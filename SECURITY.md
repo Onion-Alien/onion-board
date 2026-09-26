@@ -46,6 +46,7 @@ So you know what normal looks like when auditing it:
 |---|---|---|
 | You use the Browser tab | whatever sites you visit | it's a browser |
 | Ad blocker filter refresh | `easylist.to`, `ublockorigin.github.io` | block lists for the Browser tab |
+| You tick *Play M4A, AAC and video files* in the installer | `winget` (Microsoft's package source, then the FFmpeg build it points to) | installs `Gyan.FFmpeg.Essentials` |
 | You install the virtual cable | `vb-audio.com` | downloads VB-Cable; the installer's signature is checked before it runs |
 | Install from source (`install.ps1`) | PyPI, and `winget` if you accept installing Python | the app's `requirements.txt` |
 | You install a module | PyPI, via `pip`, plus whatever the module fetches | that module's `requirements.txt`; e.g. *live-voice* downloads a Whisper speech model (Hugging Face, via `faster-whisper`) |

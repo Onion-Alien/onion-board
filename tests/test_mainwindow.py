@@ -137,3 +137,15 @@ def test_pad_hints_show_only_on_the_sounds_tab(window):
     assert "click to play" in window.status.text()
     window.tabs.setCurrentWidget(window.setup_page)
     assert "click to play" not in window.status.text()
+
+
+def test_sounds_only_toggle_leaves_the_mic_open(window, monkeypatch):
+    opened = []
+    monkeypatch.setattr(engine.Engine, "set_mic_device", lambda self, n: opened.append(n))
+    window.chk_mic.setChecked(True)
+    window.chk_mic.setChecked(False)
+    assert window.cfg.mic_enabled is False and window.engine.mic_enabled is False
+    assert opened == []                  # only the mix changes; the mic isn't closed
+    assert "sounds only" in window.flow_mic.text()
+    window.chk_mic.setChecked(True)
+    assert window.engine.mic_enabled is True

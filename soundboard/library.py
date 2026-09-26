@@ -213,7 +213,17 @@ MIGRATIONS = {1: _migrate_1_to_2}
 # --------------------------------------------------------------------------- decoding
 
 def _ffmpeg() -> str | None:
-    return shutil.which("ffmpeg")
+    """ffmpeg on PATH, or where winget links it (the installer's M4A/video option uses
+    winget, and a process started before that doesn't see the new PATH yet)."""
+    found = shutil.which("ffmpeg")
+    if found:
+        return found
+    for env, sub in (("LOCALAPPDATA", "Microsoft/WinGet/Links"),   # per-user install
+                     ("ProgramFiles", "WinGet/Links")):            # machine-wide install
+        base = os.environ.get(env)
+        if base and (Path(base) / sub / "ffmpeg.exe").is_file():
+            return str(Path(base) / sub / "ffmpeg.exe")
+    return None
 
 
 def _decode(path: str) -> tuple[np.ndarray, bool]:

@@ -68,7 +68,8 @@ as data), licence files, `make_bunny.py` (renders the installer artwork
 `soundboard/__init__.py`. Bump `__version__` there for a release.
 
 Rebuild after changing anything under `soundboard\`, `main.py`,
-`install-vbcable.ps1`, `soundboard.ico` or `installer\`. Changes to docs, tests
+`install-vbcable.ps1`, `soundboard.ico`, `installer\` or `modules\` (the installer
+copies the add-ons from there when their boxes are ticked). Changes to docs, tests
 or `scripts\` don't need a rebuild.
 
 ## 5. Install / reinstall / uninstall
@@ -90,6 +91,13 @@ dist\SoundboardSetup.exe /VERYSILENT /SUPPRESSMSGBOXES /NORESTART /CLOSEAPPLICAT
   virtual cable is already present. If none is, VB-Cable is downloaded and
   Windows shows a **UAC prompt** — that part can't be headless, so tell the user
   to expect it.
+- Restart handling: after setup the script waits for the CABLE devices. If Windows
+  reports they need a restart it exits **3010** and writes
+  `%APPDATA%\Soundboard\cable-restart-pending`; the installer then offers
+  "Restart now / later" (suppressed by `/NORESTART`), and the setup guide shows a
+  Restart button instead of reinstalling until the PC has restarted. Check the
+  state without installing: `powershell -File install-vbcable.ps1 -Check`
+  (0 working, 3010 restart needed, 2 not installed).
 
 Headless uninstall:
 

@@ -12,20 +12,39 @@ beep use the real devices. The window's own device boxes are refreshed at the en
 """
 from __future__ import annotations
 
+import ctypes
 import subprocess
+import time
 
 import numpy as np
 from PySide6.QtCore import Qt, QTimer, QUrl
 from PySide6.QtGui import QDesktopServices
-from PySide6.QtWidgets import (QApplication, QButtonGroup, QDialog, QFrame, QHBoxLayout, QLabel,
-                               QPushButton, QRadioButton, QScrollArea, QStackedWidget,
+from PySide6.QtWidgets import (QApplication, QButtonGroup, QCheckBox, QDialog, QFrame,
+                               QHBoxLayout, QLabel,
+                               QMessageBox, QPushButton, QRadioButton, QScrollArea, QStackedWidget,
                                QVBoxLayout, QWidget)
 
 from soundboard import engine as eng
 from soundboard.bunny import bunny_pixmap
 from soundboard.engine import SR
+from soundboard import library
 from soundboard.library import RESOURCE_DIR
 from soundboard.ui.widgets import Meter
+
+RESTART_NEEDED = 3010   # install-vbcable.ps1: installed, but Windows must restart first
+
+
+def cable_restart_pending() -> bool:
+    """install-vbcable.ps1 leaves this marker when the cable needs a restart to start
+    working. Once the PC has restarted since it was written, it no longer counts."""
+    try:
+        written = (library.APP_DIR / "cable-restart-pending").stat().st_mtime
+    except OSError:
+        return False
+    tick = ctypes.windll.kernel32.GetTickCount64
+    tick.restype = ctypes.c_uint64
+    uptime = tick() / 1000
+    return written > time.time() - uptime
 
 TITLE_CSS = "font-size:17pt; font-weight:800;"
 BODY_CSS = "font-size:11pt;"
@@ -61,6 +80,7 @@ class SetupWizard(QDialog):
         self.setMinimumSize(620, 520)
         self._proc: subprocess.Popen | None = None   # the cable installer, while it runs
         self._cable_tries = 0
+        self._needs_restart = False   # the installer said Windows must restart first
 
         v = QVBoxLayout(self)
         v.setContentsMargins(24, 20, 24, 18)
@@ -142,6 +162,10 @@ class SetupWizard(QDialog):
         v.addLayout(row)
         self.mic_heard = _label("")
         v.addWidget(self.mic_heard)
+        self.chk_send = QCheckBox("Send my voice too (untick if you only want your sounds "
+                                  "to go out, not your mic)")
+        self.chk_send.setChecked(self.win.cfg.mic_enabled)
+        v.addWidget(self.chk_send)
         self._mic_peak_seen = False
         return p
 
@@ -171,8 +195,8 @@ class SetupWizard(QDialog):
         v = QVBoxLayout(p)
         v.addLayout(_header("🔌  The virtual cable", "plug"))
         v.addWidget(_label("This is a free add-on that works like an invisible microphone. "
-                           "Soundboard puts <b>your voice + your sounds</b> into it, and "
-                           "Discord or your game listens to it."))
+                           "Soundboard puts <b>your sounds</b> (and your voice, if you send "
+                           "it) into it, and Discord or your game listens to it."))
         self.cable_status = _label("")
         self.cable_status.setStyleSheet("font-size:12pt; padding:12px;")
         v.addWidget(self.cable_status)
@@ -184,6 +208,12 @@ class SetupWizard(QDialog):
         self.btn_recheck = QPushButton("⟳  Check again")
         self.btn_recheck.clicked.connect(self.recheck_cable)
         v.addWidget(self.btn_recheck)
+        self.btn_restart = QPushButton("⟲  Restart my PC now")
+        self.btn_restart.setObjectName("primary")
+        self.btn_restart.setStyleSheet("padding:12px; font-size:12pt;")
+        self.btn_restart.clicked.connect(self.restart_pc)
+        self.btn_restart.hide()
+        v.addWidget(self.btn_restart)
         v.addStretch(1)
         return p
 
@@ -246,8 +276,8 @@ class SetupWizard(QDialog):
     def finish(self):
         cfg = self.win.cfg
         cfg.setup_done = self.cable_ok()   # without the cable, offer the guide again next time
-        cfg.mic_enabled = True
-        self.win.chk_mic.setChecked(True)
+        cfg.mic_enabled = self.chk_send.isChecked()
+        self.win.chk_mic.setChecked(cfg.mic_enabled)
         cfg.save()
         self.win._init_devices()   # refresh the window's device boxes from the choices
         self.accept()
@@ -280,6 +310,7 @@ class SetupWizard(QDialog):
     def recheck_cable(self, rescan: bool = True):
         if rescan:
             self.win.refresh_devices()   # picks up a driver installed while we're open
+        self.btn_restart.hide()
         if self.cable_ok():
             if not eng.is_virtual(self.win.cfg.main_device):
                 self.win.cfg.main_device = eng.virtual_outputs()[0]
@@ -293,11 +324,20 @@ class SetupWizard(QDialog):
                                       "permission.")
             self.btn_cable.hide()
             self.btn_recheck.hide()
+        elif self._needs_restart or cable_restart_pending():
+            # installed, but Windows has to restart before it works; installing it again
+            # before then is what VB-Audio says not to do
+            self.cable_status.setText(f"<b style='color:{OK}'>✓ Installed.</b> Windows needs "
+                                      "a <b>restart</b> to finish setting it up. Restart your "
+                                      "PC and open Soundboard again — this guide will pick up "
+                                      "where you left off.")
+            self.btn_cable.hide()
+            self.btn_recheck.show()
+            self.btn_restart.show()
         elif self._cable_tries:
-            self.cable_status.setText(f"<b style='color:{BAD}'>Not showing up yet.</b> Windows "
-                                      "sometimes needs a <b>restart</b> after installing it. "
-                                      "Restart your PC and open Soundboard again — this guide "
-                                      "will pick up where you left off.")
+            self.cable_status.setText(f"<b style='color:{BAD}'>That didn't work.</b> If Windows "
+                                      "asked for permission, click <b>Yes</b> this time. If it "
+                                      "still won't install, restarting your PC often helps.")
             self.btn_cable.setText("⬇  Try installing again")
             self.btn_cable.show()
             self.btn_recheck.show()
@@ -319,6 +359,16 @@ class SetupWizard(QDialog):
             ["powershell", "-NoProfile", "-ExecutionPolicy", "Bypass", "-File", str(script),
              "-Silent"], creationflags=subprocess.CREATE_NO_WINDOW)
         self.recheck_cable(rescan=False)
+
+    def restart_pc(self):
+        if QMessageBox.question(
+                self, "Restart now?",
+                "Your PC will restart in a few seconds. Save anything you have open first.\n\n"
+                "After the restart, open Soundboard again to finish setting up.") \
+                != QMessageBox.StandardButton.Yes:
+            return
+        self.win.cfg.save()
+        subprocess.Popen(["shutdown", "/r", "/t", "5"], creationflags=subprocess.CREATE_NO_WINDOW)
 
     def _fill_discord(self):
         name = eng.virtual_mic_for(self.win.cfg.main_device)
@@ -358,8 +408,9 @@ class SetupWizard(QDialog):
             else:
                 self.mic_heard.setText("Waiting to hear you… if the bar doesn't move, pick "
                                        "another mic.")
-        if self._proc is not None and self._proc.poll() is not None:
+        if self._proc is not None and (rc := self._proc.poll()) is not None:
             self._proc = None
+            self._needs_restart = rc == RESTART_NEEDED
             self.recheck_cable()
 
 

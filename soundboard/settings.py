@@ -359,6 +359,15 @@ class SettingsDialog(QDialog):
 
     def _general(self):
         w, v = self._page()
+        card, cv = self._card("Your mic",
+                              "Normally others hear your voice and your sounds together. Untick "
+                              "this for sounds only: they hear the sounds but not your mic. "
+                              "(Same as the “send” box next to My mic.)")
+        send = QCheckBox("Send my mic to others")
+        send.setChecked(self.mw.cfg.mic_enabled)
+        send.toggled.connect(self.mw.chk_mic.setChecked)   # the window applies it
+        cv.addWidget(send)
+        v.addWidget(card)
         card, cv = self._card("Window")
         top = QCheckBox("Keep the window on top of other windows")
         top.setChecked(self.mw.cfg.always_on_top)

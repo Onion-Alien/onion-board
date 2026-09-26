@@ -2,6 +2,23 @@
 
 ## Unreleased
 
+- **Restart only when the cable needs it.** After installing VB-Cable, Soundboard
+  checks whether Windows has brought the CABLE devices up. Usually it has and you
+  carry on; if Windows needs a restart first, the installer offers *Restart now*, and
+  the setup guide shows a Restart button instead of offering to install the cable
+  again (installing over a cable that's waiting for a restart is what VB-Audio warns
+  against).
+- **Sounds only.** The *send* box next to My mic (also in Settings → General and
+  the setup guide's mic page) decides whether your voice goes out with the sounds.
+  Unticked, others hear only the sounds; the mic stays open so the meter, the tests
+  and live voice-to-speech keep working. The Record-6s test knows about it.
+- **Installer: pick what you want.** A page of tick boxes: the virtual cable,
+  M4A/AAC/video support (installs FFmpeg with winget, offered only when it's
+  missing), the retro voice effect and live voice-to-speech add-ons, and a Desktop
+  shortcut. The app also finds ffmpeg in winget's Links folder, so m4a works right
+  after installing without a restart.
+- **README:** a plain-English *Get started* section first; the technical details
+  moved under *Advanced*.
 - **Ad blocking in the browser tab.** Requests are filtered by Brave's adblock engine
   (new `adblock` dependency) using the EasyList, EasyPrivacy and uBlock Origin lists,
   which are downloaded in the background, cached and refreshed every four days. On

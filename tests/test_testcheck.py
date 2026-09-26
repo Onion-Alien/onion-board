@@ -59,3 +59,9 @@ def test_loud_sounds_produce_advice():
     out = np.stack([voice + 4 * _sound()] * 2, 1)
     r = analyze(out, RATE, mic, RATE, sound_vol=1.0)
     assert r["voice_in"] and r["diff"] > 20 and "drown" in r["advice"]
+
+
+def test_sounds_only_summary_doesnt_ask_for_the_voice():
+    r = {"talked": False, "voice_in": False, "sounds_in": True, "advice": ""}
+    html = summary_html(r, None, mic_sent=False)
+    assert "Sounds only" in html and "Didn't hear you talk" not in html

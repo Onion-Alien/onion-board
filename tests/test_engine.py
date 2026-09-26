@@ -227,3 +227,19 @@ def test_close_marks_voices_done_on_that_output():
     assert "mon" in v.done and not v.finished
     e._close("main_stream")
     assert v.finished
+
+
+def test_sounds_only_keeps_the_mic_out_of_the_cable():
+    e = Engine()
+    e.main_stream = object()             # stands in for an open cable output
+    e.ring_main.prefill = 0
+    e.mic_enabled = False                # "send my mic" unticked
+    e._mic(np.full((480, 1), 0.5, np.float32))
+    assert e.level_mic > 0.4             # the mic is still heard (meter, live voice)
+    out = np.zeros((480, 2), np.float32)
+    e._main(out, 480)
+    assert not out.any()                 # but nothing of it reaches the cable
+    e.mic_enabled = True
+    e._mic(np.full((480, 1), 0.5, np.float32))
+    e._main(out, 480)
+    assert out.any()

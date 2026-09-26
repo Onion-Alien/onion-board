@@ -98,3 +98,60 @@ def test_steam_guide_names_the_cable_mic(wizard, monkeypatch, tmp_path):
     wiz.resize(700, 600)
     wiz.grab().save(str(tmp_path.parent / "wizard-last.png"))
     g.done(0)
+
+
+def test_finish_keeps_the_send_my_voice_choice(wizard, devices):
+    w, wiz = wizard
+    wiz.chk_send.setChecked(False)
+    wiz.go(3)
+    wiz.next_clicked()
+    assert library.Config.load().mic_enabled is False
+    assert not w.chk_mic.isChecked() and w.engine.mic_enabled is False
+
+
+class _DoneProc:
+    def __init__(self, rc):
+        self.rc = rc
+
+    def poll(self):
+        return self.rc
+
+
+def test_installer_needing_a_restart_offers_restart_not_reinstall(wizard, devices):
+    devices["cable"] = False
+    w, wiz = wizard
+    wiz.go(2)
+    wiz._cable_tries, wiz._proc = 1, _DoneProc(setupwizard.RESTART_NEEDED)
+    wiz._tick()
+    assert "restart" in wiz.cable_status.text()
+    assert not wiz.btn_restart.isHidden() and wiz.btn_cable.isHidden()
+
+
+def test_failed_install_offers_to_try_again(wizard, devices):
+    devices["cable"] = False
+    w, wiz = wizard
+    wiz.go(2)
+    wiz._cable_tries, wiz._proc = 1, _DoneProc(1)
+    wiz._tick()
+    assert "didn't work" in wiz.cable_status.text()
+    assert not wiz.btn_cable.isHidden() and wiz.btn_restart.isHidden()
+
+
+def test_restart_marker_counts_only_until_the_pc_restarts(wizard, devices, app_dir):
+    import os
+    import time
+
+    devices["cable"] = False
+    w, wiz = wizard
+    marker = app_dir / "cable-restart-pending"
+    marker.write_text("x")
+    assert setupwizard.cable_restart_pending()       # written this boot
+    wiz.go(2)
+    wiz.recheck_cable()
+    assert not wiz.btn_restart.isHidden() and wiz.btn_cable.isHidden()
+
+    past = time.time() - 10 * 365 * 86400             # written before the last boot
+    os.utime(marker, (past, past))
+    assert not setupwizard.cable_restart_pending()
+    wiz.recheck_cable()
+    assert wiz.btn_restart.isHidden() and not wiz.btn_cable.isHidden()

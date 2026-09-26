@@ -77,15 +77,20 @@ def analyze(out: np.ndarray, out_rate: int, mic: np.ndarray | None, mic_rate: in
     return res
 
 
-def summary_html(r: dict, cable: str | None) -> str:
+def summary_html(r: dict, cable: str | None, mic_sent: bool = True) -> str:
+    """`mic_sent` False = sounds-only mode: the voice isn't expected in the output."""
     ok, bad, warn = "#13ce66", "#ff4d4f", "#ffb020"
     lines = []
-    if not r["talked"]:
+    if not mic_sent:
+        lines.append((ok, "— Sounds only: your mic isn't sent (untick/tick “send” next to "
+                          "My mic to change that)"))
+    elif not r["talked"]:
         lines.append((warn, "⚠ Didn't hear you talk — talk during the test to check your mic"))
     elif r["voice_in"]:
         lines.append((ok, "✓ Your VOICE is in the output"))
     else:
-        lines.append((bad, "✗ Your voice is NOT reaching the output — is “My mic” turned on?"))
+        lines.append((bad, "✗ Your voice is NOT reaching the output — is “send” ticked "
+                           "next to My mic?"))
     if r["sounds_in"]:
         lines.append((ok, "✓ SOUNDS are in the output"))
     else:

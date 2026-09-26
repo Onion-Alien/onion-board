@@ -215,8 +215,10 @@ class MainWindow(QMainWindow):
         self.mic_lbl = QLabel("My mic")
         self.mic_lbl.setStyleSheet("font-weight:600;")
         h.addWidget(self.mic_lbl)
-        self.chk_mic = QCheckBox("on")
-        self.chk_mic.setToolTip("Mix your real mic in, so they still hear you talk")
+        self.chk_mic = QCheckBox("send")
+        self.chk_mic.setToolTip("Send your voice to others along with the sounds.\n"
+                                "Untick for sounds only: they hear your sounds but not "
+                                "your mic.")
         self.chk_mic.setChecked(c.mic_enabled)
         self.chk_mic.toggled.connect(self.on_mic_toggle)
         h.addWidget(self.chk_mic)
@@ -588,7 +590,7 @@ class MainWindow(QMainWindow):
         e = self.engine
         e.sound_vol, e.mic_vol, e.mon_vol = c.sound_vol, c.mic_vol, c.mon_vol
         e.mic_enabled, e.monitor_sounds = c.mic_enabled, c.monitor_sounds
-        e.set_mic_device(c.mic_device if c.mic_enabled else None)
+        e.set_mic_device(c.mic_device)
         e.set_main_device(c.main_device)
         e.set_mon_device(c.mon_device)
         self._update_status()
@@ -611,7 +613,7 @@ class MainWindow(QMainWindow):
         elif attr == "mon_device":
             self.engine.set_mon_device(name)
         else:
-            self.engine.set_mic_device(name if self.cfg.mic_enabled else None)
+            self.engine.set_mic_device(name)
         self.cfg.save()
         self._update_status()
         self._prepare_all()
@@ -622,8 +624,10 @@ class MainWindow(QMainWindow):
                          daemon=True, name="prepare").start()
 
     def on_mic_toggle(self, b):
+        """Send my mic to others, or sounds only. The mic itself stays open either
+        way (the meter, the tests and live voice-to-speech still hear it); this only
+        decides whether it's mixed into what others get."""
         self.set_option("mic_enabled", b)
-        self.engine.set_mic_device(self.cfg.mic_device if b else None)
         self._update_status()
 
     def _update_status(self):
@@ -664,7 +668,9 @@ class MainWindow(QMainWindow):
     def _update_flow(self, talking=False):
         e = self.engine
         ok, bad = "#13ce66", "#ff4d4f"
-        if e.mic_stream is None or not self.cfg.mic_enabled:
+        if not self.cfg.mic_enabled:
+            mic = "Your mic  <b style='color:#ffb020'>not sent (sounds only)</b>"
+        elif e.mic_stream is None:
             mic = f"Your mic  <b style='color:{bad}'>✗ off</b>"
         elif talking:
             mic = f"Your mic  <b style='color:{ok}'>✓ hearing you</b>"
@@ -1180,8 +1186,8 @@ class MainWindow(QMainWindow):
                                    "font-weight:600;")
         self.mic_meter.hot = on
         if on and not self.cfg.mic_enabled:
-            self.status.setText("<span style='color:#ffb020'>“My mic” is off — "
-                                "nobody (including you) will hear your mic.</span>")
+            self.status.setText("<span style='color:#ffb020'>Sounds only: your mic isn't "
+                                "sent, so nobody (including you) hears it.</span>")
 
     def start_test(self):
         if self.engine.main_stream is None:
@@ -1231,10 +1237,13 @@ class MainWindow(QMainWindow):
         if self._stop_capture() and self._cap:
             data, rate, cable = np.concatenate(self._cap), self._cap_rate, True
         mic = e.take_mic_recording()
+        if not self.cfg.mic_enabled:   # sounds only: don't go looking for the voice
+            mic = None
         try:
             r = analyze_output(data, rate, mic[0] if mic else None, mic[1] if mic else SR,
                                self.cfg.sound_vol)
-            self.test_result.setText(summary_html(r, self._cap_name if cable else None))
+            self.test_result.setText(summary_html(r, self._cap_name if cable else None,
+                                                  mic_sent=self.cfg.mic_enabled))
         except Exception as ex:  # noqa: BLE001
             log.exception("test analysis failed")
             self.test_result.setText(
