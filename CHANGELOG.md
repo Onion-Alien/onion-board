@@ -2,6 +2,17 @@
 
 ## Unreleased
 
+- **Browser hotkeys** (global, work in-game): record start/stop (Ctrl+Alt+R), save
+  the last 15s (Ctrl+Alt+C), play/pause (Ctrl+Alt+P), LIVE on/off (Ctrl+Alt+L).
+  Record/save hotkeys confirm with a short beep in your headphones only.
+- **⚙ Settings window** (top right) with every hotkey in one place, themes and window
+  options. Giving a key to one action takes it off any other action or sound.
+- **Themes**: Dark, Light, Toxic (green) and Ocean (blue). They switch instantly and
+  are remembered.
+- **New logo**: a microphone whose head is an equalizer, on a gradient. Shown in the
+  header (in the theme's colours), the taskbar and the shortcuts (`make_icon.py`
+  regenerates `soundboard.ico`).
+
 - **🍃 Lite mode** for the Browser tab (on by default), to keep it light while you
   play. When something starts playing, the page is swapped for a small player (title,
   time, ⏪10s ⏯ 10s⏩ ⏭), so nothing is drawn or decoded as video, and YouTube drops to

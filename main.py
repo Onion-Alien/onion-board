@@ -30,8 +30,10 @@ from PySide6.QtWidgets import (QAbstractScrollArea, QAbstractSlider, QAbstractSp
                                QWidget)
 
 import engine as eng
+import theme
 import winkeys
 from browser import BrowserTab
+from settings import HOTKEY_ACTIONS, HotkeyDialog, SettingsDialog, pretty_key
 from winkeys import Hotkeys
 from engine import SR, Engine
 from library import (AUDIO_EXTS, PAD_COLORS, Config, SoundMeta, decode, delete_file, import_file,
@@ -47,42 +49,6 @@ PAD_MIME = "application/x-soundboard-pad"
 
 def is_virtual_cable(name: str) -> bool:
     return eng.is_virtual(name)
-
-
-def pretty_key(combo: str) -> str:
-    if not combo:
-        return ""
-    return "+".join(p.strip().title() if len(p.strip()) > 1 else p.strip().upper()
-                    for p in combo.split("+"))
-
-
-class HotkeyDialog(QDialog):
-    def __init__(self, hotkeys: Hotkeys, parent=None):
-        super().__init__(parent)
-        self.setWindowTitle("Set hotkey")
-        self.result_combo = None
-        lay = QVBoxLayout(self)
-        t = QLabel("Press the key or combo you want…")
-        t.setStyleSheet("font-size:16px; font-weight:600;")
-        lay.addWidget(t)
-        lay.addWidget(QLabel("Works globally, even while in-game.  Esc = cancel."))
-        self.setMinimumWidth(340)
-        hotkeys.pause()   # so pressing an existing hotkey here doesn't trigger it
-
-    def keyPressEvent(self, e):
-        vk = e.nativeVirtualKey()
-        if vk == 0x1B:            # Esc
-            self.reject()
-            return
-        if vk in winkeys.MODIFIER_VKS or not vk:
-            return                # wait for the real key
-        m = e.modifiers()
-        mods = ((winkeys.MOD_CONTROL if m & Qt.ControlModifier else 0)
-                | (winkeys.MOD_ALT if m & Qt.AltModifier else 0)
-                | (winkeys.MOD_SHIFT if m & Qt.ShiftModifier else 0)
-                | (winkeys.MOD_WIN if m & Qt.MetaModifier else 0))
-        self.result_combo = winkeys.combo_name(mods, vk)
-        self.accept()
 
 
 # =========================================================================== widgets
@@ -103,7 +69,7 @@ class Meter(QWidget):
         p.setRenderHint(QPainter.Antialiasing)
         r = self.rect()
         p.setPen(Qt.NoPen)
-        p.setBrush(QColor("#1b1d26"))
+        p.setBrush(QColor(theme.T["inset"]))
         p.drawRoundedRect(r, 4, 4)
         db = 20 * np.log10(max(self.level, 1e-5))
         frac = float(np.clip((db + 50) / 50, 0, 1))
@@ -156,10 +122,10 @@ class EqCurve(QWidget):
         p.setRenderHint(QPainter.Antialiasing)
         r = QRectF(self.rect()).adjusted(1, 1, -1, -1)
         p.setPen(Qt.NoPen)
-        p.setBrush(QColor("#15171f"))
+        p.setBrush(QColor(theme.T["bg"]))
         p.drawRoundedRect(r, 8, 8)
         mid = r.center().y()
-        p.setPen(QPen(QColor("#2a2e3d"), 1))
+        p.setPen(QPen(QColor(theme.T["groove"]), 1))
         p.drawLine(int(r.left() + 6), int(mid), int(r.right() - 6), int(mid))
         db = eq_response(self.gains, self._freqs)
         scale = (r.height() / 2 - 6) / EQ_MAX_DB
@@ -169,12 +135,12 @@ class EqCurve(QWidget):
             x = r.left() + 6 + (r.width() - 12) * i / (n - 1)
             y = mid - float(np.clip(d, -EQ_MAX_DB - 3, EQ_MAX_DB + 3)) * scale
             path.moveTo(x, y) if i == 0 else path.lineTo(x, y)
-        col = QColor("#7c5cff" if self.on else "#4a5068")
+        col = QColor(theme.T["accent"] if self.on else theme.T["off"])
         p.setPen(QPen(col, 2.2))
         p.setBrush(Qt.NoBrush)
         p.drawPath(path)
         if not self.on:
-            p.setPen(QColor("#6b7189"))
+            p.setPen(QColor(theme.T["faint"]))
             p.drawText(r, Qt.AlignCenter, "EQ off")
 
 
@@ -252,7 +218,8 @@ class Pad(QWidget):
         p.setRenderHint(QPainter.Antialiasing)
         r = QRectF(self.rect()).adjusted(2, 2, -2, -2)
         accent = QColor(self.meta.color)
-        base = QColor("#232633") if not self.hover else QColor("#2b2f3f")
+        T = theme.T
+        base = QColor(T["card_hi"] if self.hover else T["card"])
         path = QPainterPath()
         path.addRoundedRect(r, 12, 12)
         p.fillPath(path, base)
@@ -268,16 +235,16 @@ class Pad(QWidget):
                 pen.setStyle(Qt.DashLine)
             p.setPen(pen)
         elif self.selected:
-            p.setPen(QPen(QColor("#5a6080"), 1.6))
+            p.setPen(QPen(QColor(T["border_hi"]), 1.6))
         else:
-            p.setPen(QPen(QColor("#343849"), 1.2))
+            p.setPen(QPen(QColor(T["border"]), 1.2))
         p.drawPath(path)
         # accent bar
         p.setPen(Qt.NoPen)
         p.setBrush(accent)
         p.drawRoundedRect(QRectF(r.left() + 10, r.top() + 10, 22, 4), 2, 2)
         # name
-        p.setPen(QColor("#f1f3f9") if self.state == "ready" else QColor("#8a90a6"))
+        p.setPen(QColor(T["text_hi"] if self.state == "ready" else T["muted"]))
         f = QFont(self.font())
         f.setPointSizeF(10.5)
         f.setBold(True)
@@ -290,14 +257,14 @@ class Pad(QWidget):
         p.setFont(f)
         foot = r.adjusted(10, r.height() - 24, -10, -6)
         if self.state == "loading":
-            p.setPen(QColor("#8a90a6"))
+            p.setPen(QColor(T["muted"]))
             p.drawText(foot, Qt.AlignLeft | Qt.AlignVCenter, "loading…")
         elif self.state == "error":
             p.setPen(QColor("#ff6b6b"))
             p.drawText(foot, Qt.AlignLeft | Qt.AlignVCenter, "can't load file")
         else:
             flags = ("⟳ " if self.meta.loop else "") + {"overlap": "⧉ ", "toggle": "⏯ "}.get(self.meta.mode, "")
-            p.setPen(QColor("#8a90a6"))
+            p.setPen(QColor(T["muted"]))
             right = "❚❚ paused" if self.paused else f"{flags}{self.meta.duration:.1f}s"
             p.drawText(foot, Qt.AlignRight | Qt.AlignVCenter, right)
             if self.meta.hotkey:
@@ -306,9 +273,9 @@ class Pad(QWidget):
                 w = min(fm.horizontalAdvance(hk) + 12, foot.width() * 0.68)
                 badge = QRectF(foot.left(), foot.top() + 1, w, foot.height() - 2)
                 p.setPen(Qt.NoPen)
-                p.setBrush(QColor("#343849"))
+                p.setBrush(QColor(T["badge"]))
                 p.drawRoundedRect(badge, 5, 5)
-                p.setPen(QColor("#d6d9e6"))
+                p.setPen(QColor(T["badge_text"]))
                 p.drawText(badge, Qt.AlignCenter,
                            fm.elidedText(hk, Qt.ElideRight, int(badge.width()) - 8))
 
@@ -328,7 +295,7 @@ class PadGrid(QWidget):
         self.empty = QLabel("Drop sound files here\nor click  ＋ Add sounds\n\n"
                             "mp3 · wav · ogg · flac · m4a · even video files")
         self.empty.setAlignment(Qt.AlignCenter)
-        self.empty.setStyleSheet("color:#6b7189; font-size:15px; padding:60px;")
+        self.empty.setObjectName("empty")
         self._cols = 0
 
     def set_pads(self, pads):
@@ -472,7 +439,8 @@ class EditDialog(QDialog):
     def _set_color(self, c):
         self.color = c
         for b, col in self.swatches:
-            border = "3px solid white" if col == c else "1px solid #444"
+            border = (f"3px solid {theme.T['text']}" if col == c
+                      else f"1px solid {theme.T['border']}")
             b.setStyleSheet(f"background:{col}; border:{border}; border-radius:12px;")
 
     def _set_hk(self, combo):
@@ -506,8 +474,11 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Soundboard")
-        self.setWindowIcon(make_icon())
+        self.setWindowIcon(theme.app_icon())
         self.cfg = Config.load()
+        app = QApplication.instance()
+        if app is not None:   # before the UI is built, so everything polishes in-theme
+            self.cfg.theme = theme.apply(app, self.cfg.theme)
         self.engine = Engine()
         self.audio: dict[str, np.ndarray] = {}
         self.pads: dict[str, Pad] = {}
@@ -541,9 +512,37 @@ class MainWindow(QMainWindow):
     def _build_ui(self):
         root = QWidget()
         self.setCentralWidget(root)
-        h = QHBoxLayout(root)
-        h.setContentsMargins(14, 14, 14, 10)
+        rv = QVBoxLayout(root)
+        rv.setContentsMargins(14, 10, 14, 10)
+        rv.setSpacing(8)
+
+        # ---- header: logo + name, settings on the right
+        head = QHBoxLayout()
+        head.setSpacing(10)
+        self.logo = QLabel()
+        self.logo.setFixedSize(34, 34)
+        head.addWidget(self.logo)
+        names = QVBoxLayout()
+        names.setSpacing(0)
+        wm = QLabel("SOUNDBOARD")
+        wm.setObjectName("wordmark")
+        tag = QLabel("sounds + browser, straight into your mic")
+        tag.setObjectName("tagline")
+        names.addWidget(wm)
+        names.addWidget(tag)
+        head.addLayout(names)
+        head.addStretch(1)
+        gear = QPushButton("⚙  Settings")
+        gear.setObjectName("settings")
+        gear.setToolTip("Themes, hotkeys and more")
+        gear.clicked.connect(lambda: self.open_settings())
+        head.addWidget(gear)
+        rv.addLayout(head)
+        self._paint_logo()
+
+        h = QHBoxLayout()
         h.setSpacing(14)
+        rv.addLayout(h, 1)
 
         # ---- left: tabs (sounds / browser), with the mic banner + status around them
         outer = QVBoxLayout()
@@ -622,7 +621,7 @@ class MainWindow(QMainWindow):
         self.np_time = QLabel("0:00 / 0:00")
         self.np_time.setFixedWidth(84)
         self.np_time.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
-        self.np_time.setStyleSheet("color:#8a90a6;")
+        self.np_time.setObjectName("muted")
         th.addWidget(self.btn_pp)
         th.addWidget(self.btn_st)
         th.addWidget(self.np_name)
@@ -643,7 +642,7 @@ class MainWindow(QMainWindow):
 
         self.status = QLabel()
         self.status.setWordWrap(True)
-        self.status.setStyleSheet("color:#8a90a6;")
+        self.status.setObjectName("muted")
         outer.addWidget(self.status)
         h.addLayout(outer, 1)
 
@@ -680,7 +679,7 @@ class MainWindow(QMainWindow):
         self.flow_mic = QLabel()
         self.flow_snd = QLabel("🔊  Your soundboard sounds")
         arrow = QLabel("⬇   the app mixes them together   ⬇")
-        arrow.setStyleSheet("color:#8a90a6;")
+        arrow.setObjectName("muted")
         self.flow_out = QLabel()
         for w in (self.flow_mic, self.flow_snd, arrow, self.flow_out):
             w.setTextFormat(Qt.RichText)
@@ -689,8 +688,7 @@ class MainWindow(QMainWindow):
         self.step_lbl = QLabel()
         self.step_lbl.setWordWrap(True)
         self.step_lbl.setTextFormat(Qt.RichText)
-        self.step_lbl.setStyleSheet("background:#15171f; border-radius:8px; padding:8px; "
-                                    "margin-top:6px;")
+        self.step_lbl.setObjectName("stepbox")
         cv.addWidget(self.step_lbl)
         self.btn_install = QPushButton("⬇  Install the free virtual cable")
         self.btn_install.setObjectName("primary")
@@ -754,7 +752,7 @@ class MainWindow(QMainWindow):
         self.test_result = QLabel()
         self.test_result.setWordWrap(True)
         self.test_result.setTextFormat(Qt.RichText)
-        self.test_result.setStyleSheet("background:#232633; border-radius:8px; padding:8px;")
+        self.test_result.setObjectName("resultbox")
         self.test_result.hide()
         pv.addWidget(self.test_result)
 
@@ -805,37 +803,16 @@ class MainWindow(QMainWindow):
         self._build_eq(pv, section, hint)
 
         section("HOTKEYS")
-        self.btn_stop_hk = QPushButton()
-        self.btn_stop_hk.clicked.connect(self.set_stop_hotkey)
-        row = QHBoxLayout()
-        row.addWidget(QLabel("Stop all"))
-        row.addWidget(self.btn_stop_hk, 1)
-        pv.addLayout(row)
-        self.btn_pause_hk = QPushButton()
-        self.btn_pause_hk.clicked.connect(self.set_pause_hotkey)
-        row = QHBoxLayout()
-        row.addWidget(QLabel("Pause all"))
-        row.addWidget(self.btn_pause_hk, 1)
-        pv.addLayout(row)
-        self.btn_ptt = QPushButton()
-        self.btn_ptt.clicked.connect(self.set_ptt)
-        self.btn_ptt.setToolTip("Holds this key down while a sound is playing — "
-                                "set it to your in-game push-to-talk key.")
-        row = QHBoxLayout()
-        row.addWidget(QLabel("Hold PTT"))
-        row.addWidget(self.btn_ptt, 1)
-        pv.addLayout(row)
-        self._refresh_hk_buttons()
-        self.chk_top = QCheckBox("Keep window on top")
-        self.chk_top.setChecked(self.cfg.always_on_top)
-        self.chk_top.toggled.connect(self.on_top_toggle)
-        pv.addWidget(self.chk_top)
+        hk = QPushButton("⌨  Hotkeys, push-to-talk & more…")
+        hk.setToolTip("Opens Settings → Hotkeys")
+        hk.clicked.connect(lambda: self.open_settings("hotkeys"))
+        pv.addWidget(hk)
         pv = base_pv
 
         def set_adv(on):
             adv.setVisible(on)
             self.btn_adv.setText("⚙  Advanced  ▾   (hide)" if on else
-                                 "⚙  Advanced  ▸   devices, EQ, hotkeys…")
+                                 "⚙  Advanced  ▸   devices, EQ…")
             self.cfg.show_advanced = on
             self._save_later()
         self.btn_adv.toggled.connect(set_adv)
@@ -887,14 +864,14 @@ class MainWindow(QMainWindow):
         for i, lab in enumerate(EQ_LABELS):
             val = QLabel("0")
             val.setAlignment(Qt.AlignCenter)
-            val.setStyleSheet("font-size:8pt; color:#8a90a6;")
+            val.setObjectName("eqlabel")
             s = QSlider(Qt.Vertical)
             s.setRange(-EQ_MAX_DB * 2, EQ_MAX_DB * 2)   # half-dB steps
             s.setFixedHeight(96)
             s.setToolTip(f"{lab} Hz")
             f = QLabel(lab)
             f.setAlignment(Qt.AlignCenter)
-            f.setStyleSheet("font-size:8pt; color:#8a90a6;")
+            f.setObjectName("eqlabel")
             grid.addWidget(val, 0, i)
             grid.addWidget(s, 1, i, Qt.AlignHCenter)
             grid.addWidget(f, 2, i)
@@ -994,8 +971,8 @@ class MainWindow(QMainWindow):
         v.addWidget(s)
 
         def paint_spin(pct):
-            col = "#e6e8f0" if pct <= 100 else "#ffb020" if pct <= 300 else "#ff4d4f"
-            spin.setStyleSheet(f"color:{col}; font-weight:600;")
+            col = "" if pct <= 100 else "color:#ffb020;" if pct <= 300 else "color:#ff4d4f;"
+            spin.setStyleSheet(f"{col} font-weight:600;")   # normal: the theme's text colour
 
         def from_slider(pct):
             spin.blockSignals(True)
@@ -1212,10 +1189,10 @@ class MainWindow(QMainWindow):
     # ------------------------------------------------------------------ hotkeys
     def register_hotkeys(self):
         mapping = {}
-        if self.cfg.stop_hotkey:
-            mapping[self.cfg.stop_hotkey] = "__stop__"
-        if self.cfg.pause_hotkey:
-            mapping.setdefault(self.cfg.pause_hotkey, "__pause__")
+        for attr, action, _label, _desc in HOTKEY_ACTIONS:
+            combo = getattr(self.cfg, attr)
+            if combo:
+                mapping.setdefault(combo, action)
         for m in self.cfg.sounds:
             if m.hotkey:
                 mapping.setdefault(m.hotkey, m.id)
@@ -1229,49 +1206,70 @@ class MainWindow(QMainWindow):
                                 + ", ".join(pretty_key(c) for c in failed)
                                 + " — pick a different hotkey.</span>")
 
-    def _refresh_hk_buttons(self):
-        self.btn_stop_hk.setText(pretty_key(self.cfg.stop_hotkey) or "Click to set…")
-        self.btn_pause_hk.setText(pretty_key(self.cfg.pause_hotkey) or "Click to set…")
-        self.btn_ptt.setText(pretty_key(self.cfg.ptt_key) or "Off (click to set)")
-
-    def set_stop_hotkey(self):
-        d = HotkeyDialog(self.hotkeys, self)
-        if d.exec() and d.result_combo:
-            self.cfg.stop_hotkey = d.result_combo
-            self.cfg.save()
-        self._refresh_hk_buttons()
+    def set_global_hotkey(self, attr: str, combo: str):
+        """Set one of the app-wide hotkeys (or ptt_key). A combo can only do one thing,
+        so it's taken off any other action or sound that had it."""
+        if combo:
+            if attr != "ptt_key":
+                for other, *_ in HOTKEY_ACTIONS:
+                    if other != attr and getattr(self.cfg, other) == combo:
+                        setattr(self.cfg, other, "")
+                for m in self.cfg.sounds:
+                    if m.hotkey == combo:
+                        m.hotkey = ""
+                        if m.id in self.pads:
+                            self.pads[m.id].update()
+        setattr(self.cfg, attr, combo)
+        self.cfg.save()
         self.register_hotkeys()
 
-    def set_pause_hotkey(self):
-        d = HotkeyDialog(self.hotkeys, self)
-        if d.exec() and d.result_combo:
-            self.cfg.pause_hotkey = d.result_combo
-            self.cfg.save()
-        self._refresh_hk_buttons()
-        self.register_hotkeys()
+    def open_settings(self, page: str = "appearance"):
+        SettingsDialog(self, page).exec()
+        self.register_hotkeys()   # in case a capture was cancelled
 
-    def set_ptt(self):
-        if self.cfg.ptt_key:
-            if QMessageBox.question(self, "Push-to-talk", "Turn off auto push-to-talk?") \
-                    == QMessageBox.Yes:
-                self.cfg.ptt_key = ""
-                self.cfg.save()
-                self._refresh_hk_buttons()
-                return
-        d = HotkeyDialog(self.hotkeys, self)
-        if d.exec() and d.result_combo:
-            self.cfg.ptt_key = d.result_combo
-            self.cfg.save()
-        self._refresh_hk_buttons()
-        self.register_hotkeys()
+    def apply_theme(self, name: str):
+        self.cfg.theme = theme.apply(QApplication.instance(), name)
+        self._paint_logo()
+        self._save_later()
+
+    def _paint_logo(self):
+        dpr = self.devicePixelRatioF() or 1.0
+        pm = theme.logo_pixmap(int(34 * dpr), theme.T["accent"], theme.T["accent2"])
+        pm.setDevicePixelRatio(dpr)
+        self.logo.setPixmap(pm)
 
     def on_hotkey(self, action):
+        b = self.browser
         if action == "__stop__":
             self.stop_all()
         elif action == "__pause__":
             self.engine.pause_all()
+        elif action == "__rec__":
+            b.btn_rec.toggle()
+            self.cue("start" if b.recorder.recording else "stop")
+        elif action == "__clip__":
+            self.cue("saved" if b.clip_last() else "fail")
+        elif action == "__bplay__":
+            b.toggle_play()
+        elif action == "__live__":
+            b.btn_live.toggle()
+            self.cue("start" if self.cfg.browser_live else "stop")
         else:
             self.play(action)
+
+    CUES = {"start": (660, 990), "stop": (990, 660), "saved": (880, 880, 1320), "fail": (330, 247)}
+
+    def cue(self, kind: str):
+        """A short beep in the headphones only (others never hear it), so a hotkey pressed
+        in-game is confirmed without looking at the app."""
+        if not self.cfg.cue_sounds or self.engine.mon_stream is None:
+            return   # (with no headphone device a preview would go out to the cable)
+        notes, n = self.CUES[kind], int(0.075 * SR)
+        t = np.arange(n) / SR
+        env = np.minimum(1.0, np.minimum(t, t[::-1]) / 0.008)   # 8 ms fade in/out
+        tone = np.concatenate([np.sin(2 * np.pi * f * t) * env for f in notes]) * 0.18
+        self.engine.play("__cue__", np.stack([tone, tone], 1).astype(np.float32), 1.0,
+                         mode="restart", preview=True)
 
     def stop_all(self):
         self.engine.stop_all()
@@ -1509,10 +1507,9 @@ class MainWindow(QMainWindow):
                 o.hotkey = ""
                 if o.id in self.pads:
                     self.pads[o.id].update()
-        for attr in ("stop_hotkey", "pause_hotkey"):
+        for attr, *_ in HOTKEY_ACTIONS:
             if m.hotkey and m.hotkey == getattr(self.cfg, attr):
                 setattr(self.cfg, attr, "")
-                self._refresh_hk_buttons()
 
     def edit(self, sid):
         m = self.meta(sid)
@@ -1676,86 +1673,7 @@ class MainWindow(QMainWindow):
 
 # =========================================================================== theme
 
-STYLE = """
-QWidget { background:#15171f; color:#e6e8f0; font-family:'Segoe UI'; font-size:10pt; }
-QFrame#panel { background:#1c1f2a; border-radius:14px; }
-QFrame#panel QWidget { background:transparent; }
-QLabel#section { color:#8f96b3; font-size:8pt; font-weight:700; letter-spacing:1px; padding-top:8px; }
-QLabel#hint { color:#8a90a6; font-size:8.5pt; }
-QPushButton { background:#2a2e3d; border:1px solid #363b4e; border-radius:8px; padding:7px 12px; }
-QPushButton:hover { background:#333849; }
-QPushButton:pressed { background:#3c4257; }
-QPushButton:checked { background:#7c5cff; border-color:#7c5cff; color:white; }
-QPushButton:disabled { color:#8a90a6; }
-QPushButton#primary { background:#7c5cff; border:none; color:white; font-weight:600; }
-QPushButton#primary:hover { background:#8d71ff; }
-QPushButton#danger { background:#3a2230; border:1px solid #5a2a3e; color:#ff8fa3; font-weight:600; }
-QPushButton#danger:hover { background:#4a2a3c; }
-QPushButton#small { padding:2px 8px; font-size:8pt; }
-QFrame#transport { background:#1c1f2a; border-radius:12px; }
-QFrame#panel QPushButton#advtoggle { background:#2a2e3d; padding:10px; font-weight:600;
-    text-align:left; margin-top:8px; }
-QFrame#panel QPushButton#advtoggle:checked { background:#2a2e3d; color:#e6e8f0; }
-QFrame#panel QPushButton#primary { background:#7c5cff; color:white; border:none; padding:9px; }
-QFrame#panel QPushButton#primary:hover { background:#8d71ff; }
-QFrame#panel QFrame#howcard { background:#232633; border-radius:10px; }
-QFrame#panel QFrame#volbox { background:#232633; border-radius:10px; }
-QSpinBox { background:#15171f; border:1px solid #363b4e; border-radius:6px; padding:3px 4px; }
-QSpinBox::up-button, QSpinBox::down-button { width:0; }
-QSlider::groove:vertical { width:4px; background:#343849; border-radius:2px; }
-QSlider::add-page:vertical { background:#7c5cff; border-radius:2px; }
-QSlider::handle:vertical { background:white; width:14px; height:14px; margin:0 -5px; border-radius:7px; }
-QPushButton#micbanner { background:#e53935; color:white; font-weight:700; font-size:11pt;
-    border:none; border-radius:10px; padding:10px; }
-QFrame#panel QPushButton#miccheck:checked { background:#e53935; border:1px solid #ff6b6b; color:white;
-    font-weight:700; }
-QFrame#transport QLabel, QFrame#transport QCheckBox { background:transparent; }
-QPushButton#round { padding:0; font-size:14pt; border-radius:10px; }
-QSlider#seek::groove:horizontal { height:6px; border-radius:3px; }
-QSlider#seek::sub-page:horizontal { border-radius:3px; }
-QLineEdit, QComboBox { background:#232633; border:1px solid #363b4e; border-radius:8px; padding:6px 8px; }
-QFrame#panel QComboBox, QFrame#panel QPushButton { background:#232633; }
-QFrame#panel QPushButton:checked { background:#7c5cff; }
-QComboBox QAbstractItemView { background:#232633; selection-background-color:#7c5cff; }
-QSlider::groove:horizontal { height:4px; background:#343849; border-radius:2px; }
-QSlider::sub-page:horizontal { background:#7c5cff; border-radius:2px; }
-QSlider::handle:horizontal { background:white; width:14px; height:14px; margin:-5px 0; border-radius:7px; }
-QCheckBox::indicator { width:16px; height:16px; border-radius:4px; border:1px solid #4a5068; background:#232633; }
-QCheckBox::indicator:checked { background:#7c5cff; border-color:#7c5cff; }
-QScrollArea, QScrollArea > QWidget > QWidget { background:transparent; }
-QScrollBar:vertical { background:transparent; width:10px; }
-QScrollBar::handle:vertical { background:#343849; border-radius:5px; min-height:30px; }
-QScrollBar::add-line, QScrollBar::sub-line { height:0; }
-QMenu { background:#232633; border:1px solid #363b4e; padding:4px; }
-QMenu::item { padding:6px 18px; border-radius:6px; }
-QMenu::item:selected { background:#7c5cff; }
-QToolTip { background:#232633; color:#e6e8f0; border:1px solid #363b4e; }
-QTabWidget::pane { border:none; }
-QTabBar { qproperty-drawBase: 0; }
-QTabBar::tab { background:transparent; color:#8a90a6; padding:8px 16px; margin-right:4px;
-    border:none; border-bottom:2px solid transparent; font-weight:600; }
-QTabBar::tab:selected { color:#e6e8f0; border-bottom:2px solid #7c5cff; }
-QTabBar::tab:hover { color:#e6e8f0; }
-QPushButton#live { font-weight:700; }
-QPushButton#live:checked { background:#e53935; border:1px solid #ff6b6b; color:white; }
-QPushButton#rec:checked { background:#e53935; border:1px solid #ff6b6b; color:white; font-weight:700; }
-QPushButton#lite:checked { background:#13a35a; border:1px solid #13ce66; color:white; font-weight:700; }
-"""
-
-
-def make_icon() -> QIcon:
-    pm = QPixmap(64, 64)
-    pm.fill(Qt.transparent)
-    p = QPainter(pm)
-    p.setRenderHint(QPainter.Antialiasing)
-    p.setBrush(QColor("#7c5cff"))
-    p.setPen(Qt.NoPen)
-    p.drawRoundedRect(4, 4, 56, 56, 14, 14)
-    p.setBrush(QColor("white"))
-    for i, hgt in enumerate((18, 34, 26, 40, 22)):
-        p.drawRoundedRect(12 + i * 8.5, 32 - hgt / 2, 5, hgt, 2.5, 2.5)
-    p.end()
-    return QIcon(pm)
+STYLE = theme.stylesheet("Dark")   # the default theme's stylesheet (MainWindow applies the chosen one)
 
 
 # overridable so a test copy never finds (and pops up) the real, running app
@@ -1820,7 +1738,6 @@ def main():
     if not claim_single_instance():
         sys.exit(0)
     app.setStyle("Fusion")
-    app.setStyleSheet(STYLE)
     wheel_guard = NoWheelChanges(app)
     app.installEventFilter(wheel_guard)
     holder = {}

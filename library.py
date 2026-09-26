@@ -55,6 +55,12 @@ class Config:
     level_volumes: bool = True
     stop_hotkey: str = "ctrl+alt+s"
     pause_hotkey: str = ""
+    rec_hotkey: str = "ctrl+alt+r"    # browser: start / stop recording a clip
+    clip_hotkey: str = "ctrl+alt+c"   # browser: save the last 15 s
+    bplay_hotkey: str = "ctrl+alt+p"  # browser: play / pause
+    live_hotkey: str = "ctrl+alt+l"   # browser: LIVE on / off
+    cue_sounds: bool = True           # beep in the headphones when a hotkey records / saves
+    theme: str = "Dark"
     eq_enabled: bool = False
     eq_target: str = "voice"          # voice | sounds | all
     eq_preset: str = "Flat (off)"

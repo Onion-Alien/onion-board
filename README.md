@@ -27,8 +27,15 @@ through making the cable Windows' default mic.
 - Per sound: global hotkey (works in-game), volume, loop, and what pressing again
   does (restart / overlap / toggle).
 - Transport bar: play/pause, stop, and a seek slider to jump anywhere in the track.
-- Global hotkeys: stop all, pause/resume all, and auto push-to-talk (holds your
-  game's PTT key while a sound plays).
+- Global hotkeys (all set in **⚙ Settings → Hotkeys**, and all work in-game):
+  - Stop all, and pause/resume all.
+  - Browser: record start/stop (Ctrl+Alt+R), save last 15s (Ctrl+Alt+C),
+    play/pause (Ctrl+Alt+P) and LIVE on/off (Ctrl+Alt+L).
+  - Auto push-to-talk: holds your game's PTT key while a sound plays.
+  - Hotkeys that record or save a clip play a short beep in your headphones (only
+    you hear it), so you know it worked without leaving the game.
+- **⚙ Settings**: themes (Dark, Light, Toxic green, Ocean; they switch live),
+  hotkeys, and window options.
 - Volumes: sounds → them, your voice → them, your headphones. Exact % boxes
   go up to 1000%; a soft limiter stops hard clipping.
 - "Level volumes" makes every sound equally loud.
@@ -85,6 +92,9 @@ Settings and imported sounds live in `%APPDATA%\Soundboard\`.
 | `eq.py` | 7-band biquad equalizer and presets |
 | `browser.py` | Browser tab: Qt WebEngine view; an isolated-world script taps page media via WebAudio and streams 48 kHz PCM over QWebChannel into the engine; clip recorder |
 | `library.py` | decoding, loudness levelling, saving clips, config |
+| `theme.py` | colour themes (tokens → stylesheet, also read by the painted widgets) and the logo |
+| `settings.py` | Settings window, global hotkey actions, hotkey capture dialog |
+| `make_icon.py` | regenerates `soundboard.ico` (shortcut icon) from the logo in `theme.py` |
 | `testcheck.py` | analysis for the Record-6s test (finds your voice in the output by cross-correlation) |
 
 ### Audio notes

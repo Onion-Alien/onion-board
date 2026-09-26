@@ -357,7 +357,7 @@ class BrowserTab(QWidget):
         self.info = QLabel()
         self.info.setWordWrap(True)
         self.info.setTextFormat(Qt.RichText)
-        self.info.setStyleSheet("color:#8a90a6;")
+        self.info.setObjectName("muted")
         v.addWidget(self.info)
 
         # ---- Lite mini-player (replaces the page while something plays)
@@ -388,7 +388,7 @@ class BrowserTab(QWidget):
         self.mini_btns["play"].clicked.connect(lambda: self._mini_js(MINI_TOGGLE_JS))
         self.mini_btns["next"].clicked.connect(lambda: self._mini_js(MINI_NEXT_JS))
         self.mini_time = QLabel("0:00 / 0:00")
-        self.mini_time.setStyleSheet("color:#8a90a6;")
+        self.mini_time.setObjectName("muted")
         row.addWidget(self.mini_time)
         row.addStretch(1)
         show = QPushButton("🔎  Show page")
@@ -622,18 +622,23 @@ class BrowserTab(QWidget):
         self.btn_rec.setText("⏺  Record clip")
         self._emit_clip(self.recorder.stop(), "Nothing was playing while you recorded.")
 
-    def clip_last(self):
-        self._emit_clip(self.recorder.last(),
-                        f"Nothing has played in the last {CLIP_S} seconds.")
+    def clip_last(self) -> bool:
+        return self._emit_clip(self.recorder.last(),
+                               f"Nothing has played in the last {CLIP_S} seconds.")
 
-    def _emit_clip(self, data: np.ndarray, empty_msg: str):
+    def toggle_play(self):
+        """Play / pause whatever the page is playing (the last thing played if paused)."""
+        self._mini_js(MINI_TOGGLE_JS)
+
+    def _emit_clip(self, data: np.ndarray, empty_msg: str) -> bool:
         data = trim_silence(data)
         if len(data) < int(0.2 * SR):
             self._refresh_info(f"<span style='color:#ffb020'>{empty_msg}</span>")
-            return
+            return False
         self.clip_ready.emit(data, self._clip_name())
         self._refresh_info(f"<span style='color:#13ce66'>✓ Saved a {len(data) / SR:.1f}s clip "
                            "to your Sounds.</span>")
+        return True
 
     def _clip_name(self) -> str:
         title = self.view.title() if self.view is not None else ""
