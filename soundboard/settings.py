@@ -6,12 +6,13 @@ import threading
 
 from PySide6.QtCore import QObject, QRectF, QSize, Qt, Signal
 from PySide6.QtGui import QColor, QFont, QPainter, QPainterPath
-from PySide6.QtWidgets import (QCheckBox, QComboBox, QDialog, QFrame, QGridLayout, QHBoxLayout,
-                               QLabel, QPushButton, QSlider, QTabWidget, QVBoxLayout, QWidget)
+from PySide6.QtWidgets import (QApplication, QCheckBox, QComboBox, QDialog, QFrame, QGridLayout,
+                               QHBoxLayout, QLabel, QPushButton, QScrollArea, QSlider, QTabWidget,
+                               QVBoxLayout, QWidget)
 
 from shiboken6 import isValid as qt_valid
 
-from soundboard import theme, winkeys, ytdl
+from soundboard import autostart, theme, winkeys, ytdl
 from soundboard.ui import fit, icons
 from soundboard.ui import overlay as ovl
 from soundboard.wheelguard import no_wheel
@@ -22,18 +23,12 @@ from soundboard.winkeys import Hotkeys
 HOTKEY_GROUPS = [
     ("Sounds", [
         ("stop_hotkey", "__stop__", "Stop everything",
-         "Stops every sound and pauses the browser."),
+         "Stops every sound, the radio and every program."),
         ("pause_hotkey", "__pause__", "Pause / resume sounds",
          "Pauses everything playing; press again to carry on."),
-    ]),
-    ("Browser", [
-        ("rec_hotkey", "__rec__", "Record clip: start / stop",
-         "Records what the browser plays. Press again to stop: the clip lands in Sounds."),
-        ("clip_hotkey", "__clip__", "Save the last 15 seconds",
-         "Instant replay: turns what just played into a sound."),
-        ("bplay_hotkey", "__bplay__", "Play / pause the browser", ""),
-        ("live_hotkey", "__live__", "LIVE on / off",
-         "Switch between others hearing the browser and only you."),
+        ("random_hotkey", "__random__", "Play a random sound",
+         "From the category showing (All = any sound), never the same one twice in a row. "
+         "A category can have its own: right-click its tab."),
     ]),
     ("Overlay", [
         ("overlay_hotkey", "__overlay__", "Open the in-game overlay",
@@ -60,7 +55,10 @@ class HotkeyDialog(QDialog):
         t = QLabel("Press the key or combo you want…")
         t.setStyleSheet("font-size:16px; font-weight:600;")
         lay.addWidget(t)
-        lay.addWidget(QLabel("Works globally, even while in-game.  Esc = cancel."))
+        self.hint = QLabel("Works globally, even while in-game.  Esc = cancel.")
+        self.hint.setWordWrap(True)
+        lay.addWidget(self.hint)
+        self._warned_vk = None
         self.setMinimumWidth(340)
         hotkeys.pause()   # so pressing an existing hotkey here doesn't trigger it
 
@@ -76,8 +74,24 @@ class HotkeyDialog(QDialog):
                 | (winkeys.MOD_ALT if m & Qt.AltModifier else 0)
                 | (winkeys.MOD_SHIFT if m & Qt.ShiftModifier else 0)
                 | (winkeys.MOD_WIN if m & Qt.MetaModifier else 0))
+        if not mods and is_typing_key(vk) and self._warned_vk != vk:
+            # a global hotkey takes the key away from every other program: warn once
+            self._warned_vk = vk
+            key = pretty_key(winkeys.combo_name(0, vk))
+            self.hint.setText(f"<span style='color:#ffb020'><b>{key}</b> on its own would "
+                              "stop working for typing everywhere "
+                              "(chat, games, browser). Add Ctrl, Alt or Shift — or press it "
+                              "again to use it anyway.</span>")
+            return
         self.result_combo = winkeys.combo_name(mods, vk)
         self.accept()
+
+
+def is_typing_key(vk: int) -> bool:
+    """Letters, digits, punctuation, Space, Enter, Tab, Backspace, arrows: keys people
+    type with. F-keys, the numpad, Insert/Home/…, media keys are fine bare."""
+    return (0x30 <= vk <= 0x39 or 0x41 <= vk <= 0x5A or 0xBA <= vk <= 0xC0
+            or 0xDB <= vk <= 0xDF or 0x25 <= vk <= 0x28 or vk in (0x08, 0x09, 0x0D, 0x20))
 
 
 class _Relay(QObject):
@@ -140,17 +154,16 @@ class SettingsDialog(QDialog):
         fit.watch(self)   # grows to fit its text (ui/fit.py)
         self.mw = mw
         self.setWindowTitle("Settings")
-        self.setWindowIcon(theme.app_icon())
         self.setMinimumSize(720, 600)
         lay = QVBoxLayout(self)
         lay.setContentsMargins(16, 14, 16, 14)
         self.tabs = QTabWidget()
         self.tabs.setDocumentMode(True)
-        self.tabs.addTab(self._appearance(), "Appearance")
+        self.tabs.addTab(self._scroll(self._appearance()), "Appearance")
         self.hk_buttons: dict[str, list[QPushButton]] = {}
-        self.tabs.addTab(self._hotkeys(), "Hotkeys")
-        self.tabs.addTab(self._overlay(), "Overlay")
-        self.tabs.addTab(self._general(), "General")
+        self.tabs.addTab(self._scroll(self._hotkeys()), "Hotkeys")
+        self.tabs.addTab(self._scroll(self._overlay()), "Overlay")
+        self.tabs.addTab(self._scroll(self._general()), "General")
         for i, name in enumerate(("palette", "keyboard", "gamepad", "settings")):
             icons.set_tab_icon(self.tabs, i, name)
         self.tabs.setCurrentIndex(
@@ -163,8 +176,38 @@ class SettingsDialog(QDialog):
         row.addStretch(1)
         row.addWidget(close)
         lay.addLayout(row)
+        self._initial_size()
 
     # ------------------------------------------------------------------ pages
+    @staticmethod
+    def _scroll(page: QWidget) -> QScrollArea:
+        """Pages scroll: a tall one (General) otherwise gets squashed, rows on top of
+        each other, whenever the window can't grow to fit it (maximized, small screen)."""
+        sa = QScrollArea()
+        sa.setWidgetResizable(True)
+        sa.setFrameShape(QScrollArea.NoFrame)
+        sa.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        sa.setWidget(page)
+        return sa
+
+    def _initial_size(self):
+        """Open big enough for the tallest page, as far as the screen allows (a scroll
+        area on its own would open at its small default)."""
+        screen = self.screen() or QApplication.primaryScreen()
+        avail = screen.availableGeometry() if screen else None
+        width = 860
+        need = 0
+        for i in range(self.tabs.count()):
+            lay = self.tabs.widget(i).widget().layout()
+            need = max(need, lay.totalSizeHint().height(),
+                       lay.totalHeightForWidth(width - 60) if lay.hasHeightForWidth() else 0)
+        # tab bar, Done row, margins; a normal window size, not the whole screen: the
+        # tall General page scrolls
+        height = min(need + 150, 760)
+        if avail is not None:
+            width = min(width, avail.width() - 40)
+            height = min(height, avail.height() - 60)
+        self.resize(max(width, self.minimumWidth()), max(height, self.minimumHeight()))
     @staticmethod
     def _card(title: str, hint: str = ""):
         card = QFrame()
@@ -219,9 +262,10 @@ class SettingsDialog(QDialog):
             for attr, _action, label, desc in actions:
                 self._hk_row(cv, attr, label, desc)
             v.addWidget(card)
-        card, cv = self._card("Game push-to-talk",
-                              "The app holds this key down while a sound or the live browser is "
-                              "going out — set it to your game's push-to-talk key.")
+        card, cv = self._card("Auto push-to-talk (optional)",
+                              "Only if you use push-to-talk in a game or Discord: set your "
+                              "push-to-talk key and the app holds it for you while a sound, "
+                              "live radio or a program plays. Leave it Off for open mic.")
         self._hk_row(cv, "ptt_key", "Hold this key", "")
         v.addWidget(card)
         note = QLabel("Per-sound hotkeys: right-click a pad → Set hotkey. "
@@ -395,6 +439,10 @@ class SettingsDialog(QDialog):
         top.toggled.connect(self.mw.on_top_toggle)
         cv.addWidget(top)
         v.addWidget(card)
+        v.addWidget(self._background_card())
+        v.addWidget(self._backup_card())
+        v.addWidget(self._updates_card())
+        v.addWidget(self._remote_card())
         card, cv = self._card("Hotkey sounds",
                               "Short beeps in your headphones (only you hear them) when a hotkey "
                               "starts or stops a recording or saves a clip — so you know it worked "
@@ -426,14 +474,220 @@ class SettingsDialog(QDialog):
         v.addStretch(1)
         return w
 
+    # ------------------------------------------------------------------ background
+    def _background_card(self):
+        mw = self.mw
+        card, cv = self._card("Running in the background",
+                              "A soundboard is most useful left running: your hotkeys and the "
+                              "overlay work while the window is closed. The tray icon (by the "
+                              "clock) opens it again; right-click it to quit.")
+        tray = QCheckBox("Closing the window keeps Onion Board running in the tray")
+        tray.setChecked(mw.cfg.tray)
+        tray.toggled.connect(lambda b: mw.set_option("tray", b))
+        if mw.tray is None:
+            tray.setEnabled(False)
+            tray.setToolTip("This desktop has no system tray, so closing the window quits.")
+        cv.addWidget(tray)
+        auto = QCheckBox("Start Onion Board when I sign in to Windows")
+        hidden = QCheckBox("…straight to the tray, without opening the window")
+        auto.setChecked(autostart.is_enabled())
+        hidden.setChecked(mw.cfg.autostart_hidden)
+        hidden.setEnabled(auto.isChecked())
+        hidden.setContentsMargins(22, 0, 0, 0)
+
+        def set_auto(on: bool):
+            if not mw.set_autostart(on):
+                auto.blockSignals(True)
+                auto.setChecked(autostart.is_enabled())
+                auto.blockSignals(False)
+            hidden.setEnabled(auto.isChecked())
+        auto.toggled.connect(set_auto)
+        hidden.toggled.connect(mw.set_autostart_hidden)
+        if not autostart.available():
+            auto.setEnabled(False)
+            hidden.setEnabled(False)
+        cv.addWidget(auto)
+        cv.addWidget(hidden)
+        return card
+
+    # ------------------------------------------------------------------ backup
+    def _backup_card(self):
+        card, cv = self._card("Backup",
+                              "Export puts every sound (with its picture, effects, hotkey and "
+                              "categories) and your settings into one .zip: keep it safe, or "
+                              "import it on another PC. Importing a friend's sound pack adds "
+                              "its sounds; ones you already have are skipped.")
+        row = QHBoxLayout()
+        exp = QPushButton("Export everything…")
+        icons.set_icon(exp, "folder")
+        exp.clicked.connect(self.mw.export_board)
+        imp = QPushButton("Import…")
+        imp.clicked.connect(self.mw.import_dialog)
+        row.addWidget(exp)
+        row.addWidget(imp)
+        row.addStretch(1)
+        cv.addLayout(row)
+        return card
+
+    # ------------------------------------------------------------------ app updates
+    def _updates_card(self):
+        from soundboard import __version__
+        card, cv = self._card("App updates",
+                              f"This is Onion Board {__version__}. With the box ticked it asks "
+                              "GitHub once a day whether a newer version is out and tells you; "
+                              "it never downloads or installs anything by itself.")
+        chk = QCheckBox("Tell me when a new version is out (checks GitHub once a day)")
+        chk.setChecked(self.mw.cfg.update_check_optin)
+        chk.toggled.connect(self._updates_optin)
+        cv.addWidget(chk)
+        row = QHBoxLayout()
+        self.upd_label = QLabel()
+        self.upd_label.setObjectName("hint")
+        self.upd_label.setWordWrap(True)
+        row.addWidget(self.upd_label, 1)
+        self.upd_btn = QPushButton("Check now")
+        self.upd_btn.clicked.connect(self._updates_check)
+        row.addWidget(self.upd_btn)
+        cv.addLayout(row)
+        self.mw.update_done.connect(self._updates_done)
+        return card
+
+    def _updates_optin(self, on: bool):
+        self.mw.set_option("update_check_optin", on)
+        if on:
+            self.mw.check_updates()
+
+    def _updates_check(self):
+        self.upd_btn.setEnabled(False)
+        self.upd_label.setText("Checking…")
+        self.mw.check_updates(force=True)
+
+    def _updates_done(self, rel, err: str):
+        if not qt_valid(self.upd_label):
+            return
+        self.upd_btn.setEnabled(True)
+        if err:
+            self.upd_label.setText(f"Couldn't check: {err}")
+        elif rel is None:
+            self.upd_label.setText("You have the newest version.")
+        else:
+            self.upd_label.setText(f"Version {rel.version} is out.")
+
+    def done(self, r):
+        try:
+            self.mw.update_done.disconnect(self._updates_done)
+        except (RuntimeError, TypeError):
+            pass
+        super().done(r)
+
+    # ------------------------------------------------------------------ remote control
+    def _remote_card(self):
+        """The local control API (soundboard.remote): on / off, port, key."""
+        from PySide6.QtWidgets import QApplication, QLineEdit, QSpinBox
+
+        from soundboard import remote
+        mw, cfg = self.mw, self.mw.cfg
+        card, cv = self._card("Remote control (Stream Deck, scripts)",
+                              "Lets programs on this PC play your sounds: a Stream Deck (its "
+                              "API-request or website buttons, Bitfocus Companion, Touch "
+                              "Portal), AutoHotkey or a script. Only this PC can connect, and "
+                              "only with the key below — treat it like a password.")
+        on = QCheckBox("Let programs on this PC control the soundboard")
+        on.setChecked(cfg.api_enabled)
+        cv.addWidget(on)
+        row = QHBoxLayout()
+        row.addWidget(QLabel("Port"))
+        port = QSpinBox()
+        port.setRange(1024, 65535)
+        port.setValue(cfg.api_port)
+        port.setAccessibleName("Port")
+        no_wheel(port)
+        row.addWidget(port)
+        row.addSpacing(12)
+        row.addWidget(QLabel("Key"))
+        key = QLineEdit()
+        key.setReadOnly(True)
+        key.setEchoMode(QLineEdit.Password)
+        key.setAccessibleName("Key")
+        row.addWidget(key, 1)
+        show = QPushButton("Show")
+        show.setObjectName("small")
+        show.setCheckable(True)
+        show.toggled.connect(lambda b: key.setEchoMode(QLineEdit.Normal if b
+                                                       else QLineEdit.Password))
+        row.addWidget(show)
+        new = QPushButton("New key")
+        new.setObjectName("small")
+        new.setToolTip("Make a new key: anything using the old one stops working")
+        row.addWidget(new)
+        cv.addLayout(row)
+        crow = QHBoxLayout()
+        copy = QPushButton("Copy an example link")
+        copy.setToolTip("A link that plays a random sound — paste it into a Stream Deck "
+                        "website / API-request button, or open it to try it")
+        crow.addWidget(copy)
+        state = QLabel()
+        state.setObjectName("hint")
+        state.setWordWrap(True)
+        crow.addWidget(state, 1)
+        cv.addLayout(crow)
+        help_ = QLabel("Endpoints: /api/play?name=Airhorn · /api/play?id=… · /api/stop · "
+                       "/api/pause · /api/random?category=Memes · /api/sounds · "
+                       "/api/status. Send the key as ?token=…, an X-Token header or "
+                       "Authorization: Bearer ….")
+        help_.setObjectName("hint")
+        help_.setWordWrap(True)
+        help_.setTextInteractionFlags(Qt.TextSelectableByMouse)
+        cv.addWidget(help_)
+
+        def refresh(err: str = ""):
+            key.setText(cfg.api_token)
+            for w in (port, key, show, new, copy):
+                w.setEnabled(cfg.api_enabled)
+            if not cfg.api_enabled:
+                state.setText("Off.")
+            elif err or not mw.remote.running:
+                state.setText(f"Couldn't start: {err or mw.remote.error}")
+            else:
+                state.setText(f"On: listening on {remote.HOST}:{mw.remote.port}.")
+
+        def set_on(b: bool):
+            cfg.api_enabled = b
+            cfg.save()
+            refresh(mw.apply_remote())
+
+        def set_port():
+            if port.value() != cfg.api_port:
+                cfg.api_port = port.value()
+                cfg.save()
+                refresh(mw.apply_remote())
+
+        def new_key():
+            cfg.api_token = remote.new_token()
+            cfg.save()
+            refresh(mw.apply_remote())
+
+        def copy_link():
+            QApplication.clipboard().setText(
+                f"http://{remote.HOST}:{cfg.api_port}/api/random?token={cfg.api_token}")
+            state.setText("Copied. It holds your key: only paste it into your own tools.")
+
+        on.toggled.connect(set_on)
+        port.editingFinished.connect(set_port)
+        new.clicked.connect(new_key)
+        copy.clicked.connect(copy_link)
+        refresh()
+        return card
+
     # ------------------------------------------------------------------ yt-dlp
     def _downloader_card(self):
-        card, cv = self._card("Browser downloader (yt-dlp)",
-                              "“Add as sound” in the Browser tab uses yt-dlp. YouTube changes "
-                              "often, so it needs updating now and then. Nothing is downloaded "
-                              "unless you click Update now / Reset, or tick the box below. If "
-                              "downloads keep failing even after updating, Reset deletes it and "
-                              "its cache and installs a fresh copy.")
+        card, cv = self._card("Downloader (yt-dlp)",
+                              "Searching YouTube / SoundCloud and adding a pasted link use "
+                              "yt-dlp. YouTube changes often, so it needs updating now and "
+                              "then. Nothing is downloaded unless you click Update now / "
+                              "Reset, or tick the box below. If downloads keep failing even "
+                              "after updating, Reset deletes it and its cache and installs a "
+                              "fresh copy.")
         auto = QCheckBox("Update it automatically from PyPI (checks once a day, and when a "
                          "download fails)")
         auto.setToolTip("Off by default: an update is code the app runs. It's checked against "

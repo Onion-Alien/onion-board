@@ -10,6 +10,7 @@ from __future__ import annotations
 import hashlib
 import json
 import logging
+import math
 import os
 import shutil
 import subprocess
@@ -18,6 +19,7 @@ import time
 import uuid
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
+from typing import ClassVar
 
 import numpy as np
 import soundfile as sf
@@ -27,12 +29,14 @@ from soundboard.engine import SR
 
 log = logging.getLogger(__name__)
 
-APP_DIR = Path(os.environ.get("APPDATA", Path.home())) / "Soundboard"
+APP_DIR = Path(os.environ.get("APPDATA", Path.home())) / "OnionBoard"
+# from when this app was called Soundboard; see migrate_from_soundboard() below
+OLD_APP_DIR = Path(os.environ.get("APPDATA", Path.home())) / "Soundboard"
 SOUNDS_DIR = APP_DIR / "sounds"
 CACHE_DIR = APP_DIR / "cache"
 THUMBS_DIR = APP_DIR / "thumbs"   # pad pictures (soundboard.thumbs)
 CONFIG_PATH = APP_DIR / "config.json"
-CONFIG_VERSION = 2
+CONFIG_VERSION = 3
 CONFIG_BACKUPS = 3   # config.json.1 … .3, rotated on every save that changes something
 # where install-vbcable.ps1 and soundboard.ico live: the repo root, or the frozen
 # app's _internal folder when built with PyInstaller
@@ -47,6 +51,78 @@ I16 = 32767.0
 
 PAD_COLORS = ["#7c5cff", "#ff5c8a", "#1fb6ff", "#13ce66", "#ffb020", "#ff7849",
               "#00c2b2", "#e056fd", "#5c7cfa", "#94a3b8"]
+
+
+MIGRATION_ERRORS: list[str] = []
+
+
+def fits_type(default, v) -> bool:
+    """Is `v` an acceptable value for a setting whose default is `default`? Used on
+    everything read back from disk, so a hand-edited or damaged value falls back to
+    the default instead of crashing the window that uses it."""
+    if isinstance(default, bool):
+        return isinstance(v, bool)
+    if isinstance(default, float):   # json accepts NaN / Infinity: a NaN volume would
+        return (isinstance(v, (int, float)) and not isinstance(v, bool)   # poison the mix
+                and math.isfinite(v))
+    if isinstance(default, int):
+        return isinstance(v, int) and not isinstance(v, bool)
+    if default is None:
+        return v is None or isinstance(v, (str, int, float))
+    return isinstance(v, type(default))
+
+
+def _typed(raw: dict, defaults, what: str) -> dict:
+    """Keep only raw's known fields whose type fits (floats given as ints become floats)."""
+    out = {}
+    for k, v in raw.items():
+        if k not in type(defaults).__dataclass_fields__:
+            continue
+        want = getattr(defaults, k)
+        if not fits_type(want, v):
+            log.warning("ignored %s setting %s=%r (expected %s)", what, k, v, type(want).__name__)
+            continue
+        out[k] = float(v) if isinstance(want, float) else v
+    return out
+
+
+def migrate_from_soundboard() -> None:
+    """One-time move of %APPDATA%\\Soundboard (sounds, settings, cache, browser
+    profile) into %APPDATA%\\OnionBoard, for anyone who installed this app back when
+    it was called Soundboard. Must run before anything creates APP_DIR - called first
+    thing in app.py's main(), ahead of applog.setup()."""
+    # Keyed on the new config, not the new folder: the installer's cable step can
+    # create APP_DIR (its restart marker) before the app's first launch, and a move
+    # that failed halfway must be retried next launch rather than silently skipped.
+    if not OLD_APP_DIR.is_dir() or CONFIG_PATH.exists():
+        return
+    if not APP_DIR.exists():
+        try:
+            OLD_APP_DIR.rename(APP_DIR)
+            return
+        except OSError:
+            pass   # different drive, a file in use: go item by item below
+    try:
+        APP_DIR.mkdir(parents=True, exist_ok=True)
+        # the config goes last, so it only exists once everything it points at does
+        for item in sorted(OLD_APP_DIR.iterdir(), key=lambda p: p.name.startswith("config.json")):
+            dst = APP_DIR / item.name
+            if dst.exists():
+                continue
+            try:
+                item.rename(dst)
+            except OSError:   # copy instead, keep the old one
+                stage = dst.with_name(dst.name + ".migrating")
+                if stage.is_dir():
+                    shutil.rmtree(stage)
+                if item.is_dir():
+                    shutil.copytree(item, stage)
+                else:
+                    shutil.copy2(item, stage)
+                stage.rename(dst)
+    except OSError as e:
+        # logging isn't set up yet (it writes into APP_DIR); remembered for later
+        MIGRATION_ERRORS.append(f"couldn't move {OLD_APP_DIR} to {APP_DIR}: {e}")
 
 
 @dataclass
@@ -64,6 +140,9 @@ class SoundMeta:
     fingerprint: str = ""     # of the source file, to notice a re-import of the same file
     fx: dict = field(default_factory=dict)   # speed, pitch, EQ, boost… (soundboard.soundfx)
     image: str = ""           # pad picture, absolute path (usually inside THUMBS_DIR)
+    tags: list[str] = field(default_factory=list)   # the categories it's in (Config.categories)
+    fade_in: float = 0.0      # seconds: rises from silence when it starts
+    fade_out: float = 0.0     # seconds: falls to silence when stopped / near its end
 
 
 @dataclass
@@ -80,10 +159,6 @@ class Config:
     level_volumes: bool = True
     stop_hotkey: str = "ctrl+alt+s"
     pause_hotkey: str = ""
-    rec_hotkey: str = "ctrl+alt+r"    # browser: start / stop recording a clip
-    clip_hotkey: str = "ctrl+alt+c"   # browser: save the last 15 s
-    bplay_hotkey: str = "ctrl+alt+p"  # browser: play / pause
-    live_hotkey: str = "ctrl+alt+l"   # browser: LIVE on / off
     overlay_hotkey: str = "`"         # in-game overlay (see ui.overlay)
     cue_sounds: bool = True           # beep in the headphones when a hotkey records / saves
     theme: str = "Dark"
@@ -95,12 +170,7 @@ class Config:
     ptt_key: str = ""           # key held down while sounds play (game push-to-talk)
     always_on_top: bool = False
     pad_width: int = 150
-    tab: int = 0                      # 0 = sounds, 1 = browser, 2 = voice
-    browser_url: str = "https://www.youtube.com/watch?v=VJCs9LwiqBA"   # first open
-    browser_vol: float = 1.0
-    browser_live: bool = False        # browser audio goes out to others (off at every launch)
-    browser_monitor: bool = True      # ...and to your headphones
-    browser_lite: bool = True         # hide the page while it plays + 144p (light on CPU/GPU)
+    tab: int = 0                      # 0 = sounds, 1 = radio, 2 = apps, 3 = voice, 4 = setup
     # fetch newer yt-dlp versions from PyPI by itself: opt-in, since that's code the app
     # runs (named *_optin so configs saved while it defaulted to on start off again)
     ytdlp_auto_optin: bool = False
@@ -109,49 +179,98 @@ class Config:
     voice_fx: dict = field(default_factory=dict)   # voice changer (see ui.voicepanel)
     speech: dict = field(default_factory=dict)     # text-to-speech / live voice settings
     overlay: dict = field(default_factory=dict)    # in-game overlay (ui.overlay.OverlaySettings)
+    radio: dict = field(default_factory=dict)      # Radio tab: vol, monitor, favorites, last
+    apps: dict = field(default_factory=dict)       # Apps tab: exe -> {vol, monitor} to re-capture
+    categories: list[str] = field(default_factory=list)   # pad categories, in tab order
+    category: str = ""                # the category the Sounds tab shows; "" = all
+    tray: bool = True                 # closing the window keeps the app in the tray
+    autostart_hidden: bool = True     # started with Windows: straight to the tray
+    # an opt-in look at GitHub Releases for a newer version, at most once a day
+    update_check_optin: bool = False
+    update_checked: float = 0.0       # time.time() of the last check
+    update_skip: str = ""             # a version the user said to skip
+    random_hotkey: str = ""           # plays a random sound from the category showing
+    category_hotkeys: dict = field(default_factory=dict)   # category -> its random-sound key
+    # local control API for Stream Deck / scripts (soundboard.remote): off unless turned on
+    api_enabled: bool = False
+    api_port: int = 7474
+    api_token: str = ""
     sounds: list[SoundMeta] = field(default_factory=list)
+
+    # set by load() when the settings weren't read cleanly, for the window to tell the
+    # user (not a dataclass field, so it's never saved)
+    load_note: ClassVar[str] = ""
 
     @classmethod
     def load(cls) -> Config:
         """Read config.json. A corrupt file is set aside (config.json.broken-<time>)
-        and the newest backup that parses is used instead; only if there is none
-        do the defaults apply. The pad list is never silently thrown away."""
-        try:
-            raw = json.loads(CONFIG_PATH.read_text(encoding="utf-8"))
-        except FileNotFoundError:
-            return cls()
-        except (OSError, ValueError):
-            log.exception("config %s is unreadable", CONFIG_PATH)
-            raw = cls._recover()
-            if raw is None:
-                return cls()
-        try:
-            return cls.from_raw(raw)
-        except (TypeError, ValueError, KeyError, AttributeError):
-            log.exception("config %s has bad contents", CONFIG_PATH)
-            raw = cls._recover()
+        and the newest backup that loads is used instead; only if there is none
+        do the defaults apply. A missing file with backups beside it (deleted, or lost
+        mid-save) is recovered the same way, before a save rotates the backups away.
+        The pad list is never silently thrown away."""
+        raw, err, missing = None, None, False
+        for attempt in range(5):   # OneDrive / antivirus can hold the file for a moment
             try:
-                return cls.from_raw(raw) if raw is not None else cls()
+                raw = json.loads(CONFIG_PATH.read_text(encoding="utf-8"))
+                break
+            except FileNotFoundError as e:
+                if not any(CONFIG_PATH.with_name(f"config.json.{i}").exists()
+                           for i in range(1, CONFIG_BACKUPS + 1)):
+                    return cls()   # a first start
+                err, missing = e, True
+                break
+            except ValueError as e:
+                err = e
+                break
+            except OSError as e:
+                err = e
+                time.sleep(0.2 * (attempt + 1))
+        if raw is not None:
+            try:
+                return cls.from_raw(raw)
+            except (TypeError, ValueError, KeyError, AttributeError) as e:
+                err = e
+        log.error("config %s is unreadable: %r", CONFIG_PATH, err)
+        broken = "" if missing else cls._set_aside()
+        kept = ("" if missing else
+                f" The damaged file was kept as {broken or 'config.json'}.")
+        what = "missing" if missing else "damaged"
+        for name, raw in cls._backups():
+            try:
+                cfg = cls.from_raw(raw)
             except (TypeError, ValueError, KeyError, AttributeError):
-                return cls()
+                log.warning("backup %s doesn't load either", name, exc_info=True)
+                continue
+            log.warning("recovered settings from backup %s", name)
+            cfg.load_note = (f"Your settings file was {what}, so the last good copy "
+                             f"({name}) was loaded instead.{kept}")
+            return cfg
+        cfg = cls()
+        cfg.load_note = (f"Your settings file was {what} and no backup could be read, so "
+                         "Onion Board started with default settings. Your sound files are "
+                         f"still in {SOUNDS_DIR}.{kept}")
+        return cfg
 
     @classmethod
-    def _recover(cls) -> dict | None:
+    def _set_aside(cls) -> str:
         try:
             broken = CONFIG_PATH.with_name(f"config.json.broken-{time.strftime('%Y%m%d-%H%M%S')}")
             CONFIG_PATH.replace(broken)
             log.warning("set the damaged config aside as %s", broken.name)
+            return broken.name
         except OSError:
             log.debug("couldn't set the damaged config aside", exc_info=True)
+            return ""
+
+    @classmethod
+    def _backups(cls):
+        """(name, parsed json) of each backup that parses, newest first."""
         for i in range(1, CONFIG_BACKUPS + 1):
             p = CONFIG_PATH.with_name(f"config.json.{i}")
             try:
-                raw = json.loads(p.read_text(encoding="utf-8"))
-                log.warning("recovered settings from backup %s", p.name)
-                return raw
+                yield p.name, json.loads(p.read_text(encoding="utf-8"))
             except (OSError, ValueError):
                 continue
-        return None
 
     @classmethod
     def from_raw(cls, raw: dict) -> Config:
@@ -160,28 +279,43 @@ class Config:
         for v in range(version, CONFIG_VERSION):
             raw = MIGRATIONS[v](raw)
         sounds = []
-        for s in raw.pop("sounds", []):
-            if not isinstance(s, dict) or not all(s.get(k) for k in ("id", "name", "file")):
+        blank = SoundMeta(id="", name="", file="")
+        raw_sounds = raw.pop("sounds", [])
+        for s in raw_sounds if isinstance(raw_sounds, list) else []:
+            if not isinstance(s, dict) or not all(isinstance(s.get(k), str) and s.get(k)
+                                                  for k in ("id", "name", "file")):
                 log.warning("skipped a damaged sound entry in the config: %r", s)
                 continue
-            s = {k: v for k, v in s.items() if k in SoundMeta.__dataclass_fields__}
+            s = _typed(s, blank, f"sound {s['name']!r}")
+            for k in ("file", "image"):   # v0.1.0 stored full paths into the old folder
+                if s.get(k) and Path(s[k]).is_absolute() and Path(s[k]).is_relative_to(OLD_APP_DIR):
+                    s[k] = str(APP_DIR / Path(s[k]).relative_to(OLD_APP_DIR))
             if not Path(s["file"]).is_absolute():
                 s["file"] = str(SOUNDS_DIR / s["file"])   # stored relative to the library
             if s.get("image") and not Path(s["image"]).is_absolute():
                 s["image"] = str(THUMBS_DIR / s["image"])
+            s["tags"] = clean_tags(s.get("tags"))
+            for k in ("fade_in", "fade_out"):
+                s[k] = clean_fade(s.get(k))
             sounds.append(SoundMeta(**s))
         # configs from before the setup guide existed: whoever already picked an output
         # device has been set up by hand, so don't greet them with the guide
         raw.setdefault("setup_done", bool(raw.get("main_device")))
-        known = {k: v for k, v in raw.items() if k in cls.__dataclass_fields__}
+        known = _typed(raw, cls(), "config")
         known["version"] = CONFIG_VERSION
-        return cls(**known, sounds=sounds)
+        cfg = cls(**known, sounds=sounds)
+        cfg.categories = clean_tags(cfg.categories)
+        for m in sounds:   # a category a sound is in always has a tab
+            cfg.categories += [t for t in m.tags if t not in cfg.categories]
+        if cfg.category not in cfg.categories:
+            cfg.category = ""
+        return cfg
 
     def to_raw(self) -> dict:
         d = asdict(self)
         d["version"] = CONFIG_VERSION
         for s in d["sounds"]:   # files inside the library are stored by name only, so the
-            p = Path(s["file"])  # whole %APPDATA%\Soundboard folder can move or be restored
+            p = Path(s["file"])  # whole %APPDATA%\OnionBoard folder can move or be restored
             if p.is_absolute() and p.parent == SOUNDS_DIR:
                 s["file"] = p.name
             if s["image"] and Path(s["image"]).parent == THUMBS_DIR:
@@ -202,12 +336,39 @@ class Config:
             tmp = CONFIG_PATH.with_suffix(".tmp")
             tmp.write_text(text, encoding="utf-8")
             if CONFIG_PATH.exists():
-                _rotate_backups()
+                try:
+                    _rotate_backups()
+                except OSError:   # a backup locked for a moment mustn't block the save
+                    log.warning("couldn't rotate the config backups", exc_info=True)
             tmp.replace(CONFIG_PATH)
             return True
         except OSError:
             log.exception("couldn't save settings to %s", CONFIG_PATH)
             return False
+
+
+MAX_FADE_S = 10.0
+
+
+def clean_fade(v) -> float:
+    """A fade length in seconds, 0..MAX_FADE_S (anything unreadable is no fade)."""
+    try:
+        v = float(v)
+    except (TypeError, ValueError):
+        return 0.0
+    return min(max(v, 0.0), MAX_FADE_S) if v == v else 0.0
+
+
+def clean_tags(tags) -> list[str]:
+    """Category names: strings, trimmed, at most 30 characters, no duplicates
+    (ignoring case), in order."""
+    out, seen = [], set()
+    for t in tags if isinstance(tags, list) else []:
+        t = str(t).strip()[:30] if isinstance(t, str) else ""
+        if t and t.lower() not in seen:
+            seen.add(t.lower())
+            out.append(t)
+    return out
 
 
 def _rotate_backups():
@@ -228,7 +389,16 @@ def _migrate_1_to_2(raw: dict) -> dict:
     return raw
 
 
-MIGRATIONS = {1: _migrate_1_to_2}
+def _migrate_2_to_3(raw: dict) -> dict:
+    """v3 removed the Browser tab (tab 1): later tabs move down one, and the Browser
+    tab itself opens Sounds. Its settings and hotkeys are simply no longer read."""
+    tab = raw.get("tab")
+    if isinstance(tab, int) and not isinstance(tab, bool):
+        raw["tab"] = 0 if tab <= 1 else tab - 1
+    return raw
+
+
+MIGRATIONS = {1: _migrate_1_to_2, 2: _migrate_2_to_3}
 
 
 # --------------------------------------------------------------------------- decoding
@@ -385,6 +555,56 @@ def prune_cache(keep: set[str]):
         log.debug("cache prune failed", exc_info=True)
 
 
+def original_frames(meta: SoundMeta) -> int:
+    """Length of a sound as imported (before effects or trim), in frames at SR:
+    from the cache's header when it's there (no audio is read), else the file's."""
+    p = cache_path(meta.id)
+    try:
+        if p.exists():
+            return int(np.load(p, mmap_mode="r").shape[0])
+    except Exception:  # noqa: BLE001
+        log.debug("couldn't read the cache header of %s", meta.id, exc_info=True)
+    try:
+        info = sf.info(meta.file)
+        return int(min(info.frames / info.samplerate, MAX_SECONDS) * SR)
+    except Exception:  # noqa: BLE001 - m4a/video etc.: decode it
+        return len(load_original(meta))
+
+
+def peaks(data: np.ndarray, n: int) -> np.ndarray:
+    """(n,) loudest absolute sample in each of n equal slices of (m, 2) audio,
+    0..1: enough to draw a waveform."""
+    if not len(data) or n <= 0:
+        return np.zeros(max(n, 0), np.float32)
+    scale = 1 / I16 if data.dtype == np.int16 else 1.0
+    edges = np.linspace(0, len(data), n + 1).astype(np.int64)
+    out = np.zeros(n, np.float32)
+    for i in range(n):
+        a, b = edges[i], max(edges[i + 1], edges[i] + 1)
+        seg = data[a:min(b, len(data))]
+        if len(seg):
+            out[i] = float(np.abs(seg).max()) * scale
+    return np.clip(out, 0.0, 1.0)
+
+
+def original_peaks(meta: SoundMeta, n: int = 400) -> tuple[np.ndarray, float]:
+    """(waveform peaks, length in seconds) of a sound as imported, for the trim
+    control. Read from the cache without loading it (every few frames of a long
+    one: plenty for n columns). No cache yet: no peaks, the length from the file."""
+    p = cache_path(meta.id)
+    try:
+        if p.exists():
+            data = np.load(p, mmap_mode="r")
+            step = max(1, len(data) // 400_000)
+            return peaks(np.asarray(data[::step]), n), len(data) / SR
+    except Exception:  # noqa: BLE001
+        log.debug("couldn't read the cache of %s for its waveform", meta.id, exc_info=True)
+    try:
+        return np.zeros(0, np.float32), original_frames(meta) / SR
+    except Exception:  # noqa: BLE001 - the file is gone: nothing to trim
+        return np.zeros(0, np.float32), 0.0
+
+
 def fingerprint(path: str) -> str:
     """Cheap identity for a source file: size + hash of its first megabyte."""
     try:
@@ -438,19 +658,27 @@ def import_file(src: str, color: str) -> tuple[SoundMeta, np.ndarray]:
     srcp = Path(src)
     if via_ffmpeg:
         dest = SOUNDS_DIR / f"{sid}_{_safe_name(srcp.stem)}.flac"
-        sf.write(dest, data, SR, subtype="PCM_16")
     else:
-        dest = SOUNDS_DIR / f"{sid}_{srcp.name}"
-        try:
+        # capped: a long source name plus the id would pass Windows' 255-character limit
+        dest = SOUNDS_DIR / f"{sid}_{srcp.stem[:80].strip() or 'sound'}{srcp.suffix.lower()}"
+    # Never fall back to using `src` in place: a download's temp folder is deleted
+    # right after this. A failed copy leaves nothing behind and says what to do.
+    try:
+        if via_ffmpeg:
+            sf.write(dest, data, SR, subtype="PCM_16")
+        else:
             shutil.copy2(srcp, dest)
-        except OSError:
-            log.warning("couldn't copy %s into the library; using it in place", src,
-                        exc_info=True)
-            dest = srcp
-    meta = SoundMeta(id=sid, name=srcp.stem.replace("_", " ").strip()[:40], file=str(dest),
-                     color=color, level_gain=level_gain(data), duration=len(data) / SR,
-                     fingerprint=fingerprint(src))
-    return meta, store_cached(sid, data)
+        meta = SoundMeta(id=sid, name=srcp.stem.replace("_", " ").strip()[:40],
+                         file=str(dest), color=color, level_gain=level_gain(data),
+                         duration=len(data) / SR, fingerprint=fingerprint(src))
+        return meta, store_cached(sid, data)
+    except Exception as e:
+        log.warning("couldn't copy %s into the library", src, exc_info=True)
+        dest.unlink(missing_ok=True)
+        if isinstance(e, OSError):
+            raise OSError(f"couldn't save it into your Sounds folder ({e.strerror or e}). "
+                          "Check the disk isn't full and try again.") from e
+        raise
 
 
 def save_clip(data: np.ndarray, name: str, color: str) -> tuple[SoundMeta, np.ndarray]:
@@ -504,10 +732,40 @@ def duplicate(meta: SoundMeta, name: str) -> SoundMeta:
                      fingerprint="", fx=dict(meta.fx), image=image)
 
 
+def recycle(path: Path) -> bool:
+    """Send a file to the Windows Recycle Bin (so it can still be restored from
+    there). False if that isn't possible: the caller deletes it instead."""
+    if sys.platform != "win32" or not path.exists():
+        return False
+    import ctypes
+    from ctypes import wintypes
+
+    class SHFILEOPSTRUCTW(ctypes.Structure):
+        _fields_ = [("hwnd", wintypes.HWND), ("wFunc", wintypes.UINT),
+                    ("pFrom", wintypes.LPCWSTR), ("pTo", wintypes.LPCWSTR),
+                    ("fFlags", ctypes.c_uint16), ("fAnyOperationsAborted", wintypes.BOOL),
+                    ("hNameMappings", ctypes.c_void_p), ("lpszProgressTitle", wintypes.LPCWSTR)]
+    FO_DELETE, FOF_SILENT, FOF_NOCONFIRMATION, FOF_ALLOWUNDO, FOF_NOERRORUI = 3, 4, 16, 64, 1024
+    op = SHFILEOPSTRUCTW(wFunc=FO_DELETE, pFrom=str(path.resolve()) + chr(0),
+                         fFlags=FOF_SILENT | FOF_NOCONFIRMATION | FOF_ALLOWUNDO | FOF_NOERRORUI)
+    try:
+        ok = ctypes.windll.shell32.SHFileOperationW(ctypes.byref(op)) == 0
+        return ok and not op.fAnyOperationsAborted and not path.exists()
+    except Exception:  # noqa: BLE001
+        log.debug("recycling %s failed", path, exc_info=True)
+        return False
+
+
+# tests switch this off so they never fill the real Recycle Bin
+USE_RECYCLE_BIN = True
+
+
 def delete_file(meta: SoundMeta):
+    """Remove a sound's files: the audio goes to the Recycle Bin (it's the one thing
+    that can't be made again), its picture and decoded cache are deleted."""
     p = Path(meta.file)
     try:
-        if p.parent == SOUNDS_DIR:
+        if p.parent == SOUNDS_DIR and not (USE_RECYCLE_BIN and recycle(p)):
             p.unlink(missing_ok=True)
         if meta.image and Path(meta.image).parent == THUMBS_DIR:
             Path(meta.image).unlink(missing_ok=True)

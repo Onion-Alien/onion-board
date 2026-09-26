@@ -266,3 +266,207 @@ def test_computer_voice_mode_keeps_the_real_voice_out_of_the_cable():
     e._mic(np.full((480, 1), 0.5, np.float32))
     e._main(out, 480)
     assert out.any()                     # the robot voice does go out
+
+
+# ---------------------------------------------------------------- aux sources (captured programs)
+
+def test_aux_source_goes_to_the_cable_and_only_to_headphones_when_asked():
+    e = engine_with("main", "mon")
+    src = e.add_aux(("app", "music.exe"))
+    src.ring_main.prefill = src.ring_mon.prefill = 0
+    e.feed_aux(src, np.full((480, 2), 0.25, np.float32))
+    out = np.zeros((480, 2), np.float32)
+    e._main(out, 480)
+    assert out.any() and src.level > 0.2                    # live by default: others hear it
+    e._mon(out, 480)
+    assert not out.any()                                     # not in your headphones by default
+    src.monitor = True
+    e.feed_aux(src, np.full((480, 2), 0.25, np.float32))
+    e._mon(out, 480)
+    assert out.any()
+    src.live = False
+    e.feed_aux(src, np.full((480, 2), 0.25, np.float32))
+    out.fill(0)
+    e._main(out, 480)
+    assert not out.any()
+
+
+def test_aux_source_volume_on_air_and_removal():
+    e = engine_with("main")
+    src = e.add_aux("a")
+    src.ring_main.prefill = 0
+    src.vol = 0.5
+    assert not e.aux_on_air()
+    e.feed_aux(src, np.full((480, 2), 0.5, np.float32))
+    assert e.aux_on_air()
+    out = np.zeros((480, 2), np.float32)
+    e._main(out, 480)
+    assert abs(float(out[:, 0].max()) - 0.25) < 0.02
+    e.add_aux("a")                                           # same key replaces, never doubles
+    assert [a.key for a in e.aux] == ["a"]
+    e.remove_aux("a")
+    assert e.aux == () and not e.aux_on_air()
+    e._main(out, 480)                                        # nothing to read: silence
+    assert not out.any()
+
+
+# ---------------------------------------------------------------- audit fixes
+
+def test_cancelled_test_record_never_finishes():
+    e = engine_with("main")
+    e.start_test_record(1.0)
+    assert e.recording
+    e.cancel_test_record()
+    assert not e.recording
+    out = np.zeros((480, 2), np.float32)
+    e._main(out, 480)                            # a block after cancelling...
+    assert e.rec_done is None                    # ...is not taken for a finished test
+
+
+def test_test_record_finishes_after_its_length():
+    e = engine_with("main")
+    e.start_test_record(0.02)                    # 960 frames
+    out = np.zeros((480, 2), np.float32)
+    e._main(out, 480)
+    assert e.recording and e.rec_done is None
+    e._main(out, 480)
+    assert not e.recording and e.rec_done[0].shape == (960, 2)
+
+
+def test_callback_errors_are_reported_again_after_a_reopen(caplog):
+    e = engine_with("main")
+    e._last_cb["main"] = time.monotonic()
+    with caplog.at_level("ERROR"):
+        e._guard("main", RuntimeError("one"))
+        e._guard("main", RuntimeError("two"))
+        assert e.check_streams() == ["main"]     # grew since the last check: refresh
+        assert e.check_streams() == []
+        e.errors.pop("main")                     # what set_main_device does on reopen
+        e._stream_opened("main")                 # ...and a new stream starts counting
+        e._guard("main", RuntimeError("three"))
+    assert caplog.text.count("exception in main audio callback") == 2
+    assert "three" in e.errors_snapshot()["main"]
+    assert e.cb_errors["main"] == 3              # still a running total for diagnostics
+    assert e.check_streams() == ["main"]
+
+
+def test_errors_snapshot_is_a_copy():
+    e = Engine()
+    e.errors["main"] = "gone"
+    snap = e.errors_snapshot()
+    e.errors["mic"] = "also gone"
+    assert snap == {"main": "gone"}
+
+
+def fake_devices(monkeypatch, rate=44100, start_fails=False):
+    made = []
+
+    class Stream:
+        def __init__(self, **kw):
+            self.closed = False
+            made.append(self)
+
+        def start(self):
+            if start_fails:
+                raise RuntimeError("device busy")
+
+        def stop(self):
+            pass
+
+        def close(self):
+            self.closed = True
+
+    monkeypatch.setattr(eng, "find_device", lambda kind, name: 7)
+    monkeypatch.setattr(eng.sd, "query_devices",
+                        lambda idx=None: {"default_samplerate": rate, "max_output_channels": 2,
+                                          "max_input_channels": 1})
+    monkeypatch.setattr(eng.sd, "OutputStream", Stream)
+    monkeypatch.setattr(eng.sd, "InputStream", Stream)
+    return made
+
+
+def test_failed_start_closes_the_stream_and_keeps_the_rate(monkeypatch):
+    made = fake_devices(monkeypatch, start_fails=True)
+    e = Engine()
+    e.set_main_device("busy")
+    e.set_mic_device("busy mic")
+    assert len(made) == 2 and all(s.closed for s in made)     # nothing leaked
+    assert e.rates == {"main": SR, "mon": SR, "mic": SR}
+    assert "device busy" in e.errors["main"] and "device busy" in e.errors["mic"]
+    assert e.main_stream is None and e.mic_stream is None
+
+
+def test_opening_one_output_leaves_the_other_playing(monkeypatch):
+    e = Engine()
+    e.mon_stream = FakeStream()
+    ring = e.ring_rmon
+    ring.write(np.full((4800, 2), 0.1, np.float32))
+    e.set_main_device("no such device")          # fails (a retry every few seconds)...
+    assert ring.count == 4800                    # ...without resetting the headphones
+    fake_devices(monkeypatch, rate=44100)
+    e.set_main_device("cable")                   # opens at a new rate
+    assert e.main_stream is not None and e.rates["main"] == 44100
+    assert e.ring_rmain.max_fill == int(44100 * e.ring_rmain.max_s)
+    assert ring.count == 4800                    # the other output is still untouched
+
+
+def test_seek_survives_a_render_in_flight():
+    e = engine_with("main")
+    v = e.play("a", tone(1.0), 1.0)
+    n = len(v.data["main"])
+    out = np.zeros((480, 2), np.float32)
+    e._main(out, 480)
+    v.seek(0.5)                                  # as if the UI seeks mid-block...
+    v.pos["main"] = 960                          # ...and the block then writes its pos back
+    assert abs(v.progress() - 0.5) < 0.01        # the pending seek is what the UI sees
+    e._main(out, 480)
+    assert v.pos["main"] == n // 2 + 480         # applied at the top of the next block
+    assert not v.seek_to
+
+
+def test_empty_looped_sound_finishes():
+    e = engine_with("main")
+    v = e.play("a", np.zeros((0, 2), np.float32), 1.0, loop=True)
+    e._main(np.zeros((480, 2), np.float32), 480)
+    assert v.finished and not e.any_playing()
+
+
+def test_play_skips_an_output_closed_while_it_resampled(monkeypatch):
+    e = engine_with("main", "mon")
+    e.rates["mon"] = 44100
+    real = e.data_for
+
+    def slow(sid, data, rate, src_rate=SR):
+        if rate == 44100:
+            e._close("mon_stream")   # the watchdog, between picking outputs and adding the voice
+        return real(sid, data, rate, src_rate)
+
+    monkeypatch.setattr(e, "data_for", slow)
+    v = e.play("a", tone(), 1.0)
+    assert "mon" in v.done and not v.finished
+    e._close("main_stream")
+    assert not e.any_playing()
+
+
+def test_play_gives_up_when_every_output_went_away_or_changed_rate(monkeypatch):
+    e = engine_with("main")
+    real = e.data_for
+
+    def slow(sid, data, rate, src_rate=SR):
+        e.rates["main"] = 44100      # reopened at another rate meanwhile
+        return real(sid, data, rate, src_rate)
+
+    monkeypatch.setattr(e, "data_for", slow)
+    assert e.play("a", tone(), 1.0) is None
+    assert e.voices == ()
+
+
+def test_eq_and_destination_drop_their_state_when_turned_off():
+    e = engine_with("main")
+    x = np.zeros((64, 2), np.float32)
+    e._eqs[("main", "sounds")] = object()
+    e._dests["main"] = object()
+    e.eq_gains = None
+    e.dest = None
+    assert e._eq("main", "sounds", x) is x and e._dest("main", x) is x
+    assert e._eqs == {} and e._dests == {}

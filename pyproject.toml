@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "soundboard"
 dynamic = ["version"]
-description = "Gaming soundboard: mic + sounds + a browser tab, mixed into a virtual mic"
+description = "Gaming soundboard: mic + sounds + web search, mixed into a virtual mic"
 readme = "README.md"
 requires-python = ">=3.12"
 license = "MIT"
@@ -28,7 +28,6 @@ dependencies = [
     "soundfile==0.14.0",
     "soxr==1.1.0",
     "scipy==1.18.1",
-    "adblock==0.6.0",
 ]
 
 [project.optional-dependencies]

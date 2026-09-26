@@ -293,6 +293,15 @@ def _palette(p, fill):
         fill(dot)
 
 
+def _radio(p, fill):
+    """The Radio tab: a little set with an antenna."""
+    p.drawRoundedRect(QRectF(3, 9, 18, 12), 2.5, 2.5)
+    p.drawLine(QPointF(7, 9), QPointF(17, 3.5))
+    p.drawEllipse(QPointF(9, 15), 3, 3)
+    p.drawLine(QPointF(15, 13), QPointF(18, 13))
+    p.drawLine(QPointF(15, 17), QPointF(18, 17))
+
+
 def _gamepad(p, fill):
     path = QPainterPath(QPointF(7, 7))
     path.lineTo(17, 7)
@@ -322,6 +331,25 @@ def _image(p, fill):
     p.drawPath(path)
 
 
+def _apps(p, fill):
+    """The Apps tab: a window with a small sound wave leaving it."""
+    p.drawRoundedRect(QRectF(3, 4, 14, 12), 2.5, 2.5)
+    p.drawLine(QPointF(3, 8), QPointF(17, 8))
+    for x, y in ((5.5, 6), (8, 6)):
+        dot = QPainterPath()
+        dot.addEllipse(QPointF(x, y), 0.9, 0.9)
+        fill(dot)
+    p.drawLine(QPointF(10, 19.5), QPointF(10, 19.5))
+    path = QPainterPath(QPointF(16, 16))
+    path.cubicTo(QPointF(17, 15), QPointF(17, 13), QPointF(16, 12))
+    p.drawPath(path)
+    path = QPainterPath(QPointF(18.5, 18))
+    path.cubicTo(QPointF(21, 15.5), QPointF(21, 12.5), QPointF(18.5, 10))
+    p.drawPath(path)
+    p.drawLine(QPointF(6, 20), QPointF(13, 20))
+    p.drawLine(QPointF(9.5, 16), QPointF(9.5, 20))
+
+
 SHAPES = {
     "sounds": _grid, "browser": _globe, "voice": _mask, "setup": _sliders, "wave": _wave,
     "mic": _mic, "headphones": _headphones, "volume": _volume, "ear": _ear,
@@ -330,7 +358,8 @@ SHAPES = {
     "back": _arrow("back"), "forward": _arrow("forward"), "reload": _reload,
     "speech": _speech, "cable": _cable, "check": _check, "warn": _warn, "folder": _folder,
     "next": _next, "edit": _edit, "trash": _trash, "keyboard": _keyboard,
-    "palette": _palette, "gamepad": _gamepad, "image": _image,
+    "palette": _palette, "gamepad": _gamepad, "image": _image, "radio": _radio,
+    "apps": _apps,
 }
 
 
@@ -386,7 +415,7 @@ def icon(name: str, color: str | None = None, checked_color: str | None = None) 
 # --------------------------------------------------------------------------- live retheme
 
 _applied: list[tuple[weakref.ref, str, str | None, str | None]] = []
-_tabs: list[tuple[weakref.ref, int, str]] = []
+_tabs: list[tuple[weakref.ref, int, str, str | None]] = []
 
 
 def set_icon(widget, name: str, color: str | None = None, checked_color: str | None = None,
@@ -394,6 +423,8 @@ def set_icon(widget, name: str, color: str | None = None, checked_color: str | N
     """Give a button (anything with setIcon) an icon that follows theme changes."""
     widget.setIcon(icon(name, color, checked_color))
     widget.setIconSize(QSize(size, size))
+    # one entry per widget: buttons re-iconed on every click must not grow the list
+    _applied[:] = [e for e in _applied if e[0]() is not None and e[0]() is not widget]
     _applied.append((weakref.ref(widget), name, color, checked_color))
 
 
@@ -408,9 +439,22 @@ def set_label_icon(label, name: str, color: str = "muted", size: int = 18):
     _labels.append((weakref.ref(label), name, color, size))
 
 
-def set_tab_icon(tabs, index: int, name: str):
-    tabs.setTabIcon(index, icon(name, "muted", "accent"))
-    _tabs.append((weakref.ref(tabs), index, name))
+def _tab_icon(name: str, tint: str | None) -> QIcon:
+    if tint is None:
+        return icon(name, "muted", "accent")
+    ic = QIcon()   # one colour whatever the tab's state (e.g. green while it's live)
+    for s in SIZES:
+        pm = pixmap(name, s, theme.T.get(tint, tint))
+        for mode in (QIcon.Normal, QIcon.Selected, QIcon.Active):
+            ic.addPixmap(pm, mode, QIcon.Off)
+    return ic
+
+
+def set_tab_icon(tabs, index: int, name: str, tint: str | None = None):
+    """`tint` colours the icon in every state; None is the usual muted / accent."""
+    tabs.setTabIcon(index, _tab_icon(name, tint))
+    _tabs[:] = [e for e in _tabs if not (e[0]() is tabs and e[1] == index)]
+    _tabs.append((weakref.ref(tabs), index, name, tint))
 
 
 def retheme():
@@ -434,10 +478,10 @@ def retheme():
                 set_label_icon(lbl, name, color, size)
             except RuntimeError:
                 pass
-    for ref, index, name in _tabs:
+    for ref, index, name, tint in _tabs:
         t = ref()
         if t is not None:
             try:
-                t.setTabIcon(index, icon(name, "muted", "accent"))
+                t.setTabIcon(index, _tab_icon(name, tint))
             except RuntimeError:
                 pass

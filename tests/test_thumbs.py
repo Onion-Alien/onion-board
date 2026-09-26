@@ -165,6 +165,7 @@ def test_link_add_uses_the_video_thumbnail(qapp, window, monkeypatch, tmp_path):
 
 def test_image_dropped_on_a_pad_becomes_its_picture(qapp, window, tmp_path):  # noqa: F811
     window.grid.image_dropped.emit("s0", str(make_image(tmp_path / "a.png")))
+    qapp.processEvents()   # drops are handled after the drop returns (queued)
     m = window.meta("s0")
     assert m.image and Config.load().sounds[0].image == m.image
 

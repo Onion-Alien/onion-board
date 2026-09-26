@@ -52,7 +52,8 @@ RULES: list[tuple[str, re.Pattern[str]]] = [(name, re.compile(rx)) for name, rx 
 )]
 
 # e-mails that are fine to publish
-EMAIL_OK = re.compile(r"(?i)^(?:noreply|no-reply)@|@anthropic\.com$")
+EMAIL_OK = re.compile(r"(?i)^(?:noreply|no-reply)@|@anthropic\.com$"
+                      r"|^support@github\.com$")  # dependabot's Signed-off-by
 
 
 def load_private_rules() -> list[tuple[str, re.Pattern[str]]]:
@@ -107,8 +108,8 @@ def scan_worktree(rules, staged: bool) -> list[str]:
     hits = []
     for raw in filter(None, names):
         name = raw.decode()
-        if name in SELF:
-            continue
+        if name in SELF or (not staged and not (ROOT / name).is_file()):
+            continue  # deleted in the working tree (still in the index) = nothing to publish
         data = git("show", f":{name}") if staged else (ROOT / name).read_bytes()
         text = decode(data)
         if text is not None:

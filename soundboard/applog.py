@@ -2,29 +2,57 @@
 
 The app runs under pythonw.exe, so there is no console: without this, every
 traceback, Qt warning and swallowed error simply vanishes. Everything goes to a
-small rotating log in the app folder, and an unhandled exception on the UI thread
-also shows a dialog pointing at that log.
+small rotating log in the app folder.
 
-Set SOUNDBOARD_DEBUG=1 to log at DEBUG level.
+Any unhandled exception — on the UI thread, in a worker thread, or reported by
+code that caught something it didn't expect (`report()`) — is logged, saved as a
+crash report (`crash-reports\\`, personal paths scrubbed) and shown in a dialog
+that asks the user to send that report to the developer. Nothing is ever sent
+automatically: the dialog copies the report and opens the issue page, and the
+user decides what to post.
+
+Set ONIONBOARD_DEBUG=1 to log at DEBUG level.
 """
 from __future__ import annotations
 
 import logging
 import logging.handlers
 import os
+import platform
+import re
 import sys
 import threading
+import time
+import traceback
+from dataclasses import dataclass, field
 from pathlib import Path
 
-LOG_NAME = "soundboard.log"
-_shown = False   # only one crash dialog per run, so a repeating error can't stack dialogs
+LOG_NAME = "onionboard.log"
+REPORTS_DIR = "crash-reports"
+KEEP_REPORTS = 10
+LOG_TAIL_LINES = 60
+MAX_DIALOGS = 3   # per run: a bug that fires every frame mustn't bury the user in popups
+
+log = logging.getLogger("crash")
+
+_state = {"log_path": None, "version": "?", "dialogs": 0, "seen": set(), "open": None,
+          "bridge": None}
+
+
+@dataclass
+class Report:
+    title: str                  # "ValueError: bad thing"
+    text: str                   # the full, scrubbed report
+    fatal: bool = False
+    path: Path | None = None    # where it was saved, if it was
+    extra: list[str] = field(default_factory=list)   # later errors while it was open
 
 
 def setup(app_dir: Path) -> Path:
-    """Send all logging to app_dir/soundboard.log (3 x 1 MB). Returns the log path."""
+    """Send all logging to app_dir/onionboard.log (3 x 1 MB). Returns the log path."""
     app_dir.mkdir(parents=True, exist_ok=True)
     path = app_dir / LOG_NAME
-    level = logging.DEBUG if os.environ.get("SOUNDBOARD_DEBUG") else logging.INFO
+    level = logging.DEBUG if os.environ.get("ONIONBOARD_DEBUG") else logging.INFO
     root = logging.getLogger()
     root.setLevel(level)
     for h in list(root.handlers):
@@ -40,21 +68,32 @@ def setup(app_dir: Path) -> Path:
 
 
 def install_hooks(log_path: Path, version: str):
-    """Route unhandled exceptions (main thread, worker threads) and Qt's own
-    messages into the log; show one dialog for a crash on the UI thread."""
-    log = logging.getLogger("crash")
-    log.info("Soundboard %s starting (python %s)", version, sys.version.split()[0])
+    """Route unhandled exceptions (main thread, worker threads, `__del__`s) and Qt's
+    own messages into the log; offer a crash report for the first two kinds."""
+    _state["log_path"], _state["version"] = log_path, version
+    log.info("Onion Board %s starting (python %s)", version, sys.version.split()[0])
 
     def excepthook(t, v, tb):
-        log.critical("Unhandled exception", exc_info=(t, v, tb))
-        _dialog(log_path, f"{t.__name__}: {v}")
+        if issubclass(t, KeyboardInterrupt):
+            sys.__excepthook__(t, v, tb)
+            return
+        report((t, v, tb))
 
     def thread_hook(args):
-        log.critical("Unhandled exception in thread %s", args.thread.name if args.thread else "?",
-                     exc_info=(args.exc_type, args.exc_value, args.exc_traceback))
+        if args.exc_type is SystemExit:
+            return
+        name = args.thread.name if args.thread else "?"
+        report((args.exc_type, args.exc_value, args.exc_traceback),
+               where=f"background task '{name}'")
+
+    def unraisable_hook(u):
+        # Errors in __del__ / weakref callbacks / GC: log them, never interrupt the user.
+        log.error("Ignored exception in %r", u.object,
+                  exc_info=(u.exc_type, u.exc_value, u.exc_traceback))
 
     sys.excepthook = excepthook
     threading.excepthook = thread_hook
+    sys.unraisablehook = unraisable_hook
 
     try:
         from PySide6.QtCore import QtMsgType, qInstallMessageHandler
@@ -71,18 +110,176 @@ def install_hooks(log_path: Path, version: str):
     qInstallMessageHandler(qt_handler)
 
 
-def _dialog(log_path: Path, what: str):
-    global _shown
-    if _shown or threading.current_thread() is not threading.main_thread():
+def ui_ready():
+    """Call once on the UI thread after the QApplication exists: from then on an
+    error on any thread can bring up the report dialog (it's marshalled here)."""
+    from PySide6.QtCore import QObject, Qt, Signal
+
+    class _Bridge(QObject):
+        show = Signal(object)
+
+    bridge = _Bridge()
+    bridge.show.connect(_show_dialog, Qt.ConnectionType.QueuedConnection)
+    _state["bridge"] = bridge
+
+
+def report(exc_info=None, where: str = "", fatal: bool = False) -> Report | None:
+    """Log an exception, save a scrubbed crash report and offer it to the user.
+
+    Safe to call from any thread and from inside an `except` block (with no
+    argument it reports the exception being handled). Returns the Report, or
+    None if there was nothing to report. Never raises."""
+    try:
+        if exc_info is None:
+            exc_info = sys.exc_info()
+        elif isinstance(exc_info, BaseException):
+            exc_info = (type(exc_info), exc_info, exc_info.__traceback__)
+        t, v, tb = exc_info
+        if t is None:
+            return None
+        log.critical("Unhandled exception%s", f" in {where}" if where else "", exc_info=exc_info)
+        rep = build_report(exc_info, where, fatal)
+        rep.path = _save(rep)
+        _offer(rep, _signature(t, tb))
+        return rep
+    except Exception:  # noqa: BLE001 - the crash reporter must never crash
+        try:
+            log.exception("crash reporter failed")
+        except Exception:  # noqa: BLE001
+            pass
+        return None
+
+
+def build_report(exc_info, where: str = "", fatal: bool = False) -> Report:
+    t, v, tb = exc_info
+    title = f"{t.__name__}: {v}".strip().rstrip(":")
+    if len(title) > 200:
+        title = title[:197] + "…"
+    lines = [
+        "Onion Board crash report",
+        f"Version:  {_state['version']}",
+        f"Time:     {time.strftime('%Y-%m-%d %H:%M:%S')}",
+        f"Windows:  {platform.platform()}",
+        f"Python:   {sys.version.split()[0]}"
+        + (" (installed build)" if getattr(sys, "frozen", False) else ""),
+    ]
+    if where:
+        lines.append(f"Where:    {where}")
+    if fatal:
+        lines.append("Fatal:    yes (the app could not continue)")
+    lines += ["", "Error", "-----", "".join(traceback.format_exception(t, v, tb)).rstrip()]
+    tail = _log_tail(_state["log_path"], LOG_TAIL_LINES)
+    if tail:
+        lines += ["", f"Last {LOG_TAIL_LINES} log lines", "-------------------", tail]
+    return Report(title=scrub(title), text=scrub("\n".join(lines)), fatal=fatal)
+
+
+# -- privacy -----------------------------------------------------------------------
+
+def scrub(text: str) -> str:
+    """Replace the user's home folder, user name and computer name, so the report
+    can go in a public issue as-is."""
+    home = str(Path.home())
+    for variant in {home, home.replace("\\", "/"), home.replace("\\", "\\\\")}:
+        if len(variant) > 3:
+            text = re.sub(re.escape(variant), "%USERPROFILE%", text, flags=re.IGNORECASE)
+    for var, placeholder in (("COMPUTERNAME", "<pc>"), ("USERNAME", "<user>")):
+        name = os.environ.get(var, "")
+        if len(name) >= 3:
+            text = re.sub(rf"(?<![\w-]){re.escape(name)}(?![\w-])", placeholder, text,
+                          flags=re.IGNORECASE)
+    return text
+
+
+# -- internals ---------------------------------------------------------------------
+
+def _signature(t, tb) -> tuple:
+    """Same error type thrown from the same line = the same bug."""
+    frames = traceback.extract_tb(tb) if tb is not None else []
+    last = frames[-1] if frames else None
+    return (t.__name__, last.filename if last else "", last.lineno if last else 0)
+
+
+def _log_tail(path: Path | None, n: int) -> str:
+    if path is None:
+        return ""
+    try:
+        for h in logging.getLogger().handlers:
+            h.flush()
+        with open(path, "rb") as f:
+            f.seek(0, os.SEEK_END)
+            f.seek(max(0, f.tell() - 64_000))
+            data = f.read().decode("utf-8", "replace")
+        return "\n".join(data.splitlines()[-n:])
+    except OSError:
+        return ""
+
+
+def _save(rep: Report) -> Path | None:
+    if _state["log_path"] is None:
+        return None
+    try:
+        folder = Path(_state["log_path"]).parent / REPORTS_DIR
+        folder.mkdir(parents=True, exist_ok=True)
+        path = folder / f"crash-{time.strftime('%Y%m%d-%H%M%S')}-{os.getpid()}.txt"
+        path.write_text(rep.text, encoding="utf-8")
+        for old in sorted(folder.glob("crash-*.txt"))[:-KEEP_REPORTS]:
+            old.unlink(missing_ok=True)
+        return path
+    except OSError:
+        log.warning("couldn't save the crash report", exc_info=True)
+        return None
+
+
+def _offer(rep: Report, sig: tuple):
+    """Show the dialog on the UI thread, at most once per distinct bug and
+    MAX_DIALOGS per run. A dialog already open collects further errors instead."""
+    open_rep = _state["open"]
+    if open_rep is not None and not rep.fatal:
+        open_rep.extra.append(rep.title)
+        return
+    if not rep.fatal and (sig in _state["seen"] or _state["dialogs"] >= MAX_DIALOGS):
+        return
+    _state["seen"].add(sig)
+    on_ui = threading.current_thread() is threading.main_thread()
+    if on_ui:
+        _show_dialog(rep)
+    elif _state["bridge"] is not None:
+        _state["bridge"].show.emit(rep)
+
+
+def _show_dialog(rep: Report):
+    try:
+        from PySide6.QtWidgets import QApplication
+        if QApplication.instance() is None:
+            _native_box(rep)
+            return
+        from soundboard.ui.crashdialog import CrashDialog
+        _state["dialogs"] += 1
+        _state["open"] = rep
+        dlg = CrashDialog(rep, _state["log_path"], parent=QApplication.activeWindow())
+        dlg.finished.connect(lambda _r: _state.__setitem__("open", None))
+        _state["dialog"] = dlg   # keep it alive while it's shown
+        if rep.fatal:
+            dlg.exec()
+        else:
+            dlg.show()
+            dlg.raise_()
+    except Exception:  # noqa: BLE001 - never let the crash reporter itself crash
+        _state["open"] = None
+        log.exception("couldn't show the crash dialog")
+        _native_box(rep)
+
+
+def _native_box(rep: Report):
+    """Last resort (no Qt yet, or Qt itself is broken): a plain Windows message box."""
+    if sys.platform != "win32" or "pytest" in sys.modules:
         return
     try:
-        from PySide6.QtWidgets import QApplication, QMessageBox
-        if QApplication.instance() is None:
-            return
-        _shown = True
-        QMessageBox.critical(
-            None, "Soundboard hit a problem",
-            f"{what}\n\nDetails were written to:\n{log_path}\n\n"
-            "The app will keep running, but if things look wrong, restart it.")
-    except Exception:  # noqa: BLE001 - never let the crash reporter itself crash
+        import ctypes
+        where = f"\n\nA report was saved to:\n{rep.path}" if rep.path else ""
+        ctypes.windll.user32.MessageBoxW(
+            None, f"{rep.title}{where}\n\nPlease send it to the developer.",
+            "Onion Board hit a problem", 0x10)
+    except Exception:  # noqa: BLE001
         pass

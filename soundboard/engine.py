@@ -5,9 +5,11 @@ built-in resampler, auto_convert, audibly garbles audio — measured ~70% junk o
 VB-Cable — so all rate conversion is done here with soxr instead):
 
   mic  (input)  -> streaming resampler -> ring buffers -> main / monitor
-  browser (48 kHz, pushed from the UI thread) -> resampler -> ring buffers -> main / monitor
-  main (output) = sounds + browser (when live) + mic -> virtual cable (what others hear)
-  mon  (output) = sounds + browser [+ mic in test mode] -> your headphones
+  radio   (48 kHz, pushed from the UI thread) -> resampler -> ring buffers -> main / monitor
+  aux     (48 kHz, pushed from a capture thread: one per captured program, Apps tab)
+          -> the same path again, each with its own rings, volume and switches
+  main (output) = sounds + radio / programs (when live) + mic -> virtual cable (what others hear)
+  mon  (output) = sounds + radio / programs [+ mic in test mode] -> your headphones
 
 Sounds are stored at SR and resampled (cached) to each output's rate. Every
 playing Voice keeps its own position per output, so the two output devices
@@ -15,10 +17,8 @@ run on independent clocks without drift or glitches.
 
 Live speed / pitch (the ⏩ controls): sounds play at `sound_speed` by reading
 their data at a fractional rate (like a tape), and a pitch shifter on the sounds
-bus corrects the pitch back (`sound_keep_pitch`) and adds `sound_pitch`. Browser
-speed is the page's own playbackRate; its pitch goes through the same kind of
-shifter in feed_browser. Per-sound effects are baked in ahead of time instead
-(soundboard.soundfx).
+bus corrects the pitch back (`sound_keep_pitch`) and adds `sound_pitch`.
+Per-sound effects are baked in ahead of time instead (soundboard.soundfx).
 """
 from __future__ import annotations
 
@@ -167,7 +167,7 @@ class Ring:
         self.lock = threading.Lock()
         self.prefill_s, self.max_s = prefill_s, max_s
         self.track_drift = track_drift
-        # grow_to_s: a writer that stalls now and then (the browser) gets a bigger
+        # grow_to_s: a writer that stalls now and then (the radio) gets a bigger
         # cushion each time the ring runs dry, up to this, so it stops skipping
         self.grow_to_s = grow_to_s
         self.underruns = 0   # ran dry while playing (a gap)
@@ -341,6 +341,50 @@ class LivePitch:
 
 # --------------------------------------------------------------------------- voices
 
+class AuxSource:
+    """A pushed 48 kHz stereo source with its own rings, volume and switches: one
+    per program captured by the Apps tab. Pushed from the capture's own thread (a
+    ring has one writer), read by the output callbacks. Comes and goes at runtime:
+    Engine.aux is a tuple replaced under the lock, like the voices."""
+
+    def __init__(self, key, rates: dict | None = None):
+        self.key = key
+        self.vol = 1.0
+        self.live = True        # -> others (the whole point of capturing a program)
+        self.monitor = False    # -> your headphones (the program already plays there)
+        self.level = 0.0
+        # the program's audio clock is its device's, not ours: track drift; and a
+        # program that goes quiet stops sending at all, so start again quickly
+        self.ring_main = Ring(prefill_s=0.05, max_s=0.6, track_drift=True, grow_to_s=0.25)
+        self.ring_mon = Ring(prefill_s=0.05, max_s=0.6, track_drift=True, grow_to_s=0.25)
+        self._rs_main = StreamResampler(SR, SR)
+        self._rs_mon = StreamResampler(SR, SR)
+        self._heard = 0.0
+        if rates:
+            self.configure(rates)
+
+    def configure(self, rates: dict, outs=("main", "mon")):
+        if "main" in outs:
+            self._rs_main = StreamResampler(SR, rates["main"])
+            self.ring_main.configure(rates["main"])
+        if "mon" in outs:
+            self._rs_mon = StreamResampler(SR, rates["mon"])
+            self.ring_mon.configure(rates["mon"])
+
+    def feed(self, x: np.ndarray, main: bool, mon: bool):
+        lvl = peak(x)
+        self.level = max(lvl * self.vol, self.level)
+        if lvl > 0.003:
+            self._heard = time.monotonic()
+        if main:
+            self.ring_main.write(self._rs_main(x))
+        if mon:
+            self.ring_mon.write(self._rs_mon(x))
+
+    def on_air(self) -> bool:
+        return self.live and self.vol > 0 and time.monotonic() - self._heard < 0.5
+
+
 @dataclass(eq=False)
 class Voice:
     sid: str
@@ -354,10 +398,19 @@ class Voice:
     paused: bool = False
     gate: dict = field(default_factory=dict)   # out -> current fade gain (0..1)
     started: float = field(default_factory=time.monotonic)
+    fade_in: float = 0.0       # seconds: rises from silence when it starts
+    fade_out: float = 0.0      # seconds: falls to silence when stopped, and before its end
+    fading: set = field(default_factory=set)   # outs still on their way up from the start
+    # out -> requested position (0..1). seek() only posts it; the audio callback
+    # applies it at the start of its next block, since it writes `pos` and `gate`
+    # back at the end of every block and would otherwise undo a seek made meanwhile
+    seek_to: dict = field(default_factory=dict)
 
     def __post_init__(self):
         self.pos = {o: 0 for o in self.data}
-        self.gate = {o: 1.0 for o in self.data}
+        start = 0.0 if self.fade_in > 0 else 1.0
+        self.gate = {o: start for o in self.data}
+        self.fading = set(self.data) if self.fade_in > 0 else set()
 
     @property
     def outs(self) -> set:
@@ -368,14 +421,22 @@ class Voice:
         return self.done >= self.outs
 
     def seek(self, frac: float):
-        for o, d in self.data.items():
-            self.pos[o] = int(min(max(frac, 0.0), 0.999) * len(d))
-            self.gate[o] = 0.0   # fade in from the new spot (no click)
+        """Ask for a new position (applied by the audio callback: see seek_to)."""
+        frac = min(max(frac, 0.0), 0.999)
+        self.seek_to = {o: frac for o in self.data}   # one atomic swap
+
+    def _apply_seek(self, out: str):
+        """Audio thread (or before the voice is shared): take a pending seek."""
+        frac = self.seek_to.pop(out, None)
+        if frac is not None:
+            self.pos[out] = int(frac * len(self.data[out]))
+            self.gate[out] = 0.0   # fade in from the new spot (no click)
 
     def progress(self) -> float:
         for o, d in self.data.items():
             if len(d):
-                return (self.pos[o] % len(d)) / len(d)
+                frac = self.seek_to.get(o)   # a seek the callback hasn't taken yet
+                return frac if frac is not None else (self.pos[o] % len(d)) / len(d)
         return 1.0
 
 
@@ -393,7 +454,6 @@ class Engine:
         self._cache: OrderedDict[tuple[str, int], tuple[np.ndarray, np.ndarray]] = OrderedDict()
         self._cache_bytes = 0
         self._cache_lock = threading.Lock()
-        self._ramps: dict[int, np.ndarray] = {}   # fade length -> 1..0 ramp (no per-block alloc)
 
         self.latency = "low"      # sounddevice latency: 'low' or 'high' (safer)
         self.names = {"main": None, "mon": None, "mic": None}   # device names for reopening
@@ -401,13 +461,16 @@ class Engine:
         self._last_try = {"main": 0.0, "mon": 0.0, "mic": 0.0} # last (re)open attempt
         self.xruns = {"main": 0, "mon": 0, "mic": 0}           # drop-outs reported by PortAudio
         self.cb_errors = {"main": 0, "mon": 0, "mic": 0}       # exceptions inside a callback
-        self.stalls = 0                                        # streams reopened by the watchdog
+        self._cb_err_base = {"main": 0, "mon": 0, "mic": 0}    # cb_errors when the stream opened
+        self._cb_err_seen = {"main": 0, "mon": 0, "mic": 0}    # cb_errors at the last check_streams
+        self.stalls = 0                                       # streams reopened by the watchdog
 
         # live settings (read by audio callbacks; plain attribute writes are atomic)
         self.sound_vol = 1.0      # sounds -> others
         self.mic_vol = 1.0        # mic    -> others
         self.mon_vol = 0.7        # everything -> your headphones
         self.mic_enabled = True   # pass your mic through to the cable
+        self.sending = True       # master switch: False sends silence to others
         self.mic_muted = False
         self.monitor_sounds = True
         self.eq_gains: list[float] | None = None   # None = EQ off
@@ -431,27 +494,25 @@ class Engine:
         self._rs_main = StreamResampler(SR, SR)
         self._rs_mon = StreamResampler(SR, SR)
 
-        # browser audio arrives in bursty ~20 ms chunks over IPC, so it gets a
-        # bigger cushion than the mic (latency matters less for music than voice)
-        self.browser_vol = 1.0
-        self.browser_live = True      # browser -> others
-        self.browser_monitor = True   # browser -> your headphones
-        # Chromium's audio clock isn't the output devices' clock (measured up to ~1.5%
-        # apart), so these rings track drift instead of glitching every few seconds
-        # The page and the UI thread both handle every chunk, and either can stall
-        # (a heavy page like YouTube does), so the cushion grows when it runs dry.
-        self.ring_bmain = Ring(prefill_s=0.08, max_s=0.6, track_drift=True, grow_to_s=0.25)
-        self.ring_bmon = Ring(prefill_s=0.08, max_s=0.6, track_drift=True, grow_to_s=0.25)
-        self._rs_bmain = StreamResampler(SR, SR)
-        self._rs_bmon = StreamResampler(SR, SR)
-        self._browser_heard = 0.0     # monotonic time of the last non-silent chunk
-        self.browser_pitch = 0.0      # semitones (browser speed is set in the page)
-        self._bpitch = LivePitch(SR)
+        # internet radio (Radio tab): decoded by Qt Multimedia on the system clock,
+        # which isn't the output devices' clock (up to ~1.5% apart), so these rings
+        # track drift instead of glitching every few seconds. It arrives in bursty
+        # chunks from the UI thread, so it gets a bigger cushion than the mic, and the
+        # cushion grows when it runs dry. Its own volume and switches.
+        self.radio_vol = 1.0
+        self.radio_live = False       # radio -> others
+        self.radio_monitor = True     # radio -> your headphones
+        self.ring_rmain = Ring(prefill_s=0.1, max_s=0.6, track_drift=True, grow_to_s=0.3)
+        self.ring_rmon = Ring(prefill_s=0.1, max_s=0.6, track_drift=True, grow_to_s=0.3)
+        self._rs_rmain = StreamResampler(SR, SR)
+        self._rs_rmon = StreamResampler(SR, SR)
+        self._radio_heard = 0.0
+        self.aux: tuple[AuxSource, ...] = ()   # captured programs (Apps tab), see AuxSource
 
         self.level_main = 0.0
         self.level_mic = 0.0
         self.level_mon = 0.0
-        self.level_browser = 0.0
+        self.level_radio = 0.0
 
         self._rec_buf: list[np.ndarray] | None = None
         self._rec_frames_left = 0
@@ -473,11 +534,35 @@ class Engine:
             raise RuntimeError("mono output devices aren't supported")
         s = sd.OutputStream(device=idx, samplerate=rate, channels=CH, dtype="float32",
                             latency=self.latency, callback=callback)
-        self.rates[key] = rate
         self._last_cb[key] = time.monotonic()
-        s.start()
+        try:
+            s.start()
+        except Exception:
+            self._close_quietly(s, key)   # else every RETRY_S retry leaks a stream
+            raise
+        # committed only now, so a failed open leaves the rate and the rings alone.
+        # Nothing plays on or writes to this output until its *_stream attribute is
+        # set, so callbacks that run before this line render silence and do no harm.
+        self._stream_opened(key)
+        if rate != self.rates[key]:
+            self.rates[key] = rate
+            self._reconfigure_out(key)
+        else:   # same rate: only drop what was queued for the old stream
+            self._clear_out(key)
         log.info("opened %s output: %s @ %d Hz (latency %s)", key, name, rate, self.latency)
         return s
+
+    @staticmethod
+    def _close_quietly(s, what):
+        try:
+            s.close()
+        except Exception:  # noqa: BLE001
+            log.debug("closing %s raised", what, exc_info=True)
+
+    def _stream_opened(self, key):
+        # callback errors are counted per stream from here: the first failure on the
+        # new stream is logged and reported again (cb_errors stays a running total)
+        self._cb_err_base[key] = self.cb_errors[key]
 
     def set_main_device(self, name: str | None):
         self._close("main_stream")
@@ -490,7 +575,6 @@ class Engine:
             except Exception as e:  # noqa: BLE001
                 log.warning("can't open main output %r: %s", name, e)
                 self.errors["main"] = str(e)
-        self._reconfigure_mic_paths()
 
     def set_mon_device(self, name: str | None):
         self._close("mon_stream")
@@ -503,7 +587,6 @@ class Engine:
             except Exception as e:  # noqa: BLE001
                 log.warning("can't open headphone output %r: %s", name, e)
                 self.errors["mon"] = str(e)
-        self._reconfigure_mic_paths()
 
     def set_mic_device(self, name: str | None):
         self._close("mic_stream")
@@ -512,22 +595,33 @@ class Engine:
         self._last_try["mic"] = time.monotonic()
         if name:
             idx = find_device("input", name)
+            old_rate = self.rates["mic"]
+            s = None
             try:
                 if idx is None:
                     raise RuntimeError(f"device not found: {name}")
                 rate = self._native_rate(idx)
                 chans = min(2, sd.query_devices(idx)["max_input_channels"])
-                self.rates["mic"] = rate
-                self._reconfigure_mic_paths()
-                self._last_cb["mic"] = time.monotonic()
                 s = sd.InputStream(device=idx, samplerate=rate, channels=chans, dtype="float32",
                                    latency=self.latency, callback=self._cb_mic)
+                # the mic callback resamples with these from its first block, so they're
+                # set before start (cheap: no ring is touched) and undone if it fails
+                if rate != old_rate:
+                    self.rates["mic"] = rate
+                    self._reconfigure_mic_resamplers()
+                self._last_cb["mic"] = time.monotonic()
                 s.start()
+                self._stream_opened("mic")
                 self.mic_stream = s
                 log.info("opened mic: %s @ %d Hz, %d ch", name, rate, chans)
             except Exception as e:  # noqa: BLE001
                 log.warning("can't open mic %r: %s", name, e)
                 self.errors["mic"] = str(e)
+                if s is not None:
+                    self._close_quietly(s, "mic")
+                if self.rates["mic"] != old_rate:
+                    self.rates["mic"] = old_rate
+                    self._reconfigure_mic_resamplers()
 
     def reopen_all(self):
         """Close and reopen every stream with the same devices (after a latency change)."""
@@ -541,12 +635,17 @@ class Engine:
         A stream whose callback has stopped being called (headset unplugged, Windows
         changed its sample rate, PC came back from sleep) is closed and reopened. A
         device that failed to open is retried every RETRY_S. Returns the keys that
-        were touched, so the UI can refresh its status."""
+        were touched (reopened, came back, or whose callback raised since the last
+        check), so the UI can refresh its status from errors_snapshot()."""
         now = time.monotonic()
         touched = []
         for key, attr, setter in (("main", "main_stream", self.set_main_device),
                                   ("mon", "mon_stream", self.set_mon_device),
                                   ("mic", "mic_stream", self.set_mic_device)):
+            n_err = self.cb_errors[key]
+            if n_err != self._cb_err_seen[key]:
+                self._cb_err_seen[key] = n_err
+                touched.append(key)
             name = self.names[key]
             if not name:
                 continue
@@ -562,38 +661,91 @@ class Engine:
                 self.stalls += 1
                 setter(name)
                 touched.append(key)
-        return touched
+        return list(dict.fromkeys(touched))
 
-    def _reconfigure_mic_paths(self):
+    def errors_snapshot(self) -> dict[str, str]:
+        """A copy of `errors` that is safe to iterate. A failing audio callback adds
+        to `errors` from its own thread, so iterating the live dict on the UI thread
+        can raise "dictionary changed size during iteration". Copying a str-keyed
+        dict never releases the GIL, so the copy itself can't be torn."""
+        return dict(self.errors)
+
+    def _reconfigure_mic_resamplers(self):
         r = self.rates
         self._rs_main = StreamResampler(r["mic"], r["main"])
         self._rs_mon = StreamResampler(r["mic"], r["mon"])
-        self.ring_main.configure(r["main"])
-        self.ring_mon.configure(r["mon"])
-        self._rs_bmain = StreamResampler(SR, r["main"])
-        self._rs_bmon = StreamResampler(SR, r["mon"])
-        self.ring_bmain.configure(r["main"])
-        self.ring_bmon.configure(r["mon"])
 
-    # ----------------------------------------------------------------- browser input
-    def feed_browser(self, x: np.ndarray) -> np.ndarray:
-        """Push a chunk of browser audio ((n, 2) float32 at SR). Call from the UI thread.
-        Returns the chunk as it goes out (after the live pitch), for recording."""
-        x = self._bpitch.process(x, self.browser_pitch)   # passes through at 0 st
+    def _reconfigure_out(self, key: str):
+        """Rebuild what feeds output `key` for its (new) rate. Only that output's
+        rings are reset: the other output plays on without a gap."""
+        r = self.rates
+        if key == "main":
+            self._rs_main = StreamResampler(r["mic"], r["main"])
+            self._rs_rmain = StreamResampler(SR, r["main"])
+            rings = (self.ring_main, self.ring_rmain)
+        else:
+            self._rs_mon = StreamResampler(r["mic"], r["mon"])
+            self._rs_rmon = StreamResampler(SR, r["mon"])
+            rings = (self.ring_mon, self.ring_rmon)
+        for ring in rings:
+            ring.configure(r[key])
+        for a in self.aux:
+            a.configure(r, (key,))
+
+    def _clear_out(self, key: str):
+        """Drop everything queued for output `key` (its stream was reopened)."""
+        if key == "main":
+            rings = [self.ring_main, self.ring_rmain]
+            rings += [a.ring_main for a in self.aux]
+        else:
+            rings = [self.ring_mon, self.ring_rmon]
+            rings += [a.ring_mon for a in self.aux]
+        for ring in rings:
+            ring.clear()
+
+    def _reconfigure_mic_paths(self):
+        """Everything, for the current rates (resets both outputs' rings)."""
+        self._reconfigure_mic_resamplers()
+        self._reconfigure_out("main")
+        self._reconfigure_out("mon")
+
+    # ----------------------------------------------------------------- radio input
+    def feed_radio(self, x: np.ndarray):
+        """Push a chunk of radio audio ((n, 2) float32 at SR). Call from the UI thread."""
         lvl = peak(x)
-        self.level_browser = max(lvl * self.browser_vol, self.level_browser)
+        self.level_radio = max(lvl * self.radio_vol, self.level_radio)
         if lvl > 0.003:
-            self._browser_heard = time.monotonic()
+            self._radio_heard = time.monotonic()
         if self.main_stream is not None:
-            self.ring_bmain.write(self._rs_bmain(x))
+            self.ring_rmain.write(self._rs_rmain(x))
         if self.mon_stream is not None:
-            self.ring_bmon.write(self._rs_bmon(x))
-        return x
+            self.ring_rmon.write(self._rs_rmon(x))
 
-    def browser_on_air(self) -> bool:
-        """True while the browser is audibly going out to others (drives auto push-to-talk)."""
-        return (self.browser_live and self.browser_vol > 0
-                and time.monotonic() - self._browser_heard < 0.5)
+    def radio_on_air(self) -> bool:
+        """True while the radio is audibly going out to others (drives auto push-to-talk)."""
+        return (self.radio_live and self.radio_vol > 0
+                and time.monotonic() - self._radio_heard < 0.5)
+
+    # ----------------------------------------------------------------- aux sources
+    def add_aux(self, key) -> AuxSource:
+        """A new pushed source (a captured program). Feed it with feed_aux from any
+        one thread; remove_aux when done."""
+        src = AuxSource(key, self.rates)
+        with self.lock:
+            self.aux = tuple(a for a in self.aux if a.key != key) + (src,)
+        return src
+
+    def remove_aux(self, key):
+        with self.lock:
+            self.aux = tuple(a for a in self.aux if a.key != key)
+
+    def feed_aux(self, src: AuxSource, x: np.ndarray):
+        """Push a chunk ((n, 2) float32 at SR) of a captured program's audio."""
+        src.feed(x, self.main_stream is not None, self.mon_stream is not None)
+
+    def aux_on_air(self) -> bool:
+        """True while any captured program is audibly going out to others."""
+        return any(a.on_air() for a in self.aux)
 
     def _close(self, attr):
         s = getattr(self, attr)
@@ -665,8 +817,11 @@ class Engine:
 
     # ----------------------------------------------------------------- playback
     def play(self, sid: str, data: np.ndarray, gain: float, loop=False, mode="restart",
-             preview=False, src_rate: int = SR, start: float = 0.0) -> Voice | None:
-        """mode: 'restart' (stop previous instance), 'overlap', 'toggle' (stop if playing)."""
+             preview=False, src_rate: int = SR, start: float = 0.0,
+             fade_in: float = 0.0, fade_out: float = 0.0) -> Voice | None:
+        """mode: 'restart' (stop previous instance), 'overlap', 'toggle' (stop if playing).
+        fade_in / fade_out (seconds): a rise from silence at the start; a fall to silence
+        when it's stopped and, for a one-shot, over its last fade_out seconds."""
         outs = self.active_outputs()
         if preview:
             # previews are for your ears only; with no headphone device open they must
@@ -681,11 +836,23 @@ class Engine:
                     v.stopping = True
                 if mode == "toggle" and existing:
                     return None
-        per_out = {o: self.data_for(sid, data, self.rates[o], src_rate) for o in outs}
-        v = Voice(sid, per_out, gain, loop, preview=preview)
+        rates_used = {o: self.rates[o] for o in outs}
+        per_out = {o: self.data_for(sid, data, rates_used[o], src_rate) for o in outs}
+        v = Voice(sid, per_out, gain, loop, preview=preview,
+                  fade_in=max(0.0, float(fade_in)), fade_out=max(0.0, float(fade_out)))
         if start > 0:
             v.seek(start)
+            for o in v.data:     # not shared yet: apply it now, so progress() is right
+                v._apply_seek(o)
         with self.lock:
+            # an output closed or reopened at another rate while we resampled: its
+            # data is useless, and a voice waiting on it would never finish
+            live = self.active_outputs()
+            for o in v.data:
+                if o not in live or self.rates[o] != rates_used[o]:
+                    v.done.add(o)
+            if v.finished:
+                return None
             self.voices = self.voices + (v,)
         return v
 
@@ -696,8 +863,10 @@ class Engine:
                     v.stopping = True
 
     def stop_all(self):
+        """Stop everything now: the panic button skips the sounds' own fade-outs."""
         with self.lock:
             for v in self.voices:
+                v.fade_out = 0.0
                 v.stopping = True
 
     def _current(self, sid: str) -> Voice | None:
@@ -752,7 +921,9 @@ class Engine:
     def any_playing(self) -> bool:
         """True while a sound is going out to others (drives auto push-to-talk)."""
         with self.lock:
-            return any(not v.finished and not v.stopping and not v.preview and not v.paused
+            # a stopped sound still fading out is still being heard
+            return any(not v.finished and not v.preview and not v.paused
+                       and not (v.stopping and not any(v.gate.values()))
                        for v in self.voices)
 
     # ----------------------------------------------------------------- test record
@@ -764,8 +935,8 @@ class Engine:
 
     def cancel_test_record(self):
         """Give up on a test recording (its output device stopped mid-way)."""
+        self._rec_buf = None      # first: the main callback checks it before finishing
         self._rec_frames_left = 0
-        self._rec_buf = []
         self._mic_rec = None
         self.rec_done = None
 
@@ -781,13 +952,6 @@ class Engine:
         return self._rec_buf is not None
 
     # ----------------------------------------------------------------- callbacks
-    def _ramp(self, n: int) -> np.ndarray:
-        """(n, 1) fade-out ramp 1 -> 0, cached (the same few lengths recur every block)."""
-        r = self._ramps.get(n)
-        if r is None:
-            r = self._ramps[n] = np.linspace(1.0, 0.0, n, dtype=np.float32)[:, None]
-        return r
-
     def _render(self, out: str, frames: int, previews_only=False) -> np.ndarray:
         buf = np.zeros((frames, CH), np.float32)
         silent = None   # scratch for voices that must advance but not be heard
@@ -796,6 +960,11 @@ class Engine:
         # no lock: `self.voices` is an immutable tuple swapped atomically by the UI side
         voices = [v for v in self.voices if out in v.data and out not in v.done]
         for v in voices:
+            if v.seek_to:
+                v._apply_seek(out)
+            if not len(v.data[out]):   # nothing to play (even looped): it's over
+                v.done.add(out)
+                continue
             if previews_only and not v.preview:
                 if silent is None:
                     silent = np.zeros((frames, CH), np.float32)
@@ -808,19 +977,25 @@ class Engine:
             # int16 library audio is scaled here (one multiply that already happens
             # for the gain); float32 is used by cues, previews of test recordings…
             g = np.float32(v.gain) * (I16_SCALE if data.dtype == np.int16 else np.float32(1))
-            if v.stopping:  # short fade-out, then done
-                p = int(p)
-                take = min(frames, fade, n - p if not v.loop else fade)
-                if take > 0 and n:
-                    idx = (np.arange(p, p + take) % n) if v.loop else np.arange(p, p + take)
-                    dst[:take] += data[idx] * self._ramp(take) * g
-                v.done.add(out)
-                continue
-            target = 0.0 if v.paused else 1.0
             g0 = v.gate[out]
-            if g0 == 0.0 and target == 0.0:
-                continue  # paused: hold position, output nothing
-            if g0 != target:  # fading in/out for pause, resume or seek
+            rate = self.rates[out]
+            if v.stopping:  # fade out (10 ms, or the sound's own fade-out), then done
+                if g0 <= 0.0 or v.paused or not n:
+                    v.done.add(out)
+                    continue
+                target, ramp = 0.0, max(fade, int(v.fade_out * rate))
+            else:
+                target = 0.0 if v.paused else 1.0
+                if g0 == 0.0 and target == 0.0:
+                    continue  # paused: hold position, output nothing
+                # the start's fade-in; pause, resume and seek take 10 ms
+                ramp = int(v.fade_in * rate) if out in v.fading and target else fade
+            # a one-shot's fade-out before its natural end
+            tail = int(v.fade_out * rate) if v.fade_out > 0 and not v.loop else 0
+            p_start = float(p)
+            near_end = tail and n - p_start < tail + frames * max(speed, 1.0) + 1
+            shaped = g0 != target or near_end
+            if shaped:
                 dst_final = dst
                 dst = np.zeros((frames, CH), np.float32)
             if abs(speed - 1.0) < 1e-4:
@@ -839,12 +1014,22 @@ class Engine:
             else:
                 p = self._render_speed(dst, data, float(p), speed, g, v.loop)
             v.pos[out] = p
-            if g0 != target:
-                k = min(frames, fade)
-                env = np.full(frames, target, np.float32)
-                env[:k] = np.linspace(g0, target, k, dtype=np.float32)
+            if shaped:
+                if g0 != target:   # a straight line from g0 towards target, `ramp` long
+                    step = np.float32(1.0 / max(ramp, 1)) * (1 if target > g0 else -1)
+                    env = g0 + step * np.arange(1, frames + 1, dtype=np.float32)
+                    env = np.clip(env, min(g0, target), max(g0, target))
+                    v.gate[out] = float(env[-1])
+                    if v.gate[out] == target:
+                        v.fading.discard(out)
+                else:
+                    env = np.full(frames, target, np.float32)
+                if near_end:
+                    at = p_start + speed * np.arange(frames, dtype=np.float32)
+                    env = env * np.clip((n - at) / tail, 0.0, 1.0)
                 dst_final += dst * env[:, None]
-                v.gate[out] = target
+                if v.stopping and v.gate[out] <= 0.0:
+                    v.done.add(out)
             if p >= n and not v.loop:
                 v.done.add(out)
         return buf
@@ -890,9 +1075,10 @@ class Engine:
     def _eq(self, out: str, part: str, x: np.ndarray) -> np.ndarray:
         """Run x through the EQ if it's on and aimed at `part` ('sounds' / 'voice')."""
         g = self.eq_gains
-        if g is None or self.eq_target not in (part, "all"):
-            return x
         key = (out, part)
+        if g is None or self.eq_target not in (part, "all"):
+            self._eqs.pop(key, None)   # stale filter state would click when it's back on
+            return x
         f = self._eqs.get(key)
         if f is None or f.rate != self.rates[out]:
             f = self._eqs[key] = EQ(self.rates[out])
@@ -902,6 +1088,7 @@ class Engine:
         """Shape the sounds bus for whoever is listening (soundboard.destination)."""
         d = self.dest
         if d is None:
+            self._dests.pop(out, None)   # start fresh when it's turned back on
             return x
         f = self._dests.get(out)
         if f is None or f.rate != self.rates[out]:
@@ -911,11 +1098,11 @@ class Engine:
 
     # Each PortAudio callback is a thin guard around the real work: an exception that
     # escapes a callback makes PortAudio abort the stream for good, silently. Here it
-    # is logged (once per stream, so the audio thread never does repeated file I/O),
-    # counted, and the block is left silent.
+    # is logged (once per opened stream, so the audio thread never does repeated file
+    # I/O), counted, and the block is left silent. check_streams() reports the key.
     def _guard(self, key: str, exc: BaseException):
         self.cb_errors[key] += 1
-        if self.cb_errors[key] == 1:
+        if self.cb_errors[key] - self._cb_err_base[key] == 1:
             log.error("exception in %s audio callback", key, exc_info=exc)
             self.errors[key] = f"audio callback failed: {exc}"
 
@@ -951,25 +1138,32 @@ class Engine:
     def _main(self, outdata, frames):
         mix = self._pitch("main", self._render("main", frames))
         mix *= np.float32(self.sound_vol)
-        b = self.ring_bmain.read(frames)
-        if b is not None and self.browser_live:
-            mix += b * np.float32(self.browser_vol)
+        r = self.ring_rmain.read(frames)
+        if r is not None and self.radio_live:
+            mix += r * np.float32(self.radio_vol)
+        for a in self.aux:
+            x = a.ring_main.read(frames)
+            if x is not None and a.live:
+                mix += x * np.float32(a.vol)
         mix = self._dest("main", self._eq("main", "sounds", mix))
         m = self.ring_main.read(frames)
         if m is not None and self.mic_enabled and not self.mic_muted:
             mix += self._eq("main", "voice", m * np.float32(self.mic_vol))
+        if not self.sending:      # muted: others get silence, nothing else changes
+            mix.fill(0)
         soft_limit(mix)
         outdata[:] = mix
         self.level_main = max(peak(mix), self.level_main * 0.85)
-        if self._rec_buf is not None:
-            self._rec_buf.append(mix.copy())
+        rec = self._rec_buf   # read once: cancel_test_record may clear it meanwhile
+        if rec is not None:
+            rec.append(mix.copy())
             self._rec_frames_left -= frames
-            if self._rec_frames_left <= 0:
-                self.rec_done = (np.concatenate(self._rec_buf), self.rates["main"])
+            if self._rec_frames_left <= 0 and self._rec_buf is rec:   # not cancelled
                 self._rec_buf = None
+                self.rec_done = (np.concatenate(rec), self.rates["main"])
 
     def _mon(self, outdata, frames):
-        check = self.mic_check
+        check = self.mic_check and self.sending   # muted: they hear nothing, so neither do you
         # in mic check you hear the real output mix: sounds at their outgoing
         # level plus your mic, so you can judge the balance while a song plays
         mix = self._pitch("mon", self._render("mon", frames,
@@ -977,9 +1171,13 @@ class Engine:
         m = self.ring_mon.read(frames)
         if check:
             mix *= np.float32(self.sound_vol)
-        b = self.ring_bmon.read(frames)
-        if b is not None and (self.browser_monitor or (check and self.browser_live)):
-            mix += b * np.float32(self.browser_vol)
+        r = self.ring_rmon.read(frames)
+        if r is not None and (self.radio_monitor or (check and self.radio_live)):
+            mix += r * np.float32(self.radio_vol)
+        for a in self.aux:
+            x = a.ring_mon.read(frames)
+            if x is not None and (a.monitor or (check and a.live)):
+                mix += x * np.float32(a.vol)
         mix = self._dest("mon", self._eq("mon", "sounds", mix))   # you hear what others get
         if check and m is not None and self.mic_enabled and not self.mic_muted:
             mix += self._eq("mon", "voice", m * np.float32(self.mic_vol))

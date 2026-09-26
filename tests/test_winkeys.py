@@ -90,6 +90,29 @@ def test_register_reports_combos_another_thread_owns(qapp):
         b.stop()
 
 
+def test_hotkey_thread_survives_a_failing_message_and_reports_its_end(qapp, monkeypatch):
+    import time
+    calls = []
+
+    def boom(self, msg, actions):
+        calls.append(msg.message)
+        raise RuntimeError("bad message")
+
+    monkeypatch.setattr(wk.Hotkeys, "_handle", boom)
+    h = wk.Hotkeys()
+    h.register({})
+    h.register({})
+    deadline = time.monotonic() + 3
+    while len(calls) < 2 and time.monotonic() < deadline:
+        time.sleep(0.01)
+    assert len(calls) == 2 and h.alive                   # the first failure didn't end it
+    h.stop()
+    deadline = time.monotonic() + 3
+    while h.alive and time.monotonic() < deadline:
+        time.sleep(0.01)
+    assert not h.alive                                    # `alive` is false once it's gone
+
+
 def test_numpad_plus_round_trips():
     """Its old name "num +" contained the separator, so it could never be registered."""
     vk = wk.VK["num +"]

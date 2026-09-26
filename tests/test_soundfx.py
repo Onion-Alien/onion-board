@@ -136,6 +136,21 @@ def test_a_broken_module_effect_is_skipped_not_fatal(monkeypatch):
     assert np.allclose(y[:len(x)], x, atol=1e-6)
 
 
+def test_a_module_effect_that_cant_start_is_skipped(monkeypatch):
+    from soundboard import voicefx
+
+    class NoStart(voicefx.Effect):
+        type, name = "test.nostart", "No start"
+
+        def __init__(self, rate, values=None):
+            raise RuntimeError("missing model file")
+
+    monkeypatch.setitem(voicefx.REGISTRY, NoStart.type, NoStart)
+    x = sine(seconds=0.2)
+    y = soundfx.render(x, {"effects": {NoStart.type: {"on": True}}})
+    assert np.allclose(y[:len(x)], x, atol=1e-6)
+
+
 # ---------------------------------------------------------------- library cache
 
 @pytest.fixture
@@ -258,19 +273,6 @@ def test_live_pitch_on_the_sounds_bus(speed, keep, pitch, want):
         blocks.append(out.copy())
     y = np.concatenate(blocks)[8192:]
     assert abs(peak_hz(y) - want) < want * 0.04
-
-
-def test_browser_pitch_shifts_what_is_fed():
-    e = Engine()
-    e.browser_pitch = -12
-    got = []
-    e.ring_bmain.write = got.append
-    e.main_stream = object()
-    x = sine(880, 2.0)
-    for i in range(0, len(x), 1024):
-        e.feed_browser(x[i:i + 1024])
-    y = np.concatenate(got)[4096:]
-    assert abs(peak_hz(y) - 440) < 20
 
 
 # ---------------------------------------------------------------- UI

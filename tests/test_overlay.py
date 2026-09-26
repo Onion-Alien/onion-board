@@ -180,6 +180,27 @@ def test_window_shows_and_paints(make, qapp):
     assert not w.isVisible()
 
 
+def test_clicks_play_tiles_and_pause_stop(make, qapp):
+    from PySide6.QtCore import QPoint, Qt
+    from PySide6.QtTest import QTest
+    ov = make({"close_after_play": False})
+    ov.open()
+    w = ov.window
+    k = w._k()
+
+    def at(r):
+        return QPoint(round(r.center().x() * k), round(r.center().y() * k))
+    QTest.mouseClick(w, Qt.LeftButton, pos=at(w._tile_rect(4)))
+    btns = w._buttons()
+    QTest.mouseClick(w, Qt.LeftButton, pos=at(btns["pause"]))
+    QTest.mouseClick(w, Qt.LeftButton, pos=at(btns["stop"]))
+    assert ov.host.played == ["s4"]
+    assert ov.host.actions == ["__pause__", "__stop__"]
+    ov.tick({"s4": (0.3, True)})
+    assert w._all_paused()
+    w.grab()                                             # paints the Resume state
+
+
 def test_preview_claims_no_keys(make, qapp):
     ov = make()
     ov.preview(seconds=0.2)

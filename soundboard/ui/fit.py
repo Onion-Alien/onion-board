@@ -76,7 +76,7 @@ class _Fitter(QObject):
         if ev.type() in WATCHED and not self._pending:
             self._pending = True
             # after Qt has finished laying the dialog out for this change
-            QTimer.singleShot(0, self._run)
+            QTimer.singleShot(0, self, self._run)   # dropped if the dialog is freed first
         return False
 
     def _run(self):

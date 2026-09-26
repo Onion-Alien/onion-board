@@ -16,7 +16,9 @@ from __future__ import annotations
 import logging
 import secrets
 import socket
+import struct
 import subprocess
+import sys
 import threading
 import time
 from collections import deque
@@ -31,7 +33,10 @@ from soundboard.speech import protocol
 log = logging.getLogger(__name__)
 
 CONNECT_TIMEOUT_S = 30.0
+SEND_TIMEOUT_S = 5.0        # a module that stops reading can't wedge a send forever
 QUEUE_BLOCKS = 400          # ~4 s of 10 ms mic blocks
+HELLO_TIMEOUT_S = 5.0       # a connection has this long to say hello
+HELLO_MAX = 4096            # bytes: the first frame, before we know who's calling
 
 
 class ServiceHost:
@@ -54,7 +59,7 @@ class ServiceHost:
         self._stop.clear()
         srv = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         srv.bind(("127.0.0.1", 0))
-        srv.listen(1)
+        srv.listen(8)            # a stray local caller can't crowd the module out
         srv.settimeout(0.25)
         port, token = srv.getsockname()[1], secrets.token_hex(16)
         out = subprocess.DEVNULL
@@ -77,8 +82,10 @@ class ServiceHost:
                          daemon=True).start()
 
     def stop(self):
+        """Never blocks for long (the UI calls it): a module that won't quit is
+        killed from a background thread."""
         self._stop.set()
-        self.send_json({"type": "quit"})
+        self.send_json({"type": "quit"}, wait=0.25)
         s, self._sock = self._sock, None
         if s is not None:
             try:
@@ -88,11 +95,16 @@ class ServiceHost:
         p, self._proc = self._proc, None
         self.connected = False
         if p is not None:
-            try:
-                p.wait(timeout=2)
-            except subprocess.TimeoutExpired:
-                p.kill()
+            threading.Thread(target=self._reap, args=(p,), name=f"{self.name}-reap",
+                             daemon=True).start()
         self._q.clear()
+
+    def _reap(self, p: subprocess.Popen):
+        try:
+            p.wait(timeout=2)
+        except subprocess.TimeoutExpired:
+            log.warning("%s didn't quit; killing it", self.name)
+            p.kill()
 
     @property
     def running(self) -> bool:
@@ -107,50 +119,57 @@ class ServiceHost:
             self._q.append((mono.copy(), rate))
 
     # ------------------------------------------------------------ threads
-    def send_json(self, obj: dict):
+    def send_json(self, obj: dict, wait: float = -1):
+        """Send a message; with `wait` (seconds) give up if the sender is stuck."""
         s = self._sock
-        if s is None:
+        if s is None or not self._send_lock.acquire(timeout=wait):
             return
         try:
-            with self._send_lock:
-                protocol.send_json(s, obj)
+            protocol.send_json(s, obj)
         except OSError:
             pass
+        finally:
+            self._send_lock.release()
 
     def _serve(self, srv: socket.socket, token: str):
+        # any local process can connect to the port, so a connection that fails the
+        # handshake is dropped and the wait goes on: only the module's own counts
         deadline = time.monotonic() + CONNECT_TIMEOUT_S
-        conn = None
+        conn, hello, rejected = None, {}, 0
         try:
             while conn is None:
                 if self._stop.is_set() or not self.running:
                     code = None if self._proc is None else self._proc.poll()
-                    self._emit_stopped(f"{self.name} exited before connecting (code {code})"
-                                       if code is not None else "")
+                    if code is None:
+                        reason = ""
+                    elif rejected:
+                        reason = f"{self.name} failed the handshake (exited, code {code})"
+                    else:
+                        reason = f"{self.name} exited before connecting (code {code})"
+                    self._emit_stopped(reason)
                     return
                 if time.monotonic() > deadline:
-                    self._emit_stopped(f"{self.name} didn't connect")
+                    self._emit_stopped(f"{self.name} failed the handshake" if rejected
+                                       else f"{self.name} didn't connect")
                     self.stop()
                     return
                 try:
-                    conn, _ = srv.accept()
+                    c, _ = srv.accept()
                 except TimeoutError:
                     continue
+                hello = _handshake(c, token, max(0.5, min(HELLO_TIMEOUT_S,
+                                                          deadline - time.monotonic())))
+                if hello is None:
+                    rejected += 1
+                    log.warning("%s: dropped a connection that failed the handshake", self.name)
+                    c.close()
+                else:
+                    conn = c
         finally:
             srv.close()
         conn.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
-        conn.settimeout(10)
-        try:
-            first = protocol.recv(conn)
-            hello = protocol.decode_json(first[1]) if first and first[0] == protocol.JSON else {}
-        except (OSError, ValueError):
-            hello = {}
-        if hello.get("type") != "hello" or not secrets.compare_digest(
-                str(hello.get("token", "")), token):
-            conn.close()
-            self._emit_stopped(f"{self.name} failed the handshake")
-            self.stop()
-            return
         conn.settimeout(None)
+        _send_timeout(conn, SEND_TIMEOUT_S)
         self._sock = conn
         self.connected = True
         self.on_event(hello)
@@ -168,6 +187,8 @@ class ServiceHost:
             if not self._stop.is_set():
                 reason = str(e)
         self.connected = False
+        if not self._stop.is_set():
+            self.stop()         # it hung up on us: make sure the process goes too
         self._emit_stopped(reason)
 
     def _emit_stopped(self, reason: str):
@@ -195,3 +216,37 @@ class ServiceHost:
                         protocol.send(conn, protocol.AUDIO, pcm)
                 except OSError:
                     return
+
+
+def _handshake(conn: socket.socket, token: str, timeout: float) -> dict | None:
+    """The hello message if `conn` opened with one carrying `token`, else None. Before
+    that it's an unknown caller: a small first frame only, and not much time."""
+    conn.settimeout(timeout)
+    try:
+        head = protocol._exact(conn, protocol._HEAD.size)
+        if head is None:
+            return None
+        kind, n = protocol._HEAD.unpack(head)
+        if kind != protocol.JSON or n > HELLO_MAX:
+            return None
+        payload = protocol._exact(conn, n) if n else b""
+        hello = protocol.decode_json(payload) if payload is not None else {}
+    except (OSError, ValueError):
+        return None
+    if hello.get("type") != "hello" or not secrets.compare_digest(
+            str(hello.get("token", "")).encode(), token.encode()):
+        return None
+    return hello
+
+
+def _send_timeout(sock: socket.socket, seconds: float):
+    """A timeout on sends only (reads stay blocking: the reader waits as long as it
+    takes for the module to say something)."""
+    try:
+        if sys.platform == "win32":
+            val = int(seconds * 1000)                          # a DWORD of milliseconds
+        else:
+            val = struct.pack("ll", int(seconds), int(seconds % 1 * 1e6))   # a timeval
+        sock.setsockopt(socket.SOL_SOCKET, socket.SO_SNDTIMEO, val)
+    except OSError as e:
+        log.warning("couldn't set a send timeout: %s", e)

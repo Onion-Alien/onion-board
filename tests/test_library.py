@@ -1,6 +1,8 @@
 import json
+from pathlib import Path
 
 import numpy as np
+import pytest
 
 from soundboard import library
 from soundboard.library import SR, Config, SoundMeta, level_gain, trim_silence
@@ -80,6 +82,13 @@ def test_v1_config_is_migrated_and_rewritten_relative(app_dir):
     assert raw2["version"] == library.CONFIG_VERSION and raw2["sounds"][0]["file"] == "old.wav"
 
 
+@pytest.mark.parametrize("old, new", [(0, 0), (1, 0), (2, 1), (3, 2), (4, 3), (5, 4)])
+def test_v2_config_moves_tabs_down_past_the_removed_browser_tab(old, new):
+    c = Config.from_raw({"version": 2, "tab": old, "browser_live": True,
+                         "rec_hotkey": "ctrl+alt+r"})
+    assert c.tab == new and not hasattr(c, "browser_live") and not hasattr(c, "rec_hotkey")
+
+
 def test_save_keeps_rotating_backups_only_when_something_changed(app_dir):
     c = Config()
     for vol in (0.1, 0.2, 0.3, 0.4, 0.5):
@@ -144,3 +153,64 @@ def test_damaged_sound_entries_are_skipped(app_dir):
         '{"version": 2, "sounds": [{"id": "a", "name": "A", "file": "a.wav"}, {"id": "b"}, 7]}',
         encoding="utf-8")
     assert [s.id for s in Config.load().sounds] == ["a"]
+
+
+def test_a_failed_copy_into_the_library_raises_and_leaves_nothing(app_dir, tmp_path,
+                                                                   monkeypatch):
+    import pytest
+    import soundfile as sf
+    src = tmp_path / "boom.wav"
+    sf.write(src, np.zeros((SR // 10, 2), np.float32), SR)
+
+    def half_copy(a, b):
+        open(b, "wb").write(b"RIFF")    # a partial file, then the disk fills up
+        raise OSError(28, "No space left on device")
+    monkeypatch.setattr(library.shutil, "copy2", half_copy)
+    with pytest.raises(OSError, match="disk isn't full"):
+        library.import_file(str(src), "#123456")
+    assert not list(library.SOUNDS_DIR.glob("*"))
+
+
+def _old_folder(tmp_path, monkeypatch):
+    r"""An old %APPDATA%\Soundboard with a v0.1.0-style config (full paths)."""
+    old, new = tmp_path / "Soundboard", tmp_path / "OnionBoard"
+    monkeypatch.setattr(library, "OLD_APP_DIR", old)
+    monkeypatch.setattr(library, "APP_DIR", new)
+    monkeypatch.setattr(library, "SOUNDS_DIR", new / "sounds")
+    monkeypatch.setattr(library, "CONFIG_PATH", new / "config.json")
+    (old / "sounds").mkdir(parents=True)
+    (old / "sounds" / "a_x.wav").write_bytes(b"RIFF")
+    (old / "config.json").write_text(json.dumps({"version": 1, "sounds": [
+        {"id": "a", "name": "x", "file": str(old / "sounds" / "a_x.wav")}]}), "utf-8")
+    return old, new
+
+
+def test_migration_moves_the_old_folder_and_fixes_full_paths(tmp_path, monkeypatch):
+    old, new = _old_folder(tmp_path, monkeypatch)
+    library.migrate_from_soundboard()
+    assert not old.exists() and (new / "sounds" / "a_x.wav").exists()
+    cfg = library.Config.load()
+    assert Path(cfg.sounds[0].file) == new / "sounds" / "a_x.wav"
+
+
+def test_migration_still_runs_when_the_installer_made_the_new_folder(tmp_path, monkeypatch):
+    old, new = _old_folder(tmp_path, monkeypatch)
+    new.mkdir()
+    (new / "cable-restart-pending").write_text("1")
+    library.migrate_from_soundboard()
+    assert (new / "config.json").exists() and (new / "sounds" / "a_x.wav").exists()
+    assert (new / "cable-restart-pending").read_text() == "1"
+
+
+def test_migration_leaves_an_existing_new_config_alone(tmp_path, monkeypatch):
+    old, new = _old_folder(tmp_path, monkeypatch)
+    new.mkdir()
+    (new / "config.json").write_text("{}", "utf-8")
+    library.migrate_from_soundboard()
+    assert (new / "config.json").read_text("utf-8") == "{}" and old.exists()
+
+
+def test_non_finite_numbers_in_a_config_fall_back_to_defaults():
+    assert not library.fits_type(1.0, float("nan"))
+    assert not library.fits_type(1.0, float("inf"))
+    assert library.fits_type(1.0, 2)

@@ -206,6 +206,52 @@ def test_service_rejects_a_wrong_token():
     h.stop()
 
 
+def test_service_ignores_strangers_who_connect_first(monkeypatch):
+    # other local processes get to the port before the module: a wrong token, a huge
+    # frame header and a silent caller are dropped, and the module still connects
+    from soundboard.speech import service
+    monkeypatch.setattr(service, "HELLO_TIMEOUT_S", 0.5)
+    events = []
+    module = ("import json,socket,struct,sys\n"
+              "a=sys.argv; p=int(a[a.index('--port')+1]); t=a[a.index('--token')+1]\n"
+              "def hello(tok):\n"
+              "    b=json.dumps({'type':'hello','token':tok}).encode()\n"
+              "    return b'J'+struct.pack('<I',len(b))+b\n"
+              "bad=[socket.create_connection(('127.0.0.1',p)) for _ in range(3)]\n"
+              "bad[0].sendall(hello('guess'))\n"
+              "bad[1].sendall(b'J'+struct.pack('<I',16<<20))\n"
+              "s=socket.create_connection(('127.0.0.1',p))\n"
+              "s.sendall(hello(t))\n"
+              "s.recv(1)\n")
+    h = ServiceHost([sys.executable, "-c", module], events.append, name="module")
+    h.start()
+    try:
+        assert wait_for(lambda: h.connected, timeout=20)
+        assert events[0]["type"] == "hello"
+        assert not any(e["type"] == "stopped" for e in events)
+    finally:
+        h.stop()
+
+
+def test_handshake_caps_the_first_frame():
+    from soundboard.speech import service
+    a, b = socket.socketpair()
+    try:
+        a.sendall(b"J" + (service.HELLO_MAX + 1).to_bytes(4, "little"))
+        assert service._handshake(b, "tok", 1.0) is None
+        a.sendall(b"J" + (5).to_bytes(4, "little") + b"nope}")
+        assert service._handshake(b, "tok", 1.0) is None
+        msg = json.dumps({"type": "hello", "token": "toké"}).encode()
+        a.sendall(b"J" + len(msg).to_bytes(4, "little") + msg)
+        assert service._handshake(b, "tok", 1.0) is None       # non-ASCII: no TypeError
+        msg = json.dumps({"type": "hello", "token": "tok"}).encode()
+        a.sendall(b"J" + len(msg).to_bytes(4, "little") + msg)
+        assert service._handshake(b, "tok", 1.0)["type"] == "hello"
+    finally:
+        a.close()
+        b.close()
+
+
 def test_service_that_exits_early_is_reported():
     events = []
     h = ServiceHost([sys.executable, "-c", "import sys; sys.exit(3)"], events.append, name="x")
@@ -251,6 +297,7 @@ class FakeEngine:
 
     def play(self, sid, data, gain, mode="restart", src_rate=48000, **kw):
         self.played.append((sid, data.shape, gain, mode, src_rate))
+        return object()                  # a Voice: something was open to play it on
 
     def stop(self, sid):
         self.stopped.append(sid)
@@ -328,6 +375,182 @@ def test_real_voice_comes_back_if_the_module_dies():
     assert c.chain.replace
     assert wait_for(lambda: any(e["type"] == "stopped" for e in events))
     assert not c.chain.replace and c.chain.tap is None and not c.live
+
+
+# a module that connects, says `events` and then just hangs (ignores "quit")
+HANGING_MODULE = ("import json,socket,struct,sys,time\n"
+                  "a=sys.argv\n"
+                  "s=socket.create_connection(('127.0.0.1',int(a[a.index('--port')+1])))\n"
+                  "def j(o):\n"
+                  "    b=json.dumps(o).encode(); s.sendall(b'J'+struct.pack('<I',len(b))+b)\n"
+                  "j({'type':'hello','token':a[a.index('--token')+1]})\n"
+                  "for e in json.loads(a[1]): j(e)\n"
+                  "time.sleep(60)\n")
+
+
+def hanging(events):
+    return modules.ModuleInfo(id="hangs", name="hangs", version="1", description="",
+                              kind="service", path=ROOT,
+                              command=[sys.executable, "-c", HANGING_MODULE,
+                                       json.dumps(events)])
+
+
+def test_a_module_that_cant_load_gives_the_real_voice_back():
+    events = []
+    c, _ = controller(events)
+    c.start_live(hanging([{"type": "error", "text": "no model"}]))
+    assert wait_for(lambda: any(e["type"] == "stopped" for e in events))
+    assert not c.chain.replace and c.chain.tap is None and not c.live
+    assert events[-1] == {"type": "stopped", "text": "no model"}
+
+
+def test_an_error_after_ready_keeps_live_voice_on():
+    events = []
+    c, _ = controller(events)
+    c.start_live(hanging([{"type": "ready"}, {"type": "error", "text": "one line failed"}]))
+    try:
+        assert wait_for(lambda: any(e["type"] == "error" for e in events))
+        time.sleep(0.1)
+        assert c.live and c.chain.replace
+    finally:
+        c.stop_live()
+
+
+def test_stop_never_waits_on_a_stuck_sender():
+    h = ServiceHost(["unused"], lambda e: None)
+    a, b = socket.socketpair()
+    try:
+        h._sock = a
+        h._send_lock.acquire()                # the sender is stuck inside a send
+        t0 = time.monotonic()
+        h.stop()
+        assert time.monotonic() - t0 < 1.0
+    finally:
+        h._send_lock.release()
+        b.close()
+
+
+def test_helper_exits_when_its_model_cant_load():
+    try:
+        import faster_whisper  # noqa: F401
+        pytest.skip("speech recognition is installed here, so the model would load")
+    except ImportError:
+        pass
+    events = []
+    h = ServiceHost([sys.executable, str(LIVE / "helper.py")], events.append, name="live-voice")
+    h.start()
+    try:
+        assert wait_for(lambda: any(e["type"] == "stopped" for e in events), 20)
+        err = next(e for e in events if e["type"] == "error")
+        assert "Update speech recognition" in err["text"]
+        assert wait_for(lambda: h._proc is None or h._proc.poll() is not None)
+    finally:
+        h.stop()
+
+
+def test_a_line_that_cant_be_played_is_reported_and_the_next_still_plays():
+    events = []
+    c, eng = controller(events)
+    real, calls = eng.play, []
+
+    def flaky(*a, **k):
+        calls.append(1)
+        if len(calls) == 1:
+            raise ValueError("device went away")
+        return real(*a, **k)
+
+    eng.play = flaky
+    c.say("one")
+    c.say("two")
+    assert wait_for(lambda: len(eng.played) == 1)
+    assert {"type": "tts_error", "text": "device went away"} in events
+
+
+def test_no_open_device_says_so():
+    events = []
+    c, eng = controller(events)
+    eng.play = lambda *a, **k: None       # what Engine.play returns with no output open
+    c.say("hello")
+    assert wait_for(lambda: any(e["type"] == "tts_error" for e in events))
+    assert "No audio device" in events[0]["text"]
+
+
+def test_windows_speech_that_stops_answering_is_restarted():
+    import queue
+
+    from soundboard.speech.tts import SapiTTS
+
+    class Proc:
+        killed = False
+
+        def kill(self):
+            self.killed = True
+
+    t, proc = SapiTTS(), Proc()
+    t._proc, t._out = proc, queue.Queue()
+    with pytest.raises(RuntimeError, match="stopped answering"):
+        t._readline(0.05)
+    assert proc.killed and t._proc is None
+
+
+def test_windows_speech_output_that_isnt_utf8_cant_kill_the_reader(monkeypatch):
+    import io
+
+    from soundboard.speech import tts
+
+    # the script switches its stdout to UTF-8 before it says anything
+    assert tts._SCRIPT.index("[Console]::SetOut(") < tts._SCRIPT.index("WriteLine(")
+    assert "UTF8Encoding $false" in tts._SCRIPT            # no BOM ahead of "READY"
+
+    class Proc:
+        def __init__(self, args, **kw):
+            # a voice name and an error in the OEM code page (cp437), not UTF-8
+            raw = "READY René\ten-US\nERR Zugriff verweigert ä\n".encode("cp437")
+            self.stdout = io.TextIOWrapper(io.BytesIO(raw), encoding=kw["encoding"],
+                                           errors=kw.get("errors", "strict"))
+            self.stdin = io.StringIO()
+
+        def poll(self):
+            return None
+
+    monkeypatch.setattr(tts.subprocess, "Popen", Proc)
+    t = tts.SapiTTS()
+    assert t.warm_up() == ["Ren�"] and t.error == ""
+    with pytest.raises(RuntimeError, match="Zugriff verweigert"):
+        t.synth("hello")                                  # an answer, not "stopped"
+    t._proc = None
+
+
+def test_an_install_step_that_hangs_is_killed(tmp_path, monkeypatch):
+    monkeypatch.setattr(modules, "INSTALL_STEP_TIMEOUT_S", 0.5)
+    info = modules.ModuleInfo(id="slow", name="slow", version="1", description="",
+                              kind="service", path=tmp_path,
+                              install_steps=[["{base_python}", "-c",
+                                              "import time; time.sleep(60)"]])
+    lines = []
+    t0 = time.monotonic()
+    assert not modules.install(info, lines.append)
+    assert time.monotonic() - t0 < 20
+    assert "internet connection" in lines[-1]
+
+
+def test_an_install_is_stopped_if_reporting_its_output_fails(tmp_path):
+    info = modules.ModuleInfo(id="x", name="x", version="1", description="",
+                              kind="service", path=tmp_path,
+                              install_steps=[["{base_python}", "-c",
+                                              "import time; print('hi', flush=True); "
+                                              "time.sleep(60)"]])
+    seen = []
+
+    def on_line(line):
+        seen.append(line)
+        if len(seen) > 1:
+            raise RuntimeError("the UI went away")
+
+    t0 = time.monotonic()
+    with pytest.raises(RuntimeError):
+        modules.install(info, on_line)
+    assert time.monotonic() - t0 < 20       # the child was killed, not waited on
 
 
 # ---------------------------------------------------------------- Windows voices

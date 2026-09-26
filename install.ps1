@@ -1,4 +1,4 @@
-# One-shot setup for Soundboard on a fresh Windows PC:
+# One-shot setup for Onion Board on a fresh Windows PC:
 #   1. finds Python 3.12+ (offers to install it with winget if missing)
 #   2. creates .venv and installs the Python packages
 #   3. adds Desktop + Start menu shortcuts
@@ -14,7 +14,7 @@ function Ask($q) {
     return ($a -eq "" -or $a -match "^[yY]")
 }
 
-Write-Host "=== Soundboard setup ===" -ForegroundColor Cyan
+Write-Host "=== Onion Board setup ===" -ForegroundColor Cyan
 
 # ---- 1. Python
 function Find-Python {
@@ -68,12 +68,12 @@ $ws = New-Object -ComObject WScript.Shell
 $targets = @([Environment]::GetFolderPath("Desktop"),
              (Join-Path $env:APPDATA "Microsoft\Windows\Start Menu\Programs"))
 foreach ($dir in $targets) {
-    $lnk = $ws.CreateShortcut((Join-Path $dir "Soundboard.lnk"))
+    $lnk = $ws.CreateShortcut((Join-Path $dir "Onion Board.lnk"))
     $lnk.TargetPath = Join-Path $root ".venv\Scripts\pythonw.exe"
     $lnk.Arguments = "`"$(Join-Path $root 'main.py')`""
     $lnk.WorkingDirectory = $root
     $lnk.IconLocation = Join-Path $root "soundboard.ico"
-    $lnk.Description = "Soundboard"
+    $lnk.Description = "Onion Board"
     $lnk.Save()
 }
 Write-Host "Shortcuts added to the Desktop and Start menu." -ForegroundColor Green
@@ -101,7 +101,7 @@ if (-not (Get-Command ffmpeg -ErrorAction SilentlyContinue)) {
 }
 
 Write-Host ""
-Write-Host "All set! Open Soundboard from the Desktop shortcut." -ForegroundColor Cyan
+Write-Host "All set! Open Onion Board from the Desktop shortcut." -ForegroundColor Cyan
 if (Ask "Start it now?") {
     Start-Process (Join-Path $root ".venv\Scripts\pythonw.exe") -ArgumentList "`"$(Join-Path $root 'main.py')`"" -WorkingDirectory $root
 }

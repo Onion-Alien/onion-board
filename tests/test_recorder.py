@@ -1,6 +1,6 @@
 import numpy as np
 
-from soundboard.browser import CLIP_S, Recorder
+from soundboard.recorder import CLIP_S, Recorder
 from soundboard.engine import SR
 
 

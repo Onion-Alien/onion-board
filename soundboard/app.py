@@ -7,7 +7,7 @@ import logging
 import os
 import sys
 
-# Render the window through the GPU from the start. The browser tab needs a GPU
+# Render the window through the GPU from the start. The Radio tab's globe needs a GPU
 # surface; without this, opening it the first time makes Qt destroy and rebuild the
 # whole native window, which looks like the app closing and reopening.
 # (Must be set before the QApplication exists. QT_WIDGETS_RHI=0 is the escape hatch
@@ -17,7 +17,7 @@ os.environ.setdefault("QT_WIDGETS_RHI", "1")
 from PySide6.QtWidgets import QApplication  # noqa: E402
 
 from soundboard import __version__, applog  # noqa: E402
-from soundboard.library import APP_DIR  # noqa: E402
+from soundboard.library import APP_DIR, migrate_from_soundboard  # noqa: E402
 from soundboard.singleinstance import claim_single_instance, listen_for_second_launch  # noqa: E402
 
 log = logging.getLogger(__name__)
@@ -50,26 +50,47 @@ def start_ytdlp_check(cfg):
 
 
 def main():
+    migrate_from_soundboard()
     log_path = applog.setup(APP_DIR)
     applog.install_hooks(log_path, __version__)
+    from soundboard.library import MIGRATION_ERRORS
+    for msg in MIGRATION_ERRORS:
+        log.error("%s", msg)
     tune_runtime_for_audio()
     try:
-        ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID("Soundboard.App")
+        ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID("OnionBoard.App")
     except Exception:  # noqa: BLE001
         log.debug("SetCurrentProcessExplicitAppUserModelID failed", exc_info=True)
     app = QApplication(sys.argv)
+    applog.ui_ready()
     if not claim_single_instance():
-        log.info("another Soundboard is running; asked it to come to the front")
+        log.info("another Onion Board is running; asked it to come to the front")
         sys.exit(0)
     app.setStyle("Fusion")
+    from soundboard.ui import a11y
+    a11y.install(app)   # screen-reader names for icon-only controls, as focus moves
+    from soundboard import theme
+    app.setWindowIcon(theme.app_icon())   # every window, and the taskbar button
 
     from soundboard.ui.mainwindow import MainWindow   # after the QApplication exists
     holder = {}
     app.instance_server = listen_for_second_launch(app, lambda: holder.get("w"))  # kept alive
-    w = holder["w"] = MainWindow()
-    w.show()
+    try:
+        w = holder["w"] = MainWindow()
+    except Exception:  # noqa: BLE001 - tell the user why nothing appeared, then quit
+        applog.report(where="starting up", fatal=True)
+        sys.exit(1)
+    # Windows logging off / shutting down while the window is hidden in the tray never
+    # calls closeEvent: still let go of push-to-talk and save the settings
+    app.aboutToQuit.connect(w.shutdown)
+    from soundboard.autostart import TRAY_ARG
+    if not (TRAY_ARG in sys.argv and w.can_hide()):   # started with Windows: tray only
+        w.show()
     from PySide6.QtCore import QTimer
-    if not w.cfg.setup_done:   # first launch: walk them through mic, headphones, cable
+    if "--resume-setup" in sys.argv:   # back after the restart the cable asked for
+        QTimer.singleShot(400, lambda: w.run_setup(resumed=True))
+    elif not w.cfg.setup_done:   # first launch: walk them through mic, headphones, cable
         QTimer.singleShot(400, w.run_setup)
     QTimer.singleShot(30_000, lambda: start_ytdlp_check(w.cfg))
+    QTimer.singleShot(45_000, w.check_updates)   # only if opted in (updates.py)
     sys.exit(app.exec())

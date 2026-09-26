@@ -1,6 +1,6 @@
 """Live voice-to-speech module: listens to the mic, sends back what you said as text.
 
-Launched by the Soundboard app (never run by hand; it needs the app's --port and
+Launched by the Onion Board app (never run by hand; it needs the app's --port and
 --token). The app speaks each line with the text-to-speech voice you picked, so
 others hear that voice instead of yours.
 
@@ -17,6 +17,7 @@ from __future__ import annotations
 
 import argparse
 import logging
+import os
 import queue
 import re
 import socket
@@ -201,7 +202,7 @@ def main(argv=None) -> int:
         print("Speech model ready.", flush=True)
         return 0
     if args.port is None or not args.token:
-        ap.error("--port and --token are required (Soundboard starts this; don't run it "
+        ap.error("--port and --token are required (Onion Board starts this; don't run it "
                  "by hand)")
 
     sock = socket.create_connection(("127.0.0.1", args.port), timeout=10)
@@ -211,8 +212,23 @@ def main(argv=None) -> int:
     link.send(type="hello", token=args.token, name="live-voice", version="0.3.0")
 
     ready = threading.Event()
+    failed = threading.Event()
     work: queue.Queue[np.ndarray | None] = queue.Queue(maxsize=8)
     seg = Segmenter()
+
+    def fail(text: str):
+        """Couldn't load: say why, then end the connection so the whole helper exits
+        (the app gives the real mic back when it sees that)."""
+        failed.set()
+        link.send(type="error", text=text)
+        try:
+            sock.shutdown(socket.SHUT_RDWR)
+        except OSError:
+            pass
+        # on Windows the main loop's recv() may not wake up for that: don't linger
+        quit_ = threading.Timer(1.0, os._exit, (1,))
+        quit_.daemon = True
+        quit_.start()
 
     def transcribe_loop():
         link.send(type="status", text=f"loading speech model ({args.model})…")
@@ -220,12 +236,13 @@ def main(argv=None) -> int:
             t = FakeTranscriber() if args.fake else WhisperTranscriber(
                 args.model, None if args.language == "auto" else args.language, args.device)
         except ImportError:
-            link.send(type="error", text="speech recognition isn't installed: run install.bat "
-                                         "in the live-voice module folder")
+            fail("speech recognition isn't fully installed: press Update speech recognition "
+                 "under More options, then Start again")
             return
         except Exception as e:  # noqa: BLE001
             log.exception("model load failed")
-            link.send(type="error", text=f"couldn't load the speech model: {e}")
+            fail(f"couldn't load the speech model ({e}). Try another Recognition model "
+                 "under More options, then Start again")
             return
         tr = None
         if args.translate:
@@ -233,13 +250,13 @@ def main(argv=None) -> int:
             try:
                 tr = FakeTranslator() if args.fake else Translator(args.translate, args.device)
             except ImportError:
-                link.send(type="error", text="translation needs an update to speech "
-                                             "recognition: press Update speech recognition "
-                                             "under More options, then Start again")
+                fail("translation needs an update to speech recognition: press Update "
+                     "speech recognition under More options, then Start again")
                 return
             except Exception as e:  # noqa: BLE001
                 log.exception("translation model load failed")
-                link.send(type="error", text=f"couldn't load the translation: {e}")
+                fail(f"couldn't load the translation ({e}). Delete its download and "
+                     "download it again, then Start again")
                 return
         ready.set()
         link.send(type="ready")
@@ -297,7 +314,7 @@ def main(argv=None) -> int:
         work.put_nowait(None)
     except queue.Full:
         pass
-    return 0
+    return 1 if failed.is_set() else 0
 
 
 if __name__ == "__main__":

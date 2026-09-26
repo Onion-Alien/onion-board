@@ -1,0 +1,288 @@
+"""The Apps tab's logic with the Windows capture stood in by fakes: rows follow the
+programs that are running, Send starts a capture that feeds the engine, programs
+are remembered and picked up again when they restart, and a capture that fails
+says so and isn't remembered."""
+import numpy as np
+import pytest
+
+from soundboard import appaudio
+from soundboard.appaudio import App
+from soundboard.engine import Engine
+from soundboard.library import Config
+from soundboard.ui import appspanel
+from soundboard.ui.appspanel import AppsTab
+from soundboard.ui.widgets import Meter
+
+
+class FakeCapture:
+    made = []
+    fail = False
+
+    def __init__(self, pid, sink, include_tree=True, name=""):
+        self.pid, self.sink, self.name = pid, sink, name
+        self.error = None
+        self.ended = False
+        self.started = self.stopped = False
+        FakeCapture.made.append(self)
+
+    def start(self, timeout=0):
+        if FakeCapture.fail:
+            self.error = "Windows refused (fake)."
+            return False
+        self.started = True
+        return True
+
+    def stop(self):
+        self.stopped = True
+
+    @property
+    def running(self):
+        return self.started and not self.stopped and not self.ended and self.error is None
+
+
+@pytest.fixture
+def tab(qapp, monkeypatch):
+    monkeypatch.setattr(appaudio, "AppCapture", FakeCapture)
+    monkeypatch.setattr(appaudio, "list_apps", lambda: [])
+    FakeCapture.made = []
+    FakeCapture.fail = False
+    cfg = Config()
+    saved = []
+    t = AppsTab(Engine(), cfg, lambda: saved.append(1), Meter)
+    t.saved = saved
+    yield t
+    t.shutdown()
+
+
+def music(pid=100, active=True):
+    return App(pid, "music.exe", r"C:\Programs\music.exe", "Music Thing", active, 0.3, ["Speakers"])
+
+
+def test_rows_follow_running_programs_and_send_captures_into_the_engine(tab):
+    assert tab.empty.isVisibleTo(tab)
+    tab._on_apps([music(), App(200, "game.exe")])
+    assert set(tab.rows) == {"music.exe", "game.exe"} and not tab.empty.isVisibleTo(tab)
+    row = tab.rows["music.exe"]
+    assert row.name.text() == "Music" and "Music Thing" in row.sub.text()
+    assert not row.sending and tab.engine.aux == ()
+
+    row.btn_send.setChecked(True)                # click Send
+    assert row.sending and row.capture is not None and row.capture.started
+    assert row.capture.pid == 100
+    assert [a.key for a in tab.engine.aux] == [("app", "music.exe")]
+    assert tab.cfg.apps == {"music.exe": {"vol": 1.0, "monitor": False}} and tab.saved
+    src = row.src
+    src.ring_main.prefill = 0
+    tab.engine.main_stream = object()            # a cable output is open
+    row.capture.sink(np.full((480, 2), 0.5, np.float32))
+    out = np.zeros((480, 2), np.float32)
+    tab.engine._main(out, 480)
+    assert out.any() and tab.engine.aux_on_air()
+    row.vol.spin.setValue(50)                    # its own volume, remembered
+    row.chk_hear.setChecked(True)
+    assert src.vol == 0.5 and src.monitor is True
+    assert tab.cfg.apps["music.exe"] == {"vol": 0.5, "monitor": True}
+
+    row.btn_send.setChecked(False)               # Send off: stopped and forgotten
+    assert row.capture is None and tab.engine.aux == () and "music.exe" not in tab.cfg.apps
+    assert FakeCapture.made[0].stopped
+
+
+def test_unremembered_program_that_closes_is_dropped(tab):
+    tab._on_apps([App(200, "game.exe")])
+    tab._on_apps([])
+    assert tab.rows == {} and tab.empty.isVisibleTo(tab)
+
+
+def test_remembered_program_is_picked_up_again_when_it_restarts(tab):
+    tab._on_apps([music(pid=100)])
+    tab.rows["music.exe"].btn_send.setChecked(True)
+    first = tab.rows["music.exe"].capture
+    tab._on_apps([])                             # it closed
+    row = tab.rows["music.exe"]
+    assert first.stopped and row.capture is None and not row.sending
+    assert row.app is None and "Not running" in row.sub.text()
+    assert "music.exe" in tab.cfg.apps           # still remembered
+    tab._on_apps([music(pid=101)])               # it's back, under a new pid
+    assert row.sending and row.capture is not None and row.capture.pid == 101
+    assert row.capture is not first
+
+
+def test_a_capture_that_dies_is_restarted_and_a_restarted_program_is_followed(tab):
+    tab._on_apps([music(pid=100)])
+    row = tab.rows["music.exe"]
+    row.btn_send.setChecked(True)
+    cap = row.capture
+    cap.ended = True                             # the capture thread noticed the program go
+    tab._on_apps([music(pid=100)])
+    assert row.capture is not cap and row.capture.started and cap.stopped
+    cap2 = row.capture
+    tab._on_apps([music(pid=102)])               # same .exe, new process
+    assert row.capture is not cap2 and row.capture.pid == 102 and cap2.stopped
+
+
+def test_a_capture_that_errors_says_so_and_stops_sending(tab):
+    tab._on_apps([music(pid=100)])
+    row = tab.rows["music.exe"]
+    row.btn_send.setChecked(True)
+    cap = row.capture
+    cap.error = "Sending this program's sound failed. Switch Send on to try again."
+    tab._on_apps([music(pid=100)])
+    assert cap.stopped and row.capture is None and not row.sending
+    assert "Switch Send on" in row.sub.text() and tab.engine.aux == ()
+    n = len(FakeCapture.made)
+    tab._on_apps([music(pid=100)])               # no silent restart loop
+    assert len(FakeCapture.made) == n and "Switch Send on" in row.sub.text()
+    row.btn_send.setChecked(True)                # trying again clears it
+    assert row.sending and "Switch Send on" not in row.sub.text()
+
+
+def test_remembered_programs_start_from_the_config_and_auto_send(qapp, monkeypatch):
+    monkeypatch.setattr(appaudio, "AppCapture", FakeCapture)
+    FakeCapture.made, FakeCapture.fail = [], False
+    cfg = Config()
+    cfg.apps = {"music.exe": {"vol": 0.8, "monitor": True}}
+    t = AppsTab(Engine(), cfg, lambda: None, Meter)
+    try:
+        row = t.rows["music.exe"]
+        assert row.app is None and row.vol.value() == 0.8 and row.chk_hear.isChecked()
+        assert not row.btn_send.isEnabled()
+        t._on_apps([music()])
+        assert row.sending and row.capture is not None
+        assert row.src.vol == 0.8 and row.src.monitor is True
+        t.stop_all()                             # Stop all switches it off but keeps it
+        assert row.capture is None and not row.sending and "music.exe" in cfg.apps
+        t._on_apps([music()])                    # still running: stays off until you say so
+        assert not row.sending
+        row.btn_forget.click()
+        assert "music.exe" not in cfg.apps
+    finally:
+        t.shutdown()
+
+
+def test_a_failed_capture_reports_and_is_not_remembered(tab):
+    FakeCapture.fail = True
+    tab._on_apps([music()])
+    row = tab.rows["music.exe"]
+    row.btn_send.setChecked(True)
+    assert not row.sending and row.capture is None
+    assert "refused" in row.sub.text() and tab.engine.aux == ()
+    assert "music.exe" not in tab.cfg.apps
+    tab._on_apps([music()])                      # the next refresh keeps the message up
+    assert "refused" in row.sub.text()
+    FakeCapture.fail = False
+    row.btn_send.setChecked(True)                # trying again clears it
+    assert row.sending and "refused" not in row.sub.text()
+
+
+def test_shutdown_stops_every_capture(tab):
+    tab._on_apps([music(), App(200, "game.exe")])
+    for row in tab.rows.values():
+        row.btn_send.setChecked(True)
+    assert len(tab.engine.aux) == 2
+    tab.shutdown()
+    assert tab.engine.aux == () and all(c.stopped for c in FakeCapture.made)
+
+
+def test_windows_only_warning(qapp, monkeypatch):
+    monkeypatch.setattr(appaudio, "supported", lambda: (False, "Needs Windows 11."))
+    t = AppsTab(Engine(), Config(), lambda: None, Meter)
+    assert t.warn.isVisibleTo(t) and "Windows 11" in t.warn.text()
+    t.shutdown()
+
+
+def test_lister_hands_results_to_the_ui_thread(qapp, monkeypatch):
+    monkeypatch.setattr(appaudio, "list_apps", lambda: [music()])
+    got = []
+    lister = appspanel._Lister()
+    lister.ready.connect(got.append)
+    lister.refresh()
+    for _ in range(100):
+        qapp.processEvents()
+        if got:
+            break
+        import time
+        time.sleep(0.02)
+    assert got and got[0][0].exe == "music.exe"
+    lister.stop()
+
+
+def test_a_listing_failure_skips_the_update(qapp, monkeypatch):
+    def boom():
+        raise OSError("COM hiccup")
+    monkeypatch.setattr(appaudio, "list_apps", boom)
+    got = []
+    lister = appspanel._Lister()
+    lister.ready.connect(got.append)
+    lister._work()                               # an empty list would stop every capture
+    qapp.processEvents()
+    assert got == [] and not lister._busy
+    lister.stop()
+
+
+def test_record_waits_for_sound_then_adds_a_clip_without_sending(tab, monkeypatch, tmp_path):
+    monkeypatch.setattr(appspanel.library, "APP_DIR", tmp_path)
+    clips = []
+    tab.clip_ready.connect(lambda data, name: clips.append((data, name)))
+    tab._on_apps([music()])
+    row = tab.rows["music.exe"]
+
+    row.btn_rec.setChecked(True)                 # click Record: armed, nothing sent
+    cap = row.capture
+    assert cap is not None and cap.started and row.src is None and tab.engine.aux == ()
+    for _ in range(50):                          # 0.5 s of silence isn't recorded
+        cap.sink(np.zeros((480, 2), np.float32))
+    tab._meters()
+    assert not row.rec.triggered and row.btn_rec.text().startswith("Waiting")
+    for _ in range(100):                         # the program starts playing: 1 s
+        cap.sink(np.full((480, 2), 0.3, np.float32))
+    tab._meters()
+    assert row.rec.triggered and row.btn_rec.text().startswith("Stop")
+
+    row.btn_rec.setChecked(False)                # click again: the clip is handed over
+    assert len(clips) == 1
+    data, name = clips[0]
+    assert name.startswith("Music ")
+    assert 0.9 * appspanel.SR < len(data) < 1.4 * appspanel.SR   # the silence isn't in it
+    assert cap.stopped and row.capture is None and "Saved" in row.sub.text()
+    assert not list(tmp_path.iterdir())          # the spool file is gone
+
+
+def test_record_that_never_hears_anything_saves_nothing(tab, monkeypatch, tmp_path):
+    monkeypatch.setattr(appspanel.library, "APP_DIR", tmp_path)
+    clips = []
+    tab.clip_ready.connect(lambda *a: clips.append(a))
+    tab._on_apps([music()])
+    row = tab.rows["music.exe"]
+    row.btn_rec.setChecked(True)
+    row.capture.sink(np.zeros((4800, 2), np.float32))
+    row.btn_rec.setChecked(False)
+    assert clips == [] and "didn't make a sound" in row.sub.text()
+
+
+def test_record_and_send_share_one_capture(tab, monkeypatch, tmp_path):
+    monkeypatch.setattr(appspanel.library, "APP_DIR", tmp_path)
+    tab._on_apps([music()])
+    row = tab.rows["music.exe"]
+    row.btn_send.setChecked(True)
+    row.btn_rec.setChecked(True)
+    assert len(FakeCapture.made) == 1
+    row.btn_send.setChecked(False)               # Send off: still recording
+    assert row.capture is not None and not row.capture.stopped and tab.engine.aux == ()
+    tab.stop_all()
+    assert row.rec is not None
+    row.btn_rec.setChecked(False)
+    assert FakeCapture.made[0].stopped and row.capture is None
+
+
+def test_armed_recorder_keeps_a_short_preroll(tmp_path):
+    from soundboard.recorder import ArmedRecorder
+    rec = ArmedRecorder(tmp_path / "r.wav")
+    for _ in range(100):
+        rec.push(np.zeros((480, 2), np.float32))
+    rec.push(np.full((480, 2), 0.5, np.float32))
+    data = rec.stop()
+    pre = len(data) - 480
+    want = ArmedRecorder.PREROLL_S * appspanel.SR
+    assert want <= pre <= want + 480
+    assert np.allclose(data[-480:], 0.5, atol=1e-3)

@@ -37,7 +37,7 @@ def side_panel(w: int, h: int) -> QImage:
     f.setBold(True)
     p.setFont(f)
     p.setPen(QColor("white"))
-    p.drawText(QRectF(0, h * 0.74, w, h * 0.1), Qt.AlignCenter, "Soundboard")
+    p.drawText(QRectF(0, h * 0.74, w, h * 0.1), Qt.AlignCenter, "Onion Board")
     f.setPixelSize(max(9, w // 14))
     f.setBold(False)
     p.setFont(f)

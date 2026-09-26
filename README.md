@@ -1,12 +1,12 @@
-# Soundboard
+# Onion Board
 
 A free soundboard for Windows gamers. Press a button (or a hotkey, even in-game)
 and **your friends in Discord or your game hear the sound** through your mic. Your
 voice goes along with it, or switch that off and send **only the sounds**.
 
-## ⬇️ [Download Soundboard for Windows](../../releases/latest/download/SoundboardSetup.exe)
+## ⬇️ [Download Onion Board for Windows](../../releases/latest/download/OnionBoardSetup.exe)
 
-One file, `SoundboardSetup.exe`. Download it, double-click it, done.
+One file, `OnionBoardSetup.exe`. Download it, double-click it, done.
 Windows 10 or 11.
 
 <sub>Other downloads: [all versions](../../releases) ·
@@ -19,7 +19,7 @@ Version: **0.2.0**. See [CHANGELOG.md](CHANGELOG.md).
 
 ## Get started (no computer skills needed)
 
-**1. [Download `SoundboardSetup.exe`](../../releases/latest/download/SoundboardSetup.exe).**
+**1. [Download `OnionBoardSetup.exe`](../../releases/latest/download/OnionBoardSetup.exe).**
 
 **2. Double-click it.** If Windows shows a blue *"Windows protected your PC"*
 box, click **More info → Run anyway**. That appears for most small programs that
@@ -38,7 +38,7 @@ sure, leave them as they are and click **Install**.
 **4. Click Yes** when Windows asks for permission. That's the virtual cable
 being installed.
 
-**5. Answer Bun's four questions.** Soundboard opens with a short guide hosted by
+**5. Answer Bun's four questions.** Onion Board opens with a short guide hosted by
 Bun the bunny 🐰:
 - *Which mic do you talk into?* Pick yours and say something. The bar should move.
   There's a **Send my voice too** box here. Untick it if you only want your sounds
@@ -53,14 +53,17 @@ Input Device*. If a game has no mic setting, the Setup tab's *"Game has no
 microphone setting?"* button shows you how to make it Windows' default mic.
 
 **7. Add sounds and play.** Drag sound files onto the window (or click **Add sounds**),
-then click a pad. Right-click a pad to give it a hotkey that works in-game, or
+then double-click a pad to play it (a single click just selects it). Right-click a pad to give it a hotkey that works in-game, or
 **Effects…** to make a sped-up, slowed, pitched or ear-rape version of it.
 
-Got a link instead of a file? Paste it into **Search sounds** (YouTube,
-SoundCloud, TikTok, X, Reddit, a direct link to an audio or video file — most
-media sites, via [yt-dlp](https://github.com/yt-dlp/yt-dlp)). It's looked up and
-you get **Add as sound** (or press Enter) and **Play once**, which plays it
-through your mic without keeping it.
+Looking for a sound you don't have? Type it into **Search sounds** and press
+Enter: YouTube results show up in place of your pads (the **YouTube** /
+**SoundCloud** buttons above them switch sites). **Play** plays one once through
+your mic without keeping it; **Add** makes it a pad. Got a link instead? Paste it
+into the same box (YouTube, SoundCloud, TikTok, Instagram, X, Reddit, a direct
+link to an audio or video file — most media sites, via
+[yt-dlp](https://github.com/yt-dlp/yt-dlp)) and you get **Add as sound** (or press
+Enter) and **Play once**.
 
 ### Your voice, or just the sounds?
 
@@ -76,21 +79,19 @@ The same switch is in **⚙ Settings → General → Your mic** and in the setup
 ### Something's not right?
 
 - **Friends can't hear anything:** check Discord or the game uses
-  **`CABLE Output`** as its mic, and that Soundboard's *"Your mic in Discord /
+  **`CABLE Output`** as its mic, and that Onion Board's *"Your mic in Discord /
   games"* pill is green.
 - **They hear sounds but not you:** tick **send** next to *My mic*.
 - **Check it yourself:** the *Setup* tab's **Record 6s → play back** records
   exactly what others get and tells you whether your voice and sounds are in it.
 - **An `.m4a` or video won't add:** run the installer again and tick *Play M4A,
   AAC and video files*.
-- **The Browser tab looks stuck or blank:** click **Show page** in the mini-player,
-  or turn off **Lite** at the bottom of the tab.
-- **Something else:** the log is `%APPDATA%\Soundboard\soundboard.log`. Attach it
+- **Something else:** the log is `%APPDATA%\OnionBoard\onionboard.log`. Attach it
   to a [bug report](../../issues/new/choose) (it contains your device names and
   file paths, so skim it first).
 - **Start the guide again:** *Setup* tab → *Step-by-step guide*.
 
-Your sounds and settings are kept in `%APPDATA%\Soundboard\` and survive
+Your sounds and settings are kept in `%APPDATA%\OnionBoard\` and survive
 reinstalling or uninstalling.
 
 ---
@@ -100,11 +101,25 @@ reinstalling or uninstalling.
 - **Pads:** add by button or drag-and-drop (files or folders). Plays mp3, wav, ogg,
   flac, m4a and more, and pulls the audio out of video files. Search, reorder,
   resize, set colours.
+- **Categories:** the tabs above the pads (*+ Category* makes one). Right-click a
+  pad → *Categories* to put it in any number of them; right-click a category to
+  rename, export or delete it. The in-game overlay shows the same category, and
+  its **R** key (numpad **\***) switches to the next one.
+- **Remove can be undone:** *Removed “…” · Undo* stays up for 10 seconds, and the
+  audio file then goes to the Recycle Bin rather than being deleted outright.
+- **Backup / share (*Backup* button, or Settings → General):** *Export everything*
+  writes every sound (picture, effects, hotkey, categories) and your settings to
+  one `.zip`; import it on a new PC. A category or a single pad exports as a sound
+  pack to share; importing skips sounds you already have. The format is a plain
+  zip of JSON and the original audio files — see
+  [docs/BACKUP-FORMAT.md](docs/BACKUP-FORMAT.md).
 - **Per sound:** global hotkey (works in-game), volume, loop, and what pressing
   again does (restart / overlap / toggle).
 - **Effects on any sound** (right-click a pad → **Effects…**, or the *Effects* tab
   of **Edit…**): speed and pitch (separately, or together like a record player
-  with *Tape mode*), a 7-band EQ, a boost up to +36 dB that clips on purpose,
+  with *Tape mode*), **trim** (drag the start and end on the sound's waveform, or
+  type exact times — keep one line out of a 4-minute video), a 7-band EQ, a boost
+  up to +36 dB that clips on purpose,
   play backwards, and every voice effect (echo, reverb, distortion, radio, robot,
   add-on effects too). One-click presets: **Ear rape**, Bass boosted,
   Slowed + reverb, Nightcore, Chipmunk, Demon, Fast / Slow-mo (same pitch), Old
@@ -121,14 +136,19 @@ reinstalling or uninstalling.
 - **Global hotkeys** (set in **⚙ Settings → Hotkeys**, the overlay key in
   **⚙ Settings → Overlay**; all work in-game):
   - Stop all, and pause/resume all.
-  - Browser: record start/stop (Ctrl+Alt+R), save last 15s (Ctrl+Alt+C),
-    play/pause (Ctrl+Alt+P) and LIVE on/off (Ctrl+Alt+L).
   - **In-game overlay** (the <kbd>`</kbd> key by default): a small panel of your
     sounds over the game. Number keys play them, and the game keeps your mouse
     and keyboard.
   - Auto push-to-talk: holds your game's PTT key while a sound plays.
-  - Hotkeys that record or save a clip beep in your headphones (only you hear
-    it), so you know it worked.
+  - Hotkeys can beep in your headphones (only you hear it), so you know they
+    worked.
+- **Radio tab:** internet radio from all over the world, from the free
+  [Radio Browser](https://www.radio-browser.info) directory. Spin the 3D globe and
+  click a dot to tune in (hover one for its country, genres, quality and how
+  popular it is; zoom with the scroll wheel or Ctrl +/−), or search by name, genre
+  or country. Star stations for
+  *★ Favorites*. It plays in your headphones, goes out through
+  your mic when you press **LIVE**, and can *Record* or save the *Last 15s* as a pad.
 - **Voice tab:** voice changer (pitch, robot, radio, echo, reverb, distortion,
   8-bit bitcrusher, plus add-on effects; it starts off every time the app
   opens, and a big ON / OFF button shows which it is), text-to-speech with Windows' built-in
@@ -150,52 +170,31 @@ reinstalling or uninstalling.
   - **Record 6s → play back:** records the virtual cable's output, plays it back,
     and reports whether your voice and sounds are in it and whether the balance
     is off.
-- **Browser tab:** a built-in browser (YouTube, SoundCloud, clip sites…) with
-  an ad blocker. Whatever it plays goes live through your mic, no downloading.
-  - **LIVE** off means only you hear it, handy for finding the right spot first.
-    It starts off every time the app opens.
-  - Its own volume, plus "Hear it myself".
-  - **Speed & pitch** (the `1x` button): slow a video down or speed it up, with or
-    without changing its pitch, and shift the pitch on its own. It applies to
-    every video and embed you play until you press *Reset*, and what's recorded
-    or clipped has it too. At normal speed the site's own speed menu works as usual.
-  - **Record** and **Last 15s** save what played as a new pad, with dead air
-    trimmed.
-  - **Add as sound** downloads the open video's audio (YouTube, SoundCloud and
-    most video sites, via [yt-dlp](https://github.com/yt-dlp/yt-dlp)) and adds
-    the whole thing as a pad. YouTube's m4a/webm audio needs FFmpeg, like a
-    dropped m4a file does. Settings → General has *Update now* and *Reset
-    downloader* for when downloads start failing, and an opt-in box to update
-    yt-dlp from PyPI automatically (off by default).
-  - **Lite** (on by default): while a video plays, the page is swapped for a
-    small player (title, seek bar, play/pause, ±10 s, next) and YouTube drops to
-    144p, so the browser costs your game almost nothing. A YouTube video you open
-    goes straight to the small player, and it stays there while paused. Opening
-    another site brings the page back; sound-button sites never collapse.
-  - Stop all also pauses the browser, and auto push-to-talk holds while it's live.
-  - Logins and cookies persist in `%APPDATA%\Soundboard\browser\`.
-  - It only opens YouTube, SoundCloud and the big sound-clip sites (MyInstants,
-    101 Soundboards, Voicy, Voicemod Tuna, Freesound, ZapSplat, SoundBible,
-    Pixabay, Mixkit, Orange Free Sounds, Bandcamp) and TikTok; a link anywhere else is refused.
-    Qt's browser has no Safe Browsing, so it stays off the rest of the web. It
-    never downloads files either.
-  - Embedded players (a YouTube or SoundCloud embed on another site) are captured
-    too. If two players in different frames play at once, the one that started
-    first is what goes out.
-  - Limits: Qt's browser has no DRM (no Spotify / Netflix) and no H.264 (Twitch
-    won't play). Media from another site without CORS plays, but only for you.
+- **Search YouTube and SoundCloud** from the Sounds tab: Enter in *Search sounds*
+  lists results (thumbnail, title, length) in place of the pads; *Play* plays one
+  once, *Add* keeps it as a pad (only the audio is downloaded, via
+  [yt-dlp](https://github.com/yt-dlp/yt-dlp)). TikTok, Instagram and most other
+  sites have no search without an account, so paste a link to the video instead.
+  YouTube's m4a/webm audio needs FFmpeg, like a dropped m4a file does. Settings →
+  General has *Update now* and *Reset downloader* for when downloads start
+  failing, and an opt-in box to update yt-dlp from PyPI automatically (off by
+  default).
 - **⚙ Settings:** themes (Dark, Light, Toxic green, Ocean; they switch live),
   hotkeys, overlay, window and audio options.
+- **Runs in the background:** closing the window keeps it in the tray (hotkeys and
+  the overlay keep working; right-click the tray icon → *Quit*). Optionally
+  **starts with Windows**, straight to the tray. An opt-in, once-a-day check tells
+  you when a new version is out (it never downloads anything itself).
 
 ### How it works
 
 ```
 🎤 your mic ── send ✓ / ✗ ──┐
-                            ├─►  Soundboard mixes them  ─►  CABLE Input ═══ pipe ═══► CABLE Output
+                            ├─►  Onion Board mixes them  ─►  CABLE Input ═══ pipe ═══► CABLE Output
 🔊 your sounds ─────────────┘                                                          (Discord / game mic)
 ```
 
-The virtual cable is a free audio driver that works like a pipe: Soundboard plays
+The virtual cable is a free audio driver that works like a pipe: Onion Board plays
 into one end, and Discord or the game uses the other end as a microphone. You hear
 the sounds in your own headphones separately.
 
@@ -204,7 +203,7 @@ the sounds in your own headphones separately.
 ## Advanced (for developers and tinkerers)
 
 Everything below is for building from source, changing the code or debugging.
-You don't need any of it to use Soundboard.
+You don't need any of it to use Onion Board.
 
 ### Install from source (any Windows PC)
 
@@ -212,9 +211,9 @@ You don't need any of it to use Soundboard.
 2. Double-click **`install.bat`**. It:
    - finds Python 3.12+ (offers to install 3.13 with winget if you have none)
    - installs the Python packages into `.venv`
-   - adds **Soundboard** shortcuts to the Desktop and Start menu
+   - adds **Onion Board** shortcuts to the Desktop and Start menu
    - offers to install the free **virtual cable** (VB-Cable)
-3. Open Soundboard. The setup guide (also under *Setup* → *Step-by-step guide*)
+3. Open Onion Board. The setup guide (also under *Setup* → *Step-by-step guide*)
    tells you the one setting to change in Discord or your game.
 
 #### The virtual cable
@@ -231,7 +230,7 @@ free virtual cable* button runs the same script. Other virtual cables
 Optional: `winget install Gyan.FFmpeg.Essentials` adds m4a/aac/video support (the
 installer's *Play M4A, AAC and video files* box runs the same command). The app
 finds ffmpeg on `PATH` or in winget's `Links` folder.
-Settings and imported sounds live in `%APPDATA%\Soundboard\`. Its `cache\` folder
+Settings and imported sounds live in `%APPDATA%\OnionBoard\`. Its `cache\` folder
 holds each sound decoded and ready to play (int16 at 48 kHz), so later starts don't
 decode anything; it's safe to delete and is rebuilt as needed.
 
@@ -248,34 +247,48 @@ the launcher the shortcuts and PyInstaller use. The app is the `soundboard` pack
 | `soundboard/ui/mainwindow.py` | the main window: pads, transport, tabs, the audio panel, test mode, auto push-to-talk |
 | `soundboard/ui/widgets.py` | hand-painted widgets: meter, EQ curve, seek slider, pads (picture, spectrum visualizer while playing) and their grid |
 | `soundboard/ui/panel.py` | volume boxes and the equalizer panel (emit values; the window applies them) |
-| `soundboard/ui/dialogs.py` | per-sound Edit dialog: the Sound tab (name, volume, hotkey…) and the Effects tab |
+| `soundboard/ui/dialogs.py` | per-sound Edit dialog: the Sound tab (name, volume, hotkey, fades…) and the Effects tab |
+| `soundboard/ui/padbatch.py` | picking several pads (Ctrl / Shift+click, Ctrl+A) and changing them together: delete with one Undo, colour, volume, fades, categories |
+| `soundboard/ui/a11y.py` | screen-reader names for icon-only controls, taken from their tooltips as the focus moves |
+| `soundboard/shuffle.py` | the random-sound hotkeys' shuffle bag (every sound once before repeats, never twice in a row) |
+| `soundboard/remote.py` | opt-in local control API for Stream Deck / scripts: HTTP on `127.0.0.1`, token-guarded, answered on the UI thread |
 | `soundboard/ui/linkbar.py` | the Sounds tab's link bar: a link pasted into *Search sounds* is looked up with yt-dlp, then added as a sound or played once |
-| `soundboard/ui/ytsearch.py` | the Sounds tab's YouTube search: Enter in *Search sounds* lists YouTube hits (thumbnail, title, length) in place of the pads; *Play* / *Add* hand one to the link bar |
-| `soundboard/ui/speedpitch.py` | the live speed & pitch button and its popup (Sounds transport and Browser bar) |
-| `soundboard/soundfx.py` | per-sound effects: speed / pitch (phase vocoder + soxr), EQ, boost, reverse and any voice effect, rendered off the audio thread; the presets |
+| `soundboard/ui/ytsearch.py` | the Sounds tab's web search: Enter in *Search sounds* lists YouTube or SoundCloud hits (thumbnail, title, length) in place of the pads; *Play* / *Add* hand one to the link bar |
+| `soundboard/ui/speedpitch.py` | the live speed & pitch button and its popup (Sounds transport) |
+| `soundboard/soundfx.py` | per-sound effects: trim, speed / pitch (phase vocoder + soxr), EQ, boost, reverse and any voice effect, rendered off the audio thread; the presets |
+| `soundboard/ui/trim.py` | the Effects tab's trim control: waveform with start / end handles and exact-time boxes |
+| `soundboard/backup.py` | export / import of the board as a plain zip (JSON + original audio + pictures), sound packs and single sounds; see `docs/BACKUP-FORMAT.md` |
+| `soundboard/autostart.py` | *Start with Windows*: the per-user `Run` registry value (`--tray` starts it hidden) |
+| `soundboard/updates.py` | the opt-in "is there a newer version?" check against GitHub Releases |
 | `soundboard/ui/icons.py` | the line icons, drawn in code and recoloured with the theme |
 | `soundboard/ui/responsive.py` | small windows: what hides, in which order, as the window shrinks |
 | `soundboard/ui/fit.py` | dialogs grow to fit their wrapped text instead of clipping it (`fit.watch(self)` in every dialog's `__init__`) |
 | `soundboard/ui/setupwizard.py` | the first-run guide with Bun (mic, headphones, cable, Discord) and the Steam help |
 | `soundboard/ui/bunnywidget.py` | Bun animated: bobs, blinks, talks along with your mic and throws music notes |
+| `soundboard/ui/livedot.py` | the glowing dot (and green icon) on a tab whose feature is live, e.g. the Voice tab while your voice is being changed |
+| `soundboard/ui/logowidget.py` | the header logo animated: a breathing glow and sheen, flaring with embers while sounds play |
 | `soundboard/ui/overlay.py` | the in-game overlay: a click-through panel of pads driven by number keys |
 | `soundboard/ui/voicepanel.py` | the Voice tab: voice changer, text-to-speech, live voice-to-speech, add-ons list |
 | `soundboard/voicefx/` | the voice-effect chain and the built-in effects (pitch, robot, radio, …) |
-| `soundboard/speech/` | Windows text-to-speech (`tts.py`), the live voice-to-speech client (`live.py`, `service.py`, `protocol.py`) and translation model downloads (`translation.py`) |
+| `soundboard/speech/` | Windows text-to-speech (`tts.py`), the live voice-to-speech client (`live.py`, `service.py`, `protocol.py`) translation model downloads (`translation.py`) and one-click Windows voice installs (`winvoices.py`) |
 | `soundboard/modules.py` | finds, loads and installs add-ons in `modules\` |
-| `soundboard/ytdl.py` | the Browser tab's *Add as sound*: downloads the open video's audio with yt-dlp, and updates yt-dlp on request or opt-in (SHA-256-checked PyPI wheels in `%APPDATA%`, loaded ahead of the bundled copy by an import hook) |
-| `soundboard/thumbs.py` | pad pictures: a link's video thumbnail, a file's cover art / first frame (ffmpeg), or a picture you pick or drop on a pad, scaled into `%APPDATA%\Soundboard\thumbs` |
-| `soundboard/adblocker.py` | the Browser tab's ad blocker (EasyList / uBlock lists, refreshed every few days) |
+| `soundboard/ytdl.py` | yt-dlp for the link bar and web search: searches YouTube / SoundCloud, downloads one video's audio, and updates yt-dlp on request or opt-in (SHA-256-checked PyPI wheels in `%APPDATA%`, loaded ahead of the bundled copy by an import hook) |
+| `soundboard/thumbs.py` | pad pictures: a link's video thumbnail, a file's cover art / first frame (ffmpeg), or a picture you pick or drop on a pad, scaled into `%APPDATA%\OnionBoard\thumbs` |
 | `soundboard/bunny.py` | Bun the mascot, drawn in code (setup guide and installer art) |
 | `soundboard/winkeys.py` | global hotkeys (`RegisterHotKey`) and key presses (`SendInput`), no hooks |
-| `soundboard/engine.py` | real-time audio: 3 WASAPI streams (mic in, cable out, headphones out), mixing, pause/seek, live speed / pitch, limiter, watchdog |
+| `soundboard/appaudio.py` | the Apps tab's capture: lists the programs with an audio session (WASAPI sessions, over ctypes) and taps one program's audio with Windows' per-process loopback (a copy: the program still plays on your speakers), pushed into the engine as its own source |
+| `soundboard/ui/appspanel.py` | the Apps tab: one row per program (level, **Send**, volume, *Hear it myself*); programs you switch on are remembered by .exe and picked up again when they run |
+| `soundboard/engine.py` | real-time audio: 3 WASAPI streams (mic in, cable out, headphones out), mixing (sounds, radio and captured programs), pause/seek, live speed / pitch, limiter, watchdog |
 | `soundboard/eq.py` | 7-band biquad equalizer and presets |
-| `soundboard/browser.py` | Browser tab: Qt WebEngine view; an isolated-world script in every frame taps page media with an AudioWorklet and streams 48 kHz int16 PCM over a loopback WebSocket (per-launch secret) into the engine; clip recorder |
+| `soundboard/radio.py` | Radio tab back end: the Radio Browser directory client (stations, search, a day's cache), the stream player (Qt Multimedia decodes, a `QAudioBufferOutput` hands 48 kHz PCM to the engine) and the globe page (globe.gl, pinned with SRI) |
+| `soundboard/ui/radiopanel.py` | the Radio tab: search bar, 3D globe (click a dot to play), station list, favourites, LIVE / record / last 15 s |
+| `soundboard/recorder.py` | the Radio tab's clip recorder: a rolling last-15-seconds buffer plus a recording spooled to disk |
 | `soundboard/library.py` | decoding (bounded to 15 min), the int16 decoded-audio cache (plus each sound's rendered effects version), loudness levelling, duplicating a sound, imports and clips (FLAC), versioned config with backups |
 | `soundboard/theme.py` | colour themes (tokens → stylesheet, also read by the painted widgets) and the logo |
 | `soundboard/settings.py` | Settings window, global hotkey actions, hotkey capture dialog |
 | `soundboard/wheelguard.py` | mouse wheel scrolls the page instead of changing sliders / dropdowns (installed per widget) |
-| `soundboard/applog.py` | rotating log in `%APPDATA%\Soundboard\soundboard.log`; unhandled exceptions and Qt warnings land there (plus one dialog for a UI-thread crash). `SOUNDBOARD_DEBUG=1` for more |
+| `soundboard/applog.py` | rotating log in `%APPDATA%\OnionBoard\onionboard.log`; unhandled exceptions (any thread) and Qt warnings land there; each distinct crash is saved, scrubbed of personal paths, to `crash-reports\` and offered to the user. `report()` does the same for an error code caught but didn't expect. `ONIONBOARD_DEBUG=1` for more |
+| `soundboard/ui/crashdialog.py` | the "Onion Board hit a problem" dialog: the report, *Copy report*, *Report on GitHub* (copies it, opens a new issue in the browser), *Open folder* |
 | `soundboard/testcheck.py` | analysis for the Record-6s test (finds your voice in the output by cross-correlation) |
 | `soundboard/destination.py` | destination modes (Settings → *Who's listening*): shapes the sounds bus for the listener's voice codec — sub-bass harmonics, codec ceiling, gentle compressor, mono |
 | `soundboard/ui/destpanel.py` | the mode picker and the custom-modes editor |
@@ -287,7 +300,7 @@ the launcher the shortcuts and PyInstaller use. The app is the `soundboard` pack
 | `install.bat`, `install.ps1`, `run.bat` | run from source: set up `.venv` and shortcuts, then launch |
 | `install-vbcable.ps1` | downloads VB-Cable, checks its signature, installs it (used by the app and the installer) |
 | `scripts/` | `check_sensitive.py` (secrets / personal-data scan, also the pre-commit hook), `make_notices.py` (third-party licences for the build) and `codec_bench.py` (what voice chat does to your sounds, in numbers) |
-| `tests/` | pytest suite: ring buffer, engine mixing/guards/watchdog, cache and imports, recorder, hotkey parsing, EQ, levelling, config, test analysis, the main window built on Qt's offscreen platform (no window, no devices, no hotkeys) including shrinking it, the overlay, setup guide, voice panel, speech and effects, per-sound effects (speed and pitch measured by frequency and length, every preset, the effects cache, the Edit dialog) and live speed / pitch, the ad blocker, and the browser tab end to end: a headless page's audio (top frame and iframe) reaching the engine through the worklet and socket, and its speed reaching every page |
+| `tests/` | pytest suite: ring buffer, engine mixing/guards/watchdog, cache and imports, recorder, hotkey parsing, EQ, levelling, config, test analysis, the main window built on Qt's offscreen platform (no window, no devices, no hotkeys) including shrinking it, the overlay, setup guide, voice panel, speech and effects, per-sound effects (speed and pitch measured by frequency and length, every preset, the effects cache, the Edit dialog) and live speed / pitch, the web search, and the Radio tab against a local stand-in for the directory and a station (parsing untrusted station data, search, cache and mirror failover, a stream decoded to 48 kHz and measured by frequency, dead stations, the globe page's click bridge with the internet blocked) |
 
 Developing:
 
@@ -302,9 +315,9 @@ the ruff and pytest settings, and a `soundboard` GUI entry point for `pip instal
 
 #### Building an .exe
 
-`build.ps1` runs PyInstaller and produces `dist\Soundboard\Soundboard.exe` (one folder,
-QtWebEngine included), then compiles `installer\Soundboard.iss` with Inno Setup 6
-(`winget install JRSoftware.InnoSetup`) into **`dist\SoundboardSetup.exe`**, the one
+`build.ps1` runs PyInstaller and produces `dist\OnionBoard\OnionBoard.exe` (one folder,
+QtWebEngine included), then compiles `installer\OnionBoard.iss` with Inno Setup 6
+(`winget install JRSoftware.InnoSetup`) into **`dist\OnionBoardSetup.exe`**, the one
 file to hand out. It installs per user (no admin), adds the Desktop and Start menu
 shortcuts and opens the app. Its *Pick what you want* page (Inno Setup tasks) covers
 VB-Cable (downloaded and signature-checked by `install-vbcable.ps1`), FFmpeg via winget
@@ -313,7 +326,7 @@ VB-Cable (downloaded and signature-checked by `install-vbcable.ps1`), FFmpeg via
 Python is present) and the Desktop shortcut. Silent installs use the defaults or the
 previous install's choices. The installer artwork is Bun the mascot, drawn in code by
 `soundboard/bunny.py` and rendered by `make_bunny.py` (`--preview` writes a sheet of
-every pose). Settings live in `%APPDATA%\Soundboard\` either way.
+every pose). Settings live in `%APPDATA%\OnionBoard\` either way.
 Every `config.json` save keeps the last three good copies next to it
 (`config.json.1` … `.3`); a damaged file is set aside as `config.json.broken-<time>` and
 the newest backup is used, so the pad list is never silently reset.
@@ -339,10 +352,8 @@ the newest backup is used, so the pad list is never silently reset.
   instant. Sounds are read at a fractional rate with linear interpolation (like a
   tape). A pitch shifter on the sounds bus (a crossfaded two-head delay line, 70 ms
   window) then puts the pitch back when *keep pitch* is on, and adds the pitch
-  slider on top. Browser speed is the page's own `playbackRate` /
-  `preservesPitch`, sent to every frame over the tap socket. Its pitch goes
-  through the same shifter as it's fed to the engine.
-- Browser recordings are spooled to a 16-bit WAV as they happen instead of growing in
+  slider on top.
+- Radio recordings are spooled to a 16-bit WAV as they happen instead of growing in
   RAM, and the resampled copies kept for non-48 kHz devices are capped at 512 MB (LRU).
 - Every device is opened at its **native** sample rate and resampled with soxr.
   Windows' built-in `auto_convert` resampler was measured garbling VB-Cable audio
@@ -355,10 +366,10 @@ the newest backup is used, so the pad list is never silently reset.
   the path of your other keypresses, so it can't lag or stick your keys. A hotkey
   you pick is reserved for the app, so don't use one your game needs.
 - Auto push-to-talk can't press keys in a game that runs as administrator unless
-  Soundboard also runs as administrator (Windows blocks it). Keys are injected with
+  Onion Board also runs as administrator (Windows blocks it). Keys are injected with
   `SendInput`, modifiers and key in one call.
-- The window is GPU-composited from the start (`QT_WIDGETS_RHI=1`) so the browser
-  tab can appear without rebuilding it. On a machine whose GPU driver or remote-desktop
+- The window is GPU-composited from the start (`QT_WIDGETS_RHI=1`) so the Radio
+  tab's globe can appear without rebuilding it. On a machine whose GPU driver or remote-desktop
   session can't do that, set `QT_WIDGETS_RHI=0` before launching.
 - Drop-outs reported by the audio driver are counted and shown in the status line.
   **⚙ Settings → General → Audio buffering: Safer** trades a little delay for bigger

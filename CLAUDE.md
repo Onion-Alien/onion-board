@@ -14,7 +14,7 @@ published. Before writing or committing anything:
   machines. Use `%APPDATA%`, `Path.home()`, `example.com`, placeholders.
 - **Never copy content from outside the repo** (the author's other projects,
   parent-folder docs, memory files, shell history) into files here.
-- **Never commit secrets** or anything from `%APPDATA%\Soundboard\` (config, logs,
+- **Never commit secrets** or anything from `%APPDATA%\OnionBoard\` (config, logs,
   browser profile, cache).
 - **Never add audio files, binaries, or third-party assets.** Tests synthesize audio
   with numpy; icons/artwork are drawn in code.
@@ -33,9 +33,9 @@ or installing anything. The short version:
 
 - Checks: `.venv\Scripts\ruff check .` and `.venv\Scripts\python -m pytest`
   (tests use Qt's offscreen platform — no windows, devices or hotkeys).
-- Build: `powershell -ExecutionPolicy Bypass -File build.ps1` → `dist\Soundboard\`
-  and `dist\SoundboardSetup.exe`. Rebuild after changing anything the app ships.
-- Reinstall headless: `dist\SoundboardSetup.exe /VERYSILENT /SUPPRESSMSGBOXES
+- Build: `powershell -ExecutionPolicy Bypass -File build.ps1` → `dist\OnionBoard\`
+  and `dist\OnionBoardSetup.exe`. Rebuild after changing anything the app ships.
+- Reinstall headless: `dist\OnionBoardSetup.exe /VERYSILENT /SUPPRESSMSGBOXES
   /NORESTART /CLOSEAPPLICATIONS` (a UAC prompt appears only if VB-Cable is missing).
 - A `.venv` breaks if moved; recreate it instead.
 - Don't launch the GUI or anything that opens windows / grabs global hotkeys without

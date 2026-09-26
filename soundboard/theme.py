@@ -109,6 +109,12 @@ QFrame#chip QPushButton#chipstop:hover { background:$danger_bg; }
 QLabel#iconlabel { background:transparent; }
 QPushButton#pill { border-radius:15px; padding:5px 14px; font-weight:600; }
 QPushButton#pill[state="ok"] { color:#13ce66; border:1px solid #1c6b45; }
+QPushButton#onair { border-radius:15px; padding:5px 14px; font-weight:700;
+    background:$danger_bg; border:1px solid $danger_border; color:$danger_text; }
+QPushButton#onair:checked { background:#13a35a; border:1px solid #13ce66; color:white; }
+QPushButton#onair:checked:hover { background:#16b865; }
+QWidget#decktop { background:transparent; }
+QLabel#decktitle { color:$section; font-size:8pt; font-weight:700; letter-spacing:1px; }
 QPushButton#pill[state="warn"] { background:$warn_bg; color:$warn_text; border:1px solid $warn_text; }
 QSpinBox { background:$bg; border:1px solid $border; border-radius:6px; padding:3px 4px; }
 QSpinBox::up-button, QSpinBox::down-button { width:0; }
@@ -221,8 +227,8 @@ def apply(app, name: str) -> str:
 # --------------------------------------------------------------------------- logo
 
 def paint_logo(p: QPainter, rect: QRectF, c1: str, c2: str):
-    """The Soundboard mark: a gradient squircle holding a microphone whose head is
-    an equalizer — mic + soundboard in one shape."""
+    """The Onion Board mark: a gradient squircle holding an onion whose layers
+    are drawn as sound-wave arcs — onion + soundboard in one shape."""
     s = rect.width()
     x0, y0 = rect.left(), rect.top()
     p.save()
@@ -239,28 +245,50 @@ def paint_logo(p: QPainter, rect: QRectF, c1: str, c2: str):
     hi.setColorAt(0.0, QColor(255, 255, 255, 60))
     hi.setColorAt(1.0, QColor(255, 255, 255, 0))
     p.fillPath(body, hi)
-    # mic head = rounded capsule outline with equalizer bars inside
-    white = QColor("white")
+    # the onion is white, or near-black on light accents (e.g. Toxic's lime) so it stays legible
+    a, b = QColor(c1), QColor(c2)
+    lum = sum((0.299 * q.red() + 0.587 * q.green() + 0.114 * q.blue()) / 2 for q in (a, b))
+    fg = QColor("#0b1a10") if lum > 165 else QColor("white")
     cx = x0 + s * 0.5
-    head = QRectF(cx - s * 0.19, y0 + s * 0.17, s * 0.38, s * 0.44)
-    p.setPen(QPen(white, max(1.0, s * 0.045)))
-    p.setBrush(Qt.NoBrush)
-    p.drawRoundedRect(head, s * 0.19, s * 0.19)
-    p.setPen(Qt.NoPen)
-    p.setBrush(white)
-    bw = s * 0.05
-    for i, h in enumerate((0.13, 0.24, 0.17)):
-        bx = cx + (i - 1) * s * 0.095 - bw / 2
-        by = head.center().y() - s * h / 2
-        p.drawRoundedRect(QRectF(bx, by, bw, s * h), bw / 2, bw / 2)
-    # cradle arc + stand + base
-    pen = QPen(white, max(1.0, s * 0.045))
+
+    def pt(dx, dy):   # offsets in units of s, from the top-centre of the icon
+        return QPointF(cx + dx * s, y0 + dy * s)
+
+    def bulb(w):   # onion outline, w = half-width at the widest point
+        path = QPainterPath(pt(0, 0.27))
+        path.cubicTo(pt(w * 0.25, 0.36), pt(w, 0.42), pt(w, 0.59))
+        path.cubicTo(pt(w, 0.74), pt(w * 0.55, 0.81), pt(0, 0.81))
+        path.cubicTo(pt(-w * 0.55, 0.81), pt(-w, 0.74), pt(-w, 0.59))
+        path.cubicTo(pt(-w, 0.42), pt(-w * 0.25, 0.36), pt(0, 0.27))
+        return path
+
+    # sprout: two leaves curling out of the neck
+    pen = QPen(fg, max(1.2, s * 0.05))
     pen.setCapStyle(Qt.RoundCap)
     p.setPen(pen)
-    arc = QRectF(cx - s * 0.27, y0 + s * 0.30, s * 0.54, s * 0.42)
-    p.drawArc(arc, 200 * 16, 140 * 16)
-    p.drawLine(QPointF(cx, arc.bottom()), QPointF(cx, y0 + s * 0.80))
-    p.drawLine(QPointF(cx - s * 0.13, y0 + s * 0.80), QPointF(cx + s * 0.13, y0 + s * 0.80))
+    p.setBrush(Qt.NoBrush)
+    leaf = QPainterPath(pt(0, 0.29))
+    leaf.cubicTo(pt(0, 0.20), pt(-0.04, 0.15), pt(-0.12, 0.12))
+    leaf.moveTo(pt(0, 0.27))
+    leaf.cubicTo(pt(0.01, 0.19), pt(0.05, 0.14), pt(0.10, 0.10))
+    p.drawPath(leaf)
+    # bulb
+    p.setPen(Qt.NoPen)
+    p.fillPath(bulb(0.29), fg)
+    # layers: inner outlines in the brand gradient, reading like sound waves
+    if s >= 20:
+        lp = QPen(g, max(1.0, s * 0.032))
+        lp.setCapStyle(Qt.RoundCap)
+        p.setPen(lp)
+        for w in ((0.17, 0.07) if s >= 40 else (0.13,)):
+            p.drawPath(bulb(w))
+    # roots
+    if s >= 32:
+        rp = QPen(fg, max(1.0, s * 0.03))
+        rp.setCapStyle(Qt.RoundCap)
+        p.setPen(rp)
+        for dx in (-0.06, 0.0, 0.06):
+            p.drawLine(pt(dx * 0.6, 0.81), pt(dx, 0.87))
     p.restore()
 
 
@@ -276,10 +304,10 @@ def logo_pixmap(size: int, c1: str | None = None, c2: str | None = None) -> QPix
     return pm
 
 
-def app_icon() -> QIcon:
+def app_icon(c1: str | None = None, c2: str | None = None) -> QIcon:
     icon = QIcon()
     for sz in (16, 24, 32, 48, 64, 128, 256):
-        icon.addPixmap(logo_pixmap(sz))
+        icon.addPixmap(logo_pixmap(sz, c1, c2))
     return icon
 
 

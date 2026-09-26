@@ -1,6 +1,6 @@
 # Developing, building and reinstalling
 
-The loop for changing Soundboard, from edit to a reinstalled app. Written so an
+The loop for changing Onion Board, from edit to a reinstalled app. Written so an
 AI agent can follow it headless; humans can too. Commands are run from the repo
 root in PowerShell unless noted.
 
@@ -15,7 +15,7 @@ git config core.hooksPath .githooks    # secrets check on every commit
 Build tools, only needed for step 4:
 
 ```powershell
-winget install JRSoftware.InnoSetup    # for SoundboardSetup.exe
+winget install JRSoftware.InnoSetup    # for OnionBoardSetup.exe
 ```
 
 A `.venv` can't be moved or copied to another folder (its launchers hard-code the
@@ -39,11 +39,11 @@ module's `install.bat` or `pip install -r requirements.txt`).
 
 The tests are fully headless: `tests/conftest.py` forces Qt's `offscreen`
 platform and a separate single-instance name, and never touches the real
-`%APPDATA%\Soundboard`. No window appears and no global hotkey is registered.
+`%APPDATA%\OnionBoard`. No window appears and no global hotkey is registered.
 `sounddevice.OutputStream` is swapped for a silent stand-in that runs the
 callback at the device's pace but plays nothing, so no test is ever heard on
-the speakers or headphones, and the web engine runs with `--mute-audio` so the
-browser tests' tone pages are silent too (set `SOUNDBOARD_TEST_REAL_AUDIO=1` to
+the speakers or headphones, and the web engine (the Radio tab's globe) runs with
+`--mute-audio` (set `ONIONBOARD_TEST_REAL_AUDIO=1` to
 opt out of both).
 They're safe to run while someone is using the PC.
 
@@ -54,7 +54,7 @@ from source.
 
 **Launching the real app is not headless.** It opens a window, grabs global
 hotkeys and opens audio devices. Agents: ask the user before running
-`run.bat`, `python -m soundboard`, `Soundboard.exe` or the installer.
+`run.bat`, `python -m soundboard`, `OnionBoard.exe` or the installer.
 
 ## 4. Build the app and the installer
 
@@ -66,8 +66,8 @@ This produces:
 
 | output | what |
 |---|---|
-| `dist\Soundboard\Soundboard.exe` | the one-folder app (PyInstaller), with `LICENSE.txt` and `THIRD-PARTY-NOTICES.txt` beside it |
-| `dist\SoundboardSetup.exe` | the installer (Inno Setup). Skipped with a warning if Inno Setup isn't installed |
+| `dist\OnionBoard\OnionBoard.exe` | the one-folder app (PyInstaller), with `LICENSE.txt` and `THIRD-PARTY-NOTICES.txt` beside it |
+| `dist\OnionBoardSetup.exe` | the installer (Inno Setup). Skipped with a warning if Inno Setup isn't installed |
 
 `-AppDir <dir>` and `-InstallerDir <dir>` also copy those results elsewhere,
 e.g. `build.ps1 -AppDir ..\App -InstallerDir ..\Installer`.
@@ -89,16 +89,16 @@ or `scripts\` don't need a rebuild.
 ## 5. Install / reinstall / uninstall
 
 The installer is per-user (no admin for the app itself) and installs to
-`%LOCALAPPDATA%\Programs\Soundboard`. Settings and sounds live in
-`%APPDATA%\Soundboard` and survive reinstalls and uninstalls.
+`%LOCALAPPDATA%\Programs\OnionBoard`. Settings and sounds live in
+`%APPDATA%\OnionBoard` and survive reinstalls and uninstalls.
 
 Headless reinstall over an existing install:
 
 ```powershell
-dist\SoundboardSetup.exe /VERYSILENT /SUPPRESSMSGBOXES /NORESTART /CLOSEAPPLICATIONS
+dist\OnionBoardSetup.exe /VERYSILENT /SUPPRESSMSGBOXES /NORESTART /CLOSEAPPLICATIONS
 ```
 
-- `/CLOSEAPPLICATIONS` closes a running Soundboard first (it's also the
+- `/CLOSEAPPLICATIONS` closes a running Onion Board first (it's also the
   installer's default).
 - Silent installs don't launch the app afterwards (`skipifsilent`).
 - The installer runs `install-vbcable.ps1 -Silent`. It exits straight away if a
@@ -107,7 +107,7 @@ dist\SoundboardSetup.exe /VERYSILENT /SUPPRESSMSGBOXES /NORESTART /CLOSEAPPLICAT
   to expect it.
 - Restart handling: after setup the script waits for the CABLE devices. If Windows
   reports they need a restart it exits **3010** and writes
-  `%APPDATA%\Soundboard\cable-restart-pending`; the installer then offers
+  `%APPDATA%\OnionBoard\cable-restart-pending`; the installer then offers
   "Restart now / later" (suppressed by `/NORESTART`), and the setup guide shows a
   Restart button instead of reinstalling until the PC has restarted. Check the
   state without installing: `powershell -File install-vbcable.ps1 -Check`
@@ -116,22 +116,22 @@ dist\SoundboardSetup.exe /VERYSILENT /SUPPRESSMSGBOXES /NORESTART /CLOSEAPPLICAT
 Headless uninstall:
 
 ```powershell
-& "$env:LOCALAPPDATA\Programs\Soundboard\unins000.exe" /VERYSILENT /SUPPRESSMSGBOXES /NORESTART
+& "$env:LOCALAPPDATA\Programs\OnionBoard\unins000.exe" /VERYSILENT /SUPPRESSMSGBOXES /NORESTART
 ```
 
 Check what's installed without launching anything:
 
 ```powershell
-Get-Item "$env:LOCALAPPDATA\Programs\Soundboard\Soundboard.exe" | Select-Object LastWriteTime, Length
-Get-Process Soundboard -ErrorAction SilentlyContinue      # is it running?
+Get-Item "$env:LOCALAPPDATA\Programs\OnionBoard\OnionBoard.exe" | Select-Object LastWriteTime, Length
+Get-Process OnionBoard -ErrorAction SilentlyContinue      # is it running?
 ```
 
 ## 6. Debugging a user's problem
 
-- Log: `%APPDATA%\Soundboard\soundboard.log` (rotating, 3 × 1 MB). Set
-  `SOUNDBOARD_DEBUG=1` for more detail. Module logs: `module-<id>.log` beside it.
-- Config: `%APPDATA%\Soundboard\config.json`, with backups `config.json.1`–`.3`.
-- Decoded-audio cache: `%APPDATA%\Soundboard\cache\` (safe to delete).
+- Log: `%APPDATA%\OnionBoard\onionboard.log` (rotating, 3 × 1 MB). Set
+  `ONIONBOARD_DEBUG=1` for more detail. Module logs: `module-<id>.log` beside it.
+- Config: `%APPDATA%\OnionBoard\config.json`, with backups `config.json.1`–`.3`.
+- Decoded-audio cache: `%APPDATA%\OnionBoard\cache\` (safe to delete).
 - Never copy any of these into the repo. The log contains the user's paths, and
   `browser\` holds their logins.
 
@@ -141,10 +141,10 @@ Get-Process Soundboard -ErrorAction SilentlyContinue      # is it running?
 2. Commit, then push. CI (`.github/workflows/checks.yml`) runs the secrets scan
    over the full history, gitleaks, ruff and pytest.
 3. For a release: bump `__version__`, move *Unreleased* in the CHANGELOG under
-   the version, build, then upload `dist\SoundboardSetup.exe` to a GitHub Release
-   with its SHA-256 (`certutil -hashfile dist\SoundboardSetup.exe SHA256`).
-   Keep the asset named exactly `SoundboardSetup.exe` and don't mark the release
+   the version, build, then upload `dist\OnionBoardSetup.exe` to a GitHub Release
+   with its SHA-256 (`certutil -hashfile dist\OnionBoardSetup.exe SHA256`).
+   Keep the asset named exactly `OnionBoardSetup.exe` and don't mark the release
    as a pre-release: the README's download button links to
-   `releases/latest/download/SoundboardSetup.exe`.
+   `releases/latest/download/OnionBoardSetup.exe`.
    Never commit build output. Walk through
    [PUBLIC-RELEASE-CHECKLIST.md](PUBLIC-RELEASE-CHECKLIST.md) once more.

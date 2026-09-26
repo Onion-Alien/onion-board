@@ -1,4 +1,4 @@
-"""Only one Soundboard at a time.
+"""Only one Onion Board at a time.
 
 A second copy would fight the first over the virtual cable and the hotkeys, and
 every extra launch used to leave two more pythonw.exe processes lying around. The
@@ -18,11 +18,11 @@ from PySide6.QtNetwork import QLocalServer, QLocalSocket
 log = logging.getLogger(__name__)
 
 # overridable so a test copy never finds (and pops up) the real, running app
-INSTANCE_NAME = os.environ.get("SOUNDBOARD_INSTANCE", "Soundboard.App")
+INSTANCE_NAME = os.environ.get("ONIONBOARD_INSTANCE", "OnionBoard.App")
 
 
 def claim_single_instance() -> bool:
-    """True if we're the only Soundboard running. Otherwise asks the running one to
+    """True if we're the only Onion Board running. Otherwise asks the running one to
     come to the front and returns False."""
     k32 = ctypes.WinDLL("kernel32", use_last_error=True)
     k32.CreateMutexW.restype = ctypes.c_void_p
@@ -40,11 +40,22 @@ def claim_single_instance() -> bool:
         sock.write(b"show")
         sock.waitForBytesWritten(500)
         sock.disconnectFromServer()
+    else:   # the running copy didn't answer: don't just vanish without a word
+        log.warning("the running Onion Board didn't answer: %s", sock.errorString())
+        try:
+            from PySide6.QtWidgets import QMessageBox
+            QMessageBox.information(
+                None, "Onion Board is already running",
+                "Onion Board is already open — look for its icon in the taskbar tray "
+                "(the ^ arrow by the clock).\n\nIf you can't find it, end “Onion Board” "
+                "in Task Manager and start it again.")
+        except Exception:  # noqa: BLE001
+            log.debug("couldn't show the already-running message", exc_info=True)
     return False
 
 
 def listen_for_second_launch(app, get_window) -> QLocalServer:
-    """Bring the window to the front when someone launches Soundboard again."""
+    """Bring the window to the front when someone launches Onion Board again."""
     QLocalServer.removeServer(INSTANCE_NAME)
     server = QLocalServer(app)
 
@@ -60,5 +71,6 @@ def listen_for_second_launch(app, get_window) -> QLocalServer:
             w.activateWindow()
 
     server.newConnection.connect(on_connect)
-    server.listen(INSTANCE_NAME)
+    if not server.listen(INSTANCE_NAME):
+        log.warning("single-instance server couldn't listen: %s", server.errorString())
     return server

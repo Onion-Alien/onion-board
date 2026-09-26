@@ -40,7 +40,7 @@ def base_dir() -> Path:
 
 
 def model_dir(info) -> Path:
-    """Where a language's model lives once downloaded (%APPDATA%\\Soundboard\\translation\\xx)."""
+    """Where a language's model lives once downloaded (%APPDATA%\\OnionBoard\\translation\\xx)."""
     return base_dir() / info.language
 
 
@@ -59,13 +59,13 @@ def download(info, on_progress: Callable[[int, int], None] = lambda done, total:
     Raises RuntimeError (with a message for the user) or Cancelled."""
     url, want = info.download["url"], info.download["sha256"].lower()
     total = int(info.download.get("bytes", 0) or 0)
-    base_dir().mkdir(parents=True, exist_ok=True)
     part = base_dir() / f"{info.language}.part"
     h = hashlib.sha256()
     done = 0
     log.info("downloading translation model %s from %s", info.language, url)
     try:
-        req = urllib.request.Request(url, headers={"User-Agent": "Soundboard"})
+        base_dir().mkdir(parents=True, exist_ok=True)
+        req = urllib.request.Request(url, headers={"User-Agent": "OnionBoard"})
         with urllib.request.urlopen(req, timeout=TIMEOUT_S) as r, open(part, "wb") as f:  # noqa: S310
             total = int(r.headers.get("Content-Length") or total)
             while chunk := r.read(CHUNK):
@@ -81,7 +81,10 @@ def download(info, on_progress: Callable[[int, int], None] = lambda done, total:
     except OSError as e:
         raise RuntimeError(f"download failed: {e}") from e
     finally:
-        part.unlink(missing_ok=True)
+        try:
+            part.unlink(missing_ok=True)
+        except OSError:
+            pass            # a leftover .part is overwritten by the next try
     log.info("translation model %s ready", info.language)
 
 
@@ -111,7 +114,7 @@ def _unpack(zip_path: Path, dest: Path) -> None:
             raise RuntimeError("the download isn't a translation model")
         shutil.rmtree(dest, ignore_errors=True)
         tmp.rename(dest)
-    except zipfile.BadZipFile as e:
+    except (zipfile.BadZipFile, zipfile.LargeZipFile, EOFError, NotImplementedError) as e:
         raise RuntimeError("the download isn't a translation model") from e
     finally:
         shutil.rmtree(tmp, ignore_errors=True)

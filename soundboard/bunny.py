@@ -20,7 +20,10 @@ CHEEK = QColor(255, 128, 160, 110)
 PHONES = QColor("#7c5cff")       # the app's accent purple
 PHONES_HI = QColor("#a48bff")
 
-PROPS = (None, "mic", "headphones", "plug", "star")
+PROPS = (None, "mic", "headphones", "plug", "star", "hammer")
+WOOD = QColor("#c98a4b")
+WOOD_DARK = QColor("#9a6532")
+STEEL = QColor("#9aa0b4")
 
 
 def _ellipse(p: QPainter, cx, cy, w, h, fill: QColor, pen: QPen | None = None, angle=0.0):
@@ -34,10 +37,12 @@ def _ellipse(p: QPainter, cx, cy, w, h, fill: QColor, pen: QPen | None = None, a
 
 
 def draw_bunny(p: QPainter, rect: QRectF, prop: str | None = None, *,
-               blink: float = 0.0, mouth: float = 0.0, ears: float = 0.0):
+               blink: float = 0.0, mouth: float = 0.0, ears: float = 0.0,
+               swing: float = 0.0):
     """Draw Bun fitted (aspect kept, centred) into `rect`. The keywords pose Bun for
     animation (ui/bunnywidget.py): `blink` 0..1 closes the eyes, `mouth` 0..1 opens
-    the mouth (talking), `ears` tilts both ears outward by that many degrees."""
+    the mouth (talking), `ears` tilts both ears outward by that many degrees, and
+    `swing` 0..1 brings the hammer down (0 = raised, 1 = striking the plank)."""
     s = min(rect.width() / W, rect.height() / H)
     p.save()
     p.setRenderHint(QPainter.Antialiasing)
@@ -113,11 +118,11 @@ def draw_bunny(p: QPainter, rect: QRectF, prop: str | None = None, *,
         p.setBrush(Qt.NoBrush)
         p.drawPath(path)
 
-    _draw_prop(p, prop, ink)
+    _draw_prop(p, prop, ink, swing)
     p.restore()
 
 
-def _draw_prop(p: QPainter, prop: str | None, ink: QPen):
+def _draw_prop(p: QPainter, prop: str | None, ink: QPen, swing: float = 0.0):
     if prop == "mic":           # holding a mic up in the right paw
         p.setPen(ink)
         p.setBrush(QColor("#3a3452"))
@@ -149,6 +154,26 @@ def _draw_prop(p: QPainter, prop: str | None, ink: QPen):
         _sparkle(p, 10, 30, 7, QColor("#ffcf40"))
         _sparkle(p, 92, 40, 5.5, QColor("#ff8fae"))
         _sparkle(p, 88, 12, 4, QColor("#1fb6ff"))
+    elif prop == "hammer":      # building: a plank by his feet, a hammer in his paw
+        p.setPen(ink)
+        p.setBrush(WOOD)
+        p.drawRoundedRect(QRectF(56, 109, 56, 8), 2, 2)
+        p.setPen(QPen(WOOD_DARK, 1.2, Qt.SolidLine, Qt.RoundCap))
+        p.drawLine(QPointF(70, 113), QPointF(86, 113))
+        p.drawLine(QPointF(92, 111.5), QPointF(106, 111.5))
+        _ellipse(p, 66, 108, 12, 10, FUR, ink)                 # a paw holding the plank
+        # the hammer pivots at the other paw, on his right so it never crosses his
+        # face: up beside his head at 0, down on the plank at 1
+        p.save()
+        p.translate(80, 92)
+        p.rotate(25 + 98 * max(0.0, min(1.0, swing)))
+        p.setPen(ink)
+        p.setBrush(WOOD)
+        p.drawRoundedRect(QRectF(-3, -30, 6, 34), 2.5, 2.5)
+        p.setBrush(STEEL)
+        p.drawRoundedRect(QRectF(-10, -38, 20, 10), 2.5, 2.5)
+        p.restore()
+        _ellipse(p, 80, 92, 12, 10, FUR, ink)
 
 
 def _music_note(p: QPainter, x, y, k, col: QColor = PHONES):

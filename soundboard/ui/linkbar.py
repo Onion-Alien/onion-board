@@ -12,6 +12,7 @@ from __future__ import annotations
 import html
 import logging
 import shutil
+import tempfile
 import threading
 from pathlib import Path
 
@@ -27,6 +28,14 @@ from soundboard.ui.widgets import fmt_time
 log = logging.getLogger(__name__)
 
 PLAY_ID = "__link__"   # the engine voice of Play once
+
+
+def _drop_temp(path) -> None:
+    """Delete a download's folder, but only if it is the temp folder ytdl made for it."""
+    folder = Path(path).resolve().parent
+    if (folder.name.startswith("sb-ytdl-")
+            and folder.parent == Path(tempfile.gettempdir()).resolve()):
+        shutil.rmtree(folder, ignore_errors=True)
 
 
 class LinkBar(QFrame):
@@ -112,7 +121,7 @@ class LinkBar(QFrame):
 
     def _drop_download(self):
         if self._got is not None:
-            shutil.rmtree(self._got[1].parent, ignore_errors=True)
+            _drop_temp(self._got[1])
             self._got = None
 
     def shutdown(self):
@@ -140,7 +149,7 @@ class LinkBar(QFrame):
         self._buttons()
         got, self._got = self._got, None   # the worker owns (and deletes) it now
         if got is not None and got[0] != self.url:
-            shutil.rmtree(got[1].parent, ignore_errors=True)
+            _drop_temp(got[1])
             got = None
         args = (kind, self.url, got, self._color_for(), self._known_for(),
                 bool(self.cfg.ytdlp_auto_optin))
@@ -197,7 +206,7 @@ class LinkBar(QFrame):
                                          f"it: {e}{hint}")
         finally:
             if not keep and path is not None:
-                shutil.rmtree(Path(path).parent, ignore_errors=True)
+                _drop_temp(path)
 
     def _on_msg(self, kind: str, url: str, payload):
         current = url == self.url
@@ -238,6 +247,6 @@ class LinkBar(QFrame):
                 self._got = (url, Path(path), data)
                 self._play(data)
             else:
-                shutil.rmtree(Path(path).parent, ignore_errors=True)
+                _drop_temp(path)
         elif kind == "error" and current:
             self._say(html.escape(payload), "#ff4d4f")

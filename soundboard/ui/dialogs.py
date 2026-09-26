@@ -9,10 +9,11 @@ from PySide6.QtWidgets import (QCheckBox, QComboBox, QDialog, QDialogButtonBox, 
 
 from soundboard import soundfx, theme, voicefx
 from soundboard.eq import PRESETS as EQ_PRESETS
-from soundboard.library import PAD_COLORS, SoundMeta
+from soundboard.library import MAX_FADE_S, PAD_COLORS, SoundMeta, clean_fade, original_peaks
 from soundboard.settings import HotkeyDialog, pretty_key
 from soundboard.ui import fit, icons
 from soundboard.ui.panel import EqPanel, hint_label, section_label
+from soundboard.ui.trim import TrimPanel
 from soundboard.ui.voicepanel import EffectRow, ParamSlider
 from soundboard.wheelguard import no_wheel
 from soundboard.winkeys import Hotkeys
@@ -28,7 +29,7 @@ class EffectsPanel(QWidget):
     settings dict for SoundMeta.fx ({} when nothing is changed)."""
     changed = Signal()
 
-    def __init__(self, fx: dict | None):
+    def __init__(self, fx: dict | None, meta: SoundMeta | None = None):
         super().__init__()
         v = QVBoxLayout(self)
         v.setContentsMargins(0, 0, 8, 0)
@@ -42,10 +43,18 @@ class EffectsPanel(QWidget):
         prow.addWidget(self.preset, 1)
         reset = QPushButton("Reset")
         reset.setObjectName("small")
-        reset.setToolTip("Back to the original sound")
+        reset.setToolTip("Back to the original sound (the trim stays)")
         reset.clicked.connect(lambda: self.preset.setCurrentText(next(iter(soundfx.PRESETS))))
         prow.addWidget(reset)
         v.addLayout(prow)
+
+        v.addWidget(section_label("TRIM"))
+        peaks, length = original_peaks(meta) if meta is not None else ([], 0.0)
+        self.trim = TrimPanel(peaks, length)
+        self.trim.setVisible(length > 0)
+        v.addWidget(self.trim)
+        if length <= 0:
+            v.addWidget(hint_label("Trimming works once the sound has loaded."))
 
         v.addWidget(section_label("SPEED & PITCH"))
         self.speed = ParamSlider(SPEED, 1.0)
@@ -86,6 +95,7 @@ class EffectsPanel(QWidget):
             s.changed.connect(self._edited)
         self.tape.toggled.connect(self._edited)
         self.reverse.toggled.connect(self._edited)
+        self.trim.changed.connect(self._edited)
         self.eq.changed.connect(lambda *_: self._edited())
         self.preset.currentTextChanged.connect(self._on_preset)
         self._matching_preset()
@@ -93,9 +103,10 @@ class EffectsPanel(QWidget):
     def load(self, fx: dict):
         f = soundfx.clean(fx)
         widgets = (self.speed, self.pitch, self.boost, self.tape, self.reverse, self.eq,
-                   *self.rows.values())
+                   self.trim, *self.rows.values())
         for w in widgets:
             w.blockSignals(True)
+        self.trim.set_values(f["start"], f["end"])
         self.speed.set_value(f["speed"])
         self.pitch.set_value(f["pitch"])
         self.boost.set_value(f["gain_db"])
@@ -112,7 +123,9 @@ class EffectsPanel(QWidget):
 
     def fx(self) -> dict:
         gains, on, _t, _p = self.eq.state()
-        f = {"speed": round(self.speed.value(), 3), "pitch": round(self.pitch.value(), 2),
+        start, end = self.trim.values()
+        f = {"start": start, "end": end,
+             "speed": round(self.speed.value(), 3), "pitch": round(self.pitch.value(), 2),
              "tape": self.tape.isChecked(), "gain_db": round(self.boost.value(), 2),
              "reverse": self.reverse.isChecked(),
              "eq": gains if on else [0.0] * len(gains),
@@ -130,8 +143,13 @@ class EffectsPanel(QWidget):
         self._matching_preset()
         self.changed.emit()
 
+    def _untrimmed(self) -> dict:
+        f = soundfx.clean(self.fx())
+        f["start"] = f["end"] = 0.0
+        return f
+
     def _matching_preset(self):
-        cur = soundfx.key(self.fx())
+        cur = soundfx.key(self._untrimmed())   # a preset never changes the trim
         name = next((n for n, p in soundfx.PRESETS.items() if soundfx.key(p) == cur), CUSTOM)
         self.preset.blockSignals(True)
         self.preset.setCurrentText(name)
@@ -139,7 +157,8 @@ class EffectsPanel(QWidget):
 
     def _on_preset(self, name: str):
         if name in soundfx.PRESETS:
-            self.load(soundfx.PRESETS[name])
+            start, end = self.trim.values()
+            self.load({**soundfx.PRESETS[name], "start": start, "end": end})
             self.changed.emit()
 
 
@@ -149,8 +168,8 @@ class EditDialog(QDialog):
     global hotkeys. After exec(), `as_copy` says whether "Save as new sound" was
     chosen (then apply() goes onto the copy, and the original stays as it was).
 
-    preview_cb(sid, volume, fx) plays the sound, with these (unsaved) effects, to
-    your headphones only."""
+    preview_cb(sid, volume, fx, (fade_in, fade_out)) plays the sound, with these
+    (unsaved) effects and fades, to your headphones only."""
     hotkeys_changed = Signal()
 
     def __init__(self, meta: SoundMeta, hotkeys: Hotkeys, preview_cb, parent=None,
@@ -198,6 +217,14 @@ class EditDialog(QDialog):
         self.loop.setChecked(meta.loop)
         form.addRow("", self.loop)
 
+        self.fade_in = self._fade_row(form, "Fade in", meta.fade_in,
+                                      "Starts silent and rises to full volume over this long")
+        self.fade_out = self._fade_row(form, "Fade out", meta.fade_out,
+                                       "Stopping it fades it out over this long instead of "
+                                       "cutting it; a sound that isn't looping also fades "
+                                       "over its last seconds. Stop everything still cuts "
+                                       "straight away.")
+
         hrow = QHBoxLayout()
         self.hk_btn = QPushButton()
         self.hk_btn.clicked.connect(self._capture)
@@ -222,7 +249,7 @@ class EditDialog(QDialog):
         self._set_color(self.color)
         self.tabs.addTab(basics, "Sound")
 
-        self.effects = EffectsPanel(meta.fx)
+        self.effects = EffectsPanel(meta.fx, meta)
         scroll = QScrollArea()
         scroll.setWidgetResizable(True)
         scroll.setWidget(self.effects)
@@ -235,7 +262,7 @@ class EditDialog(QDialog):
         prev = QPushButton("Preview (only you hear it)")
         icons.set_icon(prev, "headphones")
         prev.clicked.connect(lambda: preview_cb(self.meta.id, self.vol.value() / 100,
-                                                self.effects.fx()))
+                                                self.effects.fx(), self.fades()))
         prow.addWidget(prev)
         self.fx_note = QLabel()
         self.fx_note.setObjectName("muted")
@@ -253,6 +280,32 @@ class EditDialog(QDialog):
         lay.addWidget(bb)
         self.setMinimumWidth(500)
         self.resize(540, 640)
+
+    @staticmethod
+    def _fade_row(form: QFormLayout, label: str, value: float, tip: str) -> QSlider:
+        """A 0..MAX_FADE_S slider in tenths of a second, with its value beside it."""
+        row = QHBoxLayout()
+        sl = QSlider(Qt.Horizontal)
+        sl.setRange(0, int(MAX_FADE_S * 10))
+        sl.setValue(int(round(clean_fade(value) * 10)))
+        sl.setToolTip(tip)
+        sl.setAccessibleName(label)
+        no_wheel(sl)
+        lbl = QLabel()
+        lbl.setFixedWidth(42)
+
+        def show(v):
+            lbl.setText(f"{v / 10:.1f} s" if v else "off")
+            sl.setAccessibleDescription(lbl.text())
+        sl.valueChanged.connect(show)
+        show(sl.value())
+        row.addWidget(sl)
+        row.addWidget(lbl)
+        form.addRow(label, row)
+        return sl
+
+    def fades(self) -> tuple[float, float]:
+        return self.fade_in.value() / 10, self.fade_out.value() / 10
 
     def _fx_note(self):
         s = soundfx.summary(self.effects.fx())
@@ -283,4 +336,5 @@ class EditDialog(QDialog):
         m.loop = self.loop.isChecked()
         m.hotkey = self.hotkey
         m.color = self.color
+        m.fade_in, m.fade_out = self.fades()
         m.fx = self.effects.fx()

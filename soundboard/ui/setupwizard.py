@@ -20,9 +20,8 @@ import numpy as np
 from PySide6.QtCore import Qt, QTimer, QUrl
 from PySide6.QtGui import QDesktopServices
 from PySide6.QtWidgets import (QApplication, QButtonGroup, QCheckBox, QDialog, QFrame,
-                               QHBoxLayout, QLabel,
-                               QMessageBox, QPushButton, QRadioButton, QScrollArea, QStackedWidget,
-                               QVBoxLayout, QWidget)
+                               QHBoxLayout, QLabel, QMessageBox, QProgressBar, QPushButton,
+                               QRadioButton, QScrollArea, QStackedWidget, QVBoxLayout, QWidget)
 
 from soundboard import engine as eng
 from soundboard.engine import SR
@@ -33,6 +32,15 @@ from soundboard.ui.bunnywidget import BunnyWidget
 from soundboard.ui.widgets import Meter
 
 RESTART_NEEDED = 3010   # install-vbcable.ps1: installed, but Windows must restart first
+
+# install-vbcable.ps1 -StatusFile writes "<step>|<text>"; these are the steps as the
+# guide shows them, in order ("wake" only happens if the cable needs a nudge)
+CABLE_STEPS = (("permission", "Click <b>Yes</b> when Windows asks"),
+               ("download", "Fetching the parts (downloading)"),
+               ("install", "Building your cable (installing)"),
+               ("check", "Checking it works"),
+               ("wake", "Waking it up, so you don't have to restart "
+                        "(your sound may blip for a second)"))
 
 
 def cable_restart_pending() -> bool:
@@ -46,6 +54,47 @@ def cable_restart_pending() -> bool:
     tick.restype = ctypes.c_uint64
     uptime = tick() / 1000
     return written > time.time() - uptime
+
+# The cable installer while it runs. Kept here, not only on the guide, so a guide
+# closed mid-install and opened again picks the same install back up instead of
+# starting a second one.
+_installer: subprocess.Popen | None = None
+
+RESUME_FLAG = "--resume-setup"
+_RUNONCE = r"Software\Microsoft\Windows\CurrentVersion\RunOnce"
+_RUNONCE_NAME = "OnionBoardResumeSetup"
+
+
+def launch_command() -> str:
+    """How to start this copy of the app: the exe when frozen, else pythonw + main.py."""
+    import sys
+    from pathlib import Path
+    if getattr(sys, "frozen", False):
+        return f'"{sys.executable}"'
+    exe = Path(sys.executable)
+    if (w := exe.with_name("pythonw.exe")).exists():
+        exe = w
+    return f'"{exe}" "{Path(__file__).resolve().parents[2] / "main.py"}"'
+
+
+def resume_after_restart(on: bool):
+    """Open the guide on the cable step by itself, once, the next time this user logs
+    in (a per-user RunOnce entry: no admin, and Windows deletes it as it runs it).
+    Set while the cable is waiting on a restart, cleared once it works."""
+    import winreg
+    try:
+        with winreg.CreateKey(winreg.HKEY_CURRENT_USER, _RUNONCE) as k:
+            if on:
+                winreg.SetValueEx(k, _RUNONCE_NAME, 0, winreg.REG_SZ,
+                                  f"{launch_command()} {RESUME_FLAG}")
+            else:
+                try:
+                    winreg.DeleteValue(k, _RUNONCE_NAME)
+                except FileNotFoundError:
+                    pass
+    except OSError:
+        pass   # only a convenience; the marker still makes the guide pick up
+
 
 TUNE_NOTES = (98.0, 123.47, 146.83, 196.0)   # G2 B2 D3 G3: a G-major arpeggio, down low
 TUNE_BASS = 49.0                              # G1 under it
@@ -125,15 +174,22 @@ def _header(title: str, body: QLabel, bun: BunnyWidget) -> QHBoxLayout:
 class SetupWizard(QDialog):
     PAGES = 4
 
-    def __init__(self, win):
+    def __init__(self, win, resumed: bool = False):
+        """`resumed`: opened by itself after the restart the cable asked for, so it
+        starts on the cable step and welcomes them back."""
         super().__init__(win)
+        self._resumed = resumed
         fit.watch(self)   # grows to fit its text (ui/fit.py)
         self.win = win
-        self.setWindowTitle("Soundboard — quick setup")
+        self.setWindowTitle("Onion Board — quick setup")
         self.setMinimumSize(620, 520)
-        self._proc: subprocess.Popen | None = None   # the cable installer, while it runs
+        # the cable installer, while it runs (one a closed guide left running included)
+        self._proc: subprocess.Popen | None = \
+            _installer if _installer is not None and _installer.poll() is None else None
         self._cable_tries = 0
         self._needs_restart = False   # the installer said Windows must restart first
+        self._cable_step = ""         # the installer's current step (CABLE_STEPS)
+        self._steps_seen: list[str] = []
 
         v = QVBoxLayout(self)
         v.setContentsMargins(24, 20, 24, 18)
@@ -167,7 +223,9 @@ class SetupWizard(QDialog):
         self.timer = QTimer(self)
         self.timer.timeout.connect(self._tick)
         self.timer.start(40)
-        self.go(0)
+        if self._proc is not None:   # still installing from a guide closed mid-way
+            self.bun_cable.build()
+        self.go(2 if resumed or self._proc is not None else 0)
 
     # ------------------------------------------------------------------ pages
     def _choice_list(self, names: list[str], current: str | None,
@@ -178,7 +236,7 @@ class SetupWizard(QDialog):
         bv.setSpacing(6)
         group = QButtonGroup(box)
         for n in names:
-            rb = QRadioButton(n)
+            rb = QRadioButton(n.replace("&", "&&"))   # a lone & is a shortcut marker
             rb.setStyleSheet("font-size:11pt; padding:6px;")
             rb.setProperty("device", n)
             group.addButton(rb)
@@ -207,6 +265,7 @@ class SetupWizard(QDialog):
                                    "(and Bun talks along) when you talk."),
                             self.bun_mic))
         mics = [d["name"] for d in eng.list_devices("input") if not eng.is_virtual(d["name"])]
+        self._no_mics = not mics
         cur = self.win.cfg.mic_device if self.win.cfg.mic_device in mics else \
             (mics[0] if mics else None)
         if cur:
@@ -254,15 +313,25 @@ class SetupWizard(QDialog):
     def _page_cable(self) -> QWidget:
         p = QWidget()
         v = QVBoxLayout(p)
+        self.bun_cable = BunnyWidget("plug")
         v.addLayout(_header("🔌  The virtual cable",
                             _label("This is a free add-on that works like an invisible "
-                                   "microphone. Soundboard puts <b>your sounds</b> (and your "
+                                   "microphone. Onion Board puts <b>your sounds</b> (and your "
                                    "voice, if you send it) into it, and Discord or your game "
                                    "listens to it."),
-                            BunnyWidget("plug")))
+                            self.bun_cable))
         self.cable_status = _label("")
         self.cable_status.setStyleSheet("font-size:12pt; padding:12px;")
         v.addWidget(self.cable_status)
+        self.cable_bar = QProgressBar()
+        self.cable_bar.setRange(0, 0)   # busy: we can't know how long Windows takes
+        self.cable_bar.setTextVisible(False)
+        self.cable_bar.setFixedHeight(10)
+        self.cable_bar.hide()
+        v.addWidget(self.cable_bar)
+        self.cable_steps = _label("")
+        self.cable_steps.hide()
+        v.addWidget(self.cable_steps)
         self.btn_cable = QPushButton("⬇  Install it now (free)")
         self.btn_cable.setObjectName("primary")
         self.btn_cable.setStyleSheet("padding:12px; font-size:12pt;")
@@ -322,6 +391,11 @@ class SetupWizard(QDialog):
 
     def _update_next(self):
         i = self.stack.currentIndex()
+        # while the cable installs, stay on its page: leaving it (or finishing) would
+        # lose track of the installer
+        busy = self._proc is not None
+        self.btn_next.setEnabled(not busy)
+        self.btn_back.setEnabled(not busy)
         if i == self.PAGES - 1:
             self.btn_next.setText("Finish  ✓")
         elif i == 2 and not self.cable_ok():
@@ -344,6 +418,18 @@ class SetupWizard(QDialog):
         cfg.save()
         self.win._init_devices()   # refresh the window's device boxes from the choices
         self.accept()
+
+    def reject(self):
+        """Esc / the window's X. Mid-install, check first: the install carries on
+        either way, and reopening the guide picks it back up."""
+        if self._proc is not None and self._proc.poll() is None and QMessageBox.question(
+                self, "Still installing",
+                "Bun is still installing the virtual cable.\n\nClose the guide anyway? The "
+                "install carries on by itself; open the guide again from the Setup tab "
+                "(Step-by-step guide) to see how it went.") \
+                != QMessageBox.StandardButton.Yes:
+            return
+        super().reject()
 
     def done(self, r):
         self.timer.stop()
@@ -373,27 +459,42 @@ class SetupWizard(QDialog):
         if rescan:
             self.win.refresh_devices()   # picks up a driver installed while we're open
         self.btn_restart.hide()
-        if self.cable_ok():
+        busy = self._proc is not None
+        self.cable_bar.setVisible(busy)
+        self.cable_steps.setVisible(busy)
+        if not busy and self.bun_cable.building:
+            self.bun_cable.stop_building(self.cable_ok())
+        if busy:
+            self.cable_status.setText("🔨  <b>Bun is setting it up for you…</b>")
+            self.cable_steps.setText(self._steps_html())
+            self.btn_cable.hide()
+            self.btn_recheck.hide()
+        elif self.cable_ok():
             if not eng.is_virtual(self.win.cfg.main_device):
                 self.win.cfg.main_device = eng.virtual_outputs()[0]
             self.win.engine.set_main_device(self.win.cfg.main_device)
-            self.cable_status.setText(f"<b style='color:{OK}'>✓ Installed and connected.</b> "
-                                      "Nothing to do here — press Next.")
-            self.btn_cable.hide()
-            self.btn_recheck.hide()
-        elif self._proc is not None:
-            self.cable_status.setText("⏳  Installing… <b>click Yes</b> when Windows asks for "
-                                      "permission.")
+            resume_after_restart(False)
+            if self._resumed:   # back from the restart, and it worked
+                self._resumed = False
+                self.bun_cable.stop_building(True)
+                self.cable_status.setText(f"<b style='color:{OK}'>👋 Welcome back — the cable "
+                                          "works now!</b> Press Next for the last step.")
+            else:
+                self.cable_status.setText(f"<b style='color:{OK}'>✓ Installed and "
+                                          "connected.</b> Nothing to do here — press Next.")
             self.btn_cable.hide()
             self.btn_recheck.hide()
         elif self._needs_restart or cable_restart_pending():
-            # installed, but Windows has to restart before it works; installing it again
-            # before then is what VB-Audio says not to do
+            # installed, but Windows wants a restart before it works. Never install it
+            # again before then (VB-Audio says not to); the button below only re-runs
+            # the installer's wake-up (restart the cable + audio service), no reinstall.
+            resume_after_restart(True)
             self.cable_status.setText(f"<b style='color:{OK}'>✓ Installed.</b> Windows needs "
-                                      "a <b>restart</b> to finish setting it up. Restart your "
-                                      "PC and open Soundboard again — this guide will pick up "
-                                      "where you left off.")
-            self.btn_cable.hide()
+                                      "a <b>restart</b> to finish setting it up. Restart "
+                                      "whenever suits you: Onion Board will open by itself "
+                                      "afterwards and pick up right here.")
+            self.btn_cable.setText("🔨  Try once more without restarting")
+            self.btn_cable.setVisible(not self._needs_restart)   # it just tried that
             self.btn_recheck.show()
             self.btn_restart.show()
         elif self._cable_tries:
@@ -403,9 +504,17 @@ class SetupWizard(QDialog):
             self.btn_cable.setText("⬇  Try installing again")
             self.btn_cable.show()
             self.btn_recheck.show()
+        elif self._resumed:   # back from the restart, and it still isn't there
+            self.cable_status.setText(f"<b style='color:{BAD}'>It still isn't showing up after "
+                                      "the restart.</b> Install it again below; if Windows "
+                                      "asks for permission, click <b>Yes</b>.")
+            self.btn_cable.setText("⬇  Try installing again")
+            self.btn_cable.show()
+            self.btn_recheck.show()
         else:
             self.cable_status.setText(f"<b style='color:{BAD}'>Not installed yet.</b> "
                                       "Without it, only you can hear your sounds.")
+            self.btn_cable.setText("⬇  Install it now (free)")
             self.btn_cable.show()
             self.btn_recheck.hide()
         self._update_next()
@@ -416,21 +525,75 @@ class SetupWizard(QDialog):
             self.cable_status.setText(f"<span style='color:{BAD}'>The cable installer is "
                                       "missing. Get it from vb-audio.com/Cable.</span>")
             return
+        global _installer
+        if self._proc is not None:
+            return   # one install at a time
+        try:
+            status = self._status_file()
+            status.unlink(missing_ok=True)
+            proc = subprocess.Popen(
+                ["powershell", "-NoProfile", "-ExecutionPolicy", "Bypass", "-File",
+                 str(script), "-Silent", "-StatusFile", str(status)],
+                creationflags=subprocess.CREATE_NO_WINDOW)
+        except OSError as e:
+            self.cable_status.setText(f"<span style='color:{BAD}'>Couldn't start the cable "
+                                      f"installer ({e.strerror or e}).</span> Restart your PC "
+                                      "and try again, or install it yourself from "
+                                      "vb-audio.com/Cable.")
+            return
         self._cable_tries += 1
-        self._proc = subprocess.Popen(
-            ["powershell", "-NoProfile", "-ExecutionPolicy", "Bypass", "-File", str(script),
-             "-Silent"], creationflags=subprocess.CREATE_NO_WINDOW)
+        self._needs_restart = False
+        self._resumed = False
+        self._cable_step, self._steps_seen = "", []
+        self._proc = _installer = proc
+        self.bun_cable.build()
         self.recheck_cable(rescan=False)
+
+    @staticmethod
+    def _status_file():
+        library.APP_DIR.mkdir(parents=True, exist_ok=True)
+        return library.APP_DIR / "cable-install-status.txt"
+
+    def _read_cable_step(self):
+        """Pick up the installer's current step from its status file."""
+        try:
+            step = self._status_file().read_text(encoding="utf-8-sig").split("|", 1)[0].strip()
+        except OSError:
+            return
+        if step != self._cable_step and step in dict(CABLE_STEPS):
+            self._cable_step = step
+            if step not in self._steps_seen:
+                self._steps_seen.append(step)
+            self.cable_steps.setText(self._steps_html())
+
+    def _steps_html(self) -> str:
+        """The install checklist: ✓ done, ▶ now, ○ still to come."""
+        rows = []
+        for key, text in CABLE_STEPS:
+            if key == self._cable_step:
+                rows.append(f"<b>▶  {text}…</b>")
+            elif key in self._steps_seen:
+                rows.append(f"<span style='color:{OK}'>✓  {text}</span>")
+            elif key != "wake":   # only listed if it actually happens
+                rows.append(f"<span style='color:gray'>○  {text}</span>")
+        return "<br>".join(rows)
 
     def restart_pc(self):
         if QMessageBox.question(
                 self, "Restart now?",
                 "Your PC will restart in a few seconds. Save anything you have open first.\n\n"
-                "After the restart, open Soundboard again to finish setting up.") \
+                "Onion Board will open by itself after the restart to finish setting up.") \
                 != QMessageBox.StandardButton.Yes:
             return
         self.win.cfg.save()
-        subprocess.Popen(["shutdown", "/r", "/t", "5"], creationflags=subprocess.CREATE_NO_WINDOW)
+        try:
+            subprocess.Popen(["shutdown", "/r", "/t", "5"],
+                             creationflags=subprocess.CREATE_NO_WINDOW)
+        except OSError as e:
+            self.cable_status.setText(f"<span style='color:{BAD}'>Couldn't restart the PC "
+                                      f"({e.strerror or e}).</span> Restart it from the Start "
+                                      "menu (Power → Restart); Onion Board will pick up here "
+                                      "afterwards.")
 
     def _fill_discord(self):
         name = eng.virtual_mic_for(self.win.cfg.main_device)
@@ -444,7 +607,7 @@ class SetupWizard(QDialog):
             return
         self.btn_copy.show()
         self.discord_text.setText(
-            "Soundboard now sends your voice and sounds into a new microphone called:"
+            "Onion Board now sends your voice and sounds into a new microphone called:"
             f"<p style='font-size:15pt; font-weight:800; color:{OK}'>{name}</p>"
             "<b>In Discord:</b> click the ⚙ gear (User Settings) → <b>Voice &amp; Video</b> → "
             f"<b>Input Device</b> → choose <b>{name}</b>.<br><br>"
@@ -463,7 +626,12 @@ class SetupWizard(QDialog):
         if lvl > 0.05:
             self._mic_peak_seen = True
         if self.stack.currentIndex() == 0:
-            if e.mic_stream is None:
+            if e.mic_stream is None and self._no_mics:
+                self.mic_heard.setText(f"<span style='color:{BAD}'>No microphone was found."
+                                       "</span> Plug one in, then open this guide again "
+                                       "from the Setup tab — or press Next to carry on "
+                                       "without one.")
+            elif e.mic_stream is None:
                 self.mic_heard.setText(f"<span style='color:{BAD}'>Couldn't open that mic — "
                                        "try another one.</span>")
             elif self._mic_peak_seen:
@@ -471,10 +639,15 @@ class SetupWizard(QDialog):
             else:
                 self.mic_heard.setText("Waiting to hear you… if the bar doesn't move, pick "
                                        "another mic.")
-        if self._proc is not None and (rc := self._proc.poll()) is not None:
-            self._proc = None
-            self._needs_restart = rc == RESTART_NEEDED
-            self.recheck_cable()
+        if self._proc is not None:
+            self._read_cable_step()
+            if (rc := self._proc.poll()) is not None:
+                global _installer
+                if _installer is self._proc:
+                    _installer = None
+                self._proc = None
+                self._needs_restart = rc == RESTART_NEEDED
+                self.recheck_cable()
 
 
 class SteamGuide(QDialog):
@@ -511,15 +684,15 @@ class SteamGuide(QDialog):
             "<b>OFF</b>: <b>Noise cancellation</b>, <b>Echo cancellation</b> and "
             "<b>Automatic volume/gain control</b>.<br>"
             "<span style='font-size:9pt'>They think music is background noise and cut "
-            "your sounds up. Soundboard already cleans up your voice.</span></li>"
+            "your sounds up. Onion Board already cleans up your voice.</span></li>"
             "<li style='margin-bottom:8px'>Click <b>Start microphone test</b> and play a "
-            "sound in Soundboard. You should hear it back.</li>"
+            "sound in Onion Board. You should hear it back.</li>"
             "<li>Restart the game if it was already open.</li>"
             "</ol>"))
         v.addWidget(_label(
             "<b>Push-to-talk tip:</b> if you use push-to-talk in Steam or the game, set "
-            "the same key in Soundboard (⚙ Settings → <b>Hotkeys</b> → <b>Game push-to-talk</b>). "
-            "Soundboard will then hold it down for you while a sound plays.",
+            "the same key in Onion Board (⚙ Settings → <b>Hotkeys</b> → <b>Auto push-to-talk</b>)."
+            "Onion Board will then hold it down for you while a sound plays.",
             "font-size:10pt;"))
         row = QHBoxLayout()
         copy = QPushButton("📋  Copy the mic name")

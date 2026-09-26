@@ -1,5 +1,5 @@
 # Keeps the pinned dependencies current; PySide6 in particular carries Chromium
-# security fixes for the Browser tab (see SECURITY.md).
+# security fixes for the Radio tab's globe (see SECURITY.md).
 version: 2
 updates:
   - package-ecosystem: pip

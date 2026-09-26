@@ -17,7 +17,8 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-ROOTS = ["PySide6", "numpy", "scipy", "sounddevice", "soundfile", "soxr", "adblock"]
+ROOTS = ["PySide6", "numpy", "scipy", "sounddevice", "soundfile", "soxr",
+         "yt-dlp", "yt-dlp-ejs"]
 LICENSE_FILE = re.compile(r"(?i)^(licen[cs]e|copying|notice|authors)|licen[cs]e")
 SKIP_FILE = re.compile(r"(?i)commercial")  # Qt's commercial terms don't apply to us
 RULE = "=" * 78
@@ -41,9 +42,23 @@ The LGPL-3.0 and the GPL-3.0 it builds on are reproduced at the end of this file
 {RULE}
 Qt WebEngine (Chromium)
 {RULE}
-The Browser tab uses Qt WebEngine, which contains Chromium and its third-party
+The Radio tab's globe uses Qt WebEngine, which contains Chromium and its third-party
 components under BSD-style and other licences. The full list:
 https://doc.qt.io/qt-6/qtwebengine-licensing.html
+
+{RULE}
+FFmpeg (through Qt Multimedia)  --  LGPL-2.1-or-later
+{RULE}
+The Radio tab decodes streams with Qt Multimedia's FFmpeg backend. The FFmpeg
+libraries (avcodec, avformat, avutil, swresample, swscale) ship with PySide6 as
+separate, replaceable DLLs. Source code and licence: https://ffmpeg.org/legal.html
+
+{RULE}
+globe.gl  --  MIT (not bundled)
+{RULE}
+The Radio tab's globe loads globe.gl (https://github.com/vasturiano/globe.gl),
+which includes three.js (MIT), from jsDelivr at a pinned version when the tab
+is opened. Earth images: NASA Visible Earth (public domain), via three-globe.
 
 {RULE}
 PyInstaller bootloader  --  GPL-2.0-or-later with the PyInstaller exception
@@ -92,8 +107,8 @@ def section(dist: md.Distribution) -> str:
 
 def main() -> None:
     dest = Path(sys.argv[1]) if len(sys.argv) > 1 else ROOT / "dist" / "THIRD-PARTY-NOTICES.txt"
-    parts = ["Soundboard includes the following third-party software.\n",
-             "Soundboard itself is MIT licensed; see LICENSE.txt.\n", EXTRA]
+    parts = ["Onion Board includes the following third-party software.\n",
+             "Onion Board itself is MIT licensed; see LICENSE.txt.\n", EXTRA]
     parts += [section(d) for d in closure(ROOTS)]
     for name in ("LGPL-3.0.txt", "GPL-3.0.txt"):
         parts += [f"{RULE}\n{name}\n{RULE}\n", (ROOT / "licenses" / name).read_text("utf-8")]

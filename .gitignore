@@ -28,7 +28,7 @@ secrets.*
 credentials*.json
 *.log
 *.log.[0-9]*
-# app data copied from %APPDATA%\Soundboard while debugging
+# app data copied from %APPDATA%\OnionBoard while debugging
 config.json
 config.json.*
 cache/

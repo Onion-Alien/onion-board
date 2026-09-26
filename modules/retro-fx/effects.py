@@ -1,11 +1,11 @@
 """Example effects module: an 8-bit bitcrusher.
 
-Copy this folder to start your own. Soundboard calls `register(api)` once at
+Copy this folder to start your own. Onion Board calls `register(api)` once at
 startup. Effects subclass `api.Effect`, declare their sliders as `api.Param`s and
 implement `run(x, rate)`: x is a 1-D float32 block of mic audio (about 10 ms);
 return a block of the same length. It runs on the audio thread, so keep it to
 numpy maths: no file or network access, no sleeping, no locks. Only import what
-Soundboard itself ships (numpy, scipy, the standard library).
+Onion Board itself ships (numpy, scipy, the standard library).
 """
 import numpy as np
 

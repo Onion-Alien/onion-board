@@ -4,10 +4,11 @@ from __future__ import annotations
 from pathlib import Path
 
 import numpy as np
-from PySide6.QtCore import QMimeData, QPoint, QRectF, Qt, Signal
+from PySide6.QtCore import QMimeData, QPoint, QPointF, QRectF, Qt, Signal
 from PySide6.QtGui import (QColor, QDrag, QFont, QLinearGradient, QPainter, QPainterPath,
                            QPen)
-from PySide6.QtWidgets import QGridLayout, QLabel, QSlider, QStyle, QWidget
+from PySide6.QtWidgets import (QAbstractButton, QGridLayout, QLabel, QScrollArea, QSlider, QStyle,
+                               QWidget)
 
 from soundboard import theme, thumbs
 from soundboard.eq import MAX_DB as EQ_MAX_DB
@@ -25,6 +26,7 @@ class Meter(QWidget):
         self.level = 0.0
         self.hot = False
         self.setFixedHeight(8)
+        self.setAccessibleName("Level meter")
 
     def set_level(self, v):
         self.level = v
@@ -57,6 +59,7 @@ class EqCurve(QWidget):
         self.gains = [0.0] * 7
         self.on = False
         self.setToolTip("Double-click to reset")
+        self.setAccessibleName("EQ curve")
         self._freqs = np.geomspace(30, 18000, 160)
 
     def set_gains(self, gains, on):
@@ -142,9 +145,15 @@ def spectrum(data: np.ndarray, frac: float, n: int) -> np.ndarray:
     return np.clip((db + 62) / 52, 0.0, 1.0).astype(np.float32)
 
 
-class Pad(QWidget):
-    clicked = Signal(str)
+class Pad(QAbstractButton):
+    """One sound's button, painted by hand. It's a QAbstractButton so screen readers
+    see a button with the sound's name, and it works from the keyboard: Tab / arrows
+    to move, Enter or Space to play, Ctrl+Space to pick, the Menu key for its menu."""
+    activated = Signal(str)     # play it (a double-click, Enter / Space, a screen reader's press)
+    chosen = Signal(str)        # a single click: select it (transport bar) without playing
+    pick = Signal(str, bool)    # Ctrl+click / Ctrl+Space (False) or Shift+click (True)
     menu = Signal(str, QPoint)
+    step = Signal(object, int, int)   # arrow key: this pad, columns, rows to move focus
 
     def __init__(self, meta: SoundMeta, width: int):
         super().__init__()
@@ -153,14 +162,80 @@ class Pad(QWidget):
         self.paused = False
         self.bands = None        # visualizer levels (0..1) while playing
         self.peaks = None        # the little caps that fall slowly
-        self.selected = False
+        self.selected = False    # the sound in the transport bar
+        self.picked = False      # one of several picked for a batch change (ui.padbatch)
         self.state = "loading"   # loading | ready | error
         self.error = ""
         self.hover = False
         self._press = None
+        self._kbd_focus = False  # focus came from the keyboard: draw the focus ring
+        self._described = None
         self.setFixedSize(width, int(width * 0.62))
         self.setCursor(Qt.PointingHandCursor)
         self.setAttribute(Qt.WA_Hover)
+        self.setFocusPolicy(Qt.StrongFocus)
+        self.clicked.connect(lambda: self.activated.emit(self.meta.id))   # keyboard / a11y
+        self.describe()
+
+    def set_picked(self, on: bool):
+        self.picked = on
+        self.describe()
+        self.update()
+
+    def describe(self):
+        """Keep what a screen reader says in step with the pad (only when it changes)."""
+        m = self.meta
+        bits = []
+        if self.progress is not None:
+            bits.append("paused" if self.paused else "playing")
+        if self.picked:
+            bits.append("selected")
+        if self.state in ("loading", "rendering"):
+            bits.append("loading")
+        elif self.state == "error":
+            bits.append("can't load the file")
+        else:
+            bits.append(f"{m.duration:.1f} seconds")
+        if m.hotkey:
+            bits.append(f"hotkey {pretty_key(m.hotkey)}")
+        if m.loop:
+            bits.append("loops")
+        if m.mode in ("overlap", "toggle"):
+            bits.append({"overlap": "presses overlap", "toggle": "press again stops"}[m.mode])
+        if m.fx:
+            bits.append("effects")
+        if m.tags:
+            bits.append("in " + ", ".join(m.tags))
+        desc = ", ".join(bits)
+        if (m.name, desc) != self._described:
+            self._described = (m.name, desc)
+            self.setText(m.name.replace("&", "&&"))   # else "R&B" claims Alt+B
+            self.setAccessibleName(m.name)
+            self.setAccessibleDescription(desc)
+
+    def focusInEvent(self, e):
+        self._kbd_focus = e.reason() in (Qt.TabFocusReason, Qt.BacktabFocusReason,
+                                         Qt.ShortcutFocusReason, Qt.OtherFocusReason)
+        super().focusInEvent(e)
+
+    def focusOutEvent(self, e):
+        self._kbd_focus = False
+        super().focusOutEvent(e)
+
+    def keyPressEvent(self, e):
+        k, mods = e.key(), e.modifiers()
+        arrows = {Qt.Key_Left: (-1, 0), Qt.Key_Right: (1, 0), Qt.Key_Up: (0, -1),
+                  Qt.Key_Down: (0, 1)}
+        if k == Qt.Key_Space and mods & Qt.ControlModifier:
+            self.pick.emit(self.meta.id, False)
+        elif k in (Qt.Key_Return, Qt.Key_Enter):
+            self.activated.emit(self.meta.id)
+        elif k == Qt.Key_Menu or (k == Qt.Key_F10 and mods & Qt.ShiftModifier):
+            self.menu.emit(self.meta.id, self.mapToGlobal(self.rect().center()))
+        elif k in arrows and not mods & (Qt.ControlModifier | Qt.AltModifier):
+            self.step.emit(self, *arrows[k])
+        else:
+            super().keyPressEvent(e)   # Space plays (QAbstractButton's click)
 
     @property
     def n_bands(self) -> int:
@@ -208,9 +283,22 @@ class Pad(QWidget):
     def mouseReleaseEvent(self, e):
         if e.button() == Qt.LeftButton and self._press is not None:
             self._press = None
-            self.clicked.emit(self.meta.id)
+            mods = e.modifiers()
+            if mods & Qt.ShiftModifier:
+                self.pick.emit(self.meta.id, True)
+            elif mods & Qt.ControlModifier:
+                self.pick.emit(self.meta.id, False)
+            else:
+                self.chosen.emit(self.meta.id)
+
+    def mouseDoubleClickEvent(self, e):
+        if e.button() == Qt.LeftButton and not e.modifiers() & (Qt.ShiftModifier |
+                                                                  Qt.ControlModifier):
+            self._press = None
+            self.activated.emit(self.meta.id)
 
     def paintEvent(self, e):
+        self.describe()
         p = QPainter(self)
         p.setRenderHint(QPainter.Antialiasing)
         p.setRenderHint(QPainter.SmoothPixmapTransform)
@@ -242,11 +330,28 @@ class Pad(QWidget):
             if self.paused:
                 pen.setStyle(Qt.DashLine)
             p.setPen(pen)
+        elif self.picked:
+            p.setPen(QPen(QColor(T["accent"]), 2.4))
         elif self.selected:
             p.setPen(QPen(QColor(T["border_hi"]), 1.6))
         else:
             p.setPen(QPen(QColor(T["border"]), 1.2))
         p.drawPath(path)
+        if self.picked:   # a tick in the corner, so it reads as picked while playing too
+            c = QRectF(r.right() - 24, r.top() + 6, 18, 18)
+            p.setPen(Qt.NoPen)
+            p.setBrush(QColor(T["accent"]))
+            p.drawEllipse(c)
+            tick = QPen(QColor("#ffffff"), 2.2)
+            tick.setCapStyle(Qt.RoundCap)
+            p.setPen(tick)
+            p.drawPolyline([QPointF(c.left() + 5, c.center().y()),
+                            QPointF(c.left() + 8, c.bottom() - 5),
+                            QPointF(c.right() - 4, c.top() + 5)])
+            p.setBrush(Qt.NoBrush)
+        if self.hasFocus() and self._kbd_focus:
+            p.setPen(QPen(QColor(T["text_hi"]), 1.4, Qt.DashLine))
+            p.drawRoundedRect(r.adjusted(3, 3, -3, -3), 10, 10)
         # accent bar
         p.setPen(Qt.NoPen)
         p.setBrush(accent)
@@ -401,6 +506,18 @@ class PadGrid(QWidget):
         return next((p for p in self.pads if p.isVisible() and p.geometry().contains(pos)),
                     None)
 
+    def focus_step(self, pad: Pad, dx: int, dy: int):
+        """Arrow keys on a pad: move the keyboard focus through the grid."""
+        shown = [p for p in self.pads if not p.property("filtered")]
+        if pad not in shown:
+            return
+        i = shown.index(pad) + dx + dy * max(1, self._cols)
+        if 0 <= i < len(shown):
+            shown[i].setFocus(Qt.TabFocusReason)
+            area = self.parentWidget() and self.parentWidget().parentWidget()
+            if isinstance(area, QScrollArea):
+                area.ensureWidgetVisible(shown[i])
+
     def dragEnterEvent(self, e):
         md = e.mimeData()
         if md.hasFormat(PAD_MIME) or md.hasUrls():
@@ -430,7 +547,10 @@ class PadGrid(QWidget):
             expanded = []
             for f in files:
                 pth = Path(f)
-                if pth.is_dir():
+                if pth.is_dir() and any((pth / n).is_file()
+                                        for n in ("onionboard.json", "sound.json")):
+                    expanded.append(f)   # an unzipped backup / sound pack (see backup.py)
+                elif pth.is_dir():
                     expanded += [str(x) for x in sorted(pth.rglob("*"))
                                  if x.suffix.lower() in AUDIO_EXTS]
                 else:

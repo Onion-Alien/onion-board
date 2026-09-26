@@ -1,0 +1,81 @@
+"""A damaged or hand-edited config.json never stops the app starting, and the user
+is told when their settings came from a backup or the defaults."""
+import json
+
+from soundboard import library
+from soundboard.library import Config
+
+
+def _write(path, raw):
+    path.write_text(json.dumps(raw), encoding="utf-8")
+
+
+def test_wrong_typed_values_fall_back_to_defaults(app_dir):
+    _write(library.CONFIG_PATH, {"tab": "1", "theme": ["x"], "sound_vol": 1, "tray": "yes",
+                                 "sounds": [{"id": "a", "name": "A", "file": "a.wav",
+                                             "volume": "loud", "tags": None}]})
+    cfg = Config.load()
+    d = Config()
+    assert cfg.tab == d.tab and cfg.theme == d.theme and cfg.tray == d.tray
+    assert cfg.sound_vol == 1.0 and isinstance(cfg.sound_vol, float)   # int is fine
+    assert len(cfg.sounds) == 1 and cfg.sounds[0].volume == library.SoundMeta("", "", "").volume
+    assert cfg.load_note == ""   # nothing was lost, so nothing to say
+
+
+def test_sounds_not_a_list_is_ignored(app_dir):
+    _write(library.CONFIG_PATH, {"sounds": None})
+    assert Config.load().sounds == []
+
+
+def test_broken_config_uses_the_newest_backup_that_loads(app_dir):
+    library.CONFIG_PATH.write_text("{not json", encoding="utf-8")
+    library.CONFIG_PATH.with_name("config.json.1").write_text("{also broken", encoding="utf-8")
+    _write(library.CONFIG_PATH.with_name("config.json.2"), {"stop_hotkey": "f9"})
+    cfg = Config.load()
+    assert cfg.stop_hotkey == "f9"
+    assert "config.json.2" in cfg.load_note
+    assert list(app_dir.glob("config.json.broken-*"))   # the damaged file is kept
+
+
+def test_nothing_loadable_says_so(app_dir):
+    library.CONFIG_PATH.write_text("{not json", encoding="utf-8")
+    cfg = Config.load()
+    assert cfg.sounds == [] and "default settings" in cfg.load_note
+
+
+def test_first_start_has_defaults_and_nothing_to_say(app_dir):
+    cfg = Config.load()
+    assert cfg.sounds == [] and cfg.load_note == ""
+
+
+def test_missing_config_with_backups_recovers_the_newest(app_dir):
+    _write(library.CONFIG_PATH.with_name("config.json.1"),
+           {"stop_hotkey": "f9", "sounds": [{"id": "a", "name": "A", "file": "a.wav"}]})
+    _write(library.CONFIG_PATH.with_name("config.json.2"), {"stop_hotkey": "f7"})
+    cfg = Config.load()
+    assert cfg.stop_hotkey == "f9" and [s.id for s in cfg.sounds] == ["a"]
+    assert "missing" in cfg.load_note and "config.json.1" in cfg.load_note
+    assert not list(app_dir.glob("config.json.broken-*"))   # nothing to set aside
+
+
+def test_missing_config_with_only_bad_backups_says_so(app_dir):
+    library.CONFIG_PATH.with_name("config.json.1").write_text("{bad", encoding="utf-8")
+    cfg = Config.load()
+    assert cfg.sounds == [] and "missing" in cfg.load_note
+    assert "default settings" in cfg.load_note
+
+
+def test_load_note_is_never_saved(app_dir):
+    cfg = Config()
+    cfg.load_note = "x"
+    assert "load_note" not in cfg.to_raw()
+
+
+def test_save_survives_a_locked_backup(app_dir, monkeypatch):
+    Config().save()
+    monkeypatch.setattr(library, "_rotate_backups", lambda: (_ for _ in ()).throw(
+        PermissionError("locked")))
+    cfg = Config()
+    cfg.stop_hotkey = "f8"
+    assert cfg.save()
+    assert json.loads(library.CONFIG_PATH.read_text(encoding="utf-8"))["stop_hotkey"] == "f8"

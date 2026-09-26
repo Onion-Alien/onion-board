@@ -16,10 +16,10 @@ labels: bug
 
 **Log**
 
-Attach or paste the relevant part of `%APPDATA%\Soundboard\soundboard.log`.
+Attach or paste the relevant part of `%APPDATA%\OnionBoard\onionboard.log`.
 
 > ⚠️ This issue is public. The log contains paths with your Windows user name —
 > replace them (e.g. `C:\Users\<me>\...`) before posting. Never paste anything from
-> `%APPDATA%\Soundboard\browser\` — that's your browser logins.
+> `%APPDATA%\OnionBoard\browser\` — that's your browser logins.
 
 **Security problem?** Don't file it here — see [SECURITY.md](https://github.com/Onion-Alien/soundboard/blob/main/SECURITY.md).

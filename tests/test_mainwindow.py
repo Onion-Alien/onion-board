@@ -36,7 +36,13 @@ def window(qapp, app_dir, monkeypatch):
     assert not w._load_thread.is_alive()
     yield w
     w.close()
+    w._load_thread.join(15)   # a test may have started another load (e.g. Undo) just now
     assert not w._load_thread.is_alive()
+    # a closed top-level window isn't freed by Qt; left alive, every later test's
+    # theme / stylesheet change restyles all of them and the suite crawls
+    from PySide6.QtCore import QEvent
+    w.deleteLater()
+    qapp.sendPostedEvents(None, QEvent.DeferredDelete)
 
 
 def test_window_builds_with_pads_and_index(window):
@@ -210,3 +216,24 @@ def test_speed_redline_unlocks_the_silly_range(window):
     b.set_values(5.0, 0, True)                               # a redline value unlocks it
     assert b.redline.isChecked() and e.sound_speed == 5.0
     b.meter.grab()                                           # paints without errors
+
+
+def test_every_tab_has_its_own_label(window):
+    texts = [window.tabs.tabText(i) for i in range(window.tabs.count())]
+    assert texts == [t for t, _ in main.TABS] and len(set(texts)) == len(texts)
+    window._tab_icons_only(True)
+    assert window.tabs.tabText(1) == "" and window.tabs.tabToolTip(1).startswith("Radio")
+    window._tab_icons_only(False)
+    assert window.tabs.tabText(2) == "Apps"
+
+
+def test_mute_switch_silences_what_others_hear(window):
+    e = window.engine
+    assert window.btn_air.isChecked() and e.sending
+    window.btn_air.click()
+    assert not e.sending and "Muted" in window.btn_air.text()
+    out = np.ones((64, 2), np.float32)
+    e._main(out, 64)
+    assert not out.any()
+    window.set_sending(True)
+    assert e.sending and window.btn_air.isChecked() and "Live" in window.btn_air.text()

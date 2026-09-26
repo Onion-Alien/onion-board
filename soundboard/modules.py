@@ -25,7 +25,7 @@ Three kinds:
              `soundboard.speech.translation`), and the live-voice helper loads it.
              `language` is its code (de, es…), `language_name` its name.
 
-Modules are searched for in %APPDATA%\\Soundboard\\modules (where users drop
+Modules are searched for in %APPDATA%\\OnionBoard\\modules (where users drop
 downloads) and in the `modules` folder next to the app (or the repo root when
 running from source).
 """
@@ -38,6 +38,7 @@ import re
 import shutil
 import subprocess
 import sys
+import threading
 from collections.abc import Callable
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -48,6 +49,7 @@ from soundboard import library
 log = logging.getLogger(__name__)
 
 KINDS = ("effects", "service", "translation")
+INSTALL_STEP_TIMEOUT_S = 30 * 60     # one install step (pip) before it's given up on
 
 
 def app_root() -> Path:
@@ -229,10 +231,32 @@ def install(info: ModuleInfo, on_line: Callable[[str], None]) -> bool:
         except OSError as e:
             on_line(f"couldn't run it: {e}")
             return False
-        for line in p.stdout:
-            if line.strip():
-                on_line(line.rstrip())
-        if p.wait() != 0:
+        # a step that hangs (a stuck download, a prompt nobody sees) is killed
+        timed_out = threading.Event()
+
+        def watchdog(p=p, timed_out=timed_out):
+            timed_out.set()
+            p.kill()
+
+        timer = threading.Timer(INSTALL_STEP_TIMEOUT_S, watchdog)
+        timer.daemon = True
+        timer.start()
+        try:
+            for line in p.stdout:
+                if line.strip():
+                    on_line(line.rstrip())
+            p.wait()
+        finally:
+            timer.cancel()
+            if p.poll() is None:
+                p.kill()
+                p.wait()
+        if timed_out.is_set():
+            on_line(f"stopped: it took over {INSTALL_STEP_TIMEOUT_S // 60:.0f} minutes. Check "
+                    "your internet connection and press it again.")
+            log.warning("install of %s timed out at: %s", info.id, argv)
+            return False
+        if p.returncode != 0:
             on_line(f"failed (exit code {p.returncode})")
             log.warning("install of %s failed at: %s", info.id, argv)
             return False

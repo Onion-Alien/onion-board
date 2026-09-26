@@ -42,3 +42,32 @@ def test_every_pose_draws(qapp):
             p = QPainter(img)
             draw_bunny(p, QRectF(0, 0, 100, 120), prop, **pose)
             p.end()
+
+
+def test_build_act_runs_off_fetches_tools_and_hammers(qapp):
+    b = BunnyWidget("plug")
+    b.resize(b.sizeHint())
+    b.build()
+    phases = []
+    for _ in range(140):   # ~5 s
+        _run(qapp, b, 1)
+        if b.act_phase() not in phases:
+            phases.append(b.act_phase())
+        if b.act_phase() == "cloud":
+            assert not b.pose()["shown"]
+        b.grab()           # every frame paints
+    assert phases == ["dash", "cloud", "back", "hammer"]
+    assert b.prop == "hammer" and b._blows >= 3 and b.puffs
+    b.stop_building(True)
+    assert not b.building and b.prop == "star" and b.celebrate
+    b.build()
+    b.stop_building(False)
+    assert b.prop == "plug" and not b.celebrate
+
+
+def test_hammer_swings(qapp):
+    img = QImage(100, 120, QImage.Format_ARGB32_Premultiplied)
+    for swing in (0.0, 0.5, 1.0):
+        p = QPainter(img)
+        draw_bunny(p, QRectF(0, 0, 100, 120), "hammer", swing=swing)
+        p.end()

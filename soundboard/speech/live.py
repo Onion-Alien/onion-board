@@ -26,6 +26,7 @@ from soundboard.voicefx import VoiceChain
 log = logging.getLogger(__name__)
 
 TTS_SID = "tts"
+NO_OUTPUT = "No audio device is open — pick one in Setup"
 
 
 class SpeechController:
@@ -40,6 +41,7 @@ class SpeechController:
         self.host: ServiceHost | None = None
         self.mute_real_voice = True
         self.live_voice: str | None = None   # voice for live lines (None: the chosen one)
+        self._ready = False     # the module said "ready": an error after that isn't fatal
 
     # ------------------------------------------------------------ text-to-speech
     def say(self, text: str):
@@ -51,7 +53,9 @@ class SpeechController:
 
     def _play(self, stereo: np.ndarray, rate: int):
         # "overlap": the Speaker already spaces lines out; this never cuts one short
-        self.engine.play(TTS_SID, stereo, self.gain, mode="overlap", src_rate=rate)
+        if self.engine.play(TTS_SID, stereo, self.gain, mode="overlap", src_rate=rate) is None:
+            # nothing open to play it on: say so rather than "speak" to nobody
+            raise RuntimeError(NO_OUTPUT)
 
     # ------------------------------------------------------------ live voice
     @property
@@ -66,6 +70,7 @@ class SpeechController:
                            cwd=module.path, log_path=library.APP_DIR / f"module-{module.id}.log",
                            name=module.id)
         holder.append(host)
+        self._ready = False
         self.host = host        # before start(): its first events must not look stale
         try:
             host.start()
@@ -92,14 +97,28 @@ class SpeechController:
     def _event(self, ev: dict, host: ServiceHost | None):
         if host is None or host is not self.host:
             return          # a module we already stopped, still saying goodbye
-        if ev.get("type") == "final" and ev.get("text"):
+        t = ev.get("type")
+        if t == "final" and ev.get("text"):
             self.speaker.say(str(ev["text"]), self.live_voice)
-        elif ev.get("type") == "stopped":
+        elif t == "ready":
+            self._ready = True
+        elif t == "stopped":
             # the module died: give the real mic back straight away
-            self.host = None
-            self.chain.tap = None
-            self.chain.replace = False
+            self._detach()
+        elif t == "error" and not self._ready:
+            # it couldn't load (no model, no translation): it will never speak, so don't
+            # leave the real mic muted behind a voice that isn't coming
+            self._detach()
+            self.on_event(ev)
+            host.stop()         # doesn't block: safe here, on its own reader thread
+            self.on_event({"type": "stopped", "text": str(ev.get("text", ""))})
+            return
         self.on_event(ev)
+
+    def _detach(self):
+        self.host = None
+        self.chain.tap = None
+        self.chain.replace = False
 
     def shutdown(self):
         self.stop_live()

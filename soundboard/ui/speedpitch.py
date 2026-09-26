@@ -22,7 +22,7 @@ SPEED = voicefx.Param("speed", "Speed", 0.25, 2.0, 1.0, "x", 0.05)
 PITCH = voicefx.Param("pitch", "Pitch", -12, 12, 0, " st", 1)
 QUICK = (0.5, 0.75, 1.0, 1.25, 1.5, 2.0)
 REDLINE_AT = 2.0                        # the meter's red zone starts here
-REDLINE_SPEED = (0.1, 10.0)             # sounds; the browser passes its own limits
+REDLINE_SPEED = (0.1, 10.0)             # sounds
 REDLINE_PITCH = voicefx.Param("pitch", "Pitch", -36, 36, 0, " st", 1)
 REDLINE_QUICK = (3.0, 4.0, 6.0, 8.0, 10.0)
 RED = "#ff4d4f"
@@ -223,10 +223,16 @@ class SpeedPitchButton(QPushButton):
     def _open(self):
         self.pop.adjustSize()
         pos = self.mapToGlobal(QPoint(0, 0))
+        # kept on the screen the button is on (a second monitor can sit left of or
+        # above the primary one, at negative coordinates)
+        area = self.screen().availableGeometry()
         y = pos.y() - self.pop.height() - 4     # above the bar, unless there's no room
-        if y < 0:
+        if y < area.top():
             y = pos.y() + self.height() + 4
-        self.pop.move(max(0, pos.x() + self.width() - self.pop.width()), y)
+        y = max(area.top(), min(y, area.bottom() - self.pop.height()))
+        x = pos.x() + self.width() - self.pop.width()
+        x = max(area.left(), min(x, area.right() - self.pop.width()))
+        self.pop.move(x, y)
         self.pop.show()
 
     def _label(self):

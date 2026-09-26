@@ -33,8 +33,8 @@ in a later commit.
    (`C:\Users\<you>\…`), host names, IPs, Discord IDs, or screenshots showing any of
    those. In code, docs and tests use `%APPDATA%`, `Path.home()`, `example.com`,
    and made-up names.
-3. **No files from your own app data.** Don't commit `config.json`, `soundboard.log`,
-   anything from `%APPDATA%\Soundboard\` (the `browser\` folder holds your logins).
+3. **No files from your own app data.** Don't commit `config.json`, `onionboard.log`,
+   anything from `%APPDATA%\OnionBoard\` (the `browser\` folder holds your logins).
 4. **No audio you don't have the rights to.** Tests generate their audio in code
    (`numpy`); keep it that way. No copyrighted sound effects, music or clips.
 5. **No bundled third-party binaries.** Dependencies come from PyPI via

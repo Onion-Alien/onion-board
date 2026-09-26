@@ -1,9 +1,11 @@
-"""The browser's "Add as sound": which pages offer it, the yt-dlp wrapper (with a fake yt_dlp, no
-network), and the browser tab turning a download into a sound."""
+"""Downloading and searching with yt-dlp: which pages offer "Add as sound", the yt-dlp
+wrapper (with a fake yt_dlp, no network), the link bar and the web search."""
 import hashlib
 import io
 import json
 import sys
+import tempfile
+import threading
 import time
 import types
 import zipfile
@@ -11,11 +13,9 @@ import zipfile
 import numpy as np
 import pytest
 import soundfile as sf
-from PySide6.QtWidgets import QWidget
 
 from conftest import process_events
 from soundboard import ytdl
-from soundboard.browser import BrowserTab
 from soundboard.engine import SR
 from soundboard.library import Config
 
@@ -57,6 +57,7 @@ def fake_yt_dlp(monkeypatch, info, write=b"audio", fail=None):
             return False
 
         def extract_info(self, url, download=True):
+            seen["query"] = url
             if fail:
                 raise Exception(fail)
             return dict(info)
@@ -103,64 +104,12 @@ def test_download_audio_errors_are_readable(monkeypatch, tmp_path):
     assert isinstance(e.value, ytdl.FetchError)   # yt-dlp's fault: an update may help
 
 
-class FakeEngine:
-    level_browser = 0.0
-    browser_live = browser_monitor = False
-    browser_vol = 1.0
-
-    def __init__(self):
-        self.prepared = []
-
-    def prepare(self, sid, data):
-        self.prepared.append(sid)
-
-
-class FakeMeter(QWidget):
-    def set_level(self, _level):
-        pass
-
-
-def test_tab_download_becomes_a_sound(qapp, app_dir, monkeypatch, tmp_path):
-    folder = tmp_path / "dl"
-    folder.mkdir()
-
-    def fake_download(url, dest=None, progress=None, auto_update=True):
-        t = np.arange(SR) / SR
-        p = folder / "vid.wav"
-        sf.write(p, np.stack([np.sin(2 * np.pi * 440 * t)] * 2, 1) * 0.5, SR)
-        progress(1.0)
-        return p, "A Tone"
-
-    monkeypatch.setattr(ytdl, "download_audio", fake_download)
-    eng = FakeEngine()
-    tab = BrowserTab(eng, Config(browser_url="about:blank"), lambda: None, FakeMeter)
-    got = []
-    tab.sound_ready.connect(lambda m, d: got.append((m, d)))
-    tab._downloading = True
-    tab._download("https://youtu.be/x", "#123456", {})
-    assert process_events(qapp, lambda: got and not tab._downloading, 5)
-    meta, data = got[0]
-    assert meta.name == "A Tone" and abs(meta.duration - 1.0) < 0.01
-    assert eng.prepared == [meta.id] and len(data) == SR
-    assert not folder.exists()                       # the download is cleaned up
-    assert "Added" in tab.info.text() and tab.btn_add.text() == "Add as sound"
-
-
-def test_tab_download_skips_a_sound_already_in_the_library(qapp, app_dir, monkeypatch,
-                                                           tmp_path):
-    p = tmp_path / "dl" / "vid.wav"
-    p.parent.mkdir()
-    sf.write(p, np.zeros((SR, 2)) + 0.1, SR)
-    from soundboard.library import fingerprint
-    known = {fingerprint(str(p)): "Old one"}
-    monkeypatch.setattr(ytdl, "download_audio", lambda url, dest=None, progress=None, **kw:
-                        (p, "Again"))
-    tab = BrowserTab(FakeEngine(), Config(browser_url="about:blank"), lambda: None, FakeMeter)
-    got = []
-    tab.sound_ready.connect(lambda m, d: got.append(m))
-    tab._download("https://youtu.be/x", "#123456", known)
-    process_events(qapp, lambda: "Old one" in tab.info.text(), 3)
-    assert not got and "already in your Sounds" in tab.info.text()
+def test_a_failed_download_leaves_no_temp_folder(monkeypatch, tmp_path):
+    fake_yt_dlp(monkeypatch, {}, fail="ERROR: Video unavailable")
+    monkeypatch.setattr(ytdl.tempfile, "tempdir", str(tmp_path))
+    with pytest.raises(ytdl.DownloadError):
+        ytdl.download_audio("https://youtu.be/x", auto_update=False)
+    assert not list(tmp_path.glob("sb-ytdl-*"))
 
 
 # ---------------------------------------------------------------- keeping yt-dlp current
@@ -323,18 +272,10 @@ def test_settings_downloader_card(qapp, window, monkeypatch):  # noqa: F811
     d.close()
 
 
-def test_auto_update_is_opt_in(qapp, app_dir, monkeypatch):
+def test_auto_update_is_opt_in():
     assert Config().ytdlp_auto_optin is False
     # a config saved while it defaulted to on (under the old name) starts off again
     assert Config.from_raw({"ytdlp_auto_update": True}).ytdlp_auto_optin is False
-
-    def fail(url, dest=None, progress=None, auto_update=True):
-        assert auto_update is False
-        raise ytdl.FetchError("Sign in to confirm you're not a bot")
-    monkeypatch.setattr(ytdl, "download_audio", fail)
-    tab = BrowserTab(FakeEngine(), Config(browser_url="about:blank"), lambda: None, FakeMeter)
-    tab._download("https://youtu.be/x", "#123456", {})
-    assert process_events(qapp, lambda: "Update now" in tab.info.text(), 3)
 
 
 # ---------------------------------------------------------------- the Sounds tab's link bar
@@ -372,7 +313,7 @@ def fake_link_download(monkeypatch, tmp_path):
 
     def download(url, dest=None, progress=None, auto_update=True):
         calls.append(url)
-        folder = tmp_path / f"dl{len(calls)}"
+        folder = tmp_path / f"sb-ytdl-{len(calls)}"   # the link bar only deletes these
         folder.mkdir()
         t = np.arange(SR) / SR
         p = folder / "vid.wav"
@@ -382,6 +323,7 @@ def fake_link_download(monkeypatch, tmp_path):
 
     monkeypatch.setattr(ytdl, "download_audio", download)
     monkeypatch.setattr(ytdl, "probe", lambda url: ("A Tone", 1.0))
+    monkeypatch.setattr(tempfile, "gettempdir", lambda: str(tmp_path))
     return calls
 
 
@@ -407,7 +349,7 @@ def test_link_add_as_sound(qapp, window, monkeypatch, tmp_path):  # noqa: F811
     m = window.cfg.sounds[-1]
     assert m.name == "A Tone" and m.id in window.pads and m.id in window.audio
     assert calls == ["https://youtu.be/abc"]
-    assert not (tmp_path / "dl1").exists()                   # the download is cleaned up
+    assert not (tmp_path / "sb-ytdl-1").exists()                   # the download is cleaned up
     assert "Added" in window.linkbar.info.text()
     window.linkbar.add()                                     # the same again: refused
     assert process_events(qapp, lambda: "already in your Sounds" in
@@ -430,7 +372,7 @@ def test_link_play_once_then_add_downloads_once(qapp, window, monkeypatch, tmp_p
     window.linkbar.add()
     assert process_events(qapp, lambda: len(window.cfg.sounds) == 3, 5)
     assert calls == ["https://youtu.be/abc"]
-    assert not (tmp_path / "dl1").exists()
+    assert not (tmp_path / "sb-ytdl-1").exists()
 
 
 def test_link_change_drops_the_kept_download(qapp, window, monkeypatch, tmp_path):  # noqa: F811
@@ -440,7 +382,7 @@ def test_link_change_drops_the_kept_download(qapp, window, monkeypatch, tmp_path
     window.linkbar.play_once()
     assert process_events(qapp, lambda: window.linkbar._got is not None, 5)
     window.search.setText("https://youtu.be/other")
-    assert window.linkbar._got is None and not (tmp_path / "dl1").exists()
+    assert window.linkbar._got is None and not (tmp_path / "sb-ytdl-1").exists()
 
 
 def test_link_play_once_shows_in_the_transport_bar(qapp, window, monkeypatch,  # noqa: F811
@@ -470,6 +412,7 @@ def test_search_lists_videos_and_skips_live_and_junk(monkeypatch):
         {"id": "zGG4kWoN8Zc", "title": "Remix", "uploader": "Someone"},
     ]})
     r = ytdl.search("  what   is love ", 5)
+    assert seen["query"] == "ytsearch5:what is love"
     assert seen["extract_flat"] == "in_playlist" and "outtmpl" not in seen
     assert [x.id for x in r] == ["HEXWRTEbj1I", "zGG4kWoN8Zc"]
     assert (r[0].title, r[0].channel, r[0].seconds) == ("What Is Love", "Haddaway", 241)
@@ -482,11 +425,31 @@ def test_search_lists_videos_and_skips_live_and_junk(monkeypatch):
         ytdl.search("x")
 
 
+def test_search_soundcloud_links_the_track_page_and_its_bigger_art(monkeypatch):
+    seen = fake_yt_dlp(monkeypatch, {"_type": "playlist", "entries": [
+        {"id": "556218435", "title": "bruh sound effect #2", "uploader": "SHYNEZ",
+         "duration": 145.6, "webpage_url": "https://soundcloud.com/someone/bruh-2",
+         "url": "https://api.soundcloud.com/tracks/soundcloud%3Atracks%3A556218435",
+         "thumbnails": [{"url": "https://i1.sndcdn.com/artworks-abc-mini.jpg"},
+                        {"url": "https://i1.sndcdn.com/artworks-abc-small.jpg"}]},
+        {"id": "1", "title": "Not SoundCloud", "url": "https://example.com/x"},
+        None,
+    ]})
+    r = ytdl.search("bruh", 10, source="soundcloud")
+    assert seen["query"] == "scsearch10:bruh"
+    assert len(r) == 1 and r[0].source == "soundcloud"
+    assert (r[0].title, r[0].channel, r[0].seconds) == ("bruh sound effect #2", "SHYNEZ", 145.6)
+    assert r[0].url == "https://soundcloud.com/someone/bruh-2"
+    assert r[0].thumb == "https://i1.sndcdn.com/artworks-abc-t300x300.jpg"
+
+
 def test_enter_searches_youtube_and_a_result_plays_through_the_link_bar(
         qapp, window, monkeypatch, tmp_path):  # noqa: F811
     calls = fake_link_download(monkeypatch, tmp_path)
     hits = [ytdl.Result("HEXWRTEbj1I", "What Is Love", "Haddaway", 241)]
-    monkeypatch.setattr(ytdl, "search", lambda q, count=20: hits)
+    searched = []
+    monkeypatch.setattr(ytdl, "search", lambda q, count=20, source="youtube": (
+        searched.append(source), hits)[1])
     monkeypatch.setattr(window.engine, "play", lambda *a, **kw: object())
     window.ytresults.net.get = lambda req: types.SimpleNamespace(   # no thumbnail fetch
         finished=types.SimpleNamespace(connect=lambda f: None))
@@ -504,5 +467,96 @@ def test_enter_searches_youtube_and_a_result_plays_through_the_link_bar(
     window.ytresults._rows[0].btn_add.click()                # Add: reuses the download
     assert process_events(qapp, lambda: len(window.cfg.sounds) == 3, 5)
     assert len(calls) == 1
+    window.ytresults.site_btns["soundcloud"].click()       # another site: searches again
+    assert process_events(qapp, lambda: searched[-1:] == ["soundcloud"], 5)
+    assert searched == ["youtube", "youtube", "soundcloud"]
+    assert "No SoundCloud results" not in window.ytresults.title.text()
     window.ytresults.close_results()
     assert not window._pads_scroll.isHidden() and window.ytresults.isHidden()
+
+
+def test_search_tiktok_and_youtube_music_go_through_youtube(monkeypatch):
+    seen = fake_yt_dlp(monkeypatch, {"_type": "playlist", "entries": [
+        {"id": "HEXWRTEbj1I", "title": "What Is Love"}]})
+    r = ytdl.search("what is love", 5, source="tiktok")
+    assert seen["query"] == "ytsearch5:what is love tiktok sound"
+    assert r[0].url == "https://www.youtube.com/watch?v=HEXWRTEbj1I" and r[0].thumb
+    ytdl.search("what is love", 5, source="ytmusic")
+    assert seen["query"] == "https://music.youtube.com/search?q=what+is+love#songs"
+    assert seen["playlistend"] == 5
+
+
+MYINSTANTS_PAGE = """
+<div class="instant"><button class="small-button"
+  onclick="play('/media/sounds/vine-boom.mp3', 'loader-1', 'vine-boom-1')"></button>
+<a href="/en/instant/vine-boom-1/" class="instant-link link-secondary">VINE BOOM &amp; CO</a></div>
+<div class="instant"><button class="small-button"
+  onclick="play('/media/sounds/bruh.mp3', 'loader-2', 'bruh-2')"></button>
+<a href="/en/instant/bruh-2/" class="instant-link link-secondary">bruh</a></div>
+"""
+
+
+class _Resp(io.BytesIO):
+    headers: dict = {}
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *a):
+        return False
+
+
+def test_search_myinstants_reads_the_buttons_and_downloads_the_mp3(monkeypatch, tmp_path):
+    asked = []
+
+    def urlopen(req, timeout=0):
+        asked.append((req.full_url, req.headers.get("User-agent", "")))
+        return _Resp(MYINSTANTS_PAGE.encode() if "/search/" in req.full_url else b"ID3mp3")
+    monkeypatch.setattr(ytdl.urllib.request, "urlopen", urlopen)
+    r = ytdl.search("vine  boom", 1, source="myinstants")
+    assert asked[0][0] == "https://www.myinstants.com/en/search/?name=vine+boom"
+    assert "Mozilla" in asked[0][1]
+    assert len(r) == 1 and r[0].title == "VINE BOOM & CO" and r[0].thumb == ""
+    assert r[0].url == "https://www.myinstants.com/media/sounds/vine-boom.mp3"
+    assert len(ytdl.search("vine boom", 10, source="myinstants")) == 2
+    assert ytdl.probe(r[0].url) == ("Vine boom", 0.0)
+    path, title = ytdl.download_audio(r[0].url, dest=tmp_path)   # no yt-dlp involved
+    assert path == tmp_path / "vine-boom.mp3" and path.read_bytes() == b"ID3mp3"
+    assert title == "Vine boom"
+
+
+def test_results_spin_while_searching_and_offer_every_site(qapp, monkeypatch):
+    from soundboard.ui.ytsearch import SearchResults
+    gate = threading.Event()
+    monkeypatch.setattr(ytdl, "search", lambda q, count=20, source="youtube": (
+        gate.wait(5), [])[1])
+    panel = SearchResults()
+    assert set(panel.site_btns) == set(ytdl.SOURCES) >= {"tiktok", "myinstants", "ytmusic"}
+    panel.set_source("tiktok")
+    panel.search("bruh")
+    assert panel.spinner.running() and "TikTok sounds" in panel.title.text()
+    gate.set()
+    assert process_events(qapp, lambda: not panel.spinner.running(), 5)
+    assert "No TikTok results" in panel.title.text()
+    panel.search("again")
+    assert panel.spinner.running()
+    panel.close_results()                        # closing stops it too
+    assert not panel.spinner.running()
+
+
+@pytest.mark.parametrize("url", [
+    "https://www.myinstants.com/media/sounds/real.mp3?x=%5C..%5C..%5Cx.bat",
+    "https://www.myinstants.com/media/sounds/real.mp3#%5C..%5Cx.bat",
+    "https://www.myinstants.com/media/sounds/x.bat",
+])
+def test_direct_download_refuses_names_that_leave_its_folder(url, monkeypatch):
+    monkeypatch.setattr(ytdl.urllib.request, "urlopen", lambda *a, **k: pytest.fail("fetched"))
+    with pytest.raises(ytdl.DownloadError):
+        ytdl._download_direct(url, None, None)
+
+
+def test_direct_leaf_keeps_only_a_plain_file_name():
+    assert ytdl._direct_leaf("https://www.myinstants.com/media/sounds/vine-boom.mp3") \
+        == "vine-boom.mp3"
+    leaf = ytdl._direct_leaf("https://www.myinstants.com/media/sounds/%2e%2e%5cStartup%5cx.mp3")
+    assert "\\" not in leaf and "/" not in leaf and not leaf.startswith(".")

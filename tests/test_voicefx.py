@@ -156,6 +156,22 @@ def test_a_broken_effect_is_bypassed_not_fatal(monkeypatch):
     assert c._effects == ()
 
 
+def test_an_effect_that_cant_start_is_left_out_and_reported(monkeypatch):
+    class NoStart(voicefx.Effect):
+        type, name = "test.nostart", "No start"
+
+        def __init__(self, rate, values=None):
+            raise RuntimeError("missing model file")
+
+    monkeypatch.setitem(REGISTRY, "test.nostart", NoStart)
+    c = VoiceChain()
+    c.configure(spec_for(**{"test.nostart": {}, "robot": {"mix": 0}}))
+    y = c.process(np.full((32, 2), 0.25, np.float32), RATE)
+    assert np.allclose(y, 0.25)
+    assert "missing model file" in c.errors["test.nostart"]
+    assert [e.type for e in c._effects] == ["robot"]
+
+
 def test_effect_returning_garbage_is_bypassed(monkeypatch):
     class Nan(voicefx.Effect):
         type, name = "test.nan", "NaN"
@@ -202,3 +218,22 @@ def test_engine_mic_runs_through_the_chain():
     e.ring_main.prefill = 0
     out = e.ring_main.read(480)
     assert out is not None and not out.any()     # but the cable got the chain's output
+
+
+def test_effects_wait_for_the_mic_rate_before_starting(monkeypatch):
+    class NeedsRate(voicefx.Effect):
+        type, name = "test.needsrate", "Needs rate"
+
+        def __init__(self, rate, values=None):
+            super().__init__(rate, values)
+            self.step = 1.0 / rate           # a rate of 0 would raise here
+
+        def run(self, x, rate):
+            return x
+
+    monkeypatch.setitem(REGISTRY, "test.needsrate", NeedsRate)
+    c = VoiceChain()
+    c.configure(spec_for(**{"test.needsrate": {}}))   # before the first mic block
+    assert c.errors == {} and c._effects == ()
+    c.process(np.zeros((32, 2), np.float32), RATE)
+    assert [e.type for e in c._effects] == ["test.needsrate"]

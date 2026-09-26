@@ -136,41 +136,54 @@ class Hotkeys(QObject):
         user32.PostThreadMessageW(self._tid, 0x0012, 0, 0)   # WM_QUIT
 
     def _loop(self):
-        self._tid = kernel32.GetCurrentThreadId()
-        msg = _MSG()
-        user32.PeekMessageW(ctypes.byref(msg), None, 0, 0, 0)   # create the queue
-        self._ready.set()
         actions: dict[int, str] = {}
-        while user32.GetMessageW(ctypes.byref(msg), None, 0, 0) > 0:
-            if msg.message == WM_HOTKEY:
-                act = actions.get(msg.wParam)
-                if act:
-                    self.fired.emit(act)
-            elif msg.message == WM_APP:
-                with self._lock:
-                    mapping, self._pending = self._pending, None
-                if mapping is None:
+        try:
+            self._tid = kernel32.GetCurrentThreadId()
+            msg = _MSG()
+            user32.PeekMessageW(ctypes.byref(msg), None, 0, 0, 0)   # create the queue
+            self._ready.set()
+            while user32.GetMessageW(ctypes.byref(msg), None, 0, 0) > 0:
+                try:
+                    self._handle(msg, actions)
+                except Exception:  # noqa: BLE001 - one bad message mustn't end hotkeys
+                    log.exception("hotkey thread: handling message 0x%x failed", msg.message)
+        except Exception:  # noqa: BLE001
+            from soundboard import applog
+            applog.report(where="hotkey thread")
+        finally:
+            self._tid = 0            # `alive` now tells the truth
+            self._ready.set()        # never leave __init__ waiting on a thread that died
+            for hid in actions:
+                user32.UnregisterHotKey(None, hid)
+
+    def _handle(self, msg, actions: dict[int, str]):
+        if msg.message == WM_HOTKEY:
+            act = actions.get(msg.wParam)
+            if act:
+                self.fired.emit(act)
+        elif msg.message == WM_APP:
+            with self._lock:
+                mapping, self._pending = self._pending, None
+            if mapping is None:
+                return
+            for hid in actions:
+                user32.UnregisterHotKey(None, hid)
+            actions.clear()
+            failed = []
+            for i, (combo, act) in enumerate(mapping.items(), start=1):
+                if not combo:
                     continue
-                for hid in actions:
-                    user32.UnregisterHotKey(None, hid)
-                actions.clear()
-                failed = []
-                for i, (combo, act) in enumerate(mapping.items(), start=1):
-                    if not combo:
-                        continue
-                    parsed = parse(combo)
-                    if not parsed:
-                        failed.append(combo)   # shown as not working, not silently dropped
-                        continue
-                    mods, vk = parsed
-                    if user32.RegisterHotKey(None, i, mods | MOD_NOREPEAT, vk):
-                        actions[i] = act
-                    else:
-                        failed.append(combo)
-                self.failed = failed
-                self.failed_changed.emit(list(failed))
-        for hid in actions:
-            user32.UnregisterHotKey(None, hid)
+                parsed = parse(combo)
+                if not parsed:
+                    failed.append(combo)   # shown as not working, not silently dropped
+                    continue
+                mods, vk = parsed
+                if user32.RegisterHotKey(None, i, mods | MOD_NOREPEAT, vk):
+                    actions[i] = act
+                else:
+                    failed.append(combo)
+            self.failed = failed
+            self.failed_changed.emit(list(failed))
 
 
 # ---------------------------------------------------------------- key presses (PTT)
@@ -307,12 +320,12 @@ SWP_NOSIZE, SWP_NOMOVE, SWP_NOACTIVATE, SWP_SHOWWINDOW = 0x1, 0x2, 0x10, 0x40
 
 
 def make_overlay(hwnd: int):
-    """Turn a window into a HUD: never takes focus (the game keeps the keyboard and
-    mouse), clicks fall through to what's under it, not in the taskbar or alt-tab."""
+    """Turn a window into a HUD: never takes focus, even when clicked (the game keeps
+    the keyboard), not in the taskbar or alt-tab."""
     h = wt.HWND(hwnd)
     ex = _GetLong(h, GWL_EXSTYLE)
-    _SetLong(h, GWL_EXSTYLE, ex | WS_EX_NOACTIVATE | WS_EX_TRANSPARENT | WS_EX_TOOLWINDOW
-             | WS_EX_LAYERED | WS_EX_TOPMOST)
+    _SetLong(h, GWL_EXSTYLE, (ex | WS_EX_NOACTIVATE | WS_EX_TOOLWINDOW | WS_EX_LAYERED
+                              | WS_EX_TOPMOST) & ~WS_EX_TRANSPARENT)
 
 
 def raise_topmost(hwnd: int):

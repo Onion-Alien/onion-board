@@ -1,6 +1,6 @@
-# Live voice-to-speech (Soundboard module)
+# Live voice-to-speech (Onion Board module)
 
-Talk normally; Soundboard hears each sentence, turns it into text on your own PC
+Talk normally; Onion Board hears each sentence, turns it into text on your own PC
 and says it with a text-to-speech voice. Everyone else hears the TTS voice
 instead of yours.
 
@@ -9,10 +9,10 @@ later depending on your CPU and the model.
 
 ## Install
 
-It comes with Soundboard (in the `modules` folder next to `Soundboard.exe`).
+It comes with Onion Board (in the `modules` folder next to `OnionBoard.exe`).
 
 1. Install Python 3.12 or newer from python.org and tick "Add python.exe to PATH".
-2. In Soundboard, open the **Voice** tab and press **Install speech recognition**.
+2. In Onion Board, open the **Voice** tab and press **Install speech recognition**.
    It creates a private Python environment in this folder's `.venv` and downloads
    the speech model (about 300 MB in total). `install.bat` here does the same.
 3. Press **Start talking as the voice**.

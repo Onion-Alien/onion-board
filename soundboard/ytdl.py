@@ -11,7 +11,7 @@ yt-dlp is imported lazily: it's a big package and only needed on click.
 Keeping it working: YouTube changes often and yt-dlp follows within days, but the
 built app can't pip-install. So a newer yt-dlp is fetched from PyPI (the wheels of
 yt-dlp and its pinned yt-dlp-ejs, checked against PyPI's SHA-256) and unpacked into
-%APPDATA%\\Soundboard\\yt-dlp\\current; an import hook (_Finder) makes that copy win
+%APPDATA%\\OnionBoard\\yt-dlp\\current; an import hook (_Finder) makes that copy win
 over the bundled one. That only happens when the user asks (Settings → General:
 Update now / Reset), or, if they opted in (off by default: it's code the app runs),
 once a day and when a download fails. "Reset" deletes the copy and its cache and fetches
@@ -22,6 +22,7 @@ from __future__ import annotations
 
 import contextlib
 import hashlib
+import html
 import importlib.abc
 import importlib.machinery
 import io
@@ -33,6 +34,7 @@ import sys
 import tempfile
 import threading
 import time
+import urllib.parse
 import urllib.request
 import zipfile
 from collections.abc import Callable
@@ -161,7 +163,7 @@ def _purge():
 
 
 def _get(url: str, limit: int) -> bytes:
-    req = urllib.request.Request(url, headers={"User-Agent": "Soundboard (yt-dlp updater)"})
+    req = urllib.request.Request(url, headers={"User-Agent": "OnionBoard (yt-dlp updater)"})
     with urllib.request.urlopen(req, timeout=30) as r:
         data = r.read(limit + 1)
     if len(data) > limit:
@@ -289,6 +291,8 @@ def download_audio(url: str, dest: Path | None = None,
     Returns (file, title). `progress` gets 0..1 while it downloads. If yt-dlp fails
     and no update check ran in the last hour, it updates yt-dlp and tries once more.
     Raises DownloadError with a message fit to show the user."""
+    if url.startswith(MYINSTANTS + "/media/sounds/"):
+        return _download_direct(url, dest, progress)
     try:
         return _download(url, dest, progress)
     except FetchError as e:
@@ -308,6 +312,8 @@ def download_audio(url: str, dest: Path | None = None,
 def probe(url: str) -> tuple[str, float]:
     """Look `url` up without downloading anything: (clean title, seconds or 0).
     Raises DownloadError like download_audio (but never updates yt-dlp)."""
+    if url.startswith(MYINSTANTS + "/media/sounds/"):
+        return _direct_title(url), 0.0
     with _ydl() as yt_dlp:
         try:
             with yt_dlp.YoutubeDL(_opts()) as ydl:
@@ -319,47 +325,120 @@ def probe(url: str) -> tuple[str, float]:
     return clean_title(info.get("title") or "") or "Sound", float(info.get("duration") or 0)
 
 
+# The sites search() can look things up on: key -> (button name, what it searches).
+# "ytsearch"/"scsearch" are yt-dlp's own searches; "ytmusic" is YouTube Music's
+# search page; "myinstants" is scraped here (meme sound buttons, plain MP3s).
+# TikTok has no search without an account, so its button searches YouTube for the
+# TikTok sound (most get reposted there); a pasted TikTok link still downloads.
+SOURCES = {"youtube": ("YouTube", "ytsearch"),
+           "ytmusic": ("YouTube Music", "ytmusic"),
+           "soundcloud": ("SoundCloud", "scsearch"),
+           "tiktok": ("TikTok", "ytsearch"),
+           "myinstants": ("Myinstants", "myinstants")}
+TIKTOK_SUFFIX = " tiktok sound"
+MYINSTANTS = "https://www.myinstants.com"
+BROWSER_HEADERS = {   # Myinstants' Cloudflare turns away urllib's default User-Agent
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+                  "(KHTML, like Gecko) Chrome/140.0 Safari/537.36",
+    "Accept": "text/html,audio/*,*/*;q=0.8", "Accept-Language": "en-US,en;q=0.9",
+    "Referer": MYINSTANTS + "/"}
+
+
 @dataclass
 class Result:
-    """One YouTube search hit (see search)."""
+    """One search hit (see search)."""
     id: str
     title: str
     channel: str
-    seconds: float     # 0 when YouTube didn't say
+    seconds: float     # 0 when the site didn't say
+    source: str = "youtube"
+    link: str = ""     # the page to download (YouTube's is built from the id)
+    art: str = ""      # thumbnail / cover art (YouTube's is built from the id)
 
     @property
     def url(self) -> str:
-        return f"https://www.youtube.com/watch?v={self.id}"
+        return self.link or f"https://www.youtube.com/watch?v={self.id}"
 
     @property
     def thumb(self) -> str:
+        """"" when there's none (Myinstants' buttons have no picture)."""
+        if self.art or self.source != "youtube":
+            return self.art
         return f"https://i.ytimg.com/vi/{self.id}/mqdefault.jpg"
 
 
-def search(query: str, count: int = 20) -> list[Result]:
-    """Search YouTube (yt-dlp's ytsearch: one results page, nothing downloaded).
-    Live streams and anything without a proper video id are left out.
-    Raises DownloadError like probe."""
+def search(query: str, count: int = 20, source: str = "youtube") -> list[Result]:
+    """Search one of SOURCES (one results page, nothing downloaded). Live streams
+    and junk entries are left out. Raises DownloadError like probe."""
     query = " ".join(query.split())
     if not query:
         return []
+    kind = SOURCES[source][1]
+    if kind == "myinstants":
+        return _myinstants(query, count)
+    if kind == "ytmusic":
+        target = ("https://music.youtube.com/search?q="
+                  f"{urllib.parse.quote_plus(query)}#songs")
+    else:
+        target = f"{kind}{count}:{query}{TIKTOK_SUFFIX if source == 'tiktok' else ''}"
     opts = {k: v for k, v in _opts().items() if k not in ("format", "outtmpl")}
-    opts.update(extract_flat="in_playlist", noplaylist=False)
+    opts.update(extract_flat="in_playlist", noplaylist=False, playlistend=count)
     with _ydl() as yt_dlp:
         try:
             with yt_dlp.YoutubeDL(opts) as ydl:
-                info = ydl.extract_info(f"ytsearch{count}:{query}", download=False)
+                info = ydl.extract_info(target, download=False)
         except Exception as e:  # noqa: BLE001 - yt-dlp raises many kinds; show its message
             raise _readable(e) from e
     out = []
     for e in (info or {}).get("entries") or ():
-        vid = str(e.get("id") or "")
-        if not re.fullmatch(r"[\w-]{11}", vid) or e.get("live_status") == "is_live":
+        if not e or e.get("live_status") == "is_live":
             continue
-        out.append(Result(vid, str(e.get("title") or vid),
-                          str(e.get("channel") or e.get("uploader") or ""),
-                          float(e.get("duration") or 0)))
+        r = _soundcloud_hit(e) if source == "soundcloud" else _youtube_hit(e)
+        if r:
+            out.append(r)
+    return out[:count]
+
+
+def _myinstants(query: str, count: int) -> list[Result]:
+    """Myinstants' search page, read for its sound buttons (title + MP3 path)."""
+    url = f"{MYINSTANTS}/en/search/?name={urllib.parse.quote_plus(query)}"
+    try:
+        req = urllib.request.Request(url, headers=BROWSER_HEADERS)
+        with urllib.request.urlopen(req, timeout=20) as r:
+            page = r.read(4 * 1024 * 1024).decode("utf-8", "replace")
+    except Exception as e:  # noqa: BLE001 - offline, blocked…: show why
+        raise FetchError(f"Myinstants didn't answer ({e})") from e
+    out = []
+    for m in re.finditer(r"onclick=\"play\('(/media/sounds/[^']+?\.mp3)'.*?"
+                         r'class="instant-link[^"]*">([^<]+)</a>', page, re.S):
+        path, title = m.group(1), html.unescape(m.group(2)).strip()
+        out.append(Result(path.rsplit("/", 1)[-1], title or "Sound", "Myinstants", 0,
+                          "myinstants", MYINSTANTS + path))
+        if len(out) >= count:
+            break
     return out
+
+
+def _youtube_hit(e: dict) -> Result | None:
+    vid = str(e.get("id") or "")
+    if not re.fullmatch(r"[\w-]{11}", vid):
+        return None   # a channel or playlist, not a video
+    return Result(vid, str(e.get("title") or vid),
+                  str(e.get("channel") or e.get("uploader") or ""),
+                  float(e.get("duration") or 0))
+
+
+def _soundcloud_hit(e: dict) -> Result | None:
+    link = str(e.get("webpage_url") or e.get("url") or "")
+    if not re.match(r"https://(api\.)?soundcloud\.com/", link):
+        return None
+    # the flat entry only lists tiny cover sizes; "-t300x300" is the same art, bigger
+    art = next((str(t.get("url")) for t in reversed(e.get("thumbnails") or ())
+                if t.get("url")), "")
+    art = re.sub(r"-(mini|tiny|small|badge|t\d+x\d+|large)\.(jpg|png)$", r"-t300x300.\2", art)
+    return Result(str(e.get("id") or link), str(e.get("title") or "Track"),
+                  str(e.get("uploader") or ""), float(e.get("duration") or 0),
+                  "soundcloud", link, art)
 
 
 @contextlib.contextmanager
@@ -377,7 +456,65 @@ def _ydl():
 
 def _download(url, dest, progress) -> tuple[Path, str]:
     with _ydl() as yt_dlp:
-        return _run(yt_dlp, url, Path(dest or tempfile.mkdtemp(prefix="sb-ytdl-")), progress)
+        if dest:
+            return _run(yt_dlp, url, Path(dest), progress)
+        # Our own temp folder: the caller only learns it on success, so a failed
+        # download (up to the size cap) must not be left behind in %TEMP%.
+        tmp = Path(tempfile.mkdtemp(prefix="sb-ytdl-"))
+        try:
+            return _run(yt_dlp, url, tmp, progress)
+        except BaseException:
+            shutil.rmtree(tmp, ignore_errors=True)
+            raise
+
+
+def _direct_leaf(url: str) -> str:
+    """The file name of a direct link, safe to put in our folder: only the last path
+    segment (never the query), decoded, with separators / `..` / odd characters gone."""
+    leaf = urllib.parse.unquote(urllib.parse.urlsplit(url).path.rsplit("/", 1)[-1])
+    return re.sub(r"[^\w .()-]", "_", leaf).strip(" .")[:80]
+
+
+def _direct_title(url: str) -> str:
+    stem = _direct_leaf(url).rsplit(".", 1)[0]
+    return re.sub(r"[-_]+", " ", stem).strip().capitalize() or "Sound"
+
+
+def _download_direct(url, dest, progress) -> tuple[Path, str]:
+    """A plain audio file yt-dlp can't fetch (Myinstants' Cloudflare blocks it)."""
+    parts = urllib.parse.urlsplit(url)
+    leaf = _direct_leaf(url)
+    # the URL comes from a paste: a query / fragment / odd name could steer the file
+    # out of our folder (Windows resolves `\..` inside the name)
+    if (parts.netloc != urllib.parse.urlsplit(MYINSTANTS).netloc or parts.query
+            or parts.fragment or not leaf.lower().endswith(".mp3")):
+        raise DownloadError("That isn't a Myinstants sound link.")
+    tmp = Path(dest) if dest else Path(tempfile.mkdtemp(prefix="sb-ytdl-"))
+    path = tmp / leaf
+    if path.resolve().parent != tmp.resolve():
+        if not dest:
+            shutil.rmtree(tmp, ignore_errors=True)
+        raise DownloadError("That isn't a Myinstants sound link.")
+    try:
+        req = urllib.request.Request(url, headers=BROWSER_HEADERS)
+        with urllib.request.urlopen(req, timeout=30) as r, open(path, "wb") as f:
+            total, got = int(r.headers.get("Content-Length") or 0), 0
+            while chunk := r.read(64 * 1024):
+                got += len(chunk)
+                if got > MAX_BYTES:
+                    raise DownloadError(f"It's over {MAX_BYTES // 2**20} MB.")
+                f.write(chunk)
+                if progress and total:
+                    progress(min(got / total, 1.0))
+    except DownloadError:
+        if not dest:
+            shutil.rmtree(tmp, ignore_errors=True)
+        raise
+    except Exception as e:  # noqa: BLE001 - network: show why
+        if not dest:
+            shutil.rmtree(tmp, ignore_errors=True)
+        raise DownloadError(f"Download failed ({e})") from e
+    return path, _direct_title(url)
 
 
 def _check(info: dict) -> dict:

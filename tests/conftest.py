@@ -1,5 +1,5 @@
 """Test setup: run from the repo root so the flat modules import, never touch the
-real %APPDATA%\\Soundboard folder, and keep Qt on the offscreen platform (no
+real %APPDATA%\\OnionBoard folder, and keep Qt on the offscreen platform (no
 window ever appears; the web engine still runs)."""
 import os
 import sys
@@ -8,7 +8,7 @@ from pathlib import Path
 import pytest
 
 os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
-os.environ.setdefault("SOUNDBOARD_INSTANCE", "pytest")
+os.environ.setdefault("ONIONBOARD_INSTANCE", "pytest")
 
 ROOT = Path(__file__).resolve().parent.parent
 if str(ROOT) not in sys.path:
@@ -56,13 +56,11 @@ class _SilentOutputStream:
     abort = stop
 
 
-# SOUNDBOARD_TEST_REAL_AUDIO=1 opts back in to real output devices.
-if os.environ.get("SOUNDBOARD_TEST_REAL_AUDIO") != "1":
+# ONIONBOARD_TEST_REAL_AUDIO=1 opts back in to real output devices.
+if os.environ.get("ONIONBOARD_TEST_REAL_AUDIO") != "1":
     import sounddevice
     sounddevice.OutputStream = _SilentOutputStream
-    # The browser tests autoplay tones in real pages; Chromium's own output would
-    # reach the default device before (or without) the soundboard's tap. Page audio
-    # still renders, so the tap still hears it.
+    # Chromium (the Radio tab's globe) must never reach the default device either.
     flags = os.environ.get("QTWEBENGINE_CHROMIUM_FLAGS", "")
     if "--mute-audio" not in flags:
         os.environ["QTWEBENGINE_CHROMIUM_FLAGS"] = f"{flags} --mute-audio".strip()
@@ -101,8 +99,66 @@ def app_dir(tmp_path, monkeypatch):
 
 @pytest.fixture(autouse=True)
 def _never_touch_real_appdata(monkeypatch, tmp_path):
-    """Any test that forgets `app_dir` still can't write into %APPDATA%\\Soundboard."""
+    """Any test that forgets `app_dir` still can't write into %APPDATA%\\OnionBoard."""
     from soundboard import library
-    for name in ("APP_DIR", "SOUNDS_DIR", "CACHE_DIR", "THUMBS_DIR", "CONFIG_PATH"):
-        if getattr(library, name).is_relative_to(library.APP_DIR.parent):
+    monkeypatch.setattr(library, "USE_RECYCLE_BIN", False)   # removed test files: just deleted
+    real = library.APP_DIR.parent   # read once: the loop re-points APP_DIR itself
+    for name in ("APP_DIR", "OLD_APP_DIR", "SOUNDS_DIR", "CACHE_DIR", "THUMBS_DIR",
+                 "CONFIG_PATH"):
+        if getattr(library, name).is_relative_to(real):
             monkeypatch.setattr(library, name, tmp_path / "guard" / name.lower())
+
+
+@pytest.fixture(autouse=True)
+def _never_touch_real_autostart(monkeypatch):
+    """Building a MainWindow re-points an existing "start with Windows" entry at this
+    copy of the app; in tests that would rewrite the developer's real Run key. Tests
+    that exercise autostart put their own fake winreg in."""
+    from soundboard import autostart
+    monkeypatch.setattr(autostart, "winreg", None)
+
+
+@pytest.fixture(autouse=True)
+def _fail_on_swallowed_exceptions(monkeypatch):
+    """An exception in a Qt slot, a worker thread or the crash reporter never reaches
+    pytest: PySide hands it to sys.excepthook and carries on, so the test passes while
+    the user would get the crash dialog. Collect them and fail the test instead."""
+    import threading
+
+    from soundboard import applog
+    seen = []
+    monkeypatch.setattr(sys, "excepthook", lambda t, v, tb: seen.append((t, v, tb)))
+    monkeypatch.setattr(threading, "excepthook",
+                        lambda a: seen.append((a.exc_type, a.exc_value, a.exc_traceback)))
+    real_report = applog.report
+
+    def report(exc_info=None, where="", fatal=False):
+        if exc_info is None:
+            exc_info = sys.exc_info()
+        elif isinstance(exc_info, BaseException):
+            exc_info = (type(exc_info), exc_info, exc_info.__traceback__)
+        if exc_info[0] is not None:
+            seen.append(exc_info)
+        return None
+    monkeypatch.setattr(applog, "report", report)
+    monkeypatch.setattr(applog, "_real_report", real_report, raising=False)
+    yield seen
+    if seen:
+        import traceback
+        text = "\n".join("".join(traceback.format_exception(*e)) for e in seen)
+        pytest.fail(f"{len(seen)} exception(s) escaped to the crash reporter:\n{text}",
+                    pytrace=False)
+
+
+@pytest.fixture(autouse=True)
+def _no_blocking_message_boxes(monkeypatch):
+    """A QMessageBox.question / warning / … nobody expected would wait forever for a
+    click on the offscreen platform and hang the whole run. Answer them with Cancel
+    (or OK) instead; tests that care patch them with their own answer."""
+    try:
+        from PySide6.QtWidgets import QMessageBox
+    except ImportError:
+        return
+    monkeypatch.setattr(QMessageBox, "question", lambda *a, **k: QMessageBox.Cancel)
+    for name in ("warning", "information", "critical"):
+        monkeypatch.setattr(QMessageBox, name, lambda *a, **k: QMessageBox.Ok)

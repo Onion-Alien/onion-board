@@ -44,7 +44,7 @@ def test_preset_turns_the_changer_on_and_configures_the_chain(panel):
     assert spec["enabled"] and spec["preset"] == "Robot"
     assert spec["effects"]["robot"]["on"] and not spec["effects"]["pitch"]["on"]
     p.chain.process(np.zeros((32, 2), np.float32), 48000)
-    assert [e.type for e in p.chain._effects] == ["robot", "reverb"]
+    assert [e.type for e in p.chain._effects] == ["robot", "compressor", "reverb"]
 
 
 def test_editing_a_slider_switches_to_custom(panel):
@@ -180,3 +180,170 @@ def test_downloaded_language_needs_a_windows_voice_and_uses_it(panel, monkeypatc
     assert s.said_log.toPlainText().endswith("Hallo   (you said: Hello)")
     s._remove_download()
     assert not d.exists() and "(download" in s.cb_lang.currentText()
+
+
+def test_voice_installed_in_windows_settings_is_found_on_return(panel, qapp, monkeypatch):
+    from PySide6.QtCore import Qt
+    from PySide6.QtGui import QDesktopServices
+    from soundboard.speech import translation
+    p, _ = panel
+    s = p.speech
+    assert process_events(qapp, lambda: not s._loading())    # the first voice load
+    s.cb_lang.setCurrentIndex(s.cb_lang.findData("zh"))
+    d = translation.model_dir(s._lang())
+    (d / "model").mkdir(parents=True)
+    (d / "model" / "model.bin").write_bytes(b"x")
+    (d / "sentencepiece.model").write_bytes(b"x")
+    tts_ = s.ctl.tts
+    tts_.voices, tts_.voice_langs = ["Microsoft Zira Desktop"], {"Microsoft Zira Desktop": "en-US"}
+    s._fill_langs()
+    assert not s.b_voices.isHidden() and not s.b_voices_check.isHidden()
+    assert "Add-ons" not in s.lbl_tr.text()
+    s._app_state(Qt.ApplicationActive)          # not sent to settings: no rescan
+    opened = []
+    monkeypatch.setattr(QDesktopServices, "openUrl", lambda url: opened.append(url))
+    s.b_voices.click()
+    assert opened and s._voice_wait
+
+    def installed(self):
+        self.voices = ["Microsoft Zira Desktop", "Microsoft Huihui Desktop"]
+        self.voice_langs = {"Microsoft Zira Desktop": "en-US",
+                            "Microsoft Huihui Desktop": "zh-CN"}
+        return self.voices
+    monkeypatch.setattr(tts.SapiTTS, "refresh", installed)
+    s._app_state(Qt.ApplicationActive)          # back from settings: looks again by itself
+    assert process_events(qapp, lambda: "Huihui says it in Chinese" in s.lbl_tr.text())
+    assert s.b_voices.isHidden() and s.b_voices_check.isHidden() and not s._voice_wait
+    assert s.b_voice_install.isHidden()
+
+
+def _chinese_without_a_voice(s, qapp):
+    from soundboard.speech import translation
+    assert process_events(qapp, lambda: not s._loading())
+    s.cb_lang.setCurrentIndex(s.cb_lang.findData("zh"))
+    d = translation.model_dir(s._lang())
+    (d / "model").mkdir(parents=True)
+    (d / "model" / "model.bin").write_bytes(b"x")
+    (d / "sentencepiece.model").write_bytes(b"x")
+    s.ctl.tts.voices = ["Microsoft Zira Desktop"]
+    s.ctl.tts.voice_langs = {"Microsoft Zira Desktop": "en-US"}
+    s._fill_langs()
+
+
+def _huihui_arrives(monkeypatch):
+    def installed(self):
+        self.voices = ["Microsoft Zira Desktop", "Microsoft Huihui"]
+        self.voice_langs = {"Microsoft Zira Desktop": "en-US", "Microsoft Huihui": "zh-CN"}
+        return self.voices
+    monkeypatch.setattr(tts.SapiTTS, "refresh", installed)
+
+
+def test_one_click_voice_install_then_its_picked_up(panel, qapp, monkeypatch):
+    import threading
+    from soundboard.speech import winvoices
+    p, _ = panel
+    s = p.speech
+    _chinese_without_a_voice(s, qapp)
+    assert not s.b_voice_install.isHidden() and "Chinese voice" in s.b_voice_install.text()
+    assert s._voice_timer.isActive()               # watching for it to turn up
+    go = threading.Event()
+    asked = []
+    monkeypatch.setattr(winvoices, "install", lambda lang: (asked.append(lang), go.wait(5),
+                                                            "ok")[-1])
+    _huihui_arrives(monkeypatch)
+    s.b_voice_install.click()
+    assert not s.b_voice_install.isEnabled() and "Installing" in s.lbl_tr.text()
+    s.b_voice_install.click()                      # a second click does nothing
+    go.set()
+    assert process_events(qapp, lambda: "Huihui says it in Chinese" in s.lbl_tr.text())
+    assert asked == ["zh"]
+    assert s.b_voice_install.isHidden() and not s._voice_timer.isActive()
+
+
+def test_voice_install_cancelled_or_failed_says_so(panel, qapp, monkeypatch):
+    from soundboard.speech import winvoices
+    p, _ = panel
+    s = p.speech
+    _chinese_without_a_voice(s, qapp)
+
+    def cancel(lang):
+        raise winvoices.Cancelled()
+    monkeypatch.setattr(winvoices, "install", cancel)
+    s.b_voice_install.click()
+    assert process_events(qapp, lambda: "permission prompt was closed" in s.lbl_tr.text())
+    assert s.b_voice_install.isEnabled() and not s.b_voices.isHidden()
+
+    def fail(lang):
+        raise RuntimeError("0x800f0954")
+    monkeypatch.setattr(winvoices, "install", fail)
+    s.b_voice_install.click()
+    assert process_events(qapp, lambda: "0x800f0954" in s.lbl_tr.text())
+    assert s.b_voice_install.isEnabled()
+
+
+def test_new_voice_is_used_mid_talk_without_a_restart(panel, qapp, monkeypatch):
+    from soundboard.speech import winvoices
+    p, _ = panel
+    s = p.speech
+    _chinese_without_a_voice(s, qapp)
+    monkeypatch.setattr(s.ctl, "start_live", lambda mod, args=(): None)
+    monkeypatch.setattr(type(s.ctl), "live", property(lambda self: True))
+    s.module = s.module or object()
+    s._toggle_live(True)
+    assert s.ctl.live_voice is None                # nothing speaks Chinese yet
+    old = frozenset({"MSTTS_V110_enUS_ZiraM"})
+    s._voice_fp = old
+    monkeypatch.setattr(winvoices, "fingerprint", lambda: old)
+    s._poll_voices()                               # nothing changed: no reload
+    assert not s._loading()
+    _huihui_arrives(monkeypatch)
+    monkeypatch.setattr(winvoices, "fingerprint",
+                        lambda: old | {"MSTTS_V110_zhCN_HuihuiM"})
+    s._poll_voices()
+    assert process_events(qapp, lambda: s.ctl.live_voice == "Microsoft Huihui")
+    assert "Huihui speaks" in s.lbl_state.text()
+
+
+def test_update_shows_progress_and_blocks_a_second_install(panel, qapp, monkeypatch):
+    from soundboard import applog
+    from soundboard import modules as mods
+    p, _ = panel
+    s = p.speech
+    if s.module is None:
+        pytest.skip("no live-voice add-on in this checkout")
+    started = []
+
+    def boom(info, on_line):
+        started.append(info)
+        on_line("> pip install")
+        raise OSError("disk full")
+
+    monkeypatch.setattr(mods, "install", boom)
+    monkeypatch.setattr(applog, "report", lambda **k: None)
+    s._install()
+    assert not s.b_update.isEnabled() and not s.b_install.isEnabled()
+    s._install()                                   # a double-click: still one pip
+    assert process_events(qapp, lambda: s.b_update.isEnabled())
+    assert len(started) == 1 and not s.lbl_install.isHidden()
+    assert "disk full" in s.lbl_install.text() and "again" in s.lbl_install.text()
+    assert s.b_update.text() == "Update speech recognition"
+
+
+def test_no_update_button_without_the_addon(panel):
+    p, _ = panel
+    s = p.speech
+    s.module = None
+    s._refresh_module()
+    assert s.b_update.isHidden()
+    s._install()                                   # nothing to install: no thread, no crash
+    assert not s._installing
+
+
+def test_a_live_voice_that_cant_load_turns_the_button_back_off(panel):
+    p, _ = panel
+    s = p.speech
+    s._set_live_ui(True, "starting…")
+    s._on_event({"type": "error", "text": "no model"})
+    s._on_event({"type": "stopped", "text": "no model"})
+    assert not s.b_live.isChecked() and "no model" in s.lbl_state.text()
+    assert s.b_update.isEnabled()

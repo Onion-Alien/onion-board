@@ -2,6 +2,68 @@
 
 ## Unreleased
 
+- **The Browser tab is gone; search the web from the Sounds tab instead.** Its
+  audio stuttered, the page hitched when switching modes, and it cost the game
+  a whole Chromium. Type in *Search sounds* and press Enter (or *Search*): the
+  results replace the pads, and the **YouTube** / **SoundCloud** buttons above
+  them switch sites. *Play* plays a result once, *Add* keeps it as a pad — only
+  the audio is downloaded. TikTok, Instagram, X, Reddit and the rest have no
+  search without an account, so paste a link to the video instead. The
+  Browser hotkeys (record, last 15 s, play / pause, LIVE) went with it; the
+  Radio tab keeps its own *Record* and *Last 15s*.
+- **Pick several pads at once.** Ctrl+click adds or removes a pad, Shift+click
+  picks a range, Ctrl+A picks everything showing, Esc clears. A bar under the pads
+  (or right-clicking a picked pad) changes them all: colour, volume, fades,
+  categories, export, or *Delete* — one *Undo* brings them all back.
+- **Fade in / fade out per sound.** *Edit…* → *Fade in* / *Fade out* (up to 10 s).
+  Stopping a sound fades it out instead of cutting it, and one that isn't looping
+  fades over its last seconds. *Stop everything* still cuts straight away.
+- **A "play a random sound" hotkey.** Settings → Hotkeys: plays a random sound from
+  the category showing, never the same one twice in a row. Each category can have
+  its own (right-click its tab → *Set a random-sound hotkey…*).
+- **Remote control for Stream Deck and scripts (opt-in).** Settings → General →
+  *Remote control* starts a small API on `127.0.0.1`: `/api/play?name=Airhorn`,
+  `/api/random?category=Memes`, `/api/stop`, `/api/pause`, `/api/sounds`… Every
+  request needs the key shown there. Works with a Stream Deck's API-request /
+  website buttons, Bitfocus Companion, Touch Portal, AutoHotkey or `curl`.
+- **Screen readers.** Pads are real buttons now: a screen reader reads each
+  sound's name, then whether it's playing, its hotkey, length and categories.
+  Tab and the arrow keys move between pads, Enter or Space plays, Ctrl+Space
+  picks, the Menu key opens a pad's menu. Icon-only buttons (■, ✕, ⚙…) get names
+  from their tooltips.
+- **Trim a sound.** Right-click a pad → *Effects…* → *Trim*: drag the start and
+  end handles on the waveform (or type exact times) and only that part plays —
+  keep one line out of a 4-minute video. It's stored with the sound's effects, so
+  the file is never cut and *Keep all* undoes it at any time. Presets keep the trim.
+- **Categories.** Tabs above the pads (*+ Category*); a sound can be in several
+  (right-click a pad → *Categories*). Search finds category names too. The in-game
+  overlay shows the same category, and **R** (numpad **\***) switches category
+  from inside the game.
+- **Remove can be undone.** No more "Are you sure?": *Removed “…” · Undo* stays
+  up for 10 seconds, and afterwards the audio file goes to the Recycle Bin
+  instead of being deleted.
+- **Backup, move to a new PC, share.** *Backup → Export everything* writes every
+  sound (with its picture, effects, hotkey and categories) and your settings to
+  one `.zip`; *Import…* (or dropping the zip on the pads) brings it back on any
+  PC. Categories and single pads export as sound packs; importing skips sounds
+  you already have, and a backup's settings are only used if you say so (your
+  devices are never touched). The format is documented in
+  `docs/BACKUP-FORMAT.md`.
+- **Keeps running in the tray.** Closing the window no longer stops your hotkeys:
+  the app stays in the tray (right-click → *Quit* to exit; switch it off in
+  Settings → General). New: *Start with Windows*, straight to the tray.
+- **Update check (opt-in).** Settings → General → *Tell me when a new version is
+  out* asks GitHub once a day and shows an *Update* button when there is one. It
+  never downloads anything itself; *Check now* works without the opt-in.
+- **When something breaks, you can tell us in two clicks.** Any error the app
+  didn't expect — on any thread, not just the window's — now opens a *hit a
+  problem* window with the full report: what failed, where, and the last lines
+  of the log, with your Windows user name and folders already blanked out.
+  *Report on GitHub* copies it and opens a new issue for you to paste into;
+  *Copy report* lets you send it any other way. Nothing is sent by itself. The
+  same bug won't pop up twice, and a report is kept in
+  `%APPDATA%\OnionBoard\crash-reports\` (last 10). If the app can't start at
+  all, it now says why instead of silently not appearing.
 - **Who's listening (Settings → General).** Voice chat runs your sounds through
   a mono voice codec. Measured: it drops the sub-bass under 100 Hz everywhere,
   and Steam voice cuts everything above 12 kHz (some game codecs above 8 kHz);
@@ -12,6 +74,44 @@
   you monitor is what they hear. *Custom modes…* describes any other service by
   the same knobs. Off (the default) sends sounds exactly as mixed. For
   developers, `scripts/codec_bench.py` is the measuring tool behind it.
+- **Apps tab: send one program's sound through your mic.** Pick any program
+  that's playing — a music player, a browser, a game, even a call in another
+  app — and its sound goes out to whoever's listening, on its own volume, without
+  touching anything else you play. It's a copy: the program keeps playing on your
+  speakers as before. Each program has **Send**, a volume and *Hear it myself*;
+  programs you switch on are remembered by their .exe and picked up again next
+  time they run. Auto push-to-talk counts them, and Stop all switches them off.
+  Uses Windows' per-process loopback (Windows 11, or Windows 10 build 20348+).
+- **Fewer restarts after installing the virtual cable.** If Windows says the new
+  cable needs a restart, the installer first tries to wake it without one:
+  it restarts the cable's devices and the Windows audio service, then waits
+  longer for it to come up. You only get asked to restart if that fails too.
+  It now asks for permission once, up front. In the setup guide, **Install it
+  now** sets Bun off: he dashes away, there's a cartoon dust cloud, and he comes
+  back with a hammer and a plank and builds while a checklist shows each step
+  (downloading, installing, checking, waking it up). If Windows still wants a
+  restart, restart whenever suits you: after you next log in, Onion Board opens
+  by itself (once) on the cable step. Bun welcomes you back when it's working,
+  or you can **try once more without restarting**. This uses a per-user RunOnce
+  entry, so there's no background task and nothing is left behind.
+
+- **Renamed to Onion Board.** Was Soundboard. `%APPDATA%\Soundboard` is migrated
+  to `%APPDATA%\OnionBoard` automatically on first launch (settings, sounds,
+  cache, browser profile — nothing is lost). The exe, log file name, debug env
+  var (`ONIONBOARD_DEBUG`) and app identifiers changed to match.
+
+- **Radio tab.** Listen to ~60 000 internet radio stations from around the world
+  (the free, open [Radio Browser](https://www.radio-browser.info) directory). A 3D
+  globe shows the most-listened ~3000 as dots: spin it, hover for the name, click
+  to tune in. Or search by name, genre or country. Stars keep your favourites.
+  The radio has its own volume, *Hear it myself* and **LIVE** (off every launch),
+  so it can go out through your mic like the Browser tab, and *Record* / *Last
+  15s* turn it into pads. Stop all stops it too, and auto push-to-talk counts it.
+  Hovering a dot shows a card with the station's country and region, genres,
+  language, audio quality, plays today (and the trend), votes and when it was last
+  checked working. Zoom with the scroll wheel, Ctrl +/− or the corner buttons;
+  ☾ / ☀ switches between the daytime Earth and the city-lights night view.
+
 - **Voice changer voices rebuilt.** The pitch shifter is now a WSOLA splice
   shifter (the SoundTouch approach) instead of a two-head delay line, so Chipmunk,
   Deep voice and Demon no longer warble; Robot is a 16-band vocoder (words on a

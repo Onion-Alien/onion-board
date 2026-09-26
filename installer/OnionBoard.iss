@@ -1,6 +1,6 @@
-; SoundboardSetup.exe: one file a non-technical person double-clicks on a fresh PC.
+; OnionBoardSetup.exe: one file a non-technical person double-clicks on a fresh PC.
 ;
-;   - no Python needed: it ships the PyInstaller build (dist\Soundboard)
+;   - no Python needed: it ships the PyInstaller build (dist\OnionBoard)
 ;   - no admin needed for the app itself (installs per user, like Discord does)
 ;   - a "Pick what you want" page of checkboxes:
 ;       * the free VB-Cable virtual cable (downloaded from vb-audio.com,
@@ -9,13 +9,14 @@
 ;         already there or winget isn't)
 ;       * the add-on modules in ..\modules (retro voice effect, live voice-to-speech)
 ;       * a Desktop shortcut
-;   - then opens Soundboard, whose Quick setup asks which mic they use and walks
+;   - then opens Onion Board, whose Quick setup asks which mic they use and walks
 ;     them through Discord
 ;
 ; Silent installs (/VERYSILENT) use each box's default, or the choices from the
 ; last install. Built by build.ps1 (needs Inno Setup 6: winget install JRSoftware.InnoSetup).
 
-#define AppName "Soundboard"
+#define AppName "Onion Board"
+#define AppExeName "OnionBoard"
 #ifndef AppVersion
   #define AppVersion "0.2.0"
 #endif
@@ -24,8 +25,8 @@
 AppId={{6B0B6E2F-6D63-4C1B-9E0B-5B8E3C2A71D4}
 AppName={#AppName}
 AppVersion={#AppVersion}
-AppPublisher=Soundboard
-DefaultDirName={localappdata}\Programs\{#AppName}
+AppPublisher=Onion Board
+DefaultDirName={localappdata}\Programs\{#AppExeName}
 DefaultGroupName={#AppName}
 PrivilegesRequired=lowest
 DisableDirPage=yes
@@ -38,9 +39,9 @@ SetupIconFile=..\soundboard.ico
 ; Bun the mascot, rendered by make_bunny.py (build.ps1 runs it)
 WizardImageFile=wizard-1x.bmp,wizard-2x.bmp
 WizardSmallImageFile=wizard-small-1x.bmp,wizard-small-2x.bmp
-UninstallDisplayIcon={app}\Soundboard.exe
+UninstallDisplayIcon={app}\{#AppExeName}.exe
 OutputDir=..\dist
-OutputBaseFilename=SoundboardSetup
+OutputBaseFilename=OnionBoardSetup
 Compression=lzma2/max
 SolidCompression=yes
 ArchitecturesAllowed=x64compatible
@@ -48,29 +49,29 @@ ArchitecturesInstallIn64BitMode=x64compatible
 CloseApplications=yes
 
 [Messages]
-WelcomeLabel1=Let's set up Soundboard
-WelcomeLabel2=This puts Soundboard on your PC and adds the free "virtual cable" it needs, so Discord and your games can hear your sounds.%n%nOn the next page you can tick any extras you want. When Windows asks for permission, click Yes.%n%nClick Next to start.
+WelcomeLabel1=Let's set up Onion Board
+WelcomeLabel2=This puts Onion Board on your PC and adds the free "virtual cable" it needs, so Discord and your games can hear your sounds.%n%nOn the next page you can tick any extras you want. When Windows asks for permission, click Yes.%n%nClick Next to start.
 WizardSelectTasks=Pick what you want
 SelectTasksDesc=Tick the things you'd like. If you're not sure, leave them as they are.
 SelectTasksLabel2=The ticked boxes are what most people want. Click Install when you're ready.
 FinishedHeadingLabel=All done!
-FinishedLabel=Soundboard is installed. It will open now and ask you a few easy questions (which mic you use, where you listen).%n%nYou can find it later on your Desktop or in the Start menu.
-FinishedRestartLabel=Soundboard is installed. To finish setting up the virtual cable, Windows needs to restart your PC.%n%nAfter the restart, open Soundboard from the Start menu and it will pick up where it left off.
+FinishedLabel=Onion Board is installed. It will open now and ask you a few easy questions (which mic you use, where you listen).%n%nYou can find it later on your Desktop or in the Start menu.
+FinishedRestartLabel=Onion Board is installed. To finish setting up the virtual cable, Windows needs to restart your PC.%n%nAfter the restart, open Onion Board from the Start menu and it will pick up where it left off.
 
 [Tasks]
 Name: "vbcable"; Description: "The free virtual cable (VB-Cable): lets Discord and games hear your sounds. Needed unless you already have one."; GroupDescription: "Needed"
 Name: "ffmpeg"; Description: "Play M4A, AAC and video files (installs the free FFmpeg, about 100 MB)"; GroupDescription: "Extras"; Check: CanOfferFfmpeg
 Name: "livevoice"; Description: "Set up live voice-to-speech now: you talk, others hear a text-to-speech voice. Needs Python from python.org; downloads about 300 MB. (You can also do this later from the Voice tab.)"; GroupDescription: "Extras"; Flags: unchecked
-Name: "desktopicon"; Description: "Put a Soundboard shortcut on my Desktop"; GroupDescription: "Shortcuts"
+Name: "desktopicon"; Description: "Put an Onion Board shortcut on my Desktop"; GroupDescription: "Shortcuts"
 
 [Files]
 ; Includes the add-ons in {app}\modules (build.ps1 copies them in; see soundboard/modules.py).
 ; live-voice's own .venv is made later, by the "livevoice" task or the Voice tab's button.
-Source: "..\dist\Soundboard\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "..\dist\OnionBoard\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 
 [Icons]
-Name: "{autodesktop}\{#AppName}"; Filename: "{app}\Soundboard.exe"; Tasks: desktopicon
-Name: "{autoprograms}\{#AppName}"; Filename: "{app}\Soundboard.exe"
+Name: "{autodesktop}\{#AppName}"; Filename: "{app}\{#AppExeName}.exe"; AppUserModelID: "OnionBoard.App"; Tasks: desktopicon
+Name: "{autoprograms}\{#AppName}"; Filename: "{app}\{#AppExeName}.exe"; AppUserModelID: "OnionBoard.App"
 
 [Run]
 ; The virtual cable is installed from CurStepChanged in [Code], so its exit code can
@@ -83,13 +84,18 @@ Filename: "{cmd}"; Parameters: "/c ""{app}\modules\live-voice\install.bat"" --qu
   WorkingDir: "{app}\modules\live-voice"; \
   StatusMsg: "Setting up live voice-to-speech (downloads about 300 MB, can take a few minutes)..."; \
   Tasks: livevoice; Check: HasPython; Flags: runhidden waituntilterminated
-Filename: "{app}\Soundboard.exe"; Description: "Open Soundboard now"; Flags: nowait postinstall skipifsilent
+Filename: "{app}\{#AppExeName}.exe"; Description: "Open Onion Board now"; Flags: nowait postinstall skipifsilent
+
+[Registry]
+; "Start with Windows" (Settings → General) writes this value; nothing is created at
+; install, but uninstalling removes it so Windows doesn't try to start a removed app.
+Root: HKCU; Subkey: "Software\Microsoft\Windows\CurrentVersion\Run"; ValueType: none; ValueName: "OnionBoard"; Flags: uninsdeletevalue dontcreatekey
 
 [UninstallDelete]
 ; made after install: a module's own Python environment and bytecode
 Type: filesandordirs; Name: "{app}\modules"
 
-; Uninstalling leaves %APPDATA%\Soundboard (their sounds and settings), the cable and
+; Uninstalling leaves %APPDATA%\OnionBoard (their sounds and settings), the cable and
 ; FFmpeg in place.
 
 [Code]
@@ -137,6 +143,12 @@ begin
           ExpandConstant('{app}\_internal\install-vbcable.ps1') + '" -Silent',
           '', SW_HIDE, ewWaitUntilTerminated, Code) then
     CableNeedsRestart := (Code = 3010);
+  // after that restart, open the app once by itself on the setup guide's cable step
+  // (the same per-user RunOnce entry the guide sets; Windows deletes it as it runs)
+  if CableNeedsRestart then
+    RegWriteStringValue(HKCU, 'Software\Microsoft\Windows\CurrentVersion\RunOnce',
+      'OnionBoardResumeSetup',
+      '"' + ExpandConstant('{app}\{#AppExeName}.exe') + '" --resume-setup');
 end;
 
 function NeedRestart(): Boolean;
@@ -151,6 +163,6 @@ begin
   if (CurStep = ssPostInstall) and WizardIsTaskSelected('livevoice') and not HasPython then
     SuppressibleMsgBox('Live voice-to-speech needs Python, which isn''t on this PC yet.' + #13#10#13#10 +
       'Get it free from python.org (tick "Add python.exe to PATH" while installing it). ' +
-      'Then in Soundboard open the Voice tab and press Install.',
+      'Then in Onion Board open the Voice tab and press Install.',
       mbInformation, MB_OK, IDOK);
 end;

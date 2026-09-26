@@ -113,6 +113,11 @@ class VoiceChain:
         self._rebuild(self._rate)
 
     def _rebuild(self, rate: int):
+        if not rate:
+            # no mic block yet: effects need the rate, so process() builds them on the
+            # first block (building now could fail and bypass them for good)
+            self._effects = ()
+            return
         wanted = self._spec.get("effects", {})
         old = {e.type: e for e in self._effects}
         new = []
@@ -121,10 +126,17 @@ class VoiceChain:
             if not cfg or not cfg.get("on") or etype in self.errors:
                 continue
             e = old.get(etype)
-            if e is None or e.rate != rate or type(e) is not cls:
-                e = cls(rate, cfg)
-            else:
-                e.set_values(cfg)        # keep its state: no click when a slider moves
+            try:
+                if e is None or e.rate != rate or type(e) is not cls:
+                    e = cls(rate, cfg)
+                else:
+                    e.set_values(cfg)    # keep its state: no click when a slider moves
+            except Exception as ex:  # noqa: BLE001
+                # like a failing run(): the effect is left out and the voice panel
+                # shows why (runs on the mic thread too, when the mic's rate changes)
+                self.errors[etype] = str(ex) or type(ex).__name__
+                log.error("voice effect %r failed to start; bypassed", etype, exc_info=ex)
+                continue
             new.append(e)
         self._effects = tuple(new)
 

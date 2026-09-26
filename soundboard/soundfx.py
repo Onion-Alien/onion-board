@@ -10,8 +10,13 @@ stays readable and new keys can be added without a migration:
      "eq": [0.0] * 7,     dB per eq.BANDS band
      "gain_db": 0.0,      -24..36   boost; above 0 dBFS the sound clips (that's the point)
      "reverse": False,
+     "start": 0.0,        seconds into the original where the sound starts (trim)
+     "end": 0.0,          seconds into the original where it ends; 0 = the very end
      "effects": {type: {"on": bool, param: value, ...}}}   any voicefx effect,
                                                             modules' included
+
+The trim is applied first, to the original, so the file itself is never cut and
+the trim can be moved or undone at any time.
 
 Speed and pitch are independent: pitch is a high-quality resample (which also
 changes length), then a phase vocoder stretches the result to the length the
@@ -35,13 +40,15 @@ F32 = np.float32
 SPEED_RANGE = (0.25, 4.0)
 PITCH_RANGE = (-24.0, 24.0)
 GAIN_RANGE = (-24.0, 36.0)
+MAX_TRIM_S = 24 * 3600.0
+MIN_TRIM_S = 0.05     # the shortest trimmed sound
 TAIL_S = 3.0          # room left for echo / reverb tails (trimmed back to the sound)
 BLOCK = 2048          # effects run in blocks like they do on the mic
 
 
 def neutral() -> dict:
     return {"speed": 1.0, "pitch": 0.0, "tape": False, "eq": [0.0] * len(eq.BANDS),
-            "gain_db": 0.0, "reverse": False, "effects": {}}
+            "gain_db": 0.0, "reverse": False, "start": 0.0, "end": 0.0, "effects": {}}
 
 
 def clean(fx: dict | None) -> dict:
@@ -58,6 +65,10 @@ def clean(fx: dict | None) -> dict:
     out["speed"] = num("speed", *SPEED_RANGE)
     out["pitch"] = num("pitch", *PITCH_RANGE)
     out["gain_db"] = num("gain_db", *GAIN_RANGE)
+    out["start"] = num("start", 0.0, MAX_TRIM_S)
+    out["end"] = num("end", 0.0, MAX_TRIM_S)
+    if out["end"] and out["end"] <= out["start"] + MIN_TRIM_S:
+        out["end"] = 0.0   # nothing (or next to nothing) left: keep the whole sound
     out["tape"] = bool(fx.get("tape", False))
     out["reverse"] = bool(fx.get("reverse", False))
     g = fx.get("eq")
@@ -76,18 +87,28 @@ def _active_effects(fx: dict) -> list[str]:
     return [t for t, cfg in fx["effects"].items() if cfg.get("on") and t in voicefx.REGISTRY]
 
 
+def is_trimmed(fx: dict | None) -> bool:
+    f = clean(fx)
+    return f["start"] >= 1e-3 or f["end"] >= 1e-3
+
+
 def is_neutral(fx: dict | None) -> bool:
     """True if these settings leave the sound exactly as it is."""
     f = clean(fx)
-    return (abs(f["speed"] - 1) < 1e-3 and abs(f["pitch"]) < 1e-3 and abs(f["gain_db"]) < 1e-3
-            and not f["reverse"] and eq.design(f["eq"], SR) is None and not _active_effects(f))
+    return (not is_trimmed(f) and abs(f["speed"] - 1) < 1e-3 and abs(f["pitch"]) < 1e-3
+            and abs(f["gain_db"]) < 1e-3 and not f["reverse"]
+            and eq.design(f["eq"], SR) is None and not _active_effects(f))
 
 
 def key(fx: dict | None) -> str:
     """Short stable id of the settings ('' for none): the cache file suffix."""
     if is_neutral(fx):
         return ""
-    text = json.dumps(clean(fx), sort_keys=True)
+    f = clean(fx)
+    for k in ("start", "end"):   # untrimmed sounds keep the keys (and caches) they had
+        if not f[k]:
+            del f[k]
+    text = json.dumps(f, sort_keys=True)
     return hashlib.blake2b(text.encode(), digest_size=6).hexdigest()
 
 
@@ -97,6 +118,8 @@ def summary(fx: dict | None) -> str:
         return ""
     f = clean(fx)
     bits = []
+    if is_trimmed(f):
+        bits.append(f"trimmed {fmt_s(f['start'])}–{fmt_s(f['end']) if f['end'] else 'end'}")
     if abs(f["speed"] - 1) >= 1e-3:
         bits.append(f"{f['speed']:.2g}x" + (" tape" if f["tape"] else ""))
     if abs(f["pitch"]) >= 1e-3:
@@ -109,6 +132,24 @@ def summary(fx: dict | None) -> str:
     if f["reverse"]:
         bits.append("reversed")
     return ", ".join(bits)
+
+
+def fmt_s(s: float) -> str:
+    """0:03.2 style: minutes, seconds and a tenth (trim points need the tenth)."""
+    s = max(0.0, s)
+    m, sec = divmod(s, 60)
+    return f"{int(m)}:{sec:04.1f}"
+
+
+def trim(x: np.ndarray, fx: dict | None) -> np.ndarray:
+    """The part of (n, 2) audio at SR that the trim keeps (all of it if untrimmed)."""
+    f = clean(fx)
+    a = min(int(round(f["start"] * SR)), len(x))
+    b = int(round(f["end"] * SR)) if f["end"] else len(x)
+    b = min(max(b, a), len(x))
+    if b - a < int(MIN_TRIM_S * SR):   # a trim past the end of this sound: ignore it
+        return x
+    return x[a:b]
 
 
 # --------------------------------------------------------------------------- stretch
@@ -215,9 +256,14 @@ def _run_effects(x: np.ndarray, fx: dict) -> np.ndarray:
         cfg = fx["effects"][t]
         chans = []
         for c in range(2):          # voice effects are mono: one instance per channel
-            e = cls(SR, cfg)
             src = np.ascontiguousarray(x[:, c])
             parts = []
+            try:
+                e = cls(SR, cfg)
+            except Exception:  # noqa: BLE001 - a module effect that can't even start
+                log.exception("sound effect %r failed to start; skipped", t)
+                chans.append(src)
+                continue
             for i in range(0, len(src), BLOCK):
                 blk = src[i:i + BLOCK]
                 try:
@@ -242,7 +288,8 @@ def render(data: np.ndarray, fx: dict | None) -> np.ndarray:
     (m, 2) float32 at SR out, clipped to [-1, 1]. Slow for long sounds (the
     stretch): call it off the UI thread."""
     f = clean(fx)
-    x = data.astype(F32) * F32(1 / 32767.0) if data.dtype == np.int16 else data.astype(F32)
+    x = trim(data, f)
+    x = x.astype(F32) * F32(1 / 32767.0) if x.dtype == np.int16 else x.astype(F32)
     if is_neutral(f):
         return x
     x = change_speed_pitch(x, f["speed"], f["pitch"], f["tape"])

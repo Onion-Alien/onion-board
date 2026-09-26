@@ -4,7 +4,7 @@ Each part of the window registers "steps": a way to make itself smaller (hide a
 label, drop a button's text, stack two columns) with a priority. On every resize
 all steps are undone, then applied in priority order, lowest first, only while
 the window's content still doesn't fit. So a big window shows everything, and a
-small one keeps the controls that matter most (pads, play / stop, the browser's
+small one keeps the controls that matter most (pads, play / stop, the radio's
 LIVE button, the mic's send box) and hides the rest.
 
 Only register widgets whose visibility nothing else manages: undoing a step shows
@@ -53,11 +53,17 @@ def hide(*widgets: QWidget) -> Callable[[bool], None]:
 
 
 def icon_only(button: QPushButton) -> Callable[[bool], None]:
-    """Drop a button's text but keep its icon (its tooltip still explains it)."""
-    text = button.text()
+    """Drop a button's text but keep its icon (its tooltip still explains it).
 
+    The full text is kept in the "full_text" property, read back when it grows again,
+    so a label the app changes meanwhile (set that property too) isn't lost."""
     def apply(compact: bool):
-        button.setText("" if compact else text)
+        if compact:
+            if button.text():
+                button.setProperty("full_text", button.text())
+            button.setText("")
+        elif not button.text() and button.property("full_text"):
+            button.setText(button.property("full_text"))
         touch(button)
     return apply
 

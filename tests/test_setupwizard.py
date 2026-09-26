@@ -10,6 +10,7 @@ from soundboard.ui import setupwizard
 
 INS = ["Headset Mic (USB)", "Desk Mic", "CABLE Output (VB-Audio Virtual Cable)"]
 OUTS = ["Headphones (USB)", "Speakers", "CABLE Input (VB-Audio Virtual Cable)"]
+_REAL_RESUME = setupwizard.resume_after_restart   # before the autouse fixture swaps it
 
 
 @pytest.fixture
@@ -32,6 +33,14 @@ def devices(monkeypatch):
     return state
 
 
+@pytest.fixture(autouse=True)
+def resume(monkeypatch):
+    """Never touch the real RunOnce key: record what the guide asks for instead."""
+    calls = []
+    monkeypatch.setattr(setupwizard, "resume_after_restart", calls.append)
+    return calls
+
+
 @pytest.fixture
 def wizard(qapp, app_dir, devices):
     w = main.MainWindow()
@@ -40,6 +49,10 @@ def wizard(qapp, app_dir, devices):
     wiz.done(0)
     w._load_thread.join(15)
     w.close()
+    from PySide6.QtCore import QEvent   # free it (see test_mainwindow's window fixture)
+    wiz.deleteLater()
+    w.deleteLater()
+    qapp.sendPostedEvents(None, QEvent.DeferredDelete)
 
 
 def test_old_configs_skip_the_guide(app_dir):
@@ -148,7 +161,8 @@ def test_restart_marker_counts_only_until_the_pc_restarts(wizard, devices, app_d
     assert setupwizard.cable_restart_pending()       # written this boot
     wiz.go(2)
     wiz.recheck_cable()
-    assert not wiz.btn_restart.isHidden() and wiz.btn_cable.isHidden()
+    # restart, or have the installer try waking it once more (never a reinstall)
+    assert not wiz.btn_restart.isHidden() and "without restarting" in wiz.btn_cable.text()
 
     past = time.time() - 10 * 365 * 86400             # written before the last boot
     os.utime(marker, (past, past))
@@ -162,3 +176,189 @@ def test_test_sound_is_quiet_and_clickless():
     assert c.dtype.name == "float32" and c.shape[1] == 2
     assert abs(float(abs(c).max()) - setupwizard.TUNE_PEAK) < 1e-4   # not a blast
     assert abs(c[:5]).max() < 0.01 and abs(c[-5:]).max() < 0.01      # no clicks
+
+
+class _RunningProc:
+    rc = None
+
+    def poll(self):
+        return self.rc
+
+
+def test_install_shows_bun_building_and_each_step(wizard, devices, app_dir, monkeypatch):
+    devices["cable"] = False
+    w, wiz = wizard
+    wiz.go(2)
+    proc, argv = _RunningProc(), []
+    monkeypatch.setattr(setupwizard.subprocess, "Popen",
+                        lambda a, **kw: (argv.extend(a), proc)[1])
+    wiz.btn_cable.click()
+    status = app_dir / "cable-install-status.txt"
+    assert str(status) in argv
+    assert wiz.bun_cable.building and not wiz.cable_bar.isHidden()
+    assert wiz.btn_cable.isHidden()
+
+    status.write_text("download|Downloading...", encoding="utf-8-sig")   # PS 5.1 writes a BOM
+    wiz._tick()
+    status.write_text("install|Installing...", encoding="utf-8-sig")
+    wiz._tick()
+    steps = wiz.cable_steps.text()
+    assert "✓  Fetching the parts" in steps and "▶  Building your cable" in steps
+    assert "Waking" not in steps   # only listed if it happens
+
+    status.write_text("wake|...", encoding="utf-8-sig")
+    wiz._tick()
+    assert "▶  Waking it up" in wiz.cable_steps.text()
+
+    devices["cable"] = True
+    proc.rc = 0
+    wiz._tick()
+    assert not wiz.bun_cable.building and wiz.bun_cable.prop == "star"
+    assert wiz.cable_bar.isHidden() and "Installed" in wiz.cable_status.text()
+
+
+def test_install_that_still_needs_a_restart_stops_bun(wizard, devices, monkeypatch):
+    devices["cable"] = False
+    w, wiz = wizard
+    wiz.go(2)
+    proc = _RunningProc()
+    monkeypatch.setattr(setupwizard.subprocess, "Popen", lambda a, **kw: proc)
+    wiz.install_cable()
+    proc.rc = setupwizard.RESTART_NEEDED
+    wiz._tick()
+    assert not wiz.bun_cable.building and wiz.bun_cable.prop == "plug"
+    assert "open by itself" in wiz.cable_status.text()
+    # the installer already tried waking it, so only the restart is offered
+    assert not wiz.btn_restart.isHidden() and wiz.btn_cable.isHidden()
+
+
+def test_restart_needed_reopens_the_guide_after_it_then_clears(wizard, devices, resume):
+    devices["cable"] = False
+    w, wiz = wizard
+    wiz.go(2)
+    wiz._cable_tries, wiz._proc = 1, _DoneProc(setupwizard.RESTART_NEEDED)
+    wiz._tick()
+    assert resume[-1] is True          # come back by itself after the restart
+    devices["cable"] = True
+    wiz.recheck_cable()
+    assert resume[-1] is False         # works now: nothing to come back for
+
+
+def test_resumed_guide_starts_on_the_cable_and_welcomes_them_back(qapp, app_dir, devices):
+    w = main.MainWindow()
+    wiz = setupwizard.SetupWizard(w, resumed=True)
+    try:
+        assert wiz.stack.currentIndex() == 2
+        assert "Welcome back" in wiz.cable_status.text()
+        assert wiz.bun_cable.celebrate
+    finally:
+        wiz.done(0)
+        w._load_thread.join(15)
+        w.close()
+
+
+class _FakeKey:
+    def __init__(self, store):
+        self.store = store
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *a):
+        return False
+
+
+def test_resume_after_restart_writes_and_removes_the_runonce_entry(monkeypatch):
+    import sys
+    import types
+
+    store = {}
+    fake = types.SimpleNamespace(
+        HKEY_CURRENT_USER="HKCU", REG_SZ=1,
+        CreateKey=lambda root, path: (store.setdefault("path", path), _FakeKey(store))[1],
+        SetValueEx=lambda k, name, _r, _t, val: store.__setitem__(name, val),
+        DeleteValue=lambda k, name: store.pop(name) if name in store else
+        (_ for _ in ()).throw(FileNotFoundError()))
+    monkeypatch.setitem(sys.modules, "winreg", fake)
+    _REAL_RESUME(True)
+    assert store["path"].endswith(r"CurrentVersion\RunOnce")
+    cmd = store["OnionBoardResumeSetup"]
+    assert cmd.endswith(" --resume-setup") and "main.py" in cmd
+    _REAL_RESUME(False)
+    assert "OnionBoardResumeSetup" not in store
+    _REAL_RESUME(False)   # already gone: fine
+
+
+def test_mid_install_the_guide_stays_put_and_a_reopened_one_picks_it_up(
+        qapp, wizard, devices, monkeypatch):
+    devices["cable"] = False
+    w, wiz = wizard
+    wiz.go(2)
+    proc, starts = _RunningProc(), []
+    monkeypatch.setattr(setupwizard.subprocess, "Popen",
+                        lambda a, **kw: (starts.append(a), proc)[1])
+    wiz.install_cable()
+    assert not wiz.btn_next.isEnabled() and not wiz.btn_back.isEnabled()
+    asked = []
+    monkeypatch.setattr(setupwizard.QMessageBox, "question",
+                        lambda *a: (asked.append(a), setupwizard.QMessageBox.StandardButton.No)[1])
+    wiz.reject()                                   # Esc: asks, and "No" keeps it open
+    assert asked and wiz.result() == 0 and wiz._proc is proc
+    again = setupwizard.SetupWizard(w)             # closed anyway, then reopened
+    try:
+        assert again._proc is proc and again.stack.currentIndex() == 2
+        again.install_cable()
+        assert len(starts) == 1                    # never a second install
+        proc.rc = 0
+        again._tick()
+        assert again.btn_next.isEnabled() and setupwizard._installer is None
+    finally:
+        again.done(0)
+    wiz._proc = None
+
+
+def test_resumed_guide_with_the_cable_still_missing_offers_to_install_again(
+        qapp, app_dir, devices):
+    devices["cable"] = False
+    w = main.MainWindow()
+    wiz = setupwizard.SetupWizard(w, resumed=True)
+    try:
+        assert "still isn't showing up after the restart" in wiz.cable_status.text()
+        assert not wiz.btn_cable.isHidden() and "again" in wiz.btn_cable.text()
+    finally:
+        wiz.done(0)
+        w._load_thread.join(15)
+        w.close()
+
+
+def test_installer_that_cant_start_says_what_to_do(wizard, devices, monkeypatch):
+    devices["cable"] = False
+    w, wiz = wizard
+    wiz.go(2)
+
+    def fail(*a, **kw):
+        raise OSError(2, "The system cannot find the file specified")
+    monkeypatch.setattr(setupwizard.subprocess, "Popen", fail)
+    wiz.install_cable()
+    assert "Couldn't start the cable installer" in wiz.cable_status.text()
+    assert wiz._proc is None and wiz.btn_next.isEnabled()
+    monkeypatch.setattr(setupwizard.QMessageBox, "question",
+                        lambda *a: setupwizard.QMessageBox.StandardButton.Yes)
+    wiz.restart_pc()
+    assert "Start menu" in wiz.cable_status.text()
+
+
+def test_no_microphone_at_all_says_so(qapp, app_dir, devices, monkeypatch):
+    real = engine.list_devices
+    monkeypatch.setattr(engine, "list_devices",
+                        lambda kind: [] if kind == "input" else real(kind))
+    w = main.MainWindow()
+    wiz = setupwizard.SetupWizard(w)
+    try:
+        w.engine.mic_stream = None
+        wiz._tick()
+        assert "No microphone was found" in wiz.mic_heard.text()
+    finally:
+        wiz.done(0)
+        w._load_thread.join(15)
+        w.close()

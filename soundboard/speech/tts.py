@@ -16,6 +16,7 @@ from __future__ import annotations
 import base64
 import logging
 import os
+import queue
 import subprocess
 import tempfile
 import threading
@@ -30,8 +31,15 @@ import soundfile as sf
 log = logging.getLogger(__name__)
 
 TTS_RATE = 22050
+START_TIMEOUT_S = 30.0      # PowerShell + loading the speech APIs; a cold start is slow
+LINE_TIMEOUT_S = 30.0       # one sentence to a WAV file takes well under a second
 
 _SCRIPT = r"""
+# stdout as UTF-8 without a BOM (a pipe otherwise gets the OEM code page, e.g. IBM437)
+$o = New-Object IO.StreamWriter([Console]::OpenStandardOutput(),
+    (New-Object Text.UTF8Encoding $false))
+$o.AutoFlush = $true
+[Console]::SetOut($o)
 $ErrorActionPreference = 'Stop'
 Add-Type -AssemblyName System.Speech
 $s = New-Object System.Speech.Synthesis.SpeechSynthesizer
@@ -117,6 +125,7 @@ def _b64(s: str) -> str:
 class SapiTTS:
     def __init__(self):
         self._proc: subprocess.Popen | None = None
+        self._out: queue.Queue[str | None] = queue.Queue()   # the process's stdout lines
         self._lock = threading.Lock()
         self.voices: list[str] = []
         self.voice_langs: dict[str, str] = {}   # voice name -> its language, like "de-DE"
@@ -130,9 +139,14 @@ class SapiTTS:
             ["powershell.exe", "-NoProfile", "-NonInteractive", "-ExecutionPolicy", "Bypass",
              "-EncodedCommand", enc],
             stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL,
-            text=True, encoding="utf-8", bufsize=1,
+            # errors="replace": one odd byte must never kill the reader thread
+            text=True, encoding="utf-8", errors="replace", bufsize=1,
             creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0))
-        line = self._proc.stdout.readline().strip()
+        # read on a thread so a hung PowerShell can't hold the lock (and every line) forever
+        self._out = queue.Queue()
+        threading.Thread(target=_pump, args=(self._proc.stdout, self._out),
+                         name="tts-stdout", daemon=True).start()
+        line = self._readline(START_TIMEOUT_S)
         if not line.startswith("READY"):
             self.close()
             raise RuntimeError(f"Windows speech didn't start: {line or 'no answer'}")
@@ -178,7 +192,7 @@ class SapiTTS:
                                 _b64(path), _b64(text)])
                 self._proc.stdin.write(req + "\n")
                 self._proc.stdin.flush()
-                ans = self._proc.stdout.readline().strip()
+                ans = self._readline(LINE_TIMEOUT_S)
             if ans != "OK":
                 if not ans:
                     self.close()
@@ -188,6 +202,20 @@ class SapiTTS:
         finally:
             Path(path).unlink(missing_ok=True)
 
+    def _readline(self, timeout: float) -> str:
+        """The process's next line; "" if it ended. A process that doesn't answer in
+        time is killed (the next line starts a fresh one)."""
+        try:
+            line = self._out.get(timeout=timeout)
+        except queue.Empty:
+            log.warning("Windows speech didn't answer in %.0f s; restarting it", timeout)
+            p, self._proc = self._proc, None
+            if p is not None:
+                p.kill()
+            raise RuntimeError("Windows speech stopped answering. It restarts on its own; "
+                               "try the line again.") from None
+        return (line or "").strip()
+
     def close(self):
         p, self._proc = self._proc, None
         if p is not None:
@@ -196,6 +224,16 @@ class SapiTTS:
                 p.wait(timeout=2)
             except Exception:  # noqa: BLE001
                 p.kill()
+
+
+def _pump(stream, out: queue.Queue):
+    """Hand a process's output lines to `out`, then None when it ends."""
+    try:
+        for line in stream:
+            out.put(line)
+    except (OSError, ValueError):
+        pass
+    out.put(None)
 
 
 class Speaker:
@@ -254,7 +292,12 @@ class Speaker:
                     continue
                 if not len(mono) or gen != self._gen:
                     continue
-                self.play(np.repeat(mono[:, None], 2, axis=1), sr)
+                try:
+                    self.play(np.repeat(mono[:, None], 2, axis=1), sr)
+                except Exception as e:  # noqa: BLE001 - keep speaking the next lines
+                    log.warning("couldn't play a spoken line: %s", e)
+                    self.on_error(str(e))
+                    continue
                 dur = len(mono) / sr
                 self._busy_until = time.monotonic() + dur
                 self._cancel.wait(dur + 0.08)
