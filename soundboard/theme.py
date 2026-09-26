@@ -21,6 +21,7 @@ THEMES: dict[str, dict[str, str]] = {
         accent="#7c5cff", accent_hi="#8d71ff", accent2="#ff4d8d", on_accent="#ffffff",
         off="#4a5068", badge="#343849", badge_text="#d6d9e6",
         danger_bg="#3a2230", danger_border="#5a2a3e", danger_text="#ff8fa3", danger_hover="#4a2a3c",
+        warn_bg="#3a2e14", warn_text="#ffb020",
     ),
     "Light": dict(
         bg="#eef0f6", panel="#ffffff", card="#ffffff", card_hi="#f4f5fa",
@@ -30,6 +31,7 @@ THEMES: dict[str, dict[str, str]] = {
         accent="#6a4cff", accent_hi="#7d62ff", accent2="#ff3d7f", on_accent="#ffffff",
         off="#b3b9cc", badge="#e3e7f0", badge_text="#2a2f40",
         danger_bg="#ffe8ec", danger_border="#f3b3c0", danger_text="#c4213f", danger_hover="#ffd9e0",
+        warn_bg="#fff1d6", warn_text="#9a5b00",
     ),
     "Toxic": dict(   # green on near-black
         bg="#0b120e", panel="#111b15", card="#16241c", card_hi="#1c2e23",
@@ -39,6 +41,7 @@ THEMES: dict[str, dict[str, str]] = {
         accent="#1ee07f", accent_hi="#45ef98", accent2="#c6ff3d", on_accent="#04140b",
         off="#3a5646", badge="#223829", badge_text="#cfeedd",
         danger_bg="#361d22", danger_border="#5a2a33", danger_text="#ff8f9e", danger_hover="#45242a",
+        warn_bg="#33301a", warn_text="#ffc53d",
     ),
     "Ocean": dict(   # cyan on deep navy
         bg="#0c131d", panel="#111a27", card="#162234", card_hi="#1c2b41",
@@ -48,6 +51,7 @@ THEMES: dict[str, dict[str, str]] = {
         accent="#1fb6ff", accent_hi="#4cc6ff", accent2="#7c5cff", on_accent="#031320",
         off="#3a4f69", badge="#22354d", badge_text="#d3e3f5",
         danger_bg="#361f2b", danger_border="#5a2a40", danger_text="#ff8fb0", danger_hover="#45243a",
+        warn_bg="#33301f", warn_text="#ffb020",
     ),
 }
 DEFAULT = "Dark"
@@ -68,15 +72,15 @@ def set_current(name: str) -> str:
 STYLE = Template("""
 QWidget { background:$bg; color:$text; font-family:'Segoe UI'; font-size:10pt; }
 QDialog { background:$bg; }
-QFrame#panel { background:$panel; border-radius:14px; }
-QFrame#panel QWidget { background:transparent; }
+QFrame#card { background:$panel; border-radius:12px; }
+QFrame#card QWidget { background:transparent; }
 QLabel#section { color:$section; font-size:8pt; font-weight:700; letter-spacing:1px; padding-top:8px; }
 QLabel#hint, QLabel#muted { color:$muted; }
 QLabel#hint { font-size:8.5pt; }
 QLabel#eqlabel { color:$muted; font-size:8pt; }
 QLabel#empty { color:$faint; font-size:15px; padding:60px; }
-QFrame#panel QLabel#stepbox { background:$bg; border-radius:8px; padding:8px; margin-top:6px; }
-QFrame#panel QLabel#resultbox { background:$card; border-radius:8px; padding:8px; }
+QFrame#card QLabel#stepbox { background:$bg; border-radius:8px; padding:8px; margin-top:6px; }
+QFrame#card QLabel#resultbox { background:$bg; border-radius:8px; padding:8px; }
 QLabel#wordmark { font-size:13pt; font-weight:800; letter-spacing:2px; color:$text_hi; background:transparent; }
 QLabel#tagline { color:$muted; font-size:8.5pt; background:transparent; }
 QPushButton { background:$btn; border:1px solid $border; border-radius:8px; padding:7px 12px; }
@@ -91,13 +95,19 @@ QPushButton#danger:hover { background:$danger_hover; }
 QPushButton#small { padding:2px 8px; font-size:8pt; }
 QPushButton#settings { padding:6px 14px; font-weight:600; }
 QFrame#transport { background:$panel; border-radius:12px; }
-QFrame#panel QPushButton#advtoggle { background:$btn; padding:10px; font-weight:600;
-    text-align:left; margin-top:8px; }
-QFrame#panel QPushButton#advtoggle:checked { background:$btn; color:$text; }
-QFrame#panel QPushButton#primary { background:$accent; color:$on_accent; border:none; padding:9px; }
-QFrame#panel QPushButton#primary:hover { background:$accent_hi; }
-QFrame#panel QFrame#howcard { background:$card; border-radius:10px; }
-QFrame#panel QFrame#volbox { background:$card; border-radius:10px; }
+QFrame#card QPushButton#primary { background:$accent; color:$on_accent; border:none; padding:9px; }
+QFrame#card QPushButton#primary:hover { background:$accent_hi; }
+QFrame#vsep { background:$border; border:none; }
+QFrame#chip { background:$panel; border:1px solid $border; border-radius:14px; }
+QFrame#chip[sel="true"] { border-color:$accent; }
+QFrame#chip QPushButton { background:transparent; border:none; padding:2px 6px; }
+QFrame#chip QPushButton#chipname { font-weight:600; }
+QFrame#chip QPushButton#chipstop { border-radius:12px; padding:0; }
+QFrame#chip QPushButton#chipstop:hover { background:$danger_bg; }
+QLabel#iconlabel { background:transparent; }
+QPushButton#pill { border-radius:15px; padding:5px 14px; font-weight:600; }
+QPushButton#pill[state="ok"] { color:#13ce66; border:1px solid #1c6b45; }
+QPushButton#pill[state="warn"] { background:$warn_bg; color:$warn_text; border:1px solid $warn_text; }
 QSpinBox { background:$bg; border:1px solid $border; border-radius:6px; padding:3px 4px; }
 QSpinBox::up-button, QSpinBox::down-button { width:0; }
 QSlider::groove:vertical { width:4px; background:$groove; border-radius:2px; }
@@ -105,15 +115,17 @@ QSlider::add-page:vertical { background:$accent; border-radius:2px; }
 QSlider::handle:vertical { background:white; border:1px solid $border; width:14px; height:14px; margin:0 -5px; border-radius:7px; }
 QPushButton#micbanner { background:#e53935; color:white; font-weight:700; font-size:11pt;
     border:none; border-radius:10px; padding:10px; }
-QFrame#panel QPushButton#miccheck:checked { background:#e53935; border:1px solid #ff6b6b; color:white;
+QPushButton#miccheck:checked { background:#e53935; border:1px solid #ff6b6b; color:white;
     font-weight:700; }
-QFrame#transport QLabel, QFrame#transport QCheckBox { background:transparent; }
+QFrame#transport QLabel, QFrame#transport QCheckBox, QFrame#transport QSlider { background:transparent; }
 QPushButton#round { padding:0; font-size:14pt; border-radius:10px; }
 QSlider#seek::groove:horizontal { height:6px; border-radius:3px; }
 QSlider#seek::sub-page:horizontal { border-radius:3px; }
 QLineEdit, QComboBox { background:$card; border:1px solid $border; border-radius:8px; padding:6px 8px; }
-QFrame#panel QComboBox, QFrame#panel QPushButton { background:$card; }
-QFrame#panel QPushButton:checked { background:$accent; }
+QFrame#card QComboBox, QFrame#card QPushButton, QFrame#card QLineEdit { background:$card; }
+QFrame#card QSpinBox { background:$bg; }
+QFrame#card QPushButton:checked { background:$accent; }
+QFrame#card QPushButton#miccheck:checked { background:#e53935; }
 QComboBox QAbstractItemView { background:$card; selection-background-color:$accent; selection-color:$on_accent; }
 QSlider::groove:horizontal { height:4px; background:$groove; border-radius:2px; }
 QSlider::sub-page:horizontal { background:$accent; border-radius:2px; }

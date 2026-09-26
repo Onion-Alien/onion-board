@@ -59,4 +59,7 @@ def main():
     app.instance_server = listen_for_second_launch(app, lambda: holder.get("w"))  # kept alive
     w = holder["w"] = MainWindow()
     w.show()
+    if not w.cfg.setup_done:   # first launch: walk them through mic, headphones, cable
+        from PySide6.QtCore import QTimer
+        QTimer.singleShot(400, w.run_setup)
     sys.exit(app.exec())

@@ -81,6 +81,7 @@ class Config:
     clip_hotkey: str = "ctrl+alt+c"   # browser: save the last 15 s
     bplay_hotkey: str = "ctrl+alt+p"  # browser: play / pause
     live_hotkey: str = "ctrl+alt+l"   # browser: LIVE on / off
+    overlay_hotkey: str = "`"         # in-game overlay (see ui.overlay)
     cue_sounds: bool = True           # beep in the headphones when a hotkey records / saves
     theme: str = "Dark"
     eq_enabled: bool = False
@@ -91,13 +92,17 @@ class Config:
     always_on_top: bool = False
     show_advanced: bool = False
     pad_width: int = 150
-    tab: int = 0                      # 0 = sounds, 1 = browser
+    tab: int = 0                      # 0 = sounds, 1 = browser, 2 = voice
     browser_url: str = "https://www.youtube.com/"
     browser_vol: float = 1.0
     browser_live: bool = True         # browser audio goes out to others
     browser_monitor: bool = True      # ...and to your headphones
     browser_lite: bool = True         # hide the page while it plays + 144p (light on CPU/GPU)
     latency: str = "low"              # audio buffering: 'low' | 'high' (safer on flaky devices)
+    setup_done: bool = False          # the quick-setup guide has been completed
+    voice_fx: dict = field(default_factory=dict)   # voice changer (see ui.voicepanel)
+    speech: dict = field(default_factory=dict)     # text-to-speech / live voice settings
+    overlay: dict = field(default_factory=dict)    # in-game overlay (ui.overlay.OverlaySettings)
     sounds: list[SoundMeta] = field(default_factory=list)
 
     @classmethod
@@ -146,6 +151,9 @@ class Config:
             if s.get("file") and not Path(s["file"]).is_absolute():
                 s["file"] = str(SOUNDS_DIR / s["file"])   # stored relative to the library
             sounds.append(SoundMeta(**s))
+        # configs from before the setup guide existed: whoever already picked an output
+        # device has been set up by hand, so don't greet them with the guide
+        raw.setdefault("setup_done", bool(raw.get("main_device")))
         known = {k: v for k, v in raw.items() if k in cls.__dataclass_fields__}
         known["version"] = CONFIG_VERSION
         return cls(**known, sounds=sounds)

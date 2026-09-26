@@ -1,0 +1,8 @@
+{
+  "id": "retro-fx",
+  "name": "Retro effects",
+  "version": "0.1.0",
+  "kind": "effects",
+  "description": "8-bit bitcrusher for a retro game-console voice. Also the example to copy when writing your own effects module.",
+  "entry": "effects.py"
+}

@@ -11,7 +11,7 @@ from PySide6.QtCore import QUrl
 from PySide6.QtWebSockets import QWebSocket
 from PySide6.QtWidgets import QWidget
 
-from soundboard import browser
+from soundboard import adblocker, browser
 from soundboard.browser import AudioSink, BrowserTab
 from conftest import process_events
 from soundboard.engine import SR
@@ -150,6 +150,7 @@ def tone_page(folder, name="page.html", iframe_of=None):
 @pytest.fixture
 def tab(qapp, app_dir, monkeypatch):
     monkeypatch.setattr(browser, "APP_DIR", app_dir)   # the persistent web profile
+    monkeypatch.setattr(adblocker, "FILTER_LISTS", ())    # no list downloads in tests
     eng = FakeEngine()
     cfg = Config(browser_url="about:blank")
     host = QWidget()
@@ -199,3 +200,39 @@ def test_stop_all_pauses_media_in_every_frame(qapp, tab, app_dir):
     n = len(eng.chunks)
     process_events(qapp, lambda: False, 0.5)
     assert len(eng.chunks) - n <= 2                     # nothing streams while paused
+
+
+def test_lite_watchdog_wakes_a_stalled_player(qapp, tab, monkeypatch):
+    t, _ = tab
+    now = [1000.0]
+    monkeypatch.setattr(browser.time, "monotonic", lambda: now[0])
+    kicks = []
+    monkeypatch.setattr(t, "_mini_js", kicks.append)
+    t._set_collapsed(True)
+    assert not t.view.isVisible()
+    for _ in range(5):                       # playing normally: the position moves
+        now[0] += 1
+        t._watch_stall(now[0] - 990, False)
+    assert not t._unsticking
+    t._watch_stall(10.0, True)               # paused for a long time: not a stall
+    now[0] += 30
+    t._watch_stall(10.0, True)
+    assert not t._unsticking
+    t._watch_stall(10.0, False)              # "playing" but stuck at 10s
+    now[0] += browser.STALL_S + 0.5
+    t._watch_stall(10.0, False)
+    assert t._unsticking
+    assert t.view.isVisible() and t.view.maximumHeight() == 2   # woken, 2 px tall
+    assert process_events(qapp, lambda: browser.MINI_KICK_JS in kicks, 3)
+    t._end_unstick()
+    assert not t.view.isVisible() and t.view.maximumHeight() > 1000
+    t._set_collapsed(False)
+    assert t.view.isVisible()
+
+
+def test_mini_player_helpers():
+    assert browser.youtube_id(QUrl("https://www.youtube.com/watch?v=abc123&t=4")) == "abc123"
+    assert browser.youtube_id(QUrl("https://youtu.be/xyz")) == "xyz"
+    assert browser.youtube_id(QUrl("https://www.youtube.com/shorts/sh0rt")) == "sh0rt"
+    assert browser.youtube_id(QUrl("https://soundcloud.com/a/b")) == ""
+    assert browser.fmt_time(75) == "1:15" and browser.fmt_time(3725) == "1:02:05"

@@ -237,3 +237,81 @@ def press(combo: str) -> bool:
 def release(combo: str) -> bool:
     events = key_sequence(combo, up=True)
     return events is not None and _send_all(events)
+
+
+# ---------------------------------------------------------------- overlay helpers
+
+user32.GetAsyncKeyState.argtypes = (ctypes.c_int,)
+user32.GetAsyncKeyState.restype = ctypes.c_short
+
+
+def is_down(vk: int) -> bool:
+    """Is this key physically held right now? (A plain state query: no hook.)"""
+    return bool(user32.GetAsyncKeyState(vk) & 0x8000)
+
+
+QUNS_RUNNING_D3D_FULL_SCREEN = 3
+
+
+def exclusive_fullscreen() -> bool:
+    """True while a game owns the screen in exclusive (D3D) fullscreen, where no
+    other window can be drawn on top of it. Borderless 'fullscreen' reports False."""
+    state = ctypes.c_int(0)
+    try:
+        hr = ctypes.windll.shell32.SHQueryUserNotificationState(ctypes.byref(state))
+    except (AttributeError, OSError):
+        return False
+    return hr == 0 and state.value == QUNS_RUNNING_D3D_FULL_SCREEN
+
+
+class _MONITORINFOEXW(ctypes.Structure):
+    _fields_ = [("cbSize", wt.DWORD), ("rcMonitor", wt.RECT), ("rcWork", wt.RECT),
+                ("dwFlags", wt.DWORD), ("szDevice", wt.WCHAR * 32)]
+
+
+user32.GetForegroundWindow.restype = wt.HWND
+user32.MonitorFromWindow.argtypes = (wt.HWND, wt.DWORD)
+user32.MonitorFromWindow.restype = wt.HANDLE
+user32.GetMonitorInfoW.argtypes = (wt.HANDLE, ctypes.POINTER(_MONITORINFOEXW))
+
+
+def foreground_monitor() -> str:
+    r"""Device name ('\\.\DISPLAY2') of the monitor the active window (the game)
+    is on, or '' if it can't be told. Matches QScreen.name() on Windows."""
+    mon = user32.MonitorFromWindow(user32.GetForegroundWindow(), 2)   # NEAREST
+    info = _MONITORINFOEXW()
+    info.cbSize = ctypes.sizeof(info)
+    if not mon or not user32.GetMonitorInfoW(mon, ctypes.byref(info)):
+        return ""
+    return info.szDevice
+
+
+GWL_EXSTYLE = -20
+WS_EX_TRANSPARENT, WS_EX_TOOLWINDOW, WS_EX_TOPMOST = 0x20, 0x80, 0x8
+WS_EX_LAYERED, WS_EX_NOACTIVATE = 0x80000, 0x8000000
+_GetLong = getattr(user32, "GetWindowLongPtrW", user32.GetWindowLongW)
+_SetLong = getattr(user32, "SetWindowLongPtrW", user32.SetWindowLongW)
+_GetLong.argtypes = (wt.HWND, ctypes.c_int)
+_GetLong.restype = ctypes.c_ssize_t
+_SetLong.argtypes = (wt.HWND, ctypes.c_int, ctypes.c_ssize_t)
+_SetLong.restype = ctypes.c_ssize_t
+user32.SetWindowPos.argtypes = (wt.HWND, wt.HWND, ctypes.c_int, ctypes.c_int, ctypes.c_int,
+                                ctypes.c_int, wt.UINT)
+HWND_TOPMOST = wt.HWND(-1)
+SWP_NOSIZE, SWP_NOMOVE, SWP_NOACTIVATE, SWP_SHOWWINDOW = 0x1, 0x2, 0x10, 0x40
+
+
+def make_overlay(hwnd: int):
+    """Turn a window into a HUD: never takes focus (the game keeps the keyboard and
+    mouse), clicks fall through to what's under it, not in the taskbar or alt-tab."""
+    h = wt.HWND(hwnd)
+    ex = _GetLong(h, GWL_EXSTYLE)
+    _SetLong(h, GWL_EXSTYLE, ex | WS_EX_NOACTIVATE | WS_EX_TRANSPARENT | WS_EX_TOOLWINDOW
+             | WS_EX_LAYERED | WS_EX_TOPMOST)
+
+
+def raise_topmost(hwnd: int):
+    """Put the window back on top without activating it (games that make themselves
+    topmost can otherwise end up above it)."""
+    user32.SetWindowPos(wt.HWND(hwnd), HWND_TOPMOST, 0, 0, 0, 0,
+                        SWP_NOSIZE | SWP_NOMOVE | SWP_NOACTIVATE | SWP_SHOWWINDOW)

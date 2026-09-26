@@ -1,0 +1,16 @@
+# Copy to `.sensitive-patterns` (gitignored) and fill in YOUR identifiers.
+# One case-insensitive regex per line; `#` starts a comment.
+# scripts/check_sensitive.py fails if any of these appear in published files.
+#
+# Things worth listing:
+#   - your Windows / Linux user name(s)
+#   - your real name, gamer tags, other handles you don't want linked
+#   - machine host names, Tailscale node names
+#   - personal e-mail addresses you don't want published
+#   - names of private projects/servers that shouldn't be mentioned
+#
+# Examples (replace these):
+# \byourusername\b
+# \bFirstname\s+Lastname\b
+# \bmy-laptop-hostname\b
+# yourname@outlook\.com

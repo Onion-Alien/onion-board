@@ -9,9 +9,9 @@ from pathlib import Path
 
 import numpy as np
 import sounddevice as sd
-from PySide6.QtCore import QObject, QPropertyAnimation, Qt, QTimer, Signal
+from PySide6.QtCore import QObject, QPropertyAnimation, QSize, Qt, QTimer, Signal
 from PySide6.QtWidgets import (QApplication, QCheckBox, QComboBox, QFileDialog, QFrame,
-                               QGraphicsOpacityEffect, QHBoxLayout, QLabel, QLineEdit,
+                               QGraphicsOpacityEffect, QGridLayout, QHBoxLayout, QLabel, QLineEdit,
                                QMainWindow, QMenu, QMessageBox, QPushButton, QScrollArea, QSlider,
                                QTabWidget, QVBoxLayout, QWidget)
 
@@ -27,7 +27,11 @@ from soundboard.settings import HOTKEY_ACTIONS, HotkeyDialog, SettingsDialog, pr
 from soundboard.testcheck import analyze as analyze_output
 from soundboard.testcheck import summary_html
 from soundboard.ui.dialogs import EditDialog
-from soundboard.ui.panel import EqPanel, VolumeBox, hint_label, section_label
+from soundboard.ui import icons
+from soundboard.ui.panel import (EqPanel, VolumeControl, bar, card, hint_label, icon_label,
+                                 vsep)
+from soundboard.ui.overlay import Overlay
+from soundboard.ui.voicepanel import VoicePanel
 from soundboard.ui.widgets import Meter, Pad, PadGrid, SeekSlider, fmt_pos
 from soundboard.wheelguard import no_wheel
 from soundboard.winkeys import Hotkeys
@@ -57,6 +61,7 @@ class MainWindow(QMainWindow):
         self.hotkeys = Hotkeys()
         self.hotkeys.fired.connect(self.on_hotkey)
         self.hotkeys.failed_changed.connect(self.on_hotkeys_failed)
+        self.overlay = Overlay(self, self.cfg.overlay)
         self._save_failed_shown = False
         self.bridge = Bridge()
         self.bridge.loaded.connect(self.on_loaded)
@@ -84,8 +89,13 @@ class MainWindow(QMainWindow):
         self._save_timer.setSingleShot(True)
         self._save_timer.timeout.connect(self._save_now)
 
+        self.setup_state = ""
         self._build_ui()
         self._init_devices()
+        if self.setup_state != "ok":
+            self.tabs.blockSignals(True)
+            self.tabs.setCurrentWidget(self.setup_page)
+            self.tabs.blockSignals(False)
         self._rebuild_pads()
         self._load_all()
         self.register_hotkeys()
@@ -98,6 +108,9 @@ class MainWindow(QMainWindow):
             self.setWindowFlag(Qt.WindowStaysOnTopHint, True)
 
     # ------------------------------------------------------------------ UI build
+    # Layout: header (setup pill, Stop all, Settings) / tabs / mixer strip / status.
+    # Every tab is built the same way: a toolbar row on top, its content, and a
+    # bottom bar ending in "Volume [slider %] | Hear it myself" for that source.
     def _build_ui(self):
         root = QWidget()
         self.setCentralWidget(root)
@@ -105,7 +118,7 @@ class MainWindow(QMainWindow):
         rv.setContentsMargins(14, 10, 14, 10)
         rv.setSpacing(8)
 
-        # ---- header: logo + name, settings on the right
+        # ---- header: logo + name, then setup status, Stop all, Settings
         head = QHBoxLayout()
         head.setSpacing(10)
         self.logo = QLabel()
@@ -115,32 +128,40 @@ class MainWindow(QMainWindow):
         names.setSpacing(0)
         wm = QLabel("SOUNDBOARD")
         wm.setObjectName("wordmark")
-        tag = QLabel("sounds + browser, straight into your mic")
+        tag = QLabel("sounds + browser + voice, straight into your mic")
         tag.setObjectName("tagline")
         names.addWidget(wm)
         names.addWidget(tag)
         head.addLayout(names)
         head.addStretch(1)
-        gear = QPushButton("⚙  Settings")
+        self.pill = QPushButton()
+        self.pill.setObjectName("pill")
+        self.pill.setCursor(Qt.PointingHandCursor)
+        self.pill.setToolTip("Where your sounds go — click for setup and testing")
+        self.pill.clicked.connect(lambda: self.tabs.setCurrentWidget(self.setup_page))
+        head.addWidget(self.pill)
+        self.stop_btn = QPushButton("Stop all")
+        self.stop_btn.setObjectName("danger")
+        self.stop_btn.setToolTip("Stops every sound and pauses the browser")
+        self.stop_btn.clicked.connect(self.stop_all)
+        icons.set_icon(self.stop_btn, "stop", "danger_text", size=14)
+        head.addWidget(self.stop_btn)
+        gear = QPushButton("Settings")
         gear.setObjectName("settings")
         gear.setToolTip("Themes, hotkeys and more")
         gear.clicked.connect(lambda: self.open_settings())
+        icons.set_icon(gear, "settings")
         head.addWidget(gear)
         rv.addLayout(head)
         self._paint_logo()
 
-        h = QHBoxLayout()
-        h.setSpacing(14)
-        rv.addLayout(h, 1)
-
-        # ---- left: tabs (sounds / browser), with the mic banner + status around them
-        outer = QVBoxLayout()
-        self.mic_banner = QPushButton("🎤  YOU'RE HEARING YOUR MIC OUTPUT  —  mic + sounds, "
+        self.mic_banner = QPushButton("YOU'RE HEARING YOUR MIC OUTPUT  —  mic + sounds, "
                                       "exactly what others hear   ·   click to turn off")
         self.mic_banner.setObjectName("micbanner")
         self.mic_banner.setCursor(Qt.PointingHandCursor)
         self.mic_banner.clicked.connect(lambda: self.btn_check.setChecked(False))
         self.mic_banner.hide()
+        icons.set_icon(self.mic_banner, "ear", "#ffffff", size=20)
         # pulse: an opacity animation, not a stylesheet rewrite 30x a second (each
         # setStyleSheet re-parses and re-polishes the widget)
         self._banner_fx = QGraphicsOpacityEffect(self.mic_banner)
@@ -151,66 +172,121 @@ class MainWindow(QMainWindow):
         self._pulse.setKeyValueAt(0.5, 0.55)
         self._pulse.setEndValue(1.0)
         self._pulse.setLoopCount(-1)
-        outer.addWidget(self.mic_banner)
+        rv.addWidget(self.mic_banner)
+
+        # ---- tabs
         self.tabs = QTabWidget()
         self.tabs.setDocumentMode(True)
-        outer.addWidget(self.tabs, 1)
-
-        self.tabs.addTab(self._build_sounds_page(), "🎛  Sounds")
+        self.tabs.setIconSize(QSize(18, 18))
+        rv.addWidget(self.tabs, 1)
+        self.sounds_page = self._build_sounds_page()
+        self.tabs.addTab(self.sounds_page, "Sounds")
         browser_page = QWidget()
         bl = QVBoxLayout(browser_page)
         bl.setContentsMargins(0, 8, 0, 0)
         self.browser = BrowserTab(self.engine, self.cfg, self._save_later, Meter)
         self.browser.clip_ready.connect(self.on_clip)
         bl.addWidget(self.browser)
-        self.tabs.addTab(browser_page, "🌐  Browser → mic")
+        self.tabs.addTab(browser_page, "Browser")
+        self.voice = VoicePanel(self.engine, self.cfg.voice_fx, self.cfg.speech)
+        self.voice.fx_changed.connect(lambda spec: self.set_option("voice_fx", spec))
+        self.voice.speech_changed.connect(lambda s: self.set_option("speech", s))
+        self.tabs.addTab(self.voice, "Voice")
+        self.setup_page = self._build_setup_page()
+        self.tabs.addTab(self.setup_page, "Setup")
+        for i, name in enumerate(("sounds", "browser", "voice", "setup")):
+            icons.set_tab_icon(self.tabs, i, name)
         self.tabs.setCurrentIndex(self.cfg.tab if 0 <= self.cfg.tab < self.tabs.count() else 0)
         self.tabs.currentChanged.connect(lambda i: self.set_option("tab", i))
+        self.tabs.currentChanged.connect(lambda _i: self._update_status())
+
+        # ---- mixer strip: the things that apply whatever tab you're on
+        rv.addWidget(self._build_mixer())
 
         self.status = QLabel()
         self.status.setWordWrap(True)
         self.status.setObjectName("muted")
-        outer.addWidget(self.status)
-        h.addLayout(outer, 1)
+        rv.addWidget(self.status)
 
-        # ---- right: audio panel
-        pscroll = QScrollArea()
-        pscroll.setWidget(self._build_panel())
-        pscroll.setWidgetResizable(True)
-        pscroll.setFrameShape(QFrame.NoFrame)
-        pscroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        pscroll.setFixedWidth(344)
-        h.addWidget(pscroll)
+    def _build_mixer(self) -> QFrame:
+        c = self.cfg
+        f, h = bar()
+        h.addWidget(icon_label("mic"))
+        self.mic_lbl = QLabel("My mic")
+        self.mic_lbl.setStyleSheet("font-weight:600;")
+        h.addWidget(self.mic_lbl)
+        self.chk_mic = QCheckBox("on")
+        self.chk_mic.setToolTip("Mix your real mic in, so they still hear you talk")
+        self.chk_mic.setChecked(c.mic_enabled)
+        self.chk_mic.toggled.connect(self.on_mic_toggle)
+        h.addWidget(self.chk_mic)
+        self.mic_meter = Meter()
+        self.mic_meter.setFixedWidth(70)
+        self.mic_meter.setToolTip("Your mic level")
+        h.addWidget(self.mic_meter)
+        self.vol_mic = VolumeControl(c.mic_vol, tip="How loud your voice is for them")
+        h.addWidget(self.vol_mic)
+        h.addWidget(vsep())
+
+        h.addWidget(icon_label("headphones"))
+        hp = QLabel("My headphones")
+        hp.setStyleSheet("font-weight:600;")
+        hp.setToolTip("Only what YOU hear. Doesn't change anything for them.")
+        h.addWidget(hp)
+        self.vol_mon = VolumeControl(c.mon_vol, tip="Only what YOU hear — doesn't change "
+                                                    "anything for them")
+        h.addWidget(self.vol_mon)
+        h.addWidget(vsep())
+
+        h.addWidget(icon_label("live", "What Discord / the game receives"))
+        h.addWidget(QLabel("Sending"))
+        self.out_meter = Meter()
+        self.out_meter.setMinimumWidth(60)
+        self.out_meter.setToolTip("Level of what Discord / the game receives")
+        h.addWidget(self.out_meter, 1)
+        self.btn_check = QPushButton("Hear what they hear")
+        self.btn_check.setObjectName("miccheck")
+        self.btn_check.setCheckable(True)
+        self.btn_check.setToolTip("Plays your mic into your headphones on top of the sounds — "
+                                  "exactly what others hear. A red banner shows while it's on.")
+        self.btn_check.toggled.connect(self.on_mic_check)
+        icons.set_icon(self.btn_check, "ear", checked_color="#ffffff")
+        h.addWidget(self.btn_check)
+
+        for box, key in ((self.vol_mic, "mic_vol"), (self.vol_mon, "mon_vol")):
+            box.changed.connect(lambda v, key=key: self.set_option(key, v))
+        return f
 
     def _build_sounds_page(self) -> QWidget:
+        c = self.cfg
         page = QWidget()
         left = QVBoxLayout(page)
         left.setContentsMargins(0, 8, 0, 0)
-        bar = QHBoxLayout()
-        add = QPushButton("＋  Add sounds")
+        left.setSpacing(8)
+        tb = QHBoxLayout()
+        tb.setSpacing(8)
+        add = QPushButton("Add sounds")
         add.setObjectName("primary")
         add.clicked.connect(self.add_dialog)
-        self.stop_btn = QPushButton("■  Stop all")
-        self.stop_btn.setObjectName("danger")
-        self.stop_btn.setToolTip("Stops every sound and pauses the browser")
-        self.stop_btn.clicked.connect(self.stop_all)
+        icons.set_icon(add, "plus", "on_accent")
         self.search = QLineEdit()
         self.search.setPlaceholderText("Search sounds…")
         self.search.setClearButtonEnabled(True)
         self.search.textChanged.connect(self.apply_filter)
-        bar.addWidget(add)
-        bar.addWidget(self.stop_btn)
-        bar.addWidget(self.search, 1)
+        tb.addWidget(add)
+        tb.addWidget(self.search, 1)
         size = QSlider(Qt.Horizontal)
         size.setRange(110, 240)
-        size.setValue(self.cfg.pad_width)
+        size.setValue(c.pad_width)
         size.setFixedWidth(90)
         size.setToolTip("Pad size")
         size.valueChanged.connect(self.set_pad_width)
         no_wheel(size)
-        bar.addWidget(QLabel("Size"))
-        bar.addWidget(size)
-        left.addLayout(bar)
+        size_lbl = QLabel("Pad size")
+        size_lbl.setObjectName("muted")
+        tb.addWidget(size_lbl)
+        tb.addWidget(size)
+        left.addLayout(tb)
 
         self.grid = PadGrid()
         self.grid.reorder.connect(self.on_reorder)
@@ -221,21 +297,31 @@ class MainWindow(QMainWindow):
         scroll.setFrameShape(QFrame.NoFrame)
         left.addWidget(scroll, 1)
 
-        tb = QFrame()
-        tb.setObjectName("transport")
-        th = QHBoxLayout(tb)
-        th.setContentsMargins(10, 8, 14, 8)
-        th.setSpacing(10)
-        self.btn_pp = QPushButton("▶")
+        # ---- "now playing" chips: shown while 2+ sounds overlap, so every one of
+        # them can be stopped (■) or taken into the player (name) without clicking
+        # its pad, which would restart it
+        self.playing_row = QWidget()
+        self._chips_hl = QHBoxLayout(self.playing_row)
+        self._chips_hl.setContentsMargins(0, 0, 0, 0)
+        self._chips_hl.setSpacing(6)
+        self._chips: dict[str, QWidget] = {}
+        self._chip_ids: tuple = ()
+        self.playing_row.hide()
+        left.addWidget(self.playing_row)
+
+        f, th = bar()
+        self.btn_pp = QPushButton()
         self.btn_pp.setObjectName("round")
         self.btn_pp.setToolTip("Play / pause")
         self.btn_pp.clicked.connect(self.toggle_play_pause)
-        self.btn_st = QPushButton("■")
+        self._pp_icon = None
+        self.btn_st = QPushButton()
         self.btn_st.setObjectName("round")
         self.btn_st.setToolTip("Stop")
         self.btn_st.clicked.connect(self.stop_current)
+        icons.set_icon(self.btn_st, "stop", size=16)
         for b in (self.btn_pp, self.btn_st):
-            b.setFixedSize(40, 36)
+            b.setFixedSize(38, 34)
         self.np_name = QLabel("Click a sound to control it here")
         self.np_name.setFixedWidth(190)
         self.np_name.setStyleSheet("font-weight:600;")
@@ -255,174 +341,200 @@ class MainWindow(QMainWindow):
         th.addWidget(self.np_name)
         th.addWidget(self.seek, 1)
         th.addWidget(self.np_time)
-        left.addWidget(tb)
+        th.addWidget(vsep())
+        th.addWidget(icon_label("volume", "Volume of all your sounds"))
+        self.vol_sound = VolumeControl(c.sound_vol, tip="How loud your sounds are — type up "
+                                                        "to 1000% in the box")
+        self.vol_sound.changed.connect(lambda v: self.set_option("sound_vol", v))
+        th.addWidget(self.vol_sound)
+        self.chk_monitor = QCheckBox("Hear it myself")
+        self.chk_monitor.setToolTip("Also play your sounds into your headphones")
+        self.chk_monitor.setChecked(c.monitor_sounds)
+        self.chk_monitor.toggled.connect(lambda b: self.set_option("monitor_sounds", b))
+        th.addWidget(self.chk_monitor)
+        left.addWidget(f)
+        self._set_pp_icon("play")
         return page
 
-    def _build_panel(self) -> QFrame:
-        panel = QFrame()
-        panel.setObjectName("panel")
-        panel.setFixedWidth(330)
-        panel.setMinimumHeight(0)
-        pv = QVBoxLayout(panel)
-        pv.setContentsMargins(16, 16, 16, 16)
-        pv.setSpacing(8)
-        c = self.cfg
+    def _update_chips(self, playing):
+        ids = tuple(s for s in self.pads if s in playing)
+        if ids != self._chip_ids:
+            self._chip_ids = ids
+            while self._chips_hl.count():
+                w = self._chips_hl.takeAt(0).widget()
+                if w:
+                    w.deleteLater()
+            self._chips = {}
+            if len(ids) >= 2:
+                lbl = QLabel("Now playing")
+                lbl.setObjectName("muted")
+                self._chips_hl.addWidget(lbl)
+                for sid in ids:
+                    m = self.meta(sid)
+                    chip = QFrame()
+                    chip.setObjectName("chip")
+                    ch = QHBoxLayout(chip)
+                    ch.setContentsMargins(4, 2, 2, 2)
+                    ch.setSpacing(2)
+                    name = QPushButton(chip.fontMetrics().elidedText(
+                        m.name if m else sid, Qt.ElideRight, 150))
+                    name.setObjectName("chipname")
+                    name.setToolTip("Show this sound in the player (keeps playing)")
+                    name.clicked.connect(lambda _=False, s=sid: self.select(s))
+                    stop = QPushButton()
+                    stop.setObjectName("chipstop")
+                    stop.setToolTip("Stop this sound")
+                    stop.setIcon(icons.icon("stop", "danger_text"))
+                    stop.setIconSize(QSize(12, 12))
+                    stop.setFixedSize(24, 24)
+                    stop.clicked.connect(lambda _=False, s=sid: self.engine.stop(s))
+                    ch.addWidget(name)
+                    ch.addWidget(stop)
+                    self._chips_hl.addWidget(chip)
+                    self._chips[sid] = chip
+                self._chips_hl.addStretch(1)
+            self.playing_row.setVisible(len(ids) >= 2)
+        for sid, chip in self._chips.items():
+            sel = "true" if sid == self.current else "false"
+            if chip.property("sel") != sel:
+                chip.setProperty("sel", sel)
+                chip.style().unpolish(chip)
+                chip.style().polish(chip)
 
-        # ---- plain-English picture of where the audio goes
-        card = QFrame()
-        card.setObjectName("howcard")
-        cv = QVBoxLayout(card)
-        cv.setContentsMargins(12, 10, 12, 12)
-        cv.setSpacing(3)
-        cv.addWidget(section_label("HOW IT WORKS"))
+    def _set_pp_icon(self, name: str):
+        if name != self._pp_icon:
+            self._pp_icon = name
+            self.btn_pp.setIcon(icons.icon(name))
+            self.btn_pp.setIconSize(QSize(16, 16))
+
+    def _build_setup_page(self) -> QWidget:
+        """One-time setup and the rarely-touched stuff: where the audio goes,
+        devices, the recorded test, EQ, levelling."""
+        c = self.cfg
+        page = QScrollArea()
+        page.setWidgetResizable(True)
+        page.setFrameShape(QFrame.NoFrame)
+        page.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        inner = QWidget()
+        cols = QHBoxLayout(inner)
+        cols.setContentsMargins(0, 10, 4, 10)
+        cols.setSpacing(12)
+        lcol, rcol = QVBoxLayout(), QVBoxLayout()
+        for col in (lcol, rcol):
+            col.setSpacing(12)
+            cols.addLayout(col, 1)
+        page.setWidget(inner)
+
+        # ---- how it works + the one thing to set in Discord
+        howcard, cv = card("YOUR VIRTUAL MIC")
         self.flow_mic = QLabel()
-        self.flow_snd = QLabel("🔊  Your soundboard sounds")
-        arrow = QLabel("⬇   the app mixes them together   ⬇")
+        self.flow_snd = QLabel("Your sounds, browser and voice effects")
+        arrow = QLabel("↓   the app mixes them together")
         arrow.setObjectName("muted")
         self.flow_out = QLabel()
-        for w in (self.flow_mic, self.flow_snd, arrow, self.flow_out):
+        for ic, w in (("mic", self.flow_mic), ("volume", self.flow_snd), ("", arrow),
+                      ("cable", self.flow_out)):
             w.setTextFormat(Qt.RichText)
             w.setWordWrap(True)
-            cv.addWidget(w)
+            row = QHBoxLayout()
+            row.setSpacing(8)
+            if ic:
+                row.addWidget(icon_label(ic))
+            else:
+                row.addSpacing(26)
+            row.addWidget(w, 1)
+            cv.addLayout(row)
         self.step_lbl = QLabel()
         self.step_lbl.setWordWrap(True)
         self.step_lbl.setTextFormat(Qt.RichText)
         self.step_lbl.setObjectName("stepbox")
         cv.addWidget(self.step_lbl)
-        self.btn_install = QPushButton("⬇  Install the free virtual cable")
+        self.btn_install = QPushButton("Install the free virtual cable")
         self.btn_install.setObjectName("primary")
         self.btn_install.clicked.connect(self.install_cable)
+        icons.set_icon(self.btn_install, "cable", "on_accent")
         cv.addWidget(self.btn_install)
-        self.btn_rescan = QPushButton("⟳  I've installed it — check again")
-        self.btn_rescan.setObjectName("small")
+        self.btn_rescan = QPushButton("I've installed it — check again")
         self.btn_rescan.clicked.connect(self.refresh_devices)
+        icons.set_icon(self.btn_rescan, "reload")
         cv.addWidget(self.btn_rescan)
-        self.btn_nomic = QPushButton("Game has no microphone setting? Click here")
-        self.btn_nomic.setObjectName("small")
+        self.btn_nomic = QPushButton("Game has no microphone setting?")
         self.btn_nomic.clicked.connect(self.open_windows_mic)
         cv.addWidget(self.btn_nomic)
-        pv.addWidget(card)
+        guide = QPushButton("Step-by-step guide")
+        guide.setToolTip("Walks you through mic, headphones, the cable and Discord")
+        icons.set_icon(guide, "check")
+        guide.clicked.connect(self.run_setup)
+        cv.addWidget(guide)
+        lcol.addWidget(howcard)
 
-        pv.addWidget(section_label("YOUR MIC"))
-        self.chk_mic = QCheckBox("Mix my mic in (so they still hear me)")
-        self.chk_mic.setChecked(c.mic_enabled)
-        self.chk_mic.toggled.connect(self.on_mic_toggle)
-        pv.addWidget(self.chk_mic)
-        mic_row = QHBoxLayout()
-        self.mic_lbl = QLabel("Mic")
-        mic_row.addWidget(self.mic_lbl)
-        self.mic_meter = Meter()
-        mic_row.addWidget(self.mic_meter, 1)
-        pv.addLayout(mic_row)
+        # ---- devices
+        devcard, av = card("DEVICES", "Already set up for you — only change these if "
+                                      "something's wrong.")
+        grid = QGridLayout()
+        grid.setHorizontalSpacing(10)
+        grid.setVerticalSpacing(6)
+        self.cb_main, self.cb_mon, self.cb_mic = QComboBox(), QComboBox(), QComboBox()
+        for r, (ic, text, cb) in enumerate((
+                ("cable", "Send into (the cable)", self.cb_main),
+                ("headphones", "My headphones", self.cb_mon),
+                ("mic", "My real mic", self.cb_mic))):
+            grid.addWidget(icon_label(ic), r, 0)
+            grid.addWidget(QLabel(text), r, 1)
+            grid.addWidget(cb, r, 2)
+            cb.setMinimumWidth(120)
+        grid.setColumnStretch(2, 1)
+        av.addLayout(grid)
+        self.setup_hint = hint_label("")
+        self.setup_hint.setTextFormat(Qt.RichText)
+        av.addWidget(self.setup_hint)
+        no_wheel(self.cb_main, self.cb_mon, self.cb_mic)
+        for cb, attr in ((self.cb_main, "main_device"), (self.cb_mon, "mon_device"),
+                         (self.cb_mic, "mic_device")):
+            cb.activated.connect(lambda _i, cb=cb, attr=attr: self.on_device(cb, attr))
+        ref = QPushButton("Re-scan devices")
+        icons.set_icon(ref, "reload")
+        ref.clicked.connect(self.refresh_devices)
+        av.addWidget(ref, 0, Qt.AlignLeft)
+        lcol.addWidget(devcard)
+        lcol.addStretch(1)
 
-        pv.addWidget(section_label("VOLUME"))
-        self.vol_sound = VolumeBox(
-            "🔊  Soundboard → them",
-            "How loud your sounds are for Discord / the game. Type up to 1000% in the box.",
-            c.sound_vol)
-        self.vol_mic = VolumeBox("🎤  Your voice → them",
-                                 "How loud your mic is for Discord / the game.", c.mic_vol)
-        self.vol_mon = VolumeBox("🎧  Your headphones",
-                                 "Only what YOU hear. Doesn't change anything for them.",
-                                 c.mon_vol)
-        for box, key in ((self.vol_sound, "sound_vol"), (self.vol_mic, "mic_vol"),
-                         (self.vol_mon, "mon_vol")):
-            box.changed.connect(lambda v, key=key: self.set_option(key, v))
-            pv.addWidget(box)
-        out_row = QHBoxLayout()
-        out_row.addWidget(QLabel("Going out"))
-        self.out_meter = Meter()
-        self.out_meter.setToolTip("Level of what Discord / the game receives")
-        out_row.addWidget(self.out_meter, 1)
-        pv.addLayout(out_row)
-
-        pv.addWidget(section_label("TEST MODE"))
-        self.btn_check = QPushButton("🎤  Listen to my mic output")
-        self.btn_check.setObjectName("miccheck")
-        self.btn_check.setCheckable(True)
-        self.btn_check.toggled.connect(self.on_mic_check)
-        pv.addWidget(self.btn_check)
-        pv.addWidget(hint_label("Plays your mic into your headphones on top of the sounds — "
-                                "exactly what others hear. A red banner shows while it's on."))
-        self.btn_rec = QPushButton("⏺  Record 6s → play back")
+        # ---- test
+        testcard, tv = card("TEST IT", "Talk while a sound plays. Records what Discord / the "
+                                       "game actually receives, plays it back, and tells you "
+                                       "if your voice + sounds are in it.")
+        self.btn_rec = QPushButton("Record 6s → play back")
+        self.btn_rec.setObjectName("primary")
+        icons.set_icon(self.btn_rec, "record", "on_accent")
         self.btn_rec.clicked.connect(self.start_test)
-        pv.addWidget(self.btn_rec)
-        pv.addWidget(hint_label("Talk while a sound plays. Records what Discord / the game "
-                                "actually receives, plays it back, and tells you if your voice "
-                                "+ sounds are in it."))
+        tv.addWidget(self.btn_rec)
+        tv.addWidget(hint_label("For a live check, use “Hear what they hear” at the bottom: "
+                                "it plays your output into your headphones."))
         self.test_result = QLabel()
         self.test_result.setWordWrap(True)
         self.test_result.setTextFormat(Qt.RichText)
         self.test_result.setObjectName("resultbox")
         self.test_result.hide()
-        pv.addWidget(self.test_result)
+        tv.addWidget(self.test_result)
+        rcol.addWidget(testcard)
 
-        # ---- everything below is advanced, hidden until you open it
-        self.btn_adv = QPushButton()
-        self.btn_adv.setObjectName("advtoggle")
-        self.btn_adv.setCheckable(True)
-        pv.addWidget(self.btn_adv)
-        adv = QWidget()
-        av = QVBoxLayout(adv)
-        av.setContentsMargins(0, 0, 0, 0)
-        av.setSpacing(8)
-        pv.addWidget(adv)
-
-        av.addWidget(section_label("DEVICES"))
-        av.addWidget(hint_label("Already set up for you — only change these if something's "
-                                "wrong."))
-        av.addWidget(hint_label("Sounds + my voice get sent into (the cable):"))
-        self.cb_main = QComboBox()
-        av.addWidget(self.cb_main)
-        self.setup_hint = hint_label("")
-        av.addWidget(self.setup_hint)
-        av.addWidget(hint_label("I listen on (my headphones):"))
-        self.cb_mon = QComboBox()
-        av.addWidget(self.cb_mon)
-        av.addWidget(hint_label("My real microphone:"))
-        self.cb_mic = QComboBox()
-        av.addWidget(self.cb_mic)
-        no_wheel(self.cb_main, self.cb_mon, self.cb_mic)
-        for cb, attr in ((self.cb_main, "main_device"), (self.cb_mon, "mon_device"),
-                         (self.cb_mic, "mic_device")):
-            cb.activated.connect(lambda _i, cb=cb, attr=attr: self.on_device(cb, attr))
-        ref = QPushButton("⟳ Re-scan devices")
-        ref.setObjectName("small")
-        ref.clicked.connect(self.refresh_devices)
-        av.addWidget(ref)
-
-        av.addWidget(section_label("SOUND OPTIONS"))
-        self.chk_monitor = QCheckBox("Hear sounds myself")
-        self.chk_monitor.setChecked(c.monitor_sounds)
-        self.chk_monitor.toggled.connect(lambda b: self.set_option("monitor_sounds", b))
-        av.addWidget(self.chk_monitor)
+        # ---- sound shaping
+        eqcard, ev = card()
+        self.eq = EqPanel(c.eq_enabled, c.eq_target, c.eq_preset, c.eq_gains)
+        self.eq.changed.connect(self.on_eq)
+        ev.addWidget(self.eq)
         self.chk_level = QCheckBox("Level volumes (all sounds equally loud)")
         self.chk_level.setChecked(c.level_volumes)
         self.chk_level.toggled.connect(self.on_level_toggle)
-        av.addWidget(self.chk_level)
-
-        self.eq = EqPanel(c.eq_enabled, c.eq_target, c.eq_preset, c.eq_gains)
-        self.eq.changed.connect(self.on_eq)
-        av.addWidget(self.eq)
-        self.on_eq(*self.eq.state())   # push the saved EQ into the engine
-
-        av.addWidget(section_label("HOTKEYS"))
-        hk = QPushButton("⌨  Hotkeys, push-to-talk & more…")
+        ev.addWidget(self.chk_level)
+        hk = QPushButton("Hotkeys & auto push-to-talk…")
         hk.setToolTip("Opens Settings → Hotkeys")
         hk.clicked.connect(lambda: self.open_settings("hotkeys"))
-        av.addWidget(hk)
-
-        def set_adv(on):
-            adv.setVisible(on)
-            self.btn_adv.setText("⚙  Advanced  ▾   (hide)" if on else
-                                 "⚙  Advanced  ▸   devices, EQ…")
-            self.cfg.show_advanced = on
-            self._save_later()
-        self.btn_adv.toggled.connect(set_adv)
-        self.btn_adv.setChecked(c.show_advanced)
-        set_adv(c.show_advanced)
-        pv.addStretch()
-        return panel
+        ev.addWidget(hk, 0, Qt.AlignLeft)
+        rcol.addWidget(eqcard)
+        rcol.addStretch(1)
+        self.on_eq(*self.eq.state())   # push the saved EQ into the engine
+        return page
 
     def on_eq(self, gains, enabled, target, preset):
         c = self.cfg
@@ -536,14 +648,16 @@ class MainWindow(QMainWindow):
                                 + " · ".join(errs) + "</span>")
             return
         n = len(self.cfg.sounds)
-        text = (f"{n} sound{'s' if n != 1 else ''} · click to play · right-click to "
-                "edit / set hotkey · drag to reorder · drop files to add")
+        text = ""
+        if self.tabs.currentWidget() is self.sounds_page:
+            text = (f"{n} sound{'s' if n != 1 else ''} · click to play · right-click to "
+                    "edit / set hotkey · drag to reorder · drop files to add")
         xr = sum(e.xruns.values())
         self._xruns_shown = xr
         if xr:
             tip = ("" if self.cfg.latency == "high" else
-                   " — try ⚙ Settings → General → Audio buffering: Safer")
-            text += (f"<br><span style='color:#ffb020'>{xr} audio drop-out"
+                   " — try Settings → General → Audio buffering: Safer")
+            text += (f"{'<br>' if text else ''}<span style='color:#ffb020'>{xr} audio drop-out"
                      f"{'s' if xr != 1 else ''} since start{tip}</span>")
         self.status.setText(text)
 
@@ -551,36 +665,50 @@ class MainWindow(QMainWindow):
         e = self.engine
         ok, bad = "#13ce66", "#ff4d4f"
         if e.mic_stream is None or not self.cfg.mic_enabled:
-            mic = f"🎤  Your mic  <b style='color:{bad}'>✗ off</b>"
+            mic = f"Your mic  <b style='color:{bad}'>✗ off</b>"
         elif talking:
-            mic = f"🎤  Your mic  <b style='color:{ok}'>✓ hearing you</b>"
+            mic = f"Your mic  <b style='color:{ok}'>✓ hearing you</b>"
         else:
-            mic = f"🎤  Your mic  <b style='color:{ok}'>✓</b>"
+            mic = f"Your mic  <b style='color:{ok}'>✓</b>"
         vm = self.virtual_mic
         any_cable = bool(eng.virtual_outputs())
         if not any_cable:
             state = "missing"
-            out = f"🎙  Virtual mic  <b style='color:{bad}'>✗ not installed yet</b>"
+            out = f"Virtual mic  <b style='color:{bad}'>✗ not installed yet</b>"
             step = ("<b style='color:#ffb020'>One-time setup:</b> install the free virtual "
                     "cable. It's what lets Discord and games hear your sounds — without it, "
                     "only you can hear them.")
         elif vm and e.main_stream is not None:
             state = "ok"
-            out = (f"🎙  <b style='color:{ok}'>{vm}</b> — your new mic "
+            out = (f"<b style='color:{ok}'>{vm}</b> — your new mic "
                    f"<b style='color:{ok}'>✓ working</b>")
             step = (f"<b>The only thing you set:</b> in Discord or your game, pick "
                     f"<b style='color:{ok}'>{vm}</b> as your <b>microphone</b>.")
         else:
             state = "unrouted"
-            out = f"🎙  Virtual mic  <b style='color:{bad}'>✗ not connected</b>"
-            step = ("<b style='color:#ffb020'>Almost:</b> open <b>⚙ Advanced → Devices</b> and "
-                    "set “Sounds + my voice get sent into” to your virtual cable.")
+            out = f"Virtual mic  <b style='color:{bad}'>✗ not connected</b>"
+            step = ("<b style='color:#ffb020'>Almost:</b> under <b>Devices</b>, set "
+                    "“Send into (the cable)” to your virtual cable.")
         self.flow_mic.setText(mic)
         self.flow_out.setText(out)
         self.step_lbl.setText(step)
         self.btn_install.setVisible(state == "missing")
         self.btn_rescan.setVisible(state == "missing")
         self.btn_nomic.setVisible(state == "ok")
+        self.setup_state = state
+        if state == "ok":
+            pill = f"Your mic in Discord / games:  {vm}"
+        elif state == "missing":
+            pill = "One-time setup needed — others can't hear you yet"
+        else:
+            pill = "Not connected to the virtual cable — click to fix"
+        if self.pill.text() != pill:
+            self.pill.setText(pill)
+            self.pill.setIcon(icons.icon("check", "#13ce66") if state == "ok" else
+                              icons.icon("warn", "warn_text"))
+            self.pill.setProperty("state", "ok" if state == "ok" else "warn")
+            self.pill.style().unpolish(self.pill)
+            self.pill.style().polish(self.pill)
 
     def install_cable(self):
         script = RESOURCE_DIR / "install-vbcable.ps1"
@@ -596,6 +724,12 @@ class MainWindow(QMainWindow):
             "Windows will ask for permission — click Yes, then click “Install Driver”.\n\n"
             "When it's done, click “I've installed it — check again”. If it doesn't show up, "
             "restart your PC.")
+
+    def run_setup(self):
+        """The quick-setup guide (first launch, or the Setup tab's Step-by-step guide)."""
+        from soundboard.ui.setupwizard import SetupWizard
+        SetupWizard(self).exec()
+        self._prepare_all()
 
     def open_windows_mic(self):
         vm = self.virtual_mic or "your virtual cable"
@@ -658,10 +792,12 @@ class MainWindow(QMainWindow):
         for m in self.cfg.sounds:
             if m.hotkey:
                 mapping.setdefault(m.hotkey, m.id)
+        mapping.update(self.overlay.layer())   # its keys, only while it's open
         self.hotkeys.register(mapping)
 
     def on_hotkeys_failed(self, failed: list[str]):
         if failed:
+            log.warning("hotkeys another program already owns: %s", failed)
             self.status.setText("<span style='color:#ffb020'>Another program is already using "
                                 + ", ".join(pretty_key(c) for c in failed)
                                 + " — pick a different hotkey.</span>")
@@ -689,6 +825,9 @@ class MainWindow(QMainWindow):
 
     def apply_theme(self, name: str):
         self.cfg.theme = theme.apply(QApplication.instance(), name)
+        icons.retheme()
+        self.pill.setText("")   # forces _update_flow to repaint its icon
+        self._update_flow()
         self._paint_logo()
         self._save_later()
 
@@ -700,6 +839,8 @@ class MainWindow(QMainWindow):
 
     def on_hotkey(self, action):
         b = self.browser
+        if self.overlay.handle(action):
+            return
         if action == "__stop__":
             self.stop_all()
         elif action == "__pause__":
@@ -719,12 +860,13 @@ class MainWindow(QMainWindow):
 
     CUES = {"start": (660, 990), "stop": (990, 660), "saved": (880, 880, 1320), "fail": (330, 247)}
 
-    def cue(self, kind: str):
+    def cue(self, kind: str | tuple):
         """A short beep in the headphones only (others never hear it), so a hotkey pressed
-        in-game is confirmed without looking at the app."""
+        in-game is confirmed without looking at the app. `kind` is a CUES name or the
+        notes themselves (Hz; 0 = a gap)."""
         if not self.cfg.cue_sounds or self.engine.mon_stream is None:
             return
-        notes, n = self.CUES[kind], int(0.075 * SR)
+        notes, n = self.CUES[kind] if isinstance(kind, str) else kind, int(0.075 * SR)
         t = np.arange(n) / SR
         env = np.minimum(1.0, np.minimum(t, t[::-1]) / 0.008)   # 8 ms fade in/out
         tone = np.concatenate([np.sin(2 * np.pi * f * t) * env for f in notes]) * 0.18
@@ -756,7 +898,7 @@ class MainWindow(QMainWindow):
         v = self.engine.play(sid, data, self.gain_for(m), loop=m.loop, mode=m.mode)
         if v is None and not self.engine.active_outputs():
             self.status.setText("<span style='color:#ffb020'>No audio device is open — pick one "
-                                "on the right.</span>")
+                                "in Setup.</span>")
 
     def select(self, sid):
         if self.current != sid:
@@ -957,13 +1099,17 @@ class MainWindow(QMainWindow):
         if not m:
             return
         menu = QMenu(self)
-        a_prev = menu.addAction("▶  Preview (only me)")
-        a_edit = menu.addAction("✎  Edit… (name, volume, hotkey, loop)")
-        a_hk = menu.addAction("⌨  Set hotkey…")
+        a_stop = (menu.addAction(icons.icon("stop"), "Stop") if self.engine.state(sid)
+                  else None)
+        a_prev = menu.addAction(icons.icon("headphones"), "Preview (only me)")
+        a_edit = menu.addAction(icons.icon("edit"), "Edit… (name, volume, hotkey, loop)")
+        a_hk = menu.addAction(icons.icon("keyboard"), "Set hotkey…")
         menu.addSeparator()
-        a_del = menu.addAction("🗑  Remove")
+        a_del = menu.addAction(icons.icon("trash", "danger_text"), "Remove")
         act = menu.exec(pos)
-        if act == a_prev:
+        if act is not None and act == a_stop:
+            self.engine.stop(sid)
+        elif act == a_prev:
             self.preview(sid)
         elif act == a_edit:
             self.edit(sid)
@@ -1022,19 +1168,19 @@ class MainWindow(QMainWindow):
     def on_mic_check(self, on):
         self.engine.ring_mon.clear()
         self.engine.mic_check = on
-        self.btn_check.setText("🔴  LISTENING TO MY MIC — click to stop" if on
-                               else "🎤  Listen to my mic output")
+        self.btn_check.setText("Stop hearing it" if on else "Hear what they hear")
         self.mic_banner.setVisible(on)
         if on:
             self._pulse.start()   # impossible to miss, and cheap
         else:
             self._pulse.stop()
             self._banner_fx.setOpacity(1.0)
-        self.setWindowTitle("🔴 MIC LIVE IN HEADPHONES — Soundboard" if on else "Soundboard")
-        self.mic_lbl.setStyleSheet("color:#ff4d4f; font-weight:700;" if on else "")
+        self.setWindowTitle("● MIC LIVE IN HEADPHONES — Soundboard" if on else "Soundboard")
+        self.mic_lbl.setStyleSheet("color:#ff4d4f; font-weight:700;" if on else
+                                   "font-weight:600;")
         self.mic_meter.hot = on
         if on and not self.cfg.mic_enabled:
-            self.status.setText("<span style='color:#ffb020'>“Mix my mic in” is off — "
+            self.status.setText("<span style='color:#ffb020'>“My mic” is off — "
                                 "nobody (including you) will hear your mic.</span>")
 
     def start_test(self):
@@ -1103,6 +1249,7 @@ class MainWindow(QMainWindow):
         if self._tick_n % 30 == 0:   # about once a second
             if e.check_streams() or sum(e.xruns.values()) != self._xruns_shown:
                 self._update_status()
+            self.voice.poll()
         playing = e.playing()
         for sid, p in self.pads.items():
             prog, paused = playing.get(sid, (None, False))
@@ -1110,6 +1257,8 @@ class MainWindow(QMainWindow):
                 p.progress, p.paused = prog, paused
                 p.update()
         self._update_transport(playing)
+        self._update_chips(playing)
+        self.overlay.tick(playing)
         self.out_meter.set_level(e.level_main)
         self.mic_meter.set_level(e.level_mic if e.mic_stream else 0.0)
         talking = e.mic_stream is not None and e.level_mic > 0.05
@@ -1125,18 +1274,18 @@ class MainWindow(QMainWindow):
         # test recording
         if e.recording:
             left = 6.0 - (time.monotonic() - self._rec_started)
-            self.btn_rec.setText(f"⏺  Recording… talk / play sounds  ({max(left, 0):.0f}s)")
+            self.btn_rec.setText(f"Recording… talk / play sounds  ({max(left, 0):.0f}s)")
         elif e.rec_done is not None:
             data, rate = e.rec_done
             e.rec_done = None
             data, rate = self._finish_test(data, rate)
             e.play("__test__", data, 1.0, preview=True, src_rate=rate)
             self._rec_playing = True
-            self.btn_rec.setText("🔊  Playing back what they heard…")
+            self.btn_rec.setText("Playing back what they heard…")
         elif self._rec_playing and "__test__" not in playing:
             self._rec_playing = False
             self.btn_rec.setEnabled(True)
-            self.btn_rec.setText("⏺  Record 6s → play back")
+            self.btn_rec.setText("Record 6s → play back")
 
         # auto push-to-talk: hold the game's PTT key only while a sound (or the live
         # browser) goes out. _ptt_held remembers exactly which key we pressed, so it's
@@ -1158,7 +1307,7 @@ class MainWindow(QMainWindow):
             return
         prog, paused = playing.get(sid, (None, False))
         live = prog is not None
-        self.btn_pp.setText("⏸" if live and not paused else "▶")
+        self._set_pp_icon("pause" if live and not paused else "play")
         if not self._seeking:
             frac = prog if live else self.start_frac
             self.seek.blockSignals(True)
@@ -1176,8 +1325,10 @@ class MainWindow(QMainWindow):
         self._release_ptt()
         self._stop_capture()
         self.cfg.save()
+        self.overlay.shutdown()
         self.hotkeys.stop()
         self.browser.shutdown()
+        self.voice.shutdown()
         self.engine.shutdown()
         log.info("closed cleanly (drop-outs %s, callback errors %s, stalls %d)",
                  self.engine.xruns, self.engine.cb_errors, self.engine.stalls)

@@ -1,0 +1,13 @@
+#!/bin/sh
+# Blocks commits that contain secrets or personal data.
+# Enable once per clone:  git config core.hooksPath .githooks
+root=$(git rev-parse --show-toplevel)
+py="$root/.venv/Scripts/python.exe"
+[ -x "$py" ] || py="$root/.venv/bin/python"
+[ -x "$py" ] || py=python
+"$py" "$root/scripts/check_sensitive.py" --staged || {
+    echo
+    echo "Commit blocked by scripts/check_sensitive.py (see CONTRIBUTING.md)."
+    echo "Fix the lines above, or mark a false positive with a 'sensitive-scan: allow' comment."
+    exit 1
+}

@@ -109,3 +109,31 @@ def test_wheel_guard_scrolls_the_page_not_the_slider(qapp):
 def test_window_uses_only_the_temp_config(window, app_dir):
     assert library.CONFIG_PATH == app_dir / "config.json"
     assert len(window.cfg.sounds) == 2
+
+
+def test_overlapping_sounds_each_get_a_stop_chip(window, monkeypatch):
+    stopped = []
+    monkeypatch.setattr(window.engine, "stop", stopped.append)
+    window._update_chips({"s0": (0.2, False)})
+    assert window.playing_row.isHidden() and not window._chips   # one sound: no chips
+    window.select("s1")
+    window._update_chips({"s0": (0.2, False), "s1": (0.1, False)})
+    assert not window.playing_row.isHidden() and set(window._chips) == {"s0", "s1"}
+    name, stop = window._chips["s0"].findChildren(main.QPushButton)
+    name.click()                        # takes s0 into the player, no restart
+    assert window.current == "s0" and not stopped
+    stop.click()
+    assert stopped == ["s0"]
+
+
+def test_mic_check_button_keeps_its_label(window):
+    window.btn_check.setChecked(True)
+    window.btn_check.setChecked(False)
+    assert window.btn_check.text() == "Hear what they hear"
+
+
+def test_pad_hints_show_only_on_the_sounds_tab(window):
+    window.tabs.setCurrentWidget(window.sounds_page)
+    assert "click to play" in window.status.text()
+    window.tabs.setCurrentWidget(window.setup_page)
+    assert "click to play" not in window.status.text()

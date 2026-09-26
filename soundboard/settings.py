@@ -1,12 +1,15 @@
-"""Settings window: themes, every global hotkey in one place, general options."""
+"""Settings window: themes, every global hotkey in one place, the in-game overlay,
+general options."""
 from __future__ import annotations
 
 from PySide6.QtCore import QRectF, QSize, Qt
 from PySide6.QtGui import QColor, QFont, QPainter, QPainterPath
 from PySide6.QtWidgets import (QCheckBox, QComboBox, QDialog, QFrame, QGridLayout, QHBoxLayout,
-                               QLabel, QPushButton, QTabWidget, QVBoxLayout, QWidget)
+                               QLabel, QPushButton, QSlider, QTabWidget, QVBoxLayout, QWidget)
 
 from soundboard import theme, winkeys
+from soundboard.ui import icons
+from soundboard.ui import overlay as ovl
 from soundboard.wheelguard import no_wheel
 from soundboard.winkeys import Hotkeys
 
@@ -27,6 +30,10 @@ HOTKEY_GROUPS = [
         ("bplay_hotkey", "__bplay__", "Play / pause the browser", ""),
         ("live_hotkey", "__live__", "LIVE on / off",
          "Switch between others hearing the browser and only you."),
+    ]),
+    ("Overlay", [
+        ("overlay_hotkey", "__overlay__", "Open the in-game overlay",
+         "Sound tiles over your game; pick one with the number keys. See the Overlay tab."),
     ]),
 ]
 HOTKEY_ACTIONS = [a for _, group in HOTKEY_GROUPS for a in group]
@@ -128,10 +135,15 @@ class SettingsDialog(QDialog):
         lay.setContentsMargins(16, 14, 16, 14)
         self.tabs = QTabWidget()
         self.tabs.setDocumentMode(True)
-        self.tabs.addTab(self._appearance(), "🎨  Appearance")
-        self.tabs.addTab(self._hotkeys(), "⌨  Hotkeys")
-        self.tabs.addTab(self._general(), "⚙  General")
-        self.tabs.setCurrentIndex({"appearance": 0, "hotkeys": 1, "general": 2}.get(page, 0))
+        self.tabs.addTab(self._appearance(), "Appearance")
+        self.hk_buttons: dict[str, list[QPushButton]] = {}
+        self.tabs.addTab(self._hotkeys(), "Hotkeys")
+        self.tabs.addTab(self._overlay(), "Overlay")
+        self.tabs.addTab(self._general(), "General")
+        for i, name in enumerate(("palette", "keyboard", "gamepad", "settings")):
+            icons.set_tab_icon(self.tabs, i, name)
+        self.tabs.setCurrentIndex(
+            {"appearance": 0, "hotkeys": 1, "overlay": 2, "general": 3}.get(page, 0))
         lay.addWidget(self.tabs, 1)
         close = QPushButton("Done")
         close.setObjectName("primary")
@@ -191,7 +203,6 @@ class SettingsDialog(QDialog):
 
     def _hotkeys(self):
         w, v = self._page()
-        self.hk_buttons: dict[str, QPushButton] = {}
         for group, actions in HOTKEY_GROUPS:
             card, cv = self._card(group)
             for attr, _action, label, desc in actions:
@@ -234,12 +245,13 @@ class SettingsDialog(QDialog):
         x.clicked.connect(lambda _=False, a=attr: self._set_hk(a, ""))
         row.addWidget(x)
         lay.addLayout(row)
-        self.hk_buttons[attr] = b
+        self.hk_buttons.setdefault(attr, []).append(b)
 
     def _refresh_hk(self):
-        for attr, b in self.hk_buttons.items():
+        for attr, buttons in self.hk_buttons.items():
             combo = getattr(self.mw.cfg, attr)
-            b.setText(pretty_key(combo) or ("Off" if attr == "ptt_key" else "Click to set…"))
+            for b in buttons:
+                b.setText(pretty_key(combo) or ("Off" if attr == "ptt_key" else "Click to set…"))
 
     def _capture(self, attr):
         d = HotkeyDialog(self.mw.hotkeys, self)
@@ -251,6 +263,99 @@ class SettingsDialog(QDialog):
     def _set_hk(self, attr, combo):
         self.mw.set_global_hotkey(attr, combo)
         self._refresh_hk()
+
+    def _overlay(self):
+        """The in-game overlay: how it opens, which keys pick, how it looks."""
+        w, v = self._page()
+        s = self.mw.overlay.s
+        card, cv = self._card("Open it",
+                              "Press the hotkey in a game and your sounds appear on top of it. "
+                              "The game keeps your keyboard and mouse, and the overlay's keys "
+                              "go back to the game the moment it closes.")
+        self._hk_row(cv, "overlay_hotkey", "Overlay hotkey", "")
+        cv.addWidget(self._ov_combo("mode", ovl.MODES, s.mode))
+        v.addWidget(card)
+
+        card, cv = self._card("Pick sounds",
+                              "Nine tiles a page, in the same order as your pads — drag pads in "
+                              "the Sounds tab to rearrange them.")
+        cv.addWidget(self._ov_combo("keys", ovl.KEY_CHOICES, s.keys))
+        after = QCheckBox("Hide the overlay after picking a sound")
+        after.setChecked(s.close_after_play)
+        after.toggled.connect(lambda b: self._ov_set("close_after_play", b))
+        cv.addWidget(after)
+        row = QHBoxLayout()
+        row.addWidget(QLabel("Hide when untouched for"))
+        row.addWidget(self._ov_combo("autohide", ovl.AUTOHIDE, s.autohide), 1)
+        cv.addLayout(row)
+        self.ov_toggle_only = (after, row.itemAt(1).widget())
+        v.addWidget(card)
+
+        card, cv = self._card("Look")
+        grid = QGridLayout()
+        grid.setHorizontalSpacing(12)
+        grid.addWidget(QLabel("Position"), 0, 0)
+        grid.addWidget(self._ov_combo("position", ovl.POSITIONS, s.position), 0, 1)
+        grid.addWidget(QLabel("Size"), 1, 0)
+        grid.addLayout(self._ov_slider("scale", 60, 160, s.scale), 1, 1)
+        grid.addWidget(QLabel("Background"), 2, 0)
+        grid.addLayout(self._ov_slider("opacity", 30, 100, s.opacity), 2, 1)
+        grid.setColumnStretch(1, 1)
+        cv.addLayout(grid)
+        prev = QPushButton("Show preview")
+        prev.setToolTip("Shows the overlay for a few seconds")
+        prev.clicked.connect(lambda: self.mw.overlay.preview())
+        row = QHBoxLayout()
+        row.addStretch(1)
+        row.addWidget(prev)
+        cv.addLayout(row)
+        v.addWidget(card)
+
+        note = QLabel("Games in true exclusive fullscreen can't have anything drawn over them: "
+                      "there the keys still work and you hear beeps instead (turn on hotkey "
+                      "beeps in General). Borderless / windowed fullscreen shows the overlay. "
+                      "Some games also see the number keys you press — if picking a sound "
+                      "switches your weapon, use the numpad.")
+        note.setObjectName("hint")
+        note.setWordWrap(True)
+        v.addWidget(note)
+        v.addStretch(1)
+        self._ov_sync()
+        return w
+
+    def _ov_combo(self, key, choices, current):
+        cb = QComboBox()
+        for value, label in choices:
+            cb.addItem(label, value)
+        cb.setCurrentIndex(max(0, cb.findData(current)))
+        cb.currentIndexChanged.connect(lambda i: self._ov_set(key, cb.itemData(i)))
+        no_wheel(cb)
+        return cb
+
+    def _ov_slider(self, key, lo, hi, value):
+        row = QHBoxLayout()
+        sl = QSlider(Qt.Horizontal)
+        sl.setRange(lo, hi)
+        sl.setValue(value)
+        val = QLabel(f"{value} %")
+        val.setFixedWidth(48)
+        val.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        sl.valueChanged.connect(lambda x: (val.setText(f"{x} %"), self._ov_set(key, x)))
+        no_wheel(sl)
+        row.addWidget(sl, 1)
+        row.addWidget(val)
+        return row
+
+    def _ov_set(self, key, value):
+        d = self.mw.overlay.s.to_dict()
+        d[key] = value
+        self.mw.overlay.apply(d)
+        self.mw.set_option("overlay", self.mw.overlay.s.to_dict())
+        self._ov_sync()
+
+    def _ov_sync(self):
+        for wdg in getattr(self, "ov_toggle_only", ()):
+            wdg.setEnabled(self.mw.overlay.s.mode == "toggle")   # hold mode: letting go hides
 
     def _general(self):
         w, v = self._page()

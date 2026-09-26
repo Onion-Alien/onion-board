@@ -70,9 +70,10 @@ def analyze(out: np.ndarray, out_rate: int, mic: np.ndarray | None, mic_rate: in
         if diff > 6:
             pct = int(round(sound_vol * 100 * 10 ** (-(diff - 2) / 20) / 5) * 5)
             res["advice"] = (f"Sounds are {diff:.0f} dB louder than your voice — they'll drown "
-                             f"you out. Try “Sounds → others” around {max(pct, 5)}%.")
+                             f"you out. Try the Sounds tab's volume around {max(pct, 5)}%.")
         elif diff < -12:
-            res["advice"] = "Sounds are much quieter than your voice — turn “Sounds → others” up."
+            res["advice"] = ("Sounds are much quieter than your voice — turn the Sounds tab's "
+                             "volume up.")
     return res
 
 
@@ -82,11 +83,11 @@ def summary_html(r: dict, cable: str | None) -> str:
     if not r["talked"]:
         lines.append((warn, "⚠ Didn't hear you talk — talk during the test to check your mic"))
     elif r["voice_in"]:
-        lines.append((ok, "✅ Your VOICE is in the output"))
+        lines.append((ok, "✓ Your VOICE is in the output"))
     else:
-        lines.append((bad, "❌ Your voice is NOT reaching the output — is “Mix my mic in” on?"))
+        lines.append((bad, "✗ Your voice is NOT reaching the output — is “My mic” turned on?"))
     if r["sounds_in"]:
-        lines.append((ok, "✅ SOUNDS are in the output"))
+        lines.append((ok, "✓ SOUNDS are in the output"))
     else:
         lines.append((warn, "— No soundboard sound was playing during the test"))
     if r["advice"]:

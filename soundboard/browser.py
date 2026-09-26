@@ -28,26 +28,28 @@ import time
 import numpy as np
 import soundfile as sf
 from PySide6.QtCore import QObject, Qt, QTimer, QUrl, Signal
-from PySide6.QtGui import QFontMetrics
-from PySide6.QtNetwork import QHostAddress
+from PySide6.QtGui import QFontMetrics, QPainter, QPainterPath, QPixmap
+from PySide6.QtNetwork import QHostAddress, QNetworkAccessManager, QNetworkRequest
 from PySide6.QtWebEngineCore import (QWebEnginePage, QWebEngineProfile, QWebEngineScript,
                                      QWebEngineSettings)
 from PySide6.QtWebEngineWidgets import QWebEngineView
 from PySide6.QtWebSockets import QWebSocket, QWebSocketServer
 from PySide6.QtWidgets import (QCheckBox, QFrame, QHBoxLayout, QLabel, QLineEdit, QPushButton,
-                               QSlider, QVBoxLayout, QWidget)
+                               QSlider, QStyle, QVBoxLayout, QWidget)
 from shiboken6 import delete as qt_delete
 from shiboken6 import isValid as qt_valid
 
+from soundboard.adblocker import YOUTUBE_JS, AdBlocker, hide_css_js
 from soundboard.engine import SR
 from soundboard.library import APP_DIR, MAX_SECONDS, trim_silence
-from soundboard.wheelguard import no_wheel
+from soundboard.ui import icons
+from soundboard.ui.panel import VolumeControl, bar, icon_label, vsep
 
 log = logging.getLogger(__name__)
 
 CLIP_S = 15            # "clip the last N seconds" length
 SPOOL_PATH = APP_DIR / "recording.tmp.wav"
-LIVE_TEXT = {True: "🔴  LIVE — others hear it", False: "🎧  Only me — click to go live"}
+LIVE_TEXT = {True: "LIVE — others hear it", False: "Only me — click to go live"}
 WORLD = QWebEngineScript.ApplicationWorld
 BLOCK = 1024           # frames per chunk (~21 ms): the same for worklet and fallback
 HANDOVER_S = 0.3       # a frame keeps the mic until it's been quiet this long
@@ -243,12 +245,28 @@ def set_lite_js(on: bool) -> str:
 _MEDIA = ("const a=[...document.querySelectorAll('video,audio')];"
           "const m=a.find(e=>!e.paused)||a.find(e=>e.currentTime>0)||a[0];")
 # returned as JSON text: PySide6 can't hand JS arrays/objects back to Python (they arrive as '')
+# [position, duration, paused, title, channel]. On YouTube the document title is
+# used: the <h1> can still hold the previous video's title after an in-page navigation.
 MINI_STATE_JS = ("(()=>{" + _MEDIA + "if(!m)return '';"
-                 "const t=document.querySelector('h1.ytd-watch-metadata, #title h1');"
+                 "const yt=/(^|\\.)youtube\\.com$/.test(location.hostname);"
+                 "const t=yt?null:document.querySelector('h1');"
+                 "const c=document.querySelector('#owner ytd-channel-name a, "
+                 "ytd-video-owner-renderer #channel-name a');"
                  "return JSON.stringify([m.currentTime||0, isFinite(m.duration)?m.duration:0, "
-                 "m.paused, (t&&t.textContent.trim())||document.title]);})()")
+                 "m.paused, (t&&t.textContent.trim())||document.title, "
+                 "(c&&c.textContent.trim())||'']);})()")
 MINI_TOGGLE_JS = "(()=>{" + _MEDIA + "if(m){m.paused?m.play():m.pause()}})()"
 MINI_SEEK_JS = "(()=>{" + _MEDIA + "if(m)m.currentTime=Math.max(0,m.currentTime+(%d))})()"
+MINI_SEEK_TO_JS = ("(()=>{" + _MEDIA + "if(m&&isFinite(m.duration))"
+                   "m.currentTime=m.duration*%f})()")
+# Restarts playback that has stalled: presses YouTube's own play button if its player
+# thinks it's paused, otherwise re-seeks in place (makes the player fetch again) and plays.
+MINI_KICK_JS = ("(()=>{" + _MEDIA + "if(!m)return;"
+                "const p=document.getElementById('movie_player');"
+                "const b=p&&p.querySelector('.ytp-play-button');"
+                "if(b&&p.classList.contains('paused-mode')){b.click();return}"
+                "m.currentTime=m.currentTime;m.play()})()")
+STALL_S = 3.0          # Lite: "playing" but the position hasn't moved this long -> unstick
 MINI_NEXT_JS = ("(()=>{const b=document.querySelector('.ytp-next-button');"
                 "if(b&&b.offsetParent!==null){b.click();return true}"
                 "const n=document.querySelector('a.ytp-next-button');if(n){n.click();return true}"
@@ -342,6 +360,66 @@ class AudioSink(QObject):
             if qt_valid(s):
                 s.close()
         self.server.close()
+
+
+class SeekBar(QSlider):
+    """A seek bar that jumps to where you click (a plain slider pages by steps)."""
+    seek = Signal(float)   # 0..1
+
+    def __init__(self):
+        super().__init__(Qt.Horizontal)
+        self.setObjectName("seek")
+        self.setRange(0, 1000)
+        self.setCursor(Qt.PointingHandCursor)
+        self.sliderReleased.connect(lambda: self.seek.emit(self.value() / 1000))
+
+    def mousePressEvent(self, e):
+        if e.button() == Qt.LeftButton:
+            self.setValue(QStyle.sliderValueFromPosition(
+                self.minimum(), self.maximum(), int(e.position().x()), self.width()))
+        super().mousePressEvent(e)   # the handle is under the cursor now: drags work too
+
+    def wheelEvent(self, e):
+        e.ignore()   # scrolling the tab must not scrub the video
+
+
+def rounded(pm: QPixmap, w: int, h: int, r: int = 10) -> QPixmap:
+    """`pm` cropped to fill w x h, with rounded corners."""
+    pm = pm.scaled(w, h, Qt.KeepAspectRatioByExpanding, Qt.SmoothTransformation)
+    out = QPixmap(w, h)
+    out.fill(Qt.transparent)
+    p = QPainter(out)
+    p.setRenderHint(QPainter.Antialiasing)
+    path = QPainterPath()
+    path.addRoundedRect(0, 0, w, h, r, r)
+    p.setClipPath(path)
+    p.drawPixmap((w - pm.width()) // 2, (h - pm.height()) // 2, pm)
+    p.end()
+    return out
+
+
+def youtube_id(url: QUrl) -> str:
+    host = url.host()
+    if host == "youtu.be":
+        return url.path().strip("/")
+    if not re.search(r"(^|\.)youtube\.com$", host):
+        return ""
+    path = url.path()
+    if path.startswith(("/shorts/", "/embed/", "/live/")):
+        return path.split("/")[2]
+    if path == "/watch":
+        for kv in url.query().split("&"):
+            k, _, val = kv.partition("=")
+            if k == "v":
+                return val
+    return ""
+
+
+def fmt_time(s: float) -> str:
+    s = int(s)
+    if s >= 3600:
+        return f"{s // 3600}:{s // 60 % 60:02d}:{s % 60:02d}"
+    return f"{s // 60}:{s % 60:02d}"
 
 
 class _Page(QWebEnginePage):
@@ -462,25 +540,31 @@ class BrowserTab(QWidget):
         self._flash_until = 0.0
         self._collapsed = False    # Lite: page hidden, mini-player shown
         self._mini_poll = 0.0
+        self._thumb_id = None      # YouTube video whose thumbnail is shown
+        self._stall = (-1.0, 0.0)  # (position, when it last moved): the Lite watchdog
+        self._unsticking = False
+        self.net = QNetworkAccessManager(self)
 
         v = QVBoxLayout(self)
         v.setContentsMargins(0, 0, 0, 0)
         v.setSpacing(8)
 
-        # ---- navigation
+        # Same shape as every tab: toolbar on top, the page, then the control bar.
+        # ---- toolbar: navigation
         nav = QHBoxLayout()
         nav.setSpacing(6)
-        self.btn_back = QPushButton("◀")
-        self.btn_fwd = QPushButton("▶")
-        self.btn_reload = QPushButton("⟳")
-        for b, tip in ((self.btn_back, "Back"), (self.btn_fwd, "Forward"),
-                       (self.btn_reload, "Reload")):
+        self.btn_back = QPushButton()
+        self.btn_fwd = QPushButton()
+        self.btn_reload = QPushButton()
+        for b, ic, tip in ((self.btn_back, "back", "Back"), (self.btn_fwd, "forward", "Forward"),
+                           (self.btn_reload, "reload", "Reload")):
             b.setObjectName("round")
             b.setFixedSize(36, 32)
             b.setToolTip(tip)
+            icons.set_icon(b, ic, size=16)
             nav.addWidget(b)
         self.url = QLineEdit()
-        self.url.setPlaceholderText("Search or type a web address…")
+        self.url.setPlaceholderText("Search YouTube or type a web address…")
         self.url.returnPressed.connect(self._go)
         nav.addWidget(self.url, 1)
         for label, link in QUICK_LINKS:
@@ -490,113 +574,94 @@ class BrowserTab(QWidget):
             nav.addWidget(b)
         v.addLayout(nav)
 
-        # ---- live / volume / record bar
-        bar = QFrame()
-        bar.setObjectName("transport")
-        bh = QHBoxLayout(bar)
-        bh.setContentsMargins(10, 8, 12, 8)
-        bh.setSpacing(10)
-        self.btn_live = QPushButton()
-        self.btn_live.setObjectName("live")
-        self.btn_live.setCheckable(True)
-        # wide enough for both labels (bold), so the bar doesn't jump when it toggles
-        self.btn_live.ensurePolished()   # pick up the stylesheet font first
-        f = self.btn_live.font()
-        f.setBold(True)
-        fm = QFontMetrics(f)
-        self.btn_live.setMinimumWidth(max(fm.horizontalAdvance(t) for t in LIVE_TEXT.values()) + 40)
-        self.btn_live.toggled.connect(self._on_live)
-        bh.addWidget(self.btn_live)
-
-        bh.addWidget(QLabel("Volume"))
-        self.vol = QSlider(Qt.Horizontal)
-        self.vol.setRange(0, 300)
-        self.vol.setFixedWidth(110)
-        self.vol.setToolTip("Browser volume (for them and for you)")
-        no_wheel(self.vol)
-        self.vol_lbl = QLabel()
-        self.vol_lbl.setFixedWidth(42)
-        self.vol.valueChanged.connect(self._on_vol)
-        bh.addWidget(self.vol)
-        bh.addWidget(self.vol_lbl)
-
-        self.chk_hear = QCheckBox("Hear it myself")
-        self.chk_hear.toggled.connect(self._on_hear)
-        bh.addWidget(self.chk_hear)
-
-        self.meter = meter_cls()
-        self.meter.setToolTip("Browser audio level")
-        bh.addWidget(self.meter, 1)
-
-        self.btn_rec = QPushButton("⏺  Record clip")
-        self.btn_rec.setObjectName("rec")
-        self.btn_rec.setCheckable(True)
-        self.btn_rec.setToolTip("Record what's playing in the browser. Click again to stop — "
-                                "the clip is added to your Sounds.")
-        self.btn_rec.toggled.connect(self._on_rec)
-        bh.addWidget(self.btn_rec)
-        self.btn_last = QPushButton(f"⏪  Clip last {CLIP_S}s")
-        self.btn_last.setToolTip(f"Save the last {CLIP_S} seconds the browser played as a sound")
-        self.btn_last.clicked.connect(self.clip_last)
-        bh.addWidget(self.btn_last)
-        self.btn_lite = QPushButton("🍃  Lite")
-        self.btn_lite.setObjectName("lite")
-        self.btn_lite.setCheckable(True)
-        self.btn_lite.setToolTip("Lite mode — easy on your game: while something plays, the page "
-                                 "is hidden (no video drawn or decoded) and YouTube drops to 144p. "
-                                 "Audio is unaffected.")
-        self.btn_lite.toggled.connect(self._on_lite)
-        bh.addWidget(self.btn_lite)
-        v.addWidget(bar)
-
-        self.info = QLabel()
-        self.info.setWordWrap(True)
-        self.info.setTextFormat(Qt.RichText)
-        self.info.setObjectName("muted")
-        v.addWidget(self.info)
-
         # ---- Lite mini-player (replaces the page while something plays)
+        # [thumbnail]  title                                   [Lite] [Show page]
+        #              channel
+        #              0:42 ━━━━━━━━━━━●──────────── 3:15
+        #                     (-10)  ( ▶ )  (+10)  (⏭)
         self.mini = QFrame()
         self.mini.setObjectName("transport")
-        mv = QVBoxLayout(self.mini)
-        mv.setContentsMargins(16, 14, 16, 14)
-        mv.setSpacing(10)
+        mh = QHBoxLayout(self.mini)
+        mh.setContentsMargins(14, 14, 18, 14)
+        mh.setSpacing(16)
+        self.mini_thumb = QLabel()
+        self.mini_thumb.setFixedSize(192, 108)
+        self.mini_thumb.setAlignment(Qt.AlignCenter)
+        self.mini_thumb.setStyleSheet("background:rgba(127,127,127,0.12); border-radius:10px;")
+        mh.addWidget(self.mini_thumb, 0, Qt.AlignTop)
+
+        mv = QVBoxLayout()
+        mv.setSpacing(4)
+        top = QHBoxLayout()
+        top.setSpacing(8)
+        titles = QVBoxLayout()
+        titles.setSpacing(2)
         self.mini_title = QLabel("—")
-        self.mini_title.setStyleSheet("font-size:12pt; font-weight:600;")
+        self.mini_title.setStyleSheet("font-size:13pt; font-weight:700;")
         self.mini_title.setWordWrap(True)
-        mv.addWidget(self.mini_title)
+        titles.addWidget(self.mini_title)
+        self.mini_sub = QLabel("")
+        self.mini_sub.setObjectName("muted")
+        titles.addWidget(self.mini_sub)
+        top.addLayout(titles, 1)
+        lite = QLabel("LITE")
+        lite.setToolTip("Lite mode: the page is hidden while it plays, so it isn't drawing "
+                        "or decoding video. Easy on your game; the audio keeps going.")
+        lite.setStyleSheet("color:#13ce66; border:1px solid #1c6b45; border-radius:9px; "
+                           "padding:1px 8px; font-size:8pt; font-weight:700;")
+        top.addWidget(lite, 0, Qt.AlignTop)
+        show = QPushButton("Show page")
+        show.setObjectName("small")
+        show.setToolTip("Bring the page back to pick something else. "
+                        "It hides again when the next thing starts playing.")
+        show.clicked.connect(lambda: self._set_collapsed(False))
+        top.addWidget(show, 0, Qt.AlignTop)
+        mv.addLayout(top)
+        mv.addStretch(1)
+
+        seek = QHBoxLayout()
+        seek.setSpacing(10)
+        self.mini_pos = QLabel("0:00")
+        self.mini_pos.setObjectName("muted")
+        self.mini_seek = SeekBar()
+        self.mini_seek.seek.connect(self._mini_seek_to)
+        self.mini_dur = QLabel("0:00")
+        self.mini_dur.setObjectName("muted")
+        for w in (self.mini_pos, self.mini_dur):
+            w.setMinimumWidth(QFontMetrics(w.font()).horizontalAdvance("0:00:00"))
+        self.mini_pos.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        seek.addWidget(self.mini_pos)
+        seek.addWidget(self.mini_seek, 1)
+        seek.addWidget(self.mini_dur)
+        mv.addLayout(seek)
+
         row = QHBoxLayout()
-        row.setSpacing(8)
+        row.setSpacing(10)
+        row.addStretch(1)
         self.mini_btns = {}
-        for key, text, tip in (("back", "⏪ 10s", "Back 10 seconds"),
-                               ("play", "⏯", "Play / pause"),
-                               ("fwd", "10s ⏩", "Forward 10 seconds"),
-                               ("next", "⏭", "Next video (YouTube)")):
-            b = QPushButton(text)
-            b.setObjectName("round")
-            b.setMinimumSize(56, 36)
+        for key, ic, tip, size in (("back", "", "Back 10 seconds", 38),
+                                   ("play", "pause", "Play / pause", 48),
+                                   ("fwd", "", "Forward 10 seconds", 38),
+                                   ("next", "next", "Next video (YouTube)", 38)):
+            b = QPushButton({"back": "−10", "fwd": "+10"}.get(key, ""))
+            b.setFixedSize(size, size)
             b.setToolTip(tip)
+            b.setCursor(Qt.PointingHandCursor)
+            b.setStyleSheet(f"border-radius:{size // 2}px; padding:0; font-weight:700;")
+            if key == "play":
+                b.setObjectName("primary")
+                icons.set_icon(b, ic, "on_accent", size=20)
+            elif ic:
+                icons.set_icon(b, ic, size=16)
             row.addWidget(b)
             self.mini_btns[key] = b
+        row.addStretch(1)
         self.mini_btns["back"].clicked.connect(lambda: self._mini_js(MINI_SEEK_JS % -10))
         self.mini_btns["fwd"].clicked.connect(lambda: self._mini_js(MINI_SEEK_JS % 10))
         self.mini_btns["play"].clicked.connect(lambda: self._mini_js(MINI_TOGGLE_JS))
         self.mini_btns["next"].clicked.connect(lambda: self._mini_js(MINI_NEXT_JS))
-        self.mini_time = QLabel("0:00 / 0:00")
-        self.mini_time.setObjectName("muted")
-        row.addWidget(self.mini_time)
-        row.addStretch(1)
-        show = QPushButton("🔎  Show page")
-        show.setToolTip("Bring the page back to pick something else. "
-                        "It hides again when the next thing starts playing.")
-        show.clicked.connect(lambda: self._set_collapsed(False))
-        row.addWidget(show)
         mv.addLayout(row)
-        hint = QLabel("🍃 Lite mode: the page is hidden while it plays, so it isn't drawing "
-                      "or decoding video — easy on your game. Audio keeps going.")
-        hint.setObjectName("hint")
-        hint.setWordWrap(True)
-        mv.addWidget(hint)
+        mh.addLayout(mv, 1)
         self.mini.hide()
         v.addWidget(self.mini)
         self.mini_spacer = QWidget()   # fills the space the page used
@@ -606,10 +671,69 @@ class BrowserTab(QWidget):
         self.holder = QVBoxLayout()   # the web view goes here once the tab is first opened
         v.addLayout(self.holder, 1)
 
+        self.info = QLabel()
+        self.info.setWordWrap(True)
+        self.info.setTextFormat(Qt.RichText)
+        self.info.setObjectName("muted")
+        v.addWidget(self.info)
+
+        # ---- control bar: live | record | volume | hear it myself
+        bar_, bh = bar()
+        self.btn_live = QPushButton()
+        self.btn_live.setObjectName("live")
+        self.btn_live.setCheckable(True)
+        icons.set_icon(self.btn_live, "live", checked_color="#ffffff")
+        # wide enough for both labels (bold), so the bar doesn't jump when it toggles
+        self.btn_live.ensurePolished()   # pick up the stylesheet font first
+        f = self.btn_live.font()
+        f.setBold(True)
+        fm = QFontMetrics(f)
+        self.btn_live.setMinimumWidth(max(fm.horizontalAdvance(t) for t in LIVE_TEXT.values()) + 56)
+        self.btn_live.toggled.connect(self._on_live)
+        bh.addWidget(self.btn_live)
+        self.meter = meter_cls()
+        self.meter.setMinimumWidth(50)
+        self.meter.setToolTip("Browser audio level")
+        bh.addWidget(self.meter, 1)
+        bh.addWidget(vsep())
+
+        self.btn_rec = QPushButton("Record")
+        self.btn_rec.setObjectName("rec")
+        self.btn_rec.setCheckable(True)
+        self.btn_rec.setToolTip("Record what's playing in the browser. Click again to stop — "
+                                "the clip is added to your Sounds.")
+        icons.set_icon(self.btn_rec, "record", "#ff4d4f", "#ffffff", size=14)
+        self.btn_rec.toggled.connect(self._on_rec)
+        bh.addWidget(self.btn_rec)
+        self.btn_last = QPushButton(f"Last {CLIP_S}s")
+        self.btn_last.setToolTip(f"Save the last {CLIP_S} seconds the browser played as a sound")
+        icons.set_icon(self.btn_last, "history")
+        self.btn_last.clicked.connect(self.clip_last)
+        bh.addWidget(self.btn_last)
+        self.btn_lite = QPushButton("Lite")
+        self.btn_lite.setObjectName("lite")
+        self.btn_lite.setCheckable(True)
+        self.btn_lite.setToolTip("Lite mode — easy on your game: while something plays, the page "
+                                 "is hidden (no video drawn or decoded) and YouTube drops to 144p. "
+                                 "Audio is unaffected.")
+        icons.set_icon(self.btn_lite, "leaf", checked_color="#ffffff")
+        self.btn_lite.toggled.connect(self._on_lite)
+        bh.addWidget(self.btn_lite)
+        bh.addWidget(vsep())
+
+        bh.addWidget(icon_label("volume", "Browser volume (for them and for you)"))
+        self.vol = VolumeControl(cfg.browser_vol, tip="Browser volume (for them and for you)")
+        self.vol.changed.connect(self._on_vol)
+        bh.addWidget(self.vol)
+        self.chk_hear = QCheckBox("Hear it myself")
+        self.chk_hear.setToolTip("Also play the browser into your headphones")
+        self.chk_hear.toggled.connect(self._on_hear)
+        bh.addWidget(self.chk_hear)
+        v.addWidget(bar_)
+
         # initial state (sets the engine too)
         self.btn_live.setChecked(cfg.browser_live)
         self._on_live(cfg.browser_live)
-        self.vol.setValue(int(round(cfg.browser_vol * 100)))
         self._on_vol(self.vol.value())
         self.chk_hear.setChecked(cfg.browser_monitor)
         self._on_hear(cfg.browser_monitor)
@@ -633,6 +757,8 @@ class BrowserTab(QWidget):
         self.profile = QWebEngineProfile("soundboard")   # named = logins/cookies persist
         self.profile.setPersistentStoragePath(str(store))
         self.profile.setCachePath(str(store / "cache"))
+        self.adblock = AdBlocker(store / "adblock", self)
+        self.profile.setUrlRequestInterceptor(self.adblock)
 
         self.view = QWebEngineView()
         page = _Page(self.profile, self.view)
@@ -661,7 +787,15 @@ class BrowserTab(QWidget):
         sc.setInjectionPoint(QWebEngineScript.DocumentReady)
         sc.setRunsOnSubFrames(False)
         page.scripts().insert(sc)
+        sc = QWebEngineScript()
+        sc.setName("sb-youtube-ads")
+        sc.setSourceCode(YOUTUBE_JS)
+        sc.setWorldId(QWebEngineScript.MainWorld)   # has to patch the page's own JSON.parse
+        sc.setInjectionPoint(QWebEngineScript.DocumentCreation)
+        sc.setRunsOnSubFrames(True)   # embedded YouTube players too
+        page.scripts().insert(sc)
         page.loadFinished.connect(lambda _ok: self._push_lite())
+        page.loadFinished.connect(lambda _ok: self._hide_ads())
 
         self.view.setPage(page)
         self.btn_back.clicked.connect(self.view.back)
@@ -707,6 +841,11 @@ class BrowserTab(QWidget):
             self.cfg.browser_url = s
             self._save()
 
+    def _hide_ads(self):
+        css = self.adblock.hide_css(self.view.url().toString()) if self.view else ""
+        if css:
+            self.view.page().runJavaScript(hide_css_js(css), WORLD)
+
     def pause_media(self):
         if self.view is not None:
             self.view.page().runJavaScript(PAUSE_JS, WORLD)   # main frame, immediately
@@ -718,6 +857,7 @@ class BrowserTab(QWidget):
             page = self.view.page()
             self.view.setParent(None)
             qt_delete(page)   # pages must go before their profile
+            self.profile.setUrlRequestInterceptor(None)
             self.view = None
             self.sink.close()
 
@@ -750,11 +890,14 @@ class BrowserTab(QWidget):
         costs little more than its audio."""
         self._collapsed = on
         if self.view is not None:
+            self.view.setMaximumHeight(16777215)
             self.view.setVisible(not on)
         self.mini.setVisible(on)
         self.mini_spacer.setVisible(on)
+        self._stall = (-1.0, time.monotonic())
         if on:
             self._mini_poll = 0.0
+            self._update_thumb()
             self._poll_mini()
 
     def _mini_js(self, js: str):
@@ -766,17 +909,73 @@ class BrowserTab(QWidget):
         if self.view is not None and self._collapsed and self.isVisible():
             self.view.page().runJavaScript(MINI_STATE_JS, WORLD, self._on_mini_state)
 
+    def _mini_seek_to(self, frac: float):
+        self._mini_js(MINI_SEEK_TO_JS % max(0.0, min(1.0, frac)))
+
     def _on_mini_state(self, st):
         try:
-            pos, dur, paused, title = json.loads(st)
+            pos, dur, paused, title, channel = json.loads(st)
         except (TypeError, ValueError):
             return   # nothing playing / page not ready
         title = re.sub(r"^\(\d+\)\s*", "", str(title or ""))
         title = re.sub(r"\s*[-–|]\s*(YouTube|SoundCloud)$", "", title).strip()
         self.mini_title.setText(title or "Playing")
-        fmt = lambda s: f"{int(s // 60)}:{int(s % 60):02d}"   # noqa: E731
-        self.mini_time.setText(f"{fmt(pos)} / {fmt(dur)}" if dur else fmt(pos))
-        self.mini_btns["play"].setText("▶" if paused else "⏸")
+        host = self.view.url().host().removeprefix("www.") if self.view is not None else ""
+        self.mini_sub.setText("  ·  ".join(x for x in (str(channel or ""), host) if x))
+        self.mini_pos.setText(fmt_time(pos))
+        self.mini_dur.setText(fmt_time(dur) if dur else "live")
+        self.mini_seek.setEnabled(bool(dur))
+        if not self.mini_seek.isSliderDown():
+            self.mini_seek.setValue(int(1000 * pos / dur) if dur else 0)
+        # set every time (the icon is cached): a theme change re-applies the initial one
+        self.mini_btns["play"].setIcon(icons.icon("play" if paused else "pause", "on_accent"))
+        self._update_thumb()
+        self._watch_stall(pos, bool(paused))
+
+    # Lite watchdog. Now and then a hidden YouTube player stops fetching: it still says
+    # it's playing, but the position stops moving (it used to take "Show page" and a
+    # click on play to get it going). When that happens the page is shown for a moment,
+    # 2 px tall so nothing jumps, and playback is kicked; then it's hidden again.
+    def _watch_stall(self, pos: float, paused: bool):
+        now = time.monotonic()
+        last, since = self._stall
+        if paused or abs(pos - last) > 0.05 or self._unsticking:
+            self._stall = (pos, now)
+            return
+        if now - since < STALL_S or self.view is None:
+            return
+        log.info("lite: playback stalled at %.1fs, waking the page", pos)
+        self._unsticking = True
+        self.view.setMaximumHeight(2)
+        self.view.setVisible(True)
+        QTimer.singleShot(600, lambda: self._mini_js(MINI_KICK_JS))
+        QTimer.singleShot(2500, self._end_unstick)
+
+    def _end_unstick(self):
+        self._unsticking = False
+        self._stall = (-1.0, time.monotonic())
+        if self.view is not None and self._collapsed:
+            self.view.setVisible(False)
+            self.view.setMaximumHeight(16777215)
+
+    def _update_thumb(self):
+        vid = youtube_id(self.view.url()) if self.view is not None else ""
+        if vid == self._thumb_id:
+            return
+        self._thumb_id = vid
+        if not vid:
+            self.mini_thumb.setPixmap(icons.icon("wave", "muted").pixmap(40, 40))
+            return
+        reply = self.net.get(QNetworkRequest(QUrl(f"https://i.ytimg.com/vi/{vid}/mqdefault.jpg")))
+        reply.finished.connect(lambda r=reply, v=vid: self._on_thumb(r, v))
+
+    def _on_thumb(self, reply, vid: str):
+        data = reply.readAll()
+        reply.deleteLater()
+        pm = QPixmap()
+        if vid == self._thumb_id and pm.loadFromData(data):
+            self.mini_thumb.setPixmap(rounded(pm, self.mini_thumb.width(),
+                                              self.mini_thumb.height()))
 
     def _refresh_info(self, msg: str = ""):
         if msg:
@@ -810,10 +1009,9 @@ class BrowserTab(QWidget):
         self._refresh_info()
         self._save()
 
-    def _on_vol(self, pct: int):
-        self.vol_lbl.setText(f"{pct}%")
-        self.cfg.browser_vol = pct / 100
-        self.engine.browser_vol = pct / 100
+    def _on_vol(self, gain: float):
+        self.cfg.browser_vol = gain
+        self.engine.browser_vol = gain
         self._save()
 
     def _on_hear(self, on: bool):
@@ -825,7 +1023,7 @@ class BrowserTab(QWidget):
         if on:
             self.recorder.start()
             return
-        self.btn_rec.setText("⏺  Record clip")
+        self.btn_rec.setText("Record")
         self._emit_clip(self.recorder.stop(), "Nothing was playing while you recorded.")
 
     def clip_last(self) -> bool:
@@ -863,12 +1061,12 @@ class BrowserTab(QWidget):
             return   # nothing below is visible: don't repaint meters or poll the page
         self.meter.set_level(e.level_browser)
         e.level_browser *= 0.8
-        if self._collapsed and time.monotonic() - self._mini_poll >= 1.0:
+        if self._collapsed and time.monotonic() - self._mini_poll >= 0.5:
             self._mini_poll = time.monotonic()
             self._poll_mini()
         if self.recorder.recording:
             secs = self.recorder.rec_frames / SR
-            self.btn_rec.setText(f"⏹  Stop  ({int(secs // 60)}:{int(secs % 60):02d})")
+            self.btn_rec.setText(f"Stop  {int(secs // 60)}:{int(secs % 60):02d}")
         elif time.monotonic() >= self._flash_until and self._flash_until:
             self._flash_until = 0.0
             self._refresh_info()

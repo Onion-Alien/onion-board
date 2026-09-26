@@ -351,6 +351,7 @@ class Engine:
         self.eq_target = "voice"                   # 'voice' | 'sounds' | 'all'
         self._eqs: dict[tuple[str, str], EQ] = {}
         self.mic_check = False    # headphones also get your mic (= exactly what others hear)
+        self.voice_chain = None   # voicefx.VoiceChain: voice changer / live speech tap on the mic
 
         self.main_stream = self.mon_stream = self.mic_stream = None
         self.rates = {"main": SR, "mon": SR, "mic": SR}
@@ -856,6 +857,9 @@ class Engine:
         rec = self._mic_rec
         if rec is not None and self._rec_buf is not None:
             rec.append(x[:, 0].copy())
+        chain = self.voice_chain
+        if chain is not None:   # after the meter and test recording: those judge the real mic
+            x = chain.process(x, self.rates["mic"])
         if self.main_stream is not None:
             self.ring_main.write(self._rs_main(x))
         if self.mic_check and self.mon_stream is not None:

@@ -8,6 +8,7 @@ from PySide6.QtWidgets import (QCheckBox, QComboBox, QDialog, QDialogButtonBox, 
 from soundboard import theme
 from soundboard.library import PAD_COLORS, SoundMeta
 from soundboard.settings import HotkeyDialog, pretty_key
+from soundboard.ui import icons
 from soundboard.wheelguard import no_wheel
 from soundboard.winkeys import Hotkeys
 
@@ -80,7 +81,8 @@ class EditDialog(QDialog):
         self._set_color(self.color)
         lay.addLayout(form)
 
-        prev = QPushButton("▶  Preview (only you hear it)")
+        prev = QPushButton("Preview (only you hear it)")
+        icons.set_icon(prev, "headphones")
         prev.clicked.connect(lambda: preview_cb(self.meta.id, self.vol.value() / 100))
         lay.addWidget(prev)
 

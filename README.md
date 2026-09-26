@@ -60,7 +60,21 @@ through making the cable Windows' default mic.
     won't play). Media from another site without CORS plays, but only for you. The
     tab tells you when that happens.
 
-## Install (any Windows PC)
+## Install (the easy way)
+
+1. Double-click **`SoundboardSetup.exe`**. Nothing else is needed first (no Python).
+2. Click **Next**, and **Yes** when Windows asks for permission. That's the free
+   virtual cable being installed.
+3. Soundboard opens with a 4-step guide, hosted by Bun the bunny 🐰:
+   - **Which mic do you talk into?** Say something and the bar moves.
+   - **Where do you listen?** Press the test beep.
+   - **The virtual cable** is checked and installed if it's missing.
+   - **Tell Discord or your game** which mic to use (with a Copy button).
+
+You can open the guide again from the **Setup** tab. To make `SoundboardSetup.exe`,
+run `build.ps1` (see *Building an .exe* below).
+
+## Install from source (any Windows PC)
 
 1. Download or clone this folder.
 2. Double-click **`install.bat`**. It:
@@ -117,8 +131,7 @@ Developing:
 
 ```
 .venv\Scripts\pip install -r requirements-dev.txt
-.venv\Scripts
-uff check .
+.venv\Scripts\ruff check .
 .venv\Scripts\python -m pytest
 ```
 
@@ -128,8 +141,13 @@ the ruff and pytest settings, and a `soundboard` GUI entry point for `pip instal
 ### Building an .exe
 
 `build.ps1` runs PyInstaller and produces `dist\Soundboard\Soundboard.exe` (one folder,
-QtWebEngine included). Zip that folder for a PC without Python; the virtual cable is still
-installed from inside the app. Settings live in `%APPDATA%\Soundboard\` either way.
+QtWebEngine included), then compiles `installer\Soundboard.iss` with Inno Setup 6
+(`winget install JRSoftware.InnoSetup`) into **`dist\SoundboardSetup.exe`**, the one
+file to hand out. It installs per user (no admin), adds the Desktop and Start menu
+shortcuts, installs VB-Cable (downloaded and signature-checked by `install-vbcable.ps1`)
+and opens the app. The installer artwork is Bun the mascot, drawn in code by
+`soundboard/bunny.py` and rendered by `make_bunny.py` (`--preview` writes a sheet of
+every pose). Settings live in `%APPDATA%\Soundboard\` either way.
 Every `config.json` save keeps the last three good copies next to it
 (`config.json.1` … `.3`); a damaged file is set aside as `config.json.broken-<time>` and
 the newest backup is used, so the pad list is never silently reset.

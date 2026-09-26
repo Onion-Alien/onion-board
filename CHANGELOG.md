@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+- **Ad blocking in the browser tab.** Requests are filtered by Brave's adblock engine
+  (new `adblock` dependency) using the EasyList, EasyPrivacy and uBlock Origin lists,
+  which are downloaded in the background, cached and refreshed every four days. On
+  YouTube a script strips the ad fields out of the player data, the same way uBlock
+  Origin's json-prune scriptlet does. If an ad gets through anyway, it's muted, jumped
+  to its end and skipped, so it never reaches your mic.
 - Push-to-talk keys are injected with `SendInput` (modifiers and key in one call)
   instead of the legacy `keybd_event`. A hotkey another program owns is reported the
   moment registration fails (a signal from the hotkey thread) rather than on a timer,

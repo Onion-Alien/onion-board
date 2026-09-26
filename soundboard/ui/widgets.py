@@ -33,7 +33,7 @@ class Meter(QWidget):
         p.setRenderHint(QPainter.Antialiasing)
         r = self.rect()
         p.setPen(Qt.NoPen)
-        p.setBrush(QColor(theme.T["inset"]))
+        p.setBrush(QColor(theme.T["groove"]))
         p.drawRoundedRect(r, 4, 4)
         db = 20 * np.log10(max(self.level, 1e-5))
         frac = float(np.clip((db + 50) / 50, 0, 1))

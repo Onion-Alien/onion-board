@@ -1,6 +1,7 @@
-"""Self-contained pieces of the right-hand audio panel: a volume box (slider +
-typed %) and the equalizer. They own their widgets and emit plain values; the
-main window maps those onto the config and the engine."""
+"""Shared UI building blocks: the bar / card / divider helpers every tab is built
+from, the compact volume control (slider + typed %), and the equalizer. They own
+their widgets and emit plain values; the main window maps those onto the config
+and the engine."""
 from __future__ import annotations
 
 from PySide6.QtCore import Qt, Signal
@@ -10,6 +11,7 @@ from PySide6.QtWidgets import (QCheckBox, QComboBox, QFrame, QGridLayout, QHBoxL
 from soundboard.eq import BAND_LABELS as EQ_LABELS
 from soundboard.eq import MAX_DB as EQ_MAX_DB
 from soundboard.eq import PRESETS as EQ_PRESETS
+from soundboard.ui import icons
 from soundboard.ui.widgets import EqCurve
 from soundboard.wheelguard import no_wheel
 
@@ -27,39 +29,77 @@ def hint_label(text: str) -> QLabel:
     return lbl
 
 
-class VolumeBox(QFrame):
-    """A titled volume control: slider to SLIDER_MAX %, typed box to TYPED_MAX %.
-    `changed` carries the gain as a factor (1.0 = 100 %)."""
-    changed = Signal(float)
-    SLIDER_MAX = 300    # slider travel; the typed box goes further
-    TYPED_MAX = 1000
+def vsep() -> QFrame:
+    """A thin vertical divider between groups in a bar."""
+    f = QFrame()
+    f.setObjectName("vsep")
+    f.setFixedWidth(1)
+    return f
 
-    def __init__(self, title: str, desc: str, value: float):
+
+def bar(margins=(10, 8, 12, 8)) -> tuple[QFrame, QHBoxLayout]:
+    """The rounded control bar every tab has along its bottom (and the mixer strip)."""
+    f = QFrame()
+    f.setObjectName("transport")
+    h = QHBoxLayout(f)
+    h.setContentsMargins(*margins)
+    h.setSpacing(10)
+    return f, h
+
+
+def card(title: str = "", hint: str = "") -> tuple[QFrame, QVBoxLayout]:
+    """A titled card, the building block of the Voice and Setup pages."""
+    f = QFrame()
+    f.setObjectName("card")
+    v = QVBoxLayout(f)
+    v.setContentsMargins(14, 8, 14, 14)
+    v.setSpacing(6)
+    if title:
+        v.addWidget(section_label(title))
+    if hint:
+        v.addWidget(hint_label(hint))
+    return f, v
+
+
+def icon_label(name: str, tip: str = "", color: str = "muted") -> QLabel:
+    """A small painted icon used as a label in the bars."""
+    lbl = QLabel()
+    icons.set_label_icon(lbl, name, color)
+    lbl.setToolTip(tip)
+    lbl.setObjectName("iconlabel")
+    return lbl
+
+
+class VolumeControl(QWidget):
+    """Slider to `slider_max` %, plus a box you can type an exact % into (up to
+    `typed_max`). `changed` carries the gain as a factor (1.0 = 100 %)."""
+    changed = Signal(float)
+
+    def __init__(self, value: float, slider_max: int = 300, typed_max: int = 1000,
+                 tip: str = ""):
         super().__init__()
-        self.setObjectName("volbox")
-        v = QVBoxLayout(self)
-        v.setContentsMargins(10, 8, 10, 8)
-        v.setSpacing(2)
-        top = QHBoxLayout()
-        t = QLabel(title)
-        t.setStyleSheet("font-weight:600;")
-        top.addWidget(t, 1)
-        self.spin = QSpinBox()
-        self.spin.setRange(0, self.TYPED_MAX)
-        self.spin.setSuffix(" %")
-        self.spin.setFixedWidth(82)
-        self.spin.setAlignment(Qt.AlignRight)
-        self.spin.setToolTip("Type an exact volume (0–1000%)")
-        top.addWidget(self.spin)
-        v.addLayout(top)
-        v.addWidget(hint_label(desc))
+        self.slider_max = slider_max
+        h = QHBoxLayout(self)
+        h.setContentsMargins(0, 0, 0, 0)
+        h.setSpacing(6)
         self.slider = QSlider(Qt.Horizontal)
-        self.slider.setRange(0, self.SLIDER_MAX)
-        v.addWidget(self.slider)
+        self.slider.setRange(0, slider_max)
+        self.slider.setMinimumWidth(70)
+        self.slider.setMaximumWidth(150)
+        self.spin = QSpinBox()
+        self.spin.setRange(0, typed_max)
+        self.spin.setSuffix(" %")
+        self.spin.setFixedWidth(74)
+        self.spin.setAlignment(Qt.AlignRight)
+        self.spin.setToolTip(f"Type an exact volume (0–{typed_max}%)")
+        if tip:
+            self.slider.setToolTip(tip)
+        h.addWidget(self.slider, 1)
+        h.addWidget(self.spin)
         no_wheel(self.slider, self.spin)
 
         pct0 = int(round(value * 100))
-        self.slider.setValue(min(pct0, self.SLIDER_MAX))
+        self.slider.setValue(min(pct0, slider_max))
         self.spin.setValue(pct0)
         self._paint(pct0)
         self.slider.valueChanged.connect(self._from_slider)
@@ -81,7 +121,7 @@ class VolumeBox(QFrame):
 
     def _from_spin(self, pct):
         self.slider.blockSignals(True)
-        self.slider.setValue(min(pct, self.SLIDER_MAX))
+        self.slider.setValue(min(pct, self.slider_max))
         self.slider.blockSignals(False)
         self._paint(pct)
         self.changed.emit(pct / 100)
@@ -104,9 +144,9 @@ class EqPanel(QWidget):
         row.addWidget(self.chk_on)
         row.addWidget(QLabel("for"))
         self.cb_target = QComboBox()
-        for label, key in (("🎤 My voice", "voice"), ("🔊 My sounds", "sounds"),
-                           ("Both", "all")):
-            self.cb_target.addItem(label, key)
+        for ic, label, key in (("mic", "My voice", "voice"), ("volume", "My sounds", "sounds"),
+                               ("wave", "Both", "all")):
+            self.cb_target.addItem(icons.icon(ic), label, key)
         self.cb_target.setCurrentIndex(max(0, self.cb_target.findData(target)))
         row.addWidget(self.cb_target, 1)
         pv.addLayout(row)
