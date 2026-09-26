@@ -55,6 +55,27 @@ THEMES: dict[str, dict[str, str]] = {
         danger_bg="#361f2b", danger_border="#5a2a40", danger_text="#ff8fb0", danger_hover="#45243a",
         warn_bg="#33301f", warn_text="#ffb020",
     ),
+    "Cherry Blossom": dict(   # sakura pink on petal white
+        bg="#fbecf1", panel="#fff7f9", card="#ffffff", card_hi="#fdf0f4",
+        btn="#f8e1e8", btn_hover="#f4d3de", btn_press="#eec3d1",
+        border="#efc9d5", border_hi="#d98aa5", groove="#f0cdd8", inset="#f6e3e9",
+        text="#3a1f2b", text_hi="#2a1520", muted="#8a5d6e", faint="#b48898", section="#a9607c",
+        accent="#e75480", accent_hi="#f06a93", accent2="#ffb7c5", on_accent="#ffffff",
+        off="#dcb0c0", badge="#f6dde5", badge_text="#5a2f40",
+        danger_bg="#ffe3e3", danger_border="#f2a9a9", danger_text="#c0282d", danger_hover="#ffd3d3",
+        warn_bg="#fff1d6", warn_text="#9a5b00",
+    ),
+    "Carbon": dict(   # graphite grey, carbon-fibre weave on the panels
+        bg="#111113", panel="#1c1c1f", card="#242428", card_hi="#2c2c31",
+        btn="#2a2a2f", btn_hover="#333339", btn_press="#3d3d44",
+        border="#38383f", border_hi="#5e5e68", groove="#36363c", inset="#161618",
+        text="#e4e4e7", text_hi="#f4f4f5", muted="#8e8e97", faint="#6a6a73", section="#9c9ca6",
+        accent="#aeb3bf", accent_hi="#c9ccd5", accent2="#6e7380", on_accent="#111113",
+        off="#4a4a52", badge="#34343a", badge_text="#d8d8dd",
+        danger_bg="#3a2226", danger_border="#5a2a32", danger_text="#ff8f9a", danger_hover="#4a2a30",
+        warn_bg="#33301a", warn_text="#ffb020",
+        texture="carbon",
+    ),
 }
 DEFAULT = "Dark"
 
@@ -209,10 +230,52 @@ def _check_url(colour: str) -> str:
     return base.as_posix()
 
 
+def _carbon_image(base: str, size: int) -> QImage:
+    """One tile of 2x2 twill weave: each cell is a tow of fibres shaded across its
+    width, the neighbouring cells turned 90 degrees, so it tiles into carbon fibre."""
+    img = QImage(size, size, QImage.Format_ARGB32)
+    img.fill(QColor(base))
+    p = QPainter(img)
+    c = size / 2
+    dark, light = QColor(base).darker(150), QColor(base).lighter(135)
+    for i in range(2):
+        for j in range(2):
+            x, y = i * c, j * c
+            if (i + j) % 2:
+                g = QLinearGradient(QPointF(x, y), QPointF(x + c, y))
+            else:
+                g = QLinearGradient(QPointF(x, y), QPointF(x, y + c))
+            g.setColorAt(0.0, dark)
+            g.setColorAt(0.5, light)
+            g.setColorAt(1.0, dark)
+            p.fillRect(QRectF(x, y, c, c), g)
+    p.end()
+    return img
+
+
+CARBON_TILE = 14
+
+
+def _texture_url(kind: str, base: str) -> str:
+    folder = Path(tempfile.gettempdir()) / "onionboard-ui"
+    path = folder / f"{kind}{CARBON_TILE}-{base.lstrip('#')}.png"
+    try:
+        folder.mkdir(exist_ok=True)
+        if not path.exists():
+            _carbon_image(base, CARBON_TILE).save(str(path))
+    except OSError:
+        return ""
+    return path.as_posix()
+
+
 def stylesheet(name: str | None = None) -> str:
     tokens = dict(THEMES.get(name or current_name, THEMES[DEFAULT]))
     tokens["check"] = _check_url(tokens["on_accent"])
-    return STYLE.substitute(tokens)
+    css = STYLE.substitute(tokens)
+    if tokens.get("texture") and (url := _texture_url(tokens["texture"], tokens["panel"])):
+        css += ("QFrame#card, QFrame#transport, QFrame#setcard "
+                f'{{ background-image:url("{url}"); }}\n')
+    return css
 
 
 def apply(app, name: str) -> str:

@@ -5,7 +5,8 @@ from __future__ import annotations
 import threading
 
 from PySide6.QtCore import QObject, QRectF, QSize, Qt, QUrl, Signal
-from PySide6.QtGui import QColor, QDesktopServices, QFont, QPainter, QPainterPath
+from PySide6.QtGui import (QBrush, QColor, QDesktopServices, QFont, QPainter, QPainterPath,
+                           QPixmap)
 from PySide6.QtWidgets import (QApplication, QCheckBox, QComboBox, QDialog, QFrame, QGridLayout,
                                QHBoxLayout, QLabel, QPushButton, QScrollArea, QSlider, QTabWidget,
                                QVBoxLayout, QWidget)
@@ -121,7 +122,8 @@ class ThemeCard(QPushButton):
         p.fillPath(win, QColor(t["bg"]))
         # side panel, pads and a slider, in the theme's own colours
         p.setPen(Qt.NoPen)
-        p.setBrush(QColor(t["panel"]))
+        p.setBrush(QBrush(QPixmap.fromImage(theme._carbon_image(t["panel"], 6)))
+                   if t.get("texture") else QColor(t["panel"]))
         p.drawRoundedRect(QRectF(r.right() - 44, r.top() + 6, 38, r.height() - 12), 5, 5)
         for i, col in enumerate(("#7c5cff", "#ff5c8a", "#1fb6ff", "#13ce66")):
             x = r.left() + 7 + (i % 2) * 44
