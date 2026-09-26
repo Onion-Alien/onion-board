@@ -11,7 +11,7 @@ from soundboard import soundfx, theme, voicefx
 from soundboard.eq import PRESETS as EQ_PRESETS
 from soundboard.library import PAD_COLORS, SoundMeta
 from soundboard.settings import HotkeyDialog, pretty_key
-from soundboard.ui import icons
+from soundboard.ui import fit, icons
 from soundboard.ui.panel import EqPanel, hint_label, section_label
 from soundboard.ui.voicepanel import EffectRow, ParamSlider
 from soundboard.wheelguard import no_wheel
@@ -156,6 +156,7 @@ class EditDialog(QDialog):
     def __init__(self, meta: SoundMeta, hotkeys: Hotkeys, preview_cb, parent=None,
                  tab: str = "sound"):
         super().__init__(parent)
+        fit.watch(self)   # grows to fit its text (ui/fit.py)
         self.setWindowTitle("Edit sound")
         self.meta = meta
         self.hotkeys = hotkeys

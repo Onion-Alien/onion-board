@@ -29,6 +29,7 @@ from soundboard.bunny import bunny_pixmap
 from soundboard.engine import SR
 from soundboard import library
 from soundboard.library import RESOURCE_DIR
+from soundboard.ui import fit
 from soundboard.ui.widgets import Meter
 
 RESTART_NEEDED = 3010   # install-vbcable.ps1: installed, but Windows must restart first
@@ -75,6 +76,7 @@ class SetupWizard(QDialog):
 
     def __init__(self, win):
         super().__init__(win)
+        fit.watch(self)   # grows to fit its text (ui/fit.py)
         self.win = win
         self.setWindowTitle("Soundboard — quick setup")
         self.setMinimumSize(620, 520)
@@ -425,6 +427,7 @@ class SteamGuide(QDialog):
 
     def __init__(self, parent, mic_name: str):
         super().__init__(parent)
+        fit.watch(self)   # grows to fit its text (ui/fit.py)
         self.setWindowTitle("Steam games — set your mic")
         self.setMinimumWidth(600)
         v = QVBoxLayout(self)

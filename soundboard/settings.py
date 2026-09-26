@@ -12,7 +12,7 @@ from PySide6.QtWidgets import (QCheckBox, QComboBox, QDialog, QFrame, QGridLayou
 from shiboken6 import isValid as qt_valid
 
 from soundboard import theme, winkeys, ytdl
-from soundboard.ui import icons
+from soundboard.ui import fit, icons
 from soundboard.ui import overlay as ovl
 from soundboard.wheelguard import no_wheel
 from soundboard.winkeys import Hotkeys
@@ -53,6 +53,7 @@ def pretty_key(combo: str) -> str:
 class HotkeyDialog(QDialog):
     def __init__(self, hotkeys: Hotkeys, parent=None):
         super().__init__(parent)
+        fit.watch(self)   # grows to fit its text (ui/fit.py)
         self.setWindowTitle("Set hotkey")
         self.result_combo = None
         lay = QVBoxLayout(self)
@@ -136,6 +137,7 @@ class SettingsDialog(QDialog):
 
     def __init__(self, mw, page: str = "appearance"):
         super().__init__(mw)
+        fit.watch(self)   # grows to fit its text (ui/fit.py)
         self.mw = mw
         self.setWindowTitle("Settings")
         self.setWindowIcon(theme.app_icon())
