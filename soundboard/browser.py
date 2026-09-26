@@ -113,14 +113,14 @@ TAP_JS = r"""
   const SR = 48000, BLOCK = %(block)d, WS_URL = %(url)s;
   const WORKLET = %(worklet)s;
   let ws = null, ctx = null, input = null, node = null, sp = null;
-  let lastOn = -1, lastOff = -1, playing = 0;
+  let lastOn = -1, lastOff = -1, lastVideo = -1, playing = 0;
   let rate = 1, keep = true, forced = false;   // live speed from the soundboard
   const tapped = new WeakSet();
 
   function connect() {
     try { ws = new WebSocket(WS_URL); } catch (e) { ws = null; setTimeout(connect, 3000); return; }
     ws.binaryType = 'arraybuffer';
-    ws.onopen = () => { lastOn = lastOff = -1; scan(); };
+    ws.onopen = () => { lastOn = lastOff = lastVideo = -1; scan(); };
     ws.onmessage = e => {
       if (e.data === 'pause') document.querySelectorAll('audio,video').forEach(el => el.pause());
       else if (typeof e.data === 'string' && e.data.startsWith('rate ')) {
@@ -216,25 +216,55 @@ TAP_JS = r"""
 
   function scan() {
     applyRate();
-    let on = 0, off = 0, live = 0;
+    let on = 0, off = 0, live = 0, video = 0;
     document.querySelectorAll('audio,video').forEach(el => {
       if (el.paused) return;
       tap(el);
       if (tapped.has(el)) live++;
       if (!el.muted) tapped.has(el) ? on++ : off++;
+      if (el.tagName === 'VIDEO') video++;
     });
     playing = live;
     if (node) node.port.postMessage(playing);
     if (ctx && ctx.state !== 'running' && on) ctx.resume();
-    if (ready() && (on !== lastOn || off !== lastOff)) {
-      lastOn = on; lastOff = off;
-      send(JSON.stringify({ on: on, off: off }));
+    if (ready() && (on !== lastOn || off !== lastOff || video !== lastVideo)) {
+      lastOn = on; lastOff = off; lastVideo = video;
+      send(JSON.stringify({ on: on, off: off, video: video }));
     }
   }
 
   for (const ev of ['play', 'playing', 'pause', 'ended', 'loadedmetadata'])
     document.addEventListener(ev, () => setTimeout(scan, 0), true);
   setInterval(scan, 1000);
+})();
+"""
+
+
+# Runs in every frame's own JS world. Sound-button sites (MyInstants…) play through
+# `new Audio()` elements that are never put in the page, so the tap can't find them.
+# Just before one plays, it's moved into a hidden holder in the page (that doesn't
+# interrupt it), and taken out again when it ends so they don't pile up.
+ADOPT_JS = r"""
+(function () {
+  if (window.__sbAdopt) return;
+  window.__sbAdopt = true;
+  const P = HTMLMediaElement.prototype, play = P.play;
+  let box = null;
+  function done() { if (this.parentNode === box) box.removeChild(this); }
+  P.play = function () {
+    try {
+      if (!this.isConnected) {
+        if (!box || !box.isConnected) {
+          box = document.createElement('div');
+          box.hidden = true;
+          (document.body || document.documentElement).appendChild(box);
+        }
+        box.appendChild(this);
+        this.addEventListener('ended', done, { once: true });
+      }
+    } catch (e) {}
+    return play.apply(this, arguments);
+  };
 })();
 """
 
@@ -304,6 +334,8 @@ MINI_KICK_JS = ("(()=>{" + _MEDIA + "if(!m)return;"
                 "if(b&&p.classList.contains('paused-mode')){b.click();return}"
                 "m.currentTime=m.currentTime;m.play()})()")
 STALL_S = 3.0          # Lite: "playing" but the position hasn't moved this long -> unstick
+PEEK_WAIT_S = 5.0      # Lite, opening a video: show the page if it hasn't started this long
+                       # after loading
 MINI_NEXT_JS = ("(()=>{const b=document.querySelector('.ytp-next-button');"
                 "if(b&&b.offsetParent!==null){b.click();return true}"
                 "const n=document.querySelector('a.ytp-next-button');if(n){n.click();return true}"
@@ -314,11 +346,12 @@ class AudioSink(QObject):
     """WebSocket server the tap scripts stream to (one connection per frame).
 
     Binary messages are int16 stereo PCM at SR; text messages are JSON status
-    ({"on": tapped-and-playing, "off": playing-but-can't-tap}). Only connections
+    ({"on": tapped-and-playing, "off": playing-but-can't-tap, "video": how many of
+    those playing are videos}). Only connections
     that present the per-launch secret path are accepted. Everything runs on the UI
     thread (Qt sockets), so `audio` is emitted there, like the old bridge."""
     audio = Signal(object)        # (n, 2) float32 at SR
-    status = Signal(int, int)     # totals across frames: tapped, can't-tap
+    status = Signal(int, int)     # totals across frames: tapped, can't-tap (`video` too)
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -329,8 +362,8 @@ class AudioSink(QObject):
         if not self.port:
             log.error("browser audio sink can't listen: %s", self.server.errorString())
         self.server.newConnection.connect(self._on_connection)
-        self._conns: dict[QWebSocket, tuple[int, int]] = {}
-        self._shown = (0, 0)
+        self._conns: dict[QWebSocket, tuple[int, int, int]] = {}
+        self._shown = (0, 0, 0)
         self._active: QWebSocket | None = None   # the frame that currently owns the mic
         self._active_t = 0.0
         self._rate_msg = ""   # live speed, also sent to frames that connect later
@@ -348,7 +381,7 @@ class AudioSink(QObject):
             s.close()
             s.deleteLater()
             return
-        self._conns[s] = (0, 0)
+        self._conns[s] = (0, 0, 0)
         s.binaryMessageReceived.connect(lambda data, s=s: self._on_binary(s, data))
         s.textMessageReceived.connect(lambda text, s=s: self._on_text(s, text))
         s.disconnected.connect(lambda s=s: self._on_closed(s))
@@ -370,7 +403,7 @@ class AudioSink(QObject):
     def _on_text(self, s: QWebSocket, text: str):
         try:
             d = json.loads(text)
-            st = (int(d["on"]), int(d["off"]))
+            st = (int(d["on"]), int(d["off"]), int(d.get("video", 0)))
         except (ValueError, KeyError, TypeError):
             return
         self._conns[s] = st
@@ -388,11 +421,16 @@ class AudioSink(QObject):
             s.deleteLater()
         self._emit_status()
 
+    @property
+    def video(self) -> int:
+        """How many videos are playing (tapped or not), across frames."""
+        return self._shown[2]
+
     def _emit_status(self):
-        tot = (sum(a for a, _ in self._conns.values()), sum(b for _, b in self._conns.values()))
+        tot = tuple(sum(c[i] for c in self._conns.values()) for i in range(3))
         if tot != self._shown:
             self._shown = tot
-            self.status.emit(*tot)
+            self.status.emit(tot[0], tot[1])
 
     def set_rate(self, speed: float, keep_pitch: bool):
         """Playback speed of every media element in every frame (the page's own
@@ -593,8 +631,13 @@ class BrowserTab(QWidget):
         self.view: QWebEngineView | None = None
         self.profile: QWebEngineProfile | None = None
         self._status = (0, 0)
+        self._video = 0            # videos playing
         self._flash_until = 0.0
         self._collapsed = False    # Lite: page hidden, mini-player shown
+        self._peeking = False      # ...with the page 2 px tall while a video starts
+        self._expect_until = 0.0   # the navigation just asked for opens a video (Lite)
+        self._peek_gen = 0
+        self._peek_url = QUrl()
         self._mini_poll = 0.0
         self._thumb_id = None      # YouTube video whose thumbnail is shown
         self._stall = (-1.0, 0.0)  # (position, when it last moved): the Lite watchdog
@@ -858,6 +901,13 @@ class BrowserTab(QWidget):
         sc.setRunsOnSubFrames(True)   # embedded players (iframes) are tapped too
         page.scripts().insert(sc)
         sc = QWebEngineScript()
+        sc.setName("sb-adopt")
+        sc.setSourceCode(ADOPT_JS)
+        sc.setWorldId(QWebEngineScript.MainWorld)   # the page's own `new Audio()`s
+        sc.setInjectionPoint(QWebEngineScript.DocumentCreation)
+        sc.setRunsOnSubFrames(True)
+        page.scripts().insert(sc)
+        sc = QWebEngineScript()
         sc.setName("sb-lite")
         sc.setSourceCode(LITE_JS)
         sc.setWorldId(QWebEngineScript.MainWorld)
@@ -873,19 +923,48 @@ class BrowserTab(QWidget):
         page.scripts().insert(sc)
         page.loadFinished.connect(lambda _ok: self._push_lite())
         page.loadFinished.connect(lambda _ok: self._hide_ads())
+        page.loadFinished.connect(lambda _ok: self._arm_peek())
 
         page.loadStarted.connect(self._on_load_started)
 
         self.view.setPage(page)
-        self.btn_back.clicked.connect(self.view.back)
-        self.btn_fwd.clicked.connect(self.view.forward)
-        self.btn_reload.clicked.connect(self.view.reload)
+        self.btn_back.clicked.connect(self._back)
+        self.btn_fwd.clicked.connect(self._forward)
+        self.btn_reload.clicked.connect(self._reload)
         self.view.urlChanged.connect(self._on_url)
         self.holder.addWidget(self.view)
 
     def load(self, url: str):
+        self._open(QUrl(url))
+
+    def _open(self, url: QUrl):
         if self.view is not None:
-            self.view.setUrl(QUrl(url))
+            self._expect(url)
+            self.view.setUrl(url)
+
+    def _back(self):
+        h = self.view.history()
+        if h.canGoBack():
+            self._expect(h.backItem().url())
+            self.view.back()
+
+    def _forward(self):
+        h = self.view.history()
+        if h.canGoForward():
+            self._expect(h.forwardItem().url())
+            self.view.forward()
+
+    def _reload(self):
+        self._expect(self.view.url())
+        self.view.reload()
+
+    def _expect(self, url: QUrl):
+        """About to navigate to `url`. In Lite, a YouTube video then opens straight
+        into the mini-player instead of flashing the page up until it plays."""
+        # (a deadline: YouTube's own back / forward never fires loadStarted)
+        self._expect_until = (time.monotonic() + 2.0
+                              if self.cfg.browser_lite and youtube_id(url) else 0.0)
+        self._peek_url = QUrl(url)
 
     @staticmethod
     def url_for(text: str) -> QUrl:
@@ -909,17 +988,33 @@ class BrowserTab(QWidget):
         if not t:
             return
         if self.view is not None:
-            self.view.setUrl(self.url_for(t))
+            self._open(self.url_for(t))
             self.view.setFocus()
 
     def _on_load_started(self):
         """A new document is loading (a quick link, the address bar, back / forward, a
         link on the page). Whatever Lite was hiding is gone, so show the page again;
-        it collapses once the new page starts playing."""
+        it collapses once the new page starts playing. A video opened from here in
+        Lite goes to the mini-player right away instead (see _set_collapsed)."""
         self._unsticking = False   # a pending _end_unstick must not hide the new page
-        if self._collapsed:
+        expect, self._expect_until = time.monotonic() < self._expect_until, 0.0
+        if expect:
+            self._set_collapsed(True, peek=True)
+        elif self._collapsed:
             self._set_collapsed(False)
         self._stall = (-1.0, time.monotonic())
+
+    def _arm_peek(self):
+        """The page has loaded; if the video still hasn't started a moment later
+        (autoplay off, a consent page…), show the page after all."""
+        if self._peeking:
+            self._peek_gen += 1
+            QTimer.singleShot(int(PEEK_WAIT_S * 1000),
+                              lambda g=self._peek_gen: self._peek_timeout(g))
+
+    def _peek_timeout(self, gen: int):
+        if gen == self._peek_gen and self._peeking:
+            self._set_collapsed(False)
 
     def _on_url(self, url: QUrl):
         s = url.toString()
@@ -968,36 +1063,49 @@ class BrowserTab(QWidget):
             self.sink.set_rate(speed, keep_pitch)
 
     def _on_status(self, on: int, off: int):
-        started = on > 0 and self._status[0] == 0
-        self._status = (on, off)
+        # Lite only hides the page for video: a sound-button site has to stay usable
+        video = self.sink.video if self.sink is not None else 0
+        started = video > 0 and self._video == 0
+        self._status, self._video = (on, off), video
         self._refresh_info()
-        if started and self.cfg.browser_lite:
-            self._set_collapsed(True)   # something started playing: hide the page
-        elif on == 0 and self._collapsed and not self._unsticking:
-            self._set_collapsed(False)  # the player went away: never leave a blank tab
+        if video and self.cfg.browser_lite and (started or self._peeking):
+            self._set_collapsed(True)   # a video started playing: hide the page
+        elif on == 0 and self._collapsed:
+            self._poll_mini()   # paused, or the player went away? (see _on_mini_state)
 
     # ------------------------------------------------------------------ lite mode
     def _on_lite(self, on: bool):
         self.cfg.browser_lite = on
         self._save()
         self._push_lite()
-        self._set_collapsed(on and self._status[0] > 0)
+        self._set_collapsed(on and self._video > 0)
 
     def _push_lite(self):
         if self.view is not None:
             self.view.page().runJavaScript(set_lite_js(self.cfg.browser_lite), WORLD)
 
-    def _set_collapsed(self, on: bool):
+    def _set_collapsed(self, on: bool, peek: bool = False):
         """Lite: swap the page for the mini-player. A hidden page isn't drawn, and
         Chromium stops decoding the video track of hidden players, so the browser
-        costs little more than its audio."""
-        self._collapsed = on
+        costs little more than its audio. It stays that way while paused.
+
+        peek: a video is opening. The page stays visible but 2 px tall (a hidden page
+        wouldn't autoplay) until it starts playing, so it never flashes up first."""
+        self._peeking = on and peek
+        self._peek_gen += 1   # any pending peek timeout is stale now
         if self.view is not None:
-            self.view.setMaximumHeight(16777215)
-            self.view.setVisible(not on)
+            self.view.setMaximumHeight(2 if self._peeking else 16777215)
+            self.view.setVisible(not on or self._peeking)
         self.mini.setVisible(on)
         self.mini_spacer.setVisible(on)
         self._stall = (-1.0, time.monotonic())
+        if on and (peek or not self._collapsed):
+            self.mini_title.setText("Loading…" if peek else "—")
+            self.mini_sub.setText("")
+            self.mini_pos.setText("0:00")
+            self.mini_dur.setText("0:00")
+            self.mini_seek.setValue(0)
+        self._collapsed = on
         if on:
             self._mini_poll = 0.0
             self._update_thumb()
@@ -1019,7 +1127,14 @@ class BrowserTab(QWidget):
         try:
             pos, dur, paused, title, channel = json.loads(st)
         except (TypeError, ValueError):
-            return   # nothing playing / page not ready
+            # no media on the page. While nothing plays either, the player has gone
+            # (closed, or a page without one): never leave a blank tab.
+            if (self._collapsed and not self._peeking and not self._unsticking
+                    and not self._status[0]):
+                self._set_collapsed(False)
+            return
+        if self._peeking:
+            return   # the video hasn't started yet: keep showing "Loading…"
         title = re.sub(r"^\(\d+\)\s*", "", str(title or ""))
         title = re.sub(r"\s*[-–|]\s*(YouTube|SoundCloud)$", "", title).strip()
         self.mini_title.setText(title or "Playing")
@@ -1044,7 +1159,8 @@ class BrowserTab(QWidget):
         last, since = self._stall
         # (a player with no duration yet hasn't loaded anything, so there's nothing
         # to kick: treated like paused)
-        if paused or abs(pos - last) > 0.05 or self._unsticking or not self._status[0]:
+        if (paused or abs(pos - last) > 0.05 or self._unsticking or self._peeking
+                or not self._status[0]):
             self._stall = (pos, now)
             return
         if now - since < STALL_S or self.view is None:
@@ -1059,12 +1175,13 @@ class BrowserTab(QWidget):
     def _end_unstick(self):
         self._unsticking = False
         self._stall = (-1.0, time.monotonic())
-        if self.view is not None and self._collapsed:
+        if self.view is not None and self._collapsed and not self._peeking:
             self.view.setVisible(False)
             self.view.setMaximumHeight(16777215)
 
     def _update_thumb(self):
-        vid = youtube_id(self.view.url()) if self.view is not None else ""
+        url = self._peek_url if self._peeking else self.view.url() if self.view else QUrl()
+        vid = youtube_id(url)
         if vid == self._thumb_id:
             return
         self._thumb_id = vid

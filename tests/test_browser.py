@@ -135,13 +135,17 @@ class FakeEngine:
         self.chunks.append(x)
 
 
-def tone_page(folder, name="page.html", iframe_of=None):
+def tone_page(folder, name="page.html", iframe_of=None, tag="audio"):
+    """A page playing a looping 440 Hz tone: in an <audio> or <video>, from an iframe,
+    or (tag="detached") from a `new Audio()` that's never put in the page."""
     t = np.arange(SR) / SR
     sf.write(folder / "tone.wav", np.stack([np.sin(2 * np.pi * 440 * t)] * 2, 1) * 0.5, SR)
     if iframe_of:
         body = f'<iframe src="{iframe_of}" width=300 height=100></iframe>'
+    elif tag == "detached":
+        body = "<script>const s = new Audio('tone.wav'); s.loop = true; s.play();</script>"
     else:
-        body = '<audio id=a src="tone.wav" autoplay loop></audio>'
+        body = f'<{tag} id=a src="tone.wav" autoplay loop></{tag}>'
     p = folder / name
     p.write_text(f"<html><body>{body}</body></html>", encoding="utf-8")
     return p
@@ -251,7 +255,7 @@ def test_navigating_away_in_lite_shows_the_new_page(qapp, tab, app_dir):
     must bring the page back instead of leaving an unresponsive, blank tab."""
     t, _ = tab
     t.cfg.browser_lite = True
-    t.load(QUrl.fromLocalFile(str(tone_page(app_dir))).toString())
+    t.load(QUrl.fromLocalFile(str(tone_page(app_dir, tag="video"))).toString())
     assert process_events(qapp, lambda: t._collapsed, 15), "Lite didn't collapse"
     assert not t.view.isVisible()
     t._unsticking = True                     # even mid-wake-up
@@ -261,6 +265,93 @@ def test_navigating_away_in_lite_shows_the_new_page(qapp, tab, app_dir):
     assert not t._unsticking
     t._end_unstick()                         # a wake-up that was pending doesn't re-hide it
     assert t.view.isVisible()
+
+
+def test_audio_played_off_the_page_is_captured(qapp, tab, app_dir):
+    """Sound-button sites play through a `new Audio()` that's never in the page."""
+    t, eng = tab
+    t.load(QUrl.fromLocalFile(str(tone_page(app_dir, tag="detached"))).toString())
+    assert process_events(qapp, lambda: len(eng.chunks) >= 20, 15), "no audio arrived"
+    assert 0.25 < rms(eng.chunks[-10:]) < 0.45
+    assert t._status == (1, 0)
+
+
+def test_lite_leaves_sound_button_pages_alone(qapp, tab, app_dir):
+    """Lite hides the page for video only: a page of sound buttons has to stay usable."""
+    t, _ = tab
+    t.cfg.browser_lite = True
+    t.load(QUrl.fromLocalFile(str(tone_page(app_dir, tag="detached"))).toString())
+    assert process_events(qapp, lambda: t._status == (1, 0), 15)
+    process_events(qapp, lambda: False, 0.5)
+    assert not t._collapsed and t.view.isVisible()
+
+
+def test_pausing_in_lite_keeps_the_mini_player(qapp, tab, app_dir):
+    """Pause (the mini-player's button, Stop all, the hotkey) must not bring the page
+    back: it did, and pressing play again then flashed it up before hiding it."""
+    t, _ = tab
+    t.cfg.browser_lite = True
+    t.load(QUrl.fromLocalFile(str(tone_page(app_dir, tag="video"))).toString())
+    assert process_events(qapp, lambda: t._collapsed, 15), "Lite didn't collapse"
+    t.pause_media()
+    assert process_events(qapp, lambda: t._status == (0, 0), 5)
+    process_events(qapp, lambda: False, 1.0)            # a few mini-player polls
+    assert t._collapsed and not t.view.isVisible()
+    t.toggle_play()                                      # and play resumes from there
+    assert process_events(qapp, lambda: t._status == (1, 0), 5)
+    assert t._collapsed and not t.view.isVisible()
+
+
+def test_lite_shows_the_page_when_the_player_goes_away(qapp, tab, app_dir):
+    t, _ = tab
+    t.cfg.browser_lite = True
+    t.load(QUrl.fromLocalFile(str(tone_page(app_dir, tag="video"))).toString())
+    assert process_events(qapp, lambda: t._collapsed, 15)
+    t.view.page().runJavaScript("document.getElementById('a').remove()")
+    assert process_events(qapp, lambda: not t._collapsed, 5), "left a blank tab"
+    assert t.view.isVisible()
+
+
+def test_lite_opens_a_video_straight_into_the_mini_player(qapp, tab, app_dir, monkeypatch):
+    """A YouTube video opened in Lite never shows the page first: it's 2 px tall (still
+    'visible', so it autoplays) until it plays, then hidden."""
+    t, _ = tab
+    monkeypatch.setattr(t, "_update_thumb", lambda: None)   # no thumbnail download
+    t.cfg.browser_lite = True
+    heights = []
+    t.view.page().loadStarted.connect(
+        lambda: heights.append((t._collapsed, t.view.maximumHeight())))
+    t._expect(QUrl("https://www.youtube.com/watch?v=abc123"))
+    page = tone_page(app_dir, tag="video")          # stands in for the video
+    t.view.setUrl(QUrl.fromLocalFile(str(page)))
+    assert process_events(qapp, lambda: heights, 10)
+    assert heights[0] == (True, 2) and t.mini_title.text() == "Loading…"
+    assert process_events(qapp, lambda: t._status == (1, 0), 15)
+    assert t._collapsed and not t._peeking and not t.view.isVisible()
+
+
+def test_lite_shows_the_page_if_the_video_never_starts(qapp, tab, app_dir, monkeypatch):
+    t, _ = tab
+    monkeypatch.setattr(t, "_update_thumb", lambda: None)
+    monkeypatch.setattr(browser, "PEEK_WAIT_S", 0.3)
+    t.cfg.browser_lite = True
+    silent = app_dir / "silent.html"
+    silent.write_text("<html><body>consent page</body></html>", encoding="utf-8")
+    t._expect(QUrl("https://youtu.be/abc123"))
+    t.view.setUrl(QUrl.fromLocalFile(str(silent)))
+    assert process_events(qapp, lambda: t._peeking, 10)
+    assert process_events(qapp, lambda: not t._collapsed, 5)
+    assert t.view.isVisible() and t.view.maximumHeight() > 1000
+
+
+def test_opening_other_pages_in_lite_shows_them(qapp, tab, app_dir):
+    t, _ = tab
+    t.cfg.browser_lite = True
+    t._expect(QUrl("https://www.youtube.com/"))          # not a video: no mini-player
+    assert t._expect_until == 0.0
+    t.cfg.browser_lite = False
+    t._expect(QUrl("https://www.youtube.com/watch?v=abc123"))   # Lite off
+    assert t._expect_until == 0.0
 
 
 def test_mini_player_helpers():

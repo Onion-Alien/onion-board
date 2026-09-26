@@ -21,6 +21,14 @@
   (±12 semitones) of whatever is playing, keeping the pitch when the speed changes
   or not. The Browser one applies to every video you play until you reset it, and
   clips you record have it too. These aren't saved; use Effects to keep a version.
+- Fixed: sound-button sites (MyInstants and the like) played but never reached
+  your mic, recordings or *Last 15s*: their sounds play from off-page players the
+  browser tap couldn't see.
+- Fixed: Lite mode. Pausing in the small player no longer throws you back to the
+  full page, and a YouTube video you open (or the one restored when you first
+  open the Browser tab) goes straight to the small player instead of flashing the
+  page first. Lite only hides the page for video now, so sound-button pages stay
+  clickable.
 - Fixed: quitting could log a "Signal source has been deleted" error from a
   browser page connection that outlived the Browser tab.
 
