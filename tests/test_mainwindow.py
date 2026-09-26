@@ -169,3 +169,27 @@ def test_window_shrinks_and_still_fits(window, size, qapp):
     window._refit()                          # fonts, so text is wider than in the app)
     assert window._fit.compact_count() < small
     assert window.mixer.isVisibleTo(window) and window.np_name.isVisibleTo(window)
+
+
+# ---------------------------------------------------------------- effects
+
+def test_mainwindow_effects_rerender(qapp, window):
+    from conftest import process_events
+    assert process_events(qapp, lambda: "s0" in window.audio, 10)
+    m = window.meta("s0")
+    before = len(window.audio["s0"])
+    m.fx = {"speed": 2.0}
+    window._rerender(m)
+    assert window.pads["s0"].state == "rendering" and "s0" not in window.audio
+    assert process_events(qapp, lambda: "s0" in window.audio, 15)
+    assert abs(len(window.audio["s0"]) - before / 2) < 10
+    assert window.pads["s0"].state == "ready"
+    assert abs(m.duration - before / 2 / SR) < 0.01
+
+
+def test_mainwindow_live_speed_button_drives_the_engine(window):
+    window.speed_btn.set_values(0.5, 4, False)
+    e = window.engine
+    assert (e.sound_speed, e.sound_pitch, e.sound_keep_pitch) == (0.5, 4, False)
+    window.speed_btn.reset()
+    assert (e.sound_speed, e.sound_pitch) == (1.0, 0.0)

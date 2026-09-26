@@ -53,7 +53,8 @@ Input Device*. If a game has no mic setting, the Setup tab's *"Game has no
 microphone setting?"* button shows you how to make it Windows' default mic.
 
 **7. Add sounds and play.** Drag sound files onto the window (or click **Add sounds**),
-then click a pad. Right-click a pad to give it a hotkey that works in-game.
+then click a pad. Right-click a pad to give it a hotkey that works in-game, or
+**Effects…** to make a sped-up, slowed, pitched or ear-rape version of it.
 
 ### Your voice, or just the sounds?
 
@@ -95,8 +96,20 @@ reinstalling or uninstalling.
   resize, set colours.
 - **Per sound:** global hotkey (works in-game), volume, loop, and what pressing
   again does (restart / overlap / toggle).
+- **Effects on any sound** (right-click a pad → **Effects…**, or the *Effects* tab
+  of **Edit…**): speed and pitch (separately, or together like a record player
+  with *Tape mode*), a 7-band EQ, a boost up to +36 dB that clips on purpose,
+  play backwards, and every voice effect (echo, reverb, distortion, radio, robot,
+  add-on effects too). One-click presets: **Ear rape**, Bass boosted,
+  Slowed + reverb, Nightcore, Chipmunk, Demon, Fast / Slow-mo (same pitch), Old
+  radio, Reversed. *Preview* plays it to you only; **Save** changes that pad,
+  **Save as new sound** keeps the original and adds the edited version as its own
+  pad. Pads with effects show **FX**; *Reset* goes back to the original. The
+  original file is never changed.
 - **Your mic on or off:** send your voice with the sounds, or sounds only.
-- **Transport bar:** play/pause, stop, and a seek slider.
+- **Transport bar:** play/pause, stop, a seek slider, and **speed & pitch while
+  it plays** (the `1x` button: 0.25×–2×, ±12 semitones, keep the pitch or not).
+  That's for listening and isn't saved; use Effects to keep a version.
 - **Any window size:** shrink it down to 300 × 300 and it stays usable. Less
   important controls tuck away as it gets smaller and come back when it grows.
 - **Global hotkeys** (set in **⚙ Settings → Hotkeys**, the overlay key in
@@ -130,6 +143,10 @@ reinstalling or uninstalling.
   an ad blocker. Whatever it plays goes live through your mic, no downloading.
   - **LIVE** off means only you hear it, handy for finding the right spot first.
   - Its own volume, plus "Hear it myself".
+  - **Speed & pitch** (the `1x` button): slow a video down or speed it up, with or
+    without changing its pitch, and shift the pitch on its own. It applies to
+    every video and embed you play until you press *Reset*, and what's recorded
+    or clipped has it too. At normal speed the site's own speed menu works as usual.
   - **Record** and **Last 15s** save what played as a new pad, with dead air
     trimmed.
   - **Lite** (on by default): while something plays, the page is swapped for a
@@ -207,7 +224,9 @@ the launcher the shortcuts and PyInstaller use. The app is the `soundboard` pack
 | `soundboard/ui/mainwindow.py` | the main window: pads, transport, tabs, the audio panel, test mode, auto push-to-talk |
 | `soundboard/ui/widgets.py` | hand-painted widgets: meter, EQ curve, seek slider, pads and their grid |
 | `soundboard/ui/panel.py` | volume boxes and the equalizer panel (emit values; the window applies them) |
-| `soundboard/ui/dialogs.py` | per-sound Edit dialog |
+| `soundboard/ui/dialogs.py` | per-sound Edit dialog: the Sound tab (name, volume, hotkey…) and the Effects tab |
+| `soundboard/ui/speedpitch.py` | the live speed & pitch button and its popup (Sounds transport and Browser bar) |
+| `soundboard/soundfx.py` | per-sound effects: speed / pitch (phase vocoder + soxr), EQ, boost, reverse and any voice effect, rendered off the audio thread; the presets |
 | `soundboard/ui/icons.py` | the line icons, drawn in code and recoloured with the theme |
 | `soundboard/ui/responsive.py` | small windows: what hides, in which order, as the window shrinks |
 | `soundboard/ui/setupwizard.py` | the first-run guide with Bun (mic, headphones, cable, Discord) and the Steam help |
@@ -219,10 +238,10 @@ the launcher the shortcuts and PyInstaller use. The app is the `soundboard` pack
 | `soundboard/adblocker.py` | the Browser tab's ad blocker (EasyList / uBlock lists, refreshed every few days) |
 | `soundboard/bunny.py` | Bun the mascot, drawn in code (setup guide and installer art) |
 | `soundboard/winkeys.py` | global hotkeys (`RegisterHotKey`) and key presses (`SendInput`), no hooks |
-| `soundboard/engine.py` | real-time audio: 3 WASAPI streams (mic in, cable out, headphones out), mixing, pause/seek, limiter, watchdog |
+| `soundboard/engine.py` | real-time audio: 3 WASAPI streams (mic in, cable out, headphones out), mixing, pause/seek, live speed / pitch, limiter, watchdog |
 | `soundboard/eq.py` | 7-band biquad equalizer and presets |
 | `soundboard/browser.py` | Browser tab: Qt WebEngine view; an isolated-world script in every frame taps page media with an AudioWorklet and streams 48 kHz int16 PCM over a loopback WebSocket (per-launch secret) into the engine; clip recorder |
-| `soundboard/library.py` | decoding (bounded to 15 min), the int16 decoded-audio cache, loudness levelling, imports and clips (FLAC), versioned config with backups |
+| `soundboard/library.py` | decoding (bounded to 15 min), the int16 decoded-audio cache (plus each sound's rendered effects version), loudness levelling, duplicating a sound, imports and clips (FLAC), versioned config with backups |
 | `soundboard/theme.py` | colour themes (tokens → stylesheet, also read by the painted widgets) and the logo |
 | `soundboard/settings.py` | Settings window, global hotkey actions, hotkey capture dialog |
 | `soundboard/wheelguard.py` | mouse wheel scrolls the page instead of changing sliders / dropdowns (installed per widget) |
@@ -235,7 +254,7 @@ the launcher the shortcuts and PyInstaller use. The app is the `soundboard` pack
 | `install.bat`, `install.ps1`, `run.bat` | run from source: set up `.venv` and shortcuts, then launch |
 | `install-vbcable.ps1` | downloads VB-Cable, checks its signature, installs it (used by the app and the installer) |
 | `scripts/` | `check_sensitive.py` (secrets / personal-data scan, also the pre-commit hook) and `make_notices.py` (third-party licences for the build) |
-| `tests/` | pytest suite: ring buffer, engine mixing/guards/watchdog, cache and imports, recorder, hotkey parsing, EQ, levelling, config, test analysis, the main window built on Qt's offscreen platform (no window, no devices, no hotkeys) including shrinking it, the overlay, setup guide, voice panel, speech and effects, the ad blocker, and the browser tab end to end: a headless page's audio (top frame and iframe) reaching the engine through the worklet and socket |
+| `tests/` | pytest suite: ring buffer, engine mixing/guards/watchdog, cache and imports, recorder, hotkey parsing, EQ, levelling, config, test analysis, the main window built on Qt's offscreen platform (no window, no devices, no hotkeys) including shrinking it, the overlay, setup guide, voice panel, speech and effects, per-sound effects (speed and pitch measured by frequency and length, every preset, the effects cache, the Edit dialog) and live speed / pitch, the ad blocker, and the browser tab end to end: a headless page's audio (top frame and iframe) reaching the engine through the worklet and socket, and its speed reaching every page |
 
 Developing:
 
@@ -274,6 +293,22 @@ the newest backup is used, so the pad list is never silently reset.
   audio rather than a copy of the source, so the library is small and stays playable
   without ffmpeg. Re-importing a file that's already in the library is refused by
   content fingerprint.
+- **Per-sound effects are baked in ahead of time**, never run on the audio thread:
+  the sound is rendered once in the background (the pad says *applying effects…*)
+  and cached as `cache\<id>.<settings-hash>.npy`, next to the untouched original.
+  Changing the effects renders a new version and the old one is pruned. Speed and
+  pitch are independent: a soxr resample sets the pitch, then a phase vocoder with
+  identity phase locking (phase from the mid signal, shared by both channels)
+  stretches it to the length the speed asks for. *Tape mode* with no extra pitch is
+  a pure resample. Voice effects run per channel in 2048-frame blocks, with room
+  for echo / reverb tails, and a module effect that throws is skipped.
+- **Live speed / pitch** (the `1x` buttons) works differently, because it has to be
+  instant. Sounds are read at a fractional rate with linear interpolation (like a
+  tape). A pitch shifter on the sounds bus (a crossfaded two-head delay line, 70 ms
+  window) then puts the pitch back when *keep pitch* is on, and adds the pitch
+  slider on top. Browser speed is the page's own `playbackRate` /
+  `preservesPitch`, sent to every frame over the tap socket. Its pitch goes
+  through the same shifter as it's fed to the engine.
 - Browser recordings are spooled to a 16-bit WAV as they happen instead of growing in
   RAM, and the resampled copies kept for non-48 kHz devices are capped at 512 MB (LRU).
 - Every device is opened at its **native** sample rate and resampled with soxr.

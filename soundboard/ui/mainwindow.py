@@ -21,14 +21,16 @@ from soundboard import theme, winkeys
 from soundboard.browser import BrowserTab
 from soundboard.engine import SR, Engine
 from soundboard.engine import is_virtual as is_virtual_cable
+from soundboard import soundfx
 from soundboard.library import (AUDIO_EXTS, PAD_COLORS, RESOURCE_DIR, Config, SoundMeta,
-                                delete_file, fingerprint, import_file, load_sound, prune_cache,
-                                save_clip)
+                                cache_keep, delete_file, duplicate, fingerprint, import_file,
+                                load_original, load_sound, prune_cache, save_clip)
 from soundboard.settings import HOTKEY_ACTIONS, HotkeyDialog, SettingsDialog, pretty_key
 from soundboard.testcheck import analyze as analyze_output
 from soundboard.testcheck import summary_html
 from soundboard.ui.dialogs import EditDialog
 from soundboard.ui import icons, responsive
+from soundboard.ui.speedpitch import SpeedPitchButton
 from soundboard.ui.panel import (EqPanel, VolumeControl, bar, card, hint_label, icon_label,
                                  vsep)
 from soundboard.ui.overlay import Overlay
@@ -43,6 +45,7 @@ log = logging.getLogger(__name__)
 class Bridge(QObject):
     loaded = Signal(str, object, str)          # id, data|None, error
     imported = Signal(object, object, str)     # meta|None, data|None, error/filename
+    preview = Signal(str, object, float)       # id, audio with unsaved effects|None, gain
 
 
 class MainWindow(QMainWindow):
@@ -67,6 +70,8 @@ class MainWindow(QMainWindow):
         self.bridge = Bridge()
         self.bridge.loaded.connect(self.on_loaded)
         self.bridge.imported.connect(self.on_imported)
+        self.bridge.preview.connect(self._on_fx_preview)
+        self._preview_gen = 0             # newest effects preview (older renders are dropped)
         self._ptt_held: str | None = None   # PTT key we're currently holding
         self._pending_imports = 0
         self._import_errors: list[str] = []
@@ -359,6 +364,11 @@ class MainWindow(QMainWindow):
         th.addWidget(self.np_name)
         th.addWidget(self.seek, 1)
         th.addWidget(self.np_time)
+        self.speed_btn = SpeedPitchButton(
+            "sounds", "Changes every sound while it plays. To save a version, "
+                      "right-click a pad → Effects.")
+        self.speed_btn.changed.connect(self.on_live_speed)
+        th.addWidget(self.speed_btn)
         sep = vsep()
         th.addWidget(sep)
         vol_icon = icon_label("volume", "Volume of all your sounds")
@@ -975,12 +985,43 @@ class MainWindow(QMainWindow):
         if not self.engine.seek(self.current, frac):
             self.start_frac = frac   # not playing: ▶ will start from here
 
-    def preview(self, sid, volume=None):
+    def preview(self, sid, volume=None, fx=None):
+        """Play a sound to your headphones only. With `fx` (the Edit dialog's unsaved
+        effects) it's rendered with those first, in the background."""
         m = self.meta(sid)
         data = self.audio.get(sid)
-        if m and data is not None:
-            self.engine.play(sid + ":preview", data, self.gain_for(m, volume), mode="restart",
-                             preview=True)
+        if not m or data is None:
+            return
+        gain = self.gain_for(m, volume)
+        if fx is None or soundfx.key(fx) == soundfx.key(m.fx):
+            self.engine.play(sid + ":preview", data, gain, mode="restart", preview=True)
+            return
+        self._preview_gen += 1
+        gen = self._preview_gen
+        self.status.setText("Rendering the preview…")
+
+        def run():
+            try:
+                out = soundfx.render(load_original(m), fx)
+            except Exception:  # noqa: BLE001
+                log.exception("effects preview failed")
+                out = None
+            if gen == self._preview_gen:
+                self.bridge.preview.emit(sid, out, gain)
+        threading.Thread(target=run, daemon=True, name="fx-preview").start()
+
+    def _on_fx_preview(self, sid, data, gain):
+        self._update_status()
+        if data is None:
+            self.status.setText("<span style='color:#ffb020'>Couldn't render the preview "
+                                "(see the log).</span>")
+            return
+        # its own id: it mustn't share the pad's resample cache or its preview voice
+        self.engine.play(sid + "~fx:preview", data, gain, mode="restart", preview=True)
+
+    def on_live_speed(self, speed: float, pitch: float, keep: bool):
+        e = self.engine
+        e.sound_speed, e.sound_pitch, e.sound_keep_pitch = speed, pitch, keep
 
     def _rebuild_pads(self):
         """Sync the pad widgets with cfg.sounds: keep the ones that still exist, create
@@ -1027,7 +1068,7 @@ class MainWindow(QMainWindow):
                 except Exception as e:  # noqa: BLE001
                     log.warning("can't load %s: %s", m.file, e)
                     self.bridge.loaded.emit(m.id, None, str(e))
-            prune_cache({m.id for m in list(self.cfg.sounds)})   # as of now, not of the start
+            prune_cache(cache_keep(list(self.cfg.sounds)))   # as of now, not of the start
             log.info("loaded %d sounds in %.1fs", len(todo), time.monotonic() - t0)
         self._load_thread = threading.Thread(target=run, daemon=True, name="load")
         self._load_thread.start()
@@ -1037,8 +1078,9 @@ class MainWindow(QMainWindow):
         if data is not None:
             self.audio[sid] = data
             m = self.meta(sid)
-            if m and not m.duration:
+            if m and abs(m.duration - len(data) / SR) > 0.005:   # effects change the length
                 m.duration = len(data) / SR
+                self._save_later()
             if m and not m.fingerprint:   # sounds imported before fingerprints existed
                 m.fingerprint = fingerprint(m.file)
                 self._save_later()
@@ -1131,6 +1173,7 @@ class MainWindow(QMainWindow):
                   else None)
         a_prev = menu.addAction(icons.icon("headphones"), "Preview (only me)")
         a_edit = menu.addAction(icons.icon("edit"), "Edit… (name, volume, hotkey, loop)")
+        a_fx = menu.addAction(icons.icon("wave"), "Effects… (speed, pitch, EQ, boost)")
         a_hk = menu.addAction(icons.icon("keyboard"), "Set hotkey…")
         menu.addSeparator()
         a_del = menu.addAction(icons.icon("trash", "danger_text"), "Remove")
@@ -1141,6 +1184,8 @@ class MainWindow(QMainWindow):
             self.preview(sid)
         elif act == a_edit:
             self.edit(sid)
+        elif act == a_fx:
+            self.edit(sid, tab="effects")
         elif act == a_hk:
             d = HotkeyDialog(self.hotkeys, self)
             if d.exec() and d.result_combo:
@@ -1180,18 +1225,68 @@ class MainWindow(QMainWindow):
             if m.hotkey and m.hotkey == getattr(self.cfg, attr):
                 setattr(self.cfg, attr, "")
 
-    def edit(self, sid):
+    def edit(self, sid, tab: str = "sound"):
         m = self.meta(sid)
-        d = EditDialog(m, self.hotkeys, self.preview, self)
+        d = EditDialog(m, self.hotkeys, self.preview, self, tab=tab)
         d.hotkeys_changed.connect(self.register_hotkeys)
-        if d.exec():
+        ok = d.exec()
+        self._preview_gen += 1                     # drop a preview still rendering
+        self.engine.stop(f"{sid}~fx:preview")
+        if ok and d.as_copy:
+            self._save_copy(m, d)
+        elif ok:
+            old_key = soundfx.key(m.fx)
             d.apply()
             self._clear_dupe_hotkey(m)
             self.engine.set_gain(sid, self.gain_for(m))
+            if soundfx.key(m.fx) != old_key:
+                self._rerender(m)
             self.cfg.save()
             self.pads[sid].update()
             self.apply_filter(self.search.text())
         self.register_hotkeys()
+
+    def _save_copy(self, m: SoundMeta, d: EditDialog):
+        """'Save as new sound': the edits go onto a copy placed after the original."""
+        name = d.name.text().strip() or m.name
+        try:
+            new = duplicate(m, name if name != m.name else f"{name} (edit)")
+        except OSError as e:
+            QMessageBox.warning(self, "Couldn't copy the sound", str(e))
+            return
+        d.apply(new)
+        if new.name == m.name:
+            new.name = f"{m.name} (edit)"[:40]
+        if new.hotkey == m.hotkey:
+            new.hotkey = ""   # the original keeps its hotkey
+        self._clear_dupe_hotkey(new)
+        self.cfg.sounds.insert(self.cfg.sounds.index(m) + 1, new)
+        self._index()
+        self.cfg.save()
+        self._rebuild_pads()
+        self._rerender(new)
+
+    def _rerender(self, m: SoundMeta):
+        """Load a sound again after its effects changed. They're rendered in the
+        background; the pad says 'applying effects…' until it's ready."""
+        self.engine.stop(m.id)
+        self.audio.pop(m.id, None)
+        self.engine.forget(m.id)
+        p = self.pads.get(m.id)
+        if p:
+            p.state = "rendering"
+            p.update()
+
+        def run():
+            try:
+                data = load_sound(m)
+                self.engine.prepare(m.id, data)
+                self.bridge.loaded.emit(m.id, data, "")
+            except Exception as e:  # noqa: BLE001
+                log.warning("can't apply effects to %s: %s", m.name, e)
+                self.bridge.loaded.emit(m.id, None, str(e))
+            prune_cache(cache_keep(list(self.cfg.sounds)))
+        threading.Thread(target=run, daemon=True, name="fx-render").start()
 
     # ------------------------------------------------------------------ test mode
     def on_mic_check(self, on):
@@ -1372,6 +1467,7 @@ class MainWindow(QMainWindow):
         f.add(10, "w", r.hide(*self._pad_size))
         f.add(12, "w", r.hide(*self._mixer_send))
         f.add(14, "w", r.hide(self.np_time))
+        f.add(45, "w", r.hide(self.speed_btn))
         f.add(20, "w", self._shorten_pill)
         f.add(22, "w", r.icon_only(self.stop_btn))
         f.add(22, "w", r.icon_only(self.gear))

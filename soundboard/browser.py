@@ -44,6 +44,7 @@ from soundboard.engine import SR
 from soundboard.library import APP_DIR, MAX_SECONDS, trim_silence
 from soundboard.ui import icons
 from soundboard.ui.panel import VolumeControl, bar, icon_label, vsep
+from soundboard.ui.speedpitch import SpeedPitchButton
 
 log = logging.getLogger(__name__)
 
@@ -105,6 +106,7 @@ TAP_JS = r"""
   const WORKLET = %(worklet)s;
   let ws = null, ctx = null, input = null, node = null, sp = null;
   let lastOn = -1, lastOff = -1, playing = 0;
+  let rate = 1, keep = true, forced = false;   // live speed from the soundboard
   const tapped = new WeakSet();
 
   function connect() {
@@ -113,6 +115,13 @@ TAP_JS = r"""
     ws.onopen = () => { lastOn = lastOff = -1; scan(); };
     ws.onmessage = e => {
       if (e.data === 'pause') document.querySelectorAll('audio,video').forEach(el => el.pause());
+      else if (typeof e.data === 'string' && e.data.startsWith('rate ')) {
+        const p = e.data.split(' ');
+        rate = Math.min(4, Math.max(0.25, parseFloat(p[1]) || 1));
+        keep = p[2] !== '0';
+        forced = true;   // apply once even when it's back to normal
+        applyRate();
+      }
     };
     ws.onclose = () => { ws = null; setTimeout(connect, 2000); };
     ws.onerror = () => {};
@@ -184,7 +193,21 @@ TAP_JS = r"""
     } catch (e) { tapped.delete(el); }
   }
 
+  // Only forced while it isn't normal speed, so the site's own speed menu still
+  // works the rest of the time. Re-applied on every scan: new videos pick it up.
+  function applyRate() {
+    if (!forced && rate === 1 && keep) return;
+    forced = false;
+    document.querySelectorAll('audio,video').forEach(el => {
+      try {
+        if (el.playbackRate !== rate) el.defaultPlaybackRate = el.playbackRate = rate;
+        if (el.preservesPitch !== keep) el.preservesPitch = keep;
+      } catch (e) {}
+    });
+  }
+
   function scan() {
+    applyRate();
     let on = 0, off = 0, live = 0;
     document.querySelectorAll('audio,video').forEach(el => {
       if (el.paused) return;
@@ -213,6 +236,11 @@ def tap_script(url: str) -> str:
 
 
 PAUSE_JS = "document.querySelectorAll('audio,video').forEach(e => e.pause());"
+
+
+def rate_message(speed: float, keep_pitch: bool) -> str:
+    """The tap script's live-speed command: 'rate <speed> <keep pitch 1/0>'."""
+    return f"rate {min(max(speed, 0.25), 4.0):g} {1 if keep_pitch else 0}"
 
 # ---- Lite mode
 # YouTube's quality API only exists in the page's own JS world, so this small script
@@ -297,6 +325,7 @@ class AudioSink(QObject):
         self._shown = (0, 0)
         self._active: QWebSocket | None = None   # the frame that currently owns the mic
         self._active_t = 0.0
+        self._rate_msg = ""   # live speed, also sent to frames that connect later
 
     @property
     def url(self) -> str:
@@ -315,6 +344,8 @@ class AudioSink(QObject):
         s.binaryMessageReceived.connect(lambda data, s=s: self._on_binary(s, data))
         s.textMessageReceived.connect(lambda text, s=s: self._on_text(s, text))
         s.disconnected.connect(lambda s=s: self._on_closed(s))
+        if self._rate_msg:
+            s.sendTextMessage(self._rate_msg)
 
     def _on_binary(self, s: QWebSocket, data):
         now = time.monotonic()
@@ -335,9 +366,13 @@ class AudioSink(QObject):
         except (ValueError, KeyError, TypeError):
             return
         self._conns[s] = st
+        if self._rate_msg:   # repeated here: a message sent the moment a frame connects can
+            s.sendTextMessage(self._rate_msg)   # arrive before its page is listening
         self._emit_status()
 
     def _on_closed(self, s: QWebSocket):
+        if not qt_valid(self):   # a socket outliving the sink at shutdown: nothing to update
+            return
         self._conns.pop(s, None)
         if self._active is s:
             self._active = None
@@ -350,6 +385,16 @@ class AudioSink(QObject):
         if tot != self._shown:
             self._shown = tot
             self.status.emit(*tot)
+
+    def set_rate(self, speed: float, keep_pitch: bool):
+        """Playback speed of every media element in every frame (the page's own
+        playbackRate; with keep_pitch the browser keeps the pitch while it does)."""
+        normal = abs(speed - 1) < 1e-3 and keep_pitch
+        msg = rate_message(speed, keep_pitch)
+        if normal and not self._rate_msg:
+            return
+        self._rate_msg = "" if normal else msg
+        self.broadcast(msg)
 
     def broadcast(self, text: str):
         for s in list(self._conns):
@@ -544,6 +589,8 @@ class BrowserTab(QWidget):
         self._thumb_id = None      # YouTube video whose thumbnail is shown
         self._stall = (-1.0, 0.0)  # (position, when it last moved): the Lite watchdog
         self._unsticking = False
+        self._rate = (1.0, True)   # live speed, keep pitch (not saved)
+        self.sink: AudioSink | None = None
         self.net = QNetworkAccessManager(self)
 
         v = QVBoxLayout(self)
@@ -719,6 +766,9 @@ class BrowserTab(QWidget):
         icons.set_icon(self.btn_lite, "leaf", checked_color="#ffffff")
         self.btn_lite.toggled.connect(self._on_lite)
         bh.addWidget(self.btn_lite)
+        self.btn_speed = SpeedPitchButton("browser", "Only while you listen; not saved.")
+        self.btn_speed.changed.connect(self._on_speed)
+        bh.addWidget(self.btn_speed)
         sep2 = vsep()
         bh.addWidget(sep2)
 
@@ -773,6 +823,7 @@ class BrowserTab(QWidget):
         self.sink = AudioSink(self)
         self.sink.audio.connect(self._on_audio)
         self.sink.status.connect(self._on_status)
+        self.sink.set_rate(*self._rate)   # a speed picked before the tab was first opened
         if not self.sink.port:
             self._refresh_info("<span style='color:#ff4d4f'>Browser audio is unavailable "
                                "(couldn't open a local socket) — see the log.</span>")
@@ -880,8 +931,17 @@ class BrowserTab(QWidget):
 
     # ------------------------------------------------------------------ audio
     def _on_audio(self, x: np.ndarray):
-        self.engine.feed_browser(x)
-        self.recorder.push(x)
+        y = self.engine.feed_browser(x)   # the pitched chunk, if the engine returns it
+        self.recorder.push(x if y is None else y)
+
+    def _on_speed(self, speed: float, semitones: float, keep_pitch: bool):
+        """Live speed / pitch of whatever the browser plays: speed is the page's own
+        playbackRate (every frame, and videos that start later); pitch is shifted
+        in the engine, so recordings and the mic get it too."""
+        self._rate = (speed, keep_pitch)
+        self.engine.browser_pitch = semitones
+        if self.sink is not None:
+            self.sink.set_rate(speed, keep_pitch)
 
     def _on_status(self, on: int, off: int):
         started = on > 0 and self._status[0] == 0
@@ -1050,6 +1110,7 @@ class BrowserTab(QWidget):
                 (36, "w", r.icon_only(self.btn_rec)),
                 (36, "w", r.icon_only(self.btn_last)),
                 (36, "w", r.icon_only(self.btn_lite)),
+                (38, "w", r.hide(self.btn_speed)),
                 (40, "w", r.hide(*self._vol_group)),
                 (44, "w", self._short_live),
                 (50, "w", r.hide(*self._clip_group)),

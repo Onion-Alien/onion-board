@@ -12,6 +12,13 @@ VB-Cable — so all rate conversion is done here with soxr instead):
 Sounds are stored at SR and resampled (cached) to each output's rate. Every
 playing Voice keeps its own position per output, so the two output devices
 run on independent clocks without drift or glitches.
+
+Live speed / pitch (the ⏩ controls): sounds play at `sound_speed` by reading
+their data at a fractional rate (like a tape), and a pitch shifter on the sounds
+bus corrects the pitch back (`sound_keep_pitch`) and adds `sound_pitch`. Browser
+speed is the page's own playbackRate; its pitch goes through the same kind of
+shifter in feed_browser. Per-sound effects are baked in ahead of time instead
+(soundboard.soundfx).
 """
 from __future__ import annotations
 
@@ -26,6 +33,7 @@ import sounddevice as sd
 import soxr
 
 from soundboard.eq import EQ
+from soundboard.voicefx.builtin import PitchShift
 
 log = logging.getLogger(__name__)
 
@@ -276,6 +284,30 @@ def is_xrun(status) -> bool:
                 or status.input_underflow or status.input_overflow)
 
 
+class LivePitch:
+    """Stereo real-time pitch shifter (one voicefx PitchShift per channel, with a
+    longer window than the voice changer's: smoother on music). Keeps its history
+    while bypassed, so switching it on doesn't click."""
+
+    class _Shift(PitchShift):
+        WINDOW_S = 0.07
+
+    def __init__(self, rate: int):
+        self.rate = rate
+        self._ch = (self._Shift(rate), self._Shift(rate))
+        self._st = 0.0
+
+    def process(self, x: np.ndarray, semitones: float) -> np.ndarray:
+        if semitones != self._st:
+            self._st = semitones
+            for e in self._ch:     # set directly: past the voice changer's ±12 limit
+                e.p = {"semitones": float(semitones), "mix": 1.0}
+        out = np.empty_like(x)
+        for c, e in enumerate(self._ch):
+            out[:, c] = e.run(np.ascontiguousarray(x[:, c]), self.rate)
+        return out
+
+
 # --------------------------------------------------------------------------- voices
 
 @dataclass(eq=False)
@@ -352,6 +384,10 @@ class Engine:
         self._eqs: dict[tuple[str, str], EQ] = {}
         self.mic_check = False    # headphones also get your mic (= exactly what others hear)
         self.voice_chain = None   # voicefx.VoiceChain: voice changer / live speech tap on the mic
+        self.sound_speed = 1.0        # live playback speed of every sound (0.25..4)
+        self.sound_pitch = 0.0        # live pitch of every sound, semitones
+        self.sound_keep_pitch = True  # speed changes leave the pitch alone
+        self._spitch: dict[str, LivePitch] = {}
 
         self.main_stream = self.mon_stream = self.mic_stream = None
         self.rates = {"main": SR, "mon": SR, "mic": SR}
@@ -374,6 +410,8 @@ class Engine:
         self._rs_bmain = StreamResampler(SR, SR)
         self._rs_bmon = StreamResampler(SR, SR)
         self._browser_heard = 0.0     # monotonic time of the last non-silent chunk
+        self.browser_pitch = 0.0      # semitones (browser speed is set in the page)
+        self._bpitch = LivePitch(SR)
 
         self.level_main = 0.0
         self.level_mic = 0.0
@@ -503,8 +541,10 @@ class Engine:
         self.ring_bmon.configure(r["mon"])
 
     # ----------------------------------------------------------------- browser input
-    def feed_browser(self, x: np.ndarray):
-        """Push a chunk of browser audio ((n, 2) float32 at SR). Call from the UI thread."""
+    def feed_browser(self, x: np.ndarray) -> np.ndarray:
+        """Push a chunk of browser audio ((n, 2) float32 at SR). Call from the UI thread.
+        Returns the chunk as it goes out (after the live pitch), for recording."""
+        x = self._bpitch.process(x, self.browser_pitch)   # passes through at 0 st
         lvl = peak(x)
         self.level_browser = max(lvl * self.browser_vol, self.level_browser)
         if lvl > 0.003:
@@ -513,6 +553,7 @@ class Engine:
             self.ring_bmain.write(self._rs_bmain(x))
         if self.mon_stream is not None:
             self.ring_bmon.write(self._rs_bmon(x))
+        return x
 
     def browser_on_air(self) -> bool:
         """True while the browser is audibly going out to others (drives auto push-to-talk)."""
@@ -716,6 +757,7 @@ class Engine:
         buf = np.zeros((frames, CH), np.float32)
         silent = None   # scratch for voices that must advance but not be heard
         fade = int(FADE_S * self.rates[out])
+        speed = float(self.sound_speed)
         # no lock: `self.voices` is an immutable tuple swapped atomically by the UI side
         voices = [v for v in self.voices if out in v.data and out not in v.done]
         for v in voices:
@@ -732,6 +774,7 @@ class Engine:
             # for the gain); float32 is used by cues, previews of test recordings…
             g = np.float32(v.gain) * (I16_SCALE if data.dtype == np.int16 else np.float32(1))
             if v.stopping:  # short fade-out, then done
+                p = int(p)
                 take = min(frames, fade, n - p if not v.loop else fade)
                 if take > 0 and n:
                     idx = (np.arange(p, p + take) % n) if v.loop else np.arange(p, p + take)
@@ -745,17 +788,21 @@ class Engine:
             if g0 != target:  # fading in/out for pause, resume or seek
                 dst_final = dst
                 dst = np.zeros((frames, CH), np.float32)
-            w = 0
-            while w < frames:
-                if p >= n:
-                    if v.loop and n:
-                        p = 0
-                    else:
-                        break
-                take = min(frames - w, n - p)
-                dst[w:w + take] += data[p:p + take] * g
-                w += take
-                p += take
+            if abs(speed - 1.0) < 1e-4:
+                p = int(p)
+                w = 0
+                while w < frames:
+                    if p >= n:
+                        if v.loop and n:
+                            p = 0
+                        else:
+                            break
+                    take = min(frames - w, n - p)
+                    dst[w:w + take] += data[p:p + take] * g
+                    w += take
+                    p += take
+            else:
+                p = self._render_speed(dst, data, float(p), speed, g, v.loop)
             v.pos[out] = p
             if g0 != target:
                 k = min(frames, fade)
@@ -766,6 +813,44 @@ class Engine:
             if p >= n and not v.loop:
                 v.done.add(out)
         return buf
+
+    @staticmethod
+    def _render_speed(dst, data, p: float, speed: float, g, loop: bool):
+        """Add `data` read from position p at `speed` (linear interpolation) into
+        dst; returns the new position (len(data) once a one-shot has ended)."""
+        n = len(data)
+        if n < 2:
+            return n
+        pos = p + speed * np.arange(len(dst), dtype=np.float64)
+        if loop:
+            pos %= n
+            i = pos.astype(np.int64)
+            j = (i + 1) % n
+        else:
+            m = int(np.searchsorted(pos, n - 1))   # frames before the end
+            pos = pos[:m]
+            i = pos.astype(np.int64)
+            j = i + 1
+        f = (pos - i).astype(np.float32)[:, None]
+        a = data[i].astype(np.float32)
+        dst[:len(pos)] += (a + (data[j].astype(np.float32) - a) * f) * g
+        p += speed * len(dst)
+        if loop:
+            return p % n
+        return p if p < n - 1 else n
+
+    def _pitch(self, out: str, x: np.ndarray) -> np.ndarray:
+        """Live pitch on the sounds bus: the user's shift, plus the correction that
+        undoes the speed's pitch change when keep-pitch is on."""
+        st = float(self.sound_pitch)
+        if self.sound_keep_pitch and abs(self.sound_speed - 1.0) >= 1e-4:
+            st -= 12.0 * float(np.log2(max(self.sound_speed, 1e-3)))
+        f = self._spitch.get(out)
+        if f is None or f.rate != self.rates[out]:
+            if abs(st) < 1e-3:
+                return x
+            f = self._spitch[out] = LivePitch(self.rates[out])
+        return f.process(x, st)   # at 0 st it only keeps its history fresh
 
     def _eq(self, out: str, part: str, x: np.ndarray) -> np.ndarray:
         """Run x through the EQ if it's on and aimed at `part` ('sounds' / 'voice')."""
@@ -818,7 +903,7 @@ class Engine:
             self._guard("mic", e)
 
     def _main(self, outdata, frames):
-        mix = self._render("main", frames)
+        mix = self._pitch("main", self._render("main", frames))
         mix *= np.float32(self.sound_vol)
         b = self.ring_bmain.read(frames)
         if b is not None and self.browser_live:
@@ -841,7 +926,8 @@ class Engine:
         check = self.mic_check
         # in mic check you hear the real output mix: sounds at their outgoing
         # level plus your mic, so you can judge the balance while a song plays
-        mix = self._render("mon", frames, previews_only=not (check or self.monitor_sounds))
+        mix = self._pitch("mon", self._render("mon", frames,
+                                              previews_only=not (check or self.monitor_sounds)))
         m = self.ring_mon.read(frames)
         if check:
             mix *= np.float32(self.sound_vol)

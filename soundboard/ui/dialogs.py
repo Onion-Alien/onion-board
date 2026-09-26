@@ -1,33 +1,173 @@
-"""Per-sound Edit dialog."""
+"""Per-sound Edit dialog: the Sound tab (name, volume, hotkey…) and the Effects tab
+(speed, pitch, EQ, boost, reverse and every voice effect, modules' included)."""
 from __future__ import annotations
 
 from PySide6.QtCore import Qt, Signal
 from PySide6.QtWidgets import (QCheckBox, QComboBox, QDialog, QDialogButtonBox, QFormLayout,
-                               QHBoxLayout, QLabel, QLineEdit, QPushButton, QSlider, QVBoxLayout)
+                               QHBoxLayout, QLabel, QLineEdit, QPushButton, QScrollArea, QSlider,
+                               QTabWidget, QVBoxLayout, QWidget)
 
-from soundboard import theme
+from soundboard import soundfx, theme, voicefx
+from soundboard.eq import PRESETS as EQ_PRESETS
 from soundboard.library import PAD_COLORS, SoundMeta
 from soundboard.settings import HotkeyDialog, pretty_key
 from soundboard.ui import icons
+from soundboard.ui.panel import EqPanel, hint_label, section_label
+from soundboard.ui.voicepanel import EffectRow, ParamSlider
 from soundboard.wheelguard import no_wheel
 from soundboard.winkeys import Hotkeys
 
+CUSTOM = "Custom"
+SPEED = voicefx.Param("speed", "Speed", *soundfx.SPEED_RANGE, 1.0, "x", 0.05)
+PITCH = voicefx.Param("pitch", "Pitch", *soundfx.PITCH_RANGE, 0.0, " st", 1)
+BOOST = voicefx.Param("gain_db", "Boost", *soundfx.GAIN_RANGE, 0.0, " dB", 1)
+
+
+class EffectsPanel(QWidget):
+    """Every per-sound effect setting. `changed` fires on any edit; `fx()` is the
+    settings dict for SoundMeta.fx ({} when nothing is changed)."""
+    changed = Signal()
+
+    def __init__(self, fx: dict | None):
+        super().__init__()
+        v = QVBoxLayout(self)
+        v.setContentsMargins(0, 0, 8, 0)
+        v.setSpacing(8)
+
+        prow = QHBoxLayout()
+        prow.addWidget(QLabel("Preset"))
+        self.preset = QComboBox()
+        self.preset.addItems(list(soundfx.PRESETS) + [CUSTOM])
+        no_wheel(self.preset)
+        prow.addWidget(self.preset, 1)
+        reset = QPushButton("Reset")
+        reset.setObjectName("small")
+        reset.setToolTip("Back to the original sound")
+        reset.clicked.connect(lambda: self.preset.setCurrentText(next(iter(soundfx.PRESETS))))
+        prow.addWidget(reset)
+        v.addLayout(prow)
+
+        v.addWidget(section_label("SPEED & PITCH"))
+        self.speed = ParamSlider(SPEED, 1.0)
+        self.pitch = ParamSlider(PITCH, 0.0)
+        self.tape = QCheckBox("Tape mode: speed changes the pitch too (nightcore / slowed)")
+        self.tape.setToolTip("Off: speed and pitch are independent. On: like a record player, "
+                             "faster is also higher; Pitch adds on top.")
+        for w in (self.speed, self.pitch, self.tape):
+            v.addWidget(w)
+
+        v.addWidget(section_label("LOUDNESS"))
+        self.boost = ParamSlider(BOOST, 0.0)
+        v.addWidget(self.boost)
+        self.boost_hint = hint_label("")
+        v.addWidget(self.boost_hint)
+        self.reverse = QCheckBox("Play backwards")
+        v.addWidget(self.reverse)
+
+        self.eq = EqPanel(False, "sounds", "Flat (off)", [0.0] * 7)
+        self.eq.lbl_for.hide()
+        self.eq.cb_target.hide()
+        v.addWidget(self.eq)
+
+        v.addWidget(section_label("EFFECTS"))
+        self.rows: dict[str, EffectRow] = {}
+        for etype, cls in voicefx.REGISTRY.items():
+            if etype == "pitch":   # the Pitch slider above does this, better
+                continue
+            row = EffectRow(cls, {})
+            row.changed.connect(self._edited)
+            self.rows[etype] = row
+            v.addWidget(row)
+        v.addWidget(hint_label("Effects from add-on modules show up here too."))
+        v.addStretch(1)
+
+        self.load(fx or {})
+        for s in (self.speed, self.pitch, self.boost):
+            s.changed.connect(self._edited)
+        self.tape.toggled.connect(self._edited)
+        self.reverse.toggled.connect(self._edited)
+        self.eq.changed.connect(lambda *_: self._edited())
+        self.preset.currentTextChanged.connect(self._on_preset)
+        self._matching_preset()
+
+    def load(self, fx: dict):
+        f = soundfx.clean(fx)
+        widgets = (self.speed, self.pitch, self.boost, self.tape, self.reverse, self.eq,
+                   *self.rows.values())
+        for w in widgets:
+            w.blockSignals(True)
+        self.speed.set_value(f["speed"])
+        self.pitch.set_value(f["pitch"])
+        self.boost.set_value(f["gain_db"])
+        self.tape.setChecked(f["tape"])
+        self.reverse.setChecked(f["reverse"])
+        self.eq.set_gains(f["eq"], next((n for n, g in EQ_PRESETS.items() if g == f["eq"]),
+                                        CUSTOM))
+        for etype, row in self.rows.items():
+            cfg = f["effects"].get(etype)
+            row.load(cfg if cfg and cfg.get("on") else {"on": False})
+        for w in widgets:
+            w.blockSignals(False)
+        self._boost_hint()
+
+    def fx(self) -> dict:
+        gains, on, _t, _p = self.eq.state()
+        f = {"speed": round(self.speed.value(), 3), "pitch": round(self.pitch.value(), 2),
+             "tape": self.tape.isChecked(), "gain_db": round(self.boost.value(), 2),
+             "reverse": self.reverse.isChecked(),
+             "eq": gains if on else [0.0] * len(gains),
+             "effects": {t: r.state() for t, r in self.rows.items() if r.chk.isChecked()}}
+        return {} if soundfx.is_neutral(f) else soundfx.clean(f)
+
+    def _boost_hint(self):
+        db = self.boost.value()
+        self.boost_hint.setText("⚠ Very loud: this clips on purpose (ear-rape territory). "
+                                "Preview it at low volume first." if db > 6 else
+                                "Above 0 dB the sound gets louder until it clips.")
+
+    def _edited(self):
+        self._boost_hint()
+        self._matching_preset()
+        self.changed.emit()
+
+    def _matching_preset(self):
+        cur = soundfx.key(self.fx())
+        name = next((n for n, p in soundfx.PRESETS.items() if soundfx.key(p) == cur), CUSTOM)
+        self.preset.blockSignals(True)
+        self.preset.setCurrentText(name)
+        self.preset.blockSignals(False)
+
+    def _on_preset(self, name: str):
+        if name in soundfx.PRESETS:
+            self.load(soundfx.PRESETS[name])
+            self.changed.emit()
+
 
 class EditDialog(QDialog):
-    """Name, volume, press mode, loop, hotkey and colour of one sound. Nothing is
-    written to the SoundMeta until `apply()`; `hotkeys_changed` fires after a
-    capture so the owner can re-register the (paused) global hotkeys."""
+    """Edit one sound. Nothing is written to the SoundMeta until `apply()`;
+    `hotkeys_changed` fires after a capture so the owner can re-register the (paused)
+    global hotkeys. After exec(), `as_copy` says whether "Save as new sound" was
+    chosen (then apply() goes onto the copy, and the original stays as it was).
+
+    preview_cb(sid, volume, fx) plays the sound, with these (unsaved) effects, to
+    your headphones only."""
     hotkeys_changed = Signal()
 
-    def __init__(self, meta: SoundMeta, hotkeys: Hotkeys, preview_cb, parent=None):
+    def __init__(self, meta: SoundMeta, hotkeys: Hotkeys, preview_cb, parent=None,
+                 tab: str = "sound"):
         super().__init__(parent)
         self.setWindowTitle("Edit sound")
         self.meta = meta
         self.hotkeys = hotkeys
         self.hotkey = meta.hotkey
         self.color = meta.color
+        self.as_copy = False
         lay = QVBoxLayout(self)
-        form = QFormLayout()
+        self.tabs = QTabWidget()
+        lay.addWidget(self.tabs, 1)
+
+        basics = QWidget()
+        form = QFormLayout(basics)
         form.setLabelAlignment(Qt.AlignRight)
         self.name = QLineEdit(meta.name)
         form.addRow("Name", self.name)
@@ -79,18 +219,43 @@ class EditDialog(QDialog):
         crow.addStretch()
         form.addRow("Colour", crow)
         self._set_color(self.color)
-        lay.addLayout(form)
+        self.tabs.addTab(basics, "Sound")
 
+        self.effects = EffectsPanel(meta.fx)
+        scroll = QScrollArea()
+        scroll.setWidgetResizable(True)
+        scroll.setWidget(self.effects)
+        scroll.setFrameShape(QScrollArea.NoFrame)
+        self.tabs.addTab(scroll, "Effects")
+        if tab == "effects":
+            self.tabs.setCurrentIndex(1)
+
+        prow = QHBoxLayout()
         prev = QPushButton("Preview (only you hear it)")
         icons.set_icon(prev, "headphones")
-        prev.clicked.connect(lambda: preview_cb(self.meta.id, self.vol.value() / 100))
-        lay.addWidget(prev)
+        prev.clicked.connect(lambda: preview_cb(self.meta.id, self.vol.value() / 100,
+                                                self.effects.fx()))
+        prow.addWidget(prev)
+        self.fx_note = QLabel()
+        self.fx_note.setObjectName("muted")
+        prow.addWidget(self.fx_note, 1)
+        lay.addLayout(prow)
+        self.effects.changed.connect(self._fx_note)
+        self._fx_note()
 
         bb = QDialogButtonBox(QDialogButtonBox.Save | QDialogButtonBox.Cancel)
+        copy = bb.addButton("Save as new sound", QDialogButtonBox.AcceptRole)
+        copy.setToolTip("Keep this sound as it is and add the edited version as a new pad")
+        copy.clicked.connect(lambda: setattr(self, "as_copy", True))
         bb.accepted.connect(self.accept)
         bb.rejected.connect(self.reject)
         lay.addWidget(bb)
-        self.setMinimumWidth(460)
+        self.setMinimumWidth(500)
+        self.resize(540, 640)
+
+    def _fx_note(self):
+        s = soundfx.summary(self.effects.fx())
+        self.fx_note.setText(f"Effects: {s}" if s else "")
 
     def _set_color(self, c):
         self.color = c
@@ -109,11 +274,12 @@ class EditDialog(QDialog):
             self._set_hk(d.result_combo)
         self.hotkeys_changed.emit()   # the capture paused them; the owner re-registers
 
-    def apply(self):
-        m = self.meta
+    def apply(self, target: SoundMeta | None = None):
+        m = target or self.meta
         m.name = self.name.text().strip() or m.name
         m.volume = self.vol.value() / 100
         m.mode = self.mode.currentData()
         m.loop = self.loop.isChecked()
         m.hotkey = self.hotkey
         m.color = self.color
+        m.fx = self.effects.fx()

@@ -206,14 +206,16 @@ class Pad(QWidget):
         f.setPointSizeF(8.5)
         p.setFont(f)
         foot = r.adjusted(10, r.height() - 24, -10, -6)
-        if self.state == "loading":
+        if self.state in ("loading", "rendering"):
             p.setPen(QColor(T["muted"]))
-            p.drawText(foot, Qt.AlignLeft | Qt.AlignVCenter, "loading…")
+            p.drawText(foot, Qt.AlignLeft | Qt.AlignVCenter,
+                       "applying effects…" if self.state == "rendering" else "loading…")
         elif self.state == "error":
             p.setPen(QColor("#ff6b6b"))
             p.drawText(foot, Qt.AlignLeft | Qt.AlignVCenter, "can't load file")
         else:
-            flags = ("⟳ " if self.meta.loop else "") + \
+            flags = ("FX " if self.meta.fx else "") + \
+                ("⟳ " if self.meta.loop else "") + \
                 {"overlap": "⧉ ", "toggle": "⏯ "}.get(self.meta.mode, "")
             p.setPen(QColor(T["muted"]))
             right = "❚❚ paused" if self.paused else f"{flags}{self.meta.duration:.1f}s"

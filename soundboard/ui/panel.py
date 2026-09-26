@@ -142,7 +142,8 @@ class EqPanel(QWidget):
         self.chk_on = QCheckBox("EQ on")
         self.chk_on.setChecked(enabled)
         row.addWidget(self.chk_on)
-        row.addWidget(QLabel("for"))
+        self.lbl_for = QLabel("for")
+        row.addWidget(self.lbl_for)
         self.cb_target = QComboBox()
         for ic, label, key in (("mic", "My voice", "voice"), ("volume", "My sounds", "sounds"),
                                ("wave", "Both", "all")):
@@ -197,6 +198,17 @@ class EqPanel(QWidget):
     # ---- state
     def gains(self) -> list[float]:
         return [s.value() / 2 for s in self.sliders]
+
+    def set_gains(self, gains: list[float], preset: str = "Custom"):
+        """Load gains, turning the EQ on unless they're flat. Emits `changed`."""
+        self._set_sliders(gains)
+        self.cb_preset.blockSignals(True)
+        self.cb_preset.setCurrentText(preset if preset in EQ_PRESETS else "Custom")
+        self.cb_preset.blockSignals(False)
+        self.chk_on.blockSignals(True)
+        self.chk_on.setChecked(any(abs(g) >= 0.05 for g in gains))
+        self.chk_on.blockSignals(False)
+        self._emit()
 
     def state(self) -> tuple[list[float], bool, str, str]:
         return (self.gains(), self.chk_on.isChecked(), self.cb_target.currentData(),

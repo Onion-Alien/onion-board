@@ -61,6 +61,7 @@ class SoundMeta:
     level_gain: float = 1.0   # computed loudness-levelling gain
     duration: float = 0.0
     fingerprint: str = ""     # of the source file, to notice a re-import of the same file
+    fx: dict = field(default_factory=dict)   # speed, pitch, EQ, boost… (soundboard.soundfx)
 
 
 @dataclass
@@ -294,13 +295,15 @@ def to_float32(data: np.ndarray) -> np.ndarray:
 
 # --------------------------------------------------------------------------- decoded cache
 
-def cache_path(sid: str) -> Path:
-    return CACHE_DIR / f"{sid}.npy"
+def cache_path(sid: str, fx_key: str = "") -> Path:
+    """<sid>.npy is the decoded original; <sid>.<fx_key>.npy the version with its
+    effects baked in (the key changes whenever the effects do)."""
+    return CACHE_DIR / (f"{sid}.{fx_key}.npy" if fx_key else f"{sid}.npy")
 
 
-def load_cached(sid: str) -> np.ndarray | None:
+def load_cached(sid: str, fx_key: str = "") -> np.ndarray | None:
     """The cached int16 audio for a sound, or None if there is none (or it's damaged)."""
-    p = cache_path(sid)
+    p = cache_path(sid, fx_key)
     if not p.exists():
         return None
     try:
@@ -313,32 +316,60 @@ def load_cached(sid: str) -> np.ndarray | None:
     return None
 
 
-def store_cached(sid: str, data: np.ndarray) -> np.ndarray:
+def store_cached(sid: str, data: np.ndarray, fx_key: str = "") -> np.ndarray:
     """Write a sound's audio to the cache (atomically) and return it as int16."""
     i16 = to_int16(data)
     try:
         CACHE_DIR.mkdir(parents=True, exist_ok=True)
-        tmp = cache_path(sid).with_suffix(".tmp.npy")
+        dest = cache_path(sid, fx_key)
+        tmp = dest.with_suffix(".tmp.npy")
         np.save(tmp, i16)
-        tmp.replace(cache_path(sid))
+        tmp.replace(dest)
     except OSError:
         log.warning("couldn't write cache for %s", sid, exc_info=True)
     return i16
 
 
-def load_sound(meta: SoundMeta) -> np.ndarray:
-    """int16 audio for a library sound: from the cache, else decoded and cached."""
+def load_original(meta: SoundMeta) -> np.ndarray:
+    """int16 audio of the sound as imported (no effects): cache, else decode."""
     data = load_cached(meta.id)
     if data is None:
         data = store_cached(meta.id, decode(meta.file))
     return data
 
 
-def prune_cache(keep_ids: set[str]):
-    """Delete cache files for sounds that no longer exist."""
+def load_sound(meta: SoundMeta) -> np.ndarray:
+    """int16 audio for a library sound as it plays, effects included. The first
+    load after its effects change renders them (slow for long sounds); after that
+    it is one file read."""
+    from soundboard import soundfx
+    key = soundfx.key(meta.fx)
+    if not key:
+        return load_original(meta)
+    data = load_cached(meta.id, key)
+    if data is None:
+        data = store_cached(meta.id, soundfx.render(load_original(meta), meta.fx), key)
+    return data
+
+
+def cache_keep(sounds: list[SoundMeta]) -> set[str]:
+    """Cache file stems still in use: every original, and each sound's current effects."""
+    from soundboard import soundfx
+    keep = set()
+    for m in sounds:
+        keep.add(m.id)
+        k = soundfx.key(m.fx)
+        if k:
+            keep.add(f"{m.id}.{k}")
+    return keep
+
+
+def prune_cache(keep: set[str]):
+    """Delete cache files that aren't in `keep` (see cache_keep): removed sounds and
+    effects versions that were replaced."""
     try:
         for p in CACHE_DIR.glob("*.npy"):
-            if p.stem not in keep_ids:
+            if p.stem not in keep:
                 p.unlink(missing_ok=True)
     except OSError:
         log.debug("cache prune failed", exc_info=True)
@@ -433,11 +464,35 @@ def trim_silence(data: np.ndarray, threshold: float = 0.002, pad_s: float = 0.05
     return data[max(loud[0] - pad, 0): loud[-1] + pad]
 
 
+def duplicate(meta: SoundMeta, name: str) -> SoundMeta:
+    """A copy of a sound with its own library file (so removing either one never
+    takes the other's audio with it), cache, id and no hotkey."""
+    sid = uuid.uuid4().hex[:10]
+    src = Path(meta.file)
+    dest = src
+    if src.is_file():
+        SOUNDS_DIR.mkdir(parents=True, exist_ok=True)
+        dest = SOUNDS_DIR / f"{sid}_{_safe_name(name)}{src.suffix}"
+        shutil.copy2(src, dest)
+    try:
+        if cache_path(meta.id).exists():
+            CACHE_DIR.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(cache_path(meta.id), cache_path(sid))
+    except OSError:
+        log.debug("couldn't copy the cache for %s", meta.id, exc_info=True)
+    return SoundMeta(id=sid, name=name[:40], file=str(dest), volume=meta.volume,
+                     mode=meta.mode, loop=meta.loop, color=meta.color,
+                     level_gain=meta.level_gain, duration=meta.duration,
+                     fingerprint="", fx=dict(meta.fx))
+
+
 def delete_file(meta: SoundMeta):
     p = Path(meta.file)
     try:
         if p.parent == SOUNDS_DIR:
             p.unlink(missing_ok=True)
-        cache_path(meta.id).unlink(missing_ok=True)
+        for c in CACHE_DIR.glob(f"{meta.id}*.npy"):
+            if c.stem == meta.id or c.stem.startswith(meta.id + "."):
+                c.unlink(missing_ok=True)
     except OSError:
         log.warning("couldn't delete %s", p, exc_info=True)

@@ -269,3 +269,66 @@ def test_mini_player_helpers():
     assert browser.youtube_id(QUrl("https://www.youtube.com/shorts/sh0rt")) == "sh0rt"
     assert browser.youtube_id(QUrl("https://soundcloud.com/a/b")) == ""
     assert browser.fmt_time(75) == "1:15" and browser.fmt_time(3725) == "1:02:05"
+
+
+# ---------------------------------------------------------------- live speed / pitch
+
+def test_rate_message_format_and_clamp():
+    assert browser.rate_message(1.5, True) == "rate 1.5 1"
+    assert browser.rate_message(0.1, False) == "rate 0.25 0"
+    assert browser.rate_message(9, True) == "rate 4 1"
+
+
+def test_sink_rate_is_broadcast_and_sent_to_frames_that_connect_later(qapp, sink):
+    s, _ = sink
+    a = Client(qapp, s.url)
+    s.set_rate(1.0, True)                    # already normal: nothing to say
+    process_events(qapp, lambda: False, 0.2)
+    assert a.texts == []
+    s.set_rate(1.5, False)
+    assert process_events(qapp, lambda: a.texts == ["rate 1.5 0"], 3)
+    late = Client(qapp, s.url)               # a frame / page that opens afterwards
+    assert process_events(qapp, lambda: late.texts == ["rate 1.5 0"], 3)
+    s.set_rate(1.0, True)                    # back to normal: told once, then not sticky
+    assert process_events(qapp, lambda: a.texts[-1] == "rate 1 1" == late.texts[-1], 3)
+    later = Client(qapp, s.url)
+    process_events(qapp, lambda: False, 0.3)
+    assert later.texts == []
+
+
+def media_state(qapp, t):
+    got = []
+    t.view.page().runJavaScript(
+        "(()=>{const m=document.querySelector('audio');"
+        "return m?JSON.stringify([m.playbackRate,m.preservesPitch]):''})()",
+        browser.WORLD, got.append)
+    assert process_events(qapp, lambda: got, 3)
+    return json.loads(got[0]) if got[0] else None
+
+
+def test_speed_button_sets_page_rate_and_engine_pitch(qapp, tab, app_dir):
+    t, eng = tab
+    t.load(QUrl.fromLocalFile(str(tone_page(app_dir))).toString())
+    assert process_events(qapp, lambda: t._status == (1, 0), 15)
+    t.btn_speed.set_values(1.5, -3, False)   # as if moved in the popup
+    assert eng.browser_pitch == -3
+    assert process_events(qapp, lambda: media_state(qapp, t) == [1.5, False], 5)
+    # a page loaded afterwards picks the speed up as soon as it plays
+    loaded = []
+    t.view.page().loadFinished.connect(loaded.append)
+    t.load(QUrl.fromLocalFile(str(tone_page(app_dir, "next.html"))).toString())
+    assert process_events(qapp, lambda: loaded, 10)
+    assert process_events(qapp, lambda: media_state(qapp, t) == [1.5, False], 15)
+    t.btn_speed.reset()
+    assert eng.browser_pitch == 0
+    assert process_events(qapp, lambda: media_state(qapp, t)[0] == 1.0, 5)
+
+
+def test_recorder_keeps_what_the_engine_returns(qapp, tab):
+    t, eng = tab
+    x = np.full((1024, 2), 0.1, np.float32)
+    t._on_audio(x)                           # an engine that returns nothing: the raw chunk
+    assert np.allclose(t.recorder.last()[-1024:], x)
+    eng.feed_browser = lambda c: c * 2       # one that returns the pitched chunk
+    t._on_audio(x)
+    assert np.allclose(t.recorder.last()[-1024:], x * 2)

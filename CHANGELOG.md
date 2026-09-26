@@ -2,6 +2,22 @@
 
 ## Unreleased
 
+- **Effects on any sound.** Right-click a pad → *Effects…* (or the new *Effects*
+  tab in *Edit…*) to change its speed and pitch (separately, or together with
+  *Tape mode*), EQ, boost (up to +36 dB, which clips on purpose), play it backwards,
+  or add any voice effect (echo, reverb, distortion, radio, robot, add-on effects).
+  Presets include **Ear rape**, Bass boosted, Slowed + reverb, Nightcore, Chipmunk,
+  Demon and Reversed. *Preview* plays it to you only. *Save* changes the pad, and
+  *Save as new sound* keeps the original and adds the edited version as its own
+  pad. The original file is never touched, and pads with effects show **FX**.
+- **Speed and pitch while you listen.** A `1x` button on the Sounds transport and
+  on the Browser bar slows down or speeds up (0.25×–2×) and shifts the pitch
+  (±12 semitones) of whatever is playing, keeping the pitch when the speed changes
+  or not. The Browser one applies to every video you play until you reset it, and
+  clips you record have it too. These aren't saved; use Effects to keep a version.
+- Fixed: quitting could log a "Signal source has been deleted" error from a
+  browser page connection that outlived the Browser tab.
+
 - **Voice tab redesigned so it's obvious how to use it.** The voice changer comes
   first: one big switch (green when on: everyone hears your changed voice), a grid
   of voices to click (Chipmunk, Robot, Old telephone…; clicking one turns it on), a
