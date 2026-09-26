@@ -3,7 +3,7 @@
 He bobs gently, blinks every few seconds and flicks an ear now and then. Feed him
 the mic level (`set_level`, 0..1) and he talks along: the mouth opens with your
 voice, he bounces, and music notes float up out of him. `burst()` throws a handful
-of notes (the test beep); `celebrate=True` makes him hop with twinkling sparkles.
+of notes (the test sound); `celebrate=True` makes him hop with twinkling sparkles.
 
 The widget is bigger than Bun himself so there's room around him for the notes,
 which also gives him even breathing room in a layout. The timer only runs while

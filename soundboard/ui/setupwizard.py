@@ -3,12 +3,12 @@ in plain words. Shown on the very first launch (and from the Setup tab's
 Step-by-step guide button any time after).
 
   1. Which microphone do you talk into?   (live level bar: "talk, it should move")
-  2. Where do you listen?                 (test beep)
+  2. Where do you listen?                 (test chime)
   3. The virtual cable                    (checks it's there; installs it if not)
   4. Tell Discord / your game             (the one setting outside the app)
 
 Every choice is applied to the engine as it's made, so the level bar and the test
-beep use the real devices. The window's own device boxes are refreshed at the end.
+chime use the real devices. The window's own device boxes are refreshed at the end.
 """
 from __future__ import annotations
 
@@ -46,6 +46,33 @@ def cable_restart_pending() -> bool:
     tick.restype = ctypes.c_uint64
     uptime = tick() / 1000
     return written > time.time() - uptime
+
+CHIME_NOTES = (784.0, 987.8, 1174.7, 1568.0)   # G5 B5 D6 G6: a soft G-major arpeggio
+CHIME_PEAK = 0.16
+
+
+def chime() -> np.ndarray:
+    """The test sound: a gentle bell arpeggio, easy on the ears (stereo float32).
+    Each note is a sine with a quiet octave and fifth above it for a bell colour, a
+    soft 15 ms fade-in and a long natural fade-out; the notes overlap like a wind
+    chime, spread gently from left (low) to right (high)."""
+    step, ring = 0.13, 1.1
+    n = int((step * (len(CHIME_NOTES) - 1) + ring) * SR)
+    out = np.zeros((n, 2), np.float32)
+    t = np.arange(int(ring * SR)) / SR
+    attack = np.minimum(1.0, t / 0.015)
+    for i, f in enumerate(CHIME_NOTES):
+        tone = (np.sin(2 * np.pi * f * t) * np.exp(-t * 3.2)
+                + 0.18 * np.sin(2 * np.pi * 2 * f * t) * np.exp(-t * 7)
+                + 0.06 * np.sin(2 * np.pi * 3 * f * t) * np.exp(-t * 11)) * attack
+        pan = (i / (len(CHIME_NOTES) - 1) - 0.5) * 0.5          # low left, high right
+        at = int(i * step * SR)
+        out[at:at + len(t), 0] += tone * (1 - pan)
+        out[at:at + len(t), 1] += tone * (1 + pan)
+    fade = min(len(out), int(0.05 * SR))
+    out[-fade:] *= np.linspace(1, 0, fade)[:, None]
+    return out * (CHIME_PEAK / np.abs(out).max())
+
 
 TITLE_CSS = "font-size:17pt; font-weight:800;"
 BODY_CSS = "font-size:11pt;"
@@ -189,7 +216,7 @@ class SetupWizard(QDialog):
         self.bun_phones = BunnyWidget("headphones")
         v.addLayout(_header("🎧  Where do you listen?",
                             _label("Pick your headphones or speakers, then press <b>Play a "
-                                   "test beep</b>. Only you hear this."),
+                                   "test sound</b>. Only you hear this."),
                             self.bun_phones))
         outs = [d["name"] for d in eng.list_devices("output") if not eng.is_virtual(d["name"])]
         cur = self.win.cfg.mon_device if self.win.cfg.mon_device in outs else \
@@ -198,10 +225,10 @@ class SetupWizard(QDialog):
             self._pick_headphones(cur)
         lst, _ = self._choice_list(outs, cur, self._pick_headphones)
         v.addWidget(lst, 1)
-        beep = QPushButton("🔊  Play a test beep")
-        beep.setStyleSheet("padding:10px; font-size:11pt;")
-        beep.clicked.connect(self.test_beep)
-        v.addWidget(beep)
+        chime = QPushButton("🔊  Play a test sound")
+        chime.setStyleSheet("padding:10px; font-size:11pt;")
+        chime.clicked.connect(self.test_sound)
+        v.addWidget(chime)
         v.addWidget(_label("Didn't hear it? Pick another one and try again.",
                            "font-size:9pt;"))
         return p
@@ -317,13 +344,8 @@ class SetupWizard(QDialog):
         self.win.cfg.mon_device = name
         self.win.engine.set_mon_device(name)
 
-    def test_beep(self):
-        n = int(0.18 * SR)
-        t = np.arange(n) / SR
-        env = np.minimum(1.0, np.minimum(t, t[::-1]) / 0.01)
-        tone = np.concatenate([np.sin(2 * np.pi * f * t) * env for f in (660, 880)]) * 0.25
-        self.win.engine.play("__setup__", np.stack([tone, tone], 1).astype(np.float32), 1.0,
-                             preview=True)
+    def test_sound(self):
+        self.win.engine.play("__setup__", chime(), 1.0, preview=True)
         self.bun_phones.burst()
 
     def cable_ok(self) -> bool:

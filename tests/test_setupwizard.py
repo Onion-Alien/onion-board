@@ -155,3 +155,10 @@ def test_restart_marker_counts_only_until_the_pc_restarts(wizard, devices, app_d
     assert not setupwizard.cable_restart_pending()
     wiz.recheck_cable()
     assert wiz.btn_restart.isHidden() and not wiz.btn_cable.isHidden()
+
+
+def test_test_sound_is_a_gentle_chime():
+    c = setupwizard.chime()
+    assert c.dtype.name == "float32" and c.shape[1] == 2
+    assert abs(float(abs(c).max()) - setupwizard.CHIME_PEAK) < 1e-4   # quiet, not a blast
+    assert abs(c[:10]).max() < 0.01 and abs(c[-10:]).max() < 0.01      # no clicks

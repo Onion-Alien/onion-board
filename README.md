@@ -43,7 +43,7 @@ Bun the bunny 🐰:
 - *Which mic do you talk into?* Pick yours and say something. The bar should move.
   There's a **Send my voice too** box here. Untick it if you only want your sounds
   to go out.
-- *Where do you listen?* Pick your headphones and press the test beep.
+- *Where do you listen?* Pick your headphones and play the test chime.
 - *The virtual cable* is checked (and installed if it's missing).
 - *Tell Discord or your game* which mic to use.
 
