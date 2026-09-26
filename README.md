@@ -198,6 +198,14 @@ The virtual cable is a free audio driver that works like a pipe: Onion Board pla
 into one end, and Discord or the game uses the other end as a microphone. You hear
 the sounds in your own headphones separately.
 
+### Use it responsibly
+
+Onion Board comes with no sounds of its own. What you add, and where it came from, is
+up to you: only download or play things you have the right to use, and follow the
+rules of the sites you get them from and the servers you play them in. Onion Board
+isn't affiliated with or endorsed by YouTube, SoundCloud, Myinstants, Discord,
+VB-Audio or any other service it mentions.
+
 ---
 
 ## Advanced (for developers and tinkerers)
