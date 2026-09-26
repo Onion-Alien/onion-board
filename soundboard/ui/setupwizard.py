@@ -284,6 +284,9 @@ class SetupWizard(QDialog):
 
     def done(self, r):
         self.timer.stop()
+        if r != QDialog.Accepted:
+            self.win.cfg.save()
+            self.win._init_devices()
         super().done(r)
 
     # ------------------------------------------------------------------ actions

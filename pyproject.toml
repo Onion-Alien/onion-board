@@ -6,9 +6,21 @@ build-backend = "setuptools.build_meta"
 name = "soundboard"
 dynamic = ["version"]
 description = "Gaming soundboard: mic + sounds + a browser tab, mixed into a virtual mic"
-requires-python = ">=3.11"
+readme = "README.md"
+requires-python = ">=3.12"
 license = "MIT"
 license-files = ["LICENSE"]
+keywords = ["soundboard", "discord", "virtual microphone", "voice changer", "gaming"]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Environment :: Win32 (MS Windows)",
+    "Environment :: X11 Applications :: Qt",
+    "Intended Audience :: End Users/Desktop",
+    "Operating System :: Microsoft :: Windows",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Multimedia :: Sound/Audio",
+]
 dependencies = [
     "PySide6==6.11.2",
     "numpy==2.5.3",
@@ -20,13 +32,18 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-dev = ["pytest>=8", "ruff>=0.6", "pyinstaller>=6.10"]
+dev = ["pytest==9.1.1", "ruff==0.16.9", "pyinstaller==6.22.3"]
+
+[project.urls]
+Homepage = "https://github.com/Onion-Alien/soundboard"
+Issues = "https://github.com/Onion-Alien/soundboard/issues"
+Changelog = "https://github.com/Onion-Alien/soundboard/blob/main/CHANGELOG.md"
 
 [project.gui-scripts]
 soundboard = "soundboard.app:main"
 
-[tool.setuptools]
-packages = ["soundboard", "soundboard.ui"]
+[tool.setuptools.packages.find]
+include = ["soundboard*"]
 
 [tool.setuptools.dynamic]
 version = { attr = "soundboard.__version__" }
@@ -34,7 +51,7 @@ version = { attr = "soundboard.__version__" }
 # ---------------------------------------------------------------- ruff
 [tool.ruff]
 line-length = 100
-target-version = "py311"
+target-version = "py312"
 extend-exclude = [".venv", "build", "dist"]
 
 [tool.ruff.lint]

@@ -15,6 +15,7 @@ from PySide6.QtWidgets import (QApplication, QCheckBox, QComboBox, QFileDialog, 
                                QMainWindow, QMenu, QMessageBox, QPushButton, QScrollArea, QSlider,
                                QTabWidget, QVBoxLayout, QWidget)
 
+from soundboard import __version__
 from soundboard import engine as eng
 from soundboard import theme, winkeys
 from soundboard.browser import BrowserTab
@@ -27,7 +28,7 @@ from soundboard.settings import HOTKEY_ACTIONS, HotkeyDialog, SettingsDialog, pr
 from soundboard.testcheck import analyze as analyze_output
 from soundboard.testcheck import summary_html
 from soundboard.ui.dialogs import EditDialog
-from soundboard.ui import icons
+from soundboard.ui import icons, responsive
 from soundboard.ui.panel import (EqPanel, VolumeControl, bar, card, hint_label, icon_label,
                                  vsep)
 from soundboard.ui.overlay import Overlay
@@ -47,7 +48,7 @@ class Bridge(QObject):
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("Soundboard")
+        self.setWindowTitle(f"Soundboard {__version__}")
         self.setWindowIcon(theme.app_icon())
         self.cfg = Config.load()
         app = QApplication.instance()
@@ -90,6 +91,7 @@ class MainWindow(QMainWindow):
         self._save_timer.timeout.connect(self._save_now)
 
         self.setup_state = ""
+        self._pill_short = False          # the header pill's short text (narrow window)
         self._build_ui()
         self._init_devices()
         if self.setup_state != "ok":
@@ -103,6 +105,7 @@ class MainWindow(QMainWindow):
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.tick)
         self.timer.start(33)
+        self._init_fit()
         self.resize(1180, 720)
         if self.cfg.always_on_top:
             self.setWindowFlag(Qt.WindowStaysOnTopHint, True)
@@ -126,12 +129,12 @@ class MainWindow(QMainWindow):
         head.addWidget(self.logo)
         names = QVBoxLayout()
         names.setSpacing(0)
-        wm = QLabel("SOUNDBOARD")
-        wm.setObjectName("wordmark")
-        tag = QLabel("sounds + browser + voice, straight into your mic")
-        tag.setObjectName("tagline")
-        names.addWidget(wm)
-        names.addWidget(tag)
+        self.wordmark = QLabel("SOUNDBOARD")
+        self.wordmark.setObjectName("wordmark")
+        self.tagline = QLabel("sounds + browser + voice, straight into your mic")
+        self.tagline.setObjectName("tagline")
+        names.addWidget(self.wordmark)
+        names.addWidget(self.tagline)
         head.addLayout(names)
         head.addStretch(1)
         self.pill = QPushButton()
@@ -146,12 +149,12 @@ class MainWindow(QMainWindow):
         self.stop_btn.clicked.connect(self.stop_all)
         icons.set_icon(self.stop_btn, "stop", "danger_text", size=14)
         head.addWidget(self.stop_btn)
-        gear = QPushButton("Settings")
-        gear.setObjectName("settings")
-        gear.setToolTip("Themes, hotkeys and more")
-        gear.clicked.connect(lambda: self.open_settings())
-        icons.set_icon(gear, "settings")
-        head.addWidget(gear)
+        self.gear = QPushButton("Settings")
+        self.gear.setObjectName("settings")
+        self.gear.setToolTip("Themes, hotkeys and more")
+        self.gear.clicked.connect(lambda: self.open_settings())
+        icons.set_icon(self.gear, "settings")
+        head.addWidget(self.gear)
         rv.addLayout(head)
         self._paint_logo()
 
@@ -211,6 +214,7 @@ class MainWindow(QMainWindow):
     def _build_mixer(self) -> QFrame:
         c = self.cfg
         f, h = bar()
+        self.mixer = f
         h.addWidget(icon_label("mic"))
         self.mic_lbl = QLabel("My mic")
         self.mic_lbl.setStyleSheet("font-weight:600;")
@@ -228,24 +232,31 @@ class MainWindow(QMainWindow):
         h.addWidget(self.mic_meter)
         self.vol_mic = VolumeControl(c.mic_vol, tip="How loud your voice is for them")
         h.addWidget(self.vol_mic)
-        h.addWidget(vsep())
+        sep1 = vsep()
+        h.addWidget(sep1)
 
-        h.addWidget(icon_label("headphones"))
-        hp = QLabel("My headphones")
-        hp.setStyleSheet("font-weight:600;")
-        hp.setToolTip("Only what YOU hear. Doesn't change anything for them.")
-        h.addWidget(hp)
+        hp_icon = icon_label("headphones", "My headphones: only what YOU hear")
+        h.addWidget(hp_icon)
+        self.hp_lbl = QLabel("My headphones")
+        self.hp_lbl.setStyleSheet("font-weight:600;")
+        self.hp_lbl.setToolTip("Only what YOU hear. Doesn't change anything for them.")
+        h.addWidget(self.hp_lbl)
         self.vol_mon = VolumeControl(c.mon_vol, tip="Only what YOU hear — doesn't change "
                                                     "anything for them")
         h.addWidget(self.vol_mon)
-        h.addWidget(vsep())
+        sep2 = vsep()
+        h.addWidget(sep2)
+        self._mixer_hp = (sep1, hp_icon, self.vol_mon)
 
-        h.addWidget(icon_label("live", "What Discord / the game receives"))
-        h.addWidget(QLabel("Sending"))
+        send_icon = icon_label("live", "What Discord / the game receives")
+        h.addWidget(send_icon)
+        send_lbl = QLabel("Sending")
+        h.addWidget(send_lbl)
         self.out_meter = Meter()
         self.out_meter.setMinimumWidth(60)
         self.out_meter.setToolTip("Level of what Discord / the game receives")
         h.addWidget(self.out_meter, 1)
+        self._mixer_send = (send_icon, send_lbl, self.out_meter, sep2)
         self.btn_check = QPushButton("Hear what they hear")
         self.btn_check.setObjectName("miccheck")
         self.btn_check.setCheckable(True)
@@ -267,8 +278,9 @@ class MainWindow(QMainWindow):
         left.setSpacing(8)
         tb = QHBoxLayout()
         tb.setSpacing(8)
-        add = QPushButton("Add sounds")
+        add = self.btn_add = QPushButton("Add sounds")
         add.setObjectName("primary")
+        add.setToolTip("Add sound files (or drag them onto the window)")
         add.clicked.connect(self.add_dialog)
         icons.set_icon(add, "plus", "on_accent")
         self.search = QLineEdit()
@@ -288,6 +300,7 @@ class MainWindow(QMainWindow):
         size_lbl.setObjectName("muted")
         tb.addWidget(size_lbl)
         tb.addWidget(size)
+        self._pad_size = (size_lbl, size)
         left.addLayout(tb)
 
         self.grid = PadGrid()
@@ -343,8 +356,10 @@ class MainWindow(QMainWindow):
         th.addWidget(self.np_name)
         th.addWidget(self.seek, 1)
         th.addWidget(self.np_time)
-        th.addWidget(vsep())
-        th.addWidget(icon_label("volume", "Volume of all your sounds"))
+        sep = vsep()
+        th.addWidget(sep)
+        vol_icon = icon_label("volume", "Volume of all your sounds")
+        th.addWidget(vol_icon)
         self.vol_sound = VolumeControl(c.sound_vol, tip="How loud your sounds are — type up "
                                                         "to 1000% in the box")
         self.vol_sound.changed.connect(lambda v: self.set_option("sound_vol", v))
@@ -354,6 +369,7 @@ class MainWindow(QMainWindow):
         self.chk_monitor.setChecked(c.monitor_sounds)
         self.chk_monitor.toggled.connect(lambda b: self.set_option("monitor_sounds", b))
         th.addWidget(self.chk_monitor)
+        self._transport_vol = (sep, vol_icon, self.vol_sound)
         left.addWidget(f)
         self._set_pp_icon("play")
         return page
@@ -416,9 +432,8 @@ class MainWindow(QMainWindow):
         page = QScrollArea()
         page.setWidgetResizable(True)
         page.setFrameShape(QFrame.NoFrame)
-        page.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         inner = QWidget()
-        cols = QHBoxLayout(inner)
+        cols = self._setup_cols = QHBoxLayout(inner)
         cols.setContentsMargins(0, 10, 4, 10)
         cols.setSpacing(12)
         lcol, rcol = QVBoxLayout(), QVBoxLayout()
@@ -529,7 +544,7 @@ class MainWindow(QMainWindow):
         self.chk_level.setChecked(c.level_volumes)
         self.chk_level.toggled.connect(self.on_level_toggle)
         ev.addWidget(self.chk_level)
-        hk = QPushButton("Hotkeys & auto push-to-talk…")
+        hk = QPushButton("Hotkeys && auto push-to-talk…")
         hk.setToolTip("Opens Settings → Hotkeys")
         hk.clicked.connect(lambda: self.open_settings("hotkeys"))
         ev.addWidget(hk, 0, Qt.AlignLeft)
@@ -702,12 +717,15 @@ class MainWindow(QMainWindow):
         self.btn_rescan.setVisible(state == "missing")
         self.btn_nomic.setVisible(state == "ok")
         self.setup_state = state
+        short = self._pill_short
         if state == "ok":
-            pill = f"Your mic in Discord / games:  {vm}"
+            pill = "Connected" if short else f"Your mic in Discord / games:  {vm}"
         elif state == "missing":
-            pill = "One-time setup needed — others can't hear you yet"
+            pill = ("Setup needed" if short
+                    else "One-time setup needed — others can't hear you yet")
         else:
-            pill = "Not connected to the virtual cable — click to fix"
+            pill = ("Not connected" if short
+                    else "Not connected to the virtual cable — click to fix")
         if self.pill.text() != pill:
             self.pill.setText(pill)
             self.pill.setIcon(icons.icon("check", "#13ce66") if state == "ok" else
@@ -832,6 +850,8 @@ class MainWindow(QMainWindow):
     def apply_theme(self, name: str):
         self.cfg.theme = theme.apply(QApplication.instance(), name)
         icons.retheme()
+        pp, self._pp_icon = self._pp_icon, None
+        self._set_pp_icon(pp or "play")
         self.pill.setText("")   # forces _update_flow to repaint its icon
         self._update_flow()
         self._paint_logo()
@@ -993,7 +1013,6 @@ class MainWindow(QMainWindow):
 
     def _load_all(self):
         todo = [m for m in self.cfg.sounds if m.id not in self.audio]
-        keep = {m.id for m in self.cfg.sounds}
 
         def run():
             t0 = time.monotonic()
@@ -1005,7 +1024,7 @@ class MainWindow(QMainWindow):
                 except Exception as e:  # noqa: BLE001
                     log.warning("can't load %s: %s", m.file, e)
                     self.bridge.loaded.emit(m.id, None, str(e))
-            prune_cache(keep)
+            prune_cache({m.id for m in list(self.cfg.sounds)})   # as of now, not of the start
             log.info("loaded %d sounds in %.1fs", len(todo), time.monotonic() - t0)
         self._load_thread = threading.Thread(target=run, daemon=True, name="load")
         self._load_thread.start()
@@ -1136,6 +1155,7 @@ class MainWindow(QMainWindow):
         if not m:
             return
         self.engine.stop(sid)
+        self.engine.stop(f"{sid}:preview")
         self.cfg.sounds.remove(m)
         self.audio.pop(sid, None)
         self.engine.forget(sid)
@@ -1192,7 +1212,8 @@ class MainWindow(QMainWindow):
     def start_test(self):
         if self.engine.main_stream is None:
             QMessageBox.information(self, "Test",
-                                    "Set up the virtual cable first (see How it works).")
+                                    "Set up the virtual cable first (Setup tab → "
+                                    "Step-by-step guide).")
             return
         # Capture the far end of the virtual cable too, so the test hears exactly
         # what Discord / the game hears (not just our internal mix).
@@ -1284,6 +1305,15 @@ class MainWindow(QMainWindow):
         if e.recording:
             left = 6.0 - (time.monotonic() - self._rec_started)
             self.btn_rec.setText(f"Recording… talk / play sounds  ({max(left, 0):.0f}s)")
+            if left < -4:   # the output stopped (device unplugged): give up
+                e.cancel_test_record()
+                self._stop_capture()
+                self.btn_rec.setEnabled(True)
+                self.btn_rec.setText("Record 6s → play back")
+                self.test_result.setText("<span style='color:#ff4d4f'>The test stopped: the "
+                                         "virtual cable's output went away. Check Devices "
+                                         "and try again.</span>")
+                self.test_result.show()
         elif e.rec_done is not None:
             data, rate = e.rec_done
             e.rec_done = None
@@ -1328,6 +1358,63 @@ class MainWindow(QMainWindow):
         if self._ptt_held:
             winkeys.release(self._ptt_held)
             self._ptt_held = None
+
+    # ------------------------------------------------------------------ small windows
+    def _init_fit(self):
+        """What gives way when the window gets small (see ui/responsive.py). Lower
+        numbers go first; width and height are handled separately."""
+        r = responsive
+        f = self._fit = r.Fitter(self.centralWidget())
+        f.add(10, "w", r.hide(self.tagline))
+        f.add(10, "w", r.hide(*self._pad_size))
+        f.add(12, "w", r.hide(*self._mixer_send))
+        f.add(14, "w", r.hide(self.np_time))
+        f.add(20, "w", self._shorten_pill)
+        f.add(22, "w", r.icon_only(self.stop_btn))
+        f.add(22, "w", r.icon_only(self.gear))
+        f.add(30, "w", r.hide(self.chk_monitor))
+        f.add(30, "w", r.hide(self.hp_lbl, self.mic_lbl))
+        f.add(34, "w", r.icon_only(self.btn_check))
+        f.add(40, "w", r.hide(*self._mixer_hp))
+        f.add(40, "w", r.hide(*self._transport_vol))
+        f.add(50, "w", r.hide(self.np_name))
+        f.add(50, "w", r.hide(self.mic_meter))
+        f.add(60, "w", r.hide(self.wordmark))
+        f.add(60, "w", r.icon_only(self.btn_add))
+        f.add(60, "w", self._tab_icons_only)
+        f.add(70, "w", r.hide(self.btn_check))
+        f.add(80, "w", r.hide(self.pill))
+        f.extend(self.browser.fit_steps())
+        f.extend(self.voice.fit_steps())
+        # height: the status line, then the whole mixer strip
+        f.add(10, "h", r.hide(self.status))
+        f.add(40, "h", r.hide(self.mixer))
+        self._stack_cols = (r.stack(self._setup_cols), *self.voice.stack_steps())
+        self._fit_timer = QTimer(self)
+        self._fit_timer.setSingleShot(True)
+        self._fit_timer.timeout.connect(self._refit)
+        self.setMinimumSize(responsive.MIN_SIZE)
+
+    def _shorten_pill(self, short: bool):
+        if short != self._pill_short:
+            self._pill_short = short
+            self._update_flow()
+
+    def _tab_icons_only(self, compact: bool):
+        for i, name in enumerate(("Sounds", "Browser", "Voice", "Setup")):
+            self.tabs.setTabText(i, "" if compact else name)
+            self.tabs.setTabToolTip(i, name if compact else "")
+
+    def _refit(self):
+        narrow = self.width() < 860   # two cards side by side get cramped below this
+        for apply in self._stack_cols:
+            apply(narrow)
+        self._fit.fit(self.centralWidget().size())
+
+    def resizeEvent(self, ev):
+        super().resizeEvent(ev)
+        if hasattr(self, "_fit_timer"):
+            self._fit_timer.start(0)   # one refit per burst of resize events
 
     def closeEvent(self, ev):
         self.timer.stop()

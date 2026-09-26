@@ -28,6 +28,14 @@ if (-not (Test-Path $py)) { throw "No .venv - run install.bat first." }
     main.py
 if ($LASTEXITCODE -ne 0) { throw "PyInstaller failed" }
 
+# Add-ons ship with the app (source only; a module's own .venv is made on the user's PC
+# by its Install button). modules.py looks for them in the folder next to the exe.
+foreach ($m in Get-ChildItem modules -Directory) {
+    robocopy $m.FullName "dist\Soundboard\modules\$($m.Name)" /E /XD .venv __pycache__ /XF *.pyc /NFL /NDL /NJH /NJS /NP | Out-Null
+    if ($LASTEXITCODE -ge 8) { throw "copying module $($m.Name) failed" }
+}
+$global:LASTEXITCODE = 0
+
 # Licences travel with the binaries (Qt is LGPL; see scripts\make_notices.py)
 Copy-Item LICENSE "dist\Soundboard\LICENSE.txt"
 & $py scripts\make_notices.py "dist\Soundboard\THIRD-PARTY-NOTICES.txt"
@@ -35,7 +43,8 @@ if ($LASTEXITCODE -ne 0) { throw "make_notices.py failed" }
 
 function Publish-Build {
     if ($AppDir) {
-        robocopy "dist\Soundboard" $AppDir /MIR /NFL /NDL /NJH /NJS /NP | Out-Null
+        # /XD .venv: keep an add-on's environment installed from the app's Voice tab
+        robocopy "dist\Soundboard" $AppDir /MIR /XD .venv /NFL /NDL /NJH /NJS /NP | Out-Null
         if ($LASTEXITCODE -ge 8) { throw "copying the app to $AppDir failed" }
         Write-Host "Copied the app to $AppDir" -ForegroundColor Green
     }

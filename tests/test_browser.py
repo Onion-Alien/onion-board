@@ -147,6 +147,11 @@ def tone_page(folder, name="page.html", iframe_of=None):
     return p
 
 
+class FakeMeter(QWidget):
+    def set_level(self, _level):
+        pass
+
+
 @pytest.fixture
 def tab(qapp, app_dir, monkeypatch):
     monkeypatch.setattr(browser, "APP_DIR", app_dir)   # the persistent web profile
@@ -154,11 +159,14 @@ def tab(qapp, app_dir, monkeypatch):
     eng = FakeEngine()
     cfg = Config(browser_url="about:blank")
     host = QWidget()
-    t = BrowserTab(eng, cfg, lambda: None, lambda: QWidget())
+    t = BrowserTab(eng, cfg, lambda: None, FakeMeter)
     t.setParent(host)
     host.resize(800, 600)
     host.show()                                        # offscreen: creates the web view
     assert process_events(qapp, lambda: t.view is not None, 5)
+    loaded = []
+    t.view.page().loadFinished.connect(loaded.append)
+    assert process_events(qapp, lambda: loaded, 10)     # the first about:blank is done
     yield t, eng
     t.shutdown()
     host.close()
@@ -208,6 +216,7 @@ def test_lite_watchdog_wakes_a_stalled_player(qapp, tab, monkeypatch):
     monkeypatch.setattr(browser.time, "monotonic", lambda: now[0])
     kicks = []
     monkeypatch.setattr(t, "_mini_js", kicks.append)
+    t._status = (1, 0)                       # a player is tapped
     t._set_collapsed(True)
     assert not t.view.isVisible()
     for _ in range(5):                       # playing normally: the position moves
@@ -227,6 +236,30 @@ def test_lite_watchdog_wakes_a_stalled_player(qapp, tab, monkeypatch):
     t._end_unstick()
     assert not t.view.isVisible() and t.view.maximumHeight() > 1000
     t._set_collapsed(False)
+    assert t.view.isVisible()
+
+    t._set_collapsed(True)                   # a player that hasn't loaded (no duration)
+    now[0] += 1                              # is never "stalled"
+    t._watch_stall(0.0, True)
+    now[0] += 30
+    t._watch_stall(0.0, True)
+    assert not t._unsticking
+
+
+def test_navigating_away_in_lite_shows_the_new_page(qapp, tab, app_dir):
+    """Lite hid the page while something played; clicking another site (a quick link)
+    must bring the page back instead of leaving an unresponsive, blank tab."""
+    t, _ = tab
+    t.cfg.browser_lite = True
+    t.load(QUrl.fromLocalFile(str(tone_page(app_dir))).toString())
+    assert process_events(qapp, lambda: t._collapsed, 15), "Lite didn't collapse"
+    assert not t.view.isVisible()
+    t._unsticking = True                     # even mid-wake-up
+    t.load(QUrl.fromLocalFile(str(tone_page(app_dir, "other.html"))).toString())
+    assert process_events(qapp, lambda: not t._collapsed, 5)
+    assert t.view.isVisible() and t.view.maximumHeight() > 1000
+    assert not t._unsticking
+    t._end_unstick()                         # a wake-up that was pending doesn't re-hide it
     assert t.view.isVisible()
 
 

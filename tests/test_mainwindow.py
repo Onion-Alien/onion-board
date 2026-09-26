@@ -149,3 +149,23 @@ def test_sounds_only_toggle_leaves_the_mic_open(window, monkeypatch):
     assert "sounds only" in window.flow_mic.text()
     window.chk_mic.setChecked(True)
     assert window.engine.mic_enabled is True
+
+
+@pytest.mark.parametrize("size", [(300, 300), (480, 420), (800, 600)])
+def test_window_shrinks_and_still_fits(window, size, qapp):
+    """Down to 300 x 300 the less important controls give way and what's left fits
+    (every tab counts: the tab widget's minimum is the largest page's)."""
+    assert window.minimumSize().width() <= 300 and window.minimumSize().height() <= 300
+    window.show()                            # offscreen: nothing appears
+    window.tabs.setCurrentWidget(window.sounds_page)
+    window.resize(*size)
+    window._refit()
+    need = window.centralWidget().minimumSizeHint()
+    assert need.width() <= size[0] and need.height() <= size[1]
+    assert window.grid.isVisibleTo(window) and window.btn_pp.isVisibleTo(window)
+    small = window._fit.compact_count()
+    assert small > 0
+    window.resize(1800, 1000)                # and it comes back (tests have no real
+    window._refit()                          # fonts, so text is wider than in the app)
+    assert window._fit.compact_count() < small
+    assert window.mixer.isVisibleTo(window) and window.np_name.isVisibleTo(window)

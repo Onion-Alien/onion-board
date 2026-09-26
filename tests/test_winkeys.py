@@ -88,3 +88,12 @@ def test_register_reports_combos_another_thread_owns(qapp):
         process_events(qapp, lambda: False, 0.2)
         a.stop()
         b.stop()
+
+
+def test_numpad_plus_round_trips():
+    """Its old name "num +" contained the separator, so it could never be registered."""
+    vk = wk.VK["num +"]
+    name = wk.combo_name(wk.MOD_CONTROL, vk)
+    assert "+" not in name.split("+", 1)[1]
+    assert wk.parse(name) == (wk.MOD_CONTROL, vk)
+    assert wk.parse("ctrl+num +") == (wk.MOD_CONTROL, vk)   # saved by 0.x

@@ -686,6 +686,13 @@ class Engine:
         self._mic_rec = [] if self.mic_stream is not None else None
         self._rec_buf = []
 
+    def cancel_test_record(self):
+        """Give up on a test recording (its output device stopped mid-way)."""
+        self._rec_frames_left = 0
+        self._rec_buf = []
+        self._mic_rec = None
+        self.rec_done = None
+
     def take_mic_recording(self) -> tuple[np.ndarray, int] | None:
         """Raw mic captured during the last test (mono, at the mic's rate)."""
         rec, self._mic_rec = self._mic_rec, None

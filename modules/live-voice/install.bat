@@ -1,6 +1,6 @@
 @echo off
 rem Fallback installer: Soundboard's Voice tab has an Install button that does the same.
-rem Needs Python 3.10+ (python.org). About 300 MB with the speech model.
+rem Needs Python 3.12+ (python.org). About 300 MB with the speech model.
 rem   install.bat --quiet   no "press a key" at the end (SoundboardSetup.exe uses this)
 cd /d "%~dp0"
 set "PY=python"

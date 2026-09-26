@@ -126,3 +126,21 @@ def test_corrupt_config_without_backups_gives_defaults_and_is_logged(app_dir, ca
     assert c == Config()
     assert "unreadable" in caplog.text
     assert not library.CONFIG_PATH.exists()               # set aside, not overwritten
+
+
+def test_valid_json_but_bad_config_falls_back_to_backup(app_dir):
+    good = Config(sounds=[SoundMeta(id="a", name="A", file=str(app_dir / "a.wav"))])
+    good.save()
+    good.theme = "Ocean"
+    good.save()                                   # a change: leaves config.json.1
+    library.CONFIG_PATH.write_text('{"version": "two", "sounds": [{"name": 1}]}',
+                                   encoding="utf-8")
+    cfg = Config.load()                           # must not raise
+    assert [s.id for s in cfg.sounds] == ["a"]
+
+
+def test_damaged_sound_entries_are_skipped(app_dir):
+    library.CONFIG_PATH.write_text(
+        '{"version": 2, "sounds": [{"id": "a", "name": "A", "file": "a.wav"}, {"id": "b"}, 7]}',
+        encoding="utf-8")
+    assert [s.id for s in Config.load().sounds] == ["a"]

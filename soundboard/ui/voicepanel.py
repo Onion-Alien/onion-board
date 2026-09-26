@@ -340,11 +340,15 @@ class SpeechPanel(QWidget):
         b_stop.clicked.connect(controller.stop_speaking)
         row.addWidget(b_say)
         row.addWidget(b_stop)
-        row.addWidget(vsep())
-        row.addWidget(icon_label("volume", "How loud the spoken voice is"))
+        sep = vsep()
+        row.addWidget(sep)
+        vol_icon = icon_label("volume", "How loud the spoken voice is")
+        row.addWidget(vol_icon)
         self.sl_gain = VolumeControl(self.s["gain"], slider_max=200, typed_max=400,
                                      tip="How loud the spoken voice is")
         row.addWidget(self.sl_gain)
+        self.say_vol_group = (sep, vol_icon, self.sl_gain)
+        self.say_stop = b_stop
 
         for sig in (self.cb_voice.currentIndexChanged, self.sl_rate.valueChanged,
                     self.sl_gain.changed, self.cb_model.currentIndexChanged,
@@ -405,11 +409,12 @@ class SpeechPanel(QWidget):
         self.b_install.setVisible(m is not None and not ok)
         if m is None:
             self.lbl_missing.setText(
-                "The live-voice add-on isn't here yet. Put its folder in the add-ons folder "
-                "and press Refresh below.")
+                "The live-voice add-on is missing from this copy of Soundboard. Run the "
+                "installer again (it comes with every install), then press Refresh below.")
         elif not ok:
             self.lbl_missing.setText("Live voice needs its speech recognition installed first "
-                                     "(runs on this PC, nothing is sent online).")
+                                     "(runs on this PC; what you say never leaves it). "
+                                     "Needs Python 3.12+ from python.org.")
             self.lbl_missing.setToolTip(str(m.path))
 
     def _install(self):
@@ -552,9 +557,8 @@ class VoicePanel(QWidget):
         scroll = QScrollArea()
         scroll.setWidgetResizable(True)
         scroll.setFrameShape(QFrame.NoFrame)
-        scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         page = QWidget()
-        cols = QHBoxLayout(page)
+        cols = self._cols = QHBoxLayout(page)
         cols.setContentsMargins(0, 2, 4, 2)
         cols.setSpacing(12)
         lcol, rcol = QVBoxLayout(), QVBoxLayout()
@@ -589,6 +593,16 @@ class VoicePanel(QWidget):
 
         outer.addWidget(self.speech.say_bar)
         self.chain.configure(self.fx.spec())
+
+    def fit_steps(self):
+        """What the main window may hide here when it gets small (ui/responsive.py)."""
+        from soundboard.ui import responsive as r
+        return [(40, "w", r.hide(*self.speech.say_vol_group)),
+                (50, "w", r.hide(self.speech.say_stop))]
+
+    def stack_steps(self):
+        from soundboard.ui import responsive as r
+        return [r.stack(self._cols)]
 
     def _fx_changed(self, spec: dict):
         self.chain.clear_errors()          # give a bypassed effect another go after an edit

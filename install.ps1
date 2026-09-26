@@ -1,5 +1,5 @@
 # One-shot setup for Soundboard on a fresh Windows PC:
-#   1. finds Python 3.11+ (offers to install it with winget if missing)
+#   1. finds Python 3.12+ (offers to install it with winget if missing)
 #   2. creates .venv and installs the Python packages
 #   3. adds Desktop + Start menu shortcuts
 #   4. offers to install the free virtual cable (VB-Cable)
@@ -19,11 +19,12 @@ Write-Host "=== Soundboard setup ===" -ForegroundColor Cyan
 # ---- 1. Python
 function Find-Python {
     # prefer well-supported versions; brand-new Pythons can lack package wheels
-    foreach ($cmd in @(@("py", "-3.13"), @("py", "-3.12"), @("py", "-3.11"), @("py", "-3"), @("python"))) {
+    foreach ($cmd in @(@("py", "-3.13"), @("py", "-3.12"), @("py", "-3"), @("python"))) {
         try {
-            $exe = $cmd[0]; $rest = $cmd[1..($cmd.Length - 1)]
+            # (not $cmd[1..0]: for a one-item list that counts backwards and repeats it)
+            $exe = $cmd[0]; $rest = @($cmd | Select-Object -Skip 1)
             $v = & $exe @rest -c "import sys; print('%d.%d' % sys.version_info[:2])" 2>$null
-            if ($LASTEXITCODE -eq 0 -and $v -and [version]$v -ge [version]"3.11") {
+            if ($LASTEXITCODE -eq 0 -and $v -and [version]$v -ge [version]"3.12") {
                 return @{ exe = $exe; args = $rest; version = $v }
             }
         } catch { }
@@ -33,7 +34,7 @@ function Find-Python {
 
 $py = Find-Python
 if (-not $py) {
-    Write-Host "Python 3.11 or newer is needed." -ForegroundColor Yellow
+    Write-Host "Python 3.12 or newer is needed." -ForegroundColor Yellow
     if ((Get-Command winget -ErrorAction SilentlyContinue) -and (Ask "Install Python 3.13 with winget now?")) {
         winget install -e --id Python.Python.3.13 --accept-source-agreements --accept-package-agreements
         $env:Path = [Environment]::GetEnvironmentVariable("Path", "Machine") + ";" +

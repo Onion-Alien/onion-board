@@ -50,6 +50,7 @@ log = logging.getLogger(__name__)
 CLIP_S = 15            # "clip the last N seconds" length
 SPOOL_PATH = APP_DIR / "recording.tmp.wav"
 LIVE_TEXT = {True: "LIVE — others hear it", False: "Only me — click to go live"}
+LIVE_SHORT = {True: "LIVE", False: "Only me"}   # a narrow window
 WORLD = QWebEngineScript.ApplicationWorld
 BLOCK = 1024           # frames per chunk (~21 ms): the same for worklet and fallback
 HANDOVER_S = 0.3       # a frame keeps the mic until it's been quiet this long
@@ -567,11 +568,13 @@ class BrowserTab(QWidget):
         self.url.setPlaceholderText("Search YouTube or type a web address…")
         self.url.returnPressed.connect(self._go)
         nav.addWidget(self.url, 1)
+        self._quick = []
         for label, link in QUICK_LINKS:
             b = QPushButton(label)
             b.setObjectName("small")
             b.clicked.connect(lambda _=False, u=link: self.load(u))
             nav.addWidget(b)
+            self._quick.append(b)
         v.addLayout(nav)
 
         # ---- Lite mini-player (replaces the page while something plays)
@@ -683,19 +686,16 @@ class BrowserTab(QWidget):
         self.btn_live.setObjectName("live")
         self.btn_live.setCheckable(True)
         icons.set_icon(self.btn_live, "live", checked_color="#ffffff")
-        # wide enough for both labels (bold), so the bar doesn't jump when it toggles
-        self.btn_live.ensurePolished()   # pick up the stylesheet font first
-        f = self.btn_live.font()
-        f.setBold(True)
-        fm = QFontMetrics(f)
-        self.btn_live.setMinimumWidth(max(fm.horizontalAdvance(t) for t in LIVE_TEXT.values()) + 56)
+        self._live_labels = LIVE_TEXT
+        self._size_live()
         self.btn_live.toggled.connect(self._on_live)
         bh.addWidget(self.btn_live)
         self.meter = meter_cls()
         self.meter.setMinimumWidth(50)
         self.meter.setToolTip("Browser audio level")
         bh.addWidget(self.meter, 1)
-        bh.addWidget(vsep())
+        sep1 = vsep()
+        bh.addWidget(sep1)
 
         self.btn_rec = QPushButton("Record")
         self.btn_rec.setObjectName("rec")
@@ -719,12 +719,16 @@ class BrowserTab(QWidget):
         icons.set_icon(self.btn_lite, "leaf", checked_color="#ffffff")
         self.btn_lite.toggled.connect(self._on_lite)
         bh.addWidget(self.btn_lite)
-        bh.addWidget(vsep())
+        sep2 = vsep()
+        bh.addWidget(sep2)
 
-        bh.addWidget(icon_label("volume", "Browser volume (for them and for you)"))
+        vol_icon = icon_label("volume", "Browser volume (for them and for you)")
+        bh.addWidget(vol_icon)
         self.vol = VolumeControl(cfg.browser_vol, tip="Browser volume (for them and for you)")
         self.vol.changed.connect(self._on_vol)
         bh.addWidget(self.vol)
+        self._clip_group = (self.btn_rec, self.btn_last, self.btn_lite, sep1)
+        self._vol_group = (sep2, vol_icon, self.vol)
         self.chk_hear = QCheckBox("Hear it myself")
         self.chk_hear.setToolTip("Also play the browser into your headphones")
         self.chk_hear.toggled.connect(self._on_hear)
@@ -797,6 +801,8 @@ class BrowserTab(QWidget):
         page.loadFinished.connect(lambda _ok: self._push_lite())
         page.loadFinished.connect(lambda _ok: self._hide_ads())
 
+        page.loadStarted.connect(self._on_load_started)
+
         self.view.setPage(page)
         self.btn_back.clicked.connect(self.view.back)
         self.btn_fwd.clicked.connect(self.view.forward)
@@ -833,6 +839,15 @@ class BrowserTab(QWidget):
             self.view.setUrl(self.url_for(t))
             self.view.setFocus()
 
+    def _on_load_started(self):
+        """A new document is loading (a quick link, the address bar, back / forward, a
+        link on the page). Whatever Lite was hiding is gone, so show the page again;
+        it collapses once the new page starts playing."""
+        self._unsticking = False   # a pending _end_unstick must not hide the new page
+        if self._collapsed:
+            self._set_collapsed(False)
+        self._stall = (-1.0, time.monotonic())
+
     def _on_url(self, url: QUrl):
         s = url.toString()
         self.url.setText(s)
@@ -853,6 +868,8 @@ class BrowserTab(QWidget):
 
     def shutdown(self):
         self.timer.stop()
+        if self.recorder.recording:
+            self.recorder.stop()   # closes and deletes the spool file
         if self.view is not None:
             page = self.view.page()
             self.view.setParent(None)
@@ -872,6 +889,8 @@ class BrowserTab(QWidget):
         self._refresh_info()
         if started and self.cfg.browser_lite:
             self._set_collapsed(True)   # something started playing: hide the page
+        elif on == 0 and self._collapsed and not self._unsticking:
+            self._set_collapsed(False)  # the player went away: never leave a blank tab
 
     # ------------------------------------------------------------------ lite mode
     def _on_lite(self, on: bool):
@@ -930,7 +949,7 @@ class BrowserTab(QWidget):
         # set every time (the icon is cached): a theme change re-applies the initial one
         self.mini_btns["play"].setIcon(icons.icon("play" if paused else "pause", "on_accent"))
         self._update_thumb()
-        self._watch_stall(pos, bool(paused))
+        self._watch_stall(pos, bool(paused) or not dur)
 
     # Lite watchdog. Now and then a hidden YouTube player stops fetching: it still says
     # it's playing, but the position stops moving (it used to take "Show page" and a
@@ -939,7 +958,9 @@ class BrowserTab(QWidget):
     def _watch_stall(self, pos: float, paused: bool):
         now = time.monotonic()
         last, since = self._stall
-        if paused or abs(pos - last) > 0.05 or self._unsticking:
+        # (a player with no duration yet hasn't loaded anything, so there's nothing
+        # to kick: treated like paused)
+        if paused or abs(pos - last) > 0.05 or self._unsticking or not self._status[0]:
             self._stall = (pos, now)
             return
         if now - since < STALL_S or self.view is None:
@@ -1001,11 +1022,44 @@ class BrowserTab(QWidget):
                               + ("<b style='color:#ff4d4f'>LIVE is on.</b>" if live else
                                  "LIVE is off: only you hear it."))
 
+    # ------------------------------------------------------------------ small windows
+    def _size_live(self):
+        """Wide enough for both labels (bold), so the bar doesn't jump when it toggles."""
+        self.btn_live.ensurePolished()   # pick up the stylesheet font first
+        f = self.btn_live.font()
+        f.setBold(True)
+        fm = QFontMetrics(f)
+        self.btn_live.setMinimumWidth(
+            max(fm.horizontalAdvance(t) for t in self._live_labels.values()) + 56)
+        self.btn_live.setText(self._live_labels[self.btn_live.isChecked()])
+
+    def _short_live(self, short: bool):
+        from soundboard.ui import responsive as r
+        labels = LIVE_SHORT if short else LIVE_TEXT
+        if labels is not self._live_labels:
+            self._live_labels = labels
+            self._size_live()
+            r.touch(self.btn_live)
+
+    def fit_steps(self):
+        """What the main window may hide here when it gets small (ui/responsive.py)."""
+        from soundboard.ui import responsive as r
+        return [(10, "w", r.hide(*self._quick)),
+                (14, "w", r.hide(self.mini_thumb)),
+                (30, "w", r.hide(self.chk_hear)),
+                (36, "w", r.icon_only(self.btn_rec)),
+                (36, "w", r.icon_only(self.btn_last)),
+                (36, "w", r.icon_only(self.btn_lite)),
+                (40, "w", r.hide(*self._vol_group)),
+                (44, "w", self._short_live),
+                (50, "w", r.hide(*self._clip_group)),
+                (20, "h", r.hide(self.info))]
+
     # ------------------------------------------------------------------ controls
     def _on_live(self, on: bool):
         self.cfg.browser_live = on
         self.engine.browser_live = on
-        self.btn_live.setText(LIVE_TEXT[on])
+        self.btn_live.setText(self._live_labels[on])
         self._refresh_info()
         self._save()
 

@@ -90,7 +90,6 @@ class Config:
     eq_gains: list[float] = field(default_factory=lambda: [0.0] * 7)
     ptt_key: str = ""           # key held down while sounds play (game push-to-talk)
     always_on_top: bool = False
-    show_advanced: bool = False
     pad_width: int = 150
     tab: int = 0                      # 0 = sounds, 1 = browser, 2 = voice
     browser_url: str = "https://www.youtube.com/"
@@ -119,7 +118,15 @@ class Config:
             raw = cls._recover()
             if raw is None:
                 return cls()
-        return cls.from_raw(raw)
+        try:
+            return cls.from_raw(raw)
+        except (TypeError, ValueError, KeyError, AttributeError):
+            log.exception("config %s has bad contents", CONFIG_PATH)
+            raw = cls._recover()
+            try:
+                return cls.from_raw(raw) if raw is not None else cls()
+            except (TypeError, ValueError, KeyError, AttributeError):
+                return cls()
 
     @classmethod
     def _recover(cls) -> dict | None:
@@ -147,8 +154,11 @@ class Config:
             raw = MIGRATIONS[v](raw)
         sounds = []
         for s in raw.pop("sounds", []):
+            if not isinstance(s, dict) or not all(s.get(k) for k in ("id", "name", "file")):
+                log.warning("skipped a damaged sound entry in the config: %r", s)
+                continue
             s = {k: v for k, v in s.items() if k in SoundMeta.__dataclass_fields__}
-            if s.get("file") and not Path(s["file"]).is_absolute():
+            if not Path(s["file"]).is_absolute():
                 s["file"] = str(SOUNDS_DIR / s["file"])   # stored relative to the library
             sounds.append(SoundMeta(**s))
         # configs from before the setup guide existed: whoever already picked an output

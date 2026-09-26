@@ -54,13 +54,15 @@ ALIASES = {"escape": "esc", "return": "enter", "spacebar": "space", "del": "dele
            "decimal": "num .", "multiply": "num *", "add": "num +", "subtract": "num -",
            "divide": "num /", "plus": "=", "+": "=", "minus": "-"}
 NAME = {v: k for k, v in reversed(list(VK.items()))}
+NAME[0x6B] = "add"   # "num +" would clash with the "+" between keys in a combo
 MODIFIER_VKS = {0x10, 0x11, 0x12, 0x5B, 0x5C, 0xA0, 0xA1, 0xA2, 0xA3, 0xA4, 0xA5}
 
 
 def parse(combo: str) -> tuple[int, int] | None:
     """'ctrl+alt+s' -> (modifier flags, vk). None if it can't be parsed."""
     mods, vk = 0, None
-    parts = combo.lower().split("+")
+    combo = combo.lower().replace("num +", "add")   # saved by older versions
+    parts = combo.split("+")
     if len(parts) >= 2 and parts[-1] == "" and parts[-2] == "":
         parts = parts[:-2] + ["+"]   # "ctrl++" = ctrl and the + key
     for raw in parts:
@@ -154,8 +156,11 @@ class Hotkeys(QObject):
                 actions.clear()
                 failed = []
                 for i, (combo, act) in enumerate(mapping.items(), start=1):
-                    parsed = parse(combo) if combo else None
+                    if not combo:
+                        continue
+                    parsed = parse(combo)
                     if not parsed:
+                        failed.append(combo)   # shown as not working, not silently dropped
                         continue
                     mods, vk = parsed
                     if user32.RegisterHotKey(None, i, mods | MOD_NOREPEAT, vk):
