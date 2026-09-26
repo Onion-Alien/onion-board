@@ -6,6 +6,8 @@ the hand-painted widgets (pads, meters, EQ curve, logo) read the same tokens thr
 """
 from __future__ import annotations
 
+import tempfile
+from pathlib import Path
 from string import Template
 
 from PySide6.QtCore import QPointF, QRectF, Qt
@@ -133,6 +135,10 @@ QSlider::handle:horizontal { background:white; border:1px solid $border; width:1
 QCheckBox::indicator, QRadioButton::indicator { width:16px; height:16px; border-radius:4px; border:1px solid $off; background:$card; }
 QRadioButton::indicator { border-radius:8px; }
 QCheckBox::indicator:checked, QRadioButton::indicator:checked { background:$accent; border-color:$accent; }
+QCheckBox::indicator:checked { image:url("$check"); }
+QCheckBox::indicator:hover, QRadioButton::indicator:hover { border-color:$border_hi; }
+QCheckBox::indicator:checked:hover, QRadioButton::indicator:checked:hover { background:$accent_hi; border-color:$accent_hi; }
+QCheckBox::indicator:disabled, QRadioButton::indicator:disabled { background:$inset; border-color:$border; }
 QScrollArea, QScrollArea > QWidget > QWidget { background:transparent; }
 QScrollBar:vertical { background:transparent; width:10px; }
 QScrollBar::handle:vertical { background:$groove; border-radius:5px; min-height:30px; }
@@ -164,8 +170,43 @@ QPushButton#themecard:checked { background:$panel; border:2px solid $accent; }
 """)
 
 
+def _check_image(colour: str, size: int) -> QImage:
+    """A rounded tick, drawn in code so it follows the theme's on-accent colour."""
+    img = QImage(size, size, QImage.Format_ARGB32)
+    img.fill(Qt.transparent)
+    p = QPainter(img)
+    p.setRenderHint(QPainter.Antialiasing)
+    pen = QPen(QColor(colour), size * 0.16)
+    pen.setCapStyle(Qt.RoundCap)
+    pen.setJoinStyle(Qt.RoundJoin)
+    p.setPen(pen)
+    path = QPainterPath(QPointF(size * 0.22, size * 0.52))
+    path.lineTo(QPointF(size * 0.42, size * 0.72))
+    path.lineTo(QPointF(size * 0.78, size * 0.30))
+    p.drawPath(path)
+    p.end()
+    return img
+
+
+def _check_url(colour: str) -> str:
+    """Stylesheets need a file for `image:`, so write the tick (plus an @2x copy Qt picks
+    on high-DPI screens) to the temp folder once per colour."""
+    folder = Path(tempfile.gettempdir()) / "soundboard-ui"
+    base = folder / f"check-{colour.lstrip('#')}.png"
+    try:
+        folder.mkdir(exist_ok=True)
+        for path, size in ((base, 14), (base.with_name(base.stem + "@2x.png"), 28)):
+            if not path.exists():
+                _check_image(colour, size).save(str(path))
+    except OSError:
+        return ""
+    return base.as_posix()
+
+
 def stylesheet(name: str | None = None) -> str:
-    return STYLE.substitute(THEMES.get(name or current_name, THEMES[DEFAULT]))
+    tokens = dict(THEMES.get(name or current_name, THEMES[DEFAULT]))
+    tokens["check"] = _check_url(tokens["on_accent"])
+    return STYLE.substitute(tokens)
 
 
 def apply(app, name: str) -> str:
