@@ -17,7 +17,7 @@ from soundboard import __version__
 
 log = logging.getLogger(__name__)
 
-REPO = "Onion-Alien/onion-board"
+REPO = "Onion-Alien/onionboard"
 API = f"https://api.github.com/repos/{REPO}/releases/latest"
 RELEASES = f"https://github.com/{REPO}/releases/latest"
 EVERY_S = 24 * 3600
