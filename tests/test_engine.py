@@ -243,3 +243,26 @@ def test_sounds_only_keeps_the_mic_out_of_the_cable():
     e._mic(np.full((480, 1), 0.5, np.float32))
     e._main(out, 480)
     assert out.any()
+
+
+def test_computer_voice_mode_keeps_the_real_voice_out_of_the_cable():
+    """Talking as the computer voice: your real voice is heard by the speech
+    recognizer (the tap) but none of it reaches the cable, only the spoken lines."""
+    from soundboard.voicefx import VoiceChain
+    e = Engine()
+    e.main_stream = object()             # stands in for an open cable output
+    e.ring_main.prefill = 0
+    e.voice_chain = chain = VoiceChain()
+    heard = []
+    chain.tap = lambda m, rate: heard.append(m.copy())
+    chain.replace = True                 # what SpeechController.start_live sets
+    out = np.zeros((480, 2), np.float32)
+    for _ in range(5):
+        e._mic(np.full((480, 1), 0.5, np.float32))
+        e._main(out, 480)
+        assert not out.any()             # the cable gets silence while you talk
+    assert heard and heard[0].max() == 0.5   # but the recognizer hears you
+    e.play("tts", tone(), 1.0, mode="overlap")
+    e._mic(np.full((480, 1), 0.5, np.float32))
+    e._main(out, 480)
+    assert out.any()                     # the robot voice does go out
