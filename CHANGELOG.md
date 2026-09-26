@@ -2,9 +2,7 @@
 
 ## Unreleased
 
-## 1.0.0 — 2026-09-26
-
-First public release.
+## 0.2.0 — 2026-09-26
 
 ### Added
 - **Any window size.** The window shrinks down to 300 × 300 and stays usable:
@@ -48,8 +46,6 @@ First public release.
   instead of the "&".
 - `pip install .` included only part of the package; `install.ps1` couldn't use a
   plain `python` when the `py` launcher was missing.
-
-## 0.2.0 — 2026-09-26
 
 - **Restart only when the cable needs it.** After installing VB-Cable, Soundboard
   checks whether Windows has brought the CABLE devices up. Usually it has and you
