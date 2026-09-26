@@ -4,6 +4,13 @@
 
 - Simple main panel; devices, sound options, EQ and hotkeys moved under a
   collapsible ⚙ Advanced section (remembers if you left it open).
+- Works on any setup: virtual cables (VB-Cable, A/B, Voicemeeter) are detected
+  and paired automatically, and the card shows the real device names.
+- If there's no virtual cable, the app shows a one-time setup step with an
+  Install button.
+- `install.bat` / `install.ps1`: one-click setup (Python, packages, shortcuts,
+  virtual cable). `install-vbcable.ps1` downloads VB-Cable from the official site
+  and checks its signature before running it.
 - The mouse wheel no longer changes dropdowns, sliders or number boxes. It
   scrolls the panel; values change only by clicking or dragging.
 

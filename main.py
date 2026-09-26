@@ -81,8 +81,7 @@ class Hotkeys(QObject):
 
 
 def is_virtual_cable(name: str) -> bool:
-    n = name.lower()
-    return any(k in n for k in ("cable", "vb-audio", "voicemeeter", "virtual"))
+    return eng.is_virtual(name)
 
 
 def pretty_key(combo: str) -> str:
@@ -702,15 +701,24 @@ class MainWindow(QMainWindow):
             w.setTextFormat(Qt.RichText)
             w.setWordWrap(True)
             cv.addWidget(w)
-        step = QLabel("<b>The only thing you set:</b> in Discord or your game, pick "
-                      "<b style='color:#13ce66'>CABLE Output</b> as your <b>microphone</b>.")
-        step.setWordWrap(True)
-        step.setStyleSheet("background:#15171f; border-radius:8px; padding:8px; margin-top:6px;")
-        cv.addWidget(step)
-        nomic = QPushButton("Game has no microphone setting? Click here")
-        nomic.setObjectName("small")
-        nomic.clicked.connect(self.open_windows_mic)
-        cv.addWidget(nomic)
+        self.step_lbl = QLabel()
+        self.step_lbl.setWordWrap(True)
+        self.step_lbl.setTextFormat(Qt.RichText)
+        self.step_lbl.setStyleSheet("background:#15171f; border-radius:8px; padding:8px; "
+                                    "margin-top:6px;")
+        cv.addWidget(self.step_lbl)
+        self.btn_install = QPushButton("⬇  Install the free virtual cable")
+        self.btn_install.setObjectName("primary")
+        self.btn_install.clicked.connect(self.install_cable)
+        cv.addWidget(self.btn_install)
+        self.btn_rescan = QPushButton("⟳  I've installed it — check again")
+        self.btn_rescan.setObjectName("small")
+        self.btn_rescan.clicked.connect(self.refresh_devices)
+        cv.addWidget(self.btn_rescan)
+        self.btn_nomic = QPushButton("Game has no microphone setting? Click here")
+        self.btn_nomic.setObjectName("small")
+        self.btn_nomic.clicked.connect(self.open_windows_mic)
+        cv.addWidget(self.btn_nomic)
         pv.addWidget(card)
 
         section("YOUR MIC")
@@ -1044,12 +1052,12 @@ class MainWindow(QMainWindow):
         c = self.cfg
         if c.mic_device and is_virtual_cable(c.mic_device):
             c.mic_device = None   # was set to the cable: fall back to the real mic
-        if not c.main_device:
-            c.main_device = next((n for n in outs if "CABLE Input" in n), None)
+        if not c.main_device or eng.find_device("output", c.main_device) is None:
+            c.main_device = next(iter(eng.virtual_outputs()), None) or c.main_device
         if not c.mon_device:
             dflt = eng.default_device_name("output")
-            c.mon_device = dflt if dflt and "CABLE" not in dflt else \
-                next((n for n in outs if "CABLE" not in n), None)
+            c.mon_device = dflt if dflt and not is_virtual_cable(dflt) else \
+                next((n for n in outs if not is_virtual_cable(n)), None)
         if not c.mic_device:
             dflt = eng.default_device_name("input")
             c.mic_device = dflt if dflt and not is_virtual_cable(dflt) else \
@@ -1102,12 +1110,15 @@ class MainWindow(QMainWindow):
     def _update_status(self):
         e = self.engine
         main = self.cfg.main_device or ""
-        if "CABLE Input" in main:
-            self.setup_hint.setText("The cable is a pipe: audio goes in at <b>CABLE Input</b> and "
-                                    "comes out at <b>CABLE Output</b>, which Discord / the game "
-                                    "uses as your mic.")
+        self.virtual_mic = eng.virtual_mic_for(main)
+        if self.virtual_mic:
+            self.setup_hint.setText(f"A virtual cable is a pipe: audio goes in at <b>{main}</b> "
+                                    f"and comes out at <b>{self.virtual_mic}</b>, which Discord "
+                                    "/ the game uses as your mic.")
         elif main:
-            self.setup_hint.setText("Pick CABLE Input here so Discord / games can hear the sounds.")
+            self.setup_hint.setText("<span style='color:#ffb020'>That's a normal speaker/headphone "
+                                    "device, so only you will hear the sounds. Pick a virtual "
+                                    "cable here.</span>")
         else:
             self.setup_hint.setText("<span style='color:#ffb020'>Nothing picked — only you "
                                     "will hear sounds.</span>")
@@ -1125,28 +1136,62 @@ class MainWindow(QMainWindow):
         e = self.engine
         ok, bad = "#13ce66", "#ff4d4f"
         if e.mic_stream is None or not self.cfg.mic_enabled:
-            mic = f"🎤  Your headset mic  <b style='color:{bad}'>✗ off</b>"
+            mic = f"🎤  Your mic  <b style='color:{bad}'>✗ off</b>"
         elif talking:
-            mic = f"🎤  Your headset mic  <b style='color:{ok}'>✓ hearing you</b>"
+            mic = f"🎤  Your mic  <b style='color:{ok}'>✓ hearing you</b>"
         else:
-            mic = f"🎤  Your headset mic  <b style='color:{ok}'>✓</b>"
-        if e.main_stream is not None and "CABLE" in (self.cfg.main_device or ""):
-            out = (f"🎙  <b style='color:{ok}'>CABLE Output</b> — your new mic "
+            mic = f"🎤  Your mic  <b style='color:{ok}'>✓</b>"
+        vm = getattr(self, "virtual_mic", None)
+        any_cable = bool(eng.virtual_outputs())
+        if not any_cable:
+            state = "missing"
+            out = f"🎙  Virtual mic  <b style='color:{bad}'>✗ not installed yet</b>"
+            step = ("<b style='color:#ffb020'>One-time setup:</b> install the free virtual "
+                    "cable. It's what lets Discord and games hear your sounds — without it, "
+                    "only you can hear them.")
+        elif vm and e.main_stream is not None:
+            state = "ok"
+            out = (f"🎙  <b style='color:{ok}'>{vm}</b> — your new mic "
                    f"<b style='color:{ok}'>✓ working</b>")
+            step = (f"<b>The only thing you set:</b> in Discord or your game, pick "
+                    f"<b style='color:{ok}'>{vm}</b> as your <b>microphone</b>.")
         else:
-            out = f"🎙  CABLE Output  <b style='color:{bad}'>✗ not connected</b> (open ⚙ below)"
+            state = "unrouted"
+            out = f"🎙  Virtual mic  <b style='color:{bad}'>✗ not connected</b>"
+            step = ("<b style='color:#ffb020'>Almost:</b> open <b>⚙ Advanced → Devices</b> and "
+                    "set “Sounds + my voice get sent into” to your virtual cable.")
         self.flow_mic.setText(mic)
         self.flow_out.setText(out)
+        self.step_lbl.setText(step)
+        self.btn_install.setVisible(state == "missing")
+        self.btn_rescan.setVisible(state == "missing")
+        self.btn_nomic.setVisible(state == "ok")
+
+    def install_cable(self):
+        script = Path(__file__).resolve().parent / "install-vbcable.ps1"
+        if not script.exists():
+            QMessageBox.warning(self, "Installer missing", f"Can't find {script.name}.")
+            return
+        subprocess.Popen(["powershell", "-NoProfile", "-ExecutionPolicy", "Bypass",
+                          "-File", str(script)],
+                         creationflags=subprocess.CREATE_NEW_CONSOLE)
+        QMessageBox.information(
+            self, "Installing the virtual cable",
+            "A window opened that downloads VB-Cable (free) from the official VB-Audio site.\n\n"
+            "Windows will ask for permission — click Yes, then click “Install Driver”.\n\n"
+            "When it's done, click “I've installed it — check again”. If it doesn't show up, "
+            "restart your PC.")
 
     def open_windows_mic(self):
+        vm = getattr(self, "virtual_mic", None) or "your virtual cable"
         subprocess.Popen(["control", "mmsys.cpl,,1"], creationflags=0x08000000)
         QMessageBox.information(
             self, "Game with no mic setting",
             "Some games just use Windows' main mic. A sound window just opened:\n\n"
-            "1.  Right-click  CABLE Output  →  Set as Default Device\n"
+            f"1.  Right-click  {vm}  →  Set as Default Device\n"
             "2.  Restart the game.\n\n"
             "Heads-up: voice typing will then also hear your sounds.\n"
-            "To undo, do the same on your headset mic.")
+            "To undo, do the same on your normal mic.")
 
     # ------------------------------------------------------------------ settings
     def _set(self, attr, v):
@@ -1485,14 +1530,15 @@ class MainWindow(QMainWindow):
 
     def start_test(self):
         if self.engine.main_stream is None:
-            QMessageBox.information(self, "Test", "Pick a “Send to” device first.")
+            QMessageBox.information(self, "Test", "Set up the virtual cable first (see How it works).")
             return
         # Capture the far end of the virtual cable too, so the test hears exactly
         # what Discord / the game hears (not just our internal mix).
         self._cap, self._cap_stream, self._cap_rate = [], None, None
-        main = self.cfg.main_device or ""
-        if "Input" in main:
-            idx = eng.find_device("input", main.replace("Input", "Output", 1))
+        vm = eng.virtual_mic_for(self.cfg.main_device)
+        self._cap_name = vm
+        if vm:
+            idx = eng.find_device("input", vm)
             if idx is not None:
                 try:
                     self._cap_rate = int(sd.query_devices(idx)["default_samplerate"])
@@ -1527,7 +1573,7 @@ class MainWindow(QMainWindow):
         try:
             r = analyze_output(data, rate, mic[0] if mic else None, mic[1] if mic else SR,
                                self.cfg.sound_vol)
-            self.test_result.setText(summary_html(r, cable))
+            self.test_result.setText(summary_html(r, self._cap_name if cable else None))
         except Exception as ex:  # noqa: BLE001
             self.test_result.setText(f"<span style='color:#ff4d4f'>Test analysis failed: {ex}</span>")
         self.test_result.show()
@@ -1641,6 +1687,8 @@ QFrame#transport { background:#1c1f2a; border-radius:12px; }
 QFrame#panel QPushButton#advtoggle { background:#2a2e3d; padding:10px; font-weight:600;
     text-align:left; margin-top:8px; }
 QFrame#panel QPushButton#advtoggle:checked { background:#2a2e3d; color:#e6e8f0; }
+QFrame#panel QPushButton#primary { background:#7c5cff; color:white; border:none; padding:9px; }
+QFrame#panel QPushButton#primary:hover { background:#8d71ff; }
 QFrame#panel QFrame#howcard { background:#232633; border-radius:10px; }
 QFrame#panel QFrame#volbox { background:#232633; border-radius:10px; }
 QSpinBox { background:#15171f; border:1px solid #363b4e; border-radius:6px; padding:3px 4px; }

@@ -79,6 +79,39 @@ def find_device(kind: str, name: str | None) -> int | None:
     return None
 
 
+# Virtual audio cables (VB-Cable, VB-Cable A/B, Hi-Fi Cable, Voicemeeter, …) show up
+# as a playback device ("... Input") paired with a recording device ("... Output").
+# Audio played into the first comes out of the second, which apps use as a mic.
+VIRTUAL_HINTS = ("cable", "vb-audio", "voicemeeter", "virtual")
+
+
+def is_virtual(name: str | None) -> bool:
+    n = (name or "").lower()
+    return any(k in n for k in VIRTUAL_HINTS)
+
+
+def virtual_mic_for(render_name: str | None) -> str | None:
+    """The recording device that carries what's played into `render_name`."""
+    if not render_name or not is_virtual(render_name):
+        return None
+    ins = [d["name"] for d in list_devices("input")]
+    for a, b in (("Input", "Output"), ("In ", "Out "), ("Input", "Out")):
+        cand = render_name.replace(a, b, 1)
+        if cand != render_name and cand in ins:
+            return cand
+    head = render_name.split("(")[0].replace("Input", "Output").strip().lower()
+    for n in ins:
+        if is_virtual(n) and n.lower().startswith(head):
+            return n
+    return None
+
+
+def virtual_outputs() -> list[str]:
+    """Playback devices that are virtual cables, best (has a mic side) first."""
+    outs = [d["name"] for d in list_devices("output") if is_virtual(d["name"])]
+    return sorted(outs, key=lambda n: virtual_mic_for(n) is None)
+
+
 def resample(data: np.ndarray, src: int, dst: int) -> np.ndarray:
     if src == dst or not len(data):
         return data

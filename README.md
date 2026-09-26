@@ -9,13 +9,13 @@ Version: **0.1.0** — see [CHANGELOG.md](CHANGELOG.md).
 ## How it works
 
 ```
-🎤 your headset mic ─┐
+🎤 your mic ────────┐
                      ├─►  Soundboard mixes them  ─►  CABLE Input ═══ pipe ═══► CABLE Output
 🔊 your sounds ──────┘                                                          (Discord / game mic)
 ```
 
-The only setting you change outside the app: in **Discord / your game, pick
-`CABLE Output (VB-Audio Virtual Cable)` as your microphone.** If a game has no
+The only setting you change outside the app: in **Discord / your game, pick the
+virtual cable's output (for VB-Cable that's `CABLE Output`) as your microphone.** If a game has no
 mic setting, the app's *"Game has no microphone setting?"* button walks you
 through making the cable Windows' default mic.
 
@@ -36,27 +36,33 @@ through making the cable Windows' default mic.
 - Test mode:
   - **Listen to my mic output**: hear your mic plus the sounds exactly as others do
     (a red banner shows while it's on).
-  - **Record 6s → play back**: records the real `CABLE Output`, plays it back,
+  - **Record 6s → play back**: records the virtual cable's output (what others get), plays it back,
     and reports whether your voice and sounds are in it and whether the balance is off.
 
-## Requirements
+## Install (any Windows PC)
 
-- Windows 10/11
-- [VB-Audio Virtual Cable](https://vb-audio.com/Cable/) (free)
-- Python 3.11+ (built with 3.13)
-- Optional: ffmpeg on PATH, for m4a/aac/video files
+1. Download or clone this folder.
+2. Double-click **`install.bat`**. It:
+   - finds Python 3.11+ (offers to install 3.13 with winget if you have none)
+   - installs the Python packages into `.venv`
+   - adds **Soundboard** shortcuts to the Desktop and Start menu
+   - offers to install the free **virtual cable** (VB-Cable)
+3. Open Soundboard. The *How it works* box tells you the one setting to change in
+   Discord or your game.
 
-## Install & run
+### The virtual cable
 
-```bat
-python -m venv .venv
-.venv\Scripts\pip install -r requirements.txt
-run.bat
-```
+It's a free audio driver (VB-Audio Virtual Cable) that acts like a pipe: the app
+plays into one end and Discord or the game uses the other end as a microphone.
+It isn't included in this repo because VB-Audio's licence doesn't allow
+redistributing it. `install-vbcable.ps1` downloads the current pack from
+[vb-audio.com](https://vb-audio.com/Cable/), checks the installer is signed by
+VB-Audio, and runs it. Windows asks for admin permission. The app's *Install the
+free virtual cable* button runs the same script. Other virtual cables
+(VB-Cable A/B, Voicemeeter) are detected too.
 
-`run.bat` starts it without a console window. Settings and imported sounds are
-stored in `%APPDATA%\Soundboard\` (`config.json` plus a `sounds\` folder), so they
-survive updates.
+Optional: `winget install Gyan.FFmpeg.Essentials` adds m4a/aac/video support.
+Settings and imported sounds live in `%APPDATA%\Soundboard\`.
 
 ## Code layout
 

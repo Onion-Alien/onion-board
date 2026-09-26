@@ -76,7 +76,7 @@ def analyze(out: np.ndarray, out_rate: int, mic: np.ndarray | None, mic_rate: in
     return res
 
 
-def summary_html(r: dict, cable: bool) -> str:
+def summary_html(r: dict, cable: str | None) -> str:
     ok, bad, warn = "#13ce66", "#ff4d4f", "#ffb020"
     lines = []
     if not r["talked"]:
@@ -91,7 +91,7 @@ def summary_html(r: dict, cable: bool) -> str:
         lines.append((warn, "— No soundboard sound was playing during the test"))
     if r["advice"]:
         lines.append((warn, "⚠ " + r["advice"]))
-    src = ("Checked the real CABLE Output — exactly what Discord / the game receives."
+    src = (f"Checked the real {cable} — exactly what Discord / the game receives."
            if cable else "Checked the app's output mix.")
     body = "<br>".join(f"<span style='color:{c}'>{t}</span>" for c, t in lines)
     return f"{body}<br><span style='color:#8a90a6'>{src}</span>"
