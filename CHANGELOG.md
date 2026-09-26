@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Opening the Browser tab no longer makes the window vanish and reappear. The window
+  is now GPU-rendered from the start (`QT_WIDGETS_RHI`), so Qt doesn't have to
+  rebuild it when the browser first appears.
+- The "Only me — click to go live" button label is no longer cut off.
+
 - Only one Soundboard can run. Opening it again brings the existing window to the
   front instead of starting another copy (repeated launches had piled up dozens of
   `pythonw.exe` processes). The lock is a named mutex, which Windows frees if the app crashes.

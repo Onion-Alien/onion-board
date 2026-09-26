@@ -19,6 +19,7 @@ import time
 
 import numpy as np
 from PySide6.QtCore import QFile, QIODevice, QObject, Qt, QTimer, QUrl, Signal, Slot
+from PySide6.QtGui import QFontMetrics
 from PySide6.QtWebChannel import QWebChannel
 from PySide6.QtWebEngineCore import (QWebEnginePage, QWebEngineProfile, QWebEngineScript,
                                      QWebEngineSettings)
@@ -31,6 +32,7 @@ from engine import SR
 from library import APP_DIR, MAX_SECONDS, trim_silence
 
 CLIP_S = 15            # "clip the last N seconds" length
+LIVE_TEXT = {True: "🔴  LIVE — others hear it", False: "🎧  Only me — click to go live"}
 WORLD = QWebEngineScript.ApplicationWorld
 
 QUICK_LINKS = (("YouTube", "https://www.youtube.com/"),
@@ -257,7 +259,12 @@ class BrowserTab(QWidget):
         self.btn_live = QPushButton()
         self.btn_live.setObjectName("live")
         self.btn_live.setCheckable(True)
-        self.btn_live.setMinimumWidth(190)
+        # wide enough for both labels (bold), so the bar doesn't jump when it toggles
+        self.btn_live.ensurePolished()   # pick up the stylesheet font first
+        f = self.btn_live.font()
+        f.setBold(True)
+        fm = QFontMetrics(f)
+        self.btn_live.setMinimumWidth(max(fm.horizontalAdvance(t) for t in LIVE_TEXT.values()) + 40)
         self.btn_live.toggled.connect(self._on_live)
         bh.addWidget(self.btn_live)
 
@@ -316,9 +323,12 @@ class BrowserTab(QWidget):
 
     # ------------------------------------------------------------------ web view
     def showEvent(self, e):
+        # created on first open, so the browser costs nothing until it's used
+        # (main.py sets QT_WIDGETS_RHI so this doesn't rebuild the main window)
         super().showEvent(e)
         if self.view is None:
             self._make_view()
+            self.load(self.cfg.browser_url or QUICK_LINKS[0][1])
 
     def _make_view(self):
         store = APP_DIR / "browser"
@@ -355,7 +365,6 @@ class BrowserTab(QWidget):
         self.btn_reload.clicked.connect(self.view.reload)
         self.view.urlChanged.connect(self._on_url)
         self.holder.addWidget(self.view)
-        self.load(self.cfg.browser_url or QUICK_LINKS[0][1])
 
     def load(self, url: str):
         if self.view is not None:
@@ -432,7 +441,7 @@ class BrowserTab(QWidget):
     def _on_live(self, on: bool):
         self.cfg.browser_live = on
         self.engine.browser_live = on
-        self.btn_live.setText("🔴  LIVE — others hear it" if on else "🎧  Only me — click to go live")
+        self.btn_live.setText(LIVE_TEXT[on])
         self._refresh_info()
         self._save()
 

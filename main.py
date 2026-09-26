@@ -11,6 +11,12 @@ import subprocess
 import time
 from pathlib import Path
 
+# Render the window through the GPU from the start. The browser tab needs a GPU
+# surface; without this, opening it the first time makes Qt destroy and rebuild the
+# whole native window, which looks like the app closing and reopening.
+# (Must be set before the QApplication exists.)
+os.environ.setdefault("QT_WIDGETS_RHI", "1")
+
 import numpy as np
 import sounddevice as sd
 from PySide6.QtCore import QEvent, QMimeData, QObject, QPoint, QRectF, Qt, QTimer, Signal
