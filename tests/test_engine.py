@@ -410,6 +410,37 @@ def test_opening_one_output_leaves_the_other_playing(monkeypatch):
     assert ring.count == 4800                    # the other output is still untouched
 
 
+def test_reopened_output_resumes_sounds_still_playing_on_the_other(monkeypatch):
+    e = engine_with("main", "mon")
+    v = e.play("a", tone(1.0), 1.0, loop=True)
+    for _ in range(10):
+        e._render("main", 480)
+        e._render("mon", 480)
+    e._close("mon_stream")                       # the watchdog found it stalled...
+    for _ in range(20):
+        e._render("main", 480)
+    fake_devices(monkeypatch, rate=SR)
+    e.set_mon_device("headphones")               # ...and reopened it
+    assert "mon" not in v.done and v.gate["mon"] == 0.0
+    assert v.pos["mon"] == v.pos["main"]         # picks up where the other output is
+    first = e._render("mon", 480)
+    assert np.abs(first[:48]).max() < 0.1        # fades in, no click
+    assert np.abs(e._render("mon", 480)).max() > 0.4
+
+
+def test_reopened_output_at_another_rate_leaves_sounds_done(monkeypatch):
+    e = engine_with("main", "mon")
+    v = e.play("a", tone(1.0), 1.0, loop=True)
+    e._render("main", 480)
+    e._close("mon_stream")
+    fake_devices(monkeypatch, rate=44100)
+    e.set_mon_device("headphones")
+    assert "mon" in v.done                       # its data is for the old rate
+    assert not e._render("mon", 480).any()
+    e.set_mon_device("headphones")               # reopened again at the same new rate:
+    assert "mon" in v.done                       # the data is still for the old one
+
+
 def test_seek_survives_a_render_in_flight():
     e = engine_with("main")
     v = e.play("a", tone(1.0), 1.0)

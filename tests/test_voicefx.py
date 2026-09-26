@@ -63,6 +63,21 @@ def test_pitch_latency_is_a_few_blocks_and_stays_put():
     assert len(e.inb) < RATE * 0.06           # ~ SEQ + SEEK + a block of backlog
 
 
+def test_live_pitch_switching_on_and_off_has_no_gap_or_click():
+    """It used to start from silence for its latency (~40 ms) when switched on,
+    and jump when switched off."""
+    from soundboard.engine import LivePitch
+    x = np.repeat(sine(440, 1.0, amp=0.5)[:, None], 2, 1)
+    lp = LivePitch(RATE)
+    sts = [0.0] * 10 + [3.0] * 30 + [0.0] * 20
+    y = np.concatenate([lp.process(x[i * 480:(i + 1) * 480], st) for i, st in enumerate(sts)])
+    peaks = np.abs(y).reshape(-1, 480, 2).max(axis=(1, 2))
+    assert peaks.min() > 0.3, peaks.round(2)
+    assert np.abs(np.diff(y, axis=0)).max() < 0.1
+    assert not any(e.running for e in lp._ch)        # faded back to the dry signal
+    assert np.array_equal(y[-480:], x[len(sts) * 480 - 480:len(sts) * 480])
+
+
 def test_echo_repeats_at_the_delay_and_decays():
     e = REGISTRY["echo"](RATE, {"delay": 100, "feedback": 0.5, "mix": 1.0, "tone": 12000})
     x = np.zeros(RATE // 2, np.float32)

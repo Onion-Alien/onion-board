@@ -18,7 +18,7 @@
 #define AppName "Onion Board"
 #define AppExeName "OnionBoard"
 #ifndef AppVersion
-  #define AppVersion "0.2.0"
+  #define AppVersion "1.0.0"
 #endif
 
 [Setup]
@@ -50,7 +50,7 @@ CloseApplications=yes
 
 [Messages]
 WelcomeLabel1=Let's set up Onion Board
-WelcomeLabel2=This puts Onion Board on your PC and adds the free "virtual cable" it needs, so Discord and your games can hear your sounds.%n%nOn the next page you can tick any extras you want. When Windows asks for permission, click Yes.%n%nClick Next to start.
+WelcomeLabel2=This puts Onion Board on your PC and adds the free "virtual cable" it needs, so Discord and your games can hear your sounds.%n%nOn the next page you can tick any extras you want. When Windows asks for permission, click Yes.%n%nDid Windows or your browser warn you before this opened ("Windows protected your PC", "not commonly downloaded")? That's normal for a free app that isn't code-signed, and you got past it fine. Next time: More info, then Run anyway.%n%nClick Next to start.
 WizardSelectTasks=Pick what you want
 SelectTasksDesc=Tick the things you'd like. If you're not sure, leave them as they are.
 SelectTasksLabel2=The ticked boxes are what most people want. Click Install when you're ready.

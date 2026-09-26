@@ -273,6 +273,7 @@ class AppsTab(QWidget):
     def showEvent(self, ev):
         super().showEvent(ev)
         self.start()
+        self.meter_timer.start(METER_MS)
 
     def start(self):
         """Begin watching for programs (also called before the tab is first shown,
@@ -280,8 +281,7 @@ class AppsTab(QWidget):
         if self._started:
             return
         self._started = True
-        self.timer.start(REFRESH_MS)
-        self.meter_timer.start(METER_MS)
+        self.timer.start(REFRESH_MS)   # the meters run while shown / recording
         self.lister.refresh()
 
     def shutdown(self):
@@ -371,6 +371,9 @@ class AppsTab(QWidget):
         self.empty.setVisible(not self.rows)
 
     def _meters(self):
+        if not self.isVisible() and not any(r.rec for r in self.rows.values()):
+            self.meter_timer.stop()   # hidden, nothing to cap: showEvent restarts it
+            return
         for row in list(self.rows.values()):
             rec = row.rec
             if rec is not None:
@@ -469,6 +472,7 @@ class AppsTab(QWidget):
             row.set_recording(False)
             return
         row.btn_rec.setText("Waiting for sound…")
+        self.meter_timer.start(METER_MS)   # also enforces the length cap while hidden
 
     def _finish_rec(self, row: AppRow, save: bool = True):
         rec, row.rec = row.rec, None

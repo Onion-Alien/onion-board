@@ -316,16 +316,13 @@ def is_xrun(status) -> bool:
 
 
 class LivePitch:
-    """Stereo real-time pitch shifter (one voicefx PitchShift per channel, with a
-    longer window than the voice changer's: smoother on music). Keeps its history
-    while bypassed, so switching it on doesn't click."""
-
-    class _Shift(PitchShift):
-        WINDOW_S = 0.07
+    """Stereo real-time pitch shifter (one voicefx PitchShift per channel). Keeps
+    its recent input while bypassed, so switching it on or off crossfades
+    instead of dropping out for its latency."""
 
     def __init__(self, rate: int):
         self.rate = rate
-        self._ch = (self._Shift(rate), self._Shift(rate))
+        self._ch = (PitchShift(rate), PitchShift(rate))
         self._st = 0.0
 
     def process(self, x: np.ndarray, semitones: float) -> np.ndarray:
@@ -405,6 +402,7 @@ class Voice:
     # applies it at the start of its next block, since it writes `pos` and `gate`
     # back at the end of every block and would otherwise undo a seek made meanwhile
     seek_to: dict = field(default_factory=dict)
+    rates: dict = field(default_factory=dict)   # out -> the rate its data was made at
 
     def __post_init__(self):
         self.pos = {o: 0 for o in self.data}
@@ -549,8 +547,32 @@ class Engine:
             self._reconfigure_out(key)
         else:   # same rate: only drop what was queued for the old stream
             self._clear_out(key)
+        self._resume_voices(key, rate)
         log.info("opened %s output: %s @ %d Hz (latency %s)", key, name, rate, self.latency)
         return s
+
+    def _resume_voices(self, key: str, rate: int):
+        """Output `key` was reopened: sounds still playing on the other output pick
+        up here again, at the same spot (with a short fade in). Data made for
+        another rate is useless, so those stay done."""
+        with self.lock:
+            for v in self.voices:
+                if (key not in v.done or v.stopping or not len(v.data.get(key, ()))
+                        or v.rates.get(key) != rate):
+                    continue
+                other = next((o for o in v.data if o != key and o not in v.done
+                              and len(v.data[o])), None)
+                if other is None:
+                    continue
+                d = v.data[other]
+                frac = v.seek_to.get(other)
+                if frac is None:
+                    frac = (v.pos[other] % len(d)) / len(d)
+                v.seek_to.pop(key, None)
+                v.pos[key] = int(frac * len(v.data[key]))
+                v.gate[key] = 0.0
+                v.fading.discard(key)
+                v.done.discard(key)   # last: the callback may render it from here on
 
     @staticmethod
     def _close_quietly(s, what):
@@ -838,7 +860,7 @@ class Engine:
                     return None
         rates_used = {o: self.rates[o] for o in outs}
         per_out = {o: self.data_for(sid, data, rates_used[o], src_rate) for o in outs}
-        v = Voice(sid, per_out, gain, loop, preview=preview,
+        v = Voice(sid, per_out, gain, loop, preview=preview, rates=rates_used,
                   fade_in=max(0.0, float(fade_in)), fade_out=max(0.0, float(fade_out)))
         if start > 0:
             v.seek(start)
@@ -1066,9 +1088,7 @@ class Engine:
         if self.sound_keep_pitch and abs(self.sound_speed - 1.0) >= 1e-4:
             st -= 12.0 * float(np.log2(max(self.sound_speed, 1e-3)))
         f = self._spitch.get(out)
-        if f is None or f.rate != self.rates[out]:
-            if abs(st) < 1e-3:
-                return x
+        if f is None or f.rate != self.rates[out]:   # made at 0 st too: it needs the history
             f = self._spitch[out] = LivePitch(self.rates[out])
         return f.process(x, st)   # at 0 st it only keeps its history fresh
 

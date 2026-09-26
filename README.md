@@ -9,11 +9,20 @@ voice goes along with it, or switch that off and send **only the sounds**.
 One file, `OnionBoardSetup.exe`. Download it, double-click it, done.
 Windows 10 or 11.
 
+> **Windows or your browser may warn you. That's normal for a free app that isn't
+> from a big company** (the installer isn't "code-signed", which costs hundreds a
+> year). It's safe to carry on:
+> - **Edge / Chrome** says it's *"not commonly downloaded"*: click the **⋯** next
+>   to the download → **Keep** (Edge: then **Show more → Keep anyway**).
+> - **Blue "Windows protected your PC" box**: click **More info → Run anyway**.
+>
+> The source code is all here if you'd rather check it or build it yourself.
+
 <sub>Other downloads: [all versions](../../releases) ·
 [source code (zip)](../../archive/refs/heads/main.zip), only if you want to build
 it yourself.</sub>
 
-Version: **0.2.0**. See [CHANGELOG.md](CHANGELOG.md).
+Version: **1.0.0**. See [CHANGELOG.md](CHANGELOG.md).
 
 ---
 

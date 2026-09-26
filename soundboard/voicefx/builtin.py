@@ -79,6 +79,10 @@ class PitchShift(Effect):
     the stretched audio is resampled back to the original length, which moves
     the pitch and the formants together (the chipmunk / giant sound people expect
     from a voice changer). Latency is about SEQ + SEEK + one block, ~50 ms.
+
+    While bypassed (0 st) it keeps the last HIST_S of input, and switching on
+    stretches that first, so the output doesn't go silent for the latency.
+    Switching on or off crossfades dry <-> wet over XF_MS (no click).
     """
 
     type = "pitch"
@@ -90,6 +94,8 @@ class PitchShift(Effect):
     SEQ_MS = 30.0       # one sequence of voice, copied to the output
     SEEK_MS = 10.0      # how far the splice point may move to line up
     OVL_MS = 7.0        # crossfade between one sequence and the next
+    XF_MS = 10.0        # dry <-> wet crossfade when it switches on or off
+    HIST_S = 0.35       # input kept while bypassed (enough to prime it at -24 st)
 
     def __init__(self, rate, values=None):
         super().__init__(rate, values)
@@ -100,6 +106,10 @@ class PitchShift(Effect):
         self.fade_out = F32(1) - self.fade_in
         self.aa = _Filter()
         self.running = False
+        self.hist = np.zeros(int(rate * self.HIST_S), F32)
+        self.xf = max(1, int(rate * self.XF_MS / 1000))
+        self.wet_g = 0.0        # 0 = dry, 1 = wet
+        self.ratio, self.mix = 1.0, 1.0
         self._reset(1.0)
 
     def _need(self, tempo: float) -> int:
@@ -154,26 +164,66 @@ class PitchShift(Effect):
         self.stretched, self.rs_phase = buf[cut:], nph - cut
         return y
 
+    def _add_stretched(self, chunks, ratio: float, rate: int):
+        new = np.concatenate(chunks)
+        if ratio > 1.02:                         # about to read faster: keep aliasing out
+            cut = 0.45 * rate / ratio
+            new = self.aa.run(new, round(cut), lambda: butter(
+                4, cut, btype="low", fs=rate, output="sos").astype(F32))
+        self.stretched = np.concatenate([self.stretched, new])
+
+    def _remember(self, x):
+        h, n = self.hist, len(x)
+        if n >= len(h):
+            h[:] = x[n - len(h):]
+        else:
+            h[:-n] = h[n:]
+            h[-n:] = x
+
+    def _prime(self, ratio: float, rate: int):
+        """Start at `ratio` with the recent input already stretched, so the
+        resampler's head start is real audio instead of zeros."""
+        self._reset(ratio)
+        head = len(self.stretched)
+        k = self._need(1 / ratio) + int((head + self.seq) / ratio)
+        self.inb = self.hist[len(self.hist) - min(k, len(self.hist)):].copy()
+        chunks = self._stretch(1.0 / ratio)
+        if chunks:
+            self._add_stretched(chunks, ratio, rate)
+        # keep what a fresh start holds after being fed len(inb) samples
+        keep = max(head - int(len(self.inb) * ratio), 0)
+        self.stretched = self.stretched[len(self.stretched) - keep:]
+
     def run(self, x, rate):
         st, mix = self.p["semitones"], self.p["mix"]
-        if abs(st) < 0.01 or mix <= 0:
-            self.running = False
+        on = abs(st) >= 0.01 and mix > 0
+        if not on and not self.running:
+            self._remember(x)
             return x
-        ratio = 2.0 ** (st / 12.0)
-        if not self.running:
-            self.running = True
-            self._reset(ratio)
+        if on:
+            ratio = 2.0 ** (st / 12.0)
+            if not self.running:
+                self.running = True
+                self._prime(ratio, rate)
+            self.ratio, self.mix = ratio, mix
+        ratio, mix = self.ratio, self.mix       # switching off: fade out at the old ones
+        self._remember(x)
         self.inb = np.concatenate([self.inb, x])
         chunks = self._stretch(1.0 / ratio)
         if chunks:
-            new = np.concatenate(chunks)
-            if ratio > 1.02:                     # about to read faster: keep aliasing out
-                cut = 0.45 * rate / ratio
-                new = self.aa.run(new, round(cut), lambda: butter(
-                    4, cut, btype="low", fs=rate, output="sos").astype(F32))
-            self.stretched = np.concatenate([self.stretched, new])
+            self._add_stretched(chunks, ratio, rate)
         wet = self._resample(ratio, len(x))
-        return wet if mix >= 1 else x * F32(1 - mix) + wet * F32(mix)
+        if mix < 1:
+            wet = x * F32(1 - mix) + wet * F32(mix)
+        g0, target = self.wet_g, 1.0 if on else 0.0
+        if g0 == target:
+            return wet
+        step = (1.0 / self.xf) * (1 if target > g0 else -1)
+        env = np.clip(g0 + step * np.arange(1, len(x) + 1), 0.0, 1.0).astype(F32)
+        self.wet_g = float(env[-1]) if len(x) else g0
+        if not on and self.wet_g <= 0.0:
+            self.running = False
+        return x + (wet - x) * env
 
 
 # --------------------------------------------------------------------------- robot

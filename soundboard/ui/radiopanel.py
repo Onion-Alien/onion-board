@@ -462,8 +462,7 @@ class RadioTab(QWidget):
         self._search_timer.setSingleShot(True)
         self._search_timer.timeout.connect(self._search_now)
         self.timer = QTimer(self)
-        self.timer.timeout.connect(self._tick)
-        self.timer.start(50)
+        self.timer.timeout.connect(self._tick)   # runs while shown, or while recording
         self._refresh_info()
         self._update_buttons()
 
@@ -671,7 +670,14 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
     # ------------------------------------------------------------------ first open
     def showEvent(self, e):
         super().showEvent(e)
+        self.timer.start(50)
         self.start()
+
+    def hideEvent(self, e):
+        super().hideEvent(e)
+        if not self.recorder.recording:   # a recording still needs its length cap
+            self.timer.stop()
+            self.engine.level_radio = 0.0
 
     def start(self):
         """Fetch the stations and build the globe (on first open; safe to repeat)."""
@@ -1083,7 +1089,10 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
     def _on_rec(self, on: bool):
         if on:
             self.recorder.start()
+            self.timer.start(50)   # the length cap is checked on the tick
             return
+        if not self.isVisible():
+            self.timer.stop()
         self.btn_rec.setText("Record")
         self._emit_clip(self.recorder.stop(), "Nothing was playing while you recorded.")
 

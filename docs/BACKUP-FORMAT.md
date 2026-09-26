@@ -38,7 +38,7 @@ twice adds nothing.
 {
   "format": "onionboard-board",
   "format_version": 1,
-  "app_version": "0.2.0",
+  "app_version": "1.0.0",
   "created": "2026-09-27T12:00:00Z",
   "categories": ["Memes", "Game"],
   "sounds": ["sounds/001 Air horn", "sounds/002 Bruh"],

@@ -1,6 +1,38 @@
 # Changelog
 
-## Unreleased
+## 1.0.0 — 2026-09-27
+
+The first public release, as **Onion Board** (it was called Soundboard). Your
+sounds and settings move over by themselves the first time it starts.
+
+### Security and fixes from the pre-release audit
+
+- A pasted Myinstants link could write a file outside the download folder, and
+  the clean-up afterwards could delete that folder. Link file names are now
+  sanitized, and only the app's own temp folders are ever deleted.
+- Names that come from the web (video and channel titles, radio stations, window
+  titles) and your own sound names are shown as plain text: before, text that
+  looked like HTML was drawn as HTML, which could load pictures from other PCs.
+- Upgrading from Soundboard 0.1.0 no longer loses every sound, and the data
+  folder still moves over if the installer already made the new one.
+- Importing a backup or sound pack: bad numbers are ignored, the total size and
+  your free disk space are checked first, and imported speech settings only
+  accept the app's own models.
+- If `config.json` goes missing, it's restored from its automatic backups.
+- The virtual-cable installer unpacks into a folder only admins can write to
+  and checks VB-Audio's certificate by name.
+- Radio stations that point into your own PC or home network are skipped.
+- A sound can no longer get stuck "playing" (holding push-to-talk down) when
+  an audio device drops out; after Windows restarts a stalled device, sounds
+  that were playing carry on through it instead of going silent there.
+- Turning pitch or speed on while a sound plays no longer cuts out for a moment.
+- "&" in a sound or category name no longer creates a hidden keyboard shortcut.
+- The Radio, Voice and Apps tabs stop their meters while you're on another tab,
+  so the app idles more quietly on a laptop battery.
+- Text-to-speech works on Windows set to other languages, and installing voices
+  works when your Windows user name has an apostrophe in it.
+
+### Everything else new since 0.2.0
 
 - **The Browser tab is gone; search the web from the Sounds tab instead.** Its
   audio stuttered, the page hitched when switching modes, and it cost the game

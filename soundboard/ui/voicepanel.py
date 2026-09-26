@@ -1126,7 +1126,14 @@ class VoicePanel(QWidget):
         # the voice changer's mic meter (only while the tab is showing)
         self._meter_timer = QTimer(self)
         self._meter_timer.timeout.connect(self._meter)
+
+    def showEvent(self, e):
+        super().showEvent(e)
         self._meter_timer.start(50)
+
+    def hideEvent(self, e):
+        super().hideEvent(e)
+        self._meter_timer.stop()   # no wake-ups while another tab is showing
 
     def _meter(self):
         if self.isVisible():
