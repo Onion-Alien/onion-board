@@ -1,3 +1,5 @@
 # cmd.exe mis-parses labels/goto in LF-only batch files
 *.bat text eol=crlf
 *.cmd text eol=crlf
+# git hooks are sh scripts: a CR breaks them
+.githooks/* text eol=lf

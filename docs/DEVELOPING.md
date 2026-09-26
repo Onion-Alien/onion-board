@@ -148,5 +148,5 @@ Get-Process OnionBoard -ErrorAction SilentlyContinue      # is it running?
    Keep the asset named exactly `OnionBoardSetup.exe` and don't mark the release
    as a pre-release: the README's download button links to
    `releases/latest/download/OnionBoardSetup.exe`.
-   Never commit build output. Walk through
-   [PUBLIC-RELEASE-CHECKLIST.md](PUBLIC-RELEASE-CHECKLIST.md) once more.
+   Never commit build output. Run `python scripts/check_sensitive.py --history`
+   once more before pushing the release.

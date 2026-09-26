@@ -14,7 +14,8 @@ python scripts\check_sensitive.py
 
 All four must pass. CI runs the same checks.
 
-Turn on the pre-commit hook once per clone so the secrets check runs on every commit:
+Turn on the hooks once per clone: the secrets check runs before every commit, and
+commit times are recorded in UTC:
 
 ```
 git config core.hooksPath .githooks

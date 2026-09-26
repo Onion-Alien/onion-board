@@ -12,7 +12,7 @@ installer/*.png
 .ruff_cache/
 
 # ---- never publish: secrets, personal data, local machine state
-# (see SECURITY.md and docs/PUBLIC-RELEASE-CHECKLIST.md)
+# (see SECURITY.md and CONTRIBUTING.md)
 .sensitive-patterns
 .env
 .env.*
