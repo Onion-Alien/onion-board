@@ -269,7 +269,7 @@ way for now:
 | **Ethereum** (ETH, USDC…), also on Base, Arbitrum, Polygon and Optimism | `0x11C66De40F99628aA52234Ae3aCa550Da5491A32` |
 
 Only trust the addresses on **this page** (`github.com/Onion-Alien/onion-board`):
-anyone can copy an open-source app and put their own in. Starring the repo or telling
+anyone can copy an app whose code is public and put their own in. Starring the repo or telling
 a friend helps just as much.
 
 ---
