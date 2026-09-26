@@ -250,6 +250,7 @@ the launcher the shortcuts and PyInstaller use. The app is the `soundboard` pack
 | `soundboard/ui/panel.py` | volume boxes and the equalizer panel (emit values; the window applies them) |
 | `soundboard/ui/dialogs.py` | per-sound Edit dialog: the Sound tab (name, volume, hotkey…) and the Effects tab |
 | `soundboard/ui/linkbar.py` | the Sounds tab's link bar: a link pasted into *Search sounds* is looked up with yt-dlp, then added as a sound or played once |
+| `soundboard/ui/ytsearch.py` | the Sounds tab's YouTube search: Enter in *Search sounds* lists YouTube hits (thumbnail, title, length) in place of the pads; *Play* / *Add* hand one to the link bar |
 | `soundboard/ui/speedpitch.py` | the live speed & pitch button and its popup (Sounds transport and Browser bar) |
 | `soundboard/soundfx.py` | per-sound effects: speed / pitch (phase vocoder + soxr), EQ, boost, reverse and any voice effect, rendered off the audio thread; the presets |
 | `soundboard/ui/icons.py` | the line icons, drawn in code and recoloured with the theme |

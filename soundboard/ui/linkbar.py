@@ -86,6 +86,18 @@ class LinkBar(QFrame):
         self._buttons()
         threading.Thread(target=self._probe, args=(url,), daemon=True, name="link-probe").start()
 
+    def open(self, url: str, title: str, secs: float = 0.0):
+        """A video picked from the YouTube search: already looked up, so no probe."""
+        if url != self.url:
+            self.url = url
+            self._drop_download()
+        self.title = title
+        self.show()
+        dur = f" · {fmt_time(secs)}" if secs else ""
+        self._say(f"<b>{html.escape(title)}</b>{dur} "
+                  f"<span style='color:#8a8f98'>· {html.escape(self._host())}</span>")
+        self._buttons()
+
     def _host(self) -> str:
         return self.url.split("/")[2].removeprefix("www.") if self.url else ""
 

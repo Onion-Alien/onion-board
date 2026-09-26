@@ -36,6 +36,7 @@ import time
 import urllib.request
 import zipfile
 from collections.abc import Callable
+from dataclasses import dataclass
 from pathlib import Path
 
 from soundboard import library
@@ -315,6 +316,49 @@ def probe(url: str) -> tuple[str, float]:
         except Exception as e:  # noqa: BLE001 - yt-dlp raises many kinds; show its message
             raise _readable(e) from e
     return clean_title(info.get("title") or "") or "Sound", float(info.get("duration") or 0)
+
+
+@dataclass
+class Result:
+    """One YouTube search hit (see search)."""
+    id: str
+    title: str
+    channel: str
+    seconds: float     # 0 when YouTube didn't say
+
+    @property
+    def url(self) -> str:
+        return f"https://www.youtube.com/watch?v={self.id}"
+
+    @property
+    def thumb(self) -> str:
+        return f"https://i.ytimg.com/vi/{self.id}/mqdefault.jpg"
+
+
+def search(query: str, count: int = 20) -> list[Result]:
+    """Search YouTube (yt-dlp's ytsearch: one results page, nothing downloaded).
+    Live streams and anything without a proper video id are left out.
+    Raises DownloadError like probe."""
+    query = " ".join(query.split())
+    if not query:
+        return []
+    opts = {k: v for k, v in _opts().items() if k not in ("format", "outtmpl")}
+    opts.update(extract_flat="in_playlist", noplaylist=False)
+    with _ydl() as yt_dlp:
+        try:
+            with yt_dlp.YoutubeDL(opts) as ydl:
+                info = ydl.extract_info(f"ytsearch{count}:{query}", download=False)
+        except Exception as e:  # noqa: BLE001 - yt-dlp raises many kinds; show its message
+            raise _readable(e) from e
+    out = []
+    for e in (info or {}).get("entries") or ():
+        vid = str(e.get("id") or "")
+        if not re.fullmatch(r"[\w-]{11}", vid) or e.get("live_status") == "is_live":
+            continue
+        out.append(Result(vid, str(e.get("title") or vid),
+                          str(e.get("channel") or e.get("uploader") or ""),
+                          float(e.get("duration") or 0)))
+    return out
 
 
 @contextlib.contextmanager

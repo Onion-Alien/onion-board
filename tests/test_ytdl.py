@@ -460,3 +460,49 @@ def test_link_play_once_shows_in_the_transport_bar(qapp, window, monkeypatch,  #
     window.toggle_play_pause()                               # the ⏸ button pauses it
     assert paused == [("__link__", True)]
     assert window.cfg.sounds and all(m.id != "__link__" for m in window.cfg.sounds)
+
+
+def test_search_lists_videos_and_skips_live_and_junk(monkeypatch):
+    seen = fake_yt_dlp(monkeypatch, {"_type": "playlist", "entries": [
+        {"id": "HEXWRTEbj1I", "title": "What Is Love", "channel": "Haddaway", "duration": 241},
+        {"id": "abcdefghijk", "title": "Live now", "live_status": "is_live"},
+        {"id": "not-a-video-id", "title": "A channel"},
+        {"id": "zGG4kWoN8Zc", "title": "Remix", "uploader": "Someone"},
+    ]})
+    r = ytdl.search("  what   is love ", 5)
+    assert seen["extract_flat"] == "in_playlist" and "outtmpl" not in seen
+    assert [x.id for x in r] == ["HEXWRTEbj1I", "zGG4kWoN8Zc"]
+    assert (r[0].title, r[0].channel, r[0].seconds) == ("What Is Love", "Haddaway", 241)
+    assert r[1].channel == "Someone" and r[1].seconds == 0
+    assert r[0].url == "https://www.youtube.com/watch?v=HEXWRTEbj1I"
+    assert r[0].thumb == "https://i.ytimg.com/vi/HEXWRTEbj1I/mqdefault.jpg"
+    assert ytdl.search("   ") == []
+    fake_yt_dlp(monkeypatch, {}, fail="ERROR: network down")
+    with pytest.raises(ytdl.FetchError, match="^network down"):
+        ytdl.search("x")
+
+
+def test_enter_searches_youtube_and_a_result_plays_through_the_link_bar(
+        qapp, window, monkeypatch, tmp_path):  # noqa: F811
+    calls = fake_link_download(monkeypatch, tmp_path)
+    hits = [ytdl.Result("HEXWRTEbj1I", "What Is Love", "Haddaway", 241)]
+    monkeypatch.setattr(ytdl, "search", lambda q, count=20: hits)
+    monkeypatch.setattr(window.engine, "play", lambda *a, **kw: object())
+    window.ytresults.net.get = lambda req: types.SimpleNamespace(   # no thumbnail fetch
+        finished=types.SimpleNamespace(connect=lambda f: None))
+    window.search.setText("what is love")
+    window.search.returnPressed.emit()                       # Enter: search YouTube
+    assert process_events(qapp, lambda: window.ytresults._rows, 5)
+    assert window._pads_scroll.isHidden() and not window.ytresults.isHidden()
+    window.ytresults._rows[0].btn_play.click()
+    assert process_events(qapp, lambda: window.current == "__link__", 5)
+    assert calls == ["https://www.youtube.com/watch?v=HEXWRTEbj1I"]
+    assert window.np_name.text() == "What Is Love" and len(window.cfg.sounds) == 2
+    window.search.returnPressed.emit()                       # Enter again: searches, no add
+    assert process_events(qapp, lambda: window.ytresults._rows, 5)
+    assert len(window.cfg.sounds) == 2
+    window.ytresults._rows[0].btn_add.click()                # Add: reuses the download
+    assert process_events(qapp, lambda: len(window.cfg.sounds) == 3, 5)
+    assert len(calls) == 1
+    window.ytresults.close_results()
+    assert not window._pads_scroll.isHidden() and window.ytresults.isHidden()

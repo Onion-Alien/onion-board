@@ -16,7 +16,7 @@ from PySide6.QtWidgets import (QApplication, QCheckBox, QComboBox, QFileDialog, 
                                QTabWidget, QVBoxLayout, QWidget)
 
 from soundboard import engine as eng
-from soundboard import theme, winkeys
+from soundboard import theme, winkeys, ytdl
 from soundboard.browser import BrowserTab
 from soundboard.engine import SR, Engine
 from soundboard.engine import is_virtual as is_virtual_cable
@@ -34,6 +34,7 @@ from soundboard.ui.panel import (EqPanel, VolumeControl, bar, card, hint_label, 
                                  vsep)
 from soundboard.ui.linkbar import PLAY_ID as LINK_ID
 from soundboard.ui.linkbar import LinkBar
+from soundboard.ui.ytsearch import YouTubeResults
 from soundboard.ui.overlay import Overlay
 from soundboard.ui.voicepanel import VoicePanel
 from soundboard.ui.widgets import Meter, Pad, PadGrid, SeekSlider, fmt_pos
@@ -295,14 +296,20 @@ class MainWindow(QMainWindow):
         add.clicked.connect(self.add_dialog)
         icons.set_icon(add, "plus", "on_accent")
         self.search = QLineEdit()
-        self.search.setPlaceholderText("Search sounds… or paste a link")
+        self.search.setPlaceholderText("Search sounds… Enter searches YouTube, or paste a link")
         self.search.setToolTip("Type to filter your sounds, or paste a link (YouTube, "
                                "SoundCloud, TikTok, most media sites) to add or play it")
         self.search.setClearButtonEnabled(True)
         self.search.textChanged.connect(self.apply_filter)
-        self.search.returnPressed.connect(lambda: self.linkbar.add())
+        self.search.returnPressed.connect(self.on_search_enter)
+        self.btn_yt = QPushButton("YouTube")
+        self.btn_yt.setToolTip("Search YouTube for what's typed (or press Enter) — play or "
+                               "add the audio, no video page")
+        icons.set_icon(self.btn_yt, "play", size=14)
+        self.btn_yt.clicked.connect(self.search_youtube)
         tb.addWidget(add)
         tb.addWidget(self.search, 1)
+        tb.addWidget(self.btn_yt)
         size = QSlider(Qt.Horizontal)
         size.setRange(110, 240)
         size.setValue(c.pad_width)
@@ -322,6 +329,10 @@ class MainWindow(QMainWindow):
         self.linkbar.sound_ready.connect(self.on_downloaded)
         self.linkbar.played.connect(self.on_link_played)
         left.addWidget(self.linkbar)
+        self.ytresults = YouTubeResults()
+        self.ytresults.play.connect(lambda r: self._from_youtube(r, play=True))
+        self.ytresults.add.connect(lambda r: self._from_youtube(r, play=False))
+        left.addWidget(self.ytresults, 1)
 
         self.grid = PadGrid()
         self.grid.reorder.connect(self.on_reorder)
@@ -331,6 +342,8 @@ class MainWindow(QMainWindow):
         scroll.setWidget(self.grid)
         scroll.setFrameShape(QFrame.NoFrame)
         left.addWidget(scroll, 1)
+        self.ytresults.closed.connect(scroll.show)   # the results take the pads' place
+        self._pads_scroll = scroll
 
         # ---- "now playing" chips: shown while 2+ sounds overlap, so every one of
         # them can be stopped (■) or taken into the player (name) without clicking
@@ -947,6 +960,27 @@ class MainWindow(QMainWindow):
         if self.current == LINK_ID:
             self.current = None   # a new link: refresh the name
         self.select(LINK_ID)
+
+    def search_youtube(self):
+        """Enter / the YouTube button: search YouTube for the search box's text (a
+        pasted link is the link bar's instead)."""
+        text = self.search.text()
+        if ytdl.as_link(text) or not self.ytresults.search(text):
+            return
+        self._pads_scroll.hide()
+
+    def on_search_enter(self):
+        if ytdl.as_link(self.search.text()):
+            self.linkbar.add()
+        else:
+            self.search_youtube()
+
+    def _from_youtube(self, r, play: bool):
+        self.linkbar.open(r.url, r.title, r.seconds)
+        if play:
+            self.linkbar.play_once()
+        else:
+            self.linkbar.add()
 
     def gain_for(self, m: SoundMeta, volume=None) -> float:
         v = m.volume if volume is None else volume
