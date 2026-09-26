@@ -39,9 +39,9 @@ from PySide6.QtWidgets import (QCheckBox, QFrame, QHBoxLayout, QLabel, QLineEdit
 from shiboken6 import delete as qt_delete
 from shiboken6 import isValid as qt_valid
 
-from engine import SR
-from library import APP_DIR, MAX_SECONDS, trim_silence
-from wheelguard import no_wheel
+from soundboard.engine import SR
+from soundboard.library import APP_DIR, MAX_SECONDS, trim_silence
+from soundboard.wheelguard import no_wheel
 
 log = logging.getLogger(__name__)
 

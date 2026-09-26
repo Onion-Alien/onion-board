@@ -11,11 +11,11 @@ from PySide6.QtCore import QUrl
 from PySide6.QtWebSockets import QWebSocket
 from PySide6.QtWidgets import QWidget
 
-import browser
-from browser import AudioSink, BrowserTab
+from soundboard import browser
+from soundboard.browser import AudioSink, BrowserTab
 from conftest import process_events
-from engine import SR
-from library import Config
+from soundboard.engine import SR
+from soundboard.library import Config
 
 
 # ---------------------------------------------------------------- sink

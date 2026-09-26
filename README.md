@@ -89,29 +89,49 @@ decode anything; it's safe to delete and is rebuilt as needed.
 
 ## Code layout
 
+Run from source with `run.bat` (or `python -m soundboard`); `main.py` at the root is
+the launcher the shortcuts and PyInstaller use. The app is the `soundboard` package:
+
 | file | what it does |
 |---|---|
-| `main.py` | PySide6 UI, auto push-to-talk, startup (single instance, crash hooks, runtime tuning) |
-| `applog.py` | rotating log in `%APPDATA%\Soundboard\soundboard.log`; unhandled exceptions and Qt warnings land there (plus one dialog for a UI-thread crash). `SOUNDBOARD_DEBUG=1` for more |
-| `winkeys.py` | global hotkeys (`RegisterHotKey`) and key presses (`keybd_event`), no hooks |
-| `engine.py` | real-time audio: 3 WASAPI streams (mic in, cable out, headphones out), mixing, pause/seek, limiter |
-| `eq.py` | 7-band biquad equalizer and presets |
-| `browser.py` | Browser tab: Qt WebEngine view; an isolated-world script in every frame taps page media with an AudioWorklet and streams 48 kHz int16 PCM over a loopback WebSocket (per-launch secret) into the engine; clip recorder |
-| `library.py` | decoding (bounded to 15 min), the int16 decoded-audio cache, loudness levelling, imports and clips (FLAC), config |
-| `theme.py` | colour themes (tokens → stylesheet, also read by the painted widgets) and the logo |
-| `settings.py` | Settings window, global hotkey actions, hotkey capture dialog |
-| `wheelguard.py` | mouse wheel scrolls the page instead of changing sliders / dropdowns (installed per widget) |
+| `soundboard/app.py` | entry point: log file, crash hooks, runtime tuning, single instance, the window |
+| `soundboard/singleinstance.py` | named mutex + local socket so a second launch just raises the first |
+| `soundboard/ui/mainwindow.py` | the main window: pads, transport, tabs, the audio panel, test mode, auto push-to-talk |
+| `soundboard/ui/widgets.py` | hand-painted widgets: meter, EQ curve, seek slider, pads and their grid |
+| `soundboard/ui/panel.py` | volume boxes and the equalizer panel (emit values; the window applies them) |
+| `soundboard/ui/dialogs.py` | per-sound Edit dialog |
+| `soundboard/winkeys.py` | global hotkeys (`RegisterHotKey`) and key presses (`SendInput`), no hooks |
+| `soundboard/engine.py` | real-time audio: 3 WASAPI streams (mic in, cable out, headphones out), mixing, pause/seek, limiter, watchdog |
+| `soundboard/eq.py` | 7-band biquad equalizer and presets |
+| `soundboard/browser.py` | Browser tab: Qt WebEngine view; an isolated-world script in every frame taps page media with an AudioWorklet and streams 48 kHz int16 PCM over a loopback WebSocket (per-launch secret) into the engine; clip recorder |
+| `soundboard/library.py` | decoding (bounded to 15 min), the int16 decoded-audio cache, loudness levelling, imports and clips (FLAC), versioned config with backups |
+| `soundboard/theme.py` | colour themes (tokens → stylesheet, also read by the painted widgets) and the logo |
+| `soundboard/settings.py` | Settings window, global hotkey actions, hotkey capture dialog |
+| `soundboard/wheelguard.py` | mouse wheel scrolls the page instead of changing sliders / dropdowns (installed per widget) |
+| `soundboard/applog.py` | rotating log in `%APPDATA%\Soundboard\soundboard.log`; unhandled exceptions and Qt warnings land there (plus one dialog for a UI-thread crash). `SOUNDBOARD_DEBUG=1` for more |
+| `soundboard/testcheck.py` | analysis for the Record-6s test (finds your voice in the output by cross-correlation) |
 | `make_icon.py` | regenerates `soundboard.ico` (shortcut icon) from the logo in `theme.py` |
-| `testcheck.py` | analysis for the Record-6s test (finds your voice in the output by cross-correlation) |
 | `tests/` | pytest suite: ring buffer, engine mixing/guards/watchdog, cache and imports, recorder, hotkey parsing, EQ, levelling, config, test analysis, the main window built on Qt's offscreen platform (no window, no devices, no hotkeys), and the browser tab end to end: a headless page's audio (top frame and iframe) reaching the engine through the worklet and socket |
 
 Developing:
 
 ```
 .venv\Scripts\pip install -r requirements-dev.txt
-.venv\Scripts\ruff check .
+.venv\Scriptsuff check .
 .venv\Scripts\python -m pytest
 ```
+
+`pyproject.toml` holds the package metadata (version comes from `soundboard/__init__.py`),
+the ruff and pytest settings, and a `soundboard` GUI entry point for `pip install .`.
+
+### Building an .exe
+
+`build.ps1` runs PyInstaller and produces `dist\Soundboard\Soundboard.exe` (one folder,
+QtWebEngine included). Zip that folder for a PC without Python; the virtual cable is still
+installed from inside the app. Settings live in `%APPDATA%\Soundboard\` either way.
+Every `config.json` save keeps the last three good copies next to it
+(`config.json.1` … `.3`); a damaged file is set aside as `config.json.broken-<time>` and
+the newest backup is used, so the pad list is never silently reset.
 
 ### Audio notes
 

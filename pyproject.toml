@@ -1,0 +1,55 @@
+[build-system]
+requires = ["setuptools>=69"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "soundboard"
+dynamic = ["version"]
+description = "Gaming soundboard: mic + sounds + a browser tab, mixed into a virtual mic"
+requires-python = ">=3.11"
+dependencies = [
+    "PySide6==6.11.2",
+    "numpy==2.5.3",
+    "sounddevice==0.5.6",
+    "soundfile==0.14.0",
+    "soxr==1.1.0",
+    "scipy==1.18.1",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8", "ruff>=0.6", "pyinstaller>=6.10"]
+
+[project.gui-scripts]
+soundboard = "soundboard.app:main"
+
+[tool.setuptools]
+packages = ["soundboard", "soundboard.ui"]
+
+[tool.setuptools.dynamic]
+version = { attr = "soundboard.__version__" }
+
+# ---------------------------------------------------------------- ruff
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+extend-exclude = [".venv", "build", "dist"]
+
+[tool.ruff.lint]
+# E/W: pycodestyle, F: pyflakes, B: bugbear, BLE: blind except, UP: modern syntax.
+# Import sorting (I) is left out on purpose: it would explode every multi-name import
+# into one-name-per-line blocks, which is not how this codebase is written.
+select = ["E", "W", "F", "B", "BLE", "UP"]
+ignore = [
+    "E731",   # lambda assignment: used deliberately for tiny local helpers
+    "B008",   # function call in default arg (Qt enums)
+    "B905",   # zip(strict=): the zips here are over fixed-size parallel tuples
+]
+
+[tool.ruff.lint.per-file-ignores]
+"soundboard/theme.py" = ["E501"]   # the stylesheet is one rule per line
+"tests/*" = ["BLE"]
+
+# ---------------------------------------------------------------- pytest
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"

@@ -3,8 +3,8 @@ import numpy as np
 import pytest
 import soundfile as sf
 
-import library
-from library import (SR, SoundMeta, cache_path, fingerprint, import_file, load_cached,
+from soundboard import library
+from soundboard.library import (SR, SoundMeta, cache_path, fingerprint, import_file, load_cached,
                      load_sound, prune_cache, save_clip, store_cached, to_float32, to_int16)
 
 

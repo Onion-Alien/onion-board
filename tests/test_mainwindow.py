@@ -8,12 +8,12 @@ from PySide6.QtCore import QPoint, QPointF, Qt
 from PySide6.QtGui import QWheelEvent
 from PySide6.QtWidgets import QApplication, QScrollArea, QSlider, QVBoxLayout, QWidget
 
-import engine
-import library
-import main
-import winkeys
-from library import SR, Config, SoundMeta
-from wheelguard import no_wheel
+from soundboard import engine
+from soundboard import library
+from soundboard.ui import mainwindow as main
+from soundboard import winkeys
+from soundboard.library import SR, Config, SoundMeta
+from soundboard.wheelguard import no_wheel
 
 
 @pytest.fixture

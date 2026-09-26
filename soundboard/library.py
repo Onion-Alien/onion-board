@@ -13,6 +13,8 @@ import logging
 import os
 import shutil
 import subprocess
+import sys
+import time
 import uuid
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
@@ -21,7 +23,7 @@ import numpy as np
 import soundfile as sf
 import soxr
 
-from engine import SR
+from soundboard.engine import SR
 
 log = logging.getLogger(__name__)
 
@@ -29,6 +31,11 @@ APP_DIR = Path(os.environ.get("APPDATA", Path.home())) / "Soundboard"
 SOUNDS_DIR = APP_DIR / "sounds"
 CACHE_DIR = APP_DIR / "cache"
 CONFIG_PATH = APP_DIR / "config.json"
+CONFIG_VERSION = 2
+CONFIG_BACKUPS = 3   # config.json.1 … .3, rotated on every save that changes something
+# where install-vbcable.ps1 and soundboard.ico live: the repo root, or the frozen
+# app's _internal folder when built with PyInstaller
+RESOURCE_DIR = Path(getattr(sys, "_MEIPASS", Path(__file__).resolve().parent.parent))
 
 AUDIO_EXTS = {".wav", ".mp3", ".ogg", ".flac", ".opus", ".m4a", ".aac", ".wma",
               ".aiff", ".aif", ".webm", ".mp4", ".mkv", ".mov"}
@@ -58,6 +65,7 @@ class SoundMeta:
 
 @dataclass
 class Config:
+    version: int = CONFIG_VERSION
     main_device: str | None = None
     mon_device: str | None = None
     mic_device: str | None = None
@@ -94,23 +102,104 @@ class Config:
 
     @classmethod
     def load(cls) -> Config:
+        """Read config.json. A corrupt file is set aside (config.json.broken-<time>)
+        and the newest backup that parses is used instead; only if there is none
+        do the defaults apply. The pad list is never silently thrown away."""
         try:
             raw = json.loads(CONFIG_PATH.read_text(encoding="utf-8"))
         except FileNotFoundError:
             return cls()
         except (OSError, ValueError):
-            log.exception("config %s is unreadable; starting with defaults", CONFIG_PATH)
-            return cls()
-        sounds = [SoundMeta(**{k: v for k, v in s.items() if k in SoundMeta.__dataclass_fields__})
-                  for s in raw.pop("sounds", [])]
+            log.exception("config %s is unreadable", CONFIG_PATH)
+            raw = cls._recover()
+            if raw is None:
+                return cls()
+        return cls.from_raw(raw)
+
+    @classmethod
+    def _recover(cls) -> dict | None:
+        try:
+            broken = CONFIG_PATH.with_name(f"config.json.broken-{time.strftime('%Y%m%d-%H%M%S')}")
+            CONFIG_PATH.replace(broken)
+            log.warning("set the damaged config aside as %s", broken.name)
+        except OSError:
+            log.debug("couldn't set the damaged config aside", exc_info=True)
+        for i in range(1, CONFIG_BACKUPS + 1):
+            p = CONFIG_PATH.with_name(f"config.json.{i}")
+            try:
+                raw = json.loads(p.read_text(encoding="utf-8"))
+                log.warning("recovered settings from backup %s", p.name)
+                return raw
+            except (OSError, ValueError):
+                continue
+        return None
+
+    @classmethod
+    def from_raw(cls, raw: dict) -> Config:
+        raw = dict(raw)
+        version = int(raw.get("version", 1) or 1)
+        for v in range(version, CONFIG_VERSION):
+            raw = MIGRATIONS[v](raw)
+        sounds = []
+        for s in raw.pop("sounds", []):
+            s = {k: v for k, v in s.items() if k in SoundMeta.__dataclass_fields__}
+            if s.get("file") and not Path(s["file"]).is_absolute():
+                s["file"] = str(SOUNDS_DIR / s["file"])   # stored relative to the library
+            sounds.append(SoundMeta(**s))
         known = {k: v for k, v in raw.items() if k in cls.__dataclass_fields__}
+        known["version"] = CONFIG_VERSION
         return cls(**known, sounds=sounds)
 
-    def save(self):
-        APP_DIR.mkdir(parents=True, exist_ok=True)
-        tmp = CONFIG_PATH.with_suffix(".tmp")
-        tmp.write_text(json.dumps(asdict(self), indent=2), encoding="utf-8")
-        tmp.replace(CONFIG_PATH)
+    def to_raw(self) -> dict:
+        d = asdict(self)
+        d["version"] = CONFIG_VERSION
+        for s in d["sounds"]:   # files inside the library are stored by name only, so the
+            p = Path(s["file"])  # whole %APPDATA%\Soundboard folder can move or be restored
+            if p.is_absolute() and p.parent == SOUNDS_DIR:
+                s["file"] = p.name
+        return d
+
+    def save(self) -> bool:
+        """Write atomically, keeping the last CONFIG_BACKUPS good copies. Returns
+        False (and logs) instead of raising: this runs from a timer on the UI thread."""
+        try:
+            APP_DIR.mkdir(parents=True, exist_ok=True)
+            text = json.dumps(self.to_raw(), indent=2)
+            try:
+                if CONFIG_PATH.read_text(encoding="utf-8") == text:
+                    return True   # nothing changed: don't churn the backups
+            except OSError:
+                pass
+            tmp = CONFIG_PATH.with_suffix(".tmp")
+            tmp.write_text(text, encoding="utf-8")
+            if CONFIG_PATH.exists():
+                _rotate_backups()
+            tmp.replace(CONFIG_PATH)
+            return True
+        except OSError:
+            log.exception("couldn't save settings to %s", CONFIG_PATH)
+            return False
+
+
+def _rotate_backups():
+    """config.json -> .1, .1 -> .2, … (the oldest falls off)."""
+    for i in range(CONFIG_BACKUPS, 0, -1):
+        src = CONFIG_PATH if i == 1 else CONFIG_PATH.with_name(f"config.json.{i - 1}")
+        dst = CONFIG_PATH.with_name(f"config.json.{i}")
+        if src.exists():
+            if i == 1:
+                shutil.copy2(src, dst)   # keep config.json in place for the atomic replace
+            else:
+                src.replace(dst)
+
+
+def _migrate_1_to_2(raw: dict) -> dict:
+    """v1 had no version field and absolute sound paths; absolute paths still load
+    (from_raw accepts both), and the next save writes them relative. Nothing else."""
+    return raw
+
+
+MIGRATIONS = {1: _migrate_1_to_2}
 
 
 # --------------------------------------------------------------------------- decoding

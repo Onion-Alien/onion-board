@@ -1,6 +1,6 @@
 import pytest
 
-import winkeys as wk
+from soundboard import winkeys as wk
 
 
 @pytest.mark.parametrize("combo, mods, vk", [

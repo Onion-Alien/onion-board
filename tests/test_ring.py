@@ -1,6 +1,6 @@
 import numpy as np
 
-from engine import CH, Ring
+from soundboard.engine import CH, Ring
 
 
 def frames(start, n):

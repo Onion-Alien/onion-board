@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+- **Package layout.** The code is now the `soundboard` package (`soundboard/ui/` for
+  the window, widgets, dialogs and panel pieces; `main.py` stays as the launcher), with
+  `pyproject.toml` (metadata, entry point, ruff and pytest settings) and `build.ps1`
+  to make a self-contained `dist\Soundboard\Soundboard.exe` with PyInstaller.
+- **Settings can't be lost.** `config.json` carries a version number and migrations,
+  every save keeps the last three good copies, and a damaged file is set aside and the
+  newest backup used instead of silently resetting to defaults. Sounds inside the
+  library are stored by file name, so `%APPDATA%\Soundboard` can be moved or restored.
 - **Browser audio path rebuilt.** Page audio is now captured by an AudioWorklet on
   Chromium's audio thread (ScriptProcessor stays as a fallback for pages whose CSP
   forbids it) and streamed to the app as raw 16-bit PCM over a WebSocket on

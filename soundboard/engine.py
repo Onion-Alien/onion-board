@@ -25,7 +25,7 @@ import numpy as np
 import sounddevice as sd
 import soxr
 
-from eq import EQ
+from soundboard.eq import EQ
 
 log = logging.getLogger(__name__)
 

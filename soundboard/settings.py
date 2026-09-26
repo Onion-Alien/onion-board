@@ -6,10 +6,9 @@ from PySide6.QtGui import QColor, QFont, QPainter, QPainterPath
 from PySide6.QtWidgets import (QCheckBox, QComboBox, QDialog, QFrame, QGridLayout, QHBoxLayout,
                                QLabel, QPushButton, QTabWidget, QVBoxLayout, QWidget)
 
-import theme
-import winkeys
-from wheelguard import no_wheel
-from winkeys import Hotkeys
+from soundboard import theme, winkeys
+from soundboard.wheelguard import no_wheel
+from soundboard.winkeys import Hotkeys
 
 # Global hotkey actions: (config attribute, action id, label, what it does).
 # Grouped for the Settings window; the action ids go to MainWindow.on_hotkey.
@@ -267,7 +266,7 @@ class SettingsDialog(QDialog):
                               "while you're in a game.")
         cue = QCheckBox("Play hotkey beeps")
         cue.setChecked(self.mw.cfg.cue_sounds)
-        cue.toggled.connect(lambda b: self.mw._set("cue_sounds", b))
+        cue.toggled.connect(lambda b: self.mw.set_option("cue_sounds", b))
         cv.addWidget(cue)
         v.addWidget(card)
         card, cv = self._card("Audio buffering",

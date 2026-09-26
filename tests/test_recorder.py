@@ -1,7 +1,7 @@
 import numpy as np
 
-from browser import CLIP_S, Recorder
-from engine import SR
+from soundboard.browser import CLIP_S, Recorder
+from soundboard.engine import SR
 
 
 def chunk(start, n=1024):

@@ -1,7 +1,7 @@
 import numpy as np
 from scipy.signal import sosfilt
 
-import eq
+from soundboard import eq
 
 
 def test_flat_designs_to_nothing():

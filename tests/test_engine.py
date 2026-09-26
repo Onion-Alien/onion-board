@@ -5,8 +5,8 @@ from types import SimpleNamespace
 
 import numpy as np
 
-import engine as eng
-from engine import SR, Engine, is_xrun
+from soundboard import engine as eng
+from soundboard.engine import SR, Engine, is_xrun
 
 
 class FakeStream:

@@ -2,8 +2,8 @@ import json
 
 import numpy as np
 
-import library
-from library import SR, Config, SoundMeta, level_gain, trim_silence
+from soundboard import library
+from soundboard.library import SR, Config, SoundMeta, level_gain, trim_silence
 
 
 def sine(db, seconds=2.0, hz=440):
@@ -54,13 +54,55 @@ def test_trim_all_silence_is_empty():
 # ---------------------------------------------------------------- Config
 
 def test_config_round_trip(app_dir):
+    inside = str(library.SOUNDS_DIR / "x.wav")
     c = Config(sound_vol=1.5, stop_hotkey="ctrl+alt+x", latency="high",
-               sounds=[SoundMeta(id="abc", name="Boom", file="x.wav", hotkey="f5")])
-    c.save()
+               sounds=[SoundMeta(id="abc", name="Boom", file=inside, hotkey="f5"),
+                       SoundMeta(id="def", name="Out", file=r"D:\elsewhere\y.wav")])
+    assert c.save()
     assert not (app_dir / "config.tmp").exists()          # atomic replace cleaned up
     d = Config.load()
     assert d.sound_vol == 1.5 and d.stop_hotkey == "ctrl+alt+x" and d.latency == "high"
-    assert d.sounds[0] == c.sounds[0]
+    assert d.sounds == c.sounds                           # absolute again in memory
+    raw = json.loads(library.CONFIG_PATH.read_text(encoding="utf-8"))
+    assert raw["version"] == library.CONFIG_VERSION
+    assert raw["sounds"][0]["file"] == "x.wav"            # library files stored by name...
+    assert raw["sounds"][1]["file"] == r"D:\elsewhere\y.wav"   # ...others as they are
+
+
+def test_v1_config_is_migrated_and_rewritten_relative(app_dir):
+    inside = str(library.SOUNDS_DIR / "old.wav")
+    raw = {"sound_vol": 0.8, "sounds": [{"id": "a", "name": "n", "file": inside}]}  # no version
+    library.CONFIG_PATH.write_text(json.dumps(raw), encoding="utf-8")
+    c = Config.load()
+    assert c.version == library.CONFIG_VERSION and c.sounds[0].file == inside
+    c.save()
+    raw2 = json.loads(library.CONFIG_PATH.read_text(encoding="utf-8"))
+    assert raw2["version"] == library.CONFIG_VERSION and raw2["sounds"][0]["file"] == "old.wav"
+
+
+def test_save_keeps_rotating_backups_only_when_something_changed(app_dir):
+    c = Config()
+    for vol in (0.1, 0.2, 0.3, 0.4, 0.5):
+        c.sound_vol = vol
+        c.save()
+    c.save()                                              # unchanged: no rotation
+    backups = sorted(p.name for p in app_dir.glob("config.json.*"))
+    assert backups == ["config.json.1", "config.json.2", "config.json.3"]
+    assert json.loads((app_dir / "config.json.1").read_text())["sound_vol"] == 0.4
+    assert json.loads((app_dir / "config.json.3").read_text())["sound_vol"] == 0.2
+
+
+def test_corrupt_config_is_set_aside_and_recovered_from_backup(app_dir, caplog):
+    c = Config(sound_vol=0.42, sounds=[SoundMeta(id="k", name="Keep", file="k.wav")])
+    c.save()
+    c.sound_vol = 0.43
+    c.save()                                              # config.json.1 now holds 0.42
+    library.CONFIG_PATH.write_text("{not json", encoding="utf-8")
+    with caplog.at_level("WARNING"):
+        d = Config.load()
+    assert d.sounds[0].name == "Keep" and d.sound_vol == 0.42
+    assert list(app_dir.glob("config.json.broken-*"))
+    assert "recovered settings from backup" in caplog.text
 
 
 def test_unknown_and_missing_fields_are_tolerated(app_dir):
@@ -77,9 +119,10 @@ def test_missing_config_gives_defaults(app_dir):
     assert Config.load() == Config()
 
 
-def test_corrupt_config_gives_defaults_and_is_logged(app_dir, caplog):
+def test_corrupt_config_without_backups_gives_defaults_and_is_logged(app_dir, caplog):
     library.CONFIG_PATH.write_text("{not json", encoding="utf-8")
     with caplog.at_level("ERROR"):
         c = Config.load()
     assert c == Config()
     assert "unreadable" in caplog.text
+    assert not library.CONFIG_PATH.exists()               # set aside, not overwritten
