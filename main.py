@@ -13,9 +13,10 @@ from pathlib import Path
 import keyboard
 import numpy as np
 import sounddevice as sd
-from PySide6.QtCore import QMimeData, QObject, QPoint, QRectF, Qt, QTimer, Signal
+from PySide6.QtCore import QEvent, QMimeData, QObject, QPoint, QRectF, Qt, QTimer, Signal
 from PySide6.QtGui import QColor, QDrag, QFont, QIcon, QPainter, QPainterPath, QPen, QPixmap
-from PySide6.QtWidgets import (QApplication, QCheckBox, QComboBox, QDialog, QDialogButtonBox,
+from PySide6.QtWidgets import (QAbstractScrollArea, QAbstractSlider, QAbstractSpinBox,
+                               QApplication, QScrollBar, QCheckBox, QComboBox, QDialog, QDialogButtonBox,
                                QFileDialog, QFormLayout, QFrame, QGridLayout, QHBoxLayout,
                                QLabel, QLineEdit, QMainWindow, QMenu, QMessageBox, QPushButton,
                                QScrollArea, QSlider, QSpinBox, QStyle, QVBoxLayout,
@@ -146,6 +147,23 @@ class Meter(QWidget):
                 col = "#ff4d4f"
             p.setBrush(QColor(col))
             p.drawRoundedRect(QRectF(0, 0, r.width() * frac, r.height()), 4, 4)
+
+
+class NoWheelChanges(QObject):
+    """Scrolling over a dropdown / slider / number box scrolls the page instead of
+    changing the value. Values only change by clicking or dragging."""
+
+    def eventFilter(self, obj, ev):
+        if ev.type() == QEvent.Wheel and isinstance(
+                obj, (QComboBox, QAbstractSpinBox, QAbstractSlider)) \
+                and not isinstance(obj, QScrollBar):
+            w = obj.parentWidget()
+            while w is not None and not isinstance(w, QAbstractScrollArea):
+                w = w.parentWidget()
+            if w is not None:
+                QApplication.sendEvent(w.verticalScrollBar(), ev)
+            return True
+        return False
 
 
 class EqCurve(QWidget):
@@ -695,44 +713,6 @@ class MainWindow(QMainWindow):
         cv.addWidget(nomic)
         pv.addWidget(card)
 
-        # ---- device pickers: auto-detected, so tucked away
-        self.btn_adv = QPushButton("⚙  Change devices  ▸")
-        self.btn_adv.setObjectName("small")
-        self.btn_adv.setCheckable(True)
-        pv.addWidget(self.btn_adv)
-        adv = QWidget()
-        av = QVBoxLayout(adv)
-        av.setContentsMargins(0, 0, 0, 0)
-        av.setSpacing(6)
-
-        def alabel(text):
-            l = QLabel(text)
-            l.setObjectName("hint")
-            av.addWidget(l)
-
-        alabel("Sounds + my voice get sent into (the cable):")
-        self.cb_main = QComboBox()
-        av.addWidget(self.cb_main)
-        self.setup_hint = QLabel()
-        self.setup_hint.setWordWrap(True)
-        self.setup_hint.setObjectName("hint")
-        av.addWidget(self.setup_hint)
-        alabel("I listen on (my headphones):")
-        self.cb_mon = QComboBox()
-        av.addWidget(self.cb_mon)
-        alabel("My real microphone:")
-        self.cb_mic = QComboBox()
-        av.addWidget(self.cb_mic)
-        ref = QPushButton("⟳ Re-scan devices")
-        ref.setObjectName("small")
-        ref.clicked.connect(self.refresh_devices)
-        av.addWidget(ref)
-        adv.hide()
-        pv.addWidget(adv)
-        self.btn_adv.toggled.connect(lambda on: (
-            adv.setVisible(on),
-            self.btn_adv.setText("⚙  Change devices  ▾" if on else "⚙  Change devices  ▸")))
-
         section("YOUR MIC")
         self.chk_mic = QCheckBox("Mix my mic in (so they still hear me)")
         self.chk_mic.setChecked(self.cfg.mic_enabled)
@@ -748,7 +728,7 @@ class MainWindow(QMainWindow):
         section("VOLUME")
         self.sl_sound = self._slider(
             pv, "🔊  Soundboard → them",
-            "How loud your sounds are for Discord / the game.",
+            "How loud your sounds are for Discord / the game. Type up to 1000% in the box.",
             self.cfg.sound_vol, lambda v: self._set("sound_vol", v))
         self.sl_mic = self._slider(
             pv, "🎤  Your voice → them",
@@ -758,24 +738,12 @@ class MainWindow(QMainWindow):
             pv, "🎧  Your headphones",
             "Only what YOU hear. Doesn't change anything for them.",
             self.cfg.mon_vol, lambda v: self._set("mon_vol", v))
-        hint("Type any % in the boxes — up to 1000% for max loud. "
-             "Over 100% it starts to crunch/distort.")
-        self.chk_monitor = QCheckBox("Hear sounds myself")
-        self.chk_monitor.setChecked(self.cfg.monitor_sounds)
-        self.chk_monitor.toggled.connect(lambda b: self._set("monitor_sounds", b))
-        pv.addWidget(self.chk_monitor)
-        self.chk_level = QCheckBox("Level volumes (all sounds equally loud)")
-        self.chk_level.setChecked(self.cfg.level_volumes)
-        self.chk_level.toggled.connect(self.on_level_toggle)
-        pv.addWidget(self.chk_level)
         out_row = QHBoxLayout()
         out_row.addWidget(QLabel("Going out"))
         self.out_meter = Meter()
         self.out_meter.setToolTip("Level of what Discord / the game receives")
         out_row.addWidget(self.out_meter, 1)
         pv.addLayout(out_row)
-
-        self._build_eq(pv, section, hint)
 
         section("TEST MODE")
         self.btn_check = QPushButton("🎤  Listen to my mic output")
@@ -796,6 +764,52 @@ class MainWindow(QMainWindow):
         self.test_result.setStyleSheet("background:#232633; border-radius:8px; padding:8px;")
         self.test_result.hide()
         pv.addWidget(self.test_result)
+
+        # ---- everything below is advanced, hidden until you open it
+        self.btn_adv = QPushButton()
+        self.btn_adv.setObjectName("advtoggle")
+        self.btn_adv.setCheckable(True)
+        pv.addWidget(self.btn_adv)
+        adv = QWidget()
+        adv_layout = QVBoxLayout(adv)
+        adv_layout.setContentsMargins(0, 0, 0, 0)
+        adv_layout.setSpacing(8)
+        pv.addWidget(adv)
+        base_pv, pv = pv, adv_layout   # section()/hint() now add to the advanced area
+
+        section("DEVICES")
+        hint("Already set up for you — only change these if something's wrong.")
+
+        def alabel(text):
+            l = QLabel(text)
+            l.setObjectName("hint")
+            pv.addWidget(l)
+
+        alabel("Sounds + my voice get sent into (the cable):")
+        self.cb_main = QComboBox()
+        pv.addWidget(self.cb_main)
+        self.setup_hint = hint("")
+        alabel("I listen on (my headphones):")
+        self.cb_mon = QComboBox()
+        pv.addWidget(self.cb_mon)
+        alabel("My real microphone:")
+        self.cb_mic = QComboBox()
+        pv.addWidget(self.cb_mic)
+        ref = QPushButton("⟳ Re-scan devices")
+        ref.setObjectName("small")
+        ref.clicked.connect(self.refresh_devices)
+        pv.addWidget(ref)
+
+        section("SOUND OPTIONS")
+        self.chk_monitor = QCheckBox("Hear sounds myself")
+        self.chk_monitor.setChecked(self.cfg.monitor_sounds)
+        self.chk_monitor.toggled.connect(lambda b: self._set("monitor_sounds", b))
+        pv.addWidget(self.chk_monitor)
+        self.chk_level = QCheckBox("Level volumes (all sounds equally loud)")
+        self.chk_level.setChecked(self.cfg.level_volumes)
+        self.chk_level.toggled.connect(self.on_level_toggle)
+        pv.addWidget(self.chk_level)
+        self._build_eq(pv, section, hint)
 
         section("HOTKEYS")
         self.btn_stop_hk = QPushButton()
@@ -823,6 +837,17 @@ class MainWindow(QMainWindow):
         self.chk_top.setChecked(self.cfg.always_on_top)
         self.chk_top.toggled.connect(self.on_top_toggle)
         pv.addWidget(self.chk_top)
+        pv = base_pv
+
+        def set_adv(on):
+            adv.setVisible(on)
+            self.btn_adv.setText("⚙  Advanced  ▾   (hide)" if on else
+                                 "⚙  Advanced  ▸   devices, EQ, hotkeys…")
+            self.cfg.show_advanced = on
+            self._save_later()
+        self.btn_adv.toggled.connect(set_adv)
+        self.btn_adv.setChecked(self.cfg.show_advanced)
+        set_adv(self.cfg.show_advanced)
         pv.addStretch()
         pscroll = QScrollArea()
         pscroll.setWidget(panel)
@@ -1613,6 +1638,9 @@ QPushButton#danger { background:#3a2230; border:1px solid #5a2a3e; color:#ff8fa3
 QPushButton#danger:hover { background:#4a2a3c; }
 QPushButton#small { padding:2px 8px; font-size:8pt; }
 QFrame#transport { background:#1c1f2a; border-radius:12px; }
+QFrame#panel QPushButton#advtoggle { background:#2a2e3d; padding:10px; font-weight:600;
+    text-align:left; margin-top:8px; }
+QFrame#panel QPushButton#advtoggle:checked { background:#2a2e3d; color:#e6e8f0; }
 QFrame#panel QFrame#howcard { background:#232633; border-radius:10px; }
 QFrame#panel QFrame#volbox { background:#232633; border-radius:10px; }
 QSpinBox { background:#15171f; border:1px solid #363b4e; border-radius:6px; padding:3px 4px; }
@@ -1671,6 +1699,8 @@ def main():
     app = QApplication(sys.argv)
     app.setStyle("Fusion")
     app.setStyleSheet(STYLE)
+    wheel_guard = NoWheelChanges(app)
+    app.installEventFilter(wheel_guard)
     w = MainWindow()
     w.show()
     sys.exit(app.exec())

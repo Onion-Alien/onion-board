@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased
+
+- Simple main panel; devices, sound options, EQ and hotkeys moved under a
+  collapsible ⚙ Advanced section (remembers if you left it open).
+- The mouse wheel no longer changes dropdowns, sliders or number boxes. It
+  scrolls the panel; values change only by clicking or dragging.
+
 ## 0.1.0 — 2026-09-26
 
 First version.
