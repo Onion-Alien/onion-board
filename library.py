@@ -63,6 +63,11 @@ class Config:
     always_on_top: bool = False
     show_advanced: bool = False
     pad_width: int = 150
+    tab: int = 0                      # 0 = sounds, 1 = browser
+    browser_url: str = "https://www.youtube.com/"
+    browser_vol: float = 1.0
+    browser_live: bool = True         # browser audio goes out to others
+    browser_monitor: bool = True      # ...and to your headphones
     sounds: list[SoundMeta] = field(default_factory=list)
 
     @classmethod
@@ -153,6 +158,26 @@ def import_file(src: str, color: str) -> tuple[SoundMeta, np.ndarray]:
     meta = SoundMeta(id=sid, name=srcp.stem.replace("_", " ").strip()[:40], file=str(dest),
                      color=color, level_gain=level_gain(data), duration=len(data) / SR)
     return meta, data
+
+
+def save_clip(data: np.ndarray, name: str, color: str) -> SoundMeta:
+    """Store recorded audio ((n, 2) float32 at SR) in the library as a WAV and return its metadata."""
+    SOUNDS_DIR.mkdir(parents=True, exist_ok=True)
+    sid = uuid.uuid4().hex[:10]
+    safe = "".join(c if c.isalnum() or c in " -_" else "_" for c in name).strip()[:40] or "clip"
+    dest = SOUNDS_DIR / f"{sid}_{safe}.wav"
+    sf.write(dest, data, SR, subtype="FLOAT")
+    return SoundMeta(id=sid, name=name[:40], file=str(dest), color=color,
+                     level_gain=level_gain(data), duration=len(data) / SR)
+
+
+def trim_silence(data: np.ndarray, threshold: float = 0.002, pad_s: float = 0.05) -> np.ndarray:
+    """Cut dead air off both ends of a recording (keeps a tiny pad so it doesn't start abruptly)."""
+    loud = np.flatnonzero(np.max(np.abs(data), axis=1) > threshold)
+    if not len(loud):
+        return data[:0]
+    pad = int(pad_s * SR)
+    return data[max(loud[0] - pad, 0): loud[-1] + pad]
 
 
 def delete_file(meta: SoundMeta):

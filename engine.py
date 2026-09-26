@@ -5,8 +5,9 @@ built-in resampler, auto_convert, audibly garbles audio — measured ~70% junk o
 VB-Cable — so all rate conversion is done here with soxr instead):
 
   mic  (input)  -> streaming resampler -> ring buffers -> main / monitor
-  main (output) = sounds + mic                -> virtual cable (what others hear)
-  mon  (output) = sounds [+ mic in test mode] -> your headphones
+  browser (48 kHz, pushed from the UI thread) -> resampler -> ring buffers -> main / monitor
+  main (output) = sounds + browser (when live) + mic -> virtual cable (what others hear)
+  mon  (output) = sounds + browser [+ mic in test mode] -> your headphones
 
 Sounds are stored at SR and resampled (cached) to each output's rate. Every
 playing Voice keeps its own position per output, so the two output devices
@@ -123,16 +124,17 @@ def resample(data: np.ndarray, src: int, dst: int) -> np.ndarray:
 class Ring:
     """Low-latency ring buffer bridging two audio clocks (mic -> output)."""
 
-    def __init__(self, rate: int = SR):
+    def __init__(self, rate: int = SR, prefill_s: float = 0.015, max_s: float = 0.08):
         self.lock = threading.Lock()
+        self.prefill_s, self.max_s = prefill_s, max_s
         self.configure(rate)
 
     def configure(self, rate: int):
         with self.lock:
-            self.cap = rate // 2
+            self.cap = max(rate // 2, int(rate * self.max_s * 2))
             self.buf = np.zeros((self.cap, CH), np.float32)
-            self.prefill = int(rate * 0.015)   # jitter cushion before (re)starting
-            self.max_fill = int(rate * 0.08)   # beyond this, skip ahead to keep latency low
+            self.prefill = int(rate * self.prefill_s)   # jitter cushion before (re)starting
+            self.max_fill = int(rate * self.max_s)      # beyond this, skip ahead to keep latency low
             self.r = self.w = self.count = 0
             self.primed = False
 
@@ -280,9 +282,21 @@ class Engine:
         self._rs_main = StreamResampler(SR, SR)
         self._rs_mon = StreamResampler(SR, SR)
 
+        # browser audio arrives in bursty ~20 ms chunks over IPC, so it gets a
+        # bigger cushion than the mic (latency matters less for music than voice)
+        self.browser_vol = 1.0
+        self.browser_live = True      # browser -> others
+        self.browser_monitor = True   # browser -> your headphones
+        self.ring_bmain = Ring(prefill_s=0.06, max_s=0.30)
+        self.ring_bmon = Ring(prefill_s=0.06, max_s=0.30)
+        self._rs_bmain = StreamResampler(SR, SR)
+        self._rs_bmon = StreamResampler(SR, SR)
+        self._browser_heard = 0.0     # monotonic time of the last non-silent chunk
+
         self.level_main = 0.0
         self.level_mic = 0.0
         self.level_mon = 0.0
+        self.level_browser = 0.0
 
         self._rec_buf: list[np.ndarray] | None = None
         self._rec_frames_left = 0
@@ -353,6 +367,27 @@ class Engine:
         self._rs_mon = StreamResampler(r["mic"], r["mon"])
         self.ring_main.configure(r["main"])
         self.ring_mon.configure(r["mon"])
+        self._rs_bmain = StreamResampler(SR, r["main"])
+        self._rs_bmon = StreamResampler(SR, r["mon"])
+        self.ring_bmain.configure(r["main"])
+        self.ring_bmon.configure(r["mon"])
+
+    # ----------------------------------------------------------------- browser input
+    def feed_browser(self, x: np.ndarray):
+        """Push a chunk of browser audio ((n, 2) float32 at SR). Call from the UI thread."""
+        lvl = peak(x)
+        self.level_browser = max(lvl * self.browser_vol, self.level_browser)
+        if lvl > 0.003:
+            self._browser_heard = time.monotonic()
+        if self.main_stream is not None:
+            self.ring_bmain.write(self._rs_bmain(x))
+        if self.mon_stream is not None:
+            self.ring_bmon.write(self._rs_bmon(x))
+
+    def browser_on_air(self) -> bool:
+        """True while the browser is audibly going out to others (drives auto push-to-talk)."""
+        return (self.browser_live and self.browser_vol > 0
+                and time.monotonic() - self._browser_heard < 0.5)
 
     def _close(self, attr):
         s = getattr(self, attr)
@@ -578,6 +613,9 @@ class Engine:
     def _cb_main(self, outdata, frames, t, status):
         mix = self._render("main", frames)
         mix *= np.float32(self.sound_vol)
+        b = self.ring_bmain.read(frames)
+        if b is not None and self.browser_live:
+            mix += b * np.float32(self.browser_vol)
         mix = self._eq("main", "sounds", mix)
         m = self.ring_main.read(frames)
         if m is not None and self.mic_enabled and not self.mic_muted:
@@ -600,6 +638,9 @@ class Engine:
         m = self.ring_mon.read(frames)
         if check:
             mix *= np.float32(self.sound_vol)
+        b = self.ring_bmon.read(frames)
+        if b is not None and (self.browser_monitor or (check and self.browser_live)):
+            mix += b * np.float32(self.browser_vol)
         mix = self._eq("mon", "sounds", mix)   # you hear the same EQ others get
         if check and m is not None and self.mic_enabled and not self.mic_muted:
             mix += self._eq("mon", "voice", m * np.float32(self.mic_vol))
