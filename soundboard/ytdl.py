@@ -44,6 +44,7 @@ from soundboard.library import MAX_SECONDS
 
 log = logging.getLogger(__name__)
 
+IMAGE_EXTS = {".jpg", ".jpeg", ".png", ".webp", ".gif", ".image"}   # thumbnails
 MAX_BYTES = 200 * 1024 * 1024   # an audio stream bigger than this isn't a sound
 PACKAGES = ("yt_dlp", "yt_dlp_ejs")
 PYPI = "https://pypi.org/pypi/{}/json"
@@ -394,7 +395,7 @@ def _readable(e: Exception) -> FetchError:
     return FetchError(msg or "Download failed")
 
 
-def _opts(dest: Path | None = None, progress=None) -> dict:
+def _opts(dest: Path | None = None, progress=None, thumbnail: bool = False) -> dict:
     def hook(d):
         if progress and d.get("status") == "downloading":
             total = d.get("total_bytes") or d.get("total_bytes_estimate") or 0
@@ -405,6 +406,7 @@ def _opts(dest: Path | None = None, progress=None) -> dict:
         "format": "bestaudio/best",
         "outtmpl": str((dest or Path(tempfile.gettempdir())) / "%(id)s.%(ext)s"),
         "noplaylist": True,            # a video in a playlist: just that video
+        "writethumbnail": thumbnail,   # the pad's picture (soundboard.thumbs)
         "quiet": True,
         "no_warnings": True,
         "noprogress": True,
@@ -418,7 +420,7 @@ def _opts(dest: Path | None = None, progress=None) -> dict:
 
 def _run(yt_dlp, url: str, dest: Path, progress) -> tuple[Path, str]:
     try:
-        with yt_dlp.YoutubeDL(_opts(dest, progress)) as ydl:
+        with yt_dlp.YoutubeDL(_opts(dest, progress, thumbnail=True)) as ydl:
             info = _check(ydl.extract_info(url, download=False))
             dur = info.get("duration") or 0
             if dur > MAX_SECONDS:
@@ -430,7 +432,8 @@ def _run(yt_dlp, url: str, dest: Path, progress) -> tuple[Path, str]:
     except Exception as e:  # noqa: BLE001 - yt-dlp raises many kinds; show its message
         raise _readable(e) from e
     if not path.is_file():   # skipped (too big) or the extension changed
-        found = [p for p in dest.iterdir() if p.is_file() and not p.name.endswith(".part")]
+        found = [p for p in dest.iterdir() if p.is_file() and not p.name.endswith(".part")
+                 and p.suffix.lower() not in IMAGE_EXTS]
         if not found:
             raise DownloadError("Nothing was downloaded (the file may be over "
                                 f"{MAX_BYTES // 2**20} MB).")

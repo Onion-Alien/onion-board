@@ -20,7 +20,7 @@ from soundboard import theme, winkeys, ytdl
 from soundboard.browser import BrowserTab
 from soundboard.engine import SR, Engine
 from soundboard.engine import is_virtual as is_virtual_cable
-from soundboard import soundfx
+from soundboard import soundfx, thumbs
 from soundboard.library import (AUDIO_EXTS, PAD_COLORS, RESOURCE_DIR, Config, SoundMeta,
                                 cache_keep, delete_file, duplicate, fingerprint, import_file,
                                 load_original, load_sound, prune_cache, save_clip)
@@ -37,7 +37,7 @@ from soundboard.ui.linkbar import LinkBar
 from soundboard.ui.ytsearch import YouTubeResults
 from soundboard.ui.overlay import Overlay
 from soundboard.ui.voicepanel import VoicePanel
-from soundboard.ui.widgets import Meter, Pad, PadGrid, SeekSlider, fmt_pos
+from soundboard.ui.widgets import Meter, Pad, PadGrid, SeekSlider, fmt_pos, spectrum
 from soundboard.wheelguard import no_wheel
 from soundboard.winkeys import Hotkeys
 
@@ -337,6 +337,7 @@ class MainWindow(QMainWindow):
         self.grid = PadGrid()
         self.grid.reorder.connect(self.on_reorder)
         self.grid.files_dropped.connect(self.import_files)
+        self.grid.image_dropped.connect(self.set_picture)
         scroll = QScrollArea()
         scroll.setWidgetResizable(True)
         scroll.setWidget(self.grid)
@@ -1128,6 +1129,7 @@ class MainWindow(QMainWindow):
                     log.warning("can't load %s: %s", m.file, e)
                     self.bridge.loaded.emit(m.id, None, str(e))
             prune_cache(cache_keep(list(self.cfg.sounds)))   # as of now, not of the start
+            thumbs.prune({m.image for m in list(self.cfg.sounds) if m.image})
             log.info("loaded %d sounds in %.1fs", len(todo), time.monotonic() - t0)
         self._load_thread = threading.Thread(target=run, daemon=True, name="load")
         self._load_thread.start()
@@ -1170,6 +1172,7 @@ class MainWindow(QMainWindow):
                     if fp and fp in known:
                         raise RuntimeError(f"already in your library as “{known[fp]}”")
                     meta, data = import_file(f, PAD_COLORS[(start + i) % len(PAD_COLORS)])
+                    meta.image = thumbs.extract_art(f, meta.id)   # cover art / first frame
                     if fp:
                         known[fp] = meta.name   # the same file twice in one drop
                     self.engine.prepare(meta.id, data)
@@ -1245,6 +1248,9 @@ class MainWindow(QMainWindow):
         a_edit = menu.addAction(icons.icon("edit"), "Edit… (name, volume, hotkey, loop)")
         a_fx = menu.addAction(icons.icon("wave"), "Effects… (speed, pitch, EQ, boost)")
         a_hk = menu.addAction(icons.icon("keyboard"), "Set hotkey…")
+        a_pic = menu.addAction(icons.icon("image"), "Change picture…" if m.image
+                               else "Add picture…")
+        a_nopic = menu.addAction("Remove picture") if m.image else None
         menu.addSeparator()
         a_del = menu.addAction(icons.icon("trash", "danger_text"), "Remove")
         act = menu.exec(pos)
@@ -1264,9 +1270,31 @@ class MainWindow(QMainWindow):
                 self.cfg.save()
                 self.pads[sid].update()
             self.register_hotkeys()
+        elif act == a_pic:
+            f, _ = QFileDialog.getOpenFileName(
+                self, "Pick a picture", str(Path.home()),
+                "Pictures (" + " ".join(f"*{x}" for x in sorted(thumbs.IMAGE_EXTS)) + ")")
+            if f:
+                self.set_picture(sid, f)
+        elif act is not None and act == a_nopic:
+            thumbs.clear(m)
+            self.cfg.save()
+            self.pads[sid].update()
         elif act == a_del:
             if QMessageBox.question(self, "Remove sound", f"Remove “{m.name}”?") == QMessageBox.Yes:
                 self.remove_sound(sid)
+
+    def set_picture(self, sid: str, path: str):
+        """Put a picture on a pad (from the menu, or an image dropped on it)."""
+        m = self.meta(sid)
+        if not m:
+            return
+        if not thumbs.set_image(m, path):
+            QMessageBox.warning(self, "Couldn't use that picture",
+                                f"{Path(path).name} isn't a picture this app can read.")
+            return
+        self.cfg.save()
+        self.pads[sid].update()
 
     def remove_sound(self, sid: str):
         m = self.meta(sid)
@@ -1451,6 +1479,10 @@ class MainWindow(QMainWindow):
         playing = e.playing()
         for sid, p in self.pads.items():
             prog, paused = playing.get(sid, (None, False))
+            if prog is not None and not paused and not p.isHidden():
+                p.set_levels(spectrum(self.audio.get(sid), prog, p.n_bands))
+            elif prog is None and p.bands is not None:
+                p.set_levels(None)
             if prog != p.progress or paused != p.paused:
                 p.progress, p.paused = prog, paused
                 p.update()

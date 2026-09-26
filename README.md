@@ -246,7 +246,7 @@ the launcher the shortcuts and PyInstaller use. The app is the `soundboard` pack
 | `soundboard/app.py` | entry point: log file, crash hooks, runtime tuning, single instance, the window |
 | `soundboard/singleinstance.py` | named mutex + local socket so a second launch just raises the first |
 | `soundboard/ui/mainwindow.py` | the main window: pads, transport, tabs, the audio panel, test mode, auto push-to-talk |
-| `soundboard/ui/widgets.py` | hand-painted widgets: meter, EQ curve, seek slider, pads and their grid |
+| `soundboard/ui/widgets.py` | hand-painted widgets: meter, EQ curve, seek slider, pads (picture, spectrum visualizer while playing) and their grid |
 | `soundboard/ui/panel.py` | volume boxes and the equalizer panel (emit values; the window applies them) |
 | `soundboard/ui/dialogs.py` | per-sound Edit dialog: the Sound tab (name, volume, hotkey…) and the Effects tab |
 | `soundboard/ui/linkbar.py` | the Sounds tab's link bar: a link pasted into *Search sounds* is looked up with yt-dlp, then added as a sound or played once |
@@ -264,6 +264,7 @@ the launcher the shortcuts and PyInstaller use. The app is the `soundboard` pack
 | `soundboard/speech/` | Windows text-to-speech (`tts.py`), the live voice-to-speech client (`live.py`, `service.py`, `protocol.py`) and translation model downloads (`translation.py`) |
 | `soundboard/modules.py` | finds, loads and installs add-ons in `modules\` |
 | `soundboard/ytdl.py` | the Browser tab's *Add as sound*: downloads the open video's audio with yt-dlp, and updates yt-dlp on request or opt-in (SHA-256-checked PyPI wheels in `%APPDATA%`, loaded ahead of the bundled copy by an import hook) |
+| `soundboard/thumbs.py` | pad pictures: a link's video thumbnail, a file's cover art / first frame (ffmpeg), or a picture you pick or drop on a pad, scaled into `%APPDATA%\Soundboard\thumbs` |
 | `soundboard/adblocker.py` | the Browser tab's ad blocker (EasyList / uBlock lists, refreshed every few days) |
 | `soundboard/bunny.py` | Bun the mascot, drawn in code (setup guide and installer art) |
 | `soundboard/winkeys.py` | global hotkeys (`RegisterHotKey`) and key presses (`SendInput`), no hooks |

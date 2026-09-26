@@ -5,12 +5,14 @@ from pathlib import Path
 
 import numpy as np
 from PySide6.QtCore import QMimeData, QPoint, QRectF, Qt, Signal
-from PySide6.QtGui import QColor, QDrag, QFont, QPainter, QPainterPath, QPen
+from PySide6.QtGui import (QColor, QDrag, QFont, QLinearGradient, QPainter, QPainterPath,
+                           QPen)
 from PySide6.QtWidgets import QGridLayout, QLabel, QSlider, QStyle, QWidget
 
-from soundboard import theme
+from soundboard import theme, thumbs
 from soundboard.eq import MAX_DB as EQ_MAX_DB
 from soundboard.eq import response_db as eq_response
+from soundboard.engine import SR
 from soundboard.library import AUDIO_EXTS, SoundMeta
 from soundboard.settings import pretty_key
 
@@ -112,6 +114,34 @@ def fmt_pos(pos: float, total: float) -> str:
     return f"{fmt_time(pos)} / {fmt_time(total)}"
 
 
+FFT_N = 2048
+_HANN = np.hanning(FFT_N).astype(np.float32)
+_FREQS = np.fft.rfftfreq(FFT_N, 1 / SR)
+
+
+def spectrum(data: np.ndarray, frac: float, n: int) -> np.ndarray:
+    """`n` log-spaced band levels (0..1) of int16/float (m, 2) audio around position
+    `frac` (0..1): what a pad's visualizer shows. Cheap: one 2048-point FFT."""
+    if data is None or not len(data) or n <= 0:
+        return np.zeros(max(n, 0), np.float32)
+    pos = int(min(max(frac, 0.0), 1.0) * len(data))
+    seg = data[pos:pos + FFT_N]
+    if len(seg) < FFT_N:
+        seg = np.concatenate([seg, np.zeros((FFT_N - len(seg), 2), seg.dtype)])
+    mono = seg.mean(axis=1, dtype=np.float32)
+    if data.dtype == np.int16:
+        mono /= 32768.0
+    mag = np.abs(np.fft.rfft(mono * _HANN)) * (4.0 / FFT_N)   # full-scale sine ~ 1
+    edges = np.geomspace(50, 14000, n + 1)
+    idx = np.clip(np.searchsorted(_FREQS, edges), 1, len(mag) - 1)
+    out = np.empty(n, np.float32)
+    for i in range(n):
+        a, b = idx[i], max(idx[i + 1], idx[i] + 1)
+        out[i] = np.sqrt(np.mean(mag[a:b] ** 2))
+    db = 20 * np.log10(out + 1e-9) + np.linspace(0, 14, n)   # music falls off up high
+    return np.clip((db + 62) / 52, 0.0, 1.0).astype(np.float32)
+
+
 class Pad(QWidget):
     clicked = Signal(str)
     menu = Signal(str, QPoint)
@@ -121,6 +151,8 @@ class Pad(QWidget):
         self.meta = meta
         self.progress = None     # None = not playing
         self.paused = False
+        self.bands = None        # visualizer levels (0..1) while playing
+        self.peaks = None        # the little caps that fall slowly
         self.selected = False
         self.state = "loading"   # loading | ready | error
         self.error = ""
@@ -129,6 +161,22 @@ class Pad(QWidget):
         self.setFixedSize(width, int(width * 0.62))
         self.setCursor(Qt.PointingHandCursor)
         self.setAttribute(Qt.WA_Hover)
+
+    @property
+    def n_bands(self) -> int:
+        return max(8, min(28, (self.width() - 20) // 9))
+
+    def set_levels(self, levels):
+        """New visualizer levels (None clears): bars jump up and fall back smoothly."""
+        if levels is None:
+            self.bands = self.peaks = None
+            return
+        levels = np.asarray(levels, np.float32)
+        if self.bands is None or len(self.bands) != len(levels):
+            self.bands, self.peaks = levels.copy(), levels.copy()
+            return
+        self.bands = np.maximum(levels, self.bands * 0.78)
+        self.peaks = np.maximum(self.bands, self.peaks - 0.025)
 
     def enterEvent(self, e):
         self.hover = True
@@ -165,6 +213,7 @@ class Pad(QWidget):
     def paintEvent(self, e):
         p = QPainter(self)
         p.setRenderHint(QPainter.Antialiasing)
+        p.setRenderHint(QPainter.SmoothPixmapTransform)
         r = QRectF(self.rect()).adjusted(2, 2, -2, -2)
         accent = QColor(self.meta.color)
         T = theme.T
@@ -172,15 +221,24 @@ class Pad(QWidget):
         path = QPainterPath()
         path.addRoundedRect(r, 12, 12)
         p.fillPath(path, base)
-        if self.progress is not None:
-            fill = QColor(accent)
-            fill.setAlpha(45 if self.paused else 90)
-            p.save()
-            p.setClipPath(path)
-            w = r.width() * max(self.progress, 0.02)
-            p.fillRect(QRectF(r.left(), r.top(), w, r.height()), fill)
-            p.restore()
-            pen = QPen(accent, 2.5)
+        pic = thumbs.pixmap(self.meta.image)
+        playing = self.progress is not None
+        p.save()
+        p.setClipPath(path)
+        if pic is not None:
+            self._paint_picture(p, r, pic)
+        if playing:
+            self._paint_visualizer(p, r, accent)
+            # progress: a thin accent line along the bottom edge
+            p.fillRect(QRectF(r.left(), r.bottom() - 3, r.width() * self.progress, 3), accent)
+        p.restore()
+        p.setBrush(Qt.NoBrush)
+        if playing:
+            glow = QColor(accent)
+            glow.setAlpha(60 if self.paused else 110)
+            p.setPen(QPen(glow, 6))
+            p.drawPath(path)
+            pen = QPen(accent, 2.2)
             if self.paused:
                 pen.setStyle(Qt.DashLine)
             p.setPen(pen)
@@ -193,21 +251,29 @@ class Pad(QWidget):
         p.setPen(Qt.NoPen)
         p.setBrush(accent)
         p.drawRoundedRect(QRectF(r.left() + 10, r.top() + 10, 22, 4), 2, 2)
+        on_pic = pic is not None
         # name
-        p.setPen(QColor(T["text_hi"] if self.state == "ready" else T["muted"]))
         f = QFont(self.font())
         f.setPointSizeF(10.5)
         f.setBold(True)
         p.setFont(f)
         text_r = r.adjusted(10, 20, -10, -24)
-        p.drawText(text_r, Qt.AlignLeft | Qt.AlignVCenter | Qt.TextWordWrap, self.meta.name)
+        flags = Qt.AlignLeft | Qt.AlignVCenter | Qt.TextWordWrap
+        if on_pic:   # a soft shadow keeps it readable on any picture
+            p.setPen(QColor(0, 0, 0, 200))
+            p.drawText(text_r.translated(1, 1), flags, self.meta.name)
+            p.setPen(QColor("#ffffff") if self.state == "ready" else QColor(255, 255, 255, 170))
+        else:
+            p.setPen(QColor(T["text_hi"] if self.state == "ready" else T["muted"]))
+        p.drawText(text_r, flags, self.meta.name)
+        muted = QColor(255, 255, 255, 200) if on_pic else QColor(T["muted"])
         # footer: hotkey + duration / state
         f.setBold(False)
         f.setPointSizeF(8.5)
         p.setFont(f)
         foot = r.adjusted(10, r.height() - 24, -10, -6)
         if self.state in ("loading", "rendering"):
-            p.setPen(QColor(T["muted"]))
+            p.setPen(muted)
             p.drawText(foot, Qt.AlignLeft | Qt.AlignVCenter,
                        "applying effects…" if self.state == "rendering" else "loading…")
         elif self.state == "error":
@@ -217,7 +283,7 @@ class Pad(QWidget):
             flags = ("FX " if self.meta.fx else "") + \
                 ("⟳ " if self.meta.loop else "") + \
                 {"overlap": "⧉ ", "toggle": "⏯ "}.get(self.meta.mode, "")
-            p.setPen(QColor(T["muted"]))
+            p.setPen(muted)
             right = "❚❚ paused" if self.paused else f"{flags}{self.meta.duration:.1f}s"
             p.drawText(foot, Qt.AlignRight | Qt.AlignVCenter, right)
             if self.meta.hotkey:
@@ -233,9 +299,56 @@ class Pad(QWidget):
                            fm.elidedText(hk, Qt.ElideRight, int(badge.width()) - 8))
 
 
+    def _paint_picture(self, p: QPainter, r: QRectF, pic):
+        """The picture, cropped to fill the pad, darkened towards the bottom for the text."""
+        dpr = pic.devicePixelRatio() or 1.0
+        pw, ph = pic.width() / dpr, pic.height() / dpr
+        scale = max(r.width() / pw, r.height() / ph)
+        w, h = pw * scale, ph * scale
+        p.drawPixmap(QRectF(r.center().x() - w / 2, r.center().y() - h / 2, w, h), pic,
+                     QRectF(pic.rect()))
+        shade = QLinearGradient(r.topLeft(), r.bottomLeft())
+        shade.setColorAt(0.0, QColor(0, 0, 0, 70 if self.hover else 100))
+        shade.setColorAt(0.55, QColor(0, 0, 0, 120 if self.hover else 150))
+        shade.setColorAt(1.0, QColor(0, 0, 0, 205))
+        p.fillRect(r, shade)
+
+    def _paint_visualizer(self, p: QPainter, r: QRectF, accent: QColor):
+        """Spectrum bars rising from the bottom, behind the text."""
+        bands = self.bands
+        if bands is None or not len(bands):
+            return
+        n = len(bands)
+        area = r.adjusted(8, r.height() * 0.28, -8, -5)
+        gap = 2.0 if area.width() / n > 6 else 1.0
+        bw = (area.width() - gap * (n - 1)) / n
+        top, bottom = QColor(accent).lighter(135), QColor(accent)
+        top.setAlpha(120 if self.paused else 235)
+        bottom.setAlpha(25 if self.paused else 60)
+        grad = QLinearGradient(0, area.top(), 0, area.bottom())
+        grad.setColorAt(0.0, top)
+        grad.setColorAt(1.0, bottom)
+        p.setPen(Qt.NoPen)
+        p.setBrush(grad)
+        rad = min(bw / 2, 2.5)
+        for i, lv in enumerate(bands):
+            x = area.left() + i * (bw + gap)
+            h = max(2.0, float(lv) * area.height())
+            p.drawRoundedRect(QRectF(x, area.bottom() - h, bw, h), rad, rad)
+        if self.peaks is not None:
+            cap = QColor(accent).lighter(160)
+            cap.setAlpha(110 if self.paused else 230)
+            p.setBrush(cap)
+            for i, pk in enumerate(self.peaks):
+                x = area.left() + i * (bw + gap)
+                y = area.bottom() - max(2.0, float(pk) * area.height()) - 4
+                p.drawRoundedRect(QRectF(x, y, bw, 2), 1, 1)
+
+
 class PadGrid(QWidget):
     reorder = Signal(str, int)   # sound id, new index
     files_dropped = Signal(list)
+    image_dropped = Signal(str, str)   # sound id, picture file dropped on its pad
 
     def __init__(self):
         super().__init__()
@@ -284,6 +397,10 @@ class PadGrid(QWidget):
         super().resizeEvent(e)
         self.relayout()
 
+    def pad_at(self, pos) -> Pad | None:
+        return next((p for p in self.pads if p.isVisible() and p.geometry().contains(pos)),
+                    None)
+
     def dragEnterEvent(self, e):
         md = e.mimeData()
         if md.hasFormat(PAD_MIME) or md.hasUrls():
@@ -305,6 +422,11 @@ class PadGrid(QWidget):
             e.acceptProposedAction()
         elif md.hasUrls():
             files = [u.toLocalFile() for u in md.urls() if u.isLocalFile()]
+            pad = self.pad_at(e.position().toPoint())
+            if pad is not None and len(files) == 1 and thumbs.is_image(files[0]):
+                self.image_dropped.emit(pad.meta.id, files[0])
+                e.acceptProposedAction()
+                return
             expanded = []
             for f in files:
                 pth = Path(f)

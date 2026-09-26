@@ -310,6 +310,18 @@ def _gamepad(p, fill):
         fill(dot)
 
 
+def _image(p, fill):
+    """A picture: frame, sun, mountains."""
+    p.drawRoundedRect(QRectF(3, 4, 18, 16), 2.5, 2.5)
+    sun = QPainterPath()
+    sun.addEllipse(QPointF(8.5, 9), 1.8, 1.8)
+    fill(sun)
+    path = QPainterPath(QPointF(3.5, 17.5))
+    for pt in ((9, 12.5), (13, 16), (16, 13), (20.5, 17.5)):
+        path.lineTo(*pt)
+    p.drawPath(path)
+
+
 SHAPES = {
     "sounds": _grid, "browser": _globe, "voice": _mask, "setup": _sliders, "wave": _wave,
     "mic": _mic, "headphones": _headphones, "volume": _volume, "ear": _ear,
@@ -318,7 +330,7 @@ SHAPES = {
     "back": _arrow("back"), "forward": _arrow("forward"), "reload": _reload,
     "speech": _speech, "cable": _cable, "check": _check, "warn": _warn, "folder": _folder,
     "next": _next, "edit": _edit, "trash": _trash, "keyboard": _keyboard,
-    "palette": _palette, "gamepad": _gamepad,
+    "palette": _palette, "gamepad": _gamepad, "image": _image,
 }
 
 

@@ -30,6 +30,7 @@ log = logging.getLogger(__name__)
 APP_DIR = Path(os.environ.get("APPDATA", Path.home())) / "Soundboard"
 SOUNDS_DIR = APP_DIR / "sounds"
 CACHE_DIR = APP_DIR / "cache"
+THUMBS_DIR = APP_DIR / "thumbs"   # pad pictures (soundboard.thumbs)
 CONFIG_PATH = APP_DIR / "config.json"
 CONFIG_VERSION = 2
 CONFIG_BACKUPS = 3   # config.json.1 … .3, rotated on every save that changes something
@@ -62,6 +63,7 @@ class SoundMeta:
     duration: float = 0.0
     fingerprint: str = ""     # of the source file, to notice a re-import of the same file
     fx: dict = field(default_factory=dict)   # speed, pitch, EQ, boost… (soundboard.soundfx)
+    image: str = ""           # pad picture, absolute path (usually inside THUMBS_DIR)
 
 
 @dataclass
@@ -164,6 +166,8 @@ class Config:
             s = {k: v for k, v in s.items() if k in SoundMeta.__dataclass_fields__}
             if not Path(s["file"]).is_absolute():
                 s["file"] = str(SOUNDS_DIR / s["file"])   # stored relative to the library
+            if s.get("image") and not Path(s["image"]).is_absolute():
+                s["image"] = str(THUMBS_DIR / s["image"])
             sounds.append(SoundMeta(**s))
         # configs from before the setup guide existed: whoever already picked an output
         # device has been set up by hand, so don't greet them with the guide
@@ -179,6 +183,8 @@ class Config:
             p = Path(s["file"])  # whole %APPDATA%\Soundboard folder can move or be restored
             if p.is_absolute() and p.parent == SOUNDS_DIR:
                 s["file"] = p.name
+            if s["image"] and Path(s["image"]).parent == THUMBS_DIR:
+                s["image"] = Path(s["image"]).name
         return d
 
     def save(self) -> bool:
@@ -483,10 +489,18 @@ def duplicate(meta: SoundMeta, name: str) -> SoundMeta:
             shutil.copy2(cache_path(meta.id), cache_path(sid))
     except OSError:
         log.debug("couldn't copy the cache for %s", meta.id, exc_info=True)
+    image = meta.image
+    if image and Path(image).parent == THUMBS_DIR:   # its own copy, like the audio
+        try:
+            image = str(THUMBS_DIR / f"{sid}{Path(image).suffix}")
+            shutil.copy2(meta.image, image)
+        except OSError:
+            log.debug("couldn't copy the picture of %s", meta.id, exc_info=True)
+            image = ""
     return SoundMeta(id=sid, name=name[:40], file=str(dest), volume=meta.volume,
                      mode=meta.mode, loop=meta.loop, color=meta.color,
                      level_gain=meta.level_gain, duration=meta.duration,
-                     fingerprint="", fx=dict(meta.fx))
+                     fingerprint="", fx=dict(meta.fx), image=image)
 
 
 def delete_file(meta: SoundMeta):
@@ -494,6 +508,8 @@ def delete_file(meta: SoundMeta):
     try:
         if p.parent == SOUNDS_DIR:
             p.unlink(missing_ok=True)
+        if meta.image and Path(meta.image).parent == THUMBS_DIR:
+            Path(meta.image).unlink(missing_ok=True)
         for c in CACHE_DIR.glob(f"{meta.id}*.npy"):
             if c.stem == meta.id or c.stem.startswith(meta.id + "."):
                 c.unlink(missing_ok=True)

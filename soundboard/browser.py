@@ -53,7 +53,7 @@ from shiboken6 import isValid as qt_valid
 
 from soundboard.adblocker import YOUTUBE_JS, AdBlocker, hide_css_js
 from soundboard.engine import SR
-from soundboard import ytdl
+from soundboard import thumbs, ytdl
 from soundboard.library import (APP_DIR, MAX_SECONDS, PAD_COLORS, fingerprint, import_file,
                                 trim_silence)
 from soundboard.ui import icons
@@ -1407,6 +1407,8 @@ class BrowserTab(QWidget):
                 raise ytdl.DownloadError(f"It's already in your Sounds as “{known[fp]}”.")
             meta, data = import_file(str(path), color)
             meta.name = title[:40]
+            if (pic := thumbs.find_in(path.parent)) is not None:
+                meta.image = thumbs.store(pic, meta.id)   # the video's thumbnail
             self.engine.prepare(meta.id, data)
             self.sound_ready.emit(meta, data)
             self._dl_msg.emit("ok", f"✓ Added “{meta.name}” ({meta.duration:.0f}s) "

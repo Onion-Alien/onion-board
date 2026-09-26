@@ -19,7 +19,7 @@ import numpy as np
 from PySide6.QtCore import Qt, Signal
 from PySide6.QtWidgets import QFrame, QHBoxLayout, QLabel, QPushButton
 
-from soundboard import ytdl
+from soundboard import thumbs, ytdl
 from soundboard.library import (SR, decode, fingerprint, import_file, level_gain, to_int16)
 from soundboard.ui import icons
 from soundboard.ui.widgets import fmt_time
@@ -185,6 +185,8 @@ class LinkBar(QFrame):
             if fp and fp in known:
                 raise ytdl.DownloadError(f"It's already in your Sounds as “{known[fp]}”.")
             meta, data = import_file(str(path), color)
+            if (pic := thumbs.find_in(Path(path).parent)) is not None:
+                meta.image = thumbs.store(pic, meta.id)   # the video's thumbnail
             self.engine.prepare(meta.id, data)
             self._msg.emit("added", url, (meta, data, title))
         except Exception as e:  # noqa: BLE001 - shown in the bar, logged
