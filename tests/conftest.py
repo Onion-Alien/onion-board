@@ -16,5 +16,15 @@ def app_dir(tmp_path, monkeypatch):
     import library
     monkeypatch.setattr(library, "APP_DIR", tmp_path)
     monkeypatch.setattr(library, "SOUNDS_DIR", tmp_path / "sounds")
+    monkeypatch.setattr(library, "CACHE_DIR", tmp_path / "cache")
     monkeypatch.setattr(library, "CONFIG_PATH", tmp_path / "config.json")
     return tmp_path
+
+
+@pytest.fixture(autouse=True)
+def _never_touch_real_appdata(monkeypatch, tmp_path):
+    """Any test that forgets `app_dir` still can't write into %APPDATA%\\Soundboard."""
+    import library
+    for name in ("APP_DIR", "SOUNDS_DIR", "CACHE_DIR", "CONFIG_PATH"):
+        if getattr(library, name).is_relative_to(library.APP_DIR.parent):
+            monkeypatch.setattr(library, name, tmp_path / "guard" / name.lower())

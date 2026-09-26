@@ -97,9 +97,10 @@ decode anything; it's safe to delete and is rebuilt as needed.
 | `library.py` | decoding (bounded to 15 min), the int16 decoded-audio cache, loudness levelling, imports and clips (FLAC), config |
 | `theme.py` | colour themes (tokens → stylesheet, also read by the painted widgets) and the logo |
 | `settings.py` | Settings window, global hotkey actions, hotkey capture dialog |
+| `wheelguard.py` | mouse wheel scrolls the page instead of changing sliders / dropdowns (installed per widget) |
 | `make_icon.py` | regenerates `soundboard.ico` (shortcut icon) from the logo in `theme.py` |
 | `testcheck.py` | analysis for the Record-6s test (finds your voice in the output by cross-correlation) |
-| `tests/` | pytest suite for the device-free parts: ring buffer, engine mixing/guards/watchdog, hotkey parsing, EQ, levelling, config, test analysis |
+| `tests/` | pytest suite: ring buffer, engine mixing/guards/watchdog, cache and imports, recorder, hotkey parsing, EQ, levelling, config, test analysis, and the main window built on Qt's offscreen platform (no window, no devices, no hotkeys) |
 
 Developing:
 

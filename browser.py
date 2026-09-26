@@ -33,6 +33,7 @@ from shiboken6 import delete as qt_delete
 
 from engine import SR
 from library import APP_DIR, MAX_SECONDS, trim_silence
+from wheelguard import no_wheel
 
 log = logging.getLogger(__name__)
 
@@ -379,6 +380,7 @@ class BrowserTab(QWidget):
         self.vol.setRange(0, 300)
         self.vol.setFixedWidth(110)
         self.vol.setToolTip("Browser volume (for them and for you)")
+        no_wheel(self.vol)
         self.vol_lbl = QLabel()
         self.vol_lbl.setFixedWidth(42)
         self.vol.valueChanged.connect(self._on_vol)

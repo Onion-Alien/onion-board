@@ -8,6 +8,7 @@ from PySide6.QtWidgets import (QCheckBox, QComboBox, QDialog, QFrame, QGridLayou
 
 import theme
 import winkeys
+from wheelguard import no_wheel
 from winkeys import Hotkeys
 
 # Global hotkey actions: (config attribute, action id, label, what it does).
@@ -278,6 +279,7 @@ class SettingsDialog(QDialog):
         lat.addItem("Safer — bigger buffers", "high")
         lat.setCurrentIndex(max(0, lat.findData(self.mw.cfg.latency)))
         lat.currentIndexChanged.connect(lambda i: self.mw.set_latency(lat.itemData(i)))
+        no_wheel(lat)
         cv.addWidget(lat)
         e = self.mw.engine
         xr = sum(e.xruns.values())

@@ -21,15 +21,15 @@ os.environ.setdefault("QT_WIDGETS_RHI", "1")
 
 import numpy as np
 import sounddevice as sd
-from PySide6.QtCore import QEvent, QMimeData, QObject, QPoint, QRectF, Qt, QTimer, Signal
-from PySide6.QtNetwork import QLocalServer, QLocalSocket
+from PySide6.QtCore import (QMimeData, QObject, QPoint, QPropertyAnimation, QRectF, Qt, QTimer,
+                            Signal)
 from PySide6.QtGui import QColor, QDrag, QFont, QPainter, QPainterPath, QPen
-from PySide6.QtWidgets import (QAbstractScrollArea, QAbstractSlider, QAbstractSpinBox,
-                               QApplication, QCheckBox, QComboBox, QDialog, QDialogButtonBox,
-                               QFileDialog, QFormLayout, QFrame, QGridLayout, QHBoxLayout,
-                               QLabel, QLineEdit, QMainWindow, QMenu, QMessageBox, QPushButton,
-                               QScrollArea, QScrollBar, QSlider, QSpinBox, QStyle, QTabWidget,
-                               QVBoxLayout, QWidget)
+from PySide6.QtNetwork import QLocalServer, QLocalSocket
+from PySide6.QtWidgets import (QApplication, QCheckBox, QComboBox, QDialog, QDialogButtonBox,
+                               QFileDialog, QFormLayout, QFrame, QGraphicsOpacityEffect,
+                               QGridLayout, QHBoxLayout, QLabel, QLineEdit, QMainWindow, QMenu,
+                               QMessageBox, QPushButton, QScrollArea, QSlider, QSpinBox, QStyle,
+                               QTabWidget, QVBoxLayout, QWidget)
 
 import applog
 import engine as eng
@@ -47,6 +47,7 @@ from library import (APP_DIR, AUDIO_EXTS, PAD_COLORS, Config, SoundMeta, delete_
 from settings import HOTKEY_ACTIONS, HotkeyDialog, SettingsDialog, pretty_key
 from testcheck import analyze as analyze_output
 from testcheck import summary_html
+from wheelguard import no_wheel
 from winkeys import Hotkeys
 
 log = logging.getLogger("ui")
@@ -82,23 +83,6 @@ class Meter(QWidget):
                 col = "#ff4d4f"
             p.setBrush(QColor(col))
             p.drawRoundedRect(QRectF(0, 0, r.width() * frac, r.height()), 4, 4)
-
-
-class NoWheelChanges(QObject):
-    """Scrolling over a dropdown / slider / number box scrolls the page instead of
-    changing the value. Values only change by clicking or dragging."""
-
-    def eventFilter(self, obj, ev):
-        if ev.type() == QEvent.Wheel and isinstance(
-                obj, (QComboBox, QAbstractSpinBox, QAbstractSlider)) \
-                and not isinstance(obj, QScrollBar):
-            w = obj.parentWidget()
-            while w is not None and not isinstance(w, QAbstractScrollArea):
-                w = w.parentWidget()
-            if w is not None:
-                QApplication.sendEvent(w.verticalScrollBar(), ev)
-            return True
-        return False
 
 
 class EqCurve(QWidget):
@@ -391,6 +375,7 @@ class EditDialog(QDialog):
         self.vol = QSlider(Qt.Horizontal)
         self.vol.setRange(0, 200)
         self.vol.setValue(int(meta.volume * 100))
+        no_wheel(self.vol)
         self.vol_lbl = QLabel()
         self.vol.valueChanged.connect(lambda v: self.vol_lbl.setText(f"{v}%"))
         self.vol_lbl.setText(f"{self.vol.value()}%")
@@ -404,6 +389,7 @@ class EditDialog(QDialog):
         self.mode.addItem("Overlap — every press plays a new copy", "overlap")
         self.mode.addItem("Toggle — press again stops it", "toggle")
         self.mode.setCurrentIndex(max(0, self.mode.findData(meta.mode)))
+        no_wheel(self.mode)
         form.addRow("On press", self.mode)
 
         self.loop = QCheckBox("Loop until stopped")
@@ -490,6 +476,8 @@ class MainWindow(QMainWindow):
         self.engine = Engine()
         self.audio: dict[str, np.ndarray] = {}
         self.pads: dict[str, Pad] = {}
+        self._meta: dict[str, SoundMeta] = {}   # id -> meta, rebuilt when the list changes
+        self._index()
         self.hotkeys = Hotkeys()
         self.hotkeys.fired.connect(self.on_hotkey)
         self.bridge = Bridge()
@@ -504,7 +492,18 @@ class MainWindow(QMainWindow):
         self._seeking = False
         self._tick_n = 0                  # ticks since start (the watchdog runs every 30th)
         self._xruns_shown = 0             # drop-out count last written to the status line
+        self._talk_until = 0.0            # "hearing you" indicator holds until this time
+        self._talk_shown: bool | None = None
+        self.virtual_mic: str | None = None
+        self._cap: list[np.ndarray] = []  # Record-6s test: capture of the cable's far end
+        self._cap_stream = None
+        self._cap_rate: int | None = None
+        self._cap_name: str | None = None
+        self._rec_started = 0.0
         self.engine.latency = self.cfg.latency if self.cfg.latency in ("low", "high") else "low"
+        self._save_timer = QTimer(self)
+        self._save_timer.setSingleShot(True)
+        self._save_timer.timeout.connect(self.cfg.save)
 
         self._build_ui()
         self._init_devices()
@@ -563,6 +562,16 @@ class MainWindow(QMainWindow):
         self.mic_banner.setCursor(Qt.PointingHandCursor)
         self.mic_banner.clicked.connect(lambda: self.btn_check.setChecked(False))
         self.mic_banner.hide()
+        # pulse: an opacity animation, not a stylesheet rewrite 30x a second (each
+        # setStyleSheet re-parses and re-polishes the widget)
+        self._banner_fx = QGraphicsOpacityEffect(self.mic_banner)
+        self.mic_banner.setGraphicsEffect(self._banner_fx)
+        self._pulse = QPropertyAnimation(self._banner_fx, b"opacity", self)
+        self._pulse.setDuration(1200)
+        self._pulse.setStartValue(1.0)
+        self._pulse.setKeyValueAt(0.5, 0.55)
+        self._pulse.setEndValue(1.0)
+        self._pulse.setLoopCount(-1)
         outer.addWidget(self.mic_banner)
         self.tabs = QTabWidget()
         self.tabs.setDocumentMode(True)
@@ -592,6 +601,7 @@ class MainWindow(QMainWindow):
         size.setFixedWidth(90)
         size.setToolTip("Pad size")
         size.valueChanged.connect(self.set_pad_width)
+        no_wheel(size)
         bar.addWidget(QLabel("Size"))
         bar.addWidget(size)
         left.addLayout(bar)
@@ -629,6 +639,7 @@ class MainWindow(QMainWindow):
         self.seek.sliderPressed.connect(lambda: setattr(self, "_seeking", True))
         self.seek.sliderReleased.connect(self.do_seek)
         self.seek.valueChanged.connect(self._seek_preview)
+        no_wheel(self.seek)
         self.np_time = QLabel("0:00 / 0:00")
         self.np_time.setFixedWidth(84)
         self.np_time.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
@@ -797,6 +808,7 @@ class MainWindow(QMainWindow):
         alabel("My real microphone:")
         self.cb_mic = QComboBox()
         pv.addWidget(self.cb_mic)
+        no_wheel(self.cb_main, self.cb_mon, self.cb_mic)
         ref = QPushButton("⟳ Re-scan devices")
         ref.setObjectName("small")
         ref.clicked.connect(self.refresh_devices)
@@ -863,6 +875,7 @@ class MainWindow(QMainWindow):
         self.cb_eq_preset.addItems(list(EQ_PRESETS))
         self.cb_eq_preset.addItem("Custom")
         pv.addWidget(self.cb_eq_preset)
+        no_wheel(self.cb_eq_target, self.cb_eq_preset)
 
         self.eq_curve = EqCurve()
         pv.addWidget(self.eq_curve)
@@ -888,6 +901,7 @@ class MainWindow(QMainWindow):
             s.valueChanged.connect(self._on_eq_slider)
             self.eq_sliders.append(s)
             self.eq_vals.append(val)
+        no_wheel(*self.eq_sliders)
         pv.addLayout(grid)
         hint("Low = bass (left) · high = treble (right). Drag up to boost, down to cut. "
              "Double-click the curve to reset.")
@@ -979,6 +993,7 @@ class MainWindow(QMainWindow):
         s = QSlider(Qt.Horizontal)
         s.setRange(0, self.SLIDER_MAX)
         v.addWidget(s)
+        no_wheel(s, spin)
 
         def paint_spin(pct):
             col = "" if pct <= 100 else "color:#ffb020;" if pct <= 300 else "color:#ff4d4f;"
@@ -1132,7 +1147,7 @@ class MainWindow(QMainWindow):
             mic = f"🎤  Your mic  <b style='color:{ok}'>✓ hearing you</b>"
         else:
             mic = f"🎤  Your mic  <b style='color:{ok}'>✓</b>"
-        vm = getattr(self, "virtual_mic", None)
+        vm = self.virtual_mic
         any_cable = bool(eng.virtual_outputs())
         if not any_cable:
             state = "missing"
@@ -1174,7 +1189,7 @@ class MainWindow(QMainWindow):
             "restart your PC.")
 
     def open_windows_mic(self):
-        vm = getattr(self, "virtual_mic", None) or "your virtual cable"
+        vm = self.virtual_mic or "your virtual cable"
         subprocess.Popen(["control", "mmsys.cpl,,1"], creationflags=0x08000000)
         QMessageBox.information(
             self, "Game with no mic setting",
@@ -1192,10 +1207,6 @@ class MainWindow(QMainWindow):
         self._save_later()
 
     def _save_later(self):
-        if not hasattr(self, "_save_timer"):
-            self._save_timer = QTimer(self)
-            self._save_timer.setSingleShot(True)
-            self._save_timer.timeout.connect(self.cfg.save)
         self._save_timer.start(400)
 
     def on_level_toggle(self, b):
@@ -1305,8 +1316,12 @@ class MainWindow(QMainWindow):
         self.browser.pause_media()
 
     # ------------------------------------------------------------------ sounds
+    def _index(self):
+        """Rebuild the id -> meta lookup (call after any change to cfg.sounds)."""
+        self._meta = {m.id: m for m in self.cfg.sounds}
+
     def meta(self, sid) -> SoundMeta | None:
-        return next((m for m in self.cfg.sounds if m.id == sid), None)
+        return self._meta.get(sid)
 
     def gain_for(self, m: SoundMeta, volume=None) -> float:
         v = m.volume if volume is None else volume
@@ -1377,19 +1392,25 @@ class MainWindow(QMainWindow):
                              preview=True)
 
     def _rebuild_pads(self):
-        for p in self.pads.values():
+        """Sync the pad widgets with cfg.sounds: keep the ones that still exist, create
+        the new ones, drop the removed ones (no more tearing down every pad on each
+        import, reorder or delete)."""
+        self._index()
+        keep = {m.id for m in self.cfg.sounds}
+        for sid in [s for s in self.pads if s not in keep]:
+            p = self.pads.pop(sid)
             p.setParent(None)
             p.deleteLater()
-        self.pads = {}
         ordered = []
         for m in self.cfg.sounds:
-            p = Pad(m, self.cfg.pad_width)
-            p.clicked.connect(self.play)
-            p.menu.connect(self.pad_menu)
-            if m.id in self.audio:
-                p.state = "ready"
+            p = self.pads.get(m.id)
+            if p is None:
+                p = Pad(m, self.cfg.pad_width)
+                p.clicked.connect(self.play)
+                p.menu.connect(self.pad_menu)
+                self.pads[m.id] = p
+            p.state = "ready" if m.id in self.audio else p.state
             p.selected = m.id == self.current
-            self.pads[m.id] = p
             ordered.append(p)
         self.grid.set_pads(ordered)
         self.apply_filter(self.search.text())
@@ -1419,7 +1440,8 @@ class MainWindow(QMainWindow):
                     self.bridge.loaded.emit(m.id, None, str(e))
             prune_cache(keep)
             log.info("loaded %d sounds in %.1fs", len(todo), time.monotonic() - t0)
-        threading.Thread(target=run, daemon=True, name="load").start()
+        self._load_thread = threading.Thread(target=run, daemon=True, name="load")
+        self._load_thread.start()
 
     def on_loaded(self, sid, data, err):
         p = self.pads.get(sid)
@@ -1472,6 +1494,7 @@ class MainWindow(QMainWindow):
         self._pending_imports -= 1
         if meta is not None:
             self.cfg.sounds.append(meta)
+            self._index()
             self.audio[meta.id] = data
         else:
             self._import_errors.append(err)
@@ -1493,6 +1516,7 @@ class MainWindow(QMainWindow):
             QMessageBox.warning(self, "Couldn't save clip", str(e))
             return
         self.cfg.sounds.append(meta)
+        self._index()
         self.audio[meta.id] = data
         threading.Thread(target=self.engine.prepare, args=(meta.id, data), daemon=True).start()
         self.cfg.save()
@@ -1575,6 +1599,11 @@ class MainWindow(QMainWindow):
         self.btn_check.setText("🔴  LISTENING TO MY MIC — click to stop" if on
                                else "🎤  Listen to my mic output")
         self.mic_banner.setVisible(on)
+        if on:
+            self._pulse.start()   # impossible to miss, and cheap
+        else:
+            self._pulse.stop()
+            self._banner_fx.setOpacity(1.0)
         self.setWindowTitle("🔴 MIC LIVE IN HEADPHONES — Soundboard" if on else "Soundboard")
         self.mic_lbl.setStyleSheet("color:#ff4d4f; font-weight:700;" if on else "")
         self.mic_meter.hot = on
@@ -1657,13 +1686,10 @@ class MainWindow(QMainWindow):
         talking = e.mic_stream is not None and e.level_mic > 0.05
         if talking:
             self._talk_until = time.monotonic() + 0.8
-        talking = time.monotonic() < getattr(self, "_talk_until", 0)
-        if talking != getattr(self, "_talk_shown", None):
+        talking = time.monotonic() < self._talk_until
+        if talking != self._talk_shown:
             self._talk_shown = talking
             self._update_flow(talking)
-        if e.mic_check:  # pulse the banner so it's impossible to miss
-            a = int(160 + 95 * (0.5 + 0.5 * np.sin(time.monotonic() * 5)))
-            self.mic_banner.setStyleSheet(f"background: rgba(229,57,53,{a});")
         e.level_main *= 0.9
         e.level_mic *= 0.9
 
@@ -1812,8 +1838,6 @@ def main():
         log.info("another Soundboard is running; asked it to come to the front")
         sys.exit(0)
     app.setStyle("Fusion")
-    wheel_guard = NoWheelChanges(app)
-    app.installEventFilter(wheel_guard)
     holder = {}
     app.instance_server = listen_for_second_launch(app, lambda: holder.get("w"))  # kept alive
     w = holder["w"] = MainWindow()

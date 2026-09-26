@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+- **Lighter UI.** The mouse-wheel guard is installed on the dropdowns, sliders and
+  number boxes themselves instead of on the whole application, where it ran a Python
+  call for every event of every object (mouse moves, paints, the web view's stream).
+  The red mic-check banner pulses with an opacity animation instead of rewriting its
+  stylesheet 30 times a second. Importing, reordering or deleting a sound updates the
+  pad grid in place instead of recreating every pad. Sound lookups are a dict.
 - **Faster starts, half the RAM.** Each sound is decoded once and kept in
   `%APPDATA%\Soundboard\cache\` as int16 at 48 kHz; after that a sound loads by reading
   one file instead of decoding and resampling. In memory a 4-minute song is 46 MB
