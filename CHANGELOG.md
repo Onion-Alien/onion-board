@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+- **Voice tab redesigned so it's obvious how to use it.** The voice changer comes
+  first: one big switch (green when on: everyone hears your changed voice), a grid
+  of voices to click (Chipmunk, Robot, Old telephone…; clicking one turns it on), a
+  *Hear my voice* button and a mic meter right there, and the individual effects
+  folded under *Fine-tune effects*. It says plainly that there's nothing to start:
+  it works on your mic whenever it's on. Live voice-to-speech is now *Talk as a
+  computer voice*, with its rarely-changed options under *More options*.
+
 ## 0.2.0 — 2026-09-26
 
 ### Added

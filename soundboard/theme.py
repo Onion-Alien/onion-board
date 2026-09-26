@@ -148,6 +148,10 @@ QTabBar::tab { background:transparent; color:$muted; padding:8px 16px; margin-ri
 QTabBar::tab:selected { color:$text; border-bottom:2px solid $accent; }
 QTabBar::tab:hover { color:$text; }
 QPushButton#live { font-weight:700; }
+QPushButton#voicetile { text-align:left; padding:9px 10px; border-radius:10px; }
+QPushButton#voicetile:checked { background:$accent; color:$on_accent; border:1px solid $accent_hi; font-weight:700; }
+QPushButton#power { font-weight:700; }
+QPushButton#power:checked, QFrame#card QPushButton#power:checked { background:#13a35a; border:1px solid #13ce66; color:white; }
 QPushButton#live:checked { background:#e53935; border:1px solid #ff6b6b; color:white; }
 QPushButton#rec:checked { background:#e53935; border:1px solid #ff6b6b; color:white; font-weight:700; }
 QPushButton#lite:checked { background:#13a35a; border:1px solid #13ce66; color:white; font-weight:700; }

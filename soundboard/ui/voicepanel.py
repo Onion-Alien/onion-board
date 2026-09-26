@@ -9,9 +9,10 @@ from __future__ import annotations
 import os
 import threading
 
-from PySide6.QtCore import Qt, Signal
-from PySide6.QtWidgets import (QCheckBox, QComboBox, QFrame, QGridLayout, QHBoxLayout, QLabel,
-                               QLineEdit, QPushButton, QScrollArea, QSlider, QVBoxLayout, QWidget)
+from PySide6.QtCore import Qt, QTimer, Signal
+from PySide6.QtWidgets import (QButtonGroup, QCheckBox, QComboBox, QFrame, QGridLayout,
+                               QHBoxLayout, QLabel, QLineEdit, QPushButton, QScrollArea, QSlider,
+                               QVBoxLayout, QWidget)
 
 from soundboard import modules as mods
 from soundboard import voicefx
@@ -20,6 +21,7 @@ from soundboard.speech.live import SpeechController
 from soundboard.ui import icons
 from soundboard.ui.panel import (VolumeControl, bar, card, hint_label, icon_label,
                                  section_label, vsep)
+from soundboard.ui.widgets import Meter
 from soundboard.wheelguard import no_wheel
 
 CUSTOM = "Custom"
@@ -142,38 +144,137 @@ class EffectRow(QWidget):
         self.err.setVisible(bool(msg))
 
 
+PRESET_ICONS = {"Chipmunk": "🐿️", "Deep voice": "🐻", "Giant / demon": "👹", "Robot": "🤖",
+                "Alien": "👽", "Walkie-talkie": "📻", "Old telephone": "☎️", "Megaphone": "📢",
+                "Cave": "🦇", "Stadium announcer": "🏟️"}
+POWER_TEXT = {False: "Voice changer is OFF  —  pick a voice below to turn it on",
+              True: "ON  —  everyone hears your changed voice"}
+
+
 class VoiceFxPanel(QWidget):
-    """`changed(spec)` with spec = {"enabled", "preset", "effects": {type: {...}}}."""
+    """The voice changer: one big on/off switch, a grid of voices to pick from, a
+    way to hear yourself, and (folded away) the individual effects for fine-tuning.
+
+    `changed(spec)` with spec = {"enabled", "preset", "effects": {type: {...}}}.
+    `hear_toggled(bool)` asks the window to switch "Hear what they hear" on or off."""
     changed = Signal(dict)
+    hear_toggled = Signal(bool)
+
+    COLS = 3
 
     def __init__(self, spec: dict):
         super().__init__()
         spec = {**default_fx_spec(), **(spec or {})}
+        self._preset = spec.get("preset") if spec.get("preset") in voicefx.PRESETS else CUSTOM
         v = QVBoxLayout(self)
         v.setContentsMargins(0, 0, 0, 0)
-        v.setSpacing(6)
+        v.setSpacing(8)
         v.addWidget(section_label("VOICE CHANGER"))
-        row = QHBoxLayout()
-        self.chk_on = QCheckBox("Voice changer on")
-        self.chk_on.setChecked(spec["enabled"])
-        row.addWidget(self.chk_on)
-        self.cb_preset = QComboBox()
-        self.cb_preset.addItems(list(voicefx.PRESETS) + [CUSTOM])
-        self.cb_preset.setCurrentText(spec.get("preset") if spec.get("preset") in
-                                      voicefx.PRESETS else CUSTOM)
-        no_wheel(self.cb_preset)
-        row.addWidget(self.cb_preset, 1)
-        v.addLayout(row)
-        v.addWidget(hint_label("Changes your mic for everyone. Use “Hear what they hear” at "
-                               "the bottom to hear it yourself."))
-        self.rows: dict[str, EffectRow] = {}
-        self.box = QVBoxLayout()
+        v.addWidget(hint_label("Changes your real voice as you talk, live. There's nothing "
+                               "to start: while it's on, Discord and your game hear the "
+                               "changed voice every time you speak."))
+
+        # ---- the switch
+        self.btn_power = QPushButton()
+        self.btn_power.setObjectName("power")
+        self.btn_power.setCheckable(True)
+        self.btn_power.setMinimumHeight(42)
+        self.btn_power.setCursor(Qt.PointingHandCursor)
+        icons.set_icon(self.btn_power, "mic", checked_color="#ffffff")
+        self.btn_power.setChecked(spec["enabled"])
+        self.btn_power.toggled.connect(self._on_power)
+        v.addWidget(self.btn_power)
+
+        # ---- pick a voice
+        v.addWidget(QLabel("<b>Pick a voice</b>"))
+        grid = QGridLayout()
+        grid.setSpacing(6)
+        self.tiles = QButtonGroup(self)
+        self.tiles.setExclusive(True)
+        self._tile: dict[str, QPushButton] = {}
+        names = list(voicefx.PRESETS) + [CUSTOM]
+        for i, name in enumerate(names):
+            label = (f"{PRESET_ICONS.get(name, '🎛️')}  {name}" if name != CUSTOM
+                     else "🎚️  My own mix")
+            b = QPushButton(label)
+            b.setObjectName("voicetile")
+            b.setCheckable(True)
+            b.setCursor(Qt.PointingHandCursor)
+            b.setToolTip("Your own settings from Fine-tune below" if name == CUSTOM else
+                         f"Sound like: {name}. Click to turn the voice changer on with it.")
+            b.clicked.connect(lambda _=False, n=name: self.pick(n))
+            self.tiles.addButton(b)
+            grid.addWidget(b, i // self.COLS, i % self.COLS)
+            self._tile[name] = b
+        for c in range(self.COLS):
+            grid.setColumnStretch(c, 1)
+        v.addLayout(grid)
+
+        # ---- hear it
+        hear = QHBoxLayout()
+        hear.setSpacing(8)
+        self.btn_hear = QPushButton("Hear my voice (only me)")
+        self.btn_hear.setObjectName("miccheck")
+        self.btn_hear.setCheckable(True)
+        self.btn_hear.setToolTip("Plays your mic, changed, into your headphones, the same "
+                                 "as “Hear what they hear” at the bottom. Click again to stop.")
+        icons.set_icon(self.btn_hear, "ear", checked_color="#ffffff")
+        self.btn_hear.toggled.connect(self.hear_toggled)
+        hear.addWidget(self.btn_hear)
+        hear.addWidget(icon_label("mic", "Your mic level"))
+        self.meter = Meter()
+        self.meter.setToolTip("Your mic level: it moves when you talk")
+        hear.addWidget(self.meter, 1)
+        v.addLayout(hear)
+
+        # ---- fine-tune (folded away)
+        self.btn_more = QPushButton()
+        self.btn_more.setObjectName("small")
+        self.btn_more.setCheckable(True)
+        self.btn_more.toggled.connect(self._show_more)
+        v.addWidget(self.btn_more, 0, Qt.AlignLeft)
+        self.more = QWidget()
+        self.box = QVBoxLayout(self.more)
+        self.box.setContentsMargins(0, 0, 0, 0)
         self.box.setSpacing(4)
-        v.addLayout(self.box)
+        self.box.addWidget(hint_label("Tick effects and drag their sliders to make your own "
+                                      "voice. Changing anything here switches to "
+                                      "“My own mix”."))
+        v.addWidget(self.more)
+        self.rows: dict[str, EffectRow] = {}
         self._spec_effects = dict(spec.get("effects", {}))
         self.add_new_effects()
-        self.chk_on.toggled.connect(lambda _on: self._emit())
-        self.cb_preset.currentTextChanged.connect(self._on_preset)
+        self._show_more(False)
+        self._refresh()
+
+    # ------------------------------------------------------------------ public
+    @property
+    def preset(self) -> str:
+        return self._preset
+
+    def pick(self, name: str):
+        """Choose a voice (a preset name or CUSTOM) and turn the changer on."""
+        self._preset = name
+        fx = voicefx.PRESETS.get(name)
+        if fx is not None:
+            for t, r in self.rows.items():
+                r.load({"on": True, **fx[t]} if t in fx else None)
+        elif name == CUSTOM:
+            self.btn_more.setChecked(True)   # your own mix lives in Fine-tune
+        self.btn_power.blockSignals(True)
+        self.btn_power.setChecked(True)
+        self.btn_power.blockSignals(False)
+        self._refresh()
+        self._emit()
+
+    def set_hearing(self, on: bool):
+        """Mirror the window's "Hear what they hear" state."""
+        self.btn_hear.blockSignals(True)
+        self.btn_hear.setChecked(on)
+        self.btn_hear.blockSignals(False)
+
+    def set_level(self, level: float):
+        self.meter.set_level(level)
 
     def add_new_effects(self):
         """Add rows for effect types registered since (modules loaded later)."""
@@ -186,31 +287,38 @@ class VoiceFxPanel(QWidget):
             self.rows[etype] = r
 
     def spec(self) -> dict:
-        return {"enabled": self.chk_on.isChecked(), "preset": self.cb_preset.currentText(),
+        return {"enabled": self.btn_power.isChecked(), "preset": self._preset,
                 "effects": {t: r.state() for t, r in self.rows.items()}}
 
     def show_errors(self, errors: dict[str, str]):
         for t, r in self.rows.items():
             r.set_error(errors.get(t, ""))
 
-    def _on_preset(self, name):
-        fx = voicefx.PRESETS.get(name)
-        if fx is None:
-            return self._emit()
-        for t, r in self.rows.items():
-            r.load({"on": True, **fx[t]} if t in fx else None)
-        if not self.chk_on.isChecked():
-            self.chk_on.setChecked(True)   # emits
-            return
+    # ------------------------------------------------------------------ internals
+    def _on_power(self, on: bool):
+        self._refresh()
         self._emit()
 
+    def _show_more(self, on: bool):
+        self.more.setVisible(on)
+        self.btn_more.setText("▾  Fine-tune effects" if on else "▸  Fine-tune effects")
+
+    def _refresh(self):
+        on = self.btn_power.isChecked()
+        self.btn_power.setText(POWER_TEXT[on])
+        # only a voice that's actually in use is highlighted
+        self.tiles.setExclusive(False)
+        for name, b in self._tile.items():
+            b.setChecked(on and name == self._preset)
+        self.tiles.setExclusive(True)
+
     def _edited(self):
-        self.cb_preset.blockSignals(True)
-        self.cb_preset.setCurrentText(CUSTOM)
-        self.cb_preset.blockSignals(False)
-        if not self.chk_on.isChecked() and any(r.chk.isChecked() for r in self.rows.values()):
-            self.chk_on.setChecked(True)   # touching an effect means you want it on (emits)
-            return
+        self._preset = CUSTOM
+        if not self.btn_power.isChecked() and any(r.chk.isChecked() for r in self.rows.values()):
+            self.btn_power.blockSignals(True)
+            self.btn_power.setChecked(True)   # touching an effect means you want it on
+            self.btn_power.blockSignals(False)
+        self._refresh()
         self._emit()
 
     def _emit(self):
@@ -249,10 +357,11 @@ class SpeechPanel(QWidget):
         v.setSpacing(6)
 
         # ---- live voice to speech: the main event
-        v.addWidget(section_label("VOICE-TO-SPEECH (LIVE)"))
-        v.addWidget(hint_label("Just talk. Each sentence is turned into text on this PC and "
-                               "spoken in the voice below, a second or two after you finish "
-                               "it, so others hear that voice instead of yours."))
+        v.addWidget(section_label("TALK AS A COMPUTER VOICE"))
+        v.addWidget(hint_label("Press Start and talk normally. Each sentence you say is typed "
+                               "out on this PC and read aloud by the computer voice below, a "
+                               "second or two after you finish it, so others hear that voice "
+                               "instead of yours. Press Stop when you're done."))
         self.live_box = QWidget()
         lv = QVBoxLayout(self.live_box)
         lv.setContentsMargins(0, 0, 0, 0)
@@ -303,6 +412,16 @@ class SpeechPanel(QWidget):
         self.sl_rate.setRange(-10, 10)
         self.sl_rate.setValue(int(self.s["rate"]))
         grid.addWidget(self.sl_rate, 1, 1)
+        grid.setColumnStretch(1, 1)
+        v.addLayout(grid)
+        self.btn_opts = QPushButton("▸  More options")
+        self.btn_opts.setObjectName("small")
+        self.btn_opts.setCheckable(True)
+        v.addWidget(self.btn_opts, 0, Qt.AlignLeft)
+        self.opts = QWidget()
+        ov = QVBoxLayout(self.opts)
+        ov.setContentsMargins(0, 0, 0, 0)
+        grid = QGridLayout()
         grid.addWidget(QLabel("Recognition"), 2, 0)
         self.cb_model = QComboBox()
         for label, key in MODELS:
@@ -316,12 +435,17 @@ class SpeechPanel(QWidget):
                                 "an 'Any language' recognition model for anything but English.")
         grid.addWidget(self.ed_lang, 3, 1)
         grid.setColumnStretch(1, 1)
-        v.addLayout(grid)
+        ov.addLayout(grid)
         no_wheel(self.cb_voice, self.sl_rate, self.cb_model)
-        self.chk_mute = QCheckBox("Mute my real mic while live")
+        self.chk_mute = QCheckBox("Mute my real mic while the computer voice is on")
         self.chk_mute.setToolTip("Others hear only the spoken voice, not your real one.")
         self.chk_mute.setChecked(self.s["mute_real_voice"])
-        v.addWidget(self.chk_mute)
+        ov.addWidget(self.chk_mute)
+        v.addWidget(self.opts)
+        self.opts.hide()
+        self.btn_opts.toggled.connect(lambda on: (
+            self.opts.setVisible(on),
+            self.btn_opts.setText("▾  More options" if on else "▸  More options")))
         self.tts_err = hint_label("")
         self.tts_err.setStyleSheet("color:#ff4d4f;")
         self.tts_err.hide()
@@ -457,7 +581,7 @@ class SpeechPanel(QWidget):
         self.b_live.blockSignals(True)
         self.b_live.setChecked(on)
         self.b_live.blockSignals(False)
-        self.b_live.setText("Stop" if on else "Start talking as the voice")
+        self.b_live.setText("Stop the computer voice" if on else "Start talking as the voice")
         for w in (self.cb_model, self.ed_lang):
             w.setEnabled(not on)
         self.lbl_state.setText(state)
@@ -568,21 +692,21 @@ class VoicePanel(QWidget):
         scroll.setWidget(page)
         outer.addWidget(scroll, 1)
 
-        # left: live voice-to-speech, the main feature
+        # left: the voice changer
+        self.fx = VoiceFxPanel(fx_spec or {})
+        self.fx.changed.connect(self._fx_changed)
+        fx_card, fv = card()
+        fv.addWidget(self.fx)
+        lcol.addWidget(fx_card)
+        lcol.addStretch(1)
+
+        # right: talk as a computer voice, then add-ons
         self.controller = SpeechController(engine, self.chain, lambda ev: None)
         self.speech = SpeechPanel(self.controller, speech or {}, self.modules)
         self.speech.changed.connect(self.speech_changed)
         live_card, lv = card()
         lv.addWidget(self.speech)
-        lcol.addWidget(live_card)
-        lcol.addStretch(1)
-
-        # right: voice changer, then add-ons
-        self.fx = VoiceFxPanel(fx_spec or {})
-        self.fx.changed.connect(self._fx_changed)
-        fx_card, fv = card()
-        fv.addWidget(self.fx)
-        rcol.addWidget(fx_card)
+        rcol.addWidget(live_card)
         self.addons = ModulesList()
         self.addons.refresh.connect(self.rescan_modules)
         self.addons.show_modules(self.modules)
@@ -593,6 +717,16 @@ class VoicePanel(QWidget):
 
         outer.addWidget(self.speech.say_bar)
         self.chain.configure(self.fx.spec())
+
+        # the voice changer's mic meter (only while the tab is showing)
+        self._meter_timer = QTimer(self)
+        self._meter_timer.timeout.connect(self._meter)
+        self._meter_timer.start(50)
+
+    def _meter(self):
+        if self.isVisible():
+            e = self.engine
+            self.fx.set_level(e.level_mic if e.mic_stream is not None else 0.0)
 
     def fit_steps(self):
         """What the main window may hide here when it gets small (ui/responsive.py)."""
@@ -624,5 +758,6 @@ class VoicePanel(QWidget):
         self.addons.show_modules(self.modules)
 
     def shutdown(self):
+        self._meter_timer.stop()
         self.controller.shutdown()
         self.engine.voice_chain = None

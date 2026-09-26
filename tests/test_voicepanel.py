@@ -39,7 +39,7 @@ def test_preset_turns_the_changer_on_and_configures_the_chain(panel):
     p, _ = panel
     seen = []
     p.fx_changed.connect(seen.append)
-    p.fx.cb_preset.setCurrentText("Robot")
+    p.fx.pick("Robot")
     spec = seen[-1]
     assert spec["enabled"] and spec["preset"] == "Robot"
     assert spec["effects"]["robot"]["on"] and not spec["effects"]["pitch"]["on"]
@@ -49,11 +49,29 @@ def test_preset_turns_the_changer_on_and_configures_the_chain(panel):
 
 def test_editing_a_slider_switches_to_custom(panel):
     p, _ = panel
-    p.fx.cb_preset.setCurrentText("Chipmunk")
+    p.fx.pick("Chipmunk")
     row = p.fx.rows["pitch"]
     row.sliders[0].slider.setValue(row.sliders[0].slider.value() - 3)
-    assert p.fx.cb_preset.currentText() == "Custom"
+    assert p.fx.preset == "Custom"
     assert p.fx.spec()["effects"]["pitch"]["semitones"] == 5
+
+
+def test_power_switch_and_hear_button(panel):
+    p, _ = panel
+    seen, hear = [], []
+    p.fx_changed.connect(seen.append)
+    p.fx.hear_toggled.connect(hear.append)
+    assert not p.fx.btn_power.isChecked() and "OFF" in p.fx.btn_power.text()
+    p.fx.pick("Deep voice")                  # picking a voice turns it on
+    assert p.fx.btn_power.isChecked() and "ON" in p.fx.btn_power.text()
+    assert p.fx._tile["Deep voice"].isChecked()
+    p.fx.btn_power.setChecked(False)         # the switch turns it off, voice kept
+    assert not seen[-1]["enabled"] and seen[-1]["preset"] == "Deep voice"
+    assert not p.fx._tile["Deep voice"].isChecked()   # nothing looks selected while off
+    p.fx.btn_hear.setChecked(True)
+    assert hear == [True]
+    p.fx.set_hearing(False)                  # mirrored from the window: no echo back
+    assert hear == [True] and not p.fx.btn_hear.isChecked()
 
 
 def test_saved_spec_loads_back(qapp, monkeypatch):

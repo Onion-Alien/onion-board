@@ -205,6 +205,9 @@ class MainWindow(QMainWindow):
 
         # ---- mixer strip: the things that apply whatever tab you're on
         rv.addWidget(self._build_mixer())
+        # the Voice tab's "Hear my voice" and the mixer's "Hear what they hear" are one switch
+        self.voice.fx.hear_toggled.connect(self.btn_check.setChecked)
+        self.btn_check.toggled.connect(self.voice.fx.set_hearing)
 
         self.status = QLabel()
         self.status.setWordWrap(True)
