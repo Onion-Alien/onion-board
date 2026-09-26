@@ -252,6 +252,7 @@ the launcher the shortcuts and PyInstaller use. The app is the `soundboard` pack
 | `soundboard/ui/responsive.py` | small windows: what hides, in which order, as the window shrinks |
 | `soundboard/ui/fit.py` | dialogs grow to fit their wrapped text instead of clipping it (`fit.watch(self)` in every dialog's `__init__`) |
 | `soundboard/ui/setupwizard.py` | the first-run guide with Bun (mic, headphones, cable, Discord) and the Steam help |
+| `soundboard/ui/bunnywidget.py` | Bun animated: bobs, blinks, talks along with your mic and throws music notes |
 | `soundboard/ui/overlay.py` | the in-game overlay: a click-through panel of pads driven by number keys |
 | `soundboard/ui/voicepanel.py` | the Voice tab: voice changer, text-to-speech, live voice-to-speech, add-ons list |
 | `soundboard/voicefx/` | the voice-effect chain and the built-in effects (pitch, robot, radio, …) |
