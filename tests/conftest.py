@@ -60,6 +60,12 @@ class _SilentOutputStream:
 if os.environ.get("SOUNDBOARD_TEST_REAL_AUDIO") != "1":
     import sounddevice
     sounddevice.OutputStream = _SilentOutputStream
+    # The browser tests autoplay tones in real pages; Chromium's own output would
+    # reach the default device before (or without) the soundboard's tap. Page audio
+    # still renders, so the tap still hears it.
+    flags = os.environ.get("QTWEBENGINE_CHROMIUM_FLAGS", "")
+    if "--mute-audio" not in flags:
+        os.environ["QTWEBENGINE_CHROMIUM_FLAGS"] = f"{flags} --mute-audio".strip()
 
 
 @pytest.fixture(scope="session")
