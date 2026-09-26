@@ -33,8 +33,11 @@ def _ellipse(p: QPainter, cx, cy, w, h, fill: QColor, pen: QPen | None = None, a
     p.restore()
 
 
-def draw_bunny(p: QPainter, rect: QRectF, prop: str | None = None):
-    """Draw Bun fitted (aspect kept, centred) into `rect`."""
+def draw_bunny(p: QPainter, rect: QRectF, prop: str | None = None, *,
+               blink: float = 0.0, mouth: float = 0.0, ears: float = 0.0):
+    """Draw Bun fitted (aspect kept, centred) into `rect`. The keywords pose Bun for
+    animation (ui/bunnywidget.py): `blink` 0..1 closes the eyes, `mouth` 0..1 opens
+    the mouth (talking), `ears` tilts both ears outward by that many degrees."""
     s = min(rect.width() / W, rect.height() / H)
     p.save()
     p.setRenderHint(QPainter.Antialiasing)
@@ -45,10 +48,14 @@ def draw_bunny(p: QPainter, rect: QRectF, prop: str | None = None):
     ink.setCapStyle(Qt.RoundCap)
 
     # ears (behind the head): the right one flops a little for character
-    _ellipse(p, 36, 26, 19, 50, FUR, ink, -10)
-    _ellipse(p, 36, 28, 9, 36, PINK, None, -10)
-    _ellipse(p, 66, 28, 19, 48, FUR, ink, 18)
-    _ellipse(p, 66, 30, 9, 34, PINK, None, 18)
+    for bx, cx, cy, h, a, tilt in ((36, 36, 26, 50, -10, -ears), (64, 66, 28, 48, 18, ears)):
+        p.save()
+        p.translate(bx, 48)   # pivot at the base of the ear, where it meets the head
+        p.rotate(tilt)
+        p.translate(-bx, -48)
+        _ellipse(p, cx, cy, 19, h, FUR, ink, a)
+        _ellipse(p, cx, cy + 2, 9, h - 14, PINK, None, a)
+        p.restore()
 
     # body, feet, head
     _ellipse(p, 50, 100, 50, 36, FUR, ink)
@@ -75,7 +82,14 @@ def draw_bunny(p: QPainter, rect: QRectF, prop: str | None = None):
 
     # face
     for x in (39, 61):
-        _ellipse(p, x, 62, 9, 11.5, INK)
+        if blink > 0.6:       # shut: a happy little arc
+            arc = QPainterPath(QPointF(x - 4.5, 62))
+            arc.quadTo(x, 65.5, x + 4.5, 62)
+            p.setPen(QPen(INK, 2.2, Qt.SolidLine, Qt.RoundCap))
+            p.setBrush(Qt.NoBrush)
+            p.drawPath(arc)
+            continue
+        _ellipse(p, x, 62, 9, 11.5 * (1 - blink), INK)
         _ellipse(p, x + 1.6, 59, 3.4, 3.8, QColor("white"))
         _ellipse(p, x - 1.6, 65.5, 1.6, 1.6, QColor("white"))
     _ellipse(p, 30, 72, 11, 6.5, CHEEK)
@@ -87,12 +101,17 @@ def draw_bunny(p: QPainter, rect: QRectF, prop: str | None = None):
     p.setPen(QPen(QColor("#e0708f"), 1.2, Qt.SolidLine, Qt.RoundCap, Qt.RoundJoin))
     p.setBrush(QColor("#ff8fae"))
     p.drawPath(nose)
-    mouth = QPainterPath(QPointF(44, 75))
-    mouth.quadTo(47, 79.5, 50, 75.5)
-    mouth.quadTo(53, 79.5, 56, 75)
-    p.setPen(QPen(INK, 1.8, Qt.SolidLine, Qt.RoundCap))
-    p.setBrush(Qt.NoBrush)
-    p.drawPath(mouth)
+    if mouth > 0.08:          # open, as if talking
+        oh = 2.5 + 6.5 * min(1.0, mouth)
+        _ellipse(p, 50, 76 + oh / 2, 7 + 2 * mouth, oh, QColor("#5a2238"), QPen(INK, 1.6))
+        _ellipse(p, 50, 76 + oh * 0.78, 4.5, oh * 0.4, QColor("#ff8fae"))
+    else:
+        path = QPainterPath(QPointF(44, 75))
+        path.quadTo(47, 79.5, 50, 75.5)
+        path.quadTo(53, 79.5, 56, 75)
+        p.setPen(QPen(INK, 1.8, Qt.SolidLine, Qt.RoundCap))
+        p.setBrush(Qt.NoBrush)
+        p.drawPath(path)
 
     _draw_prop(p, prop, ink)
     p.restore()
@@ -132,11 +151,14 @@ def _draw_prop(p: QPainter, prop: str | None, ink: QPen):
         _sparkle(p, 88, 12, 4, QColor("#1fb6ff"))
 
 
-def _music_note(p: QPainter, x, y, k):
-    p.setPen(QPen(PHONES, 2.2, Qt.SolidLine, Qt.RoundCap))
+def _music_note(p: QPainter, x, y, k, col: QColor = PHONES):
+    p.setPen(QPen(col, 2.2 * k, Qt.SolidLine, Qt.RoundCap))
     p.drawLine(QPointF(x + 4 * k, y), QPointF(x + 4 * k, y + 12 * k))
     p.drawLine(QPointF(x + 4 * k, y), QPointF(x + 9 * k, y + 3 * k))
-    _ellipse(p, x + 1.5 * k, y + 12.5 * k, 6 * k, 4.5 * k, PHONES, None, -20)
+    _ellipse(p, x + 1.5 * k, y + 12.5 * k, 6 * k, 4.5 * k, col, None, -20)
+
+
+music_note = _music_note   # for the animated widget's floating notes
 
 
 def _sparkle(p: QPainter, x, y, r, col: QColor):
@@ -148,6 +170,9 @@ def _sparkle(p: QPainter, x, y, r, col: QColor):
     p.setPen(Qt.NoPen)
     p.setBrush(col)
     p.drawPath(path)
+
+
+sparkle = _sparkle
 
 
 def bunny_image(height: int, prop: str | None = None, dpr: float = 1.0) -> QImage:

@@ -25,11 +25,11 @@ from PySide6.QtWidgets import (QApplication, QButtonGroup, QCheckBox, QDialog, Q
                                QVBoxLayout, QWidget)
 
 from soundboard import engine as eng
-from soundboard.bunny import bunny_pixmap
 from soundboard.engine import SR
 from soundboard import library
 from soundboard.library import RESOURCE_DIR
 from soundboard.ui import fit
+from soundboard.ui.bunnywidget import BunnyWidget
 from soundboard.ui.widgets import Meter
 
 RESTART_NEEDED = 3010   # install-vbcable.ps1: installed, but Windows must restart first
@@ -60,14 +60,20 @@ def _label(text: str, css: str = BODY_CSS) -> QLabel:
     return lbl
 
 
-def _header(title: str, prop: str | None) -> QHBoxLayout:
-    """A page title with Bun beside it, holding something that fits the page."""
+def _header(title: str, body: QLabel, bun: BunnyWidget) -> QHBoxLayout:
+    """A page's title and intro, with Bun (holding something that fits the page)
+    beside both. He sits in the same top-right spot on every page, and his widget
+    carries its own padding, so he has even room all round instead of sitting on top
+    of the text."""
     row = QHBoxLayout()
-    row.addWidget(_label(title, TITLE_CSS), 1)
-    pic = QLabel()
-    dpr = QApplication.instance().devicePixelRatio() if QApplication.instance() else 1.0
-    pic.setPixmap(bunny_pixmap(110, prop, dpr))
-    row.addWidget(pic, 0, Qt.AlignTop)
+    row.setSpacing(16)
+    col = QVBoxLayout()
+    col.setSpacing(10)
+    col.addWidget(_label(title, TITLE_CSS))
+    col.addWidget(body)
+    col.addStretch(1)
+    row.addLayout(col, 1)
+    row.addWidget(bun, 0, Qt.AlignTop)
     return row
 
 
@@ -96,6 +102,9 @@ class SetupWizard(QDialog):
         self.stack.addWidget(self._page_headphones())
         self.stack.addWidget(self._page_cable())
         self.stack.addWidget(self._page_discord())
+        # fill the last page's text now, so the window sizes itself for the tallest
+        # page when it opens and stays the same size through every step
+        self._fill_discord()
 
         nav = QHBoxLayout()
         self.btn_back = QPushButton("←  Back")
@@ -146,9 +155,12 @@ class SetupWizard(QDialog):
     def _page_mic(self) -> QWidget:
         p = QWidget()
         v = QVBoxLayout(p)
-        v.addLayout(_header("🎤  Which microphone do you talk into?", "mic"))
-        v.addWidget(_label("Pick the mic you use for gaming (your headset or desk mic). "
-                           "<b>Say something</b> — the bar below should move when you talk."))
+        self.bun_mic = BunnyWidget("mic")
+        v.addLayout(_header("🎤  Which microphone do you talk into?",
+                            _label("Pick the mic you use for gaming (your headset or desk "
+                                   "mic). <b>Say something</b> — the bar below should move "
+                                   "(and Bun talks along) when you talk."),
+                            self.bun_mic))
         mics = [d["name"] for d in eng.list_devices("input") if not eng.is_virtual(d["name"])]
         cur = self.win.cfg.mic_device if self.win.cfg.mic_device in mics else \
             (mics[0] if mics else None)
@@ -174,9 +186,11 @@ class SetupWizard(QDialog):
     def _page_headphones(self) -> QWidget:
         p = QWidget()
         v = QVBoxLayout(p)
-        v.addLayout(_header("🎧  Where do you listen?", "headphones"))
-        v.addWidget(_label("Pick your headphones or speakers, then press <b>Play a test "
-                           "beep</b>. Only you hear this."))
+        self.bun_phones = BunnyWidget("headphones")
+        v.addLayout(_header("🎧  Where do you listen?",
+                            _label("Pick your headphones or speakers, then press <b>Play a "
+                                   "test beep</b>. Only you hear this."),
+                            self.bun_phones))
         outs = [d["name"] for d in eng.list_devices("output") if not eng.is_virtual(d["name"])]
         cur = self.win.cfg.mon_device if self.win.cfg.mon_device in outs else \
             (outs[0] if outs else None)
@@ -195,10 +209,12 @@ class SetupWizard(QDialog):
     def _page_cable(self) -> QWidget:
         p = QWidget()
         v = QVBoxLayout(p)
-        v.addLayout(_header("🔌  The virtual cable", "plug"))
-        v.addWidget(_label("This is a free add-on that works like an invisible microphone. "
-                           "Soundboard puts <b>your sounds</b> (and your voice, if you send "
-                           "it) into it, and Discord or your game listens to it."))
+        v.addLayout(_header("🔌  The virtual cable",
+                            _label("This is a free add-on that works like an invisible "
+                                   "microphone. Soundboard puts <b>your sounds</b> (and your "
+                                   "voice, if you send it) into it, and Discord or your game "
+                                   "listens to it."),
+                            BunnyWidget("plug")))
         self.cable_status = _label("")
         self.cable_status.setStyleSheet("font-size:12pt; padding:12px;")
         v.addWidget(self.cable_status)
@@ -222,9 +238,9 @@ class SetupWizard(QDialog):
     def _page_discord(self) -> QWidget:
         p = QWidget()
         v = QVBoxLayout(p)
-        v.addLayout(_header("🎮  Last step: tell Discord or your game", "star"))
         self.discord_text = _label("")
-        v.addWidget(self.discord_text)
+        v.addLayout(_header("🎮  Last step: tell Discord or your game", self.discord_text,
+                            BunnyWidget("star", celebrate=True)))
         row = QHBoxLayout()
         self.btn_copy = QPushButton("📋  Copy the name")
         self.btn_copy.clicked.connect(self.copy_name)
@@ -308,6 +324,7 @@ class SetupWizard(QDialog):
         tone = np.concatenate([np.sin(2 * np.pi * f * t) * env for f in (660, 880)]) * 0.25
         self.win.engine.play("__setup__", np.stack([tone, tone], 1).astype(np.float32), 1.0,
                              preview=True)
+        self.bun_phones.burst()
 
     def cable_ok(self) -> bool:
         return bool(eng.virtual_outputs())
@@ -402,6 +419,7 @@ class SetupWizard(QDialog):
         e = self.win.engine
         lvl = e.level_mic if e.mic_stream is not None else 0.0
         self.mic_meter.set_level(lvl)
+        self.bun_mic.set_level(lvl)
         if lvl > 0.05:
             self._mic_peak_seen = True
         if self.stack.currentIndex() == 0:
@@ -433,11 +451,11 @@ class SteamGuide(QDialog):
         v = QVBoxLayout(self)
         v.setContentsMargins(24, 20, 24, 18)
         v.setSpacing(12)
-        v.addLayout(_header("🎮  Steam games", "headphones"))
-        v.addWidget(_label(
+        v.addLayout(_header("🎮  Steam games", _label(
             "Games that use <b>Steam's voice chat</b> (like <b>Counter-Strike 2</b>, "
             "<b>Dota 2</b> and <b>Deadlock</b>) don't have their own mic setting. "
-            "They use the mic you pick <b>in Steam</b>. Do this once:"))
+            "They use the mic you pick <b>in Steam</b>. Do this once:"),
+            BunnyWidget("headphones")))
         v.addWidget(_label(
             "<ol style='margin-left:-20px'>"
             "<li style='margin-bottom:8px'>Open <b>Steam</b>. Click <b>Steam</b> in the "
