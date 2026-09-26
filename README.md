@@ -9,7 +9,7 @@ Version: **0.1.0** — see [CHANGELOG.md](CHANGELOG.md).
 ## How it works
 
 ```
-🎤 your mic ────────┐
+🎤 your mic ─────────┐
                      ├─►  Soundboard mixes them  ─►  CABLE Input ═══ pipe ═══► CABLE Output
 🔊 your sounds ──────┘                                                          (Discord / game mic)
 ```
