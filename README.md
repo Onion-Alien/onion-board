@@ -117,7 +117,8 @@ Developing:
 
 ```
 .venv\Scripts\pip install -r requirements-dev.txt
-.venv\Scriptsuff check .
+.venv\Scripts
+uff check .
 .venv\Scripts\python -m pytest
 ```
 
@@ -152,7 +153,11 @@ the newest backup is used, so the pad list is never silently reset.
   the path of your other keypresses, so it can't lag or stick your keys. A hotkey
   you pick is reserved for the app, so don't use one your game needs.
 - Auto push-to-talk can't press keys in a game that runs as administrator unless
-  Soundboard also runs as administrator (Windows blocks it).
+  Soundboard also runs as administrator (Windows blocks it). Keys are injected with
+  `SendInput`, modifiers and key in one call.
+- The window is GPU-composited from the start (`QT_WIDGETS_RHI=1`) so the browser
+  tab can appear without rebuilding it. On a machine whose GPU driver or remote-desktop
+  session can't do that, set `QT_WIDGETS_RHI=0` before launching.
 - Drop-outs reported by the audio driver are counted and shown in the status line.
   **⚙ Settings → General → Audio buffering: Safer** trades a little delay for bigger
   buffers if a device keeps crackling.

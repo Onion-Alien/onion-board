@@ -713,6 +713,7 @@ class BrowserTab(QWidget):
             self.sink.broadcast("pause")                       # every frame with a socket
 
     def shutdown(self):
+        self.timer.stop()
         if self.view is not None:
             page = self.view.page()
             self.view.setParent(None)

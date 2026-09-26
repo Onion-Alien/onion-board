@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+- Push-to-talk keys are injected with `SendInput` (modifiers and key in one call)
+  instead of the legacy `keybd_event`. A hotkey another program owns is reported the
+  moment registration fails (a signal from the hotkey thread) rather than on a timer,
+  and a hotkey thread that fails to start is logged instead of silently ignored.
+- A settings save that fails (disk full, antivirus lock) shows once in the status line
+  instead of raising inside a timer. Closing the window stops the tick timers and any
+  test-capture stream still open.
 - **Package layout.** The code is now the `soundboard` package (`soundboard/ui/` for
   the window, widgets, dialogs and panel pieces; `main.py` stays as the launcher), with
   `pyproject.toml` (metadata, entry point, ruff and pytest settings) and `build.ps1`

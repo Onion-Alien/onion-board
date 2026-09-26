@@ -56,6 +56,8 @@ class MainWindow(QMainWindow):
         self._index()
         self.hotkeys = Hotkeys()
         self.hotkeys.fired.connect(self.on_hotkey)
+        self.hotkeys.failed_changed.connect(self.on_hotkeys_failed)
+        self._save_failed_shown = False
         self.bridge = Bridge()
         self.bridge.loaded.connect(self.on_loaded)
         self.bridge.imported.connect(self.on_imported)
@@ -80,7 +82,7 @@ class MainWindow(QMainWindow):
         self.engine.latency = self.cfg.latency if self.cfg.latency in ("low", "high") else "low"
         self._save_timer = QTimer(self)
         self._save_timer.setSingleShot(True)
-        self._save_timer.timeout.connect(self.cfg.save)
+        self._save_timer.timeout.connect(self._save_now)
 
         self._build_ui()
         self._init_devices()
@@ -618,6 +620,16 @@ class MainWindow(QMainWindow):
 
     def _save_later(self):
         self._save_timer.start(400)
+
+    def _save_now(self):
+        """The debounced save. A failure (disk full, antivirus lock) is logged by
+        Config.save; here it's shown once so the user knows settings aren't sticking."""
+        if self.cfg.save():
+            self._save_failed_shown = False
+        elif not self._save_failed_shown:
+            self._save_failed_shown = True
+            self.status.setText("<span style='color:#ff6b6b'>Couldn't save your settings — "
+                                r"see the log in %APPDATA%\Soundboard.</span>")
 
     def on_level_toggle(self, b):
         self.set_option("level_volumes", b)
