@@ -16,13 +16,19 @@ goes quiet for a moment; the other is heard by nobody (it's reported, not mixed)
 The same stream feeds a recorder. ⏺ records until you stop it, and ⏪ saves the
 last CLIP_S seconds, so you can grab a moment after it happened. Clips are
 added to the Sounds tab as ordinary pads.
+
+"Add as sound" downloads the audio of the page itself (a YouTube video, a
+SoundCloud track…) with yt-dlp and adds it whole; see ytdl.py.
 """
 from __future__ import annotations
 
+import html
 import json
 import logging
 import re
 import secrets
+import shutil
+import threading
 import time
 
 import numpy as np
@@ -41,7 +47,9 @@ from shiboken6 import isValid as qt_valid
 
 from soundboard.adblocker import YOUTUBE_JS, AdBlocker, hide_css_js
 from soundboard.engine import SR
-from soundboard.library import APP_DIR, MAX_SECONDS, trim_silence
+from soundboard import ytdl
+from soundboard.library import (APP_DIR, MAX_SECONDS, PAD_COLORS, fingerprint, import_file,
+                                trim_silence)
 from soundboard.ui import icons
 from soundboard.ui.panel import VolumeControl, bar, icon_label, vsep
 from soundboard.ui.speedpitch import SpeedPitchButton
@@ -575,6 +583,8 @@ class Recorder:
 
 class BrowserTab(QWidget):
     clip_ready = Signal(object, str)     # audio, suggested name
+    sound_ready = Signal(object, object)  # SoundMeta, int16 audio: "Add as sound" finished
+    _dl_msg = Signal(str, str)           # download thread -> UI: (progress | ok | error, text)
 
     def __init__(self, engine, cfg, save_cb, meter_cls):
         super().__init__()
@@ -592,6 +602,8 @@ class BrowserTab(QWidget):
         self._rate = (1.0, True)   # live speed, keep pitch (not saved)
         self.sink: AudioSink | None = None
         self.net = QNetworkAccessManager(self)
+        self._downloading = False
+        self._dl_msg.connect(self._on_dl_msg)
 
         v = QVBoxLayout(self)
         v.setContentsMargins(0, 0, 0, 0)
@@ -615,6 +627,14 @@ class BrowserTab(QWidget):
         self.url.setPlaceholderText("Search YouTube or type a web address…")
         self.url.returnPressed.connect(self._go)
         nav.addWidget(self.url, 1)
+        self.btn_add = QPushButton("Add as sound")
+        self.btn_add.setObjectName("primary")
+        self.btn_add.setToolTip("Download this video's audio and add it to your Sounds "
+                                "(YouTube, SoundCloud and most video sites)")
+        icons.set_icon(self.btn_add, "plus", "on_accent", size=14)
+        self.btn_add.setEnabled(False)
+        self.btn_add.clicked.connect(self.add_as_sound)
+        nav.addWidget(self.btn_add)
         self._quick = []
         for label, link in QUICK_LINKS:
             b = QPushButton(label)
@@ -901,6 +921,8 @@ class BrowserTab(QWidget):
 
     def _on_url(self, url: QUrl):
         s = url.toString()
+        if not self._downloading:
+            self.btn_add.setEnabled(ytdl.downloadable(s))
         self.url.setText(s)
         self.url.setCursorPosition(0)
         if url.scheme() in ("http", "https"):
@@ -1105,6 +1127,7 @@ class BrowserTab(QWidget):
         """What the main window may hide here when it gets small (ui/responsive.py)."""
         from soundboard.ui import responsive as r
         return [(10, "w", r.hide(*self._quick)),
+                (12, "w", r.icon_only(self.btn_add)),
                 (14, "w", r.hide(self.mini_thumb)),
                 (30, "w", r.hide(self.chk_hear)),
                 (36, "w", r.icon_only(self.btn_rec)),
@@ -1164,6 +1187,57 @@ class BrowserTab(QWidget):
         title = re.sub(r"^\(\d+\)\s*", "", title)                       # "(3) " unread counts
         title = re.sub(r"\s*[-–|]\s*(YouTube|SoundCloud)$", "", title).strip()
         return f"{title[:30] or 'Clip'} {time.strftime('%H.%M.%S')}"
+
+    # ------------------------------------------------------------------ add as sound
+    def add_as_sound(self) -> bool:
+        """Download the open page's audio (yt-dlp) and add it to the Sounds tab."""
+        url = self.view.url().toString() if self.view is not None else ""
+        if self._downloading or not ytdl.downloadable(url):
+            return False
+        self._downloading = True
+        self.btn_add.setEnabled(False)
+        self.btn_add.setText("Adding…")
+        color = PAD_COLORS[len(self.cfg.sounds) % len(PAD_COLORS)]
+        known = {m.fingerprint: m.name for m in self.cfg.sounds if m.fingerprint}
+        self._refresh_info("Downloading the audio…")
+        threading.Thread(target=self._download, args=(url, color, known), daemon=True,
+                         name="ytdl").start()
+        return True
+
+    def _download(self, url: str, color: str, known: dict):
+        """Runs on its own thread; reports back through _dl_msg / sound_ready."""
+        tmp = None
+        try:
+            path, title = ytdl.download_audio(
+                url, progress=lambda f: self._dl_msg.emit("progress", f"{f:.0%}"))
+            tmp = path.parent
+            self._dl_msg.emit("progress", "decoding")
+            fp = fingerprint(str(path))
+            if fp and fp in known:
+                raise ytdl.DownloadError(f"It's already in your Sounds as “{known[fp]}”.")
+            meta, data = import_file(str(path), color)
+            meta.name = title[:40]
+            self.engine.prepare(meta.id, data)
+            self.sound_ready.emit(meta, data)
+            self._dl_msg.emit("ok", f"✓ Added “{meta.name}” ({meta.duration:.0f}s) "
+                                    "to your Sounds.")
+        except Exception as e:  # noqa: BLE001 - shown in the info line, logged
+            log.warning("add as sound failed for %s: %s", url, e)
+            self._dl_msg.emit("error", f"Couldn't add it: {e}")
+        finally:
+            if tmp is not None:
+                shutil.rmtree(tmp, ignore_errors=True)
+
+    def _on_dl_msg(self, kind: str, text: str):
+        if kind == "progress":
+            self.btn_add.setText("Adding…" if text == "decoding" else f"Adding… {text}")
+            return
+        self._downloading = False
+        self.btn_add.setText("Add as sound")
+        self.btn_add.setEnabled(self.view is not None
+                                and ytdl.downloadable(self.view.url().toString()))
+        color = "#13ce66" if kind == "ok" else "#ff4d4f"
+        self._refresh_info(f"<span style='color:{color}'>{html.escape(text)}</span>")
 
     def _tick(self):
         e = self.engine

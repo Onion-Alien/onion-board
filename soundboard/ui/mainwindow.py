@@ -194,6 +194,7 @@ class MainWindow(QMainWindow):
         bl.setContentsMargins(0, 8, 0, 0)
         self.browser = BrowserTab(self.engine, self.cfg, self._save_later, Meter)
         self.browser.clip_ready.connect(self.on_clip)
+        self.browser.sound_ready.connect(self.on_downloaded)
         bl.addWidget(self.browser)
         self.tabs.addTab(browser_page, "Browser")
         self.voice = VoicePanel(self.engine, self.cfg.voice_fx, self.cfg.speech)
@@ -1150,6 +1151,16 @@ class MainWindow(QMainWindow):
         self._index()
         self.audio[meta.id] = data
         threading.Thread(target=self.engine.prepare, args=(meta.id, data), daemon=True).start()
+        self.cfg.save()
+        self._rebuild_pads()
+        self.status.setText(f"Added “{meta.name}” ({meta.duration:.1f}s) to Sounds — "
+                            "right-click it there to rename or set a hotkey.")
+
+    def on_downloaded(self, meta, data):
+        """The browser's "Add as sound" finished: already decoded, stored and prepared."""
+        self.cfg.sounds.append(meta)
+        self._index()
+        self.audio[meta.id] = data
         self.cfg.save()
         self._rebuild_pads()
         self.status.setText(f"Added “{meta.name}” ({meta.duration:.1f}s) to Sounds — "

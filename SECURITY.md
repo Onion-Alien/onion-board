@@ -46,6 +46,7 @@ So you know what normal looks like when auditing it:
 |---|---|---|
 | You use the Browser tab | whatever sites you visit | it's a browser |
 | Ad blocker filter refresh | `easylist.to`, `ublockorigin.github.io` | block lists for the Browser tab |
+| You click *Add as sound* in the Browser tab | the page's site (e.g. YouTube), via `yt-dlp` | downloads that one video's audio stream into a temp folder, imports it, deletes the download |
 | Lite mini-player shows a YouTube video | `i.ytimg.com` | the video's thumbnail, fetched by the app itself |
 | You tick *Play M4A, AAC and video files* in the installer | `winget` (Microsoft's package source, then the FFmpeg build it points to) | installs `Gyan.FFmpeg.Essentials` |
 | You install the virtual cable | `vb-audio.com` | downloads VB-Cable; the installer's signature is checked before it runs |
