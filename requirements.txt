@@ -1,0 +1,7 @@
+PySide6
+sounddevice
+soundfile
+soxr
+scipy
+numpy
+keyboard
