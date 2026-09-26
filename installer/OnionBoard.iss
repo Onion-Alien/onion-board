@@ -194,7 +194,11 @@ begin
         'Windows will ask for permission, and may want a restart afterwards.',
         mbConfirmation, MB_YESNO or Default) = IDYES then
     begin
-      if not ShellExec('runas', Setup, '-u -h', '', SW_HIDE, ewWaitUntilTerminated, Code) then
+      if ShellExec('runas', Setup, '-u -h', '', SW_HIDE, ewWaitUntilTerminated, Code) then
+        // its CABLE devices stay listed (not working) until Windows restarts
+        MsgBox('The virtual cable has been removed. Restart your PC to finish: until then ' +
+          'Windows still lists "CABLE Input" / "CABLE Output".', mbInformation, MB_OK)
+      else
         MsgBox('The virtual cable wasn''t removed (permission was refused). You can remove ' +
           'it later from Settings > Apps > Installed apps > VBCABLE.', mbInformation, MB_OK);
     end;

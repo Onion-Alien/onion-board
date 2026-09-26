@@ -54,6 +54,9 @@ function Get-CableState {
         Where-Object { $_.Name -match "VB-Audio|Virtual Cable" })
     if (-not $devs) { return "missing" }
     if ($devs | Where-Object { $_.ConfigManagerErrorCode -eq 14 }) { return "restart" }
+    # just uninstalled: the driver's own device is gone but its CABLE endpoints linger
+    # until Windows restarts. Not working, and VB-Audio wants a reboot before reinstalling.
+    if (-not ($devs | Where-Object { $_.PNPClass -ne "AudioEndpoint" })) { return "restart" }
     $endpoints = @($devs | Where-Object { $_.PNPClass -eq "AudioEndpoint" -and
                                            $_.ConfigManagerErrorCode -eq 0 })
     if (-not $endpoints) { return "restart" }
