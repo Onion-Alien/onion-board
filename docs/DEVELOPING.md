@@ -129,5 +129,8 @@ Get-Process Soundboard -ErrorAction SilentlyContinue      # is it running?
 3. For a release: bump `__version__`, move *Unreleased* in the CHANGELOG under
    the version, build, then upload `dist\SoundboardSetup.exe` to a GitHub Release
    with its SHA-256 (`certutil -hashfile dist\SoundboardSetup.exe SHA256`).
+   Keep the asset named exactly `SoundboardSetup.exe` and don't mark the release
+   as a pre-release: the README's download button links to
+   `releases/latest/download/SoundboardSetup.exe`.
    Never commit build output. Walk through
    [PUBLIC-RELEASE-CHECKLIST.md](PUBLIC-RELEASE-CHECKLIST.md) once more.

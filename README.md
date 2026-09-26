@@ -4,14 +4,22 @@ A free soundboard for Windows gamers. Press a button (or a hotkey, even in-game)
 and **your friends in Discord or your game hear the sound** through your mic. Your
 voice goes along with it, or switch that off and send **only the sounds**.
 
+## ⬇️ [Download Soundboard for Windows](../../releases/latest/download/SoundboardSetup.exe)
+
+One file, `SoundboardSetup.exe`. Download it, double-click it, done.
+Windows 10 or 11.
+
+<sub>Other downloads: [all versions](../../releases) ·
+[source code (zip)](../../archive/refs/heads/main.zip), only if you want to build
+it yourself.</sub>
+
 Version: **0.1.0**. See [CHANGELOG.md](CHANGELOG.md).
 
 ---
 
 ## Get started (no computer skills needed)
 
-**1. Download** `SoundboardSetup.exe` from the [Releases page](../../releases)
-(under *Assets*).
+**1. [Download `SoundboardSetup.exe`](../../releases/latest/download/SoundboardSetup.exe).**
 
 **2. Double-click it.** If Windows shows a blue *"Windows protected your PC"*
 box, click **More info → Run anyway**. That appears for most small programs that
