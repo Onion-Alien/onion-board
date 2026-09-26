@@ -4,6 +4,7 @@ import shutil
 import socket
 import subprocess
 import sys
+import threading
 import time
 from pathlib import Path
 
@@ -298,6 +299,23 @@ def test_live_voice_speaks_what_the_module_heard(tmp_path, monkeypatch):
         c.stop_live()
     assert c.chain.tap is None and not c.chain.replace and not c.live
     del mod
+
+
+def test_stopping_live_voice_silences_the_queued_backlog():
+    c, eng = controller()
+    gate = threading.Event()
+    synth = c.tts.synth
+    c.tts.synth = lambda *a: (gate.wait(5), synth(*a))[1]     # hold line 1 mid-synth
+    for i in range(5):
+        c.say(f"line {i}")
+    assert wait_for(lambda: len(c.speaker._q) == 4)          # line 0 is being synthesized
+    c.host = object.__new__(ServiceHost)                      # pretend live is on
+    c.host.stop = lambda: None
+    c.stop_live()
+    gate.set()
+    time.sleep(0.3)
+    assert eng.played == []            # the line mid-synth and the queued ones are dropped
+    assert eng.stopped == ["tts"]      # and whatever was already playing is cut
 
 
 def test_real_voice_comes_back_if_the_module_dies():

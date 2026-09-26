@@ -149,6 +149,7 @@ class Speaker:
         self._q: deque[str] = deque(maxlen=20)
         self._wake = threading.Event()
         self._cancel = threading.Event()
+        self._gen = 0           # bumped by stop(); a line from an older gen is dropped
         self._busy_until = 0.0
         threading.Thread(target=self._run, name="tts-speaker", daemon=True).start()
 
@@ -159,6 +160,7 @@ class Speaker:
 
     def stop(self):
         """Drop anything queued and cut the current line's wait short."""
+        self._gen += 1
         self._q.clear()
         self._cancel.set()
         self._busy_until = 0.0
@@ -171,8 +173,12 @@ class Speaker:
         while True:
             self._wake.wait()
             self._wake.clear()
-            while self._q:
-                text = self._q.popleft()
+            while True:
+                gen = self._gen     # read before popping, so a stop() in between is seen
+                try:
+                    text = self._q.popleft()
+                except IndexError:
+                    break
                 self._cancel.clear()
                 try:
                     mono, sr = self.tts.synth(text, self.voice, self.rate)
@@ -180,7 +186,7 @@ class Speaker:
                     log.warning("text-to-speech failed: %s", e)
                     self.on_error(str(e))
                     continue
-                if not len(mono) or self._cancel.is_set():
+                if not len(mono) or gen != self._gen:
                     continue
                 self.play(np.repeat(mono[:, None], 2, axis=1), sr)
                 dur = len(mono) / sr

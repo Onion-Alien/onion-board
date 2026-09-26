@@ -8,11 +8,12 @@ from __future__ import annotations
 
 import os
 import threading
+import time
 
 from PySide6.QtCore import Qt, QTimer, Signal
 from PySide6.QtWidgets import (QButtonGroup, QCheckBox, QComboBox, QFrame, QGridLayout,
-                               QHBoxLayout, QLabel, QLineEdit, QPushButton, QScrollArea, QSlider,
-                               QVBoxLayout, QWidget)
+                               QHBoxLayout, QLabel, QLineEdit, QPlainTextEdit, QPushButton,
+                               QScrollArea, QSlider, QVBoxLayout, QWidget)
 
 from soundboard import modules as mods
 from soundboard import voicefx
@@ -376,9 +377,22 @@ class SpeechPanel(QWidget):
         self.lbl_state = QLabel(IDLE_HINT)
         self.lbl_state.setObjectName("muted")
         lv.addWidget(self.lbl_state)
-        self.lbl_said = hint_label("")
-        lv.addWidget(self.lbl_said)
         v.addWidget(self.live_box)
+        # everything the voice was asked to say, live or typed, newest at the bottom
+        lrow = QHBoxLayout()
+        lrow.addWidget(section_label("WHAT THE VOICE SAID"))
+        lrow.addStretch(1)
+        b_clear = QPushButton("Clear")
+        b_clear.setObjectName("small")
+        lrow.addWidget(b_clear)
+        v.addLayout(lrow)
+        self.said_log = QPlainTextEdit()
+        self.said_log.setReadOnly(True)
+        self.said_log.setMaximumBlockCount(500)
+        self.said_log.setFixedHeight(130)
+        self.said_log.setPlaceholderText("Nothing yet. Lines show up here as they're spoken.")
+        b_clear.clicked.connect(self.said_log.clear)
+        v.addWidget(self.said_log)
 
         self.missing = QWidget()
         mv = QVBoxLayout(self.missing)
@@ -490,7 +504,13 @@ class SpeechPanel(QWidget):
         text = self.ed.text().strip()
         if text:
             self.ctl.say(text)
+            self._log_said(text)
             self.ed.clear()
+
+    def _log_said(self, text: str):
+        self.said_log.appendPlainText(f"{time.strftime('%H:%M:%S')}  {text}")
+        bar_ = self.said_log.verticalScrollBar()
+        bar_.setValue(bar_.maximum())
 
     def _fill_voices(self, voices: list, error: str):
         self.cb_voice.blockSignals(True)
@@ -597,8 +617,8 @@ class SpeechPanel(QWidget):
             self.lbl_state.setText("● listening")
         elif t == "vad":
             self.lbl_state.setText("● hearing you…" if ev.get("speaking") else "● listening")
-        elif t == "final":
-            self.lbl_said.setText(f"“{text}”")
+        elif t == "final" and text:
+            self._log_said(text)
         elif t == "error":
             self.lbl_state.setText(f"⚠ {text}")
         elif t == "stopped":

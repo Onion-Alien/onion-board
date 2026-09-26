@@ -99,3 +99,16 @@ def test_live_voice_needs_the_addon_set_up(panel):
     m = p.speech.module
     if m is None or not m.installed:
         assert p.speech.live_box.isHidden() and not p.speech.missing.isHidden()
+
+
+def test_everything_spoken_lands_in_the_log(panel, monkeypatch):
+    p, _ = panel
+    s = p.speech
+    monkeypatch.setattr(s.ctl, "say", lambda text: None)
+    s.ed.setText("typed line")
+    s._say()
+    s._on_event({"type": "final", "text": "heard line"})
+    s._on_event({"type": "final", "text": ""})
+    lines = s.said_log.toPlainText().splitlines()
+    assert len(lines) == 2
+    assert lines[0].endswith("typed line") and lines[1].endswith("heard line")

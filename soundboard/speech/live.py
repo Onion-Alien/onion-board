@@ -77,6 +77,8 @@ class SpeechController:
         self.chain.replace = False
         if h is not None:
             h.stop()
+            # "Stop" means stop talking: drop lines still queued from a long ramble
+            self.stop_speaking()
 
     def set_mute_real_voice(self, on: bool):
         self.mute_real_voice = on
