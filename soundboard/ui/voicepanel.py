@@ -712,8 +712,9 @@ class VoicePanel(QWidget):
         scroll.setWidget(page)
         outer.addWidget(scroll, 1)
 
-        # left: the voice changer
-        self.fx = VoiceFxPanel(fx_spec or {})
+        # left: the voice changer. It always starts off (the voice you picked is kept):
+        # left on from last time, it changed your mic the moment the app opened.
+        self.fx = VoiceFxPanel({**(fx_spec or {}), "enabled": False})
         self.fx.changed.connect(self._fx_changed)
         fx_card, fv = card()
         fv.addWidget(self.fx)

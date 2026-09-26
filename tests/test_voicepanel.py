@@ -112,3 +112,17 @@ def test_everything_spoken_lands_in_the_log(panel, monkeypatch):
     lines = s.said_log.toPlainText().splitlines()
     assert len(lines) == 2
     assert lines[0].endswith("typed line") and lines[1].endswith("heard line")
+
+
+def test_changer_starts_off_even_if_it_was_left_on(qapp, monkeypatch):
+    monkeypatch.setattr(tts.SapiTTS, "warm_up", lambda self: [])
+    from soundboard.ui.voicepanel import POWER_TEXT, VoicePanel
+    p = VoicePanel(FakeEngine(), {"enabled": True, "preset": "Old telephone", "effects": {}}, {})
+    try:
+        assert not p.fx.btn_power.isChecked() and not p.chain.enabled
+        assert p.fx.btn_power.text() == POWER_TEXT[False]
+        assert not any(t.isChecked() for t in p.fx._tile.values())   # nothing looks active
+        assert p.fx.preset == "Old telephone"                          # the choice is kept
+    finally:
+        p.shutdown()
+        p.deleteLater()

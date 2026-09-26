@@ -130,7 +130,8 @@ reinstalling or uninstalling.
   - Hotkeys that record or save a clip beep in your headphones (only you hear
     it), so you know it worked.
 - **Voice tab:** voice changer (pitch, robot, radio, echo, reverb, distortion,
-  8-bit bitcrusher, plus add-on effects), text-to-speech with Windows' built-in
+  8-bit bitcrusher, plus add-on effects; it starts off every time the app
+  opens, and a big ON / OFF button shows which it is), text-to-speech with Windows' built-in
   voices, and **live voice-to-speech**: press *Start talking as the voice* and each
   sentence you say is spoken by a computer voice instead of yours. Speech
   recognition runs on your PC (the first time, the Voice tab's *Install speech
