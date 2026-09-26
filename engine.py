@@ -18,6 +18,7 @@ from __future__ import annotations
 import logging
 import threading
 import time
+from collections import OrderedDict
 from dataclasses import dataclass, field
 
 import numpy as np
@@ -33,6 +34,8 @@ CH = 2
 FADE_S = 0.010  # fade when a sound is stopped early (no clicks)
 STALL_S = 1.5   # a stream whose callback hasn't run for this long is dead: reopen it
 RETRY_S = 5.0   # how often to retry a device that failed to open
+I16_SCALE = np.float32(1 / 32767.0)   # int16 sound data -> float
+CACHE_BUDGET = 512 << 20               # bytes of resampled copies kept for non-48 kHz devices
 
 
 # --------------------------------------------------------------------------- devices
@@ -278,7 +281,7 @@ def is_xrun(status) -> bool:
 @dataclass(eq=False)
 class Voice:
     sid: str
-    data: dict                 # out -> (n, 2) float32 at that output's rate
+    data: dict                 # out -> (n, 2) int16 or float32 at that output's rate
     gain: float
     loop: bool
     preview: bool = False
@@ -323,7 +326,9 @@ class Engine:
         # audio thread stalls while a lower-priority thread holds the lock).
         self.lock = threading.Lock()
         self.voices: tuple[Voice, ...] = ()
-        self._cache: dict[tuple[str, int], tuple[np.ndarray, np.ndarray]] = {}
+        # (sid, rate) -> (source array, resampled copy); LRU, bounded by CACHE_BUDGET
+        self._cache: OrderedDict[tuple[str, int], tuple[np.ndarray, np.ndarray]] = OrderedDict()
+        self._cache_bytes = 0
         self._cache_lock = threading.Lock()
         self._ramps: dict[int, np.ndarray] = {}   # fade length -> 1..0 ramp (no per-block alloc)
 
@@ -548,14 +553,27 @@ class Engine:
         key = (sid.split(":")[0], rate)   # "abc:preview" shares abc's cache
         with self._cache_lock:
             hit = self._cache.get(key)
+            if hit is not None:
+                self._cache.move_to_end(key)
         # the cache holds a reference to the source array and compares identity with
         # `is`: comparing id() alone could match a *new* array that happens to be
         # allocated at a freed one's address (e.g. successive test recordings)
         if hit and hit[0] is data:
             return hit[1]
-        out = resample(data, src_rate, rate)
+        if data.dtype == np.int16:   # library audio: resample in float, keep the copy compact
+            out = resample(data.astype(np.float32) * I16_SCALE, src_rate, rate)
+            out = np.clip(np.rint(out * 32767.0), -32768, 32767).astype(np.int16)
+        else:
+            out = resample(data, src_rate, rate)
         with self._cache_lock:
+            old = self._cache.pop(key, None)
+            if old is not None:
+                self._cache_bytes -= old[1].nbytes
             self._cache[key] = (data, out)
+            self._cache_bytes += out.nbytes
+            while self._cache_bytes > CACHE_BUDGET and len(self._cache) > 1:
+                _, (_, dropped) = self._cache.popitem(last=False)
+                self._cache_bytes -= dropped.nbytes
         return out
 
     def prepare(self, sid: str, data: np.ndarray):
@@ -566,7 +584,7 @@ class Engine:
     def forget(self, sid: str):
         with self._cache_lock:
             for k in [k for k in self._cache if k[0] == sid]:
-                del self._cache[k]
+                self._cache_bytes -= self._cache.pop(k)[1].nbytes
 
     # ----------------------------------------------------------------- playback
     def play(self, sid: str, data: np.ndarray, gain: float, loop=False, mode="restart",
@@ -702,7 +720,9 @@ class Engine:
             data = v.data[out]
             n = len(data)
             p = v.pos[out]
-            g = np.float32(v.gain)
+            # int16 library audio is scaled here (one multiply that already happens
+            # for the gain); float32 is used by cues, previews of test recordings…
+            g = np.float32(v.gain) * (I16_SCALE if data.dtype == np.int16 else np.float32(1))
             if v.stopping:  # short fade-out, then done
                 take = min(frames, fade, n - p if not v.loop else fade)
                 if take > 0 and n:

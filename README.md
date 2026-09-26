@@ -80,7 +80,9 @@ free virtual cable* button runs the same script. Other virtual cables
 (VB-Cable A/B, Voicemeeter) are detected too.
 
 Optional: `winget install Gyan.FFmpeg.Essentials` adds m4a/aac/video support.
-Settings and imported sounds live in `%APPDATA%\Soundboard\`.
+Settings and imported sounds live in `%APPDATA%\Soundboard\`. Its `cache\` folder
+holds each sound decoded and ready to play (int16 at 48 kHz), so later starts don't
+decode anything; it's safe to delete and is rebuilt as needed.
 
 ## Code layout
 
@@ -92,7 +94,7 @@ Settings and imported sounds live in `%APPDATA%\Soundboard\`.
 | `engine.py` | real-time audio: 3 WASAPI streams (mic in, cable out, headphones out), mixing, pause/seek, limiter |
 | `eq.py` | 7-band biquad equalizer and presets |
 | `browser.py` | Browser tab: Qt WebEngine view; an isolated-world script taps page media via WebAudio and streams 48 kHz PCM over QWebChannel into the engine; clip recorder |
-| `library.py` | decoding, loudness levelling, saving clips, config |
+| `library.py` | decoding (bounded to 15 min), the int16 decoded-audio cache, loudness levelling, imports and clips (FLAC), config |
 | `theme.py` | colour themes (tokens → stylesheet, also read by the painted widgets) and the logo |
 | `settings.py` | Settings window, global hotkey actions, hotkey capture dialog |
 | `make_icon.py` | regenerates `soundboard.ico` (shortcut icon) from the logo in `theme.py` |
@@ -109,6 +111,14 @@ Developing:
 
 ### Audio notes
 
+- Sounds are held in RAM as int16 stereo at 48 kHz (half the size of float32; the
+  engine scales them in the same multiply as the gain). Only the first 15 minutes of a
+  file are ever decoded. Video, m4a, aac and wma imports are stored as FLAC of their
+  audio rather than a copy of the source, so the library is small and stays playable
+  without ffmpeg. Re-importing a file that's already in the library is refused by
+  content fingerprint.
+- Browser recordings are spooled to a 16-bit WAV as they happen instead of growing in
+  RAM, and the resampled copies kept for non-48 kHz devices are capped at 512 MB (LRU).
 - Every device is opened at its **native** sample rate and resampled with soxr.
   Windows' built-in `auto_convert` resampler was measured garbling VB-Cable audio
   (about 70% junk), so it's never used.

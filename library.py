@@ -1,6 +1,13 @@
-"""Sound library: decoding, loudness analysis and persistent config."""
+"""Sound library: decoding, loudness analysis, the decoded-audio cache and config.
+
+Audio in memory is int16 stereo at SR ((n, 2), the engine scales it on the fly).
+That is half the RAM of float32 and it round-trips losslessly through the cache
+folder, so after the first run a sound loads by reading one file instead of
+decoding and resampling it again.
+"""
 from __future__ import annotations
 
+import hashlib
 import json
 import logging
 import os
@@ -20,12 +27,15 @@ log = logging.getLogger(__name__)
 
 APP_DIR = Path(os.environ.get("APPDATA", Path.home())) / "Soundboard"
 SOUNDS_DIR = APP_DIR / "sounds"
+CACHE_DIR = APP_DIR / "cache"
 CONFIG_PATH = APP_DIR / "config.json"
 
 AUDIO_EXTS = {".wav", ".mp3", ".ogg", ".flac", ".opus", ".m4a", ".aac", ".wma",
               ".aiff", ".aif", ".webm", ".mp4", ".mkv", ".mov"}
 MAX_SECONDS = 15 * 60
+FFMPEG_TIMEOUT = 120
 TARGET_RMS_DB = -17.0  # loudness everything is levelled to when "Level volumes" is on
+I16 = 32767.0
 
 PAD_COLORS = ["#7c5cff", "#ff5c8a", "#1fb6ff", "#13ce66", "#ffb020", "#ff7849",
               "#00c2b2", "#e056fd", "#5c7cfa", "#94a3b8"]
@@ -43,6 +53,7 @@ class SoundMeta:
     color: str = PAD_COLORS[0]
     level_gain: float = 1.0   # computed loudness-levelling gain
     duration: float = 0.0
+    fingerprint: str = ""     # of the source file, to notice a re-import of the same file
 
 
 @dataclass
@@ -108,32 +119,125 @@ def _ffmpeg() -> str | None:
     return shutil.which("ffmpeg")
 
 
-def decode(path: str) -> np.ndarray:
-    """Decode any audio file to (n, 2) float32 at SR with high-quality resampling."""
-    data = sr = None
+def _decode(path: str) -> tuple[np.ndarray, bool]:
+    """(audio as (n, 2) float32 at SR, decoded-by-ffmpeg?).
+
+    Only the first MAX_SECONDS are ever read: libsndfile is asked for that many
+    frames and ffmpeg is given -t, so a two-hour file costs the same as a
+    fifteen-minute one."""
+    via_ffmpeg = False
     try:
-        data, sr = sf.read(path, dtype="float32", always_2d=True)
+        with sf.SoundFile(path) as f:
+            sr = f.samplerate
+            data = f.read(frames=int(MAX_SECONDS * sr), dtype="float32", always_2d=True)
     except Exception as e:  # noqa: BLE001 - fall back to ffmpeg for m4a/aac/video etc.
         log.debug("libsndfile can't read %s (%s); trying ffmpeg", path, e)
         ff = _ffmpeg()
         if not ff:
             raise RuntimeError("Can't decode this format (install ffmpeg for m4a/aac/video)") from e
-        p = subprocess.run([ff, "-v", "error", "-i", path, "-vn", "-f", "f32le", "-ac", "2",
-                            "-ar", str(SR), "-"], capture_output=True,
-                           creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0))
+        try:
+            p = subprocess.run([ff, "-v", "error", "-i", path, "-vn", "-t", str(MAX_SECONDS),
+                                "-f", "f32le", "-ac", "2", "-ar", str(SR), "-"],
+                               capture_output=True, timeout=FFMPEG_TIMEOUT,
+                               creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0))
+        except subprocess.TimeoutExpired:
+            raise RuntimeError(f"ffmpeg took longer than {FFMPEG_TIMEOUT}s") from None
         if p.returncode != 0 or not p.stdout:
             msg = p.stderr.decode(errors="ignore").strip() or "ffmpeg failed"
             raise RuntimeError(msg) from None
         data = np.frombuffer(p.stdout, np.float32).reshape(-1, 2).copy()
         sr = SR
+        via_ffmpeg = True
     if data.shape[1] == 1:
         data = np.repeat(data, 2, axis=1)
     elif data.shape[1] > 2:
         data = data[:, :2]
-    data = data[: int(MAX_SECONDS * sr)]
     if sr != SR:
         data = soxr.resample(data, sr, SR, quality="VHQ").astype(np.float32)
-    return np.ascontiguousarray(data, dtype=np.float32)
+    return np.ascontiguousarray(data, dtype=np.float32), via_ffmpeg
+
+
+def decode(path: str) -> np.ndarray:
+    """Decode any audio file to (n, 2) float32 at SR with high-quality resampling."""
+    return _decode(path)[0]
+
+
+def to_int16(data: np.ndarray) -> np.ndarray:
+    """float32 [-1, 1] -> int16 (the in-memory / cached format). int16 passes through."""
+    if data.dtype == np.int16:
+        return data
+    return np.ascontiguousarray(np.clip(np.rint(data * I16), -I16 - 1, I16).astype(np.int16))
+
+
+def to_float32(data: np.ndarray) -> np.ndarray:
+    if data.dtype == np.float32:
+        return data
+    return data.astype(np.float32) * np.float32(1 / I16)
+
+
+# --------------------------------------------------------------------------- decoded cache
+
+def cache_path(sid: str) -> Path:
+    return CACHE_DIR / f"{sid}.npy"
+
+
+def load_cached(sid: str) -> np.ndarray | None:
+    """The cached int16 audio for a sound, or None if there is none (or it's damaged)."""
+    p = cache_path(sid)
+    if not p.exists():
+        return None
+    try:
+        data = np.load(p)
+        if data.dtype == np.int16 and data.ndim == 2 and data.shape[1] == 2:
+            return data
+        log.warning("cache %s has the wrong shape/dtype; ignoring it", p.name)
+    except Exception:  # noqa: BLE001
+        log.warning("cache %s is unreadable; ignoring it", p.name, exc_info=True)
+    return None
+
+
+def store_cached(sid: str, data: np.ndarray) -> np.ndarray:
+    """Write a sound's audio to the cache (atomically) and return it as int16."""
+    i16 = to_int16(data)
+    try:
+        CACHE_DIR.mkdir(parents=True, exist_ok=True)
+        tmp = cache_path(sid).with_suffix(".tmp.npy")
+        np.save(tmp, i16)
+        tmp.replace(cache_path(sid))
+    except OSError:
+        log.warning("couldn't write cache for %s", sid, exc_info=True)
+    return i16
+
+
+def load_sound(meta: SoundMeta) -> np.ndarray:
+    """int16 audio for a library sound: from the cache, else decoded and cached."""
+    data = load_cached(meta.id)
+    if data is None:
+        data = store_cached(meta.id, decode(meta.file))
+    return data
+
+
+def prune_cache(keep_ids: set[str]):
+    """Delete cache files for sounds that no longer exist."""
+    try:
+        for p in CACHE_DIR.glob("*.npy"):
+            if p.stem not in keep_ids:
+                p.unlink(missing_ok=True)
+    except OSError:
+        log.debug("cache prune failed", exc_info=True)
+
+
+def fingerprint(path: str) -> str:
+    """Cheap identity for a source file: size + hash of its first megabyte."""
+    try:
+        p = Path(path)
+        h = hashlib.blake2b(digest_size=12)
+        h.update(str(p.stat().st_size).encode())
+        with p.open("rb") as f:
+            h.update(f.read(1 << 20))
+        return h.hexdigest()
+    except OSError:
+        return ""
 
 
 def level_gain(data: np.ndarray) -> float:
@@ -160,32 +264,47 @@ def level_gain(data: np.ndarray) -> float:
     return float(np.clip(g, 0.1, 6.0))
 
 
+def _safe_name(name: str) -> str:
+    return "".join(c if c.isalnum() or c in " -_" else "_" for c in name).strip()[:40] or "clip"
+
+
 def import_file(src: str, color: str) -> tuple[SoundMeta, np.ndarray]:
-    """Decode, copy into the library folder, and return metadata + audio."""
-    data = decode(src)
+    """Decode, bring into the library folder, and return metadata + int16 audio.
+
+    Plain audio files are copied as they are. Anything that needed ffmpeg (video,
+    m4a, aac, wma) is stored as a FLAC of its *audio* instead: a 300 MB video used
+    to be copied whole, and the library stays playable if ffmpeg goes away."""
+    data, via_ffmpeg = _decode(src)
     SOUNDS_DIR.mkdir(parents=True, exist_ok=True)
     sid = uuid.uuid4().hex[:10]
     srcp = Path(src)
-    dest = SOUNDS_DIR / f"{sid}_{srcp.name}"
-    try:
-        shutil.copy2(srcp, dest)
-    except OSError:
-        log.warning("couldn't copy %s into the library; using it in place", src, exc_info=True)
-        dest = srcp
+    if via_ffmpeg:
+        dest = SOUNDS_DIR / f"{sid}_{_safe_name(srcp.stem)}.flac"
+        sf.write(dest, data, SR, subtype="PCM_16")
+    else:
+        dest = SOUNDS_DIR / f"{sid}_{srcp.name}"
+        try:
+            shutil.copy2(srcp, dest)
+        except OSError:
+            log.warning("couldn't copy %s into the library; using it in place", src,
+                        exc_info=True)
+            dest = srcp
     meta = SoundMeta(id=sid, name=srcp.stem.replace("_", " ").strip()[:40], file=str(dest),
-                     color=color, level_gain=level_gain(data), duration=len(data) / SR)
-    return meta, data
+                     color=color, level_gain=level_gain(data), duration=len(data) / SR,
+                     fingerprint=fingerprint(src))
+    return meta, store_cached(sid, data)
 
 
-def save_clip(data: np.ndarray, name: str, color: str) -> SoundMeta:
-    """Store recorded audio ((n, 2) float32 at SR) in the library as a WAV; return its metadata."""
+def save_clip(data: np.ndarray, name: str, color: str) -> tuple[SoundMeta, np.ndarray]:
+    """Store recorded audio ((n, 2) float32 at SR) as a FLAC; return metadata + int16 audio."""
     SOUNDS_DIR.mkdir(parents=True, exist_ok=True)
     sid = uuid.uuid4().hex[:10]
-    safe = "".join(c if c.isalnum() or c in " -_" else "_" for c in name).strip()[:40] or "clip"
-    dest = SOUNDS_DIR / f"{sid}_{safe}.wav"
-    sf.write(dest, data, SR, subtype="FLOAT")
-    return SoundMeta(id=sid, name=name[:40], file=str(dest), color=color,
-                     level_gain=level_gain(data), duration=len(data) / SR)
+    dest = SOUNDS_DIR / f"{sid}_{_safe_name(name)}.flac"
+    sf.write(dest, data, SR, subtype="PCM_16")
+    meta = SoundMeta(id=sid, name=name[:40], file=str(dest), color=color,
+                     level_gain=level_gain(data), duration=len(data) / SR,
+                     fingerprint=fingerprint(str(dest)))
+    return meta, store_cached(sid, data)
 
 
 def trim_silence(data: np.ndarray, threshold: float = 0.002, pad_s: float = 0.05) -> np.ndarray:
@@ -202,5 +321,6 @@ def delete_file(meta: SoundMeta):
     try:
         if p.parent == SOUNDS_DIR:
             p.unlink(missing_ok=True)
+        cache_path(meta.id).unlink(missing_ok=True)
     except OSError:
         log.warning("couldn't delete %s", p, exc_info=True)

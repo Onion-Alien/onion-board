@@ -119,6 +119,41 @@ def test_seek_and_state():
     assert e.state("zzz") is None
 
 
+# ---------------------------------------------------------------- int16 sources
+
+def test_int16_data_renders_scaled_like_float():
+    e = engine_with("main")
+    d = tone(0.02)
+    i16 = np.clip(d * 32767, -32768, 32767).astype(np.int16)
+    e.play("f", d, 0.5)
+    e.play("i", i16, 0.5, mode="overlap")
+    out = np.zeros((480, 2), np.float32)
+    e._main(out, 480)
+    assert np.allclose(out, d[:480], atol=1e-3)          # 0.5 + 0.5 = the same tone once
+
+
+def test_int16_data_is_resampled_and_cached_as_int16():
+    e = engine_with("main")
+    e.rates["main"] = 44100
+    i16 = np.clip(tone(0.1) * 32767, -32768, 32767).astype(np.int16)
+    out = e.data_for("x", i16, 44100)
+    assert out.dtype == np.int16 and abs(len(out) - 4410) <= 2
+    assert e._cache_bytes == out.nbytes
+
+
+def test_resample_cache_evicts_least_recently_used(monkeypatch):
+    monkeypatch.setattr(eng, "CACHE_BUDGET", 3 * 4410 * 2 * 4 + 10)   # room for 3 copies
+    e = engine_with("main")
+    e.rates["main"] = 44100
+    arrays = {k: tone(0.1) * (i + 1) / 10 for i, k in enumerate("abcd")}
+    for k in "abc":
+        e.data_for(k, arrays[k], 44100)
+    e.data_for("a", arrays["a"], 44100)                    # touch a: b is now the oldest
+    e.data_for("d", arrays["d"], 44100)
+    assert set(k for k, _ in e._cache) == {"a", "c", "d"}
+    assert e._cache_bytes == sum(v[1].nbytes for v in e._cache.values())
+
+
 # ---------------------------------------------------------------- cache
 
 def test_resample_cache_is_keyed_on_the_array_object_not_its_address():

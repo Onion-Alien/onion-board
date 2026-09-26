@@ -42,8 +42,8 @@ from eq import BAND_LABELS as EQ_LABELS
 from eq import MAX_DB as EQ_MAX_DB
 from eq import PRESETS as EQ_PRESETS
 from eq import response_db as eq_response
-from library import (APP_DIR, AUDIO_EXTS, PAD_COLORS, Config, SoundMeta, decode, delete_file,
-                     import_file, save_clip)
+from library import (APP_DIR, AUDIO_EXTS, PAD_COLORS, Config, SoundMeta, delete_file, fingerprint,
+                     import_file, load_sound, prune_cache, save_clip)
 from settings import HOTKEY_ACTIONS, HotkeyDialog, SettingsDialog, pretty_key
 from testcheck import analyze as analyze_output
 from testcheck import summary_html
@@ -1404,17 +1404,21 @@ class MainWindow(QMainWindow):
         self.grid.relayout(force=True)
 
     def _load_all(self):
-        todo = [(m.id, m.file) for m in self.cfg.sounds if m.id not in self.audio]
+        todo = [m for m in self.cfg.sounds if m.id not in self.audio]
+        keep = {m.id for m in self.cfg.sounds}
 
         def run():
-            for sid, path in todo:
+            t0 = time.monotonic()
+            for m in todo:
                 try:
-                    data = decode(path)
-                    self.engine.prepare(sid, data)
-                    self.bridge.loaded.emit(sid, data, "")
+                    data = load_sound(m)   # from the cache after the first run
+                    self.engine.prepare(m.id, data)
+                    self.bridge.loaded.emit(m.id, data, "")
                 except Exception as e:  # noqa: BLE001
-                    log.warning("can't load %s: %s", path, e)
-                    self.bridge.loaded.emit(sid, None, str(e))
+                    log.warning("can't load %s: %s", m.file, e)
+                    self.bridge.loaded.emit(m.id, None, str(e))
+            prune_cache(keep)
+            log.info("loaded %d sounds in %.1fs", len(todo), time.monotonic() - t0)
         threading.Thread(target=run, daemon=True, name="load").start()
 
     def on_loaded(self, sid, data, err):
@@ -1424,6 +1428,9 @@ class MainWindow(QMainWindow):
             m = self.meta(sid)
             if m and not m.duration:
                 m.duration = len(data) / SR
+            if m and not m.fingerprint:   # sounds imported before fingerprints existed
+                m.fingerprint = fingerprint(m.file)
+                self._save_later()
         if p:
             p.state = "ready" if data is not None else "error"
             p.error = err
@@ -1442,11 +1449,17 @@ class MainWindow(QMainWindow):
             return
         self._pending_imports += len(files)
         start = len(self.cfg.sounds)
+        known = {m.fingerprint: m.name for m in self.cfg.sounds if m.fingerprint}
 
         def run():
             for i, f in enumerate(files):
                 try:
+                    fp = fingerprint(f)
+                    if fp and fp in known:
+                        raise RuntimeError(f"already in your library as “{known[fp]}”")
                     meta, data = import_file(f, PAD_COLORS[(start + i) % len(PAD_COLORS)])
+                    if fp:
+                        known[fp] = meta.name   # the same file twice in one drop
                     self.engine.prepare(meta.id, data)
                     self.bridge.imported.emit(meta, data, "")
                 except Exception as e:  # noqa: BLE001
@@ -1467,14 +1480,14 @@ class MainWindow(QMainWindow):
             self.cfg.save()
             self._rebuild_pads()
             if self._import_errors:
-                QMessageBox.warning(self, "Some files couldn't be added",
+                QMessageBox.warning(self, "Some files weren't added",
                                     "\n".join(self._import_errors[:15]))
                 self._import_errors = []
 
     def on_clip(self, data, name):
         """A clip recorded in the browser tab becomes a normal sound pad."""
         try:
-            meta = save_clip(data, name, PAD_COLORS[len(self.cfg.sounds) % len(PAD_COLORS)])
+            meta, data = save_clip(data, name, PAD_COLORS[len(self.cfg.sounds) % len(PAD_COLORS)])
         except Exception as e:  # noqa: BLE001
             log.exception("can't save clip")
             QMessageBox.warning(self, "Couldn't save clip", str(e))

@@ -15,10 +15,12 @@ from __future__ import annotations
 
 import base64
 import json
+import logging
 import re
 import time
 
 import numpy as np
+import soundfile as sf
 from PySide6.QtCore import QFile, QIODevice, QObject, Qt, QTimer, QUrl, Signal, Slot
 from PySide6.QtGui import QFontMetrics
 from PySide6.QtWebChannel import QWebChannel
@@ -32,7 +34,10 @@ from shiboken6 import delete as qt_delete
 from engine import SR
 from library import APP_DIR, MAX_SECONDS, trim_silence
 
+log = logging.getLogger(__name__)
+
 CLIP_S = 15            # "clip the last N seconds" length
+SPOOL_PATH = APP_DIR / "recording.tmp.wav"
 LIVE_TEXT = {True: "🔴  LIVE — others hear it", False: "🎧  Only me — click to go live"}
 WORLD = QWebEngineScript.ApplicationWorld
 
@@ -211,13 +216,21 @@ class _Page(QWebEnginePage):
 
 
 class Recorder:
-    """Keeps a rolling CLIP_S-second replay buffer, plus a manual recording."""
+    """Keeps a rolling CLIP_S-second replay buffer, plus a manual recording.
 
-    def __init__(self):
+    The manual recording is spooled to a 16-bit WAV on disk as it happens instead
+    of being held in RAM: at the 15-minute cap that is 172 MB on disk versus
+    345 MB of float32 chunks *plus* another 345 MB to concatenate them. If the
+    spool file can't be opened it falls back to memory."""
+
+    def __init__(self, spool_path=SPOOL_PATH):
         self.replay = np.zeros((CLIP_S * SR, 2), np.float32)
         self.w = 0
         self.filled = 0
-        self.rec: list[np.ndarray] | None = None
+        self.spool_path = spool_path
+        self._spool: sf.SoundFile | None = None
+        self._mem: list[np.ndarray] | None = None
+        self._recording = False
         self.rec_frames = 0
 
     def push(self, x: np.ndarray):
@@ -234,8 +247,17 @@ class Recorder:
             self.replay[:n - k] = x[k:]
         self.w = end % cap
         self.filled = min(self.filled + n, cap)
-        if self.rec is not None and self.rec_frames < MAX_SECONDS * SR:
-            self.rec.append(x.copy())
+        if self._recording and self.rec_frames < MAX_SECONDS * SR:
+            if self._spool is not None:
+                try:
+                    self._spool.write(x)
+                except Exception:  # noqa: BLE001 - disk full etc.: keep the rest in memory
+                    log.warning("recording spool failed; continuing in memory", exc_info=True)
+                    self._close_spool()
+                    self._mem = [self._read_spool()]
+                    self._mem.append(x.copy())
+            else:
+                self._mem.append(x.copy())
             self.rec_frames += n
 
     def last(self) -> np.ndarray:
@@ -244,15 +266,53 @@ class Recorder:
         return np.concatenate([self.replay[self.w:], self.replay[:self.w]])
 
     def start(self):
-        self.rec, self.rec_frames = [], 0
+        self.stop()
+        self.rec_frames = 0
+        self._recording = True
+        try:
+            self.spool_path.parent.mkdir(parents=True, exist_ok=True)
+            self._spool = sf.SoundFile(str(self.spool_path), "w", SR, 2, subtype="PCM_16")
+        except Exception:  # noqa: BLE001
+            log.warning("can't open recording spool %s; recording in memory", self.spool_path,
+                        exc_info=True)
+            self._spool = None
+            self._mem = []
 
     def stop(self) -> np.ndarray:
-        rec, self.rec = self.rec or [], None
-        return np.concatenate(rec) if rec else np.zeros((0, 2), np.float32)
+        """End the recording and return it as (n, 2) float32 (empty if nothing recorded)."""
+        if not self._recording:
+            return np.zeros((0, 2), np.float32)
+        self._recording = False
+        if self._spool is not None:
+            self._close_spool()
+            data = self._read_spool()
+        else:
+            mem, self._mem = self._mem or [], None
+            data = np.concatenate(mem) if mem else np.zeros((0, 2), np.float32)
+        return data
+
+    def _close_spool(self):
+        try:
+            self._spool.close()
+        except Exception:  # noqa: BLE001
+            log.debug("closing the spool raised", exc_info=True)
+        self._spool = None
+
+    def _read_spool(self) -> np.ndarray:
+        try:
+            data, _ = sf.read(str(self.spool_path), dtype="float32", always_2d=True)
+        except Exception:  # noqa: BLE001
+            log.warning("can't read back the recording spool", exc_info=True)
+            data = np.zeros((0, 2), np.float32)
+        try:
+            self.spool_path.unlink(missing_ok=True)
+        except OSError:
+            pass
+        return data
 
     @property
     def recording(self) -> bool:
-        return self.rec is not None
+        return self._recording
 
 
 class BrowserTab(QWidget):

@@ -2,6 +2,20 @@
 
 ## Unreleased
 
+- **Faster starts, half the RAM.** Each sound is decoded once and kept in
+  `%APPDATA%\Soundboard\cache\` as int16 at 48 kHz; after that a sound loads by reading
+  one file instead of decoding and resampling. In memory a 4-minute song is 46 MB
+  instead of 92. Orphaned cache files are pruned at start; the folder is safe to delete.
+- Only the first 15 minutes of a file are decoded (a two-hour podcast used to be read
+  in full and then cut). ffmpeg decodes get a 2-minute timeout instead of hanging the
+  import forever.
+- Importing a video (or m4a/aac/wma) stores a FLAC of its audio instead of copying the
+  whole file into the library. Recorded clips are FLAC too (were float WAV, 4× bigger).
+- Importing a file that's already in the library is refused ("already in your library
+  as …") using a content fingerprint, including the same file twice in one drop.
+- Browser **Record clip** spools to disk as it records instead of holding up to 700 MB
+  of chunks in RAM at the 15-minute cap.
+- Resampled copies for devices not at 48 kHz are now an LRU cache capped at 512 MB.
 - **Log file**: `%APPDATA%\Soundboard\soundboard.log` (rotating). Unhandled exceptions,
   worker-thread errors and Qt warnings all land there; a crash on the UI thread also
   shows one dialog with the path. Previously, under `pythonw.exe`, they vanished.
