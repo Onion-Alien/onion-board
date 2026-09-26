@@ -30,6 +30,7 @@ if ($Clean) { $cleanArg = @("--clean") }
     --name Soundboard --icon soundboard.ico `
     --add-data "install-vbcable.ps1;." `
     --add-data "soundboard.ico;." `
+    --copy-metadata yt-dlp --collect-all yt_dlp_ejs `
     --paths . `
     main.py
 if ($LASTEXITCODE -ne 0) { throw "PyInstaller failed" }

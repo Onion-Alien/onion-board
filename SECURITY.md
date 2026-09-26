@@ -47,6 +47,7 @@ So you know what normal looks like when auditing it:
 | You use the Browser tab | whatever sites you visit | it's a browser |
 | Ad blocker filter refresh | `easylist.to`, `ublockorigin.github.io` | block lists for the Browser tab |
 | You click *Add as sound* in the Browser tab | the page's site (e.g. YouTube), via `yt-dlp` | downloads that one video's audio stream into a temp folder, imports it, deletes the download |
+| Once a day (Settings → General can turn it off), after an *Add as sound* that failed, or when you click *Update now* / *Reset downloader* | `pypi.org`, `files.pythonhosted.org` | checks for a newer `yt-dlp`; if there is one, downloads the `yt-dlp` and `yt-dlp-ejs` wheels, checks each against PyPI's SHA-256, and unpacks them into `%APPDATA%\Soundboard\yt-dlp\`. That code then runs inside the app, like the bundled copy it replaces |
 | Lite mini-player shows a YouTube video | `i.ytimg.com` | the video's thumbnail, fetched by the app itself |
 | You tick *Play M4A, AAC and video files* in the installer | `winget` (Microsoft's package source, then the FFmpeg build it points to) | installs `Gyan.FFmpeg.Essentials` |
 | You install the virtual cable | `vb-audio.com` | downloads VB-Cable; the installer's signature is checked before it runs |

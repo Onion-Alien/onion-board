@@ -152,7 +152,9 @@ reinstalling or uninstalling.
   - **Add as sound** downloads the open video's audio (YouTube, SoundCloud and
     most video sites, via [yt-dlp](https://github.com/yt-dlp/yt-dlp)) and adds
     the whole thing as a pad. YouTube's m4a/webm audio needs FFmpeg, like a
-    dropped m4a file does.
+    dropped m4a file does. yt-dlp keeps itself current (a daily check against
+    PyPI); Settings → General has *Update now* and *Reset downloader* for when
+    downloads keep failing.
   - **Lite** (on by default): while something plays, the page is swapped for a
     small player (title, seek bar, play/pause, ±10 s, next) and YouTube drops to
     144p, so the browser costs your game almost nothing. Opening another site
@@ -239,7 +241,7 @@ the launcher the shortcuts and PyInstaller use. The app is the `soundboard` pack
 | `soundboard/voicefx/` | the voice-effect chain and the built-in effects (pitch, robot, radio, …) |
 | `soundboard/speech/` | Windows text-to-speech (`tts.py`) and the live voice-to-speech client (`live.py`, `service.py`, `protocol.py`) |
 | `soundboard/modules.py` | finds, loads and installs add-ons in `modules\` |
-| `soundboard/ytdl.py` | the Browser tab's *Add as sound*: downloads the open video's audio with yt-dlp |
+| `soundboard/ytdl.py` | the Browser tab's *Add as sound*: downloads the open video's audio with yt-dlp, and keeps yt-dlp updated (SHA-256-checked PyPI wheels in `%APPDATA%`, loaded ahead of the bundled copy by an import hook) |
 | `soundboard/adblocker.py` | the Browser tab's ad blocker (EasyList / uBlock lists, refreshed every few days) |
 | `soundboard/bunny.py` | Bun the mascot, drawn in code (setup guide and installer art) |
 | `soundboard/winkeys.py` | global hotkeys (`RegisterHotKey`) and key presses (`SendInput`), no hooks |

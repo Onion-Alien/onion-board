@@ -2,12 +2,16 @@
 general options."""
 from __future__ import annotations
 
-from PySide6.QtCore import QRectF, QSize, Qt
+import threading
+
+from PySide6.QtCore import QObject, QRectF, QSize, Qt, Signal
 from PySide6.QtGui import QColor, QFont, QPainter, QPainterPath
 from PySide6.QtWidgets import (QCheckBox, QComboBox, QDialog, QFrame, QGridLayout, QHBoxLayout,
                                QLabel, QPushButton, QSlider, QTabWidget, QVBoxLayout, QWidget)
 
-from soundboard import theme, winkeys
+from shiboken6 import isValid as qt_valid
+
+from soundboard import theme, winkeys, ytdl
 from soundboard.ui import icons
 from soundboard.ui import overlay as ovl
 from soundboard.wheelguard import no_wheel
@@ -73,6 +77,11 @@ class HotkeyDialog(QDialog):
                 | (winkeys.MOD_WIN if m & Qt.MetaModifier else 0))
         self.result_combo = winkeys.combo_name(mods, vk)
         self.accept()
+
+
+class _Relay(QObject):
+    """Carries a background job's result back to the UI thread."""
+    done = Signal(str)
 
 
 class ThemeCard(QPushButton):
@@ -401,5 +410,65 @@ class SettingsDialog(QDialog):
         stat.setObjectName("hint")
         cv.addWidget(stat)
         v.addWidget(card)
+        v.addWidget(self._downloader_card())
         v.addStretch(1)
         return w
+
+    # ------------------------------------------------------------------ yt-dlp
+    def _downloader_card(self):
+        card, cv = self._card("Browser downloader (yt-dlp)",
+                              "“Add as sound” in the Browser tab uses yt-dlp. YouTube changes "
+                              "often, so it needs updating now and then. If downloads keep "
+                              "failing even after updating, Reset deletes it and its cache and "
+                              "installs a fresh copy.")
+        auto = QCheckBox("Keep it updated automatically (checks once a day)")
+        auto.setChecked(self.mw.cfg.ytdlp_auto_update)
+        auto.toggled.connect(lambda b: self.mw.set_option("ytdlp_auto_update", b))
+        cv.addWidget(auto)
+        row = QHBoxLayout()
+        self.ytdlp_label = QLabel()
+        self.ytdlp_label.setObjectName("hint")
+        self.ytdlp_label.setWordWrap(True)
+        row.addWidget(self.ytdlp_label, 1)
+        self.ytdlp_btns = []
+        for text, job, tip in (
+                ("Update now", ytdl.update, "Check for a newer yt-dlp and install it"),
+                ("Reset downloader", ytdl.reset,
+                 "Delete the downloaded yt-dlp and its cache, then install a fresh copy")):
+            b = QPushButton(text)
+            b.setToolTip(tip)
+            b.clicked.connect(lambda _=False, j=job: self._ytdlp_run(j))
+            row.addWidget(b)
+            self.ytdlp_btns.append(b)
+        cv.addLayout(row)
+        self._ytdlp_show()
+        return card
+
+    def _ytdlp_show(self, msg: str = ""):
+        v, downloaded = ytdl.active_version()
+        where = "updated copy" if downloaded else "built in"
+        now = f"In use: yt-dlp {v} ({where})." if v else "yt-dlp isn't installed."
+        self.ytdlp_label.setText(f"{msg} {now}".strip())
+
+    def _ytdlp_run(self, job):
+        for b in self.ytdlp_btns:
+            b.setEnabled(False)
+        self.ytdlp_label.setText("Working…")
+        relay = _Relay(self.mw)   # outlives this window if it's closed meanwhile
+
+        def finish(msg):
+            relay.deleteLater()
+            if qt_valid(self.ytdlp_label):
+                for b in self.ytdlp_btns:
+                    b.setEnabled(True)
+                self._ytdlp_show(msg)
+
+        relay.done.connect(finish)
+
+        def run():
+            try:
+                msg = job()
+            except Exception as e:  # noqa: BLE001 - offline, PyPI down…
+                msg = f"Couldn't update: {e}."
+            relay.done.emit(msg)
+        threading.Thread(target=run, daemon=True, name="ytdlp-settings").start()

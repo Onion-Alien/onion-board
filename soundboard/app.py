@@ -40,6 +40,15 @@ def tune_runtime_for_audio():
     gc.set_threshold(50_000, 20, 20)
 
 
+def start_ytdlp_check(cfg):
+    """The daily "is there a newer yt-dlp?" check, off the UI thread (see ytdl.py)."""
+    import threading
+
+    from soundboard import ytdl
+    threading.Thread(target=ytdl.auto_update, args=(cfg.ytdlp_auto_update,), daemon=True,
+                     name="ytdlp-update").start()
+
+
 def main():
     log_path = applog.setup(APP_DIR)
     applog.install_hooks(log_path, __version__)
@@ -59,7 +68,8 @@ def main():
     app.instance_server = listen_for_second_launch(app, lambda: holder.get("w"))  # kept alive
     w = holder["w"] = MainWindow()
     w.show()
+    from PySide6.QtCore import QTimer
     if not w.cfg.setup_done:   # first launch: walk them through mic, headphones, cable
-        from PySide6.QtCore import QTimer
         QTimer.singleShot(400, w.run_setup)
+    QTimer.singleShot(30_000, lambda: start_ytdlp_check(w.cfg))
     sys.exit(app.exec())

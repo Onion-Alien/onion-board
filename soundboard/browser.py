@@ -1209,7 +1209,8 @@ class BrowserTab(QWidget):
         tmp = None
         try:
             path, title = ytdl.download_audio(
-                url, progress=lambda f: self._dl_msg.emit("progress", f"{f:.0%}"))
+                url, progress=lambda f: self._dl_msg.emit("progress", f"{f:.0%}"),
+                auto_update=self.cfg.ytdlp_auto_update)
             tmp = path.parent
             self._dl_msg.emit("progress", "decoding")
             fp = fingerprint(str(path))

@@ -1,7 +1,12 @@
 """The browser's "Add as sound": which pages offer it, the yt-dlp wrapper (with a fake yt_dlp, no
 network), and the browser tab turning a download into a sound."""
+import hashlib
+import io
+import json
 import sys
+import time
 import types
+import zipfile
 
 import numpy as np
 import pytest
@@ -93,8 +98,9 @@ def test_download_audio_refuses_playlists_and_live(monkeypatch, tmp_path):
 def test_download_audio_errors_are_readable(monkeypatch, tmp_path):
     fake_yt_dlp(monkeypatch, {}, fail="ERROR: \x1b[0;31mVideo unavailable\x1b[0m")
     with pytest.raises(ytdl.DownloadError) as e:
-        ytdl.download_audio("https://youtu.be/x", tmp_path)
+        ytdl.download_audio("https://youtu.be/x", tmp_path, auto_update=False)
     assert str(e.value) == "Video unavailable"
+    assert isinstance(e.value, ytdl.FetchError)   # yt-dlp's fault: an update may help
 
 
 class FakeEngine:
@@ -118,7 +124,7 @@ def test_tab_download_becomes_a_sound(qapp, app_dir, monkeypatch, tmp_path):
     folder = tmp_path / "dl"
     folder.mkdir()
 
-    def fake_download(url, dest=None, progress=None):
+    def fake_download(url, dest=None, progress=None, auto_update=True):
         t = np.arange(SR) / SR
         p = folder / "vid.wav"
         sf.write(p, np.stack([np.sin(2 * np.pi * 440 * t)] * 2, 1) * 0.5, SR)
@@ -147,7 +153,7 @@ def test_tab_download_skips_a_sound_already_in_the_library(qapp, app_dir, monkey
     sf.write(p, np.zeros((SR, 2)) + 0.1, SR)
     from soundboard.library import fingerprint
     known = {fingerprint(str(p)): "Old one"}
-    monkeypatch.setattr(ytdl, "download_audio", lambda url, dest=None, progress=None:
+    monkeypatch.setattr(ytdl, "download_audio", lambda url, dest=None, progress=None, **kw:
                         (p, "Again"))
     tab = BrowserTab(FakeEngine(), Config(browser_url="about:blank"), lambda: None, FakeMeter)
     got = []
@@ -155,3 +161,163 @@ def test_tab_download_skips_a_sound_already_in_the_library(qapp, app_dir, monkey
     tab._download("https://youtu.be/x", "#123456", known)
     process_events(qapp, lambda: "Old one" in tab.info.text(), 3)
     assert not got and "already in your Sounds" in tab.info.text()
+
+
+# ---------------------------------------------------------------- keeping yt-dlp current
+
+@pytest.fixture
+def pypi(app_dir, monkeypatch):
+    """A fake PyPI: `releases[version]` makes a wheel whose yt_dlp says that version.
+    Nothing touches the network; the import hook is removed afterwards."""
+    state = {"latest": "2099.1.1", "fetched": [], "corrupt": False}
+
+    def wheel(pkg, version):
+        buf = io.BytesIO()
+        with zipfile.ZipFile(buf, "w") as z:
+            z.writestr(f"{pkg}/__init__.py", f"__version__ = {version!r}\nFAKE = True\n")
+            z.writestr(f"{pkg}/sub.py", "X = 1\n")
+            z.writestr(f"{pkg}-{version}.dist-info/METADATA", "Name: x\n")
+        return buf.getvalue()
+
+    def release(name, version, requires=()):
+        data = wheel(name.replace("-", "_"), version)
+        url = f"{ytdl.WHEEL_HOST}{name}-{version}-py3-none-any.whl"
+        state[url] = data
+        digest = "0" * 64 if state["corrupt"] else hashlib.sha256(data).hexdigest()
+        return {"info": {"name": name, "version": version, "requires_dist": list(requires)},
+                "urls": [{"packagetype": "bdist_wheel", "url": url, "digests": {"sha256": digest},
+                          "filename": url.rsplit("/", 1)[1]}]}
+
+    def get(url, limit):
+        state["fetched"].append(url)
+        if url == ytdl.PYPI.format("yt-dlp"):
+            return json.dumps(release("yt-dlp", state["latest"],
+                                      ['yt-dlp-ejs==0.9.0; extra == "default"'])).encode()
+        if url.endswith("/yt-dlp-ejs/0.9.0/json"):
+            return json.dumps(release("yt-dlp-ejs", "0.9.0")).encode()
+        return state[url]
+
+    monkeypatch.setattr(ytdl, "_get", get)
+    monkeypatch.setattr(ytdl, "bundled_version", lambda: "2026.8.19")
+    saved = {n: m for n, m in sys.modules.items() if n.partition(".")[0] in ytdl.PACKAGES}
+    yield state
+    if ytdl._finder in sys.meta_path:
+        sys.meta_path.remove(ytdl._finder)
+    ytdl._purge()
+    sys.modules.update(saved)
+
+
+def test_update_installs_a_newer_copy_that_imports_win(pypi):
+    assert ytdl.update() == "Updated yt-dlp to 2099.1.1."
+    assert ytdl.active_version() == ("2099.1.1", True)
+    ytdl.install()
+    import yt_dlp
+    import yt_dlp.sub
+    assert yt_dlp.FAKE and yt_dlp.__version__ == "2099.1.1"
+    assert yt_dlp.sub.__file__.startswith(str(ytdl._pkg_dir()))
+    assert (ytdl._pkg_dir() / "yt_dlp_ejs" / "__init__.py").is_file()   # its pinned partner
+    assert not list(ytdl._pkg_dir().glob("*.dist-info"))
+    assert not list(ytdl.root().glob("new-*")) and not list(ytdl.root().glob("old-*"))
+
+
+def test_update_skips_when_up_to_date(pypi):
+    pypi["latest"] = "2026.08.19"
+    assert "up to date" in ytdl.update()
+    assert pypi["fetched"] == [ytdl.PYPI.format("yt-dlp")]   # no wheel downloaded
+    assert not ytdl.due()                                    # but it counts as a check
+
+
+def test_update_rejects_a_bad_checksum(pypi):
+    pypi["corrupt"] = True
+    with pytest.raises(ytdl.DownloadError, match="checksum"):
+        ytdl.update()
+    assert ytdl.active_version() == ("2026.8.19", False)
+
+
+def test_reset_clears_and_reinstalls(pypi):
+    ytdl.update()
+    junk = ytdl.cache_dir() / "youtube-sigfuncs" / "x.json"
+    junk.parent.mkdir(parents=True)
+    junk.write_text("{}")
+    pypi["latest"] = "2099.2.2"
+    assert "2099.2.2" in ytdl.reset()
+    assert not junk.exists()
+    assert ytdl.active_version() == ("2099.2.2", True)
+
+
+def test_reset_offline_falls_back_to_the_built_in_copy(pypi, monkeypatch):
+    ytdl.update()
+
+    def offline(url, limit):
+        raise OSError("no network")
+    monkeypatch.setattr(ytdl, "_get", offline)
+    msg = ytdl.reset()
+    assert "built-in yt-dlp 2026.8.19" in msg and not ytdl.root().exists()
+
+
+def test_a_copy_older_than_the_bundled_one_is_dropped(pypi):
+    pypi["latest"] = "2099.1.1"
+    ytdl.update()
+    ytdl._save_state(version="2020.1.1")   # the app has since shipped a newer yt-dlp
+    ytdl.install()
+    assert ytdl.active_version() == ("2026.8.19", False)
+
+
+def test_auto_update_only_when_enabled_and_due(pypi):
+    ytdl.auto_update(False)
+    assert pypi["fetched"] == []
+    ytdl.auto_update(True)
+    assert ytdl.override_version() == "2099.1.1"
+    pypi["fetched"].clear()
+    ytdl.auto_update(True)                     # checked a moment ago
+    assert pypi["fetched"] == []
+    ytdl._save_state(checked=time.time() - ytdl.CHECK_EVERY - 1)
+    assert ytdl.due()
+
+
+def test_a_failed_download_updates_and_retries_once(pypi, monkeypatch, tmp_path):
+    calls = []
+
+    def dl(url, dest, progress):
+        calls.append(ytdl.override_version())
+        if len(calls) == 1:
+            raise ytdl.FetchError("Sign in to confirm you're not a bot")
+        return tmp_path / "a.m4a", "Title"
+
+    monkeypatch.setattr(ytdl, "_download", dl)
+    assert ytdl.download_audio("https://youtu.be/x")[1] == "Title"
+    assert calls == ["", "2099.1.1"]           # retried with the new copy
+
+    calls.clear()                               # checked just now: no second update
+    with pytest.raises(ytdl.FetchError):
+        ytdl.download_audio("https://youtu.be/x")
+    assert calls == ["2099.1.1"]
+
+
+def test_a_refused_download_does_not_update(pypi, monkeypatch):
+    def dl(url, dest, progress):
+        raise ytdl.DownloadError("That's a playlist")
+    monkeypatch.setattr(ytdl, "_download", dl)
+    with pytest.raises(ytdl.DownloadError):
+        ytdl.download_audio("https://youtu.be/x")
+    assert pypi["fetched"] == []
+
+
+# ---------------------------------------------------------------- Settings → General
+
+from test_mainwindow import window  # noqa: E402,F401  (the real MainWindow fixture)
+
+
+def test_settings_downloader_card(qapp, window, monkeypatch):  # noqa: F811
+    from soundboard.settings import SettingsDialog
+    monkeypatch.setattr(ytdl, "active_version", lambda: ("2026.8.19", False))
+    monkeypatch.setattr(ytdl, "update", lambda: "Updated yt-dlp to 2099.1.1.")
+    d = SettingsDialog(window, "general")
+    assert "2026.8.19 (built in)" in d.ytdlp_label.text()
+    d.ytdlp_btns[0].click()                               # Update now
+    assert not d.ytdlp_btns[0].isEnabled()
+    monkeypatch.setattr(ytdl, "active_version", lambda: ("2099.1.1", True))
+    assert process_events(qapp, lambda: d.ytdlp_btns[0].isEnabled(), 5)
+    assert d.ytdlp_label.text() == ("Updated yt-dlp to 2099.1.1. "
+                                    "In use: yt-dlp 2099.1.1 (updated copy).")
+    d.close()
