@@ -36,10 +36,11 @@ import secrets
 import shutil
 import threading
 import time
+from collections.abc import Callable
 
 import numpy as np
 import soundfile as sf
-from PySide6.QtCore import QObject, Qt, QTimer, QUrl, Signal
+from PySide6.QtCore import QObject, Qt, QThread, QTimer, QUrl, Signal, Slot
 from PySide6.QtGui import QFontMetrics, QPainter, QPainterPath, QPixmap
 from PySide6.QtNetwork import QHostAddress, QNetworkAccessManager, QNetworkRequest
 from PySide6.QtWebEngineCore import (QWebEnginePage, QWebEngineProfile, QWebEngineScript,
@@ -396,6 +397,8 @@ class AudioSink(QObject):
         self._active: QWebSocket | None = None   # the frame that currently owns the mic
         self._active_t = 0.0
         self._rate_msg = ""   # live speed, also sent to frames that connect later
+        # called with each chunk instead of emitting `audio` (ThreadedSink: on its thread)
+        self.feed: Callable[[np.ndarray], None] | None = None
 
     @property
     def url(self) -> str:
@@ -444,7 +447,14 @@ class AudioSink(QObject):
         x = np.frombuffer(bytes(data), np.int16)
         if len(x) % 2:
             return
-        self.audio.emit(x.reshape(-1, 2).astype(np.float32) * np.float32(1 / 32768))
+        y = x.reshape(-1, 2).astype(np.float32) * np.float32(1 / 32768)
+        if self.feed is None:
+            self.audio.emit(y)
+            return
+        try:
+            self.feed(y)
+        except Exception:  # noqa: BLE001 - one bad chunk mustn't take the stream down
+            log.exception("browser audio feed failed")
 
     def _on_text(self, s: QWebSocket, text: str):
         try:
@@ -478,6 +488,7 @@ class AudioSink(QObject):
             self._shown = tot
             self.status.emit(tot[0], tot[1])
 
+    @Slot(float, bool)
     def set_rate(self, speed: float, keep_pitch: bool):
         """Playback speed of every media element in every frame (the page's own
         playbackRate; with keep_pitch the browser keeps the pitch while it does)."""
@@ -488,6 +499,7 @@ class AudioSink(QObject):
         self._rate_msg = "" if normal else msg
         self.broadcast(msg)
 
+    @Slot(str)
     def broadcast(self, text: str):
         n = len(self._conns)
         for s in list(self._conns):
@@ -501,6 +513,58 @@ class AudioSink(QObject):
             if qt_valid(s):
                 s.close()
         self.server.close()
+
+
+class ThreadedSink(QObject):
+    """An AudioSink on its own thread. The page audio then goes socket -> engine
+    (and the replay recorder) without waiting for the UI thread, which can be busy
+    for a long time: resizing the window re-lays out the whole page on every mouse
+    move, and the browser rings used to run dry meanwhile (a stutter). `feed` is
+    called on that thread; `status` arrives on the UI thread as usual."""
+    status = Signal(int, int)
+    _rate = Signal(float, bool)
+    _broadcast = Signal(str)
+    _close = Signal()
+
+    def __init__(self, feed: Callable[[np.ndarray], None], parent=None):
+        super().__init__(parent)
+        self.sink = AudioSink()               # listens now, so port / url are known
+        self.sink.feed = feed
+        self.thread = QThread()
+        self.thread.setObjectName("browser-audio")
+        self.sink.moveToThread(self.thread)   # the server (and its sockets) go with it
+        self.sink.status.connect(self.status)
+        self._rate.connect(self.sink.set_rate)
+        self._broadcast.connect(self.sink.broadcast)
+        self._close.connect(self.sink.close, Qt.BlockingQueuedConnection)
+        self.thread.finished.connect(self.sink.deleteLater)
+        self.thread.start()
+
+    @property
+    def port(self) -> int:
+        return self.sink.port
+
+    @property
+    def url(self) -> str:
+        return self.sink.url
+
+    @property
+    def video(self) -> int:
+        return self.sink.video
+
+    def set_rate(self, speed: float, keep_pitch: bool):
+        self._rate.emit(speed, keep_pitch)
+
+    def broadcast(self, text: str):
+        self._broadcast.emit(text)
+
+    def close(self):
+        if not self.thread.isRunning():
+            return
+        self._close.emit()                    # runs there; returns once it's done
+        self.thread.quit()
+        if not self.thread.wait(3000):
+            log.warning("browser audio thread didn't stop")
 
 
 class SeekBar(QSlider):
@@ -595,8 +659,13 @@ class Recorder:
         self._mem: list[np.ndarray] | None = None
         self._recording = False
         self.rec_frames = 0
+        self._lock = threading.RLock()   # push() runs on the browser audio thread
 
     def push(self, x: np.ndarray):
+        with self._lock:
+            self._push(x)
+
+    def _push(self, x: np.ndarray):
         n = len(x)
         cap = len(self.replay)
         if n >= cap:
@@ -624,12 +693,20 @@ class Recorder:
             self.rec_frames += n
 
     def last(self) -> np.ndarray:
+        with self._lock:
+            return self._last()
+
+    def _last(self) -> np.ndarray:
         if self.filled < len(self.replay):
             return self.replay[:self.filled].copy()
         return np.concatenate([self.replay[self.w:], self.replay[:self.w]])
 
     def start(self):
-        self.stop()
+        with self._lock:
+            self._start()
+
+    def _start(self):
+        self._stop()
         self.rec_frames = 0
         self._recording = True
         try:
@@ -643,6 +720,10 @@ class Recorder:
 
     def stop(self) -> np.ndarray:
         """End the recording and return it as (n, 2) float32 (empty if nothing recorded)."""
+        with self._lock:
+            return self._stop()
+
+    def _stop(self) -> np.ndarray:
         if not self._recording:
             return np.zeros((0, 2), np.float32)
         self._recording = False
@@ -702,7 +783,7 @@ class BrowserTab(QWidget):
         self._stall = (-1.0, 0.0)  # (position, when it last moved): the Lite watchdog
         self._unsticking = False
         self._rate = (1.0, True)   # live speed, keep pitch (not saved)
-        self.sink: AudioSink | None = None
+        self.sink: ThreadedSink | None = None
         self.net = QNetworkAccessManager(self)
         self._downloading = False
         self._dl_msg.connect(self._on_dl_msg)
@@ -946,8 +1027,7 @@ class BrowserTab(QWidget):
         s.setAttribute(QWebEngineSettings.PlaybackRequiresUserGesture, False)
         s.setAttribute(QWebEngineSettings.FullScreenSupportEnabled, False)
 
-        self.sink = AudioSink(self)
-        self.sink.audio.connect(self._on_audio)
+        self.sink = ThreadedSink(self._on_audio, self)   # _on_audio runs on its thread
         self.sink.status.connect(self._on_status)
         self.sink.set_rate(*self._rate)   # a speed picked before the tab was first opened
         if not self.sink.port:
@@ -1120,6 +1200,7 @@ class BrowserTab(QWidget):
 
     # ------------------------------------------------------------------ audio
     def _on_audio(self, x: np.ndarray):
+        """A chunk of page audio, on the sink's thread (see ThreadedSink)."""
         y = self.engine.feed_browser(x)   # the pitched chunk, if the engine returns it
         self.recorder.push(x if y is None else y)
 

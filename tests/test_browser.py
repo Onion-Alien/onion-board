@@ -485,3 +485,15 @@ def test_live_starts_off_even_if_it_was_left_on(qapp, app_dir, monkeypatch):
     t.btn_live.click()
     assert eng.browser_live and cfg.browser_live
     assert Config().browser_live is False
+
+
+def test_page_audio_keeps_flowing_while_the_ui_thread_is_busy(qapp, tab, app_dir):
+    """Resizing the window keeps the UI thread busy re-laying out the page; the audio
+    must not wait for it (it used to, and the browser rings ran dry: a stutter)."""
+    t, eng = tab
+    t.load(QUrl.fromLocalFile(str(tone_page(app_dir))).toString())
+    assert process_events(qapp, lambda: len(eng.chunks) >= 20, 15), "no audio arrived"
+    n = len(eng.chunks)
+    time.sleep(0.6)                                     # the UI thread handles nothing
+    got = len(eng.chunks) - n
+    assert got * browser.BLOCK >= 0.3 * browser.SR, f"only {got} chunks while the UI was busy"
