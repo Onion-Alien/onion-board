@@ -33,6 +33,7 @@ class LinkBar(QFrame):
     """`sound_ready(meta, int16 audio)` fires when Add as sound finished (the audio
     is already stored and prepared); the owner adds it to the library."""
     sound_ready = Signal(object, object)
+    played = Signal(str, object, float)   # Play once started: (title, int16 audio, gain)
     _msg = Signal(str, str, object)   # worker -> UI: (kind, url, payload)
 
     def __init__(self, engine, cfg, color_for, known_for):
@@ -139,6 +140,7 @@ class LinkBar(QFrame):
         if v is None:
             self._say("No audio device is open — pick one in Setup.", "#ffb020")
         else:
+            self.played.emit(self.title or "Link", data, gain)
             name = html.escape(self.title or "it")
             self._say(f"▶ Playing <b>{name}</b> ({fmt_time(len(data) / SR)}) — "
                       "<i>Add as sound</i> keeps it.")

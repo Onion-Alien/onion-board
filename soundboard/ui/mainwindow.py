@@ -32,6 +32,7 @@ from soundboard.ui import icons, responsive
 from soundboard.ui.speedpitch import SpeedPitchButton
 from soundboard.ui.panel import (EqPanel, VolumeControl, bar, card, hint_label, icon_label,
                                  vsep)
+from soundboard.ui.linkbar import PLAY_ID as LINK_ID
 from soundboard.ui.linkbar import LinkBar
 from soundboard.ui.overlay import Overlay
 from soundboard.ui.voicepanel import VoicePanel
@@ -77,6 +78,7 @@ class MainWindow(QMainWindow):
         self._import_errors: list[str] = []
         self._rec_playing = False
         self.current: str | None = None   # sound shown in the transport bar
+        self._link_meta: SoundMeta | None = None   # the link bar's Play once
         self.start_frac = 0.0             # where ▶ starts if it isn't playing
         self._seeking = False
         self._tick_n = 0                  # ticks since start (the watchdog runs every 30th)
@@ -318,6 +320,7 @@ class MainWindow(QMainWindow):
             self.engine, c, lambda: PAD_COLORS[len(self.cfg.sounds) % len(PAD_COLORS)],
             lambda: {m.fingerprint: m.name for m in self.cfg.sounds if m.fingerprint})
         self.linkbar.sound_ready.connect(self.on_downloaded)
+        self.linkbar.played.connect(self.on_link_played)
         left.addWidget(self.linkbar)
 
         self.grid = PadGrid()
@@ -931,7 +934,19 @@ class MainWindow(QMainWindow):
         self._meta = {m.id: m for m in self.cfg.sounds}
 
     def meta(self, sid) -> SoundMeta | None:
+        if sid == LINK_ID:
+            return self._link_meta
         return self._meta.get(sid)
+
+    def on_link_played(self, title: str, data, gain: float):
+        """The link bar's Play once: show it in the transport bar like a pad, so it
+        can be paused, stopped and seeked. It isn't a sound in the library."""
+        self._link_meta = SoundMeta(id=LINK_ID, name=title, file="", level_gain=gain,
+                                    duration=len(data) / SR)
+        self.audio[LINK_ID] = data
+        if self.current == LINK_ID:
+            self.current = None   # a new link: refresh the name
+        self.select(LINK_ID)
 
     def gain_for(self, m: SoundMeta, volume=None) -> float:
         v = m.volume if volume is None else volume

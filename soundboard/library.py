@@ -93,7 +93,7 @@ class Config:
     always_on_top: bool = False
     pad_width: int = 150
     tab: int = 0                      # 0 = sounds, 1 = browser, 2 = voice
-    browser_url: str = "https://www.youtube.com/"
+    browser_url: str = "https://www.youtube.com/watch?v=VJCs9LwiqBA"   # first open
     browser_vol: float = 1.0
     browser_live: bool = False        # browser audio goes out to others (off at every launch)
     browser_monitor: bool = True      # ...and to your headphones

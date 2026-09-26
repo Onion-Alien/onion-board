@@ -193,3 +193,20 @@ def test_mainwindow_live_speed_button_drives_the_engine(window):
     assert (e.sound_speed, e.sound_pitch, e.sound_keep_pitch) == (0.5, 4, False)
     window.speed_btn.reset()
     assert (e.sound_speed, e.sound_pitch) == (1.0, 0.0)
+
+
+def test_speed_redline_unlocks_the_silly_range(window):
+    b, e = window.speed_btn, window.engine
+    assert b.speed.q.hi == 2.0 and b.red_box.isHidden()
+    b.speed.set_value(10)                                    # locked: capped at 2x
+    assert b.speed.value() == 2.0
+    b.redline.setChecked(True)
+    assert not b.red_box.isHidden() and b.speed.q.hi == 10 and b.pitch.q.hi == 36
+    b.set_values(8.0, -30, True)
+    assert (e.sound_speed, e.sound_pitch) == (8.0, -30)
+    assert b.meter.speed == 8.0 and "8x" in b.text()
+    b.redline.setChecked(False)                              # locking pulls it back in
+    assert (e.sound_speed, e.sound_pitch) == (2.0, -12)
+    b.set_values(5.0, 0, True)                               # a redline value unlocks it
+    assert b.redline.isChecked() and e.sound_speed == 5.0
+    b.meter.grab()                                           # paints without errors

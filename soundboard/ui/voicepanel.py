@@ -69,6 +69,16 @@ class ParamSlider(QWidget):
         self.set_value(value)
         self.slider.valueChanged.connect(self._moved)
 
+    def set_param(self, q: voicefx.Param):
+        """Swap the range (keeps the value, clamped into the new one)."""
+        v = self.value()
+        self.q = q
+        self.steps = int(round((q.hi - q.lo) / q.step)) if q.step else 200
+        self.slider.blockSignals(True)
+        self.slider.setRange(0, self.steps)
+        self.slider.blockSignals(False)
+        self.set_value(v)
+
     def value(self) -> float:
         return self.q.lo + (self.q.hi - self.q.lo) * self.slider.value() / self.steps
 

@@ -888,7 +888,8 @@ class BrowserTab(QWidget):
         icons.set_icon(self.btn_lite, "leaf", checked_color="#ffffff")
         self.btn_lite.toggled.connect(self._on_lite)
         bh.addWidget(self.btn_lite)
-        self.btn_speed = SpeedPitchButton("browser", "Only while you listen; not saved.")
+        self.btn_speed = SpeedPitchButton("browser", "Only while you listen; not saved.",
+                                          redline=(0.25, 4.0))   # the page's playbackRate limits
         self.btn_speed.changed.connect(self._on_speed)
         bh.addWidget(self.btn_speed)
         sep2 = vsep()

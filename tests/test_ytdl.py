@@ -441,3 +441,22 @@ def test_link_change_drops_the_kept_download(qapp, window, monkeypatch, tmp_path
     assert process_events(qapp, lambda: window.linkbar._got is not None, 5)
     window.search.setText("https://youtu.be/other")
     assert window.linkbar._got is None and not (tmp_path / "dl1").exists()
+
+
+def test_link_play_once_shows_in_the_transport_bar(qapp, window, monkeypatch,  # noqa: F811
+                                                   tmp_path):
+    fake_link_download(monkeypatch, tmp_path)
+    monkeypatch.setattr(window.engine, "play", lambda *a, **kw: object())
+    window.search.setText("https://youtu.be/abc")
+    window.linkbar.play_once()
+    assert process_events(qapp, lambda: window.current == "__link__", 5)
+    assert window.np_name.text() == "A Tone"
+    assert window.meta("__link__").duration == 1.0
+    window._update_transport({"__link__": (0.5, False)})
+    assert window.btn_pp.isEnabled() and window.seek.value() == 500
+    paused = []
+    monkeypatch.setattr(window.engine, "state", lambda sid: (0.5, False))
+    monkeypatch.setattr(window.engine, "set_paused", lambda sid, p: paused.append((sid, p)))
+    window.toggle_play_pause()                               # the ⏸ button pauses it
+    assert paused == [("__link__", True)]
+    assert window.cfg.sounds and all(m.id != "__link__" for m in window.cfg.sounds)
