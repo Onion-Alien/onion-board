@@ -12,6 +12,9 @@
 #   build.ps1 -AppDir ..\App -InstallerDir ..\Installer
 param([string]$AppDir, [string]$InstallerDir)
 $ErrorActionPreference = "Stop"
+# relative to where the caller ran us, not to the repo (we cd into it below)
+if ($AppDir) { $AppDir = [IO.Path]::GetFullPath((Join-Path (Get-Location) $AppDir)) }
+if ($InstallerDir) { $InstallerDir = [IO.Path]::GetFullPath((Join-Path (Get-Location) $InstallerDir)) }
 Set-Location $PSScriptRoot
 
 $py = ".venv\Scripts\python.exe"

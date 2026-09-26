@@ -4,8 +4,17 @@
 # it, so this script downloads the current pack from vb-audio.com, checks the setup
 # program is really signed by VB-Audio, then runs it (Windows will ask for admin).
 #
-# Usage:  powershell -ExecutionPolicy Bypass -File install-vbcable.ps1 [-Silent]
-param([switch]$Silent)
+# VB-Audio says to restart after installing. Often the cable works straight away, so
+# this checks instead of always asking: once setup has run it waits for the CABLE
+# devices to come up healthy, and if Windows reports they need a restart (problem
+# code 14) or they never appear, it exits 3010 (the standard "restart required"
+# code) and leaves a marker the app reads until the PC has restarted. Never install
+# over a cable that's waiting for a restart; VB-Audio wants a reboot between.
+#
+# Usage:  powershell -ExecutionPolicy Bypass -File install-vbcable.ps1 [-Silent] [-Check]
+#   exit 0 = cable working, 3010 = restart needed, 1 = failed / cancelled,
+#   2 = (-Check only) no cable installed
+param([switch]$Silent, [switch]$Check)
 
 $ErrorActionPreference = "Stop"
 $ProgressPreference = "SilentlyContinue"   # makes Invoke-WebRequest much faster
@@ -15,15 +24,44 @@ function Pause-Exit($code) {
     exit $code
 }
 
+$marker = Join-Path $env:APPDATA "Soundboard\cable-restart-pending"
+
+# "ok": driver and its CABLE endpoints present and healthy. "restart": the driver is
+# there but Windows hasn't finished with it. "missing": nothing installed.
+function Get-CableState {
+    $devs = @(Get-CimInstance Win32_PnPEntity -ErrorAction SilentlyContinue |
+        Where-Object { $_.Name -match "VB-Audio|Virtual Cable" })
+    if (-not $devs) { return "missing" }
+    if ($devs | Where-Object { $_.ConfigManagerErrorCode -eq 14 }) { return "restart" }
+    $endpoints = @($devs | Where-Object { $_.PNPClass -eq "AudioEndpoint" -and
+                                           $_.ConfigManagerErrorCode -eq 0 })
+    if (-not $endpoints) { return "restart" }
+    return "ok"
+}
+
+function Exit-NeedsRestart {
+    New-Item -ItemType Directory -Force -Path (Split-Path $marker) | Out-Null
+    Set-Content -Path $marker -Value (Get-Date -Format o) -Encoding ascii
+    Write-Host ""
+    Write-Host "The virtual cable is installed. Windows needs a RESTART to finish" -ForegroundColor Yellow
+    Write-Host "setting it up: restart your PC, then open Soundboard again." -ForegroundColor Yellow
+    Pause-Exit 3010
+}
+
+if ($Check) {
+    switch (Get-CableState) { "ok" { exit 0 } "restart" { exit 3010 } default { exit 2 } }
+}
+
 Write-Host "=== Virtual cable setup ===" -ForegroundColor Cyan
 
 # Already installed?
-$existing = Get-CimInstance Win32_SoundDevice -ErrorAction SilentlyContinue |
-    Where-Object { $_.Name -match "VB-Audio|Virtual Cable" }
-if ($existing) {
-    Write-Host "A virtual cable is already installed:" -ForegroundColor Green
-    $existing | ForEach-Object { Write-Host "  - $($_.Name)" }
-    Pause-Exit 0
+switch (Get-CableState) {
+    "ok" {
+        Remove-Item $marker -ErrorAction SilentlyContinue
+        Write-Host "A virtual cable is already installed and working." -ForegroundColor Green
+        Pause-Exit 0
+    }
+    "restart" { Exit-NeedsRestart }
 }
 
 # Find the newest Windows driver pack linked from the official page.
@@ -85,7 +123,23 @@ try {
     Pause-Exit 1
 }
 
-Write-Host ""
-Write-Host "Done. Back in Soundboard, click 'I've installed it - check again'." -ForegroundColor Green
-Write-Host "If the cable doesn't show up, restart your PC." -ForegroundColor Green
-Pause-Exit 0
+# Setup returns before Windows has finished bringing the devices up; give it a moment.
+Write-Host "Checking the cable..."
+$state = "missing"
+for ($i = 0; $i -lt 10; $i++) {
+    $state = Get-CableState
+    if ($state -eq "ok") { break }
+    Start-Sleep -Seconds 2
+}
+if ($state -eq "ok") {
+    Remove-Item $marker -ErrorAction SilentlyContinue
+    Write-Host ""
+    Write-Host "Done - the virtual cable is working. No restart needed." -ForegroundColor Green
+    Pause-Exit 0
+}
+if ($state -eq "missing" -and -not $Silent) {
+    # interactive setup closed without clicking "Install Driver"
+    Write-Host "The cable didn't get installed. Run this again and click 'Install Driver'." -ForegroundColor Yellow
+    Pause-Exit 1
+}
+Exit-NeedsRestart
