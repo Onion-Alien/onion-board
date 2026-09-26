@@ -544,16 +544,21 @@ class PadGrid(QWidget):
                 self.image_dropped.emit(pad.meta.id, files[0])
                 e.acceptProposedAction()
                 return
-            expanded = []
-            for f in files:
-                pth = Path(f)
-                if pth.is_dir() and any((pth / n).is_file()
-                                        for n in ("onionboard.json", "sound.json")):
-                    expanded.append(f)   # an unzipped backup / sound pack (see backup.py)
-                elif pth.is_dir():
-                    expanded += [str(x) for x in sorted(pth.rglob("*"))
-                                 if x.suffix.lower() in AUDIO_EXTS]
-                else:
-                    expanded.append(f)
-            self.files_dropped.emit(expanded)
+            self.files_dropped.emit(expand_dropped(files))
             e.acceptProposedAction()
+
+
+def expand_dropped(files: list[str]) -> list[str]:
+    """Files dropped from Explorer, with folders opened up into the sound files (and zips)
+    in them. An unzipped backup / sound pack folder is kept whole (see backup.py)."""
+    expanded = []
+    for f in files:
+        pth = Path(f)
+        if pth.is_dir() and any((pth / n).is_file() for n in ("onionboard.json", "sound.json")):
+            expanded.append(f)
+        elif pth.is_dir():
+            expanded += [str(x) for x in sorted(pth.rglob("*"))
+                         if x.is_file() and x.suffix.lower() in AUDIO_EXTS | {".zip"}]
+        else:
+            expanded.append(f)
+    return expanded

@@ -5,6 +5,7 @@ import copy
 import html
 import logging
 import subprocess
+import tempfile
 import threading
 import time
 from collections.abc import Callable
@@ -47,7 +48,8 @@ from soundboard.ui.overlay import Overlay
 from soundboard.ui.appspanel import AppsTab
 from soundboard.ui.radiopanel import RadioTab
 from soundboard.ui.voicepanel import VoicePanel
-from soundboard.ui.widgets import Meter, Pad, PadGrid, SeekSlider, fmt_pos, spectrum
+from soundboard.ui.widgets import (Meter, Pad, PadGrid, SeekSlider, expand_dropped, fmt_pos,
+                                   spectrum)
 from soundboard.wheelguard import no_wheel
 from soundboard.winkeys import Hotkeys
 
@@ -82,6 +84,7 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Onion Board")
+        self.setAcceptDrops(True)   # files dropped outside the pad grid: see dropEvent
         self.cfg = Config.load()
         app = QApplication.instance()
         if app is not None:   # before the UI is built, so everything polishes in-theme
@@ -1602,23 +1605,50 @@ class MainWindow(QMainWindow):
         exts = " ".join(f"*{e}" for e in sorted(AUDIO_EXTS))
         files, _ = QFileDialog.getOpenFileNames(
             self, "Add sounds", str(Path.home()),
-            f"Audio ({exts});;Onion Board backup or sound pack (*.zip);;All files (*)")
+            f"Sounds and zips ({exts} *.zip);;Audio ({exts});;Zip of sounds, backup or "
+            "sound pack (*.zip);;All files (*)")
         if files:
             self.import_files(files)
 
     def import_files(self, files):
         files = [f for f in files if f]
+        zips = {}   # a plain zip of sound files: unpacked, then imported like the rest
         # a backup / sound pack (a .zip, or a folder with its JSON) is unpacked instead
         for f in [f for f in files if self._is_package(f)]:
             files.remove(f)
-            self.import_package(f)
-        if not files:
+            names = backup.loose_audio(f)
+            if names:
+                zips[f] = names
+            else:
+                self.import_package(f)
+        count = len(files) + sum(len(n) for n in zips.values())
+        if not count:
             return
-        self._pending_imports += len(files)
+        self._pending_imports += count
         start = len(self.cfg.sounds)
         known = {m.fingerprint: m.name for m in self.cfg.sounds if m.fingerprint}
 
         def run():
+            with tempfile.TemporaryDirectory(prefix="onionboard-zip-") as tmp:
+                todo = list(files)
+                for k, (z, names) in enumerate(zips.items()):
+                    try:
+                        res = backup.extract_loose(z, names, Path(tmp) / str(k))
+                    except Exception as e:  # noqa: BLE001 - too big, no room, damaged
+                        log.warning("can't unpack %s: %s", z, e)
+                        # one message for the zip; the rest only count down
+                        self.bridge.imported.emit(None, None, f"{Path(z).name}: {e}")
+                        for _ in names[1:]:
+                            self.bridge.imported.emit(None, None, "")
+                        continue
+                    for _n, dest, err in res:
+                        if dest is None:
+                            self.bridge.imported.emit(None, None, f"{Path(z).name} → {err}")
+                        else:
+                            todo.append(str(dest))
+                import_all(todo)
+
+        def import_all(files):
             for i, f in enumerate(files):
                 try:
                     fp = fingerprint(f)
@@ -1634,7 +1664,7 @@ class MainWindow(QMainWindow):
                     log.warning("can't import %s: %s", f, e)
                     self.bridge.imported.emit(None, None, f"{Path(f).name}: {e}")
         threading.Thread(target=run, daemon=True, name="import").start()
-        self.status.setText(f"Importing {len(files)} file(s)…")
+        self.status.setText(f"Importing {count} file(s)…")
 
     def on_imported(self, meta, data, err):
         self._pending_imports -= 1
@@ -1643,7 +1673,7 @@ class MainWindow(QMainWindow):
             self.cfg.sounds.append(meta)
             self._index()
             self.audio[meta.id] = data
-        else:
+        elif err:
             self._import_errors.append(err)
         if self._pending_imports <= 0:
             self._pending_imports = 0
@@ -2022,10 +2052,11 @@ class MainWindow(QMainWindow):
                             f"{html.escape(Path(path).name)}.")
 
     def import_dialog(self):
-        f, _ = QFileDialog.getOpenFileName(self, "Import a backup or sound pack",
-                                           str(Path.home()), "Zip file (*.zip)")
-        if f:
-            self.import_package(f)
+        files, _ = QFileDialog.getOpenFileNames(
+            self, "Import a backup, sound pack or zip of sounds", str(Path.home()),
+            "Zip file (*.zip)")
+        if files:
+            self.import_files(files)   # a plain zip of sounds is imported too
 
     def import_package(self, path: str):
         """Add the sounds from a backup / sound pack (ones already here are skipped).
@@ -2462,6 +2493,21 @@ class MainWindow(QMainWindow):
         super().resizeEvent(ev)
         if hasattr(self, "_fit_timer"):
             self._fit_timer.start(0)   # one refit per burst of resize events
+
+    # Files dropped anywhere else on the window (the toolbar, another tab, the edge of
+    # the pad area) are added just like ones dropped on the pads.
+    def dragEnterEvent(self, e):
+        if e.mimeData().hasUrls():
+            e.acceptProposedAction()
+
+    dragMoveEvent = dragEnterEvent
+
+    def dropEvent(self, e):
+        files = [u.toLocalFile() for u in e.mimeData().urls() if u.isLocalFile()]
+        if files:
+            e.acceptProposedAction()
+            # after the drop returns, so Explorer isn't frozen until a dialog is answered
+            QTimer.singleShot(0, lambda: self.import_files(expand_dropped(files)))
 
     def closeEvent(self, ev):
         if self.tray is not None and self.tray.isVisible() and self.cfg.tray \

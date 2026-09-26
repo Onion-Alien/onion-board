@@ -292,8 +292,81 @@ def _read(src: _Source, path: Path) -> Package:
     if not pkg.sounds and pkg.settings is None:
         if pkg.is_board:
             raise BackupError(f"{path.name} has no sounds or settings in it.")
-        raise BackupError(f"{path.name} isn't an Onion Board backup or sound pack.")
+        raise BackupError(f"{path.name} has no sound files in it, and isn't an Onion Board "
+                          "backup or sound pack.")
     return pkg
+
+
+# ----------------------------------------------------------------- a plain zip of sounds
+
+def _is_junk(name: str) -> bool:
+    """macOS resource forks and the like that ride along in zips made on a Mac."""
+    p = PurePosixPath(name)
+    return p.parts[0] == "__MACOSX" or p.name.startswith("._")
+
+
+def loose_audio(path: str | Path) -> list[str]:
+    """The audio files in a plain zip of sounds (one with no onionboard.json or
+    sound.json), in name order. [] for a backup or sound pack, a zip with no audio,
+    or one that can't be read: those go to read(), which says what's wrong."""
+    path = Path(path)
+    if path.is_dir() or path.suffix.lower() != ".zip":
+        return []
+    try:
+        src = _Source(path)
+    except BackupError:
+        return []
+    try:
+        names = src.names()
+        if any(n == MANIFEST or n == SOUND_JSON or n.endswith("/" + SOUND_JSON)
+               for n in names):
+            return []
+        return sorted((n for n in names if PurePosixPath(n).suffix.lower() in AUDIO_EXTS
+                       and not _is_junk(n)), key=str.lower)
+    finally:
+        src.close()
+
+
+def extract_loose(path: str | Path, names: list[str], dest_dir: Path
+                  ) -> list[tuple[str, Path | None, str]]:
+    """Unpack `names` (from loose_audio) into `dest_dir` to be imported like dropped
+    files: (name, where it went or None, why not). Each lands in a folder of its own
+    under a safe name that keeps its own stem, since that becomes the sound's name.
+    Raises BackupError (before anything is written) if the zip is too big or the disk
+    too full."""
+    path = Path(path)
+    src = _Source(path)
+    out = []
+    try:
+        total = sum(min(src.size(n), MAX_FILE + 1) for n in names if src.has(n))
+        if total > MAX_TOTAL:
+            raise BackupError(f"{path.name} holds {_size(total)} of sounds, more than the "
+                              f"{_size(MAX_TOTAL)} one import can take. Import it in parts.")
+        dest_dir.mkdir(parents=True, exist_ok=True)
+        free = shutil.disk_usage(dest_dir).free
+        if 2 * total + DISK_SPARE > free:   # unpacked here, then copied into the library
+            raise BackupError(f"There isn't enough free disk space to import {path.name}: "
+                              f"it needs {_size(2 * total + DISK_SPARE)} and {_size(free)} "
+                              "is free.")
+        budget = _Budget(total)
+        for i, n in enumerate(names):
+            shown = PurePosixPath(n).name
+            if not src.has(n):
+                out.append((n, None, f"{shown}: not in the zip"))
+                continue
+            dest = dest_dir / f"{i:04d}" / _safe(shown, keep_ext=True)
+            dest.parent.mkdir(parents=True, exist_ok=True)
+            try:
+                _extract(src, n, dest, budget=budget)
+            except (BackupError, *_ZIP_ERRORS) as e:
+                log.warning("import: can't unpack %s from %s", n, path.name, exc_info=True)
+                why = str(e) if isinstance(e, BackupError) else "damaged in the zip"
+                out.append((n, None, f"{shown}: {why}"))
+                continue
+            out.append((n, dest, ""))
+    finally:
+        src.close()
+    return out
 
 
 # --------------------------------------------------------------------------- import

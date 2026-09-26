@@ -321,3 +321,46 @@ def test_apply_settings_type_checks_radio_fields():
     assert cfg.radio == {"favorites": [st]}
     backup.apply_settings(cfg, {"radio": {"vol": 99, "monitor": False, "last": st}})
     assert cfg.radio == {"vol": 10.0, "monitor": False, "last": st}
+
+
+def _audio_zip(p, tmp_path, names):
+    wav = _tone(tmp_path / "tone.wav").read_bytes()
+    with zipfile.ZipFile(p, "w") as z:
+        for n in names:
+            z.writestr(n, wav)
+    return p
+
+
+def test_a_plain_zip_of_sounds_is_found_and_unpacked_safely(app_dir, tmp_path):
+    p = _audio_zip(tmp_path / "memes.zip", tmp_path,
+                   ["b/Boom.wav", "Air horn.wav", "__MACOSX/._Air horn.wav", "../../evil.wav"])
+    with zipfile.ZipFile(p, "a") as z:
+        z.writestr("readme.txt", "hi")
+    names = backup.loose_audio(p)
+    assert names == ["../../evil.wav", "Air horn.wav", "b/Boom.wav"]
+    out = tmp_path / "out"
+    res = backup.extract_loose(p, names, out)
+    assert all(dest is not None and not err for _n, dest, err in res)
+    got = [dest for _n, dest, _e in res]
+    assert [d.name for d in got] == ["evil.wav", "Air horn.wav", "Boom.wav"]
+    assert all(d.resolve().is_relative_to(out.resolve()) and d.stat().st_size for d in got)
+
+
+def test_backups_packs_and_zips_without_audio_are_not_loose(board, tmp_path):
+    pack = tmp_path / "pack.zip"
+    backup.export(pack, board.sounds)
+    assert backup.loose_audio(pack) == []
+    empty = tmp_path / "empty.zip"
+    zipfile.ZipFile(empty, "w").writestr("readme.txt", "hi")
+    assert backup.loose_audio(empty) == []
+    (tmp_path / "bad.zip").write_bytes(b"not a zip")
+    assert backup.loose_audio(tmp_path / "bad.zip") == []
+    assert backup.loose_audio(tmp_path) == []
+
+
+def test_a_zip_of_sounds_too_big_to_import_is_refused(app_dir, tmp_path, monkeypatch):
+    p = _audio_zip(tmp_path / "big.zip", tmp_path, ["a.wav", "b.wav"])
+    monkeypatch.setattr(backup, "MAX_TOTAL", 10)
+    with pytest.raises(backup.BackupError, match="Import it in parts"):
+        backup.extract_loose(p, backup.loose_audio(p), tmp_path / "out")
+    assert not (tmp_path / "out").exists()   # refused before anything is written

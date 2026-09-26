@@ -111,6 +111,43 @@ def test_zip_files_go_to_the_importer(window, monkeypatch, tmp_path):
     assert got == [str(tmp_path / "board.zip")]
 
 
+def _wav_bytes(tmp_path, freq):
+    import numpy as np
+    import soundfile as sf
+    from soundboard.library import SR
+    t = np.arange(SR // 10) / SR
+    p = tmp_path / f"{freq}.wav"
+    sf.write(p, np.stack([np.sin(2 * np.pi * freq * t)] * 2, 1) * 0.3, SR)
+    return p.read_bytes()
+
+
+def test_a_zip_of_sounds_imports_like_dropped_files(window, qapp, tmp_path):
+    import zipfile
+    z = tmp_path / "memes.zip"
+    with zipfile.ZipFile(z, "w") as f:
+        f.writestr("Bruh.wav", _wav_bytes(tmp_path, 300))
+        f.writestr("more/Vine boom.wav", _wav_bytes(tmp_path, 500))
+        f.writestr("readme.txt", "hi")
+    loose = tmp_path / "Oof.wav"
+    loose.write_bytes(_wav_bytes(tmp_path, 700))
+    window.import_files([str(z), str(loose)])     # a multi-select: a zip and a file
+    assert process_events(qapp, lambda: not window._pending_imports
+                          and len(window.cfg.sounds) == 5)
+    assert [m.name for m in window.cfg.sounds[2:]] == ["Oof", "Bruh", "Vine boom"]
+    assert all(Path(m.file).is_file() and m.duration > 0 for m in window.cfg.sounds[2:])
+    assert not window._import_errors
+
+
+def test_dropped_folders_open_up_into_sounds_and_zips(tmp_path):
+    from soundboard.ui.widgets import expand_dropped
+    d = tmp_path / "pack"
+    (d / "sub").mkdir(parents=True)
+    for n in ("a.mp3", "sub/b.wav", "c.zip", "notes.txt"):
+        (d / n).write_bytes(b"x")
+    got = expand_dropped([str(d), str(tmp_path / "x.wav")])
+    assert [Path(f).name for f in got] == ["a.mp3", "c.zip", "b.wav", "x.wav"]
+
+
 def test_effects_tab_has_the_trim(window):
     d = EditDialog(window.meta("s0"), window.hotkeys, lambda *a: None, window, tab="effects")
     tp = d.effects.trim

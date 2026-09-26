@@ -32,6 +32,9 @@ An unzipped folder of any of these imports too (drop it on the pads). Sounds who
 fingerprint is already in the library are skipped, so importing the same thing
 twice adds nothing.
 
+A zip with none of these, just audio files (in any folders inside it), is a
+**zip of sounds**: each audio file is added as if it had been dropped on the pads.
+
 ## `onionboard.json`
 
 ```json
