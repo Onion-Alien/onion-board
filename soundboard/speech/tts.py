@@ -1,6 +1,9 @@
 """Text-to-speech with the voices built into Windows (no download, works in the exe).
 
-System.Speech is a .NET API, so a single hidden PowerShell process is kept running
+Two kinds of Windows voice: the classic desktop ones (System.Speech: David, Zira,
+Hazel…) and the newer ones Windows adds with a language's speech pack (WinRT
+Windows.Media.SpeechSynthesis: Katja for German, Helena for Spanish…). Both are
+.NET / WinRT APIs, so a single hidden PowerShell process is kept running
 and handed one line per sentence. It writes a WAV file and answers "OK", and
 `SapiTTS.synth` reads that file back. Starting PowerShell takes about a second, so
 it is started once, on first use (or ahead of time with `warm_up`).
@@ -32,9 +35,29 @@ _SCRIPT = r"""
 $ErrorActionPreference = 'Stop'
 Add-Type -AssemblyName System.Speech
 $s = New-Object System.Speech.Synthesis.SpeechSynthesizer
-$names = ($s.GetInstalledVoices() | Where-Object { $_.Enabled } |
-    ForEach-Object { $_.VoiceInfo.Name }) -join '|'
-[Console]::Out.WriteLine('READY ' + $names)
+$list = @($s.GetInstalledVoices() | Where-Object { $_.Enabled } |
+    ForEach-Object { $_.VoiceInfo.Name + "`t" + $_.VoiceInfo.Culture.Name })
+$desk = @{}
+foreach ($v in $s.GetInstalledVoices()) { $desk[$v.VoiceInfo.Name] = 1 }
+# the newer voices, where Windows has them; one already listed as "<name> Desktop" is skipped
+$w = $null; $wv = @{}; $asTask = $null
+try {
+    $ns = 'Windows.Media.SpeechSynthesis'
+    $null = [Type]::GetType("$ns.SpeechSynthesizer, $ns, ContentType=WindowsRuntime", $true)
+    Add-Type -AssemblyName System.Runtime.WindowsRuntime
+    $asTask = ([System.WindowsRuntimeSystemExtensions].GetMethods() | Where-Object {
+        $_.Name -eq 'AsTask' -and $_.GetParameters().Count -eq 1 -and
+        $_.GetParameters()[0].ParameterType.Name -eq 'IAsyncOperation`1' })[0].MakeGenericMethod(
+        [Windows.Media.SpeechSynthesis.SpeechSynthesisStream])
+    $w = New-Object Windows.Media.SpeechSynthesis.SpeechSynthesizer
+    foreach ($v in [Windows.Media.SpeechSynthesis.SpeechSynthesizer]::AllVoices) {
+        $n = $v.DisplayName
+        if ($desk.ContainsKey($n) -or $desk.ContainsKey($n + ' Desktop')) { continue }
+        $wv[$n] = $v
+        $list += $n + "`t" + $v.Language
+    }
+} catch { $w = $null }
+[Console]::Out.WriteLine('READY ' + ($list -join '|'))
 [Console]::Out.Flush()
 $utf8 = [Text.Encoding]::UTF8
 while ($true) {
@@ -42,16 +65,29 @@ while ($true) {
     if ($line -eq $null) { break }
     try {
         $f = $line.Split(' ')
-        if ($f[0] -ne '-') { $s.SelectVoice($utf8.GetString([Convert]::FromBase64String($f[0]))) }
-        $s.Rate = [int]$f[1]
+        $name = ''
+        if ($f[0] -ne '-') { $name = $utf8.GetString([Convert]::FromBase64String($f[0])) }
         $out = $utf8.GetString([Convert]::FromBase64String($f[2]))
         $text = $utf8.GetString([Convert]::FromBase64String($f[3]))
-        $fmt = New-Object System.Speech.AudioFormat.SpeechAudioFormatInfo(RATE,
-            [System.Speech.AudioFormat.AudioBitsPerSample]::Sixteen,
-            [System.Speech.AudioFormat.AudioChannel]::Mono)
-        $s.SetOutputToWaveFile($out, $fmt)
-        $s.Speak($text)
-        $s.SetOutputToNull()
+        if ($name -and $wv.ContainsKey($name)) {
+            $w.Voice = $wv[$name]
+            try { $w.Options.SpeakingRate = [Math]::Pow(2, [int]$f[1] / 10.0) } catch {}
+            $t = $asTask.Invoke($null, @($w.SynthesizeTextToStreamAsync($text)))
+            $t.Wait()
+            $st = $t.Result
+            $in = [System.IO.WindowsRuntimeStreamExtensions]::AsStreamForRead($st)
+            $fs = [System.IO.File]::Create($out)
+            try { $in.CopyTo($fs) } finally { $fs.Close(); $in.Close(); $st.Dispose() }
+        } else {
+            if ($name) { $s.SelectVoice($name) }
+            $s.Rate = [int]$f[1]
+            $fmt = New-Object System.Speech.AudioFormat.SpeechAudioFormatInfo(RATE,
+                [System.Speech.AudioFormat.AudioBitsPerSample]::Sixteen,
+                [System.Speech.AudioFormat.AudioChannel]::Mono)
+            $s.SetOutputToWaveFile($out, $fmt)
+            $s.Speak($text)
+            $s.SetOutputToNull()
+        }
         [Console]::Out.WriteLine('OK')
     } catch {
         $s.SetOutputToNull()
@@ -60,6 +96,18 @@ while ($true) {
     [Console]::Out.Flush()
 }
 """.replace("RATE", str(TTS_RATE))
+
+
+def parse_voices(listing: str) -> tuple[list[str], dict[str, str]]:
+    """The READY line's "name<TAB>language|…" into (names, {name: language})."""
+    names, langs = [], {}
+    for entry in listing.strip().split("|"):
+        name, _, lang = entry.partition("	")
+        name = name.strip()
+        if name and name not in langs:
+            names.append(name)
+            langs[name] = lang.strip()
+    return names, langs
 
 
 def _b64(s: str) -> str:
@@ -71,6 +119,7 @@ class SapiTTS:
         self._proc: subprocess.Popen | None = None
         self._lock = threading.Lock()
         self.voices: list[str] = []
+        self.voice_langs: dict[str, str] = {}   # voice name -> its language, like "de-DE"
         self.error = ""
 
     def _start(self):
@@ -87,8 +136,17 @@ class SapiTTS:
         if not line.startswith("READY"):
             self.close()
             raise RuntimeError(f"Windows speech didn't start: {line or 'no answer'}")
-        self.voices = [v for v in line[5:].strip().split("|") if v]
+        self.voices, self.voice_langs = parse_voices(line[5:])
         log.info("Windows speech ready: %s", ", ".join(self.voices) or "no voices")
+
+    def voice_for(self, lang: str, prefer: str = "") -> str:
+        """A voice that speaks `lang` ("de", "zh"…): `prefer` if it does, else the
+        first one installed; "" when Windows has none."""
+        def speaks(name: str) -> bool:
+            return self.voice_langs.get(name, "").lower().split("-")[0] == lang.lower()
+        if prefer and speaks(prefer):
+            return prefer
+        return next((v for v in self.voices if speaks(v)), "")
 
     def warm_up(self) -> list[str]:
         with self._lock:
@@ -99,6 +157,12 @@ class SapiTTS:
                 self.error = str(e)
                 log.warning("text-to-speech unavailable: %s", e)
             return self.voices
+
+    def refresh(self) -> list[str]:
+        """Look for voices again (one was just installed in Windows settings)."""
+        with self._lock:
+            self.close()
+        return self.warm_up()
 
     def synth(self, text: str, voice: str = "", rate: int = 0) -> tuple[np.ndarray, int]:
         """Speak `text` into memory: (float32 mono samples, sample rate)."""
@@ -146,16 +210,17 @@ class Speaker:
         self.tts, self.play, self.on_error = tts, play, on_error
         self.voice = ""
         self.rate = 0
-        self._q: deque[str] = deque(maxlen=20)
+        self._q: deque[tuple[str, str | None]] = deque(maxlen=20)
         self._wake = threading.Event()
         self._cancel = threading.Event()
         self._gen = 0           # bumped by stop(); a line from an older gen is dropped
         self._busy_until = 0.0
         threading.Thread(target=self._run, name="tts-speaker", daemon=True).start()
 
-    def say(self, text: str):
+    def say(self, text: str, voice: str | None = None):
+        """Queue a line; `voice` overrides `self.voice` for this line only."""
         if text.strip():
-            self._q.append(text)
+            self._q.append((text, voice))
             self._wake.set()
 
     def stop(self):
@@ -176,12 +241,13 @@ class Speaker:
             while True:
                 gen = self._gen     # read before popping, so a stop() in between is seen
                 try:
-                    text = self._q.popleft()
+                    text, voice = self._q.popleft()
                 except IndexError:
                     break
                 self._cancel.clear()
                 try:
-                    mono, sr = self.tts.synth(text, self.voice, self.rate)
+                    mono, sr = self.tts.synth(text, self.voice if voice is None else voice,
+                                              self.rate)
                 except Exception as e:  # noqa: BLE001
                     log.warning("text-to-speech failed: %s", e)
                     self.on_error(str(e))

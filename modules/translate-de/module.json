@@ -1,0 +1,15 @@
+{
+  "id": "translate-de",
+  "name": "Translate to German",
+  "version": "1.0.0",
+  "kind": "translation",
+  "description": "The computer voice speaks what you say in German. Needs live voice-to-speech. Downloads a 151 MB translation model once, when you ask for it; translating then happens on this PC.",
+  "language": "de",
+  "language_name": "German",
+  "download": {
+    "url": "https://argos-net.com/v1/translate-en_de-1_3.argosmodel",
+    "sha256": "6cd847f0c06c9c66013e6b0932e07fd54a6d90894659c02bf6c5247b72fb25b1",
+    "bytes": 150508297
+  },
+  "credits": "English to German model from the Argos Translate package index: Argos Translate, trained on OPUS data."
+}

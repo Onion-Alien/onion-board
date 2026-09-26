@@ -1,0 +1,15 @@
+{
+  "id": "translate-ru",
+  "name": "Translate to Russian",
+  "version": "1.0.0",
+  "kind": "translation",
+  "description": "The computer voice speaks what you say in Russian. Needs live voice-to-speech. Downloads a 196 MB translation model once, when you ask for it; translating then happens on this PC.",
+  "language": "ru",
+  "language_name": "Russian",
+  "download": {
+    "url": "https://argos-net.com/v1/translate-en_ru-1_9.argosmodel",
+    "sha256": "591d743ae103752b88ffc38785c50421320f4eff93c8967e0d3d2e14d4e27811",
+    "bytes": 195746693
+  },
+  "credits": "English to Russian model from the Argos Translate package index: Argos Translate (Aleksey Kutashov), trained on OPUS data (CCMatrix, WikiMatrix…)."
+}

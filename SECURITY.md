@@ -56,6 +56,7 @@ So you know what normal looks like when auditing it:
 | You install the virtual cable | `vb-audio.com` | downloads VB-Cable; the installer's signature is checked before it runs |
 | Install from source (`install.ps1`) | PyPI, and `winget` if you accept installing Python | the app's `requirements.txt` |
 | You install a module (its Install button, its `install.bat`, or the installer's *live voice* box) | PyPI, via `pip`, plus whatever the module fetches | that module's `requirements.txt`; *live-voice* downloads a Whisper speech model from Hugging Face (via `faster-whisper`), and picking a different model in the Voice tab downloads that one the first time it starts |
+| You pick a language under *Speak in* (Voice tab) and press its *Download* button | `argos-net.com` | downloads that language's translation model (65–195 MB) once, checks it against the SHA-256 in its add-on's `module.json`, and unpacks only the model files into `%APPDATA%\Soundboard\translation\`. Translating what you say then happens on your PC |
 | Always | `127.0.0.1` only | browser audio sink and module link, each guarded by a random per-launch secret |
 | Always | a local named pipe (`Soundboard.App`) | single instance: a second launch asks the first to come to the front. It only accepts that one request |
 

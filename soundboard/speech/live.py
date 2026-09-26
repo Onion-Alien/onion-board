@@ -3,6 +3,9 @@
     typed text ─────────────────────────────┐
     mic ─ VoiceChain.tap ─ ServiceHost ─ "final" text ─┴─ Speaker ─ SapiTTS ─ Engine.play
 
+When live voice translates (a translation add-on), its lines come back already in
+that language and are spoken with `live_voice`, a voice that speaks it.
+
 Spoken lines are played like a sound (sid "tts"), so they go to the cable, your
 headphones and auto push-to-talk exactly as a pad would. While live voice is on,
 the chain can also mute your real voice (`replace`), so others only hear the TTS.
@@ -36,6 +39,7 @@ class SpeechController:
                                lambda m: self.on_event({"type": "tts_error", "text": m}))
         self.host: ServiceHost | None = None
         self.mute_real_voice = True
+        self.live_voice: str | None = None   # voice for live lines (None: the chosen one)
 
     # ------------------------------------------------------------ text-to-speech
     def say(self, text: str):
@@ -89,7 +93,7 @@ class SpeechController:
         if host is None or host is not self.host:
             return          # a module we already stopped, still saying goodbye
         if ev.get("type") == "final" and ev.get("text"):
-            self.speaker.say(str(ev["text"]))
+            self.speaker.say(str(ev["text"]), self.live_voice)
         elif ev.get("type") == "stopped":
             # the module died: give the real mic back straight away
             self.host = None

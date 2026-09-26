@@ -126,3 +126,57 @@ def test_changer_starts_off_even_if_it_was_left_on(qapp, monkeypatch):
     finally:
         p.shutdown()
         p.deleteLater()
+
+
+def test_speak_in_offers_the_languages_and_downloads_only_on_request(panel, monkeypatch):
+    from soundboard.speech import translation
+    p, _ = panel
+    s = p.speech
+    codes = [s.cb_lang.itemData(i) for i in range(s.cb_lang.count())]
+    assert codes[0] == "" and set(codes[1:]) == {"zh", "es", "fr", "de", "ru"}
+    assert s.tr_box.isHidden()                          # English: nothing to download
+    assert not translation.base_dir().exists()          # and nothing was fetched
+    got = []
+    s.changed.connect(got.append)
+    s.cb_lang.setCurrentIndex(s.cb_lang.findData("de"))
+    assert got[-1]["translate"] == "de"
+    assert not s.tr_box.isHidden() and not s.b_dl.isHidden()
+    assert s.b_dl.text() == "Download German" and "151 MB" in s.lbl_tr.text()
+    started = []
+    monkeypatch.setattr(s.ctl, "start_live", lambda m, args=(): started.append(args))
+    if s.module is not None:
+        s._toggle_live(True)                            # not downloaded: refuses to start
+        assert started == [] and "Download German first" in s.lbl_state.text()
+
+
+def test_downloaded_language_needs_a_windows_voice_and_uses_it(panel, monkeypatch):
+    from soundboard.speech import translation
+    p, _ = panel
+    s = p.speech
+    s.cb_lang.setCurrentIndex(s.cb_lang.findData("de"))
+    m = s._lang()
+    d = translation.model_dir(m)
+    (d / "model").mkdir(parents=True)
+    (d / "model" / "model.bin").write_bytes(b"x")
+    (d / "sentencepiece.model").write_bytes(b"x")
+    tts = s.ctl.tts
+    tts.voices, tts.voice_langs = ["Microsoft Zira Desktop"], {"Microsoft Zira Desktop": "en-US"}
+    s._fill_langs()
+    assert s.cb_lang.currentText() == "German"
+    assert s.b_dl.isHidden() and not s.b_voices.isHidden()
+    assert "no German voice" in s.lbl_tr.text()
+    tts.voices.append("Microsoft Katja")
+    tts.voice_langs["Microsoft Katja"] = "de-DE"
+    s._refresh_translation()
+    assert s.b_voices.isHidden() and "Katja says it in German" in s.lbl_tr.text()
+    started = []
+    monkeypatch.setattr(s.ctl, "start_live", lambda mod, args=(): started.append(args))
+    s.module = s.module or object()
+    s._toggle_live(True)
+    args = started[0]
+    assert args[args.index("--translate") + 1] == str(d)
+    assert s.ctl.live_voice == "Microsoft Katja"
+    s._on_event({"type": "final", "text": "Hallo", "original": "Hello"})
+    assert s.said_log.toPlainText().endswith("Hallo   (you said: Hello)")
+    s._remove_download()
+    assert not d.exists() and "(download" in s.cb_lang.currentText()

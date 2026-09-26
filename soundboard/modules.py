@@ -4,7 +4,7 @@
         module.json      {"id", "name", "version", "description", "kind", ...}
         ...
 
-Two kinds:
+Three kinds:
 
   "effects"  An `entry` Python file loaded into the app. Its `register(api)` adds
              voice effects with `api.register_effect(EffectSubclass)`. It may only
@@ -19,6 +19,12 @@ Two kinds:
              .venv\\Scripts\\python.exe (made by its install script) and "{dir}" its
              folder.
 
+  "translation"  A language the live computer voice can speak in. Nothing to run:
+             `download` names a translation model ({"url", "sha256", "bytes"}) that
+             is fetched only when the user asks for it (see
+             `soundboard.speech.translation`), and the live-voice helper loads it.
+             `language` is its code (de, es…), `language_name` its name.
+
 Modules are searched for in %APPDATA%\\Soundboard\\modules (where users drop
 downloads) and in the `modules` folder next to the app (or the repo root when
 running from source).
@@ -28,6 +34,7 @@ from __future__ import annotations
 import importlib.util
 import json
 import logging
+import re
 import shutil
 import subprocess
 import sys
@@ -40,7 +47,7 @@ from soundboard import library
 
 log = logging.getLogger(__name__)
 
-KINDS = ("effects", "service")
+KINDS = ("effects", "service", "translation")
 
 
 def app_root() -> Path:
@@ -65,6 +72,10 @@ class ModuleInfo:
     command: list[str] = field(default_factory=list)
     provides: list[str] = field(default_factory=list)
     install_steps: list[list[str]] = field(default_factory=list)
+    language: str = ""
+    language_name: str = ""
+    download: dict = field(default_factory=dict)
+    credits: str = ""
     error: str = ""
     loaded: bool = False
 
@@ -80,7 +91,11 @@ class ModuleInfo:
 
     @property
     def installed(self) -> bool:
-        """For a service: are its dependencies set up (its own venv exists)?"""
+        """For a service: are its dependencies set up (its own venv exists)? For a
+        translation: has its model been downloaded?"""
+        if self.kind == "translation":
+            from soundboard.speech import translation
+            return translation.is_downloaded(self)
         if self.kind != "service" or not any("{python}" in a for a in self.command):
             return True
         return (self.path / ".venv" / "Scripts" / "python.exe").exists()
@@ -100,7 +115,11 @@ def _read(folder: Path) -> ModuleInfo | None:
                           command=[str(a) for a in d.get("command", [])],
                           provides=[str(a) for a in d.get("provides", [])],
                           install_steps=[[str(a) for a in step]
-                                         for step in d.get("install", [])])
+                                         for step in d.get("install", [])],
+                          language=str(d.get("language", "")),
+                          language_name=str(d.get("language_name", "")),
+                          download=dict(d.get("download") or {}),
+                          credits=str(d.get("credits", "")))
     except (OSError, ValueError, KeyError, TypeError) as e:
         log.warning("bad module.json in %s: %s", folder, e)
         return ModuleInfo(id=folder.name, name=folder.name, version="?", description="",
@@ -111,6 +130,11 @@ def _read(folder: Path) -> ModuleInfo | None:
         info.error = f"entry file {info.entry!r} not found"
     elif info.kind == "service" and not info.command:
         info.error = "no command"
+    elif info.kind == "translation" and not (
+            re.fullmatch(r"[a-z]{2,3}", info.language)
+            and str(info.download.get("url", "")).startswith("https://")
+            and re.fullmatch(r"[0-9a-f]{64}", str(info.download.get("sha256", "")))):
+        info.error = "needs a language code and an https download with its sha256"
     return info
 
 

@@ -24,6 +24,15 @@ but slower. For languages other than English, use `base` or `small` and set the
 language in the Voice tab. With an NVIDIA GPU and CUDA, choose the `cuda`
 device.
 
+## Speaking another language
+
+The `translate-*` add-ons (Chinese, Spanish, French, German, Russian) let the
+voice say what you said in that language. Pick one under **Speak in** in the
+Voice tab and press **Download** (65–195 MB, once). The app then starts this
+helper with `--translate <folder>`: each English sentence is translated on your
+PC with that CTranslate2 model before it's spoken. The models come from the
+Argos Translate package index (mostly OPUS-MT, CC BY 4.0).
+
 ## How it talks to the app
 
 It runs as its own process and talks to the app over a local socket (see

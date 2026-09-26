@@ -355,3 +355,132 @@ def test_helper_refuses_to_run_without_the_app():
     r = subprocess.run([sys.executable, str(LIVE / "helper.py")], capture_output=True,
                        timeout=30)
     assert r.returncode != 0 and b"--port" in r.stderr
+
+
+# ---------------------------------------------------------------- translation add-ons
+
+LANGS = {"zh", "es", "fr", "de", "ru"}
+
+
+def test_repo_ships_the_five_translation_addons_not_downloaded():
+    infos = [m for m in modules.discover([ROOT / "modules"]) if m.kind == "translation"]
+    assert {m.language for m in infos} == LANGS
+    for m in infos:
+        assert not m.error and m.language_name and m.credits
+        assert m.download["url"].startswith("https://") and m.download["bytes"] > 1e6
+        assert not m.installed          # nothing is fetched until the user asks
+    assert not list((ROOT / "modules").glob("translate-*/model"))
+
+
+def test_translation_manifest_needs_https_and_a_checksum(tmp_path):
+    good = {"url": "https://example.com/m.zip", "sha256": "a" * 64, "bytes": 5}
+    write_module(tmp_path / "ok", id="ok", kind="translation", language="de", download=good)
+    write_module(tmp_path / "http", id="http", kind="translation", language="de",
+                 download={**good, "url": "http://example.com/m.zip"})
+    write_module(tmp_path / "nosum", id="nosum", kind="translation", language="de",
+                 download={"url": good["url"]})
+    write_module(tmp_path / "nolang", id="nolang", kind="translation", download=good)
+    got = {m.id: m for m in modules.discover([tmp_path])}
+    assert got["ok"].error == ""
+    assert all(got[k].error for k in ("http", "nosum", "nolang"))
+
+
+def model_package(path: Path, top="translate-en_xx-1_0") -> tuple[str, int]:
+    """A tiny .argosmodel-shaped zip, plus files that must never be unpacked."""
+    import zipfile
+    with zipfile.ZipFile(path, "w") as z:
+        z.writestr(f"{top}/model/model.bin", b"weights")
+        z.writestr(f"{top}/model/config.json", b"{}")
+        z.writestr(f"{top}/sentencepiece.model", b"tokens")
+        z.writestr(f"{top}/README.md", b"readme")
+        z.writestr(f"{top}/stanza/en/tokenize.pt", b"x")
+        z.writestr("../../escape.txt", b"nope")
+        z.writestr(f"{top}/model/../../../escape2.txt", b"nope")
+    import hashlib
+    data = path.read_bytes()
+    return hashlib.sha256(data).hexdigest(), len(data)
+
+
+def translation_info(tmp_path, sha, size, lang="xx"):
+    zip_path = tmp_path / "pkg.argosmodel"
+    return modules.ModuleInfo(id=f"translate-{lang}", name="T", version="1", description="",
+                              kind="translation", path=tmp_path, language=lang,
+                              language_name="Test", download={"url": zip_path.as_uri(),
+                                                              "sha256": sha, "bytes": size})
+
+
+def test_download_checks_the_sum_and_unpacks_only_the_model(tmp_path):
+    from soundboard.speech import translation
+    sha, size = model_package(tmp_path / "pkg.argosmodel")
+    info = translation_info(tmp_path, sha, size)
+    seen = []
+    translation.download(info, lambda done, total: seen.append((done, total)))
+    d = translation.model_dir(info)
+    assert info.installed and d.is_relative_to(translation.base_dir())
+    files = sorted(p.relative_to(d).as_posix() for p in d.rglob("*") if p.is_file())
+    assert files == ["model/config.json", "model/model.bin", "sentencepiece.model"]
+    assert seen[-1][0] == size
+    assert not list(tmp_path.rglob("escape*.txt"))
+    assert not list(translation.base_dir().glob("*.part"))
+    translation.remove(info)
+    assert not info.installed
+
+
+def test_download_with_the_wrong_sum_is_thrown_away(tmp_path):
+    from soundboard.speech import translation
+    _, size = model_package(tmp_path / "pkg.argosmodel")
+    info = translation_info(tmp_path, "0" * 64, size)
+    with pytest.raises(RuntimeError, match="checksum"):
+        translation.download(info)
+    assert not info.installed and not list(translation.base_dir().glob("*"))
+
+
+def test_download_can_be_cancelled(tmp_path):
+    from soundboard.speech import translation
+    sha, size = model_package(tmp_path / "pkg.argosmodel")
+    info = translation_info(tmp_path, sha, size)
+    with pytest.raises(translation.Cancelled):
+        translation.download(info, cancelled=lambda: True)
+    assert not info.installed and not list(translation.base_dir().glob("*"))
+
+
+def test_live_voice_speaks_the_translation_in_the_languages_voice(tmp_path, monkeypatch):
+    from soundboard import library
+    monkeypatch.setattr(library, "APP_DIR", tmp_path)
+    events = []
+    c, eng = controller(events)
+    shutil.copytree(LIVE, tmp_path / "live-voice", ignore=shutil.ignore_patterns(".venv"))
+    info = next(m for m in modules.discover([tmp_path]) if m.id == "live-voice")
+    info.command = [sys.executable, "{dir}/helper.py", "--fake"]
+    c.live_voice = "Katja"
+    c.start_live(info, ["--translate", str(tmp_path / "model")])
+    try:
+        assert wait_for(lambda: any(e["type"] == "ready" for e in events))
+        for b in speechlike(np.random.default_rng(3), [(0.5, 0.002), (1.0, 0.2), (1.0, 0.002)]):
+            c.chain.process(np.stack([b, b], 1), 48000)
+            time.sleep(0.0005)
+        assert wait_for(lambda: len(eng.played) == 1)
+        final = next(e for e in events if e["type"] == "final")
+        assert final["text"].startswith("[translated] utterance 1")
+        assert final["original"].startswith("utterance 1")
+        assert c.tts.said[0][:2] == (final["text"], "Katja")
+    finally:
+        c.stop_live()
+    c.say("typed")                     # typed lines keep the chosen voice
+    assert wait_for(lambda: len(c.tts.said) == 2)
+    assert c.tts.said[1][:2] == ("typed", "")
+
+
+def test_voice_listing_and_picking_a_voice_for_a_language():
+    from soundboard.speech.tts import SapiTTS, parse_voices
+    names, langs = parse_voices("Microsoft Zira Desktop\ten-US|Microsoft Katja\tde-DE|"
+                                "Microsoft Stefan\tde-DE|Microsoft Huihui\tzh-CN|Old\t|")
+    assert names == ["Microsoft Zira Desktop", "Microsoft Katja", "Microsoft Stefan",
+                     "Microsoft Huihui", "Old"]
+    t = SapiTTS()
+    t.voices, t.voice_langs = names, langs
+    assert t.voice_for("de") == "Microsoft Katja"
+    assert t.voice_for("de", prefer="Microsoft Stefan") == "Microsoft Stefan"
+    assert t.voice_for("de", prefer="Microsoft Zira Desktop") == "Microsoft Katja"
+    assert t.voice_for("zh") == "Microsoft Huihui"
+    assert t.voice_for("ru") == ""

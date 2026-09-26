@@ -1,0 +1,15 @@
+{
+  "id": "translate-es",
+  "name": "Translate to Spanish",
+  "version": "1.0.0",
+  "kind": "translation",
+  "description": "The computer voice speaks what you say in Spanish. Needs live voice-to-speech. Downloads a 88 MB translation model once, when you ask for it; translating then happens on this PC.",
+  "language": "es",
+  "language_name": "Spanish",
+  "download": {
+    "url": "https://argos-net.com/v1/translate-en_es-1_0.argosmodel",
+    "sha256": "d698d0ef87ad70d5d184b7fa6965905bf4368f09a2bb9ffb165a79bac96af0c4",
+    "bytes": 87503191
+  },
+  "credits": "English to Spanish model from the Argos Translate package index: Argos Translate, trained on OPUS data (OpenSubtitles, ParaCrawl, UNPC)."
+}

@@ -10,7 +10,8 @@ import os
 import threading
 import time
 
-from PySide6.QtCore import Qt, QTimer, Signal
+from PySide6.QtCore import Qt, QTimer, QUrl, Signal
+from PySide6.QtGui import QDesktopServices
 from PySide6.QtWidgets import (QButtonGroup, QCheckBox, QComboBox, QFrame, QGridLayout,
                                QHBoxLayout, QLabel, QLineEdit, QPlainTextEdit, QPushButton,
                                QScrollArea, QSlider, QVBoxLayout, QWidget)
@@ -18,6 +19,7 @@ from PySide6.QtWidgets import (QButtonGroup, QCheckBox, QComboBox, QFrame, QGrid
 from soundboard import modules as mods
 from soundboard import voicefx
 from soundboard import library
+from soundboard.speech import translation
 from soundboard.speech.live import SpeechController
 from soundboard.ui import icons
 from soundboard.ui.panel import (VolumeControl, bar, card, hint_label, icon_label,
@@ -39,7 +41,13 @@ def default_fx_spec() -> dict:
 
 def default_speech_settings() -> dict:
     return {"voice": "", "rate": 0, "gain": 1.0, "model": "base.en", "language": "en",
-            "mute_real_voice": True}
+            "mute_real_voice": True, "translate": ""}
+
+
+def translations(module_list: list[mods.ModuleInfo]) -> list[mods.ModuleInfo]:
+    """The languages the live voice can speak in (translation add-ons), A to Z."""
+    return sorted((m for m in module_list if m.kind == "translation" and not m.error),
+                  key=lambda m: m.language_name or m.language)
 
 
 # =========================================================================== voice changer
@@ -345,6 +353,9 @@ class SpeechPanel(QWidget):
     _voices = Signal(list, str)
     _install_line = Signal(str)
     _install_done = Signal(bool)
+    _dl_progress = Signal(int, int)
+    _dl_done = Signal(str)          # "" when it worked, else what went wrong
+    downloaded = Signal()           # a translation was downloaded or removed
 
     def __init__(self, controller: SpeechController, settings: dict,
                  module_list: list[mods.ModuleInfo]):
@@ -353,6 +364,9 @@ class SpeechPanel(QWidget):
         self.s = {**default_speech_settings(), **(settings or {})}
         self.module = next((m for m in module_list if m.id == LIVE_MODULE and not m.error),
                            None)
+        self.langs = translations(module_list)
+        self._dl_cancel = False
+        self._dl_busy: mods.ModuleInfo | None = None
         controller.gain = self.s["gain"]
         controller.speaker.voice = self.s["voice"]
         controller.speaker.rate = int(self.s["rate"])
@@ -362,6 +376,8 @@ class SpeechPanel(QWidget):
         self._voices.connect(self._fill_voices)
         self._install_line.connect(lambda t: self.lbl_install.setText(t[-160:]))
         self._install_done.connect(self._on_install_done)
+        self._dl_progress.connect(self._on_dl_progress)
+        self._dl_done.connect(self._on_dl_done)
 
         v = QVBoxLayout(self)
         v.setContentsMargins(0, 0, 0, 0)
@@ -377,6 +393,41 @@ class SpeechPanel(QWidget):
         lv = QVBoxLayout(self.live_box)
         lv.setContentsMargins(0, 0, 0, 0)
         lv.setSpacing(6)
+        # speak in another language: English in, the chosen language out
+        trow = QHBoxLayout()
+        self.lbl_lang = QLabel("Speak in")
+        trow.addWidget(self.lbl_lang)
+        self.cb_lang = QComboBox()
+        self.cb_lang.setToolTip("Say it in English; the computer voice says it in this "
+                                "language. Each language is a one-time download.")
+        trow.addWidget(self.cb_lang, 1)
+        lv.addLayout(trow)
+        self.tr_box = QWidget()
+        tv = QVBoxLayout(self.tr_box)
+        tv.setContentsMargins(0, 0, 0, 0)
+        tv.setSpacing(4)
+        self.lbl_tr = hint_label("")
+        tv.addWidget(self.lbl_tr)
+        tb = QHBoxLayout()
+        self.b_dl = QPushButton("Download")
+        icons.set_icon(self.b_dl, "plus")
+        self.b_dl.clicked.connect(self._download)
+        self.b_dl_cancel = QPushButton("Cancel")
+        self.b_dl_cancel.clicked.connect(self._cancel_download)
+        self.b_voices = QPushButton("Get the voice in Windows settings")
+        self.b_voices.setToolTip("Settings \u2192 Time & language \u2192 Speech \u2192 Add "
+                                 "voices. Come back and press Refresh under Add-ons when it's "
+                                 "installed.")
+        self.b_voices.clicked.connect(
+            lambda: QDesktopServices.openUrl(QUrl("ms-settings:speech")))
+        self.b_dl_remove = QPushButton("Delete download")
+        self.b_dl_remove.setObjectName("small")
+        self.b_dl_remove.clicked.connect(self._remove_download)
+        for b in (self.b_dl, self.b_dl_cancel, self.b_voices, self.b_dl_remove):
+            tb.addWidget(b)
+        tb.addStretch(1)
+        tv.addLayout(tb)
+        lv.addWidget(self.tr_box)
         self.b_live = QPushButton("Start talking as the voice")
         icons.set_icon(self.b_live, "mic", "on_accent", "on_accent")
         self.b_live.setCheckable(True)
@@ -465,6 +516,11 @@ class SpeechPanel(QWidget):
         self.chk_mute.setToolTip("Others hear only the spoken voice, not your real one.")
         self.chk_mute.setChecked(self.s["mute_real_voice"])
         ov.addWidget(self.chk_mute)
+        self.b_update = QPushButton("Update speech recognition")
+        self.b_update.setToolTip("Runs its install again: picks up what a newer Soundboard "
+                                 "needs (translation, for one). Needs Python 3.12+.")
+        self.b_update.clicked.connect(self._install)
+        ov.addWidget(self.b_update, 0, Qt.AlignLeft)
         v.addWidget(self.opts)
         self.opts.hide()
         self.btn_opts.toggled.connect(lambda on: (
@@ -503,6 +559,8 @@ class SpeechPanel(QWidget):
                     self.chk_mute.toggled):
             sig.connect(self._settings_edited)
         self.ed_lang.editingFinished.connect(self._settings_edited)
+        self._fill_langs()
+        self.cb_lang.currentIndexChanged.connect(self._lang_picked)
         self._refresh_module()
 
         threading.Thread(target=lambda: self._voices.emit(controller.tts.warm_up(),
@@ -531,6 +589,7 @@ class SpeechPanel(QWidget):
         self.cb_voice.setCurrentIndex(max(0, self.cb_voice.findData(self.s["voice"])))
         self.cb_voice.setEnabled(bool(voices))
         self.cb_voice.blockSignals(False)
+        self._refresh_translation()
         if error:
             self._tts_error(f"Text-to-speech isn't available: {error}")
 
@@ -542,7 +601,8 @@ class SpeechPanel(QWidget):
         self.s.update(voice=self.cb_voice.currentData() or "", rate=self.sl_rate.value(),
                       gain=self.sl_gain.value(), model=self.cb_model.currentData(),
                       language=self.ed_lang.text().strip() or "en",
-                      mute_real_voice=self.chk_mute.isChecked())
+                      mute_real_voice=self.chk_mute.isChecked(),
+                      translate=self.cb_lang.currentData() or "")
         self.ctl.speaker.voice = self.s["voice"]
         self.ctl.speaker.rate = self.s["rate"]
         self.ctl.gain = self.s["gain"]
@@ -553,7 +613,124 @@ class SpeechPanel(QWidget):
     def set_modules(self, module_list: list[mods.ModuleInfo]):
         self.module = next((m for m in module_list if m.id == LIVE_MODULE and not m.error),
                            None)
+        self.langs = translations(module_list)
+        self._fill_langs()
         self._refresh_module()
+        # "Refresh" may come right after installing a voice in Windows settings
+        threading.Thread(target=lambda: self._voices.emit(self.ctl.tts.refresh(),
+                                                          self.ctl.tts.error),
+                         name="tts-refresh", daemon=True).start()
+
+    # ---- translation
+    def _lang(self) -> mods.ModuleInfo | None:
+        code = self.cb_lang.currentData()
+        return next((m for m in self.langs if m.language == code), None)
+
+    def _fill_langs(self):
+        self.cb_lang.blockSignals(True)
+        self.cb_lang.clear()
+        self.cb_lang.addItem("English (as you say it)", "")
+        for m in self.langs:
+            name = m.language_name or m.language
+            self.cb_lang.addItem(name if m.installed
+                                 else f"{name}  (download {translation.size_mb(m)} MB)",
+                                 m.language)
+        self.cb_lang.setCurrentIndex(max(0, self.cb_lang.findData(self.s["translate"])))
+        self.cb_lang.blockSignals(False)
+        self.lbl_lang.setVisible(bool(self.langs))
+        self.cb_lang.setVisible(bool(self.langs))
+        self._refresh_translation()
+
+    def _lang_picked(self, *_):
+        self._settings_edited()
+        self._refresh_translation()
+
+    def _voice_for(self, m: mods.ModuleInfo) -> str:
+        return self.ctl.tts.voice_for(m.language, self.s["voice"])
+
+    def _refresh_translation(self):
+        """The box under "Speak in": download it, get its Windows voice, or all set."""
+        m = self._lang()
+        busy = self._dl_busy is not None
+        self.tr_box.setVisible(m is not None or busy)
+        for b in (self.b_dl, self.b_dl_cancel, self.b_voices, self.b_dl_remove):
+            b.hide()
+        if busy:
+            self.b_dl_cancel.show()
+            return
+        if m is None:
+            return
+        name = m.language_name or m.language
+        live = self.ctl.live
+        if not m.installed:
+            self.lbl_tr.setText(f"{name} needs a one-time download of its translation model "
+                                f"({translation.size_mb(m)} MB). After that, translating "
+                                "happens on this PC; what you say never leaves it.")
+            self.b_dl.setText(f"Download {name}")
+            self.b_dl.show()
+            self.b_dl.setEnabled(not live)
+            return
+        self.b_dl_remove.setVisible(not live)
+        if not self.ctl.tts.voices:        # still loading, or no speech at all
+            self.lbl_tr.setText(f"Say it in English; the voice says it in {name}.")
+            return
+        voice = self._voice_for(m)
+        if voice:
+            short = voice.replace("Microsoft ", "").replace(" Desktop", "")
+            self.lbl_tr.setText(f"Say it in English; {short} says it in {name}. "
+                                "Translation is quick but not perfect with slang.")
+        else:
+            self.lbl_tr.setText(f"\u26a0 Windows has no {name} voice yet, so it can't be "
+                                f"spoken properly. Add one: Speech \u2192 Add voices \u2192 "
+                                f"{name} (free), then press Refresh under Add-ons.")
+            self.b_voices.show()
+
+    def _download(self):
+        m = self._lang()
+        if m is None or self._dl_busy is not None:
+            return
+        self._dl_busy, self._dl_cancel = m, False
+        self.cb_lang.setEnabled(False)
+        self.b_live.setEnabled(False)
+        self._refresh_translation()
+        self.lbl_tr.setText(f"Downloading {m.language_name}\u2026 0%")
+
+        def work():
+            try:
+                translation.download(m, self._dl_progress.emit, lambda: self._dl_cancel)
+                self._dl_done.emit("")
+            except translation.Cancelled:
+                self._dl_done.emit("cancelled")
+            except RuntimeError as e:
+                self._dl_done.emit(str(e))
+
+        threading.Thread(target=work, name="translation-download", daemon=True).start()
+
+    def _cancel_download(self):
+        self._dl_cancel = True
+
+    def _on_dl_progress(self, done: int, total: int):
+        m = self._dl_busy
+        if m is not None:
+            pct = f"{done * 100 // total}%" if total else f"{done // 1_000_000} MB"
+            self.lbl_tr.setText(f"Downloading {m.language_name}\u2026 {pct}")
+
+    def _on_dl_done(self, err: str):
+        m, self._dl_busy = self._dl_busy, None
+        self.cb_lang.setEnabled(not self.ctl.live)
+        self.b_live.setEnabled(True)
+        self._fill_langs()
+        if err and m is not None:
+            self.lbl_tr.setText("Download cancelled." if err == "cancelled"
+                                else f"\u26a0 {m.language_name}: {err}")
+        self.downloaded.emit()
+
+    def _remove_download(self):
+        m = self._lang()
+        if m is not None and not self.ctl.live:
+            translation.remove(m)
+            self._fill_langs()
+            self.downloaded.emit()
 
     def _refresh_module(self):
         m = self.module
@@ -596,9 +773,17 @@ class SpeechPanel(QWidget):
 
     def _toggle_live(self, on: bool):
         if on and not self.ctl.live:
+            args = ["--model", self.s["model"], "--language", self.s["language"]]
+            m = self._lang()
+            self.ctl.live_voice = None
+            if m is not None:
+                if not m.installed:
+                    self._set_live_ui(False, f"Download {m.language_name} first (above).")
+                    return
+                args += ["--translate", str(translation.model_dir(m))]
+                self.ctl.live_voice = self._voice_for(m) or None
             try:
-                self.ctl.start_live(self.module, ["--model", self.s["model"],
-                                                  "--language", self.s["language"]])
+                self.ctl.start_live(self.module, args)
             except RuntimeError as e:
                 self._set_live_ui(False, f"⚠ {e}")
                 return
@@ -612,9 +797,10 @@ class SpeechPanel(QWidget):
         self.b_live.setChecked(on)
         self.b_live.blockSignals(False)
         self.b_live.setText("Stop the computer voice" if on else "Start talking as the voice")
-        for w in (self.cb_model, self.ed_lang):
+        for w in (self.cb_model, self.ed_lang, self.cb_lang, self.b_update):
             w.setEnabled(not on)
         self.lbl_state.setText(state)
+        self._refresh_translation()
 
     def _on_event(self, ev: dict):
         t = ev.get("type")
@@ -628,7 +814,8 @@ class SpeechPanel(QWidget):
         elif t == "vad":
             self.lbl_state.setText("● hearing you…" if ev.get("speaking") else "● listening")
         elif t == "final" and text:
-            self._log_said(text)
+            orig = str(ev.get("original", ""))
+            self._log_said(f"{text}   (you said: {orig})" if orig else text)
         elif t == "error":
             self.lbl_state.setText(f"⚠ {text}")
         elif t == "stopped":
@@ -677,6 +864,10 @@ class ModulesList(QWidget):
                 state = f"⚠ {m.error}"
             elif m.kind == "service" and not m.installed:
                 state = "not set up: run its install.bat"
+            elif m.kind == "translation":
+                state = ("downloaded" if m.installed else
+                         f"not downloaded ({translation.size_mb(m)} MB): pick it under "
+                         "Speak in")
             elif m.kind == "effects":
                 state = "loaded" if m.loaded else "not loaded"
             else:
@@ -735,6 +926,7 @@ class VoicePanel(QWidget):
         self.controller = SpeechController(engine, self.chain, lambda ev: None)
         self.speech = SpeechPanel(self.controller, speech or {}, self.modules)
         self.speech.changed.connect(self.speech_changed)
+        self.speech.downloaded.connect(lambda: self.addons.show_modules(self.modules))
         live_card, lv = card()
         lv.addWidget(self.speech)
         rcol.addWidget(live_card)

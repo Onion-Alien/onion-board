@@ -1,0 +1,15 @@
+{
+  "id": "translate-fr",
+  "name": "Translate to French",
+  "version": "1.0.0",
+  "kind": "translation",
+  "description": "The computer voice speaks what you say in French. Needs live voice-to-speech. Downloads a 65 MB translation model once, when you ask for it; translating then happens on this PC.",
+  "language": "fr",
+  "language_name": "French",
+  "download": {
+    "url": "https://argos-net.com/v1/translate-en_fr-1_9.argosmodel",
+    "sha256": "3a65ed83364f4e7b06e30f9dd823db1934899ed3ce839e63f46dc7b09dc797b4",
+    "bytes": 65472327
+  },
+  "credits": "English to French model from the Argos Translate package index: OPUS-MT (Tiedemann & Thottingal, 2020), CC BY 4.0."
+}

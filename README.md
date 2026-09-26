@@ -136,6 +136,10 @@ reinstalling or uninstalling.
   sentence you say is spoken by a computer voice instead of yours. Speech
   recognition runs on your PC (the first time, the Voice tab's *Install speech
   recognition* button downloads it, about 300 MB; needs Python 3.12+).
+  *Speak in* makes the voice say it in Chinese, Spanish, French, German or
+  Russian: talk in English and it's translated on your PC. Each language is an
+  add-on you download only if you pick it (65–195 MB), and it needs that
+  language's Windows voice (Settings → Speech → Add voices, free).
 - **Volumes:** sounds → them, your voice → them, your headphones. Exact % boxes go
   up to 1000%; a soft limiter stops hard clipping. "Level volumes" makes every
   sound equally loud.
@@ -256,7 +260,7 @@ the launcher the shortcuts and PyInstaller use. The app is the `soundboard` pack
 | `soundboard/ui/overlay.py` | the in-game overlay: a click-through panel of pads driven by number keys |
 | `soundboard/ui/voicepanel.py` | the Voice tab: voice changer, text-to-speech, live voice-to-speech, add-ons list |
 | `soundboard/voicefx/` | the voice-effect chain and the built-in effects (pitch, robot, radio, …) |
-| `soundboard/speech/` | Windows text-to-speech (`tts.py`) and the live voice-to-speech client (`live.py`, `service.py`, `protocol.py`) |
+| `soundboard/speech/` | Windows text-to-speech (`tts.py`), the live voice-to-speech client (`live.py`, `service.py`, `protocol.py`) and translation model downloads (`translation.py`) |
 | `soundboard/modules.py` | finds, loads and installs add-ons in `modules\` |
 | `soundboard/ytdl.py` | the Browser tab's *Add as sound*: downloads the open video's audio with yt-dlp, and updates yt-dlp on request or opt-in (SHA-256-checked PyPI wheels in `%APPDATA%`, loaded ahead of the bundled copy by an import hook) |
 | `soundboard/adblocker.py` | the Browser tab's ad blocker (EasyList / uBlock lists, refreshed every few days) |
@@ -273,7 +277,7 @@ the launcher the shortcuts and PyInstaller use. The app is the `soundboard` pack
 | `soundboard/testcheck.py` | analysis for the Record-6s test (finds your voice in the output by cross-correlation) |
 | `make_icon.py` | regenerates `soundboard.ico` (shortcut icon) from the logo in `theme.py` |
 | `make_bunny.py` | renders the installer artwork from `bunny.py` (`--preview` for a sheet of poses) |
-| `modules/` | add-ons shipped with the app: `retro-fx` (an effects module, the example to copy) and `live-voice` (a service module with its own Python environment) |
+| `modules/` | add-ons shipped with the app: `retro-fx` (an effects module, the example to copy), `live-voice` (a service module with its own Python environment) and `translate-zh/es/fr/de/ru` (translation modules: a manifest naming a model that's downloaded only when picked) |
 | `build.ps1`, `installer/` | the PyInstaller build and the Inno Setup installer |
 | `install.bat`, `install.ps1`, `run.bat` | run from source: set up `.venv` and shortcuts, then launch |
 | `install-vbcable.ps1` | downloads VB-Cable, checks its signature, installs it (used by the app and the installer) |

@@ -1,0 +1,15 @@
+{
+  "id": "translate-zh",
+  "name": "Translate to Chinese",
+  "version": "1.0.0",
+  "kind": "translation",
+  "description": "The computer voice speaks what you say in Chinese. Needs live voice-to-speech. Downloads a 71 MB translation model once, when you ask for it; translating then happens on this PC.",
+  "language": "zh",
+  "language_name": "Chinese",
+  "download": {
+    "url": "https://argos-net.com/v1/translate-en_zh-1_9.argosmodel",
+    "sha256": "433e7c4f034d87fbe2353161e05f18646d7999452f801a4e1f0378522b9850ab",
+    "bytes": 70743021
+  },
+  "credits": "English to Chinese model from the Argos Translate package index: OPUS-MT (Tiedemann & Thottingal, 2020), CC BY 4.0."
+}

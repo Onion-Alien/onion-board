@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+- **The computer voice speaks other languages.** *Speak in* on the Voice tab: talk
+  in English and the voice says it in Chinese, Spanish, French, German or Russian.
+  Each language is an add-on you download only when you pick it (65–195 MB, an
+  offline Argos Translate model), so translation runs on your PC and what you say
+  never leaves it. It uses that language's Windows voice, and tells you how to add
+  one if it's missing. Existing live-voice installs need *Update speech
+  recognition* (More options) once, for the translation tokenizer.
+- **More Windows voices.** Text-to-speech now also finds the newer Windows voices
+  (Mark, George, Susan… and any language voice you add in Windows settings), not
+  just the classic desktop ones.
 - **No more crackles and skips in Browser audio.** A busy page (YouTube) can hold up
   its audio for a moment, which used to drain the buffer and cut the sound mid-wave.
   The buffer now grows each time that happens (up to 250 ms), and any gap or

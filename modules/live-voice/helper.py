@@ -5,7 +5,10 @@ Launched by the Soundboard app (never run by hand; it needs the app's --port and
 others hear that voice instead of yours.
 
     mic audio (16 kHz int16) -> Segmenter (energy VAD) -> utterance
-                             -> faster-whisper -> {"type": "final", "text": ...}
+                             -> faster-whisper [-> Translator] -> {"type": "final", "text": ...}
+
+With --translate <folder> (a translation add-on's downloaded model), each line is
+translated from English before it's sent; "original" then carries what was said.
 
 Runs in its own Python environment (install.bat makes it) so the ~100 MB of
 speech-recognition libraries never touch the app itself.
@@ -15,6 +18,7 @@ from __future__ import annotations
 import argparse
 import logging
 import queue
+import re
 import socket
 import sys
 import threading
@@ -128,6 +132,40 @@ class WhisperTranscriber:
         return "" if text.lower() in self.JUNK else text
 
 
+class Translator:
+    """English -> another language with a CTranslate2 model + SentencePiece (the
+    layout of an Argos Translate package, as the app unpacks it)."""
+    SENTENCE = re.compile(r"(?<=[.!?])\s+")
+    CJK = re.compile("[　-鿿＀-￯]")
+
+    def __init__(self, folder: str, device: str):
+        import ctranslate2
+        import sentencepiece
+        self.sp = sentencepiece.SentencePieceProcessor(model_file=f"{folder}/sentencepiece.model")
+        self.model = ctranslate2.Translator(f"{folder}/model", device=device,
+                                            compute_type="int8" if device == "cpu" else "auto")
+
+    def __call__(self, text: str) -> str:
+        parts = [p for p in self.SENTENCE.split(text.strip()) if p]
+        if not parts:
+            return ""
+        res = self.model.translate_batch([self.sp.encode(p, out_type=str) for p in parts],
+                                         beam_size=2, max_decoding_length=256)
+        # joined by hand: some models' target pieces aren't in the source tokenizer
+        out = ["".join(r.hypotheses[0]).replace("▁", " ").strip() for r in res]
+        text = ""
+        for o in (o for o in out if o):   # no space after Chinese / Japanese sentences
+            text += ("" if not text or self.CJK.search(text[-1]) else " ") + o
+        return text
+
+
+class FakeTranslator:
+    """For tests: no model."""
+
+    def __call__(self, text: str) -> str:
+        return f"[translated] {text}"
+
+
 class Link:
     def __init__(self, sock: socket.socket):
         self.sock = sock
@@ -151,6 +189,8 @@ def main(argv=None) -> int:
                     help="tiny.en, base.en, small.en, … (multilingual: base, small, …)")
     ap.add_argument("--language", default="en", help="spoken language code, or 'auto'")
     ap.add_argument("--device", default="cpu", help="cpu or cuda")
+    ap.add_argument("--translate", metavar="FOLDER",
+                    help="a downloaded translation model: speak each line in its language")
     ap.add_argument("--fake", action="store_true", help=argparse.SUPPRESS)
     args = ap.parse_args(argv)
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
@@ -168,7 +208,7 @@ def main(argv=None) -> int:
     sock.settimeout(None)
     sock.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
     link = Link(sock)
-    link.send(type="hello", token=args.token, name="live-voice", version="0.2.0")
+    link.send(type="hello", token=args.token, name="live-voice", version="0.3.0")
 
     ready = threading.Event()
     work: queue.Queue[np.ndarray | None] = queue.Queue(maxsize=8)
@@ -187,6 +227,20 @@ def main(argv=None) -> int:
             log.exception("model load failed")
             link.send(type="error", text=f"couldn't load the speech model: {e}")
             return
+        tr = None
+        if args.translate:
+            link.send(type="status", text="loading translation…")
+            try:
+                tr = FakeTranslator() if args.fake else Translator(args.translate, args.device)
+            except ImportError:
+                link.send(type="error", text="translation needs an update to speech "
+                                             "recognition: press Update speech recognition "
+                                             "under More options, then Start again")
+                return
+            except Exception as e:  # noqa: BLE001
+                log.exception("translation model load failed")
+                link.send(type="error", text=f"couldn't load the translation: {e}")
+                return
         ready.set()
         link.send(type="ready")
         while (audio := work.get()) is not None:
@@ -199,7 +253,18 @@ def main(argv=None) -> int:
                 continue
             log.info("%.1fs of speech -> %r in %.2fs", len(audio) / RATE, text,
                      time.monotonic() - t0)
-            if text:
+            if text and tr is not None:
+                t0 = time.monotonic()
+                try:
+                    said = tr(text)
+                except Exception as e:  # noqa: BLE001
+                    log.exception("translation failed")
+                    link.send(type="error", text=f"translation failed: {e}")
+                    continue
+                log.info("  translated -> %r in %.2fs", said, time.monotonic() - t0)
+                if said:
+                    link.send(type="final", text=said, original=text)
+            elif text:
                 link.send(type="final", text=text)
 
     threading.Thread(target=transcribe_loop, daemon=True).start()
