@@ -335,3 +335,109 @@ def test_auto_update_is_opt_in(qapp, app_dir, monkeypatch):
     tab = BrowserTab(FakeEngine(), Config(browser_url="about:blank"), lambda: None, FakeMeter)
     tab._download("https://youtu.be/x", "#123456", {})
     assert process_events(qapp, lambda: "Update now" in tab.info.text(), 3)
+
+
+# ---------------------------------------------------------------- the Sounds tab's link bar
+
+@pytest.mark.parametrize("text, url", [
+    ("https://youtu.be/jNQXAC9IVRw", "https://youtu.be/jNQXAC9IVRw"),
+    ("  https://www.tiktok.com/@a/video/123 ", "https://www.tiktok.com/@a/video/123"),
+    ("www.example.com/clip.mp3", "https://www.example.com/clip.mp3"),
+    ("http://example.com", "http://example.com"),
+    ("bruh", ""),
+    ("air horn", ""),
+    ("file:///C:/x.mp3", ""),
+    ("javascript:alert(1)", ""),
+    ("https://", ""),
+])
+def test_as_link(text, url):
+    assert ytdl.as_link(text) == url
+
+
+def test_probe_returns_title_and_duration_without_downloading(monkeypatch):
+    seen = fake_yt_dlp(monkeypatch, {"title": "Boom [HD]", "duration": 4})
+    assert ytdl.probe("https://youtu.be/x") == ("Boom", 4.0)
+    assert seen["noplaylist"]
+    fake_yt_dlp(monkeypatch, {"_type": "playlist"})
+    with pytest.raises(ytdl.DownloadError, match="playlist"):
+        ytdl.probe("https://youtu.be/x")
+    fake_yt_dlp(monkeypatch, {}, fail="ERROR: Unsupported URL: https://example.com")
+    with pytest.raises(ytdl.FetchError, match="^Unsupported URL"):
+        ytdl.probe("https://example.com")
+
+
+def fake_link_download(monkeypatch, tmp_path):
+    """download_audio writes a 1 s tone into a fresh folder; returns the call log."""
+    calls = []
+
+    def download(url, dest=None, progress=None, auto_update=True):
+        calls.append(url)
+        folder = tmp_path / f"dl{len(calls)}"
+        folder.mkdir()
+        t = np.arange(SR) / SR
+        p = folder / "vid.wav"
+        sf.write(p, np.stack([np.sin(2 * np.pi * 330 * t)] * 2, 1) * 0.5, SR)
+        progress(1.0)
+        return p, "A Tone"
+
+    monkeypatch.setattr(ytdl, "download_audio", download)
+    monkeypatch.setattr(ytdl, "probe", lambda url: ("A Tone", 1.0))
+    return calls
+
+
+def test_link_in_search_shows_the_bar_and_filters_nothing(qapp, window, monkeypatch,  # noqa: F811
+                                                          tmp_path):
+    fake_link_download(monkeypatch, tmp_path)
+    window.search.setText("Boom")
+    assert window.linkbar.isHidden()
+    assert window.pads["s1"].property("filtered")
+    window.search.setText("https://youtu.be/abc")
+    assert not window.linkbar.isHidden() and window.linkbar.url == "https://youtu.be/abc"
+    assert not any(p.property("filtered") for p in window.pads.values())
+    assert process_events(qapp, lambda: "A Tone" in window.linkbar.info.text(), 3)
+    window.search.clear()
+    assert window.linkbar.isHidden() and window.linkbar.url == ""
+
+
+def test_link_add_as_sound(qapp, window, monkeypatch, tmp_path):  # noqa: F811
+    calls = fake_link_download(monkeypatch, tmp_path)
+    window.search.setText("https://youtu.be/abc")
+    window.search.returnPressed.emit()                       # Enter = Add as sound
+    assert process_events(qapp, lambda: len(window.cfg.sounds) == 3, 5)
+    m = window.cfg.sounds[-1]
+    assert m.name == "A Tone" and m.id in window.pads and m.id in window.audio
+    assert calls == ["https://youtu.be/abc"]
+    assert not (tmp_path / "dl1").exists()                   # the download is cleaned up
+    assert "Added" in window.linkbar.info.text()
+    window.linkbar.add()                                     # the same again: refused
+    assert process_events(qapp, lambda: "already in your Sounds" in
+                          window.linkbar.info.text(), 5)
+    assert len(window.cfg.sounds) == 3
+
+
+def test_link_play_once_then_add_downloads_once(qapp, window, monkeypatch, tmp_path):  # noqa: F811
+    calls = fake_link_download(monkeypatch, tmp_path)
+    played = []
+    monkeypatch.setattr(window.engine, "play",
+                        lambda sid, data, gain, **kw: played.append((sid, len(data))) or object())
+    window.search.setText("https://youtu.be/abc")
+    assert window.linkbar.play_once()
+    assert process_events(qapp, lambda: played, 5)
+    assert played == [("__link__", SR)] and len(window.cfg.sounds) == 2   # nothing kept
+    assert "Playing" in window.linkbar.info.text()
+    window.linkbar.play_once()                               # again: no second download
+    assert len(played) == 2 and calls == ["https://youtu.be/abc"]
+    window.linkbar.add()
+    assert process_events(qapp, lambda: len(window.cfg.sounds) == 3, 5)
+    assert calls == ["https://youtu.be/abc"]
+    assert not (tmp_path / "dl1").exists()
+
+
+def test_link_change_drops_the_kept_download(qapp, window, monkeypatch, tmp_path):  # noqa: F811
+    fake_link_download(monkeypatch, tmp_path)
+    monkeypatch.setattr(window.engine, "play", lambda *a, **kw: object())
+    window.search.setText("https://youtu.be/abc")
+    window.linkbar.play_once()
+    assert process_events(qapp, lambda: window.linkbar._got is not None, 5)
+    window.search.setText("https://youtu.be/other")
+    assert window.linkbar._got is None and not (tmp_path / "dl1").exists()

@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+- **Add or play a sound from a link.** Paste a link into *Search sounds* on the
+  Sounds tab (YouTube, SoundCloud, TikTok, X, Reddit, direct audio/video links and
+  most other media sites, via yt-dlp). It's looked up and shows its title, then
+  **Add as sound** (or Enter) downloads its audio into your Sounds, and **Play
+  once** plays it through your mic without keeping it. Adding after playing reuses
+  the same download.
 - **Effects on any sound.** Right-click a pad → *Effects…* (or the new *Effects*
   tab in *Edit…*) to change its speed and pitch (separately, or together with
   *Tape mode*), EQ, boost (up to +36 dB, which clips on purpose), play it backwards,

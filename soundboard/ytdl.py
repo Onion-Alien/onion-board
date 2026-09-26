@@ -20,6 +20,7 @@ dropped at startup.
 """
 from __future__ import annotations
 
+import contextlib
 import hashlib
 import importlib.abc
 import importlib.machinery
@@ -262,6 +263,15 @@ def downloadable(url: str) -> bool:
     return path.strip("/") != "" and not path.startswith(("/search", "/results"))
 
 
+def as_link(text: str) -> str:
+    """`text` as a web link if it is one ("www.…" gets https://), else "". Only
+    http(s): a typed file:// or data: link is never handed to yt-dlp."""
+    t = text.strip()
+    if re.match(r"www\.[\w-]+\.", t, re.I):
+        t = "https://" + t
+    return t if re.fullmatch(r"https?://[\w.-]+\.[a-z]{2,}(:\d+)?([/?#]\S*)?", t, re.I) else ""
+
+
 def clean_title(title: str) -> str:
     """A pad name from a video title: no "(Official Video)" / "[HD]" noise."""
     t = re.sub(r"\s*[(\[][^)\]]*\b(official|video|audio|lyrics?|hd|4k|visuali[sz]er)\b[^)\]]*[)\]]",
@@ -293,27 +303,63 @@ def download_audio(url: str, dest: Path | None = None,
         raise
 
 
-def _download(url, dest, progress) -> tuple[Path, str]:
+def probe(url: str) -> tuple[str, float]:
+    """Look `url` up without downloading anything: (clean title, seconds or 0).
+    Raises DownloadError like download_audio (but never updates yt-dlp)."""
+    with _ydl() as yt_dlp:
+        try:
+            with yt_dlp.YoutubeDL(_opts()) as ydl:
+                info = _check(ydl.extract_info(url, download=False))
+        except DownloadError:
+            raise
+        except Exception as e:  # noqa: BLE001 - yt-dlp raises many kinds; show its message
+            raise _readable(e) from e
+    return clean_title(info.get("title") or "") or "Sound", float(info.get("duration") or 0)
+
+
+@contextlib.contextmanager
+def _ydl():
+    """The yt_dlp module, held under _lock (an update never swaps it mid-use)."""
     install()
     with _lock:
         try:
             import yt_dlp
         except ImportError as e:
-            raise FetchError("The YouTube downloader (yt-dlp) isn't installed — "
+            raise FetchError("The downloader (yt-dlp) isn't installed — "
                              "Settings → General → Reset downloader.") from e
+        yield yt_dlp
+
+
+def _download(url, dest, progress) -> tuple[Path, str]:
+    with _ydl() as yt_dlp:
         return _run(yt_dlp, url, Path(dest or tempfile.mkdtemp(prefix="sb-ytdl-")), progress)
 
 
-def _run(yt_dlp, url: str, dest: Path, progress) -> tuple[Path, str]:
+def _check(info: dict) -> dict:
+    """Refuse what isn't one sound."""
+    if info.get("_type") == "playlist":
+        raise DownloadError("That's a playlist — open one video and try again.")
+    if info.get("is_live"):
+        raise DownloadError("Can't add a live stream — use Record instead.")
+    return info
+
+
+def _readable(e: Exception) -> FetchError:
+    msg = re.sub(r"^ERROR:\s*", "", str(e)).strip()
+    msg = re.sub(r"\x1b\[[0-9;]*m", "", msg)   # colour codes
+    return FetchError(msg or "Download failed")
+
+
+def _opts(dest: Path | None = None, progress=None) -> dict:
     def hook(d):
         if progress and d.get("status") == "downloading":
             total = d.get("total_bytes") or d.get("total_bytes_estimate") or 0
             if total:
                 progress(min(d.get("downloaded_bytes", 0) / total, 1.0))
 
-    opts = {
+    return {
         "format": "bestaudio/best",
-        "outtmpl": str(dest / "%(id)s.%(ext)s"),
+        "outtmpl": str((dest or Path(tempfile.gettempdir())) / "%(id)s.%(ext)s"),
         "noplaylist": True,            # a video in a playlist: just that video
         "quiet": True,
         "no_warnings": True,
@@ -324,13 +370,12 @@ def _run(yt_dlp, url: str, dest: Path, progress) -> tuple[Path, str]:
         "progress_hooks": [hook],
         "logger": log,
     }
+
+
+def _run(yt_dlp, url: str, dest: Path, progress) -> tuple[Path, str]:
     try:
-        with yt_dlp.YoutubeDL(opts) as ydl:
-            info = ydl.extract_info(url, download=False)
-            if info.get("_type") == "playlist":
-                raise DownloadError("That's a playlist — open one video and try again.")
-            if info.get("is_live"):
-                raise DownloadError("Can't add a live stream — use Record instead.")
+        with yt_dlp.YoutubeDL(_opts(dest, progress)) as ydl:
+            info = _check(ydl.extract_info(url, download=False))
             dur = info.get("duration") or 0
             if dur > MAX_SECONDS:
                 log.info("%s is %ds; only the first %ds will be kept", url, dur, MAX_SECONDS)
@@ -339,9 +384,7 @@ def _run(yt_dlp, url: str, dest: Path, progress) -> tuple[Path, str]:
     except DownloadError:
         raise
     except Exception as e:  # noqa: BLE001 - yt-dlp raises many kinds; show its message
-        msg = re.sub(r"^ERROR:\s*", "", str(e)).strip()
-        msg = re.sub(r"\x1b\[[0-9;]*m", "", msg)   # colour codes
-        raise FetchError(msg or "Download failed") from e
+        raise _readable(e) from e
     if not path.is_file():   # skipped (too big) or the extension changed
         found = [p for p in dest.iterdir() if p.is_file() and not p.name.endswith(".part")]
         if not found:

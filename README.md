@@ -56,6 +56,12 @@ microphone setting?"* button shows you how to make it Windows' default mic.
 then click a pad. Right-click a pad to give it a hotkey that works in-game, or
 **Effects…** to make a sped-up, slowed, pitched or ear-rape version of it.
 
+Got a link instead of a file? Paste it into **Search sounds** (YouTube,
+SoundCloud, TikTok, X, Reddit, a direct link to an audio or video file — most
+media sites, via [yt-dlp](https://github.com/yt-dlp/yt-dlp)). It's looked up and
+you get **Add as sound** (or press Enter) and **Play once**, which plays it
+through your mic without keeping it.
+
 ### Your voice, or just the sounds?
 
 Next to **My mic** at the bottom of the window there's a **send** box:
@@ -156,10 +162,11 @@ reinstalling or uninstalling.
     dropped m4a file does. Settings → General has *Update now* and *Reset
     downloader* for when downloads start failing, and an opt-in box to update
     yt-dlp from PyPI automatically (off by default).
-  - **Lite** (on by default): while something plays, the page is swapped for a
+  - **Lite** (on by default): while a video plays, the page is swapped for a
     small player (title, seek bar, play/pause, ±10 s, next) and YouTube drops to
-    144p, so the browser costs your game almost nothing. Opening another site
-    brings the page back.
+    144p, so the browser costs your game almost nothing. A YouTube video you open
+    goes straight to the small player, and it stays there while paused. Opening
+    another site brings the page back; sound-button sites never collapse.
   - Stop all also pauses the browser, and auto push-to-talk holds while it's live.
   - Logins and cookies persist in `%APPDATA%\Soundboard\browser\`.
   - Embedded players (a YouTube or SoundCloud embed on another site) are captured
@@ -232,6 +239,7 @@ the launcher the shortcuts and PyInstaller use. The app is the `soundboard` pack
 | `soundboard/ui/widgets.py` | hand-painted widgets: meter, EQ curve, seek slider, pads and their grid |
 | `soundboard/ui/panel.py` | volume boxes and the equalizer panel (emit values; the window applies them) |
 | `soundboard/ui/dialogs.py` | per-sound Edit dialog: the Sound tab (name, volume, hotkey…) and the Effects tab |
+| `soundboard/ui/linkbar.py` | the Sounds tab's link bar: a link pasted into *Search sounds* is looked up with yt-dlp, then added as a sound or played once |
 | `soundboard/ui/speedpitch.py` | the live speed & pitch button and its popup (Sounds transport and Browser bar) |
 | `soundboard/soundfx.py` | per-sound effects: speed / pitch (phase vocoder + soxr), EQ, boost, reverse and any voice effect, rendered off the audio thread; the presets |
 | `soundboard/ui/icons.py` | the line icons, drawn in code and recoloured with the theme |

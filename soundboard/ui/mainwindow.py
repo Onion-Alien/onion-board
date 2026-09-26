@@ -15,7 +15,6 @@ from PySide6.QtWidgets import (QApplication, QCheckBox, QComboBox, QFileDialog, 
                                QMainWindow, QMenu, QMessageBox, QPushButton, QScrollArea, QSlider,
                                QTabWidget, QVBoxLayout, QWidget)
 
-from soundboard import __version__
 from soundboard import engine as eng
 from soundboard import theme, winkeys
 from soundboard.browser import BrowserTab
@@ -33,6 +32,7 @@ from soundboard.ui import icons, responsive
 from soundboard.ui.speedpitch import SpeedPitchButton
 from soundboard.ui.panel import (EqPanel, VolumeControl, bar, card, hint_label, icon_label,
                                  vsep)
+from soundboard.ui.linkbar import LinkBar
 from soundboard.ui.overlay import Overlay
 from soundboard.ui.voicepanel import VoicePanel
 from soundboard.ui.widgets import Meter, Pad, PadGrid, SeekSlider, fmt_pos
@@ -51,7 +51,7 @@ class Bridge(QObject):
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle(f"Soundboard {__version__}")
+        self.setWindowTitle("Soundboard")
         self.setWindowIcon(theme.app_icon())
         self.cfg = Config.load()
         app = QApplication.instance()
@@ -136,7 +136,7 @@ class MainWindow(QMainWindow):
         names.setSpacing(0)
         self.wordmark = QLabel("SOUNDBOARD")
         self.wordmark.setObjectName("wordmark")
-        self.tagline = QLabel("sounds + browser + voice, straight into your mic")
+        self.tagline = QLabel("an app by Onion Alien")
         self.tagline.setObjectName("tagline")
         names.addWidget(self.wordmark)
         names.addWidget(self.tagline)
@@ -293,9 +293,12 @@ class MainWindow(QMainWindow):
         add.clicked.connect(self.add_dialog)
         icons.set_icon(add, "plus", "on_accent")
         self.search = QLineEdit()
-        self.search.setPlaceholderText("Search sounds…")
+        self.search.setPlaceholderText("Search sounds… or paste a link")
+        self.search.setToolTip("Type to filter your sounds, or paste a link (YouTube, "
+                               "SoundCloud, TikTok, most media sites) to add or play it")
         self.search.setClearButtonEnabled(True)
         self.search.textChanged.connect(self.apply_filter)
+        self.search.returnPressed.connect(lambda: self.linkbar.add())
         tb.addWidget(add)
         tb.addWidget(self.search, 1)
         size = QSlider(Qt.Horizontal)
@@ -311,6 +314,11 @@ class MainWindow(QMainWindow):
         tb.addWidget(size)
         self._pad_size = (size_lbl, size)
         left.addLayout(tb)
+        self.linkbar = LinkBar(
+            self.engine, c, lambda: PAD_COLORS[len(self.cfg.sounds) % len(PAD_COLORS)],
+            lambda: {m.fingerprint: m.name for m in self.cfg.sounds if m.fingerprint})
+        self.linkbar.sound_ready.connect(self.on_downloaded)
+        left.addWidget(self.linkbar)
 
         self.grid = PadGrid()
         self.grid.reorder.connect(self.on_reorder)
@@ -1049,7 +1057,8 @@ class MainWindow(QMainWindow):
         self._update_status()
 
     def apply_filter(self, text):
-        t = text.strip().lower()
+        self.linkbar.set_text(text)
+        t = "" if self.linkbar.url else text.strip().lower()   # a link filters nothing
         for m in self.cfg.sounds:
             p = self.pads.get(m.id)
             if p:
@@ -1157,7 +1166,8 @@ class MainWindow(QMainWindow):
                             "right-click it there to rename or set a hotkey.")
 
     def on_downloaded(self, meta, data):
-        """The browser's "Add as sound" finished: already decoded, stored and prepared."""
+        """"Add as sound" (Browser tab or link bar) finished: already decoded, stored and
+        prepared."""
         self.cfg.sounds.append(meta)
         self._index()
         self.audio[meta.id] = data
@@ -1534,6 +1544,7 @@ class MainWindow(QMainWindow):
         self.overlay.shutdown()
         self.hotkeys.stop()
         self.browser.shutdown()
+        self.linkbar.shutdown()
         self.voice.shutdown()
         self.engine.shutdown()
         log.info("closed cleanly (drop-outs %s, callback errors %s, stalls %d)",
