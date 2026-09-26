@@ -75,7 +75,9 @@ def test_register_reports_combos_another_thread_owns(qapp):
         b.register({combo: "y"})
         assert process_events(qapp, lambda: got["b"] is not None, 3)
         assert got["b"] == [combo]                        # ...so b can't
+        got["a"] = None
         a.register({})
+        assert process_events(qapp, lambda: got["a"] is not None, 3)   # a has let go...
         got["b"] = None
         b.register({combo: "y"})
         assert process_events(qapp, lambda: got["b"] is not None, 3)
