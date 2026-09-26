@@ -2,6 +2,22 @@
 
 ## Unreleased
 
+- **Voice changer voices rebuilt.** The pitch shifter is now a WSOLA splice
+  shifter (the SoundTouch approach) instead of a two-head delay line, so Chipmunk,
+  Deep voice and Demon no longer warble; Robot is a 16-band vocoder (words on a
+  synth buzz) instead of a ring modulator; the reverb is a damped Freeverb that no
+  longer rings like a pipe or piles up bass. New building blocks: Compressor,
+  Tone (bass / presence / treble) and Chorus, and Echo repeats can darken. The
+  voices are now Chipmunk, Deep voice, Demon, Robot, Alien, Ghost, Walkie-talkie,
+  Old telephone, Megaphone, Stadium announcer, Cave and Podcast voice, each
+  levelled to come out about as loud as your real voice. Pitch latency is ~50 ms.
+- **Pictures on pads.** A sound added from a link (YouTube, TikTok, SoundCloud…)
+  gets the video's thumbnail; an imported mp3/m4a/video gets its cover art or
+  first frame (with ffmpeg). Right-click a pad → *Add picture…* to pick any image,
+  or drop an image file onto a pad; *Remove picture* takes it off.
+- **Pads show what's playing.** A playing pad now has a live spectrum
+  visualizer (bars that bounce with the sound, with falling peak caps), a thin
+  progress line along the bottom and a glowing border, instead of a flat fill.
 - **The computer voice speaks other languages.** *Speak in* on the Voice tab: talk
   in English and the voice says it in Chinese, Spanish, French, German or Russian.
   Each language is an add-on you download only when you pick it (65–195 MB, an

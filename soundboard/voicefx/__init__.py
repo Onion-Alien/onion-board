@@ -174,6 +174,7 @@ class VoiceChain:
 
 
 from soundboard.voicefx import builtin  # noqa: E402,F401  (registers the built-ins)
-from soundboard.voicefx.builtin import PRESETS  # noqa: E402
+from soundboard.voicefx.builtin import PRESET_ICONS, PRESETS  # noqa: E402
 
-__all__ = ["Param", "Effect", "REGISTRY", "register", "defaults", "VoiceChain", "PRESETS"]
+__all__ = ["Param", "Effect", "REGISTRY", "register", "defaults", "VoiceChain", "PRESETS",
+           "PRESET_ICONS"]

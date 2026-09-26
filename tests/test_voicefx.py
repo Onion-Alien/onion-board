@@ -43,18 +43,28 @@ def test_pitch_zero_is_a_passthrough():
     assert np.array_equal(e.run(x, RATE), x)
 
 
-@pytest.mark.parametrize("etype", ["pitch", "distortion", "robot", "echo", "reverb", "radio"])
+@pytest.mark.parametrize("etype", ["pitch", "distortion", "robot", "echo", "reverb", "radio",
+                                   "tone", "chorus"])
 def test_block_size_never_changes_the_sound(etype):
     """The mic delivers whatever block size the driver likes; state must carry over."""
-    vals = {**defaults(etype), "noise": 0.0, "semitones": 5}
+    vals = {**defaults(etype), "noise": 0.0, "semitones": 5, "bass": 3, "presence": -2}
     x = (sine(220, 0.6) + sine(1300, 0.6, amp=0.1)).astype(np.float32)
     a = run_blocks(REGISTRY[etype](RATE, vals), x, 480)
     b = run_blocks(REGISTRY[etype](RATE, vals), x, 173)
     assert np.allclose(a, b, atol=1e-5)
 
 
+def test_pitch_latency_is_a_few_blocks_and_stays_put():
+    e = REGISTRY["pitch"](RATE, {"semitones": -7})
+    run_blocks(e, sine(150, 3.0), 480)
+    pads = e.pads
+    run_blocks(e, sine(150, 3.0), 480)
+    assert pads == 0 and e.pads == 0          # the head start keeps the resampler fed
+    assert len(e.inb) < RATE * 0.06           # ~ SEQ + SEEK + a block of backlog
+
+
 def test_echo_repeats_at_the_delay_and_decays():
-    e = REGISTRY["echo"](RATE, {"delay": 100, "feedback": 0.5, "mix": 1.0})
+    e = REGISTRY["echo"](RATE, {"delay": 100, "feedback": 0.5, "mix": 1.0, "tone": 12000})
     x = np.zeros(RATE // 2, np.float32)
     x[0] = 1.0
     y = run_blocks(e, x, 480)
