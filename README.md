@@ -24,6 +24,31 @@ it yourself.</sub>
 
 Version: **1.0.0**. See [CHANGELOG.md](CHANGELOG.md).
 
+![The Sounds tab: a grid of sound buttons with hotkeys, sorted into categories](docs/screenshots/sounds.png)
+
+<details>
+<summary><b>More screenshots</b></summary>
+
+**Voice**: change your voice live, or type / talk and a computer voice says it.
+![The Voice tab](docs/screenshots/voice.png)
+
+**Apps**: send one program's sound (music, a video, a browser tab) to your friends.
+![The Apps tab](docs/screenshots/apps.png)
+
+**Setup**: shows at a glance whether others can hear you, plus devices and an equalizer.
+![The Setup tab](docs/screenshots/setup.png)
+
+**In-game overlay**: press a key in your game, then a number to play a sound.
+![The in-game overlay](docs/screenshots/overlay.png)
+
+**First start**: Bun the bunny walks you through four quick questions.
+![The setup guide](docs/screenshots/setup-guide.png)
+
+**Hotkeys**: work while you're in a game.
+![Settings, Hotkeys](docs/screenshots/settings-hotkeys.png)
+
+</details>
+
 ---
 
 ## Get started (no computer skills needed)
@@ -316,7 +341,7 @@ the launcher the shortcuts and PyInstaller use. The app is the `soundboard` pack
 | `build.ps1`, `installer/` | the PyInstaller build and the Inno Setup installer |
 | `install.bat`, `install.ps1`, `run.bat` | run from source: set up `.venv` and shortcuts, then launch |
 | `install-vbcable.ps1` | downloads VB-Cable, checks its signature, installs it (used by the app and the installer) |
-| `scripts/` | `check_sensitive.py` (secrets / personal-data scan, also the pre-commit hook), `make_notices.py` (third-party licences for the build) and `codec_bench.py` (what voice chat does to your sounds, in numbers) |
+| `scripts/` | `check_sensitive.py` (secrets / personal-data scan, also the pre-commit hook), `make_notices.py` (third-party licences for the build), `codec_bench.py` (what voice chat does to your sounds, in numbers) and `screenshots.py` (renders `docs/screenshots/` offscreen from made-up demo data) |
 | `tests/` | pytest suite: ring buffer, engine mixing/guards/watchdog, cache and imports, recorder, hotkey parsing, EQ, levelling, config, test analysis, the main window built on Qt's offscreen platform (no window, no devices, no hotkeys) including shrinking it, the overlay, setup guide, voice panel, speech and effects, per-sound effects (speed and pitch measured by frequency and length, every preset, the effects cache, the Edit dialog) and live speed / pitch, the web search, and the Radio tab against a local stand-in for the directory and a station (parsing untrusted station data, search, cache and mirror failover, a stream decoded to 48 kHz and measured by frequency, dead stations, the globe page's click bridge with the internet blocked) |
 
 Developing:
