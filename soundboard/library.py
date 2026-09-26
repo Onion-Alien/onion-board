@@ -95,7 +95,7 @@ class Config:
     tab: int = 0                      # 0 = sounds, 1 = browser, 2 = voice
     browser_url: str = "https://www.youtube.com/"
     browser_vol: float = 1.0
-    browser_live: bool = True         # browser audio goes out to others
+    browser_live: bool = False        # browser audio goes out to others (off at every launch)
     browser_monitor: bool = True      # ...and to your headphones
     browser_lite: bool = True         # hide the page while it plays + 144p (light on CPU/GPU)
     # fetch newer yt-dlp versions from PyPI by itself: opt-in, since that's code the app

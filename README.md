@@ -142,6 +142,7 @@ reinstalling or uninstalling.
 - **Browser tab:** a built-in browser (YouTube, SoundCloud, clip sites…) with
   an ad blocker. Whatever it plays goes live through your mic, no downloading.
   - **LIVE** off means only you hear it, handy for finding the right spot first.
+    It starts off every time the app opens.
   - Its own volume, plus "Hear it myself".
   - **Speed & pitch** (the `1x` button): slow a video down or speed it up, with or
     without changing its pitch, and shift the pitch on its own. It applies to

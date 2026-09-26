@@ -805,9 +805,11 @@ class BrowserTab(QWidget):
         bh.addWidget(self.chk_hear)
         v.addWidget(bar_)
 
-        # initial state (sets the engine too)
-        self.btn_live.setChecked(cfg.browser_live)
-        self._on_live(cfg.browser_live)
+        # initial state (sets the engine too). LIVE always starts off: a page left
+        # playing, or one that autoplays, mustn't go out to others the moment the app opens.
+        cfg.browser_live = False
+        self.btn_live.setChecked(False)
+        self._on_live(False)
         self._on_vol(self.vol.value())
         self.chk_hear.setChecked(cfg.browser_monitor)
         self._on_hear(cfg.browser_monitor)

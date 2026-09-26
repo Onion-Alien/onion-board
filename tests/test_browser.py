@@ -332,3 +332,14 @@ def test_recorder_keeps_what_the_engine_returns(qapp, tab):
     eng.feed_browser = lambda c: c * 2       # one that returns the pitched chunk
     t._on_audio(x)
     assert np.allclose(t.recorder.last()[-1024:], x * 2)
+
+
+def test_live_starts_off_even_if_it_was_left_on(qapp, app_dir, monkeypatch):
+    monkeypatch.setattr(browser, "APP_DIR", app_dir)
+    eng = FakeEngine()
+    cfg = Config(browser_url="about:blank", browser_live=True)   # quit while live
+    t = BrowserTab(eng, cfg, lambda: None, FakeMeter)
+    assert not t.btn_live.isChecked() and not eng.browser_live and not cfg.browser_live
+    t.btn_live.click()
+    assert eng.browser_live and cfg.browser_live
+    assert Config().browser_live is False

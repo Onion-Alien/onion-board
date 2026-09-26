@@ -53,7 +53,7 @@ def test_never_taller_than_the_screen(qapp):
     d.close()
 
 
-def test_setup_wizard_last_page_text_is_not_squashed(qapp, wizard):
+def test_setup_wizard_last_page_text_is_not_squashed(qapp, wizard):  # noqa: F811
     w, wiz = wizard
     w.cfg.main_device = "CABLE Input (VB-Audio Virtual Cable)"
     wiz.resize(wiz.minimumSize())
