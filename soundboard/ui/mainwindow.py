@@ -1547,6 +1547,11 @@ class MainWindow(QMainWindow):
         self.linkbar.shutdown()
         self.voice.shutdown()
         self.engine.shutdown()
-        log.info("closed cleanly (drop-outs %s, callback errors %s, stalls %d)",
-                 self.engine.xruns, self.engine.cb_errors, self.engine.stalls)
+        e = self.engine
+        log.info("closed cleanly (drop-outs %s, callback errors %s, stalls %d, "
+                 "browser gaps %d / skips %d, cushion %d ms)",
+                 e.xruns, e.cb_errors, e.stalls,
+                 e.ring_bmon.underruns + e.ring_bmain.underruns,
+                 e.ring_bmon.overflows + e.ring_bmain.overflows,
+                 e.ring_bmon.prefill * 1000 // max(e.rates.get("mon", SR), 1))
         super().closeEvent(ev)

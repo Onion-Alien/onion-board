@@ -158,12 +158,20 @@ class Ring:
     # stretches them to fit, steering the fill back to the prefill level. At most
     # ±DRIFT_MAX speed (about 1/3 of a semitone); real clock drift needs ~0.01–0.1%.
     DRIFT_MAX = 0.02
+    # Running dry or skipping ahead is a jump in the waveform, heard as a crack. The
+    # frames around it are faded over this long instead, so it's a soft dip.
+    FADE_S = 0.004
 
     def __init__(self, rate: int = SR, prefill_s: float = 0.015, max_s: float = 0.08,
-                 track_drift: bool = False):
+                 track_drift: bool = False, grow_to_s: float = 0.0):
         self.lock = threading.Lock()
         self.prefill_s, self.max_s = prefill_s, max_s
         self.track_drift = track_drift
+        # grow_to_s: a writer that stalls now and then (the browser) gets a bigger
+        # cushion each time the ring runs dry, up to this, so it stops skipping
+        self.grow_to_s = grow_to_s
+        self.underruns = 0   # ran dry while playing (a gap)
+        self.overflows = 0   # skipped ahead to cut latency (a jump)
         self.configure(rate)
 
     def configure(self, rate: int):
@@ -172,6 +180,9 @@ class Ring:
             self.buf = np.zeros((self.cap, CH), np.float32)
             self.prefill = int(rate * self.prefill_s)   # jitter cushion before (re)starting
             self.max_fill = int(rate * self.max_s)      # beyond this, skip ahead (latency)
+            self.max_prefill = max(self.prefill, int(rate * self.grow_to_s))
+            self.fade = max(1, int(rate * self.FADE_S))
+            self._fade_in = True
             self.r = self.w = self.count = 0
             self.primed = False
             self.ratio = 1.0     # current read speed (drift tracking)
@@ -182,6 +193,7 @@ class Ring:
         with self.lock:
             self.r = self.w = self.count = 0
             self.primed = False
+            self._fade_in = True
 
     def write(self, x: np.ndarray):
         with self.lock:
@@ -203,8 +215,11 @@ class Ring:
                 drop = self.count - self.prefill
                 self.r = (self.r + drop) % self.cap
                 self.count -= drop
+                self.overflows += 1
+                self._fade_in = True
             elif self.count == self.cap:
                 self.r = self.w
+                self._fade_in = True
 
     def read(self, n: int) -> np.ndarray | None:
         with self.lock:
@@ -212,6 +227,7 @@ class Ring:
                 if self.count < self.prefill + n:
                     return None
                 self.primed = True
+                self._fade_in = True
             m = n
             if self.track_drift:
                 # PI control: the integral learns the steady clock offset, so the fill
@@ -225,9 +241,20 @@ class Ring:
                 m = max(1, int(self._acc))
                 self._acc -= m
             if self.count < m:
+                # ran dry: play out what's left, fading to silence, then wait for
+                # the cushion to refill (a bigger one next time if it can grow)
                 self.primed = False
                 self._acc = 0.0
-                return None
+                self.underruns += 1
+                self.prefill = min(self.max_prefill, int(self.prefill * 1.5))
+                k = min(self.count, n)
+                if not k:
+                    return None
+                out = np.zeros((n, CH), np.float32)
+                out[:k] = self._peek(k) * np.linspace(1, 0, k, dtype=np.float32)[:, None]
+                self.r = (self.r + k) % self.cap
+                self.count -= k
+                return out
             if m == n:
                 out = self._peek(n)
             else:  # stretch m frames to n (peek one past the end for a seamless joint)
@@ -240,6 +267,10 @@ class Ring:
                 out = src[i] * (1 - f) + src[i + 1] * f
             self.r = (self.r + m) % self.cap
             self.count -= m
+            if self._fade_in:   # (re)starting or after a skip: no hard edge
+                self._fade_in = False
+                k = min(self.fade, n)
+                out[:k] *= np.linspace(0, 1, k, dtype=np.float32)[:, None]
             return out
 
     def _peek(self, n: int) -> np.ndarray:
@@ -405,8 +436,10 @@ class Engine:
         self.browser_monitor = True   # browser -> your headphones
         # Chromium's audio clock isn't the output devices' clock (measured up to ~1.5%
         # apart), so these rings track drift instead of glitching every few seconds
-        self.ring_bmain = Ring(prefill_s=0.08, max_s=0.35, track_drift=True)
-        self.ring_bmon = Ring(prefill_s=0.08, max_s=0.35, track_drift=True)
+        # The page and the UI thread both handle every chunk, and either can stall
+        # (a heavy page like YouTube does), so the cushion grows when it runs dry.
+        self.ring_bmain = Ring(prefill_s=0.08, max_s=0.6, track_drift=True, grow_to_s=0.25)
+        self.ring_bmon = Ring(prefill_s=0.08, max_s=0.6, track_drift=True, grow_to_s=0.25)
         self._rs_bmain = StreamResampler(SR, SR)
         self._rs_bmon = StreamResampler(SR, SR)
         self._browser_heard = 0.0     # monotonic time of the last non-silent chunk
