@@ -17,7 +17,7 @@
 
 #define AppName "Soundboard"
 #ifndef AppVersion
-  #define AppVersion "0.1.0"
+  #define AppVersion "0.2.0"
 #endif
 
 [Setup]
@@ -60,20 +60,13 @@ FinishedRestartLabel=Soundboard is installed. To finish setting up the virtual c
 [Tasks]
 Name: "vbcable"; Description: "The free virtual cable (VB-Cable): lets Discord and games hear your sounds. Needed unless you already have one."; GroupDescription: "Needed"
 Name: "ffmpeg"; Description: "Play M4A, AAC and video files (installs the free FFmpeg, about 100 MB)"; GroupDescription: "Extras"; Check: CanOfferFfmpeg
-Name: "retrofx"; Description: "Retro 8-bit voice effect (tiny)"; GroupDescription: "Extras"
-Name: "livevoice"; Description: "Live voice-to-speech: you talk, others hear a text-to-speech voice. Needs Python from python.org; downloads about 300 MB"; GroupDescription: "Extras"; Flags: unchecked
+Name: "livevoice"; Description: "Set up live voice-to-speech now: you talk, others hear a text-to-speech voice. Needs Python from python.org; downloads about 300 MB. (You can also do this later from the Voice tab.)"; GroupDescription: "Extras"; Flags: unchecked
 Name: "desktopicon"; Description: "Put a Soundboard shortcut on my Desktop"; GroupDescription: "Shortcuts"
 
 [Files]
+; Includes the add-ons in {app}\modules (build.ps1 copies them in; see soundboard/modules.py).
+; live-voice's own .venv is made later, by the "livevoice" task or the Voice tab's button.
 Source: "..\dist\Soundboard\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
-; add-on modules: the app looks in {app}\modules (see soundboard/modules.py)
-Source: "..\modules\retro-fx\*"; DestDir: "{app}\modules\retro-fx"; Excludes: "__pycache__,*.pyc"; Tasks: retrofx; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "..\modules\live-voice\*"; DestDir: "{app}\modules\live-voice"; Excludes: "__pycache__,*.pyc,.venv"; Tasks: livevoice; Flags: ignoreversion recursesubdirs createallsubdirs
-
-[InstallDelete]
-; a module unticked on a reinstall goes away (its own .venv with it)
-Type: filesandordirs; Name: "{app}\modules\retro-fx"; Tasks: not retrofx
-Type: filesandordirs; Name: "{app}\modules\live-voice"; Tasks: not livevoice
 
 [Icons]
 Name: "{autodesktop}\{#AppName}"; Filename: "{app}\Soundboard.exe"; Tasks: desktopicon
@@ -96,8 +89,8 @@ Filename: "{app}\Soundboard.exe"; Description: "Open Soundboard now"; Flags: now
 ; made after install: a module's own Python environment and bytecode
 Type: filesandordirs; Name: "{app}\modules"
 
-[UninstallRun]
-; Leave %APPDATA%\Soundboard (their sounds and settings), the cable and FFmpeg in place.
+; Uninstalling leaves %APPDATA%\Soundboard (their sounds and settings), the cable and
+; FFmpeg in place.
 
 [Code]
 function WingetPath(Param: String): String;

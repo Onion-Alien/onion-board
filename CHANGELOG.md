@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.2.0 — 2026-09-26
+
 - **Restart only when the cable needs it.** After installing VB-Cable, Soundboard
   checks whether Windows has brought the CABLE devices up. Usually it has and you
   carry on; if Windows needs a restart first, the installer offers *Restart now*, and

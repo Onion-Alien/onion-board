@@ -13,7 +13,7 @@ Windows 10 or 11.
 [source code (zip)](../../archive/refs/heads/main.zip), only if you want to build
 it yourself.</sub>
 
-Version: **0.1.0**. See [CHANGELOG.md](CHANGELOG.md).
+Version: **0.2.0**. See [CHANGELOG.md](CHANGELOG.md).
 
 ---
 
