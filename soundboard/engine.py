@@ -412,6 +412,8 @@ class Engine:
         self.monitor_sounds = True
         self.eq_gains: list[float] | None = None   # None = EQ off
         self.eq_target = "voice"                   # 'voice' | 'sounds' | 'all'
+        self.dest = None                           # destination.Dest shaping the sounds bus
+        self._dests: dict[str, object] = {}        # out -> destination.Processor
         self._eqs: dict[tuple[str, str], EQ] = {}
         self.mic_check = False    # headphones also get your mic (= exactly what others hear)
         self.voice_chain = None   # voicefx.VoiceChain: voice changer / live speech tap on the mic
@@ -896,6 +898,17 @@ class Engine:
             f = self._eqs[key] = EQ(self.rates[out])
         return f.process(x, g)
 
+    def _dest(self, out: str, x: np.ndarray) -> np.ndarray:
+        """Shape the sounds bus for whoever is listening (soundboard.destination)."""
+        d = self.dest
+        if d is None:
+            return x
+        f = self._dests.get(out)
+        if f is None or f.rate != self.rates[out]:
+            from soundboard.destination import Processor
+            f = self._dests[out] = Processor(self.rates[out])
+        return f.process(x, d)
+
     # Each PortAudio callback is a thin guard around the real work: an exception that
     # escapes a callback makes PortAudio abort the stream for good, silently. Here it
     # is logged (once per stream, so the audio thread never does repeated file I/O),
@@ -941,7 +954,7 @@ class Engine:
         b = self.ring_bmain.read(frames)
         if b is not None and self.browser_live:
             mix += b * np.float32(self.browser_vol)
-        mix = self._eq("main", "sounds", mix)
+        mix = self._dest("main", self._eq("main", "sounds", mix))
         m = self.ring_main.read(frames)
         if m is not None and self.mic_enabled and not self.mic_muted:
             mix += self._eq("main", "voice", m * np.float32(self.mic_vol))
@@ -967,7 +980,7 @@ class Engine:
         b = self.ring_bmon.read(frames)
         if b is not None and (self.browser_monitor or (check and self.browser_live)):
             mix += b * np.float32(self.browser_vol)
-        mix = self._eq("mon", "sounds", mix)   # you hear the same EQ others get
+        mix = self._dest("mon", self._eq("mon", "sounds", mix))   # you hear what others get
         if check and m is not None and self.mic_enabled and not self.mic_muted:
             mix += self._eq("mon", "voice", m * np.float32(self.mic_vol))
         mix *= np.float32(self.mon_vol)

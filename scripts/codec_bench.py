@@ -5,6 +5,11 @@
     python scripts/codec_bench.py clip.wav other.mp3    # these files
     python scripts/codec_bench.py --profiles discord steam
     python scripts/codec_bench.py --json out.json       # also save the numbers
+    python scripts/codec_bench.py --dest steam --profiles steam   # with the app's mode on
+
+With --dest the "level" and band columns compare the codec's output against the
+*shaped* input, so read the mode's own effect from the <100 and 100-300 columns
+of a --dest run next to a plain one (the harmonics land in 100-300).
 
 Per signal and profile: overall level change, the frequency ceiling the codec
 really kept, the energy change in each band, the mono-downmix loss (independent
@@ -28,6 +33,7 @@ if str(ROOT) not in sys.path:
 from soundboard import codecsim  # noqa: E402
 from soundboard.codecsim import (BANDS, PROFILES, SIGNALS, analyze, band_label,  # noqa: E402
                                  mono_loss_db, roundtrip)
+from soundboard.destination import BUILTIN_BY_KEY, Processor  # noqa: E402
 
 MAX_S = 20.0   # longest stretch of a file to analyse (the middle of it)
 
@@ -74,6 +80,9 @@ def main() -> int:
     ap.add_argument("--level", action="store_true",
                     help="with --library: apply each sound's levelling gain and volume first")
     ap.add_argument("--profiles", nargs="+", choices=sorted(PROFILES), default=sorted(PROFILES))
+    ap.add_argument("--dest", metavar="MODE", choices=sorted(BUILTIN_BY_KEY),
+                    help="run the audio through this destination mode first (what the app "
+                         "does when the mode is on); use with the plain run to compare")
     ap.add_argument("--json", metavar="FILE", help="also write the numbers as JSON")
     args = ap.parse_args()
 
@@ -87,7 +96,13 @@ def main() -> int:
     print(f"{'signal':<28}{'profile':<16}{'level':>7}{'ceiling':>9}{'mono':>7}{'snr':>6}  {heads}")
     print("-" * (28 + 16 + 7 + 9 + 7 + 6 + 2 + len(heads)))
     results = []
+    dest = BUILTIN_BY_KEY[args.dest] if args.dest else None
     for name, x in _sources(args):
+        if dest is not None:
+            # blocks of 480 like the real callback, so filter state carries the same way
+            proc = Processor(codecsim.SR)
+            x = np.concatenate([proc.process(x[i:i + 480].copy(), dest)
+                                for i in range(0, len(x), 480)])
         mono = mono_loss_db(x)
         for key in args.profiles:
             p = PROFILES[key]

@@ -20,7 +20,7 @@ from soundboard import theme, winkeys, ytdl
 from soundboard.browser import BrowserTab
 from soundboard.engine import SR, Engine
 from soundboard.engine import is_virtual as is_virtual_cable
-from soundboard import soundfx, thumbs
+from soundboard import destination, soundfx, thumbs
 from soundboard.library import (AUDIO_EXTS, PAD_COLORS, RESOURCE_DIR, Config, SoundMeta,
                                 cache_keep, delete_file, duplicate, fingerprint, import_file,
                                 load_original, load_sound, prune_cache, save_clip)
@@ -590,6 +590,7 @@ class MainWindow(QMainWindow):
         rcol.addWidget(eqcard)
         rcol.addStretch(1)
         self.on_eq(*self.eq.state())   # push the saved EQ into the engine
+        destination.apply(self.cfg, self.engine)   # ...and the destination mode (Settings)
         return page
 
     def on_eq(self, gains, enabled, target, preset):

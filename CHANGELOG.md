@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+- **Who's listening (Settings → General).** Voice chat runs your sounds through
+  a mono voice codec. Measured: it drops the sub-bass under 100 Hz everywhere,
+  and Steam voice cuts everything above 12 kHz (some game codecs above 8 kHz);
+  100 Hz–6 kHz gets through untouched. Pick where your sounds are going —
+  Discord, Steam voice, game voice, low-bandwidth game voice — and they're
+  shaped to survive it: the bass that would be lost becomes harmonics the codec
+  keeps, the level is evened out for the service's gate and auto gain, what
+  you monitor is what they hear. *Custom modes…* describes any other service by
+  the same knobs. Off (the default) sends sounds exactly as mixed. For
+  developers, `scripts/codec_bench.py` is the measuring tool behind it.
 - **Voice changer voices rebuilt.** The pitch shifter is now a WSOLA splice
   shifter (the SoundTouch approach) instead of a two-head delay line, so Chipmunk,
   Deep voice and Demon no longer warble; Robot is a 16-band vocoder (words on a

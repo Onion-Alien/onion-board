@@ -91,6 +91,7 @@ class Config:
     eq_target: str = "voice"          # voice | sounds | all
     eq_preset: str = "Flat (off)"
     eq_gains: list[float] = field(default_factory=lambda: [0.0] * 7)
+    dest: dict = field(default_factory=dict)   # who's listening (soundboard.destination)
     ptt_key: str = ""           # key held down while sounds play (game push-to-talk)
     always_on_top: bool = False
     pad_width: int = 150

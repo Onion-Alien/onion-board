@@ -277,13 +277,16 @@ the launcher the shortcuts and PyInstaller use. The app is the `soundboard` pack
 | `soundboard/wheelguard.py` | mouse wheel scrolls the page instead of changing sliders / dropdowns (installed per widget) |
 | `soundboard/applog.py` | rotating log in `%APPDATA%\Soundboard\soundboard.log`; unhandled exceptions and Qt warnings land there (plus one dialog for a UI-thread crash). `SOUNDBOARD_DEBUG=1` for more |
 | `soundboard/testcheck.py` | analysis for the Record-6s test (finds your voice in the output by cross-correlation) |
+| `soundboard/destination.py` | destination modes (Settings → *Who's listening*): shapes the sounds bus for the listener's voice codec — sub-bass harmonics, codec ceiling, gentle compressor, mono |
+| `soundboard/ui/destpanel.py` | the mode picker and the custom-modes editor |
+| `soundboard/codecsim.py` | development bench: runs audio through Discord / Steam / Vivox's Opus pipeline (ffmpeg's libopus) and measures what's lost |
 | `make_icon.py` | regenerates `soundboard.ico` (shortcut icon) from the logo in `theme.py` |
 | `make_bunny.py` | renders the installer artwork from `bunny.py` (`--preview` for a sheet of poses) |
 | `modules/` | add-ons shipped with the app: `retro-fx` (an effects module, the example to copy), `live-voice` (a service module with its own Python environment) and `translate-zh/es/fr/de/ru` (translation modules: a manifest naming a model that's downloaded only when picked) |
 | `build.ps1`, `installer/` | the PyInstaller build and the Inno Setup installer |
 | `install.bat`, `install.ps1`, `run.bat` | run from source: set up `.venv` and shortcuts, then launch |
 | `install-vbcable.ps1` | downloads VB-Cable, checks its signature, installs it (used by the app and the installer) |
-| `scripts/` | `check_sensitive.py` (secrets / personal-data scan, also the pre-commit hook) and `make_notices.py` (third-party licences for the build) |
+| `scripts/` | `check_sensitive.py` (secrets / personal-data scan, also the pre-commit hook), `make_notices.py` (third-party licences for the build) and `codec_bench.py` (what voice chat does to your sounds, in numbers) |
 | `tests/` | pytest suite: ring buffer, engine mixing/guards/watchdog, cache and imports, recorder, hotkey parsing, EQ, levelling, config, test analysis, the main window built on Qt's offscreen platform (no window, no devices, no hotkeys) including shrinking it, the overlay, setup guide, voice panel, speech and effects, per-sound effects (speed and pitch measured by frequency and length, every preset, the effects cache, the Edit dialog) and live speed / pitch, the ad blocker, and the browser tab end to end: a headless page's audio (top frame and iframe) reaching the engine through the worklet and socket, and its speed reaching every page |
 
 Developing:
