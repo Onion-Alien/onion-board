@@ -10,7 +10,11 @@
 #
 # -AppDir / -InstallerDir additionally copy the results somewhere handy, e.g.
 #   build.ps1 -AppDir ..\App -InstallerDir ..\Installer
-param([string]$AppDir, [string]$InstallerDir)
+#
+# Rebuilds are incremental: PyInstaller keeps its analysis in build\ and reuses it.
+#   -Clean        start from scratch (for a release, or if a build acts strangely)
+#   -NoInstaller  stop after the app folder; skips the slow Inno Setup compression
+param([string]$AppDir, [string]$InstallerDir, [switch]$Clean, [switch]$NoInstaller)
 $ErrorActionPreference = "Stop"
 # relative to where the caller ran us, not to the repo (we cd into it below)
 if ($AppDir) { $AppDir = [IO.Path]::GetFullPath((Join-Path (Get-Location) $AppDir)) }
@@ -20,7 +24,9 @@ Set-Location $PSScriptRoot
 $py = ".venv\Scripts\python.exe"
 if (-not (Test-Path $py)) { throw "No .venv - run install.bat first." }
 
-& $py -m PyInstaller --noconfirm --clean --windowed `
+$cleanArg = @()
+if ($Clean) { $cleanArg = @("--clean") }
+& $py -m PyInstaller --noconfirm @cleanArg --windowed `
     --name Soundboard --icon soundboard.ico `
     --add-data "install-vbcable.ps1;." `
     --add-data "soundboard.ico;." `
@@ -48,7 +54,8 @@ function Publish-Build {
         if ($LASTEXITCODE -ge 8) { throw "copying the app to $AppDir failed" }
         Write-Host "Copied the app to $AppDir" -ForegroundColor Green
     }
-    if ($InstallerDir -and (Test-Path "dist\SoundboardSetup.exe")) {
+    # -NoInstaller: dist\ may hold an older installer; don't pass it off as new
+    if ($InstallerDir -and -not $NoInstaller -and (Test-Path "dist\SoundboardSetup.exe")) {
         New-Item -ItemType Directory -Force $InstallerDir | Out-Null
         Copy-Item "dist\SoundboardSetup.exe" $InstallerDir -Force
         Write-Host "Copied SoundboardSetup.exe to $InstallerDir" -ForegroundColor Green
@@ -62,6 +69,10 @@ Write-Host ""
 Write-Host "Built $exe ($size MB folder)" -ForegroundColor Green
 
 # ---- the installer
+if ($NoInstaller) {
+    Publish-Build
+    exit 0
+}
 & $py make_bunny.py   # installer side-panel art (the mascot)
 if ($LASTEXITCODE -ne 0) { throw "make_bunny.py failed" }
 $iscc = @("$env:LOCALAPPDATA\Programs\Inno Setup 6\ISCC.exe",

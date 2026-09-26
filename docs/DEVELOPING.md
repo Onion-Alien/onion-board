@@ -39,8 +39,16 @@ module's `install.bat` or `pip install -r requirements.txt`).
 
 The tests are fully headless: `tests/conftest.py` forces Qt's `offscreen`
 platform and a separate single-instance name, and never touches the real
-`%APPDATA%\Soundboard`. No window appears, no audio device opens and no global
-hotkey is registered. They're safe to run while someone is using the PC.
+`%APPDATA%\Soundboard`. No window appears and no global hotkey is registered.
+`sounddevice.OutputStream` is swapped for a silent stand-in that runs the
+callback at the device's pace but plays nothing, so no test is ever heard on
+the speakers or headphones (set `SOUNDBOARD_TEST_REAL_AUDIO=1` to opt out).
+They're safe to run while someone is using the PC.
+
+To iterate faster, run just the file you touched, e.g.
+`.venv\Scripts\python -m pytest -q tests\test_engine.py`, and the full suite
+before committing. You don't need to rebuild to see a change: `run.bat` runs
+from source.
 
 **Launching the real app is not headless.** It opens a window, grabs global
 hotkeys and opens audio devices. Agents: ask the user before running
@@ -61,6 +69,10 @@ This produces:
 
 `-AppDir <dir>` and `-InstallerDir <dir>` also copy those results elsewhere,
 e.g. `build.ps1 -AppDir ..\App -InstallerDir ..\Installer`.
+
+Rebuilds are incremental: PyInstaller reuses its analysis cache in `build\`.
+`-Clean` starts from scratch (do this for a release, or if a build misbehaves).
+`-NoInstaller` stops after the app folder and skips the Inno Setup compression.
 
 Build steps, in order: PyInstaller (bundles `install-vbcable.ps1` and the icon
 as data), licence files, `make_bunny.py` (renders the installer artwork

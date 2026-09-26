@@ -15,6 +15,53 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 
+class _SilentOutputStream:
+    """Stands in for sounddevice.OutputStream: the callback runs on a thread at the
+    device's pace, but what it writes goes nowhere. Tests that open the engine's
+    outputs (main window, setup wizard) would otherwise play through the developer's
+    real speakers or headphones."""
+
+    def __init__(self, *, samplerate, channels, callback, blocksize=0, **_):
+        import sounddevice as sd
+        self._rate, self._chans, self._cb = int(samplerate), int(channels), callback
+        self._frames = blocksize or max(1, self._rate // 100)   # 10 ms blocks
+        self._flags = sd.CallbackFlags
+        self._stop = None
+        self._thread = None
+
+    def _run(self):
+        import numpy as np
+        buf = np.zeros((self._frames, self._chans), dtype="float32")
+        period = self._frames / self._rate
+        while not self._stop.wait(period):
+            try:
+                self._cb(buf, self._frames, None, self._flags())
+            except Exception:  # noqa: BLE001 - a real stream would swallow it too
+                return
+
+    def start(self):
+        import threading
+        if self._thread is None:
+            self._stop = threading.Event()
+            self._thread = threading.Thread(target=self._run, daemon=True)
+            self._thread.start()
+
+    def stop(self):
+        if self._thread is not None:
+            self._stop.set()
+            self._thread.join(1)
+            self._thread = None
+
+    close = stop
+    abort = stop
+
+
+# SOUNDBOARD_TEST_REAL_AUDIO=1 opts back in to real output devices.
+if os.environ.get("SOUNDBOARD_TEST_REAL_AUDIO") != "1":
+    import sounddevice
+    sounddevice.OutputStream = _SilentOutputStream
+
+
 @pytest.fixture(scope="session")
 def qapp():
     from PySide6.QtWidgets import QApplication
