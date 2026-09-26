@@ -27,8 +27,17 @@ reports. Don't add `# sensitive-scan: allow` to silence it without telling the u
 
 ## Working in the code
 
+**[docs/DEVELOPING.md](docs/DEVELOPING.md) is the full loop**: setup → change →
+headless checks → `build.ps1` → silent reinstall → commit. Read it before building
+or installing anything. The short version:
+
 - Checks: `.venv\Scripts\ruff check .` and `.venv\Scripts\python -m pytest`
   (tests use Qt's offscreen platform — no windows, devices or hotkeys).
+- Build: `powershell -ExecutionPolicy Bypass -File build.ps1` → `dist\Soundboard\`
+  and `dist\SoundboardSetup.exe`. Rebuild after changing anything the app ships.
+- Reinstall headless: `dist\SoundboardSetup.exe /VERYSILENT /SUPPRESSMSGBOXES
+  /NORESTART /CLOSEAPPLICATIONS` (a UAC prompt appears only if VB-Cable is missing).
+- A `.venv` breaks if moved; recreate it instead.
 - Don't launch the GUI or anything that opens windows / grabs global hotkeys without
   asking first; the author may be mid-game.
 - Edit files with UTF-8-safe tools. Windows PowerShell 5.1 `Get-Content`/`Set-Content`

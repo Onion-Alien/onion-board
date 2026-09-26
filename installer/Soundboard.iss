@@ -60,7 +60,7 @@ Filename: "powershell.exe"; \
   Parameters: "-NoProfile -ExecutionPolicy Bypass -File ""{app}\_internal\install-vbcable.ps1"" -Silent"; \
   StatusMsg: "Installing the virtual cable... click Yes if Windows asks for permission."; \
   Flags: runhidden waituntilterminated
-Filename: "{app}\Soundboard.exe"; Description: "Open Soundboard now"; Flags: nowait postinstall
+Filename: "{app}\Soundboard.exe"; Description: "Open Soundboard now"; Flags: nowait postinstall skipifsilent
 
 [UninstallRun]
 ; Leave %APPDATA%\Soundboard (their sounds and settings) and the cable in place.

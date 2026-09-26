@@ -7,6 +7,10 @@
 #
 # Needs the dev tools once:  .venv\Scripts\pip install -r requirements-dev.txt
 # Run:                       powershell -ExecutionPolicy Bypass -File build.ps1
+#
+# -AppDir / -InstallerDir additionally copy the results somewhere handy, e.g.
+#   build.ps1 -AppDir ..\App -InstallerDir ..\Installer
+param([string]$AppDir, [string]$InstallerDir)
 $ErrorActionPreference = "Stop"
 Set-Location $PSScriptRoot
 
@@ -20,6 +24,25 @@ if (-not (Test-Path $py)) { throw "No .venv - run install.bat first." }
     --paths . `
     main.py
 if ($LASTEXITCODE -ne 0) { throw "PyInstaller failed" }
+
+# Licences travel with the binaries (Qt is LGPL; see scripts\make_notices.py)
+Copy-Item LICENSE "dist\Soundboard\LICENSE.txt"
+& $py scripts\make_notices.py "dist\Soundboard\THIRD-PARTY-NOTICES.txt"
+if ($LASTEXITCODE -ne 0) { throw "make_notices.py failed" }
+
+function Publish-Build {
+    if ($AppDir) {
+        robocopy "dist\Soundboard" $AppDir /MIR /NFL /NDL /NJH /NJS /NP | Out-Null
+        if ($LASTEXITCODE -ge 8) { throw "copying the app to $AppDir failed" }
+        Write-Host "Copied the app to $AppDir" -ForegroundColor Green
+    }
+    if ($InstallerDir -and (Test-Path "dist\SoundboardSetup.exe")) {
+        New-Item -ItemType Directory -Force $InstallerDir | Out-Null
+        Copy-Item "dist\SoundboardSetup.exe" $InstallerDir -Force
+        Write-Host "Copied SoundboardSetup.exe to $InstallerDir" -ForegroundColor Green
+    }
+    $global:LASTEXITCODE = 0
+}
 
 $exe = Join-Path $PSScriptRoot "dist\Soundboard\Soundboard.exe"
 $size = [math]::Round((Get-ChildItem (Split-Path $exe) -Recurse | Measure-Object Length -Sum).Sum / 1MB)
@@ -35,9 +58,11 @@ $iscc = @("$env:LOCALAPPDATA\Programs\Inno Setup 6\ISCC.exe",
 if (-not $iscc) {
     Write-Host "Inno Setup 6 not found, so no SoundboardSetup.exe this time." -ForegroundColor Yellow
     Write-Host "Install it with:  winget install JRSoftware.InnoSetup" -ForegroundColor Yellow
+    Publish-Build
     exit 0
 }
 $version = & $py -c "import soundboard; print(soundboard.__version__)"
 & $iscc /Q "/DAppVersion=$version" installer\Soundboard.iss
 if ($LASTEXITCODE -ne 0) { throw "Inno Setup failed" }
 Write-Host "Built dist\SoundboardSetup.exe - that's the one file to give people." -ForegroundColor Green
+Publish-Build
