@@ -68,7 +68,8 @@ Settings and imported sounds live in `%APPDATA%\Soundboard\`.
 
 | file | what it does |
 |---|---|
-| `main.py` | PySide6 UI, hotkeys, auto push-to-talk |
+| `main.py` | PySide6 UI, auto push-to-talk |
+| `winkeys.py` | global hotkeys (`RegisterHotKey`) and key presses (`keybd_event`), no hooks |
 | `engine.py` | real-time audio: 3 WASAPI streams (mic in, cable out, headphones out), mixing, pause/seek, limiter |
 | `eq.py` | 7-band biquad equalizer and presets |
 | `library.py` | decoding, loudness levelling, config |
@@ -81,4 +82,8 @@ Settings and imported sounds live in `%APPDATA%\Soundboard\`.
   (about 70% junk), so it's never used.
 - Virtual cables are hidden from the app's mic list. Picking the cable as the app's
   own mic makes a feedback loop (a loud screech).
-- If a game runs as administrator, hotkeys only work if Soundboard does too.
+- Hotkeys use Windows' `RegisterHotKey`, not a keyboard hook. The app is never in
+  the path of your other keypresses, so it can't lag or stick your keys. A hotkey
+  you pick is reserved for the app, so don't use one your game needs.
+- Auto push-to-talk can't press keys in a game that runs as administrator unless
+  Soundboard also runs as administrator (Windows blocks it).

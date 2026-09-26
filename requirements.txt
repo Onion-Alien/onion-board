@@ -4,4 +4,3 @@ soundfile
 soxr
 scipy
 numpy
-keyboard

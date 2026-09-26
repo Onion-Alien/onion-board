@@ -10,7 +10,6 @@ import subprocess
 import time
 from pathlib import Path
 
-import keyboard
 import numpy as np
 import sounddevice as sd
 from PySide6.QtCore import QEvent, QMimeData, QObject, QPoint, QRectF, Qt, QTimer, Signal
@@ -23,6 +22,8 @@ from PySide6.QtWidgets import (QAbstractScrollArea, QAbstractSlider, QAbstractSp
                                QWidget)
 
 import engine as eng
+import winkeys
+from winkeys import Hotkeys
 from engine import SR, Engine
 from library import AUDIO_EXTS, PAD_COLORS, Config, SoundMeta, decode, delete_file, import_file
 from testcheck import analyze as analyze_output, summary_html
@@ -33,52 +34,6 @@ PAD_MIME = "application/x-soundboard-pad"
 
 
 # =========================================================================== hotkeys
-
-class Hotkeys(QObject):
-    fired = Signal(str)          # sound id, or "__stop__"
-    captured = Signal(str)
-
-    def __init__(self):
-        super().__init__()
-        self._last: dict[str, float] = {}
-        self._lock = threading.Lock()
-
-    def register(self, mapping: dict[str, str]):
-        """mapping: hotkey combo -> action id."""
-        try:
-            keyboard.unhook_all_hotkeys()
-        except Exception:  # noqa: BLE001
-            pass
-        for combo, action in mapping.items():
-            if not combo:
-                continue
-            try:
-                keyboard.add_hotkey(combo, self._trigger, args=(action,), suppress=False)
-            except Exception:  # noqa: BLE001
-                pass
-
-    def _trigger(self, action):
-        # key auto-repeat sends events every ~30ms; only fire on a fresh press
-        now = time.monotonic()
-        with self._lock:
-            last = self._last.get(action, 0.0)
-            self._last[action] = now
-        if now - last > 0.25:
-            self.fired.emit(action)
-
-    def capture(self):
-        def run():
-            try:
-                keyboard.unhook_all_hotkeys()
-            except Exception:  # noqa: BLE001
-                pass
-            try:
-                combo = keyboard.read_hotkey(suppress=False)
-            except Exception:  # noqa: BLE001
-                combo = ""
-            self.captured.emit(combo)
-        threading.Thread(target=run, daemon=True).start()
-
 
 def is_virtual_cable(name: str) -> bool:
     return eng.is_virtual(name)
@@ -102,20 +57,22 @@ class HotkeyDialog(QDialog):
         lay.addWidget(t)
         lay.addWidget(QLabel("Works globally, even while in-game.  Esc = cancel."))
         self.setMinimumWidth(340)
-        hotkeys.captured.connect(self._got)
-        self._hk = hotkeys
-        hotkeys.capture()
+        hotkeys.pause()   # so pressing an existing hotkey here doesn't trigger it
 
-    def _got(self, combo):
-        try:
-            self._hk.captured.disconnect(self._got)
-        except (RuntimeError, TypeError):
-            pass
-        if combo and combo.lower() not in ("esc", "escape"):
-            self.result_combo = combo
-            self.accept()
-        else:
+    def keyPressEvent(self, e):
+        vk = e.nativeVirtualKey()
+        if vk == 0x1B:            # Esc
             self.reject()
+            return
+        if vk in winkeys.MODIFIER_VKS or not vk:
+            return                # wait for the real key
+        m = e.modifiers()
+        mods = ((winkeys.MOD_CONTROL if m & Qt.ControlModifier else 0)
+                | (winkeys.MOD_ALT if m & Qt.AltModifier else 0)
+                | (winkeys.MOD_SHIFT if m & Qt.ShiftModifier else 0)
+                | (winkeys.MOD_WIN if m & Qt.MetaModifier else 0))
+        self.result_combo = winkeys.combo_name(mods, vk)
+        self.accept()
 
 
 # =========================================================================== widgets
@@ -549,7 +506,7 @@ class MainWindow(QMainWindow):
         self.bridge = Bridge()
         self.bridge.loaded.connect(self.on_loaded)
         self.bridge.imported.connect(self.on_imported)
-        self._ptt_down = False
+        self._ptt_held: str | None = None   # PTT key we're currently holding
         self._pending_imports = 0
         self._import_errors: list[str] = []
         self._rec_playing = False
@@ -1235,6 +1192,14 @@ class MainWindow(QMainWindow):
             if m.hotkey:
                 mapping.setdefault(m.hotkey, m.id)
         self.hotkeys.register(mapping)
+        QTimer.singleShot(300, self._report_hotkey_failures)
+
+    def _report_hotkey_failures(self):
+        failed = self.hotkeys.failed
+        if failed:
+            self.status.setText("<span style='color:#ffb020'>Another program is already using "
+                                + ", ".join(pretty_key(c) for c in failed)
+                                + " — pick a different hotkey.</span>")
 
     def _refresh_hk_buttons(self):
         self.btn_stop_hk.setText(pretty_key(self.cfg.stop_hotkey) or "Click to set…")
@@ -1620,17 +1585,14 @@ class MainWindow(QMainWindow):
             self.btn_rec.setEnabled(True)
             self.btn_rec.setText("⏺  Record 6s → play back")
 
-        # auto push-to-talk
-        if self.cfg.ptt_key:
-            want = e.any_playing()
-            if want != self._ptt_down:
-                try:
-                    (keyboard.press if want else keyboard.release)(self.cfg.ptt_key)
-                    self._ptt_down = want
-                except Exception:  # noqa: BLE001
-                    self._ptt_down = False
-        elif self._ptt_down:
-            self._ptt_down = False
+        # auto push-to-talk: hold the game's PTT key only while a sound goes out.
+        # _ptt_held remembers exactly which key we pressed, so it's always released
+        # even if the setting changes mid-sound.
+        want = self.cfg.ptt_key if (self.cfg.ptt_key and e.any_playing()) else None
+        if want != self._ptt_held:
+            self._release_ptt()
+            if want and winkeys.press(want):
+                self._ptt_held = want
 
     def _update_transport(self, playing):
         sid = self.current
@@ -1650,17 +1612,15 @@ class MainWindow(QMainWindow):
             self.seek.blockSignals(False)
             self.np_time.setText(fmt_pos(frac * m.duration, m.duration))
 
+    def _release_ptt(self):
+        if self._ptt_held:
+            winkeys.release(self._ptt_held)
+            self._ptt_held = None
+
     def closeEvent(self, ev):
-        if self._ptt_down and self.cfg.ptt_key:
-            try:
-                keyboard.release(self.cfg.ptt_key)
-            except Exception:  # noqa: BLE001
-                pass
+        self._release_ptt()
         self.cfg.save()
-        try:
-            keyboard.unhook_all()
-        except Exception:  # noqa: BLE001
-            pass
+        self.hotkeys.stop()
         self.engine.shutdown()
         super().closeEvent(ev)
 

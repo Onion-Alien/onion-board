@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+- **Fix: keys getting stuck / input freezing.** Dropped the `keyboard` package,
+  whose low-level hook put the app in the path of every keypress. While the app
+  was busy (e.g. starting up) Windows stalled input, and a held key stayed
+  "down". Hotkeys now use `RegisterHotKey`, which can't block input.
+- Fix: auto push-to-talk always releases the exact key it pressed, even if the
+  PTT setting changes while it's held.
+- Warns when another program already owns a chosen hotkey.
 - Simple main panel; devices, sound options, EQ and hotkeys moved under a
   collapsible ⚙ Advanced section (remembers if you left it open).
 - Works on any setup: virtual cables (VB-Cable, A/B, Voicemeeter) are detected
