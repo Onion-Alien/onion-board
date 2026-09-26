@@ -7,7 +7,7 @@ root in PowerShell unless noted.
 ## 1. One-time setup
 
 ```powershell
-py -3.13 -m venv .venv                 # Python 3.11+ works
+py -3.13 -m venv .venv                 # Python 3.12+ works
 .venv\Scripts\pip install -r requirements.txt -r requirements-dev.txt
 git config core.hooksPath .githooks    # secrets check on every commit
 ```

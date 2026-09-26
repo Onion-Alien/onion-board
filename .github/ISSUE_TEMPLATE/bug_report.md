@@ -22,4 +22,4 @@ Attach or paste the relevant part of `%APPDATA%\Soundboard\soundboard.log`.
 > replace them (e.g. `C:\Users\<me>\...`) before posting. Never paste anything from
 > `%APPDATA%\Soundboard\browser\` — that's your browser logins.
 
-**Security problem?** Don't file it here — see [SECURITY.md](../../SECURITY.md).
+**Security problem?** Don't file it here — see [SECURITY.md](https://github.com/Onion-Alien/soundboard/blob/main/SECURITY.md).

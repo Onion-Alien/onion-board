@@ -9,22 +9,24 @@ later depending on your CPU and the model.
 
 ## Install
 
-1. Install Python 3.10 or newer from python.org and tick "Add python.exe to PATH".
-2. Put this `live-voice` folder in `%APPDATA%\Soundboard\modules\`, or in the
-   `modules` folder next to `Soundboard.exe`.
-3. Double-click `install.bat`. It creates a private Python environment in
-   `.venv` and downloads the speech model (about 300 MB in total).
-4. In Soundboard, open the Voice panel and press **Start live voice**.
+It comes with Soundboard (in the `modules` folder next to `Soundboard.exe`).
+
+1. Install Python 3.12 or newer from python.org and tick "Add python.exe to PATH".
+2. In Soundboard, open the **Voice** tab and press **Install speech recognition**.
+   It creates a private Python environment in this folder's `.venv` and downloads
+   the speech model (about 300 MB in total). `install.bat` here does the same.
+3. Press **Start talking as the voice**.
 
 ## Models
 
 `base.en` is the default: fast on any recent CPU. `small.en` is more accurate
 but slower. For languages other than English, use `base` or `small` and set the
-language in the Voice panel. With an NVIDIA GPU and CUDA, choose the `cuda`
+language in the Voice tab. With an NVIDIA GPU and CUDA, choose the `cuda`
 device.
 
 ## How it talks to the app
 
 It runs as its own process and talks to the app over a local socket (see
 `protocol.py`). The app sends it 16 kHz mic audio and it sends back text. If it
-crashes, your mic and sounds keep working. Nothing leaves your PC.
+crashes, your mic and sounds keep working. What you say never leaves your PC
+(only the one-time model download goes online).

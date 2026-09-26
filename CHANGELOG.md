@@ -2,6 +2,53 @@
 
 ## Unreleased
 
+## 1.0.0 — 2026-09-26
+
+First public release.
+
+### Added
+- **Any window size.** The window shrinks down to 300 × 300 and stays usable:
+  as it gets smaller, labels shorten, buttons drop to icons, the less-used controls
+  tuck away (pad size, meters, extra volume boxes, quick links, then the mixer strip)
+  and the Setup and Voice pages go to one column. Everything comes back as it grows.
+  It used to stop at about 1070 px wide.
+- The version is shown in the title bar.
+
+### Changed
+- **Add-ons always come with the app.** The retro effect and the live
+  voice-to-speech add-on are part of every install, so the Voice tab always offers
+  *Install speech recognition* and then *Start talking as the voice*. Before, the
+  live-voice add-on was only there if its installer box was ticked, and otherwise the
+  tab just said to put a folder you didn't have into the add-ons folder. The
+  installer's box now means "set it up now" (it can also be done later from the tab).
+- Python 3.12 or newer is needed to run from source or to set up live voice (the
+  pinned numpy and SciPy need it); the docs and `install.ps1` said 3.11.
+
+### Fixed
+- **Browser tab stuck after switching sites.** With Lite on, clicking another site
+  (say SoundCloud) while a YouTube video played left the page hidden behind the
+  mini-player, and the stalled-playback watchdog then flashed it 2 px tall; clicks did
+  nothing. Loading any new page now brings it back, and the watchdog only acts on a
+  player that has actually loaded something.
+- Numpad **+** can be used as a hotkey (it was saved under a name that couldn't be
+  read back, so it silently never worked). A hotkey that can't be read is now listed
+  as not working instead of being skipped.
+- A settings file that is valid JSON but damaged no longer stops Soundboard from
+  starting: the last good backup is used, and a damaged sound entry is skipped.
+- The Record-6s test gives up with a message if the virtual cable's output goes away
+  mid-test, instead of leaving the button disabled.
+- Sounds added while the library was still loading at startup kept their decoded
+  cache (it was pruned against the list from before they were added).
+- The play / pause button takes the new theme's colour straight away.
+- Closing the setup guide with X or Esc shows the devices picked in it in the
+  Devices card (only *Finish* used to refresh them).
+- Removing a sound also stops its headphone preview; quitting mid-recording no
+  longer leaves `recording.tmp.wav` behind.
+- The Setup tab's *Hotkeys & auto push-to-talk* button showed an underlined "a"
+  instead of the "&".
+- `pip install .` included only part of the package; `install.ps1` couldn't use a
+  plain `python` when the `py` launcher was missing.
+
 ## 0.2.0 — 2026-09-26
 
 - **Restart only when the cable needs it.** After installing VB-Cable, Soundboard

@@ -1,9 +1,9 @@
 {
   "id": "live-voice",
   "name": "Live voice-to-speech",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "kind": "service",
-  "description": "Turns what you say into text and speaks it with a text-to-speech voice, so others hear the TTS voice instead of yours. Uses faster-whisper on your own PC; nothing is sent online.",
+  "description": "Turns what you say into text and speaks it with a text-to-speech voice, so others hear the TTS voice instead of yours. Uses faster-whisper on your own PC; what you say never leaves it.",
   "command": ["{python}", "{dir}/helper.py"],
   "install": [
     ["{base_python}", "-m", "venv", "{dir}/.venv"],

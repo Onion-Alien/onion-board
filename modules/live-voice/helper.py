@@ -168,7 +168,7 @@ def main(argv=None) -> int:
     sock.settimeout(None)
     sock.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
     link = Link(sock)
-    link.send(type="hello", token=args.token, name="live-voice", version="0.1.0")
+    link.send(type="hello", token=args.token, name="live-voice", version="1.0.0")
 
     ready = threading.Event()
     work: queue.Queue[np.ndarray | None] = queue.Queue(maxsize=8)

@@ -1,0 +1,16 @@
+# Keeps the pinned dependencies current; PySide6 in particular carries Chromium
+# security fixes for the Browser tab (see SECURITY.md).
+version: 2
+updates:
+  - package-ecosystem: pip
+    directory: /
+    schedule:
+      interval: weekly
+  - package-ecosystem: pip
+    directory: /modules/live-voice
+    schedule:
+      interval: monthly
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly

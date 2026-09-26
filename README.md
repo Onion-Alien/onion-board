@@ -13,7 +13,7 @@ Windows 10 or 11.
 [source code (zip)](../../archive/refs/heads/main.zip), only if you want to build
 it yourself.</sub>
 
-Version: **0.2.0**. See [CHANGELOG.md](CHANGELOG.md).
+Version: **1.0.0**. See [CHANGELOG.md](CHANGELOG.md).
 
 ---
 
@@ -32,8 +32,7 @@ sure, leave them as they are and click **Install**.
 |---|---|---|
 | **The free virtual cable** | The part that lets Discord and games hear your sounds. You need it. | ✅ yes |
 | **Play M4A, AAC and video files** | Lets you add `.m4a` files and videos as sounds. Only shown if your PC doesn't have it yet. | ✅ yes |
-| **Retro 8-bit voice effect** | A fun extra voice effect. | ✅ yes |
-| **Live voice-to-speech** | You talk, and everyone hears a computer voice say your words instead. Needs [Python](https://www.python.org/downloads/) installed first, and a 300 MB download. | no |
+| **Set up live voice-to-speech now** | You talk, and everyone hears a computer voice say your words instead. Needs [Python](https://www.python.org/downloads/) installed first, and a 300 MB download. You can also set it up later from the *Voice* tab. | no |
 | **Desktop shortcut** | An icon on your Desktop. | ✅ yes |
 
 **4. Click Yes** when Windows asks for permission. That's the virtual cable
@@ -77,6 +76,11 @@ The same switch is in **⚙ Settings → General → Your mic** and in the setup
   exactly what others get and tells you whether your voice and sounds are in it.
 - **An `.m4a` or video won't add:** run the installer again and tick *Play M4A,
   AAC and video files*.
+- **The Browser tab looks stuck or blank:** click **Show page** in the mini-player,
+  or turn off **Lite** at the bottom of the tab.
+- **Something else:** the log is `%APPDATA%\Soundboard\soundboard.log`. Attach it
+  to a [bug report](../../issues/new/choose) (it contains your device names and
+  file paths, so skim it first).
 - **Start the guide again:** *Setup* tab → *Step-by-step guide*.
 
 Your sounds and settings are kept in `%APPDATA%\Soundboard\` and survive
@@ -93,7 +97,10 @@ reinstalling or uninstalling.
   again does (restart / overlap / toggle).
 - **Your mic on or off:** send your voice with the sounds, or sounds only.
 - **Transport bar:** play/pause, stop, and a seek slider.
-- **Global hotkeys** (all set in **⚙ Settings → Hotkeys**, all work in-game):
+- **Any window size:** shrink it down to 300 × 300 and it stays usable. Less
+  important controls tuck away as it gets smaller and come back when it grows.
+- **Global hotkeys** (set in **⚙ Settings → Hotkeys**, the overlay key in
+  **⚙ Settings → Overlay**; all work in-game):
   - Stop all, and pause/resume all.
   - Browser: record start/stop (Ctrl+Alt+R), save last 15s (Ctrl+Alt+C),
     play/pause (Ctrl+Alt+P) and LIVE on/off (Ctrl+Alt+L).
@@ -103,9 +110,12 @@ reinstalling or uninstalling.
   - Auto push-to-talk: holds your game's PTT key while a sound plays.
   - Hotkeys that record or save a clip beep in your headphones (only you hear
     it), so you know it worked.
-- **Voice tab:** voice changer (pitch, robot, radio, echo, reverb, distortion, plus
-  add-on effects), text-to-speech with Windows' built-in voices, and live
-  voice-to-speech (add-on).
+- **Voice tab:** voice changer (pitch, robot, radio, echo, reverb, distortion,
+  8-bit bitcrusher, plus add-on effects), text-to-speech with Windows' built-in
+  voices, and **live voice-to-speech**: press *Start talking as the voice* and each
+  sentence you say is spoken by a computer voice instead of yours. Speech
+  recognition runs on your PC (the first time, the Voice tab's *Install speech
+  recognition* button downloads it, about 300 MB; needs Python 3.12+).
 - **Volumes:** sounds → them, your voice → them, your headphones. Exact % boxes go
   up to 1000%; a soft limiter stops hard clipping. "Level volumes" makes every
   sound equally loud.
@@ -116,12 +126,16 @@ reinstalling or uninstalling.
   - **Record 6s → play back:** records the virtual cable's output, plays it back,
     and reports whether your voice and sounds are in it and whether the balance
     is off.
-- **Browser → mic tab:** a built-in browser (YouTube, SoundCloud, clip sites…) with
+- **Browser tab:** a built-in browser (YouTube, SoundCloud, clip sites…) with
   an ad blocker. Whatever it plays goes live through your mic, no downloading.
   - **LIVE** off means only you hear it, handy for finding the right spot first.
   - Its own volume, plus "Hear it myself".
-  - **⏺ Record clip** and **⏪ Clip last 15s** save what played as a new pad, with
-    dead air trimmed.
+  - **Record** and **Last 15s** save what played as a new pad, with dead air
+    trimmed.
+  - **Lite** (on by default): while something plays, the page is swapped for a
+    small player (title, seek bar, play/pause, ±10 s, next) and YouTube drops to
+    144p, so the browser costs your game almost nothing. Opening another site
+    brings the page back.
   - Stop all also pauses the browser, and auto push-to-talk holds while it's live.
   - Logins and cookies persist in `%APPDATA%\Soundboard\browser\`.
   - Embedded players (a YouTube or SoundCloud embed on another site) are captured
@@ -155,12 +169,12 @@ You don't need any of it to use Soundboard.
 
 1. Download or clone this folder.
 2. Double-click **`install.bat`**. It:
-   - finds Python 3.11+ (offers to install 3.13 with winget if you have none)
+   - finds Python 3.12+ (offers to install 3.13 with winget if you have none)
    - installs the Python packages into `.venv`
    - adds **Soundboard** shortcuts to the Desktop and Start menu
    - offers to install the free **virtual cable** (VB-Cable)
-3. Open Soundboard. The *How it works* box tells you the one setting to change in
-   Discord or your game.
+3. Open Soundboard. The setup guide (also under *Setup* → *Step-by-step guide*)
+   tells you the one setting to change in Discord or your game.
 
 #### The virtual cable
 
@@ -187,12 +201,23 @@ the launcher the shortcuts and PyInstaller use. The app is the `soundboard` pack
 
 | file | what it does |
 |---|---|
+| `soundboard/__main__.py` | `python -m soundboard` |
 | `soundboard/app.py` | entry point: log file, crash hooks, runtime tuning, single instance, the window |
 | `soundboard/singleinstance.py` | named mutex + local socket so a second launch just raises the first |
 | `soundboard/ui/mainwindow.py` | the main window: pads, transport, tabs, the audio panel, test mode, auto push-to-talk |
 | `soundboard/ui/widgets.py` | hand-painted widgets: meter, EQ curve, seek slider, pads and their grid |
 | `soundboard/ui/panel.py` | volume boxes and the equalizer panel (emit values; the window applies them) |
 | `soundboard/ui/dialogs.py` | per-sound Edit dialog |
+| `soundboard/ui/icons.py` | the line icons, drawn in code and recoloured with the theme |
+| `soundboard/ui/responsive.py` | small windows: what hides, in which order, as the window shrinks |
+| `soundboard/ui/setupwizard.py` | the first-run guide with Bun (mic, headphones, cable, Discord) and the Steam help |
+| `soundboard/ui/overlay.py` | the in-game overlay: a click-through panel of pads driven by number keys |
+| `soundboard/ui/voicepanel.py` | the Voice tab: voice changer, text-to-speech, live voice-to-speech, add-ons list |
+| `soundboard/voicefx/` | the voice-effect chain and the built-in effects (pitch, robot, radio, …) |
+| `soundboard/speech/` | Windows text-to-speech (`tts.py`) and the live voice-to-speech client (`live.py`, `service.py`, `protocol.py`) |
+| `soundboard/modules.py` | finds, loads and installs add-ons in `modules\` |
+| `soundboard/adblocker.py` | the Browser tab's ad blocker (EasyList / uBlock lists, refreshed every few days) |
+| `soundboard/bunny.py` | Bun the mascot, drawn in code (setup guide and installer art) |
 | `soundboard/winkeys.py` | global hotkeys (`RegisterHotKey`) and key presses (`SendInput`), no hooks |
 | `soundboard/engine.py` | real-time audio: 3 WASAPI streams (mic in, cable out, headphones out), mixing, pause/seek, limiter, watchdog |
 | `soundboard/eq.py` | 7-band biquad equalizer and presets |
@@ -204,7 +229,13 @@ the launcher the shortcuts and PyInstaller use. The app is the `soundboard` pack
 | `soundboard/applog.py` | rotating log in `%APPDATA%\Soundboard\soundboard.log`; unhandled exceptions and Qt warnings land there (plus one dialog for a UI-thread crash). `SOUNDBOARD_DEBUG=1` for more |
 | `soundboard/testcheck.py` | analysis for the Record-6s test (finds your voice in the output by cross-correlation) |
 | `make_icon.py` | regenerates `soundboard.ico` (shortcut icon) from the logo in `theme.py` |
-| `tests/` | pytest suite: ring buffer, engine mixing/guards/watchdog, cache and imports, recorder, hotkey parsing, EQ, levelling, config, test analysis, the main window built on Qt's offscreen platform (no window, no devices, no hotkeys), and the browser tab end to end: a headless page's audio (top frame and iframe) reaching the engine through the worklet and socket |
+| `make_bunny.py` | renders the installer artwork from `bunny.py` (`--preview` for a sheet of poses) |
+| `modules/` | add-ons shipped with the app: `retro-fx` (an effects module, the example to copy) and `live-voice` (a service module with its own Python environment) |
+| `build.ps1`, `installer/` | the PyInstaller build and the Inno Setup installer |
+| `install.bat`, `install.ps1`, `run.bat` | run from source: set up `.venv` and shortcuts, then launch |
+| `install-vbcable.ps1` | downloads VB-Cable, checks its signature, installs it (used by the app and the installer) |
+| `scripts/` | `check_sensitive.py` (secrets / personal-data scan, also the pre-commit hook) and `make_notices.py` (third-party licences for the build) |
+| `tests/` | pytest suite: ring buffer, engine mixing/guards/watchdog, cache and imports, recorder, hotkey parsing, EQ, levelling, config, test analysis, the main window built on Qt's offscreen platform (no window, no devices, no hotkeys) including shrinking it, the overlay, setup guide, voice panel, speech and effects, the ad blocker, and the browser tab end to end: a headless page's audio (top frame and iframe) reaching the engine through the worklet and socket |
 
 Developing:
 

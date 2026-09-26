@@ -6,7 +6,7 @@
 
 Use GitHub's private reporting instead: go to the repository's **Security** tab →
 **Report a vulnerability**. Include what you found, how to reproduce it, and which
-version (see the title bar or `soundboard/__init__.py`).
+version (it's in the title bar).
 
 You'll get an acknowledgement within a week. Fixes ship in a normal release and
 the CHANGELOG credits you unless you'd rather not be named.
@@ -46,11 +46,13 @@ So you know what normal looks like when auditing it:
 |---|---|---|
 | You use the Browser tab | whatever sites you visit | it's a browser |
 | Ad blocker filter refresh | `easylist.to`, `ublockorigin.github.io` | block lists for the Browser tab |
+| Lite mini-player shows a YouTube video | `i.ytimg.com` | the video's thumbnail, fetched by the app itself |
 | You tick *Play M4A, AAC and video files* in the installer | `winget` (Microsoft's package source, then the FFmpeg build it points to) | installs `Gyan.FFmpeg.Essentials` |
 | You install the virtual cable | `vb-audio.com` | downloads VB-Cable; the installer's signature is checked before it runs |
 | Install from source (`install.ps1`) | PyPI, and `winget` if you accept installing Python | the app's `requirements.txt` |
-| You install a module | PyPI, via `pip`, plus whatever the module fetches | that module's `requirements.txt`; e.g. *live-voice* downloads a Whisper speech model (Hugging Face, via `faster-whisper`) |
+| You install a module (its Install button, its `install.bat`, or the installer's *live voice* box) | PyPI, via `pip`, plus whatever the module fetches | that module's `requirements.txt`; *live-voice* downloads a Whisper speech model from Hugging Face (via `faster-whisper`), and picking a different model in the Voice tab downloads that one the first time it starts |
 | Always | `127.0.0.1` only | browser audio sink and module link, each guarded by a random per-launch secret |
+| Always | a local named pipe (`Soundboard.App`) | single instance: a second launch asks the first to come to the front. It only accepts that one request |
 
 No telemetry, analytics, crash upload or update pings. Logs and settings stay in
 `%APPDATA%\Soundboard\`.
