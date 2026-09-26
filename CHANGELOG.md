@@ -1,5 +1,16 @@
 # Changelog
 
+## Unreleased
+
+- Only one Soundboard can run. Opening it again brings the existing window to the
+  front instead of starting another copy (repeated launches had piled up dozens of
+  `pythonw.exe` processes). The lock is a named mutex, which Windows frees if the app crashes.
+- Browser → mic no longer stutters every few seconds. Chromium's audio clock and the
+  output devices' clocks drift apart, so the browser buffers now track the drift
+  (speed nudged by at most 2%, no clicks) instead of running dry.
+- Quiet passages in browser audio are streamed too, so sound after a pause in the
+  video isn't delayed by re-buffering.
+
 ## 0.1.0 — 2026-09-26
 
 First version.

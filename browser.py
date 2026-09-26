@@ -43,7 +43,7 @@ TAP_JS = r"""
   if (window.__sbTap) return;
   window.__sbTap = true;
   const SR = 48000, BLOCK = 1024;           // ~21 ms per chunk
-  let bridge = null, ctx = null, input = null, lastOn = -1, lastOff = -1;
+  let bridge = null, ctx = null, input = null, lastOn = -1, lastOff = -1, playing = 0;
   const tapped = new WeakSet();
 
   new QWebChannel(qt.webChannelTransport, ch => { bridge = ch.objects.sb; scan(); });
@@ -74,7 +74,10 @@ TAP_JS = r"""
         out[2 * i] = l * 32767;
         out[2 * i + 1] = r * 32767;
       }
-      if (loud && bridge) bridge.pcm(b64(out));
+      // while tapped media plays, quiet passages are sent too, so the stream stays
+      // continuous (no re-buffering delay after a pause in the audio); nothing is
+      // sent while everything is paused
+      if (bridge && (loud || playing)) bridge.pcm(b64(out));
     };
     input.connect(sp);
     sp.connect(ctx.destination);
@@ -101,12 +104,14 @@ TAP_JS = r"""
   }
 
   function scan() {
-    let on = 0, off = 0;
+    let on = 0, off = 0, live = 0;
     document.querySelectorAll('audio,video').forEach(el => {
       if (el.paused) return;
       tap(el);
+      if (tapped.has(el)) live++;
       if (!el.muted) tapped.has(el) ? on++ : off++;
     });
+    playing = live;
     if (ctx && ctx.state !== 'running' && on) ctx.resume();
     if (bridge && (on !== lastOn || off !== lastOff)) {
       lastOn = on; lastOff = off;

@@ -124,9 +124,18 @@ def resample(data: np.ndarray, src: int, dst: int) -> np.ndarray:
 class Ring:
     """Low-latency ring buffer bridging two audio clocks (mic -> output)."""
 
-    def __init__(self, rate: int = SR, prefill_s: float = 0.015, max_s: float = 0.08):
+    # Drift tracking (opt-in): when the writer's clock runs a little slower or faster
+    # than the output device's, the ring slowly drains or fills and eventually glitches.
+    # With track_drift, each read takes slightly fewer/more frames than asked and
+    # stretches them to fit, steering the fill back to the prefill level. At most
+    # ±DRIFT_MAX speed (about 1/3 of a semitone); real clock drift needs ~0.01–0.1%.
+    DRIFT_MAX = 0.02
+
+    def __init__(self, rate: int = SR, prefill_s: float = 0.015, max_s: float = 0.08,
+                 track_drift: bool = False):
         self.lock = threading.Lock()
         self.prefill_s, self.max_s = prefill_s, max_s
+        self.track_drift = track_drift
         self.configure(rate)
 
     def configure(self, rate: int):
@@ -137,6 +146,9 @@ class Ring:
             self.max_fill = int(rate * self.max_s)      # beyond this, skip ahead to keep latency low
             self.r = self.w = self.count = 0
             self.primed = False
+            self.ratio = 1.0     # current read speed (drift tracking)
+            self._acc = 0.0      # fractional frames carried between reads
+            self._integ = 0.0    # learned clock offset
 
     def clear(self):
         with self.lock:
@@ -172,18 +184,42 @@ class Ring:
                 if self.count < self.prefill + n:
                     return None
                 self.primed = True
-            if self.count < n:
+            m = n
+            if self.track_drift:
+                # PI control: the integral learns the steady clock offset, so the fill
+                # settles back at the full prefill cushion instead of hovering near empty
+                err = float(np.clip((self.count - self.prefill) / max(self.prefill, 1), -1, 1))
+                lim = self.DRIFT_MAX
+                self._integ = float(np.clip(self._integ + err * 0.0002, -lim, lim))
+                want = 1.0 + float(np.clip(err * lim * 0.5 + self._integ, -lim, lim))
+                self.ratio += (want - self.ratio) * 0.05          # glide, no audible warble
+                self._acc += n * self.ratio
+                m = max(1, int(self._acc))
+                self._acc -= m
+            if self.count < m:
                 self.primed = False
+                self._acc = 0.0
                 return None
-            end = self.r + n
-            if end <= self.cap:
-                out = self.buf[self.r:end].copy()
-            else:
-                k = self.cap - self.r
-                out = np.concatenate([self.buf[self.r:], self.buf[: n - k]])
-            self.r = end % self.cap
-            self.count -= n
+            if m == n:
+                out = self._peek(n)
+            else:  # stretch m frames to n (peek one past the end for a seamless joint)
+                src = self._peek(min(m + 1, self.count))
+                if len(src) < m + 1:
+                    src = np.concatenate([src, src[-1:]])
+                pos = np.arange(n, dtype=np.float64) * (m / n)
+                i = pos.astype(np.int64)
+                f = (pos - i).astype(np.float32)[:, None]
+                out = src[i] * (1 - f) + src[i + 1] * f
+            self.r = (self.r + m) % self.cap
+            self.count -= m
             return out
+
+    def _peek(self, n: int) -> np.ndarray:
+        end = self.r + n
+        if end <= self.cap:
+            return self.buf[self.r:end].copy()
+        k = self.cap - self.r
+        return np.concatenate([self.buf[self.r:], self.buf[: n - k]])
 
 
 class StreamResampler:
@@ -287,8 +323,10 @@ class Engine:
         self.browser_vol = 1.0
         self.browser_live = True      # browser -> others
         self.browser_monitor = True   # browser -> your headphones
-        self.ring_bmain = Ring(prefill_s=0.06, max_s=0.30)
-        self.ring_bmon = Ring(prefill_s=0.06, max_s=0.30)
+        # Chromium's audio clock isn't the output devices' clock (measured up to ~1.5%
+        # apart), so these rings track drift instead of glitching every few seconds
+        self.ring_bmain = Ring(prefill_s=0.08, max_s=0.35, track_drift=True)
+        self.ring_bmon = Ring(prefill_s=0.08, max_s=0.35, track_drift=True)
         self._rs_bmain = StreamResampler(SR, SR)
         self._rs_bmon = StreamResampler(SR, SR)
         self._browser_heard = 0.0     # monotonic time of the last non-silent chunk
