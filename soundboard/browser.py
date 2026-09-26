@@ -19,6 +19,12 @@ added to the Sounds tab as ordinary pads.
 
 "Add as sound" downloads the audio of the page itself (a YouTube video, a
 SoundCloud track…) with yt-dlp and adds it whole; see ytdl.py.
+
+The browser only goes to the sites in ALLOWED_SITES (YouTube, SoundCloud and the
+big sound-clip sites): QtWebEngine has no Safe Browsing, so instead of guarding
+the whole web it doesn't go there. Pages on those sites still load their images,
+scripts and videos from wherever they like; only the page itself is limited. File
+downloads are never accepted (nothing handles `downloadRequested`).
 """
 from __future__ import annotations
 
@@ -67,6 +73,29 @@ HANDOVER_S = 0.3       # a frame keeps the mic until it's been quiet this long
 QUICK_LINKS = (("YouTube", "https://www.youtube.com/"),
                ("SoundCloud", "https://soundcloud.com/"),
                ("MyInstants", "https://www.myinstants.com/"))
+
+# Sites the browser will open, subdomains included. Links anywhere else are refused.
+ALLOWED_SITES = (
+    "youtube.com", "youtu.be", "youtube-nocookie.com",
+    "soundcloud.com",
+    "myinstants.com", "101soundboards.com", "voicy.network", "tuna.voicemod.net",
+    "freesound.org", "zapsplat.com", "soundbible.com", "pixabay.com", "mixkit.co",
+    "orangefreesounds.com", "bandcamp.com",
+)
+# single hosts rather than whole sites: signing in to YouTube goes through these
+ALLOWED_HOSTS = ("accounts.google.com", "accounts.youtube.com", "consent.google.com")
+
+
+def site_allowed(url: QUrl) -> bool:
+    """Whether the browser may open `url` as a page: one of ALLOWED_SITES over http(s),
+    or something local (about:blank, a file already on this PC)."""
+    if url.scheme() in ("about", "file"):
+        return True
+    if url.scheme() not in ("http", "https"):
+        return False
+    host = url.host().lower().rstrip(".")
+    return host in ALLOWED_HOSTS or any(host == d or host.endswith("." + d)
+                                        for d in ALLOWED_SITES)
 
 # Runs on the audio rendering thread. Collects BLOCK stereo frames as int16 and
 # posts them (transferred, no copy) to the page thread, which sends them over the
@@ -386,7 +415,24 @@ class AudioSink(QObject):
         s.textMessageReceived.connect(lambda text, s=s: self._on_text(s, text))
         s.disconnected.connect(lambda s=s: self._on_closed(s))
         if self._rate_msg:
-            s.sendTextMessage(self._rate_msg)
+            self._send(s, self._rate_msg)
+
+    def _send(self, s: QWebSocket, text: str) -> bool:
+        """Send to one frame; a socket Qt has already destroyed (its frame went away
+        and the `disconnected` handler didn't get to run first) is forgotten instead."""
+        if qt_valid(s):
+            try:
+                s.sendTextMessage(text)
+                return True
+            except RuntimeError:   # deleted between the check and the call
+                pass
+        self._forget(s)
+        return False
+
+    def _forget(self, s: QWebSocket):
+        self._conns.pop(s, None)
+        if self._active is s:
+            self._active = None
 
     def _on_binary(self, s: QWebSocket, data):
         now = time.monotonic()
@@ -406,17 +452,17 @@ class AudioSink(QObject):
             st = (int(d["on"]), int(d["off"]), int(d.get("video", 0)))
         except (ValueError, KeyError, TypeError):
             return
+        if not qt_valid(s):
+            return
         self._conns[s] = st
         if self._rate_msg:   # repeated here: a message sent the moment a frame connects can
-            s.sendTextMessage(self._rate_msg)   # arrive before its page is listening
+            self._send(s, self._rate_msg)   # arrive before its page is listening
         self._emit_status()
 
     def _on_closed(self, s: QWebSocket):
         if not qt_valid(self):   # a socket outliving the sink at shutdown: nothing to update
             return
-        self._conns.pop(s, None)
-        if self._active is s:
-            self._active = None
+        self._forget(s)
         if qt_valid(s):   # `disconnected` is also emitted from the socket's destructor
             s.deleteLater()
         self._emit_status()
@@ -443,8 +489,11 @@ class AudioSink(QObject):
         self.broadcast(msg)
 
     def broadcast(self, text: str):
+        n = len(self._conns)
         for s in list(self._conns):
-            s.sendTextMessage(text)
+            self._send(s, text)
+        if len(self._conns) != n:
+            self._emit_status()   # dead frames no longer count as playing
 
     def close(self):
         conns, self._conns = list(self._conns), {}
@@ -515,8 +564,18 @@ def fmt_time(s: float) -> str:
 
 
 class _Page(QWebEnginePage):
+    refused = Signal(QUrl)   # a page outside ALLOWED_SITES wasn't opened
+
     def createWindow(self, _type):
         return self   # pop-ups and target=_blank links open in the same tab
+
+    def acceptNavigationRequest(self, url, _type, is_main_frame):
+        # redirects come through here too, so a link that bounces off an allowed site
+        # (youtube.com/redirect?q=…) is still stopped
+        if is_main_frame and not site_allowed(url):
+            self.refused.emit(QUrl(url))
+            return False
+        return True
 
 
 class Recorder:
@@ -869,7 +928,8 @@ class BrowserTab(QWidget):
         super().showEvent(e)
         if self.view is None:
             self._make_view()
-            self.load(self.cfg.browser_url or QUICK_LINKS[0][1])
+            last = self.cfg.browser_url
+            self.load(last if last and site_allowed(QUrl(last)) else QUICK_LINKS[0][1])
 
     def _make_view(self):
         store = APP_DIR / "browser"
@@ -926,6 +986,7 @@ class BrowserTab(QWidget):
         page.loadFinished.connect(lambda _ok: self._arm_peek())
 
         page.loadStarted.connect(self._on_load_started)
+        page.refused.connect(self._on_refused)
 
         self.view.setPage(page)
         self.btn_back.clicked.connect(self._back)
@@ -1025,6 +1086,14 @@ class BrowserTab(QWidget):
         if url.scheme() in ("http", "https"):
             self.cfg.browser_url = s
             self._save()
+
+    def _on_refused(self, url: QUrl):
+        self.url.setText(self.view.url().toString())   # not the address that was refused
+        self.url.setCursorPosition(0)
+        self._refresh_info("<span style='color:#ffb020'>⛔ "
+                           f"{html.escape(url.host() or url.toString())} isn't one of the "
+                           "sites this browser opens (YouTube, SoundCloud and sound-clip "
+                           "sites), to keep you away from scam and virus pages.</span>")
 
     def _hide_ads(self):
         css = self.adblock.hide_css(self.view.url().toString()) if self.view else ""

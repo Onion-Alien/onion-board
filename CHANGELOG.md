@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- **The Browser only opens safe sites.** YouTube, SoundCloud and the big sound-clip
+  sites (MyInstants, Freesound, 101 Soundboards, Voicy…). Links anywhere else,
+  including redirects and pop-ups, are refused with a note, since Qt's browser has
+  no protection against scam or virus sites.
 - **Add or play a sound from a link.** Paste a link into *Search sounds* on the
   Sounds tab (YouTube, SoundCloud, TikTok, X, Reddit, direct audio/video links and
   most other media sites, via yt-dlp). It's looked up and shows its title, then

@@ -170,6 +170,11 @@ reinstalling or uninstalling.
     another site brings the page back; sound-button sites never collapse.
   - Stop all also pauses the browser, and auto push-to-talk holds while it's live.
   - Logins and cookies persist in `%APPDATA%\Soundboard\browser\`.
+  - It only opens YouTube, SoundCloud and the big sound-clip sites (MyInstants,
+    101 Soundboards, Voicy, Voicemod Tuna, Freesound, ZapSplat, SoundBible,
+    Pixabay, Mixkit, Orange Free Sounds, Bandcamp); a link anywhere else is refused.
+    Qt's browser has no Safe Browsing, so it stays off the rest of the web. It
+    never downloads files either.
   - Embedded players (a YouTube or SoundCloud embed on another site) are captured
     too. If two players in different frames play at once, the one that started
     first is what goes out.

@@ -6,8 +6,9 @@ import time
 
 import numpy as np
 import pytest
+import shiboken6
 import soundfile as sf
-from PySide6.QtCore import QUrl
+from PySide6.QtCore import QCoreApplication, QEvent, QUrl
 from PySide6.QtWebSockets import QWebSocket
 from PySide6.QtWidgets import QWidget
 
@@ -104,6 +105,23 @@ def test_broadcast_reaches_every_frame(qapp, sink):
     assert process_events(qapp, lambda: a.texts == ["pause"] and b.texts == ["pause"], 3)
 
 
+def test_broadcast_skips_a_socket_qt_already_destroyed(qapp, sink):
+    s, got = sink
+    a, b = Client(qapp, s.url), Client(qapp, s.url)
+    a.ws.sendTextMessage(json.dumps({"on": 1, "off": 0}))
+    b.ws.sendTextMessage(json.dumps({"on": 1, "off": 0}))
+    assert process_events(qapp, lambda: got["status"] and got["status"][-1] == (2, 0), 3)
+    dead = next(iter(s._conns))
+    dead.blockSignals(True)   # its `disconnected` never reaches the sink, as when the
+    dead.deleteLater()        # frame is torn down before the handler runs
+    QCoreApplication.sendPostedEvents(dead, QEvent.DeferredDelete)
+    assert not shiboken6.isValid(dead)
+    s.broadcast("pause")      # used to raise "Internal C++ object ... already deleted"
+    assert len(s._conns) == 1 and got["status"][-1] == (1, 0)
+    s.set_rate(1.5, True)     # the same path for speed changes
+    assert len(s._conns) == 1
+
+
 # ---------------------------------------------------------------- address bar
 
 @pytest.mark.parametrize("text, expect", [
@@ -120,6 +138,26 @@ def test_address_bar_addresses(text, expect):
 def test_address_bar_searches(text):
     u = BrowserTab.url_for(text)
     assert u.host() == "www.youtube.com" and "search_query=" in u.query()
+
+
+@pytest.mark.parametrize("url, ok", [
+    ("https://www.youtube.com/watch?v=abc", True),
+    ("https://youtu.be/abc", True),
+    ("https://m.soundcloud.com/x", True),
+    ("https://www.myinstants.com/en/index/us/", True),
+    ("https://accounts.google.com/signin", True),
+    ("about:blank", True),
+    ("file:///C:/x/page.html", True),
+    ("https://evil.example/", False),
+    ("https://youtube.com.evil.example/", False),
+    ("https://notyoutube.com/", False),
+    ("https://www.google.com/search?q=x", False),
+    ("http://localhost:8080/", False),
+    ("javascript:alert(1)", False),
+    ("ftp://soundcloud.com/", False),
+])
+def test_only_allowed_sites_open(url, ok):
+    assert browser.site_allowed(QUrl(url)) is ok
 
 
 # ---------------------------------------------------------------- end to end
@@ -265,6 +303,17 @@ def test_navigating_away_in_lite_shows_the_new_page(qapp, tab, app_dir):
     assert not t._unsticking
     t._end_unstick()                         # a wake-up that was pending doesn't re-hide it
     assert t.view.isVisible()
+
+
+def test_links_off_the_allowed_sites_are_refused(qapp, tab):
+    t, _ = tab
+    refused = []
+    t.view.page().refused.connect(refused.append)
+    t.load("https://evil.example/")
+    assert process_events(qapp, lambda: refused, 5)
+    assert refused[0].host() == "evil.example"
+    assert t.view.url().toString() == "about:blank"
+    assert "evil.example" in t.info.text()
 
 
 def test_audio_played_off_the_page_is_captured(qapp, tab, app_dir):

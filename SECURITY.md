@@ -21,6 +21,8 @@ In scope, for example:
 
 - A web page in the **Browser** tab reaching anything beyond its own audio:
   the loopback WebSocket, local files, the app's settings, other processes.
+- The Browser tab opening a page outside its allowed sites (`ALLOWED_SITES` in
+  `soundboard/browser.py`), or downloading a file.
 - Another local process or web page connecting to the app's loopback sockets
   (browser audio sink, module link) without the per-launch secret.
 - The installer or `install-vbcable.ps1` running something that isn't what it
@@ -44,7 +46,7 @@ So you know what normal looks like when auditing it:
 
 | When | Where | Why |
 |---|---|---|
-| You use the Browser tab | whatever sites you visit | it's a browser |
+| You use the Browser tab | the sites you visit (YouTube, SoundCloud, clip sites) and what their pages load | it's a browser |
 | Ad blocker filter refresh | `easylist.to`, `ublockorigin.github.io` | block lists for the Browser tab |
 | You click *Add as sound* in the Browser tab | the page's site (e.g. YouTube), via `yt-dlp` | downloads that one video's audio stream into a temp folder, imports it, deletes the download |
 | You paste a link into *Search sounds* on the Sounds tab | that link's site, via `yt-dlp` (only `http`/`https` links) | looks the link up (title, length); *Add as sound* / *Play once* then download its audio stream into a temp folder, which is deleted once it's imported, or when the link is cleared or the app closes |
