@@ -77,7 +77,7 @@ QUICK_LINKS = (("YouTube", "https://www.youtube.com/"),
 # Sites the browser will open, subdomains included. Links anywhere else are refused.
 ALLOWED_SITES = (
     "youtube.com", "youtu.be", "youtube-nocookie.com",
-    "soundcloud.com",
+    "soundcloud.com", "tiktok.com",
     "myinstants.com", "101soundboards.com", "voicy.network", "tuna.voicemod.net",
     "freesound.org", "zapsplat.com", "soundbible.com", "pixabay.com", "mixkit.co",
     "orangefreesounds.com", "bandcamp.com",

@@ -2,7 +2,11 @@
 
 ## Unreleased
 
-- **The Browser only opens safe sites.** YouTube, SoundCloud and the big sound-clip
+- **No more crackles and skips in Browser audio.** A busy page (YouTube) can hold up
+  its audio for a moment, which used to drain the buffer and cut the sound mid-wave.
+  The buffer now grows each time that happens (up to 250 ms), and any gap or
+  jump fades instead of clicking. The log on exit counts how often it happened.
+- **The Browser only opens safe sites.** YouTube, SoundCloud, TikTok and the big sound-clip
   sites (MyInstants, Freesound, 101 Soundboards, Voicy…). Links anywhere else,
   including redirects and pop-ups, are refused with a note, since Qt's browser has
   no protection against scam or virus sites.

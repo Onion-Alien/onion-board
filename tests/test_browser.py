@@ -144,6 +144,8 @@ def test_address_bar_searches(text):
     ("https://www.youtube.com/watch?v=abc", True),
     ("https://youtu.be/abc", True),
     ("https://m.soundcloud.com/x", True),
+    ("https://www.tiktok.com/@x/video/1", True),
+    ("https://vm.tiktok.com/abc/", True),
     ("https://www.myinstants.com/en/index/us/", True),
     ("https://accounts.google.com/signin", True),
     ("about:blank", True),

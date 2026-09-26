@@ -172,7 +172,7 @@ reinstalling or uninstalling.
   - Logins and cookies persist in `%APPDATA%\Soundboard\browser\`.
   - It only opens YouTube, SoundCloud and the big sound-clip sites (MyInstants,
     101 Soundboards, Voicy, Voicemod Tuna, Freesound, ZapSplat, SoundBible,
-    Pixabay, Mixkit, Orange Free Sounds, Bandcamp); a link anywhere else is refused.
+    Pixabay, Mixkit, Orange Free Sounds, Bandcamp) and TikTok; a link anywhere else is refused.
     Qt's browser has no Safe Browsing, so it stays off the rest of the web. It
     never downloads files either.
   - Embedded players (a YouTube or SoundCloud embed on another site) are captured
