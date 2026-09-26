@@ -8,7 +8,7 @@ Built-in rules catch credential formats and machine-identifying data (user
 profile paths, LAN / Tailscale IPs, default Windows host names, e-mail
 addresses). Your own identifiers (real name, handles, host names) go in
 `.sensitive-patterns` -- one regex per line, gitignored so the list of things
-you want hidden is not itself published. See `.sensitive-patterns.example`.
+you want hidden is not itself published. See `scripts/sensitive-patterns.example`.
 
 A line containing `sensitive-scan: allow` is skipped. Exit status 1 = findings.
 """
@@ -97,7 +97,8 @@ def decode(data: bytes) -> str | None:
     return data.decode("utf-8", errors="replace")
 
 
-SELF = {"scripts/check_sensitive.py", ".sensitive-patterns.example", ".sensitive-patterns"}
+SELF = {"scripts/check_sensitive.py", "scripts/sensitive-patterns.example", ".sensitive-patterns",
+        ".sensitive-patterns.example"}   # (the example's old path, for --history)
 
 
 def scan_worktree(rules, staged: bool) -> list[str]:

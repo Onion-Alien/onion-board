@@ -1,7 +1,7 @@
-"""Regenerate soundboard.ico (used by the desktop / Start menu shortcuts) from the
+"""Regenerate assets/onionboard.ico (the .exe, installer and shortcut icon) from the
 logo in theme.py, so the shortcut icon always matches the in-app one.
 
-    .venv\\Scripts\\python make_icon.py
+    .venv\\Scripts\\python scripts\\make_icon.py
 """
 import os
 import struct
@@ -12,6 +12,9 @@ os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")   # no window needed
 
 from PySide6.QtCore import QBuffer, QIODevice
 from PySide6.QtGui import QGuiApplication
+
+ROOT = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(ROOT))   # run from scripts\: make `soundboard` importable
 
 SIZES = (16, 20, 24, 32, 40, 48, 64, 128, 256)
 
@@ -34,7 +37,7 @@ def main():
         out += struct.pack("<BBBBHHII", s % 256, s % 256, 0, 0, 1, 32, len(data), offset)
         offset += len(data)
     out += b"".join(pngs)
-    dest = Path(__file__).resolve().parent / "soundboard.ico"
+    dest = ROOT / "assets" / "onionboard.ico"
     dest.write_bytes(out)
     print(f"wrote {dest.name} ({len(out) // 1024} KB, sizes {', '.join(map(str, SIZES))})")
 

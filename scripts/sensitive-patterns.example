@@ -1,4 +1,4 @@
-# Copy to `.sensitive-patterns` (gitignored) and fill in YOUR identifiers.
+# Copy to `.sensitive-patterns` at the repo root (gitignored) and fill in YOUR identifiers.
 # One case-insensitive regex per line; `#` starts a comment.
 # scripts/check_sensitive.py fails if any of these appear in published files.
 #

@@ -35,8 +35,8 @@ DisableReadyPage=yes
 DisableWelcomePage=no
 WizardStyle=modern
 WizardSizePercent=110
-SetupIconFile=..\soundboard.ico
-; Bun the mascot, rendered by make_bunny.py (build.ps1 runs it)
+SetupIconFile=..\assets\onionboard.ico
+; Bun the mascot, rendered by scripts\make_bunny.py (build.ps1 runs it)
 WizardImageFile=wizard-1x.bmp,wizard-2x.bmp
 WizardSmallImageFile=wizard-small-1x.bmp,wizard-small-2x.bmp
 UninstallDisplayIcon={app}\{#AppExeName}.exe
@@ -87,7 +87,7 @@ Filename: "{cmd}"; Parameters: "/c ""{app}\modules\live-voice\install.bat"" --qu
 Filename: "{app}\{#AppExeName}.exe"; Description: "Open Onion Board now"; Flags: nowait postinstall skipifsilent
 
 [Registry]
-; "Start with Windows" (Settings → General) writes this value; nothing is created at
+; "Start with Windows" (Settings -> General) writes this value; nothing is created at
 ; install, but uninstalling removes it so Windows doesn't try to start a removed app.
 Root: HKCU; Subkey: "Software\Microsoft\Windows\CurrentVersion\Run"; ValueType: none; ValueName: "OnionBoard"; Flags: uninsdeletevalue dontcreatekey
 
@@ -95,8 +95,8 @@ Root: HKCU; Subkey: "Software\Microsoft\Windows\CurrentVersion\Run"; ValueType: 
 ; made after install: a module's own Python environment and bytecode
 Type: filesandordirs; Name: "{app}\modules"
 
-; Uninstalling leaves %APPDATA%\OnionBoard (their sounds and settings), the cable and
-; FFmpeg in place.
+; Uninstalling leaves %APPDATA%\OnionBoard (their sounds and settings) and FFmpeg in
+; place; the cable is offered for removal (CurUninstallStepChanged below).
 
 [Code]
 function WingetPath(Param: String): String;
@@ -133,16 +133,32 @@ end;
 var
   CableNeedsRestart: Boolean;
 
+// VB-Audio's own setup program, which the cable install leaves in Program Files; run
+// with -u -h it removes the cable. '' = no cable installed.
+function CableSetup: String;
+begin
+  Result := ExpandConstant('{commonpf64}\VB\CABLE\VBCABLE_Setup_x64.exe');
+  if not FileExists(Result) then
+    Result := ExpandConstant('{commonpf}\VB\CABLE\VBCABLE_Setup.exe');
+  if not FileExists(Result) then
+    Result := '';
+end;
+
 procedure InstallCable;
 var
   Code: Integer;
+  HadCable: Boolean;
 begin
+  HadCable := CableSetup <> '';
   WizardForm.StatusLabel.Caption :=
     'Installing the virtual cable... click Yes if Windows asks for permission.';
   if Exec('powershell.exe', '-NoProfile -ExecutionPolicy Bypass -File "' +
           ExpandConstant('{app}\_internal\install-vbcable.ps1') + '" -Silent',
           '', SW_HIDE, ewWaitUntilTerminated, Code) then
     CableNeedsRestart := (Code = 3010);
+  // remembered for the uninstaller: a cable we put there is offered for removal first
+  if (not HadCable) and (CableSetup <> '') then
+    RegWriteStringValue(HKCU, 'Software\OnionBoard', 'InstalledCable', '1');
   // after that restart, open the app once by itself on the setup guide's cable step
   // (the same per-user RunOnce entry the guide sets; Windows deletes it as it runs)
   if CableNeedsRestart then
@@ -154,6 +170,37 @@ end;
 function NeedRestart(): Boolean;
 begin
   Result := CableNeedsRestart;
+end;
+
+// Uninstall: offer to remove the cable too. The default answer is Yes only when this
+// installer put it there (other apps, e.g. Voicemeeter, may use one that was already
+// installed). Silent uninstalls leave it alone.
+procedure CurUninstallStepChanged(CurUninstallStep: TUninstallStep);
+var
+  Setup, Mine: String;
+  Code, Default: Integer;
+begin
+  if CurUninstallStep <> usUninstall then
+    exit;
+  Setup := CableSetup;
+  Mine := '';
+  RegQueryStringValue(HKCU, 'Software\OnionBoard', 'InstalledCable', Mine);
+  if (Setup <> '') and not UninstallSilent then
+  begin
+    if Mine = '1' then Default := MB_DEFBUTTON1 else Default := MB_DEFBUTTON2;
+    if MsgBox('Also remove the virtual cable (VB-Cable)?' + #13#10#13#10 +
+        'Onion Board used it to send your sounds into Discord and games. Choose No if ' +
+        'another program uses it too (Voicemeeter, another soundboard...).' + #13#10#13#10 +
+        'Windows will ask for permission, and may want a restart afterwards.',
+        mbConfirmation, MB_YESNO or Default) = IDYES then
+    begin
+      if not ShellExec('runas', Setup, '-u -h', '', SW_HIDE, ewWaitUntilTerminated, Code) then
+        MsgBox('The virtual cable wasn''t removed (permission was refused). You can remove ' +
+          'it later from Settings > Apps > Installed apps > VBCABLE.', mbInformation, MB_OK);
+    end;
+  end;
+  RegDeleteValue(HKCU, 'Software\OnionBoard', 'InstalledCable');
+  RegDeleteKeyIfEmpty(HKCU, 'Software\OnionBoard');
 end;
 
 procedure CurStepChanged(CurStep: TSetupStep);

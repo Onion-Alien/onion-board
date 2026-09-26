@@ -5,6 +5,11 @@
 The first public release, as **Onion Board** (it was called Soundboard). Your
 sounds and settings move over by themselves the first time it starts.
 
+- **Uninstalling asks whether to remove the virtual cable too** (Yes by default
+  only if Onion Board installed it; say No if another program uses it).
+- **Settings → General → Support Onion Board** opens the project page's Support
+  section, if you'd like to chip in.
+
 ### Security and fixes from the pre-release audit
 
 - A pasted Myinstants link could write a file outside the download folder, and

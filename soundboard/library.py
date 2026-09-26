@@ -38,9 +38,10 @@ THUMBS_DIR = APP_DIR / "thumbs"   # pad pictures (soundboard.thumbs)
 CONFIG_PATH = APP_DIR / "config.json"
 CONFIG_VERSION = 3
 CONFIG_BACKUPS = 3   # config.json.1 … .3, rotated on every save that changes something
-# where install-vbcable.ps1 and soundboard.ico live: the repo root, or the frozen
-# app's _internal folder when built with PyInstaller
-RESOURCE_DIR = Path(getattr(sys, "_MEIPASS", Path(__file__).resolve().parent.parent))
+# where install-vbcable.ps1 lives: installer/ in a source checkout, or the frozen
+# app's _internal folder (PyInstaller's _MEIPASS; build.ps1 bundles it at its root)
+RESOURCE_DIR = (Path(sys._MEIPASS) if hasattr(sys, "_MEIPASS")
+                else Path(__file__).resolve().parent.parent / "installer")
 
 AUDIO_EXTS = {".wav", ".mp3", ".ogg", ".flac", ".opus", ".m4a", ".aac", ".wma",
               ".aiff", ".aif", ".webm", ".mp4", ".mkv", ".mov"}

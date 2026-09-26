@@ -126,7 +126,8 @@ The same switch is in **⚙ Settings → General → Your mic** and in the setup
 - **Start the guide again:** *Setup* tab → *Step-by-step guide*.
 
 Your sounds and settings are kept in `%APPDATA%\OnionBoard\` and survive
-reinstalling or uninstalling.
+reinstalling or uninstalling. Uninstalling asks whether to remove the virtual cable
+too (say No if another program, like Voicemeeter, uses it).
 
 ---
 
@@ -240,6 +241,37 @@ rules of the sites you get them from and the servers you play them in. Onion Boa
 isn't affiliated with or endorsed by YouTube, SoundCloud, Myinstants, Discord,
 VB-Audio or any other service it mentions.
 
+### License
+
+Onion Board is free, and it has to stay free. It's under the
+[MIT license with the Commons Clause](LICENSE). In plain words:
+
+- **You can** use it for anything, including on monetized streams and videos.
+- **You can** copy it, change it, and share your own version, as long as that
+  version is free too and keeps the same license.
+- **You can't** sell Onion Board, or a version of it, or charge for something whose
+  value is mostly Onion Board (a paid download, a paid "premium" build, bundling it
+  into a paid product). If someone charged you for it, you were ripped off; the real
+  one is always free here.
+
+The name "Onion Board" and its logo aren't covered by the license: a version you
+make should use its own name.
+
+## Support Onion Board
+
+Onion Board is free, with no ads and no tracking, and it stays that way. If it made
+your games or calls more fun and you want to chip in, thank you! Crypto is the only
+way for now:
+
+| Coin | Address |
+|---|---|
+| **Bitcoin** (BTC) | `bc1qrr382vd6xsfavyuqvwxjy5watfd4fqr0tufyk7` |
+| **Ethereum** (ETH, USDC…), also on Base, Arbitrum, Polygon and Optimism | `0x11C66De40F99628aA52234Ae3aCa550Da5491A32` |
+
+Only trust the addresses on **this page** (`github.com/Onion-Alien/onion-board`):
+anyone can copy an open-source app and put their own in. Starring the repo or telling
+a friend helps just as much.
+
 ---
 
 ## Advanced (for developers and tinkerers)
@@ -250,7 +282,7 @@ You don't need any of it to use Onion Board.
 ### Install from source (any Windows PC)
 
 1. Download or clone this folder.
-2. Double-click **`install.bat`**. It:
+2. Double-click **`scripts\install.bat`**. It:
    - finds Python 3.12+ (offers to install 3.13 with winget if you have none)
    - installs the Python packages into `.venv`
    - adds **Onion Board** shortcuts to the Desktop and Start menu
@@ -263,7 +295,7 @@ You don't need any of it to use Onion Board.
 It's a free audio driver (VB-Audio Virtual Cable) that acts like a pipe: the app
 plays into one end and Discord or the game uses the other end as a microphone.
 It isn't included in this repo because VB-Audio's licence doesn't allow
-redistributing it. `install-vbcable.ps1` downloads the current pack from
+redistributing it. `installer\install-vbcable.ps1` downloads the current pack from
 [vb-audio.com](https://vb-audio.com/Cable/), checks the installer is signed by
 VB-Audio, and runs it. Windows asks for admin permission. The app's *Install the
 free virtual cable* button runs the same script. Other virtual cables
@@ -278,7 +310,7 @@ decode anything; it's safe to delete and is rebuilt as needed.
 
 ### Code layout
 
-Run from source with `run.bat` (or `python -m soundboard`); `main.py` at the root is
+Run from source with `scripts\run.bat` (or `python -m soundboard`); `main.py` at the root is
 the launcher the shortcuts and PyInstaller use. The app is the `soundboard` package:
 
 | file | what it does |
@@ -335,13 +367,10 @@ the launcher the shortcuts and PyInstaller use. The app is the `soundboard` pack
 | `soundboard/destination.py` | destination modes (Settings → *Who's listening*): shapes the sounds bus for the listener's voice codec — sub-bass harmonics, codec ceiling, gentle compressor, mono |
 | `soundboard/ui/destpanel.py` | the mode picker and the custom-modes editor |
 | `soundboard/codecsim.py` | development bench: runs audio through Discord / Steam / Vivox's Opus pipeline (ffmpeg's libopus) and measures what's lost |
-| `make_icon.py` | regenerates `soundboard.ico` (shortcut icon) from the logo in `theme.py` |
-| `make_bunny.py` | renders the installer artwork from `bunny.py` (`--preview` for a sheet of poses) |
 | `modules/` | add-ons shipped with the app: `retro-fx` (an effects module, the example to copy), `live-voice` (a service module with its own Python environment) and `translate-zh/es/fr/de/ru` (translation modules: a manifest naming a model that's downloaded only when picked) |
-| `build.ps1`, `installer/` | the PyInstaller build and the Inno Setup installer |
-| `install.bat`, `install.ps1`, `run.bat` | run from source: set up `.venv` and shortcuts, then launch |
-| `install-vbcable.ps1` | downloads VB-Cable, checks its signature, installs it (used by the app and the installer) |
-| `scripts/` | `check_sensitive.py` (secrets / personal-data scan, also the pre-commit hook), `make_notices.py` (third-party licences for the build), `codec_bench.py` (what voice chat does to your sounds, in numbers) and `screenshots.py` (renders `docs/screenshots/` offscreen from made-up demo data) |
+| `build.ps1`, `installer/` | the PyInstaller build and the Inno Setup installer (`installer/OnionBoard.iss`); `installer/install-vbcable.ps1` downloads VB-Cable, checks its signature and installs it (used by the app and the installer) |
+| `assets/onionboard.ico` | the .exe, installer and shortcut icon, generated by `scripts/make_icon.py` |
+| `scripts/` | `install.bat` / `install.ps1` / `run.bat` (run from source: set up `.venv` and shortcuts, then launch), `make_icon.py` (regenerates `assets/onionboard.ico` from the logo in `theme.py`), `make_bunny.py` (renders the installer artwork from `bunny.py`; `--preview` for a sheet of poses), `check_sensitive.py` (secrets / personal-data scan, also the pre-commit hook; your own patterns go in a root `.sensitive-patterns`, see `sensitive-patterns.example`), `make_notices.py` (third-party licences for the build), `codec_bench.py` (what voice chat does to your sounds, in numbers) and `screenshots.py` (renders `docs/screenshots/` offscreen from made-up demo data) |
 | `tests/` | pytest suite: ring buffer, engine mixing/guards/watchdog, cache and imports, recorder, hotkey parsing, EQ, levelling, config, test analysis, the main window built on Qt's offscreen platform (no window, no devices, no hotkeys) including shrinking it, the overlay, setup guide, voice panel, speech and effects, per-sound effects (speed and pitch measured by frequency and length, every preset, the effects cache, the Edit dialog) and live speed / pitch, the web search, and the Radio tab against a local stand-in for the directory and a station (parsing untrusted station data, search, cache and mirror failover, a stream decoded to 48 kHz and measured by frequency, dead stations, the globe page's click bridge with the internet blocked) |
 
 Developing:
@@ -362,12 +391,12 @@ QtWebEngine included), then compiles `installer\OnionBoard.iss` with Inno Setup 
 (`winget install JRSoftware.InnoSetup`) into **`dist\OnionBoardSetup.exe`**, the one
 file to hand out. It installs per user (no admin), adds the Desktop and Start menu
 shortcuts and opens the app. Its *Pick what you want* page (Inno Setup tasks) covers
-VB-Cable (downloaded and signature-checked by `install-vbcable.ps1`), FFmpeg via winget
+VB-Cable (downloaded and signature-checked by `installer\install-vbcable.ps1`), FFmpeg via winget
 (offered only when ffmpeg is missing and winget exists), the add-ons in `modules\`
 (copied to `{app}\modules`; *live-voice* then runs its `install.bat --quiet` when
 Python is present) and the Desktop shortcut. Silent installs use the defaults or the
 previous install's choices. The installer artwork is Bun the mascot, drawn in code by
-`soundboard/bunny.py` and rendered by `make_bunny.py` (`--preview` writes a sheet of
+`soundboard/bunny.py` and rendered by `scripts\make_bunny.py` (`--preview` writes a sheet of
 every pose). Settings live in `%APPDATA%\OnionBoard\` either way.
 Every `config.json` save keeps the last three good copies next to it
 (`config.json.1` … `.3`); a damaged file is set aside as `config.json.broken-<time>` and

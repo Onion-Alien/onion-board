@@ -16,7 +16,7 @@
 # The script elevates itself once (one "Yes" on the Windows prompt) when it has
 # something to install or wake; checking a working cable needs no admin.
 #
-# Usage:  powershell -ExecutionPolicy Bypass -File install-vbcable.ps1 [-Silent] [-Check]
+# Usage:  powershell -ExecutionPolicy Bypass -File installer\install-vbcable.ps1 [-Silent] [-Check]
 #                    [-StatusFile <path>]
 #   exit 0 = cable working, 3010 = restart needed, 1 = failed / cancelled,
 #   2 = (-Check only) no cable installed

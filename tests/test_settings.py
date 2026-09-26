@@ -20,3 +20,14 @@ def test_a_short_window_scrolls_the_general_page_instead_of_squashing_it(window,
             want = wdg.heightForWidth(wdg.width()) if wdg.hasHeightForWidth() else -1
             assert wdg.height() >= max(want, wdg.minimumSizeHint().height()), wdg.text()
     d.close()
+
+
+def test_support_opens_the_project_page_not_an_address_in_the_app(window, monkeypatch):  # noqa: F811
+    from soundboard import settings
+    opened = []
+    monkeypatch.setattr(settings.QDesktopServices, "openUrl", lambda u: opened.append(u.toString()))
+    d = SettingsDialog(window, "general")
+    btn = next(b for b in d.findChildren(QPushButton) if "Support" in b.text())
+    btn.click()
+    assert opened == ["https://github.com/Onion-Alien/onion-board#support-onion-board"]
+    d.close()

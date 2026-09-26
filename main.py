@@ -1,5 +1,5 @@
-"""Launcher kept at the repo root so run.bat, the Desktop / Start-menu shortcuts and
-PyInstaller all have one obvious entry point. The app lives in the `soundboard`
+"""Launcher kept at the repo root so scripts/run.bat, the Desktop / Start-menu
+shortcuts and PyInstaller all have one obvious entry point. The app lives in the `soundboard`
 package; `python -m soundboard` works too."""
 import sys
 from pathlib import Path

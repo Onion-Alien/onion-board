@@ -4,8 +4,8 @@ from __future__ import annotations
 
 import threading
 
-from PySide6.QtCore import QObject, QRectF, QSize, Qt, Signal
-from PySide6.QtGui import QColor, QFont, QPainter, QPainterPath
+from PySide6.QtCore import QObject, QRectF, QSize, Qt, QUrl, Signal
+from PySide6.QtGui import QColor, QDesktopServices, QFont, QPainter, QPainterPath
 from PySide6.QtWidgets import (QApplication, QCheckBox, QComboBox, QDialog, QFrame, QGridLayout,
                                QHBoxLayout, QLabel, QPushButton, QScrollArea, QSlider, QTabWidget,
                                QVBoxLayout, QWidget)
@@ -471,8 +471,28 @@ class SettingsDialog(QDialog):
         cv.addWidget(stat)
         v.addWidget(card)
         v.addWidget(self._downloader_card())
+        v.addWidget(self._support_card())
         v.addStretch(1)
         return w
+
+    # ------------------------------------------------------------------ support
+    def _support_card(self):
+        """A link to the GitHub page's Support section: the ways to donate live there,
+        not in the app, so they can change without a release and a copy of the app
+        with someone else's details swapped in is easy to spot."""
+        from soundboard.updates import REPO
+        card, cv = self._card("Support Onion Board",
+                              "Onion Board is free, with no ads and no tracking. If it made "
+                              "your games or calls more fun, you can chip in. Entirely "
+                              "optional. The button opens the project's GitHub page.")
+        btn = QPushButton("♥  Support Onion Board")
+        btn.clicked.connect(lambda: QDesktopServices.openUrl(
+            QUrl(f"https://github.com/{REPO}#support-onion-board")))
+        row = QHBoxLayout()
+        row.addWidget(btn)
+        row.addStretch(1)
+        cv.addLayout(row)
+        return card
 
     # ------------------------------------------------------------------ background
     def _background_card(self):

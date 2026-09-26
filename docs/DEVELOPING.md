@@ -49,12 +49,12 @@ They're safe to run while someone is using the PC.
 
 To iterate faster, run just the file you touched, e.g.
 `.venv\Scripts\python -m pytest -q tests\test_engine.py`, and the full suite
-before committing. You don't need to rebuild to see a change: `run.bat` runs
+before committing. You don't need to rebuild to see a change: `scripts\run.bat` runs
 from source.
 
 **Launching the real app is not headless.** It opens a window, grabs global
 hotkeys and opens audio devices. Agents: ask the user before running
-`run.bat`, `python -m soundboard`, `OnionBoard.exe` or the installer.
+`scripts\run.bat`, `python -m soundboard`, `OnionBoard.exe` or the installer.
 
 ## 4. Build the app and the installer
 
@@ -76,15 +76,16 @@ Rebuilds are incremental: PyInstaller reuses its analysis cache in `build\`.
 `-Clean` starts from scratch (do this for a release, or if a build misbehaves).
 `-NoInstaller` stops after the app folder and skips the Inno Setup compression.
 
-Build steps, in order: PyInstaller (bundles `install-vbcable.ps1` and the icon
-as data), licence files, `make_bunny.py` (renders the installer artwork
+Build steps, in order: PyInstaller (bundles `installer\install-vbcable.ps1` and
+`assets\onionboard.ico` as data, both at the root of `_internal\`), licence files,
+`scripts\make_bunny.py` (renders the installer artwork
 `installer\wizard*.bmp`, gitignored), then `ISCC` with `/DAppVersion` taken from
 `soundboard/__init__.py`. Bump `__version__` there for a release.
 
 Rebuild after changing anything under `soundboard\`, `main.py`,
-`install-vbcable.ps1`, `soundboard.ico`, `installer\` or `modules\` (the installer
+`assets\`, `installer\` (including `install-vbcable.ps1`) or `modules\` (the installer
 copies the add-ons from there when their boxes are ticked). Changes to docs, tests
-or `scripts\` don't need a rebuild.
+or `scripts\` don't need a rebuild, except `scripts\make_bunny.py` (the installer art).
 
 ## 5. Install / reinstall / uninstall
 
@@ -101,19 +102,20 @@ dist\OnionBoardSetup.exe /VERYSILENT /SUPPRESSMSGBOXES /NORESTART /CLOSEAPPLICAT
 - `/CLOSEAPPLICATIONS` closes a running Onion Board first (it's also the
   installer's default).
 - Silent installs don't launch the app afterwards (`skipifsilent`).
-- The installer runs `install-vbcable.ps1 -Silent`. It exits straight away if a
-  virtual cable is already present. If none is, VB-Cable is downloaded and
-  Windows shows a **UAC prompt** — that part can't be headless, so tell the user
+- The installer runs `install-vbcable.ps1 -Silent` (bundled as
+  `_internal\install-vbcable.ps1`). It exits straight away if a virtual cable is
+  already present. If none is, VB-Cable is downloaded and Windows shows a **UAC prompt** — that part can't be headless, so tell the user
   to expect it.
 - Restart handling: after setup the script waits for the CABLE devices. If Windows
   reports they need a restart it exits **3010** and writes
   `%APPDATA%\OnionBoard\cable-restart-pending`; the installer then offers
   "Restart now / later" (suppressed by `/NORESTART`), and the setup guide shows a
   Restart button instead of reinstalling until the PC has restarted. Check the
-  state without installing: `powershell -File install-vbcable.ps1 -Check`
+  state without installing: `powershell -File installer\install-vbcable.ps1 -Check`
   (0 working, 3010 restart needed, 2 not installed).
 
-Headless uninstall:
+Headless uninstall (a silent uninstall never removes the cable; an interactive one
+asks, defaulting to Yes only if this installer put the cable there):
 
 ```powershell
 & "$env:LOCALAPPDATA\Programs\OnionBoard\unins000.exe" /VERYSILENT /SUPPRESSMSGBOXES /NORESTART

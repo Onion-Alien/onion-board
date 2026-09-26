@@ -4,9 +4,9 @@
 #   3. adds Desktop + Start menu shortcuts
 #   4. offers to install the free virtual cable (VB-Cable)
 #
-# Run it by double-clicking install.bat.
+# Run it by double-clicking scripts\install.bat.
 $ErrorActionPreference = "Stop"
-$root = $PSScriptRoot
+$root = Split-Path $PSScriptRoot -Parent   # the repo root (this file is in scripts\)
 Set-Location $root
 
 function Ask($q) {
@@ -72,7 +72,7 @@ foreach ($dir in $targets) {
     $lnk.TargetPath = Join-Path $root ".venv\Scripts\pythonw.exe"
     $lnk.Arguments = "`"$(Join-Path $root 'main.py')`""
     $lnk.WorkingDirectory = $root
-    $lnk.IconLocation = Join-Path $root "soundboard.ico"
+    $lnk.IconLocation = Join-Path $root "assets\onionboard.ico"
     $lnk.Description = "Onion Board"
     $lnk.Save()
 }
@@ -87,7 +87,7 @@ if ($cable) {
     Write-Host ""
     Write-Host "No virtual cable found. It's what lets Discord / games hear your sounds." -ForegroundColor Yellow
     if (Ask "Install VB-Cable (free, from vb-audio.com) now?") {
-        & (Join-Path $root "install-vbcable.ps1")
+        & (Join-Path $root "installer\install-vbcable.ps1")
     } else {
         Write-Host "No problem - the app has an Install button for it too."
     }

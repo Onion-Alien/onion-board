@@ -1,6 +1,6 @@
 """Bun, the mascot: a cartoon bunny in gaming headphones, drawn with QPainter so it's
 crisp at any size and needs no image files. Used by the quick-setup guide (a
-different prop on each page) and by make_bunny.py for the installer's artwork.
+different prop on each page) and by scripts/make_bunny.py for the installer's artwork.
 
     bunny_image(160, prop="mic")   # QImage, transparent background
 """

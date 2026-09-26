@@ -22,14 +22,14 @@ if ($InstallerDir) { $InstallerDir = [IO.Path]::GetFullPath((Join-Path (Get-Loca
 Set-Location $PSScriptRoot
 
 $py = ".venv\Scripts\python.exe"
-if (-not (Test-Path $py)) { throw "No .venv - run install.bat first." }
+if (-not (Test-Path $py)) { throw "No .venv - run scripts\install.bat first." }
 
 $cleanArg = @()
 if ($Clean) { $cleanArg = @("--clean") }
 & $py -m PyInstaller --noconfirm @cleanArg --windowed `
-    --name OnionBoard --icon soundboard.ico `
-    --add-data "install-vbcable.ps1;." `
-    --add-data "soundboard.ico;." `
+    --name OnionBoard --icon assets\onionboard.ico `
+    --add-data "installer\install-vbcable.ps1;." `
+    --add-data "assets\onionboard.ico;." `
     --copy-metadata yt-dlp --collect-all yt_dlp_ejs `
     --paths . `
     main.py
@@ -74,7 +74,7 @@ if ($NoInstaller) {
     Publish-Build
     exit 0
 }
-& $py make_bunny.py   # installer side-panel art (the mascot)
+& $py scripts\make_bunny.py   # installer side-panel art (the mascot)
 if ($LASTEXITCODE -ne 0) { throw "make_bunny.py failed" }
 $iscc = @("$env:LOCALAPPDATA\Programs\Inno Setup 6\ISCC.exe",
           "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe",
