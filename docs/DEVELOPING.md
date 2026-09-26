@@ -42,7 +42,9 @@ platform and a separate single-instance name, and never touches the real
 `%APPDATA%\Soundboard`. No window appears and no global hotkey is registered.
 `sounddevice.OutputStream` is swapped for a silent stand-in that runs the
 callback at the device's pace but plays nothing, so no test is ever heard on
-the speakers or headphones (set `SOUNDBOARD_TEST_REAL_AUDIO=1` to opt out).
+the speakers or headphones, and the web engine runs with `--mute-audio` so the
+browser tests' tone pages are silent too (set `SOUNDBOARD_TEST_REAL_AUDIO=1` to
+opt out of both).
 They're safe to run while someone is using the PC.
 
 To iterate faster, run just the file you touched, e.g.
