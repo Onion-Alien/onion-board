@@ -247,8 +247,9 @@ Onion Board is free, and it has to stay free. It's under the
 [MIT license with the Commons Clause](LICENSE). In plain words:
 
 - **You can** use it for anything, including on monetized streams and videos.
-- **You can** copy it, change it, and share your own version, as long as that
-  version is free too and keeps the same license.
+- **You can** copy it, change it, and share your own version for free, as long
+  as you keep the `LICENSE` file (Commons Clause included) with it, so your version
+  can't be sold either.
 - **You can't** sell Onion Board, or a version of it, or charge for something whose
   value is mostly Onion Board (a paid download, a paid "premium" build, bundling it
   into a paid product). If someone charged you for it, you were ripped off; the real

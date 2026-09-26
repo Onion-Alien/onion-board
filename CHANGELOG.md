@@ -5,6 +5,10 @@
 The first public release, as **Onion Board** (it was called Soundboard). Your
 sounds and settings move over by themselves the first time it starts.
 
+- **New licence: MIT with the Commons Clause.** Still free to use (streams and
+  videos included), copy, change and share, but not to sell. 0.1.0 and 0.2.0
+  stay plain MIT.
+
 - **Uninstalling asks whether to remove the virtual cable too** (Yes by default
   only if Onion Board installed it; say No if another program uses it).
 - **Settings → General → Support Onion Board** opens the project page's Support
@@ -142,7 +146,7 @@ sounds and settings move over by themselves the first time it starts.
   globe shows the most-listened ~3000 as dots: spin it, hover for the name, click
   to tune in. Or search by name, genre or country. Stars keep your favourites.
   The radio has its own volume, *Hear it myself* and **LIVE** (off every launch),
-  so it can go out through your mic like the Browser tab, and *Record* / *Last
+  so it can go out through your mic like a sound, and *Record* / *Last
   15s* turn it into pads. Stop all stops it too, and auto push-to-talk counts it.
   Hovering a dot shows a card with the station's country and region, genres,
   language, audio quality, plays today (and the trend), votes and when it was last
@@ -175,14 +179,6 @@ sounds and settings move over by themselves the first time it starts.
 - **More Windows voices.** Text-to-speech now also finds the newer Windows voices
   (Mark, George, Susan… and any language voice you add in Windows settings), not
   just the classic desktop ones.
-- **No more crackles and skips in Browser audio.** A busy page (YouTube) can hold up
-  its audio for a moment, which used to drain the buffer and cut the sound mid-wave.
-  The buffer now grows each time that happens (up to 250 ms), and any gap or
-  jump fades instead of clicking. The log on exit counts how often it happened.
-- **The Browser only opens safe sites.** YouTube, SoundCloud, TikTok and the big sound-clip
-  sites (MyInstants, Freesound, 101 Soundboards, Voicy…). Links anywhere else,
-  including redirects and pop-ups, are refused with a note, since Qt's browser has
-  no protection against scam or virus sites.
 - **Add or play a sound from a link.** Paste a link into *Search sounds* on the
   Sounds tab (YouTube, SoundCloud, TikTok, X, Reddit, direct audio/video links and
   most other media sites, via yt-dlp). It's looked up and shows its title, then
@@ -197,21 +193,10 @@ sounds and settings move over by themselves the first time it starts.
   Demon and Reversed. *Preview* plays it to you only. *Save* changes the pad, and
   *Save as new sound* keeps the original and adds the edited version as its own
   pad. The original file is never touched, and pads with effects show **FX**.
-- **Speed and pitch while you listen.** A `1x` button on the Sounds transport and
-  on the Browser bar slows down or speeds up (0.25×–2×) and shifts the pitch
-  (±12 semitones) of whatever is playing, keeping the pitch when the speed changes
-  or not. The Browser one applies to every video you play until you reset it, and
-  clips you record have it too. These aren't saved; use Effects to keep a version.
-- Fixed: sound-button sites (MyInstants and the like) played but never reached
-  your mic, recordings or *Last 15s*: their sounds play from off-page players the
-  browser tap couldn't see.
-- Fixed: Lite mode. Pausing in the small player no longer throws you back to the
-  full page, and a YouTube video you open (or the one restored when you first
-  open the Browser tab) goes straight to the small player instead of flashing the
-  page first. Lite only hides the page for video now, so sound-button pages stay
-  clickable.
-- Fixed: quitting could log a "Signal source has been deleted" error from a
-  browser page connection that outlived the Browser tab.
+- **Speed and pitch while you listen.** A `1x` button on the Sounds transport
+  slows down or speeds up (0.25×–2×) and shifts the pitch (±12 semitones) of
+  whatever is playing, keeping the pitch when the speed changes or not. It isn't
+  saved; use Effects to keep a version.
 
 - **Voice tab redesigned so it's obvious how to use it.** The voice changer comes
   first: one big switch (green when on: everyone hears your changed voice), a grid
