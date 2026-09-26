@@ -1210,7 +1210,7 @@ class BrowserTab(QWidget):
         try:
             path, title = ytdl.download_audio(
                 url, progress=lambda f: self._dl_msg.emit("progress", f"{f:.0%}"),
-                auto_update=self.cfg.ytdlp_auto_update)
+                auto_update=self.cfg.ytdlp_auto_optin)
             tmp = path.parent
             self._dl_msg.emit("progress", "decoding")
             fp = fingerprint(str(path))
@@ -1224,7 +1224,9 @@ class BrowserTab(QWidget):
                                     "to your Sounds.")
         except Exception as e:  # noqa: BLE001 - shown in the info line, logged
             log.warning("add as sound failed for %s: %s", url, e)
-            self._dl_msg.emit("error", f"Couldn't add it: {e}")
+            hint = ("" if not isinstance(e, ytdl.FetchError) or self.cfg.ytdlp_auto_optin else
+                    " A newer yt-dlp may fix this: Settings → General → Update now.")
+            self._dl_msg.emit("error", f"Couldn't add it: {e}{hint}")
         finally:
             if tmp is not None:
                 shutil.rmtree(tmp, ignore_errors=True)

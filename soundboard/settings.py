@@ -418,12 +418,16 @@ class SettingsDialog(QDialog):
     def _downloader_card(self):
         card, cv = self._card("Browser downloader (yt-dlp)",
                               "“Add as sound” in the Browser tab uses yt-dlp. YouTube changes "
-                              "often, so it needs updating now and then. If downloads keep "
-                              "failing even after updating, Reset deletes it and its cache and "
-                              "installs a fresh copy.")
-        auto = QCheckBox("Keep it updated automatically (checks once a day)")
-        auto.setChecked(self.mw.cfg.ytdlp_auto_update)
-        auto.toggled.connect(lambda b: self.mw.set_option("ytdlp_auto_update", b))
+                              "often, so it needs updating now and then. Nothing is downloaded "
+                              "unless you click Update now / Reset, or tick the box below. If "
+                              "downloads keep failing even after updating, Reset deletes it and "
+                              "its cache and installs a fresh copy.")
+        auto = QCheckBox("Update it automatically from PyPI (checks once a day, and when a "
+                         "download fails)")
+        auto.setToolTip("Off by default: an update is code the app runs. It's checked against "
+                        "PyPI's SHA-256 before it's used.")
+        auto.setChecked(self.mw.cfg.ytdlp_auto_optin)
+        auto.toggled.connect(lambda b: self.mw.set_option("ytdlp_auto_optin", b))
         cv.addWidget(auto)
         row = QHBoxLayout()
         self.ytdlp_label = QLabel()

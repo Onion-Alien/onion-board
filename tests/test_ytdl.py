@@ -321,3 +321,17 @@ def test_settings_downloader_card(qapp, window, monkeypatch):  # noqa: F811
     assert d.ytdlp_label.text() == ("Updated yt-dlp to 2099.1.1. "
                                     "In use: yt-dlp 2099.1.1 (updated copy).")
     d.close()
+
+
+def test_auto_update_is_opt_in(qapp, app_dir, monkeypatch):
+    assert Config().ytdlp_auto_optin is False
+    # a config saved while it defaulted to on (under the old name) starts off again
+    assert Config.from_raw({"ytdlp_auto_update": True}).ytdlp_auto_optin is False
+
+    def fail(url, dest=None, progress=None, auto_update=True):
+        assert auto_update is False
+        raise ytdl.FetchError("Sign in to confirm you're not a bot")
+    monkeypatch.setattr(ytdl, "download_audio", fail)
+    tab = BrowserTab(FakeEngine(), Config(browser_url="about:blank"), lambda: None, FakeMeter)
+    tab._download("https://youtu.be/x", "#123456", {})
+    assert process_events(qapp, lambda: "Update now" in tab.info.text(), 3)

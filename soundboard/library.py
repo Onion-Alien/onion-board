@@ -98,7 +98,9 @@ class Config:
     browser_live: bool = True         # browser audio goes out to others
     browser_monitor: bool = True      # ...and to your headphones
     browser_lite: bool = True         # hide the page while it plays + 144p (light on CPU/GPU)
-    ytdlp_auto_update: bool = True    # keep the browser's "Add as sound" downloader current
+    # fetch newer yt-dlp versions from PyPI by itself: opt-in, since that's code the app
+    # runs (named *_optin so configs saved while it defaulted to on start off again)
+    ytdlp_auto_optin: bool = False
     latency: str = "low"              # audio buffering: 'low' | 'high' (safer on flaky devices)
     setup_done: bool = False          # the quick-setup guide has been completed
     voice_fx: dict = field(default_factory=dict)   # voice changer (see ui.voicepanel)

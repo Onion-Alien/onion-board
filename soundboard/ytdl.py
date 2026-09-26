@@ -12,8 +12,9 @@ Keeping it working: YouTube changes often and yt-dlp follows within days, but th
 built app can't pip-install. So a newer yt-dlp is fetched from PyPI (the wheels of
 yt-dlp and its pinned yt-dlp-ejs, checked against PyPI's SHA-256) and unpacked into
 %APPDATA%\\Soundboard\\yt-dlp\\current; an import hook (_Finder) makes that copy win
-over the bundled one. It's checked once a day (Settings → General can turn that off),
-and again when a download fails. "Reset" deletes the copy and its cache and fetches
+over the bundled one. That only happens when the user asks (Settings → General:
+Update now / Reset), or, if they opted in (off by default: it's code the app runs),
+once a day and when a download fails. "Reset" deletes the copy and its cache and fetches
 a fresh one. A copy older than the bundled yt-dlp (the app itself was updated) is
 dropped at startup.
 """

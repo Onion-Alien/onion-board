@@ -45,7 +45,7 @@ def start_ytdlp_check(cfg):
     import threading
 
     from soundboard import ytdl
-    threading.Thread(target=ytdl.auto_update, args=(cfg.ytdlp_auto_update,), daemon=True,
+    threading.Thread(target=ytdl.auto_update, args=(cfg.ytdlp_auto_optin,), daemon=True,
                      name="ytdlp-update").start()
 
 
