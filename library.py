@@ -68,6 +68,7 @@ class Config:
     browser_vol: float = 1.0
     browser_live: bool = True         # browser audio goes out to others
     browser_monitor: bool = True      # ...and to your headphones
+    browser_lite: bool = True         # hide the page while it plays + 144p (light on CPU/GPU)
     sounds: list[SoundMeta] = field(default_factory=list)
 
     @classmethod

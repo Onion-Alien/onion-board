@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+- **🍃 Lite mode** for the Browser tab (on by default), to keep it light while you
+  play. When something starts playing, the page is swapped for a small player (title,
+  time, ⏪10s ⏯ 10s⏩ ⏭), so nothing is drawn or decoded as video, and YouTube drops to
+  144p. **Show page** brings the page back to pick something else. Measured on an HD
+  video: browser CPU roughly halved (40% → 20% of a core), audio unchanged.
+
 - Opening the Browser tab no longer makes the window vanish and reappear. The window
   is now GPU-rendered from the start (`QT_WIDGETS_RHI`), so Qt doesn't have to
   rebuild it when the browser first appears.

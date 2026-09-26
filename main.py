@@ -1739,6 +1739,7 @@ QTabBar::tab:hover { color:#e6e8f0; }
 QPushButton#live { font-weight:700; }
 QPushButton#live:checked { background:#e53935; border:1px solid #ff6b6b; color:white; }
 QPushButton#rec:checked { background:#e53935; border:1px solid #ff6b6b; color:white; font-weight:700; }
+QPushButton#lite:checked { background:#13a35a; border:1px solid #13ce66; color:white; font-weight:700; }
 """
 
 
