@@ -197,7 +197,7 @@ def _check_image(colour: str, size: int) -> QImage:
 def _check_url(colour: str) -> str:
     """Stylesheets need a file for `image:`, so write the tick (plus an @2x copy Qt picks
     on high-DPI screens) to the temp folder once per colour."""
-    folder = Path(tempfile.gettempdir()) / "soundboard-ui"
+    folder = Path(tempfile.gettempdir()) / "onionboard-ui"
     base = folder / f"check-{colour.lstrip('#')}.png"
     try:
         folder.mkdir(exist_ok=True)

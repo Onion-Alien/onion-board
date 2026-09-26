@@ -187,7 +187,7 @@ class MainWindow(QMainWindow):
         head.addWidget(self.logo)
         names = QVBoxLayout()
         names.setSpacing(0)
-        self.wordmark = QLabel("SOUNDBOARD")
+        self.wordmark = QLabel("ONION BOARD")
         self.wordmark.setObjectName("wordmark")
         self.tagline = QLabel("an app by Onion Alien")
         self.tagline.setObjectName("tagline")

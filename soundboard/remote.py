@@ -138,7 +138,7 @@ class RemoteControl(QObject):
 
 def _handler_for(ctl: RemoteControl):
     class Handler(BaseHTTPRequestHandler):
-        server_version = "SoundboardAPI"
+        server_version = "OnionBoardAPI"
         sys_version = ""
         timeout = IDLE_S
 
