@@ -1,31 +1,19 @@
 """Builds the real MainWindow on Qt's offscreen platform (no window appears, no
 audio device is opened, no global hotkey is registered) and exercises the UI
 plumbing: pad syncing, the metadata index, the mic-check pulse, the wheel guard."""
-import os
+import numpy as np
+import pytest
+import soundfile as sf
+from PySide6.QtCore import QPoint, QPointF, Qt
+from PySide6.QtGui import QWheelEvent
+from PySide6.QtWidgets import QApplication, QScrollArea, QSlider, QVBoxLayout, QWidget
 
-os.environ["QT_QPA_PLATFORM"] = "offscreen"
-os.environ.setdefault("SOUNDBOARD_INSTANCE", "pytest")
-
-import numpy as np  # noqa: E402
-import pytest  # noqa: E402
-import soundfile as sf  # noqa: E402
-from PySide6.QtCore import QPoint, QPointF, Qt  # noqa: E402
-from PySide6.QtGui import QWheelEvent  # noqa: E402
-from PySide6.QtWidgets import QApplication, QScrollArea, QSlider, QVBoxLayout, QWidget  # noqa: E402
-
-import engine  # noqa: E402
-import library  # noqa: E402
-import main  # noqa: E402
-import winkeys  # noqa: E402
-from library import SR, Config, SoundMeta  # noqa: E402
-from wheelguard import no_wheel  # noqa: E402
-
-
-@pytest.fixture(scope="session")
-def qapp():
-    app = QApplication.instance() or QApplication([])
-    app.setStyle("Fusion")
-    return app
+import engine
+import library
+import main
+import winkeys
+from library import SR, Config, SoundMeta
+from wheelguard import no_wheel
 
 
 @pytest.fixture

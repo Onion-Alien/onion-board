@@ -1,13 +1,37 @@
-"""Test setup: run from the repo root so the flat modules import, and never touch
-the real %APPDATA%\\Soundboard folder."""
+"""Test setup: run from the repo root so the flat modules import, never touch the
+real %APPDATA%\\Soundboard folder, and keep Qt on the offscreen platform (no
+window ever appears; the web engine still runs)."""
+import os
 import sys
 from pathlib import Path
 
 import pytest
 
+os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
+os.environ.setdefault("SOUNDBOARD_INSTANCE", "pytest")
+
 ROOT = Path(__file__).resolve().parent.parent
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
+
+
+@pytest.fixture(scope="session")
+def qapp():
+    from PySide6.QtWidgets import QApplication
+    app = QApplication.instance() or QApplication([])
+    app.setStyle("Fusion")
+    return app
+
+
+def process_events(app, until, timeout=8.0, step=0.02):
+    """Spin the Qt event loop until `until()` is true (or the timeout passes)."""
+    import time
+    from PySide6.QtCore import QEventLoop
+    end = time.monotonic() + timeout
+    while not until() and time.monotonic() < end:
+        app.processEvents(QEventLoop.AllEvents, int(step * 1000))
+        time.sleep(step / 4)
+    return until()
 
 
 @pytest.fixture

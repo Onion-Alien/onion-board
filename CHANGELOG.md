@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+- **Browser audio path rebuilt.** Page audio is now captured by an AudioWorklet on
+  Chromium's audio thread (ScriptProcessor stays as a fallback for pages whose CSP
+  forbids it) and streamed to the app as raw 16-bit PCM over a WebSocket on
+  127.0.0.1 with a per-launch secret: no more base64 inside JSON over QWebChannel,
+  and no decoding on the UI thread. Embedded players in iframes are captured too
+  (when two frames play at once the first keeps the mic until it goes quiet). Stop
+  all pauses media in every frame. The mini-player is only polled while the tab is
+  visible. The address bar accepts ports, paths and `localhost`.
 - **Lighter UI.** The mouse-wheel guard is installed on the dropdowns, sliders and
   number boxes themselves instead of on the whole application, where it ran a Python
   call for every event of every object (mouse moves, paints, the web view's stream).

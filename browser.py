@@ -1,11 +1,17 @@
 """Browser tab: a built-in web browser whose audio goes out through your mic.
 
-Every <audio>/<video> a page plays is tapped with WebAudio and streamed to
-Python over QWebChannel as 16-bit PCM at 48 kHz. The tap runs in an isolated
-JS world, so pages can't see it, break it, or push audio into the mic
+Every <audio>/<video> a page plays is tapped with WebAudio (an AudioWorklet on
+the audio thread; ScriptProcessor as a fallback) and streamed to Python as raw
+16-bit PCM at 48 kHz over a WebSocket on 127.0.0.1 with a per-launch secret in
+its URL. Binary frames go straight into numpy: no base64, no JSON, no
+QWebChannel. The tap runs in an isolated JS world in every frame (embedded
+players too), so pages can't see it, break it, or push audio into the mic
 themselves. Chromium's own output stays silent. The engine plays the audio in
 your headphones and, while you're live, into the virtual cable, which makes it
 come out of your mic. Nothing has to be downloaded first.
+
+When two frames play at once, the one that started first owns the mic until it
+goes quiet for a moment; the other is heard by nobody (it's reported, not mixed).
 
 The same stream feeds a recorder. ⏺ records until you stop it, and ⏪ saves the
 last CLIP_S seconds, so you can grab a moment after it happened. Clips are
@@ -13,23 +19,25 @@ added to the Sounds tab as ordinary pads.
 """
 from __future__ import annotations
 
-import base64
 import json
 import logging
 import re
+import secrets
 import time
 
 import numpy as np
 import soundfile as sf
-from PySide6.QtCore import QFile, QIODevice, QObject, Qt, QTimer, QUrl, Signal, Slot
+from PySide6.QtCore import QObject, Qt, QTimer, QUrl, Signal
 from PySide6.QtGui import QFontMetrics
-from PySide6.QtWebChannel import QWebChannel
+from PySide6.QtNetwork import QHostAddress
 from PySide6.QtWebEngineCore import (QWebEnginePage, QWebEngineProfile, QWebEngineScript,
                                      QWebEngineSettings)
 from PySide6.QtWebEngineWidgets import QWebEngineView
+from PySide6.QtWebSockets import QWebSocket, QWebSocketServer
 from PySide6.QtWidgets import (QCheckBox, QFrame, QHBoxLayout, QLabel, QLineEdit, QPushButton,
                                QSlider, QVBoxLayout, QWidget)
 from shiboken6 import delete as qt_delete
+from shiboken6 import isValid as qt_valid
 
 from engine import SR
 from library import APP_DIR, MAX_SECONDS, trim_silence
@@ -41,56 +49,116 @@ CLIP_S = 15            # "clip the last N seconds" length
 SPOOL_PATH = APP_DIR / "recording.tmp.wav"
 LIVE_TEXT = {True: "🔴  LIVE — others hear it", False: "🎧  Only me — click to go live"}
 WORLD = QWebEngineScript.ApplicationWorld
+BLOCK = 1024           # frames per chunk (~21 ms): the same for worklet and fallback
+HANDOVER_S = 0.3       # a frame keeps the mic until it's been quiet this long
 
 QUICK_LINKS = (("YouTube", "https://www.youtube.com/"),
                ("SoundCloud", "https://soundcloud.com/"),
                ("MyInstants", "https://www.myinstants.com/"))
 
-# Runs in every page (isolated world). Taps media elements and ships their audio out.
+# Runs on the audio rendering thread. Collects BLOCK stereo frames as int16 and
+# posts them (transferred, no copy) to the page thread, which sends them over the
+# socket. Its output is left silent: the soundboard plays this audio, not Chromium.
+# While tapped media plays, quiet passages are sent too, so the stream stays
+# continuous (no re-buffering delay after a pause in the audio); nothing is sent
+# while everything is paused.
+WORKLET_JS = r"""
+class SbTap extends AudioWorkletProcessor {
+  constructor() {
+    super();
+    this.buf = new Int16Array(BLOCK * 2); this.n = 0; this.loud = false; this.playing = 0;
+    this.port.onmessage = e => { this.playing = e.data; };
+  }
+  process(inputs) {
+    const inp = inputs[0];
+    if (!inp || !inp.length) return true;
+    const L = inp[0], R = inp.length > 1 ? inp[1] : inp[0];
+    for (let i = 0; i < L.length; i++) {
+      const l = Math.max(-1, Math.min(1, L[i])), r = Math.max(-1, Math.min(1, R[i]));
+      if (l !== 0 || r !== 0) this.loud = true;
+      this.buf[this.n++] = l * 32767;
+      this.buf[this.n++] = r * 32767;
+      if (this.n === this.buf.length) {
+        if (this.loud || this.playing) {
+          const out = this.buf.slice();
+          this.port.postMessage(out.buffer, [out.buffer]);
+        }
+        this.n = 0; this.loud = false;
+      }
+    }
+    return true;
+  }
+}
+registerProcessor('sb-tap', SbTap);
+""".replace("BLOCK", str(BLOCK))
+
+# Runs in every frame of every page (isolated world). Taps media elements and ships
+# their audio to the sink. %(url)s is the sink's ws://127.0.0.1:port/secret.
 TAP_JS = r"""
 (function () {
   if (window.__sbTap) return;
   window.__sbTap = true;
-  const SR = 48000, BLOCK = 1024;           // ~21 ms per chunk
-  let bridge = null, ctx = null, input = null, lastOn = -1, lastOff = -1, playing = 0;
+  const SR = 48000, BLOCK = %(block)d, WS_URL = %(url)s;
+  const WORKLET = %(worklet)s;
+  let ws = null, ctx = null, input = null, node = null, sp = null;
+  let lastOn = -1, lastOff = -1, playing = 0;
   const tapped = new WeakSet();
 
-  new QWebChannel(qt.webChannelTransport, ch => { bridge = ch.objects.sb; scan(); });
-
-  function b64(i16) {
-    const u8 = new Uint8Array(i16.buffer);
-    let s = '';
-    for (let i = 0; i < u8.length; i += 0x8000)
-      s += String.fromCharCode.apply(null, u8.subarray(i, i + 0x8000));
-    return btoa(s);
-  }
-
-  function context() {
-    if (ctx) return ctx;
-    ctx = new AudioContext({ sampleRate: SR, latencyHint: 'interactive' });
-    input = ctx.createGain();
-    const sp = ctx.createScriptProcessor(BLOCK, 2, 2);
-    sp.onaudioprocess = e => {
-      // leave the output silent: the soundboard plays this audio, not Chromium
-      for (let c = 0; c < e.outputBuffer.numberOfChannels; c++)
-        e.outputBuffer.getChannelData(c).fill(0);
-      const L = e.inputBuffer.getChannelData(0), R = e.inputBuffer.getChannelData(1);
-      const out = new Int16Array(L.length * 2);
-      let loud = false;
-      for (let i = 0; i < L.length; i++) {
-        const l = Math.max(-1, Math.min(1, L[i])), r = Math.max(-1, Math.min(1, R[i]));
-        if (l !== 0 || r !== 0) loud = true;
-        out[2 * i] = l * 32767;
-        out[2 * i + 1] = r * 32767;
-      }
-      // while tapped media plays, quiet passages are sent too, so the stream stays
-      // continuous (no re-buffering delay after a pause in the audio); nothing is
-      // sent while everything is paused
-      if (bridge && (loud || playing)) bridge.pcm(b64(out));
+  function connect() {
+    try { ws = new WebSocket(WS_URL); } catch (e) { ws = null; setTimeout(connect, 3000); return; }
+    ws.binaryType = 'arraybuffer';
+    ws.onopen = () => { lastOn = lastOff = -1; scan(); };
+    ws.onmessage = e => {
+      if (e.data === 'pause') document.querySelectorAll('audio,video').forEach(el => el.pause());
     };
-    input.connect(sp);
-    sp.connect(ctx.destination);
-    return ctx;
+    ws.onclose = () => { ws = null; setTimeout(connect, 2000); };
+    ws.onerror = () => {};
+  }
+  const ready = () => ws !== null && ws.readyState === 1;
+  function send(data) { if (ready()) ws.send(data); }
+  connect();
+
+  let making = null;
+  function context() {
+    if (making) return making;
+    making = (async () => {
+      ctx = new AudioContext({ sampleRate: SR, latencyHint: 'interactive' });
+      input = ctx.createGain();
+      try {
+        const url = URL.createObjectURL(new Blob([WORKLET], { type: 'application/javascript' }));
+        await ctx.audioWorklet.addModule(url);
+        node = new AudioWorkletNode(ctx, 'sb-tap', {
+          numberOfInputs: 1, numberOfOutputs: 1, outputChannelCount: [2],
+          channelCount: 2, channelCountMode: 'explicit', channelInterpretation: 'speakers' });
+        node.port.onmessage = e => send(e.data);
+        node.port.postMessage(playing);
+        input.connect(node);
+        node.connect(ctx.destination);
+      } catch (e) {
+        // no worklet (a page CSP forbids blob: scripts, say): ScriptProcessor on the
+        // page thread does the same job, a little less smoothly
+        node = null;
+        sp = ctx.createScriptProcessor(BLOCK, 2, 2);
+        sp.onaudioprocess = ev => {
+          for (let c = 0; c < ev.outputBuffer.numberOfChannels; c++)
+            ev.outputBuffer.getChannelData(c).fill(0);
+          const L = ev.inputBuffer.getChannelData(0), R = ev.inputBuffer.getChannelData(1);
+          const out = new Int16Array(L.length * 2);
+          let loud = false;
+          for (let i = 0; i < L.length; i++) {
+            const l = Math.max(-1, Math.min(1, L[i])), r = Math.max(-1, Math.min(1, R[i]));
+            if (l !== 0 || r !== 0) loud = true;
+            out[2 * i] = l * 32767;
+            out[2 * i + 1] = r * 32767;
+          }
+          if (loud || playing) send(out.buffer);
+        };
+        input.connect(sp);
+        sp.connect(ctx.destination);
+      }
+      return ctx;
+    })();
+    return making;
   }
 
   // Media from another site without CORS would come out of WebAudio as silence,
@@ -104,12 +172,13 @@ TAP_JS = r"""
     return el.crossOrigin !== null;
   }
 
-  function tap(el) {
-    if (!bridge || tapped.has(el) || !capturable(el)) return;
+  async function tap(el) {
+    if (!ready() || tapped.has(el) || !capturable(el)) return;
+    tapped.add(el);   // createMediaElementSource may only ever be called once per element
     try {
-      context().createMediaElementSource(el).connect(input);
-      tapped.add(el);
-    } catch (e) {}
+      const c = await context();
+      c.createMediaElementSource(el).connect(input);
+    } catch (e) { tapped.delete(el); }
   }
 
   function scan() {
@@ -121,10 +190,11 @@ TAP_JS = r"""
       if (!el.muted) tapped.has(el) ? on++ : off++;
     });
     playing = live;
+    if (node) node.port.postMessage(playing);
     if (ctx && ctx.state !== 'running' && on) ctx.resume();
-    if (bridge && (on !== lastOn || off !== lastOff)) {
+    if (ready() && (on !== lastOn || off !== lastOff)) {
       lastOn = on; lastOff = off;
-      bridge.report(on, off);
+      send(JSON.stringify({ on: on, off: off }));
     }
   }
 
@@ -133,6 +203,11 @@ TAP_JS = r"""
   setInterval(scan, 1000);
 })();
 """
+
+
+def tap_script(url: str) -> str:
+    return TAP_JS % {"block": BLOCK, "url": json.dumps(url), "worklet": json.dumps(WORKLET_JS)}
+
 
 PAUSE_JS = "document.querySelectorAll('audio,video').forEach(e => e.pause());"
 
@@ -180,35 +255,93 @@ MINI_NEXT_JS = ("(()=>{const b=document.querySelector('.ytp-next-button');"
                 "return false})()")
 
 
-def _qrc_text(path: str) -> str:
-    f = QFile(path)
-    if not f.open(QIODevice.ReadOnly):
-        raise RuntimeError(f"can't open {path}")
-    try:
-        return bytes(f.readAll()).decode("utf-8")
-    finally:
-        f.close()
+class AudioSink(QObject):
+    """WebSocket server the tap scripts stream to (one connection per frame).
 
-
-class _Bridge(QObject):
-    """The object pages talk to (as `sb`). Slots run on the UI thread."""
+    Binary messages are int16 stereo PCM at SR; text messages are JSON status
+    ({"on": tapped-and-playing, "off": playing-but-can't-tap}). Only connections
+    that present the per-launch secret path are accepted. Everything runs on the UI
+    thread (Qt sockets), so `audio` is emitted there, like the old bridge."""
     audio = Signal(object)        # (n, 2) float32 at SR
-    status = Signal(int, int)     # playing media: tapped, can't-tap
+    status = Signal(int, int)     # totals across frames: tapped, can't-tap
 
-    @Slot(str)
-    def pcm(self, b64: str):
-        try:
-            raw = base64.b64decode(b64)
-        except ValueError:
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.token = secrets.token_urlsafe(18)
+        self.server = QWebSocketServer("soundboard", QWebSocketServer.NonSecureMode, self)
+        self.port = self.server.serverPort() if self.server.listen(QHostAddress.LocalHost, 0) \
+            else 0
+        if not self.port:
+            log.error("browser audio sink can't listen: %s", self.server.errorString())
+        self.server.newConnection.connect(self._on_connection)
+        self._conns: dict[QWebSocket, tuple[int, int]] = {}
+        self._shown = (0, 0)
+        self._active: QWebSocket | None = None   # the frame that currently owns the mic
+        self._active_t = 0.0
+
+    @property
+    def url(self) -> str:
+        return f"ws://127.0.0.1:{self.port}/{self.token}"
+
+    def _on_connection(self):
+        s = self.server.nextPendingConnection()
+        if s is None:
             return
-        x = np.frombuffer(raw, np.int16)
+        if s.requestUrl().path() != "/" + self.token:
+            log.warning("browser sink: rejected a connection without the secret")
+            s.close()
+            s.deleteLater()
+            return
+        self._conns[s] = (0, 0)
+        s.binaryMessageReceived.connect(lambda data, s=s: self._on_binary(s, data))
+        s.textMessageReceived.connect(lambda text, s=s: self._on_text(s, text))
+        s.disconnected.connect(lambda s=s: self._on_closed(s))
+
+    def _on_binary(self, s: QWebSocket, data):
+        now = time.monotonic()
+        if self._active is not s:
+            if self._active is not None and now - self._active_t < HANDOVER_S:
+                return   # another frame owns the mic right now
+            self._active = s
+        self._active_t = now
+        x = np.frombuffer(bytes(data), np.int16)
         if len(x) % 2:
             return
-        self.audio.emit(x.reshape(-1, 2).astype(np.float32) / 32768.0)
+        self.audio.emit(x.reshape(-1, 2).astype(np.float32) * np.float32(1 / 32768))
 
-    @Slot(int, int)
-    def report(self, on: int, off: int):
-        self.status.emit(on, off)
+    def _on_text(self, s: QWebSocket, text: str):
+        try:
+            d = json.loads(text)
+            st = (int(d["on"]), int(d["off"]))
+        except (ValueError, KeyError, TypeError):
+            return
+        self._conns[s] = st
+        self._emit_status()
+
+    def _on_closed(self, s: QWebSocket):
+        self._conns.pop(s, None)
+        if self._active is s:
+            self._active = None
+        if qt_valid(s):   # `disconnected` is also emitted from the socket's destructor
+            s.deleteLater()
+        self._emit_status()
+
+    def _emit_status(self):
+        tot = (sum(a for a, _ in self._conns.values()), sum(b for _, b in self._conns.values()))
+        if tot != self._shown:
+            self._shown = tot
+            self.status.emit(*tot)
+
+    def broadcast(self, text: str):
+        for s in list(self._conns):
+            s.sendTextMessage(text)
+
+    def close(self):
+        conns, self._conns = list(self._conns), {}
+        for s in conns:
+            if qt_valid(s):
+                s.close()
+        self.server.close()
 
 
 class _Page(QWebEnginePage):
@@ -507,22 +640,20 @@ class BrowserTab(QWidget):
         s.setAttribute(QWebEngineSettings.PlaybackRequiresUserGesture, False)
         s.setAttribute(QWebEngineSettings.FullScreenSupportEnabled, False)
 
-        self.bridge = _Bridge()
-        self.bridge.audio.connect(self._on_audio)
-        self.bridge.status.connect(self._on_status)
-        self.channel = QWebChannel(page)
-        self.channel.registerObject("sb", self.bridge)
-        page.setWebChannel(self.channel, WORLD)
+        self.sink = AudioSink(self)
+        self.sink.audio.connect(self._on_audio)
+        self.sink.status.connect(self._on_status)
+        if not self.sink.port:
+            self._refresh_info("<span style='color:#ff4d4f'>Browser audio is unavailable "
+                               "(couldn't open a local socket) — see the log.</span>")
 
-        for name, src in (("qwebchannel", _qrc_text(":/qtwebchannel/qwebchannel.js")),
-                          ("sb-tap", TAP_JS)):
-            sc = QWebEngineScript()
-            sc.setName(name)
-            sc.setSourceCode(src)
-            sc.setWorldId(WORLD)
-            sc.setInjectionPoint(QWebEngineScript.DocumentCreation)
-            sc.setRunsOnSubFrames(False)
-            page.scripts().insert(sc)
+        sc = QWebEngineScript()
+        sc.setName("sb-tap")
+        sc.setSourceCode(tap_script(self.sink.url))
+        sc.setWorldId(WORLD)
+        sc.setInjectionPoint(QWebEngineScript.DocumentCreation)
+        sc.setRunsOnSubFrames(True)   # embedded players (iframes) are tapped too
+        page.scripts().insert(sc)
         sc = QWebEngineScript()
         sc.setName("sb-lite")
         sc.setSourceCode(LITE_JS)
@@ -543,19 +674,29 @@ class BrowserTab(QWidget):
         if self.view is not None:
             self.view.setUrl(QUrl(url))
 
+    @staticmethod
+    def url_for(text: str) -> QUrl:
+        """What the address bar means: an address (scheme optional, ports and paths
+        fine, 'localhost' too) or, failing that, a YouTube search."""
+        t = text.strip()
+        looks_like_address = " " not in t and ("." in t or "://" in t
+                                               or t.split("/")[0].split(":")[0] == "localhost")
+        if looks_like_address:
+            if "://" not in t:   # fromUserInput would pick http; the web is https now
+                t = ("http://" if t.startswith("localhost") else "https://") + t
+            url = QUrl.fromUserInput(t)
+            if url.isValid() and url.host():
+                return url
+        url = QUrl("https://www.youtube.com/results")
+        url.setQuery("search_query=" + QUrl.toPercentEncoding(t).data().decode())
+        return url
+
     def _go(self):
         t = self.url.text().strip()
         if not t:
             return
-        if re.match(r"^[a-z]+://", t, re.I):
-            url = QUrl(t)
-        elif "." in t and " " not in t:
-            url = QUrl("https://" + t)
-        else:
-            url = QUrl("https://www.youtube.com/results")
-            url.setQuery("search_query=" + QUrl.toPercentEncoding(t).data().decode())
         if self.view is not None:
-            self.view.setUrl(url)
+            self.view.setUrl(self.url_for(t))
             self.view.setFocus()
 
     def _on_url(self, url: QUrl):
@@ -568,7 +709,8 @@ class BrowserTab(QWidget):
 
     def pause_media(self):
         if self.view is not None:
-            self.view.page().runJavaScript(PAUSE_JS, WORLD)
+            self.view.page().runJavaScript(PAUSE_JS, WORLD)   # main frame, immediately
+            self.sink.broadcast("pause")                       # every frame with a socket
 
     def shutdown(self):
         if self.view is not None:
@@ -576,6 +718,7 @@ class BrowserTab(QWidget):
             self.view.setParent(None)
             qt_delete(page)   # pages must go before their profile
             self.view = None
+            self.sink.close()
 
     # ------------------------------------------------------------------ audio
     def _on_audio(self, x: np.ndarray):
@@ -619,7 +762,7 @@ class BrowserTab(QWidget):
             QTimer.singleShot(150, self._poll_mini)
 
     def _poll_mini(self):
-        if self.view is not None and self._collapsed:
+        if self.view is not None and self._collapsed and self.isVisible():
             self.view.page().runJavaScript(MINI_STATE_JS, WORLD, self._on_mini_state)
 
     def _on_mini_state(self, st):
@@ -710,6 +853,13 @@ class BrowserTab(QWidget):
 
     def _tick(self):
         e = self.engine
+        if self.recorder.recording:
+            secs = self.recorder.rec_frames / SR
+            if secs >= MAX_SECONDS:
+                self.btn_rec.setChecked(False)   # the cap applies even while the tab is hidden
+        if not self.isVisible():
+            e.level_browser *= 0.8
+            return   # nothing below is visible: don't repaint meters or poll the page
         self.meter.set_level(e.level_browser)
         e.level_browser *= 0.8
         if self._collapsed and time.monotonic() - self._mini_poll >= 1.0:
@@ -718,8 +868,6 @@ class BrowserTab(QWidget):
         if self.recorder.recording:
             secs = self.recorder.rec_frames / SR
             self.btn_rec.setText(f"⏹  Stop  ({int(secs // 60)}:{int(secs % 60):02d})")
-            if secs >= MAX_SECONDS:
-                self.btn_rec.setChecked(False)
         elif time.monotonic() >= self._flash_until and self._flash_until:
             self._flash_until = 0.0
             self._refresh_info()

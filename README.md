@@ -53,6 +53,9 @@ through making the cable Windows' default mic.
     save what played as a new pad on the Sounds tab, with dead air trimmed.
   - Stop all also pauses the browser, and auto push-to-talk holds while it's live.
   - Logins and cookies persist in `%APPDATA%\Soundboard\browser\`.
+  - Embedded players (a YouTube or SoundCloud embed on another site) are captured too.
+    If two players in different frames play at once, the one that started first is
+    what goes out; the other is heard by nobody until the first stops.
   - Limits: Qt's browser has no DRM (no Spotify / Netflix) and no H.264 (Twitch
     won't play). Media from another site without CORS plays, but only for you. The
     tab tells you when that happens.
@@ -93,14 +96,14 @@ decode anything; it's safe to delete and is rebuilt as needed.
 | `winkeys.py` | global hotkeys (`RegisterHotKey`) and key presses (`keybd_event`), no hooks |
 | `engine.py` | real-time audio: 3 WASAPI streams (mic in, cable out, headphones out), mixing, pause/seek, limiter |
 | `eq.py` | 7-band biquad equalizer and presets |
-| `browser.py` | Browser tab: Qt WebEngine view; an isolated-world script taps page media via WebAudio and streams 48 kHz PCM over QWebChannel into the engine; clip recorder |
+| `browser.py` | Browser tab: Qt WebEngine view; an isolated-world script in every frame taps page media with an AudioWorklet and streams 48 kHz int16 PCM over a loopback WebSocket (per-launch secret) into the engine; clip recorder |
 | `library.py` | decoding (bounded to 15 min), the int16 decoded-audio cache, loudness levelling, imports and clips (FLAC), config |
 | `theme.py` | colour themes (tokens → stylesheet, also read by the painted widgets) and the logo |
 | `settings.py` | Settings window, global hotkey actions, hotkey capture dialog |
 | `wheelguard.py` | mouse wheel scrolls the page instead of changing sliders / dropdowns (installed per widget) |
 | `make_icon.py` | regenerates `soundboard.ico` (shortcut icon) from the logo in `theme.py` |
 | `testcheck.py` | analysis for the Record-6s test (finds your voice in the output by cross-correlation) |
-| `tests/` | pytest suite: ring buffer, engine mixing/guards/watchdog, cache and imports, recorder, hotkey parsing, EQ, levelling, config, test analysis, and the main window built on Qt's offscreen platform (no window, no devices, no hotkeys) |
+| `tests/` | pytest suite: ring buffer, engine mixing/guards/watchdog, cache and imports, recorder, hotkey parsing, EQ, levelling, config, test analysis, the main window built on Qt's offscreen platform (no window, no devices, no hotkeys), and the browser tab end to end: a headless page's audio (top frame and iframe) reaching the engine through the worklet and socket |
 
 Developing:
 
