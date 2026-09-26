@@ -4,10 +4,12 @@ from __future__ import annotations
 __version__ = "0.1.0"
 
 import ctypes
+import gc
+import logging
 import os
+import subprocess
 import sys
 import threading
-import subprocess
 import time
 from pathlib import Path
 
@@ -21,34 +23,35 @@ import numpy as np
 import sounddevice as sd
 from PySide6.QtCore import QEvent, QMimeData, QObject, QPoint, QRectF, Qt, QTimer, Signal
 from PySide6.QtNetwork import QLocalServer, QLocalSocket
-from PySide6.QtGui import QColor, QDrag, QFont, QIcon, QPainter, QPainterPath, QPen, QPixmap
+from PySide6.QtGui import QColor, QDrag, QFont, QPainter, QPainterPath, QPen
 from PySide6.QtWidgets import (QAbstractScrollArea, QAbstractSlider, QAbstractSpinBox,
-                               QApplication, QScrollBar, QCheckBox, QComboBox, QDialog, QDialogButtonBox,
+                               QApplication, QCheckBox, QComboBox, QDialog, QDialogButtonBox,
                                QFileDialog, QFormLayout, QFrame, QGridLayout, QHBoxLayout,
                                QLabel, QLineEdit, QMainWindow, QMenu, QMessageBox, QPushButton,
-                               QScrollArea, QSlider, QSpinBox, QStyle, QTabWidget, QVBoxLayout,
-                               QWidget)
+                               QScrollArea, QScrollBar, QSlider, QSpinBox, QStyle, QTabWidget,
+                               QVBoxLayout, QWidget)
 
+import applog
 import engine as eng
 import theme
 import winkeys
 from browser import BrowserTab
-from settings import HOTKEY_ACTIONS, HotkeyDialog, SettingsDialog, pretty_key
-from winkeys import Hotkeys
 from engine import SR, Engine
-from library import (AUDIO_EXTS, PAD_COLORS, Config, SoundMeta, decode, delete_file, import_file,
-                     save_clip)
-from testcheck import analyze as analyze_output, summary_html
-from eq import BAND_LABELS as EQ_LABELS, MAX_DB as EQ_MAX_DB, PRESETS as EQ_PRESETS
+from engine import is_virtual as is_virtual_cable
+from eq import BAND_LABELS as EQ_LABELS
+from eq import MAX_DB as EQ_MAX_DB
+from eq import PRESETS as EQ_PRESETS
 from eq import response_db as eq_response
+from library import (APP_DIR, AUDIO_EXTS, PAD_COLORS, Config, SoundMeta, decode, delete_file,
+                     import_file, save_clip)
+from settings import HOTKEY_ACTIONS, HotkeyDialog, SettingsDialog, pretty_key
+from testcheck import analyze as analyze_output
+from testcheck import summary_html
+from winkeys import Hotkeys
+
+log = logging.getLogger("ui")
 
 PAD_MIME = "application/x-soundboard-pad"
-
-
-# =========================================================================== hotkeys
-
-def is_virtual_cable(name: str) -> bool:
-    return eng.is_virtual(name)
 
 
 # =========================================================================== widgets
@@ -198,7 +201,9 @@ class Pad(QWidget):
             self.menu.emit(self.meta.id, e.globalPosition().toPoint())
 
     def mouseMoveEvent(self, e):
-        if self._press is not None and (e.position().toPoint() - self._press).manhattanLength() > 12:
+        moved = self._press is not None and \
+            (e.position().toPoint() - self._press).manhattanLength() > 12
+        if moved:
             self._press = None
             drag = QDrag(self)
             md = QMimeData()
@@ -228,7 +233,8 @@ class Pad(QWidget):
             fill.setAlpha(45 if self.paused else 90)
             p.save()
             p.setClipPath(path)
-            p.fillRect(QRectF(r.left(), r.top(), r.width() * max(self.progress, 0.02), r.height()), fill)
+            w = r.width() * max(self.progress, 0.02)
+            p.fillRect(QRectF(r.left(), r.top(), w, r.height()), fill)
             p.restore()
             pen = QPen(accent, 2.5)
             if self.paused:
@@ -263,7 +269,8 @@ class Pad(QWidget):
             p.setPen(QColor("#ff6b6b"))
             p.drawText(foot, Qt.AlignLeft | Qt.AlignVCenter, "can't load file")
         else:
-            flags = ("⟳ " if self.meta.loop else "") + {"overlap": "⧉ ", "toggle": "⏯ "}.get(self.meta.mode, "")
+            flags = ("⟳ " if self.meta.loop else "") + \
+                {"overlap": "⧉ ", "toggle": "⏯ "}.get(self.meta.mode, "")
             p.setPen(QColor(T["muted"]))
             right = "❚❚ paused" if self.paused else f"{flags}{self.meta.duration:.1f}s"
             p.drawText(foot, Qt.AlignRight | Qt.AlignVCenter, right)
@@ -356,7 +363,8 @@ class PadGrid(QWidget):
             for f in files:
                 pth = Path(f)
                 if pth.is_dir():
-                    expanded += [str(x) for x in sorted(pth.rglob("*")) if x.suffix.lower() in AUDIO_EXTS]
+                    expanded += [str(x) for x in sorted(pth.rglob("*"))
+                                 if x.suffix.lower() in AUDIO_EXTS]
                 else:
                     expanded.append(f)
             self.files_dropped.emit(expanded)
@@ -494,6 +502,9 @@ class MainWindow(QMainWindow):
         self.current: str | None = None   # sound shown in the transport bar
         self.start_frac = 0.0             # where ▶ starts if it isn't playing
         self._seeking = False
+        self._tick_n = 0                  # ticks since start (the watchdog runs every 30th)
+        self._xruns_shown = 0             # drop-out count last written to the status line
+        self.engine.latency = self.cfg.latency if self.cfg.latency in ("low", "high") else "low"
 
         self._build_ui()
         self._init_devices()
@@ -656,16 +667,16 @@ class MainWindow(QMainWindow):
         pv.setSpacing(8)
 
         def section(t):
-            l = QLabel(t)
-            l.setObjectName("section")
-            pv.addWidget(l)
+            lbl = QLabel(t)
+            lbl.setObjectName("section")
+            pv.addWidget(lbl)
 
         def hint(t):
-            l = QLabel(t)
-            l.setWordWrap(True)
-            l.setObjectName("hint")
-            pv.addWidget(l)
-            return l
+            lbl = QLabel(t)
+            lbl.setWordWrap(True)
+            lbl.setObjectName("hint")
+            pv.addWidget(lbl)
+            return lbl
 
         # ---- plain-English picture of where the audio goes
         card = QFrame()
@@ -772,9 +783,9 @@ class MainWindow(QMainWindow):
         hint("Already set up for you — only change these if something's wrong.")
 
         def alabel(text):
-            l = QLabel(text)
-            l.setObjectName("hint")
-            pv.addWidget(l)
+            lbl = QLabel(text)
+            lbl.setObjectName("hint")
+            pv.addWidget(lbl)
 
         alabel("Sounds + my voice get sent into (the cable):")
         self.cb_main = QComboBox()
@@ -827,9 +838,8 @@ class MainWindow(QMainWindow):
         pscroll.setFixedWidth(344)
         h.addWidget(pscroll)
 
-        for cb, kind, attr in ((self.cb_main, "output", "main_device"),
-                               (self.cb_mon, "output", "mon_device"),
-                               (self.cb_mic, "input", "mic_device")):
+        for cb, attr in ((self.cb_main, "main_device"), (self.cb_mon, "mon_device"),
+                         (self.cb_mic, "mic_device")):
             cb.activated.connect(lambda _i, cb=cb, attr=attr: self.on_device(cb, attr))
 
     # ------------------------------------------------------------------ equalizer
@@ -1001,10 +1011,21 @@ class MainWindow(QMainWindow):
     def refresh_devices(self):
         e = self.engine
         e.shutdown()
-        e.main_stream = e.mon_stream = e.mic_stream = None
-        eng.rescan()
+        if not eng.rescan():
+            self.status.setText("<span style='color:#ffb020'>Couldn't re-scan devices — "
+                                "restart the app to pick up new ones.</span>")
         self._init_devices()
         self._prepare_all()
+
+    def set_latency(self, mode: str):
+        """'low' (default) or 'high' (bigger buffers: more delay, fewer drop-outs)."""
+        if mode not in ("low", "high") or mode == self.cfg.latency:
+            return
+        self.cfg.latency = mode
+        self.engine.latency = mode
+        self.engine.reopen_all()
+        self.cfg.save()
+        self._update_status()
 
     def _init_devices(self):
         outs = [d["name"] for d in eng.list_devices("output")]
@@ -1089,10 +1110,18 @@ class MainWindow(QMainWindow):
         if errs:
             self.status.setText("<span style='color:#ff6b6b'>Audio device problem — "
                                 + " · ".join(errs) + "</span>")
-        else:
-            n = len(self.cfg.sounds)
-            self.status.setText(f"{n} sound{'s' if n != 1 else ''} · click to play · right-click to "
-                                "edit / set hotkey · drag to reorder · drop files to add")
+            return
+        n = len(self.cfg.sounds)
+        text = (f"{n} sound{'s' if n != 1 else ''} · click to play · right-click to "
+                "edit / set hotkey · drag to reorder · drop files to add")
+        xr = sum(e.xruns.values())
+        self._xruns_shown = xr
+        if xr:
+            tip = ("" if self.cfg.latency == "high" else
+                   " — try ⚙ Settings → General → Audio buffering: Safer")
+            text += (f"<br><span style='color:#ffb020'>{xr} audio drop-out"
+                     f"{'s' if xr != 1 else ''} since start{tip}</span>")
+        self.status.setText(text)
 
     def _update_flow(self, talking=False):
         e = self.engine
@@ -1384,8 +1413,9 @@ class MainWindow(QMainWindow):
                     self.engine.prepare(sid, data)
                     self.bridge.loaded.emit(sid, data, "")
                 except Exception as e:  # noqa: BLE001
+                    log.warning("can't load %s: %s", path, e)
                     self.bridge.loaded.emit(sid, None, str(e))
-        threading.Thread(target=run, daemon=True).start()
+        threading.Thread(target=run, daemon=True, name="load").start()
 
     def on_loaded(self, sid, data, err):
         p = self.pads.get(sid)
@@ -1420,8 +1450,9 @@ class MainWindow(QMainWindow):
                     self.engine.prepare(meta.id, data)
                     self.bridge.imported.emit(meta, data, "")
                 except Exception as e:  # noqa: BLE001
+                    log.warning("can't import %s: %s", f, e)
                     self.bridge.imported.emit(None, None, f"{Path(f).name}: {e}")
-        threading.Thread(target=run, daemon=True).start()
+        threading.Thread(target=run, daemon=True, name="import").start()
         self.status.setText(f"Importing {len(files)} file(s)…")
 
     def on_imported(self, meta, data, err):
@@ -1445,6 +1476,7 @@ class MainWindow(QMainWindow):
         try:
             meta = save_clip(data, name, PAD_COLORS[len(self.cfg.sounds) % len(PAD_COLORS)])
         except Exception as e:  # noqa: BLE001
+            log.exception("can't save clip")
             QMessageBox.warning(self, "Couldn't save clip", str(e))
             return
         self.cfg.sounds.append(meta)
@@ -1539,7 +1571,8 @@ class MainWindow(QMainWindow):
 
     def start_test(self):
         if self.engine.main_stream is None:
-            QMessageBox.information(self, "Test", "Set up the virtual cable first (see How it works).")
+            QMessageBox.information(self, "Test",
+                                    "Set up the virtual cable first (see How it works).")
             return
         # Capture the far end of the virtual cable too, so the test hears exactly
         # what Discord / the game hears (not just our internal mix).
@@ -1556,6 +1589,8 @@ class MainWindow(QMainWindow):
                         callback=lambda i, f, t, s: self._cap.append(i.copy()))
                     self._cap_stream.start()
                 except Exception:  # noqa: BLE001 - fall back to the internal mix
+                    log.warning("can't capture %s for the test; using the internal mix",
+                                vm, exc_info=True)
                     self._cap_stream = None
         self.engine.start_test_record(6.0)
         self.btn_rec.setEnabled(False)
@@ -1570,7 +1605,7 @@ class MainWindow(QMainWindow):
                 self._cap_stream.stop()
                 self._cap_stream.close()
             except Exception:  # noqa: BLE001
-                pass
+                log.debug("closing the test capture stream raised", exc_info=True)
             self._cap_stream = None
             if self._cap:
                 data, rate, cable = np.concatenate(self._cap), self._cap_rate, True
@@ -1584,13 +1619,19 @@ class MainWindow(QMainWindow):
                                self.cfg.sound_vol)
             self.test_result.setText(summary_html(r, self._cap_name if cable else None))
         except Exception as ex:  # noqa: BLE001
-            self.test_result.setText(f"<span style='color:#ff4d4f'>Test analysis failed: {ex}</span>")
+            log.exception("test analysis failed")
+            self.test_result.setText(
+                f"<span style='color:#ff4d4f'>Test analysis failed: {ex}</span>")
         self.test_result.show()
         return data, rate
 
     # ------------------------------------------------------------------ tick
     def tick(self):
         e = self.engine
+        self._tick_n += 1
+        if self._tick_n % 30 == 0:   # about once a second
+            if e.check_streams() or sum(e.xruns.values()) != self._xruns_shown:
+                self._update_status()
         playing = e.playing()
         for sid, p in self.pads.items():
             prog, paused = playing.get(sid, (None, False))
@@ -1668,13 +1709,12 @@ class MainWindow(QMainWindow):
         self.hotkeys.stop()
         self.browser.shutdown()
         self.engine.shutdown()
+        log.info("closed cleanly (drop-outs %s, callback errors %s, stalls %d)",
+                 self.engine.xruns, self.engine.cb_errors, self.engine.stalls)
         super().closeEvent(ev)
 
 
-# =========================================================================== theme
-
-STYLE = theme.stylesheet("Dark")   # the default theme's stylesheet (MainWindow applies the chosen one)
-
+# =========================================================================== startup
 
 # overridable so a test copy never finds (and pops up) the real, running app
 INSTANCE_NAME = os.environ.get("SOUNDBOARD_INSTANCE", "Soundboard.App")
@@ -1698,7 +1738,7 @@ def claim_single_instance() -> bool:
     try:
         ctypes.windll.user32.AllowSetForegroundWindow(-1)   # ASFW_ANY: let it take focus
     except Exception:  # noqa: BLE001
-        pass
+        log.debug("AllowSetForegroundWindow failed", exc_info=True)
     sock = QLocalSocket()
     sock.connectToServer(INSTANCE_NAME)
     if sock.waitForConnected(1500):
@@ -1729,19 +1769,40 @@ def listen_for_second_launch(app, get_window):
     return server
 
 
+def tune_runtime_for_audio():
+    """Two cheap knobs that keep the audio callbacks from waiting on the UI thread.
+
+    The interpreter lets a thread hold the GIL for 5 ms before forcing a switch; a
+    WASAPI callback at low latency has about 10 ms to produce its block, so a 5 ms
+    wait is half its budget. 1 ms leaves the UI slightly less efficient and the
+    audio thread almost never waiting.
+
+    The garbage collector's gen-0 threshold is 700 allocations; numpy blocks in
+    the callbacks are Python objects, so every few blocks a collection ran *on the
+    audio thread*. Raising the threshold makes collections rarer (and they still
+    run mostly on the UI thread, where a pause costs nothing).
+    """
+    sys.setswitchinterval(0.001)
+    gc.set_threshold(50_000, 20, 20)
+
+
 def main():
+    log_path = applog.setup(APP_DIR)
+    applog.install_hooks(log_path, __version__)
+    tune_runtime_for_audio()
     try:
         ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID("Soundboard.App")
     except Exception:  # noqa: BLE001
-        pass
+        log.debug("SetCurrentProcessExplicitAppUserModelID failed", exc_info=True)
     app = QApplication(sys.argv)
     if not claim_single_instance():
+        log.info("another Soundboard is running; asked it to come to the front")
         sys.exit(0)
     app.setStyle("Fusion")
     wheel_guard = NoWheelChanges(app)
     app.installEventFilter(wheel_guard)
     holder = {}
-    server = listen_for_second_launch(app, lambda: holder.get("w"))  # noqa: F841 - keep alive
+    app.instance_server = listen_for_second_launch(app, lambda: holder.get("w"))  # kept alive
     w = holder["w"] = MainWindow()
     w.show()
     sys.exit(app.exec())

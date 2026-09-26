@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import json
+import logging
 import os
 import shutil
 import subprocess
@@ -14,6 +15,8 @@ import soundfile as sf
 import soxr
 
 from engine import SR
+
+log = logging.getLogger(__name__)
 
 APP_DIR = Path(os.environ.get("APPDATA", Path.home())) / "Soundboard"
 SOUNDS_DIR = APP_DIR / "sounds"
@@ -75,13 +78,17 @@ class Config:
     browser_live: bool = True         # browser audio goes out to others
     browser_monitor: bool = True      # ...and to your headphones
     browser_lite: bool = True         # hide the page while it plays + 144p (light on CPU/GPU)
+    latency: str = "low"              # audio buffering: 'low' | 'high' (safer on flaky devices)
     sounds: list[SoundMeta] = field(default_factory=list)
 
     @classmethod
-    def load(cls) -> "Config":
+    def load(cls) -> Config:
         try:
             raw = json.loads(CONFIG_PATH.read_text(encoding="utf-8"))
+        except FileNotFoundError:
+            return cls()
         except (OSError, ValueError):
+            log.exception("config %s is unreadable; starting with defaults", CONFIG_PATH)
             return cls()
         sounds = [SoundMeta(**{k: v for k, v in s.items() if k in SoundMeta.__dataclass_fields__})
                   for s in raw.pop("sounds", [])]
@@ -106,15 +113,17 @@ def decode(path: str) -> np.ndarray:
     data = sr = None
     try:
         data, sr = sf.read(path, dtype="float32", always_2d=True)
-    except Exception:  # noqa: BLE001 - fall back to ffmpeg for m4a/aac/video etc.
+    except Exception as e:  # noqa: BLE001 - fall back to ffmpeg for m4a/aac/video etc.
+        log.debug("libsndfile can't read %s (%s); trying ffmpeg", path, e)
         ff = _ffmpeg()
         if not ff:
-            raise RuntimeError("Can't decode this format (install ffmpeg for m4a/aac/video)")
+            raise RuntimeError("Can't decode this format (install ffmpeg for m4a/aac/video)") from e
         p = subprocess.run([ff, "-v", "error", "-i", path, "-vn", "-f", "f32le", "-ac", "2",
                             "-ar", str(SR), "-"], capture_output=True,
                            creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0))
         if p.returncode != 0 or not p.stdout:
-            raise RuntimeError(p.stderr.decode(errors="ignore").strip() or "ffmpeg failed")
+            msg = p.stderr.decode(errors="ignore").strip() or "ffmpeg failed"
+            raise RuntimeError(msg) from None
         data = np.frombuffer(p.stdout, np.float32).reshape(-1, 2).copy()
         sr = SR
     if data.shape[1] == 1:
@@ -161,6 +170,7 @@ def import_file(src: str, color: str) -> tuple[SoundMeta, np.ndarray]:
     try:
         shutil.copy2(srcp, dest)
     except OSError:
+        log.warning("couldn't copy %s into the library; using it in place", src, exc_info=True)
         dest = srcp
     meta = SoundMeta(id=sid, name=srcp.stem.replace("_", " ").strip()[:40], file=str(dest),
                      color=color, level_gain=level_gain(data), duration=len(data) / SR)
@@ -168,7 +178,7 @@ def import_file(src: str, color: str) -> tuple[SoundMeta, np.ndarray]:
 
 
 def save_clip(data: np.ndarray, name: str, color: str) -> SoundMeta:
-    """Store recorded audio ((n, 2) float32 at SR) in the library as a WAV and return its metadata."""
+    """Store recorded audio ((n, 2) float32 at SR) in the library as a WAV; return its metadata."""
     SOUNDS_DIR.mkdir(parents=True, exist_ok=True)
     sid = uuid.uuid4().hex[:10]
     safe = "".join(c if c.isalnum() or c in " -_" else "_" for c in name).strip()[:40] or "clip"
@@ -193,4 +203,4 @@ def delete_file(meta: SoundMeta):
         if p.parent == SOUNDS_DIR:
             p.unlink(missing_ok=True)
     except OSError:
-        pass
+        log.warning("couldn't delete %s", p, exc_info=True)

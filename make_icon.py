@@ -24,7 +24,7 @@ def png_bytes(img) -> bytes:
 
 
 def main():
-    app = QGuiApplication(sys.argv)   # noqa: F841 - QPainter needs an app
+    _app = QGuiApplication(sys.argv)   # QPainter needs a live application object
     import theme
     pngs = [png_bytes(theme.logo_image(s)) for s in SIZES]
     # ICO = header + one directory entry per size + PNG payloads (Vista+ format)

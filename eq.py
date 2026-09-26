@@ -58,11 +58,16 @@ def _biquad(kind: str, f0: float, db: float, rate: int, q: float = 1.0) -> np.nd
 
 
 def design(gains: list[float], rate: int) -> np.ndarray | None:
-    """Second-order sections for these band gains, or None if the EQ is flat."""
+    """Second-order sections for these band gains, or None if the EQ is flat.
+
+    Coefficients are designed in float64 and stored as float32 so sosfilt runs the
+    whole block in float32 (the audio format) instead of upcasting to float64 and
+    converting back every block. With a 60 Hz shelf at 48 kHz the poles sit at
+    radius ~0.996: comfortably inside float32 precision (see tests/test_eq.py)."""
     if all(abs(g) < 0.05 for g in gains):
         return None
     return np.array([_biquad(kind, f, g, rate, q=1.1 if kind == "peak" else 1.0)
-                     for (f, kind), g in zip(BANDS, gains)])
+                     for (f, kind), g in zip(BANDS, gains)], dtype=np.float32)
 
 
 def response_db(gains: list[float], freqs: np.ndarray, rate: int = 48000) -> np.ndarray:
@@ -99,6 +104,8 @@ class EQ:
         if self._sos is None:
             return x
         if self._zi is None:
-            self._zi = np.zeros((len(self._sos), 2, x.shape[1]))
+            self._zi = np.zeros((len(self._sos), 2, x.shape[1]), np.float32)
+        if x.dtype != np.float32:
+            x = x.astype(np.float32)
         y, self._zi = sosfilt(self._sos, x, axis=0, zi=self._zi)
-        return y.astype(np.float32)
+        return y   # float32 in, float32 sos and state -> float32 out, no conversion

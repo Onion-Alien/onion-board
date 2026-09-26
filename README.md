@@ -86,7 +86,8 @@ Settings and imported sounds live in `%APPDATA%\Soundboard\`.
 
 | file | what it does |
 |---|---|
-| `main.py` | PySide6 UI, auto push-to-talk |
+| `main.py` | PySide6 UI, auto push-to-talk, startup (single instance, crash hooks, runtime tuning) |
+| `applog.py` | rotating log in `%APPDATA%\Soundboard\soundboard.log`; unhandled exceptions and Qt warnings land there (plus one dialog for a UI-thread crash). `SOUNDBOARD_DEBUG=1` for more |
 | `winkeys.py` | global hotkeys (`RegisterHotKey`) and key presses (`keybd_event`), no hooks |
 | `engine.py` | real-time audio: 3 WASAPI streams (mic in, cable out, headphones out), mixing, pause/seek, limiter |
 | `eq.py` | 7-band biquad equalizer and presets |
@@ -96,6 +97,15 @@ Settings and imported sounds live in `%APPDATA%\Soundboard\`.
 | `settings.py` | Settings window, global hotkey actions, hotkey capture dialog |
 | `make_icon.py` | regenerates `soundboard.ico` (shortcut icon) from the logo in `theme.py` |
 | `testcheck.py` | analysis for the Record-6s test (finds your voice in the output by cross-correlation) |
+| `tests/` | pytest suite for the device-free parts: ring buffer, engine mixing/guards/watchdog, hotkey parsing, EQ, levelling, config, test analysis |
+
+Developing:
+
+```
+.venv\Scripts\pip install -r requirements-dev.txt
+.venv\Scripts\ruff check .
+.venv\Scripts\python -m pytest
+```
 
 ### Audio notes
 
@@ -109,3 +119,12 @@ Settings and imported sounds live in `%APPDATA%\Soundboard\`.
   you pick is reserved for the app, so don't use one your game needs.
 - Auto push-to-talk can't press keys in a game that runs as administrator unless
   Soundboard also runs as administrator (Windows blocks it).
+- Drop-outs reported by the audio driver are counted and shown in the status line.
+  **⚙ Settings → General → Audio buffering: Safer** trades a little delay for bigger
+  buffers if a device keeps crackling.
+- A stream whose callback stops (headset unplugged, sample rate changed, PC woke from
+  sleep) is reopened automatically within about a second; a device that failed to open
+  is retried every few seconds.
+- The audio callbacks never take the engine lock: the voice list is an immutable tuple
+  swapped by the UI thread. An exception inside a callback is logged once and that
+  block is silent; the stream keeps running.

@@ -3,8 +3,8 @@ from __future__ import annotations
 
 from PySide6.QtCore import QRectF, QSize, Qt
 from PySide6.QtGui import QColor, QFont, QPainter, QPainterPath
-from PySide6.QtWidgets import (QCheckBox, QDialog, QFrame, QGridLayout, QHBoxLayout, QLabel,
-                               QPushButton, QTabWidget, QVBoxLayout, QWidget)
+from PySide6.QtWidgets import (QCheckBox, QComboBox, QDialog, QFrame, QGridLayout, QHBoxLayout,
+                               QLabel, QPushButton, QTabWidget, QVBoxLayout, QWidget)
 
 import theme
 import winkeys
@@ -103,7 +103,8 @@ class ThemeCard(QPushButton):
         p.drawRoundedRect(QRectF(r.right() - 39, r.top() + 20, 28, 3), 1.5, 1.5)
         p.setBrush(QColor(t["accent"]))
         p.drawRoundedRect(QRectF(r.right() - 39, r.top() + 20, 17, 3), 1.5, 1.5)
-        theme.paint_logo(p, QRectF(r.right() - 36, r.bottom() - 30, 22, 22), t["accent"], t["accent2"])
+        theme.paint_logo(p, QRectF(r.right() - 36, r.bottom() - 30, 22, 22),
+                         t["accent"], t["accent2"])
         # name
         p.setPen(QColor(theme.T["text"]))
         f = QFont(self.font())
@@ -267,6 +268,23 @@ class SettingsDialog(QDialog):
         cue.setChecked(self.mw.cfg.cue_sounds)
         cue.toggled.connect(lambda b: self.mw._set("cue_sounds", b))
         cv.addWidget(cue)
+        v.addWidget(card)
+        card, cv = self._card("Audio buffering",
+                              "Low keeps your voice and sounds as immediate as possible. If the "
+                              "status line reports drop-outs (crackles, stutters), Safer uses "
+                              "bigger buffers: a little more delay, far fewer drop-outs.")
+        lat = QComboBox()
+        lat.addItem("Low (default)", "low")
+        lat.addItem("Safer — bigger buffers", "high")
+        lat.setCurrentIndex(max(0, lat.findData(self.mw.cfg.latency)))
+        lat.currentIndexChanged.connect(lambda i: self.mw.set_latency(lat.itemData(i)))
+        cv.addWidget(lat)
+        e = self.mw.engine
+        xr = sum(e.xruns.values())
+        stat = QLabel(f"Since start: {xr} drop-out{'s' if xr != 1 else ''}, "
+                      f"{e.stalls} device reconnect{'s' if e.stalls != 1 else ''}.")
+        stat.setObjectName("hint")
+        cv.addWidget(stat)
         v.addWidget(card)
         v.addStretch(1)
         return w

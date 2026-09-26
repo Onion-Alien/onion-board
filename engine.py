@@ -15,6 +15,7 @@ run on independent clocks without drift or glitches.
 """
 from __future__ import annotations
 
+import logging
 import threading
 import time
 from dataclasses import dataclass, field
@@ -25,9 +26,13 @@ import soxr
 
 from eq import EQ
 
+log = logging.getLogger(__name__)
+
 SR = 48000  # library storage rate
 CH = 2
 FADE_S = 0.010  # fade when a sound is stopped early (no clicks)
+STALL_S = 1.5   # a stream whose callback hasn't run for this long is dead: reopen it
+RETRY_S = 5.0   # how often to retry a device that failed to open
 
 
 # --------------------------------------------------------------------------- devices
@@ -39,10 +44,22 @@ def _wasapi_index() -> int | None:
     return None
 
 
-def rescan():
-    """Re-enumerate devices (picks up newly plugged ones). Kills open streams — reopen after."""
-    sd._terminate()
-    sd._initialize()
+def rescan() -> bool:
+    """Re-enumerate devices (picks up newly plugged ones). Kills open streams — reopen after.
+
+    sounddevice has no public API for this; _terminate/_initialize are what its own
+    tests use. If a future version drops them, the app keeps its current device list."""
+    try:
+        sd._terminate()
+        sd._initialize()
+        return True
+    except Exception:  # noqa: BLE001
+        log.exception("device rescan failed")
+        try:
+            sd._initialize()
+        except Exception:  # noqa: BLE001
+            pass
+        return False
 
 
 def list_devices(kind: str) -> list[dict]:
@@ -143,7 +160,7 @@ class Ring:
             self.cap = max(rate // 2, int(rate * self.max_s * 2))
             self.buf = np.zeros((self.cap, CH), np.float32)
             self.prefill = int(rate * self.prefill_s)   # jitter cushion before (re)starting
-            self.max_fill = int(rate * self.max_s)      # beyond this, skip ahead to keep latency low
+            self.max_fill = int(rate * self.max_s)      # beyond this, skip ahead (latency)
             self.r = self.w = self.count = 0
             self.primed = False
             self.ratio = 1.0     # current read speed (drift tracking)
@@ -248,6 +265,14 @@ def peak(x: np.ndarray) -> float:
     return float(np.max(np.abs(x))) if len(x) else 0.0
 
 
+def is_xrun(status) -> bool:
+    """True if a callback status reports a real drop-out (not just output priming)."""
+    if not status:
+        return False
+    return bool(status.output_underflow or status.output_overflow
+                or status.input_underflow or status.input_overflow)
+
+
 # --------------------------------------------------------------------------- voices
 
 @dataclass(eq=False)
@@ -292,10 +317,23 @@ class Voice:
 
 class Engine:
     def __init__(self):
+        # `voices` is an immutable tuple that is *replaced* (never mutated) under
+        # `lock`. The audio callbacks read the current tuple without locking, so they
+        # can never block on the UI thread (which would be a priority inversion: the
+        # audio thread stalls while a lower-priority thread holds the lock).
         self.lock = threading.Lock()
-        self.voices: list[Voice] = []
-        self._cache: dict[tuple[str, int], tuple[int, np.ndarray]] = {}
+        self.voices: tuple[Voice, ...] = ()
+        self._cache: dict[tuple[str, int], tuple[np.ndarray, np.ndarray]] = {}
         self._cache_lock = threading.Lock()
+        self._ramps: dict[int, np.ndarray] = {}   # fade length -> 1..0 ramp (no per-block alloc)
+
+        self.latency = "low"      # sounddevice latency: 'low' or 'high' (safer)
+        self.names = {"main": None, "mon": None, "mic": None}   # device names for reopening
+        self._last_cb = {"main": 0.0, "mon": 0.0, "mic": 0.0}  # monotonic time of last callback
+        self._last_try = {"main": 0.0, "mon": 0.0, "mic": 0.0} # last (re)open attempt
+        self.xruns = {"main": 0, "mon": 0, "mic": 0}           # drop-outs reported by PortAudio
+        self.cb_errors = {"main": 0, "mon": 0, "mic": 0}       # exceptions inside a callback
+        self.stalls = 0                                        # streams reopened by the watchdog
 
         # live settings (read by audio callbacks; plain attribute writes are atomic)
         self.sound_vol = 1.0      # sounds -> others
@@ -355,34 +393,44 @@ class Engine:
         if chans < CH:
             raise RuntimeError("mono output devices aren't supported")
         s = sd.OutputStream(device=idx, samplerate=rate, channels=CH, dtype="float32",
-                            latency="low", callback=callback)
+                            latency=self.latency, callback=callback)
         self.rates[key] = rate
+        self._last_cb[key] = time.monotonic()
         s.start()
+        log.info("opened %s output: %s @ %d Hz (latency %s)", key, name, rate, self.latency)
         return s
 
     def set_main_device(self, name: str | None):
         self._close("main_stream")
         self.errors.pop("main", None)
+        self.names["main"] = name
+        self._last_try["main"] = time.monotonic()
         if name:
             try:
                 self.main_stream = self._open_out("main", name, self._cb_main)
             except Exception as e:  # noqa: BLE001
+                log.warning("can't open main output %r: %s", name, e)
                 self.errors["main"] = str(e)
         self._reconfigure_mic_paths()
 
     def set_mon_device(self, name: str | None):
         self._close("mon_stream")
         self.errors.pop("mon", None)
+        self.names["mon"] = name
+        self._last_try["mon"] = time.monotonic()
         if name:
             try:
                 self.mon_stream = self._open_out("mon", name, self._cb_mon)
             except Exception as e:  # noqa: BLE001
+                log.warning("can't open headphone output %r: %s", name, e)
                 self.errors["mon"] = str(e)
         self._reconfigure_mic_paths()
 
     def set_mic_device(self, name: str | None):
         self._close("mic_stream")
         self.errors.pop("mic", None)
+        self.names["mic"] = name
+        self._last_try["mic"] = time.monotonic()
         if name:
             idx = find_device("input", name)
             try:
@@ -392,12 +440,50 @@ class Engine:
                 chans = min(2, sd.query_devices(idx)["max_input_channels"])
                 self.rates["mic"] = rate
                 self._reconfigure_mic_paths()
+                self._last_cb["mic"] = time.monotonic()
                 s = sd.InputStream(device=idx, samplerate=rate, channels=chans, dtype="float32",
-                                   latency="low", callback=self._cb_mic)
+                                   latency=self.latency, callback=self._cb_mic)
                 s.start()
                 self.mic_stream = s
+                log.info("opened mic: %s @ %d Hz, %d ch", name, rate, chans)
             except Exception as e:  # noqa: BLE001
+                log.warning("can't open mic %r: %s", name, e)
                 self.errors["mic"] = str(e)
+
+    def reopen_all(self):
+        """Close and reopen every stream with the same devices (after a latency change)."""
+        self.set_mic_device(self.names["mic"])
+        self.set_main_device(self.names["main"])
+        self.set_mon_device(self.names["mon"])
+
+    def check_streams(self) -> list[str]:
+        """Watchdog (call about once a second from the UI thread).
+
+        A stream whose callback has stopped being called (headset unplugged, Windows
+        changed its sample rate, PC came back from sleep) is closed and reopened. A
+        device that failed to open is retried every RETRY_S. Returns the keys that
+        were touched, so the UI can refresh its status."""
+        now = time.monotonic()
+        touched = []
+        for key, attr, setter in (("main", "main_stream", self.set_main_device),
+                                  ("mon", "mon_stream", self.set_mon_device),
+                                  ("mic", "mic_stream", self.set_mic_device)):
+            name = self.names[key]
+            if not name:
+                continue
+            if getattr(self, attr) is None:
+                if now - self._last_try[key] >= RETRY_S:
+                    setter(name)
+                    if key not in self.errors:
+                        log.info("%s device came back: %s", key, name)
+                        touched.append(key)
+            elif now - self._last_cb[key] > STALL_S:
+                log.warning("%s stream stalled (%.1fs without a callback); reopening %s",
+                            key, now - self._last_cb[key], name)
+                self.stalls += 1
+                setter(name)
+                touched.append(key)
+        return touched
 
     def _reconfigure_mic_paths(self):
         r = self.rates
@@ -440,7 +526,7 @@ class Engine:
                 s.stop()
                 s.close()
             except Exception:  # noqa: BLE001
-                pass
+                log.debug("closing %s raised", attr, exc_info=True)
 
     def shutdown(self):
         for a in ("mic_stream", "main_stream", "mon_stream"):
@@ -462,11 +548,14 @@ class Engine:
         key = (sid.split(":")[0], rate)   # "abc:preview" shares abc's cache
         with self._cache_lock:
             hit = self._cache.get(key)
-        if hit and hit[0] == id(data):
+        # the cache holds a reference to the source array and compares identity with
+        # `is`: comparing id() alone could match a *new* array that happens to be
+        # allocated at a freed one's address (e.g. successive test recordings)
+        if hit and hit[0] is data:
             return hit[1]
         out = resample(data, src_rate, rate)
         with self._cache_lock:
-            self._cache[key] = (id(data), out)
+            self._cache[key] = (data, out)
         return out
 
     def prepare(self, sid: str, data: np.ndarray):
@@ -484,8 +573,10 @@ class Engine:
              preview=False, src_rate: int = SR, start: float = 0.0) -> Voice | None:
         """mode: 'restart' (stop previous instance), 'overlap', 'toggle' (stop if playing)."""
         outs = self.active_outputs()
-        if preview and "mon" in outs:
-            outs = {"mon"}
+        if preview:
+            # previews are for your ears only; with no headphone device open they must
+            # not fall through to the cable (everyone in the call would hear them)
+            outs = {"mon"} if "mon" in outs else set()
         if not outs:
             return None
         with self.lock:
@@ -500,7 +591,7 @@ class Engine:
         if start > 0:
             v.seek(start)
         with self.lock:
-            self.voices.append(v)
+            self.voices = self.voices + (v,)
         return v
 
     def stop(self, sid: str):
@@ -557,7 +648,7 @@ class Engine:
         """sid -> (progress 0..1, paused) of the newest voice for that sound."""
         res = {}
         with self.lock:
-            self.voices = [v for v in self.voices if not v.finished]
+            self.voices = tuple(v for v in self.voices if not v.finished)
             for v in self.voices:
                 if not v.stopping:
                     res[v.sid] = (v.progress(), v.paused)
@@ -588,14 +679,26 @@ class Engine:
         return self._rec_buf is not None
 
     # ----------------------------------------------------------------- callbacks
+    def _ramp(self, n: int) -> np.ndarray:
+        """(n, 1) fade-out ramp 1 -> 0, cached (the same few lengths recur every block)."""
+        r = self._ramps.get(n)
+        if r is None:
+            r = self._ramps[n] = np.linspace(1.0, 0.0, n, dtype=np.float32)[:, None]
+        return r
+
     def _render(self, out: str, frames: int, previews_only=False) -> np.ndarray:
         buf = np.zeros((frames, CH), np.float32)
-        silent = np.zeros((frames, CH), np.float32)
+        silent = None   # scratch for voices that must advance but not be heard
         fade = int(FADE_S * self.rates[out])
-        with self.lock:
-            voices = [v for v in self.voices if out in v.data and out not in v.done]
+        # no lock: `self.voices` is an immutable tuple swapped atomically by the UI side
+        voices = [v for v in self.voices if out in v.data and out not in v.done]
         for v in voices:
-            dst = silent if (previews_only and not v.preview) else buf
+            if previews_only and not v.preview:
+                if silent is None:
+                    silent = np.zeros((frames, CH), np.float32)
+                dst = silent
+            else:
+                dst = buf
             data = v.data[out]
             n = len(data)
             p = v.pos[out]
@@ -604,8 +707,7 @@ class Engine:
                 take = min(frames, fade, n - p if not v.loop else fade)
                 if take > 0 and n:
                     idx = (np.arange(p, p + take) % n) if v.loop else np.arange(p, p + take)
-                    ramp = np.linspace(1.0, 0.0, take, dtype=np.float32)[:, None]
-                    dst[:take] += data[idx] * ramp * g
+                    dst[:take] += data[idx] * self._ramp(take) * g
                 v.done.add(out)
                 continue
             target = 0.0 if v.paused else 1.0
@@ -648,7 +750,46 @@ class Engine:
             f = self._eqs[key] = EQ(self.rates[out])
         return f.process(x, g)
 
+    # Each PortAudio callback is a thin guard around the real work: an exception that
+    # escapes a callback makes PortAudio abort the stream for good, silently. Here it
+    # is logged (once per stream, so the audio thread never does repeated file I/O),
+    # counted, and the block is left silent.
+    def _guard(self, key: str, exc: BaseException):
+        self.cb_errors[key] += 1
+        if self.cb_errors[key] == 1:
+            log.error("exception in %s audio callback", key, exc_info=exc)
+            self.errors[key] = f"audio callback failed: {exc}"
+
     def _cb_main(self, outdata, frames, t, status):
+        self._last_cb["main"] = time.monotonic()
+        if is_xrun(status):
+            self.xruns["main"] += 1
+        try:
+            self._main(outdata, frames)
+        except Exception as e:  # noqa: BLE001
+            outdata.fill(0)
+            self._guard("main", e)
+
+    def _cb_mon(self, outdata, frames, t, status):
+        self._last_cb["mon"] = time.monotonic()
+        if is_xrun(status):
+            self.xruns["mon"] += 1
+        try:
+            self._mon(outdata, frames)
+        except Exception as e:  # noqa: BLE001
+            outdata.fill(0)
+            self._guard("mon", e)
+
+    def _cb_mic(self, indata, frames, t, status):
+        self._last_cb["mic"] = time.monotonic()
+        if is_xrun(status):
+            self.xruns["mic"] += 1
+        try:
+            self._mic(indata)
+        except Exception as e:  # noqa: BLE001
+            self._guard("mic", e)
+
+    def _main(self, outdata, frames):
         mix = self._render("main", frames)
         mix *= np.float32(self.sound_vol)
         b = self.ring_bmain.read(frames)
@@ -668,7 +809,7 @@ class Engine:
                 self.rec_done = (np.concatenate(self._rec_buf), self.rates["main"])
                 self._rec_buf = None
 
-    def _cb_mon(self, outdata, frames, t, status):
+    def _mon(self, outdata, frames):
         check = self.mic_check
         # in mic check you hear the real output mix: sounds at their outgoing
         # level plus your mic, so you can judge the balance while a song plays
@@ -687,7 +828,7 @@ class Engine:
         outdata[:] = mix
         self.level_mon = max(peak(mix), self.level_mon * 0.85)
 
-    def _cb_mic(self, indata, frames, t, status):
+    def _mic(self, indata):
         x = indata
         x = np.repeat(x, 2, axis=1) if x.shape[1] == 1 else x[:, :2]
         x = np.ascontiguousarray(x, dtype=np.float32)

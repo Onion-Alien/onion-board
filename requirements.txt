@@ -1,6 +1,6 @@
-PySide6
-sounddevice
-soundfile
-soxr
-scipy
-numpy
+PySide6==6.11.2
+numpy==2.5.3
+sounddevice==0.5.6
+soundfile==0.14.0
+soxr==1.1.0
+scipy==1.18.1

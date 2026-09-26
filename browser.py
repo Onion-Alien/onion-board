@@ -164,8 +164,8 @@ _MEDIA = ("const a=[...document.querySelectorAll('video,audio')];"
 # returned as JSON text: PySide6 can't hand JS arrays/objects back to Python (they arrive as '')
 MINI_STATE_JS = ("(()=>{" + _MEDIA + "if(!m)return '';"
                  "const t=document.querySelector('h1.ytd-watch-metadata, #title h1');"
-                 "return JSON.stringify([m.currentTime||0, isFinite(m.duration)?m.duration:0, m.paused,"
-                 "(t&&t.textContent.trim())||document.title]);})()")
+                 "return JSON.stringify([m.currentTime||0, isFinite(m.duration)?m.duration:0, "
+                 "m.paused, (t&&t.textContent.trim())||document.title]);})()")
 MINI_TOGGLE_JS = "(()=>{" + _MEDIA + "if(m){m.paused?m.play():m.pause()}})()"
 MINI_SEEK_JS = "(()=>{" + _MEDIA + "if(m)m.currentTime=Math.max(0,m.currentTime+(%d))})()"
 MINI_NEXT_JS = ("(()=>{const b=document.querySelector('.ytp-next-button');"

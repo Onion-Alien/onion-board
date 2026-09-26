@@ -49,7 +49,7 @@ VK.update({
 ALIASES = {"escape": "esc", "return": "enter", "spacebar": "space", "del": "delete",
            "pgup": "page up", "pgdn": "page down", "prtsc": "print screen",
            "decimal": "num .", "multiply": "num *", "add": "num +", "subtract": "num -",
-           "divide": "num /", "plus": "=", "minus": "-"}
+           "divide": "num /", "plus": "=", "+": "=", "minus": "-"}
 NAME = {v: k for k, v in reversed(list(VK.items()))}
 MODIFIER_VKS = {0x10, 0x11, 0x12, 0x5B, 0x5C, 0xA0, 0xA1, 0xA2, 0xA3, 0xA4, 0xA5}
 
@@ -57,10 +57,13 @@ MODIFIER_VKS = {0x10, 0x11, 0x12, 0x5B, 0x5C, 0xA0, 0xA1, 0xA2, 0xA3, 0xA4, 0xA5
 def parse(combo: str) -> tuple[int, int] | None:
     """'ctrl+alt+s' -> (modifier flags, vk). None if it can't be parsed."""
     mods, vk = 0, None
-    for raw in combo.lower().split("+"):
+    parts = combo.lower().split("+")
+    if len(parts) >= 2 and parts[-1] == "" and parts[-2] == "":
+        parts = parts[:-2] + ["+"]   # "ctrl++" = ctrl and the + key
+    for raw in parts:
         p = raw.strip()
         if not p:
-            p = "+"   # "ctrl++" style
+            return None
         p = MOD_ALIASES.get(p, p)
         if p in MODS:
             mods |= MODS[p]

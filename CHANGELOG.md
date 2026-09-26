@@ -2,6 +2,29 @@
 
 ## Unreleased
 
+- **Log file**: `%APPDATA%\Soundboard\soundboard.log` (rotating). Unhandled exceptions,
+  worker-thread errors and Qt warnings all land there; a crash on the UI thread also
+  shows one dialog with the path. Previously, under `pythonw.exe`, they vanished.
+- **Audio streams are self-healing**: a callback that stops (headset unplugged, sample
+  rate changed in Windows, PC back from sleep) is detected within about a second and
+  the stream reopened; a device that failed to open is retried every 5 s. An exception
+  inside an audio callback no longer kills the stream: it's logged once, the block is
+  silent, and audio continues.
+- **Drop-outs are counted** (from the driver's own underflow/overflow flags) and shown
+  in the status line and in Settings → General. New **Audio buffering: Low / Safer**
+  option for devices that crackle at low latency.
+- The audio thread no longer waits on the UI: the voice list is an immutable snapshot
+  (no lock in the callbacks), the interpreter's thread switch interval is 1 ms instead
+  of 5, and the garbage collector runs far less often.
+- Fixed: with no headphone device open, **Preview** in the Edit dialog played the sound
+  out to Discord / the game.
+- Fixed: the resampled-audio cache could serve a stale block if a freed array was
+  reallocated at the same address (only when a device isn't at 48 kHz).
+- Fixed: a hotkey of `ctrl++` (the + key) never parsed.
+- EQ runs entirely in float32 (no per-block float64 round trip).
+- Dependencies are pinned in `requirements.txt`; `requirements-dev.txt` adds ruff and
+  pytest. New `tests/` suite (66 tests, no audio device needed) and `ruff.toml`.
+
 - **Browser hotkeys** (global, work in-game): record start/stop (Ctrl+Alt+R), save
   the last 15s (Ctrl+Alt+C), play/pause (Ctrl+Alt+P), LIVE on/off (Ctrl+Alt+L).
   Record/save hotkeys confirm with a short beep in your headphones only.
