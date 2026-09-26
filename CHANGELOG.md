@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- New **Browser → mic** tab: a built-in browser whose audio goes live through your mic
+  (LIVE toggle, own volume, hear-it-myself). **Record clip** and **Clip last 15s** turn
+  what played into new sound pads. Stop all pauses it, and auto push-to-talk covers it.
+
 - Simple main panel; devices, sound options, EQ and hotkeys moved under a
   collapsible ⚙ Advanced section (remembers if you left it open).
 - The mouse wheel no longer changes dropdowns, sliders or number boxes. It

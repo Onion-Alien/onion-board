@@ -38,6 +38,17 @@ through making the cable Windows' default mic.
     (a red banner shows while it's on).
   - **Record 6s → play back**: records the real `CABLE Output`, plays it back,
     and reports whether your voice and sounds are in it and whether the balance is off.
+- **Browser → mic** tab: a built-in browser (YouTube, SoundCloud, clip sites…). Whatever
+  it plays goes live through your mic, so you don't have to download anything first.
+  - **LIVE** toggle: off means only you hear it, which is handy for finding the right spot first.
+  - Its own volume, plus "Hear it myself".
+  - **⏺ Record clip** (click again to stop) and **⏪ Clip last 15s** (instant replay)
+    save what played as a new pad on the Sounds tab, with dead air trimmed.
+  - Stop all also pauses the browser, and auto push-to-talk holds while it's live.
+  - Logins and cookies persist in `%APPDATA%\Soundboard\browser\`.
+  - Limits: Qt's browser has no DRM (no Spotify / Netflix) and no H.264 (Twitch
+    won't play). Media from another site without CORS plays, but only for you. The
+    tab tells you when that happens.
 
 ## Requirements
 
@@ -65,7 +76,8 @@ survive updates.
 | `main.py` | PySide6 UI, hotkeys, auto push-to-talk |
 | `engine.py` | real-time audio: 3 WASAPI streams (mic in, cable out, headphones out), mixing, pause/seek, limiter |
 | `eq.py` | 7-band biquad equalizer and presets |
-| `library.py` | decoding, loudness levelling, config |
+| `browser.py` | Browser tab: Qt WebEngine view; an isolated-world script taps page media via WebAudio and streams 48 kHz PCM over QWebChannel into the engine; clip recorder |
+| `library.py` | decoding, loudness levelling, saving clips, config |
 | `testcheck.py` | analysis for the Record-6s test (finds your voice in the output by cross-correlation) |
 
 ### Audio notes

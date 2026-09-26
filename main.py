@@ -19,12 +19,14 @@ from PySide6.QtWidgets import (QAbstractScrollArea, QAbstractSlider, QAbstractSp
                                QApplication, QScrollBar, QCheckBox, QComboBox, QDialog, QDialogButtonBox,
                                QFileDialog, QFormLayout, QFrame, QGridLayout, QHBoxLayout,
                                QLabel, QLineEdit, QMainWindow, QMenu, QMessageBox, QPushButton,
-                               QScrollArea, QSlider, QSpinBox, QStyle, QVBoxLayout,
+                               QScrollArea, QSlider, QSpinBox, QStyle, QTabWidget, QVBoxLayout,
                                QWidget)
 
 import engine as eng
+from browser import BrowserTab
 from engine import SR, Engine
-from library import AUDIO_EXTS, PAD_COLORS, Config, SoundMeta, decode, delete_file, import_file
+from library import (AUDIO_EXTS, PAD_COLORS, Config, SoundMeta, decode, delete_file, import_file,
+                     save_clip)
 from testcheck import analyze as analyze_output, summary_html
 from eq import BAND_LABELS as EQ_LABELS, MAX_DB as EQ_MAX_DB, PRESETS as EQ_PRESETS
 from eq import response_db as eq_response
@@ -579,15 +581,30 @@ class MainWindow(QMainWindow):
         h.setContentsMargins(14, 14, 14, 10)
         h.setSpacing(14)
 
-        # ---- left: toolbar + pads
-        left = QVBoxLayout()
+        # ---- left: tabs (sounds / browser), with the mic banner + status around them
+        outer = QVBoxLayout()
+        self.mic_banner = QPushButton("🎤  YOU'RE HEARING YOUR MIC OUTPUT  —  mic + sounds, "
+                                      "exactly what others hear   ·   click to turn off")
+        self.mic_banner.setObjectName("micbanner")
+        self.mic_banner.setCursor(Qt.PointingHandCursor)
+        self.mic_banner.clicked.connect(lambda: self.btn_check.setChecked(False))
+        self.mic_banner.hide()
+        outer.addWidget(self.mic_banner)
+        self.tabs = QTabWidget()
+        self.tabs.setDocumentMode(True)
+        outer.addWidget(self.tabs, 1)
+
+        sounds_page = QWidget()
+        left = QVBoxLayout(sounds_page)
+        left.setContentsMargins(0, 8, 0, 0)
         bar = QHBoxLayout()
         add = QPushButton("＋  Add sounds")
         add.setObjectName("primary")
         add.clicked.connect(self.add_dialog)
         self.stop_btn = QPushButton("■  Stop all")
         self.stop_btn.setObjectName("danger")
-        self.stop_btn.clicked.connect(self.engine.stop_all)
+        self.stop_btn.setToolTip("Stops every sound and pauses the browser")
+        self.stop_btn.clicked.connect(self.stop_all)
         self.search = QLineEdit()
         self.search.setPlaceholderText("Search sounds…")
         self.search.setClearButtonEnabled(True)
@@ -604,14 +621,6 @@ class MainWindow(QMainWindow):
         bar.addWidget(QLabel("Size"))
         bar.addWidget(size)
         left.addLayout(bar)
-
-        self.mic_banner = QPushButton("🎤  YOU'RE HEARING YOUR MIC OUTPUT  —  mic + sounds, "
-                                      "exactly what others hear   ·   click to turn off")
-        self.mic_banner.setObjectName("micbanner")
-        self.mic_banner.setCursor(Qt.PointingHandCursor)
-        self.mic_banner.clicked.connect(lambda: self.btn_check.setChecked(False))
-        self.mic_banner.hide()
-        left.addWidget(self.mic_banner)
 
         self.grid = PadGrid()
         self.grid.reorder.connect(self.on_reorder)
@@ -656,12 +665,23 @@ class MainWindow(QMainWindow):
         th.addWidget(self.seek, 1)
         th.addWidget(self.np_time)
         left.addWidget(tb)
+        self.tabs.addTab(sounds_page, "🎛  Sounds")
+
+        browser_page = QWidget()
+        bl = QVBoxLayout(browser_page)
+        bl.setContentsMargins(0, 8, 0, 0)
+        self.browser = BrowserTab(self.engine, self.cfg, self._save_later, Meter)
+        self.browser.clip_ready.connect(self.on_clip)
+        bl.addWidget(self.browser)
+        self.tabs.addTab(browser_page, "🌐  Browser → mic")
+        self.tabs.setCurrentIndex(self.cfg.tab if 0 <= self.cfg.tab < self.tabs.count() else 0)
+        self.tabs.currentChanged.connect(lambda i: self._set("tab", i))
 
         self.status = QLabel()
         self.status.setWordWrap(True)
         self.status.setStyleSheet("color:#8a90a6;")
-        left.addWidget(self.status)
-        h.addLayout(left, 1)
+        outer.addWidget(self.status)
+        h.addLayout(outer, 1)
 
         # ---- right: audio panel
         panel = QFrame()
@@ -1229,11 +1249,15 @@ class MainWindow(QMainWindow):
 
     def on_hotkey(self, action):
         if action == "__stop__":
-            self.engine.stop_all()
+            self.stop_all()
         elif action == "__pause__":
             self.engine.pause_all()
         else:
             self.play(action)
+
+    def stop_all(self):
+        self.engine.stop_all()
+        self.browser.pause_media()
 
     # ------------------------------------------------------------------ sounds
     def meta(self, sid) -> SoundMeta | None:
@@ -1399,6 +1423,21 @@ class MainWindow(QMainWindow):
                 QMessageBox.warning(self, "Some files couldn't be added",
                                     "\n".join(self._import_errors[:15]))
                 self._import_errors = []
+
+    def on_clip(self, data, name):
+        """A clip recorded in the browser tab becomes a normal sound pad."""
+        try:
+            meta = save_clip(data, name, PAD_COLORS[len(self.cfg.sounds) % len(PAD_COLORS)])
+        except Exception as e:  # noqa: BLE001
+            QMessageBox.warning(self, "Couldn't save clip", str(e))
+            return
+        self.cfg.sounds.append(meta)
+        self.audio[meta.id] = data
+        threading.Thread(target=self.engine.prepare, args=(meta.id, data), daemon=True).start()
+        self.cfg.save()
+        self._rebuild_pads()
+        self.status.setText(f"Added “{meta.name}” ({meta.duration:.1f}s) to Sounds — "
+                            "right-click it there to rename or set a hotkey.")
 
     def on_reorder(self, sid, target):
         m = self.meta(sid)
@@ -1576,7 +1615,7 @@ class MainWindow(QMainWindow):
 
         # auto push-to-talk
         if self.cfg.ptt_key:
-            want = e.any_playing()
+            want = e.any_playing() or e.browser_on_air()
             if want != self._ptt_down:
                 try:
                     (keyboard.press if want else keyboard.release)(self.cfg.ptt_key)
@@ -1611,6 +1650,7 @@ class MainWindow(QMainWindow):
             except Exception:  # noqa: BLE001
                 pass
         self.cfg.save()
+        self.browser.shutdown()
         try:
             keyboard.unhook_all()
         except Exception:  # noqa: BLE001
@@ -1652,7 +1692,7 @@ QPushButton#micbanner { background:#e53935; color:white; font-weight:700; font-s
     border:none; border-radius:10px; padding:10px; }
 QFrame#panel QPushButton#miccheck:checked { background:#e53935; border:1px solid #ff6b6b; color:white;
     font-weight:700; }
-QFrame#transport QLabel { background:transparent; }
+QFrame#transport QLabel, QFrame#transport QCheckBox { background:transparent; }
 QPushButton#round { padding:0; font-size:14pt; border-radius:10px; }
 QSlider#seek::groove:horizontal { height:6px; border-radius:3px; }
 QSlider#seek::sub-page:horizontal { border-radius:3px; }
@@ -1673,6 +1713,15 @@ QMenu { background:#232633; border:1px solid #363b4e; padding:4px; }
 QMenu::item { padding:6px 18px; border-radius:6px; }
 QMenu::item:selected { background:#7c5cff; }
 QToolTip { background:#232633; color:#e6e8f0; border:1px solid #363b4e; }
+QTabWidget::pane { border:none; }
+QTabBar { qproperty-drawBase: 0; }
+QTabBar::tab { background:transparent; color:#8a90a6; padding:8px 16px; margin-right:4px;
+    border:none; border-bottom:2px solid transparent; font-weight:600; }
+QTabBar::tab:selected { color:#e6e8f0; border-bottom:2px solid #7c5cff; }
+QTabBar::tab:hover { color:#e6e8f0; }
+QPushButton#live { font-weight:700; }
+QPushButton#live:checked { background:#e53935; border:1px solid #ff6b6b; color:white; }
+QPushButton#rec:checked { background:#e53935; border:1px solid #ff6b6b; color:white; font-weight:700; }
 """
 
 
