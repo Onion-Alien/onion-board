@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Onion Board: free soundboard for Discord and games (Windows)</title>
+<meta name="description" content="Free Windows soundboard: play sounds into Discord and games through your mic, with a voice changer, text-to-speech, an in-game overlay, and screen triggers that play a sound when something shows up, like YOU DIED.">
+<meta property="og:title" content="Onion Board: free soundboard for Discord and games">
+<meta property="og:description" content="Play sounds through your mic in Discord and games. Voice changer, text-to-speech, and screen triggers that play a sound when you die.">
+<meta property="og:image" content="https://onion-alien.github.io/onionboard/screenshots/sounds.png">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="canonical" href="https://onion-alien.github.io/onionboard/">
+<style>
+  :root {
+    --bg: #0f1016; --card: #1a1b24; --edge: #2a2b38; --text: #ececf3; --muted: #a3a4b8;
+    --accent: #7c5cff; --accent2: #ff5c8a; --green: #13ce66;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text);
+         font: 17px/1.55 "Segoe UI", system-ui, -apple-system, sans-serif; }
+  a { color: #a996ff; }
+  .wrap { max-width: 1040px; margin: 0 auto; padding: 0 16px; }
+  header { text-align: center; padding: 56px 0 24px; }
+  h1 { font-size: clamp(34px, 6vw, 56px); margin: 0 0 8px; letter-spacing: 0.02em; }
+  h1 span { background: linear-gradient(90deg, var(--accent), var(--accent2));
+            -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .tag { color: var(--muted); font-size: clamp(18px, 2.6vw, 22px); max-width: 700px; margin: 0 auto 28px; }
+  .dl { display: inline-block; background: var(--accent); color: #fff; text-decoration: none;
+        font-weight: 700; font-size: 20px; padding: 16px 30px; border-radius: 14px;
+        box-shadow: 0 8px 30px rgba(124, 92, 255, 0.35); }
+  .dl:hover { background: #8d71ff; }
+  .small { color: var(--muted); font-size: 14px; margin-top: 12px; }
+  .hero { margin: 32px auto 8px; border-radius: 14px; border: 1px solid var(--edge);
+          max-width: 100%; display: block; }
+  h2 { font-size: 28px; margin: 56px 0 16px; text-align: center; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; }
+  .card { background: var(--card); border: 1px solid var(--edge); border-radius: 14px; padding: 18px 20px; }
+  .card h3 { margin: 0 0 6px; font-size: 19px; }
+  .card p { margin: 0; color: var(--muted); }
+  .new { color: var(--green); font-size: 13px; font-weight: 700; margin-left: 6px; }
+  .shots img { width: 100%; border-radius: 12px; border: 1px solid var(--edge); display: block; }
+  .shots figure { margin: 0; }
+  .shots figcaption { color: var(--muted); font-size: 15px; margin-top: 6px; }
+  ol.steps { max-width: 720px; margin: 0 auto; padding-left: 22px; }
+  ol.steps li { margin: 8px 0; }
+  .note { max-width: 720px; margin: 20px auto 0; background: var(--card); border: 1px solid var(--edge);
+          border-radius: 12px; padding: 14px 18px; color: var(--muted); font-size: 15px; }
+  footer { text-align: center; color: var(--muted); font-size: 14px; padding: 48px 0 40px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1><span>Onion Board</span></h1>
+    <p class="tag">A free soundboard for Windows. Press a button or a hotkey, even in-game, and your
+      friends in Discord or your game hear the sound through your mic.</p>
+    <a class="dl" href="https://github.com/Onion-Alien/onionboard/releases/latest/download/OnionBoardSetup.exe">⬇ Download for Windows</a>
+    <p class="small">Free · Windows 10 and 11 · one installer, no account, no ads, no tracking</p>
+    <img class="hero" src="screenshots/triggers-demo.gif" width="560" height="315"
+         alt="A game shows YOU DIED, Onion Board's trigger matches it and plays a sad trombone">
+  </header>
+
+  <h2>What it does</h2>
+  <div class="grid">
+    <div class="card"><h3>Sounds into Discord and games</h3><p>Your sounds go out through your mic
+      (via a free virtual cable the installer sets up). Your voice goes along with them, or send only the sounds.</p></div>
+    <div class="card"><h3>Screen triggers<span class="new">NEW</span></h3><p>Pick a picture, like a
+      game's "YOU DIED", and a sound plays the moment it shows up. You set a delay, a cooldown and how close the match must be.</p></div>
+    <div class="card"><h3>Hotkeys and in-game overlay</h3><p>Global hotkeys work while you play. Press
+      a key for a small panel of pads over your game, then a number to play one.</p></div>
+    <div class="card"><h3>Voice changer and text-to-speech</h3><p>Robot, radio, echo, pitch and more
+      on your live voice, or type and a computer voice says it. Live voice-to-speech and translation too.</p></div>
+    <div class="card"><h3>Effects on any sound</h3><p>Trim, speed, pitch, bass boost, reverse, reverb.
+      One-click presets like Ear rape, Nightcore, Slowed + reverb.</p></div>
+    <div class="card"><h3>Add sounds from anywhere</h3><p>Drag in files, or search YouTube and SoundCloud
+      right in the app and add the audio as a pad.</p></div>
+    <div class="card"><h3>Internet radio and app audio</h3><p>Radio from around the world on a 3D globe,
+      or send one program's sound (music, a video) to your friends.</p></div>
+    <div class="card"><h3>Shaped for voice chat</h3><p>Discord, Steam and game voice modes pre-shape
+      your sounds so they survive the call's compression.</p></div>
+  </div>
+
+  <h2>Screenshots</h2>
+  <div class="grid shots">
+    <figure><img src="screenshots/sounds.png" alt="The Sounds tab" loading="lazy"><figcaption>Your sound pads, in categories</figcaption></figure>
+    <figure><img src="screenshots/triggers.png" alt="The Triggers tab" loading="lazy"><figcaption>Triggers: a sound when something appears</figcaption></figure>
+    <figure><img src="screenshots/voice.png" alt="The Voice tab" loading="lazy"><figcaption>Voice changer and text-to-speech</figcaption></figure>
+    <figure><img src="screenshots/overlay.png" alt="The in-game overlay" loading="lazy"><figcaption>The in-game overlay</figcaption></figure>
+  </div>
+
+  <h2>Get started</h2>
+  <ol class="steps">
+    <li><a href="https://github.com/Onion-Alien/onionboard/releases/latest/download/OnionBoardSetup.exe">Download <code>OnionBoardSetup.exe</code></a> and run it.</li>
+    <li>A short guide asks which mic and headphones you use and sets everything up.</li>
+    <li>In Discord (or your game), pick <b>CABLE Output</b> as your microphone. That's it.</li>
+  </ol>
+  <p class="note">Windows or your browser may warn you about the download. That's normal for a free
+    app from a small developer: the installer isn't "code-signed", which costs hundreds a year.
+    Click <b>More info → Run anyway</b> (or <b>⋯ → Keep</b> in Edge / Chrome). The full source code is
+    <a href="https://github.com/Onion-Alien/onionboard">on GitHub</a> if you'd like to check it.</p>
+
+  <footer>
+    <a href="https://github.com/Onion-Alien/onionboard">Source code</a> ·
+    <a href="https://github.com/Onion-Alien/onionboard/releases">All versions</a> ·
+    <a href="https://github.com/Onion-Alien/onionboard/issues">Report a problem</a><br>
+    Onion Board is free to use. Nothing is collected about you.
+  </footer>
+</div>
+</body>
+</html>
