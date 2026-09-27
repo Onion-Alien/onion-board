@@ -33,6 +33,16 @@ def describe(d: Dest) -> str:
     return f"{d.note}  ({what})" if d.note else what
 
 
+DUCK_LABELS = (("Off", 0.0), ("A little (-6 dB)", -6.0), ("Half (-12 dB)", -12.0),
+               ("A lot (-20 dB)", -20.0))
+
+
+def apply_send(cfg, engine):
+    """Push the config's send options (mono, ducking) onto the engine."""
+    engine.send_mono = bool(cfg.send_mono)
+    engine.duck_db = min(0.0, float(cfg.duck_db))
+
+
 def ceiling_label(hz: int) -> str:
     return "No cut (full band)" if not hz else f"Cut above {hz // 1000} kHz"
 
@@ -58,8 +68,26 @@ class DestPanel(QWidget):
         v.addLayout(row)
         self.desc = hint_label("")
         v.addWidget(self.desc)
+        # the send stage (soundboard.sendfx), whatever the mode
+        self.chk_mono = QCheckBox("Send in mono (recommended)")
+        self.chk_mono.setToolTip(
+            "Every voice chat sends one channel. Onion Board makes it, smarter than "
+            "Discord or a game would: wide stereo sounds and phasey bass don't cancel out")
+        v.addWidget(self.chk_mono)
+        duck = QHBoxLayout()
+        duck.addWidget(QLabel("While I talk, lower my sounds:"))
+        self.cb_duck = QComboBox()
+        no_wheel(self.cb_duck)
+        for label, db in DUCK_LABELS:
+            self.cb_duck.addItem(label, db)
+        self.cb_duck.setToolTip("Turns your sounds down while the mic hears you, so your "
+                                "voice isn't buried under a song")
+        duck.addWidget(self.cb_duck, 1)
+        v.addLayout(duck)
         self.refresh()
         self.combo.currentIndexChanged.connect(self._picked)
+        self.chk_mono.toggled.connect(self._send_changed)
+        self.cb_duck.currentIndexChanged.connect(self._send_changed)
 
     def _cfg(self) -> dict:
         d = self.mw.cfg.dest
@@ -76,6 +104,14 @@ class DestPanel(QWidget):
             self.combo.addItem(d.label + ("  (custom)" if d.custom else ""), d.key)
         self.combo.setCurrentIndex(max(0, self.combo.findData(current)))
         self.combo.blockSignals(False)
+        c = self.mw.cfg
+        for w in (self.chk_mono, self.cb_duck):
+            w.blockSignals(True)
+        self.chk_mono.setChecked(bool(c.send_mono))
+        i = min(range(len(DUCK_LABELS)), key=lambda k: abs(DUCK_LABELS[k][1] - c.duck_db))
+        self.cb_duck.setCurrentIndex(i)
+        for w in (self.chk_mono, self.cb_duck):
+            w.blockSignals(False)
         self._show()
 
     def showEvent(self, e):
@@ -94,6 +130,13 @@ class DestPanel(QWidget):
         destination.apply(self.mw.cfg, self.mw.engine)
         self.mw._save_later()
         self._show()
+
+    def _send_changed(self, *_):
+        c = self.mw.cfg
+        c.send_mono = self.chk_mono.isChecked()
+        c.duck_db = float(self.cb_duck.currentData())
+        apply_send(c, self.mw.engine)
+        self.mw._save_later()
 
     def edit_custom(self):
         dlg = CustomDestDialog(self.mw, self)

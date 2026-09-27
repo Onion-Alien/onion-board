@@ -35,6 +35,7 @@ import sounddevice as sd
 import soxr
 
 from soundboard.eq import EQ
+from soundboard.sendfx import Ducker, Limiter, SmartMono
 from soundboard.voicefx.builtin import PitchShift
 
 log = logging.getLogger(__name__)
@@ -159,6 +160,15 @@ def resample(data: np.ndarray, src: int, dst: int) -> np.ndarray:
 
 # --------------------------------------------------------------------------- helpers
 
+def hermite(p0, p1, p2, p3, f):
+    """4-point cubic (Catmull-Rom) interpolation between p1 and p2 at fraction f.
+    Linear interpolation dulls the top end and leaves images around it (measured
+    -20 dB against a proper resampler on music); this is much cleaner for the
+    cost of two more reads."""
+    return p1 + 0.5 * f * (p2 - p0 + f * (2 * p0 - 5 * p1 + 4 * p2 - p3
+                                          + f * (3 * (p1 - p2) + p3 - p0)))
+
+
 class Ring:
     """Low-latency ring buffer bridging two audio clocks (mic -> output)."""
 
@@ -173,10 +183,14 @@ class Ring:
     FADE_S = 0.004
 
     def __init__(self, rate: int = SR, prefill_s: float = 0.015, max_s: float = 0.08,
-                 track_drift: bool = False, grow_to_s: float = 0.0):
+                 track_drift: bool = False, grow_to_s: float = 0.0, auto_drift: bool = False):
         self.lock = threading.Lock()
         self.prefill_s, self.max_s = prefill_s, max_s
         self.track_drift = track_drift
+        # auto_drift: start without drift tracking, and switch it on once the ring has
+        # had to skip or refill twice (the writer's clock really is off: a wireless
+        # headset's mic against the cable, say)
+        self.auto_drift = auto_drift
         # grow_to_s: a writer that stalls now and then (the radio) gets a bigger
         # cushion each time the ring runs dry, up to this, so it stops skipping
         self.grow_to_s = grow_to_s
@@ -198,6 +212,12 @@ class Ring:
             self.ratio = 1.0     # current read speed (drift tracking)
             self._acc = 0.0      # fractional frames carried between reads
             self._integ = 0.0    # learned clock offset
+            self._last = np.zeros((1, CH), np.float32)   # the frame before the next read
+
+    def _glitched(self):
+        """Count toward switching drift tracking on (auto_drift)."""
+        if self.auto_drift and not self.track_drift and self.underruns + self.overflows >= 2:
+            self.track_drift = True
 
     def clear(self):
         with self.lock:
@@ -226,6 +246,7 @@ class Ring:
                 self.r = (self.r + drop) % self.cap
                 self.count -= drop
                 self.overflows += 1
+                self._glitched()
                 self._fade_in = True
             elif self.count == self.cap:
                 self.r = self.w
@@ -256,6 +277,7 @@ class Ring:
                 self.primed = False
                 self._acc = 0.0
                 self.underruns += 1
+                self._glitched()
                 self.prefill = min(self.max_prefill, int(self.prefill * 1.5))
                 k = min(self.count, n)
                 if not k:
@@ -267,14 +289,16 @@ class Ring:
                 return out
             if m == n:
                 out = self._peek(n)
-            else:  # stretch m frames to n (peek one past the end for a seamless joint)
-                src = self._peek(min(m + 1, self.count))
-                if len(src) < m + 1:
+            else:  # stretch m frames to n (cubic, with a frame either side for the joints)
+                src = self._peek(min(m + 2, self.count))
+                while len(src) < m + 2:
                     src = np.concatenate([src, src[-1:]])
+                src = np.concatenate([self._last, src])      # src[k + 1] is frame k
                 pos = np.arange(n, dtype=np.float64) * (m / n)
-                i = pos.astype(np.int64)
-                f = (pos - i).astype(np.float32)[:, None]
-                out = src[i] * (1 - f) + src[i + 1] * f
+                i = pos.astype(np.int64) + 1
+                f = (pos - (i - 1)).astype(np.float32)[:, None]
+                out = hermite(src[i - 1], src[i], src[i + 1], src[i + 2], f)
+            self._last = self._peek_at(m - 1)
             self.r = (self.r + m) % self.cap
             self.count -= m
             if self._fade_in:   # (re)starting or after a skip: no hard edge
@@ -282,6 +306,10 @@ class Ring:
                 k = min(self.fade, n)
                 out[:k] *= np.linspace(0, 1, k, dtype=np.float32)[:, None]
             return out
+
+    def _peek_at(self, k: int) -> np.ndarray:
+        """Frame k after the read position, as (1, CH)."""
+        return self.buf[(self.r + k) % self.cap][None, :].copy()
 
     def _peek(self, n: int) -> np.ndarray:
         end = self.r + n
@@ -489,6 +517,11 @@ class Engine:
         self._eqs: dict[tuple[str, str], EQ] = {}
         self.mic_check = False    # headphones also get your mic (= exactly what others hear)
         self.voice_chain = None   # voicefx.VoiceChain: voice changer / live speech tap on the mic
+        # the send stage (soundboard.sendfx): what makes the mix survive voice chat
+        self.send_mono = True     # phase-aware mono into the cable (every voice chat is mono)
+        self.duck_db = 0.0        # lower the sounds this much while you talk (0 = off)
+        self.limiter_on = True    # hold the cable's peaks at sendfx.CEILING_DB
+        self._send: dict[tuple[str, str], object] = {}   # (out, kind) -> its sendfx stage
         self.sound_speed = 1.0        # live playback speed of every sound (0.25..4)
         self.sound_pitch = 0.0        # live pitch of every sound, semitones
         self.sound_keep_pitch = True  # speed changes leave the pitch alone
@@ -498,8 +531,10 @@ class Engine:
         self.rates = {"main": SR, "mon": SR, "mic": SR}
         self.errors: dict[str, str] = {}
 
-        self.ring_main = Ring()
-        self.ring_mon = Ring()
+        # the mic's clock is its own device's: drift tracking switches itself on if it
+        # turns out to wander from the output's (see Ring.auto_drift)
+        self.ring_main = Ring(auto_drift=True)
+        self.ring_mon = Ring(auto_drift=True)
         self._rs_main = StreamResampler(SR, SR)
         self._rs_mon = StreamResampler(SR, SR)
 
@@ -1092,15 +1127,19 @@ class Engine:
         if loop:
             pos %= n
             i = pos.astype(np.int64)
-            j = (i + 1) % n
+            h, j, k = (i - 1) % n, (i + 1) % n, (i + 2) % n
         else:
             m = int(np.searchsorted(pos, n - 1))   # frames before the end
             pos = pos[:m]
             i = pos.astype(np.int64)
-            j = i + 1
+            h, j, k = np.maximum(i - 1, 0), i + 1, np.minimum(i + 2, n - 1)
         f = (pos - i).astype(np.float32)[:, None]
-        a = data[i].astype(np.float32)
-        dst[:len(pos)] += (a + (data[j].astype(np.float32) - a) * f) * g
+        p0, p1, p2, p3 = (data[x].astype(np.float32) for x in (h, i, j, k))
+        if not loop:   # past either end: continue the line (a ramp stays a ramp)
+            first, last = i == 0, i + 2 > n - 1
+            p0[first] = 2 * p1[first] - p2[first]
+            p3[last] = 2 * p2[last] - p1[last]
+        dst[:len(pos)] += hermite(p0, p1, p2, p3, f) * g
         p += speed * len(dst)
         if loop:
             return p % n
@@ -1136,6 +1175,14 @@ class Engine:
         if f is None or f.rate != self.rates[out]:
             f = self._eqs[key] = EQ(self.rates[out])
         return f.process(x, g)
+
+    def _stage(self, out: str, kind: type):
+        """This output's Limiter / SmartMono / Ducker, made for its current rate."""
+        key = (out, kind.__name__)
+        f = self._send.get(key)
+        if f is None or f.rate != self.rates[out]:
+            f = self._send[key] = kind(self.rates[out])
+        return f
 
     def _dest(self, out: str, x: np.ndarray) -> np.ndarray:
         """Shape the sounds bus for whoever is listening (soundboard.destination)."""
@@ -1198,12 +1245,11 @@ class Engine:
             x = a.ring_main.read(frames)
             if x is not None and a.live:
                 mix += x * np.float32(a.vol)
-        mix = self._dest("main", self._eq("main", "sounds", mix))
-        m = self.ring_main.read(frames)
-        if m is not None and self.mic_enabled and not self.mic_muted:
-            mix += self._eq("main", "voice", m * np.float32(self.mic_vol))
+        mix = self._send_bus("main", mix, self.ring_main.read(frames))
         if not self.sending:      # muted: others get silence, nothing else changes
             mix.fill(0)
+        if self.limiter_on:
+            mix = self._stage("main", Limiter).process(mix)
         soft_limit(mix)
         outdata[:] = mix
         self.level_main = max(peak(mix), self.level_main * 0.85)
@@ -1233,13 +1279,29 @@ class Engine:
             x = a.ring_mon.read(frames)
             if x is not None and (a.monitor or (check and a.live)):
                 mix += x * np.float32(a.vol)
-        mix = self._dest("mon", self._eq("mon", "sounds", mix))   # you hear what others get
-        if check and m is not None and self.mic_enabled and not self.mic_muted:
-            mix += self._eq("mon", "voice", m * np.float32(self.mic_vol))
+        if check:   # you hear what others get: the same send stage, your mic in it
+            mix = self._send_bus("mon", mix, m)
+        else:
+            mix = self._dest("mon", self._eq("mon", "sounds", mix))
         mix *= np.float32(self.mon_vol)
         soft_limit(mix)
         outdata[:] = mix
         self.level_mon = max(peak(mix), self.level_mon * 0.85)
+
+    def _send_bus(self, out: str, mix: np.ndarray, m: np.ndarray | None) -> np.ndarray:
+        """The sounds bus shaped for voice chat (EQ, destination mode, ducking under
+        your voice, phase-aware mono), with the mic block `m` added on top."""
+        mic_on = m is not None and self.mic_enabled and not self.mic_muted
+        mix = self._dest(out, self._eq(out, "sounds", mix))
+        if self.duck_db < 0 or (out, "Ducker") in self._send:
+            g = self._stage(out, Ducker).process(m if mic_on else None, len(mix), self.duck_db)
+            if not isinstance(g, float):
+                mix = mix * g
+        if self.send_mono:
+            mix = self._stage(out, SmartMono).process(mix)
+        if mic_on:
+            mix += self._eq(out, "voice", m * np.float32(self.mic_vol))
+        return mix
 
     def _mic(self, indata):
         x = indata

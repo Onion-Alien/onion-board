@@ -11,6 +11,19 @@
   which Discord setting is still hurting your sounds: noise suppression, the
   voice-activity gate cutting quiet parts, or automatic gain control pumping the
   volume.
+- **Loud sounds don't crackle on the other end.** Voice chat's codec pushes peaks
+  back up after it squeezes them, so a loud song that left here at full volume
+  clipped in your friends' ears. Onion Board now leaves room for that, with a real
+  limiter that turns the level down around a peak instead of distorting it.
+- **Stereo sounds don't lose parts in mono.** Every voice chat sends one channel.
+  Out-of-phase bass and wide stereo effects used to cancel out when Discord or a
+  game mixed them down; Onion Board now does the mix-down itself, smarter, before
+  they get the chance. On by default (Setup tab → *Who's listening* → *Send in
+  mono*).
+- **Lower my sounds while I talk** (Setup tab → *Who's listening*): your sounds dip
+  under your voice so a song doesn't bury what you say. Off, a little, half or a
+  lot.
+- **Speeding up or slowing down sounds live sounds cleaner** (better interpolation).
 - **The virtual cable passes your sound through untouched.** Windows sometimes
   puts one end of the cable on 44.1 kHz, and the cable then converts everything on
   the way through. The Setup tab spots it and fixes it in one click (the setup

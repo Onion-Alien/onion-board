@@ -1,6 +1,6 @@
 import numpy as np
 
-from soundboard.engine import CH, Ring
+from soundboard.engine import CH, SR, Ring
 
 
 def frames(start, n):
@@ -120,3 +120,12 @@ def test_restart_after_underrun_fades_in():
     r.write(np.ones((40, CH), np.float32))
     out = r.read(10)
     assert out[0, 0] == 0 and np.all(np.diff(out[:F, 0]) > 0) and np.all(out[F:] == 1)
+
+
+def test_auto_drift_switches_on_after_two_glitches():
+    r = Ring(prefill_s=0.01, max_s=0.02, auto_drift=True)
+    assert not r.track_drift
+    for _ in range(2):   # a writer running fast: the ring overflows and skips ahead
+        r.write(np.zeros((int(SR * 0.03), 2), np.float32))
+    assert r.overflows >= 2 and r.track_drift
+    assert not Ring(prefill_s=0.01, max_s=0.02).track_drift

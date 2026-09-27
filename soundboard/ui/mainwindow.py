@@ -788,6 +788,8 @@ class MainWindow(QMainWindow):
         rcol.addStretch(1)
         self.on_eq(*self.eq.state())   # push the saved EQ into the engine
         destination.apply(self.cfg, self.engine)   # ...and the destination mode (Who's listening)
+        from soundboard.ui.destpanel import apply_send
+        apply_send(self.cfg, self.engine)          # ...and mono / ducking
         return page
 
     def on_eq(self, gains, enabled, target, preset):
@@ -2758,8 +2760,11 @@ class MainWindow(QMainWindow):
                 log.exception("shutdown step %s failed", getattr(step, "__name__", step))
         e = self.engine
         log.info("closed cleanly (drop-outs %s, callback errors %s, stalls %d, "
-                 "radio gaps %d / skips %d, cushion %d ms)",
+                 "radio gaps %d / skips %d, cushion %d ms, mic into cable gaps %d / "
+                 "skips %d%s)",
                  e.xruns, e.cb_errors, e.stalls,
                  e.ring_rmon.underruns + e.ring_rmain.underruns,
                  e.ring_rmon.overflows + e.ring_rmain.overflows,
-                 e.ring_rmon.prefill * 1000 // max(e.rates.get("mon", SR), 1))
+                 e.ring_rmon.prefill * 1000 // max(e.rates.get("mon", SR), 1),
+                 e.ring_main.underruns, e.ring_main.overflows,
+                 ", drift tracked" if e.ring_main.track_drift else "")

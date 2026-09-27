@@ -394,6 +394,7 @@ the launcher the shortcuts and PyInstaller use. The app is the `soundboard` pack
 | `soundboard/codecsim.py` | development bench: runs audio through Discord / Steam / Vivox's Opus pipeline (ffmpeg's libopus) and measures what's lost |
 | `soundboard/chatcheck.py` | the Discord check: a test sound, and how to tell from Discord's Mic Test playback whether its noise suppression, gate or gain control is changing your sounds |
 | `soundboard/ui/chatguide.py` | the Discord and game voice-chat guides (the settings that keep sounds clean) and the check that runs from them |
+| `soundboard/sendfx.py` | the send stage before the cable: phase-aware mono downmix, lookahead peak limiter, ducking under your voice |
 | `soundboard/cableformat.py` | reads both ends of the virtual cable's Windows format and sets them to 48 kHz, so the cable passes sound through unconverted |
 | `modules/` | add-ons shipped with the app: `retro-fx` (an effects module, the example to copy), `live-voice` (a service module with its own Python environment) and `translate-zh/es/fr/de/ru` (translation modules: a manifest naming a model that's downloaded only when picked) |
 | `build.ps1`, `installer/` | the PyInstaller build and the Inno Setup installer (`installer/OnionBoard.iss`); `installer/install-vbcable.ps1` downloads VB-Cable, checks its signature and installs it (used by the app and the installer) |
@@ -448,12 +449,21 @@ the newest backup is used, so the pad list is never silently reset.
   a pure resample. Voice effects run per channel in 2048-frame blocks, with room
   for echo / reverb tails, and a module effect that throws is skipped.
 - **Live speed / pitch** (the `1x` buttons) works differently, because it has to be
-  instant. Sounds are read at a fractional rate with linear interpolation (like a
+  instant. Sounds are read at a fractional rate with cubic interpolation (like a
   tape). A pitch shifter on the sounds bus (a crossfaded two-head delay line, 70 ms
   window) then puts the pitch back when *keep pitch* is on, and adds the pitch
   slider on top.
 - Radio recordings are spooled to a 16-bit WAV as they happen instead of growing in
   RAM, and the resampled copies kept for non-48 kHz devices are capped at 512 MB (LRU).
+- **The send stage** (`soundboard/sendfx.py`) is the last thing before the cable.
+  Everything Discord and games send is one channel, so the sounds are downmixed
+  here first, per band: a band that is mostly out of phase between left and right
+  is summed with the right channel flipped, and wide stereo gets back the power a
+  plain average loses (a plain average took out-of-phase bass down 25 dB). Your
+  mic is never touched by it. Then a lookahead peak limiter (3 ms) holds the cable
+  at -3 dBFS, because Opus puts peaks back up by ~2.5 dB and the listener's decoder
+  clips them; it turns the level down around a peak instead of bending the
+  waveform. Optionally the sounds duck under your voice while the mic hears you.
 - Every device is opened at its **native** sample rate and resampled with soxr.
   Windows' built-in `auto_convert` resampler was measured garbling VB-Cable audio
   (about 70% junk), so it's never used.

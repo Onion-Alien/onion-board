@@ -58,13 +58,14 @@ def test_bass_leaves_midrange_alone():
     assert np.abs(y[RATE // 4:] - x[RATE // 4:]).max() < 1e-3
 
 
-def test_mono_averages_channels():
+def test_mono_is_one_channel_that_doesnt_cancel():
     d = Dest("t", "t", mono=True)
     x = _tone(440)
-    x[:, 1] *= -1                                   # out of phase: mono should cancel
+    x[:, 1] *= -1                  # out of phase: a plain average would be silence
     y = _run(x, d)
-    assert np.abs(y).max() < 1e-6
     assert np.array_equal(y[:, 0], y[:, 1])
+    tail = slice(RATE // 2, None)
+    assert np.sqrt((y[tail, 0] ** 2).mean()) > 0.9 * np.sqrt((x[tail, 0] ** 2).mean())
 
 
 def test_compressor_tames_loud_keeps_quiet():

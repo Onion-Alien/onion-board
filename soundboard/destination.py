@@ -15,8 +15,9 @@ A mode pre-shapes the sounds bus for that pipeline:
            content nobody will hear, and what you monitor matches what they get
   comp     gentle stereo-linked compressor: a steadier level rides the
            service's gate and automatic gain better than a spiky one
-  mono     average the channels here, the way the mic capture will, so stereo
-           effects that would cancel in mono are heard (and judged) that way
+  mono     one channel, the way the mic capture will send it, with the
+           phase-aware downmix (soundboard.sendfx.SmartMono) so stereo effects
+           that would cancel in a plain average don't
 
 Built-in modes cover the services measured; custom ones (Settings) let you
 describe any other codec by the same four knobs. The engine runs one Processor
@@ -152,6 +153,7 @@ class Processor:
         self.rate = int(rate)
         self.dest: Dest | None = None
         self._lp = self._bp = self._ceil = None
+        self._mono = None
         self.g = 1.0   # compressor gain
 
     def _design(self, d: Dest):
@@ -196,8 +198,10 @@ class Processor:
         if d.comp > 0:
             x = self._compress(x, d.comp)
         if d.mono:
-            m = x.mean(axis=1, keepdims=True)
-            x = np.repeat(m, 2, axis=1)
+            if self._mono is None:
+                from soundboard.sendfx import SmartMono
+                self._mono = SmartMono(self.rate)
+            x = self._mono.process(x)
         return np.ascontiguousarray(x, dtype=F32)
 
     def _compress(self, x: np.ndarray, amount: float) -> np.ndarray:

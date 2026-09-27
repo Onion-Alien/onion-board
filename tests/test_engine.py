@@ -25,8 +25,12 @@ def tone(seconds=0.5):
     return np.stack([np.sin(2 * np.pi * 440 * t)] * 2, 1).astype(np.float32) * 0.5
 
 
-def engine_with(*outs):
+def engine_with(*outs, send_stage=False):
+    """An engine with fake output streams. The send stage (limiter delay, mono
+    crossovers) is off unless asked for, so render tests can compare exact samples;
+    test_sendfx covers it."""
     e = Engine()
+    e.send_mono = e.limiter_on = send_stage
     for o in outs:
         setattr(e, f"{o}_stream", FakeStream())
         e.names[o] = f"fake {o}"

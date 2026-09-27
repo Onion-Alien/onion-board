@@ -94,7 +94,8 @@ PAD_WIDTH_RANGE = (110, 240)  # the Sounds tab's pad-size slider
 # settings shown on a control with a fixed range: a value from a hand-edited config or
 # someone's backup is brought into it (Qt raises OverflowError on one past an int)
 SETTING_RANGES = {"sound_vol": (0.0, VOLUME_MAX), "mic_vol": (0.0, VOLUME_MAX),
-                  "mon_vol": (0.0, VOLUME_MAX), "pad_width": PAD_WIDTH_RANGE}
+                  "mon_vol": (0.0, VOLUME_MAX), "pad_width": PAD_WIDTH_RANGE,
+                  "duck_db": (-24.0, 0.0)}
 
 
 def clean_setting(k: str, v):
@@ -216,6 +217,8 @@ class Config:
     eq_preset: str = "Flat (off)"
     eq_gains: list[float] = field(default_factory=lambda: [0.0] * 7)
     dest: dict = field(default_factory=dict)   # who's listening (soundboard.destination)
+    send_mono: bool = True    # phase-aware mono into the cable (soundboard.sendfx.SmartMono)
+    duck_db: float = 0.0      # lower the sounds this much while you talk; 0 = off
     ptt_key: str = ""           # key held down while sounds play (game push-to-talk)
     always_on_top: bool = False
     pad_width: int = 150
