@@ -177,3 +177,12 @@ def _no_blocking_message_boxes(monkeypatch):
     monkeypatch.setattr(QMessageBox, "question", lambda *a, **k: QMessageBox.Cancel)
     for name in ("warning", "information", "critical"):
         monkeypatch.setattr(QMessageBox, name, lambda *a, **k: QMessageBox.Ok)
+
+
+@pytest.fixture(autouse=True)
+def _never_change_real_device_formats(monkeypatch):
+    """The cable check reads and sets Windows device formats. Tests see a cable that's
+    already fine and can never change a real device's format."""
+    from soundboard import cableformat
+    monkeypatch.setattr(cableformat, "cable_ends", lambda names_hint=None: [])
+    monkeypatch.setattr(cableformat, "set_rate", lambda end, rate=cableformat.RATE: False)

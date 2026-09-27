@@ -48,7 +48,7 @@ I16_SCALE = np.float32(1 / 32767.0)   # int16 sound data -> float
 CACHE_BUDGET = 512 << 20               # bytes of resampled copies kept for non-48 kHz devices
 # the app's own playback: the test recording, cue beeps, the setup wizard's tune. With
 # previews ("<sid>:preview", "<sid>~fx:preview") they ignore the live speed / pitch
-FIXED_SIDS = frozenset({"__test__", "__cue__", "__setup__"})
+FIXED_SIDS = frozenset({"__test__", "__cue__", "__setup__", "__check__"})
 
 
 def is_fixed(sid: str) -> bool:
@@ -527,6 +527,9 @@ class Engine:
         self._rec_frames_left = 0
         self.rec_done: tuple[np.ndarray, int] | None = None   # (audio, rate)
         self._mic_rec: list[np.ndarray] | None = None          # mic during a test (see _mic)
+        # a copy of every block sent into the cable while set to a list (the voice chat
+        # check compares it with what Discord plays back); None = off
+        self.main_tap: list[np.ndarray] | None = None
 
     # ----------------------------------------------------------------- streams
     @staticmethod
@@ -851,11 +854,15 @@ class Engine:
     # ----------------------------------------------------------------- playback
     def play(self, sid: str, data: np.ndarray, gain: float, loop=False, mode="restart",
              preview=False, src_rate: int = SR, start: float = 0.0,
-             fade_in: float = 0.0, fade_out: float = 0.0) -> Voice | None:
+             fade_in: float = 0.0, fade_out: float = 0.0,
+             only: str | None = None) -> Voice | None:
         """mode: 'restart' (stop previous instance), 'overlap', 'toggle' (stop if playing).
         fade_in / fade_out (seconds): a rise from silence at the start; a fall to silence
-        when it's stopped and, for a one-shot, over its last fade_out seconds."""
+        when it's stopped and, for a one-shot, over its last fade_out seconds.
+        only: 'main' or 'mon' plays on that output alone (the voice chat check)."""
         outs = self.active_outputs()
+        if only is not None:
+            outs &= {only}
         if preview:
             # previews are for your ears only; with no headphone device open they must
             # not fall through to the cable (everyone in the call would hear them)
@@ -1200,6 +1207,9 @@ class Engine:
         soft_limit(mix)
         outdata[:] = mix
         self.level_main = max(peak(mix), self.level_main * 0.85)
+        tap = self.main_tap
+        if tap is not None:
+            tap.append(mix.copy())
         rec = self._rec_buf   # read once: cancel_test_record may clear it meanwhile
         if rec is not None:
             rec.append(mix.copy())

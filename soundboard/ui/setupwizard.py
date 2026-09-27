@@ -30,7 +30,6 @@ from soundboard import library
 from soundboard.library import RESOURCE_DIR
 from soundboard.ui import fit
 from soundboard.ui.bunnywidget import BunnyWidget
-from soundboard.ui.crashdialog import free_dialog
 from soundboard.ui.widgets import Meter
 
 RESTART_NEEDED = 3010   # install-vbcable.ps1: installed, but Windows must restart first
@@ -380,12 +379,24 @@ class SetupWizard(QDialog):
         row.addWidget(nomic)
         row.addStretch(1)
         v.addLayout(row)
-        self.btn_steam = QPushButton("🎮  Playing a Steam game (CS2, Dota 2, Deadlock…)? "
-                                     "Show me how")
+        self.btn_discord = QPushButton("🎧  Discord: make my sounds come through clean")
+        self.btn_discord.setObjectName("primary")
+        self.btn_discord.setToolTip("The Discord settings that stop it chopping up your "
+                                    "sounds, and a check that listens to what Discord does")
+        self.btn_discord.clicked.connect(lambda: self.show_guide("discord"))
+        v.addWidget(self.btn_discord)
+        games = QHBoxLayout()
+        self.btn_steam = QPushButton("🎮  Steam games (CS2, Dota 2, Deadlock…)")
         self.btn_steam.setToolTip("Games that use Steam voice chat take the mic from "
                                   "Steam's own settings")
         self.btn_steam.clicked.connect(self.show_steam_guide)
-        v.addWidget(self.btn_steam)
+        games.addWidget(self.btn_steam)
+        self.btn_game = QPushButton("🎮  Other games")
+        self.btn_game.setToolTip("Valorant, Fortnite, Apex, Rust… the voice chat settings "
+                                 "that matter")
+        self.btn_game.clicked.connect(lambda: self.show_guide("game"))
+        games.addWidget(self.btn_game)
+        v.addLayout(games)
         v.addStretch(1)
         v.addWidget(_label("That's it. Add sounds by dragging files onto the window, then "
                            "click one to play it. You can open this guide again any time "
@@ -496,6 +507,10 @@ class SetupWizard(QDialog):
             if not eng.is_virtual(self.win.cfg.main_device):
                 self.win.cfg.main_device = eng.virtual_outputs()[0]
             self.win.engine.set_main_device(self.win.cfg.main_device)
+            # both ends of the cable on 48 kHz: it then passes the sound through as is
+            self.win._check_cable_format()
+            if self.win.cable_bad:
+                self.win.fix_cable_format(quiet=True)
             resume_after_restart(False)
             if self._resumed:   # back from the restart, and it worked
                 self._resumed = False
@@ -627,20 +642,26 @@ class SetupWizard(QDialog):
                 "will hear your sounds.</span> Go <b>Back</b> to install it, or finish now and "
                 "this guide will open again next time.")
             self.btn_copy.hide()
+            self.btn_discord.hide()
             return
         self.btn_copy.show()
+        self.btn_discord.show()
         self.discord_text.setText(
             "Onion Board now sends your voice and sounds into a new microphone called:"
             f"<p style='font-size:15pt; font-weight:800; color:{_ok()}'>{name}</p>"
             "<b>In Discord:</b> click the ⚙ gear (User Settings) → <b>Voice &amp; Video</b> → "
-            f"<b>Input Device</b> → choose <b>{name}</b>.<br><br>"
-            f"<b>In a game:</b> open its audio / voice chat settings and set the microphone to "
-            f"<b>{name}</b>.")
+            f"<b>Input Device</b> → choose <b>{name}</b>, and set <b>Input Profile</b> to "
+            "<b>Studio</b>. Left on, Discord's noise suppression treats your sounds as "
+            "background noise and chops them up.<br><br>"
+            f"<b>In a game:</b> open its audio / voice chat settings, set the microphone to "
+            f"<b>{name}</b> and turn off its noise suppression.")
 
     def show_steam_guide(self):
-        g = SteamGuide(self, self._vm)
-        g.exec()
-        free_dialog(g)
+        self.show_guide("steam")
+
+    def show_guide(self, which: str):
+        from soundboard.ui.chatguide import show_guide
+        show_guide(which, self, self.win, self._vm)
 
     def copy_name(self):
         QApplication.clipboard().setText(self._vm)

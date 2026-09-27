@@ -150,6 +150,7 @@ class MainWindow(QMainWindow):
 
         self.setup_state = ""
         self._pill_short = False          # the header pill's short text (narrow window)
+        self.cable_bad = []               # cable ends not at 48 kHz (_check_cable_format)
         self._build_ui()
         self._init_devices()
         if self.setup_state != "ok":
@@ -685,6 +686,15 @@ class MainWindow(QMainWindow):
         self.btn_rescan.clicked.connect(self.refresh_devices)
         icons.set_icon(self.btn_rescan, "reload")
         cv.addWidget(self.btn_rescan)
+        self.btn_chat = QPushButton("Make it sound clean in Discord")
+        self.btn_chat.setToolTip("The Discord settings that stop it chopping up your sounds, "
+                                 "and a check that listens to what Discord does to them")
+        icons.set_icon(self.btn_chat, "headphones")
+        self.btn_chat.clicked.connect(lambda: self.show_chat_guide("discord"))
+        cv.addWidget(self.btn_chat)
+        self.btn_game = QPushButton("…or in a game's voice chat")
+        self.btn_game.clicked.connect(lambda: self.show_chat_guide("game"))
+        cv.addWidget(self.btn_game)
         self.btn_nomic = QPushButton("Game has no microphone setting?")
         self.btn_nomic.clicked.connect(self.open_windows_mic)
         cv.addWidget(self.btn_nomic)
@@ -715,6 +725,13 @@ class MainWindow(QMainWindow):
         self.setup_hint = hint_label("")
         self.setup_hint.setTextFormat(Qt.RichText)
         av.addWidget(self.setup_hint)
+        self.btn_cablefix = QPushButton("Fix the cable: both ends to 48 kHz")
+        self.btn_cablefix.setToolTip("Sets the cable's playback and recording side to "
+                                     "48 kHz, so it passes your sound through without "
+                                     "converting it")
+        self.btn_cablefix.clicked.connect(self.fix_cable_format)
+        self.btn_cablefix.hide()
+        av.addWidget(self.btn_cablefix, 0, Qt.AlignLeft)
         no_wheel(self.cb_main, self.cb_mon, self.cb_mic)
         for cb, attr in ((self.cb_main, "main_device"), (self.cb_mon, "mon_device"),
                          (self.cb_mic, "mic_device")):
@@ -835,7 +852,47 @@ class MainWindow(QMainWindow):
         e.set_mic_device(c.mic_device)
         e.set_main_device(c.main_device)
         e.set_mon_device(c.mon_device)
+        self._check_cable_format()
         self._update_status()
+
+    def _check_cable_format(self):
+        """Note which ends of the cable in use aren't at 48 kHz (shown on the Setup tab)."""
+        from soundboard import cableformat
+        main = self.cfg.main_device
+        vm = eng.virtual_mic_for(main)
+        try:
+            ends = cableformat.pair(cableformat.cable_ends(), main, vm) if vm else []
+        except Exception:  # noqa: BLE001 - only a hint
+            log.debug("cable format check failed", exc_info=True)
+            ends = []
+        self.cable_bad = [x for x in ends if not x.ok]
+        if self.cable_bad:
+            log.info("cable not at 48 kHz: %s",
+                     ", ".join(f"{x.name} @ {x.rate}" for x in self.cable_bad))
+
+    def fix_cable_format(self, quiet: bool = False) -> bool:
+        """Put both ends of the cable on 48 kHz, then reopen the streams at the new rate."""
+        from soundboard import cableformat
+        self._check_cable_format()
+        if not self.cable_bad:
+            return True
+        ok = cableformat.fix(self.cable_bad)
+        self.refresh_devices()   # the rates changed: rescan and reopen (re-checks too)
+        if not quiet:
+            if ok and not self.cable_bad:
+                self.status.setText(f"<span style='color:{theme.status('ok')}'>"
+                                    "✓ The cable is on 48 kHz both ends now. If Discord "
+                                    "goes quiet, rejoin the voice channel.</span>")
+            else:
+                self.status.setText(f"<span style='color:{theme.status('warn')}'>"
+                                    "Couldn't change the cable's format. Set it by hand: "
+                                    "Sound settings → the cable → Advanced → 48000 Hz."
+                                    "</span>")
+        return ok
+
+    def show_chat_guide(self, which: str):
+        from soundboard.ui.chatguide import show_guide
+        show_guide(which, self, self, self.virtual_mic or "CABLE Output")
 
     def _fill_combo(self, cb, names, current):
         cb.blockSignals(True)
@@ -852,6 +909,7 @@ class MainWindow(QMainWindow):
         setattr(self.cfg, attr, name)
         if attr == "main_device":
             self.engine.set_main_device(name)
+            self._check_cable_format()
         elif attr == "mon_device":
             self.engine.set_mon_device(name)
         else:
@@ -877,9 +935,15 @@ class MainWindow(QMainWindow):
         main = self.cfg.main_device or ""
         self.virtual_mic = eng.virtual_mic_for(main)
         if self.virtual_mic:
-            self.setup_hint.setText(f"A virtual cable is a pipe: audio goes in at <b>{main}</b> "
-                                    f"and comes out at <b>{self.virtual_mic}</b>, which Discord "
-                                    "/ the game uses as your mic.")
+            hint = (f"A virtual cable is a pipe: audio goes in at <b>{main}</b> "
+                    f"and comes out at <b>{self.virtual_mic}</b>, which Discord "
+                    "/ the game uses as your mic.")
+            if self.cable_bad:
+                rates = " and ".join(f"{x.rate / 1000:g} kHz" for x in self.cable_bad)
+                hint += (f"<br><span style='color:{theme.status('warn')}'>One end of the "
+                         f"cable is on {rates}, so it converts your sound on the way "
+                         "through. Fix it for the cleanest sound.</span>")
+            self.setup_hint.setText(hint)
         elif main:
             self.setup_hint.setText(f"<span style='color:{theme.status('warn')}'>"
                                     "That's a normal speaker/headphone "
@@ -936,7 +1000,9 @@ class MainWindow(QMainWindow):
             out = (f"<b style='color:{ok}'>{vm}</b> — your new mic "
                    f"<b style='color:{ok}'>✓ working</b>")
             step = (f"<b>The only thing you set:</b> in Discord or your game, pick "
-                    f"<b style='color:{ok}'>{vm}</b> as your <b>microphone</b>.")
+                    f"<b style='color:{ok}'>{vm}</b> as your <b>microphone</b>, and switch "
+                    "off its noise suppression (Discord: <b>Input Profile → Studio</b>), "
+                    "or it chops your sounds up.")
         else:
             state = "unrouted"
             out = f"Virtual mic  <b style='color:{bad}'>✗ not connected</b>"
@@ -949,6 +1015,9 @@ class MainWindow(QMainWindow):
         self.btn_install.setVisible(state == "missing")
         self.btn_rescan.setVisible(state == "missing")
         self.btn_nomic.setVisible(state == "ok")
+        self.btn_chat.setVisible(state == "ok")
+        self.btn_game.setVisible(state == "ok")
+        self.btn_cablefix.setVisible(state == "ok" and bool(self.cable_bad))
         self.setup_state = state
         short = self._pill_short
         if state == "ok":

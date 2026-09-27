@@ -1,0 +1,137 @@
+"""The Discord / game guides, the Discord check's plumbing (with a fake Discord
+capture) and the cable-format fix on the Setup tab. Offscreen, fake devices."""
+import numpy as np
+import pytest
+
+from soundboard import appaudio, cableformat, chatcheck
+from soundboard.ui import chatguide, setupwizard
+from tests import test_setupwizard as _sw
+
+devices, wizard = _sw.devices, _sw.wizard   # the guide's fixtures, shared
+
+
+def _text(dlg) -> str:
+    return " ".join(lbl.text() for lbl in dlg.findChildren(chatguide.QLabel))
+
+
+def test_discord_guide_says_studio_and_names_the_mic(wizard):
+    w, wiz = wizard
+    g = chatguide.DiscordGuide(wiz, w, "CABLE Output (VB-Audio Virtual Cable)")
+    t = _text(g)
+    assert "Studio" in t and "CABLE Output (VB-Audio Virtual Cable)" in t
+    assert "Automatically determine input sensitivity" in t
+    g.done(0)
+
+
+def test_game_guide_and_freeing(wizard, monkeypatch):
+    w, wiz = wizard
+    wiz.go(3)
+    g = chatguide.GameGuide(wiz, w, "CABLE Output")
+    assert "noise" in _text(g).lower()
+    g.setParent(None)
+    for cls in (chatguide.DiscordGuide, chatguide.GameGuide, setupwizard.SteamGuide):
+        monkeypatch.setattr(cls, "exec", lambda self: 0)
+    for which in ("discord", "game", "steam"):
+        wiz.show_guide(which)
+    assert not wiz.findChildren(chatguide.DiscordGuide)
+    assert not wiz.findChildren(chatguide.GameGuide)
+
+
+def test_result_text_covers_every_issue():
+    for issue in chatcheck.ISSUES:
+        html = chatguide.result_html({"issues": [issue]}, "CABLE Output")
+        assert "<li" in html
+    assert "clean" in chatguide.result_html({"issues": []}, "CABLE Output")
+    assert "nope" in chatguide.result_html({"issues": [], "error": "nope"}, "x")
+
+
+def test_check_without_discord_explains(wizard, monkeypatch):
+    w, _ = wizard
+    w.engine.main_stream = object()   # the fake devices don't open real streams
+    monkeypatch.setattr(appaudio, "supported", lambda: (True, ""))
+    monkeypatch.setattr(chatguide, "find_discord", lambda: None)
+    got = []
+    c = chatguide.ChatCheck(w.engine)
+    c.done.connect(got.append)
+    c.start()
+    assert got and "Let's Check" in got[0]["error"]
+    w.engine.main_stream = None
+
+
+class _FakeCapture:
+    """Plays Discord: 'captures' whatever the engine tapped, 0.3 s late, halved."""
+
+    engine = None
+
+    def __init__(self, pid, sink, include_tree=True, name=""):
+        self.sink, self.error = sink, None
+
+    def start(self):
+        return True
+
+    def stop(self):
+        tap = np.concatenate(self.engine.main_tap or [np.zeros((1, 2), np.float32)])
+        self.sink(np.zeros((int(0.3 * chatcheck.SR), 2), np.float32))
+        self.sink(tap * 0.5)
+
+
+def test_check_runs_end_to_end_with_a_clean_discord(wizard, monkeypatch):
+    w, _ = wizard
+    e = w.engine
+    e.main_stream = object()
+    monkeypatch.setattr(appaudio, "supported", lambda: (True, ""))
+    monkeypatch.setattr(chatguide, "find_discord",
+                        lambda: appaudio.App(pid=4242, exe="Discord.exe"))
+    _FakeCapture.engine = e
+    monkeypatch.setattr(appaudio, "AppCapture", _FakeCapture)
+    played = []
+    monkeypatch.setattr(e, "play", lambda *a, **k: played.append(k.get("only")))
+    got = []
+    c = chatguide.ChatCheck(e)
+    c.done.connect(got.append)
+    c.start()
+    assert played == ["main"] and c.running
+    # what the main output would have sent while the test played
+    e.main_tap.extend(np.array_split(chatcheck.test_signal(), 200))
+    c._timer.stop()
+    c._finish()
+    assert got and got[0]["issues"] == [] and not c.running
+    assert e.main_tap is None
+    e.main_stream = None
+
+
+def test_setup_tab_offers_and_applies_the_cable_fix(wizard, monkeypatch):
+    w, _ = wizard
+    bad = cableformat.CableEnd("CABLE Output (VB-Audio Virtual Cable)", "capture", "{id}",
+                               44100, 16, 2)
+    state = {"ends": [bad], "set": []}
+    monkeypatch.setattr(cableformat, "cable_ends", lambda names_hint=None: state["ends"])
+
+    def set_rate(end, rate=cableformat.RATE):
+        state["set"].append((end.name, rate))
+        state["ends"] = []
+        return True
+    monkeypatch.setattr(cableformat, "set_rate", set_rate)
+    w.cfg.main_device = "CABLE Input (VB-Audio Virtual Cable)"
+    w._check_cable_format()
+    assert w.cable_bad == [bad]
+    w._update_status()
+    assert "44.1 kHz" in w.setup_hint.text()
+    assert w.fix_cable_format()
+    assert state["set"] == [(bad.name, 48000)]
+    assert w.cable_bad == []
+
+
+@pytest.mark.parametrize("rate", [44100, 96000])
+def test_cable_end_ok_only_at_48k(rate):
+    assert not cableformat.CableEnd("x", "render", "i", rate, 24, 2).ok
+    assert cableformat.CableEnd("x", "render", "i", 48000, 24, 2).ok
+
+
+def test_with_rate_rewrites_rate_and_byte_rate():
+    from soundboard.appaudio import WAVEFORMATEX
+    wf = WAVEFORMATEX(1, 2, 44100, 44100 * 4, 4, 16, 0)
+    raw = bytearray(bytes(wf))
+    out = cableformat._with_rate(raw, 48000)
+    assert cableformat._parse(out) == (48000, 16, 2)
+    assert WAVEFORMATEX.from_buffer_copy(bytes(out)).nAvgBytesPerSec == 48000 * 4

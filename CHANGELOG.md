@@ -2,6 +2,20 @@
 
 ## Unreleased
 
+- **Your sounds come through clean in Discord.** Discord cleans up your mic for
+  talking, and left on, that cleanup treats music and sound effects as noise and
+  chops them up. The setup guide and the Setup tab now say what to switch off
+  (Discord: *Input Profile → Studio*), with a guide for game voice chat too.
+- **Check Discord.** With Discord's *Let's Check* running, one click plays a short
+  test into your mic, listens to what Discord plays back, and tells you exactly
+  which Discord setting is still hurting your sounds: noise suppression, the
+  voice-activity gate cutting quiet parts, or automatic gain control pumping the
+  volume.
+- **The virtual cable passes your sound through untouched.** Windows sometimes
+  puts one end of the cable on 44.1 kHz, and the cable then converts everything on
+  the way through. The Setup tab spots it and fixes it in one click (the setup
+  guide does it for you).
+
 ## 1.2.3 — 2026-09-27
 
 A bug-fix release from a feature-by-feature test of the whole app.
