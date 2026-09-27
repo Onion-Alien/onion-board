@@ -4,9 +4,9 @@ their widgets and emit plain values; the main window maps those onto the config
 and the engine."""
 from __future__ import annotations
 
-from PySide6.QtCore import Qt, Signal
+from PySide6.QtCore import QPoint, QRect, QSize, Qt, Signal
 from PySide6.QtWidgets import (QCheckBox, QComboBox, QFrame, QGridLayout, QHBoxLayout, QLabel,
-                               QSlider, QSpinBox, QVBoxLayout, QWidget)
+                               QLayout, QSlider, QSpinBox, QVBoxLayout, QWidget)
 
 from soundboard.eq import BAND_LABELS as EQ_LABELS
 from soundboard.eq import MAX_DB as EQ_MAX_DB
@@ -45,6 +45,64 @@ def bar(margins=(10, 8, 12, 8)) -> tuple[QFrame, QHBoxLayout]:
     h.setContentsMargins(*margins)
     h.setSpacing(10)
     return f, h
+
+
+class Flow(QLayout):
+    """Lays its widgets out left to right, wrapping onto new lines (the Radio tab's
+    genre chips, the Triggers tab's settings)."""
+
+    def __init__(self, parent=None, gap: int = 6):
+        super().__init__(parent)
+        self._items, self._gap = [], gap
+        self.setContentsMargins(0, 0, 0, 0)
+
+    def addItem(self, item):
+        self._items.append(item)
+
+    def count(self):
+        return len(self._items)
+
+    def itemAt(self, i):
+        return self._items[i] if 0 <= i < len(self._items) else None
+
+    def takeAt(self, i):
+        return self._items.pop(i) if 0 <= i < len(self._items) else None
+
+    def expandingDirections(self):
+        return Qt.Orientation(0)
+
+    def hasHeightForWidth(self):
+        return True
+
+    def heightForWidth(self, w):
+        return self._place(QRect(0, 0, w, 0), move=False)
+
+    def setGeometry(self, rect):
+        super().setGeometry(rect)
+        self._place(rect, move=True)
+
+    def sizeHint(self):
+        return self.minimumSize()
+
+    def minimumSize(self):
+        size = QSize()
+        for it in self._items:
+            size = size.expandedTo(it.minimumSize())
+        return size
+
+    def _place(self, rect: QRect, move: bool) -> int:
+        x, y, line = rect.x(), rect.y(), 0
+        for it in self._items:
+            if it.isEmpty():
+                continue
+            hint = it.sizeHint()
+            if line and x + hint.width() > rect.right() + 1:
+                x, y, line = rect.x(), y + line + self._gap, 0
+            if move:
+                it.setGeometry(QRect(QPoint(x, y), hint))
+            x += hint.width() + self._gap
+            line = max(line, hint.height())
+        return y + line - rect.y()
 
 
 def card(title: str = "", hint: str = "") -> tuple[QFrame, QVBoxLayout]:

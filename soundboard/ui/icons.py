@@ -350,6 +350,18 @@ def _apps(p, fill):
     p.drawLine(QPointF(9.5, 16), QPointF(9.5, 20))
 
 
+def _eye(p, fill):
+    """The Triggers tab: an eye, watching the screen."""
+    path = QPainterPath(QPointF(2.5, 12))
+    path.cubicTo(QPointF(6, 5.5), QPointF(18, 5.5), QPointF(21.5, 12))
+    path.cubicTo(QPointF(18, 18.5), QPointF(6, 18.5), QPointF(2.5, 12))
+    p.drawPath(path)
+    p.drawEllipse(QPointF(12, 12), 3.2, 3.2)
+    dot = QPainterPath()
+    dot.addEllipse(QPointF(12, 12), 1.3, 1.3)
+    fill(dot)
+
+
 SHAPES = {
     "sounds": _grid, "browser": _globe, "voice": _mask, "setup": _sliders, "wave": _wave,
     "mic": _mic, "headphones": _headphones, "volume": _volume, "ear": _ear,
@@ -359,7 +371,7 @@ SHAPES = {
     "speech": _speech, "cable": _cable, "check": _check, "warn": _warn, "folder": _folder,
     "next": _next, "edit": _edit, "trash": _trash, "keyboard": _keyboard,
     "palette": _palette, "gamepad": _gamepad, "image": _image, "radio": _radio,
-    "apps": _apps,
+    "apps": _apps, "triggers": _eye,
 }
 
 

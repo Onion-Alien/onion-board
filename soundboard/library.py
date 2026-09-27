@@ -36,7 +36,7 @@ SOUNDS_DIR = APP_DIR / "sounds"
 CACHE_DIR = APP_DIR / "cache"
 THUMBS_DIR = APP_DIR / "thumbs"   # pad pictures (soundboard.thumbs)
 CONFIG_PATH = APP_DIR / "config.json"
-CONFIG_VERSION = 3
+CONFIG_VERSION = 4
 CONFIG_BACKUPS = 3   # config.json.1 … .3, rotated on every save that changes something
 # where install-vbcable.ps1 lives: installer/ in a source checkout, or the frozen
 # app's _internal folder (PyInstaller's _MEIPASS; build.ps1 bundles it at its root)
@@ -171,7 +171,7 @@ class Config:
     ptt_key: str = ""           # key held down while sounds play (game push-to-talk)
     always_on_top: bool = False
     pad_width: int = 150
-    tab: int = 0                      # 0 = sounds, 1 = radio, 2 = apps, 3 = voice, 4 = setup
+    tab: int = 0     # 0 = sounds, 1 = radio, 2 = apps, 3 = triggers, 4 = voice, 5 = setup
     # fetch newer yt-dlp versions from PyPI by itself: opt-in, since that's code the app
     # runs (named *_optin so configs saved while it defaulted to on start off again)
     ytdlp_auto_optin: bool = False
@@ -182,6 +182,8 @@ class Config:
     overlay: dict = field(default_factory=dict)    # in-game overlay (ui.overlay.OverlaySettings)
     radio: dict = field(default_factory=dict)      # Radio tab: vol, monitor, favorites, last
     apps: dict = field(default_factory=dict)       # Apps tab: exe -> {vol, monitor} to re-capture
+    # Triggers tab: on, interval_ms, monitor, triggers (soundboard.screenwatch.Trigger)
+    screen: dict = field(default_factory=dict)
     categories: list[str] = field(default_factory=list)   # pad categories, in tab order
     category: str = ""                # the category the Sounds tab shows; "" = all
     tray: bool = True                 # closing the window keeps the app in the tray
@@ -399,7 +401,15 @@ def _migrate_2_to_3(raw: dict) -> dict:
     return raw
 
 
-MIGRATIONS = {1: _migrate_1_to_2, 2: _migrate_2_to_3}
+def _migrate_3_to_4(raw: dict) -> dict:
+    """v4 added the Triggers tab after Apps (tab 3): Voice and Setup move up one."""
+    tab = raw.get("tab")
+    if isinstance(tab, int) and not isinstance(tab, bool) and tab >= 3:
+        raw["tab"] = tab + 1
+    return raw
+
+
+MIGRATIONS = {1: _migrate_1_to_2, 2: _migrate_2_to_3, 3: _migrate_3_to_4}
 
 
 # --------------------------------------------------------------------------- decoding

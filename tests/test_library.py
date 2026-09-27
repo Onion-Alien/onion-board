@@ -82,11 +82,17 @@ def test_v1_config_is_migrated_and_rewritten_relative(app_dir):
     assert raw2["version"] == library.CONFIG_VERSION and raw2["sounds"][0]["file"] == "old.wav"
 
 
-@pytest.mark.parametrize("old, new", [(0, 0), (1, 0), (2, 1), (3, 2), (4, 3), (5, 4)])
+# v2 -> v3 moves tabs down past Browser, v3 -> v4 moves Voice / Setup up past Triggers
+@pytest.mark.parametrize("old, new", [(0, 0), (1, 0), (2, 1), (3, 2), (4, 4), (5, 5)])
 def test_v2_config_moves_tabs_down_past_the_removed_browser_tab(old, new):
     c = Config.from_raw({"version": 2, "tab": old, "browser_live": True,
                          "rec_hotkey": "ctrl+alt+r"})
     assert c.tab == new and not hasattr(c, "browser_live") and not hasattr(c, "rec_hotkey")
+
+
+@pytest.mark.parametrize("old, new", [(0, 0), (1, 1), (2, 2), (3, 4), (4, 5)])
+def test_v3_config_moves_voice_and_setup_past_the_new_triggers_tab(old, new):
+    assert Config.from_raw({"version": 3, "tab": old}).tab == new
 
 
 def test_save_keeps_rotating_backups_only_when_something_changed(app_dir):

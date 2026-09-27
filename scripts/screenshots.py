@@ -33,7 +33,7 @@ import soundfile as sf  # noqa: E402
 from PySide6.QtCore import QEventLoop  # noqa: E402
 from PySide6.QtWidgets import QApplication  # noqa: E402
 
-from soundboard import appaudio, autostart, engine, library, winkeys  # noqa: E402
+from soundboard import appaudio, autostart, engine, library, screenwatch, winkeys  # noqa: E402
 
 OUTS = ["CABLE Input (VB-Audio Virtual Cable)", "Headphones (USB Audio Device)",
         "Speakers (Realtek(R) Audio)"]
@@ -49,6 +49,10 @@ SOUNDS = [("Airhorn", "F1", "Memes"), ("Vine Boom", "F2", "Memes"),
           ("Oof", "", "Memes"), ("Record Scratch", "", "Music"),
           ("Dun Dun Dunn", "", "Memes"), ("Laugh Track", "", "Reactions"),
           ("Bonk", "F5", "Memes")]
+# Triggers tab: (name, picture text, text colour, sound index, wait, live match %)
+TRIGGERS = [("Died", "YOU DIED", "#b3202a", 2, 1.5, 12),
+            ("Boss beaten", "VICTORY ACHIEVED", "#e8c15a", 9, 0.0, 91),
+            ("Headshot", "HEADSHOT", "#ffffff", 13, 0.0, 34)]
 
 
 class _Stream:
@@ -73,6 +77,9 @@ def fake_machine(tmp: Path):
     for setter, attr in (("set_main_device", "main_stream"), ("set_mon_device", "mon_stream"),
                          ("set_mic_device", "mic_stream")):
         setattr(engine.Engine, setter, lambda self, n, _a=attr: setattr(self, _a, _Stream()))
+    # the Triggers tab: one made-up screen, and a watcher that never reads the real one
+    screenwatch.monitors = lambda: [screenwatch.Monitor(0, 0, 1920, 1080, True)]
+    screenwatch.Watcher.start = lambda self: None
     appaudio.list_apps = lambda: [
         appaudio.App(pid=1000 + i, exe=exe, title=title, active=on, peak=0.4 if on else 0.0,
                      devices=[OUTS[1]], session_pids={1000 + i})
@@ -91,7 +98,29 @@ def demo_config(tmp: Path, theme: str):
                                         color=library.PAD_COLORS[i % len(library.PAD_COLORS)],
                                         tags=[tag]))
     library.Config(sounds=sounds, categories=["Memes", "Reactions", "Music"],
-                   setup_done=True, theme=theme).save()
+                   setup_done=True, theme=theme, screen={"triggers": demo_triggers(tmp)}).save()
+
+
+def demo_triggers(tmp: Path) -> list[dict]:
+    """Made-up trigger pictures: a word on a dark band, drawn here."""
+    from PySide6.QtCore import Qt
+    from PySide6.QtGui import QColor, QFont, QImage, QPainter
+    out = []
+    (tmp / "triggers").mkdir(exist_ok=True)
+    for i, (name, text, colour, sound, wait, _live) in enumerate(TRIGGERS):
+        img = QImage(360, 110, QImage.Format_RGB32)
+        img.fill(QColor("#0b0b0d"))
+        p = QPainter(img)
+        p.setRenderHint(QPainter.Antialiasing)
+        p.setPen(QColor(colour))
+        p.setFont(QFont("Georgia", 34 if len(text) < 10 else 22))
+        p.drawText(img.rect(), Qt.AlignCenter, text)
+        p.end()
+        path = tmp / "triggers" / f"t{i}.png"
+        img.save(str(path))
+        out.append({"id": f"t{i}", "name": name, "image": str(path), "sound": f"s{sound}",
+                    "delay": wait, "cooldown": 5.0})
+    return out
 
 
 def main():
@@ -132,6 +161,15 @@ def main():
         w.tabs.setCurrentWidget(page)
         spin()
         save(w, name)
+    tr = w.triggers
+    tr.set_watching(True)             # Watcher.start is a no-op here (fake_machine)
+    tr.poll.stop()                    # show made-up live matches instead
+    w.tabs.setCurrentWidget(tr)
+    for i, row in enumerate(tr.rows.values()):
+        row.show_score(TRIGGERS[i][5] / 100)
+    tr.rows["t1"].flash("Played!", 60000)
+    spin()
+    save(w, "triggers")
     w.tabs.setCurrentWidget(w.sounds_page)
 
     d = SettingsDialog(w, "hotkeys")

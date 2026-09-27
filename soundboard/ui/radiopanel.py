@@ -14,11 +14,11 @@ import zlib
 from string import Template
 
 import numpy as np
-from PySide6.QtCore import (QEvent, QFile, QIODevice, QObject, QPoint, QRect, QRectF, QSize,
+from PySide6.QtCore import (QEvent, QFile, QIODevice, QObject, QRect, QRectF, QSize,
                             Qt, QTimer, QUrl, Signal, Slot)
 from PySide6.QtGui import QColor, QFont, QFontMetrics, QPainter, QPainterPath
 from PySide6.QtWidgets import (QButtonGroup, QCheckBox, QComboBox, QFrame, QHBoxLayout,
-                               QLabel, QLayout, QLineEdit, QListWidget, QListWidgetItem,
+                               QLabel, QLineEdit, QListWidget, QListWidgetItem,
                                QPushButton, QSizePolicy, QSplitter, QStyle,
                                QStyledItemDelegate, QVBoxLayout, QWidget)
 
@@ -27,6 +27,7 @@ from soundboard.engine import SR
 from soundboard.library import MAX_SECONDS, trim_silence
 from soundboard.radio import RadioDirectory, RadioPlayer, Station
 from soundboard.ui import icons
+from soundboard.ui.panel import Flow as _Flow
 from soundboard.ui.panel import VolumeControl, bar, icon_label, vsep
 
 log = logging.getLogger(__name__)
@@ -96,63 +97,6 @@ class _Bridge(QObject):
     @Slot(str)
     def play(self, uuid):
         self.clicked.emit(str(uuid)[:64])
-
-
-class _Flow(QLayout):
-    """Lays its widgets out left to right, wrapping onto new lines (the genre chips)."""
-
-    def __init__(self, parent=None, gap: int = 6):
-        super().__init__(parent)
-        self._items, self._gap = [], gap
-        self.setContentsMargins(0, 0, 0, 0)
-
-    def addItem(self, item):
-        self._items.append(item)
-
-    def count(self):
-        return len(self._items)
-
-    def itemAt(self, i):
-        return self._items[i] if 0 <= i < len(self._items) else None
-
-    def takeAt(self, i):
-        return self._items.pop(i) if 0 <= i < len(self._items) else None
-
-    def expandingDirections(self):
-        return Qt.Orientation(0)
-
-    def hasHeightForWidth(self):
-        return True
-
-    def heightForWidth(self, w):
-        return self._place(QRect(0, 0, w, 0), move=False)
-
-    def setGeometry(self, rect):
-        super().setGeometry(rect)
-        self._place(rect, move=True)
-
-    def sizeHint(self):
-        return self.minimumSize()
-
-    def minimumSize(self):
-        size = QSize()
-        for it in self._items:
-            size = size.expandedTo(it.minimumSize())
-        return size
-
-    def _place(self, rect: QRect, move: bool) -> int:
-        x, y, line = rect.x(), rect.y(), 0
-        for it in self._items:
-            if it.isEmpty():
-                continue
-            hint = it.sizeHint()
-            if line and x + hint.width() > rect.right() + 1:
-                x, y, line = rect.x(), y + line + self._gap, 0
-            if move:
-                it.setGeometry(QRect(QPoint(x, y), hint))
-            x += hint.width() + self._gap
-            line = max(line, hint.height())
-        return y + line - rect.y()
 
 
 class _StationDelegate(QStyledItemDelegate):

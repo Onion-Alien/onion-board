@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+- **New Triggers tab: play a sound when something shows up on your screen.**
+  Give it a picture (paste one cut with Win+Shift+S, or pick a file), for example
+  a game's "YOU DIED", and the sound to play. It plays straight away or after a
+  wait you set, once per appearance, with a cooldown and an adjustable match
+  level that shows the live match next to it. Checks every 100 ms by default
+  (down to 16 ms). Watching is remembered, so it carries on next time the app
+  opens.
 - **Who's listening is on the Setup tab.** The Discord / Steam / game voice modes
   (and *Custom modes…* for any other codec) were only in Settings → General; they
   now have their own card under Devices. Settings keeps a copy, and the two stay

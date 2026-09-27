@@ -46,6 +46,7 @@ from soundboard.ui.ytsearch import SearchResults
 from soundboard.ui.padbatch import PadSelection
 from soundboard.ui.overlay import Overlay
 from soundboard.ui.appspanel import AppsTab
+from soundboard.ui.triggerspanel import TriggersTab
 from soundboard.ui.radiopanel import RadioTab
 from soundboard.ui.voicepanel import VoicePanel
 from soundboard.ui.widgets import (Meter, Pad, PadGrid, SeekSlider, expand_dropped, fmt_pos,
@@ -60,6 +61,7 @@ log = logging.getLogger(__name__)
 TABS = (("Sounds", "Your sound buttons: click one to play it"),
         ("Radio", "Internet radio stations from around the world"),
         ("Apps", "Send another program's sound (music player, game…)"),
+        ("Triggers", "Play a sound when something shows up on your screen (“YOU DIED”…)"),
         ("Voice", "Change your voice, or talk as a computer voice"),
         ("Setup", "Connect to Discord / games, pick devices, test it"))
 
@@ -183,7 +185,6 @@ class MainWindow(QMainWindow):
         else:
             self._pending_note = self.cfg.load_note
 
-
     # ------------------------------------------------------------------ UI build
     # Layout: header (setup pill, Stop all, Settings) / tabs / mixer strip / status.
     # Every tab is built the same way: a toolbar row on top, its content, and a
@@ -281,6 +282,9 @@ class MainWindow(QMainWindow):
         self.apps = AppsTab(self.engine, self.cfg, self._save_later, Meter)
         self.apps.clip_ready.connect(self.on_clip)
         self.tabs.addTab(self.apps, "")
+        self.triggers = TriggersTab(self.cfg, self._save_later, self._trigger_sounds, self.play)
+        self.triggers.add_sound.connect(lambda path: self.import_files([path]))
+        self.tabs.addTab(self.triggers, "")
         self.voice = VoicePanel(self.engine, self.cfg.voice_fx, self.cfg.speech)
         self.voice.fx_changed.connect(lambda spec: self.set_option("voice_fx", spec))
         self.voice.speech_changed.connect(lambda s: self.set_option("speech", s))
@@ -300,6 +304,10 @@ class MainWindow(QMainWindow):
         self.voice.active_changed.connect(lambda on: set_tab_live(
             self.tabs, vi, on, "● ON: others hear your changed / computer voice", "voice"))
         set_tab_live(self.tabs, vi, self.voice.is_active(), icon="voice")
+        ti = self.tabs.indexOf(self.triggers)
+        self.triggers.active_changed.connect(lambda on: set_tab_live(
+            self.tabs, ti, on, "● ON: watching your screen", "triggers"))
+        set_tab_live(self.tabs, ti, self.triggers.is_active(), icon="triggers")
 
         # ---- mixer strip: the things that apply whatever tab you're on
         rv.addWidget(self._build_mixer())
@@ -1171,11 +1179,16 @@ class MainWindow(QMainWindow):
         self.engine.stop_all()
         self.radio.stop()
         self.apps.stop_all()
+        self.triggers.cancel_pending()
 
     # ------------------------------------------------------------------ sounds
     def _index(self):
         """Rebuild the id -> meta lookup (call after any change to cfg.sounds)."""
         self._meta = {m.id: m for m in self.cfg.sounds}
+
+    def _trigger_sounds(self) -> list[tuple[str, str, str]]:
+        """The Triggers tab's sound list: (id, name, fingerprint) of every sound."""
+        return [(m.id, m.name, m.fingerprint) for m in self.cfg.sounds]
 
     def meta(self, sid) -> SoundMeta | None:
         if sid == LINK_ID:
@@ -1335,6 +1348,8 @@ class MainWindow(QMainWindow):
         """Sync the pad widgets with cfg.sounds: keep the ones that still exist, create
         the new ones, drop the removed ones."""
         self._index()
+        if getattr(self, "triggers", None) is not None:   # not built yet on the first call
+            self.triggers.sounds_changed()
         keep = {m.id for m in self.cfg.sounds}
         for sid in [s for s in self.pads if s not in keep]:
             p = self.pads.pop(sid)
@@ -2521,6 +2536,7 @@ class MainWindow(QMainWindow):
         f.add(80, "w", r.hide(self.pill))
         f.extend(self.radio.fit_steps())
         f.extend(self.voice.fit_steps())
+        f.extend(self.triggers.fit_steps())
         # height: the status line, then the whole mixer strip
         f.add(10, "h", r.hide(self.status))
         f.add(30, "h", r.hide(*self._deck_titles))
@@ -2596,7 +2612,8 @@ class MainWindow(QMainWindow):
         for step in (self._finish_removals, self.timer.stop, self._release_ptt,
                      self._stop_capture, self.cfg.save, self.overlay.shutdown,
                      self.hotkeys.stop, self.remote.stop,
-                     self.radio.shutdown, self.apps.shutdown, self.linkbar.shutdown,
+                     self.radio.shutdown, self.apps.shutdown, self.triggers.shutdown,
+                     self.linkbar.shutdown,
                      self.voice.shutdown, self.engine.shutdown):
             try:
                 step()
