@@ -267,9 +267,9 @@ def frame(w: int, h: int, t: float, shot: QImage) -> QImage:
             sh = sw * shot.height() / shot.width()
             target = QRectF((w - sw) / 2, h * 0.30, sw, sh)
         else:
-            sh = h * 0.62
+            sh = h * 0.60
             sw = sh * shot.width() / shot.height()
-            target = QRectF((w - sw) / 2, h * 0.30, sw, sh)
+            target = QRectF((w - sw) / 2, h * 0.32, sw, sh)
         p.setPen(QPen(EDGE, 3))
         p.drawImage(target, shot)
         p.drawRect(target)
@@ -277,7 +277,7 @@ def frame(w: int, h: int, t: float, shot: QImage) -> QImage:
                   w * (0.14 if vertical else 0.06))
         caption(p, QRectF(0, h * (0.17 if vertical else 0.16), w, h * 0.06), "Onion Board",
                 w * (0.085 if vertical else 0.045))
-        caption(p, QRectF(0, h * (0.22 if vertical else 0.22), w, h * 0.05),
+        caption(p, QRectF(0, h * (0.22 if vertical else 0.235), w, h * 0.05),
                 "free soundboard for Windows", w * (0.05 if vertical else 0.026), 1, MUTED,
                 bold=False)
         if vertical:
