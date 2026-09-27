@@ -93,6 +93,7 @@ class MainWindow(QMainWindow):
         app = QApplication.instance()
         if app is not None:   # before the UI is built, so everything polishes in-theme
             self.cfg.theme = theme.apply(app, self.cfg.theme)
+            app.commitDataRequest.connect(self._on_session_end)   # log-off / installer
         self.engine = Engine()
         self.audio: dict[str, np.ndarray] = {}
         self.pads: dict[str, Pad] = {}
@@ -2223,6 +2224,13 @@ class MainWindow(QMainWindow):
     def quit_app(self):
         self._quitting = True
         self.close()
+
+    def _on_session_end(self, _manager=None):
+        """Windows is logging off, shutting down, or an installer / updater asked the
+        app to close (the Restart Manager sends the same message). Closing then really
+        quits: hiding to the tray would veto it, and an upgrade run while the app is
+        open would fail with "Setup was unable to close all applications"."""
+        self._quitting = True
 
     def apply_remote(self) -> str:
         """Start / stop the local control API to match the settings; "" or an error."""

@@ -4,6 +4,10 @@
 
 ## 1.2.1 — 2026-09-27
 
+- **Installing an update while Onion Board is open works.** The installer's
+  request to close the app used to just hide it to the tray, so setup stopped
+  with "unable to close all applications". It now closes properly (logging off
+  or shutting Windows down with the app open is handled the same way).
 - **Custom destination modes: the form works straight away.** With no custom
   modes yet, its fields ignored clicks and typing until you pressed *Add*. Now
   the first thing you type makes the mode.

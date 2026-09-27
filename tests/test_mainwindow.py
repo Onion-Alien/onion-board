@@ -237,3 +237,34 @@ def test_mute_switch_silences_what_others_hear(window):
     assert not out.any()
     window.set_sending(True)
     assert e.sending and window.btn_air.isChecked() and "Live" in window.btn_air.text()
+
+
+def test_an_installer_or_log_off_really_closes_the_app(window, monkeypatch):
+    """Closing normally hides to the tray; but when Windows asks the app to close
+    (log-off, or an installer through the Restart Manager) hiding would veto it and
+    the upgrade would fail with "unable to close all applications"."""
+    from PySide6.QtGui import QCloseEvent
+
+    class Tray:
+        def isVisible(self):
+            return True
+
+        def hide(self):
+            pass
+
+        def showMessage(self, *a):
+            pass
+
+    monkeypatch.setattr(window, "tray", Tray())
+    monkeypatch.setattr(window, "shutdown", lambda: None)
+    monkeypatch.setattr(main.QTimer, "singleShot", staticmethod(lambda *a: None))
+    window.cfg.tray = True
+    ev = QCloseEvent()
+    window.closeEvent(ev)
+    assert not ev.isAccepted()                  # the ✕ button: off to the tray
+    app = QApplication.instance()          # Windows' request reaches the window...
+    assert app.receivers("2commitDataRequest(QSessionManager&)") >= 1
+    window._on_session_end()               # ...(emitting it here needs a real session)
+    ev = QCloseEvent()
+    window.closeEvent(ev)
+    assert ev.isAccepted()
