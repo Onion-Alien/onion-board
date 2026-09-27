@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 1.2.2 — 2026-09-27
+
 - **Triggers keep working when a game switches display mode.** When a game went
   into (or out of) exclusive fullscreen at another resolution, the screen capture
   quietly froze on its last picture or went black, and the tab told you to switch
