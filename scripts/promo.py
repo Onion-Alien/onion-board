@@ -2,11 +2,11 @@
 up, the Triggers tab spots it and a sad trombone plays.
 
     .venv\\Scripts\\python scripts/promo.py --out <folder>
-        [--gif docs\\screenshots\\triggers-demo.gif]
+        [--gif <file>.gif]
 
 Writes `onionboard-triggers-vertical.mp4` (1080 x 1920, for TikTok / Shorts /
 Reels) and `onionboard-triggers-wide.mp4` (1280 x 720) into --out, and with --gif a
-small looping GIF of the wide version for the README. Everything is drawn here with
+small looping GIF of the wide version. Everything is drawn here with
 QPainter (the game scene, the app's trigger card) and the trombone is synthesized
 with numpy, so nothing from anyone's game or sound library is used. Needs ffmpeg
 on PATH. Runs on Qt's offscreen platform: no window appears.
