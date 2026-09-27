@@ -2,6 +2,18 @@
 
 ## Unreleased
 
+## 1.1.0 — 2026-09-27
+
+- **Installing the virtual cable no longer takes over your speakers.** Windows
+  often makes "CABLE Input" the default speakers (and "CABLE Output" the default
+  mic) when the cable installs, which silenced the PC until you switched back by
+  hand. The installer now remembers your defaults and puts them back.
+- **Two new themes:** Cherry Blossom (light sakura pink) and Carbon (graphite grey
+  with a carbon-fibre weave).
+- **Uninstalling offers to remove the cable again after a reinstall.** The installer
+  now asks Windows whether a cable is really there instead of looking for files VB-
+  Audio's uninstaller leaves behind, so it remembers when it was the one that
+  installed the cable.
 - **A much smaller download.** The build now leaves out the parts of Qt the app
   never uses (QML, 3D, charts, Chromium's developer tools, translations) and
   compresses harder: about a third of the previous installer size, and the
