@@ -43,6 +43,13 @@ FLAT_STD = 2 / 255      # screen windows flatter than this never match (blank ar
 BLACK_LEVEL = 3 / 255   # a whole frame darker than this is a capture that can't see the game
 INTERVALS_MS = (16, 33, 50, 100, 250, 500)
 DEFAULT_INTERVAL_MS = 100
+RETRY_S = 1.0           # how often a lost capture is tried again
+GIVE_UP_S = 20.0        # ...and how long before the whole capture is set up afresh
+
+
+class CaptureLost(OSError):
+    """The capture can't be brought back by itself (raised from grab()): close the
+    grabber and open a new one."""
 
 
 @dataclass
@@ -288,13 +295,16 @@ class Grabber:
     taken at twice that size with GDI's plain pixel-dropping shrink (COLORONCOLOR:
     ~1 ms of CPU, where the smoother HALFTONE costs over 10) and each 2x2 block is
     then averaged, so thin text still shows. GDI handles belong to the thread that
-    made them: create, use and close it on the watcher thread."""
+    made them: create, use and close it on the watcher thread. `source` is the size
+    in pixels of what's being copied (the monitor); `lost` is never set here."""
 
     SRCCOPY = 0x00CC0020
     COLORONCOLOR = 3
+    lost = False
 
     def __init__(self, src: Monitor, w: int, h: int):
         self.src, self.w, self.h = src, w, h
+        self.source = (src.width, src.height)
         self.factor = 2 if 2 * w <= src.width and 2 * h <= src.height else 1
         cw, ch = w * self.factor, h * self.factor
         self.cw, self.ch = cw, ch
@@ -340,6 +350,11 @@ class Grabber:
                                   s.left, s.top, s.width, s.height, self.SRCCOPY):
             return None
         return gray_2x(self.pixels) if self.factor == 2 else to_gray(self.pixels)
+
+    def resize(self, w: int, h: int):
+        """Copy at a new size from now on."""
+        self.close()
+        self.__init__(self.src, w, h)
 
     def close(self):
         g, u = self._g, self._u
@@ -423,41 +438,60 @@ class _MAPPED(ctypes.Structure):
                 ("DepthPitch", ctypes.c_uint)]
 
 
+class _OUTDUPL_DESC(ctypes.Structure):
+    """DXGI_OUTDUPL_DESC: the mode the duplicated frames come in."""
+    _fields_ = [("Width", ctypes.c_uint), ("Height", ctypes.c_uint),
+                ("RefreshNum", ctypes.c_uint), ("RefreshDen", ctypes.c_uint),
+                ("Format", ctypes.c_uint), ("ScanlineOrdering", ctypes.c_uint),
+                ("Scaling", ctypes.c_uint), ("Rotation", ctypes.c_uint),
+                ("DesktopImageInSystemMemory", wintypes.BOOL)]
+
+
 class DupGrabber:
     """Desktop Duplication (IDXGIOutputDuplication): the frames the graphics card
     shows, so fullscreen games are seen too, where GDI may only see black. Same
     interface as Grabber. Each frame is copied to a CPU-readable texture and sampled
-    at twice (w, h), then averaged 2x2. An unchanged screen (no new frame) gives
-    the last one again. Everything lives on the thread that made it."""
+    at twice (w, h), then averaged 2x2. Everything lives on the thread that made it.
+
+    The frames are the size of the output's *current mode*, not of the desktop
+    rectangle: a game in exclusive fullscreen at another resolution changes it (the
+    duplication is lost and remade, and `source` follows), and a process that isn't
+    DPI-aware is told a scaled-down rectangle. The staging texture and the sampling
+    are laid out from the mode, since a copy between textures of different sizes is
+    dropped without a word and the picture would just freeze or stay black.
+
+    While the duplication is lost (a mode switch, the UAC or lock screen) grab()
+    gives None and `lost` is set; it's tried again every RETRY_S. If that keeps
+    failing for GIVE_UP_S, grab() raises CaptureLost so the owner starts over."""
 
     # vtable slots (IUnknown 0-2, IDXGIObject 3-6, ID3D11DeviceChild 3-6)
     FACTORY_ENUM_ADAPTERS1 = 12
     ADAPTER_ENUM_OUTPUTS = 7
     OUTPUT_GET_DESC = 7
     OUTPUT1_DUPLICATE = 22
+    DUP_GET_DESC = 7
     DUP_ACQUIRE = 8
     DUP_RELEASE_FRAME = 14
     DEVICE_CREATE_TEXTURE2D = 5
     CTX_MAP, CTX_UNMAP, CTX_COPY_RESOURCE = 14, 15, 47
-    B8G8R8A8 = 87
     USAGE_STAGING, CPU_ACCESS_READ, MAP_READ = 3, 0x20000, 1
-    RETRY_S = 1.0             # how often a lost duplication is tried again
 
     def __init__(self, src: Monitor, w: int, h: int):
         self.src, self.w, self.h = src, w, h
-        self.factor = 2 if 2 * w <= src.width and 2 * h <= src.height else 1
+        self.source = (src.width, src.height)     # the frames' size; see _duplicate
+        self.factor = 1
         self.device, self.ctx, self.output1 = _COM(), _COM(), _COM()
         self.dup, self.staging = _COM(), _COM()
+        self._mode: tuple[int, int, int] | None = None   # the staging texture's (w, h, format)
         self.last: np.ndarray | None = None
+        self.lost = False
         self._lost_at = 0.0
+        self._lost_since = 0.0
         try:
             self._open()
         except Exception:
             self.close()
             raise
-        n = self.factor
-        self.ys = ((np.arange(h * n) + 0.5) * src.height / (h * n)).astype(np.intp)
-        self.xs = ((np.arange(w * n) + 0.5) * src.width / (w * n)).astype(np.intp)
         for _ in range(5):          # the first real frame follows soon after opening
             if self.grab(timeout_ms=100) is not None:
                 break
@@ -487,13 +521,6 @@ class DupGrabber:
             adapter.release()
             output.release()
         self._duplicate()
-        desc = _TEXTURE2D_DESC(self.src.width, self.src.height, 1, 1, self.B8G8R8A8, 1, 0,
-                               self.USAGE_STAGING, 0, self.CPU_ACCESS_READ, 0)
-        hr = self.device.call(self.DEVICE_CREATE_TEXTURE2D, ctypes.byref(desc), None,
-                              ctypes.byref(self.staging.p),
-                              argtypes=(ctypes.c_void_p, ctypes.c_void_p, ctypes.c_void_p))
-        if hr < 0:
-            raise OSError(f"CreateTexture2D failed (0x{_hr(hr):08X})")
 
     def _find_output(self, factory: _COM) -> tuple[_COM, _COM]:
         """The graphics card and output showing self.src (matched by position)."""
@@ -521,22 +548,61 @@ class DupGrabber:
         raise OSError("no graphics output shows that monitor unrotated")
 
     def _duplicate(self):
+        """(Re)start the duplication and lay out the staging texture and the sampling
+        for the mode its frames come in."""
         self.dup.release()
         hr = self.output1.call(self.OUTPUT1_DUPLICATE, self.device.p, ctypes.byref(self.dup.p),
                                argtypes=(ctypes.c_void_p, ctypes.c_void_p))
         if hr < 0:
             raise OSError(f"DuplicateOutput failed (0x{_hr(hr):08X})")
+        d = _OUTDUPL_DESC()
+        self.dup.call(self.DUP_GET_DESC, ctypes.byref(d), restype=None,
+                      argtypes=(ctypes.c_void_p,))
+        if d.Rotation not in (0, 1) or d.Width < 2 or d.Height < 2:
+            raise OSError(f"unusable duplication mode {d.Width}x{d.Height} "
+                          f"rotation {d.Rotation}")
+        mode = (int(d.Width), int(d.Height), int(d.Format))
+        if mode != self._mode:
+            self.staging.release()
+            desc = _TEXTURE2D_DESC(mode[0], mode[1], 1, 1, mode[2], 1, 0,
+                                   self.USAGE_STAGING, 0, self.CPU_ACCESS_READ, 0)
+            hr = self.device.call(self.DEVICE_CREATE_TEXTURE2D, ctypes.byref(desc), None,
+                                  ctypes.byref(self.staging.p),
+                                  argtypes=(ctypes.c_void_p, ctypes.c_void_p, ctypes.c_void_p))
+            if hr < 0:
+                raise OSError(f"CreateTexture2D failed (0x{_hr(hr):08X})")
+            self._mode = mode
+            self.source = mode[:2]
+            self.last = None
+            self._layout()
+
+    def _layout(self):
+        """Which frame pixels make up the (w, h) picture, at 2x where the frame allows."""
+        sw, sh = self.source
+        w, h = self.w, self.h
+        self.factor = n = 2 if 2 * w <= sw and 2 * h <= sh else 1
+        self.ys = ((np.arange(h * n) + 0.5) * sh / (h * n)).astype(np.intp)
+        self.xs = ((np.arange(w * n) + 0.5) * sw / (w * n)).astype(np.intp)
+
+    def resize(self, w: int, h: int):
+        """Give out (w, h) pictures from now on."""
+        self.w, self.h = w, h
+        self.last = None
+        self._layout()
 
     def grab(self, timeout_ms: int = 0) -> np.ndarray | None:
         if not self.dup:
-            # lost (a display mode switch, the UAC / lock screen): retry now and then
-            if time.monotonic() - self._lost_at < self.RETRY_S:
-                return self.last
-            self._lost_at = time.monotonic()
+            now = time.monotonic()
+            if now - self._lost_at < RETRY_S:
+                return None
+            self._lost_at = now
             try:
                 self._duplicate()
-            except OSError:
-                return self.last
+            except OSError as e:
+                if now - self._lost_since > GIVE_UP_S:
+                    raise CaptureLost(f"screen capture lost ({e})") from e
+                return None
+            self.lost = False
         info = (ctypes.c_ubyte * 64)()              # DXGI_OUTDUPL_FRAME_INFO (48 bytes)
         res = _COM()
         hr = self.dup.call(self.DUP_ACQUIRE, timeout_ms, ctypes.byref(info), ctypes.byref(res.p),
@@ -545,9 +611,11 @@ class DupGrabber:
         if code == DXGI_ERROR_WAIT_TIMEOUT:
             return self.last                        # nothing new on screen
         if code == DXGI_ERROR_ACCESS_LOST:
+            # a display mode switch (a game going fullscreen), the UAC / lock screen
             self.dup.release()
-            self._lost_at = time.monotonic()
-            return self.last
+            self.lost = True
+            self._lost_at = self._lost_since = time.monotonic()
+            return None
         if hr < 0:
             raise OSError(f"AcquireNextFrame failed (0x{code:08X})")
         # LastPresentTime 0: only the mouse moved, or the (blank) frame a new
@@ -573,10 +641,11 @@ class DupGrabber:
         if hr < 0:
             raise OSError(f"Map failed (0x{_hr(hr):08X})")
         try:
-            rows, pitch = self.src.height, m.RowPitch
+            sw, rows = self.source
+            pitch = m.RowPitch
             buf = (ctypes.c_uint8 * (rows * pitch)).from_address(m.pData)
             img = np.frombuffer(buf, np.uint8).reshape(rows, pitch)
-            px = img[:, :self.src.width * 4].reshape(rows, self.src.width, 4)
+            px = img[:, :sw * 4].reshape(rows, sw, 4)
             sample = px[self.ys[:, None], self.xs[None, :]]      # a copy, taken while mapped
         finally:
             self.ctx.call(self.CTX_UNMAP, self.staging.p, 0, restype=None,
@@ -592,13 +661,20 @@ class DupGrabber:
                 log.debug("releasing a capture object failed", exc_info=True)
 
 
-def open_grabber(src: Monitor, w: int, h: int):
-    """Desktop Duplication where it works, else GDI."""
-    try:
-        return DupGrabber(src, w, h)
-    except (OSError, AttributeError) as e:
-        log.info("desktop duplication unavailable (%s): capturing with GDI", e)
-        return Grabber(src, w, h)
+def open_grabber(src: Monitor, w: int, h: int, tries: int = 1):
+    """Desktop Duplication where it works, else GDI. `tries` > 1 gives duplication a
+    few goes (RETRY_S apart) before settling for GDI: right after a display mode
+    switch it can fail for a moment, and GDI only sees black in fullscreen games."""
+    err = None
+    for i in range(max(1, tries)):
+        try:
+            return DupGrabber(src, w, h)
+        except (OSError, AttributeError) as e:
+            err = e
+        if i + 1 < tries:
+            time.sleep(RETRY_S)
+    log.info("desktop duplication unavailable (%s): capturing with GDI", err)
+    return Grabber(src, w, h)
 
 
 # --------------------------------------------------------------------------- watcher
@@ -631,6 +707,7 @@ class Watcher:
         self.monitor = 0
         self.scores: dict[str, float] = {}
         self.black = False                # the capture only sees black
+        self.lost = False                 # the capture dropped out; it's being brought back
         self.error = ""
         self.check_ms = 0.0               # how long the last check took
 
@@ -668,12 +745,15 @@ class Watcher:
         if t is not None and t is not threading.current_thread():
             t.join(2.0)
         self.scores = {}
-        self.black = False
+        self.black = self.lost = False
 
     # the thread
     def _run(self):
         grab: Grabber | None = None
         scaled: dict[str, tuple] = {}
+        fitted = (0, 0)             # the source size the pictures are scaled for
+        mon: Monitor | None = None
+        reopen_since = 0.0          # > 0: the capture was lost; opening afresh
         try:
             while not self._stop.is_set():
                 t0 = time.perf_counter()
@@ -681,7 +761,7 @@ class Watcher:
                     items = list(self._items.values())
                     changed, self._changed = self._changed, False
                     mon_index = self.monitor
-                if changed:
+                if changed or grab is None:
                     if grab is not None:
                         grab.close()
                         grab = None
@@ -690,13 +770,40 @@ class Watcher:
                         raise OSError("no monitor found")
                     mon = mons[mon_index] if 0 <= mon_index < len(mons) else mons[0]
                     scale = work_scale(mon.width, [min(i.gray.shape) for i in items])
-                    grab = (self._grabber or open_grabber)(
-                        mon, max(1, round(mon.width * scale)), max(1, round(mon.height * scale)))
-                    scaled = {i.id: (shrink(i.gray, scale),
-                                     None if i.mask is None else shrink(i.mask, scale) > 0.99)
-                              for i in items}
+                    w, h = max(1, round(mon.width * scale)), max(1, round(mon.height * scale))
+                    try:
+                        opener = self._grabber or open_grabber
+                        if reopen_since and opener is open_grabber:
+                            grab = opener(mon, w, h, tries=3)
+                        else:
+                            grab = opener(mon, w, h)
+                    except OSError:
+                        # a fresh start after a loss may take a few goes (the mode is
+                        # still switching); a first start that fails is an error
+                        if not reopen_since or time.monotonic() - reopen_since > GIVE_UP_S:
+                            raise
+                        self._stop.wait(RETRY_S)
+                        continue
+                    reopen_since = 0.0
+                    self.lost = False
+                    fitted, scaled = self._fit(grab, mon, items)
                 if items:
-                    gray = grab.grab()
+                    try:
+                        gray = grab.grab()
+                    except CaptureLost as e:
+                        log.info("screen capture lost (%s): starting it afresh", e)
+                        grab.close()
+                        grab = None
+                        reopen_since = time.monotonic()
+                        self.lost = True
+                        self._stop.wait(RETRY_S)
+                        continue
+                    self.lost = bool(getattr(grab, "lost", False))
+                    if getattr(grab, "source", fitted) != fitted:
+                        # the frames changed size (a game switched display mode):
+                        # scale the pictures for what the capture really sees
+                        fitted, scaled = self._fit(grab, mon, items)
+                        gray = None
                     if gray is not None:
                         self._check(gray, items, scaled)
                 self.check_ms = (time.perf_counter() - t0) * 1000
@@ -707,6 +814,21 @@ class Watcher:
         finally:
             if grab is not None:
                 grab.close()
+
+    @staticmethod
+    def _fit(grab, mon: Monitor, items: list[Watched]) -> tuple[tuple[int, int], dict]:
+        """Shrink the pictures for the size of screen the grabber really copies
+        (`source`; the monitor's when it doesn't say), and have it give out pictures
+        that size too. Returns (source size, {id: (picture, mask)})."""
+        sw, sh = getattr(grab, "source", None) or (mon.width, mon.height)
+        scale = work_scale(sw, [min(i.gray.shape) for i in items])
+        w, h = max(1, round(sw * scale)), max(1, round(sh * scale))
+        if (w, h) != (getattr(grab, "w", w), getattr(grab, "h", h)):
+            grab.resize(w, h)
+        scaled = {i.id: (shrink(i.gray, scale),
+                         None if i.mask is None else shrink(i.mask, scale) > 0.99)
+                  for i in items}
+        return (sw, sh), scaled
 
     def _check(self, gray: np.ndarray, items: list[Watched], scaled: dict[str, tuple]):
         self.black = float(gray.max()) < BLACK_LEVEL

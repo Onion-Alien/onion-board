@@ -205,6 +205,100 @@ def test_watcher_reports_a_capture_that_fails(monkeypatch):
     assert w.error == "no screen"
 
 
+class ModeGrabber(FakeGrabber):
+    """A capture whose frames come at `source` size, like Desktop Duplication's: it
+    says so, and gives out frames at whatever size the watcher asks for."""
+    source = (W, H)
+    resized: list = []
+    lost = False
+
+    def __init__(self, mon, w, h):
+        super().__init__(mon, w, h)
+        self.w, self.h = w, h
+
+    def resize(self, w, h):
+        self.w, self.h = w, h
+        self.size = (w, h)
+        ModeGrabber.resized.append((w, h))
+
+
+def test_watcher_scales_the_pictures_to_the_screen_the_capture_really_sees(monkeypatch):
+    """The monitor is listed as WxH but the frames come in at twice that (a game's
+    mode, or a DPI-unaware view of the desktop): the pictures are shrunk to match
+    what the frames show."""
+    monkeypatch.setattr(sw, "monitors", lambda: [Monitor(0, 0, W, H, True)])
+    monkeypatch.setattr(sw, "WORK_WIDTH", W)
+    # the real screen: 2x the size, the banner at its real size (in real pixels)
+    big = with_banner(np.kron(scene(), np.ones((2, 2), np.float32)), x=220, y=140)
+    ModeGrabber.source, ModeGrabber.resized = (2 * W, 2 * H), []
+    FakeGrabber.frames, FakeGrabber.made = [sw.shrink(big, 0.5)], []   # a (W, H) sample of it
+    fired = []
+    w = sw.Watcher(fired.append, grabber=ModeGrabber)
+    w.interval = 0.001
+    w.set_items([sw.Watched("t1", banner(), 0.8, 0.0)])
+    w.start()
+    try:
+        assert run_until(lambda: fired)
+        score = w.scores["t1"]
+    finally:
+        w.stop()
+    assert score > 0.8
+    assert ModeGrabber.resized == []      # the working size didn't change, only the scale
+
+
+def test_watcher_refits_when_the_screen_changes_mode(monkeypatch):
+    """Mid-run the frames change size (a game went fullscreen at another
+    resolution): the pictures are rescaled, nothing dies, and matching goes on."""
+    monkeypatch.setattr(sw, "monitors", lambda: [Monitor(0, 0, W, H, True)])
+    monkeypatch.setattr(sw, "WORK_WIDTH", W)
+    ModeGrabber.source, ModeGrabber.resized = (W, H), []
+    plain = scene()
+    FakeGrabber.frames, FakeGrabber.made = [plain, plain, plain, plain], []
+    fired = []
+    w = sw.Watcher(fired.append, grabber=ModeGrabber)
+    w.interval = 0.001
+    w.set_items([sw.Watched("t1", banner(), 0.8, 0.0)])
+    w.start()
+    try:
+        assert run_until(lambda: "t1" in w.scores)
+        # the mode switches to a smaller screen that shows the banner at its real size
+        small = with_banner(scene()[:H // 2, :W // 2], x=10, y=20)
+        FakeGrabber.frames = [small]
+        ModeGrabber.source = (W // 2, H // 2)
+        assert run_until(lambda: fired)
+    finally:
+        w.stop()
+    assert ModeGrabber.resized == [(W // 2, H // 2)] and not w.error
+
+
+def test_watcher_reopens_a_capture_that_is_lost(monkeypatch):
+    """A grab that raises CaptureLost closes the grabber, says `lost`, and opens a
+    new one a moment later instead of stopping."""
+    monkeypatch.setattr(sw, "monitors", lambda: [Monitor(0, 0, W, H, True)])
+    monkeypatch.setattr(sw, "WORK_WIDTH", W)
+    monkeypatch.setattr(sw, "RETRY_S", 0.05)
+    seen_lost = []
+
+    class Losing(FakeGrabber):
+        def grab(self):
+            if len(FakeGrabber.made) == 1:
+                raise sw.CaptureLost("gone")
+            return super().grab()
+
+    FakeGrabber.frames, FakeGrabber.made = [with_banner(scene())], []
+    fired = []
+    w = sw.Watcher(fired.append, grabber=Losing)
+    w.interval = 0.001
+    w.set_items([sw.Watched("t1", banner(), 0.8, 0.0)])
+    w.start()
+    try:
+        assert run_until(lambda: (seen_lost.append(w.lost), fired)[1])
+    finally:
+        w.stop()
+    assert len(FakeGrabber.made) == 2 and FakeGrabber.made[0].closed
+    assert any(seen_lost) and not w.error
+
+
 # --------------------------------------------------------------------------- the tab
 
 def as_qimage(gray: np.ndarray) -> QImage:

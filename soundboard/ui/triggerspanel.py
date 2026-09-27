@@ -545,6 +545,9 @@ class TriggersTab(QWidget):
             why = unsupported
         elif w.error:
             why = f"Watching stopped: {w.error}"
+        elif self.is_active() and w.lost:
+            why = ("Waiting for the screen to come back. A game switching to or from "
+                   "fullscreen does this for a moment.")
         elif self.is_active() and w.black:
             why = ("The screen looks all black to the app. If a game is running in "
                    "exclusive fullscreen and this stays, set it to Borderless or Windowed "

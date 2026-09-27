@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+- **Triggers keep working when a game switches display mode.** When a game went
+  into (or out of) exclusive fullscreen at another resolution, the screen capture
+  quietly froze on its last picture or went black, and the tab told you to switch
+  to borderless. The capture now follows the screen's real size, rescales your
+  pictures to it, says "Waiting for the screen to come back" while the switch
+  happens, and starts itself afresh if it can't recover.
+
 ## 1.2.1 — 2026-09-27
 
 - **Installing an update while Onion Board is open works.** The installer's
