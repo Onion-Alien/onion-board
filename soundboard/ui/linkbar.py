@@ -17,10 +17,10 @@ import threading
 from pathlib import Path
 
 import numpy as np
-from PySide6.QtCore import Qt, Signal
+from PySide6.QtCore import Qt, QTimer, Signal
 from PySide6.QtWidgets import QFrame, QHBoxLayout, QLabel, QPushButton
 
-from soundboard import thumbs, ytdl
+from soundboard import theme, thumbs, ytdl
 from soundboard.library import (SR, decode, fingerprint, import_file, level_gain, to_int16)
 from soundboard.ui import icons
 from soundboard.ui.widgets import fmt_time
@@ -28,6 +28,7 @@ from soundboard.ui.widgets import fmt_time
 log = logging.getLogger(__name__)
 
 PLAY_ID = "__link__"   # the engine voice of Play once
+PROBE_DELAY_MS = 400
 
 
 def _drop_temp(path) -> None:
@@ -53,9 +54,15 @@ class LinkBar(QFrame):
         self._color_for, self._known_for = color_for, known_for
         self.url = ""
         self.title = ""
+        self._text = ""               # the search box's text last seen
         self._busy = ""               # "", "add" or "play": one download at a time
         self._got = None              # (url, file, int16 audio) of the last download
+        self._queued = ""             # "add" / "play" asked for while another download ran
         self._msg.connect(self._on_msg)
+        # a link typed by hand is a new "link" at every keystroke: look up only the
+        # one the typing stops at
+        self._probe_timer = QTimer(self, singleShot=True, interval=PROBE_DELAY_MS)
+        self._probe_timer.timeout.connect(self._probe_now)
 
         self.setObjectName("card")
         h = QHBoxLayout(self)
@@ -81,24 +88,38 @@ class LinkBar(QFrame):
 
     # ------------------------------------------------------------------ state
     def set_text(self, text: str):
-        """Whatever is in the search box: a link shows the bar, anything else hides it."""
+        """Whatever is in the search box: a link shows the bar, anything else hides it.
+        Only a change counts: the board re-filters with the same text after every add,
+        which mustn't drop a web-search pick that's downloading or waiting its turn."""
+        if text == self._text:
+            return
+        self._text = text
         url = ytdl.as_link(text)
         if url == self.url:
             return
         self.url = url
         self.title = ""
+        self._queued = ""
         self._drop_download()
         self.setVisible(bool(url))
         if not url:
+            self._probe_timer.stop()
             return
         self._say(f"Looking up <b>{html.escape(self._host())}</b>…")
         self._buttons()
-        threading.Thread(target=self._probe, args=(url,), daemon=True, name="link-probe").start()
+        self._probe_timer.start()
+
+    def _probe_now(self):
+        if self.url:
+            threading.Thread(target=self._probe, args=(self.url,), daemon=True,
+                             name="link-probe").start()
 
     def open(self, url: str, title: str, secs: float = 0.0):
         """A video picked from the YouTube search: already looked up, so no probe."""
         if url != self.url:
             self.url = url
+            self._queued = ""
+            self._probe_timer.stop()
             self._drop_download()
         self.title = title
         self.show()
@@ -130,18 +151,31 @@ class LinkBar(QFrame):
 
     # ------------------------------------------------------------------ actions
     def add(self) -> bool:
-        if not self.url or self._busy:
+        if not self.url:
             return False
+        if self._busy:
+            return self._queue("add")
         self._start("add")
         return True
 
     def play_once(self) -> bool:
-        if not self.url or self._busy:
+        if not self.url:
             return False
+        if self._busy:
+            return self._queue("play")
         if self._got is not None and self._got[0] == self.url:
             self._play(self._got[2])
             return True
         self._start("play")
+        return True
+
+    def _queue(self, kind: str) -> bool:
+        """Another download is running (one at a time): do this one after it."""
+        if self._queued == kind:
+            return False
+        self._queued = kind
+        name = html.escape(self.title or self._host())
+        self._say(f"<b>{name}</b> is next: waiting for the download before it to finish…")
         return True
 
     def _start(self, kind: str):
@@ -159,7 +193,7 @@ class LinkBar(QFrame):
         gain = level_gain(data.astype(np.float32) / 32768) if self.cfg.level_volumes else 1.0
         v = self.engine.play(PLAY_ID, data, gain, mode="restart")
         if v is None:
-            self._say("No audio device is open — pick one in Setup.", "#ffb020")
+            self._say("No audio device is open — pick one in Setup.", theme.status("warn"))
         else:
             self.played.emit(self.title or "Link", data, gain)
             name = html.escape(self.title or "it")
@@ -219,7 +253,7 @@ class LinkBar(QFrame):
             return
         if kind == "probe-error":
             if current and not self._busy:
-                self._say(html.escape(f"Can't use this link: {payload}"), "#ff4d4f")
+                self._say(html.escape(f"Can't use this link: {payload}"), theme.status("error"))
             return
         if kind == "title":
             if current:
@@ -240,7 +274,7 @@ class LinkBar(QFrame):
             self.sound_ready.emit(meta, data)
             if current:
                 self._say(f"✓ Added <b>{html.escape(meta.name)}</b> to your Sounds.",
-                          "#13ce66")
+                          theme.status("ok"))
         elif kind == "play":
             path, data = payload
             if current:
@@ -249,4 +283,10 @@ class LinkBar(QFrame):
             else:
                 _drop_temp(path)
         elif kind == "error" and current:
-            self._say(html.escape(payload), "#ff4d4f")
+            self._say(html.escape(payload), theme.status("error"))
+        if self._queued and self.url:
+            queued, self._queued = self._queued, ""
+            if queued == "add":
+                self.add()
+            else:
+                self.play_once()

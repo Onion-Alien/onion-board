@@ -33,6 +33,7 @@ from soundboard.settings import HOTKEY_ACTIONS, HotkeyDialog, SettingsDialog, pr
 from soundboard.shuffle import ShuffleBag
 from soundboard.testcheck import analyze as analyze_output
 from soundboard.testcheck import summary_html
+from soundboard.ui.crashdialog import free_dialog
 from soundboard.ui.dialogs import EditDialog
 from soundboard.ui import a11y, icons, responsive
 from soundboard.ui.speedpitch import SpeedPitchButton
@@ -40,7 +41,7 @@ from soundboard.ui.panel import (EqPanel, VolumeControl, bar, card, hint_label, 
                                  vsep)
 from soundboard.ui.linkbar import PLAY_ID as LINK_ID
 from soundboard.ui.linkbar import LinkBar
-from soundboard.ui.livedot import set_tab_live
+from soundboard.ui.livedot import is_tab_live, set_tab_live
 from soundboard.ui.logowidget import LogoWidget
 from soundboard.ui.ytsearch import SearchResults
 from soundboard.ui.padbatch import PadSelection
@@ -157,6 +158,7 @@ class MainWindow(QMainWindow):
             self.tabs.blockSignals(False)
         self._rebuild_pads()
         self._load_all()
+        self._fit_overlay_key()
         self.register_hotkeys()
         # Stream Deck / scripts (Settings → General), only if turned on
         self.remote = remote.RemoteControl(lambda a, p: remote.dispatch(self, a, p), self)
@@ -447,6 +449,7 @@ class MainWindow(QMainWindow):
         tb.addWidget(self.btn_yt)
         size = QSlider(Qt.Horizontal)
         size.setRange(110, 240)
+        c.pad_width = min(max(c.pad_width, 110), 240)   # the pads are built with it next
         size.setValue(c.pad_width)
         size.setFixedWidth(90)
         size.setToolTip("Pad size")
@@ -785,10 +788,12 @@ class MainWindow(QMainWindow):
         self._init_devices()
         self._prepare_all()
         if not rescanned:   # after _init_devices, whose status update would hide it
-            self.status.setText("<span style='color:#ffb020'>Couldn't re-scan devices — "
+            self.status.setText(f"<span style='color:{theme.status('warn')}'>"
+                                "Couldn't re-scan devices — "
                                 "restart the app to pick up new ones.</span>")
         elif not any(is_virtual_cable(d["name"]) for d in eng.list_devices("output")):
-            self.status.setText("<span style='color:#ffb020'>Still no virtual cable. If you "
+            self.status.setText(f"<span style='color:{theme.status('warn')}'>"
+                                "Still no virtual cable. If you "
                                 "just installed it, restart your PC — Windows often only "
                                 "shows it after a restart.</span>")
 
@@ -876,16 +881,19 @@ class MainWindow(QMainWindow):
                                     f"and comes out at <b>{self.virtual_mic}</b>, which Discord "
                                     "/ the game uses as your mic.")
         elif main:
-            self.setup_hint.setText("<span style='color:#ffb020'>That's a normal speaker/headphone "
+            self.setup_hint.setText(f"<span style='color:{theme.status('warn')}'>"
+                                    "That's a normal speaker/headphone "
                                     "device, so only you will hear the sounds. Pick a virtual "
                                     "cable here.</span>")
         else:
-            self.setup_hint.setText("<span style='color:#ffb020'>Nothing picked — only you "
+            self.setup_hint.setText(f"<span style='color:{theme.status('warn')}'>"
+                                    "Nothing picked — only you "
                                     "will hear sounds.</span>")
         self._update_flow()
         errs = [f"{k}: {v}" for k, v in e.errors_snapshot().items()]
         if errs:
-            self.status.setText("<span style='color:#ff6b6b'>Audio device problem — "
+            self.status.setText(f"<span style='color:{theme.status('error')}'>"
+                                "Audio device problem — "
                                 + " · ".join(errs) + "</span>")
             return
         n = len(self.cfg.sounds)
@@ -898,15 +906,16 @@ class MainWindow(QMainWindow):
         if xr:
             tip = ("" if self.cfg.latency == "high" else
                    " — try Settings → General → Audio buffering: Safer")
-            text += (f"{'<br>' if text else ''}<span style='color:#ffb020'>{xr} audio drop-out"
+            text += (f"{'<br>' if text else ''}<span style='color:{theme.status('warn')}'>"
+                     f"{xr} audio drop-out"
                      f"{'s' if xr != 1 else ''} since start{tip}</span>")
         self.status.setText(text)
 
     def _update_flow(self, talking=False):
         e = self.engine
-        ok, bad = "#13ce66", "#ff4d4f"
+        ok, bad = theme.status("ok"), theme.status("error")
         if not self.cfg.mic_enabled:
-            mic = "Your mic  <b style='color:#ffb020'>not sent (sounds only)</b>"
+            mic = f"Your mic  <b style='color:{theme.status('warn')}'>not sent (sounds only)</b>"
         elif e.mic_stream is None:
             mic = f"Your mic  <b style='color:{bad}'>✗ off</b>"
         elif talking:
@@ -918,7 +927,8 @@ class MainWindow(QMainWindow):
         if not any_cable:
             state = "missing"
             out = f"Virtual mic  <b style='color:{bad}'>✗ not installed yet</b>"
-            step = ("<b style='color:#ffb020'>One-time setup:</b> install the free virtual "
+            step = (f"<b style='color:{theme.status('warn')}'>"
+                    "One-time setup:</b> install the free virtual "
                     "cable. It's what lets Discord and games hear your sounds — without it, "
                     "only you can hear them.")
         elif vm and e.main_stream is not None:
@@ -930,7 +940,8 @@ class MainWindow(QMainWindow):
         else:
             state = "unrouted"
             out = f"Virtual mic  <b style='color:{bad}'>✗ not connected</b>"
-            step = ("<b style='color:#ffb020'>Almost:</b> under <b>Devices</b>, set "
+            step = (f"<b style='color:{theme.status('warn')}'>"
+                    "Almost:</b> under <b>Devices</b>, set "
                     "“Send into (the cable)” to your virtual cable.")
         self.flow_mic.setText(mic)
         self.flow_out.setText(out)
@@ -950,7 +961,7 @@ class MainWindow(QMainWindow):
                     else "Not connected to the virtual cable — click to fix")
         if self.pill.text() != pill:
             self.pill.setText(pill)
-            self.pill.setIcon(icons.icon("check", "#13ce66") if state == "ok" else
+            self.pill.setIcon(icons.icon("check", "ok_text") if state == "ok" else
                               icons.icon("warn", "warn_text"))
             self.pill.setProperty("state", "ok" if state == "ok" else "warn")
             self.pill.style().unpolish(self.pill)
@@ -984,7 +995,9 @@ class MainWindow(QMainWindow):
         """The quick-setup guide (first launch, or the Setup tab's Step-by-step guide).
         `resumed`: reopened by itself after the restart the virtual cable needed."""
         from soundboard.ui.setupwizard import SetupWizard
-        SetupWizard(self, resumed=resumed).exec()
+        wiz = SetupWizard(self, resumed=resumed)
+        wiz.exec()
+        free_dialog(wiz)
         self._prepare_all()
 
     def open_windows_mic(self):
@@ -1025,7 +1038,8 @@ class MainWindow(QMainWindow):
             self._save_failed_shown = False
         elif not self._save_failed_shown:
             self._save_failed_shown = True
-            self.status.setText("<span style='color:#ff6b6b'>Couldn't save your settings — "
+            self.status.setText(f"<span style='color:{theme.status('error')}'>"
+                                "Couldn't save your settings — "
                                 r"see the log in %APPDATA%\OnionBoard.</span>")
 
     def on_level_toggle(self, b):
@@ -1046,6 +1060,20 @@ class MainWindow(QMainWindow):
         self._save_later()
 
     # ------------------------------------------------------------------ hotkeys
+    def _fit_overlay_key(self):
+        """The default overlay key is the one left of 1 on a US keyboard, where it types
+        a rarely used `. On most other layouts that key types a letter or everyday
+        punctuation (ö, ñ, ù, UK '@), which a bare global hotkey would take away from
+        typing everywhere: there it becomes Alt + that key. Checked once, so a key the
+        user picks later is left alone."""
+        if self.cfg.overlay_key_checked:
+            return
+        self.cfg.overlay_key_checked = True
+        if self.cfg.overlay_hotkey == "`" and winkeys.key_char(winkeys.VK["`"]) not in ("`", ""):
+            self.cfg.overlay_hotkey = "alt+`"
+            log.info("overlay hotkey moved to Alt+` for this keyboard layout")
+        self._save_later()
+
     def register_hotkeys(self):
         mapping = {}
         for attr, action, _label, _desc in HOTKEY_ACTIONS:
@@ -1059,12 +1087,16 @@ class MainWindow(QMainWindow):
             if combo and cat in self.cfg.categories:
                 mapping.setdefault(combo, RANDOM + cat)
         mapping.update(self.overlay.layer())   # its keys, only while it's open
+        # the game's push-to-talk key is pressed by us (auto-PTT) and by the player: as a
+        # hotkey of ours, Windows would hand those presses to us instead of the game
+        mapping.pop(self.cfg.ptt_key, None)
         self.hotkeys.register(mapping)
 
     def on_hotkeys_failed(self, failed: list[str]):
         if failed:
             log.warning("hotkeys another program already owns: %s", failed)
-            self.status.setText("<span style='color:#ffb020'>Another program is already using "
+            self.status.setText(f"<span style='color:{theme.status('warn')}'>"
+                                "Another program is already using "
                                 + ", ".join(pretty_key(c) for c in failed)
                                 + " — pick a different hotkey.</span>")
 
@@ -1072,22 +1104,25 @@ class MainWindow(QMainWindow):
         """Set one of the app-wide hotkeys (or ptt_key). A combo can only do one thing,
         so it's taken off any other action or sound that had it."""
         if combo:
-            if attr != "ptt_key":
-                for other, *_ in HOTKEY_ACTIONS:
-                    if other != attr and getattr(self.cfg, other) == combo:
-                        setattr(self.cfg, other, "")
-                for m in self.cfg.sounds:
-                    if m.hotkey == combo:
-                        m.hotkey = ""
-                        if m.id in self.pads:
-                            self.pads[m.id].update()
-                self._clear_category_hotkey(combo)
+            for other, *_ in HOTKEY_ACTIONS:
+                if other != attr and getattr(self.cfg, other) == combo:
+                    setattr(self.cfg, other, "")
+            for m in self.cfg.sounds:
+                if m.hotkey == combo:
+                    m.hotkey = ""
+                    if m.id in self.pads:
+                        self.pads[m.id].update()
+            self._clear_category_hotkey(combo)
+            if attr != "ptt_key" and self.cfg.ptt_key == combo:
+                self.cfg.ptt_key = ""
         setattr(self.cfg, attr, combo)
         self._save_now()
         self.register_hotkeys()
 
     def open_settings(self, page: str = "appearance"):
-        SettingsDialog(self, page).exec()
+        dlg = SettingsDialog(self, page)
+        dlg.exec()
+        free_dialog(dlg)
         self.register_hotkeys()   # in case a capture was cancelled
 
     def apply_theme(self, name: str):
@@ -1098,7 +1133,7 @@ class MainWindow(QMainWindow):
         pp, self._pp_icon = self._pp_icon, None
         self._set_pp_icon(pp or "play")
         self.pill.setText("")   # forces _update_flow to repaint its icon
-        self._update_flow()
+        self._update_status()   # the hints and flow, in this theme's status colours
         self._paint_logo()
         self._save_later()
 
@@ -1242,7 +1277,8 @@ class MainWindow(QMainWindow):
             if p is not None and p.state == "error":
                 why = f": {html.escape(p.error)}" if p.error else ""
                 name = html.escape(m.name)
-                self.status.setText(f"<span style='color:#ff6b6b'>Can't play “{name}”{why}. "
+                self.status.setText(f"<span style='color:{theme.status('error')}'>"
+                                    f"Can't play “{name}”{why}. "
                                     "If the file was moved or deleted, remove the pad and "
                                     "add the sound again.</span>")
             else:
@@ -1252,7 +1288,8 @@ class MainWindow(QMainWindow):
         v = self.engine.play(sid, data, self.gain_for(m), loop=m.loop, mode=m.mode,
                              fade_in=m.fade_in, fade_out=m.fade_out)
         if v is None and not self.engine.active_outputs():
-            self.status.setText("<span style='color:#ffb020'>No audio device is open — pick one "
+            self.status.setText(f"<span style='color:{theme.status('warn')}'>"
+                                "No audio device is open — pick one "
                                 "in Setup.</span>")
 
     def select(self, sid):
@@ -1334,7 +1371,8 @@ class MainWindow(QMainWindow):
     def _on_fx_preview(self, sid, data, gain):
         self._update_status()
         if data is None:
-            self.status.setText("<span style='color:#ffb020'>Couldn't render the preview "
+            self.status.setText(f"<span style='color:{theme.status('warn')}'>"
+                                "Couldn't render the preview "
                                 "(see the log).</span>")
             return
         # its own id: it mustn't share the pad's resample cache or its preview voice
@@ -1520,12 +1558,13 @@ class MainWindow(QMainWindow):
         if old in self.cfg.category_hotkeys:
             self.cfg.category_hotkeys[new] = self.cfg.category_hotkeys.pop(old)
         self.shuffle.forget(old)
-        for m in self.cfg.sounds:
+        for m in self._live_metas():   # removed ones too, or Undo brings `old` back
             m.tags = [new if t == old else t for t in m.tags]
         if self.cfg.category == old:
             self.cfg.category = new
         self._save_now()
         self._fill_categories()
+        self.register_hotkeys()   # its random-sound hotkey now plays `new`
 
     def delete_category(self, name: str):
         """Delete a category. Its sounds stay (in All and their other categories)."""
@@ -1540,7 +1579,7 @@ class MainWindow(QMainWindow):
         self.cfg.categories.remove(name)
         self.cfg.category_hotkeys.pop(name, None)
         self.shuffle.forget(name)
-        for m in self.cfg.sounds:
+        for m in self._live_metas():   # removed ones too, or Undo brings it back
             if name in m.tags:
                 m.tags.remove(name)
         if self.cfg.category == name:
@@ -1548,6 +1587,7 @@ class MainWindow(QMainWindow):
         self._save_now()
         self._fill_categories()
         self.apply_filter(self.search.text())
+        self.register_hotkeys()   # let go of its random-sound hotkey
 
     def _category_menu(self, pos):
         i = self.cat_tabs.tabAt(pos)
@@ -1716,6 +1756,7 @@ class MainWindow(QMainWindow):
             self._pending_imports = 0
             self.cfg.save()
             self._rebuild_pads()
+            self.triggers.import_done()   # a trigger's sound that failed to import
             if self._import_errors:
                 QMessageBox.warning(self, "Some files weren't added",
                                     "<br>".join(html.escape(e) for e in self._import_errors[:15]))
@@ -1946,6 +1987,8 @@ class MainWindow(QMainWindow):
                     if m.id in self.pads:
                         self.pads[m.id].update()
             self._clear_category_hotkey(combo, keep=name)
+            if self.cfg.ptt_key == combo:
+                self.cfg.ptt_key = ""
             self.cfg.category_hotkeys[name] = combo
         else:
             self.cfg.category_hotkeys.pop(name, None)
@@ -1988,6 +2031,7 @@ class MainWindow(QMainWindow):
         if new.hotkey == m.hotkey:
             new.hotkey = ""   # the original keeps its hotkey
         self._clear_dupe_hotkey(new)
+        self._tag_new(new)   # stays in sight in the category showing
         self.cfg.sounds.insert(self.cfg.sounds.index(m) + 1, new)
         self._index()
         self._save_now()
@@ -2128,7 +2172,9 @@ class MainWindow(QMainWindow):
             self._apply_backup_settings(pkg.settings)
         if not pkg.sounds:
             return
-        known = {m.fingerprint for m in self._live_metas() if m.fingerprint}
+        # only what's on the board: a sound removed a moment ago (still undo-able) must
+        # come back from its backup, or deleting all then restoring leaves nothing
+        known = {m.fingerprint for m in self.cfg.sounds if m.fingerprint}
         start = len(self.cfg.sounds)
         self.status.setText(f"Importing {len(pkg.sounds)} sound(s)…")
 
@@ -2160,17 +2206,16 @@ class MainWindow(QMainWindow):
             return
         taken = {o.hotkey for o in self.cfg.sounds if o.hotkey}
         taken |= {getattr(self.cfg, a) for a, *_ in HOTKEY_ACTIONS if getattr(self.cfg, a)}
+        taken |= {k for k in self.cfg.category_hotkeys.values() if k}
+        from soundboard.library import merge_tags
         for m in res.sounds:
             if m.hotkey in taken:
                 m.hotkey = ""   # the sounds already here keep theirs
             taken.add(m.hotkey)
-            for t in m.tags:
-                if t not in self.cfg.categories:
-                    self.cfg.categories.append(t)
+            # "memes" goes into the "Memes" already here (and a new one gets a tab)
+            m.tags = merge_tags(m.tags, self.cfg.categories)
             self.cfg.sounds.append(m)
-        for t in pkg.categories:   # empty categories of a full backup too
-            if t not in self.cfg.categories:
-                self.cfg.categories.append(t)
+        merge_tags(pkg.categories, self.cfg.categories)   # a full backup's empty ones too
         self._save_now()
         self._rebuild_pads()
         self._fill_categories()
@@ -2236,7 +2281,8 @@ class MainWindow(QMainWindow):
         """Start / stop the local control API to match the settings; "" or an error."""
         err = remote.apply(self, self.remote)
         if err:
-            self.status.setText(f"<span style='color:#ffb020'>Remote control is off: "
+            self.status.setText(f"<span style='color:{theme.status('warn')}'>"
+                                "Remote control is off: "
                                 f"{html.escape(err)}.</span>")
         return err
 
@@ -2312,10 +2358,11 @@ class MainWindow(QMainWindow):
             self._pulse.stop()
             self._banner_fx.setOpacity(1.0)
         self.setWindowTitle("● MIC LIVE IN HEADPHONES — Onion Board" if on else "Onion Board")
-        self.mic_lbl.setStyleSheet("color:#ff4d4f;" if on else "")
+        self.mic_lbl.setStyleSheet(f"color:{theme.status('error')};" if on else "")
         self.mic_meter.hot = on
         if on and not self.cfg.mic_enabled:
-            self.status.setText("<span style='color:#ffb020'>Sounds only: your mic isn't "
+            self.status.setText(f"<span style='color:{theme.status('warn')}'>"
+                                "Sounds only: your mic isn't "
                                 "sent, so nobody (including you) hears it.</span>")
 
     def start_test(self):
@@ -2377,7 +2424,7 @@ class MainWindow(QMainWindow):
         except Exception as ex:  # noqa: BLE001
             log.exception("test analysis failed")
             self.test_result.setText(
-                f"<span style='color:#ff4d4f'>Test analysis failed: {ex}</span>")
+                f"<span style='color:{theme.status('error')}'>Test analysis failed: {ex}</span>")
         self.test_result.show()
         return data, rate
 
@@ -2405,10 +2452,11 @@ class MainWindow(QMainWindow):
 
     def _set_tick_rate(self):
         live = self.isVisible() and not self.isMinimized()
-        if live == self._ui_live and self.timer.interval() in (TICK_MS, TICK_IDLE_MS):
+        pace = TICK_MS if live or self.overlay.is_open else TICK_IDLE_MS   # see tick()
+        if live == self._ui_live and self.timer.interval() == pace:
             return
         self._ui_live = live
-        self.timer.start(TICK_MS if live else TICK_IDLE_MS)
+        self.timer.start(pace)
         if not live:   # a level frozen mid-flight would show as stuck on the next show
             self.out_meter.set_level(0.0)
             self.mic_meter.set_level(0.0)
@@ -2422,8 +2470,13 @@ class MainWindow(QMainWindow):
                 self._update_status()
             self.voice.poll()
         playing = e.playing()
+        # the in-game overlay shows what's playing too, usually with this window in the tray
+        pace = TICK_MS if self._ui_live or self.overlay.is_open else TICK_IDLE_MS
+        if self.timer.interval() != pace:
+            self.timer.start(pace)
         if self._ui_live:
             self._tick_visuals(playing, now)
+        self.overlay.tick(playing)
         e.level_main *= 0.9
         e.level_mic *= 0.9
 
@@ -2436,7 +2489,8 @@ class MainWindow(QMainWindow):
                 self._stop_capture()
                 self.btn_rec.setEnabled(True)
                 self.btn_rec.setText("Record 6s → play back")
-                self.test_result.setText("<span style='color:#ff4d4f'>The test stopped: the "
+                self.test_result.setText(f"<span style='color:{theme.status('error')}'>"
+                                         "The test stopped: the "
                                          "virtual cable's output went away. Check Devices "
                                          "and try again.</span>")
                 self.test_result.show()
@@ -2477,7 +2531,6 @@ class MainWindow(QMainWindow):
                 p.update()
         self._update_transport(playing)
         self._update_chips(playing)
-        self.overlay.tick(playing)
         self.out_meter.set_level(e.level_main)
         self.logo.set_level(e.level_main)
         self.mic_meter.set_level(e.level_mic if e.mic_stream else 0.0)
@@ -2564,7 +2617,14 @@ class MainWindow(QMainWindow):
     def _tab_icons_only(self, compact: bool):
         for i, (text, tip) in enumerate(TABS):
             self.tabs.setTabText(i, "" if compact else text)
-            self.tabs.setTabToolTip(i, f"{text}: {tip}" if compact else tip)
+            base = f"{text}: {tip}" if compact else tip
+            old = self.tabs.property(f"_tip{i}")   # set_tab_live's copy of the plain tip
+            if old is not None:
+                cur = self.tabs.tabToolTip(i)
+                self.tabs.setProperty(f"_tip{i}", base)
+                if is_tab_live(self.tabs, i) and cur.endswith(old):   # keep its "● ON" line
+                    base = cur[:len(cur) - len(old)] + base
+            self.tabs.setTabToolTip(i, base)
 
     def _refit(self):
         narrow = self.width() < 860   # two cards side by side get cramped below this

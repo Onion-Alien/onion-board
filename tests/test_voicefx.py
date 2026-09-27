@@ -118,6 +118,43 @@ def test_params_are_clamped():
     assert e.p["delay"] == 1000 and e.p["feedback"] == 0.35
 
 
+def test_non_finite_params_fall_back_to_the_default():
+    e = REGISTRY["echo"](RATE, {"delay": float("nan"), "mix": float("inf")})
+    assert e.p["delay"] == 250 and e.p["mix"] == 0.4
+    assert np.all(np.isfinite(e.run(np.full(480, 0.1, np.float32), RATE)))
+
+
+@pytest.mark.parametrize("lo, hi, step", [(1, 1, 0), (0, 1, 2), (2, 1, 0), (0, 1, -1),
+                                          (0, float("nan"), 0)])
+def test_a_param_with_no_room_to_move_is_refused(lo, hi, step):
+    class Stuck(voicefx.Effect):
+        type, name = "test.stuck", "Stuck"
+        params = (voicefx.Param("k", "K", lo, hi, lo, "", step),)
+
+        def run(self, x, rate):
+            return x
+
+    with pytest.raises(ValueError, match="lo < hi"):
+        voicefx.register(Stuck)
+    assert "test.stuck" not in REGISTRY
+
+
+@pytest.mark.parametrize("raw, want", [
+    (None, {"effects": {}}),
+    ([1, 2], {"effects": {}}),
+    ({"enabled": "yes", "preset": ["x"], "effects": None}, {"effects": {}}),
+    ({"effects": []}, {"effects": {}}),
+    ({"effects": {"pitch": None, "echo": [1, 2]}}, {"effects": {}}),
+    ({"enabled": True, "preset": "Robot",
+      "effects": {"pitch": {"on": "yes", "semitones": "abc", "mix": float("nan")},
+                  "echo": {"on": True, "delay": 400, "mix": True}}},
+     {"enabled": True, "preset": "Robot",
+      "effects": {"pitch": {}, "echo": {"on": True, "delay": 400}}}),
+])
+def test_a_damaged_saved_spec_is_cleaned(raw, want):
+    assert voicefx.clean_spec(raw) == want
+
+
 # ---------------------------------------------------------------- chain
 
 def test_disabled_chain_returns_the_same_block():

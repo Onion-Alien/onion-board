@@ -17,7 +17,9 @@ run on independent clocks without drift or glitches.
 
 Live speed / pitch (the ⏩ controls): sounds play at `sound_speed` by reading
 their data at a fractional rate (like a tape), and a pitch shifter on the sounds
-bus corrects the pitch back (`sound_keep_pitch`) and adds `sound_pitch`.
+bus corrects the pitch back (`sound_keep_pitch`) and adds `sound_pitch`. The
+app's own playback (test recording, cue beeps, the setup tune, previews) is
+`fixed`: played at speed 1 and mixed in after the pitch shifter.
 Per-sound effects are baked in ahead of time instead (soundboard.soundfx).
 """
 from __future__ import annotations
@@ -44,6 +46,14 @@ STALL_S = 1.5   # a stream whose callback hasn't run for this long is dead: reop
 RETRY_S = 5.0   # how often to retry a device that failed to open
 I16_SCALE = np.float32(1 / 32767.0)   # int16 sound data -> float
 CACHE_BUDGET = 512 << 20               # bytes of resampled copies kept for non-48 kHz devices
+# the app's own playback: the test recording, cue beeps, the setup wizard's tune. With
+# previews ("<sid>:preview", "<sid>~fx:preview") they ignore the live speed / pitch
+FIXED_SIDS = frozenset({"__test__", "__cue__", "__setup__"})
+
+
+def is_fixed(sid: str) -> bool:
+    """True for voices the live speed / pitch must leave alone (see FIXED_SIDS)."""
+    return sid in FIXED_SIDS or sid.endswith(":preview")
 
 
 # --------------------------------------------------------------------------- devices
@@ -403,6 +413,7 @@ class Voice:
     # back at the end of every block and would otherwise undo a seek made meanwhile
     seek_to: dict = field(default_factory=dict)
     rates: dict = field(default_factory=dict)   # out -> the rate its data was made at
+    fixed: bool = False        # the app's own playback: no live speed / pitch (is_fixed)
 
     def __post_init__(self):
         self.pos = {o: 0 for o in self.data}
@@ -515,7 +526,7 @@ class Engine:
         self._rec_buf: list[np.ndarray] | None = None
         self._rec_frames_left = 0
         self.rec_done: tuple[np.ndarray, int] | None = None   # (audio, rate)
-        self._mic_rec: list[np.ndarray] | None = None          # raw mic during a test
+        self._mic_rec: list[np.ndarray] | None = None          # mic during a test (see _mic)
 
     # ----------------------------------------------------------------- streams
     @staticmethod
@@ -861,7 +872,8 @@ class Engine:
         rates_used = {o: self.rates[o] for o in outs}
         per_out = {o: self.data_for(sid, data, rates_used[o], src_rate) for o in outs}
         v = Voice(sid, per_out, gain, loop, preview=preview, rates=rates_used,
-                  fade_in=max(0.0, float(fade_in)), fade_out=max(0.0, float(fade_out)))
+                  fade_in=max(0.0, float(fade_in)), fade_out=max(0.0, float(fade_out)),
+                  fixed=is_fixed(sid))
         if start > 0:
             v.seek(start)
             for o in v.data:     # not shared yet: apply it now, so progress() is right
@@ -963,7 +975,9 @@ class Engine:
         self.rec_done = None
 
     def take_mic_recording(self) -> tuple[np.ndarray, int] | None:
-        """Raw mic captured during the last test (mono, at the mic's rate)."""
+        """The mic captured during the last test, at the mic's rate: (n, 2) with the
+        raw mic in column 0 and the mic as sent (after the voice changer) in column 1,
+        which is what testcheck.analyze looks for in the output."""
         rec, self._mic_rec = self._mic_rec, None
         if not rec:
             return None
@@ -974,13 +988,17 @@ class Engine:
         return self._rec_buf is not None
 
     # ----------------------------------------------------------------- callbacks
-    def _render(self, out: str, frames: int, previews_only=False) -> np.ndarray:
+    def _render(self, out: str, frames: int, previews_only=False,
+                fixed=False) -> np.ndarray:
+        """Mix the voices playing on `out`: the sounds (at the live speed) or, with
+        `fixed`, the app's own playback (always at speed 1)."""
         buf = np.zeros((frames, CH), np.float32)
         silent = None   # scratch for voices that must advance but not be heard
         fade = int(FADE_S * self.rates[out])
-        speed = float(self.sound_speed)
+        speed = 1.0 if fixed else float(self.sound_speed)
         # no lock: `self.voices` is an immutable tuple swapped atomically by the UI side
-        voices = [v for v in self.voices if out in v.data and out not in v.done]
+        voices = [v for v in self.voices
+                  if v.fixed == fixed and out in v.data and out not in v.done]
         for v in voices:
             if v.seek_to:
                 v._apply_seek(out)
@@ -1081,6 +1099,14 @@ class Engine:
             return p % n
         return p if p < n - 1 else n
 
+    def _sounds(self, out: str, frames: int, previews_only=False) -> np.ndarray:
+        """The sounds bus: sounds at the live speed through the live pitch, plus the
+        app's own playback (fixed voices) as it is."""
+        mix = self._pitch(out, self._render(out, frames, previews_only))
+        if any(v.fixed for v in self.voices):
+            mix += self._render(out, frames, previews_only, fixed=True)
+        return mix
+
     def _pitch(self, out: str, x: np.ndarray) -> np.ndarray:
         """Live pitch on the sounds bus: the user's shift, plus the correction that
         undoes the speed's pitch change when keep-pitch is on."""
@@ -1156,7 +1182,7 @@ class Engine:
             self._guard("mic", e)
 
     def _main(self, outdata, frames):
-        mix = self._pitch("main", self._render("main", frames))
+        mix = self._sounds("main", frames)
         mix *= np.float32(self.sound_vol)
         r = self.ring_rmain.read(frames)
         if r is not None and self.radio_live:
@@ -1186,8 +1212,7 @@ class Engine:
         check = self.mic_check and self.sending   # muted: they hear nothing, so neither do you
         # in mic check you hear the real output mix: sounds at their outgoing
         # level plus your mic, so you can judge the balance while a song plays
-        mix = self._pitch("mon", self._render("mon", frames,
-                                              previews_only=not (check or self.monitor_sounds)))
+        mix = self._sounds("mon", frames, previews_only=not (check or self.monitor_sounds))
         m = self.ring_mon.read(frames)
         if check:
             mix *= np.float32(self.sound_vol)
@@ -1212,11 +1237,12 @@ class Engine:
         x = np.ascontiguousarray(x, dtype=np.float32)
         self.level_mic = max(peak(x), self.level_mic * 0.85)
         rec = self._mic_rec
-        if rec is not None and self._rec_buf is not None:
-            rec.append(x[:, 0].copy())
+        raw = x[:, 0].copy() if rec is not None and self._rec_buf is not None else None
         chain = self.voice_chain
-        if chain is not None:   # after the meter and test recording: those judge the real mic
+        if chain is not None:   # after the meter: that judges the real mic
             x = chain.process(x, self.rates["mic"])
+        if raw is not None:     # a test: the real mic (did you talk?) and what's sent
+            rec.append(np.stack([raw, x[:, 0]], 1))
         if self.main_stream is not None:
             self.ring_main.write(self._rs_main(x))
         if self.mic_check and self.mon_stream is not None:

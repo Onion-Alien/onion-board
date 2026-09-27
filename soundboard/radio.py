@@ -28,7 +28,7 @@ import logging
 import random
 import time
 from dataclasses import asdict, dataclass, field
-from urllib.parse import quote, urlsplit
+from urllib.parse import quote
 
 import numpy as np
 from PySide6.QtCore import QObject, QTimer, QUrl, Signal
@@ -75,16 +75,17 @@ def _http(url: str) -> str:
     url = str(url or "").strip()
     if not url.lower().startswith(("http://", "https://")):
         return ""
-    try:
-        host = (urlsplit(url).hostname or "").rstrip(".").lower()
-    except ValueError:
-        return ""
+    # the host as Qt / FFmpeg will really connect to it: 127.1, 2130706433 and
+    # 0x7f000001 all become 127.0.0.1 there, which ipaddress wouldn't recognise
+    q = QUrl(url)
+    host = q.host().rstrip(".").lower() if q.isValid() else ""
     if not host or host == "localhost" or host.endswith((".localhost", ".local", ".lan")):
         return ""
     try:
         ip = ipaddress.ip_address(host)
     except ValueError:
         return url   # a name, not an address
+    ip = getattr(ip, "ipv4_mapped", None) or ip   # ::ffff:127.0.0.1
     return "" if (ip.is_private or ip.is_loopback or ip.is_link_local or ip.is_unspecified
                   or ip.is_multicast or ip.is_reserved) else url
 
@@ -230,7 +231,8 @@ class RadioDirectory(QObject):
 
     # -- plumbing
     def _get(self, path: str, done, fail, attempt: int = 0):
-        """GET `path` from a mirror; on a network error try the next mirror."""
+        """GET `path` from a mirror; on a network error or a reply that isn't JSON,
+        try the next mirror."""
         base = self.bases[attempt % len(self.bases)]
         req = QNetworkRequest(QUrl(base + path))
         req.setHeader(QNetworkRequest.UserAgentHeader, USER_AGENT)
@@ -241,14 +243,21 @@ class RadioDirectory(QObject):
 
         def finished():
             reply.deleteLater()
+            err = reply.errorString()
             if reply.error() == QNetworkReply.NoError:
-                done(bytes(reply.readAll()))
-            elif attempt + 1 < len(self.bases):
-                log.info("radio directory %s failed (%s); trying another mirror",
-                         base, reply.errorString())
+                raw = bytes(reply.readAll())
+                try:
+                    json.loads(raw)
+                except ValueError:   # a maintenance page or a captive portal, say
+                    err = "the directory sent something that isn't station data"
+                else:
+                    done(raw)
+                    return
+            if attempt + 1 < len(self.bases):
+                log.info("radio directory %s failed (%s); trying another mirror", base, err)
                 self._get(path, done, fail, attempt + 1)
             else:
-                fail(reply.errorString())
+                fail(err)
         reply.finished.connect(finished)
         return reply
 

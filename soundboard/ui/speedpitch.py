@@ -243,7 +243,7 @@ class SpeedPitchButton(QPushButton):
         self.setText(txt)
         hot = s > REDLINE_AT + 1e-6 or abs(p) > PITCH.hi
         self.setStyleSheet("" if self.is_default() else
-                           f"font-weight:700; color:{RED if hot else '#ffb020'};")
+                           f"font-weight:700; color:{RED if hot else theme.status('warn')};")
 
     def _edited(self):
         self._label()

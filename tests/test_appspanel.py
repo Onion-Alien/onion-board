@@ -160,6 +160,22 @@ def test_remembered_programs_start_from_the_config_and_auto_send(qapp, monkeypat
         t.shutdown()
 
 
+def test_a_damaged_remembered_volume_does_not_stop_the_app_starting(qapp, monkeypatch):
+    """A hand-edited or damaged config ("loud", NaN, huge) used to crash the window."""
+    monkeypatch.setattr(appaudio, "list_apps", lambda: [])
+    cfg = Config()
+    cfg.apps = {"a.exe": {"vol": "loud"}, "b.exe": {"vol": float("nan")},
+                "c.exe": {"vol": 1e9}, "d.exe": {"vol": -2}, "e.exe": {"vol": None},
+                "f.exe": {"vol": "0.5"}}
+    t = AppsTab(Engine(), cfg, lambda: None, Meter)
+    try:
+        vols = {exe: row.vol.value() for exe, row in t.rows.items()}
+    finally:
+        t.shutdown()
+    assert vols == {"a.exe": 1.0, "b.exe": 1.0, "c.exe": appspanel.MAX_VOL, "d.exe": 0.0,
+                    "e.exe": 1.0, "f.exe": 0.5}
+
+
 def test_a_failed_capture_reports_and_is_not_remembered(tab):
     FakeCapture.fail = True
     tab._on_apps([music()])

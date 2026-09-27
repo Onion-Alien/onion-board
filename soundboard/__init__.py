@@ -1,3 +1,3 @@
 """Onion Board — gaming soundboard with virtual-mic output, mic passthrough and test mode."""
 
-__version__ = "1.2.2"
+__version__ = "1.2.3"

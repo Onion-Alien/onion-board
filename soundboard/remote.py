@@ -61,6 +61,11 @@ class Job:
     done: threading.Event = field(default_factory=threading.Event)
     status: int = 500
     body: object = None
+    # a request answered "busy" must not still run later (a retrying Stream Deck
+    # would play the sound twice); the lock settles which of the two happens
+    lock: threading.Lock = field(default_factory=threading.Lock)
+    started: bool = False
+    cancelled: bool = False
 
 
 class _Server(ThreadingHTTPServer):
@@ -95,6 +100,10 @@ class RemoteControl(QObject):
             return False
         try:
             srv = _Server((HOST, self.port), _handler_for(self))
+        except (OverflowError, ValueError) as e:   # a port outside 0-65535
+            self.error = f"port {self.port} isn't a valid port — pick one from 1024 to 65535"
+            log.warning("control API couldn't listen on %s:%s: %s", HOST, self.port, e)
+            return False
         except OSError as e:
             self.error = (f"port {self.port} is already in use — pick another"
                           if getattr(e, "winerror", None) == 10048 or e.errno in (98, 10048)
@@ -116,6 +125,10 @@ class RemoteControl(QObject):
             log.info("control API stopped")
 
     def _on_request(self, job: Job):
+        with job.lock:
+            if job.cancelled:
+                return
+            job.started = True
         try:
             job.status, job.body = self.dispatch(job.action, job.params)
         except Exception:  # noqa: BLE001 - a bad request must never take the app down
@@ -169,7 +182,11 @@ def _handler_for(ctl: RemoteControl):
             job = Job(action, params)
             ctl.request.emit(job)
             if not job.done.wait(ANSWER_S):
-                return self._answer(503, {"error": "the app is busy, try again"})
+                with job.lock:
+                    job.cancelled = not job.started
+                if job.cancelled:
+                    return self._answer(503, {"error": "the app is busy, try again"})
+                job.done.wait()   # it got going just now: answer what it did
             self._answer(job.status, job.body)
 
         do_GET = do_POST = _go

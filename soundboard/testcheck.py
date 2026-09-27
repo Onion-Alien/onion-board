@@ -1,9 +1,12 @@
 """Output self-test: is my voice / are my sounds really in what others receive?
 
 Given a recording of the real output (e.g. captured from CABLE Output) and the
-raw mic recorded at the same time, find the mic inside the output by
+mic recorded at the same time, find the mic inside the output by
 cross-correlation. A sharp correlation peak means the voice made it through;
 subtracting that copy leaves the sounds, so the two levels can be compared.
+With the voice changer on, the output holds the changed voice, so the mic as
+sent (after the changer) is what's looked for; the raw mic still says whether
+you talked.
 """
 from __future__ import annotations
 
@@ -27,8 +30,10 @@ def _active_level(x: np.ndarray, rate: int) -> float:
 
 def analyze(out: np.ndarray, out_rate: int, mic: np.ndarray | None, mic_rate: int,
             sound_vol: float) -> dict:
+    """`mic` is the raw mic (n,), or (n, 2): the raw mic and the mic as sent (what
+    Engine.take_mic_recording returns)."""
     o = (out.mean(axis=1) if out.ndim == 2 else out).astype(np.float64)
-    res = {"talked": False, "voice_in": False, "sounds_in": False,
+    res = {"talked": False, "voice_in": False, "sounds_in": False, "replaced": False,
            "voice_db": None, "sounds_db": None, "advice": ""}
 
     if mic is None or len(mic) < mic_rate // 2:
@@ -36,18 +41,37 @@ def analyze(out: np.ndarray, out_rate: int, mic: np.ndarray | None, mic_rate: in
         res["sounds_in"] = res["sounds_db"] > -45
         return res
 
-    m = soxr.resample(mic.astype(np.float32), mic_rate, out_rate).astype(np.float64)
-    k = min(len(o), len(m))
-    o, m = o[:k], m[:k]
-    res["talked"] = _active_level(m, out_rate) > -48
+    raw = mic[:, 0] if mic.ndim == 2 else mic
+    sent = mic[:, 1] if mic.ndim == 2 else mic
+
+    def at_out_rate(x):
+        return soxr.resample(np.ascontiguousarray(x, dtype=np.float32), mic_rate,
+                             out_rate).astype(np.float64)
+    m = at_out_rate(sent)
+    heard = m if sent is raw else at_out_rate(raw)
+    k = min(len(o), len(m), len(heard))
+    o, m, heard = o[:k], m[:k], heard[:k]
+    res["talked"] = _active_level(heard, out_rate) > -48
+    # you talked, but nothing of it is sent: the computer voice mutes the real mic
+    res["replaced"] = res["talked"] and not np.any(m)
 
     # where (0..500 ms later) does the mic show up in the output?
     n = 1 << int(np.ceil(np.log2(2 * k)))
-    xc = np.fft.irfft(np.fft.rfft(o, n) * np.conj(np.fft.rfft(m, n)), n)
+    cross = np.fft.rfft(o, n) * np.conj(np.fft.rfft(m, n))
+    xc = np.fft.irfft(cross, n)
     lags = xc[: int(out_rate * 0.5)]
     i = int(np.abs(lags).argmax())
     ratio = abs(lags[i]) / (np.median(np.abs(lags)) + 1e-12)
-    res["voice_in"] = res["talked"] and ratio > 12
+    # the same, whitened (GCC-PHAT): a voice changer's buzz (robot) or pitch shift is
+    # so periodic that the plain correlation has a peak every period and no clear
+    # winner; whitened, the real delay is one sharp spike (no match stays under ~8)
+    mag = np.abs(cross)
+    ph = np.fft.irfft(cross / (mag + 1e-9 * mag.max() + 1e-30), n)[: len(lags)]
+    j = int(np.abs(ph).argmax())
+    pratio = abs(ph[j]) / (np.median(np.abs(ph)) + 1e-12)
+    if pratio > 25:
+        i = j
+    res["voice_in"] = res["talked"] and (ratio > 12 or pratio > 25)
 
     if res["voice_in"]:
         g = lags[i] / (m ** 2).sum()
@@ -79,13 +103,17 @@ def analyze(out: np.ndarray, out_rate: int, mic: np.ndarray | None, mic_rate: in
 
 def summary_html(r: dict, cable: str | None, mic_sent: bool = True) -> str:
     """`mic_sent` False = sounds-only mode: the voice isn't expected in the output."""
-    ok, bad, warn = "#13ce66", "#ff4d4f", "#ffb020"
+    from soundboard import theme   # the current theme's readable green / red / amber
+    ok, bad, warn = theme.status("ok"), theme.status("error"), theme.status("warn")
     lines = []
     if not mic_sent:
         lines.append((ok, "— Sounds only: your mic isn't sent (untick/tick “send” next to "
                           "My mic to change that)"))
     elif not r["talked"]:
         lines.append((warn, "⚠ Didn't hear you talk — talk during the test to check your mic"))
+    elif r.get("replaced"):
+        lines.append((ok, "— Computer voice is on: your real voice is muted, so others hear "
+                          "only the spoken voice"))
     elif r["voice_in"]:
         lines.append((ok, "✓ Your VOICE is in the output"))
     else:

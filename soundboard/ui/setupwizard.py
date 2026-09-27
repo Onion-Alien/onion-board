@@ -24,11 +24,13 @@ from PySide6.QtWidgets import (QApplication, QButtonGroup, QCheckBox, QDialog, Q
                                QRadioButton, QScrollArea, QStackedWidget, QVBoxLayout, QWidget)
 
 from soundboard import engine as eng
+from soundboard import theme
 from soundboard.engine import SR
 from soundboard import library
 from soundboard.library import RESOURCE_DIR
 from soundboard.ui import fit
 from soundboard.ui.bunnywidget import BunnyWidget
+from soundboard.ui.crashdialog import free_dialog
 from soundboard.ui.widgets import Meter
 
 RESTART_NEEDED = 3010   # install-vbcable.ps1: installed, but Windows must restart first
@@ -143,7 +145,14 @@ def test_tune() -> np.ndarray:
 
 TITLE_CSS = "font-size:17pt; font-weight:800;"
 BODY_CSS = "font-size:11pt;"
-OK, BAD = "#13ce66", "#ffb020"
+
+
+def _ok() -> str:    # status colours readable on the current theme (theme.status)
+    return theme.status("ok")
+
+
+def _bad() -> str:
+    return theme.status("warn")
 
 
 def _label(text: str, css: str = BODY_CSS) -> QLabel:
@@ -190,6 +199,11 @@ class SetupWizard(QDialog):
         self._needs_restart = False   # the installer said Windows must restart first
         self._cable_step = ""         # the installer's current step (CABLE_STEPS)
         self._steps_seen: list[str] = []
+        # the devices from before the guide: a page that stands in the first one it
+        # finds for a missing (unplugged) device must not overwrite them on Cancel
+        self._saved_devices = {"mic_device": win.cfg.mic_device,
+                               "mon_device": win.cfg.mon_device}
+        self._user_picked: set[str] = set()   # the ones they actually clicked
 
         v = QVBoxLayout(self)
         v.setContentsMargins(24, 20, 24, 18)
@@ -244,7 +258,7 @@ class SetupWizard(QDialog):
             if n == current:
                 rb.setChecked(True)
         if not names:
-            bv.addWidget(_label(f"<span style='color:{BAD}'>None found. Plug it in, close "
+            bv.addWidget(_label(f"<span style='color:{_bad()}'>None found. Plug it in, close "
                                 "this, then press <b>Step-by-step guide</b> on the Setup "
                                 "tab.</span>"))
         bv.addStretch(1)
@@ -268,9 +282,10 @@ class SetupWizard(QDialog):
         self._no_mics = not mics
         cur = self.win.cfg.mic_device if self.win.cfg.mic_device in mics else \
             (mics[0] if mics else None)
-        if cur:
+        if cur and cur != self.win.cfg.mic_device:   # the saved one is missing
             self._pick_mic(cur)
-        lst, self.mic_group = self._choice_list(mics, cur, self._pick_mic)
+        lst, self.mic_group = self._choice_list(
+            mics, cur, lambda n: self._pick_mic(n, by_user=True))
         v.addWidget(lst, 1)
         row = QHBoxLayout()
         row.addWidget(_label("Your voice:"))
@@ -298,9 +313,10 @@ class SetupWizard(QDialog):
         outs = [d["name"] for d in eng.list_devices("output") if not eng.is_virtual(d["name"])]
         cur = self.win.cfg.mon_device if self.win.cfg.mon_device in outs else \
             (outs[0] if outs else None)
-        if cur:
+        if cur and cur != self.win.cfg.mon_device:   # the saved one is missing
             self._pick_headphones(cur)
-        lst, _ = self._choice_list(outs, cur, self._pick_headphones)
+        lst, _ = self._choice_list(outs, cur,
+                                   lambda n: self._pick_headphones(n, by_user=True))
         v.addWidget(lst, 1)
         play = QPushButton("🔊  Play a test sound")
         play.setStyleSheet("padding:10px; font-size:11pt;")
@@ -368,7 +384,7 @@ class SetupWizard(QDialog):
                                      "Show me how")
         self.btn_steam.setToolTip("Games that use Steam voice chat take the mic from "
                                   "Steam's own settings")
-        self.btn_steam.clicked.connect(lambda: SteamGuide(self, self._vm).exec())
+        self.btn_steam.clicked.connect(self.show_steam_guide)
         v.addWidget(self.btn_steam)
         v.addStretch(1)
         v.addWidget(_label("That's it. Add sounds by dragging files onto the window, then "
@@ -434,17 +450,24 @@ class SetupWizard(QDialog):
     def done(self, r):
         self.timer.stop()
         if r != QDialog.Accepted:
+            for k, v in self._saved_devices.items():   # keep what they had, unless
+                if k not in self._user_picked:         # they picked another one here
+                    setattr(self.win.cfg, k, v)
             self.win.cfg.save()
             self.win._init_devices()
         super().done(r)
 
     # ------------------------------------------------------------------ actions
-    def _pick_mic(self, name: str):
+    def _pick_mic(self, name: str, by_user: bool = False):
+        if by_user:
+            self._user_picked.add("mic_device")
         self.win.cfg.mic_device = name
         self.win.engine.set_mic_device(name)
         self._mic_peak_seen = False
 
-    def _pick_headphones(self, name: str):
+    def _pick_headphones(self, name: str, by_user: bool = False):
+        if by_user:
+            self._user_picked.add("mon_device")
         self.win.cfg.mon_device = name
         self.win.engine.set_mon_device(name)
 
@@ -477,10 +500,10 @@ class SetupWizard(QDialog):
             if self._resumed:   # back from the restart, and it worked
                 self._resumed = False
                 self.bun_cable.stop_building(True)
-                self.cable_status.setText(f"<b style='color:{OK}'>👋 Welcome back — the cable "
+                self.cable_status.setText(f"<b style='color:{_ok()}'>👋 Welcome back — the cable "
                                           "works now!</b> Press Next for the last step.")
             else:
-                self.cable_status.setText(f"<b style='color:{OK}'>✓ Installed and "
+                self.cable_status.setText(f"<b style='color:{_ok()}'>✓ Installed and "
                                           "connected.</b> Nothing to do here — press Next.")
             self.btn_cable.hide()
             self.btn_recheck.hide()
@@ -489,7 +512,7 @@ class SetupWizard(QDialog):
             # again before then (VB-Audio says not to); the button below only re-runs
             # the installer's wake-up (restart the cable + audio service), no reinstall.
             resume_after_restart(True)
-            self.cable_status.setText(f"<b style='color:{OK}'>✓ Installed.</b> Windows needs "
+            self.cable_status.setText(f"<b style='color:{_ok()}'>✓ Installed.</b> Windows needs "
                                       "a <b>restart</b> to finish setting it up. Restart "
                                       "whenever suits you: Onion Board will open by itself "
                                       "afterwards and pick up right here.")
@@ -498,21 +521,21 @@ class SetupWizard(QDialog):
             self.btn_recheck.show()
             self.btn_restart.show()
         elif self._cable_tries:
-            self.cable_status.setText(f"<b style='color:{BAD}'>That didn't work.</b> If Windows "
+            self.cable_status.setText(f"<b style='color:{_bad()}'>That didn't work.</b> If Windows "
                                       "asked for permission, click <b>Yes</b> this time. If it "
                                       "still won't install, restarting your PC often helps.")
             self.btn_cable.setText("⬇  Try installing again")
             self.btn_cable.show()
             self.btn_recheck.show()
         elif self._resumed:   # back from the restart, and it still isn't there
-            self.cable_status.setText(f"<b style='color:{BAD}'>It still isn't showing up after "
+            self.cable_status.setText(f"<b style='color:{_bad()}'>It still isn't showing up after "
                                       "the restart.</b> Install it again below; if Windows "
                                       "asks for permission, click <b>Yes</b>.")
             self.btn_cable.setText("⬇  Try installing again")
             self.btn_cable.show()
             self.btn_recheck.show()
         else:
-            self.cable_status.setText(f"<b style='color:{BAD}'>Not installed yet.</b> "
+            self.cable_status.setText(f"<b style='color:{_bad()}'>Not installed yet.</b> "
                                       "Without it, only you can hear your sounds.")
             self.btn_cable.setText("⬇  Install it now (free)")
             self.btn_cable.show()
@@ -522,7 +545,7 @@ class SetupWizard(QDialog):
     def install_cable(self):
         script = RESOURCE_DIR / "install-vbcable.ps1"
         if not script.exists():
-            self.cable_status.setText(f"<span style='color:{BAD}'>The cable installer is "
+            self.cable_status.setText(f"<span style='color:{_bad()}'>The cable installer is "
                                       "missing. Get it from vb-audio.com/Cable.</span>")
             return
         global _installer
@@ -536,7 +559,7 @@ class SetupWizard(QDialog):
                  str(script), "-Silent", "-StatusFile", str(status)],
                 creationflags=subprocess.CREATE_NO_WINDOW)
         except OSError as e:
-            self.cable_status.setText(f"<span style='color:{BAD}'>Couldn't start the cable "
+            self.cable_status.setText(f"<span style='color:{_bad()}'>Couldn't start the cable "
                                       f"installer ({e.strerror or e}).</span> Restart your PC "
                                       "and try again, or install it yourself from "
                                       "vb-audio.com/Cable.")
@@ -573,7 +596,7 @@ class SetupWizard(QDialog):
             if key == self._cable_step:
                 rows.append(f"<b>▶  {text}…</b>")
             elif key in self._steps_seen:
-                rows.append(f"<span style='color:{OK}'>✓  {text}</span>")
+                rows.append(f"<span style='color:{_ok()}'>✓  {text}</span>")
             elif key != "wake":   # only listed if it actually happens
                 rows.append(f"<span style='color:gray'>○  {text}</span>")
         return "<br>".join(rows)
@@ -590,7 +613,7 @@ class SetupWizard(QDialog):
             subprocess.Popen(["shutdown", "/r", "/t", "5"],
                              creationflags=subprocess.CREATE_NO_WINDOW)
         except OSError as e:
-            self.cable_status.setText(f"<span style='color:{BAD}'>Couldn't restart the PC "
+            self.cable_status.setText(f"<span style='color:{_bad()}'>Couldn't restart the PC "
                                       f"({e.strerror or e}).</span> Restart it from the Start "
                                       "menu (Power → Restart); Onion Board will pick up here "
                                       "afterwards.")
@@ -600,7 +623,7 @@ class SetupWizard(QDialog):
         self._vm = name or "CABLE Output"
         if not name:
             self.discord_text.setText(
-                f"<span style='color:{BAD}'>The virtual cable isn't set up yet, so only you "
+                f"<span style='color:{_bad()}'>The virtual cable isn't set up yet, so only you "
                 "will hear your sounds.</span> Go <b>Back</b> to install it, or finish now and "
                 "this guide will open again next time.")
             self.btn_copy.hide()
@@ -608,11 +631,16 @@ class SetupWizard(QDialog):
         self.btn_copy.show()
         self.discord_text.setText(
             "Onion Board now sends your voice and sounds into a new microphone called:"
-            f"<p style='font-size:15pt; font-weight:800; color:{OK}'>{name}</p>"
+            f"<p style='font-size:15pt; font-weight:800; color:{_ok()}'>{name}</p>"
             "<b>In Discord:</b> click the ⚙ gear (User Settings) → <b>Voice &amp; Video</b> → "
             f"<b>Input Device</b> → choose <b>{name}</b>.<br><br>"
             f"<b>In a game:</b> open its audio / voice chat settings and set the microphone to "
             f"<b>{name}</b>.")
+
+    def show_steam_guide(self):
+        g = SteamGuide(self, self._vm)
+        g.exec()
+        free_dialog(g)
 
     def copy_name(self):
         QApplication.clipboard().setText(self._vm)
@@ -627,15 +655,15 @@ class SetupWizard(QDialog):
             self._mic_peak_seen = True
         if self.stack.currentIndex() == 0:
             if e.mic_stream is None and self._no_mics:
-                self.mic_heard.setText(f"<span style='color:{BAD}'>No microphone was found."
+                self.mic_heard.setText(f"<span style='color:{_bad()}'>No microphone was found."
                                        "</span> Plug one in, then open this guide again "
                                        "from the Setup tab — or press Next to carry on "
                                        "without one.")
             elif e.mic_stream is None:
-                self.mic_heard.setText(f"<span style='color:{BAD}'>Couldn't open that mic — "
+                self.mic_heard.setText(f"<span style='color:{_bad()}'>Couldn't open that mic — "
                                        "try another one.</span>")
             elif self._mic_peak_seen:
-                self.mic_heard.setText(f"<b style='color:{OK}'>✓ Hearing you!</b>")
+                self.mic_heard.setText(f"<b style='color:{_ok()}'>✓ Hearing you!</b>")
             else:
                 self.mic_heard.setText("Waiting to hear you… if the bar doesn't move, pick "
                                        "another mic.")
@@ -677,7 +705,7 @@ class SteamGuide(QDialog):
             "the ⚙ gear.)</span></li>"
             "<li style='margin-bottom:8px'>On the left, click <b>Voice</b>.</li>"
             "<li style='margin-bottom:8px'>Click the <b>Voice Input Device</b> box and "
-            f"choose <b style='color:{OK}'>{mic_name}</b>.<br>"
+            f"choose <b style='color:{_ok()}'>{mic_name}</b>.<br>"
             "<span style='font-size:9pt'>Not in the list? Close Steam completely "
             "(right-click its icon by the clock → Exit) and open it again.</span></li>"
             "<li style='margin-bottom:8px'>Under <b>Advanced options</b>, turn "
@@ -691,7 +719,7 @@ class SteamGuide(QDialog):
             "</ol>"))
         v.addWidget(_label(
             "<b>Push-to-talk tip:</b> if you use push-to-talk in Steam or the game, set "
-            "the same key in Onion Board (⚙ Settings → <b>Hotkeys</b> → <b>Auto push-to-talk</b>)."
+            "the same key in Onion Board (⚙ Settings → <b>Hotkeys</b> → <b>Auto push-to-talk</b>). "
             "Onion Board will then hold it down for you while a sound plays.",
             "font-size:10pt;"))
         row = QHBoxLayout()

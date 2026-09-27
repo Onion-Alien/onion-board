@@ -43,6 +43,9 @@ $o.AutoFlush = $true
 $ErrorActionPreference = 'Stop'
 Add-Type -AssemblyName System.Speech
 $s = New-Object System.Speech.Synthesis.SpeechSynthesizer
+# the Windows default voice, put back for a line with no voice named (SelectVoice sticks)
+$def = ''
+try { $def = $s.Voice.Name } catch {}
 $list = @($s.GetInstalledVoices() | Where-Object { $_.Enabled } |
     ForEach-Object { $_.VoiceInfo.Name + "`t" + $_.VoiceInfo.Culture.Name })
 $desk = @{}
@@ -87,7 +90,7 @@ while ($true) {
             $fs = [System.IO.File]::Create($out)
             try { $in.CopyTo($fs) } finally { $fs.Close(); $in.Close(); $st.Dispose() }
         } else {
-            if ($name) { $s.SelectVoice($name) }
+            if ($name) { $s.SelectVoice($name) } elseif ($def) { $s.SelectVoice($def) }
             $s.Rate = [int]$f[1]
             $fmt = New-Object System.Speech.AudioFormat.SpeechAudioFormatInfo(RATE,
                 [System.Speech.AudioFormat.AudioBitsPerSample]::Sixteen,
@@ -290,7 +293,11 @@ class Speaker:
                     log.warning("text-to-speech failed: %s", e)
                     self.on_error(str(e))
                     continue
-                if not len(mono) or gen != self._gen:
+                if gen != self._gen:
+                    continue
+                if not len(mono):
+                    # nothing came out: the voice can't read this language or script
+                    self.on_error("this voice can't read that text")
                     continue
                 try:
                     self.play(np.repeat(mono[:, None], 2, axis=1), sr)

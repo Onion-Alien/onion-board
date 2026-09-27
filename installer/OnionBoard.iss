@@ -66,6 +66,13 @@ Name: "ffmpeg"; Description: "Play M4A, AAC and video files (installs the free F
 Name: "livevoice"; Description: "Set up live voice-to-speech now: you talk, others hear a text-to-speech voice. Needs Python from python.org; downloads about 300 MB. (You can also do this later from the Voice tab.)"; GroupDescription: "Extras"; Flags: unchecked
 Name: "desktopicon"; Description: "Put an Onion Board shortcut on my Desktop"; GroupDescription: "Shortcuts"
 
+[InstallDelete]
+; The Python runtime and libraries from the last version: cleared first so files a
+; release no longer ships don't linger (and get loaded) after an update. Nothing of the
+; user's lives there: settings, sounds and downloaded add-ons are in %APPDATA%\OnionBoard,
+; and {app}\modules (live-voice's own .venv) is left alone.
+Type: filesandordirs; Name: "{app}\_internal"
+
 [Files]
 ; Includes the add-ons in {app}\modules (build.ps1 copies them in; see soundboard/modules.py).
 ; live-voice's own .venv is made later, by the "livevoice" task or the Voice tab's button.
@@ -215,6 +222,9 @@ begin
     end;
   end;
   RegDeleteValue(HKCU, 'Software\OnionBoard', 'InstalledCable');
+  // a restart still pending: don't try to reopen an app that's gone
+  RegDeleteValue(HKCU, 'Software\Microsoft\Windows\CurrentVersion\RunOnce',
+    'OnionBoardResumeSetup');
   RegDeleteKeyIfEmpty(HKCU, 'Software\OnionBoard');
 end;
 

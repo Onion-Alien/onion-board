@@ -24,6 +24,7 @@ per output (it keeps filter state), all reading the same Dest.
 """
 from __future__ import annotations
 
+import math
 from dataclasses import asdict, dataclass
 
 import numpy as np
@@ -58,14 +59,15 @@ class Dest:
         """A custom mode from saved JSON; bad values fall back to safe ones."""
         def num(k, lo, hi, default):
             try:
-                return float(min(max(float(d.get(k, default)), lo), hi))
-            except (TypeError, ValueError):
+                v = float(d.get(k, default))
+            except (TypeError, ValueError, OverflowError):
                 return float(default)
+            return float(min(max(v, lo), hi)) if math.isfinite(v) else float(default)
         key = str(d.get("key") or "").strip() or "custom"
         label = str(d.get("label") or key)[:40]
         try:
             ceiling = int(d.get("ceiling", 0) or 0)
-        except (TypeError, ValueError):
+        except (TypeError, ValueError, OverflowError):   # also NaN / Infinity in the JSON
             ceiling = 0
         ceiling = min(max(ceiling, 0), 20000)
         if 0 < ceiling < 1000:
@@ -93,7 +95,8 @@ BUILTIN_BY_KEY = {d.key: d for d in BUILTIN}
 def all_modes(custom: list[dict] | None) -> list[Dest]:
     out = list(BUILTIN)
     seen = set(BUILTIN_BY_KEY)
-    for raw in custom or ():
+    # a hand-edited or imported config can hold anything here: only a list is used
+    for raw in custom if isinstance(custom, list) else ():
         if not isinstance(raw, dict):
             continue
         d = Dest.from_dict(raw)
@@ -106,7 +109,7 @@ def all_modes(custom: list[dict] | None) -> list[Dest]:
 
 def resolve(cfg_dest: dict | None) -> Dest:
     """The Dest a config's `dest` dict selects (OFF when unset or unknown)."""
-    cfg_dest = cfg_dest or {}
+    cfg_dest = cfg_dest if isinstance(cfg_dest, dict) else {}
     key = cfg_dest.get("mode", "off")
     for d in all_modes(cfg_dest.get("custom")):
         if d.key == key:

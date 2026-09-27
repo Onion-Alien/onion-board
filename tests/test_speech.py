@@ -80,6 +80,26 @@ def test_discover_reads_manifests_and_reports_bad_ones(tmp_path):
     assert "bad module.json" in got["d"].error
 
 
+def test_manifest_with_a_bom_is_read_and_string_commands_are_refused(tmp_path):
+    (tmp_path / "bom").mkdir()
+    (tmp_path / "bom" / "module.json").write_text(      # Notepad / PowerShell style
+        json.dumps({"id": "bom", "kind": "service", "command": ["x"]}), encoding="utf-8-sig")
+    write_module(tmp_path / "cmd", id="cmd", kind="service", command="python helper.py")
+    write_module(tmp_path / "inst", id="inst", kind="service", command=["x"],
+                 install="pip install x")
+    write_module(tmp_path / "step", id="step", kind="service", command=["x"],
+                 install=["pip install x"])
+    write_module(tmp_path / "list", id="list", kind="service", command=["x", 1])
+    (tmp_path / "arr").mkdir()
+    (tmp_path / "arr" / "module.json").write_text("[]", encoding="utf-8")
+    got = {m.id: m for m in modules.discover([tmp_path])}
+    assert got["bom"].error == "" and got["bom"].command == ["x"]
+    for mid in ("cmd", "inst", "step", "list"):
+        assert "bad module.json" in got[mid].error, mid
+        assert got[mid].command == [] and got[mid].install_steps == []
+    assert "bad module.json" in got["arr"].error
+
+
 def test_first_folder_wins_for_the_same_id(tmp_path):
     write_module(tmp_path / "user" / "m", id="m", version="2", kind="service", command=["x"])
     write_module(tmp_path / "app" / "m", id="m", version="1", kind="service", command=["x"])
@@ -259,6 +279,26 @@ def test_service_that_exits_early_is_reported():
     assert wait_for(lambda: any(e["type"] == "stopped" for e in events))
     assert "code 3" in events[-1]["text"]
     h.stop()
+
+
+def test_a_message_that_breaks_the_reader_still_reports_stopped():
+    # JSON nested too deep raises RecursionError: the UI must not stay on "listening"
+    mod = ("import json,socket,struct,sys,time\n"
+           "a=sys.argv; p=int(a[a.index('--port')+1]); t=a[a.index('--token')+1]\n"
+           "s=socket.create_connection(('127.0.0.1',p))\n"
+           "def fr(b): s.sendall(b'J'+struct.pack('<I',len(b))+b)\n"
+           "fr(json.dumps({'type':'hello','token':t}).encode())\n"
+           "fr(b'{\"type\":\"ready\"}')\n"
+           "fr(b'['*100000 + b']'*100000)\n"
+           "time.sleep(5)\n")
+    events = []
+    h = ServiceHost([sys.executable, "-c", mod], events.append, name="deep")
+    h.start()
+    try:
+        assert wait_for(lambda: any(e["type"] == "stopped" for e in events))
+        assert "recursion" in events[-1]["text"] and not h.connected
+    finally:
+        h.stop()
 
 
 def test_feed_never_blocks_and_drops_oldest_when_nobody_reads():
@@ -466,6 +506,17 @@ def test_a_line_that_cant_be_played_is_reported_and_the_next_still_plays():
     assert {"type": "tts_error", "text": "device went away"} in events
 
 
+def test_a_line_the_voice_cant_read_is_reported():
+    # an English voice given Chinese or Arabic text makes no sound at all
+    events = []
+    c, eng = controller(events)
+    c.tts.synth = lambda text, voice="", rate=0: (np.zeros(0, np.float32), 22050)
+    c.say("你好世界")
+    assert wait_for(lambda: events)
+    assert events == [{"type": "tts_error", "text": "this voice can't read that text"}]
+    assert eng.played == []
+
+
 def test_no_open_device_says_so():
     events = []
     c, eng = controller(events)
@@ -570,6 +621,23 @@ def test_windows_tts_speaks_into_memory():
         with pytest.raises(RuntimeError):
             t.synth("x", "No Such Voice")
         assert len(t.synth("still works")[0])        # an error doesn't kill the engine
+    finally:
+        t.close()
+
+
+@pytest.mark.skipif(sys.platform != "win32" or not shutil.which("powershell.exe"),
+                    reason="needs Windows PowerShell")
+def test_windows_default_voice_comes_back_after_a_named_one():
+    from soundboard.speech.tts import SapiTTS
+    t = SapiTTS()
+    try:
+        voices = [v for v in t.warm_up() if v.endswith(" Desktop")]
+        line = "The quick brown fox jumps over the lazy dog."
+        default = t.synth(line)[0]
+        other = next((v for v in voices if len(t.synth(line, v)[0]) != len(default)), None)
+        if other is None:
+            pytest.skip("needs two different Windows desktop voices")
+        assert np.array_equal(t.synth(line)[0], default)   # not stuck on `other`
     finally:
         t.close()
 

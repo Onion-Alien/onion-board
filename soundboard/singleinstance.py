@@ -11,6 +11,7 @@ from __future__ import annotations
 import ctypes
 import logging
 import os
+import time
 
 from PySide6.QtCore import Qt
 from PySide6.QtNetwork import QLocalServer, QLocalSocket
@@ -19,6 +20,7 @@ log = logging.getLogger(__name__)
 
 # overridable so a test copy never finds (and pops up) the real, running app
 INSTANCE_NAME = os.environ.get("ONIONBOARD_INSTANCE", "OnionBoard.App")
+CONNECT_SECONDS = 5.0   # how long a second launch waits for the first to answer
 
 
 def claim_single_instance() -> bool:
@@ -35,8 +37,16 @@ def claim_single_instance() -> bool:
     except Exception:  # noqa: BLE001
         log.debug("AllowSetForegroundWindow failed", exc_info=True)
     sock = QLocalSocket()
-    sock.connectToServer(INSTANCE_NAME)
-    if sock.waitForConnected(1500):
+    # The running copy may still be starting up (its server not listening yet): keep
+    # trying for a few seconds before telling the user to go look for it.
+    deadline = time.monotonic() + CONNECT_SECONDS
+    while True:
+        sock.connectToServer(INSTANCE_NAME)
+        if sock.waitForConnected(500) or time.monotonic() >= deadline:
+            break
+        sock.abort()
+        time.sleep(0.2)
+    if sock.state() == QLocalSocket.LocalSocketState.ConnectedState:
         sock.write(b"show")
         sock.waitForBytesWritten(500)
         sock.disconnectFromServer()
@@ -58,13 +68,16 @@ def listen_for_second_launch(app, get_window) -> QLocalServer:
     """Bring the window to the front when someone launches Onion Board again."""
     QLocalServer.removeServer(INSTANCE_NAME)
     server = QLocalServer(app)
+    server.show_requested = False
 
     def on_connect():
         conn = server.nextPendingConnection()
         if conn is not None:
             conn.disconnected.connect(conn.deleteLater)
         w = get_window()
-        if w is not None:
+        if w is None:   # still starting up: app.main() shows it once it exists
+            server.show_requested = True
+        else:
             w.setWindowState((w.windowState() & ~Qt.WindowMinimized) | Qt.WindowActive)
             w.show()
             w.raise_()

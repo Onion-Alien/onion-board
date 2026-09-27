@@ -9,6 +9,7 @@ import threading
 import time
 import types
 import zipfile
+from collections import namedtuple
 
 import numpy as np
 import pytest
@@ -560,3 +561,63 @@ def test_direct_leaf_keeps_only_a_plain_file_name():
         == "vine-boom.mp3"
     leaf = ytdl._direct_leaf("https://www.myinstants.com/media/sounds/%2e%2e%5cStartup%5cx.mp3")
     assert "\\" not in leaf and "/" not in leaf and not leaf.startswith(".")
+
+
+def test_yt_dlp_is_shared_and_an_update_waits_for_its_users():
+    """One slow lookup mustn't hold up a search; swapping in a new copy waits for both."""
+    order = []
+    first_in, release = threading.Event(), threading.Event()
+
+    def slow_user():
+        with ytdl._lock.shared():
+            first_in.set()
+            release.wait(5)
+            order.append("slow done")
+
+    def updater():
+        with ytdl._lock.exclusive():
+            order.append("swapped")
+
+    a = threading.Thread(target=slow_user)
+    a.start()
+    assert first_in.wait(5)
+    with ytdl._lock.shared():            # a search gets in while the lookup is still going
+        order.append("search")
+    u = threading.Thread(target=updater)
+    u.start()
+    u.join(0.3)
+    assert u.is_alive() and order == ["search"]   # the swap waits for the lookup
+    release.set()
+    a.join(5)
+    u.join(5)
+    assert order == ["search", "slow done", "swapped"]
+
+
+@pytest.mark.parametrize("answer", [b"<html>down for maintenance</html>", b'{"x": 1}', b"[]"])
+def test_update_says_so_when_pypi_answers_junk(monkeypatch, answer):
+    monkeypatch.setattr(ytdl, "_get", lambda url, limit: answer)
+    with pytest.raises(ytdl.DownloadError, match="PyPI"):
+        ytdl.update()
+
+
+def test_add_on_a_second_result_while_one_downloads_adds_both(qapp, window, monkeypatch,  # noqa: F811
+                                                                tmp_path):
+    fake_link_download(monkeypatch, tmp_path)
+    gate = threading.Event()
+
+    def slow(url, dest=None, progress=None, auto_update=True):
+        gate.wait(5)
+        folder = tmp_path / f"sb-ytdl-{url[-3:]}"
+        folder.mkdir()
+        t = np.arange(SR) / SR
+        p = folder / "vid.wav"   # a different tone per video, or the second is a duplicate
+        sf.write(p, np.stack([np.sin(2 * np.pi * len(url) * 20 * t)] * 2, 1) * 0.5, SR)
+        return p, url[-3:]
+    monkeypatch.setattr(ytdl, "download_audio", slow)
+    R = namedtuple("R", "url title seconds")
+    window._from_youtube(R("https://youtu.be/one", "One", 1.0), play=False)
+    window._from_youtube(R("https://youtu.be/second", "Two", 1.0), play=False)
+    assert "is next" in window.linkbar.info.text()
+    gate.set()
+    assert process_events(qapp, lambda: len(window.cfg.sounds) == 4, 10)
+    assert [m.name for m in window.cfg.sounds[-2:]] == ["one", "ond"]

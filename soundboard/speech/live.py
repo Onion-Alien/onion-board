@@ -13,6 +13,7 @@ the chain can also mute your real voice (`replace`), so others only hear the TTS
 from __future__ import annotations
 
 import logging
+import math
 from collections.abc import Callable
 
 import numpy as np
@@ -27,6 +28,28 @@ log = logging.getLogger(__name__)
 
 TTS_SID = "tts"
 NO_OUTPUT = "No audio device is open — pick one in Setup"
+MAX_GAIN = 4.0          # the voice volume box goes to 400 %
+
+
+def clean_settings(raw) -> dict:
+    """Saved speech settings (config or an imported backup) with every known field
+    of the wrong type dropped, so the panel falls back to its default for it instead
+    of failing to open. Numbers are brought into range; unknown keys are kept."""
+    out = dict(raw) if isinstance(raw, dict) else {}
+    for k in ("voice", "model", "language", "translate"):
+        if k in out and not isinstance(out[k], str):
+            del out[k]
+    if "mute_real_voice" in out and not isinstance(out["mute_real_voice"], bool):
+        del out["mute_real_voice"]
+    for k, lo, hi in (("rate", -10, 10), ("gain", 0.0, MAX_GAIN)):
+        if k not in out:
+            continue
+        v = out[k]
+        if isinstance(v, bool) or not isinstance(v, (int, float)) or not math.isfinite(v):
+            del out[k]
+        else:
+            out[k] = min(max(round(v) if k == "rate" else float(v), lo), hi)
+    return out
 
 
 class SpeechController:

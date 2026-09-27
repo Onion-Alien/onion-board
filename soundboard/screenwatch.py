@@ -38,6 +38,8 @@ log = logging.getLogger(__name__)
 
 WORK_WIDTH = 480        # the screen is shrunk to about this wide before matching
 MIN_SIDE = 12           # ...but never so far that a picture's short side drops below this
+MAX_ZOOM = 2            # ...nor ever kept above this many times WORK_WIDTH (small pictures)
+MASK_MIN = 16           # a cut-out with fewer opaque pixels than this once shrunk is unreliable
 REARM_MARGIN = 0.08     # a match must fall this far below the threshold to count as gone
 FLAT_STD = 2 / 255      # screen windows flatter than this never match (blank areas)
 BLACK_LEVEL = 3 / 255   # a whole frame darker than this is a capture that can't see the game
@@ -173,13 +175,31 @@ def _match_masked(f: Frame, tmpl: np.ndarray, mask: np.ndarray) -> tuple[float, 
 
 def work_scale(screen_w: int, tmpl_sides: list[int]) -> float:
     """How much to shrink the screen (and every picture) before matching: down to
-    about WORK_WIDTH, but keeping the smallest picture at least MIN_SIDE px."""
+    about WORK_WIDTH, but keeping the smallest picture at least MIN_SIDE px. A tiny
+    picture can't push it past MAX_ZOOM x WORK_WIDTH: every check would get slow
+    (a whole 4K screen matched at full size takes over a second)."""
     if screen_w <= 0:
         return 1.0
     scale = WORK_WIDTH / screen_w
+    cap = MAX_ZOOM * scale
     if tmpl_sides:
         scale = max(scale, MIN_SIDE / max(min(tmpl_sides), 1))
-    return min(1.0, scale)
+    return min(1.0, scale, cap)
+
+
+def shrink_mask(mask: np.ndarray, scale: float) -> np.ndarray:
+    """A picture's opaque part at `scale`. Shrunk pixels that were wholly opaque match
+    best (the others blend in whatever is behind the picture), but a thin outline has
+    next to none of them: then the cut-off is eased, down to half opaque, until there
+    are enough to compare."""
+    m = shrink(mask, scale)
+    loose = m >= 0.5
+    enough = max(MASK_MIN, int(loose.sum()) // 3)
+    for cut in (0.99, 0.75):
+        keep = m >= cut
+        if int(keep.sum()) >= enough:
+            return keep
+    return loose
 
 
 def shrink(gray: np.ndarray, scale: float) -> np.ndarray:
@@ -489,12 +509,12 @@ class DupGrabber:
         self._lost_since = 0.0
         try:
             self._open()
+            for _ in range(5):          # the first real frame follows soon after opening
+                if self.grab(timeout_ms=100) is not None:
+                    break
         except Exception:
             self.close()
             raise
-        for _ in range(5):          # the first real frame follows soon after opening
-            if self.grab(timeout_ms=100) is not None:
-                break
 
     def _open(self):
         dxgi, d3d = ctypes.windll.dxgi, ctypes.windll.d3d11
@@ -617,7 +637,9 @@ class DupGrabber:
             self._lost_at = self._lost_since = time.monotonic()
             return None
         if hr < 0:
-            raise OSError(f"AcquireNextFrame failed (0x{code:08X})")
+            # the graphics card was reset or removed (a driver update or crash, a laptop
+            # switching cards): only a new device can see the screen again
+            raise CaptureLost(f"AcquireNextFrame failed (0x{code:08X})")
         # LastPresentTime 0: only the mouse moved, or the (blank) frame a new
         # duplication starts with. The picture is unchanged, so skip the copy.
         if int.from_bytes(bytes(info[:8]), "little", signed=True) == 0:
@@ -639,7 +661,7 @@ class DupGrabber:
                            argtypes=(ctypes.c_void_p, ctypes.c_uint, ctypes.c_int,
                                      ctypes.c_uint, ctypes.c_void_p))
         if hr < 0:
-            raise OSError(f"Map failed (0x{_hr(hr):08X})")
+            raise CaptureLost(f"Map failed (0x{_hr(hr):08X})")
         try:
             sw, rows = self.source
             pitch = m.RowPitch
@@ -720,7 +742,8 @@ class Watcher:
                     it.gate = old[it.id].gate
             self._items = {it.id: it for it in items}
             self._changed = True
-        self.scores = {k: v for k, v in self.scores.items() if k in self._items}
+            # the thread replaces `scores` whole rather than changing it, so a copy is safe
+            self.scores = {k: v for k, v in self.scores.items() if k in self._items}
 
     def set_monitor(self, index: int):
         with self._lock:
@@ -729,33 +752,42 @@ class Watcher:
 
     @property
     def running(self) -> bool:
-        return self._thread is not None and self._thread.is_alive()
+        """Watching: a thread is going and hasn't been told to stop."""
+        return (self._thread is not None and self._thread.is_alive()
+                and not self._stop.is_set())
 
     def start(self):
         if self.running:
             return
-        self._stop.clear()
+        # each run has its own stop switch: a thread that stop() couldn't wait out (a
+        # slow check) still sees its own and ends, instead of carrying on beside the new one
+        self._stop = stop = threading.Event()
         self.error = ""
-        self._thread = threading.Thread(target=self._run, name="screenwatch", daemon=True)
+        self._thread = threading.Thread(target=self._run, args=(stop,), name="screenwatch",
+                                        daemon=True)
         self._thread.start()
 
     def stop(self):
         self._stop.set()
-        t, self._thread = self._thread, None
+        t = self._thread
         if t is not None and t is not threading.current_thread():
             t.join(2.0)
+        if t is not None and not t.is_alive():
+            self._thread = None
         self.scores = {}
         self.black = self.lost = False
 
     # the thread
-    def _run(self):
+    def _run(self, stop: threading.Event | None = None):
+        stop = stop or self._stop
         grab: Grabber | None = None
         scaled: dict[str, tuple] = {}
         fitted = (0, 0)             # the source size the pictures are scaled for
         mon: Monitor | None = None
         reopen_since = 0.0          # > 0: the capture was lost; opening afresh
+        failing = False             # grabs keep failing (said once in the log)
         try:
-            while not self._stop.is_set():
+            while not stop.is_set():
                 t0 = time.perf_counter()
                 with self._lock:
                     items = list(self._items.values())
@@ -767,7 +799,12 @@ class Watcher:
                         grab = None
                     mons = monitors()
                     if not mons:
-                        raise OSError("no monitor found")
+                        # right after a loss the screen may be gone for a moment
+                        # (a cable, a dock, a mode switch): wait for it like a reopen
+                        if not reopen_since or time.monotonic() - reopen_since > GIVE_UP_S:
+                            raise OSError("no monitor found")
+                        stop.wait(RETRY_S)
+                        continue
                     mon = mons[mon_index] if 0 <= mon_index < len(mons) else mons[0]
                     scale = work_scale(mon.width, [min(i.gray.shape) for i in items])
                     w, h = max(1, round(mon.width * scale)), max(1, round(mon.height * scale))
@@ -782,7 +819,7 @@ class Watcher:
                         # still switching); a first start that fails is an error
                         if not reopen_since or time.monotonic() - reopen_since > GIVE_UP_S:
                             raise
-                        self._stop.wait(RETRY_S)
+                        stop.wait(RETRY_S)
                         continue
                     reopen_since = 0.0
                     self.lost = False
@@ -790,14 +827,19 @@ class Watcher:
                 if items:
                     try:
                         gray = grab.grab()
-                    except CaptureLost as e:
-                        log.info("screen capture lost (%s): starting it afresh", e)
+                    except OSError as e:
+                        # CaptureLost, or any other failure of a capture that did work (a
+                        # graphics driver reset): open it afresh rather than stop watching
+                        if not failing:
+                            log.info("screen capture lost (%s): starting it afresh", e)
+                        failing = True
                         grab.close()
                         grab = None
                         reopen_since = time.monotonic()
                         self.lost = True
-                        self._stop.wait(RETRY_S)
+                        stop.wait(RETRY_S)
                         continue
+                    failing = False
                     self.lost = bool(getattr(grab, "lost", False))
                     if getattr(grab, "source", fitted) != fitted:
                         # the frames changed size (a game switched display mode):
@@ -805,12 +847,15 @@ class Watcher:
                         fitted, scaled = self._fit(grab, mon, items)
                         gray = None
                     if gray is not None:
-                        self._check(gray, items, scaled)
+                        scores = self._check(gray, items, scaled)
+                        if not stop.is_set():       # stop() has cleared them already
+                            self.scores = scores
                 self.check_ms = (time.perf_counter() - t0) * 1000
-                self._stop.wait(max(0.001, self.interval - (time.perf_counter() - t0)))
+                stop.wait(max(0.001, self.interval - (time.perf_counter() - t0)))
         except Exception as e:  # noqa: BLE001 - say so in the tab instead of dying quietly
             log.exception("screen watching stopped")
-            self.error = str(e) or type(e).__name__
+            if not stop.is_set():
+                self.error = str(e) or type(e).__name__
         finally:
             if grab is not None:
                 grab.close()
@@ -826,20 +871,25 @@ class Watcher:
         if (w, h) != (getattr(grab, "w", w), getattr(grab, "h", h)):
             grab.resize(w, h)
         scaled = {i.id: (shrink(i.gray, scale),
-                         None if i.mask is None else shrink(i.mask, scale) > 0.99)
+                         None if i.mask is None else shrink_mask(i.mask, scale))
                   for i in items}
         return (sw, sh), scaled
 
-    def _check(self, gray: np.ndarray, items: list[Watched], scaled: dict[str, tuple]):
+    def _check(self, gray: np.ndarray, items: list[Watched],
+               scaled: dict[str, tuple]) -> dict[str, float]:
+        """Match every picture against one frame; returns the scores (a new dict: the
+        UI thread reads `scores` while this runs, so it's only ever swapped whole)."""
         self.black = float(gray.max()) < BLACK_LEVEL
         frame = None if self.black else Frame(gray)
         now = time.monotonic()
+        scores = {}
         for it in items:
             t = scaled.get(it.id)
             score = 0.0 if t is None or frame is None else match(frame, *t)[0]
-            self.scores[it.id] = score
+            scores[it.id] = score
             if it.gate.update(score, now, it.threshold, it.cooldown):
                 try:
                     self._on_fire(it.id)
                 except Exception:  # noqa: BLE001
                     log.exception("trigger callback failed")
+        return scores

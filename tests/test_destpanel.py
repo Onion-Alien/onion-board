@@ -120,3 +120,28 @@ def test_the_setup_tab_has_the_picker_and_settings_follows_it(window):  # noqa: 
     d.show()   # the Settings copy re-reads the mode when it appears
     assert _dest_combo(d.tabs.currentWidget()).currentData() == "discord"
     d.close()
+
+
+def test_custom_editor_opens_with_a_damaged_custom_list(window):  # noqa: F811
+    window.cfg.dest = {"mode": "off", "custom": 5}
+    dlg = CustomDestDialog(window)
+    assert dlg.items == [] and window.cfg.dest["custom"] == []
+    dlg.accept()
+    window.cfg.dest = {"mode": "off", "custom": [3, {"key": "m", "label": "Mumble"}]}
+    dlg = CustomDestDialog(window)
+    assert [d["key"] for d in dlg.items] == ["m"]
+    dlg.accept()
+
+
+def test_main_window_starts_with_a_bad_custom_dest(qapp, app_dir, monkeypatch):
+    from test_mainwindow import engine, main, winkeys
+    for name in ("set_main_device", "set_mon_device", "set_mic_device"):
+        monkeypatch.setattr(engine.Engine, name, lambda self, n, _k=name: None)
+    monkeypatch.setattr(winkeys.Hotkeys, "register", lambda self, m: None)
+    Config(dest={"mode": "discord", "custom": 5}).save()
+    w = main.MainWindow()
+    try:
+        w._load_thread.join(15)
+        assert w.engine.dest is not None and w.engine.dest.key == "discord"
+    finally:
+        w.close()

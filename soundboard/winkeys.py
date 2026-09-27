@@ -211,6 +211,14 @@ user32.SendInput.argtypes = (wt.UINT, ctypes.POINTER(_INPUT), ctypes.c_int)
 user32.SendInput.restype = wt.UINT
 
 
+def key_char(vk: int) -> str:
+    """What the key with virtual-key code `vk` types on the current keyboard layout
+    ("" if nothing): VK_OEM_3 is ` on a US keyboard but ' on a UK one and ö on a
+    German one."""
+    code = user32.MapVirtualKeyW(vk, 2) & 0x7FFF   # MAPVK_VK_TO_CHAR; top bit = dead key
+    return chr(code) if 32 < code < 0xD800 else ""
+
+
 def key_input(vk: int, up: bool) -> _INPUT:
     """One keyboard INPUT record (exposed for tests; nothing is sent)."""
     inp = _INPUT()

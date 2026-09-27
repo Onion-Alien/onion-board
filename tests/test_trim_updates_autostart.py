@@ -111,9 +111,13 @@ class FakeReg:
     REG_SZ = 1
 
     def __init__(self):
-        self.values = {}
+        self.values = {}     # the Run key
+        self.approved = {}   # Task Manager's StartupApproved\Run key
 
     class _Key:
+        def __init__(self, values):
+            self.values = values
+
         def __enter__(self):
             return self
 
@@ -121,22 +125,22 @@ class FakeReg:
             return False
 
     def OpenKey(self, root, path, *a):
-        return self._Key()
+        return self._Key(self.approved if path == autostart.APPROVED_KEY else self.values)
 
     CreateKey = OpenKey
 
     def QueryValueEx(self, k, name):
-        if name not in self.values:
+        if name not in k.values:
             raise FileNotFoundError(name)
-        return self.values[name], self.REG_SZ
+        return k.values[name], self.REG_SZ
 
     def SetValueEx(self, k, name, _r, _t, value):
-        self.values[name] = value
+        k.values[name] = value
 
     def DeleteValue(self, k, name):
-        if name not in self.values:
+        if name not in k.values:
             raise FileNotFoundError(name)
-        del self.values[name]
+        del k.values[name]
 
 
 def test_autostart_adds_updates_and_removes_the_run_value(monkeypatch):
@@ -152,3 +156,15 @@ def test_autostart_adds_updates_and_removes_the_run_value(monkeypatch):
     assert autostart.set_enabled(False)              # already off: fine
     autostart.refresh(hidden=True)
     assert not autostart.is_enabled()                # refresh never switches it on
+
+
+def test_autostart_follows_task_managers_switch(monkeypatch):
+    reg = FakeReg()
+    monkeypatch.setattr(autostart, "winreg", reg)
+    assert autostart.set_enabled(True)
+    reg.approved["OnionBoard"] = b"" + bytes(11)   # Task Manager → Startup apps: off
+    assert not autostart.is_enabled()                # the box shows what Windows will do
+    assert autostart.set_enabled(True)               # ticking it again really turns it on
+    assert autostart.is_enabled() and "OnionBoard" not in reg.approved
+    reg.approved["OnionBoard"] = b"" + bytes(11)   # on there: fine
+    assert autostart.is_enabled()

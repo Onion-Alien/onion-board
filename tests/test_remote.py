@@ -126,3 +126,27 @@ def test_window_starts_it_only_when_turned_on(qapp, window):
     w.cfg.api_enabled = False
     w.apply_remote()
     assert not w.remote.running
+
+
+def test_a_request_answered_busy_never_runs_later(qapp, ctl, monkeypatch):
+    """A Stream Deck that retries on "busy" mustn't get the sound played twice."""
+    monkeypatch.setattr(remote, "ANSWER_S", 0.2)
+    out = {}
+
+    def run():
+        c = http.client.HTTPConnection(remote.HOST, ctl.port, timeout=5)
+        c.request("GET", "/api/stop", headers={"Authorization": f"Bearer {TOKEN}"})
+        out["status"] = c.getresponse().status
+        c.close()
+    t = threading.Thread(target=run)
+    t.start()
+    t.join(5)                  # the UI thread is "busy": no events processed meanwhile
+    assert out["status"] == 503
+    process_events(qapp, lambda: False, timeout=0.3)
+    assert ctl.calls == []
+
+
+def test_a_port_out_of_range_is_reported_not_raised(qapp):
+    c = remote.RemoteControl(lambda a, p: (200, {}))
+    assert not c.start(70000, TOKEN) and "isn't a valid port" in c.error
+    assert not c.running

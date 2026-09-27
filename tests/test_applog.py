@@ -135,3 +135,97 @@ def test_crash_dialog_copies_report(qapp, monkeypatch):
     assert "Crash" in opened[0] and "REPORT BODY" not in opened[0]   # report stays local
     assert not dlg.folder_btn.isEnabled()
     dlg.close()
+
+
+def _state_in(tmp_path, monkeypatch):
+    log_path = tmp_path / applog.LOG_NAME
+    log_path.write_text("x\n", encoding="utf-8")
+    monkeypatch.setattr(applog, "_state", {"log_path": log_path, "version": "t",
+                                           "dialogs": 0, "seen": set(), "open": None,
+                                           "bridge": None, "pending": None})
+    return log_path
+
+
+def test_held_back_report_is_shown_once_the_app_is_in_front(qapp, tmp_path, monkeypatch):
+    """An error while a game had the focus waits; it must appear when the user comes
+    back (applicationStateChanged fires before activeWindow() is set: not enough)."""
+    from PySide6.QtWidgets import QApplication, QWidget
+
+    from soundboard.ui import crashdialog
+    from conftest import process_events
+    _state_in(tmp_path, monkeypatch)
+    shown = []
+
+    class FakeDialog:
+        def __init__(self, rep, *_a, **_k):
+            shown.append(rep)
+            self.finished = type("Sig", (), {"connect": lambda self, f: None})()
+
+        def show(self):
+            pass
+
+        def raise_(self):
+            pass
+    monkeypatch.setattr(crashdialog, "CrashDialog", FakeDialog)
+    applog.ui_ready()
+    try:
+        assert QApplication.activeWindow() is None
+        rep = applog.report(_raise(ValueError("boom")))
+        assert applog._state["pending"] is rep and shown == []
+        w = QWidget()
+        w.show()
+        w.activateWindow()
+        process_events(qapp, lambda: bool(shown), 3)
+        w.close()
+        assert shown == [rep] and applog._state["pending"] is None
+    finally:
+        qapp.focusWindowChanged.disconnect(applog._show_pending)
+
+
+USERS = r"C:\Users"   # + a made-up profile folder in each test
+
+
+def test_long_title_is_scrubbed_before_it_is_cut(monkeypatch):
+    monkeypatch.setenv("USERNAME", "ExampleUser")
+    monkeypatch.setattr(Path, "home", classmethod(lambda cls: Path(USERS, "ExampleUser")))
+    msg = rf"in use: '{USERS}\ExampleUser\AppData\Roaming\OnionBoard\config.json'"
+    pad = "x" * (197 - len("PermissionError: ") - msg.index("ExampleUser") - 6)
+    rep = applog.build_report((PermissionError, PermissionError(pad + msg), None))
+    assert "Exampl" not in rep.title and len(rep.title) <= 200
+
+
+@pytest.mark.parametrize("text", [
+    rf'File "{USERS}\EXAMPL~1\AppData\Local\Temp\x.webm"',     # 8.3 short form (%TEMP%)
+    repr(rf"{USERS}\EXAMPL~1\AppData"),                         # ...in a repr
+    "file:///" + USERS.replace("\\", "/") + "/Example%20User/Music/a.mp3",   # a file URL
+])
+def test_scrub_catches_other_spellings_of_the_home_folder(monkeypatch, text):
+    monkeypatch.setenv("USERNAME", "Example User")
+    monkeypatch.setattr(Path, "home", classmethod(lambda cls: Path(USERS, "Example User")))
+    out = applog.scrub(text)
+    assert "EXAMPL" not in out.upper() and "Example%20User" not in out
+    assert "%USERPROFILE%" in out
+
+
+def test_device_names_carrying_the_owners_name_are_cut_from_the_log(tmp_path, monkeypatch):
+    """Windows names Bluetooth headsets after their owner, and the log names devices."""
+    log_path = _state_in(tmp_path, monkeypatch)
+    log_path.write_text("INFO soundboard.engine: opened mic: Headset (Alex's AirPods Pro)\n"
+                        "INFO it's fine\n", encoding="utf-8")
+    rep = applog.build_report((ValueError, ValueError("x"), None))
+    assert "Alex" not in rep.text and "Headset (<name>'s AirPods Pro)" in rep.text
+    assert "it's fine" in rep.text
+
+
+def test_two_reports_in_the_same_second_keep_both_files(tmp_path, monkeypatch):
+    _state_in(tmp_path, monkeypatch)
+    monkeypatch.setattr(applog, "_show_dialog", lambda rep: None)
+    real = applog.time.strftime
+    monkeypatch.setattr(applog.time, "strftime",
+                        lambda fmt, *a: "20260101-120000" if fmt == "%Y%m%d-%H%M%S"
+                        else real(fmt, *a))
+    a = applog.report(_raise(ValueError("first")))
+    b = applog.report(_raise(KeyError("second")))
+    assert a.path != b.path
+    assert a.path.read_text(encoding="utf-8") == a.text
+    assert b.path.read_text(encoding="utf-8") == b.text

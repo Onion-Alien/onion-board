@@ -298,3 +298,68 @@ def test_edit_dialog_presets_apply_and_reset(qapp):
     d2.effects.preset.setCurrentText("None (original)")
     d2.apply()
     assert m.fx == {}
+
+
+# ---------------------------------------------------------------- damaged settings, tails, memory
+
+def test_clean_replaces_nan_and_infinity_with_defaults():
+    """min/max let NaN through; a NaN "eq" band then made render() raise."""
+    nan, inf = float("nan"), float("inf")
+    f = soundfx.clean({"speed": nan, "pitch": inf, "gain_db": -inf, "start": nan,
+                       "end": nan, "eq": [nan, inf, 3, 0, 0, 0, 0]})
+    assert f["speed"] == 1.0 and f["pitch"] == 0.0 and f["gain_db"] == 0.0
+    assert f["start"] == 0.0 and f["end"] == 0.0
+    assert f["eq"] == [0.0, 0.0, 3.0, 0.0, 0.0, 0.0, 0.0]
+    y = soundfx.render(sine(440, 0.5), {"eq": [nan] * 7, "speed": nan, "start": nan})
+    assert np.all(np.isfinite(y)) and len(y) == SR // 2
+
+
+def test_old_radio_does_not_keep_the_whole_tail_of_static():
+    """The static never falls under the fixed 1e-3 threshold, so a 1 s sound came
+    out 4 s long (and, reversed, started after 3 s of static)."""
+    x = sine(440, 1.0, 0.3)
+    y = soundfx.render(x, soundfx.PRESETS["Old radio"])
+    assert len(y) < 1.1 * SR
+    assert np.abs(y[-10:]).max() < 1e-3                     # faded out, no click at the cut
+    r = soundfx.render(x, dict(soundfx.PRESETS["Old radio"], reverse=True))
+    assert np.flatnonzero(np.abs(r[:, 0]) > 0.1)[0] < 0.1 * SR
+
+
+@pytest.mark.parametrize("name", list(soundfx.PRESETS))
+def test_every_preset_keeps_a_sensible_length(name):
+    """Tails of echo / reverb stay, silence after them doesn't."""
+    fx = soundfx.PRESETS[name]
+    x = sine(440, 1.0, 0.3)
+    click = np.zeros((SR // 10, 2), np.float32)
+    click[:100] = 0.8
+    for src in (x, click):
+        y = soundfx.render(src, fx)
+        base = len(src) / fx["speed"]
+        assert base * 0.95 <= len(y) <= base + 2.0 * SR, (name, len(y) / SR)
+    rev = soundfx.render(click, fx)
+    if fx["effects"].get("reverb", {}).get("on"):          # the reverb tail is kept
+        assert len(rev) > len(click) / fx["speed"] + 0.3 * SR
+
+
+def test_stretch_memory_stays_near_the_output_size():
+    """The overlap-add used to keep full-length float64 buffers (a 15 min sound at
+    0.25x needed ~7 GB)."""
+    import tracemalloc
+    x = (np.random.default_rng(0).standard_normal((5 * SR, 2)) * 0.1).astype(np.float32)
+    tracemalloc.start()
+    try:
+        y = soundfx.stretch(x, 4.0, chunk=16)
+        _cur, peak = tracemalloc.get_traced_memory()
+    finally:
+        tracemalloc.stop()
+    assert len(y) == 4 * len(x) and y.dtype == np.float32
+    assert peak < 2.5 * y.nbytes, f"peak {peak / 1e6:.0f} MB for {y.nbytes / 1e6:.0f} MB out"
+
+
+@pytest.mark.parametrize("chunk", [1, 7, 64])
+def test_stretch_result_does_not_depend_on_the_chunk_size(chunk):
+    x = (np.random.default_rng(1).standard_normal((SR // 2, 2)) * 0.1).astype(np.float32)
+    for factor in (0.5, 1.7, 4.0):
+        a = soundfx.stretch(x, factor, chunk=chunk)
+        b = soundfx.stretch(x, factor, chunk=10_000)          # everything in one go
+        assert a.shape == b.shape and np.abs(a - b).max() < 1e-4

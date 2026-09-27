@@ -47,6 +47,13 @@ def test_station_from_api_keeps_the_useful_fields():
     {"url": "file:///C:/Windows/win.ini", "url_resolved": "ftp://x/"},
     {"name": "   "},
     {"stationuuid": ""},
+    # this PC / the home network written the ways Qt and FFmpeg still read as an address
+    {"url": "http://127.1:8000/x", "url_resolved": ""},
+    {"url": "http://2130706433/", "url_resolved": ""},
+    {"url": "http://0x7f000001/", "url_resolved": ""},
+    {"url": "http://017700000001/", "url_resolved": ""},
+    {"url": "http://192.168.1/", "url_resolved": ""},
+    {"url": "http://[::ffff:127.0.0.1]/", "url_resolved": ""},
 ])
 def test_unplayable_or_nameless_stations_are_dropped(bad):
     assert Station.from_api(api_station(1, **bad)) is None
@@ -527,3 +534,103 @@ def test_tab_star_toggles_by_uuid_and_rows_paint(tab):
     assert not tab.list.grab().isNull()               # the delegate paints without errors
     tab._toggle_fav("uuid-2")
     assert tab.cfg.radio["favorites"] == []
+
+
+class _JunkMirror:
+    """A mirror answering 200 with an HTML page (maintenance, a captive portal)."""
+
+    def __init__(self):
+        class H(http.server.BaseHTTPRequestHandler):
+            def log_message(self, *_):
+                pass
+
+            def do_GET(self):
+                body = b"<html>maintenance</html>"
+                self.send_response(200)
+                self.send_header("Content-Type", "text/html")
+                self.send_header("Content-Length", str(len(body)))
+                self.end_headers()
+                self.wfile.write(body)
+        self.httpd = http.server.ThreadingHTTPServer(("127.0.0.1", 0), H)
+        self.base = f"http://127.0.0.1:{self.httpd.server_address[1]}"
+        threading.Thread(target=self.httpd.serve_forever, daemon=True).start()
+
+    def close(self):
+        self.httpd.shutdown()
+        self.httpd.server_close()
+
+
+def test_directory_fails_over_from_a_mirror_answering_junk(qapp, server, tmp_path):
+    junk = _JunkMirror()
+    try:
+        d = RadioDirectory(tmp_path, bases=(junk.base, server.base))
+        got, fails, res = [], [], []
+        d.globe_ready.connect(got.append)
+        d.failed.connect(lambda k, m: fails.append((k, m)))
+        d.results.connect(lambda q, st: res.append(len(st)))
+        d.load_globe()
+        process_events(qapp, lambda: got or fails)
+        d.search("rock")
+        process_events(qapp, lambda: res or len(fails) > 1)
+    finally:
+        junk.close()
+    assert got and not fails and res == [1]
+
+
+def test_tab_plays_fresh_directory_data_over_a_saved_favourite(qapp, app_dir, server):
+    from soundboard.ui.radiopanel import RadioTab
+    old = Station.from_api(api_station(1, url_resolved="http://example.com/OLD.mp3"))
+    cfg = Config()
+    cfg.radio = {"favorites": [old.to_saved()]}
+    d = RadioDirectory(app_dir / "radio", bases=(server.base,))
+    t = RadioTab(FakeEngine(), cfg, lambda: None, FakeMeter, directory=d, globe=False)
+    t.start()
+    try:
+        assert process_events(qapp, lambda: t._globe_list)
+        played = []
+        t.player.play = played.append
+        t._on_globe_click("uuid-1")
+        assert [s.url for s in played] == ["http://example.com/1.mp3"]
+        assert cfg.radio["favorites"][0]["url"] == "http://example.com/1.mp3"   # saved too
+    finally:
+        t.shutdown()
+
+
+def test_tab_reload_updates_stations_already_known(qapp, tab, server):
+    server.stations[2]["url_resolved"] = "http://example.com/NEW.mp3"
+    first = tab._globe_list
+    tab._reload()
+    assert process_events(qapp, lambda: tab._globe_list is not first)
+    played = []
+    tab.player.play = played.append
+    tab._play_or_stop("uuid-2")
+    assert played[0].url == "http://example.com/NEW.mp3"
+
+
+def test_tab_radio_volume_zero_is_remembered(qapp, app_dir, server):
+    from soundboard.ui.radiopanel import RadioTab
+    cfg = Config()
+    d = RadioDirectory(app_dir / "radio", bases=(server.base,))
+    t = RadioTab(FakeEngine(), cfg, lambda: None, FakeMeter, directory=d, globe=False)
+    t.vol.spin.setValue(0)
+    t.shutdown()
+    t2 = RadioTab(FakeEngine(), cfg, lambda: None, FakeMeter, directory=d, globe=False)
+    try:
+        assert t2.engine.radio_vol == 0.0
+    finally:
+        t2.shutdown()
+
+
+def test_last_15s_holds_only_the_station_that_played(qapp, tab, server):
+    a, b = tab._stations["uuid-0"], tab._stations["uuid-3"]
+    a.url = b.url = server.base + "/stream.wav"
+    names = []
+    tab.clip_ready.connect(lambda data, name: names.append(name))
+    tab.play(a)
+    assert process_events(qapp, lambda: sum(map(len, tab.engine.chunks)) > SR, 15)
+    tab.stop()
+    tab.list.setCurrentRow(3)            # browsing to another station afterwards
+    assert tab.clip_last() and names[-1].startswith(a.name)
+    tab.play(b)                          # a different station: its own 15 seconds
+    assert len(tab.recorder.last()) < SR // 2
+    tab.stop()

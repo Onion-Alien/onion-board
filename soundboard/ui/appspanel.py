@@ -11,6 +11,7 @@ switch on are remembered by their .exe and picked up again next time they run.
 from __future__ import annotations
 
 import logging
+import math
 import re
 import threading
 import time
@@ -19,7 +20,7 @@ from PySide6.QtCore import QFileInfo, QObject, QSize, Qt, QTimer, Signal
 from PySide6.QtWidgets import (QCheckBox, QFileIconProvider, QFrame, QHBoxLayout, QLabel,
                                QPushButton, QScrollArea, QSizePolicy, QVBoxLayout, QWidget)
 
-from soundboard import appaudio, library
+from soundboard import appaudio, library, theme
 from soundboard.engine import SR
 from soundboard.library import MAX_SECONDS, trim_silence
 from soundboard.recorder import ArmedRecorder
@@ -32,6 +33,16 @@ REFRESH_MS = 1500       # how often the list of programs is re-read while the ta
 REFRESH_HIDDEN_MS = 5000   # ...and while it isn't (a remembered program still gets picked up)
 METER_MS = 60
 MAX_REMEMBERED = 30
+MAX_VOL = 10.0          # 1000 %, the most the volume box takes
+
+
+def saved_volume(v) -> float:
+    """A remembered program's volume from the config, whatever was written there."""
+    try:
+        v = float(v)
+    except (TypeError, ValueError):
+        return 1.0
+    return min(max(v, 0.0), MAX_VOL) if math.isfinite(v) else 1.0
 
 
 class _Lister(QObject):
@@ -176,7 +187,7 @@ class AppRow(QFrame):
         self.status_error = error
         if text:
             self.sub.setText(text)
-            self.sub.setStyleSheet("color:#ff4d4f;" if error else "")
+            theme.set_tone(self.sub, "error" if error else "")
         else:
             self.sub.setStyleSheet("")
             if self.app is not None:
@@ -231,7 +242,7 @@ class AppsTab(QWidget):
                         "you switch on are remembered and picked up again next time they run.")
         hv.itemAt(0).widget().setWordWrap(True)   # the title too: this tab must fit 300 px
         self.warn = hint_label("")
-        self.warn.setStyleSheet("color:#ffb020;")
+        theme.set_tone(self.warn, "warn")
         self.warn.setVisible(False)
         hv.addWidget(self.warn)
         v.addWidget(head)
@@ -258,7 +269,7 @@ class AppsTab(QWidget):
 
         for exe, spec in list(cfg.apps.items())[:MAX_REMEMBERED]:   # remembered programs
             if isinstance(spec, dict):
-                self._row(exe, float(spec.get("vol", 1.0) or 0.0), bool(spec.get("monitor")))
+                self._row(exe, saved_volume(spec.get("vol", 1.0)), bool(spec.get("monitor")))
 
         self.lister = _Lister(self)
         self.lister.ready.connect(self._on_apps)

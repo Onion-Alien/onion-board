@@ -32,9 +32,12 @@ import zlib
 from dataclasses import dataclass, field, fields
 from pathlib import Path, PurePosixPath
 
-from soundboard import __version__, library
-from soundboard.library import (AUDIO_EXTS, Config, SoundMeta, clean_fade, clean_tags,
-                                fits_type)
+import soundfile as sf
+
+from soundboard import __version__, library, voicefx
+from soundboard.library import (AUDIO_EXTS, Config, SoundMeta, clean_fade, clean_setting,
+                                clean_tags, fits_type)
+from soundboard.speech.live import clean_settings as clean_speech_settings
 
 log = logging.getLogger(__name__)
 
@@ -94,7 +97,15 @@ def export(dest: str | Path, sounds: list[SoundMeta], cfg: Config | None = None,
                 entry = {k: getattr(m, k) for k in SOUND_FIELDS}
                 entry["audio"] = _safe(_original_name(audio), keep_ext=True)
                 entry["picture"] = ""
-                _add_file(z, audio, f"{folder}/{entry['audio']}")
+                if audio.suffix.lower() in AUDIO_EXTS:
+                    _add_file(z, audio, f"{folder}/{entry['audio']}")
+                else:   # only AUDIO_EXTS are read back in: a .caf, .au… goes as a FLAC
+                    entry["audio"] = Path(entry["audio"]).stem + ".flac"
+                    try:
+                        _add_as_flac(z, audio, f"{folder}/{entry['audio']}")
+                    except Exception:  # noqa: BLE001 - one odd file mustn't stop the rest
+                        log.warning("export: can't convert %s; skipped", audio, exc_info=True)
+                        continue
                 pic = Path(m.image) if m.image else None
                 if pic and pic.is_file() and pic.suffix.lower() in PICTURE_EXTS:
                     entry["picture"] = "picture" + pic.suffix.lower()
@@ -141,6 +152,22 @@ def _safe(name: str, keep_ext: bool = False) -> str:
 def _add_file(z: zipfile.ZipFile, src: Path, arcname: str):
     comp = zipfile.ZIP_STORED if src.suffix.lower() in STORED else zipfile.ZIP_DEFLATED
     z.write(src, arcname, compress_type=comp)
+
+
+def _add_as_flac(z: zipfile.ZipFile, src: Path, arcname: str):
+    """Add `src` to the zip re-encoded as FLAC (at its own rate and channels when
+    libsndfile reads it, else as the app decodes it)."""
+    with tempfile.TemporaryDirectory(prefix="onionboard-export-") as td:
+        tmp = Path(td) / "sound.flac"
+        try:
+            with sf.SoundFile(src) as fin, sf.SoundFile(
+                    tmp, "w", fin.samplerate, fin.channels, "PCM_16", format="FLAC") as fout:
+                for block in fin.blocks(1 << 16, dtype="float32", always_2d=True):
+                    fout.write(block)
+        except Exception:  # noqa: BLE001 - too many channels for FLAC, an odd rate…
+            log.debug("export: re-encoding %s as it plays", src, exc_info=True)
+            sf.write(tmp, library.decode(str(src)), library.SR, subtype="PCM_16")
+        _add_file(z, tmp, arcname)
 
 
 # --------------------------------------------------------------------------- reading
@@ -266,6 +293,7 @@ def _read(src: _Source, path: Path) -> Package:
         pkg.categories = clean_tags(man.get("categories"))
         order = man.get("sounds")
         order = [f for f in order if isinstance(f, str)] if isinstance(order, list) else []
+        order = list(dict.fromkeys(order))   # a folder listed twice is still one sound
         sname = man.get("settings")
         if isinstance(sname, str) and src.has(sname):
             pkg.settings = src.json(sname)
@@ -529,15 +557,21 @@ def apply_settings(cfg: Config, raw: dict) -> list[str]:
             ok = v is None or isinstance(v, str)
         else:
             ok = _accept(want, v)
-        if ok and isinstance(want, float):
+        if not ok:
+            continue
+        if isinstance(want, float):
             v = float(v)
-        elif ok and k == "eq_gains":
-            ok = all(isinstance(g, (int, float)) and not isinstance(g, bool) for g in v)
-        elif ok and k == "speech":
-            v = _clean_speech(v)
-        elif ok and k == "radio":
+        if v is not None:
+            v = clean_setting(k, v)   # into its control's range (None: unusable)
+            if v is None:
+                continue
+        if k == "speech":
+            v = _clean_speech(clean_speech_settings(v))
+        elif k == "voice_fx":
+            v = voicefx.clean_spec(v)
+        elif k == "radio":
             v = _clean_radio(v)
-        if ok and getattr(cfg, k) != v:
+        if getattr(cfg, k) != v:
             setattr(cfg, k, v)
             changed.append(k)
     return changed

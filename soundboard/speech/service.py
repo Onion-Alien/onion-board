@@ -183,9 +183,11 @@ class ServiceHost:
                     break
                 if msg[0] == protocol.JSON:
                     self.on_event(protocol.decode_json(msg[1]))
-        except (OSError, ValueError) as e:
+        except Exception as e:  # noqa: BLE001
+            # anything (a JSON message nested too deep: RecursionError) ends the
+            # session with "stopped", so the UI never stays on "listening", mic muted
             if not self._stop.is_set():
-                reason = str(e)
+                reason = str(e) or type(e).__name__
         self.connected = False
         if not self._stop.is_set():
             self.stop()         # it hung up on us: make sure the process goes too

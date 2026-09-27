@@ -26,6 +26,8 @@ import soundfile as sf
 import soxr
 
 from soundboard.engine import SR
+from soundboard.eq import BANDS as EQ_BANDS
+from soundboard.eq import MAX_DB as EQ_MAX_DB
 
 log = logging.getLogger(__name__)
 
@@ -87,6 +89,51 @@ def _typed(raw: dict, defaults, what: str) -> dict:
     return out
 
 
+VOLUME_MAX = 10.0             # the mixer's volume boxes take up to 1000 %
+PAD_WIDTH_RANGE = (110, 240)  # the Sounds tab's pad-size slider
+# settings shown on a control with a fixed range: a value from a hand-edited config or
+# someone's backup is brought into it (Qt raises OverflowError on one past an int)
+SETTING_RANGES = {"sound_vol": (0.0, VOLUME_MAX), "mic_vol": (0.0, VOLUME_MAX),
+                  "mon_vol": (0.0, VOLUME_MAX), "pad_width": PAD_WIDTH_RANGE}
+
+
+def clean_setting(k: str, v):
+    """Setting `k` (already of the right type) as the app can use it: brought into the
+    range of its control. None if it's unusable, so the default applies instead."""
+    if k in SETTING_RANGES:
+        lo, hi = SETTING_RANGES[k]
+        return min(max(v, lo), hi)
+    if k == "eq_gains":   # one finite gain per band, within the EQ's sliders
+        if len(v) != len(EQ_BANDS) or not all(
+                isinstance(g, (int, float)) and not isinstance(g, bool) and math.isfinite(g)
+                for g in v):
+            return None
+        return [min(max(float(g), -EQ_MAX_DB), EQ_MAX_DB) for g in v]
+    if k == "dest":   # {"mode": key, "custom": [mode dicts]} (soundboard.destination)
+        v = dict(v)
+        if not isinstance(v.get("mode", ""), str):
+            v.pop("mode")
+        if "custom" in v:
+            custom = v["custom"]
+            if isinstance(custom, list):
+                v["custom"] = [d for d in custom if isinstance(d, dict)]
+            else:
+                v.pop("custom")
+    return v
+
+
+def _is_our_old_folder() -> bool:
+    """%APPDATA%\\Soundboard is a common name: only take it if it looks like ours
+    (a config.json of ours, or a sounds folder), never another program's data."""
+    if (OLD_APP_DIR / "sounds").is_dir():
+        return True
+    try:
+        raw = json.loads((OLD_APP_DIR / "config.json").read_text(encoding="utf-8-sig"))
+    except (OSError, ValueError):
+        return False
+    return isinstance(raw, dict) and ("sounds" in raw or "version" in raw)
+
+
 def migrate_from_soundboard() -> None:
     """One-time move of %APPDATA%\\Soundboard (sounds, settings, cache, browser
     profile) into %APPDATA%\\OnionBoard, for anyone who installed this app back when
@@ -95,7 +142,7 @@ def migrate_from_soundboard() -> None:
     # Keyed on the new config, not the new folder: the installer's cable step can
     # create APP_DIR (its restart marker) before the app's first launch, and a move
     # that failed halfway must be retried next launch rather than silently skipped.
-    if not OLD_APP_DIR.is_dir() or CONFIG_PATH.exists():
+    if not OLD_APP_DIR.is_dir() or CONFIG_PATH.exists() or not _is_our_old_folder():
         return
     if not APP_DIR.exists():
         try:
@@ -161,6 +208,7 @@ class Config:
     stop_hotkey: str = "ctrl+alt+s"
     pause_hotkey: str = ""
     overlay_hotkey: str = "`"         # in-game overlay (see ui.overlay)
+    overlay_key_checked: bool = False   # "`" looked at against the keyboard layout once
     cue_sounds: bool = True           # beep in the headphones when a hotkey records / saves
     theme: str = "Dark"
     eq_enabled: bool = False
@@ -214,7 +262,7 @@ class Config:
         raw, err, missing = None, None, False
         for attempt in range(5):   # OneDrive / antivirus can hold the file for a moment
             try:
-                raw = json.loads(CONFIG_PATH.read_text(encoding="utf-8"))
+                raw = json.loads(CONFIG_PATH.read_text(encoding="utf-8-sig"))   # sig: a BOM is fine
                 break
             except FileNotFoundError as e:
                 if not any(CONFIG_PATH.with_name(f"config.json.{i}").exists()
@@ -271,14 +319,16 @@ class Config:
         for i in range(1, CONFIG_BACKUPS + 1):
             p = CONFIG_PATH.with_name(f"config.json.{i}")
             try:
-                yield p.name, json.loads(p.read_text(encoding="utf-8"))
+                yield p.name, json.loads(p.read_text(encoding="utf-8-sig"))
             except (OSError, ValueError):
                 continue
 
     @classmethod
     def from_raw(cls, raw: dict) -> Config:
+        if not isinstance(raw, dict):   # e.g. a top-level [] - damaged, try the backups
+            raise ValueError(f"config is a {type(raw).__name__}, not an object")
         raw = dict(raw)
-        version = int(raw.get("version", 1) or 1)
+        version = max(1, int(raw.get("version", 1) or 1))   # nothing older than v1 exists
         for v in range(version, CONFIG_VERSION):
             raw = MIGRATIONS[v](raw)
         sounds = []
@@ -300,16 +350,26 @@ class Config:
             s["tags"] = clean_tags(s.get("tags"))
             for k in ("fade_in", "fade_out"):
                 s[k] = clean_fade(s.get(k))
+            for k, lo, hi in (("volume", 0.0, 2.0), ("level_gain", 0.1, 6.0)):
+                if k in s:   # the Edit dialog's slider can't take any number
+                    s[k] = min(max(s[k], lo), hi)
             sounds.append(SoundMeta(**s))
         # configs from before the setup guide existed: whoever already picked an output
         # device has been set up by hand, so don't greet them with the guide
         raw.setdefault("setup_done", bool(raw.get("main_device")))
         known = _typed(raw, cls(), "config")
+        for k, v in list(known.items()):
+            if v is None:   # a device: None is the system default
+                continue
+            known[k] = clean_setting(k, v)
+            if known[k] is None:
+                log.warning("ignored config setting %s=%r (out of range)", k, v)
+                del known[k]
         known["version"] = CONFIG_VERSION
         cfg = cls(**known, sounds=sounds)
         cfg.categories = clean_tags(cfg.categories)
         for m in sounds:   # a category a sound is in always has a tab
-            cfg.categories += [t for t in m.tags if t not in cfg.categories]
+            m.tags = merge_tags(m.tags, cfg.categories)
         if cfg.category not in cfg.categories:
             cfg.category = ""
         return cfg
@@ -371,6 +431,21 @@ def clean_tags(tags) -> list[str]:
         if t and t.lower() not in seen:
             seen.add(t.lower())
             out.append(t)
+    return out
+
+
+def merge_tags(tags: list[str], categories: list[str]) -> list[str]:
+    """`tags` spelled the way `categories` already spells them (ignoring case), so an
+    imported "memes" lands in the existing "Memes". Tags that aren't a category yet
+    are appended to `categories`, which is changed in place."""
+    by_lower = {c.lower(): c for c in categories}
+    out = []
+    for t in clean_tags(tags):
+        c = by_lower.get(t.lower())
+        if c is None:
+            categories.append(t)
+            c = by_lower[t.lower()] = t
+        out.append(c)
     return out
 
 
@@ -662,12 +737,17 @@ def import_file(src: str, color: str) -> tuple[SoundMeta, np.ndarray]:
 
     Plain audio files are copied as they are. Anything that needed ffmpeg (video,
     m4a, aac, wma) is stored as a FLAC of its *audio* instead: a 300 MB video used
-    to be copied whole, and the library stays playable if ffmpeg goes away."""
+    to be copied whole, and the library stays playable if ffmpeg goes away. So is a
+    file libsndfile reads under a name outside AUDIO_EXTS (.au, .caf, .w64…): only
+    those come back in from a backup (soundboard.backup)."""
     data, via_ffmpeg = _decode(src)
+    if not len(data):
+        raise ValueError("this file has no audio in it")
     SOUNDS_DIR.mkdir(parents=True, exist_ok=True)
     sid = uuid.uuid4().hex[:10]
     srcp = Path(src)
-    if via_ffmpeg:
+    as_flac = via_ffmpeg or srcp.suffix.lower() not in AUDIO_EXTS
+    if as_flac:
         dest = SOUNDS_DIR / f"{sid}_{_safe_name(srcp.stem)}.flac"
     else:
         # capped: a long source name plus the id would pass Windows' 255-character limit
@@ -675,7 +755,7 @@ def import_file(src: str, color: str) -> tuple[SoundMeta, np.ndarray]:
     # Never fall back to using `src` in place: a download's temp folder is deleted
     # right after this. A failed copy leaves nothing behind and says what to do.
     try:
-        if via_ffmpeg:
+        if as_flac:
             sf.write(dest, data, SR, subtype="PCM_16")
         else:
             shutil.copy2(srcp, dest)
@@ -740,7 +820,8 @@ def duplicate(meta: SoundMeta, name: str) -> SoundMeta:
     return SoundMeta(id=sid, name=name[:40], file=str(dest), volume=meta.volume,
                      mode=meta.mode, loop=meta.loop, color=meta.color,
                      level_gain=meta.level_gain, duration=meta.duration,
-                     fingerprint="", fx=dict(meta.fx), image=image)
+                     fingerprint="", fx=dict(meta.fx), image=image, tags=list(meta.tags),
+                     fade_in=meta.fade_in, fade_out=meta.fade_out)
 
 
 def recycle(path: Path) -> bool:

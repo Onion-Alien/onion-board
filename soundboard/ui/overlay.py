@@ -164,6 +164,8 @@ class Overlay:
                 mods = winkeys.combo_name(parsed[0], ord("A"))[:-1]   # "ctrl+alt+"
                 for k, act in keys.items():
                     out.setdefault(mods + k, act)
+        # the overlay's own hotkey (say Num 0 with the numpad keys) keeps closing it
+        out.pop(self.host.cfg.overlay_hotkey, None)
         return out
 
     def handle(self, action: str) -> bool:

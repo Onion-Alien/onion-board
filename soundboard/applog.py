@@ -26,6 +26,7 @@ import time
 import traceback
 from dataclasses import dataclass, field
 from pathlib import Path
+from urllib.parse import quote
 
 LOG_NAME = "onionboard.log"
 REPORTS_DIR = "crash-reports"
@@ -121,9 +122,11 @@ def ui_ready():
     bridge = _Bridge()
     bridge.show.connect(_show_dialog, Qt.ConnectionType.QueuedConnection)
     _state["bridge"] = bridge
-    # a report held back while another program was in front (see _show_dialog)
+    # a report held back while another program was in front (see _show_dialog).
+    # focusWindowChanged, not applicationStateChanged: that one fires before
+    # activeWindow() is set, so the report would be held back again, forever.
     from PySide6.QtWidgets import QApplication
-    QApplication.instance().applicationStateChanged.connect(_show_pending)
+    QApplication.instance().focusWindowChanged.connect(_show_pending)
 
 
 def report(exc_info=None, where: str = "", fatal: bool = False) -> Report | None:
@@ -155,7 +158,8 @@ def report(exc_info=None, where: str = "", fatal: bool = False) -> Report | None
 
 def build_report(exc_info, where: str = "", fatal: bool = False) -> Report:
     t, v, tb = exc_info
-    title = f"{t.__name__}: {v}".strip().rstrip(":")
+    # scrub before cutting: a cut can split the home path so scrub() no longer sees it
+    title = scrub(f"{t.__name__}: {v}".strip().rstrip(":"))
     if len(title) > 200:
         title = title[:197] + "…"
     lines = [
@@ -171,10 +175,10 @@ def build_report(exc_info, where: str = "", fatal: bool = False) -> Report:
     if fatal:
         lines.append("Fatal:    yes (the app could not continue)")
     lines += ["", "Error", "-----", "".join(traceback.format_exception(t, v, tb)).rstrip()]
-    tail = _log_tail(_state["log_path"], LOG_TAIL_LINES)
+    tail = _scrub_owner_names(_log_tail(_state["log_path"], LOG_TAIL_LINES))
     if tail:
         lines += ["", f"Last {LOG_TAIL_LINES} log lines", "-------------------", tail]
-    return Report(title=scrub(title), text=scrub("\n".join(lines)), fatal=fatal)
+    return Report(title=title, text=scrub("\n".join(lines)), fatal=fatal)
 
 
 # -- privacy -----------------------------------------------------------------------
@@ -183,15 +187,60 @@ def scrub(text: str) -> str:
     """Replace the user's home folder, user name and computer name, so the report
     can go in a public issue as-is."""
     home = str(Path.home())
-    for variant in {home, home.replace("\\", "/"), home.replace("\\", "\\\\")}:
+    variants = {home, home.replace("\\", "/"), home.replace("\\", "\\\\"),
+                quote(home.replace("\\", "/"), safe="/:")}   # in a file:// URL
+    short = _short_path(home)   # the 8.3 form (ABCDEF~1), as in %TEMP% on many PCs
+    if short:
+        variants |= {short, short.replace("\\", "/"), short.replace("\\", "\\\\")}
+    for variant in sorted(variants, key=len, reverse=True):
         if len(variant) > 3:
             text = re.sub(re.escape(variant), "%USERPROFILE%", text, flags=re.IGNORECASE)
+    text = _scrub_short_home(text, home)
     for var, placeholder in (("COMPUTERNAME", "<pc>"), ("USERNAME", "<user>")):
         name = os.environ.get(var, "")
         if len(name) >= 3:
             text = re.sub(rf"(?<![\w-]){re.escape(name)}(?![\w-])", placeholder, text,
                           flags=re.IGNORECASE)
     return text
+
+
+def _short_path(path: str) -> str:
+    """The 8.3 short form of path, or "" if it has none (or isn't there)."""
+    if sys.platform != "win32":
+        return ""
+    try:
+        import ctypes
+        buf = ctypes.create_unicode_buffer(1024)
+        n = ctypes.windll.kernel32.GetShortPathNameW(path, buf, len(buf))
+    except (AttributeError, OSError):
+        return ""
+    return buf.value if 0 < n < len(buf) and buf.value.lower() != path.lower() else ""
+
+
+def _scrub_short_home(text: str, home: str) -> str:
+    """8.3 forms of the profile folder that GetShortPathNameW didn't give us: the
+    folder name without spaces etc., cut to k chars + "~" + a number (8 chars max)."""
+    parent, _, name = home.replace("/", "\\").rpartition("\\")
+    stem = re.sub(r"[^\w$-]", "", name)
+    if not parent or not stem:
+        return text
+    sep = r"[\\/]{1,2}"
+    parent_re = sep.join(re.escape(part) for part in parent.split("\\"))
+    short_re = "|".join(rf"{re.escape(stem[:k])}~\d{{1,{7 - k}}}"
+                        for k in range(min(len(stem), 6), 0, -1))
+    return re.sub(rf"{parent_re}{sep}(?:{short_re})(?![\w~])", "%USERPROFILE%", text,
+                  flags=re.IGNORECASE)
+
+
+_NOT_NAMES = {"it", "that", "what", "there", "here", "let", "who", "he", "she"}
+
+
+def _scrub_owner_names(text: str) -> str:
+    """Windows names Bluetooth devices after their owner ("Headset (Alex's AirPods)")
+    and the log records every device opened: keep only the "'s" in the log excerpt."""
+    return re.sub(r"\b([\w.-]+)(['\u2019]s)\b",
+                  lambda m: m.group(0) if m.group(1).lower() in _NOT_NAMES
+                  else f"<name>{m.group(2)}", text)
 
 
 # -- internals ---------------------------------------------------------------------
@@ -224,8 +273,17 @@ def _save(rep: Report) -> Path | None:
     try:
         folder = Path(_state["log_path"]).parent / REPORTS_DIR
         folder.mkdir(parents=True, exist_ok=True)
-        path = folder / f"crash-{time.strftime('%Y%m%d-%H%M%S')}-{os.getpid()}.txt"
-        path.write_text(rep.text, encoding="utf-8")
+        stem = f"crash-{time.strftime('%Y%m%d-%H%M%S')}-{os.getpid()}"
+        for i in range(100):   # two reports in the same second must both be kept
+            path = folder / (f"{stem}-{i}.txt" if i else f"{stem}.txt")
+            try:
+                with open(path, "x", encoding="utf-8") as f:
+                    f.write(rep.text)
+                break
+            except FileExistsError:
+                continue
+        else:
+            return None
         for old in sorted(folder.glob("crash-*.txt"))[:-KEEP_REPORTS]:
             old.unlink(missing_ok=True)
         return path

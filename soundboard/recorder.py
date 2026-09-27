@@ -73,6 +73,11 @@ class Recorder:
         with self._lock:
             return self._last()
 
+    def clear_replay(self):
+        """Forget the last CLIP_S seconds (a different source starts)."""
+        with self._lock:
+            self.w = self.filled = 0
+
     def _last(self) -> np.ndarray:
         if self.filled < len(self.replay):
             return self.replay[:self.filled].copy()

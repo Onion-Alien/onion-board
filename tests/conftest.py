@@ -119,6 +119,16 @@ def _never_touch_real_autostart(monkeypatch):
 
 
 @pytest.fixture(autouse=True)
+def _us_keyboard_layout(monkeypatch):
+    """Key labels and the overlay key's layout check read the PC's keyboard layout;
+    tests see a US one wherever they run."""
+    from soundboard import winkeys
+    us = {winkeys.VK[k]: k for k in (";", "=", ",", "-", ".", "/", "`", "[", "\\", "]", "'")}
+    monkeypatch.setattr(winkeys, "key_char",
+                        lambda vk: us.get(vk) or (chr(vk) if 0x30 <= vk <= 0x5A else ""))
+
+
+@pytest.fixture(autouse=True)
 def _fail_on_swallowed_exceptions(monkeypatch):
     """An exception in a Qt slot, a worker thread or the crash reporter never reaches
     pytest: PySide hands it to sys.excepthook and carries on, so the test passes while

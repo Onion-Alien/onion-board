@@ -55,7 +55,41 @@ CHECK_EVERY = 24 * 3600          # automatic update check
 RETRY_CHECK_AFTER = 3600         # a failed download checks again if the last check is older
 WHEEL_MAX = 30 * 1024 * 1024
 
-_lock = threading.RLock()        # a download and swapping in a new copy never overlap
+class _SharedLock:
+    """Searches, lookups and downloads share yt-dlp (one slow site mustn't hold up
+    the rest); swapping in a new copy waits until none of them is using it."""
+
+    def __init__(self):
+        self._cond = threading.Condition()
+        self._users = 0
+        self._swapping = False
+
+    @contextlib.contextmanager
+    def shared(self):
+        with self._cond:
+            self._cond.wait_for(lambda: not self._swapping)
+            self._users += 1
+        try:
+            yield
+        finally:
+            with self._cond:
+                self._users -= 1
+                self._cond.notify_all()
+
+    @contextlib.contextmanager
+    def exclusive(self):
+        with self._cond:
+            self._cond.wait_for(lambda: not self._swapping and not self._users)
+            self._swapping = True
+        try:
+            yield
+        finally:
+            with self._cond:
+                self._swapping = False
+                self._cond.notify_all()
+
+
+_lock = _SharedLock()   # a download and swapping in a new copy never overlap
 
 
 class DownloadError(RuntimeError):
@@ -187,8 +221,11 @@ def _wheel(meta: dict) -> bytes:
 def update(force: bool = False) -> str:
     """Fetch the latest yt-dlp if it's newer than what's in use (or always, with
     force). Returns a short message for the user; raises DownloadError on failure."""
-    meta = json.loads(_get(PYPI.format("yt-dlp"), 5 * 1024 * 1024))
-    latest = meta["info"]["version"]
+    try:
+        meta = json.loads(_get(PYPI.format("yt-dlp"), 5 * 1024 * 1024))
+        latest = str(meta["info"]["version"])
+    except (ValueError, KeyError, TypeError) as e:
+        raise DownloadError("PyPI sent an answer that couldn't be read") from e
     current, _ = active_version()
     _save_state(checked=time.time())
     if not force and current and vtuple(latest) <= vtuple(current):
@@ -207,7 +244,7 @@ def update(force: bool = False) -> str:
                 z.extractall(new, [n for n in z.namelist() if n.split("/")[0] in PACKAGES])
         if not (new / "yt_dlp" / "__init__.py").is_file():
             raise DownloadError("the yt-dlp wheel didn't contain yt_dlp")
-        with _lock:   # not while a download is using the old copy
+        with _lock.exclusive():   # not while a download is using the old copy
             old = root() / f"old-{time.time_ns()}"
             if _pkg_dir().exists():
                 _pkg_dir().rename(old)
@@ -224,7 +261,7 @@ def update(force: bool = False) -> str:
 def reset() -> str:
     """For when it's thoroughly broken: delete the downloaded copy and yt-dlp's cache,
     then download the latest again (falling back to the bundled one if that fails)."""
-    with _lock:
+    with _lock.exclusive():
         shutil.rmtree(root(), ignore_errors=True)
         _purge()
     try:
@@ -443,9 +480,9 @@ def _soundcloud_hit(e: dict) -> Result | None:
 
 @contextlib.contextmanager
 def _ydl():
-    """The yt_dlp module, held under _lock (an update never swaps it mid-use)."""
+    """The yt_dlp module, in shared use (an update never swaps it mid-use)."""
     install()
-    with _lock:
+    with _lock.shared():
         try:
             import yt_dlp
         except ImportError as e:

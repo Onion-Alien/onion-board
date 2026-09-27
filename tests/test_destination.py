@@ -138,3 +138,21 @@ def test_every_builtin_runs_at_odd_rates():
         for d in BUILTIN:
             y = Processor(rate).process(x.copy(), d)
             assert y.shape == x.shape and y.dtype == np.float32 and np.all(np.isfinite(y))
+
+
+def test_custom_that_is_not_a_list_is_ignored():
+    """An imported settings file can hold {"custom": 5}: every start then raised in
+    destination.apply() while the main window was being built."""
+    for custom in (5, True, "abc", {"key": "x"}, None):
+        assert all_modes(custom) == list(BUILTIN)
+        assert resolve({"mode": "discord", "custom": custom}).key == "discord"
+    for bad in (5, "off", [1, 2], None):
+        assert resolve(bad) is OFF
+
+
+def test_from_dict_survives_nan_and_infinity():
+    inf, nan = float("inf"), float("nan")
+    d = Dest.from_dict({"key": "k", "ceiling": inf, "bass": nan, "comp": inf})
+    assert d.ceiling == 0 and d.bass == 0.0 and d.comp == 0.0
+    assert Dest.from_dict({"key": "k", "ceiling": nan}).ceiling == 0
+    assert Dest.from_dict({"key": "k", "ceiling": -inf, "bass": 10 ** 400}).ceiling == 0

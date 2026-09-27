@@ -28,6 +28,7 @@ from __future__ import annotations
 import hashlib
 import json
 import logging
+import math
 
 import numpy as np
 
@@ -58,9 +59,11 @@ def clean(fx: dict | None) -> dict:
 
     def num(key, lo, hi):
         try:
-            return float(min(max(float(fx.get(key, out[key])), lo), hi))
-        except (TypeError, ValueError):
+            v = float(fx.get(key, out[key]))
+        except (TypeError, ValueError, OverflowError):
             return out[key]
+        # NaN would slip through min/max: a hand-edited config gets the default
+        return float(min(max(v, lo), hi)) if math.isfinite(v) else out[key]
 
     out["speed"] = num("speed", *SPEED_RANGE)
     out["pitch"] = num("pitch", *PITCH_RANGE)
@@ -74,8 +77,9 @@ def clean(fx: dict | None) -> dict:
     g = fx.get("eq")
     if isinstance(g, list) and len(g) == len(eq.BANDS):
         try:
-            out["eq"] = [float(min(max(float(v), -eq.MAX_DB), eq.MAX_DB)) for v in g]
-        except (TypeError, ValueError):
+            out["eq"] = [float(min(max(float(v), -eq.MAX_DB), eq.MAX_DB))
+                         if math.isfinite(float(v)) else 0.0 for v in g]
+        except (TypeError, ValueError, OverflowError):
             pass
     effs = fx.get("effects")
     if isinstance(effs, dict):
@@ -155,14 +159,15 @@ def trim(x: np.ndarray, fx: dict | None) -> np.ndarray:
 # --------------------------------------------------------------------------- stretch
 
 def stretch(x: np.ndarray, factor: float, n_fft: int = 2048, hop: int = 512,
-            chunk: int = 256) -> np.ndarray:
+            chunk: int = 64) -> np.ndarray:
     """Make (n, 2) float32 audio `factor` times longer without changing its pitch.
 
     Phase vocoder with identity phase locking (each bin keeps its phase relation
     to the nearest spectral peak), which keeps it from sounding washed out. The
     phase is taken from the mid (L+R) signal and shared by both channels, so the
-    stereo image doesn't smear. Frames are processed `chunk` at a time to keep
-    memory bounded on long sounds."""
+    stereo image doesn't smear. Frames are processed `chunk` at a time, and each
+    stretch of the overlap-add is written to the output as soon as no later frame
+    can reach it, so memory beyond the output itself stays bounded on long sounds."""
     n = len(x)
     if n == 0 or abs(factor - 1.0) < 1e-3:
         return np.ascontiguousarray(x, dtype=F32)
@@ -173,8 +178,12 @@ def stretch(x: np.ndarray, factor: float, n_fft: int = 2048, hop: int = 512,
     xp = np.concatenate([pad, x.astype(F32, copy=False), pad])
     n_frames = int(np.ceil((n + n_fft) / ha)) + 1
     starts = np.minimum(np.round(np.arange(n_frames) * ha).astype(np.int64), len(xp) - n_fft)
-    y = np.zeros((n_frames * hop + n_fft, 2), np.float64)
-    wsum = np.zeros(n_frames * hop + n_fft, np.float64)
+    lead = int(round(n_fft * factor))         # the zero padding, stretched
+    res = np.zeros((out_len, 2), F32)
+    # overlap-add accumulators for one chunk of frames plus the overlap it leaves;
+    # acc[0] is output-timeline position `base` (res[0] is `lead`)
+    acc = np.zeros((chunk * hop + n_fft, 2), np.float64)
+    wacc = np.zeros(chunk * hop + n_fft, np.float64)
     bins = np.arange(n_fft // 2 + 1)
     omega = 2 * np.pi * bins / n_fft         # expected phase advance per sample
     idx = np.arange(n_fft)
@@ -219,14 +228,24 @@ def stretch(x: np.ndarray, factor: float, n_fft: int = 2048, hop: int = 512,
         rot = np.exp(1j * locked)[..., None]
         out = np.fft.irfft(mag * rot, n=n_fft, axis=1) * win[None, :, None]
         for j in range(k):
-            o = (c0 + j) * hop
-            y[o:o + n_fft] += out[j]
-            wsum[o:o + n_fft] += win2
+            o = j * hop
+            acc[o:o + n_fft] += out[j]
+            wacc[o:o + n_fft] += win2
         prev_ang, prev_phase, prev_start = ang[-1], phase[-1], st[-1]
-    wsum[wsum < 1e-3] = 1.0
-    y /= wsum[:, None]
-    lead = int(round(n_fft * factor))         # the zero padding, stretched
-    return np.ascontiguousarray(y[lead:lead + out_len], dtype=F32)
+        # everything before the next frame's start is final: normalise and flush it
+        base = c0 * hop
+        done = k * hop if c0 + k < n_frames else k * hop + n_fft
+        w = wacc[:done]
+        w[w < 1e-3] = 1.0
+        a, b = max(base, lead), min(base + done, lead + out_len)
+        if a < b:
+            res[a - lead:b - lead] = acc[a - base:b - base] / w[a - base:b - base, None]
+        keep = len(acc) - done
+        acc[:keep] = acc[done:].copy()
+        acc[keep:] = 0.0
+        wacc[:keep] = wacc[done:].copy()
+        wacc[keep:] = 0.0
+    return res
 
 
 def change_speed_pitch(x: np.ndarray, speed: float, semitones: float,
@@ -277,9 +296,19 @@ def _run_effects(x: np.ndarray, fx: dict) -> np.ndarray:
                 parts.append(yb)
             chans.append(np.concatenate(parts) if parts is not None else src)
         x = np.stack(chans, 1)
-    # trim the tail back to where it falls silent
-    loud = np.flatnonzero(np.max(np.abs(x), axis=1) > 1e-3)
+    # trim the tail back to where it falls silent: below 1e-3, or to the level the
+    # effects settle at once the sound is over (the Radio's static never stops, and
+    # would otherwise keep the whole TAIL_S pad). Decaying tails end well below
+    # 1e-3 inside the pad, so for them the threshold stays at 1e-3.
+    lvl = np.max(np.abs(x), axis=1)
+    floor = float(lvl[-int(0.25 * SR):].max()) if len(lvl) else 0.0
+    thr = max(1e-3, 2.0 * floor)
+    loud = np.flatnonzero(lvl > thr)
     end = max(int(loud[-1]) + 1 if len(loud) else 0, len(x) - int(TAIL_S * SR))
+    if thr > 1e-3 and end < len(x):   # cut into a noise bed: fade it out, no click
+        k = min(int(0.02 * SR), len(x) - end)
+        x[end:end + k] *= np.linspace(1, 0, k, dtype=F32)[:, None]
+        end += k
     return np.ascontiguousarray(x[:end])
 
 
@@ -300,7 +329,7 @@ def render(data: np.ndarray, fx: dict | None) -> np.ndarray:
         x = x * F32(10 ** (f["gain_db"] / 20))
     if f["reverse"]:
         x = x[::-1]
-    return np.ascontiguousarray(np.clip(x, -1.0, 1.0), dtype=F32)
+    return np.ascontiguousarray(np.clip(x, -1.0, 1.0, out=x), dtype=F32)   # x is ours
 
 
 # --------------------------------------------------------------------------- presets

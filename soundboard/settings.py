@@ -42,8 +42,14 @@ HOTKEY_ACTIONS = [a for _, group in HOTKEY_GROUPS for a in group]
 def pretty_key(combo: str) -> str:
     if not combo:
         return ""
-    return "+".join(p.strip().title() if len(p.strip()) > 1 else p.strip().upper()
-                    for p in combo.split("+"))
+
+    def part(p: str) -> str:
+        if len(p) > 1:
+            return p.title()
+        if not p.isalnum() and p in winkeys.VK:   # punctuation: as printed on this keyboard
+            return (winkeys.key_char(winkeys.VK[p]) or p).upper()
+        return p.upper()
+    return "+".join(part(p.strip()) for p in combo.split("+"))
 
 
 class HotkeyDialog(QDialog):
@@ -79,7 +85,8 @@ class HotkeyDialog(QDialog):
             # a global hotkey takes the key away from every other program: warn once
             self._warned_vk = vk
             key = pretty_key(winkeys.combo_name(0, vk))
-            self.hint.setText(f"<span style='color:#ffb020'><b>{key}</b> on its own would "
+            warn = theme.status("warn")
+            self.hint.setText(f"<span style='color:{warn}'><b>{key}</b> on its own would "
                               "stop working for typing everywhere "
                               "(chat, games, browser). Add Ctrl, Alt or Shift — or press it "
                               "again to use it anyway.</span>")
@@ -92,7 +99,8 @@ def is_typing_key(vk: int) -> bool:
     """Letters, digits, punctuation, Space, Enter, Tab, Backspace, arrows: keys people
     type with. F-keys, the numpad, Insert/Home/…, media keys are fine bare."""
     return (0x30 <= vk <= 0x39 or 0x41 <= vk <= 0x5A or 0xBA <= vk <= 0xC0
-            or 0xDB <= vk <= 0xDF or 0x25 <= vk <= 0x28 or vk in (0x08, 0x09, 0x0D, 0x20))
+            or 0xDB <= vk <= 0xDF or 0x25 <= vk <= 0x28
+            or vk in (0x08, 0x09, 0x0D, 0x20, 0xE2))   # 0xE2: the extra key of ISO keyboards
 
 
 class _Relay(QObject):
@@ -580,6 +588,7 @@ class SettingsDialog(QDialog):
             self.mw.check_updates()
 
     def _updates_check(self):
+        self._upd_asked = True
         self.upd_btn.setEnabled(False)
         self.upd_label.setText("Checking…")
         self.mw.check_updates(force=True)
@@ -588,10 +597,14 @@ class SettingsDialog(QDialog):
         if not qt_valid(self.upd_label):
             return
         self.upd_btn.setEnabled(True)
+        asked, self._upd_asked = getattr(self, "_upd_asked", False), False
         if err:
             self.upd_label.setText(f"Couldn't check: {err}")
         elif rel is None:
-            self.upd_label.setText("You have the newest version.")
+            # a check the user didn't ask for may not have asked GitHub at all (done
+            # today already, or the newer version was skipped): don't claim anything
+            if asked:
+                self.upd_label.setText("You have the newest version.")
         else:
             self.upd_label.setText(f"Version {rel.version} is out.")
 

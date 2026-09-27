@@ -2,6 +2,78 @@
 
 ## Unreleased
 
+## 1.2.3 — 2026-09-27
+
+A bug-fix release from a feature-by-feature test of the whole app.
+
+- **Onion Board always starts.** A damaged setting (from an old backup, a
+  hand-edited config, or an add-on with a broken slider) used to stop the app
+  from opening, every time: a huge volume or EQ value, a broken voice changer,
+  text-to-speech or "Who's listening" setting, a bad Apps-tab volume or API port.
+  The damaged value now just goes back to its default.
+- **Hotkeys don't fight each other or your keyboard.**
+  - On keyboards other than US English, the default overlay key (the one left of
+    1) types a letter or everyday punctuation, such as ö, ñ or the UK ' key, and
+    Onion Board took it away from typing everywhere. There it's now Alt + that
+    key, and hotkeys show the character your keyboard really prints.
+  - The game's push-to-talk key can no longer also be one of Onion Board's
+    hotkeys (it used to catch its own key presses instead of the game).
+  - Renaming or deleting a category updates its random-sound hotkey straight
+    away, and a numpad overlay key closes the overlay again.
+- **The in-game overlay shows what's playing** (progress, Pause/Resume) while the
+  main window is in the tray, which is how it's normally used.
+- **Backups and the Sounds tab are sturdier.** Sounds in less common formats
+  (.au, .caf, .w64) come back when you restore a backup. Restoring right after
+  deleting all your sounds brings them back instead of skipping them. "Save as
+  new sound" keeps the copy's categories and fades, Undo no longer brings back a
+  category you just renamed or deleted, imported sounds join an existing category
+  whatever its capitals, empty audio files are refused with a clear message, and
+  the Edit dialog no longer lowers some volumes by 1%.
+- **Triggers are more reliable.** Big pictures and full-screen screenshots are
+  kept at their real size, so they match; cut-outs with thin outlines are found;
+  a graphics-driver reset or a screen briefly unplugging no longer switches
+  watching off; a refused picture no longer replaces the trigger's old one; tiny
+  pictures no longer slow every check down; screens plugged in later show up.
+  A trigger whose sound was removed says so instead of claiming it played.
+- **Voice tab.** "Windows default" really speaks in the default voice after you've
+  used another one, a saved voice that has since been uninstalled falls back to
+  the default, and a line the voice can't read (Chinese with an English voice,
+  say) says so instead of staying silent. Add-ons whose `module.json` was saved
+  with a byte-order mark (Notepad) load.
+- **Record 6s** no longer says your voice isn't getting through when the voice
+  changer is on; in computer-voice mode it says your real voice is muted instead
+  of blaming the send switch. Live speed / pitch no longer changes the test
+  playback, cue beeps or previews.
+- **The "Old radio" effect** no longer adds 3 seconds of static to a sound (before
+  it, when reversed), and slowing down long sounds uses far less memory.
+- **Radio.** Favourites and stations you've played pick up a station's new stream
+  address instead of staying on a dead one; a radio volume of 0 is remembered;
+  when one directory mirror answers with a maintenance page the next one is used;
+  "Last 15s" only holds (and is named after) the station that played. Station
+  links can no longer reach your PC or home network with an address written in
+  an unusual form (like `127.1`).
+- **Links and web search.** One slow link lookup no longer holds up every search
+  and download; pressing *Add* on a second result while one is downloading adds
+  it next instead of doing nothing; typing a link by hand looks it up once.
+- **Local control API (Stream Deck).** A request answered "busy, try again" no
+  longer runs later as well, so a retrying button can't play a sound twice.
+- **Settings.** "Start with Windows" shows off when it's been switched off in Task
+  Manager, and ticking it turns it back on there; *App updates* only says "You
+  have the newest version" after it really checked.
+- **Readable on light themes.** Green, amber and red status text (setup guide,
+  header, warnings everywhere) was hard to read on Light and Cherry Blossom; each
+  theme now has its own readable shades.
+- **Setup guide.** Closing it without finishing no longer swaps in another mic or
+  headphones for a headset that happens to be unplugged.
+- **Problem reports** that came up while you were in a game now really appear when
+  you switch back, and hide your Windows user name more thoroughly (short `~1`
+  paths, web-style paths, device names).
+- **Odds and ends.** Launching Onion Board again while it's still starting brings it
+  to the front. A settings file saved by Notepad (with a byte-order mark) no longer
+  counts as damaged. First start no longer adopts another program's
+  `%APPDATA%\Soundboard` folder. Opening Settings over and over no longer makes
+  theme changes slower. Updating clears out the old version's program files.
+
 ## 1.2.2 — 2026-09-27
 
 - **Triggers keep working when a game switches display mode.** When a game went

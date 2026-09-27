@@ -37,7 +37,7 @@ LIST_MAX = 300             # rows shown at once
 SEARCH_DELAY_MS = 450      # typing pause before the directory is asked
 FAV_MAX = 200
 RECENT_MAX = 30
-GREEN, AMBER, RED = "#13ce66", "#ffb020", "#ff4d4f"
+GREEN = "#13ce66"   # the globe's highlight on dark themes
 ROW_H = 54
 
 # genre chips: a station is in a genre when one of its tags contains one of the words
@@ -287,6 +287,7 @@ class RadioTab(QWidget):
         self._globe_error = ""       # the station list couldn't be fetched (and none cached)
         self._title = ""           # what the station says is playing
         self._flash_until = 0.0
+        self._fed_by: Station | None = None   # the station the clip buffers hold
         self.favorites: list[Station] = [s for s in map(Station.from_saved,
                                                         cfg.radio.get("favorites", [])) if s]
         self.recent: list[Station] = [s for s in map(Station.from_saved,
@@ -382,7 +383,8 @@ class RadioTab(QWidget):
         bh.addWidget(vol_icon)
         vol_lbl = QLabel("Radio volume")
         bh.addWidget(vol_lbl)
-        self.vol = VolumeControl(float(cfg.radio.get("vol", 1.0) or 1.0),
+        vol = cfg.radio.get("vol", 1.0)
+        self.vol = VolumeControl(float(vol) if isinstance(vol, (int, float)) else 1.0,
                                  tip="Radio volume (for them and for you)")
         self.vol.changed.connect(self._on_vol)
         bh.addWidget(self.vol)
@@ -698,8 +700,17 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
 
     # ------------------------------------------------------------------ station lists
     def _remember(self, stations: list[Station]):
-        for s in stations:
-            self._stations.setdefault(s.uuid, s)
+        """Fresh directory data wins over what was known, favourites and recents
+        included: a station whose stream moved plays again."""
+        fresh = {s.uuid: s for s in stations}
+        self._stations.update(fresh)
+        favs = [fresh.get(f.uuid, f) for f in self.favorites]
+        recent = [fresh.get(r.uuid, r) for r in self.recent]
+        if favs != self.favorites or recent != self.recent:
+            self.favorites, self.recent = favs, recent
+            self.cfg.radio["favorites"] = [f.to_saved() for f in favs]
+            self.cfg.radio["recent"] = [r.to_saved() for r in recent]
+            self._save()
 
     def _reload(self):
         self._globe_error = ""
@@ -729,7 +740,7 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
         elif self._query:
             self._results, self._search_failed = [], True
             self._show_list()
-            self._refresh_info(f"<span style='color:{RED}'>Search failed "
+            self._refresh_info(f"<span style='color:{theme.status('error')}'>Search failed "
                                f"({html.escape(msg)}). Check your connection and press "
                                f"Enter to try again.</span>")
 
@@ -857,6 +868,9 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
     # ------------------------------------------------------------------ playing
     def play(self, s: Station):
         self._title = ""
+        if self._fed_by is None or self._fed_by.uuid != s.uuid:
+            self.recorder.clear_replay()   # "Last 15s" is only ever this station
+        self._fed_by = s
         self.player.play(s)
         self.dir.count_click(s.uuid)
         self.cfg.radio["last"] = s.to_saved()
@@ -886,7 +900,7 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
             return
         s = self.selected() or Station.from_saved(self.cfg.radio.get("last") or {})
         if s is not None:
-            self._stations.setdefault(s.uuid, s)
+            s = self._stations.setdefault(s.uuid, s)
             self.play(s)
 
     def _on_audio(self, x: np.ndarray):
@@ -900,7 +914,8 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
 
     def _on_error(self, msg: str):
         self._show_list()
-        self._refresh_info(f"<span style='color:{RED}'>That station isn't working "
+        red = theme.status("error")
+        self._refresh_info(f"<span style='color:{red}'>That station isn't working "
                            f"({html.escape(msg)}). Try another one.</span>")
         self._select_on_globe(fly=False)
 
@@ -940,7 +955,8 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
                     "Click a station's badge (or double-click it) to play it." if n else
                     self._no_stations_text())
             if not n and self._globe_error:
-                text = (f"<span style='color:{RED}'>Can't reach the station directory "
+                red = theme.status("error")
+                text = (f"<span style='color:{red}'>Can't reach the station directory "
                         f"({html.escape(self._globe_error)}) — press ↻ to try again.</span>")
         else:
             name = html.escape(st.name)
@@ -952,7 +968,7 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
                 if self._title:
                     text += f" — <i>{html.escape(self._title)}</i>"
             if self.engine.radio_live:
-                text += f"  <span style='color:{GREEN}'>· others hear it</span>"
+                text += f"  <span style='color:{theme.status('ok')}'>· others hear it</span>"
             else:
                 text += "  · only you hear it (LIVE sends it to others)"
         self.info.setText(text)
@@ -1047,12 +1063,13 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
     def _emit_clip(self, data: np.ndarray, empty_msg: str) -> bool:
         data = trim_silence(data)
         if len(data) < int(0.2 * SR):
-            self._refresh_info(f"<span style='color:{AMBER}'>{empty_msg}</span>")
+            self._refresh_info(f"<span style='color:{theme.status('warn')}'>{empty_msg}</span>")
             return False
-        st = self.player.station or self.selected()
+        st = self.player.station or self._fed_by or self.selected()
         name = (st.name[:30] if st else "Radio") + " " + time.strftime("%H.%M.%S")
         self.clip_ready.emit(data, name)
-        self._refresh_info(f"<span style='color:{GREEN}'>✓ Saved a {len(data) / SR:.1f}s clip "
+        green = theme.status("ok")
+        self._refresh_info(f"<span style='color:{green}'>✓ Saved a {len(data) / SR:.1f}s clip "
                            "to your Sounds.</span>")
         return True
 

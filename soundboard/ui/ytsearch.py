@@ -262,7 +262,8 @@ class SearchResults(QFrame):
         self.spinner.stop()
         q = html.escape(self.query)
         if err:
-            self.title.setText(f"<span style='color:#ff4d4f'>Couldn't search {self.site}: "
+            red = theme.status("error")
+            self.title.setText(f"<span style='color:{red}'>Couldn't search {self.site}: "
                                f"{html.escape(err)}</span>")
             return
         if not results:

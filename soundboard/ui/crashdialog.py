@@ -13,6 +13,7 @@ from PySide6.QtCore import Qt, QUrl
 from PySide6.QtGui import QDesktopServices, QFont, QGuiApplication
 from PySide6.QtWidgets import (QDialog, QHBoxLayout, QLabel, QPlainTextEdit, QPushButton,
                                QVBoxLayout)
+import shiboken6
 
 from soundboard.updates import REPO
 
@@ -121,3 +122,14 @@ class CrashDialog(QDialog):
         folder = self._folder()
         if folder is not None:
             QDesktopServices.openUrl(QUrl.fromLocalFile(str(folder)))
+
+
+def free_dialog(dlg: QDialog):
+    """Delete a modal dialog once its exec() has returned. Parented to the window and
+    never freed, every closed copy stayed alive and made each theme change slower.
+    A crash report opened over it is moved to the dialog's parent first, so it stays."""
+    parent = dlg.parentWidget()
+    for c in dlg.findChildren(CrashDialog):
+        c.setParent(parent, c.windowFlags())
+        c.show()
+    shiboken6.delete(dlg)

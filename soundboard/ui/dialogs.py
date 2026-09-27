@@ -195,7 +195,7 @@ class EditDialog(QDialog):
         vrow = QHBoxLayout()
         self.vol = QSlider(Qt.Horizontal)
         self.vol.setRange(0, 200)
-        self.vol.setValue(int(meta.volume * 100))
+        self.vol.setValue(round(meta.volume * 100))   # int() made 0.29 read as 28 %
         no_wheel(self.vol)
         self.vol_lbl = QLabel()
         self.vol.valueChanged.connect(lambda v: self.vol_lbl.setText(f"{v}%"))

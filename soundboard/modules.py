@@ -103,21 +103,35 @@ class ModuleInfo:
         return (self.path / ".venv" / "Scripts" / "python.exe").exists()
 
 
+def _strings(v, what: str) -> list[str]:
+    """A manifest list of strings (a lone string would otherwise run as one argument
+    per character)."""
+    if not (isinstance(v, list) and all(isinstance(a, str) for a in v)):
+        raise ValueError(f"{what} must be a list of strings")
+    return list(v)
+
+
 def _read(folder: Path) -> ModuleInfo | None:
     mf = folder / "module.json"
     if not mf.is_file():
         return None
     try:
-        d = json.loads(mf.read_text(encoding="utf-8"))
+        # utf-8-sig: Notepad and PowerShell save JSON with a byte-order mark
+        d = json.loads(mf.read_text(encoding="utf-8-sig"))
+        if not isinstance(d, dict):
+            raise ValueError("not a JSON object")
+        install = d.get("install", [])
+        if not isinstance(install, list):
+            raise ValueError("install must be a list of commands")
         info = ModuleInfo(id=str(d["id"]), name=str(d.get("name", d["id"])),
                           version=str(d.get("version", "0")),
                           description=str(d.get("description", "")),
                           kind=str(d.get("kind", "")), path=folder,
                           entry=str(d.get("entry", "")),
-                          command=[str(a) for a in d.get("command", [])],
+                          command=_strings(d.get("command", []), "command"),
                           provides=[str(a) for a in d.get("provides", [])],
-                          install_steps=[[str(a) for a in step]
-                                         for step in d.get("install", [])],
+                          install_steps=[_strings(step, "each install step")
+                                         for step in install],
                           language=str(d.get("language", "")),
                           language_name=str(d.get("language_name", "")),
                           download=dict(d.get("download") or {}),

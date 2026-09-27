@@ -347,3 +347,80 @@ def test_a_live_voice_that_cant_load_turns_the_button_back_off(panel):
     s._on_event({"type": "stopped", "text": "no model"})
     assert not s.b_live.isChecked() and "no model" in s.lbl_state.text()
     assert s.b_update.isEnabled()
+
+
+@pytest.mark.parametrize("fx, speech", [
+    ({"effects": None}, {}),
+    ({"effects": {"pitch": None, "echo": [1, 2]}}, {}),
+    ({"effects": {"pitch": {"on": True, "semitones": float("nan")}}}, {}),
+    ([1, 2], None),
+    ({"enabled": "yes", "preset": ["x"]}, {}),
+    ({}, {"rate": None, "gain": "loud", "mute_real_voice": None, "voice": None,
+          "language": None, "model": None, "translate": None}),
+    ({}, {"rate": 99, "gain": float("inf")}),
+    ({}, [1, 2]),
+])
+def test_damaged_saved_settings_still_open_the_tab(qapp, monkeypatch, fx, speech):
+    # a hand-edited config or an old backup used to stop the app starting at all
+    monkeypatch.setattr(tts.SapiTTS, "warm_up", lambda self: ["Microsoft Zira Desktop"])
+    from soundboard.ui.voicepanel import VoicePanel
+    p = VoicePanel(FakeEngine(), fx, speech)
+    try:
+        assert process_events(qapp, lambda: p.speech.cb_voice.isEnabled())
+        p.speech._settings_edited()
+        assert -10 <= p.controller.speaker.rate <= 10 and 0 <= p.controller.gain <= 4
+        spec = p.fx.spec()
+        assert spec["preset"] in {"Custom", *voicefx.PRESETS}
+        p.chain.configure({**spec, "enabled": True})
+        p.chain.process(np.zeros((480, 2), np.float32), 48000)
+    finally:
+        p.shutdown()
+        p.deleteLater()
+
+
+def test_a_saved_voice_that_was_uninstalled_falls_back_to_the_default(qapp, monkeypatch):
+    monkeypatch.setattr(tts.SapiTTS, "warm_up", lambda self: ["Microsoft Zira Desktop"])
+    from soundboard.ui.voicepanel import VoicePanel
+    p = VoicePanel(FakeEngine(), {}, {"voice": "Microsoft Gone Desktop"})
+    try:
+        s = p.speech
+        assert process_events(qapp, lambda: s.cb_voice.isEnabled())
+        assert s.cb_voice.currentData() == ""                  # shows "Windows default"
+        assert p.controller.speaker.voice == ""                # and speaks in it
+    finally:
+        p.shutdown()
+        p.deleteLater()
+
+
+@pytest.mark.parametrize("q", [voicefx.Param("k", "K", 1, 1, 1),
+                               voicefx.Param("k", "K", 0, 1, 0, "", 2)])
+def test_a_slider_with_no_room_to_move_doesnt_divide_by_zero(qapp, q):
+    from soundboard.ui.voicepanel import ParamSlider
+    s = ParamSlider(q, q.default)
+    s.set_value(float("nan"))
+    assert s.steps >= 1 and s.value() == q.lo
+
+
+def test_an_add_on_with_a_bad_slider_is_reported_not_fatal(qapp, app_dir, monkeypatch):
+    d = app_dir / "modules" / "stuck"
+    d.mkdir(parents=True)
+    (d / "module.json").write_text('{"id": "stuck", "kind": "effects", "entry": "fx.py"}',
+                                   encoding="utf-8")
+    (d / "fx.py").write_text(
+        "def register(api):\n"
+        "    class E(api.Effect):\n"
+        "        type, name = 'stuck.e', 'Stuck'\n"
+        "        params = (api.Param('k', 'K', 1, 1, 1),)\n"
+        "        def run(self, x, rate):\n"
+        "            return x\n"
+        "    api.register_effect(E)\n", encoding="utf-8")
+    monkeypatch.setattr(voicefx, "REGISTRY", dict(voicefx.REGISTRY))
+    monkeypatch.setattr(tts.SapiTTS, "warm_up", lambda self: [])
+    from soundboard.ui.voicepanel import VoicePanel
+    p = VoicePanel(FakeEngine(), {}, {})
+    try:
+        m = next(m for m in p.modules if m.id == "stuck")
+        assert "lo < hi" in m.error and "stuck.e" not in p.fx.rows
+    finally:
+        p.shutdown()
+        p.deleteLater()

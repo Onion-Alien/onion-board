@@ -16,6 +16,7 @@ effect's whole `p` dict (one atomic attribute write).
 from __future__ import annotations
 
 import logging
+import math
 from dataclasses import dataclass
 from collections.abc import Callable
 
@@ -38,6 +39,8 @@ class Param:
         try:
             v = float(v)
         except (TypeError, ValueError):
+            return self.default
+        if not math.isfinite(v):
             return self.default
         return min(max(v, self.lo), self.hi)
 
@@ -76,10 +79,42 @@ def register(cls: type[Effect]) -> type[Effect]:
     """Make an effect type available (usable as a class decorator)."""
     if not cls.type or not cls.name:
         raise ValueError(f"{cls.__name__} needs a `type` and a `name`")
+    for q in cls.params:
+        # the UI divides by the range and the step: a slider with no room to move
+        # would stop the Voice tab from opening
+        if not (isinstance(q, Param) and all(math.isfinite(float(n))
+                                             for n in (q.lo, q.hi, q.default, q.step))
+                and q.lo < q.hi and 0 <= q.step <= q.hi - q.lo):
+            raise ValueError(f"{cls.__name__}: parameter {getattr(q, 'key', q)!r} needs "
+                             "lo < hi and a step between 0 and hi - lo")
     if cls.type in REGISTRY and REGISTRY[cls.type] is not cls:
         log.warning("effect type %r registered twice; keeping the newer one", cls.type)
     REGISTRY[cls.type] = cls
     return cls
+
+
+def _number(v) -> bool:
+    return isinstance(v, (int, float)) and not isinstance(v, bool) and math.isfinite(v)
+
+
+def clean_spec(raw) -> dict:
+    """Saved voice changer settings (config or an imported backup) cut down to the
+    shape the voice panel and `VoiceChain` expect: {"enabled": bool, "preset": str,
+    "effects": {type: {"on": bool, param: number, ...}}}. Anything of the wrong type
+    is dropped, so it falls back to its default instead of stopping the app."""
+    raw = raw if isinstance(raw, dict) else {}
+    out = {}
+    if isinstance(raw.get("enabled"), bool):
+        out["enabled"] = raw["enabled"]
+    if isinstance(raw.get("preset"), str):
+        out["preset"] = raw["preset"]
+    effects = raw.get("effects")
+    out["effects"] = {
+        t: {k: v for k, v in cfg.items()
+            if isinstance(k, str) and (isinstance(v, bool) if k == "on" else _number(v))}
+        for t, cfg in (effects.items() if isinstance(effects, dict) else ())
+        if isinstance(t, str) and isinstance(cfg, dict)}
+    return out
 
 
 def defaults(etype: str) -> dict:
@@ -188,5 +223,5 @@ class VoiceChain:
 from soundboard.voicefx import builtin  # noqa: E402,F401  (registers the built-ins)
 from soundboard.voicefx.builtin import PRESET_ICONS, PRESETS  # noqa: E402
 
-__all__ = ["Param", "Effect", "REGISTRY", "register", "defaults", "VoiceChain", "PRESETS",
-           "PRESET_ICONS"]
+__all__ = ["Param", "Effect", "REGISTRY", "register", "defaults", "clean_spec", "VoiceChain",
+           "PRESETS", "PRESET_ICONS"]

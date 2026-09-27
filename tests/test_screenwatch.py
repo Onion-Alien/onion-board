@@ -88,8 +88,48 @@ def test_a_picture_cut_at_full_size_matches_the_shrunk_screen():
 
 def test_work_scale_keeps_small_pictures_readable():
     assert sw.work_scale(1920, []) == pytest.approx(sw.WORK_WIDTH / 1920)
-    assert sw.work_scale(1920, [20]) == pytest.approx(sw.MIN_SIDE / 20)
+    assert sw.work_scale(1920, [40]) == pytest.approx(sw.MIN_SIDE / 40)
     assert sw.work_scale(400, []) == 1.0
+
+
+def test_one_tiny_picture_cannot_make_every_check_full_size():
+    """A 6-px picture used to mean matching the whole 4K screen at full size (over a
+    second a check, for every trigger): the zoom stops at MAX_ZOOM x WORK_WIDTH."""
+    cap = sw.MAX_ZOOM * sw.WORK_WIDTH
+    assert sw.work_scale(3840, [6]) == pytest.approx(cap / 3840)
+    assert sw.work_scale(1920, [6]) == pytest.approx(cap / 1920)
+    assert sw.work_scale(cap // 2, [6]) == 1.0
+
+
+def outline(h=70, w=240, stroke=3) -> tuple[np.ndarray, np.ndarray]:
+    """A cut-out of outlined 'letters': thin strokes, transparent everywhere else."""
+    gray = np.zeros((h, w), np.float32)
+    mask = np.zeros((h, w), bool)
+    for i in range(6):
+        x = 8 + i * 38
+        box = np.zeros((h, w), bool)
+        box[10:58, x:x + 28] = True
+        box[10 + stroke:58 - stroke, x + stroke:x + 28 - stroke] = False
+        box[34:34 + stroke, x:x + 28] = True
+        gray[box] = 1.0 if i % 2 else 0.3
+        mask |= box
+    return gray, mask
+
+
+def test_a_cut_out_with_thin_lines_is_still_found():
+    """Shrinking the mask used to keep only pixels that were wholly opaque, so 3-px
+    outlines wore away to nothing and the picture could never match."""
+    gray, mask = outline()
+    rng = np.random.default_rng(9)
+    screen = np.kron(rng.random((136, 241)).astype(np.float32),
+                     np.ones((8, 8), np.float32))[:1080, :1920] * 0.6 + 0.1
+    screen[500:570, 800:1040][mask] = gray[mask]
+    scale = sw.work_scale(1920, [min(gray.shape)])
+    m = sw.shrink_mask(mask, scale)
+    assert m.sum() >= sw.MASK_MIN
+    score = sw.match(sw.shrink(screen, scale), sw.shrink(gray, scale), m)[0]
+    assert score > 0.8
+    assert sw.match(sw.shrink(scene(), 1.0), sw.shrink(gray, scale), m)[0] < 0.6
 
 
 def test_gray_2x_averages_blocks_into_luma():
@@ -299,6 +339,145 @@ def test_watcher_reopens_a_capture_that_is_lost(monkeypatch):
     assert any(seen_lost) and not w.error
 
 
+def test_watcher_reopens_after_any_capture_error(monkeypatch):
+    """A graphics driver reset makes a grab fail with some other error than
+    CaptureLost: the capture is opened afresh instead of watching stopping."""
+    monkeypatch.setattr(sw, "monitors", lambda: [Monitor(0, 0, W, H, True)])
+    monkeypatch.setattr(sw, "WORK_WIDTH", W)
+    monkeypatch.setattr(sw, "RETRY_S", 0.05)
+
+    class Resetting(FakeGrabber):
+        def grab(self):
+            if len(FakeGrabber.made) == 1:
+                raise OSError("AcquireNextFrame failed (0x887A0005)")
+            return super().grab()
+
+    FakeGrabber.frames, FakeGrabber.made = [with_banner(scene())], []
+    fired = []
+    w = sw.Watcher(fired.append, grabber=Resetting)
+    w.interval = 0.001
+    w.set_items([sw.Watched("t1", banner(), 0.8, 0.0)])
+    w.start()
+    try:
+        assert run_until(lambda: fired)
+    finally:
+        w.stop()
+    assert len(FakeGrabber.made) == 2 and FakeGrabber.made[0].closed and not w.error
+
+
+def test_watcher_waits_for_a_screen_that_is_gone_for_a_moment(monkeypatch):
+    """After a loss the monitor list can be empty for a moment (a cable, a dock):
+    that's waited out like the rest of the reopen, not the end of watching."""
+    monkeypatch.setattr(sw, "WORK_WIDTH", W)
+    monkeypatch.setattr(sw, "RETRY_S", 0.05)
+    mons = [Monitor(0, 0, W, H, True)]
+    monkeypatch.setattr(sw, "monitors", lambda: list(mons))
+
+    class Unplugged(FakeGrabber):
+        def grab(self):
+            if len(FakeGrabber.made) == 1:
+                mons.clear()
+                raise sw.CaptureLost("gone")
+            return super().grab()
+
+    FakeGrabber.frames, FakeGrabber.made = [with_banner(scene())], []
+    fired = []
+    w = sw.Watcher(fired.append, grabber=Unplugged)
+    w.interval = 0.001
+    w.set_items([sw.Watched("t1", banner(), 0.8, 0.0)])
+    w.start()
+    try:
+        assert run_until(lambda: not mons)
+        time.sleep(0.2)
+        assert w.running and w.lost and not w.error
+        mons.append(Monitor(0, 0, W, H, True))            # ...and it's back
+        assert run_until(lambda: fired)
+    finally:
+        w.stop()
+    assert not w.error
+
+
+def test_stop_then_start_during_a_slow_check_leaves_one_thread(monkeypatch):
+    """stop() gives up waiting after 2 s; the old thread must still end on its own
+    rather than carry on beside the new one."""
+    monkeypatch.setattr(sw, "monitors", lambda: [Monitor(0, 0, W, H, True)])
+    monkeypatch.setattr(sw, "WORK_WIDTH", W)
+    slow = sw.threading.Event()
+
+    class Slow(FakeGrabber):
+        def grab(self):
+            if len(FakeGrabber.made) == 1 and not slow.is_set():
+                slow.set()
+                time.sleep(2.5)                  # a hung driver call, say
+            return scene()
+
+    FakeGrabber.frames, FakeGrabber.made = [], []
+    w = sw.Watcher(lambda _t: None, grabber=Slow)
+    w.interval = 0.01
+    w.set_items([sw.Watched("t1", banner(), 0.8, 0.0)])
+    w.start()
+    try:
+        assert slow.wait(2)
+        w.stop()                                 # times out: the grab is still going
+        assert not w.running
+        w.start()
+        assert w.running
+        assert run_until(lambda: sum(t.name == "screenwatch"
+                                     for t in sw.threading.enumerate()) == 1)
+        assert w.running
+    finally:
+        w.stop()
+    assert run_until(lambda: not any(t.name == "screenwatch" for t in sw.threading.enumerate()))
+
+
+def test_scores_are_replaced_whole_not_changed_in_place(fake_screen):
+    """The UI thread reads and prunes `scores` while the watcher writes it."""
+    w = sw.Watcher(lambda _t: None)
+    items = [sw.Watched("t1", banner(), 0.8, 0.0)]
+    old = w.scores = {"gone": 0.5}
+    new = w._check(with_banner(scene()), items, {"t1": (banner(), None)})
+    assert old == {"gone": 0.5} and new["t1"] > 0.99
+    w.scores = {"t1": 0.9, "gone": 0.5}
+    w.set_items(items)
+    assert w.scores == {"t1": 0.9}
+
+
+class FakeDup:
+    """A duplication that answers AcquireNextFrame with `hr`."""
+
+    def __init__(self, hr):
+        self.hr = hr
+
+    def __bool__(self):
+        return True
+
+    def call(self, *_a, **_k):
+        return self.hr
+
+    def release(self):
+        pass
+
+
+def test_a_graphics_reset_is_a_lost_capture_not_the_end():
+    g = object.__new__(sw.DupGrabber)
+    g.dup, g.last, g.lost = FakeDup(0x887A0005 - (1 << 32)), None, False   # DEVICE_REMOVED
+    with pytest.raises(sw.CaptureLost):
+        g.grab()
+
+
+def test_a_duplication_that_fails_while_warming_up_is_released(monkeypatch):
+    closed = []
+
+    def failing_grab(self, timeout_ms=0):
+        raise sw.CaptureLost("no frame")
+    monkeypatch.setattr(sw.DupGrabber, "_open", lambda self: None)
+    monkeypatch.setattr(sw.DupGrabber, "grab", failing_grab)
+    monkeypatch.setattr(sw.DupGrabber, "close", lambda self: closed.append(self))
+    with pytest.raises(sw.CaptureLost):
+        sw.DupGrabber(Monitor(0, 0, W, H, True), W, H)
+    assert len(closed) == 1
+
+
 # --------------------------------------------------------------------------- the tab
 
 def as_qimage(gray: np.ndarray) -> QImage:
@@ -410,3 +589,149 @@ def test_a_plain_picture_is_refused(tab):
     img = QImage(40, 20, QImage.Format_RGB32)
     img.fill(Qt.black)
     assert tab._new(img, "flat") is None and tab.triggers == []
+
+
+# --------------------------------------------------------------------------- tab fixes
+
+def plain(w=60, h=30) -> QImage:
+    img = QImage(w, h, QImage.Format_RGB32)
+    img.fill(Qt.black)
+    return img
+
+
+@pytest.fixture
+def warnings(monkeypatch):
+    said = []
+    monkeypatch.setattr(triggerspanel.QMessageBox, "warning",
+                        lambda _p, title, text: said.append((title, text)))
+    return said
+
+
+def test_a_refused_picture_keeps_the_old_one_and_leaves_no_file(tab, monkeypatch, tmp_path):
+    """The picture used to be saved over <id>.png before it was checked."""
+    t = tab._new(as_qimage(banner()), "Died")
+    before = triggerspanel.load_picture(t.image)[0]
+    p = tmp_path / "flat.png"
+    plain().save(str(p))
+    monkeypatch.setattr(triggerspanel.QFileDialog, "getOpenFileName",
+                        lambda *a, **k: (str(p), ""))
+    tab._change_picture(tab.rows[t.id])                # "Picture is one plain colour"
+    after = triggerspanel.load_picture(t.image)[0]
+    assert after.shape == before.shape and np.array_equal(after, before)
+    assert tab._new(plain(), "flat") is None           # a new one: nothing kept at all
+    assert sorted(triggerspanel.pictures_dir().iterdir()) == [triggerspanel.Path(t.image)]
+
+
+def test_pictures_are_kept_pixel_for_pixel(app_dir):
+    """A picture bigger than 1600 px used to be shrunk when saved, so it no longer
+    had the screen's scale and never matched."""
+    wide = np.tile(banner(), (4, 25))                  # 96 x 2250
+    got = triggerspanel.load_picture(triggerspanel.save_picture(as_qimage(wide), "wide"))[0]
+    assert got.shape == wide.shape
+    assert np.allclose(got, np.round(wide * 255) / 255, atol=1 / 255)
+
+
+def test_a_picture_too_big_is_refused_and_one_bigger_than_the_screen_warned(
+        tab, warnings, monkeypatch):
+    monkeypatch.setattr(triggerspanel, "MAX_SIDE", 500)
+    big = np.tile(banner(), (1, 6))                    # 540 wide: over the limit
+    assert tab._new(as_qimage(big), "big") is None and tab.triggers == []
+    assert warnings[-1][0] == "Picture too big"
+    wide = np.tile(banner(), (1, 4))                   # 360 wide: the fake screen is 320
+    assert tab._new(as_qimage(wide), "wide") is not None
+    assert "bigger than the screen" in warnings[-1][1]
+
+
+def test_tiny_and_thin_pictures_are_warned_about(tab, warnings, monkeypatch):
+    """On a 1920-wide screen: a picture too small to survive the working scale, and
+    a cut-out whose opaque part is a 1-px line, are kept but said to be unreliable."""
+    monkeypatch.setattr(sw, "monitors", lambda: [Monitor(0, 0, 1920, 1080, True)])
+    monkeypatch.setattr(sw, "WORK_WIDTH", 480)
+    assert tab._new(as_qimage(banner()[:10, :40]), "tiny") is not None
+    assert "very small" in warnings[-1][1]
+    warnings.clear()
+    img = QImage(200, 60, QImage.Format_ARGB32)
+    img.fill(Qt.transparent)
+    for x in range(10, 190):
+        img.setPixelColor(x, 30, Qt.white if x % 7 < 4 else Qt.red)
+    assert tab._new(img, "thin") is not None
+    assert len(warnings) == 1 and "see-through" in warnings[0][1]
+    warnings.clear()
+    assert tab._new(as_qimage(np.tile(banner(), (2, 2))), "fine") is not None
+    assert warnings == []
+
+
+def test_a_trigger_whose_sound_was_removed_says_so_and_stays_quiet(tab):
+    t = tab._new(as_qimage(banner()), "Died")
+    row = tab.rows[t.id]
+    row.sound.setCurrentIndex(row.sound.findData("s1"))
+    row._on_sound(row.sound.currentIndex())
+    tab.board[:] = [("s2", "Win", "fp2")]              # removed on the Sounds tab
+    tab.sounds_changed()
+    assert row.sound.currentData() == "s1" and row.sound.currentText() == "Removed sound"
+    assert "removed" in row.state.text() and "Plays" not in row.state.text()
+    tab.btn_watch.setChecked(True)
+    tab._on_fired(t.id)
+    assert tab.played == [] and row.state.text() != "Played!"
+    tab.board.insert(0, ("s1", "Died", "fp1"))         # Undo brings it back
+    tab.sounds_changed()
+    assert row.sound.currentText() == "Died" and row.state.text().startswith("Plays")
+    tab._on_fired(t.id)
+    assert tab.played == ["s1"]
+
+
+def test_a_sound_file_that_fails_to_add_is_given_up_on(tab, monkeypatch, tmp_path):
+    t = tab._new(as_qimage(banner()), "Died")
+    row = tab.rows[t.id]
+    f = tmp_path / "broken.mp3"
+    f.write_bytes(b"not audio")
+    monkeypatch.setattr(triggerspanel.QFileDialog, "getOpenFileName",
+                        lambda *a, **k: (str(f), ""))
+    tab._choose_sound_file(row)
+    assert t.pending and row.sound.currentText() == "Adding the sound…"
+    row.sound.activated.emit(row.sound.currentIndex())   # picking it again changes nothing
+    assert t.pending
+    row.sound.activated.emit(row.sound.findData(triggerspanel.FILE))   # then cancelled
+    assert row.sound.currentText() == "Adding the sound…" and t.pending
+    tab.sounds_changed()                               # still importing: keep waiting
+    assert t.pending
+    tab.import_done()                                  # the import failed
+    assert not t.pending and not t.sound
+    assert row.sound.currentIndex() == 0 and row.state.text() == "Pick the sound to play"
+    assert tab.cfg.screen["triggers"][0]["pending"] == ""
+
+
+def test_watching_that_dies_by_itself_stays_on_for_next_launch(tab, qapp, monkeypatch):
+    """The thread dying (a capture that can't be opened) stops watching, but isn't
+    saved as switched off: next launch tries again."""
+    def broken(*_a, **_k):
+        raise OSError("no screen")
+    monkeypatch.setattr(sw, "open_grabber", broken)
+    t = tab._new(as_qimage(banner()), "Died")
+    t.sound = "s1"
+    tab.set_watching(True)
+    assert tab.cfg.screen["on"] is True
+    assert process_events(qapp, lambda: not tab.is_active())
+    assert tab.cfg.screen["on"] is True and "no screen" in tab.warn.text()
+    tab.set_watching(False)                            # switched off by hand: remembered
+    assert tab.cfg.screen["on"] is False
+
+
+def test_the_screen_list_follows_screens_plugged_in_later(qapp, app_dir, fake_screen,
+                                                          monkeypatch):
+    mons = [Monitor(0, 0, W, H, True)]
+    monkeypatch.setattr(sw, "monitors", lambda: list(mons))
+    tab = TriggersTab(Config(), lambda: None, lambda: [], lambda _s: None)
+    try:
+        assert tab.cb_monitor.count() == 1 and not tab.cb_monitor.isVisibleTo(tab)
+        mons.append(Monitor(W, 0, W, H))
+        tab.set_watching(True)
+        assert tab.cb_monitor.count() == 2 and tab.cb_monitor.isVisibleTo(tab)
+        tab.set_watching(False)
+        mons.pop()
+        tab.show()
+        qapp.processEvents()
+        assert tab.cb_monitor.count() == 1
+    finally:
+        tab.hide()
+        tab.shutdown()

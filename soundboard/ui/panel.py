@@ -4,10 +4,13 @@ their widgets and emit plain values; the main window maps those onto the config
 and the engine."""
 from __future__ import annotations
 
+import math
+
 from PySide6.QtCore import QPoint, QRect, QSize, Qt, Signal
 from PySide6.QtWidgets import (QCheckBox, QComboBox, QFrame, QGridLayout, QHBoxLayout, QLabel,
                                QLayout, QSlider, QSpinBox, QVBoxLayout, QWidget)
 
+from soundboard import theme
 from soundboard.eq import BAND_LABELS as EQ_LABELS
 from soundboard.eq import MAX_DB as EQ_MAX_DB
 from soundboard.eq import PRESETS as EQ_PRESETS
@@ -167,7 +170,7 @@ class VolumeControl(QWidget):
         return self.spin.value() / 100
 
     def _paint(self, pct):
-        col = "" if pct <= 100 else "color:#ffb020;" if pct <= 300 else "color:#ff4d4f;"
+        col = ("" if pct <= 100 else f"color:{theme.status('warn' if pct <= 300 else 'error')};")
         self.spin.setStyleSheet(f"{col} font-weight:600;")   # normal: the theme's text colour
 
     def _from_slider(self, pct):
@@ -264,7 +267,7 @@ class EqPanel(QWidget):
         self.cb_preset.setCurrentText(preset if preset in EQ_PRESETS else "Custom")
         self.cb_preset.blockSignals(False)
         self.chk_on.blockSignals(True)
-        self.chk_on.setChecked(any(abs(g) >= 0.05 for g in gains))
+        self.chk_on.setChecked(any(abs(g) >= 0.05 for g in self.gains()))
         self.chk_on.blockSignals(False)
         self._emit()
 
@@ -274,9 +277,14 @@ class EqPanel(QWidget):
 
     # ---- internals
     def _set_sliders(self, gains):
+        # a damaged config can hand us anything: a band that isn't a finite number, or
+        # a list of the wrong length, is flat (0 dB) instead of an error
+        if not isinstance(gains, (list, tuple)) or len(gains) != len(self.sliders):
+            gains = [0.0] * len(self.sliders)
         for s, g in zip(self.sliders, gains):
+            ok = isinstance(g, (int, float)) and not isinstance(g, bool) and math.isfinite(g)
             s.blockSignals(True)
-            s.setValue(int(round(g * 2)))
+            s.setValue(int(round(min(max(g, -EQ_MAX_DB), EQ_MAX_DB) * 2)) if ok else 0)
             s.blockSignals(False)
         self._refresh_labels()
 

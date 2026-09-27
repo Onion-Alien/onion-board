@@ -362,3 +362,59 @@ def test_no_microphone_at_all_says_so(qapp, app_dir, devices, monkeypatch):
         wiz.done(0)
         w._load_thread.join(15)
         w.close()
+
+
+def test_cancelling_the_guide_keeps_an_unplugged_device(qapp, app_dir, devices):
+    """Their headset is unplugged: the guide stands in the first mic / output it finds
+    (so the meter works), but closing it without choosing must not save that."""
+    w = main.MainWindow()
+    w.cfg.mic_device, w.cfg.mon_device = "Unplugged Mic", "Unplugged Headphones"
+    wiz = setupwizard.SetupWizard(w)
+    try:
+        assert devices["picked"]["set_mic_device"] == "Headset Mic (USB)"   # stand-in
+        wiz.reject()
+        saved = library.Config.load()
+        assert (saved.mic_device, saved.mon_device) == ("Unplugged Mic",
+                                                        "Unplugged Headphones")
+        assert devices["picked"]["set_mic_device"] == "Unplugged Mic"   # engine too
+    finally:
+        _close(qapp, w, wiz)
+
+
+def test_cancelling_keeps_a_device_they_did_pick(qapp, app_dir, devices):
+    w = main.MainWindow()
+    w.cfg.mic_device = "Unplugged Mic"
+    wiz = setupwizard.SetupWizard(w)
+    try:
+        wiz.mic_group.buttons()[1].click()
+        wiz.reject()
+        assert library.Config.load().mic_device == "Desk Mic"
+    finally:
+        _close(qapp, w, wiz)
+
+
+def test_steam_guide_is_freed_after_it_closes(wizard, monkeypatch):
+    _, wiz = wizard
+    wiz.go(3)
+    monkeypatch.setattr(setupwizard.SteamGuide, "exec", lambda self: 0)
+    for _ in range(3):
+        wiz.show_steam_guide()
+    assert wiz.findChildren(setupwizard.SteamGuide) == []
+
+
+def test_steam_guide_text_has_its_spaces(wizard):
+    _, wiz = wizard
+    g = setupwizard.SteamGuide(wiz, "CABLE Output")
+    text = " ".join(lbl.text() for lbl in g.findChildren(setupwizard.QLabel))
+    assert ").Onion" not in text
+    g.done(0)
+
+
+def _close(qapp, w, wiz):
+    from PySide6.QtCore import QEvent
+    wiz.done(0)
+    w._load_thread.join(15)
+    w.close()
+    wiz.deleteLater()
+    w.deleteLater()
+    qapp.sendPostedEvents(None, QEvent.DeferredDelete)

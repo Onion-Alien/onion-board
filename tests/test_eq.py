@@ -64,3 +64,16 @@ def test_switching_off_then_on_restarts_state_cleanly():
     assert f.process(x, None) is x           # off: passthrough
     y = f.process(x, eq.PRESETS["Music — bass boost"])
     assert np.all(np.isfinite(y))
+
+
+def test_eq_panel_copes_with_damaged_gains(qapp):
+    """A NaN, a string or a huge number in eq_gains made int(round(g * 2)) raise while
+    the main window was built, on every launch."""
+    from soundboard.ui.panel import EqPanel
+    p = EqPanel(True, "voice", "Custom", [float("nan"), "x", 1e308, None, True, -3, 2.5])
+    assert p.gains() == [0.0, 0.0, eq.MAX_DB, 0.0, 0.0, -3.0, 2.5]
+    for bad in ([1, 2], None, 5, "flat"):
+        p = EqPanel(False, "voice", "Custom", bad)
+        assert p.gains() == [0.0] * 7
+    p.set_gains([float("inf")] * 7)
+    assert p.gains() == [0.0] * 7 and not p.chk_on.isChecked()

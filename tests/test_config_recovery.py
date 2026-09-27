@@ -79,3 +79,35 @@ def test_save_survives_a_locked_backup(app_dir, monkeypatch):
     cfg.stop_hotkey = "f8"
     assert cfg.save()
     assert json.loads(library.CONFIG_PATH.read_text(encoding="utf-8"))["stop_hotkey"] == "f8"
+
+
+def test_config_saved_with_a_bom_still_loads(app_dir):
+    """Notepad and some scripts save UTF-8 with a byte-order mark: not damage."""
+    library.CONFIG_PATH.write_text("﻿" + json.dumps({"stop_hotkey": "f9"}),
+                                   encoding="utf-8")
+    cfg = Config.load()
+    assert cfg.stop_hotkey == "f9" and cfg.load_note == ""
+
+
+def test_config_that_isnt_an_object_uses_the_backup(app_dir):
+    library.CONFIG_PATH.write_text("[]", encoding="utf-8")
+    _write(library.CONFIG_PATH.with_name("config.json.1"), {"stop_hotkey": "f9"})
+    cfg = Config.load()
+    assert cfg.stop_hotkey == "f9" and "config.json.1" in cfg.load_note
+
+
+def test_another_programs_soundboard_folder_is_left_alone(tmp_path, monkeypatch):
+    r"""%APPDATA%\Soundboard is a generic name: only move it if it's this app's."""
+    old, new = tmp_path / "Soundboard", tmp_path / "OnionBoard"
+    monkeypatch.setattr(library, "OLD_APP_DIR", old)
+    monkeypatch.setattr(library, "APP_DIR", new)
+    monkeypatch.setattr(library, "SOUNDS_DIR", new / "sounds")
+    monkeypatch.setattr(library, "CONFIG_PATH", new / "config.json")
+    (old / "Local Storage").mkdir(parents=True)
+    _write(old / "config.json", {"boards": [{"name": "Other app"}], "volume": 0.4})
+    library.migrate_from_soundboard()
+    assert (old / "config.json").exists() and not new.exists()
+    # one of ours (a config with sounds / a version, or a sounds folder) still moves
+    _write(old / "config.json", {"version": 1, "sounds": []})
+    library.migrate_from_soundboard()
+    assert not old.exists() and (new / "config.json").exists()

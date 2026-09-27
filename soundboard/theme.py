@@ -24,6 +24,7 @@ THEMES: dict[str, dict[str, str]] = {
         off="#4a5068", badge="#343849", badge_text="#d6d9e6",
         danger_bg="#3a2230", danger_border="#5a2a3e", danger_text="#ff8fa3", danger_hover="#4a2a3c",
         warn_bg="#3a2e14", warn_text="#ffb020",
+        ok_text="#13ce66", ok_border="#1c6b45", error_text="#ff4d4f",
     ),
     "Light": dict(
         bg="#eef0f6", panel="#ffffff", card="#ffffff", card_hi="#f4f5fa",
@@ -33,7 +34,8 @@ THEMES: dict[str, dict[str, str]] = {
         accent="#6a4cff", accent_hi="#7d62ff", accent2="#ff3d7f", on_accent="#ffffff",
         off="#b3b9cc", badge="#e3e7f0", badge_text="#2a2f40",
         danger_bg="#ffe8ec", danger_border="#f3b3c0", danger_text="#c4213f", danger_hover="#ffd9e0",
-        warn_bg="#fff1d6", warn_text="#9a5b00",
+        warn_bg="#fff1d6", warn_text="#855000",
+        ok_text="#0a6634", ok_border="#7cc39a", error_text="#b01e36",
     ),
     "Toxic": dict(   # green on near-black
         bg="#0b120e", panel="#111b15", card="#16241c", card_hi="#1c2e23",
@@ -44,6 +46,7 @@ THEMES: dict[str, dict[str, str]] = {
         off="#3a5646", badge="#223829", badge_text="#cfeedd",
         danger_bg="#361d22", danger_border="#5a2a33", danger_text="#ff8f9e", danger_hover="#45242a",
         warn_bg="#33301a", warn_text="#ffc53d",
+        ok_text="#13ce66", ok_border="#1c6b45", error_text="#ff4d4f",
     ),
     "Ocean": dict(   # cyan on deep navy
         bg="#0c131d", panel="#111a27", card="#162234", card_hi="#1c2b41",
@@ -54,6 +57,7 @@ THEMES: dict[str, dict[str, str]] = {
         off="#3a4f69", badge="#22354d", badge_text="#d3e3f5",
         danger_bg="#361f2b", danger_border="#5a2a40", danger_text="#ff8fb0", danger_hover="#45243a",
         warn_bg="#33301f", warn_text="#ffb020",
+        ok_text="#13ce66", ok_border="#1c6b45", error_text="#ff4d4f",
     ),
     "Cherry Blossom": dict(   # sakura pink on petal white
         bg="#fbecf1", panel="#fff7f9", card="#ffffff", card_hi="#fdf0f4",
@@ -63,7 +67,8 @@ THEMES: dict[str, dict[str, str]] = {
         accent="#e75480", accent_hi="#f06a93", accent2="#ffb7c5", on_accent="#ffffff",
         off="#dcb0c0", badge="#f6dde5", badge_text="#5a2f40",
         danger_bg="#ffe3e3", danger_border="#f2a9a9", danger_text="#c0282d", danger_hover="#ffd3d3",
-        warn_bg="#fff1d6", warn_text="#9a5b00",
+        warn_bg="#fff1d6", warn_text="#855000",
+        ok_text="#0a6634", ok_border="#7cc39a", error_text="#b01e36",
     ),
     "Carbon": dict(   # graphite grey, carbon-fibre weave on the panels
         bg="#111113", panel="#1c1c1f", card="#242428", card_hi="#2c2c31",
@@ -74,6 +79,7 @@ THEMES: dict[str, dict[str, str]] = {
         off="#4a4a52", badge="#34343a", badge_text="#d8d8dd",
         danger_bg="#3a2226", danger_border="#5a2a32", danger_text="#ff8f9a", danger_hover="#4a2a30",
         warn_bg="#33301a", warn_text="#ffb020",
+        ok_text="#13ce66", ok_border="#1c6b45", error_text="#ff4d4f",
         texture="carbon",
     ),
 }
@@ -81,6 +87,21 @@ DEFAULT = "Dark"
 
 T: dict[str, str] = dict(THEMES[DEFAULT])   # current theme (read at paint time)
 current_name = DEFAULT
+
+
+def status(kind: str) -> str:
+    """The current theme's colour for an inline "ok", "warn" or "error" message. The
+    bright green / amber / red of the dark themes can't be read on the light ones."""
+    return T[f"{kind}_text"]
+
+
+def set_tone(label, kind: str = "") -> None:
+    """Colour a label as an "ok", "warn" or "error" message ("" = normal) in a way that
+    follows theme changes (the stylesheet's [tone] rules)."""
+    if label.property("tone") != kind:
+        label.setProperty("tone", kind)
+        label.style().unpolish(label)
+        label.style().polish(label)
 
 
 def set_current(name: str) -> str:
@@ -100,6 +121,9 @@ QFrame#card QWidget { background:transparent; }
 QLabel#section { color:$section; font-size:8pt; font-weight:700; letter-spacing:1px; padding-top:8px; }
 QLabel#hint, QLabel#muted { color:$muted; }
 QLabel#hint { font-size:8.5pt; }
+QLabel[tone="ok"], QLabel#hint[tone="ok"] { color:$ok_text; }
+QLabel[tone="warn"], QLabel#hint[tone="warn"] { color:$warn_text; }
+QLabel[tone="error"], QLabel#hint[tone="error"] { color:$error_text; }
 QLabel#eqlabel { color:$muted; font-size:8pt; }
 QLabel#empty { color:$faint; font-size:15px; padding:60px; }
 QFrame#card QLabel#stepbox { background:$bg; border-radius:8px; padding:8px; margin-top:6px; }
@@ -129,7 +153,7 @@ QFrame#chip QPushButton#chipstop { border-radius:12px; padding:0; }
 QFrame#chip QPushButton#chipstop:hover { background:$danger_bg; }
 QLabel#iconlabel { background:transparent; }
 QPushButton#pill { border-radius:15px; padding:5px 14px; font-weight:600; }
-QPushButton#pill[state="ok"] { color:#13ce66; border:1px solid #1c6b45; }
+QPushButton#pill[state="ok"] { color:$ok_text; border:1px solid $ok_border; }
 QPushButton#onair { border-radius:15px; padding:5px 14px; font-weight:700;
     background:$danger_bg; border:1px solid $danger_border; color:$danger_text; }
 QPushButton#onair:checked { background:#13a35a; border:1px solid #13ce66; color:white; }

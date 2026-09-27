@@ -21,9 +21,9 @@ from PySide6.QtWidgets import (QButtonGroup, QCheckBox, QComboBox, QFrame, QGrid
 from soundboard import applog
 from soundboard import modules as mods
 from soundboard import voicefx
-from soundboard import library
+from soundboard import library, theme
 from soundboard.speech import translation, winvoices
-from soundboard.speech.live import SpeechController
+from soundboard.speech.live import SpeechController, clean_settings
 from soundboard.ui import icons
 from soundboard.ui.panel import (VolumeControl, bar, card, hint_label, icon_label,
                                  section_label, vsep)
@@ -61,7 +61,7 @@ class ParamSlider(QWidget):
     def __init__(self, q: voicefx.Param, value: float):
         super().__init__()
         self.q = q
-        self.steps = int(round((q.hi - q.lo) / q.step)) if q.step else 200
+        self.steps = max(1, int(round((q.hi - q.lo) / q.step))) if q.step else 200
         self.setMinimumHeight(26)
         h = QHBoxLayout(self)
         h.setContentsMargins(22, 0, 0, 0)
@@ -84,7 +84,7 @@ class ParamSlider(QWidget):
         """Swap the range (keeps the value, clamped into the new one)."""
         v = self.value()
         self.q = q
-        self.steps = int(round((q.hi - q.lo) / q.step)) if q.step else 200
+        self.steps = max(1, int(round((q.hi - q.lo) / q.step))) if q.step else 200
         self.slider.blockSignals(True)
         self.slider.setRange(0, self.steps)
         self.slider.blockSignals(False)
@@ -95,8 +95,9 @@ class ParamSlider(QWidget):
 
     def set_value(self, v: float):
         v = self.q.clamp(v)
+        span = (self.q.hi - self.q.lo) or 1.0
         self.slider.blockSignals(True)
-        self.slider.setValue(int(round((v - self.q.lo) / (self.q.hi - self.q.lo) * self.steps)))
+        self.slider.setValue(int(round((v - self.q.lo) / span * self.steps)))
         self.slider.blockSignals(False)
         self._label()
 
@@ -127,7 +128,7 @@ class EffectRow(QWidget):
         self.chk.setChecked(bool(cfg.get("on")))
         v.addWidget(self.chk)
         self.err = hint_label("")
-        self.err.setStyleSheet("color:#ff4d4f;")
+        theme.set_tone(self.err, "error")
         self.err.hide()
         v.addWidget(self.err)
         self.body = QWidget()
@@ -184,7 +185,8 @@ class VoiceFxPanel(QWidget):
 
     def __init__(self, spec: dict):
         super().__init__()
-        spec = {**default_fx_spec(), **(spec or {})}
+        # cleaned: a damaged setting (hand-edited, an old backup) mustn't stop the app
+        spec = {**default_fx_spec(), **voicefx.clean_spec(spec)}
         self._preset = spec.get("preset") if spec.get("preset") in voicefx.PRESETS else CUSTOM
         v = QVBoxLayout(self)
         v.setContentsMargins(0, 0, 0, 0)
@@ -364,7 +366,7 @@ class SpeechPanel(QWidget):
                  module_list: list[mods.ModuleInfo]):
         super().__init__()
         self.ctl = controller
-        self.s = {**default_speech_settings(), **(settings or {})}
+        self.s = {**default_speech_settings(), **clean_settings(settings)}
         self.module = next((m for m in module_list if m.id == LIVE_MODULE and not m.error),
                            None)
         self.langs = translations(module_list)
@@ -555,7 +557,7 @@ class SpeechPanel(QWidget):
             self.opts.setVisible(on),
             self.btn_opts.setText("▾  More options" if on else "▸  More options")))
         self.tts_err = hint_label("")
-        self.tts_err.setStyleSheet("color:#ff4d4f;")
+        theme.set_tone(self.tts_err, "error")
         self.tts_err.hide()
         v.addWidget(self.tts_err)
         # ---- the tab's bottom bar (placed by VoicePanel, like every tab's bar):
@@ -627,6 +629,9 @@ class SpeechPanel(QWidget):
         self.cb_voice.setCurrentIndex(max(0, self.cb_voice.findData(self.s["voice"])))
         self.cb_voice.setEnabled(bool(voices))
         self.cb_voice.blockSignals(False)
+        # speak in the voice the list shows: a saved voice that's been uninstalled
+        # shows as "Windows default", and asking for it would fail every line
+        self.ctl.speaker.voice = self.cb_voice.currentData() or ""
         self._loading_since = 0.0
         self.b_voices_check.setEnabled(True)
         self.b_voices_check.setText("Reload voices")
@@ -1096,7 +1101,7 @@ class VoicePanel(QWidget):
 
         # left: the voice changer. It always starts off (the voice you picked is kept):
         # left on from last time, it changed your mic the moment the app opened.
-        self.fx = VoiceFxPanel({**(fx_spec or {}), "enabled": False})
+        self.fx = VoiceFxPanel({**voicefx.clean_spec(fx_spec), "enabled": False})
         self.fx.changed.connect(self._fx_changed)
         fx_card, fv = card()
         fv.addWidget(self.fx)

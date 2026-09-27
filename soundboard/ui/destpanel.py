@@ -114,7 +114,9 @@ class CustomDestDialog(QDialog):
         self.setMinimumSize(640, 420)
         cfg = mw.cfg.dest if isinstance(mw.cfg.dest, dict) else {}
         mw.cfg.dest = cfg
-        self.items: list[dict] = [d for d in cfg.get("custom", []) if isinstance(d, dict)]
+        raw = cfg.get("custom")
+        self.items: list[dict] = ([d for d in raw if isinstance(d, dict)]
+                                  if isinstance(raw, list) else [])
         cfg["custom"] = self.items
         self._loading = False
 

@@ -17,6 +17,8 @@ except ImportError:   # not Windows: start with Windows isn't offered
 log = logging.getLogger(__name__)
 
 RUN_KEY = r"Software\Microsoft\Windows\CurrentVersion\Run"
+# Task Manager → Startup apps keeps its on / off switch here, apart from the Run value
+APPROVED_KEY = r"Software\Microsoft\Windows\CurrentVersion\Explorer\StartupApproved\Run"
 VALUE = "OnionBoard"
 TRAY_ARG = "--tray"
 
@@ -51,8 +53,19 @@ def current() -> str | None:
         return None
 
 
+def _disabled_in_task_manager() -> bool:
+    """The first byte of Task Manager's record is even when the entry may run and odd
+    when the user switched it off there."""
+    try:
+        with winreg.OpenKey(winreg.HKEY_CURRENT_USER, APPROVED_KEY) as k:
+            v, _t = winreg.QueryValueEx(k, VALUE)
+    except OSError:
+        return False
+    return isinstance(v, (bytes, bytearray)) and len(v) > 0 and bool(v[0] & 1)
+
+
 def is_enabled() -> bool:
-    return current() is not None
+    return current() is not None and not _disabled_in_task_manager()
 
 
 def set_enabled(on: bool, hidden: bool = True) -> bool:
@@ -63,6 +76,10 @@ def set_enabled(on: bool, hidden: bool = True) -> bool:
         if on:
             with winreg.CreateKey(winreg.HKEY_CURRENT_USER, RUN_KEY) as k:
                 winreg.SetValueEx(k, VALUE, 0, winreg.REG_SZ, command(hidden))
+            if _disabled_in_task_manager():   # ticking the box undoes Task Manager's "off"
+                with winreg.OpenKey(winreg.HKEY_CURRENT_USER, APPROVED_KEY, 0,
+                                    winreg.KEY_SET_VALUE) as k:
+                    winreg.DeleteValue(k, VALUE)
         else:
             with winreg.OpenKey(winreg.HKEY_CURRENT_USER, RUN_KEY, 0,
                                 winreg.KEY_SET_VALUE) as k:
