@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 1.2.1 — 2026-09-27
+
 - **Custom destination modes: the form works straight away.** With no custom
   modes yet, its fields ignored clicks and typing until you pressed *Add*. Now
   the first thing you type makes the mode.

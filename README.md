@@ -22,7 +22,7 @@ Windows 10 or 11.
 [source code (zip)](../../archive/refs/heads/main.zip), only if you want to build
 it yourself.</sub>
 
-Version: **1.2.0**. See [CHANGELOG.md](CHANGELOG.md).
+Version: **1.2.1**. See [CHANGELOG.md](CHANGELOG.md).
 
 ![The Sounds tab: a grid of sound buttons with hotkeys, sorted into categories](docs/screenshots/sounds.png)
 
