@@ -63,6 +63,20 @@ def test_match_gives_up_on_flat_or_oversized_pictures():
     assert sw.match(blank, banner())[0] == 0.0
 
 
+def test_transparent_parts_of_a_picture_are_ignored():
+    """A cut-out icon (transparent around it) matches whatever is behind it."""
+    tmpl = np.full((40, 120), 0.0, np.float32)        # transparent parts saved as black
+    b = banner()
+    tmpl[8:32, 15:105] = b
+    mask = np.zeros(tmpl.shape, bool)
+    mask[8:32, 15:105] = True
+    s = with_banner(scene(3), 110, 70)                # busy background, not black
+    assert sw.match(s, tmpl)[0] < 0.9                 # the black border spoils a plain match
+    score, (x, y) = sw.match(s, tmpl, mask)
+    assert score > 0.99 and (x, y) == (95, 62)
+    assert sw.match(scene(3), tmpl, mask)[0] < 0.6    # and it's still not everywhere
+
+
 def test_a_picture_cut_at_full_size_matches_the_shrunk_screen():
     big = np.kron(with_banner(scene(), 100, 60), np.ones((4, 4), np.float32))
     tmpl = np.kron(banner(), np.ones((4, 4), np.float32))
@@ -139,6 +153,7 @@ class FakeGrabber:
 def fake_screen(monkeypatch):
     monkeypatch.setattr(sw, "monitors", lambda: [Monitor(0, 0, W, H, True)])
     monkeypatch.setattr(sw, "Grabber", FakeGrabber)
+    monkeypatch.setattr(sw, "open_grabber", FakeGrabber)   # never the real screen
     monkeypatch.setattr(sw, "WORK_WIDTH", W)
     FakeGrabber.frames, FakeGrabber.made = [], []
     return FakeGrabber
@@ -279,6 +294,22 @@ def test_triggers_are_remembered_and_removing_one_deletes_its_picture(tab, qapp,
     tab._remove(tab.rows[t.id])
     assert tab.triggers == [] and tab.cfg.screen["triggers"] == []
     assert not triggerspanel.Path(path).exists()
+
+
+def test_a_cut_out_picture_is_watched_with_its_mask(tab, qapp):
+    img = as_qimage(banner()).convertToFormat(QImage.Format_ARGB32)
+    big = QImage(img.width() + 20, img.height() + 20, QImage.Format_ARGB32)
+    big.fill(Qt.transparent)
+    from PySide6.QtGui import QPainter
+    p = QPainter(big)
+    p.drawImage(10, 10, img)
+    p.end()
+    t = tab._new(big, "icon")
+    t.sound = "s1"
+    gray, mask = triggerspanel.load_picture(t.image)
+    assert mask is not None and mask.sum() == banner().size and not mask[0].any()
+    tab._sync()
+    assert tab.watcher._items[t.id].mask is not None
 
 
 def test_a_plain_picture_is_refused(tab):

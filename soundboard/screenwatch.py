@@ -1,16 +1,18 @@
 """The Triggers tab's back end: watch the screen for pictures you picked (a game's
 "YOU DIED", a victory banner, a kill icon) and say when one appears.
 
-Capture is plain GDI over ctypes: the monitor is copied and shrunk to about
-twice a working width of a few hundred pixels, then turned grey and averaged
-down 2x2 (see Grabber). Each picture is shrunk by
-the same factor and found with normalised cross-correlation (an FFT for the
-correlation, running sums for each window's brightness and contrast), so a match
-scores the same whatever the game's brightness and nothing is downloaded or
-installed. A 1080p screen at the default size costs a few milliseconds per check.
-
-GDI sees what the desktop compositor shows: borderless and windowed games, not
-some exclusive-fullscreen ones, which come out black (`Watcher.black` says so).
+Capture uses Windows' Desktop Duplication (DXGI, over ctypes: `DupGrabber`),
+which also sees fullscreen games; where that isn't available it falls back to
+plain GDI (`Grabber`), which sees borderless and windowed games but can come out
+black for exclusive-fullscreen ones (`Watcher.black` says so). Either way the
+monitor is sampled at about twice a working width of a few hundred pixels, then
+turned grey and averaged down 2x2. Each picture is shrunk by the same factor and
+found with normalised cross-correlation (an FFT for the correlation, running sums
+for each window's brightness and contrast), so a match scores the same whatever
+the game's brightness and nothing is downloaded or installed. Transparent parts of
+a picture are left out of the comparison (`match(..., mask)`), so a cut-out icon
+matches whatever is behind it. A 1080p screen at the default size costs a few
+milliseconds per check.
 
 `Gate` decides when a score is a new appearance: it fires once when a picture shows
 up, then waits for it to go away before it can fire again (and never sooner than
@@ -25,6 +27,7 @@ import math
 import sys
 import threading
 import time
+import uuid
 from ctypes import wintypes
 from dataclasses import dataclass, field
 
@@ -108,15 +111,19 @@ class Frame:
         return ii[th:, tw:] - ii[:-th, tw:] - ii[th:, :-tw] + ii[:-th, :-tw]
 
 
-def match(screen: np.ndarray | Frame, tmpl: np.ndarray) -> tuple[float, tuple[int, int]]:
+def match(screen: np.ndarray | Frame, tmpl: np.ndarray,
+          mask: np.ndarray | None = None) -> tuple[float, tuple[int, int]]:
     """Best normalised cross-correlation of `tmpl` anywhere in `screen` (2-D float
     grey, or a Frame of it): (score in -1..1, (x, y) of its top-left corner). 0 when
-    it can't match at all (bigger than the screen, or a flat picture)."""
+    it can't match at all (bigger than the screen, or a flat picture). `mask` (the
+    picture's shape, true = counts) leaves out its transparent parts."""
     f = screen if isinstance(screen, Frame) else Frame(screen)
     th, tw = tmpl.shape
     sh, sw = f.shape
     if th < 2 or tw < 2 or th > sh or tw > sw:
         return 0.0, (0, 0)
+    if mask is not None and not mask.all():
+        return _match_masked(f, tmpl, mask)
     t = tmpl.astype(np.float64) - float(tmpl.mean())
     tnorm = math.sqrt(float((t * t).sum()))
     if tnorm < 1e-6:
@@ -125,6 +132,30 @@ def match(screen: np.ndarray | Frame, tmpl: np.ndarray) -> tuple[float, tuple[in
     n = th * tw
     s1 = f.window_sums(f.ii, th, tw)
     var = f.window_sums(f.ii2, th, tw) - s1 * s1 / n     # n * the window's variance
+    ok = var > n * FLAT_STD * FLAT_STD
+    score = np.zeros(num.shape)
+    np.divide(num, np.sqrt(np.where(ok, var, 1.0)) * tnorm, out=score, where=ok)
+    i = int(np.argmax(score))
+    y, x = divmod(i, score.shape[1])
+    return float(min(score.flat[i], 1.0)), (x, y)
+
+
+def _match_masked(f: Frame, tmpl: np.ndarray, mask: np.ndarray) -> tuple[float, tuple[int, int]]:
+    """match() over the mask's pixels only: each window's brightness and contrast
+    are taken under the mask too (two more correlations, as the mask isn't a box)."""
+    m = mask.astype(np.float64)
+    n = float(m.sum())
+    if n < 4:
+        return 0.0, (0, 0)
+    t = (tmpl.astype(np.float64) - float((tmpl * m).sum()) / n) * m
+    tnorm = math.sqrt(float((t * t).sum()))
+    if tnorm < 1e-6:
+        return 0.0, (0, 0)
+    mk = m[::-1, ::-1].astype(np.float32)
+    num = fftconvolve(f.s, t[::-1, ::-1].astype(np.float32), mode="valid")
+    s1 = fftconvolve(f.s, mk, mode="valid").astype(np.float64)
+    s2 = fftconvolve(f.s * f.s, mk, mode="valid").astype(np.float64)
+    var = s2 - s1 * s1 / n
     ok = var > n * FLAT_STD * FLAT_STD
     score = np.zeros(num.shape)
     np.divide(num, np.sqrt(np.where(ok, var, 1.0)) * tnorm, out=score, where=ok)
@@ -326,6 +357,250 @@ class Grabber:
             self.screen_dc = None
 
 
+def _guid(text: str) -> ctypes.Array:
+    """A COM interface id as the 16 bytes Windows expects."""
+    return (ctypes.c_ubyte * 16).from_buffer_copy(uuid.UUID(text).bytes_le)
+
+
+IID_IDXGIFactory1 = "770aae78-f26f-4dba-a829-253c83d1b387"
+IID_IDXGIOutput1 = "00cddea8-939b-4b83-a340-a685226666cc"
+IID_ID3D11Texture2D = "6f15aaf2-d208-4e89-9ab4-489535d34f9c"
+DXGI_ERROR_NOT_FOUND = 0x887A0002
+DXGI_ERROR_ACCESS_LOST = 0x887A0026
+DXGI_ERROR_WAIT_TIMEOUT = 0x887A0027
+
+
+def _hr(v: int) -> int:
+    return v & 0xFFFFFFFF
+
+
+class _COM:
+    """A COM pointer called by vtable slot (the interfaces are only ever used here,
+    so no type library is needed)."""
+
+    def __init__(self):
+        self.p = ctypes.c_void_p()
+
+    def __bool__(self):
+        return bool(self.p.value)
+
+    def call(self, index: int, *args, restype=ctypes.c_long, argtypes=()):
+        vtbl = ctypes.cast(self.p, ctypes.POINTER(ctypes.POINTER(ctypes.c_void_p)))[0]
+        fn = ctypes.WINFUNCTYPE(restype, ctypes.c_void_p, *argtypes)(vtbl[index])
+        return fn(self.p, *args)
+
+    def query(self, iid: str) -> _COM:
+        out = _COM()
+        hr = self.call(0, ctypes.byref(_guid(iid)), ctypes.byref(out.p),
+                       argtypes=(ctypes.c_void_p, ctypes.c_void_p))
+        if hr < 0:
+            raise OSError(f"QueryInterface failed (0x{_hr(hr):08X})")
+        return out
+
+    def release(self):
+        if self.p.value:
+            self.call(2, restype=ctypes.c_ulong)
+            self.p = ctypes.c_void_p()
+
+
+class _OUTPUT_DESC(ctypes.Structure):
+    _fields_ = [("DeviceName", wintypes.WCHAR * 32), ("DesktopCoordinates", wintypes.RECT),
+                ("AttachedToDesktop", wintypes.BOOL), ("Rotation", ctypes.c_uint),
+                ("Monitor", wintypes.HMONITOR)]
+
+
+class _TEXTURE2D_DESC(ctypes.Structure):
+    _fields_ = [("Width", ctypes.c_uint), ("Height", ctypes.c_uint),
+                ("MipLevels", ctypes.c_uint), ("ArraySize", ctypes.c_uint),
+                ("Format", ctypes.c_uint), ("SampleCount", ctypes.c_uint),
+                ("SampleQuality", ctypes.c_uint), ("Usage", ctypes.c_uint),
+                ("BindFlags", ctypes.c_uint), ("CPUAccessFlags", ctypes.c_uint),
+                ("MiscFlags", ctypes.c_uint)]
+
+
+class _MAPPED(ctypes.Structure):
+    _fields_ = [("pData", ctypes.c_void_p), ("RowPitch", ctypes.c_uint),
+                ("DepthPitch", ctypes.c_uint)]
+
+
+class DupGrabber:
+    """Desktop Duplication (IDXGIOutputDuplication): the frames the graphics card
+    shows, so fullscreen games are seen too, where GDI may only see black. Same
+    interface as Grabber. Each frame is copied to a CPU-readable texture and sampled
+    at twice (w, h), then averaged 2x2. An unchanged screen (no new frame) gives
+    the last one again. Everything lives on the thread that made it."""
+
+    # vtable slots (IUnknown 0-2, IDXGIObject 3-6, ID3D11DeviceChild 3-6)
+    FACTORY_ENUM_ADAPTERS1 = 12
+    ADAPTER_ENUM_OUTPUTS = 7
+    OUTPUT_GET_DESC = 7
+    OUTPUT1_DUPLICATE = 22
+    DUP_ACQUIRE = 8
+    DUP_RELEASE_FRAME = 14
+    DEVICE_CREATE_TEXTURE2D = 5
+    CTX_MAP, CTX_UNMAP, CTX_COPY_RESOURCE = 14, 15, 47
+    B8G8R8A8 = 87
+    USAGE_STAGING, CPU_ACCESS_READ, MAP_READ = 3, 0x20000, 1
+    RETRY_S = 1.0             # how often a lost duplication is tried again
+
+    def __init__(self, src: Monitor, w: int, h: int):
+        self.src, self.w, self.h = src, w, h
+        self.factor = 2 if 2 * w <= src.width and 2 * h <= src.height else 1
+        self.device, self.ctx, self.output1 = _COM(), _COM(), _COM()
+        self.dup, self.staging = _COM(), _COM()
+        self.last: np.ndarray | None = None
+        self._lost_at = 0.0
+        try:
+            self._open()
+        except Exception:
+            self.close()
+            raise
+        n = self.factor
+        self.ys = ((np.arange(h * n) + 0.5) * src.height / (h * n)).astype(np.intp)
+        self.xs = ((np.arange(w * n) + 0.5) * src.width / (w * n)).astype(np.intp)
+        for _ in range(5):          # the first real frame follows soon after opening
+            if self.grab(timeout_ms=100) is not None:
+                break
+
+    def _open(self):
+        dxgi, d3d = ctypes.windll.dxgi, ctypes.windll.d3d11
+        factory = _COM()
+        hr = dxgi.CreateDXGIFactory1(ctypes.byref(_guid(IID_IDXGIFactory1)),
+                                     ctypes.byref(factory.p))
+        if hr < 0:
+            raise OSError(f"CreateDXGIFactory1 failed (0x{_hr(hr):08X})")
+        try:
+            adapter, output = self._find_output(factory)
+        finally:
+            factory.release()
+        try:
+            d3d.D3D11CreateDevice.argtypes = [
+                ctypes.c_void_p, ctypes.c_int, ctypes.c_void_p, ctypes.c_uint, ctypes.c_void_p,
+                ctypes.c_uint, ctypes.c_uint, ctypes.c_void_p, ctypes.c_void_p, ctypes.c_void_p]
+            hr = d3d.D3D11CreateDevice(adapter.p, 0, None, 0, None, 0, 7,   # 7: SDK version
+                                       ctypes.byref(self.device.p), None,
+                                       ctypes.byref(self.ctx.p))
+            if hr < 0:
+                raise OSError(f"D3D11CreateDevice failed (0x{_hr(hr):08X})")
+            self.output1 = output.query(IID_IDXGIOutput1)
+        finally:
+            adapter.release()
+            output.release()
+        self._duplicate()
+        desc = _TEXTURE2D_DESC(self.src.width, self.src.height, 1, 1, self.B8G8R8A8, 1, 0,
+                               self.USAGE_STAGING, 0, self.CPU_ACCESS_READ, 0)
+        hr = self.device.call(self.DEVICE_CREATE_TEXTURE2D, ctypes.byref(desc), None,
+                              ctypes.byref(self.staging.p),
+                              argtypes=(ctypes.c_void_p, ctypes.c_void_p, ctypes.c_void_p))
+        if hr < 0:
+            raise OSError(f"CreateTexture2D failed (0x{_hr(hr):08X})")
+
+    def _find_output(self, factory: _COM) -> tuple[_COM, _COM]:
+        """The graphics card and output showing self.src (matched by position)."""
+        s = self.src
+        for i in range(16):
+            adapter = _COM()
+            hr = factory.call(self.FACTORY_ENUM_ADAPTERS1, i, ctypes.byref(adapter.p),
+                              argtypes=(ctypes.c_uint, ctypes.c_void_p))
+            if hr < 0:
+                break
+            for j in range(16):
+                output = _COM()
+                hr = adapter.call(self.ADAPTER_ENUM_OUTPUTS, j, ctypes.byref(output.p),
+                                  argtypes=(ctypes.c_uint, ctypes.c_void_p))
+                if hr < 0:
+                    break
+                d = _OUTPUT_DESC()
+                output.call(self.OUTPUT_GET_DESC, ctypes.byref(d), argtypes=(ctypes.c_void_p,))
+                r = d.DesktopCoordinates
+                if ((r.left, r.top, r.right - r.left, r.bottom - r.top)
+                        == (s.left, s.top, s.width, s.height) and d.Rotation in (0, 1)):
+                    return adapter, output
+                output.release()
+            adapter.release()
+        raise OSError("no graphics output shows that monitor unrotated")
+
+    def _duplicate(self):
+        self.dup.release()
+        hr = self.output1.call(self.OUTPUT1_DUPLICATE, self.device.p, ctypes.byref(self.dup.p),
+                               argtypes=(ctypes.c_void_p, ctypes.c_void_p))
+        if hr < 0:
+            raise OSError(f"DuplicateOutput failed (0x{_hr(hr):08X})")
+
+    def grab(self, timeout_ms: int = 0) -> np.ndarray | None:
+        if not self.dup:
+            # lost (a display mode switch, the UAC / lock screen): retry now and then
+            if time.monotonic() - self._lost_at < self.RETRY_S:
+                return self.last
+            self._lost_at = time.monotonic()
+            try:
+                self._duplicate()
+            except OSError:
+                return self.last
+        info = (ctypes.c_ubyte * 64)()              # DXGI_OUTDUPL_FRAME_INFO (48 bytes)
+        res = _COM()
+        hr = self.dup.call(self.DUP_ACQUIRE, timeout_ms, ctypes.byref(info), ctypes.byref(res.p),
+                           argtypes=(ctypes.c_uint, ctypes.c_void_p, ctypes.c_void_p))
+        code = _hr(hr)
+        if code == DXGI_ERROR_WAIT_TIMEOUT:
+            return self.last                        # nothing new on screen
+        if code == DXGI_ERROR_ACCESS_LOST:
+            self.dup.release()
+            self._lost_at = time.monotonic()
+            return self.last
+        if hr < 0:
+            raise OSError(f"AcquireNextFrame failed (0x{code:08X})")
+        # LastPresentTime 0: only the mouse moved, or the (blank) frame a new
+        # duplication starts with. The picture is unchanged, so skip the copy.
+        if int.from_bytes(bytes(info[:8]), "little", signed=True) == 0:
+            res.release()
+            self.dup.call(self.DUP_RELEASE_FRAME)
+            return self.last
+        try:
+            tex = res.query(IID_ID3D11Texture2D)
+            try:
+                self.ctx.call(self.CTX_COPY_RESOURCE, self.staging.p, tex.p, restype=None,
+                              argtypes=(ctypes.c_void_p, ctypes.c_void_p))
+            finally:
+                tex.release()
+        finally:
+            res.release()
+            self.dup.call(self.DUP_RELEASE_FRAME)
+        m = _MAPPED()
+        hr = self.ctx.call(self.CTX_MAP, self.staging.p, 0, self.MAP_READ, 0, ctypes.byref(m),
+                           argtypes=(ctypes.c_void_p, ctypes.c_uint, ctypes.c_int,
+                                     ctypes.c_uint, ctypes.c_void_p))
+        if hr < 0:
+            raise OSError(f"Map failed (0x{_hr(hr):08X})")
+        try:
+            rows, pitch = self.src.height, m.RowPitch
+            buf = (ctypes.c_uint8 * (rows * pitch)).from_address(m.pData)
+            img = np.frombuffer(buf, np.uint8).reshape(rows, pitch)
+            px = img[:, :self.src.width * 4].reshape(rows, self.src.width, 4)
+            sample = px[self.ys[:, None], self.xs[None, :]]      # a copy, taken while mapped
+        finally:
+            self.ctx.call(self.CTX_UNMAP, self.staging.p, 0, restype=None,
+                          argtypes=(ctypes.c_void_p, ctypes.c_uint))
+        self.last = gray_2x(sample) if self.factor == 2 else to_gray(sample)
+        return self.last
+
+    def close(self):
+        for c in (self.staging, self.dup, self.output1, self.ctx, self.device):
+            try:
+                c.release()
+            except OSError:
+                log.debug("releasing a capture object failed", exc_info=True)
+
+
+def open_grabber(src: Monitor, w: int, h: int):
+    """Desktop Duplication where it works, else GDI."""
+    try:
+        return DupGrabber(src, w, h)
+    except (OSError, AttributeError) as e:
+        log.info("desktop duplication unavailable (%s): capturing with GDI", e)
+        return Grabber(src, w, h)
+
+
 # --------------------------------------------------------------------------- watcher
 
 @dataclass
@@ -337,6 +612,7 @@ class Watched:
     threshold: float
     cooldown: float
     gate: Gate = field(default_factory=Gate)
+    mask: np.ndarray | None = None      # the picture's opaque part (None: all of it)
 
 
 class Watcher:
@@ -397,7 +673,7 @@ class Watcher:
     # the thread
     def _run(self):
         grab: Grabber | None = None
-        scaled: dict[str, np.ndarray] = {}
+        scaled: dict[str, tuple] = {}
         try:
             while not self._stop.is_set():
                 t0 = time.perf_counter()
@@ -414,9 +690,11 @@ class Watcher:
                         raise OSError("no monitor found")
                     mon = mons[mon_index] if 0 <= mon_index < len(mons) else mons[0]
                     scale = work_scale(mon.width, [min(i.gray.shape) for i in items])
-                    grab = (self._grabber or Grabber)(
+                    grab = (self._grabber or open_grabber)(
                         mon, max(1, round(mon.width * scale)), max(1, round(mon.height * scale)))
-                    scaled = {i.id: shrink(i.gray, scale) for i in items}
+                    scaled = {i.id: (shrink(i.gray, scale),
+                                     None if i.mask is None else shrink(i.mask, scale) > 0.99)
+                              for i in items}
                 if items:
                     gray = grab.grab()
                     if gray is not None:
@@ -430,13 +708,13 @@ class Watcher:
             if grab is not None:
                 grab.close()
 
-    def _check(self, gray: np.ndarray, items: list[Watched], scaled: dict[str, np.ndarray]):
+    def _check(self, gray: np.ndarray, items: list[Watched], scaled: dict[str, tuple]):
         self.black = float(gray.max()) < BLACK_LEVEL
         frame = None if self.black else Frame(gray)
         now = time.monotonic()
         for it in items:
             t = scaled.get(it.id)
-            score = 0.0 if t is None or frame is None else match(frame, t)[0]
+            score = 0.0 if t is None or frame is None else match(frame, *t)[0]
             self.scores[it.id] = score
             if it.gate.update(score, now, it.threshold, it.cooldown):
                 try:

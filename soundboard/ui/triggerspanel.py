@@ -44,16 +44,21 @@ def pictures_dir() -> Path:
     return library.APP_DIR / "triggers"
 
 
-def picture_gray(path: str) -> np.ndarray | None:
-    """A picture file as grey float32 0..1 (transparent parts count as black)."""
+Picture = tuple[np.ndarray, "np.ndarray | None"]   # grey 0..1, opaque mask (None: all)
+
+
+def load_picture(path: str) -> Picture | None:
+    """A picture file as grey float32 0..1, plus which pixels count: the opaque ones
+    (None when it has no transparency). Transparent parts are left out of matching."""
     img = QImage(path)
     if img.isNull():
         return None
-    img = img.convertToFormat(QImage.Format_RGB32)   # B, G, R, 0xff in memory
+    img = img.convertToFormat(QImage.Format_ARGB32)   # B, G, R, A in memory
     h, w = img.height(), img.width()
     buf = np.frombuffer(img.constBits(), np.uint8, count=img.bytesPerLine() * h)
     bgra = buf.reshape(h, img.bytesPerLine())[:, :w * 4].reshape(h, w, 4)
-    return screenwatch.to_gray(bgra)
+    mask = bgra[..., 3] >= 128
+    return screenwatch.to_gray(bgra), (None if mask.all() else mask)
 
 
 def save_picture(img: QImage, tid: str) -> str:
@@ -87,8 +92,10 @@ def labelled(text: str, w: QWidget) -> QWidget:
     return box
 
 
-def flatness(gray: np.ndarray) -> float:
-    return float(gray.std()) if gray.size else 0.0
+def flatness(gray: np.ndarray, mask: np.ndarray | None = None) -> float:
+    """How much detail there is to recognise (the opaque part's spread of greys)."""
+    px = gray if mask is None else gray[mask]
+    return float(px.std()) if px.size >= 16 else 0.0
 
 
 class TriggerRow(QFrame):
@@ -316,7 +323,7 @@ class TriggersTab(QWidget):
             if t is not None and len(self.triggers) < MAX_TRIGGERS:
                 self.triggers.append(t)
         self.rows: dict[str, TriggerRow] = {}
-        self._gray: dict[str, tuple[str, float, np.ndarray]] = {}   # id -> (path, mtime, grey)
+        self._gray: dict[str, tuple[str, float, Picture]] = {}   # id -> (path, mtime, picture)
         self._gen = 0                   # bumped to drop sounds still waiting to play
         self.watcher = screenwatch.Watcher(self._fired.emit)
         self._fired.connect(self._on_fired)
@@ -479,12 +486,12 @@ class TriggersTab(QWidget):
         for t in self.triggers:
             if not (t.enabled and t.image and (t.sound or t.pending)):
                 continue
-            gray = self._picture(t)
-            if gray is not None:
-                items.append(Watched(t.id, gray, t.threshold, t.cooldown))
+            pic = self._picture(t)
+            if pic is not None:
+                items.append(Watched(t.id, pic[0], t.threshold, t.cooldown, mask=pic[1]))
         self.watcher.set_items(items)
 
-    def _picture(self, t: Trigger) -> np.ndarray | None:
+    def _picture(self, t: Trigger) -> Picture | None:
         try:
             mtime = Path(t.image).stat().st_mtime
         except OSError:
@@ -492,10 +499,10 @@ class TriggersTab(QWidget):
         got = self._gray.get(t.id)
         if got is not None and got[0] == t.image and got[1] == mtime:
             return got[2]
-        gray = picture_gray(t.image)
-        if gray is not None:
-            self._gray[t.id] = (t.image, mtime, gray)
-        return gray
+        pic = load_picture(t.image)
+        if pic is not None:
+            self._gray[t.id] = (t.image, mtime, pic)
+        return pic
 
     def _on_fired(self, tid: str):
         t = next((t for t in self.triggers if t.id == tid), None)
@@ -540,7 +547,8 @@ class TriggersTab(QWidget):
             why = f"Watching stopped: {w.error}"
         elif self.is_active() and w.black:
             why = ("The screen looks all black to the app. If a game is running in "
-                   "fullscreen, set it to Borderless or Windowed fullscreen so it can be seen.")
+                   "exclusive fullscreen and this stays, set it to Borderless or Windowed "
+                   "fullscreen so it can be seen.")
         elif self.is_active() and not w.scores and not any(
                 t.enabled and t.image and t.sound for t in self.triggers):
             why = "Nothing to watch for yet: each trigger needs a picture and a sound."
@@ -638,11 +646,12 @@ class TriggersTab(QWidget):
         except OSError as e:
             QMessageBox.warning(self, "Couldn't keep the picture", str(e))
             return False
-        gray = picture_gray(path)
-        if gray is None or flatness(gray) < screenwatch.FLAT_STD:
+        pic = load_picture(path)
+        if pic is None or flatness(*pic) < screenwatch.FLAT_STD:
             QMessageBox.warning(self, "Picture is one plain colour",
                                 "There's nothing in it to recognise. Cut a piece with some "
-                                "detail, like the words or an icon.")
+                                "detail, like the words or an icon. (Transparent parts "
+                                "don't count.)")
             return False
         t.image = path
         self._gray.pop(t.id, None)
