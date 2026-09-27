@@ -36,7 +36,7 @@ MAX_DIALOGS = 3   # per run: a bug that fires every frame mustn't bury the user 
 log = logging.getLogger("crash")
 
 _state = {"log_path": None, "version": "?", "dialogs": 0, "seen": set(), "open": None,
-          "bridge": None}
+          "bridge": None, "pending": None}
 
 
 @dataclass
@@ -121,6 +121,9 @@ def ui_ready():
     bridge = _Bridge()
     bridge.show.connect(_show_dialog, Qt.ConnectionType.QueuedConnection)
     _state["bridge"] = bridge
+    # a report held back while another program was in front (see _show_dialog)
+    from PySide6.QtWidgets import QApplication
+    QApplication.instance().applicationStateChanged.connect(_show_pending)
 
 
 def report(exc_info=None, where: str = "", fatal: bool = False) -> Report | None:
@@ -254,6 +257,16 @@ def _show_dialog(rep: Report):
         if QApplication.instance() is None:
             _native_box(rep)
             return
+        # An error that didn't stop the app must not put a window over the user's game
+        # (typically the app is in the tray while they play): hold it until they come
+        # back to Onion Board. A fatal one is shown at once: the app is about to quit.
+        if not rep.fatal and not _app_in_front():
+            if _state["pending"] is None:
+                _state["pending"] = rep
+            else:
+                _state["pending"].extra.append(rep.title)
+            log.info("crash report held back until Onion Board is in front: %s", rep.title)
+            return
         from soundboard.ui.crashdialog import CrashDialog
         _state["dialogs"] += 1
         _state["open"] = rep
@@ -269,6 +282,24 @@ def _show_dialog(rep: Report):
         _state["open"] = None
         log.exception("couldn't show the crash dialog")
         _native_box(rep)
+
+
+def _app_in_front() -> bool:
+    """Is one of this app's windows the active window? (False in the tray, or
+    while a game or another program has the focus.)"""
+    from PySide6.QtCore import Qt
+    from PySide6.QtWidgets import QApplication
+    app = QApplication.instance()
+    return (app is not None and app.applicationState() == Qt.ApplicationActive
+            and app.activeWindow() is not None)
+
+
+def _show_pending(_state_=None):
+    rep, _state["pending"] = _state["pending"], None
+    if rep is not None and _app_in_front():
+        _show_dialog(rep)
+    elif rep is not None:
+        _state["pending"] = rep
 
 
 def _native_box(rep: Report):

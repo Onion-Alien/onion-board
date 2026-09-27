@@ -13,7 +13,7 @@ from pathlib import Path
 
 import numpy as np
 import sounddevice as sd
-from PySide6.QtCore import QObject, QPropertyAnimation, QSize, Qt, QTimer, QUrl, Signal
+from PySide6.QtCore import QEvent, QObject, QPropertyAnimation, QSize, Qt, QTimer, QUrl, Signal
 from PySide6.QtGui import QDesktopServices
 from PySide6.QtWidgets import (QApplication, QCheckBox, QComboBox, QFileDialog, QFrame,
                                QGraphicsOpacityEffect, QGridLayout, QHBoxLayout, QInputDialog,
@@ -65,6 +65,8 @@ TABS = (("Sounds", "Your sound buttons: click one to play it"),
 
 
 UNDO_S = 10          # how long "Removed … · Undo" stays up
+TICK_MS = 33         # the UI timer while the window is on screen (meters, visualisers)
+TICK_IDLE_MS = 250   # ...and while it's in the tray or minimised (push-to-talk, watchdog)
 RANDOM = "__random__:"   # hotkey action prefix: a random sound from the category after it
 ALL = "All"          # the category tab that shows every sound
 
@@ -125,7 +127,8 @@ class MainWindow(QMainWindow):
         self._link_meta: SoundMeta | None = None   # the link bar's Play once
         self.start_frac = 0.0             # where ▶ starts if it isn't playing
         self._seeking = False
-        self._tick_n = 0                  # ticks since start (the watchdog runs every 30th)
+        self._tick_n = 0                  # ticks since start (the watchdog runs ~once a second)
+        self._ui_live = True              # the window is on screen (see _set_tick_rate)
         self._xruns_shown = 0             # drop-out count last written to the status line
         self._talk_until = 0.0            # "hearing you" indicator holds until this time
         self._talk_shown: bool | None = None
@@ -159,7 +162,7 @@ class MainWindow(QMainWindow):
 
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.tick)
-        self.timer.start(33)
+        self.timer.start(TICK_MS)
         self._init_fit()
         self.resize(1180, 720)
         if self.cfg.always_on_top:
@@ -168,9 +171,18 @@ class MainWindow(QMainWindow):
         if autostart.available():
             autostart.refresh(self.cfg.autostart_hidden)   # the app may have moved
         self._shut_down = False   # shutdown() ran (app.py also calls it on aboutToQuit)
+        self._pending_note: str | None = None
         if self.cfg.load_note:   # settings came from a backup or the defaults: say so
-            QTimer.singleShot(1200, lambda: QMessageBox.warning(
-                self, "Settings were restored", self.cfg.load_note))
+            QTimer.singleShot(1200, self._show_load_note)
+
+    def _show_load_note(self):
+        """Started hidden in the tray (--tray at sign-in)? Then the box waits for the
+        window to be opened, instead of popping up over whatever the user is doing."""
+        if self.isVisible():
+            QMessageBox.warning(self, "Settings were restored", self.cfg.load_note)
+        else:
+            self._pending_note = self.cfg.load_note
+
 
     # ------------------------------------------------------------------ UI build
     # Layout: header (setup pill, Stop all, Settings) / tabs / mixer strip / status.
@@ -2338,42 +2350,54 @@ class MainWindow(QMainWindow):
         return data, rate
 
     # ------------------------------------------------------------------ tick
+    # The window's visibility sets the UI timer's pace: 30/s for the meters and
+    # visualisers while it's on screen, TICK_IDLE_MS while it's hidden in the tray or
+    # minimised (nothing to paint, but push-to-talk, the stream watchdog and the test
+    # recording must go on). Qt tells us through these three events.
+    def showEvent(self, ev):
+        super().showEvent(ev)
+        self._set_tick_rate()
+        note, self._pending_note = getattr(self, "_pending_note", None), None
+        if note:   # held back while the window was in the tray (see __init__)
+            QTimer.singleShot(400, lambda: QMessageBox.warning(
+                self, "Settings were restored", note))
+
+    def hideEvent(self, ev):
+        super().hideEvent(ev)
+        self._set_tick_rate()
+
+    def changeEvent(self, ev):
+        super().changeEvent(ev)
+        if ev.type() == QEvent.WindowStateChange:
+            self._set_tick_rate()
+
+    def _set_tick_rate(self):
+        live = self.isVisible() and not self.isMinimized()
+        if live == self._ui_live and self.timer.interval() in (TICK_MS, TICK_IDLE_MS):
+            return
+        self._ui_live = live
+        self.timer.start(TICK_MS if live else TICK_IDLE_MS)
+        if not live:   # a level frozen mid-flight would show as stuck on the next show
+            self.out_meter.set_level(0.0)
+            self.mic_meter.set_level(0.0)
+
     def tick(self):
         e = self.engine
+        now = time.monotonic()
         self._tick_n += 1
-        if self._tick_n % 30 == 0:   # about once a second
+        if self._tick_n % max(1, 1000 // self.timer.interval()) == 0:   # about once a second
             if e.check_streams() or sum(e.xruns.values()) != self._xruns_shown:
                 self._update_status()
             self.voice.poll()
         playing = e.playing()
-        for sid, p in self.pads.items():
-            prog, paused = playing.get(sid, (None, False))
-            if prog is not None and not paused and not p.isHidden():
-                p.set_levels(spectrum(self.audio.get(sid), prog, p.n_bands))
-            elif prog is None and p.bands is not None:
-                p.set_levels(None)
-            if prog != p.progress or paused != p.paused:
-                p.progress, p.paused = prog, paused
-                p.update()
-        self._update_transport(playing)
-        self._update_chips(playing)
-        self.overlay.tick(playing)
-        self.out_meter.set_level(e.level_main)
-        self.logo.set_level(e.level_main)
-        self.mic_meter.set_level(e.level_mic if e.mic_stream else 0.0)
-        talking = e.mic_stream is not None and e.level_mic > 0.05
-        if talking:
-            self._talk_until = time.monotonic() + 0.8
-        talking = time.monotonic() < self._talk_until
-        if talking != self._talk_shown:
-            self._talk_shown = talking
-            self._update_flow(talking)
+        if self._ui_live:
+            self._tick_visuals(playing, now)
         e.level_main *= 0.9
         e.level_mic *= 0.9
 
         # test recording
         if e.recording:
-            left = 6.0 - (time.monotonic() - self._rec_started)
+            left = 6.0 - (now - self._rec_started)
             self.btn_rec.setText(f"Recording… talk / play sounds  ({max(left, 0):.0f}s)")
             if left < -4:   # the output stopped (device unplugged): give up
                 e.cancel_test_record()
@@ -2406,6 +2430,32 @@ class MainWindow(QMainWindow):
             self._release_ptt()
             if want and winkeys.press(want):
                 self._ptt_held = want
+
+    def _tick_visuals(self, playing, now: float):
+        """The part of tick() that only matters while the window is on screen."""
+        e = self.engine
+        for sid, p in self.pads.items():
+            prog, paused = playing.get(sid, (None, False))
+            if prog is not None and not paused and not p.isHidden():
+                p.set_levels(spectrum(self.audio.get(sid), prog, p.n_bands))
+            elif prog is None and p.bands is not None:
+                p.set_levels(None)
+            if prog != p.progress or paused != p.paused:
+                p.progress, p.paused = prog, paused
+                p.update()
+        self._update_transport(playing)
+        self._update_chips(playing)
+        self.overlay.tick(playing)
+        self.out_meter.set_level(e.level_main)
+        self.logo.set_level(e.level_main)
+        self.mic_meter.set_level(e.level_mic if e.mic_stream else 0.0)
+        talking = e.mic_stream is not None and e.level_mic > 0.05
+        if talking:
+            self._talk_until = now + 0.8
+        talking = now < self._talk_until
+        if talking != self._talk_shown:
+            self._talk_shown = talking
+            self._update_flow(talking)
 
     def _update_transport(self, playing):
         sid = self.current

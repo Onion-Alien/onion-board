@@ -28,7 +28,8 @@ from soundboard.ui.panel import VolumeControl, card, hint_label
 
 log = logging.getLogger(__name__)
 
-REFRESH_MS = 1500       # how often the list of programs is re-read
+REFRESH_MS = 1500       # how often the list of programs is re-read while the tab is shown
+REFRESH_HIDDEN_MS = 5000   # ...and while it isn't (a remembered program still gets picked up)
 METER_MS = 60
 MAX_REMEMBERED = 30
 
@@ -273,7 +274,13 @@ class AppsTab(QWidget):
     def showEvent(self, ev):
         super().showEvent(ev)
         self.start()
+        self.timer.start(REFRESH_MS)
         self.meter_timer.start(METER_MS)
+
+    def hideEvent(self, ev):
+        super().hideEvent(ev)
+        if self._started:
+            self.timer.start(REFRESH_HIDDEN_MS)
 
     def start(self):
         """Begin watching for programs (also called before the tab is first shown,
@@ -281,7 +288,8 @@ class AppsTab(QWidget):
         if self._started:
             return
         self._started = True
-        self.timer.start(REFRESH_MS)   # the meters run while shown / recording
+        # the meters run while shown / recording; the list is re-read slowly until then
+        self.timer.start(REFRESH_MS if self.isVisible() else REFRESH_HIDDEN_MS)
         self.lister.refresh()
 
     def shutdown(self):

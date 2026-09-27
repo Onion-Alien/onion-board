@@ -77,7 +77,12 @@ Rebuilds are incremental: PyInstaller reuses its analysis cache in `build\`.
 `-NoInstaller` stops after the app folder and skips the Inno Setup compression.
 
 Build steps, in order: PyInstaller (bundles `installer\install-vbcable.ps1` and
-`assets\onionboard.ico` as data, both at the root of `_internal\`), licence files,
+`assets\onionboard.ico` as data, both at the root of `_internal\`),
+`scripts\prune_build.py` (removes the parts of Qt the app never loads — QML, 3D,
+charts, Chromium's dev tools, translations — by walking the DLL import tables; the
+build fails if a kept file would lose an import), `OnionBoard.exe --selftest` (the
+trimmed app loads Qt, WebEngine, Multimedia and the audio stack headless, no window
+or device), licence files,
 `scripts\make_bunny.py` (renders the installer artwork
 `installer\wizard*.bmp`, gitignored), then `ISCC` with `/DAppVersion` taken from
 `soundboard/__init__.py`. Bump `__version__` there for a release.

@@ -35,6 +35,13 @@ if ($Clean) { $cleanArg = @("--clean") }
     main.py
 if ($LASTEXITCODE -ne 0) { throw "PyInstaller failed" }
 
+# PyInstaller ships all of Qt (QML, 3D, Charts, dev tools, 186 translations...).
+# Drop what the app never loads, then prove the trimmed app still starts.
+& $py scripts\prune_build.py dist\OnionBoard
+if ($LASTEXITCODE -ne 0) { throw "prune_build.py failed" }
+& "dist\OnionBoard\OnionBoard.exe" --selftest | Out-Host
+if ($LASTEXITCODE -ne 0) { throw "the built app failed its self-test (see above)" }
+
 # Add-ons ship with the app (source only; a module's own .venv is made on the user's PC
 # by its Install button). modules.py looks for them in the folder next to the exe.
 foreach ($m in Get-ChildItem modules -Directory) {

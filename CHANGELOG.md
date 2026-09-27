@@ -1,5 +1,21 @@
 # Changelog
 
+## Unreleased
+
+- **A much smaller download.** The build now leaves out the parts of Qt the app
+  never uses (QML, 3D, charts, Chromium's developer tools, translations) and
+  compresses harder: about a third of the previous installer size, and the
+  installed app is about 60% smaller. Every build proves the trimmed app still
+  starts (`OnionBoard.exe --selftest`, headless) before it's packaged.
+- **Less CPU while hidden.** In the tray or minimised, the window's 30-a-second
+  meter and visualiser timer slows to 4 a second (push-to-talk, the device
+  watchdog and the test recording carry on as before), and the Programs tab
+  re-reads the audio sessions every 5 s instead of every 1.5 s.
+- **Nothing pops up over your game.** A crash report for an error that didn't stop
+  the app waits until Onion Board is in front again instead of appearing over
+  whatever you're doing, and the "settings were restored" notice waits for the
+  window to be opened when the app started hidden in the tray.
+
 ## 1.0.0 — 2026-09-27
 
 The first public release, as **Onion Board** (it was called Soundboard). Your

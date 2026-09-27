@@ -49,7 +49,40 @@ def start_ytdlp_check(cfg):
                      name="ytdlp-update").start()
 
 
+def selftest() -> int:
+    """`OnionBoard.exe --selftest`: prove a (pruned) build can load everything it
+    ships, without a window, a device, a hotkey or a network request. build.ps1
+    runs it after trimming Qt (scripts/prune_build.py), so a missing DLL fails the
+    build instead of a user's first launch. Prints OK and returns 0."""
+    os.environ["QT_QPA_PLATFORM"] = "offscreen"
+    os.environ.setdefault("QTWEBENGINE_CHROMIUM_FLAGS", "--mute-audio --disable-gpu")
+    for mod in ("numpy", "scipy.signal", "sounddevice", "soundfile", "soxr", "yt_dlp"):
+        __import__(mod)
+    from PySide6.QtCore import QEventLoop, QTimer
+    from PySide6.QtMultimedia import QMediaPlayer
+    from PySide6.QtWebEngineWidgets import QWebEngineView
+    _app = QApplication(sys.argv)   # kept until the loop below has run
+    from soundboard.ui import mainwindow, setupwizard, crashdialog  # noqa: F401
+    from soundboard import engine, radio, theme  # noqa: F401
+    theme.app_icon()
+    QMediaPlayer()   # loads the FFmpeg multimedia plugin
+    view = QWebEngineView()   # starts Chromium: resources, locale, the helper exe
+    loop = QEventLoop()
+    result = {}
+    view.loadFinished.connect(lambda ok: (result.__setitem__("ok", ok), loop.quit()))
+    QTimer.singleShot(30_000, loop.quit)
+    view.setHtml("<html><body><script>document.title='ready'</script></body></html>")
+    loop.exec()
+    if not result.get("ok"):
+        print("FAIL: the web engine didn't load a page", file=sys.stderr)
+        return 1
+    print(f"OK: Onion Board {__version__} self-test passed")
+    return 0
+
+
 def main():
+    if "--selftest" in sys.argv:
+        sys.exit(selftest())
     migrate_from_soundboard()
     log_path = applog.setup(APP_DIR)
     applog.install_hooks(log_path, __version__)
