@@ -146,20 +146,29 @@ begin
     Result := '';
 end;
 
+// Run install-vbcable.ps1 with `Args`; its exit code, or -1 if it couldn't start.
+function CableScript(Args: String): Integer;
+begin
+  if not Exec('powershell.exe', '-NoProfile -ExecutionPolicy Bypass -File "' +
+              ExpandConstant('{app}\_internal\install-vbcable.ps1') + '" ' + Args,
+              '', SW_HIDE, ewWaitUntilTerminated, Result) then
+    Result := -1;
+end;
+
 procedure InstallCable;
 var
   Code: Integer;
   HadCable: Boolean;
 begin
-  HadCable := CableSetup <> '';
+  // ask Windows whether the driver is there (2 = not installed): VB-Audio's own
+  // uninstaller leaves its setup program in Program Files, so that proves nothing
+  HadCable := CableScript('-Check') <> 2;
   WizardForm.StatusLabel.Caption :=
     'Installing the virtual cable... click Yes if Windows asks for permission.';
-  if Exec('powershell.exe', '-NoProfile -ExecutionPolicy Bypass -File "' +
-          ExpandConstant('{app}\_internal\install-vbcable.ps1') + '" -Silent',
-          '', SW_HIDE, ewWaitUntilTerminated, Code) then
-    CableNeedsRestart := (Code = 3010);
+  Code := CableScript('-Silent');
+  CableNeedsRestart := (Code = 3010);
   // remembered for the uninstaller: a cable we put there is offered for removal first
-  if (not HadCable) and (CableSetup <> '') then
+  if (not HadCable) and ((Code = 0) or (Code = 3010)) then
     RegWriteStringValue(HKCU, 'Software\OnionBoard', 'InstalledCable', '1');
   // after that restart, open the app once by itself on the setup guide's cable step
   // (the same per-user RunOnce entry the guide sets; Windows deletes it as it runs)
