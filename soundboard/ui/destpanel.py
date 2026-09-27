@@ -130,6 +130,9 @@ class CustomDestDialog(QDialog):
         self.list = QListWidget()
         self.list.currentRowChanged.connect(self._select)
         left.addWidget(self.list, 1)
+        self.empty = hint_label("No custom modes yet. Fill in the form to make one, or "
+                                "click Add / Copy built-in….")
+        left.addWidget(self.empty)
         btns = QHBoxLayout()
         self.b_add = QPushButton("Add")
         self.b_add.clicked.connect(self.add)
@@ -207,12 +210,12 @@ class CustomDestDialog(QDialog):
         self._select(self.list.currentRow())
 
     def _select(self, row: int):
+        # The form is always usable: with no mode picked, the first edit makes one
+        # (a disabled form looked the same and just ignored clicks and typing).
         ok = 0 <= row < len(self.items)
-        self.form_box.setEnabled(ok)
         self.b_del.setEnabled(ok)
-        if not ok:
-            return
-        d = Dest.from_dict(self.items[row])
+        self.empty.setVisible(not self.items)
+        d = Dest.from_dict(self.items[row]) if ok else Dest("", "", 0, 0.5, 0.4, True)
         self._loading = True
         self.name.setText(d.label)
         self.ceiling.setCurrentIndex(max(0, self.ceiling.findData(d.ceiling)))
@@ -269,10 +272,17 @@ class CustomDestDialog(QDialog):
         if self._loading:
             return
         row = self.list.currentRow()
-        if not (0 <= row < len(self.items)):
-            return
+        if not (0 <= row < len(self.items)):       # nothing picked: this edit makes a mode
+            self.items.append(Dest(self._new_key(), "", 0, 0.5, 0.4, True).to_dict())
+            row = len(self.items) - 1
+            self.list.blockSignals(True)
+            self.list.addItem("")
+            self.list.setCurrentRow(row)
+            self.list.blockSignals(False)
+            self.b_del.setEnabled(True)
+            self.empty.setVisible(False)
         raw = self.items[row]
-        raw.update(label=self.name.text().strip() or raw.get("key", "custom"),
+        raw.update(label=self.name.text().strip() or f"My mode {row + 1}",
                    ceiling=int(self.ceiling.currentData() or 0),
                    bass=self.bass.value() / 100, comp=self.comp.value() / 100,
                    mono=self.mono.isChecked(), note=self.note.text().strip())

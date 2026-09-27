@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- **Custom destination modes: the form works straight away.** With no custom
+  modes yet, its fields ignored clicks and typing until you pressed *Add*. Now
+  the first thing you type makes the mode.
+
 ## 1.2.0 — 2026-09-27
 
 - **New Triggers tab: play a sound when something shows up on your screen.**

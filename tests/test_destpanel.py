@@ -76,6 +76,23 @@ def test_custom_mode_add_edit_pick_remove(window):  # noqa: F811
     assert panel.combo.currentData() == "off"
 
 
+def test_typing_into_the_empty_editor_makes_a_mode(window):  # noqa: F811
+    """With no custom modes yet, the form is still live: the first edit creates one
+    (it used to be disabled, which looked the same and just ignored typing)."""
+    dlg = CustomDestDialog(window)
+    assert window.cfg.dest.get("custom", []) == []
+    assert dlg.name.isEnabled() and dlg.note.isEnabled() and dlg.empty.isVisibleTo(dlg)
+    dlg.name.setText("Mumble")
+    dlg.name.textEdited.emit("Mumble")
+    dlg.bass.setValue(40)
+    custom = window.cfg.dest["custom"]
+    assert len(custom) == 1 and custom[0]["label"] == "Mumble"
+    assert abs(custom[0]["bass"] - 0.4) < 1e-9
+    assert dlg.list.count() == 1 and dlg.list.item(0).text() == "Mumble"
+    assert dlg.b_del.isEnabled() and not dlg.empty.isVisibleTo(dlg)
+    dlg.accept()
+
+
 def test_copy_builtin_starts_from_its_settings(window, monkeypatch):  # noqa: F811
     from PySide6.QtWidgets import QInputDialog
     steam = destination.BUILTIN_BY_KEY["steam"]
