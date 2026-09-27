@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- **Who's listening is on the Setup tab.** The Discord / Steam / game voice modes
+  (and *Custom modes…* for any other codec) were only in Settings → General; they
+  now have their own card under Devices. Settings keeps a copy, and the two stay
+  in step.
+
 ## 1.1.0 — 2026-09-27
 
 - **Installing the virtual cable no longer takes over your speakers.** Windows

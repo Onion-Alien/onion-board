@@ -92,3 +92,14 @@ def test_describe_lines():
     assert describe(destination.OFF) == destination.OFF.note
     s = describe(destination.BUILTIN_BY_KEY["steam"])
     assert "mono" in s and "12 kHz" in s and "harmonics 60%" in s
+
+
+def test_the_setup_tab_has_the_picker_and_settings_follows_it(window):  # noqa: F811
+    combo = window.dest_panel.combo
+    assert window.setup_page.isAncestorOf(window.dest_panel)
+    combo.setCurrentIndex(combo.findData("discord"))
+    assert window.engine.dest is not None and window.engine.dest.key == "discord"
+    d = SettingsDialog(window, "general")
+    d.show()   # the Settings copy re-reads the mode when it appears
+    assert _dest_combo(d.tabs.currentWidget()).currentData() == "discord"
+    d.close()

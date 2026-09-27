@@ -712,6 +712,15 @@ class MainWindow(QMainWindow):
         ref.clicked.connect(self.refresh_devices)
         av.addWidget(ref, 0, Qt.AlignLeft)
         lcol.addWidget(devcard)
+
+        # ---- who's listening: shape the sounds for the voice chat on the other end
+        destcard, dv = card("WHO'S LISTENING", "Where people hear you. Your sounds are "
+                                               "shaped to come through that voice chat's "
+                                               "compression clearly.")
+        from soundboard.ui.destpanel import DestPanel
+        self.dest_panel = DestPanel(self)
+        dv.addWidget(self.dest_panel)
+        lcol.addWidget(destcard)
         lcol.addStretch(1)
 
         # ---- test
@@ -749,7 +758,7 @@ class MainWindow(QMainWindow):
         rcol.addWidget(eqcard)
         rcol.addStretch(1)
         self.on_eq(*self.eq.state())   # push the saved EQ into the engine
-        destination.apply(self.cfg, self.engine)   # ...and the destination mode (Settings)
+        destination.apply(self.cfg, self.engine)   # ...and the destination mode (Who's listening)
         return page
 
     def on_eq(self, gains, enabled, target, preset):

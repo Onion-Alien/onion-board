@@ -35,7 +35,9 @@ Version: **1.0.0**. See [CHANGELOG.md](CHANGELOG.md).
 **Apps**: send one program's sound (music, a video, a browser tab) to your friends.
 ![The Apps tab](docs/screenshots/apps.png)
 
-**Setup**: shows at a glance whether others can hear you, plus devices and an equalizer.
+**Setup**: shows at a glance whether others can hear you, plus devices, *Who's listening*
+(Discord, Steam or game voice: your sounds are shaped to survive its compression) and an
+equalizer.
 ![The Setup tab](docs/screenshots/setup.png)
 
 **In-game overlay**: press a key in your game, then a number to play a sound.
@@ -365,7 +367,7 @@ the launcher the shortcuts and PyInstaller use. The app is the `soundboard` pack
 | `soundboard/applog.py` | rotating log in `%APPDATA%\OnionBoard\onionboard.log`; unhandled exceptions (any thread) and Qt warnings land there; each distinct crash is saved, scrubbed of personal paths, to `crash-reports\` and offered to the user. `report()` does the same for an error code caught but didn't expect. `ONIONBOARD_DEBUG=1` for more |
 | `soundboard/ui/crashdialog.py` | the "Onion Board hit a problem" dialog: the report, *Copy report*, *Report on GitHub* (copies it, opens a new issue in the browser), *Open folder* |
 | `soundboard/testcheck.py` | analysis for the Record-6s test (finds your voice in the output by cross-correlation) |
-| `soundboard/destination.py` | destination modes (Settings → *Who's listening*): shapes the sounds bus for the listener's voice codec — sub-bass harmonics, codec ceiling, gentle compressor, mono |
+| `soundboard/destination.py` | destination modes (Setup tab / Settings → *Who's listening*): shapes the sounds bus for the listener's voice codec — sub-bass harmonics, codec ceiling, gentle compressor, mono |
 | `soundboard/ui/destpanel.py` | the mode picker and the custom-modes editor |
 | `soundboard/codecsim.py` | development bench: runs audio through Discord / Steam / Vivox's Opus pipeline (ffmpeg's libopus) and measures what's lost |
 | `modules/` | add-ons shipped with the app: `retro-fx` (an effects module, the example to copy), `live-voice` (a service module with its own Python environment) and `translate-zh/es/fr/de/ru` (translation modules: a manifest naming a model that's downloaded only when picked) |

@@ -1,6 +1,7 @@
-"""Settings → General → "Who's listening": pick the destination mode that shapes
-the sounds bus for the voice chat on the other end (soundboard.destination),
-and an editor for custom modes (describe any other codec by the same knobs)."""
+"""Who's listening (on the Setup tab, and in Settings -> General): pick the
+destination mode that shapes the sounds bus for the voice chat on the other end
+(soundboard.destination), and an editor for custom modes (describe any other
+codec by the same knobs)."""
 from __future__ import annotations
 
 from PySide6.QtCore import Qt, Signal
@@ -76,6 +77,10 @@ class DestPanel(QWidget):
         self.combo.setCurrentIndex(max(0, self.combo.findData(current)))
         self.combo.blockSignals(False)
         self._show()
+
+    def showEvent(self, e):
+        super().showEvent(e)
+        self.refresh()   # the other copy (Setup tab / Settings) may have changed it
 
     def _show(self):
         d = destination.resolve(self._cfg())
