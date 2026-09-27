@@ -183,6 +183,37 @@ def bandwidth_hz(o: np.ndarray, b: np.ndarray, rate: int = SR, drop_db: float = 
     return keep
 
 
+def spectral_distance_db(o: np.ndarray, b: np.ndarray, rate: int = SR,
+                         top_hz: float = 16000.0) -> float:
+    """How different the two sound, frame by frame: the mean absolute difference (dB)
+    of their third-octave band levels from 100 Hz to top_hz, over 20 ms frames where
+    the input is active, after matching overall level. Band energy per whole clip
+    (the `bands` numbers) can't see a codec's noise fill or warble, which keeps the
+    energy but not the detail; this does. 0 = identical; lower is better."""
+    n = int(0.02 * rate)
+    k = min(len(o), len(b)) // n
+    if k < 2:
+        return 0.0
+    win = np.hanning(n)
+    fo = np.abs(np.fft.rfft(o[: k * n].reshape(k, n) * win, axis=1)) ** 2
+    fb = np.abs(np.fft.rfft(b[: k * n].reshape(k, n) * win, axis=1)) ** 2
+    freqs = np.fft.rfftfreq(n, 1 / rate)
+    edges = 100.0 * 2 ** (np.arange(0, 40) / 3)
+    edges = edges[edges <= min(top_hz, rate / 2)]
+    idx = [(freqs >= lo) & (freqs < hi) for lo, hi in zip(edges[:-1], edges[1:])]
+    idx = [m for m in idx if m.any()]
+    po = np.stack([fo[:, m].sum(axis=1) for m in idx], 1)
+    pb = np.stack([fb[:, m].sum(axis=1) for m in idx], 1)
+    lo_db, lb_db = 10 * np.log10(po + 1e-12), 10 * np.log10(pb + 1e-12)
+    lb_db += np.median(lo_db - lb_db)                 # level-matched
+    active = lo_db.max(axis=1) > lo_db.max() - 50     # frames with something in them
+    loud = lo_db > lo_db.max() - 60                   # bands with something in them
+    m = active[:, None] & loud
+    if not m.any():
+        return 0.0
+    return float(np.mean(np.minimum(np.abs(lo_db - lb_db)[m], 30.0)))
+
+
 def analyze(orig: np.ndarray, back: np.ndarray, rate: int = SR) -> dict:
     """Compare what went in with what came back.
 
@@ -193,10 +224,13 @@ def analyze(orig: np.ndarray, back: np.ndarray, rate: int = SR) -> dict:
                   kHz, so this is low even when it sounds fine; compare between runs,
                   don't read it as quality on its own
     lag           codec delay in samples (how far back trailed orig)
+    spec_dist_db  frame-by-frame spectral distance (spectral_distance_db): how
+                  different it sounds, noise fill and warble included; lower = better
     """
     o, b, lag = align(orig, back, rate=rate)
     if not len(o):
-        return {"level_db": -180.0, "bandwidth_hz": 0.0, "bands": [], "snr_db": 0.0, "lag": lag}
+        return {"level_db": -180.0, "bandwidth_hz": 0.0, "bands": [], "snr_db": 0.0, "lag": lag,
+                "spec_dist_db": 30.0}
     ro, rb = float(np.sqrt((o ** 2).mean())), float(np.sqrt((b ** 2).mean()))
     fo, fb, freqs = _spectra(o, b, rate)
     top = float((fo ** 2).sum()) * 1e-7             # a band with less than this has no input
@@ -208,7 +242,8 @@ def analyze(orig: np.ndarray, back: np.ndarray, rate: int = SR) -> dict:
     err = b - g * o
     snr = float(10 * np.log10((o ** 2).sum() * g * g / ((err ** 2).sum() + 1e-30)))
     return {"level_db": _db(rb / max(ro, 1e-9)), "bandwidth_hz": bandwidth_hz(o, b, rate),
-            "bands": bands, "snr_db": snr, "lag": lag}
+            "bands": bands, "snr_db": snr, "lag": lag,
+            "spec_dist_db": spectral_distance_db(o, b, rate)}
 
 
 def mono_loss_db(x: np.ndarray) -> float:

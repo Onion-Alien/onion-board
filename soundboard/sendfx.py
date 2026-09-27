@@ -110,7 +110,9 @@ class SmartMono:
     2 kHz (4th-order Linkwitz-Riley: the bands sum back flat)."""
 
     SPLITS = (200.0, 2000.0)
-    TAU_S = 0.15           # how fast the per-band statistics follow the music
+    TAU_S = 1.0            # how fast the per-band statistics follow the music (slow:
+                           # stereo width changes slowly, and a moving make-up gain
+                           # would be heard as pumping)
     FLIP_BELOW = -0.35     # correlation under which a band is summed with R flipped
     UNFLIP_ABOVE = -0.10   # ...and back above this (hysteresis: no flapping)
     MAX_GAIN = 1.4125      # +3 dB at most for power lost to decorrelation

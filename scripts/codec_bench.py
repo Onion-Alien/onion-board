@@ -6,6 +6,8 @@
     python scripts/codec_bench.py --profiles discord steam
     python scripts/codec_bench.py --json out.json       # also save the numbers
     python scripts/codec_bench.py --dest steam --profiles steam   # with the app's mode on
+    python scripts/codec_bench.py --send                # through the app's send stage first
+    python scripts/codec_bench.py --processing suppress agc gate   # voice cleanup left on
 
 With --dest the "level" and band columns compare the codec's output against the
 *shaped* input, so read the mode's own effect from the <100 and 100-300 columns
@@ -14,8 +16,13 @@ of a --dest run next to a plain one (the harmonics land in 100-300).
 Per signal and profile: overall level change, the frequency ceiling the codec
 really kept, the energy change in each band, the mono-downmix loss (independent
 of the codec: what a mono mic capture does to our stereo), and the waveform SNR
-(only comparable between runs; Opus isn't a waveform coder). Needs ffmpeg with
-libopus, the same ffmpeg the importer uses for m4a / video.
+(only comparable between runs; Opus isn't a waveform coder), the spectral
+distance ("dist": frame by frame how different it sounds, lower is better; unlike
+the band columns it hears noise fill and warble) and how much the listener's
+decoder clips ("clip%"). --send runs the app's send stage (phase-aware mono +
+limiter) first; --processing adds the voice chat's own mic cleanup
+(soundboard.chatsim) before the codec, the way it is when it's left on.
+Needs ffmpeg with libopus, the same ffmpeg the importer uses for m4a / video.
 """
 from __future__ import annotations
 
@@ -33,7 +40,9 @@ if str(ROOT) not in sys.path:
 from soundboard import codecsim  # noqa: E402
 from soundboard.codecsim import (BANDS, PROFILES, SIGNALS, analyze, band_label,  # noqa: E402
                                  mono_loss_db, roundtrip)
+from soundboard import chatsim  # noqa: E402
 from soundboard.destination import BUILTIN_BY_KEY, Processor  # noqa: E402
+from soundboard.sendfx import Limiter, SmartMono  # noqa: E402
 
 MAX_S = 20.0   # longest stretch of a file to analyse (the middle of it)
 
@@ -83,6 +92,10 @@ def main() -> int:
     ap.add_argument("--dest", metavar="MODE", choices=sorted(BUILTIN_BY_KEY),
                     help="run the audio through this destination mode first (what the app "
                          "does when the mode is on); use with the plain run to compare")
+    ap.add_argument("--send", action="store_true",
+                    help="run the app's send stage (phase-aware mono + limiter) first")
+    ap.add_argument("--processing", nargs="+", choices=chatsim.STAGES, default=(),
+                    help="simulate the voice chat's mic cleanup being left on")
     ap.add_argument("--json", metavar="FILE", help="also write the numbers as JSON")
     args = ap.parse_args()
 
@@ -93,8 +106,9 @@ def main() -> int:
         return 2
 
     heads = "".join(band_label(lo, hi).rjust(8) for lo, hi in BANDS)
-    print(f"{'signal':<28}{'profile':<16}{'level':>7}{'ceiling':>9}{'mono':>7}{'snr':>6}  {heads}")
-    print("-" * (28 + 16 + 7 + 9 + 7 + 6 + 2 + len(heads)))
+    print(f"{'signal':<28}{'profile':<16}{'level':>7}{'ceiling':>9}{'mono':>7}{'snr':>6}"
+          f"{'dist':>6}{'clip%':>7}  {heads}")
+    print("-" * (28 + 16 + 7 + 9 + 7 + 6 + 6 + 7 + 2 + len(heads)))
     results = []
     dest = BUILTIN_BY_KEY[args.dest] if args.dest else None
     for name, x in _sources(args):
@@ -104,20 +118,35 @@ def main() -> int:
             x = np.concatenate([proc.process(x[i:i + 480].copy(), dest)
                                 for i in range(0, len(x), 480)])
         mono = mono_loss_db(x)
+        sent = x
+        if args.send:
+            lim, mix = Limiter(codecsim.SR), SmartMono(codecsim.SR)
+            sent = np.concatenate([lim.process(mix.process(x[i:i + 480]))
+                                   for i in range(0, len(x), 480)])
+        ref = sent      # what the app puts into the cable
+        if args.processing:
+            sent = chatsim.process(sent, args.processing)
         for key in args.profiles:
             p = PROFILES[key]
             try:
-                r = analyze(x, roundtrip(x, p, ff))
+                back = roundtrip(sent, p, ff)
+                # judged against what went into the cable, so --processing shows the
+                # voice cleanup's damage (the send stage's own effect is by design;
+                # compare clip% and a plain run for that)
+                r = analyze(ref, back)
             except Exception as e:  # noqa: BLE001
                 print(f"{name[:27]:<28}{key:<16}  failed: {e}")
                 continue
+            clip = float(np.mean(np.abs(back) >= 0.999)) * 100
             cells = "".join(_fmt(d).rjust(8) for _, _, d in r["bands"])
             print(f"{name[:27]:<28}{key:<16}{r['level_db']:+6.1f} {r['bandwidth_hz'] / 1000:7.1f}k"
-                  f"{mono:+6.1f} {r['snr_db']:5.1f}  {cells}")
-            results.append({"signal": name, "profile": key, "mono_loss_db": mono, **r})
+                  f"{mono:+6.1f} {r['snr_db']:5.1f}{r['spec_dist_db']:6.1f}{clip:7.2f}  {cells}")
+            results.append({"signal": name, "profile": key, "mono_loss_db": mono,
+                            "clipped_pct": clip, **r})
         print()
     print("level / mono / bands in dB (negative = lost); ceiling = highest kHz still carried;")
-    print("snr = waveform SNR, compare between runs only. Profiles:")
+    print("snr = waveform SNR, compare between runs only; dist = spectral distance in dB,")
+    print("lower is better; clip% = samples the listener's decoder clips. Profiles:")
     for key in args.profiles:
         p = PROFILES[key]
         print(f"  {key:<14} {p.label}: {p.bitrate_kbps} kbps, {p.rate // 1000} kHz "

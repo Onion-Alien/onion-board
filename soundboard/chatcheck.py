@@ -198,14 +198,16 @@ def analyze(sent: np.ndarray, heard: np.ndarray, rate: int = SR) -> dict:
     issues = []
     # noise suppression: steady music fades away, or what comes back no longer
     # looks like what we sent (spectral subtraction / a neural denoiser)
-    if res["steady_drop_db"] < -6.0 or fid < 0.7:
+    suppressed = res["steady_drop_db"] < -6.0 or fid < 0.7
+    if suppressed:
         issues.append("suppression")
-    # a gate: the quiet part is (nearly) gone compared with the loud one
-    if res["quiet_db"] < -12.0:
+    # a gate: the quiet part is gone. Suppression also pulls it down (it's steady
+    # music too), so with suppression on only a real cut counts
+    if res["quiet_db"] < -35.0 or (res["quiet_db"] < -12.0 and not suppressed):
         issues.append("gate")
     # a gain control: the quiet part comes back lifted, or after it the loud part
-    # starts too loud and settles
-    if res["quiet_db"] > 4.0 or res["pump_db"] > 3.0:
+    # starts too loud and settles (which suppression re-adapting also looks like)
+    if res["quiet_db"] > 4.0 or (res["pump_db"] > 3.0 and not suppressed):
         issues.append("agc")
     res["issues"] = issues
     return res
