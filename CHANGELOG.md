@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+## 1.3.0 — 2026-09-28
+
+Sound quality on the other end. Measured, not guessed: the codec Discord and
+games use keeps nearly everything, so most of the damage came from voice chat's
+own mic cleanup, a cable converting on the way through, and how the sound was
+sent. Onion Board now fixes what it can itself and tells you exactly which
+setting to flip for the rest.
+
 - **Your sounds come through clean in Discord.** Discord cleans up your mic for
   talking, and left on, that cleanup treats music and sound effects as noise and
   chops them up. The setup guide and the Setup tab now say what to switch off
