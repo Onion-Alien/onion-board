@@ -28,8 +28,97 @@ $ErrorActionPreference = "Stop"
 $ProgressPreference = "SilentlyContinue"   # makes Invoke-WebRequest much faster
 
 function Pause-Exit($code) {
+    Restore-AudioDefaults
     if (-not $Silent) { Read-Host "`nPress Enter to close" | Out-Null }
     exit $code
+}
+
+# Installing the cable often makes "CABLE Input" the default speakers (and "CABLE
+# Output" the default mic), which silences the PC. The app never needs the cable to be
+# the default, so remember the defaults before installing and put them back after.
+# Windows' own IPolicyConfig (undocumented but stable since Vista) sets the default.
+$audioDefaultsCs = @"
+using System;
+using System.Runtime.InteropServices;
+namespace OnionBoardSetup {
+    [ComImport, Guid("D666063F-1587-4E43-81F1-B948E807363F"), InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+    interface IMMDevice {
+        [PreserveSig] int Activate();
+        [PreserveSig] int OpenPropertyStore();
+        [PreserveSig] int GetId([MarshalAs(UnmanagedType.LPWStr)] out string id);
+    }
+    [ComImport, Guid("A95664D2-9614-4F35-A746-DE8DB63617E6"), InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+    interface IMMDeviceEnumerator {
+        [PreserveSig] int EnumAudioEndpoints();
+        [PreserveSig] int GetDefaultAudioEndpoint(int flow, int role, out IMMDevice device);
+    }
+    [ComImport, Guid("F8679F50-850A-41CF-9C72-430F290290C8"), InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+    interface IPolicyConfig {
+        [PreserveSig] int GetMixFormat();
+        [PreserveSig] int GetDeviceFormat();
+        [PreserveSig] int ResetDeviceFormat();
+        [PreserveSig] int SetDeviceFormat();
+        [PreserveSig] int GetProcessingPeriod();
+        [PreserveSig] int SetProcessingPeriod();
+        [PreserveSig] int GetShareMode();
+        [PreserveSig] int SetShareMode();
+        [PreserveSig] int GetPropertyValue();
+        [PreserveSig] int SetPropertyValue();
+        [PreserveSig] int SetDefaultEndpoint([MarshalAs(UnmanagedType.LPWStr)] string id, int role);
+    }
+    [ComImport, Guid("BCDE0395-E52F-467C-8E3D-C4579291692E")] class MMDeviceEnumerator { }
+    [ComImport, Guid("870AF99C-171D-4F9E-AF0D-E63DF40C2BC9")] class PolicyConfigClient { }
+    public static class AudioDefaults {
+        // flow: 0 = playback, 1 = recording. role: 0 = console, 1 = multimedia, 2 = communications
+        public static string Get(int flow, int role) {
+            IMMDevice device;
+            var e = (IMMDeviceEnumerator)new MMDeviceEnumerator();
+            if (e.GetDefaultAudioEndpoint(flow, role, out device) != 0 || device == null) return null;
+            string id;
+            return device.GetId(out id) == 0 ? id : null;
+        }
+        public static bool Set(string id, int role) {
+            return ((IPolicyConfig)new PolicyConfigClient()).SetDefaultEndpoint(id, role) == 0;
+        }
+    }
+}
+"@
+
+$savedDefaults = $null
+
+function Save-AudioDefaults {
+    try {
+        Add-Type -TypeDefinition $audioDefaultsCs -ErrorAction Stop
+        $script:savedDefaults = @(foreach ($flow in 0, 1) { foreach ($role in 0, 1, 2) {
+            $id = [OnionBoardSetup.AudioDefaults]::Get($flow, $role)
+            if ($id) { [pscustomobject]@{ Flow = $flow; Role = $role; Id = $id } }
+        } })
+    } catch { $script:savedDefaults = $null }   # never let this get in the way of installing
+}
+
+# The cable's endpoint ids, in the same "{0.0.0.00000000}.{guid}" form the defaults use.
+function Get-CableEndpointIds {
+    @(Get-CimInstance Win32_PnPEntity -ErrorAction SilentlyContinue |
+        Where-Object { $_.Name -match "VB-Audio|Virtual Cable" -and $_.PNPClass -eq "AudioEndpoint" } |
+        ForEach-Object { ($_.DeviceID -replace '^SWD\\MMDEVAPI\\', '').ToLower() })
+}
+
+# Only undoes a switch *to the cable*: any other change is the user's.
+function Restore-AudioDefaults {
+    if (-not $script:savedDefaults) { return }
+    try {
+        # Windows can switch a moment after the device appears, so check twice.
+        foreach ($pass in 1, 2) {
+            $cable = Get-CableEndpointIds
+            foreach ($s in $script:savedDefaults) {
+                $now = [OnionBoardSetup.AudioDefaults]::Get($s.Flow, $s.Role)
+                if ($now -and $now -ne $s.Id -and $cable -contains $now.ToLower()) {
+                    [OnionBoardSetup.AudioDefaults]::Set($s.Id, $s.Role) | Out-Null
+                }
+            }
+            if ($pass -eq 1) { Start-Sleep -Seconds 2 }
+        }
+    } catch { }
 }
 
 function Say($step, $text) {
@@ -128,6 +217,10 @@ if ($state -eq "ok") {
     Pause-Exit 0
 }
 
+# Remember the defaults here, in the user's own (unelevated) process: the elevated copy
+# could be a different admin account, whose defaults aren't the ones that matter.
+if (-not $Elevated) { Save-AudioDefaults }
+
 # Everything past here needs admin: ask once, then carry on as the elevated copy.
 if (-not (Test-Admin) -and -not $Elevated) {
     Say "permission" "Waiting for you to click Yes..."
@@ -141,6 +234,7 @@ if (-not (Test-Admin) -and -not $Elevated) {
         Say "cancelled" "Install was cancelled."
         Pause-Exit 1
     }
+    Restore-AudioDefaults
     exit $p.ExitCode   # the elevated copy has already said everything (and paused)
 }
 
