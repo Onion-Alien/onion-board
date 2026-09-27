@@ -176,8 +176,9 @@ too (say No if another program, like Voicemeeter, uses it).
 - **Global hotkeys** (set in **⚙ Settings → Hotkeys**, the overlay key in
   **⚙ Settings → Overlay**; all work in-game):
   - Stop all, and pause/resume all.
-  - **In-game overlay** (the <kbd>`</kbd> key by default): a small panel of your
-    sounds over the game. Number keys play them, and the game keeps your mouse
+  - **In-game overlay** (by default the key left of <kbd>1</kbd>: <kbd>`</kbd> on a
+    US keyboard; where that key types a letter, like ö or ñ, it's Alt + that key):
+    a small panel of your sounds over the game. Number keys play them, and the game keeps your mouse
     and keyboard.
   - Auto push-to-talk: holds your game's PTT key while a sound plays.
   - Hotkeys can beep in your headphones (only you hear it), so you know they
@@ -230,8 +231,13 @@ too (say No if another program, like Voicemeeter, uses it).
   General has *Update now* and *Reset downloader* for when downloads start
   failing, and an opt-in box to update yt-dlp from PyPI automatically (off by
   default).
-- **⚙ Settings:** themes (Dark, Light, Toxic green, Ocean; they switch live),
-  hotkeys, overlay, window and audio options.
+- **⚙ Settings:** themes (Dark, Light, Toxic green, Ocean, Cherry Blossom, Carbon;
+  they switch live), hotkeys, overlay, window and audio options.
+- **Stream Deck and scripts (optional, off by default):** Settings → General →
+  *Remote control* lets programs on this PC play your sounds: a Stream Deck
+  (Bitfocus Companion, Touch Portal, its website buttons), AutoHotkey or a script.
+  It only listens on this PC and needs the key shown there (*Copy link* gives a
+  ready-made "play a random sound" link).
 - **Runs in the background:** closing the window keeps it in the tray (hotkeys and
   the overlay keep working; right-click the tray icon → *Quit*). Optionally
   **starts with Windows**, straight to the tray. An opt-in, once-a-day check tells

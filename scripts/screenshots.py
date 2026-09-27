@@ -35,6 +35,8 @@ from PySide6.QtWidgets import QApplication  # noqa: E402
 
 from soundboard import appaudio, autostart, engine, library, screenwatch, winkeys  # noqa: E402
 
+winkeys.key_char = conftest.us_key_char   # hotkeys drawn as on a US keyboard
+
 OUTS = ["CABLE Input (VB-Audio Virtual Cable)", "Headphones (USB Audio Device)",
         "Speakers (Realtek(R) Audio)"]
 INS = ["CABLE Output (VB-Audio Virtual Cable)", "Microphone (USB Audio Device)"]

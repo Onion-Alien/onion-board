@@ -57,6 +57,7 @@
       friends in Discord or your game hear the sound through your mic.</p>
     <a class="dl" href="https://github.com/Onion-Alien/onionboard/releases/latest/download/OnionBoardSetup.exe">⬇ Download for Windows</a>
     <p class="small">Free · Windows 10 and 11 · one installer, no account, no ads, no tracking</p>
+    <p class="small"><a id="ver" href="https://github.com/Onion-Alien/onionboard/releases/latest">Latest version 1.2.3 · what's new</a></p>
     <img class="hero" src="screenshots/tour.webp" width="1100" height="736"
          alt="A quick tour: playing sounds, the radio globe, a trigger catching YOU DIED, and the voice changer">
   </header>
@@ -79,6 +80,10 @@
       or send one program's sound (music, a video) to your friends.</p></div>
     <div class="card"><h3>Shaped for voice chat</h3><p>Discord, Steam and game voice modes pre-shape
       your sounds so they survive the call's compression.</p></div>
+    <div class="card"><h3>Stream Deck and scripts</h3><p>Optional: let a Stream Deck, Touch Portal,
+      AutoHotkey or a script on your PC play your sounds, guarded by a key only you have.</p></div>
+    <div class="card"><h3>Make it yours</h3><p>Six themes, pictures and colours on your pads,
+      categories, backups you can take to a new PC, and sound packs to share with friends.</p></div>
   </div>
 
   <h2>Screenshots</h2>
@@ -107,5 +112,15 @@
     Onion Board is free to use. Nothing is collected about you.
   </footer>
 </div>
+<script>
+  // The newest version's number, straight from GitHub (the link works without it too).
+  fetch("https://api.github.com/repos/Onion-Alien/onionboard/releases/latest")
+    .then(r => r.ok ? r.json() : null)
+    .then(r => {
+      const v = r && /^v?(\d+\.\d+\.\d+)$/.exec(r.tag_name || "");
+      if (v) document.getElementById("ver").textContent = `Latest version ${v[1]} · what's new`;
+    })
+    .catch(() => {});
+</script>
 </body>
 </html>

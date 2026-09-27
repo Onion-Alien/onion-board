@@ -118,14 +118,19 @@ def _never_touch_real_autostart(monkeypatch):
     monkeypatch.setattr(autostart, "winreg", None)
 
 
+def us_key_char(vk: int) -> str:
+    """winkeys.key_char on a US keyboard layout, whatever layout this PC has."""
+    from soundboard import winkeys
+    us = {winkeys.VK[k]: k for k in (";", "=", ",", "-", ".", "/", "`", "[", "\\", "]", "'")}
+    return us.get(vk) or (chr(vk) if 0x30 <= vk <= 0x5A else "")
+
+
 @pytest.fixture(autouse=True)
 def _us_keyboard_layout(monkeypatch):
     """Key labels and the overlay key's layout check read the PC's keyboard layout;
     tests see a US one wherever they run."""
     from soundboard import winkeys
-    us = {winkeys.VK[k]: k for k in (";", "=", ",", "-", ".", "/", "`", "[", "\\", "]", "'")}
-    monkeypatch.setattr(winkeys, "key_char",
-                        lambda vk: us.get(vk) or (chr(vk) if 0x30 <= vk <= 0x5A else ""))
+    monkeypatch.setattr(winkeys, "key_char", us_key_char)
 
 
 @pytest.fixture(autouse=True)
