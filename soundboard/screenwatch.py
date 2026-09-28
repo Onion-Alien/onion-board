@@ -310,6 +310,52 @@ def gray_2x(bgra: np.ndarray) -> np.ndarray:
     return y.astype(np.float32) * (1 / (256 * 4 * 255))
 
 
+# DXGI_FORMAT values a duplicated desktop comes in, and their bytes per pixel.
+FMT_BGRA8, FMT_BGRX8 = 87, 88   # B8G8R8A8_UNORM / B8G8R8X8_UNORM: the usual SDR desktop
+FMT_RGBA16F = 10                # R16G16B16A16_FLOAT: HDR ("advanced colour") on, scRGB linear
+FMT_RGB10A2 = 24                # R10G10B10A2_UNORM: a 10-bit desktop
+FRAME_FORMATS = {FMT_BGRA8: 4, FMT_BGRX8: 4, FMT_RGBA16F: 8, FMT_RGB10A2: 4}
+
+
+def frame_view(rows: np.ndarray, fmt: int, width: int) -> np.ndarray:
+    """The pixels of a mapped frame's rows ((h, pitch) uint8) one entry per pixel in the
+    format's own type: (h, w, 4) uint8 BGRA for the 8-bit formats, (h, w, 4) float16
+    RGBA for RGBA16F, (h, w) uint32 for RGB10A2. A view, no copy."""
+    bpp = FRAME_FORMATS.get(fmt)
+    if bpp is None:
+        raise OSError(f"unsupported duplication format {fmt}")
+    px = rows[:, :width * bpp]
+    if fmt == FMT_RGBA16F:
+        return px.view(np.float16).reshape(rows.shape[0], width, 4)
+    if fmt == FMT_RGB10A2:
+        return px.view(np.uint32).reshape(rows.shape[0], width)
+    return px.reshape(rows.shape[0], width, 4)
+
+
+def frame_gray(sample: np.ndarray, fmt: int, factor: int = 1) -> np.ndarray:
+    """Pixels sampled from a duplicated frame (see frame_view for their shape) ->
+    (h, w) float32 luma in 0..1 on the same scale as the pictures, which are 8-bit
+    sRGB screenshots turned grey by to_gray. With `factor` 2 each output pixel is
+    the average of a 2x2 block, as gray_2x does."""
+    if fmt in (FMT_BGRA8, FMT_BGRX8):
+        return gray_2x(sample) if factor == 2 else to_gray(sample)
+    if fmt == FMT_RGBA16F:
+        # scRGB: linear light, 1.0 is SDR white and highlights go above it. Clip to
+        # SDR and put the sRGB curve back on, so grey matches an 8-bit screenshot.
+        rgb = np.clip(sample[..., :3].astype(np.float32), 0.0, 1.0) ** (1 / 2.2)
+    elif fmt == FMT_RGB10A2:
+        # 10 bits each, R lowest; already gamma-encoded like the 8-bit desktop.
+        u = sample.astype(np.uint32)
+        rgb = np.stack([(u >> sh) & 1023 for sh in (0, 10, 20)], -1).astype(np.float32) / 1023
+    else:
+        raise OSError(f"unsupported duplication format {fmt}")
+    y = 0.299 * rgb[..., 0] + 0.587 * rgb[..., 1] + 0.114 * rgb[..., 2]
+    if factor == 2:
+        h, w = y.shape[0] // 2, y.shape[1] // 2
+        y = y[:2 * h, :2 * w].reshape(h, 2, w, 2).mean((1, 3), dtype=np.float32)
+    return y.astype(np.float32)
+
+
 class Grabber:
     """Copies one monitor, shrunk to (w, h), as grey (float32 0..1). The copy is
     taken at twice that size with GDI's plain pixel-dropping shrink (COLORONCOLOR:
@@ -467,6 +513,9 @@ class _OUTDUPL_DESC(ctypes.Structure):
                 ("DesktopImageInSystemMemory", wintypes.BOOL)]
 
 
+_unknown_formats: set[int] = set()     # DXGI formats already reported (see _duplicate)
+
+
 class DupGrabber:
     """Desktop Duplication (IDXGIOutputDuplication): the frames the graphics card
     shows, so fullscreen games are seen too, where GDI may only see black. Same
@@ -582,6 +631,12 @@ class DupGrabber:
             raise OSError(f"unusable duplication mode {d.Width}x{d.Height} "
                           f"rotation {d.Rotation}")
         mode = (int(d.Width), int(d.Height), int(d.Format))
+        if mode[2] not in FRAME_FORMATS:
+            if mode[2] not in _unknown_formats:
+                _unknown_formats.add(mode[2])
+                log.info("desktop duplication gives frames in DXGI format %d, which isn't "
+                         "supported: falling back to GDI", mode[2])
+            raise OSError(f"unsupported duplication format {mode[2]}")
         if mode != self._mode:
             self.staging.release()
             desc = _TEXTURE2D_DESC(mode[0], mode[1], 1, 1, mode[2], 1, 0,
@@ -664,15 +719,16 @@ class DupGrabber:
             raise CaptureLost(f"Map failed (0x{_hr(hr):08X})")
         try:
             sw, rows = self.source
+            fmt = self._mode[2]
             pitch = m.RowPitch
             buf = (ctypes.c_uint8 * (rows * pitch)).from_address(m.pData)
             img = np.frombuffer(buf, np.uint8).reshape(rows, pitch)
-            px = img[:, :sw * 4].reshape(rows, sw, 4)
+            px = frame_view(img, fmt, sw)
             sample = px[self.ys[:, None], self.xs[None, :]]      # a copy, taken while mapped
         finally:
             self.ctx.call(self.CTX_UNMAP, self.staging.p, 0, restype=None,
                           argtypes=(ctypes.c_void_p, ctypes.c_uint))
-        self.last = gray_2x(sample) if self.factor == 2 else to_gray(sample)
+        self.last = frame_gray(sample, fmt, self.factor)
         return self.last
 
     def close(self):

@@ -421,7 +421,10 @@ class TriggersTab(QWidget):
         every = labelled("Check every", self.cb_interval)
         self.lbl_interval = every.layout().itemAt(0).widget()
         h.addWidget(every)
-        self.cb_monitor = narrow(QComboBox(), 10)
+        self.cb_monitor = QComboBox()
+        # Wide enough for "Screen 2: 2560×1440  (main)": it grows with its entries
+        # (and re-adjusts when _fill_monitors refills them), else the size is cut off.
+        self.cb_monitor.setSizeAdjustPolicy(QComboBox.AdjustToContents)
         self.cb_monitor.setToolTip("Which screen to watch (the one the game is on)")
         self.cb_monitor.currentIndexChanged.connect(self._on_monitor)
         no_wheel(self.cb_monitor)

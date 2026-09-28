@@ -735,3 +735,24 @@ def test_the_screen_list_follows_screens_plugged_in_later(qapp, app_dir, fake_sc
     finally:
         tab.hide()
         tab.shutdown()
+
+
+def test_the_screen_list_is_wide_enough_for_its_longest_entry(qapp, app_dir, fake_screen,
+                                                              monkeypatch):
+    """"Screen 2: 1920×1080" was cut off at "Screen 2: 1920×10": the list must size
+    itself to its entries, and again when they're refilled."""
+    mons = [Monitor(0, 0, 2560, 1440, True), Monitor(2560, 0, 1920, 1080)]
+    monkeypatch.setattr(sw, "monitors", lambda: list(mons))
+    tab = TriggersTab(Config(), lambda: None, lambda: [], lambda _s: None)
+    try:
+        cb = tab.cb_monitor
+        longest = max((cb.itemText(i) for i in range(cb.count())), key=len)
+        assert longest == "Screen 1: 2560×1440  (main)"
+        assert cb.sizeHint().width() >= cb.fontMetrics().horizontalAdvance(longest)
+        mons.append(Monitor(0, 1440, 3840, 2160))
+        tab.set_watching(True)
+        tab.set_watching(False)
+        assert cb.count() == 3
+        assert cb.sizeHint().width() >= cb.fontMetrics().horizontalAdvance("Screen 3: 3840×2160")
+    finally:
+        tab.shutdown()

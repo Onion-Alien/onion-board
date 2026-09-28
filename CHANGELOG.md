@@ -5,6 +5,10 @@
 - **The in-game overlay opens on the monitor your game is on.** On a second
   monitor it used to appear on the main one (Qt 6 names screens differently from
   Windows, so the overlay never recognised the game's monitor).
+- **Triggers work on HDR screens.** A monitor with HDR (advanced colour) on hands
+  the app 16-bit frames; it read them as 8-bit and saw only black, so nothing
+  ever matched.
+- **Triggers: the screen picker no longer cuts off the screen's size.**
 
 ## 1.3.0 — 2026-09-28
 
