@@ -1,15 +1,25 @@
 """A glowing, gently pulsing dot that marks a tab whose feature is live right now
-(e.g. the Voice tab while the voice changer is changing your mic), so it can't be
-left on by accident without you noticing from another tab."""
+(the Voice tab while the voice changer is changing your mic, Radio while a station
+plays, Apps while a program's sound is sent, Triggers while the screen is watched),
+so it can't be left on by accident without you noticing from another tab. The tab's
+name is drawn in the live colour too."""
 from __future__ import annotations
 
 from PySide6.QtCore import QPointF, QSize, Qt, QVariantAnimation
-from PySide6.QtGui import QColor, QPainter, QRadialGradient
-from PySide6.QtWidgets import QTabBar, QTabWidget, QWidget
+from PySide6.QtGui import QColor, QPainter, QPalette, QRadialGradient
+from PySide6.QtWidgets import QProxyStyle, QStyleFactory, QTabBar, QTabWidget, QWidget
 
+from soundboard import theme
 from soundboard.ui import icons
 
-GREEN = "#13ce66"   # the same green as the voice changer's ON switch
+GREEN = "#13ce66"     # the dot and the tab's icon: the same green as the voice changer's ON switch
+BASE_STYLE = "Fusion"   # the app's widget style (app.py); the tab bar's own style sits on it
+
+
+def live_color() -> str:
+    """The colour a live tab's name is drawn in: the theme's "ok" green (the light
+    themes darken it so it can be read)."""
+    return theme.status("ok")
 
 
 class LiveDot(QWidget):
@@ -62,30 +72,62 @@ class LiveDot(QWidget):
         p.drawEllipse(c, 4, 4)
 
 
+class LiveTabStyle(QProxyStyle):
+    """Draws the names of a tab bar's live tabs in the live colour. The theme's
+    stylesheet gives every tab its text colour, which wins over
+    QTabBar.setTabTextColor, but it leaves the actual drawing of the text to the
+    style beneath it: this one, which swaps the colour for a live tab. It reads the
+    theme when it paints, so a theme change needs nothing beyond the repaint it
+    causes anyway. Owned by the tab bar (its child)."""
+
+    def __init__(self, bar: QTabBar):
+        super().__init__(QStyleFactory.create(BASE_STYLE))
+        self.setParent(bar)
+
+    def drawItemText(self, painter, rect, flags, pal, enabled, text, role=QPalette.NoRole):
+        bar = self.parent()
+        if text and isinstance(bar, QTabBar):
+            for i in range(bar.count()):
+                if _dot(bar, i) is not None and bar.tabRect(i).contains(rect.center()):
+                    pal = QPalette(pal)
+                    pal.setColor(role, QColor(live_color()))
+                    break
+        super().drawItemText(painter, rect, flags, pal, enabled, text, role)
+
+
+def _dot(bar: QTabBar, index: int) -> LiveDot | None:
+    dot = bar.tabButton(index, QTabBar.RightSide)
+    return dot if isinstance(dot, LiveDot) else None
+
+
 def set_tab_live(tabs: QTabWidget, index: int, on: bool, tip: str = "",
                  icon: str | None = None):
-    """Show (or remove) a LiveDot on a tab, and put `tip` in front of its tooltip
-    while it's live. `icon` names the tab's icon, turned green while live."""
+    """Show (or remove) a LiveDot on a tab, draw its name in the live colour, and put
+    `tip` in front of its tooltip while it's live. `icon` names the tab's icon,
+    turned green while live."""
     if icon:
         icons.set_tab_icon(tabs, index, icon, GREEN if on else None)
     bar = tabs.tabBar()
-    dot = bar.tabButton(index, QTabBar.RightSide)
+    if bar.findChild(LiveTabStyle) is None:
+        bar.setStyle(LiveTabStyle(bar))
+    dot = _dot(bar, index)
     base = tabs.property(f"_tip{index}")
     if base is None:
         base = tabs.tabToolTip(index)
         tabs.setProperty(f"_tip{index}", base)
     if on:
-        if not isinstance(dot, LiveDot):
+        if dot is None:
             dot = LiveDot()
             bar.setTabButton(index, QTabBar.RightSide, dot)
         dot.show()
         tabs.setTabToolTip(index, f"{tip}\n{base}" if tip else base)
     else:
-        if isinstance(dot, LiveDot):
+        if dot is not None:
             bar.setTabButton(index, QTabBar.RightSide, None)
             dot.deleteLater()
         tabs.setTabToolTip(index, base)
+    bar.update()   # the name's colour
 
 
 def is_tab_live(tabs: QTabWidget, index: int) -> bool:
-    return isinstance(tabs.tabBar().tabButton(index, QTabBar.RightSide), LiveDot)
+    return _dot(tabs.tabBar(), index) is not None

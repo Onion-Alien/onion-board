@@ -13,6 +13,7 @@ from soundboard import library
 from soundboard.ui import mainwindow as main
 from soundboard import winkeys
 from soundboard.library import SR, Config, SoundMeta
+from soundboard.ui.livedot import is_tab_live
 from soundboard.wheelguard import no_wheel
 
 
@@ -225,6 +226,17 @@ def test_every_tab_has_its_own_label(window):
     assert window.tabs.tabText(1) == "" and window.tabs.tabToolTip(1).startswith("Radio")
     window._tab_icons_only(False)
     assert window.tabs.tabText(2) == "Apps"
+
+
+def test_radio_and_apps_light_their_tabs_while_they_send_sound(window):
+    tabs = window.tabs
+    for panel in (window.radio, window.apps):
+        i = tabs.indexOf(panel)
+        assert not is_tab_live(tabs, i)
+        panel.active_changed.emit(True)
+        assert is_tab_live(tabs, i) and tabs.tabToolTip(i).startswith("● ON")
+        panel.active_changed.emit(False)
+        assert not is_tab_live(tabs, i) and not tabs.tabToolTip(i).startswith("●")
 
 
 def test_mute_switch_silences_what_others_hear(window):

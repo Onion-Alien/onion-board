@@ -112,6 +112,26 @@ def narrow(combo: QComboBox, chars: int) -> QComboBox:
     return combo
 
 
+class WideCombo(QComboBox):
+    """A list as wide as its longest entry when there's room ("Screen 2: 1920×1080"
+    isn't cut off) that still gives way when the window is small. A plain
+    AdjustToContents list can never be narrower than its entries, and the tab, so
+    the whole window, then can't shrink below it (the window must fit 300 px)."""
+
+    MIN_WIDTH = 90
+
+    def __init__(self, parent: QWidget | None = None):
+        super().__init__(parent)
+        self.setSizeAdjustPolicy(QComboBox.AdjustToContents)   # sizeHint: the entries
+        pol = self.sizePolicy()
+        pol.setHorizontalPolicy(QSizePolicy.Maximum)   # up to that, down to MIN_WIDTH
+        self.setSizePolicy(pol)
+
+    def minimumSizeHint(self) -> QSize:
+        s = super().minimumSizeHint()
+        return QSize(min(s.width(), self.MIN_WIDTH), s.height())
+
+
 def labelled(text: str, w: QWidget) -> QWidget:
     """`text` and its control kept together on one line of a wrapping row."""
     box = QWidget()
@@ -207,6 +227,7 @@ class Strip(QScrollArea):
     def set_paths(self, paths: list[str]):
         for th in self.thumbs:
             self.row.removeWidget(th)
+            th.setParent(None)   # out of the strip now, not when the event loop gets to it
             th.deleteLater()
         self.thumbs = []
         for i, p in enumerate(paths):
@@ -327,8 +348,7 @@ class TriggerRow(QFrame):
                               "it's added there too)")
         no_wheel(self.sound)
         self.sound.activated.connect(self._on_sound)
-        self.pick = QComboBox()
-        self.pick.setSizeAdjustPolicy(QComboBox.AdjustToContents)
+        self.pick = WideCombo()
         for key, label in PICKS:
             self.pick.addItem(label, key)
         self.pick.setCurrentIndex(max(self.pick.findData(t.pick), 0))
@@ -374,8 +394,7 @@ class TriggerRow(QFrame):
         match = labelled("Match", self.threshold)
         match.layout().addWidget(self.live)
         row.addWidget(match)
-        self.screen = QComboBox()
-        self.screen.setSizeAdjustPolicy(QComboBox.AdjustToContents)
+        self.screen = WideCombo()
         self.screen.setToolTip("Which screen to look for the pictures on. “Same as below” "
                                "is the screen picked at the bottom of the tab.")
         no_wheel(self.screen)
@@ -421,6 +440,10 @@ class TriggerRow(QFrame):
         self.pick.setVisible(len(self.t.sounds) > 1)
         self._layout_sounds()
         for chip in old:
+            # off the card now: a chip waiting for the event loop to delete it is still
+            # a child of the card, and one never laid out paints its frame at Qt's
+            # default size over the card (the README screenshots showed exactly that)
+            chip.setParent(None)
             chip.deleteLater()
         self._update_state()
 
@@ -700,10 +723,10 @@ class TriggersTab(QWidget):
         every = labelled("Check every", self.cb_interval)
         self.lbl_interval = every.layout().itemAt(0).widget()
         h.addWidget(every)
-        self.cb_monitor = QComboBox()
         # Wide enough for "Screen 2: 2560×1440  (main)": it grows with its entries
-        # (and re-adjusts when _fill_monitors refills them), else the size is cut off.
-        self.cb_monitor.setSizeAdjustPolicy(QComboBox.AdjustToContents)
+        # (and re-adjusts when _fill_monitors refills them), else the size is cut off;
+        # narrower again when the window is.
+        self.cb_monitor = WideCombo()
         self.cb_monitor.setToolTip("Which screen to watch (the one the game is on). A trigger "
                                    "that picks its own screen on its card is looked for "
                                    "there instead.")
@@ -1185,6 +1208,7 @@ class TriggersTab(QWidget):
         self._bag.forget(t.id)
         self._order.pop(t.id, None)
         self.list_layout.removeWidget(row)
+        row.setParent(None)   # gone from the list now, not when the event loop gets to it
         row.deleteLater()
         for path in t.images:
             delete_picture(path)

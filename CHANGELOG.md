@@ -18,6 +18,10 @@
   to 100 pictures to one trigger (any of them fires it) and give it a list of
   sounds, played one at random (each once before any repeats), in order, or all
   at once.
+- **The Radio and Apps tabs light up while they're sending sound**, like Triggers
+  and Voice already did, and a live tab's name is tinted too, not just the dot.
+- **The window shrinks to small sizes again** (the new Triggers screen pickers
+  stopped it).
 
 ## 1.3.0 — 2026-09-28
 

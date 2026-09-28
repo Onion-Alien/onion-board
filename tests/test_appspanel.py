@@ -94,6 +94,24 @@ def test_unremembered_program_that_closes_is_dropped(tab):
     assert tab.rows == {} and tab.empty.isVisibleTo(tab)
 
 
+def test_tab_reports_programs_being_sent_for_the_live_dot(tab):
+    seen = []
+    tab.active_changed.connect(seen.append)
+    tab._on_apps([music(), App(200, "game.exe")])
+    assert not tab.is_active() and seen == []
+    tab.rows["music.exe"].btn_send.setChecked(True)
+    assert seen == [True] and tab.is_active() and tab.live_tip() == "● ON: sending Music"
+    tab.rows["game.exe"].btn_send.setChecked(True)    # said again: the tip names both
+    assert seen == [True, True] and "Music" in tab.live_tip() and "Game" in tab.live_tip()
+    tab.rows["game.exe"].btn_send.setChecked(False)
+    assert seen == [True, True, True] and tab.is_active()
+    tab.stop_all()
+    assert seen == [True, True, True, False] and not tab.is_active()
+    tab.rows["music.exe"].btn_send.setChecked(True)
+    tab._on_apps([])                                   # the program closed while sent
+    assert seen[-2:] == [True, False] and not tab.is_active()
+
+
 def test_remembered_program_is_picked_up_again_when_it_restarts(tab):
     tab._on_apps([music(pid=100)])
     tab.rows["music.exe"].btn_send.setChecked(True)

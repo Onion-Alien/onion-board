@@ -255,6 +255,7 @@ class _StationDelegate(QStyledItemDelegate):
 
 class RadioTab(QWidget):
     clip_ready = Signal(object, str)   # audio, suggested name (like BrowserTab's)
+    active_changed = Signal(bool)      # a station started / stopped (for the tab's live dot)
 
     def __init__(self, engine, cfg, save_cb, meter_cls, directory: RadioDirectory | None = None,
                  globe: bool = True):
@@ -286,6 +287,7 @@ class RadioTab(QWidget):
         self._search_failed = False  # the last directory search didn't get through
         self._globe_error = ""       # the station list couldn't be fetched (and none cached)
         self._title = ""           # what the station says is playing
+        self._active = False       # is_active() as last reported
         self._flash_until = 0.0
         self._fed_by: Station | None = None   # the station the clip buffers hold
         self.favorites: list[Station] = [s for s in map(Station.from_saved,
@@ -880,6 +882,22 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
         self._select_on_globe(fly=True)
         self._show_list()
         self._refresh_info()
+        self._report_active()
+
+    def is_active(self) -> bool:
+        """A station is playing (to you, or to everyone with LIVE on)."""
+        return self.player.station is not None
+
+    def live_tip(self) -> str:
+        """The "● ON" line for the Radio tab's tooltip while a station plays."""
+        return ("● ON: a station is playing — others hear it" if self.engine.radio_live
+                else "● ON: a station is playing (only you hear it)")
+
+    def _report_active(self):
+        on = self.is_active()
+        if on != self._active:
+            self._active = on
+            self.active_changed.emit(on)
 
     def _play_or_stop(self, uuid: str):
         on = self.player.station
@@ -893,6 +911,7 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
             self.player.stop()
             self._select_on_globe(fly=False)
             self._show_list()
+        self._report_active()
 
     def _toggle_play(self):
         if self.player.station is not None:
@@ -911,6 +930,7 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
         self._flash_until = 0.0    # what's playing matters more than an older notice
         self._refresh_info()
         self._update_buttons()
+        self._report_active()      # the player gave the station up by itself
 
     def _on_error(self, msg: str):
         self._show_list()
@@ -996,6 +1016,8 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
         self.btn_live.blockSignals(False)
         self._label_live()
         self._refresh_info()
+        if self._active:
+            self.active_changed.emit(True)   # again: the tab's tip says who hears it
 
     def _label_live(self):
         on = self.btn_live.isChecked()

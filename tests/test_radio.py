@@ -410,6 +410,25 @@ def test_tab_plays_into_the_engine_and_clips_to_sounds(qapp, tab, server):
     assert tab.player.station is None and tab.btn_play.text() == "Play"
 
 
+def test_tab_reports_a_playing_station_for_the_live_dot(tab, server):
+    s = tab._stations["uuid-0"]
+    s.url = server.base + "/stream.wav"
+    seen = []
+    tab.active_changed.connect(seen.append)
+    assert not tab.is_active()
+    tab.play(s)
+    assert seen == [True] and tab.is_active() and "only you" in tab.live_tip()
+    tab.btn_live.click()                          # said again: the tip changes
+    assert seen == [True, True] and "others hear" in tab.live_tip()
+    tab.stop()
+    assert seen == [True, True, False] and not tab.is_active()
+    tab.stop()                                    # already stopped: nothing new
+    assert seen == [True, True, False]
+    tab.play(s)
+    tab.player._retry("the station didn't answer")   # the player gives the station up
+    assert seen[-2:] == [True, False] and not tab.is_active()
+
+
 def test_tab_favorites_are_saved(tab):
     tab.list.setCurrentRow(1)
     tab._toggle_fav()

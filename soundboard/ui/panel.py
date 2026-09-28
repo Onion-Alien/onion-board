@@ -99,6 +99,8 @@ class Flow(QLayout):
             if it.isEmpty():
                 continue
             hint = it.sizeHint()
+            if hint.width() > rect.width() > 0:   # wider than the whole row: as narrow
+                hint.setWidth(max(rect.width(), it.minimumSize().width()))   # as it goes
             if line and x + hint.width() > rect.right() + 1:
                 x, y, line = rect.x(), y + line + self._gap, 0
             if move:

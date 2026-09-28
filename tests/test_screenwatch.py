@@ -506,6 +506,11 @@ def tab(qapp, app_dir, fake_screen):
     t.board, t.played, t.saved = board, played, saved
     yield t
     t.shutdown()
+    # cards and thumbnails a test removed were deleteLater()'d: deliver those deletes
+    # while their parents are still alive, or a later test's event loop delivers them
+    # to objects Python has already freed and the process aborts
+    from PySide6.QtCore import QEvent
+    qapp.sendPostedEvents(None, QEvent.DeferredDelete)
 
 
 def test_pasted_picture_becomes_a_trigger_that_plays_its_sound(tab, qapp):
@@ -768,6 +773,32 @@ def test_the_screen_list_is_wide_enough_for_its_longest_entry(qapp, app_dir, fak
         assert cb.sizeHint().width() >= cb.fontMetrics().horizontalAdvance("Screen 3: 3840×2160")
     finally:
         tab.shutdown()
+
+
+def test_the_tab_still_fits_a_small_window_with_two_screens(qapp, app_dir, two_screens):
+    """The screen lists want to be as wide as their longest entry, but must give way
+    when the window is small: the tab's minimum width (the window's, on the
+    Triggers tab) stays under 300 px with two screens and a card full of pictures
+    and sounds — while the lists still ask for their full width when there's room."""
+    board = [("s1", "A sound with a long name", "fp1"), ("s2", "Win", "fp2"),
+             ("s3", "Airhorn", "fp3")]
+    tab = TriggersTab(Config(), lambda: None, lambda: list(board), lambda _s: None)
+    try:
+        t = tab._new([as_qimage(banner()), as_qimage(badge()), as_qimage(stripes())], "Died")
+        row = tab.rows[t.id]
+        for sid in ("s1", "s2", "s3"):
+            row._on_sound(row.sound.findData(sid))
+        assert tab.cb_monitor.count() == 2 and row.screen.count() == 3
+        assert len(row.chips) == 3 and row.pick.isVisibleTo(row)
+        assert tab.minimumSizeHint().width() < 300
+        for cb in (tab.cb_monitor, row.screen, row.pick):
+            longest = max((cb.itemText(i) for i in range(cb.count())), key=len)
+            assert cb.sizeHint().width() >= cb.fontMetrics().horizontalAdvance(longest)
+            assert cb.minimumSizeHint().width() <= triggerspanel.WideCombo.MIN_WIDTH
+    finally:
+        tab.shutdown()
+        from PySide6.QtCore import QEvent
+        qapp.sendPostedEvents(None, QEvent.DeferredDelete)   # the chips set_sounds replaced
 
 
 # --------------------------------------------------------------------------- several screens

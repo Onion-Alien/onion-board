@@ -302,8 +302,9 @@ class MainWindow(QMainWindow):
         self.tabs.setCurrentIndex(self.cfg.tab if 0 <= self.cfg.tab < self.tabs.count() else 0)
         self.tabs.currentChanged.connect(lambda i: self.set_option("tab", i))
         self.tabs.currentChanged.connect(lambda _i: self._update_status())
-        # a glowing dot on the Voice tab while it's changing your voice, so it's never
-        # left on without you noticing
+        # a glowing dot (and a green name) on a tab while its feature is live — the
+        # voice changer, a radio station, a program being sent, the screen watched —
+        # so it's never left on without you noticing
         vi = self.tabs.indexOf(self.voice)
         self.voice.active_changed.connect(lambda on: set_tab_live(
             self.tabs, vi, on, "● ON: others hear your changed / computer voice", "voice"))
@@ -312,6 +313,14 @@ class MainWindow(QMainWindow):
         self.triggers.active_changed.connect(lambda on: set_tab_live(
             self.tabs, ti, on, "● ON: watching your screen", "triggers"))
         set_tab_live(self.tabs, ti, self.triggers.is_active(), icon="triggers")
+        ri = self.tabs.indexOf(self.radio)
+        self.radio.active_changed.connect(lambda on: set_tab_live(
+            self.tabs, ri, on, self.radio.live_tip(), "radio"))
+        set_tab_live(self.tabs, ri, self.radio.is_active(), icon="radio")
+        ai = self.tabs.indexOf(self.apps)
+        self.apps.active_changed.connect(lambda on: set_tab_live(
+            self.tabs, ai, on, self.apps.live_tip(), "apps"))
+        set_tab_live(self.tabs, ai, self.apps.is_active(), icon="apps")
 
         # ---- mixer strip: the things that apply whatever tab you're on
         rv.addWidget(self._build_mixer())

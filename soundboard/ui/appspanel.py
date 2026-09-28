@@ -224,6 +224,7 @@ class AppRow(QFrame):
 class AppsTab(QWidget):
     """Lists the programs that have sound and captures the ones you switch on."""
     clip_ready = Signal(object, str)   # audio, suggested name (like RadioTab's)
+    active_changed = Signal(bool)      # some program is / no program is sent (the tab's live dot)
 
     def __init__(self, engine, cfg, save_cb, meter_cls):
         super().__init__()
@@ -231,6 +232,7 @@ class AppsTab(QWidget):
         if not isinstance(cfg.apps, dict):
             cfg.apps = {}
         self.rows: dict[str, AppRow] = {}     # exe (lower) -> row
+        self._sending: tuple[str, ...] = ()   # the programs being sent, as last reported
         v = QVBoxLayout(self)
         v.setContentsMargins(0, 8, 0, 0)
         v.setSpacing(8)
@@ -317,9 +319,27 @@ class AppsTab(QWidget):
             if row.sending:
                 row.set_sending(False)
                 self._stop_send(row)
+        self._report_active()
 
     def on_air(self) -> bool:
         return self.engine.aux_on_air()
+
+    def is_active(self) -> bool:
+        """Some program's sound is being sent."""
+        return any(row.sending for row in self.rows.values())
+
+    def live_tip(self) -> str:
+        """The "● ON" line for the Apps tab's tooltip while a program is sent."""
+        names = [row.name.text() for row in self.rows.values() if row.sending]
+        return "● ON: sending " + (", ".join(names) if names else "a program's sound")
+
+    def _report_active(self):
+        """Tell the tab's live dot when the set of programs being sent changes
+        (on / off, and which: its tip names them)."""
+        now = tuple(sorted(exe for exe, row in self.rows.items() if row.sending))
+        if now != self._sending:
+            self._sending = now
+            self.active_changed.emit(bool(now))
 
     # ------------------------------------------------------------------ rows
     def _row(self, exe: str, vol: float = 1.0, hear: bool = False) -> AppRow:
@@ -342,6 +362,7 @@ class AppsTab(QWidget):
         self.list_layout.removeWidget(row)
         row.deleteLater()
         self.empty.setVisible(not self.rows)
+        self._report_active()
 
     def _on_apps(self, apps: list):
         by_exe: dict[str, appaudio.App] = {}
@@ -388,6 +409,7 @@ class AppsTab(QWidget):
             elif row.status_text and row.status_error:
                 row.set_status("")
         self.empty.setVisible(not self.rows)
+        self._report_active()
 
     def _meters(self):
         if not self.isVisible() and not any(r.rec for r in self.rows.values()):
@@ -542,6 +564,7 @@ class AppsTab(QWidget):
             row.btn_forget.setVisible(True)
             if row.app is None:
                 self._drop_row(row)
+        self._report_active()
 
     def _on_vol(self, row: AppRow, v: float):
         if row.src is not None:
@@ -563,6 +586,7 @@ class AppsTab(QWidget):
         else:
             self._stop_send(row)
             row.set_sending(False)
+        self._report_active()
 
     def retheme(self):
         for row in self.rows.values():
