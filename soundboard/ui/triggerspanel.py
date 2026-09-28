@@ -1,8 +1,10 @@
 """The Triggers tab: play a sound when a picture shows up on your screen — a game's
 "YOU DIED", a victory banner, a kill-feed icon. Each trigger is a card: the picture
 to look for (a file, or pasted after Win+Shift+S), the sound from your board, how
-long to wait before playing it, how soon it may play again, and how close a match
-must be, with the live match next to it so the number is easy to set.
+long to wait before playing it, how soon it may play again, how close a match
+must be, with the live match next to it so the number is easy to set, and (with
+more than one screen) which screen to look on — "Same as below" being the one
+picked at the bottom of the tab.
 
 The watching itself (screen capture and matching on a worker thread) is
 soundboard.screenwatch. Triggers are kept in Config.screen and their pictures in
@@ -26,7 +28,7 @@ from PySide6.QtWidgets import (QApplication, QCheckBox, QComboBox, QDoubleSpinBo
 
 from soundboard import library, screenwatch, theme
 from soundboard.library import AUDIO_EXTS
-from soundboard.screenwatch import INTERVALS_MS, Trigger, Watched
+from soundboard.screenwatch import INTERVALS_MS, Monitor, Trigger, Watched
 from soundboard.ui import icons
 from soundboard.ui.panel import Flow, card, hint_label
 from soundboard.wheelguard import no_wheel
@@ -115,11 +117,14 @@ class TriggerRow(QFrame):
     test = Signal(object)
     remove = Signal(object)
 
-    def __init__(self, t: Trigger, sounds: list[tuple[str, str]]):
+    def __init__(self, t: Trigger, sounds: list[tuple[str, str]],
+                 screens: list[Monitor] = ()):
         super().__init__()
         self.setObjectName("card")
         self.t = t
         self.missing = False            # its sound was removed from the board
+        self.fallback = False           # its own screen isn't there: the default is watched
+        self._screens = 0               # how many screens there are
         v = QVBoxLayout(self)
         v.setContentsMargins(12, 8, 12, 10)
         v.setSpacing(6)
@@ -209,12 +214,21 @@ class TriggerRow(QFrame):
         match = labelled("Match", self.threshold)
         match.layout().addWidget(self.live)
         row.addWidget(match)
+        self.screen = QComboBox()
+        self.screen.setSizeAdjustPolicy(QComboBox.AdjustToContents)
+        self.screen.setToolTip("Which screen to look for this picture on. “Same as below” "
+                               "is the screen picked at the bottom of the tab.")
+        no_wheel(self.screen)
+        self.screen.currentIndexChanged.connect(self._on_screen)
+        self.screen_box = labelled("Screen", self.screen)
+        row.addWidget(self.screen_box)
         v.addLayout(row)
         for w in (self.delay, self.cooldown, self.threshold):
             no_wheel(w)
             w.valueChanged.connect(self._on_numbers)
 
         self.set_sounds(sounds)
+        self.set_screens(list(screens))
         self.refresh_picture()
         self._flash = QTimer(self)
         self._flash.setSingleShot(True)
@@ -241,6 +255,24 @@ class TriggerRow(QFrame):
             i = 1
         self.sound.setCurrentIndex(max(i, 0))
         self.sound.blockSignals(False)
+        self._update_state()
+
+    def set_screens(self, mons: list[Monitor]):
+        """Fill the screen list. It's shown when there's more than one screen, or when
+        this trigger picked one that isn't plugged in (so it can be put back)."""
+        cb, t = self.screen, self.t
+        cb.blockSignals(True)
+        cb.clear()
+        cb.addItem("Same as below", None)
+        for i, m in enumerate(mons):
+            cb.addItem(f"Screen {i + 1}: {m.label}", i)
+        self._screens = len(mons)
+        self.fallback = t.monitor is not None and not 0 <= t.monitor < len(mons)
+        if self.fallback:
+            cb.addItem(f"Screen {t.monitor + 1} (not plugged in)", t.monitor)
+        cb.setCurrentIndex(0 if t.monitor is None else max(cb.findData(t.monitor), 0))
+        cb.blockSignals(False)
+        self.screen_box.setVisible(len(mons) > 1 or t.monitor is not None)
         self._update_state()
 
     def refresh_picture(self):
@@ -274,6 +306,10 @@ class TriggerRow(QFrame):
             text, warn = "Pick the sound to play", True
         elif self.missing:
             text, warn = "Its sound was removed from Sounds — pick another", True
+        elif self.fallback:
+            where = "the screen picked below" if self._screens > 1 else "the main screen"
+            text, warn = (f"Screen {t.monitor + 1} isn't plugged in, so it's looked for "
+                          f"on {where}"), True
         else:
             wait = f"{t.delay:g} s after it shows up" if t.delay else "as soon as it shows up"
             text, warn = f"Plays {wait}", False
@@ -312,6 +348,15 @@ class TriggerRow(QFrame):
         self.sound.setCurrentIndex(max(i, 0))
         self.sound.blockSignals(False)
 
+    def _on_screen(self, i: int):
+        m = self.screen.itemData(i)
+        m = m if isinstance(m, int) and not isinstance(m, bool) else None
+        if m != self.t.monitor:
+            self.t.monitor = m
+            self.fallback = m is not None and not 0 <= m < self._screens
+            self._update_state()
+            self.changed.emit(self)
+
     def _on_numbers(self, _v=None):
         t = self.t
         t.delay = round(self.delay.value(), 1)
@@ -341,6 +386,8 @@ class TriggersTab(QWidget):
             if t is not None and len(self.triggers) < MAX_TRIGGERS:
                 self.triggers.append(t)
         self.rows: dict[str, TriggerRow] = {}
+        self._mons: list[Monitor] = []      # the screens as last listed
+        self._fell_back: frozenset[str] = frozenset()   # watcher.fell_back as last seen
         self._gray: dict[str, tuple[str, float, Picture]] = {}   # id -> (path, mtime, picture)
         self._gen = 0                   # bumped to drop sounds still waiting to play
         self.watcher = screenwatch.Watcher(self._fired.emit)
@@ -425,7 +472,9 @@ class TriggersTab(QWidget):
         # Wide enough for "Screen 2: 2560×1440  (main)": it grows with its entries
         # (and re-adjusts when _fill_monitors refills them), else the size is cut off.
         self.cb_monitor.setSizeAdjustPolicy(QComboBox.AdjustToContents)
-        self.cb_monitor.setToolTip("Which screen to watch (the one the game is on)")
+        self.cb_monitor.setToolTip("Which screen to watch (the one the game is on). A trigger "
+                                   "that picks its own screen on its card is looked for "
+                                   "there instead.")
         self.cb_monitor.currentIndexChanged.connect(self._on_monitor)
         no_wheel(self.cb_monitor)
         h.addWidget(self.cb_monitor)
@@ -515,7 +564,8 @@ class TriggersTab(QWidget):
                 continue
             pic = self._picture(t)
             if pic is not None:
-                items.append(Watched(t.id, pic[0], t.threshold, t.cooldown, mask=pic[1]))
+                items.append(Watched(t.id, pic[0], t.threshold, t.cooldown, mask=pic[1],
+                                     monitor=t.monitor))
         self.watcher.set_items(items)
 
     def _picture(self, t: Trigger) -> Picture | None:
@@ -563,6 +613,10 @@ class TriggersTab(QWidget):
             # the thread died (_show_warning says why): stop, but leave the setting on
             self.set_watching(False, remember=False)
             return
+        if w.fell_back != self._fell_back:
+            # a trigger's own screen went away (or came back) while watching
+            self._fell_back = w.fell_back
+            self._fill_monitors()
         if not self.isVisible():
             return
         for tid, row in self.rows.items():
@@ -576,6 +630,10 @@ class TriggersTab(QWidget):
             why = unsupported
         elif w.error:
             why = f"Watching stopped: {w.error}"
+        elif self.is_active() and w.failed:
+            i, err = next(iter(w.failed.items()))
+            why = (f"Screen {i + 1} can't be captured ({err}). Triggers on it wait until "
+                   "it can; the others carry on.")
         elif self.is_active() and w.lost:
             why = ("Waiting for the screen to come back. A game switching to or from "
                    "fullscreen does this for a moment.")
@@ -596,6 +654,8 @@ class TriggersTab(QWidget):
         self._save()
 
     def _fill_monitors(self):
+        """List the screens again: the picker at the bottom (the default) and each
+        card's own list. A change while watching is passed on to the watcher."""
         mons = screenwatch.monitors()
         self.cb_monitor.blockSignals(True)
         self.cb_monitor.clear()
@@ -607,6 +667,11 @@ class TriggersTab(QWidget):
         self.cb_monitor.setCurrentIndex(idx)
         self.cb_monitor.setVisible(len(mons) > 1)
         self.cb_monitor.blockSignals(False)
+        for row in self.rows.values():
+            row.set_screens(mons)
+        if mons != self._mons and self.watcher.running:
+            self.watcher.rescan()
+        self._mons = mons
 
     def _on_monitor(self, i: int):
         self.watcher.set_monitor(i)
@@ -646,7 +711,7 @@ class TriggersTab(QWidget):
             self._store()
 
     def _add_row(self, t: Trigger) -> TriggerRow:
-        row = TriggerRow(t, self._board_sounds())
+        row = TriggerRow(t, self._board_sounds(), self._mons)
         row.changed.connect(lambda _r: self._store())
         row.picture_wanted.connect(self._change_picture)
         row.sound_file_wanted.connect(self._choose_sound_file)
@@ -712,19 +777,19 @@ class TriggersTab(QWidget):
         if row is not None:
             row.refresh_picture()
             row._update_state()
-        notes = self._picture_notes(pic)
+        notes = self._picture_notes(pic, t)
         if notes:
             QMessageBox.warning(self, "This picture may not be found",
                                 "\n\n".join(notes))
         return True
 
-    def _picture_notes(self, pic: Picture) -> list[str]:
-        """What may stop a picture being found on the watched screen (it's kept anyway:
-        it may be meant for another screen)."""
+    def _picture_notes(self, pic: Picture, t: Trigger) -> list[str]:
+        """What may stop a picture being found on the screen it's watched on (it's kept
+        anyway: it may be meant for another screen)."""
         mons = screenwatch.monitors()
         if not mons:
             return []
-        i = self.watcher.monitor
+        i = self.watcher.monitor if t.monitor is None else t.monitor
         mon = mons[i] if 0 <= i < len(mons) else mons[0]
         gray, mask = pic
         h, w = gray.shape

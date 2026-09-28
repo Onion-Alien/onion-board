@@ -233,7 +233,8 @@ class Config:
     overlay: dict = field(default_factory=dict)    # in-game overlay (ui.overlay.OverlaySettings)
     radio: dict = field(default_factory=dict)      # Radio tab: vol, monitor, favorites, last
     apps: dict = field(default_factory=dict)       # Apps tab: exe -> {vol, monitor} to re-capture
-    # Triggers tab: on, interval_ms, monitor, triggers (soundboard.screenwatch.Trigger)
+    # Triggers tab: on, interval_ms, monitor (the screen for triggers that don't pick
+    # their own), triggers (soundboard.screenwatch.Trigger)
     screen: dict = field(default_factory=dict)
     categories: list[str] = field(default_factory=list)   # pad categories, in tab order
     category: str = ""                # the category the Sounds tab shows; "" = all

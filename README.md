@@ -375,7 +375,7 @@ the launcher the shortcuts and PyInstaller use. The app is the `soundboard` pack
 | `soundboard/winkeys.py` | global hotkeys (`RegisterHotKey`) and key presses (`SendInput`), no hooks |
 | `soundboard/appaudio.py` | the Apps tab's capture: lists the programs with an audio session (WASAPI sessions, over ctypes) and taps one program's audio with Windows' per-process loopback (a copy: the program still plays on your speakers), pushed into the engine as its own source |
 | `soundboard/screenwatch.py` | the Triggers tab's back end: copies the screen with Desktop Duplication (DXGI / D3D11 over ctypes, falling back to GDI), sampled down to a few hundred pixels and turned grey, finds each trigger's picture by normalised cross-correlation (FFT; transparent parts masked out), and fires once per appearance (`Gate`) on a worker thread |
-| `soundboard/ui/triggerspanel.py` | the Triggers tab: one card per trigger (picture, sound, wait, cooldown, match %, the live match), the Watching switch, how often to check and which screen |
+| `soundboard/ui/triggerspanel.py` | the Triggers tab: one card per trigger (picture, sound, wait, cooldown, match %, the live match, which screen to look on), the Watching switch, how often to check and the default screen |
 | `soundboard/ui/appspanel.py` | the Apps tab: one row per program (level, **Send**, volume, *Hear it myself*); programs you switch on are remembered by .exe and picked up again when they run |
 | `soundboard/engine.py` | real-time audio: 3 WASAPI streams (mic in, cable out, headphones out), mixing (sounds, radio and captured programs), pause/seek, live speed / pitch, limiter, watchdog |
 | `soundboard/eq.py` | 7-band biquad equalizer and presets |

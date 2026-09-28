@@ -18,6 +18,10 @@ milliseconds per check.
 up, then waits for it to go away before it can fire again (and never sooner than
 the trigger's cooldown), so a death screen that stays up for five seconds plays
 its sound once.
+
+Each trigger can name the screen it's looked for on; the rest use the tab's
+default. `Watcher` keeps one capture per screen in use and grabs each every tick,
+so a picture on the main monitor and one on a second monitor both work at once.
 """
 from __future__ import annotations
 
@@ -47,6 +51,7 @@ INTERVALS_MS = (16, 33, 50, 100, 250, 500)
 DEFAULT_INTERVAL_MS = 100
 RETRY_S = 1.0           # how often a lost capture is tried again
 GIVE_UP_S = 20.0        # ...and how long before the whole capture is set up afresh
+MAX_SCREENS = 64        # a trigger's saved screen index beyond this is nonsense
 
 
 class CaptureLost(OSError):
@@ -69,13 +74,21 @@ class Trigger:
     # a sound file picked here that's still being added to the board: its fingerprint,
     # so the trigger takes the new sound's id once the import finishes
     pending: str = ""
+    # the screen to look for it on (an index into monitors()); None: the screen picked
+    # for the whole tab. One that isn't plugged in falls back to that screen too.
+    monitor: int | None = None
 
     @classmethod
     def from_raw(cls, d: dict) -> Trigger | None:
         if not isinstance(d, dict) or not isinstance(d.get("id"), str) or not d["id"]:
             return None
         t = cls(id=d["id"])
+        m = d.get("monitor")
+        if isinstance(m, int) and not isinstance(m, bool) and 0 <= m < MAX_SCREENS:
+            t.monitor = m
         for k, default in list(vars(t).items()):
+            if k == "monitor":
+                continue
             v = d.get(k, default)
             if isinstance(default, bool):
                 ok = isinstance(v, bool)
@@ -767,11 +780,45 @@ class Watched:
     cooldown: float
     gate: Gate = field(default_factory=Gate)
     mask: np.ndarray | None = None      # the picture's opaque part (None: all of it)
+    monitor: int | None = None          # Trigger.monitor: its own screen, or None
+
+
+def is_black(gray: np.ndarray) -> bool:
+    """A whole frame too dark to be a game: the capture can't see it."""
+    return float(gray.max()) < BLACK_LEVEL
+
+
+class _Capture:
+    """One screen as the watching thread captures it: its grabber, the pictures
+    shrunk to what that grabber sees, and where it is in coming back from a loss."""
+
+    def __init__(self, index: int, mon: Monitor):
+        self.index = index
+        self.mon = mon
+        self.grab = None
+        self.scaled: dict[str, tuple] = {}
+        self.fitted = (0, 0)        # the source size the pictures are scaled for
+        self.scores: dict[str, float] = {}
+        self.reopen_since = 0.0     # > 0: the capture was lost (or never opened); trying again
+        self.next_try = 0.0         # ...not before this time
+        self.opened = False         # it has captured at some point
+        self.failing = False        # grabs keep failing (said once in the log)
+        self.error = ""             # why the last open failed
+        self.black = False
+        self.lost = False
+
+    def close(self):
+        if self.grab is not None:
+            self.grab.close()
+            self.grab = None
 
 
 class Watcher:
     """The watching thread. `on_fire(trigger_id)` is called from that thread when a
-    picture appears; `scores` holds each trigger's latest match for the UI to show."""
+    picture appears; `scores` holds each trigger's latest match for the UI to show.
+
+    Each trigger is looked for on its own screen (`Watched.monitor`), or on `monitor`
+    when it hasn't one: one capture per screen in use, each grabbed every tick."""
 
     def __init__(self, on_fire, grabber=None):
         self._on_fire = on_fire
@@ -782,12 +829,17 @@ class Watcher:
         self._stop = threading.Event()
         self._thread: threading.Thread | None = None
         self.interval = DEFAULT_INTERVAL_MS / 1000
-        self.monitor = 0
+        self.monitor = 0                  # the screen for triggers that don't pick one
         self.scores: dict[str, float] = {}
-        self.black = False                # the capture only sees black
-        self.lost = False                 # the capture dropped out; it's being brought back
+        self.black = False                # a capture only sees black
+        self.lost = False                 # a capture dropped out; it's being brought back
         self.error = ""
         self.check_ms = 0.0               # how long the last check took
+        # triggers whose own screen isn't there (watched on `monitor` instead), and
+        # screens that couldn't be captured for GIVE_UP_S: index -> why (their triggers
+        # wait until they can). Both replaced whole by the thread, like `scores`.
+        self.fell_back: frozenset[str] = frozenset()
+        self.failed: dict[int, str] = {}
 
     # set from the UI thread
     def set_items(self, items: list[Watched]):
@@ -804,6 +856,11 @@ class Watcher:
     def set_monitor(self, index: int):
         with self._lock:
             self.monitor = index
+            self._changed = True
+
+    def rescan(self):
+        """The screens changed (one plugged in or out): list them again."""
+        with self._lock:
             self._changed = True
 
     @property
@@ -831,81 +888,66 @@ class Watcher:
         if t is not None and not t.is_alive():
             self._thread = None
         self.scores = {}
+        self.fell_back, self.failed = frozenset(), {}
         self.black = self.lost = False
 
     # the thread
     def _run(self, stop: threading.Event | None = None):
         stop = stop or self._stop
-        grab: Grabber | None = None
-        scaled: dict[str, tuple] = {}
-        fitted = (0, 0)             # the source size the pictures are scaled for
-        mon: Monitor | None = None
-        reopen_since = 0.0          # > 0: the capture was lost; opening afresh
-        failing = False             # grabs keep failing (said once in the log)
+        caps: dict[int, _Capture] = {}           # by screen index: only screens in use
+        groups: dict[int, list[Watched]] = {}    # screen index -> the triggers on it
         try:
             while not stop.is_set():
                 t0 = time.perf_counter()
                 with self._lock:
                     items = list(self._items.values())
                     changed, self._changed = self._changed, False
-                    mon_index = self.monitor
-                if changed or grab is None:
-                    if grab is not None:
-                        grab.close()
-                        grab = None
+                    default = self.monitor
+                if changed or (items and not caps) or any(c.grab is None for c in caps.values()):
                     mons = monitors()
                     if not mons:
                         # right after a loss the screen may be gone for a moment
                         # (a cable, a dock, a mode switch): wait for it like a reopen
-                        if not reopen_since or time.monotonic() - reopen_since > GIVE_UP_S:
+                        now = time.monotonic()
+                        if not any(c.reopen_since and now - c.reopen_since <= GIVE_UP_S
+                                   for c in caps.values()):
                             raise OSError("no monitor found")
                         stop.wait(RETRY_S)
                         continue
-                    mon = mons[mon_index] if 0 <= mon_index < len(mons) else mons[0]
-                    scale = work_scale(mon.width, [min(i.gray.shape) for i in items])
-                    w, h = max(1, round(mon.width * scale)), max(1, round(mon.height * scale))
-                    try:
-                        opener = self._grabber or open_grabber
-                        if reopen_since and opener is open_grabber:
-                            grab = opener(mon, w, h, tries=3)
-                        else:
-                            grab = opener(mon, w, h)
-                    except OSError:
-                        # a fresh start after a loss may take a few goes (the mode is
-                        # still switching); a first start that fails is an error
-                        if not reopen_since or time.monotonic() - reopen_since > GIVE_UP_S:
-                            raise
-                        stop.wait(RETRY_S)
-                        continue
-                    reopen_since = 0.0
-                    self.lost = False
-                    fitted, scaled = self._fit(grab, mon, items)
-                if items:
-                    try:
-                        gray = grab.grab()
-                    except OSError as e:
-                        # CaptureLost, or any other failure of a capture that did work (a
-                        # graphics driver reset): open it afresh rather than stop watching
-                        if not failing:
-                            log.info("screen capture lost (%s): starting it afresh", e)
-                        failing = True
-                        grab.close()
-                        grab = None
-                        reopen_since = time.monotonic()
-                        self.lost = True
-                        stop.wait(RETRY_S)
-                        continue
-                    failing = False
-                    self.lost = bool(getattr(grab, "lost", False))
-                    if getattr(grab, "source", fitted) != fitted:
-                        # the frames changed size (a game switched display mode):
-                        # scale the pictures for what the capture really sees
-                        fitted, scaled = self._fit(grab, mon, items)
-                        gray = None
-                    if gray is not None:
-                        scores = self._check(gray, items, scaled)
-                        if not stop.is_set():       # stop() has cleared them already
-                            self.scores = scores
+                    groups, fell_back = self._assign(items, default, len(mons))
+                    self.fell_back = frozenset(fell_back)
+                    for i in list(caps):        # screens no trigger needs, or that changed
+                        if i not in groups or caps[i].mon != mons[i]:
+                            caps.pop(i).close()
+                    for i, group in groups.items():
+                        cap = caps.get(i)
+                        if cap is None:
+                            caps[i] = _Capture(i, mons[i])
+                        elif cap.grab is not None and changed:
+                            cap.fitted, cap.scaled = self._fit(cap.grab, cap.mon, group)
+                now = time.monotonic()
+                for cap in caps.values():
+                    if cap.grab is None and now >= cap.next_try:
+                        self._open(cap, groups[cap.index])
+                live = [c for c in caps.values() if c.grab is not None]
+                if caps and not live:
+                    # nothing can be captured. A first start that fails is an error; a
+                    # loss is given GIVE_UP_S of tries (the mode may still be switching)
+                    if all(c.error and (not c.opened or now - c.reopen_since > GIVE_UP_S)
+                           for c in caps.values()):
+                        raise OSError(next(c.error for c in caps.values() if c.error))
+                    stop.wait(RETRY_S)
+                    continue
+                self.failed = {c.index: c.error for c in caps.values()
+                               if c.grab is None and c.error and now - c.reopen_since > GIVE_UP_S}
+                for cap in live:
+                    self._tick(cap, groups.get(cap.index, []))
+                self.lost = any(c.lost for c in caps.values())
+                self.black = any(c.black for c in live)
+                ids = {it.id for it in items}
+                scores = {k: v for c in caps.values() for k, v in c.scores.items() if k in ids}
+                if not stop.is_set():           # stop() has cleared them already
+                    self.scores = scores
                 self.check_ms = (time.perf_counter() - t0) * 1000
                 stop.wait(max(0.001, self.interval - (time.perf_counter() - t0)))
         except Exception as e:  # noqa: BLE001 - say so in the tab instead of dying quietly
@@ -913,8 +955,82 @@ class Watcher:
             if not stop.is_set():
                 self.error = str(e) or type(e).__name__
         finally:
-            if grab is not None:
-                grab.close()
+            for cap in caps.values():
+                cap.close()
+
+    @staticmethod
+    def _assign(items: list[Watched], default: int,
+                n: int) -> tuple[dict[int, list[Watched]], set[str]]:
+        """Which screen each trigger is watched on: its own, or `default` when it
+        hasn't one or its own isn't among the `n` there are. Returns ({screen index:
+        its triggers}, the ids that fell back to the default)."""
+        default = default if 0 <= default < n else 0
+        groups: dict[int, list[Watched]] = {}
+        fell_back: set[str] = set()
+        for it in items:
+            i = it.monitor
+            if i is None:
+                i = default
+            elif not 0 <= i < n:
+                fell_back.add(it.id)
+                i = default
+            groups.setdefault(i, []).append(it)
+        return groups, fell_back
+
+    def _open(self, cap: _Capture, items: list[Watched]) -> bool:
+        """Open the screen's capture (a fresh start after a loss gives duplication a
+        few goes). A failure is kept on the capture and tried again later: RETRY_S
+        apart at first, every GIVE_UP_S once it's clearly not coming back."""
+        mon = cap.mon
+        scale = work_scale(mon.width, [min(i.gray.shape) for i in items])
+        w, h = max(1, round(mon.width * scale)), max(1, round(mon.height * scale))
+        now = time.monotonic()
+        try:
+            opener = self._grabber or open_grabber
+            if cap.reopen_since and opener is open_grabber:
+                cap.grab = opener(mon, w, h, tries=3)
+            else:
+                cap.grab = opener(mon, w, h)
+        except OSError as e:
+            cap.error = str(e) or type(e).__name__
+            if not cap.reopen_since:
+                cap.reopen_since = now
+            slow = now - cap.reopen_since > GIVE_UP_S
+            if slow and cap.index not in self.failed:
+                log.info("screen %d can't be captured (%s): its triggers wait until it can",
+                         cap.index + 1, cap.error)
+            cap.next_try = now + (GIVE_UP_S if slow else RETRY_S)
+            return False
+        cap.reopen_since, cap.error = 0.0, ""
+        cap.opened, cap.lost = True, False
+        cap.fitted, cap.scaled = self._fit(cap.grab, mon, items)
+        return True
+
+    def _tick(self, cap: _Capture, items: list[Watched]):
+        """Grab the screen once and match its triggers against it."""
+        try:
+            gray = cap.grab.grab()
+        except OSError as e:
+            # CaptureLost, or any other failure of a capture that did work (a
+            # graphics driver reset): open it afresh rather than stop watching
+            if not cap.failing:
+                log.info("screen capture lost (%s): starting it afresh", e)
+            cap.failing = True
+            cap.close()
+            cap.reopen_since = time.monotonic()
+            cap.next_try = cap.reopen_since + RETRY_S
+            cap.lost = True
+            return
+        cap.failing = False
+        cap.lost = bool(getattr(cap.grab, "lost", False))
+        if getattr(cap.grab, "source", cap.fitted) != cap.fitted:
+            # the frames changed size (a game switched display mode):
+            # scale the pictures for what the capture really sees
+            cap.fitted, cap.scaled = self._fit(cap.grab, cap.mon, items)
+            return
+        if gray is not None:
+            cap.black = is_black(gray)
+            cap.scores = self._check(gray, items, cap.scaled)
 
     @staticmethod
     def _fit(grab, mon: Monitor, items: list[Watched]) -> tuple[tuple[int, int], dict]:
@@ -935,8 +1051,7 @@ class Watcher:
                scaled: dict[str, tuple]) -> dict[str, float]:
         """Match every picture against one frame; returns the scores (a new dict: the
         UI thread reads `scores` while this runs, so it's only ever swapped whole)."""
-        self.black = float(gray.max()) < BLACK_LEVEL
-        frame = None if self.black else Frame(gray)
+        frame = None if is_black(gray) else Frame(gray)
         now = time.monotonic()
         scores = {}
         for it in items:

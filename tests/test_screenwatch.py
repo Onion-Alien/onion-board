@@ -3,6 +3,7 @@ brightness and after shrinking, the gate fires once per appearance (and respects
 the cooldown), the watcher thread runs on a fake capture (the real screen is never
 read), and the Triggers tab turns a match into a sound after the chosen wait."""
 import time
+from dataclasses import asdict
 
 import numpy as np
 import pytest
@@ -754,5 +755,199 @@ def test_the_screen_list_is_wide_enough_for_its_longest_entry(qapp, app_dir, fak
         tab.set_watching(False)
         assert cb.count() == 3
         assert cb.sizeHint().width() >= cb.fontMetrics().horizontalAdvance("Screen 3: 3840×2160")
+    finally:
+        tab.shutdown()
+
+
+# --------------------------------------------------------------------------- several screens
+
+SCREENS = [Monitor(0, 0, W, H, True), Monitor(W, 0, W, H)]
+
+
+def badge() -> np.ndarray:
+    """A second picture the banner never matches (its negative: correlation -1)."""
+    return 1 - banner()
+
+
+def showing(screen: np.ndarray, pic: np.ndarray, x=110, y=70) -> np.ndarray:
+    s = screen.copy()
+    s[y:y + pic.shape[0], x:x + pic.shape[1]] = pic
+    return s
+
+
+class ScreenGrabber(FakeGrabber):
+    """One capture per screen: each grab hands out what `shown` says that screen
+    (by index) is showing right now."""
+    shown: dict = {}
+
+    def __init__(self, mon, w, h):
+        super().__init__(mon, w, h)
+        self.mon = mon
+
+    def grab(self):
+        return ScreenGrabber.shown.get(self.mon.left // W)
+
+
+@pytest.fixture
+def two_screens(monkeypatch):
+    monkeypatch.setattr(sw, "monitors", lambda: list(SCREENS))
+    monkeypatch.setattr(sw, "Grabber", ScreenGrabber)
+    monkeypatch.setattr(sw, "open_grabber", ScreenGrabber)   # never the real screens
+    monkeypatch.setattr(sw, "WORK_WIDTH", W)
+    FakeGrabber.made, ScreenGrabber.shown = [], {}
+    return ScreenGrabber
+
+
+def test_each_trigger_is_looked_for_on_its_own_screen(two_screens):
+    """Two triggers, one per screen: each fires only when ITS screen shows its
+    picture, and each screen is captured once, not once per trigger."""
+    fired = []
+    w = sw.Watcher(fired.append)
+    w.interval = 0.001
+    w.set_items([sw.Watched("a", banner(), 0.8, 0.0, monitor=0),
+                 sw.Watched("b", badge(), 0.8, 0.0, monitor=1)])
+    # each picture on the other one's screen: nothing fires
+    two_screens.shown = {0: showing(scene(), badge()), 1: showing(scene(1), banner())}
+    w.start()
+    try:
+        assert run_until(lambda: {"a", "b"} <= w.scores.keys())
+        time.sleep(0.05)
+        assert fired == [] and max(w.scores.values()) < 0.6
+        # ...and on their own: both fire
+        two_screens.shown = {0: showing(scene(), banner()), 1: showing(scene(1), badge())}
+        assert run_until(lambda: len(fired) == 2)
+    finally:
+        w.stop()
+    assert sorted(fired) == ["a", "b"]
+    assert sorted(g.mon.left for g in two_screens.made) == [0, W]
+    assert all(g.closed for g in two_screens.made)
+
+
+def test_a_trigger_without_a_screen_follows_the_picker(two_screens):
+    """No screen of its own: the one picked at the bottom, live as it changes. A
+    screen two triggers share is opened once, and only screens in use at all."""
+    two_screens.shown = {0: scene(), 1: showing(scene(1), banner())}
+    fired = []
+    w = sw.Watcher(fired.append)
+    w.interval = 0.001
+    w.monitor = 1
+    w.set_items([sw.Watched("t", banner(), 0.8, 0.0),
+                 sw.Watched("u", badge(), 0.8, 0.0, monitor=1)])
+    w.start()
+    try:
+        assert run_until(lambda: fired == ["t"])
+        assert [g.mon.left for g in two_screens.made] == [W]
+        w.set_monitor(0)                     # the picker moves: the banner isn't there
+        assert run_until(lambda: [g.mon.left for g in two_screens.made] == [W, 0])
+        assert run_until(lambda: w.scores.get("t", 1.0) < 0.6)
+        assert fired == ["t"] and not two_screens.made[0].closed   # "u" still needs it
+    finally:
+        w.stop()
+
+
+def test_a_trigger_screen_is_remembered_and_checked_when_loaded():
+    assert Trigger.from_raw({"id": "a", "monitor": 1}).monitor == 1
+    for bad in (None, "1", True, -1, 1.5, sw.MAX_SCREENS):
+        assert Trigger.from_raw({"id": "a", "monitor": bad}).monitor is None
+    assert Trigger.from_raw({"id": "a"}).monitor is None          # an older config
+    raw = asdict(Trigger(id="a", monitor=1))
+    assert raw["monitor"] == 1 and Trigger.from_raw(raw).monitor == 1
+
+
+def test_a_screen_that_is_not_there_falls_back_to_the_picker(fake_screen):
+    fake_screen.frames = [with_banner(scene())]
+    fired = []
+    w = sw.Watcher(fired.append)
+    w.interval = 0.001
+    w.set_items([sw.Watched("t", banner(), 0.8, 0.0, monitor=3)])
+    w.start()
+    try:
+        assert run_until(lambda: fired)
+        assert w.fell_back == {"t"} and len(fake_screen.made) == 1
+    finally:
+        w.stop()
+    assert w.fell_back == frozenset()
+
+
+def test_a_screen_that_cannot_be_captured_does_not_stop_the_other(two_screens, monkeypatch):
+    monkeypatch.setattr(sw, "RETRY_S", 0.02)
+    monkeypatch.setattr(sw, "GIVE_UP_S", 0.1)
+    tried = []
+
+    def opener(mon, w, h, tries=1):
+        if mon.left:
+            tried.append(time.monotonic())
+            raise OSError("no second screen")
+        return two_screens(mon, w, h)
+
+    two_screens.shown = {0: showing(scene(), banner())}
+    fired = []
+    w = sw.Watcher(fired.append, grabber=opener)
+    w.interval = 0.001
+    w.set_items([sw.Watched("a", banner(), 0.8, 0.0, monitor=0),
+                 sw.Watched("b", badge(), 0.8, 0.0, monitor=1)])
+    w.start()
+    try:
+        assert run_until(lambda: fired == ["a"])
+        assert run_until(lambda: w.failed == {1: "no second screen"})
+        assert w.running and not w.error and "b" not in w.scores
+    finally:
+        w.stop()
+    assert len(tried) >= 2 and w.failed == {}
+
+
+def test_each_card_has_a_screen_list_that_the_watcher_follows(qapp, app_dir, two_screens):
+    cfg = Config()
+    played = []
+    tab = TriggersTab(cfg, lambda: None, lambda: [("s1", "Died", "fp1")], played.append)
+    try:
+        t = tab._new(as_qimage(banner()), "Died")
+        row = tab.rows[t.id]
+        row.sound.setCurrentIndex(row.sound.findData("s1"))
+        row._on_sound(row.sound.currentIndex())
+        assert [row.screen.itemText(i) for i in range(row.screen.count())] == [
+            "Same as below", "Screen 1: 320×180  (main)", "Screen 2: 320×180"]
+        assert row.screen_box.isVisibleTo(row) and row.screen.currentIndex() == 0
+        two_screens.shown = {0: scene(), 1: showing(scene(1), banner())}
+        tab.watcher.interval = 0.001
+        tab.set_watching(True)
+        assert process_events(qapp, lambda: t.id in tab.watcher.scores)
+        assert played == []                                # watched on screen 1: not there
+        row.screen.setCurrentIndex(2)
+        assert t.monitor == 1 and cfg.screen["triggers"][0]["monitor"] == 1
+        assert tab.watcher._items[t.id].monitor == 1
+        assert process_events(qapp, lambda: played == ["s1"])
+        tab.set_watching(False)
+        again = TriggersTab(cfg, lambda: None, lambda: [], lambda _s: None)
+        try:
+            assert again.triggers[0].monitor == 1
+            assert again.rows[t.id].screen.currentText() == "Screen 2: 320×180"
+        finally:
+            again.shutdown()
+    finally:
+        tab.shutdown()
+
+
+def test_a_card_says_when_its_screen_is_unplugged(qapp, app_dir, fake_screen, monkeypatch):
+    mons = list(SCREENS)
+    monkeypatch.setattr(sw, "monitors", lambda: list(mons))
+    tab = TriggersTab(Config(), lambda: None, lambda: [("s1", "Died", "fp1")], lambda _s: None)
+    try:
+        t = tab._new(as_qimage(banner()), "Died")
+        row = tab.rows[t.id]
+        row.sound.setCurrentIndex(row.sound.findData("s1"))
+        row._on_sound(row.sound.currentIndex())
+        row.screen.setCurrentIndex(2)
+        assert row.state.text().startswith("Plays")
+        mons.pop()
+        tab._fill_monitors()                              # showEvent / Start watching
+        assert "Screen 2 isn't plugged in" in row.state.text()
+        assert "main screen" in row.state.text()
+        assert row.screen_box.isVisibleTo(row)
+        assert row.screen.currentText() == "Screen 2 (not plugged in)" and t.monitor == 1
+        row.screen.setCurrentIndex(0)                     # put back on the default
+        assert t.monitor is None and row.state.text().startswith("Plays")
+        tab._fill_monitors()
+        assert not row.screen_box.isVisibleTo(row)        # one screen: nothing to pick
     finally:
         tab.shutdown()

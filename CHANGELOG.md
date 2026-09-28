@@ -9,6 +9,10 @@
   the app 16-bit frames; it read them as 8-bit and saw only black, so nothing
   ever matched.
 - **Triggers: the screen picker no longer cuts off the screen's size.**
+- **Triggers can watch several screens at once.** Each trigger can pick its own
+  screen on its card, so a picture on your second monitor and one on your main
+  monitor both work at the same time. The picker at the bottom stays the screen
+  for triggers that don't pick one.
 
 ## 1.3.0 — 2026-09-28
 
