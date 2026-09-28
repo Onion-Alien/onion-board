@@ -58,6 +58,34 @@ def key_label(key: str) -> str:
     return {"subtract": "−", "add": "+", "multiply": "*", "esc": "Esc"}.get(k, k.upper())
 
 
+def pick_screen(screens, device_name: str, native_rect):
+    """The QScreen for the monitor Windows describes as `device_name` (GDI, like
+    '\\\\.\\DISPLAY2') at `native_rect` (left, top, width, height in physical pixels),
+    or None.
+
+    Qt 5 named screens by device, so the name matches. Qt 6 uses the monitor's
+    friendly name, so the screen is found by its native geometry instead: Qt keeps
+    each screen's native top-left as its logical position and scales only the size
+    by devicePixelRatio. An exact position + size match wins; failing that, a size
+    nobody else has is enough."""
+    if device_name:
+        for sc in screens:
+            if sc.name() == device_name:
+                return sc
+    if not native_rect:
+        return None
+    x, y, w, h = native_rect
+    same_size = []
+    for sc in screens:
+        g, k = sc.geometry(), sc.devicePixelRatio()
+        if (round(g.width() * k), round(g.height() * k)) != (w, h):
+            continue
+        if (g.left(), g.top()) == (x, y):
+            return sc
+        same_size.append(sc)
+    return same_size[0] if len(same_size) == 1 else None
+
+
 @dataclass
 class OverlaySettings:
     mode: str = "toggle"            # toggle | hold
@@ -410,10 +438,10 @@ class OverlayWindow(QWidget):
 
     def _screen(self, follow_game: bool):
         if follow_game and QGuiApplication.platformName() == "windows":
-            name = winkeys.foreground_monitor()
-            for sc in QGuiApplication.screens():
-                if sc.name() == name:
-                    return sc
+            name, rect = winkeys.foreground_monitor_info()
+            sc = pick_screen(QGuiApplication.screens(), name, rect)
+            if sc is not None:
+                return sc
         return self.screen() if self.isVisible() else QGuiApplication.primaryScreen()
 
     def _place(self, follow_game: bool):

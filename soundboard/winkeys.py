@@ -301,15 +301,26 @@ user32.MonitorFromWindow.restype = wt.HANDLE
 user32.GetMonitorInfoW.argtypes = (wt.HANDLE, ctypes.POINTER(_MONITORINFOEXW))
 
 
-def foreground_monitor() -> str:
-    r"""Device name ('\\.\DISPLAY2') of the monitor the active window (the game)
-    is on, or '' if it can't be told. Matches QScreen.name() on Windows."""
+def foreground_monitor_info() -> tuple[str, tuple[int, int, int, int] | None]:
+    r"""The monitor the active window (the game) is on: its GDI device name
+    ('\\.\DISPLAY2') and its rectangle in native pixels (left, top, width, height),
+    or ('', None) if it can't be told.
+
+    Qt 5's QScreen.name() was this device name; Qt 6 reports the monitor's friendly
+    name instead, so callers match on the rectangle (overlay.pick_screen)."""
     mon = user32.MonitorFromWindow(user32.GetForegroundWindow(), 2)   # NEAREST
     info = _MONITORINFOEXW()
     info.cbSize = ctypes.sizeof(info)
     if not mon or not user32.GetMonitorInfoW(mon, ctypes.byref(info)):
-        return ""
-    return info.szDevice
+        return "", None
+    r = info.rcMonitor
+    return info.szDevice, (r.left, r.top, r.right - r.left, r.bottom - r.top)
+
+
+def foreground_monitor() -> str:
+    r"""Device name ('\\.\DISPLAY2') of the monitor the active window is on, or ''.
+    Not QScreen.name() under Qt 6; see foreground_monitor_info()."""
+    return foreground_monitor_info()[0]
 
 
 GWL_EXSTYLE = -20

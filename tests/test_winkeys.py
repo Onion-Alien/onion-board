@@ -120,3 +120,13 @@ def test_numpad_plus_round_trips():
     assert "+" not in name.split("+", 1)[1]
     assert wk.parse(name) == (wk.MOD_CONTROL, vk)
     assert wk.parse("ctrl+num +") == (wk.MOD_CONTROL, vk)   # saved by 0.x
+
+
+def test_foreground_monitor_info_shape():
+    """Device name plus the monitor's native rectangle; the old name-only call still works."""
+    name, rect = wk.foreground_monitor_info()
+    assert isinstance(name, str)
+    assert rect is None or (len(rect) == 4 and all(isinstance(v, int) for v in rect))
+    if rect is not None:
+        assert rect[2] > 0 and rect[3] > 0
+    assert wk.foreground_monitor() == name
