@@ -22,6 +22,11 @@ its sound once.
 Each trigger can name the screen it's looked for on; the rest use the tab's
 default. `Watcher` keeps one capture per screen in use and grabs each every tick,
 so a picture on the main monitor and one on a second monitor both work at once.
+
+A trigger can hold several pictures (up to MAX_PICTURES): every one is matched
+each tick, its live score is the best of them, and any one of them reaching the
+threshold counts as the trigger showing up. The pictures are shrunk once, when
+they change or the screen's mode does, never per tick.
 """
 from __future__ import annotations
 
@@ -33,7 +38,7 @@ import threading
 import time
 import uuid
 from ctypes import wintypes
-from dataclasses import dataclass, field
+from dataclasses import asdict, dataclass, field
 
 import numpy as np
 from scipy.signal import fftconvolve
@@ -52,6 +57,9 @@ DEFAULT_INTERVAL_MS = 100
 RETRY_S = 1.0           # how often a lost capture is tried again
 GIVE_UP_S = 20.0        # ...and how long before the whole capture is set up afresh
 MAX_SCREENS = 64        # a trigger's saved screen index beyond this is nonsense
+MAX_PICTURES = 100      # pictures one trigger can look for (extras in a config are dropped)
+MAX_SOUNDS = 100        # ...and sounds it can play
+PICKS = ("random", "order", "all")   # Trigger.pick: which of its sounds play when it fires
 
 
 class CaptureLost(OSError):
@@ -59,14 +67,32 @@ class CaptureLost(OSError):
     grabber and open a new one."""
 
 
+def _ids(*values, limit: int) -> list[str]:
+    """The non-empty strings in `values` (each a string or a list of them), each once,
+    in order, at most `limit` of them: a trigger's pictures or sounds as saved."""
+    out: list[str] = []
+    for v in values:
+        for s in ([v] if isinstance(v, str) else v if isinstance(v, list) else []):
+            if isinstance(s, str) and s and s not in out:
+                out.append(s)
+                if len(out) >= limit:
+                    return out
+    return out
+
+
 @dataclass
 class Trigger:
-    """One picture to watch for and what to play when it shows up (stored in
-    Config.screen["triggers"])."""
+    """The pictures to watch for and what to play when one shows up (stored in
+    Config.screen["triggers"]). Older versions kept one picture in `image` and one
+    sound in `sound`; those load as one-item lists and are saved back beside the
+    lists (to_raw) so a config still opens in one of them."""
     id: str
     name: str = "Trigger"
-    image: str = ""           # the picture, a PNG inside library.APP_DIR / "triggers"
-    sound: str = ""           # a sound id from the board
+    # the pictures, PNGs inside library.APP_DIR / "triggers": any of them showing
+    # up fires the trigger
+    images: list[str] = field(default_factory=list)
+    sounds: list[str] = field(default_factory=list)   # sound ids from the board
+    pick: str = "random"      # which of them play: "random" (a shuffle bag), "order", "all"
     delay: float = 0.0        # seconds between the match and the sound
     cooldown: float = 3.0     # seconds before this trigger can play again
     threshold: float = 0.80   # how alike (0..1) the screen must be to count as a match
@@ -78,6 +104,24 @@ class Trigger:
     # for the whole tab. One that isn't plugged in falls back to that screen too.
     monitor: int | None = None
 
+    @property
+    def image(self) -> str:
+        """The first picture ("" without one): what older code and the saved `image` see.
+        Setting it makes that the only picture."""
+        return self.images[0] if self.images else ""
+
+    @image.setter
+    def image(self, path: str):
+        self.images = [path] if path else []
+
+    @property
+    def sound(self) -> str:
+        return self.sounds[0] if self.sounds else ""
+
+    @sound.setter
+    def sound(self, sid: str):
+        self.sounds = [sid] if sid else []
+
     @classmethod
     def from_raw(cls, d: dict) -> Trigger | None:
         if not isinstance(d, dict) or not isinstance(d.get("id"), str) or not d["id"]:
@@ -86,8 +130,12 @@ class Trigger:
         m = d.get("monitor")
         if isinstance(m, int) and not isinstance(m, bool) and 0 <= m < MAX_SCREENS:
             t.monitor = m
+        t.images = _ids(d.get("image"), d.get("images"), limit=MAX_PICTURES)
+        t.sounds = _ids(d.get("sound"), d.get("sounds"), limit=MAX_SOUNDS)
+        if d.get("pick") in PICKS:
+            t.pick = d["pick"]
         for k, default in list(vars(t).items()):
-            if k == "monitor":
+            if k in ("monitor", "images", "sounds", "pick"):
                 continue
             v = d.get(k, default)
             if isinstance(default, bool):
@@ -102,6 +150,13 @@ class Trigger:
         t.cooldown = min(max(t.cooldown, 0.0), 600.0)
         t.threshold = min(max(t.threshold, 0.3), 0.99)
         return t
+
+    def to_raw(self) -> dict:
+        """What's saved: the fields, plus the first picture and sound under the old
+        names so an older version of the app still shows something for it."""
+        d = asdict(self)
+        d["image"], d["sound"] = self.image, self.sound
+        return d
 
 
 # --------------------------------------------------------------------------- matching
@@ -795,17 +850,24 @@ def open_grabber(src: Monitor, w: int, h: int, tries: int = 1):
 
 # --------------------------------------------------------------------------- watcher
 
+Picture = tuple[np.ndarray, "np.ndarray | None"]   # grey 0..1, opaque mask (None: all of it)
+
+
 @dataclass
 class Watched:
-    """A trigger as the watcher thread sees it: its picture (full size, grey) and
-    the numbers it's judged by."""
+    """A trigger as the watcher thread sees it: its pictures (full size, grey, each
+    with the mask of its opaque part) and the numbers it's judged by."""
     id: str
-    gray: np.ndarray
+    pictures: list[Picture]
     threshold: float
     cooldown: float
     gate: Gate = field(default_factory=Gate)
-    mask: np.ndarray | None = None      # the picture's opaque part (None: all of it)
     monitor: int | None = None          # Trigger.monitor: its own screen, or None
+
+    @property
+    def sides(self) -> list[int]:
+        """Each picture's short side, for work_scale."""
+        return [min(g.shape) for g, _m in self.pictures]
 
 
 def is_black(gray: np.ndarray) -> bool:
@@ -821,7 +883,7 @@ class _Capture:
         self.index = index
         self.mon = mon
         self.grab = None
-        self.scaled: dict[str, tuple] = {}
+        self.scaled: dict[str, list[Picture]] = {}   # each trigger's pictures, shrunk
         self.fitted = (0, 0)        # the source size the pictures are scaled for
         self.scores: dict[str, float] = {}
         self.reopen_since = 0.0     # > 0: the capture was lost (or never opened); trying again
@@ -1007,7 +1069,7 @@ class Watcher:
         few goes). A failure is kept on the capture and tried again later: RETRY_S
         apart at first, every GIVE_UP_S once it's clearly not coming back."""
         mon = cap.mon
-        scale = work_scale(mon.width, [min(i.gray.shape) for i in items])
+        scale = work_scale(mon.width, [s for i in items for s in i.sides])
         w, h = max(1, round(mon.width * scale)), max(1, round(mon.height * scale))
         now = time.monotonic()
         try:
@@ -1061,27 +1123,30 @@ class Watcher:
     def _fit(grab, mon: Monitor, items: list[Watched]) -> tuple[tuple[int, int], dict]:
         """Shrink the pictures for the size of screen the grabber really copies
         (`source`; the monitor's when it doesn't say), and have it give out pictures
-        that size too. Returns (source size, {id: (picture, mask)})."""
+        that size too. Done once per change, not per tick: a trigger with a hundred
+        pictures keeps them all shrunk. Returns (source size, {id: [(picture, mask)]})."""
         sw, sh = getattr(grab, "source", None) or (mon.width, mon.height)
-        scale = work_scale(sw, [min(i.gray.shape) for i in items])
+        scale = work_scale(sw, [s for i in items for s in i.sides])
         w, h = max(1, round(sw * scale)), max(1, round(sh * scale))
         if (w, h) != (getattr(grab, "w", w), getattr(grab, "h", h)):
             grab.resize(w, h)
-        scaled = {i.id: (shrink(i.gray, scale),
-                         None if i.mask is None else shrink_mask(i.mask, scale))
+        scaled = {i.id: [(shrink(g, scale), None if m is None else shrink_mask(m, scale))
+                         for g, m in i.pictures]
                   for i in items}
         return (sw, sh), scaled
 
     def _check(self, gray: np.ndarray, items: list[Watched],
-               scaled: dict[str, tuple]) -> dict[str, float]:
-        """Match every picture against one frame; returns the scores (a new dict: the
-        UI thread reads `scores` while this runs, so it's only ever swapped whole)."""
+               scaled: dict[str, list[Picture]]) -> dict[str, float]:
+        """Match every trigger's pictures against one frame; a trigger's score is its
+        best picture's. Returns the scores (a new dict: the UI thread reads `scores`
+        while this runs, so it's only ever swapped whole)."""
         frame = None if is_black(gray) else Frame(gray)
         now = time.monotonic()
         scores = {}
         for it in items:
-            t = scaled.get(it.id)
-            score = 0.0 if t is None or frame is None else match(frame, *t)[0]
+            pics = scaled.get(it.id) or []
+            score = 0.0 if frame is None else max((match(frame, g, m)[0] for g, m in pics),
+                                                  default=0.0)
             scores[it.id] = score
             if it.gate.update(score, now, it.threshold, it.cooldown):
                 try:

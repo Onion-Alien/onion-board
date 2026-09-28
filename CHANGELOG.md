@@ -14,6 +14,10 @@
   screen on its card, so a picture on your second monitor and one on your main
   monitor both work at the same time. The picker at the bottom stays the screen
   for triggers that don't pick one.
+- **A trigger can look for several pictures and play several sounds.** Add up
+  to 100 pictures to one trigger (any of them fires it) and give it a list of
+  sounds, played one at random (each once before any repeats), in order, or all
+  at once.
 
 ## 1.3.0 — 2026-09-28
 

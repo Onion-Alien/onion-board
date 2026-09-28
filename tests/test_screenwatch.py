@@ -200,6 +200,11 @@ def fake_screen(monkeypatch):
     return FakeGrabber
 
 
+def pics(*grays) -> list:
+    """Watched.pictures for pictures without transparency."""
+    return [(g, None) for g in grays]
+
+
 def run_until(cond, timeout=5.0):
     end = time.monotonic() + timeout
     while not cond() and time.monotonic() < end:
@@ -213,7 +218,7 @@ def test_watcher_fires_when_the_picture_appears(fake_screen):
     fired = []
     w = sw.Watcher(fired.append)
     w.interval = 0.001
-    w.set_items([sw.Watched("t1", banner(), 0.8, 0.0)])
+    w.set_items([sw.Watched("t1", pics(banner()), 0.8, 0.0)])
     w.start()
     try:
         assert run_until(lambda: len(fake_screen.frames) == 1 and len(fired) >= 2)
@@ -227,7 +232,7 @@ def test_watcher_says_when_it_only_sees_black(fake_screen):
     fake_screen.frames = [np.zeros((H, W), np.float32)]
     w = sw.Watcher(lambda _t: None)
     w.interval = 0.001
-    w.set_items([sw.Watched("t1", banner(), 0.8, 0.0)])
+    w.set_items([sw.Watched("t1", pics(banner()), 0.8, 0.0)])
     w.start()
     try:
         assert run_until(lambda: w.black)
@@ -240,7 +245,7 @@ def test_watcher_reports_a_capture_that_fails(monkeypatch):
         raise OSError("no screen")
     monkeypatch.setattr(sw, "monitors", lambda: [Monitor(0, 0, W, H, True)])
     w = sw.Watcher(lambda _t: None, grabber=broken)
-    w.set_items([sw.Watched("t1", banner(), 0.8, 0.0)])
+    w.set_items([sw.Watched("t1", pics(banner()), 0.8, 0.0)])
     w.start()
     assert run_until(lambda: not w.running)
     assert w.error == "no screen"
@@ -276,7 +281,7 @@ def test_watcher_scales_the_pictures_to_the_screen_the_capture_really_sees(monke
     fired = []
     w = sw.Watcher(fired.append, grabber=ModeGrabber)
     w.interval = 0.001
-    w.set_items([sw.Watched("t1", banner(), 0.8, 0.0)])
+    w.set_items([sw.Watched("t1", pics(banner()), 0.8, 0.0)])
     w.start()
     try:
         assert run_until(lambda: fired)
@@ -298,7 +303,7 @@ def test_watcher_refits_when_the_screen_changes_mode(monkeypatch):
     fired = []
     w = sw.Watcher(fired.append, grabber=ModeGrabber)
     w.interval = 0.001
-    w.set_items([sw.Watched("t1", banner(), 0.8, 0.0)])
+    w.set_items([sw.Watched("t1", pics(banner()), 0.8, 0.0)])
     w.start()
     try:
         assert run_until(lambda: "t1" in w.scores)
@@ -330,7 +335,7 @@ def test_watcher_reopens_a_capture_that_is_lost(monkeypatch):
     fired = []
     w = sw.Watcher(fired.append, grabber=Losing)
     w.interval = 0.001
-    w.set_items([sw.Watched("t1", banner(), 0.8, 0.0)])
+    w.set_items([sw.Watched("t1", pics(banner()), 0.8, 0.0)])
     w.start()
     try:
         assert run_until(lambda: (seen_lost.append(w.lost), fired)[1])
@@ -357,7 +362,7 @@ def test_watcher_reopens_after_any_capture_error(monkeypatch):
     fired = []
     w = sw.Watcher(fired.append, grabber=Resetting)
     w.interval = 0.001
-    w.set_items([sw.Watched("t1", banner(), 0.8, 0.0)])
+    w.set_items([sw.Watched("t1", pics(banner()), 0.8, 0.0)])
     w.start()
     try:
         assert run_until(lambda: fired)
@@ -385,7 +390,7 @@ def test_watcher_waits_for_a_screen_that_is_gone_for_a_moment(monkeypatch):
     fired = []
     w = sw.Watcher(fired.append, grabber=Unplugged)
     w.interval = 0.001
-    w.set_items([sw.Watched("t1", banner(), 0.8, 0.0)])
+    w.set_items([sw.Watched("t1", pics(banner()), 0.8, 0.0)])
     w.start()
     try:
         assert run_until(lambda: not mons)
@@ -415,7 +420,7 @@ def test_stop_then_start_during_a_slow_check_leaves_one_thread(monkeypatch):
     FakeGrabber.frames, FakeGrabber.made = [], []
     w = sw.Watcher(lambda _t: None, grabber=Slow)
     w.interval = 0.01
-    w.set_items([sw.Watched("t1", banner(), 0.8, 0.0)])
+    w.set_items([sw.Watched("t1", pics(banner()), 0.8, 0.0)])
     w.start()
     try:
         assert slow.wait(2)
@@ -434,9 +439,9 @@ def test_stop_then_start_during_a_slow_check_leaves_one_thread(monkeypatch):
 def test_scores_are_replaced_whole_not_changed_in_place(fake_screen):
     """The UI thread reads and prunes `scores` while the watcher writes it."""
     w = sw.Watcher(lambda _t: None)
-    items = [sw.Watched("t1", banner(), 0.8, 0.0)]
+    items = [sw.Watched("t1", pics(banner()), 0.8, 0.0)]
     old = w.scores = {"gone": 0.5}
-    new = w._check(with_banner(scene()), items, {"t1": (banner(), None)})
+    new = w._check(with_banner(scene()), items, {"t1": [(banner(), None)]})
     assert old == {"gone": 0.5} and new["t1"] > 0.99
     w.scores = {"t1": 0.9, "gone": 0.5}
     w.set_items(items)
@@ -485,6 +490,11 @@ def as_qimage(gray: np.ndarray) -> QImage:
     a = np.ascontiguousarray((gray * 255).clip(0, 255).astype(np.uint8))
     img = QImage(a.data, a.shape[1], a.shape[0], a.shape[1], QImage.Format_Grayscale8)
     return img.copy()
+
+
+def chip_names(row) -> list[str]:
+    """The sounds a card shows, as its chips name them."""
+    return [c.findChild(triggerspanel.QPushButton, "chipname").text() for c in row.chips]
 
 
 @pytest.fixture
@@ -583,7 +593,7 @@ def test_a_cut_out_picture_is_watched_with_its_mask(tab, qapp):
     gray, mask = triggerspanel.load_picture(t.image)
     assert mask is not None and mask.sum() == banner().size and not mask[0].any()
     tab._sync()
-    assert tab.watcher._items[t.id].mask is not None
+    assert tab.watcher._items[t.id].pictures[0][1] is not None
 
 
 def test_a_plain_picture_is_refused(tab):
@@ -669,14 +679,15 @@ def test_a_trigger_whose_sound_was_removed_says_so_and_stays_quiet(tab):
     row._on_sound(row.sound.currentIndex())
     tab.board[:] = [("s2", "Win", "fp2")]              # removed on the Sounds tab
     tab.sounds_changed()
-    assert row.sound.currentData() == "s1" and row.sound.currentText() == "Removed sound"
+    assert t.sounds == ["s1"] and row.missing == ["s1"]
+    assert chip_names(row) == ["Removed sound"]
     assert "removed" in row.state.text() and "Plays" not in row.state.text()
     tab.btn_watch.setChecked(True)
     tab._on_fired(t.id)
     assert tab.played == [] and row.state.text() != "Played!"
     tab.board.insert(0, ("s1", "Died", "fp1"))         # Undo brings it back
     tab.sounds_changed()
-    assert row.sound.currentText() == "Died" and row.state.text().startswith("Plays")
+    assert chip_names(row) == ["Died"] and row.state.text().startswith("Plays")
     tab._on_fired(t.id)
     assert tab.played == ["s1"]
 
@@ -689,16 +700,16 @@ def test_a_sound_file_that_fails_to_add_is_given_up_on(tab, monkeypatch, tmp_pat
     monkeypatch.setattr(triggerspanel.QFileDialog, "getOpenFileName",
                         lambda *a, **k: (str(f), ""))
     tab._choose_sound_file(row)
-    assert t.pending and row.sound.currentText() == "Adding the sound…"
-    row.sound.activated.emit(row.sound.currentIndex())   # picking it again changes nothing
-    assert t.pending
-    row.sound.activated.emit(row.sound.findData(triggerspanel.FILE))   # then cancelled
-    assert row.sound.currentText() == "Adding the sound…" and t.pending
+    assert t.pending and chip_names(row) == ["Adding the sound…"]
+    row.sound.activated.emit(row.sound.currentIndex())   # "+ Add sound…" itself: nothing
+    assert t.pending and t.sounds == []
+    row.sound.activated.emit(row.sound.findData(triggerspanel.FILE))   # the same file again
+    assert chip_names(row) == ["Adding the sound…"] and t.pending
     tab.sounds_changed()                               # still importing: keep waiting
     assert t.pending
     tab.import_done()                                  # the import failed
-    assert not t.pending and not t.sound
-    assert row.sound.currentIndex() == 0 and row.state.text() == "Pick the sound to play"
+    assert not t.pending and not t.sounds
+    assert chip_names(row) == [] and row.state.text() == "Pick the sound to play"
     assert tab.cfg.screen["triggers"][0]["pending"] == ""
 
 
@@ -804,8 +815,8 @@ def test_each_trigger_is_looked_for_on_its_own_screen(two_screens):
     fired = []
     w = sw.Watcher(fired.append)
     w.interval = 0.001
-    w.set_items([sw.Watched("a", banner(), 0.8, 0.0, monitor=0),
-                 sw.Watched("b", badge(), 0.8, 0.0, monitor=1)])
+    w.set_items([sw.Watched("a", pics(banner()), 0.8, 0.0, monitor=0),
+                 sw.Watched("b", pics(badge()), 0.8, 0.0, monitor=1)])
     # each picture on the other one's screen: nothing fires
     two_screens.shown = {0: showing(scene(), badge()), 1: showing(scene(1), banner())}
     w.start()
@@ -831,8 +842,8 @@ def test_a_trigger_without_a_screen_follows_the_picker(two_screens):
     w = sw.Watcher(fired.append)
     w.interval = 0.001
     w.monitor = 1
-    w.set_items([sw.Watched("t", banner(), 0.8, 0.0),
-                 sw.Watched("u", badge(), 0.8, 0.0, monitor=1)])
+    w.set_items([sw.Watched("t", pics(banner()), 0.8, 0.0),
+                 sw.Watched("u", pics(badge()), 0.8, 0.0, monitor=1)])
     w.start()
     try:
         assert run_until(lambda: fired == ["t"])
@@ -859,7 +870,7 @@ def test_a_screen_that_is_not_there_falls_back_to_the_picker(fake_screen):
     fired = []
     w = sw.Watcher(fired.append)
     w.interval = 0.001
-    w.set_items([sw.Watched("t", banner(), 0.8, 0.0, monitor=3)])
+    w.set_items([sw.Watched("t", pics(banner()), 0.8, 0.0, monitor=3)])
     w.start()
     try:
         assert run_until(lambda: fired)
@@ -884,8 +895,8 @@ def test_a_screen_that_cannot_be_captured_does_not_stop_the_other(two_screens, m
     fired = []
     w = sw.Watcher(fired.append, grabber=opener)
     w.interval = 0.001
-    w.set_items([sw.Watched("a", banner(), 0.8, 0.0, monitor=0),
-                 sw.Watched("b", badge(), 0.8, 0.0, monitor=1)])
+    w.set_items([sw.Watched("a", pics(banner()), 0.8, 0.0, monitor=0),
+                 sw.Watched("b", pics(badge()), 0.8, 0.0, monitor=1)])
     w.start()
     try:
         assert run_until(lambda: fired == ["a"])
@@ -951,3 +962,200 @@ def test_a_card_says_when_its_screen_is_unplugged(qapp, app_dir, fake_screen, mo
         assert not row.screen_box.isVisibleTo(row)        # one screen: nothing to pick
     finally:
         tab.shutdown()
+
+
+# --------------------------------------------------------------------------- many pictures, sounds
+
+def stripes() -> np.ndarray:
+    """A third picture, unlike the banner and the badge (blocks of noise)."""
+    rng = np.random.default_rng(5)
+    return np.kron(rng.random((6, 22)).astype(np.float32), np.ones((4, 4), np.float32))
+
+
+def test_a_trigger_with_several_pictures_fires_when_any_of_them_shows(fake_screen):
+    """Three pictures on one trigger: the second one showing up fires it, and its
+    live score is the best of its pictures (the one that's there)."""
+    plain = scene()
+    fake_screen.frames = [plain, plain, showing(plain, badge()), showing(plain, badge()), plain]
+    fired = []
+    w = sw.Watcher(fired.append)
+    w.interval = 0.001
+    w.set_items([sw.Watched("t", pics(banner(), badge(), stripes()), 0.8, 0.0)])
+    w.start()
+    try:
+        assert run_until(lambda: fired)
+        assert w.scores["t"] > 0.99
+        assert run_until(lambda: len(fake_screen.frames) == 1 and w.scores["t"] < 0.6)
+    finally:
+        w.stop()
+    assert fired == ["t"]
+
+
+def test_the_live_score_is_the_best_of_the_pictures():
+    w = sw.Watcher(lambda _t: None)
+    frame = showing(scene(), badge())
+    scaled = {"both": [(banner(), None), (badge(), None)], "one": [(banner(), None)]}
+    items = [sw.Watched("both", pics(banner(), badge()), 0.8, 0.0),
+             sw.Watched("one", pics(banner()), 0.8, 0.0)]
+    scores = w._check(frame, items, scaled)
+    assert scores["both"] > 0.99 and scores["one"] < 0.6
+    assert w._check(frame, items, {})["both"] == 0.0     # no pictures fitted yet
+
+
+def test_a_hundred_pictures_are_shrunk_once_not_every_tick(fake_screen, monkeypatch):
+    """The pictures are scaled in _fit (on a change) and reused by every _check."""
+    fits = []
+    real_fit = sw.Watcher._fit
+    monkeypatch.setattr(sw.Watcher, "_fit", staticmethod(
+        lambda grab, mon, items: (fits.append(1), real_fit(grab, mon, items))[1]))
+    fake_screen.frames = [scene()]
+    w = sw.Watcher(lambda _t: None)
+    w.interval = 0.001
+    w.set_items([sw.Watched("t", pics(*[banner()] * 100), 0.8, 0.0)])
+    w.start()
+    try:
+        assert run_until(lambda: "t" in w.scores)
+        time.sleep(0.1)
+    finally:
+        w.stop()
+    assert fits == [1]
+
+
+def test_old_and_odd_trigger_configs_load_their_pictures_and_sounds():
+    old = Trigger.from_raw({"id": "a", "image": "p.png", "sound": "s1"})
+    assert old.images == ["p.png"] and old.sounds == ["s1"] and old.pick == "random"
+    assert old.image == "p.png" and old.sound == "s1"
+    raw = old.to_raw()
+    assert raw["image"] == "p.png" and raw["images"] == ["p.png"] and raw["sound"] == "s1"
+    assert Trigger.from_raw(raw).images == ["p.png"]
+    both = Trigger.from_raw({"id": "a", "image": "a.png", "images": ["a.png", "b.png"],
+                             "sounds": ["s1", "s1", "", 3, "s2"], "pick": "order"})
+    assert both.images == ["a.png", "b.png"] and both.sounds == ["s1", "s2"]
+    assert both.pick == "order"
+    odd = Trigger.from_raw({"id": "a", "images": "x.png", "sounds": 5, "pick": "weird"})
+    assert odd.images == ["x.png"] and odd.sounds == [] and odd.pick == "random"
+    assert Trigger.from_raw({"id": "a", "images": None}).images == []
+    assert Trigger(id="a").to_raw()["image"] == ""
+
+
+def test_pictures_are_capped_at_a_hundred(tab, monkeypatch):
+    many = Trigger.from_raw({"id": "a", "images": [f"p{i}.png" for i in range(101)]})
+    assert len(many.images) == sw.MAX_PICTURES == 100
+    monkeypatch.setattr(triggerspanel, "MAX_PICTURES", 3)
+    t = tab._new([as_qimage(banner()), as_qimage(badge())], "two")
+    row = tab.rows[t.id]
+    assert tab._add_pictures(t, [as_qimage(stripes())] * 3) == 1
+    assert len(t.images) == 3 and "up to 3 pictures" in row.state.text()
+    assert not row.btn_pictures.isEnabled() and not row.btn_paste.isEnabled()
+
+
+def test_an_old_config_with_one_picture_and_sound_still_loads_and_fires(qapp, app_dir,
+                                                                        fake_screen):
+    path = str(app_dir / "died.png")
+    assert as_qimage(banner()).save(path)
+    cfg = Config()
+    cfg.screen = {"triggers": [{"id": "old", "name": "Died", "image": path, "sound": "s1",
+                                "delay": 0.0, "cooldown": 0.0}]}
+    played = []
+    tab = TriggersTab(cfg, lambda: None, lambda: [("s1", "Died", "fp1")], played.append)
+    try:
+        t = tab.triggers[0]
+        assert t.images == [path] and t.sounds == ["s1"]
+        row = tab.rows[t.id]
+        assert len(row.strip.thumbs) == 1 and chip_names(row) == ["Died"]
+        assert row.count.text() == "1 picture" and not row.pick.isVisibleTo(row)
+        fake_screen.frames = [scene(), scene(), with_banner(scene())]
+        tab.watcher.interval = 0.001
+        tab.set_watching(True)
+        assert process_events(qapp, lambda: played == ["s1"])
+        tab.set_watching(False)
+        tab._store()                                   # any edit saves it the new way
+        raw = cfg.screen["triggers"][0]
+        assert raw["image"] == path and raw["images"] == [path] and raw["sounds"] == ["s1"]
+    finally:
+        tab.shutdown()
+
+
+@pytest.fixture
+def three_sounds(tab):
+    tab.board.append(("s3", "Boom", "fp3"))
+    t = tab._new(as_qimage(banner()), "Died")
+    t.sounds = ["s1", "s2", "s3"]
+    tab.rows[t.id].set_sounds(tab._board_sounds())
+    return tab, t
+
+
+def test_random_plays_each_sound_once_before_any_repeats(three_sounds):
+    tab, t = three_sounds
+    assert t.pick == "random"
+    for _ in range(30):
+        tab._play_trigger(t)
+    played = tab.played
+    assert len(played) == 30
+    for i in range(0, 30, 3):                          # each round of the bag: all three
+        assert sorted(played[i:i + 3]) == ["s1", "s2", "s3"]
+    assert all(a != b for a, b in zip(played, played[1:]))
+    tab.board[:] = [("s1", "Died", "fp1"), ("s3", "Boom", "fp3")]   # s2 gone: skipped
+    tab.played.clear()
+    for _ in range(6):
+        tab._play_trigger(t)
+    assert "s2" not in tab.played and set(tab.played) == {"s1", "s3"}
+
+
+def test_in_order_takes_the_sounds_in_turn_and_skips_a_missing_one(three_sounds):
+    tab, t = three_sounds
+    row = tab.rows[t.id]
+    row.pick.setCurrentIndex(row.pick.findData("order"))
+    assert t.pick == "order" and tab.cfg.screen["triggers"][0]["pick"] == "order"
+    assert "in turn" in row.state.text()
+    for _ in range(4):
+        tab._play_trigger(t)
+    assert tab.played == ["s1", "s2", "s3", "s1"]
+    tab.board[:] = [("s1", "Died", "fp1"), ("s3", "Boom", "fp3")]   # s2 gone: skipped
+    tab._play_trigger(t)
+    tab._play_trigger(t)
+    assert tab.played[4:] == ["s3", "s1"]
+
+
+def test_all_at_once_plays_every_sound(three_sounds):
+    tab, t = three_sounds
+    t.pick = "all"
+    assert tab._play_trigger(t) == ["s1", "s2", "s3"] and tab.played == ["s1", "s2", "s3"]
+    tab.board[:] = [("s1", "Died", "fp1"), ("s3", "Boom", "fp3")]
+    assert tab._play_trigger(t) == ["s1", "s3"]
+    tab.board[:] = []
+    assert tab._play_trigger(t) == [] and len(tab.played) == 5
+    row = tab.rows[t.id]
+    row.test.emit(row)                                 # the card's play button: the same
+    assert len(tab.played) == 5
+
+
+def test_the_card_shows_every_picture_and_adds_and_removes_them_and_the_sounds(tab):
+    t = tab._new([as_qimage(banner()), as_qimage(badge())], "Died")
+    row = tab.rows[t.id]
+    assert len(t.images) == 2 and len(row.strip.thumbs) == 2
+    assert row.count.text() == "2 pictures"
+    assert len({triggerspanel.Path(p).name for p in t.images}) == 2
+    assert tab._add_pictures(t, [as_qimage(stripes())]) == 1
+    assert len(row.strip.thumbs) == 3 and row.count.text() == "3 pictures"
+    gone = t.images[1]
+    row.strip.thumbs[1].removed.emit(1)                # the ✕ on the second thumbnail
+    assert len(t.images) == 2 and gone not in t.images
+    assert not triggerspanel.Path(gone).exists() and len(row.strip.thumbs) == 2
+    assert tab.cfg.screen["triggers"][0]["images"] == t.images
+    # sounds: chips, the Play mode, and taking one off
+    row._on_sound(row.sound.findData("s1"))
+    row._on_sound(row.sound.findData("s2"))
+    row._on_sound(row.sound.findData("s2"))            # again: still once
+    assert t.sounds == ["s1", "s2"] and chip_names(row) == ["Died", "Win"]
+    assert row.pick.isVisibleTo(row) and "at random" in row.state.text()
+    assert row.sound.currentIndex() == 0               # the list goes back to "+ Add sound…"
+    row.pick.setCurrentIndex(row.pick.findData("all"))
+    assert t.pick == "all" and "all 2 sounds" in row.state.text()
+    row._remove_sound("s1")
+    assert t.sounds == ["s2"] and chip_names(row) == ["Win"] and not row.pick.isVisibleTo(row)
+    assert tab.cfg.screen["triggers"][0]["sounds"] == ["s2"]
+    tab._sync()
+    assert len(tab.watcher._items[t.id].pictures) == 2
+    tab._remove(row)                                   # deleting the trigger: no files left
+    assert not any(triggerspanel.pictures_dir().iterdir())

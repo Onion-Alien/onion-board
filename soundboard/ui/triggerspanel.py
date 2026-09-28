@@ -1,10 +1,11 @@
 """The Triggers tab: play a sound when a picture shows up on your screen — a game's
-"YOU DIED", a victory banner, a kill-feed icon. Each trigger is a card: the picture
-to look for (a file, or pasted after Win+Shift+S), the sound from your board, how
-long to wait before playing it, how soon it may play again, how close a match
-must be, with the live match next to it so the number is easy to set, and (with
-more than one screen) which screen to look on — "Same as below" being the one
-picked at the bottom of the tab.
+"YOU DIED", a victory banner, a kill-feed icon. Each trigger is a card: the pictures
+to look for (files, or pasted after Win+Shift+S; any of them showing up counts),
+the sounds from your board and which of them play (one at random, in turn, or all
+at once), how long to wait before playing, how soon it may play again, how close a
+match must be, with the live match next to it so the number is easy to set, and
+(with more than one screen) which screen to look on — "Same as below" being the
+one picked at the bottom of the tab.
 
 The watching itself (screen capture and matching on a worker thread) is
 soundboard.screenwatch. Triggers are kept in Config.screen and their pictures in
@@ -16,7 +17,6 @@ import logging
 import math
 import os
 import uuid
-from dataclasses import asdict
 from pathlib import Path
 
 import numpy as np
@@ -28,7 +28,9 @@ from PySide6.QtWidgets import (QApplication, QCheckBox, QComboBox, QDoubleSpinBo
 
 from soundboard import library, screenwatch, theme
 from soundboard.library import AUDIO_EXTS
-from soundboard.screenwatch import INTERVALS_MS, Monitor, Trigger, Watched
+from soundboard.screenwatch import (INTERVALS_MS, MAX_PICTURES, MAX_SOUNDS, Monitor, Picture,
+                                    Trigger, Watched)
+from soundboard.shuffle import ShuffleBag
 from soundboard.ui import icons
 from soundboard.ui.panel import Flow, card, hint_label
 from soundboard.wheelguard import no_wheel
@@ -36,19 +38,20 @@ from soundboard.wheelguard import no_wheel
 log = logging.getLogger(__name__)
 
 PICTURE_EXTS = "*.png *.jpg *.jpeg *.bmp *.webp *.gif"
-FILE = "__file__"       # the sound list's "Choose a sound file…" entry
-PENDING = "__pending__"  # ...and its "Adding the sound…" one
+ADD = "__add__"         # the sound list's "+ Add sound…" entry (its resting state)
+FILE = "__file__"       # ...its "Choose a sound file…" entry
+PENDING = "__pending__"  # a chip for a sound still being added to the board
 POLL_MS = 150           # how often the live match numbers refresh
 MAX_TRIGGERS = 50
 MAX_SIDE = 8192         # bigger pictures are refused (kept pixel for pixel, never resized)
 THUMB = QSize(80, 45)
+STRIP_THUMBS = 3        # thumbnails a card's strip shows before it scrolls
+CHIP_CHARS = 24         # a sound chip's name is cut to this many characters
+PICKS = (("random", "Random"), ("order", "In order"), ("all", "All at once"))
 
 
 def pictures_dir() -> Path:
     return library.APP_DIR / "triggers"
-
-
-Picture = tuple[np.ndarray, "np.ndarray | None"]   # grey 0..1, opaque mask (None: all)
 
 
 def load_picture(path: str) -> Picture | None:
@@ -69,19 +72,37 @@ def picture_of(img: QImage) -> Picture | None:
     return screenwatch.to_gray(bgra), (None if mask.all() else mask)
 
 
-def save_picture(img: QImage, tid: str) -> str:
-    """Keep a copy of the picture as <id>.png; returns its path. It's kept pixel for
+def save_picture(img: QImage, name: str) -> str:
+    """Keep a copy of the picture as <name>.png; returns its path. It's kept pixel for
     pixel: resized, it would no longer match the screen it was cut from. Written
     beside it first, so a failed save leaves the old picture as it was."""
     folder = pictures_dir()
     folder.mkdir(parents=True, exist_ok=True)
-    path = folder / f"{tid}.png"
-    tmp = folder / f"{tid}.saving"
+    path = folder / f"{name}.png"
+    tmp = folder / f"{name}.saving"
     if not img.save(str(tmp), "PNG"):
         tmp.unlink(missing_ok=True)
         raise OSError(f"couldn't save the picture to {path}")
     os.replace(tmp, path)
     return str(path)
+
+
+def picture_name(t: Trigger) -> str:
+    """A file name (without .png) for a picture being added to `t`: <id> for the
+    first, as older versions saved it, then <id>-<random> so removing and adding
+    pictures never reuses a name."""
+    if not t.images and not (pictures_dir() / f"{t.id}.png").exists():
+        return t.id
+    return f"{t.id}-{uuid.uuid4().hex[:6]}"
+
+
+def delete_picture(path: str):
+    """Remove a picture file this tab keeps (never one the user pointed at)."""
+    if path and Path(path).parent == pictures_dir():
+        try:
+            Path(path).unlink(missing_ok=True)
+        except OSError:
+            log.debug("couldn't delete %s", path, exc_info=True)
 
 
 def narrow(combo: QComboBox, chars: int) -> QComboBox:
@@ -109,11 +130,124 @@ def flatness(gray: np.ndarray, mask: np.ndarray | None = None) -> float:
     return float(px.std()) if px.size >= 16 else 0.0
 
 
+def plural(n: int, word: str) -> str:
+    return f"{n} {word}" + ("" if n == 1 else "s")
+
+
+class Thumb(QWidget):
+    """One picture in a card's strip: the thumbnail (click to swap it for another
+    file) with a ✕ in its corner while the mouse is over it."""
+    clicked = Signal(int)
+    removed = Signal(int)
+
+    def __init__(self, index: int, path: str):
+        super().__init__()
+        self.index = index
+        self.pic = QPushButton(self)
+        self.pic.setFixedSize(THUMB + QSize(8, 8))
+        self.pic.setIconSize(THUMB)
+        self.pic.setCursor(Qt.PointingHandCursor)
+        self.pic.clicked.connect(lambda: self.clicked.emit(self.index))
+        pm = QPixmap(path) if path else QPixmap()
+        if pm.isNull():
+            self.pic.setIcon(icons.icon("image", "muted"))
+            self.pic.setToolTip(f"{Path(path).name}: this picture can't be read — click to "
+                                "swap it for another file")
+        else:
+            self.pic.setIcon(pm.scaled(THUMB, Qt.KeepAspectRatio, Qt.SmoothTransformation))
+            self.pic.setToolTip(f"{Path(path).name} ({pm.width()}×{pm.height()})\n"
+                                "Click to swap it for another file")
+        self.setFixedSize(self.pic.size())
+        self.x = QPushButton("✕", self)
+        self.x.setObjectName("danger")
+        self.x.setStyleSheet("padding:0; font-size:8pt;")
+        self.x.setFixedSize(18, 18)
+        self.x.setToolTip("Remove this picture")
+        self.x.move(self.width() - self.x.width() - 3, 3)
+        self.x.clicked.connect(lambda: self.removed.emit(self.index))
+        self.x.hide()
+
+    def enterEvent(self, ev):
+        self.x.show()
+        self.x.raise_()
+        super().enterEvent(ev)
+
+    def leaveEvent(self, ev):
+        self.x.hide()
+        super().leaveEvent(ev)
+
+
+class Strip(QScrollArea):
+    """A card's pictures in a row: up to STRIP_THUMBS wide, scrolling sideways
+    past that, so a trigger with a hundred pictures stays a short card."""
+    picture_clicked = Signal(int)
+    picture_removed = Signal(int)
+
+    def __init__(self):
+        super().__init__()
+        self.setFrameShape(QFrame.NoFrame)
+        self.setWidgetResizable(True)
+        self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.setHorizontalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+        self.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Fixed)
+        self.box = QWidget()
+        self.row = QHBoxLayout(self.box)
+        self.row.setContentsMargins(0, 0, 0, 0)
+        self.row.setSpacing(4)
+        self.row.addStretch(1)
+        self.setWidget(self.box)
+        self.thumbs: list[Thumb] = []
+        self._h = 0
+        self._fit_height()
+
+    @property
+    def slot(self) -> int:
+        return THUMB.width() + 8 + self.row.spacing()
+
+    def set_paths(self, paths: list[str]):
+        for th in self.thumbs:
+            self.row.removeWidget(th)
+            th.deleteLater()
+        self.thumbs = []
+        for i, p in enumerate(paths):
+            th = Thumb(i, p)
+            th.clicked.connect(self.picture_clicked)
+            th.removed.connect(self.picture_removed)
+            self.row.insertWidget(i, th)
+            self.thumbs.append(th)
+        self.updateGeometry()
+        self._fit_height()
+
+    def sizeHint(self) -> QSize:
+        n = min(max(len(self.thumbs), 1), STRIP_THUMBS)
+        return QSize(n * self.slot, self._h)
+
+    def minimumSizeHint(self) -> QSize:
+        return QSize(self.slot, self._h)
+
+    def resizeEvent(self, ev):
+        super().resizeEvent(ev)
+        self._fit_height()
+
+    def _fit_height(self):
+        """The thumbnails' height, plus the scrollbar's only when there's more than fits."""
+        h = THUMB.height() + 8
+        if len(self.thumbs) * self.slot - self.row.spacing() > self.viewport().width():
+            h += self.horizontalScrollBar().sizeHint().height()
+        if h != self._h:
+            self._h = h
+            self.setFixedHeight(h)
+
+
 class TriggerRow(QFrame):
     """One trigger's card."""
-    changed = Signal(object)            # row: a setting changed
-    picture_wanted = Signal(object)     # row: pick a new picture
-    sound_file_wanted = Signal(object)  # row: "Choose a sound file…"
+    changed = Signal(object)             # row: a setting changed
+    pictures_wanted = Signal(object)     # row: "+ Add pictures…" (files)
+    paste_wanted = Signal(object)        # row: "Paste picture"
+    picture_swap = Signal(object, int)   # row, index: swap that picture for another file
+    picture_removed = Signal(object, int)  # row, index
+    sound_file_wanted = Signal(object)   # row: "Choose a sound file…"
+    hear = Signal(str)                   # a sound chip was clicked: play that sound id
     test = Signal(object)
     remove = Signal(object)
 
@@ -122,22 +256,21 @@ class TriggerRow(QFrame):
         super().__init__()
         self.setObjectName("card")
         self.t = t
-        self.missing = False            # its sound was removed from the board
+        self.missing: list[str] = []    # its sounds that were removed from the board
         self.fallback = False           # its own screen isn't there: the default is watched
         self._screens = 0               # how many screens there are
+        self._sounds: list[tuple[str, str]] = []   # the board's sounds as last given
         v = QVBoxLayout(self)
         v.setContentsMargins(12, 8, 12, 10)
         v.setSpacing(6)
 
         top = QHBoxLayout()
         top.setSpacing(10)
-        self.thumb = QPushButton()
-        self.thumb.setFixedSize(THUMB + QSize(8, 8))
-        self.thumb.setIconSize(THUMB)
-        self.thumb.setCursor(Qt.PointingHandCursor)
-        self.thumb.setToolTip("The picture to look for — click to change it")
-        self.thumb.clicked.connect(lambda: self.picture_wanted.emit(self))
-        top.addWidget(self.thumb)
+        self.strip = Strip()
+        self.strip.setToolTip("The pictures to look for: any of them showing up plays the sound")
+        self.strip.picture_clicked.connect(lambda i: self.picture_swap.emit(self, i))
+        self.strip.picture_removed.connect(lambda i: self.picture_removed.emit(self, i))
+        top.addWidget(self.strip, 0, Qt.AlignTop)
         names = QVBoxLayout()
         names.setSpacing(4)
         self.name = QLineEdit(t.name)
@@ -150,9 +283,10 @@ class TriggerRow(QFrame):
         self.state.setObjectName("hint")
         self.state.setSizePolicy(QSizePolicy.Ignored, QSizePolicy.Preferred)
         names.addWidget(self.state)
+        names.addStretch(1)
         top.addLayout(names, 1)
         self.chk_on = QCheckBox("On")
-        self.chk_on.setToolTip("Watch for this picture (untick to keep it but pause it)")
+        self.chk_on.setToolTip("Watch for this trigger (untick to keep it but pause it)")
         self.chk_on.setChecked(t.enabled)
         self.chk_on.toggled.connect(self._on_enabled)
         top.addWidget(self.chk_on, 0, Qt.AlignTop)
@@ -164,23 +298,49 @@ class TriggerRow(QFrame):
         top.addWidget(self.btn_del, 0, Qt.AlignTop)
         v.addLayout(top)
 
-        row = QHBoxLayout()
-        row.setSpacing(8)
-        row.addWidget(QLabel("Play"))
+        row = Flow(gap=8)
+        self.count = QLabel()
+        self.count.setObjectName("muted")
+        row.addWidget(self.count)
+        self.btn_pictures = QPushButton("+ Add pictures…")
+        self.btn_pictures.setObjectName("small")
+        self.btn_pictures.setToolTip(f"Add picture files to this trigger (up to {MAX_PICTURES}): "
+                                     "any of them showing up plays the sound")
+        self.btn_pictures.clicked.connect(lambda: self.pictures_wanted.emit(self))
+        row.addWidget(self.btn_pictures)
+        self.btn_paste = QPushButton("Paste picture")
+        self.btn_paste.setObjectName("small")
+        self.btn_paste.setToolTip("Add the picture you copied (Win+Shift+S cuts a piece of "
+                                  "the screen) to this trigger")
+        self.btn_paste.clicked.connect(lambda: self.paste_wanted.emit(self))
+        row.addWidget(self.btn_paste)
+        v.addLayout(row)
+
+        # "Play", the chips (one per sound), "+ Add sound…", the Play mode, the test
+        # button: a wrapping row, rebuilt by _layout_sounds when the chips change
+        self.sounds_row = Flow(gap=6)
+        self.lbl_play = QLabel("Play")
+        self.chips: list[QFrame] = []
         self.sound = QComboBox()
         narrow(self.sound, 10)
-        self.sound.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
-        self.sound.setToolTip("The sound to play (from your Sounds tab, or pick a file and "
+        self.sound.setToolTip("Add a sound to play (from your Sounds tab, or pick a file and "
                               "it's added there too)")
         no_wheel(self.sound)
         self.sound.activated.connect(self._on_sound)
-        row.addWidget(self.sound, 1)
+        self.pick = QComboBox()
+        self.pick.setSizeAdjustPolicy(QComboBox.AdjustToContents)
+        for key, label in PICKS:
+            self.pick.addItem(label, key)
+        self.pick.setCurrentIndex(max(self.pick.findData(t.pick), 0))
+        self.pick.setToolTip("With several sounds: play one at random (each once before any "
+                             "repeats), take them in turn, or play them all at once")
+        no_wheel(self.pick)
+        self.pick.currentIndexChanged.connect(self._on_pick)
         self.btn_test = QPushButton()
-        self.btn_test.setToolTip("Play the sound now, to check it")
+        self.btn_test.setToolTip("Play now, as the trigger would, to check it")
         icons.set_icon(self.btn_test, "play", size=14)
         self.btn_test.clicked.connect(lambda: self.test.emit(self))
-        row.addWidget(self.btn_test)
-        v.addLayout(row)
+        v.addLayout(self.sounds_row)
 
         row = Flow(gap=10)
         self.delay = QDoubleSpinBox()
@@ -189,7 +349,7 @@ class TriggerRow(QFrame):
         self.delay.setSingleStep(0.5)
         self.delay.setSuffix(" s")
         self.delay.setValue(t.delay)
-        self.delay.setToolTip("How long after the picture shows up to play the sound "
+        self.delay.setToolTip("How long after a picture shows up to play the sound "
                               "(0 = straight away)")
         row.addWidget(labelled("Wait", self.delay))
         self.cooldown = QDoubleSpinBox()
@@ -198,8 +358,8 @@ class TriggerRow(QFrame):
         self.cooldown.setSingleStep(1.0)
         self.cooldown.setSuffix(" s")
         self.cooldown.setValue(t.cooldown)
-        self.cooldown.setToolTip("After playing, ignore this picture for this long. It "
-                                 "also has to leave the screen before it can play again.")
+        self.cooldown.setToolTip("After playing, ignore this trigger for this long. Its "
+                                 "picture also has to leave the screen before it can play again.")
         row.addWidget(labelled("Not again for", self.cooldown))
         self.threshold = QSpinBox()
         self.threshold.setRange(30, 99)
@@ -210,13 +370,13 @@ class TriggerRow(QFrame):
                                   "the live number on the right helps.")
         self.live = QLabel("—")
         self.live.setMinimumWidth(64)
-        self.live.setToolTip("How well the screen matches the picture right now")
+        self.live.setToolTip("How well the screen matches right now (the best of its pictures)")
         match = labelled("Match", self.threshold)
         match.layout().addWidget(self.live)
         row.addWidget(match)
         self.screen = QComboBox()
         self.screen.setSizeAdjustPolicy(QComboBox.AdjustToContents)
-        self.screen.setToolTip("Which screen to look for this picture on. “Same as below” "
+        self.screen.setToolTip("Which screen to look for the pictures on. “Same as below” "
                                "is the screen picked at the bottom of the tab.")
         no_wheel(self.screen)
         self.screen.currentIndexChanged.connect(self._on_screen)
@@ -229,7 +389,7 @@ class TriggerRow(QFrame):
 
         self.set_sounds(sounds)
         self.set_screens(list(screens))
-        self.refresh_picture()
+        self.refresh_pictures()
         self._flash = QTimer(self)
         self._flash.setSingleShot(True)
         self._flash.timeout.connect(self._update_state)
@@ -237,25 +397,69 @@ class TriggerRow(QFrame):
 
     # ------------------------------------------------------------------ view
     def set_sounds(self, sounds: list[tuple[str, str]]):
-        self.sound.blockSignals(True)
-        self.sound.clear()
-        self.sound.addItem("Pick a sound…", "")
+        """The board's sounds: fill the "+ Add sound" list and redraw the chips."""
+        self._sounds = list(sounds)
+        cb = self.sound
+        cb.blockSignals(True)
+        cb.clear()
+        cb.addItem("+ Add sound…", ADD)
         for sid, name in sounds:
-            self.sound.addItem(name, sid)
-        self.sound.insertSeparator(self.sound.count())
-        self.sound.addItem(icons.icon("folder"), "Choose a sound file…", FILE)
-        i = self.sound.findData(self.t.sound) if self.t.sound else -1
+            cb.addItem(name, sid)
+        cb.insertSeparator(cb.count())
+        cb.addItem(icons.icon("folder"), "Choose a sound file…", FILE)
+        cb.setCurrentIndex(0)
+        cb.blockSignals(False)
+        names = dict(sounds)
         # a removed sound keeps its id (Undo on the Sounds tab brings it back)
-        self.missing = bool(self.t.sound) and i < 0
-        if self.missing:
-            self.sound.insertItem(1, "Removed sound", self.t.sound)
-            i = 1
-        elif i < 0 and self.t.pending:
-            self.sound.insertItem(1, "Adding the sound…", PENDING)
-            i = 1
-        self.sound.setCurrentIndex(max(i, 0))
-        self.sound.blockSignals(False)
+        self.missing = [sid for sid in self.t.sounds if sid not in names]
+        old, self.chips = self.chips, []
+        for sid in self.t.sounds:
+            self.chips.append(self._chip(names.get(sid, "Removed sound"), sid,
+                                         warn=sid not in names))
+        if self.t.pending:
+            self.chips.append(self._chip("Adding the sound…", PENDING))
+        self.pick.setVisible(len(self.t.sounds) > 1)
+        self._layout_sounds()
+        for chip in old:
+            chip.deleteLater()
         self._update_state()
+
+    def _layout_sounds(self):
+        """Put the sounds row's widgets back in order (the Flow layout has no insert)."""
+        while self.sounds_row.count():
+            self.sounds_row.takeAt(0)
+        for w in (self.lbl_play, *self.chips, self.sound, self.pick, self.btn_test):
+            self.sounds_row.addWidget(w)
+        self.sounds_row.invalidate()
+
+    def _chip(self, text: str, sid: str, warn: bool = False) -> QFrame:
+        """A sound the trigger plays: its name (click to hear it) and a ✕."""
+        chip = QFrame()
+        chip.setObjectName("chip")
+        h = QHBoxLayout(chip)
+        h.setContentsMargins(4, 0, 2, 0)
+        h.setSpacing(2)
+        name = QPushButton(text if len(text) <= CHIP_CHARS else text[:CHIP_CHARS - 1] + "…")
+        name.setObjectName("chipname")
+        if sid == PENDING:
+            name.setToolTip("This sound file is still being added to your Sounds tab")
+            name.setEnabled(False)
+        elif warn:
+            name.setToolTip("This sound was removed from your Sounds tab (Undo there "
+                            "brings it back)")
+            name.setStyleSheet(f"color:{theme.status('warn')};")
+        else:
+            name.setToolTip(f"{text} — click to hear it")
+            name.clicked.connect(lambda _=False, s=sid: self.hear.emit(s))
+        h.addWidget(name)
+        x = QPushButton("✕")
+        x.setObjectName("chipstop")
+        x.setFixedSize(22, 22)
+        x.setToolTip("Stop adding this sound" if sid == PENDING else "Take this sound off "
+                     "the trigger")
+        x.clicked.connect(lambda _=False, s=sid: self._remove_sound(s))
+        h.addWidget(x)
+        return chip
 
     def set_screens(self, mons: list[Monitor]):
         """Fill the screen list. It's shown when there's more than one screen, or when
@@ -275,13 +479,15 @@ class TriggerRow(QFrame):
         self.screen_box.setVisible(len(mons) > 1 or t.monitor is not None)
         self._update_state()
 
-    def refresh_picture(self):
-        pm = QPixmap(self.t.image) if self.t.image else QPixmap()
-        if pm.isNull():
-            self.thumb.setIcon(icons.icon("image", "muted"))
-            self.thumb.setText("")
-        else:
-            self.thumb.setIcon(pm.scaled(THUMB, Qt.KeepAspectRatio, Qt.SmoothTransformation))
+    def refresh_pictures(self):
+        """Redraw the strip after the trigger's pictures changed."""
+        t = self.t
+        self.strip.set_paths(t.images)
+        self.count.setText(plural(len(t.images), "picture") if t.images else "No picture")
+        room = len(t.images) < MAX_PICTURES
+        self.btn_pictures.setEnabled(room)
+        self.btn_paste.setEnabled(room)
+        self._update_state()
 
     def show_score(self, score: float | None):
         if score is None:
@@ -293,26 +499,35 @@ class TriggerRow(QFrame):
         self.live.setText(f"now {pct}%")
         self.live.setStyleSheet(f"color:{theme.status('ok')}; font-weight:600;" if hit else "")
 
-    def flash(self, text: str, ms: int = 2500):
+    def flash(self, text: str, ms: int = 2500, tone: str = "ok"):
         self.state.setText(text)
-        theme.set_tone(self.state, "ok")
+        theme.set_tone(self.state, tone)
         self._flash.start(ms)
 
     def _update_state(self):
         t = self.t
-        if not t.image:
-            text, warn = "No picture yet — click the box on the left", True
-        elif not t.sound and not t.pending:
+        n = len(t.sounds)
+        if not t.images:
+            text, warn = "No picture yet — click Add pictures… or Paste picture", True
+        elif not n and not t.pending:
             text, warn = "Pick the sound to play", True
-        elif self.missing:
-            text, warn = "Its sound was removed from Sounds — pick another", True
+        elif n and len(self.missing) == n:
+            text, warn = ("Its sound was removed from Sounds — pick another" if n == 1 else
+                          "Its sounds were removed from Sounds — pick others"), True
         elif self.fallback:
             where = "the screen picked below" if self._screens > 1 else "the main screen"
             text, warn = (f"Screen {t.monitor + 1} isn't plugged in, so it's looked for "
                           f"on {where}"), True
         else:
             wait = f"{t.delay:g} s after it shows up" if t.delay else "as soon as it shows up"
-            text, warn = f"Plays {wait}", False
+            if n > 1:
+                what = {"random": f"one of its {n} sounds at random",
+                        "order": f"its {n} sounds in turn",
+                        "all": f"all {n} sounds at once"}[t.pick]
+                text = f"Plays {what}, {wait}"
+            else:
+                text = f"Plays {wait}"
+            warn = False
         self.state.setText(text)
         theme.set_tone(self.state, "warn" if warn else "")
 
@@ -328,25 +543,39 @@ class TriggerRow(QFrame):
         self.changed.emit(self)
 
     def _on_sound(self, i: int):
+        """An entry of the "+ Add sound" list was picked: add it to the trigger."""
         sid = self.sound.itemData(i)
+        self.sound.blockSignals(True)
+        self.sound.setCurrentIndex(0)
+        self.sound.blockSignals(False)
         if sid == FILE:
-            self.set_sounds_back()
             self.sound_file_wanted.emit(self)
             return
-        if sid == PENDING:                  # "Adding the sound…" again: still adding it
+        if not sid or sid == ADD or sid in self.t.sounds:
             return
-        if sid != self.t.sound or self.t.pending:
-            self.t.sound, self.t.pending = sid or "", ""
-            self.missing = False
-            self.changed.emit(self)
-        self._update_state()
+        if len(self.t.sounds) >= MAX_SOUNDS:
+            self.flash(f"A trigger can play up to {MAX_SOUNDS} sounds", 4000, "warn")
+            return
+        self.t.sounds.append(sid)
+        self.set_sounds(self._sounds)
+        self.changed.emit(self)
 
-    def set_sounds_back(self):
-        """Put the list back on the trigger's own sound (after Choose a file…)."""
-        self.sound.blockSignals(True)
-        i = self.sound.findData(self.t.sound or (PENDING if self.t.pending else ""))
-        self.sound.setCurrentIndex(max(i, 0))
-        self.sound.blockSignals(False)
+    def _remove_sound(self, sid: str):
+        if sid == PENDING:
+            self.t.pending = ""
+        elif sid in self.t.sounds:
+            self.t.sounds.remove(sid)
+        else:
+            return
+        self.set_sounds(self._sounds)
+        self.changed.emit(self)
+
+    def _on_pick(self, i: int):
+        key = self.pick.itemData(i)
+        if key in screenwatch.PICKS and key != self.t.pick:
+            self.t.pick = key
+            self._update_state()
+            self.changed.emit(self)
 
     def _on_screen(self, i: int):
         m = self.screen.itemData(i)
@@ -388,8 +617,10 @@ class TriggersTab(QWidget):
         self.rows: dict[str, TriggerRow] = {}
         self._mons: list[Monitor] = []      # the screens as last listed
         self._fell_back: frozenset[str] = frozenset()   # watcher.fell_back as last seen
-        self._gray: dict[str, tuple[str, float, Picture]] = {}   # id -> (path, mtime, picture)
+        self._gray: dict[str, tuple[float, Picture]] = {}   # picture path -> (mtime, picture)
         self._gen = 0                   # bumped to drop sounds still waiting to play
+        self._bag = ShuffleBag()        # "Random": each trigger's sounds, each once per round
+        self._order: dict[str, int] = {}   # "In order": each trigger's next sound
         self.watcher = screenwatch.Watcher(self._fired.emit)
         self._fired.connect(self._on_fired)
         interval = s.get("interval_ms", screenwatch.DEFAULT_INTERVAL_MS)
@@ -408,7 +639,8 @@ class TriggersTab(QWidget):
                         "and plays the sound when the picture appears, straight away or after "
                         "a wait you choose. Cut the picture from a screenshot of the same "
                         "game at the same resolution: press Win+Shift+S, drag around it, "
-                        "then click Paste picture.")
+                        "then click Paste picture. A trigger can hold several pictures (any "
+                        "of them counts) and several sounds.")
         hv.itemAt(0).widget().setWordWrap(True)
         self.hint = hv.itemAt(1).widget()
         self.warn = hint_label("")
@@ -560,33 +792,34 @@ class TriggersTab(QWidget):
         """Hand the watcher the triggers that can fire, pictures loaded and grey."""
         items = []
         for t in self.triggers:
-            if not (t.enabled and t.image and (t.sound or t.pending)):
+            if not (t.enabled and t.images and (self._playable(t) or t.pending)):
                 continue
-            pic = self._picture(t)
-            if pic is not None:
-                items.append(Watched(t.id, pic[0], t.threshold, t.cooldown, mask=pic[1],
-                                     monitor=t.monitor))
+            pics = [p for p in map(self._picture, t.images) if p is not None]
+            if pics:
+                items.append(Watched(t.id, pics, t.threshold, t.cooldown, monitor=t.monitor))
         self.watcher.set_items(items)
 
-    def _picture(self, t: Trigger) -> Picture | None:
+    def _picture(self, path: str) -> Picture | None:
         try:
-            mtime = Path(t.image).stat().st_mtime
+            mtime = Path(path).stat().st_mtime
         except OSError:
             return None
-        got = self._gray.get(t.id)
-        if got is not None and got[0] == t.image and got[1] == mtime:
-            return got[2]
-        pic = load_picture(t.image)
+        got = self._gray.get(path)
+        if got is not None and got[0] == mtime:
+            return got[1]
+        pic = load_picture(path)
         if pic is not None:
-            self._gray[t.id] = (t.image, mtime, pic)
+            self._gray[path] = (mtime, pic)
         return pic
 
-    def _on_board(self, sid: str) -> bool:
-        return bool(sid) and any(s == sid for s, _n, _fp in self._sounds())
+    def _playable(self, t: Trigger) -> list[str]:
+        """The trigger's sounds that are on the board right now, in its order."""
+        board = {s for s, _n, _fp in self._sounds()}
+        return [sid for sid in t.sounds if sid in board]
 
     def _on_fired(self, tid: str):
         t = next((t for t in self.triggers if t.id == tid), None)
-        if t is None or not self.is_active() or not self._on_board(t.sound):
+        if t is None or not self.is_active() or not self._playable(t):
             return
         gen = self._gen
         if t.delay > 0:
@@ -599,13 +832,38 @@ class TriggersTab(QWidget):
 
     def _fire(self, tid: str, gen: int):
         t = next((t for t in self.triggers if t.id == tid), None)
-        if gen != self._gen or t is None or not t.enabled or not self._on_board(t.sound):
+        if gen != self._gen or t is None or not t.enabled:
             return
-        log.info("screen trigger %r matched", t.name)
-        self._play(t.sound)
-        row = self.rows.get(tid)
-        if row is not None:
-            row.flash("Played!")
+        if self._play_trigger(t):
+            log.info("screen trigger %r matched", t.name)
+            row = self.rows.get(tid)
+            if row is not None:
+                row.flash("Played!")
+
+    def _play_trigger(self, t: Trigger) -> list[str]:
+        """Play the trigger's sound(s) the way its Play setting says: one at random
+        (a shuffle bag: each once before any repeats, never twice running), the next
+        in turn, or all of them. Sounds no longer on the board are skipped. Returns
+        what played."""
+        pool = self._playable(t)
+        if not pool:
+            return []
+        if t.pick == "all":
+            chosen = pool
+        elif t.pick == "order":
+            n, i = len(t.sounds), self._order.get(t.id, 0)
+            chosen = []
+            for _ in range(n):
+                sid, i = t.sounds[i % n], i + 1
+                if sid in pool:
+                    chosen = [sid]
+                    break
+            self._order[t.id] = i % n
+        else:
+            chosen = [self._bag.next(t.id, pool)]
+        for sid in chosen:
+            self._play(sid)
+        return chosen
 
     def _poll(self):
         w = self.watcher
@@ -642,7 +900,7 @@ class TriggersTab(QWidget):
                    "exclusive fullscreen and this stays, set it to Borderless or Windowed "
                    "fullscreen so it can be seen.")
         elif self.is_active() and not w.scores and not any(
-                t.enabled and t.image and t.sound for t in self.triggers):
+                t.enabled and t.images and t.sounds for t in self.triggers):
             why = "Nothing to watch for yet: each trigger needs a picture and a sound."
         self.warn.setText(why)
         self.warn.setVisible(bool(why))
@@ -689,7 +947,9 @@ class TriggersTab(QWidget):
         changed = False
         for t in self.triggers:
             if t.pending and t.pending in by_fp:
-                t.sound, t.pending = by_fp[t.pending], ""
+                if by_fp[t.pending] not in t.sounds:
+                    t.sounds.append(by_fp[t.pending])
+                t.pending = ""
                 changed = True
         sounds = [(sid, name) for sid, name, _fp in board]
         for row in self.rows.values():
@@ -713,9 +973,13 @@ class TriggersTab(QWidget):
     def _add_row(self, t: Trigger) -> TriggerRow:
         row = TriggerRow(t, self._board_sounds(), self._mons)
         row.changed.connect(lambda _r: self._store())
-        row.picture_wanted.connect(self._change_picture)
+        row.pictures_wanted.connect(self._add_picture_files)
+        row.paste_wanted.connect(self._paste_picture)
+        row.picture_swap.connect(self._change_picture)
+        row.picture_removed.connect(self._remove_picture)
         row.sound_file_wanted.connect(self._choose_sound_file)
-        row.test.connect(lambda r: self._on_board(r.t.sound) and self._play(r.t.sound))
+        row.hear.connect(lambda sid: sid in self._playable(row.t) and self._play(sid))
+        row.test.connect(lambda r: self._play_trigger(r.t))
         row.remove.connect(self._remove)
         self.rows[t.id] = row
         self.list_layout.insertWidget(self.list_layout.count() - 1, row)
@@ -723,19 +987,20 @@ class TriggersTab(QWidget):
         return row
 
     def _store(self):
-        self.cfg.screen["triggers"] = [asdict(t) for t in self.triggers]
+        self.cfg.screen["triggers"] = [t.to_raw() for t in self.triggers]
         self._save()
         if self.is_active():
             self._sync()
         self._show_warning()
 
-    def _new(self, img: QImage, name: str) -> Trigger | None:
+    def _new(self, img: QImage | list[QImage], name: str) -> Trigger | None:
+        """A new trigger from a picture (or several); None when none could be used."""
         if len(self.triggers) >= MAX_TRIGGERS:
             QMessageBox.information(self, "Too many triggers",
                                     f"You can have up to {MAX_TRIGGERS} triggers.")
             return None
         t = Trigger(id=uuid.uuid4().hex[:12], name=name[:60] or "Trigger")
-        if not self._set_picture(t, img):
+        if not self._add_pictures(t, [img] if isinstance(img, QImage) else list(img)):
             return None
         self.triggers.append(t)
         row = self._add_row(t)
@@ -745,43 +1010,75 @@ class TriggersTab(QWidget):
         row.name.selectAll()
         return t
 
-    def _set_picture(self, t: Trigger, img: QImage) -> bool:
+    def _check_picture(self, img: QImage) -> tuple[Picture | None, tuple[str, str]]:
+        """Whether a picture can be looked for: (its grey and mask, ()) or (None,
+        (why not, in detail))."""
         if img.isNull():
-            QMessageBox.warning(self, "Not a picture", "That picture couldn't be read.")
-            return False
+            return None, ("Not a picture", "That picture couldn't be read.")
         if min(img.width(), img.height()) < 6:
-            QMessageBox.warning(self, "Picture too small",
-                                "Cut a bigger piece of the screen: at least 6 pixels each way.")
-            return False
+            return None, ("Picture too small",
+                          "Cut a bigger piece of the screen: at least 6 pixels each way.")
         if max(img.width(), img.height()) > MAX_SIDE:
-            QMessageBox.warning(self, "Picture too big",
-                                f"Cut a smaller piece of the screen: at most {MAX_SIDE} "
-                                "pixels each way.")
-            return False
-        # checked before it's saved, so a refused picture never replaces the old one
+            return None, ("Picture too big", "Cut a smaller piece of the screen: at most "
+                          f"{MAX_SIDE} pixels each way.")
         pic = picture_of(img)
         if pic is None or flatness(*pic) < screenwatch.FLAT_STD:
-            QMessageBox.warning(self, "Picture is one plain colour",
-                                "There's nothing in it to recognise. Cut a piece with some "
-                                "detail, like the words or an icon. (Transparent parts "
-                                "don't count.)")
-            return False
-        try:
-            path = save_picture(img, t.id)
-        except OSError as e:
-            QMessageBox.warning(self, "Couldn't keep the picture", str(e))
-            return False
-        t.image = path
-        self._gray.pop(t.id, None)
+            return None, ("Picture is one plain colour",
+                          "There's nothing in it to recognise. Cut a piece with some detail, "
+                          "like the words or an icon. (Transparent parts don't count.)")
+        return pic, ()
+
+    def _add_pictures(self, t: Trigger, imgs: list[QImage], names: list[str] = (),
+                      at: int | None = None) -> int:
+        """Add pictures to a trigger (`at`: replace that one instead). Each is checked
+        before it's saved, so a refused picture never replaces or joins the others;
+        what was refused, and what may not be found, is said once for the lot.
+        Returns how many were added."""
+        refused: list[tuple[str, str, str]] = []      # (name, title, text)
+        notes: list[tuple[str, str]] = []             # (name, note)
+        added = left_out = 0
+        for i, img in enumerate(imgs):
+            name = names[i] if i < len(names) else f"Picture {len(t.images) + 1}"
+            if at is None and len(t.images) >= MAX_PICTURES:
+                left_out = len(imgs) - i
+                break
+            pic, why = self._check_picture(img)
+            if pic is None:
+                refused.append((name, *why))
+                continue
+            try:
+                path = save_picture(img, picture_name(t))
+            except OSError as e:
+                refused.append((name, "Couldn't keep the picture", str(e)))
+                continue
+            if at is not None and 0 <= at < len(t.images):
+                old, t.images[at] = t.images[at], path
+                delete_picture(old)
+                self._gray.pop(old, None)
+                at = None                   # a second picture would only be added
+            else:
+                t.images.append(path)
+            added += 1
+            for note in self._picture_notes(pic, t):
+                notes.append((name, note))
         row = self.rows.get(t.id)
         if row is not None:
-            row.refresh_picture()
-            row._update_state()
-        notes = self._picture_notes(pic, t)
-        if notes:
-            QMessageBox.warning(self, "This picture may not be found",
-                                "\n\n".join(notes))
-        return True
+            row.refresh_pictures()
+            if left_out:
+                row.flash(f"A trigger can look for up to {MAX_PICTURES} pictures — "
+                          f"{plural(left_out, 'picture')} not added", 4000, "warn")
+        self._say(refused, "Some pictures couldn't be used")
+        self._say([(n, "This picture may not be found", note) for n, note in notes],
+                  "Some pictures may not be found")
+        return added
+
+    def _say(self, items: list[tuple[str, str, str]], title: str):
+        """One warning for a list of (picture name, title, text): the picture's own
+        title when there's only one, `title` with the names when there are more."""
+        if len(items) == 1:
+            QMessageBox.warning(self, items[0][1], items[0][2])
+        elif items:
+            QMessageBox.warning(self, title, "\n\n".join(f"{n}: {text}" for n, _t, text in items))
 
     def _picture_notes(self, pic: Picture, t: Trigger) -> list[str]:
         """What may stop a picture being found on the screen it's watched on (it's kept
@@ -828,11 +1125,41 @@ class TriggersTab(QWidget):
             return
         self._new(img, f"Trigger {len(self.triggers) + 1}")
 
-    def _change_picture(self, row: TriggerRow):
+    def _add_picture_files(self, row: TriggerRow):
+        """The card's "+ Add pictures…": any number of files onto this trigger."""
+        paths, _ = QFileDialog.getOpenFileNames(self, "Pictures to look for", str(Path.home()),
+                                                f"Pictures ({PICTURE_EXTS});;All files (*)")
+        if paths and self._add_pictures(row.t, [QImage(p) for p in paths],
+                                        [Path(p).name for p in paths]):
+            self._store()
+
+    def _paste_picture(self, row: TriggerRow):
+        """The card's "Paste picture": the copied picture onto this trigger."""
+        img = QApplication.clipboard().image()
+        if img.isNull():
+            QMessageBox.information(self, "No picture copied",
+                                    "Copy a picture first: press Win+Shift+S, drag around "
+                                    "the thing to look for, then click Paste picture.")
+            return
+        if self._add_pictures(row.t, [img]):
+            self._store()
+
+    def _change_picture(self, row: TriggerRow, index: int = 0):
+        """Swap one of the trigger's pictures for a file."""
         path, _ = QFileDialog.getOpenFileName(self, "Picture to look for", str(Path.home()),
                                               f"Pictures ({PICTURE_EXTS});;All files (*)")
-        if path and self._set_picture(row.t, QImage(path)):
+        if path and self._add_pictures(row.t, [QImage(path)], [Path(path).name], at=index):
             self._store()
+
+    def _remove_picture(self, row: TriggerRow, index: int):
+        t = row.t
+        if not 0 <= index < len(t.images):
+            return
+        path = t.images.pop(index)
+        delete_picture(path)
+        self._gray.pop(path, None)
+        row.refresh_pictures()
+        self._store()
 
     def _choose_sound_file(self, row: TriggerRow):
         exts = " ".join(f"*{e}" for e in sorted(AUDIO_EXTS))
@@ -843,9 +1170,10 @@ class TriggersTab(QWidget):
         fp = library.fingerprint(path)
         known = {f: sid for sid, _n, f in self._sounds() if f}
         if fp and fp in known:                 # already on the board
-            row.t.sound, row.t.pending = known[fp], ""
+            if known[fp] not in row.t.sounds:
+                row.t.sounds.append(known[fp])
         else:
-            row.t.sound, row.t.pending = "", fp
+            row.t.pending = fp
             self.add_sound.emit(path)
         row.set_sounds(self._board_sounds())
         self._store()
@@ -854,14 +1182,13 @@ class TriggersTab(QWidget):
         t = row.t
         self.triggers = [x for x in self.triggers if x.id != t.id]
         self.rows.pop(t.id, None)
-        self._gray.pop(t.id, None)
+        self._bag.forget(t.id)
+        self._order.pop(t.id, None)
         self.list_layout.removeWidget(row)
         row.deleteLater()
-        if t.image and Path(t.image).parent == pictures_dir():
-            try:
-                Path(t.image).unlink(missing_ok=True)
-            except OSError:
-                log.debug("couldn't delete %s", t.image, exc_info=True)
+        for path in t.images:
+            delete_picture(path)
+            self._gray.pop(path, None)
         self.empty.setVisible(not self.triggers)
         self._store()
         if not self.triggers and self.is_active():
