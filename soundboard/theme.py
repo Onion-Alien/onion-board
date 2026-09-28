@@ -161,8 +161,26 @@ QPushButton#onair:checked:hover { background:#16b865; }
 QWidget#decktop { background:transparent; }
 QLabel#decktitle { color:$section; font-size:8pt; font-weight:700; letter-spacing:1px; }
 QPushButton#pill[state="warn"] { background:$warn_bg; color:$warn_text; border:1px solid $warn_text; }
-QSpinBox { background:$bg; border:1px solid $border; border-radius:6px; padding:3px 4px; }
+QAbstractSpinBox { background:$bg; border:1px solid $border; border-radius:6px; padding:3px 6px; }
+QAbstractSpinBox:hover { border-color:$border_hi; }
+QAbstractSpinBox:focus { border-color:$accent; }
 QSpinBox::up-button, QSpinBox::down-button { width:0; }
+QDoubleSpinBox, QSpinBox#stepper { padding-right:20px; }
+QDoubleSpinBox::up-button, QDoubleSpinBox::down-button,
+QSpinBox#stepper::up-button, QSpinBox#stepper::down-button {
+    subcontrol-origin:border; width:18px; border:none; background:transparent; }
+QDoubleSpinBox::up-button, QSpinBox#stepper::up-button {
+    subcontrol-position:top right; border-top-right-radius:6px; }
+QDoubleSpinBox::down-button, QSpinBox#stepper::down-button {
+    subcontrol-position:bottom right; border-bottom-right-radius:6px; }
+QDoubleSpinBox::up-button:hover, QDoubleSpinBox::down-button:hover,
+QSpinBox#stepper::up-button:hover, QSpinBox#stepper::down-button:hover { background:$btn_hover; }
+QDoubleSpinBox::up-arrow, QSpinBox#stepper::up-arrow { image:url("$up_small"); width:8px; height:8px; }
+QDoubleSpinBox::down-arrow, QSpinBox#stepper::down-arrow { image:url("$down_small"); width:8px; height:8px; }
+QDoubleSpinBox::up-arrow:disabled, QDoubleSpinBox::up-arrow:off,
+QSpinBox#stepper::up-arrow:disabled, QSpinBox#stepper::up-arrow:off { image:url("$up_small_off"); }
+QDoubleSpinBox::down-arrow:disabled, QDoubleSpinBox::down-arrow:off,
+QSpinBox#stepper::down-arrow:disabled, QSpinBox#stepper::down-arrow:off { image:url("$down_small_off"); }
 QSlider::groove:vertical { width:4px; background:$groove; border-radius:2px; }
 QSlider::add-page:vertical { background:$accent; border-radius:2px; }
 QSlider::handle:vertical { background:white; border:1px solid $border; width:14px; height:14px; margin:0 -5px; border-radius:7px; }
@@ -175,11 +193,30 @@ QPushButton#round { padding:0; font-size:14pt; border-radius:10px; }
 QSlider#seek::groove:horizontal { height:6px; border-radius:3px; }
 QSlider#seek::sub-page:horizontal { border-radius:3px; }
 QLineEdit, QComboBox { background:$card; border:1px solid $border; border-radius:8px; padding:6px 8px; }
+QLineEdit:hover, QComboBox:hover { border-color:$border_hi; }
+QLineEdit:focus, QComboBox:focus, QComboBox:on { border-color:$accent; }
+QLineEdit { selection-background-color:$accent; selection-color:$on_accent; }
+QComboBox { padding:6px 10px; padding-right:30px; combobox-popup:0; }
+QComboBox::drop-down { subcontrol-origin:padding; subcontrol-position:center right;
+    width:26px; border:none; background:transparent; }
+QComboBox::down-arrow { image:url("$down"); width:10px; height:10px; }
+QComboBox::down-arrow:on { image:url("$up"); }
+QComboBox::down-arrow:disabled { image:url("$down_off"); }
+QComboBox:disabled, QLineEdit:disabled { color:$muted; background:$inset; }
 QFrame#card QComboBox, QFrame#card QPushButton, QFrame#card QLineEdit { background:$card; }
-QFrame#card QSpinBox { background:$bg; }
+QFrame#card QComboBox:disabled, QFrame#card QLineEdit:disabled { background:$inset; }
+QFrame#card QAbstractSpinBox { background:$bg; }
 QFrame#card QPushButton:checked { background:$accent; }
 QFrame#card QPushButton#miccheck:checked { background:#e53935; }
-QComboBox QAbstractItemView { background:$card; selection-background-color:$accent; selection-color:$on_accent; }
+QComboBox QAbstractItemView { background:$card; color:$text; border:1px solid $border_hi;
+    padding:4px; outline:0; selection-background-color:$accent; selection-color:$on_accent; }
+QComboBox QAbstractItemView::item { min-height:28px; padding:0 10px; border-radius:6px; }
+QComboBox QAbstractItemView::item:hover { background:$btn_hover; color:$text_hi; }
+QComboBox QAbstractItemView::item:selected { background:$accent; color:$on_accent; }
+QComboBox QAbstractItemView::item:disabled { color:$faint; }
+QPushButton::menu-indicator { image:url("$down"); width:9px; height:9px;
+    subcontrol-origin:padding; subcontrol-position:center right; right:2px; }
+QPushButton::menu-indicator:open { image:url("$up"); }
 QSlider::groove:horizontal { height:4px; background:$groove; border-radius:2px; }
 QSlider::sub-page:horizontal { background:$accent; border-radius:2px; }
 QSlider::handle:horizontal { background:white; border:1px solid $border; width:14px; height:14px; margin:-5px 0; border-radius:7px; }
@@ -193,11 +230,19 @@ QCheckBox::indicator:disabled, QRadioButton::indicator:disabled { background:$in
 QScrollArea, QScrollArea > QWidget > QWidget { background:transparent; }
 QScrollBar:vertical { background:transparent; width:10px; }
 QScrollBar::handle:vertical { background:$groove; border-radius:5px; min-height:30px; }
-QScrollBar::add-line, QScrollBar::sub-line { height:0; }
-QMenu { background:$card; border:1px solid $border; padding:4px; }
-QMenu::item { padding:6px 18px; border-radius:6px; }
+QScrollBar::handle:vertical:hover { background:$border_hi; }
+QScrollBar:horizontal { background:transparent; height:10px; }
+QScrollBar::handle:horizontal { background:$groove; border-radius:5px; min-width:30px; }
+QScrollBar::handle:horizontal:hover { background:$border_hi; }
+QScrollBar::add-line, QScrollBar::sub-line { height:0; width:0; }
+QScrollBar::add-page, QScrollBar::sub-page { background:transparent; }
+QMenu { background:$card; border:1px solid $border_hi; padding:5px; }
+QMenu::item { padding:7px 22px 7px 12px; border-radius:6px; margin:1px 0; }
 QMenu::item:selected { background:$accent; color:$on_accent; }
-QToolTip { background:$card; color:$text; border:1px solid $border; }
+QMenu::item:disabled { color:$faint; }
+QMenu::icon { padding-left:10px; }
+QMenu::separator { height:1px; background:$border; margin:5px 8px; }
+QToolTip { background:$card; color:$text; border:1px solid $border_hi; border-radius:6px; padding:5px 8px; }
 QTabWidget::pane { border:none; }
 QTabBar { qproperty-drawBase: 0; }
 QTabBar::tab { background:transparent; color:$muted; padding:8px 16px; margin-right:4px;
@@ -207,6 +252,11 @@ QTabBar::tab:hover { color:$text; }
 QPushButton#live { font-weight:700; }
 QPushButton#voicetile { text-align:left; padding:9px 10px; border-radius:10px; }
 QPushButton#voicetile:checked { background:$accent; color:$on_accent; border:1px solid $accent_hi; font-weight:700; }
+QPushButton#voicetile[art="true"] { padding:5px 10px 5px 6px; }
+QPushButton#voicetile:hover:!checked { border-color:$border_hi; }
+QPushButton#fold { background:transparent; border:none; color:$muted; padding:3px 6px; font-size:8.5pt; font-weight:600; }
+QPushButton#fold:hover, QPushButton#fold:checked { color:$text; background:transparent; }
+QFrame#card QPushButton#fold, QFrame#card QPushButton#fold:checked { background:transparent; }
 QPushButton#power { font-weight:700; }
 QPushButton#power:checked, QFrame#card QPushButton#power:checked { background:#13a35a; border:1px solid #13ce66; color:white; }
 QPushButton#live:checked { background:#e53935; border:1px solid #ff6b6b; color:white; }
@@ -218,6 +268,13 @@ QPushButton#hkbtn { min-width:150px; font-weight:600; }
 QPushButton#themecard { background:$panel; border:2px solid $border; border-radius:12px; padding:0; }
 QPushButton#themecard:hover { border-color:$border_hi; }
 QPushButton#themecard:checked { background:$panel; border:2px solid $accent; }
+QFrame#card QFrame#chip { background:$btn; border:1px solid $border; border-radius:11px; }
+QFrame#card QFrame#chip:hover { border-color:$border_hi; }
+QFrame#card QFrame#chip[sel="true"] { border-color:$accent; }
+QFrame#card QFrame#chip QPushButton { background:transparent; border:none; }
+QFrame#card QFrame#chip QPushButton#chipname:hover { color:$text_hi; }
+QFrame#card QFrame#chip QPushButton#chipstop { border-radius:11px; color:$muted; }
+QFrame#card QFrame#chip QPushButton#chipstop:hover { background:$danger_bg; color:$danger_text; }
 """)
 
 
@@ -249,6 +306,38 @@ def _check_url(colour: str) -> str:
         for path, size in ((base, 14), (base.with_name(base.stem + "@2x.png"), 28)):
             if not path.exists():
                 _check_image(colour, size).save(str(path))
+    except OSError:
+        return ""
+    return base.as_posix()
+
+
+def _chevron_image(colour: str, size: int, up: bool) -> QImage:
+    """A rounded chevron (dropdown / stepper arrow), drawn in code like the tick."""
+    img = QImage(size, size, QImage.Format_ARGB32)
+    img.fill(Qt.transparent)
+    p = QPainter(img)
+    p.setRenderHint(QPainter.Antialiasing)
+    pen = QPen(QColor(colour), size * 0.17)
+    pen.setCapStyle(Qt.RoundCap)
+    pen.setJoinStyle(Qt.RoundJoin)
+    p.setPen(pen)
+    tip, ends = (0.34, 0.64) if up else (0.66, 0.36)
+    path = QPainterPath(QPointF(size * 0.18, size * ends))
+    path.lineTo(QPointF(size * 0.5, size * tip))
+    path.lineTo(QPointF(size * 0.82, size * ends))
+    p.drawPath(path)
+    p.end()
+    return img
+
+
+def _chevron_url(colour: str, size: int, up: bool) -> str:
+    folder = Path(tempfile.gettempdir()) / "onionboard-ui"
+    base = folder / f"chevron-{'up' if up else 'down'}{size}-{colour.lstrip('#')}.png"
+    try:
+        folder.mkdir(exist_ok=True)
+        for path, px in ((base, size), (base.with_name(base.stem + "@2x.png"), size * 2)):
+            if not path.exists():
+                _chevron_image(colour, px, up).save(str(path))
     except OSError:
         return ""
     return base.as_posix()
@@ -295,6 +384,11 @@ def _texture_url(kind: str, base: str) -> str:
 def stylesheet(name: str | None = None) -> str:
     tokens = dict(THEMES.get(name or current_name, THEMES[DEFAULT]))
     tokens["check"] = _check_url(tokens["on_accent"])
+    for key, colour in (("", tokens["muted"]), ("_off", tokens["off"])):
+        tokens["down" + key] = _chevron_url(colour, 10, up=False)
+        tokens["up" + key] = _chevron_url(colour, 10, up=True)
+        tokens["down_small" + key] = _chevron_url(colour, 8, up=False)
+        tokens["up_small" + key] = _chevron_url(colour, 8, up=True)
     css = STYLE.substitute(tokens)
     if tokens.get("texture") and (url := _texture_url(tokens["texture"], tokens["panel"])):
         css += ("QFrame#card, QFrame#transport, QFrame#setcard "

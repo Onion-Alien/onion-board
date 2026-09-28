@@ -382,6 +382,7 @@ class TriggerRow(QFrame):
                                  "picture also has to leave the screen before it can play again.")
         row.addWidget(labelled("Not again for", self.cooldown))
         self.threshold = QSpinBox()
+        self.threshold.setObjectName("stepper")   # arrows like Wait / Not again for
         self.threshold.setRange(30, 99)
         self.threshold.setSuffix(" %")
         self.threshold.setValue(round(t.threshold * 100))

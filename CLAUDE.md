@@ -17,7 +17,8 @@ published. Before writing or committing anything:
 - **Never commit secrets** or anything from `%APPDATA%\OnionBoard\` (config, logs,
   browser profile, cache).
 - **Never add audio files, binaries, or third-party assets.** Tests synthesize audio
-  with numpy; icons/artwork are drawn in code.
+  with numpy; icons are drawn in code. The one exception is artwork made for this
+  project (e.g. generated pictures) in `assets/art/` — see its README.
 - New network access must be added to the table in `SECURITY.md`. No telemetry.
 - Loopback sockets bind `127.0.0.1` and verify a per-launch secret with
   `secrets.compare_digest`; never log the secret.

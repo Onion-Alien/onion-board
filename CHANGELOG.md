@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+- **A cleaner look.** Dropdowns have a slim arrow and open as a list below the box
+  with rounded, highlighted rows; number boxes (Triggers' Wait, Not again for,
+  Match) get matching arrows; menus, tooltips and scrollbars are tidied up; sound
+  chips on a trigger are round again; a clearer Settings gear and folder icon.
+  Nothing has moved.
+- **Pictures for the voices.** Voice changer tiles, the computer voice and its
+  languages can show a picture (from `assets/art`), and while one is on the Voice
+  tab shows it. Missing pictures fall back to the emoji and icons as before.
+
 ## 1.3.1 — 2026-09-28
 
 A bug-fix release from testing the whole app for real on a two-monitor PC, plus

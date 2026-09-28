@@ -11,7 +11,7 @@ import math
 import weakref
 
 from PySide6.QtCore import QPointF, QRectF, QSize, Qt
-from PySide6.QtGui import QColor, QIcon, QPainter, QPainterPath, QPen, QPixmap
+from PySide6.QtGui import QColor, QIcon, QPainter, QPainterPath, QPen, QPixmap, QTransform
 
 from soundboard import theme
 
@@ -102,21 +102,16 @@ def _plus(p, fill):
 
 
 def _gear(p, fill):
-    path = QPainterPath()
-    teeth = 8
-    for i in range(teeth * 2):
-        a0 = math.pi * 2 * i / (teeth * 2)
-        a1 = math.pi * 2 * (i + 1) / (teeth * 2)
-        r = 9.5 if i % 2 == 0 else 7.2
-        pts = [QPointF(12 + r * math.cos(a), 12 + r * math.sin(a)) for a in (a0, a1)]
-        if i == 0:
-            path.moveTo(pts[0])
-        else:
-            path.lineTo(pts[0])
-        path.lineTo(pts[1])
-    path.closeSubpath()
-    p.drawPath(path)
-    p.drawEllipse(QPointF(12, 12), 3, 3)
+    """Six chunky rounded teeth on a ring: reads as a gear even at 16 px."""
+    body = QPainterPath()
+    body.addEllipse(QPointF(12, 12), 6.6, 6.6)
+    for i in range(6):
+        tooth = QPainterPath()
+        tooth.addRoundedRect(QRectF(-2.3, -9.6, 4.6, 5.5), 1.3, 1.3)
+        a = math.degrees(math.pi * 2 * i / 6)
+        body = body.united(QTransform().translate(12, 12).rotate(a).map(tooth))
+    p.drawPath(body.simplified())
+    p.drawEllipse(QPointF(12, 12), 2.8, 2.8)
 
 
 def _history(p, fill):
@@ -228,11 +223,21 @@ def _warn(p, fill):
 
 
 def _folder(p, fill):
-    path = QPainterPath(QPointF(3, 7))
-    for pt in ((3, 5), (9, 5), (11, 7), (21, 7), (21, 19), (3, 19)):
-        path.lineTo(*pt)
-    path.closeSubpath()
+    """A folder with a rounded body, its tab, and the front flap's edge."""
+    path = QPainterPath(QPointF(3, 17.5))
+    path.lineTo(3, 6.5)
+    path.quadTo(3, 4.5, 5, 4.5)
+    path.lineTo(8.6, 4.5)
+    path.quadTo(9.6, 4.5, 10.3, 5.3)
+    path.lineTo(11.6, 6.8)
+    path.lineTo(19, 6.8)
+    path.quadTo(21, 6.8, 21, 8.8)
+    path.lineTo(21, 17.5)
+    path.quadTo(21, 19.5, 19, 19.5)
+    path.lineTo(5, 19.5)
+    path.quadTo(3, 19.5, 3, 17.5)
     p.drawPath(path)
+    p.drawLine(QPointF(3, 10), QPointF(21, 10))
 
 
 def _next(p, fill):
@@ -362,6 +367,22 @@ def _eye(p, fill):
     fill(dot)
 
 
+def _chevron(direction):
+    """A fold-out's state: > closed, v open."""
+    def draw(p, fill):
+        path = QPainterPath()
+        if direction == "down":
+            path.moveTo(6, 9)
+            path.lineTo(12, 15)
+            path.lineTo(18, 9)
+        else:
+            path.moveTo(9, 6)
+            path.lineTo(15, 12)
+            path.lineTo(9, 18)
+        p.drawPath(path)
+    return draw
+
+
 SHAPES = {
     "sounds": _grid, "browser": _globe, "voice": _mask, "setup": _sliders, "wave": _wave,
     "mic": _mic, "headphones": _headphones, "volume": _volume, "ear": _ear,
@@ -371,7 +392,7 @@ SHAPES = {
     "speech": _speech, "cable": _cable, "check": _check, "warn": _warn, "folder": _folder,
     "next": _next, "edit": _edit, "trash": _trash, "keyboard": _keyboard,
     "palette": _palette, "gamepad": _gamepad, "image": _image, "radio": _radio,
-    "apps": _apps, "triggers": _eye,
+    "apps": _apps, "triggers": _eye, "fold": _chevron("right"), "fold_open": _chevron("down"),
 }
 
 
@@ -452,6 +473,9 @@ def set_label_icon(label, name: str, color: str = "muted", size: int = 18):
 
 
 def _tab_icon(name: str, tint: str | None) -> QIcon:
+    if name.startswith("art:"):   # a picture (ui/art.py): its own colours, whatever the tint
+        from soundboard.ui import art
+        return art.icon(name[4:]) or QIcon()
     if tint is None:
         return icon(name, "muted", "accent")
     ic = QIcon()   # one colour whatever the tab's state (e.g. green while it's live)
@@ -463,7 +487,8 @@ def _tab_icon(name: str, tint: str | None) -> QIcon:
 
 
 def set_tab_icon(tabs, index: int, name: str, tint: str | None = None):
-    """`tint` colours the icon in every state; None is the usual muted / accent."""
+    """`tint` colours the icon in every state; None is the usual muted / accent.
+    "art:<key>" shows that picture from ui/art.py instead of a painted icon."""
     tabs.setTabIcon(index, _tab_icon(name, tint))
     _tabs[:] = [e for e in _tabs if not (e[0]() is tabs and e[1] == index)]
     _tabs.append((weakref.ref(tabs), index, name, tint))

@@ -30,6 +30,7 @@ if ($Clean) { $cleanArg = @("--clean") }
     --name OnionBoard --icon assets\onionboard.ico `
     --add-data "installer\install-vbcable.ps1;." `
     --add-data "assets\onionboard.ico;." `
+    --add-data "assets\art;art" `
     --copy-metadata yt-dlp --collect-all yt_dlp_ejs `
     --paths . `
     main.py

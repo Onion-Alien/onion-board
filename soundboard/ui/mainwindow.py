@@ -307,8 +307,9 @@ class MainWindow(QMainWindow):
         # so it's never left on without you noticing
         vi = self.tabs.indexOf(self.voice)
         self.voice.active_changed.connect(lambda on: set_tab_live(
-            self.tabs, vi, on, "● ON: others hear your changed / computer voice", "voice"))
-        set_tab_live(self.tabs, vi, self.voice.is_active(), icon="voice")
+            self.tabs, vi, on, "● ON: others hear your changed / computer voice",
+            self.voice.tab_icon()))   # the active voice's picture, when there is one
+        set_tab_live(self.tabs, vi, self.voice.is_active(), icon=self.voice.tab_icon())
         ti = self.tabs.indexOf(self.triggers)
         self.triggers.active_changed.connect(lambda on: set_tab_live(
             self.tabs, ti, on, "● ON: watching your screen", "triggers"))

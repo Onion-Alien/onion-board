@@ -42,8 +42,9 @@ in a later commit.
    `requirements.txt`; VB-Cable is downloaded at install time because its licence
    forbids redistribution. Don't add `.exe`, `.dll` or driver files.
 6. **Assets must be ours.** Icons and artwork are drawn in code (`theme.py`,
-   `bunny.py`). New images, fonts or sounds need a licence that allows
-   redistribution, noted in the PR.
+   `icons.py`, `bunny.py`), except pictures made for this project in `assets/art/`
+   (see its README); the app works without them. Other images, fonts or sounds need
+   a licence that allows redistribution, noted in the PR.
 7. **No new network calls without saying so.** Anything that talks to the
    internet goes in the table in [SECURITY.md](SECURITY.md#what-the-app-does-on-the-network)
    in the same PR. No telemetry.
