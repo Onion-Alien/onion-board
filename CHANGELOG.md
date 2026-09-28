@@ -6,8 +6,9 @@
   monitor it used to appear on the main one (Qt 6 names screens differently from
   Windows, so the overlay never recognised the game's monitor).
 - **Triggers work on HDR screens.** A monitor with HDR (advanced colour) on hands
-  the app 16-bit frames; it read them as 8-bit and saw only black, so nothing
-  ever matched.
+  the app its frames in a different format than it announces; the copy came
+  out black, so nothing ever matched. A screen where nothing moves is read
+  straight away now too.
 - **Triggers: the screen picker no longer cuts off the screen's size.**
 - **Triggers can watch several screens at once.** Each trigger can pick its own
   screen on its card, so a picture on your second monitor and one on your main

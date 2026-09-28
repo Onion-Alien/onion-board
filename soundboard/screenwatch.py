@@ -555,6 +555,7 @@ class DupGrabber:
     DUP_ACQUIRE = 8
     DUP_RELEASE_FRAME = 14
     DEVICE_CREATE_TEXTURE2D = 5
+    TEX_GET_DESC = 10               # ID3D11Texture2D::GetDesc
     CTX_MAP, CTX_UNMAP, CTX_COPY_RESOURCE = 14, 15, 47
     USAGE_STAGING, CPU_ACCESS_READ, MAP_READ = 3, 0x20000, 1
 
@@ -651,18 +652,26 @@ class DupGrabber:
                          "supported: falling back to GDI", mode[2])
             raise OSError(f"unsupported duplication format {mode[2]}")
         if mode != self._mode:
-            self.staging.release()
-            desc = _TEXTURE2D_DESC(mode[0], mode[1], 1, 1, mode[2], 1, 0,
-                                   self.USAGE_STAGING, 0, self.CPU_ACCESS_READ, 0)
-            hr = self.device.call(self.DEVICE_CREATE_TEXTURE2D, ctypes.byref(desc), None,
-                                  ctypes.byref(self.staging.p),
-                                  argtypes=(ctypes.c_void_p, ctypes.c_void_p, ctypes.c_void_p))
-            if hr < 0:
-                raise OSError(f"CreateTexture2D failed (0x{_hr(hr):08X})")
-            self._mode = mode
-            self.source = mode[:2]
-            self.last = None
-            self._layout()
+            self._make_staging(mode)
+
+    def _make_staging(self, mode: tuple[int, int, int]):
+        """A CPU-readable copy of the frames in `mode` (w, h, DXGI format). The mode the
+        duplication announces isn't always the one its frames come in: an HDR desktop
+        announces 16-bit float yet hands over 8-bit BGRA textures, and CopyResource
+        between different formats silently copies nothing. So grab() checks every
+        frame's own description and calls this again when it differs."""
+        self.staging.release()
+        desc = _TEXTURE2D_DESC(mode[0], mode[1], 1, 1, mode[2], 1, 0,
+                               self.USAGE_STAGING, 0, self.CPU_ACCESS_READ, 0)
+        hr = self.device.call(self.DEVICE_CREATE_TEXTURE2D, ctypes.byref(desc), None,
+                              ctypes.byref(self.staging.p),
+                              argtypes=(ctypes.c_void_p, ctypes.c_void_p, ctypes.c_void_p))
+        if hr < 0:
+            raise OSError(f"CreateTexture2D failed (0x{_hr(hr):08X})")
+        self._mode = mode
+        self.source = mode[:2]
+        self.last = None
+        self._layout()
 
     def _layout(self):
         """Which frame pixels make up the (w, h) picture, at 2x where the frame allows."""
@@ -708,15 +717,31 @@ class DupGrabber:
             # the graphics card was reset or removed (a driver update or crash, a laptop
             # switching cards): only a new device can see the screen again
             raise CaptureLost(f"AcquireNextFrame failed (0x{code:08X})")
-        # LastPresentTime 0: only the mouse moved, or the (blank) frame a new
-        # duplication starts with. The picture is unchanged, so skip the copy.
-        if int.from_bytes(bytes(info[:8]), "little", signed=True) == 0:
+        # LastPresentTime 0: only the mouse moved, or the frame a new duplication
+        # starts with. The picture is unchanged, so skip the copy, except for the
+        # very first frame: on a screen where nothing moves (a static death screen,
+        # a launcher) it's the only one carrying the picture, and it isn't blank.
+        if int.from_bytes(bytes(info[:8]), "little", signed=True) == 0 and self.last is not None:
             res.release()
             self.dup.call(self.DUP_RELEASE_FRAME)
             return self.last
         try:
             tex = res.query(IID_ID3D11Texture2D)
             try:
+                td = _TEXTURE2D_DESC()
+                tex.call(self.TEX_GET_DESC, ctypes.byref(td), restype=None,
+                         argtypes=(ctypes.c_void_p,))
+                got = (int(td.Width), int(td.Height), int(td.Format))
+                if got != self._mode:
+                    if got[2] not in FRAME_FORMATS:
+                        if got[2] not in _unknown_formats:
+                            _unknown_formats.add(got[2])
+                            log.info("desktop duplication frames come in DXGI format %d, "
+                                     "which isn't supported: falling back to GDI", got[2])
+                        raise CaptureLost(f"unsupported duplication format {got[2]}")
+                    log.info("duplicated frames are %dx%d in DXGI format %d (the mode said "
+                             "%dx%d format %d): reading them as they come", *got, *self._mode)
+                    self._make_staging(got)
                 self.ctx.call(self.CTX_COPY_RESOURCE, self.staging.p, tex.p, restype=None,
                               argtypes=(ctypes.c_void_p, ctypes.c_void_p))
             finally:
