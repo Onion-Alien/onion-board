@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+## 1.3.1 — 2026-09-28
+
+A bug-fix release from testing the whole app for real on a two-monitor PC, plus
+three Triggers upgrades that came out of it.
+
 - **The in-game overlay opens on the monitor your game is on.** On a second
   monitor it used to appear on the main one (Qt 6 names screens differently from
   Windows, so the overlay never recognised the game's monitor).

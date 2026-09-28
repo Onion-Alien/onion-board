@@ -209,9 +209,11 @@ too (say No if another program, like Voicemeeter, uses it).
   to it makes that easy to set. It plays once each time the picture appears, not
   over and over while it stays up. A trigger can hold up to 100 pictures (any of
   them showing up fires it) and several sounds, played one at random, in order,
-  or all at once. It checks every 100 ms by default (16 ms to
-  500 ms). It sees fullscreen games too (Windows' Desktop Duplication), and a
-  picture with transparent parts (a cut-out icon) matches whatever is behind it.
+  or all at once. Each trigger can watch its own screen, so one on your second
+  monitor and one on your main monitor work at the same time. It checks every
+  100 ms by default (16 ms to 500 ms). It sees fullscreen games too (Windows'
+  Desktop Duplication, HDR screens included), and a picture with transparent
+  parts (a cut-out icon) matches whatever is behind it.
   Everything happens on your PC: the screen is never saved or sent anywhere. If
   a game still shows up black, set it to Borderless or Windowed fullscreen.
 - **Volumes:** sounds → them, your voice → them, your headphones. Exact % boxes go
