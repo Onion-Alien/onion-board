@@ -2,12 +2,6 @@
 
 ## Unreleased
 
-- **The logo reacts to everything that plays.** The glowing onion in the header
-  followed only what others hear, so the radio or a program on *Only me* left it
-  still, and talking into your mic made it flare. It now glows with any sound, the
-  radio or a captured program, wherever they go, and never with your voice. The
-  title bar, taskbar and tray icons glow along with it.
-
 ## 1.3.3 — 2026-09-29
 
 Onion Board now updates itself, plus 25 new themes and an overlay you can drag
@@ -34,6 +28,11 @@ anywhere. This is the last version you have to install by hand: from here on the
   its edges) and it opens there from then on — on any monitor. Settings → Overlay
   picks the monitor (the game's, the main one, or a particular screen, say a
   second monitor next to the game) and one of nine spots.
+- **The logo reacts to everything that plays.** The glowing onion in the header
+  followed only what others hear, so the radio or a program on *Only me* left it
+  still, and talking into your mic made it flare. It now glows with any sound, the
+  radio or a captured program, wherever they go, and never with your voice. The
+  title bar, taskbar and tray icons glow along with it.
 
 ## 1.3.2 — 2026-09-29
 
