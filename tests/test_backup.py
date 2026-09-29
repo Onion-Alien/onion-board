@@ -221,11 +221,11 @@ def test_apply_settings_checks_types_and_skips_local_ones():
     cfg = Config()
     changed = backup.apply_settings(cfg, {"theme": 5, "sound_vol": 2, "mic_enabled": "yes",
                                           "pad_width": 180, "cue_sounds": False,
-                                          "mic_device": "Evil", "update_check_optin": True,
+                                          "mic_device": "Evil", "update_check": False,
                                           "no_such_setting": 1})
     assert cfg.theme == Config().theme and cfg.mic_enabled is True
     assert cfg.sound_vol == 2.0 and cfg.pad_width == 180 and cfg.cue_sounds is False
-    assert cfg.mic_device is None and cfg.update_check_optin is False
+    assert cfg.mic_device is None and cfg.update_check is True
     assert sorted(changed) == ["cue_sounds", "pad_width", "sound_vol"]
 
 

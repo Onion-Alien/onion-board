@@ -110,6 +110,24 @@ def _never_touch_real_appdata(monkeypatch, tmp_path):
 
 
 @pytest.fixture(autouse=True)
+def _never_update_for_real(monkeypatch, tmp_path):
+    """The update check is on by default: no test asks GitHub, downloads an installer
+    into %APPDATA% or runs one. Tests fake the parts they exercise."""
+    from soundboard import updates
+
+    def offline(*_a, **_k):
+        raise OSError("tests don't go online")
+
+    def no_installer(*_a, **_k):
+        raise AssertionError("a test tried to run the update installer")
+    monkeypatch.setattr(updates, "UPDATES_DIR", tmp_path / "guard" / "updates")
+    monkeypatch.setattr(updates, "INSTALL_LOG", tmp_path / "guard" / "updates" / "install.log")
+    monkeypatch.setattr(updates, "_get", offline)
+    monkeypatch.setattr(updates, "_open", offline)
+    monkeypatch.setattr(updates, "start_install", no_installer)
+
+
+@pytest.fixture(autouse=True)
 def _never_touch_real_autostart(monkeypatch):
     """Building a MainWindow re-points an existing "start with Windows" entry at this
     copy of the app; in tests that would rewrite the developer's real Run key. Tests

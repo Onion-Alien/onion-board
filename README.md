@@ -246,8 +246,11 @@ too (say No if another program, like Voicemeeter, uses it).
   ready-made "play a random sound" link).
 - **Runs in the background:** closing the window keeps it in the tray (hotkeys and
   the overlay keep working; right-click the tray icon → *Quit*). Optionally
-  **starts with Windows**, straight to the tray. An opt-in, once-a-day check tells
-  you when a new version is out (it never downloads anything itself).
+  **starts with Windows**, straight to the tray.
+- **Updates itself:** once a day it checks GitHub for a new version (untick it in
+  Settings → General). *Update now* downloads it, checks it's the file GitHub lists,
+  and on *Restart now* installs it and reopens the app, keeping your sounds and
+  settings. Nothing is downloaded until you click.
 
 ### How it works
 
@@ -362,7 +365,7 @@ the launcher the shortcuts and PyInstaller use. The app is the `soundboard` pack
 | `soundboard/ui/trim.py` | the Effects tab's trim control: waveform with start / end handles and exact-time boxes |
 | `soundboard/backup.py` | export / import of the board as a plain zip (JSON + original audio + pictures), sound packs and single sounds; see `docs/BACKUP-FORMAT.md` |
 | `soundboard/autostart.py` | *Start with Windows*: the per-user `Run` registry value (`--tray` starts it hidden) |
-| `soundboard/updates.py` | the opt-in "is there a newer version?" check against GitHub Releases |
+| `soundboard/updates.py` | "is there a newer version?" (GitHub Releases, once a day) and the self-update: downloads the release's installer, checks its SHA-256, runs it silently and reopens the app |
 | `soundboard/ui/icons.py` | the line icons, drawn in code and recoloured with the theme |
 | `soundboard/ui/art.py` | optional pictures from `assets/art` (voice tiles, the computer voice, its languages); emoji / painted icons when missing |
 | `soundboard/ui/responsive.py` | small windows: what hides, in which order, as the window shrinks |

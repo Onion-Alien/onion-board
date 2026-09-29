@@ -128,5 +128,11 @@ def main():
     elif not w.cfg.setup_done:   # first launch: walk them through mic, headphones, cable
         QTimer.singleShot(400, w.run_setup)
     QTimer.singleShot(30_000, lambda: start_ytdlp_check(w.cfg))
-    QTimer.singleShot(45_000, w.check_updates)   # only if opted in (updates.py)
+    QTimer.singleShot(600, w.after_update)   # "Updated to …" after an update restarted it
+    # new versions (updates.py): unless unticked, at most once a day, also for an app
+    # left running for days
+    QTimer.singleShot(45_000, w.check_updates)
+    recheck = QTimer(w)
+    recheck.timeout.connect(w.check_updates)
+    recheck.start(6 * 3600 * 1000)
     sys.exit(app.exec())

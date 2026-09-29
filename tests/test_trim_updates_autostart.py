@@ -1,5 +1,9 @@
-"""Trimming a sound (part of its effects), the opt-in update check and start with
-Windows. No network: the GitHub answer is faked. No registry: winreg is faked."""
+"""Trimming a sound (part of its effects), the update check / self-update and start
+with Windows. No network: GitHub's answers and downloads are faked. No registry: winreg
+is faked."""
+import hashlib
+import io
+
 import numpy as np
 import pytest
 
@@ -71,13 +75,13 @@ def test_version_compare(latest, current, want):
     assert updates.newer(latest, current) is want
 
 
-def test_check_only_when_opted_in_and_once_a_day(monkeypatch):
+def test_check_on_by_default_and_once_a_day(monkeypatch):
     calls = []
     monkeypatch.setattr(updates, "latest",
                         lambda: calls.append(1) or updates.Release("99.0.0", "https://x"))
+    cfg = Config(update_check=False)
+    assert updates.check(cfg) is None and calls == []            # unticked
     cfg = Config()
-    assert updates.check(cfg) is None and calls == []            # not opted in
-    cfg.update_check_optin = True
     rel = updates.check(cfg)
     assert rel.version == "99.0.0" and cfg.update_checked > 0
     assert updates.check(cfg) is None and len(calls) == 1        # checked today already
@@ -97,10 +101,146 @@ def test_network_errors_are_quiet_unless_asked(monkeypatch):
     def boom():
         raise OSError("offline")
     monkeypatch.setattr(updates, "latest", boom)
-    cfg = Config(update_check_optin=True)
+    cfg = Config()
     assert updates.check(cfg) is None
     with pytest.raises(OSError):
         updates.check(cfg, force=True)
+
+
+def test_old_opt_in_setting_gives_way_to_the_new_default():
+    cfg = Config.from_raw({"version": library.CONFIG_VERSION, "update_check_optin": False})
+    assert cfg.update_check is True
+
+
+SETUP = b"MZ pretend installer " * 1000
+SETUP_SHA = hashlib.sha256(SETUP).hexdigest()
+SETUP_URL = updates.DOWNLOADS + "v9.0.0/OnionBoardSetup.exe"
+
+
+def _release_json(**asset):
+    a = {"name": "OnionBoardSetup.exe", "browser_download_url": SETUP_URL,
+         "digest": f"sha256:{SETUP_SHA}", "size": len(SETUP)}
+    a.update(asset)
+    return {"tag_name": "v9.0.0", "html_url": "https://github.com/x", "body": "notes",
+            "assets": [{"name": "other.zip"}, a]}
+
+
+def test_latest_finds_the_installer_and_its_checksum(monkeypatch):
+    monkeypatch.setattr(updates, "_get", lambda url: _release_json())
+    rel = updates.latest()
+    assert (rel.asset_url, rel.sha256, rel.size) == (SETUP_URL, SETUP_SHA, len(SETUP))
+
+
+def test_latest_takes_the_checksum_from_the_notes_without_a_digest(monkeypatch):
+    data = _release_json(digest=None)
+    data["body"] = f"Download below.\n\nSHA-256: `{SETUP_SHA.upper()}`\n"
+    monkeypatch.setattr(updates, "_get", lambda url: data)
+    assert updates.latest().sha256 == SETUP_SHA
+
+
+@pytest.mark.parametrize("asset", [
+    {"browser_download_url": "https://evil.example.com/OnionBoardSetup.exe"},
+    {"browser_download_url": "https://github.com/someone-else/onionboard/releases/"
+                             "download/v9.0.0/OnionBoardSetup.exe"},
+    {"digest": None},                     # nothing to check it against
+    {"digest": "sha512:abcd"},
+    {"name": "Setup.exe"},
+])
+def test_latest_offers_no_installer_it_cannot_trust(monkeypatch, asset):
+    monkeypatch.setattr(updates, "_get", lambda url: _release_json(**asset))
+    rel = updates.latest()
+    assert rel.version == "9.0.0" and rel.asset_url == "" and rel.sha256 == ""
+
+
+class FakeResponse(io.BytesIO):
+    def __init__(self, data, url=SETUP_URL):
+        super().__init__(data)
+        self.headers = {"Content-Length": str(len(data))}
+        self._url = url
+
+    def geturl(self):
+        return self._url
+
+
+def _release():
+    return updates.Release("9.0.0", "https://github.com/x", "", SETUP_URL, SETUP_SHA,
+                           len(SETUP))
+
+
+def test_download_checks_the_file_and_reports_progress(monkeypatch):
+    opened = []
+    monkeypatch.setattr(updates, "_open",
+                        lambda url: opened.append(url) or FakeResponse(SETUP))
+    monkeypatch.setattr(updates, "CHUNK", 4096)
+    seen = []
+    path = updates.download(_release(), lambda d, t: seen.append((d, t)))
+    assert path == updates.installer_path(_release()) and path.read_bytes() == SETUP
+    assert opened == [SETUP_URL] and seen[-1] == (len(SETUP), len(SETUP)) and len(seen) > 1
+    assert not list(path.parent.glob("*.part"))
+    assert updates.download(_release()) == path and len(opened) == 1   # already there
+
+
+def test_download_throws_away_a_file_that_does_not_match(monkeypatch):
+    monkeypatch.setattr(updates, "_open", lambda url: FakeResponse(SETUP + b"tampered"))
+    with pytest.raises(updates.UpdateError, match="checksum"):
+        updates.download(_release())
+    assert not list(updates.UPDATES_DIR.glob("*"))
+
+
+def test_download_refuses_a_release_without_a_checked_installer():
+    rel = _release()
+    rel.sha256 = ""
+    with pytest.raises(updates.UpdateError):
+        updates.download(rel)
+    rel = _release()
+    rel.asset_url = "https://evil.example.com/OnionBoardSetup.exe"
+    with pytest.raises(updates.UpdateError):
+        updates.download(rel)
+
+
+def test_download_refuses_a_redirect_off_https(monkeypatch):
+    monkeypatch.setattr(updates, "_open",
+                        lambda url: FakeResponse(SETUP, "http://example.com/x.exe"))
+    with pytest.raises(updates.UpdateError, match="HTTPS"):
+        updates.download(_release())
+    assert not list(updates.UPDATES_DIR.glob("*"))
+
+
+def test_download_stops_when_cancelled_or_offline(monkeypatch):
+    monkeypatch.setattr(updates, "_open", lambda url: FakeResponse(SETUP))
+    with pytest.raises(updates.UpdateError, match="cancelled"):
+        updates.download(_release(), cancelled=lambda: True)
+
+    def offline(url):
+        raise OSError("no network")
+    monkeypatch.setattr(updates, "_open", offline)
+    with pytest.raises(updates.UpdateError, match="no network"):
+        updates.download(_release())
+    assert not list(updates.UPDATES_DIR.glob("*.part"))
+
+
+def test_installer_runs_quietly_without_the_extras_and_reopens_the_app(tmp_path):
+    args = updates.installer_args(tmp_path / "OnionBoardSetup-9.0.0.exe")
+    assert args[0].endswith("OnionBoardSetup-9.0.0.exe")
+    assert "/SILENT" in args and "/NORESTART" in args and "/RELAUNCH=1" in args
+    assert "/MERGETASKS=!vbcable,!ffmpeg,!livevoice" in args
+    assert any(a.startswith("/LOG=") for a in args)
+
+
+@pytest.mark.parametrize("pending, current, want", [
+    ("9.0.0", "9.0.0", True), ("9.0.0", "9.0.1", True), ("9.0.0", "1.3.2", False),
+])
+def test_finished_compares_versions(pending, current, want):
+    assert updates.finished(pending, current) is want
+
+
+def test_cleanup_removes_downloaded_installers_only():
+    updates.UPDATES_DIR.mkdir(parents=True)
+    for name in ("OnionBoardSetup-9.0.0.exe", "OnionBoardSetup-9.0.1.exe.part",
+                 "install.log"):
+        (updates.UPDATES_DIR / name).write_bytes(b"x")
+    updates.cleanup()
+    assert [p.name for p in updates.UPDATES_DIR.iterdir()] == ["install.log"]
 
 
 # --------------------------------------------------------------------------- autostart

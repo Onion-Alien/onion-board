@@ -152,6 +152,11 @@ Get-Process OnionBoard -ErrorAction SilentlyContinue      # is it running?
    with its SHA-256 (`certutil -hashfile dist\OnionBoardSetup.exe SHA256`).
    Keep the asset named exactly `OnionBoardSetup.exe` and don't mark the release
    as a pre-release: the README's download button links to
-   `releases/latest/download/OnionBoardSetup.exe`.
+   `releases/latest/download/OnionBoardSetup.exe`, and installed copies update
+   themselves from the latest release's `OnionBoardSetup.exe` (`soundboard/updates.py`
+   only installs it when GitHub lists its SHA-256, and runs it with `/RELAUNCH=1`,
+   see `installer/OnionBoard.iss`). A release with a broken installer reaches
+   everyone who clicks *Update now*: install the built one over your own copy
+   before publishing.
    Never commit build output. Run `python scripts/check_sensitive.py --history`
    once more before pushing the release.

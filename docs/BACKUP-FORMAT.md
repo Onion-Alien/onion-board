@@ -96,7 +96,7 @@ Only `name` and `audio` are needed; everything else falls back to the defaults.
 The app's settings (`Config` in `soundboard/library.py`) minus anything that
 belongs to one PC or that must only be switched on by hand: audio devices, the
 setup-guide state, per-program Apps settings, and the network / downloaded-code
-opt-ins (yt-dlp auto-update, update check). On import only known settings of the
+settings (yt-dlp auto-update, the update check and its state). On import only known settings of the
 right type are used, and only if the user says yes.
 
 ## Safety

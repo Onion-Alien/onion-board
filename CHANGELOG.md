@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+- **Onion Board updates itself.** When a new version is out the *Update* button
+  at the top offers *Update now*: it downloads the new installer in the
+  background, checks it's exactly the file on GitHub, and when you click
+  *Restart now* installs it and opens the app again. Your sounds and settings
+  are kept, and the virtual cable isn't touched. The daily check for a new version
+  is now on by default (untick it in Settings → General); it only reads GitHub's
+  release list. Coming from 1.3.2 or older, install this version by hand once.
 - **Triggers see fullscreen games on a portrait monitor.** A rotated monitor never
   got Desktop Duplication (it fell back to GDI, which sees fullscreen games as
   black); its sideways frames are now read and turned upright.

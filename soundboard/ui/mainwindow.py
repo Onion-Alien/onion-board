@@ -79,6 +79,8 @@ class Bridge(QObject):
     exported = Signal(str, int, str)           # file, sounds written, error
     unpacked = Signal(object, object, str)     # backup.Imported|None, backup.Package, error
     update = Signal(object, str, bool)         # updates.Release|None, error, asked by the user
+    update_progress = Signal(int)              # percent of the new version downloaded
+    update_ready = Signal(object, str)         # its installer's Path|None, error
     imported = Signal(object, object, str)     # meta|None, data|None, error/filename
     preview = Signal(str, object, float)       # id, audio with unsaved effects|None, gain
 
@@ -112,6 +114,8 @@ class MainWindow(QMainWindow):
         self.bridge.exported.connect(self._on_exported)
         self.bridge.unpacked.connect(self._on_unpacked)
         self.bridge.update.connect(self._on_update)
+        self.bridge.update_progress.connect(self._on_update_progress)
+        self.bridge.update_ready.connect(self._on_update_ready)
         self._removed: list[tuple[SoundMeta, int, np.ndarray | None]] = []   # undo-able
         self._render_gen: dict[str, int] = {}   # sid -> newest effects render (_rerender)
         self.shuffle = ShuffleBag()       # the random-sound hotkeys
@@ -122,6 +126,8 @@ class MainWindow(QMainWindow):
         self._tray_told = False           # the "still running in the tray" note was shown
         self.tray: QSystemTrayIcon | None = None
         self.release: updates.Release | None = None   # a newer version, once found
+        self._update_file: Path | None = None   # its downloaded, checked installer
+        self._downloading = False
         self._preview_gen = 0             # newest effects preview (older renders are dropped)
         self._ptt_held: str | None = None   # PTT key we're currently holding
         self._pending_imports = 0
@@ -2377,8 +2383,8 @@ class MainWindow(QMainWindow):
     # ------------------------------------------------------------------ updates
     def check_updates(self, force: bool = False):
         """Look for a newer release on a thread (see updates.py). Without `force` only
-        if the user opted in, and at most once a day."""
-        if not force and not self.cfg.update_check_optin:
+        if the box is ticked, and at most once a day."""
+        if not force and not self.cfg.update_check:
             return
 
         def run():
@@ -2391,11 +2397,11 @@ class MainWindow(QMainWindow):
 
     def _on_update(self, rel, err: str, asked: bool):
         self._save_later()   # update_checked
-        if rel is not None:
+        busy = self._downloading or self._update_file is not None
+        if rel is not None and not busy:
             self.release = rel
-            self.btn_update.setText(f"Update: {rel.version}")
-            self.btn_update.setToolTip(f"Onion Board {rel.version} is out — click for details")
-            self.btn_update.show()
+            self._set_update_pill(f"Update: {rel.version}",
+                                  f"Onion Board {rel.version} is out — click for details")
             if self.tray is not None and not self.isVisible():
                 self.tray.showMessage("Onion Board", f"Version {rel.version} is out.",
                                       QSystemTrayIcon.Information, 8000)
@@ -2403,26 +2409,179 @@ class MainWindow(QMainWindow):
         if asked and rel is not None:
             self.show_update()
 
+    def _set_update_pill(self, text: str, tip: str, enabled: bool = True):
+        self.btn_update.setText(text)
+        self.btn_update.setToolTip(tip)
+        self.btn_update.setEnabled(enabled)
+        self.btn_update.show()
+
     def show_update(self):
+        """The update pill was clicked: what's new, and what can be done about it."""
+        if self._update_file is not None:
+            self.install_update()
+            return
         rel = self.release
-        if rel is None:
+        if rel is None or self._downloading:
             return
         from soundboard import __version__
         box = QMessageBox(QMessageBox.Information, "Update available",
                           f"Onion Board {rel.version} is out (you have {__version__}).",
                           QMessageBox.NoButton, self)
-        if rel.notes:
-            box.setInformativeText("<p>" + html.escape(rel.notes).replace("\n", "<br>") + "</p>")
-        get = box.addButton("Open the download page", QMessageBox.AcceptRole)
+        info = html.escape(rel.notes).replace("\n", "<br>") if rel.notes else ""
+        installable = updates.can_install() and bool(rel.asset_url)
+        if installable:
+            info += ("<p>Update now downloads it in the background (about 140 MB); you "
+                     "choose when the app restarts to install it. Your sounds and "
+                     "settings stay as they are.</p>")
+        elif not updates.can_install():
+            info += "<p>This copy runs from source: update it with <code>git pull</code>.</p>"
+        if info:
+            box.setInformativeText(f"<p>{info}</p>")
+        get = box.addButton("Update now" if installable else "Open the download page",
+                            QMessageBox.AcceptRole)
+        page = box.addButton("Release page", QMessageBox.HelpRole) if installable else None
         skip = box.addButton("Skip this version", QMessageBox.DestructiveRole)
         box.addButton("Later", QMessageBox.RejectRole)
         box.exec()
-        if box.clickedButton() is get:
+        clicked = box.clickedButton()
+        if clicked is get and installable:
+            self.download_update()
+        elif clicked is get or (page is not None and clicked is page):
             QDesktopServices.openUrl(QUrl(rel.url))
-        elif box.clickedButton() is skip:
+        elif clicked is skip:
             self.set_option("update_skip", rel.version)
             self.release = None
             self.btn_update.hide()
+
+    def download_update(self):
+        """Fetch the new version's installer on a thread (updates.download)."""
+        rel = self.release
+        if rel is None or self._downloading:
+            return
+        self._downloading = True
+        self._set_update_pill("Downloading update…",
+                              f"Downloading Onion Board {rel.version}", enabled=False)
+        last = [-1]
+
+        def progress(done, total):
+            pct = min(done * 100 // total, 100) if total else 0
+            if pct != last[0]:
+                last[0] = pct
+                self.bridge.update_progress.emit(pct)
+
+        def run():
+            try:
+                path = updates.download(rel, progress, lambda: self._shut_down)
+                self.bridge.update_ready.emit(path, "")
+            except updates.UpdateError as e:
+                self.bridge.update_ready.emit(None, str(e))
+            except Exception as e:  # noqa: BLE001 - never leave the pill stuck
+                log.exception("update download failed")
+                self.bridge.update_ready.emit(None, str(e) or type(e).__name__)
+        threading.Thread(target=run, daemon=True, name="update-download").start()
+
+    def _on_update_progress(self, pct: int):
+        if self._downloading:
+            self.btn_update.setText(f"Downloading update… {pct}%")
+
+    def _on_update_ready(self, path, err: str):
+        self._downloading = False
+        rel = self.release
+        if rel is None:
+            return
+        if path is None:
+            self._set_update_pill(f"Update: {rel.version}",
+                                  f"Onion Board {rel.version} is out — click for details")
+            box = QMessageBox(QMessageBox.Warning, "Couldn't update",
+                              f"Onion Board {rel.version} couldn't be downloaded: {err}.",
+                              QMessageBox.NoButton, self)
+            page = box.addButton("Open the download page", QMessageBox.AcceptRole)
+            box.addButton("Close", QMessageBox.RejectRole)
+            box.exec()
+            if box.clickedButton() is page:
+                QDesktopServices.openUrl(QUrl(rel.url))
+            return
+        self._update_file = path
+        self._set_update_pill("Restart to update",
+                              f"Onion Board {rel.version} is downloaded — click to install it")
+        if self.tray is not None and not self.isVisible():
+            # hidden in the tray, maybe mid-game: don't pop a question, just say so
+            self.tray.showMessage("Onion Board", f"Version {rel.version} is ready to install: "
+                                  "open Onion Board and click Restart to update.",
+                                  QSystemTrayIcon.Information, 8000)
+            return
+        self.install_update()
+
+    def install_update(self):
+        """Ask, then close the app and let the downloaded installer replace it (it
+        opens the app again when it's done)."""
+        rel, path = self.release, self._update_file
+        if rel is None or path is None:
+            return
+        box = QMessageBox(QMessageBox.Question, "Install the update",
+                          f"Onion Board {rel.version} is ready. Restart now to install it?",
+                          QMessageBox.NoButton, self)
+        box.setInformativeText("Onion Board closes, installs the new version and opens "
+                               "again by itself, usually within a minute. Sounds that are "
+                               "playing stop.")
+        now = box.addButton("Restart now", QMessageBox.AcceptRole)
+        box.addButton("Later", QMessageBox.RejectRole)
+        box.exec()
+        if box.clickedButton() is not now:
+            return
+        if not path.is_file():   # removed meanwhile: fetch it again
+            self._update_file = None
+            self.download_update()
+            return
+        self.cfg.update_pending = rel.version
+        self.cfg.save()
+        try:
+            updates.start_install(path)
+        except OSError as e:
+            log.warning("couldn't start the update installer: %s", e)
+            self.cfg.update_pending = ""
+            self._save_later()
+            QMessageBox.warning(self, "Couldn't update",
+                                f"The installer couldn't be started ({e}). You can "
+                                "download it from the release page instead.")
+            return
+        self.quit_app()
+
+    def after_update(self):
+        """At start: remove downloaded installers and, the first time after an update
+        was started, say whether it worked."""
+        pending, self.cfg.update_pending = self.cfg.update_pending, ""
+        updates.cleanup()
+        if not pending:
+            return
+        self._save_later()
+        from soundboard import __version__
+        if updates.finished(pending):
+            log.info("updated to %s", __version__)
+            box = QMessageBox(QMessageBox.Information, "Updated",
+                              f"Onion Board is up to date: version {__version__}.",
+                              QMessageBox.NoButton, self)
+            new = box.addButton("What's new", QMessageBox.HelpRole)
+            box.addButton(QMessageBox.Ok)
+            box.exec()
+            if box.clickedButton() is new:
+                QDesktopServices.openUrl(QUrl(
+                    f"https://github.com/{updates.REPO}/releases/tag/v{__version__}"))
+            return
+        log.warning("the update to %s didn't finish (still %s)", pending, __version__)
+        box = QMessageBox(QMessageBox.Warning, "The update didn't finish",
+                          f"Onion Board {pending} wasn't installed; this is still "
+                          f"{__version__}. You can download it from its page and "
+                          "run it yourself.", QMessageBox.NoButton, self)
+        page = box.addButton("Open the download page", QMessageBox.AcceptRole)
+        logb = (box.addButton("Show the install log", QMessageBox.HelpRole)
+                if updates.INSTALL_LOG.is_file() else None)
+        box.addButton("Close", QMessageBox.RejectRole)
+        box.exec()
+        if box.clickedButton() is page:
+            QDesktopServices.openUrl(QUrl(updates.RELEASES))
+        elif logb is not None and box.clickedButton() is logb:
+            QDesktopServices.openUrl(QUrl.fromLocalFile(str(updates.INSTALL_LOG)))
 
     # ------------------------------------------------------------------ test mode
     def on_mic_check(self, on):

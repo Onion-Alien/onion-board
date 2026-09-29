@@ -94,6 +94,9 @@ Filename: "{cmd}"; Parameters: "/c ""{app}\modules\live-voice\install.bat"" --qu
   StatusMsg: "Setting up live voice-to-speech (downloads about 300 MB, can take a few minutes)..."; \
   Tasks: livevoice; Check: HasPython; Flags: runhidden waituntilterminated
 Filename: "{app}\{#AppExeName}.exe"; Description: "Open Onion Board now"; Flags: nowait postinstall skipifsilent
+; The app's own updater (soundboard/updates.py) runs this silently with /RELAUNCH=1 after
+; closing itself: open it again once the new version is in place.
+Filename: "{app}\{#AppExeName}.exe"; Flags: nowait; Check: Relaunch
 
 [Registry]
 ; "Start with Windows" (Settings -> General) writes this value; nothing is created at
@@ -118,6 +121,12 @@ begin
   Result := (FileSearch('ffmpeg.exe', GetEnv('PATH')) <> '') or
             FileExists(ExpandConstant('{localappdata}\Microsoft\WinGet\Links\ffmpeg.exe')) or
             FileExists(ExpandConstant('{commonpf64}\WinGet\Links\ffmpeg.exe'));
+end;
+
+// /RELAUNCH=1: started by the app's "Restart to update" (see [Run])
+function Relaunch: Boolean;
+begin
+  Result := ExpandConstant('{param:RELAUNCH|0}') = '1';
 end;
 
 // Offered only when it's missing and winget (built into Windows 10/11) is there to get it.

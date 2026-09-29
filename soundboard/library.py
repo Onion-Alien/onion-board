@@ -240,10 +240,12 @@ class Config:
     category: str = ""                # the category the Sounds tab shows; "" = all
     tray: bool = True                 # closing the window keeps the app in the tray
     autostart_hidden: bool = True     # started with Windows: straight to the tray
-    # an opt-in look at GitHub Releases for a newer version, at most once a day
-    update_check_optin: bool = False
+    # look at GitHub Releases for a newer version, at most once a day (soundboard.updates).
+    # Was the opt-in update_check_optin, off by default: renamed so every config starts on
+    update_check: bool = True
     update_checked: float = 0.0       # time.time() of the last check
     update_skip: str = ""             # a version the user said to skip
+    update_pending: str = ""          # the version an update is installing (see updates.py)
     random_hotkey: str = ""           # plays a random sound from the category showing
     category_hotkeys: dict = field(default_factory=dict)   # category -> its random-sound key
     # local control API for Stream Deck / scripts (soundboard.remote): off unless turned on

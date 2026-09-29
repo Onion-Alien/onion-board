@@ -63,8 +63,9 @@ STORED = {".mp3", ".ogg", ".opus", ".m4a", ".aac", ".flac", ".wma", ".webm", ".m
 # (they make the app go online / run downloaded code): never exported or imported
 LOCAL_SETTINGS = {"version", "sounds", "categories", "category", "main_device", "mon_device",
                   "mic_device", "setup_done", "tab", "apps", "screen",
-                  "ytdlp_auto_optin", "update_check_optin", "update_checked", "update_skip",
-                  "category_hotkeys", "api_enabled", "api_port", "api_token"}
+                  "ytdlp_auto_optin", "update_check", "update_checked", "update_skip",
+                  "update_pending", "category_hotkeys", "api_enabled", "api_port",
+                  "api_token"}
 # per-sound fields that are written to sound.json (the paths are replaced by names)
 SOUND_FIELDS = ("name", "volume", "hotkey", "mode", "loop", "color", "level_gain",
                 "duration", "fingerprint", "fx", "tags", "fade_in", "fade_out")
