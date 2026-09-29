@@ -128,3 +128,32 @@ def test_stereo_in_gives_stereo_shape_out():
     back = roundtrip(x, PROFILES["discord"], FF)
     assert back.ndim == 2 and back.shape[1] == 2 and back.dtype == np.float32
     assert abs(len(back) - len(x)) < RATE // 4
+
+
+def _rms_db(x):
+    return 20 * np.log10(np.sqrt(np.mean(np.square(x))) + 1e-12)
+
+
+def test_discord_highpass_matches_the_real_call_measurement():
+    # measured through real Discord: -33 dB at 70 Hz, -19 at 80, -6 at 90, flat from 100
+    hp = PROFILES["discord"].highpass_hz
+    assert hp
+    for hz, want in ((70, -33.1), (80, -18.9), (90, -5.8), (150, -0.9), (1000, -0.4)):
+        x = _tone(hz)
+        y = codecsim.highpass(x, hp)
+        cut = RATE // 2   # past the filter's settling
+        got = _rms_db(y[cut:, 0]) - _rms_db(x[cut:, 0])
+        assert abs(got - want) < 2.0, (hz, got, want)
+
+
+def test_highpass_is_only_on_the_measured_profiles():
+    assert all(PROFILES[k].highpass_hz for k in ("discord", "discord_low", "discord_128"))
+    assert not any(PROFILES[k].highpass_hz for k in ("steam", "vivox", "vivox_siren7"))
+
+
+@needs_ffmpeg
+def test_discord_roundtrip_drops_sub_bass_keeps_bass():
+    low = roundtrip(_tone(60, level=0.3), PROFILES["discord"], FF)
+    mid = roundtrip(_tone(200, level=0.3), PROFILES["discord"], FF)
+    assert _rms_db(low[RATE // 2:]) - _rms_db(_tone(60, level=0.3)) < -20
+    assert abs(_rms_db(mid[RATE // 2:-RATE // 4]) - _rms_db(_tone(200, level=0.3))) < 3

@@ -178,9 +178,13 @@ class VoiceFxPanel(QWidget):
     way to hear yourself, and (folded away) the individual effects for fine-tuning.
 
     `changed(spec)` with spec = {"enabled", "preset", "effects": {type: {...}}}.
-    `hear_toggled(bool)` asks the window to switch "Hear what they hear" on or off."""
+    `hear_toggled(bool)` asks the window to switch "Hear what they hear" on or off.
+    `chat_help()` asks for the Discord guide; `tip_dismissed()` means "Got it" on the
+    Discord notice (the window remembers it)."""
     changed = Signal(dict)
     hear_toggled = Signal(bool)
+    chat_help = Signal()
+    tip_dismissed = Signal()
 
     COLS = 3
 
@@ -207,6 +211,27 @@ class VoiceFxPanel(QWidget):
         self.btn_power.setChecked(spec["enabled"])
         self.btn_power.toggled.connect(self._on_power)
         v.addWidget(self.btn_power)
+
+        # ---- the Discord catch (shown with the changer on, until "Got it")
+        # Measured in a real call: with Discord's default Input Profile (Voice
+        # Isolation) a deep voice arrived ~20% of the time; on Studio, 93% at -0.8 dB.
+        self.tip = QFrame()
+        tl = QHBoxLayout(self.tip)
+        tl.setContentsMargins(0, 0, 0, 0)
+        tl.setSpacing(8)
+        tip_text = hint_label("⚠ Discord deletes most of a changed voice unless its "
+                              "<b>Input Profile</b> is <b>Studio</b> (Settings → Voice & "
+                              "Video). Game voice chats' noise suppression does the same.")
+        theme.set_tone(tip_text, "warn")
+        tl.addWidget(tip_text, 1)
+        self.btn_tip_help = QPushButton("Show me how")
+        self.btn_tip_help.clicked.connect(self.chat_help)
+        tl.addWidget(self.btn_tip_help)
+        self.btn_tip_ok = QPushButton("Got it")
+        self.btn_tip_ok.clicked.connect(self._tip_ok)
+        tl.addWidget(self.btn_tip_ok)
+        self._tip_enabled = True
+        v.addWidget(self.tip)
 
         # ---- pick a voice
         v.addWidget(QLabel("<b>Pick a voice</b>"))
@@ -305,6 +330,11 @@ class VoiceFxPanel(QWidget):
     def set_level(self, level: float):
         self.meter.set_level(level)
 
+    def set_tip_enabled(self, on: bool):
+        """Whether the Discord notice may show (False once it's been dismissed)."""
+        self._tip_enabled = on
+        self._refresh()
+
     def add_new_effects(self):
         """Add rows for effect types registered since (modules loaded later)."""
         for etype, cls in voicefx.REGISTRY.items():
@@ -328,6 +358,10 @@ class VoiceFxPanel(QWidget):
         self._refresh()
         self._emit()
 
+    def _tip_ok(self):
+        self.set_tip_enabled(False)
+        self.tip_dismissed.emit()
+
     def _show_more(self, on: bool):
         self.more.setVisible(on)
         icons.set_icon(self.btn_more, "fold_open" if on else "fold", "muted", "text", size=12)
@@ -335,6 +369,7 @@ class VoiceFxPanel(QWidget):
     def _refresh(self):
         on = self.btn_power.isChecked()
         self.btn_power.setText(POWER_TEXT[on])
+        self.tip.setVisible(on and self._tip_enabled)
         # only a voice that's actually in use is highlighted
         self.tiles.setExclusive(False)
         for name, b in self._tile.items():

@@ -424,3 +424,28 @@ def test_an_add_on_with_a_bad_slider_is_reported_not_fatal(qapp, app_dir, monkey
     finally:
         p.shutdown()
         p.deleteLater()
+
+
+def test_discord_notice_shows_with_the_changer_on_until_dismissed(panel):
+    p, _ = panel
+    fx = p.fx
+    assert fx.tip.isHidden()                     # changer off: nothing to warn about
+    fx.pick(next(iter(voicefx.PRESETS)))
+    assert not fx.tip.isHidden()
+    helped, dismissed = [], []
+    fx.chat_help.connect(lambda: helped.append(1))
+    fx.tip_dismissed.connect(lambda: dismissed.append(1))
+    fx.btn_tip_help.click()
+    assert helped == [1] and not fx.tip.isHidden()   # the guide doesn't dismiss it
+    fx.btn_tip_ok.click()
+    assert dismissed == [1] and fx.tip.isHidden()
+    fx.btn_power.setChecked(False)
+    fx.btn_power.setChecked(True)
+    assert fx.tip.isHidden()                     # stays gone once dismissed
+
+
+def test_discord_notice_stays_hidden_when_already_dismissed(panel):
+    p, _ = panel
+    p.fx.set_tip_enabled(False)
+    p.fx.pick(next(iter(voicefx.PRESETS)))
+    assert p.fx.tip.isHidden()

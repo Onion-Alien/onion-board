@@ -20,6 +20,7 @@ from dataclasses import dataclass
 
 import numpy as np
 import soxr
+from scipy.signal import butter, sosfilt
 
 from soundboard.library import FFMPEG_TIMEOUT, _ffmpeg
 
@@ -36,6 +37,8 @@ class Profile:
     bitrate_kbps: int
     application: str = "voip"   # libopus mode: voip favours speech, audio favours fidelity
     frame_ms: int = 20
+    highpass_hz: int = 0   # the app's capture high-pass before the encoder (0 = none)
+    highpass_order: int = 13
     note: str = ""
 
     @property
@@ -43,12 +46,21 @@ class Profile:
         return self.rate // 2
 
 
+# Discord's capture high-pass, measured in a real call (a 60 Hz-18 kHz sweep sent
+# through the desktop app on the Studio input profile, received by a second client):
+# -33 dB at 70 Hz, -19 at 80, -6 at 90, flat from 100 Hz up. A 13th-order Butterworth
+# at 94 Hz matches that within 1 dB. It isn't one of the switchable voice filters:
+# Studio (no noise suppression, echo cancellation or auto gain) still has it.
+DISCORD_HP = 94
+
 PROFILES: dict[str, Profile] = {p.key: p for p in (
-    Profile("discord", "Discord voice, default", 48000, 1, 64,
+    Profile("discord", "Discord voice, default", 48000, 1, 64, highpass_hz=DISCORD_HP,
             note="64 kbps mono Opus is the default voice-channel bitrate"),
     Profile("discord_low", "Discord voice, weak connection", 48000, 1, 24,
+            highpass_hz=DISCORD_HP,
             note="Discord adapts down under packet loss; 24 kbps is mid-range of 8-128"),
     Profile("discord_128", "Discord voice, boosted 128 kbps", 48000, 1, 128,
+            highpass_hz=DISCORD_HP,
             note="a boosted server's higher bitrate; still mono unless stereo is enabled"),
     Profile("steam", "Steam voice (CS2 etc.)", 24000, 1, 32,
             note="Opus PLC fed 24 kHz mono: nothing above 12 kHz survives; bitrate is an estimate"),
@@ -93,6 +105,12 @@ def downmix(x: np.ndarray) -> np.ndarray:
     return x.mean(axis=1, keepdims=True).astype(F32)
 
 
+def highpass(x: np.ndarray, hz: float, order: int = 13) -> np.ndarray:
+    """Butterworth high-pass along axis 0 (a chat app's capture filter)."""
+    sos = butter(order, hz, "highpass", fs=SR, output="sos")
+    return sosfilt(sos, np.asarray(x, F32), axis=0).astype(F32)
+
+
 def roundtrip(x: np.ndarray, profile: Profile, ffmpeg: str | None = None) -> np.ndarray:
     """Send x ((n, 2) float32 at 48 kHz, the engine's main bus) through the profile's
     pipeline and return what the listener gets, as (n', 2) float32 at 48 kHz.
@@ -104,6 +122,8 @@ def roundtrip(x: np.ndarray, profile: Profile, ffmpeg: str | None = None) -> np.
     if x.ndim == 1:
         x = np.repeat(x[:, None], 2, axis=1)
     src = downmix(x) if profile.channels == 1 else x
+    if profile.highpass_hz:
+        src = highpass(src, profile.highpass_hz, profile.highpass_order)
     if profile.rate != SR:
         src = soxr.resample(src, SR, profile.rate, quality="VHQ").astype(F32)
     ch = src.shape[1]
