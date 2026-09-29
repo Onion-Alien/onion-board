@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+## 1.3.3 — 2026-09-29
+
+Onion Board now updates itself, plus 25 new themes and an overlay you can drag
+anywhere. This is the last version you have to install by hand: from here on the
+*Update* button at the top does it for you.
+
 - **Onion Board updates itself.** When a new version is out the *Update* button
   at the top offers *Update now*: it downloads the new installer in the
   background, checks it's exactly the file on GitHub, and when you click
