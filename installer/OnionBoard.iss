@@ -26,6 +26,18 @@ AppId={{6B0B6E2F-6D63-4C1B-9E0B-5B8E3C2A71D4}
 AppName={#AppName}
 AppVersion={#AppVersion}
 AppPublisher=Onion Board
+AppPublisherURL=https://github.com/Onion-Alien/onionboard
+AppSupportURL=https://github.com/Onion-Alien/onionboard/issues
+AppUpdatesURL=https://github.com/Onion-Alien/onionboard/releases
+AppCopyright=Copyright (C) Onion Board contributors
+; Setup's own file details (Properties -> Details): a named, versioned installer rather
+; than a blank one, which also helps machine-learning virus scanners that distrust those
+VersionInfoVersion={#AppVersion}
+VersionInfoProductName={#AppName}
+VersionInfoProductVersion={#AppVersion}
+VersionInfoCompany=Onion Board
+VersionInfoDescription={#AppName} Setup
+VersionInfoCopyright=Copyright (C) Onion Board contributors
 DefaultDirName={localappdata}\Programs\{#AppExeName}
 DefaultGroupName={#AppName}
 PrivilegesRequired=lowest
