@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- **Triggers see fullscreen games on a portrait monitor.** A rotated monitor never
+  got Desktop Duplication (it fell back to GDI, which sees fullscreen games as
+  black); its sideways frames are now read and turned upright.
+
 ## 1.3.2 — 2026-09-29
 
 A fresh coat of paint: the same app, tidier controls and pictures for the voices.

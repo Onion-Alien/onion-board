@@ -148,3 +148,57 @@ def test_the_first_frame_is_read_even_when_nothing_has_moved_yet(monkeypatch):
     assert calls["copy"] == 1
     again = g.grab(100)
     assert again is first and calls["copy"] == 1       # unchanged screen: no second copy
+
+
+def _rotated_grabber(monkeypatch, rotation, desktop):
+    """A DupGrabber on a portrait/rotated output (DXGI_MODE_ROTATION `rotation`) whose
+    frames arrive in the panel's orientation: `desktop` ((h, w) grey 0..255, as the
+    desktop shows it) turned back to how the graphics card scans it out."""
+    turns = sw.FRAME_TURNS[rotation]
+    panel = np.rot90(desktop, -turns)                  # upright(panel) == desktop
+    fh, fw = panel.shape
+    g, created = _grabber(monkeypatch, sw.FMT_BGRA8, fw, fh, (0, 0, 0, 255))
+    buf = (ctypes.c_uint8 * (fh * fw * 4))()
+    img = np.frombuffer(buf, np.uint8).reshape(fh, fw, 4)
+    img[..., :3] = panel[..., None]
+    img[..., 3] = 255
+    real = g.ctx.handler
+
+    def mapped(kind, slot, args=None):
+        r = real(kind, slot, args)
+        if kind == "call" and slot == sw.DupGrabber.CTX_MAP:
+            args[4]._obj.pData = ctypes.addressof(buf)
+        return r
+
+    g.ctx.handler = mapped
+    g._buf = buf
+    g.src = sw.Monitor(0, 0, desktop.shape[1], desktop.shape[0], True)
+    g.w, g.h = desktop.shape[1] // 6, desktop.shape[0] // 6
+    g.turns = turns
+    g._mode = None
+    g._make_staging((fw, fh, sw.FMT_BGRA8))
+    return g
+
+
+def test_a_portrait_monitor_is_captured_upright(monkeypatch):
+    """Rotated outputs used to be refused ("no graphics output shows that monitor
+    unrotated"), so a portrait monitor fell back to GDI and a fullscreen game on it
+    was black. The frames come on their side; the picture must come out upright."""
+    desktop = np.zeros((1920, 1080), np.uint8)
+    desktop[:480] = 240                                # bright band at the top
+    desktop[:, :270] = np.maximum(desktop[:, :270], 120)   # grey band down the left
+    for rotation in (2, 3, 4):
+        g = _rotated_grabber(monkeypatch, rotation, desktop)
+        assert g.source == (1080, 1920)                # upright, like the monitor
+        gray = g.grab(100)
+        assert gray.shape == (320, 180), rotation
+        assert gray[:70].mean() > 0.9, rotation        # the top is bright
+        assert gray[-70:, -100:].mean() < 0.05, rotation   # bottom right is dark
+        assert 0.4 < gray[-70:, :40].mean() < 0.55, rotation   # the left band, bottom
+
+
+def test_frame_turns_undo_each_rotation():
+    d = np.arange(12, dtype=np.float32).reshape(3, 4)
+    for k in sw.FRAME_TURNS.values():
+        assert np.array_equal(sw.upright(np.rot90(d, -k), k), d)
+    assert sw.upright(d, 0) is d

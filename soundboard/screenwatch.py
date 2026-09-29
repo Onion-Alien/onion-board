@@ -583,6 +583,18 @@ class _OUTDUPL_DESC(ctypes.Structure):
 
 _unknown_formats: set[int] = set()     # DXGI formats already reported (see _duplicate)
 
+# DXGI_MODE_ROTATION -> np.rot90 turns that bring a duplicated frame upright. The
+# frames of a rotated (portrait) output come in the panel's own orientation, so a
+# 1080x1920 portrait desktop hands over 1920x1080 frames turned on their side.
+# 0 (unspecified) and 1 (identity) need nothing.
+FRAME_TURNS = {2: -1, 3: 2, 4: 1}      # 90: turn clockwise; 180; 270: anticlockwise
+
+
+def upright(gray: np.ndarray, turns: int) -> np.ndarray:
+    """A picture sampled from a duplicated frame, turned `turns` quarter turns
+    (np.rot90's k) so it's the way the desktop shows it."""
+    return np.ascontiguousarray(np.rot90(gray, turns)) if turns % 4 else gray
+
 
 class DupGrabber:
     """Desktop Duplication (IDXGIOutputDuplication): the frames the graphics card
@@ -596,6 +608,10 @@ class DupGrabber:
     DPI-aware is told a scaled-down rectangle. The staging texture and the sampling
     are laid out from the mode, since a copy between textures of different sizes is
     dropped without a word and the picture would just freeze or stay black.
+
+    A rotated (portrait) output hands over frames in the panel's orientation: they
+    are sampled as they come and the picture turned upright (FRAME_TURNS), so
+    `source` and the pictures given out are always the way the desktop shows them.
 
     While the duplication is lost (a mode switch, the UAC or lock screen) grab()
     gives None and `lost` is set; it's tried again every RETRY_S. If that keeps
@@ -613,10 +629,12 @@ class DupGrabber:
     TEX_GET_DESC = 10               # ID3D11Texture2D::GetDesc
     CTX_MAP, CTX_UNMAP, CTX_COPY_RESOURCE = 14, 15, 47
     USAGE_STAGING, CPU_ACCESS_READ, MAP_READ = 3, 0x20000, 1
+    turns = 0                       # FRAME_TURNS for the output's rotation
 
     def __init__(self, src: Monitor, w: int, h: int):
         self.src, self.w, self.h = src, w, h
-        self.source = (src.width, src.height)     # the frames' size; see _duplicate
+        self.source = (src.width, src.height)     # the frames' size, upright; see _duplicate
+        self._frame = self.source                 # ...as the frames come (see turns)
         self.factor = 1
         self.device, self.ctx, self.output1 = _COM(), _COM(), _COM()
         self.dup, self.staging = _COM(), _COM()
@@ -679,11 +697,12 @@ class DupGrabber:
                 output.call(self.OUTPUT_GET_DESC, ctypes.byref(d), argtypes=(ctypes.c_void_p,))
                 r = d.DesktopCoordinates
                 if ((r.left, r.top, r.right - r.left, r.bottom - r.top)
-                        == (s.left, s.top, s.width, s.height) and d.Rotation in (0, 1)):
+                        == (s.left, s.top, s.width, s.height)):
+                    self.turns = FRAME_TURNS.get(int(d.Rotation), 0)
                     return adapter, output
                 output.release()
             adapter.release()
-        raise OSError("no graphics output shows that monitor unrotated")
+        raise OSError("no graphics output shows that monitor")
 
     def _duplicate(self):
         """(Re)start the duplication and lay out the staging texture and the sampling
@@ -696,9 +715,11 @@ class DupGrabber:
         d = _OUTDUPL_DESC()
         self.dup.call(self.DUP_GET_DESC, ctypes.byref(d), restype=None,
                       argtypes=(ctypes.c_void_p,))
-        if d.Rotation not in (0, 1) or d.Width < 2 or d.Height < 2:
+        if d.Rotation > 4 or d.Width < 2 or d.Height < 2:
             raise OSError(f"unusable duplication mode {d.Width}x{d.Height} "
                           f"rotation {d.Rotation}")
+        if d.Rotation > 1:
+            self.turns = FRAME_TURNS[int(d.Rotation)]
         mode = (int(d.Width), int(d.Height), int(d.Format))
         if mode[2] not in FRAME_FORMATS:
             if mode[2] not in _unknown_formats:
@@ -724,14 +745,16 @@ class DupGrabber:
         if hr < 0:
             raise OSError(f"CreateTexture2D failed (0x{_hr(hr):08X})")
         self._mode = mode
-        self.source = mode[:2]
+        self._frame = mode[:2]
+        self.source = mode[1::-1] if self.turns % 2 else mode[:2]
         self.last = None
         self._layout()
 
     def _layout(self):
-        """Which frame pixels make up the (w, h) picture, at 2x where the frame allows."""
-        sw, sh = self.source
-        w, h = self.w, self.h
+        """Which frame pixels make up the (w, h) picture, at 2x where the frame allows.
+        For a frame on its side that's an (h, w) sample, turned upright in grab()."""
+        sw, sh = self._frame
+        w, h = (self.h, self.w) if self.turns % 2 else (self.w, self.h)
         self.factor = n = 2 if 2 * w <= sw and 2 * h <= sh else 1
         self.ys = ((np.arange(h * n) + 0.5) * sh / (h * n)).astype(np.intp)
         self.xs = ((np.arange(w * n) + 0.5) * sw / (w * n)).astype(np.intp)
@@ -811,7 +834,7 @@ class DupGrabber:
         if hr < 0:
             raise CaptureLost(f"Map failed (0x{_hr(hr):08X})")
         try:
-            sw, rows = self.source
+            sw, rows = self._frame
             fmt = self._mode[2]
             pitch = m.RowPitch
             buf = (ctypes.c_uint8 * (rows * pitch)).from_address(m.pData)
@@ -821,7 +844,7 @@ class DupGrabber:
         finally:
             self.ctx.call(self.CTX_UNMAP, self.staging.p, 0, restype=None,
                           argtypes=(ctypes.c_void_p, ctypes.c_uint))
-        self.last = frame_gray(sample, fmt, self.factor)
+        self.last = upright(frame_gray(sample, fmt, self.factor), self.turns)
         return self.last
 
     def close(self):
