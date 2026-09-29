@@ -14,6 +14,9 @@ A fresh coat of paint: the same app, tidier controls and pictures for the voices
 - **Pictures for the voices.** Voice changer tiles, the computer voice and its
   languages can show a picture (from `assets/art`), and while one is on the Voice
   tab shows it. Missing pictures fall back to the emoji and icons as before.
+- **The window still shrinks to small sizes with the new look.** The Triggers tab's
+  "Check every" list got wider with its new arrow and held the window at a larger
+  minimum width; it now gives way like the screen list beside it.
 
 ## 1.3.1 — 2026-09-28
 

@@ -120,16 +120,17 @@ class WideCombo(QComboBox):
 
     MIN_WIDTH = 90
 
-    def __init__(self, parent: QWidget | None = None):
+    def __init__(self, parent: QWidget | None = None, min_width: int = MIN_WIDTH):
         super().__init__(parent)
+        self.min_width = min_width
         self.setSizeAdjustPolicy(QComboBox.AdjustToContents)   # sizeHint: the entries
         pol = self.sizePolicy()
-        pol.setHorizontalPolicy(QSizePolicy.Maximum)   # up to that, down to MIN_WIDTH
+        pol.setHorizontalPolicy(QSizePolicy.Maximum)   # up to that, down to min_width
         self.setSizePolicy(pol)
 
     def minimumSizeHint(self) -> QSize:
         s = super().minimumSizeHint()
-        return QSize(min(s.width(), self.MIN_WIDTH), s.height())
+        return QSize(min(s.width(), self.min_width), s.height())
 
 
 def labelled(text: str, w: QWidget) -> QWidget:
@@ -711,7 +712,9 @@ class TriggersTab(QWidget):
         icons.set_icon(self.btn_paste, "image")
         self.btn_paste.clicked.connect(self.add_from_clipboard)
         h.addWidget(self.btn_paste)
-        self.cb_interval = narrow(QComboBox(), 6)
+        # six characters ("100 ms") when there's room, just enough for them when the
+        # window is small: the theme's padding for the arrow made a fixed six too wide
+        self.cb_interval = narrow(WideCombo(min_width=110), 6)
         for ms in INTERVALS_MS:
             label = f"{ms} ms" + (" (every frame)" if ms == 16 else "")
             self.cb_interval.addItem(label, ms)

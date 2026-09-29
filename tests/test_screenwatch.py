@@ -12,6 +12,7 @@ from PySide6.QtCore import Qt
 from PySide6.QtGui import QImage
 
 from soundboard import screenwatch as sw
+from soundboard import theme
 from soundboard.library import Config
 from soundboard.screenwatch import Gate, Monitor, Trigger
 from soundboard.ui import triggerspanel
@@ -775,11 +776,17 @@ def test_the_screen_list_is_wide_enough_for_its_longest_entry(qapp, app_dir, fak
         tab.shutdown()
 
 
-def test_the_tab_still_fits_a_small_window_with_two_screens(qapp, app_dir, two_screens):
+@pytest.mark.parametrize("theme_name", [None, *theme.THEMES])
+def test_the_tab_still_fits_a_small_window_with_two_screens(qapp, app_dir, two_screens,
+                                                             theme_name):
     """The screen lists want to be as wide as their longest entry, but must give way
     when the window is small: the tab's minimum width (the window's, on the
     Triggers tab) stays under 300 px with two screens and a card full of pictures
-    and sounds — while the lists still ask for their full width when there's room."""
+    and sounds — while the lists still ask for their full width when there's room.
+    With every theme too: the themed lists' padding for their arrow made the
+    "Check every" list too wide to give way."""
+    if theme_name:
+        theme.apply(qapp, theme_name)
     board = [("s1", "A sound with a long name", "fp1"), ("s2", "Win", "fp2"),
              ("s3", "Airhorn", "fp3")]
     tab = TriggersTab(Config(), lambda: None, lambda: list(board), lambda _s: None)
@@ -795,8 +802,11 @@ def test_the_tab_still_fits_a_small_window_with_two_screens(qapp, app_dir, two_s
             longest = max((cb.itemText(i) for i in range(cb.count())), key=len)
             assert cb.sizeHint().width() >= cb.fontMetrics().horizontalAdvance(longest)
             assert cb.minimumSizeHint().width() <= triggerspanel.WideCombo.MIN_WIDTH
+        every = tab.cb_interval
+        assert every.sizeHint().width() >= every.fontMetrics().horizontalAdvance("100 ms")
     finally:
         tab.shutdown()
+        qapp.setStyleSheet("")
         from PySide6.QtCore import QEvent
         qapp.sendPostedEvents(None, QEvent.DeferredDelete)   # the chips set_sounds replaced
 
