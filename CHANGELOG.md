@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## 1.3.2 — 2026-09-29
+
+A fresh coat of paint: the same app, tidier controls and pictures for the voices.
+
 - **A cleaner look.** Dropdowns have a slim arrow and open as a list below the box
   with rounded, highlighted rows; number boxes (Triggers' Wait, Not again for,
   Match) get matching arrows; menus, tooltips and scrollbars are tidied up; sound
