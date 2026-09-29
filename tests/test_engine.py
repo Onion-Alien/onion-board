@@ -505,3 +505,28 @@ def test_eq_and_destination_drop_their_state_when_turned_off():
     e.dest = None
     assert e._eq("main", "sounds", x) is x and e._dest("main", x) is x
     assert e._eqs == {} and e._dests == {}
+
+
+# ---------------------------------------------------------------- the logo's "playing" level
+
+def test_play_level_counts_everything_playing_but_not_the_mic():
+    """The header logo and the taskbar icon glow with level_play: the radio and a
+    captured program count even when only you hear them; your voice doesn't."""
+    e = engine_with("main", "mon")
+    e.ring_main.prefill = 0
+    out = np.zeros((480, 2), np.float32)
+    e._mic(np.full((480, 1), 0.5, np.float32))
+    e._main(out, 480)
+    assert out.any() and e.level_main > 0.4 and e.level_play == 0   # talking: not playing
+    e.radio_live = False                                             # radio for you only
+    e.ring_rmain.prefill = e.ring_rmon.prefill = 0
+    e.feed_radio(np.full((480, 2), 0.25, np.float32))
+    e._main(out, 480)
+    assert e.level_play > 0.2
+    e.level_play = 0.0
+    src = e.add_aux("prog")
+    src.live = False                                                 # a program, not sent
+    src.ring_main.prefill = src.ring_mon.prefill = 0
+    e.feed_aux(src, np.full((480, 2), 0.3, np.float32))
+    e._mon(out, 480)
+    assert e.level_play > 0.25

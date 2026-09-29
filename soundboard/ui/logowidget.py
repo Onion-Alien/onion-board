@@ -1,7 +1,8 @@
 """The header logo, alive: the onion mark from theme.paint_logo with a glow around it.
 
 At rest the glow breathes slowly and a sheen sweeps across the tile every few seconds.
-Feed it the output level (`set_level`, 0..1) and it reacts: the glow flares and warms
+Feed it the level of whatever is playing (`set_level`, 0..1: sounds, the radio,
+captured programs; not your mic) and it reacts: the glow flares and warms
 towards flame orange, and embers drift up off the onion while sounds play.
 
 It always paints in the current theme's accent colours, so theme switches recolour
@@ -14,9 +15,11 @@ from __future__ import annotations
 import math
 import random
 import time
+from functools import lru_cache
 
 from PySide6.QtCore import QPointF, QRectF, QSize, Qt, QTimer
-from PySide6.QtGui import QColor, QLinearGradient, QPainter, QPainterPath, QPixmap, QRadialGradient
+from PySide6.QtGui import (QColor, QIcon, QLinearGradient, QPainter, QPainterPath, QPixmap,
+                           QRadialGradient)
 from PySide6.QtWidgets import QWidget
 
 from soundboard import theme
@@ -34,6 +37,36 @@ def _mix(a: QColor, b: QColor, t: float) -> QColor:
     return QColor(round(a.red() + (b.red() - a.red()) * t),
                   round(a.green() + (b.green() - a.green()) * t),
                   round(a.blue() + (b.blue() - a.blue()) * t))
+
+
+@lru_cache(maxsize=64)
+def glow_icon(c1: str, c2: str, amount: float) -> QIcon:
+    """The app icon for the title bar, taskbar and tray, glowing warm by `amount`
+    (0..1) the way the header logo does while something plays. At 0 it's the plain
+    theme.app_icon; above, the mark shrinks a little inside a flame-coloured halo."""
+    if amount <= 0:
+        return theme.app_icon(c1, c2)
+    icon = QIcon()
+    for sz in (16, 24, 32, 48, 64, 128, 256):
+        pm = QPixmap(sz, sz)
+        pm.fill(Qt.transparent)
+        p = QPainter(pm)
+        p.setRenderHint(QPainter.Antialiasing)
+        c = sz / 2
+        rg = QRadialGradient(QPointF(c, c), c)
+        col = _mix(QColor(c2), FLAME, 0.6 + 0.4 * amount)
+        col.setAlpha(round(170 + 85 * amount))
+        rg.setColorAt(0.5, col)
+        col.setAlpha(0)
+        rg.setColorAt(1.0, col)
+        p.setPen(Qt.NoPen)
+        p.setBrush(rg)
+        p.drawEllipse(QPointF(c, c), c, c)
+        m = sz * (0.86 - 0.08 * amount)   # the halo needs room at the edge
+        theme.paint_logo(p, QRectF(c - m / 2, c - m / 2, m, m), c1, c2)
+        p.end()
+        icon.addPixmap(pm)
+    return icon
 
 
 class LogoWidget(QWidget):

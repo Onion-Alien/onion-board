@@ -557,6 +557,9 @@ class Engine:
         self.level_mic = 0.0
         self.level_mon = 0.0
         self.level_radio = 0.0
+        # anything playing — sounds, the radio, captured programs — wherever it goes
+        # (to others or only to your headphones), without your mic: the logo's cue
+        self.level_play = 0.0
 
         self._rec_buf: list[np.ndarray] | None = None
         self._rec_frames_left = 0
@@ -1238,13 +1241,19 @@ class Engine:
     def _main(self, outdata, frames):
         mix = self._sounds("main", frames)
         mix *= np.float32(self.sound_vol)
+        play = peak(mix)
         r = self.ring_rmain.read(frames)
-        if r is not None and self.radio_live:
-            mix += r * np.float32(self.radio_vol)
+        if r is not None:
+            play = max(play, peak(r) * self.radio_vol)
+            if self.radio_live:
+                mix += r * np.float32(self.radio_vol)
         for a in self.aux:
             x = a.ring_main.read(frames)
-            if x is not None and a.live:
-                mix += x * np.float32(a.vol)
+            if x is not None:
+                play = max(play, peak(x) * a.vol)
+                if a.live:
+                    mix += x * np.float32(a.vol)
+        self.level_play = max(play, self.level_play * 0.85)
         mix = self._send_bus("main", mix, self.ring_main.read(frames))
         if not self.sending:      # muted: others get silence, nothing else changes
             mix.fill(0)
@@ -1272,13 +1281,19 @@ class Engine:
         m = self.ring_mon.read(frames)
         if check:
             mix *= np.float32(self.sound_vol)
+        play = peak(mix)   # the main output sees the rest; this one counts with no cable too
         r = self.ring_rmon.read(frames)
-        if r is not None and (self.radio_monitor or (check and self.radio_live)):
-            mix += r * np.float32(self.radio_vol)
+        if r is not None:
+            play = max(play, peak(r) * self.radio_vol)
+            if self.radio_monitor or (check and self.radio_live):
+                mix += r * np.float32(self.radio_vol)
         for a in self.aux:
             x = a.ring_mon.read(frames)
-            if x is not None and (a.monitor or (check and a.live)):
-                mix += x * np.float32(a.vol)
+            if x is not None:
+                play = max(play, peak(x) * a.vol)
+                if a.monitor or (check and a.live):
+                    mix += x * np.float32(a.vol)
+        self.level_play = max(play, self.level_play)   # _main decays it; no main: the UI does
         if check:   # you hear what others get: the same send stage, your mic in it
             mix = self._send_bus("mon", mix, m)
         else:

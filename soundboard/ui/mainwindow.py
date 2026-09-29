@@ -42,7 +42,7 @@ from soundboard.ui.panel import (EqPanel, VolumeControl, bar, card, hint_label, 
 from soundboard.ui.linkbar import PLAY_ID as LINK_ID
 from soundboard.ui.linkbar import LinkBar
 from soundboard.ui.livedot import is_tab_live, set_tab_live
-from soundboard.ui.logowidget import LogoWidget
+from soundboard.ui.logowidget import LogoWidget, glow_icon
 from soundboard.ui.ytsearch import SearchResults
 from soundboard.ui.padbatch import PadSelection
 from soundboard.ui.overlay import Overlay
@@ -70,6 +70,8 @@ TABS = (("Sounds", "Your sound buttons: click one to play it"),
 UNDO_S = 10          # how long "Removed … · Undo" stays up
 TICK_MS = 33         # the UI timer while the window is on screen (meters, visualisers)
 TICK_IDLE_MS = 250   # ...and while it's in the tray or minimised (push-to-talk, watchdog)
+GLOW_STEPS = 4       # how many glow levels the taskbar / tray icon has while sound plays
+ICON_GLOW_MS = 120   # ...and how often at most it changes
 RANDOM = "__random__:"   # hotkey action prefix: a random sound from the category after it
 ALL = "All"          # the category tab that shows every sound
 
@@ -139,6 +141,7 @@ class MainWindow(QMainWindow):
         self._seeking = False
         self._tick_n = 0                  # ticks since start (the watchdog runs ~once a second)
         self._ui_live = True              # the window is on screen (see _set_tick_rate)
+        self._icon_step, self._icon_next = -1, 0.0   # the icons' glow step (_glow_icons)
         self._xruns_shown = 0             # drop-out count last written to the status line
         self._talk_until = 0.0            # "hearing you" indicator holds until this time
         self._talk_shown: bool | None = None
@@ -1227,8 +1230,22 @@ class MainWindow(QMainWindow):
     def _paint_logo(self):
         self.logo.update()   # it reads the theme colours itself
         # title bar + taskbar follow the theme too (the .exe / shortcut icon stays BRAND)
-        icon = theme.app_icon(theme.T["accent"], theme.T["accent2"])
-        QApplication.setWindowIcon(icon)   # every window without its own icon
+        self._icon_step = -1
+        self._glow_icons(0.0, time.monotonic(), force=True)
+
+    def _glow_icons(self, level: float, now: float, force: bool = False):
+        """The title bar / taskbar and tray icons glow warm with whatever is playing,
+        like the header logo: a few steps of glow, swapped only when the step changes
+        (at most every ICON_GLOW_MS), back to the plain icon when it goes quiet."""
+        step = min(GLOW_STEPS, round(min(1.0, level * 1.4) * GLOW_STEPS))
+        if not force and (step == self._icon_step or now < self._icon_next):
+            return
+        self._icon_step, self._icon_next = step, now + ICON_GLOW_MS / 1000
+        amount = step / GLOW_STEPS
+        QApplication.setWindowIcon(glow_icon(theme.T["accent"], theme.T["accent2"], amount))
+        tray = getattr(self, "tray", None)
+        if tray is not None:
+            tray.setIcon(glow_icon(*theme.BRAND, amount))
 
     def on_hotkey(self, action):
         if self.overlay.handle(action):
@@ -2717,6 +2734,8 @@ class MainWindow(QMainWindow):
         if self._ui_live:
             self._tick_visuals(playing, now)
         self.overlay.tick(playing)
+        self._glow_icons(e.level_play, now)
+        e.level_play *= 0.9
         e.level_main *= 0.9
         e.level_mic *= 0.9
 
@@ -2772,7 +2791,7 @@ class MainWindow(QMainWindow):
         self._update_transport(playing)
         self._update_chips(playing)
         self.out_meter.set_level(e.level_main)
-        self.logo.set_level(e.level_main)
+        self.logo.set_level(e.level_play)   # anything playing, not your voice
         self.mic_meter.set_level(e.level_mic if e.mic_stream else 0.0)
         talking = e.mic_stream is not None and e.level_mic > 0.05
         if talking:

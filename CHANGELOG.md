@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+- **The logo reacts to everything that plays.** The glowing onion in the header
+  followed only what others hear, so the radio or a program on *Only me* left it
+  still, and talking into your mic made it flare. It now glows with any sound, the
+  radio or a captured program, wherever they go, and never with your voice. The
+  title bar, taskbar and tray icons glow along with it.
+
 ## 1.3.3 — 2026-09-29
 
 Onion Board now updates itself, plus 25 new themes and an overlay you can drag
