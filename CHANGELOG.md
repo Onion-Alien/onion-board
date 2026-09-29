@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+## 1.4.0 — 2026-09-29
+
+Drum pads, instant replay and hold-to-play: play your sounds from a MIDI pad
+controller, clip what a friend just said and play it straight back at them.
+
 - **MIDI pad controllers work as hotkeys.** Plug in an Akai LPD8 / MPD, a
   Launchpad or any USB MIDI keyboard, click a hotkey and hit a pad instead of
   pressing a key. No extra software needed. Pads play sounds and can do anything
