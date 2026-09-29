@@ -2,6 +2,19 @@
 
 ## Unreleased
 
+## 1.4.1 — 2026-09-29
+
+A fix for the new self-update.
+
+- **The app opens again properly after an update.** After *Update now → Restart
+  now*, the new version installed fine but crashed as it reopened ("Importing the
+  numpy C-extensions failed"): it was started with the old version's internal
+  settings. The installer now reopens it the way a double-click does, and the app
+  starts the installer without them. If an update left you with that error, just
+  open Onion Board again: the new version is installed and works.
+- **The update window's notes read properly**: plain text, whole sentences, no
+  stray `**` marks.
+
 ## 1.4.0 — 2026-09-29
 
 Drum pads, instant replay and hold-to-play: play your sounds from a MIDI pad

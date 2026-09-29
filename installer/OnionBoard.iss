@@ -108,7 +108,12 @@ Filename: "{cmd}"; Parameters: "/c ""{app}\modules\live-voice\install.bat"" --qu
 Filename: "{app}\{#AppExeName}.exe"; Description: "Open Onion Board now"; Flags: nowait postinstall skipifsilent
 ; The app's own updater (soundboard/updates.py) runs this silently with /RELAUNCH=1 after
 ; closing itself: open it again once the new version is in place.
-Filename: "{app}\{#AppExeName}.exe"; Flags: nowait; Check: Relaunch
+; Through Explorer, so the app starts with the user's own environment like a
+; double-click does: the updater that started setup is a frozen Python app whose
+; variables (PyInstaller's _PYI_*, PATH / QT_PLUGIN_PATH into its old _internal)
+; setup inherits, and an app started straight from setup with them crashed on
+; start (1.3.3 -> 1.4.0: "Importing the numpy C-extensions failed").
+Filename: "{win}\explorer.exe"; Parameters: """{app}\{#AppExeName}.exe"""; Flags: nowait; Check: Relaunch
 
 [Registry]
 ; "Start with Windows" (Settings -> General) writes this value; nothing is created at

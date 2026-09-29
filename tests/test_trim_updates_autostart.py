@@ -94,7 +94,7 @@ def test_latest_only_links_to_github(monkeypatch):
     monkeypatch.setattr(updates, "_get", lambda url: {
         "tag_name": "v2.1.0", "html_url": "https://evil.example.com/x", "body": "a\nb"})
     rel = updates.latest()
-    assert rel.version == "2.1.0" and rel.url == updates.RELEASES and rel.notes == "a\nb"
+    assert rel.version == "2.1.0" and rel.url == updates.RELEASES and rel.notes == "a b"
 
 
 def test_network_errors_are_quiet_unless_asked(monkeypatch):
@@ -308,3 +308,41 @@ def test_autostart_follows_task_managers_switch(monkeypatch):
     assert autostart.is_enabled() and "OnionBoard" not in reg.approved
     reg.approved["OnionBoard"] = b"" + bytes(11)   # on there: fine
     assert autostart.is_enabled()
+
+
+def test_release_notes_become_plain_whole_paragraphs():
+    body = ("Drum pads and **instant replay**: see [the docs](https://example.com).\n\n"
+            "- **MIDI pads.** Plug in a `Launchpad` and go.\n"
+            "- Hold to play.\n\n"
+            + "A very long third paragraph. " * 30)
+    s = updates.summary(body)
+    assert "**" not in s and "`" not in s and "](" not in s
+    assert s.startswith("Drum pads and instant replay: see the docs.")
+    assert "MIDI pads. Plug in a Launchpad and go. - Hold to play." in s
+    assert "third paragraph" not in s                  # only whole paragraphs that fit
+    long = updates.summary("First sentence here. " * 40)
+    assert long.endswith(".") and len(long) <= 420
+
+
+def test_installer_starts_without_the_frozen_apps_variables():
+    bundle = r"C:\Apps\OnionBoard\_internal"
+    env = updates.installer_env({
+        "PATH": bundle + r";C:\Windows;C:\Apps\OnionBoard\_internal\sub",
+        "_PYI_APPLICATION_HOME_DIR": bundle, "_PYI_ARCHIVE_FILE": "x",
+        "_PYI_PARENT_PROCESS_LEVEL": "0", "_MEIPASS2": bundle,
+        "QT_PLUGIN_PATH": bundle + r"\PySide6\plugins", "APPDATA": r"C:\Roaming",
+    }, bundle)
+    assert env == {"PATH": r"C:\Windows", "APPDATA": r"C:\Roaming",
+                   "PYINSTALLER_RESET_ENVIRONMENT": "1"}
+    # from source there's no bundle: only the reset flag is added
+    assert updates.installer_env({"PATH": r"C:\x"}, "") == {
+        "PATH": r"C:\x", "PYINSTALLER_RESET_ENVIRONMENT": "1"}
+
+
+def test_installer_reopens_the_app_through_explorer():
+    """Straight from setup, the new app inherits the old frozen app's variables and
+    crashed on start (1.3.3 -> 1.4.0)."""
+    from pathlib import Path
+    iss = (Path(__file__).parent.parent / "installer" / "OnionBoard.iss").read_text("utf-8")
+    run = [line for line in iss.splitlines() if "Check: Relaunch" in line]
+    assert len(run) == 1 and run[0].startswith(r'Filename: "{win}\explorer.exe"')

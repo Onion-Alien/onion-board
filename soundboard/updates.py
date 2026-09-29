@@ -102,6 +102,27 @@ def _installer(data: dict) -> tuple[str, str, int]:
     return "", "", 0
 
 
+def summary(body: str, limit: int = 420) -> str:
+    """The start of a release's notes as plain text for the dialog: Markdown marks
+    (**bold**, `code`, [links](…)) taken out, and whole paragraphs only, as many as
+    fit in `limit` characters (at least the first, cut at a sentence if it's long)."""
+    text = re.sub(r"\[([^\]]*)\]\([^)]*\)", r"\1", body.replace("\r\n", "\n"))
+    text = re.sub(r"\*\*|__|`", "", text)
+    paras = [" ".join(line.strip() for line in p.splitlines())
+             for p in re.split(r"\n\s*\n", text.strip()) if p.strip()]
+    out: list[str] = []
+    for p in paras:
+        if out and len("\n\n".join(out + [p])) > limit:
+            break
+        out.append(p)
+    first = out[0] if out else ""
+    if len(first) > limit:   # one long paragraph: end it at a sentence
+        cut = first[:limit]
+        end = max(cut.rfind(". "), cut.rfind("! "), cut.rfind("? "))
+        out[0] = cut[:end + 1] if end > 0 else cut.rsplit(" ", 1)[0] + "…"
+    return "\n\n".join(out)
+
+
 def latest() -> Release | None:
     """The newest published release (drafts and pre-releases aren't 'latest')."""
     data = _get(API)
@@ -112,7 +133,7 @@ def latest() -> Release | None:
     url = str(data.get("html_url") or RELEASES)
     if not url.startswith("https://github.com/"):
         url = RELEASES   # only ever open the project's own page
-    notes = "\n".join(str(data.get("body") or "").strip().splitlines()[:8])
+    notes = summary(str(data.get("body") or ""))
     return Release(".".join(map(str, ver)), url, notes, *_installer(data))
 
 
@@ -222,13 +243,43 @@ def installer_args(path: Path) -> list[str]:
             f"/LOG={INSTALL_LOG}"]
 
 
+def installer_env(env: dict[str, str] | None = None,
+                  bundle: str | None = None) -> dict[str, str]:
+    """This process's environment minus what the frozen app set up for itself:
+    PyInstaller's _PYI_* / _MEIPASS2 bookkeeping, and PATH / QT_PLUGIN_PATH /
+    QML2_IMPORT_PATH pointing into its own _internal folder (the PySide6 hook). The
+    installer passes its environment on to the app it reopens, and a new version
+    started with the old one's crashed on start. PYINSTALLER_RESET_ENVIRONMENT makes
+    any frozen program started from it begin afresh as well."""
+    env = dict(os.environ if env is None else env)
+    bundle = bundle if bundle is not None else getattr(sys, "_MEIPASS", None)
+    for k in list(env):
+        if k.upper().startswith("_PYI_") or k.upper() == "_MEIPASS2":
+            del env[k]
+    if bundle:
+        root = os.path.normcase(os.path.abspath(bundle))
+
+        def inside(p: str) -> bool:
+            p = os.path.normcase(os.path.abspath(p.strip('"'))) if p.strip() else ""
+            return bool(p) and (p == root or p.startswith(root + os.sep))
+        for k in ("QT_PLUGIN_PATH", "QML2_IMPORT_PATH"):
+            if k in env and inside(env[k].split(os.pathsep)[0]):
+                del env[k]
+        path_key = next((k for k in env if k.upper() == "PATH"), None)
+        if path_key:
+            env[path_key] = os.pathsep.join(
+                p for p in env[path_key].split(os.pathsep) if not inside(p))
+    env["PYINSTALLER_RESET_ENVIRONMENT"] = "1"
+    return env
+
+
 def start_install(path: Path) -> None:
     """Start the installer on its own; the caller then quits the app so it can
     replace the files. Raises OSError if it couldn't be started."""
     flags = (getattr(subprocess, "DETACHED_PROCESS", 0)
              | getattr(subprocess, "CREATE_NEW_PROCESS_GROUP", 0))
     subprocess.Popen(installer_args(path), creationflags=flags, close_fds=True,
-                     cwd=str(UPDATES_DIR))
+                     cwd=str(UPDATES_DIR), env=installer_env())
     log.info("started the installer for the update: %s", path.name)
 
 
