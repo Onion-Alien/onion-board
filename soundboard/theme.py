@@ -14,6 +14,19 @@ from PySide6.QtCore import QPointF, QRectF, Qt
 from PySide6.QtGui import (QColor, QIcon, QImage, QLinearGradient, QPainter, QPainterPath,
                            QPen, QPixmap)
 
+# Status colours (inline ok / warn / error messages, danger buttons) most themes share:
+# the bright ones read on dark backgrounds, the deep ones on light.
+_DARK_STATUS = dict(
+    danger_bg="#3a2230", danger_border="#5a2a3e", danger_text="#ff8fa3", danger_hover="#4a2a3c",
+    warn_bg="#3a2e14", warn_text="#ffb020",
+    ok_text="#13ce66", ok_border="#1c6b45", error_text="#ff4d4f",
+)
+_LIGHT_STATUS = dict(
+    danger_bg="#ffe8ec", danger_border="#f3b3c0", danger_text="#c4213f", danger_hover="#ffd9e0",
+    warn_bg="#fff1d6", warn_text="#855000",
+    ok_text="#0a6634", ok_border="#7cc39a", error_text="#b01e36",
+)
+
 THEMES: dict[str, dict[str, str]] = {
     "Dark": dict(
         bg="#15171f", panel="#1c1f2a", card="#232633", card_hi="#2b2f3f",
@@ -82,8 +95,253 @@ THEMES: dict[str, dict[str, str]] = {
         ok_text="#13ce66", ok_border="#1c6b45", error_text="#ff4d4f",
         texture="carbon",
     ),
+    # ---- more classics
+    "Midnight": dict(   # true black, for OLED screens
+        bg="#000000", panel="#0c0c0f", card="#131318", card_hi="#1a1a21",
+        btn="#16161c", btn_hover="#1f1f27", btn_press="#292932",
+        border="#25252e", border_hi="#45455a", groove="#22222b", inset="#070709",
+        text="#e8e8ee", text_hi="#ffffff", muted="#85859a", faint="#5e5e70", section="#9090a8",
+        accent="#5b8cff", accent_hi="#7aa2ff", accent2="#b36bff", on_accent="#ffffff",
+        off="#3a3a48", badge="#1f1f27", badge_text="#d8d8e4", **_DARK_STATUS,
+    ),
+    "Slate": dict(   # blue-grey with teal and brass
+        bg="#1a2129", panel="#212a34", card="#28323e", card_hi="#2f3b49",
+        btn="#2c3744", btn_hover="#354251", btn_press="#3f4e5f",
+        border="#3a4757", border_hi="#5b6e84", groove="#37434f", inset="#161c23",
+        text="#e2e8ef", text_hi="#f3f6f9", muted="#8d9bab", faint="#687686", section="#9fb0c2",
+        accent="#4fa3a5", accent_hi="#63b9bb", accent2="#e0a458", on_accent="#0e1a1b",
+        off="#4a5868", badge="#354251", badge_text="#d6dee7",
+        **_DARK_STATUS | dict(error_text="#ff7a7c"),
+    ),
+    "Arctic": dict(   # frosty blue-grey
+        bg="#2e3440", panel="#353c4a", card="#3b4252", card_hi="#434c5e",
+        btn="#3f4758", btn_hover="#4a5367", btn_press="#545e74",
+        border="#4c566a", border_hi="#6b7891", groove="#4c566a", inset="#2a2f3a",
+        text="#e5e9f0", text_hi="#eceff4", muted="#a3adc0", faint="#7b869c", section="#93b3d3",
+        accent="#88c0d0", accent_hi="#9fd0de", accent2="#b48ead", on_accent="#1d232e",
+        off="#5a6479", badge="#434c5e", badge_text="#e5e9f0",
+        **_DARK_STATUS | dict(ok_text="#a3e635", error_text="#ff8a8a", warn_text="#ffc857"),
+    ),
+    "Paper": dict(   # warm sepia, like an old notebook
+        bg="#f3ecdf", panel="#fbf7ef", card="#fffdf8", card_hi="#f6efe2",
+        btn="#ece3d2", btn_hover="#e4d8c3", btn_press="#d9cab1",
+        border="#d8cbb4", border_hi="#a8977a", groove="#dccfb9", inset="#ebe2d1",
+        text="#3b3226", text_hi="#2a2319", muted="#6e604a", faint="#a08f74", section="#8a6f47",
+        accent="#b5562c", accent_hi="#c9663a", accent2="#2f6f73", on_accent="#ffffff",
+        off="#c9b99c", badge="#ece3d2", badge_text="#4a3f30", **_LIGHT_STATUS,
+    ),
+    "High Contrast": dict(   # black, white and yellow: easiest to read
+        bg="#000000", panel="#000000", card="#0a0a0a", card_hi="#141414",
+        btn="#000000", btn_hover="#1a1a1a", btn_press="#2a2a2a",
+        border="#ffffff", border_hi="#ffff00", groove="#808080", inset="#000000",
+        text="#ffffff", text_hi="#ffffff", muted="#e0e0e0", faint="#bdbdbd", section="#ffff00",
+        accent="#ffff00", accent_hi="#ffff66", accent2="#00ffff", on_accent="#000000",
+        off="#9e9e9e", badge="#1a1a1a", badge_text="#ffffff",
+        danger_bg="#3a0000", danger_border="#ff6b6b", danger_text="#ff9e9e", danger_hover="#520000",
+        warn_bg="#332b00", warn_text="#ffd000",
+        ok_text="#3dff7a", ok_border="#3dff7a", error_text="#ff7070",
+    ),
+    # ---- colourful
+    "Vampire": dict(   # purple and pink on dusk grey
+        bg="#1e1f29", panel="#282a36", card="#2f3242", card_hi="#373a4d",
+        btn="#343746", btn_hover="#3e4154", btn_press="#494d63",
+        border="#44475a", border_hi="#6272a4", groove="#44475a", inset="#191a22",
+        text="#f8f8f2", text_hi="#ffffff", muted="#a0a4c0", faint="#6f7494", section="#bd93f9",
+        accent="#bd93f9", accent_hi="#caa8fb", accent2="#ff79c6", on_accent="#1e1f29",
+        off="#565a70", badge="#3e4154", badge_text="#f0f0ea",
+        **_DARK_STATUS | dict(ok_text="#50fa7b", error_text="#ff6e6e"),
+    ),
+    "Forest": dict(   # moss and bark
+        bg="#141a14", panel="#1b231b", card="#222c21", card_hi="#2a3628",
+        btn="#263025", btn_hover="#2f3b2d", btn_press="#394837",
+        border="#354433", border_hi="#587055", groove="#324030", inset="#101510",
+        text="#e6eedf", text_hi="#f4f9ef", muted="#93a58a", faint="#6c7d64", section="#b5c98f",
+        accent="#8bbf4d", accent_hi="#9fd060", accent2="#d9a441", on_accent="#122008",
+        off="#4a5a45", badge="#2f3b2d", badge_text="#dbe6d1", **_DARK_STATUS,
+    ),
+    "Mocha": dict(   # coffee browns and caramel
+        bg="#1c1714", panel="#251e1a", card="#2d2520", card_hi="#362c26",
+        btn="#312822", btn_hover="#3b302a", btn_press="#473a32",
+        border="#45382f", border_hi="#6e5a4b", groove="#413429", inset="#171210",
+        text="#efe4da", text_hi="#fbf3ec", muted="#a8927f", faint="#7d6a5b", section="#d0a77f",
+        accent="#d4915a", accent_hi="#e0a36e", accent2="#a86a4a", on_accent="#1c120a",
+        off="#5a4a3f", badge="#3b302a", badge_text="#e8dccf", **_DARK_STATUS,
+    ),
+    "Sunset": dict(   # orange and pink on plum
+        bg="#1f1420", panel="#2a1a2b", card="#332034", card_hi="#3d273e",
+        btn="#38233a", btn_hover="#442b46", btn_press="#523452",
+        border="#4d2f4f", border_hi="#7a4d7a", groove="#4a2d4b", inset="#1a1019",
+        text="#fbe9f0", text_hi="#fff5f8", muted="#c095a8", faint="#8e6a7c", section="#ff9e7a",
+        accent="#ff7849", accent_hi="#ff8f66", accent2="#ff3d7f", on_accent="#1f0e0a",
+        off="#614160", badge="#442b46", badge_text="#f5dbe5",
+        **_DARK_STATUS | dict(error_text="#ff6b6b"),
+    ),
+    "Royal": dict(   # gold on deep violet
+        bg="#140f24", panel="#1c1530", card="#241b3c", card_hi="#2c2248",
+        btn="#271e40", btn_hover="#31264f", btn_press="#3c2f5f",
+        border="#3a2d5c", border_hi="#5f4c91", groove="#372a58", inset="#100b1d",
+        text="#ece6ff", text_hi="#f7f3ff", muted="#a497c7", faint="#766a99", section="#e0bf5c",
+        accent="#e6b93d", accent_hi="#f0c95a", accent2="#9d6bff", on_accent="#1c1405",
+        off="#4c406e", badge="#31264f", badge_text="#e2daf7", **_DARK_STATUS,
+    ),
+    "Onion": dict(   # red-onion purple with a green sprout, like the logo
+        bg="#1d1224", panel="#27182f", card="#301d3a", card_hi="#3a2446",
+        btn="#352040", btn_hover="#40274d", btn_press="#4c2f5b",
+        border="#4a2f57", border_hi="#7a4f8e", groove="#472c54", inset="#170e1d",
+        text="#f3e6f7", text_hi="#fbf5fd", muted="#b596c2", faint="#846a90", section="#9ad36a",
+        accent="#b04ad8", accent_hi="#c064e4", accent2="#8fd14f", on_accent="#ffffff",
+        off="#5e416b", badge="#40274d", badge_text="#ecdcf2",
+        **_DARK_STATUS | dict(error_text="#ff6b6b"),
+    ),
+    "Mint": dict(   # fresh mint and white
+        bg="#e8f5ef", panel="#f7fcfa", card="#ffffff", card_hi="#eef8f3",
+        btn="#dcefe6", btn_hover="#cfe7db", btn_press="#bfdecf",
+        border="#c3ddd1", border_hi="#7fb39b", groove="#c9e2d6", inset="#e0f0e8",
+        text="#16322a", text_hi="#0c231c", muted="#4d6e62", faint="#85a498", section="#3f7f68",
+        accent="#0f9373", accent_hi="#12a882", accent2="#3f8cff", on_accent="#ffffff",
+        off="#a9cbbd", badge="#dcefe6", badge_text="#1e3d33", **_LIGHT_STATUS,
+    ),
+    # ---- wild
+    "Synthwave": dict(   # neon pink and cyan on an 80s grid
+        bg="#1a0b2e", panel="#240f3d", card="#2d1450", card_hi="#37195f",
+        btn="#2f1553", btn_hover="#3b1b66", btn_press="#472179",
+        border="#4a2280", border_hi="#7a3bd1", groove="#45206f", inset="#140824",
+        text="#fbe6ff", text_hi="#ffffff", muted="#c49be0", faint="#8a64a8", section="#36f9f6",
+        accent="#ff2a6d", accent_hi="#ff4f88", accent2="#36f9f6", on_accent="#ffffff",
+        off="#5a3585", badge="#3b1b66", badge_text="#f5d7ff",
+        **_DARK_STATUS | dict(ok_text="#36f9a0", error_text="#ff6b8b"),
+        texture="grid",
+    ),
+    "Vaporwave": dict(   # A E S T H E T I C pastel pink and mint
+        bg="#fce4f4", panel="#fff1fa", card="#ffffff", card_hi="#fdeaf6",
+        btn="#f5d5ec", btn_hover="#efc4e4", btn_press="#e6b1d9",
+        border="#e9bfdc", border_hi="#c47fb5", groove="#eac6e0", inset="#f6dcee",
+        text="#3b1d4a", text_hi="#2a1236", muted="#74508a", faint="#a888b8", section="#1f8a83",
+        accent="#a94dff", accent_hi="#b96bff", accent2="#05e0a1", on_accent="#ffffff",
+        off="#d9b3d6", badge="#f5d5ec", badge_text="#4a2860", **_LIGHT_STATUS,
+    ),
+    "Blood Moon": dict(   # crimson on black
+        bg="#120a0b", panel="#1b0f11", card="#241417", card_hi="#2d191d",
+        btn="#29161a", btn_hover="#341c21", btn_press="#40232a",
+        border="#3e2228", border_hi="#6b3440", groove="#3a1f25", inset="#0d0708",
+        text="#f3e3e5", text_hi="#fff4f5", muted="#b08a90", faint="#7f5f65", section="#e0606f",
+        accent="#d91f35", accent_hi="#ec3448", accent2="#ff8a3d", on_accent="#ffffff",
+        off="#56313a", badge="#341c21", badge_text="#f0d6da",
+        **_DARK_STATUS | dict(error_text="#ff7a7c"),
+    ),
+    "Lava": dict(   # molten orange and yellow
+        bg="#150805", panel="#1f0c07", card="#2a1109", card_hi="#35160b",
+        btn="#2e130a", btn_hover="#3b180c", btn_press="#4a1e0f",
+        border="#4d2010", border_hi="#8a3a14", groove="#45200e", inset="#100604",
+        text="#ffe4d1", text_hi="#fff3ea", muted="#d08a63", faint="#9a6043", section="#ffae3d",
+        accent="#ff5a1f", accent_hi="#ff7640", accent2="#ffd23d", on_accent="#1a0600",
+        off="#5f2b16", badge="#3b180c", badge_text="#ffd9c2",
+        **_DARK_STATUS | dict(error_text="#ff7a7c"),
+    ),
+    "Amber Terminal": dict(   # an old amber CRT, scanlines and all
+        bg="#0d0a05", panel="#15100a", card="#1c160d", card_hi="#241c10",
+        btn="#1f180e", btn_hover="#2a2012", btn_press="#352816",
+        border="#3a2c15", border_hi="#6b5020", groove="#33270f", inset="#0a0804",
+        text="#ffc766", text_hi="#ffd98f", muted="#c29445", faint="#7f612c", section="#ffb000",
+        accent="#ffb000", accent_hi="#ffc233", accent2="#ff7a00", on_accent="#1a1000",
+        off="#54401c", badge="#2a2012", badge_text="#ffd07a",
+        **_DARK_STATUS | dict(warn_text="#ffd24d"),
+        texture="scanlines", font="Consolas",
+    ),
+    "Hacker": dict(   # green phosphor. I'm in.
+        bg="#020a04", panel="#051208", card="#08190c", card_hi="#0b2110",
+        btn="#0a1c0e", btn_hover="#0e2814", btn_press="#13341a",
+        border="#11361a", border_hi="#1f6b33", groove="#0f2e17", inset="#010702",
+        text="#33ff66", text_hi="#99ffb3", muted="#22b04b", faint="#177a33", section="#33ff66",
+        accent="#00ff41", accent_hi="#4dff7a", accent2="#00c8ff", on_accent="#001a07",
+        off="#1a4a26", badge="#0e2814", badge_text="#66ff8c",
+        **_DARK_STATUS | dict(ok_text="#00ff41"),
+        texture="scanlines", font="Consolas",
+    ),
+    # ---- memes
+    "Flashbang": dict(   # light mode, but worse. Your eyes will thank you (they won't)
+        bg="#ffffff", panel="#ffffff", card="#ffffff", card_hi="#fafafa",
+        btn="#ffffff", btn_hover="#fff9c4", btn_press="#fff176",
+        border="#eeeeee", border_hi="#ffd600", groove="#eeeeee", inset="#fafafa",
+        text="#222222", text_hi="#000000", muted="#666666", faint="#9e9e9e", section="#8a6500",
+        accent="#ffd600", accent_hi="#ffea00", accent2="#ff9100", on_accent="#000000",
+        off="#d6d6d6", badge="#fffde7", badge_text="#333333", **_LIGHT_STATUS,
+    ),
+    "Barbie": dict(   # everything is pink. Everything.
+        bg="#ffb3d9", panel="#ffc9e4", card="#ffdcee", card_hi="#ffd0e8",
+        btn="#ff9ccf", btn_hover="#ff85c4", btn_press="#ff6eb8",
+        border="#ff5fb0", border_hi="#e0218a", groove="#ff8cc6", inset="#ffc0e0",
+        text="#4a0027", text_hi="#330019", muted="#7a1650", faint="#a8407c", section="#a3005a",
+        accent="#d6157f", accent_hi="#e82a91", accent2="#ff00a0", on_accent="#ffffff",
+        off="#e889bd", badge="#ff9ccf", badge_text="#4a0027",
+        **_LIGHT_STATUS | dict(ok_text="#044a22", warn_text="#5e3700", error_text="#7a0017",
+                               danger_bg="#ffe0e8", danger_text="#9a0f25"),
+    ),
+    "Swamp": dict(   # what are you doing in my swamp
+        bg="#2a3312", panel="#34401a", card="#3e4c1f", card_hi="#485824",
+        btn="#425220", btn_hover="#4d5f26", btn_press="#596d2c",
+        border="#56692a", border_hi="#86a03e", groove="#50622a", inset="#232b0f",
+        text="#eef5d0", text_hi="#fbffe8", muted="#b9c78c", faint="#899960", section="#c9e05a",
+        accent="#a4c639", accent_hi="#b6d64c", accent2="#8b5a2b", on_accent="#1a2205",
+        off="#647535", badge="#4d5f26", badge_text="#e6efc4",
+        **_DARK_STATUS | dict(ok_text="#7dffa8", error_text="#ffa0a0", warn_text="#ffd466"),
+        texture="dots",
+    ),
+    "Deep Fried": dict(   # saturation turned up until the meme cooks
+        bg="#3d0a00", panel="#5c1000", card="#7a1a00", card_hi="#8f2200",
+        btn="#8a1f00", btn_hover="#a82a00", btn_press="#c43500",
+        border="#ff4400", border_hi="#ffcc00", groove="#b32d00", inset="#2e0700",
+        text="#ffff00", text_hi="#ffffff", muted="#ffc266", faint="#ff9c3d", section="#00ffff",
+        accent="#00ff00", accent_hi="#66ff66", accent2="#ffff00", on_accent="#000000",
+        off="#b35900", badge="#a82a00", badge_text="#ffff66",
+        danger_bg="#000000", danger_border="#ffff00", danger_text="#ffff00", danger_hover="#222200",
+        warn_bg="#000000", warn_text="#ffe066",
+        ok_text="#7dff7d", ok_border="#7dff7d", error_text="#ffffff",
+        texture="dots",
+    ),
+    "Retro 98": dict(   # it's 1998 and you just got a new PC
+        bg="#c0c0c0", panel="#d4d0c8", card="#ffffff", card_hi="#eeeeee",
+        btn="#d4d0c8", btn_hover="#e0ddd6", btn_press="#b8b4ac",
+        border="#808080", border_hi="#404040", groove="#a0a0a0", inset="#ffffff",
+        text="#000000", text_hi="#000000", muted="#3a3a3a", faint="#6d6d6d", section="#000080",
+        accent="#000080", accent_hi="#1084d0", accent2="#008080", on_accent="#ffffff",
+        off="#a0a0a0", badge="#ffffff", badge_text="#000000",
+        **_LIGHT_STATUS | dict(ok_text="#005a1e", warn_text="#6b3f00", error_text="#9a0000"),
+        font="Tahoma",
+    ),
+    "Comic Sans": dict(   # the most serious theme
+        bg="#fff8b8", panel="#fffbd6", card="#ffffff", card_hi="#fffce6",
+        btn="#ffe97a", btn_hover="#ffe14d", btn_press="#ffd41a",
+        border="#f2c200", border_hi="#d99a00", groove="#f5dc70", inset="#fff3a0",
+        text="#2b1d00", text_hi="#1a1100", muted="#63500f", faint="#a08530", section="#c2006b",
+        accent="#e8198b", accent_hi="#f7349c", accent2="#1aa7ec", on_accent="#ffffff",
+        off="#e0c860", badge="#ffe97a", badge_text="#3a2a00",
+        **_LIGHT_STATUS | dict(ok_text="#085a2d", warn_text="#6b3f00", error_text="#a0142e"),
+        font="Comic Sans MS",
+    ),
+    "Brainrot": dict(   # lime and magenta, fighting
+        bg="#0d001a", panel="#1a0033", card="#240046", card_hi="#2e0059",
+        btn="#29004f", btn_hover="#3a0070", btn_press="#4b0091",
+        border="#7a00ff", border_hi="#c6ff00", groove="#3d0073", inset="#08000f",
+        text="#c6ff00", text_hi="#eaff80", muted="#ff70ff", faint="#b347d9", section="#00ffea",
+        accent="#ff00d4", accent_hi="#ff40df", accent2="#c6ff00", on_accent="#ffffff",
+        off="#52307a", badge="#3a0070", badge_text="#eaff80",
+        **_DARK_STATUS | dict(ok_text="#00ffea", error_text="#ff8080"),
+        texture="grid",
+    ),
 }
 DEFAULT = "Dark"
+# How the Settings window groups the theme cards. Every theme is in exactly one group.
+GROUPS: list[tuple[str, list[str]]] = [
+    ("Classic", ["Dark", "Light", "Midnight", "Carbon", "Slate", "Arctic", "Paper",
+                 "High Contrast"]),
+    ("Colourful", ["Ocean", "Toxic", "Vampire", "Forest", "Mocha", "Sunset", "Royal", "Onion",
+                   "Mint", "Cherry Blossom"]),
+    ("Wild", ["Synthwave", "Vaporwave", "Blood Moon", "Lava", "Amber Terminal", "Hacker"]),
+    ("Meme", ["Flashbang", "Barbie", "Swamp", "Deep Fried", "Retro 98", "Comic Sans",
+              "Brainrot"]),
+]
+FONT = "Segoe UI"   # a theme can swap it with a `font` token
 
 T: dict[str, str] = dict(THEMES[DEFAULT])   # current theme (read at paint time)
 current_name = DEFAULT
@@ -114,7 +372,7 @@ def set_current(name: str) -> str:
 
 
 STYLE = Template("""
-QWidget { background:$bg; color:$text; font-family:'Segoe UI'; font-size:10pt; }
+QWidget { background:$bg; color:$text; font-family:'$font'; font-size:10pt; }
 QDialog { background:$bg; }
 QFrame#card { background:$panel; border-radius:12px; }
 QFrame#card QWidget { background:transparent; }
@@ -366,23 +624,61 @@ def _carbon_image(base: str, size: int) -> QImage:
     return img
 
 
-CARBON_TILE = 14
+def _pattern_image(kind: str, base: str, size: int) -> QImage:
+    """The simpler tiling patterns: CRT scanlines, a neon grid, polka dots. Each is the
+    panel colour a shade lighter or darker, so text on it stays readable."""
+    img = QImage(size, size, QImage.Format_ARGB32)
+    img.fill(QColor(base))
+    p = QPainter(img)
+    if kind == "scanlines":   # a darker row every third pixel
+        for y in range(0, size, 3):
+            p.fillRect(QRectF(0, y, size, 1), QColor(base).darker(135))
+    elif kind == "grid":      # one lit line along the top and left of each tile
+        line = QColor(base).lighter(150)
+        p.fillRect(QRectF(0, 0, size, 1), line)
+        p.fillRect(QRectF(0, 0, 1, size), line)
+    elif kind == "dots":
+        p.setRenderHint(QPainter.Antialiasing)
+        p.setPen(Qt.NoPen)
+        p.setBrush(QColor(base).lighter(125))
+        r = size * 0.14
+        for c in (0.25, 0.75):
+            p.drawEllipse(QPointF(size * c, size * c), r, r)
+    p.end()
+    return img
+
+
+TEXTURE_TILE = {"carbon": 14, "scanlines": 3, "grid": 24, "dots": 12}
+
+
+def texture_image(kind: str, base: str, size: int | None = None) -> QImage:
+    """One tile of theme texture `kind` ("carbon", "scanlines", "grid", "dots") on `base`."""
+    size = size or TEXTURE_TILE.get(kind, 14)
+    return _carbon_image(base, size) if kind == "carbon" else _pattern_image(kind, base, size)
 
 
 def _texture_url(kind: str, base: str) -> str:
     folder = Path(tempfile.gettempdir()) / "onionboard-ui"
-    path = folder / f"{kind}{CARBON_TILE}-{base.lstrip('#')}.png"
+    size = TEXTURE_TILE.get(kind, 14)
+    path = folder / f"{kind}{size}-{base.lstrip('#')}.png"
     try:
         folder.mkdir(exist_ok=True)
         if not path.exists():
-            _carbon_image(base, CARBON_TILE).save(str(path))
+            texture_image(kind, base, size).save(str(path))
     except OSError:
         return ""
     return path.as_posix()
 
 
+def is_light(name: str | None = None) -> bool:
+    """Whether theme `name` (default: the current one) has a light background."""
+    c = QColor(THEMES.get(name or current_name, THEMES[DEFAULT])["bg"])
+    return 0.299 * c.red() + 0.587 * c.green() + 0.114 * c.blue() > 140
+
+
 def stylesheet(name: str | None = None) -> str:
     tokens = dict(THEMES.get(name or current_name, THEMES[DEFAULT]))
+    tokens.setdefault("font", FONT)
     tokens["check"] = _check_url(tokens["on_accent"])
     for key, colour in (("", tokens["muted"]), ("_off", tokens["off"])):
         tokens["down" + key] = _chevron_url(colour, 10, up=False)

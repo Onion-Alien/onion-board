@@ -12,6 +12,16 @@
 - **Triggers see fullscreen games on a portrait monitor.** A rotated monitor never
   got Desktop Duplication (it fell back to GDI, which sees fullscreen games as
   black); its sideways frames are now read and turned upright.
+- **25 new themes, 31 in all**, grouped in Settings → Appearance: Classic
+  (Midnight for OLED screens, Slate, Arctic, Paper, High Contrast), Colourful
+  (Vampire, Forest, Mocha, Sunset, Royal, Onion, Mint), Wild (Synthwave with a
+  neon grid, Vaporwave, Blood Moon, Lava, and Amber Terminal and Hacker with CRT
+  scanlines and a terminal font) and Meme (Flashbang, Barbie, Swamp, Deep Fried,
+  Retro 98, Comic Sans, Brainrot).
+- **Put the overlay where you want it.** Drag it by any empty part (its title,
+  its edges) and it opens there from then on — on any monitor. Settings → Overlay
+  picks the monitor (the game's, the main one, or a particular screen, say a
+  second monitor next to the game) and one of nine spots.
 
 ## 1.3.2 — 2026-09-29
 

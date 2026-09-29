@@ -75,18 +75,38 @@ def _contrast(a: str, b: str) -> float:
     return (hi + 0.05) / (lo + 0.05)
 
 
-@pytest.mark.parametrize("name", ["Light", "Cherry Blossom"])
-def test_status_colours_are_readable_on_the_light_themes(name):
+@pytest.mark.parametrize("name", list(theme.THEMES))
+def test_every_theme_is_complete_and_readable(name):
+    """Every theme has every colour, and its text, inline ok / warn / error messages
+    and accent buttons can be read — the meme ones too. (The light themes get the
+    full 4.5:1; the dark ones' red on a button is a shade under that, as Dark always was.)"""
     t = theme.THEMES[name]
+    assert set(theme.THEMES["Dark"]) - {"texture"} <= set(t)
+    need = 4.5 if theme.is_light(name) else 4.0
     for kind in ("ok", "warn", "error"):
         for bg in ("bg", "panel", "card", "btn"):
-            assert _contrast(t[f"{kind}_text"], t[bg]) >= 4.5, (kind, bg)
+            assert _contrast(t[f"{kind}_text"], t[bg]) >= need, (kind, bg)
+    for fg, bg in (("text", "bg"), ("text", "card"), ("muted", "panel"),
+                   ("on_accent", "accent"), ("danger_text", "danger_bg")):
+        assert _contrast(t[fg], t[bg]) >= 3.0, (fg, bg)
+    assert t.get("texture", "carbon") in theme.TEXTURE_TILE
 
 
-def test_dark_themes_keep_their_status_colours():
-    for name, t in theme.THEMES.items():
-        if name not in ("Light", "Cherry Blossom"):
-            assert (t["ok_text"], t["error_text"]) == ("#13ce66", "#ff4d4f")
+def test_every_theme_is_in_one_settings_group():
+    grouped = [n for _, names in theme.GROUPS for n in names]
+    assert sorted(grouped) == sorted(theme.THEMES)
+    assert theme.is_light("Light") and theme.is_light("Flashbang")
+    assert not theme.is_light("Dark") and not theme.is_light("Midnight")
+
+
+@pytest.mark.parametrize("name", [n for n, t in theme.THEMES.items() if t.get("texture")
+                                  or t.get("font")])
+def test_textured_and_font_themes_build_their_stylesheet(qapp, name):
+    css = theme.stylesheet(name)
+    font = theme.THEMES[name].get("font", theme.FONT)
+    assert f"font-family:'{font}'" in css
+    if theme.THEMES[name].get("texture"):
+        assert "background-image:url(" in css
 
 
 def test_setup_tab_uses_the_themes_status_colours(qapp, win):

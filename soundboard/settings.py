@@ -130,8 +130,12 @@ class ThemeCard(QPushButton):
         p.fillPath(win, QColor(t["bg"]))
         # side panel, pads and a slider, in the theme's own colours
         p.setPen(Qt.NoPen)
-        p.setBrush(QBrush(QPixmap.fromImage(theme._carbon_image(t["panel"], 6)))
-                   if t.get("texture") else QColor(t["panel"]))
+        tex = t.get("texture")
+        if tex:   # carbon's weave drawn finer, to read at this size
+            tile = theme.texture_image(tex, t["panel"], 6 if tex == "carbon" else None)
+            p.setBrush(QBrush(QPixmap.fromImage(tile)))
+        else:
+            p.setBrush(QColor(t["panel"]))
         p.drawRoundedRect(QRectF(r.right() - 44, r.top() + 6, 38, r.height() - 12), 5, 5)
         for i, col in enumerate(("#7c5cff", "#ff5c8a", "#1fb6ff", "#13ce66")):
             x = r.left() + 7 + (i % 2) * 44
@@ -146,9 +150,10 @@ class ThemeCard(QPushButton):
         p.drawRoundedRect(QRectF(r.right() - 39, r.top() + 20, 17, 3), 1.5, 1.5)
         theme.paint_logo(p, QRectF(r.right() - 36, r.bottom() - 30, 22, 22),
                          t["accent"], t["accent2"])
-        # name
+        # name, in the theme's own font
         p.setPen(QColor(theme.T["text"]))
         f = QFont(self.font())
+        f.setFamily(t.get("font", theme.FONT))
         f.setBold(True)
         p.setFont(f)
         p.drawText(QRectF(10, self.height() - 28, self.width() - 20, 22),
@@ -244,18 +249,22 @@ class SettingsDialog(QDialog):
 
     def _appearance(self):
         w, v = self._page()
-        card, cv = self._card("Theme", "Changes the whole app instantly.")
-        grid = QGridLayout()
-        grid.setSpacing(12)
         self.theme_cards = []
-        for i, name in enumerate(theme.THEMES):
-            c = ThemeCard(name)
-            c.setChecked(name == theme.current_name)
-            c.clicked.connect(lambda _=False, n=name: self._pick_theme(n))
-            grid.addWidget(c, i // 4, i % 4)
-            self.theme_cards.append(c)
-        cv.addLayout(grid)
-        v.addWidget(card)
+        hints = {"Classic": "Changes the whole app instantly.",
+                 "Meme": "For when you want your soundboard to be a bit."}
+        for group, names in theme.GROUPS:
+            card, cv = self._card(group, hints.get(group, ""))
+            grid = QGridLayout()
+            grid.setSpacing(12)
+            for i, name in enumerate(names):
+                c = ThemeCard(name)
+                c.setChecked(name == theme.current_name)
+                c.clicked.connect(lambda _=False, n=name: self._pick_theme(n))
+                grid.addWidget(c, i // 4, i % 4)
+                self.theme_cards.append(c)
+            grid.setColumnStretch(4, 1)
+            cv.addLayout(grid)
+            v.addWidget(card)
         v.addStretch(1)
         return w
 
@@ -356,20 +365,33 @@ class SettingsDialog(QDialog):
         self.ov_toggle_only = (after, row.itemAt(1).widget())
         v.addWidget(card)
 
-        card, cv = self._card("Look")
+        card, cv = self._card("Where and how it looks",
+                              "Or just drag it: grab any empty part of the overlay (its title, "
+                              "its edges) and drop it anywhere, on any monitor. It opens there "
+                              "from then on. Show the preview to place it now.")
         grid = QGridLayout()
         grid.setHorizontalSpacing(12)
-        grid.addWidget(QLabel("Position"), 0, 0)
-        grid.addWidget(self._ov_combo("position", ovl.POSITIONS, s.position), 0, 1)
-        grid.addWidget(QLabel("Size"), 1, 0)
-        grid.addLayout(self._ov_slider("scale", 60, 160, s.scale), 1, 1)
-        grid.addWidget(QLabel("Background"), 2, 0)
-        grid.addLayout(self._ov_slider("opacity", 30, 100, s.opacity), 2, 1)
+        grid.addWidget(QLabel("Monitor"), 0, 0)
+        self.ov_monitor = self._ov_combo("monitor", self._monitor_choices(s.monitor), s.monitor)
+        self.ov_monitor.setToolTip("With more than one monitor: put the overlay on the one "
+                                   "you're gaming on, or keep it on a second one")
+        grid.addWidget(self.ov_monitor, 0, 1)
+        grid.addWidget(QLabel("Position"), 1, 0)
+        self.ov_position = self._ov_combo("position", ovl.POSITIONS, s.position)
+        grid.addWidget(self.ov_position, 1, 1)
+        grid.addWidget(QLabel("Size"), 2, 0)
+        grid.addLayout(self._ov_slider("scale", 60, 160, s.scale), 2, 1)
+        grid.addWidget(QLabel("Background"), 3, 0)
+        grid.addLayout(self._ov_slider("opacity", 30, 100, s.opacity), 3, 1)
         grid.setColumnStretch(1, 1)
         cv.addLayout(grid)
+        # a drag on the overlay changes monitor / position: show it here
+        self.mw.overlay.listeners.append(self._ov_dragged)
+        self.destroyed.connect(lambda *_: self._ov_forget())
+        self.finished.connect(lambda *_: self._ov_forget())
         prev = QPushButton("Show preview")
-        prev.setToolTip("Shows the overlay for a few seconds")
-        prev.clicked.connect(lambda: self.mw.overlay.preview())
+        prev.setToolTip("Shows the overlay for a few seconds — drag it while it's up")
+        prev.clicked.connect(lambda: self.mw.overlay.preview(6))
         row = QHBoxLayout()
         row.addStretch(1)
         row.addWidget(prev)
@@ -417,6 +439,32 @@ class SettingsDialog(QDialog):
         self.mw.overlay.apply(d)
         self.mw.set_option("overlay", self.mw.overlay.s.to_dict())
         self._ov_sync()
+
+    def _monitor_choices(self, current: str) -> list[tuple[str, str]]:
+        choices = ovl.monitor_choices(QApplication.screens(), QApplication.primaryScreen())
+        if current not in dict(choices):   # a monitor that isn't plugged in right now
+            choices.append((current, f"{current.rpartition('@')[0] or current}  (not connected)"))
+        return choices
+
+    def _ov_dragged(self):
+        """The overlay was dragged somewhere: show its new monitor and position."""
+        if not qt_valid(self):
+            return
+        s = self.mw.overlay.s
+        for cb, value, choices in ((self.ov_monitor, s.monitor, self._monitor_choices(s.monitor)),
+                                   (self.ov_position, s.position, ovl.POSITIONS)):
+            cb.blockSignals(True)
+            cb.clear()
+            for v, label in choices:
+                cb.addItem(label, v)
+            cb.setCurrentIndex(max(0, cb.findData(value)))
+            cb.blockSignals(False)
+
+    def _ov_forget(self):
+        try:
+            self.mw.overlay.listeners.remove(self._ov_dragged)
+        except ValueError:
+            pass
 
     def _ov_sync(self):
         for wdg in getattr(self, "ov_toggle_only", ()):

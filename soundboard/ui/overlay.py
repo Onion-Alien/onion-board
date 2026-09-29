@@ -11,6 +11,11 @@ Pages are the Sounds tab's pads in order, nine at a time, so dragging pads aroun
 there rearranges the overlay too. It shows the category the Sounds tab shows;
 switching category here switches it there too.
 
+It opens on the game's monitor, or on a monitor picked in Settings, at one of nine
+spots or wherever it was last dragged to: drag it by any empty part (the title, the
+edges) and it stays there, kept as a fraction of the monitor so it survives a change
+of resolution or overlay size.
+
 In exclusive fullscreen nothing can be drawn over the game, so the overlay opens
 "blind": the keys still work, and short beeps in your headphones confirm it.
 """
@@ -21,8 +26,8 @@ import math
 import time
 from dataclasses import asdict, dataclass
 
-from PySide6.QtCore import (QEasingCurve, QPointF, QPropertyAnimation, QRectF, QSize, Qt,
-                            QTimer)
+from PySide6.QtCore import (QEasingCurve, QPoint, QPointF, QPropertyAnimation, QRect, QRectF,
+                            QSize, Qt, QTimer)
 from PySide6.QtGui import (QColor, QFont, QGuiApplication, QPainter, QPainterPath, QPen,
                            QPolygonF)
 from PySide6.QtWidgets import QWidget
@@ -44,8 +49,13 @@ MODES = [("toggle", "Tap to open, tap again to close"),
          ("hold", "Hold to show, let go to hide")]
 KEY_CHOICES = [("digits", "Number row 1–9  (Q / E flip pages, R category)"),
                ("numpad", "Numpad  (− / + flip pages, * category)")]
-POSITIONS = [("top", "Top"), ("center", "Middle"), ("bottom", "Bottom"),
-             ("top-left", "Top left"), ("top-right", "Top right")]
+POSITIONS = [("top-left", "Top left"), ("top", "Top middle"), ("top-right", "Top right"),
+             ("left", "Middle left"), ("center", "Middle"), ("right", "Middle right"),
+             ("bottom-left", "Bottom left"), ("bottom", "Bottom middle"),
+             ("bottom-right", "Bottom right"), ("custom", "Where I dragged it")]
+# which monitor: the one the game is on, the main one, or one screen's screen_key()
+MONITOR_GAME, MONITOR_PRIMARY = "game", "primary"
+DRAG_START_PX = 4       # how far a press has to move before it's a drag
 AUTOHIDE = [(0, "Never"), (3, "3 seconds"), (4, "4 seconds"), (6, "6 seconds"),
             (10, "10 seconds")]
 CLOSE_DELAY_MS = 220    # after a pick, long enough to see the tile light up
@@ -86,13 +96,61 @@ def pick_screen(screens, device_name: str, native_rect):
     return same_size[0] if len(same_size) == 1 else None
 
 
+def screen_key(sc) -> str:
+    """How a monitor is remembered: its name plus its top-left, so two identical
+    monitors (same name) are still told apart."""
+    g = sc.geometry()
+    return f"{sc.name()}@{g.left()},{g.top()}"
+
+
+def find_screen(screens, key: str):
+    """The screen saved as `key` (screen_key), or None. If the monitors were
+    rearranged, a screen with the same name still counts, as long as only one has it."""
+    for sc in screens:
+        if screen_key(sc) == key:
+            return sc
+    name = key.rpartition("@")[0]
+    named = [sc for sc in screens if sc.name() == name]
+    return named[0] if len(named) == 1 else None
+
+
+def monitor_choices(screens, primary) -> list[tuple[str, str]]:
+    """(value, label) for the Settings window's monitor list."""
+    out = [(MONITOR_GAME, "The one the game is on"), (MONITOR_PRIMARY, "Main monitor")]
+    for i, sc in enumerate(screens, 1):
+        g, k = sc.geometry(), sc.devicePixelRatio()
+        main = "  (main)" if sc is primary else ""
+        out.append((screen_key(sc), f"Screen {i}: {sc.name()}  "
+                                    f"{round(g.width() * k)}×{round(g.height() * k)}{main}"))
+    return out
+
+
+def place(geo: QRect, size: QSize, s: OverlaySettings, margin: int) -> QPoint:
+    """Top-left for a window of `size` on a monitor at `geo`, per the settings."""
+    w, h = size.width(), size.height()
+    if s.position == "custom":
+        return QPoint(geo.left() + round(s.x * max(0, geo.width() - w)),
+                      geo.top() + round(s.y * max(0, geo.height() - h)))
+    pos = s.position
+    col = "left" if pos.endswith("left") else "right" if pos.endswith("right") else ""
+    row = "top" if pos.startswith("top") else "bottom" if pos.startswith("bottom") else ""
+    x = {"left": geo.left() + margin, "right": geo.left() + geo.width() - margin - w}.get(
+        col, geo.left() + (geo.width() - w) // 2)
+    y = {"top": geo.top() + margin, "bottom": geo.top() + geo.height() - margin - h}.get(
+        row, geo.top() + (geo.height() - h) // 2)
+    return QPoint(x, y)
+
+
 @dataclass
 class OverlaySettings:
     mode: str = "toggle"            # toggle | hold
     keys: str = "digits"            # digits | numpad
     close_after_play: bool = True   # toggle mode: hide as soon as a sound is picked
     autohide: int = 4               # toggle mode: seconds untouched before it hides; 0 = never
-    position: str = "top"
+    position: str = "top"           # one of POSITIONS; "custom" = at x, y
+    monitor: str = MONITOR_GAME     # "game" | "primary" | a screen_key()
+    x: float = 0.5                  # custom spot, as a fraction of the room the
+    y: float = 0.0                  # monitor has around the window (0 = left / top)
     scale: int = 100                # tile size, %
     opacity: int = 85               # background, %
 
@@ -107,6 +165,12 @@ class OverlaySettings:
             s.close_after_play = d["close_after_play"]
         if d.get("position") in dict(POSITIONS):
             s.position = d["position"]
+        if isinstance(d.get("monitor"), str) and 0 < len(d["monitor"]) <= 300:
+            s.monitor = d["monitor"]
+        for name in ("x", "y"):
+            v = d.get(name)
+            if isinstance(v, (int, float)) and not isinstance(v, bool) and math.isfinite(v):
+                setattr(s, name, min(max(float(v), 0.0), 1.0))
         for name, lo, hi in (("autohide", 0, 60), ("scale", 60, 160), ("opacity", 30, 100)):
             v = d.get(name)
             if isinstance(v, (int, float)) and not isinstance(v, bool):
@@ -147,6 +211,7 @@ class Overlay:
         self._preview_end = QTimer()
         self._preview_end.setSingleShot(True)
         self._preview_end.timeout.connect(self._end_preview)
+        self.listeners: list = []     # called (no args) after a drag changed the settings
 
     @property
     def keyset(self) -> dict:
@@ -337,6 +402,30 @@ class Overlay:
         self.window.present(follow_game=False)
         self._preview_end.start(int(seconds * 1000))
 
+    def keep_preview(self):
+        """The mouse is on the preview (say, dragging it into place): keep it up."""
+        if not self.is_open and self._preview_end.isActive():
+            self._preview_end.start(3000)
+
+    def dropped(self, rect: QRect, screen, placed_on):
+        """The window was dragged to `rect` on `screen` (it had opened on `placed_on`):
+        remember the spot, and save it. Set to follow the game, it keeps doing so
+        unless it was dragged onto another monitor, which then becomes its monitor."""
+        g = screen.geometry()
+        room_w, room_h = g.width() - rect.width(), g.height() - rect.height()
+        self.s.position = "custom"
+        self.s.x = min(max((rect.left() - g.left()) / room_w, 0.0), 1.0) if room_w > 0 else 0.5
+        self.s.y = min(max((rect.top() - g.top()) / room_h, 0.0), 1.0) if room_h > 0 else 0.0
+        if self.s.monitor != MONITOR_GAME or screen is not placed_on:
+            self.s.monitor = screen_key(screen)
+        save = getattr(self.host, "set_option", None)
+        if save is not None:
+            save("overlay", self.s.to_dict())
+        for cb in list(self.listeners):
+            cb()
+        self.keep_preview()
+        self._touch()
+
     def _end_preview(self):
         if not self.is_open and self._window is not None:
             self._window.dismiss()
@@ -379,6 +468,9 @@ class OverlayWindow(QWidget):
         self._fade.setEasingCurve(QEasingCurve.OutCubic)
         self._fade.finished.connect(self._faded)
         self._styled = False
+        self._press: QPoint | None = None     # where a press on an empty part was
+        self._grab: QPoint | None = None      # while dragging: that point − window pos
+        self._placed_on = None                # the screen present() put it on
 
     # ------------------------------------------------------------------ geometry
     def _k(self) -> float:
@@ -418,11 +510,41 @@ class OverlayWindow(QWidget):
 
     # ------------------------------------------------------------------ mouse
     def mouseMoveEvent(self, e):
+        self.ov.keep_preview()
+        if self._press is not None and e.buttons() & Qt.LeftButton:
+            at = e.globalPosition().toPoint()
+            if self._grab is None and (at - self._press).manhattanLength() >= DRAG_START_PX:
+                self._grab = self._press - self.pos()
+                self.setCursor(Qt.ClosedHandCursor)
+            if self._grab is not None:
+                self.move(self._clamped(at - self._grab, at))
+                self.ov._touch()
+            return
         hit = self._hit(e.position())
         if hit != self._hover:
             self._hover = hit
-            self.setCursor(Qt.PointingHandCursor if hit else Qt.ArrowCursor)
+            self.setCursor(Qt.PointingHandCursor if hit else Qt.OpenHandCursor)
             self.update()
+
+    def _clamped(self, top_left: QPoint, cursor: QPoint) -> QPoint:
+        """Keep the whole window on the monitor under the mouse."""
+        sc = QGuiApplication.screenAt(cursor) or self.screen()
+        if sc is None:
+            return top_left
+        g = sc.geometry()
+        return QPoint(min(max(top_left.x(), g.left()), g.left() + g.width() - self.width()),
+                      min(max(top_left.y(), g.top()), g.top() + g.height() - self.height()))
+
+    def mouseReleaseEvent(self, e):
+        if e.button() != Qt.LeftButton:
+            return
+        dragged, self._grab, self._press = self._grab is not None, None, None
+        self.setCursor(Qt.PointingHandCursor if self._hover else Qt.OpenHandCursor)
+        if dragged:
+            geo = self.geometry()
+            sc = QGuiApplication.screenAt(geo.center()) or self.screen()
+            if sc is not None:
+                self.ov.dropped(geo, sc, self._placed_on)
 
     def leaveEvent(self, e):
         if self._hover is not None:
@@ -435,14 +557,23 @@ class OverlayWindow(QWidget):
         if hit:
             self.ov.click(hit)
             self.update()
+        elif e.button() == Qt.LeftButton:     # anywhere else grabs it, to move it
+            self._press = e.globalPosition().toPoint()
 
     def _screen(self, follow_game: bool):
-        if follow_game and QGuiApplication.platformName() == "windows":
-            name, rect = winkeys.foreground_monitor_info()
-            sc = pick_screen(QGuiApplication.screens(), name, rect)
+        monitor = self.ov.s.monitor
+        if monitor == MONITOR_GAME:
+            if follow_game and QGuiApplication.platformName() == "windows":
+                name, rect = winkeys.foreground_monitor_info()
+                sc = pick_screen(QGuiApplication.screens(), name, rect)
+                if sc is not None:
+                    return sc
+            return self.screen() if self.isVisible() else QGuiApplication.primaryScreen()
+        if monitor != MONITOR_PRIMARY:
+            sc = find_screen(QGuiApplication.screens(), monitor)
             if sc is not None:
                 return sc
-        return self.screen() if self.isVisible() else QGuiApplication.primaryScreen()
+        return QGuiApplication.primaryScreen()   # also when that monitor is unplugged
 
     def _place(self, follow_game: bool):
         size = self.sizeHint()
@@ -450,13 +581,8 @@ class OverlayWindow(QWidget):
         sc = self._screen(follow_game)
         if sc is None:
             return
-        g, m = sc.geometry(), round(self.MARGIN * self._k())
-        pos = self.ov.s.position
-        x = {"top-left": g.left() + m, "top-right": g.right() - m - size.width()}.get(
-            pos, g.center().x() - size.width() // 2)
-        y = {"center": g.center().y() - size.height() // 2,
-             "bottom": g.bottom() - m - size.height()}.get(pos, g.top() + m)
-        self.move(x, y)
+        self._placed_on = sc
+        self.move(place(sc.geometry(), size, self.ov.s, round(self.MARGIN * self._k())))
 
     # ------------------------------------------------------------------ show / hide
     def present(self, follow_game: bool = True):

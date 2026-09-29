@@ -239,3 +239,91 @@ def test_settings_overlay_tab_saves_changes(window):  # noqa: F811
     keys.setCurrentIndex(keys.findData("numpad"))
     assert window.overlay.s.keys == "numpad" and window.cfg.overlay["keys"] == "numpad"
     d.close()
+
+
+def test_monitor_and_custom_spot_settings_round_trip_and_reject_junk():
+    s = OverlaySettings.from_dict({"monitor": "Side@-1920,0", "position": "custom",
+                                   "x": 0.25, "y": 7})
+    assert (s.monitor, s.position, s.x, s.y) == ("Side@-1920,0", "custom", 0.25, 1.0)
+    assert OverlaySettings.from_dict(s.to_dict()) == s
+    junk = OverlaySettings.from_dict({"monitor": 3, "x": float("nan"), "y": True})
+    assert (junk.monitor, junk.x, junk.y) == ("game", 0.5, 0.0)
+
+
+class _Screen:
+    def __init__(self, name, x, y, w, h):
+        from PySide6.QtCore import QRect
+        self._name, self._geo = name, QRect(x, y, w, h)
+
+    def name(self):
+        return self._name
+
+    def geometry(self):
+        return self._geo
+
+
+def test_dropping_it_remembers_the_spot_and_saves(make):
+    from PySide6.QtCore import QRect
+    ov = make()
+    saved, told = [], []
+    ov.host.set_option = lambda key, value: saved.append((key, value))
+    ov.listeners.append(lambda: told.append(True))
+    main, side = _Screen("Main", 0, 0, 1920, 1080), _Screen("Side", 1920, 0, 1280, 1024)
+    # dropped on the monitor it opened on: still follows the game, at the new spot
+    ov.dropped(QRect(1520, 780, 400, 300), main, main)
+    assert (ov.s.position, ov.s.x, ov.s.y, ov.s.monitor) == ("custom", 1.0, 1.0, "game")
+    assert saved[-1] == ("overlay", ov.s.to_dict()) and told == [True]
+    # dragged onto the other monitor: that one becomes its monitor
+    ov.dropped(QRect(1920 + 440, 362, 400, 300), side, main)
+    assert ov.s.monitor == "Side@1920,0" and (ov.s.x, ov.s.y) == (0.5, 0.5)
+    # a picked monitor always follows the drop
+    ov.dropped(QRect(0, 0, 400, 300), main, main)
+    assert ov.s.monitor == "Main@0,0" and (ov.s.x, ov.s.y) == (0.0, 0.0)
+
+
+def test_dragging_the_window_moves_it_and_a_click_on_a_tile_still_plays(make, qapp):
+    from PySide6.QtCore import QPoint, QPointF, Qt
+    from PySide6.QtGui import QMouseEvent
+    ov = make({"close_after_play": False})
+    ov.open()
+    w = ov.window
+    drops = []
+    ov.dropped = lambda rect, sc, placed: drops.append(rect)
+    start = w.pos()
+
+    def send(kind, local, buttons):
+        glob = QPointF(w.mapToGlobal(QPoint(*local)))
+        btn = Qt.LeftButton
+        qapp.sendEvent(w, QMouseEvent(kind, QPointF(*local), glob, btn, buttons, Qt.NoModifier))
+    grip = (w.width() - 6, 6)                            # the top-right corner: empty
+    send(QMouseEvent.MouseButtonPress, grip, Qt.LeftButton)
+    send(QMouseEvent.MouseMove, (grip[0] - 60, grip[1] + 40), Qt.LeftButton)
+    send(QMouseEvent.MouseButtonRelease, (grip[0] - 60, grip[1] + 40), Qt.NoButton)
+    assert len(drops) == 1 and ov.host.played == []
+    moved = w.pos() - start
+    assert moved.x() <= 0 and moved.y() >= 0 and moved != QPoint(0, 0)   # clamped to screen
+    # a tiny wobble is still a click, not a drag
+    k = w._k()
+    tile = w._tile_rect(0).center()
+    at = (round(tile.x() * k), round(tile.y() * k))
+    send(QMouseEvent.MouseButtonPress, at, Qt.LeftButton)
+    send(QMouseEvent.MouseButtonRelease, at, Qt.NoButton)
+    assert ov.host.played == ["s0"] and len(drops) == 1
+
+
+def test_settings_overlay_tab_shows_a_drag(window):  # noqa: F811
+    from soundboard.settings import SettingsDialog
+    d = SettingsDialog(window, "overlay")
+    try:
+        assert d.ov_monitor.findData("game") >= 0 and d.ov_monitor.findData("primary") >= 0
+        d.ov_monitor.setCurrentIndex(d.ov_monitor.findData("primary"))
+        assert window.overlay.s.monitor == "primary" and window.cfg.overlay["monitor"] == "primary"
+        window.overlay.s.position, window.overlay.s.monitor = "custom", "Gone@9999,0"
+        for cb in window.overlay.listeners:
+            cb()
+        assert d.ov_position.currentData() == "custom"
+        assert d.ov_monitor.currentData() == "Gone@9999,0"
+        assert "not connected" in d.ov_monitor.currentText()
+    finally:
+        d.accept()                                       # Done
+    assert d._ov_dragged not in window.overlay.listeners

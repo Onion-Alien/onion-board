@@ -237,8 +237,10 @@ too (say No if another program, like Voicemeeter, uses it).
   General has *Update now* and *Reset downloader* for when downloads start
   failing, and an opt-in box to update yt-dlp from PyPI automatically (off by
   default).
-- **⚙ Settings:** themes (Dark, Light, Toxic green, Ocean, Cherry Blossom, Carbon;
-  they switch live), hotkeys, overlay, window and audio options.
+- **⚙ Settings:** 31 themes in four groups — Classic (Dark, Light, true-black
+  Midnight, High Contrast…), Colourful, Wild (Synthwave, Hacker, Amber Terminal…)
+  and Meme (Flashbang, Deep Fried, Retro 98, Comic Sans…); they switch live —
+  plus hotkeys, overlay, window and audio options.
 - **Stream Deck and scripts (optional, off by default):** Settings → General →
   *Remote control* lets programs on this PC play your sounds: a Stream Deck
   (Bitfocus Companion, Touch Portal, its website buttons), AutoHotkey or a script.
@@ -374,7 +376,7 @@ the launcher the shortcuts and PyInstaller use. The app is the `soundboard` pack
 | `soundboard/ui/bunnywidget.py` | Bun animated: bobs, blinks, talks along with your mic and throws music notes |
 | `soundboard/ui/livedot.py` | the glowing dot (and green icon) on a tab whose feature is live, e.g. the Voice tab while your voice is being changed |
 | `soundboard/ui/logowidget.py` | the header logo animated: a breathing glow and sheen, flaring with embers while sounds play |
-| `soundboard/ui/overlay.py` | the in-game overlay: a click-through panel of pads driven by number keys |
+| `soundboard/ui/overlay.py` | the in-game overlay: a panel of pads that never takes focus, driven by number keys or clicks, on a chosen monitor and spot (or wherever it was dragged) |
 | `soundboard/ui/voicepanel.py` | the Voice tab: voice changer, text-to-speech, live voice-to-speech, add-ons list |
 | `soundboard/voicefx/` | the voice-effect chain and the built-in effects (pitch, robot, radio, …) |
 | `soundboard/speech/` | Windows text-to-speech (`tts.py`), the live voice-to-speech client (`live.py`, `service.py`, `protocol.py`) translation model downloads (`translation.py`) and one-click Windows voice installs (`winvoices.py`) |

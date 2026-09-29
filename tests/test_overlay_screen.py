@@ -62,3 +62,53 @@ def test_no_match_returns_none():
     # Two same-size screens and a position matching neither: ambiguous, so None.
     a, b = Screen("Left", -1920, 0, 1920, 1080), Screen("Right", 0, 0, 1920, 1080)
     assert pick_screen([a, b], DISPLAY1, (5000, 0, 1920, 1080)) is None
+
+
+# ---------------------------------------------------------------- picked monitor + spot
+
+from PySide6.QtCore import QSize  # noqa: E402
+
+from soundboard.ui.overlay import (OverlaySettings, find_screen, monitor_choices,  # noqa: E402
+                                   place, screen_key)
+
+
+def test_a_saved_monitor_is_found_by_key_then_by_a_unique_name():
+    assert screen_key(SECOND) == "SidePanel@-1920,0"
+    assert find_screen(TWO, "SidePanel@-1920,0") is SECOND
+    # monitors rearranged: the name alone still finds it
+    assert find_screen(TWO, "SidePanel@2048,0") is SECOND
+    assert find_screen(TWO, "Unplugged@0,0") is None
+    # two identical monitors: only the exact key tells them apart
+    a, b = Screen("Same", -1920, 0, 1920, 1080), Screen("Same", 0, 0, 1920, 1080)
+    assert find_screen([a, b], "Same@0,0") is b
+    assert find_screen([a, b], "Same@5000,0") is None
+
+
+def test_monitor_choices_list_every_screen_and_mark_the_main_one():
+    choices = monitor_choices(TWO, PRIMARY)
+    assert [v for v, _ in choices] == ["game", "primary", "MainPanel@0,0", "SidePanel@-1920,0"]
+    assert "2560×1440" in choices[2][1] and "(main)" in choices[2][1]   # native pixels
+    assert "1920×1080" in choices[3][1] and "(main)" not in choices[3][1]
+
+
+def test_every_position_lands_inside_the_monitor():
+    geo, size, m = SECOND.geometry(), QSize(400, 300), 20
+    spots = {}
+    for pos in ("top-left", "top", "top-right", "left", "center", "right",
+                "bottom-left", "bottom", "bottom-right"):
+        pt = place(geo, size, OverlaySettings(position=pos), m)
+        assert geo.contains(pt) and geo.contains(pt.x() + 399, pt.y() + 299), pos
+        spots[pos] = (pt.x(), pt.y())
+    assert spots["top-left"] == (-1920 + m, m)
+    assert spots["bottom-right"] == (-m - 400, 1080 - m - 300)
+    assert spots["center"] == (-1920 + 760, 390)
+    assert len(set(spots.values())) == 9
+
+
+def test_a_custom_spot_is_a_fraction_of_the_room_left():
+    geo, size = SECOND.geometry(), QSize(400, 300)
+    s = OverlaySettings(position="custom", x=1.0, y=0.5)
+    pt = place(geo, size, s, 20)
+    assert (pt.x(), pt.y()) == (-400, 390)          # flush right, centred
+    s.x = 0.0
+    assert place(geo, size, s, 20).x() == -1920
