@@ -17,13 +17,16 @@ import threading
 
 from PySide6.QtCore import QObject, Signal
 
+from soundboard import midi
+
 log = logging.getLogger(__name__)
 
 user32 = ctypes.WinDLL("user32", use_last_error=True)
 kernel32 = ctypes.WinDLL("kernel32", use_last_error=True)
 
 MOD_ALT, MOD_CONTROL, MOD_SHIFT, MOD_WIN, MOD_NOREPEAT = 0x1, 0x2, 0x4, 0x8, 0x4000
-WM_HOTKEY, WM_APP = 0x0312, 0x8000
+WM_HOTKEY, WM_APP, WM_TIMER = 0x0312, 0x8000, 0x0113
+HELD_POLL_MS = 25     # while a hotkey is held: how often we look for it being let go
 MODS = {"ctrl": MOD_CONTROL, "alt": MOD_ALT, "shift": MOD_SHIFT, "windows": MOD_WIN}
 MOD_ALIASES = {"control": "ctrl", "win": "windows", "left windows": "windows",
                "right windows": "windows", "left ctrl": "ctrl", "right ctrl": "ctrl",
@@ -93,22 +96,35 @@ def combo_name(mods: int, vk: int) -> str:
     return "+".join(parts)
 
 
+user32.SetTimer.argtypes = (wt.HWND, ctypes.c_size_t, wt.UINT, ctypes.c_void_p)
+user32.SetTimer.restype = ctypes.c_size_t
+user32.KillTimer.argtypes = (wt.HWND, ctypes.c_size_t)
+
+
 class _MSG(ctypes.Structure):
     _fields_ = [("hwnd", wt.HWND), ("message", wt.UINT), ("wParam", wt.WPARAM),
                 ("lParam", wt.LPARAM), ("time", wt.DWORD), ("pt", wt.POINT)]
 
 
 class Hotkeys(QObject):
-    """RegisterHotKey on a private thread; emits `fired(action)` on the Qt thread.
+    """RegisterHotKey on a private thread; emits `fired(action)` on the Qt thread, and
+    `released(action)` when that key (or MIDI pad) is let go again, for hold-to-play.
+
+    Combos starting `midi:` are MIDI pads (soundboard.midi), handled by `self.midi`.
 
     `failed_changed(list)` is emitted (on the Qt thread) after every `register`
     with the combos another program already owns."""
     fired = Signal(str)
+    released = Signal(str)
     failed_changed = Signal(list)
 
-    def __init__(self):
+    def __init__(self, midi_in: midi.MidiIn | None = None):
         super().__init__()
         self.failed: list[str] = []      # combos another app already owns (last register)
+        self.midi = midi_in or midi.MidiIn()
+        self._midi_map: dict[str, str] = {}
+        self.midi.pressed.connect(self._midi_pressed)
+        self.midi.released.connect(self._midi_released)
         self._pending: dict[str, str] | None = None
         self._lock = threading.Lock()
         self._ready = threading.Event()
@@ -123,8 +139,10 @@ class Hotkeys(QObject):
 
     def register(self, mapping: dict[str, str]):
         """mapping: combo -> action. Replaces all current hotkeys."""
+        self._midi_map = {c: a for c, a in mapping.items() if midi.is_midi(c)}
+        self.midi.want({p[2] for p in map(midi.parse, self._midi_map) if p})
         with self._lock:
-            self._pending = dict(mapping)
+            self._pending = {c: a for c, a in mapping.items() if not midi.is_midi(c)}
         if not self._tid or not user32.PostThreadMessageW(self._tid, WM_APP, 0, 0):
             log.error("can't reach the hotkey thread (error %d)", ctypes.get_last_error())
 
@@ -133,10 +151,23 @@ class Hotkeys(QObject):
         self.register({})
 
     def stop(self):
+        self.midi.close_all()
         user32.PostThreadMessageW(self._tid, 0x0012, 0, 0)   # WM_QUIT
 
+    def _midi_pressed(self, combo: str):
+        act = self._midi_map.get(combo)
+        if act:
+            self.fired.emit(act)
+
+    def _midi_released(self, combo: str):
+        act = self._midi_map.get(combo)
+        if act:
+            self.released.emit(act)
+
     def _loop(self):
-        actions: dict[int, str] = {}
+        actions: dict[int, tuple[str, int]] = {}   # hotkey id -> (action, vk)
+        self._held: dict[int, str] = {}            # vk -> action, until let go
+        self._timer = 0
         try:
             self._tid = kernel32.GetCurrentThreadId()
             msg = _MSG()
@@ -156,11 +187,24 @@ class Hotkeys(QObject):
             for hid in actions:
                 user32.UnregisterHotKey(None, hid)
 
-    def _handle(self, msg, actions: dict[int, str]):
+    def _handle(self, msg, actions: dict[int, tuple[str, int]]):
         if msg.message == WM_HOTKEY:
-            act = actions.get(msg.wParam)
-            if act:
+            hit = actions.get(msg.wParam)
+            if hit:
+                act, vk = hit
                 self.fired.emit(act)
+                # WM_HOTKEY has no key-up: watch the key until it's let go
+                self._held[vk] = act
+                if not self._timer:
+                    self._timer = user32.SetTimer(None, 0, HELD_POLL_MS, None)
+        elif msg.message == WM_TIMER:
+            for vk, act in list(self._held.items()):
+                if not is_down(vk):
+                    del self._held[vk]
+                    self.released.emit(act)
+            if not self._held and self._timer:
+                user32.KillTimer(None, self._timer)
+                self._timer = 0
         elif msg.message == WM_APP:
             with self._lock:
                 mapping, self._pending = self._pending, None
@@ -179,7 +223,7 @@ class Hotkeys(QObject):
                     continue
                 mods, vk = parsed
                 if user32.RegisterHotKey(None, i, mods | MOD_NOREPEAT, vk):
-                    actions[i] = act
+                    actions[i] = (act, vk)
                 else:
                     failed.append(combo)
             self.failed = failed

@@ -26,8 +26,8 @@ class Recorder:
     345 MB of float32 chunks *plus* another 345 MB to concatenate them. If the
     spool file can't be opened it falls back to memory."""
 
-    def __init__(self, spool_path=None):
-        self.replay = np.zeros((CLIP_S * SR, 2), np.float32)
+    def __init__(self, spool_path=None, seconds: int = CLIP_S):
+        self.replay = np.zeros((int(seconds * SR), 2), np.float32)
         self.w = 0
         self.filled = 0
         # looked up now, not at import, so tests that re-point APP_DIR are honoured

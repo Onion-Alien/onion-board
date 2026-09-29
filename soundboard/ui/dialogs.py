@@ -209,6 +209,7 @@ class EditDialog(QDialog):
         self.mode.addItem("Restart — press again restarts it", "restart")
         self.mode.addItem("Overlap — every press plays a new copy", "overlap")
         self.mode.addItem("Toggle — press again stops it", "toggle")
+        self.mode.addItem("Solo — stops every other sound first", "solo")
         self.mode.setCurrentIndex(max(0, self.mode.findData(meta.mode)))
         no_wheel(self.mode)
         form.addRow("On press", self.mode)
@@ -216,6 +217,12 @@ class EditDialog(QDialog):
         self.loop = QCheckBox("Loop until stopped")
         self.loop.setChecked(meta.loop)
         form.addRow("", self.loop)
+
+        self.hold = QCheckBox("Hold to play — stops when you let go of its hotkey")
+        self.hold.setToolTip("Plays only while its hotkey or MIDI pad is held down, like "
+                             "an air horn. Clicking the pad still plays it through.")
+        self.hold.setChecked(meta.hold)
+        form.addRow("", self.hold)
 
         self.fade_in = self._fade_row(form, "Fade in", meta.fade_in,
                                       "Starts silent and rises to full volume over this long")
@@ -334,6 +341,7 @@ class EditDialog(QDialog):
         m.volume = self.vol.value() / 100
         m.mode = self.mode.currentData()
         m.loop = self.loop.isChecked()
+        m.hold = self.hold.isChecked()
         m.hotkey = self.hotkey
         m.color = self.color
         m.fade_in, m.fade_out = self.fades()

@@ -38,9 +38,10 @@ DUCK_LABELS = (("Off", 0.0), ("A little (-6 dB)", -6.0), ("Half (-12 dB)", -12.0
 
 
 def apply_send(cfg, engine):
-    """Push the config's send options (mono, ducking) onto the engine."""
+    """Push the config's send options (mono, ducking, the mic gate) onto the engine."""
     engine.send_mono = bool(cfg.send_mono)
     engine.duck_db = min(0.0, float(cfg.duck_db))
+    engine.mic_gate = bool(cfg.mic_gate)
 
 
 def ceiling_label(hz: int) -> str:
@@ -84,10 +85,16 @@ class DestPanel(QWidget):
                                 "voice isn't buried under a song")
         duck.addWidget(self.cb_duck, 1)
         v.addLayout(duck)
+        self.chk_gate = QCheckBox("Mute my mic while a sound plays")
+        self.chk_gate.setToolTip("Others hear only the sound, clean, and your mic comes "
+                                 "back the moment it ends. Handy with a noisy room or "
+                                 "keyboard.")
+        v.addWidget(self.chk_gate)
         self.refresh()
         self.combo.currentIndexChanged.connect(self._picked)
         self.chk_mono.toggled.connect(self._send_changed)
         self.cb_duck.currentIndexChanged.connect(self._send_changed)
+        self.chk_gate.toggled.connect(self._send_changed)
 
     def _cfg(self) -> dict:
         d = self.mw.cfg.dest
@@ -105,12 +112,13 @@ class DestPanel(QWidget):
         self.combo.setCurrentIndex(max(0, self.combo.findData(current)))
         self.combo.blockSignals(False)
         c = self.mw.cfg
-        for w in (self.chk_mono, self.cb_duck):
+        for w in (self.chk_mono, self.cb_duck, self.chk_gate):
             w.blockSignals(True)
+        self.chk_gate.setChecked(bool(c.mic_gate))
         self.chk_mono.setChecked(bool(c.send_mono))
         i = min(range(len(DUCK_LABELS)), key=lambda k: abs(DUCK_LABELS[k][1] - c.duck_db))
         self.cb_duck.setCurrentIndex(i)
-        for w in (self.chk_mono, self.cb_duck):
+        for w in (self.chk_mono, self.cb_duck, self.chk_gate):
             w.blockSignals(False)
         self._show()
 
@@ -135,6 +143,7 @@ class DestPanel(QWidget):
         c = self.mw.cfg
         c.send_mono = self.chk_mono.isChecked()
         c.duck_db = float(self.cb_duck.currentData())
+        c.mic_gate = self.chk_gate.isChecked()
         apply_send(c, self.mw.engine)
         self.mw._save_later()
 

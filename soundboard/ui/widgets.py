@@ -10,7 +10,7 @@ from PySide6.QtGui import (QColor, QDrag, QFont, QLinearGradient, QPainter, QPai
 from PySide6.QtWidgets import (QAbstractButton, QGridLayout, QLabel, QScrollArea, QSlider, QStyle,
                                QWidget)
 
-from soundboard import theme, thumbs
+from soundboard import midi, theme, thumbs
 from soundboard.eq import MAX_DB as EQ_MAX_DB
 from soundboard.eq import response_db as eq_response
 from soundboard.engine import SR
@@ -200,8 +200,11 @@ class Pad(QAbstractButton):
             bits.append(f"hotkey {pretty_key(m.hotkey)}")
         if m.loop:
             bits.append("loops")
-        if m.mode in ("overlap", "toggle"):
-            bits.append({"overlap": "presses overlap", "toggle": "press again stops"}[m.mode])
+        if m.mode in ("overlap", "toggle", "solo"):
+            bits.append({"overlap": "presses overlap", "toggle": "press again stops",
+                         "solo": "stops the other sounds"}[m.mode])
+        if m.hold:
+            bits.append("plays while its hotkey is held")
         if m.fx:
             bits.append("effects")
         if m.tags:
@@ -387,12 +390,14 @@ class Pad(QAbstractButton):
         else:
             flags = ("FX " if self.meta.fx else "") + \
                 ("⟳ " if self.meta.loop else "") + \
-                {"overlap": "⧉ ", "toggle": "⏯ "}.get(self.meta.mode, "")
+                {"overlap": "⧉ ", "toggle": "⏯ ", "solo": "◉ "}.get(self.meta.mode, "") + \
+                ("✋ " if self.meta.hold else "")
             p.setPen(muted)
             right = "❚❚ paused" if self.paused else f"{flags}{self.meta.duration:.1f}s"
             p.drawText(foot, Qt.AlignRight | Qt.AlignVCenter, right)
             if self.meta.hotkey:
-                hk = pretty_key(self.meta.hotkey)
+                hk = (midi.short(self.meta.hotkey) if midi.is_midi(self.meta.hotkey)
+                      else pretty_key(self.meta.hotkey))
                 fm = p.fontMetrics()
                 w = min(fm.horizontalAdvance(hk) + 12, foot.width() * 0.68)
                 badge = QRectF(foot.left(), foot.top() + 1, w, foot.height() - 2)

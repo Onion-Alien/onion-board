@@ -82,9 +82,11 @@ Only `name` and `audio` are needed; everything else falls back to the defaults.
 | `audio` | file name of the audio, in the same folder. Any format the app plays (mp3, wav, ogg, flac, opus, m4a, aac, wma, aiff, webm, mp4, mkv, mov) |
 | `picture` | file name of the pad picture in the same folder (png, jpg, webp, gif, bmp), or `""` |
 | `volume` | 0–2 (1 = 100 %) |
-| `hotkey` | e.g. `ctrl+alt+1`, `f5`, `num 7`; dropped on import if something already uses it |
-| `mode` | `restart`, `overlap` or `toggle` |
+| `hotkey` | e.g. `ctrl+alt+1`, `f5`, `num 7`, or a MIDI pad: `midi:note 36:LPD8` (`note`, `cc` or `pc`, its number, the device name); dropped on import if something already uses it |
+| `mode` | `restart`, `overlap`, `toggle` or `solo` (stops the other sounds first) |
 | `loop` | `true` / `false` |
+| `hold` | `true`: plays only while its hotkey / MIDI pad is held down |
+| `fade_in`, `fade_out` | seconds |
 | `color` | `#rrggbb` |
 | `fx` | the sound's effects, as in `soundboard/soundfx.py`: `start` / `end` (trim, seconds into the audio; `end` 0 = to the end), `speed`, `pitch` (semitones), `tape`, `eq` (7 dB values), `gain_db`, `reverse`, `effects` (voice effects by type) |
 | `tags` | the categories the sound is in |

@@ -520,6 +520,8 @@ class Engine:
         # the send stage (soundboard.sendfx): what makes the mix survive voice chat
         self.send_mono = True     # phase-aware mono into the cable (every voice chat is mono)
         self.duck_db = 0.0        # lower the sounds this much while you talk (0 = off)
+        self.mic_gate = False     # mute your mic while a sound plays (only the sounds go out)
+        self._gate: dict[str, float] = {}   # output -> the mic's current gate gain
         self.limiter_on = True    # hold the cable's peaks at sendfx.CEILING_DB
         self._send: dict[tuple[str, str], object] = {}   # (out, kind) -> its sendfx stage
         self.sound_speed = 1.0        # live playback speed of every sound (0.25..4)
@@ -894,7 +896,8 @@ class Engine:
              preview=False, src_rate: int = SR, start: float = 0.0,
              fade_in: float = 0.0, fade_out: float = 0.0,
              only: str | None = None) -> Voice | None:
-        """mode: 'restart' (stop previous instance), 'overlap', 'toggle' (stop if playing).
+        """mode: 'restart' (stop previous instance), 'overlap', 'toggle' (stop if playing),
+        'solo' (stop every other sound, then restart this one).
         fade_in / fade_out (seconds): a rise from silence at the start; a fall to silence
         when it's stopped and, for a one-shot, over its last fade_out seconds.
         only: 'main' or 'mon' plays on that output alone (the voice chat check)."""
@@ -909,11 +912,16 @@ class Engine:
             return None
         with self.lock:
             existing = [v for v in self.voices if v.sid == sid and not v.stopping]
-            if mode in ("restart", "toggle"):
+            if mode in ("restart", "toggle", "solo"):
                 for v in existing:
                     v.stopping = True
                 if mode == "toggle" and existing:
                     return None
+            if mode == "solo":   # other pads only: not previews, cues, TTS or checks
+                for v in self.voices:
+                    if (v.sid != sid and not v.preview and not v.sid.startswith("__")
+                            and not is_fixed(v.sid)):
+                        v.stopping = True
         rates_used = {o: self.rates[o] for o in outs}
         per_out = {o: self.data_for(sid, data, rates_used[o], src_rate) for o in outs}
         v = Voice(sid, per_out, gain, loop, preview=preview, rates=rates_used,
@@ -1315,8 +1323,27 @@ class Engine:
         if self.send_mono:
             mix = self._stage(out, SmartMono).process(mix)
         if mic_on:
+            m = self._gated(out, m)
             mix += self._eq(out, "voice", m * np.float32(self.mic_vol))
         return mix
+
+    GATE_S = 0.04    # how fast the mic fades out / back in around a sound
+
+    def _gated(self, out: str, m: np.ndarray) -> np.ndarray:
+        """The mic block, faded out while a sound is going out on `out` (mic_gate)."""
+        g0 = self._gate.get(out, 1.0)
+        if not self.mic_gate and g0 >= 1.0:
+            return m
+        playing = self.mic_gate and any(
+            out in v.data and not v.preview and not v.paused and not v.finished
+            for v in self.voices)
+        target = 0.0 if playing else 1.0
+        step = len(m) / (self.GATE_S * max(self.rates.get(out, SR), 1))
+        g1 = max(g0 - step, target) if target < g0 else min(g0 + step, target)
+        self._gate[out] = g1
+        if g0 >= 1.0 and g1 >= 1.0:
+            return m
+        return m * np.linspace(g0, g1, len(m), dtype=np.float32)[:, None]
 
     def _mic(self, indata):
         x = indata

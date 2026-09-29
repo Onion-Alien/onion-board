@@ -24,7 +24,7 @@ Windows 10 or 11.
 [source code (zip)](../../archive/refs/heads/main.zip), only if you want to build
 it yourself.</sub>
 
-Version: **1.3.2**. See [CHANGELOG.md](CHANGELOG.md).
+Version: **1.4.0**. See [CHANGELOG.md](CHANGELOG.md).
 
 ![A quick tour: playing sounds, the radio globe spinning, a trigger catching "YOU DIED" in a game, and the voice changer](docs/screenshots/tour.webp)
 
@@ -155,8 +155,10 @@ too (say No if another program, like Voicemeeter, uses it).
   pack to share; importing skips sounds you already have. The format is a plain
   zip of JSON and the original audio files — see
   [docs/BACKUP-FORMAT.md](docs/BACKUP-FORMAT.md).
-- **Per sound:** global hotkey (works in-game), volume, loop, and what pressing
-  again does (restart / overlap / toggle).
+- **Per sound:** global hotkey (works in-game) or MIDI pad, volume, loop, what
+  pressing again does (restart / overlap / toggle), **Solo** (stops every other
+  sound first) and **Hold to play** (plays only while you hold its key or pad down,
+  like an air horn).
 - **Effects on any sound** (right-click a pad → **Effects…**, or the *Effects* tab
   of **Edit…**): speed and pitch (separately, or together like a record player
   with *Tape mode*), **trim** (drag the start and end on the sound's waveform, or
@@ -183,6 +185,11 @@ too (say No if another program, like Voicemeeter, uses it).
     a small panel of your sounds over the game. Number keys play them, and the game keeps your mouse
     and keyboard.
   - Auto push-to-talk: holds your game's PTT key while a sound plays.
+  - **Instant replay:** set its key and the last 30 seconds of everything your PC
+    plays (a friend in Discord, the game, a video; not Onion Board's own sounds)
+    are kept in memory. Press it after something funny and it becomes a pad.
+    Nothing is saved or sent anywhere until you press it; clear the key to switch
+    it off. Needs Windows 11 or Windows 10 build 20348+.
   - Hotkeys can beep in your headphones (only you hear it), so you know they
     worked.
 - **Radio tab:** internet radio from all over the world, from the free
@@ -218,6 +225,9 @@ too (say No if another program, like Voicemeeter, uses it).
   parts (a cut-out icon) matches whatever is behind it.
   Everything happens on your PC: the screen is never saved or sent anywhere. If
   a game still shows up black, set it to Borderless or Windowed fullscreen.
+- **Mute my mic while a sound plays** (Setup → *Who's listening*): others hear
+  only the sound, clean, and your mic comes back the moment it ends. Or the
+  opposite, *While I talk, lower my sounds*.
 - **Volumes:** sounds → them, your voice → them, your headphones. Exact % boxes go
   up to 1000%; a soft limiter stops hard clipping. "Level volumes" makes every
   sound equally loud.
@@ -241,6 +251,14 @@ too (say No if another program, like Voicemeeter, uses it).
   Midnight, High Contrast…), Colourful, Wild (Synthwave, Hacker, Amber Terminal…)
   and Meme (Flashbang, Deep Fried, Retro 98, Comic Sans…); they switch live —
   plus hotkeys, overlay, window and audio options.
+- **MIDI pads and macro keypads:** a pad controller (Akai LPD8 / MPD, Launchpad,
+  any USB MIDI keyboard) works without extra software: set a hotkey and hit a pad
+  instead of pressing a key. Pads work for sounds, stop / pause, random sounds and
+  the overlay. A controller is only opened while a hotkey uses it, so your music
+  app can have your other MIDI gear. On Windows only one program can use a MIDI
+  device at a time: if one is busy, Onion Board says so and picks it up once it's
+  free. A cheap USB macro keypad works too: set its keys to F13–F24 (keys nothing
+  else uses) and use those as hotkeys.
 - **Stream Deck and scripts (optional, off by default):** Settings → General →
   *Remote control* lets programs on this PC play your sounds: a Stream Deck
   (Bitfocus Companion, Touch Portal, its website buttons), AutoHotkey or a script.
@@ -384,7 +402,9 @@ the launcher the shortcuts and PyInstaller use. The app is the `soundboard` pack
 | `soundboard/ytdl.py` | yt-dlp for the link bar and web search: searches YouTube / SoundCloud, downloads one video's audio, and updates yt-dlp on request or opt-in (SHA-256-checked PyPI wheels in `%APPDATA%`, loaded ahead of the bundled copy by an import hook) |
 | `soundboard/thumbs.py` | pad pictures: a link's video thumbnail, a file's cover art / first frame (ffmpeg), or a picture you pick or drop on a pad, scaled into `%APPDATA%\OnionBoard\thumbs` |
 | `soundboard/bunny.py` | Bun the mascot, drawn in code (setup guide and installer art) |
-| `soundboard/winkeys.py` | global hotkeys (`RegisterHotKey`) and key presses (`SendInput`), no hooks |
+| `soundboard/winkeys.py` | global hotkeys (`RegisterHotKey`, and when each is let go, for hold-to-play) and key presses (`SendInput`), no hooks |
+| `soundboard/midi.py` | MIDI pad controllers as hotkeys (`midi:note 36:LPD8`): Windows' winmm over ctypes, a device opened only while a hotkey uses it, busy / unplugged devices retried |
+| `soundboard/replay.py` | instant replay: process loopback of everything but Onion Board into a ring buffer, saved as a pad on its hotkey |
 | `soundboard/appaudio.py` | the Apps tab's capture: lists the programs with an audio session (WASAPI sessions, over ctypes) and taps one program's audio with Windows' per-process loopback (a copy: the program still plays on your speakers), pushed into the engine as its own source |
 | `soundboard/screenwatch.py` | the Triggers tab's back end: copies the screen with Desktop Duplication (DXGI / D3D11 over ctypes, falling back to GDI), sampled down to a few hundred pixels and turned grey, finds each trigger's picture by normalised cross-correlation (FFT; transparent parts masked out), and fires once per appearance (`Gate`) on a worker thread |
 | `soundboard/ui/triggerspanel.py` | the Triggers tab: one card per trigger (its pictures in a strip, any of which fires it; its sounds as chips, played at random / in order / all at once; wait, cooldown, match %, the live match, which screen to look on), the Watching switch, how often to check and the default screen |
@@ -403,7 +423,7 @@ the launcher the shortcuts and PyInstaller use. The app is the `soundboard` pack
 | `soundboard/testcheck.py` | analysis for the Record-6s test (finds your voice in the output by cross-correlation) |
 | `soundboard/destination.py` | destination modes (Setup tab / Settings → *Who's listening*): shapes the sounds bus for the listener's voice codec — sub-bass harmonics, codec ceiling, gentle compressor, mono |
 | `soundboard/ui/destpanel.py` | the mode picker and the custom-modes editor |
-| `soundboard/codecsim.py` | development bench: runs audio through Discord / Steam / Vivox's Opus pipeline (ffmpeg's libopus) and measures what's lost, including a frame-by-frame spectral distance that hears noise fill and warble |
+| `soundboard/codecsim.py` | development bench: runs audio through Discord / Steam / Vivox's Opus pipeline (ffmpeg's libopus, plus Discord's ~94 Hz capture high-pass, measured in a real call) and measures what's lost, including a frame-by-frame spectral distance that hears noise fill and warble |
 | `soundboard/chatsim.py` | development tool: simulates a voice chat's mic cleanup (noise suppression, gain control, gate) so the bench and tests can measure it and check the Discord check against it |
 | `soundboard/chatcheck.py` | the Discord check: a test sound, and how to tell from Discord's Mic Test playback whether its noise suppression, gate or gain control is changing your sounds |
 | `soundboard/ui/chatguide.py` | the Discord and game voice-chat guides (the settings that keep sounds clean) and the check that runs from them |
@@ -412,7 +432,7 @@ the launcher the shortcuts and PyInstaller use. The app is the `soundboard` pack
 | `modules/` | add-ons shipped with the app: `retro-fx` (an effects module, the example to copy), `live-voice` (a service module with its own Python environment) and `translate-zh/es/fr/de/ru` (translation modules: a manifest naming a model that's downloaded only when picked) |
 | `build.ps1`, `installer/` | the PyInstaller build and the Inno Setup installer (`installer/OnionBoard.iss`); `installer/install-vbcable.ps1` downloads VB-Cable, checks its signature and installs it (used by the app and the installer) |
 | `assets/onionboard.ico` | the .exe, installer and shortcut icon, generated by `scripts/make_icon.py` |
-| `scripts/` | `install.bat` / `install.ps1` / `run.bat` (run from source: set up `.venv` and shortcuts, then launch), `make_icon.py` (regenerates `assets/onionboard.ico` from the logo in `theme.py`), `make_bunny.py` (renders the installer artwork from `bunny.py`; `--preview` for a sheet of poses), `check_sensitive.py` (secrets / personal-data scan, also the pre-commit hook; your own patterns go in a root `.sensitive-patterns`, see `sensitive-patterns.example`), `make_notices.py` (third-party licences for the build), `prune_build.py` (drops the unused parts of Qt from the PyInstaller output; `--dry-run` lists them), `codec_bench.py` (what voice chat does to your sounds, in numbers) `screenshots.py` (renders `docs/screenshots/` offscreen from made-up demo data) `promo.py` (renders the Triggers promo clips: a made-up game scene drawn with QPainter, a synthesized trombone, ffmpeg) and `tour.py` (records the README's feature tour `docs/screenshots/tour.webp` from the real app, driven in a window parked off-screen, with the same made-up data as the screenshots) |
+| `scripts/` | `install.bat` / `install.ps1` / `run.bat` (run from source: set up `.venv` and shortcuts, then launch), `make_icon.py` (regenerates `assets/onionboard.ico` from the logo in `theme.py`), `make_bunny.py` (renders the installer artwork from `bunny.py`; `--preview` for a sheet of poses), `check_sensitive.py` (secrets / personal-data scan, also the pre-commit hook; your own patterns go in a root `.sensitive-patterns`, see `sensitive-patterns.example`), `make_notices.py` (third-party licences for the build), `prune_build.py` (drops the unused parts of Qt from the PyInstaller output; `--dry-run` lists them), `codec_bench.py` (what voice chat does to your sounds, in numbers), `discord_roundtrip.py` (the same measured through a real Discord call to a second client) `screenshots.py` (renders `docs/screenshots/` offscreen from made-up demo data) `promo.py` (renders the Triggers promo clips: a made-up game scene drawn with QPainter, a synthesized trombone, ffmpeg) and `tour.py` (records the README's feature tour `docs/screenshots/tour.webp` from the real app, driven in a window parked off-screen, with the same made-up data as the screenshots) |
 | `tests/` | pytest suite: ring buffer, engine mixing/guards/watchdog, cache and imports, recorder, hotkey parsing, EQ, levelling, config, test analysis, the main window built on Qt's offscreen platform (no window, no devices, no hotkeys) including shrinking it, the overlay, setup guide, voice panel, speech and effects, per-sound effects (speed and pitch measured by frequency and length, every preset, the effects cache, the Edit dialog) and live speed / pitch, the web search, screen triggers (made-up screens matched after shrinking and at any brightness, fire-once and cooldown, a stand-in capture so the real screen is never read), and the Radio tab against a local stand-in for the directory and a station (parsing untrusted station data, search, cache and mirror failover, a stream decoded to 48 kHz and measured by frequency, dead stations, the globe page's click bridge with the internet blocked) |
 
 Developing:

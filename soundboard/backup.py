@@ -68,7 +68,7 @@ LOCAL_SETTINGS = {"version", "sounds", "categories", "category", "main_device", 
                   "api_token"}
 # per-sound fields that are written to sound.json (the paths are replaced by names)
 SOUND_FIELDS = ("name", "volume", "hotkey", "mode", "loop", "color", "level_gain",
-                "duration", "fingerprint", "fx", "tags", "fade_in", "fade_out")
+                "duration", "fingerprint", "fx", "tags", "fade_in", "fade_out", "hold")
 
 
 class BackupError(Exception):
@@ -495,7 +495,7 @@ def _fill_meta(src: _Source, ps: PackedSound, sid: str, name: str, color: str | 
     meta.volume = min(max(meta.volume, 0.0), 2.0)
     meta.level_gain = min(max(meta.level_gain, 0.1), 6.0)
     meta.fade_in, meta.fade_out = clean_fade(meta.fade_in), clean_fade(meta.fade_out)
-    if meta.mode not in ("restart", "overlap", "toggle"):
+    if meta.mode not in ("restart", "overlap", "toggle", "solo"):
         meta.mode = "restart"
     if not (meta.color.startswith("#") and len(meta.color) in (4, 7)):
         meta.color = color or library.PAD_COLORS[0]

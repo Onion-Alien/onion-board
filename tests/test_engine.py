@@ -64,6 +64,17 @@ def test_modes():
     assert c.stopping
 
 
+def test_solo_mode_stops_the_other_sounds_but_not_previews_or_cues():
+    e = engine_with("main", "mon")
+    other = e.play("b", tone(), 1.0)
+    prev = e.play("c:preview", tone(), 1.0, preview=True)
+    cue = e.play("__cue__", tone(), 1.0, preview=True)
+    first = e.play("a", tone(), 1.0, mode="solo")
+    assert other.stopping and not prev.stopping and not cue.stopping
+    again = e.play("a", tone(), 1.0, mode="solo")              # restarts itself
+    assert first.stopping and not again.stopping
+
+
 # ---------------------------------------------------------------- rendering
 
 def test_render_plays_data_then_finishes_and_is_pruned():
@@ -530,3 +541,24 @@ def test_play_level_counts_everything_playing_but_not_the_mic():
     e.feed_aux(src, np.full((480, 2), 0.3, np.float32))
     e._mon(out, 480)
     assert e.level_play > 0.25
+
+
+def test_mic_gate_mutes_the_mic_only_while_a_sound_plays():
+    e = engine_with("main")
+    mic = np.full((480, 2), 0.5, np.float32)
+    silent = np.zeros((480, 2), np.float32)
+
+    def mic_level():
+        return float(np.abs(e._send_bus("main", silent.copy(), mic)).max())
+    assert mic_level() > 0.4                     # off: the mic always goes out
+    e.mic_gate = True
+    assert mic_level() > 0.4                     # on, nothing playing
+    v = e.play("a", tone(), 1.0)
+    for _ in range(5):                           # fades out over a few blocks, no click
+        mic_level()
+    assert mic_level() == 0.0
+    v.stopping = True
+    v.done.add("main")                           # the sound ended
+    for _ in range(5):
+        mic_level()
+    assert mic_level() > 0.4

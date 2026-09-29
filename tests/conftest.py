@@ -127,6 +127,28 @@ def _never_update_for_real(monkeypatch, tmp_path):
     monkeypatch.setattr(updates, "start_install", no_installer)
 
 
+class NoMidi:
+    """soundboard.midi's winmm backend with no devices: tests never open the
+    developer's real MIDI controllers (a DAW may be using them)."""
+    def __init__(self):
+        self.on_message = self.on_closed = lambda *_: None
+
+    def devices(self):
+        return []
+
+    def open(self, index, key):
+        raise OSError("no MIDI in tests")
+
+    def close(self, handle):
+        pass
+
+
+@pytest.fixture(autouse=True)
+def _never_touch_real_midi(monkeypatch):
+    from soundboard import midi
+    monkeypatch.setattr(midi, "WinMM", NoMidi)
+
+
 @pytest.fixture(autouse=True)
 def _never_touch_real_autostart(monkeypatch):
     """Building a MainWindow re-points an existing "start with Windows" entry at this

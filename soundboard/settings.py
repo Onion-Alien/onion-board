@@ -13,7 +13,7 @@ from PySide6.QtWidgets import (QApplication, QCheckBox, QComboBox, QDialog, QFra
 
 from shiboken6 import isValid as qt_valid
 
-from soundboard import autostart, theme, winkeys, ytdl
+from soundboard import autostart, midi, theme, winkeys, ytdl
 from soundboard.ui import fit, icons
 from soundboard.ui import overlay as ovl
 from soundboard.wheelguard import no_wheel
@@ -31,6 +31,13 @@ HOTKEY_GROUPS = [
          "From the category showing (All = any sound), never the same one twice in a row. "
          "A category can have its own: right-click its tab."),
     ]),
+    ("Instant replay", [
+        ("replay_hotkey", "__replay__", "Save what you just heard",
+         "Turns instant replay on: the last 30 seconds of everything your PC plays (a "
+         "friend in Discord, the game, a video; not Onion Board's own sounds) are kept "
+         "in memory, and this key adds them to your Sounds as a pad. Nothing is saved "
+         "until you press it. Clear the key to switch it off."),
+    ]),
     ("Overlay", [
         ("overlay_hotkey", "__overlay__", "Open the in-game overlay",
          "Sound tiles over your game; pick one with the number keys. See the Overlay tab."),
@@ -42,6 +49,8 @@ HOTKEY_ACTIONS = [a for _, group in HOTKEY_GROUPS for a in group]
 def pretty_key(combo: str) -> str:
     if not combo:
         return ""
+    if midi.is_midi(combo):
+        return midi.pretty(combo)
 
     def part(p: str) -> str:
         if len(p) > 1:
@@ -53,11 +62,14 @@ def pretty_key(combo: str) -> str:
 
 
 class HotkeyDialog(QDialog):
-    def __init__(self, hotkeys: Hotkeys, parent=None):
+    """Asks for a key combo, or (with `pads`) a hit on a MIDI pad controller."""
+
+    def __init__(self, hotkeys: Hotkeys, parent=None, pads: bool = True):
         super().__init__(parent)
         fit.watch(self)   # grows to fit its text (ui/fit.py)
         self.setWindowTitle("Set hotkey")
         self.result_combo = None
+        self._midi = hotkeys.midi if pads else None
         lay = QVBoxLayout(self)
         t = QLabel("Press the key or combo you want…")
         t.setStyleSheet("font-size:16px; font-weight:600;")
@@ -65,9 +77,51 @@ class HotkeyDialog(QDialog):
         self.hint = QLabel("Works globally, even while in-game.  Esc = cancel.")
         self.hint.setWordWrap(True)
         lay.addWidget(self.hint)
+        self.pads_note = QLabel()
+        self.pads_note.setObjectName("hint")
+        self.pads_note.setWordWrap(True)
+        lay.addWidget(self.pads_note)
         self._warned_vk = None
         self.setMinimumWidth(340)
         hotkeys.pause()   # so pressing an existing hotkey here doesn't trigger it
+        if self._midi is not None:
+            self._midi.pressed.connect(self._on_pad)
+            self._midi.busy_changed.connect(self._show_pads)
+            self._midi.capture(True)
+            self.finished.connect(self._stop_pads)
+        self._show_pads()
+
+    def _show_pads(self, *_):
+        if self._midi is None:
+            self.pads_note.hide()
+            return
+        found = self._midi.devices()
+        busy = set(self._midi.busy)
+        free = [d for d in found if d not in busy]
+        lines = []
+        if free:
+            lines.append("…or hit a pad on " + ", ".join(free) + ".")
+        if busy:
+            warn = theme.status("warn")
+            lines.append(f"<span style='color:{warn}'>" + ", ".join(sorted(busy))
+                         + " is open in another program (a music app?), so its pads can't "
+                         "be used here. Close that program and it's picked up in a few "
+                         "seconds.</span>")
+        self.pads_note.setText("<br>".join(lines))
+        self.pads_note.setVisible(bool(lines))
+
+    def _on_pad(self, combo: str):
+        if self.result_combo is None and self.isVisible():
+            self.result_combo = combo
+            self.accept()
+
+    def _stop_pads(self):
+        try:
+            self._midi.pressed.disconnect(self._on_pad)
+            self._midi.busy_changed.disconnect(self._show_pads)
+        except (RuntimeError, TypeError):
+            pass
+        self._midi.capture(False)
 
     def keyPressEvent(self, e):
         vk = e.nativeVirtualKey()
@@ -328,7 +382,8 @@ class SettingsDialog(QDialog):
                 b.setText(pretty_key(combo) or ("Off" if attr == "ptt_key" else "Click to set…"))
 
     def _capture(self, attr):
-        d = HotkeyDialog(self.mw.hotkeys, self)
+        # auto push-to-talk presses the key itself: that can't be a MIDI pad
+        d = HotkeyDialog(self.mw.hotkeys, self, pads=attr != "ptt_key")
         if d.exec() and d.result_combo:
             self._set_hk(attr, d.result_combo)
         else:

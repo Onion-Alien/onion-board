@@ -2,6 +2,32 @@
 
 ## Unreleased
 
+- **MIDI pad controllers work as hotkeys.** Plug in an Akai LPD8 / MPD, a
+  Launchpad or any USB MIDI keyboard, click a hotkey and hit a pad instead of
+  pressing a key. No extra software needed. Pads play sounds and can do anything
+  a hotkey does (stop, pause, random sound, the overlay). A controller is only
+  opened while a hotkey uses it, so your music app keeps your other MIDI gear. If
+  another program has it open, Onion Board says so and picks it up once it's free.
+- **Instant replay.** Give *Save what you just heard* a key (Settings → Hotkeys)
+  and the last 30 seconds of everything your PC plays (a friend in Discord, the
+  game, a video; not Onion Board's own sounds) are kept in memory. Press it after
+  something funny and it's a new pad. Nothing is saved or sent anywhere until you
+  press it.
+- **Hold to play.** A sound can play only while its hotkey or pad is held down, and
+  stop the moment you let go, like an air horn (Edit → *Hold to play*).
+- **Solo sounds.** A new *On press* choice, *Solo*, stops every other sound
+  before it plays.
+- **Mute my mic while a sound plays** (Setup → *Who's listening*): others hear
+  only the sound, and your mic comes back the moment it ends.
+- **Voice changer and Discord:** while the voice changer is on, a notice explains
+  that Discord deletes most of a changed voice unless its *Input Profile* is
+  *Studio*, with a *Show me how* button. Measured in a real call: on the default
+  Voice Isolation only about 20% of a Deep voice got through; on Studio 93%, at the
+  same volume.
+- Developers: `scripts/discord_roundtrip.py` measures what a second client in a real
+  Discord call receives (raw vs the app vs Discord mode, plus the mic path). The
+  codec bench now models Discord's ~94 Hz capture high-pass, found in that test.
+
 ## 1.3.3 — 2026-09-29
 
 Onion Board now updates itself, plus 25 new themes and an overlay you can drag

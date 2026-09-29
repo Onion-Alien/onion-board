@@ -95,7 +95,7 @@ PAD_WIDTH_RANGE = (110, 240)  # the Sounds tab's pad-size slider
 # someone's backup is brought into it (Qt raises OverflowError on one past an int)
 SETTING_RANGES = {"sound_vol": (0.0, VOLUME_MAX), "mic_vol": (0.0, VOLUME_MAX),
                   "mon_vol": (0.0, VOLUME_MAX), "pad_width": PAD_WIDTH_RANGE,
-                  "duck_db": (-24.0, 0.0)}
+                  "duck_db": (-24.0, 0.0), "replay_seconds": (5, 120)}
 
 
 def clean_setting(k: str, v):
@@ -181,7 +181,7 @@ class SoundMeta:
     file: str                 # absolute path (usually inside SOUNDS_DIR)
     volume: float = 1.0       # 0..2 user gain
     hotkey: str = ""
-    mode: str = "restart"     # restart | overlap | toggle
+    mode: str = "restart"     # restart | overlap | toggle | solo (stops the other sounds)
     loop: bool = False
     color: str = PAD_COLORS[0]
     level_gain: float = 1.0   # computed loudness-levelling gain
@@ -192,6 +192,7 @@ class SoundMeta:
     tags: list[str] = field(default_factory=list)   # the categories it's in (Config.categories)
     fade_in: float = 0.0      # seconds: rises from silence when it starts
     fade_out: float = 0.0     # seconds: falls to silence when stopped / near its end
+    hold: bool = False        # plays only while its hotkey / MIDI pad is held down
 
 
 @dataclass
@@ -219,6 +220,7 @@ class Config:
     dest: dict = field(default_factory=dict)   # who's listening (soundboard.destination)
     send_mono: bool = True    # phase-aware mono into the cable (soundboard.sendfx.SmartMono)
     duck_db: float = 0.0      # lower the sounds this much while you talk; 0 = off
+    mic_gate: bool = False    # mute your mic while a sound plays (only the sound goes out)
     ptt_key: str = ""           # key held down while sounds play (game push-to-talk)
     always_on_top: bool = False
     pad_width: int = 150
@@ -228,6 +230,7 @@ class Config:
     ytdlp_auto_optin: bool = False
     latency: str = "low"              # audio buffering: 'low' | 'high' (safer on flaky devices)
     setup_done: bool = False          # the quick-setup guide has been completed
+    voice_discord_tip_shown: bool = False   # "Got it" on the voice changer's Studio notice
     voice_fx: dict = field(default_factory=dict)   # voice changer (see ui.voicepanel)
     speech: dict = field(default_factory=dict)     # text-to-speech / live voice settings
     overlay: dict = field(default_factory=dict)    # in-game overlay (ui.overlay.OverlaySettings)
@@ -248,6 +251,11 @@ class Config:
     update_pending: str = ""          # the version an update is installing (see updates.py)
     random_hotkey: str = ""           # plays a random sound from the category showing
     category_hotkeys: dict = field(default_factory=dict)   # category -> its random-sound key
+    # instant replay (soundboard.replay): while this hotkey is set, the last
+    # replay_seconds of everything you hear (except Onion Board's own sounds) are kept
+    # in memory, and the key saves them as a new pad
+    replay_hotkey: str = ""
+    replay_seconds: int = 30
     # local control API for Stream Deck / scripts (soundboard.remote): off unless turned on
     api_enabled: bool = False
     api_port: int = 7474
@@ -827,7 +835,7 @@ def duplicate(meta: SoundMeta, name: str) -> SoundMeta:
                      mode=meta.mode, loop=meta.loop, color=meta.color,
                      level_gain=meta.level_gain, duration=meta.duration,
                      fingerprint="", fx=dict(meta.fx), image=image, tags=list(meta.tags),
-                     fade_in=meta.fade_in, fade_out=meta.fade_out)
+                     fade_in=meta.fade_in, fade_out=meta.fade_out, hold=meta.hold)
 
 
 def recycle(path: Path) -> bool:

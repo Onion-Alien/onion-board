@@ -25,7 +25,8 @@ from soundboard import engine as eng
 from soundboard import theme, winkeys, ytdl
 from soundboard.engine import SR, Engine
 from soundboard.engine import is_virtual as is_virtual_cable
-from soundboard import autostart, backup, destination, remote, soundfx, thumbs, updates
+from soundboard import autostart, backup, destination, midi, remote, soundfx, thumbs, updates
+from soundboard.replay import InstantReplay
 from soundboard.library import (AUDIO_EXTS, PAD_COLORS, RESOURCE_DIR, Config, SoundMeta,
                                 cache_keep, clean_tags, delete_file, duplicate, fingerprint,
                                 import_file, load_original, load_sound, prune_cache, save_clip)
@@ -106,7 +107,11 @@ class MainWindow(QMainWindow):
         self._index()
         self.hotkeys = Hotkeys()
         self.hotkeys.fired.connect(self.on_hotkey)
+        self.hotkeys.released.connect(self.on_hotkey_released)
         self.hotkeys.failed_changed.connect(self.on_hotkeys_failed)
+        self.hotkeys.midi.busy_changed.connect(self.on_midi_busy)
+        self.replay = InstantReplay(self.cfg.replay_seconds)
+        self.replay.state_changed.connect(self.on_replay_state)
         self.overlay = Overlay(self, self.cfg.overlay)
         self._save_failed_shown = False
         self.bridge = Bridge()
@@ -337,6 +342,10 @@ class MainWindow(QMainWindow):
         # the Voice tab's "Hear my voice" and the mixer's "Hear what they hear" are one switch
         self.voice.fx.hear_toggled.connect(self.btn_check.setChecked)
         self.btn_check.toggled.connect(self.voice.fx.set_hearing)
+        self.voice.fx.set_tip_enabled(not self.cfg.voice_discord_tip_shown)
+        self.voice.fx.chat_help.connect(lambda: self.show_chat_guide("discord"))
+        self.voice.fx.tip_dismissed.connect(
+            lambda: self.set_option("voice_discord_tip_shown", True))
 
         self.status = QLabel()
         self.status.setWordWrap(True)
@@ -1181,6 +1190,44 @@ class MainWindow(QMainWindow):
         # hotkey of ours, Windows would hand those presses to us instead of the game
         mapping.pop(self.cfg.ptt_key, None)
         self.hotkeys.register(mapping)
+        # instant replay listens only while its hotkey is set
+        self.replay.set_enabled(bool(self.cfg.replay_hotkey), self.cfg.replay_seconds)
+
+    def on_hotkey_released(self, action: str):
+        """A hotkey or MIDI pad was let go: a hold-to-play sound stops, and an overlay
+        in hold mode opened by a MIDI pad closes (a key's release it watches itself)."""
+        m = self._meta.get(action)
+        if m is not None and m.hold:
+            self.engine.stop(action)
+        elif (action == "__overlay__" and self.overlay.s.mode == "hold"
+              and midi.is_midi(self.cfg.overlay_hotkey) and self.overlay.is_open):
+            self.overlay.close()
+
+    def on_midi_busy(self, busy: list[str]):
+        if busy:
+            self.status.setText(f"<span style='color:{theme.status('warn')}'>"
+                                + html.escape(", ".join(busy))
+                                + " is open in another program (a music app?), so its pads "
+                                "don't work here until that program lets go of it.</span>")
+
+    def on_replay_state(self):
+        if self.replay.enabled and self.replay.error:
+            self.status.setText(f"<span style='color:{theme.status('warn')}'>"
+                                "Instant replay can't listen: "
+                                + html.escape(self.replay.error) + "</span>")
+
+    def save_replay(self):
+        """The instant-replay hotkey: the last seconds of what you heard become a pad."""
+        data = self.replay.clip()
+        if len(data) < int(0.2 * SR):
+            self.cue("fail")
+            why = self.replay.error or (
+                f"nothing has played on this PC in the last {self.replay.seconds} seconds")
+            self.status.setText(f"<span style='color:{theme.status('warn')}'>"
+                                f"Nothing to save: {html.escape(why)}.</span>")
+            return
+        self.on_clip(data, "Replay " + time.strftime("%H.%M.%S"))
+        self.cue("saved")
 
     def on_hotkeys_failed(self, failed: list[str]):
         if failed:
@@ -1252,6 +1299,8 @@ class MainWindow(QMainWindow):
             return
         if action == "__stop__":
             self.stop_all()
+        elif action == "__replay__":
+            self.save_replay()
         elif action == "__pause__":
             self.engine.pause_all()
         elif action == "__random__":
@@ -2938,7 +2987,7 @@ class MainWindow(QMainWindow):
         self._shut_down = True
         for step in (self._finish_removals, self.timer.stop, self._release_ptt,
                      self._stop_capture, self.cfg.save, self.overlay.shutdown,
-                     self.hotkeys.stop, self.remote.stop,
+                     self.hotkeys.stop, self.replay.stop, self.remote.stop,
                      self.radio.shutdown, self.apps.shutdown, self.triggers.shutdown,
                      self.linkbar.shutdown,
                      self.voice.shutdown, self.engine.shutdown):
