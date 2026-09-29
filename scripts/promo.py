@@ -26,8 +26,8 @@ os.environ.setdefault("QT_QPA_FONTDIR", str(Path(os.environ.get("WINDIR", r"C:\W
 import numpy as np  # noqa: E402
 import soundfile as sf  # noqa: E402
 from PySide6.QtCore import QPointF, QRectF, Qt  # noqa: E402
-from PySide6.QtGui import (QColor, QFont, QGuiApplication, QImage, QLinearGradient,  # noqa: E402
-                           QPainter, QPainterPath, QPen, QRadialGradient)
+from PySide6.QtGui import (QColor, QFont, QFontMetricsF, QGuiApplication, QImage,  # noqa: E402
+                           QLinearGradient, QPainter, QPainterPath, QPen, QRadialGradient)
 
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
@@ -47,7 +47,6 @@ TEXT = QColor("#e8e8f0")
 MUTED = QColor("#9a9bb0")
 ACCENT = QColor("#7c5cff")
 GREEN = QColor("#13ce66")
-RED = QColor("#a3161f")
 
 
 def ease(t: float) -> float:
@@ -61,70 +60,270 @@ def fade(t: float, start: float, dur: float) -> float:
 
 # --------------------------------------------------------------------------- drawing
 
-def draw_game(p: QPainter, r: QRectF, t: float):
-    """A made-up dark-fantasy scene: fog, a ruined arch, a bonfire glow."""
-    g = QLinearGradient(r.topLeft(), r.bottomLeft())
-    g.setColorAt(0, QColor("#1b1d24"))
-    g.setColorAt(0.6, QColor("#101116"))
-    g.setColorAt(1, QColor("#08080b"))
-    p.fillRect(r, g)
-    cx, base = r.center().x(), r.top() + r.height() * 0.72
-    w = r.width()
-    # the arch
+SERIF = ["Palatino Linotype", "Book Antiqua", "Constantia", "Georgia", "Times New Roman"]
+SOUL_RED = QColor("#b01a22")
+SOUL_GOLD = QColor("#e2b650")
+
+
+def _blur(img: QImage, radius: float) -> QImage:
+    """A cheap soft blur: shrink, then scale back up smoothly (twice, for a rounder falloff)."""
+    w, h = img.width(), img.height()
+    for k in (max(2.0, radius), max(2.0, radius * 0.5)):
+        small = img.scaled(max(1, int(w / k)), max(1, int(h / k)), Qt.IgnoreAspectRatio,
+                           Qt.SmoothTransformation)
+        img = small.scaled(w, h, Qt.IgnoreAspectRatio, Qt.SmoothTransformation)
+    return img
+
+
+def _fit_font(families: list[str], text: str, width: float, height: float,
+              spacing: float = 100, bold: bool = False, italic: bool = False) -> QFont:
+    """The biggest font (pixel size) whose `text` fits `width`, and at most `height` px."""
+    f = QFont()
+    f.setFamilies(families)
+    f.setBold(bold)
+    f.setItalic(italic)
+    f.setLetterSpacing(QFont.PercentageSpacing, spacing)
+    f.setPixelSize(100)
+    adv = QFontMetricsF(f).horizontalAdvance(text) or 1
+    f.setPixelSize(max(6, int(min(width / adv * 100, height))))
+    return f
+
+
+def _text_path(f: QFont, text: str, c: QPointF) -> QPainterPath:
+    """`text` as a path, centred on c (vertically by its capitals' height)."""
+    fm = QFontMetricsF(f)
+    path = QPainterPath()
+    path.setFillRule(Qt.WindingFill)
+    path.addText(QPointF(c.x() - fm.horizontalAdvance(text) / 2, c.y() + fm.capHeight() / 2),
+                 f, text)
+    return path
+
+
+def _glow(p: QPainter, path: QPainterPath, box: QRectF, colour: QColor, radius: float):
+    """A soft halo of `colour` around `path`, painted into the box it sits in."""
+    img = QImage(max(1, int(box.width())), max(1, int(box.height())),
+                 QImage.Format_ARGB32_Premultiplied)
+    img.fill(Qt.transparent)
+    q = QPainter(img)
+    q.setRenderHint(QPainter.Antialiasing)
+    q.translate(-box.left(), -box.top())
+    q.setPen(QPen(colour, radius * 0.6, Qt.SolidLine, Qt.RoundCap, Qt.RoundJoin))
+    q.setBrush(colour)
+    q.drawPath(path)
+    q.end()
+    p.drawImage(box, _blur(img, radius))
+
+
+def draw_banner(p: QPainter, r: QRectF, text: str, colour: QColor = SOUL_RED,
+                alpha: float = 1.0, grow: float = 1.0, size: float = 0.13, fill: float = 0.62):
+    """A souls-like title card across r: a soft black band the full width, and `text`
+    in big spaced serif capitals with a faint glow. `size` caps the letters' height as
+    a fraction of r's height, `fill` their width as a fraction of r's width."""
+    if alpha <= 0:
+        return
+    f = _fit_font(SERIF, text, r.width() * fill, r.height() * size, spacing=112)
+    px = f.pixelSize()
+    c = r.center()
+    band = QRectF(r.left(), c.y() - px * 1.3, r.width(), px * 2.6)
+    g = QLinearGradient(band.topLeft(), band.bottomLeft())
+    g.setColorAt(0.0, QColor(0, 0, 0, 0))
+    g.setColorAt(0.3, QColor(0, 0, 0, int(200 * alpha)))
+    g.setColorAt(0.7, QColor(0, 0, 0, int(200 * alpha)))
+    g.setColorAt(1.0, QColor(0, 0, 0, 0))
+    p.save()
     p.setPen(Qt.NoPen)
-    p.setBrush(QColor("#1f2129"))
-    arch = QPainterPath()
-    arch.addRect(QRectF(cx - w * 0.30, base - w * 0.55, w * 0.08, w * 0.55))
-    arch.addRect(QRectF(cx + w * 0.22, base - w * 0.48, w * 0.08, w * 0.48))
-    arch.addEllipse(QRectF(cx - w * 0.30, base - w * 0.75, w * 0.60, w * 0.45))
-    inner = QPainterPath()
-    inner.addEllipse(QRectF(cx - w * 0.22, base - w * 0.67, w * 0.44, w * 0.40))
-    inner.addRect(QRectF(cx - w * 0.22, base - w * 0.47, w * 0.44, w * 0.47))
-    p.drawPath(arch.subtracted(inner))
-    # the ground
-    p.setBrush(QColor("#0b0c10"))
-    p.drawRect(QRectF(r.left(), base, w, r.bottom() - base))
-    # a bonfire's glow, flickering
-    flick = 0.85 + 0.15 * math.sin(t * 13) * math.sin(t * 7.3)
-    glow = QRadialGradient(QPointF(cx, base), w * 0.25 * flick)
-    glow.setColorAt(0, QColor(255, 140, 50, 150))
-    glow.setColorAt(1, QColor(255, 120, 40, 0))
-    p.setBrush(glow)
-    p.drawEllipse(QPointF(cx, base), w * 0.25 * flick, w * 0.25 * flick)
-    p.setBrush(QColor(255, 190, 90))
-    p.drawEllipse(QPointF(cx, base - w * 0.01), w * 0.012, w * 0.02 * flick)
-    # drifting fog
-    for i in range(5):
-        y = base - w * (0.1 + 0.08 * i)
-        x = (cx - w + ((t * 30 * (i + 1)) % (w * 2)))
-        fog = QRadialGradient(QPointF(x, y), w * 0.4)
-        fog.setColorAt(0, QColor(150, 160, 180, 22))
-        fog.setColorAt(1, QColor(150, 160, 180, 0))
+    p.fillRect(band, g)
+    path = _text_path(f, text, QPointF(0, 0))
+    p.translate(c)
+    p.scale(grow, grow)
+    p.setOpacity(p.opacity() * alpha)
+    halo = QColor(colour)
+    halo.setAlpha(130)
+    _glow(p, path, QRectF(-r.width() / 2, -px * 1.4, r.width(), px * 2.8), halo, px * 0.3)
+    fill_g = QLinearGradient(QPointF(0, -px * 0.45), QPointF(0, px * 0.45))
+    fill_g.setColorAt(0, colour.lighter(125))
+    fill_g.setColorAt(1, colour.darker(130))
+    p.setBrush(fill_g)
+    p.drawPath(path)
+    p.restore()
+
+
+def draw_callout(p: QPainter, r: QRectF, text: str, accent: QColor = QColor("#ff4a3d"),
+                 fill: float = 0.5):
+    """A shooter-style kill callout: a crosshair and bold italic capitals on a slanted
+    dark plate with an accent edge; the word takes `fill` of r's width."""
+    f = _fit_font(["Bahnschrift", "Impact", "Segoe UI"], text, r.width() * fill,
+                  r.height() * fill * 0.4, spacing=104, bold=True, italic=True)
+    px = f.pixelSize()
+    fm = QFontMetricsF(f)
+    tw = fm.horizontalAdvance(text)
+    ch = px * 1.05                                          # the crosshair's size
+    total = ch + px * 0.45 + tw
+    left = r.center().x() - total / 2
+    cy = r.center().y()
+    plate_h, slant = px * 1.55, px * 0.35                  # slanted like the letters
+    x0, x1 = left - px * 0.7, left + total + px * 0.9
+
+    def slanted(a: float, b: float) -> QPainterPath:
+        path = QPainterPath()
+        path.moveTo(a + slant, cy - plate_h / 2)
+        path.lineTo(b + slant, cy - plate_h / 2)
+        path.lineTo(b - slant, cy + plate_h / 2)
+        path.lineTo(a - slant, cy + plate_h / 2)
+        path.closeSubpath()
+        return path
+    g = QLinearGradient(QPointF(x0, 0), QPointF(x1, 0))
+    g.setColorAt(0, QColor(10, 10, 14, 235))
+    g.setColorAt(0.75, QColor(10, 10, 14, 205))
+    g.setColorAt(1, QColor(10, 10, 14, 0))
+    p.save()
+    p.setPen(Qt.NoPen)
+    p.setBrush(g)
+    p.drawPath(slanted(x0, x1))
+    p.setBrush(accent)
+    p.drawPath(slanted(x0, x0 + px * 0.16))                # the accent edge
+    cc = QPointF(left + ch / 2, cy)                        # the crosshair
+    p.setPen(QPen(accent, px * 0.11, Qt.SolidLine, Qt.FlatCap))
+    p.setBrush(Qt.NoBrush)
+    p.drawEllipse(cc, ch * 0.34, ch * 0.34)
+    for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1)):
+        p.drawLine(QPointF(cc.x() + dx * ch * 0.18, cc.y() + dy * ch * 0.18),
+                   QPointF(cc.x() + dx * ch * 0.5, cc.y() + dy * ch * 0.5))
+    p.setPen(Qt.NoPen)
+    p.setBrush(accent)
+    p.drawEllipse(cc, px * 0.07, px * 0.07)
+    path = QPainterPath()                                  # the word, with a hot glow
+    path.setFillRule(Qt.WindingFill)       # variable fonts' overlapping strokes stay solid
+    path.addText(QPointF(left + ch + px * 0.45, cy + fm.capHeight() / 2), f, text)
+    halo = QColor(accent)
+    halo.setAlpha(150)
+    _glow(p, path, QRectF(r), halo, px * 0.25)
+    p.setBrush(QColor("#fbfbfd"))
+    p.drawPath(path)
+    p.restore()
+
+
+def draw_scene(p: QPainter, r: QRectF, t: float):
+    """A made-up dark-fantasy scene at dusk: a ruined keep on the horizon, broken
+    pillars, drifting fog and a bonfire with a sword in it, flickering."""
+    w, h = r.width(), r.height()
+    u = h / 100
+    cx = r.center().x()
+    horizon = r.top() + h * 0.64
+    p.save()
+    p.setClipRect(r)
+    p.setPen(Qt.NoPen)
+    sky = QLinearGradient(r.topLeft(), QPointF(r.left(), horizon))
+    sky.setColorAt(0, QColor("#15171f"))
+    sky.setColorAt(0.65, QColor("#2b2a33"))
+    sky.setColorAt(1, QColor("#453a3a"))
+    p.fillRect(QRectF(r.left(), r.top(), w, horizon - r.top()), sky)
+    far = QPainterPath()                  # the distant keep, pale with distance
+    far.moveTo(r.left(), horizon)
+    for x, top in ((0.00, 8), (0.06, 8), (0.06, 14), (0.10, 14), (0.10, 9), (0.18, 9),
+                   (0.18, 22), (0.195, 25), (0.21, 22), (0.21, 11), (0.30, 11), (0.33, 7),
+                   (0.62, 7), (0.62, 17), (0.635, 30), (0.65, 17), (0.65, 12), (0.70, 12),
+                   (0.70, 19), (0.74, 19), (0.74, 10), (0.86, 10), (0.88, 6), (1.0, 6)):
+        far.lineTo(r.left() + w * x, horizon - u * top)
+    far.lineTo(r.right(), horizon)
+    far.closeSubpath()
+    p.setBrush(QColor("#24232b"))
+    p.drawPath(far)
+    ground = QLinearGradient(QPointF(r.left(), horizon), r.bottomLeft())
+    ground.setColorAt(0, QColor("#16161b"))
+    ground.setColorAt(1, QColor("#060608"))
+    p.fillRect(QRectF(r.left(), horizon, w, r.bottom() - horizon), ground)
+    p.setBrush(QColor("#0c0c10"))          # near ruins: a broken pillar each side
+    for side in (-1, 1):
+        bx = cx + side * w * 0.36
+        pw = u * 9
+        top = horizon - u * (52 if side < 0 else 40)
+        pillar = QPainterPath()
+        pillar.moveTo(bx - pw / 2, r.bottom())
+        pillar.lineTo(bx - pw / 2, top + u * 3)
+        pillar.lineTo(bx - pw * 0.1, top)
+        pillar.lineTo(bx + pw * 0.2, top + u * 4)
+        pillar.lineTo(bx + pw / 2, top + u * 1.5)
+        pillar.lineTo(bx + pw / 2, r.bottom())
+        pillar.closeSubpath()
+        p.drawPath(pillar)
+        p.drawRect(QRectF(bx - pw * 0.7, horizon + u * 6, pw * 1.4, u * 4))
+    for i in range(4):                     # fog, drifting
+        y = horizon - u * (4 + 7 * i)
+        x = r.left() + ((t * w * 0.02 * (i + 1) + i * w * 0.37) % (w * 1.6)) - w * 0.3
+        fog = QRadialGradient(QPointF(0, 0), w * 0.35)
+        fog.setColorAt(0, QColor(160, 165, 185, 30))
+        fog.setColorAt(1, QColor(160, 165, 185, 0))
+        p.save()
+        p.translate(x, y)
+        p.scale(1, u * 9 / (w * 0.35))    # squashed flat: an elliptical gradient
         p.setBrush(fog)
-        p.drawEllipse(QPointF(x, y), w * 0.4, w * 0.12)
-    # YOU DIED
+        p.drawEllipse(QPointF(0, 0), w * 0.35, w * 0.35)
+        p.restore()
+    # the bonfire: its glow on the ground, stones, a sword, flames and embers
+    fu = u * 1.45
+    fire = QPointF(cx, horizon + u * 22)
+    flick = 0.9 + 0.1 * math.sin(t * 11) * math.sin(t * 6.3 + 1)
+    glow = QRadialGradient(fire, fu * 32 * flick)
+    glow.setColorAt(0, QColor(255, 150, 60, 120))
+    glow.setColorAt(0.5, QColor(255, 110, 40, 40))
+    glow.setColorAt(1, QColor(255, 100, 30, 0))
+    p.setBrush(glow)
+    p.drawEllipse(fire, fu * 32 * flick, fu * 32 * flick)
+    p.setBrush(QColor("#1b1715"))
+    for dx, s in ((-5.5, 3.0), (-2.2, 3.4), (1.5, 3.2), (4.8, 2.8), (-0.4, 2.6)):
+        p.drawEllipse(QPointF(fire.x() + fu * dx, fire.y() + fu * 0.8), fu * s, fu * s * 0.55)
+    sword = QPainterPath()
+    sword.addRect(QRectF(-fu * 0.45, -fu * 16, fu * 0.9, fu * 16))     # blade
+    sword.addRect(QRectF(-fu * 2.6, -fu * 16.8, fu * 5.2, fu * 0.9))   # crossguard
+    sword.addRect(QRectF(-fu * 0.35, -fu * 20.5, fu * 0.7, fu * 3.8))  # grip
+    sword.addEllipse(QPointF(0, -fu * 21), fu * 0.8, fu * 0.8)        # pommel
+    p.save()
+    p.translate(fire.x(), fire.y() - fu * 0.5)
+    p.rotate(-8)
+    p.setBrush(QColor("#2a2624"))
+    p.drawPath(sword)
+    p.restore()
+    for i, (dx, hgt, wid, sp) in enumerate(((-2.6, 7, 2.2, 9), (2.4, 8, 2.3, 7.7),
+                                            (0, 11, 3.2, 8.3), (-0.8, 6, 1.6, 12))):
+        fh = fu * hgt * (0.82 + 0.18 * math.sin(t * sp + i * 1.7))
+        fw = fu * wid
+        bx = fire.x() + fu * dx
+        tip = QPointF(bx + fu * 0.8 * math.sin(t * sp * 0.7 + i), fire.y() - fh)
+        flame = QPainterPath()
+        flame.moveTo(bx - fw, fire.y())
+        flame.cubicTo(QPointF(bx - fw, fire.y() - fh * 0.5),
+                      QPointF(tip.x() - fw * 0.2, tip.y() + fh * 0.3), tip)
+        flame.cubicTo(QPointF(tip.x() + fw * 0.2, tip.y() + fh * 0.3),
+                      QPointF(bx + fw, fire.y() - fh * 0.5), QPointF(bx + fw, fire.y()))
+        flame.closeSubpath()
+        fg = QLinearGradient(QPointF(0, fire.y()), QPointF(0, tip.y()))
+        fg.setColorAt(0, QColor(255, 236, 170, 240))
+        fg.setColorAt(0.45, QColor(255, 150, 50, 220))
+        fg.setColorAt(1, QColor(220, 60, 20, 0))
+        p.setBrush(fg)
+        p.drawPath(flame)
+    for i in range(14):                    # embers rising
+        life = (t * 0.45 + i * 0.137) % 1.0
+        ex = fire.x() + fu * (math.sin(i * 12.9) * 4 + math.sin(t * 2 + i) * 2 * life)
+        ey = fire.y() - fu * (4 + life * 30)
+        p.setBrush(QColor(255, 170 + i % 3 * 25, 80, int(230 * (1 - life))))
+        p.drawEllipse(QPointF(ex, ey), fu * 0.3, fu * 0.3)
+    vig = QRadialGradient(r.center(), max(w, h) * 0.75)
+    vig.setColorAt(0.55, QColor(0, 0, 0, 0))
+    vig.setColorAt(1, QColor(0, 0, 0, 190))
+    p.setBrush(vig)
+    p.drawRect(r)
+    p.restore()
+
+
+def draw_game(p: QPainter, r: QRectF, t: float):
+    """The made-up game: the scene, and YOU DIED fading in over it at DIED_AT."""
+    draw_scene(p, r, t)
     a = fade(t, DIED_AT, 1.2)
     if a > 0:
-        band = QRectF(r.left(), r.center().y() - w * 0.09, w, w * 0.18)
-        bg = QLinearGradient(band.topLeft(), band.bottomLeft())
-        bg.setColorAt(0, QColor(0, 0, 0, 0))
-        bg.setColorAt(0.5, QColor(0, 0, 0, int(200 * a)))
-        bg.setColorAt(1, QColor(0, 0, 0, 0))
-        p.fillRect(band, bg)
-        f = QFont("Georgia")
-        f.setPixelSize(int(w * 0.105))
-        f.setLetterSpacing(QFont.PercentageSpacing, 108)
-        p.setFont(f)
-        c = QColor(RED)
-        c.setAlpha(int(255 * a))
-        p.setPen(c)
-        grow = 1 + 0.04 * (t - DIED_AT) / 4
-        p.save()
-        p.translate(band.center())
-        p.scale(grow, grow)
-        p.drawText(QRectF(-w / 2, -band.height() / 2, w, band.height()), Qt.AlignCenter,
-                   "YOU DIED")
-        p.restore()
+        p.fillRect(r, QColor(0, 0, 0, int(70 * a)))      # the screen dims as it comes up
+        draw_banner(p, r, "YOU DIED", SOUL_RED, a, 1 + 0.05 * min(1.0, (t - DIED_AT) / 4))
 
 
 def draw_card(p: QPainter, r: QRectF, t: float):
@@ -139,11 +338,13 @@ def draw_card(p: QPainter, r: QRectF, t: float):
     p.setPen(QPen(EDGE, 1.5 * s))
     p.setBrush(QColor("#08080b"))
     p.drawRoundedRect(th, 8 * s, 8 * s)
-    f = QFont("Georgia")
-    f.setPixelSize(int(17 * s))
-    p.setFont(f)
-    p.setPen(RED)
-    p.drawText(th, Qt.AlignCenter, "YOU DIED")
+    p.save()
+    clip = QPainterPath()
+    clip.addRoundedRect(th, 8 * s, 8 * s)
+    p.setClipPath(clip)
+    draw_scene(p, th, 6.0)
+    draw_banner(p, th, "YOU DIED", SOUL_RED, size=0.2, fill=0.78)
+    p.restore()
     # name + state line
     x = th.right() + 16 * s
     f = QFont("Segoe UI")

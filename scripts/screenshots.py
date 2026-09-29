@@ -51,10 +51,10 @@ SOUNDS = [("Airhorn", "F1", "Memes"), ("Vine Boom", "F2", "Memes"),
           ("Oof", "", "Memes"), ("Record Scratch", "", "Music"),
           ("Dun Dun Dunn", "", "Memes"), ("Laugh Track", "", "Reactions"),
           ("Bonk", "F5", "Memes")]
-# Triggers tab: (name, picture text, text colour, sound index, wait, live match %)
-TRIGGERS = [("Died", "YOU DIED", "#b3202a", 2, 1.5, 12),
-            ("Boss beaten", "VICTORY ACHIEVED", "#e8c15a", 9, 0.0, 91),
-            ("Headshot", "HEADSHOT", "#ffffff", 13, 0.0, 34)]
+# Triggers tab: (name, picture (see trigger_picture), sound index, wait, live match %)
+TRIGGERS = [("Died", "died", 2, 1.5, 12),
+            ("Boss beaten", "victory", 9, 0.0, 91),
+            ("Headshot", "headshot", 13, 0.0, 34)]
 
 
 class _Stream:
@@ -103,23 +103,47 @@ def demo_config(tmp: Path, theme: str):
                    setup_done=True, theme=theme, screen={"triggers": demo_triggers(tmp)}).save()
 
 
+def trigger_picture(kind: str):
+    """A made-up trigger picture, as if cut from a game's screenshot: the souls-like
+    death / boss banners over promo.py's game scene, or a shooter's kill callout."""
+    import promo
+    from PySide6.QtCore import QRectF
+    from PySide6.QtGui import QColor, QImage, QLinearGradient, QPainter
+    full = QRectF(0, 0, 800, 400)            # cut close around it, as people do
+    img = QImage(int(full.width()), int(full.height()), QImage.Format_RGB32)
+    p = QPainter(img)
+    p.setRenderHint(QPainter.Antialiasing)
+    if kind == "headshot":
+        g = QLinearGradient(full.topLeft(), full.bottomLeft())
+        g.setColorAt(0, QColor("#3b4a55"))
+        g.setColorAt(0.55, QColor("#6d6a5e"))
+        g.setColorAt(0.56, QColor("#403a31"))
+        g.setColorAt(1, QColor("#221f1b"))
+        p.fillRect(full, g)
+        p.setPen(QColor(0, 0, 0, 0))
+        for x, wd, ht, shade in ((0.05, 0.18, 0.30, "#2e3439"), (0.30, 0.10, 0.22, "#353b40"),
+                                 (0.62, 0.22, 0.36, "#2a3035"), (0.88, 0.14, 0.26, "#32383d")):
+            p.fillRect(QRectF(full.width() * x, full.height() * (0.56 - ht),
+                              full.width() * wd, full.height() * ht), QColor(shade))
+        promo.draw_callout(p, full, "HEADSHOT", fill=0.56)
+    else:
+        promo.draw_scene(p, full, 6.0)
+        p.fillRect(full, QColor(0, 0, 0, 70))
+        if kind == "died":
+            promo.draw_banner(p, full, "YOU DIED", promo.SOUL_RED, size=0.24, fill=0.8)
+        else:
+            promo.draw_banner(p, full, "VICTORY ACHIEVED", promo.SOUL_GOLD, size=0.24,
+                              fill=0.92)
+    p.end()
+    return img
+
+
 def demo_triggers(tmp: Path) -> list[dict]:
-    """Made-up trigger pictures: a word on a dark band, drawn here."""
-    from PySide6.QtCore import Qt
-    from PySide6.QtGui import QColor, QFont, QImage, QPainter
     out = []
     (tmp / "triggers").mkdir(exist_ok=True)
-    for i, (name, text, colour, sound, wait, _live) in enumerate(TRIGGERS):
-        img = QImage(360, 110, QImage.Format_RGB32)
-        img.fill(QColor("#0b0b0d"))
-        p = QPainter(img)
-        p.setRenderHint(QPainter.Antialiasing)
-        p.setPen(QColor(colour))
-        p.setFont(QFont("Georgia", 34 if len(text) < 10 else 22))
-        p.drawText(img.rect(), Qt.AlignCenter, text)
-        p.end()
+    for i, (name, kind, sound, wait, _live) in enumerate(TRIGGERS):
         path = tmp / "triggers" / f"t{i}.png"
-        img.save(str(path))
+        trigger_picture(kind).save(str(path))
         out.append({"id": f"t{i}", "name": name, "image": str(path), "sound": f"s{sound}",
                     "delay": wait, "cooldown": 5.0})
     return out
@@ -168,7 +192,7 @@ def main():
     tr.poll.stop()                    # show made-up live matches instead
     w.tabs.setCurrentWidget(tr)
     for i, row in enumerate(tr.rows.values()):
-        row.show_score(TRIGGERS[i][5] / 100)
+        row.show_score(TRIGGERS[i][4] / 100)
     tr.rows["t1"].flash("Played!", 60000)
     spin()
     save(w, "triggers")
