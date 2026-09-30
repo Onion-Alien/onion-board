@@ -324,3 +324,69 @@ def test_an_installer_or_log_off_really_closes_the_app(window, monkeypatch):
     ev = QCloseEvent()
     window.closeEvent(ev)
     assert ev.isAccepted()
+
+
+def test_pads_fit_the_width_with_no_sideways_scrolling(window, qapp):
+    """Big pads in a narrow window get narrower instead of running off the edge, and
+    the mini player puts two a row while they're still a usable size."""
+    window.show()
+    window.set_pad_width(240)
+    window.resize(1000, 700)
+    window._refit()
+    assert window.pads["s0"].width() == 240
+    window.resize(270, 600)
+    window._refit()
+    qapp.processEvents()
+    scroll = window._pads_scroll
+    assert window.is_mini() and scroll.isVisibleTo(window)
+    assert scroll.horizontalScrollBar().maximum() == 0
+    assert window.grid.width() <= scroll.viewport().width()
+    a, b = window.pads["s0"], window.pads["s1"]
+    assert a.geometry().right() <= scroll.viewport().width()
+    assert a.y() == b.y() and a.width() < 240          # two a row
+    window.resize(1000, 700)
+    window._refit()
+    assert not window.is_mini() and window.pads["s0"].width() == 240
+
+
+def test_an_empty_board_shrinks_with_the_window(window, qapp):
+    """No sounds, then a small window: the "drop sound files here" bunny came along at
+    the big window's width, so the mini player showed an empty void you had to
+    scroll sideways across."""
+    window.cfg.sounds.clear()
+    window._rebuild_pads()
+    window.show()
+    window.resize(1400, 800)
+    window._refit()
+    window.resize(265, 520)
+    window._refit()
+    qapp.processEvents()
+    scroll = window._pads_scroll
+    assert window.is_mini() and window.grid.empty.isVisibleTo(window)
+    assert window.grid.width() <= scroll.viewport().width()
+    assert window.grid.empty.geometry().right() <= scroll.viewport().width()
+
+
+def test_the_whole_window_comes_back_after_the_mini_player(window, qapp):
+    """Out of the mini player at a size the whole window fits (its hidden page's
+    sizes went stale, and it stayed the mini player)."""
+    window.show()
+    window.tabs.setCurrentWidget(window.sounds_page)
+    window.resize(1000, 700)
+    window._refit()
+    for size in ((300, 600), (430, 600), (520, 600)):
+        window.resize(*size)
+        window._refit()
+    assert not window.is_mini()
+
+
+def test_a_whole_row_of_pads_before_the_mixer(window, qapp):
+    """A short window drops the mixer and the rest before squeezing the pads into a
+    slit you'd have to scroll through."""
+    window.show()
+    window.tabs.setCurrentWidget(window.sounds_page)
+    window.resize(700, 400)
+    window._refit()
+    qapp.processEvents()
+    if not window.is_mini():
+        assert window._pads_scroll.height() >= window.pads["s0"].height()

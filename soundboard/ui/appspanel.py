@@ -28,6 +28,7 @@ from soundboard.recorder import ArmedRecorder
 from soundboard.ui import icons
 from soundboard.ui.bunnywidget import BunnyWidget
 from soundboard.ui.panel import UndoBar, VolumeControl, card, hint_label
+from soundboard.ui.responsive import FitWidth
 
 log = logging.getLogger(__name__)
 
@@ -165,15 +166,49 @@ class AppRow(QFrame):
         self.btn_forget.setFixedWidth(26)
         self.btn_forget.clicked.connect(lambda: self.forget.emit(self))
         h.addWidget(self.btn_forget)
+        self._tight = 0   # how many of _TIGHTEN are applied (a narrow window)
         self._label_send()
         self.set_app(None)
+
+    NAME_ROOM = 90   # the program's name keeps at least this much when the row tightens
+    # narrow window, in this order: the level meter goes, the typed volume goes, the
+    # buttons keep only their icons (their tooltips say what they are), "Hear it
+    # myself" becomes "Hear"
+    _TIGHTEN = ("meter", "spin", "send", "rec", "hear")
+
+    def resizeEvent(self, e):
+        super().resizeEvent(e)
+        self._fit_width(self.width())
+
+    def _fit_width(self, width: int):
+        want = 0
+        while want < len(self._TIGHTEN):
+            self._set_tight(want)
+            if self.minimumSizeHint().width() + self.NAME_ROOM <= width:
+                break
+            want += 1
+        self._set_tight(want)
+
+    def _set_tight(self, n: int):
+        if n == self._tight:
+            return
+        self._tight = n
+        on = set(self._TIGHTEN[:n])
+        self.meter.setVisible("meter" not in on)
+        self.vol.spin.setVisible("spin" not in on)
+        self.chk_hear.setText("Hear" if "hear" in on else "Hear it myself")
+        self._label_send()
+        if not self.btn_rec.isChecked():   # while recording it shows how long it's been
+            self.btn_rec.setText("" if "rec" in on else "Record")
+        self.layout().activate()
 
     @property
     def sending(self) -> bool:
         return self.btn_send.isChecked()
 
     def _label_send(self):
-        self.btn_send.setText("Sending" if self.sending else "Send")
+        self.btn_send.setText("" if "send" in self._TIGHTEN[:self._tight]
+                              else "Sending" if self.sending else "Send")
 
     def set_app(self, app: appaudio.App | None):
         """The program is running (app) or not (None)."""
@@ -221,7 +256,7 @@ class AppRow(QFrame):
         self.btn_rec.setChecked(on)
         self.btn_rec.blockSignals(False)
         if not on:
-            self.btn_rec.setText("Record")
+            self.btn_rec.setText("" if "rec" in self._TIGHTEN[:self._tight] else "Record")
 
     _icons = QFileIconProvider()
 
@@ -276,7 +311,7 @@ class AppsTab(QWidget):
         self.scroll.setWidgetResizable(True)
         self.scroll.setFrameShape(QFrame.NoFrame)
         self.scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        self.list = QWidget()
+        self.list = FitWidth()   # the rows fit the width they get (AppRow._fit_width)
         self.list_layout = QVBoxLayout(self.list)
         self.list_layout.setContentsMargins(0, 0, 0, 0)
         self.list_layout.setSpacing(6)

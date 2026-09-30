@@ -237,3 +237,13 @@ def _never_change_real_device_formats(monkeypatch):
     from soundboard import cableformat
     monkeypatch.setattr(cableformat, "cable_ends", lambda names_hint=None: [])
     monkeypatch.setattr(cableformat, "set_rate", lambda end, rate=cableformat.RATE: False)
+
+
+def pytest_runtest_logreport(report):
+    """Name a failing test the moment it fails, not only in the summary at the end:
+    a long run that's stopped early still says what broke, and `pytest --lf` then
+    reruns just those."""
+    if report.failed:
+        import sys
+        sys.stderr.write(f"\nFAILED {report.nodeid} ({report.when})\n")
+        sys.stderr.flush()

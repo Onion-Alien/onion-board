@@ -71,4 +71,4 @@ ignore = [
 # ---------------------------------------------------------------- pytest
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-addopts = "-q"
+addopts = "-q -rfE"   # -rfE: the failures and errors, listed at the end

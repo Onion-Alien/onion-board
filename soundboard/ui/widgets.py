@@ -6,9 +6,10 @@ import time
 from pathlib import Path
 
 import numpy as np
-from PySide6.QtCore import QMimeData, QPoint, QPointF, QRectF, Qt, QVariantAnimation, Signal
-from PySide6.QtGui import (QColor, QDrag, QFont, QLinearGradient, QPainter, QPainterPath,
-                           QPen)
+from PySide6.QtCore import (QMimeData, QPoint, QPointF, QRectF, QSize, Qt, QVariantAnimation,
+                            Signal)
+from PySide6.QtGui import (QColor, QDrag, QFont, QFontMetrics, QLinearGradient, QPainter,
+                           QPainterPath, QPen)
 from PySide6.QtWidgets import (QAbstractButton, QGridLayout, QLabel, QScrollArea, QSlider, QStyle,
                                QVBoxLayout, QWidget)
 
@@ -154,6 +155,13 @@ def spectrum(data: np.ndarray, frac: float, n: int) -> np.ndarray:
     return np.clip((db + 62) / 52, 0.0, 1.0).astype(np.float32)
 
 
+MINI_PAD_MIN_W = 96   # the mini player's two-a-row pads get no smaller than this
+
+
+def pad_height(width: int) -> int:
+    return int(width * 0.62)
+
+
 class Pad(QAbstractButton):
     """One sound's button, painted by hand. It's a QAbstractButton so screen readers
     see a button with the sound's name, and it works from the keyboard: Tab / arrows
@@ -185,7 +193,8 @@ class Pad(QAbstractButton):
         self._press = None
         self._kbd_focus = False  # focus came from the keyboard: draw the focus ring
         self._described = None
-        self.setFixedSize(width, int(width * 0.62))
+        self._name_fit = None    # (what it was fitted to, how) - see _fit_name
+        self.setFixedSize(width, pad_height(width))
         self.setCursor(Qt.PointingHandCursor)
         self.setAttribute(Qt.WA_Hover)
         self.setFocusPolicy(Qt.StrongFocus)
@@ -254,6 +263,32 @@ class Pad(QAbstractButton):
             self.step.emit(self, *arrows[k])
         else:
             super().keyPressEvent(e)   # Space plays (QAbstractButton's click)
+
+    def _fit_name(self, room: QRectF) -> tuple[QFont, Qt.AlignmentFlag, str]:
+        """The name's font, flags and text so it fits the pad: wrapped over two lines,
+        then a size smaller, then on one line cut short with "…" (small pads cut
+        words in half and lost the line below)."""
+        key = (self.meta.name, room.width(), room.height(), self.font().key())
+        if self._name_fit is None or self._name_fit[0] != key:
+            name = self.meta.name
+            wrap = Qt.AlignLeft | Qt.AlignVCenter | Qt.TextWordWrap
+            box = room.toRect()
+            f = QFont(self.font())
+            f.setBold(True)
+            for pt in (10.5, 9.0):
+                f.setPointSizeF(pt)
+                fm = QFontMetrics(f)
+                longest = max(name.split(), key=len, default="")   # no word cut in half
+                if (fm.boundingRect(box, wrap, name).height() <= box.height()
+                        and fm.horizontalAdvance(longest) <= box.width()):
+                    self._name_fit = (key, (f, wrap, name))
+                    break
+            else:
+                one = Qt.AlignLeft | Qt.AlignVCenter
+                self._name_fit = (key, (f, one, fm.elidedText(name, Qt.ElideRight,
+                                                              box.width())))
+        f, flags, name = self._name_fit[1]
+        return QFont(f), flags, name   # a copy: the footer changes the one it's given
 
     @property
     def n_bands(self) -> int:
@@ -410,19 +445,16 @@ class Pad(QAbstractButton):
         p.drawRoundedRect(QRectF(r.left() + 10, r.top() + 10, 22, 4), 2, 2)
         on_pic = pic is not None
         # name
-        f = QFont(self.font())
-        f.setPointSizeF(10.5)
-        f.setBold(True)
-        p.setFont(f)
         text_r = r.adjusted(10, 20, -10, -24)
-        flags = Qt.AlignLeft | Qt.AlignVCenter | Qt.TextWordWrap
+        f, flags, name = self._fit_name(text_r)
+        p.setFont(f)
         if on_pic:   # a soft shadow keeps it readable on any picture
             p.setPen(QColor(0, 0, 0, 200))
-            p.drawText(text_r.translated(1, 1), flags, self.meta.name)
+            p.drawText(text_r.translated(1, 1), flags, name)
             p.setPen(QColor("#ffffff") if self.state == "ready" else QColor(255, 255, 255, 170))
         else:
             p.setPen(QColor(T["text_hi"] if self.state == "ready" else T["muted"]))
-        p.drawText(text_r, flags, self.meta.name)
+        p.drawText(text_r, flags, name)
         muted = QColor(255, 255, 255, 200) if on_pic else QColor(T["muted"])
         # footer: hotkey + duration / state
         f.setBold(False)
@@ -512,6 +544,8 @@ class PadGrid(QWidget):
     def __init__(self):
         super().__init__()
         self.pads: list[Pad] = []
+        self.pad_w = 150         # the size picked (Pad size); narrower only when it won't fit
+        self.two_up = False      # the mini player: two smaller pads a row rather than one
         self.grid = QGridLayout(self)
         self.grid.setSpacing(10)
         self.grid.setContentsMargins(4, 4, 4, 4)
@@ -532,32 +566,74 @@ class PadGrid(QWidget):
         self.bun.setToolTip("Bun is waiting for some sounds")
         ev.addWidget(self.bun, 0, Qt.AlignHCenter)
         self.empty_text = QLabel("Drop sound files here\nor click  ＋ Add sounds\n\n"
-                                 "mp3 · wav · ogg · flac · m4a · even video files")
-        self.empty_text.setAlignment(Qt.AlignCenter)
+                                 "mp3 · wav · ogg · flac\nm4a · even video files")
+        self.empty_text.setAlignment(Qt.AlignCenter)   # short lines: fits the mini player
         self.empty_text.setObjectName("empty")
         ev.addWidget(self.empty_text)
         self._cols = 0
+        self._shape = None       # (columns, pad width) last laid out
+
+    def minimumSizeHint(self):
+        # never wider than the scroll area around it: the pads fit themselves to its
+        # width (relayout), so a narrower window can't leave them stuck wider than it
+        # is, with a sideways scroll bar and the rest out of sight
+        return QSize(0, super().minimumSizeHint().height())
+
+    def sizeHint(self):
+        return QSize(0, super().sizeHint().height())
 
     def set_pads(self, pads):
         self.pads = pads
-        self._cols = 0
+        self._shape = None
         self.relayout(force=True)
 
+    def set_pad_width(self, w: int):
+        self.pad_w = w
+        self.relayout(force=True)
+
+    def set_two_up(self, on: bool):
+        if on != self.two_up:
+            self.two_up = on
+            self.relayout(force=True)
+
+    def fit_width(self, room: int) -> tuple[int, int]:
+        """(columns, pad width) for `room` pixels: the picked size, but never wider than
+        the room, and two a row in the mini player while they'd still be a usable size."""
+        sp = self.grid.spacing()
+        w = max(1, min(self.pad_w, room))
+        if self.two_up and (room + sp) // (w + sp) < 2 and room - sp >= 2 * MINI_PAD_MIN_W:
+            w = (room - sp) // 2
+        return max(1, (room + sp) // (w + sp)), w
+
+    def row_height(self) -> int:
+        """One row of pads as they're laid out now, margins included (0 with none)."""
+        m = self.grid.contentsMargins()
+        if not self.pads or self._shape is None:
+            return 0
+        return pad_height(self._shape[1]) + m.top() + m.bottom()
+
     def relayout(self, force=False):
-        pw = self.pads[0].width() + self.grid.spacing() if self.pads else 160
-        cols = max(1, (self.width() - 8) // pw)
-        if cols == self._cols and not force:
+        m = self.grid.contentsMargins()
+        cols, w = self.fit_width(self.width() - m.left() - m.right())
+        if (cols, w) == self._shape and not force:
             return
+        self._shape = (cols, w)
         self._cols = cols
+        for p in self.pads:
+            if p.width() != w:
+                p.setFixedSize(w, pad_height(w))
         while self.grid.count():
             it = self.grid.takeAt(0)
             if it.widget() and it.widget() is not self.empty:
                 it.widget().setParent(self)
         if not self.pads:
-            self.empty.setFixedWidth(max(260, self.width() - 8))   # centred across the grid
+            # across the whole width, however wide that is now (a fixed width here kept
+            # the grid as wide as the window once was: a shrunk window showed nothing)
+            self.grid.setAlignment(Qt.AlignTop)
             self.grid.addWidget(self.empty, 0, 0)
             self.empty.show()
             return
+        self.grid.setAlignment(Qt.AlignTop | Qt.AlignLeft)
         self.empty.hide()
         i = 0
         for p in self.pads:

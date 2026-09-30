@@ -475,3 +475,26 @@ def test_my_own_mix_is_kept_across_restarts(qapp, monkeypatch):
     finally:
         p.shutdown()
         p.deleteLater()
+
+
+def test_voice_tiles_reflow_in_a_narrow_window(qapp, monkeypatch):
+    """Three voices a row ran off the side of a narrow window: the switch's text
+    gets shorter, then two a row, then one."""
+    monkeypatch.setattr(tts.SapiTTS, "warm_up", lambda self: [])
+    from PySide6.QtWidgets import QWidget
+
+    from soundboard.ui.voicepanel import POWER_SHORT, POWER_TEXT, VoiceFxPanel
+    holder = QWidget()                 # inside the tab, it gets the width there is
+    fx = VoiceFxPanel({})
+    fx.setParent(holder)
+    holder.show()
+    fx.setGeometry(0, 0, 1600, 600)   # (test fonts run wide)
+    assert fx._tile_cols == 3 and fx.btn_power.text() == POWER_TEXT[False]
+    for width in (420, 260):
+        fx.setGeometry(0, 0, width, 1200)
+        assert fx._tile_cols < 3 and fx.btn_power.text() == POWER_SHORT[False]
+        qapp.processEvents()
+        assert max(b.geometry().right() for b in fx.tiles.buttons()) <= fx.width()
+    fx.setGeometry(0, 0, 1600, 600)
+    assert fx._tile_cols == 3 and fx.btn_power.text() == POWER_TEXT[False]
+    holder.hide()

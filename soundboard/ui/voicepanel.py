@@ -27,6 +27,7 @@ from soundboard.speech.live import SpeechController, clean_settings
 from soundboard.ui import art, icons
 from soundboard.ui.panel import (VolumeControl, bar, card, hint_label, icon_label,
                                  section_label, vsep)
+from soundboard.ui.responsive import FitWidth
 from soundboard.ui.widgets import Meter
 from soundboard.wheelguard import no_wheel
 
@@ -171,6 +172,7 @@ class EffectRow(QWidget):
 PRESET_ICONS = voicefx.PRESET_ICONS
 POWER_TEXT = {False: "Voice changer is OFF  —  pick a voice below to turn it on",
               True: "ON  —  everyone hears your changed voice"}
+POWER_SHORT = {False: "Voice changer is OFF", True: "ON  —  everyone hears it"}   # narrow
 
 
 class VoiceFxPanel(QWidget):
@@ -258,8 +260,10 @@ class VoiceFxPanel(QWidget):
 
         # ---- pick a voice
         v.addWidget(QLabel("<b>Pick a voice</b>"))
-        grid = QGridLayout()
+        grid = self._tile_grid = QGridLayout()
         grid.setSpacing(6)
+        self._tile_cols = self.COLS
+        self._short = False   # the switch's short text (a narrow window)
         self.tiles = QButtonGroup(self)
         self.tiles.setExclusive(True)
         self._tile: dict[str, QPushButton] = {}
@@ -380,9 +384,36 @@ class VoiceFxPanel(QWidget):
         self.more.setVisible(on)
         icons.set_icon(self.btn_more, "fold_open" if on else "fold", "muted", "text", size=12)
 
+    def resizeEvent(self, e):
+        super().resizeEvent(e)
+        self._fit_width(self.width())
+
+    def _fit_width(self, width: int):
+        """Narrow: the switch's shorter text, then fewer voices a row, down to one."""
+        for short, cols in ((False, self.COLS), (True, self.COLS), (True, 2), (True, 1)):
+            self._set_shape(short, cols)
+            if self.minimumSizeHint().width() <= width:
+                return
+
+    def _set_shape(self, short: bool, cols: int):
+        if short != self._short:
+            self._short = short
+            self.btn_power.setText((POWER_SHORT if short else POWER_TEXT)[
+                self.btn_power.isChecked()])
+        if cols != self._tile_cols:
+            self._tile_cols = cols
+            g = self._tile_grid
+            for b in self.tiles.buttons():
+                g.removeWidget(b)
+            for i, b in enumerate(self.tiles.buttons()):
+                g.addWidget(b, i // cols, i % cols)
+            for c in range(self.COLS):
+                g.setColumnStretch(c, 1 if c < cols else 0)
+        self.layout().activate()
+
     def _refresh(self):
         on = self.btn_power.isChecked()
-        self.btn_power.setText(POWER_TEXT[on])
+        self.btn_power.setText((POWER_SHORT if self._short else POWER_TEXT)[on])
         self.tip.setVisible(on and self._tip_enabled)
         # only a voice that's actually in use is highlighted
         self.tiles.setExclusive(False)
@@ -1165,7 +1196,8 @@ class VoicePanel(QWidget):
         scroll = QScrollArea()
         scroll.setWidgetResizable(True)
         scroll.setFrameShape(QFrame.NoFrame)
-        page = QWidget()
+        scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        page = FitWidth()   # the voice changer fits itself to the width (_fit_width)
         cols = self._cols = QHBoxLayout(page)
         cols.setContentsMargins(0, 2, 4, 2)
         cols.setSpacing(12)

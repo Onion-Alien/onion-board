@@ -75,6 +75,19 @@ def stack(layout: QBoxLayout) -> Callable[[bool], None]:
     return apply
 
 
+class FitWidth(QWidget):
+    """What a scroll area holds when its content fits itself to the width it's given
+    (rows that tighten, tiles that re-flow): it's never wider than the scroll area,
+    so the content gets that width instead of running off the edge. Pair it with
+    the scroll area's horizontal bar off."""
+
+    def minimumSizeHint(self):
+        return QSize(0, super().minimumSizeHint().height())
+
+    def sizeHint(self):
+        return QSize(0, super().sizeHint().height())
+
+
 class Fitter:
     """Steps are applied lowest priority first, per axis, and undone in reverse.
 

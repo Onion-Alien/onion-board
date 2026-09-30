@@ -56,7 +56,7 @@ from soundboard.ui.triggerstab import TriggersTab
 from soundboard.ui.radiopanel import RadioTab
 from soundboard.ui.voicepanel import VoicePanel
 from soundboard.ui.widgets import (Meter, Pad, PadGrid, SeekSlider, expand_dropped, fmt_pos,
-                                   spectrum)
+                                   pad_height, spectrum)
 from soundboard.wheelguard import no_wheel
 from soundboard.winkeys import Hotkeys
 
@@ -78,7 +78,7 @@ TICK_IDLE_MS = 250   # ...and while it's in the tray or minimised (push-to-talk,
 GLOW_STEPS = 4       # how many glow levels the taskbar / tray icon has while sound plays
 ICON_GLOW_MS = 120   # ...and how often at most it changes
 MINI_SIZE = QSize(440, 380)   # below this the window becomes the mini player...
-MINI_PADS_H = 230             # ...which has the pads above it from this tall
+MINI_PAD_ROWS = 2             # ...which has the pads above it when this many rows fit
 RANDOM = "__random__:"   # hotkey action prefix: a random sound from the category after it
 ALL = "All"          # the category tab that shows every sound
 VOICE_POLL_MS = 3000  # how often the game in front is looked at (soundboard.voicesdk)
@@ -389,7 +389,7 @@ class MainWindow(QMainWindow):
         v.setContentsMargins(8, 8, 8, 8)
         v.setSpacing(6)
         v.addStretch(0)   # keeps the player at the bottom when the pads don't fit
-        card = QFrame()
+        card = self._mini_card = QFrame()
         card.setObjectName("transport")
         cv = QVBoxLayout(card)
         cv.setContentsMargins(8, 6, 8, 6)
@@ -613,6 +613,7 @@ class MainWindow(QMainWindow):
         left.addWidget(self.ytresults, 1)
 
         self.grid = PadGrid()
+        self.grid.pad_w = c.pad_width
         self.grid.reorder.connect(self.on_reorder)
         # queued: the import (and any question it asks) runs after the drop returns,
         # so Explorer isn't frozen until a dialog is answered
@@ -622,6 +623,7 @@ class MainWindow(QMainWindow):
         scroll.setWidgetResizable(True)
         scroll.setWidget(self.grid)
         scroll.setFrameShape(QFrame.NoFrame)
+        scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)   # the pads fit the width
         left.addWidget(scroll, 1)
         self._pads_home = (left, left.indexOf(scroll))   # the mini player borrows it
         self.ytresults.closed.connect(scroll.show)   # the results take the pads' place
@@ -1282,9 +1284,7 @@ class MainWindow(QMainWindow):
 
     def set_pad_width(self, w):
         self.cfg.pad_width = w
-        for p in self.pads.values():
-            p.setFixedSize(w, int(w * 0.62))
-        self.grid.relayout(force=True)
+        self.grid.set_pad_width(w)
         self._save_later()
 
     # ------------------------------------------------------------------ hotkeys
@@ -3144,6 +3144,13 @@ class MainWindow(QMainWindow):
         size = self._pages.size()
         mini = size.width() < MINI_SIZE.width() or size.height() < MINI_SIZE.height()
         if not mini:
+            # measured with the whole window in place: while the mini player shows, the
+            # hidden page's sizes go stale and it stayed the mini player at sizes the
+            # whole window fits (nothing is painted before this returns)
+            self._set_mini(False)
+            # room for a whole row of pads comes before the mixer, the status line and
+            # the rest: without it they kept their room and the pads got a slit
+            self._pads_scroll.setMinimumHeight(self.grid.row_height())
             narrow = self.width() < 860   # two cards side by side get cramped below this
             for apply in self._stack_cols:
                 apply(narrow)
@@ -3151,10 +3158,23 @@ class MainWindow(QMainWindow):
             need = self._full.minimumSizeHint()   # even the smallest layout won't fit
             mini = need.width() > size.width() or need.height() > size.height()
         self._set_mini(mini)
-        if mini:   # the pads too, when there's room for a row of them
-            show = size.height() >= MINI_PADS_H
+        if mini:   # the pads too, when there's room for a couple of rows of them
+            show = self._mini_pad_room(size) >= MINI_PAD_ROWS * self._mini_row(size)
             if self._pads_scroll.isHidden() == show:
                 self._pads_scroll.setVisible(show)
+
+    def _mini_pad_room(self, size: QSize) -> int:
+        """The height above the mini player's card."""
+        m = self._mini_v.contentsMargins()
+        return (size.height() - m.top() - m.bottom() - self._mini_v.spacing()
+                - self._mini_card.sizeHint().height())
+
+    def _mini_row(self, size: QSize) -> int:
+        """How tall a row of pads is in the mini player at this size."""
+        m, g = self._mini_v.contentsMargins(), self.grid.grid.contentsMargins()
+        bar = self._pads_scroll.verticalScrollBar().sizeHint().width()
+        room = size.width() - m.left() - m.right() - g.left() - g.right() - bar
+        return pad_height(self.grid.fit_width(room)[1]) + self.grid.grid.spacing()
 
     def is_mini(self) -> bool:
         return self._pages.currentIndex() == 1
@@ -3166,7 +3186,9 @@ class MainWindow(QMainWindow):
         scroll = self._pads_scroll
         self.setUpdatesEnabled(False)
         try:
+            self.grid.set_two_up(on)
             if on:
+                scroll.setMinimumHeight(0)
                 self._mini_v.insertWidget(0, scroll, 1)
             else:
                 home, index = self._pads_home

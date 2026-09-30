@@ -320,3 +320,26 @@ def test_armed_recorder_keeps_a_short_preroll(tmp_path):
     want = ArmedRecorder.PREROLL_S * appspanel.SR
     assert want <= pre <= want + 480
     assert np.allclose(data[-480:], 0.5, atol=1e-3)
+
+
+def test_rows_tighten_in_a_narrow_window_and_keep_the_name(qapp):
+    """Narrow: the level meter, the typed volume and the buttons' words give way, in
+    that order, so the row fits and the program's name keeps its room."""
+    from PySide6.QtWidgets import QWidget
+
+    from soundboard.ui.appspanel import AppRow
+    holder = QWidget()                 # a row is always inside the list, never a window
+    row = AppRow("music.exe", Meter)
+    row.setParent(holder)
+    row.set_app(music())
+    holder.show()
+    row.setGeometry(0, 0, 1600, 60)   # (test fonts run wide)
+    assert row.meter.isVisibleTo(row) and row.btn_rec.text() == "Record"
+    row.setGeometry(0, 0, 420, 60)
+    assert not row.meter.isVisibleTo(row) and row.btn_rec.text() == ""
+    assert not row.vol.spin.isVisibleTo(row) and row.chk_hear.text() == "Hear"
+    row.set_sending(True)                         # the words stay away when it changes
+    assert row.btn_send.text() == ""
+    row.setGeometry(0, 0, 1600, 60)
+    assert row.meter.isVisibleTo(row) and row.btn_send.text() == "Sending"
+    holder.hide()
