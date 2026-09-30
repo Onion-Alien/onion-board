@@ -26,6 +26,10 @@ in the same lobby / party / proximity range:
      how much of the first 30 ms of a sound after silence survived (a voice gate),
      and the level over time of steady noise (noise suppression).
 
+--ptt KEY holds the game's push-to-talk key during each run, the way the app's Auto
+push-to-talk does. Games under kernel anti-cheat (Valorant) ignore injected keys: there
+the player has to hold the key, and on voice activation only speech gets sent.
+
 If the game *can* run twice on one PC (a second Steam account in a sandbox, a
 game with a local test mode), `play --listener game.exe` records the second copy
 by process loopback, the way discord_roundtrip.py does, and analyses at once.
@@ -47,7 +51,7 @@ from scipy.signal import fftconvolve
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 import discord_roundtrip as rt  # noqa: E402  (same folder: its signals and analysis)
-from soundboard import destination  # noqa: E402
+from soundboard import destination, winkeys  # noqa: E402
 from soundboard.engine import Engine  # noqa: E402
 from soundboard.library import decode, level_gain  # noqa: E402
 
@@ -85,12 +89,24 @@ def find_chirps(rec: np.ndarray, count: int, min_gap_s: float) -> list[int]:
     return sorted(picks)
 
 
-def send(track: np.ndarray, mode: str, dest: str, sound_vol: float) -> np.ndarray:
-    """Play one run into the cable and return what reached the cable's far end."""
+def send(track: np.ndarray, mode: str, dest: str, sound_vol: float,
+         ptt: str = "") -> np.ndarray:
+    """Play one run into the cable and return what reached the cable's far end. With
+    `ptt`, hold that key for the whole run, as the app's Auto push-to-talk does."""
     cable: list[np.ndarray] = []
     ins = sd.InputStream(SR, channels=2, device=rt.wasapi("CABLE Output"), dtype="float32",
                          callback=lambda d, *_: cable.append(d.copy()))
     ins.start()
+    if ptt and not winkeys.press(ptt):
+        print(f"  ! couldn't press {ptt}", flush=True)
+    try:
+        return _send(track, mode, dest, sound_vol, ins, cable)
+    finally:
+        if ptt:
+            winkeys.release(ptt)
+
+
+def _send(track, mode, dest, sound_vol, ins, cable) -> np.ndarray:
     time.sleep(0.3)
     if mode == "raw":
         sd.play(track, SR, device=rt.wasapi("CABLE Input"))
@@ -129,7 +145,7 @@ def cmd_play(a) -> None:
         for mode in modes:
             print(f"== {mode}", flush=True)
             starts.append(round(time.time() - t0, 2))
-            cable = send(track, mode, a.dest, a.sound_vol)
+            cable = send(track, mode, a.dest, a.sound_vol, a.ptt)
             sf.write(out / f"sent_{mode}.wav", cable, SR)
             time.sleep(2.0)
     finally:
@@ -206,6 +222,8 @@ def main():
     p.add_argument("--dest", default="game", choices=sorted(destination.BUILTIN_BY_KEY))
     p.add_argument("--song", help="also send 15 s of this file (from 0:30)")
     p.add_argument("--sound-vol", type=float, default=1.0)
+    p.add_argument("--ptt", default="", help="hold this key during each run (the game's "
+                   "push-to-talk, e.g. V), as the app's Auto push-to-talk does")
     p.add_argument("--listener", help="a second copy of the game on this PC: its exe")
     p.add_argument("--out", default="game-roundtrip-out")
     q = sub.add_parser("analyze", help="compare the listener's recording with what was sent")

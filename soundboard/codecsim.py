@@ -62,6 +62,12 @@ class Profile:
 # Studio (no noise suppression, echo cancellation or auto gain) still has it.
 DISCORD_HP = 94
 
+# Vivox's capture high-pass, measured in a real Valorant party (a sweep sent through
+# Valorant with push-to-talk held, recorded on a second PC): -19..-25 dB at 70 Hz,
+# -7..-12 at 80, -4..-5 at 90, -2..-3 at 100, flat from 120 Hz. A 10th-order
+# Butterworth at 87 Hz sits inside that spread.
+VIVOX_HP = 87
+
 # Game voice stacks. Where a value comes from the stack's source code or SDK docs the
 # profile says "sourced"; "estimate" means nothing public pins it down (the bench
 # still runs it, read those rows as a best guess). Speex's AGC and noise suppressor
@@ -89,11 +95,11 @@ PROFILES: dict[str, Profile] = {p.key: p for p in (
             note="Steam's codec, heard through a Unity 3D sound: fades with distance",
             games="Rust", confidence="estimate"),
     Profile("vivox", "Vivox in-game voice (Unity / Unreal)", 48000, 1, 32,
-            cleanup=("webrtc_ns", "webrtc_agc"), gate_db=-45, gate_hang_s=2.0,
-            note="Opus at Vivox's documented 32 kbps default; noise suppression and AGC on "
-                 "by default in current SDKs, voice gate with a 2 s hangover",
-            games="Valorant, League of Legends, Rainbow Six Siege, Overwatch 2",
-            confidence="sourced"),
+            highpass_hz=VIVOX_HP, highpass_order=10,
+            note="measured in a real Valorant party with push-to-talk held: ~87 Hz "
+                 "high-pass, full band, no noise suppression or AGC. On voice "
+                 "activation only speech is sent. Bitrate is Vivox's 32 kbps default",
+            games="Valorant, League of Legends, Rainbow Six Siege, Overwatch 2"),
     Profile("vivox_3d", "Vivox positional channel", 48000, 1, 32,
             cleanup=("webrtc_ns", "webrtc_agc"), gate_db=-45, gate_hang_s=2.0,
             proximity="vivox_3d",

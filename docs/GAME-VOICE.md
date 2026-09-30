@@ -59,4 +59,17 @@ Lethal Company's occlusion and walkie-talkie filters come from its decompiled
   plain capture stream on the communications mic didn't duck the sounds going into
   the cable (a stream tagged as a call might; not tested).
 
-Still open: a real lobby with `scripts/game_roundtrip.py`.
+- **Valorant, measured in a real party** (`scripts/game_roundtrip.py` on one PC,
+  `scripts/game_listener.py` recording the second PC's Valorant). With push-to-talk
+  held: level kept within 2 dB, a high-pass near 87 Hz (-19..-25 dB at 70 Hz, flat
+  from 120 Hz), the full band up to 10 kHz and a few dB down above, no noise
+  suppression or AGC, the start of sounds kept. The bench's `vivox` profile now uses
+  these numbers. On *Automatic* Valorant sends only speech: test tones, noise, sweeps
+  and speech-shaped noise were never transmitted. Its anti-cheat ignores injected key
+  presses, so the app's *Auto push-to-talk* can't hold the key: hold it yourself.
+- **A bass-heavy song in Valorant**: sent raw it arrived 7 dB quieter, most of that the
+  lost sub-bass (the bottom band 8.5 dB down on the rest). Through the *Game*
+  destination mode the bass harmonics halved that loss (4 dB), but the mode's
+  compressor and limiter sent the song 11 dB quieter to begin with, so it was heard
+  8.5 dB quieter than raw. The Game mode should keep the harmonics and lose the
+  squeeze.

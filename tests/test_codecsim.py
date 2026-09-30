@@ -146,9 +146,22 @@ def test_discord_highpass_matches_the_real_call_measurement():
         assert abs(got - want) < 2.0, (hz, got, want)
 
 
+def test_vivox_highpass_matches_the_real_valorant_measurement():
+    # measured through real Valorant with push-to-talk held (two runs' spread)
+    p = PROFILES["vivox"]
+    assert p.confidence == "measured" and p.gate_db is None and not p.cleanup
+    for hz, lo, hi in ((70, -26, -15), (80, -13, -4), (90, -6, -1), (150, -1.5, 0.5)):
+        x = _tone(hz)
+        y = codecsim.highpass(x, p.highpass_hz, p.highpass_order)
+        cut = RATE // 2
+        got = _rms_db(y[cut:, 0]) - _rms_db(x[cut:, 0])
+        assert lo <= got <= hi, (hz, got)
+
+
 def test_highpass_is_only_on_the_measured_profiles():
-    assert all(PROFILES[k].highpass_hz for k in ("discord", "discord_low", "discord_128"))
-    assert not any(PROFILES[k].highpass_hz for k in ("steam", "vivox", "vivox_siren7"))
+    assert all(PROFILES[k].highpass_hz for k in ("discord", "discord_low", "discord_128",
+                                                 "vivox"))
+    assert not any(PROFILES[k].highpass_hz for k in ("steam", "vivox_siren7"))
 
 
 @needs_ffmpeg
