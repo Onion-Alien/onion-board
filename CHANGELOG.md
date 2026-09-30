@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+## 1.4.2 — 2026-09-30
+
+Better help for game voice chat, from testing what ~20 games' voice chats do to
+your sounds.
+
 - **The project moved to [github.com/Onion-Alien/onion-board](https://github.com/Onion-Alien/onion-board)**
   and its website to [onion-alien.github.io/onion-board](https://onion-alien.github.io/onion-board/).
   The old addresses still lead there. Updates keep working: this version takes an
