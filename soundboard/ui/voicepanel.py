@@ -210,7 +210,27 @@ class VoiceFxPanel(QWidget):
         icons.set_icon(self.btn_power, "mic", checked_color="#ffffff")
         self.btn_power.setChecked(spec["enabled"])
         self.btn_power.toggled.connect(self._on_power)
-        v.addWidget(self.btn_power)
+        # the switch, your mic level and "Hear my voice" side by side: everything you
+        # need to try a voice is up here, next to the voice tiles
+        top = QHBoxLayout()
+        top.setSpacing(8)
+        top.addWidget(self.btn_power, 3)
+        self.btn_hear = QPushButton("Hear my voice")
+        self.btn_hear.setObjectName("miccheck")
+        self.btn_hear.setCheckable(True)
+        self.btn_hear.setMinimumHeight(42)
+        self.btn_hear.setToolTip("Hear my voice (only me): plays your mic, changed, into your "
+                                 "headphones, the same as “Hear what they hear”. Click again "
+                                 "to stop.")
+        icons.set_icon(self.btn_hear, "ear", checked_color="#ffffff")
+        self.btn_hear.toggled.connect(self.hear_toggled)
+        top.addWidget(icon_label("mic", "Your mic level"))
+        self.meter = Meter()
+        self.meter.setMinimumWidth(60)
+        self.meter.setToolTip("Your mic level: it moves when you talk")
+        top.addWidget(self.meter, 1)
+        top.addWidget(self.btn_hear)
+        v.addLayout(top)
 
         # ---- the Discord catch (shown with the changer on, until "Got it")
         # Measured in a real call: with Discord's default Input Profile (Voice
@@ -263,23 +283,6 @@ class VoiceFxPanel(QWidget):
         for c in range(self.COLS):
             grid.setColumnStretch(c, 1)
         v.addLayout(grid)
-
-        # ---- hear it
-        hear = QHBoxLayout()
-        hear.setSpacing(8)
-        self.btn_hear = QPushButton("Hear my voice (only me)")
-        self.btn_hear.setObjectName("miccheck")
-        self.btn_hear.setCheckable(True)
-        self.btn_hear.setToolTip("Plays your mic, changed, into your headphones, the same "
-                                 "as “Hear what they hear” at the bottom. Click again to stop.")
-        icons.set_icon(self.btn_hear, "ear", checked_color="#ffffff")
-        self.btn_hear.toggled.connect(self.hear_toggled)
-        hear.addWidget(self.btn_hear)
-        hear.addWidget(icon_label("mic", "Your mic level"))
-        self.meter = Meter()
-        self.meter.setToolTip("Your mic level: it moves when you talk")
-        hear.addWidget(self.meter, 1)
-        v.addLayout(hear)
 
         # ---- fine-tune (folded away)
         self.btn_more = QPushButton("Fine-tune effects")
@@ -498,6 +501,27 @@ class SpeechPanel(QWidget):
         tb.addStretch(1)
         tv.addLayout(tb)
         lv.addWidget(self.tr_box)
+        v.addWidget(self.live_box)
+
+        # ---- the voice (shared by live and typed speech): set before you press Start
+        grid = QGridLayout()
+        grid.addWidget(QLabel("Voice"), 0, 0)
+        self.cb_voice = QComboBox()
+        self.cb_voice.addItem("Loading voices…", "")
+        self.cb_voice.setEnabled(False)
+        grid.addWidget(self.cb_voice, 0, 1)
+        grid.addWidget(QLabel("Speed"), 1, 0)
+        self.sl_rate = QSlider(Qt.Horizontal)
+        self.sl_rate.setRange(-10, 10)
+        self.sl_rate.setValue(int(self.s["rate"]))
+        grid.addWidget(self.sl_rate, 1, 1)
+        grid.setColumnStretch(1, 1)
+        v.addLayout(grid)
+
+        self.start_box = QWidget()   # Start and its state: shown with live_box
+        lv = QVBoxLayout(self.start_box)
+        lv.setContentsMargins(0, 0, 0, 0)
+        lv.setSpacing(6)
         self.b_live = QPushButton("Start talking as the voice")
         if (pic := art.icon(art.COMPUTER_VOICE)) is not None:
             self.b_live.setIcon(pic)
@@ -513,7 +537,7 @@ class SpeechPanel(QWidget):
         self.lbl_state.setTextFormat(Qt.PlainText)   # shows the module's error text
         self.lbl_state.setObjectName("muted")
         lv.addWidget(self.lbl_state)
-        v.addWidget(self.live_box)
+        v.addWidget(self.start_box)
         # everything the voice was asked to say, live or typed, newest at the bottom
         lrow = QHBoxLayout()
         lrow.addWidget(section_label("WHAT THE VOICE SAID"))
@@ -551,20 +575,6 @@ class SpeechPanel(QWidget):
         self.lbl_install.hide()
         v.addWidget(self.lbl_install)
 
-        # ---- the voice (shared by live and typed speech)
-        grid = QGridLayout()
-        grid.addWidget(QLabel("Voice"), 0, 0)
-        self.cb_voice = QComboBox()
-        self.cb_voice.addItem("Loading voices…", "")
-        self.cb_voice.setEnabled(False)
-        grid.addWidget(self.cb_voice, 0, 1)
-        grid.addWidget(QLabel("Speed"), 1, 0)
-        self.sl_rate = QSlider(Qt.Horizontal)
-        self.sl_rate.setRange(-10, 10)
-        self.sl_rate.setValue(int(self.s["rate"]))
-        grid.addWidget(self.sl_rate, 1, 1)
-        grid.setColumnStretch(1, 1)
-        v.addLayout(grid)
         self.btn_opts = QPushButton("More options")
         self.btn_opts.setObjectName("fold")
         icons.set_icon(self.btn_opts, "fold", "muted", "text", size=12)
@@ -950,6 +960,7 @@ class SpeechPanel(QWidget):
         m = self.module
         ok = m is not None and m.installed
         self.live_box.setVisible(ok)
+        self.start_box.setVisible(ok)
         self.missing.setVisible(not ok)
         self.b_install.setVisible(m is not None and not ok)
         self.b_update.setVisible(m is not None)
@@ -1204,7 +1215,8 @@ class VoicePanel(QWidget):
     def fit_steps(self):
         """What the main window may hide here when it gets small (ui/responsive.py)."""
         from soundboard.ui import responsive as r
-        return [(40, "w", r.hide(*self.speech.say_vol_group)),
+        return [(35, "w", r.icon_only(self.fx.btn_hear)),
+                (40, "w", r.hide(*self.speech.say_vol_group)),
                 (50, "w", r.hide(self.speech.say_stop))]
 
     def stack_steps(self):
