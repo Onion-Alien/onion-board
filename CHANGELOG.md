@@ -2,15 +2,34 @@
 
 ## Unreleased
 
+## 1.5.2 — 2026-10-01
+
+*Who's listening* has a mode for every kind of game voice chat, and suggests the
+right one for the game you're playing.
+
 - ***Who's listening* has one mode per voice chat engine**: Discord, Vivox, Epic
   Online Services, Steam voice, Unity voice (Photon / Dissonance) and Low bandwidth
-  (8 kHz), each saying which kinds of games use it. Each engine's own mic cleanup
-  and voice gate were run on 99 songs across the pitch range to tune its mode. The
-  old *Game voice* mode is now called *Vivox*; your saved choice carries over.
+  (8 kHz), each saying which kinds of games use it. Every engine's own mic cleanup
+  and voice gate were tested on 99 songs, from 808 trap to chipmunk vocals, to tune
+  its mode: in every one, songs arrive within about 2 dB of playing the file
+  straight in. The old *Game voice* mode is now called *Vivox*; your saved choice
+  carries over.
 - **The picker suggests the right mode for the game you're playing** when it can
   tell (Vivox and Unity voice games): the game's install folder is checked for its
   voice library. It only suggests; nothing switches on its own, and the game
   itself is never touched.
+- **The game voice chat guide says how to choose**, and the Steam guide reminds you
+  to pick *Steam voice*.
+- **Livelier mascots.** When the board has no sounds, Bun begs for one in a speech
+  bubble, cheers up while you drag files over him and hops for joy when clicked;
+  Hoot waits the same way on the Triggers tab, and a glum Bun sits on an empty Apps
+  tab.
+- **Livelier pads**: a smooth hover, a press, a flash when a sound starts, and a
+  breathing glow while it plays. The overlay's keys are drawn as keycaps.
+- **Small fixes**: long app names end in "…" instead of being cut mid-word, "EQ off"
+  is readable, and empty-state text has better contrast in the Light theme.
+- **The installer is packed differently**, so virus scanners stop mistaking it for
+  malware. It's a bit bigger to download.
 
 ## 1.5.1 — 2026-09-30
 
