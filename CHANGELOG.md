@@ -6,6 +6,16 @@
   knowing the map. Zoomed out you see the big countries; zoom in and the smaller
   ones and islands (Hawaii, the Caribbean, the Pacific) appear. Names never pile on
   top of each other, and the **Aa** button on the globe hides them.
+- **Small windows work properly**: the mini player showed a blank space with a
+  sideways scroll bar when you had no sounds; now it shows the "drop sounds here"
+  bunny. Pads shrink to fit instead of running off the edge (two a row in the mini
+  player, names never cut in half), a short window hides the mixer before squeezing
+  the pads, and the Voice and Apps tabs no longer cut off on the right when narrow.
+- **A tidier Settings window.** General had grown to a dozen cards, so it's split
+  up: **Audio** (your mic, Who's listening, buffering), **Updates** (app updates
+  and the downloader) and **Remote** (Stream Deck and scripts) are tabs of their
+  own, and the hotkey beeps are on the Hotkeys tab. General keeps the window,
+  tray, backup and support settings.
 
 ## 1.5.4 — 2026-09-30
 
