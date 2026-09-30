@@ -1106,6 +1106,8 @@ class ModulesList(QWidget):
                          "Speak in")
             elif m.kind == "effects":
                 state = "loaded" if m.loaded else "not loaded"
+            elif m.kind == "triggers":
+                state = "on the Triggers tab"
             else:
                 state = "ready"
             e = html.escape   # error text is often "<class ...>"-shaped

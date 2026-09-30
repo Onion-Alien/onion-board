@@ -26,6 +26,7 @@ from soundboard import theme, winkeys, ytdl
 from soundboard.engine import SR, Engine
 from soundboard.engine import is_virtual as is_virtual_cable
 from soundboard import autostart, backup, destination, midi, remote, soundfx, thumbs, updates
+from soundboard import watchaddon
 from soundboard.replay import InstantReplay
 from soundboard.library import (AUDIO_EXTS, PAD_COLORS, RESOURCE_DIR, Config, SoundMeta,
                                 cache_keep, clean_tags, delete_file, duplicate, fingerprint,
@@ -48,7 +49,8 @@ from soundboard.ui.ytsearch import SearchResults
 from soundboard.ui.padbatch import PadSelection
 from soundboard.ui.overlay import Overlay
 from soundboard.ui.appspanel import AppsTab
-from soundboard.ui.triggerspanel import TriggersTab
+from soundboard.ui.triggershost import BoardHost
+from soundboard.ui.triggerstab import TriggersTab
 from soundboard.ui.radiopanel import RadioTab
 from soundboard.ui.voicepanel import VoicePanel
 from soundboard.ui.widgets import (Meter, Pad, PadGrid, SeekSlider, expand_dropped, fmt_pos,
@@ -84,6 +86,7 @@ class Bridge(QObject):
     update = Signal(object, str, bool)         # updates.Release|None, error, asked by the user
     update_progress = Signal(int)              # percent of the new version downloaded
     update_ready = Signal(object, str)         # its installer's Path|None, error
+    watch_update = Signal(object)              # a newer Onion Watch: watchaddon.Offer
     imported = Signal(object, object, str)     # meta|None, data|None, error/filename
     preview = Signal(str, object, float)       # id, audio with unsaved effects|None, gain
 
@@ -123,6 +126,7 @@ class MainWindow(QMainWindow):
         self.bridge.update.connect(self._on_update)
         self.bridge.update_progress.connect(self._on_update_progress)
         self.bridge.update_ready.connect(self._on_update_ready)
+        self.bridge.watch_update.connect(lambda offer: self.triggers.offer_update(offer))
         self._removed: list[tuple[SoundMeta, int, np.ndarray | None]] = []   # undo-able
         self._render_gen: dict[str, int] = {}   # sid -> newest effects render (_rerender)
         self.shuffle = ShuffleBag()       # the random-sound hotkeys
@@ -300,8 +304,8 @@ class MainWindow(QMainWindow):
         self.apps = AppsTab(self.engine, self.cfg, self._save_later, Meter)
         self.apps.clip_ready.connect(self.on_clip)
         self.tabs.addTab(self.apps, "")
-        self.triggers = TriggersTab(self.cfg, self._save_later, self._trigger_sounds, self.play)
-        self.triggers.add_sound.connect(lambda path: self.import_files([path]))
+        # the Onion Watch add-on, or Hoot and its download button until it's installed
+        self.triggers = TriggersTab(BoardHost(self))
         self.tabs.addTab(self.triggers, "")
         self.voice = VoicePanel(self.engine, self.cfg.voice_fx, self.cfg.speech)
         self.voice.fx_changed.connect(lambda spec: self.set_option("voice_fx", spec))
@@ -328,6 +332,8 @@ class MainWindow(QMainWindow):
         self.triggers.active_changed.connect(lambda on: set_tab_live(
             self.tabs, ti, on, "● ON: watching your screen", "triggers"))
         set_tab_live(self.tabs, ti, self.triggers.is_active(), icon="triggers")
+        if self.triggers.needs_nudge():
+            self._nudge_triggers(ti)
         ri = self.tabs.indexOf(self.radio)
         self.radio.active_changed.connect(lambda on: set_tab_live(
             self.tabs, ri, on, self.radio.live_tip(), "radio"))
@@ -1269,6 +1275,7 @@ class MainWindow(QMainWindow):
         icons.retheme()
         self.radio.retheme()
         self.apps.retheme()
+        self.triggers.retheme()
         pp, self._pp_icon = self._pp_icon, None
         self._set_pp_icon(pp or "play")
         self.pill.setText("")   # forces _update_flow to repaint its icon
@@ -1372,14 +1379,29 @@ class MainWindow(QMainWindow):
         self.apps.stop_all()
         self.triggers.cancel_pending()
 
+    def _nudge_triggers(self, index: int):
+        """Triggers were being watched before they moved into the Onion Watch add-on,
+        which isn't installed: tint the tab and say so once, until the tab is opened."""
+        icons.set_tab_icon(self.tabs, index, "triggers", theme.status("warn"))
+        QTimer.singleShot(0, self, lambda: self.status.setText(
+            f"<span style='color:{theme.status('warn')}'>Your screen triggers now come from "
+            "the free Onion Watch add-on: open the Triggers tab to get it.</span>"))
+
+        def seen(i: int):
+            if self.tabs.widget(i) is self.triggers:
+                self.tabs.currentChanged.disconnect(seen)
+                self.triggers.nudged()
+                icons.set_tab_icon(self.tabs, index, "triggers")
+        if self.tabs.currentWidget() is self.triggers:
+            self.triggers.nudged()
+            icons.set_tab_icon(self.tabs, index, "triggers")
+        else:
+            self.tabs.currentChanged.connect(seen)
+
     # ------------------------------------------------------------------ sounds
     def _index(self):
         """Rebuild the id -> meta lookup (call after any change to cfg.sounds)."""
         self._meta = {m.id: m for m in self.cfg.sounds}
-
-    def _trigger_sounds(self) -> list[tuple[str, str, str]]:
-        """The Triggers tab's sound list: (id, name, fingerprint) of every sound."""
-        return [(m.id, m.name, m.fingerprint) for m in self.cfg.sounds]
 
     def meta(self, sid) -> SoundMeta | None:
         if sid == LINK_ID:
@@ -2455,12 +2477,18 @@ class MainWindow(QMainWindow):
         if not force and not self.cfg.update_check:
             return
 
+        due = force or time.time() - self.cfg.update_checked >= updates.EVERY_S
+
         def run():
             try:
                 rel = updates.check(self.cfg, force=force)
                 self.bridge.update.emit(rel, "", force)
             except Exception as e:  # noqa: BLE001 - offline etc.
                 self.bridge.update.emit(None, str(e) or type(e).__name__, force)
+            if due:   # and the Onion Watch add-on, once it's installed (else nothing asked)
+                offer = watchaddon.check_update()
+                if offer is not None:
+                    self.bridge.watch_update.emit(offer)
         threading.Thread(target=run, daemon=True, name="update-check").start()
 
     def _on_update(self, rel, err: str, asked: bool):
