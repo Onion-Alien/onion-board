@@ -54,10 +54,12 @@ WizardSmallImageFile=wizard-small-1x.bmp,wizard-small-2x.bmp
 UninstallDisplayIcon={app}\{#AppExeName}.exe
 OutputDir=..\dist
 OutputBaseFilename=OnionBoardSetup
-Compression=lzma2/ultra64
-SolidCompression=yes
-LZMAUseSeparateProcess=yes
-LZMANumFastBytes=273
+; zip, not solid: don't go back to lzma. Microsoft's machine-learning scanner on
+; VirusTotal calls most solid-lzma installers of a PyInstaller app
+; Trojan:Win32/Wacatac.B!ml whatever is inside them (a false positive, and a dice roll
+; per build); the same files zipped scan clean. It makes the installer bigger.
+Compression=zip
+SolidCompression=no
 ArchitecturesAllowed=x64compatible
 ArchitecturesInstallIn64BitMode=x64compatible
 CloseApplications=yes
