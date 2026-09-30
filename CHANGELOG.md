@@ -12,6 +12,8 @@
 - **✕ on the Apps tab works on any program**: it used to do nothing on a program
   you'd never sent. Now it takes the program off the list (it stays off, even
   while it runs) with an Undo bar, and *Forgotten programs…* brings it back.
+- **Removing a sound asks first** (from a pad's menu, picked pads or the Delete
+  key), and a *Recently deleted (n)* button beside Backup shows what's in the bin.
 - *Remove Onion Watch…* is in Onion Watch's *More* menu instead of a row of its
   own under the Triggers tab.
 
