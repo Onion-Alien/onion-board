@@ -25,31 +25,54 @@ Three kinds:
              `soundboard.speech.translation`), and the live-voice helper loads it.
              `language` is its code (de, es…), `language_name` its name.
 
+  "triggers" The Triggers tab (Onion Watch, soundboard.watchaddon). A Python
+             package (`package`, a folder inside the module's) loaded into the app
+             from the module's folder, and `entry`, a module in it whose
+             `create(host)` makes the tab (see soundboard.ui.triggershost for the
+             host). `api_version` is the version of that host interface it was
+             written for: TRIGGERS_API is what this app can host, and anything else
+             is refused with a message. `imports` lists what it needs from outside
+             the standard library, checked before it's loaded. Like "effects", it
+             may only import what the app ships.
+
 Modules are searched for in %APPDATA%\\OnionBoard\\modules (where users drop
 downloads) and in the `modules` folder next to the app (or the repo root when
 running from source).
 """
 from __future__ import annotations
 
+import importlib
 import importlib.util
 import json
 import logging
+import os
 import re
 import shutil
+import stat
 import subprocess
 import sys
 import threading
+import uuid
+import zipfile
 from collections.abc import Callable
 from dataclasses import dataclass, field
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 
 from soundboard import voicefx
 from soundboard import library
 
 log = logging.getLogger(__name__)
 
-KINDS = ("effects", "service", "translation")
+KINDS = ("effects", "service", "translation", "triggers")
 INSTALL_STEP_TIMEOUT_S = 30 * 60     # one install step (pip) before it's given up on
+TRIGGERS_API = (1, 1)   # the oldest and newest "triggers" api_version this app can host
+MAX_ZIP_FILES = 2000                  # a module zip with more is refused
+MAX_ZIP_UNPACKED = 200 << 20          # ...or that would unpack to more than this
+_NAME = re.compile(r"[A-Za-z_][A-Za-z0-9_]*")
+
+
+class ModuleError(Exception):
+    """A module that can't be installed or loaded: the message is for the user."""
 
 
 def app_root() -> Path:
@@ -78,6 +101,9 @@ class ModuleInfo:
     language_name: str = ""
     download: dict = field(default_factory=dict)
     credits: str = ""
+    api_version: int = 0
+    package: str = ""
+    imports: list[str] = field(default_factory=list)
     error: str = ""
     loaded: bool = False
 
@@ -135,7 +161,11 @@ def _read(folder: Path) -> ModuleInfo | None:
                           language=str(d.get("language", "")),
                           language_name=str(d.get("language_name", "")),
                           download=dict(d.get("download") or {}),
-                          credits=str(d.get("credits", "")))
+                          credits=str(d.get("credits", "")),
+                          package=str(d.get("package", "")),
+                          imports=_strings(d.get("imports", []), "imports"))
+        api = d.get("api_version", 0)
+        info.api_version = api if isinstance(api, int) and not isinstance(api, bool) else 0
     except (OSError, ValueError, KeyError, TypeError) as e:
         log.warning("bad module.json in %s: %s", folder, e)
         return ModuleInfo(id=folder.name, name=folder.name, version="?", description="",
@@ -151,7 +181,25 @@ def _read(folder: Path) -> ModuleInfo | None:
             and str(info.download.get("url", "")).startswith("https://")
             and re.fullmatch(r"[0-9a-f]{64}", str(info.download.get("sha256", "")))):
         info.error = "needs a language code and an https download with its sha256"
+    elif info.kind == "triggers":
+        info.error = _triggers_error(info)
     return info
+
+
+def _triggers_error(info: ModuleInfo) -> str:
+    """Why a "triggers" module can't be loaded ("" if it can be tried)."""
+    pkg, entry = info.package, info.entry
+    if not (_NAME.fullmatch(pkg) and (info.path / pkg / "__init__.py").is_file()):
+        return f"package {pkg!r} not found"
+    if not (entry == pkg or entry.startswith(pkg + ".")) or not all(
+            _NAME.fullmatch(p) for p in entry.split(".")):
+        return f"entry {entry!r} isn't a module of {pkg!r}"
+    low, high = TRIGGERS_API
+    if info.api_version > high:
+        return "it needs a newer Onion Board: update Onion Board first"
+    if info.api_version < low:
+        return "it's too old for this Onion Board: get its update"
+    return ""
 
 
 def discover(dirs: list[Path] | None = None) -> list[ModuleInfo]:
@@ -209,6 +257,128 @@ def load_effects(infos: list[ModuleInfo]) -> None:
         except Exception as e:  # noqa: BLE001
             info.error = f"failed to load: {e}"
             log.exception("module %s failed to load", info.id)
+
+
+def _importable(name: str) -> bool:
+    try:
+        return importlib.util.find_spec(name) is not None
+    except (ImportError, ValueError):
+        return False
+
+
+def _forget(package: str):
+    for name in [n for n in sys.modules if n == package or n.startswith(package + ".")]:
+        del sys.modules[name]
+
+
+def load_package(info: ModuleInfo):
+    """Load a "triggers" module's package from its folder and return its `entry`
+    module (which has create(host)). Loaded once per run: a copy already loaded
+    from the same folder, at the same version, is reused; a different one needs a
+    restart (Python can't swap a package it's running). Raises ModuleError."""
+    if info.kind != "triggers":
+        raise ModuleError(f"{info.name} isn't a Triggers add-on")
+    if info.error:
+        raise ModuleError(info.error)
+    missing = [m for m in info.imports if not _importable(m)]
+    if missing:
+        raise ModuleError(f"it needs {', '.join(missing)}, which this Onion Board doesn't have: "
+                          "update Onion Board")
+    pkg_dir = info.path / info.package
+    have = sys.modules.get(info.package)
+    if have is not None:
+        where = Path(getattr(have, "__file__", "") or ".").resolve().parent
+        if where != pkg_dir.resolve() or getattr(have, "__version__", None) != info.version:
+            raise ModuleError(f"restart Onion Board to use {info.name} {info.version}")
+    else:
+        spec = importlib.util.spec_from_file_location(
+            info.package, pkg_dir / "__init__.py", submodule_search_locations=[str(pkg_dir)])
+        pkg = importlib.util.module_from_spec(spec)
+        sys.modules[info.package] = pkg
+        try:
+            spec.loader.exec_module(pkg)
+        except Exception as e:  # noqa: BLE001 - a bad add-on can't stop the app
+            _forget(info.package)
+            log.exception("module %s failed to load", info.id)
+            raise ModuleError(f"failed to load: {e}") from e
+    try:
+        entry = importlib.import_module(info.entry)
+    except Exception as e:  # noqa: BLE001
+        _forget(info.package)
+        log.exception("module %s failed to load", info.id)
+        raise ModuleError(f"failed to load: {e}") from e
+    if not callable(getattr(entry, "create", None)):
+        raise ModuleError(f"{info.entry} has no create()")
+    info.loaded = True
+    log.info("loaded module %s %s from %s", info.id, info.version, info.path)
+    return entry
+
+
+def _check_zip(z: zipfile.ZipFile, module_id: str) -> None:
+    """Refuse a zip that would write anywhere but one `module_id` folder, holds
+    links, or is far too big once unpacked."""
+    items = z.infolist()
+    if not items or len(items) > MAX_ZIP_FILES:
+        raise ModuleError("it isn't an add-on (empty, or far too many files)")
+    total = 0
+    for i in items:
+        n = i.filename
+        parts = PurePosixPath(n).parts
+        if (not parts or parts[0] != module_id or n.startswith("/") or "\\" in n or ":" in n
+                or ".." in parts):
+            raise ModuleError(f"it holds a file outside its own folder ({n})")
+        if stat.S_ISLNK(i.external_attr >> 16):
+            raise ModuleError(f"it holds a link ({n})")
+        total += i.file_size
+    if total > MAX_ZIP_UNPACKED:
+        raise ModuleError("it would unpack to far more than an add-on")
+
+
+def install_zip(path: Path, module_id: str, kind: str,
+                base: Path | None = None) -> ModuleInfo:
+    """Install a module from a zip holding one `<module_id>/` folder (module.json
+    in it) into `base` (%APPDATA%\\OnionBoard\\modules): unpacked beside it first,
+    checked, then swapped for any copy already there, so a failed install leaves the
+    old one working. Returns the installed module. Raises ModuleError."""
+    base = base if base is not None else library.APP_DIR / "modules"
+    try:
+        z = zipfile.ZipFile(path)
+    except (OSError, zipfile.BadZipFile) as e:
+        raise ModuleError(f"it isn't a zip file that can be opened ({e})") from e
+    staging = base.parent / f"modules-new-{uuid.uuid4().hex[:8]}"
+    try:
+        with z:
+            _check_zip(z, module_id)
+            try:
+                d = json.loads(z.read(f"{module_id}/module.json").decode("utf-8-sig"))
+            except KeyError as e:
+                raise ModuleError("it has no module.json") from e
+            except ValueError as e:
+                raise ModuleError(f"its module.json can't be read ({e})") from e
+            if not isinstance(d, dict) or d.get("id") != module_id or d.get("kind") != kind:
+                raise ModuleError(f"it isn't the {module_id} add-on")
+            staging.mkdir(parents=True)
+            z.extractall(staging)
+        info = _read(staging / module_id)
+        if info is None or info.error:
+            raise ModuleError(info.error if info is not None else "it has no module.json")
+        base.mkdir(parents=True, exist_ok=True)
+        dest, old = base / module_id, staging / f"{module_id}.old"
+        if dest.exists():
+            os.rename(dest, old)
+        try:
+            os.rename(staging / module_id, dest)
+        except OSError:
+            if old.exists() and not dest.exists():
+                os.rename(old, dest)           # put the working copy back
+            raise
+    except OSError as e:
+        raise ModuleError(f"it couldn't be installed ({e})") from e
+    finally:
+        shutil.rmtree(staging, ignore_errors=True)
+    info = _read(dest)
+    log.info("installed module %s %s into %s", module_id, info.version, dest)
+    return info
 
 
 def base_python() -> str | None:
