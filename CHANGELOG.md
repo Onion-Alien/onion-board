@@ -2,11 +2,19 @@
 
 ## Unreleased
 
+## 1.5.4 — 2026-09-30
+
 - **Smoother Radio tab**: the globe is now light by default. It only draws while you
   use it, skips the stars and terrain, pins the 1,000 most-listened stations and
   stops drawing while the app is in the background, so the rest of the app no
   longer stutters. The **HD** button on the globe brings back the full, spinning
   version, and it's remembered.
+- **✕ on the Apps tab works on any program**: it used to do nothing on a program
+  you'd never sent. Now it takes the program off the list (it stays off, even
+  while it runs) with an Undo bar, and *Forgotten programs…* brings it back.
+- *Remove Onion Watch…* is in Onion Watch's *More* menu instead of a row of its
+  own under the Triggers tab.
+
 ## 1.5.3 — 2026-09-30
 
 A mini player for small windows, a Recently deleted bin, and Onion Watch can be
