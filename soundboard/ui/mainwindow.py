@@ -3032,7 +3032,8 @@ class MainWindow(QMainWindow):
         if self._shut_down:
             return
         self._shut_down = True
-        for step in (self._finish_removals, self.timer.stop, self._release_ptt,
+        for step in (self._finish_removals, self.timer.stop, self._voice_timer.stop,
+                     self._release_ptt,
                      self._stop_capture, self.cfg.save, self.overlay.shutdown,
                      self.hotkeys.stop, self.replay.stop, self.remote.stop,
                      self.radio.shutdown, self.apps.shutdown, self.triggers.shutdown,

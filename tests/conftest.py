@@ -143,12 +143,15 @@ class NoMidi:
         pass
 
 
-@pytest.fixture(autouse=True)
-def _never_look_at_the_real_foreground(monkeypatch):
+@pytest.fixture(autouse=True, scope="session")
+def _never_look_at_the_real_foreground():
     """The main window asks which game is in front (soundboard.voicesdk) to suggest a
-    Who's listening mode: in tests nothing is, whatever the developer is playing."""
+    Who's listening mode: in tests nothing is, whatever the developer is playing.
+    For the whole session: test windows outlive their test, timers and all."""
     from soundboard import voicesdk
-    monkeypatch.setattr(voicesdk, "foreground_process", lambda: (0, ""))
+    with pytest.MonkeyPatch.context() as mp:
+        mp.setattr(voicesdk, "foreground_process", lambda: (0, ""))
+        yield
 
 
 @pytest.fixture(autouse=True)

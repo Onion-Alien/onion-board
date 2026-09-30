@@ -106,6 +106,34 @@ def scan(exe: str | Path, max_entries: int = MAX_ENTRIES) -> str | None:
         return None
 
 
+_api = None
+
+
+def _win32():
+    """Private handles on user32 / kernel32 with their own prototypes: setting
+    argtypes on ctypes.windll's shared function objects would change them under
+    every other module that calls the same functions."""
+    global _api
+    if _api is None:
+        import ctypes
+        from ctypes import c_int, c_ulong, c_void_p
+        u = ctypes.WinDLL("user32", use_last_error=True)
+        k = ctypes.WinDLL("kernel32", use_last_error=True)
+        u.GetForegroundWindow.restype = c_void_p
+        u.GetForegroundWindow.argtypes = ()
+        u.GetWindowThreadProcessId.restype = c_ulong
+        u.GetWindowThreadProcessId.argtypes = (c_void_p, ctypes.POINTER(c_ulong))
+        k.OpenProcess.restype = c_void_p
+        k.OpenProcess.argtypes = (c_ulong, c_int, c_ulong)
+        k.QueryFullProcessImageNameW.restype = c_int
+        k.QueryFullProcessImageNameW.argtypes = (c_void_p, c_ulong, ctypes.c_wchar_p,
+                                                 ctypes.POINTER(c_ulong))
+        k.CloseHandle.restype = c_int
+        k.CloseHandle.argtypes = (c_void_p,)
+        _api = u, k
+    return _api
+
+
 def foreground_process() -> tuple[int, str]:
     """(pid, exe path) of the window you're using, or (0, ''). This app's own
     windows count as none."""
@@ -113,14 +141,8 @@ def foreground_process() -> tuple[int, str]:
         return 0, ""
     try:
         import ctypes
-        from ctypes import byref, c_int, c_ulong, c_void_p
-        u, k = ctypes.windll.user32, ctypes.windll.kernel32
-        u.GetForegroundWindow.restype = c_void_p
-        u.GetWindowThreadProcessId.argtypes = (c_void_p, c_void_p)
-        k.OpenProcess.restype = c_void_p
-        k.OpenProcess.argtypes = (c_ulong, c_int, c_ulong)
-        k.QueryFullProcessImageNameW.argtypes = (c_void_p, c_ulong, c_void_p, c_void_p)
-        k.CloseHandle.argtypes = (c_void_p,)
+        from ctypes import byref, c_ulong
+        u, k = _win32()
         hwnd = u.GetForegroundWindow()
         if not hwnd:
             return 0, ""
