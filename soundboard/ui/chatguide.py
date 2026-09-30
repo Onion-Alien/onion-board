@@ -303,9 +303,10 @@ class GameGuide(QDialog):
             "completely.</li>"
             "<li style='margin-bottom:8px'><b>Push to talk</b> instead of open mic or voice "
             "activation, with the same key under <b>Auto push-to-talk</b> here: voice "
-            "activation cuts the quiet parts of sounds.<br><b>Valorant</b>: its anti-cheat "
-            "ignores keys other programs press, so <b>hold your push-to-talk key yourself</b> "
-            "while a sound plays; on <i>Automatic</i> it only sends speech, never music.</li>"
+            "activation cuts the quiet parts of sounds, and some games send only speech "
+            "on it, never music. Some games' anti-cheat ignores keys other programs press: "
+            "if your mic doesn't open for a sound, <b>hold your push-to-talk key "
+            "yourself</b> while it plays.</li>"
             "<li>On the Setup tab, set <b>Who's listening</b> to your game, so your sounds "
             "are shaped for its voice chat.</li></ol>"))
         row = QHBoxLayout()

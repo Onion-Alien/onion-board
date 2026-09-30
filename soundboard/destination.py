@@ -107,9 +107,8 @@ BUILTIN: tuple[Dest, ...] = (
               "Phasmophobia and other Photon Voice games (24 kHz too)."),
     Dest("game", "Game voice (Fortnite, Valorant, Unity / Unreal games)", 0, 0.8, 0.0, True,
          lowcut=80,
-         note="Vivox Opus at 32 kbps mono, measured in a real Valorant party: full band, "
-              "nothing under ~80 Hz. Also suits Overwatch, FiveM, TeamSpeak and console "
-              "party chat."),
+         note="Vivox Opus at 32 kbps mono (measured in a real game): full band, nothing "
+              "under ~80 Hz. Also suits Overwatch, FiveM, TeamSpeak and console party chat."),
     Dest("game_lo", "Game voice, low bandwidth (8 kHz)", 8000, 0.9, 0.0, True, lowcut=80,
          note="Games on Unreal's own voice chat or Vivox's Siren 7: nothing above "
               "8 kHz."),

@@ -5,8 +5,8 @@
 ## 1.5.1 — 2026-09-30
 
 Songs come through game voice chat as loud as they should, bass and all. Tested on
-99 songs, from 808-heavy trap to chipmunk-pitched vocals, through a model of
-Valorant's voice chat measured in a real party.
+99 songs, from 808-heavy trap to chipmunk-pitched vocals, through a model of a game
+voice chat measured in a real game.
 
 - **The *Who's listening* modes no longer turn bass-heavy songs down.** A song was
   levelled with its deepest bass counted, then the voice chat threw that bass away,
@@ -16,10 +16,10 @@ Valorant's voice chat measured in a real party.
   the chat keeps: every kind of song now arrives about as loud as the original,
   with the bass still there and less pumping on the kicks. Custom modes get the
   same choice (*Deep bass* in the mode editor).
-- **Valorant: hold your push-to-talk key.** Valorant ignores keys pressed by other
-  programs, so *Auto push-to-talk* can't hold it for you, and on *Automatic* it only
-  sends speech, never music. The first time Onion Board sees Valorant running it
-  says so in a notification, and the game voice chat guide says it too.
+- **The game voice chat guide explains push-to-talk better.** Some games' anti-cheat
+  ignores keys pressed by other programs, so *Auto push-to-talk* can't open the mic
+  there: hold the key yourself. And on voice activation some games send only
+  speech, never music.
 
 ## 1.5.0 — 2026-09-30
 
