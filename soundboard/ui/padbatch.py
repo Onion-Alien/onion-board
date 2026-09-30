@@ -255,11 +255,11 @@ class PadSelection(QObject):
 
     def delete(self, *_):
         sids = [m.id for m in self.sounds()]
+        if not sids or not self.mw.ask_remove(sids):
+            return
         self.picked.clear()
         self.anchor = None
         self._refresh()
-        if sids:
-            self.mw.remove_sounds(sids)
 
     def _delete_key(self):
         if self.picked:

@@ -575,8 +575,14 @@ class MainWindow(QMainWindow):
         icons.set_icon(mm.addAction("Recently deleted sounds…", self.show_deleted), "trash")
         mm.aboutToShow.connect(lambda: self._act_export_cat.setEnabled(bool(self.cfg.category)))
         more.setMenu(mm)
+        self.btn_bin = QPushButton()
+        self.btn_bin.setToolTip("Sounds you removed: bring them back, exactly as they were")
+        icons.set_icon(self.btn_bin, "trash")
+        self.btn_bin.clicked.connect(self.show_deleted)
         tb.addWidget(add)
         tb.addWidget(more)
+        tb.addWidget(self.btn_bin)
+        self._label_bin()
         tb.addWidget(self.search, 1)
         tb.addWidget(self.btn_yt)
         size = QSlider(Qt.Horizontal)
@@ -2164,7 +2170,7 @@ class MainWindow(QMainWindow):
             self.cfg.save()
             self.pads[sid].update()
         elif act == a_del:
-            self.remove_sound(sid)   # no "are you sure?": it can be undone
+            self.ask_remove([sid])
 
     def set_picture(self, sid: str, path: str):
         """Put a picture on a pad (from the menu, or an image dropped on it)."""
@@ -2177,6 +2183,24 @@ class MainWindow(QMainWindow):
             return
         self._save_now()
         self.pads[sid].update()
+
+    def ask_remove(self, sids: list[str]) -> bool:
+        """Remove from the menu / picked pads: ask first. They go to Recently deleted."""
+        gone = [m for m in (self.meta(s) for s in sids) if m]
+        if not gone:
+            return False
+        what = f"“{gone[0].name}”" if len(gone) == 1 else f"these {len(gone)} sounds"
+        box = QMessageBox(QMessageBox.Question, "Remove sound" if len(gone) == 1
+                          else "Remove sounds",
+                          f"Remove {what}?\n\nRemoved sounds go to Recently deleted, "
+                          f"where you can bring them back for {trash.KEEP_DAYS} days.",
+                          QMessageBox.Yes | QMessageBox.Cancel, self)
+        box.button(QMessageBox.Yes).setText("Remove")
+        box.setDefaultButton(QMessageBox.Cancel)
+        if box.exec() != QMessageBox.Yes:
+            return False
+        self.remove_sounds([m.id for m in gone])
+        return True
 
     def remove_sound(self, sid: str):
         """Take a sound off the board. Its files stay until the Undo bar goes away
@@ -2253,12 +2277,21 @@ class MainWindow(QMainWindow):
         done, self._removed = self._removed, []
         for m, i, _d in done:
             trash.put_sound(m, i)
+        if done:
+            self._label_bin()
+
+    def _label_bin(self):
+        """The "Recently deleted (n)" button: there while the bin has sounds in it."""
+        n = len(trash.items(trash.SOUND))
+        self.btn_bin.setText(f"Recently deleted ({n})")
+        self.btn_bin.setVisible(n > 0)
 
     def show_deleted(self):
         """Backup → Recently deleted sounds…"""
         from soundboard.ui.deleted import DeletedDialog
         self._finish_removals()   # the ones on the Undo bar are listed too
         DeletedDialog(trash.SOUND, "sounds", self._restore_deleted, self).exec()
+        self._label_bin()
 
     def _restore_deleted(self, item: trash.Item) -> bool:
         m = trash.meta_of(item)

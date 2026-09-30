@@ -130,7 +130,9 @@ def test_the_edit_dialog_does_not_nudge_the_volume(window):
 
 # ------------------------------------------------------------------ imports
 
-def test_a_backup_restores_sounds_removed_a_moment_ago(window, tmp_path, qapp):
+def test_a_backup_restores_sounds_removed_a_moment_ago(window, tmp_path, qapp, monkeypatch):
+    from PySide6.QtWidgets import QMessageBox
+    monkeypatch.setattr(QMessageBox, "exec", lambda self: QMessageBox.Yes)   # "Remove?"
     process_events(qapp, lambda: all(m.fingerprint for m in window.cfg.sounds), 5)
     out = tmp_path / "b.zip"
     backup.export(out, list(window.cfg.sounds))

@@ -85,9 +85,15 @@ def test_batch_colour_volume_fades_and_category(window):
     assert not any(m.tags for m in w.cfg.sounds)
 
 
-def test_batch_delete_undoes_in_one_go(window):
+def test_batch_delete_asks_first_then_undoes_in_one_go(window, monkeypatch):
+    from PySide6.QtWidgets import QMessageBox
     w = window
+    monkeypatch.setattr(QMessageBox, "exec", lambda self: QMessageBox.Cancel)
     add_sounds(w, "A", "B")
+    w.selection.picked = {"s1"}
+    w.selection.delete()                           # said no: nothing removed
+    assert len(w.cfg.sounds) == 4 and w.selection.picked == {"s1"}
+    monkeypatch.setattr(QMessageBox, "exec", lambda self: QMessageBox.Yes)
     before = [m.id for m in w.cfg.sounds]
     w.selection.picked = {"s1", "x1"}
     w.selection.delete()
