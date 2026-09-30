@@ -17,7 +17,7 @@ Windows 10 or 11.
 > - **Blue "Windows protected your PC" box**: click **More info → Run anyway**.
 >
 > The source code is all here if you'd rather check it or build it yourself. The latest installer's
-> [VirusTotal scan](https://www.virustotal.com/gui/file/0f3c5ac92678f5a6f5ea3361611bb73c3139ee2a884cf48b55497044852e2236): none of the 67 virus
+> [VirusTotal scan](https://www.virustotal.com/gui/file/546b938f845cd6ad32ee3b3e1e0050aabb04882dc859d144050280085e0b371e): none of the 67 virus
 > scanners that checked it found anything.
 
 <sub>Other downloads: [all versions](../../releases) ·
@@ -38,8 +38,8 @@ Version: **1.4.0**. See [CHANGELOG.md](CHANGELOG.md).
 ![The Apps tab](docs/screenshots/apps.png)
 
 **Triggers**: plays a sound when something shows up in your game, like "YOU DIED", even
-while other windows cover it. It's the free [Onion Watch](https://github.com/Onion-Alien/onion-watch)
-add-on, one click away on the tab.
+while other windows cover it. It's the free [Onion Watch](https://onion-alien.github.io/onion-watch/)
+add-on, one click away on the tab (Onion Watch is also its own app).
 ![The Triggers tab](docs/screenshots/triggers.png)
 
 **Setup**: shows at a glance whether others can hear you, plus devices, *Who's listening*
