@@ -2,6 +2,25 @@
 
 ## Unreleased
 
+## 1.5.1 — 2026-09-30
+
+Songs come through game voice chat as loud as they should, bass and all. Tested on
+99 songs, from 808-heavy trap to chipmunk-pitched vocals, through a model of
+Valorant's voice chat measured in a real party.
+
+- **The *Who's listening* modes no longer turn bass-heavy songs down.** A song was
+  levelled with its deepest bass counted, then the voice chat threw that bass away,
+  so an 808 track reached your friends about 11 dB quieter than playing the file
+  straight into the game. The Game, Discord and Steam modes now remove that bass
+  themselves, give each sound back the level it took, and turn it into harmonics
+  the chat keeps: every kind of song now arrives about as loud as the original,
+  with the bass still there and less pumping on the kicks. Custom modes get the
+  same choice (*Deep bass* in the mode editor).
+- **Valorant: hold your push-to-talk key.** Valorant ignores keys pressed by other
+  programs, so *Auto push-to-talk* can't hold it for you, and on *Automatic* it only
+  sends speech, never music. The first time Onion Board sees Valorant running it
+  says so in a notification, and the game voice chat guide says it too.
+
 ## 1.5.0 — 2026-09-30
 
 The Triggers tab becomes Onion Watch.
