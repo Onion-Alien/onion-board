@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+## 1.5.3 — 2026-09-30
+
+A mini player for small windows, a Recently deleted bin, and Onion Watch can be
+removed.
+
 - **Mini player**: make the window too small to use and it turns into a small
   player — what's playing, play / pause, stop, the seek bar, Live and Stop all —
   with your pads above it when there's room. Drag it bigger and the whole window
@@ -11,6 +16,24 @@
   come back change.
 - The tab bar never shows scroll arrows, and the category bar's arrows match the
   theme instead of looking like stock Windows buttons.
+- **Onion Watch can be removed**: *Remove Onion Watch…* under the Triggers tab
+  uninstalls the add-on after asking. Your triggers and their pictures are kept
+  for when you get it again, and getting it again needs no restart.
+- **Recently deleted**: a removed sound is kept for 30 days (Backup → *Recently
+  deleted sounds…*) with its audio, picture and pad settings, and can be brought
+  back after its Undo bar is gone. Forgetting a program on the Apps tab can be
+  undone too (*Forgotten programs…*), and so can removing a custom mode. Picking a
+  voice preset no longer wipes *My own mix*.
+- **Controls sit next to what they control**: the Voice tab's mic meter and *Hear
+  my voice* share the voice changer's on/off row, the computer voice's Voice and
+  Speed come before its Start button, and Setup → *Test it* has its own *Hear what
+  they hear* button.
+- **The Apps tab's meters move live** instead of jumping every 1.5 seconds.
+- **Themes**: dropdowns and menus are readable on every theme (they drew black on
+  light ones), selected rows and ticked boxes read better, and switching theme
+  recolours everything, the tray icon included.
+- **Quitting always quits**: an invisible copy could be left running, so the next
+  start said Onion Board was already running.
 
 ## 1.5.2 — 2026-09-30
 
