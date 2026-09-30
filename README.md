@@ -228,7 +228,7 @@ too (say No if another program, like Voicemeeter, uses it).
   pad; a ringing one loops in your headphones. Triggers from before the add-on
   (Onion Board 1.4 and older) carry over as they were. When a newer Onion Watch
   is out, the tab offers it (only while *Tell me when a new version is out* is
-  ticked). *Remove Onion Watch…* under the tab uninstalls it (after asking);
+  ticked). *Remove Onion Watch…* in its *More* menu uninstalls it (after asking);
   your triggers are kept for when you get it again.
   Everything happens on your PC: the screen is never saved or sent anywhere. If
   a game still shows up black, set it to Borderless or Windowed fullscreen.

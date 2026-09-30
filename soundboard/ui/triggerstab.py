@@ -14,8 +14,8 @@ side of it:
 An add-on that fails to load shows Hoot again with why, and a button to get it
 afresh: a broken add-on never stops the app.
 
-*Remove Onion Watch…* (under its tab, or beside *Get Onion Watch again* when it's
-broken) uninstalls it after asking, and Hoot is back; the triggers are kept.
+*Remove Onion Watch…* (last in the add-on's More menu, or beside *Get Onion Watch
+again* when it's broken) uninstalls it after asking, and Hoot is back; the triggers are kept.
 """
 from __future__ import annotations
 
@@ -75,7 +75,8 @@ class TriggersTab(QWidget):
         bv.setSpacing(0)
         self._build_update_bar()
         bv.addWidget(self.update_bar)
-        self.foot = QHBoxLayout()           # under the add-on's tab (load() puts it in)
+        self.act_remove = None              # "Remove Onion Watch…" in the add-on's More menu
+        self.foot = QHBoxLayout()           # ...or, if it has none, under its tab
         self.foot.setContentsMargins(0, 6, 0, 0)
         self.foot.addStretch(1)
         self.btn_remove = self._remove_button()
@@ -168,6 +169,15 @@ class TriggersTab(QWidget):
         b.hide()
         return b
 
+    @staticmethod
+    def _more_menu(panel):
+        """The add-on's More menu (its btn_more), if it has one."""
+        btn = getattr(panel, "btn_more", None)
+        try:
+            return btn.menu() if btn is not None else None
+        except (AttributeError, RuntimeError):
+            return None
+
     def _base(self):
         """The modules folder Onion Watch is installed into."""
         return self._dirs[0] if self._dirs else None
@@ -214,12 +224,19 @@ class TriggersTab(QWidget):
         self.panel = panel
         lay = self.board_page.layout()
         lay.addWidget(panel, 1)
-        if self.foot.parent() is None:
-            lay.addLayout(self.foot)
-        else:                               # it's back after a remove: keep the button last
+        if self.foot.parent() is not None:  # from an earlier load: put back only if needed
             lay.removeItem(self.foot)
-            lay.addLayout(self.foot)
-        self.btn_remove.setVisible(watchaddon.removable(self.info, self._base()))
+            self.foot.setParent(None)
+        self.act_remove = None
+        if watchaddon.removable(self.info, self._base()):
+            menu = self._more_menu(panel)
+            if menu is not None:            # last in its More menu, no row of its own
+                menu.addSeparator()
+                self.act_remove = menu.addAction(icons.icon("trash", "danger_text"),
+                                                 "Remove Onion Watch…", self.remove)
+            else:
+                lay.addLayout(self.foot)
+                self.btn_remove.show()
         if hasattr(panel, "active_changed"):
             panel.active_changed.connect(self.active_changed)
         for key, compact in self._compact.items():
@@ -319,6 +336,7 @@ class TriggersTab(QWidget):
             panel.setParent(None)
             panel.deleteLater()
         self.btn_remove.hide()
+        self.act_remove = None              # went with the add-on's menu
         self.update_bar.hide()
         self.offer = None
         if was_active:

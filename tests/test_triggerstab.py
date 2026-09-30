@@ -19,7 +19,7 @@ from test_triggers_module import make_module, zip_of
 
 PANEL = '''
 from PySide6.QtCore import Signal
-from PySide6.QtWidgets import QLabel, QPushButton, QVBoxLayout, QWidget
+from PySide6.QtWidgets import QLabel, QMenu, QPushButton, QVBoxLayout, QWidget
 from . import __version__
 
 
@@ -34,6 +34,12 @@ class Panel(QWidget):
         self.watch = QPushButton("Start watching")
         v.addWidget(self.hint)
         v.addWidget(self.watch)
+        if not host.screen.get("no_more"):
+            self.btn_more = QPushButton("More")
+            menu = QMenu(self.btn_more)
+            menu.addAction("What went off…")
+            self.btn_more.setMenu(menu)
+            v.addWidget(self.btn_more)
 
     def is_active(self):
         return self.active
@@ -190,17 +196,22 @@ def test_remove_asks_first_then_uninstalls_it_and_keeps_the_triggers(qapp, tmp_p
     tab = TriggersTab(host, [tmp_path / "modules"])
     tab.btn_get.click()
     assert process_events(qapp, lambda: tab.panel is not None)
-    assert not tab.btn_remove.isHidden()
+    menu = tab.panel.btn_more.menu()
+    assert menu.actions()[-1] is tab.act_remove and tab.btn_remove.isHidden()
+    assert tab.act_remove.text() == "Remove Onion Watch…"
+    lay = tab.board_page.layout()
+    assert lay.itemAt(lay.count() - 1).widget() is tab.panel     # no row of its own
     panel = tab.panel
     panel.set_active(True)
     live = []
     tab.active_changed.connect(live.append)
     monkeypatch.setattr(tab, "confirm_remove", lambda: False)
-    tab.btn_remove.click()                 # "No": nothing happens
+    tab.act_remove.trigger()               # "No": nothing happens
     assert tab.panel is panel and (tmp_path / "modules" / "onion-watch").is_dir()
     monkeypatch.setattr(tab, "confirm_remove", lambda: True)
-    tab.btn_remove.click()
-    assert tab.panel is None and tab.stack.currentWidget() is tab.get_page
+    tab.act_remove.trigger()
+    assert tab.panel is None and tab.act_remove is None
+    assert tab.stack.currentWidget() is tab.get_page
     assert panel.calls == ["shutdown"] and live == [False]
     assert not (tmp_path / "modules" / "onion-watch").exists()
     assert watchaddon.installed([tmp_path / "modules"]) is None
@@ -209,9 +220,20 @@ def test_remove_asks_first_then_uninstalls_it_and_keeps_the_triggers(qapp, tmp_p
     # ...and getting it again in the same run loads it afresh
     tab.btn_get.click()
     assert process_events(qapp, lambda: tab.panel is not None)
-    assert tab.panel is not panel and not tab.btn_remove.isHidden()
+    assert tab.panel is not panel
+    assert tab.panel.btn_more.menu().actions()[-1] is tab.act_remove
+
+
+def test_an_add_on_without_a_more_menu_gets_a_remove_button_under_it(qapp, tmp_path,
+                                                                     addon_zip, monkeypatch):
+    watchaddon.install(addon_zip(), tmp_path / "modules")
+    tab = TriggersTab(FakeHost({"no_more": True}), [tmp_path / "modules"])
+    assert tab.act_remove is None and not tab.btn_remove.isHidden()
     lay = tab.board_page.layout()
-    assert lay.itemAt(lay.count() - 1).layout() is tab.foot    # the button stays under it
+    assert lay.itemAt(lay.count() - 1).layout() is tab.foot
+    monkeypatch.setattr(tab, "confirm_remove", lambda: True)
+    tab.btn_remove.click()
+    assert tab.panel is None and watchaddon.installed([tmp_path / "modules"]) is None
 
 
 def test_a_broken_one_can_be_removed_from_hoots_page(qapp, tmp_path, addon_zip, monkeypatch):
@@ -228,7 +250,8 @@ def test_a_broken_one_can_be_removed_from_hoots_page(qapp, tmp_path, addon_zip, 
 def test_one_shipped_with_the_app_cannot_be_removed(qapp, tmp_path, addon_zip):
     watchaddon.install(addon_zip(), tmp_path / "shipped")
     tab = TriggersTab(FakeHost(), [tmp_path / "modules", tmp_path / "shipped"])
-    assert tab.panel is not None and tab.btn_remove.isHidden()
+    assert tab.panel is not None and tab.btn_remove.isHidden() and tab.act_remove is None
+    assert [a.text() for a in tab.panel.btn_more.menu().actions()] == ["What went off…"]
 
 
 # ---------------------------------------------------------------- the board as host
