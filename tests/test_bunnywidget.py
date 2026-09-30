@@ -87,3 +87,24 @@ def test_sad_bun_droops_and_cheers_up_while_hoping(qapp):
     b.hope(False)
     _run(qapp, b, 120)
     assert b.pose()["sad"] > 0.8                     # back to waiting
+
+
+def test_sad_bun_begs_in_a_bubble_and_cheers_when_clicked(qapp):
+    b = BunnyWidget(sad=0.9, lines=("add a sound?",), hope_lines=("for me?",),
+                    joy_lines=("yay",))
+    b.resize(b.sizeHint())
+    assert b.sizeHint().width() > BunnyWidget(sad=0.9).sizeHint().width()   # bubble room
+    b._next_beg = 0
+    _run(qapp, b, 3)
+    assert b.say == "add a sound?"
+    assert not b.grab().isNull()
+    b.hope(True)
+    assert b.say == "for me?"
+    b.hope(False)
+    assert b.say == ""
+    hits = []
+    b.clicked.connect(lambda: hits.append(1))
+    b.cheer()
+    assert b.say == "yay"
+    _run(qapp, b, 15)
+    assert b.pose()["sad"] < 0.3             # happy while cheering

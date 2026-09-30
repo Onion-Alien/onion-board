@@ -6,8 +6,11 @@ voice, he bounces, and music notes float up out of him. `burst()` throws a handf
 of notes (the test sound); `celebrate=True` makes him hop with twinkling sparkles.
 
 `sad` (0..1) is Bun waiting for something: ears drooping, worried brows, wet eyes,
-a big sigh now and then. `hope(True)` (say, while files are dragged over him) cheers
-him up and he bounces; `hope(False)` and he's back to waiting.
+a big sigh now and then. Give him `lines` and every so often he begs for it in a
+speech bubble with a hopeful little hop (the widget gets room beside him for it).
+`hope(True)` (say, while files are dragged over him) cheers him up and he bounces,
+saying one of `hope_lines`; `hope(False)` and he's back to waiting. A click makes
+him hop for joy (`joy_lines`) and emits `clicked`.
 
 `build()` is for the cable install: he dashes off, a cartoon dust cloud rattles where
 he went, and he comes back with a hammer and a plank and hammers away until
@@ -23,8 +26,8 @@ import math
 import random
 import time
 
-from PySide6.QtCore import QRectF, QSize, Qt, QTimer
-from PySide6.QtGui import QColor, QPainter, QPen
+from PySide6.QtCore import QPointF, QRectF, QSize, Qt, QTimer, Signal
+from PySide6.QtGui import QColor, QFont, QPainter, QPainterPath, QPen
 from PySide6.QtWidgets import QSizePolicy, QWidget
 
 from soundboard.bunny import H, INK, W, WOOD, draw_bunny, music_note, sparkle
@@ -38,6 +41,8 @@ DASH_END, CLOUD_END, BACK_END = 0.45, 1.6, 2.1
 SWING = 0.55     # one hammer blow, seconds
 TALK = 0.05        # mic level that counts as talking (same as the wizard's "Hearing you")
 FPS = 30
+BUBBLE = QColor("#fffaf0")
+BEG = 2.8          # how long a begging line stays up, seconds
 
 
 class _Note:
@@ -63,9 +68,22 @@ class _Puff:
 
 
 class BunnyWidget(QWidget):
+    clicked = Signal()
+
     def __init__(self, prop: str | None = None, height: int = 110, pad: int = 26,
-                 celebrate: bool = False, parent=None, *, sad: float = 0.0):
+                 celebrate: bool = False, parent=None, *, sad: float = 0.0,
+                 lines=(), hope_lines=(), joy_lines=()):
         super().__init__(parent)
+        self.lines, self.hope_lines, self.joy_lines = (tuple(lines), tuple(hope_lines),
+                                                       tuple(joy_lines))
+        # room either side for the speech bubble (both, so he stays centred)
+        self.side = round(height * 1.3) if (lines or hope_lines or joy_lines) else 0
+        self.say = ""
+        self._say_until = 0.0
+        self._beg_at = -1.0
+        self._joy_at = -1.0
+        if joy_lines:
+            self.setCursor(Qt.PointingHandCursor)
         self.sad = sad             # his mood at rest
         self._sad = sad            # ... and right now (smoothed)
         self._hopeful = False
@@ -74,7 +92,8 @@ class BunnyWidget(QWidget):
         self.bun_h = height
         self.pad = pad
         self.celebrate = celebrate
-        self.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+        self.setSizePolicy(QSizePolicy.Maximum if self.side else QSizePolicy.Fixed,
+                           QSizePolicy.Fixed)
         self._rng = random.Random()
         self._t0 = time.monotonic()
         self._last = self._t0
@@ -86,6 +105,7 @@ class BunnyWidget(QWidget):
         self._next_flick = self._t0 + self._rng.uniform(3, 7)
         self._flick_at = -1.0
         self._next_sigh = self._t0 + self._rng.uniform(2.5, 5)
+        self._next_beg = self._t0 + self._rng.uniform(1.5, 3)
         self._note_debt = 0.0
         self.notes: list[_Note] = []
         self.puffs: list[_Puff] = []
@@ -97,9 +117,12 @@ class BunnyWidget(QWidget):
         self._timer.timeout.connect(self._step)
 
     def sizeHint(self) -> QSize:
-        return QSize(round(self.bun_h * W / H) + 2 * self.pad + 20, self.bun_h + 2 * self.pad)
+        return QSize(round(self.bun_h * W / H) + 2 * self.pad + 20 + 2 * self.side,
+                     self.bun_h + 2 * self.pad)
 
-    minimumSizeHint = sizeHint
+    def minimumSizeHint(self) -> QSize:
+        """The bubble's room gives way when space is short (it then overlaps him)."""
+        return QSize(round(self.bun_h * W / H) + 2 * self.pad + 20, self.bun_h + 2 * self.pad)
 
     # ------------------------------------------------------------------ inputs
     def set_level(self, level: float):
@@ -115,7 +138,27 @@ class BunnyWidget(QWidget):
         """Cheer him up (True) or let him go back to his mood at rest (False)."""
         if on and not self._hopeful:
             self.burst(5)
+            self._say(self.hope_lines, 60.0)
+        elif not on and self._hopeful:
+            self.say = ""
         self._hopeful = on
+
+    def cheer(self):
+        """A happy hop, notes and a joyful line (what a click does)."""
+        self._joy_at = time.monotonic()
+        self.burst(6)
+        self._say(self.joy_lines, 1.6)
+
+    def mousePressEvent(self, ev):
+        if ev.button() == Qt.LeftButton and self.joy_lines:
+            self.cheer()
+            self.clicked.emit()
+        super().mousePressEvent(ev)
+
+    def _say(self, lines, secs: float):
+        if lines:
+            self.say = self._rng.choice(lines)
+            self._say_until = time.monotonic() + secs
 
     @property
     def building(self) -> bool:
@@ -253,11 +296,19 @@ class BunnyWidget(QWidget):
         if now >= self._next_flick:
             self._flick_at = now
             self._next_flick = now + self._rng.uniform(4, 9)
-        target = 0.0 if self._hopeful else self.sad
+        cheering = self._joy_at >= 0 and now - self._joy_at < 1.4
+        target = 0.0 if self._hopeful or cheering else self.sad
         self._sad += (target - self._sad) * min(1.0, dt * (8 if target < self._sad else 1.5))
         if self._sad > 0.3 and now >= self._next_sigh:
             self._sigh_at = now
             self._next_sigh = now + self._rng.uniform(5, 9)
+        if self.say and now >= self._say_until:
+            self.say = ""
+        if (self.lines and self._sad > 0.3 and not self.say and now >= self._next_beg
+                and not (0 <= now - self._sigh_at < 1.6)):
+            self._beg_at = now
+            self._say(self.lines, BEG)
+            self._next_beg = now + BEG + self._rng.uniform(3, 6)
         self.update()
 
     def pose(self, now: float | None = None) -> dict:
@@ -278,6 +329,13 @@ class BunnyWidget(QWidget):
             dy += 4 * b
             ears += 14 * b
             blink = max(blink, 0.5 * b)
+        if self._beg_at >= 0 and (g := now - self._beg_at) < BEG:
+            b = math.sin(math.pi * g / BEG)   # perks up and bounces, hoping
+            ears -= 22 * b * self._sad
+            dy -= 4 * b * abs(math.sin(g * 9))
+        if self._joy_at >= 0 and (j := now - self._joy_at) < 1.2:
+            dy -= 12 * abs(math.sin(j * math.pi * 2.5)) * (1 - j / 1.2)
+            ears -= 30 * self._sad
         if self._hopeful:
             dy -= 6 * abs(math.sin(t * 5))
         if self.celebrate:
@@ -333,6 +391,8 @@ class BunnyWidget(QWidget):
                        swing=pose["swing"], sad=pose["sad"])
         else:
             self._paint_scuffle(p)
+        if self.say and pose["shown"]:
+            self._bubble(p, self.say, r.translated(pose["dx"], pose["dy"]))
         for n in self.notes:
             k = n.age / n.life
             alpha = min(1.0, n.age * 6) * (1 - k) ** 1.4
@@ -343,6 +403,32 @@ class BunnyWidget(QWidget):
             music_note(p, -5, -8, n.size, n.col)
             p.restore()
         p.end()
+
+    def _bubble(self, p: QPainter, text: str, body: QRectF):
+        """A comic speech bubble up and to the right of his head (Hoot's style)."""
+        f = QFont(self.font())
+        f.setPixelSize(max(9, round(self.bun_h * 0.13)))
+        f.setBold(True)
+        p.setFont(f)
+        fm = p.fontMetrics()
+        tw = min(fm.horizontalAdvance(text), self.width() - 20)
+        pad = 7
+        bw, bh = tw + 2 * pad, fm.height() + 2 * pad - 4
+        x = max(2.0, min(body.right() - body.width() * 0.05, self.width() - bw - 2))
+        y = max(2.0, body.top() + body.height() * 0.05 - bh)
+        box = QRectF(x, y, bw, bh)
+        tail = QPainterPath(QPointF(box.left() + 10, box.bottom() - 2))
+        tail.lineTo(body.center().x() + body.width() * 0.3, body.top() + body.height() * 0.38)
+        tail.lineTo(box.left() + 22, box.bottom() - 2)
+        shape = QPainterPath()
+        shape.addRoundedRect(box, bh / 2, bh / 2)
+        shape = shape.united(tail)
+        p.setPen(QPen(INK, 1.6))
+        p.setBrush(BUBBLE)
+        p.drawPath(shape)
+        p.setPen(INK)
+        p.drawText(box.adjusted(pad, 0, -pad, 0), Qt.AlignCenter,
+                   fm.elidedText(text, Qt.ElideRight, round(tw)))
 
     def _paint_puffs(self, p: QPainter):
         p.setPen(Qt.NoPen)

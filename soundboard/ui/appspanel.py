@@ -277,7 +277,9 @@ class AppsTab(QWidget):
         ev = QVBoxLayout(self.empty)
         ev.setContentsMargins(0, 12, 0, 0)
         ev.setSpacing(4)
-        self.bun = BunnyWidget(height=72, pad=18, sad=0.6)
+        self.bun = BunnyWidget(height=72, pad=18, sad=0.6,
+                               lines=("play something?", "so quiet…", "music, please?"),
+                               joy_lines=("hehe!", "yay!"))
         ev.addWidget(self.bun, 0, Qt.AlignHCenter)
         self.empty_text = hint_label("Nothing is playing sound right now. Start some music, "
                                      "a video or a call and it'll show up here.")

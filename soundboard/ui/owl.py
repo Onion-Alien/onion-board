@@ -243,7 +243,9 @@ class OwlWidget(QWidget):
         self.left = side if left is None else left
         self.right = side if right is None else right
         self.top = round(height * 0.34)    # room above for "?" and z's
-        self.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+        # the room beside him gives way first when space is short (the bubble then
+        # overlaps him a little)
+        self.setSizePolicy(QSizePolicy.Maximum, QSizePolicy.Fixed)
         self.setCursor(Qt.PointingHandCursor)
         self.setToolTip("Hoot is waiting for something to watch")
         self._rng = random.Random()
@@ -268,7 +270,8 @@ class OwlWidget(QWidget):
         return QSize(round(self.owl_h * W / H) + self.left + self.right,
                      self.owl_h + self.top + 8)
 
-    minimumSizeHint = sizeHint
+    def minimumSizeHint(self) -> QSize:
+        return QSize(round(self.owl_h * W / H) + 8, self.owl_h + self.top + 8)
 
     def showEvent(self, ev):
         self._last = time.monotonic()
@@ -294,7 +297,8 @@ class OwlWidget(QWidget):
     # ------------------------------------------------------------------ time
     def _owl_rect(self) -> QRectF:
         w = self.owl_h * W / H
-        x = self.left + (self.width() - self.left - self.right - w) / 2
+        spare, room = self.width() - w, self.left + self.right   # shared as asked
+        x = spare * self.left / room if room else spare / 2
         return QRectF(x, self.height() - self.owl_h - 4, w, self.owl_h)
 
     def _tick(self):

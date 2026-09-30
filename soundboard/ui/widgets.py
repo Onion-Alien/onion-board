@@ -523,7 +523,12 @@ class PadGrid(QWidget):
         ev = QVBoxLayout(self.empty)
         ev.setContentsMargins(0, 24, 0, 0)
         ev.setSpacing(0)
-        self.bun = BunnyWidget(height=96, pad=16, sad=0.9)
+        self.bun = BunnyWidget(
+            height=96, pad=16, sad=0.9,
+            lines=("add a sound?", "pleeease?", "it's so quiet…", "drop one on me!",
+                   "just one sound?", "I'm bored…"),
+            hope_lines=("yes! drop it!", "ooh, for me?!"),
+            joy_lines=("yay!!", "↑ Add sounds!", "hehe!"))
         self.bun.setToolTip("Bun is waiting for some sounds")
         ev.addWidget(self.bun, 0, Qt.AlignHCenter)
         self.empty_text = QLabel("Drop sound files here\nor click  ＋ Add sounds\n\n"
