@@ -6,6 +6,9 @@ updates:
     directory: /
     schedule:
       interval: weekly
+    # Pins (==) still get bumped; ranges like setuptools>=77 are left alone
+    # while the newest release already satisfies them.
+    versioning-strategy: increase-if-necessary
   - package-ecosystem: pip
     directory: /modules/live-voice
     schedule:
