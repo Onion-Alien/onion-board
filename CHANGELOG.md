@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- **Country and island names on the Radio globe**, so you can find places without
+  knowing the map. Zoomed out you see the big countries; zoom in and the smaller
+  ones and islands (Hawaii, the Caribbean, the Pacific) appear. Names never pile on
+  top of each other, and the **Aa** button on the globe hides them.
+
 ## 1.5.4 — 2026-09-30
 
 - **Smoother Radio tab**: the globe is now light by default. It only draws while you

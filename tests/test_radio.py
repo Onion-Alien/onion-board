@@ -82,6 +82,19 @@ def test_globe_page_is_light_unless_hd():
     assert "pauseAnimation" in light and "bridge.setHd" in light and "setActive" in light
 
 
+def test_globe_page_names_countries_and_islands():
+    page = radio.globe_html("", "#000000", "#111111", "#222222", "#333333")
+    # the outlines are pinned like the globe itself, and names are text, never HTML
+    assert f'fetch("{radio.COUNTRIES}", {{integrity: "{radio.COUNTRIES_SRI}"}})' in page
+    assert "el.textContent = d.n" in page and 'id="names"' in page
+    assert '"Tasmania"' in page and '"United States"' in page
+    names = [p[0] for p in radio.PLACES]
+    assert len(names) == len(set(names))
+    for name, lat, lon, width in radio.PLACES:
+        assert -90 <= lat <= 90 and -180 <= lon <= 180 and 0 < width < 10, name
+        assert name.isascii() and "<" not in name, name
+
+
 def test_bad_coordinates_and_numbers_are_cleaned():
     s = Station.from_api(api_station(1, geo_lat=0, geo_long=0, bitrate="x", countrycode="J1"))
     assert s.lat is None and s.lon is None and s.bitrate == 0 and s.cc == ""

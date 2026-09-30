@@ -61,6 +61,45 @@ EARTH_DAY = _IMG + "earth-blue-marble.jpg"     # NASA Blue Marble (public domain
 EARTH_NIGHT = _IMG + "earth-night.jpg"         # NASA Black Marble: city lights
 EARTH_BUMP = _IMG + "earth-topology.png"
 SKY = _IMG + "night-sky.png"
+# Natural Earth country outlines (public domain), where the globe's country names go
+COUNTRIES = ("https://cdn.jsdelivr.net/npm/globe.gl@2.46.2/example/datasets/"
+             "ne_110m_admin_0_countries.geojson")
+COUNTRIES_SRI = "sha384-hAVr+/g2HDlVDeHrAVqTIQV3tH1JE5AbtuvCSCcoeG+ZDteCU2XGaE5yLDiLP9m5"
+# The outlines are coarse and leave out small countries and islands. These are named
+# too: (name, lat, lon, width in degrees, which decides how far in you zoom to see it).
+PLACES = (
+    ("Hawaii", 20.5, -157.0, 5), ("Tasmania", -42.0, 146.6, 4), ("Svalbard", 78.5, 17.0, 4),
+    ("Sicily", 37.6, 14.1, 2.5), ("Sardinia", 40.1, 9.0, 1.5), ("Corsica", 42.15, 9.1, 1),
+    ("Crete", 35.25, 24.9, 2), ("Mallorca", 39.6, 2.95, 1), ("Faroe Islands", 62.0, -6.9, 1),
+    ("Canary Islands", 28.3, -15.9, 3), ("Azores", 38.5, -28.2, 3), ("Madeira", 32.75, -17.0, 1),
+    ("Cape Verde", 15.1, -23.6, 2), ("Sao Tome and Principe", 0.25, 6.6, 1),
+    ("Galapagos", -0.7, -90.5, 2), ("Bermuda", 32.3, -64.75, 1), ("Singapore", 1.35, 103.82, 1),
+    ("Hong Kong", 22.32, 114.17, 1), ("Bali", -8.4, 115.2, 1.5), ("Malta", 35.9, 14.45, 1),
+    ("Bahrain", 26.05, 50.55, 1), ("Maldives", 3.2, 73.2, 2), ("Mauritius", -20.25, 57.55, 1),
+    ("Reunion", -21.1, 55.5, 1), ("Seychelles", -4.6, 55.45, 1), ("Comoros", -11.9, 43.9, 1),
+    ("Zanzibar", -6.1, 39.3, 0.8), ("Barbados", 13.17, -59.55, 0.6),
+    ("Saint Lucia", 13.9, -60.97, 0.5), ("Grenada", 12.11, -61.68, 0.5),
+    ("Saint Vincent", 13.25, -61.2, 0.5), ("Dominica", 15.42, -61.35, 0.5),
+    ("Antigua", 17.07, -61.8, 0.5), ("Saint Kitts", 17.3, -62.73, 0.5),
+    ("Guadeloupe", 16.2, -61.55, 0.6), ("Martinique", 14.64, -61.02, 0.5),
+    ("Aruba", 12.52, -69.97, 0.5), ("Curacao", 12.17, -68.99, 0.5), ("Samoa", -13.75, -172.1, 1.5),
+    ("American Samoa", -14.3, -170.7, 0.6), ("Tonga", -21.18, -175.2, 1.5),
+    ("Tahiti", -17.65, -149.43, 1), ("Cook Islands", -21.23, -159.78, 0.8),
+    ("Guam", 13.44, 144.79, 0.8), ("Northern Mariana Islands", 15.2, 145.75, 0.6),
+    ("Palau", 7.5, 134.6, 1), ("Micronesia", 6.9, 158.2, 1.5),
+    ("Marshall Islands", 7.1, 171.2, 1.5),
+    ("Nauru", -0.53, 166.93, 0.5), ("Kiribati", 1.42, 172.98, 1), ("Tuvalu", -8.52, 179.2, 0.8),
+)
+# how the outlines' short names read on the globe; None leaves one unnamed
+COUNTRY_NAMES = {
+    "United States of America": "United States", "Dem. Rep. Congo": "DR Congo",
+    "Central African Rep.": "Central African Republic", "Bosnia and Herz.": "Bosnia",
+    "Dominican Rep.": "Dominican Republic", "Eq. Guinea": "Equatorial Guinea",
+    "S. Sudan": "South Sudan", "W. Sahara": "Western Sahara", "Falkland Is.": "Falkland Islands",
+    "Solomon Is.": "Solomon Islands", "Macedonia": "North Macedonia", "Swaziland": "Eswatini",
+    "Côte d'Ivoire": "Ivory Coast", "Fr. S. Antarctic Lands": None, "N. Cyprus": None,
+    "Somaliland": None,
+}
 
 
 def radio_dir():
@@ -597,12 +636,17 @@ html,body{{margin:0;height:100%;overflow:hidden;background:{bg};color:{text};
 #zoom button{{width:30px;height:30px;border-radius:8px;border:1px solid rgba(255,255,255,.18);
   background:rgba(12,14,22,.75);color:#fff;font:600 17px 'Segoe UI',sans-serif;cursor:pointer}}
 #zoom button:hover{{border-color:var(--accent)}}
-#zoom #hd{{font-size:10px;opacity:.6}} #zoom #hd.on{{opacity:1;border-color:var(--accent)}}
+#zoom #hd,#zoom #names{{font-size:10px;opacity:.6}}
+#zoom #hd.on,#zoom #names.on{{opacity:1;border-color:var(--accent)}}
+.place{{font:600 11px 'Segoe UI',sans-serif;color:#fff;white-space:nowrap;pointer-events:none;
+  text-shadow:0 0 3px #000,0 0 2px #000,0 1px 2px #000;opacity:.9;letter-spacing:.2px}}
+.place.big{{font-size:13px}} .place.isle{{font-weight:400;font-style:italic;opacity:.8}}
 #hint{{position:absolute;left:10px;bottom:10px;font-size:11px;opacity:.55;pointer-events:none}}
 </style></head><body><div id="g"></div><div id="msg">Loading the globe…</div>
 <div id="zoom"><button id="zin" title="Zoom in (Ctrl +)">+</button>
 <button id="zout" title="Zoom out (Ctrl −)">−</button>
 <button id="look" title="Day / night Earth">☾</button>
+<button id="names" title="Country and island names on / off">Aa</button>
 <button id="hd" title="">HD</button></div>
 <div id="hint">Drag to spin · scroll or Ctrl +/− to zoom · click a dot to play</div>
 <script>{qwebchannel_js}</script>
@@ -613,7 +657,7 @@ let ACCENT = "{accent}", HOT = "{hot}";
 const ring = () => t => HOT + Math.round(255 * (1 - t)).toString(16).padStart(2, "0");
 let W = null, bridge = null, stations = [], current = null, maxK = 1;
 let night = false, HD = {'true' if hd else 'false'};
-let asleep = false, idleT = 0, appActive = true;
+let asleep = false, idleT = 0, appActive = true, fitting = false;
 try {{ night = localStorage.getItem("earth") === "night"; }} catch (e) {{}}
 const msg = t => {{ const m = document.getElementById("msg"); m.textContent = t || "";
                    m.style.display = t ? "flex" : "none"; }};
@@ -622,10 +666,17 @@ const msg = t => {{ const m = document.getElementById("msg"); m.textContent = t 
 function wake(ms) {{
   if (!W) return;
   if (asleep) {{ W.resumeAnimation(); asleep = false; }}
+  if (!fitting) {{ fitting = true; requestAnimationFrame(fitLoop); }}
   clearTimeout(idleT);
   if (!(HD && appActive && W.controls().autoRotate))
     idleT = setTimeout(() => {{ if (W) {{ W.pauseAnimation(); asleep = true; }} }},
                        appActive ? (ms || 1500) : 0);
+}}
+function fitLoop() {{
+  // the names are re-placed on every frame the globe draws (so, not while it sleeps)
+  if (asleep || !W) {{ fitting = false; return; }}
+  fitNames();
+  requestAnimationFrame(fitLoop);
 }}
 for (const ev of ["pointerdown", "pointermove", "wheel", "keydown"])
   addEventListener(ev, () => wake(), {{passive: true, capture: true}});
@@ -724,6 +775,122 @@ function setActive(on) {{
   appActive = !!on;
   wake();
 }}
+
+// Country and island names. They're HTML on top of the globe, so they stay the same
+// readable size at any zoom; a name only shows once its country is wider on screen
+// than the name, so zoomed out you see the big countries and zooming in adds the rest.
+let places = [], showNames = true;
+try {{ showNames = localStorage.getItem("names") !== "off"; }} catch (e) {{}}
+const namesBtn = document.getElementById("names");
+function labelPoint(ring) {{
+  // the point deepest inside the outline (a centre can fall outside: Vietnam, Croatia)
+  let x0 = 180, x1 = -180, y0 = 90, y1 = -90;
+  for (const [x, y] of ring) {{ x0 = Math.min(x0, x); x1 = Math.max(x1, x); y0 = Math.min(y0, y);
+                               y1 = Math.max(y1, y); }}
+  const k = Math.cos((y0 + y1) / 2 * Math.PI / 180);   // a degree of longitude is shorter
+  const inside = (x, y) => {{
+    let n = false;
+    for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {{
+      const [xi, yi] = ring[i], [xj, yj] = ring[j];
+      if ((yi > y) !== (yj > y) && x < (xj - xi) * (y - yi) / (yj - yi) + xi) n = !n;
+    }}
+    return n;
+  }};
+  const depth = (x, y) => {{
+    let best = Infinity;
+    for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {{
+      const ax = ring[j][0] * k, ay = ring[j][1], bx = ring[i][0] * k, by = ring[i][1];
+      const dx = bx - ax, dy = by - ay, px = x * k - ax, py = y - ay;
+      const t = Math.max(0, Math.min(1, (px * dx + py * dy) / (dx * dx + dy * dy || 1)));
+      best = Math.min(best, Math.hypot(px - t * dx, py - t * dy));
+    }}
+    return best;
+  }};
+  let bx = (x0 + x1) / 2, by = (y0 + y1) / 2, bd = -1;
+  let sx = (x1 - x0) / 24, sy = (y1 - y0) / 24, cx = bx, cy = by;
+  for (let pass = 0; pass < 2; pass++) {{   // a coarse grid, then a finer one around the best
+    for (let i = -12; i <= 12; i++) for (let j = -12; j <= 12; j++) {{
+      const x = cx + i * sx, y = cy + j * sy;
+      if (!inside(x, y)) continue;
+      const d = depth(x, y);
+      if (d > bd) {{ bd = d; bx = x; by = y; }}
+    }}
+    cx = bx; cy = by; sx /= 10; sy /= 10;
+  }}
+  return {{la: by, lo: bx, w: (x1 - x0) * k}};
+}}
+const area = ring => {{
+  let a = 0;
+  for (let i = 0, j = ring.length - 1; i < ring.length; j = i++)
+    a += (ring[j][0] - ring[i][0]) * (ring[j][1] + ring[i][1]);
+  return Math.abs(a / 2) * Math.cos(ring[0][1] * Math.PI / 180);
+}};
+const RENAME = {json.dumps(COUNTRY_NAMES)};
+function loadPlaces() {{
+  const extra = {json.dumps([{"n": n, "la": la, "lo": lo, "w": w, "isle": 1}
+                             for n, la, lo, w in PLACES])};
+  fetch("{COUNTRIES}", {{integrity: "{COUNTRIES_SRI}"}}).then(r => r.json()).then(geo => {{
+    const list = [];
+    for (const f of geo.features) {{
+      const p = f.properties, g = f.geometry;
+      let n = RENAME.hasOwnProperty(p.NAME) ? RENAME[p.NAME] : p.NAME;
+      if (!n || !g) continue;
+      const polys = g.type === "Polygon" ? [g.coordinates] : g.coordinates;
+      const main = polys.map(q => q[0]).reduce((a, b) => area(b) > area(a) ? b : a);
+      list.push(Object.assign({{n}}, labelPoint(main)));
+    }}
+    setPlaces(list.concat(extra));
+  }}).catch(() => setPlaces(extra));   // offline: the islands still get their names
+}}
+function setPlaces(list) {{
+  places = list.sort((a, b) => b.w - a.w);   // the biggest get first claim on the space
+  if (W) {{ W.htmlElementsData(places); wake(3000); }}
+  setTimeout(fitNames, 50);   // the globe makes the name elements on its next update
+}}
+function placeEl(d) {{
+  const el = document.createElement("div");
+  el.className = "place" + (d.isle ? " isle" : d.w > 25 ? " big" : "");
+  el.style.visibility = "hidden";   // until fitNames decides
+  el.textContent = d.n;
+  d.el = el;
+  return el;
+}}
+function fitNames() {{
+  // Runs on every frame drawn. A name shows when its country is about as wide on screen
+  // as the name (an island: once it's a speck you can see, as the sea around it is free),
+  // it isn't near the globe's edge, and it doesn't cover a bigger one's.
+  if (!W) return;
+  const pov = W.pointOfView(), R = Math.PI / 180;
+  // px per degree in the middle of the view: the camera is alt globe radii up, 50° fov
+  const pxDeg = innerHeight / (2 * pov.altitude * Math.tan(25 * R) * 57.3);
+  const s0 = Math.sin(pov.lat * R), c0 = Math.cos(pov.lat * R), kept = [];
+  for (const d of places) {{
+    if (!d.el) continue;
+    // cosine of the angle from the middle of the view: 1 facing us, 0 at the edge
+    const facing = s0 * Math.sin(d.la * R) +
+                   c0 * Math.cos(d.la * R) * Math.cos((d.lo - pov.lng) * R);
+    let show = showNames && facing > 0.45 &&
+               d.w * pxDeg * facing >= (d.isle ? 12 : d.n.length * 5.2);
+    if (show) {{
+      if (!d.pw) {{ d.pw = d.el.offsetWidth; d.ph = d.el.offsetHeight; }}
+      const p = W.getScreenCoords(d.la, d.lo, 0.01);
+      const box = [p.x - d.pw / 2 - 3, p.y - d.ph / 2, p.x + d.pw / 2 + 3, p.y + d.ph / 2];
+      show = !kept.some(b => box[0] < b[2] && box[2] > b[0] && box[1] < b[3] && box[3] > b[1]);
+      if (show) kept.push(box);
+    }}
+    d.el.style.visibility = show ? "" : "hidden";
+  }}
+}}
+function applyNames() {{
+  namesBtn.classList.toggle("on", showNames);
+  fitNames(); wake();
+}}
+namesBtn.onclick = () => {{
+  showNames = !showNames;
+  try {{ localStorage.setItem("names", showNames ? "on" : "off"); }} catch (e) {{}}
+  applyNames();
+}};
+namesBtn.classList.toggle("on", showNames);
 document.getElementById("zin").onclick = () => zoom(1 / 1.35, 250);
 document.getElementById("zout").onclick = () => zoom(1.35, 250);
 try {{ new QWebChannel(qt.webChannelTransport, ch => {{ bridge = ch.objects.radio; }}); }}
@@ -748,19 +915,22 @@ function build() {{
       .pointLabel(card)
       .onPointClick(d => {{ if (bridge) bridge.play(d.id); }})
       .ringLat("la").ringLng("lo").ringColor(ring)
-      .ringMaxRadius(3).ringPropagationSpeed(2).ringRepeatPeriod(900);
+      .ringMaxRadius(3).ringPropagationSpeed(2).ringRepeatPeriod(900)
+      .htmlLat("la").htmlLng("lo").htmlAltitude(0.01).htmlElement(placeEl)
+      .htmlTransitionDuration(0).htmlElementsData(places);
     const c = W.controls();
     c.autoRotateSpeed = 0.35;
     c.enableZoom = false;   // our own wheel handler zooms (see zoom above)
     const m = W.globeMaterial();
     if (m.specular) {{ m.specular.setStyle("#222a38"); m.shininess = 12; }}   // a soft sheen
     W.renderer().domElement.addEventListener("pointerdown", () => {{ c.autoRotate = false; }});
-    const fit = () => W.width(innerWidth).height(innerHeight);
-    addEventListener("resize", fit); fit();
+    const fit = () => {{ W.width(innerWidth).height(innerHeight); fitNames(); }};
     W.pointOfView({{lat: 25, lng: 10, altitude: 2.4}});
+    addEventListener("resize", fit); fit();
     applyHd();
     msg(stations.length ? "" : "Finding stations…");
     if (stations.length) W.pointsData(stations);
+    loadPlaces();
   }} catch (e) {{
     W = null;
     msg("The globe can't be shown here (" + e.message + "). Search and the list still work.");
