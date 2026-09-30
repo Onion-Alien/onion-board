@@ -323,3 +323,59 @@ class EqPanel(QWidget):
 
     def _emit(self):
         self._refresh(emit=True)
+
+
+class UndoBar(QFrame):
+    """"Deleted X · Undo" for a few seconds after something is thrown away.
+    show_for(text, undo, done): Undo calls `undo`; the bar timing out, being
+    dismissed, or showing something else calls `done` (if given) instead."""
+    SECONDS = 10
+
+    def __init__(self, tip: str = "Put it back, exactly as it was"):
+        super().__init__()
+        from PySide6.QtCore import QTimer
+        from PySide6.QtWidgets import QPushButton
+        self.setObjectName("chip")
+        h = QHBoxLayout(self)
+        h.setContentsMargins(10, 4, 4, 4)
+        self.label = QLabel()
+        self.label.setTextFormat(Qt.PlainText)   # names are user / web text
+        h.addWidget(self.label, 1)
+        self.btn_undo = QPushButton("Undo")
+        self.btn_undo.setObjectName("primary")
+        self.btn_undo.setToolTip(tip)
+        self.btn_undo.clicked.connect(self.undo)
+        h.addWidget(self.btn_undo)
+        dismiss = QPushButton()
+        dismiss.setObjectName("chipstop")
+        dismiss.setToolTip("Dismiss")
+        dismiss.setFixedSize(24, 24)
+        icons.set_icon(dismiss, "stop", size=10)
+        dismiss.clicked.connect(self.finish)
+        h.addWidget(dismiss)
+        self._timer = QTimer(self)
+        self._timer.setSingleShot(True)
+        self._timer.timeout.connect(self.finish)
+        self._undo = self._done = None
+        self.hide()
+
+    def show_for(self, text: str, undo, done=None):
+        self.finish()
+        self.label.setText(self.label.fontMetrics().elidedText(text, Qt.ElideRight, 320))
+        self._undo, self._done = undo, done
+        self.show()
+        self._timer.start(self.SECONDS * 1000)
+
+    def undo(self):
+        cb, self._undo, self._done = self._undo, None, None
+        self._timer.stop()
+        self.hide()
+        if cb is not None:
+            cb()
+
+    def finish(self):
+        cb, self._undo, self._done = self._done, None, None
+        self._timer.stop()
+        self.hide()
+        if cb is not None:
+            cb()

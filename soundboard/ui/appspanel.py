@@ -21,13 +21,13 @@ from PySide6.QtGui import QPainter
 from PySide6.QtWidgets import (QCheckBox, QFileIconProvider, QFrame, QHBoxLayout, QLabel,
                                QPushButton, QScrollArea, QSizePolicy, QVBoxLayout, QWidget)
 
-from soundboard import appaudio, library, theme
+from soundboard import appaudio, library, theme, trash
 from soundboard.engine import SR
 from soundboard.library import MAX_SECONDS, trim_silence
 from soundboard.recorder import ArmedRecorder
 from soundboard.ui import icons
 from soundboard.ui.bunnywidget import BunnyWidget
-from soundboard.ui.panel import VolumeControl, card, hint_label
+from soundboard.ui.panel import UndoBar, VolumeControl, card, hint_label
 
 log = logging.getLogger(__name__)
 
@@ -263,7 +263,15 @@ class AppsTab(QWidget):
         theme.set_tone(self.warn, "warn")
         self.warn.setVisible(False)
         hv.addWidget(self.warn)
+        self.btn_bin = QPushButton("Forgotten programs…")
+        self.btn_bin.setToolTip("Bring back a program you forgot, with its volume and "
+                                "“Hear it myself”")
+        icons.set_icon(self.btn_bin, "trash")
+        self.btn_bin.clicked.connect(self.show_forgotten)
+        hv.addWidget(self.btn_bin, 0, Qt.AlignLeft)
         v.addWidget(head)
+        self.undo_bar = UndoBar("Remember the program again, as it was")
+        v.addWidget(self.undo_bar)
         self.scroll = QScrollArea()
         self.scroll.setWidgetResizable(True)
         self.scroll.setFrameShape(QFrame.NoFrame)
@@ -307,6 +315,7 @@ class AppsTab(QWidget):
         self.meter_timer.timeout.connect(self._meters)
         self.peaks = appaudio.PeakWatcher()   # live levels; the list is only re-read every 1.5 s
         self._started = False
+        self._label_bin()
         if self.rows:   # remembered programs are picked up even if this tab is never opened
             QTimer.singleShot(1500, self.start)
 
@@ -612,14 +621,55 @@ class AppsTab(QWidget):
             self._remember(row)
 
     def _on_forget(self, row: AppRow):
-        self.cfg.apps.pop(row.exe.lower(), None)
+        key = row.exe.lower()
+        spec = self.cfg.apps.pop(key, None)
         self._save()
+        if isinstance(spec, dict):   # something was remembered: keep it in the bin
+            name = row.name.text() or row.exe
+            item = trash.put_app(key, spec, name)
+            self._label_bin()
+            self.undo_bar.show_for(f"Forgot “{name}”",
+                                   lambda: self._undo_forget(item.id))
         if row.app is None:
             self._drop_row(row)
         else:
             self._stop_send(row)
             row.set_sending(False)
         self._report_active()
+
+    def _undo_forget(self, item_id: str):
+        it = trash.take(item_id)
+        if it is not None:
+            self._unforget(it)
+
+    def show_forgotten(self):
+        from soundboard.ui.deleted import DeletedDialog
+        self.undo_bar.finish()
+        DeletedDialog(trash.APP, "programs", self._unforget, self).exec()
+        self._label_bin()
+
+    def _label_bin(self):
+        self.btn_bin.setVisible(bool(trash.items(trash.APP)))
+
+    def _unforget(self, item: trash.Item) -> bool:
+        """A forgotten program taken out of the bin: remember it again."""
+        exe, spec = str(item.data.get("exe", "")).lower(), item.data.get("spec")
+        if not exe or not isinstance(spec, dict):
+            return False
+        self.cfg.apps[exe] = dict(spec)
+        while len(self.cfg.apps) > MAX_REMEMBERED:
+            self.cfg.apps.pop(next(iter(self.cfg.apps)))
+        self._save()
+        old = self.rows.get(exe)
+        app = old.app if old is not None else None
+        if old is not None and not old.sending:
+            self._drop_row(old)   # built again with the remembered volume
+        row = self._row(exe, saved_volume(spec.get("vol", 1.0)), bool(spec.get("monitor")))
+        row.set_app(app)
+        self._label_bin()
+        if not self._started:
+            self.start()
+        return True
 
     def retheme(self):
         for row in self.rows.values():   # a program that isn't running: the placeholder

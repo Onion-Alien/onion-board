@@ -27,11 +27,11 @@ from soundboard import theme, winkeys, ytdl
 from soundboard.engine import SR, Engine
 from soundboard.engine import is_virtual as is_virtual_cable
 from soundboard import (autostart, backup, destination, midi, remote, soundfx, thumbs,
-                        updates, voicesdk)
+                        trash, updates, voicesdk)
 from soundboard import watchaddon
 from soundboard.replay import InstantReplay
 from soundboard.library import (AUDIO_EXTS, PAD_COLORS, RESOURCE_DIR, Config, SoundMeta,
-                                cache_keep, clean_tags, delete_file, duplicate, fingerprint,
+                                cache_keep, clean_tags, duplicate, fingerprint,
                                 import_file, load_original, load_sound, prune_cache, save_clip)
 from soundboard.settings import HOTKEY_ACTIONS, HotkeyDialog, SettingsDialog, pretty_key
 from soundboard.shuffle import ShuffleBag
@@ -490,6 +490,8 @@ class MainWindow(QMainWindow):
         mm.addSeparator()
         mm.addAction("Export everything (sounds + settings)…", self.export_board)
         self._act_export_cat = mm.addAction("Export this category…", self.export_category)
+        mm.addSeparator()
+        icons.set_icon(mm.addAction("Recently deleted sounds…", self.show_deleted), "trash")
         mm.aboutToShow.connect(lambda: self._act_export_cat.setEnabled(bool(self.cfg.category)))
         more.setMenu(mm)
         tb.addWidget(add)
@@ -562,7 +564,8 @@ class MainWindow(QMainWindow):
         uh.addWidget(self.undo_lbl, 1)
         undo = QPushButton("Undo")
         undo.setObjectName("primary")
-        undo.setToolTip("Put the sound back, exactly as it was")
+        undo.setToolTip("Put the sound back, exactly as it was. Later: Backup → "
+                        "Recently deleted sounds…")
         undo.clicked.connect(self.undo_remove)
         uh.addWidget(undo)
         dismiss = QPushButton()
@@ -1850,6 +1853,7 @@ class MainWindow(QMainWindow):
             live = self._live_metas()   # as of now, not of the start
             prune_cache(cache_keep(live))
             thumbs.prune({m.image for m in live if m.image})
+            trash.prune()   # what's been in Recently deleted for too long
             log.info("loaded %d sounds in %.1fs", len(todo), time.monotonic() - t0)
         self._load_thread = threading.Thread(target=run, daemon=True, name="load")
         self._load_thread.start()
@@ -2126,9 +2130,17 @@ class MainWindow(QMainWindow):
         self.undo_bar.hide()
         if not self._removed:
             return
-        # last removed first: each goes back to the index it had when it was taken out
-        while self._removed:
-            m, index, data = self._removed.pop()
+        done, self._removed = self._removed, []
+        self._put_back(done)
+
+    def _put_back(self, entries: list[tuple[SoundMeta, int, np.ndarray | None]]):
+        """Put removed sounds back on the board: (meta, the index it had, its audio or
+        None to load it). The last one goes in first, so each lands where it was."""
+        entries = list(entries)
+        while entries:
+            m, index, data = entries.pop()
+            if any(o.id == m.id for o in self.cfg.sounds):
+                continue   # already back
             if m.hotkey and any(o.hotkey == m.hotkey for o in self.cfg.sounds):
                 m.hotkey = ""   # given to another sound in the meantime
             self.cfg.sounds.insert(min(index, len(self.cfg.sounds)), m)
@@ -2147,12 +2159,26 @@ class MainWindow(QMainWindow):
         self.register_hotkeys()
 
     def _finish_removals(self):
-        """The undo window is over: delete the removed sounds' files for real."""
+        """The undo window is over: the removed sounds go to Recently deleted
+        (soundboard.trash), where they can still be brought back for a while."""
         self._undo_timer.stop()
         self.undo_bar.hide()
         done, self._removed = self._removed, []
-        for m, _i, _d in done:
-            delete_file(m)
+        for m, i, _d in done:
+            trash.put_sound(m, i)
+
+    def show_deleted(self):
+        """Backup → Recently deleted sounds…"""
+        from soundboard.ui.deleted import DeletedDialog
+        self._finish_removals()   # the ones on the Undo bar are listed too
+        DeletedDialog(trash.SOUND, "sounds", self._restore_deleted, self).exec()
+
+    def _restore_deleted(self, item: trash.Item) -> bool:
+        m = trash.meta_of(item)
+        if m is None or not Path(m.file).exists():
+            return False
+        self._put_back([(m, item.index, None)])
+        return True
 
     def _clear_dupe_hotkey(self, m):
         for o in self.cfg.sounds:

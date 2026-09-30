@@ -100,20 +100,23 @@ def _number(v) -> bool:
 def clean_spec(raw) -> dict:
     """Saved voice changer settings (config or an imported backup) cut down to the
     shape the voice panel and `VoiceChain` expect: {"enabled": bool, "preset": str,
-    "effects": {type: {"on": bool, param: number, ...}}}. Anything of the wrong type
-    is dropped, so it falls back to its default instead of stopping the app."""
+    "effects": {type: {"on": bool, param: number, ...}}, "custom": {like effects}}.
+    Anything of the wrong type is dropped, so it falls back to its default instead of
+    stopping the app."""
     raw = raw if isinstance(raw, dict) else {}
     out = {}
     if isinstance(raw.get("enabled"), bool):
         out["enabled"] = raw["enabled"]
     if isinstance(raw.get("preset"), str):
         out["preset"] = raw["preset"]
-    effects = raw.get("effects")
-    out["effects"] = {
-        t: {k: v for k, v in cfg.items()
-            if isinstance(k, str) and (isinstance(v, bool) if k == "on" else _number(v))}
-        for t, cfg in (effects.items() if isinstance(effects, dict) else ())
-        if isinstance(t, str) and isinstance(cfg, dict)}
+    def effects(v):
+        return {t: {k: x for k, x in cfg.items()
+                    if isinstance(k, str) and (isinstance(x, bool) if k == "on" else _number(x))}
+                for t, cfg in (v.items() if isinstance(v, dict) else ())
+                if isinstance(t, str) and isinstance(cfg, dict)}
+    out["effects"] = effects(raw.get("effects"))
+    if isinstance(raw.get("custom"), dict):   # "My own mix", kept while a preset is on
+        out["custom"] = effects(raw["custom"])
     return out
 
 

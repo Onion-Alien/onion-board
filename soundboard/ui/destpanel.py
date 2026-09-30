@@ -12,7 +12,7 @@ from PySide6.QtWidgets import (QCheckBox, QComboBox, QDialog, QDialogButtonBox, 
 from soundboard import destination, voicesdk
 from soundboard.destination import CEILINGS, LOWCUTS, Dest
 from soundboard.ui import fit
-from soundboard.ui.panel import hint_label
+from soundboard.ui.panel import UndoBar, hint_label
 from soundboard.wheelguard import no_wheel
 
 
@@ -247,6 +247,8 @@ class CustomDestDialog(QDialog):
             b.setObjectName("small")
             btns.addWidget(b)
         left.addLayout(btns)
+        self.undo_bar = UndoBar("Put the mode back, as it was")
+        left.addWidget(self.undo_bar)
         body.addLayout(left, 1)
 
         self.form_box = QWidget()
@@ -373,8 +375,21 @@ class CustomDestDialog(QDialog):
             return
         gone = self.items.pop(row)
         cfg = self.mw.cfg.dest
-        if cfg.get("mode") == gone.get("key"):
+        was_on = cfg.get("mode") == gone.get("key")
+        if was_on:
             cfg["mode"] = "off"
+        self._fill(row)
+        self._commit()
+        self.undo_bar.show_for(f"Removed “{gone.get('label') or 'mode'}”",
+                               lambda: self._put_back(row, gone, was_on))
+
+    def _put_back(self, row: int, raw: dict, was_on: bool):
+        if raw.get("key") in {d.get("key") for d in self.items}:
+            return
+        row = min(row, len(self.items))
+        self.items.insert(row, raw)
+        if was_on and self.mw.cfg.dest.get("mode") == "off":
+            self.mw.cfg.dest["mode"] = raw.get("key")
         self._fill(row)
         self._commit()
 

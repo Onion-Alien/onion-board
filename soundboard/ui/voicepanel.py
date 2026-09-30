@@ -193,6 +193,9 @@ class VoiceFxPanel(QWidget):
         # cleaned: a damaged setting (hand-edited, an old backup) mustn't stop the app
         spec = {**default_fx_spec(), **voicefx.clean_spec(spec)}
         self._preset = spec.get("preset") if spec.get("preset") in voicefx.PRESETS else CUSTOM
+        # "My own mix" while a preset is on, so picking a preset never loses it
+        self._custom: dict = (dict(spec.get("effects", {})) if self._preset == CUSTOM
+                              else dict(spec.get("custom", {})))
         v = QVBoxLayout(self)
         v.setContentsMargins(0, 0, 0, 0)
         v.setSpacing(8)
@@ -310,13 +313,19 @@ class VoiceFxPanel(QWidget):
         return self._preset
 
     def pick(self, name: str):
-        """Choose a voice (a preset name or CUSTOM) and turn the changer on."""
-        self._preset = name
+        """Choose a voice (a preset name or CUSTOM) and turn the changer on. Your own
+        mix is kept aside while a preset is on, and comes back with "My own mix"."""
+        if self._preset == CUSTOM and name != CUSTOM:
+            self._custom = {t: r.state() for t, r in self.rows.items()}
+        was, self._preset = self._preset, name
         fx = voicefx.PRESETS.get(name)
         if fx is not None:
             for t, r in self.rows.items():
                 r.load({"on": True, **fx[t]} if t in fx else None)
         elif name == CUSTOM:
+            if was != CUSTOM and self._custom:
+                for t, r in self.rows.items():
+                    r.load(self._custom.get(t))
             self.btn_more.setChecked(True)   # your own mix lives in Fine-tune
         self.btn_power.blockSignals(True)
         self.btn_power.setChecked(True)
@@ -349,8 +358,10 @@ class VoiceFxPanel(QWidget):
             self.rows[etype] = r
 
     def spec(self) -> dict:
+        effects = {t: r.state() for t, r in self.rows.items()}
         return {"enabled": self.btn_power.isChecked(), "preset": self._preset,
-                "effects": {t: r.state() for t, r in self.rows.items()}}
+                "effects": effects,
+                "custom": effects if self._preset == CUSTOM else self._custom}
 
     def show_errors(self, errors: dict[str, str]):
         for t, r in self.rows.items():

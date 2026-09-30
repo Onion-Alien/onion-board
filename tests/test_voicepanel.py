@@ -449,3 +449,29 @@ def test_discord_notice_stays_hidden_when_already_dismissed(panel):
     p.fx.set_tip_enabled(False)
     p.fx.pick(next(iter(voicefx.PRESETS)))
     assert p.fx.tip.isHidden()
+
+
+def test_picking_a_preset_keeps_my_own_mix(panel):
+    p, _ = panel
+    p.fx.pick("Chipmunk")
+    row = p.fx.rows["pitch"]
+    row.sliders[0].slider.setValue(row.sliders[0].slider.value() - 3)   # my own mix
+    mine = p.fx.spec()["effects"]
+    p.fx.pick("Robot")                          # a preset overwrites Fine-tune...
+    assert p.fx.spec()["custom"] == mine
+    p.fx.pick("Custom")                         # ...and My own mix brings it back
+    assert p.fx.preset == "Custom" and p.fx.spec()["effects"] == mine
+
+
+def test_my_own_mix_is_kept_across_restarts(qapp, monkeypatch):
+    monkeypatch.setattr(tts.SapiTTS, "warm_up", lambda self: [])
+    from soundboard.ui.voicepanel import VoicePanel
+    mix = {"pitch": {"on": True, "semitones": 3.0}}
+    p = VoicePanel(FakeEngine(), {"enabled": True, "preset": "Robot", "effects": {},
+                                  "custom": mix}, {})
+    try:
+        p.fx.pick("Custom")
+        assert p.fx.spec()["effects"]["pitch"]["semitones"] == pytest.approx(3.0)
+    finally:
+        p.shutdown()
+        p.deleteLater()
