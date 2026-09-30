@@ -44,6 +44,7 @@ log = logging.getLogger(__name__)
 API_BASES = ("https://all.api.radio-browser.info", "https://de1.api.radio-browser.info",
              "https://de2.api.radio-browser.info")
 GLOBE_LIMIT = 3000         # stations pinned on the globe (the most listened-to)
+GLOBE_LIGHT = 1000         # ...of which the light (default) globe shows this many
 SEARCH_LIMIT = 150
 SEARCH_MAX_CHARS = 80
 CACHE_S = 24 * 3600        # how long the globe's station list is reused
@@ -551,8 +552,14 @@ def globe_points(stations: list[Station]) -> list[dict]:
             for s in stations if s.lat is not None and s.lon is not None]
 
 
-def globe_html(qwebchannel_js: str, bg: str, accent: str, hot: str, text: str) -> str:
-    """The globe page. Colours are theme tokens (validated hex), scripts are pinned."""
+def globe_html(qwebchannel_js: str, bg: str, accent: str, hot: str, text: str,
+               hd: bool = False) -> str:
+    """The globe page. Colours are theme tokens (validated hex), scripts are pinned.
+
+    The light globe (the default) only draws while it's being used: no auto-spin, no
+    stars or terrain relief, one pixel per screen pixel. A web view that redraws 60+
+    times a second makes the whole app stutter. HD is the full show, opted into with
+    the page's HD button. Either one stops drawing while the app is in the background."""
     def hexcol(c: str, fallback: str) -> str:
         c = str(c)
         return c if len(c) == 7 and c[0] == "#" and all(ch in "0123456789abcdefABCDEF"
@@ -590,11 +597,13 @@ html,body{{margin:0;height:100%;overflow:hidden;background:{bg};color:{text};
 #zoom button{{width:30px;height:30px;border-radius:8px;border:1px solid rgba(255,255,255,.18);
   background:rgba(12,14,22,.75);color:#fff;font:600 17px 'Segoe UI',sans-serif;cursor:pointer}}
 #zoom button:hover{{border-color:var(--accent)}}
+#zoom #hd{{font-size:10px;opacity:.6}} #zoom #hd.on{{opacity:1;border-color:var(--accent)}}
 #hint{{position:absolute;left:10px;bottom:10px;font-size:11px;opacity:.55;pointer-events:none}}
 </style></head><body><div id="g"></div><div id="msg">Loading the globe…</div>
 <div id="zoom"><button id="zin" title="Zoom in (Ctrl +)">+</button>
 <button id="zout" title="Zoom out (Ctrl −)">−</button>
-<button id="look" title="Day / night Earth">☾</button></div>
+<button id="look" title="Day / night Earth">☾</button>
+<button id="hd" title="">HD</button></div>
 <div id="hint">Drag to spin · scroll or Ctrl +/− to zoom · click a dot to play</div>
 <script>{qwebchannel_js}</script>
 <script src="{GLOBE_JS}" integrity="{GLOBE_SRI}" crossorigin="anonymous"></script>
@@ -603,10 +612,23 @@ html,body{{margin:0;height:100%;overflow:hidden;background:{bg};color:{text};
 let ACCENT = "{accent}", HOT = "{hot}";
 const ring = () => t => HOT + Math.round(255 * (1 - t)).toString(16).padStart(2, "0");
 let W = null, bridge = null, stations = [], current = null, maxK = 1;
-let night = false;
+let night = false, HD = {'true' if hd else 'false'};
+let asleep = false, idleT = 0, appActive = true;
 try {{ night = localStorage.getItem("earth") === "night"; }} catch (e) {{}}
 const msg = t => {{ const m = document.getElementById("msg"); m.textContent = t || "";
                    m.style.display = t ? "flex" : "none"; }};
+// Draw only while something moves: input, a camera flight, a texture arriving. HD with
+// the app in front spins forever, so it never sleeps.
+function wake(ms) {{
+  if (!W) return;
+  if (asleep) {{ W.resumeAnimation(); asleep = false; }}
+  clearTimeout(idleT);
+  if (!(HD && appActive && W.controls().autoRotate))
+    idleT = setTimeout(() => {{ if (W) {{ W.pauseAnimation(); asleep = true; }} }},
+                       appActive ? (ms || 1500) : 0);
+}}
+for (const ev of ["pointerdown", "pointermove", "wheel", "keydown"])
+  addEventListener(ev, () => wake(), {{passive: true, capture: true}});
 const esc = s => String(s).replace(/[&<>"']/g,
   c => ({{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}})[c]);
 const ago = iso => {{
@@ -647,6 +669,13 @@ function zoom(f, ms) {{
   const p = W.pointOfView();
   W.controls().autoRotate = false;
   W.pointOfView({{altitude: Math.min(5, Math.max(0.12, p.altitude * f))}}, ms);
+  wake(ms + 1500);
+}}
+function fly(lat, lng, altitude, ms) {{
+  if (!W) return;
+  W.controls().autoRotate = false;
+  W.pointOfView({{lat, lng, altitude}}, ms);
+  wake(ms + 1500);
 }}
 addEventListener("wheel", e => {{
   e.preventDefault();
@@ -656,14 +685,14 @@ addEventListener("keydown", e => {{
   const k = e.key;
   if (k === "+" || k === "=" || k === "-" || k === "_" || (e.ctrlKey && k === "0")) {{
     e.preventDefault();
-    if (k === "0") {{ if (W) W.pointOfView({{altitude: 2.4}}, 600); }}
+    if (k === "0") {{ if (W) {{ W.pointOfView({{altitude: 2.4}}, 600); wake(2100); }} }}
     else zoom(k === "-" || k === "_" ? 1.35 : 1 / 1.35, 250);
   }}
 }}, true);
 const look = document.getElementById("look");
 const setLook = () => {{
   look.textContent = night ? "☀" : "☾";
-  if (W) W.globeImageUrl(night ? "{EARTH_NIGHT}" : "{EARTH_DAY}");
+  if (W) {{ W.globeImageUrl(night ? "{EARTH_NIGHT}" : "{EARTH_DAY}"); wake(4000); }}
 }};
 look.onclick = () => {{
   night = !night;
@@ -671,6 +700,30 @@ look.onclick = () => {{
   setLook();
 }};
 setLook();
+const hdBtn = document.getElementById("hd");
+function applyHd() {{
+  hdBtn.classList.toggle("on", HD);
+  hdBtn.title = HD ? "High detail is on: stars, terrain, a spinning globe and every " +
+    "station. Click for the light globe (smoother on slower PCs)."
+    : "Light globe: smoother for the rest of the app. Click for high detail " +
+    "(stars, terrain, a spinning globe, more stations; uses more graphics power).";
+  if (!W) return;
+  W.renderer().setPixelRatio(HD ? devicePixelRatio : 1);
+  W.backgroundImageUrl(HD ? "{SKY}" : null).bumpImageUrl(HD ? "{EARTH_BUMP}" : null)
+   .pointResolution(HD ? 6 : 4);
+  W.controls().autoRotate = HD;
+  wake(4000);
+}}
+hdBtn.onclick = () => {{
+  HD = !HD; applyHd();
+  if (bridge) bridge.setHd(HD);   // remembered, and the app sends the right number of dots
+}};
+applyHd();
+function setActive(on) {{
+  // the app went to the background (a game, another window): stop drawing
+  appActive = !!on;
+  wake();
+}}
 document.getElementById("zin").onclick = () => zoom(1 / 1.35, 250);
 document.getElementById("zout").onclick = () => zoom(1.35, 250);
 try {{ new QWebChannel(qt.webChannelTransport, ch => {{ bridge = ch.objects.radio; }}); }}
@@ -685,21 +738,19 @@ function build() {{
   try {{
     W = Globe({{animateIn: true}})(document.getElementById("g"))
       .backgroundColor("{bg}")
-      .backgroundImageUrl("{SKY}")
       .globeImageUrl(night ? "{EARTH_NIGHT}" : "{EARTH_DAY}")
-      .bumpImageUrl("{EARTH_BUMP}")
+      .onGlobeReady(() => wake(2500))
       .showAtmosphere(true).atmosphereColor("#7fb8ff").atmosphereAltitude(0.16)
       .pointLat("la").pointLng("lo")
       .pointAltitude(d => d.id === current ? 0.08 : 0.004 + 0.03 * Math.sqrt(d.k / maxK))
       .pointRadius(d => d.id === current ? 0.55 : 0.33)
       .pointColor(d => d.id === current ? HOT : ACCENT)
-      .pointResolution(6)
       .pointLabel(card)
       .onPointClick(d => {{ if (bridge) bridge.play(d.id); }})
       .ringLat("la").ringLng("lo").ringColor(ring)
       .ringMaxRadius(3).ringPropagationSpeed(2).ringRepeatPeriod(900);
     const c = W.controls();
-    c.autoRotate = true; c.autoRotateSpeed = 0.35;
+    c.autoRotateSpeed = 0.35;
     c.enableZoom = false;   // our own wheel handler zooms (see zoom above)
     const m = W.globeMaterial();
     if (m.specular) {{ m.specular.setStyle("#222a38"); m.shininess = 12; }}   // a soft sheen
@@ -707,6 +758,7 @@ function build() {{
     const fit = () => W.width(innerWidth).height(innerHeight);
     addEventListener("resize", fit); fit();
     W.pointOfView({{lat: 25, lng: 10, altitude: 2.4}});
+    applyHd();
     msg(stations.length ? "" : "Finding stations…");
     if (stations.length) W.pointsData(stations);
   }} catch (e) {{
@@ -717,9 +769,9 @@ function build() {{
 
 function setStations(list) {{
   stations = list; maxK = Math.max(1, ...list.map(d => d.k));
-  if (W) {{ W.pointsData(stations); msg(""); }}
+  if (W) {{ W.pointsData(stations); msg(""); wake(); }}
 }}
-function select(p, fly) {{
+function select(p, go) {{
   // p: the playing station's point (or null); one found by search is added to the globe
   current = p ? p.id : null;
   if (p && !stations.some(d => d.id === p.id)) stations = stations.concat([p]);
@@ -727,10 +779,7 @@ function select(p, fly) {{
   W.pointsData(stations);
   const s = stations.find(d => d.id === current);
   W.ringsData(s ? [s] : []);
-  if (s && fly) {{
-    W.controls().autoRotate = false;
-    W.pointOfView({{lat: s.la, lng: s.lo, altitude: 1.5}}, 1200);
-  }}
+  if (s && go) fly(s.la, s.lo, 1.5, 1200); else wake();
 }}
 function showMessage(t) {{ msg(t); }}
 function setTheme(bg, accent, hot, text) {{
@@ -743,6 +792,7 @@ function setTheme(bg, accent, hot, text) {{
   W.backgroundColor(bg);   // setting the accessors again makes the globe redraw with them
   W.pointColor(d => d.id === current ? HOT : ACCENT);
   W.ringColor(ring);
+  wake();
 }}
 build();
 </script></body></html>"""

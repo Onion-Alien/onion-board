@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- **Smoother Radio tab**: the globe is now light by default. It only draws while you
+  use it, skips the stars and terrain, pins the 1,000 most-listened stations and
+  stops drawing while the app is in the background, so the rest of the app no
+  longer stutters. The **HD** button on the globe brings back the full, spinning
+  version, and it's remembered.
 ## 1.5.3 — 2026-09-30
 
 A mini player for small windows, a Recently deleted bin, and Onion Watch can be

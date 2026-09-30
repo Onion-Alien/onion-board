@@ -75,6 +75,13 @@ def test_globe_page_escapes_the_card_and_zooms_itself():
     assert "passive: false" in page and "c.enableZoom = false" in page
 
 
+def test_globe_page_is_light_unless_hd():
+    light = radio.globe_html("", "#000000", "#111111", "#222222", "#333333")
+    hd = radio.globe_html("", "#000000", "#111111", "#222222", "#333333", hd=True)
+    assert "HD = false" in light and "HD = true" in hd
+    assert "pauseAnimation" in light and "bridge.setHd" in light and "setActive" in light
+
+
 def test_bad_coordinates_and_numbers_are_cleaned():
     s = Station.from_api(api_station(1, geo_lat=0, geo_long=0, bitrate="x", countrycode="J1"))
     assert s.lat is None and s.lon is None and s.bitrate == 0 and s.cc == ""
@@ -380,6 +387,16 @@ def test_tab_lists_popular_stations_and_starts_off_air(tab):
     assert tab.list.count() == 5
     assert tab.engine.radio_live is False and not tab.btn_live.isChecked()
     assert tab.engine.radio_vol == pytest.approx(0.5)
+
+
+def test_light_globe_pins_only_the_top_stations_and_hd_is_remembered(tab, monkeypatch):
+    sent = []
+    monkeypatch.setattr(tab, "_js", sent.append)
+    monkeypatch.setattr(radio, "GLOBE_LIGHT", 2)
+    tab._push_globe(force=True)
+    assert sent[-1].count('"id"') == 2
+    tab._on_globe_hd(True)
+    assert tab.cfg.radio["globe_hd"] is True and sent[-1].count('"id"') == 5
 
 
 def test_tab_search_shows_local_matches_then_the_directory(qapp, tab, server):

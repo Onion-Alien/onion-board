@@ -16,7 +16,8 @@ from string import Template
 import numpy as np
 from PySide6.QtCore import (QEvent, QFile, QIODevice, QObject, QRect, QRectF, QSize,
                             Qt, QTimer, QUrl, Signal, Slot)
-from PySide6.QtGui import QColor, QFont, QFontMetrics, QPainter, QPainterPath
+from PySide6.QtGui import (QColor, QFont, QFontMetrics, QGuiApplication, QPainter,
+                           QPainterPath)
 from PySide6.QtWidgets import (QButtonGroup, QCheckBox, QComboBox, QFrame, QHBoxLayout,
                                QLabel, QLineEdit, QListWidget, QListWidgetItem,
                                QPushButton, QSizePolicy, QSplitter, QStyle,
@@ -91,12 +92,18 @@ def _qwebchannel_js() -> str:
 
 
 class _Bridge(QObject):
-    """The globe page's only way back into the app: "this dot was clicked"."""
+    """The globe page's only way back into the app: "this dot was clicked" and
+    "the HD button was pressed"."""
     clicked = Signal(str)
+    hd = Signal(bool)
 
     @Slot(str)
     def play(self, uuid):
         self.clicked.emit(str(uuid)[:64])
+
+    @Slot(bool)
+    def setHd(self, on):
+        self.hd.emit(bool(on))
 
 
 class _StationDelegate(QStyledItemDelegate):
@@ -635,9 +642,10 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
             return
         self._started = True
         if self._want_globe:
-            self._make_globe()
             w = max(self.split.width(), 800)
             self.split.setSizes([w * 3 // 5, w * 2 // 5])
+            # after the tab has painted: starting the web view takes a moment
+            QTimer.singleShot(0, self, lambda: self._make_globe())
         self.dir.load_globe()
         self._refresh_info()
 
@@ -662,6 +670,7 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
         page = Page(self.profile, self.view)
         self._bridge = _Bridge(self)
         self._bridge.clicked.connect(self._on_globe_click)
+        self._bridge.hd.connect(self._on_globe_hd)
         self._channel = QWebChannel(page)
         self._channel.registerObject("radio", self._bridge)
         page.setWebChannel(self._channel)
@@ -670,8 +679,23 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
         self.view.setContextMenuPolicy(Qt.NoContextMenu)
         t = theme.T
         page.setHtml(radio.globe_html(_qwebchannel_js(), t["bg"], t["accent"], t["accent2"],
-                                      t["text"]), QUrl("about:blank"))
+                                      t["text"], hd=self._globe_hd()), QUrl("about:blank"))
         self.globe_layout.addWidget(self.view)
+        app = QGuiApplication.instance()
+        if app is not None:
+            app.applicationStateChanged.connect(self._on_app_state)
+
+    def _globe_hd(self) -> bool:
+        return bool(self.cfg.radio.get("globe_hd", False))
+
+    def _on_globe_hd(self, on: bool):
+        self.cfg.radio["globe_hd"] = on
+        self._save()
+        self._push_globe()   # HD shows every station, the light globe the top ones
+
+    def _on_app_state(self, state):
+        # a game or another window in front: the globe stops drawing
+        self._js(f"setActive({'true' if state == Qt.ApplicationActive else 'false'})")
 
     def _js(self, js: str):
         if self.view is not None and self._globe_loaded:
@@ -680,6 +704,9 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
     def _on_globe_loaded(self, ok: bool):
         self._globe_loaded = bool(ok)
         self._globe_theme()   # the theme may have changed while it was loading
+        app = QGuiApplication.instance()
+        if app is not None and app.applicationState() != Qt.ApplicationActive:
+            self._on_app_state(app.applicationState())
         if self._globe_list:
             self._push_globe(force=True)
         self._select_on_globe(fly=False)
@@ -687,6 +714,8 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
     def _push_globe(self, force: bool = False):
         """Pin the popular stations on the globe — only those the filters let through."""
         shown = self._filtered(self._globe_list)
+        if not self._globe_hd():
+            shown = shown[:radio.GLOBE_LIGHT]   # the list is most-listened first
         ids = [s.uuid for s in shown]
         if force or ids != self._globe_shown:
             self._globe_shown = ids
@@ -861,8 +890,7 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
         if s is not None and s.lat is not None and self.player.station is None:
             # browsing the list turns the globe to the station (play one and it stays put)
             p = radio.globe_points([s])[0]
-            self._js(f"W && (W.controls().autoRotate = false, "
-                     f"W.pointOfView({{lat: {p['la']}, lng: {p['lo']}, altitude: 1.8}}, 800))")
+            self._js(f"fly({p['la']}, {p['lo']}, 1.8, 800)")
         self._update_buttons()
 
     def _on_activated(self, it):
@@ -974,7 +1002,7 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
         st, state = self.player.station, self.player.status
         if st is None:
             n = len(self._globe_list)
-            text = (f"{n:,} stations on the globe — spin it and click a dot, or search. "
+            text = (f"{n:,} popular stations — spin the globe and click a dot, or search. "
                     "Click a station's badge (or double-click it) to play it." if n else
                     self._no_stations_text())
             if not n and self._globe_error:
