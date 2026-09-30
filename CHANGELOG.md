@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## 1.5.0 — 2026-09-30
+
+The Triggers tab becomes Onion Watch.
+
 - **The Triggers tab is now the Onion Watch add-on.** Onion Watch is the Triggers
   tab grown into its own project, and it plugs back in here: click *Get Onion
   Watch* on the tab and it's downloaded, checked and there in a moment, no
