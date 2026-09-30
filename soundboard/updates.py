@@ -83,14 +83,20 @@ def _get(url: str) -> dict:
 
 def _installer(data: dict) -> tuple[str, str, int]:
     """The release's OnionBoardSetup.exe: (download link, SHA-256, size), or blanks
-    when it has none from this project, or no checksum to hold it to. The checksum is
-    GitHub's own `digest` for the file; releases made before GitHub listed one carry it
-    in their notes ("SHA-256: `…`")."""
+    when it has none from this project, or no checksum to hold it to."""
+    return find_asset(data, ASSET, (DOWNLOADS, OLD_DOWNLOADS))
+
+
+def find_asset(data: dict, name: str, trusted: tuple[str, ...]) -> tuple[str, str, int]:
+    """A GitHub release's file called `name`: (download link, SHA-256, size), or
+    blanks when its link isn't under one of the `trusted` prefixes, or it has no
+    checksum to hold it to. The checksum is GitHub's own `digest` for the file;
+    releases made before GitHub listed one carry it in their notes ("SHA-256: `…`")."""
     for a in data.get("assets") or []:
-        if not isinstance(a, dict) or a.get("name") != ASSET:
+        if not isinstance(a, dict) or a.get("name") != name:
             continue
         url = str(a.get("browser_download_url") or "")
-        if not url.startswith((DOWNLOADS, OLD_DOWNLOADS)):
+        if not url.startswith(trusted):
             return "", "", 0
         digest = str(a.get("digest") or "").lower()
         sha = digest.removeprefix("sha256:") if digest.startswith("sha256:") else ""
@@ -195,33 +201,48 @@ def download(rel: Release, progress: Callable[[int, int], None] | None = None,
     if not rel.asset_url.startswith((DOWNLOADS, OLD_DOWNLOADS)) or not SHA_RE.fullmatch(rel.sha256):
         raise UpdateError("this release has no installer the app can check, "
                           "so it can only be downloaded from its page")
-    dest = installer_path(rel)
-    if dest.is_file() and _sha256(dest) == rel.sha256:
-        return dest   # downloaded earlier, never installed
-    UPDATES_DIR.mkdir(parents=True, exist_ok=True)
+    dest = fetch(rel.asset_url, rel.sha256, installer_path(rel), (DOWNLOADS, OLD_DOWNLOADS),
+                 MAX_SIZE, "an installer", rel.size, progress, cancelled)
+    log.info("downloaded update %s (SHA-256 checked)", rel.version)
+    return dest
+
+
+def fetch(url: str, sha256: str, dest: Path, trusted: tuple[str, ...], max_size: int,
+          what: str, size: int = 0, progress: Callable[[int, int], None] | None = None,
+          cancelled: Callable[[], bool] | None = None) -> Path:
+    """Download a release file to `dest` (via dest + ".part", so a failed download
+    never leaves a half file under its name) and prove it's the one GitHub lists
+    (`sha256`); returns `dest`. Only from a link under `trusted`, only over HTTPS,
+    and never more than `max_size` bytes (`what` it is, for the message). A file
+    already there with the right checksum isn't fetched again. Raises UpdateError
+    with a message for the user. Call off the UI thread."""
+    if not url.startswith(trusted) or not SHA_RE.fullmatch(sha256):
+        raise UpdateError(f"there's no {what.split(' ', 1)[-1]} here the app can check")
+    if dest.is_file() and _sha256(dest) == sha256:
+        return dest   # downloaded earlier, never used
+    dest.parent.mkdir(parents=True, exist_ok=True)
     part = dest.with_name(dest.name + ".part")
     h = hashlib.sha256()
     done = 0
     try:
-        with _open(rel.asset_url) as r, open(part, "wb") as f:
+        with _open(url) as r, open(part, "wb") as f:
             if not r.geturl().startswith("https://"):
                 raise UpdateError("the download was redirected off HTTPS")
-            total = int(r.headers.get("Content-Length") or rel.size or 0)
-            if total > MAX_SIZE:
-                raise UpdateError("the download is far bigger than an installer")
+            total = int(r.headers.get("Content-Length") or size or 0)
+            if total > max_size:
+                raise UpdateError(f"the download is far bigger than {what}")
             while chunk := r.read(CHUNK):
                 if cancelled is not None and cancelled():
                     raise UpdateError("cancelled")
                 done += len(chunk)
-                if done > MAX_SIZE:
-                    raise UpdateError("the download is far bigger than an installer")
+                if done > max_size:
+                    raise UpdateError(f"the download is far bigger than {what}")
                 h.update(chunk)
                 f.write(chunk)
                 if progress is not None:
                     progress(done, total)
-        if h.hexdigest() != rel.sha256:
-            log.warning("update %s: SHA-256 %s, expected %s", rel.version,
-                        h.hexdigest(), rel.sha256)
+        if h.hexdigest() != sha256:
+            log.warning("%s: SHA-256 %s, expected %s", dest.name, h.hexdigest(), sha256)
             raise UpdateError("the downloaded file isn't the one GitHub lists "
                               "(its checksum doesn't match), so it wasn't kept")
         os.replace(part, dest)
@@ -231,7 +252,7 @@ def download(rel: Release, progress: Callable[[int, int], None] | None = None,
     except OSError as e:   # offline, disk full, connection dropped…
         part.unlink(missing_ok=True)
         raise UpdateError(f"the download failed ({e})") from e
-    log.info("downloaded update %s (%d bytes, SHA-256 checked)", rel.version, done)
+    log.info("downloaded %s (%d bytes, SHA-256 checked)", dest.name, done)
     return dest
 
 
