@@ -47,6 +47,16 @@ Lethal Company's occlusion and walkie-talkie filters come from its decompiled
   device*, which "Set as Default Device" doesn't change; the app's
   *Game has no microphone setting?* steps now set both.
 
-Still open: Steam voice measured through `scripts/steam_voice_roundtrip.py`,
-Windows' capture resampling and ducking (`scripts/game_capture.py --resample
---ducking`), and a real lobby with `scripts/game_roundtrip.py`.
+- **Steam voice, measured** (`scripts/steam_voice_roundtrip.py`): Steamworks reports
+  24 kHz as its voice rate, confirming the 12 kHz ceiling. Its capture gates the
+  input on its own, even with Steam's threshold set to Off: steady tones never got
+  through, and full-level speech only in bursts (1.4 s of 20 s). Sounds in Steam
+  games need to be loud and voice-like; quiet intros and steady tones can vanish.
+  The gating was too erratic to measure a full frequency response.
+- **Windows' capture path is clean** (`scripts/game_capture.py --resample
+  --ducking`): games opening the cable at 44.1 / 32 / 24 / 16 kHz or through MME
+  lose at most 1.2 dB, with no more converter junk than the 48 kHz reference. A
+  plain capture stream on the communications mic didn't duck the sounds going into
+  the cable (a stream tagged as a call might; not tested).
+
+Still open: a real lobby with `scripts/game_roundtrip.py`.

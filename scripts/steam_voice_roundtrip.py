@@ -11,6 +11,9 @@ Set up once:
   * Steam > Settings > Voice > Voice input device = CABLE Output (the app's virtual
     mic), or Windows' default recording device set to it (Steam follows that when
     its own setting is "Default"). Put it back afterwards.
+  * Steam's voice capture is erratic: it gates the input itself (even with its
+    threshold Off) and sometimes sends nothing for minutes. Starting Steam's own
+    microphone test (Settings > Voice) before a run has helped
   * nothing else talking into the cable (mute your mic in the app, close other
     soundboards), and not in a Discord call that uses the cable as its mic: the
     test tones go out wherever the cable does
@@ -50,7 +53,7 @@ import soundfile as sf
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 import discord_roundtrip as rt  # noqa: E402  (same folder: its signals and analysis)
-from soundboard import destination  # noqa: E402
+from soundboard import codecsim, destination  # noqa: E402
 from soundboard.engine import Engine  # noqa: E402
 from soundboard.library import level_gain  # noqa: E402
 
@@ -161,6 +164,33 @@ class SteamVoice:
     def shutdown(self):
         self.lib.SteamAPI_Shutdown()
 
+    def warm_up(self, timeout: float = 60.0) -> bool:
+        """Start recording and wait until Steam really sends: its capture can take
+        seconds to begin, and it only passes loud, voice-like input (a steady tone
+        never gets through, even with Steam's threshold Off), so loud noise plays
+        into the cable meanwhile. Recording then stays on for the whole run."""
+        self.start()
+        tone = codecsim.pink_noise(1.0, level=0.9)[:, 0]
+        out = sd.OutputStream(SR, channels=2, dtype="float32", device=rt.wasapi("CABLE Input"))
+        out.start()
+        t0 = time.perf_counter()
+        got = 0
+        try:
+            while time.perf_counter() - t0 < timeout and got < 10:
+                out.write(np.repeat(tone[:4800, None], 2, 1))
+                self.lib.SteamAPI_RunCallbacks()
+                while self.get() is not None:
+                    got += 1
+        finally:
+            out.stop()
+            out.close()
+        time.sleep(1.0)
+        while self.get() is not None:
+            pass
+        print(f"Steam voice started after {time.perf_counter() - t0:.1f} s" if got >= 10
+              else "Steam voice never started sending")
+        return got >= 10
+
 
 class Capture:
     """Polls Steam's voice while the cable's far end records: the decoded packets are
@@ -187,7 +217,8 @@ class Capture:
             time.sleep(0.005)
 
     def __enter__(self):
-        self.steam.start()
+        while self.steam.get() is not None:      # anything left over from before
+            pass
         self.t0 = time.perf_counter()
         self.ins.start()
         self._run = True
@@ -199,7 +230,6 @@ class Capture:
         time.sleep(0.5)
         self._run = False
         self._th.join()
-        self.steam.stop()
         self.ins.stop()
         self.ins.close()
 
@@ -263,6 +293,9 @@ def main():
     os.add_dll_directory(str(dll.parent))
     steam = SteamVoice(dll)
     print(f"Steam voice optimal sample rate: {steam.optimal_rate} Hz")
+    if not steam.warm_up():
+        steam.shutdown()
+        raise SystemExit("is Steam's voice input device CABLE Output?")
     track, marks = rt.signals(a.song)
     src = track[:, 0]
     results = {}
@@ -287,6 +320,7 @@ def main():
                 print(f"  {name}: {json.dumps(m)}")
             time.sleep(1.5)
     finally:
+        steam.stop()
         steam.shutdown()
     (out / "results.json").write_text(json.dumps(results, indent=1))
     print(f"wrote {out / 'results.json'}")
