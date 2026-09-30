@@ -161,7 +161,7 @@ class AppRow(QFrame):
         h.addWidget(self.chk_hear)
         self.btn_forget = QPushButton("✕")
         self.btn_forget.setObjectName("small")
-        self.btn_forget.setToolTip("Forget this program")
+        self.btn_forget.setToolTip("Take this program off the list")
         self.btn_forget.setFixedWidth(26)
         self.btn_forget.clicked.connect(lambda: self.forget.emit(self))
         h.addWidget(self.btn_forget)
@@ -403,10 +403,16 @@ class AppsTab(QWidget):
         self.empty.setVisible(not self.rows)
         self._report_active()
 
+    def _hidden(self) -> set[str]:
+        return {str(e).lower() for e in self.cfg.apps_hidden}
+
     def _on_apps(self, apps: list):
         by_exe: dict[str, appaudio.App] = {}
+        hidden = self._hidden()
         for app in apps:
             key = app.exe.lower()
+            if key in hidden and key not in self.rows:
+                continue                          # taken off the list with ✕
             cur = self.rows.get(key)
             if cur is not None and cur.capture is not None and cur.capture.pid == app.pid:
                 by_exe[key] = app   # two copies running: stay on the one being captured
@@ -621,20 +627,24 @@ class AppsTab(QWidget):
             self._remember(row)
 
     def _on_forget(self, row: AppRow):
+        """✕: forget what's remembered about the program and take it off the list. A
+        running one stays off (cfg.apps_hidden) until it's brought back from the
+        Undo bar or *Forgotten programs…*."""
         key = row.exe.lower()
         spec = self.cfg.apps.pop(key, None)
+        spec = spec if isinstance(spec, dict) else {}
+        running = row.app is not None
+        if running and key not in self._hidden():
+            self.cfg.apps_hidden.append(key)
         self._save()
-        if isinstance(spec, dict):   # something was remembered: keep it in the bin
+        if spec or running:          # something to bring back: keep it in the bin
             name = row.name.text() or row.exe
-            item = trash.put_app(key, spec, name)
+            item = trash.put_app(key, spec, name, hidden=running)
             self._label_bin()
-            self.undo_bar.show_for(f"Forgot “{name}”",
+            self.undo_bar.show_for(f"Removed “{name}”",
                                    lambda: self._undo_forget(item.id))
-        if row.app is None:
-            self._drop_row(row)
-        else:
-            self._stop_send(row)
-            row.set_sending(False)
+        self._stop_send(row)
+        self._drop_row(row)
         self._report_active()
 
     def _undo_forget(self, item_id: str):
@@ -656,6 +666,13 @@ class AppsTab(QWidget):
         exe, spec = str(item.data.get("exe", "")).lower(), item.data.get("spec")
         if not exe or not isinstance(spec, dict):
             return False
+        self.cfg.apps_hidden = [e for e in self.cfg.apps_hidden if str(e).lower() != exe]
+        if not spec:                 # only taken off the list: back on the next listing
+            self._save()
+            self._label_bin()
+            if self._started:
+                self.lister.refresh()
+            return True
         self.cfg.apps[exe] = dict(spec)
         while len(self.cfg.apps) > MAX_REMEMBERED:
             self.cfg.apps.pop(next(iter(self.cfg.apps)))

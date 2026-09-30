@@ -122,10 +122,11 @@ def put_sound(meta: SoundMeta, index: int) -> None:
     _add(Item(uuid.uuid4().hex[:12], SOUND, meta.name, time.time(), d, index))
 
 
-def put_app(exe: str, spec: dict, name: str) -> Item:
-    """A remembered program was forgotten: keep what was remembered about it."""
+def put_app(exe: str, spec: dict, name: str, hidden: bool = False) -> Item:
+    """A program was forgotten: keep what was remembered about it (`spec`, maybe
+    empty), and whether it was also taken off the Apps tab's list (`hidden`)."""
     item = Item(uuid.uuid4().hex[:12], APP, name or exe, time.time(),
-                {"exe": exe, "spec": dict(spec)})
+                {"exe": exe, "spec": dict(spec), "hidden": hidden})
     _add(item)
     return item
 

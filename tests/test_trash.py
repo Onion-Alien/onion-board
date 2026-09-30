@@ -106,6 +106,28 @@ def test_a_forgotten_program_can_be_undone_or_brought_back(apps_tab):  # noqa: F
     assert "music.exe" in tab.cfg.apps and "music.exe" in tab.rows
 
 
+
+def test_x_on_a_running_program_takes_it_off_the_list_until_brought_back(apps_tab):  # noqa: F811
+    tab = apps_tab
+    tab._on_apps([music(pid=100)])
+    tab.rows["music.exe"].btn_forget.click()
+    assert "music.exe" not in tab.rows and tab.cfg.apps_hidden == ["music.exe"]
+    assert tab.undo_bar.label.text() == "Removed “Music”"
+    tab._on_apps([music(pid=100)])                 # still running: stays off the list
+    assert "music.exe" not in tab.rows
+    tab.undo_bar.btn_undo.click()
+    assert tab.cfg.apps_hidden == [] and "music.exe" not in tab.cfg.apps
+    tab._on_apps([music(pid=100)])                 # the next listing brings it back
+    assert "music.exe" in tab.rows
+    # ...and from the Forgotten programs window
+    tab.rows["music.exe"].btn_forget.click()
+    tab.undo_bar.finish()
+    tab._on_apps([music(pid=100)])
+    assert "music.exe" not in tab.rows
+    DeletedDialog(trash.APP, "programs", tab._unforget, tab).bring_back()
+    tab._on_apps([music(pid=100)])
+    assert "music.exe" in tab.rows and tab.cfg.apps_hidden == []
+
 def test_a_removed_destination_mode_can_be_undone(window):  # noqa: F811
     from soundboard.ui.destpanel import CustomDestDialog, DestPanel
     panel = DestPanel(window)
