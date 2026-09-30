@@ -381,6 +381,23 @@ def install_zip(path: Path, module_id: str, kind: str,
     return info
 
 
+def uninstall(module_id: str, base: Path | None = None) -> None:
+    """Remove a module installed into `base` (%APPDATA%\\OnionBoard\\modules): moved
+    aside in one step, so it's either there or gone, then deleted. Nothing there is
+    fine. Raises ModuleError."""
+    base = base if base is not None else library.APP_DIR / "modules"
+    dest = base / module_id
+    if not dest.exists():
+        return
+    gone = base.parent / f"modules-old-{uuid.uuid4().hex[:8]}"
+    try:
+        os.rename(dest, gone)
+    except OSError as e:
+        raise ModuleError(f"it couldn't be removed ({e})") from e
+    shutil.rmtree(gone, ignore_errors=True)
+    log.info("removed module %s from %s", module_id, dest)
+
+
 def base_python() -> str | None:
     """A Python to build a module's own environment from. From source that's the one
     running the app; the packaged exe has none of its own, so look on PATH."""

@@ -183,6 +183,54 @@ def test_an_update_is_offered_and_installed_for_the_next_start(qapp, tmp_path, a
     assert tab.btn_update.isHidden()
 
 
+def test_remove_asks_first_then_uninstalls_it_and_keeps_the_triggers(qapp, tmp_path, addon_zip,
+                                                                     monkeypatch):
+    monkeypatch.setenv(watchaddon.LOCAL_ENV, str(addon_zip()))
+    host = FakeHost(two_triggers())
+    tab = TriggersTab(host, [tmp_path / "modules"])
+    tab.btn_get.click()
+    assert process_events(qapp, lambda: tab.panel is not None)
+    assert not tab.btn_remove.isHidden()
+    panel = tab.panel
+    panel.set_active(True)
+    live = []
+    tab.active_changed.connect(live.append)
+    monkeypatch.setattr(tab, "confirm_remove", lambda: False)
+    tab.btn_remove.click()                 # "No": nothing happens
+    assert tab.panel is panel and (tmp_path / "modules" / "onion-watch").is_dir()
+    monkeypatch.setattr(tab, "confirm_remove", lambda: True)
+    tab.btn_remove.click()
+    assert tab.panel is None and tab.stack.currentWidget() is tab.get_page
+    assert panel.calls == ["shutdown"] and live == [False]
+    assert not (tmp_path / "modules" / "onion-watch").exists()
+    assert watchaddon.installed([tmp_path / "modules"]) is None
+    assert tab.btn_get.text() == "Get Onion Watch" and tab.btn_remove_broken.isHidden()
+    assert host.screen["triggers"] and tab.kept.text().startswith("Your 2 triggers")
+    # ...and getting it again in the same run loads it afresh
+    tab.btn_get.click()
+    assert process_events(qapp, lambda: tab.panel is not None)
+    assert tab.panel is not panel and not tab.btn_remove.isHidden()
+    lay = tab.board_page.layout()
+    assert lay.itemAt(lay.count() - 1).layout() is tab.foot    # the button stays under it
+
+
+def test_a_broken_one_can_be_removed_from_hoots_page(qapp, tmp_path, addon_zip, monkeypatch):
+    watchaddon.install(addon_zip(), tmp_path / "modules")
+    tab = TriggersTab(FakeHost({"explode": True}), [tmp_path / "modules"])
+    assert tab.panel is None and not tab.btn_remove_broken.isHidden()
+    monkeypatch.setattr(tab, "confirm_remove", lambda: True)
+    tab.btn_remove_broken.click()
+    assert watchaddon.installed([tmp_path / "modules"]) is None
+    assert tab.title.text() == "Get Onion Watch for the Triggers tab"
+    assert tab.error.isHidden() and tab.btn_remove_broken.isHidden()
+
+
+def test_one_shipped_with_the_app_cannot_be_removed(qapp, tmp_path, addon_zip):
+    watchaddon.install(addon_zip(), tmp_path / "shipped")
+    tab = TriggersTab(FakeHost(), [tmp_path / "modules", tmp_path / "shipped"])
+    assert tab.panel is not None and tab.btn_remove.isHidden()
+
+
 # ---------------------------------------------------------------- the board as host
 
 class FakeEngine:

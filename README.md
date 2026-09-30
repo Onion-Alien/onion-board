@@ -228,7 +228,8 @@ too (say No if another program, like Voicemeeter, uses it).
   pad; a ringing one loops in your headphones. Triggers from before the add-on
   (Onion Board 1.4 and older) carry over as they were. When a newer Onion Watch
   is out, the tab offers it (only while *Tell me when a new version is out* is
-  ticked).
+  ticked). *Remove Onion Watch…* under the tab uninstalls it (after asking);
+  your triggers are kept for when you get it again.
   Everything happens on your PC: the screen is never saved or sent anywhere. If
   a game still shows up black, set it to Borderless or Windowed fullscreen.
 - **Mute my mic while a sound plays** (Setup → *Who's listening*): others hear
@@ -414,7 +415,7 @@ the launcher the shortcuts and PyInstaller use. The app is the `soundboard` pack
 | `soundboard/midi.py` | MIDI pad controllers as hotkeys (`midi:note 36:LPD8`): Windows' winmm over ctypes, a device opened only while a hotkey uses it, busy / unplugged devices retried |
 | `soundboard/replay.py` | instant replay: process loopback of everything but Onion Board into a ring buffer, saved as a pad on its hotkey |
 | `soundboard/appaudio.py` | the Apps tab's capture: lists the programs with an audio session (WASAPI sessions, over ctypes) and taps one program's audio with Windows' per-process loopback (a copy: the program still plays on your speakers), pushed into the engine as its own source |
-| `soundboard/ui/triggerstab.py` | the Triggers tab: Hoot (`ui/owl.py`) and *Get Onion Watch* until the add-on is installed, then the add-on's own tab, with a bar when an update is out |
+| `soundboard/ui/triggerstab.py` | the Triggers tab: Hoot (`ui/owl.py`) and *Get Onion Watch* until the add-on is installed, then the add-on's own tab, with a bar when an update is out and a button to remove it |
 | `soundboard/ui/triggershost.py` | Onion Board as the Onion Watch add-on's host: the board's sounds and playing them (a ringing trigger loops in the headphones), `Config.screen`, the trigger pictures' folder, the theme's colours |
 | `soundboard/ui/appspanel.py` | the Apps tab: one row per program (level, **Send**, volume, *Hear it myself*); programs you switch on are remembered by .exe and picked up again when they run |
 | `soundboard/engine.py` | real-time audio: 3 WASAPI streams (mic in, cable out, headphones out), mixing (sounds, radio and captured programs), pause/seek, live speed / pitch, limiter, watchdog |

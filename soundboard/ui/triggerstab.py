@@ -13,6 +13,9 @@ side of it:
 
 An add-on that fails to load shows Hoot again with why, and a button to get it
 afresh: a broken add-on never stops the app.
+
+*Remove Onion Watch…* (under its tab, or beside *Get Onion Watch again* when it's
+broken) uninstalls it after asking, and Hoot is back; the triggers are kept.
 """
 from __future__ import annotations
 
@@ -20,8 +23,8 @@ import logging
 import threading
 
 from PySide6.QtCore import Qt, Signal
-from PySide6.QtWidgets import (QHBoxLayout, QProgressBar, QPushButton, QStackedWidget,
-                               QVBoxLayout, QWidget)
+from PySide6.QtWidgets import (QHBoxLayout, QMessageBox, QProgressBar, QPushButton,
+                               QStackedWidget, QVBoxLayout, QWidget)
 
 from soundboard import modules, theme, updates, watchaddon
 from soundboard.ui import icons
@@ -72,6 +75,11 @@ class TriggersTab(QWidget):
         bv.setSpacing(0)
         self._build_update_bar()
         bv.addWidget(self.update_bar)
+        self.foot = QHBoxLayout()           # under the add-on's tab (load() puts it in)
+        self.foot.setContentsMargins(0, 6, 0, 0)
+        self.foot.addStretch(1)
+        self.btn_remove = self._remove_button()
+        self.foot.addWidget(self.btn_remove)
         self.stack.addWidget(self.board_page)
         self.load()
 
@@ -114,6 +122,8 @@ class TriggersTab(QWidget):
         self.btn_cancel.clicked.connect(self.cancel)
         self.btn_cancel.hide()
         buttons.addWidget(self.btn_cancel)
+        self.btn_remove_broken = self._remove_button()
+        buttons.addWidget(self.btn_remove_broken)
         buttons.addStretch(1)
         text.addLayout(buttons)
         self.bar = QProgressBar()
@@ -150,6 +160,18 @@ class TriggersTab(QWidget):
         h.addWidget(self.btn_later)
         self.update_bar.hide()
 
+    def _remove_button(self) -> QPushButton:
+        b = QPushButton("Remove Onion Watch…")
+        icons.set_icon(b, "trash", "danger_text")
+        b.setToolTip("Uninstall the Onion Watch add-on. Your triggers are kept.")
+        b.clicked.connect(self.remove)
+        b.hide()
+        return b
+
+    def _base(self):
+        """The modules folder Onion Watch is installed into."""
+        return self._dirs[0] if self._dirs else None
+
     def _label_get(self, error: str = ""):
         """The Hoot page's words: first time, or after it failed to load."""
         n = len(self.host.screen.get("triggers") or [])
@@ -167,6 +189,8 @@ class TriggersTab(QWidget):
         self.kept.setVisible(bool(n))
         self.error.setText(error)
         self.error.setVisible(bool(error))
+        self.btn_remove_broken.setVisible(
+            self.info is not None and watchaddon.removable(self.info, self._base()))
 
     # ------------------------------------------------------------------ loading
     def load(self, error: str = "") -> bool:
@@ -188,7 +212,14 @@ class TriggersTab(QWidget):
             self.stack.setCurrentWidget(self.get_page)
             return False
         self.panel = panel
-        self.board_page.layout().addWidget(panel, 1)
+        lay = self.board_page.layout()
+        lay.addWidget(panel, 1)
+        if self.foot.parent() is None:
+            lay.addLayout(self.foot)
+        else:                               # it's back after a remove: keep the button last
+            lay.removeItem(self.foot)
+            lay.addLayout(self.foot)
+        self.btn_remove.setVisible(watchaddon.removable(self.info, self._base()))
         if hasattr(panel, "active_changed"):
             panel.active_changed.connect(self.active_changed)
         for key, compact in self._compact.items():
@@ -224,7 +255,7 @@ class TriggersTab(QWidget):
                     raise updates.UpdateError(
                         "there's no Onion Watch release the app can check. Try again later.")
                 path = watchaddon.fetch(o, self._progress.emit, lambda: self._cancel)
-                info = watchaddon.install(path, self._dirs[0] if self._dirs else None)
+                info = watchaddon.install(path, self._base())
                 self._finished.emit(info, "", update)
             except Exception as e:  # noqa: BLE001 - offline, 404, bad zip…
                 log.info("getting Onion Watch failed: %s", e)
@@ -260,6 +291,50 @@ class TriggersTab(QWidget):
             return
         self.offer = None
         self.load()
+
+    # ------------------------------------------------------------------ removing it
+    def confirm_remove(self) -> bool:
+        n = len(self.host.screen.get("triggers") or [])
+        kept = (f" Your {plural(n, 'trigger')} and {'its' if n == 1 else 'their'} pictures "
+                "are kept for when you get it again." if n else "")
+        return QMessageBox.question(
+            self, "Remove Onion Watch?",
+            f"Remove the Onion Watch add-on from Onion Board?{kept}\n\n"
+            "You can get it again from the Triggers tab any time.",
+            QMessageBox.Yes | QMessageBox.No, QMessageBox.No) == QMessageBox.Yes
+
+    def remove(self):
+        """Uninstall Onion Watch, after asking: its tab is closed and Hoot is back."""
+        info = self.info
+        if self._busy or info is None or not self.confirm_remove():
+            return
+        was_active = self.is_active()
+        panel, self.panel = self.panel, None
+        if panel is not None:
+            try:
+                panel.shutdown()
+            except Exception:  # noqa: BLE001 - it's being removed anyway
+                log.warning("Onion Watch didn't shut down cleanly", exc_info=True)
+            self.board_page.layout().removeWidget(panel)
+            panel.setParent(None)
+            panel.deleteLater()
+        self.btn_remove.hide()
+        self.update_bar.hide()
+        self.offer = None
+        if was_active:
+            self.active_changed.emit(False)
+        try:
+            watchaddon.remove(info, self._base())
+        except modules.ModuleError as e:
+            log.warning("Onion Watch couldn't be removed: %s", e)
+            QMessageBox.warning(self, "Onion Watch wasn't removed",
+                                f"Onion Watch wasn't removed: {e}")
+            self.load()                     # it's still there: put its tab back
+            return
+        log.info("Onion Watch %s was removed", info.version)
+        self.info = None
+        self._label_get()
+        self.stack.setCurrentWidget(self.get_page)
 
     def offer_update(self, offer: watchaddon.Offer):
         """A newer Onion Watch is out (the daily update check): say so on the tab."""

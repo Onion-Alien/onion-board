@@ -114,6 +114,26 @@ def install(path: Path, base: Path | None = None) -> ModuleInfo:
             path.unlink(missing_ok=True)
 
 
+def removable(info: ModuleInfo, base: Path | None = None) -> bool:
+    """Whether this copy is the one installed into `base` (the modules folder in
+    %APPDATA%), which remove() can take out, rather than one shipped with the app."""
+    base = base if base is not None else modules.search_dirs()[0]
+    try:
+        return info.path.resolve() == (base / MODULE_ID).resolve()
+    except OSError:
+        return False
+
+
+def remove(info: ModuleInfo, base: Path | None = None) -> None:
+    """Uninstall it (modules.uninstall) and forget its loaded package, so getting it
+    again in this run loads the new copy afresh. The triggers and their pictures are
+    the board's (Config.screen, the triggers folder) and are kept. Raises
+    modules.ModuleError."""
+    modules.uninstall(MODULE_ID, base)
+    if info.package:
+        modules._forget(info.package)
+
+
 def check_update(dirs: list[Path] | None = None) -> Offer | None:
     """A newer Onion Watch than the one installed, or None (also when it isn't
     installed: then nothing is asked). Errors are logged, not raised. Call off the
