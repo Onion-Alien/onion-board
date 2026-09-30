@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+- **Mini player**: make the window too small to use and it turns into a small
+  player — what's playing, play / pause, stop, the seek bar, Live and Stop all —
+  with your pads above it when there's room. Drag it bigger and the whole window
+  comes back.
+- **Resizing no longer flickers**: dragging the window's edge used to make parts
+  of it flash in two places; now only the controls that actually need to hide or
+  come back change.
+- The tab bar never shows scroll arrows, and the category bar's arrows match the
+  theme instead of looking like stock Windows buttons.
+
 ## 1.5.2 — 2026-09-30
 
 *Who's listening* has a mode for every kind of game voice chat, and suggests the

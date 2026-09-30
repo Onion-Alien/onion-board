@@ -158,16 +158,16 @@ def test_sounds_only_toggle_leaves_the_mic_open(window, monkeypatch):
     assert window.engine.mic_enabled is True
 
 
-@pytest.mark.parametrize("size", [(300, 300), (480, 420), (800, 600)])
+@pytest.mark.parametrize("size", [(480, 420), (800, 600)])
 def test_window_shrinks_and_still_fits(window, size, qapp):
-    """Down to 300 x 300 the less important controls give way and what's left fits
-    (every tab counts: the tab widget's minimum is the largest page's)."""
-    assert window.minimumSize().width() <= 300 and window.minimumSize().height() <= 300
+    """The less important controls give way and what's left fits (every tab counts:
+    the tab widget's minimum is the largest page's)."""
     window.show()                            # offscreen: nothing appears
     window.tabs.setCurrentWidget(window.sounds_page)
     window.resize(*size)
     window._refit()
-    need = window.centralWidget().minimumSizeHint()
+    assert not window.is_mini()
+    need = window._full.minimumSizeHint()
     assert need.width() <= size[0] and need.height() <= size[1]
     assert window.grid.isVisibleTo(window) and window.btn_pp.isVisibleTo(window)
     small = window._fit.compact_count()
@@ -176,6 +176,50 @@ def test_window_shrinks_and_still_fits(window, size, qapp):
     window._refit()                          # fonts, so text is wider than in the app)
     assert window._fit.compact_count() < small
     assert window.mixer.isVisibleTo(window) and window.np_name.isVisibleTo(window)
+
+
+def test_tiny_window_becomes_mini_player_and_back(window, qapp):
+    """Too small to use: just the player (plus the pads if it's tall enough), and the
+    whole window again, pads back in the Sounds tab, once it's big enough."""
+    assert window.minimumSize().width() <= 260 and window.minimumSize().height() <= 120
+    window.show()
+    window.tabs.setCurrentWidget(window.sounds_page)
+    window.select("s1")
+    window.resize(260, 120)
+    window._refit()
+    assert window.is_mini()
+    assert window.mini_pp.isVisibleTo(window) and window.mini_air.isVisibleTo(window)
+    assert window.mini_name.text() == "Airhorn"
+    assert not window.grid.isVisibleTo(window)    # no room for pads
+    window.resize(360, 700)                        # tall and narrow: the pads come along
+    window._refit()
+    assert window.is_mini() and window.grid.isVisibleTo(window)
+    window.mini_air.setChecked(False)              # one switch, both buttons
+    assert not window.btn_air.isChecked() and window.engine.sending is False
+    window.btn_air.setChecked(True)
+    assert window.mini_air.isChecked()
+    window.resize(1100, 760)
+    window._refit()
+    assert not window.is_mini()
+    assert window._pads_scroll.parentWidget().parentWidget() is window.sounds_page.parentWidget() \
+        or window.grid.isVisibleTo(window)
+    assert window._pads_home[0].indexOf(window._pads_scroll) == window._pads_home[1]
+
+
+def test_refit_leaves_widgets_alone_when_nothing_crosses_an_edge(window, qapp):
+    """Resizing only touches the steps at the edge it crossed, so a border drag
+    doesn't show and hide half the window on every mouse move (it flashed)."""
+    window.show()
+    window.resize(900, 700)
+    window._refit()
+    flips = []
+    orig = [s[2] for s in window._fit.steps]
+    window._fit.steps = [(p, a, (lambda c, f=f: (flips.append(c), f(c))))
+                         for (p, a, _), f in zip(window._fit.steps, orig)]
+    for w in range(900, 880, -2):                  # small moves, no edge crossed
+        window.resize(w, 700)
+        window._refit()
+    assert len(flips) <= 2
 
 
 # ---------------------------------------------------------------- effects

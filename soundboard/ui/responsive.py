@@ -1,4 +1,4 @@
-"""Keeps the main window usable at any size, down to about 300 x 300.
+"""Keeps the main window usable at any size, down to where it becomes the mini player.
 
 Each part of the window registers "steps": a way to make itself smaller (hide a
 label, drop a button's text, stack two columns) with a priority. On every resize
@@ -19,7 +19,7 @@ from PySide6.QtWidgets import QBoxLayout, QPushButton, QWidget
 
 Step = tuple[int, str, Callable[[bool], None]]   # (priority, "w" / "h", apply(compact))
 
-MIN_SIZE = QSize(300, 300)
+MIN_SIZE = QSize(260, 120)   # the mini player (see MainWindow._refit)
 
 
 def touch(*widgets: QWidget):
@@ -76,12 +76,19 @@ def stack(layout: QBoxLayout) -> Callable[[bool], None]:
 
 
 class Fitter:
+    """Steps are applied lowest priority first, per axis, and undone in reverse.
+
+    Incremental: a resize only touches the steps at the edge it crossed, so dragging
+    the window's border doesn't show and hide every registered widget on each mouse
+    move (that made parts of the window flash in two places while resizing)."""
+
     def __init__(self, root: QWidget):
         self.root = root
         self.steps: list[Step] = []
-        self._applied: tuple[bool, ...] = ()
+        self._at: dict[int, int] = {}   # applied step index -> the size it was applied at
 
     def add(self, priority: int, axis: str, apply: Callable[[bool], None]):
+        self.reset()
         self.steps.append((priority, axis, apply))
         self.steps.sort(key=lambda s: s[0])   # stable: same priority keeps its order
 
@@ -89,23 +96,43 @@ class Fitter:
         for s in steps:
             self.add(*s)
 
+    def reset(self):
+        """Undo every step (everything shows again)."""
+        for i in sorted(self._at, reverse=True):
+            self.steps[i][2](False)
+        self._at.clear()
+
+    def _over(self, size: QSize, axis: str) -> bool:
+        need = self.root.minimumSizeHint()
+        return (need.width() > size.width() if axis == "w"
+                else need.height() > size.height())
+
     def fit(self, size: QSize):
         """Apply as few steps as it takes for the content to fit `size`."""
+        dim = {"w": size.width(), "h": size.height()}
         self.root.setUpdatesEnabled(False)
         try:
-            for _, _, apply in self.steps:
-                apply(False)
-            applied = []
-            for _, axis, apply in self.steps:
-                need = self.root.minimumSizeHint()
-                over = (need.width() > size.width() if axis == "w"
-                        else need.height() > size.height())
-                if over:
+            for axis in ("h", "w"):   # hiding the mixer (height) narrows the window too
+                for i, (_, ax, apply) in enumerate(self.steps):
+                    if ax != axis or i in self._at:
+                        continue
+                    if not self._over(size, axis):
+                        break
                     apply(True)
-                applied.append(over)
-            self._applied = tuple(applied)
+                    self._at[i] = dim[axis]
+            for axis in ("w", "h"):   # grown: bring back what fits again, last-hidden first
+                for i in sorted((i for i in self._at if self.steps[i][1] == axis),
+                                reverse=True):
+                    if dim[axis] <= self._at[i]:
+                        break   # no bigger than when it had to go
+                    self.steps[i][2](False)
+                    if self._over(size, "w") or self._over(size, "h"):
+                        self.steps[i][2](True)
+                        self._at[i] = dim[axis]
+                        break
+                    del self._at[i]
         finally:
             self.root.setUpdatesEnabled(True)
 
     def compact_count(self) -> int:
-        return sum(self._applied)
+        return len(self._at)

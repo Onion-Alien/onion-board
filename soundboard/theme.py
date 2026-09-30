@@ -13,7 +13,7 @@ from string import Template
 
 from PySide6.QtCore import QPointF, QRectF, Qt
 from PySide6.QtGui import (QColor, QIcon, QImage, QLinearGradient, QPainter, QPainterPath,
-                           QPen, QPixmap)
+                           QPen, QPixmap, QTransform)
 
 # Status colours (inline ok / warn / error messages, danger buttons) most themes share:
 # the bright ones read on dark backgrounds, the deep ones on light.
@@ -509,6 +509,15 @@ QTabBar::tab { background:transparent; color:$muted; padding:8px 16px; margin-ri
     border:none; border-bottom:2px solid transparent; font-weight:600; }
 QTabBar::tab:selected { color:$text; border-bottom:2px solid $accent; }
 QTabBar::tab:hover { color:$text; }
+QTabBar::scroller { width:48px; }
+QTabBar QToolButton { background:$btn; border:none; border-radius:8px; margin:5px 0 5px 2px; }
+QTabBar QToolButton:hover { background:$btn_hover; }
+QTabBar QToolButton:disabled { background:$bg; }
+QTabBar QToolButton::left-arrow { image:url("$left"); width:10px; height:10px; }
+QTabBar QToolButton::right-arrow { image:url("$right"); width:10px; height:10px; }
+QTabBar QToolButton::left-arrow:disabled { image:url("$left_off"); }
+QTabBar QToolButton::right-arrow:disabled { image:url("$right_off"); }
+QTabBar::tear { width:0; border:none; }
 QPushButton#live { font-weight:700; }
 QPushButton#voicetile { text-align:left; padding:9px 10px; border-radius:10px; }
 QPushButton#voicetile:checked { background:$accent; color:$on_accent; border:1px solid $accent_hi; font-weight:700; }
@@ -596,14 +605,19 @@ def _chevron_image(colour: str, size: int, up: bool) -> QImage:
     return img
 
 
-def _chevron_url(colour: str, size: int, up: bool) -> str:
+def _chevron_url(colour: str, size: int, up: bool, side: str = "") -> str:
+    """`side` "left" / "right" turns the down chevron on its side (tab-bar scroll arrows)."""
     folder = Path(tempfile.gettempdir()) / "onionboard-ui"
-    base = folder / f"chevron-{'up' if up else 'down'}{size}-{colour.lstrip('#')}.png"
+    name = side or ("up" if up else "down")
+    base = folder / f"chevron-{name}{size}-{colour.lstrip('#')}.png"
     try:
         folder.mkdir(exist_ok=True)
         for path, px in ((base, size), (base.with_name(base.stem + "@2x.png"), size * 2)):
             if not path.exists():
-                _chevron_image(colour, px, up).save(str(path))
+                img = _chevron_image(colour, px, up)
+                if side:
+                    img = img.transformed(QTransform().rotate(90 if side == "left" else -90))
+                img.save(str(path))
     except OSError:
         return ""
     return base.as_posix()
@@ -694,6 +708,8 @@ def stylesheet(name: str | None = None) -> str:
         tokens["up" + key] = _chevron_url(colour, 10, up=True)
         tokens["down_small" + key] = _chevron_url(colour, 8, up=False)
         tokens["up_small" + key] = _chevron_url(colour, 8, up=True)
+        tokens["left" + key] = _chevron_url(colour, 10, False, side="left")
+        tokens["right" + key] = _chevron_url(colour, 10, False, side="right")
     css = STYLE.substitute(tokens)
     if tokens.get("texture") and (url := _texture_url(tokens["texture"], tokens["panel"])):
         css += ("QFrame#card, QFrame#transport, QFrame#setcard "

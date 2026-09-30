@@ -19,8 +19,8 @@ from PySide6.QtGui import QDesktopServices
 from PySide6.QtWidgets import (QApplication, QCheckBox, QComboBox, QFileDialog, QFrame,
                                QGraphicsOpacityEffect, QGridLayout, QHBoxLayout, QInputDialog,
                                QLabel, QLineEdit, QMainWindow, QMenu, QMessageBox, QPushButton,
-                               QScrollArea, QSlider, QSystemTrayIcon, QTabBar, QTabWidget,
-                               QVBoxLayout, QWidget)
+                               QScrollArea, QSizePolicy, QSlider, QStackedWidget,
+                               QSystemTrayIcon, QTabBar, QTabWidget, QVBoxLayout, QWidget)
 
 from soundboard import engine as eng
 from soundboard import theme, winkeys, ytdl
@@ -50,7 +50,7 @@ from soundboard.ui.logowidget import LogoWidget, glow_icon
 from soundboard.ui.ytsearch import SearchResults
 from soundboard.ui.padbatch import PadSelection
 from soundboard.ui.overlay import Overlay
-from soundboard.ui.appspanel import AppsTab
+from soundboard.ui.appspanel import AppsTab, ElidedLabel
 from soundboard.ui.triggershost import BoardHost
 from soundboard.ui.triggerstab import TriggersTab
 from soundboard.ui.radiopanel import RadioTab
@@ -77,6 +77,8 @@ TICK_MS = 33         # the UI timer while the window is on screen (meters, visua
 TICK_IDLE_MS = 250   # ...and while it's in the tray or minimised (push-to-talk, watchdog)
 GLOW_STEPS = 4       # how many glow levels the taskbar / tray icon has while sound plays
 ICON_GLOW_MS = 120   # ...and how often at most it changes
+MINI_SIZE = QSize(440, 380)   # below this the window becomes the mini player...
+MINI_PADS_H = 230             # ...which has the pads above it from this tall
 RANDOM = "__random__:"   # hotkey action prefix: a random sound from the category after it
 ALL = "All"          # the category tab that shows every sound
 VOICE_POLL_MS = 3000  # how often the game in front is looked at (soundboard.voicesdk)
@@ -223,8 +225,12 @@ class MainWindow(QMainWindow):
     # Every tab is built the same way: a toolbar row on top, its content, and a
     # bottom bar ending in "Volume [slider %] | Hear it myself" for that source.
     def _build_ui(self):
-        root = QWidget()
-        self.setCentralWidget(root)
+        # page 0 the whole window, page 1 the mini player it turns into when it's
+        # made too small to use (see _refit)
+        self._pages = QStackedWidget()
+        self.setCentralWidget(self._pages)
+        root = self._full = QWidget()
+        self._pages.addWidget(root)
         rv = QVBoxLayout(root)
         rv.setContentsMargins(14, 10, 14, 10)
         rv.setSpacing(8)
@@ -306,6 +312,7 @@ class MainWindow(QMainWindow):
         self.tabs = QTabWidget()
         self.tabs.setDocumentMode(True)
         self.tabs.setIconSize(QSize(18, 18))
+        self.tabs.tabBar().setUsesScrollButtons(False)   # small windows drop the tab text
         rv.addWidget(self.tabs, 1)
         self.sounds_page = self._build_sounds_page()
         self.tabs.addTab(self.sounds_page, "")
@@ -371,6 +378,80 @@ class MainWindow(QMainWindow):
         self.status.setWordWrap(True)
         self.status.setObjectName("muted")
         rv.addWidget(self.status)
+        self._pages.addWidget(self._build_mini())
+
+    def _build_mini(self) -> QWidget:
+        """The mini player: what's playing, play / stop, where it's at, Live and Stop
+        all, and the pads above them if there's room. The pads are the real ones,
+        moved in and out of the Sounds tab (_set_mini)."""
+        page = QWidget()
+        v = self._mini_v = QVBoxLayout(page)
+        v.setContentsMargins(8, 8, 8, 8)
+        v.setSpacing(6)
+        v.addStretch(0)   # keeps the player at the bottom when the pads don't fit
+        card = QFrame()
+        card.setObjectName("transport")
+        cv = QVBoxLayout(card)
+        cv.setContentsMargins(8, 6, 8, 6)
+        cv.setSpacing(4)
+        top = QHBoxLayout()
+        top.setSpacing(6)
+        self.mini_pp = QPushButton()
+        self.mini_pp.setObjectName("round")
+        self.mini_pp.setToolTip("Play / pause")
+        self.mini_pp.clicked.connect(self.toggle_play_pause)
+        self.mini_st = QPushButton()
+        self.mini_st.setObjectName("round")
+        self.mini_st.setToolTip("Stop")
+        self.mini_st.clicked.connect(self.stop_current)
+        icons.set_icon(self.mini_st, "stop", size=16)
+        for b in (self.mini_pp, self.mini_st):
+            b.setFixedSize(34, 30)
+            top.addWidget(b)
+        self.mini_name = ElidedLabel(self.np_name.text())
+        self.mini_name.setTextFormat(Qt.PlainText)   # sound names are user / web text
+        self.mini_name.setStyleSheet("font-weight:600;")
+        self.mini_name.setMinimumWidth(30)
+        self.mini_name.setSizePolicy(QSizePolicy.Ignored, QSizePolicy.Preferred)
+        top.addWidget(self.mini_name, 1)
+        self.mini_air = QPushButton()
+        self.mini_air.setObjectName("onair")
+        self.mini_air.setCheckable(True)
+        self.mini_air.setChecked(self.btn_air.isChecked())
+        self.mini_air.setToolTip(self.btn_air.toolTip())
+        self.mini_air.toggled.connect(self.set_sending)
+        icons.set_icon(self.mini_air, "live", "danger_text", "#ffffff")
+        self.mini_stop = QPushButton()
+        self.mini_stop.setObjectName("danger")
+        self.mini_stop.setToolTip(self.stop_btn.toolTip())
+        self.mini_stop.clicked.connect(self.stop_all)
+        icons.set_icon(self.mini_stop, "stop", "danger_text", size=14)
+        for b in (self.mini_air, self.mini_stop):
+            b.setFixedSize(38, 30)
+            top.addWidget(b)
+        cv.addLayout(top)
+        bottom = QHBoxLayout()
+        bottom.setSpacing(6)
+        self.mini_seek = SeekSlider(Qt.Horizontal)
+        self.mini_seek.setRange(0, 1000)
+        self.mini_seek.setObjectName("seek")
+        self.mini_seek.sliderPressed.connect(lambda: setattr(self, "_seeking", True))
+        self.mini_seek.sliderReleased.connect(lambda: self.do_seek(self.mini_seek))
+        self.mini_seek.valueChanged.connect(self._seek_preview)
+        no_wheel(self.mini_seek)
+        bottom.addWidget(self.mini_seek, 1)
+        self.mini_time = QLabel(self.np_time.text())
+        self.mini_time.setObjectName("muted")
+        self.mini_time.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        bottom.addWidget(self.mini_time)
+        cv.addLayout(bottom)
+        v.addWidget(card)
+        icons.set_icon(self.mini_pp, "play", size=16)
+        return page
+
+    def _set_np_name(self, text: str):
+        self.np_name.setText(self.np_name.fontMetrics().elidedText(text, Qt.ElideRight, 186))
+        self.mini_name.setText(text)   # elides itself to whatever room it has
 
     def _build_mixer(self) -> QFrame:
         """The levels strip along the bottom, the same on every tab: three labelled
@@ -536,6 +617,7 @@ class MainWindow(QMainWindow):
         scroll.setWidget(self.grid)
         scroll.setFrameShape(QFrame.NoFrame)
         left.addWidget(scroll, 1)
+        self._pads_home = (left, left.indexOf(scroll))   # the mini player borrows it
         self.ytresults.closed.connect(scroll.show)   # the results take the pads' place
         self._pads_scroll = scroll
         # ---- "3 selected · Colour · Volume… · Delete": Ctrl / Shift+click picks pads
@@ -683,8 +765,10 @@ class MainWindow(QMainWindow):
     def _set_pp_icon(self, name: str):
         if name != self._pp_icon:
             self._pp_icon = name
-            self.btn_pp.setIcon(icons.icon(name))
-            self.btn_pp.setIconSize(QSize(16, 16))
+            for b in (self.btn_pp, getattr(self, "mini_pp", None)):
+                if b is not None:
+                    b.setIcon(icons.icon(name))
+                    b.setIconSize(QSize(16, 16))
 
     def _build_setup_page(self) -> QWidget:
         """One-time setup and the rarely-touched stuff: where the audio goes,
@@ -1395,6 +1479,9 @@ class MainWindow(QMainWindow):
         self.btn_air.setToolTip(
             "Click to mute: nothing at all goes out to Discord / the game (you still hear "
             "everything)" if on else "Click to go live again: others hear you and your sounds")
+        if hasattr(self, "mini_air"):
+            self.mini_air.setChecked(on)
+            self.mini_air.setToolTip(self.btn_air.toolTip())
 
     def _shorten_air(self, size: int) -> Callable[[bool], None]:
         def apply(compact: bool):
@@ -1512,8 +1599,7 @@ class MainWindow(QMainWindow):
                 self.pads[sid].selected = True
                 self.pads[sid].update()
             m = self.meta(sid)
-            name = m.name if m else ""
-            self.np_name.setText(self.np_name.fontMetrics().elidedText(name, Qt.ElideRight, 186))
+            self._set_np_name(m.name if m else "")
 
     def toggle_play_pause(self):
         sid = self.current
@@ -1539,12 +1625,13 @@ class MainWindow(QMainWindow):
             m = self.meta(self.current) if self.current else None
             if m:
                 self.np_time.setText(fmt_pos(v / 1000 * m.duration, m.duration))
+                self.mini_time.setText(self.np_time.text())
 
-    def do_seek(self):
+    def do_seek(self, slider=None):
         self._seeking = False
         if not self.current:
             return
-        frac = self.seek.value() / 1000
+        frac = (slider or self.seek).value() / 1000
         if not self.engine.seek(self.current, frac):
             self.start_frac = frac   # not playing: ▶ will start from here
 
@@ -2111,7 +2198,7 @@ class MainWindow(QMainWindow):
             self.engine.forget(m.id)
             if self.current == m.id:
                 self.current = None
-                self.np_name.setText("Click a sound to control it here")
+                self._set_np_name("Click a sound to control it here")
         self._save_now()
         self._rebuild_pads()
         self._fill_categories()
@@ -2940,7 +3027,8 @@ class MainWindow(QMainWindow):
         sid = self.current
         m = self.meta(sid) if sid else None
         enabled = m is not None
-        for w in (self.btn_pp, self.btn_st, self.seek):
+        for w in (self.btn_pp, self.btn_st, self.seek, self.mini_pp, self.mini_st,
+                  self.mini_seek):
             w.setEnabled(enabled)
         if not m:
             return
@@ -2949,10 +3037,12 @@ class MainWindow(QMainWindow):
         self._set_pp_icon("pause" if live and not paused else "play")
         if not self._seeking:
             frac = prog if live else self.start_frac
-            self.seek.blockSignals(True)
-            self.seek.setValue(int(frac * 1000))
-            self.seek.blockSignals(False)
+            for slider in (self.seek, self.mini_seek):
+                slider.blockSignals(True)
+                slider.setValue(int(frac * 1000))
+                slider.blockSignals(False)
             self.np_time.setText(fmt_pos(frac * m.duration, m.duration))
+            self.mini_time.setText(self.np_time.text())
 
     def _release_ptt(self):
         if self._ptt_held:
@@ -2964,7 +3054,7 @@ class MainWindow(QMainWindow):
         """What gives way when the window gets small (see ui/responsive.py). Lower
         numbers go first; width and height are handled separately."""
         r = responsive
-        f = self._fit = r.Fitter(self.centralWidget())
+        f = self._fit = r.Fitter(self._full)
         f.add(10, "w", r.hide(self.tagline))
         f.add(10, "w", r.hide(*self._pad_size))
         f.add(12, "w", r.hide(*self._mixer_send))
@@ -2998,9 +3088,6 @@ class MainWindow(QMainWindow):
         f.add(40, "h", r.hide(self.mixer))
         f.add(50, "h", r.hide(self.cat_bar))   # the overlay's category key still works
         self._stack_cols = (r.stack(self._setup_cols), *self.voice.stack_steps())
-        self._fit_timer = QTimer(self)
-        self._fit_timer.setSingleShot(True)
-        self._fit_timer.timeout.connect(self._refit)
         self.setMinimumSize(responsive.MIN_SIZE)
 
     def _shorten_pill(self, short: bool):
@@ -3021,15 +3108,47 @@ class MainWindow(QMainWindow):
             self.tabs.setTabToolTip(i, base)
 
     def _refit(self):
-        narrow = self.width() < 860   # two cards side by side get cramped below this
-        for apply in self._stack_cols:
-            apply(narrow)
-        self._fit.fit(self.centralWidget().size())
+        size = self._pages.size()
+        mini = size.width() < MINI_SIZE.width() or size.height() < MINI_SIZE.height()
+        if not mini:
+            narrow = self.width() < 860   # two cards side by side get cramped below this
+            for apply in self._stack_cols:
+                apply(narrow)
+            self._fit.fit(size)
+            need = self._full.minimumSizeHint()   # even the smallest layout won't fit
+            mini = need.width() > size.width() or need.height() > size.height()
+        self._set_mini(mini)
+        if mini:   # the pads too, when there's room for a row of them
+            show = size.height() >= MINI_PADS_H
+            if self._pads_scroll.isHidden() == show:
+                self._pads_scroll.setVisible(show)
+
+    def is_mini(self) -> bool:
+        return self._pages.currentIndex() == 1
+
+    def _set_mini(self, on: bool):
+        """Swap the whole window for the mini player (or back). The pads move with it."""
+        if on == self.is_mini():
+            return
+        scroll = self._pads_scroll
+        self.setUpdatesEnabled(False)
+        try:
+            if on:
+                self._mini_v.insertWidget(0, scroll, 1)
+            else:
+                home, index = self._pads_home
+                home.insertWidget(index, scroll, 1)
+                scroll.setVisible(self.ytresults.isHidden())   # results take the pads' place
+            self._pages.setCurrentIndex(1 if on else 0)
+        finally:
+            self.setUpdatesEnabled(True)
 
     def resizeEvent(self, ev):
         super().resizeEvent(ev)
-        if hasattr(self, "_fit_timer"):
-            self._fit_timer.start(0)   # one refit per burst of resize events
+        if hasattr(self, "_fit"):
+            # right away, before the frame is painted: a queued refit let each frame
+            # paint twice, before and after, which made parts of the window flash
+            self._refit()
 
     # Files dropped anywhere else on the window (the toolbar, another tab, the edge of
     # the pad area) are added just like ones dropped on the pads.
