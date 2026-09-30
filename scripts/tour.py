@@ -120,7 +120,7 @@ def end_card(size) -> QImage:
     promo.caption(p, QRectF(0, h * 0.44, w, h * 0.12), "Onion Board", h * 0.10)
     promo.caption(p, QRectF(0, h * 0.57, w, h * 0.08), "free soundboard for Windows",
                   h * 0.05, 1, promo.MUTED, bold=False)
-    promo.caption(p, QRectF(0, h * 0.70, w, h * 0.08), "onion-alien.github.io/onionboard",
+    promo.caption(p, QRectF(0, h * 0.70, w, h * 0.08), "onion-alien.github.io/onion-board",
                   h * 0.05, 1, promo.GREEN)
     p.end()
     return img

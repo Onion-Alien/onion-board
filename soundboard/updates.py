@@ -29,12 +29,14 @@ from soundboard.library import APP_DIR
 
 log = logging.getLogger(__name__)
 
-REPO = "Onion-Alien/onionboard"
+REPO = "Onion-Alien/onion-board"
 API = f"https://api.github.com/repos/{REPO}/releases/latest"
 RELEASES = f"https://github.com/{REPO}/releases/latest"
 ASSET = "OnionBoardSetup.exe"
 # the only place an installer is ever fetched from (GitHub then redirects to its CDN)
 DOWNLOADS = f"https://github.com/{REPO}/releases/download/"
+# ...or under the project's name before it was renamed (GitHub redirects the old one)
+OLD_DOWNLOADS = "https://github.com/Onion-Alien/onionboard/releases/download/"
 UPDATES_DIR = APP_DIR / "updates"
 INSTALL_LOG = UPDATES_DIR / "install.log"
 EVERY_S = 24 * 3600
@@ -88,7 +90,7 @@ def _installer(data: dict) -> tuple[str, str, int]:
         if not isinstance(a, dict) or a.get("name") != ASSET:
             continue
         url = str(a.get("browser_download_url") or "")
-        if not url.startswith(DOWNLOADS):
+        if not url.startswith((DOWNLOADS, OLD_DOWNLOADS)):
             return "", "", 0
         digest = str(a.get("digest") or "").lower()
         sha = digest.removeprefix("sha256:") if digest.startswith("sha256:") else ""
@@ -190,7 +192,7 @@ def download(rel: Release, progress: Callable[[int, int], None] | None = None,
     """Fetch the release's installer into UPDATES_DIR and prove it's the file GitHub
     lists (SHA-256); its path. `progress(done, total)` is called as it arrives. Raises
     UpdateError with a message for the user. Call off the UI thread."""
-    if not rel.asset_url.startswith(DOWNLOADS) or not SHA_RE.fullmatch(rel.sha256):
+    if not rel.asset_url.startswith((DOWNLOADS, OLD_DOWNLOADS)) or not SHA_RE.fullmatch(rel.sha256):
         raise UpdateError("this release has no installer the app can check, "
                           "so it can only be downloaded from its page")
     dest = installer_path(rel)

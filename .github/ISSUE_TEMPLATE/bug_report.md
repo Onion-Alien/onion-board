@@ -22,4 +22,4 @@ Attach or paste the relevant part of `%APPDATA%\OnionBoard\onionboard.log`.
 > replace them (e.g. `C:\Users\<me>\...`) before posting. Never paste anything from
 > `%APPDATA%\OnionBoard\browser\` — that's your browser logins.
 
-**Security problem?** Don't file it here — see [SECURITY.md](https://github.com/Onion-Alien/onionboard/blob/main/SECURITY.md).
+**Security problem?** Don't file it here — see [SECURITY.md](https://github.com/Onion-Alien/onion-board/blob/main/SECURITY.md).

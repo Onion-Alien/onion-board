@@ -34,9 +34,9 @@ dependencies = [
 dev = ["pytest==9.1.1", "ruff==0.16.9", "pyinstaller==6.22.3"]
 
 [project.urls]
-Homepage = "https://github.com/Onion-Alien/onionboard"
-Issues = "https://github.com/Onion-Alien/onionboard/issues"
-Changelog = "https://github.com/Onion-Alien/onionboard/blob/main/CHANGELOG.md"
+Homepage = "https://github.com/Onion-Alien/onion-board"
+Issues = "https://github.com/Onion-Alien/onion-board/issues"
+Changelog = "https://github.com/Onion-Alien/onion-board/blob/main/CHANGELOG.md"
 
 [project.gui-scripts]
 soundboard = "soundboard.app:main"

@@ -131,6 +131,14 @@ def test_latest_finds_the_installer_and_its_checksum(monkeypatch):
     assert (rel.asset_url, rel.sha256, rel.size) == (SETUP_URL, SETUP_SHA, len(SETUP))
 
 
+def test_an_installer_under_the_old_repo_name_is_still_trusted(monkeypatch):
+    """The repo was renamed onionboard -> onion-board; GitHub redirects the old name."""
+    old = "https://github.com/Onion-Alien/onionboard/releases/download/v9.0.0/OnionBoardSetup.exe"
+    assert updates.DOWNLOADS == "https://github.com/Onion-Alien/onion-board/releases/download/"
+    monkeypatch.setattr(updates, "_get", lambda url: _release_json(browser_download_url=old))
+    assert updates.latest().asset_url == old
+
+
 def test_latest_takes_the_checksum_from_the_notes_without_a_digest(monkeypatch):
     data = _release_json(digest=None)
     data["body"] = f"Download below.\n\nSHA-256: `{SETUP_SHA.upper()}`\n"

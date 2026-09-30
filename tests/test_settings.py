@@ -29,5 +29,5 @@ def test_support_opens_the_project_page_not_an_address_in_the_app(window, monkey
     d = SettingsDialog(window, "general")
     btn = next(b for b in d.findChildren(QPushButton) if "Support" in b.text())
     btn.click()
-    assert opened == ["https://github.com/Onion-Alien/onionboard#support-onion-board"]
+    assert opened == ["https://github.com/Onion-Alien/onion-board#support-onion-board"]
     d.close()

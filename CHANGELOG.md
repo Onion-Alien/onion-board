@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- **The project moved to [github.com/Onion-Alien/onion-board](https://github.com/Onion-Alien/onion-board)**
+  and its website to [onion-alien.github.io/onion-board](https://onion-alien.github.io/onion-board/).
+  The old addresses still lead there. Updates keep working: this version takes an
+  installer from either address.
 - **"Game has no microphone setting?" now covers voice chat too.** Windows keeps
   a separate *default communication device*, and that's the one many games' voice
   chat asks for. The steps now set the cable as both, not just the default device.

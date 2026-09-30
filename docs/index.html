@@ -7,10 +7,10 @@
 <meta name="description" content="Free Windows soundboard: play sounds into Discord and games through your mic, with MIDI pad support, instant replay, a voice changer, text-to-speech, an in-game overlay, and screen triggers that play a sound when something shows up, like YOU DIED.">
 <meta property="og:title" content="Onion Board: free soundboard for Discord and games">
 <meta property="og:description" content="Play sounds through your mic in Discord and games. Voice changer, text-to-speech, and screen triggers that play a sound when you die.">
-<meta property="og:image" content="https://onion-alien.github.io/onionboard/screenshots/sounds.png">
+<meta property="og:image" content="https://onion-alien.github.io/onion-board/screenshots/sounds.png">
 <meta property="og:type" content="website">
 <meta name="twitter:card" content="summary_large_image">
-<link rel="canonical" href="https://onion-alien.github.io/onionboard/">
+<link rel="canonical" href="https://onion-alien.github.io/onion-board/">
 <style>
   :root {
     --bg: #0f1016; --card: #1a1b24; --edge: #2a2b38; --text: #ececf3; --muted: #a3a4b8;
@@ -55,10 +55,10 @@
     <h1><span>Onion Board</span></h1>
     <p class="tag">A free soundboard for Windows. Press a button or a hotkey, even in-game, and your
       friends in Discord or your game hear the sound through your mic.</p>
-    <a class="dl" href="https://github.com/Onion-Alien/onionboard/releases/latest/download/OnionBoardSetup.exe">⬇ Download for Windows</a>
+    <a class="dl" href="https://github.com/Onion-Alien/onion-board/releases/latest/download/OnionBoardSetup.exe">⬇ Download for Windows</a>
     <p class="small">Free · Windows 10 and 11 · one installer, no account, no ads, no tracking</p>
     <p class="small"><a href="https://www.virustotal.com/gui/file/0f3c5ac92678f5a6f5ea3361611bb73c3139ee2a884cf48b55497044852e2236">VirusTotal scan of 1.4.1</a> · 67 of 67 scanners clean</p>
-    <p class="small"><a id="ver" href="https://github.com/Onion-Alien/onionboard/releases/latest">Latest version 1.4.0 · what's new</a></p>
+    <p class="small"><a id="ver" href="https://github.com/Onion-Alien/onion-board/releases/latest">Latest version 1.4.0 · what's new</a></p>
     <img class="hero" src="screenshots/tour.webp" width="1100" height="736"
          alt="A quick tour: playing sounds, the radio globe, a trigger catching YOU DIED, and the voice changer">
   </header>
@@ -105,7 +105,7 @@
 
   <h2>Get started</h2>
   <ol class="steps">
-    <li><a href="https://github.com/Onion-Alien/onionboard/releases/latest/download/OnionBoardSetup.exe">Download <code>OnionBoardSetup.exe</code></a> and run it.</li>
+    <li><a href="https://github.com/Onion-Alien/onion-board/releases/latest/download/OnionBoardSetup.exe">Download <code>OnionBoardSetup.exe</code></a> and run it.</li>
     <li>A short guide asks which mic and headphones you use and sets everything up.</li>
     <li>In Discord (or your game), pick <b>CABLE Output</b> as your microphone, and set Discord's
       <b>Input Profile</b> to <b>Studio</b> so it doesn't treat your sounds as noise.</li>
@@ -113,18 +113,18 @@
   <p class="note">Windows or your browser may warn you about the download. That's normal for a free
     app from a small developer: the installer isn't "code-signed", which costs hundreds a year.
     Click <b>More info → Run anyway</b> (or <b>⋯ → Keep</b> in Edge / Chrome). The full source code is
-    <a href="https://github.com/Onion-Alien/onionboard">on GitHub</a> if you'd like to check it.</p>
+    <a href="https://github.com/Onion-Alien/onion-board">on GitHub</a> if you'd like to check it.</p>
 
   <footer>
-    <a href="https://github.com/Onion-Alien/onionboard">Source code</a> ·
-    <a href="https://github.com/Onion-Alien/onionboard/releases">All versions</a> ·
-    <a href="https://github.com/Onion-Alien/onionboard/issues">Report a problem</a><br>
+    <a href="https://github.com/Onion-Alien/onion-board">Source code</a> ·
+    <a href="https://github.com/Onion-Alien/onion-board/releases">All versions</a> ·
+    <a href="https://github.com/Onion-Alien/onion-board/issues">Report a problem</a><br>
     Onion Board is free to use. Nothing is collected about you.
   </footer>
 </div>
 <script>
   // The newest version's number, straight from GitHub (the link works without it too).
-  fetch("https://api.github.com/repos/Onion-Alien/onionboard/releases/latest")
+  fetch("https://api.github.com/repos/Onion-Alien/onion-board/releases/latest")
     .then(r => r.ok ? r.json() : null)
     .then(r => {
       const v = r && /^v?(\d+\.\d+\.\d+)$/.exec(r.tag_name || "");
