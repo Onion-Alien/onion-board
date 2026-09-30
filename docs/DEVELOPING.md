@@ -28,6 +28,17 @@ module's `install.bat` or `pip install -r requirements.txt`).
 - Layout: README → *Code layout*. Rules: [CONTRIBUTING.md](../CONTRIBUTING.md).
 - Real-time audio callbacks never block and never take the engine lock.
 - Anything user-visible goes in `CHANGELOG.md` under *Unreleased*.
+- The Triggers tab is the [Onion Watch](https://github.com/Onion-Alien/onion-watch)
+  add-on, a separate project. Onion Board's side is `ui/triggerstab.py` (the tab,
+  Hoot and the download), `ui/triggershost.py` (the host interface the add-on
+  talks to; `modules.TRIGGERS_API` is the version of it this app can host) and
+  `watchaddon.py` (its releases). To try an Onion Watch build before it's
+  released, or while its repo isn't reachable, build its zip
+  (`scripts\build_module.py` there) and start Onion Board with
+  `ONIONBOARD_ONION_WATCH_ZIP` set to it: *Get Onion Watch* and the update check
+  then use that file instead of GitHub. The add-on may only import what the built
+  app ships (it has no pip): the standard library, numpy, scipy and PySide6's
+  QtCore / QtGui / QtWidgets. Removing one of those from the build breaks it.
 
 ## 3. Check it (headless)
 

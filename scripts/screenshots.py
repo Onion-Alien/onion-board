@@ -7,6 +7,11 @@ hotkey is registered. Everything shown is made up here -- demo sounds synthesize
 with numpy, generic device names, a fake list of programs -- so nothing from the
 machine it runs on (its sound library, headset, open windows) ends up in a picture.
 The Radio tab isn't captured: its globe is a web view, which renders blank offscreen.
+
+The Triggers tab is the Onion Watch add-on. Set ONIONBOARD_ONION_WATCH_ZIP to an
+OnionWatch-module.zip (Onion Watch's scripts/build_module.py) to capture it: it's
+installed into the made-up profile, with one made-up screen. Without it the
+triggers picture is left as it is.
 """
 import argparse
 import os
@@ -33,7 +38,7 @@ import soundfile as sf  # noqa: E402
 from PySide6.QtCore import QEventLoop  # noqa: E402
 from PySide6.QtWidgets import QApplication  # noqa: E402
 
-from soundboard import appaudio, autostart, engine, library, screenwatch, winkeys  # noqa: E402
+from soundboard import appaudio, autostart, engine, library, winkeys  # noqa: E402
 
 winkeys.key_char = conftest.us_key_char   # hotkeys drawn as on a US keyboard
 
@@ -79,13 +84,28 @@ def fake_machine(tmp: Path):
     for setter, attr in (("set_main_device", "main_stream"), ("set_mon_device", "mon_stream"),
                          ("set_mic_device", "mic_stream")):
         setattr(engine.Engine, setter, lambda self, n, _a=attr: setattr(self, _a, _Stream()))
-    # the Triggers tab: one made-up screen, and a watcher that never reads the real one
-    screenwatch.monitors = lambda: [screenwatch.Monitor(0, 0, 1920, 1080, True)]
-    screenwatch.Watcher.start = lambda self: None
     appaudio.list_apps = lambda: [
         appaudio.App(pid=1000 + i, exe=exe, title=title, active=on, peak=0.4 if on else 0.0,
                      devices=[OUTS[1]], session_pids={1000 + i})
         for i, (exe, title, on) in enumerate(PROGRAMS)]
+
+
+def install_onion_watch() -> bool:
+    """Install the Onion Watch add-on (the Triggers tab) into the made-up profile from
+    ONIONBOARD_ONION_WATCH_ZIP and load it with one made-up screen and a watcher that
+    never reads the real one. False when there's no zip to install."""
+    import importlib
+
+    from soundboard import modules, watchaddon
+    z = watchaddon.local_zip()
+    if z is None:
+        return False
+    info = watchaddon.install(z)
+    modules.load_package(info)
+    sw = importlib.import_module(f"{info.package}.screenwatch")
+    sw.monitors = lambda: [sw.Monitor(0, 0, 1920, 1080, True)]
+    sw.Watcher.start = lambda self: None
+    return True
 
 
 def demo_config(tmp: Path, theme: str):
@@ -161,6 +181,7 @@ def main():
     tmp = Path(tempfile.mkdtemp())
     fake_machine(tmp)
     demo_config(tmp, args.theme)
+    watch = install_onion_watch()
 
     def spin(seconds=0.8):
         end = time.monotonic() + seconds
@@ -187,15 +208,18 @@ def main():
         w.tabs.setCurrentWidget(page)
         spin()
         save(w, name)
-    tr = w.triggers
-    tr.set_watching(True)             # Watcher.start is a no-op here (fake_machine)
-    tr.poll.stop()                    # show made-up live matches instead
-    w.tabs.setCurrentWidget(tr)
-    for i, row in enumerate(tr.rows.values()):
-        row.show_score(TRIGGERS[i][4] / 100)
-    tr.rows["t1"].flash("Played!", 60000)
-    spin()
-    save(w, "triggers")
+    if watch:
+        tr = w.triggers.panel.panel       # the add-on's triggers page
+        tr.set_watching(True)             # Watcher.start is a no-op (install_onion_watch)
+        tr.poll.stop()                    # show made-up live matches instead
+        w.tabs.setCurrentWidget(w.triggers)
+        for i, row in enumerate(tr.rows.values()):
+            row.show_score(TRIGGERS[i][4] / 100)
+        tr.rows["t1"].flash("Played!", 60000)
+        spin()
+        save(w, "triggers")
+    else:
+        print("triggers not captured: set ONIONBOARD_ONION_WATCH_ZIP to an OnionWatch-module.zip")
     w.tabs.setCurrentWidget(w.sounds_page)
 
     d = SettingsDialog(w, "hotkeys")

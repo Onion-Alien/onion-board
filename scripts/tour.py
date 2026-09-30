@@ -150,6 +150,8 @@ def main():
     for name, fn in real.items():               # outputs: silent streams, not stubs
         setattr(engine.Engine, name, fn)
     screenshots.demo_config(tmp, "Dark")
+    if not screenshots.install_onion_watch():   # the Triggers tab is the Onion Watch add-on
+        raise SystemExit("set ONIONBOARD_ONION_WATCH_ZIP to an OnionWatch-module.zip first")
 
     from soundboard.ui import mainwindow
     w = mainwindow.MainWindow()
@@ -184,10 +186,10 @@ def main():
     size = w.grab().size()
     rec.record(2.4, "Triggers: pick a picture, like a game's “YOU DIED”…",
                image=lambda t: game_scene(size, t))
-    tr = w.triggers
-    tr.set_watching(True)                        # Watcher.start is a no-op (fake_machine)
+    tr = w.triggers.panel.panel                  # the add-on's triggers page
+    tr.set_watching(True)                        # Watcher.start is a no-op (install_onion_watch)
     tr.poll.stop()
-    w.tabs.setCurrentWidget(tr)
+    w.tabs.setCurrentWidget(w.triggers)
     rows = list(tr.rows.values())
 
     def triggers(t):

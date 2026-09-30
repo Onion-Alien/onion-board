@@ -37,7 +37,9 @@ Version: **1.4.0**. See [CHANGELOG.md](CHANGELOG.md).
 **Apps**: send one program's sound (music, a video, a browser tab) to your friends.
 ![The Apps tab](docs/screenshots/apps.png)
 
-**Triggers**: plays a sound when something shows up on your screen, like "YOU DIED".
+**Triggers**: plays a sound when something shows up in your game, like "YOU DIED", even
+while other windows cover it. It's the free [Onion Watch](https://github.com/Onion-Alien/onion-watch)
+add-on, one click away on the tab.
 ![The Triggers tab](docs/screenshots/triggers.png)
 
 **Setup**: shows at a glance whether others can hear you, plus devices, *Who's listening*
@@ -210,19 +212,21 @@ too (say No if another program, like Voicemeeter, uses it).
   Russian: talk in English and it's translated on your PC. Each language is an
   add-on you download only if you pick it (65–195 MB), and it needs that
   language's Windows voice (Settings → Speech → Add voices, free).
-- **Triggers tab:** plays a sound when a picture shows up on your screen: a
-  game's "YOU DIED", a victory banner, a kill icon. Cut the picture from a
-  screenshot (Win+Shift+S, then *Paste picture*, or *Add picture…* for a file),
-  pick a sound, and choose how long to wait before it plays (0 s or more), how
-  soon it may play again, and how close a match must be. The live match % next
-  to it makes that easy to set. It plays once each time the picture appears, not
-  over and over while it stays up. A trigger can hold up to 100 pictures (any of
-  them showing up fires it) and several sounds, played one at random, in order,
-  or all at once. Each trigger can watch its own screen, so one on your second
-  monitor and one on your main monitor work at the same time. It checks every
-  100 ms by default (16 ms to 500 ms). It sees fullscreen games too (Windows'
-  Desktop Duplication, HDR screens included), and a picture with transparent
-  parts (a cut-out icon) matches whatever is behind it.
+- **Triggers tab:** plays a sound when a picture shows up in your game: a
+  game's "YOU DIED", a rare spawn, a queue popping. It's the
+  [Onion Watch](https://github.com/Onion-Alien/onion-watch) add-on: the tab's
+  *Get Onion Watch* button downloads it from its GitHub release (checked against
+  the SHA-256 GitHub lists) and it appears right there, no restart. Pick the
+  game's window (it's watched even while other windows cover it, and two copies of
+  a game are told apart) or a screen, cut the thing to watch for straight out of
+  it (or paste a Win+Shift+S cut, or add a file), pick sounds from your board,
+  and choose the wait, how soon it may play again and how close a match must be,
+  with the live match % next to it. A trigger plays once each time the picture
+  appears, or rings until you stop it. Its sounds play through the board like a
+  pad; a ringing one loops in your headphones. Triggers from before the add-on
+  (Onion Board 1.4 and older) carry over as they were. When a newer Onion Watch
+  is out, the tab offers it (only while *Tell me when a new version is out* is
+  ticked).
   Everything happens on your PC: the screen is never saved or sent anywhere. If
   a game still shows up black, set it to Borderless or Windowed fullscreen.
 - **Mute my mic while a sound plays** (Setup → *Who's listening*): others hear
@@ -398,7 +402,8 @@ the launcher the shortcuts and PyInstaller use. The app is the `soundboard` pack
 | `soundboard/ui/voicepanel.py` | the Voice tab: voice changer, text-to-speech, live voice-to-speech, add-ons list |
 | `soundboard/voicefx/` | the voice-effect chain and the built-in effects (pitch, robot, radio, …) |
 | `soundboard/speech/` | Windows text-to-speech (`tts.py`), the live voice-to-speech client (`live.py`, `service.py`, `protocol.py`) translation model downloads (`translation.py`) and one-click Windows voice installs (`winvoices.py`) |
-| `soundboard/modules.py` | finds, loads and installs add-ons in `modules\` |
+| `soundboard/modules.py` | finds, loads and installs add-ons in `modules\`: effects, services, translations and the Triggers tab's package (its host interface version checked first); installs a module zip only if it stays in its own folder |
+| `soundboard/watchaddon.py` | the Onion Watch add-on: its latest GitHub release, downloading and checking it, installing it, and whether a newer one is out (`ONIONBOARD_ONION_WATCH_ZIP` uses a local zip instead) |
 | `soundboard/ytdl.py` | yt-dlp for the link bar and web search: searches YouTube / SoundCloud, downloads one video's audio, and updates yt-dlp on request or opt-in (SHA-256-checked PyPI wheels in `%APPDATA%`, loaded ahead of the bundled copy by an import hook) |
 | `soundboard/thumbs.py` | pad pictures: a link's video thumbnail, a file's cover art / first frame (ffmpeg), or a picture you pick or drop on a pad, scaled into `%APPDATA%\OnionBoard\thumbs` |
 | `soundboard/bunny.py` | Bun the mascot, drawn in code (setup guide and installer art) |
@@ -406,8 +411,8 @@ the launcher the shortcuts and PyInstaller use. The app is the `soundboard` pack
 | `soundboard/midi.py` | MIDI pad controllers as hotkeys (`midi:note 36:LPD8`): Windows' winmm over ctypes, a device opened only while a hotkey uses it, busy / unplugged devices retried |
 | `soundboard/replay.py` | instant replay: process loopback of everything but Onion Board into a ring buffer, saved as a pad on its hotkey |
 | `soundboard/appaudio.py` | the Apps tab's capture: lists the programs with an audio session (WASAPI sessions, over ctypes) and taps one program's audio with Windows' per-process loopback (a copy: the program still plays on your speakers), pushed into the engine as its own source |
-| `soundboard/screenwatch.py` | the Triggers tab's back end: copies the screen with Desktop Duplication (DXGI / D3D11 over ctypes, falling back to GDI), sampled down to a few hundred pixels and turned grey, finds each trigger's picture by normalised cross-correlation (FFT; transparent parts masked out), and fires once per appearance (`Gate`) on a worker thread |
-| `soundboard/ui/triggerspanel.py` | the Triggers tab: one card per trigger (its pictures in a strip, any of which fires it; its sounds as chips, played at random / in order / all at once; wait, cooldown, match %, the live match, which screen to look on), the Watching switch, how often to check and the default screen |
+| `soundboard/ui/triggerstab.py` | the Triggers tab: Hoot (`ui/owl.py`) and *Get Onion Watch* until the add-on is installed, then the add-on's own tab, with a bar when an update is out |
+| `soundboard/ui/triggershost.py` | Onion Board as the Onion Watch add-on's host: the board's sounds and playing them (a ringing trigger loops in the headphones), `Config.screen`, the trigger pictures' folder, the theme's colours |
 | `soundboard/ui/appspanel.py` | the Apps tab: one row per program (level, **Send**, volume, *Hear it myself*); programs you switch on are remembered by .exe and picked up again when they run |
 | `soundboard/engine.py` | real-time audio: 3 WASAPI streams (mic in, cable out, headphones out), mixing (sounds, radio and captured programs), pause/seek, live speed / pitch, limiter, watchdog |
 | `soundboard/eq.py` | 7-band biquad equalizer and presets |
@@ -434,8 +439,8 @@ the launcher the shortcuts and PyInstaller use. The app is the `soundboard` pack
 | `modules/` | add-ons shipped with the app: `retro-fx` (an effects module, the example to copy), `live-voice` (a service module with its own Python environment) and `translate-zh/es/fr/de/ru` (translation modules: a manifest naming a model that's downloaded only when picked) |
 | `build.ps1`, `installer/` | the PyInstaller build and the Inno Setup installer (`installer/OnionBoard.iss`); `installer/install-vbcable.ps1` downloads VB-Cable, checks its signature and installs it (used by the app and the installer) |
 | `assets/onionboard.ico` | the .exe, installer and shortcut icon, generated by `scripts/make_icon.py` |
-| `scripts/` | `install.bat` / `install.ps1` / `run.bat` (run from source: set up `.venv` and shortcuts, then launch), `make_icon.py` (regenerates `assets/onionboard.ico` from the logo in `theme.py`), `make_bunny.py` (renders the installer artwork from `bunny.py`; `--preview` for a sheet of poses), `check_sensitive.py` (secrets / personal-data scan, also the pre-commit hook; your own patterns go in a root `.sensitive-patterns`, see `sensitive-patterns.example`), `make_notices.py` (third-party licences for the build), `prune_build.py` (drops the unused parts of Qt from the PyInstaller output; `--dry-run` lists them), `codec_bench.py` (what voice chat does to your sounds, in numbers), `discord_roundtrip.py` (the same measured through a real Discord call to a second client), `dest_fit.py` (which *Who's listening* mode suits each game), `game_capture.py` (which mic Windows gives a game, its resampling and ducking), `steam_voice_roundtrip.py` (Steam's own voice codec, measured on one PC), `game_roundtrip.py` (a real game, recorded by a friend in the lobby) `screenshots.py` (renders `docs/screenshots/` offscreen from made-up demo data) `promo.py` (renders the Triggers promo clips: a made-up game scene drawn with QPainter, a synthesized trombone, ffmpeg) and `tour.py` (records the README's feature tour `docs/screenshots/tour.webp` from the real app, driven in a window parked off-screen, with the same made-up data as the screenshots) |
-| `tests/` | pytest suite: ring buffer, engine mixing/guards/watchdog, cache and imports, recorder, hotkey parsing, EQ, levelling, config, test analysis, the main window built on Qt's offscreen platform (no window, no devices, no hotkeys) including shrinking it, the overlay, setup guide, voice panel, speech and effects, per-sound effects (speed and pitch measured by frequency and length, every preset, the effects cache, the Edit dialog) and live speed / pitch, the web search, screen triggers (made-up screens matched after shrinking and at any brightness, fire-once and cooldown, a stand-in capture so the real screen is never read), and the Radio tab against a local stand-in for the directory and a station (parsing untrusted station data, search, cache and mirror failover, a stream decoded to 48 kHz and measured by frequency, dead stations, the globe page's click bridge with the internet blocked) |
+| `scripts/` | `install.bat` / `install.ps1` / `run.bat` (run from source: set up `.venv` and shortcuts, then launch), `make_icon.py` (regenerates `assets/onionboard.ico` from the logo in `theme.py`), `make_bunny.py` (renders the installer artwork from `bunny.py`; `--preview` for a sheet of poses), `check_sensitive.py` (secrets / personal-data scan, also the pre-commit hook; your own patterns go in a root `.sensitive-patterns`, see `sensitive-patterns.example`), `make_notices.py` (third-party licences for the build), `prune_build.py` (drops the unused parts of Qt from the PyInstaller output; `--dry-run` lists them), `codec_bench.py` (what voice chat does to your sounds, in numbers), `discord_roundtrip.py` (the same measured through a real Discord call to a second client), `dest_fit.py` (which *Who's listening* mode suits each game), `game_capture.py` (which mic Windows gives a game, its resampling and ducking), `steam_voice_roundtrip.py` (Steam's own voice codec, measured on one PC), `game_roundtrip.py` (a real game, recorded by a friend in the lobby) `screenshots.py` (renders `docs/screenshots/` offscreen from made-up demo data; set `ONIONBOARD_ONION_WATCH_ZIP` to an Onion Watch module zip to include the Triggers tab) `promo.py` (renders the Triggers promo clips: a made-up game scene drawn with QPainter, a synthesized trombone, ffmpeg) and `tour.py` (records the README's feature tour `docs/screenshots/tour.webp` from the real app, driven in a window parked off-screen, with the same made-up data as the screenshots) |
+| `tests/` | pytest suite: ring buffer, engine mixing/guards/watchdog, cache and imports, recorder, hotkey parsing, EQ, levelling, config, test analysis, the main window built on Qt's offscreen platform (no window, no devices, no hotkeys) including shrinking it, the overlay, setup guide, voice panel, speech and effects, per-sound effects (speed and pitch measured by frequency and length, every preset, the effects cache, the Edit dialog) and live speed / pitch, the web search, the Triggers tab and its add-on (a made-up one: loading it and refusing one it can't host, zip installs that stay in their folder, downloads checked against GitHub's SHA-256, updates), and the Radio tab against a local stand-in for the directory and a station (parsing untrusted station data, search, cache and mirror failover, a stream decoded to 48 kHz and measured by frequency, dead stations, the globe page's click bridge with the internet blocked) |
 
 Developing:
 

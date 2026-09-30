@@ -2,6 +2,17 @@
 
 ## Unreleased
 
+- **The Triggers tab is now the Onion Watch add-on.** Onion Watch is the Triggers
+  tab grown into its own project, and it plugs back in here: click *Get Onion
+  Watch* on the tab and it's downloaded, checked and there in a moment, no
+  restart. On top of what the tab did, it can watch a game's own window even while
+  other windows cover it, tell two copies of a game apart, cut the picture straight
+  out of the game window, and ring until you stop it (in your headphones, with a
+  red Stop bar on the tab; Stop all stops it too). Your triggers and their pictures
+  are kept as they were and work again as soon as it's installed. Nothing is
+  downloaded until you click, and a newer Onion Watch is offered on the tab with
+  the app's own update check.
+
 ## 1.4.2 — 2026-09-30
 
 Better help for game voice chat, from testing what ~20 games' voice chats do to
