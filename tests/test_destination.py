@@ -191,6 +191,25 @@ def test_builtin_modes_and_custom_resolution():
     assert d == m
 
 
+def test_one_mode_per_voice_engine_and_old_keys_still_resolve():
+    """Configs saved by 1.5.1 and earlier store dest.mode: every key it had still
+    picks the same kind of mode ("game" was Vivox all along, now named so)."""
+    for key in ("off", "discord", "steam", "game", "game_lo"):
+        assert resolve({"mode": key}).key == key
+    assert resolve({"mode": "game"}).label == "Vivox"
+    assert [d.key for d in BUILTIN] == ["off", "discord", "game", "eos", "steam", "unity",
+                                        "game_lo"]
+    for d in BUILTIN[1:]:
+        # tuned on the bench: the cut and make-up, harmonics, never a compressor
+        assert d.mono and d.lowcut in (80, 90) and d.bass > 0 and d.comp == 0, d.key
+        assert d.note and len(d.label) <= 40, d.key
+    assert {d.key: d.ceiling for d in BUILTIN if d.ceiling} == {
+        "steam": 12000, "unity": 12000, "game_lo": 8000}
+    from soundboard import voicesdk
+    assert set(voicesdk.SIGNATURES.values()) <= set(destination.BUILTIN_BY_KEY)
+    assert set(voicesdk.NAMES) <= set(destination.BUILTIN_BY_KEY)
+
+
 def test_apply_sets_engine_dest():
     class Cfg:
         dest = {"mode": "discord"}

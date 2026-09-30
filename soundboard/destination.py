@@ -1,10 +1,12 @@
 """Destination modes: shape the sounds bus for whoever is listening.
 
 The codec bench (soundboard.codecsim) measured what voice chat does to what
-we send. Every service captures its mic in mono and high-passes it: Discord at
-~94 Hz, Vivox (Valorant) at ~80 Hz with a slow tail to ~150 Hz, Opus' own voice
-mode on top. Steam voice is fed 24 kHz so nothing above 12 kHz survives; Vivox's
-low-CPU codec stops at 8 kHz. 100 Hz to 6 kHz gets through everywhere.
+we send. Every engine captures its mic in mono and high-passes it: Discord at
+~94 Hz, Vivox at ~80 Hz with a slow tail to ~150 Hz, WebRTC's cleanup (Epic
+Online Services, browsers) around 80 Hz, Opus' own voice mode on top. Steam
+voice and Photon are fed 24 kHz so nothing above 12 kHz survives; Unreal's
+built-in voice and Vivox's low-CPU codec stop at 8 kHz. 100 Hz to 6 kHz gets
+through everywhere.
 
 A mode pre-shapes the sounds bus for that pipeline:
 
@@ -22,14 +24,14 @@ A mode pre-shapes the sounds bus for that pipeline:
            was levelled 8-10 dB quieter than the others and then lost its bass too
   ceiling  low-pass at the codec's ceiling: the encoder stops spending bits on
            content nobody will hear, and what you monitor matches what they get
-  comp     gentle RMS compressor: a steadier level rides a service's gate and
-           automatic gain better than a spiky one. Push-to-talk chats have neither,
-           and there it only costs punch
+  comp     gentle RMS compressor, for custom modes. None of the engines wants it:
+           it cost 2-5 dB and added distortion in every one, even behind an automatic
+           gain, and pushed songs under a voice gate where the make-up kept them over
   mono     one channel, the way the mic capture will send it, with the
            phase-aware downmix (soundboard.sendfx.SmartMono) so stereo effects
            that would cancel in a plain average don't
 
-Built-in modes cover the services measured; custom ones (Settings) let you
+Built-in modes are one per voice chat engine; custom ones (Settings) let you
 describe any other codec by the same knobs. The engine runs one Processor per
 output (it keeps filter state), all reading the same Dest.
 """
@@ -98,20 +100,33 @@ class Dest:
 
 OFF = Dest("off", "Off (send as is)", note="No shaping. Your sounds go out exactly as mixed.")
 
+# One mode per voice chat engine. Every engine's own cleanup and voice gate were run on
+# 99 songs (docs/GAME-VOICE.md): all of them want the same shaping (sub-bass cut at
+# their high-pass with the level given back, harmonics, no compressor), so the modes
+# differ in the cut and the codec's ceiling, and in the games they name. A game is
+# only ever an example here; the engine is what's matched. Keys are what configs
+# store: "game" was the Vivox mode all along, and keeps its key.
 BUILTIN: tuple[Dest, ...] = (
     OFF,
     Dest("discord", "Discord", 0, 0.8, 0.0, True, lowcut=90,
-         note="Opus 64 kbps, mono, voice mode. Keeps 100 Hz-20 kHz; loses sub-bass."),
-    Dest("steam", "Steam voice (CS2, Dota, Steam games)", 12000, 0.8, 0.0, True, lowcut=80,
-         note="Opus fed 24 kHz mono: nothing above 12 kHz gets through. Also suits "
-              "Phasmophobia and other Photon Voice games (24 kHz too)."),
-    Dest("game", "Game voice (Fortnite, Valorant, Unity / Unreal games)", 0, 0.8, 0.0, True,
-         lowcut=80,
-         note="Vivox Opus at 32 kbps mono (measured in a real game): full band, nothing "
-              "under ~80 Hz. Also suits Overwatch, FiveM, TeamSpeak and console party chat."),
-    Dest("game_lo", "Game voice, low bandwidth (8 kHz)", 8000, 0.9, 0.0, True, lowcut=80,
-         note="Games on Unreal's own voice chat or Vivox's Siren 7: nothing above "
-              "8 kHz."),
+         note="Discord calls and servers. Opus 64 kbps mono, keeps 100 Hz-20 kHz "
+              "(measured in a real call)."),
+    Dest("game", "Vivox", 0, 0.8, 0.0, True, lowcut=80,
+         note="Valorant, League of Legends, Rainbow Six Siege, Overwatch 2 and other "
+              "games on Vivox. Opus 32 kbps mono, full band, nothing under ~80 Hz "
+              "(measured in a real game). Also suits TeamSpeak and Mumble."),
+    Dest("eos", "Epic Online Services", 0, 0.8, 0.0, True, lowcut=80,
+         note="Fortnite and other games on Epic's voice chat. Opus mono with "
+              "WebRTC-style noise suppression: turn that off in the game if it lets you."),
+    Dest("steam", "Steam voice", 12000, 0.8, 0.0, True, lowcut=80,
+         note="CS2, Dota 2, TF2 and other games on Steam's voice chat. Opus fed "
+              "24 kHz mono: nothing above 12 kHz gets through."),
+    Dest("unity", "Unity voice (Photon / Dissonance)", 12000, 0.8, 0.0, True, lowcut=80,
+         note="Phasmophobia, Lethal Company and other Unity games with Photon Voice or "
+              "Dissonance: Opus at 17-30 kbps, 12 kHz at most, voice activation."),
+    Dest("game_lo", "Low bandwidth (8 kHz)", 8000, 0.9, 0.0, True, lowcut=80,
+         note="Older and console titles: Unreal's built-in voice chat, Vivox's "
+              "low-CPU codec. Nothing above 8 kHz."),
 )
 BUILTIN_BY_KEY = {d.key: d for d in BUILTIN}
 

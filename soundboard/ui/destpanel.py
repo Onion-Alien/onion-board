@@ -9,7 +9,7 @@ from PySide6.QtWidgets import (QCheckBox, QComboBox, QDialog, QDialogButtonBox, 
                                QHBoxLayout, QLabel, QLineEdit, QListWidget, QPushButton, QSlider,
                                QVBoxLayout, QWidget)
 
-from soundboard import destination
+from soundboard import destination, voicesdk
 from soundboard.destination import CEILINGS, LOWCUTS, Dest
 from soundboard.ui import fit
 from soundboard.ui.panel import hint_label
@@ -75,6 +75,24 @@ class DestPanel(QWidget):
         v.addLayout(row)
         self.desc = hint_label("")
         v.addWidget(self.desc)
+        # the game in front ships a voice engine we know (soundboard.voicesdk)
+        self.suggest = QWidget()
+        sr = QVBoxLayout(self.suggest)   # stacked: side by side it widened the Setup tab
+        sr.setContentsMargins(0, 0, 0, 0)
+        sr.setSpacing(4)
+        self.suggest_text = hint_label("")
+        sr.addWidget(self.suggest_text)
+        self.suggest_btn = QPushButton("Use it")
+        self.suggest_btn.setToolTip("Switch Who's listening to the mode for this game's "
+                                    "voice chat")
+        self.suggest_btn.setObjectName("small")
+        self.suggest_btn.clicked.connect(self._use_suggestion)
+        sr.addWidget(self.suggest_btn, 0, Qt.AlignLeft)
+        self.suggest.hide()
+        v.addWidget(self.suggest)
+        sig = getattr(mw, "voice_engine", None)
+        if sig is not None:
+            sig.connect(self._on_voice_engine)   # a bound slot: gone with the panel
         # the send stage (soundboard.sendfx), whatever the mode
         self.chk_mono = QCheckBox("Send in mono (recommended)")
         self.chk_mono.setToolTip(
@@ -135,6 +153,30 @@ class DestPanel(QWidget):
     def _show(self):
         d = destination.resolve(self._cfg())
         self.desc.setText(describe(d))
+        self._show_suggestion()
+
+    def _suggested(self) -> str | None:
+        """The mode the game in front calls for, if it isn't the one picked."""
+        key = getattr(self.mw, "voice_suggestion", None)
+        if key not in destination.BUILTIN_BY_KEY:
+            return None
+        return None if destination.resolve(self._cfg()).key == key else key
+
+    def _on_voice_engine(self, _key):
+        self._show_suggestion()
+
+    def _show_suggestion(self):
+        key = self._suggested()
+        if key:
+            self.suggest_text.setText(
+                f"🎮 The game you have open uses {voicesdk.NAMES.get(key, key)} for voice "
+                f"chat: <b>{destination.BUILTIN_BY_KEY[key].label}</b> suits it.")
+        self.suggest.setVisible(bool(key))
+
+    def _use_suggestion(self):
+        key = self._suggested()
+        if key:
+            self.combo.setCurrentIndex(max(0, self.combo.findData(key)))
 
     def _picked(self, i: int):
         key = self.combo.itemData(i)

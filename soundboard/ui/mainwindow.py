@@ -5,6 +5,7 @@ import copy
 import html
 import logging
 import subprocess
+import sys
 import tempfile
 import threading
 import time
@@ -25,7 +26,8 @@ from soundboard import engine as eng
 from soundboard import theme, winkeys, ytdl
 from soundboard.engine import SR, Engine
 from soundboard.engine import is_virtual as is_virtual_cable
-from soundboard import autostart, backup, destination, midi, remote, soundfx, thumbs, updates
+from soundboard import (autostart, backup, destination, midi, remote, soundfx, thumbs,
+                        updates, voicesdk)
 from soundboard import watchaddon
 from soundboard.replay import InstantReplay
 from soundboard.library import (AUDIO_EXTS, PAD_COLORS, RESOURCE_DIR, Config, SoundMeta,
@@ -77,6 +79,7 @@ GLOW_STEPS = 4       # how many glow levels the taskbar / tray icon has while so
 ICON_GLOW_MS = 120   # ...and how often at most it changes
 RANDOM = "__random__:"   # hotkey action prefix: a random sound from the category after it
 ALL = "All"          # the category tab that shows every sound
+VOICE_POLL_MS = 3000  # how often the game in front is looked at (soundboard.voicesdk)
 
 
 class Bridge(QObject):
@@ -93,6 +96,7 @@ class Bridge(QObject):
 
 class MainWindow(QMainWindow):
     update_done = Signal(object, str)   # an update check finished: Release|None, error
+    voice_engine = Signal(object)       # the voice engine of the game in front (a mode key|None)
 
     def __init__(self):
         super().__init__()
@@ -187,6 +191,13 @@ class MainWindow(QMainWindow):
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.tick)
         self.timer.start(TICK_MS)
+        # which voice chat the game you're playing uses: a hint by Who's listening
+        self.voice_suggestion: str | None = None
+        self.voice_watch = voicesdk.Watcher() if sys.platform == "win32" else None
+        self._voice_timer = QTimer(self)
+        self._voice_timer.timeout.connect(self._poll_voice)
+        if self.voice_watch is not None:
+            self._voice_timer.start(VOICE_POLL_MS)
         self._init_fit()
         self.resize(1180, 720)
         if self.cfg.always_on_top:
@@ -1134,6 +1145,12 @@ class MainWindow(QMainWindow):
         if hasattr(self.engine, attr):
             setattr(self.engine, attr, v)
         self._save_later()
+
+    def _poll_voice(self):
+        key = self.voice_watch.poll() if self.voice_watch is not None else None
+        if key != self.voice_suggestion:
+            self.voice_suggestion = key
+            self.voice_engine.emit(key)
 
     def _save_later(self):
         self._save_timer.start(400)

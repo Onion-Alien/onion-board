@@ -144,6 +144,14 @@ class NoMidi:
 
 
 @pytest.fixture(autouse=True)
+def _never_look_at_the_real_foreground(monkeypatch):
+    """The main window asks which game is in front (soundboard.voicesdk) to suggest a
+    Who's listening mode: in tests nothing is, whatever the developer is playing."""
+    from soundboard import voicesdk
+    monkeypatch.setattr(voicesdk, "foreground_process", lambda: (0, ""))
+
+
+@pytest.fixture(autouse=True)
 def _never_touch_real_midi(monkeypatch):
     from soundboard import midi
     monkeypatch.setattr(midi, "WinMM", NoMidi)

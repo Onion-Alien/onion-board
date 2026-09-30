@@ -43,7 +43,9 @@ add-on, one click away on the tab (Onion Watch is also its own app).
 ![The Triggers tab](docs/screenshots/triggers.png)
 
 **Setup**: shows at a glance whether others can hear you, plus devices, *Who's listening*
-(Discord, Steam or game voice: your sounds are shaped to survive its compression) and an
+(the voice chat on the other end — Discord, Vivox, Epic Online Services, Steam voice,
+Unity voice or low-bandwidth game voice: your sounds are shaped to survive it, and the
+picker suggests the right one for the game you're playing when it can tell) and an
 equalizer.
 ![The Setup tab](docs/screenshots/setup.png)
 
@@ -426,7 +428,8 @@ the launcher the shortcuts and PyInstaller use. The app is the `soundboard` pack
 | `soundboard/applog.py` | rotating log in `%APPDATA%\OnionBoard\onionboard.log`; unhandled exceptions (any thread) and Qt warnings land there; each distinct crash is saved, scrubbed of personal paths, to `crash-reports\` and offered to the user. `report()` does the same for an error code caught but didn't expect. `ONIONBOARD_DEBUG=1` for more |
 | `soundboard/ui/crashdialog.py` | the "Onion Board hit a problem" dialog: the report, *Copy report*, *Report on GitHub* (copies it, opens a new issue in the browser), *Open folder* |
 | `soundboard/testcheck.py` | analysis for the Record-6s test (finds your voice in the output by cross-correlation) |
-| `soundboard/destination.py` | destination modes (Setup tab / Settings → *Who's listening*): shapes the sounds bus for the listener's voice codec — sub-bass harmonics, a low cut with each sound's level given back, codec ceiling, gentle compressor, mono |
+| `soundboard/destination.py` | destination modes (Setup tab / Settings → *Who's listening*), one per voice chat engine: shapes the sounds bus for the listener's voice codec — sub-bass harmonics, a low cut with each sound's level given back, codec ceiling, gentle compressor (custom modes), mono |
+| `soundboard/voicesdk.py` | which voice chat engine the game in front uses, from the voice libraries in its install folder (the exe path is read with the least access Windows has; nothing touches the game): a suggestion by *Who's listening*, never a switch |
 | `soundboard/ui/destpanel.py` | the mode picker and the custom-modes editor |
 | `soundboard/codecsim.py` | development bench: runs audio through Discord's and ~20 game voice stacks' Opus pipelines (ffmpeg's libopus, plus Discord's ~94 Hz capture high-pass, measured in a real call) and measures what's lost, including a frame-by-frame spectral distance that hears noise fill and warble |
 | `soundboard/chatsim.py` | development tool: simulates a voice chat's mic cleanup (noise suppression, gain control, gate) so the bench and tests can measure it and check the Discord check against it |

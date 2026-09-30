@@ -97,3 +97,93 @@ Lethal Company's occlusion and walkie-talkie filters come from its decompiled
   Steam got the same treatment (Discord −8.3 → +0.2 dB, Steam −8.6 → −1.8 dB); a
   compressor lost level and added distortion in every range and every chat, so the
   built-in modes run without one.
+
+## One mode per engine (2026-09)
+
+*Who's listening* now has one mode per voice chat engine: Discord, Vivox, Epic Online
+Services, Steam voice, Unity voice (Photon / Dissonance) and Low bandwidth (8 kHz).
+Each engine was tuned on the same 99 songs (30 s from the middle of each, five pitch
+ranges from 808 trap to chipmunk vocals), through the app's real send path (each
+sound's levelling and make-up, the mode, phase-aware mono, the limiter) and then the
+engine's own mic cleanup and voice gate as it ships (`codec_bench.py --defaults`: the
+real WebRTC and RNNoise code in the bench environment) before its codec. Earlier runs
+left the cleanup and gate out; with them in, compression and loudness could have
+helped (a gate needs level, an automatic gain pumps), so every knob was swept again.
+
+**Sweep** (20 songs, 4 per pitch range; heard level against the same song played
+straight into the chat, median dB; *chop* = % of the song's active moments the
+listener doesn't get):
+
+| Engine (bench profile) | Cleanup, gate | No mode | 60 Hz cut | 80 Hz cut | 90 Hz cut | + compressor 25 / 50 / 100 % |
+|---|---|---|---|---|---|---|
+| Epic Online Services (`eos`) | WebRTC NS + AGC | −3.8 | −1.5 | −1.4 | −1.3 | −3.8 / −4.7 / −5.3 |
+| Photon (`photon`) | gate −43 dB | −4.8 | −2.8 | −1.7 | −1.7 | −4.4 / −5.5 / −6.3 |
+| Dissonance (`dissonance`) | WebRTC NS + AGC, gate −45 dB | −3.8 | −1.4 | −1.2 | −0.8 | −3.5 / −4.4 / −5.0 |
+| Browser / WebRTC (`webrtc`) | WebRTC HPF + NS + AGC, gate −30 dB | −3.7 | −1.5 | −1.4 | −1.3 | −3.8 / −4.7 / −5.2 |
+| TeamSpeak (`teamspeak`) | WebRTC NS + AGC, gate −40 dB | −3.8 | −1.5 | −1.4 | −1.3 | −3.7 / −4.6 / −5.3 |
+| Mumble (`mumble`) | NS + AGC model, gate −24 dB | +0.0 | +0.1 | +0.1 | +0.2 | +0.2 / +0.2 / +0.2 |
+| Unreal built-in (`ue_voip`) | gate −26 dB | −4.9 | −2.0 | −1.2 | −1.0 | −3.6 / −4.7 / −5.7 |
+| Vivox Siren 7 (`vivox_siren7`) | none | −4.8 | −2.8 | −1.7 | −1.6 | −4.4 / −5.5 / −6.3 |
+
+(Every cut column is with the sub-bass harmonics at 80 % and each sound's level
+given back; the compressor columns are on top of the 80 Hz cut.)
+
+- **Every engine wants the same shaping**: cut the sub-bass at 80-90 Hz after making
+  the harmonics, give each sound back the level the cut took, no compressor. What
+  sets the modes apart is the cut (Discord's high-pass sits at 94 Hz, so 90 there)
+  and the codec's ceiling (12 kHz for Steam and Photon, 8 kHz for the low-bandwidth
+  codecs). Epic Online Services came out the same as Vivox; it stays its own entry
+  so its players find it, with a note to turn its noise suppression off.
+- **The compressor never paid.** Even behind an automatic gain it cost 2-5 dB and
+  added distortion. Mumble's AGC levels everything anyway, and there a light
+  compressor did pump a little less (6.3 → 5.5 dB), for more distortion and less
+  bass; not worth a mode of its own, and that AGC is a model.
+- **A gate needs level, and the make-up gives it.** A bass-heavy song sent without a
+  mode fell under the browser chat's −30 dB gate and was chopped (3 % of the song gone,
+  the mid-band wobbling by 18 dB); the 80 Hz cut with its make-up kept it open
+  (0.04 %). Unreal's −26 dB gate: 1 % → 0. Mumble's −24 dB: 3.5 % → 1.5 %. A
+  compressor put songs back under the gate (browser: 1.2-2.4 %).
+- **The ceiling barely matters for the level.** At Photon's 24 kHz the 12 kHz
+  low-pass changed nothing measurable; it's there so what you monitor matches what
+  they hear. An 8 kHz low-pass for Dissonance only lost detail: at 17 kbps its codec
+  still carries more than that.
+- **Noise suppression is what hurts, and no mode fixes it.** On every engine with
+  WebRTC's suppressor the mid-band pumping sat at 3-4 dB and the spectral distance at
+  ~4 dB whatever was sent (Vivox without it: 0.5 and 2.0). Only turning it off in the
+  game helps; the game voice chat guide says so.
+
+**The modes on all 99 songs** (heard level against the same song played straight into
+the chat, median dB per pitch range: no mode → the engine's mode; each engine's own
+cleanup and gate included):
+
+| Mode (engine) | super low | low | medium | high | super high | all |
+|---|---|---|---|---|---|---|
+| Discord | −8.7 → **+0.7** | −4.6 → **−0.1** | −3.8 → **−1.3** | −2.0 → **−0.7** | +0.7 → **+0.8** | −3.6 → **+0.3** |
+| Vivox | −8.7 → **+0.2** | −4.6 → **−0.6** | −3.8 → **−1.5** | −2.0 → **−1.0** | +0.8 → **+0.8** | −3.6 → **+0.0** |
+| Epic Online Services | −5.8 → **−1.6** | −4.2 → **−1.1** | −3.0 → **−1.6** | −1.7 → **−0.9** | +1.1 → **+1.3** | −2.2 → **−0.5** |
+| Steam voice | −8.8 → **−1.8** | −4.7 → **−1.7** | −4.0 → **−2.0** | −2.2 → **−1.4** | +0.7 → **+0.7** | −3.6 → **−1.3** |
+| Unity voice: Photon | −8.8 → **−1.8** | −4.7 → **−1.7** | −4.0 → **−2.0** | −2.2 → **−1.4** | +0.8 → **+0.9** | −3.6 → **−1.3** |
+| Unity voice: Dissonance | −5.7 → **−1.1** | −4.2 → **−0.8** | −2.8 → **−1.3** | −1.7 → **−1.3** | +0.9 → **+1.3** | −2.4 → **−0.6** |
+| Low bandwidth: Unreal built-in | −8.2 → **−0.6** | −4.7 → **−1.1** | −3.8 → **−1.8** | −2.2 → **−1.3** | +0.6 → **+0.7** | −3.7 → **−0.6** |
+| Low bandwidth: Vivox Siren 7 | −8.8 → **−1.5** | −4.7 → **−1.6** | −4.0 → **−2.0** | −2.2 → **−1.5** | +0.7 → **+0.7** | −3.6 → **−1.3** |
+
+Every range of every engine now arrives within about 2 dB of the raw song, and the
+super-low range (808s, bass-boosted) gains 4-9 dB. Through Dissonance the Unity mode's
+12 kHz ceiling measured the same as full band (−0.6 against −0.7 dB, spectral distance
+4.42 against 4.39), so one Unity mode covers Photon and Dissonance.
+
+**Suggesting the mode** (`soundboard/voicesdk.py`). A voice SDK ships as its own library
+in the game's install folder, so the program in front is matched by its files: its
+exe path is read with `PROCESS_QUERY_LIMITED_INFORMATION` (what Task Manager uses;
+anti-cheat allows it), and its install folder (for an Unreal game, three levels above
+`Binaries\Win64`) is listed. No module list, no memory read, nothing injected.
+Checked against the installs on a test PC: `vivoxsdk.dll` was there in all five Vivox
+games (Valorant, League of Legends, Teamfight Tactics, the Riot client, and an Unreal
+game whose Vivox plugin sits ten folders deep) and in none of three games without
+it; the path query worked on a running game behind anti-cheat. Photon Voice ships
+`opus_egpv.dll` in `<Game>_Data\Plugins\x86_64`, Dissonance `DissonanceVoip.dll` in
+`Managed\` (from their SDKs and the games' modding docs; no such game was installed
+to check). Not suggested, because the files can't tell: Epic Online Services
+(`EOSSDK-Win64-Shipping.dll` was also in a single-player game with no voice chat at
+all), Steam voice (`steam_api64.dll` is in nearly every Steam game) and
+Unreal's built-in voice.

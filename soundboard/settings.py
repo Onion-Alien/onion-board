@@ -539,10 +539,10 @@ class SettingsDialog(QDialog):
         card, cv = self._card("Who's listening",
                               "Voice chat runs your sounds through a mono voice codec that drops "
                               "the sub-bass and, in some games, everything above 8-12 kHz. Pick "
-                              "where your sounds are going and they're shaped to survive it: the "
-                              "lost bass becomes harmonics that get through, the level is evened "
-                              "out for the service's gate, and you hear the same thing they do. "
-                              "Off sends them exactly as mixed.")
+                              "the voice chat your game is built on and they're shaped to survive "
+                              "it: the lost bass becomes harmonics that get through, each sound "
+                              "gets back the level the bass took, and you hear the same thing "
+                              "they do. Off sends them exactly as mixed.")
         from soundboard.ui.destpanel import DestPanel
         cv.addWidget(DestPanel(self.mw))
         v.addWidget(card)

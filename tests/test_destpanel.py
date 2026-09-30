@@ -160,3 +160,33 @@ def test_main_window_starts_with_a_bad_custom_dest(qapp, app_dir, monkeypatch):
         assert w.engine.dest is not None and w.engine.dest.key == "discord"
     finally:
         w.close()
+
+
+def test_the_game_in_front_suggests_its_voice_engine(window):  # noqa: F811
+    panel = window.dest_panel
+    panel.combo.setCurrentIndex(panel.combo.findData("discord"))
+    assert panel.suggest.isHidden()
+
+    class Watch:
+        key = "game"
+
+        def poll(self):
+            return self.key
+    window.voice_watch = Watch()
+    window._poll_voice()
+    assert window.voice_suggestion == "game" and not panel.suggest.isHidden()
+    assert "Vivox" in panel.suggest_text.text()
+    assert window.engine.dest.key == "discord"     # only suggested, never switched
+    panel.suggest_btn.click()
+    assert window.cfg.dest["mode"] == "game" and window.engine.dest.key == "game"
+    assert panel.suggest.isHidden()                # already picked: nothing to suggest
+    window.voice_watch.key = None                  # the game closed
+    window._poll_voice()
+    panel.combo.setCurrentIndex(panel.combo.findData("off"))
+    assert panel.suggest.isHidden()
+    d = SettingsDialog(window, "general")          # a second picker hears it too
+    window.voice_watch.key = "game"
+    window._poll_voice()
+    other = next(p for p in d.findChildren(DestPanel))
+    assert not other.suggest.isHidden()
+    d.close()

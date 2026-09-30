@@ -307,8 +307,14 @@ class GameGuide(QDialog):
             "on it, never music. Some games' anti-cheat ignores keys other programs press: "
             "if your mic doesn't open for a sound, <b>hold your push-to-talk key "
             "yourself</b> while it plays.</li>"
-            "<li>On the Setup tab, set <b>Who's listening</b> to your game, so your sounds "
-            "are shaped for its voice chat.</li></ol>"))
+            "<li>On the Setup tab, set <b>Who's listening</b> to the voice chat your game "
+            "is built on, so your sounds are shaped for it: <b>Vivox</b> (Valorant, "
+            "League of Legends, Rainbow Six Siege, Overwatch 2), <b>Epic Online "
+            "Services</b> (Fortnite), <b>Steam voice</b> (CS2, Dota 2), <b>Unity "
+            "voice</b> (Phasmophobia, Lethal Company) or <b>Low bandwidth</b> for older "
+            "and console titles. Not sure? Start the game and switch back: the picker "
+            "names the engine when it can tell. Otherwise <b>Vivox</b> suits most "
+            "games.</li></ol>"))
         row = QHBoxLayout()
         copy = QPushButton("📋  Copy the mic name")
         copy.clicked.connect(lambda: (QApplication.clipboard().setText(vm),

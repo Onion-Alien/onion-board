@@ -736,6 +736,8 @@ class SteamGuide(QDialog):
             "your sounds up. Onion Board already cleans up your voice.</span></li>"
             "<li style='margin-bottom:8px'>Click <b>Start microphone test</b> and play a "
             "sound in Onion Board. You should hear it back.</li>"
+            "<li style='margin-bottom:8px'>On the Setup tab, set <b>Who's listening</b> "
+            "to <b>Steam voice</b>.</li>"
             "<li>Restart the game if it was already open.</li>"
             "</ol>"))
         v.addWidget(_label(

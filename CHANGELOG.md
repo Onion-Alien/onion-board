@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+- ***Who's listening* has one mode per voice chat engine**: Discord, Vivox, Epic
+  Online Services, Steam voice, Unity voice (Photon / Dissonance) and Low bandwidth
+  (8 kHz), each saying which kinds of games use it. Each engine's own mic cleanup
+  and voice gate were run on 99 songs across the pitch range to tune its mode. The
+  old *Game voice* mode is now called *Vivox*; your saved choice carries over.
+- **The picker suggests the right mode for the game you're playing** when it can
+  tell (Vivox and Unity voice games): the game's install folder is checked for its
+  voice library. It only suggests; nothing switches on its own, and the game
+  itself is never touched.
+
 ## 1.5.1 — 2026-09-30
 
 Songs come through game voice chat as loud as they should, bass and all. Tested on
