@@ -727,10 +727,17 @@ class OverlayWindow(QWidget):
         p.setFont(f)
         p.setPen(ink)
         p.drawText(body, Qt.AlignLeft | Qt.AlignVCenter, text)
-        f.setBold(False)
-        p.setFont(f)
-        p.setPen(QColor(T["muted"]))
-        p.drawText(body, Qt.AlignRight | Qt.AlignVCenter, key)
+        if key:   # the key on a little keycap, like a pad's hotkey badge
+            f.setBold(False)
+            p.setFont(f)
+            fm = p.fontMetrics()
+            w = fm.horizontalAdvance(key) + 10
+            cap = QRectF(body.right() - w, cy - fm.height() / 2 - 1, w, fm.height() + 2)
+            p.setPen(Qt.NoPen)
+            p.setBrush(QColor(T["badge"]))
+            p.drawRoundedRect(cap, 4, 4)
+            p.setPen(QColor(T["badge_text"]))
+            p.drawText(cap, Qt.AlignCenter, key)
 
     def _tile(self, p: QPainter, f: QFont, r: QRectF, i: int, meta, flash: bool):
         T = theme.T

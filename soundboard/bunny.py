@@ -38,11 +38,12 @@ def _ellipse(p: QPainter, cx, cy, w, h, fill: QColor, pen: QPen | None = None, a
 
 def draw_bunny(p: QPainter, rect: QRectF, prop: str | None = None, *,
                blink: float = 0.0, mouth: float = 0.0, ears: float = 0.0,
-               swing: float = 0.0):
+               swing: float = 0.0, sad: float = 0.0):
     """Draw Bun fitted (aspect kept, centred) into `rect`. The keywords pose Bun for
     animation (ui/bunnywidget.py): `blink` 0..1 closes the eyes, `mouth` 0..1 opens
-    the mouth (talking), `ears` tilts both ears outward by that many degrees, and
-    `swing` 0..1 brings the hammer down (0 = raised, 1 = striking the plank)."""
+    the mouth (talking), `ears` tilts both ears outward by that many degrees,
+    `swing` 0..1 brings the hammer down (0 = raised, 1 = striking the plank), and
+    `sad` 0..1 worries his brows, wets his eyes and turns his smile down."""
     s = min(rect.width() / W, rect.height() / H)
     p.save()
     p.setRenderHint(QPainter.Antialiasing)
@@ -94,9 +95,19 @@ def draw_bunny(p: QPainter, rect: QRectF, prop: str | None = None, *,
             p.setBrush(Qt.NoBrush)
             p.drawPath(arc)
             continue
-        _ellipse(p, x, 62, 9, 11.5 * (1 - blink), INK)
-        _ellipse(p, x + 1.6, 59, 3.4, 3.8, QColor("white"))
+        _ellipse(p, x, 62, 9 + 1.5 * sad, (11.5 + 1.5 * sad) * (1 - blink), INK)
+        _ellipse(p, x + 1.6, 59, 3.4 + sad, 3.8 + sad, QColor("white"))
         _ellipse(p, x - 1.6, 65.5, 1.6, 1.6, QColor("white"))
+        if sad > 0.05:        # welling up
+            c = QColor("#8fd3ff")
+            c.setAlphaF(0.8 * sad)
+            _ellipse(p, x, 68.5, 8, 2.6 * sad, c)
+    if sad > 0.05:            # worried brows, inner ends lifted
+        c = QColor(INK)
+        c.setAlphaF(min(1.0, sad * 1.4))
+        p.setPen(QPen(c, 2.2, Qt.SolidLine, Qt.RoundCap))
+        for x, sx in ((39, -1), (61, 1)):
+            p.drawLine(QPointF(x + sx * 6, 53 + sad), QPointF(x - sx * 3, 52 - 4 * sad))
     _ellipse(p, 30, 72, 11, 6.5, CHEEK)
     _ellipse(p, 70, 72, 11, 6.5, CHEEK)
     nose = QPainterPath(QPointF(46.5, 69))
@@ -110,6 +121,12 @@ def draw_bunny(p: QPainter, rect: QRectF, prop: str | None = None, *,
         oh = 2.5 + 6.5 * min(1.0, mouth)
         _ellipse(p, 50, 76 + oh / 2, 7 + 2 * mouth, oh, QColor("#5a2238"), QPen(INK, 1.6))
         _ellipse(p, 50, 76 + oh * 0.78, 4.5, oh * 0.4, QColor("#ff8fae"))
+    elif sad > 0.5:           # a little wobbly frown
+        path = QPainterPath(QPointF(45, 78.5))
+        path.quadTo(50, 74.5, 55, 78.5)
+        p.setPen(QPen(INK, 1.8, Qt.SolidLine, Qt.RoundCap))
+        p.setBrush(Qt.NoBrush)
+        p.drawPath(path)
     else:
         path = QPainterPath(QPointF(44, 75))
         path.quadTo(47, 79.5, 50, 75.5)

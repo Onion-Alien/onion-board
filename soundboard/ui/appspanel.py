@@ -17,6 +17,7 @@ import threading
 import time
 
 from PySide6.QtCore import QFileInfo, QObject, QSize, Qt, QTimer, Signal
+from PySide6.QtGui import QPainter
 from PySide6.QtWidgets import (QCheckBox, QFileIconProvider, QFrame, QHBoxLayout, QLabel,
                                QPushButton, QScrollArea, QSizePolicy, QVBoxLayout, QWidget)
 
@@ -25,6 +26,7 @@ from soundboard.engine import SR
 from soundboard.library import MAX_SECONDS, trim_silence
 from soundboard.recorder import ArmedRecorder
 from soundboard.ui import icons
+from soundboard.ui.bunnywidget import BunnyWidget
 from soundboard.ui.panel import VolumeControl, card, hint_label
 
 log = logging.getLogger(__name__)
@@ -77,6 +79,20 @@ class _Lister(QObject):
         self._stopped = True
 
 
+class ElidedLabel(QLabel):
+    """A one-line label that ends in "…" when it doesn't fit (the full text in its
+    tooltip), instead of being cut off mid-word."""
+
+    def paintEvent(self, e):
+        text = self.text()
+        r = self.contentsRect()
+        shown = self.fontMetrics().elidedText(text, Qt.ElideRight, r.width())
+        self.setToolTip(text if shown != text else "")
+        p = QPainter(self)
+        p.setPen(self.palette().color(self.foregroundRole()))
+        p.drawText(r, int(self.alignment() | Qt.AlignVCenter), shown)
+
+
 class AppRow(QFrame):
     """One program: icon, name, level, Send, Record, volume, Hear it myself."""
     send_toggled = Signal(object, bool)     # row, on
@@ -104,9 +120,9 @@ class AppRow(QFrame):
         h.addWidget(self.icon)
         names = QVBoxLayout()
         names.setSpacing(1)
-        self.name = QLabel(exe)
+        self.name = ElidedLabel(exe)
         self.name.setStyleSheet("font-weight:600;")
-        self.sub = QLabel()
+        self.sub = ElidedLabel()
         self.sub.setObjectName("hint")
         for lbl in (self.name, self.sub):   # long titles give way instead of widening the row
             lbl.setSizePolicy(QSizePolicy.Ignored, QSizePolicy.Preferred)
@@ -236,7 +252,7 @@ class AppsTab(QWidget):
         v = QVBoxLayout(self)
         v.setContentsMargins(0, 8, 0, 0)
         v.setSpacing(8)
-        head, hv = card("Send a program's sound",
+        head, hv = card("SEND A PROGRAM'S SOUND",
                         "Pick a program that's playing — a music player, a browser, a game, "
                         "even a call in another app — and it goes out to whoever's listening, "
                         "on its own volume. Only that program: nothing else you play is "
@@ -256,9 +272,17 @@ class AppsTab(QWidget):
         self.list_layout = QVBoxLayout(self.list)
         self.list_layout.setContentsMargins(0, 0, 0, 0)
         self.list_layout.setSpacing(6)
-        self.empty = hint_label("Nothing is playing sound right now. Start some music, a "
-                                "video or a call and it'll show up here.")
-        self.empty.setAlignment(Qt.AlignCenter)
+        # nothing playing: Bun waits, a bit glum, above the how-to
+        self.empty = QWidget()
+        ev = QVBoxLayout(self.empty)
+        ev.setContentsMargins(0, 12, 0, 0)
+        ev.setSpacing(4)
+        self.bun = BunnyWidget(height=72, pad=18, sad=0.6)
+        ev.addWidget(self.bun, 0, Qt.AlignHCenter)
+        self.empty_text = hint_label("Nothing is playing sound right now. Start some music, "
+                                     "a video or a call and it'll show up here.")
+        self.empty_text.setAlignment(Qt.AlignCenter)
+        ev.addWidget(self.empty_text)
         self.list_layout.addWidget(self.empty)
         self.list_layout.addStretch(1)
         self.scroll.setWidget(self.list)

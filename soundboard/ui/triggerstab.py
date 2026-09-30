@@ -20,18 +20,21 @@ import logging
 import threading
 
 from PySide6.QtCore import Qt, Signal
-from PySide6.QtGui import QPixmap
-from PySide6.QtWidgets import (QHBoxLayout, QLabel, QProgressBar, QPushButton, QStackedWidget,
+from PySide6.QtWidgets import (QHBoxLayout, QProgressBar, QPushButton, QStackedWidget,
                                QVBoxLayout, QWidget)
 
 from soundboard import modules, theme, updates, watchaddon
 from soundboard.ui import icons
-from soundboard.ui.owl import owl_image
+from soundboard.ui.owl import OwlWidget
 from soundboard.ui.panel import card, hint_label, section_label
 
 log = logging.getLogger(__name__)
 
-HOOT_PX = 150
+HOOT_PX = 130
+# what Hoot says while he waits to be installed, and when he's clicked
+HOOT_BEGS = ("pleeease?", "install me?", "one click!", "hoo? hoo…?", "I'd watch for you…",
+             "so… bored…")
+HOOT_JOY = ("yay!!", "hoo-ray!", "↓ that button!")
 
 
 def plural(n: int, word: str) -> str:
@@ -80,12 +83,8 @@ class TriggersTab(QWidget):
         box, bv = card()
         row = QHBoxLayout()
         row.setSpacing(18)
-        self.hoot = QLabel()
-        img = owl_image(HOOT_PX * 2)
-        pm = QPixmap.fromImage(img)
-        pm.setDevicePixelRatio(2.0)
-        self.hoot.setPixmap(pm)
-        self.hoot.setAlignment(Qt.AlignTop)
+        self.hoot = OwlWidget(HOOT_PX, HOOT_BEGS, HOOT_JOY, left=0, right=round(HOOT_PX * 0.7))
+        self.hoot.setToolTip("Hoot is waiting for Onion Watch")
         row.addWidget(self.hoot, 0, Qt.AlignTop)
         text = QVBoxLayout()
         text.setSpacing(8)
@@ -109,6 +108,7 @@ class TriggersTab(QWidget):
         self.btn_get.setObjectName("primary")
         icons.set_icon(self.btn_get, "triggers", "on_accent")
         self.btn_get.clicked.connect(self.get)
+        self.hoot.clicked.connect(lambda: self.btn_get.setFocus(Qt.OtherFocusReason))
         buttons.addWidget(self.btn_get)
         self.btn_cancel = QPushButton("Cancel")
         self.btn_cancel.clicked.connect(self.cancel)

@@ -5,6 +5,10 @@ the mic level (`set_level`, 0..1) and he talks along: the mouth opens with your
 voice, he bounces, and music notes float up out of him. `burst()` throws a handful
 of notes (the test sound); `celebrate=True` makes him hop with twinkling sparkles.
 
+`sad` (0..1) is Bun waiting for something: ears drooping, worried brows, wet eyes,
+a big sigh now and then. `hope(True)` (say, while files are dragged over him) cheers
+him up and he bounces; `hope(False)` and he's back to waiting.
+
 `build()` is for the cable install: he dashes off, a cartoon dust cloud rattles where
 he went, and he comes back with a hammer and a plank and hammers away until
 `stop_building(ok)`, which ends in a celebration (ok) or back to how he was.
@@ -60,8 +64,12 @@ class _Puff:
 
 class BunnyWidget(QWidget):
     def __init__(self, prop: str | None = None, height: int = 110, pad: int = 26,
-                 celebrate: bool = False, parent=None):
+                 celebrate: bool = False, parent=None, *, sad: float = 0.0):
         super().__init__(parent)
+        self.sad = sad             # his mood at rest
+        self._sad = sad            # ... and right now (smoothed)
+        self._hopeful = False
+        self._sigh_at = -1.0
         self.prop = prop
         self.bun_h = height
         self.pad = pad
@@ -77,6 +85,7 @@ class BunnyWidget(QWidget):
         self._blink_at = -1.0
         self._next_flick = self._t0 + self._rng.uniform(3, 7)
         self._flick_at = -1.0
+        self._next_sigh = self._t0 + self._rng.uniform(2.5, 5)
         self._note_debt = 0.0
         self.notes: list[_Note] = []
         self.puffs: list[_Puff] = []
@@ -101,6 +110,12 @@ class BunnyWidget(QWidget):
         """Throw a handful of notes out at once."""
         for _ in range(n):
             self._spawn(1.3)
+
+    def hope(self, on: bool):
+        """Cheer him up (True) or let him go back to his mood at rest (False)."""
+        if on and not self._hopeful:
+            self.burst(5)
+        self._hopeful = on
 
     @property
     def building(self) -> bool:
@@ -238,6 +253,11 @@ class BunnyWidget(QWidget):
         if now >= self._next_flick:
             self._flick_at = now
             self._next_flick = now + self._rng.uniform(4, 9)
+        target = 0.0 if self._hopeful else self.sad
+        self._sad += (target - self._sad) * min(1.0, dt * (8 if target < self._sad else 1.5))
+        if self._sad > 0.3 and now >= self._next_sigh:
+            self._sigh_at = now
+            self._next_sigh = now + self._rng.uniform(5, 9)
         self.update()
 
     def pose(self, now: float | None = None) -> dict:
@@ -251,7 +271,15 @@ class BunnyWidget(QWidget):
         if self._flick_at >= 0 and (f := now - self._flick_at) < 0.5:
             ears += 14 * math.sin(f / 0.5 * math.pi) * math.cos(f * 30) * (1 - f / 0.5)
         ears += self._mouth * 8 * math.sin(t * 11)
-        dy = 2.2 * math.sin(t * 2.2)
+        dy = 2.2 * math.sin(t * 2.2) * (1 - 0.5 * self._sad)
+        ears += 34 * self._sad    # drooping
+        if self._sigh_at >= 0 and (s := now - self._sigh_at) < 1.6:
+            b = math.sin(math.pi * s / 1.6) * self._sad
+            dy += 4 * b
+            ears += 14 * b
+            blink = max(blink, 0.5 * b)
+        if self._hopeful:
+            dy -= 6 * abs(math.sin(t * 5))
         if self.celebrate:
             dy -= 7 * abs(math.sin(t * 3.4))
         dy -= self._bounce * abs(math.sin(t * 9))
@@ -273,7 +301,7 @@ class BunnyWidget(QWidget):
             dy += 1.5 * swing    # leans into each blow
             ears += 6 * swing
         return {"blink": blink, "mouth": self._mouth, "ears": ears, "dy": dy,
-                "dx": dx, "swing": swing, "shown": shown}
+                "dx": dx, "swing": swing, "shown": shown, "sad": self._sad}
 
     # ------------------------------------------------------------------ paint
     def paintEvent(self, ev):
@@ -302,7 +330,7 @@ class BunnyWidget(QWidget):
         if pose["shown"]:
             draw_bunny(p, r.translated(pose["dx"], pose["dy"]), self.prop,
                        blink=pose["blink"], mouth=pose["mouth"], ears=pose["ears"],
-                       swing=pose["swing"])
+                       swing=pose["swing"], sad=pose["sad"])
         else:
             self._paint_scuffle(p)
         for n in self.notes:

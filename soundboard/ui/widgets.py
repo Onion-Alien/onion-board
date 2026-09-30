@@ -1,14 +1,16 @@
 """Hand-painted widgets: level meter, EQ curve, seek slider, sound pads and their grid."""
 from __future__ import annotations
 
+import math
+import time
 from pathlib import Path
 
 import numpy as np
-from PySide6.QtCore import QMimeData, QPoint, QPointF, QRectF, Qt, Signal
+from PySide6.QtCore import QMimeData, QPoint, QPointF, QRectF, Qt, QVariantAnimation, Signal
 from PySide6.QtGui import (QColor, QDrag, QFont, QLinearGradient, QPainter, QPainterPath,
                            QPen)
 from PySide6.QtWidgets import (QAbstractButton, QGridLayout, QLabel, QScrollArea, QSlider, QStyle,
-                               QWidget)
+                               QVBoxLayout, QWidget)
 
 from soundboard import midi, theme, thumbs
 from soundboard.eq import MAX_DB as EQ_MAX_DB
@@ -16,6 +18,7 @@ from soundboard.eq import response_db as eq_response
 from soundboard.engine import SR
 from soundboard.library import AUDIO_EXTS, SoundMeta
 from soundboard.settings import pretty_key
+from soundboard.ui.bunnywidget import BunnyWidget
 
 PAD_MIME = "application/x-soundboard-pad"
 
@@ -91,9 +94,15 @@ class EqCurve(QWidget):
         p.setPen(QPen(col, 2.2))
         p.setBrush(Qt.NoBrush)
         p.drawPath(path)
-        if not self.on:
-            p.setPen(QColor(theme.T["faint"]))
-            p.drawText(r, Qt.AlignCenter, "EQ off")
+        if not self.on:   # on a little plate, so the flat line doesn't strike it through
+            fm = p.fontMetrics()
+            plate = QRectF(0, 0, fm.horizontalAdvance("EQ off") + 14, fm.height() + 4)
+            plate.moveCenter(r.center())
+            p.setPen(Qt.NoPen)
+            p.setBrush(QColor(theme.T["bg"]))
+            p.drawRoundedRect(plate, plate.height() / 2, plate.height() / 2)
+            p.setPen(QColor(theme.T["muted"]))
+            p.drawText(plate, Qt.AlignCenter, "EQ off")
 
 
 class SeekSlider(QSlider):
@@ -167,6 +176,12 @@ class Pad(QAbstractButton):
         self.state = "loading"   # loading | ready | error
         self.error = ""
         self.hover = False
+        self._hover_k = 0.0      # 0..1, eased in and out (the card lights up smoothly)
+        self._hover_anim = QVariantAnimation(self)
+        self._hover_anim.setDuration(140)
+        self._hover_anim.valueChanged.connect(self._on_hover_k)
+        self._down = False       # pressed: the card sinks a little
+        self._play_t = None      # when it started playing (the flash on start)
         self._press = None
         self._kbd_focus = False  # focus came from the keyboard: draw the focus ring
         self._described = None
@@ -256,17 +271,29 @@ class Pad(QAbstractButton):
         self.bands = np.maximum(levels, self.bands * 0.78)
         self.peaks = np.maximum(self.bands, self.peaks - 0.025)
 
-    def enterEvent(self, e):
-        self.hover = True
+    def _on_hover_k(self, v):
+        self._hover_k = float(v)
         self.update()
 
+    def _fade_hover(self, on: bool):
+        self.hover = on
+        self._hover_anim.stop()
+        self._hover_anim.setStartValue(self._hover_k)
+        self._hover_anim.setEndValue(1.0 if on else 0.0)
+        self._hover_anim.start()
+
+    def enterEvent(self, e):
+        self._fade_hover(True)
+
     def leaveEvent(self, e):
-        self.hover = False
-        self.update()
+        self._down = False
+        self._fade_hover(False)
 
     def mousePressEvent(self, e):
         if e.button() == Qt.LeftButton:
             self._press = e.position().toPoint()
+            self._down = True
+            self.update()
         elif e.button() == Qt.RightButton:
             self.menu.emit(self.meta.id, e.globalPosition().toPoint())
 
@@ -275,6 +302,8 @@ class Pad(QAbstractButton):
             (e.position().toPoint() - self._press).manhattanLength() > 12
         if moved:
             self._press = None
+            self._down = False
+            self.update()
             drag = QDrag(self)
             md = QMimeData()
             md.setData(PAD_MIME, self.meta.id.encode())
@@ -284,6 +313,9 @@ class Pad(QAbstractButton):
             drag.exec(Qt.MoveAction)
 
     def mouseReleaseEvent(self, e):
+        if self._down:
+            self._down = False
+            self.update()
         if e.button() == Qt.LeftButton and self._press is not None:
             self._press = None
             mods = e.modifiers()
@@ -306,27 +338,44 @@ class Pad(QAbstractButton):
         p.setRenderHint(QPainter.Antialiasing)
         p.setRenderHint(QPainter.SmoothPixmapTransform)
         r = QRectF(self.rect()).adjusted(2, 2, -2, -2)
+        if self._down:
+            r.adjust(1.5, 1.5, -1.5, -1.5)
         accent = QColor(self.meta.color)
         T = theme.T
-        base = QColor(T["card_hi"] if self.hover else T["card"])
+        lo, hi, k = QColor(T["card"]), QColor(T["card_hi"]), self._hover_k
+        base = QColor.fromRgbF(lo.redF() + (hi.redF() - lo.redF()) * k,
+                               lo.greenF() + (hi.greenF() - lo.greenF()) * k,
+                               lo.blueF() + (hi.blueF() - lo.blueF()) * k)
+        if self._down:
+            base = base.darker(108)
         path = QPainterPath()
         path.addRoundedRect(r, 12, 12)
         p.fillPath(path, base)
         pic = thumbs.pixmap(self.meta.image)
         playing = self.progress is not None
+        now = time.monotonic()
+        if not playing:
+            self._play_t = None
+        elif self._play_t is None:
+            self._play_t = now
         p.save()
         p.setClipPath(path)
         if pic is not None:
             self._paint_picture(p, r, pic)
         if playing:
+            flash = 1 - (now - self._play_t) / 0.35
+            if flash > 0:   # a quick wash of its colour as it starts
+                wash = QColor(accent)
+                wash.setAlpha(int(90 * flash))
+                p.fillPath(path, wash)
             self._paint_visualizer(p, r, accent)
             # progress: a thin accent line along the bottom edge
             p.fillRect(QRectF(r.left(), r.bottom() - 3, r.width() * self.progress, 3), accent)
         p.restore()
         p.setBrush(Qt.NoBrush)
         if playing:
-            glow = QColor(accent)
-            glow.setAlpha(60 if self.paused else 110)
+            glow = QColor(accent)   # breathes while it plays
+            glow.setAlpha(60 if self.paused else int(105 + 35 * math.sin(now * 5)))
             p.setPen(QPen(glow, 6))
             p.drawPath(path)
             pen = QPen(accent, 2.2)
@@ -468,10 +517,20 @@ class PadGrid(QWidget):
         self.grid.setContentsMargins(4, 4, 4, 4)
         self.grid.setAlignment(Qt.AlignTop | Qt.AlignLeft)
         self.setAcceptDrops(True)
-        self.empty = QLabel("Drop sound files here\nor click  ＋ Add sounds\n\n"
-                            "mp3 · wav · ogg · flac · m4a · even video files")
-        self.empty.setAlignment(Qt.AlignCenter)
-        self.empty.setObjectName("empty")
+        # no sounds yet: Bun waits (sadly) above the how-to, and cheers up when
+        # files are dragged over
+        self.empty = QWidget()
+        ev = QVBoxLayout(self.empty)
+        ev.setContentsMargins(0, 24, 0, 0)
+        ev.setSpacing(0)
+        self.bun = BunnyWidget(height=96, pad=16, sad=0.9)
+        self.bun.setToolTip("Bun is waiting for some sounds")
+        ev.addWidget(self.bun, 0, Qt.AlignHCenter)
+        self.empty_text = QLabel("Drop sound files here\nor click  ＋ Add sounds\n\n"
+                                 "mp3 · wav · ogg · flac · m4a · even video files")
+        self.empty_text.setAlignment(Qt.AlignCenter)
+        self.empty_text.setObjectName("empty")
+        ev.addWidget(self.empty_text)
         self._cols = 0
 
     def set_pads(self, pads):
@@ -490,6 +549,7 @@ class PadGrid(QWidget):
             if it.widget() and it.widget() is not self.empty:
                 it.widget().setParent(self)
         if not self.pads:
+            self.empty.setFixedWidth(max(260, self.width() - 8))   # centred across the grid
             self.grid.addWidget(self.empty, 0, 0)
             self.empty.show()
             return
@@ -527,10 +587,20 @@ class PadGrid(QWidget):
         md = e.mimeData()
         if md.hasFormat(PAD_MIME) or md.hasUrls():
             e.acceptProposedAction()
+            if md.hasUrls() and not self.pads:
+                self.bun.hope(True)
 
-    dragMoveEvent = dragEnterEvent
+    def dragMoveEvent(self, e):
+        md = e.mimeData()
+        if md.hasFormat(PAD_MIME) or md.hasUrls():
+            e.acceptProposedAction()
+
+    def dragLeaveEvent(self, e):
+        self.bun.hope(False)
+        super().dragLeaveEvent(e)
 
     def dropEvent(self, e):
+        self.bun.hope(False)
         md = e.mimeData()
         if md.hasFormat(PAD_MIME):
             sid = bytes(md.data(PAD_MIME)).decode()

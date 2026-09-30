@@ -71,3 +71,19 @@ def test_hammer_swings(qapp):
         p = QPainter(img)
         draw_bunny(p, QRectF(0, 0, 100, 120), "hammer", swing=swing)
         p.end()
+
+
+def test_sad_bun_droops_and_cheers_up_while_hoping(qapp):
+    b = BunnyWidget(sad=0.9)
+    b.resize(b.sizeHint())
+    _run(qapp, b, 5)
+    glum = b.pose()
+    assert glum["sad"] > 0.8 and glum["ears"] > 20   # ears drooping
+    b.hope(True)                                     # files dragged over him
+    assert b.notes
+    _run(qapp, b, 30)
+    assert b.pose()["sad"] < 0.1
+    assert not b.grab().isNull()
+    b.hope(False)
+    _run(qapp, b, 120)
+    assert b.pose()["sad"] > 0.8                     # back to waiting

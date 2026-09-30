@@ -383,7 +383,7 @@ QLabel[tone="ok"], QLabel#hint[tone="ok"] { color:$ok_text; }
 QLabel[tone="warn"], QLabel#hint[tone="warn"] { color:$warn_text; }
 QLabel[tone="error"], QLabel#hint[tone="error"] { color:$error_text; }
 QLabel#eqlabel { color:$muted; font-size:8pt; }
-QLabel#empty { color:$faint; font-size:15px; padding:60px; }
+QLabel#empty { color:$muted; font-size:15px; padding:8px 40px 40px 40px; }
 QFrame#card QLabel#stepbox { background:$bg; border-radius:8px; padding:8px; margin-top:6px; }
 QFrame#card QLabel#resultbox { background:$bg; border-radius:8px; padding:8px; }
 QLabel#wordmark { font-size:13pt; font-weight:800; letter-spacing:2px; color:$text_hi; background:transparent; }
