@@ -17,14 +17,14 @@ Windows 10 or 11.
 > - **Blue "Windows protected your PC" box**: click **More info → Run anyway**.
 >
 > The source code is all here if you'd rather check it or build it yourself. The latest installer's
-> [VirusTotal scan](https://www.virustotal.com/gui/file/b25d034457cd976435a2503d2da1a9d899521281b64fde5f75b1667fdc671272): none of the 68 virus
+> [VirusTotal scan](https://www.virustotal.com/gui/file/8c8c2c4400f85db8d058396e96278acef702d257b6b1fefcf017e021d6500031): none of the 69 virus
 > scanners that checked it found anything.
 
 <sub>Other downloads: [all versions](../../releases) ·
 [source code (zip)](../../archive/refs/heads/main.zip), only if you want to build
 it yourself.</sub>
 
-Version: **1.5.2**. See [CHANGELOG.md](CHANGELOG.md).
+Version: **1.5.3**. See [CHANGELOG.md](CHANGELOG.md).
 
 ![A quick tour: playing sounds, the radio globe spinning, a trigger catching "YOU DIED" in a game, and the voice changer](docs/screenshots/tour.webp)
 
