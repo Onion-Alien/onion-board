@@ -2,7 +2,7 @@
 
 ## Unreleased
 
-## 1.5.2 — 2026-10-01
+## 1.5.2 — 2026-09-30
 
 *Who's listening* has a mode for every kind of game voice chat, and suggests the
 right one for the game you're playing.
