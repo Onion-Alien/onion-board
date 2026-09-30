@@ -52,6 +52,29 @@ To iterate faster, run just the file you touched, e.g.
 before committing. You don't need to rebuild to see a change: `scripts\run.bat` runs
 from source.
 
+### What voice chat does to the sounds (the bench)
+
+`scripts\codec_bench.py` runs sounds through each voice chat's codec, and with
+`--defaults` through its own mic cleanup and voice gate as the game ships it
+(`--list` shows every profile: the games it covers, its settings and whether
+they're measured, sourced or estimated). `scripts\dest_fit.py` ranks the
+*Who's listening* modes for each game. The cleanup is the real WebRTC / RNNoise
+code, which lives in a separate environment so the app's stays lean:
+
+```powershell
+py -3.13 -m venv .venv-bench
+.venv-bench\Scripts\pip install -r requirements-bench.txt
+.venv-bench\Scripts\python scripts\codec_bench.py --library --defaults
+```
+
+The real-world checks play test signals into the virtual cable, so they aren't
+headless: mute your mic in the app and stay out of calls that use the cable.
+`game_capture.py` (which device Windows gives a game, its resampling, ducking;
+with no flags it only reports), `steam_voice_roundtrip.py` (Steam's own voice
+codec, one PC, one account), `discord_roundtrip.py` and `game_roundtrip.py` (a
+friend records the game on their end). The stacks, their sources and what the
+bench found: [GAME-VOICE.md](GAME-VOICE.md).
+
 **Launching the real app is not headless.** It opens a window, grabs global
 hotkeys and opens audio devices. Agents: ask the user before running
 `scripts\run.bat`, `python -m soundboard`, `OnionBoard.exe` or the installer.

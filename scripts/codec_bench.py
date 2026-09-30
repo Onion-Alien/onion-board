@@ -8,6 +8,11 @@
     python scripts/codec_bench.py --dest steam --profiles steam   # with the app's mode on
     python scripts/codec_bench.py --send                # through the app's send stage first
     python scripts/codec_bench.py --processing suppress agc gate   # voice cleanup left on
+    python scripts/codec_bench.py --processing webrtc_ns webrtc_agc  # the real WebRTC code
+    python scripts/codec_bench.py --list                # every profile: games, confidence
+    python scripts/codec_bench.py --defaults            # each chat's own cleanup + voice gate
+    python scripts/codec_bench.py --profiles svc lethal --defaults --at 10   # 10 m away
+    python scripts/codec_bench.py --profiles dissonance --situation lethal:walkie
 
 With --dest the "level" and band columns compare the codec's output against the
 *shaped* input, so read the mode's own effect from the <100 and 100-300 columns
@@ -21,7 +26,14 @@ distance ("dist": frame by frame how different it sounds, lower is better; unlik
 the band columns it hears noise fill and warble) and how much the listener's
 decoder clips ("clip%"). --send runs the app's send stage (phase-aware mono +
 limiter) first; --processing adds the voice chat's own mic cleanup
-(soundboard.chatsim) before the codec, the way it is when it's left on.
+(soundboard.chatsim) before the codec, the way it is when it's left on; its
+webrtc_* and rnnoise stages run the real libraries instead of the models
+(soundboard.realproc, which needs the bench environment: requirements-bench.txt).
+--defaults instead runs each profile's own cleanup and voice gate, as the game
+ships it (outside the bench environment the real stages fall back to chatsim's
+models, and the run says so). --at puts the listener that far away in the
+proximity-chat profiles (soundboard.proxsim); --situation picks a listening
+situation (behind a wall, over a radio) for every profile.
 Needs ffmpeg with libopus, the same ffmpeg the importer uses for m4a / video.
 """
 from __future__ import annotations
@@ -40,7 +52,7 @@ if str(ROOT) not in sys.path:
 from soundboard import codecsim  # noqa: E402
 from soundboard.codecsim import (BANDS, PROFILES, SIGNALS, analyze, band_label,  # noqa: E402
                                  mono_loss_db, roundtrip)
-from soundboard import chatsim  # noqa: E402
+from soundboard import chatsim, proxsim, realproc  # noqa: E402
 from soundboard.destination import BUILTIN_BY_KEY, Processor  # noqa: E402
 from soundboard.sendfx import Limiter, SmartMono  # noqa: E402
 
@@ -77,6 +89,48 @@ def _sources(args) -> list[tuple[str, np.ndarray]]:
     return out
 
 
+def _process(x: np.ndarray, stages) -> np.ndarray:
+    """The real libraries first, then the models, so `webrtc_ns webrtc_agc gate` is
+    a real cleanup followed by a voice gate (the WebRTC module has none of its own)."""
+    model = [s for s in stages if s in chatsim.STAGES]
+    real = [s for s in stages if s in realproc.STAGES]
+    if real:
+        x = realproc.process(x, real)
+    if model:
+        x = chatsim.process(x, model)
+    return x
+
+
+# what a real stage becomes when its library isn't installed
+_FALLBACK = {"webrtc_ns": "suppress", "webrtc_agc": "agc", "rnnoise": "suppress"}
+
+
+def _defaults(x: np.ndarray, p) -> np.ndarray:
+    """The profile's own cleanup, then its voice gate (none = push-to-talk)."""
+    stages = list(p.cleanup)
+    real = [s for s in stages if s in realproc.STAGES]
+    if real and not realproc.available(real):
+        stages = list(dict.fromkeys(_FALLBACK.get(s, s) for s in stages
+                                    if s != "webrtc_hpf"))
+    if stages:
+        x = _process(x, stages)
+    if p.gate_db is not None:
+        y = chatsim.gate(chatsim._mono(x), threshold_db=p.gate_db, hang_s=p.gate_hang_s)
+        x = np.repeat(y[:, None], 2, axis=1).astype(np.float32)
+    return x
+
+
+def _list() -> None:
+    for key, p in PROFILES.items():
+        clean = " + ".join(p.cleanup) or "none"
+        gate = "push-to-talk" if p.gate_db is None else f"gate {p.gate_db:.0f} dB"
+        prox = f"; proximity {p.proximity}" if p.proximity else ""
+        print(f"{key:<14}{p.label} [{p.confidence}]")
+        print(f"{'':<14}{p.games or '-'}")
+        print(f"{'':<14}{p.rate // 1000} kHz, {p.bitrate_kbps} kbps{' CBR' if p.cbr else ''}, "
+              f"{p.application}, {p.frame_ms} ms; cleanup {clean}; {gate}{prox}\n")
+
+
 def _fmt(d: float | None) -> str:
     return "   —  " if d is None else f"{d:+5.1f}"
 
@@ -94,11 +148,32 @@ def main() -> int:
                          "does when the mode is on); use with the plain run to compare")
     ap.add_argument("--send", action="store_true",
                     help="run the app's send stage (phase-aware mono + limiter) first")
-    ap.add_argument("--processing", nargs="+", choices=chatsim.STAGES, default=(),
-                    help="simulate the voice chat's mic cleanup being left on")
+    ap.add_argument("--processing", nargs="+", choices=chatsim.STAGES + realproc.STAGES,
+                    default=(), help="simulate the voice chat's mic cleanup being left on "
+                    "(webrtc_* / rnnoise: the real libraries)")
+    ap.add_argument("--defaults", action="store_true",
+                    help="run each profile's own mic cleanup and voice gate (as shipped)")
+    ap.add_argument("--at", type=float, metavar="DIST",
+                    help="proximity profiles: the listener this far away (game units)")
+    ap.add_argument("--situation", metavar="MODEL:VARIANT",
+                    help="a proxsim listening situation for every profile, e.g. "
+                         "lethal:occluded, lethal:walkie, pma_voice:radio, crewlink:vent")
+    ap.add_argument("--list", action="store_true", help="list the profiles and exit")
     ap.add_argument("--json", metavar="FILE", help="also write the numbers as JSON")
     args = ap.parse_args()
+    if args.list:
+        _list()
+        return 0
+    if args.defaults and not realproc.available():
+        print(f"(--defaults: {', '.join(realproc.missing())} not installed, so the real "
+              "cleanup stages run as chatsim's models)", file=sys.stderr)
 
+    real = [s for s in args.processing if s in realproc.STAGES]
+    if real and not realproc.available(real):
+        print(f"--processing {' '.join(real)} needs {', '.join(realproc.missing())}: "
+              "run from the bench environment (pip install -r requirements-bench.txt)",
+              file=sys.stderr)
+        return 2
     ff = codecsim.available()
     if not ff:
         print("ffmpeg with libopus not found; install ffmpeg (winget install Gyan.FFmpeg) first",
@@ -125,11 +200,14 @@ def main() -> int:
                                    for i in range(0, len(x), 480)])
         ref = sent      # what the app puts into the cable
         if args.processing:
-            sent = chatsim.process(sent, args.processing)
+            sent = _process(sent, args.processing)
         for key in args.profiles:
             p = PROFILES[key]
             try:
-                back = roundtrip(sent, p, ff)
+                back = roundtrip(_defaults(sent, p) if args.defaults else sent, p, ff)
+                listen = args.situation or p.proximity
+                if listen and (args.at is not None or args.situation):
+                    back = proxsim.apply(back, listen, args.at or 0.0)
                 # judged against what went into the cable, so --processing shows the
                 # voice cleanup's damage (the send stage's own effect is by design;
                 # compare clip% and a plain run for that)

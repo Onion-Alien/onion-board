@@ -84,11 +84,14 @@ BUILTIN: tuple[Dest, ...] = (
     Dest("discord", "Discord", 0, 0.6, 0.4, True,
          note="Opus 64 kbps, mono, voice mode. Keeps 100 Hz-20 kHz; loses sub-bass."),
     Dest("steam", "Steam voice (CS2, Dota, Steam games)", 12000, 0.6, 0.4, True,
-         note="Opus fed 24 kHz mono: nothing above 12 kHz gets through."),
+         note="Opus fed 24 kHz mono: nothing above 12 kHz gets through. Also suits "
+              "Phasmophobia and other Photon Voice games (24 kHz too)."),
     Dest("game", "Game voice (Fortnite, Valorant, Unity / Unreal games)", 0, 0.6, 0.5, True,
-         note="Vivox Opus at 32 kbps mono. Keeps the full band, squeezes it harder."),
+         note="Vivox Opus at 32 kbps mono. Keeps the full band, squeezes it harder. "
+              "Also suits Valorant, Overwatch, FiveM, TeamSpeak and console party chat."),
     Dest("game_lo", "Game voice, low bandwidth (8 kHz)", 8000, 0.7, 0.5, True,
-         note="Consoles and games on Vivox's Siren 7: nothing above 8 kHz."),
+         note="Games on Unreal's own voice chat or Vivox's Siren 7: nothing above "
+              "8 kHz."),
 )
 BUILTIN_BY_KEY = {d.key: d for d in BUILTIN}
 

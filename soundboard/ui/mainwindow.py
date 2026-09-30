@@ -1113,7 +1113,9 @@ class MainWindow(QMainWindow):
             self, "Game with no mic setting",
             "Some games just use Windows' main mic. A sound window just opened:\n\n"
             f"1.  Right-click  {vm}  →  Set as Default Device\n"
-            "2.  Restart the game.\n\n"
+            "2.  Right-click it again  →  Set as Default Communication Device\n"
+            "     (voice chat in many games asks Windows for that one)\n"
+            "3.  Restart the game.\n\n"
             "Heads-up: voice typing will then also hear your sounds.\n"
             "To undo, do the same on your normal mic.")
 

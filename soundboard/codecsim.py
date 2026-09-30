@@ -40,6 +40,15 @@ class Profile:
     highpass_hz: int = 0   # the app's capture high-pass before the encoder (0 = none)
     highpass_order: int = 13
     note: str = ""
+    cbr: bool = False      # constant bitrate (Mumble, FiveM) instead of Opus' default VBR
+    # the mic cleanup the chat runs with its defaults (codec_bench --defaults): stage
+    # names from soundboard.realproc (the real libraries) or soundboard.chatsim (models)
+    cleanup: tuple[str, ...] = ()
+    gate_db: float | None = None   # voice activation threshold (10 ms RMS), None = push-to-talk
+    gate_hang_s: float = 0.2
+    proximity: str = ""    # listener side: a soundboard.proxsim "model[:variant]" ("" = none)
+    games: str = ""        # what uses it
+    confidence: str = "measured"   # measured / sourced / estimate
 
     @property
     def ceiling_hz(self) -> int:
@@ -53,21 +62,103 @@ class Profile:
 # Studio (no noise suppression, echo cancellation or auto gain) still has it.
 DISCORD_HP = 94
 
+# Game voice stacks. Where a value comes from the stack's source code or SDK docs the
+# profile says "sourced"; "estimate" means nothing public pins it down (the bench
+# still runs it, read those rows as a best guess). Speex's AGC and noise suppressor
+# (Mumble, Dissonance) have no packaged build, so those profiles stand in WebRTC's.
+# Gate thresholds are converted from each stack's own scale to 10 ms RMS dBFS.
+WEBRTC_CLEANUP = ("webrtc_hpf", "webrtc_ns", "webrtc_agc")
+
 PROFILES: dict[str, Profile] = {p.key: p for p in (
     Profile("discord", "Discord voice, default", 48000, 1, 64, highpass_hz=DISCORD_HP,
-            note="64 kbps mono Opus is the default voice-channel bitrate"),
+            note="64 kbps mono Opus is the default voice-channel bitrate",
+            games="Discord"),
     Profile("discord_low", "Discord voice, weak connection", 48000, 1, 24,
             highpass_hz=DISCORD_HP,
-            note="Discord adapts down under packet loss; 24 kbps is mid-range of 8-128"),
+            note="Discord adapts down under packet loss; 24 kbps is mid-range of 8-128",
+            games="Discord"),
     Profile("discord_128", "Discord voice, boosted 128 kbps", 48000, 1, 128,
             highpass_hz=DISCORD_HP,
-            note="a boosted server's higher bitrate; still mono unless stereo is enabled"),
+            note="a boosted server's higher bitrate; still mono unless stereo is enabled",
+            games="Discord"),
     Profile("steam", "Steam voice (CS2 etc.)", 24000, 1, 32,
-            note="Opus PLC fed 24 kHz mono: nothing above 12 kHz survives; bitrate is an estimate"),
+            note="Opus PLC fed 24 kHz mono: nothing above 12 kHz survives; bitrate is an estimate",
+            games="CS2, Dota 2, TF2, Deep Rock Galactic, Unreal games on Steam's voice",
+            confidence="sourced"),
+    Profile("steam_rust", "Steam voice in 3D (Rust)", 24000, 1, 32, proximity="unity_3d",
+            note="Steam's codec, heard through a Unity 3D sound: fades with distance",
+            games="Rust", confidence="estimate"),
     Profile("vivox", "Vivox in-game voice (Unity / Unreal)", 48000, 1, 32,
-            note="Opus at Vivox's documented 32 kbps default"),
+            cleanup=("webrtc_ns", "webrtc_agc"), gate_db=-45, gate_hang_s=2.0,
+            note="Opus at Vivox's documented 32 kbps default; noise suppression and AGC on "
+                 "by default in current SDKs, voice gate with a 2 s hangover",
+            games="Valorant, League of Legends, Rainbow Six Siege, Overwatch 2",
+            confidence="sourced"),
+    Profile("vivox_3d", "Vivox positional channel", 48000, 1, 32,
+            cleanup=("webrtc_ns", "webrtc_agc"), gate_db=-45, gate_hang_s=2.0,
+            proximity="vivox_3d",
+            note="as vivox, 6 dB down, inverse-distance fade from 1 m to silence at 32 m",
+            games="games with Vivox proximity chat", confidence="sourced"),
+    Profile("vivox_siren14", "Vivox Siren 14 (32 kHz)", 32000, 1, 32,
+            note="Vivox's mid codec: 16 kHz ceiling, modelled with Opus at 32 kHz",
+            games="older Vivox titles", confidence="sourced"),
     Profile("vivox_siren7", "Vivox Siren 7 (16 kHz)", 16000, 1, 32,
-            note="games on Vivox's low-CPU codec; 8 kHz ceiling, modelled with Opus at 16 kHz"),
+            note="games on Vivox's low-CPU codec; 8 kHz ceiling, modelled with Opus at 16 kHz",
+            games="older Vivox titles, consoles", confidence="sourced"),
+    Profile("eos", "Epic Online Services voice", 48000, 1, 32, frame_ms=20,
+            cleanup=WEBRTC_CLEANUP,
+            note="Fortnite's voice since it left Vivox; nothing public on its settings",
+            games="Fortnite, EOS games", confidence="estimate"),
+    Profile("ue_voip", "Unreal Engine built-in voice", 16000, 1, 20, gate_db=-26,
+            note="16 kHz by default (8 kHz ceiling); voice.MicNoiseGateThreshold 0.08",
+            games="Unreal games not on Steam / EOS / Vivox voice", confidence="estimate"),
+    Profile("photon", "Photon Voice", 24000, 1, 30, gate_db=-43, gate_hang_s=0.5,
+            proximity="phasmo",
+            note="Photon's defaults: Opus 24 kHz, 30 kbps, 20 ms; gate 0.01 with 500 ms "
+                 "release; proximity up to 20 m in Phasmophobia",
+            games="Phasmophobia, Photon Unity games", confidence="sourced"),
+    Profile("dissonance", "Dissonance (Lethal Company)", 48000, 1, 17, frame_ms=40,
+            cleanup=("webrtc_ns", "webrtc_agc"), gate_db=-45, gate_hang_s=0.3,
+            proximity="lethal",
+            note="Dissonance medium quality (~17 kbps), 40 ms frames, voice activation; "
+                 "Speex AGC / noise removal (WebRTC's stand in)",
+            games="Lethal Company, Dissonance Unity games", confidence="sourced"),
+    Profile("mumble", "Mumble", 48000, 1, 40, application="audio", cbr=True,
+            cleanup=("webrtc_ns", "agc"), gate_db=-24, gate_hang_s=0.2,
+            note="Mumble's defaults: 40 kbps CBR in Opus' audio mode, Speex noise "
+                 "suppression and AGC (stand-ins), amplitude voice activation",
+            games="Mumble servers", confidence="sourced"),
+    Profile("fivem", "FiveM (GTA RP) voice", 48000, 1, 48, application="audio", cbr=True,
+            frame_ms=40, cleanup=WEBRTC_CLEANUP, proximity="pma_voice",
+            note="FiveM's Mumble client: 48 kbps CBR audio mode, 40 ms, WebRTC high-pass, "
+                 "noise suppression High and AGC; push-to-talk; pma-voice ranges 3/7/15 m",
+            games="GTA V roleplay (FiveM)", confidence="sourced"),
+    Profile("fivem_radio", "FiveM radio (pma-voice)", 48000, 1, 48, application="audio",
+            cbr=True, frame_ms=40, cleanup=WEBRTC_CLEANUP, proximity="pma_voice:radio",
+            note="as fivem, then pma-voice's radio: 389-3248 Hz band, ring modulation",
+            games="GTA V roleplay radios", confidence="sourced"),
+    Profile("svc", "Simple Voice Chat (Minecraft)", 48000, 1, 48,
+            cleanup=("rnnoise", "agc"), proximity="svc",
+            note="Opus voip 20 ms (bitrate left to Opus, ~48), RNNoise and AGC on, "
+                 "push-to-talk; linear fade to silence at 48 blocks",
+            games="Minecraft with Simple Voice Chat", confidence="sourced"),
+    Profile("vrchat", "VRChat", 48000, 1, 30, cleanup=("rnnoise",), gate_db=-35,
+            proximity="vrchat",
+            note="RNNoise on, 5% activation threshold; +15 dB, fades 0-25 m with a "
+                 "distance low-pass; bitrate is an estimate",
+            games="VRChat", confidence="estimate"),
+    Profile("webrtc", "Browser / WebRTC voice", 48000, 1, 32, cleanup=WEBRTC_CLEANUP,
+            gate_db=-30, proximity="crewlink",
+            note="getUserMedia's cleanup (high-pass, noise suppression, AGC), Opus ~32 kbps",
+            games="Among Us (BetterCrewLink), Roblox, web games", confidence="sourced"),
+    Profile("teamspeak", "TeamSpeak (Opus Voice)", 48000, 1, 29,
+            cleanup=("webrtc_ns", "webrtc_agc"), gate_db=-40,
+            note="Opus Voice quality 6 (28.7 kbps); background-noise removal and AGC on",
+            games="TeamSpeak 3 / 5", confidence="estimate"),
+    Profile("console_party", "Xbox / PlayStation party", 48000, 1, 32, cleanup=WEBRTC_CLEANUP,
+            note="platform voice with its own noise suppression and AGC; nothing public",
+            games="Xbox app / party chat, PlayStation party, Sea of Thieves",
+            confidence="estimate"),
 )}
 
 # analysis bands (Hz): roughly where a voice, a bass hit, presence and 'air' live
@@ -131,7 +222,7 @@ def roundtrip(x: np.ndarray, profile: Profile, ffmpeg: str | None = None) -> np.
     ogg = _run([ff, "-v", "error", "-f", "f32le", "-ar", str(profile.rate), "-ac", str(ch),
                 "-i", "pipe:0", "-c:a", "libopus", "-b:a", f"{profile.bitrate_kbps}k",
                 "-application", profile.application, "-frame_duration", str(profile.frame_ms),
-                "-vbr", "on", "-f", "ogg", "pipe:1"], raw)
+                "-vbr", "off" if profile.cbr else "on", "-f", "ogg", "pipe:1"], raw)
     pcm = _run([ff, "-v", "error", "-i", "pipe:0", "-f", "f32le", "-ar", str(SR),
                 "-ac", str(ch), "pipe:1"], ogg)
     out = np.frombuffer(pcm, F32).reshape(-1, ch)

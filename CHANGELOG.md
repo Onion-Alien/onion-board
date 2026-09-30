@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+- **"Game has no microphone setting?" now covers voice chat too.** Windows keeps
+  a separate *default communication device*, and that's the one many games' voice
+  chat asks for. The steps now set the cable as both, not just the default device.
+- **The game voice chat guide names more of the settings that mangle sounds**:
+  *denoiser* and *background sound removal* as well as noise suppression. The AI
+  denoisers in VRChat and Minecraft's Simple Voice Chat take music out almost
+  completely.
+
 ## 1.4.1 — 2026-09-29
 
 A fix for the new self-update.
