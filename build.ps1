@@ -42,6 +42,12 @@ if ($LASTEXITCODE -ne 0) { throw "PyInstaller failed" }
 if ($LASTEXITCODE -ne 0) { throw "prune_build.py failed" }
 & "dist\OnionBoard\OnionBoard.exe" --selftest | Out-Host
 if ($LASTEXITCODE -ne 0) { throw "the built app failed its self-test (see above)" }
+# The Triggers tab's add-on (Onion Watch) runs on what this build ships: prove it with
+# its zip when there is one (ONIONBOARD_ONION_WATCH_ZIP, see docs\DEVELOPING.md).
+if ($env:ONIONBOARD_ONION_WATCH_ZIP) {
+    & "dist\OnionBoard\OnionBoard.exe" --selftest-addon $env:ONIONBOARD_ONION_WATCH_ZIP | Out-Host
+    if ($LASTEXITCODE -ne 0) { throw "the built app can't run the Onion Watch add-on (see above)" }
+}
 
 # Add-ons ship with the app (source only; a module's own .venv is made on the user's PC
 # by its Install button). modules.py looks for them in the folder next to the exe.

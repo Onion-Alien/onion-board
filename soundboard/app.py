@@ -80,9 +80,54 @@ def selftest() -> int:
     return 0
 
 
+def selftest_addon(path: str) -> int:
+    """`OnionBoard.exe --selftest-addon OnionWatch-module.zip`: prove this build can
+    run the Onion Watch add-on (it has no pip, so the add-on may only use what the
+    build ships). Installs the zip into a temp folder, loads it the way the Triggers
+    tab does, builds its tab on a stand-in board, and lists windows and screens with
+    it. No window, no device, no network. Prints OK and returns 0."""
+    import importlib
+    import tempfile
+    from pathlib import Path
+    os.environ["QT_QPA_PLATFORM"] = "offscreen"
+    _app = QApplication(sys.argv)   # noqa: F841 - kept while the tab is built
+    from soundboard import modules, theme
+    tmp = Path(tempfile.mkdtemp(prefix="onionboard-selftest-"))
+    info = modules.install_zip(Path(path), "onion-watch", "triggers", tmp / "modules")
+    entry = modules.load_package(info)
+
+    class Host:   # the stand-in board: onionwatch.host.Host, nothing played
+        api_version = modules.TRIGGERS_API[1]
+        name, default_sound = "Onion Board", ""
+        audio_exts = frozenset({".wav"})
+        screen, data_dir = {}, tmp
+
+        def save(self): pass
+        def sounds(self): return []
+        def add_sound(self, path, done): done(None)
+        def play(self, sid, loop=False, tag=""): return False
+        def stop_tag(self, tag): pass
+        def ringing(self): return []
+        def palette(self): return dict(theme.T)
+        def notify(self, title, body): pass
+
+    tab = entry.create(Host())
+    pkg = info.package
+    for sub in ("ui.windowpicker", "ui.snip", "windows", "screenwatch"):   # the lazy ones
+        importlib.import_module(f"{pkg}.{sub}")
+    wins = sys.modules[f"{pkg}.windows"].list_windows()
+    mons = sys.modules[f"{pkg}.screenwatch"].monitors()
+    tab.shutdown()
+    print(f"OK: Onion Watch {info.version} runs in Onion Board {__version__} "
+          f"({len(wins)} windows, {len(mons)} screens seen)")
+    return 0
+
+
 def main():
     if "--selftest" in sys.argv:
         sys.exit(selftest())
+    if "--selftest-addon" in sys.argv:
+        sys.exit(selftest_addon(sys.argv[sys.argv.index("--selftest-addon") + 1]))
     migrate_from_soundboard()
     log_path = applog.setup(APP_DIR)
     applog.install_hooks(log_path, __version__)
