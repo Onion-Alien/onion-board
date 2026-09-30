@@ -87,9 +87,55 @@ def test_every_theme_is_complete_and_readable(name):
         for bg in ("bg", "panel", "card", "btn"):
             assert _contrast(t[f"{kind}_text"], t[bg]) >= need, (kind, bg)
     for fg, bg in (("text", "bg"), ("text", "card"), ("muted", "panel"),
-                   ("on_accent", "accent"), ("danger_text", "danger_bg")):
+                   ("on_accent", "accent"), ("danger_text", "danger_bg"),
+                   ("section", "panel"), ("on_accent", "accent_hi"),
+                   ("accent_hi", "panel")):   # the radio's playing station / Clear link
         assert _contrast(t[fg], t[bg]) >= 3.0, (fg, bg)
+    # the selected row of every dropdown, checked buttons, primary buttons
+    assert _contrast(t["on_accent"], t["accent"]) >= 4.3
     assert t.get("texture", "carbon") in theme.TEXTURE_TILE
+
+
+@pytest.mark.parametrize("box", ["card", "setcard", "stations", ""])
+def test_popups_inside_cards_keep_the_themes_background(qapp, box):
+    """A dropdown list or menu is a child of the widget that opens it, so a card's
+    "QWidget { background:transparent }" used to reach it and the popup drew black --
+    unreadable on every light theme."""
+    from PySide6.QtGui import QColor
+    from PySide6.QtWidgets import QComboBox, QFrame, QMenu, QVBoxLayout
+
+    from soundboard.ui.radiopanel import RadioTab
+    try:
+        for name in theme.THEMES:
+            theme.apply(qapp, name)
+            f = QFrame()
+            f.setObjectName(box)
+            if box == "stations":
+                f.setStyleSheet(RadioTab._PANEL_STYLE.substitute(theme.T))
+            cb = QComboBox()
+            cb.addItems(["Off", "Discord", "Vivox"])
+            QVBoxLayout(f).addWidget(cb)
+            f.show()
+            cb.showPopup()
+            menu = QMenu(cb)
+            menu.addAction("Item")
+            menu.popup(f.mapToGlobal(f.rect().center()))
+            qapp.processEvents()
+            want = QColor(theme.T["card"])
+            pop = cb.view().window().grab().toImage()
+            vp = cb.view().viewport()
+            for img, x, y in ((pop, pop.width() - 3, pop.height() - 3),
+                              (vp.grab().toImage(), 3, vp.height() - 3),
+                              (menu.grab().toImage(), menu.width() // 2, menu.height() - 3)):
+                got = QColor(img.pixel(x, y))
+                diff = sum(abs(a - b) for a, b in zip(got.getRgb()[:3], want.getRgb()[:3]))
+                assert diff < 30, (name, got.name(), want.name())
+            menu.close()
+            cb.hidePopup()
+            f.close()
+            f.deleteLater()
+    finally:
+        theme.apply(qapp, theme.DEFAULT)
 
 
 def test_every_theme_is_in_one_settings_group():
@@ -114,5 +160,28 @@ def test_setup_tab_uses_the_themes_status_colours(qapp, win):
     try:
         text = win.flow_mic.text() + win.flow_out.text() + win.step_lbl.text()
         assert "#13ce66" not in text and "#ffb020" not in text and "#ff4d4f" not in text
+    finally:
+        win.apply_theme("Dark")
+
+
+def test_a_live_theme_switch_leaves_no_old_text_colours(qapp, win):
+    """Colours written into a label's text or a widget's own stylesheet when it was
+    built (a warning, a red error, the over-100% volume) follow a live theme switch,
+    not only a restart."""
+    from PySide6.QtWidgets import QLabel
+
+    win.apply_theme("Dark")
+    red, amber = theme.status("error"), theme.status("warn")
+    lbl = QLabel(f"<span style='color:{red}'>Oops</span>", win)
+    lbl.setStyleSheet(f"color:{amber}; background:{red};")
+    win.apply_theme("Mint")
+    try:
+        assert theme.status("error") in lbl.text() and red not in lbl.text()
+        assert lbl.styleSheet() == f"color:{theme.status('warn')}; background:{red};"
+        old = {theme.THEMES["Dark"][k].lower() for k in ("ok_text", "warn_text", "error_text")}
+        for w in qapp.allWidgets():
+            text = w.text() if isinstance(w, QLabel) else ""
+            for c in old:
+                assert f"color:{c}" not in (text + w.styleSheet()).lower(), (w, c)
     finally:
         win.apply_theme("Dark")

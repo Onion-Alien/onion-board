@@ -6,6 +6,7 @@ the hand-painted widgets (pads, meters, EQ curve, logo) read the same tokens thr
 """
 from __future__ import annotations
 
+import re
 import tempfile
 from pathlib import Path
 from string import Template
@@ -77,7 +78,7 @@ THEMES: dict[str, dict[str, str]] = {
         btn="#f8e1e8", btn_hover="#f4d3de", btn_press="#eec3d1",
         border="#efc9d5", border_hi="#d98aa5", groove="#f0cdd8", inset="#f6e3e9",
         text="#3a1f2b", text_hi="#2a1520", muted="#8a5d6e", faint="#b48898", section="#a9607c",
-        accent="#e75480", accent_hi="#f06a93", accent2="#ffb7c5", on_accent="#ffffff",
+        accent="#d23f6a", accent_hi="#e0527e", accent2="#ffb7c5", on_accent="#ffffff",
         off="#dcb0c0", badge="#f6dde5", badge_text="#5a2f40",
         danger_bg="#ffe3e3", danger_border="#f2a9a9", danger_text="#c0282d", danger_hover="#ffd3d3",
         warn_bg="#fff1d6", warn_text="#855000",
@@ -101,7 +102,7 @@ THEMES: dict[str, dict[str, str]] = {
         btn="#16161c", btn_hover="#1f1f27", btn_press="#292932",
         border="#25252e", border_hi="#45455a", groove="#22222b", inset="#070709",
         text="#e8e8ee", text_hi="#ffffff", muted="#85859a", faint="#5e5e70", section="#9090a8",
-        accent="#5b8cff", accent_hi="#7aa2ff", accent2="#b36bff", on_accent="#ffffff",
+        accent="#336bed", accent_hi="#5a8aff", accent2="#b36bff", on_accent="#ffffff",
         off="#3a3a48", badge="#1f1f27", badge_text="#d8d8e4", **_DARK_STATUS,
     ),
     "Slate": dict(   # blue-grey with teal and brass
@@ -189,7 +190,7 @@ THEMES: dict[str, dict[str, str]] = {
         btn="#352040", btn_hover="#40274d", btn_press="#4c2f5b",
         border="#4a2f57", border_hi="#7a4f8e", groove="#472c54", inset="#170e1d",
         text="#f3e6f7", text_hi="#fbf5fd", muted="#b596c2", faint="#846a90", section="#9ad36a",
-        accent="#b04ad8", accent_hi="#c064e4", accent2="#8fd14f", on_accent="#ffffff",
+        accent="#ae45d7", accent_hi="#c064e4", accent2="#8fd14f", on_accent="#ffffff",
         off="#5e416b", badge="#40274d", badge_text="#ecdcf2",
         **_DARK_STATUS | dict(error_text="#ff6b6b"),
     ),
@@ -198,7 +199,7 @@ THEMES: dict[str, dict[str, str]] = {
         btn="#dcefe6", btn_hover="#cfe7db", btn_press="#bfdecf",
         border="#c3ddd1", border_hi="#7fb39b", groove="#c9e2d6", inset="#e0f0e8",
         text="#16322a", text_hi="#0c231c", muted="#4d6e62", faint="#85a498", section="#3f7f68",
-        accent="#0f9373", accent_hi="#12a882", accent2="#3f8cff", on_accent="#ffffff",
+        accent="#0e8669", accent_hi="#10a07c", accent2="#3f8cff", on_accent="#ffffff",
         off="#a9cbbd", badge="#dcefe6", badge_text="#1e3d33", **_LIGHT_STATUS,
     ),
     # ---- wild
@@ -207,7 +208,7 @@ THEMES: dict[str, dict[str, str]] = {
         btn="#2f1553", btn_hover="#3b1b66", btn_press="#472179",
         border="#4a2280", border_hi="#7a3bd1", groove="#45206f", inset="#140824",
         text="#fbe6ff", text_hi="#ffffff", muted="#c49be0", faint="#8a64a8", section="#36f9f6",
-        accent="#ff2a6d", accent_hi="#ff4f88", accent2="#36f9f6", on_accent="#ffffff",
+        accent="#e5155a", accent_hi="#ff3d7c", accent2="#36f9f6", on_accent="#ffffff",
         off="#5a3585", badge="#3b1b66", badge_text="#f5d7ff",
         **_DARK_STATUS | dict(ok_text="#36f9a0", error_text="#ff6b8b"),
         texture="grid",
@@ -217,7 +218,7 @@ THEMES: dict[str, dict[str, str]] = {
         btn="#f5d5ec", btn_hover="#efc4e4", btn_press="#e6b1d9",
         border="#e9bfdc", border_hi="#c47fb5", groove="#eac6e0", inset="#f6dcee",
         text="#3b1d4a", text_hi="#2a1236", muted="#74508a", faint="#a888b8", section="#1f8a83",
-        accent="#a94dff", accent_hi="#b96bff", accent2="#05e0a1", on_accent="#ffffff",
+        accent="#9f3dff", accent_hi="#b060ff", accent2="#05e0a1", on_accent="#ffffff",
         off="#d9b3d6", badge="#f5d5ec", badge_text="#4a2860", **_LIGHT_STATUS,
     ),
     "Blood Moon": dict(   # crimson on black
@@ -262,17 +263,17 @@ THEMES: dict[str, dict[str, str]] = {
     "Flashbang": dict(   # light mode, but worse. Your eyes will thank you (they won't)
         bg="#ffffff", panel="#ffffff", card="#ffffff", card_hi="#fafafa",
         btn="#ffffff", btn_hover="#fff9c4", btn_press="#fff176",
-        border="#eeeeee", border_hi="#ffd600", groove="#eeeeee", inset="#fafafa",
+        border="#eeeeee", border_hi="#d4b000", groove="#e0e0e0", inset="#fafafa",
         text="#222222", text_hi="#000000", muted="#666666", faint="#9e9e9e", section="#8a6500",
-        accent="#ffd600", accent_hi="#ffea00", accent2="#ff9100", on_accent="#000000",
-        off="#d6d6d6", badge="#fffde7", badge_text="#333333", **_LIGHT_STATUS,
+        accent="#ffd600", accent_hi="#a38600", accent2="#ff9100", on_accent="#000000",
+        off="#bdbdbd", badge="#fffde7", badge_text="#333333", **_LIGHT_STATUS,
     ),
     "Barbie": dict(   # everything is pink. Everything.
         bg="#ffb3d9", panel="#ffc9e4", card="#ffdcee", card_hi="#ffd0e8",
         btn="#ff9ccf", btn_hover="#ff85c4", btn_press="#ff6eb8",
         border="#ff5fb0", border_hi="#e0218a", groove="#ff8cc6", inset="#ffc0e0",
         text="#4a0027", text_hi="#330019", muted="#7a1650", faint="#a8407c", section="#a3005a",
-        accent="#d6157f", accent_hi="#e82a91", accent2="#ff00a0", on_accent="#ffffff",
+        accent="#d6157f", accent_hi="#d91a84", accent2="#ff00a0", on_accent="#ffffff",
         off="#e889bd", badge="#ff9ccf", badge_text="#4a0027",
         **_LIGHT_STATUS | dict(ok_text="#044a22", warn_text="#5e3700", error_text="#7a0017",
                                danger_bg="#ffe0e8", danger_text="#9a0f25"),
@@ -304,7 +305,7 @@ THEMES: dict[str, dict[str, str]] = {
         btn="#d4d0c8", btn_hover="#e0ddd6", btn_press="#b8b4ac",
         border="#808080", border_hi="#404040", groove="#a0a0a0", inset="#ffffff",
         text="#000000", text_hi="#000000", muted="#3a3a3a", faint="#6d6d6d", section="#000080",
-        accent="#000080", accent_hi="#1084d0", accent2="#008080", on_accent="#ffffff",
+        accent="#000080", accent_hi="#0e6fae", accent2="#008080", on_accent="#ffffff",
         off="#a0a0a0", badge="#ffffff", badge_text="#000000",
         **_LIGHT_STATUS | dict(ok_text="#005a1e", warn_text="#6b3f00", error_text="#9a0000"),
         font="Tahoma",
@@ -314,7 +315,7 @@ THEMES: dict[str, dict[str, str]] = {
         btn="#ffe97a", btn_hover="#ffe14d", btn_press="#ffd41a",
         border="#f2c200", border_hi="#d99a00", groove="#f5dc70", inset="#fff3a0",
         text="#2b1d00", text_hi="#1a1100", muted="#63500f", faint="#a08530", section="#c2006b",
-        accent="#e8198b", accent_hi="#f7349c", accent2="#1aa7ec", on_accent="#ffffff",
+        accent="#e01686", accent_hi="#f7349c", accent2="#1aa7ec", on_accent="#ffffff",
         off="#e0c860", badge="#ffe97a", badge_text="#3a2a00",
         **_LIGHT_STATUS | dict(ok_text="#085a2d", warn_text="#6b3f00", error_text="#a0142e"),
         font="Comic Sans MS",
@@ -324,7 +325,7 @@ THEMES: dict[str, dict[str, str]] = {
         btn="#29004f", btn_hover="#3a0070", btn_press="#4b0091",
         border="#7a00ff", border_hi="#c6ff00", groove="#3d0073", inset="#08000f",
         text="#c6ff00", text_hi="#eaff80", muted="#ff70ff", faint="#b347d9", section="#00ffea",
-        accent="#ff00d4", accent_hi="#ff40df", accent2="#c6ff00", on_accent="#ffffff",
+        accent="#ff00d4", accent_hi="#ff40df", accent2="#c6ff00", on_accent="#000000",
         off="#52307a", badge="#3a0070", badge_text="#eaff80",
         **_DARK_STATUS | dict(ok_text="#00ffea", error_text="#ff8080"),
         texture="grid",
@@ -485,6 +486,7 @@ QCheckBox::indicator:checked { image:url("$check"); }
 QCheckBox::indicator:hover, QRadioButton::indicator:hover { border-color:$border_hi; }
 QCheckBox::indicator:checked:hover, QRadioButton::indicator:checked:hover { background:$accent_hi; border-color:$accent_hi; }
 QCheckBox::indicator:disabled, QRadioButton::indicator:disabled { background:$inset; border-color:$border; }
+QCheckBox::indicator:checked:disabled { image:url("$check_off"); }
 QScrollArea, QScrollArea > QWidget > QWidget { background:transparent; }
 QScrollBar:vertical { background:transparent; width:10px; }
 QScrollBar::handle:vertical { background:$groove; border-radius:5px; min-height:30px; }
@@ -533,6 +535,12 @@ QFrame#card QFrame#chip QPushButton { background:transparent; border:none; }
 QFrame#card QFrame#chip QPushButton#chipname:hover { color:$text_hi; }
 QFrame#card QFrame#chip QPushButton#chipstop { border-radius:11px; color:$muted; }
 QFrame#card QFrame#chip QPushButton#chipstop:hover { background:$danger_bg; color:$danger_text; }
+/* popups (combo lists, menus) are children of the widget that opens them, so the
+   "card QWidget { transparent }" rules above reach them and a see-through popup draws black.
+   Last so it wins the tie with those rules. */
+QFrame#card QComboBox QAbstractItemView, QFrame#setcard QComboBox QAbstractItemView,
+QFrame#card QComboBoxPrivateContainer, QFrame#setcard QComboBoxPrivateContainer,
+QFrame#card QMenu, QFrame#setcard QMenu { background:$card; }
 """)
 
 
@@ -680,6 +688,7 @@ def stylesheet(name: str | None = None) -> str:
     tokens = dict(THEMES.get(name or current_name, THEMES[DEFAULT]))
     tokens.setdefault("font", FONT)
     tokens["check"] = _check_url(tokens["on_accent"])
+    tokens["check_off"] = _check_url(tokens["muted"])   # ticked but greyed out: on $inset
     for key, colour in (("", tokens["muted"]), ("_off", tokens["off"])):
         tokens["down" + key] = _chevron_url(colour, 10, up=False)
         tokens["up" + key] = _chevron_url(colour, 10, up=True)
@@ -692,11 +701,48 @@ def stylesheet(name: str | None = None) -> str:
     return css
 
 
+# Text colours code writes straight into a label's rich text or a widget's own stylesheet
+# (status(), T["faint"]...): a live theme switch swaps the old theme's for the new one's.
+_INLINE_KEYS = ("ok_text", "warn_text", "error_text", "danger_text", "text", "text_hi",
+                "muted", "faint", "section", "accent", "accent_hi")
+_TEXT_COLOUR = re.compile(r"(?<![-\w])(color:\s*)(#[0-9a-fA-F]{6})(?![0-9a-fA-F])")
+
+
+def _recolour_inline(widgets, old: dict[str, str]) -> None:
+    """Only `color:` (text), never backgrounds or borders: those can be a sound's own
+    colour that merely matches a token."""
+    swap: dict[str, str] = {}
+    for k in _INLINE_KEYS:
+        if k in old and k in T:
+            swap.setdefault(old[k].lower(), T[k])
+    swap = {a: b for a, b in swap.items() if a != b.lower()}
+    if not swap:
+        return
+
+    def sub(text: str) -> str:
+        return _TEXT_COLOUR.sub(lambda m: m[1] + swap.get(m[2].lower(), m[2]), text)
+    for w in widgets:
+        try:
+            css = w.styleSheet()
+            if "color" in css and (new := sub(css)) != css:
+                w.setStyleSheet(new)
+            if not hasattr(w, "textFormat"):   # QLabel: its rich text
+                continue
+            text = w.text()
+            if "color" in text and (new := sub(text)) != text:
+                w.setText(new)
+        except RuntimeError:   # being deleted
+            pass
+
+
 def apply(app, name: str) -> str:
     """Switch the whole app to theme `name` (live)."""
+    old = dict(T)
     name = set_current(name)
     app.setStyleSheet(stylesheet(name))
-    for w in app.allWidgets():   # hand-painted widgets read T in paintEvent
+    widgets = app.allWidgets()
+    _recolour_inline(widgets, old)
+    for w in widgets:   # hand-painted widgets read T in paintEvent
         w.update()
     return name
 

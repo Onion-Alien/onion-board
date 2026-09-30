@@ -453,9 +453,11 @@ _tabs: list[tuple[weakref.ref, int, str, str | None]] = []
 
 def set_icon(widget, name: str, color: str | None = None, checked_color: str | None = None,
              size: int = 18):
-    """Give a button (anything with setIcon) an icon that follows theme changes."""
+    """Give a button or menu action (anything with setIcon) an icon that follows theme
+    changes."""
     widget.setIcon(icon(name, color, checked_color))
-    widget.setIconSize(QSize(size, size))
+    if hasattr(widget, "setIconSize"):   # a QAction takes its menu's size
+        widget.setIconSize(QSize(size, size))
     # one entry per widget: buttons re-iconed on every click must not grow the list
     _applied[:] = [e for e in _applied if e[0]() is not None and e[0]() is not widget]
     _applied.append((weakref.ref(widget), name, color, checked_color))
@@ -470,6 +472,17 @@ def set_label_icon(label, name: str, color: str = "muted", size: int = 18):
     pm = icon(name, color).pixmap(QSize(size, size), dpr)
     label.setPixmap(pm)
     _labels.append((weakref.ref(label), name, color, size))
+
+
+_items: list[tuple[weakref.ref, list[str]]] = []
+
+
+def set_item_icons(combo, names: list[str]):
+    """Icons for a combo box's items, in order, that follow theme changes."""
+    for i, name in enumerate(names):
+        combo.setItemIcon(i, icon(name))
+    _items[:] = [e for e in _items if e[0]() is not None and e[0]() is not combo]
+    _items.append((weakref.ref(combo), names))
 
 
 def _tab_icon(name: str, tint: str | None) -> QIcon:
@@ -506,6 +519,13 @@ def retheme():
         except RuntimeError:   # the C++ widget is gone
             pass
     _applied[:] = alive
+    for ref, names in list(_items):
+        combo = ref()
+        try:
+            if combo is not None:
+                set_item_icons(combo, names)
+        except RuntimeError:   # the C++ widget is gone
+            _items[:] = [e for e in _items if e[0] is not ref]
     labels = list(_labels)
     _labels.clear()
     for ref, name, color, size in labels:

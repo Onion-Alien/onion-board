@@ -565,17 +565,18 @@ def globe_html(qwebchannel_js: str, bg: str, accent: str, hot: str, text: str) -
     return f"""<!doctype html><html><head><meta charset="utf-8">
 <meta http-equiv="Content-Security-Policy" content="{html.escape(csp)}">
 <style>
+:root{{--accent:{accent};--hot:{hot}}}
 html,body{{margin:0;height:100%;overflow:hidden;background:{bg};color:{text};
   font-family:'Segoe UI',sans-serif;user-select:none}}
 #g{{position:absolute;inset:0}}
 #msg{{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
   text-align:center;padding:24px;font-size:13px;opacity:.75;pointer-events:none}}
-.card{{background:rgba(12,14,22,.94);color:#e9ecf5;border:1px solid {accent};
+.card{{background:rgba(12,14,22,.94);color:#e9ecf5;border:1px solid var(--accent);
   border-radius:10px;padding:10px 12px;font:12px 'Segoe UI',sans-serif;width:260px;
   box-shadow:0 6px 24px rgba(0,0,0,.5)}}
 .card h3{{margin:0 0 2px;font-size:14px;font-weight:600;line-height:1.25}}
 .card .where{{opacity:.8;margin-bottom:6px}}
-.card .cc{{display:inline-block;background:{accent};color:#fff;border-radius:4px;
+.card .cc{{display:inline-block;background:var(--accent);color:#fff;border-radius:4px;
   padding:0 4px;margin-right:5px;font-size:10px;font-weight:700}}
 .card .tags{{margin:4px 0 6px}}
 .card .tag{{display:inline-block;background:rgba(255,255,255,.1);border-radius:9px;
@@ -584,11 +585,11 @@ html,body{{margin:0;height:100%;overflow:hidden;background:{bg};color:{text};
 .card td{{padding:1px 0;vertical-align:top}}
 .card td:first-child{{opacity:.6;padding-right:8px;white-space:nowrap}}
 .card .up{{color:#13ce66}} .card .down{{color:#ff8fa3}}
-.card .go{{margin-top:7px;color:{hot};font-weight:600}}
+.card .go{{margin-top:7px;color:var(--hot);font-weight:600}}
 #zoom{{position:absolute;right:10px;bottom:10px;display:flex;flex-direction:column;gap:4px}}
 #zoom button{{width:30px;height:30px;border-radius:8px;border:1px solid rgba(255,255,255,.18);
   background:rgba(12,14,22,.75);color:#fff;font:600 17px 'Segoe UI',sans-serif;cursor:pointer}}
-#zoom button:hover{{border-color:{accent}}}
+#zoom button:hover{{border-color:var(--accent)}}
 #hint{{position:absolute;left:10px;bottom:10px;font-size:11px;opacity:.55;pointer-events:none}}
 </style></head><body><div id="g"></div><div id="msg">Loading the globe…</div>
 <div id="zoom"><button id="zin" title="Zoom in (Ctrl +)">+</button>
@@ -599,7 +600,8 @@ html,body{{margin:0;height:100%;overflow:hidden;background:{bg};color:{text};
 <script src="{GLOBE_JS}" integrity="{GLOBE_SRI}" crossorigin="anonymous"></script>
 <script>
 "use strict";
-const ACCENT = "{accent}", HOT = "{hot}";
+let ACCENT = "{accent}", HOT = "{hot}";
+const ring = () => t => HOT + Math.round(255 * (1 - t)).toString(16).padStart(2, "0");
 let W = null, bridge = null, stations = [], current = null, maxK = 1;
 let night = false;
 try {{ night = localStorage.getItem("earth") === "night"; }} catch (e) {{}}
@@ -694,7 +696,7 @@ function build() {{
       .pointResolution(6)
       .pointLabel(card)
       .onPointClick(d => {{ if (bridge) bridge.play(d.id); }})
-      .ringLat("la").ringLng("lo").ringColor(() => t => "rgba(255,77,141," + (1 - t) + ")")
+      .ringLat("la").ringLng("lo").ringColor(ring)
       .ringMaxRadius(3).ringPropagationSpeed(2).ringRepeatPeriod(900);
     const c = W.controls();
     c.autoRotate = true; c.autoRotateSpeed = 0.35;
@@ -731,5 +733,16 @@ function select(p, fly) {{
   }}
 }}
 function showMessage(t) {{ msg(t); }}
+function setTheme(bg, accent, hot, text) {{
+  // a live theme switch in the app: recolour without reloading the globe
+  ACCENT = accent; HOT = hot;
+  const r = document.documentElement.style;
+  r.setProperty("--accent", accent); r.setProperty("--hot", hot);
+  document.body.style.background = bg; document.body.style.color = text;
+  if (!W) return;
+  W.backgroundColor(bg);   // setting the accessors again makes the globe redraw with them
+  W.pointColor(d => d.id === current ? HOT : ACCENT);
+  W.ringColor(ring);
+}}
 build();
 </script></body></html>"""

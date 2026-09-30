@@ -622,6 +622,5 @@ class AppsTab(QWidget):
         self._report_active()
 
     def retheme(self):
-        for row in self.rows.values():
-            if row.app is not None:
-                row._set_icon(row.app.path)
+        for row in self.rows.values():   # a program that isn't running: the placeholder
+            row._set_icon(row.app.path if row.app is not None else "")

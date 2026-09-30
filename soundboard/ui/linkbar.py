@@ -125,7 +125,7 @@ class LinkBar(QFrame):
         self.show()
         dur = f" · {fmt_time(secs)}" if secs else ""
         self._say(f"<b>{html.escape(title)}</b>{dur} "
-                  f"<span style='color:#8a8f98'>· {html.escape(self._host())}</span>")
+                  f"<span style='color:{theme.T['muted']}'>· {html.escape(self._host())}</span>")
         self._buttons()
 
     def _host(self) -> str:
@@ -249,7 +249,8 @@ class LinkBar(QFrame):
                 self.title, secs = payload
                 dur = f" · {fmt_time(secs)}" if secs else ""
                 self._say(f"<b>{html.escape(self.title)}</b>{dur} "
-                          f"<span style='color:#8a8f98'>· {html.escape(self._host())}</span>")
+                          f"<span style='color:{theme.T['muted']}'>"
+                          f"· {html.escape(self._host())}</span>")
             return
         if kind == "probe-error":
             if current and not self._busy:

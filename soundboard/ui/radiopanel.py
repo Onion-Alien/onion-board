@@ -418,6 +418,8 @@ class RadioTab(QWidget):
     _PANEL_STYLE = Template("""
 QFrame#stations { background:$panel; border-radius:12px; }
 QFrame#stations QWidget { background:transparent; }
+QFrame#stations QComboBox QAbstractItemView, QFrame#stations QComboBoxPrivateContainer,
+QFrame#stations QMenu { background:$card; }
 QFrame#stations QListWidget { border:none; outline:0; }
 QFrame#stations QPushButton#seg { border:none; border-radius:7px; padding:5px 10px;
     background:transparent; color:$muted; font-weight:600; }
@@ -677,6 +679,7 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
 
     def _on_globe_loaded(self, ok: bool):
         self._globe_loaded = bool(ok)
+        self._globe_theme()   # the theme may have changed while it was loading
         if self._globe_list:
             self._push_globe(force=True)
         self._select_on_globe(fly=False)
@@ -1112,10 +1115,13 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
             self._refresh_info()
 
     def retheme(self):
-        t = theme.T
         self._style_panel()
-        self._js(f"document.body.style.background = {json.dumps(t['bg'])}; "
-                 f"W && W.backgroundColor({json.dumps(t['bg'])})")
+        self._globe_theme()
+
+    def _globe_theme(self):
+        """The globe page was built with the theme of its day: send it today's."""
+        args = ", ".join(json.dumps(theme.T[k]) for k in ("bg", "accent", "accent2", "text"))
+        self._js(f"setTheme({args})")
 
     def shutdown(self):
         self.timer.stop()

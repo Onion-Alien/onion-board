@@ -208,9 +208,9 @@ class EqPanel(QWidget):
         self.lbl_for = QLabel("for")
         row.addWidget(self.lbl_for)
         self.cb_target = QComboBox()
-        for ic, label, key in (("mic", "My voice", "voice"), ("volume", "My sounds", "sounds"),
-                               ("wave", "Both", "all")):
-            self.cb_target.addItem(icons.icon(ic), label, key)
+        for label, key in (("My voice", "voice"), ("My sounds", "sounds"), ("Both", "all")):
+            self.cb_target.addItem(label, key)
+        icons.set_item_icons(self.cb_target, ["mic", "volume", "wave"])
         self.cb_target.setCurrentIndex(max(0, self.cb_target.findData(target)))
         row.addWidget(self.cb_target, 1)
         pv.addLayout(row)

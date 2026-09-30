@@ -180,4 +180,10 @@ def main():
     recheck = QTimer(w)
     recheck.timeout.connect(w.check_updates)
     recheck.start(6 * 3600 * 1000)
-    sys.exit(app.exec())
+    code = app.exec()
+    # w.shutdown already ran (aboutToQuit). Python's own teardown after this -- Qt,
+    # the web view, COM, audio objects -- can hang with the window gone, leaving an
+    # invisible copy that still holds the single-instance lock, so every new launch
+    # says "already running". Nothing left needs it: flush the log and end here.
+    logging.shutdown()
+    os._exit(code)

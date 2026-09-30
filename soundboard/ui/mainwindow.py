@@ -485,8 +485,8 @@ class MainWindow(QMainWindow):
                         "or sound pack")
         icons.set_icon(more, "folder")
         mm = QMenu(more)
-        mm.addAction(icons.icon("folder"), "Import a backup or sound pack…",
-                     self.import_dialog)
+        icons.set_icon(mm.addAction("Import a backup or sound pack…", self.import_dialog),
+                       "folder")
         mm.addSeparator()
         mm.addAction("Export everything (sounds + settings)…", self.export_board)
         self._act_export_cat = mm.addAction("Export this category…", self.export_category)
@@ -661,8 +661,7 @@ class MainWindow(QMainWindow):
                     stop = QPushButton()
                     stop.setObjectName("chipstop")
                     stop.setToolTip("Stop this sound")
-                    stop.setIcon(icons.icon("stop", "danger_text"))
-                    stop.setIconSize(QSize(12, 12))
+                    icons.set_icon(stop, "stop", "danger_text", size=12)
                     stop.setFixedSize(24, 24)
                     stop.clicked.connect(lambda _=False, s=sid: self.engine.stop(s))
                     ch.addWidget(name)
@@ -1327,10 +1326,11 @@ class MainWindow(QMainWindow):
             return
         self._icon_step, self._icon_next = step, now + ICON_GLOW_MS / 1000
         amount = step / GLOW_STEPS
-        QApplication.setWindowIcon(glow_icon(theme.T["accent"], theme.T["accent2"], amount))
+        icon = glow_icon(theme.T["accent"], theme.T["accent2"], amount)
+        QApplication.setWindowIcon(icon)
         tray = getattr(self, "tray", None)
-        if tray is not None:
-            tray.setIcon(glow_icon(*theme.BRAND, amount))
+        if tray is not None:   # the tray icon follows the theme too
+            tray.setIcon(icon)
 
     def on_hotkey(self, action):
         if self.overlay.handle(action):
@@ -1411,7 +1411,7 @@ class MainWindow(QMainWindow):
     def _nudge_triggers(self, index: int):
         """Triggers were being watched before they moved into the Onion Watch add-on,
         which isn't installed: tint the tab and say so once, until the tab is opened."""
-        icons.set_tab_icon(self.tabs, index, "triggers", theme.status("warn"))
+        icons.set_tab_icon(self.tabs, index, "triggers", "warn_text")
         QTimer.singleShot(0, self, lambda: self.status.setText(
             f"<span style='color:{theme.status('warn')}'>Your screen triggers now come from "
             "the free Onion Watch add-on: open the Triggers tab to get it.</span>"))
@@ -2442,11 +2442,11 @@ class MainWindow(QMainWindow):
         there, unless turned off in Settings. No tray (some desktops): close quits."""
         if not QSystemTrayIcon.isSystemTrayAvailable():
             return
-        t = self.tray = QSystemTrayIcon(theme.app_icon(), self)
+        t = self.tray = QSystemTrayIcon(glow_icon(theme.T["accent"], theme.T["accent2"], 0.0), self)
         t.setToolTip("Onion Board")
         menu = QMenu(self)
         menu.addAction("Open Onion Board", self.show_from_tray)
-        menu.addAction(icons.icon("stop"), "Stop all sounds", self.stop_all)
+        icons.set_icon(menu.addAction("Stop all sounds", self.stop_all), "stop")
         menu.addSeparator()
         menu.addAction("Quit", self.quit_app)
         t.setContextMenu(menu)

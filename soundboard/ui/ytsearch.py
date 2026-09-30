@@ -103,7 +103,7 @@ class ResultRow(QFrame):
         self.thumb = QLabel()
         self.thumb.setFixedSize(THUMB_W, THUMB_H)
         self.thumb.setAlignment(Qt.AlignCenter)
-        self.thumb.setPixmap(icons.icon("wave", "muted").pixmap(32, 32))
+        icons.set_label_icon(self.thumb, "wave", "muted", 32)
         h.addWidget(self.thumb)
         text = QVBoxLayout()
         text.setSpacing(2)
@@ -269,7 +269,7 @@ class SearchResults(QFrame):
         if not results:
             self.title.setText(f"No {self.site} results for <b>{q}</b>.")
             return
-        self.title.setText(f"<b>{q}</b> <span style='color:#8a8f98'>· ▶ plays it "
+        self.title.setText(f"<b>{q}</b> <span style='color:{theme.T['muted']}'>· ▶ plays it "
                            "once, Add keeps it</span>")
         for r in results:
             row = ResultRow(r)
