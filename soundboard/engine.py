@@ -34,6 +34,7 @@ import numpy as np
 import sounddevice as sd
 import soxr
 
+from soundboard import destination
 from soundboard.eq import EQ
 from soundboard.sendfx import Ducker, Limiter, SmartMono
 from soundboard.voicefx.builtin import PitchShift
@@ -442,6 +443,9 @@ class Voice:
     seek_to: dict = field(default_factory=dict)
     rates: dict = field(default_factory=dict)   # out -> the rate its data was made at
     fixed: bool = False        # the app's own playback: no live speed / pitch (is_fixed)
+    # power share each destination low cut takes from this sound (destination.cut_shares):
+    # its make-up gain while a mode with that cut is on
+    cut_share: dict = field(default_factory=dict)
 
     def __post_init__(self):
         self.pos = {o: 0 for o in self.data}
@@ -452,6 +456,10 @@ class Voice:
     @property
     def outs(self) -> set:
         return set(self.data)
+
+    def makeup(self, lowcut: int) -> float:
+        """The gain that gives this sound back what `lowcut` takes from it."""
+        return destination.makeup(self.cut_share.get(lowcut, 0.0))
 
     @property
     def finished(self) -> bool:
@@ -926,7 +934,7 @@ class Engine:
         per_out = {o: self.data_for(sid, data, rates_used[o], src_rate) for o in outs}
         v = Voice(sid, per_out, gain, loop, preview=preview, rates=rates_used,
                   fade_in=max(0.0, float(fade_in)), fade_out=max(0.0, float(fade_out)),
-                  fixed=is_fixed(sid))
+                  fixed=is_fixed(sid), cut_share=destination.cut_shares(data, src_rate))
         if start > 0:
             v.seek(start)
             for o in v.data:     # not shared yet: apply it now, so progress() is right
@@ -1070,6 +1078,9 @@ class Engine:
             # int16 library audio is scaled here (one multiply that already happens
             # for the gain); float32 is used by cues, previews of test recordings…
             g = np.float32(v.gain) * (I16_SCALE if data.dtype == np.int16 else np.float32(1))
+            dest = self.dest
+            if dest is not None and dest.lowcut:
+                g = g * np.float32(v.makeup(dest.lowcut))
             g0 = v.gate[out]
             rate = self.rates[out]
             if v.stopping:  # fade out (10 ms, or the sound's own fade-out), then done
@@ -1203,8 +1214,7 @@ class Engine:
             return x
         f = self._dests.get(out)
         if f is None or f.rate != self.rates[out]:
-            from soundboard.destination import Processor
-            f = self._dests[out] = Processor(self.rates[out])
+            f = self._dests[out] = destination.Processor(self.rates[out])
         return f.process(x, d)
 
     # Each PortAudio callback is a thin guard around the real work: an exception that

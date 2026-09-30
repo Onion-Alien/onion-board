@@ -347,6 +347,11 @@ def _process_table() -> dict[int, tuple[int, str]]:
     return table
 
 
+def running_exes() -> set[str]:
+    """Lower-case .exe names of every running process (one Toolhelp snapshot)."""
+    return {exe for _, exe in _process_table().values()}
+
+
 def root_pid(pid: int, table: dict[int, tuple[int, str]] | None = None) -> int:
     """The topmost ancestor with the same .exe name. Browsers and chat apps play
     their audio from a helper child process that comes and goes; capturing the main

@@ -518,6 +518,32 @@ def test_eq_and_destination_drop_their_state_when_turned_off():
     assert e._eqs == {} and e._dests == {}
 
 
+def test_a_low_cut_gives_each_sound_back_its_own_sub_bass():
+    """With a mode that cuts the sub-bass, a bass-heavy sound is turned up by what the
+    cut takes from *it*; a sound with no sub-bass playing alongside isn't."""
+    from soundboard import destination
+    t = np.arange(SR) / SR
+    boom = np.stack([np.sin(2 * np.pi * 40 * t) * 0.3 + np.sin(2 * np.pi * 800 * t) * 0.1] * 2,
+                    1).astype(np.float32)
+    e = engine_with("main")
+    vb = e.play("boom", boom, 1.0, mode="overlap")
+    vt = e.play("beep", tone(1.0), 1.0, mode="overlap")
+    assert vb.makeup(70) > 2.5 and abs(vt.makeup(70) - 1.0) < 0.01
+
+    def render(dest):
+        e.dest = dest
+        for v in e.voices:
+            v.pos["main"] = 0
+        return e._render("main", 480)
+    plain = render(None)
+    game = destination.BUILTIN_BY_KEY["game"]
+    cut = render(game)
+    only_beep = tone(1.0)[:480]
+    boost = (cut - only_beep)[:, 0] / (plain - only_beep)[:, 0].clip(1e-6)
+    assert abs(np.median(boost[np.abs(plain - only_beep)[:, 0] > 1e-3]) - vb.makeup(70)) < 0.01
+    assert render(destination.BUILTIN_BY_KEY["discord"]) is not None
+
+
 # ---------------------------------------------------------------- the logo's "playing" level
 
 def test_play_level_counts_everything_playing_but_not_the_mic():

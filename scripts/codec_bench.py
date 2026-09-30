@@ -53,7 +53,7 @@ from soundboard import codecsim  # noqa: E402
 from soundboard.codecsim import (BANDS, PROFILES, SIGNALS, analyze, band_label,  # noqa: E402
                                  mono_loss_db, roundtrip)
 from soundboard import chatsim, proxsim, realproc  # noqa: E402
-from soundboard.destination import BUILTIN_BY_KEY, Processor  # noqa: E402
+from soundboard.destination import BUILTIN_BY_KEY, Processor, cut_shares, makeup  # noqa: E402
 from soundboard.sendfx import Limiter, SmartMono  # noqa: E402
 
 MAX_S = 20.0   # longest stretch of a file to analyse (the middle of it)
@@ -188,6 +188,8 @@ def main() -> int:
     dest = BUILTIN_BY_KEY[args.dest] if args.dest else None
     for name, x in _sources(args):
         if dest is not None:
+            if dest.lowcut:   # the sound's make-up for the cut, as Engine._render gives it
+                x = x * np.float32(makeup(cut_shares(x, codecsim.SR).get(dest.lowcut, 0.0)))
             # blocks of 480 like the real callback, so filter state carries the same way
             proc = Processor(codecsim.SR)
             x = np.concatenate([proc.process(x[i:i + 480].copy(), dest)

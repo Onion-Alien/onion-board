@@ -1,38 +1,53 @@
 """Destination modes: shape the sounds bus for whoever is listening.
 
 The codec bench (soundboard.codecsim) measured what voice chat does to what
-we send. Every service captures its mic in mono and runs Opus in voice mode,
-which high-passes everything under ~100 Hz (3 dB lost on real music, more on
-bass-heavy clips); Steam voice is fed 24 kHz so nothing above 12 kHz survives;
-Vivox's low-CPU codec stops at 8 kHz. 100 Hz to 6 kHz gets through everywhere.
+we send. Every service captures its mic in mono and high-passes it: Discord at
+~94 Hz, Vivox (Valorant) at ~80 Hz with a slow tail to ~150 Hz, Opus' own voice
+mode on top. Steam voice is fed 24 kHz so nothing above 12 kHz survives; Vivox's
+low-CPU codec stops at 8 kHz. 100 Hz to 6 kHz gets through everywhere.
 
 A mode pre-shapes the sounds bus for that pipeline:
 
-  bass     sub-bass harmonics: the part under 120 Hz the codec will drop is
-           saturated and its 2nd..5th harmonics (100-350 Hz, which survive) are
-           mixed back in, so a kick still reads as a kick on the other side
+  bass     sub-bass harmonics: the part under 100 Hz the chat will drop is
+           saturated and its 2nd..4th harmonics (100-350 Hz, which survive) are
+           mixed back in, so a kick still reads as a kick on the other side. The
+           saturation runs on the band divided by its own envelope, so the
+           harmonics keep the same character at any level
+  lowcut   remove the sub-bass ourselves, after the harmonics are made: the chat
+           throws it away anyway, but until then it sets the peaks, and the limiter
+           turns the whole song down for bass nobody will hear (an 808 track lost
+           11 dB that way in a real Valorant party). Each sound is also given back
+           the level the cut takes from it (Voice.makeup, from cut_shares when it
+           starts): levelling measured it *with* its sub-bass, so a bass-heavy song
+           was levelled 8-10 dB quieter than the others and then lost its bass too
   ceiling  low-pass at the codec's ceiling: the encoder stops spending bits on
            content nobody will hear, and what you monitor matches what they get
-  comp     gentle stereo-linked compressor: a steadier level rides the
-           service's gate and automatic gain better than a spiky one
+  comp     gentle RMS compressor: a steadier level rides a service's gate and
+           automatic gain better than a spiky one. Push-to-talk chats have neither,
+           and there it only costs punch
   mono     one channel, the way the mic capture will send it, with the
            phase-aware downmix (soundboard.sendfx.SmartMono) so stereo effects
            that would cancel in a plain average don't
 
 Built-in modes cover the services measured; custom ones (Settings) let you
-describe any other codec by the same four knobs. The engine runs one Processor
-per output (it keeps filter state), all reading the same Dest.
+describe any other codec by the same knobs. The engine runs one Processor per
+output (it keeps filter state), all reading the same Dest.
 """
 from __future__ import annotations
 
 import math
 from dataclasses import asdict, dataclass
+from functools import lru_cache
 
 import numpy as np
-from scipy.signal import butter, sosfilt
+from scipy import fft as sfft
+from scipy.signal import butter, lfilter, sosfilt, sosfreqz
 
 F32 = np.float32
 CEILINGS = (0, 16000, 12000, 8000, 6000, 4000)   # 0 = none; the rest are codec bandwidths
+LOWCUTS = (0, 60, 70, 80, 90)                     # 0 = none; Hz
+CUT_ORDER = 8                                     # the low cut's Butterworth order
+MAKEUP_MAX_DB = 12.0                              # most a sound is given back for its cut
 
 
 @dataclass(frozen=True)
@@ -45,10 +60,11 @@ class Dest:
     mono: bool = False
     note: str = ""
     custom: bool = False
+    lowcut: int = 0           # Hz high-pass (one of LOWCUTS); 0 = none
 
     @property
     def active(self) -> bool:
-        return bool(self.ceiling or self.bass > 0 or self.comp > 0 or self.mono)
+        return bool(self.ceiling or self.bass > 0 or self.comp > 0 or self.mono or self.lowcut)
 
     def to_dict(self) -> dict:
         d = asdict(self)
@@ -73,23 +89,28 @@ class Dest:
         ceiling = min(max(ceiling, 0), 20000)
         if 0 < ceiling < 1000:
             ceiling = 1000
+        cut = num("lowcut", 0, max(LOWCUTS), 0)
+        lowcut = min(LOWCUTS, key=lambda c: abs(c - cut))   # a hand-edited value: nearest
         return Dest(key, label, ceiling, num("bass", 0, 1, 0), num("comp", 0, 1, 0),
-                    bool(d.get("mono", False)), str(d.get("note", ""))[:200], custom=True)
+                    bool(d.get("mono", False)), str(d.get("note", ""))[:200], custom=True,
+                    lowcut=lowcut)
 
 
 OFF = Dest("off", "Off (send as is)", note="No shaping. Your sounds go out exactly as mixed.")
 
 BUILTIN: tuple[Dest, ...] = (
     OFF,
-    Dest("discord", "Discord", 0, 0.6, 0.4, True,
+    Dest("discord", "Discord", 0, 0.8, 0.0, True, lowcut=90,
          note="Opus 64 kbps, mono, voice mode. Keeps 100 Hz-20 kHz; loses sub-bass."),
-    Dest("steam", "Steam voice (CS2, Dota, Steam games)", 12000, 0.6, 0.4, True,
+    Dest("steam", "Steam voice (CS2, Dota, Steam games)", 12000, 0.8, 0.0, True, lowcut=80,
          note="Opus fed 24 kHz mono: nothing above 12 kHz gets through. Also suits "
               "Phasmophobia and other Photon Voice games (24 kHz too)."),
-    Dest("game", "Game voice (Fortnite, Valorant, Unity / Unreal games)", 0, 0.6, 0.5, True,
-         note="Vivox Opus at 32 kbps mono. Keeps the full band, squeezes it harder. "
-              "Also suits Valorant, Overwatch, FiveM, TeamSpeak and console party chat."),
-    Dest("game_lo", "Game voice, low bandwidth (8 kHz)", 8000, 0.7, 0.5, True,
+    Dest("game", "Game voice (Fortnite, Valorant, Unity / Unreal games)", 0, 0.8, 0.0, True,
+         lowcut=80,
+         note="Vivox Opus at 32 kbps mono, measured in a real Valorant party: full band, "
+              "nothing under ~80 Hz. Also suits Overwatch, FiveM, TeamSpeak and console "
+              "party chat."),
+    Dest("game_lo", "Game voice, low bandwidth (8 kHz)", 8000, 0.9, 0.0, True, lowcut=80,
          note="Games on Unreal's own voice chat or Vivox's Siren 7: nothing above "
               "8 kHz."),
 )
@@ -128,10 +149,68 @@ def apply(cfg, engine) -> Dest:
     return d
 
 
+# --------------------------------------------------------------------------- make-up
+
+def _cut_sos(hz: float, rate: int) -> np.ndarray:
+    return butter(CUT_ORDER, hz / (rate / 2), "high", output="sos")
+
+
+@lru_cache(maxsize=32)
+def _cut_power(hz: int, rate: int, n: int) -> np.ndarray:
+    """|H|^2 of the low cut at an n-point rfft's bins."""
+    _, h = sosfreqz(_cut_sos(hz, rate), worN=np.fft.rfftfreq(n, 1 / rate), fs=rate)
+    return (np.abs(h) ** 2).astype(np.float64)
+
+
+def cut_shares(data: np.ndarray, rate: int) -> dict[int, float]:
+    """How much of a sound's power each of LOWCUTS takes away: {cut Hz: 0..1}.
+
+    Measured over the loud part of the sound (up to 128 spread-out frames of ~170 ms,
+    so a long song costs the same few milliseconds as a short clip), through the
+    cut's real filter response. The engine works this out once when a sound starts
+    (Engine.play) and turns it into that sound's make-up gain (makeup)."""
+    if data.ndim != 2 or len(data) < 1024:
+        return {}
+    n = 8192 if rate >= 32000 else 4096
+    if len(data) < n:
+        n = 1 << int(math.log2(len(data)))
+    k = len(data) // n
+    starts = np.linspace(0, k - 1, min(k, 128)).astype(np.int64) * n
+    # only the frames used are read (a whole song's mono mix would cost 100+ ms)
+    frames = np.stack([data[s:s + n] for s in starts]).astype(F32)   # (m, n, 2)
+    frames = (frames[:, :, 0] + frames[:, :, 1]) * F32(
+        0.5 / 32768.0 if data.dtype == np.int16 else 0.5)
+    frames *= np.hanning(n).astype(F32)
+    z = sfft.rfft(frames, axis=1)
+    spec = z.real * z.real + z.imag * z.imag
+    power = spec.sum(axis=1, dtype=np.float64)
+    if power.max() <= 1e-18:
+        return {}
+    spec = spec[power > power.max() * 0.01].sum(axis=0, dtype=np.float64)   # loud frames
+    total = float(spec.sum())
+    out = {}
+    for cut in LOWCUTS:
+        if not cut or cut >= rate / 2 * 0.9:
+            continue
+        kept = float(spec @ _cut_power(cut, rate, n))
+        out[cut] = min(max(1.0 - kept / total, 0.0), 1.0)
+    return out
+
+
+def makeup(share: float) -> float:
+    """The gain that gives a sound back the power a cut took (share = cut_shares'
+    value), capped at MAKEUP_MAX_DB so a sound that is almost all sub-bass (a bare
+    808, a rumble) isn't pushed into the limiter."""
+    cap = 10 ** (MAKEUP_MAX_DB / 20)
+    if share <= 0.0:
+        return 1.0
+    return float(min(1.0 / math.sqrt(max(1.0 - share, 1.0 / (cap * cap))), cap))
+
+
 # --------------------------------------------------------------------------- DSP
 
 class _Sos:
-    """A stateful stereo second-order-section filter (sosfilt with kept memory)."""
+    """A stateful second-order-section filter (sosfilt with kept memory)."""
 
     def __init__(self, sos: np.ndarray):
         self.sos = np.asarray(sos, F32)
@@ -148,16 +227,22 @@ class Processor:
     """Runs one Dest on one output's sounds bus. Re-designs its filters when the
     Dest changes; keeps state otherwise so switching a knob doesn't click."""
 
-    BASS_SPLIT = 120.0        # Hz: below this the codec's high-pass will eat it
-    BASS_BAND = (90.0, 350.0)  # where the generated harmonics are placed
-    ATTACK_S, RELEASE_S = 0.005, 0.20
+    BASS_SPLIT = 100.0          # Hz: below this the chat's high-pass will eat it
+    BASS_BAND = (100.0, 350.0)  # where the generated harmonics are placed
+    BASS_GAIN = 1.0             # harmonics level at bass = 1
+    ENV_S = 0.015               # the sub-bass envelope the saturator is normalised by
+    COMP_THRESHOLD_DB = -20.0   # RMS, after the sound's levelling
+    ATTACK_S, RELEASE_S = 0.03, 0.30
+    GATE_DB = -50.0             # quieter than this the compressor holds its gain
 
     def __init__(self, rate: int):
         self.rate = int(rate)
         self.dest: Dest | None = None
-        self._lp = self._bp = self._ceil = None
+        self._lp = self._bp = self._cut = self._ceil = None
+        self._env_zi = np.zeros(1)
         self._mono = None
-        self.g = 1.0   # compressor gain
+        self._pw = None   # compressor's smoothed power
+        self.g = 1.0      # compressor gain
 
     def _design(self, d: Dest):
         r = self.rate
@@ -165,10 +250,13 @@ class Processor:
         if d.bass > 0:
             # steep split so the midrange never reaches the saturator
             self._lp = _Sos(butter(4, self.BASS_SPLIT / nyq, "low", output="sos"))
-            self._bp = _Sos(butter(4, [self.BASS_BAND[0] / nyq, self.BASS_BAND[1] / nyq],
+            self._bp = _Sos(butter(4, [self.BASS_BAND[0] / nyq, min(self.BASS_BAND[1] / nyq,
+                                                                    0.95)],
                                    "band", output="sos"))
+            self._env_zi = np.zeros(1)
         else:
             self._lp = self._bp = None
+        self._cut = _Sos(_cut_sos(d.lowcut, r)) if d.lowcut and d.lowcut < nyq * 0.9 else None
         if d.ceiling and d.ceiling < nyq * 0.9:
             # 8th order: a codec's band edge is a wall, not a slope
             self._ceil = _Sos(butter(8, d.ceiling / nyq, "low", output="sos"))
@@ -180,22 +268,21 @@ class Processor:
         if d is None or not d.active:
             self.dest = None
             self.g = 1.0
+            self._pw = None
             return x
         if d != self.dest:
             keep = self.dest is not None and (d.bass > 0) == (self.dest.bass > 0) \
-                and d.ceiling == self.dest.ceiling
-            lp, bp, ce = self._lp, self._bp, self._ceil
+                and d.ceiling == self.dest.ceiling and d.lowcut == self.dest.lowcut
+            old = self._lp, self._bp, self._cut, self._ceil, self._env_zi
             self._design(d)
             if keep:                 # only amounts changed: keep filter memory
-                self._lp, self._bp, self._ceil = lp, bp, ce
+                self._lp, self._bp, self._cut, self._ceil, self._env_zi = old
         if x.dtype != F32:
             x = x.astype(F32)
         if d.bass > 0:
-            low = self._lp(x)
-            # odd harmonics from tanh saturation, even ones from the squared term;
-            # the band-pass removes the fundamental (going anyway) and the DC
-            drive = np.tanh(low * F32(6.0)) + low * np.abs(low) * F32(8.0)
-            x = x + self._bp(drive) * F32(0.45 * d.bass)
+            x = x + self._harmonics(x, d.bass)
+        if self._cut is not None:
+            x = self._cut(x)
         if self._ceil is not None:
             x = self._ceil(x)
         if d.comp > 0:
@@ -207,22 +294,41 @@ class Processor:
             x = self._mono.process(x)
         return np.ascontiguousarray(x, dtype=F32)
 
+    def _harmonics(self, x: np.ndarray, amount: float) -> np.ndarray:
+        """The sub-bass's 2nd..4th harmonics, (n, 1) to add to both channels.
+        The band is divided by its own envelope before the saturator, so a quiet bass
+        line gets the same harmonics as a loud one (just quieter): |u| makes the even
+        ones (mostly the 2nd, an octave up), tanh the odd ones."""
+        low = self._lp(x.mean(axis=1, keepdims=True))[:, 0]
+        a = math.exp(-1.0 / (self.rate * self.ENV_S))
+        env, self._env_zi = lfilter([1.0 - a], [1.0, -a], np.abs(low), zi=self._env_zi)
+        env = np.maximum(env, 1e-5)
+        u = low / env
+        drive = (np.abs(u) + 0.5 * np.tanh(1.5 * u)) * env
+        return self._bp(drive.astype(F32)[:, None]) * F32(self.BASS_GAIN * amount)
+
     def _compress(self, x: np.ndarray, amount: float) -> np.ndarray:
-        """Block-wise peak compressor (one gain per block, ramped; no sample loop).
-        amount 0..1 -> ratio 1..4:1 above -18 dBFS, with up to 3 dB of make-up."""
+        """Block-wise RMS compressor (one gain per block, ramped; no sample loop).
+        amount 0..1 -> ratio 1..4:1 above COMP_THRESHOLD_DB. No make-up: the sound's
+        levelling and the limiter set the loudness; this only evens it out."""
         n = len(x)
-        ratio = 1.0 + 3.0 * amount
-        thr = -18.0
-        level = 20 * np.log10(float(np.max(np.abs(x))) + 1e-9)
-        over = level - thr
-        target = 10 ** (-over * (1 - 1 / ratio) / 20) if over > 0 else 1.0
-        tau = self.ATTACK_S if target < self.g else self.RELEASE_S
-        g = target + (self.g - target) * float(np.exp(-n / (self.rate * tau)))
+        pw = float(np.mean(np.square(x, dtype=np.float64)))
+        if 10 * math.log10(pw + 1e-20) < self.GATE_DB:   # a pause: hold, don't wind up
+            g = self.g
+        else:
+            if self._pw is None:
+                self._pw = pw
+            tau = self.ATTACK_S if pw > self._pw else self.RELEASE_S
+            k = math.exp(-n / (self.rate * tau))
+            self._pw = k * self._pw + (1 - k) * pw
+            level = 10 * math.log10(self._pw + 1e-20)
+            over = level - self.COMP_THRESHOLD_DB
+            ratio = 1.0 + 3.0 * amount
+            g = 10 ** (-over * (1 - 1 / ratio) / 20) if over > 0 else 1.0
         ramp = np.linspace(self.g, g, n + 1, dtype=F32)[1:]
         self.g = float(g)
-        makeup = F32(10 ** (3.0 * amount / 20))
-        return x * ramp[:, None] * makeup
+        return x * ramp[:, None]
 
 
-__all__ = ["BUILTIN", "BUILTIN_BY_KEY", "CEILINGS", "OFF", "Dest", "Processor", "all_modes",
-           "apply", "resolve"]
+__all__ = ["BUILTIN", "BUILTIN_BY_KEY", "CEILINGS", "LOWCUTS", "OFF", "Dest", "Processor",
+           "all_modes", "apply", "cut_shares", "makeup", "resolve"]

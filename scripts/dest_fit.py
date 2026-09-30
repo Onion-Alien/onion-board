@@ -40,7 +40,7 @@ if str(ROOT) not in sys.path:
 import codec_bench as cb  # noqa: E402  (same folder: its sources and the chat's defaults)
 from soundboard import codecsim, proxsim  # noqa: E402
 from soundboard.codecsim import PROFILES, analyze, roundtrip  # noqa: E402
-from soundboard.destination import BUILTIN, Processor  # noqa: E402
+from soundboard.destination import BUILTIN, Processor, cut_shares, makeup  # noqa: E402
 from soundboard.sendfx import Limiter, SmartMono  # noqa: E402
 
 SR = codecsim.SR
@@ -54,6 +54,8 @@ def _blocks(fn, x: np.ndarray) -> np.ndarray:
 def shaped(x: np.ndarray, dest) -> np.ndarray:
     """x through the mode and the send stage, in the engine's 480-sample blocks."""
     if dest.active:
+        if dest.lowcut:   # the sound's make-up for the cut, as Engine._render gives it
+            x = x * np.float32(makeup(cut_shares(x, SR).get(dest.lowcut, 0.0)))
         proc = Processor(SR)
         x = _blocks(lambda b: proc.process(b, dest), x)
     lim, mix = Limiter(SR), SmartMono(SR)

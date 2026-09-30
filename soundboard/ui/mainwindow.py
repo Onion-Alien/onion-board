@@ -77,6 +77,11 @@ GLOW_STEPS = 4       # how many glow levels the taskbar / tray icon has while so
 ICON_GLOW_MS = 120   # ...and how often at most it changes
 RANDOM = "__random__:"   # hotkey action prefix: a random sound from the category after it
 ALL = "All"          # the category tab that shows every sound
+# games whose kernel anti-cheat ignores keys another program presses (measured: Riot's
+# Vanguard dropped the app's SendInput push-to-talk in a real Valorant party), so auto
+# push-to-talk can't talk for the player there
+INPUT_BLOCKING_GAMES = {"valorant-win64-shipping.exe": "Valorant"}
+GAME_CHECK_S = 15.0  # how often to look for one (a process snapshot: ~1 ms)
 
 
 class Bridge(QObject):
@@ -149,6 +154,7 @@ class MainWindow(QMainWindow):
         self.start_frac = 0.0             # where ▶ starts if it isn't playing
         self._seeking = False
         self._tick_n = 0                  # ticks since start (the watchdog runs ~once a second)
+        self._game_check_at = 0.0         # next look for an INPUT_BLOCKING_GAMES game
         self._ui_live = True              # the window is on screen (see _set_tick_rate)
         self._icon_step, self._icon_next = -1, 0.0   # the icons' glow step (_glow_icons)
         self._xruns_shown = 0             # drop-out count last written to the status line
@@ -2805,6 +2811,7 @@ class MainWindow(QMainWindow):
             if e.check_streams() or sum(e.xruns.values()) != self._xruns_shown:
                 self._update_status()
             self.voice.poll()
+            self._check_input_blocking_game(now)
         playing = e.playing()
         # the in-game overlay shows what's playing too, usually with this window in the tray
         pace = TICK_MS if self._ui_live or self.overlay.is_open else TICK_IDLE_MS
@@ -2854,6 +2861,29 @@ class MainWindow(QMainWindow):
             self._release_ptt()
             if want and winkeys.press(want):
                 self._ptt_held = want
+
+    def _check_input_blocking_game(self, now: float):
+        """Once ever, when a game that ignores injected keys is running: tell the player
+        to hold their own push-to-talk key (and that voice activation only sends speech
+        there). A tray notification, never a window: they're in the game."""
+        if (self.cfg.anticheat_tip_shown or self.tray is None or not self.tray.isVisible()
+                or now < self._game_check_at):
+            return
+        self._game_check_at = now + GAME_CHECK_S
+        from soundboard.appaudio import running_exes
+        try:
+            exes = running_exes()
+        except OSError:
+            return
+        game = next((name for exe, name in INPUT_BLOCKING_GAMES.items() if exe in exes), None)
+        if game is None:
+            return
+        self.tray.showMessage(
+            f"{game}: hold your push-to-talk key",
+            f"{game} ignores keys other programs press, so Auto push-to-talk can't talk "
+            "for you: hold your own key while a sound plays. On voice activation it only "
+            "sends speech, not music.", QSystemTrayIcon.Information, 15000)
+        self.set_option("anticheat_tip_shown", True)
 
     def _tick_visuals(self, playing, now: float):
         """The part of tick() that only matters while the window is on screen."""

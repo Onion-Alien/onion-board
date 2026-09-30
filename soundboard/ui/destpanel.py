@@ -10,7 +10,7 @@ from PySide6.QtWidgets import (QCheckBox, QComboBox, QDialog, QDialogButtonBox, 
                                QVBoxLayout, QWidget)
 
 from soundboard import destination
-from soundboard.destination import CEILINGS, Dest
+from soundboard.destination import CEILINGS, LOWCUTS, Dest
 from soundboard.ui import fit
 from soundboard.ui.panel import hint_label
 from soundboard.wheelguard import no_wheel
@@ -25,6 +25,8 @@ def describe(d: Dest) -> str:
         parts.append("mono")
     if d.bass > 0:
         parts.append(f"sub-bass harmonics {round(d.bass * 100)}%")
+    if d.lowcut:
+        parts.append(f"sub-bass under {d.lowcut} Hz swapped for level")
     if d.comp > 0:
         parts.append(f"compressor {round(d.comp * 100)}%")
     if d.ceiling:
@@ -46,6 +48,10 @@ def apply_send(cfg, engine):
 
 def ceiling_label(hz: int) -> str:
     return "No cut (full band)" if not hz else f"Cut above {hz // 1000} kHz"
+
+
+def lowcut_label(hz: int) -> str:
+    return "Keep it (no cut)" if not hz else f"Cut under {hz} Hz, give the level back"
 
 
 class DestPanel(QWidget):
@@ -215,6 +221,14 @@ class CustomDestDialog(QDialog):
         form.addRow("Frequencies", self.ceiling)
         self.bass, bass_row = self._slider("sub-bass turned into harmonics the codec keeps")
         form.addRow("Sub-bass", bass_row)
+        self.lowcut = QComboBox()
+        for hz in LOWCUTS:
+            self.lowcut.addItem(lowcut_label(hz), hz)
+        self.lowcut.setToolTip("The chat throws the deepest bass away anyway. Cutting it here "
+                               "stops it pulling the whole sound down in the limiter, and "
+                               "each sound is turned back up by what the cut took from it")
+        self.lowcut.currentIndexChanged.connect(self._edited)
+        form.addRow("Deep bass", self.lowcut)
         self.comp, comp_row = self._slider("evens the level out for the service's gate / auto gain")
         form.addRow("Compressor", comp_row)
         self.mono = QCheckBox("Mono (the service captures a mono mic)")
@@ -225,7 +239,7 @@ class CustomDestDialog(QDialog):
         self.note.setPlaceholderText("e.g. Mumble at 72 kbps, TeamSpeak…")
         self.note.textEdited.connect(self._edited)
         form.addRow("Notes", self.note)
-        no_wheel(self.ceiling, self.bass, self.comp)
+        no_wheel(self.ceiling, self.lowcut, self.bass, self.comp)
         body.addWidget(self.form_box, 2)
         lay.addLayout(body, 1)
 
@@ -277,6 +291,7 @@ class CustomDestDialog(QDialog):
             self.ceiling.insertItem(1, ceiling_label(d.ceiling), d.ceiling)
             self.ceiling.setCurrentIndex(1)
         self.bass.setValue(round(d.bass * 100))
+        self.lowcut.setCurrentIndex(max(0, self.lowcut.findData(d.lowcut)))
         self.comp.setValue(round(d.comp * 100))
         self.mono.setChecked(d.mono)
         self.note.setText(d.note)
@@ -339,6 +354,7 @@ class CustomDestDialog(QDialog):
         raw.update(label=self.name.text().strip() or f"My mode {row + 1}",
                    ceiling=int(self.ceiling.currentData() or 0),
                    bass=self.bass.value() / 100, comp=self.comp.value() / 100,
+                   lowcut=int(self.lowcut.currentData() or 0),
                    mono=self.mono.isChecked(), note=self.note.text().strip())
         item = self.list.item(row)
         if item is not None and item.text() != raw["label"]:

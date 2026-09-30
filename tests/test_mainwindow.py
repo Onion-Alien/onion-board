@@ -280,3 +280,31 @@ def test_an_installer_or_log_off_really_closes_the_app(window, monkeypatch):
     ev = QCloseEvent()
     window.closeEvent(ev)
     assert ev.isAccepted()
+
+
+def test_valorant_running_gets_the_push_to_talk_notice_once(window, monkeypatch):
+    """Valorant's anti-cheat drops the keys auto push-to-talk presses: the first time
+    it's seen running, a tray notification (never a window) says to hold the key."""
+    from soundboard import appaudio
+    shown = []
+
+    class Tray:
+        def isVisible(self):
+            return True
+
+        def showMessage(self, title, body, *a):
+            shown.append((title, body))
+
+    monkeypatch.setattr(window, "tray", Tray())
+    exes = {"explorer.exe"}
+    monkeypatch.setattr(appaudio, "running_exes", lambda: set(exes))
+    window._check_input_blocking_game(100.0)
+    assert shown == [] and not window.cfg.anticheat_tip_shown
+    exes.add("valorant-win64-shipping.exe")
+    window._check_input_blocking_game(101.0)      # looked 1 s ago: not yet
+    assert shown == []
+    window._check_input_blocking_game(100.0 + main.GAME_CHECK_S)
+    assert len(shown) == 1 and "Valorant" in shown[0][0] and "hold" in shown[0][1]
+    assert window.cfg.anticheat_tip_shown
+    window._check_input_blocking_game(1000.0)      # once ever
+    assert len(shown) == 1

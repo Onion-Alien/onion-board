@@ -152,9 +152,15 @@ def test_vivox_highpass_matches_the_real_valorant_measurement():
     assert p.confidence == "measured" and p.gate_db is None and not p.cleanup
     for hz, lo, hi in ((70, -26, -15), (80, -13, -4), (90, -6, -1), (150, -1.5, 0.5)):
         x = _tone(hz)
-        y = codecsim.highpass(x, p.highpass_hz, p.highpass_order)
+        y = codecsim.highpass(x, p.highpass_hz, p.highpass_order, p.highpass_tail_hz)
         cut = RATE // 2
         got = _rms_db(y[cut:, 0]) - _rms_db(x[cut:, 0])
+        assert lo <= got <= hi, (hz, got)
+    # the song through the same party: the tail above the sweep's steep edge
+    for hz, lo, hi in ((110, -4.0, -1.5), (160, -1.5, -0.3)):
+        x = _tone(hz)
+        y = codecsim.highpass(x, p.highpass_hz, p.highpass_order, p.highpass_tail_hz)
+        got = _rms_db(y[RATE // 2:, 0]) - _rms_db(x[RATE // 2:, 0])
         assert lo <= got <= hi, (hz, got)
 
 

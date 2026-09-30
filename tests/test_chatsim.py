@@ -89,7 +89,9 @@ def _send(x):
 @needs_ffmpeg
 def test_send_stage_keeps_the_listeners_decoder_from_clipping():
     x = _brick_walled()
-    p = codecsim.PROFILES["vivox"]
+    # a 48 kHz game stack with no capture high-pass (Vivox's takes the kick's sub-bass,
+    # and with it most of the overshoot)
+    p = codecsim.PROFILES["eos"]
     old = codecsim.roundtrip(soft_limit(x.copy()), p)
     new = codecsim.roundtrip(_send(x), p)
     clip = lambda y: float(np.mean(np.abs(y) >= 0.999))   # noqa: E731

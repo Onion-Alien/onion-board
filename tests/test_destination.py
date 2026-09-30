@@ -72,11 +72,79 @@ def test_compressor_tames_loud_keeps_quiet():
     d = Dest("t", "t", comp=1.0)
     loud = _run(_tone(440, level=0.9), d)
     quiet = _run(_tone(440, level=0.05), d)
-    assert np.abs(loud[RATE // 2:]).max() < 0.75      # 0.9 squeezed
-    assert 0.06 < np.abs(quiet[RATE // 2:]).max() < 0.08   # only the 3 dB make-up
+    assert np.abs(loud[RATE // 2:]).max() < 0.35      # 0.9 (-4 dB RMS) squeezed 4:1
+    assert 0.049 < np.abs(quiet[RATE // 2:]).max() < 0.051   # under the threshold: untouched
     p = Processor(RATE)
     y = p.process(_tone(440, seconds=0.01, level=0.9), d)
     assert np.all(np.isfinite(y))
+
+
+def test_compressor_holds_through_silence():
+    """A pause mustn't wind the gain back up (the next hit would come in too loud)."""
+    d = Dest("t", "t", comp=1.0)
+    p = Processor(RATE)
+    for _ in range(100):
+        p.process(_tone(440, seconds=0.01, level=0.9), d)
+    g = p.g
+    for _ in range(100):
+        p.process(np.zeros((480, 2), np.float32), d)
+    assert p.g == g
+
+
+def test_lowcut_removes_sub_bass_keeps_bass():
+    d = Dest("t", "t", lowcut=70)
+    sub, kick, body = _run(_tone(40), d), _run(_tone(100), d), _run(_tone(1000), d)
+    tail = slice(RATE // 2, None)
+    rms = lambda y: 20 * np.log10(np.sqrt((y[tail, 0] ** 2).mean()) / (0.3 / np.sqrt(2)))  # noqa: E731
+    assert rms(sub) < -30
+    assert rms(kick) > -1.0 and abs(rms(body)) < 0.1
+
+
+def test_harmonics_follow_the_level():
+    """The saturator runs on the envelope-normalised band: a bass line 20 dB quieter
+    gets harmonics 20 dB quieter, not a different sound."""
+    d = Dest("t", "t", bass=1.0, lowcut=70)
+    loud, quiet = _run(_tone(50, level=0.5), d), _run(_tone(50, level=0.05), d)
+    tail = slice(RATE // 2, None)
+    diff = _band_db(loud[tail], 100, 350) - _band_db(quiet[tail], 100, 350)
+    assert abs(diff - 20) < 1.0
+
+
+def test_cut_shares_and_makeup():
+    x = _tone(40) + _tone(1000)                    # half the power under the cut
+    s = destination.cut_shares(x, RATE)
+    assert set(s) == {c for c in destination.LOWCUTS if c}
+    assert 0.45 < s[70] < 0.55
+    assert abs(destination.makeup(s[70]) - np.sqrt(2)) < 0.1
+    assert destination.cut_shares(_tone(2000), RATE)[90] < 0.01
+    assert destination.makeup(0.0) == 1.0
+    cap = 10 ** (destination.MAKEUP_MAX_DB / 20)
+    assert destination.makeup(1.0) == cap and destination.makeup(0.9999) == cap
+    assert destination.cut_shares(np.zeros((500, 2), np.float32), RATE) == {}
+    assert destination.cut_shares(np.zeros((RATE, 2), np.float32), RATE) == {}
+    ints = (x * 32767).astype(np.int16)
+    assert abs(destination.cut_shares(ints, RATE)[70] - s[70]) < 0.01
+    for rate in (16000, 44100):                    # a sound decoded at another rate
+        assert 0.4 < destination.cut_shares(x, rate)[70] < 0.6
+
+
+def test_game_mode_sends_a_bass_song_at_its_level_without_the_sub():
+    """The whole point, on a synthetic 808 track: most of the power under 70 Hz. With
+    the sound's make-up (as Engine._render applies it) the mode sends the part a
+    voice chat keeps at the level it had, where the old mode lost ~10 dB of it."""
+    t = np.arange(4 * RATE) / RATE
+    beat = np.exp(-(t % 0.5) * 6)                  # a hit every half second
+    x = (0.5 * beat * np.sin(2 * np.pi * 45 * t) + 0.08 * np.sin(2 * np.pi * 600 * t)
+         + 0.05 * np.sin(2 * np.pi * 2500 * t)).astype(np.float32)
+    x = np.repeat(x[:, None], 2, axis=1)
+    game = destination.BUILTIN_BY_KEY["game"]
+    g = destination.makeup(destination.cut_shares(x, RATE)[game.lowcut])
+    y = _run(x * np.float32(g), game)
+    tail = slice(RATE, None)
+    kept = _band_db(y[tail], 300, 3000) - _band_db(x[tail], 300, 3000)
+    assert kept > 6                                 # the audible part comes up, not down
+    assert _band_db(y[tail], 20, 60) - _band_db(x[tail], 20, 60) < -20   # the sub is gone
+    assert _band_db(y[tail], 100, 300) - _band_db(x[tail], 100, 300) > 10  # harmonics
 
 
 def test_changing_amount_keeps_filter_memory():
@@ -114,7 +182,11 @@ def test_builtin_modes_and_custom_resolution():
     m = resolve({"mode": "mumble", "custom": custom})
     assert m.custom and m.comp == 1.0 and m.ceiling == 16000 and m.mono
     bad = resolve({"mode": "bad", "custom": custom})
-    assert bad.ceiling == 0 and bad.bass == 0
+    assert bad.ceiling == 0 and bad.bass == 0 and bad.lowcut == 0   # old configs: no cut
+    assert Dest.from_dict({"lowcut": 74}).lowcut == 70           # hand-edited: nearest
+    assert Dest.from_dict({"lowcut": "x"}).lowcut == 0
+    assert Dest.from_dict({"lowcut": 1e9}).lowcut == max(destination.LOWCUTS)
+    assert Dest("k", "k", lowcut=80).active
     d = Dest.from_dict(m.to_dict())
     assert d == m
 

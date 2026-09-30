@@ -39,6 +39,7 @@ class Profile:
     frame_ms: int = 20
     highpass_hz: int = 0   # the app's capture high-pass before the encoder (0 = none)
     highpass_order: int = 13
+    highpass_tail_hz: int = 0   # a gentle 2nd-order high-pass after the steep one (0 = none)
     note: str = ""
     cbr: bool = False      # constant bitrate (Mumble, FiveM) instead of Opus' default VBR
     # the mic cleanup the chat runs with its defaults (codec_bench --defaults): stage
@@ -64,9 +65,13 @@ DISCORD_HP = 94
 
 # Vivox's capture high-pass, measured in a real Valorant party (a sweep sent through
 # Valorant with push-to-talk held, recorded on a second PC): -19..-25 dB at 70 Hz,
-# -7..-12 at 80, -4..-5 at 90, -2..-3 at 100, flat from 120 Hz. A 10th-order
-# Butterworth at 87 Hz sits inside that spread.
-VIVOX_HP = 87
+# -7..-12 at 80, -4..-5 at 90, -2..-3 at 100. A bass-heavy song through the same party
+# shows a slow tail on top: -5 dB at 80-100 Hz, -3 at 100-120, -1.3 at 120-200. A
+# 12th-order Butterworth at 80 Hz followed by a 2nd-order one at 104 Hz fits both (the
+# song's bands within 0.5 dB, the sweep points within 1 dB); one steep filter can't
+# make the tail.
+VIVOX_HP = 80
+VIVOX_HP_TAIL = 104
 
 # Game voice stacks. Where a value comes from the stack's source code or SDK docs the
 # profile says "sourced"; "estimate" means nothing public pins it down (the bench
@@ -95,7 +100,7 @@ PROFILES: dict[str, Profile] = {p.key: p for p in (
             note="Steam's codec, heard through a Unity 3D sound: fades with distance",
             games="Rust", confidence="estimate"),
     Profile("vivox", "Vivox in-game voice (Unity / Unreal)", 48000, 1, 32,
-            highpass_hz=VIVOX_HP, highpass_order=10,
+            highpass_hz=VIVOX_HP, highpass_order=12, highpass_tail_hz=VIVOX_HP_TAIL,
             note="measured in a real Valorant party with push-to-talk held: ~87 Hz "
                  "high-pass, full band, no noise suppression or AGC. On voice "
                  "activation only speech is sent. Bitrate is Vivox's 32 kbps default",
@@ -202,9 +207,12 @@ def downmix(x: np.ndarray) -> np.ndarray:
     return x.mean(axis=1, keepdims=True).astype(F32)
 
 
-def highpass(x: np.ndarray, hz: float, order: int = 13) -> np.ndarray:
-    """Butterworth high-pass along axis 0 (a chat app's capture filter)."""
+def highpass(x: np.ndarray, hz: float, order: int = 13, tail_hz: float = 0) -> np.ndarray:
+    """Butterworth high-pass along axis 0 (a chat app's capture filter), optionally
+    followed by a gentle 2nd-order one at tail_hz."""
     sos = butter(order, hz, "highpass", fs=SR, output="sos")
+    if tail_hz:
+        sos = np.vstack([sos, butter(2, tail_hz, "highpass", fs=SR, output="sos")])
     return sosfilt(sos, np.asarray(x, F32), axis=0).astype(F32)
 
 
@@ -220,7 +228,8 @@ def roundtrip(x: np.ndarray, profile: Profile, ffmpeg: str | None = None) -> np.
         x = np.repeat(x[:, None], 2, axis=1)
     src = downmix(x) if profile.channels == 1 else x
     if profile.highpass_hz:
-        src = highpass(src, profile.highpass_hz, profile.highpass_order)
+        src = highpass(src, profile.highpass_hz, profile.highpass_order,
+                       profile.highpass_tail_hz)
     if profile.rate != SR:
         src = soxr.resample(src, SR, profile.rate, quality="VHQ").astype(F32)
     ch = src.shape[1]

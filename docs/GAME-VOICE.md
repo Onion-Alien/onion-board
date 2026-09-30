@@ -42,7 +42,7 @@ Lethal Company's occlusion and walkie-talkie filters come from its decompiled
 - **The send modes are a small win, not a fix.** Across the stacks every mode keeps
   ~4 dB more bass for ~2.7 dB of deliberate change; where the chat runs an AGC they
   also cut its damage (6.4 → 4.5). None beats the others everywhere, so they were
-  left as they are.
+  left as they are. (Later rebuilt after the Valorant measurements: see below.)
 - **Windows' default mic.** Voice SDKs ask Windows for the *default communication
   device*, which "Set as Default Device" doesn't change; the app's
   *Game has no microphone setting?* steps now set both.
@@ -61,15 +61,39 @@ Lethal Company's occlusion and walkie-talkie filters come from its decompiled
 
 - **Valorant, measured in a real party** (`scripts/game_roundtrip.py` on one PC,
   `scripts/game_listener.py` recording the second PC's Valorant). With push-to-talk
-  held: level kept within 2 dB, a high-pass near 87 Hz (-19..-25 dB at 70 Hz, flat
-  from 120 Hz), the full band up to 10 kHz and a few dB down above, no noise
-  suppression or AGC, the start of sounds kept. The bench's `vivox` profile now uses
-  these numbers. On *Automatic* Valorant sends only speech: test tones, noise, sweeps
+  held: level kept within 2 dB, a steep high-pass near 80 Hz (-19..-25 dB at 70 Hz)
+  with a slow tail above it (a bass-heavy song lost 5 dB at 80-100 Hz, 3 at 100-120,
+  1.3 at 120-200), the full band up to 10 kHz and a few dB down above, no noise
+  suppression or AGC, the start of sounds kept. The bench's `vivox` profile models it
+  as a 12th-order high-pass at 80 Hz plus a 2nd-order one at 104 Hz: run on the same
+  cable recordings it matches what the second PC heard within 0.7 dB in every band. On *Automatic* Valorant sends only speech: test tones, noise, sweeps
   and speech-shaped noise were never transmitted. Its anti-cheat ignores injected key
   presses, so the app's *Auto push-to-talk* can't hold the key: hold it yourself.
 - **A bass-heavy song in Valorant**: sent raw it arrived 7 dB quieter, most of that the
   lost sub-bass (the bottom band 8.5 dB down on the rest). Through the *Game*
   destination mode the bass harmonics halved that loss (4 dB), but the mode's
   compressor and limiter sent the song 11 dB quieter to begin with, so it was heard
-  8.5 dB quieter than raw. The Game mode should keep the harmonics and lose the
-  squeeze.
+  8.5 dB quieter than raw.
+- **Why, and the fix (99 songs, five pitch ranges, through the `vivox` model):** the
+  sounds' levelling measures a song *with* its sub-bass, so an 808 track was levelled
+  8–10 dB quieter than a bright one and then lost that sub-bass in the chat; the old
+  peak compressor took another 5–9 dB off everything. The modes now cut the sub-bass
+  themselves after making the harmonics (`lowcut`), give each sound back the level
+  the cut takes from it (worked out per sound when it starts, so a short clip over a
+  bass song isn't pushed up with it), and run without compression. Heard level
+  against the same song played straight into the cable (median, worst):
+
+  | Pitch range | Old Game mode | New Game mode |
+  |---|---|---|
+  | super low (808s, bass-boosted) | −11.1 dB (−13) | +0.2 dB (−3) |
+  | low | −9.8 dB (−13) | −0.6 dB (−6) |
+  | medium | −8.3 dB (−12) | −1.5 dB (−6) |
+  | high | −8.3 dB (−11) | −1.0 dB (−5) |
+  | super high (chipmunk, monk vocals) | −5.6 dB (−10) | +0.8 dB (−4) |
+
+  Every range now arrives within ~2 dB of the others, the bass reads ~2 dB fuller
+  than the raw song on 808 tracks, the mid-band pumping on kicks dropped from
+  1.0 to 0.6 dB (raw: 0.4) and the spectral distance from 2.2 to 2.0. Discord and
+  Steam got the same treatment (Discord −8.3 → +0.2 dB, Steam −8.6 → −1.8 dB); a
+  compressor lost level and added distortion in every range and every chat, so the
+  built-in modes run without one.

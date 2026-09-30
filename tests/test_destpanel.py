@@ -105,10 +105,25 @@ def test_copy_builtin_starts_from_its_settings(window, monkeypatch):  # noqa: F8
     dlg.accept()
 
 
+def test_low_cut_is_edited_and_saved(window, monkeypatch):  # noqa: F811
+    from PySide6.QtWidgets import QInputDialog
+    game = destination.BUILTIN_BY_KEY["game"]
+    monkeypatch.setattr(QInputDialog, "getItem", staticmethod(lambda *a, **k: (game.label, True)))
+    dlg = CustomDestDialog(window)
+    dlg.copy_builtin()
+    assert dlg.lowcut.currentData() == game.lowcut
+    dlg.lowcut.setCurrentIndex(dlg.lowcut.findData(90))
+    assert window.cfg.dest["custom"][0]["lowcut"] == 90
+    dlg.lowcut.setCurrentIndex(dlg.lowcut.findData(0))
+    assert window.cfg.dest["custom"][0]["lowcut"] == 0
+    dlg.accept()
+
+
 def test_describe_lines():
     assert describe(destination.OFF) == destination.OFF.note
     s = describe(destination.BUILTIN_BY_KEY["steam"])
-    assert "mono" in s and "12 kHz" in s and "harmonics 60%" in s
+    assert "mono" in s and "12 kHz" in s and "harmonics 80%" in s
+    assert "under 80 Hz" in describe(destination.BUILTIN_BY_KEY["game"])
 
 
 def test_the_setup_tab_has_the_picker_and_settings_follows_it(window):  # noqa: F811
