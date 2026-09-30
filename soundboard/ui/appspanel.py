@@ -305,6 +305,7 @@ class AppsTab(QWidget):
         self.timer.timeout.connect(self.lister.refresh)
         self.meter_timer = QTimer(self)
         self.meter_timer.timeout.connect(self._meters)
+        self.peaks = appaudio.PeakWatcher()   # live levels; the list is only re-read every 1.5 s
         self._started = False
         if self.rows:   # remembered programs are picked up even if this tab is never opened
             QTimer.singleShot(1500, self.start)
@@ -315,9 +316,11 @@ class AppsTab(QWidget):
         self.start()
         self.timer.start(REFRESH_MS)
         self.meter_timer.start(METER_MS)
+        self.peaks.start()
 
     def hideEvent(self, ev):
         super().hideEvent(ev)
+        self.peaks.stop()
         if self._started:
             self.timer.start(REFRESH_HIDDEN_MS)
 
@@ -334,6 +337,7 @@ class AppsTab(QWidget):
     def shutdown(self):
         self.timer.stop()
         self.meter_timer.stop()
+        self.peaks.stop()
         self.lister.stop()
         for row in list(self.rows.values()):
             self._stop_capture(row, save=False)
@@ -454,8 +458,11 @@ class AppsTab(QWidget):
             if row.src is not None:
                 row.meter.set_level(row.src.level)
                 row.src.level *= 0.8
+            elif row.app is None:
+                row.meter.set_level(0.0)
             else:
-                row.meter.set_level(row.app.peak if row.app else 0.0)
+                live = self.peaks.peak(row.app.pid)
+                row.meter.set_level(row.app.peak if live is None else live)
 
     # ------------------------------------------------------------------ capture
     # One capture per program, open while it's being sent, recorded, or both.

@@ -85,6 +85,45 @@ def test_list_apps_runs_and_never_lists_this_process():
         assert a.exe.lower() not in appaudio.SYSTEM_EXES
 
 
+class _FakeMeter:
+    def __init__(self, v):
+        self.v, self.released = v, False
+
+    def call(self, slot, argtypes, ptr, what=""):
+        ptr._obj.value = self.v
+
+    def release(self):
+        self.released = True
+
+
+@pytest.mark.skipif(not WIN, reason="Windows only")
+def test_peak_watcher_reads_meters_between_scans_and_releases_them(monkeypatch):
+    made = []
+
+    def fake_list(meters=None):
+        ms = [_FakeMeter(0.25), _FakeMeter(0.5)]   # two sessions of one program: the louder
+        made.extend(ms)
+        meters[42] = ms
+        return []
+
+    monkeypatch.setattr(appaudio, "_list_apps", fake_list)
+    w = appaudio.PeakWatcher(interval=0.01, rescan=60)
+    assert w.peak(42) is None
+    w.start()
+    deadline = time.monotonic() + 2
+    while w.peak(42) is None and time.monotonic() < deadline:
+        time.sleep(0.01)
+    assert w.peak(42) == pytest.approx(0.5)
+    for m in made:                                  # it keeps reading without rescanning
+        m.v = 0.0
+    time.sleep(0.3)
+    assert w.peak(42) < 0.05 and len(made) == 2
+    t = w._thread
+    w.stop()
+    t.join(2)
+    assert all(m.released for m in made) and w.peak(42) is None
+
+
 @pytest.mark.skipif(not WIN, reason="Windows only")
 def test_capture_of_a_missing_process_fails_politely():
     got = []

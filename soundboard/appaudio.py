@@ -430,7 +430,9 @@ def list_apps() -> list[App]:
             _ole32.CoUninitialize()
 
 
-def _list_apps() -> list[App]:
+def _list_apps(meters: dict | None = None) -> list[App]:
+    """With `meters`, also keeps each session's IAudioMeterInformation there
+    (root pid -> [Com]) for the caller to read and release; window titles are skipped."""
     me = os.getpid()
     table = _process_table()
     apps: dict[int, App] = {}
@@ -459,18 +461,19 @@ def _list_apps() -> list[App]:
                         except ComError:
                             continue
                         with Com(ctl.value) as c:
-                            _read_session(c, dname, me, table, apps)
+                            _read_session(c, dname, me, table, apps, meters)
     finally:
         for dev in devices:
             dev.release()
-    titles = window_titles() if apps else {}
+    titles = window_titles() if apps and meters is None else {}
     for app in apps.values():
         pids = (app.pid, *sorted(app.session_pids))
         app.title = next((titles[p] for p in pids if p in titles), "")
     return sorted(apps.values(), key=lambda a: (not a.active, a.name.lower(), a.pid))
 
 
-def _read_session(c: Com, dname: str, me: int, table, apps: dict[int, App]):
+def _read_session(c: Com, dname: str, me: int, table, apps: dict[int, App],
+                  meters: dict | None = None):
     with c.qi(IID_IAudioSessionControl2) as c2:
         state = c_int()
         c2.call(3, (POINTER(c_int),), byref(state), what="GetState")
@@ -503,6 +506,82 @@ def _read_session(c: Com, dname: str, me: int, table, apps: dict[int, App]):
     app.peak = max(app.peak, float(peak.value))
     if dname and dname not in app.devices:
         app.devices.append(dname)
+    if meters is not None:
+        try:
+            meters.setdefault(root, []).append(c.qi(IID_IAudioMeterInformation))
+        except ComError:
+            pass
+
+
+class PeakWatcher:
+    """Live levels of every program, from Windows' own session meters, read
+    ~20 times a second on a worker thread (`list_apps` is too slow to re-run that
+    often: it walks processes and windows). The sessions are re-found every
+    `rescan` seconds. `peak(pid)` takes the root pid, as in `App.pid`."""
+
+    def __init__(self, interval: float = 0.05, rescan: float = 1.5):
+        self.interval, self.rescan = interval, rescan
+        self._peaks: dict[int, float] = {}
+        self._stop = threading.Event()
+        self._thread: threading.Thread | None = None
+
+    def peak(self, pid: int) -> float | None:
+        """0..1, or None if the program has no session the watcher knows of yet."""
+        return self._peaks.get(pid)
+
+    def start(self):
+        if not _win or (self._thread and self._thread.is_alive()):
+            return
+        self._stop = threading.Event()
+        self._thread = threading.Thread(target=self._run, args=(self._stop,),
+                                        name="apppeaks", daemon=True)
+        self._thread.start()
+
+    def stop(self):
+        self._stop.set()
+        self._thread = None
+        self._peaks = {}
+
+    def _run(self, stop: threading.Event):
+        meters: dict[int, list[Com]] = {}
+        own = _co_init()
+        try:
+            next_scan = 0.0
+            peak = c_float()
+            while not stop.is_set():
+                if time.monotonic() >= next_scan:
+                    _release_meters(meters)
+                    meters = {}
+                    try:
+                        _list_apps(meters)
+                    except ComError:
+                        log.debug("finding session meters failed", exc_info=True)
+                    next_scan = time.monotonic() + self.rescan
+                old, peaks = self._peaks, {}
+                for pid, ms in meters.items():
+                    v = 0.0
+                    for m in ms:
+                        try:
+                            m.call(3, (POINTER(c_float),), byref(peak), what="GetPeakValue")
+                            v = max(v, float(peak.value))
+                        except ComError:
+                            pass
+                    peaks[pid] = max(v, old.get(pid, 0.0) * 0.8)   # fall, don't flicker
+                if not stop.is_set():
+                    self._peaks = peaks
+                stop.wait(self.interval)
+        except Exception:  # noqa: BLE001
+            log.exception("program level watcher failed")
+        finally:
+            _release_meters(meters)
+            if own:
+                _ole32.CoUninitialize()
+
+
+def _release_meters(meters: dict):
+    for ms in meters.values():
+        for m in ms:
+            m.release()
 
 
 # --------------------------------------------------------------------------- capture
