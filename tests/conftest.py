@@ -255,3 +255,42 @@ def pytest_runtest_logreport(report):
         import sys
         sys.stderr.write(f"\nFAILED {report.nodeid} ({report.when})\n")
         sys.stderr.flush()
+
+
+@pytest.fixture(autouse=True)
+def _no_windows_speech(request, monkeypatch):
+    """Every main window warms up Windows speech: a PowerShell process that loads the
+    speech engine. Across the hundred-odd tests that build one, that's what made the
+    whole suite crawl. Only the speech tests talk to it (or their own fake)."""
+    if request.node.module.__name__.rsplit(".", 1)[-1] == "test_speech":
+        return
+    from soundboard.speech import tts
+    monkeypatch.setattr(tts.SapiTTS, "warm_up", lambda self: [])
+
+
+@pytest.fixture(autouse=True)
+def _free_test_windows():
+    """Close and free the windows a test leaves behind. Qt keeps a closed top-level
+    window alive, and every theme change restyles all of them: with a few hundred
+    left over from earlier tests, one theme-switching test took 50 s, not 1 s."""
+    from PySide6.QtWidgets import QApplication
+    from shiboken6 import getCppPointer
+
+    def key(w):
+        return getCppPointer(w)[0]   # the C++ object: a wrapper's id() can change
+
+    app = QApplication.instance()
+    before = set(map(key, app.topLevelWidgets())) if app is not None else set()
+    yield
+    app = QApplication.instance()
+    if app is None:
+        return
+    from PySide6.QtCore import QEvent
+    for w in app.topLevelWidgets():
+        if key(w) not in before:
+            try:
+                w.close()
+                w.deleteLater()
+            except RuntimeError:   # already gone on the C++ side
+                pass
+    app.sendPostedEvents(None, QEvent.DeferredDelete)
