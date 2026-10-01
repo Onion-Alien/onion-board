@@ -418,6 +418,13 @@ class RadioTab(QWidget):
         self._search_timer.timeout.connect(self._search_now)
         self.timer = QTimer(self)
         self.timer.timeout.connect(self._tick)   # runs while shown, or while recording
+        # the window being dragged keeps the globe drawing (a few wakes a second, not one
+        # per move event): a move to another screen loses a sleeping globe's picture
+        self._wake_timer = QTimer(self)
+        self._wake_timer.setSingleShot(True)
+        self._wake_timer.setInterval(120)
+        self._wake_timer.timeout.connect(self._wake_globe)
+        self._watched = None   # the window whose moves we follow
         self._refresh_info()
         self._update_buttons()
 
@@ -629,6 +636,7 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
         super().showEvent(e)
         self.timer.start(50)
         self.start()
+        self._wake_globe()   # back from another tab: draw the globe under its names
 
     def hideEvent(self, e):
         super().hideEvent(e)
@@ -684,6 +692,33 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
         app = QGuiApplication.instance()
         if app is not None:
             app.applicationStateChanged.connect(self._on_app_state)
+        self._follow_window()
+
+    def _follow_window(self):
+        """Redraw the globe while the window moves or goes to another screen. A sleeping
+        globe isn't redrawn by itself, and a screen change can drop its picture while the
+        country names (page text) stay — names floating on nothing."""
+        win = self.window()
+        if win is self._watched:
+            return
+        if self._watched is not None:
+            self._watched.removeEventFilter(self)
+        self._watched = win
+        win.installEventFilter(self)
+        handle = win.windowHandle()
+        if handle is not None:
+            handle.screenChanged.connect(self._wake_globe)
+
+    def eventFilter(self, obj, ev):
+        if obj is self._watched and ev.type() in (QEvent.Move, QEvent.Resize,
+                                                  QEvent.ScreenChangeInternal,
+                                                  QEvent.DevicePixelRatioChange):
+            if not self._wake_timer.isActive():
+                self._wake_timer.start()
+        return super().eventFilter(obj, ev)
+
+    def _wake_globe(self, *_):
+        self._js("wake()")
 
     def _globe_hd(self) -> bool:
         return bool(self.cfg.radio.get("globe_hd", False))

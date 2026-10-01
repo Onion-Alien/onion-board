@@ -95,6 +95,17 @@ def test_globe_page_names_countries_and_islands():
         assert name.isascii() and "<" not in name, name
 
 
+def test_globe_names_never_float_without_the_globe():
+    page = radio.globe_html("", "#000000", "#111111", "#222222", "#333333")
+    # a lost WebGL picture hides the names until it's back and redrawn
+    assert "body.nogl .place{visibility:hidden!important}" in page
+    assert 'document.body.classList.add("nogl")' in page and "webglcontextlost" in page
+    assert 'document.body.classList.remove("nogl"); wake(3000);' in page
+    # a resize or a new screen scale redraws a sleeping globe, even in the background
+    assert "fitNames(); wake();" in page and "dppx" in page
+    assert "appActive ? (ms || 1500) : 250" in page
+
+
 def test_bad_coordinates_and_numbers_are_cleaned():
     s = Station.from_api(api_station(1, geo_lat=0, geo_long=0, bitrate="x", countrycode="J1"))
     assert s.lat is None and s.lon is None and s.bitrate == 0 and s.cc == ""
@@ -410,6 +421,25 @@ def test_light_globe_pins_only_the_top_stations_and_hd_is_remembered(tab, monkey
     assert sent[-1].count('"id"') == 2
     tab._on_globe_hd(True)
     assert tab.cfg.radio["globe_hd"] is True and sent[-1].count('"id"') == 5
+
+
+def test_moving_the_window_keeps_the_globe_drawing(qapp, tab, monkeypatch):
+    from PySide6.QtCore import QPoint, Qt
+    from PySide6.QtGui import QMoveEvent, QShowEvent
+    from PySide6.QtWidgets import QApplication, QVBoxLayout
+    sent = []
+    monkeypatch.setattr(tab, "_js", sent.append)
+    win = QWidget()
+    QVBoxLayout(win).addWidget(tab)
+    tab._follow_window()
+    for x in range(5):   # a drag: many moves, a few wakes
+        QApplication.sendEvent(win, QMoveEvent(QPoint(x, 0), QPoint(x - 1, 0)))
+    assert process_events(qapp, lambda: sent) and sent == ["wake()"]
+    tab._on_app_state(Qt.ApplicationInactive)
+    tab.showEvent(QShowEvent())   # back on the tab
+    assert sent[-1] == "wake()"
+    tab.setParent(None)
+    win.deleteLater()
 
 
 def test_tab_search_shows_local_matches_then_the_directory(qapp, tab, server):

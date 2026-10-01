@@ -640,6 +640,7 @@ html,body{{margin:0;height:100%;overflow:hidden;background:{bg};color:{text};
 #zoom #hd.on,#zoom #names.on{{opacity:1;border-color:var(--accent)}}
 .place{{font:600 11px 'Segoe UI',sans-serif;color:#fff;white-space:nowrap;pointer-events:none;
   text-shadow:0 0 3px #000,0 0 2px #000,0 1px 2px #000;opacity:.9;letter-spacing:.2px}}
+body.nogl .place{{visibility:hidden!important}}
 .place.big{{font-size:13px}} .place.isle{{font-weight:400;font-style:italic;opacity:.8}}
 #hint{{position:absolute;left:10px;bottom:10px;font-size:11px;opacity:.55;pointer-events:none}}
 </style></head><body><div id="g"></div><div id="msg">Loading the globe…</div>
@@ -661,8 +662,10 @@ let asleep = false, idleT = 0, appActive = true, fitting = false;
 try {{ night = localStorage.getItem("earth") === "night"; }} catch (e) {{}}
 const msg = t => {{ const m = document.getElementById("msg"); m.textContent = t || "";
                    m.style.display = t ? "flex" : "none"; }};
-// Draw only while something moves: input, a camera flight, a texture arriving. HD with
-// the app in front spins forever, so it never sleeps.
+// Draw only while something moves: input, a camera flight, a texture arriving, the
+// window being moved or resized. HD with the app in front spins forever, so it never
+// sleeps. In the background it still draws a moment, so a resize or a move to another
+// screen (which blanks the picture) is redrawn before it sleeps again.
 function wake(ms) {{
   if (!W) return;
   if (asleep) {{ W.resumeAnimation(); asleep = false; }}
@@ -670,7 +673,7 @@ function wake(ms) {{
   clearTimeout(idleT);
   if (!(HD && appActive && W.controls().autoRotate))
     idleT = setTimeout(() => {{ if (W) {{ W.pauseAnimation(); asleep = true; }} }},
-                       appActive ? (ms || 1500) : 0);
+                       appActive ? (ms || 1500) : 250);
 }}
 function fitLoop() {{
   // the names are re-placed on every frame the globe draws (so, not while it sleeps)
@@ -923,10 +926,29 @@ function build() {{
     c.enableZoom = false;   // our own wheel handler zooms (see zoom above)
     const m = W.globeMaterial();
     if (m.specular) {{ m.specular.setStyle("#222a38"); m.shininess = 12; }}   // a soft sheen
-    W.renderer().domElement.addEventListener("pointerdown", () => {{ c.autoRotate = false; }});
-    const fit = () => {{ W.width(innerWidth).height(innerHeight); fitNames(); }};
+    const cv = W.renderer().domElement;
+    cv.addEventListener("pointerdown", () => {{ c.autoRotate = false; }});
+    // The names are page text, the globe a WebGL picture. Moving the window to another
+    // screen can lose the picture (a lost context, or a resize that clears it while the
+    // globe sleeps) while the text stays, so the names hide until the globe is back.
+    cv.addEventListener("webglcontextlost", () => {{ document.body.classList.add("nogl"); }});
+    cv.addEventListener("webglcontextrestored", () => {{
+      document.body.classList.remove("nogl"); wake(3000);
+    }});
+    const fit = () => {{
+      W.renderer().setPixelRatio(HD ? devicePixelRatio : 1);
+      W.width(innerWidth).height(innerHeight); fitNames(); wake();   // resizing clears it
+    }};
+    const onDpr = () => {{   // a screen with another scale: no resize event for that alone
+      fit();
+      matchMedia("(resolution: " + devicePixelRatio + "dppx)")
+        .addEventListener("change", onDpr, {{once: true}});
+    }};
     W.pointOfView({{lat: 25, lng: 10, altitude: 2.4}});
     addEventListener("resize", fit); fit();
+    matchMedia("(resolution: " + devicePixelRatio + "dppx)")
+      .addEventListener("change", onDpr, {{once: true}});
+    document.addEventListener("visibilitychange", () => {{ if (!document.hidden) wake(); }});
     applyHd();
     msg(stations.length ? "" : "Finding stations…");
     if (stations.length) W.pointsData(stations);
