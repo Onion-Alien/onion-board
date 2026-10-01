@@ -545,6 +545,49 @@ def test_results_spin_while_searching_and_offer_every_site(qapp, monkeypatch):
     assert not panel.spinner.running()
 
 
+def test_searching_shows_a_centred_mascot_then_the_results(qapp, monkeypatch):
+    from soundboard.ui.bunnywidget import BunnyWidget
+    from soundboard.ui.owl import OwlWidget
+    from soundboard.ui.ytsearch import SearchResults
+    gate = threading.Event()
+    hit = ytdl.Result(id="x", title="Bruh", channel="c", seconds=3.0, source="myinstants")
+    monkeypatch.setattr(ytdl, "search", lambda q, count=20, source="youtube": (
+        gate.wait(5), [hit])[1])
+    panel = SearchResults()
+    panel.resize(700, 500)
+    panel.search("bruh")
+    qapp.processEvents()
+    view = panel.loading
+    assert view.isVisible() and not panel.scroll.isVisible() and not panel.hint.isVisible()
+    assert view.kind in ("bunny", "owl")
+    assert isinstance(view.mascot, OwlWidget if view.kind == "owl" else BunnyWidget)
+    assert view.mascot.isVisible() and view.bar.ticking()
+    assert "Searching YouTube for <b>bruh</b>" in view.label.text()
+    centre = view.rect().center()
+    for w in (view.mascot, view.bar, view.label):    # stacked down the middle
+        assert abs(w.geometry().center().x() - centre.x()) <= 2
+    assert view.mascot.geometry().top() > 20 and view.label.geometry().bottom() < view.height() - 20
+    assert view.mascot.geometry().bottom() < view.bar.geometry().top() \
+        < view.label.geometry().top()
+    panel.resize(300, 120)                            # no room: the mascot steps aside
+    qapp.processEvents()
+    assert not view.mascot.isVisible() and view.label.isVisible()
+    assert view.label.geometry().bottom() <= view.height()
+    panel.resize(700, 500)
+    qapp.processEvents()
+    assert view.mascot.isVisible()
+    kinds = set()
+    for _ in range(40):                               # a coin toss each search
+        view.start("x")
+        kinds.add(view.kind)
+    assert kinds == {"bunny", "owl"}
+    gate.set()
+    assert process_events(qapp, lambda: not view.running(), 5)
+    assert not view.isVisible() and not view.bar.ticking()
+    assert panel.scroll.isVisible() and panel.title.isVisible() and len(panel._rows) == 1
+    panel.close_results()
+
+
 @pytest.mark.parametrize("url", [
     "https://www.myinstants.com/media/sounds/real.mp3?x=%5C..%5C..%5Cx.bat",
     "https://www.myinstants.com/media/sounds/real.mp3#%5C..%5Cx.bat",

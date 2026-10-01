@@ -2,7 +2,9 @@
 button next to it) and this list takes the pad grid's place. It's a plain list of
 hits (thumbnail, title, channel, length) from the site searches in ytdl.SOURCES
 (YouTube, YouTube Music, SoundCloud, TikTok sounds, Myinstants), with no web page
-and no video; a spinner turns while one runs. ▶ plays one once and ＋ adds it as a
+and no video. While one runs the list makes way for a loading view: Bun or Hoot
+(picked at random each time) over a sliding bar and "Searching YouTube for ...".
+▶ plays one once and ＋ adds it as a
 pad; both hand the page to the link bar (ui/linkbar.py), which downloads just its
 audio. Sites without a search (Instagram, X…) work by pasting a link into the
 search box instead.
@@ -11,16 +13,25 @@ from __future__ import annotations
 
 import html
 import logging
+import math
+import random
 import threading
+import time
 
-from PySide6.QtCore import QRectF, QTimer, QUrl, Qt, Signal
-from PySide6.QtGui import QColor, QPainter, QPainterPath, QPen, QPixmap
+from PySide6.QtCore import QRectF, QSize, QTimer, QUrl, Qt, Signal
+from PySide6.QtGui import QColor, QLinearGradient, QPainter, QPainterPath, QPixmap
 from PySide6.QtNetwork import QNetworkAccessManager, QNetworkRequest
 from PySide6.QtWidgets import (QButtonGroup, QFrame, QHBoxLayout, QLabel, QPushButton,
                                QScrollArea, QVBoxLayout, QWidget)
 
 from soundboard import theme, ytdl
+from soundboard.bunny import H as BUN_H
+from soundboard.bunny import W as BUN_W
 from soundboard.ui import icons
+from soundboard.ui.bunnywidget import BunnyWidget
+from soundboard.ui.owl import H as OWL_H
+from soundboard.ui.owl import W as OWL_W
+from soundboard.ui.owl import OwlWidget
 from soundboard.ui.widgets import fmt_time
 
 log = logging.getLogger(__name__)
@@ -36,42 +47,184 @@ TIPS = {"youtube": "Search YouTube",
         "myinstants": "Search Myinstants: short meme sound buttons"}
 
 
-class Spinner(QWidget):
-    """A small turning arc in the accent colour, shown while something loads."""
+class LoadingBar(QWidget):
+    """An indeterminate progress bar: an accent pill gliding back and forth along a
+    rounded groove. Theme colours are read on every paint, and the timer only runs
+    while it's started and on screen."""
 
-    def __init__(self, size: int = 16):
-        super().__init__()
-        self.setFixedSize(size, size)
-        self._angle = 0
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setFixedHeight(6)
+        self._t0 = time.monotonic()
+        self._on = False
         self._timer = QTimer(self)
-        self._timer.setInterval(40)
-        self._timer.timeout.connect(self._tick)
-        self.hide()
+        self._timer.setInterval(1000 // 30)
+        self._timer.timeout.connect(self.update)
 
     def start(self):
-        self.show()
-        self._timer.start()
+        self._on = True
+        self._t0 = time.monotonic()
+        if self.isVisible():
+            self._timer.start()
 
     def stop(self):
+        self._on = False
         self._timer.stop()
-        self.hide()
 
     def running(self) -> bool:
+        return self._on
+
+    def ticking(self) -> bool:
         return self._timer.isActive()
 
-    def _tick(self):
-        self._angle = (self._angle + 30) % 360
-        self.update()
+    def showEvent(self, ev):
+        if self._on:
+            self._timer.start()
+        super().showEvent(ev)
+
+    def hideEvent(self, ev):
+        self._timer.stop()
+        super().hideEvent(ev)
+
+    def sizeHint(self) -> QSize:
+        return QSize(240, 6)
 
     def paintEvent(self, _e):
         p = QPainter(self)
         p.setRenderHint(QPainter.Antialiasing)
-        pen = QPen(QColor(theme.T.get("accent", "#7c5cff")), 2.2)
-        pen.setCapStyle(Qt.RoundCap)
-        p.setPen(pen)
-        r = QRectF(self.rect()).adjusted(2, 2, -2, -2)
-        p.drawArc(r, -self._angle * 16, 270 * 16)
+        r = QRectF(self.rect())
+        rad = r.height() / 2
+        p.setPen(Qt.NoPen)
+        p.setBrush(QColor(theme.T.get("groove", "#343849")))
+        p.drawRoundedRect(r, rad, rad)
+        # the pill eases from one end to the other and back, stretching mid-glide
+        k = 0.5 - 0.5 * math.cos((time.monotonic() - self._t0) * math.pi / 0.9)
+        w = r.width() * (0.28 + 0.14 * math.sin(k * math.pi))
+        x = r.left() + (r.width() - w) * k
+        g = QLinearGradient(x, 0, x + w, 0)
+        g.setColorAt(0, QColor(theme.T.get("accent", "#7c5cff")))
+        g.setColorAt(1, QColor(theme.T.get("accent2", theme.T.get("accent_hi", "#8d71ff"))))
+        p.setBrush(g)
+        p.drawRoundedRect(QRectF(x, r.top(), w, r.height()), rad, rad)
         p.end()
+
+
+class _BusyOwl(OwlWidget):
+    """Hoot on the job: bright-eyed and tufts up instead of moping, scanning left and
+    right for your sound, no dozing or begging."""
+
+    def __init__(self, height: int, parent=None):
+        super().__init__(height, lines=(), joy=(), parent=parent, left=0, right=0)
+        self._next_act = math.inf
+        self.setToolTip("")
+
+    def pose(self) -> dict:
+        d = super().pose()
+        d["sad"] = 0.0
+        d["tufts"] = -8 + 3 * math.sin(self.t * 1.1)
+        d["look"] = 0.8 * math.sin(self.t * 1.6)     # scanning the results
+        d["look_y"] = 0.25
+        return d
+
+
+class SearchingView(QWidget):
+    """What the results area shows while a search runs: a mascot (Bun with his
+    headphones on, or Hoot keeping watch; a coin toss each time) over a loading bar
+    and the "Searching ... for ..." line, all centred. Laid out by hand so it never
+    asks the window for room: the mascot shrinks with the space and goes when
+    there's too little, then the bar, leaving just the line."""
+
+    MASCOTS = ("bunny", "owl")
+    BIG, SMALL = 104, 44       # mascot heights, px
+    GAP = 12
+
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.kind = ""
+        self.mascot: QWidget | None = None
+        self._rng = random.Random()
+        self.bar = LoadingBar(self)
+        self.label = QLabel(self)
+        self.label.setTextFormat(Qt.RichText)
+        self.label.setWordWrap(True)
+        self.label.setAlignment(Qt.AlignCenter)
+        self.hide()
+
+    def sizeHint(self) -> QSize:
+        return QSize(320, 220)
+
+    def minimumSizeHint(self) -> QSize:
+        return QSize(0, self.label.sizeHint().height())
+
+    def start(self, text: str):
+        """Show `text` (rich text) under a freshly picked mascot and start the bar."""
+        self.label.setText(text)
+        kind = self._rng.choice(self.MASCOTS)
+        if kind != self.kind or self.mascot is None:
+            if self.mascot is not None:
+                self.mascot.hide()
+                self.mascot.deleteLater()
+            self.mascot = self._make(kind)
+            self.kind = kind
+        self.bar.start()
+        self.show()
+        self._place()
+
+    def stop(self):
+        self.bar.stop()
+        self.hide()            # the mascot's own timer stops with it
+
+    def running(self) -> bool:
+        return self.bar.running()
+
+    def _make(self, kind: str) -> QWidget:
+        if kind == "owl":
+            m = _BusyOwl(self.BIG, parent=self)
+        else:
+            m = BunnyWidget("headphones", height=self.BIG, pad=22, parent=self)
+        return m
+
+    def _fit_mascot(self, h: int) -> QSize:
+        """Draw the mascot `h` px tall; returns the box it then needs."""
+        m = self.mascot
+        if isinstance(m, OwlWidget):
+            m.owl_h, m.top = h, round(h * 0.34)
+            return QSize(round(h * OWL_W / OWL_H) + 8, h + m.top + 8)
+        m.bun_h, m.pad = h, round(h * 0.22)
+        return QSize(round(h * BUN_W / BUN_H) + 2 * m.pad + 20, h + 2 * m.pad)
+
+    def resizeEvent(self, ev):
+        super().resizeEvent(ev)
+        self._place()
+
+    def _place(self):
+        w, h, gap = self.width(), self.height(), self.GAP
+        tw = max(40, min(w - 24, 460))
+        th = self.label.heightForWidth(tw)
+        th = th if th > 0 else self.label.sizeHint().height()
+        bw = max(0, min(260, w - 48))
+        show_bar = bw >= 60 and h >= th + gap + 6
+        need = th + (gap + 6 if show_bar else 0)
+        room = h - need - gap               # what's left above for the mascot
+        box = QSize()
+        if self.mascot is not None:
+            # biggest that fits (its box is about 1.5x its height), or none at all
+            mh = min(self.BIG, int(room / 1.5))
+            if mh >= self.SMALL:
+                box = self._fit_mascot(mh)
+                if box.width() > w - 8 or box.height() > room:
+                    box = QSize()
+            self.mascot.setVisible(not box.isEmpty())
+        total = need + (box.height() + gap if not box.isEmpty() else 0)
+        y = max(0, (h - total) // 2)
+        if not box.isEmpty():
+            self.mascot.setGeometry((w - box.width()) // 2, y, box.width(), box.height())
+            y += box.height() + gap
+        self.bar.setVisible(show_bar)
+        if show_bar:
+            self.bar.setGeometry((w - bw) // 2, y, bw, 6)
+            y += 6 + gap
+        self.label.setGeometry((w - tw) // 2, y, tw, th)
 
 
 def rounded(pm: QPixmap, w: int, h: int, r: int = 10) -> QPixmap:
@@ -183,19 +336,17 @@ class SearchResults(QFrame):
         close.clicked.connect(self.close_results)
         head.addWidget(close)
         v.addLayout(head)
-        status = QHBoxLayout()
-        status.setSpacing(8)
-        self.spinner = Spinner()
-        status.addWidget(self.spinner)
         self.title = QLabel()
         self.title.setTextFormat(Qt.RichText)
         self.title.setWordWrap(True)
-        status.addWidget(self.title, 1)
-        v.addLayout(status)
-        hint = QLabel(PASTE_HINT)
-        hint.setObjectName("muted")
-        hint.setWordWrap(True)
-        v.addWidget(hint)
+        v.addWidget(self.title)
+        self.hint = QLabel(PASTE_HINT)
+        self.hint.setObjectName("muted")
+        self.hint.setWordWrap(True)
+        v.addWidget(self.hint)
+        self.loading = SearchingView()      # takes the list's place while searching
+        self.spinner = self.loading         # start / stop / running()
+        v.addWidget(self.loading, 1)
         self.list = QWidget()
         self.rows = QVBoxLayout(self.list)
         self.rows.setContentsMargins(0, 0, 6, 0)
@@ -206,6 +357,7 @@ class SearchResults(QFrame):
         scroll.setWidget(self.list)
         scroll.setFrameShape(QFrame.NoFrame)
         v.addWidget(scroll, 1)
+        self.scroll = scroll
         self.hide()
 
     @property
@@ -230,8 +382,9 @@ class SearchResults(QFrame):
         self._gen += 1
         self._clear()
         where = "TikTok sounds" if self.source == "tiktok" else self.site
-        self.title.setText(f"Searching {where} for <b>{html.escape(query)}</b>…")
-        self.spinner.start()
+        text = f"Searching {where} for <b>{html.escape(query)}</b>…"
+        self.title.setText(text)
+        self._loading(True, text)
         self.show()
         threading.Thread(target=self._work, args=(self._gen, query, self.source),
                          daemon=True, name="web-search").start()
@@ -239,10 +392,19 @@ class SearchResults(QFrame):
 
     def close_results(self):
         self._gen += 1       # a search still running is ignored when it lands
-        self.spinner.stop()
+        self._loading(False)
         self._clear()
         self.hide()
         self.closed.emit()
+
+    def _loading(self, on: bool, text: str = ""):
+        """The loading view in place of the title, hint and list (on), or those back."""
+        for w in (self.title, self.hint, self.scroll):
+            w.setVisible(not on)
+        if on:
+            self.loading.start(text)
+        else:
+            self.loading.stop()
 
     def _clear(self):
         for r in self._rows:
@@ -259,7 +421,7 @@ class SearchResults(QFrame):
     def _on_done(self, gen: int, results, err: str):
         if gen != self._gen:
             return
-        self.spinner.stop()
+        self._loading(False)
         q = html.escape(self.query)
         if err:
             red = theme.status("error")
