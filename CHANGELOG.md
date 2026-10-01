@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 1.5.5 — 2026-10-01
 
 - **Country and island names on the Radio globe**, so you can find places without
   knowing the map. Zoomed out you see the big countries; zoom in and the smaller
