@@ -365,7 +365,9 @@ installer's *Play M4A, AAC and video files* box runs the same command). The app
 finds ffmpeg on `PATH` or in winget's `Links` folder.
 Settings and imported sounds live in `%APPDATA%\OnionBoard\`. Its `cache\` folder
 holds each sound decoded and ready to play (int16 at 48 kHz), so later starts don't
-decode anything; it's safe to delete and is rebuilt as needed.
+decode anything; it's safe to delete and is rebuilt as needed. The `icons\` folder
+there holds the app icon in each theme you've used, which the app's own Desktop and Start
+menu shortcuts point at (a reinstall resets them; the next start re-themes them).
 
 ### Code layout
 
@@ -392,6 +394,7 @@ the launcher the shortcuts and PyInstaller use. The app is the `soundboard` pack
 | `soundboard/ui/trim.py` | the Effects tab's trim control: waveform with start / end handles and exact-time boxes |
 | `soundboard/backup.py` | export / import of the board as a plain zip (JSON + original audio + pictures), sound packs and single sounds; see `docs/BACKUP-FORMAT.md` |
 | `soundboard/autostart.py` | *Start with Windows*: the per-user `Run` registry value (`--tray` starts it hidden) |
+| `soundboard/shellicon.py` | the app icon in the theme's colours outside its windows: writes `%APPDATA%\OnionBoard\icons\onionboard-<hash>.ico`, puts it on the main window's relaunch properties (taskbar right-click menu, a pin) and on this copy's own *Onion Board* Desktop / Start menu / taskbar-pin shortcuts |
 | `soundboard/updates.py` | "is there a newer version?" (GitHub Releases, once a day) and the self-update: downloads the release's installer, checks its SHA-256, runs it silently and reopens the app |
 | `soundboard/ui/icons.py` | the line icons, drawn in code and recoloured with the theme |
 | `soundboard/ui/art.py` | optional pictures from `assets/art` (voice tiles, the computer voice, its languages); emoji / painted icons when missing |

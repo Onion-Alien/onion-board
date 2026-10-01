@@ -2,8 +2,17 @@
 
 ## Unreleased
 
+- **The app icon follows your theme everywhere**: the taskbar's right-click menu,
+  a taskbar pin and the Onion Board shortcuts on your Desktop and Start menu (so
+  Start search too) now show the icon in your theme's colours, not always purple.
 - **The version is on show**: in the title bar, the taskbar, the tray icon's
   tooltip and under the logo, so you can tell at a glance which one you're running.
+- **The Radio globe no longer vanishes when you move the window** to another spot or
+  screen, leaving its country names floating on an empty background. It redraws as
+  you move, and the names hide whenever the globe can't be shown.
+- **A friendlier wait while searching YouTube**: instead of a line of text in the
+  corner, Bun or Hoot keeps you company in the middle of the results, over a sliding
+  loading bar, until the results are in.
 
 ## 1.5.5 — 2026-10-01
 

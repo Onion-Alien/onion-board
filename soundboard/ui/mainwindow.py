@@ -28,7 +28,7 @@ from soundboard.engine import SR, Engine
 from soundboard.engine import is_virtual as is_virtual_cable
 from soundboard import (autostart, backup, destination, midi, remote, soundfx, thumbs,
                         trash, updates, voicesdk)
-from soundboard import watchaddon
+from soundboard import shellicon, watchaddon
 from soundboard.replay import InstantReplay
 from soundboard.library import (AUDIO_EXTS, PAD_COLORS, RESOURCE_DIR, Config, SoundMeta,
                                 cache_keep, clean_tags, duplicate, fingerprint,
@@ -1415,9 +1415,11 @@ class MainWindow(QMainWindow):
 
     def _paint_logo(self):
         self.logo.update()   # it reads the theme colours itself
-        # title bar + taskbar follow the theme too (the .exe / shortcut icon stays BRAND)
+        # title bar + taskbar follow the theme too, and so do the taskbar's right-click
+        # menu, a pin and the app's own Desktop / Start menu shortcuts (shellicon)
         self._icon_step = -1
         self._glow_icons(0.0, time.monotonic(), force=True)
+        shellicon.follow_theme(self, theme.T["accent"], theme.T["accent2"])
 
     def _glow_icons(self, level: float, now: float, force: bool = False):
         """The title bar / taskbar and tray icons glow warm with whatever is playing,
@@ -2955,6 +2957,7 @@ class MainWindow(QMainWindow):
     # minimised (nothing to paint, but push-to-talk, the stream watchdog and the test
     # recording must go on). Qt tells us through these three events.
     def showEvent(self, ev):
+        shellicon.on_show(self)   # the Jump List icon, before the taskbar button exists
         super().showEvent(ev)
         self._set_tick_rate()
         note, self._pending_note = getattr(self, "_pending_note", None), None
@@ -3260,7 +3263,7 @@ class MainWindow(QMainWindow):
                      self.hotkeys.stop, self.replay.stop, self.remote.stop,
                      self.radio.shutdown, self.apps.shutdown, self.triggers.shutdown,
                      self.linkbar.shutdown,
-                     self.voice.shutdown, self.engine.shutdown):
+                     self.voice.shutdown, self.engine.shutdown, shellicon.detach):
             try:
                 step()
             except Exception:  # noqa: BLE001 - keep shutting the rest down

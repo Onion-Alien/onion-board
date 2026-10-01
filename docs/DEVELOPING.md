@@ -175,6 +175,8 @@ Get-Process OnionBoard -ErrorAction SilentlyContinue      # is it running?
   `ONIONBOARD_DEBUG=1` for more detail. Module logs: `module-<id>.log` beside it.
 - Config: `%APPDATA%\OnionBoard\config.json`, with backups `config.json.1`–`.3`.
 - Decoded-audio cache: `%APPDATA%\OnionBoard\cache\` (safe to delete).
+- Themed app icons: `%APPDATA%\OnionBoard\icons\` (the shortcuts point at one;
+  deleting it leaves them blank until the next start writes it again).
 - Never copy any of these into the repo. The log contains the user's paths, and
   `browser\` holds their logins.
 

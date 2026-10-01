@@ -110,6 +110,14 @@ def _never_touch_real_appdata(monkeypatch, tmp_path):
 
 
 @pytest.fixture(autouse=True)
+def _never_touch_real_shortcuts(monkeypatch):
+    """The theme re-icons the app's Desktop / Start menu shortcuts: never the
+    developer's real ones (offscreen already skips it; this is the second lock)."""
+    from soundboard import shellicon
+    monkeypatch.setattr(shellicon, "shortcut_folders", lambda: [])
+
+
+@pytest.fixture(autouse=True)
 def _never_update_for_real(monkeypatch, tmp_path):
     """The update check is on by default: no test asks GitHub, downloads an installer
     into %APPDATA% or runs one. Tests fake the parts they exercise."""
