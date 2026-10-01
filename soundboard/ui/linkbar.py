@@ -235,7 +235,7 @@ class LinkBar(QFrame):
         except Exception as e:  # noqa: BLE001 - shown in the bar, logged
             log.warning("link %s failed for %s: %s", kind, url, e)
             hint = ("" if not isinstance(e, ytdl.FetchError) or auto_update else
-                    " A newer yt-dlp may fix this: Settings → General → Update now.")
+                    " A newer yt-dlp may fix this: Settings → Updates → Update now.")
             self._msg.emit("error", url, f"Couldn't {'add' if kind == 'add' else 'play'} "
                                          f"it: {e}{hint}")
         finally:

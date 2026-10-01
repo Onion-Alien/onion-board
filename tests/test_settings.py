@@ -5,8 +5,8 @@ from soundboard.settings import SettingsDialog
 from test_mainwindow import window  # noqa: F401  (the real MainWindow fixture)
 
 
-def test_a_short_window_scrolls_the_general_page_instead_of_squashing_it(window, qapp):  # noqa: F811,E501
-    d = SettingsDialog(window, "general")
+def test_a_short_window_scrolls_a_page_instead_of_squashing_it(window, qapp):  # noqa: F811
+    d = SettingsDialog(window, "hotkeys")
     d.show()
     d.resize(2000, 700)             # wide and short, like a maximized window on a small screen
     for _ in range(5):
@@ -30,4 +30,21 @@ def test_support_opens_the_project_page_not_an_address_in_the_app(window, monkey
     btn = next(b for b in d.findChildren(QPushButton) if "Support" in b.text())
     btn.click()
     assert opened == ["https://github.com/Onion-Alien/onion-board#support-onion-board"]
+    d.close()
+
+
+def test_each_page_opens_by_name_and_holds_its_cards(window):  # noqa: F811
+    where = {"audio": ("YOUR MIC", "WHO'S LISTENING", "AUDIO BUFFERING"),
+             "hotkeys": ("HOTKEY SOUNDS",),
+             "general": ("WINDOW", "RUNNING IN THE BACKGROUND", "BACKUP",
+                         "SUPPORT ONION BOARD"),
+             "updates": ("APP UPDATES", "DOWNLOADER (YT-DLP)"),
+             "remote": ("REMOTE CONTROL (STREAM DECK, SCRIPTS)",)}
+    for page, titles in where.items():
+        d = SettingsDialog(window, page)
+        shown = {lb.text() for lb in d.tabs.currentWidget().widget().findChildren(QLabel)}
+        assert set(titles) <= shown, page
+        d.close()
+    d = SettingsDialog(window, "nonsense")
+    assert d.tabs.currentIndex() == 0
     d.close()

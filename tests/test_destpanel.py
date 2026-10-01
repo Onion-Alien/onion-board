@@ -1,4 +1,4 @@
-"""Settings → General → Who's listening, and the custom-mode editor."""
+"""Settings → Audio → Who's listening, and the custom-mode editor."""
 from PySide6.QtWidgets import QComboBox
 
 from soundboard import destination
@@ -14,7 +14,7 @@ def _dest_combo(page) -> QComboBox:
 
 def test_picking_a_mode_applies_and_saves(window):  # noqa: F811
     assert window.engine.dest is None
-    d = SettingsDialog(window, "general")
+    d = SettingsDialog(window, "audio")
     combo = _dest_combo(d.tabs.currentWidget())
     combo.setCurrentIndex(combo.findData("steam"))
     assert window.engine.dest is not None and window.engine.dest.key == "steam"
@@ -131,7 +131,7 @@ def test_the_setup_tab_has_the_picker_and_settings_follows_it(window):  # noqa: 
     assert window.setup_page.isAncestorOf(window.dest_panel)
     combo.setCurrentIndex(combo.findData("discord"))
     assert window.engine.dest is not None and window.engine.dest.key == "discord"
-    d = SettingsDialog(window, "general")
+    d = SettingsDialog(window, "audio")
     d.show()   # the Settings copy re-reads the mode when it appears
     assert _dest_combo(d.tabs.currentWidget()).currentData() == "discord"
     d.close()
@@ -184,7 +184,7 @@ def test_the_game_in_front_suggests_its_voice_engine(window):  # noqa: F811
     window._poll_voice()
     panel.combo.setCurrentIndex(panel.combo.findData("off"))
     assert panel.suggest.isHidden()
-    d = SettingsDialog(window, "general")          # a second picker hears it too
+    d = SettingsDialog(window, "audio")            # a second picker hears it too
     window.voice_watch.key = "game"
     window._poll_voice()
     other = next(p for p in d.findChildren(DestPanel))

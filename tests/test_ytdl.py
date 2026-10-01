@@ -253,7 +253,7 @@ def test_a_refused_download_does_not_update(pypi, monkeypatch):
     assert pypi["fetched"] == []
 
 
-# ---------------------------------------------------------------- Settings → General
+# ---------------------------------------------------------------- Settings → Updates
 
 from test_mainwindow import window  # noqa: E402,F401  (the real MainWindow fixture)
 
@@ -262,7 +262,7 @@ def test_settings_downloader_card(qapp, window, monkeypatch):  # noqa: F811
     from soundboard.settings import SettingsDialog
     monkeypatch.setattr(ytdl, "active_version", lambda: ("2026.8.19", False))
     monkeypatch.setattr(ytdl, "update", lambda: "Updated yt-dlp to 2099.1.1.")
-    d = SettingsDialog(window, "general")
+    d = SettingsDialog(window, "updates")
     assert "2026.8.19 (built in)" in d.ytdlp_label.text()
     d.ytdlp_btns[0].click()                               # Update now
     assert not d.ytdlp_btns[0].isEnabled()

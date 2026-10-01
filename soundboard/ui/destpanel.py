@@ -1,4 +1,4 @@
-"""Who's listening (on the Setup tab, and in Settings -> General): pick the
+"""Who's listening (on the Setup tab, and in Settings -> Audio): pick the
 destination mode that shapes the sounds bus for the voice chat on the other end
 (soundboard.destination), and an editor for custom modes (describe any other
 codec by the same knobs)."""

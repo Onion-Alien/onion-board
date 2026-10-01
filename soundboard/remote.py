@@ -1,7 +1,7 @@
 """Local control API: lets a Stream Deck (its "API request" / website actions, Bitfocus
 Companion, Touch Portal…), AutoHotkey or a script play pads.
 
-Off unless turned on in Settings → General. It listens on 127.0.0.1 only, on
+Off unless turned on in Settings → Remote. It listens on 127.0.0.1 only, on
 Config.api_port, and every request must carry the token shown in Settings, as
 `Authorization: Bearer <token>`, an `X-Token: <token>` header, or `?token=<token>`
 for tools that can only open a URL. The token is random, stays in config.json (a

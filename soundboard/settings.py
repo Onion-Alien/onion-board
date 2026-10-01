@@ -228,15 +228,19 @@ class SettingsDialog(QDialog):
         lay.setContentsMargins(16, 14, 16, 14)
         self.tabs = QTabWidget()
         self.tabs.setDocumentMode(True)
-        self.tabs.addTab(self._scroll(self._appearance()), "Appearance")
         self.hk_buttons: dict[str, list[QPushButton]] = {}
-        self.tabs.addTab(self._scroll(self._hotkeys()), "Hotkeys")
-        self.tabs.addTab(self._scroll(self._overlay()), "Overlay")
-        self.tabs.addTab(self._scroll(self._general()), "General")
-        for i, name in enumerate(("palette", "keyboard", "gamepad", "settings")):
-            icons.set_tab_icon(self.tabs, i, name)
-        self.tabs.setCurrentIndex(
-            {"appearance": 0, "hotkeys": 1, "overlay": 2, "general": 3}.get(page, 0))
+        pages = (("appearance", "Appearance", "palette", self._appearance),
+                 ("audio", "Audio", "volume", self._audio),
+                 ("hotkeys", "Hotkeys", "keyboard", self._hotkeys),
+                 ("overlay", "Overlay", "gamepad", self._overlay),
+                 ("general", "General", "settings", self._general),
+                 ("updates", "Updates", "reload", self._updates),
+                 ("remote", "Remote", "cable", self._remote))
+        for i, (_key, title, icon, build) in enumerate(pages):
+            self.tabs.addTab(self._scroll(build()), title)
+            icons.set_tab_icon(self.tabs, i, icon)
+        keys = [p[0] for p in pages]
+        self.tabs.setCurrentIndex(keys.index(page) if page in keys else 0)
         lay.addWidget(self.tabs, 1)
         close = QPushButton("Done")
         close.setObjectName("primary")
@@ -250,7 +254,7 @@ class SettingsDialog(QDialog):
     # ------------------------------------------------------------------ pages
     @staticmethod
     def _scroll(page: QWidget) -> QScrollArea:
-        """Pages scroll: a tall one (General) otherwise gets squashed, rows on top of
+        """Pages scroll: a tall one (Hotkeys) otherwise gets squashed, rows on top of
         each other, whenever the window can't grow to fit it (maximized, small screen)."""
         sa = QScrollArea()
         sa.setWidgetResizable(True)
@@ -270,8 +274,8 @@ class SettingsDialog(QDialog):
             lay = self.tabs.widget(i).widget().layout()
             need = max(need, lay.totalSizeHint().height(),
                        lay.totalHeightForWidth(width - 60) if lay.hasHeightForWidth() else 0)
-        # tab bar, Done row, margins; a normal window size, not the whole screen: the
-        # tall General page scrolls
+        # tab bar, Done row, margins; a normal window size, not the whole screen: a
+        # tall page scrolls
         height = min(need + 150, 760)
         if avail is not None:
             width = min(width, avail.width() - 40)
@@ -340,6 +344,15 @@ class SettingsDialog(QDialog):
                               "push-to-talk key and the app holds it for you while a sound, "
                               "live radio or a program plays. Leave it Off for open mic.")
         self._hk_row(cv, "ptt_key", "Hold this key", "")
+        v.addWidget(card)
+        card, cv = self._card("Hotkey sounds",
+                              "Short beeps in your headphones (only you hear them) when a hotkey "
+                              "starts or stops a recording or saves a clip — so you know it worked "
+                              "while you're in a game.")
+        cue = QCheckBox("Play hotkey beeps")
+        cue.setChecked(self.mw.cfg.cue_sounds)
+        cue.toggled.connect(lambda b: self.mw.set_option("cue_sounds", b))
+        cv.addWidget(cue)
         v.addWidget(card)
         note = QLabel("Per-sound hotkeys: right-click a pad → Set hotkey. "
                       "All hotkeys work while you're in a game.")
@@ -455,7 +468,7 @@ class SettingsDialog(QDialog):
 
         note = QLabel("Games in true exclusive fullscreen can't have anything drawn over them: "
                       "there the keys still work and you hear beeps instead (turn on hotkey "
-                      "beeps in General). Borderless / windowed fullscreen shows the overlay. "
+                      "beeps above). Borderless / windowed fullscreen shows the overlay. "
                       "Some games also see the number keys you press — if picking a sound "
                       "switches your weapon, use the numpad.")
         note.setObjectName("hint")
@@ -525,7 +538,7 @@ class SettingsDialog(QDialog):
         for wdg in getattr(self, "ov_toggle_only", ()):
             wdg.setEnabled(self.mw.overlay.s.mode == "toggle")   # hold mode: letting go hides
 
-    def _general(self):
+    def _audio(self):
         w, v = self._page()
         card, cv = self._card("Your mic",
                               "Normally others hear your voice and your sounds together. Untick "
@@ -546,25 +559,6 @@ class SettingsDialog(QDialog):
         from soundboard.ui.destpanel import DestPanel
         cv.addWidget(DestPanel(self.mw))
         v.addWidget(card)
-        card, cv = self._card("Window")
-        top = QCheckBox("Keep the window on top of other windows")
-        top.setChecked(self.mw.cfg.always_on_top)
-        top.toggled.connect(self.mw.on_top_toggle)
-        cv.addWidget(top)
-        v.addWidget(card)
-        v.addWidget(self._background_card())
-        v.addWidget(self._backup_card())
-        v.addWidget(self._updates_card())
-        v.addWidget(self._remote_card())
-        card, cv = self._card("Hotkey sounds",
-                              "Short beeps in your headphones (only you hear them) when a hotkey "
-                              "starts or stops a recording or saves a clip — so you know it worked "
-                              "while you're in a game.")
-        cue = QCheckBox("Play hotkey beeps")
-        cue.setChecked(self.mw.cfg.cue_sounds)
-        cue.toggled.connect(lambda b: self.mw.set_option("cue_sounds", b))
-        cv.addWidget(cue)
-        v.addWidget(card)
         card, cv = self._card("Audio buffering",
                               "Low keeps your voice and sounds as immediate as possible. If the "
                               "status line reports drop-outs (crackles, stutters), Safer uses "
@@ -583,8 +577,33 @@ class SettingsDialog(QDialog):
         stat.setObjectName("hint")
         cv.addWidget(stat)
         v.addWidget(card)
-        v.addWidget(self._downloader_card())
+        v.addStretch(1)
+        return w
+
+    def _general(self):
+        w, v = self._page()
+        card, cv = self._card("Window")
+        top = QCheckBox("Keep the window on top of other windows")
+        top.setChecked(self.mw.cfg.always_on_top)
+        top.toggled.connect(self.mw.on_top_toggle)
+        cv.addWidget(top)
+        v.addWidget(card)
+        v.addWidget(self._background_card())
+        v.addWidget(self._backup_card())
         v.addWidget(self._support_card())
+        v.addStretch(1)
+        return w
+
+    def _updates(self):
+        w, v = self._page()
+        v.addWidget(self._updates_card())
+        v.addWidget(self._downloader_card())
+        v.addStretch(1)
+        return w
+
+    def _remote(self):
+        w, v = self._page()
+        v.addWidget(self._remote_card())
         v.addStretch(1)
         return w
 

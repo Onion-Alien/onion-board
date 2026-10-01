@@ -1,5 +1,5 @@
 """Is there a newer Onion Board, and installing it. The app asks the project's latest
-GitHub release once a day (Settings → General; on unless unticked), plus a "Check now"
+GitHub release once a day (Settings → Updates; on unless unticked), plus a "Check now"
 button.
 
 A newer version is only announced. Nothing is downloaded until the user presses

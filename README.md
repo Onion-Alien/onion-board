@@ -119,7 +119,7 @@ Next to **My mic** at the bottom of the window there's a **send** box:
 - **Unticked** (sounds only): others hear **only the sounds**, never your mic.
   Handy if you talk through a different app, or just want to be the DJ.
 
-The same switch is in **⚙ Settings → General → Your mic** and in the setup guide.
+The same switch is in **⚙ Settings → Audio → Your mic** and in the setup guide.
 
 ### Something's not right?
 
@@ -251,7 +251,7 @@ too (say No if another program, like Voicemeeter, uses it).
   [yt-dlp](https://github.com/yt-dlp/yt-dlp)). TikTok, Instagram and most other
   sites have no search without an account, so paste a link to the video instead.
   YouTube's m4a/webm audio needs FFmpeg, like a dropped m4a file does. Settings →
-  General has *Update now* and *Reset downloader* for when downloads start
+  Updates has *Update now* and *Reset downloader* for when downloads start
   failing, and an opt-in box to update yt-dlp from PyPI automatically (off by
   default).
 - **⚙ Settings:** 31 themes in four groups — Classic (Dark, Light, true-black
@@ -266,7 +266,7 @@ too (say No if another program, like Voicemeeter, uses it).
   device at a time: if one is busy, Onion Board says so and picks it up once it's
   free. A cheap USB macro keypad works too: set its keys to F13–F24 (keys nothing
   else uses) and use those as hotkeys.
-- **Stream Deck and scripts (optional, off by default):** Settings → General →
+- **Stream Deck and scripts (optional, off by default):** Settings → Remote →
   *Remote control* lets programs on this PC play your sounds: a Stream Deck
   (Bitfocus Companion, Touch Portal, its website buttons), AutoHotkey or a script.
   It only listens on this PC and needs the key shown there (*Copy link* gives a
@@ -275,7 +275,7 @@ too (say No if another program, like Voicemeeter, uses it).
   the overlay keep working; right-click the tray icon → *Quit*). Optionally
   **starts with Windows**, straight to the tray.
 - **Updates itself:** once a day it checks GitHub for a new version (untick it in
-  Settings → General). *Update now* downloads it, checks it's the file GitHub lists,
+  Settings → Updates). *Update now* downloads it, checks it's the file GitHub lists,
   and on *Restart now* installs it and reopens the app, keeping your sounds and
   settings. Nothing is downloaded until you click.
 
@@ -527,7 +527,7 @@ the newest backup is used, so the pad list is never silently reset.
   tab's globe can appear without rebuilding it. On a machine whose GPU driver or remote-desktop
   session can't do that, set `QT_WIDGETS_RHI=0` before launching.
 - Drop-outs reported by the audio driver are counted and shown in the status line.
-  **⚙ Settings → General → Audio buffering: Safer** trades a little delay for bigger
+  **⚙ Settings → Audio → Audio buffering: Safer** trades a little delay for bigger
   buffers if a device keeps crackling.
 - A stream whose callback stops (headset unplugged, sample rate changed, PC woke from
   sleep) is reopened automatically within about a second; a device that failed to open

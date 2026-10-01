@@ -185,7 +185,7 @@ class MainWindow(QMainWindow):
         self._load_all()
         self._fit_overlay_key()
         self.register_hotkeys()
-        # Stream Deck / scripts (Settings → General), only if turned on
+        # Stream Deck / scripts (Settings → Remote), only if turned on
         self.remote = remote.RemoteControl(lambda a, p: remote.dispatch(self, a, p), self)
         self.apply_remote()
         a11y.label_tree(self, force=True)   # names for the icon-only buttons
@@ -1122,7 +1122,7 @@ class MainWindow(QMainWindow):
         self._xruns_shown = xr
         if xr:
             tip = ("" if self.cfg.latency == "high" else
-                   " — try Settings → General → Audio buffering: Safer")
+                   " — try Settings → Audio → Audio buffering: Safer")
             text += (f"{'<br>' if text else ''}<span style='color:{theme.status('warn')}'>"
                      f"{xr} audio drop-out"
                      f"{'s' if xr != 1 else ''} since start{tip}</span>")
