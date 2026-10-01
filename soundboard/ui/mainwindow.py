@@ -3039,7 +3039,8 @@ class MainWindow(QMainWindow):
                                 or e.aux_on_air())
         want = self.cfg.ptt_key if (self.cfg.ptt_key and on_air) else None
         if want != self._ptt_held:
-            self._release_ptt()
+            if not self._release_ptt():
+                return   # still held: try the key-up again next tick
             if want and winkeys.press(want):
                 self._ptt_held = want
 
@@ -3089,10 +3090,15 @@ class MainWindow(QMainWindow):
             self.np_time.setText(fmt_pos(frac * m.duration, m.duration))
             self.mini_time.setText(self.np_time.text())
 
-    def _release_ptt(self):
+    def _release_ptt(self) -> bool:
+        """Let go of the PTT key we hold. False if Windows refused the key-up (an
+        admin window or a UAC prompt in front blocks it): it stays ours to release,
+        or the game's push-to-talk would stay stuck down."""
         if self._ptt_held:
-            winkeys.release(self._ptt_held)
+            if not winkeys.release(self._ptt_held):
+                return False
             self._ptt_held = None
+        return True
 
     # ------------------------------------------------------------------ small windows
     def _init_fit(self):

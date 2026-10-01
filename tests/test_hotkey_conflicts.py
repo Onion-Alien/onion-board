@@ -70,3 +70,16 @@ def test_the_default_overlay_key_moves_off_a_letter_on_other_layouts(qapp, app_d
 
 def test_a_us_layout_keeps_the_backtick(window):  # noqa: F811
     assert window.cfg.overlay_hotkey == "`" and window.cfg.overlay_key_checked
+
+
+def test_a_blocked_ptt_key_up_is_tried_again(window, monkeypatch):  # noqa: F811
+    """An admin window in front makes Windows drop the key-up: the app must keep
+    trying, not forget it holds the key (the game's PTT would stay stuck down)."""
+    ok = {"up": False}
+    ups = []
+    monkeypatch.setattr(main.winkeys, "release", lambda k: ups.append(k) or ok["up"])
+    window._ptt_held = "v"
+    assert window._release_ptt() is False and window._ptt_held == "v"
+    ok["up"] = True
+    assert window._release_ptt() is True and window._ptt_held is None
+    assert ups == ["v", "v"]

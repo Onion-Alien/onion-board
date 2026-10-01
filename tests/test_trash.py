@@ -152,3 +152,26 @@ def test_removing_from_the_menu_asks_first_and_the_bin_button_shows(window, monk
     assert window.ask_remove(["s0"]) and window.meta("s0") is None
     window._finish_removals()
     assert not window.btn_bin.isHidden() and window.btn_bin.text() == "Recently deleted (1)"
+
+
+def test_a_locked_bin_list_is_never_saved_over(app_dir, monkeypatch):
+    """Antivirus or OneDrive holding deleted.json while a sound is binned: the rest
+    of the bin must survive (it used to read as empty and be saved over)."""
+    for sid in ("k1", "k2"):
+        trash.put_sound(_sound(app_dir, sid), 0)
+    assert len(trash.items()) == 2
+    real = Path.read_text
+    locked = {"n": 0}
+
+    def read_text(self, *a, **k):
+        if self.name == "deleted.json":
+            locked["n"] += 1
+            raise PermissionError(32, "being used by another process")
+        return real(self, *a, **k)
+
+    monkeypatch.setattr(trash.time, "sleep", lambda _s: None)
+    monkeypatch.setattr(Path, "read_text", read_text)
+    trash.put_sound(_sound(app_dir, "k3"), 0)
+    assert locked["n"] > 1                     # tried again before giving up
+    monkeypatch.setattr(Path, "read_text", real)
+    assert sorted(i.data["id"] for i in trash.items()) == ["k1", "k2"]

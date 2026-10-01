@@ -588,3 +588,17 @@ def test_mic_gate_mutes_the_mic_only_while_a_sound_plays():
     for _ in range(5):
         mic_level()
     assert mic_level() > 0.4
+
+
+def test_a_broken_block_from_a_program_is_silenced():
+    """A captured program handing over NaN / Inf must not reach the send chain's
+    filters (one NaN there silences the call until a restart)."""
+    a = eng.AuxSource("app", {"main": SR, "mon": SR})
+    x = np.full((960, 2), 0.1, np.float32)
+    x[5, 0], x[9, 1] = np.nan, np.inf
+    a.feed(x, True, True)
+    assert np.isfinite(a.level)
+    got = a.ring_main.read(480)
+    assert got is None or np.isfinite(got).all()
+    y = np.array([[np.nan, -np.inf], [0.2, 0.2]], np.float32)
+    assert np.isfinite(eng.finite(y)).all() and y[1, 0] == np.float32(0.2)

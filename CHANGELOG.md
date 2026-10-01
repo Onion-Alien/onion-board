@@ -1,5 +1,17 @@
 # Changelog
 
+## 1.5.7 — 2026-10-01
+
+- **Push-to-talk can't get stuck down any more.** With an admin window or a Windows
+  prompt in front, Windows can refuse the key-up after a sound; Onion Board now keeps
+  trying until it goes through, instead of leaving your game's push-to-talk held.
+- **A glitch from a captured program can't silence your call.** One broken block of
+  audio from a program on the Apps tab could leave the people you're talking to
+  hearing nothing until a restart; it's now turned into a moment of silence.
+- **Recently deleted can't be wiped by a locked file.** If an antivirus or OneDrive was
+  holding the bin's list just as you deleted a sound, everything else in the bin was
+  lost from the list. Now it waits, and never saves over a list it couldn't read.
+
 ## 1.5.6 — 2026-10-01
 
 - **The app icon follows your theme everywhere**: the taskbar's right-click menu,

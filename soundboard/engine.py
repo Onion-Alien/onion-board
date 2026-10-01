@@ -346,6 +346,14 @@ def peak(x: np.ndarray) -> float:
     return float(np.max(np.abs(x))) if len(x) else 0.0
 
 
+def finite(x: np.ndarray) -> np.ndarray:
+    """`x` with any NaN / Inf sample made silent (in place). One such sample would stay
+    in the send chain's filters for good: the call would hear nothing until a restart."""
+    if len(x) and not np.isfinite(np.max(np.abs(x))):
+        np.nan_to_num(x, copy=False, nan=0.0, posinf=0.0, neginf=0.0)
+    return x
+
+
 def is_xrun(status) -> bool:
     """True if a callback status reports a real drop-out (not just output priming)."""
     if not status:
@@ -409,6 +417,9 @@ class AuxSource:
 
     def feed(self, x: np.ndarray, main: bool, mon: bool):
         lvl = peak(x)
+        if not np.isfinite(lvl):   # a program's capture can hand over a broken block
+            x = finite(np.array(x, dtype=np.float32))
+            lvl = peak(x)
         self.level = max(lvl * self.vol, self.level)
         if lvl > 0.003:
             self._heard = time.monotonic()
@@ -1272,7 +1283,7 @@ class Engine:
                 if a.live:
                     mix += x * np.float32(a.vol)
         self.level_play = max(play, self.level_play * 0.85)
-        mix = self._send_bus("main", mix, self.ring_main.read(frames))
+        mix = self._send_bus("main", finite(mix), self.ring_main.read(frames))
         if not self.sending:      # muted: others get silence, nothing else changes
             mix.fill(0)
         if self.limiter_on:
@@ -1312,6 +1323,7 @@ class Engine:
                 if a.monitor or (check and a.live):
                     mix += x * np.float32(a.vol)
         self.level_play = max(play, self.level_play)   # _main decays it; no main: the UI does
+        finite(mix)
         if check:   # you hear what others get: the same send stage, your mic in it
             mix = self._send_bus("mon", mix, m)
         else:

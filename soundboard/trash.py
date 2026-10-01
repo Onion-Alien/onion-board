@@ -52,13 +52,27 @@ class Item:
 
 def load() -> list[Item]:
     """What's in the bin, oldest first. A damaged file reads as an empty bin."""
-    try:
-        raw = json.loads(_index().read_text(encoding="utf-8"))
-    except FileNotFoundError:
-        return []
-    except (OSError, ValueError):
-        log.warning("couldn't read %s", _index(), exc_info=True)
-        return []
+    return _read()[0]
+
+
+def _read(tries: int = 1) -> tuple[list[Item], bool]:
+    """The bin, and False when its index exists but couldn't be read (locked by an
+    antivirus or OneDrive): then it mustn't be saved over, or everything in it is lost.
+    A locked file is tried `tries` times."""
+    for n in range(tries):
+        try:
+            raw = json.loads(_index().read_text(encoding="utf-8"))
+            break
+        except FileNotFoundError:
+            return [], True
+        except ValueError:
+            log.warning("couldn't read %s", _index(), exc_info=True)
+            return [], True   # damaged for good: starting over is all that's left
+        except OSError:
+            if n == tries - 1:
+                log.warning("couldn't read %s", _index(), exc_info=True)
+                return [], False
+            time.sleep(0.1)
     items = []
     for d in raw.get("items", []) if isinstance(raw, dict) else []:
         try:
@@ -69,7 +83,7 @@ def load() -> list[Item]:
             continue
         if it.kind in (SOUND, APP):
             items.append(it)
-    return items
+    return items, True
 
 
 def _save(items: list[Item]) -> None:
@@ -133,7 +147,10 @@ def put_app(exe: str, spec: dict, name: str, hidden: bool = False) -> Item:
 
 def _add(item: Item) -> None:
     with _lock:
-        all_ = load()
+        all_, ok = _read(tries=10)
+        if not ok:   # keep the rest of the bin; this one's files stay in its folder
+            log.warning("the bin's list is locked: %s isn't listed in it", item.name)
+            return
         all_.append(item)
         _save(_prune(all_))
 
