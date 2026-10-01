@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+- **The version is on show**: in the title bar, the taskbar, the tray icon's
+  tooltip and under the logo, so you can tell at a glance which one you're running.
+
 ## 1.5.5 — 2026-10-01
 
 - **Country and island names on the Radio globe**, so you can find places without

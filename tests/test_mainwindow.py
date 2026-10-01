@@ -390,3 +390,16 @@ def test_a_whole_row_of_pads_before_the_mixer(window, qapp):
     qapp.processEvents()
     if not window.is_mini():
         assert window._pads_scroll.height() >= window.pads["s0"].height()
+
+
+def test_the_window_shows_which_version_is_running(window, monkeypatch):
+    from soundboard import __version__
+    from soundboard.ui import mainwindow
+    assert window.windowTitle() == f"Onion Board {__version__} from source"
+    assert window.tagline.text().endswith(f"v{__version__} from source")
+    window.on_mic_check(True)                           # the warning keeps the version
+    assert window.windowTitle().endswith(f"Onion Board {__version__} from source")
+    window.on_mic_check(False)
+    assert window.windowTitle() == f"Onion Board {__version__} from source"
+    monkeypatch.setattr("sys.frozen", True, raising=False)
+    assert mainwindow.version_text() == __version__     # the installed app: just the number

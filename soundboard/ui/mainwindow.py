@@ -62,6 +62,14 @@ from soundboard.winkeys import Hotkeys
 
 log = logging.getLogger(__name__)
 
+
+def version_text() -> str:
+    """The version, as the title bar and header show it: "1.5.5", or "1.5.5 from
+    source" when run with Python rather than the installed app."""
+    from soundboard import __version__
+    return __version__ if getattr(sys, "frozen", False) else f"{__version__} from source"
+
+
 # The tabs, in order: each one is a thing you can play (or, last, the setup). The
 # tooltip says what it's for in a few words.
 TABS = (("Sounds", "Your sound buttons: click one to play it"),
@@ -102,7 +110,8 @@ class MainWindow(QMainWindow):
 
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("Onion Board")
+        self.title = f"Onion Board {version_text()}"
+        self.setWindowTitle(self.title)
         self.setAcceptDrops(True)   # files dropped outside the pad grid: see dropEvent
         self.cfg = Config.load()
         app = QApplication.instance()
@@ -244,7 +253,7 @@ class MainWindow(QMainWindow):
         names.setSpacing(0)
         self.wordmark = QLabel("ONION BOARD")
         self.wordmark.setObjectName("wordmark")
-        self.tagline = QLabel("an app by Onion Alien")
+        self.tagline = QLabel(f"an app by Onion Alien · v{version_text()}")
         self.tagline.setObjectName("tagline")
         names.addWidget(self.wordmark)
         names.addWidget(self.tagline)
@@ -2589,7 +2598,7 @@ class MainWindow(QMainWindow):
         if not QSystemTrayIcon.isSystemTrayAvailable():
             return
         t = self.tray = QSystemTrayIcon(glow_icon(theme.T["accent"], theme.T["accent2"], 0.0), self)
-        t.setToolTip("Onion Board")
+        t.setToolTip(self.title)
         menu = QMenu(self)
         menu.addAction("Open Onion Board", self.show_from_tray)
         icons.set_icon(menu.addAction("Stop all sounds", self.stop_all), "stop")
@@ -2869,7 +2878,7 @@ class MainWindow(QMainWindow):
         else:
             self._pulse.stop()
             self._banner_fx.setOpacity(1.0)
-        self.setWindowTitle("● MIC LIVE IN HEADPHONES — Onion Board" if on else "Onion Board")
+        self.setWindowTitle(f"● MIC LIVE IN HEADPHONES — {self.title}" if on else self.title)
         self.mic_lbl.setStyleSheet(f"color:{theme.status('error')};" if on else "")
         self.mic_meter.hot = on
         if on and not self.cfg.mic_enabled:
