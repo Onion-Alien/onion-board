@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 1.5.6 — 2026-10-01
 
 - **The app icon follows your theme everywhere**: the taskbar's right-click menu,
   a taskbar pin and the Onion Board shortcuts on your Desktop and Start menu (so
