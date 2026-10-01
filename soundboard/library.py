@@ -12,6 +12,7 @@ import json
 import logging
 import math
 import os
+import re
 import shutil
 import subprocess
 import sys
@@ -39,6 +40,7 @@ CACHE_DIR = APP_DIR / "cache"
 THUMBS_DIR = APP_DIR / "thumbs"   # pad pictures (soundboard.thumbs)
 CONFIG_PATH = APP_DIR / "config.json"
 CONFIG_VERSION = 4
+LOAD_TRIES = 12      # ~10 s of retries while config.json is locked
 CONFIG_BACKUPS = 3   # config.json.1 … .3, rotated on every save that changes something
 # where install-vbcable.ps1 lives: installer/ in a source checkout, or the frozen
 # app's _internal folder (PyInstaller's _MEIPASS; build.ps1 bundles it at its root)
@@ -123,11 +125,17 @@ def clean_setting(k: str, v):
     return v
 
 
+_OUR_SOUND_FILE = re.compile(r"[0-9a-f]{10}_")
+
+
 def _is_our_old_folder() -> bool:
     """%APPDATA%\\Soundboard is a common name: only take it if it looks like ours
-    (a config.json of ours, or a sounds folder), never another program's data."""
-    if (OLD_APP_DIR / "sounds").is_dir():
-        return True
+    (a config.json of ours, or a sounds folder of our files), never another program's data."""
+    try:   # our sound files are named <10-hex id>_<name>
+        if any(_OUR_SOUND_FILE.match(f.name) for f in (OLD_APP_DIR / "sounds").iterdir()):
+            return True
+    except OSError:
+        pass
     try:
         raw = json.loads((OLD_APP_DIR / "config.json").read_text(encoding="utf-8-sig"))
     except (OSError, ValueError):
@@ -266,6 +274,9 @@ class Config:
     # set by load() when the settings weren't read cleanly, for the window to tell the
     # user (not a dataclass field, so it's never saved)
     load_note: ClassVar[str] = ""
+    # set by load() when config.json stayed locked: a backup was loaded, and saving
+    # would overwrite the user's newest settings with it
+    read_only: ClassVar[bool] = False
 
     @classmethod
     def load(cls) -> Config:
@@ -274,10 +285,11 @@ class Config:
         do the defaults apply. A missing file with backups beside it (deleted, or lost
         mid-save) is recovered the same way, before a save rotates the backups away.
         The pad list is never silently thrown away."""
-        raw, err, missing = None, None, False
-        for attempt in range(5):   # OneDrive / antivirus can hold the file for a moment
+        raw, err, missing, locked = None, None, False, False
+        for attempt in range(LOAD_TRIES):   # OneDrive / antivirus can hold it for a moment
             try:
                 raw = json.loads(CONFIG_PATH.read_text(encoding="utf-8-sig"))   # sig: a BOM is fine
+                locked = False
                 break
             except FileNotFoundError as e:
                 if not any(CONFIG_PATH.with_name(f"config.json.{i}").exists()
@@ -286,16 +298,36 @@ class Config:
                 err, missing = e, True
                 break
             except ValueError as e:
-                err = e
+                err, locked = e, False
                 break
-            except OSError as e:
-                err = e
-                time.sleep(0.2 * (attempt + 1))
+            except OSError as e:   # locked (sharing violation, access denied): not damage
+                err, locked = e, True
+                time.sleep(min(0.2 * (attempt + 1), 1.0))
         if raw is not None:
             try:
-                return cls.from_raw(raw)
+                cfg = cls.from_raw(raw)
+                cls._keep_newer(raw)
+                return cfg
             except (TypeError, ValueError, KeyError, AttributeError) as e:
                 err = e
+        if locked:   # it may be fine: load a backup, but never save over the newest edits
+            log.error("config %s stayed locked: %r; not saving this session", CONFIG_PATH, err)
+            for name, raw in cls._backups():
+                try:
+                    cfg = cls.from_raw(raw)
+                except (TypeError, ValueError, KeyError, AttributeError):
+                    continue
+                cfg.read_only = True
+                cfg.load_note = (f"Your settings file was locked by another program, so the "
+                                 f"last copy ({name}) was loaded instead. Changes won't be "
+                                 "saved until you restart Onion Board.")
+                return cfg
+            cfg = cls()
+            cfg.read_only = True
+            cfg.load_note = ("Your settings file was locked by another program, so Onion "
+                             "Board started with default settings. Changes won't be saved "
+                             "until you restart it.")
+            return cfg
         log.error("config %s is unreadable: %r", CONFIG_PATH, err)
         broken = "" if missing else cls._set_aside()
         kept = ("" if missing else
@@ -316,6 +348,24 @@ class Config:
                          "Onion Board started with default settings. Your sound files are "
                          f"still in {SOUNDS_DIR}.{kept}")
         return cfg
+
+    @classmethod
+    def _keep_newer(cls, raw: dict):
+        """A config written by a newer version has fields this one doesn't know, and
+        the next save drops them: keep a copy (config.json.newer) the first time."""
+        try:
+            version = int(raw.get("version", 1) or 1)
+        except (TypeError, ValueError):
+            return
+        newer = CONFIG_PATH.with_name("config.json.newer")
+        if version <= CONFIG_VERSION or newer.exists():
+            return
+        try:
+            shutil.copy2(CONFIG_PATH, newer)
+            log.warning("config is from a newer version (v%s, this one reads v%s): kept a "
+                        "copy as %s", version, CONFIG_VERSION, newer.name)
+        except OSError:
+            log.warning("couldn't keep a copy of the newer config", exc_info=True)
 
     @classmethod
     def _set_aside(cls) -> str:
@@ -403,6 +453,9 @@ class Config:
     def save(self) -> bool:
         """Write atomically, keeping the last CONFIG_BACKUPS good copies. Returns
         False (and logs) instead of raising: this runs from a timer on the UI thread."""
+        if self.read_only:
+            log.warning("not saving settings: config.json was locked at startup")
+            return False
         try:
             APP_DIR.mkdir(parents=True, exist_ok=True)
             text = json.dumps(self.to_raw(), indent=2)
@@ -707,13 +760,18 @@ def original_peaks(meta: SoundMeta, n: int = 400) -> tuple[np.ndarray, float]:
 
 
 def fingerprint(path: str) -> str:
-    """Cheap identity for a source file: size + hash of its first megabyte."""
+    """Cheap identity for a source file: size + hash of its first and last megabyte
+    (a file of up to 1 MB hashes as it always did, whole)."""
     try:
         p = Path(path)
         h = hashlib.blake2b(digest_size=12)
-        h.update(str(p.stat().st_size).encode())
+        size = p.stat().st_size
+        h.update(str(size).encode())
         with p.open("rb") as f:
             h.update(f.read(1 << 20))
+            if size > 1 << 20:
+                f.seek(max(size - (1 << 20), 1 << 20))
+                h.update(f.read(1 << 20))
         return h.hexdigest()
     except OSError:
         return ""
@@ -774,7 +832,7 @@ def import_file(src: str, color: str) -> tuple[SoundMeta, np.ndarray]:
             sf.write(dest, data, SR, subtype="PCM_16")
         else:
             shutil.copy2(srcp, dest)
-        meta = SoundMeta(id=sid, name=srcp.stem.replace("_", " ").strip()[:40],
+        meta = SoundMeta(id=sid, name=srcp.stem.replace("_", " ").strip()[:40] or "Sound",
                          file=str(dest), color=color, level_gain=level_gain(data),
                          duration=len(data) / SR, fingerprint=fingerprint(src))
         return meta, store_cached(sid, data)

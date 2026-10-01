@@ -26,6 +26,8 @@ import ipaddress
 import json
 import logging
 import random
+import socket
+import threading
 import time
 from dataclasses import asdict, dataclass, field
 from urllib.parse import quote
@@ -124,10 +126,31 @@ def _http(url: str) -> str:
     try:
         ip = ipaddress.ip_address(host)
     except ValueError:
-        return url   # a name, not an address
+        return url   # a name, not an address: RadioPlayer looks up where it points
+    return "" if _local_ip(ip) else url
+
+
+def _local_ip(ip) -> bool:
+    """Is this address this PC or the home network (or nowhere real)?"""
     ip = getattr(ip, "ipv4_mapped", None) or ip   # ::ffff:127.0.0.1
-    return "" if (ip.is_private or ip.is_loopback or ip.is_link_local or ip.is_unspecified
-                  or ip.is_multicast or ip.is_reserved) else url
+    return (ip.is_private or ip.is_loopback or ip.is_link_local or ip.is_unspecified
+            or ip.is_multicast or ip.is_reserved)
+
+
+def _name_is_local(host: str) -> bool:
+    """Does the station's host name lead into this PC / the home network? A name that
+    doesn't resolve isn't refused here: the stream just fails to connect, as it would."""
+    try:
+        infos = socket.getaddrinfo(host, None, proto=socket.IPPROTO_TCP)
+    except (OSError, UnicodeError):
+        return False
+    for info in infos:
+        try:
+            if _local_ip(ipaddress.ip_address(info[4][0].split("%")[0])):
+                return True
+        except ValueError:
+            continue
+    return False
 
 
 def _num(v, lo: float, hi: float) -> float | None:
@@ -426,6 +449,7 @@ class RadioPlayer(QObject):
     state = Signal(str)          # connecting | playing | stopped | error
     error = Signal(str)
     now_playing = Signal(str)    # the stream's own title (song / show), when it sends one
+    _looked_up = Signal(int, bool)   # (play generation, the host is local): lookup thread
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -444,6 +468,7 @@ class RadioPlayer(QObject):
         self._watch = QTimer(self)
         self._watch.setInterval(1000)
         self._watch.timeout.connect(self._check)
+        self._looked_up.connect(self._on_looked_up)
 
     def _make(self):
         fmt = QAudioFormat()
@@ -474,7 +499,28 @@ class RadioPlayer(QObject):
         self._retries = 0
         self._reconnecting = self._reopen_pending = False
         self._gen += 1
+        host = QUrl(station.url).host()
+        try:
+            ipaddress.ip_address(host)   # an address was already checked (_http)
+        except ValueError:   # a name: where it leads is looked up first, off the UI thread
+            self._set_state("connecting")
+            gen = self._gen
+            threading.Thread(target=lambda: self._looked_up.emit(gen, _name_is_local(host)),
+                             daemon=True, name="radio-lookup").start()
+            return
         self._open()
+
+    def _on_looked_up(self, gen: int, local: bool):
+        if gen != self._gen or self.station is None:
+            return
+        if not local:
+            self._open()
+            return
+        log.warning("radio: refused %s, its address is on this PC / home network",
+                    self.station.url)
+        self.station = None
+        self._set_state("error")
+        self.error.emit("this station points into your home network, so it isn't played")
 
     def _open(self):
         self._got_audio = False

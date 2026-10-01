@@ -9,6 +9,7 @@ import threading
 import time
 import types
 import zipfile
+from pathlib import Path
 from collections import namedtuple
 
 import numpy as np
@@ -182,6 +183,34 @@ def test_update_rejects_a_bad_checksum(pypi):
     with pytest.raises(ytdl.DownloadError, match="checksum"):
         ytdl.update()
     assert ytdl.active_version() == ("2026.8.19", False)
+
+
+def test_a_swap_that_fails_halfway_keeps_the_copy_in_use(pypi, monkeypatch):
+    ytdl.update()
+    pypi["latest"] = "2099.2.2"
+    real = Path.rename
+
+    def rename(self, target):
+        if self.name.startswith("new-"):
+            raise PermissionError("in use")
+        return real(self, target)
+    with monkeypatch.context() as m:
+        m.setattr(Path, "rename", rename)
+        with pytest.raises(ytdl.DownloadError):
+            ytdl.update()
+    assert ytdl.active_version() == ("2099.1.1", True)
+    assert (ytdl._pkg_dir() / "yt_dlp" / "__init__.py").is_file()
+    assert not list(ytdl.root().glob("old-*")) and not list(ytdl.root().glob("new-*"))
+
+
+def test_leftovers_of_a_cut_short_update_are_tidied_at_startup(pypi):
+    ytdl.update()
+    ytdl._pkg_dir().rename(ytdl.root() / "old-1")   # stopped between the two renames
+    (ytdl.root() / "new-abc" / "yt_dlp").mkdir(parents=True)
+    ytdl.install()
+    assert ytdl.active_version() == ("2099.1.1", True)
+    assert (ytdl._pkg_dir() / "yt_dlp" / "__init__.py").is_file()
+    assert not list(ytdl.root().glob("old-*")) and not list(ytdl.root().glob("new-*"))
 
 
 def test_reset_clears_and_reinstalls(pypi):

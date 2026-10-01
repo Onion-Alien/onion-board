@@ -2263,8 +2263,8 @@ class MainWindow(QMainWindow):
             m, index, data = entries.pop()
             if any(o.id == m.id for o in self.cfg.sounds):
                 continue   # already back
-            if m.hotkey and any(o.hotkey == m.hotkey for o in self.cfg.sounds):
-                m.hotkey = ""   # given to another sound in the meantime
+            if m.hotkey and self._hotkey_taken(m.hotkey):
+                m.hotkey = ""   # given to something else in the meantime
             self.cfg.sounds.insert(min(index, len(self.cfg.sounds)), m)
             for t in m.tags:
                 if t not in self.cfg.categories:
@@ -2279,6 +2279,14 @@ class MainWindow(QMainWindow):
         if any(m.id not in self.audio for m in self.cfg.sounds):
             self._load_all()
         self.register_hotkeys()
+
+    def _hotkey_taken(self, combo: str) -> bool:
+        """Does a sound, an app-wide action, the push-to-talk key or a category's
+        random-sound key already have `combo`?"""
+        return (any(o.hotkey == combo for o in self.cfg.sounds)
+                or any(getattr(self.cfg, attr) == combo for attr, *_ in HOTKEY_ACTIONS)
+                or self.cfg.ptt_key == combo
+                or combo in self.cfg.category_hotkeys.values())
 
     def _finish_removals(self):
         """The undo window is over: the removed sounds go to Recently deleted

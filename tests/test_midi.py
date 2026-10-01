@@ -133,6 +133,26 @@ def test_unplugged_and_plugged_back_in(qapp):
     assert got == [("press", "midi:note 40:LPD8")]
 
 
+def test_closing_a_device_lets_go_of_the_pads_held_on_it(qapp):
+    """Turned off (or no longer wanted) while a hold-to-play pad is down: no note-off
+    will ever come, so closing it releases what was held."""
+    fake = FakeWinMM(["LPD8"])
+    m = midi.MidiIn(fake)
+    got = listen(m)
+    m.want({"LPD8"})
+    fake.hit("LPD8", note_on(36))
+    fake.hit("LPD8", note_on(37))
+    fake.hit("LPD8", note_on(37, vel=0))
+    fake.hit("LPD8", 0xC0 | 5 << 8)             # program change: nothing to release
+    (key,) = fake.opened
+    fake.on_closed(key)                         # switched off
+    fake.names = []
+    m.sync()
+    assert got[-1] == ("release", "midi:note 36:LPD8")
+    assert [g for g in got if g[0] == "release"] == [("release", "midi:note 37:LPD8"),
+                                                     ("release", "midi:note 36:LPD8")]
+
+
 def test_two_of_the_same_controller_are_told_apart(qapp):
     fake = FakeWinMM(["LPD8", "LPD8"])
     m = midi.MidiIn(fake)

@@ -463,6 +463,24 @@ def test_picking_a_preset_keeps_my_own_mix(panel):
     assert p.fx.preset == "Custom" and p.fx.spec()["effects"] == mine
 
 
+def test_nudging_a_preset_doesnt_replace_my_own_mix(panel):
+    """Own mix made, Robot picked, a slider nudged (shows as Custom), then Ghost: the
+    mix you made is still "My own mix", not the nudged Robot."""
+    p, _ = panel
+    p.fx.pick("Chipmunk")
+    row = p.fx.rows["pitch"]
+    row.sliders[0].slider.setValue(row.sliders[0].slider.value() - 3)
+    mine = p.fx.spec()["effects"]
+    p.fx.pick("Robot")
+    robot = p.fx.rows[next(t for t in voicefx.PRESETS["Robot"])]
+    robot.sliders[0].slider.setValue(robot.sliders[0].slider.value() + 2)   # a nudge
+    assert p.fx.preset == "Custom" and p.fx.spec()["custom"] == mine
+    p.fx.pick("Ghost")
+    assert p.fx.spec()["custom"] == mine
+    p.fx.pick("Custom")
+    assert p.fx.spec()["effects"] == mine
+
+
 def test_my_own_mix_is_kept_across_restarts(qapp, monkeypatch):
     monkeypatch.setattr(tts.SapiTTS, "warm_up", lambda self: [])
     from soundboard.ui.voicepanel import VoicePanel

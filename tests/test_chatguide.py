@@ -45,6 +45,20 @@ def test_result_text_covers_every_issue():
     assert "nope" in chatguide.result_html({"issues": [], "error": "nope"}, "x")
 
 
+def test_error_text_and_device_names_are_shown_as_typed(wizard):
+    """A device called "Mic <USB> & Co" or an error quoting markup isn't read as HTML."""
+    vm = "Mic <USB> & Co"
+    html = chatguide.result_html({"issues": ["not_heard"]}, vm)
+    assert "Mic &lt;USB&gt; &amp; Co" in html and vm not in html
+    html = chatguide.result_html({"issues": [], "error": "bad <b>value</b>"}, vm)
+    assert "bad &lt;b&gt;value&lt;/b&gt;" in html
+    w, wiz = wizard
+    for cls in (chatguide.DiscordGuide, chatguide.GameGuide):
+        g = cls(wiz, w, vm)
+        assert "Mic &lt;USB&gt; &amp; Co" in _text(g) and vm not in _text(g)
+        g.done(0)
+
+
 def test_check_without_discord_explains(wizard, monkeypatch):
     w, _ = wizard
     w.engine.main_stream = object()   # the fake devices don't open real streams

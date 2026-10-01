@@ -121,3 +121,20 @@ def test_fingerprint_identifies_same_content(app_dir):
     c = wav(app_dir / "c.wav", hz=880)
     assert fingerprint(str(a)) == fingerprint(str(b)) != fingerprint(str(c))
     assert fingerprint(str(app_dir / "missing.wav")) == ""
+
+
+def test_fingerprint_tells_apart_long_files_that_differ_only_at_the_end(app_dir):
+    head = bytes(range(256)) * 8192   # 2 MB, the same in both
+    a, b = app_dir / "a.bin", app_dir / "b.bin"
+    a.write_bytes(head + b"ending one")
+    b.write_bytes(head + b"ending two")
+    assert fingerprint(str(a)) != fingerprint(str(b))
+
+
+def test_import_of_a_name_made_only_of_underscores_keeps_the_pad(app_dir):
+    """`_.wav` has no name once underscores become spaces, and the config drops
+    sounds without one: it falls back to "Sound"."""
+    meta, _ = import_file(str(wav(app_dir / "_.wav")), "#000000")
+    assert meta.name == "Sound"
+    cfg = library.Config(sounds=[meta])
+    assert [m.id for m in library.Config.from_raw(cfg.to_raw()).sounds] == [meta.id]

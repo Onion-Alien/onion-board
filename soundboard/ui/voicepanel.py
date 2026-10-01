@@ -196,8 +196,11 @@ class VoiceFxPanel(QWidget):
         spec = {**default_fx_spec(), **voicefx.clean_spec(spec)}
         self._preset = spec.get("preset") if spec.get("preset") in voicefx.PRESETS else CUSTOM
         # "My own mix" while a preset is on, so picking a preset never loses it
-        self._custom: dict = (dict(spec.get("effects", {})) if self._preset == CUSTOM
-                              else dict(spec.get("custom", {})))
+        effects, custom = dict(spec.get("effects", {})), dict(spec.get("custom", {}))
+        self._custom: dict = custom or (effects if self._preset == CUSTOM else {})
+        # Fine-tune holds your own mix, not a preset you nudged (that shows as Custom
+        # too, but mustn't replace the mix you made)
+        self._own = self._preset == CUSTOM and self._custom == effects
         v = QVBoxLayout(self)
         v.setContentsMargins(0, 0, 0, 0)
         v.setSpacing(8)
@@ -319,17 +322,20 @@ class VoiceFxPanel(QWidget):
     def pick(self, name: str):
         """Choose a voice (a preset name or CUSTOM) and turn the changer on. Your own
         mix is kept aside while a preset is on, and comes back with "My own mix"."""
-        if self._preset == CUSTOM and name != CUSTOM:
+        mine = self._mine()
+        if mine and name != CUSTOM:
             self._custom = {t: r.state() for t, r in self.rows.items()}
-        was, self._preset = self._preset, name
+        self._preset = name
         fx = voicefx.PRESETS.get(name)
         if fx is not None:
+            self._own = False
             for t, r in self.rows.items():
                 r.load({"on": True, **fx[t]} if t in fx else None)
         elif name == CUSTOM:
-            if was != CUSTOM and self._custom:
+            if not mine and self._custom:
                 for t, r in self.rows.items():
                     r.load(self._custom.get(t))
+            self._own = True
             self.btn_more.setChecked(True)   # your own mix lives in Fine-tune
         self.btn_power.blockSignals(True)
         self.btn_power.setChecked(True)
@@ -361,11 +367,17 @@ class VoiceFxPanel(QWidget):
             self.box.addWidget(r)
             self.rows[etype] = r
 
+    def _mine(self) -> bool:
+        """Is Fine-tune showing your own mix? A nudged preset counts only while you
+        haven't made one."""
+        made = any(isinstance(e, dict) and e.get("on") for e in self._custom.values())
+        return self._preset == CUSTOM and (self._own or not made)
+
     def spec(self) -> dict:
         effects = {t: r.state() for t, r in self.rows.items()}
         return {"enabled": self.btn_power.isChecked(), "preset": self._preset,
                 "effects": effects,
-                "custom": effects if self._preset == CUSTOM else self._custom}
+                "custom": effects if self._mine() else self._custom}
 
     def show_errors(self, errors: dict[str, str]):
         for t, r in self.rows.items():

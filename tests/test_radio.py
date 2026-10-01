@@ -325,6 +325,22 @@ def test_player_reports_a_dead_station(qapp, monkeypatch):
     assert p.station is None and p.status == "error"
 
 
+def test_a_station_name_that_leads_into_the_home_network_isnt_played(qapp, monkeypatch):
+    addrs = {"lan.example.com": "169.254.10.20", "fm.example.com": "93.184.216.34"}
+    monkeypatch.setattr(radio.socket, "getaddrinfo", lambda host, *_a, **_k: [
+        (2, 1, 6, "", (addrs[host], 0))])
+    p = RadioPlayer()
+    opens, errors = [], []
+    p._open = lambda: opens.append(p.station.url)
+    p.error.connect(errors.append)
+    p.play(Station(uuid="u", name="Router FM", url="http://lan.example.com/admin"))
+    assert process_events(qapp, lambda: errors, timeout=5)
+    assert opens == [] and p.station is None and p.status == "error"
+    p.play(Station(uuid="v", name="Real FM", url="http://fm.example.com/live"))
+    assert process_events(qapp, lambda: opens, timeout=5)
+    assert opens == ["http://fm.example.com/live"]
+
+
 def later(monkeypatch) -> list:
     """Collect the player's QTimer.singleShot calls instead of running them."""
     scheduled = []

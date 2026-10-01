@@ -1,5 +1,39 @@
 # Changelog
 
+## 1.5.8 — 2026-10-01
+
+- **Your settings are never swapped for an older copy just because they were busy.**
+  If another program (OneDrive, an antivirus) still held `config.json` at startup,
+  Onion Board treated it as damaged and loaded an older backup over it. It now waits
+  longer, and if the file is still locked it loads the backup without saving over
+  your newest settings.
+- **Settings from a newer version are kept.** Opening a config written by a newer
+  Onion Board keeps a copy (`config.json.newer`) before anything is saved, so the
+  newer version's extra settings aren't lost.
+- **A sound brought back gives up a hotkey that's been taken meanwhile.** If you gave
+  a removed sound's key to Stop all (or another action) and then brought the sound
+  back with Undo or Recently deleted, its pad showed a key that never played it.
+- **Tweaking a voice preset no longer replaces "My own mix".** Picking a preset,
+  nudging a slider and moving on to another voice used to save the nudged preset
+  over the mix you'd made.
+- **Bringing back a sound can't strand its files.** If its picture couldn't be moved
+  back, the sound's audio was left outside Recently deleted and the sound couldn't
+  come back; now the entry stays whole.
+- **Turning off a MIDI controller lets go of the pads held on it**, so hold-to-play
+  sounds stop instead of playing on.
+- **A failed yt-dlp update can't break downloads.** If swapping in the new copy
+  failed halfway, downloads could stay broken until a restart; the working copy is
+  now put back, and leftovers from an interrupted update are tidied at startup.
+- **Radio stations can't point into your home network by name.** A station whose
+  web address resolved to your router or another device on your network is now
+  refused, as stations with such an address already were.
+- Smaller fixes: a file named only with underscores (like `_.wav`) became a pad that
+  vanished on the next start; two long sounds that differed only near the end could
+  be taken for the same sound when restoring a backup; a device name or error text
+  with `<` or `&` in it could show garbled in the Discord and game guides; another
+  program's `%APPDATA%\Soundboard` folder with a `sounds` folder in it could be
+  mistaken for this app's old one.
+
 ## 1.5.7 — 2026-10-01
 
 - **Push-to-talk can't get stuck down any more.** With an admin window or a Windows

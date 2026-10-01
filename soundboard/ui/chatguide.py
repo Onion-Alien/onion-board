@@ -9,6 +9,7 @@ switches to flip, and the check tells them which ones are still on.
 """
 from __future__ import annotations
 
+import html
 import logging
 import time
 
@@ -72,8 +73,9 @@ def result_html(res: dict, vm: str) -> str:
     """What the check found, and what to switch in Discord for each finding."""
     ok, warn = _ok(), _warn()
     issues = res.get("issues", [])
+    vm = html.escape(vm)   # names and error text are plain, not markup
     if res.get("error"):
-        return f"<span style='color:{warn}'>{res['error']}</span>"
+        return f"<span style='color:{warn}'>{html.escape(str(res['error']))}</span>"
     if not issues:
         return (f"<b style='color:{ok}'>✓ Discord passes your sounds through clean.</b> "
                 "Nothing in its settings is changing them.")
@@ -211,7 +213,7 @@ class DiscordGuide(QDialog):
             "<li style='margin-bottom:8px'>In Discord, click the ⚙ gear next to your name "
             "(<b>User Settings</b>) → <b>Voice &amp; Video</b>.</li>"
             "<li style='margin-bottom:8px'><b>Input Device</b>: choose "
-            f"<b style='color:{_ok()}'>{vm}</b>.</li>"
+            f"<b style='color:{_ok()}'>{html.escape(vm)}</b>.</li>"
             "<li style='margin-bottom:8px'><b>Input Profile</b>: choose <b>Studio</b>. That "
             "switches off noise suppression, echo cancellation and automatic gain "
             "control in one go.<br><span style='font-size:9pt'>No Input Profile in your "
@@ -294,8 +296,8 @@ class GameGuide(QDialog):
         v.addWidget(_label(
             "<ol style='margin-left:-20px'>"
             f"<li style='margin-bottom:8px'><b>Microphone / Input device</b>: "
-            f"<b style='color:{_ok()}'>{vm}</b>. No such setting? Use <b>My game has no "
-            "microphone setting</b> on the Setup tab.</li>"
+            f"<b style='color:{_ok()}'>{html.escape(vm)}</b>. No such setting? Use "
+            "<b>My game has no microphone setting</b> on the Setup tab.</li>"
             "<li style='margin-bottom:8px'>Turn <b>off</b> anything called <b>noise "
             "suppression</b>, <b>noise cancellation</b>, <b>denoiser</b>, <b>background "
             "sound removal</b>, <b>voice clarity</b> or <b>automatic gain</b>. The AI "

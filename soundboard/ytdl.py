@@ -182,11 +182,26 @@ _finder = _Finder()
 def install():
     """Put the import hook in place (idempotent), dropping a stale downloaded copy."""
     if _finder not in sys.meta_path:
+        _tidy()
         ov, bv = override_version(), bundled_version()
         if ov and bv and vtuple(ov) < vtuple(bv):
             log.info("dropping downloaded yt-dlp %s: the app ships %s", ov, bv)
             shutil.rmtree(_pkg_dir(), ignore_errors=True)
         sys.meta_path.insert(0, _finder)
+
+
+def _tidy():
+    """Clear what an update cut short left behind: a half-unpacked new-* folder, and
+    old-* copies (one is put back first if the swap stopped before `current` was)."""
+    try:
+        olds = sorted(root().glob("old-*"), key=lambda d: d.stat().st_mtime)
+        if olds and not _pkg_dir().exists():
+            olds.pop().rename(_pkg_dir())
+            log.info("put back the yt-dlp copy an update had moved aside")
+        for d in olds + list(root().glob("new-*")):
+            shutil.rmtree(d, ignore_errors=True)
+    except OSError:
+        log.warning("couldn't tidy %s", root(), exc_info=True)
 
 
 def _purge():
@@ -248,7 +263,12 @@ def update(force: bool = False) -> str:
             old = root() / f"old-{time.time_ns()}"
             if _pkg_dir().exists():
                 _pkg_dir().rename(old)
-            new.rename(_pkg_dir())
+            try:
+                new.rename(_pkg_dir())
+            except OSError as e:   # put the copy in use back, or downloads break
+                if old.exists():
+                    old.rename(_pkg_dir())
+                raise DownloadError(f"couldn't swap in the new yt-dlp ({e})") from e
             shutil.rmtree(old, ignore_errors=True)
             _save_state(version=latest)
             _purge()

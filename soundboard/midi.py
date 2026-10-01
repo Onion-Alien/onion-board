@@ -189,6 +189,7 @@ class MidiIn(QObject):
         self._names: dict[int, str] = {}                   # key -> name (callback thread)
         self._dead: set[int] = set()
         self._cc: dict[tuple[int, int], bool] = {}         # (key, cc) -> is down
+        self._held: dict[int, set[str]] = {}               # key -> pads down right now
         self._next_key = 1
         self._lock = threading.Lock()
         self._timer = QTimer(self)
@@ -266,12 +267,15 @@ class MidiIn(QObject):
         with self._lock:
             self._names.pop(key, None)
             self._dead.discard(key)
+            held = self._held.pop(key, set())
         self._cc = {k: v for k, v in self._cc.items() if k[0] != key}
         try:
             self.backend.close(h)
         except OSError:
             pass   # unplugged: the handle is already gone
         log.info("MIDI: closed %s", name)
+        for combo in sorted(held):   # no note-off is coming: let hold-to-play pads go
+            self.released.emit(combo)
 
     # -- winmm's thread
     def _on_message(self, key: int, msg: int):
@@ -289,6 +293,10 @@ class MidiIn(QObject):
                 return
             self._cc[(key, num)] = down
         combo = make(kind, num, name)
+        if kind != "pc":   # a program change has no release
+            with self._lock:
+                held = self._held.setdefault(key, set())
+                (held.add if what == "press" else held.discard)(combo)
         (self.pressed if what == "press" else self.released).emit(combo)
 
     def _on_closed(self, key: int):

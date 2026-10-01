@@ -122,14 +122,17 @@ def put_sound(meta: SoundMeta, index: int) -> None:
         p = Path(meta.file)
         if p.parent == library.SOUNDS_DIR and p.exists():
             d["file"] = _move(p, folder()).name
-        if meta.image and Path(meta.image).parent == library.THUMBS_DIR \
-                and Path(meta.image).exists():
-            d["image"] = _move(Path(meta.image), folder()).name
     except OSError:
         log.warning("couldn't move %s to the bin; removing it instead", meta.file,
                     exc_info=True)
         library.delete_file(meta)
         return
+    try:
+        if meta.image and Path(meta.image).parent == library.THUMBS_DIR \
+                and Path(meta.image).exists():
+            d["image"] = _move(Path(meta.image), folder()).name
+    except OSError:   # the audio is in the bin already: the picture stays where it is
+        log.warning("couldn't move %s to the bin", meta.image, exc_info=True)
     for c in library.CACHE_DIR.glob(f"{meta.id}*.npy"):
         if c.stem == meta.id or c.stem.startswith(meta.id + "."):
             c.unlink(missing_ok=True)
@@ -175,17 +178,25 @@ def take(item_id: str) -> Item | None:
         if item.kind == SOUND:
             d = dict(item.data)
             f = _in_bin(d.get("file", ""))
+            moved = None
             try:
                 if f is not None and f.parent == folder():
                     if not f.exists():
                         log.warning("the bin lost %s", f)
                         return None
-                    d["file"] = str(_move(f, library.SOUNDS_DIR))
+                    moved = _move(f, library.SOUNDS_DIR)
+                    d["file"] = str(moved)
                 img = _in_bin(d.get("image", ""))
                 if img is not None and img.parent == folder():
                     d["image"] = str(_move(img, library.THUMBS_DIR)) if img.exists() else ""
             except OSError:
                 log.warning("couldn't bring %s back", item.name, exc_info=True)
+                if moved is not None:   # the audio came back but the picture didn't
+                    try:
+                        shutil.move(str(moved), f)
+                    except OSError:   # then the entry follows the audio where it is now
+                        item.data["file"] = str(moved)
+                        _save(all_)
                 return None
             item.data = d
         all_.remove(item)

@@ -83,3 +83,23 @@ def test_a_blocked_ptt_key_up_is_tried_again(window, monkeypatch):  # noqa: F811
     ok["up"] = True
     assert window._release_ptt() is True and window._ptt_held is None
     assert ups == ["v", "v"]
+
+
+def test_a_sound_brought_back_gives_up_a_key_an_action_took_meanwhile(window, qapp):  # noqa: F811
+    """F9 went to Stop all while the pad was on the Undo bar / in Recently deleted:
+    the pad comes back without it, rather than showing a key that never plays it."""
+    from conftest import process_events
+    from soundboard import trash
+    assert process_events(qapp, lambda: all(m.id in window.audio for m in window.cfg.sounds))
+    for sid, done in (("s0", window.undo_remove), ("s1", None)):
+        window.meta(sid).hotkey = "f9"
+        window.remove_sound(sid)
+        window.set_global_hotkey("stop_hotkey", "f9")
+        if done is None:   # from Recently deleted
+            window._finish_removals()
+            [it] = trash.items(trash.SOUND)
+            assert window._restore_deleted(trash.take(it.id))
+        else:
+            done()
+        assert window.meta(sid).hotkey == "" and window.cfg.stop_hotkey == "f9"
+        window.cfg.stop_hotkey = ""

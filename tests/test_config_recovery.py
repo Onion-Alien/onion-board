@@ -111,3 +111,59 @@ def test_another_programs_soundboard_folder_is_left_alone(tmp_path, monkeypatch)
     _write(old / "config.json", {"version": 1, "sounds": []})
     library.migrate_from_soundboard()
     assert not old.exists() and (new / "config.json").exists()
+
+
+def test_any_sounds_folder_isnt_enough_to_take_the_old_folder(tmp_path, monkeypatch):
+    old, new = tmp_path / "Soundboard", tmp_path / "OnionBoard"
+    monkeypatch.setattr(library, "OLD_APP_DIR", old)
+    monkeypatch.setattr(library, "APP_DIR", new)
+    monkeypatch.setattr(library, "SOUNDS_DIR", new / "sounds")
+    monkeypatch.setattr(library, "CONFIG_PATH", new / "config.json")
+    (old / "sounds").mkdir(parents=True)
+    (old / "sounds" / "airhorn.wav").write_bytes(b"x")   # another program's
+    library.migrate_from_soundboard()
+    assert old.exists() and not new.exists()
+    (old / "sounds" / "0123456789_bruh.wav").write_bytes(b"x")   # one of ours
+    library.migrate_from_soundboard()
+    assert not old.exists() and (new / "sounds" / "0123456789_bruh.wav").exists()
+
+
+def test_config_from_a_newer_version_is_kept_before_it_is_saved_over(app_dir):
+    raw = {"version": library.CONFIG_VERSION + 1, "stop_hotkey": "f9", "future_thing": [1]}
+    _write(library.CONFIG_PATH, raw)
+    cfg = Config.load()
+    assert cfg.stop_hotkey == "f9"
+    newer = library.CONFIG_PATH.with_name("config.json.newer")
+    assert json.loads(newer.read_text(encoding="utf-8")) == raw
+    cfg.stop_hotkey = "f8"
+    assert cfg.save()
+    Config.load()   # only the first copy is kept
+    assert json.loads(newer.read_text(encoding="utf-8")) == raw
+
+
+def test_current_config_isnt_copied_aside(app_dir):
+    _write(library.CONFIG_PATH, {"version": library.CONFIG_VERSION})
+    Config.load()
+    assert not library.CONFIG_PATH.with_name("config.json.newer").exists()
+
+
+def test_locked_config_isnt_set_aside_or_saved_over(app_dir, monkeypatch):
+    """A file another program holds isn't damaged: a backup is loaded, but nothing is
+    saved over the user's newest settings, and the file isn't renamed."""
+    _write(library.CONFIG_PATH, {"stop_hotkey": "f9"})
+    _write(library.CONFIG_PATH.with_name("config.json.1"), {"stop_hotkey": "f7"})
+    real = type(library.CONFIG_PATH).read_text
+
+    def locked(self, *a, **k):
+        if self == library.CONFIG_PATH:
+            raise PermissionError(13, "The process cannot access the file")
+        return real(self, *a, **k)
+    with monkeypatch.context() as m:
+        m.setattr(type(library.CONFIG_PATH), "read_text", locked)
+        m.setattr(library.time, "sleep", lambda s: None)
+        cfg = Config.load()
+    assert cfg.stop_hotkey == "f7" and "locked" in cfg.load_note
+    assert not list(app_dir.glob("config.json.broken-*"))
+    assert not cfg.save()
+    assert json.loads(library.CONFIG_PATH.read_text(encoding="utf-8"))["stop_hotkey"] == "f9"
+    assert not Config.read_only   # only that instance

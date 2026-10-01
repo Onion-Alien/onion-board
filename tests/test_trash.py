@@ -175,3 +175,35 @@ def test_a_locked_bin_list_is_never_saved_over(app_dir, monkeypatch):
     assert locked["n"] > 1                     # tried again before giving up
     monkeypatch.setattr(Path, "read_text", real)
     assert sorted(i.data["id"] for i in trash.items()) == ["k1", "k2"]
+
+
+def _failing_picture_move(monkeypatch):
+    real = trash._move
+
+    def move(src, dest_dir):
+        if src.suffix == ".png":
+            raise PermissionError("picture locked")
+        return real(src, dest_dir)
+    monkeypatch.setattr(trash, "_move", move)
+
+
+def test_a_failed_restore_leaves_the_entry_whole(app_dir, monkeypatch):
+    """The audio comes back, then the picture can't: the audio goes back in the bin,
+    so the entry still works next time."""
+    trash.put_sound(_sound(app_dir, "b1"), 0)
+    [it] = trash.items(trash.SOUND)
+    with monkeypatch.context() as m:
+        _failing_picture_move(m)
+        assert trash.take(it.id) is None
+    assert (trash.folder() / "b1.wav").exists()
+    back = trash.meta_of(trash.take(it.id))
+    assert Path(back.file).exists() and Path(back.image).exists()
+
+
+def test_a_picture_that_cant_go_in_the_bin_doesnt_lose_the_sound(app_dir, monkeypatch):
+    m = _sound(app_dir, "c1")
+    _failing_picture_move(monkeypatch)
+    trash.put_sound(m, 0)
+    [it] = trash.items(trash.SOUND)   # listed, so it can come back
+    back = trash.meta_of(trash.take(it.id))
+    assert Path(back.file).exists() and Path(back.image) == Path(m.image)
