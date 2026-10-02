@@ -1,5 +1,17 @@
 # Changelog
 
+## 1.5.9 — 2026-10-03
+
+- **Headsets with "Virtual" in their name show up again.** Onion Board took any
+  device named "...Virtual..." for a virtual cable and hid it, so a headset like
+  "Speakers (HyperX Virtual Surround Sound)" was missing from the quick setup's mic
+  and headphones lists: no microphone found, and your own sounds played on the wrong
+  speakers while everyone in the call heard them fine. Only real cables (VB-Cable,
+  Voicemeeter, Virtual Audio Cable) are hidden now.
+- **Input and output in Settings.** Settings → Audio now has your mic, your
+  headphones and the cable at the top, with a Re-scan button for a headset plugged
+  in after Onion Board started. (The same pickers are still on the Setup tab.)
+
 ## 1.5.8 — 2026-10-01
 
 - **Your settings are never swapped for an older copy just because they were busy.**
