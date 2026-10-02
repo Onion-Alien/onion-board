@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.5.9 — 2026-10-03
+## 1.5.9 — 2026-10-02
 
 - **Headsets with "Virtual" in their name show up again.** Onion Board took any
   device named "...Virtual..." for a virtual cable and hid it, so a headset like
