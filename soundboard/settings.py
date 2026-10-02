@@ -540,6 +540,7 @@ class SettingsDialog(QDialog):
 
     def _audio(self):
         w, v = self._page()
+        v.addWidget(self._devices_card())
         card, cv = self._card("Your mic",
                               "Normally others hear your voice and your sounds together. Untick "
                               "this for sounds only: they hear the sounds but not your mic. "
@@ -579,6 +580,48 @@ class SettingsDialog(QDialog):
         v.addWidget(card)
         v.addStretch(1)
         return w
+
+    def _devices_card(self):
+        """Input / output pickers: the Setup tab's Devices combos, mirrored here so
+        people find them where they look first. Picking goes through the window."""
+        mw = self.mw
+        card, cv = self._card("Devices",
+                              "Your mic (input) and where you listen (output). Plugged "
+                              "something in? Press Re-scan.")
+        grid = QGridLayout()
+        grid.setHorizontalSpacing(10)
+        grid.setVerticalSpacing(6)
+        self.dev_combos = []
+        for r, (text, src, attr) in enumerate((
+                ("Input — my mic", mw.cb_mic, "mic_device"),
+                ("Output — my headphones", mw.cb_mon, "mon_device"),
+                ("Send into (the cable)", mw.cb_main, "main_device"))):
+            cb = QComboBox()
+            cb.setMinimumWidth(120)
+            no_wheel(cb)
+            cb.activated.connect(lambda i, src=src, attr=attr: self._pick_device(src, attr, i))
+            grid.addWidget(QLabel(text), r, 0)
+            grid.addWidget(cb, r, 1)
+            self.dev_combos.append((cb, src))
+        grid.setColumnStretch(1, 1)
+        cv.addLayout(grid)
+        ref = QPushButton("Re-scan devices")
+        icons.set_icon(ref, "reload")
+        ref.clicked.connect(lambda: (mw.refresh_devices(), self._sync_devices()))
+        cv.addWidget(ref, 0, Qt.AlignLeft)
+        self._sync_devices()
+        return card
+
+    def _sync_devices(self):
+        for cb, src in self.dev_combos:
+            cb.clear()
+            for i in range(src.count()):
+                cb.addItem(src.itemText(i), src.itemData(i))
+            cb.setCurrentIndex(src.currentIndex())
+
+    def _pick_device(self, src, attr, i):
+        src.setCurrentIndex(i)
+        self.mw.on_device(src, attr)
 
     def _general(self):
         w, v = self._page()

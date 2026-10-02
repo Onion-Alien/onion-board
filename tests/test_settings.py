@@ -34,7 +34,7 @@ def test_support_opens_the_project_page_not_an_address_in_the_app(window, monkey
 
 
 def test_each_page_opens_by_name_and_holds_its_cards(window):  # noqa: F811
-    where = {"audio": ("YOUR MIC", "WHO'S LISTENING", "AUDIO BUFFERING"),
+    where = {"audio": ("DEVICES", "YOUR MIC", "WHO'S LISTENING", "AUDIO BUFFERING"),
              "hotkeys": ("HOTKEY SOUNDS",),
              "general": ("WINDOW", "RUNNING IN THE BACKGROUND", "BACKUP",
                          "SUPPORT ONION BOARD"),
@@ -47,4 +47,21 @@ def test_each_page_opens_by_name_and_holds_its_cards(window):  # noqa: F811
         d.close()
     d = SettingsDialog(window, "nonsense")
     assert d.tabs.currentIndex() == 0
+    d.close()
+
+
+def test_audio_page_picks_input_and_output_through_the_window(window, monkeypatch):  # noqa: F811
+    window._fill_combo(window.cb_mic, ["Mic A", "Headset Mic"], "Mic A")
+    window._fill_combo(window.cb_mon, ["Speakers", "Headset"], "Speakers")
+    picked = []
+    monkeypatch.setattr(window, "on_device",
+                        lambda cb, attr: picked.append((attr, cb.currentData())))
+    d = SettingsDialog(window, "audio")
+    mic, mon = d.dev_combos[0][0], d.dev_combos[1][0]
+    assert [mic.itemText(i) for i in range(mic.count())] == ["— none —", "Mic A", "Headset Mic"]
+    assert mon.currentText() == "Speakers"
+    mic.activated.emit(2)
+    mon.activated.emit(2)
+    assert picked == [("mic_device", "Headset Mic"), ("mon_device", "Headset")]
+    assert window.cb_mon.currentText() == "Headset"   # the Setup tab follows
     d.close()
