@@ -123,7 +123,9 @@ def find_device(kind: str, name: str | None) -> int | None:
 # Virtual audio cables (VB-Cable, VB-Cable A/B, Hi-Fi Cable, Voicemeeter, …) show up
 # as a playback device ("... Input") paired with a recording device ("... Output").
 # Audio played into the first comes out of the second, which apps use as a mic.
-VIRTUAL_HINTS = ("cable", "vb-audio", "voicemeeter", "virtual")
+# Not plain "virtual": real USB headsets are called e.g. "Speakers (HyperX Virtual
+# Surround Sound)", and matching that hid a tester's headset from every device list.
+VIRTUAL_HINTS = ("cable", "vb-audio", "voicemeeter", "virtual audio cable")
 
 
 def is_virtual(name: str | None) -> bool:

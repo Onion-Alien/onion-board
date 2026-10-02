@@ -4,6 +4,7 @@ import time
 from types import SimpleNamespace
 
 import numpy as np
+import pytest
 
 from soundboard import engine as eng
 from soundboard.engine import SR, Engine, is_xrun
@@ -602,3 +603,20 @@ def test_a_broken_block_from_a_program_is_silenced():
     assert got is None or np.isfinite(got).all()
     y = np.array([[np.nan, -np.inf], [0.2, 0.2]], np.float32)
     assert np.isfinite(eng.finite(y)).all() and y[1, 0] == np.float32(0.2)
+
+
+@pytest.mark.parametrize("name", [
+    "CABLE Input (VB-Audio Virtual Cable)", "CABLE-A Output (VB-Audio Cable A)",
+    "Hi-Fi Cable Input (VB-Audio Hi-Fi Cable)", "VoiceMeeter Input (VB-Audio VoiceMeeter VAIO)",
+    "Line 1 (Virtual Audio Cable)",
+])
+def test_is_virtual_cables(name):
+    assert eng.is_virtual(name)
+
+
+@pytest.mark.parametrize("name", [
+    "Speakers (HyperX Virtual Surround Sound)", "Microphone (HyperX Virtual Surround Sound)",
+    "Headphones (Logitech G Virtual Surround)", "Speakers (Realtek High Definition Audio)",
+])
+def test_is_virtual_leaves_real_headsets(name):
+    assert not eng.is_virtual(name)
