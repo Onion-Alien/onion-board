@@ -7,6 +7,7 @@ and emit plain dicts (`changed`) that the main window stores in the config.
 from __future__ import annotations
 
 import html
+import random
 import re
 import threading
 import time
@@ -262,7 +263,17 @@ class VoiceFxPanel(QWidget):
         v.addWidget(self.tip)
 
         # ---- pick a voice
-        v.addWidget(QLabel("<b>Pick a voice</b>"))
+        prow = QHBoxLayout()
+        prow.addWidget(QLabel("<b>Pick a voice</b>"))
+        prow.addStretch(1)
+        self.btn_random = QPushButton("🎲  Random voice")
+        self.btn_random.setObjectName("small")
+        self.btn_random.setCursor(Qt.PointingHandCursor)
+        self.btn_random.setToolTip("A random silly mix of effects, as “My own mix”. Click "
+                                   "again for another.")
+        self.btn_random.clicked.connect(lambda: self.randomize())
+        prow.addWidget(self.btn_random)
+        v.addLayout(prow)
         grid = self._tile_grid = QGridLayout()
         grid.setSpacing(6)
         self._tile_cols = self.COLS
@@ -337,6 +348,39 @@ class VoiceFxPanel(QWidget):
                     r.load(self._custom.get(t))
             self._own = True
             self.btn_more.setChecked(True)   # your own mix lives in Fine-tune
+        self.btn_power.blockSignals(True)
+        self.btn_power.setChecked(True)
+        self.btn_power.blockSignals(False)
+        self._refresh()
+        self._emit()
+
+    # never ear-splitting: louder settings are capped below their slider's top
+    RANDOM_CAPS = {("compressor", "boost"): 9, ("distortion", "drive"): 20,
+                   ("echo", "feedback"): 0.6, ("radio", "drive"): 14}
+
+    def randomize(self, rng: random.Random | None = None):
+        """A random mix for the lols: the pitch moved well away from normal plus one
+        or two other effects at random settings, as "My own mix"."""
+        rng = rng or random.Random()
+        others = [t for t in self.rows if t != "pitch"]
+        chosen = set(rng.sample(others, min(len(others), rng.randint(1, 2))))
+        if "pitch" in self.rows:
+            chosen.add("pitch")
+        for t, r in self.rows.items():
+            if t not in chosen:
+                r.load(None)
+                continue
+            cfg = {"on": True}
+            for q in r.cls.params:
+                hi = min(q.hi, self.RANDOM_CAPS.get((t, q.key), q.hi))
+                cfg[q.key] = rng.uniform(q.lo, hi)
+            if t == "pitch":
+                cfg["semitones"] = rng.choice((-1, 1)) * rng.uniform(4, 12)
+                cfg["mix"] = 1.0
+            r.load(cfg)
+        self._own = True
+        self._custom = {t: r.state() for t, r in self.rows.items()}
+        self._preset = CUSTOM
         self.btn_power.blockSignals(True)
         self.btn_power.setChecked(True)
         self.btn_power.blockSignals(False)

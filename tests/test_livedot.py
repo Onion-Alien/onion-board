@@ -90,3 +90,17 @@ def test_voice_panel_reports_when_it_is_changing_your_voice(panel):
     assert seen[-1] is True
     panel.speech._set_live_ui(False, "")
     assert seen[-1] is False
+
+
+def test_random_voice_is_a_silly_own_mix(panel):
+    import random
+
+    from soundboard.ui.voicepanel import CUSTOM
+    for seed in range(20):
+        panel.fx.randomize(random.Random(seed))
+        on = {t: r.state() for t, r in panel.fx.rows.items() if r.state().get("on")}
+        assert panel.fx.preset == CUSTOM and panel.fx.btn_power.isChecked()
+        assert "pitch" in on and abs(on["pitch"]["semitones"]) >= 4
+        assert 2 <= len(on) <= 3
+        if "compressor" in on:
+            assert on["compressor"]["boost"] <= 9

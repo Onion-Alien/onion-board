@@ -907,3 +907,12 @@ def test_last_15s_holds_only_the_station_that_played(qapp, tab, server):
     tab.play(b)                          # a different station: its own 15 seconds
     assert len(tab.recorder.last()) < SR // 2
     tab.stop()
+
+
+def test_the_dice_plays_another_listed_station(tab, monkeypatch):
+    played = []
+    monkeypatch.setattr(tab, "play", played.append)
+    listed = {s.uuid for s in tab.visible_stations()}
+    for _ in range(5):
+        tab.btn_random.click()
+    assert played and all(s.uuid in listed for s in played)

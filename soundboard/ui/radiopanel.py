@@ -10,6 +10,7 @@ from __future__ import annotations
 import html
 import json
 import logging
+import random
 import time
 import zlib
 from string import Template
@@ -371,6 +372,11 @@ class RadioTab(QWidget):
         icons.set_icon(self.btn_live, "live", checked_color="#ffffff")
         self.btn_live.toggled.connect(self._on_live)
         bh.addWidget(self.btn_live)
+        self.btn_random = QPushButton("🎲")
+        self.btn_random.setToolTip("Play a random station from the list showing (pick a "
+                                   "genre or country first to narrow it)")
+        self.btn_random.clicked.connect(self.play_random)
+        bh.addWidget(self.btn_random)
         self.meter = meter_cls()
         self.meter.setMinimumWidth(50)
         self.meter.setToolTip("Radio level")
@@ -1037,6 +1043,15 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
             self.play(s)
 
     # ------------------------------------------------------------------ playing
+    def play_random(self):
+        """A random station from the ones listed (the filters apply), never the one
+        already playing."""
+        now = self.player.station
+        pool = [s for s in self.visible_stations()[:LIST_MAX]
+                if now is None or s.uuid != now.uuid]
+        if pool:
+            self.play(random.choice(pool))
+
     def play(self, s: Station):
         self._title = ""
         if self._fed_by is None or self._fed_by.uuid != s.uuid:
