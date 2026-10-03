@@ -565,6 +565,13 @@ class SpeechPanel(QWidget):
         self.cb_voice.addItem("Loading voices…", "")
         self.cb_voice.setEnabled(False)
         grid.addWidget(self.cb_voice, 0, 1)
+        # custom voices sit under More options: this gets you there from the list itself
+        self.b_add_voices = QPushButton("Add voices…")
+        icons.set_icon(self.b_add_voices, "plus")
+        self.b_add_voices.setToolTip("Your own voices: a TTS server on your PC (Kokoro, "
+                                     "AllTalk…) or Piper voice packs")
+        self.b_add_voices.clicked.connect(self.show_custom_voices)
+        grid.addWidget(self.b_add_voices, 0, 2)
         grid.addWidget(QLabel("Speed"), 1, 0)
         self.sl_rate = QSlider(Qt.Horizontal)
         self.sl_rate.setRange(-10, 10)
@@ -664,7 +671,8 @@ class SpeechPanel(QWidget):
         self.b_update.clicked.connect(self._install)
         ov.addWidget(self.b_update, 0, Qt.AlignLeft)
         # ---- custom voices: a TTS server on this PC, a TTS program, Piper voice packs
-        ov.addWidget(section_label("CUSTOM VOICES"))
+        self.custom_head = section_label("CUSTOM VOICES")
+        ov.addWidget(self.custom_head)
         ov.addWidget(hint_label("Use a TTS server running on your PC (Kokoro, AllTalk, any "
                                 "OpenAI-style one) or drop voice packs (Piper) into the "
                                 "voices folder. They join the Voice list above."))
@@ -787,6 +795,15 @@ class SpeechPanel(QWidget):
         self.lbl_custom.setVisible(bool(self.lbl_custom.text()))
         if error:
             self._tts_error(f"Text-to-speech isn't available: {error}")
+
+    def show_custom_voices(self):
+        """Open More options and bring its Custom voices part into view."""
+        self.btn_opts.setChecked(True)
+        w = self.parentWidget()
+        while w is not None and not isinstance(w, QScrollArea):
+            w = w.parentWidget()
+        if w is not None:
+            QTimer.singleShot(0, self, lambda a=w: a.ensureWidgetVisible(self.custom_head, 0, 40))
 
     def _add_voice_server(self):
         """A small form for a TTS server's address; saved as a .json in the voices folder."""

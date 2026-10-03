@@ -2,6 +2,7 @@
 general options."""
 from __future__ import annotations
 
+import os
 import threading
 
 from PySide6.QtCore import QObject, QRectF, QSize, Qt, QUrl, Signal
@@ -589,6 +590,7 @@ class SettingsDialog(QDialog):
         cv.addWidget(send)
         v.addWidget(card)
         v.addWidget(self._stream_card())
+        v.addWidget(self._voices_card())
         card, cv = self._card("Who's listening",
                               "Voice chat runs your sounds through a mono voice codec that drops "
                               "the sub-bass and, in some games, everything above 8-12 kHz. Pick "
@@ -660,6 +662,39 @@ class SettingsDialog(QDialog):
         voice.setChecked(c.obs_voice)
         voice.toggled.connect(lambda b: mw.set_option("obs_voice", b))
         cv.addWidget(voice)
+        return card
+
+    def _voices_card(self):
+        """Custom text-to-speech voices live on the Voice tab (under More options); this
+        card is where people look for them first."""
+        from soundboard.speech import customvoices
+        mw = self.mw
+        speech = mw.voice.speech
+        card, cv = self._card(
+            "Custom voices (text-to-speech)",
+            "Your own voices for typed lines and Talk as a computer voice: a TTS server "
+            "running on your PC (Kokoro, AllTalk, any OpenAI-style one), a TTS program, or "
+            "Piper voice packs dropped into the voices folder. They join the Voice list on "
+            "the Voice tab.")
+        row = QHBoxLayout()
+        add = QPushButton("Add a voice server…")
+        icons.set_icon(add, "plus")
+        add.clicked.connect(speech._add_voice_server)
+        row.addWidget(add)
+        folder = QPushButton("Open voices folder")
+        folder.setToolTip("Voice packs and voice settings go here; README.txt in it says how")
+        folder.clicked.connect(lambda: os.startfile(customvoices.ensure_folder()))  # noqa: S606
+        row.addWidget(folder)
+        show = QPushButton("Show on the Voice tab")
+
+        def go():
+            self.accept()
+            mw.tabs.setCurrentWidget(mw.voice)
+            speech.show_custom_voices()
+        show.clicked.connect(go)
+        row.addWidget(show)
+        row.addStretch(1)
+        cv.addLayout(row)
         return card
 
     def _devices_card(self):

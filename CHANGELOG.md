@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.6.3 — 2026-10-03
+
+- **Custom voices are easy to find**: an *Add voices…* button right beside the Voice
+  list, and a *Custom voices* card in Settings → Audio (add a voice server, open the
+  voices folder, or jump to them on the Voice tab). They used to be only at the bottom
+  of the Voice tab's folded *More options*.
+
 ## 1.6.2 — 2026-10-03
 
 - **A tidier right-click menu on a sound**: short names in three groups (play, change,

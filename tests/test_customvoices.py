@@ -12,6 +12,7 @@ import soundfile as sf
 from soundboard import library
 from soundboard.speech import customvoices, tts
 from soundboard.speech.customvoices import CustomVoice, VoiceSet
+from test_mainwindow import window  # noqa: F401  (the real MainWindow)
 
 
 def wav_bytes(n=2400, rate=24000, channels=1) -> bytes:
@@ -177,3 +178,24 @@ def test_voice_tab_lists_custom_voices_and_bad_files(vdir, qapp, monkeypatch):
     finally:
         p.shutdown()
         p.deleteLater()
+
+
+def test_custom_voices_are_found_from_the_voice_list_and_from_settings(window):  # noqa: F811
+    """Add voices… beside the Voice list, and Settings → Audio's card, both lead to
+    the Custom voices part (folded away under More options)."""
+    from PySide6.QtWidgets import QPushButton
+    from soundboard.settings import SettingsDialog
+    w = window
+    s = w.voice.speech
+    assert not s.btn_opts.isChecked()
+    s.b_add_voices.click()
+    assert s.btn_opts.isChecked() and not s.opts.isHidden()
+    s.btn_opts.setChecked(False)
+    dlg = SettingsDialog(w, "audio")
+    try:
+        buttons = {b.text(): b for b in dlg.findChildren(QPushButton)}
+        assert {"Add a voice server…", "Open voices folder"} <= set(buttons)
+        buttons["Show on the Voice tab"].click()
+        assert w.tabs.currentWidget() is w.voice and s.btn_opts.isChecked()
+    finally:
+        dlg.deleteLater()
