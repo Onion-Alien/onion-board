@@ -28,13 +28,38 @@ class Meter(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.level = 0.0
-        self.hot = False
+        self._hot = False
+        self._drawn = None        # (bar width in px, colour) as last painted
         self.setFixedHeight(8)
         self.setAccessibleName("Level meter")
 
+    @property
+    def hot(self) -> bool:
+        return self._hot
+
+    @hot.setter
+    def hot(self, on: bool):
+        self._hot = bool(on)
+        self.update()
+
+    def _bar(self) -> tuple[float, str]:
+        db = 20 * np.log10(max(self.level, 1e-5))
+        frac = float(np.clip((db + 50) / 50, 0, 1))
+        col = "#13ce66" if db < -9 else "#ffb020" if db < -2 else "#ff4d4f"
+        return frac, "#ff4d4f" if self._hot else col
+
     def set_level(self, v):
         self.level = v
-        self.update()
+        frac, col = self._bar()
+        # fed 20-30 times a second: repaint only when the bar would look different
+        drawn = (round(self.width() * frac), col if frac > 0 else "")
+        if drawn != self._drawn:
+            self._drawn = drawn
+            self.update()
+
+    def resizeEvent(self, e):
+        super().resizeEvent(e)
+        self._drawn = None
 
     def paintEvent(self, e):
         p = QPainter(self)
@@ -43,12 +68,8 @@ class Meter(QWidget):
         p.setPen(Qt.NoPen)
         p.setBrush(QColor(theme.T["groove"]))
         p.drawRoundedRect(r, 4, 4)
-        db = 20 * np.log10(max(self.level, 1e-5))
-        frac = float(np.clip((db + 50) / 50, 0, 1))
+        frac, col = self._bar()
         if frac > 0:
-            col = "#13ce66" if db < -9 else "#ffb020" if db < -2 else "#ff4d4f"
-            if self.hot:
-                col = "#ff4d4f"
             p.setBrush(QColor(col))
             p.drawRoundedRect(QRectF(0, 0, r.width() * frac, r.height()), 4, 4)
 

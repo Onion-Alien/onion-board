@@ -21,6 +21,8 @@ can't navigate anywhere, and it reports clicks back over QWebChannel.
 """
 from __future__ import annotations
 
+import base64
+import hashlib
 import html
 import ipaddress
 import json
@@ -45,8 +47,8 @@ log = logging.getLogger(__name__)
 # Radio Browser mirrors. `all.` round-robins across them; the rest are fallbacks.
 API_BASES = ("https://all.api.radio-browser.info", "https://de1.api.radio-browser.info",
              "https://de2.api.radio-browser.info")
-GLOBE_LIMIT = 3000         # stations pinned on the globe (the most listened-to)
-GLOBE_LIGHT = 1000         # ...of which the light (default) globe shows this many
+GLOBE_LIMIT = 3000         # stations fetched for the map (the most listened-to)
+GLOBE_LIGHT = 1000         # ...of which the 3D globe pins this many (the flat map: all)
 SEARCH_LIMIT = 150
 SEARCH_MAX_CHARS = 80
 CACHE_S = 24 * 3600        # how long the globe's station list is reused
@@ -61,8 +63,6 @@ GLOBE_SRI = "sha384-1uolMBZ25k3zJcNwCLEv49+L+m2dZudqAzsoSAJfQTzDCSBxJzrMuZ2dkp/5
 _IMG = "https://cdn.jsdelivr.net/npm/three-globe@2.45.2/example/img/"
 EARTH_DAY = _IMG + "earth-blue-marble.jpg"     # NASA Blue Marble (public domain)
 EARTH_NIGHT = _IMG + "earth-night.jpg"         # NASA Black Marble: city lights
-EARTH_BUMP = _IMG + "earth-topology.png"
-SKY = _IMG + "night-sky.png"
 # Natural Earth country outlines (public domain), where the globe's country names go
 COUNTRIES = ("https://cdn.jsdelivr.net/npm/globe.gl@2.46.2/example/datasets/"
              "ne_110m_admin_0_countries.geojson")
@@ -256,6 +256,29 @@ def search_text(text: str) -> str:
     return " ".join(text.split())[:SEARCH_MAX_CHARS]
 
 
+def outline_rings(raw: bytes) -> list[list[tuple[float, float]]]:
+    """The land outlines for the flat map: each country's outer rings as (lon, lat), or
+    [] unless `raw` is exactly the pinned outline file (checked like the globe's SRI)."""
+    if not isinstance(raw, bytes | bytearray):
+        return []
+    digest = "sha384-" + base64.b64encode(hashlib.sha384(raw).digest()).decode()
+    if digest != COUNTRIES_SRI:
+        return []
+    try:
+        features = json.loads(raw)["features"]
+    except (ValueError, KeyError, TypeError):
+        return []
+    rings = []
+    for f in features:
+        g = f.get("geometry") or {}
+        polys = ([g.get("coordinates")] if g.get("type") == "Polygon"
+                 else g.get("coordinates") if g.get("type") == "MultiPolygon" else [])
+        for poly in polys or []:
+            if poly and len(poly[0]) >= 3:
+                rings.append([(float(x), float(y)) for x, y, *_ in poly[0]])
+    return rings
+
+
 def parse_stations(raw: bytes | str) -> list[Station]:
     try:
         data = json.loads(raw)
@@ -277,6 +300,7 @@ def parse_stations(raw: bytes | str) -> list[Station]:
 class RadioDirectory(QObject):
     """Talks to Radio Browser. Every call answers with a signal on the UI thread."""
     globe_ready = Signal(list)          # [Station] with a location, most listened first
+    outlines_ready = Signal(list)       # outline_rings(): the flat map's land ([] offline)
     results = Signal(str, list)         # query, [Station]
     failed = Signal(str, str)           # "globe" | "search", message
 
@@ -291,6 +315,10 @@ class RadioDirectory(QObject):
     @property
     def cache_path(self):
         return self.cache_dir / "stations.json"
+
+    @property
+    def outlines_path(self):
+        return self.cache_dir / "countries.geojson"
 
     # -- plumbing
     def _get(self, path: str, done, fail, attempt: int = 0):
@@ -368,6 +396,40 @@ class RadioDirectory(QObject):
             tmp.replace(self.cache_path)
         except OSError:
             log.warning("can't cache the radio station list", exc_info=True)
+
+    # -- the flat map's land
+    def load_outlines(self):
+        """The country outlines, from the cache (they're pinned, so it never goes stale)
+        or jsDelivr. Answers [] when neither has them: the map shows just its dots."""
+        try:
+            rings = outline_rings(self.outlines_path.read_bytes())
+        except OSError:
+            rings = []
+        if rings:
+            QTimer.singleShot(0, lambda: self.outlines_ready.emit(rings))
+            return
+        req = QNetworkRequest(QUrl(COUNTRIES))
+        req.setHeader(QNetworkRequest.UserAgentHeader, USER_AGENT)
+        req.setTransferTimeout(TIMEOUT_MS)
+        reply = self.nam.get(req)
+
+        def finished():
+            reply.deleteLater()
+            raw = bytes(reply.readAll()) if reply.error() == QNetworkReply.NoError else b""
+            rings = outline_rings(raw)
+            if rings:
+                try:
+                    self.cache_dir.mkdir(parents=True, exist_ok=True)
+                    tmp = self.outlines_path.with_suffix(".tmp")
+                    tmp.write_bytes(raw)
+                    tmp.replace(self.outlines_path)
+                except OSError:
+                    log.warning("can't cache the map outlines", exc_info=True)
+            else:
+                log.info("map outlines unavailable: %s", reply.errorString() if not raw
+                         else "the file didn't match its pinned hash")
+            self.outlines_ready.emit(rings)
+        reply.finished.connect(finished)
 
     # -- search
     def search(self, text: str):
@@ -637,14 +699,13 @@ def globe_points(stations: list[Station]) -> list[dict]:
             for s in stations if s.lat is not None and s.lon is not None]
 
 
-def globe_html(qwebchannel_js: str, bg: str, accent: str, hot: str, text: str,
-               hd: bool = False) -> str:
-    """The globe page. Colours are theme tokens (validated hex), scripts are pinned.
+def globe_html(qwebchannel_js: str, bg: str, accent: str, hot: str, text: str) -> str:
+    """The 3D globe page (the Radio tab's HD view; the flat map is the default). Colours
+    are theme tokens (validated hex), scripts are pinned.
 
-    The light globe (the default) only draws while it's being used: no auto-spin, no
-    stars or terrain relief, one pixel per screen pixel. A web view that redraws 60+
-    times a second makes the whole app stutter. HD is the full show, opted into with
-    the page's HD button. Either one stops drawing while the app is in the background."""
+    It only draws while it's being used: no auto-spin, no stars or terrain relief, one
+    pixel per screen pixel. A web view that redraws 60+ times a second makes the whole
+    app stutter. It stops drawing at once while the app is in the background."""
     def hexcol(c: str, fallback: str) -> str:
         c = str(c)
         return c if len(c) == 7 and c[0] == "#" and all(ch in "0123456789abcdefABCDEF"
@@ -682,8 +743,8 @@ html,body{{margin:0;height:100%;overflow:hidden;background:{bg};color:{text};
 #zoom button{{width:30px;height:30px;border-radius:8px;border:1px solid rgba(255,255,255,.18);
   background:rgba(12,14,22,.75);color:#fff;font:600 17px 'Segoe UI',sans-serif;cursor:pointer}}
 #zoom button:hover{{border-color:var(--accent)}}
-#zoom #hd,#zoom #names{{font-size:10px;opacity:.6}}
-#zoom #hd.on,#zoom #names.on{{opacity:1;border-color:var(--accent)}}
+#zoom #flat,#zoom #names{{font-size:10px;opacity:.6}}
+#zoom #names.on{{opacity:1;border-color:var(--accent)}}
 .place{{font:600 11px 'Segoe UI',sans-serif;color:#fff;white-space:nowrap;pointer-events:none;
   text-shadow:0 0 3px #000,0 0 2px #000,0 1px 2px #000;opacity:.9;letter-spacing:.2px}}
 body.nogl .place{{visibility:hidden!important}}
@@ -694,7 +755,7 @@ body.nogl .place{{visibility:hidden!important}}
 <button id="zout" title="Zoom out (Ctrl −)">−</button>
 <button id="look" title="Day / night Earth">☾</button>
 <button id="names" title="Country and island names on / off">Aa</button>
-<button id="hd" title="">HD</button></div>
+<button id="flat" title="Back to the flat map (lighter on your PC)">2D</button></div>
 <div id="hint">Drag to spin · scroll or Ctrl +/− to zoom · click a dot to play</div>
 <script>{qwebchannel_js}</script>
 <script src="{GLOBE_JS}" integrity="{GLOBE_SRI}" crossorigin="anonymous"></script>
@@ -703,23 +764,21 @@ body.nogl .place{{visibility:hidden!important}}
 let ACCENT = "{accent}", HOT = "{hot}";
 const ring = () => t => HOT + Math.round(255 * (1 - t)).toString(16).padStart(2, "0");
 let W = null, bridge = null, stations = [], current = null, maxK = 1;
-let night = false, HD = {'true' if hd else 'false'};
+let night = false;
 let asleep = false, idleT = 0, appActive = true, fitting = false;
 try {{ night = localStorage.getItem("earth") === "night"; }} catch (e) {{}}
 const msg = t => {{ const m = document.getElementById("msg"); m.textContent = t || "";
                    m.style.display = t ? "flex" : "none"; }};
 // Draw only while something moves: input, a camera flight, a texture arriving, the
-// window being moved or resized. HD with the app in front spins forever, so it never
-// sleeps. In the background it still draws a moment, so a resize or a move to another
-// screen (which blanks the picture) is redrawn before it sleeps again.
+// window being moved or resized. In the background it still draws a moment, so a resize
+// or a move to another screen (which blanks the picture) is redrawn before it sleeps.
 function wake(ms) {{
   if (!W) return;
   if (asleep) {{ W.resumeAnimation(); asleep = false; }}
   if (!fitting) {{ fitting = true; requestAnimationFrame(fitLoop); }}
   clearTimeout(idleT);
-  if (!(HD && appActive && W.controls().autoRotate))
-    idleT = setTimeout(() => {{ if (W) {{ W.pauseAnimation(); asleep = true; }} }},
-                       appActive ? (ms || 1500) : 250);
+  idleT = setTimeout(() => {{ if (W) {{ W.pauseAnimation(); asleep = true; }} }},
+                     appActive ? (ms || 1500) : 250);
 }}
 function fitLoop() {{
   // the names are re-placed on every frame the globe draws (so, not while it sleeps)
@@ -767,13 +826,11 @@ function card(d) {{
 function zoom(f, ms) {{
   if (!W) return;
   const p = W.pointOfView();
-  W.controls().autoRotate = false;
   W.pointOfView({{altitude: Math.min(5, Math.max(0.12, p.altitude * f))}}, ms);
   wake(ms + 1500);
 }}
 function fly(lat, lng, altitude, ms) {{
   if (!W) return;
-  W.controls().autoRotate = false;
   W.pointOfView({{lat, lng, altitude}}, ms);
   wake(ms + 1500);
 }}
@@ -800,25 +857,7 @@ look.onclick = () => {{
   setLook();
 }};
 setLook();
-const hdBtn = document.getElementById("hd");
-function applyHd() {{
-  hdBtn.classList.toggle("on", HD);
-  hdBtn.title = HD ? "High detail is on: stars, terrain, a spinning globe and every " +
-    "station. Click for the light globe (smoother on slower PCs)."
-    : "Light globe: smoother for the rest of the app. Click for high detail " +
-    "(stars, terrain, a spinning globe, more stations; uses more graphics power).";
-  if (!W) return;
-  W.renderer().setPixelRatio(HD ? devicePixelRatio : 1);
-  W.backgroundImageUrl(HD ? "{SKY}" : null).bumpImageUrl(HD ? "{EARTH_BUMP}" : null)
-   .pointResolution(HD ? 6 : 4);
-  W.controls().autoRotate = HD;
-  wake(4000);
-}}
-hdBtn.onclick = () => {{
-  HD = !HD; applyHd();
-  if (bridge) bridge.setHd(HD);   // remembered, and the app sends the right number of dots
-}};
-applyHd();
+document.getElementById("flat").onclick = () => {{ if (bridge) bridge.setHd(false); }};
 function setActive(on) {{
   // the app went to the background (a game, another window): stop drawing
   appActive = !!on;
@@ -957,6 +996,7 @@ function build() {{
       .globeImageUrl(night ? "{EARTH_NIGHT}" : "{EARTH_DAY}")
       .onGlobeReady(() => wake(2500))
       .showAtmosphere(true).atmosphereColor("#7fb8ff").atmosphereAltitude(0.16)
+      .pointResolution(4)
       .pointLat("la").pointLng("lo")
       .pointAltitude(d => d.id === current ? 0.08 : 0.004 + 0.03 * Math.sqrt(d.k / maxK))
       .pointRadius(d => d.id === current ? 0.55 : 0.33)
@@ -968,12 +1008,10 @@ function build() {{
       .htmlLat("la").htmlLng("lo").htmlAltitude(0.01).htmlElement(placeEl)
       .htmlTransitionDuration(0).htmlElementsData(places);
     const c = W.controls();
-    c.autoRotateSpeed = 0.35;
     c.enableZoom = false;   // our own wheel handler zooms (see zoom above)
     const m = W.globeMaterial();
     if (m.specular) {{ m.specular.setStyle("#222a38"); m.shininess = 12; }}   // a soft sheen
     const cv = W.renderer().domElement;
-    cv.addEventListener("pointerdown", () => {{ c.autoRotate = false; }});
     // The names are page text, the globe a WebGL picture. Moving the window to another
     // screen can lose the picture (a lost context, or a resize that clears it while the
     // globe sleeps) while the text stays, so the names hide until the globe is back.
@@ -982,7 +1020,7 @@ function build() {{
       document.body.classList.remove("nogl"); wake(3000);
     }});
     const fit = () => {{
-      W.renderer().setPixelRatio(HD ? devicePixelRatio : 1);
+      W.renderer().setPixelRatio(1);
       W.width(innerWidth).height(innerHeight); fitNames(); wake();   // resizing clears it
     }};
     const onDpr = () => {{   // a screen with another scale: no resize event for that alone
@@ -995,7 +1033,6 @@ function build() {{
     matchMedia("(resolution: " + devicePixelRatio + "dppx)")
       .addEventListener("change", onDpr, {{once: true}});
     document.addEventListener("visibilitychange", () => {{ if (!document.hidden) wake(); }});
-    applyHd();
     msg(stations.length ? "" : "Finding stations…");
     if (stations.length) W.pointsData(stations);
     loadPlaces();

@@ -23,6 +23,7 @@ from PySide6.QtGui import (QColor, QIcon, QLinearGradient, QPainter, QPainterPat
 from PySide6.QtWidgets import QWidget
 
 from soundboard import theme
+from soundboard.ui import appstate
 
 FLAME = QColor("#ff8a2b")
 EMBER_COLORS = ("#ffcf40", "#ff8a2b", "#ff5a36")
@@ -85,6 +86,7 @@ class LogoWidget(QWidget):
         self._timer = QTimer(self)
         self._timer.setTimerType(Qt.CoarseTimer)
         self._timer.timeout.connect(self._step)
+        appstate.pause_in_background(self, self._resume, self._timer.stop)
 
     # ---- feeding
     def set_level(self, v: float):
@@ -95,9 +97,13 @@ class LogoWidget(QWidget):
 
     # ---- lifecycle
     def showEvent(self, e):
+        if appstate.active():   # behind a game it waits until the app is back in front
+            self._resume()
+        super().showEvent(e)
+
+    def _resume(self):
         self._last = time.monotonic()
         self._timer.start(FAST_MS)
-        super().showEvent(e)
 
     def hideEvent(self, e):
         self._timer.stop()

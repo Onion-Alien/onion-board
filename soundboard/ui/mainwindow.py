@@ -41,7 +41,7 @@ from soundboard.testcheck import analyze as analyze_output
 from soundboard.testcheck import summary_html
 from soundboard.ui.crashdialog import free_dialog
 from soundboard.ui.dialogs import EditDialog
-from soundboard.ui import a11y, icons, responsive
+from soundboard.ui import a11y, appstate, icons, responsive
 from soundboard.ui.speedpitch import SpeedPitchButton
 from soundboard.ui.panel import (EqPanel, VolumeControl, bar, card, hint_label, icon_label,
                                  vsep)
@@ -84,6 +84,7 @@ TABS = (("Sounds", "Your sound buttons: click one to play it"),
 
 UNDO_S = 10          # how long "Removed … · Undo" stays up
 TICK_MS = 33         # the UI timer while the window is on screen (meters, visualisers)
+TICK_BG_MS = 100     # ...while it's on screen but another program is in front (a game)
 TICK_IDLE_MS = 250   # ...and while it's in the tray or minimised (push-to-talk, watchdog)
 GLOW_STEPS = 4       # how many glow levels the taskbar / tray icon has while sound plays
 ICON_GLOW_MS = 120   # ...and how often at most it changes
@@ -216,6 +217,7 @@ class MainWindow(QMainWindow):
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.tick)
         self.timer.start(TICK_MS)
+        QApplication.instance().applicationStateChanged.connect(self._set_tick_rate)
         # which voice chat the game you're playing uses: a hint by Who's listening
         self.voice_suggestion: str | None = None
         self.voice_watch = voicesdk.Watcher() if sys.platform == "win32" else None
@@ -3412,9 +3414,11 @@ class MainWindow(QMainWindow):
 
     # ------------------------------------------------------------------ tick
     # The window's visibility sets the UI timer's pace: 30/s for the meters and
-    # visualisers while it's on screen, TICK_IDLE_MS while it's hidden in the tray or
-    # minimised (nothing to paint, but push-to-talk, the stream watchdog and the test
-    # recording must go on). Qt tells us through these three events.
+    # visualisers while it's on screen, TICK_BG_MS while it's on screen behind another
+    # program (a game: the meters still move, a third as often), TICK_IDLE_MS while it's
+    # hidden in the tray or minimised (nothing to paint, but push-to-talk, the stream
+    # watchdog and the test recording must go on). Qt tells us through these three
+    # events and applicationStateChanged.
     def showEvent(self, ev):
         shellicon.on_show(self)   # the Jump List icon, before the taskbar button exists
         super().showEvent(ev)
@@ -3433,12 +3437,19 @@ class MainWindow(QMainWindow):
         if ev.type() == QEvent.WindowStateChange:
             self._set_tick_rate()
 
-    def _set_tick_rate(self):
+    def _tick_pace(self) -> int:
+        if self.overlay.is_open:   # the in-game overlay shows what's playing, over the game
+            return TICK_MS
+        if not self._ui_live:
+            return TICK_IDLE_MS
+        return TICK_MS if appstate.active() else TICK_BG_MS
+
+    def _set_tick_rate(self, *_):
         live = self.isVisible() and not self.isMinimized()
-        pace = TICK_MS if live or self.overlay.is_open else TICK_IDLE_MS   # see tick()
-        if live == self._ui_live and self.timer.interval() == pace:
+        was, self._ui_live = self._ui_live, live
+        pace = self._tick_pace()
+        if live == was and self.timer.interval() == pace:
             return
-        self._ui_live = live
         self.timer.start(pace)
         if not live:   # a level frozen mid-flight would show as stuck on the next show
             self.out_meter.set_level(0.0)
@@ -3456,8 +3467,7 @@ class MainWindow(QMainWindow):
         if self._queue and not any(sid in self._meta for sid in playing):
             self._next_in_queue()
             playing = e.playing()
-        # the in-game overlay shows what's playing too, usually with this window in the tray
-        pace = TICK_MS if self._ui_live or self.overlay.is_open else TICK_IDLE_MS
+        pace = self._tick_pace()
         if self.timer.interval() != pace:
             self.timer.start(pace)
         if self._ui_live:
@@ -3509,9 +3519,10 @@ class MainWindow(QMainWindow):
     def _tick_visuals(self, playing, now: float):
         """The part of tick() that only matters while the window is on screen."""
         e = self.engine
+        on_board = self.tabs.currentWidget() is self.sounds_page   # no visualiser off-screen
         for sid, p in self.pads.items():
             prog, paused = playing.get(sid, (None, False))
-            if prog is not None and not paused and not p.isHidden():
+            if prog is not None and not paused and on_board and not p.isHidden():
                 p.set_levels(spectrum(self.audio.get(sid), prog, p.n_bands))
             elif prog is None and p.bands is not None:
                 p.set_levels(None)

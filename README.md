@@ -213,10 +213,11 @@ too (say No if another program, like Voicemeeter, uses it).
   - Hotkeys can beep in your headphones (only you hear it), so you know they
     worked.
 - **Radio tab:** internet radio from all over the world, from the free
-  [Radio Browser](https://www.radio-browser.info) directory. Spin the 3D globe and
-  click a dot to tune in (hover one for its country, genres, quality and how
-  popular it is; zoom with the scroll wheel or Ctrl +/−), or search by name, genre
-  or country. Star stations for
+  [Radio Browser](https://www.radio-browser.info) directory. Click a dot on the
+  world map to tune in (hover one for its country, genres, quality and how popular
+  it is; drag to move, scroll to zoom), or search by name, genre or country. The
+  map's **HD** button swaps it for a 3D globe you can spin (heavier: it runs a web
+  engine); **2D** on the globe goes back. Star stations for
   *★ Favorites*. It plays in your headphones, goes out through
   your mic when you press **LIVE**, and can *Record* or save the *Last 15s* as a pad.
 - **Voice tab:** voice changer (pitch, robot, radio, echo, reverb, distortion,
@@ -443,8 +444,10 @@ the launcher the shortcuts and PyInstaller use. The app is the `soundboard` pack
 | `soundboard/ui/appspanel.py` | the Apps tab: one row per program (level, **Send**, volume, *Hear it myself*); programs you switch on are remembered by .exe and picked up again when they run |
 | `soundboard/engine.py` | real-time audio: WASAPI streams (mic in, cable out, headphones out, the optional stream output for OBS), mixing (sounds, radio and captured programs), pause/seek, live speed / pitch, limiter, watchdog |
 | `soundboard/eq.py` | 7-band biquad equalizer and presets |
-| `soundboard/radio.py` | Radio tab back end: the Radio Browser directory client (stations, search, a day's cache), the stream player (Qt Multimedia decodes, a `QAudioBufferOutput` hands 48 kHz PCM to the engine) and the globe page (globe.gl, pinned with SRI) |
-| `soundboard/ui/radiopanel.py` | the Radio tab: search bar, 3D globe (click a dot to play), station list, favourites, LIVE / record / last 15 s |
+| `soundboard/radio.py` | Radio tab back end: the Radio Browser directory client (stations, search, a day's cache), the stream player (Qt Multimedia decodes, a `QAudioBufferOutput` hands 48 kHz PCM to the engine) the globe page (globe.gl, pinned with SRI) and the flat map's land outlines (SHA-384-checked) |
+| `soundboard/ui/radiopanel.py` | the Radio tab: search bar, the map (click a dot to play), station list, favourites, LIVE / record / last 15 s |
+| `soundboard/ui/flatmap.py` | the Radio tab's flat world map (the default view, painted by Qt, no web engine); the 3D globe is its HD option |
+| `soundboard/ui/appstate.py` | stops decorative animations (logo, mascots, live dot) while another program is in front |
 | `soundboard/recorder.py` | the Radio tab's clip recorder: a rolling last-15-seconds buffer plus a recording spooled to disk |
 | `soundboard/library.py` | decoding (bounded to 15 min), the int16 decoded-audio cache (plus each sound's rendered effects version), loudness levelling, duplicating a sound, imports and clips (FLAC), versioned config with backups |
 | `soundboard/theme.py` | colour themes (tokens → stylesheet, also read by the painted widgets) and the logo |

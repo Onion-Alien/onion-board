@@ -5,12 +5,15 @@ so it can't be left on by accident without you noticing from another tab. The ta
 name is drawn in the live colour too."""
 from __future__ import annotations
 
-from PySide6.QtCore import QPointF, QSize, Qt, QVariantAnimation
+import math
+import time
+
+from PySide6.QtCore import QPointF, QSize, Qt, QTimer
 from PySide6.QtGui import QColor, QPainter, QPalette, QRadialGradient
 from PySide6.QtWidgets import QProxyStyle, QStyleFactory, QTabBar, QTabWidget, QWidget
 
 from soundboard import theme
-from soundboard.ui import icons
+from soundboard.ui import appstate, icons
 
 GREEN = "#13ce66"     # the dot and the tab's icon: the same green as the voice changer's ON switch
 BASE_STYLE = "Fusion"   # the app's widget style (app.py); the tab bar's own style sits on it
@@ -24,7 +27,8 @@ def live_color() -> str:
 
 class LiveDot(QWidget):
     """A green dot with a soft halo that breathes (the halo, not the dot, so it
-    stays readable). Animation runs only while the dot is shown."""
+    stays readable). Animation runs only while the dot is shown and the app is in
+    front, at 15 frames a second: a slow breath doesn't need more."""
 
     SIZE = 20
 
@@ -34,24 +38,25 @@ class LiveDot(QWidget):
         self._glow = 1.0
         self.setFixedSize(QSize(self.SIZE, self.SIZE))
         self.setAttribute(Qt.WA_TransparentForMouseEvents)   # clicks go to the tab
-        self._anim = QVariantAnimation(self)
-        self._anim.setDuration(1400)
-        self._anim.setStartValue(1.0)
-        self._anim.setKeyValueAt(0.5, 0.25)
-        self._anim.setEndValue(1.0)
-        self._anim.setLoopCount(-1)
-        self._anim.valueChanged.connect(self._set_glow)
+        self._timer = QTimer(self)
+        self._timer.setInterval(66)
+        self._timer.setTimerType(Qt.CoarseTimer)
+        self._timer.timeout.connect(self._step)
+        appstate.pause_in_background(self, self._timer.start, self._timer.stop)
 
-    def _set_glow(self, v):
-        self._glow = float(v)
+    def _step(self):
+        # 1 → 0.25 → 1 every 1.4 s
+        phase = (time.monotonic() % 1.4) / 1.4
+        self._glow = 0.625 + 0.375 * math.cos(2 * math.pi * phase)
         self.update()
 
     def showEvent(self, e):
-        self._anim.start()
+        if appstate.active():
+            self._timer.start()
         super().showEvent(e)
 
     def hideEvent(self, e):
-        self._anim.stop()
+        self._timer.stop()
         super().hideEvent(e)
 
     def paintEvent(self, _e):

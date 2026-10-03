@@ -175,6 +175,9 @@ def test_playing_pad_gets_visualizer_levels(qapp, window, monkeypatch):  # noqa:
     monkeypatch.setattr(window.engine, "playing", lambda: {"s0": (0.2, False)})
     window.tick()
     pad = window.pads["s0"]
+    assert pad.bands is None and pad.progress == 0.2   # another tab showing: no spectrum
+    window.tabs.setCurrentWidget(window.sounds_page)
+    window.tick()
     assert pad.bands is not None and pad.bands.max() > 0.3 and pad.progress == 0.2
     monkeypatch.setattr(window.engine, "playing", lambda: {})
     window.tick()

@@ -17,6 +17,8 @@ from PySide6.QtCore import QPointF, QRectF, QSize, Qt, QTimer, Signal
 from PySide6.QtGui import QColor, QCursor, QFont, QImage, QPainter, QPainterPath, QPen
 from PySide6.QtWidgets import QSizePolicy, QWidget
 
+from soundboard.ui import appstate
+
 # drawn on a 100 x 120 canvas, scaled to the requested height
 W, H = 100.0, 120.0
 INK = QColor("#2b2340")
@@ -265,6 +267,7 @@ class OwlWidget(QWidget):
         self._timer = QTimer(self)
         self._timer.setInterval(1000 // FPS)
         self._timer.timeout.connect(self._tick)
+        appstate.pause_in_background(self, self._resume, self._timer.stop)
 
     def sizeHint(self) -> QSize:
         return QSize(round(self.owl_h * W / H) + self.left + self.right,
@@ -274,9 +277,13 @@ class OwlWidget(QWidget):
         return QSize(round(self.owl_h * W / H) + 8, self.owl_h + self.top + 8)
 
     def showEvent(self, ev):
+        if appstate.active():   # behind a game it waits until the app is back in front
+            self._resume()
+        super().showEvent(ev)
+
+    def _resume(self):
         self._last = time.monotonic()
         self._timer.start()
-        super().showEvent(ev)
 
     def hideEvent(self, ev):
         self._timer.stop()

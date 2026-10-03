@@ -1,6 +1,7 @@
-"""The Radio tab: internet radio from all over the world, picked on a 3D globe or
+"""The Radio tab: internet radio from all over the world, picked on a world map or
 by searching, played through the engine so it can go out through your mic like
-the Browser tab's audio. The directory, player and globe page are in radio.py.
+the Browser tab's audio. The directory, player and globe page are in radio.py; the
+flat map (the default view) is ui/flatmap.py, the 3D globe its HD option.
 
 Nothing touches the network until the tab is first opened.
 """
@@ -38,7 +39,7 @@ LIST_MAX = 300             # rows shown at once
 SEARCH_DELAY_MS = 450      # typing pause before the directory is asked
 FAV_MAX = 200
 RECENT_MAX = 30
-GREEN = "#13ce66"   # the globe's highlight on dark themes
+GREEN = "#13ce66"   # the playing station's highlight on dark themes
 ROW_H = 54
 
 # genre chips: a station is in a genre when one of its tags contains one of the words
@@ -93,7 +94,7 @@ def _qwebchannel_js() -> str:
 
 class _Bridge(QObject):
     """The globe page's only way back into the app: "this dot was clicked" and
-    "the HD button was pressed"."""
+    "back to the flat map" (setHd(false))."""
     clicked = Signal(str)
     hd = Signal(bool)
 
@@ -283,9 +284,12 @@ class RadioTab(QWidget):
         from soundboard.recorder import Recorder
         self.recorder = Recorder(library.APP_DIR / "radio-recording.tmp.wav")
 
-        self._want_globe = globe
-        self.view = None           # the globe, made on first show
+        self._want_globe = globe   # a map at all (tests run without one)
+        self.view = None           # the 3D globe (HD), made on first show when chosen
+        self.flat = None           # ...or the flat map (the default)
         self._globe_loaded = False
+        self._app_state_hooked = False
+        self._outlines_hooked = False
         self._started = False
         self._stations: dict[str, Station] = {}
         self._globe_list: list[Station] = []
@@ -306,7 +310,7 @@ class RadioTab(QWidget):
         self._fav_ids = {s.uuid for s in self.favorites}
         self._genre = ""           # "" = all genres
         self._country = ""         # "" = all countries
-        self._globe_shown: list[str] = []   # uuids last pinned on the globe
+        self._globe_shown: list[str] = []   # uuids last pinned on the map
 
         v = QVBoxLayout(self)
         v.setContentsMargins(0, 8, 0, 0)
@@ -317,7 +321,7 @@ class RadioTab(QWidget):
         top.setSpacing(8)
         self.search = QLineEdit()
         self.search.setPlaceholderText("Search radio stations, genres or countries…  "
-                                       "(or spin the globe and click a dot)")
+                                       "(or click a dot on the map)")
         self.search.setClearButtonEnabled(True)
         self.search.textChanged.connect(self._on_text)
         self.search.returnPressed.connect(self._search_now)
@@ -652,10 +656,71 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
         if self._want_globe:
             w = max(self.split.width(), 800)
             self.split.setSizes([w * 3 // 5, w * 2 // 5])
-            # after the tab has painted: starting the web view takes a moment
-            QTimer.singleShot(0, self, lambda: self._make_globe())
+            # after the tab has painted: starting a web view takes a moment
+            QTimer.singleShot(0, self, self._make_map)
         self.dir.load_globe()
         self._refresh_info()
+
+    # ------------------------------------------------------------------ the map
+    def _map_mode(self) -> str:
+        """"flat" (the default, painted by Qt: no web engine) or "globe" (HD, 3D)."""
+        return "globe" if self.cfg.radio.get("map") == "globe" else "flat"
+
+    def _make_map(self):
+        if self._map_mode() == "globe":
+            self._make_globe()
+        else:
+            self._make_flat()
+
+    def _set_map(self, mode: str):
+        """Swap the flat map and the 3D globe. The one going away is deleted, so the
+        globe's web engine isn't kept alive behind a flat map."""
+        if mode == self._map_mode() and (self.view or self.flat):
+            return
+        self.cfg.radio["map"] = mode
+        self.cfg.radio.pop("globe_hd", None)   # the old light / HD globe switch
+        self._save()
+        for w in (self.view, self.flat):
+            if w is not None:
+                self.globe_layout.removeWidget(w)
+                w.hide()
+                w.deleteLater()
+        self.view = self.flat = None
+        self._globe_loaded = False
+        self._globe_shown = []
+        self._make_map()
+
+    def _make_flat(self):
+        from soundboard.ui.flatmap import FlatMap
+        self.flat = FlatMap()
+        self.flat.clicked.connect(self._on_globe_click)
+        self.flat.hd_requested.connect(lambda: self._set_map("globe"))
+        self.globe_layout.addWidget(self.flat)
+        if not self._outlines_hooked:
+            self._outlines_hooked = True
+            self.dir.outlines_ready.connect(self._on_outlines)
+        self.dir.load_outlines()
+        if self._globe_error:
+            self.flat.show_message(self._no_stations_text())
+        self._push_globe(force=True)
+        self._select_on_globe(fly=False)
+
+    def _on_outlines(self, rings: list):
+        if self.flat is not None:
+            self.flat.set_land(rings)
+
+    _FLAT_CALLS = {"setStations": "set_points", "select": "select", "fly": "fly",
+                   "showMessage": "show_message", "setTheme": "set_theme"}
+
+    def _map(self, fn: str, *args):
+        """Tell whichever map is showing: the flat map's method, or the globe page's
+        function for the same job (args go to the page as JSON)."""
+        if self.flat is not None:
+            method = self._FLAT_CALLS.get(fn)
+            if method:
+                getattr(self.flat, method)(*args)
+        else:
+            self._js(f"{fn}({', '.join(json.dumps(a) for a in args)})")
 
     def _make_globe(self):
         from PySide6.QtWebChannel import QWebChannel
@@ -670,10 +735,11 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
                 # only our own page (setHtml arrives as a data: URL); links go nowhere
                 return not is_main_frame or url.scheme() in ("data", "about")
 
-        store = radio.radio_dir() / "web"
-        self.profile = QWebEngineProfile("soundboard-radio", self)   # caches the globe script
-        self.profile.setPersistentStoragePath(str(store))
-        self.profile.setCachePath(str(store / "cache"))
+        if getattr(self, "profile", None) is None:
+            store = radio.radio_dir() / "web"
+            self.profile = QWebEngineProfile("soundboard-radio", self)   # caches the script
+            self.profile.setPersistentStoragePath(str(store))
+            self.profile.setCachePath(str(store / "cache"))
         self.view = QWebEngineView()
         page = Page(self.profile, self.view)
         self._bridge = _Bridge(self)
@@ -687,10 +753,11 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
         self.view.setContextMenuPolicy(Qt.NoContextMenu)
         t = theme.T
         page.setHtml(radio.globe_html(_qwebchannel_js(), t["bg"], t["accent"], t["accent2"],
-                                      t["text"], hd=self._globe_hd()), QUrl("about:blank"))
+                                      t["text"]), QUrl("about:blank"))
         self.globe_layout.addWidget(self.view)
         app = QGuiApplication.instance()
-        if app is not None:
+        if app is not None and not self._app_state_hooked:
+            self._app_state_hooked = True
             app.applicationStateChanged.connect(self._on_app_state)
         self._follow_window()
 
@@ -720,13 +787,9 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
     def _wake_globe(self, *_):
         self._js("wake()")
 
-    def _globe_hd(self) -> bool:
-        return bool(self.cfg.radio.get("globe_hd", False))
-
     def _on_globe_hd(self, on: bool):
-        self.cfg.radio["globe_hd"] = on
-        self._save()
-        self._push_globe()   # HD shows every station, the light globe the top ones
+        # from inside the page's own callback: swap once it has returned
+        QTimer.singleShot(0, self, lambda: self._set_map("globe" if on else "flat"))
 
     def _on_app_state(self, state):
         # a game or another window in front: the globe stops drawing
@@ -747,19 +810,20 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
         self._select_on_globe(fly=False)
 
     def _push_globe(self, force: bool = False):
-        """Pin the popular stations on the globe — only those the filters let through."""
+        """Pin the popular stations on the map — only those the filters let through. The
+        flat map takes them all, the globe the most listened (WebGL: fewer is smoother)."""
         shown = self._filtered(self._globe_list)
-        if not self._globe_hd():
+        if self._map_mode() == "globe":
             shown = shown[:radio.GLOBE_LIGHT]   # the list is most-listened first
         ids = [s.uuid for s in shown]
         if force or ids != self._globe_shown:
             self._globe_shown = ids
-            self._js(f"setStations({json.dumps(radio.globe_points(shown))})")
+            self._map("setStations", radio.globe_points(shown))
 
     def _select_on_globe(self, fly: bool):
         st = self.player.station
         pts = radio.globe_points([st]) if st is not None else []
-        self._js(f"select({json.dumps(pts[0] if pts else None)}, {'true' if fly else 'false'})")
+        self._map("select", pts[0] if pts else None, fly)
 
     def _on_globe_click(self, uuid: str):
         s = self._stations.get(uuid)
@@ -799,8 +863,8 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
 
     def _on_failed(self, kind: str, msg: str):
         if kind == "globe":
-            self._js("showMessage('The station directory can\\'t be reached right now. "
-                     "Check your connection and press ↻.')")
+            self._map("showMessage", "The station directory can't be reached right now. "
+                      "Check your connection and press ↻.")
             # stays up (list and info line) until a reload gets through
             self._globe_error = msg or "no answer"
             self._flash_until = 0.0
@@ -923,9 +987,9 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
     def _on_current(self, it, _prev):
         s = self._stations.get(it.data(Qt.UserRole)) if it is not None else None
         if s is not None and s.lat is not None and self.player.station is None:
-            # browsing the list turns the globe to the station (play one and it stays put)
+            # browsing the list turns the map to the station (play one and it stays put)
             p = radio.globe_points([s])[0]
-            self._js(f"fly({p['la']}, {p['lo']}, 1.8, 800)")
+            self._map("fly", p["la"], p["lo"], 1.8, 800)
         self._update_buttons()
 
     def _on_activated(self, it):
@@ -1037,7 +1101,7 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
         st, state = self.player.station, self.player.status
         if st is None:
             n = len(self._globe_list)
-            text = (f"{n:,} popular stations — spin the globe and click a dot, or search. "
+            text = (f"{n:,} popular stations — click a dot on the map, or search. "
                     "Click a station's badge (or double-click it) to play it." if n else
                     self._no_stations_text())
             if not n and self._globe_error:
@@ -1182,9 +1246,8 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
         self._globe_theme()
 
     def _globe_theme(self):
-        """The globe page was built with the theme of its day: send it today's."""
-        args = ", ".join(json.dumps(theme.T[k]) for k in ("bg", "accent", "accent2", "text"))
-        self._js(f"setTheme({args})")
+        """The map was drawn in the theme of its day: send it today's."""
+        self._map("setTheme", *(theme.T[k] for k in ("bg", "accent", "accent2", "text")))
 
     def shutdown(self):
         self.timer.stop()

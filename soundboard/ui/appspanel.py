@@ -260,7 +260,12 @@ class AppRow(QFrame):
 
     _icons = QFileIconProvider()
 
-    def _set_icon(self, path: str):
+    def _set_icon(self, path: str, force: bool = False):
+        # set_app runs on every refresh (each 1.5 s, 5 s while hidden): the shell's
+        # icon lookup is only worth doing when the program changed
+        if not force and path == getattr(self, "_icon_path", None):
+            return
+        self._icon_path = path
         pm = None
         if path:
             try:
@@ -725,4 +730,4 @@ class AppsTab(QWidget):
 
     def retheme(self):
         for row in self.rows.values():   # a program that isn't running: the placeholder
-            row._set_icon(row.app.path if row.app is not None else "")
+            row._set_icon(row.app.path if row.app is not None else "", force=True)

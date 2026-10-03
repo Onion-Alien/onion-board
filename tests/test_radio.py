@@ -75,11 +75,72 @@ def test_globe_page_escapes_the_card_and_zooms_itself():
     assert "passive: false" in page and "c.enableZoom = false" in page
 
 
-def test_globe_page_is_light_unless_hd():
-    light = radio.globe_html("", "#000000", "#111111", "#222222", "#333333")
-    hd = radio.globe_html("", "#000000", "#111111", "#222222", "#333333", hd=True)
-    assert "HD = false" in light and "HD = true" in hd
-    assert "pauseAnimation" in light and "bridge.setHd" in light and "setActive" in light
+def test_globe_page_is_light_and_leads_back_to_the_flat_map():
+    page = radio.globe_html("", "#000000", "#111111", "#222222", "#333333")
+    assert "pauseAnimation" in page and "bridge.setHd(false)" in page and "setActive" in page
+    # nothing that draws on its own: no spin, no stars, no relief, one pixel per pixel
+    assert "autoRotate" not in page and "night-sky" not in page and "topology" not in page
+    assert "setPixelRatio(1)" in page
+
+
+def _outline_file(**changes):
+    geo = {"type": "FeatureCollection", "features": [
+        {"type": "Feature", "properties": {"NAME": "Square"},
+         "geometry": {"type": "Polygon", "coordinates": [[[0, 0], [10, 0], [10, 10], [0, 0]]]}},
+        {"type": "Feature", "properties": {"NAME": "Two"},
+         "geometry": {"type": "MultiPolygon", "coordinates": [
+             [[[20, 20], [30, 20], [30, 30], [20, 20]]], [[[40, 40], [50, 40], [50, 50]]]]}}]}
+    geo.update(changes)
+    return json.dumps(geo).encode()
+
+
+def test_map_outlines_must_be_the_pinned_file(monkeypatch):
+    import base64
+    import hashlib
+    raw = _outline_file()
+    assert radio.outline_rings(raw) == []          # not the pinned file: refused
+    monkeypatch.setattr(radio, "COUNTRIES_SRI",
+                        "sha384-" + base64.b64encode(hashlib.sha384(raw).digest()).decode())
+    rings = radio.outline_rings(raw)
+    assert len(rings) == 3 and rings[0][1] == (10.0, 0.0)
+    assert radio.outline_rings(raw + b" ") == [] and radio.outline_rings("text") == []
+
+
+def test_flat_map_hovers_clicks_and_follows_the_playing_station(qapp):
+    from PySide6.QtCore import QPointF, Qt
+    from PySide6.QtGui import QMouseEvent
+    from PySide6.QtWidgets import QApplication
+
+    from soundboard.ui.flatmap import FlatMap
+    m = FlatMap()
+    m.resize(720, 284)          # 2 px per degree
+    pts = radio.globe_points([Station.from_api(api_station(i, geo_lat=10 * i, geo_long=20 * i,
+                                                           name=f"<b>S{i}</b>"))
+                              for i in range(1, 4)])
+    m.set_points(pts)
+    m.set_land([[(0, 0), (10, 0), (10, 10)]])
+    m.grab()                    # paints (land, dots) without a window
+    x, y = m._screen()
+    i = [d["id"] for d in m._points].index("uuid-2")
+    at = QPointF(x[i] + 2, y[i] - 1)
+    assert m._hit(at) == i and m._hit(QPointF(5, 5)) == -1
+    assert "&lt;b&gt;S2&lt;/b&gt;" in m._tip(m._points[i])        # names are text
+    got = []
+    m.clicked.connect(got.append)
+    for kind in (QMouseEvent.MouseButtonPress, QMouseEvent.MouseButtonRelease):
+        QApplication.sendEvent(m, QMouseEvent(kind, at, at, Qt.LeftButton, Qt.LeftButton,
+                                              Qt.NoModifier))
+    assert got == ["uuid-2"]
+    extra = radio.globe_points([Station.from_api(api_station(9, geo_lat=-20, geo_long=-60))])[0]
+    m.select(extra, go=True)    # one found by search joins the map, which turns to it
+    assert len(m._points) == 4 and m.zoom > 1 and (m.cx, m.cy) == (-60, -20)
+    m.grab()
+    m._zoom_by(100)
+    assert m.zoom == pytest.approx(14)
+    m.mouseDoubleClickEvent(QMouseEvent(QMouseEvent.MouseButtonDblClick, QPointF(1, 1),
+                                        QPointF(1, 1), Qt.LeftButton, Qt.LeftButton,
+                                        Qt.NoModifier))
+    assert m.zoom == 1
 
 
 def test_globe_page_names_countries_and_islands():
@@ -429,14 +490,40 @@ def test_tab_lists_popular_stations_and_starts_off_air(tab):
     assert tab.engine.radio_vol == pytest.approx(0.5)
 
 
-def test_light_globe_pins_only_the_top_stations_and_hd_is_remembered(tab, monkeypatch):
+def test_globe_pins_only_the_top_stations(tab, monkeypatch):
     sent = []
     monkeypatch.setattr(tab, "_js", sent.append)
     monkeypatch.setattr(radio, "GLOBE_LIGHT", 2)
+    tab.cfg.radio["map"] = "globe"
     tab._push_globe(force=True)
-    assert sent[-1].count('"id"') == 2
-    tab._on_globe_hd(True)
-    assert tab.cfg.radio["globe_hd"] is True and sent[-1].count('"id"') == 5
+    assert sent[-1].startswith("setStations(") and sent[-1].count('"id"') == 2
+
+
+def test_flat_map_is_the_default_and_hd_swaps_in_the_globe(qapp, app_dir, server, monkeypatch):
+    from soundboard.ui.flatmap import FlatMap
+    from soundboard.ui.radiopanel import RadioTab
+    d = RadioDirectory(app_dir / "radio", bases=(server.base,))
+    monkeypatch.setattr(d, "load_outlines", lambda: d.outlines_ready.emit([]))   # offline
+    cfg = Config()
+    cfg.radio = {"globe_hd": True}               # the old switch: the flat map all the same
+    t = RadioTab(FakeEngine(), cfg, lambda: None, FakeMeter, directory=d, globe=True)
+    made = []
+    monkeypatch.setattr(t, "_make_globe", lambda: made.append(1))
+    t.start()
+    assert process_events(qapp, lambda: t.flat is not None and t._globe_list)
+    assert isinstance(t.flat, FlatMap) and t.view is None and not made
+    assert len(t.flat._points) == 5               # the flat map takes every station
+    flat = t.flat
+    flat.hd_requested.emit()
+    assert made and t.flat is None and cfg.radio["map"] == "globe"
+    assert "globe_hd" not in cfg.radio
+    from PySide6.QtCore import QEvent
+    from shiboken6 import isValid
+    qapp.sendPostedEvents(None, QEvent.DeferredDelete)
+    assert not isValid(flat)                      # deleted, not hidden
+    t._on_globe_hd(False)                         # the globe page's 2D button
+    assert process_events(qapp, lambda: t.flat is not None) and cfg.radio["map"] == "flat"
+    t.shutdown()
 
 
 def test_moving_the_window_keeps_the_globe_drawing(qapp, tab, monkeypatch):
@@ -530,7 +617,9 @@ def test_globe_click_reaches_the_tab_without_the_internet(qapp, app_dir, server,
 
     eng = FakeEngine()
     d = RadioDirectory(app_dir / "radio", bases=(server.base,))
-    t = RadioTab(eng, Config(), lambda: None, FakeMeter, directory=d, globe=True)
+    cfg = Config()
+    cfg.radio = {"map": "globe"}
+    t = RadioTab(eng, cfg, lambda: None, FakeMeter, directory=d, globe=True)
     played = []
     monkeypatch.setattr(t, "play", played.append)
     t._make_globe_orig = t._make_globe

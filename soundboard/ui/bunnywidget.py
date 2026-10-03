@@ -31,6 +31,7 @@ from PySide6.QtGui import QColor, QFont, QPainter, QPainterPath, QPen
 from PySide6.QtWidgets import QSizePolicy, QWidget
 
 from soundboard.bunny import H, INK, W, WOOD, draw_bunny, music_note, sparkle
+from soundboard.ui import appstate
 
 NOTE_COLORS = ("#7c5cff", "#a48bff", "#1fb6ff", "#ff8fae", "#13ce66")
 SPARKLE_COLORS = ("#ffcf40", "#ff8fae", "#1fb6ff", "#a48bff")
@@ -115,6 +116,7 @@ class BunnyWidget(QWidget):
         self._timer = QTimer(self)
         self._timer.setInterval(1000 // FPS)
         self._timer.timeout.connect(self._step)
+        appstate.pause_in_background(self, self._resume, self._timer.stop)
 
     def sizeHint(self) -> QSize:
         return QSize(round(self.bun_h * W / H) + 2 * self.pad + 20 + 2 * self.side,
@@ -194,9 +196,13 @@ class BunnyWidget(QWidget):
 
     # ------------------------------------------------------------------ animation
     def showEvent(self, ev):
+        if appstate.active():   # behind a game it waits until the app is back in front
+            self._resume()
+        super().showEvent(ev)
+
+    def _resume(self):
         self._last = time.monotonic()
         self._timer.start()
-        super().showEvent(ev)
 
     def hideEvent(self, ev):
         self._timer.stop()
