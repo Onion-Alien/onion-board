@@ -35,6 +35,25 @@ def test_categories_filter_the_pads_and_the_overlay(window):
     assert window.cfg.category == "" and window.cat_tabs.currentIndex() == 0
 
 
+def test_web_results_put_a_back_button_in_place_of_the_category_tabs(window, monkeypatch):
+    """The category tabs pick pads, so they step aside while web results take the
+    pads' place; the results' own back button brings both back. The new-category
+    button is a "+" right after the last tab, not across the window."""
+    window.new_category(name="Memes")
+    window.tabs.setCurrentWidget(window.sounds_page)
+    window.show()
+    assert window.btn_cat_add.text() == "" and window.btn_cat_add.toolTip()
+    assert window.btn_cat_add.x() < window.cat_tabs.geometry().right() + 40
+    monkeypatch.setattr(window.ytresults, "available", lambda: True)
+    monkeypatch.setattr(window.ytresults, "search", lambda q: window.ytresults.show() or True)
+    window.search.setText("test tone")
+    window.search_youtube()
+    assert not window._cat_row.isVisibleTo(window) and window.ytresults.isVisibleTo(window)
+    window.ytresults.btn_back.click()
+    assert window._cat_row.isVisibleTo(window) and window._pads_scroll.isVisibleTo(window)
+    assert window.ytresults.isHidden()
+
+
 def test_rename_and_delete_category_keep_the_sounds(window, monkeypatch):
     from PySide6.QtWidgets import QMessageBox
     monkeypatch.setattr(QMessageBox, "question", lambda *a, **k: QMessageBox.Yes)

@@ -9,6 +9,11 @@
   answer and encryption where the app can read them. Requests a switch turned
   away show as blocked. Kept in memory only: nothing is saved, logged or sent,
   and key-like values in addresses are masked.
+- **Tidier search results and category tabs:** web search results open with a
+  *← My sounds* back button at the start of their header (it was *Back to my
+  sounds*, alone at the far right), and the category tabs step aside while the
+  results show, since they only pick pads. New categories are made with a small
+  *+* right after the last tab instead of a *+ Category* button across the window.
 - **City and town names on the radio maps:** zoom in on the flat map or the 3D
   globe and the cities and towns that have stations are named, so you can find
   your own place and its stations. Only the places in view are named, a few dozen

@@ -148,7 +148,7 @@ too (say No if another program, like Voicemeeter, uses it).
   the sounds folder (**Sounds folder** opens it; they join the board by themselves). Plays mp3, wav, ogg,
   flac, m4a and more, and pulls the audio out of video files. Search, reorder,
   resize, set colours.
-- **Categories:** the tabs above the pads (*+ Category* makes one). Right-click a
+- **Categories:** the tabs above the pads (the *+* after the last tab makes one). Right-click a
   pad → *Categories* to put it in any number of them; right-click a category to
   rename, export or delete it. The in-game overlay shows the same category, and
   its **R** key (numpad **\***) switches to the next one. Right-click a category to
