@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 1.6.1 — 2026-10-03
 
 - **Custom text-to-speech voices** (Voice tab → More options → *Custom voices*): use
   a TTS server running on your PC (Kokoro, AllTalk, openedai-speech, LocalAI — any
