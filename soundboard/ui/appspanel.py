@@ -27,7 +27,7 @@ from soundboard.library import MAX_SECONDS, trim_silence
 from soundboard.recorder import ArmedRecorder
 from soundboard.ui import icons
 from soundboard.ui.bunnywidget import BunnyWidget
-from soundboard.ui.panel import UndoBar, VolumeControl, card, hint_label
+from soundboard.ui.panel import UndoBar, VolumeControl, hint_label
 from soundboard.ui.responsive import FitWidth
 
 log = logging.getLogger(__name__)
@@ -293,8 +293,9 @@ class AppsTab(QWidget):
         v = QVBoxLayout(self)
         v.setContentsMargins(0, 8, 0, 0)
         v.setSpacing(8)
-        head, hv = card("SEND A PROGRAM'S SOUND", info=
-                        "Pick a program that's playing — a music player, a browser, a game, "
+        # the explanation is behind the ⓘ at the end of the tab bar (MainWindow)
+        self.info = ("Send a program's sound",
+                     "Pick a program that's playing — a music player, a browser, a game, "
                         "even a call in another app — and it goes out to whoever's listening, "
                         "on its own volume. Only that program: nothing else you play is "
                         "touched, and it keeps playing on your speakers as before. Programs "
@@ -302,14 +303,13 @@ class AppsTab(QWidget):
         self.warn = hint_label("")
         theme.set_tone(self.warn, "warn")
         self.warn.setVisible(False)
-        hv.addWidget(self.warn)
+        v.addWidget(self.warn)
         self.btn_bin = QPushButton("Forgotten programs…")
         self.btn_bin.setToolTip("Bring back a program you forgot, with its volume and "
                                 "“Hear it myself”")
         icons.set_icon(self.btn_bin, "trash")
         self.btn_bin.clicked.connect(self.show_forgotten)
-        hv.addWidget(self.btn_bin, 0, Qt.AlignLeft)
-        v.addWidget(head)
+        v.addWidget(self.btn_bin, 0, Qt.AlignLeft)
         self.undo_bar = UndoBar("Remember the program again, as it was")
         v.addWidget(self.undo_bar)
         self.scroll = QScrollArea()

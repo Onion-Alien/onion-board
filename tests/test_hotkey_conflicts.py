@@ -129,3 +129,14 @@ def test_the_sounds_tab_quick_hotkeys_menu(window, monkeypatch):  # noqa: F811
     monkeypatch.setattr(window, "open_settings", pages.append)
     menu.actions()[-1].trigger()
     assert pages == ["hotkeys"]
+
+
+def test_tab_explanations_sit_behind_one_info_button(window, monkeypatch):  # noqa: F811
+    shown = []
+    monkeypatch.setattr(main.QMessageBox, "information", lambda p, t, x: shown.append(t))
+    window.tabs.setCurrentWidget(window.apps)
+    assert not window.btn_info.isHidden()
+    window.btn_info.click()
+    assert shown == ["Send a program's sound"]
+    window.tabs.setCurrentWidget(window.sounds_page)
+    assert window.btn_info.isHidden()

@@ -8,7 +8,7 @@ import math
 
 from PySide6.QtCore import QPoint, QRect, QSize, Qt, Signal
 from PySide6.QtWidgets import (QCheckBox, QComboBox, QFrame, QGridLayout, QHBoxLayout, QLabel,
-                               QLayout, QPushButton, QSlider, QSpinBox, QVBoxLayout, QWidget)
+                               QLayout, QSlider, QSpinBox, QVBoxLayout, QWidget)
 
 from soundboard import theme
 from soundboard.eq import BAND_LABELS as EQ_LABELS
@@ -110,40 +110,14 @@ class Flow(QLayout):
         return y + line - rect.y()
 
 
-def info_button(title: str, text: str) -> QPushButton:
-    """A small ⓘ that shows a tab's explanation in a popup, instead of a paragraph
-    that's always on screen."""
-    b = QPushButton("ⓘ")
-    b.setObjectName("small")
-    b.setCursor(Qt.PointingHandCursor)
-    b.setToolTip("What is this?")
-
-    def show():
-        from PySide6.QtWidgets import QMessageBox
-        box = QMessageBox(QMessageBox.Information, title.capitalize(), text,
-                          QMessageBox.Ok, b.window())
-        box.exec()
-        box.deleteLater()
-    b.clicked.connect(show)
-    return b
-
-
-def card(title: str = "", hint: str = "", info: str = "") -> tuple[QFrame, QVBoxLayout]:
-    """A titled card, the building block of the Voice and Setup pages. `info` puts
-    the longer explanation behind an ⓘ next to the title."""
+def card(title: str = "", hint: str = "") -> tuple[QFrame, QVBoxLayout]:
+    """A titled card, the building block of the Voice and Setup pages."""
     f = QFrame()
     f.setObjectName("card")
     v = QVBoxLayout(f)
     v.setContentsMargins(14, 8, 14, 14)
     v.setSpacing(6)
-    if title and info:
-        row = QHBoxLayout()
-        row.setSpacing(6)
-        row.addWidget(section_label(title))
-        row.addWidget(info_button(title, info))
-        row.addStretch(1)
-        v.addLayout(row)
-    elif title:
+    if title:
         v.addWidget(section_label(title))
     if hint:
         v.addWidget(hint_label(hint))

@@ -47,6 +47,10 @@ class BoardHost:
         self._adding: list[tuple[str, Callable[[str | None], None]]] = []   # (fingerprint, done)
         self._pressed: dict[str, set[str]] = {}     # tag -> pads its one-shots pressed
 
+    def tab_info(self, title: str, text: str):
+        """Onion Watch's explanation goes behind the ⓘ by the tabs, not a banner."""
+        self.win.tab_info["triggers"] = (title, text)
+
     # ------------------------------------------------------------------ settings
     @property
     def screen(self) -> dict:
