@@ -56,6 +56,7 @@ def selftest() -> int:
     build instead of a user's first launch. Prints OK and returns 0."""
     os.environ["QT_QPA_PLATFORM"] = "offscreen"
     os.environ.setdefault("QTWEBENGINE_CHROMIUM_FLAGS", "--mute-audio --disable-gpu")
+    # scipy: the app itself doesn't use it any more, but add-ons may (build.ps1)
     for mod in ("numpy", "scipy.signal", "sounddevice", "soundfile", "soxr", "yt_dlp"):
         __import__(mod)
     from PySide6.QtCore import QEventLoop, QTimer

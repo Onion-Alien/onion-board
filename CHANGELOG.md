@@ -2,6 +2,18 @@
 
 ## Unreleased
 
+- **Better EQ:** the 7-band EQ and the voice *Tone* effect now follow the analog EQ
+  curve they describe all the way up the treble. The 6 kHz and 12 kHz bands used to
+  come out up to ~2 dB off (narrower and lop-sided, worst at 44.1 kHz); now they're
+  within ~0.3 dB at every sample rate. The drawn EQ curve shows the same thing.
+- **No more clicks when you move an EQ slider:** changing a band, a preset or a voice
+  effect's knob crossfades from the old sound to the new over ~20 ms instead of
+  switching at once. Turning the EQ on or back to flat fades too.
+- **Our own filter engine:** all of the app's audio filters (EQ, voice effects,
+  destination modes, the smart mono downmix, the limiter's look-ahead) now run on
+  Onion Board's own code instead of scipy, and float32 audio is filtered more
+  accurately than before. scipy still ships for add-ons and modules that use it.
+
 - **Cleaner bottom bars:** My mic, What others hear and My headphones are three
   separate boxes. Each volume is a speaker icon, a slider and a plain % you can
   still click and type into; the mic and radio level meters sit under their own

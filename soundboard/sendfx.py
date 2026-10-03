@@ -24,8 +24,8 @@ state, and are built for one output rate (the engine keeps one set per output).
 from __future__ import annotations
 
 import numpy as np
-from scipy.ndimage import minimum_filter1d
-from scipy.signal import butter, sosfilt
+
+from soundboard.dsp import butter, running_min, sosfilt
 
 F32 = np.float32
 CEILING_DB = -3.0          # peak level sent into the cable (room for the codec's overshoot)
@@ -89,10 +89,7 @@ class Limiter:
 
 def _forward_min(x: np.ndarray, la: int) -> np.ndarray:
     """out[i] = min(x[i : i + la + 1]) (the window runs past the end as 1s)."""
-    s = la + 1
-    centred = minimum_filter1d(np.concatenate([x, np.ones(s, x.dtype)]), size=s,
-                               mode="nearest")   # covers [j - s//2, j + (s-1)//2]
-    return centred[s // 2: s // 2 + len(x)]
+    return running_min(np.concatenate([x, np.ones(la, x.dtype)]), la + 1)
 
 
 class _Band:
@@ -120,10 +117,10 @@ class SmartMono:
     def __init__(self, rate: int):
         self.rate = int(rate)
         nyq = rate / 2
-        lo = butter(2, self.SPLITS[0] / nyq, "low", output="sos")
-        hi = butter(2, self.SPLITS[0] / nyq, "high", output="sos")
-        lo2 = butter(2, self.SPLITS[1] / nyq, "low", output="sos")
-        hi2 = butter(2, self.SPLITS[1] / nyq, "high", output="sos")
+        lo = butter(2, self.SPLITS[0] / nyq, "low")
+        hi = butter(2, self.SPLITS[0] / nyq, "high")
+        lo2 = butter(2, self.SPLITS[1] / nyq, "low")
+        hi2 = butter(2, self.SPLITS[1] / nyq, "high")
         # LR4 = the Butterworth pair run twice; the low band also runs through the
         # upper split's all-pass (its LP + HP) so all three bands stay in phase
         self._sos = {
