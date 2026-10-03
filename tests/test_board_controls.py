@@ -236,3 +236,44 @@ def test_the_queue_shows_above_the_pads_and_can_be_trimmed(window, monkeypatch, 
     w._unqueue(0)
     w._update_chips({"s0": (0.5, False)})
     assert w._queue == [] and w.playing_row.isHidden()
+
+
+def test_the_queue_status_goes_once_the_queue_is_empty(window, monkeypatch, calls):
+    w = window
+    playing(monkeypatch, w, ["s0"])
+    w.queue_sound("s1")
+    w.queue_sound("s0")
+    assert w.status.text().startswith("Up next: “Airhorn” (+1 more)")
+    w._unqueue(0)                     # the ✕ on Airhorn's chip
+    assert w.status.text().startswith("Up next: “Boom”")
+    playing(monkeypatch, w, [])
+    w.tick()                          # the last one starts: nothing is up next
+    assert w._queue == [] and not w.status.text().startswith("Up next")
+    playing(monkeypatch, w, ["s0"])
+    w.queue_sound("s1")
+    w.stop_all()
+    assert not w.status.text().startswith("Up next")
+
+
+def test_a_trigger_deleted_while_its_pad_waits_or_queues_never_starts_it(window, monkeypatch,
+                                                                         calls, qapp):
+    """A trigger's sound plays like its pad, with the pad's Wait first or Queue; stopping
+    the trigger's tag (sound taken off it, trigger deleted) must stop those too."""
+    from conftest import process_events
+    from soundboard.ui.triggershost import BoardHost
+    w = window
+    host = BoardHost(w)
+    w.meta("s0").delay = 0.05
+    assert host.play("s0", tag="t1/s0")
+    assert "s0" in w._waiting
+    host.stop_tag("t1/s0")
+    assert not w._waiting
+    process_events(qapp, lambda: False, 0.2)
+    assert calls == []
+    w.meta("s1").mode = "queue"
+    playing(monkeypatch, w, ["s0"])
+    w.queue_sound("s0")               # queued by hand: stays
+    assert host.play("s1", tag="t2/s1")
+    assert w._queue == ["s0", "s1"]
+    host.stop_tag("t2/s1")
+    assert w._queue == ["s0"]

@@ -305,6 +305,9 @@ class FakeWindow:
     def play(self, sid):
         self.played.append(sid)
 
+    def drop_pending(self, sid):
+        pass
+
     def import_files(self, files):
         self.imports.extend(files)
 

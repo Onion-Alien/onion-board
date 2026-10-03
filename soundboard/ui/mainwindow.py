@@ -828,6 +828,15 @@ class MainWindow(QMainWindow):
     def _unqueue(self, i: int):
         if 0 <= i < len(self._queue):
             del self._queue[i]
+            self._say_queue()
+
+    def drop_pending(self, sid: str):
+        """`sid` won't start later after all: off the queue, and not when its wait
+        before playing is over (what pressed it is gone, e.g. a deleted trigger)."""
+        self._cancel_waiting(sid)
+        if sid in self._queue:
+            self._queue = [s for s in self._queue if s != sid]
+            self._say_queue()
 
     def _set_pp_icon(self, name: str):
         if name != self._pp_icon:
@@ -1696,6 +1705,7 @@ class MainWindow(QMainWindow):
 
     def stop_all(self):
         self._queue.clear()
+        self._say_queue()
         for sid in list(self._waiting):
             self._cancel_waiting(sid)
         self.engine.stop_all()
@@ -1872,6 +1882,8 @@ class MainWindow(QMainWindow):
             more = f" (+{len(self._queue) - 1} more)" if len(self._queue) > 1 else ""
             self.status.setText(f"Up next: “{html.escape(m.name if m else '?')}”{more} · "
                                 "Stop everything clears the queue")
+        elif self.status.text().startswith("Up next:"):   # the queue ran out / was cleared
+            self._update_status()
 
     def select(self, sid):
         if self.current != sid:

@@ -122,9 +122,11 @@ class BoardHost:
         for sid in eng.playing():
             if sid.endswith(RING + tag) or sid.endswith(HEAR + tag):
                 eng.stop(sid)
-        # the pads its one-shots pressed (pressed by hand meanwhile, they stop too)
+        # the pads its one-shots pressed (pressed by hand meanwhile, they stop too),
+        # and a press still waiting out the pad's wait or in the queue never starts
         for sid in self._pressed.pop(tag, ()):
             eng.stop(sid)
+            self.win.drop_pending(sid)
 
     def ringing(self) -> list[str]:
         return [sid.split(RING, 1)[1] for sid in self._ring_voices()]
