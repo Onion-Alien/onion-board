@@ -334,6 +334,31 @@ def test_with_no_headphones_a_ring_plays_where_the_board_plays():
     assert win.engine.voices == {"s1:ring:t1": False}
 
 
+def test_a_sound_checked_on_a_card_plays_to_you_alone_and_stops_by_its_tag():
+    win = FakeWindow()
+    host = BoardHost(win)
+    assert host.play("s1", tag="hear:t1/s1")
+    assert win.played == [] and win.engine.voices == {"s1:hear:hear:t1/s1": True}
+    assert host.ringing() == []                     # a preview isn't a ring
+    host.stop_tag("hear:t1/s1")
+    assert win.engine.voices == {}
+
+
+def test_a_tagged_one_shot_stops_by_its_tag():
+    """A trigger's sound plays like its pad; stopping its tag stops that pad (a
+    sound taken off the trigger, or the trigger deleted, while it plays)."""
+    win = FakeWindow()
+    host = BoardHost(win)
+    assert host.play("s1", tag="t1/s1")
+    assert win.played == ["s1"]
+    win.engine.voices["s1"] = False                 # the pad playing, as win.play does
+    host.stop_tag("t2/s1")                          # another trigger's: left alone
+    assert "s1" in win.engine.voices
+    host.stop_tag("t1/s1")
+    assert win.engine.voices == {}
+    host.stop_tag("t1/s1")                          # twice is fine
+
+
 def test_a_sound_file_is_added_through_the_boards_import(tmp_path, monkeypatch):
     win = FakeWindow()
     host = BoardHost(win)

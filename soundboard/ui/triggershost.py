@@ -10,6 +10,12 @@ pad's volume and mode). A ringing trigger ("Ring until stopped") loops its sound
 until it's stopped, under its own voice id (`<sound>:ring:<trigger>`), in your
 headphones when they're open (an alarm left ringing while you're away shouldn't
 go out to everyone in the call), else wherever the board plays.
+
+Every sound is played with a tag, and stop_tag(tag) stops it again: a ring, a
+sound clicked on a trigger's card to check it (tags starting "hear:", played to
+you alone like a pad's preview, as `<sound>:hear:<tag>`), or a pad-like one-shot
+(the pads it pressed are remembered by tag). Removing a sound from a trigger, or
+the trigger, then stops what it was playing.
 """
 from __future__ import annotations
 
@@ -23,6 +29,7 @@ from soundboard.modules import TRIGGERS_API
 log = logging.getLogger(__name__)
 
 RING = ":ring:"
+HEAR = ":hear:"
 
 
 class BoardHost:
@@ -38,6 +45,7 @@ class BoardHost:
         if not isinstance(win.cfg.screen, dict):
             win.cfg.screen = {}
         self._adding: list[tuple[str, Callable[[str | None], None]]] = []   # (fingerprint, done)
+        self._pressed: dict[str, set[str]] = {}     # tag -> pads its one-shots pressed
 
     # ------------------------------------------------------------------ settings
     @property
@@ -89,11 +97,19 @@ class BoardHost:
         m, data = win.meta(sid), win.audio.get(sid)
         if m is None or data is None:
             return False
+        eng = win.engine
+        if tag.startswith("hear:"):  # checking it on the card: to you, not the call
+            voice = f"{sid}{HEAR}{tag}"
+            v = eng.play(voice, data, win.gain_for(m), mode="restart", preview=True)
+            if v is None:            # no headphones open: where the board plays
+                v = eng.play(voice, data, win.gain_for(m), mode="restart")
+            return v is not None
         if not loop:
             win.play(sid)            # like pressing its pad
+            if tag:
+                self._pressed.setdefault(tag, set()).add(sid)
             return True
         voice = f"{sid}{RING}{tag}"
-        eng = win.engine
         v = eng.play(voice, data, win.gain_for(m), loop=True, preview=True)
         if v is None:                # no headphones open: where the board plays
             v = eng.play(voice, data, win.gain_for(m), loop=True)
@@ -103,9 +119,13 @@ class BoardHost:
         return [sid for sid in self.win.engine.playing() if RING in sid]
 
     def stop_tag(self, tag: str):
-        for sid in self._ring_voices():
-            if sid.endswith(RING + tag):
-                self.win.engine.stop(sid)
+        eng = self.win.engine
+        for sid in eng.playing():
+            if sid.endswith(RING + tag) or sid.endswith(HEAR + tag):
+                eng.stop(sid)
+        # the pads its one-shots pressed (pressed by hand meanwhile, they stop too)
+        for sid in self._pressed.pop(tag, ()):
+            eng.stop(sid)
 
     def ringing(self) -> list[str]:
         return [sid.split(RING, 1)[1] for sid in self._ring_voices()]
