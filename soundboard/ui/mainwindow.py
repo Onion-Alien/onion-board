@@ -343,6 +343,7 @@ class MainWindow(QMainWindow):
         rv.addWidget(self.mic_banner)
 
         # ---- tabs
+        self.tab_info: dict[str, tuple[str, str]] = {}   # page attr -> (title, text) for ⓘ
         self.tabs = QTabWidget()
         self.tabs.setDocumentMode(True)
         self.tabs.setIconSize(QSize(18, 18))
@@ -369,6 +370,16 @@ class MainWindow(QMainWindow):
             self.tabs.setTabText(i, text)
             self.tabs.setTabToolTip(i, tip)
             icons.set_tab_icon(self.tabs, i, text.lower())
+        self.tab_info["apps"] = self.apps.info
+        # one ⓘ at the end of the tab bar: the tab's explanation, instead of a banner
+        self.btn_info = QPushButton("ⓘ")
+        self.btn_info.setObjectName("small")
+        self.btn_info.setCursor(Qt.PointingHandCursor)
+        self.btn_info.setToolTip("What's this tab for?")
+        self.btn_info.clicked.connect(self._show_tab_info)
+        self.tabs.setCornerWidget(self.btn_info, Qt.TopRightCorner)
+        self.tabs.currentChanged.connect(lambda _i: self.btn_info.setVisible(
+            self._current_tab_info() is not None))
         self.tabs.setCurrentIndex(self.cfg.tab if 0 <= self.cfg.tab < self.tabs.count() else 0)
         self.tabs.currentChanged.connect(lambda i: self.set_option("tab", i))
         self.tabs.currentChanged.connect(lambda _i: self._update_status())
@@ -1638,6 +1649,16 @@ class MainWindow(QMainWindow):
         else:
             self.register_hotkeys()   # the capture paused them
         free_dialog(d)
+
+    def _current_tab_info(self) -> tuple[str, str] | None:
+        page = self.tabs.currentWidget()
+        return next((v for k, v in self.tab_info.items() if getattr(self, k, None) is page),
+                    None)
+
+    def _show_tab_info(self):
+        info = self._current_tab_info()
+        if info:
+            QMessageBox.information(self, info[0], info[1])
 
     def open_settings(self, page: str = "privacy"):
         dlg = SettingsDialog(self, page)
