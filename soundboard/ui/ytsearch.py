@@ -287,7 +287,7 @@ class ResultRow(QFrame):
         self.setToolTip("Double-click to play")
 
     def mouseDoubleClickEvent(self, e):
-        if self.btn_play.isEnabled():
+        if not busy.is_busy(self.btn_play):
             self.play.emit(self.result)
         super().mouseDoubleClickEvent(e)
 
@@ -305,7 +305,7 @@ class ResultRow(QFrame):
         if kind == "add" and ok:
             release()
             self.btn_add.setText("✓ Added")   # added once is enough
-            self.btn_add.setEnabled(False)
+            busy.set_busy(self.btn_add, True)
         else:
             release(None if ok else ("Didn't add" if kind == "add" else "Didn't play"))
 

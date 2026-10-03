@@ -394,6 +394,7 @@ QPushButton:hover { background:$btn_hover; }
 QPushButton:pressed { background:$btn_press; }
 QPushButton:checked { background:$accent; border-color:$accent; color:$on_accent; }
 QPushButton:disabled { color:$muted; }
+QPushButton[busy="true"], QPushButton#primary[busy="true"] { color:$muted; }
 QPushButton#primary { background:$accent; border:none; color:$on_accent; font-weight:600; }
 QPushButton#primary:hover { background:$accent_hi; }
 QPushButton#danger { background:$danger_bg; border:1px solid $danger_border; color:$danger_text; font-weight:600; }

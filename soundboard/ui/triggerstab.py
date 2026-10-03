@@ -265,7 +265,7 @@ class TriggersTab(QWidget):
         self.error.hide()
         self.update_text.setText("Downloading Onion Watch…")
         self._busy_label("Downloading…")
-        self.btn_cancel.setEnabled(True)
+        busy.set_busy(self.btn_cancel, False)
         self.btn_cancel.setText("Cancel")
 
         def run():
@@ -284,7 +284,7 @@ class TriggersTab(QWidget):
 
     def cancel(self):
         self._cancel = True
-        self.btn_cancel.setEnabled(False)   # the download notices between chunks
+        busy.set_busy(self.btn_cancel, True)   # the download notices between chunks
         self.btn_cancel.setText("Cancelling…")
 
     def _busy_label(self, text: str):

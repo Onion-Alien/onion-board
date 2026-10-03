@@ -28,7 +28,7 @@ from soundboard import library, radio, theme
 from soundboard.engine import SR
 from soundboard.library import MAX_SECONDS, trim_silence
 from soundboard.radio import RadioDirectory, RadioPlayer, Station
-from soundboard.ui import icons
+from soundboard.ui import busy, icons
 from soundboard.ui.panel import Flow as _Flow
 from soundboard.ui.panel import VolumeControl, bar, icon_label, vsep
 
@@ -859,7 +859,7 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
         self._globe_error = ""
         self._flash_until = 0.0
         self._reloading = True
-        self.btn_refresh.setEnabled(False)   # back on when the list (or an error) is in
+        busy.set_busy(self.btn_refresh, True)   # back when the list (or an error) is in
         self.dir.load_globe(force=True)
         if self._globe_list:
             self._refresh_info("Refreshing the station list…")
@@ -875,7 +875,7 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
         self._show_list()
         if self._reloading:
             self._reloading = False
-            self.btn_refresh.setEnabled(True)
+            busy.set_busy(self.btn_refresh, False)
             stale = getattr(self.dir, "globe_stale", "")
             self._refresh_info(
                 f"<span style='color:{theme.status('warn')}'>Couldn't reach the station "
@@ -888,7 +888,7 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
     def _on_failed(self, kind: str, msg: str):
         if kind == "globe":
             self._reloading = False
-            self.btn_refresh.setEnabled(True)
+            busy.set_busy(self.btn_refresh, False)
             self._map("showMessage", "The station directory can't be reached right now. "
                       "Check your connection and press ↻.")
             # stays up (list and info line) until a reload gets through

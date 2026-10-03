@@ -62,14 +62,53 @@ def flash(btn, text: str, ms: int = FLASH_MS):
     QTimer.singleShot(ms, lambda: _restore(btn, serial))
 
 
+class _ClickBlocker(QObject):
+    """Swallows clicks and Space / Enter on a busy button. Used instead of
+    setEnabled(False): disabling the button that has keyboard focus makes Qt move the
+    focus to the next control (e.g. the combo box under Re-scan)."""
+
+    def eventFilter(self, obj: QObject, ev: QEvent) -> bool:
+        if not obj.property("busy"):
+            return False
+        t = ev.type()
+        if t in (QEvent.MouseButtonPress, QEvent.MouseButtonRelease,
+                 QEvent.MouseButtonDblClick):
+            return True
+        return t in (QEvent.KeyPress, QEvent.KeyRelease) and ev.key() in (
+            Qt.Key_Space, Qt.Key_Return, Qt.Key_Enter, Qt.Key_Select)
+
+
+_blocker: _ClickBlocker | None = None
+
+
+def set_busy(btn, on: bool):
+    """Grey ``btn`` out and ignore clicks on it (``on``), or back to normal. Unlike
+    setEnabled(False) it keeps the keyboard focus where it is."""
+    global _blocker
+    if _blocker is None:
+        _blocker = _ClickBlocker(QApplication.instance())
+    if not btn.property("_busy_filtered"):
+        btn.setProperty("_busy_filtered", True)
+        btn.installEventFilter(_blocker)
+    if bool(btn.property("busy")) != on:
+        btn.setProperty("busy", on)
+        btn.setDown(False)
+        btn.style().unpolish(btn)
+        btn.style().polish(btn)
+
+
+def is_busy(btn) -> bool:
+    return bool(btn.property("busy"))
+
+
 def hold(btn, text: str) -> Callable[..., None]:
     """Grey the button out showing ``text``; returns ``release(text=None, ms=…)`` which
-    re-enables it and, given a text, flashes that before going back to normal."""
+    takes it back and, given a text, flashes that before going back to normal."""
     btn.setProperty(_IDLE, _idle_text(btn))
     _keep_width(btn)
     serial = _bump(btn)
     btn.setText(text)
-    btn.setEnabled(False)
+    set_busy(btn, True)
     btn.repaint()
     done = []
 
@@ -78,7 +117,7 @@ def hold(btn, text: str) -> Callable[..., None]:
             return
         done.append(True)
         try:
-            btn.setEnabled(True)
+            set_busy(btn, False)
             if btn.property(_SERIAL) != serial:
                 return
             if text:
@@ -95,7 +134,7 @@ def run_busy(btn, text: str, fn: Callable[[], object],
              ms: int = FLASH_MS):
     """Run ``fn`` (on the GUI thread) with the button showing ``text`` meanwhile, then
     flash ``done`` — a string, or a function of ``fn``'s result returning one."""
-    if not btn.isEnabled():
+    if is_busy(btn) or not btn.isEnabled():
         return   # already running: a double click mustn't start it twice
     release = hold(btn, text)
 

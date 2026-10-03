@@ -2510,7 +2510,7 @@ class MainWindow(QMainWindow):
                     self.bridge.imported.emit(None, None, f"{Path(f).name}: {e}")
         threading.Thread(target=run, daemon=True, name="import").start()
         self.status.setText(f"Importing {count} file(s)…")
-        self.btn_add.setEnabled(False)   # back on in on_imported, when they're all in
+        busy.set_busy(self.btn_add, True)   # back in on_imported, when they're all in
         self.toast(f"Adding {count} sound{'s' if count != 1 else ''}…")
 
     def on_imported(self, meta, data, err):
@@ -2528,7 +2528,7 @@ class MainWindow(QMainWindow):
             self._save_now()
             self._rebuild_pads()
             n, self._imported_ok = self._imported_ok, 0
-            self.btn_add.setEnabled(True)
+            busy.set_busy(self.btn_add, False)
             if n:
                 self.toast(f"✓ Added {n} sound{'s' if n != 1 else ''}", "ok")
             elif not self._import_errors:
