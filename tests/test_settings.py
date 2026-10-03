@@ -2,6 +2,7 @@
 from PySide6.QtWidgets import QLabel, QPushButton, QScrollArea
 
 from soundboard.settings import SettingsDialog
+from soundboard.ui import busy
 from test_mainwindow import window  # noqa: F401  (the real MainWindow fixture)
 
 
@@ -25,7 +26,7 @@ def test_a_short_window_scrolls_a_page_instead_of_squashing_it(window, qapp):  #
 def test_support_opens_the_project_page_not_an_address_in_the_app(window, monkeypatch):  # noqa: F811
     from soundboard import settings
     opened = []
-    monkeypatch.setattr(settings.QDesktopServices, "openUrl", lambda u: opened.append(u.toString()))
+    monkeypatch.setattr(busy.QDesktopServices, "openUrl", lambda u: opened.append(u.toString()))
     d = SettingsDialog(window, "general")
     btn = next(b for b in d.findChildren(QPushButton) if "Support" in b.text())
     btn.click()
@@ -71,7 +72,7 @@ def test_audio_page_picks_input_and_output_through_the_window(window, monkeypatc
 def test_feedback_and_problem_buttons_only_open_the_browser(window, monkeypatch):  # noqa: F811
     from soundboard import __version__, feedback, settings
     opened = []
-    monkeypatch.setattr(settings.QDesktopServices, "openUrl", lambda u: opened.append(u.toString()))
+    monkeypatch.setattr(busy.QDesktopServices, "openUrl", lambda u: opened.append(u.toString()))
     d = SettingsDialog(window, "general")
     monkeypatch.setattr(feedback, "FORM_URL", "https://forms.example.com/r/x")
     d.feedback_btn.click()

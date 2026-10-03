@@ -12,7 +12,7 @@ from soundboard.eq import PRESETS as EQ_PRESETS
 from soundboard.library import (MAX_COOLDOWN_S, MAX_DELAY_S, MAX_FADE_S, PAD_COLORS,
                                 SoundMeta, original_peaks)
 from soundboard.settings import HotkeyDialog, pretty_key
-from soundboard.ui import fit, icons
+from soundboard.ui import busy, fit, icons
 from soundboard.ui.panel import EqPanel, hint_label, section_label
 from soundboard.ui.trim import TrimPanel
 from soundboard.ui.voicepanel import EffectRow, ParamSlider
@@ -169,7 +169,7 @@ class EditDialog(QDialog):
     global hotkeys. After exec(), `as_copy` says whether "Save as new sound" was
     chosen (then apply() goes onto the copy, and the original stays as it was).
 
-    preview_cb(sid, volume, fx, (fade_in, fade_out)) plays the sound, with these
+    preview_cb(sid, volume, fx, (fade_in, fade_out), done) plays the sound, with these
     (unsaved) effects and fades, to your headphones only."""
     hotkeys_changed = Signal()
 
@@ -283,8 +283,16 @@ class EditDialog(QDialog):
         prow = QHBoxLayout()
         prev = QPushButton("Preview (only you hear it)")
         icons.set_icon(prev, "headphones")
-        prev.clicked.connect(lambda: preview_cb(self.meta.id, self.vol.value() / 100,
-                                                self.effects.fx(), self.fades()))
+
+        def play_preview():
+            release = busy.hold(prev, "Rendering the effects…")
+            got = preview_cb(self.meta.id, self.vol.value() / 100, self.effects.fx(),
+                             self.fades(), lambda ok: release(
+                                 "▶  Playing" if ok else "Couldn't render it"))
+            if got != "rendering":
+                release("Not loaded yet — try again in a moment" if got == "missing"
+                        else "▶  Playing", 1200)
+        prev.clicked.connect(play_preview)
         prow.addWidget(prev)
         self.fx_note = QLabel()
         self.fx_note.setObjectName("muted")

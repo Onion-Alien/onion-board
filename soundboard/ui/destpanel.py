@@ -380,7 +380,8 @@ class CustomDestDialog(QDialog):
             cfg["mode"] = "off"
         self._fill(row)
         self._commit()
-        self.undo_bar.show_for(f"Removed “{gone.get('label') or 'mode'}”",
+        self.undo_bar.show_for(f"Removed “{gone.get('label') or 'mode'}”"
+                               + (" — Who's listening is Off now" if was_on else ""),
                                lambda: self._put_back(row, gone, was_on))
 
     def _put_back(self, row: int, raw: dict, was_on: bool):

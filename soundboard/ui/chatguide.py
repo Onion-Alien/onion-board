@@ -14,13 +14,12 @@ import logging
 import time
 
 import numpy as np
-from PySide6.QtCore import QObject, Qt, QTimer, QUrl, Signal
-from PySide6.QtGui import QDesktopServices
+from PySide6.QtCore import QObject, Qt, QTimer, Signal
 from PySide6.QtWidgets import (QApplication, QDialog, QHBoxLayout, QLabel, QPushButton,
                                QVBoxLayout)
 
 from soundboard import chatcheck, theme
-from soundboard.ui import fit
+from soundboard.ui import busy, fit
 from soundboard.ui.bunnywidget import BunnyWidget
 from soundboard.ui.crashdialog import free_dialog
 
@@ -139,7 +138,7 @@ class ChatCheck(QObject):
         if app is None:
             self.done.emit({"issues": [], "error": (
                 "Couldn't find Discord playing anything. Open Discord → ⚙ User Settings → "
-                "<b>Voice &amp; Video</b>, click <b>Let's Check</b>, then check again.")})
+                "Voice & Video, click Let's Check, then check again.")})
             return
         self._heard = []
         self._cap = appaudio.AppCapture(app.pid, self._heard.append, name=app.name)
@@ -234,11 +233,14 @@ class DiscordGuide(QDialog):
         row = QHBoxLayout()
         copy = QPushButton("📋  Copy the mic name")
         copy.clicked.connect(lambda: (QApplication.clipboard().setText(vm),
-                                      copy.setText("✓  Copied")))
+                                      busy.flash(copy, "✓  Copied")))
         row.addWidget(copy)
         opn = QPushButton("Open Discord")
         opn.setToolTip("Opens Discord's Voice & Video settings")
-        opn.clicked.connect(lambda: QDesktopServices.openUrl(QUrl(DISCORD_VOICE_URL)))
+        opn.clicked.connect(lambda: busy.open_url(
+            DISCORD_VOICE_URL, opn, self, opened="✓ Opened Discord",
+            failed="Couldn't open Discord — is it installed? Open it yourself: ⚙ User "
+                   "Settings → Voice & Video. The link was"))
         row.addWidget(opn)
         ptt = QPushButton("Auto push-to-talk…")
         ptt.clicked.connect(lambda: mw.open_settings("hotkeys"))
@@ -258,9 +260,17 @@ class DiscordGuide(QDialog):
 
     def check(self):
         self.btn_check.setEnabled(False)
+        self.btn_check.setText("Checking…")
         self.result.setText("Starting…")
         self.result.show()
-        self._check.start()
+        QTimer.singleShot(0, self, self._start_check)   # paint "Starting…" first
+
+    def _start_check(self):
+        try:
+            self._check.start()
+        except Exception as e:  # noqa: BLE001 - never leave the button stuck on "Checking…"
+            log.exception("discord check couldn't start")
+            self._checked({"issues": [], "error": f"The check couldn't start: {e}"})
 
     def _progress(self, text: str):
         self.result.setText(f"{text} (about {round(chatcheck.LENGTH_S + TAIL_S)} seconds; "
@@ -320,7 +330,7 @@ class GameGuide(QDialog):
         row = QHBoxLayout()
         copy = QPushButton("📋  Copy the mic name")
         copy.clicked.connect(lambda: (QApplication.clipboard().setText(vm),
-                                      copy.setText("✓  Copied")))
+                                      busy.flash(copy, "✓  Copied")))
         row.addWidget(copy)
         ptt = QPushButton("Auto push-to-talk…")
         ptt.clicked.connect(lambda: mw.open_settings("hotkeys"))

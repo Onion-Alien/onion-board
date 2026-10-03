@@ -22,7 +22,7 @@ from PySide6.QtWidgets import QFrame, QHBoxLayout, QLabel, QPushButton
 
 from soundboard import theme, thumbs, ytdl
 from soundboard.library import (SR, decode, fingerprint, import_file, level_gain, to_int16)
-from soundboard.ui import icons
+from soundboard.ui import busy, icons
 from soundboard.ui.widgets import fmt_time
 
 log = logging.getLogger(__name__)
@@ -45,6 +45,7 @@ class LinkBar(QFrame):
     sound_ready = Signal(object, object)
     played = Signal(str, object, float)   # Play once started: (title, int16 audio, gain)
     _msg = Signal(str, str, object)   # worker -> UI: (kind, url, payload)
+    done = Signal(str, str, bool)     # (url, "add" | "play", it worked): a search row's busy end
 
     def __init__(self, engine, cfg, color_for, known_for):
         """`color_for()` gives the next pad colour, `known_for()` {fingerprint: name}
@@ -117,6 +118,8 @@ class LinkBar(QFrame):
     def open(self, url: str, title: str, secs: float = 0.0):
         """A video picked from the YouTube search: already looked up, so no probe."""
         if url != self.url:
+            if self._queued:   # a pick waiting its turn is replaced: its row stops waiting
+                self.done.emit(self.url, self._queued, False)
             self.url = url
             self._queued = ""
             self._probe_timer.stop()
@@ -165,6 +168,7 @@ class LinkBar(QFrame):
             return self._queue("play")
         if self._got is not None and self._got[0] == self.url:
             self._play(self._got[2])
+            self.done.emit(self.url, "play", True)
             return True
         self._start("play")
         return True
@@ -267,7 +271,7 @@ class LinkBar(QFrame):
                 (self.btn_add if self._busy == "add" else self.btn_play).setText(t)
             return
         # the download finished one way or another
-        self._busy = ""
+        was, self._busy = self._busy, ""
         self._buttons()
         if kind == "added":
             meta, data, title = payload
@@ -276,6 +280,10 @@ class LinkBar(QFrame):
             if current:
                 self._say(f"✓ Added <b>{html.escape(meta.name)}</b> to your Sounds.",
                           theme.status("ok"))
+            else:   # another link is showing now: still say this one made it
+                busy.toast(self.window(), f"✓ Added <b>{html.escape(meta.name)}</b> to your "
+                                          "Sounds.", "ok")
+            self.done.emit(url, "add", True)
         elif kind == "play":
             path, data = payload
             if current:
@@ -283,8 +291,13 @@ class LinkBar(QFrame):
                 self._play(data)
             else:
                 _drop_temp(path)
-        elif kind == "error" and current:
-            self._say(html.escape(payload), theme.status("error"))
+            self.done.emit(url, "play", current)
+        elif kind == "error":
+            if current:
+                self._say(html.escape(payload), theme.status("error"))
+            else:   # it was for a link no longer showing: don't lose the reason
+                busy.toast(self.window(), html.escape(payload), "error", 8000)
+            self.done.emit(url, was or "add", False)
         if self._queued and self.url:
             queued, self._queued = self._queued, ""
             if queued == "add":

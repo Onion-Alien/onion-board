@@ -7,14 +7,13 @@ and emit plain dicts (`changed`) that the main window stores in the config.
 from __future__ import annotations
 
 import html
-import os
 import re
 import threading
 import time
 
-from PySide6.QtCore import QSize, Qt, QTimer, QUrl, Signal
-from PySide6.QtGui import QDesktopServices, QGuiApplication
-from PySide6.QtWidgets import (QButtonGroup, QCheckBox, QComboBox, QDialog,
+from PySide6.QtCore import QSize, Qt, QTimer, Signal
+from PySide6.QtGui import QGuiApplication
+from PySide6.QtWidgets import (QButtonGroup, QCheckBox, QComboBox, QDialog, QMessageBox,
                                QDialogButtonBox, QFormLayout, QFrame, QGridLayout,
                                QHBoxLayout, QLabel, QLineEdit, QPlainTextEdit, QPushButton,
                                QScrollArea, QSlider, QVBoxLayout, QWidget)
@@ -25,7 +24,7 @@ from soundboard import voicefx
 from soundboard import library, theme
 from soundboard.speech import customvoices, translation, winvoices
 from soundboard.speech.live import SpeechController, clean_settings
-from soundboard.ui import art, icons
+from soundboard.ui import art, busy, icons
 from soundboard.ui.panel import (VolumeControl, bar, card, hint_label, icon_label,
                                  section_label, vsep)
 from soundboard.ui.responsive import FitWidth
@@ -545,7 +544,8 @@ class SpeechPanel(QWidget):
         self.b_voices_check.setObjectName("small")
         self.b_voices_check.setToolTip("Restart the speech engine to pick up new Windows "
                                        "voices (it also does this by itself)")
-        self.b_voices_check.clicked.connect(self._recheck_voices)
+        self.b_voices_check.clicked.connect(self._recheck_voices_asked)
+        self._voices_asked = False   # the button was pressed: say what it found
         self._voice_wait = False     # sent to Windows settings for a voice; look on return
         self.b_dl_remove = QPushButton("Delete download")
         self.b_dl_remove.setObjectName("small")
@@ -627,7 +627,7 @@ class SpeechPanel(QWidget):
         self.b_install.clicked.connect(self._install)
         mrow.addWidget(self.b_install)
         b_open = QPushButton("Open folder")
-        b_open.clicked.connect(lambda: self._open_folder(self.module))
+        b_open.clicked.connect(lambda: self._open_folder(self.module, b_open))
         mrow.addWidget(b_open)
         mrow.addStretch(1)
         mv.addLayout(mrow)
@@ -683,7 +683,7 @@ class SpeechPanel(QWidget):
         crow.addWidget(b_server)
         b_vfolder = QPushButton("Open voices folder")
         b_vfolder.setToolTip("Voice packs and voice settings go here; README.txt in it says how")
-        b_vfolder.clicked.connect(lambda: os.startfile(customvoices.ensure_folder()))  # noqa: S606
+        b_vfolder.clicked.connect(lambda: busy.open_folder(customvoices.ensure_folder, b_vfolder))
         crow.addWidget(b_vfolder)
         crow.addStretch(1)
         ov.addLayout(crow)
@@ -712,7 +712,8 @@ class SpeechPanel(QWidget):
         b_say = QPushButton("Say")
         b_say.clicked.connect(self._say)
         b_stop = QPushButton("Stop")
-        b_stop.clicked.connect(controller.stop_speaking)
+        b_stop.clicked.connect(lambda: (controller.stop_speaking(),
+                                        busy.flash(b_stop, "✓ Stopped", 1200)))
         row.addWidget(b_say)
         row.addWidget(b_stop)
         sep = vsep()
@@ -776,6 +777,11 @@ class SpeechPanel(QWidget):
         self._loading_since = 0.0
         self.b_voices_check.setEnabled(True)
         self.b_voices_check.setText("Reload voices")
+        if self._voices_asked:
+            self._voices_asked = False
+            busy.flash(self.b_voices_check,
+                       f"✓ {len(voices)} voice{'s' if len(voices) != 1 else ''}" if not error
+                       else "Couldn't load them")
         m = self._lang()
         voice = self._voice_for(m) if m is not None else ""
         if m is None or voice:
@@ -842,14 +848,26 @@ class SpeechPanel(QWidget):
                 err.show()
                 return
             name = ed_name.text().strip() or "Voice server"
-            customvoices.save_server(name, url, ed_voice.text().strip(),
-                                     ed_model.text().strip(), ed_key.text().strip())
+            try:
+                if customvoices.server_path(name).exists() and QMessageBox.question(
+                        dlg, "Add a voice server",
+                        f"There's already a voice server called “{name}”. Replace it?"
+                ) != QMessageBox.Yes:
+                    return
+                customvoices.save_server(name, url, ed_voice.text().strip(),
+                                         ed_model.text().strip(), ed_key.text().strip())
+            except OSError as e:
+                err.setText(f"Couldn't save it in the voices folder: {e}")
+                err.show()
+                return
             self.s["voice"] = customvoices.PREFIX + name   # pick it once it's loaded
             dlg.accept()
         btns.accepted.connect(ok)
         if dlg.exec() == QDialog.Accepted:
             self.changed.emit(dict(self.s))
-            self._recheck_voices()
+            busy.toast(self, f"✓ Saved “{html.escape(ed_name.text().strip() or 'Voice server')}”"
+                       " — loading its voices…", "ok")
+            self._recheck_voices_asked()
 
     def _tts_error(self, msg: str):
         self.tts_err.setText(f"⚠ {msg}")
@@ -1003,8 +1021,10 @@ class SpeechPanel(QWidget):
             self._recheck_voices()
 
     def _get_voice(self):
-        self._voice_wait = True
-        QDesktopServices.openUrl(QUrl("ms-settings:speech"))
+        self._voice_wait = busy.open_url(
+            "ms-settings:speech", self.b_voices, opened="✓ Opened Windows settings",
+            failed="Couldn't open Windows settings. Go to Settings → Time & language → "
+                   "Speech → Add voices yourself")
 
     def _app_state(self, state):
         # back from Windows settings: a voice may have just been installed
@@ -1025,6 +1045,10 @@ class SpeechPanel(QWidget):
         """Reload the speech engine when Windows' voice list changed since it loaded."""
         if not self._loading() and winvoices.fingerprint() != self._voice_fp:
             self._recheck_voices()
+
+    def _recheck_voices_asked(self):
+        self._voices_asked = not self._loading()
+        self._recheck_voices()
 
     def _recheck_voices(self):
         """Look for Windows voices again, off the UI thread. Safe while talking: a line
@@ -1094,10 +1118,27 @@ class SpeechPanel(QWidget):
 
     def _remove_download(self):
         m = self._lang()
-        if m is not None and not self.ctl.live:
+        if m is None or self.ctl.live:
+            return
+        if QMessageBox.question(
+                self, "Delete download",
+                f"Delete the downloaded {m.language_name} translation? You can download "
+                "it again any time.") != QMessageBox.Yes:
+            return
+
+        def go():
             translation.remove(m)
             self._fill_langs()
             self.downloaded.emit()
+            return not translation.model_dir(m).exists()
+
+        def said(gone: bool):
+            if gone:
+                busy.toast(self, f"✓ Deleted the {html.escape(m.language_name)} download", "ok")
+            else:
+                busy.toast(self, "Couldn't delete all of it (a file is in use). Restart Onion "
+                                 "Board and try again.", "warn")
+        busy.run_busy(self.b_dl_remove, "Deleting…", go, said)
 
     def _refresh_module(self):
         m = self.module
@@ -1212,11 +1253,14 @@ class SpeechPanel(QWidget):
             self._set_live_ui(False, f"⚠ stopped: {text}" if text else "stopped")
 
     @staticmethod
-    def _open_folder(module: mods.ModuleInfo | None = None):
+    def _open_folder(module: mods.ModuleInfo | None = None, btn=None):
         """The module's own folder, or the user add-ons folder when it isn't there yet."""
         d = module.path if module is not None else library.APP_DIR / "modules"
-        d.mkdir(parents=True, exist_ok=True)
-        os.startfile(d)  # noqa: S606
+
+        def make():
+            d.mkdir(parents=True, exist_ok=True)
+            return d
+        busy.open_folder(make, btn)
 
 
 # =========================================================================== add-ons list
@@ -1234,9 +1278,9 @@ class ModulesList(QWidget):
         v.addLayout(self.list)
         row = QHBoxLayout()
         b = QPushButton("Refresh")
-        b.clicked.connect(self.refresh)
+        b.clicked.connect(lambda: busy.run_busy(b, "Checking…", self.refresh.emit, "✓ Up to date"))
         o = QPushButton("Open add-ons folder")
-        o.clicked.connect(lambda: SpeechPanel._open_folder())
+        o.clicked.connect(lambda: SpeechPanel._open_folder(btn=o))
         row.addWidget(b)
         row.addWidget(o)
         row.addStretch(1)

@@ -99,8 +99,9 @@ def test_steam_guide_names_the_cable_mic(wizard, monkeypatch, tmp_path):
     w, wiz = wizard
     wiz.go(3)
     opened = []
-    monkeypatch.setattr(setupwizard.QDesktopServices, "openUrl",
-                        lambda url: opened.append(url.toString()))
+    from soundboard.ui import busy
+    monkeypatch.setattr(busy.QDesktopServices, "openUrl",
+                        lambda url: opened.append(url.toString()) or True)
     g = setupwizard.SteamGuide(wiz, wiz._vm)
     text = " ".join(lbl.text() for lbl in g.findChildren(setupwizard.QLabel))
     assert "CABLE Output (VB-Audio Virtual Cable)" in text and "Voice Input Device" in text

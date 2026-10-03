@@ -244,15 +244,20 @@ def load(d: Path | None = None) -> tuple[list[CustomVoice], list[str]]:
     return unique, problems
 
 
+def server_path(name: str) -> Path:
+    """Where the server voice called ``name`` is saved."""
+    stem = "".join(c if c.isalnum() or c in "-_ " else "_" for c in name).strip() or "voice"
+    return folder() / f"{stem}.json"
+
+
 def save_server(name: str, url: str, voice: str = "", model: str = "",
                 api_key: str = "") -> Path:
     """Write a server voice's .json (the "Add a voice server" box)."""
-    d = ensure_folder()
-    stem = "".join(c if c.isalnum() or c in "-_ " else "_" for c in name).strip() or "voice"
+    ensure_folder()
     raw = {"name": name, "url": url}
     raw.update({k: v for k, v in (("voice", voice), ("model", model),
                                   ("api_key", api_key)) if v})
-    path = d / f"{stem}.json"
+    path = server_path(name)
     path.write_text(json.dumps(raw, indent=2), encoding="utf-8")
     return path
 

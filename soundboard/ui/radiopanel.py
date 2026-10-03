@@ -300,6 +300,8 @@ class RadioTab(QWidget):
         self._title = ""           # what the station says is playing
         self._active = False       # is_active() as last reported
         self._flash_until = 0.0
+        self._reloading = False   # ↻ was pressed: say how the refresh went
+        self.clip_error = ""      # set by whoever saves a clip_ready clip, when it can't
         self._fed_by: Station | None = None   # the station the clip buffers hold
         self.favorites: list[Station] = [s for s in map(Station.from_saved,
                                                         cfg.radio.get("favorites", [])) if s]
@@ -694,7 +696,7 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
         from soundboard.ui.flatmap import FlatMap
         self.flat = FlatMap()
         self.flat.clicked.connect(self._on_globe_click)
-        self.flat.hd_requested.connect(lambda: self._set_map("globe"))
+        self.flat.hd_requested.connect(self._go_hd)
         self.globe_layout.addWidget(self.flat)
         if not self._outlines_hooked:
             self._outlines_hooked = True
@@ -704,6 +706,14 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
             self.flat.show_message(self._no_stations_text())
         self._push_globe(force=True)
         self._select_on_globe(fly=False)
+
+    def _go_hd(self):
+        """The 3D globe's web engine takes a few seconds to start the first time: say so
+        on the flat map before the window stops answering for it."""
+        if self.flat is not None:
+            self.flat.show_message("Loading the 3D globe…")
+            self.flat.repaint()
+        QTimer.singleShot(30, self, lambda: self._set_map("globe"))
 
     def _on_outlines(self, rings: list, labels: list):
         if self.flat is not None:
@@ -848,7 +858,11 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
     def _reload(self):
         self._globe_error = ""
         self._flash_until = 0.0
+        self._reloading = True
+        self.btn_refresh.setEnabled(False)   # back on when the list (or an error) is in
         self.dir.load_globe(force=True)
+        if self._globe_list:
+            self._refresh_info("Refreshing the station list…")
         if not self._globe_list:
             self._show_list()
             self._refresh_info()
@@ -859,10 +873,22 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
         self._remember(stations)
         self._push_globe(force=True)
         self._show_list()
-        self._refresh_info()
+        if self._reloading:
+            self._reloading = False
+            self.btn_refresh.setEnabled(True)
+            stale = getattr(self.dir, "globe_stale", "")
+            self._refresh_info(
+                f"<span style='color:{theme.status('warn')}'>Couldn't reach the station "
+                "directory — showing the saved list.</span>" if stale else
+                f"<span style='color:{theme.status('ok')}'>✓ Station list updated: "
+                f"{len(stations)} stations.</span>")
+        else:
+            self._refresh_info()
 
     def _on_failed(self, kind: str, msg: str):
         if kind == "globe":
+            self._reloading = False
+            self.btn_refresh.setEnabled(True)
             self._map("showMessage", "The station directory can't be reached right now. "
                       "Check your connection and press ↻.")
             # stays up (list and info line) until a reload gets through
@@ -1219,7 +1245,12 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
             return False
         st = self.player.station or self._fed_by or self.selected()
         name = (st.name[:30] if st else "Radio") + " " + time.strftime("%H.%M.%S")
-        self.clip_ready.emit(data, name)
+        self.clip_error = ""
+        self.clip_ready.emit(data, name)   # the window saves it (and sets clip_error if not)
+        if self.clip_error:
+            self._refresh_info(f"<span style='color:{theme.status('error')}'>Couldn't save "
+                               f"the clip: {html.escape(self.clip_error)}</span>")
+            return False
         green = theme.status("ok")
         self._refresh_info(f"<span style='color:{green}'>✓ Saved a {len(data) / SR:.1f}s clip "
                            "to your Sounds.</span>")

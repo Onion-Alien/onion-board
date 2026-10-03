@@ -27,7 +27,7 @@ from PySide6.QtWidgets import (QButtonGroup, QFrame, QHBoxLayout, QLabel, QPushB
 from soundboard import theme, ytdl
 from soundboard.bunny import H as BUN_H
 from soundboard.bunny import W as BUN_W
-from soundboard.ui import icons
+from soundboard.ui import busy, icons
 from soundboard.ui.bunnywidget import BunnyWidget
 from soundboard.ui.owl import H as OWL_H
 from soundboard.ui.owl import W as OWL_W
@@ -287,8 +287,27 @@ class ResultRow(QFrame):
         self.setToolTip("Double-click to play")
 
     def mouseDoubleClickEvent(self, e):
-        self.play.emit(self.result)
+        if self.btn_play.isEnabled():
+            self.play.emit(self.result)
         super().mouseDoubleClickEvent(e)
+
+    def set_busy(self, kind: str):
+        """Its audio is being fetched: that button greys out until set_done."""
+        btn = self.btn_add if kind == "add" else self.btn_play
+        self._release = getattr(self, "_release", {})
+        if kind not in self._release and btn.isEnabled():
+            self._release[kind] = busy.hold(btn, "Adding…" if kind == "add" else "Loading…")
+
+    def set_done(self, kind: str, ok: bool):
+        release = getattr(self, "_release", {}).pop(kind, None)
+        if release is None:
+            return
+        if kind == "add" and ok:
+            release()
+            self.btn_add.setText("✓ Added")   # added once is enough
+            self.btn_add.setEnabled(False)
+        else:
+            release(None if ok else ("Didn't add" if kind == "add" else "Didn't play"))
 
     def set_thumb(self, pm: QPixmap):
         self.thumb.setPixmap(rounded(pm, THUMB_W, THUMB_H, 8))
@@ -405,6 +424,15 @@ class SearchResults(QFrame):
             self.loading.start(text)
         else:
             self.loading.stop()
+
+    def mark(self, url: str, kind: str, ok: bool | None = None):
+        """A row's Play / Add: busy (ok None) while its audio is fetched, then done."""
+        for r in self._rows:
+            if r.result.url == url:
+                if ok is None:
+                    r.set_busy(kind)
+                else:
+                    r.set_done(kind, ok)
 
     def _clear(self):
         for r in self._rows:

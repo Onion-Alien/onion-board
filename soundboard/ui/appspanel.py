@@ -280,6 +280,7 @@ class AppRow(QFrame):
 class AppsTab(QWidget):
     """Lists the programs that have sound and captures the ones you switch on."""
     clip_ready = Signal(object, str)   # audio, suggested name (like RadioTab's)
+    clip_error = ""                    # set by whoever saves the clip, when it can't
     active_changed = Signal(bool)      # some program is / no program is sent (the tab's live dot)
 
     def __init__(self, engine, cfg, save_cb, meter_cls):
@@ -555,6 +556,8 @@ class AppsTab(QWidget):
         """Send on: the program's audio goes into the mix."""
         if row.app is None or row.src is not None:
             return
+        row.set_status("Connecting…")   # opening its audio can take a moment
+        row.sub.repaint()
         key = ("app", row.exe.lower())
         src = self.engine.add_aux(key)
         src.vol = row.vol.value()
@@ -608,6 +611,9 @@ class AppsTab(QWidget):
         if rec is None:
             return
         row.set_recording(False)
+        if save:
+            row.set_status("Saving the clip…")
+            row.sub.repaint()
         heard = rec.triggered
         data = rec.stop()
         if row.src is None:
@@ -620,7 +626,11 @@ class AppsTab(QWidget):
                         else "Nothing was recorded: it didn't make a sound.")
             return
         name = (row.app.name if row.app else row.name.text())[:30] or "App"
+        self.clip_error = ""
         self.clip_ready.emit(data, f"{name} {time.strftime('%H.%M.%S')}")
+        if self.clip_error:   # the window couldn't save it
+            row.set_status(f"Couldn't save the clip: {self.clip_error}", error=True)
+            return
         self._flash(row, f"✓ Saved a {len(data) / SR:.1f}s clip to your Sounds.")
 
     def _flash(self, row: AppRow, text: str):

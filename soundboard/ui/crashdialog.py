@@ -120,8 +120,12 @@ class CrashDialog(QDialog):
 
     def open_folder(self):
         folder = self._folder()
-        if folder is not None:
-            QDesktopServices.openUrl(QUrl.fromLocalFile(str(folder)))
+        if folder is None:
+            return
+        if QDesktopServices.openUrl(QUrl.fromLocalFile(str(folder))):
+            self.status.setText("Opened the folder with the log in it.")
+        else:
+            self.status.setText(f"Couldn't open the folder. It's here: {folder}")
 
 
 def free_dialog(dlg: QDialog):

@@ -17,8 +17,7 @@ import subprocess
 import time
 
 import numpy as np
-from PySide6.QtCore import Qt, QTimer, QUrl
-from PySide6.QtGui import QDesktopServices
+from PySide6.QtCore import Qt, QTimer
 from PySide6.QtWidgets import (QApplication, QButtonGroup, QCheckBox, QDialog, QFrame,
                                QHBoxLayout, QLabel, QMessageBox, QProgressBar, QPushButton,
                                QRadioButton, QScrollArea, QStackedWidget, QVBoxLayout, QWidget)
@@ -28,7 +27,7 @@ from soundboard import theme
 from soundboard.engine import SR
 from soundboard import library
 from soundboard.library import RESOURCE_DIR
-from soundboard.ui import fit
+from soundboard.ui import busy, fit
 from soundboard.ui.bunnywidget import BunnyWidget
 from soundboard.ui.widgets import Meter
 
@@ -317,7 +316,7 @@ class SetupWizard(QDialog):
         lst, _ = self._choice_list(outs, cur,
                                    lambda n: self._pick_headphones(n, by_user=True))
         v.addWidget(lst, 1)
-        play = QPushButton("🔊  Play a test sound")
+        play = self.btn_test = QPushButton("🔊  Play a test sound")
         play.setStyleSheet("padding:10px; font-size:11pt;")
         play.clicked.connect(self.test_sound)
         v.addWidget(play)
@@ -353,7 +352,10 @@ class SetupWizard(QDialog):
         self.btn_cable.clicked.connect(self.install_cable)
         v.addWidget(self.btn_cable)
         self.btn_recheck = QPushButton("⟳  Check again")
-        self.btn_recheck.clicked.connect(self.recheck_cable)
+        self.btn_recheck.clicked.connect(lambda: busy.run_busy(
+            self.btn_recheck, "Checking…", self.recheck_cable,
+            lambda _r: None if self.cable_ok() else "Still not found — checked just now",
+            ms=3500))
         v.addWidget(self.btn_recheck)
         self.btn_restart = QPushButton("⟲  Restart my PC now")
         self.btn_restart.setObjectName("primary")
@@ -411,6 +413,8 @@ class SetupWizard(QDialog):
         self.progress.setText(f"Step {i + 1} of {self.PAGES}")
         self.btn_back.setVisible(i > 0)
         if i == 2:
+            self.cable_status.setText("Checking the cable…")
+            self.cable_status.repaint()   # the check can take a moment (it may reopen devices)
             self.recheck_cable(rescan=False)
         elif i == 3:
             self._fill_discord()
@@ -483,8 +487,12 @@ class SetupWizard(QDialog):
         self.win.engine.set_mon_device(name)
 
     def test_sound(self):
+        if self.win.engine.mon_stream is None:
+            busy.flash(self.btn_test, "No headphones open — pick another above", 3500)
+            return
         self.win.engine.play("__setup__", test_tune(), 1.0, preview=True)
         self.bun_phones.burst()
+        busy.flash(self.btn_test, "🔊  Playing… hear it?", 1500)
 
     def cable_ok(self) -> bool:
         return bool(eng.virtual_outputs())
@@ -627,6 +635,7 @@ class SetupWizard(QDialog):
         try:
             subprocess.Popen(["shutdown", "/r", "/t", "5"],
                              creationflags=subprocess.CREATE_NO_WINDOW)
+            busy.hold(self.btn_restart, "Restarting in a few seconds…")
         except OSError as e:
             self.cable_status.setText(f"<span style='color:{_bad()}'>Couldn't restart the PC "
                                       f"({e.strerror or e}).</span> Restart it from the Start "
@@ -665,7 +674,7 @@ class SetupWizard(QDialog):
 
     def copy_name(self):
         QApplication.clipboard().setText(self._vm)
-        self.btn_copy.setText("✓  Copied")
+        busy.flash(self.btn_copy, "✓  Copied")
 
     def _tick(self):
         e = self.win.engine
@@ -748,10 +757,10 @@ class SteamGuide(QDialog):
         row = QHBoxLayout()
         copy = QPushButton("📋  Copy the mic name")
         copy.clicked.connect(lambda: (QApplication.clipboard().setText(mic_name),
-                                      copy.setText("✓  Copied")))
+                                      busy.flash(copy, "✓  Copied")))
         row.addWidget(copy)
         open_steam = QPushButton("Open Steam's voice settings")
-        open_steam.clicked.connect(self.open_steam)
+        open_steam.clicked.connect(lambda: self.open_steam(open_steam))
         row.addWidget(open_steam)
         row.addStretch(1)
         ok = QPushButton("Done")
@@ -760,7 +769,9 @@ class SteamGuide(QDialog):
         row.addWidget(ok)
         v.addLayout(row)
 
-    def open_steam(self):
+    def open_steam(self, btn=None):
         """steam://settings/voice opens the Voice page when Steam is installed; if it
         isn't, Windows says so and the written steps still apply."""
-        QDesktopServices.openUrl(QUrl("steam://settings/voice"))
+        busy.open_url("steam://settings/voice", btn, self, opened="✓ Opened Steam",
+                      failed="Couldn't open Steam — is it installed? Follow the steps "
+                             "above instead. The link was")

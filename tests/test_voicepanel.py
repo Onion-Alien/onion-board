@@ -178,8 +178,11 @@ def test_downloaded_language_needs_a_windows_voice_and_uses_it(panel, monkeypatc
     assert s.ctl.live_voice == "Microsoft Katja"
     s._on_event({"type": "final", "text": "Hallo", "original": "Hello"})
     assert s.said_log.toPlainText().endswith("Hallo   (you said: Hello)")
-    s._remove_download()
-    assert not d.exists() and "(download" in s.cb_lang.currentText()
+    from PySide6.QtWidgets import QApplication, QMessageBox
+    monkeypatch.setattr(QMessageBox, "question", lambda *a, **k: QMessageBox.Yes)
+    s._remove_download()                         # asks, then "Deleting…" on the button
+    process_events(QApplication.instance(), lambda: not d.exists())
+    assert "(download" in s.cb_lang.currentText()
 
 
 def test_voice_installed_in_windows_settings_is_found_on_return(panel, qapp, monkeypatch):
@@ -201,7 +204,7 @@ def test_voice_installed_in_windows_settings_is_found_on_return(panel, qapp, mon
     assert "Add-ons" not in s.lbl_tr.text()
     s._app_state(Qt.ApplicationActive)          # not sent to settings: no rescan
     opened = []
-    monkeypatch.setattr(QDesktopServices, "openUrl", lambda url: opened.append(url))
+    monkeypatch.setattr(QDesktopServices, "openUrl", lambda url: opened.append(url) or True)
     s.b_voices.click()
     assert opened and s._voice_wait
 

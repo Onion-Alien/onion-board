@@ -6,6 +6,7 @@ clicking a pad still plays it, and the pick stays until Esc, the bar's ✕, or t
 picked pads are filtered out of view."""
 from __future__ import annotations
 
+import html
 from typing import TYPE_CHECKING
 
 from PySide6.QtCore import QObject, Qt
@@ -186,6 +187,11 @@ class PadSelection(QObject):
                 self.mw.pads[sid].update()
         self.mw.cfg.save()
 
+    def _said(self, what: str):
+        """Volume and fades don't show on the pads: say the change happened."""
+        n = len(self.sounds())
+        self.mw.toast(f"{what} on {n} sound{'s' if n != 1 else ''}", "ok")
+
     def set_color(self, color: str):
         for m in self.sounds():
             m.color = color
@@ -197,6 +203,7 @@ class PadSelection(QObject):
             m.volume = volume
             self.mw.engine.set_gain(m.id, self.mw.gain_for(m))
         self._changed()
+        self._said(f"✓ Volume {round(volume * 100)}%")
 
     def ask_volume(self, *_):
         sounds = self.sounds()
@@ -216,6 +223,7 @@ class PadSelection(QObject):
             if fade_out is not None:
                 m.fade_out = min(max(fade_out, 0.0), MAX_FADE_S)
         self._changed()
+        self._said("✓ Fades set")
 
     def ask_fades(self, *_):
         sounds = self.sounds()
@@ -240,9 +248,12 @@ class PadSelection(QObject):
                 m.tags.append(name)
             elif not on and name in m.tags:
                 m.tags.remove(name)
-        self.mw.cfg.save()
+        n = len(self.sounds())
+        self.mw._save_now()
         self.mw._fill_categories()
         self.mw.apply_filter(self.mw.search.text())
+        self.mw.toast(f"✓ Added {n} sound{'s' if n != 1 else ''} to {html.escape(name)}" if on
+                      else f"Took {n} sound{'s' if n != 1 else ''} out of {html.escape(name)}")
 
     def new_category(self, *_):
         keep = set(self.picked)   # the new, empty category shows: that unpicks them

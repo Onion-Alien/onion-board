@@ -2,11 +2,10 @@
 general options."""
 from __future__ import annotations
 
-import os
 import threading
 
-from PySide6.QtCore import QObject, QRectF, QSize, Qt, QUrl, Signal
-from PySide6.QtGui import (QBrush, QColor, QDesktopServices, QFont, QPainter, QPainterPath,
+from PySide6.QtCore import QObject, QRectF, QSize, Qt, Signal
+from PySide6.QtGui import (QBrush, QColor, QFont, QPainter, QPainterPath,
                            QPixmap)
 from PySide6.QtWidgets import (QApplication, QCheckBox, QComboBox, QDialog, QFrame, QGridLayout,
                                QHBoxLayout, QLabel, QPushButton, QScrollArea, QSlider, QTabWidget,
@@ -15,7 +14,7 @@ from PySide6.QtWidgets import (QApplication, QCheckBox, QComboBox, QDialog, QFra
 from shiboken6 import isValid as qt_valid
 
 from soundboard import autostart, midi, theme, winkeys, ytdl
-from soundboard.ui import fit, icons
+from soundboard.ui import busy, fit, icons
 from soundboard.ui import overlay as ovl
 from soundboard.wheelguard import no_wheel
 from soundboard.winkeys import Hotkeys
@@ -683,7 +682,7 @@ class SettingsDialog(QDialog):
         row.addWidget(add)
         folder = QPushButton("Open voices folder")
         folder.setToolTip("Voice packs and voice settings go here; README.txt in it says how")
-        folder.clicked.connect(lambda: os.startfile(customvoices.ensure_folder()))  # noqa: S606
+        folder.clicked.connect(lambda: busy.open_folder(customvoices.ensure_folder, folder))
         row.addWidget(folder)
         show = QPushButton("Show on the Voice tab")
 
@@ -723,7 +722,7 @@ class SettingsDialog(QDialog):
         cv.addLayout(grid)
         ref = QPushButton("Re-scan devices")
         icons.set_icon(ref, "reload")
-        ref.clicked.connect(lambda: (mw.refresh_devices(), self._sync_devices()))
+        ref.clicked.connect(lambda: mw.rescan_with_feedback(ref, self._sync_devices))
         cv.addWidget(ref, 0, Qt.AlignLeft)
         self._sync_devices()
         return card
@@ -818,13 +817,15 @@ class SettingsDialog(QDialog):
         row = QHBoxLayout()
         send = QPushButton("Send feedback")
         send.setObjectName("primary")
-        send.clicked.connect(lambda: QDesktopServices.openUrl(
-            QUrl(feedback.feedback_url(__version__))))
+        send.clicked.connect(lambda: busy.open_url(
+            feedback.feedback_url(__version__), send, opened="✓ Opened in your browser",
+            failed="Couldn't open your browser. The page is"))
         icons.set_icon(send, "speech")
         bug = QPushButton("Report a problem on GitHub")
         bug.setToolTip("For people with a GitHub account: opens a new bug report")
-        bug.clicked.connect(lambda: QDesktopServices.openUrl(
-            QUrl(feedback.problem_url(__version__))))
+        bug.clicked.connect(lambda: busy.open_url(
+            feedback.problem_url(__version__), bug, opened="✓ Opened in your browser",
+            failed="Couldn't open your browser. The page is"))
         row.addWidget(send)
         row.addWidget(bug)
         row.addStretch(1)
@@ -842,8 +843,10 @@ class SettingsDialog(QDialog):
                               "your games or calls more fun, you can chip in. Entirely "
                               "optional. The button opens the project's GitHub page.")
         btn = QPushButton("♥  Support Onion Board")
-        btn.clicked.connect(lambda: QDesktopServices.openUrl(
-            QUrl(f"https://github.com/{REPO}#support-onion-board")))
+        btn.clicked.connect(lambda: busy.open_url(
+            f"https://github.com/{REPO}#support-onion-board", btn,
+            opened="✓ Opened in your browser — thank you!",
+            failed="Couldn't open your browser. The page is"))
         row = QHBoxLayout()
         row.addWidget(btn)
         row.addStretch(1)
@@ -876,6 +879,8 @@ class SettingsDialog(QDialog):
                 auto.blockSignals(True)
                 auto.setChecked(autostart.is_enabled())
                 auto.blockSignals(False)
+                busy.toast(self, "Couldn't change Windows startup — see the log in "
+                           r"%APPDATA%\OnionBoard.", "warn")
             hidden.setEnabled(auto.isChecked())
         auto.toggled.connect(set_auto)
         hidden.toggled.connect(mw.set_autostart_hidden)
@@ -896,7 +901,13 @@ class SettingsDialog(QDialog):
         row = QHBoxLayout()
         exp = QPushButton("Export everything…")
         icons.set_icon(exp, "folder")
-        exp.clicked.connect(self.mw.export_board)
+        def export():
+            mw = self.mw
+            mw.export_board()
+            if mw._exporting:   # it started (not cancelled in the save dialog)
+                busy.hold_until(exp, "Exporting…", mw.bridge.exported,
+                                lambda _p, _n, err: "Didn't export" if err else "✓ Exported")
+        exp.clicked.connect(export)
         imp = QPushButton("Import…")
         imp.clicked.connect(self.mw.import_dialog)
         row.addWidget(exp)
@@ -1051,6 +1062,10 @@ class SettingsDialog(QDialog):
             cfg.api_token = remote.new_token()
             cfg.save()
             refresh(mw.apply_remote())
+            busy.flash(new, "✓ New key made")
+            if mw.remote.running:
+                state.setText("New key made: anything using the old one has stopped working. "
+                              "Copy the example link for the new one.")
 
         def copy_link():
             QApplication.clipboard().setText(

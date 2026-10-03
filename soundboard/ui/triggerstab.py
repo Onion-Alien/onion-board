@@ -27,7 +27,7 @@ from PySide6.QtWidgets import (QHBoxLayout, QMessageBox, QProgressBar, QPushButt
                                QStackedWidget, QVBoxLayout, QWidget)
 
 from soundboard import modules, theme, updates, watchaddon
-from soundboard.ui import icons
+from soundboard.ui import busy, icons
 from soundboard.ui.owl import OwlWidget
 from soundboard.ui.panel import card, hint_label, section_label
 
@@ -264,6 +264,9 @@ class TriggersTab(QWidget):
         self.bar.show()
         self.error.hide()
         self.update_text.setText("Downloading Onion Watch…")
+        self._busy_label("Downloading…")
+        self.btn_cancel.setEnabled(True)
+        self.btn_cancel.setText("Cancel")
 
         def run():
             try:
@@ -281,16 +284,30 @@ class TriggersTab(QWidget):
 
     def cancel(self):
         self._cancel = True
+        self.btn_cancel.setEnabled(False)   # the download notices between chunks
+        self.btn_cancel.setText("Cancelling…")
+
+    def _busy_label(self, text: str):
+        """What the button that started it says while it runs (the bar and Cancel are
+        on the get page; an update from the bar only has its own button and text)."""
+        (self.btn_update if self.panel is not None else self.btn_get).setText(text)
 
     def _on_progress(self, done: int, total: int):
         if total > 0:
             self.bar.setRange(0, 1000)
             self.bar.setValue(int(done * 1000 / total))
+            pct = int(done * 100 / total)
+            self._busy_label(f"Downloading… {pct}%")
+            self.update_text.setText(f"Downloading Onion Watch… {pct}%")
+            if done >= total:
+                self._busy_label("Installing…")
 
     def _on_finished(self, info, error: str, update: bool):
         self._busy = False
         self.btn_get.setEnabled(True)
         self.btn_update.setEnabled(True)
+        self.btn_update.setText("Update")
+        self._label_get()                   # the get button's own words again
         self.btn_cancel.hide()
         self.bar.hide()
         if update:
@@ -323,7 +340,12 @@ class TriggersTab(QWidget):
     def remove(self):
         """Uninstall Onion Watch, after asking: its tab is closed and Hoot is back."""
         info = self.info
-        if self._busy or info is None or not self.confirm_remove():
+        if self._busy:
+            QMessageBox.information(self, "Remove Onion Watch",
+                                    "Onion Watch is being downloaded right now. Try again "
+                                    "when it's done.")
+            return
+        if info is None or not self.confirm_remove():
             return
         was_active = self.is_active()
         panel, self.panel = self.panel, None
@@ -353,6 +375,9 @@ class TriggersTab(QWidget):
         self.info = None
         self._label_get()
         self.stack.setCurrentWidget(self.get_page)
+        n = len(self.host.screen.get("triggers") or [])
+        busy.toast(self, "✓ Onion Watch removed." + (" Your triggers are kept." if n else ""),
+                   "ok")
 
     def offer_update(self, offer: watchaddon.Offer):
         """A newer Onion Watch is out (the daily update check): say so on the tab."""

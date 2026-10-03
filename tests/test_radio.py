@@ -548,7 +548,9 @@ def test_flat_map_is_the_default_and_hd_swaps_in_the_globe(qapp, app_dir, server
     assert len(t.flat._points) == 5               # the flat map takes every station
     flat = t.flat
     flat.hd_requested.emit()
-    assert made and t.flat is None and cfg.radio["map"] == "globe"
+    assert "Loading the 3D globe" in flat._msg   # said first: the web engine is slow to start
+    assert process_events(qapp, lambda: made)
+    assert t.flat is None and cfg.radio["map"] == "globe"
     assert "globe_hd" not in cfg.radio
     from PySide6.QtCore import QEvent
     from shiboken6 import isValid

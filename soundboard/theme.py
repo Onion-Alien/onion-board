@@ -404,6 +404,8 @@ QFrame#transport { background:$panel; border-radius:12px; }
 QFrame#card QPushButton#primary { background:$accent; color:$on_accent; border:none; padding:9px; }
 QFrame#card QPushButton#primary:hover { background:$accent_hi; }
 QFrame#vsep { background:$border; border:none; }
+QLabel#toast { background:$panel; border:1px solid $border_hi;
+               border-radius:12px; padding:8px 14px; }
 QFrame#chip { background:$panel; border:1px solid $border; border-radius:14px; }
 QFrame#chip[sel="true"] { border-color:$accent; }
 QFrame#chip QPushButton { background:transparent; border:none; padding:2px 6px; }
