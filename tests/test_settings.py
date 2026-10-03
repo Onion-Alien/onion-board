@@ -36,7 +36,7 @@ def test_support_opens_the_project_page_not_an_address_in_the_app(window, monkey
 def test_each_page_opens_by_name_and_holds_its_cards(window):  # noqa: F811
     where = {"audio": ("DEVICES", "YOUR MIC", "WHO'S LISTENING", "AUDIO BUFFERING"),
              "hotkeys": ("HOTKEY SOUNDS",),
-             "general": ("WINDOW", "RUNNING IN THE BACKGROUND", "BACKUP",
+             "general": ("WINDOW", "RUNNING IN THE BACKGROUND", "BACKUP", "FEEDBACK AND PROBLEMS",
                          "SUPPORT ONION BOARD"),
              "updates": ("APP UPDATES", "DOWNLOADER (YT-DLP)"),
              "remote": ("REMOTE CONTROL (STREAM DECK, SCRIPTS)",)}
@@ -64,4 +64,21 @@ def test_audio_page_picks_input_and_output_through_the_window(window, monkeypatc
     mon.activated.emit(2)
     assert picked == [("mic_device", "Headset Mic"), ("mon_device", "Headset")]
     assert window.cb_mon.currentText() == "Headset"   # the Setup tab follows
+    d.close()
+
+
+def test_feedback_and_problem_buttons_only_open_the_browser(window, monkeypatch):  # noqa: F811
+    from soundboard import __version__, feedback, settings
+    opened = []
+    monkeypatch.setattr(settings.QDesktopServices, "openUrl", lambda u: opened.append(u.toString()))
+    d = SettingsDialog(window, "general")
+    monkeypatch.setattr(feedback, "FORM_URL", "https://forms.example.com/r/x")
+    d.feedback_btn.click()
+    d.problem_btn.click()
+    assert opened[0] == f"https://forms.example.com/r/x?version={__version__}"
+    assert opened[1].startswith("https://github.com/Onion-Alien/onion-board/issues/new?labels=bug")
+    assert __version__ in opened[1]
+    monkeypatch.setattr(feedback, "FORM_URL", "")       # no form: feedback goes to GitHub too
+    d.feedback_btn.click()
+    assert opened[2] == opened[1]
     d.close()

@@ -396,6 +396,7 @@ the launcher the shortcuts and PyInstaller use. The app is the `soundboard` pack
 | `soundboard/autostart.py` | *Start with Windows*: the per-user `Run` registry value (`--tray` starts it hidden) |
 | `soundboard/shellicon.py` | the app icon in the theme's colours outside its windows: writes `%APPDATA%\OnionBoard\icons\onionboard-<hash>.ico`, puts it on the main window's relaunch properties (taskbar right-click menu, a pin) and on this copy's own *Onion Board* Desktop / Start menu / taskbar-pin shortcuts |
 | `soundboard/updates.py` | "is there a newer version?" (GitHub Releases, once a day) and the self-update: downloads the release's installer, checks its SHA-256, runs it silently and reopens the app |
+| `soundboard/feedback.py` | where *Send feedback* and *Report a problem* (Settings → General) go: a no-account form or a GitHub issue, opened in the browser with the version filled in; the app sends nothing |
 | `soundboard/ui/icons.py` | the line icons, drawn in code and recoloured with the theme |
 | `soundboard/ui/art.py` | optional pictures from `assets/art` (voice tiles, the computer voice, its languages); emoji / painted icons when missing |
 | `soundboard/ui/responsive.py` | small windows: what hides, in which order, as the window shrinks |

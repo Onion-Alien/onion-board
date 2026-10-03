@@ -633,6 +633,7 @@ class SettingsDialog(QDialog):
         v.addWidget(card)
         v.addWidget(self._background_card())
         v.addWidget(self._backup_card())
+        v.addWidget(self._feedback_card())
         v.addWidget(self._support_card())
         v.addStretch(1)
         return w
@@ -651,6 +652,31 @@ class SettingsDialog(QDialog):
         return w
 
     # ------------------------------------------------------------------ support
+    def _feedback_card(self):
+        """Feedback and bug reports: both open a page in the browser, nothing is sent
+        from the app (feedback.py)."""
+        from soundboard import __version__, feedback
+        card, cv = self._card("Feedback and problems",
+                              "Found a bug, missing something, or just want to say hi? It "
+                              "opens in your browser, and nothing is sent unless you submit "
+                              "it there.")
+        row = QHBoxLayout()
+        send = QPushButton("Send feedback")
+        send.setObjectName("primary")
+        send.clicked.connect(lambda: QDesktopServices.openUrl(
+            QUrl(feedback.feedback_url(__version__))))
+        icons.set_icon(send, "speech")
+        bug = QPushButton("Report a problem on GitHub")
+        bug.setToolTip("For people with a GitHub account: opens a new bug report")
+        bug.clicked.connect(lambda: QDesktopServices.openUrl(
+            QUrl(feedback.problem_url(__version__))))
+        row.addWidget(send)
+        row.addWidget(bug)
+        row.addStretch(1)
+        cv.addLayout(row)
+        self.feedback_btn, self.problem_btn = send, bug
+        return card
+
     def _support_card(self):
         """A link to the GitHub page's Support section: the ways to donate live there,
         not in the app, so they can change without a release and a copy of the app
