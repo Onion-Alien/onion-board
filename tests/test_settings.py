@@ -38,7 +38,7 @@ def test_support_opens_the_project_page_not_an_address_in_the_app(window, monkey
 def test_each_page_opens_by_name_and_holds_its_cards(window):  # noqa: F811
     where = {"privacy": ("WHAT GOES ONLINE", "SOUNDS AND RADIO", "VOICES",
                          "UPDATES AND ADD-ONS", "SETUP DOWNLOADS", "NETWORK INFORMATION"),
-             "connection": ("CONNECTION",),
+             "connection": ("CONNECTION", "NETWORK ACTIVITY"),
              "audio": ("DEVICES", "YOUR MIC", "WHO'S LISTENING", "AUDIO BUFFERING"),
              "hotkeys": ("HOTKEY SOUNDS",),
              "general": ("WINDOW", "RUNNING IN THE BACKGROUND", "BACKUP"),

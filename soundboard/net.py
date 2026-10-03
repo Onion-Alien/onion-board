@@ -30,6 +30,9 @@ feature (urlopen(feature=…), connect(feature=…), the relay's user name), and
 doesn't, or names one that's off, is refused with FeatureOff before anything is
 looked up or connected, in every mode. That's why the relay runs in Direct mode too:
 FFmpeg and Qt connect from C++, and the relay is the only place they can be stopped.
+
+Every connection made here, and every one refused, is listed in soundboard.netlog
+(Settings > Connection > Network activity), in memory only.
 """
 from __future__ import annotations
 
@@ -52,6 +55,8 @@ import urllib.request
 import weakref
 from collections.abc import Callable
 from dataclasses import dataclass
+
+from soundboard import netlog
 
 log = logging.getLogger(__name__)
 
@@ -407,21 +412,64 @@ def connect(host: str, port: int, timeout: float | None = CONNECT_TIMEOUT_S,
     allowed. Raises ProxyError (an OSError) with a readable message; never goes
     direct when a proxy or Tor is set, unless `direct` (the user's "Try this one
     without Tor" click; the switch is checked all the same)."""
+    return _open(host, port, timeout, via, feature, direct)[0]
+
+
+def _open(host: str, port: int, timeout: float | None = CONNECT_TIMEOUT_S,
+          via: Proxy | None = None, feature: str | None = None, direct: bool = False,
+          how: str = netlog.APP) -> tuple[socket.socket, netlog.Entry]:
+    """connect(), and its entry in the activity list (netlog) for the caller to add
+    to (bytes, requests) and close."""
     host = str(host).strip("[]")
-    if not known(feature) or not (via is None and is_loopback(host)):
-        check(feature)   # before the Tor gate: a switched-off feature never starts Tor
+    entry = netlog.begin(feature, host, port, how)
+    try:
+        if not known(feature) or not (via is None and is_loopback(host)):
+            check(feature)   # before the Tor gate: a switched-off feature never starts Tor
+    except FeatureOff as e:
+        entry.state, entry.reason, entry.ended = netlog.BLOCKED, str(e), entry.started
+        raise
+    try:
+        sock, route = _route(host, port, timeout, via, direct)
+    except OSError as e:
+        entry.route = _route_name(via, direct, host)
+        entry.failed(str(e) if isinstance(e, ProxyError) else _why(e))
+        raise
+    entry.connected(route)
+    return sock, entry
+
+
+def _route_name(via: Proxy | None, direct: bool, host: str) -> str:
+    """How a connection to `host` goes, in words (never with a login)."""
+    if via is None:
+        if is_loopback(host):
+            return "this PC"
+        if direct and active():
+            return "direct (Try this one without Tor)"
+        if not active():
+            return "direct"
+        if _mode == TOR:
+            return "Tor"
+        via = _proxy
+        if via is None:
+            return "proxy (address not usable)"
+    return f"{'SOCKS5' if via.kind == 'socks5' else 'HTTP'} proxy {via.where}"
+
+
+def _route(host: str, port: int, timeout: float | None, via: Proxy | None,
+           direct: bool) -> tuple[socket.socket, str]:
     if via is None:
         if direct or not active() or is_loopback(host):
-            return socket.create_connection((host, port), timeout)
+            return (socket.create_connection((host, port), timeout),
+                    _route_name(via, direct, host))
         if _mode == TOR:
             # a Tor circuit can take longer to open than a proxy's connection
             return _via(_tor_proxy(), host, port, timeout, "Tor",
-                        handshake=max(timeout or 0, TOR_HANDSHAKE_S))
+                        handshake=max(timeout or 0, TOR_HANDSHAKE_S)), "Tor"
         if _proxy is None:
             raise _failed(f"Not connecting: the proxy address in Settings > Privacy isn't "
                           f"usable ({_bad})")
         via = _proxy
-    return _via(via, host, port, timeout)
+    return _via(via, host, port, timeout), _route_name(via, direct, host)
 
 
 def _via(via: Proxy, host: str, port: int, timeout: float | None,
@@ -544,8 +592,9 @@ def test(proxy_url: str, target: tuple[str, int] = TEST_HOST,
     The answer for the user; raises ValueError / ProxyError with one."""
     p = parse(proxy_url)
     t = time.monotonic()
-    sock = connect(target[0], target[1], timeout, via=p, feature=TEST)
+    sock, entry = _open(target[0], target[1], timeout, via=p, feature=TEST)
     sock.close()
+    entry.closed()
     return f"It works: the proxy reached {target[0]} in {time.monotonic() - t:.1f} s."
 
 
@@ -555,29 +604,131 @@ def _timeout(t):
     return t if isinstance(t, int | float) else None   # socket._GLOBAL_DEFAULT_TIMEOUT
 
 
-class _HTTPConnection(http.client.HTTPConnection):
+class _Counted:
+    """A response's file, counting what's read into its activity entry."""
+
+    def __init__(self, fp, entry: netlog.Entry):
+        self._fp, self._entry = fp, entry
+
+    def _count(self, data):
+        if data:
+            self._entry.add_received(len(data))
+        return data
+
+    def read(self, *a):
+        return self._count(self._fp.read(*a))
+
+    def read1(self, *a):
+        return self._count(self._fp.read1(*a))
+
+    def readline(self, *a):
+        return self._count(self._fp.readline(*a))
+
+    def readinto(self, b):
+        n = self._fp.readinto(b)
+        if n:
+            self._entry.add_received(n)
+        return n
+
+    def close(self):
+        self._fp.close()
+        self._entry.closed()
+
+    def __getattr__(self, name):
+        return getattr(self._fp, name)
+
+
+class _Response(http.client.HTTPResponse):
+    def __init__(self, sock, *a, entry: netlog.Entry | None = None, **kw):
+        super().__init__(sock, *a, **kw)
+        if entry is not None:
+            self.fp = _Counted(self.fp, entry)
+
+
+class _Logged:
+    """An http.client connection that adds its requests, answers and bytes to its
+    activity entry (netlog)."""
+    entry: netlog.Entry | None = None
+    answered = False   # a response has the entry now: its close() closes it
+    asking = ("", "")  # the request line: put before the (lazy) connect
+
+    def putrequest(self, method, url, *a, **kw):
+        self.asking = (method, url)
+        if self.entry is not None:
+            self.entry.request(method, url)
+        return super().putrequest(method, url, *a, **kw)
+
+    def _opened(self, entry: netlog.Entry):
+        self.entry = entry
+        if self.asking[0]:
+            entry.request(*self.asking)
+
+    def send(self, data):
+        super().send(data)   # connects first, if it hasn't yet
+        if self.entry is not None and isinstance(data, bytes | bytearray | memoryview):
+            self.entry.add_sent(len(data))
+
+    def getresponse(self):
+        entry = self.entry
+        self.response_class = (lambda sock, *a, **kw: _Response(sock, *a, entry=entry, **kw))
+        r = super().getresponse()
+        self.answered = True
+        if entry is not None:
+            entry.response(r.status, r.reason)
+        return r
+
+    def close(self):
+        super().close()
+        if self.entry is not None and not self.answered:
+            self.entry.closed()   # no response will close it
+
+
+class _HTTPConnection(_Logged, http.client.HTTPConnection):
     def __init__(self, *a, feature: str = "", direct: bool = False, **kw):
         super().__init__(*a, **kw)
         self.feature, self.direct = feature, direct
 
     def connect(self):
-        self.sock = connect(self.host, self.port, _timeout(self.timeout),
+        self.sock, entry = _open(self.host, self.port, _timeout(self.timeout),
+                                 feature=self.feature, direct=self.direct)
+        self._opened(entry)
+
+
+class _HTTPSConnection(_Logged, http.client.HTTPSConnection):
+    def __init__(self, *a, feature: str = "", direct: bool = False, **kw):
+        super().__init__(*a, **kw)
+        self.feature, self.direct = feature, direct
+
+    def connect(self):
+        sock, entry = _open(self.host, self.port, _timeout(self.timeout),
                             feature=self.feature, direct=self.direct)
-
-
-class _HTTPSConnection(http.client.HTTPSConnection):
-    def __init__(self, *a, feature: str = "", direct: bool = False, **kw):
-        super().__init__(*a, **kw)
-        self.feature, self.direct = feature, direct
-
-    def connect(self):
-        sock = connect(self.host, self.port, _timeout(self.timeout), feature=self.feature,
-                       direct=self.direct)
+        self._opened(entry)
         try:
             self.sock = self._context.wrap_socket(sock, server_hostname=self.host)
-        except BaseException:
+        except BaseException as e:
             sock.close()
+            self.entry.failed(f"secure connection failed ({e})")
             raise
+        self.entry.set_tls(_tls_text(self.sock))
+
+
+def _tls_text(sock: ssl.SSLSocket) -> str:
+    """The TLS version, cipher and certificate, in a line."""
+    out = f"{sock.version() or 'TLS'}, {(sock.cipher() or ('?',))[0]}"
+    try:
+        cert = sock.getpeercert() or {}
+    except ValueError:
+        return out
+
+    def name(part, key):
+        return next((v for rdn in cert.get(part, ()) for k, v in rdn if k == key), "")
+    subject = name("subject", "commonName")
+    issuer = name("issuer", "organizationName") or name("issuer", "commonName")
+    if subject:
+        out += f"; certificate for {subject}"
+    if issuer:
+        out += f", issued by {issuer}"
+    return out
 
 
 class _HTTPHandler(urllib.request.HTTPHandler):
@@ -624,8 +775,17 @@ def urlopen(req, timeout: float = 30, feature: str | None = None, direct: bool =
         o = urllib.request.OpenerDirector()
         o.add_handler(urllib.request.FileHandler())
         return o.open(req, timeout=timeout)
-    if not known(feature) or not is_loopback(urllib.parse.urlsplit(url).hostname or ""):
-        check(feature)
+    u = urllib.parse.urlsplit(url)
+    if not known(feature) or not is_loopback(u.hostname or ""):
+        try:
+            check(feature)
+        except FeatureOff as e:
+            try:
+                port = u.port or (443 if u.scheme.lower() == "https" else 80)
+            except ValueError:
+                port = 0
+            netlog.blocked(feature, u.hostname or "", port, str(e))
+            raise
     try:
         return _opener(feature, direct).open(req, timeout=timeout)
     except urllib.error.URLError as e:
@@ -740,7 +900,7 @@ class _Relay:
                 pass
 
     def _serve(self, c: socket.socket):
-        up = None
+        up = entry = None
         self._track("", c)
         try:
             c.settimeout(CONNECT_TIMEOUT_S)
@@ -784,16 +944,19 @@ class _Relay:
             if not allowed(feature):
                 # switched off: refused before anything is looked up or connected
                 self.seen.append((feature, host, "off"))
+                netlog.blocked(feature, host, int(port), off_message(feature), netlog.RELAY)
                 return self._refuse(c, 403, str(_failed(off_message(feature))))
             if _local_target(host) and not (_mode == DIRECT and is_loopback(host)):
                 # nothing the app fetches through the relay lives on this PC or the
                 # home network; a stream redirecting there is refused. (In Direct mode
                 # this PC stays reachable, as it was before the relay ran in it.)
                 self.seen.append((feature, host, "local"))
-                return self._refuse(c, 403, str(_failed(
-                    f"Not connecting to {host}: it's on this PC or your home network")))
+                why = f"Not connecting to {host}: it's on this PC or your home network"
+                netlog.blocked(feature, host, int(port), why, netlog.RELAY)
+                return self._refuse(c, 403, str(_failed(why)))
             try:
-                up = connect(host, int(port), feature=feature, direct=direct)
+                up, entry = _open(host, int(port), feature=feature, direct=direct,
+                                  how=netlog.RELAY)
             except OSError as e:
                 self.seen.append((feature, host, "failed"))
                 return self._refuse(c, 502, str(e))
@@ -801,13 +964,21 @@ class _Relay:
             self._track(feature, up)
             if method.upper() == "CONNECT":
                 c.sendall(b"HTTP/1.1 200 Connection established\r\n\r\n")
+            else:
+                entry.request(method, path)
             if first or rest:
                 up.sendall(first + rest)
-            self._pipe(c, up)
+                entry.add_sent(len(first + rest))
+            tunnel = method.upper() == "CONNECT"
+            if tunnel and rest:   # the client didn't wait for the 200
+                _sniff(entry, rest, from_site=False)
+            self._pipe(c, up, entry, tunnel=tunnel and not rest)
         except (OSError, ValueError):   # ValueError: select() on a socket drop() closed
             pass
         finally:
             self._untrack(*(s for s in (c, up) if s is not None))
+            if entry is not None:
+                entry.closed()
 
     def _authorised(self, headers: list[str]) -> str | None:
         """The feature the login names, if it carries this launch's secret."""
@@ -850,10 +1021,15 @@ class _Relay:
             pass
 
     @staticmethod
-    def _pipe(a: socket.socket, b: socket.socket):
+    def _pipe(a: socket.socket, b: socket.socket, entry: netlog.Entry | None = None,
+              tunnel: bool = False):
+        """Carry bytes both ways between the client `a` and the site `b`, counting them
+        into `entry`. What a tunnel carries is the client's own: the relay only tells
+        whether it's encrypted (TLS) and, for plain HTTP, reads the status line."""
         a.settimeout(None)
         b.settimeout(None)
         pair = {a: b, b: a}
+        first = {a: tunnel, b: True}   # the first bytes each way not yet looked at
         while True:
             ready, _, _ = select.select(list(pair), [], [], 60)
             for s in ready:
@@ -861,6 +1037,29 @@ class _Relay:
                 if not data:
                     return
                 pair[s].sendall(data)
+                if entry is None:
+                    continue
+                (entry.add_sent if s is a else entry.add_received)(len(data))
+                if first[s]:
+                    first[s] = False
+                    _sniff(entry, data, from_site=s is b)
+
+
+def _sniff(entry: netlog.Entry, data: bytes, from_site: bool) -> None:
+    """Note what the first bytes of a relayed connection are: TLS (the app can't read
+    what's inside), a request line through a tunnel, or the site's HTTP status."""
+    if data[:1] == b"\x16":
+        if not from_site:
+            entry.set_tls("TLS, encrypted end to end (the relay can't read it)")
+        return
+    line = data.split(b"\r\n", 1)[0].decode("latin-1", "replace")
+    parts = line.split(" ", 2)
+    if len(parts) < 2:
+        return
+    if from_site and parts[0].startswith(("HTTP/", "ICY")):
+        entry.response(parts[1], parts[2] if len(parts) > 2 else "")
+    elif not from_site and parts[-1].startswith("HTTP/") and len(parts) == 3:
+        entry.request(parts[0], parts[1])
 
 
 def _local_target(host: str) -> bool:

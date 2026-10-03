@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+- **Network activity** (Settings → Connection): see every connection the app
+  makes, to check for yourself where it goes. *Simple* lists each server with
+  what it was for, how often and how much data; *Detailed* lists each connection
+  with its route (direct, proxy, Tor), result, bytes each way, and the request,
+  answer and encryption where the app can read them. Requests a switch turned
+  away show as blocked. Kept in memory only: nothing is saved, logged or sent,
+  and key-like values in addresses are masked.
 - **City and town names on the radio maps:** zoom in on the flat map or the 3D
   globe and the cities and towns that have stations are named, so you can find
   your own place and its stations. Only the places in view are named, a few dozen

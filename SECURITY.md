@@ -79,6 +79,16 @@ So you know what normal looks like when auditing it:
 | You turn on *Remote control* (Settings → Remote; off by default) | listens on `127.0.0.1` only (port 7474 unless you change it) | lets a Stream Deck, AutoHotkey or a script on this PC play / stop / pause sounds and list them. Every request needs the key shown in Settings. Unlike the sockets above the key survives restarts (a Stream Deck button has to keep working), so it's stored in `config.json`; it's never exported with a backup or logged, and *New key* replaces it. Requests for any other `Host` are refused and no CORS headers are sent, so web pages can't use it | — (this PC) |
 | Always | a local named pipe (`OnionBoard.App`) | single instance: a second launch asks the first to come to the front. It only accepts that one request | — (this PC) |
 
+To see it happen, Settings → Connection → *Network activity* lists every
+connection the app makes or refuses while it runs (`soundboard/netlog.py`):
+server, feature, route, result, bytes, and the HTTP request line, answer and TLS
+version where the app can read them (inside a radio or yt-dlp `https` tunnel it
+can't). The list is kept in memory only (at most 1000 entries): it's never written
+to disk or the log, and it never holds proxy passwords, the relay's secret, request
+headers or bodies; query values whose names look like keys or tokens are masked.
+`tor.exe`'s own connections to the Tor network and everything under *Not covered*
+below aren't in it.
+
 ### Switches and Offline mode
 
 Settings → Privacy & security has a switch for each feature in the *Switch* column
