@@ -3,3 +3,5 @@
 *.cmd text eol=crlf
 # git hooks are sh scripts: a CR breaks them
 .githooks/* text eol=lf
+# the radio maps are checked against pinned SHA-384s: never rewrite their line endings
+assets/radio/** -text
