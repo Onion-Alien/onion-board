@@ -3745,6 +3745,10 @@ class MainWindow(QMainWindow):
             self._fit.fit(size)
             need = self._full.minimumSizeHint()   # even the smallest layout won't fit
             mini = need.width() > size.width() or need.height() > size.height()
+            if mini and not self.is_mini():
+                log.info("mini player at %dx%d: the window needs %dx%d (tab %s)",
+                         size.width(), size.height(), need.width(), need.height(),
+                         type(self.tabs.currentWidget()).__name__)
         self._set_mini(mini)
         if mini:   # the pads too: cards with room for a couple of rows of them, else
             # one-line rows, so they can still be seen and played however small it gets

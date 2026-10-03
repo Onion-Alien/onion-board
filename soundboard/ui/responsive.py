@@ -133,6 +133,14 @@ class Fitter:
                         break
                     apply(True)
                     self._at[i] = dim[axis]
+            # still over (a diagonal drag): the other axis' steps can help too (hiding
+            # the mixer narrows the window), so try them before anyone calls it too small
+            for i, (_, ax, apply) in enumerate(self.steps):
+                if not (self._over(size, "w") or self._over(size, "h")):
+                    break
+                if i not in self._at:
+                    apply(True)
+                    self._at[i] = dim[ax]
             for axis in ("w", "h"):   # grown: bring back what fits again, last-hidden first
                 for i in sorted((i for i in self._at if self.steps[i][1] == axis),
                                 reverse=True):
