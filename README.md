@@ -221,9 +221,7 @@ too (say No if another program, like Voicemeeter, uses it).
 - **Voice tab:** voice changer (pitch, robot, radio, echo, reverb, distortion,
   8-bit bitcrusher, plus add-on effects; it starts off every time the app
   opens, and a big ON / OFF button shows which it is), text-to-speech with Windows' built-in
-  voices or your own (*More options → Custom voices*: a TTS server on your PC such as
-  Kokoro or AllTalk — any OpenAI-style `/v1/audio/speech` address — a TTS program, or
-  Piper voice packs dropped into the voices folder), and **live voice-to-speech**: press *Start talking as the voice* and each
+  voices, and **live voice-to-speech**: press *Start talking as the voice* and each
   sentence you say is spoken by a computer voice instead of yours. Speech
   recognition runs on your PC (the first time, the Voice tab's *Install speech
   recognition* button downloads it, about 300 MB; needs Python 3.12+).
@@ -426,7 +424,7 @@ the launcher the shortcuts and PyInstaller use. The app is the `soundboard` pack
 | `soundboard/ui/overlay.py` | the in-game overlay: a panel of pads that never takes focus, driven by number keys or clicks, on a chosen monitor and spot (or wherever it was dragged) |
 | `soundboard/ui/voicepanel.py` | the Voice tab: voice changer, text-to-speech, live voice-to-speech, add-ons list |
 | `soundboard/voicefx/` | the voice-effect chain and the built-in effects (pitch, robot, radio, …) |
-| `soundboard/speech/` | Windows text-to-speech (`tts.py`), custom voices — local TTS servers, TTS programs, Piper packs (`customvoices.py`), the live voice-to-speech client (`live.py`, `service.py`, `protocol.py`) translation model downloads (`translation.py`) and one-click Windows voice installs (`winvoices.py`) |
+| `soundboard/speech/` | Windows text-to-speech (`tts.py`), the live voice-to-speech client (`live.py`, `service.py`, `protocol.py`) translation model downloads (`translation.py`) and one-click Windows voice installs (`winvoices.py`) |
 | `soundboard/modules.py` | finds, loads and installs add-ons in `modules\`: effects, services, translations and the Triggers tab's package (its host interface version checked first); installs a module zip only if it stays in its own folder |
 | `soundboard/watchaddon.py` | the Onion Watch add-on: its latest GitHub release, downloading and checking it, installing it, and whether a newer one is out (`ONIONBOARD_ONION_WATCH_ZIP` uses a local zip instead) |
 | `soundboard/ytdl.py` | yt-dlp for the link bar and web search: searches YouTube / SoundCloud, downloads one video's audio, and updates yt-dlp on request or opt-in (SHA-256-checked PyPI wheels in `%APPDATA%`, loaded ahead of the bundled copy by an import hook) |
