@@ -256,9 +256,9 @@ def search_text(text: str) -> str:
     return " ".join(text.split())[:SEARCH_MAX_CHARS]
 
 
-def outline_rings(raw: bytes) -> list[list[tuple[float, float]]]:
-    """The land outlines for the flat map: each country's outer rings as (lon, lat), or
-    [] unless `raw` is exactly the pinned outline file (checked like the globe's SRI)."""
+def _outline_features(raw: bytes) -> list[tuple[dict, list[list[tuple[float, float]]]]]:
+    """(properties, outer rings as (lon, lat)) per country, or [] unless `raw` is
+    exactly the pinned outline file (checked like the globe's SRI)."""
     if not isinstance(raw, bytes | bytearray):
         return []
     digest = "sha384-" + base64.b64encode(hashlib.sha384(raw).digest()).decode()
@@ -268,15 +268,55 @@ def outline_rings(raw: bytes) -> list[list[tuple[float, float]]]:
         features = json.loads(raw)["features"]
     except (ValueError, KeyError, TypeError):
         return []
-    rings = []
+    out = []
     for f in features:
         g = f.get("geometry") or {}
         polys = ([g.get("coordinates")] if g.get("type") == "Polygon"
                  else g.get("coordinates") if g.get("type") == "MultiPolygon" else [])
-        for poly in polys or []:
-            if poly and len(poly[0]) >= 3:
-                rings.append([(float(x), float(y)) for x, y, *_ in poly[0]])
-    return rings
+        rings = [[(float(x), float(y)) for x, y, *_ in poly[0]]
+                 for poly in polys or [] if poly and len(poly[0]) >= 3]
+        if rings:
+            out.append((f.get("properties") or {}, rings))
+    return out
+
+
+def outline_rings(raw: bytes) -> list[list[tuple[float, float]]]:
+    """The land outlines for the flat map: each country's outer rings as (lon, lat), or
+    [] unless `raw` is exactly the pinned outline file."""
+    return [r for _props, rings in _outline_features(raw) for r in rings]
+
+
+def _centre(ring: list[tuple[float, float]]) -> tuple[float, float, float]:
+    """A ring's centroid (lon, lat) and its area (shoelace, in square degrees)."""
+    a = cx = cy = 0.0
+    for (x0, y0), (x1, y1) in zip(ring, ring[1:] + ring[:1]):
+        k = x0 * y1 - x1 * y0
+        a += k
+        cx += (x0 + x1) * k
+        cy += (y0 + y1) * k
+    if abs(a) < 1e-9:
+        xs, ys = [p[0] for p in ring], [p[1] for p in ring]
+        return sum(xs) / len(xs), sum(ys) / len(ys), 0.0
+    return cx / (3 * a), cy / (3 * a), abs(a) / 2
+
+
+def outline_labels(raw: bytes) -> list[tuple[str, float, float, float]]:
+    """Names for the flat map: (name, lon, lat, width in degrees) per country, on its
+    biggest piece of land, plus the small places the outlines leave out (PLACES).
+    [] unless `raw` is the pinned outline file."""
+    out = []
+    for props, rings in _outline_features(raw):
+        name = str(props.get("NAME") or props.get("ADMIN") or "")
+        name = COUNTRY_NAMES.get(name, name)
+        if not name:
+            continue
+        ring = max(rings, key=lambda r: _centre(r)[2])
+        lon, lat, _a = _centre(ring)
+        xs = [p[0] for p in ring]
+        out.append((name, lon, lat, max(xs) - min(xs)))
+    if out:
+        out += [(name, lon, lat, w) for name, lat, lon, w in PLACES]
+    return out
 
 
 def parse_stations(raw: bytes | str) -> list[Station]:
@@ -300,7 +340,8 @@ def parse_stations(raw: bytes | str) -> list[Station]:
 class RadioDirectory(QObject):
     """Talks to Radio Browser. Every call answers with a signal on the UI thread."""
     globe_ready = Signal(list)          # [Station] with a location, most listened first
-    outlines_ready = Signal(list)       # outline_rings(): the flat map's land ([] offline)
+    # outline_rings() and outline_labels(): the flat map's land and names ([] offline)
+    outlines_ready = Signal(list, list)
     results = Signal(str, list)         # query, [Station]
     failed = Signal(str, str)           # "globe" | "search", message
 
@@ -355,6 +396,7 @@ class RadioDirectory(QObject):
     # -- the globe's stations
     def load_globe(self, force: bool = False):
         cached = self._read_cache()
+        self.globe_stale = ""   # set when a refresh failed and the saved list stands in
         if cached is not None and not force and time.time() - cached[0] < CACHE_S:
             QTimer.singleShot(0, lambda: self.globe_ready.emit(cached[1]))
             return
@@ -367,11 +409,13 @@ class RadioDirectory(QObject):
                 fail("the directory sent no stations")
                 return
             self._write_cache(stations)
+            self.globe_stale = ""
             self.globe_ready.emit(stations)
 
         def fail(msg):
             log.warning("radio directory unavailable: %s", msg)
             if cached is not None:   # an old list beats none
+                self.globe_stale = msg or "no answer"
                 self.globe_ready.emit(cached[1])
             else:
                 self.failed.emit("globe", msg)
@@ -402,11 +446,13 @@ class RadioDirectory(QObject):
         """The country outlines, from the cache (they're pinned, so it never goes stale)
         or jsDelivr. Answers [] when neither has them: the map shows just its dots."""
         try:
-            rings = outline_rings(self.outlines_path.read_bytes())
+            raw = self.outlines_path.read_bytes()
         except OSError:
-            rings = []
+            raw = b""
+        rings = outline_rings(raw)
         if rings:
-            QTimer.singleShot(0, lambda: self.outlines_ready.emit(rings))
+            labels = outline_labels(raw)
+            QTimer.singleShot(0, lambda: self.outlines_ready.emit(rings, labels))
             return
         req = QNetworkRequest(QUrl(COUNTRIES))
         req.setHeader(QNetworkRequest.UserAgentHeader, USER_AGENT)
@@ -428,7 +474,7 @@ class RadioDirectory(QObject):
             else:
                 log.info("map outlines unavailable: %s", reply.errorString() if not raw
                          else "the file didn't match its pinned hash")
-            self.outlines_ready.emit(rings)
+            self.outlines_ready.emit(rings, outline_labels(raw) if rings else [])
         reply.finished.connect(finished)
 
     # -- search

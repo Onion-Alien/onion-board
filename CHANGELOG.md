@@ -9,9 +9,11 @@
   default again turns it back on.
 - **The Radio tab is much lighter**: it opens on a flat world map instead of the 3D
   globe. The map is drawn by the app itself (no web engine running behind it) and
-  only redraws while you drag, zoom or hover a dot. Hover a dot for the station,
-  click to play, drag to move, scroll to zoom, double-click to see the whole world
-  again. The 3D globe is still there: the map's **HD** button opens it (it's the
+  only redraws while you drag, zoom or hover a dot. It fills the whole area (no
+  empty bands), names the countries as you zoom in, and wraps round sideways, so
+  dragging stays smooth even zoomed all the way out. Hover a dot for the station,
+  click to play, drag to move, scroll to zoom, double-click to zoom back out. The
+  3D globe is still there: the map's **HD** button opens it (it's the
   old light globe; the spinning one with stars is gone), and **2D** goes back.
 - **Less work behind a game**: with the window open but another program in front,
   the meters update 10 times a second instead of 30, and the logo, the mascots and

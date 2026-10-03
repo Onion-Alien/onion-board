@@ -705,9 +705,9 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
         self._push_globe(force=True)
         self._select_on_globe(fly=False)
 
-    def _on_outlines(self, rings: list):
+    def _on_outlines(self, rings: list, labels: list):
         if self.flat is not None:
-            self.flat.set_land(rings)
+            self.flat.set_land(rings, labels)
 
     _FLAT_CALLS = {"setStations": "set_points", "select": "select", "fly": "fly",
                    "showMessage": "show_message", "setTheme": "set_theme"}

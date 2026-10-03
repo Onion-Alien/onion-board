@@ -1,9 +1,11 @@
 """The Radio tab's flat world map: the default view, painted by Qt itself.
 
-A plain map (land outlines and a dot per station) costs nothing while it sits there:
-it only repaints when you drag, zoom, hover over a different dot or the stations
-change, and it needs no web engine. The 3D globe (radio.globe_html) is the HD view,
-one click away on the map's HD button.
+A plain map (land outlines, country names and a dot per station) costs nothing while
+it sits there: it only repaints when you drag, zoom, hover over a different dot or the
+stations change, and it needs no web engine. The whole world is drawn once per zoom
+level and a drag only slides that picture; zoomed in too far for one picture, just
+the part in view is drawn (there's little of it then). The 3D globe
+(radio.globe_html) is the HD view, one click away on the map's HD button.
 
 Stations arrive as radio.globe_points() dicts, like the globe's, so the tab can
 feed either view the same way.
@@ -13,8 +15,9 @@ from __future__ import annotations
 import html
 
 import numpy as np
-from PySide6.QtCore import QPointF, QRectF, Qt, Signal
-from PySide6.QtGui import QColor, QPainter, QPainterPath, QPen, QPixmap, QTransform
+from PySide6.QtCore import QPointF, QRectF, Qt, QTimer, Signal
+from PySide6.QtGui import (QColor, QFont, QFontMetricsF, QPainter, QPainterPath, QPen,
+                           QPixmap, QTransform)
 from PySide6.QtWidgets import QPushButton, QToolTip, QVBoxLayout, QWidget
 
 from soundboard import theme
@@ -22,6 +25,8 @@ from soundboard import theme
 LAT_TOP, LAT_BOTTOM = 84.0, -58.0   # the inhabited world: no polar wastes
 ZOOM_MAX = 14.0
 HIT_PX = 7.0                        # how near the pointer a dot counts as under it
+WORLD_MAX_PX = 10_000_000           # biggest whole-world picture kept (device pixels)
+SETTLE_MS = 160                     # zooming: the old picture, stretched, until this idle
 
 
 def _mix(a: str, b: str, t: float) -> QColor:
@@ -41,6 +46,7 @@ class FlatMap(QWidget):
         self.setMinimumSize(120, 80)
         self.setAttribute(Qt.WA_OpaquePaintEvent)
         self._land = QPainterPath()     # in (lon, -lat) degrees
+        self._labels: list[tuple[str, float, float, float]] = []   # name, lon, lat, width°
         self._points: list[dict] = []
         self._lon = np.zeros(0)
         self._lat = np.zeros(0)
@@ -52,7 +58,13 @@ class FlatMap(QWidget):
         self.cx, self.cy = 10.0, (LAT_TOP + LAT_BOTTOM) / 2   # the view's centre (lon, lat)
         self._drag: QPointF | None = None
         self._dragged = False
-        self._bg: QPixmap | None = None   # land at the current view, redrawn when it moves
+        self._ver = 0                     # bumped when what's drawn changes
+        self._world: tuple | None = None  # (key, the whole world at this zoom)
+        self._view: tuple | None = None   # (key, just the part in view): zoomed far in
+        self._settle = QTimer(self)       # running while the wheel is still zooming
+        self._settle.setSingleShot(True)
+        self._settle.setInterval(SETTLE_MS)
+        self._settle.timeout.connect(self.update)
 
         box = QVBoxLayout(self)
         box.setContentsMargins(0, 0, 10, 10)
@@ -73,7 +85,10 @@ class FlatMap(QWidget):
         self.set_theme()
 
     # ------------------------------------------------------------------ what's shown
-    def set_land(self, rings: list):
+    def set_land(self, rings: list, labels: list | None = None):
+        """The countries' outlines, and their names: (name, lon, lat, width in degrees),
+        each shown once there's room for it at the zoom."""
+        self._labels = sorted(labels or [], key=lambda x: -x[3])   # big countries first
         path = QPainterPath()
         path.setFillRule(Qt.WindingFill)
         for ring in rings:
@@ -112,7 +127,7 @@ class FlatMap(QWidget):
         """Centre on a place, zooming in a little if the whole world is showing."""
         self.zoom = max(self.zoom, 2.5)
         self.cx, self.cy = lon, lat
-        self._redraw()
+        self.update()
 
     def show_message(self, text: str):
         self._msg = text
@@ -128,18 +143,26 @@ class FlatMap(QWidget):
 
     # ------------------------------------------------------------------ the projection
     def _scale(self) -> float:
-        """Pixels per degree."""
+        """Pixels per degree. Zoomed all the way out the map still fills the whole
+        area, top to bottom and side to side (no empty bands): it wraps around
+        sideways, so whatever is cut off at one edge is a drag away."""
         w, h = max(1, self.width()), max(1, self.height())
-        return min(w / 360.0, h / (LAT_TOP - LAT_BOTTOM)) * self.zoom
+        return max(w / 360.0, h / (LAT_TOP - LAT_BOTTOM)) * self.zoom
 
     def _clamp(self):
         self.zoom = min(ZOOM_MAX, max(1.0, self.zoom))
         s = self._scale()
-        half_w, half_h = self.width() / s / 2, self.height() / s / 2
-        lo, hi = -180 + half_w, 180 - half_w
-        self.cx = min(hi, max(lo, self.cx)) if lo <= hi else 0.0
+        half_h = self.height() / s / 2
+        self.cx = (self.cx + 180) % 360 - 180   # round the world, east or west
         lo, hi = LAT_BOTTOM + half_h, LAT_TOP - half_h
         self.cy = min(hi, max(lo, self.cy)) if lo <= hi else (LAT_TOP + LAT_BOTTOM) / 2
+
+    def _copies(self) -> list[int]:
+        """The world's copies (as degrees east) that show: it repeats sideways."""
+        s = self._scale()
+        half = self.width() / s / 2
+        return [k for k in (-360, 0, 360)
+                if self.cx - half < 180 + k and self.cx + half > -180 + k]
 
     def _transform(self) -> QTransform:
         s = self._scale()
@@ -149,34 +172,29 @@ class FlatMap(QWidget):
         return t
 
     def _screen(self) -> tuple[np.ndarray, np.ndarray]:
+        """Each dot's spot on screen: its copy of the world nearest the middle."""
         s = self._scale()
-        return (self.width() / 2 + (self._lon - self.cx) * s,
+        return (self.width() / 2 + ((self._lon - self.cx + 180) % 360 - 180) * s,
                 self.height() / 2 - (self._lat - self.cy) * s)
 
     def _redraw(self):
-        self._bg = None
+        """What's drawn changed (stations, land, theme): draw it again."""
+        self._ver += 1
+        self._world = self._view = None
         self.update()
 
     # ------------------------------------------------------------------ painting
     def _grow(self) -> float:
         return min(2.0, 1 + (self.zoom - 1) * 0.15)   # dots get a little bigger zoomed in
 
-    def _background(self) -> QPixmap:
-        """The sea, the land and the dots at this view, kept until the view, the stations
-        or the theme change: hovering only draws its ring on top."""
+    def _paint_map(self, p: QPainter, tr: QTransform, s: float, rect: QRectF):
+        """The sea, grid, land, names and dots, through `tr` ((lon, -lat) degrees to
+        pixels); only what falls in `rect` (pixels) matters."""
         t = theme.T
-        dpr = self.devicePixelRatioF()
-        pm = QPixmap(round(self.width() * dpr), round(self.height() * dpr))
-        pm.setDevicePixelRatio(dpr)
-        pm.fill(QColor(t["bg"]))
-        p = QPainter(pm)
-        p.setRenderHint(QPainter.Antialiasing)
-        tr = self._transform()
-        s = self._scale()
-        # the map's own rectangle (the world can be narrower or shorter than the widget)
         world = tr.mapRect(QRectF(-180, -LAT_TOP, 360, LAT_TOP - LAT_BOTTOM))
         p.fillRect(world, _mix(t["bg"], t["accent"], 0.06))
-        p.setClipRect(world)
+        p.save()
+        p.setClipRect(world.intersected(rect))
         p.setPen(QPen(_mix(t["bg"], t["text"], 0.07), 1))
         for lon in range(-150, 180, 30):
             x = tr.map(QPointF(lon, 0)).x()
@@ -186,14 +204,17 @@ class FlatMap(QWidget):
             p.drawLine(QPointF(world.left(), y), QPointF(world.right(), y))
         if not self._land.isEmpty():
             p.save()
-            p.setTransform(tr)
+            p.setTransform(tr, True)
             p.setPen(QPen(_mix(t["bg"], t["text"], 0.3), 0.8 / s))
             p.setBrush(_mix(t["bg"], t["text"], 0.14))
             p.drawPath(self._land)
             p.restore()
+        self._paint_labels(p, tr, s, rect)
         if len(self._points):
-            xs, ys = self._screen()
-            on = (xs > -8) & (xs < self.width() + 8) & (ys > -8) & (ys < self.height() + 8)
+            o = tr.map(QPointF(0, 0))
+            xs, ys = o.x() + self._lon * s, o.y() - self._lat * s
+            on = ((xs > rect.left() - 8) & (xs < rect.right() + 8)
+                  & (ys > rect.top() - 8) & (ys < rect.bottom() + 8))
             accent = QColor(t["accent"])
             accent.setAlphaF(0.85)
             p.setPen(Qt.NoPen)
@@ -202,16 +223,103 @@ class FlatMap(QWidget):
             for i in np.flatnonzero(on):
                 r = self._r[i] * grow
                 p.drawEllipse(QPointF(xs[i], ys[i]), r, r)
-        p.end()
-        return pm
+        p.restore()
+
+    def _paint_labels(self, p: QPainter, tr: QTransform, s: float, rect: QRectF):
+        """Country names, biggest first, each where it fits inside its country's width
+        and doesn't run into a name already drawn."""
+        if not self._labels:
+            return
+        t = theme.T
+        font = QFont(self.font())
+        font.setPointSizeF(max(7.0, font.pointSizeF() * 0.85))
+        fm = QFontMetricsF(font)
+        p.setFont(font)
+        p.setPen(_mix(t["bg"], t["text"], 0.62))
+        taken: list[QRectF] = []
+        h = fm.height()
+        for name, lon, lat, width in self._labels:
+            w = fm.horizontalAdvance(name)
+            if width * s < 30:   # sorted widest first: none of the rest fit either
+                break
+            c = tr.map(QPointF(lon, -lat))
+            box = QRectF(c.x() - w / 2, c.y() - h / 2, w, h)
+            if not box.intersects(rect) or width * s < w * 0.8:
+                continue
+            pad = box.adjusted(-4, -2, 4, 2)
+            if any(pad.intersects(o) for o in taken):
+                continue
+            taken.append(pad)
+            p.drawText(box, Qt.AlignCenter, name)
+
+    def _world_key(self, dpr: float):
+        s = self._scale()
+        w, h = 360 * s, (LAT_TOP - LAT_BOTTOM) * s
+        if w * h * dpr * dpr > WORLD_MAX_PX:
+            return None
+        return (round(s, 6), dpr, self._ver)
+
+    def _world_pixmap(self, dpr: float) -> QPixmap | None:
+        """The whole world at this zoom, drawn once: dragging only slides it. While the
+        wheel is still zooming, the last one (it's stretched to fit)."""
+        key = self._world_key(dpr)
+        if key is None:
+            return None
+        if (self._settle.isActive() and self._world is not None
+                and self._world[0][1:] == key[1:]):
+            return self._world[1]
+        if self._world is None or self._world[0] != key:
+            s = self._scale()
+            w, h = 360 * s, (LAT_TOP - LAT_BOTTOM) * s
+            pm = QPixmap(max(1, round(w * dpr)), max(1, round(h * dpr)))
+            pm.setDevicePixelRatio(dpr)
+            pm.fill(QColor(theme.T["bg"]))
+            p = QPainter(pm)
+            p.setRenderHint(QPainter.Antialiasing)
+            tr = QTransform()
+            tr.translate(180 * s, LAT_TOP * s)
+            tr.scale(s, s)
+            self._paint_map(p, tr, s, QRectF(0, 0, w, h))
+            p.end()
+            self._world = (key, pm)
+        return self._world[1]
 
     def paintEvent(self, _e):
         self._clamp()
-        if self._bg is None or self._bg.deviceIndependentSize().toSize() != self.size():
-            self._bg = self._background()
+        dpr = self.devicePixelRatioF()
         p = QPainter(self)
-        p.drawPixmap(0, 0, self._bg)
         t = theme.T
+        p.fillRect(self.rect(), QColor(t["bg"]))
+        world = self._world_pixmap(dpr)
+        if world is not None:
+            s = self._scale()
+            # zooming: the last zoom's picture, stretched, until the wheel stops
+            stretched = abs(world.deviceIndependentSize().width() - 360 * s) > 0.5
+            if stretched:
+                p.setRenderHint(QPainter.SmoothPixmapTransform)
+            for k in self._copies():
+                target = QRectF(self.width() / 2 - (self.cx - k + 180) * s,
+                                self.height() / 2 - (LAT_TOP - self.cy) * s,
+                                360 * s, (LAT_TOP - LAT_BOTTOM) * s)
+                if stretched:
+                    p.drawPixmap(target, world, QRectF(world.rect()))
+                else:
+                    p.drawPixmap(target.topLeft(), world)
+        else:   # zoomed far in: draw the part in view (kept while nothing moves)
+            key = (self.cx, self.cy, self.size(), dpr, round(self._scale(), 6), self._ver)
+            if self._view is None or self._view[0] != key:
+                pm = QPixmap(round(self.width() * dpr), round(self.height() * dpr))
+                pm.setDevicePixelRatio(dpr)
+                pm.fill(QColor(t["bg"]))
+                q = QPainter(pm)
+                q.setRenderHint(QPainter.Antialiasing)
+                for k in self._copies():
+                    tr = self._transform()
+                    tr.translate(k, 0)
+                    self._paint_map(q, tr, self._scale(), QRectF(self.rect()))
+                q.end()
+                self._view = (key, pm)
+            p.drawPixmap(0, 0, self._view[1])
         p.setRenderHint(QPainter.Antialiasing)
         if len(self._points):
             xs, ys = self._screen()
@@ -255,11 +363,12 @@ class FlatMap(QWidget):
         s1 = self._scale()
         self.cx = lon - (at.x() - self.width() / 2) / s1
         self.cy = lat + (at.y() - self.height() / 2) / s1
-        self._redraw()
+        self.update()
 
     def wheelEvent(self, e):
         steps = e.angleDelta().y() / 120.0
         if steps:
+            self._settle.start()
             self._zoom_by(1.25 ** steps, e.position())
         e.accept()
 
@@ -280,7 +389,7 @@ class FlatMap(QWidget):
                 self._drag = pos
                 self.setCursor(Qt.ClosedHandCursor)
                 QToolTip.hideText()
-                self._redraw()
+                self.update()
             return
         i = self._hit(pos)
         if i != self._hover:
@@ -305,7 +414,7 @@ class FlatMap(QWidget):
     def mouseDoubleClickEvent(self, e):
         if self._hit(e.position()) < 0:   # the empty map: back to the whole world
             self.zoom = 1.0
-            self._redraw()
+            self.update()
 
     def leaveEvent(self, e):
         super().leaveEvent(e)

@@ -106,6 +106,39 @@ def test_map_outlines_must_be_the_pinned_file(monkeypatch):
     assert radio.outline_rings(raw + b" ") == [] and radio.outline_rings("text") == []
 
 
+def test_map_names_sit_on_each_countrys_biggest_land(monkeypatch):
+    import base64
+    import hashlib
+    raw = _outline_file()
+    assert radio.outline_labels(raw) == []          # not the pinned file: no names either
+    monkeypatch.setattr(radio, "COUNTRIES_SRI",
+                        "sha384-" + base64.b64encode(hashlib.sha384(raw).digest()).decode())
+    labels = {n: (lon, lat, w) for n, lon, lat, w in radio.outline_labels(raw)}
+    lon, lat, w = labels["Square"]
+    assert (round(lon, 2), round(lat, 2), w) == (6.67, 3.33, 10)   # the triangle's centroid
+    assert labels["Two"][0] == pytest.approx(26.67, abs=0.01)     # the first of equal pieces
+    assert "Hawaii" in labels                       # and the places the outlines leave out
+
+
+def test_flat_map_fills_its_area_and_wraps_round_the_world(qapp):
+    from soundboard.ui.flatmap import LAT_BOTTOM, LAT_TOP, FlatMap
+    m = FlatMap()
+    m.resize(800, 600)                    # taller than the world at its width
+    m.set_land([[(0, 0), (10, 0), (10, 10)]], [("Square", 6.7, 3.3, 10)])
+    m.grab()
+    s = m._scale()
+    assert (LAT_TOP - LAT_BOTTOM) * s >= m.height() and 360 * s >= m.width()   # no bands
+    m.set_points(radio.globe_points([Station.from_api(api_station(1, geo_lat=0,
+                                                                  geo_long=-170))]))
+    m.cx = 175.0                          # the dateline in the middle
+    m.grab()
+    x, _y = m._screen()
+    assert abs(x[0] - (m.width() / 2 + 15 * s)) < 1   # -170 is just east of 175
+    m.cx = 190.0
+    m._clamp()
+    assert m.cx == -170.0
+
+
 def test_flat_map_hovers_clicks_and_follows_the_playing_station(qapp):
     from PySide6.QtCore import QPointF, Qt
     from PySide6.QtGui import QMouseEvent
@@ -503,7 +536,7 @@ def test_flat_map_is_the_default_and_hd_swaps_in_the_globe(qapp, app_dir, server
     from soundboard.ui.flatmap import FlatMap
     from soundboard.ui.radiopanel import RadioTab
     d = RadioDirectory(app_dir / "radio", bases=(server.base,))
-    monkeypatch.setattr(d, "load_outlines", lambda: d.outlines_ready.emit([]))   # offline
+    monkeypatch.setattr(d, "load_outlines", lambda: d.outlines_ready.emit([], []))   # offline
     cfg = Config()
     cfg.radio = {"globe_hd": True}               # the old switch: the flat map all the same
     t = RadioTab(FakeEngine(), cfg, lambda: None, FakeMeter, directory=d, globe=True)
