@@ -31,6 +31,15 @@
   themselves when you're back (the game moves, you alt-tab back, it's gone, you touch
   the mouse or keys, or only on Stop), and characters and creatures cut out of a
   game as transparent PNGs are matched properly.
+- **Send feedback** (Settings → General): opens a short form in your browser, no
+  account needed, with your version filled in; *Report a problem on GitHub* is beside
+  it. Nothing is sent from the app.
+- **Remove Onion Watch** from Settings → General → *Add-ons*, not only from the end of
+  the Triggers tab's More menu.
+- **Fixed: Recently deleted on the Triggers tab could crash** with "No module named
+  onionwatch.ui.deleted" after Onion Watch was updated while Onion Board was open. An
+  add-on is now loaded in full when it starts, so replacing it on disk can't break the
+  running copy.
 
 ## 1.5.9 — 2026-10-02
 
