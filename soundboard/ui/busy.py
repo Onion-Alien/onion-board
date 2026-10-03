@@ -44,12 +44,18 @@ def _restore(btn, serial: int):
             return   # a newer flash / busy state owns the label now
         btn.setText(_idle_text(btn))
         btn.setProperty(_IDLE, None)
+        if btn.property("min_w_before") is not None:   # let it shrink again (small windows)
+            btn.setMinimumWidth(btn.property("min_w_before"))
+            btn.setProperty("min_w_before", None)
     except RuntimeError:   # the button was deleted meanwhile
         pass
 
 
 def _keep_width(btn):
     # the label changes length; don't let the button jump narrower under the cursor
+    # while it shows (_restore lets go again)
+    if btn.property("min_w_before") is None:
+        btn.setProperty("min_w_before", btn.minimumWidth())
     btn.setMinimumWidth(max(btn.minimumWidth(), btn.sizeHint().width()))
 
 
