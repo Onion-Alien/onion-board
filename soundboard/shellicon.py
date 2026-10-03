@@ -417,3 +417,29 @@ def on_show(window) -> None:
 def detach() -> None:
     hwnd, _state["hwnd"] = _state["hwnd"], None
     clear_window(hwnd)
+
+
+def paint_background(window, color: str) -> None:
+    """While the window is dragged bigger fast, Windows fills the new strip with the
+    window class's background brush (white) before Qt gets to paint it: make that
+    brush the theme's background so a fast resize shows the theme, not a white edge.
+    The brush is per window class, so Qt's dialogs get it too."""
+    if not _native() or window.windowHandle() is None:
+        return
+    import ctypes
+    from ctypes import wintypes
+    from PySide6.QtGui import QColor
+    c = QColor(color)
+    gdi, user = ctypes.windll.gdi32, ctypes.windll.user32
+    gdi.CreateSolidBrush.restype = wintypes.HANDLE
+    gdi.CreateSolidBrush.argtypes = [wintypes.DWORD]
+    brush = gdi.CreateSolidBrush(c.red() | c.green() << 8 | c.blue() << 16)
+    if not brush:
+        return
+    user.SetClassLongPtrW.restype = ctypes.c_void_p
+    user.SetClassLongPtrW.argtypes = [wintypes.HWND, ctypes.c_int, ctypes.c_void_p]
+    old = user.SetClassLongPtrW(int(window.winId()), -10, brush)   # GCLP_HBRBACKGROUND
+    if old and old == _state.get("brush"):
+        gdi.DeleteObject.argtypes = [wintypes.HANDLE]
+        gdi.DeleteObject(old)   # our previous theme's brush; never the system's own
+    _state["brush"] = brush

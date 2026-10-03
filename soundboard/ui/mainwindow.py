@@ -1665,6 +1665,7 @@ class MainWindow(QMainWindow):
         self._icon_step = -1
         self._glow_icons(0.0, time.monotonic(), force=True)
         shellicon.follow_theme(self, theme.T["accent"], theme.T["accent2"])
+        shellicon.paint_background(self, theme.T["bg"])   # fast resizes: no white edge
 
     def _glow_icons(self, level: float, now: float, force: bool = False):
         """The title bar / taskbar and tray icons glow warm with whatever is playing,
@@ -3551,6 +3552,7 @@ class MainWindow(QMainWindow):
     # events and applicationStateChanged.
     def showEvent(self, ev):
         shellicon.on_show(self)   # the Jump List icon, before the taskbar button exists
+        shellicon.paint_background(self, theme.T["bg"])
         super().showEvent(ev)
         self._set_tick_rate()
         note, self._pending_note = getattr(self, "_pending_note", None), None
