@@ -14,7 +14,8 @@ import time
 
 from PySide6.QtCore import QSize, Qt, QTimer, QUrl, Signal
 from PySide6.QtGui import QDesktopServices, QGuiApplication
-from PySide6.QtWidgets import (QButtonGroup, QCheckBox, QComboBox, QFrame, QGridLayout,
+from PySide6.QtWidgets import (QButtonGroup, QCheckBox, QComboBox, QDialog,
+                               QDialogButtonBox, QFormLayout, QFrame, QGridLayout,
                                QHBoxLayout, QLabel, QLineEdit, QPlainTextEdit, QPushButton,
                                QScrollArea, QSlider, QVBoxLayout, QWidget)
 
@@ -22,7 +23,7 @@ from soundboard import applog
 from soundboard import modules as mods
 from soundboard import voicefx
 from soundboard import library, theme
-from soundboard.speech import translation, winvoices
+from soundboard.speech import customvoices, translation, winvoices
 from soundboard.speech.live import SpeechController, clean_settings
 from soundboard.ui import art, icons
 from soundboard.ui.panel import (VolumeControl, bar, card, hint_label, icon_label,
@@ -662,6 +663,26 @@ class SpeechPanel(QWidget):
                                  "needs (translation, for one). Needs Python 3.12+.")
         self.b_update.clicked.connect(self._install)
         ov.addWidget(self.b_update, 0, Qt.AlignLeft)
+        # ---- custom voices: a TTS server on this PC, a TTS program, Piper voice packs
+        ov.addWidget(section_label("CUSTOM VOICES"))
+        ov.addWidget(hint_label("Use a TTS server running on your PC (Kokoro, AllTalk, any "
+                                "OpenAI-style one) or drop voice packs (Piper) into the "
+                                "voices folder. They join the Voice list above."))
+        crow = QHBoxLayout()
+        b_server = QPushButton("Add a voice server…")
+        icons.set_icon(b_server, "plus")
+        b_server.clicked.connect(self._add_voice_server)
+        crow.addWidget(b_server)
+        b_vfolder = QPushButton("Open voices folder")
+        b_vfolder.setToolTip("Voice packs and voice settings go here; README.txt in it says how")
+        b_vfolder.clicked.connect(lambda: os.startfile(customvoices.ensure_folder()))  # noqa: S606
+        crow.addWidget(b_vfolder)
+        crow.addStretch(1)
+        ov.addLayout(crow)
+        self.lbl_custom = hint_label("")
+        self.lbl_custom.setTextFormat(Qt.PlainText)    # shows file names and errors
+        self.lbl_custom.hide()
+        ov.addWidget(self.lbl_custom)
         v.addWidget(self.opts)
         self.opts.hide()
         self.btn_opts.toggled.connect(lambda on: (
@@ -737,7 +758,7 @@ class SpeechPanel(QWidget):
         self.cb_voice.clear()
         self.cb_voice.addItem("Windows default", "")
         for name in voices:
-            self.cb_voice.addItem(name.replace("Microsoft ", "").replace(" Desktop", ""), name)
+            self.cb_voice.addItem(customvoices.label(name), name)
         self.cb_voice.setCurrentIndex(max(0, self.cb_voice.findData(self.s["voice"])))
         self.cb_voice.setEnabled(bool(voices))
         self.cb_voice.blockSignals(False)
@@ -755,12 +776,63 @@ class SpeechPanel(QWidget):
         if self.ctl.live and m is not None and voice and self.ctl.live_voice != voice:
             # talking already: switch to the new voice now, no restart needed
             self.ctl.live_voice = voice
-            short = voice.replace("Microsoft ", "").replace(" Desktop", "")
+            short = customvoices.label(voice)
             self.lbl_state.setText(f"✓ {m.language_name} voice found: {short} speaks "
                                    "from the next line on.")
         self._refresh_translation()
+        problems = getattr(self.ctl.tts, "problems", [])
+        custom = getattr(self.ctl.tts, "custom", {})
+        self.lbl_custom.setText("\n".join(f"⚠ {p}" for p in problems) if problems else
+                                f"{len(custom)} custom voice(s) loaded." if custom else "")
+        self.lbl_custom.setVisible(bool(self.lbl_custom.text()))
         if error:
             self._tts_error(f"Text-to-speech isn't available: {error}")
+
+    def _add_voice_server(self):
+        """A small form for a TTS server's address; saved as a .json in the voices folder."""
+        dlg = QDialog(self)
+        dlg.setWindowTitle("Add a voice server")
+        form = QFormLayout(dlg)
+        form.addRow(hint_label("A text-to-speech server running on your PC. Most have an "
+                               "OpenAI-style address ending in /v1/audio/speech; one that takes "
+                               "the text in the address can use {text} in it instead."))
+        ed_name = QLineEdit()
+        ed_name.setPlaceholderText("Kokoro")
+        ed_url = QLineEdit()
+        ed_url.setPlaceholderText("http://127.0.0.1:8880/v1/audio/speech")
+        ed_voice = QLineEdit()
+        ed_voice.setPlaceholderText("the server's voice name, e.g. af_bella (optional)")
+        ed_model = QLineEdit()
+        ed_model.setPlaceholderText("optional")
+        ed_key = QLineEdit()
+        ed_key.setEchoMode(QLineEdit.Password)
+        ed_key.setPlaceholderText("only if the server asks for one")
+        for lbl, w in (("Name", ed_name), ("Address", ed_url), ("Voice", ed_voice),
+                       ("Model", ed_model), ("API key", ed_key)):
+            form.addRow(lbl, w)
+        err = hint_label("")
+        theme.set_tone(err, "error")
+        err.hide()
+        form.addRow(err)
+        btns = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
+        form.addRow(btns)
+        btns.rejected.connect(dlg.reject)
+
+        def ok():
+            url = ed_url.text().strip()
+            if not url.lower().startswith(("http://", "https://")):
+                err.setText("The address starts with http:// or https://")
+                err.show()
+                return
+            name = ed_name.text().strip() or "Voice server"
+            customvoices.save_server(name, url, ed_voice.text().strip(),
+                                     ed_model.text().strip(), ed_key.text().strip())
+            self.s["voice"] = customvoices.PREFIX + name   # pick it once it's loaded
+            dlg.accept()
+        btns.accepted.connect(ok)
+        if dlg.exec() == QDialog.Accepted:
+            self.changed.emit(dict(self.s))
+            self._recheck_voices()
 
     def _tts_error(self, msg: str):
         self.tts_err.setText(f"⚠ {msg}")
@@ -850,7 +922,7 @@ class SpeechPanel(QWidget):
             return
         voice = self._voice_for(m)
         if voice:
-            short = voice.replace("Microsoft ", "").replace(" Desktop", "")
+            short = customvoices.label(voice)
             self.lbl_tr.setText(f"Say it in English; {short} says it in {name}. "
                                 "Translation is quick but not perfect with slang.")
         else:

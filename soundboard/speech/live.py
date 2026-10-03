@@ -1,7 +1,7 @@
 """Glue for text-to-speech and live voice-to-speech (no Qt here; the panel adds that).
 
     typed text ─────────────────────────────┐
-    mic ─ VoiceChain.tap ─ ServiceHost ─ "final" text ─┴─ Speaker ─ SapiTTS ─ Engine.play
+    mic ─ VoiceChain.tap ─ ServiceHost ─ "final" text ─┴─ Speaker ─ VoiceSet ─ Engine.play
 
 When live voice translates (a translation add-on), its lines come back already in
 that language and are spoken with `live_voice`, a voice that speaks it.
@@ -20,8 +20,9 @@ import numpy as np
 
 from soundboard import library
 from soundboard.modules import ModuleInfo
+from soundboard.speech.customvoices import VoiceSet
 from soundboard.speech.service import ServiceHost
-from soundboard.speech.tts import SapiTTS, Speaker
+from soundboard.speech.tts import Speaker
 from soundboard.voicefx import VoiceChain
 
 log = logging.getLogger(__name__)
@@ -57,7 +58,7 @@ class SpeechController:
         """`on_event(dict)` gets every module event plus {"type": "tts_error"} —
         from background threads, so the UI must hop to its own thread."""
         self.engine, self.chain, self.on_event = engine, chain, on_event
-        self.tts = SapiTTS()
+        self.tts = VoiceSet()     # Windows voices + custom ones
         self.gain = 1.0
         self.speaker = Speaker(self.tts, self._play,
                                lambda m: self.on_event({"type": "tts_error", "text": m}))

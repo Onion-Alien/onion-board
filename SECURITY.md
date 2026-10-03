@@ -38,7 +38,9 @@ Out of scope:
 - **Modules** (`%APPDATA%\OnionBoard\modules\`) are Python code that runs with
   your user's full permissions, exactly like any program you download. A
   malicious module being malicious isn't a vulnerability in Onion Board; a
-  module escaping into something the user never installed is.
+  module escaping into something the user never installed is. The same goes for
+  custom voice programs (a `"command"` in `%APPDATA%\OnionBoard\voices\`, or the
+  `piper.exe` there): they're programs you chose to run.
 - Games' anti-cheat reacting to global hotkeys or `SendInput` (auto push-to-talk).
 - Chromium bugs in Qt WebEngine that are already fixed upstream. Tell us if
   the pinned PySide6 is behind on security releases, though — that's in scope.
@@ -57,6 +59,7 @@ So you know what normal looks like when auditing it:
 | You open the Radio tab (or start the app with Radio as the last tab you used: the app reopens it) | `*.api.radio-browser.info` | the station directory: the ~3000 most-listened stations with a location (cached for a day), your searches, and a "click" when you start a station (Radio Browser's own popularity count). Nothing else about you is sent |
 | You open the Radio tab (same as above) | `cdn.jsdelivr.net` | the 3D globe: `globe.gl` at a pinned version, checked against its SHA-384 (subresource integrity), the Earth pictures, and the country outlines the globe's names are placed from (also SHA-384-checked) |
 | You play a radio station | that station's stream server (the address listed for it in the directory) | the stream itself, decoded by Qt Multimedia (FFmpeg) and played through the app's audio engine |
+| You speak a line with a custom voice server you added (Voice tab → More options → *Custom voices*; a `.json` with a `"url"` in `%APPDATA%\OnionBoard\voices\`) | the address you gave it (normally a TTS server on your own PC, e.g. `127.0.0.1`) | sends the line's text (and the voice / model / API key you entered) and gets the spoken audio back. Nothing is sent until you add one |
 | You tick *Play M4A, AAC and video files* in the installer | `winget` (Microsoft's package source, then the FFmpeg build it points to) | installs `Gyan.FFmpeg.Essentials` |
 | You install the virtual cable (its box is ticked by default in the installer; also the setup guide's button) | `vb-audio.com` | downloads VB-Cable; the installer's signature is checked before it runs |
 | Install from source (`scripts/install.ps1`) | PyPI, and `winget` if you accept installing Python | the app's `requirements.txt` |

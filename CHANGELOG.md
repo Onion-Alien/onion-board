@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+- **Custom text-to-speech voices** (Voice tab → More options → *Custom voices*): use
+  a TTS server running on your PC (Kokoro, AllTalk, openedai-speech, LocalAI — any
+  OpenAI-style `/v1/audio/speech` address, or one that takes `{text}` in the URL),
+  a TTS program, or Piper voice packs dropped into the voices folder. They show up
+  in the Voice list next to the Windows voices, follow the Speed slider, and work
+  for typed lines and *Talk as a computer voice*.
 - **A frozen window is noted down**: if Onion Board stops responding for 5 seconds,
   what it was doing is saved beside the crash reports, so a freeze can be fixed even
   when it can't be repeated. Nothing is shown or sent.
