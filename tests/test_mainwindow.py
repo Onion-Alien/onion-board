@@ -382,6 +382,38 @@ def test_the_whole_window_comes_back_after_the_mini_player(window, qapp):
     assert not window.is_mini()
 
 
+@pytest.mark.parametrize("theme_name", ["Dark", "Retro 98"])
+def test_restoring_a_large_window_keeps_search_results(window, qapp, theme_name):
+    """Maximize/restore must keep the full app and the selected search view."""
+    from soundboard import theme, ytdl
+
+    old_theme = window.cfg.theme
+    try:
+        theme.apply(qapp, theme_name)
+        window.cfg.sounds.clear()
+        window._rebuild_pads()
+        window.tabs.setCurrentWidget(window.sounds_page)
+        window.ytresults.query = "test tone"
+        window.ytresults._on_done(0, [
+            ytdl.Result("test", "Test tone", "Example", 60, source="myinstants")
+        ], "")
+        window.ytresults.show()
+        window._pads_scroll.hide()
+        window.resize(1180, 720)
+        window.show()
+        qapp.processEvents()
+        for _ in range(2):
+            window.showMaximized()
+            qapp.processEvents()
+            window.showNormal()
+            qapp.processEvents()
+            assert not window.is_mini()
+            assert window.ytresults.isVisibleTo(window)
+            assert window.tabs.isVisibleTo(window)
+    finally:
+        theme.apply(qapp, old_theme)
+
+
 def test_a_whole_row_of_pads_before_the_mixer(window, qapp):
     """A short window drops the mixer and the rest before squeezing the pads into a
     slit you'd have to scroll through."""
