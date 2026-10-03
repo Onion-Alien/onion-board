@@ -923,7 +923,7 @@ class SettingsDialog(QDialog):
     # ------------------------------------------------------------------ privacy & security
     def _privacy(self):
         w, v = self._page()
-        v.addWidget(self._sends_card())
+        v.addWidget(self._switches_card())
         v.addWidget(self._connection_card())
         v.addWidget(self._online_card())
         v.addStretch(1)
@@ -958,32 +958,149 @@ class SettingsDialog(QDialog):
                     b.blockSignals(False)
         box.toggled.connect(follow)
 
-    def _sends_card(self):
-        """What the app sends by itself, each one switchable."""
+    # what each switch contacts, and when (soundboard.net.FEATURES)
+    NET_HINTS = {
+        "sounds_web": "Searches and pasted links on the Sounds tab go to that site, and "
+                      "search results show its thumbnails. Off: the search bar only "
+                      "searches your own sounds.",
+        "ytdlp_update": "Fetches a newer yt-dlp from PyPI when you press Update now or "
+                        "Reset downloader (Updates page).",
+        "radio": "The station directory (Radio Browser) and the stations you play. Off: "
+                 "the Radio tab contacts nobody.",
+        "app_update": "Asks GitHub for the latest release, and downloads its installer "
+                      "when you press Update now.",
+        "addons": "GitHub, for Onion Watch (Triggers tab) and its updates, and the "
+                  "packages an add-on's Install step downloads (pip).",
+        "voices": "Translation models (Voice tab), live voice's speech model (Hugging "
+                  "Face) and Windows' own voices (Windows Update). Off: live voice still "
+                  "works with a model it already has.",
+        "voice_servers": "Voices in your voices folder that are a server on the "
+                         "internet. Ones on this PC (127.0.0.1) always work.",
+        "setup_downloads": "The setup guide's Install button downloads VB-Cable from "
+                           "vb-audio.com. Off: install it yourself from there.",
+    }
+
+    def _switches_card(self):
+        """Every feature that goes online, each with its own switch (soundboard.net
+        enforces them: off means no connection at all, in any Connection mode), and
+        Offline mode over all of them."""
+        from soundboard import net
         cfg = self.mw.cfg
         card, cv = self._card(
             "Privacy & security",
             "Onion Board has no account, tracking or analytics, and sends nothing to us. "
-            "These are the only things it does online without you asking each time:")
-        self._option(cv, "Check for new versions of Onion Board",
-                     "Asks GitHub for the latest release once a day. Only the release list "
-                     "is read; nothing is downloaded until you press Update now.",
-                     cfg.update_check, self._updates_optin, mirror="update_check")
-        self._option(cv, "Update the downloader (yt-dlp) automatically",
-                     "Asks PyPI once a day, and after a failed download, for a newer yt-dlp. "
-                     "An update is code the app runs, so it's off unless you turn it on.",
-                     cfg.ytdlp_auto_optin,
-                     lambda b: self.mw.set_option("ytdlp_auto_optin", b), mirror="ytdlp_auto")
-
-        def count_plays(on: bool):
-            cfg.radio["count_plays"] = on
-            self.mw.set_option("radio", cfg.radio)   # saves
-        self.plays_box = self._option(
-            cv, "Tell Radio Browser which stations I play",
-            "Radio Browser ranks stations by how often they're played. Off: starting a "
-            "station only contacts the station itself.",
-            bool(cfg.radio.get("count_plays", False)), count_plays)
+            "These are the only things that go online. Switch off what you don't want: "
+            "off means it makes no connection at all, whatever the Connection below.")
+        self.offline_box = self._option(
+            cv, "Offline mode",
+            "Nothing goes online at all: every switch below is off until you untick this.",
+            cfg.net_offline, self._set_offline)
+        body = QWidget()
+        bl = QVBoxLayout(body)
+        bl.setContentsMargins(0, 4, 0, 0)
+        bl.setSpacing(8)
+        self._net_body = body
+        self.net_boxes: dict[str, QCheckBox] = {}
+        self._net_subs: dict[str, QWidget] = {}
+        for key, label in net.FEATURES.items():
+            self.net_boxes[key] = self._option(
+                bl, label, self.NET_HINTS[key], key not in cfg.net_off,
+                lambda on, k=key: self._set_feature(k, on))
+            sub = QWidget()
+            sl = QVBoxLayout(sub)
+            sl.setContentsMargins(26, 0, 0, 0)   # under its feature
+            sl.setSpacing(6)
+            self._net_sub_options(key, sl)
+            if sl.count():
+                bl.addWidget(sub)
+                self._net_subs[key] = sub
+        cv.addWidget(body)
+        note = QLabel("Not covered by these: links you open in your own browser (Support, "
+                      "Report a problem, release pages) and the installer's own downloads.")
+        note.setObjectName("hint")
+        note.setWordWrap(True)
+        cv.addWidget(note)
+        self._net_sync()
         return card
+
+    def _net_sub_options(self, key: str, sl):
+        """The options that belong to one switch, indented under it."""
+        from soundboard import net
+        cfg = self.mw.cfg
+        if key == "sounds_web":
+            row = QHBoxLayout()
+            row.setSpacing(14)
+            for site, name in net.SITES.items():
+                k = f"sounds_web.{site}"
+                b = QCheckBox(name)
+                b.setChecked(k not in cfg.net_off)
+                b.toggled.connect(lambda on, k=k: self._set_feature(k, on))
+                self.net_boxes[k] = b
+                row.addWidget(b)
+            row.addStretch(1)
+            sl.addLayout(row)
+            h = QLabel("YouTube also covers YouTube Music, and the TikTok button (it "
+                       "searches YouTube for TikTok sounds). Other: any other site's link.")
+            h.setObjectName("hint")
+            h.setWordWrap(True)
+            sl.addWidget(h)
+        elif key == "ytdlp_update":
+            self._option(sl, "Automatically",
+                         "Once a day, and after a failed download. An update is code the "
+                         "app runs, so it's off unless you turn it on.",
+                         cfg.ytdlp_auto_optin,
+                         lambda b: self.mw.set_option("ytdlp_auto_optin", b), mirror="ytdlp_auto")
+        elif key == "radio":
+            def count_plays(on: bool):
+                cfg.radio["count_plays"] = on
+                self.mw.set_option("radio", cfg.radio)   # saves
+            self.plays_box = self._option(
+                sl, "Tell Radio Browser which stations I play",
+                "Radio Browser ranks stations by how often they're played. Off: starting a "
+                "station only contacts the station itself.",
+                bool(cfg.radio.get("count_plays", False)), count_plays)
+        elif key == "app_update":
+            self._option(sl, "Check once a day",
+                         "Only the release list is read; nothing is downloaded until you "
+                         "press Update now.",
+                         cfg.update_check, self._updates_optin, mirror="update_check")
+
+    def _set_feature(self, key: str, on: bool):
+        from soundboard import net
+        cfg = self.mw.cfg
+        off = [k for k in cfg.net_off if k != key] + ([] if on else [key])
+        self.mw.set_option("net_off", off)   # saves
+        net.configure_features(cfg.net_off, cfg.net_offline)   # applies at once
+        self._net_sync()
+
+    def _set_offline(self, on: bool):
+        from soundboard import net
+        cfg = self.mw.cfg
+        self.mw.set_option("net_offline", on)
+        net.configure_features(cfg.net_off, cfg.net_offline)
+        self._net_sync()
+
+    def _net_sync(self):
+        """Grey out what's under a switch that's off (everything, in Offline mode), and
+        the buttons on other pages that would go online for it."""
+        from soundboard import net
+        body = getattr(self, "_net_body", None)
+        if body is None or not qt_valid(body):
+            return
+        self._net_body.setEnabled(not net.offline())
+        for key, sub in self._net_subs.items():
+            sub.setEnabled(key not in self.mw.cfg.net_off)
+        for keys, attr in ((("app_update",), "upd_btn"), (("app_update",), "upd_chk"),
+                           (("ytdlp_update",), "ytdlp_auto_box")):
+            w = getattr(self, attr, None)
+            if w is not None and qt_valid(w):
+                w.setEnabled(all(net.allowed(k) for k in keys))
+                w.setToolTip("" if w.isEnabled() else net.off_message(keys[0]))
+        for b in getattr(self, "ytdlp_btns", ()):
+            if qt_valid(b):
+                b.setEnabled(net.allowed("ytdlp_update"))
+                b.setToolTip(b.property("tip") if b.isEnabled()
+                             else net.off_message("ytdlp_update"))
 
     def _online_card(self):
         """What goes online only when you do something, and the app's local doors."""
@@ -1125,6 +1242,7 @@ class SettingsDialog(QDialog):
         chk.toggled.connect(self._updates_optin)
         self._mirror("update_check", chk)
         cv.addWidget(chk)
+        self.upd_chk = chk
         row = QHBoxLayout()
         self.upd_label = QLabel()
         self.upd_label.setObjectName("hint")
@@ -1135,6 +1253,7 @@ class SettingsDialog(QDialog):
         row.addWidget(self.upd_btn)
         cv.addLayout(row)
         self.mw.update_done.connect(self._updates_done)
+        self._net_sync()   # off in Settings > Privacy: greyed, with the reason
         return card
 
     def _updates_optin(self, on: bool):
@@ -1152,6 +1271,7 @@ class SettingsDialog(QDialog):
         if not qt_valid(self.upd_label):
             return
         self.upd_btn.setEnabled(True)
+        self._net_sync()
         asked, self._upd_asked = getattr(self, "_upd_asked", False), False
         if err:
             self.upd_label.setText(f"Couldn't check: {err}")
@@ -1290,6 +1410,7 @@ class SettingsDialog(QDialog):
         auto.toggled.connect(lambda b: self.mw.set_option("ytdlp_auto_optin", b))
         self._mirror("ytdlp_auto", auto)
         cv.addWidget(auto)
+        self.ytdlp_auto_box = auto
         row = QHBoxLayout()
         self.ytdlp_label = QLabel()
         self.ytdlp_label.setObjectName("hint")
@@ -1302,11 +1423,13 @@ class SettingsDialog(QDialog):
                  "Delete the downloaded yt-dlp and its cache, then install a fresh copy")):
             b = QPushButton(text)
             b.setToolTip(tip)
+            b.setProperty("tip", tip)
             b.clicked.connect(lambda _=False, j=job: self._ytdlp_run(j))
             row.addWidget(b)
             self.ytdlp_btns.append(b)
         cv.addLayout(row)
         self._ytdlp_show()
+        self._net_sync()
         return card
 
     def _ytdlp_show(self, msg: str = ""):
@@ -1326,6 +1449,7 @@ class SettingsDialog(QDialog):
             if qt_valid(self.ytdlp_label):
                 for b in self.ytdlp_btns:
                     b.setEnabled(True)
+                self._net_sync()
                 self._ytdlp_show(msg)
 
         relay.done.connect(finish)

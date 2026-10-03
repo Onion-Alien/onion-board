@@ -59,7 +59,7 @@ from dataclasses import dataclass, field
 from pathlib import Path, PurePosixPath
 
 from soundboard import voicefx
-from soundboard import library
+from soundboard import library, net
 
 log = logging.getLogger(__name__)
 
@@ -437,6 +437,9 @@ def install(info: ModuleInfo, on_line: Callable[[str], None]) -> bool:
     if not info.install_steps:
         on_line("This add-on has no install steps.")
         return False
+    if not net.allowed("addons"):
+        on_line(net.off_message("addons"))
+        return False
     py = base_python()
     if py is None:
         on_line("Python isn't installed. Get it from python.org (tick \"Add python.exe to "
@@ -446,7 +449,10 @@ def install(info: ModuleInfo, on_line: Callable[[str], None]) -> bool:
         argv = [info._fill(a, py) for a in step]
         on_line("> " + " ".join(argv[1:]))
         try:
+            # pip & co. go online through the app's relay as "addons", so the
+            # Connection setting holds and switching add-ons off stops them
             p = subprocess.Popen(argv, cwd=info.path, stdout=subprocess.PIPE,
+                                 env=net.child_env("addons"),
                                  stderr=subprocess.STDOUT, stdin=subprocess.DEVNULL,
                                  text=True, encoding="utf-8", errors="replace",
                                  creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0))

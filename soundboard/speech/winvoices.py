@@ -18,6 +18,8 @@ import subprocess
 import tempfile
 from pathlib import Path
 
+from soundboard import net
+
 INSTALL_TIMEOUT_S = 30 * 60      # a slow Windows Update download
 ERROR_CANCELLED = 1223           # the UAC prompt was answered No
 
@@ -137,7 +139,11 @@ def outcome(code: int, stdout: str, answer: str) -> str:
 
 def install(lang: str, timeout: float = INSTALL_TIMEOUT_S) -> str:
     """Install Windows' voice for `lang`: "ok", "restart" (Windows wants a reboot to
-    finish) or "already". Blocks for the download; raises Cancelled or RuntimeError."""
+    finish) or "already". Blocks for the download; raises Cancelled or RuntimeError
+    (also when "Download voices and speech models" is off: Windows Update can't be
+    sent through the app's connection, so it isn't started at all)."""
+    if not net.allowed("voices"):
+        raise RuntimeError(net.off_message("voices"))
     tmp = Path(tempfile.mkdtemp(prefix="sb-voice-"))
     try:
         script, out = tmp / "install-voice.ps1", tmp / "answer.txt"

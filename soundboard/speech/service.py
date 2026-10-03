@@ -41,8 +41,10 @@ HELLO_MAX = 4096            # bytes: the first frame, before we know who's calli
 
 class ServiceHost:
     def __init__(self, argv: list[str], on_event: Callable[[dict], None],
-                 cwd: Path | None = None, log_path: Path | None = None, name: str = "module"):
+                 cwd: Path | None = None, log_path: Path | None = None, name: str = "module",
+                 env: dict[str, str] | None = None):
         self.argv, self.cwd, self.log_path, self.name = argv, cwd, log_path, name
+        self.env = env          # None: this process's (soundboard.net.child_env makes one)
         self.on_event = on_event
         self._proc: subprocess.Popen | None = None
         self._sock: socket.socket | None = None
@@ -68,7 +70,7 @@ class ServiceHost:
                 self.log_path.parent.mkdir(parents=True, exist_ok=True)
                 out = open(self.log_path, "ab")  # noqa: SIM115
             self._proc = subprocess.Popen(
-                self.argv + ["--port", str(port), "--token", token], cwd=self.cwd,
+                self.argv + ["--port", str(port), "--token", token], cwd=self.cwd, env=self.env,
                 stdin=subprocess.DEVNULL, stdout=out, stderr=out,
                 creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0))
         except OSError as e:

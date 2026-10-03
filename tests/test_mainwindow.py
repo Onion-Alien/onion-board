@@ -277,7 +277,7 @@ def test_every_tab_has_its_own_label(window):
 def test_radio_and_apps_light_their_tabs_while_they_send_sound(window):
     tabs = window.tabs
     for panel in (window.radio, window.apps):
-        i = tabs.indexOf(panel)
+        i = tabs.indexOf(window.radio_page if panel is window.radio else panel)
         assert not is_tab_live(tabs, i)
         panel.active_changed.emit(True)
         assert is_tab_live(tabs, i) and tabs.tabToolTip(i).startswith("● ON")

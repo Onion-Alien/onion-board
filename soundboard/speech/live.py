@@ -18,7 +18,7 @@ from collections.abc import Callable
 
 import numpy as np
 
-from soundboard import library
+from soundboard import library, net
 from soundboard.modules import ModuleInfo
 from soundboard.speech.customvoices import VoiceSet
 from soundboard.speech.service import ServiceHost
@@ -96,7 +96,10 @@ class SpeechController:
         host = ServiceHost(module.resolved_command(list(args)),
                            lambda ev: self._event(ev, holder[0] if holder else None),
                            cwd=module.path, log_path=library.APP_DIR / f"module-{module.id}.log",
-                           name=module.id)
+                           name=module.id,
+                           # its speech model download goes through the relay as
+                           # "voices"; switched off, it uses only the model it has
+                           env=net.child_env("voices"))
         holder.append(host)
         self._ready = False
         self.host = host        # before start(): its first events must not look stale

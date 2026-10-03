@@ -110,6 +110,9 @@ def clean_setting(k: str, v):
         return min(max(v, lo), hi)
     if k == "net_mode":   # a mode this version doesn't know (a newer one's "tor"): fail
         return v if v in NET_MODES else "proxy"   # closed, never quietly direct
+    if k == "net_off":   # feature keys (strings); unknown ones are kept, so a newer
+        # version's switch stays off after a downgrade and an upgrade
+        return list(dict.fromkeys(x for x in v if isinstance(x, str) and x))
     if k == "eq_gains":   # one finite gain per band, within the EQ's sliders
         if len(v) != len(EQ_BANDS) or not all(
                 isinstance(g, (int, float)) and not isinstance(g, bool) and math.isfinite(g)
@@ -302,6 +305,10 @@ class Config:
     # net_proxy (socks5h://host:port or http://host:port)
     net_mode: str = "direct"
     net_proxy: str = ""
+    # Settings > Privacy & security, the switches (soundboard.net.FEATURES): the
+    # features switched off (opt-out: everything's on by default), and Offline mode
+    net_off: list[str] = field(default_factory=list)
+    net_offline: bool = False
     sounds: list[SoundMeta] = field(default_factory=list)
 
     # set by load() when the settings weren't read cleanly, for the window to tell the

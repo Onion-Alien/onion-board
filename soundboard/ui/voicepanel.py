@@ -22,7 +22,7 @@ from PySide6.QtWidgets import (QButtonGroup, QCheckBox, QComboBox, QDialog, QMes
 from soundboard import applog
 from soundboard import modules as mods
 from soundboard import voicefx
-from soundboard import library, theme
+from soundboard import library, net, theme
 from soundboard.speech import customvoices, translation, winvoices
 from soundboard.speech.live import SpeechController, clean_settings
 from soundboard.ui import art, busy, icons
@@ -576,9 +576,11 @@ class SpeechPanel(QWidget):
         self.b_dl_cancel.clicked.connect(self._cancel_download)
         self.b_voice_install = QPushButton("Install the voice")
         icons.set_icon(self.b_voice_install, "plus")
-        self.b_voice_install.setToolTip("Windows asks for permission once, then downloads its "
-                                        "free voice for this language. It's used as soon as "
-                                        "it's in; no restart.")
+        self._voice_install_tip = ("Windows asks for permission once, then downloads its "
+                                   "free voice for this language. It's used as soon as "
+                                   "it's in; no restart.")
+        self.b_voice_install.setToolTip(self._voice_install_tip)
+        net.on_change(self._refresh_translation)   # Settings > Privacy's switches
         self.b_voice_install.clicked.connect(self._install_voice)
         self.b_voices = QPushButton("Windows settings")
         self.b_voices.setObjectName("small")
@@ -1009,7 +1011,9 @@ class SpeechPanel(QWidget):
                                 "happens on this PC; what you say never leaves it.")
             self.b_dl.setText(f"Download {name}")
             self.b_dl.show()
-            self.b_dl.setEnabled(not live)
+            # downloading voices switched off in Settings > Privacy: greyed, saying why
+            self.b_dl.setEnabled(not live and net.allowed("voices"))
+            self.b_dl.setToolTip("" if net.allowed("voices") else net.off_message("voices"))
             return
         self.b_dl_remove.setVisible(not live)
         if not self.ctl.tts.voices:        # still loading, or no speech at all
@@ -1033,7 +1037,10 @@ class SpeechPanel(QWidget):
                 self.b_voices.hide()
                 return
             self.b_voice_install.setText(f"Install the {name} voice")
-            self.b_voice_install.setEnabled(True)
+            # Windows Update can't go through the app's connection: off means not at all
+            self.b_voice_install.setEnabled(net.allowed("voices"))
+            self.b_voice_install.setToolTip(
+                self._voice_install_tip if net.allowed("voices") else net.off_message("voices"))
             self.lbl_tr.setText(self._voice_note or (
                 f"\u26a0 Windows has no {name} voice yet, so {name} can't be spoken "
                 "properly. Press Install (free, one click); it's picked up by itself "

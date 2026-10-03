@@ -20,7 +20,7 @@ import numpy as np
 from PySide6.QtCore import Qt, QTimer, Signal
 from PySide6.QtWidgets import QFrame, QHBoxLayout, QLabel, QPushButton
 
-from soundboard import theme, thumbs, ytdl
+from soundboard import net, theme, thumbs, ytdl
 from soundboard.library import (SR, decode, fingerprint, import_file, level_gain, to_int16)
 from soundboard.ui import busy, icons
 from soundboard.ui.widgets import fmt_time
@@ -106,6 +106,12 @@ class LinkBar(QFrame):
         if not url:
             self._probe_timer.stop()
             return
+        if not ytdl.site_allowed(url):   # switched off in Settings > Privacy: no look-up
+            self._probe_timer.stop()
+            self._say(html.escape(net.off_message(ytdl.site_feature(url))),
+                      theme.status("warn"))
+            self._buttons()
+            return
         self._say(f"Looking up <b>{html.escape(self._host())}</b>…")
         self._buttons()
         self._probe_timer.start()
@@ -140,8 +146,9 @@ class LinkBar(QFrame):
     def _buttons(self):
         # already added: no second "Add as sound" next to "✓ Added …"
         self.btn_add.setVisible(not self.url or self.url != getattr(self, "_added", ""))
-        self.btn_add.setEnabled(bool(self.url) and not self._busy)
-        self.btn_play.setEnabled(bool(self.url) and not self._busy)
+        ok = bool(self.url) and not self._busy and ytdl.site_allowed(self.url)
+        self.btn_add.setEnabled(ok)
+        self.btn_play.setEnabled(ok)
         self.btn_add.setText("Adding…" if self._busy == "add" else "Add as sound")
         self.btn_play.setText("Loading…" if self._busy == "play" else "Play once")
 

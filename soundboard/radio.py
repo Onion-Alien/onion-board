@@ -6,7 +6,9 @@ and no key. Most stations carry a latitude / longitude, which the globe uses.
 The app asks it for: the most-listened stations that have a location (the globe,
 cached for a day in radio_dir()), searches you type, and a "click" when you
 start a station (the directory's own popularity count, which it asks clients to
-send; Settings > Privacy turns it off). Nothing else about you is sent.
+send; Settings > Privacy turns it off). Nothing else about you is sent. With Radio
+switched off in Settings > Privacy & security none of it goes online (FEATURE): the
+tab shows an "off" panel instead and the relay refuses the directory and the streams.
 
 The player is Qt Multimedia (FFmpeg): it opens the stream (MP3, AAC, Ogg, HLS…)
 and decodes it, but never plays it itself. A QAudioBufferOutput hands the decoded
@@ -57,6 +59,7 @@ SEARCH_MAX_CHARS = 80
 CACHE_S = 24 * 3600        # how long the globe's station list is reused
 TIMEOUT_MS = 15000
 USER_AGENT = "OnionBoard"   # Radio Browser asks apps to name themselves; no version
+FEATURE = "radio"           # its switch in Settings > Privacy & security (soundboard.net)
 RETRIES = 3                # a dropped stream is reopened this many times in a row
 CONNECT_S = 20.0           # a station that sends no audio this long after opening is dead
 STALL_S = 8.0              # ...and one that goes quiet this long while playing is reopened
@@ -369,7 +372,7 @@ class RadioDirectory(QObject):
         self.cache_dir = cache_dir or radio_dir()
         self.bases = list(bases)
         self.nam = QNetworkAccessManager(self)
-        net.apply_qt(self.nam)          # Settings > Privacy > Connection
+        net.apply_qt(self.nam, FEATURE)   # Settings > Privacy: the connection and switch
         self._search_gen = 0
         self._pending: dict[int, list] = {}
 
@@ -381,6 +384,9 @@ class RadioDirectory(QObject):
     def _get(self, path: str, done, fail, attempt: int = 0):
         """GET `path` from a mirror; on a network error or a reply that isn't JSON,
         try the next mirror."""
+        if not net.allowed(FEATURE):   # switched off: nothing is asked
+            QTimer.singleShot(0, lambda: fail(net.off_message(FEATURE)))
+            return None
         base = self.bases[attempt % len(self.bases)]
         req = QNetworkRequest(QUrl(base + path))
         req.setHeader(QNetworkRequest.UserAgentHeader, USER_AGENT)
@@ -572,6 +578,7 @@ class RadioPlayer(QObject):
         self._watch.setInterval(1000)
         self._watch.timeout.connect(self._check)
         self._looked_up.connect(self._on_looked_up)
+        self._conn = 0               # net.generation() when the stream was opened
         net.on_change(self._on_connection)
 
     def _make(self):
@@ -597,12 +604,18 @@ class RadioPlayer(QObject):
         return self._state
 
     def play(self, station: Station):
+        if not net.allowed(FEATURE):   # switched off: no lookup, no stream
+            self.stop()
+            self._set_state("error")
+            self.error.emit(net.off_message(FEATURE))
+            return
         if self._player is None:
             self._make()
         self.station = station
         self._retries = 0
         self._reconnecting = self._reopen_pending = False
         self._gen += 1
+        self._conn = net.generation()
         host = QUrl(station.url).host()
         if net.active():
             # a lookup here would tell this PC's DNS server which station it is; the
@@ -643,8 +656,19 @@ class RadioPlayer(QObject):
 
     def _on_connection(self):
         """The Connection setting changed: a playing station reconnects the new way at
-        once (FFmpeg reads the relay's address each time it opens a stream)."""
-        if self.station is not None and self._player is not None:
+        once (FFmpeg reads the relay's address each time it opens a stream). Radio
+        switched off stops it."""
+        if self.station is None or self._player is None:
+            return
+        if not net.allowed(FEATURE):
+            log.info("radio: stopped, it was switched off")
+            self.stop()
+            self._set_state("error")
+            self.error.emit(net.off_message(FEATURE) if net.offline() else
+                            "Radio was switched off in Settings > Privacy & security.")
+            return
+        if net.generation() != self._conn:   # the connection itself changed, not a switch
+            self._conn = net.generation()
             log.info("radio: reconnecting after a connection setting change")
             self._gen += 1            # a reopen already scheduled does nothing
             self._retries = 0

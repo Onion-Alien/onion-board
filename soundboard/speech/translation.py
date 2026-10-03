@@ -66,7 +66,8 @@ def download(info, on_progress: Callable[[int, int], None] = lambda done, total:
     try:
         base_dir().mkdir(parents=True, exist_ok=True)
         req = urllib.request.Request(url, headers={"User-Agent": "OnionBoard"})
-        with net.urlopen(req, timeout=TIMEOUT_S) as r, open(part, "wb") as f:
+        with (net.urlopen(req, timeout=TIMEOUT_S, feature="voices") as r,
+              open(part, "wb") as f):
             total = int(r.headers.get("Content-Length") or total)
             while chunk := r.read(CHUNK):
                 if cancelled():

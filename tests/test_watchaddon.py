@@ -45,7 +45,7 @@ def no_local_zip(monkeypatch):
 def test_the_latest_release_is_asked_of_onion_watchs_own_repo(monkeypatch, tmp_path):
     data = module_zip(tmp_path)
     asked = []
-    monkeypatch.setattr(updates, "_get", lambda url: asked.append(url) or release_json(data))
+    monkeypatch.setattr(updates, "_get", lambda url, *_f: asked.append(url) or release_json(data))
     offer = watchaddon.latest()
     assert asked == ["https://api.github.com/repos/Onion-Alien/onion-watch/releases/latest"]
     assert (offer.version, offer.url, offer.size) == ("0.2.0", ZIP_URL, len(data))
@@ -61,22 +61,22 @@ def test_the_latest_release_is_asked_of_onion_watchs_own_repo(monkeypatch, tmp_p
 ])
 def test_a_release_without_a_zip_it_can_trust_offers_nothing(monkeypatch, tmp_path, asset):
     data = module_zip(tmp_path)
-    monkeypatch.setattr(updates, "_get", lambda url: release_json(data, **asset))
+    monkeypatch.setattr(updates, "_get", lambda url, *_f: release_json(data, **asset))
     assert watchaddon.latest() is None
 
 
 def test_the_release_page_link_stays_on_github(monkeypatch, tmp_path):
     data = release_json(module_zip(tmp_path))
     data["html_url"] = "https://evil.example.com/"
-    monkeypatch.setattr(updates, "_get", lambda url: data)
+    monkeypatch.setattr(updates, "_get", lambda url, *_f: data)
     assert watchaddon.latest().page == watchaddon.RELEASES
 
 
 def test_get_downloads_checks_and_installs_it(monkeypatch, tmp_path):
     data = module_zip(tmp_path)
-    monkeypatch.setattr(updates, "_get", lambda url: release_json(data))
+    monkeypatch.setattr(updates, "_get", lambda url, *_f: release_json(data))
     opened = []
-    monkeypatch.setattr(updates, "_open", lambda url: opened.append(url) or Response(data))
+    monkeypatch.setattr(updates, "_open", lambda url, *_f: opened.append(url) or Response(data))
     offer = watchaddon.latest()
     path = watchaddon.fetch(offer)
     assert opened == [ZIP_URL] and path.parent == updates.UPDATES_DIR
@@ -89,8 +89,8 @@ def test_get_downloads_checks_and_installs_it(monkeypatch, tmp_path):
 
 def test_a_download_that_does_not_match_is_thrown_away(monkeypatch, tmp_path):
     data = module_zip(tmp_path)
-    monkeypatch.setattr(updates, "_get", lambda url: release_json(data))
-    monkeypatch.setattr(updates, "_open", lambda url: Response(data + b"tampered"))
+    monkeypatch.setattr(updates, "_get", lambda url, *_f: release_json(data))
+    monkeypatch.setattr(updates, "_open", lambda url, *_f: Response(data + b"tampered"))
     with pytest.raises(updates.UpdateError, match="checksum"):
         watchaddon.fetch(watchaddon.latest())
     assert not list(updates.UPDATES_DIR.glob("OnionWatch*"))
@@ -100,8 +100,8 @@ def test_a_local_zip_stands_in_for_github(monkeypatch, tmp_path):
     z = tmp_path / "OnionWatch-module.zip"
     z.write_bytes(module_zip(tmp_path, "0.3.0"))
     monkeypatch.setenv(watchaddon.LOCAL_ENV, f'"{z}"')
-    monkeypatch.setattr(updates, "_get", lambda url: pytest.fail("asked GitHub"))
-    monkeypatch.setattr(updates, "_open", lambda url: pytest.fail("downloaded"))
+    monkeypatch.setattr(updates, "_get", lambda url, *_f: pytest.fail("asked GitHub"))
+    monkeypatch.setattr(updates, "_open", lambda url, *_f: pytest.fail("downloaded"))
     offer = watchaddon.latest()
     assert offer.version == "0.3.0" and offer.local == z
     assert watchaddon.fetch(offer) == z
@@ -113,7 +113,7 @@ def test_updates_are_only_looked_for_once_it_is_installed(monkeypatch, tmp_path)
     base = tmp_path / "modules"
     asked = []
     new = module_zip(tmp_path, "0.2.0")
-    monkeypatch.setattr(updates, "_get", lambda url: asked.append(url) or release_json(new))
+    monkeypatch.setattr(updates, "_get", lambda url, *_f: asked.append(url) or release_json(new))
     assert watchaddon.check_update([base]) is None and asked == []   # not installed: no request
     old = tmp_path / "old.zip"
     old.write_bytes(module_zip(tmp_path, "0.1.0", "old"))
@@ -129,7 +129,7 @@ def test_an_update_check_that_fails_is_quiet(monkeypatch, tmp_path):
     z.write_bytes(module_zip(tmp_path))
     watchaddon.install(z, base)
 
-    def boom(url):
+    def boom(url, *_feature):
         raise OSError("HTTP Error 404: Not Found")
     monkeypatch.setattr(updates, "_get", boom)
     assert watchaddon.check_update([base]) is None

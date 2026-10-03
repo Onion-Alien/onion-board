@@ -44,6 +44,7 @@ LIMIT = 1 << 20          # the API's answer is a few KB
 MAX_SIZE = 400 << 20     # the installer is ~140 MB
 CHUNK = 1 << 20
 SHA_RE = re.compile(r"[0-9a-f]{64}")
+FEATURE = "app_update"   # its switch in Settings > Privacy & security (soundboard.net)
 
 
 class UpdateError(Exception):
@@ -73,11 +74,12 @@ def newer(latest: str, current: str = __version__) -> bool:
     return a is not None and b is not None and a > b
 
 
-def _get(url: str) -> dict:
+def _get(url: str, feature: str = FEATURE) -> dict:
+    """A GitHub API answer, for `feature` (this update check, or the add-ons')."""
     req = urllib.request.Request(url, headers={
         "User-Agent": "OnionBoard (update check)",   # no version: GitHub needs a name only
         "Accept": "application/vnd.github+json"})
-    with net.urlopen(req, timeout=15) as r:
+    with net.urlopen(req, timeout=15, feature=feature) as r:
         return json.loads(r.read(LIMIT).decode("utf-8"))
 
 
@@ -148,8 +150,10 @@ def latest() -> Release | None:
 def check(cfg, force: bool = False) -> Release | None:
     """A newer release than this one, or None. Without `force` it only asks if the
     box is ticked, once a day, and stays quiet about a version they skipped.
-    Network errors are logged and read as 'nothing new'. Call off the UI thread."""
-    if not force and (not cfg.update_check
+    Network errors are logged and read as 'nothing new'. Switched off in Settings >
+    Privacy & security, the daily check skips itself silently (a forced one raises
+    net.FeatureOff). Call off the UI thread."""
+    if not force and (not cfg.update_check or not net.allowed(FEATURE)
                       or time.time() - cfg.update_checked < EVERY_S):
         return None
     try:
@@ -187,10 +191,10 @@ def _sha256(path: Path) -> str:
     return h.hexdigest()
 
 
-def _open(url: str):
+def _open(url: str, feature: str = FEATURE):
     req = urllib.request.Request(url, headers={
         "User-Agent": "OnionBoard (update download)"})
-    return net.urlopen(req, timeout=30)
+    return net.urlopen(req, timeout=30, feature=feature)
 
 
 def download(rel: Release, progress: Callable[[int, int], None] | None = None,
@@ -209,13 +213,14 @@ def download(rel: Release, progress: Callable[[int, int], None] | None = None,
 
 def fetch(url: str, sha256: str, dest: Path, trusted: tuple[str, ...], max_size: int,
           what: str, size: int = 0, progress: Callable[[int, int], None] | None = None,
-          cancelled: Callable[[], bool] | None = None) -> Path:
+          cancelled: Callable[[], bool] | None = None, feature: str = FEATURE) -> Path:
     """Download a release file to `dest` (via dest + ".part", so a failed download
     never leaves a half file under its name) and prove it's the one GitHub lists
     (`sha256`); returns `dest`. Only from a link under `trusted`, only over HTTPS,
     and never more than `max_size` bytes (`what` it is, for the message). A file
-    already there with the right checksum isn't fetched again. Raises UpdateError
-    with a message for the user. Call off the UI thread."""
+    already there with the right checksum isn't fetched again. `feature` is whose
+    download it is (soundboard.net). Raises UpdateError with a message for the user.
+    Call off the UI thread."""
     if not url.startswith(trusted) or not SHA_RE.fullmatch(sha256):
         raise UpdateError(f"there's no {what.split(' ', 1)[-1]} here the app can check")
     if dest.is_file() and _sha256(dest) == sha256:
@@ -225,7 +230,7 @@ def fetch(url: str, sha256: str, dest: Path, trusted: tuple[str, ...], max_size:
     h = hashlib.sha256()
     done = 0
     try:
-        with _open(url) as r, open(part, "wb") as f:
+        with _open(url, feature) as r, open(part, "wb") as f:
             if not r.geturl().startswith("https://"):
                 raise UpdateError("the download was redirected off HTTPS")
             total = int(r.headers.get("Content-Length") or size or 0)
@@ -293,7 +298,8 @@ def installer_env(env: dict[str, str] | None = None,
             env[path_key] = os.pathsep.join(
                 p for p in env[path_key].split(os.pathsep) if not inside(p))
     env["PYINSTALLER_RESET_ENVIRONMENT"] = "1"
-    return env
+    # the app's relay (soundboard.net) closes with it: the user's own proxy settings
+    return net.own_env(env)
 
 
 def start_install(path: Path) -> None:

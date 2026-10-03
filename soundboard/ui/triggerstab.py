@@ -26,7 +26,7 @@ from PySide6.QtCore import Qt, Signal
 from PySide6.QtWidgets import (QHBoxLayout, QMessageBox, QProgressBar, QPushButton,
                                QStackedWidget, QVBoxLayout, QWidget)
 
-from soundboard import modules, theme, updates, watchaddon
+from soundboard import modules, net, theme, updates, watchaddon
 from soundboard.ui import busy, icons
 from soundboard.ui.owl import OwlWidget
 from soundboard.ui.panel import card, hint_label, section_label
@@ -74,6 +74,7 @@ class TriggersTab(QWidget):
         bv.setContentsMargins(0, 0, 0, 0)
         bv.setSpacing(0)
         self._build_update_bar()
+        net.on_change(self._follow_switch)
         bv.addWidget(self.update_bar)
         self.act_remove = None              # "Remove Onion Watch…" in the add-on's More menu
         self.foot = QHBoxLayout()           # ...or, if it has none, under its tab
@@ -201,6 +202,21 @@ class TriggersTab(QWidget):
         self.error.setVisible(bool(error))
         self.btn_remove_broken.setVisible(
             self.info is not None and watchaddon.removable(self.info, self._base()))
+        self._follow_switch()
+
+    def _follow_switch(self):
+        """Getting add-ons switched off in Settings > Privacy & security: Get / Update
+        are greyed, saying why (a local zip, ONIONBOARD_ONION_WATCH_ZIP, still installs)."""
+        if self._busy:
+            return
+        ok = net.allowed(watchaddon.FEATURE) or watchaddon.local_zip() is not None
+        why = "" if ok else net.off_message(watchaddon.FEATURE)
+        self.btn_get.setEnabled(ok)
+        if why:
+            self.btn_get.setToolTip(why)
+        if hasattr(self, "btn_update"):   # not yet while the get page is being built
+            self.btn_update.setEnabled(ok)
+            self.btn_update.setToolTip(why)
 
     # ------------------------------------------------------------------ loading
     def load(self, error: str = "") -> bool:
@@ -307,7 +323,7 @@ class TriggersTab(QWidget):
         self.btn_get.setEnabled(True)
         self.btn_update.setEnabled(True)
         self.btn_update.setText("Update")
-        self._label_get()                   # the get button's own words again
+        self._label_get()                   # the get button's own words (and switch) again
         self.btn_cancel.hide()
         self.bar.hide()
         if update:

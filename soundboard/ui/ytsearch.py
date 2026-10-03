@@ -329,7 +329,7 @@ class SearchResults(QFrame):
         self._gen = 0
         self._rows: list[ResultRow] = []
         self.net = QNetworkAccessManager(self)
-        net.apply_qt(self.net)        # Settings > Privacy > Connection
+        net.apply_qt(self.net, "sounds_web")   # thumbnails: Settings > Privacy
         self._done.connect(self._on_done)
 
         v = QVBoxLayout(self)
@@ -379,6 +379,30 @@ class SearchResults(QFrame):
         v.addWidget(scroll, 1)
         self.scroll = scroll
         self.hide()
+        self.follow_switches()
+        net.on_change(self.follow_switches)
+
+    def follow_switches(self):
+        """Settings > Privacy & security: a site switched off has its button greyed
+        (saying why), and searching moves to one that's on. With finding sounds online
+        switched off altogether, open results close."""
+        for key, b in self.site_btns.items():
+            ok = ytdl.site_allowed(key)
+            b.setEnabled(ok)
+            b.setToolTip(TIPS.get(key, f"Search {ytdl.SOURCES[key][0]}") if ok
+                         else net.off_message(ytdl.site_feature(key)))
+        if not ytdl.site_allowed(self.source):
+            on = [k for k in self.site_btns if ytdl.site_allowed(k)]
+            if on:
+                self.set_source(on[0])
+            elif not self.isHidden():
+                self.close_results()
+
+    @staticmethod
+    def available() -> bool:
+        """Can anything be searched online at all (else the bar searches only the
+        board)?"""
+        return any(ytdl.site_allowed(k) for k in ytdl.SOURCES)
 
     @property
     def site(self) -> str:
@@ -396,7 +420,7 @@ class SearchResults(QFrame):
 
     def search(self, query: str) -> bool:
         query = " ".join(query.split())
-        if not query:
+        if not query or not ytdl.site_allowed(self.source):
             return False
         self.query = query
         self._gen += 1

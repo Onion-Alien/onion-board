@@ -257,7 +257,7 @@ def test_auto_update_only_when_enabled_and_due(pypi):
 def test_a_failed_download_updates_and_retries_once(pypi, monkeypatch, tmp_path):
     calls = []
 
-    def dl(url, dest, progress):
+    def dl(url, dest, progress, *_feature):
         calls.append(ytdl.override_version())
         if len(calls) == 1:
             raise ytdl.FetchError("Sign in to confirm you're not a bot")
@@ -274,7 +274,7 @@ def test_a_failed_download_updates_and_retries_once(pypi, monkeypatch, tmp_path)
 
 
 def test_a_refused_download_does_not_update(pypi, monkeypatch):
-    def dl(url, dest, progress):
+    def dl(url, dest, progress, *_feature):
         raise ytdl.DownloadError("That's a playlist")
     monkeypatch.setattr(ytdl, "_download", dl)
     with pytest.raises(ytdl.DownloadError):
@@ -539,10 +539,10 @@ class _Resp(io.BytesIO):
 def test_search_myinstants_reads_the_buttons_and_downloads_the_mp3(monkeypatch, tmp_path):
     asked = []
 
-    def urlopen(req, timeout=0):
+    def urlopen(req, timeout=0, feature=None):
         asked.append((req.full_url, req.headers.get("User-agent", "")))
         return _Resp(MYINSTANTS_PAGE.encode() if "/search/" in req.full_url else b"ID3mp3")
-    monkeypatch.setattr(ytdl.urllib.request, "urlopen", urlopen)
+    monkeypatch.setattr(ytdl.net, "urlopen", urlopen)
     r = ytdl.search("vine  boom", 1, source="myinstants")
     assert asked[0][0] == "https://www.myinstants.com/en/search/?name=vine+boom"
     assert "Mozilla" in asked[0][1]
@@ -623,7 +623,7 @@ def test_searching_shows_a_centred_mascot_then_the_results(qapp, monkeypatch):
     "https://www.myinstants.com/media/sounds/x.bat",
 ])
 def test_direct_download_refuses_names_that_leave_its_folder(url, monkeypatch):
-    monkeypatch.setattr(ytdl.urllib.request, "urlopen", lambda *a, **k: pytest.fail("fetched"))
+    monkeypatch.setattr(ytdl.net, "urlopen", lambda *a, **k: pytest.fail("fetched"))
     with pytest.raises(ytdl.DownloadError):
         ytdl._download_direct(url, None, None)
 

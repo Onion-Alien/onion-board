@@ -241,6 +241,11 @@ def main(argv=None) -> int:
             return
         except Exception as e:  # noqa: BLE001
             log.exception("model load failed")
+            if os.environ.get("HF_HUB_OFFLINE") == "1":   # the app's voices switch is off
+                fail(f"the speech model {args.model} isn't downloaded, and downloading "
+                     "voices and speech models is switched off in Settings > Privacy & "
+                     "security. Switch it on to download the model once, then Start again")
+                return
             fail(f"couldn't load the speech model ({e}). Try another Recognition model "
                  "under More options, then Start again")
             return

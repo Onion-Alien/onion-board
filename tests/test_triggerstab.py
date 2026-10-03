@@ -127,7 +127,7 @@ def test_without_the_add_on_it_shows_hoot_and_keeps_the_triggers(qapp, tmp_path)
 
 def test_get_installs_it_and_loads_it_into_the_tab(qapp, tmp_path, addon_zip, monkeypatch):
     monkeypatch.setenv(watchaddon.LOCAL_ENV, str(addon_zip()))
-    monkeypatch.setattr(updates, "_get", lambda url: pytest.fail("asked GitHub"))
+    monkeypatch.setattr(updates, "_get", lambda url, *_f: pytest.fail("asked GitHub"))
     host = FakeHost(two_triggers())
     tab = TriggersTab(host, [tmp_path / "modules"])
     step = dict((p, f) for p, _axis, f in tab.fit_steps() if p in (20, 28))
@@ -165,7 +165,7 @@ def test_one_that_breaks_shows_hoot_with_why(qapp, tmp_path, addon_zip):
 
 
 def test_one_that_cannot_be_downloaded_says_why(qapp, tmp_path, monkeypatch):
-    def not_found(url):
+    def not_found(url, *_feature):
         raise OSError("HTTP Error 404: Not Found")
     monkeypatch.setattr(updates, "_get", not_found)
     tab = TriggersTab(FakeHost(), [tmp_path / "modules"])

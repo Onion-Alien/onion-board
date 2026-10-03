@@ -11,6 +11,9 @@ Triggers tab loads it.
 
 ONIONBOARD_ONION_WATCH_ZIP=<path to an OnionWatch-module.zip> makes both use that
 file instead of GitHub, to try a build before it's released.
+
+"Get and update add-ons" switched off in Settings > Privacy & security stops all of
+it (net.FeatureOff); the daily check then skips itself without a word.
 """
 from __future__ import annotations
 
@@ -22,7 +25,7 @@ from collections.abc import Callable
 from dataclasses import dataclass
 from pathlib import Path
 
-from soundboard import modules, updates
+from soundboard import modules, net, updates
 from soundboard.modules import ModuleInfo
 
 log = logging.getLogger(__name__)
@@ -37,6 +40,7 @@ MODULE_ID = "onion-watch"
 KIND = "triggers"
 LOCAL_ENV = "ONIONBOARD_ONION_WATCH_ZIP"
 MAX_SIZE = 20 << 20      # the zip is ~70 KB
+FEATURE = "addons"       # its switch in Settings > Privacy & security (soundboard.net)
 
 
 @dataclass
@@ -77,7 +81,7 @@ def latest() -> Offer | None:
     lz = local_zip()
     if lz is not None:
         return Offer(_zip_version(lz), page=str(lz), local=lz)
-    data = updates._get(API)
+    data = updates._get(API, FEATURE)
     ver = updates.parse_version(str(data.get("tag_name") or data.get("name") or ""))
     if ver is None:
         return None
@@ -101,7 +105,7 @@ def fetch(offer: Offer, progress: Callable[[int, int], None] | None = None,
         return offer.local
     dest = updates.UPDATES_DIR / f"OnionWatch-module-{offer.version}.zip"
     return updates.fetch(offer.url, offer.sha256, dest, (DOWNLOADS,), MAX_SIZE, "an add-on",
-                         offer.size, progress, cancelled)
+                         offer.size, progress, cancelled, FEATURE)
 
 
 def install(path: Path, base: Path | None = None) -> ModuleInfo:
@@ -139,7 +143,7 @@ def check_update(dirs: list[Path] | None = None) -> Offer | None:
     installed: then nothing is asked). Errors are logged, not raised. Call off the
     UI thread; the app calls it with its own daily update check."""
     info = installed(dirs)
-    if info is None:
+    if info is None or not net.allowed(FEATURE):   # switched off: skip, silently
         return None
     try:
         offer = latest()

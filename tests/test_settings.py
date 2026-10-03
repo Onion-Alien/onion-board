@@ -2,6 +2,7 @@
 from PySide6.QtWidgets import QLabel, QPushButton, QScrollArea
 
 from conftest import process_events
+from soundboard import net
 from soundboard.settings import SettingsDialog
 from soundboard.ui import busy
 from test_mainwindow import window  # noqa: F401  (the real MainWindow fixture)
@@ -146,11 +147,11 @@ def test_privacy_switches_match_their_twins_on_other_pages(window, monkeypatch):
     try:
         def boxes(text):
             return [b for b in d.findChildren(QCheckBox) if b.text().startswith(text)]
-        mine, theirs = boxes("Check for new versions")[0], boxes("Tell me when a new")[0]
+        mine, theirs = boxes("Check once a day")[0], boxes("Tell me when a new")[0]
         assert mine.isChecked() == theirs.isChecked() == window.cfg.update_check
         mine.setChecked(not mine.isChecked())
         assert theirs.isChecked() == mine.isChecked() == window.cfg.update_check
-        auto, twin = boxes("Update the downloader")[0], boxes("Update it automatically")[0]
+        auto, twin = boxes("Automatically")[0], boxes("Update it automatically")[0]
         twin.setChecked(True)
         assert auto.isChecked() and window.cfg.ytdlp_auto_optin
         d.plays_box.setChecked(True)
@@ -180,3 +181,52 @@ def test_privacy_and_general_pages_fit_their_window(window, qapp):  # noqa: F811
         assert "&&" in d.tabs.tabText(0)        # "&" alone would underline the next letter
     finally:
         d.close()
+
+
+def test_each_switch_writes_its_setting_and_applies_at_once(window, monkeypatch):  # noqa: F811
+    """Settings > Privacy & security: one switch per feature (and per sound site),
+    saved in net_off and applied to soundboard.net straight away; sub-options grey out
+    under a switch that's off, and Offline mode greys out everything under it."""
+    monkeypatch.setattr(window, "_save_later", lambda: None)
+    monkeypatch.setattr(window, "check_updates", lambda *a, **k: None)
+    d = SettingsDialog(window)
+    try:
+        assert set(net.FEATURES) <= set(d.net_boxes)
+        for key, box in d.net_boxes.items():
+            assert box.isChecked() and net.allowed(key)
+            box.setChecked(False)
+            assert key in window.cfg.net_off and not net.allowed(key)
+            box.setChecked(True)
+            assert key not in window.cfg.net_off and net.allowed(key)
+        d.net_boxes["radio"].setChecked(False)
+        assert not d._net_subs["radio"].isEnabled() and d._net_subs["app_update"].isEnabled()
+        d.net_boxes["app_update"].setChecked(False)   # the Updates page follows
+        assert not d.upd_btn.isEnabled() and "switched off" in d.upd_btn.toolTip()
+        d.net_boxes["ytdlp_update"].setChecked(False)
+        assert not any(b.isEnabled() for b in d.ytdlp_btns)
+        d.offline_box.setChecked(True)
+        assert window.cfg.net_offline and not net.any_allowed()
+        assert not d._net_body.isEnabled()
+        d.offline_box.setChecked(False)
+        assert d._net_body.isEnabled() and net.allowed("voices") and not net.allowed("radio")
+    finally:
+        d.close()
+        window.cfg.net_off, window.cfg.net_offline = [], False
+        net.configure_features()
+
+
+def test_switching_radio_off_swaps_the_tab_and_stops_a_station(window, monkeypatch):  # noqa: F811
+    from soundboard.ui.radiopanel import RadioOff, RadioTab
+    stopped = []
+    monkeypatch.setattr(window.radio, "is_active", lambda: True)
+    monkeypatch.setattr(window.radio, "shutdown", lambda: stopped.append(1))
+    told = []
+    monkeypatch.setattr(window, "toast", lambda text, kind="": told.append(text))
+    net.configure_features(["radio"])
+    try:
+        assert isinstance(window.radio, RadioOff) and stopped == [1]
+        assert told and "Radio was switched off" in told[0]
+        assert window.radio_page.currentWidget() is window.radio
+    finally:
+        net.configure_features()
+    assert isinstance(window.radio, RadioTab)   # back on: built again

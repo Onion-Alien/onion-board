@@ -2,6 +2,13 @@
 
 ## 1.6.5 — 2026-10-03
 
+- **Switch off anything that goes online**: Settings → Privacy & security has a switch
+  for each thing the app does online (finding and downloading sounds, with one per
+  site; updating yt-dlp; radio; Onion Board updates; add-ons; voice and speech-model
+  downloads; custom voice servers; installing the virtual cable), and *Offline mode*
+  on top that switches them all off. Off means no connection at all, through a proxy
+  or not: the Radio tab says it's off instead of loading, the search bar only searches
+  your own sounds, and the buttons that would go online are greyed with the reason.
 - **More private radio**: the radio maps (the country outlines, the 3D globe and its
   Earth pictures) now come with the app instead of being downloaded, so opening the
   Radio tab doesn't contact a CDN at all. Stations play over `https` when the

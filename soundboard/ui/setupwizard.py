@@ -13,6 +13,7 @@ sound use the real devices. The window's own device boxes are refreshed at the e
 from __future__ import annotations
 
 import ctypes
+import html
 import subprocess
 import time
 
@@ -25,7 +26,7 @@ from PySide6.QtWidgets import (QApplication, QButtonGroup, QCheckBox, QDialog, Q
 from soundboard import engine as eng
 from soundboard import theme
 from soundboard.engine import SR
-from soundboard import library
+from soundboard import library, net
 from soundboard.library import RESOURCE_DIR
 from soundboard.ui import busy, fit
 from soundboard.ui.bunnywidget import BunnyWidget
@@ -563,10 +564,20 @@ class SetupWizard(QDialog):
             self.btn_cable.setText("⬇  Install it now (free)")
             self.btn_cable.show()
             self.btn_recheck.hide()
+        # switched off in Settings > Privacy & security: the installer's download
+        # (PowerShell, from vb-audio.com) can't go through the app's connection
+        allowed = net.allowed("setup_downloads")
+        self.btn_cable.setEnabled(allowed)
+        self.btn_cable.setToolTip("" if allowed else net.off_message("setup_downloads"))
+        if not allowed and not self.btn_cable.isHidden():
+            self.btn_recheck.show()   # for after installing it by hand
         self._update_next()
 
     def install_cable(self):
         script = RESOURCE_DIR / "install-vbcable.ps1"
+        if not net.allowed("setup_downloads"):
+            self.cable_status.setText(html.escape(net.off_message("setup_downloads")))
+            return
         if not script.exists():
             self.cable_status.setText(f"<span style='color:{_bad()}'>The cable installer is "
                                       "missing. Get it from vb-audio.com/Cable.</span>")

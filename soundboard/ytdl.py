@@ -100,6 +100,51 @@ class FetchError(DownloadError):
     """yt-dlp itself failed (vs. something we refused): a newer yt-dlp may fix it."""
 
 
+class SwitchedOff(DownloadError):
+    """The site (or finding sounds online at all) is switched off in Settings > Privacy
+    & security: nothing was looked up or sent. The message says so."""
+
+
+FEATURE = "sounds_web"           # soundboard.net's switch for all of this
+UPDATE_FEATURE = "ytdlp_update"  # ...and for updating yt-dlp from PyPI
+
+
+def site_of(target: str) -> str:
+    """Which of net.SITES a search source (a key of SOURCES) or a link belongs to.
+    TikTok's button searches YouTube, so it's YouTube's; a pasted TikTok link is
+    "other"."""
+    if target in SOURCES:
+        return {"soundcloud": "soundcloud", "myinstants": "myinstants"}.get(target, "youtube")
+    host = (urllib.parse.urlsplit(target).hostname or "").lower().rstrip(".")
+
+    def under(*domains):
+        return any(host == d or host.endswith("." + d) for d in domains)
+    if under("youtube.com", "youtu.be", "youtube-nocookie.com"):
+        return "youtube"
+    if under("soundcloud.com", "snd.sc"):
+        return "soundcloud"
+    if under("myinstants.com"):
+        return "myinstants"
+    return "other"
+
+
+def site_feature(target: str) -> str:
+    """The key the requests for `target` carry: "sounds_web.<site>"."""
+    return f"{FEATURE}.{site_of(target)}"
+
+
+def site_allowed(target: str) -> bool:
+    return net.allowed(site_feature(target))
+
+
+def _gate(target: str) -> str:
+    """The site's feature key, or SwitchedOff (before anything goes online)."""
+    feature = site_feature(target)
+    if not net.allowed(feature):
+        raise SwitchedOff(net.off_message(feature))
+    return feature
+
+
 # ---------------------------------------------------------------------- the updated copy
 
 def root() -> Path:
@@ -213,7 +258,7 @@ def _purge():
 
 def _get(url: str, limit: int) -> bytes:
     req = urllib.request.Request(url, headers={"User-Agent": "OnionBoard (yt-dlp updater)"})
-    with net.urlopen(req, timeout=30) as r:
+    with net.urlopen(req, timeout=30, feature=UPDATE_FEATURE) as r:
         data = r.read(limit + 1)
     if len(data) > limit:
         raise DownloadError(f"{url} is unexpectedly large")
@@ -235,7 +280,10 @@ def _wheel(meta: dict) -> bytes:
 
 def update(force: bool = False) -> str:
     """Fetch the latest yt-dlp if it's newer than what's in use (or always, with
-    force). Returns a short message for the user; raises DownloadError on failure."""
+    force). Returns a short message for the user; raises DownloadError on failure
+    (SwitchedOff when updating it is switched off in Settings > Privacy & security)."""
+    if not net.allowed(UPDATE_FEATURE):
+        raise SwitchedOff(net.off_message(UPDATE_FEATURE))
     try:
         meta = json.loads(_get(PYPI.format("yt-dlp"), 5 * 1024 * 1024))
         latest = str(meta["info"]["version"])
@@ -280,7 +328,11 @@ def update(force: bool = False) -> str:
 
 def reset() -> str:
     """For when it's thoroughly broken: delete the downloaded copy and yt-dlp's cache,
-    then download the latest again (falling back to the bundled one if that fails)."""
+    then download the latest again (falling back to the bundled one if that fails).
+    Switched off, it does nothing (raises SwitchedOff): a reset that can't fetch a
+    fresh copy would only throw the working one away."""
+    if not net.allowed(UPDATE_FEATURE):
+        raise SwitchedOff(net.off_message(UPDATE_FEATURE))
     with _lock.exclusive():
         shutil.rmtree(root(), ignore_errors=True)
         _purge()
@@ -299,8 +351,9 @@ def due(every: float = CHECK_EVERY) -> bool:
 
 
 def auto_update(enabled: bool):
-    """The daily background check (call from a thread)."""
-    if not enabled or not due():
+    """The daily background check (call from a thread); switched off in Settings >
+    Privacy & security, it skips itself."""
+    if not enabled or not net.allowed(UPDATE_FEATURE) or not due():
         return
     try:
         log.info(update())
@@ -347,13 +400,16 @@ def download_audio(url: str, dest: Path | None = None,
 
     Returns (file, title). `progress` gets 0..1 while it downloads. If yt-dlp fails
     and no update check ran in the last hour, it updates yt-dlp and tries once more.
-    Raises DownloadError with a message fit to show the user."""
+    Raises DownloadError with a message fit to show the user (SwitchedOff when its
+    site is switched off in Settings > Privacy & security)."""
+    feature = _gate(url)
     if url.startswith(MYINSTANTS + "/media/sounds/"):
         return _download_direct(url, dest, progress)
     try:
-        return _download(url, dest, progress)
+        return _download(url, dest, progress, feature)
     except FetchError as e:
-        if not auto_update or not due(RETRY_CHECK_AFTER):
+        if (not auto_update or not due(RETRY_CHECK_AFTER)
+                or not net.allowed(UPDATE_FEATURE)):
             raise
         try:
             msg = update()
@@ -362,18 +418,19 @@ def download_audio(url: str, dest: Path | None = None,
             raise e from None
         if msg.startswith("Updated"):
             log.info("%s Retrying %s", msg, url)
-            return _download(url, dest, progress)
+            return _download(url, dest, progress, feature)
         raise
 
 
 def probe(url: str) -> tuple[str, float]:
     """Look `url` up without downloading anything: (clean title, seconds or 0).
     Raises DownloadError like download_audio (but never updates yt-dlp)."""
+    feature = _gate(url)
     if url.startswith(MYINSTANTS + "/media/sounds/"):
         return _direct_title(url), 0.0
     with _ydl() as yt_dlp:
         try:
-            with yt_dlp.YoutubeDL(_opts()) as ydl:
+            with yt_dlp.YoutubeDL(_opts(feature=feature)) as ydl:
                 info = _check(ydl.extract_info(url, download=False))
         except DownloadError:
             raise
@@ -431,6 +488,7 @@ def search(query: str, count: int = 20, source: str = "youtube") -> list[Result]
     if not query:
         return []
     kind = SOURCES[source][1]
+    feature = _gate(source)
     if kind == "myinstants":
         return _myinstants(query, count)
     if kind == "ytmusic":
@@ -438,7 +496,8 @@ def search(query: str, count: int = 20, source: str = "youtube") -> list[Result]
                   f"{urllib.parse.quote_plus(query)}#songs")
     else:
         target = f"{kind}{count}:{query}{TIKTOK_SUFFIX if source == 'tiktok' else ''}"
-    opts = {k: v for k, v in _opts().items() if k not in ("format", "outtmpl")}
+    opts = {k: v for k, v in _opts(feature=feature).items()
+            if k not in ("format", "outtmpl")}
     opts.update(extract_flat="in_playlist", noplaylist=False, playlistend=count)
     with _ydl() as yt_dlp:
         try:
@@ -461,8 +520,10 @@ def _myinstants(query: str, count: int) -> list[Result]:
     url = f"{MYINSTANTS}/en/search/?name={urllib.parse.quote_plus(query)}"
     try:
         req = urllib.request.Request(url, headers=BROWSER_HEADERS)
-        with net.urlopen(req, timeout=20) as r:
+        with net.urlopen(req, timeout=20, feature=f"{FEATURE}.myinstants") as r:
             page = r.read(4 * 1024 * 1024).decode("utf-8", "replace")
+    except net.FeatureOff as e:
+        raise SwitchedOff(str(e)) from None
     except Exception as e:  # noqa: BLE001 - offline, blocked…: show why
         raise FetchError(f"Myinstants didn't answer ({e})") from e
     out = []
@@ -511,15 +572,15 @@ def _ydl():
         yield yt_dlp
 
 
-def _download(url, dest, progress) -> tuple[Path, str]:
+def _download(url, dest, progress, feature: str = FEATURE) -> tuple[Path, str]:
     with _ydl() as yt_dlp:
         if dest:
-            return _run(yt_dlp, url, Path(dest), progress)
+            return _run(yt_dlp, url, Path(dest), progress, feature)
         # Our own temp folder: the caller only learns it on success, so a failed
         # download (up to the size cap) must not be left behind in %TEMP%.
         tmp = Path(tempfile.mkdtemp(prefix="sb-ytdl-"))
         try:
-            return _run(yt_dlp, url, tmp, progress)
+            return _run(yt_dlp, url, tmp, progress, feature)
         except BaseException:
             shutil.rmtree(tmp, ignore_errors=True)
             raise
@@ -554,7 +615,8 @@ def _download_direct(url, dest, progress) -> tuple[Path, str]:
         raise DownloadError("That isn't a Myinstants sound link.")
     try:
         req = urllib.request.Request(url, headers=BROWSER_HEADERS)
-        with net.urlopen(req, timeout=30) as r, open(path, "wb") as f:
+        with (net.urlopen(req, timeout=30, feature=f"{FEATURE}.myinstants") as r,
+              open(path, "wb") as f):
             total, got = int(r.headers.get("Content-Length") or 0), 0
             while chunk := r.read(64 * 1024):
                 got += len(chunk)
@@ -567,6 +629,10 @@ def _download_direct(url, dest, progress) -> tuple[Path, str]:
         if not dest:
             shutil.rmtree(tmp, ignore_errors=True)
         raise
+    except net.FeatureOff as e:
+        if not dest:
+            shutil.rmtree(tmp, ignore_errors=True)
+        raise SwitchedOff(str(e)) from None
     except Exception as e:  # noqa: BLE001 - network: show why
         if not dest:
             shutil.rmtree(tmp, ignore_errors=True)
@@ -589,7 +655,8 @@ def _readable(e: Exception) -> FetchError:
     return FetchError(msg or "Download failed")
 
 
-def _opts(dest: Path | None = None, progress=None, thumbnail: bool = False) -> dict:
+def _opts(dest: Path | None = None, progress=None, thumbnail: bool = False,
+          feature: str = FEATURE) -> dict:
     def hook(d):
         if progress and d.get("status") == "downloading":
             total = d.get("total_bytes") or d.get("total_bytes_estimate") or 0
@@ -610,15 +677,14 @@ def _opts(dest: Path | None = None, progress=None, thumbnail: bool = False) -> d
         "progress_hooks": [hook],
         "logger": log,
     }
-    proxy = net.ytdlp_proxy()   # Settings > Privacy > Connection; None = direct
-    if proxy:
-        opts["proxy"] = proxy
+    # the relay, as this site: Settings > Privacy (the connection and the switches)
+    opts["proxy"] = net.ytdlp_proxy(feature)
     return opts
 
 
-def _run(yt_dlp, url: str, dest: Path, progress) -> tuple[Path, str]:
+def _run(yt_dlp, url: str, dest: Path, progress, feature: str = FEATURE) -> tuple[Path, str]:
     try:
-        with yt_dlp.YoutubeDL(_opts(dest, progress, thumbnail=True)) as ydl:
+        with yt_dlp.YoutubeDL(_opts(dest, progress, thumbnail=True, feature=feature)) as ydl:
             info = _check(ydl.extract_info(url, download=False))
             dur = info.get("duration") or 0
             if dur > MAX_SECONDS:

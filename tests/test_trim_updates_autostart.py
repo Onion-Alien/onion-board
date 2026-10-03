@@ -91,7 +91,7 @@ def test_check_on_by_default_and_once_a_day(monkeypatch):
 
 
 def test_latest_only_links_to_github(monkeypatch):
-    monkeypatch.setattr(updates, "_get", lambda url: {
+    monkeypatch.setattr(updates, "_get", lambda url, *_f: {
         "tag_name": "v2.1.0", "html_url": "https://evil.example.com/x", "body": "a\nb"})
     rel = updates.latest()
     assert rel.version == "2.1.0" and rel.url == updates.RELEASES and rel.notes == "a b"
@@ -126,7 +126,7 @@ def _release_json(**asset):
 
 
 def test_latest_finds_the_installer_and_its_checksum(monkeypatch):
-    monkeypatch.setattr(updates, "_get", lambda url: _release_json())
+    monkeypatch.setattr(updates, "_get", lambda url, *_f: _release_json())
     rel = updates.latest()
     assert (rel.asset_url, rel.sha256, rel.size) == (SETUP_URL, SETUP_SHA, len(SETUP))
 
@@ -135,14 +135,14 @@ def test_an_installer_under_the_old_repo_name_is_still_trusted(monkeypatch):
     """The repo was renamed onionboard -> onion-board; GitHub redirects the old name."""
     old = "https://github.com/Onion-Alien/onionboard/releases/download/v9.0.0/OnionBoardSetup.exe"
     assert updates.DOWNLOADS == "https://github.com/Onion-Alien/onion-board/releases/download/"
-    monkeypatch.setattr(updates, "_get", lambda url: _release_json(browser_download_url=old))
+    monkeypatch.setattr(updates, "_get", lambda url, *_f: _release_json(browser_download_url=old))
     assert updates.latest().asset_url == old
 
 
 def test_latest_takes_the_checksum_from_the_notes_without_a_digest(monkeypatch):
     data = _release_json(digest=None)
     data["body"] = f"Download below.\n\nSHA-256: `{SETUP_SHA.upper()}`\n"
-    monkeypatch.setattr(updates, "_get", lambda url: data)
+    monkeypatch.setattr(updates, "_get", lambda url, *_f: data)
     assert updates.latest().sha256 == SETUP_SHA
 
 
@@ -155,7 +155,7 @@ def test_latest_takes_the_checksum_from_the_notes_without_a_digest(monkeypatch):
     {"name": "Setup.exe"},
 ])
 def test_latest_offers_no_installer_it_cannot_trust(monkeypatch, asset):
-    monkeypatch.setattr(updates, "_get", lambda url: _release_json(**asset))
+    monkeypatch.setattr(updates, "_get", lambda url, *_f: _release_json(**asset))
     rel = updates.latest()
     assert rel.version == "9.0.0" and rel.asset_url == "" and rel.sha256 == ""
 
@@ -178,7 +178,7 @@ def _release():
 def test_download_checks_the_file_and_reports_progress(monkeypatch):
     opened = []
     monkeypatch.setattr(updates, "_open",
-                        lambda url: opened.append(url) or FakeResponse(SETUP))
+                        lambda url, *_f: opened.append(url) or FakeResponse(SETUP))
     monkeypatch.setattr(updates, "CHUNK", 4096)
     seen = []
     path = updates.download(_release(), lambda d, t: seen.append((d, t)))
@@ -189,7 +189,7 @@ def test_download_checks_the_file_and_reports_progress(monkeypatch):
 
 
 def test_download_throws_away_a_file_that_does_not_match(monkeypatch):
-    monkeypatch.setattr(updates, "_open", lambda url: FakeResponse(SETUP + b"tampered"))
+    monkeypatch.setattr(updates, "_open", lambda url, *_f: FakeResponse(SETUP + b"tampered"))
     with pytest.raises(updates.UpdateError, match="checksum"):
         updates.download(_release())
     assert not list(updates.UPDATES_DIR.glob("*"))
@@ -208,18 +208,18 @@ def test_download_refuses_a_release_without_a_checked_installer():
 
 def test_download_refuses_a_redirect_off_https(monkeypatch):
     monkeypatch.setattr(updates, "_open",
-                        lambda url: FakeResponse(SETUP, "http://example.com/x.exe"))
+                        lambda url, *_f: FakeResponse(SETUP, "http://example.com/x.exe"))
     with pytest.raises(updates.UpdateError, match="HTTPS"):
         updates.download(_release())
     assert not list(updates.UPDATES_DIR.glob("*"))
 
 
 def test_download_stops_when_cancelled_or_offline(monkeypatch):
-    monkeypatch.setattr(updates, "_open", lambda url: FakeResponse(SETUP))
+    monkeypatch.setattr(updates, "_open", lambda url, *_f: FakeResponse(SETUP))
     with pytest.raises(updates.UpdateError, match="cancelled"):
         updates.download(_release(), cancelled=lambda: True)
 
-    def offline(url):
+    def offline(url, *_feature):
         raise OSError("no network")
     monkeypatch.setattr(updates, "_open", offline)
     with pytest.raises(updates.UpdateError, match="no network"):

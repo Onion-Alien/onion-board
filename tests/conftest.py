@@ -135,6 +135,15 @@ def _never_update_for_real(monkeypatch, tmp_path):
     monkeypatch.setattr(updates, "start_install", no_installer)
 
 
+@pytest.fixture(autouse=True)
+def _switches_back_on():
+    """Settings > Privacy & security's switches (soundboard.net) are process-wide: a
+    test that switches something off doesn't leave it off for the next one."""
+    yield
+    from soundboard import net
+    net.configure_features()
+
+
 class NoMidi:
     """soundboard.midi's winmm backend with no devices: tests never open the
     developer's real MIDI controllers (a DAW may be using them)."""

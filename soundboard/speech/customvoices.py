@@ -124,11 +124,14 @@ class CustomVoice:
         if self.api_key:
             req.add_header("Authorization", f"Bearer {self.api_key}")
         try:
-            with net.urlopen(req, timeout=TIMEOUT_S) as r:   # this PC's servers stay direct
+            # this PC's servers stay direct, and work with the switch off too
+            with net.urlopen(req, timeout=TIMEOUT_S, feature="voice_servers") as r:
                 return r.read(MAX_BYTES + 1)[:MAX_BYTES]
         except urllib.error.HTTPError as e:
             detail = e.read(300).decode("utf-8", "replace").strip()
             raise RuntimeError(f"{self.name}: the server said {e.code} {detail}".strip()) from None
+        except net.FeatureOff as e:
+            raise RuntimeError(f"{self.name}: {e}") from None
         except (urllib.error.URLError, OSError) as e:
             why = getattr(e, "reason", e)
             raise RuntimeError(f"{self.name}: couldn't reach {self.url} ({why}). "
@@ -147,8 +150,11 @@ class CustomVoice:
                     a = a.replace(k, v)
                 args.append(a)
             try:
+                # a program that goes online by the proxy variables goes through the
+                # relay as a voice server (one that ignores them can't be stopped)
                 r = subprocess.run(args, input=text.encode("utf-8"), capture_output=True,
                                    timeout=TIMEOUT_S, cwd=self.cwd,
+                                   env=net.child_env("voice_servers"),
                                    creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0))
             except subprocess.TimeoutExpired:
                 raise RuntimeError(f"{self.name}: the program took too long") from None

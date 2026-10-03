@@ -1316,3 +1316,56 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
         if self.recorder.recording:
             self.recorder.stop()
         self.player.shutdown()
+
+
+class RadioOff(QWidget):
+    """The Radio tab while Radio is switched off in Settings > Privacy & security: a
+    short note and a way there. Nothing here goes online (no directory, player or web
+    view is made). It answers the main window like RadioTab, with nothing playing."""
+    clip_ready = Signal(object, str)
+    active_changed = Signal(bool)
+    open_settings = Signal()
+
+    def __init__(self):
+        super().__init__()
+        v = QVBoxLayout(self)
+        v.addStretch(1)
+        title = QLabel("Radio is off")
+        title.setObjectName("section")
+        title.setAlignment(Qt.AlignCenter)
+        v.addWidget(title)
+        note = QLabel("It's switched off in Settings > Privacy & security, so the radio "
+                      "contacts nobody: no station directory, no stations.")
+        note.setObjectName("hint")
+        note.setWordWrap(True)
+        note.setAlignment(Qt.AlignCenter)
+        v.addWidget(note)
+        go = QPushButton("Privacy & security settings")
+        go.clicked.connect(self.open_settings)
+        row = QHBoxLayout()
+        row.addStretch(1)
+        row.addWidget(go)
+        row.addStretch(1)
+        v.addLayout(row)
+        v.addStretch(2)
+
+    def start(self):
+        pass
+
+    def stop(self):
+        pass
+
+    def shutdown(self):
+        pass
+
+    def retheme(self):
+        pass
+
+    def is_active(self) -> bool:
+        return False
+
+    def live_tip(self) -> str:
+        return ""
+
+    def fit_steps(self):
+        return []

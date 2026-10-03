@@ -55,7 +55,7 @@ from soundboard.ui.overlay import Overlay
 from soundboard.ui.appspanel import AppsTab, ElidedLabel
 from soundboard.ui.triggershost import BoardHost
 from soundboard.ui.triggerstab import TriggersTab
-from soundboard.ui.radiopanel import RadioTab
+from soundboard.ui.radiopanel import RadioOff, RadioTab
 from soundboard.ui.voicepanel import VoicePanel
 from soundboard.ui.widgets import (Meter, Pad, PadGrid, SeekSlider, expand_dropped, fmt_pos,
                                    pad_height, spectrum, SLIM_PAD_H)
@@ -351,9 +351,10 @@ class MainWindow(QMainWindow):
         rv.addWidget(self.tabs, 1)
         self.sounds_page = self._build_sounds_page()
         self.tabs.addTab(self.sounds_page, "")
-        self.radio = RadioTab(self.engine, self.cfg, self._save_later, Meter)
-        self.radio.clip_ready.connect(self.on_clip)
-        self.tabs.addTab(self.radio, "")
+        # the Radio tab, or the panel saying it's switched off (Settings > Privacy)
+        self.radio_page = QStackedWidget()
+        self.radio = self._make_radio()
+        self.tabs.addTab(self.radio_page, "")
         self.apps = AppsTab(self.engine, self.cfg, self._save_later, Meter)
         self.apps.clip_ready.connect(self.on_clip)
         self.tabs.addTab(self.apps, "")
@@ -400,10 +401,9 @@ class MainWindow(QMainWindow):
         set_tab_live(self.tabs, ti, self.triggers.is_active(), icon="triggers")
         if self.triggers.needs_nudge():
             self._nudge_triggers(ti)
-        ri = self.tabs.indexOf(self.radio)
-        self.radio.active_changed.connect(lambda on: set_tab_live(
-            self.tabs, ri, on, self.radio.live_tip(), "radio"))
-        set_tab_live(self.tabs, ri, self.radio.is_active(), icon="radio")
+        self._radio_live(self.radio.is_active())
+        self._search_follow_switch()
+        net.on_change(self._follow_switches)
         ai = self.tabs.indexOf(self.apps)
         self.apps.active_changed.connect(lambda on: set_tab_live(
             self.tabs, ai, on, self.apps.live_tip(), "apps"))
@@ -1358,6 +1358,7 @@ class MainWindow(QMainWindow):
         self.flow_out.setText(out)
         self.step_lbl.setText(step)
         self.btn_install.setVisible(state == "missing")
+        self._cable_follow_switch()
         self.btn_rescan.setVisible(state == "missing")
         self.btn_nomic.setVisible(state == "ok")
         self.btn_chat.setVisible(state == "ok")
@@ -1382,6 +1383,9 @@ class MainWindow(QMainWindow):
             self.pill.style().polish(self.pill)
 
     def install_cable(self):
+        if not net.allowed("setup_downloads"):   # its download can't go through the app
+            self.toast(html.escape(net.off_message("setup_downloads")), "warn")
+            return
         script = RESOURCE_DIR / "install-vbcable.ps1"
         if not script.exists():
             QMessageBox.warning(self, "Installer missing", f"Can't find {script.name}.")
@@ -1457,6 +1461,55 @@ class MainWindow(QMainWindow):
         """A result the user should see now, whatever tab or dialog is in front (the
         status line is rewritten on every tab change and hidden in small windows)."""
         busy.toast(self, text, kind)
+
+    def _make_radio(self):
+        """The Radio tab, or with Radio switched off in Settings > Privacy & security a
+        panel saying so: then no directory, player or web view is made at all."""
+        if net.allowed("radio"):
+            r = RadioTab(self.engine, self.cfg, self._save_later, Meter)
+            r.clip_ready.connect(self.on_clip)
+        else:
+            r = RadioOff()
+            r.open_settings.connect(lambda: self.open_settings("privacy"))
+        r.active_changed.connect(self._radio_live)
+        self.radio_page.addWidget(r)
+        self.radio_page.setCurrentWidget(r)
+        return r
+
+    def _radio_live(self, on: bool):
+        set_tab_live(self.tabs, self.tabs.indexOf(self.radio_page), on,
+                     self.radio.live_tip(), "radio")
+
+    def _follow_switches(self):
+        """Settings > Privacy & security changed: the parts of the window that go
+        online follow their switches."""
+        self._radio_follow_switch()
+        self._cable_follow_switch()
+        self._search_follow_switch()
+
+    def _search_follow_switch(self):
+        """Finding sounds online switched off: no Search button, and the search box
+        only filters your own sounds."""
+        self.btn_yt.setVisible(self.ytresults.available())
+
+    def _cable_follow_switch(self):
+        allowed = net.allowed("setup_downloads")
+        self.btn_install.setEnabled(allowed)
+        self.btn_install.setToolTip("" if allowed else net.off_message("setup_downloads"))
+
+    def _radio_follow_switch(self):
+        """Radio switched off: the tab becomes the "off" panel (a playing station
+        stops); switched back on, the tab is built again."""
+        if net.allowed("radio") == isinstance(self.radio, RadioTab):
+            return
+        old, playing = self.radio, self.radio.is_active()
+        old.shutdown()
+        self.radio = self._make_radio()
+        self.radio_page.removeWidget(old)
+        old.deleteLater()
+        self._radio_live(False)
+        if playing:
+            self.toast(html.escape("Radio was switched off, so the station stopped."))
 
     def _save_now(self):
         """The debounced save. A failure (disk full, antivirus lock) is logged by
@@ -1904,7 +1957,7 @@ class MainWindow(QMainWindow):
         picked (ytdl.SOURCES) for the search box's text (a pasted link is the
         link bar's instead)."""
         text = self.search.text()
-        if ytdl.as_link(text):
+        if ytdl.as_link(text) or not self.ytresults.available():
             return
         if not self.ytresults.search(text):
             if not text.strip():
@@ -3355,6 +3408,9 @@ class MainWindow(QMainWindow):
         """Fetch the new version's installer on a thread (updates.download)."""
         rel = self.release
         if rel is None or self._downloading:
+            return
+        if not net.allowed(updates.FEATURE):   # switched off since it was found
+            self.toast(html.escape(net.off_message(updates.FEATURE)), "warn")
             return
         self._downloading = True
         self._set_update_pill("Downloading update…",
