@@ -213,6 +213,9 @@ class Config:
     version: int = CONFIG_VERSION
     main_device: str | None = None
     mon_device: str | None = None
+    # the headphones are Windows' default output, and move with it when it changes
+    # (off once another device is picked for them)
+    mon_follows_default: bool = True
     mic_device: str | None = None
     # the stream output: a device OBS captures, getting what others hear without the
     # voice chat shaping (None = off; engine.Engine._obs)

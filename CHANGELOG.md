@@ -1,5 +1,13 @@
 # Changelog
 
+## Unreleased
+
+- **Your headphones follow Windows' default output**: switch Windows from your
+  headset to your speakers (or back) while the app is open and the sounds you hear
+  move with it, instead of playing on the device you just switched away from. Picking
+  a different headphones device by hand stops the following; picking Windows'
+  default again turns it back on.
+
 ## 1.6.4 — 2026-10-03
 
 - **A Sounds folder button** on the Sounds tab (also in the *Backup* menu) opens the

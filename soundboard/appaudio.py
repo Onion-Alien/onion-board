@@ -42,6 +42,7 @@ VT_BLOB = 0x41
 VT_LPWSTR = 31
 STGM_READ = 0
 E_RENDER, DEVICE_STATE_ACTIVE = 0, 1
+E_CONSOLE = 0   # ERole: the default device (not the communications one)
 AUDCLNT_SHAREMODE_SHARED = 0
 AUDCLNT_STREAMFLAGS_LOOPBACK = 0x00020000
 AUDCLNT_STREAMFLAGS_EVENTCALLBACK = 0x00040000
@@ -412,6 +413,27 @@ class App:
         """Short display name: 'Spotify' from spotify.exe."""
         stem = os.path.splitext(self.exe)[0]
         return stem[:1].upper() + stem[1:] if stem else f"pid {self.pid}"
+
+
+def default_output_name() -> str | None:
+    """The name of Windows' default playback device, asked now (PortAudio only knows
+    the one from when it started). None if it can't be asked."""
+    if not _win:
+        return None
+    own = _co_init()
+    try:
+        with _enumerator() as en:
+            d = c_void_p()
+            en.call(4, (c_int, c_int, POINTER(c_void_p)), E_RENDER, E_CONSOLE, byref(d),
+                    what="GetDefaultAudioEndpoint")
+            with Com(d.value) as dev:
+                return _device_name(dev) or None
+    except ComError:
+        log.debug("no default playback device", exc_info=True)
+        return None
+    finally:
+        if own:
+            _ole32.CoUninitialize()
 
 
 def list_apps() -> list[App]:

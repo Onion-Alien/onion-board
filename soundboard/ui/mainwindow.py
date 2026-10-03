@@ -27,8 +27,8 @@ from soundboard import engine as eng
 from soundboard import theme, winkeys, ytdl
 from soundboard.engine import SR, Engine
 from soundboard.engine import is_virtual as is_virtual_cable
-from soundboard import (autostart, backup, destination, library, midi, remote, soundfx,
-                        thumbs, trash, updates, voicesdk)
+from soundboard import (appaudio, autostart, backup, destination, library, midi, remote,
+                        soundfx, thumbs, trash, updates, voicesdk)
 from soundboard import shellicon, watchaddon
 from soundboard.replay import InstantReplay
 from soundboard.library import (AUDIO_EXTS, PAD_COLORS, RESOURCE_DIR, Config, SoundMeta,
@@ -87,6 +87,7 @@ TICK_MS = 33         # the UI timer while the window is on screen (meters, visua
 TICK_IDLE_MS = 250   # ...and while it's in the tray or minimised (push-to-talk, watchdog)
 GLOW_STEPS = 4       # how many glow levels the taskbar / tray icon has while sound plays
 ICON_GLOW_MS = 120   # ...and how often at most it changes
+DEFAULT_POLL_MS = 1500   # how often Windows' default output is checked
 LOOSE_WAIT_MS = 1500   # a file dragged into the sounds folder is looked at again (ms)
 MINI_SIZE = QSize(440, 380)   # below this the window becomes the mini player...
 MINI_PAD_ROWS = 1             # ...which has the pads above it when this many rows fit
@@ -195,6 +196,7 @@ class MainWindow(QMainWindow):
         self.setup_state = ""
         self._pill_short = False          # the header pill's short text (narrow window)
         self.cable_bad = []               # cable ends not at 48 kHz (_check_cable_format)
+        self._default_out = appaudio.default_output_name()   # see _follow_default_output
         self._build_ui()
         self._init_devices()
         if self.setup_state != "ok":
@@ -221,6 +223,11 @@ class MainWindow(QMainWindow):
         self._voice_timer.timeout.connect(self._poll_voice)
         if self.voice_watch is not None:
             self._voice_timer.start(VOICE_POLL_MS)
+        # the headphones follow Windows' default output when it changes
+        self._default_timer = QTimer(self)
+        self._default_timer.timeout.connect(self._follow_default_output)
+        if sys.platform == "win32":
+            self._default_timer.start(DEFAULT_POLL_MS)
         self._init_fit()
         self.resize(1180, 720)
         if self.cfg.always_on_top:
@@ -1067,6 +1074,8 @@ class MainWindow(QMainWindow):
             c.mic_device = None   # was set to the cable: fall back to the real mic
         if not c.main_device or eng.find_device("output", c.main_device) is None:
             c.main_device = next(iter(eng.virtual_outputs()), None) or c.main_device
+        if c.mon_follows_default:   # Windows' default now, not when PortAudio started
+            c.mon_device = self._default_output() or c.mon_device
         if not c.mon_device:
             dflt = eng.default_device_name("output")
             c.mon_device = dflt if dflt and not is_virtual_cable(dflt) else \
@@ -1089,6 +1098,41 @@ class MainWindow(QMainWindow):
         e.set_obs_device(self._obs_name(c.obs_device))
         self._check_cable_format()
         self._update_status()
+
+    def _default_output(self) -> str | None:
+        """Windows' default output as the device lists name it (None: unknown, or the
+        cable, which is never the headphones)."""
+        idx = eng.find_device("output", self._default_out)
+        name = eng.list_name(idx) if idx is not None else None
+        return None if name is None or is_virtual_cable(name) else name
+
+    def _follow_default_output(self):
+        """Windows' default output changed (headphones → speakers): the headphones
+        output moves with it, unless another device was picked for it by hand."""
+        now = appaudio.default_output_name()
+        if not now or now == self._default_out:
+            return
+        self._default_out = now
+        c = self.cfg
+        if not c.mon_follows_default:
+            return
+        name = self._default_output()
+        if name is None and not is_virtual_cable(now):
+            self.refresh_devices()   # plugged in since the app started: not listed yet
+            name = self._default_output()
+        if name is None or name == c.mon_device:
+            return
+        log.info("Windows' default output changed: headphones %r -> %r", c.mon_device, name)
+        c.mon_device = name
+        self._fill_combo(self.cb_mon, [d["name"] for d in eng.list_devices("output")], name)
+        self.engine.set_mon_device(name)
+        obs = self._obs_name(c.obs_device)
+        if self.engine.names["obs"] != obs:
+            self.engine.set_obs_device(obs)
+        self._save_now()
+        self._update_status()
+        self.status.setText(f"You hear your sounds on {html.escape(name)} now: it's "
+                            "Windows' default output.")
 
     def _check_cable_format(self):
         """Note which ends of the cable in use aren't at 48 kHz (shown on the Setup tab)."""
@@ -1147,6 +1191,8 @@ class MainWindow(QMainWindow):
             self._check_cable_format()
         elif attr == "mon_device":
             self.engine.set_mon_device(name)
+            # picking Windows' default keeps following it; anything else stays put
+            self.cfg.mon_follows_default = name is not None and name == self._default_output()
         else:
             self.engine.set_mic_device(name)
         obs = self._obs_name(self.cfg.obs_device)   # never the cable or headphones too

@@ -109,12 +109,21 @@ def default_device_name(kind: str) -> str | None:
     return sd.query_devices(idx)["name"]
 
 
+def list_name(index: int) -> str:
+    """A device's name as the device lists show it."""
+    return sd.query_devices(index)["name"]
+
+
 def find_device(kind: str, name: str | None) -> int | None:
     if not name:
         return None
     devs = list_devices(kind)
     for d in devs:
         if d["name"] == name:
+            return d["index"]
+    squash = " ".join(name.split()).lower()   # Windows' own name may space it differently
+    for d in devs:
+        if " ".join(d["name"].split()).lower() == squash:
             return d["index"]
     for d in devs:  # loose match (device renamed / number changed)
         if name.lower() in d["name"].lower() or d["name"].lower() in name.lower():
