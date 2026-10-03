@@ -1,4 +1,5 @@
-"""Built-in voice effects: plain numpy/scipy DSP, cheap enough for the mic callback.
+"""Built-in voice effects: plain numpy DSP (filters from soundboard.dsp), cheap enough
+for the mic callback.
 
 Every effect works on 1-D float32 blocks and keeps its own memory between blocks.
 Recursive delays (echo, reverb) are computed in chunks no longer than their delay,
@@ -12,58 +13,36 @@ space. The presets at the bottom are built from these building blocks.
 from __future__ import annotations
 
 import numpy as np
-from scipy.signal import butter, lfilter, sosfilt
-
+from soundboard.dsp import SmoothSos, butter, lfilter, matched_biquad, sosfilt, sosfilt_bank
 from soundboard.voicefx import Effect, Param, register
 
 F32 = np.float32
 
 
 def _one_pole_lowpass(hz: float, rate: int) -> np.ndarray:
-    return butter(1, min(hz, rate * 0.45), btype="low", fs=rate, output="sos").astype(F32)
+    return butter(1, min(hz, rate * 0.45), btype="low", fs=rate).astype(F32)
 
 
 def _biquad(kind: str, f0: float, rate: int, gain_db: float, q: float = 0.707) -> np.ndarray:
-    """One RBJ cookbook section as a (1, 6) sos row: 'peak', 'lowshelf' or 'highshelf'."""
-    A = 10 ** (gain_db / 40)
-    w = 2 * np.pi * min(f0, rate * 0.45) / rate
-    c, s = np.cos(w), np.sin(w)
-    if kind == "peak":
-        al = s / (2 * q)
-        b = (1 + al * A, -2 * c, 1 - al * A)
-        a = (1 + al / A, -2 * c, 1 - al / A)
-    else:
-        al = s / 2 * np.sqrt(2.0)               # shelf slope 1
-        r = 2 * np.sqrt(A) * al
-        if kind == "lowshelf":
-            b = (A * ((A + 1) - (A - 1) * c + r), 2 * A * ((A - 1) - (A + 1) * c),
-                 A * ((A + 1) - (A - 1) * c - r))
-            a = ((A + 1) + (A - 1) * c + r, -2 * ((A - 1) + (A + 1) * c),
-                 (A + 1) + (A - 1) * c - r)
-        else:
-            b = (A * ((A + 1) + (A - 1) * c + r), -2 * A * ((A - 1) + (A + 1) * c),
-                 A * ((A + 1) + (A - 1) * c - r))
-            a = ((A + 1) - (A - 1) * c + r, 2 * ((A - 1) - (A + 1) * c),
-                 (A + 1) - (A - 1) * c - r)
-    return (np.array([b + a]) / a[0]).astype(F32)
+    """One EQ band as a (1, 6) sos row: 'peak', 'lowshelf' or 'highshelf', matched to
+    its analog shape up to Nyquist (dsp.matched_biquad)."""
+    return matched_biquad(kind, f0, gain_db, rate, q)[None].astype(F32)
 
 
 class _Filter:
-    """sosfilt with memory, redesigned only when its settings change."""
+    """A filter with memory, redesigned only when its settings change. A new design
+    (or None: straight through) is crossfaded in over the block, so turning a knob
+    doesn't click (dsp.SmoothSos)."""
 
     def __init__(self):
         self.key = None
         self.sos = None
-        self.zi = None
+        self.f = SmoothSos()
 
     def run(self, x: np.ndarray, key, design) -> np.ndarray:
         if key != self.key:
-            sos = design()
-            if self.sos is None or sos.shape != self.sos.shape:
-                self.zi = np.zeros((len(sos), 2), F32)
-            self.key, self.sos = key, sos
-        y, self.zi = sosfilt(self.sos, x, zi=self.zi)
-        return y.astype(F32, copy=False)
+            self.key, self.sos = key, design()
+        return self.f.run(x, self.sos).astype(F32, copy=False)
 
 
 # --------------------------------------------------------------------------- pitch
@@ -169,7 +148,7 @@ class PitchShift(Effect):
         if ratio > 1.02:                         # about to read faster: keep aliasing out
             cut = 0.45 * rate / ratio
             new = self.aa.run(new, round(cut), lambda: butter(
-                4, cut, btype="low", fs=rate, output="sos").astype(F32))
+                4, cut, btype="low", fs=rate).astype(F32))
         self.stretched = np.concatenate([self.stretched, new])
 
     def _remember(self, x):
@@ -250,10 +229,10 @@ class Robot(Effect):
         rate = rate or 48000                    # the chain builds effects before the mic opens
         hi = min(self.HI_HZ, rate * 0.42)
         edges = np.geomspace(self.LO_HZ, hi, self.BANDS + 1)
-        self.sos = [butter(2, [edges[i], edges[i + 1]], btype="band", fs=rate,
-                           output="sos").astype(F32) for i in range(self.BANDS)]
-        self.zi = [np.zeros((len(s), 2, 2), F32) for s in self.sos]   # (voice, carrier)
-        self.env_sos = butter(1, self.ENV_HZ, btype="low", fs=rate, output="sos").astype(F32)
+        self.bank = np.stack([butter(2, [edges[i], edges[i + 1]], btype="band", fs=rate)
+                              for i in range(self.BANDS)]).astype(F32)
+        self.state = None        # the bank's memory, for (voice, carrier)
+        self.env_sos = butter(1, self.ENV_HZ, btype="low", fs=rate).astype(F32)
         self.env_zi = np.zeros((1, 2 * self.BANDS, 2), F32)
         self.harmonics = np.arange(1, int(hi / self.params[0].lo) + 1, dtype=np.float64)
         self.phase = 0.0
@@ -271,10 +250,8 @@ class Robot(Effect):
     def run(self, x, rate):
         n = len(x)
         pair = np.stack([x, self._carrier(n, rate)])
-        bands = np.empty((2 * self.BANDS, n), F32)
-        for i, sos in enumerate(self.sos):
-            y, self.zi[i] = sosfilt(sos, pair, zi=self.zi[i])
-            bands[i], bands[self.BANDS + i] = y[0], y[1]
+        y, self.state = sosfilt_bank(self.bank, pair, self.state)   # (bands, 2, n)
+        bands = np.concatenate([y[:, 0], y[:, 1]])                 # voice's, then carrier's
         env, self.env_zi = sosfilt(self.env_sos, np.abs(bands), zi=self.env_zi)
         gain = np.minimum(env[:self.BANDS] / (env[self.BANDS:] + F32(2e-3)), F32(20))
         wet = (gain * bands[self.BANDS:]).sum(0).astype(F32)
@@ -329,9 +306,10 @@ class Tone(Effect):
 
     def run(self, x, rate):
         b, p, t = self.p["bass"], self.p["presence"], self.p["treble"]
-        if not (b or p or t):
+        if not (b or p or t) and self.f.sos is None:
             return x
-        return self.f.run(x, (b, p, t), lambda: np.vstack([
+        # all at 0: fade out to straight through (then the line above skips it)
+        return self.f.run(x, (b, p, t), lambda: None if not (b or p or t) else np.vstack([
             _biquad("lowshelf", 160, rate, b), _biquad("peak", 2500, rate, p, 1.0),
             _biquad("highshelf", 6000, rate, t)]))
 
@@ -361,7 +339,7 @@ class Radio(Effect):
         hi = min(max(hi, lo * 1.5), rate * 0.45)
 
         def design():
-            return butter(2, [lo, hi], btype="band", fs=rate, output="sos").astype(F32)
+            return butter(2, [lo, hi], btype="band", fs=rate).astype(F32)
 
         y = self.bp.run(x, (lo, hi), design)
         g = F32(10 ** (self.p["drive"] / 20))
@@ -508,19 +486,35 @@ class Reverb(Effect):
         self.combs[k] = hist
         return out
 
+    def _all_combs(self, x, g, a):
+        """All the combs at once, for a block no longer than the shortest delay (the
+        usual case): each one's feedback is then already in its history, so the
+        eight damping filters run as one call over an (8, n) array."""
+        n = len(x)
+        fed, zf = lfilter([1 - a], [1, -a], np.stack([h[:n] for h in self.combs]),
+                          zi=np.stack(self.damp))
+        v = x[None] + F32(g) * fed.astype(F32)
+        for k, h in enumerate(self.combs):
+            self.combs[k] = np.concatenate([h[n:], v[k]])
+            self.damp[k] = zf[k]
+        return v.sum(axis=0)
+
     def run(self, x, rate):
         g = 0.7 + 0.28 * self.p["size"]
         a = float(np.exp(-2 * np.pi * self.p["tone"] / rate))
-        wet = np.zeros_like(x)
-        for k in range(len(self.combs)):
-            wet += self._comb(x, k, g, a)
+        if len(x) <= min(len(h) for h in self.combs):
+            wet = self._all_combs(x, g, a)
+        else:
+            wet = np.zeros_like(x)
+            for k in range(len(self.combs)):
+                wet += self._comb(x, k, g, a)
         wet *= F32(0.25 * np.sqrt(1 - g * g))     # same loudness at every size
         for k, (xh, yh) in enumerate(self.aps):
             wet, xh, yh = _allpass(wet, xh, yh, 0.5)
             self.aps[k] = (xh, yh)
         # the combs pile up below ~150 Hz (they all agree there): keep the mud out
         wet = self.hp.run(wet, "hp", lambda: butter(
-            2, 150, btype="high", fs=rate, output="sos").astype(F32))
+            2, 150, btype="high", fs=rate).astype(F32))
         mix = F32(self.p["mix"])
         return x * (1 - F32(0.6) * mix) + wet * (mix * F32(0.8))
 

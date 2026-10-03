@@ -42,8 +42,8 @@ from dataclasses import asdict, dataclass
 from functools import lru_cache
 
 import numpy as np
-from scipy import fft as sfft
-from scipy.signal import butter, lfilter, sosfilt, sosfreqz
+
+from soundboard.dsp import butter, lfilter, sos_response, sosfilt
 
 F32 = np.float32
 CEILINGS = (0, 16000, 12000, 8000, 6000, 4000)   # 0 = none; the rest are codec bandwidths
@@ -166,13 +166,13 @@ def apply(cfg, engine) -> Dest:
 # --------------------------------------------------------------------------- make-up
 
 def _cut_sos(hz: float, rate: int) -> np.ndarray:
-    return butter(CUT_ORDER, hz / (rate / 2), "high", output="sos")
+    return butter(CUT_ORDER, hz / (rate / 2), "high")
 
 
 @lru_cache(maxsize=32)
 def _cut_power(hz: int, rate: int, n: int) -> np.ndarray:
     """|H|^2 of the low cut at an n-point rfft's bins."""
-    _, h = sosfreqz(_cut_sos(hz, rate), worN=np.fft.rfftfreq(n, 1 / rate), fs=rate)
+    h = sos_response(_cut_sos(hz, rate), np.fft.rfftfreq(n, 1 / rate), rate)
     return (np.abs(h) ** 2).astype(np.float64)
 
 
@@ -195,7 +195,7 @@ def cut_shares(data: np.ndarray, rate: int) -> dict[int, float]:
     frames = (frames[:, :, 0] + frames[:, :, 1]) * F32(
         0.5 / 32768.0 if data.dtype == np.int16 else 0.5)
     frames *= np.hanning(n).astype(F32)
-    z = sfft.rfft(frames, axis=1)
+    z = np.fft.rfft(frames, axis=1)
     spec = z.real * z.real + z.imag * z.imag
     power = spec.sum(axis=1, dtype=np.float64)
     if power.max() <= 1e-18:
@@ -263,17 +263,17 @@ class Processor:
         nyq = r / 2
         if d.bass > 0:
             # steep split so the midrange never reaches the saturator
-            self._lp = _Sos(butter(4, self.BASS_SPLIT / nyq, "low", output="sos"))
+            self._lp = _Sos(butter(4, self.BASS_SPLIT / nyq, "low"))
             self._bp = _Sos(butter(4, [self.BASS_BAND[0] / nyq, min(self.BASS_BAND[1] / nyq,
                                                                     0.95)],
-                                   "band", output="sos"))
+                                   "band"))
             self._env_zi = np.zeros(1)
         else:
             self._lp = self._bp = None
         self._cut = _Sos(_cut_sos(d.lowcut, r)) if d.lowcut and d.lowcut < nyq * 0.9 else None
         if d.ceiling and d.ceiling < nyq * 0.9:
             # 8th order: a codec's band edge is a wall, not a slope
-            self._ceil = _Sos(butter(8, d.ceiling / nyq, "low", output="sos"))
+            self._ceil = _Sos(butter(8, d.ceiling / nyq, "low"))
         else:
             self._ceil = None
         self.dest = d

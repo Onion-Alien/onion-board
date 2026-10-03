@@ -33,6 +33,7 @@ if ($Clean) { $cleanArg = @("--clean") }
     --add-data "assets\art;art" `
     --add-data "assets\radio;radio" `
     --copy-metadata yt-dlp --collect-all yt_dlp_ejs `
+    --hidden-import scipy.signal --hidden-import scipy.ndimage --hidden-import scipy.fft `
     --paths . `
     main.py
 if ($LASTEXITCODE -ne 0) { throw "PyInstaller failed" }

@@ -20,8 +20,8 @@ from dataclasses import dataclass
 
 import numpy as np
 import soxr
-from scipy.signal import butter, sosfilt
 
+from soundboard.dsp import butter, sosfilt
 from soundboard.library import FFMPEG_TIMEOUT, _ffmpeg
 
 SR = 48000
@@ -210,9 +210,9 @@ def downmix(x: np.ndarray) -> np.ndarray:
 def highpass(x: np.ndarray, hz: float, order: int = 13, tail_hz: float = 0) -> np.ndarray:
     """Butterworth high-pass along axis 0 (a chat app's capture filter), optionally
     followed by a gentle 2nd-order one at tail_hz."""
-    sos = butter(order, hz, "highpass", fs=SR, output="sos")
+    sos = butter(order, hz, "highpass", fs=SR)
     if tail_hz:
-        sos = np.vstack([sos, butter(2, tail_hz, "highpass", fs=SR, output="sos")])
+        sos = np.vstack([sos, butter(2, tail_hz, "highpass", fs=SR)])
     return sosfilt(sos, np.asarray(x, F32), axis=0).astype(F32)
 
 

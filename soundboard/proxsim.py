@@ -22,7 +22,8 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 
 import numpy as np
-from scipy.signal import butter, lfilter, sosfilt
+
+from soundboard.dsp import butter, lfilter, sosfilt
 
 SR = 48000
 F32 = np.float32
@@ -169,11 +170,11 @@ def apply(x: np.ndarray, model: str, distance: float = 0.0, variant: str = "") -
     if v.band:
         lo, hi = v.band
         hi = min(hi, SR / 2 - 100)
-        y = sosfilt(butter(4, (lo, hi), "bandpass", fs=SR, output="sos"), y)
+        y = sosfilt(butter(4, (lo, hi), "bandpass", fs=SR), y)
     hz = cutoff_hz(model, distance, variant)
     if hz and hz < SR / 2 - 100:
         y = (_resonant_lowpass(y, hz, v.lowpass_q) if v.lowpass_q > 0.71
-             else sosfilt(butter(2, hz, "lowpass", fs=SR, output="sos"), y))
+             else sosfilt(butter(2, hz, "lowpass", fs=SR), y))
     y = y * gain(model, distance, variant)
     return np.repeat(y[:, None], 2, axis=1).astype(F32)
 
