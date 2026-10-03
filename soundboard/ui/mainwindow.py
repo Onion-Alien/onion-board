@@ -29,7 +29,7 @@ from soundboard.engine import SR, Engine
 from soundboard.engine import is_virtual as is_virtual_cable
 from soundboard import (appaudio, autostart, backup, destination, library, midi, remote,
                         soundfx, thumbs, trash, updates, voicesdk)
-from soundboard import shellicon, watchaddon
+from soundboard import net, shellicon, watchaddon
 from soundboard.replay import InstantReplay
 from soundboard.library import (AUDIO_EXTS, PAD_COLORS, RESOURCE_DIR, Config, SoundMeta,
                                 cache_keep, clean_tags, duplicate, fingerprint,
@@ -58,7 +58,7 @@ from soundboard.ui.triggerstab import TriggersTab
 from soundboard.ui.radiopanel import RadioTab
 from soundboard.ui.voicepanel import VoicePanel
 from soundboard.ui.widgets import (Meter, Pad, PadGrid, SeekSlider, expand_dropped, fmt_pos,
-                                   pad_height, spectrum)
+                                   pad_height, spectrum, SLIM_PAD_H)
 from soundboard.wheelguard import no_wheel
 from soundboard.winkeys import Hotkeys
 
@@ -120,6 +120,7 @@ class MainWindow(QMainWindow):
         self.setWindowTitle(self.title)
         self.setAcceptDrops(True)   # files dropped outside the pad grid: see dropEvent
         self.cfg = Config.load()
+        net.configure_from(self.cfg)   # before anything goes online
         app = QApplication.instance()
         if app is not None:   # before the UI is built, so everything polishes in-theme
             self.cfg.theme = theme.apply(app, self.cfg.theme)
@@ -1285,11 +1286,7 @@ class MainWindow(QMainWindow):
                                 "Audio device problem — "
                                 + " · ".join(errs) + "</span>")
             return
-        n = len(self.cfg.sounds)
         text = ""
-        if self.tabs.currentWidget() is self.sounds_page:
-            text = (f"{n} sound{'s' if n != 1 else ''} · click to play · right-click to "
-                    "edit / set hotkey · drag to reorder · drop files to add")
         xr = sum(e.xruns.values())
         self._xruns_shown = xr
         if xr:
@@ -3749,8 +3746,12 @@ class MainWindow(QMainWindow):
             need = self._full.minimumSizeHint()   # even the smallest layout won't fit
             mini = need.width() > size.width() or need.height() > size.height()
         self._set_mini(mini)
-        if mini:   # the pads too, when there's room for a couple of rows of them
-            show = self._mini_pad_room(size) >= MINI_PAD_ROWS * self._mini_row(size)
+        if mini:   # the pads too: cards with room for a couple of rows of them, else
+            # one-line rows, so they can still be seen and played however small it gets
+            room = self._mini_pad_room(size)
+            self.grid.set_slim(room < MINI_PAD_ROWS * self._mini_row(size))
+            m = self.grid.grid.contentsMargins()
+            show = room >= SLIM_PAD_H + m.top() + m.bottom()
             if self._pads_scroll.isHidden() == show:
                 self._pads_scroll.setVisible(show)
 
@@ -3765,7 +3766,7 @@ class MainWindow(QMainWindow):
         m, g = self._mini_v.contentsMargins(), self.grid.grid.contentsMargins()
         bar = self._pads_scroll.verticalScrollBar().sizeHint().width()
         room = size.width() - m.left() - m.right() - g.left() - g.right() - bar
-        return pad_height(self.grid.fit_width(room)[1]) + self.grid.grid.spacing()
+        return pad_height(self.grid.fit_width(room, slim=False)[1]) + 10
 
     def is_mini(self) -> bool:
         return self._pages.currentIndex() == 1
@@ -3778,6 +3779,8 @@ class MainWindow(QMainWindow):
         self.setUpdatesEnabled(False)
         try:
             self.grid.set_two_up(on)
+            if not on:
+                self.grid.set_slim(False)
             if on:
                 scroll.setMinimumHeight(0)
                 self._mini_v.insertWidget(0, scroll, 1)

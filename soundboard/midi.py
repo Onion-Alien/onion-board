@@ -106,6 +106,7 @@ class _MIDIINCAPSW(ctypes.Structure):
 class WinMM:
     """The real devices. `open(index, key)` starts one; its messages go to
     `on_message(key, msg)` and `on_closed(key)` on winmm's thread."""
+    slow = True   # MidiIn lists its devices on a thread
 
     def __init__(self):
         self.on_message = lambda key, msg: None
@@ -176,6 +177,7 @@ class MidiIn(QObject):
     pressed = Signal(str)
     released = Signal(str)
     busy_changed = Signal(list)
+    _scanned = Signal(list)   # device names from the scan thread
 
     def __init__(self, backend=None):
         super().__init__()
@@ -195,6 +197,12 @@ class MidiIn(QObject):
         self._timer = QTimer(self)
         self._timer.setInterval(POLL_MS)
         self._timer.timeout.connect(self.sync)
+        # winmm's device list can take seconds (the first call loads every MIDI driver:
+        # it froze the hotkey dialog for 6 s), so the real one is read on a thread
+        self._async = getattr(self.backend, "slow", False)
+        self._devs: list[str] = []
+        self._scanning = False
+        self._scanned.connect(self._on_scanned)
 
     # -- what to open
     def want(self, devices: set[str]):
@@ -215,7 +223,8 @@ class MidiIn(QObject):
         """Connected devices: display name -> winmm index."""
         seen: dict[str, int] = {}
         out = {}
-        for i, name in enumerate(self.backend.devices()):
+        devs = self._devs if self._async else self.backend.devices()
+        for i, name in enumerate(devs):
             if not name:
                 continue
             seen[name] = seen.get(name, 0) + 1
@@ -224,6 +233,28 @@ class MidiIn(QObject):
 
     def sync(self):
         """Open what's needed and connected, close the rest; retry busy ones later."""
+        if self._async and (self._capturing or self._wanted) and not self._scanning:
+            self._scanning = True
+            threading.Thread(target=self._scan_thread, daemon=True, name="midi-scan").start()
+        self._apply()
+
+    def _scan_thread(self):
+        try:
+            names = list(self.backend.devices())
+        except Exception:  # noqa: BLE001 - no devices this time; tried again next poll
+            log.exception("MIDI: listing devices failed")
+            names = list(self._devs)
+        self._scanned.emit(names)
+
+    def _on_scanned(self, names: list):
+        self._scanning = False
+        if names != self._devs:
+            self._devs = names
+            self._apply()
+            if self._capturing:
+                self.busy_changed.emit(list(self.busy))   # the dialog's device list
+
+    def _apply(self):
         needed = None if self._capturing else self._wanted
         present = self._scan() if (self._capturing or self._wanted) else {}
         for name, (key, _h) in list(self._open.items()):

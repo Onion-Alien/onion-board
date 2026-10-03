@@ -212,3 +212,29 @@ def test_the_hotkey_dialog_says_when_a_pad_is_busy(qapp):
         d.reject()
     finally:
         hk.stop()
+
+
+def test_a_slow_device_list_doesnt_block_the_ui(qapp):
+    """winmm can take seconds to list devices (it froze the hotkey dialog): the real
+    backend is read on a thread, and the device opens once the list comes back."""
+    import threading
+    import time
+
+    from conftest import process_events
+    gate = threading.Event()
+
+    class Slow(FakeWinMM):
+        slow = True
+
+        def devices(self):
+            gate.wait(5)
+            return super().devices()
+
+    w = Slow(["LPD8"])
+    m = midi.MidiIn(w)
+    t = time.monotonic()
+    m.capture(True)
+    assert time.monotonic() - t < 0.5 and not w.opened
+    gate.set()
+    assert process_events(qapp, lambda: w.opened, 5)
+    m.capture(False)

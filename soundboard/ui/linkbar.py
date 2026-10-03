@@ -138,6 +138,8 @@ class LinkBar(QFrame):
         self.info.setText(f"<span style='color:{color}'>{text}</span>" if color else text)
 
     def _buttons(self):
+        # already added: no second "Add as sound" next to "✓ Added …"
+        self.btn_add.setVisible(not self.url or self.url != getattr(self, "_added", ""))
         self.btn_add.setEnabled(bool(self.url) and not self._busy)
         self.btn_play.setEnabled(bool(self.url) and not self._busy)
         self.btn_add.setText("Adding…" if self._busy == "add" else "Add as sound")
@@ -272,6 +274,8 @@ class LinkBar(QFrame):
             return
         # the download finished one way or another
         was, self._busy = self._busy, ""
+        if kind == "added":
+            self._added = url
         self._buttons()
         if kind == "added":
             meta, data, title = payload

@@ -139,10 +139,8 @@ def test_mic_check_button_keeps_its_label(window):
     assert window.btn_check.text() == "Hear what they hear"
 
 
-def test_pad_hints_show_only_on_the_sounds_tab(window):
+def test_no_pad_hint_line_under_the_player(window):
     window.tabs.setCurrentWidget(window.sounds_page)
-    assert "click to play" in window.status.text()
-    window.tabs.setCurrentWidget(window.setup_page)
     assert "click to play" not in window.status.text()
 
 
@@ -191,9 +189,13 @@ def test_tiny_window_becomes_mini_player_and_back(window, qapp):
     assert window.mini_pp.isVisibleTo(window) and window.mini_air.isVisibleTo(window)
     assert window.mini_name.text() == "Airhorn"
     assert not window.grid.isVisibleTo(window)    # no room for pads
+    window.resize(540, 180)                        # short: one-line rows, not cards
+    window._refit()
+    assert window.is_mini() and window.grid.isVisibleTo(window) and window.grid.slim
+    assert window.pads["s0"].height() <= 30
     window.resize(360, 700)                        # tall and narrow: the pads come along
     window._refit()
-    assert window.is_mini() and window.grid.isVisibleTo(window)
+    assert window.is_mini() and window.grid.isVisibleTo(window) and not window.grid.slim
     window.mini_air.setChecked(False)              # one switch, both buttons
     assert not window.btn_air.isChecked() and window.engine.sending is False
     window.btn_air.setChecked(True)

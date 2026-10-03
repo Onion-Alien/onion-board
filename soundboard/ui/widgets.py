@@ -179,6 +179,9 @@ def spectrum(data: np.ndarray, frac: float, n: int) -> np.ndarray:
 MINI_PAD_MIN_W = 96   # the mini player's two-a-row pads get no smaller than this
 
 
+SLIM_PAD_H = 30      # a pad as a one-line row: the mini player when it's too small for cards
+
+
 def pad_height(width: int) -> int:
     return int(width * 0.62)
 
@@ -396,6 +399,9 @@ class Pad(QAbstractButton):
 
     def paintEvent(self, e):
         self.describe()
+        if self.height() <= SLIM_PAD_H:
+            self._paint_slim()
+            return
         p = QPainter(self)
         p.setRenderHint(QPainter.Antialiasing)
         p.setRenderHint(QPainter.SmoothPixmapTransform)
@@ -517,6 +523,71 @@ class Pad(QAbstractButton):
                            fm.elidedText(hk, Qt.ElideRight, int(badge.width()) - 8))
 
 
+    def _paint_slim(self):
+        """A one-line row: accent dot, name, duration; progress along the bottom."""
+        p = QPainter(self)
+        p.setRenderHint(QPainter.Antialiasing)
+        r = QRectF(self.rect()).adjusted(1, 1, -1, -1)
+        T = theme.T
+        accent = QColor(self.meta.color)
+        lo, hi, k = QColor(T["card"]), QColor(T["card_hi"]), self._hover_k
+        base = QColor.fromRgbF(lo.redF() + (hi.redF() - lo.redF()) * k,
+                               lo.greenF() + (hi.greenF() - lo.greenF()) * k,
+                               lo.blueF() + (hi.blueF() - lo.blueF()) * k)
+        if self._down:
+            base = base.darker(108)
+        path = QPainterPath()
+        path.addRoundedRect(r, 7, 7)
+        p.fillPath(path, base)
+        playing = self.progress is not None
+        if playing:
+            p.save()
+            p.setClipPath(path)
+            wash = QColor(accent)
+            wash.setAlpha(40)
+            p.fillPath(path, wash)
+            p.fillRect(QRectF(r.left(), r.bottom() - 2, r.width() * self.progress, 2), accent)
+            p.restore()
+        if playing:
+            pen = QPen(accent, 1.8)
+            if self.paused:
+                pen.setStyle(Qt.DashLine)
+        elif self.picked:
+            pen = QPen(QColor(T["accent"]), 2)
+        elif self.selected:
+            pen = QPen(QColor(T["border_hi"]), 1.4)
+        else:
+            pen = QPen(QColor(T["border"]), 1)
+        p.setPen(pen)
+        p.drawPath(path)
+        if self.hasFocus() and self._kbd_focus:
+            p.setPen(QPen(QColor(T["text_hi"]), 1.2, Qt.DashLine))
+            p.drawRoundedRect(r.adjusted(2, 2, -2, -2), 5, 5)
+        p.setPen(Qt.NoPen)
+        p.setBrush(QColor(T["accent"]) if self.picked else accent)
+        p.drawEllipse(QRectF(r.left() + 9, r.center().y() - 4, 8, 8))
+        f = QFont(self.font())
+        f.setPointSizeF(8.5)
+        p.setFont(f)
+        fm = p.fontMetrics()
+        if self.state in ("loading", "rendering"):
+            right, rc = ("applying…" if self.state == "rendering" else "loading…"), T["muted"]
+        elif self.state == "error":
+            right, rc = "can't load", "#ff6b6b"
+        else:
+            right = "❚❚" if self.paused else f"{self.meta.duration:.1f}s"
+            rc = T["muted"]
+        rw = fm.horizontalAdvance(right) + 4
+        p.setPen(QColor(rc))
+        p.drawText(r.adjusted(0, 0, -9, 0), Qt.AlignRight | Qt.AlignVCenter, right)
+        f.setBold(True)
+        p.setFont(f)
+        text_r = r.adjusted(24, 0, -14 - rw, 0)
+        p.setPen(QColor(T["text_hi"] if self.state == "ready" else T["muted"]))
+        p.drawText(text_r, Qt.AlignLeft | Qt.AlignVCenter,
+                   p.fontMetrics().elidedText(self.meta.name, Qt.ElideRight,
+                                              int(text_r.width())))
+
     def _paint_picture(self, p: QPainter, r: QRectF, pic):
         """The picture, cropped to fill the pad, darkened towards the bottom for the text."""
         dpr = pic.devicePixelRatio() or 1.0
@@ -573,6 +644,7 @@ class PadGrid(QWidget):
         self.pads: list[Pad] = []
         self.pad_w = 150         # the size picked (Pad size); narrower only when it won't fit
         self.two_up = False      # the mini player: two smaller pads a row rather than one
+        self.slim = False        # a tiny mini player: one-line rows instead of cards
         self.grid = QGridLayout(self)
         self.grid.setSpacing(10)
         self.grid.setContentsMargins(4, 4, 4, 4)
@@ -623,10 +695,22 @@ class PadGrid(QWidget):
             self.two_up = on
             self.relayout(force=True)
 
-    def fit_width(self, room: int) -> tuple[int, int]:
+    def set_slim(self, on: bool):
+        if on != self.slim:
+            self.slim = on
+            self.grid.setSpacing(4 if on else 10)
+            self.relayout(force=True)
+
+    def pad_h(self, w: int) -> int:
+        return SLIM_PAD_H if self.slim else pad_height(w)
+
+    def fit_width(self, room: int, slim: bool | None = None) -> tuple[int, int]:
         """(columns, pad width) for `room` pixels: the picked size, but never wider than
-        the room, and two a row in the mini player while they'd still be a usable size."""
-        sp = self.grid.spacing()
+        the room, and two a row in the mini player while they'd still be a usable size.
+        Slim rows take the whole width, one a row."""
+        if self.slim if slim is None else slim:
+            return 1, max(1, room)
+        sp = 10
         w = max(1, min(self.pad_w, room))
         if self.two_up and (room + sp) // (w + sp) < 2 and room - sp >= 2 * MINI_PAD_MIN_W:
             w = (room - sp) // 2
@@ -637,7 +721,7 @@ class PadGrid(QWidget):
         m = self.grid.contentsMargins()
         if not self.pads or self._shape is None:
             return 0
-        return pad_height(self._shape[1]) + m.top() + m.bottom()
+        return self.pad_h(self._shape[1]) + m.top() + m.bottom()
 
     def relayout(self, force=False):
         m = self.grid.contentsMargins()
@@ -647,8 +731,8 @@ class PadGrid(QWidget):
         self._shape = (cols, w)
         self._cols = cols
         for p in self.pads:
-            if p.width() != w:
-                p.setFixedSize(w, pad_height(w))
+            if p.width() != w or p.height() != self.pad_h(w):
+                p.setFixedSize(w, self.pad_h(w))
         while self.grid.count():
             it = self.grid.takeAt(0)
             if it.widget() and it.widget() is not self.empty:
