@@ -1047,8 +1047,10 @@ class SettingsDialog(QDialog):
                 row.addWidget(b)
             row.addStretch(1)
             sl.addLayout(row)
-            h = QLabel("YouTube also covers YouTube Music, and the TikTok button (it "
-                       "searches YouTube for TikTok sounds). Other: any other site's link.")
+            h = QLabel("YouTube also covers YouTube Music and the TikTok search button "
+                       "(TikTok's own search needs an account, so it finds TikTok sounds "
+                       "on YouTube). Other: any other site's link, including pasted "
+                       "TikTok links, which still download from TikTok.")
             h.setObjectName("hint")
             h.setWordWrap(True)
             sl.addWidget(h)
