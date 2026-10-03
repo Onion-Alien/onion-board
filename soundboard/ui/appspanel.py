@@ -1,6 +1,6 @@
 """The Apps tab: send one running program's sound (a music player, a browser, a
 game, a call in another app) out through your mic, without touching what any
-other program plays. Each program is a row: its level, a **Send** switch, its own
+other program plays. Each program is a card: its level, a **Send** switch, its own
 volume and *Hear it myself*, and **Record**, which waits for the program to make a
 sound, records it until you click again and adds it to your Sounds as a pad.
 
@@ -27,7 +27,7 @@ from soundboard.library import MAX_SECONDS, trim_silence
 from soundboard.recorder import ArmedRecorder
 from soundboard.ui import icons
 from soundboard.ui.bunnywidget import BunnyWidget
-from soundboard.ui.panel import UndoBar, VolumeControl, hint_label
+from soundboard.ui.panel import CardGrid, UndoBar, VolumeControl, hint_label
 from soundboard.ui.responsive import FitWidth
 
 log = logging.getLogger(__name__)
@@ -36,6 +36,7 @@ REFRESH_MS = 1500       # how often the list of programs is re-read while the ta
 REFRESH_HIDDEN_MS = 5000   # ...and while it isn't (a remembered program still gets picked up)
 METER_MS = 60
 MAX_REMEMBERED = 30
+CARD_MIN_W = 300        # programs are cards, as many across as fit at this width
 MAX_VOL = 10.0          # 1000 %, the most the volume box takes
 
 
@@ -95,7 +96,8 @@ class ElidedLabel(QLabel):
 
 
 class AppRow(QFrame):
-    """One program: icon, name, level, Send, Record, volume, Hear it myself."""
+    """One program, as a card: icon and name, its level, Send and Record, volume and
+    Hear it myself."""
     send_toggled = Signal(object, bool)     # row, on
     rec_toggled = Signal(object, bool)
     vol_changed = Signal(object, float)
@@ -112,36 +114,46 @@ class AppRow(QFrame):
         self.rec: ArmedRecorder | None = None   # while Record is on
         self.status_text = ""
         self.status_error = False
-        h = QHBoxLayout(self)
-        h.setContentsMargins(12, 8, 12, 8)
-        h.setSpacing(10)
+        v = QVBoxLayout(self)
+        v.setContentsMargins(12, 10, 12, 10)
+        v.setSpacing(8)
+        top = QHBoxLayout()
+        top.setSpacing(10)
         self.icon = QLabel()
         self.icon.setFixedSize(28, 28)
         self.icon.setAlignment(Qt.AlignCenter)
-        h.addWidget(self.icon)
+        top.addWidget(self.icon)
         names = QVBoxLayout()
         names.setSpacing(1)
         self.name = ElidedLabel(exe)
         self.name.setStyleSheet("font-weight:600;")
         self.sub = ElidedLabel()
         self.sub.setObjectName("hint")
-        for lbl in (self.name, self.sub):   # long titles give way instead of widening the row
+        for lbl in (self.name, self.sub):   # long titles give way instead of widening the card
             lbl.setSizePolicy(QSizePolicy.Ignored, QSizePolicy.Preferred)
             lbl.setTextFormat(Qt.PlainText)   # window titles are set by web pages
         names.addWidget(self.name)
         names.addWidget(self.sub)
-        h.addLayout(names, 2)
+        top.addLayout(names, 1)
+        self.btn_forget = QPushButton("✕")
+        self.btn_forget.setObjectName("small")
+        self.btn_forget.setToolTip("Take this program off the list")
+        self.btn_forget.setFixedWidth(26)
+        self.btn_forget.clicked.connect(lambda: self.forget.emit(self))
+        top.addWidget(self.btn_forget, 0, Qt.AlignTop)
+        v.addLayout(top)
         self.meter = meter_cls()
         self.meter.setMinimumWidth(60)
         self.meter.setToolTip("What the program is playing")
-        h.addWidget(self.meter, 1)
+        v.addWidget(self.meter)
+        buttons = QHBoxLayout()
+        buttons.setSpacing(6)
         self.btn_send = QPushButton()
         self.btn_send.setObjectName("live")
         self.btn_send.setCheckable(True)
         self.btn_send.setToolTip("Send this program's sound out through your mic")
         icons.set_icon(self.btn_send, "live", checked_color="#ffffff")
         self.btn_send.toggled.connect(lambda on: self.send_toggled.emit(self, on))
-        h.addWidget(self.btn_send)
         self.btn_rec = QPushButton("Record")
         self.btn_rec.setObjectName("rec")
         self.btn_rec.setCheckable(True)
@@ -150,31 +162,31 @@ class AppRow(QFrame):
                                 "added to your Sounds. Nobody hears it unless Send is on.")
         icons.set_icon(self.btn_rec, "record", "#ff4d4f", "#ffffff", size=14)
         self.btn_rec.toggled.connect(lambda on: self.rec_toggled.emit(self, on))
-        h.addWidget(self.btn_rec)
+        for b in (self.btn_send, self.btn_rec):
+            b.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+            buttons.addWidget(b)
+        v.addLayout(buttons)
+        mix = QHBoxLayout()
+        mix.setSpacing(8)
         self.vol = VolumeControl(vol, tip="This program's volume in the mix")
+        self.vol.slider.setMaximumWidth(16777215)   # the card's width, not a row's sliver
         self.vol.changed.connect(lambda v: self.vol_changed.emit(self, v))
-        h.addWidget(self.vol)
+        mix.addWidget(self.vol, 1)
         self.chk_hear = QCheckBox("Hear it myself")
         self.chk_hear.setToolTip("Also play it into your headphones (off: the program already "
                                  "plays there on its own)")
         self.chk_hear.setChecked(hear)
         self.chk_hear.toggled.connect(lambda on: self.hear_toggled.emit(self, on))
-        h.addWidget(self.chk_hear)
-        self.btn_forget = QPushButton("✕")
-        self.btn_forget.setObjectName("small")
-        self.btn_forget.setToolTip("Take this program off the list")
-        self.btn_forget.setFixedWidth(26)
-        self.btn_forget.clicked.connect(lambda: self.forget.emit(self))
-        h.addWidget(self.btn_forget)
+        mix.addWidget(self.chk_hear)
+        v.addLayout(mix)
         self._tight = 0   # how many of _TIGHTEN are applied (a narrow window)
         self._label_send()
         self.set_app(None)
 
-    NAME_ROOM = 90   # the program's name keeps at least this much when the row tightens
-    # narrow window, in this order: the level meter goes, the typed volume goes, the
-    # buttons keep only their icons (their tooltips say what they are), "Hear it
-    # myself" becomes "Hear"
-    _TIGHTEN = ("meter", "spin", "send", "rec", "hear")
+    NAME_ROOM = 0    # the name has its own line in the card: nothing to keep room for
+    # narrow card, in this order: the typed volume goes, the buttons keep only their
+    # icons (their tooltips say what they are), "Hear it myself" becomes "Hear"
+    _TIGHTEN = ("spin", "send", "rec", "hear")
 
     def resizeEvent(self, e):
         super().resizeEvent(e)
@@ -194,7 +206,6 @@ class AppRow(QFrame):
             return
         self._tight = n
         on = set(self._TIGHTEN[:n])
-        self.meter.setVisible("meter" not in on)
         self.vol.spin.setVisible("spin" not in on)
         self.chk_hear.setText("Hear" if "hear" in on else "Hear it myself")
         self._label_send()
@@ -316,10 +327,11 @@ class AppsTab(QWidget):
         self.scroll.setWidgetResizable(True)
         self.scroll.setFrameShape(QFrame.NoFrame)
         self.scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        self.list = FitWidth()   # the rows fit the width they get (AppRow._fit_width)
+        self.list = FitWidth()   # the cards re-flow to the width they get (AppRow._fit_width)
         self.list_layout = QVBoxLayout(self.list)
-        self.list_layout.setContentsMargins(0, 0, 0, 0)
+        self.list_layout.setContentsMargins(0, 0, 6, 0)
         self.list_layout.setSpacing(6)
+        self.grid = CardGrid(min_w=CARD_MIN_W, gap=10)   # one card per program
         # nothing playing: Bun waits, a bit glum, above the how-to
         self.empty = QWidget()
         ev = QVBoxLayout(self.empty)
@@ -334,6 +346,7 @@ class AppsTab(QWidget):
         self.empty_text.setAlignment(Qt.AlignCenter)
         ev.addWidget(self.empty_text)
         self.list_layout.addWidget(self.empty)
+        self.list_layout.addLayout(self.grid)
         self.list_layout.addStretch(1)
         self.scroll.setWidget(self.list)
         v.addWidget(self.scroll, 1)
@@ -431,14 +444,14 @@ class AppsTab(QWidget):
             row.vol_changed.connect(self._on_vol)
             row.hear_toggled.connect(self._on_hear)
             row.forget.connect(self._on_forget)
-            self.list_layout.insertWidget(self.list_layout.count() - 1, row)
+            self.grid.addWidget(row)
             self.empty.setVisible(False)
         return row
 
     def _drop_row(self, row: AppRow):
         self._stop_capture(row)
         self.rows.pop(row.exe.lower(), None)
-        self.list_layout.removeWidget(row)
+        self.grid.removeWidget(row)
         row.deleteLater()
         self.empty.setVisible(not self.rows)
         self._report_active()

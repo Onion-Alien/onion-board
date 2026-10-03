@@ -62,6 +62,7 @@ def test_rows_follow_running_programs_and_send_captures_into_the_engine(tab):
     assert tab.empty.isVisibleTo(tab)
     tab._on_apps([music(), App(200, "game.exe")])
     assert set(tab.rows) == {"music.exe", "game.exe"} and not tab.empty.isVisibleTo(tab)
+    assert tab.grid.count() == 2                 # a card each, in the grid
     row = tab.rows["music.exe"]
     assert row.name.text() == "Music" and "Music Thing" in row.sub.text()
     assert not row.sending and tab.engine.aux == ()
@@ -322,24 +323,42 @@ def test_armed_recorder_keeps_a_short_preroll(tmp_path):
     assert np.allclose(data[-480:], 0.5, atol=1e-3)
 
 
-def test_rows_tighten_in_a_narrow_window_and_keep_the_name(qapp):
-    """Narrow: the level meter, the typed volume and the buttons' words give way, in
-    that order, so the row fits and the program's name keeps its room."""
+def test_cards_tighten_when_narrow_and_keep_the_meter(qapp):
+    """A narrow card: the typed volume and the buttons' words give way, in that
+    order, so it fits; the level meter has its own line and stays."""
     from PySide6.QtWidgets import QWidget
 
     from soundboard.ui.appspanel import AppRow
-    holder = QWidget()                 # a row is always inside the list, never a window
+    holder = QWidget()                 # a card is always inside the list, never a window
     row = AppRow("music.exe", Meter)
     row.setParent(holder)
     row.set_app(music())
     holder.show()
-    row.setGeometry(0, 0, 1600, 60)   # (test fonts run wide)
-    assert row.meter.isVisibleTo(row) and row.btn_rec.text() == "Record"
-    row.setGeometry(0, 0, 420, 60)
-    assert not row.meter.isVisibleTo(row) and row.btn_rec.text() == ""
+    row.setGeometry(0, 0, 800, 140)   # (test fonts run wide)
+    assert row.vol.spin.isVisibleTo(row) and row.btn_rec.text() == "Record"
+    row.setGeometry(0, 0, 150, 140)
+    assert row.meter.isVisibleTo(row) and row.btn_rec.text() == ""
     assert not row.vol.spin.isVisibleTo(row) and row.chk_hear.text() == "Hear"
     row.set_sending(True)                         # the words stay away when it changes
     assert row.btn_send.text() == ""
-    row.setGeometry(0, 0, 1600, 60)
-    assert row.meter.isVisibleTo(row) and row.btn_send.text() == "Sending"
+    row.setGeometry(0, 0, 800, 140)
+    assert row.vol.spin.isVisibleTo(row) and row.btn_send.text() == "Sending"
     holder.hide()
+
+
+def test_programs_are_cards_several_across(tab, qapp, monkeypatch):
+    """A wide window shows the programs side by side, an equal-width card each."""
+    apps = [music(), App(200, "game.exe"), App(300, "call.exe")]
+    monkeypatch.setattr(appaudio, "list_apps", lambda: apps)   # still running when shown
+    tab._on_apps(apps)
+    tab.resize(1200, 600)
+    tab.show()
+    qapp.processEvents()
+    cards = [tab.rows[k] for k in ("music.exe", "game.exe", "call.exe")]
+    tops = {c.geometry().top() for c in cards}
+    widths = {c.width() for c in cards}
+    assert len(tops) == 1 and len(widths) == 1 and cards[0].width() >= appspanel.CARD_MIN_W
+    tab.resize(400, 600)
+    qapp.processEvents()
+    assert len({c.geometry().top() for c in cards}) == 3   # one per line when narrow
+    tab.hide()

@@ -13,6 +13,15 @@
   unticks the installer's own downloads (VB-Cable, FFmpeg, live voice, Tor). It's
   ticked already when reinstalling over an app that's in Offline mode. Silent installs
   use `/OFFLINE=1`, which skips those downloads unless `/TASKS=` names them.
+- **Search results and Apps as cards:** web search results are a grid of cards
+  (picture on top, title, channel and length, Play and Add), as many across as
+  the window fits, instead of full-width rows. The Apps tab shows each program as
+  a card too, several side by side.
+- **Restoring a maximized window no longer makes it the mini player:** the Radio
+  tab's genre chips asked for room as if each sat on its own line (~300 px)
+  whenever the window was big enough to show them, and every tab counts towards
+  what the window needs.
+- **Get Onion Watch:** Hoot stands in the middle of his side of the card.
 - **Cleaner bottom bars:** My mic, What others hear and My headphones are three
   separate boxes. Each volume is a speaker icon, a slider and a plain % you can
   still click and type into; the mic and radio level meters sit under their own

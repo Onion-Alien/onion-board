@@ -18,11 +18,12 @@ import random
 import threading
 import time
 
-from PySide6.QtCore import QRectF, QSize, QTimer, QUrl, Qt, Signal
-from PySide6.QtGui import QColor, QLinearGradient, QPainter, QPainterPath, QPixmap
+from PySide6.QtCore import QPointF, QRectF, QSize, QTimer, QUrl, Qt, Signal
+from PySide6.QtGui import (QColor, QLinearGradient, QPainter, QPainterPath, QPixmap,
+                           QTextLayout)
 from PySide6.QtNetwork import QNetworkAccessManager, QNetworkRequest
 from PySide6.QtWidgets import (QButtonGroup, QFrame, QHBoxLayout, QLabel, QPushButton,
-                               QScrollArea, QVBoxLayout, QWidget)
+                               QScrollArea, QSizePolicy, QVBoxLayout, QWidget)
 
 from soundboard import net, theme, ytdl
 from soundboard.bunny import H as BUN_H
@@ -32,11 +33,14 @@ from soundboard.ui.bunnywidget import BunnyWidget
 from soundboard.ui.owl import H as OWL_H
 from soundboard.ui.owl import W as OWL_W
 from soundboard.ui.owl import OwlWidget
+from soundboard.ui.panel import CardGrid
+from soundboard.ui.responsive import FitWidth
 from soundboard.ui.widgets import fmt_time
 
 log = logging.getLogger(__name__)
 
-THUMB_W, THUMB_H = 128, 72
+THUMB_W, THUMB_H = 128, 72   # the pictures' shape (16:9); they fill the card's width
+CARD_MIN_W = 210             # results are cards, as many across as fit at this width
 PASTE_HINT = ("Instagram, X, Reddit, a TikTok you already have…? Copy the video's link "
               "and paste it in the search box.")
 TIPS = {"youtube": "Search YouTube",
@@ -227,22 +231,98 @@ class SearchingView(QWidget):
         self.label.setGeometry((w - tw) // 2, y, tw, th)
 
 
-def rounded(pm: QPixmap, w: int, h: int, r: int = 10) -> QPixmap:
-    """`pm` cropped to fill w x h, with rounded corners."""
-    pm = pm.scaled(w, h, Qt.KeepAspectRatioByExpanding, Qt.SmoothTransformation)
-    out = QPixmap(w, h)
-    out.fill(Qt.transparent)
-    p = QPainter(out)
-    p.setRenderHint(QPainter.Antialiasing)
-    path = QPainterPath()
-    path.addRoundedRect(0, 0, w, h, r, r)
-    p.setClipPath(path)
-    p.drawPixmap((w - pm.width()) // 2, (h - pm.height()) // 2, pm)
-    p.end()
-    return out
+class Thumb(QWidget):
+    """A result's picture: fills the card's width at 16:9 with rounded corners, a
+    wave icon until the picture arrives."""
+
+    def __init__(self):
+        super().__init__()
+        self._pm: QPixmap | None = None
+        self._icon = icons.icon("wave", "muted").pixmap(QSize(32, 32))
+        self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
+        policy = self.sizePolicy()
+        policy.setHeightForWidth(True)
+        self.setSizePolicy(policy)
+
+    def hasHeightForWidth(self) -> bool:
+        return True
+
+    def heightForWidth(self, w: int) -> int:
+        return round(w * THUMB_H / THUMB_W)
+
+    def sizeHint(self) -> QSize:
+        return QSize(THUMB_W, THUMB_H)
+
+    def minimumSizeHint(self) -> QSize:
+        return QSize(THUMB_W, THUMB_H)
+
+    def set_pixmap(self, pm: QPixmap):
+        self._pm = pm
+        self.update()
+
+    def has_picture(self) -> bool:
+        return self._pm is not None
+
+    def paintEvent(self, e):
+        p = QPainter(self)
+        p.setRenderHint(QPainter.Antialiasing)
+        p.setRenderHint(QPainter.SmoothPixmapTransform)
+        w, h = self.width(), self.height()
+        path = QPainterPath()
+        path.addRoundedRect(QRectF(0, 0, w, h), 8, 8)
+        p.setClipPath(path)
+        if self._pm is None:
+            p.fillPath(path, QColor(128, 128, 128, 40))   # reads on light and dark
+            p.drawPixmap((w - self._icon.width()) // 2, (h - self._icon.height()) // 2,
+                         self._icon)
+        else:
+            pm = self._pm.scaled(w, h, Qt.KeepAspectRatioByExpanding,
+                                 Qt.SmoothTransformation)
+            p.drawPixmap((w - pm.width()) // 2, (h - pm.height()) // 2, pm)
+        p.end()
+
+
+class ClampLabel(QLabel):
+    """Text (bold by default) wrapped onto at most `lines` lines, the last ending in "…" when it
+    doesn't fit (the full text in the tooltip). Always that tall, so cards in a row
+    line up."""
+
+    def __init__(self, text: str, lines: int = 2, bold: bool = True):
+        super().__init__()
+        self.full, self.lines = text, lines
+        f = self.font()
+        f.setBold(bold)
+        self.setFont(f)
+        self.setToolTip(text)
+        self.setSizePolicy(QSizePolicy.Ignored, QSizePolicy.Fixed)
+        self.setFixedHeight(self.fontMetrics().lineSpacing() * lines + 2)
+
+    def paintEvent(self, e):
+        p = QPainter(self)
+        p.setPen(self.palette().color(self.foregroundRole()))
+        p.setFont(self.font())
+        fm = self.fontMetrics()
+        layout = QTextLayout(self.full, self.font())
+        layout.beginLayout()
+        y, shown = 0.0, []
+        while len(shown) < self.lines:
+            line = layout.createLine()
+            if not line.isValid():
+                break
+            line.setLineWidth(self.width())
+            shown.append((line.textStart(), line.textLength(), y))
+            y += fm.lineSpacing()
+        layout.endLayout()
+        for i, (start, length, ly) in enumerate(shown):
+            text = self.full[start:start + length].rstrip()
+            if i == len(shown) - 1 and start + length < len(self.full):
+                text = fm.elidedText(self.full[start:], Qt.ElideRight, self.width())
+            p.drawText(QPointF(0, ly + fm.ascent()), text)
+        p.end()
 
 
 class ResultRow(QFrame):
+    """One hit as a card: picture, title, channel and length, Play and Add."""
     play = Signal(object)
     add = Signal(object)
 
@@ -250,28 +330,22 @@ class ResultRow(QFrame):
         super().__init__()
         self.result = r
         self.setObjectName("card")
-        h = QHBoxLayout(self)
-        h.setContentsMargins(8, 6, 8, 6)
-        h.setSpacing(10)
-        self.thumb = QLabel()
-        self.thumb.setFixedSize(THUMB_W, THUMB_H)
-        self.thumb.setAlignment(Qt.AlignCenter)
-        icons.set_label_icon(self.thumb, "wave", "muted", 32)
-        h.addWidget(self.thumb)
-        text = QVBoxLayout()
-        text.setSpacing(2)
-        title = QLabel(f"<b>{html.escape(r.title)}</b>")
-        title.setWordWrap(True)
-        title.setTextFormat(Qt.RichText)
-        sub = QLabel(" · ".join(x for x in (r.channel, fmt_time(r.seconds) if r.seconds
-                                            else "") if x))
-        sub.setTextFormat(Qt.PlainText)   # channel names come from YouTube
-        sub.setObjectName("muted")
-        text.addStretch(1)
-        text.addWidget(title)
-        text.addWidget(sub)
-        text.addStretch(1)
-        h.addLayout(text, 1)
+        v = QVBoxLayout(self)
+        v.setContentsMargins(8, 8, 8, 8)
+        v.setSpacing(6)
+        self.thumb = Thumb()
+        v.addWidget(self.thumb)
+        self.title = ClampLabel(r.title)
+        v.addWidget(self.title)
+        # channel names come from YouTube: painted as plain text
+        self.sub = ClampLabel(" · ".join(x for x in (r.channel, fmt_time(r.seconds)
+                                                       if r.seconds else "") if x),
+                              lines=1, bold=False)
+        self.sub.setObjectName("muted")
+        v.addWidget(self.sub)
+        v.addStretch(1)
+        h = QHBoxLayout()
+        h.setSpacing(6)
         self.btn_play = QPushButton("Play")
         self.btn_play.setToolTip("Download its audio and play it once (it isn't kept)")
         icons.set_icon(self.btn_play, "play", size=14)
@@ -281,10 +355,18 @@ class ResultRow(QFrame):
         self.btn_add.setToolTip("Download its audio and add it to your Sounds")
         icons.set_icon(self.btn_add, "plus", "on_accent", size=14)
         self.btn_add.clicked.connect(lambda: self.add.emit(self.result))
-        h.addWidget(self.btn_play)
-        h.addWidget(self.btn_add)
+        for b in (self.btn_play, self.btn_add):
+            b.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+            h.addWidget(b)
+        v.addLayout(h)
         self.setCursor(Qt.PointingHandCursor)
         self.setToolTip("Double-click to play")
+
+    def hasHeightForWidth(self) -> bool:
+        return True
+
+    def heightForWidth(self, w: int) -> int:
+        return self.layout().heightForWidth(w)
 
     def mouseDoubleClickEvent(self, e):
         if not busy.is_busy(self.btn_play):
@@ -310,7 +392,7 @@ class ResultRow(QFrame):
             release(None if ok else ("Didn't add" if kind == "add" else "Didn't play"))
 
     def set_thumb(self, pm: QPixmap):
-        self.thumb.setPixmap(rounded(pm, THUMB_W, THUMB_H, 8))
+        self.thumb.set_pixmap(pm)
 
 
 class SearchResults(QFrame):
@@ -378,13 +460,15 @@ class SearchResults(QFrame):
         self.loading = SearchingView()      # takes the list's place while searching
         self.spinner = self.loading         # start / stop / running()
         v.addWidget(self.loading, 1)
-        self.list = QWidget()
-        self.rows = QVBoxLayout(self.list)
-        self.rows.setContentsMargins(0, 0, 6, 0)
-        self.rows.setSpacing(6)
-        self.rows.addStretch(1)
+        self.list = FitWidth()   # the cards re-flow to the width they get
+        lv = QVBoxLayout(self.list)
+        lv.setContentsMargins(0, 0, 6, 0)
+        self.rows = CardGrid(min_w=CARD_MIN_W, gap=10)
+        lv.addLayout(self.rows)
+        lv.addStretch(1)
         scroll = QScrollArea()
         scroll.setWidgetResizable(True)
+        scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         scroll.setWidget(self.list)
         scroll.setFrameShape(QFrame.NoFrame)
         v.addWidget(scroll, 1)
@@ -507,7 +591,7 @@ class SearchResults(QFrame):
             row = ResultRow(r)
             row.play.connect(self.play)
             row.add.connect(self.add)
-            self.rows.insertWidget(self.rows.count() - 1, row)
+            self.rows.addWidget(row)
             self._rows.append(row)
             if not r.thumb:
                 continue

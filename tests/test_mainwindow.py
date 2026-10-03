@@ -224,6 +224,48 @@ def test_refit_leaves_widgets_alone_when_nothing_crosses_an_edge(window, qapp):
     assert len(flips) <= 2
 
 
+def test_maximizing_doesnt_grow_what_the_window_needs(window, qapp):
+    """A maximized window shows the Radio tab's genre chips, and their box used to
+    ask for every chip on its own line (~300 px). Every tab counts towards what the
+    window needs, so restoring it to an ordinary size made it the mini player. Each
+    page now needs about as much big as at an ordinary size."""
+    window.show()
+    window.tabs.setCurrentWidget(window.sounds_page)
+    window.resize(1180, 720)
+    window._refit()
+    page = window.tabs.widget([t for t, _ in main.TABS].index("Radio"))
+    assert page.isAncestorOf(window.radio)
+    small = page.minimumSizeHint().height()
+    for _ in range(2):
+        window.resize(1920, 1040)                  # maximize...
+        window._refit()
+        qapp.processEvents()
+        assert not window.radio.genre_box.isHidden()   # (its tab isn't the one showing)
+        assert page.minimumSizeHint().height() < small + 120
+        assert window._full.minimumSizeHint().height() <= 720
+        window.resize(1180, 720)                   # ...and restore
+        window._refit()
+        qapp.processEvents()
+        assert not window.is_mini() and window.tabs.isVisibleTo(window)
+
+
+def test_flow_asks_for_its_lines_at_its_width_not_one_chip_a_line(qapp):
+    from PySide6.QtWidgets import QPushButton, QWidget
+
+    from soundboard.ui.panel import Flow
+    box = QWidget()
+    flow = Flow(box, gap=5)
+    for i in range(12):
+        flow.addWidget(QPushButton(f"Genre {i}"))
+    one_line = flow.sizeHint()
+    assert one_line.height() == flow.heightForWidth(one_line.width())
+    assert one_line.height() < 2 * QPushButton("Genre 0").sizeHint().height()
+    box.resize(300, 400)
+    flow.activate()
+    assert flow.sizeHint().width() == 300
+    assert flow.sizeHint().height() == flow.heightForWidth(300) > one_line.height()
+
+
 # ---------------------------------------------------------------- effects
 
 def test_mainwindow_effects_rerender(qapp, window):

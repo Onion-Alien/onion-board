@@ -85,7 +85,18 @@ class Flow(QLayout):
         self._place(rect, move=True)
 
     def sizeHint(self):
-        return self.minimumSize()
+        # its lines at the width it has (all on one line before it's been laid out).
+        # Not the narrowest width: Qt sizes a widget holding this at the height for
+        # its hint's width, and a box whose height can't shrink (the Radio tab's genre
+        # chips) then asked for every chip on its own line. That made the Radio tab
+        # need ~300 px more whenever the window was big enough to show the chips, so
+        # a maximized window restored to an ordinary size became the mini player.
+        w = self.geometry().width()
+        if w <= 0:
+            w = sum(it.sizeHint().width() + self._gap for it in self._items
+                    if not it.isEmpty()) - self._gap
+        w = max(w, self.minimumSize().width())
+        return QSize(w, self.heightForWidth(w))
 
     def minimumSize(self):
         size = QSize()
@@ -108,6 +119,72 @@ class Flow(QLayout):
             x += hint.width() + self._gap
             line = max(line, hint.height())
         return y + line - rect.y()
+
+
+class CardGrid(QLayout):
+    """Lays its widgets out as a grid of equal-width cards, as many across as fit
+    at `min_w` each (at most `max_cols`), stretched to fill the row. Each row is as
+    tall as its tallest card (the search results, the Apps tab)."""
+
+    def __init__(self, parent=None, min_w: int = 240, gap: int = 10, max_cols: int = 0):
+        super().__init__(parent)
+        self._items, self._gap = [], gap
+        self.min_w, self.max_cols = min_w, max_cols
+        self.setContentsMargins(0, 0, 0, 0)
+
+    def addItem(self, item):
+        self._items.append(item)
+
+    def count(self):
+        return len(self._items)
+
+    def itemAt(self, i):
+        return self._items[i] if 0 <= i < len(self._items) else None
+
+    def takeAt(self, i):
+        return self._items.pop(i) if 0 <= i < len(self._items) else None
+
+    def expandingDirections(self):
+        return Qt.Orientation(0)
+
+    def hasHeightForWidth(self):
+        return True
+
+    def heightForWidth(self, w):
+        return self._place(QRect(0, 0, w, 0), move=False)
+
+    def setGeometry(self, rect):
+        super().setGeometry(rect)
+        self._place(rect, move=True)
+
+    def sizeHint(self):
+        return self.minimumSize()
+
+    def minimumSize(self):
+        return QSize(self.min_w, 0)
+
+    def columns(self, width: int) -> int:
+        """How many cards fit across `width`."""
+        n = max(1, (width + self._gap) // (self.min_w + self._gap))
+        return min(n, self.max_cols) if self.max_cols else n
+
+    def _place(self, rect: QRect, move: bool) -> int:
+        shown = [it for it in self._items if not it.isEmpty()]
+        if not shown:
+            return 0
+        cols = self.columns(rect.width())
+        cw = max(1, (rect.width() - self._gap * (cols - 1)) // cols)
+        y = rect.y()
+        for i in range(0, len(shown), cols):
+            line = shown[i:i + cols]
+            h = max(it.heightForWidth(cw) if it.hasHeightForWidth() else it.sizeHint().height()
+                    for it in line)
+            h = max(h, *(it.minimumSize().height() for it in line))
+            if move:
+                for j, it in enumerate(line):
+                    it.setGeometry(QRect(rect.x() + j * (cw + self._gap), y, cw, h))
+            y += h + self._gap
+        return y - self._gap - rect.y()
 
 
 def card(title: str = "", hint: str = "") -> tuple[QFrame, QVBoxLayout]:
