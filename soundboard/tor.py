@@ -1,4 +1,4 @@
-"""The app's own Tor (Settings > Privacy & security > Connection > Tor).
+"""The app's own Tor (Settings > Connection > Tor).
 
 tor.exe (the Tor Expert Bundle, which the app doesn't ship: soundboard.torget downloads
 it into %APPDATA%\\OnionBoard\\tor\\bin when the user presses Get Tor or ticks the
@@ -81,8 +81,8 @@ def available() -> bool:
     return tor_exe() is not None
 
 
-NOT_INSTALLED = ("Tor isn't on this PC yet: press Get Tor (Settings > Privacy & security "
-                 "> Connection) to download it." + (
+NOT_INSTALLED = ("Tor isn't on this PC yet: press Get Tor (Settings > Connection) "
+                 "to download it." + (
                      "" if hasattr(sys, "_MEIPASS") else
                      " From source, scripts/fetch_tor.py also works."))
 
@@ -726,7 +726,10 @@ def _follow_switches() -> None:
     """Offline mode (or every switch off): a running Tor stops (off the UI thread: it
     waits for tor.exe to go), and isn't started again until something may go online."""
     t = _tor
-    if t is None or net.any_allowed():
+    if t is None:
+        return
+    if net.any_allowed():
+        t._changed()   # clear the Offline status; connections still start it on demand
         return
     if t.state in (STARTING, READY):
         threading.Thread(target=t.stop, daemon=True, name="tor-offline").start()

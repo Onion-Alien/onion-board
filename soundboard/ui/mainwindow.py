@@ -502,6 +502,7 @@ class MainWindow(QMainWindow):
 
     def _set_np_name(self, text: str):
         self.np_name.setText(self.np_name.fontMetrics().elidedText(text, Qt.ElideRight, 186))
+        self.np_name.setToolTip(text)
         self.mini_name.setText(text)   # elides itself to whatever room it has
 
     def _build_mixer(self) -> QFrame:
@@ -750,7 +751,8 @@ class MainWindow(QMainWindow):
         icons.set_icon(self.btn_st, "stop", size=16)
         for b in (self.btn_pp, self.btn_st):
             b.setFixedSize(38, 34)
-        self.np_name = QLabel("Click a sound to control it here")
+        self.np_name = QLabel("Pick a sound")
+        self.np_name.setToolTip("Select a sound pad to use these playback controls.")
         self.np_name.setTextFormat(Qt.PlainText)   # sound names are user / web text
         self.np_name.setFixedWidth(190)
         self.np_name.setStyleSheet("font-weight:600;")
@@ -2855,7 +2857,8 @@ class MainWindow(QMainWindow):
             self.engine.forget(m.id)
             if self.current == m.id:
                 self.current = None
-                self._set_np_name("Click a sound to control it here")
+                self._set_np_name("Pick a sound")
+                self.np_name.setToolTip("Select a sound pad to use these playback controls.")
         self._save_now()
         self._rebuild_pads()
         self._fill_categories()

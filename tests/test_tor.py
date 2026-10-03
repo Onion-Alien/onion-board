@@ -733,3 +733,16 @@ def test_offline_mode_stops_a_running_tor(fake_tor, monkeypatch):
     net.configure_features(offline=True)
     assert _wait(lambda: t.state == tor.OFF)
     net.configure_features()
+
+
+def test_leaving_offline_refreshes_status_without_starting_tor(fake_tor, monkeypatch):
+    t = fake_tor()
+    monkeypatch.setattr(tor, "_tor", t)
+    t.configure(True)
+    shown = []
+    t.on_change(lambda: shown.append(t.status_text()))
+    net.configure_features(offline=True)
+    assert "Offline mode" in shown[-1]
+    net.configure_features()
+    assert shown[-1] == "Tor starts the next time the app goes online."
+    assert t.state == tor.OFF and t._proc is None

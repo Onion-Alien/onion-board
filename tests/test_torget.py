@@ -170,7 +170,7 @@ def test_the_get_tor_download_itself_names_its_switch(monkeypatch, app_dir):
 
 def test_settings_get_tor_button(window, qapp, served, monkeypatch):  # noqa: F811
     from soundboard.settings import SettingsDialog
-    d = SettingsDialog(window, "privacy")
+    d = SettingsDialog(window, "connection")
     d.show()
     qapp.processEvents()
     assert d.net_get.isVisibleTo(d) and not d.net_tor.isEnabled()
@@ -185,7 +185,7 @@ def test_settings_get_tor_button(window, qapp, served, monkeypatch):  # noqa: F8
 
 def test_settings_get_tor_button_follows_its_switch(window, qapp, served):  # noqa: F811
     from soundboard.settings import SettingsDialog
-    d = SettingsDialog(window, "privacy")
+    d = SettingsDialog(window, "connection")
     d.show()
     qapp.processEvents()
     assert d.net_get.isEnabled() and "tor_download" in d.net_boxes

@@ -76,11 +76,22 @@ def newer(latest: str, current: str = __version__) -> bool:
 
 def _get(url: str, feature: str = FEATURE) -> dict:
     """A GitHub API answer, for `feature` (this update check, or the add-ons')."""
-    req = urllib.request.Request(url, headers={
+    headers = {
         "User-Agent": "OnionBoard (update check)",   # no version: GitHub needs a name only
-        "Accept": "application/vnd.github+json"})
-    with net.urlopen(req, timeout=15, feature=feature) as r:
-        return json.loads(r.read(LIMIT).decode("utf-8"))
+        "Accept": "application/vnd.github+json"}
+    # A gateway can cache a failed release lookup. Retry once with a distinct URL,
+    # through the same connection and feature gate, before giving up.
+    for attempt in range(2):
+        target = url if attempt == 0 else url + ("&" if "?" in url else "?") + "retry=1"
+        req = urllib.request.Request(target, headers=headers)
+        try:
+            with net.urlopen(req, timeout=15, feature=feature) as r:
+                return json.loads(r.read(LIMIT).decode("utf-8"))
+        except urllib.error.HTTPError as e:
+            e.close()
+            if attempt or e.code not in (502, 503, 504):
+                raise
+    raise AssertionError("release lookup exhausted without a result")
 
 
 def _installer(data: dict) -> tuple[str, str, int]:

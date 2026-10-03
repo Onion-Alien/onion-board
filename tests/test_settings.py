@@ -28,7 +28,7 @@ def test_a_short_window_scrolls_a_page_instead_of_squashing_it(window, qapp):  #
 def test_support_opens_the_project_page_not_an_address_in_the_app(window, monkeypatch):  # noqa: F811
     opened = []
     monkeypatch.setattr(busy.QDesktopServices, "openUrl", lambda u: opened.append(u.toString()))
-    d = SettingsDialog(window, "general")
+    d = SettingsDialog(window, "help")
     btn = next(b for b in d.findChildren(QPushButton) if "Support" in b.text())
     btn.click()
     assert opened == ["https://github.com/Onion-Alien/onion-board#support-onion-board"]
@@ -36,11 +36,13 @@ def test_support_opens_the_project_page_not_an_address_in_the_app(window, monkey
 
 
 def test_each_page_opens_by_name_and_holds_its_cards(window):  # noqa: F811
-    where = {"privacy": ("PRIVACY & SECURITY", "CONNECTION", "WHEN YOU ASK"),
+    where = {"privacy": ("WHAT GOES ONLINE", "SOUNDS AND RADIO", "VOICES",
+                         "UPDATES AND ADD-ONS", "SETUP DOWNLOADS", "NETWORK INFORMATION"),
+             "connection": ("CONNECTION",),
              "audio": ("DEVICES", "YOUR MIC", "WHO'S LISTENING", "AUDIO BUFFERING"),
              "hotkeys": ("HOTKEY SOUNDS",),
-             "general": ("WINDOW", "RUNNING IN THE BACKGROUND", "BACKUP", "ADD-ONS",
-                         "FEEDBACK AND PROBLEMS",
+             "general": ("WINDOW", "RUNNING IN THE BACKGROUND", "BACKUP"),
+             "help": ("ADD-ONS", "FEEDBACK AND PROBLEMS",
                          "SUPPORT ONION BOARD"),
              "updates": ("APP UPDATES", "DOWNLOADER (YT-DLP)"),
              "remote": ("REMOTE CONTROL (STREAM DECK, SCRIPTS)",)}
@@ -75,7 +77,7 @@ def test_feedback_and_problem_buttons_only_open_the_browser(window, monkeypatch)
     from soundboard import __version__, feedback
     opened = []
     monkeypatch.setattr(busy.QDesktopServices, "openUrl", lambda u: opened.append(u.toString()))
-    d = SettingsDialog(window, "general")
+    d = SettingsDialog(window, "help")
     monkeypatch.setattr(feedback, "FORM_URL", "https://forms.example.com/r/x")
     d.feedback_btn.click()
     d.problem_btn.click()
@@ -93,7 +95,7 @@ def test_onion_watch_can_be_removed_from_settings(window, monkeypatch):  # noqa:
 
     from soundboard import watchaddon
     tab = window.triggers
-    d = SettingsDialog(window, "general")
+    d = SettingsDialog(window, "help")
     assert not d.addon_remove.isVisibleTo(d) and "isn't installed" in d.addon_label.text()
     d.close()
     monkeypatch.setattr(tab, "info", SimpleNamespace(version="9.9"))
@@ -104,7 +106,7 @@ def test_onion_watch_can_be_removed_from_settings(window, monkeypatch):  # noqa:
         removed.append(True)
         tab.info = None
     monkeypatch.setattr(tab, "remove", fake_remove)
-    d = SettingsDialog(window, "general")
+    d = SettingsDialog(window, "help")
     assert d.addon_remove.isVisibleTo(d) and "9.9 is installed" in d.addon_label.text()
     d.addon_remove.click()
     assert removed and not d.addon_remove.isVisibleTo(d)
@@ -137,9 +139,8 @@ def test_connection_choice_applies_at_once_and_fails_closed(window, qapp, monkey
         net.configure(net.DIRECT)
 
 
-def test_privacy_switches_match_their_twins_on_other_pages(window, monkeypatch):  # noqa: F811
-    """Update checks and yt-dlp's auto-update are on the Updates page too: ticking one
-    ticks the other, and the setting changes once."""
+def test_update_preferences_have_one_home_and_privacy_links_to_it(window, monkeypatch):  # noqa: F811
+    """Privacy grants network permission; update scheduling has one home in Updates."""
     from PySide6.QtWidgets import QCheckBox
     monkeypatch.setattr(window, "_save_later", lambda: None)
     monkeypatch.setattr(window, "check_updates", lambda *a, **k: None)
@@ -147,13 +148,15 @@ def test_privacy_switches_match_their_twins_on_other_pages(window, monkeypatch):
     try:
         def boxes(text):
             return [b for b in d.findChildren(QCheckBox) if b.text().startswith(text)]
-        mine, theirs = boxes("Check once a day")[0], boxes("Tell me when a new")[0]
-        assert mine.isChecked() == theirs.isChecked() == window.cfg.update_check
-        mine.setChecked(not mine.isChecked())
-        assert theirs.isChecked() == mine.isChecked() == window.cfg.update_check
-        auto, twin = boxes("Automatically")[0], boxes("Update it automatically")[0]
-        twin.setChecked(True)
-        assert auto.isChecked() and window.cfg.ytdlp_auto_optin
+        assert len(boxes("Check once a day")) == len(boxes("Update automatically")) == 1
+        d.upd_chk.setChecked(not d.upd_chk.isChecked())
+        assert d.upd_chk.isChecked() == window.cfg.update_check
+        d.ytdlp_auto_box.setChecked(True)
+        assert window.cfg.ytdlp_auto_optin
+        link = next(b for b in d.findChildren(QPushButton) if b.text() == "Update settings")
+        link.click()
+        assert d._page_keys[d.tabs.currentIndex()] == "updates"
+        assert d.categories.currentRow() == d.tabs.currentIndex()
         d.plays_box.setChecked(True)
         assert window.cfg.radio["count_plays"] is True
         remote = next(b for b in d.findChildren(QPushButton) if b.text() == "Remote settings")
@@ -163,22 +166,42 @@ def test_privacy_switches_match_their_twins_on_other_pages(window, monkeypatch):
         d.close()
 
 
-def test_privacy_and_general_pages_fit_their_window(window, qapp):  # noqa: F811
+def test_all_settings_pages_fit_their_window(window, qapp):  # noqa: F811
     """No row wider than the window: a checkbox or radio button can't wrap, and one too
     long made the whole General page wider than its view, pushing Remove Onion Watch
     and the ends of the hints off the right edge. (Offscreen text is drawn wider than
     on Windows, so passing here leaves room.)"""
     d = SettingsDialog(window)
     d.show()
-    d.resize(860, 700)
     try:
-        for key in ("privacy", "general"):
-            d.tabs.setCurrentIndex(d._page_keys.index(key))
-            for _ in range(3):
-                qapp.processEvents()
-            sa = d.tabs.currentWidget()
-            assert sa.widget().minimumSizeHint().width() <= sa.viewport().width(), key
+        for width, height in ((720, 600), (860, 700), (1020, 760)):
+            d.resize(width, height)
+            for key in d._page_keys:
+                d.categories.setCurrentRow(d._page_keys.index(key))
+                for _ in range(3):
+                    qapp.processEvents()
+                sa = d.tabs.currentWidget()
+                assert sa.widget().minimumSizeHint().width() <= sa.viewport().width(), key
+                assert d.tabs.currentIndex() == d.categories.currentRow()
         assert "&&" in d.tabs.tabText(0)        # "&" alone would underline the next letter
+    finally:
+        d.close()
+
+
+def test_theme_previews_reflow_when_settings_is_resized(window, qapp):  # noqa: F811
+    from soundboard.settings import ThemeGrid
+
+    d = SettingsDialog(window, "appearance")
+    d.show()
+    try:
+        grid = d.findChildren(ThemeGrid)[0]
+        for width, expected in ((1020, 4), (720, 2), (1200, 5), (720, 2)):
+            d.resize(width, 760)
+            for _ in range(5):
+                qapp.processEvents()
+            assert grid.columns == expected
+            assert all(c.geometry().right() < grid.width() for c in grid.cards)
+            assert len({id(c) for c in grid.cards}) == grid.grid.count()
     finally:
         d.close()
 

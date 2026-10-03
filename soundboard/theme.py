@@ -486,10 +486,16 @@ QCheckBox::indicator, QRadioButton::indicator { width:16px; height:16px; border-
 QRadioButton::indicator { border-radius:8px; }
 QCheckBox::indicator:checked, QRadioButton::indicator:checked { background:$accent; border-color:$accent; }
 QCheckBox::indicator:checked { image:url("$check"); }
+QRadioButton::indicator:checked { image:url("$radio_dot"); }
 QCheckBox::indicator:hover, QRadioButton::indicator:hover { border-color:$border_hi; }
 QCheckBox::indicator:checked:hover, QRadioButton::indicator:checked:hover { background:$accent_hi; border-color:$accent_hi; }
 QCheckBox::indicator:disabled, QRadioButton::indicator:disabled { background:$inset; border-color:$border; }
 QCheckBox::indicator:checked:disabled { image:url("$check_off"); }
+QRadioButton::indicator:checked:disabled { image:url("$radio_dot_off"); }
+QListWidget#settingscategories { background:$panel; border:1px solid $border; }
+QListWidget#settingscategories::item { padding:4px; }
+QListWidget#settingscategories::item:selected { background:$accent; color:$on_accent; }
+QListWidget#settingscategories::item:hover:!selected { background:$inset; }
 QScrollArea, QScrollArea > QWidget > QWidget { background:transparent; }
 QScrollBar:vertical { background:transparent; width:10px; }
 QScrollBar::handle:vertical { background:$groove; border-radius:5px; min-height:30px; }
@@ -584,6 +590,28 @@ def _check_url(colour: str) -> str:
         for path, size in ((base, 14), (base.with_name(base.stem + "@2x.png"), 28)):
             if not path.exists():
                 _check_image(colour, size).save(str(path))
+    except OSError:
+        return ""
+    return base.as_posix()
+
+
+def _radio_dot_url(colour: str) -> str:
+    """A contrasting centre dot, including a sharp high-DPI copy."""
+    folder = Path(tempfile.gettempdir()) / "onionboard-ui"
+    base = folder / f"radio-dot-{colour.lstrip('#')}.png"
+    try:
+        folder.mkdir(exist_ok=True)
+        for path, size in ((base, 14), (base.with_name(base.stem + "@2x.png"), 28)):
+            if not path.exists():
+                img = QImage(size, size, QImage.Format_ARGB32)
+                img.fill(Qt.transparent)
+                p = QPainter(img)
+                p.setRenderHint(QPainter.Antialiasing)
+                p.setPen(Qt.NoPen)
+                p.setBrush(QColor(colour))
+                p.drawEllipse(QPointF(size / 2, size / 2), size / 4, size / 4)
+                p.end()
+                img.save(str(path))
     except OSError:
         return ""
     return base.as_posix()
@@ -706,6 +734,8 @@ def stylesheet(name: str | None = None) -> str:
     tokens.setdefault("font", FONT)
     tokens["check"] = _check_url(tokens["on_accent"])
     tokens["check_off"] = _check_url(tokens["muted"])   # ticked but greyed out: on $inset
+    tokens["radio_dot"] = _radio_dot_url(tokens["on_accent"])
+    tokens["radio_dot_off"] = _radio_dot_url(tokens["muted"])
     for key, colour in (("", tokens["muted"]), ("_off", tokens["off"])):
         tokens["down" + key] = _chevron_url(colour, 10, up=False)
         tokens["up" + key] = _chevron_url(colour, 10, up=True)

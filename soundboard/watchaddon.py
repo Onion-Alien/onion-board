@@ -159,6 +159,11 @@ def check_update(dirs: list[Path] | None = None) -> Offer | None:
 def friendly(e: Exception) -> str:
     """An error from getting the add-on, as a sentence for the tab."""
     text = str(e) or type(e).__name__
+    if isinstance(e, net.FeatureOff):
+        return text
+    if getattr(e, "code", None) in (502, 503, 504):
+        return ("GitHub's download check is temporarily unavailable (gateway error). "
+                "Try Get Onion Watch again in a moment.")
     if "404" in text:
         return ("Onion Watch isn't available to download yet (GitHub says it can't find "
                 "it). Try again later.")

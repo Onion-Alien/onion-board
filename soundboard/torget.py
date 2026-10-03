@@ -1,5 +1,5 @@
 """Getting Tor: the Tor Project's Tor Expert Bundle, downloaded when the user asks for
-it (Settings > Privacy & security > Connection > Get Tor, or the installer's "Private
+it (Settings > Connection > Get Tor, or the installer's "Private
 connection (Tor)" box, which runs `OnionBoard.exe --get-tor`). The app doesn't ship it.
 
 The tarball comes from dist.torproject.org through net.urlopen (feature

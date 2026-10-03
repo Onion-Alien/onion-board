@@ -1,5 +1,22 @@
 # Changelog
 
+## Unreleased
+
+- **Sounds playback controls:** the empty selection says "Pick a sound" with a
+  tooltip explaining the controls, so the instruction fits instead of cutting off.
+
+- **Settings categories:** a sidebar keeps all categories visible. Privacy &
+  security groups online permissions, Connection holds proxy and Tor controls,
+  Updates holds automatic update preferences, and Add-ons & help holds Onion
+  Watch, feedback and support. Short labels and wrapped hints fit small windows.
+  Theme previews use as many columns as fit, cards have space beside the scrollbar,
+  and selected checkboxes and radio buttons show distinct ticks and centre dots.
+- **Tor status:** leaving Offline mode refreshes the connection status immediately;
+  Tor still starts only when needed.
+- **Get Onion Watch:** retry a temporary GitHub gateway error once through the
+  same connection and privacy gate, avoiding a cached failure. A persistent
+  gateway error asks you to retry instead of blaming your internet connection.
+
 ## 1.6.5 — 2026-10-03
 
 - **Switch off anything that goes online**: Settings → Privacy & security has a switch
@@ -22,7 +39,7 @@
   only when you ask. The installer's last page points to it. The General page no
   longer runs off the right edge of the window (the Remove Onion Watch button and the
   ends of the hints were cut off).
-- **Send everything through a proxy**: Settings → Privacy & security → *Connection*
+- **Send everything through a proxy**: Settings → Connection
   can send everything the app fetches (searches, downloads, the radio directory and
   its stations, thumbnails, updates, add-ons, translation models) through a SOCKS5
   or HTTP proxy, such as Tor's `socks5h://127.0.0.1:9050`. Site names are looked up

@@ -246,7 +246,7 @@ too (say No if another program, like Voicemeeter, uses it).
   appears, or rings until you stop it. Its sounds play through the board like a
   pad; a ringing one loops in your headphones. Triggers from before the add-on
   (Onion Board 1.4 and older) carry over as they were. When a newer Onion Watch
-  is out, the tab offers it (only while *Tell me when a new version is out* is
+  is out, the tab offers it (only while *Check once a day* is
   ticked). *Remove Onion Watch…* in its *More* menu uninstalls it (after asking);
   your triggers are kept for when you get it again.
   Everything happens on your PC: the screen is never saved or sent anywhere. If
@@ -276,7 +276,12 @@ too (say No if another program, like Voicemeeter, uses it).
 - **⚙ Settings:** 31 themes in four groups — Classic (Dark, Light, true-black
   Midnight, High Contrast…), Colourful, Wild (Synthwave, Hacker, Amber Terminal…)
   and Meme (Flashbang, Deep Fried, Retro 98, Comic Sans…); they switch live —
-  plus hotkeys, overlay, window and audio options.
+  plus hotkeys, overlay, window and audio options. A category sidebar keeps every
+  page visible: **Privacy & security** groups online permissions and Offline mode;
+  **Connection** holds Direct, proxy and Tor; **Updates** holds update scheduling
+  and maintenance; **General** holds window, startup and backups; **Add-ons & help**
+  holds Onion Watch, feedback and support. The other categories are Appearance,
+  Audio, Hotkeys, Overlay and Remote. Changes apply immediately.
 - **MIDI pads and macro keypads:** a pad controller (Akai LPD8 / MPD, Launchpad,
   any USB MIDI keyboard) works without extra software: set a hotkey and hit a pad
   instead of pressing a key. Pads work for sounds, stop / pause, random sounds and
@@ -416,7 +421,7 @@ the launcher the shortcuts and PyInstaller use. The app is the `soundboard` pack
 | `soundboard/autostart.py` | *Start with Windows*: the per-user `Run` registry value (`--tray` starts it hidden) |
 | `soundboard/shellicon.py` | the app icon in the theme's colours outside its windows: writes `%APPDATA%\OnionBoard\icons\onionboard-<hash>.ico`, puts it on the main window's relaunch properties (taskbar right-click menu, a pin) and on this copy's own *Onion Board* Desktop / Start menu / taskbar-pin shortcuts |
 | `soundboard/updates.py` | "is there a newer version?" (GitHub Releases, once a day) and the self-update: downloads the release's installer, checks its SHA-256, runs it silently and reopens the app |
-| `soundboard/feedback.py` | where *Send feedback* and *Report a problem* (Settings → General) go: a no-account form or a GitHub issue, opened in the browser with the version filled in; the app sends nothing |
+| `soundboard/feedback.py` | where *Send feedback* and *Report a problem* (Settings → Add-ons & help) go: a no-account form or a GitHub issue, opened in the browser with the version filled in; the app sends nothing |
 | `soundboard/hangwatch.py` | notes down a frozen window: if the UI thread stops answering for 5 s, its stack goes into the log and a report beside the crash reports (nothing shown or sent) |
 | `soundboard/ui/icons.py` | the line icons, drawn in code and recoloured with the theme |
 | `soundboard/ui/art.py` | optional pictures from `assets/art` (voice tiles, the computer voice, its languages); emoji / painted icons when missing |

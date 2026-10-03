@@ -5,10 +5,11 @@ from __future__ import annotations
 import threading
 
 from PySide6.QtCore import QObject, QRectF, QSize, Qt, Signal
-from PySide6.QtGui import (QBrush, QColor, QFont, QPainter, QPainterPath,
+from PySide6.QtGui import (QBrush, QColor, QFont, QIcon, QPainter, QPainterPath,
                            QPixmap)
 from PySide6.QtWidgets import (QApplication, QCheckBox, QComboBox, QDialog, QFrame, QGridLayout,
-                               QHBoxLayout, QLabel, QPushButton, QScrollArea, QSlider, QTabWidget,
+                               QHBoxLayout, QLabel, QLayout, QListWidget, QListWidgetItem,
+                               QPushButton, QScrollArea, QSlider, QTabWidget,
                                QVBoxLayout, QWidget)
 
 from shiboken6 import isValid as qt_valid
@@ -246,6 +247,40 @@ class ThemeCard(QPushButton):
         p.end()
 
 
+class ThemeGrid(QWidget):
+    """Keep previews their readable size, using as many columns as fit."""
+
+    def __init__(self, cards):
+        super().__init__()
+        self.cards = cards
+        self.columns = 0
+        self.grid = QGridLayout(self)
+        self.grid.setContentsMargins(0, 0, 0, 0)
+        self.grid.setSpacing(12)
+        self.grid.setSizeConstraint(QLayout.SetNoConstraint)
+        self._reflow(1)
+
+    def minimumSizeHint(self):
+        return QSize(150, 112)
+
+    def resizeEvent(self, event):
+        super().resizeEvent(event)
+        self._reflow(max(1, min(len(self.cards), (self.width() + 12) // 162)))
+
+    def _reflow(self, columns):
+        if columns == self.columns:
+            return
+        for col in range(self.columns + 1):
+            self.grid.setColumnStretch(col, 0)
+        while self.grid.count():
+            self.grid.takeAt(0)
+        for i, card in enumerate(self.cards):
+            self.grid.addWidget(card, i // columns, i % columns, Qt.AlignLeft)
+        self.grid.setColumnStretch(columns, 1)
+        self.columns = columns
+        self.updateGeometry()
+
+
 class SettingsDialog(QDialog):
     """All settings in one place. `mw` is the MainWindow; changes apply immediately."""
 
@@ -260,21 +295,40 @@ class SettingsDialog(QDialog):
         self.tabs = QTabWidget()
         self.tabs.setDocumentMode(True)
         self.hk_buttons: dict[str, list[QPushButton]] = {}
-        self._mirrors: dict[str, list[QCheckBox]] = {}   # one setting shown on two pages
         pages = (("privacy", "Privacy && security", "shield", self._privacy),
+                 ("connection", "Connection", "radio", self._connection),
+                 ("general", "General", "settings", self._general),
                  ("appearance", "Appearance", "palette", self._appearance),
                  ("audio", "Audio", "volume", self._audio),
                  ("hotkeys", "Hotkeys", "keyboard", self._hotkeys),
                  ("overlay", "Overlay", "gamepad", self._overlay),
-                 ("general", "General", "settings", self._general),
                  ("updates", "Updates", "reload", self._updates),
+                 ("help", "Add-ons && help", "plus", self._help),
                  ("remote", "Remote", "cable", self._remote))
+        self.categories = QListWidget()
+        self.categories.setObjectName("settingscategories")
+        self.categories.setAccessibleName("Settings categories")
+        self.categories.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.categories.setFixedWidth(196)
         for i, (_key, title, icon, build) in enumerate(pages):
             self.tabs.addTab(self._scroll(build()), title)
             icons.set_tab_icon(self.tabs, i, icon)
+            item = QListWidgetItem(icons.icon(icon), title.replace("&&", "&"))
+            item.setData(Qt.UserRole, icon)
+            item.setSizeHint(QSize(180, 38))
+            self.categories.addItem(item)
+        self._category_icons()
+        self.tabs.tabBar().hide()
+        self.categories.currentRowChanged.connect(self.tabs.setCurrentIndex)
+        self.tabs.currentChanged.connect(self.categories.setCurrentRow)
         keys = self._page_keys = [p[0] for p in pages]
+        self.categories.setCurrentRow(keys.index(page) if page in keys else 0)
         self.tabs.setCurrentIndex(keys.index(page) if page in keys else 0)
-        lay.addWidget(self.tabs, 1)
+        content = QHBoxLayout()
+        content.setSpacing(16)
+        content.addWidget(self.categories)
+        content.addWidget(self.tabs, 1)
+        lay.addLayout(content, 1)
         close = QPushButton("Done")
         close.setObjectName("primary")
         close.clicked.connect(self.accept)
@@ -283,6 +337,16 @@ class SettingsDialog(QDialog):
         row.addWidget(close)
         lay.addLayout(row)
         self._initial_size()
+
+    def _category_icons(self):
+        for i in range(self.categories.count()):
+            item = self.categories.item(i)
+            name = item.data(Qt.UserRole)
+            icon = QIcon(icons.icon(name))
+            for size in icons.SIZES:
+                icon.addPixmap(icons.pixmap(name, size, theme.T["on_accent"]),
+                               QIcon.Selected, QIcon.Off)
+            item.setIcon(icon)
 
     # ------------------------------------------------------------------ pages
     @staticmethod
@@ -293,6 +357,11 @@ class SettingsDialog(QDialog):
         sa.setWidgetResizable(True)
         sa.setFrameShape(QScrollArea.NoFrame)
         sa.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        for label in page.findChildren(QLabel):
+            label.setWordWrap(True)
+        for combo in page.findChildren(QComboBox):
+            combo.setSizeAdjustPolicy(QComboBox.AdjustToMinimumContentsLengthWithIcon)
+            combo.setMinimumContentsLength(6)
         sa.setWidget(page)
         return sa
 
@@ -303,12 +372,12 @@ class SettingsDialog(QDialog):
         avail = screen.availableGeometry() if screen else None
         # wide enough to show every tab (the bar scrolls only when the screen is too
         # narrow for that)
-        width = max(860, self.tabs.tabBar().sizeHint().width() + 40)
+        width = 1020
         need = 0
         for i in range(self.tabs.count()):
             lay = self.tabs.widget(i).widget().layout()
             need = max(need, lay.totalSizeHint().height(),
-                       lay.totalHeightForWidth(width - 60) if lay.hasHeightForWidth() else 0)
+                       lay.totalHeightForWidth(width - 260) if lay.hasHeightForWidth() else 0)
         # tab bar, Done row, margins; a normal window size, not the whole screen: a
         # tall page scrolls
         height = min(need + 150, 760)
@@ -336,7 +405,7 @@ class SettingsDialog(QDialog):
     def _page(self):
         w = QWidget()
         v = QVBoxLayout(w)
-        v.setContentsMargins(0, 12, 0, 0)
+        v.setContentsMargins(0, 12, 16, 12)
         v.setSpacing(12)
         return w, v
 
@@ -347,22 +416,21 @@ class SettingsDialog(QDialog):
                  "Meme": "For when you want your soundboard to be a bit."}
         for group, names in theme.GROUPS:
             card, cv = self._card(group, hints.get(group, ""))
-            grid = QGridLayout()
-            grid.setSpacing(12)
-            for i, name in enumerate(names):
+            cards = []
+            for name in names:
                 c = ThemeCard(name)
                 c.setChecked(name == theme.current_name)
                 c.clicked.connect(lambda _=False, n=name: self._pick_theme(n))
-                grid.addWidget(c, i // 4, i % 4)
+                cards.append(c)
                 self.theme_cards.append(c)
-            grid.setColumnStretch(4, 1)
-            cv.addLayout(grid)
+            cv.addWidget(ThemeGrid(cards))
             v.addWidget(card)
         v.addStretch(1)
         return w
 
     def _pick_theme(self, name: str):
         self.mw.apply_theme(name)
+        self._category_icons()
         for c in self.theme_cards:
             c.setChecked(c.name == name)
             c.update()
@@ -374,8 +442,7 @@ class SettingsDialog(QDialog):
             for attr, _action, label, desc in actions:
                 self._hk_row(cv, attr, label, desc)
             if group == "Categories":   # its keys and the per-category sets go together
-                scoped = QCheckBox("A set of sound hotkeys per category: sound hotkeys only "
-                                   "work in the category showing")
+                scoped = QCheckBox("Use hotkeys per category")
                 scoped.setToolTip("One key can play a different sound in each category: "
                                   "switch category (its tab, or the keys above) and the same "
                                   "keys play that category's sounds. Sounds in no category "
@@ -383,6 +450,11 @@ class SettingsDialog(QDialog):
                 scoped.setChecked(self.mw.cfg.scoped_hotkeys)
                 scoped.toggled.connect(self.mw.set_scoped_hotkeys)
                 cv.addWidget(scoped)
+                hint = QLabel("Sound hotkeys only work in the category showing. "
+                              "Switch categories to use the same keys for different sounds.")
+                hint.setObjectName("hint")
+                hint.setWordWrap(True)
+                cv.addWidget(hint)
             v.addWidget(card)
         card, cv = self._card("Auto push-to-talk (optional)",
                               "Only if you use push-to-talk in a game or Discord: set your "
@@ -469,11 +541,11 @@ class SettingsDialog(QDialog):
                               "Nine tiles a page, in the same order as your pads — drag pads in "
                               "the Sounds tab to rearrange them.")
         cv.addWidget(self._ov_combo("keys", ovl.KEY_CHOICES, s.keys))
-        after = QCheckBox("Hide the overlay after picking a sound")
+        after = QCheckBox("Hide after picking a sound")
         after.setChecked(s.close_after_play)
         after.toggled.connect(lambda b: self._ov_set("close_after_play", b))
         cv.addWidget(after)
-        row = QHBoxLayout()
+        row = QVBoxLayout()
         row.addWidget(QLabel("Hide when untouched for"))
         row.addWidget(self._ov_combo("autohide", ovl.AUTOHIDE, s.autohide), 1)
         cv.addLayout(row)
@@ -607,7 +679,9 @@ class SettingsDialog(QDialog):
                               "gets back the level the bass took, and you hear the same thing "
                               "they do. Off sends them exactly as mixed.")
         from soundboard.ui.destpanel import DestPanel
-        cv.addWidget(DestPanel(self.mw))
+        dest = DestPanel(self.mw)
+        dest.chk_gate.setText("Mute mic during sounds")
+        cv.addWidget(dest)
         v.addWidget(card)
         card, cv = self._card("Audio buffering",
                               "Low keeps your voice and sounds as immediate as possible. If the "
@@ -665,11 +739,15 @@ class SettingsDialog(QDialog):
         grid.addWidget(vol, 1, 1)
         grid.setColumnStretch(2, 1)   # the slider and its box stay together on the left
         cv.addLayout(grid)
-        voice = QCheckBox("Include my voice (with the voice changer, when it's on)")
+        voice = QCheckBox("Include my voice")
         voice.setToolTip("Untick if OBS already records your mic on its own")
         voice.setChecked(c.obs_voice)
         voice.toggled.connect(lambda b: mw.set_option("obs_voice", b))
         cv.addWidget(voice)
+        note = QLabel("Includes the voice changer when it's on. Untick if OBS "
+                      "already records your mic separately.")
+        note.setObjectName("hint")
+        cv.addWidget(note)
         return card
 
     def _voices_card(self):
@@ -684,7 +762,7 @@ class SettingsDialog(QDialog):
             "running on your PC (Kokoro, AllTalk, any OpenAI-style one), a TTS program, or "
             "Piper voice packs dropped into the voices folder. They join the Voice list on "
             "the Voice tab.")
-        row = QHBoxLayout()
+        row = QVBoxLayout()
         add = QPushButton("Add a voice server…")
         icons.set_icon(add, "plus")
         add.clicked.connect(speech._add_voice_server)
@@ -750,18 +828,27 @@ class SettingsDialog(QDialog):
     def _general(self):
         w, v = self._page()
         card, cv = self._card("Window")
-        top = QCheckBox("Keep the window on top of other windows")
+        top = QCheckBox("Keep window on top")
         top.setChecked(self.mw.cfg.always_on_top)
         top.toggled.connect(self.mw.on_top_toggle)
         cv.addWidget(top)
-        one = QCheckBox("One click on a pad plays it (instead of a double-click)")
+        one = QCheckBox("Play pads with one click")
         one.setToolTip("Then Ctrl+click picks a pad without playing it")
         one.setChecked(self.mw.cfg.single_click)
         one.toggled.connect(self.mw.set_single_click)
         cv.addWidget(one)
+        hint = QLabel("Otherwise, double-click to play. Ctrl+click selects without playing.")
+        hint.setObjectName("hint")
+        hint.setWordWrap(True)
+        cv.addWidget(hint)
         v.addWidget(card)
         v.addWidget(self._background_card())
         v.addWidget(self._backup_card())
+        v.addStretch(1)
+        return w
+
+    def _help(self):
+        w, v = self._page()
         v.addWidget(self._addons_card())
         v.addWidget(self._feedback_card())
         v.addWidget(self._support_card())
@@ -823,7 +910,7 @@ class SettingsDialog(QDialog):
                               "Found a bug, missing something, or just want to say hi? It "
                               "opens in your browser, and nothing is sent unless you submit "
                               "it there.")
-        row = QHBoxLayout()
+        row = QVBoxLayout()
         send = QPushButton("Send feedback")
         send.setObjectName("primary")
         send.clicked.connect(lambda: busy.open_url(
@@ -869,15 +956,15 @@ class SettingsDialog(QDialog):
                               "A soundboard is most useful left running: your hotkeys and the "
                               "overlay work while the window is closed. The tray icon (by the "
                               "clock) opens it again; right-click it to quit.")
-        tray = QCheckBox("Closing the window keeps Onion Board running in the tray")
+        tray = QCheckBox("Close to tray")
         tray.setChecked(mw.cfg.tray)
         tray.toggled.connect(lambda b: mw.set_option("tray", b))
         if mw.tray is None:
             tray.setEnabled(False)
             tray.setToolTip("This desktop has no system tray, so closing the window quits.")
         cv.addWidget(tray)
-        auto = QCheckBox("Start Onion Board when I sign in to Windows")
-        hidden = QCheckBox("…straight to the tray, without opening the window")
+        auto = QCheckBox("Start when I sign in")
+        hidden = QCheckBox("Start in the tray")
         auto.setChecked(autostart.is_enabled())
         hidden.setChecked(mw.cfg.autostart_hidden)
         hidden.setEnabled(auto.isChecked())
@@ -929,19 +1016,22 @@ class SettingsDialog(QDialog):
     def _privacy(self):
         w, v = self._page()
         v.addWidget(self._switches_card())
-        v.addWidget(self._connection_card())
         v.addWidget(self._online_card())
         v.addStretch(1)
         return w
 
-    def _option(self, cv, text: str, hint: str, on: bool, changed, mirror: str = ""):
+    def _connection(self):
+        w, v = self._page()
+        v.addWidget(self._connection_card())
+        v.addStretch(1)
+        return w
+
+    def _option(self, cv, text: str, hint: str, on: bool, changed):
         """A checkbox with a short label and its explanation underneath (a long label
         can't wrap, and would make the whole page wider than the window)."""
         box = QCheckBox(text)
         box.setChecked(on)
         box.toggled.connect(changed)
-        if mirror:
-            self._mirror(mirror, box)
         cv.addWidget(box)
         h = QLabel(hint)
         h.setObjectName("hint")
@@ -949,19 +1039,6 @@ class SettingsDialog(QDialog):
         h.setContentsMargins(26, 0, 0, 4)   # under the box's text, not its tick
         cv.addWidget(h)
         return box
-
-    def _mirror(self, key: str, box: QCheckBox):
-        """The same setting shown on two pages: ticking one ticks the other."""
-        boxes = self._mirrors.setdefault(key, [])
-        boxes.append(box)
-
-        def follow(on: bool, me=box):
-            for b in boxes:
-                if b is not me and qt_valid(b) and b.isChecked() != on:
-                    b.blockSignals(True)
-                    b.setChecked(on)
-                    b.blockSignals(False)
-        box.toggled.connect(follow)
 
     # what each switch contacts, and when (soundboard.net.FEATURES)
     NET_HINTS = {
@@ -983,7 +1060,7 @@ class SettingsDialog(QDialog):
                          "internet. Ones on this PC (127.0.0.1) always work.",
         "setup_downloads": "The setup guide's Install button downloads VB-Cable from "
                            "vb-audio.com. Off: install it yourself from there.",
-        "tor_download": "Get Tor / Update Tor (Connection, below) downloads Tor from the "
+        "tor_download": "Get Tor / Update Tor (Connection page) downloads Tor from the "
                         "Tor Project (dist.torproject.org). Off: a Tor that's already "
                         "here still works.",
     }
@@ -995,10 +1072,10 @@ class SettingsDialog(QDialog):
         from soundboard import net
         cfg = self.mw.cfg
         card, cv = self._card(
-            "Privacy & security",
+            "What goes online",
             "Onion Board has no account, tracking or analytics, and sends nothing to us. "
             "These are the only things that go online. Switch off what you don't want: "
-            "off means it makes no connection at all, whatever the Connection below.")
+            "off means it makes no connection at all, whatever the Connection setting.")
         self.offline_box = self._option(
             cv, "Offline mode",
             "Nothing goes online at all: every switch below is off until you untick this.",
@@ -1010,18 +1087,31 @@ class SettingsDialog(QDialog):
         self._net_body = body
         self.net_boxes: dict[str, QCheckBox] = {}
         self._net_subs: dict[str, QWidget] = {}
-        for key, label in net.FEATURES.items():
-            self.net_boxes[key] = self._option(
-                bl, label, self.NET_HINTS[key], key not in cfg.net_off,
-                lambda on, k=key: self._set_feature(k, on))
-            sub = QWidget()
-            sl = QVBoxLayout(sub)
-            sl.setContentsMargins(26, 0, 0, 0)   # under its feature
-            sl.setSpacing(6)
-            self._net_sub_options(key, sl)
-            if sl.count():
-                bl.addWidget(sub)
-                self._net_subs[key] = sub
+        groups = (
+            ("Sounds and radio", ("sounds_web", "radio")),
+            ("Voices", ("voices", "voice_servers")),
+            ("Updates and add-ons", ("app_update", "ytdlp_update", "addons")),
+            ("Setup downloads", ("setup_downloads", "tor_download")),
+        )
+        labels = {"sounds_web": "Online sounds", "app_update": "App updates",
+                  "ytdlp_update": "Downloader updates", "addons": "Add-on downloads",
+                  "voices": "Voice and model downloads", "voice_servers": "Online voice servers",
+                  "setup_downloads": "Virtual cable download", "tor_download": "Tor download"}
+        for title, keys in groups:
+            section, sv = self._card(title)
+            for key in keys:
+                self.net_boxes[key] = self._option(
+                    sv, labels.get(key, net.FEATURES[key]), self.NET_HINTS[key],
+                    key not in cfg.net_off, lambda on, k=key: self._set_feature(k, on))
+                sub = QWidget()
+                sl = QVBoxLayout(sub)
+                sl.setContentsMargins(26, 0, 0, 0)
+                sl.setSpacing(6)
+                self._net_sub_options(key, sl)
+                if sl.count():
+                    sv.addWidget(sub)
+                    self._net_subs[key] = sub
+            bl.addWidget(section)
         cv.addWidget(body)
         note = QLabel("Not covered by these: links you open in your own browser (Support, "
                       "Report a problem, release pages) and the installer's own downloads.")
@@ -1036,16 +1126,15 @@ class SettingsDialog(QDialog):
         from soundboard import net
         cfg = self.mw.cfg
         if key == "sounds_web":
-            row = QHBoxLayout()
-            row.setSpacing(14)
-            for site, name in net.SITES.items():
+            row = QGridLayout()
+            row.setHorizontalSpacing(14)
+            for i, (site, name) in enumerate(net.SITES.items()):
                 k = f"sounds_web.{site}"
-                b = QCheckBox(name)
+                b = QCheckBox("Other links" if site == "other" else name)
                 b.setChecked(k not in cfg.net_off)
                 b.toggled.connect(lambda on, k=k: self._set_feature(k, on))
                 self.net_boxes[k] = b
-                row.addWidget(b)
-            row.addStretch(1)
+                row.addWidget(b, i // 2, i % 2)
             sl.addLayout(row)
             h = QLabel("YouTube also covers YouTube Music and the TikTok search button "
                        "(TikTok's own search needs an account, so it finds TikTok sounds "
@@ -1054,26 +1143,19 @@ class SettingsDialog(QDialog):
             h.setObjectName("hint")
             h.setWordWrap(True)
             sl.addWidget(h)
-        elif key == "ytdlp_update":
-            self._option(sl, "Automatically",
-                         "Once a day, and after a failed download. An update is code the "
-                         "app runs, so it's off unless you turn it on.",
-                         cfg.ytdlp_auto_optin,
-                         lambda b: self.mw.set_option("ytdlp_auto_optin", b), mirror="ytdlp_auto")
         elif key == "radio":
             def count_plays(on: bool):
                 cfg.radio["count_plays"] = on
                 self.mw.set_option("radio", cfg.radio)   # saves
             self.plays_box = self._option(
-                sl, "Tell Radio Browser which stations I play",
+                sl, "Share play counts",
                 "Radio Browser ranks stations by how often they're played. Off: starting a "
                 "station only contacts the station itself.",
                 bool(cfg.radio.get("count_plays", False)), count_plays)
-        elif key == "app_update":
-            self._option(sl, "Check once a day",
-                         "Only the release list is read; nothing is downloaded until you "
-                         "press Update now.",
-                         cfg.update_check, self._updates_optin, mirror="update_check")
+        elif key in ("app_update", "ytdlp_update"):
+            go = QPushButton("Update settings")
+            go.clicked.connect(lambda: self.tabs.setCurrentIndex(self._page_keys.index("updates")))
+            sl.addWidget(go, 0, Qt.AlignLeft)
 
     def _set_feature(self, key: str, on: bool):
         from soundboard import net
@@ -1120,12 +1202,12 @@ class SettingsDialog(QDialog):
     def _online_card(self):
         """What goes online only when you do something, and the app's local doors."""
         card, cv = self._card(
-            "When you ask",
+            "Network information",
             "Everything else goes online only when you do it: a search or a pasted link "
             "goes to that site (YouTube, SoundCloud, TikTok, Myinstants), a radio station "
             "plays straight from that station, and a download you press fetches that one "
             "file. Those sites see your IP address like they would in a browser, unless "
-            "you use a proxy (Connection, above). The radio maps ship with the app: opening "
+            "you use a proxy or Tor (Connection page). The radio maps ship with the app: opening "
             "them contacts nobody.")
         remote = QLabel()
         remote.setWordWrap(True)
@@ -1140,7 +1222,7 @@ class SettingsDialog(QDialog):
         row.addWidget(remote, 1)
         row.addWidget(go)
         cv.addLayout(row)
-        full = QPushButton("Everything it contacts, and when")
+        full = QPushButton("Network details")
         full.setToolTip("Opens the full list (SECURITY.md) on GitHub, in your browser")
         from soundboard.updates import REPO
         full.clicked.connect(lambda: busy.open_url(
@@ -1254,8 +1336,10 @@ class SettingsDialog(QDialog):
         hide.setChecked(bool(cfg.tor_bridges))
         row.addWidget(hide)
         kind = QComboBox()
-        kind.addItem("Snowflake (looks like a video call)", "snowflake")
-        kind.addItem("obfs4 (looks like random noise)", "obfs4")
+        kind.addItem("Snowflake", "snowflake")
+        kind.addItem("obfs4", "obfs4")
+        kind.setItemData(0, "Looks like a video call", Qt.ToolTipRole)
+        kind.setItemData(1, "Looks like random noise", Qt.ToolTipRole)
         kind.setCurrentIndex(max(0, kind.findData(cfg.tor_bridges or tor.DEFAULT_BRIDGE)))
         kind.setToolTip("If one doesn't connect, try the other")
         no_wheel(kind)
@@ -1422,11 +1506,10 @@ class SettingsDialog(QDialog):
                               f"This is Onion Board {__version__}. With the box ticked it asks "
                               "GitHub once a day whether a newer version is out and tells you. "
                               + how)
-        chk = QCheckBox("Tell me when a new version is out (checks GitHub once a day)")
-        chk.setChecked(self.mw.cfg.update_check)
-        chk.toggled.connect(self._updates_optin)
-        self._mirror("update_check", chk)
-        cv.addWidget(chk)
+        chk = self._option(cv, "Check once a day",
+                           "Tell me when a new version is out. Nothing is downloaded "
+                           "until I press Update now.", self.mw.cfg.update_check,
+                           self._updates_optin)
         self.upd_chk = chk
         row = QHBoxLayout()
         self.upd_label = QLabel()
@@ -1487,34 +1570,33 @@ class SettingsDialog(QDialog):
                               "API-request or website buttons, Bitfocus Companion, Touch "
                               "Portal), AutoHotkey or a script. Only this PC can connect, and "
                               "only with the key below — treat it like a password.")
-        on = QCheckBox("Let programs on this PC control the soundboard")
+        on = QCheckBox("Enable remote control")
         on.setChecked(cfg.api_enabled)
         cv.addWidget(on)
-        row = QHBoxLayout()
-        row.addWidget(QLabel("Port"))
+        row = QGridLayout()
+        row.addWidget(QLabel("Port"), 0, 0)
         port = QSpinBox()
         port.setRange(1024, 65535)
         port.setValue(cfg.api_port)
         port.setAccessibleName("Port")
         no_wheel(port)
-        row.addWidget(port)
-        row.addSpacing(12)
-        row.addWidget(QLabel("Key"))
+        row.addWidget(port, 0, 1)
+        row.addWidget(QLabel("Key"), 1, 0)
         key = QLineEdit()
         key.setReadOnly(True)
         key.setEchoMode(QLineEdit.Password)
         key.setAccessibleName("Key")
-        row.addWidget(key, 1)
+        row.addWidget(key, 1, 1)
         show = QPushButton("Show")
         show.setObjectName("small")
         show.setCheckable(True)
         show.toggled.connect(lambda b: key.setEchoMode(QLineEdit.Normal if b
                                                        else QLineEdit.Password))
-        row.addWidget(show)
+        row.addWidget(show, 2, 0)
         new = QPushButton("New key")
         new.setObjectName("small")
         new.setToolTip("Make a new key: anything using the old one stops working")
-        row.addWidget(new)
+        row.addWidget(new, 2, 1)
         cv.addLayout(row)
         crow = QHBoxLayout()
         copy = QPushButton("Copy an example link")
@@ -1587,20 +1669,19 @@ class SettingsDialog(QDialog):
                               "Reset, or tick the box below. If downloads keep failing even "
                               "after updating, Reset deletes it and its cache and installs a "
                               "fresh copy.")
-        auto = QCheckBox("Update it automatically from PyPI (checks once a day, and when a "
-                         "download fails)")
+        auto = self._option(cv, "Update automatically",
+                            "Check PyPI once a day and after a failed download. Off by "
+                            "default: an update is code the app runs.",
+                            self.mw.cfg.ytdlp_auto_optin,
+                            lambda b: self.mw.set_option("ytdlp_auto_optin", b))
         auto.setToolTip("Off by default: an update is code the app runs. It's checked against "
                         "PyPI's SHA-256 before it's used.")
-        auto.setChecked(self.mw.cfg.ytdlp_auto_optin)
-        auto.toggled.connect(lambda b: self.mw.set_option("ytdlp_auto_optin", b))
-        self._mirror("ytdlp_auto", auto)
-        cv.addWidget(auto)
         self.ytdlp_auto_box = auto
-        row = QHBoxLayout()
+        row = QVBoxLayout()
         self.ytdlp_label = QLabel()
         self.ytdlp_label.setObjectName("hint")
         self.ytdlp_label.setWordWrap(True)
-        row.addWidget(self.ytdlp_label, 1)
+        cv.addWidget(self.ytdlp_label)
         self.ytdlp_btns = []
         for text, job, tip in (
                 ("Update now", ytdl.update, "Check for a newer yt-dlp and install it"),
