@@ -1,5 +1,21 @@
 # Changelog
 
+## Unreleased
+
+- **A tidier right-click menu on a sound**: short names in three groups (play, change,
+  share / remove), with what each does in its tooltip. The hotkey shows in the menu
+  (*Hotkey: Ctrl+Alt+1* → Change… / Remove hotkey), and the picture options are one
+  entry.
+- **Giving a sound a key that's already used says so**: "F2 plays “Airhorn” now — it
+  was the key for “Boom”" (or *Stop everything*, or a category's random key), instead
+  of quietly taking it.
+- **The hotkey is near the top of Edit…**, under the name and volume, not below the
+  timings.
+- **Fixed: a screen trigger's sound could still play after the trigger was deleted**
+  (or the sound taken off it) when its pad was set to *Wait first* or *Queue*.
+- **Fixed: "Up next" stayed in the status line** after the queue ran out, was cleared,
+  or its last sound was taken out with ✕.
+
 ## 1.6.1 — 2026-10-03
 
 - **Custom text-to-speech voices** (Voice tab → More options → *Custom voices*): use

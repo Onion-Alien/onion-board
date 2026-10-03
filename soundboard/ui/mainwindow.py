@@ -15,7 +15,7 @@ from pathlib import Path
 import numpy as np
 import sounddevice as sd
 from PySide6.QtCore import QEvent, QObject, QPropertyAnimation, QSize, Qt, QTimer, QUrl, Signal
-from PySide6.QtGui import QDesktopServices
+from PySide6.QtGui import QDesktopServices, QIcon
 from PySide6.QtWidgets import (QApplication, QCheckBox, QComboBox, QFileDialog, QFrame,
                                QGraphicsOpacityEffect, QGridLayout, QHBoxLayout, QInputDialog,
                                QLabel, QLineEdit, QMainWindow, QMenu, QMessageBox, QPushButton,
@@ -2408,17 +2408,31 @@ class MainWindow(QMainWindow):
         if sid in self.selection.picked and len(self.selection.picked) > 1:
             self.selection.menu(pos)   # right-click on a picked pad: act on all of them
             return
+        # short labels in three groups (play / change / share & remove); what each does
+        # in more words is its tooltip
         menu = QMenu(self)
-        a_stop = (menu.addAction(icons.icon("stop"), "Stop") if self.engine.state(sid)
-                  else None)
-        a_prev = menu.addAction(icons.icon("headphones"), "Preview (only me)")
-        a_next = menu.addAction(icons.icon("play"), "Play next (after what's playing)")
-        a_edit = menu.addAction(icons.icon("edit"), "Edit… (name, volume, hotkey, loop)")
-        a_fx = menu.addAction(icons.icon("wave"), "Effects… (speed, pitch, EQ, boost)")
-        a_hk = menu.addAction(icons.icon("keyboard"), "Set hotkey…")
-        a_pic = menu.addAction(icons.icon("image"), "Change picture…" if m.image
-                               else "Add picture…")
-        a_nopic = menu.addAction("Remove picture") if m.image else None
+        menu.setToolTipsVisible(True)
+
+        def add(icon, text, tip="", parent=menu):
+            a = parent.addAction(icons.icon(*icon) if icon else QIcon(), text)
+            a.setToolTip(tip or text)
+            return a
+        a_stop = add(("stop",), "Stop") if self.engine.state(sid) else None
+        a_prev = add(("headphones",), "Preview", "Plays it to you alone, not into the call")
+        a_next = add(("play",), "Play next", "Plays it after the sounds playing now")
+        menu.addSeparator()
+        a_edit = add(("edit",), "Edit…", "Name, volume, hotkey, what a press does, loop, "
+                     "fades, wait first, cooldown, colour")
+        a_fx = add(("wave",), "Effects…", "Speed, pitch, EQ, boost")
+        a_hk_clear = None
+        if m.hotkey:
+            hk = menu.addMenu(icons.icon("keyboard"), f"Hotkey: {pretty_key(m.hotkey)}")
+            hk.setToolTipsVisible(True)
+            a_hk = add(None, "Change…", "Press a new key or combo for it", hk)
+            a_hk_clear = add(None, "Remove hotkey", "", hk)
+        else:
+            a_hk = add(("keyboard",), "Set hotkey…", "A key or combo that plays it, even "
+                       "in-game")
         cats = menu.addMenu("Categories")
         cat_acts = {}
         for c in self.cfg.categories:
@@ -2429,9 +2443,17 @@ class MainWindow(QMainWindow):
         if cat_acts:
             cats.addSeparator()
         a_newcat = cats.addAction(icons.icon("plus"), "New category…")
-        a_export = menu.addAction(icons.icon("folder"), "Export (to share)…")
+        a_nopic = None
+        if m.image:
+            pic = menu.addMenu(icons.icon("image"), "Picture")
+            a_pic = pic.addAction("Change…")
+            a_nopic = pic.addAction("Remove picture")
+        else:
+            a_pic = add(("image",), "Add picture…", "Shown on the pad (you can also drop a "
+                        "picture on it)")
         menu.addSeparator()
-        a_del = menu.addAction(icons.icon("trash", "danger_text"), "Remove")
+        a_export = add(("folder",), "Export…", "Save it as a file to share with friends")
+        a_del = add(("trash", "danger_text"), "Remove", "Goes to Recently deleted")
         act = menu.exec(pos)
         if act is None:
             return
@@ -2452,13 +2474,9 @@ class MainWindow(QMainWindow):
         elif act == a_fx:
             self.edit(sid, tab="effects")
         elif act == a_hk:
-            d = HotkeyDialog(self.hotkeys, self)
-            if d.exec() and d.result_combo:
-                m.hotkey = d.result_combo
-                self._clear_dupe_hotkey(m)
-                self.cfg.save()
-                self.pads[sid].update()
-            self.register_hotkeys()
+            self.set_sound_hotkey(sid)
+        elif act is not None and act == a_hk_clear:
+            self.set_sound_hotkey(sid, "")
         elif act == a_pic:
             f, _ = QFileDialog.getOpenFileName(
                 self, "Pick a picture", str(Path.home()),
@@ -2614,17 +2632,49 @@ class MainWindow(QMainWindow):
         return (not self.cfg.scoped_hotkeys or not a.tags or not b.tags
                 or bool(set(a.tags) & set(b.tags)))
 
-    def _clear_dupe_hotkey(self, m):
+    def _clear_dupe_hotkey(self, m) -> list[str]:
+        """A combo does one thing: m's hotkey comes off whatever else had it. Returns
+        what lost it ("“Boom”", "Stop everything"...), and says so in the status line,
+        so a key taken from another sound or action is never a silent surprise."""
+        lost = []
+        if not m.hotkey:
+            return lost
         for o in self.cfg.sounds:
             if (o is not m and o.hotkey and o.hotkey == m.hotkey
                     and self._shares_keys(o, m)):
                 o.hotkey = ""
+                lost.append(f"“{o.name}”")
                 if o.id in self.pads:
                     self.pads[o.id].update()
-        for attr, *_ in HOTKEY_ACTIONS:
-            if m.hotkey and m.hotkey == getattr(self.cfg, attr):
+        for attr, _action, label, _desc in HOTKEY_ACTIONS:
+            if m.hotkey == getattr(self.cfg, attr):
                 setattr(self.cfg, attr, "")
+                lost.append(label)
+        lost += [f"a random sound from “{c}”" for c, k in self.cfg.category_hotkeys.items()
+                 if k == m.hotkey]
         self._clear_category_hotkey(m.hotkey)
+        if lost:
+            self.status.setText(
+                f"<span style='color:{theme.status('warn')}'>"
+                f"{html.escape(pretty_key(m.hotkey))} plays “{html.escape(m.name)}” now — "
+                f"it was the key for {html.escape(' and '.join(lost))}.</span>")
+        return lost
+
+    def set_sound_hotkey(self, sid: str, combo: str | None = None):
+        """The pad menu's hotkey: asks for one unless given ("" removes it)."""
+        m = self.meta(sid)
+        if m is None:
+            return
+        if combo is None:
+            d = HotkeyDialog(self.hotkeys, self)
+            combo = d.result_combo if d.exec() and d.result_combo else None
+        if combo is not None and combo != m.hotkey:
+            m.hotkey = combo
+            self._clear_dupe_hotkey(m)
+            self.cfg.save()
+            if sid in self.pads:
+                self.pads[sid].update()
+        self.register_hotkeys()   # the capture paused them
 
     def _clear_category_hotkey(self, combo: str, keep: str | None = None):
         """A combo does one thing: take it off any category's random-sound hotkey."""

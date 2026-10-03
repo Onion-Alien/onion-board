@@ -277,3 +277,51 @@ def test_a_trigger_deleted_while_its_pad_waits_or_queues_never_starts_it(window,
     assert w._queue == ["s0", "s1"]
     host.stop_tag("t2/s1")
     assert w._queue == ["s0"]
+
+
+def menu_pick(monkeypatch, path):
+    """Make the pad menu pick the action at `path` (texts, through submenus); returns
+    the top-level menu's texts as it was shown."""
+    from PySide6.QtWidgets import QMenu
+    from soundboard.ui import mainwindow
+    shown = []
+
+    class Menu(QMenu):
+        def exec(self, *_a):
+            shown.extend(a.text() or "---" for a in self.actions())
+            acts = self.actions()
+            for text in path:
+                a = next(a for a in acts if a.text() == text)
+                acts = a.menu().actions() if a.menu() else acts
+            return a
+    monkeypatch.setattr(mainwindow, "QMenu", Menu)
+    return shown
+
+
+def test_pad_menu_is_short_grouped_and_shows_the_hotkey(window, monkeypatch):
+    w = window
+    shown = menu_pick(monkeypatch, ["Set hotkey…"])
+    from soundboard.ui import mainwindow
+    monkeypatch.setattr(mainwindow.HotkeyDialog, "exec",
+                        lambda self: setattr(self, "result_combo", "ctrl+alt+7") or True)
+    w.pad_menu("s0", None)
+    assert shown == ["Preview", "Play next", "---", "Edit…", "Effects…", "Set hotkey…",
+                     "Categories", "Add picture…", "---", "Export…", "Remove"]
+    assert w.meta("s0").hotkey == "ctrl+alt+7"
+    shown = menu_pick(monkeypatch, ["Hotkey: Ctrl+Alt+7", "Remove hotkey"])
+    w.pad_menu("s0", None)
+    assert "Hotkey: Ctrl+Alt+7" in shown and "Set hotkey…" not in shown
+    assert w.meta("s0").hotkey == ""
+
+
+def test_a_key_taken_from_another_sound_or_action_says_so(window):
+    w = window
+    w.cfg.stop_hotkey = "ctrl+alt+s"
+    w.meta("s1").hotkey = "f2"
+    w.set_sound_hotkey("s0", "f2")
+    assert w.meta("s1").hotkey == "" and "it was the key for “Airhorn”" in w.status.text()
+    w.set_sound_hotkey("s0", "ctrl+alt+s")
+    assert w.cfg.stop_hotkey == "" and "Stop everything" in w.status.text()
+    w.status.setText("")
+    w.set_sound_hotkey("s1", "f9")         # a free key: nothing to say
+    assert w.status.text() == ""

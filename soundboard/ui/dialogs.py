@@ -206,6 +206,17 @@ class EditDialog(QDialog):
         vrow.addWidget(self.vol_lbl)
         form.addRow("Volume", vrow)
 
+        # the hotkey is what most people open this for: near the top, not under the timings
+        hrow = QHBoxLayout()
+        self.hk_btn = QPushButton()
+        self.hk_btn.clicked.connect(self._capture)
+        clr = QPushButton("Clear")
+        clr.clicked.connect(lambda: self._set_hk(""))
+        hrow.addWidget(self.hk_btn, 1)
+        hrow.addWidget(clr)
+        form.addRow("Hotkey", hrow)
+        self._set_hk(self.hotkey)
+
         self.mode = QComboBox()
         self.mode.addItem("Restart — press again restarts it", "restart")
         self.mode.addItem("Overlap — every press plays a new copy", "overlap")
@@ -245,16 +256,6 @@ class EditDialog(QDialog):
         self.cooldown = self._fade_row(form, "Cooldown", meta.cooldown,
                                        "After it starts, presses are ignored for this long, so "
                                        "nobody can spam it", MAX_COOLDOWN_S)
-
-        hrow = QHBoxLayout()
-        self.hk_btn = QPushButton()
-        self.hk_btn.clicked.connect(self._capture)
-        clr = QPushButton("Clear")
-        clr.clicked.connect(lambda: self._set_hk(""))
-        hrow.addWidget(self.hk_btn, 1)
-        hrow.addWidget(clr)
-        form.addRow("Hotkey", hrow)
-        self._set_hk(self.hotkey)
 
         crow = QHBoxLayout()
         crow.setSpacing(6)
