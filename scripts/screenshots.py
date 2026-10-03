@@ -193,9 +193,12 @@ def main():
         widget.grab().save(str(args.out / f"{name}.png"))
         print("saved", name)
 
+    from soundboard import __version__
     from soundboard.settings import SettingsDialog
     from soundboard.ui import mainwindow
     from soundboard.ui.setupwizard import SetupWizard
+
+    mainwindow.version_text = lambda: __version__   # as the installed app shows it
 
     w = mainwindow.MainWindow()
     w._load_thread.join(15)
@@ -215,6 +218,8 @@ def main():
         w.tabs.setCurrentWidget(w.triggers)
         for i, row in enumerate(tr.rows.values()):
             row.show_score(TRIGGERS[i][4] / 100)
+        if hasattr(tr.rows["t0"], "set_open"):
+            tr.rows["t0"].set_open(True)  # one card open, to show what's in one
         tr.rows["t1"].flash("Played!", 60000)
         spin()
         save(w, "triggers")
