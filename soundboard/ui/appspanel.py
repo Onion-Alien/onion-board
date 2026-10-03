@@ -293,13 +293,12 @@ class AppsTab(QWidget):
         v = QVBoxLayout(self)
         v.setContentsMargins(0, 8, 0, 0)
         v.setSpacing(8)
-        head, hv = card("SEND A PROGRAM'S SOUND",
+        head, hv = card("SEND A PROGRAM'S SOUND", info=
                         "Pick a program that's playing — a music player, a browser, a game, "
                         "even a call in another app — and it goes out to whoever's listening, "
                         "on its own volume. Only that program: nothing else you play is "
                         "touched, and it keeps playing on your speakers as before. Programs "
                         "you switch on are remembered and picked up again next time they run.")
-        hv.itemAt(0).widget().setWordWrap(True)   # the title too: this tab must fit 300 px
         self.warn = hint_label("")
         theme.set_tone(self.warn, "warn")
         self.warn.setVisible(False)

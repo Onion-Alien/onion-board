@@ -1160,7 +1160,8 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
             if self.engine.radio_live:
                 text += f"  <span style='color:{theme.status('ok')}'>· others hear it</span>"
             else:
-                text += "  · only you hear it (LIVE sends it to others)"
+                text += ("  · only you hear the radio: press “Only me” below to send it "
+                         "to others too")
         self.info.setText(text)
 
     # ------------------------------------------------------------------ favourites
