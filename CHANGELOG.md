@@ -19,6 +19,10 @@
   headphones), *Wait first* (up to 10 s between the press and the sound) and
   *Cooldown* (presses are ignored for up to 60 s, so nobody can spam it).
 - **One click plays a pad**, if you'd rather (Settings → General). Off by default.
+- **Onion Watch 0.5.4** (Triggers tab, offered there as an update): alarms stop by
+  themselves when you're back (the game moves, you alt-tab back, it's gone, you touch
+  the mouse or keys, or only on Stop), and characters and creatures cut out of a
+  game as transparent PNGs are matched properly.
 
 ## 1.5.9 — 2026-10-02
 
