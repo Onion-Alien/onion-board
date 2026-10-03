@@ -611,7 +611,15 @@ class SpeechPanel(QWidget):
         self.said_log = QPlainTextEdit()
         self.said_log.setReadOnly(True)
         self.said_log.setMaximumBlockCount(500)
-        self.said_log.setFixedHeight(130)
+        # short while empty (a tall blank box pushed More options far down), growing
+        # with what's said up to a few lines, then it scrolls
+        def fit_log():
+            fm = self.said_log.fontMetrics()
+            lines = min(5, max(1, self.said_log.document().blockCount()))
+            pad = self.said_log.frameWidth() * 2 + 16
+            self.said_log.setFixedHeight(lines * fm.lineSpacing() + pad)
+        self.said_log.textChanged.connect(fit_log)
+        fit_log()
         self.said_log.setPlaceholderText("Nothing yet. Lines show up here as they're spoken.")
         b_clear.clicked.connect(self.said_log.clear)
         v.addWidget(self.said_log)
