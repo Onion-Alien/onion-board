@@ -66,7 +66,7 @@ LOCAL_SETTINGS = {"version", "sounds", "categories", "category", "main_device", 
                   "ytdlp_auto_optin", "update_check", "update_checked", "update_skip",
                   "update_pending", "category_hotkeys", "api_enabled", "api_port",
                   "api_token", "net_mode", "net_proxy",
-                  "net_off", "net_offline"}
+                  "net_off", "net_offline", "tor_bridges"}
 # per-sound fields that are written to sound.json (the paths are replaced by names)
 SOUND_FIELDS = ("name", "volume", "hotkey", "mode", "loop", "color", "level_gain",
                 "duration", "fingerprint", "fx", "tags", "fade_in", "fade_out", "hold",

@@ -6,8 +6,10 @@ Modes:
   "proxy"   everything goes through the proxy in cfg.net_proxy:
             socks5h://host:port (socks5:// and a bare host:port mean the same) or
             http://host:port, either with user:password@ if it needs one.
-Phase 3 adds "tor": the app's own Tor, which plugs in here by being a SOCKS port
-(configure(TOR, "socks5h://127.0.0.1:<its port>")); nothing else has to change.
+  "tor"     everything goes through the app's own Tor (soundboard.tor), a SOCKS port
+            on 127.0.0.1 that's only there once Tor has connected. A connection
+            made before that waits for it (up to TOR_WAIT_S), then fails: it never
+            goes direct. soundboard.tor plugs itself in with set_tor_gate().
 
 How each kind of traffic gets here:
   * urllib (updates, yt-dlp updater, Myinstants, translation models, add-ons, custom
@@ -53,15 +55,18 @@ from dataclasses import dataclass
 
 log = logging.getLogger(__name__)
 
-DIRECT, PROXY = "direct", "proxy"
-MODES = (DIRECT, PROXY)
+DIRECT, PROXY, TOR = "direct", "proxy", "tor"
+MODES = (DIRECT, PROXY, TOR)
 CONNECT_TIMEOUT_S = 20.0
+TOR_WAIT_S = 120.0                  # a connection waits this long for Tor to connect
+TOR_HANDSHAKE_S = 60.0              # Tor opening a circuit to the site
 TEST_HOST = ("api.github.com", 443)   # the Test button's target: the update check's host
 HEAD_LIMIT = 64 * 1024              # a request head bigger than this isn't FFmpeg / Qt
 # the relay's address for FFmpeg (radio) and, with their own feature's login, for child
 # processes (pip, the live-voice helper)
 ENV_KEYS = ("http_proxy", "https_proxy", "all_proxy", "no_proxy")
 LOOPBACK_NAMES = ("localhost", "localhost.")
+DIRECT_LOGIN = "direct-"   # relay login "direct-<feature>": not through the proxy / Tor
 
 # Everything that goes online, by the key its requests carry: its switch in Settings >
 # Privacy & security (cfg.net_off lists the ones switched off).
@@ -74,6 +79,7 @@ FEATURES = {
     "voices": "Download voices and speech models",
     "voice_servers": "Custom voice servers",
     "setup_downloads": "Install the virtual cable from the app",
+    "tor_download": "Download Tor from the app",
 }
 # "sounds_web.<site>": the sites sounds come from, each with its own switch under it
 SITES = {"youtube": "YouTube", "soundcloud": "SoundCloud", "myinstants": "Myinstants",
@@ -89,6 +95,7 @@ _OFF_WHAT = {
     "voices": "Downloading voices and speech models is",
     "voice_servers": "Custom voice servers are",
     "setup_downloads": "Installing the virtual cable from the app is",
+    "tor_download": "Downloading Tor from the app is",
 }
 WHERE = "Settings > Privacy & security"
 
@@ -177,6 +184,7 @@ _off: frozenset[str] = frozenset()   # cfg.net_off: the features switched off
 _offline = False                     # cfg.net_offline: all of them
 _generation = 0                      # bumped by every change of the Connection setting
 _last_failure: tuple[float, str] = (0.0, "")
+_tor_gate: Callable[[float], Proxy] | None = None   # soundboard.tor: waits, then its port
 
 
 def mode() -> str:
@@ -200,7 +208,7 @@ def configure(new_mode: str, proxy_url: str = "") -> None:
     if new_mode not in MODES:   # unknown (a newer version's mode): fail closed
         new_mode = PROXY
     p, bad = None, ""
-    if new_mode != DIRECT:
+    if new_mode == PROXY:
         try:
             p = parse(proxy_url)
         except ValueError as e:
@@ -332,10 +340,29 @@ def check(feature) -> None:
         raise FeatureOff(msg)
 
 
+def set_tor_gate(fn: Callable[[float], Proxy] | None) -> None:
+    """soundboard.tor's gate: given a timeout, starts Tor if needed, waits for it to
+    connect and returns its SOCKS port as a Proxy, or raises ProxyError."""
+    global _tor_gate
+    _tor_gate = fn
+
+
+def _tor_proxy() -> Proxy:
+    if _tor_gate is None:
+        raise _failed(f"Not connecting: Tor isn't available. Pick another Connection in "
+                      f"{WHERE}.")
+    try:
+        return _tor_gate(TOR_WAIT_S)
+    except ProxyError as e:
+        raise _failed(str(e)) from None
+
+
 def describe() -> str:
     """For the log and Settings: never includes a password."""
     if _mode == DIRECT:
         return "direct"
+    if _mode == TOR:
+        return "through Tor"
     if _proxy is None:
         return f"{_mode}, but the address isn't usable ({_bad})"
     return f"{_mode} via {'SOCKS5' if _proxy.kind == 'socks5' else 'HTTP'} {_proxy.where}"
@@ -371,28 +398,39 @@ def _failed(msg: str) -> ProxyError:
 # --------------------------------------------------------------------------- connect
 
 def connect(host: str, port: int, timeout: float | None = CONNECT_TIMEOUT_S,
-            via: Proxy | None = None, feature: str | None = None) -> socket.socket:
+            via: Proxy | None = None, feature: str | None = None,
+            direct: bool = False) -> socket.socket:
     """A TCP connection to host:port for `feature` (a key of FEATURES, or TEST), the
     way the Connection setting says (or through `via`, for the Test button). Through a
     proxy the name is resolved by the proxy. Raises FeatureOff when the feature is
     switched off (or missing), before any lookup; this PC (loopback) is always
     allowed. Raises ProxyError (an OSError) with a readable message; never goes
-    direct when a proxy is set."""
+    direct when a proxy or Tor is set, unless `direct` (the user's "Try this one
+    without Tor" click; the switch is checked all the same)."""
     host = str(host).strip("[]")
     if not known(feature) or not (via is None and is_loopback(host)):
-        check(feature)
+        check(feature)   # before the Tor gate: a switched-off feature never starts Tor
     if via is None:
-        if not active() or is_loopback(host):
+        if direct or not active() or is_loopback(host):
             return socket.create_connection((host, port), timeout)
+        if _mode == TOR:
+            # a Tor circuit can take longer to open than a proxy's connection
+            return _via(_tor_proxy(), host, port, timeout, "Tor",
+                        handshake=max(timeout or 0, TOR_HANDSHAKE_S))
         if _proxy is None:
             raise _failed(f"Not connecting: the proxy address in Settings > Privacy isn't "
                           f"usable ({_bad})")
         via = _proxy
+    return _via(via, host, port, timeout)
+
+
+def _via(via: Proxy, host: str, port: int, timeout: float | None,
+         name: str = "", handshake: float | None = None) -> socket.socket:
     try:
-        sock = socket.create_connection((via.host, via.port), timeout)
+        sock = socket.create_connection((via.host, via.port), handshake or timeout)
     except OSError as e:
-        raise _failed(f"Couldn't reach the proxy at {via.where} ({_why(e)}). Nothing "
-                      "was sent without it.") from None
+        raise _failed(f"Couldn't reach {name or f'the proxy at {via.where}'} ({_why(e)}). "
+                      "Nothing was sent without it.") from None
     try:
         if via.kind == "socks5":
             _socks5(sock, via, host, port)
@@ -403,7 +441,9 @@ def connect(host: str, port: int, timeout: float | None = CONNECT_TIMEOUT_S,
         raise _failed(str(e)) from None
     except OSError as e:
         sock.close()
-        raise _failed(f"The proxy at {via.where} stopped answering ({_why(e)})") from None
+        raise _failed(f"{name or f'The proxy at {via.where}'} stopped answering "
+                      f"({_why(e)})") from None
+    sock.settimeout(timeout)
     return sock
 
 
@@ -516,22 +556,23 @@ def _timeout(t):
 
 
 class _HTTPConnection(http.client.HTTPConnection):
-    def __init__(self, *a, feature: str = "", **kw):
+    def __init__(self, *a, feature: str = "", direct: bool = False, **kw):
         super().__init__(*a, **kw)
-        self.feature = feature
+        self.feature, self.direct = feature, direct
 
     def connect(self):
         self.sock = connect(self.host, self.port, _timeout(self.timeout),
-                            feature=self.feature)
+                            feature=self.feature, direct=self.direct)
 
 
 class _HTTPSConnection(http.client.HTTPSConnection):
-    def __init__(self, *a, feature: str = "", **kw):
+    def __init__(self, *a, feature: str = "", direct: bool = False, **kw):
         super().__init__(*a, **kw)
-        self.feature = feature
+        self.feature, self.direct = feature, direct
 
     def connect(self):
-        sock = connect(self.host, self.port, _timeout(self.timeout), feature=self.feature)
+        sock = connect(self.host, self.port, _timeout(self.timeout), feature=self.feature,
+                       direct=self.direct)
         try:
             self.sock = self._context.wrap_socket(sock, server_hostname=self.host)
         except BaseException:
@@ -540,41 +581,44 @@ class _HTTPSConnection(http.client.HTTPSConnection):
 
 
 class _HTTPHandler(urllib.request.HTTPHandler):
-    def __init__(self, feature: str):
+    def __init__(self, feature: str, direct: bool = False):
         super().__init__()
-        self.feature = feature
+        self.feature, self.direct = feature, direct
 
     def http_open(self, req):
-        return self.do_open(_HTTPConnection, req, feature=self.feature)
+        return self.do_open(_HTTPConnection, req, feature=self.feature, direct=self.direct)
 
 
 class _HTTPSHandler(urllib.request.HTTPSHandler):
-    def __init__(self, feature: str, context):
+    def __init__(self, feature: str, context, direct: bool = False):
         super().__init__(context=context)
-        self.feature = feature
+        self.feature, self.direct = feature, direct
 
     def https_open(self, req):
         return self.do_open(_HTTPSConnection, req, context=self._context,
-                            feature=self.feature)
+                            feature=self.feature, direct=self.direct)
 
 
-def _opener(feature: str) -> urllib.request.OpenerDirector:
+def _opener(feature: str, direct: bool = False) -> urllib.request.OpenerDirector:
     """http / https only, connections made by connect() for `feature`: no ftp:// or
     file:// handler, and environment proxies are ignored (they point at the relay, and
     a redirect can't step around the setting)."""
     o = urllib.request.OpenerDirector()
-    for h in (urllib.request.UnknownHandler(), _HTTPHandler(feature),
-              _HTTPSHandler(feature, ssl.create_default_context()),
+    for h in (urllib.request.UnknownHandler(), _HTTPHandler(feature, direct),
+              _HTTPSHandler(feature, ssl.create_default_context(), direct),
               urllib.request.HTTPDefaultErrorHandler(), urllib.request.HTTPRedirectHandler(),
               urllib.request.HTTPErrorProcessor()):
         o.add_handler(h)
     return o
 
 
-def urlopen(req, timeout: float = 30, feature: str | None = None):
+def urlopen(req, timeout: float = 30, feature: str | None = None, direct: bool = False):
     """urllib.request.urlopen for `feature` (a key of FEATURES), the way the Connection
     setting says. Raises FeatureOff, before anything is looked up, when that's switched
-    off or no feature is named (a URL on this PC is always allowed)."""
+    off or no feature is named (a URL on this PC is always allowed). `direct` connects
+    straight to the site whatever the Connection setting (the switches still hold):
+    only for a click on "Try this one without Tor" (the user's own choice for that one
+    request)."""
     url = req.full_url if isinstance(req, urllib.request.Request) else str(req)
     if urllib.parse.urlsplit(url).scheme.lower() == "file":   # a file on this PC
         o = urllib.request.OpenerDirector()
@@ -583,7 +627,7 @@ def urlopen(req, timeout: float = 30, feature: str | None = None):
     if not known(feature) or not is_loopback(urllib.parse.urlsplit(url).hostname or ""):
         check(feature)
     try:
-        return _opener(feature).open(req, timeout=timeout)
+        return _opener(feature, direct).open(req, timeout=timeout)
     except urllib.error.URLError as e:
         if isinstance(e.reason, FeatureOff):   # a redirect to somewhere switched off
             raise e.reason from None
@@ -592,11 +636,13 @@ def urlopen(req, timeout: float = 30, feature: str | None = None):
 
 # --------------------------------------------------------------------------- yt-dlp
 
-def ytdlp_proxy(feature: str) -> str:
+def ytdlp_proxy(feature: str, direct: bool = False) -> str:
     """yt-dlp's "proxy" option for `feature` (sounds_web): the relay, in every mode.
     The relay (not the SOCKS proxy itself) because yt-dlp hands its proxy to ffmpeg
-    for some downloads, and ffmpeg can't speak SOCKS: it would go direct."""
-    return relay_url(feature)
+    for some downloads, and ffmpeg can't speak SOCKS: it would go direct. `direct`:
+    the relay connects straight to the site (the user's "Try this one without Tor";
+    the switch still holds)."""
+    return relay_url(feature, direct)
 
 
 # --------------------------------------------------------------------------- Qt
@@ -633,7 +679,8 @@ class _Relay:
     takes CONNECT host:port (https) and absolute-URL GETs (http), both only with the
     per-launch secret. The login's user name is the feature asking (radio,
     sounds_web…): one that's switched off is refused here, and the onward connection
-    is made with connect() for it."""
+    is made with connect() for it. DIRECT_LOGIN + the feature asks for that connection
+    to go straight to the site (the user's "Try this one without Tor")."""
 
     def __init__(self):
         self.secret = secrets.token_urlsafe(18)
@@ -648,8 +695,8 @@ class _Relay:
         self.seen: collections.deque = collections.deque(maxlen=500)
         threading.Thread(target=self._accept, daemon=True, name="net-relay").start()
 
-    def url(self, feature: str) -> str:
-        cred = f"{feature}:{self.secret}"
+    def url(self, feature: str, direct: bool = False) -> str:
+        cred = f"{DIRECT_LOGIN if direct else ''}{feature}:{self.secret}"
         return f"http://{cred}@127.0.0.1:{self.port}"
 
     def _accept(self):
@@ -704,6 +751,9 @@ class _Relay:
             parts = lines[0].split(" ")
             headers = [ln for ln in lines[1:] if ln]
             feature = self._authorised(headers)
+            direct = feature is not None and feature.startswith(DIRECT_LOGIN)
+            if direct:
+                feature = feature[len(DIRECT_LOGIN):]
             if feature is None:
                 c.sendall(b"HTTP/1.1 407 Proxy Authentication Required\r\n"
                           b"Proxy-Authenticate: Basic realm=\"onionboard\"\r\n"
@@ -743,7 +793,7 @@ class _Relay:
                 return self._refuse(c, 403, str(_failed(
                     f"Not connecting to {host}: it's on this PC or your home network")))
             try:
-                up = connect(host, int(port), feature=feature)
+                up = connect(host, int(port), feature=feature, direct=direct)
             except OSError as e:
                 self.seen.append((feature, host, "failed"))
                 return self._refuse(c, 502, str(e))
@@ -843,9 +893,9 @@ def _relay_drop_all():
         _relay.drop_all()
 
 
-def relay_url(feature: str) -> str:
+def relay_url(feature: str, direct: bool = False) -> str:
     """The relay's address with `feature`'s login (never log it: it has the secret)."""
-    return _relay_start().url(feature)
+    return _relay_start().url(feature, direct)
 
 
 def relay_seen() -> list[tuple[str, str, str]]:

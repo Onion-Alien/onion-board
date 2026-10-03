@@ -50,3 +50,6 @@ Thumbs.db
 desktop.ini
 .DS_Store
 .claude/settings.local.json
+
+# Tor Expert Bundle, unpacked by scripts/fetch_tor.py (never committed)
+vendor/

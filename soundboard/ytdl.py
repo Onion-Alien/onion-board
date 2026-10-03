@@ -145,6 +145,57 @@ def _gate(target: str) -> str:
     return feature
 
 
+class TorBlocked(FetchError):
+    """In Tor mode, the site turned Tor away even after TOR_TRIES new identities. The
+    UI offers "Try this one without Tor"; only that click (direct=True) goes direct."""
+
+
+# YouTube (and others) turning a Tor exit away: "Sign in to confirm you're not a bot",
+# rate limits and refusals. Retried over a new Tor identity, never directly.
+TOR_TRIES = 3
+_TOR_BLOCKED = re.compile(r"not a bot|confirm you.?re not|HTTP Error 429|Too Many Requests|"
+                          r"HTTP Error 403|unusual traffic|try again later", re.I)
+
+
+def blocked_by_site(msg: str) -> bool:
+    return bool(_TOR_BLOCKED.search(msg or ""))
+
+
+def _site_name(target: str) -> str:
+    host = urllib.parse.urlsplit(target).hostname or ""
+    if not host or "youtube" in host or "youtu.be" in host:
+        return "YouTube"
+    return host.removeprefix("www.")
+
+
+def _over_tor(fn, target: str):
+    """fn(), and in Tor mode, when the site turns the Tor exit away, a new Tor identity
+    and another try, up to TOR_TRIES times. Never falls back to a direct connection:
+    the last refusal is raised as TorBlocked for the UI to offer that."""
+    if net.mode() != net.TOR:
+        return fn()
+    from soundboard import tor
+    for attempt in range(TOR_TRIES + 1):
+        try:
+            return fn()
+        except SwitchedOff:
+            raise
+        except DownloadError as e:
+            if not blocked_by_site(str(e)):
+                raise
+            if not site_allowed(target):   # switched off meanwhile: no more tries
+                raise SwitchedOff(net.off_message(site_feature(target))) from None
+            if attempt == TOR_TRIES:
+                site = _site_name(target)
+                raise TorBlocked(
+                    f"{site} turned Tor away ({site} often blocks Tor's addresses), and "
+                    f"so did {TOR_TRIES} other Tor routes. You can try this one without "
+                    f"Tor: {site} would then see your own address.") from e
+            log.info("site turned Tor away (%s); new identity, try %d of %d",
+                     str(e)[:120], attempt + 1, TOR_TRIES)
+            tor.new_identity()
+
+
 # ---------------------------------------------------------------------- the updated copy
 
 def root() -> Path:
@@ -395,20 +446,29 @@ def clean_title(title: str) -> str:
 
 def download_audio(url: str, dest: Path | None = None,
                    progress: Callable[[float], None] | None = None,
-                   auto_update: bool = True) -> tuple[Path, str]:
+                   auto_update: bool = True, direct: bool = False) -> tuple[Path, str]:
     """Download the best audio of `url` into `dest` (a new temp folder by default).
 
     Returns (file, title). `progress` gets 0..1 while it downloads. If yt-dlp fails
     and no update check ran in the last hour, it updates yt-dlp and tries once more.
     Raises DownloadError with a message fit to show the user (SwitchedOff when its
-    site is switched off in Settings > Privacy & security)."""
+    site is switched off in Settings > Privacy & security, TorBlocked when the site
+    turned Tor away). `direct` skips the Connection setting (not the switches) for
+    this one download: only for the user's own "Try this one without Tor" click."""
     feature = _gate(url)
     if url.startswith(MYINSTANTS + "/media/sounds/"):
-        return _download_direct(url, dest, progress)
+        if direct:
+            return _download_direct(url, dest, progress, direct=True)
+        return _over_tor(lambda: _download_direct(url, dest, progress), url)
+
+    def fetch():
+        if direct:
+            return _download(url, dest, progress, feature, direct=True)
+        return _over_tor(lambda: _download(url, dest, progress, feature), url)
     try:
-        return _download(url, dest, progress, feature)
+        return fetch()
     except FetchError as e:
-        if (not auto_update or not due(RETRY_CHECK_AFTER)
+        if (isinstance(e, TorBlocked) or not auto_update or not due(RETRY_CHECK_AFTER)
                 or not net.allowed(UPDATE_FEATURE)):
             raise
         try:
@@ -418,24 +478,27 @@ def download_audio(url: str, dest: Path | None = None,
             raise e from None
         if msg.startswith("Updated"):
             log.info("%s Retrying %s", msg, url)
-            return _download(url, dest, progress, feature)
+            return fetch()
         raise
 
 
-def probe(url: str) -> tuple[str, float]:
+def probe(url: str, direct: bool = False) -> tuple[str, float]:
     """Look `url` up without downloading anything: (clean title, seconds or 0).
     Raises DownloadError like download_audio (but never updates yt-dlp)."""
     feature = _gate(url)
     if url.startswith(MYINSTANTS + "/media/sounds/"):
         return _direct_title(url), 0.0
-    with _ydl() as yt_dlp:
-        try:
-            with yt_dlp.YoutubeDL(_opts(feature=feature)) as ydl:
-                info = _check(ydl.extract_info(url, download=False))
-        except DownloadError:
-            raise
-        except Exception as e:  # noqa: BLE001 - yt-dlp raises many kinds; show its message
-            raise _readable(e) from e
+
+    def look():
+        with _ydl() as yt_dlp:
+            try:
+                with yt_dlp.YoutubeDL(_opts(feature=feature, direct=direct)) as ydl:
+                    return _check(ydl.extract_info(url, download=False))
+            except DownloadError:
+                raise
+            except Exception as e:  # noqa: BLE001 - yt-dlp raises many kinds; show its message
+                raise _readable(e) from e
+    info = look() if direct else _over_tor(look, url)
     return clean_title(info.get("title") or "") or "Sound", float(info.get("duration") or 0)
 
 
@@ -481,30 +544,38 @@ class Result:
         return f"https://i.ytimg.com/vi/{self.id}/mqdefault.jpg"
 
 
-def search(query: str, count: int = 20, source: str = "youtube") -> list[Result]:
+def search(query: str, count: int = 20, source: str = "youtube",
+           direct: bool = False) -> list[Result]:
     """Search one of SOURCES (one results page, nothing downloaded). Live streams
-    and junk entries are left out. Raises DownloadError like probe."""
+    and junk entries are left out. Raises DownloadError like probe (TorBlocked when
+    the site turned Tor away; `direct` is the user's "without Tor" click)."""
     query = " ".join(query.split())
     if not query:
         return []
     kind = SOURCES[source][1]
     feature = _gate(source)
     if kind == "myinstants":
-        return _myinstants(query, count)
+        if direct:
+            return _myinstants(query, count, direct=True)
+        return _over_tor(lambda: _myinstants(query, count), MYINSTANTS)
     if kind == "ytmusic":
         target = ("https://music.youtube.com/search?q="
                   f"{urllib.parse.quote_plus(query)}#songs")
     else:
         target = f"{kind}{count}:{query}{TIKTOK_SUFFIX if source == 'tiktok' else ''}"
-    opts = {k: v for k, v in _opts(feature=feature).items()
+    opts = {k: v for k, v in _opts(feature=feature, direct=direct).items()
             if k not in ("format", "outtmpl")}
     opts.update(extract_flat="in_playlist", noplaylist=False, playlistend=count)
-    with _ydl() as yt_dlp:
-        try:
-            with yt_dlp.YoutubeDL(opts) as ydl:
-                info = ydl.extract_info(target, download=False)
-        except Exception as e:  # noqa: BLE001 - yt-dlp raises many kinds; show its message
-            raise _readable(e) from e
+
+    def look():
+        with _ydl() as yt_dlp:
+            try:
+                with yt_dlp.YoutubeDL(opts) as ydl:
+                    return ydl.extract_info(target, download=False)
+            except Exception as e:  # noqa: BLE001 - yt-dlp raises many kinds; show its message
+                raise _readable(e) from e
+    site = "https://soundcloud.com" if source == "soundcloud" else "https://www.youtube.com"
+    info = look() if direct else _over_tor(look, site)
     out = []
     for e in (info or {}).get("entries") or ():
         if not e or e.get("live_status") == "is_live":
@@ -515,12 +586,13 @@ def search(query: str, count: int = 20, source: str = "youtube") -> list[Result]
     return out[:count]
 
 
-def _myinstants(query: str, count: int) -> list[Result]:
+def _myinstants(query: str, count: int, direct: bool = False) -> list[Result]:
     """Myinstants' search page, read for its sound buttons (title + MP3 path)."""
     url = f"{MYINSTANTS}/en/search/?name={urllib.parse.quote_plus(query)}"
     try:
         req = urllib.request.Request(url, headers=BROWSER_HEADERS)
-        with net.urlopen(req, timeout=20, feature=f"{FEATURE}.myinstants") as r:
+        with net.urlopen(req, timeout=20, feature=f"{FEATURE}.myinstants",
+                         direct=direct) as r:
             page = r.read(4 * 1024 * 1024).decode("utf-8", "replace")
     except net.FeatureOff as e:
         raise SwitchedOff(str(e)) from None
@@ -572,15 +644,16 @@ def _ydl():
         yield yt_dlp
 
 
-def _download(url, dest, progress, feature: str = FEATURE) -> tuple[Path, str]:
+def _download(url, dest, progress, feature: str = FEATURE,
+              direct: bool = False) -> tuple[Path, str]:
     with _ydl() as yt_dlp:
         if dest:
-            return _run(yt_dlp, url, Path(dest), progress, feature)
+            return _run(yt_dlp, url, Path(dest), progress, feature, direct)
         # Our own temp folder: the caller only learns it on success, so a failed
         # download (up to the size cap) must not be left behind in %TEMP%.
         tmp = Path(tempfile.mkdtemp(prefix="sb-ytdl-"))
         try:
-            return _run(yt_dlp, url, tmp, progress, feature)
+            return _run(yt_dlp, url, tmp, progress, feature, direct)
         except BaseException:
             shutil.rmtree(tmp, ignore_errors=True)
             raise
@@ -598,7 +671,7 @@ def _direct_title(url: str) -> str:
     return re.sub(r"[-_]+", " ", stem).strip().capitalize() or "Sound"
 
 
-def _download_direct(url, dest, progress) -> tuple[Path, str]:
+def _download_direct(url, dest, progress, direct: bool = False) -> tuple[Path, str]:
     """A plain audio file yt-dlp can't fetch (Myinstants' Cloudflare blocks it)."""
     parts = urllib.parse.urlsplit(url)
     leaf = _direct_leaf(url)
@@ -615,7 +688,8 @@ def _download_direct(url, dest, progress) -> tuple[Path, str]:
         raise DownloadError("That isn't a Myinstants sound link.")
     try:
         req = urllib.request.Request(url, headers=BROWSER_HEADERS)
-        with (net.urlopen(req, timeout=30, feature=f"{FEATURE}.myinstants") as r,
+        with (net.urlopen(req, timeout=30, feature=f"{FEATURE}.myinstants",
+                          direct=direct) as r,
               open(path, "wb") as f):
             total, got = int(r.headers.get("Content-Length") or 0), 0
             while chunk := r.read(64 * 1024):
@@ -656,7 +730,7 @@ def _readable(e: Exception) -> FetchError:
 
 
 def _opts(dest: Path | None = None, progress=None, thumbnail: bool = False,
-          feature: str = FEATURE) -> dict:
+          feature: str = FEATURE, direct: bool = False) -> dict:
     def hook(d):
         if progress and d.get("status") == "downloading":
             total = d.get("total_bytes") or d.get("total_bytes_estimate") or 0
@@ -677,14 +751,17 @@ def _opts(dest: Path | None = None, progress=None, thumbnail: bool = False,
         "progress_hooks": [hook],
         "logger": log,
     }
-    # the relay, as this site: Settings > Privacy (the connection and the switches)
-    opts["proxy"] = net.ytdlp_proxy(feature)
+    # the relay, as this site: Settings > Privacy (the connection and the switches);
+    # `direct` is the user's "Try this one without Tor" (the switches still hold)
+    opts["proxy"] = net.ytdlp_proxy(feature, direct=direct)
     return opts
 
 
-def _run(yt_dlp, url: str, dest: Path, progress, feature: str = FEATURE) -> tuple[Path, str]:
+def _run(yt_dlp, url: str, dest: Path, progress, feature: str = FEATURE,
+         direct: bool = False) -> tuple[Path, str]:
     try:
-        with yt_dlp.YoutubeDL(_opts(dest, progress, thumbnail=True, feature=feature)) as ydl:
+        with yt_dlp.YoutubeDL(_opts(dest, progress, thumbnail=True, feature=feature,
+                                    direct=direct)) as ydl:
             info = _check(ydl.extract_info(url, download=False))
             dur = info.get("duration") or 0
             if dur > MAX_SECONDS:

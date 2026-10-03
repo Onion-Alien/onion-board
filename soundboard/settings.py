@@ -188,6 +188,11 @@ class _Relay(QObject):
     done = Signal(str)
 
 
+class _ProgressRelay(_Relay):
+    """A _Relay that also carries progress (bytes done, bytes in all; 0 = unknown)."""
+    progress = Signal(int, int)
+
+
 class ThemeCard(QPushButton):
     """A clickable mini-preview of a theme."""
 
@@ -978,6 +983,9 @@ class SettingsDialog(QDialog):
                          "internet. Ones on this PC (127.0.0.1) always work.",
         "setup_downloads": "The setup guide's Install button downloads VB-Cable from "
                            "vb-audio.com. Off: install it yourself from there.",
+        "tor_download": "Get Tor / Update Tor (Connection, below) downloads Tor from the "
+                        "Tor Project (dist.torproject.org). Off: a Tor that's already "
+                        "here still works.",
     }
 
     def _switches_card(self):
@@ -1083,7 +1091,7 @@ class SettingsDialog(QDialog):
     def _net_sync(self):
         """Grey out what's under a switch that's off (everything, in Offline mode), and
         the buttons on other pages that would go online for it."""
-        from soundboard import net
+        from soundboard import net, torget
         body = getattr(self, "_net_body", None)
         if body is None or not qt_valid(body):
             return
@@ -1101,6 +1109,11 @@ class SettingsDialog(QDialog):
                 b.setEnabled(net.allowed("ytdlp_update"))
                 b.setToolTip(b.property("tip") if b.isEnabled()
                              else net.off_message("ytdlp_update"))
+        b = getattr(self, "net_get", None)
+        if b is not None and qt_valid(b) and not busy.is_busy(b):
+            b.setEnabled(net.allowed(torget.FEATURE))
+            b.setToolTip(b.property("tip") if b.isEnabled()
+                         else net.off_message(torget.FEATURE))
 
     def _online_card(self):
         """What goes online only when you do something, and the app's local doors."""
@@ -1138,29 +1151,71 @@ class SettingsDialog(QDialog):
         return card
 
     def _connection_card(self):
-        """Connection: Direct, or everything through a proxy (soundboard.net). Applies
-        at once; a proxy that can't be reached makes requests fail, never go direct."""
+        """Connection: Direct, through a proxy, or through the app's own Tor
+        (soundboard.net, soundboard.tor). Applies at once; a proxy or Tor that can't be
+        reached makes requests fail, never go direct."""
         from PySide6.QtWidgets import QButtonGroup, QLineEdit, QRadioButton
 
-        from soundboard import net
+        import logging
+
+        from soundboard import net, tor, torget
         cfg = self.mw.cfg
         card, cv = self._card(
             "Connection",
-            "Through a proxy, everything the app fetches (searches, downloads, radio, "
-            "updates) goes through it, and site names are looked up by the proxy, not on "
-            "this PC. If the proxy can't be reached, nothing is fetched: the app never "
-            "quietly goes direct. This PC's own addresses (127.0.0.1) stay direct.")
+            "Through a proxy or Tor, everything the app fetches (searches, downloads, "
+            "radio, updates) goes through it, and site names are looked up there, not on "
+            "this PC. If it can't be reached, nothing is fetched: the app never quietly "
+            "goes direct. This PC's own addresses (127.0.0.1) stay direct.")
         direct = QRadioButton("Direct")
         direct.setToolTip("Connect straight to each site")
         via = QRadioButton("Through a proxy")
+        via.setToolTip("A proxy of your own (or one your VPN app offers)")
+        use_tor = QRadioButton("Tor")
+        use_tor.setToolTip("The app's own Tor: sites and radio stations don't see your "
+                           "address")
         group = QButtonGroup(card)
         row = QHBoxLayout()
-        for b in (direct, via):
+        for b in (direct, via, use_tor):
             group.addButton(b)
             row.addWidget(b)
         row.addStretch(1)
         cv.addLayout(row)
-        row = QHBoxLayout()
+
+        # ---- Get Tor: the app doesn't ship it (soundboard.torget)
+        get_box = QWidget()
+        row = QHBoxLayout(get_box)
+        row.setContentsMargins(0, 0, 0, 0)
+        get_note = QLabel()
+        get_note.setObjectName("hint")
+        get_note.setWordWrap(True)
+        row.addWidget(get_note, 1)
+        get = QPushButton("Get Tor")
+        get.setProperty("tip", f"Download Tor {torget.VERSION} from the Tor Project "
+                               "(dist.torproject.org), the way the Connection setting says")
+        get.setToolTip(get.property("tip"))
+        row.addWidget(get)
+        cv.addWidget(get_box)
+
+        def show_get(msg: str = ""):
+            have = tor.available()
+            outdated = (have and tor.bundle_dir() == torget.bin_dir()
+                        and not torget.installed())
+            use_tor.setEnabled(have)
+            use_tor.setToolTip(
+                "The app's own Tor: sites and radio stations don't see your address"
+                if have else tor.NOT_INSTALLED)
+            if not busy.is_busy(get):
+                get.setText("Update Tor" if outdated else "Get Tor")
+            get_box.setVisible(bool(msg) or busy.is_busy(get) or not have or outdated)
+            get_note.setText(msg or (
+                f"A newer Tor ({torget.VERSION}) is ready to download." if outdated else
+                "To use Tor, get it first: about 22 MB from the Tor Project, checked "
+                "before it's used. " + torget.BLOCKED_HINT))
+
+        # ---- proxy
+        proxy_box = QWidget()
+        row = QHBoxLayout(proxy_box)
+        row.setContentsMargins(0, 0, 0, 0)
         addr = QLineEdit(cfg.net_proxy)
         addr.setPlaceholderText("socks5h://127.0.0.1:9050  or  http://host:8080")
         addr.setToolTip("A SOCKS5 proxy (host names are looked up by the proxy) or an "
@@ -1169,18 +1224,73 @@ class SettingsDialog(QDialog):
         test = QPushButton("Test")
         test.setToolTip("Connect to GitHub through this proxy (only to see that it works)")
         row.addWidget(test)
-        cv.addLayout(row)
+        cv.addWidget(proxy_box)
+
+        # ---- Tor
+        tor_box = QWidget()
+        tv = QVBoxLayout(tor_box)
+        tv.setContentsMargins(0, 0, 0, 0)
+        about = QLabel("Tor sends everything through three volunteer computers around the "
+                       "world, so the sites you search and download from and the radio "
+                       "stations you play see a Tor address, not yours. It's slower, and "
+                       "YouTube often turns Tor away: the app then tries other Tor routes, "
+                       "and only goes without Tor if you click to.")
+        about.setObjectName("hint")
+        about.setWordWrap(True)
+        tv.addWidget(about)
+        row = QHBoxLayout()
+        tor_state = QLabel()
+        tor_state.setWordWrap(True)
+        row.addWidget(tor_state, 1)
+        newnym = QPushButton("New identity")
+        newnym.setToolTip("New connections go out through a different Tor route, so sites "
+                          "see a different address")
+        row.addWidget(newnym)
+        tv.addLayout(row)
+        row = QHBoxLayout()
+        hide = QCheckBox("Hide that I'm using Tor")
+        hide.setChecked(bool(cfg.tor_bridges))
+        row.addWidget(hide)
+        kind = QComboBox()
+        kind.addItem("Snowflake (looks like a video call)", "snowflake")
+        kind.addItem("obfs4 (looks like random noise)", "obfs4")
+        kind.setCurrentIndex(max(0, kind.findData(cfg.tor_bridges or tor.DEFAULT_BRIDGE)))
+        kind.setToolTip("If one doesn't connect, try the other")
+        no_wheel(kind)
+        row.addWidget(kind)
+        row.addStretch(1)
+        tv.addLayout(row)
+        hide_hint = QLabel("Disguises the connection so your internet provider can't easily "
+                           "tell it's Tor. Helps where Tor is blocked or frowned on. It's "
+                           "slower, and connecting can take a few minutes.")
+        hide_hint.setObjectName("hint")
+        hide_hint.setWordWrap(True)
+        hide_hint.setContentsMargins(26, 0, 0, 0)   # under the box's text, not its tick
+        tv.addWidget(hide_hint)
+        cv.addWidget(tor_box)
+
         note = QLabel()
         note.setObjectName("hint")
         note.setWordWrap(True)
         cv.addWidget(note)
-        (via if cfg.net_mode != net.DIRECT else direct).setChecked(True)
+        {net.TOR: use_tor, net.PROXY: via}.get(cfg.net_mode, direct).setChecked(True)
 
         def show():
-            on = via.isChecked()
-            addr.setEnabled(on)
-            test.setEnabled(on)
-            if on:
+            if not qt_valid(note):
+                return
+            proxy_box.setVisible(via.isChecked())
+            addr.setEnabled(via.isChecked())
+            test.setEnabled(via.isChecked())
+            tor_box.setVisible(use_tor.isChecked())
+            note.setVisible(not use_tor.isChecked())
+            kind.setEnabled(hide.isChecked())
+            t = tor.manager()
+            tor_state.setText(t.status_text())
+            color = {tor.READY: "ok", tor.FAILED: "error"}.get(t.state)
+            tor_state.setStyleSheet(f"color: {theme.status(color)}" if color else "")
+            if not busy.is_busy(newnym):
+                newnym.setEnabled(t.state == tor.READY)
+            if via.isChecked():
                 try:
                     net.parse(addr.text())
                 except ValueError as e:
@@ -1189,16 +1299,84 @@ class SettingsDialog(QDialog):
             note.setText(f"Now: {net.describe()}.")
 
         def apply():
-            mode = net.PROXY if via.isChecked() else net.DIRECT
+            mode = (net.TOR if use_tor.isChecked() else
+                    net.PROXY if via.isChecked() else net.DIRECT)
             text = addr.text().strip()
-            if (mode, text) != (cfg.net_mode, cfg.net_proxy):
+            bridges = kind.currentData() if hide.isChecked() else ""
+            if (mode, text, bridges) != (cfg.net_mode, cfg.net_proxy, cfg.tor_bridges):
                 self.mw.set_option("net_mode", mode)     # saves
                 self.mw.set_option("net_proxy", text)
+                self.mw.set_option("tor_bridges", bridges)
+                tor.configure_from(cfg)                  # before net: its gate needs it
                 net.configure(mode, text)
+                if mode == net.TOR:
+                    tor.manager().start()   # picked here: connect now and show how far
             show()
 
-        direct.toggled.connect(lambda _on: apply())
+        for b in (direct, via, use_tor):
+            b.toggled.connect(lambda on: on and apply())
         addr.editingFinished.connect(apply)
+        hide.toggled.connect(lambda _on: apply())
+        kind.currentIndexChanged.connect(lambda _i: apply())
+        status = tor.qt_status()
+        status.changed.connect(show)
+
+        def unhook(*_):
+            try:
+                status.changed.disconnect(show)
+            except (RuntimeError, TypeError):
+                pass
+        card.destroyed.connect(unhook)
+
+        def run_newnym():
+            release = busy.hold(newnym, "Changing…")
+            relay = _Relay(self.mw)   # outlives this window if it's closed meanwhile
+
+            def finish(msg):
+                relay.deleteLater()
+                release("✓ Changed" if msg.startswith("New identity") else "✗ Failed")
+                if qt_valid(tor_state):
+                    tor_state.setText(msg)
+
+            relay.done.connect(finish)
+            threading.Thread(target=lambda: relay.done.emit(tor.new_identity()),
+                             daemon=True, name="tor-newnym").start()
+        newnym.clicked.connect(run_newnym)
+
+        def run_get():
+            release = busy.hold(get, "Downloading…")
+            relay = _ProgressRelay(self.mw)   # outlives this window if it's closed meanwhile
+
+            def progress(done, total):
+                if qt_valid(get_note):
+                    get_note.setText(f"Downloading Tor… {done / 1e6:.1f}" + (
+                        f" of {total / 1e6:.1f} MB" if total else " MB"))
+
+            def finish(err):
+                relay.deleteLater()
+                release("✗ Failed" if err else "✓ Got Tor")
+                if qt_valid(get_note):
+                    show_get(err or f"Tor {torget.VERSION} is ready: pick Tor above to "
+                                    "use it.")
+                    show()
+                    self._net_sync()
+
+            def work():
+                try:
+                    # a running Tor may have carried the download: stopped before its
+                    # files are swapped, the next connection starts the new one
+                    torget.get(relay.progress.emit, before_unpack=tor.shutdown)
+                    relay.done.emit("")
+                except torget.GetError as e:
+                    relay.done.emit(str(e))
+                except Exception as e:  # noqa: BLE001 - shown, never a stuck button
+                    logging.getLogger(__name__).exception("Get Tor failed")
+                    relay.done.emit(f"Couldn't get Tor ({e}).")
+
+            relay.progress.connect(progress)
+            relay.done.connect(finish)
+            threading.Thread(target=work, daemon=True, name="tor-get").start()
+        get.clicked.connect(run_get)
 
         def run_test():
             text = addr.text()
@@ -1222,8 +1400,13 @@ class SettingsDialog(QDialog):
             threading.Thread(target=run, daemon=True, name="proxy-test").start()
         test.clicked.connect(run_test)
         self.net_direct, self.net_via, self.net_addr, self.net_test = direct, via, addr, test
+        self.net_tor, self.net_hide, self.net_bridge = use_tor, hide, kind
+        self.net_tor_state, self.net_newnym = tor_state, newnym
+        self.net_get, self.net_get_note = get, get_note
         self.net_note = note
+        show_get()
         show()
+        self._net_sync()   # Get Tor switched off: greyed, with the reason
         return card
 
     # ------------------------------------------------------------------ app updates

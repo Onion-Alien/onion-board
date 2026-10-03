@@ -95,7 +95,8 @@ VOLUME_MAX = 10.0             # the mixer's volume boxes take up to 1000 %
 PAD_WIDTH_RANGE = (110, 240)  # the Sounds tab's pad-size slider
 # settings shown on a control with a fixed range: a value from a hand-edited config or
 # someone's backup is brought into it (Qt raises OverflowError on one past an int)
-NET_MODES = ("direct", "proxy")   # soundboard.net.MODES
+NET_MODES = ("direct", "proxy", "tor")   # soundboard.net.MODES
+TOR_BRIDGES = ("", "snowflake", "obfs4")   # soundboard.tor.BRIDGES
 SETTING_RANGES = {"sound_vol": (0.0, VOLUME_MAX), "mic_vol": (0.0, VOLUME_MAX),
                   "mon_vol": (0.0, VOLUME_MAX), "obs_vol": (0.0, VOLUME_MAX),
                   "pad_width": PAD_WIDTH_RANGE,
@@ -108,11 +109,13 @@ def clean_setting(k: str, v):
     if k in SETTING_RANGES:
         lo, hi = SETTING_RANGES[k]
         return min(max(v, lo), hi)
-    if k == "net_mode":   # a mode this version doesn't know (a newer one's "tor"): fail
+    if k == "net_mode":   # a mode this version doesn't know (a newer one's): fail
         return v if v in NET_MODES else "proxy"   # closed, never quietly direct
     if k == "net_off":   # feature keys (strings); unknown ones are kept, so a newer
         # version's switch stays off after a downgrade and an upgrade
         return list(dict.fromkeys(x for x in v if isinstance(x, str) and x))
+    if k == "tor_bridges":   # an unknown kind: still hide Tor, with the default bridge
+        return v if v in TOR_BRIDGES else "snowflake"
     if k == "eq_gains":   # one finite gain per band, within the EQ's sliders
         if len(v) != len(EQ_BANDS) or not all(
                 isinstance(g, (int, float)) and not isinstance(g, bool) and math.isfinite(g)
@@ -301,14 +304,16 @@ class Config:
     api_enabled: bool = False
     api_port: int = 7474
     api_token: str = ""
-    # Settings > Privacy > Connection (soundboard.net): "direct", or "proxy" through
-    # net_proxy (socks5h://host:port or http://host:port)
+    # Settings > Privacy > Connection (soundboard.net): "direct", "proxy" through
+    # net_proxy (socks5h://host:port or http://host:port), or "tor" (soundboard.tor)
     net_mode: str = "direct"
     net_proxy: str = ""
     # Settings > Privacy & security, the switches (soundboard.net.FEATURES): the
     # features switched off (opt-out: everything's on by default), and Offline mode
     net_off: list[str] = field(default_factory=list)
     net_offline: bool = False
+    # "Hide that I'm using Tor": "" (off), "snowflake" or "obfs4" bridges
+    tor_bridges: str = ""
     sounds: list[SoundMeta] = field(default_factory=list)
 
     # set by load() when the settings weren't read cleanly, for the window to tell the

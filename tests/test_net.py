@@ -189,7 +189,7 @@ def test_a_bad_address_fails_closed_too(monkeypatch):
 
 
 def test_an_unknown_mode_fails_closed():
-    net.configure("tor", "")          # a newer version's mode, read by this one
+    net.configure("i2p", "")          # a newer version's mode, read by this one
     assert net.mode() == net.PROXY
     with pytest.raises(OSError, match="isn't usable"):
         net.connect("example.com", 443, feature=F)

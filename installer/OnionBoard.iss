@@ -2,12 +2,20 @@
 ;
 ;   - no Python needed: it ships the PyInstaller build (dist\OnionBoard)
 ;   - no admin needed for the app itself (installs per user, like Discord does)
+;   - a "Your privacy" page (PrivacyPage in [Code], before the checkboxes): in plain
+;     words, what the app connects to and when, what the Tor box does, and a link to
+;     SECURITY.md#what-the-app-does-on-the-network
 ;   - a "Pick what you want" page of checkboxes:
 ;       * the free VB-Cable virtual cable (downloaded from vb-audio.com,
 ;         signature-checked by install-vbcable.ps1; Windows asks "Yes" once)
 ;       * FFmpeg for m4a / aac / video files (via winget; hidden when ffmpeg is
 ;         already there or winget isn't)
 ;       * the add-on modules in ..\modules (retro voice effect, live voice-to-speech)
+;       * Tor, unticked: the installer doesn't carry it. A ticked box runs
+;         OnionBoard.exe --get-tor, which downloads the Tor Project's Expert Bundle
+;         (soundboard/torget.py: SHA-256 pinned, the saved proxy used) into
+;         %APPDATA%\OnionBoard\tor\bin (Settings > Privacy's "Get Tor" button does
+;         the same). A failed download says so and leaves the app working without it
 ;       * a Desktop shortcut
 ;   - then opens Onion Board, whose Quick setup asks which mic they use and walks
 ;     them through Discord
@@ -71,13 +79,14 @@ WizardSelectTasks=Pick what you want
 SelectTasksDesc=Tick the things you'd like. If you're not sure, leave them as they are.
 SelectTasksLabel2=The ticked boxes are what most people want. Click Install when you're ready.
 FinishedHeadingLabel=All done!
-FinishedLabel=Onion Board is installed. It will open now and ask you a few easy questions (which mic you use, where you listen).%n%nYou can find it later on your Desktop or in the Start menu.%n%nPrivacy: no account, ads or tracking. Settings > Privacy & security shows everything the app does online, lets you switch those things off, and can send all of it through a proxy.
+FinishedLabel=Onion Board is installed. It will open now and ask you a few easy questions (which mic you use, where you listen).%n%nYou can find it later on your Desktop or in the Start menu.%n%nPrivacy: no account, ads or tracking. Settings > Privacy & security shows everything the app does online, lets you switch those things off, and can send all of it through a proxy or Tor.
 FinishedRestartLabel=Onion Board is installed. To finish setting up the virtual cable, Windows needs to restart your PC.%n%nAfter the restart, open Onion Board from the Start menu and it will pick up where it left off.
 
 [Tasks]
 Name: "vbcable"; Description: "The free virtual cable (VB-Cable): lets Discord and games hear your sounds. Needed unless you already have one."; GroupDescription: "Needed"
 Name: "ffmpeg"; Description: "Play M4A, AAC and video files (installs the free FFmpeg, about 100 MB)"; GroupDescription: "Extras"; Check: CanOfferFfmpeg
 Name: "livevoice"; Description: "Set up live voice-to-speech now: you talk, others hear a text-to-speech voice. Needs Python from python.org; downloads about 300 MB. (You can also do this later from the Voice tab.)"; GroupDescription: "Extras"; Flags: unchecked
+Name: "tor"; Description: "Private connection (Tor): hides your address from the sites you search and download from and the radio stations you play. Slower. Downloads Tor from the Tor Project (about 22 MB). It stays off until you pick it in Settings > Privacy & security."; GroupDescription: "Privacy (optional)"; Flags: unchecked
 Name: "desktopicon"; Description: "Put an Onion Board shortcut on my Desktop"; GroupDescription: "Shortcuts"
 
 [InstallDelete]
@@ -126,10 +135,64 @@ Root: HKCU; Subkey: "Software\Microsoft\Windows\CurrentVersion\Run"; ValueType: 
 ; made after install: a module's own Python environment and bytecode
 Type: filesandordirs; Name: "{app}\modules"
 
-; Uninstalling leaves %APPDATA%\OnionBoard (their sounds and settings) and FFmpeg in
-; place; the cable is offered for removal (CurUninstallStepChanged below).
+; Uninstalling leaves %APPDATA%\OnionBoard (their sounds and settings, and a downloaded
+; Tor in tor\bin) and FFmpeg in place; the cable is offered for removal
+; (CurUninstallStepChanged below).
 
 [Code]
+const
+  PrivacyURL = 'https://github.com/Onion-Alien/onion-board/blob/main/SECURITY.md#what-the-app-does-on-the-network';
+
+var
+  PrivacyPage: TWizardPage;
+
+procedure OpenPrivacyLink(Sender: TObject);
+var
+  Code: Integer;
+begin
+  ShellExecAsOriginalUser('open', PrivacyURL, '', '', SW_SHOWNORMAL, ewNoWait, Code);
+end;
+
+// "Your privacy": what the app connects to, in plain words, before the boxes (so they
+// know what the Tor box is for when they get to it). Interactive installs only.
+procedure InitializeWizard;
+var
+  Body, Link: TNewStaticText;
+  Bullet: String;
+begin
+  Bullet := '  ' + #$2022 + '  ';
+  PrivacyPage := CreateCustomPage(wpWelcome, 'Your privacy',
+    'What Onion Board connects to, and when');
+  Body := TNewStaticText.Create(PrivacyPage);
+  Body.Parent := PrivacyPage.Surface;
+  Body.AutoSize := False;
+  Body.WordWrap := True;
+  Body.Width := PrivacyPage.SurfaceWidth;
+  Body.Caption :=
+    'No account, no ads, no tracking. On its own, Onion Board only goes online to ' +
+    'check for updates, and you can switch that off.' + #13#10#13#10 +
+    'Everything else happens only when you use it:' + #13#10 +
+    Bullet + 'Searching for sounds and downloading them goes to YouTube, SoundCloud ' +
+    'and Myinstants.' + #13#10 +
+    Bullet + 'The radio uses Radio Browser (a free list of stations) and the stations ' +
+    'you play.' + #13#10 +
+    Bullet + 'Add-on modules are optional: skip their boxes on the next page, or ' +
+    'remove them later.' + #13#10#13#10 +
+    'Like any website, those sites can see your internet address. The "Private ' +
+    'connection (Tor)" box on the next page hides it from them. It''s slower, it ' +
+    'downloads Tor from the Tor Project, and it stays off until you pick it in ' +
+    'Settings > Privacy & security.';
+  Body.AdjustHeight;
+  Link := TNewStaticText.Create(PrivacyPage);
+  Link.Parent := PrivacyPage.Surface;
+  Link.Caption := 'See exactly what the app does online';
+  Link.Cursor := crHand;
+  Link.Font.Color := clHotLight;
+  Link.Font.Style := [fsUnderline];
+  Link.OnClick := @OpenPrivacyLink;
+  Link.Top := Body.Top + Body.Height + ScaleY(12);
+end;
+
 function WingetPath(Param: String): String;
 begin
   Result := ExpandConstant('{localappdata}\Microsoft\WindowsApps\winget.exe');
@@ -256,10 +319,32 @@ begin
   RegDeleteKeyIfEmpty(HKCU, 'Software\OnionBoard');
 end;
 
+// The "tor" box: the app downloads Tor itself (OnionBoard.exe --get-tor, the same
+// routine as Settings' Get Tor button: checked against its pinned SHA-256, through the
+// saved proxy if there is one). Nothing to do when this Tor is already there.
+procedure GetTor;
+var
+  Code: Integer;
+begin
+  WizardForm.StatusLabel.Caption :=
+    'Downloading Tor from the Tor Project (about 22 MB)... this can take a minute.';
+  if not Exec(ExpandConstant('{app}\{#AppExeName}.exe'), '--get-tor', '', SW_HIDE,
+              ewWaitUntilTerminated, Code) then
+    Code := -1;
+  if Code <> 0 then
+    SuppressibleMsgBox('Tor couldn''t be downloaded, so the private connection isn''t ' +
+      'ready yet. Onion Board works fine without it.' + #13#10#13#10 +
+      'Where Tor is blocked, downloading it often is too. You can try again any time: ' +
+      'Settings > Privacy & security > Connection > Get Tor.',
+      mbInformation, MB_OK, IDOK);
+end;
+
 procedure CurStepChanged(CurStep: TSetupStep);
 begin
   if (CurStep = ssPostInstall) and WizardIsTaskSelected('vbcable') then
     InstallCable;
+  if (CurStep = ssPostInstall) and WizardIsTaskSelected('tor') then
+    GetTor;
   if (CurStep = ssPostInstall) and WizardIsTaskSelected('livevoice') and not HasPython then
     SuppressibleMsgBox('Live voice-to-speech needs Python, which isn''t on this PC yet.' + #13#10#13#10 +
       'Get it free from python.org (tick "Add python.exe to PATH" while installing it). ' +

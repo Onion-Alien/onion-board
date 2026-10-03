@@ -29,7 +29,7 @@ from soundboard.engine import SR, Engine
 from soundboard.engine import is_virtual as is_virtual_cable
 from soundboard import (appaudio, autostart, backup, destination, library, midi, remote,
                         soundfx, thumbs, trash, updates, voicesdk)
-from soundboard import net, shellicon, watchaddon
+from soundboard import net, shellicon, tor, watchaddon
 from soundboard.replay import InstantReplay
 from soundboard.library import (AUDIO_EXTS, PAD_COLORS, RESOURCE_DIR, Config, SoundMeta,
                                 cache_keep, clean_tags, duplicate, fingerprint,
@@ -121,6 +121,9 @@ class MainWindow(QMainWindow):
         self.setAcceptDrops(True)   # files dropped outside the pad grid: see dropEvent
         self.cfg = Config.load()
         net.configure_from(self.cfg)   # before anything goes online
+        tor.configure_from(self.cfg)   # Connection = Tor: starts when something goes online
+        self._tor_told = ""             # what the last Tor toast said (one per change)
+        tor.qt_status().changed.connect(self._on_tor)
         app = QApplication.instance()
         if app is not None:   # before the UI is built, so everything polishes in-theme
             self.cfg.theme = theme.apply(app, self.cfg.theme)
@@ -1510,6 +1513,27 @@ class MainWindow(QMainWindow):
         self._radio_live(False)
         if playing:
             self.toast(html.escape("Radio was switched off, so the station stopped."))
+
+    def _on_tor(self):
+        """Something is waiting for Tor: say so (once), and when it's ready or failed."""
+        t = tor.manager()
+        if t.state == tor.STARTING and t.waiting:
+            say = ("starting", "Connecting to Tor… what you asked for goes once it's "
+                                "connected (Settings → Privacy & security shows how far "
+                                "it is).", "")
+        elif t.state == tor.READY and self._tor_told == "starting":
+            say = ("ready", "✓ Connected to Tor.", "ok")
+        elif t.state == tor.FAILED and self._tor_told in ("starting", "") and t.waiting:
+            say = ("failed", f"Couldn't connect to Tor: {t.message}. Nothing was sent "
+                               "without it.", "error")
+        elif t.state == tor.OFF:
+            self._tor_told = ""
+            return
+        else:
+            return
+        if say[0] != self._tor_told:
+            self._tor_told = say[0]
+            self.toast(html.escape(say[1]), say[2])
 
     def _save_now(self):
         """The debounced save. A failure (disk full, antivirus lock) is logged by
@@ -3964,7 +3988,8 @@ class MainWindow(QMainWindow):
                      self._release_ptt,
                      self._stop_capture, self.cfg.save, self.overlay.shutdown,
                      self.hotkeys.stop, self.replay.stop, self.remote.stop,
-                     self.radio.shutdown, self.apps.shutdown, self.triggers.shutdown,
+                     self.radio.shutdown, tor.shutdown, self.apps.shutdown,
+                     self.triggers.shutdown,
                      self.linkbar.shutdown,
                      self.voice.shutdown, self.engine.shutdown, shellicon.detach):
             try:

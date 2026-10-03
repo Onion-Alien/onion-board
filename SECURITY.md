@@ -65,6 +65,7 @@ So you know what normal looks like when auditing it:
 | You speak a line with a custom voice server you added (Voice tab → More options → *Custom voices*; a `.json` with a `"url"` in `%APPDATA%\OnionBoard\voices\`) | the address you gave it (normally a TTS server on your own PC, e.g. `127.0.0.1`) | sends the line's text (and the voice / model / API key you entered) and gets the spoken audio back. Nothing is sent until you add one | `voice_servers` |
 | You tick *Play M4A, AAC and video files* in the installer | `winget` (Microsoft's package source, then the FFmpeg build it points to) | installs `Gyan.FFmpeg.Essentials` | — (the installer) |
 | You install the virtual cable (its box is ticked by default in the installer; also the setup guide's button) | `vb-audio.com` | downloads VB-Cable; the installer's signature is checked before it runs | `setup_downloads` (not the installer's box) |
+| You press *Get Tor* / *Update Tor* (Settings → Privacy & security → *Connection*), or tick *Private connection (Tor)* in the installer (unticked by default) | `dist.torproject.org` (through your proxy if *Connection* is set to one; when updating, through the Tor that's already there if Tor is picked) | downloads the Tor Project's Tor Expert Bundle for Windows (about 22 MB), checks it against the SHA-256 pinned in `soundboard/torget.py` (taken from the release's GPG-signed checksum list; a download that doesn't match is thrown away) and unpacks only `tor.exe`, `lyrebird.exe`, `pt_config.json` and their licence texts into `%APPDATA%\OnionBoard\tor\bin\`. The app doesn't ship Tor. Where Tor is blocked, this download often is too | `tor_download` |
 | Install from source (`scripts/install.ps1`) | PyPI, and `winget` if you accept installing Python | the app's `requirements.txt` | — |
 | You install a module (its Install button, its `install.bat`, or the installer's *live voice* box) | PyPI, via `pip`, plus whatever the module fetches | that module's `requirements.txt`; *live-voice* downloads a Whisper speech model from Hugging Face (via `faster-whisper`), and picking a different model in the Voice tab downloads that one the first time it starts. Each time live voice starts, `faster-whisper` also asks `huggingface.co` whether the model has changed (no audio or text is sent) | `addons` (pip); `voices` (the speech model) |
 | You click *Get Onion Watch* on the Triggers tab | `api.github.com` | asks for the Onion Watch project's latest release (version number, release page, the first lines of its notes, and its add-on zip's download link and SHA-256) | `addons` |
@@ -143,6 +144,60 @@ addresses, `.local`, `.lan`). Without the setting it isn't started.
   Windows' own proxy setting, not this one). The config keeps the proxy address
   (with any password in it) in `config.json`. It's never exported with a backup
   or written to the log.
+
+### Through Tor
+
+Settings → Privacy & security → *Connection* → *Tor* sends everything above
+through the app's own Tor instead of a proxy: the same paths and rules (fails
+closed, DNS through Tor, loopback stays direct), with Tor's SOCKS port on
+`127.0.0.1` as the proxy. Off by default. The app doesn't ship Tor: it's only
+on your PC once you press *Get Tor* or tick *Private connection (Tor)* in the
+installer (see *Get Tor* in the table above); a source checkout can also use
+`scripts/fetch_tor.py`. Uninstalling leaves it in `%APPDATA%\OnionBoard\tor\bin\`
+with your settings; delete that folder to remove it.
+
+| When | Where | Why |
+|---|---|---|
+| Tor mode is on and the app first needs the network (or you pick *Tor* in Settings) | the Tor network: Tor's directory authorities and relays (or, with *Hide that I'm using Tor*, the Snowflake broker via a CDN plus WebRTC volunteers, or the built-in obfs4 bridges) | `tor.exe` connects ("bootstraps"). Its data folder is `%APPDATA%\OnionBoard\tor\` (directory cache, the control-port cookie); it logs at notice level with `SafeLogging` (no addresses) to the app only |
+
+- **What it is.** `tor.exe` and `lyrebird.exe` are the Tor Project's own Windows
+  Expert Bundle (`dist.torproject.org`), unmodified. The download is checked
+  against a SHA-256 pinned in `soundboard/torget.py`, taken from the
+  release's GPG-signed `sha256sums-signed-build.txt`. Antivirus programs sometimes
+  flag `tor.exe` (a false positive common to Tor).
+- **Only while it's needed.** Tor starts when Tor mode is on and something goes
+  online, and stops when you switch Tor mode off or the app quits. It's tied to
+  the app three ways (a Windows job object that kills it with the app, even after a
+  crash; `TAKEOWNERSHIP` on its control connection; `__OwningControllerProcess`).
+  Its SOCKS and control ports are on `127.0.0.1`, picked by Tor, and the control
+  port needs the cookie only the app can read.
+- **The switches still hold.** A feature that's switched off is refused before
+  Tor is asked, so it never starts Tor; in Offline mode `tor.exe` isn't started at
+  all, and one that's running stops. *Try this one without Tor* only skips the
+  Connection setting: that site's switch still has to be on.
+- **Waits, then fails.** Until Tor has connected, a request waits (the app shows
+  how far Tor has got) and then fails if Tor doesn't make it. It never goes direct.
+- **YouTube** often turns Tor away ("Sign in to confirm you're not a bot", HTTP
+  429 / 403). The app then asks Tor for a new identity (`SIGNAL NEWNYM`: new
+  circuits, usually another exit) and tries again, up to 3 times. If YouTube still
+  refuses, it says so and offers *Try this one without Tor* (search: *Search this
+  without Tor*). Only that click makes that one request directly, and the site then
+  sees your own address.
+- **Radio** streams reconnect over a new circuit if theirs breaks (more retries
+  and more time than without Tor).
+- **New identity** (Settings) sends `NEWNYM`: new connections leave from a
+  different exit. Connections already open (a playing station) keep theirs.
+- **What Tor hides:** your IP address from every site the app contacts (YouTube,
+  SoundCloud, Myinstants, Radio Browser, radio stations, GitHub, PyPI), and which
+  sites those are from your internet provider. With *Hide that I'm using Tor* the
+  provider also can't easily tell that it's Tor at all.
+- **What it can't hide:** what you send. YouTube still sees a Tor exit asking
+  for that video; Radio Browser still gets your searches (and your plays, if you
+  tick that box); a custom voice server still gets the text. The exit relay can
+  see a plain `http://` radio stream (the app prefers `https` where the directory
+  lists one). Everything under *Not covered* above stays outside Tor too.
+  Connecting looks like Tor to your provider unless *Hide that I'm using Tor* is
+  ticked.
 
 No telemetry, analytics or crash upload. The update check only reads the public
 release list, and nothing is installed unless you click *Update now*. *Export* only writes a zip where you save it; nothing is uploaded. Logs and

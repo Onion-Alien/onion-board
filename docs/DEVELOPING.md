@@ -112,6 +112,12 @@ Rebuilds are incremental: PyInstaller reuses its analysis cache in `build\`.
 `-Clean` starts from scratch (do this for a release, or if a build misbehaves).
 `-NoInstaller` stops after the app folder and skips the Inno Setup compression.
 
+Tor isn't part of the build: the app downloads it when asked (`soundboard\torget.py`,
+which pins the version and SHA-256 and says how to move to a newer Tor; the
+installer's *Private connection (Tor)* box runs `OnionBoard.exe --get-tor`). To try
+Tor mode from source without pressing *Get Tor*, `scripts\fetch_tor.py` unpacks the
+same files into the gitignored `vendor\tor`.
+
 Build steps, in order: PyInstaller (bundles `installer\install-vbcable.ps1` and
 `assets\onionboard.ico` as data, both at the root of `_internal\`),
 `scripts\prune_build.py` (removes the parts of Qt the app never loads — QML, 3D,

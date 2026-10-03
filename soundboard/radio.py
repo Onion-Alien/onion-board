@@ -63,6 +63,11 @@ FEATURE = "radio"           # its switch in Settings > Privacy & security (sound
 RETRIES = 3                # a dropped stream is reopened this many times in a row
 CONNECT_S = 20.0           # a station that sends no audio this long after opening is dead
 STALL_S = 8.0              # ...and one that goes quiet this long while playing is reopened
+# Over Tor a stream's circuit can break (a relay in it goes away, or Tor restarts) and a
+# new one takes longer to open: more reopens, more time, and no giving up while Tor
+# itself is still connecting (its own wait fails the stream if it never does)
+TOR_RETRIES = 6
+TOR_CONNECT_S = 60.0
 
 # The maps' files ship with the app: assets/radio in a source checkout, radio/ in the
 # frozen app (build.ps1 bundles it). Nothing is fetched from a CDN.
@@ -715,7 +720,11 @@ class RadioPlayer(QObject):
         if self._reopen_pending:
             return
         now = time.monotonic()
-        if not self._got_audio and now - self._opened > CONNECT_S:
+        over_tor = net.mode() == net.TOR
+        if not self._got_audio and over_tor and not _tor_ready():
+            self._opened = now   # Tor is still connecting: the station's time starts after
+        elif not self._got_audio and now - self._opened > (TOR_CONNECT_S if over_tor
+                                                           else CONNECT_S):
             self._retry("the station didn't answer")
         elif self._got_audio and now - self._last_audio > STALL_S:
             self._retry("the station stopped sending")
@@ -737,10 +746,12 @@ class RadioPlayer(QObject):
     def _retry(self, msg: str):
         if self._reopen_pending:   # one reopen at a time: the error/status/watchdog all fire
             return
-        if (self._got_audio or self._reconnecting) and self._retries < RETRIES:
+        over_tor = net.mode() == net.TOR
+        if (self._got_audio or self._reconnecting) and self._retries < (
+                TOR_RETRIES if over_tor else RETRIES):
             self._retries += 1
             self._reconnecting = self._reopen_pending = True
-            delay = 500 * self._retries + random.randint(0, 300)
+            delay = (1000 if over_tor else 500) * self._retries + random.randint(0, 300)
             log.info("reopening the radio stream in %d ms (%s)", delay, msg)
             self._set_state("connecting")
             gen = self._gen
@@ -770,6 +781,11 @@ class RadioPlayer(QObject):
 
     def shutdown(self):
         self.stop()
+
+
+def _tor_ready() -> bool:
+    from soundboard import tor
+    return tor.manager().state == tor.READY
 
 
 # --------------------------------------------------------------------------- globe page

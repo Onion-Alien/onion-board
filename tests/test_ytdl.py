@@ -539,7 +539,7 @@ class _Resp(io.BytesIO):
 def test_search_myinstants_reads_the_buttons_and_downloads_the_mp3(monkeypatch, tmp_path):
     asked = []
 
-    def urlopen(req, timeout=0, feature=None):
+    def urlopen(req, timeout=0, feature=None, direct=False):
         asked.append((req.full_url, req.headers.get("User-agent", "")))
         return _Resp(MYINSTANTS_PAGE.encode() if "/search/" in req.full_url else b"ID3mp3")
     monkeypatch.setattr(ytdl.net, "urlopen", urlopen)

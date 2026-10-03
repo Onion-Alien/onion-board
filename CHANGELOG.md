@@ -30,6 +30,24 @@
   with a message saying why: the app never quietly goes direct. *Test* checks the
   address first, and switching applies at once (a playing station reconnects the
   new way).
+- **Tor (optional)**: press **Get Tor** under Settings → Privacy & security →
+  *Connection* (or tick *Private connection (Tor)* in the installer, unticked by
+  default), then pick **Tor** there. The app doesn't ship Tor: it downloads the Tor
+  Project's own (about 22 MB, through your proxy if you use one), checks it against
+  a pinned checksum and shows how far the download has got. Where Tor is blocked,
+  the download may be too. The sites you search and download from and the radio stations you
+  play then see a Tor address instead of yours. Tor only runs while that's picked,
+  shows how far it's got (*Connecting… 45%*, *Connected*), and until it's connected
+  nothing is fetched: the app never goes direct behind your back. **New identity**
+  switches to a different Tor route. **Hide that I'm using Tor** disguises the
+  connection (Snowflake, or obfs4) for networks where Tor is blocked or frowned on;
+  it's slower. YouTube often turns Tor away: the app tries up to three other Tor
+  routes, then offers *Try this one without Tor*, which you have to click. Radio
+  stations reconnect if their Tor route breaks. The switches above hold over Tor
+  too: Offline mode never starts Tor, and *Get Tor* has a switch of its own.
+- **The installer has a "Your privacy" page**, before the boxes: in plain words,
+  what the app connects to and when, and what the *Private connection (Tor)* box
+  does, with a link to the full list.
 - A radio station that drops now really reconnects; before, the retry could end up
   replaying what was already received instead of opening the stream again.
 - **Your headphones follow Windows' default output**: switch Windows from your

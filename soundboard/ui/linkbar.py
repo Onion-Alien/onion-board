@@ -83,6 +83,15 @@ class LinkBar(QFrame):
         self.btn_add.setToolTip("Download its audio and add it to your Sounds (Enter)")
         icons.set_icon(self.btn_add, "plus", "on_accent", size=14)
         self.btn_add.clicked.connect(self.add)
+        # Tor mode, after the site turned Tor away even over new routes: only this click
+        # makes one download go without Tor (ytdl.TorBlocked)
+        self.btn_direct = QPushButton("Try this one without Tor")
+        self.btn_direct.setToolTip("Download just this one link straight from the site, not "
+                                   "through Tor: the site will see your own address")
+        self.btn_direct.clicked.connect(self._without_tor)
+        self.btn_direct.hide()
+        self._blocked = ""            # "add" / "play" that Tor couldn't do for this link
+        h.addWidget(self.btn_direct)
         h.addWidget(self.btn_play)
         h.addWidget(self.btn_add)
         self.hide()
@@ -101,6 +110,7 @@ class LinkBar(QFrame):
         self.url = url
         self.title = ""
         self._queued = ""
+        self._blocked = ""
         self._drop_download()
         self.setVisible(bool(url))
         if not url:
@@ -128,6 +138,7 @@ class LinkBar(QFrame):
                 self.done.emit(self.url, self._queued, False)
             self.url = url
             self._queued = ""
+            self._blocked = ""
             self._probe_timer.stop()
             self._drop_download()
         self.title = title
@@ -144,6 +155,7 @@ class LinkBar(QFrame):
         self.info.setText(f"<span style='color:{color}'>{text}</span>" if color else text)
 
     def _buttons(self):
+        self.btn_direct.setVisible(bool(self._blocked) and not self._busy)
         # already added: no second "Add as sound" next to "✓ Added …"
         self.btn_add.setVisible(not self.url or self.url != getattr(self, "_added", ""))
         ok = bool(self.url) and not self._busy and ytdl.site_allowed(self.url)
@@ -191,7 +203,14 @@ class LinkBar(QFrame):
         self._say(f"<b>{name}</b> is next: waiting for the download before it to finish…")
         return True
 
-    def _start(self, kind: str):
+    def _without_tor(self):
+        """The user's click on "Try this one without Tor": that one download, direct."""
+        kind, self._blocked = self._blocked, ""
+        if kind and self.url and not self._busy:
+            self._start(kind, direct=True)
+
+    def _start(self, kind: str, direct: bool = False):
+        self._blocked = ""
         self._busy = kind
         self._buttons()
         got, self._got = self._got, None   # the worker owns (and deletes) it now
@@ -199,7 +218,7 @@ class LinkBar(QFrame):
             _drop_temp(got[1])
             got = None
         args = (kind, self.url, got, self._color_for(), self._known_for(),
-                bool(self.cfg.ytdlp_auto_optin))
+                bool(self.cfg.ytdlp_auto_optin), direct)
         threading.Thread(target=self._work, args=args, daemon=True, name="link-dl").start()
 
     def _play(self, data):
@@ -221,7 +240,7 @@ class LinkBar(QFrame):
             log.info("link lookup failed for %s: %s", url, e)
             self._msg.emit("probe-error", url, str(e))
 
-    def _work(self, kind, url, got, color, known, auto_update):
+    def _work(self, kind, url, got, color, known, auto_update, direct=False):
         """Download (unless `got` already holds it), then import or decode."""
         path = got[1] if got else None
         title = ""
@@ -230,7 +249,7 @@ class LinkBar(QFrame):
             if path is None:
                 path, title = ytdl.download_audio(
                     url, progress=lambda f: self._msg.emit("progress", url, f),
-                    auto_update=auto_update)
+                    auto_update=auto_update, **({"direct": True} if direct else {}))
                 self._msg.emit("title", url, title)
             self._msg.emit("progress", url, -1.0)
             if kind == "play":
@@ -245,6 +264,10 @@ class LinkBar(QFrame):
                 meta.image = thumbs.store(pic, meta.id)   # the video's thumbnail
             self.engine.prepare(meta.id, data)
             self._msg.emit("added", url, (meta, data, title))
+        except ytdl.TorBlocked as e:   # the bar offers to try it without Tor
+            log.warning("link %s turned away over Tor for %s", kind, url)
+            self._msg.emit("blocked", url, (kind, f"Couldn't {'add' if kind == 'add' else 'play'}"
+                                                  f" it: {e}"))
         except Exception as e:  # noqa: BLE001 - shown in the bar, logged
             log.warning("link %s failed for %s: %s", kind, url, e)
             hint = ("" if not isinstance(e, ytdl.FetchError) or auto_update else
@@ -281,6 +304,11 @@ class LinkBar(QFrame):
             return
         # the download finished one way or another
         was, self._busy = self._busy, ""
+        if kind == "blocked":
+            blocked_kind, payload = payload
+            kind = "error"
+            if current:
+                self._blocked = blocked_kind
         if kind == "added":
             self._added = url
         self._buttons()

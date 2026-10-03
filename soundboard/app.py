@@ -80,6 +80,31 @@ def selftest() -> int:
     return 0
 
 
+def get_tor() -> int:
+    """`OnionBoard.exe --get-tor`: the installer's "Private connection (Tor)" box.
+    Downloads Tor into %APPDATA%\\OnionBoard\\tor\\bin (soundboard.torget, the same
+    routine as Settings' Get Tor button) the way the saved Connection setting says, so
+    a proxy set there is used. No window. Returns 0 when Tor is there (already, or
+    now), 1 if it couldn't be got."""
+    applog.setup(APP_DIR)
+    from soundboard import library, net, tor, torget
+    if torget.installed():
+        return 0
+    cfg = library.Config.load()
+    tor.configure_from(cfg)   # updating an older Tor in Tor mode: through that Tor
+    net.configure_from(cfg)
+    try:
+        torget.get(before_unpack=tor.shutdown)
+    except torget.GetError as e:
+        log.warning("--get-tor: %s", e)
+        print(f"FAIL: {e}", file=sys.stderr)
+        return 1
+    finally:
+        tor.shutdown()
+    print(f"OK: Tor {torget.VERSION} is in {torget.bin_dir()}")
+    return 0
+
+
 def selftest_addon(path: str) -> int:
     """`OnionBoard.exe --selftest-addon OnionWatch-module.zip`: prove this build can
     run the Onion Watch add-on (it has no pip, so the add-on may only use what the
@@ -126,6 +151,8 @@ def selftest_addon(path: str) -> int:
 def main():
     if "--selftest" in sys.argv:
         sys.exit(selftest())
+    if "--get-tor" in sys.argv:
+        sys.exit(get_tor())
     if "--selftest-addon" in sys.argv:
         sys.exit(selftest_addon(sys.argv[sys.argv.index("--selftest-addon") + 1]))
     migrate_from_soundboard()

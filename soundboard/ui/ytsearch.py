@@ -360,6 +360,17 @@ class SearchResults(QFrame):
         self.title.setTextFormat(Qt.RichText)
         self.title.setWordWrap(True)
         v.addWidget(self.title)
+        # Tor mode, after the site turned Tor away even over new routes: only this click
+        # runs the search without Tor (ytdl.TorBlocked)
+        self.direct_btn = QPushButton("Search this without Tor")
+        self.direct_btn.setToolTip("Run just this search straight from the site, not through "
+                                   "Tor: the site will see your own address")
+        self.direct_btn.clicked.connect(lambda: self.search(self.query, direct=True))
+        self.direct_btn.hide()
+        row = QHBoxLayout()
+        row.addWidget(self.direct_btn)
+        row.addStretch(1)
+        v.addLayout(row)
         self.hint = QLabel(PASTE_HINT)
         self.hint.setObjectName("muted")
         self.hint.setWordWrap(True)
@@ -418,7 +429,7 @@ class SearchResults(QFrame):
             if self.query and not self.isHidden():
                 self.search(self.query)
 
-    def search(self, query: str) -> bool:
+    def search(self, query: str, direct: bool = False) -> bool:
         query = " ".join(query.split())
         if not query or not ytdl.site_allowed(self.source):
             return False
@@ -430,7 +441,8 @@ class SearchResults(QFrame):
         self.title.setText(text)
         self._loading(True, text)
         self.show()
-        threading.Thread(target=self._work, args=(self._gen, query, self.source),
+        self.direct_btn.hide()
+        threading.Thread(target=self._work, args=(self._gen, query, self.source, direct),
                          daemon=True, name="web-search").start()
         return True
 
@@ -464,9 +476,13 @@ class SearchResults(QFrame):
             r.deleteLater()
         self._rows = []
 
-    def _work(self, gen: int, query: str, source: str):
+    def _work(self, gen: int, query: str, source: str, direct: bool = False):
         try:
-            self._done.emit(gen, ytdl.search(query, source=source), "")
+            more = {"direct": True} if direct else {}   # the user's "without Tor" click
+            self._done.emit(gen, ytdl.search(query, source=source, **more), "")
+        except ytdl.TorBlocked as e:   # offered without Tor, never done unasked
+            log.info("%s search turned away over Tor", source)
+            self._done.emit(gen, "blocked", str(e))
         except Exception as e:  # noqa: BLE001 - shown in the panel
             log.info("%s search failed for %r: %s", source, query, e)
             self._done.emit(gen, [], str(e) or "Search failed")
@@ -480,6 +496,7 @@ class SearchResults(QFrame):
             red = theme.status("error")
             self.title.setText(f"<span style='color:{red}'>Couldn't search {self.site}: "
                                f"{html.escape(err)}</span>")
+            self.direct_btn.setVisible(results == "blocked")
             return
         if not results:
             self.title.setText(f"No {self.site} results for <b>{q}</b>.")
