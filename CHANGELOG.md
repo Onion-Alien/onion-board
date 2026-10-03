@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+- **Offline from the first start:** the installer's *Your privacy* page has an
+  *Offline mode* box. Ticked, it switches Offline mode on before the app first opens
+  (`OnionBoard.exe --set-offline`), so it never goes online, not even once, and
+  unticks the installer's own downloads (VB-Cable, FFmpeg, live voice, Tor). It's
+  ticked already when reinstalling over an app that's in Offline mode. Silent installs
+  use `/OFFLINE=1`, which skips those downloads unless `/TASKS=` names them.
 - **Cleaner bottom bars:** My mic, What others hear and My headphones are three
   separate boxes. Each volume is a speaker icon, a slider and a plain % you can
   still click and type into; the mic and radio level meters sit under their own

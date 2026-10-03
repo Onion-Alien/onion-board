@@ -149,6 +149,11 @@ dist\OnionBoardSetup.exe /VERYSILENT /SUPPRESSMSGBOXES /NORESTART /CLOSEAPPLICAT
 - `/CLOSEAPPLICATIONS` closes a running Onion Board first (it's also the
   installer's default).
 - Silent installs don't launch the app afterwards (`skipifsilent`).
+- `/OFFLINE=1` ticks the privacy page's *Offline mode* box: the installer runs
+  `OnionBoard.exe --set-offline` first (`net_offline: true` in
+  `%APPDATA%\OnionBoard\config.json`, other settings kept) and skips VB-Cable,
+  FFmpeg, live voice and Tor unless `/TASKS=` or `/MERGETASKS=` names them (Tor
+  never: the app doesn't start it while offline). It never switches Offline mode off.
 - The installer runs `install-vbcable.ps1 -Silent` (bundled as
   `_internal\install-vbcable.ps1`). It exits straight away if a virtual cable is
   already present. If none is, VB-Cable is downloaded and Windows shows a **UAC prompt** — that part can't be headless, so tell the user

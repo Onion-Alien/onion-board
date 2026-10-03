@@ -4,7 +4,12 @@
 ;   - no admin needed for the app itself (installs per user, like Discord does)
 ;   - a "Your privacy" page (PrivacyPage in [Code], before the checkboxes): in plain
 ;     words, what the app connects to and when, what the Tor box does, and a link to
-;     SECURITY.md#what-the-app-does-on-the-network
+;     SECURITY.md#what-the-app-does-on-the-network. Its "Offline mode" box (unticked;
+;     ticked already when the app is in Offline mode) runs OnionBoard.exe --set-offline
+;     before anything else runs, so the app never goes online, not even on its first
+;     start, and unticks the boxes below that download things (they can be ticked
+;     again: the installer downloads those, the app stays offline; Tor is skipped,
+;     since the app never starts it while offline)
 ;   - a "Pick what you want" page of checkboxes:
 ;       * the free VB-Cable virtual cable (downloaded from vb-audio.com,
 ;         signature-checked by install-vbcable.ps1; Windows asks "Yes" once)
@@ -21,7 +26,10 @@
 ;     them through Discord
 ;
 ; Silent installs (/VERYSILENT) use each box's default, or the choices from the
-; last install. Built by build.ps1 (needs Inno Setup 6: winget install JRSoftware.InnoSetup).
+; last install. /OFFLINE=1 is the Offline mode box: it also skips the boxes that
+; download (VB-Cable, FFmpeg, live voice, Tor) unless /TASKS= or /MERGETASKS= names
+; them. Neither the box nor /OFFLINE ever switches Offline mode off: that's in the app.
+; Built by build.ps1 (needs Inno Setup 6: winget install JRSoftware.InnoSetup).
 
 #define AppName "Onion Board"
 #define AppExeName "OnionBoard"
@@ -106,16 +114,21 @@ Name: "{autodesktop}\{#AppName}"; Filename: "{app}\{#AppExeName}.exe"; AppUserMo
 Name: "{autoprograms}\{#AppName}"; Filename: "{app}\{#AppExeName}.exe"; AppUserModelID: "OnionBoard.App"
 
 [Run]
+; Offline mode first: these entries run before CurStepChanged(ssPostInstall), and the
+; relaunch below starts the app. AfterInstall checks config.json really says so.
+Filename: "{app}\{#AppExeName}.exe"; Parameters: "--set-offline"; \
+  StatusMsg: "Switching on Offline mode..."; \
+  Check: OfflineChosen; AfterInstall: CheckOffline; Flags: runhidden waituntilterminated
 ; The virtual cable is installed from CurStepChanged in [Code], so its exit code can
 ; ask for a restart.
 Filename: "{code:WingetPath}"; \
   Parameters: "install --id Gyan.FFmpeg.Essentials --exact --silent --disable-interactivity --accept-package-agreements --accept-source-agreements"; \
   StatusMsg: "Adding M4A and video support (FFmpeg)... this can take a minute."; \
-  Tasks: ffmpeg; Flags: runhidden waituntilterminated
+  Tasks: ffmpeg; Check: MayDownload('ffmpeg'); Flags: runhidden waituntilterminated
 Filename: "{cmd}"; Parameters: "/c ""{app}\modules\live-voice\install.bat"" --quiet"; \
   WorkingDir: "{app}\modules\live-voice"; \
   StatusMsg: "Setting up live voice-to-speech (downloads about 300 MB, can take a few minutes)..."; \
-  Tasks: livevoice; Check: HasPython; Flags: runhidden waituntilterminated
+  Tasks: livevoice; Check: HasPython and MayDownload('livevoice'); Flags: runhidden waituntilterminated
 Filename: "{app}\{#AppExeName}.exe"; Description: "Open Onion Board now"; Flags: nowait postinstall skipifsilent
 ; The app's own updater (soundboard/updates.py) runs this silently with /RELAUNCH=1 after
 ; closing itself: open it again once the new version is in place.
@@ -145,6 +158,80 @@ const
 
 var
   PrivacyPage: TWizardPage;
+  OfflineBox: TNewCheckBox;
+  OfflineApplied: Boolean;     // the download boxes were unticked for Offline mode
+  TasksLabelText: String;      // the Pick what you want page's own label
+
+// "net_offline": true in %APPDATA%\OnionBoard\config.json: the app is in Offline mode
+// already (a reinstall). A plain text search: json.dumps writes it on one line.
+function ConfigIsOffline: Boolean;
+var
+  Raw: AnsiString;
+  S: String;
+begin
+  Result := False;
+  if not LoadStringFromFile(ExpandConstant('{userappdata}\OnionBoard\config.json'), Raw) then
+    exit;
+  S := String(Raw);
+  StringChangeEx(S, ' ', '', True);
+  StringChangeEx(S, #9, '', True);
+  StringChangeEx(S, #13, '', True);
+  StringChangeEx(S, #10, '', True);
+  Result := Pos('"net_offline":true', S) > 0;
+end;
+
+// The Offline mode box (silent installs: /OFFLINE=1, or the app already offline)
+function OfflineChosen: Boolean;
+begin
+  Result := (OfflineBox <> nil) and OfflineBox.Checked;
+end;
+
+// Is `Task` in the comma-separated /<Param>= list on the command line?
+function ListedIn(Param, Task: String): Boolean;
+var
+  List, Item: String;
+  I: Integer;
+begin
+  Result := False;
+  List := Lowercase(ExpandConstant('{param:' + Param + '|}')) + ',';
+  while List <> '' do
+  begin
+    I := Pos(',', List);
+    Item := Trim(Copy(List, 1, I - 1));
+    Delete(List, 1, I);
+    if Item = Lowercase(Task) then
+    begin
+      Result := True;
+      exit;
+    end;
+  end;
+end;
+
+// A box that downloads something: may it? Interactive installs do what's ticked (Offline
+// mode unticked them, so a tick now is on purpose). A silent one in Offline mode only
+// downloads what /TASKS or /MERGETASKS names; Tor never, since an offline app never
+// starts it (and --get-tor would refuse anyway).
+function MayDownload(Task: String): Boolean;
+begin
+  Result := WizardIsTaskSelected(Task);
+  if not Result or not OfflineChosen then
+    exit;
+  if Task = 'tor' then
+    Result := False
+  else if WizardSilent then
+    Result := ListedIn('TASKS', Task) or ListedIn('MERGETASKS', Task);
+end;
+
+// after --set-offline: is it really in config.json? If not, say so before they open it
+procedure CheckOffline;
+begin
+  if not ConfigIsOffline then
+    SuppressibleMsgBox('Offline mode couldn''t be switched on (the settings file couldn''t ' +
+      'be written).' + #13#10#13#10 +
+      'Onion Board will go online as usual until you switch it on: before using it, open ' +
+      'Settings > Privacy & security and turn on Offline mode.',
+      mbError, MB_OK, IDOK);
+end;
 
 procedure OpenPrivacyLink(Sender: TObject);
 var
@@ -157,7 +244,7 @@ end;
 // know what the Tor box is for when they get to it). Interactive installs only.
 procedure InitializeWizard;
 var
-  Body, Link: TNewStaticText;
+  Body, Link, Note: TNewStaticText;
   Bullet: String;
 begin
   Bullet := '  ' + #$2022 + '  ';
@@ -191,6 +278,48 @@ begin
   Link.Font.Style := [fsUnderline];
   Link.OnClick := @OpenPrivacyLink;
   Link.Top := Body.Top + Body.Height + ScaleY(12);
+  OfflineBox := TNewCheckBox.Create(PrivacyPage);
+  OfflineBox.Parent := PrivacyPage.Surface;
+  OfflineBox.Top := Link.Top + Link.Height + ScaleY(14);
+  OfflineBox.Width := PrivacyPage.SurfaceWidth;
+  OfflineBox.Height := ScaleY(17);
+  OfflineBox.Caption := 'Offline mode: Onion Board never goes online, from its first start';
+  OfflineBox.Checked := (ExpandConstant('{param:OFFLINE|0}') = '1') or ConfigIsOffline;
+  Note := TNewStaticText.Create(PrivacyPage);
+  Note.Parent := PrivacyPage.Surface;
+  Note.AutoSize := False;
+  Note.WordWrap := True;
+  Note.Left := ScaleX(18);
+  Note.Width := PrivacyPage.SurfaceWidth - ScaleX(18);
+  Note.Top := OfflineBox.Top + OfflineBox.Height + ScaleY(2);
+  Note.Caption := 'No update checks, no searching or downloading. Unticks the boxes on the ' +
+    'next page that download things. Switch it off any time in Settings > Privacy & security.';
+  Note.AdjustHeight;
+  TasksLabelText := WizardForm.SelectTasksLabel.Caption;
+end;
+
+// Offline mode ticked: untick the boxes that download (once, so ticking one again
+// sticks) and grey out Tor. Unticked again: back to the defaults.
+procedure CurPageChanged(CurPageID: Integer);
+var
+  I: Integer;
+begin
+  if (CurPageID <> wpSelectTasks) or WizardSilent then
+    exit;
+  if OfflineChosen and not OfflineApplied then
+    WizardSelectTasks('!vbcable,!ffmpeg,!livevoice,!tor')
+  else if OfflineApplied and not OfflineChosen then
+    WizardSelectTasks('vbcable,ffmpeg');
+  OfflineApplied := OfflineChosen;
+  for I := 0 to WizardForm.TasksList.Items.Count - 1 do
+    if Pos('(Tor)', WizardForm.TasksList.ItemCaption[I]) > 0 then
+      WizardForm.TasksList.ItemEnabled[I] := not OfflineChosen;
+  if OfflineChosen then
+    WizardForm.SelectTasksLabel.Caption := 'Offline mode is on, so the boxes that ' +
+      'download things are unticked. Ticking one lets this installer download it; ' +
+      'Onion Board itself stays offline.'
+  else
+    WizardForm.SelectTasksLabel.Caption := TasksLabelText;
 end;
 
 function WingetPath(Param: String): String;
@@ -341,11 +470,11 @@ end;
 
 procedure CurStepChanged(CurStep: TSetupStep);
 begin
-  if (CurStep = ssPostInstall) and WizardIsTaskSelected('vbcable') then
+  if (CurStep = ssPostInstall) and MayDownload('vbcable') then
     InstallCable;
-  if (CurStep = ssPostInstall) and WizardIsTaskSelected('tor') then
+  if (CurStep = ssPostInstall) and MayDownload('tor') then
     GetTor;
-  if (CurStep = ssPostInstall) and WizardIsTaskSelected('livevoice') and not HasPython then
+  if (CurStep = ssPostInstall) and MayDownload('livevoice') and not HasPython then
     SuppressibleMsgBox('Live voice-to-speech needs Python, which isn''t on this PC yet.' + #13#10#13#10 +
       'Get it free from python.org (tick "Add python.exe to PATH" while installing it). ' +
       'Then in Onion Board open the Voice tab and press Install.',
