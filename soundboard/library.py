@@ -190,6 +190,7 @@ class SoundMeta:
     volume: float = 1.0       # 0..2 user gain
     hotkey: str = ""
     mode: str = "restart"     # restart | overlap | toggle | solo (stops the other sounds)
+    #                           | queue (waits for the sounds playing to finish)
     loop: bool = False
     color: str = PAD_COLORS[0]
     level_gain: float = 1.0   # computed loudness-levelling gain
@@ -201,6 +202,9 @@ class SoundMeta:
     fade_in: float = 0.0      # seconds: rises from silence when it starts
     fade_out: float = 0.0     # seconds: falls to silence when stopped / near its end
     hold: bool = False        # plays only while its hotkey / MIDI pad is held down
+    only_them: bool = False   # goes out to others but not into your own headphones
+    delay: float = 0.0        # seconds between the press and the sound starting
+    cooldown: float = 0.0     # seconds after it starts during which presses are ignored
 
 
 @dataclass
@@ -259,6 +263,19 @@ class Config:
     update_skip: str = ""             # a version the user said to skip
     update_pending: str = ""          # the version an update is installing (see updates.py)
     random_hotkey: str = ""           # plays a random sound from the category showing
+    last_hotkey: str = ""             # plays the last sound played again
+    next_cat_hotkey: str = ""         # shows the next category (random key + overlay follow)
+    prev_cat_hotkey: str = ""         # ... and the one before
+    vol_up_hotkey: str = ""           # sounds 10 % louder
+    vol_down_hotkey: str = ""         # sounds 10 % quieter
+    mic_hotkey: str = ""              # send my mic on / off
+    voice_hotkey: str = ""            # the voice changer on / off
+    voice_hold_hotkey: str = ""       # the voice changer on only while held
+    hotkeys_off_hotkey: str = ""      # every other hotkey off / on (this one keeps working)
+    # a sound's hotkey only works while its category is showing, so one key can play a
+    # different sound in each category (keybind profiles)
+    scoped_hotkeys: bool = False
+    single_click: bool = False        # one click on a pad plays it (not a double-click)
     category_hotkeys: dict = field(default_factory=dict)   # category -> its random-sound key
     # instant replay (soundboard.replay): while this hotkey is set, the last
     # replay_seconds of everything you hear (except Onion Board's own sounds) are kept
@@ -415,6 +432,11 @@ class Config:
             s["tags"] = clean_tags(s.get("tags"))
             for k in ("fade_in", "fade_out"):
                 s[k] = clean_fade(s.get(k))
+            for k in ("delay", "cooldown"):
+                if k in s:
+                    s[k] = clean_wait(s[k], k)
+            if s.get("mode") not in MODES:
+                s["mode"] = "restart"
             for k, lo, hi in (("volume", 0.0, 2.0), ("level_gain", 0.1, 6.0)):
                 if k in s:   # the Edit dialog's slider can't take any number
                     s[k] = min(max(s[k], lo), hi)
@@ -479,6 +501,9 @@ class Config:
 
 
 MAX_FADE_S = 10.0
+MAX_DELAY_S = 10.0      # a sound's "wait before playing"
+MAX_COOLDOWN_S = 60.0   # a sound's "ignore presses for"
+MODES = ("restart", "overlap", "toggle", "solo", "queue")   # SoundMeta.mode
 
 
 def clean_fade(v) -> float:
@@ -488,6 +513,16 @@ def clean_fade(v) -> float:
     except (TypeError, ValueError):
         return 0.0
     return min(max(v, 0.0), MAX_FADE_S) if v == v else 0.0
+
+
+def clean_wait(v, kind: str = "delay") -> float:
+    """A delay or cooldown in seconds, within its slider (anything unreadable is 0)."""
+    try:
+        v = float(v)
+    except (TypeError, ValueError):
+        return 0.0
+    hi = MAX_COOLDOWN_S if kind == "cooldown" else MAX_DELAY_S
+    return min(max(v, 0.0), hi) if v == v else 0.0
 
 
 def clean_tags(tags) -> list[str]:

@@ -1,5 +1,25 @@
 # Changelog
 
+## Unreleased
+
+- **One key, a random sound from the category you're on.** The new *Next category*
+  / *Previous category* hotkeys switch the category in-game, with a beep for each
+  step along (one for the first, two for the second…; a low one for All). The
+  *Play a random sound* key, and the overlay, follow the category you switch to.
+- **A set of hotkeys per category** (Settings → Hotkeys): turn on *Sound hotkeys only
+  work in the category showing* and the same key can play a different sound in each
+  category.
+- **More hotkeys** (Settings → Hotkeys): play the last sound again, sounds louder /
+  quieter by 10%, send my mic on / off, voice changer on / off, change my voice only
+  while a key is held, and *All hotkeys off / on* (so they type normally in chat).
+- **Queue sounds.** A sound's *On press* can be *Queue*: it waits for the sounds
+  playing to finish. Right-click any pad → *Play next*, or a category → *Play them
+  all, in order* / *shuffled*. *Stop everything* clears the queue.
+- **New per-sound options** (Edit…): *Only others hear it* (not played in your
+  headphones), *Wait first* (up to 10 s between the press and the sound) and
+  *Cooldown* (presses are ignored for up to 60 s, so nobody can spam it).
+- **One click plays a pad**, if you'd rather (Settings → General). Off by default.
+
 ## 1.5.9 — 2026-10-02
 
 - **Headsets with "Virtual" in their name show up again.** Onion Board took any

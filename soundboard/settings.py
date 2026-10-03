@@ -30,6 +30,32 @@ HOTKEY_GROUPS = [
         ("random_hotkey", "__random__", "Play a random sound",
          "From the category showing (All = any sound), never the same one twice in a row. "
          "A category can have its own: right-click its tab."),
+        ("last_hotkey", "__last__", "Play the last sound again",
+         "Whatever played last, from a pad, a hotkey or the random key."),
+        ("vol_up_hotkey", "__volup__", "Sounds louder",
+         "Turns your sounds up by 10% (what others hear and what you hear)."),
+        ("vol_down_hotkey", "__voldown__", "Sounds quieter",
+         "Turns your sounds down by 10%."),
+    ]),
+    ("Categories", [
+        ("next_cat_hotkey", "__nextcat__", "Next category",
+         "Shows the next category's pads. The random-sound key and the overlay follow it, "
+         "so one key plays a random sound from whichever category you switched to."),
+        ("prev_cat_hotkey", "__prevcat__", "Previous category",
+         "Shows the category before it."),
+    ]),
+    ("Mic and voice", [
+        ("mic_hotkey", "__mic__", "Send my mic on / off",
+         "Others hear your voice with the sounds, or only the sounds."),
+        ("voice_hotkey", "__voice__", "Voice changer on / off",
+         "Turns the voice changer on with the voice picked on the Voice tab, or off."),
+        ("voice_hold_hotkey", "__voicehold__", "Change my voice while held",
+         "The voice changer is on only while you hold this key down."),
+    ]),
+    ("Turn hotkeys off", [
+        ("hotkeys_off_hotkey", "__hotkeys__", "All hotkeys off / on",
+         "Turns every other hotkey off, so they type normally (in chat, say), and back "
+         "on. Hotkeys are always on when Onion Board opens."),
     ]),
     ("Instant replay", [
         ("replay_hotkey", "__replay__", "Save what you just heard",
@@ -354,6 +380,16 @@ class SettingsDialog(QDialog):
         cue.toggled.connect(lambda b: self.mw.set_option("cue_sounds", b))
         cv.addWidget(cue)
         v.addWidget(card)
+        card, cv = self._card("A set of hotkeys per category",
+                              "One key can play a different sound in each category: switch "
+                              "category (its tab, or the Next category key above) and the "
+                              "same keys play that category's sounds. Sounds in no category "
+                              "always keep their keys.")
+        scoped = QCheckBox("Sound hotkeys only work in the category showing")
+        scoped.setChecked(self.mw.cfg.scoped_hotkeys)
+        scoped.toggled.connect(self.mw.set_scoped_hotkeys)
+        cv.addWidget(scoped)
+        v.addWidget(card)
         note = QLabel("Per-sound hotkeys: right-click a pad → Set hotkey. "
                       "All hotkeys work while you're in a game.")
         note.setObjectName("hint")
@@ -630,6 +666,11 @@ class SettingsDialog(QDialog):
         top.setChecked(self.mw.cfg.always_on_top)
         top.toggled.connect(self.mw.on_top_toggle)
         cv.addWidget(top)
+        one = QCheckBox("One click on a pad plays it (instead of a double-click)")
+        one.setToolTip("Then Ctrl+click picks a pad without playing it")
+        one.setChecked(self.mw.cfg.single_click)
+        one.toggled.connect(self.mw.set_single_click)
+        cv.addWidget(one)
         v.addWidget(card)
         v.addWidget(self._background_card())
         v.addWidget(self._backup_card())

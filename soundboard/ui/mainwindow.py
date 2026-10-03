@@ -145,6 +145,13 @@ class MainWindow(QMainWindow):
         self._removed: list[tuple[SoundMeta, int, np.ndarray | None]] = []   # undo-able
         self._render_gen: dict[str, int] = {}   # sid -> newest effects render (_rerender)
         self.shuffle = ShuffleBag()       # the random-sound hotkeys
+        self._last_sid: str | None = None   # the last sound played (its replay hotkey)
+        self._queue: list[str] = []       # sounds waiting for the ones playing to finish
+        self._cool: dict[str, float] = {}   # sid -> time.monotonic() its cooldown ends
+        self._waiting: dict[str, list[QTimer]] = {}   # sid -> its delayed starts
+        self._hotkeys_off = False         # "All hotkeys off": only that key still works
+        self._voice_was: bool | None = None   # voice changer state before a held key
+        Pad.single_click = self.cfg.single_click
         self._undo_timer = QTimer(self)
         self._undo_timer.setSingleShot(True)
         self._undo_timer.timeout.connect(self._finish_removals)
@@ -1313,12 +1320,18 @@ class MainWindow(QMainWindow):
 
     def register_hotkeys(self):
         mapping = {}
+        if self._hotkeys_off:   # only the key that turns them back on
+            if self.cfg.hotkeys_off_hotkey:
+                mapping[self.cfg.hotkeys_off_hotkey] = "__hotkeys__"
+            self.hotkeys.register(mapping)
+            self.replay.set_enabled(bool(self.cfg.replay_hotkey), self.cfg.replay_seconds)
+            return
         for attr, action, _label, _desc in HOTKEY_ACTIONS:
             combo = getattr(self.cfg, attr)
             if combo:
                 mapping.setdefault(combo, action)
         for m in self.cfg.sounds:
-            if m.hotkey:
+            if m.hotkey and self._hotkey_live(m):
                 mapping.setdefault(m.hotkey, m.id)
         for cat, combo in self.cfg.category_hotkeys.items():
             if combo and cat in self.cfg.categories:
@@ -1331,11 +1344,48 @@ class MainWindow(QMainWindow):
         # instant replay listens only while its hotkey is set
         self.replay.set_enabled(bool(self.cfg.replay_hotkey), self.cfg.replay_seconds)
 
+    def _hotkey_live(self, m: SoundMeta) -> bool:
+        """Does m's hotkey work right now? Always, unless hotkeys follow the category
+        (scoped_hotkeys): then only while a category it's in is showing (All shows
+        every sound; one in no category always keeps its key)."""
+        cat = self.cfg.category
+        return not self.cfg.scoped_hotkeys or not cat or not m.tags or cat in m.tags
+
+    def set_scoped_hotkeys(self, on: bool):
+        """Settings -> Hotkeys: a set of sound hotkeys per category."""
+        self.cfg.scoped_hotkeys = on
+        if not on:   # one key, one sound again: the first sound (in board order) keeps it
+            seen = set(self._global_combos())
+            for m in self.cfg.sounds:
+                if m.hotkey and m.hotkey in seen:
+                    m.hotkey = ""
+                    if m.id in self.pads:
+                        self.pads[m.id].update()
+                elif m.hotkey:
+                    seen.add(m.hotkey)
+        self._save_now()
+        self.register_hotkeys()
+
+    def _global_combos(self) -> list[str]:
+        """Combos the app-wide actions, the push-to-talk key and category keys hold."""
+        return ([getattr(self.cfg, a) for a, *_ in HOTKEY_ACTIONS if getattr(self.cfg, a)]
+                + [c for c in (self.cfg.ptt_key, *self.cfg.category_hotkeys.values()) if c])
+
+    def set_single_click(self, on: bool):
+        """Settings -> General: one click on a pad plays it."""
+        self.set_option("single_click", on)
+        Pad.single_click = on
+
     def on_hotkey_released(self, action: str):
         """A hotkey or MIDI pad was let go: a hold-to-play sound stops, and an overlay
         in hold mode opened by a MIDI pad closes (a key's release it watches itself)."""
         m = self._meta.get(action)
-        if m is not None and m.hold:
+        if action == "__voicehold__":
+            if self._voice_was is not None:
+                self._set_voice(self._voice_was)
+                self._voice_was = None
+        elif m is not None and m.hold:
+            self._cancel_waiting(action)
             self.engine.stop(action)
         elif (action == "__overlay__" and self.overlay.s.mode == "hold"
               and midi.is_midi(self.cfg.overlay_hotkey) and self.overlay.is_open):
@@ -1437,10 +1487,36 @@ class MainWindow(QMainWindow):
             tray.setIcon(icon)
 
     def on_hotkey(self, action):
+        if action == "__hotkeys__":
+            self.toggle_hotkeys()
+            return
+        if self._hotkeys_off:   # one already on its way when they were turned off
+            return
         if self.overlay.handle(action):
             return
         if action == "__stop__":
             self.stop_all()
+        elif action == "__last__":
+            if self._last_sid is None or self.meta(self._last_sid) is None:
+                self.cue("fail")
+            else:
+                self.play(self._last_sid)
+        elif action in ("__nextcat__", "__prevcat__"):
+            self.step_category(1 if action == "__nextcat__" else -1)
+        elif action in ("__volup__", "__voldown__"):
+            self.step_sound_volume(1 if action == "__volup__" else -1)
+        elif action == "__mic__":
+            self.chk_mic.setChecked(not self.chk_mic.isChecked())   # -> on_mic_toggle
+            self.cue("start" if self.cfg.mic_enabled else "stop")
+        elif action == "__voice__":
+            on = not self.voice.fx.btn_power.isChecked()
+            self._voice_was = None
+            self._set_voice(on)
+            self.cue("start" if on else "stop")
+        elif action == "__voicehold__":
+            if self._voice_was is None:
+                self._voice_was = self.voice.fx.btn_power.isChecked()
+            self._set_voice(True)
         elif action == "__replay__":
             self.save_replay()
         elif action == "__pause__":
@@ -1451,6 +1527,49 @@ class MainWindow(QMainWindow):
             self.play_random(action[len(RANDOM):])
         else:
             self.play(action)
+
+    def _set_voice(self, on: bool):
+        """The voice changer's big ON / OFF switch, from a hotkey."""
+        if self.voice.fx.btn_power.isChecked() != on:
+            self.voice.fx.btn_power.setChecked(on)   # its toggled handler applies it
+
+    def toggle_hotkeys(self):
+        """All hotkeys off (they type normally again), or back on. Not saved: the app
+        always opens with them on."""
+        self._hotkeys_off = not self._hotkeys_off
+        if self._hotkeys_off and self._voice_was is not None:   # a held voice key
+            self._set_voice(self._voice_was)
+            self._voice_was = None
+        self.register_hotkeys()
+        self.cue("stop" if self._hotkeys_off else "start")
+        key = pretty_key(self.cfg.hotkeys_off_hotkey)
+        self.status.setText(
+            f"<span style='color:{theme.status('warn')}'>Hotkeys are off — "
+            f"{html.escape(key)} turns them back on.</span>" if self._hotkeys_off
+            else "Hotkeys are on again.")
+
+    def step_category(self, step: int):
+        """Next / previous category (with All at the front), with a beep for each
+        place along it, so you can tell where you are without looking."""
+        names = ["", *self.cfg.categories]
+        if len(names) < 2:
+            self.cue("fail")
+            return
+        i = names.index(self.cfg.category) if self.cfg.category in names else 0
+        name = names[(i + step) % len(names)]
+        self.set_category(name)
+        n = names.index(name)
+        # All: one low beep; the 1st category one high beep, the 2nd two... (up to 5)
+        self.cue((523,) if n == 0 else ((784, 0) * min(n, 5))[:-1])
+        self.status.setText(f"Category: {html.escape(name or 'All')}")
+
+    def step_sound_volume(self, step: int):
+        """The louder / quieter hotkeys: the sounds' volume box by 10 % a press."""
+        pct = self.vol_sound.spin.value()
+        new = min(max((round(pct / 10) + step) * 10, 0), self.vol_sound.spin.maximum())
+        self.vol_sound.spin.setValue(new)   # -> set_option("sound_vol")
+        self.cue((880, 1175) if step > 0 else (880, 659))
+        self.status.setText(f"Sounds: {new}%")
 
     def play_random(self, category: str | None = None) -> str | None:
         """Play a random loaded sound from `category` (None = the one showing, "" = all
@@ -1510,6 +1629,9 @@ class MainWindow(QMainWindow):
         return apply
 
     def stop_all(self):
+        self._queue.clear()
+        for sid in list(self._waiting):
+            self._cancel_waiting(sid)
         self.engine.stop_all()
         self.radio.stop()
         self.apps.stop_all()
@@ -1580,11 +1702,31 @@ class MainWindow(QMainWindow):
         v = m.volume if volume is None else volume
         return v * (m.level_gain if self.cfg.level_volumes else 1.0)
 
-    def play(self, sid):
+    def play(self, sid, now: bool = False):
+        """Play a pad's sound as its settings say: its cooldown, a Queue sound waiting
+        for the ones playing, its wait before playing. now=True skips all of that (the
+        queue and a delayed start, whose press was already checked)."""
         m = self.meta(sid)
         data = self.audio.get(sid)
         if m is None:
             return
+        if not now and data is not None:
+            t = time.monotonic()
+            if t < self._cool.get(sid, 0.0):
+                return   # in its cooldown: a spammed key does nothing
+            if m.cooldown:
+                self._cool[sid] = t + m.delay + m.cooldown
+            if m.mode == "queue" and (self._pads_playing() or self._queue):
+                self.queue_sound(sid)
+                return
+            if m.delay > 0:
+                timer = QTimer(self)
+                timer.setSingleShot(True)
+                timer.timeout.connect(lambda s=sid, tm=timer: self._waited(s, tm))
+                self._waiting.setdefault(sid, []).append(timer)
+                timer.start(int(m.delay * 1000))
+                self.select(sid)
+                return
         if data is None:   # say why nothing happens instead of silently ignoring the press
             p = self.pads.get(sid)
             if p is not None and p.state == "error":
@@ -1598,12 +1740,72 @@ class MainWindow(QMainWindow):
                 self.status.setText(f"“{html.escape(m.name)}” is still loading…")
             return
         self.select(sid)
-        v = self.engine.play(sid, data, self.gain_for(m), loop=m.loop, mode=m.mode,
-                             fade_in=m.fade_in, fade_out=m.fade_out)
+        self._last_sid = sid
+        v = self.engine.play(sid, data, self.gain_for(m), loop=m.loop,
+                             mode="restart" if m.mode == "queue" else m.mode,
+                             fade_in=m.fade_in, fade_out=m.fade_out,
+                             only="main" if m.only_them else None)
         if v is None and not self.engine.active_outputs():
             self.status.setText(f"<span style='color:{theme.status('warn')}'>"
                                 "No audio device is open — pick one "
                                 "in Setup.</span>")
+
+    def _waited(self, sid: str, timer: QTimer):
+        """A sound's wait before playing is over."""
+        timers = self._waiting.get(sid, [])
+        if timer in timers:
+            timers.remove(timer)
+            if not timers:
+                del self._waiting[sid]
+            self.play(sid, now=True)
+        timer.deleteLater()
+
+    def _cancel_waiting(self, sid: str):
+        for timer in self._waiting.pop(sid, []):
+            timer.stop()
+            timer.deleteLater()
+
+    def _pads_playing(self) -> bool:
+        """Is one of the board's sounds playing (not a preview, cue or the radio)?"""
+        return any(sid in self._meta and not paused
+                   for sid, (_p, paused) in self.engine.playing().items())
+
+    def queue_sound(self, sid: str):
+        """Play `sid` once the board's sounds playing now have finished (now, if none are)."""
+        if not self._pads_playing() and not self._queue:
+            self.play(sid, now=True)
+            return
+        self._queue.append(sid)
+        self._say_queue()
+
+    def queue_category(self, name: str, shuffled: bool):
+        """Play every sound in category `name`, one after another."""
+        sids = [m.id for m in self.cfg.sounds if name in m.tags and m.id in self.audio]
+        if not sids:
+            self.cue("fail")
+            return
+        if shuffled:
+            self.shuffle.rng.shuffle(sids)
+        self._queue = sids
+        for sid in self.engine.playing():   # the board's sounds make way (not the radio)
+            if sid in self._meta:
+                self.engine.stop(sid)
+        self._next_in_queue()
+
+    def _next_in_queue(self):
+        while self._queue:
+            sid = self._queue.pop(0)
+            if self.meta(sid) is not None and sid in self.audio:
+                self.play(sid, now=True)
+                self._say_queue()
+                return
+
+    def _say_queue(self):
+        if self._queue:
+            m = self.meta(self._queue[0])
+            more = f" (+{len(self._queue) - 1} more)" if len(self._queue) > 1 else ""
+            self.status.setText(f"Up next: “{html.escape(m.name if m else '?')}”{more} · "
+                                "Stop everything clears the queue")
 
     def select(self, sid):
         if self.current != sid:
@@ -1816,6 +2018,8 @@ class MainWindow(QMainWindow):
             self.overlay.page = 0
             self.apply_filter(self.search.text())
             self._save_later()
+            if self.cfg.scoped_hotkeys:   # this category's set of sound hotkeys
+                self.register_hotkeys()
 
     def category_sounds(self) -> list[SoundMeta]:
         cat = self.cfg.category
@@ -1915,6 +2119,8 @@ class MainWindow(QMainWindow):
                               else "Set a random-sound hotkey…")
         a_nohk = menu.addAction("Clear the random-sound hotkey") if hk else None
         a_rand = menu.addAction(icons.icon("play"), "Play a random sound from it")
+        a_all = menu.addAction("Play them all, in order")
+        a_shuf = menu.addAction("Play them all, shuffled")
         a_exp = menu.addAction(icons.icon("folder"), "Export as a sound pack…")
         menu.addSeparator()
         a_del = menu.addAction(icons.icon("trash", "danger_text"),
@@ -1930,6 +2136,8 @@ class MainWindow(QMainWindow):
             self.set_category_hotkey(name, "")
         elif act == a_rand:
             self.play_random(name)
+        elif act in (a_all, a_shuf):
+            self.queue_category(name, shuffled=act == a_shuf)
         elif act == a_exp:
             self.export_sounds([m for m in self.cfg.sounds if name in m.tags], name)
         elif act == a_del:
@@ -2126,6 +2334,7 @@ class MainWindow(QMainWindow):
         a_stop = (menu.addAction(icons.icon("stop"), "Stop") if self.engine.state(sid)
                   else None)
         a_prev = menu.addAction(icons.icon("headphones"), "Preview (only me)")
+        a_next = menu.addAction(icons.icon("play"), "Play next (after what's playing)")
         a_edit = menu.addAction(icons.icon("edit"), "Edit… (name, volume, hotkey, loop)")
         a_fx = menu.addAction(icons.icon("wave"), "Effects… (speed, pitch, EQ, boost)")
         a_hk = menu.addAction(icons.icon("keyboard"), "Set hotkey…")
@@ -2158,6 +2367,8 @@ class MainWindow(QMainWindow):
             self.engine.stop(sid)
         elif act == a_prev:
             self.preview(sid)
+        elif act == a_next:
+            self.queue_sound(sid)
         elif act == a_edit:
             self.edit(sid)
         elif act == a_fx:
@@ -2319,9 +2530,16 @@ class MainWindow(QMainWindow):
         self._put_back([(m, item.index, None)])
         return True
 
+    def _shares_keys(self, a: SoundMeta, b: SoundMeta) -> bool:
+        """Can a and b's hotkeys be live at the same time? With a set of hotkeys per
+        category, two sounds with no category in common can share a key."""
+        return (not self.cfg.scoped_hotkeys or not a.tags or not b.tags
+                or bool(set(a.tags) & set(b.tags)))
+
     def _clear_dupe_hotkey(self, m):
         for o in self.cfg.sounds:
-            if o is not m and o.hotkey and o.hotkey == m.hotkey:
+            if (o is not m and o.hotkey and o.hotkey == m.hotkey
+                    and self._shares_keys(o, m)):
                 o.hotkey = ""
                 if o.id in self.pads:
                     self.pads[o.id].update()
@@ -3002,6 +3220,9 @@ class MainWindow(QMainWindow):
                 self._update_status()
             self.voice.poll()
         playing = e.playing()
+        if self._queue and not any(sid in self._meta for sid in playing):
+            self._next_in_queue()
+            playing = e.playing()
         # the in-game overlay shows what's playing too, usually with this window in the tray
         pace = TICK_MS if self._ui_live or self.overlay.is_open else TICK_IDLE_MS
         if self.timer.interval() != pace:

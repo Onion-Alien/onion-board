@@ -9,7 +9,8 @@ from PySide6.QtWidgets import (QCheckBox, QComboBox, QDialog, QDialogButtonBox, 
 
 from soundboard import soundfx, theme, voicefx
 from soundboard.eq import PRESETS as EQ_PRESETS
-from soundboard.library import MAX_FADE_S, PAD_COLORS, SoundMeta, clean_fade, original_peaks
+from soundboard.library import (MAX_COOLDOWN_S, MAX_DELAY_S, MAX_FADE_S, PAD_COLORS,
+                                SoundMeta, original_peaks)
 from soundboard.settings import HotkeyDialog, pretty_key
 from soundboard.ui import fit, icons
 from soundboard.ui.panel import EqPanel, hint_label, section_label
@@ -210,6 +211,7 @@ class EditDialog(QDialog):
         self.mode.addItem("Overlap — every press plays a new copy", "overlap")
         self.mode.addItem("Toggle — press again stops it", "toggle")
         self.mode.addItem("Solo — stops every other sound first", "solo")
+        self.mode.addItem("Queue — waits for the sounds playing to finish", "queue")
         self.mode.setCurrentIndex(max(0, self.mode.findData(meta.mode)))
         no_wheel(self.mode)
         form.addRow("On press", self.mode)
@@ -224,6 +226,12 @@ class EditDialog(QDialog):
         self.hold.setChecked(meta.hold)
         form.addRow("", self.hold)
 
+        self.only_them = QCheckBox("Only others hear it — not played in my headphones")
+        self.only_them.setToolTip("It still goes out to Discord / the game; you just don't "
+                                  "hear it yourself (Preview still plays it to you)")
+        self.only_them.setChecked(meta.only_them)
+        form.addRow("", self.only_them)
+
         self.fade_in = self._fade_row(form, "Fade in", meta.fade_in,
                                       "Starts silent and rises to full volume over this long")
         self.fade_out = self._fade_row(form, "Fade out", meta.fade_out,
@@ -231,6 +239,12 @@ class EditDialog(QDialog):
                                        "cutting it; a sound that isn't looping also fades "
                                        "over its last seconds. Stop everything still cuts "
                                        "straight away.")
+        self.delay = self._fade_row(form, "Wait first", meta.delay,
+                                    "Waits this long after the press before it plays, say for "
+                                    "a punchline. Stop everything cancels it.", MAX_DELAY_S)
+        self.cooldown = self._fade_row(form, "Cooldown", meta.cooldown,
+                                       "After it starts, presses are ignored for this long, so "
+                                       "nobody can spam it", MAX_COOLDOWN_S)
 
         hrow = QHBoxLayout()
         self.hk_btn = QPushButton()
@@ -289,12 +303,13 @@ class EditDialog(QDialog):
         self.resize(540, 640)
 
     @staticmethod
-    def _fade_row(form: QFormLayout, label: str, value: float, tip: str) -> QSlider:
-        """A 0..MAX_FADE_S slider in tenths of a second, with its value beside it."""
+    def _fade_row(form: QFormLayout, label: str, value: float, tip: str,
+                  top: float = MAX_FADE_S) -> QSlider:
+        """A 0..top slider in tenths of a second, with its value beside it."""
         row = QHBoxLayout()
         sl = QSlider(Qt.Horizontal)
-        sl.setRange(0, int(MAX_FADE_S * 10))
-        sl.setValue(int(round(clean_fade(value) * 10)))
+        sl.setRange(0, int(top * 10))
+        sl.setValue(int(round(min(max(value, 0.0), top) * 10)))
         sl.setToolTip(tip)
         sl.setAccessibleName(label)
         no_wheel(sl)
@@ -342,6 +357,9 @@ class EditDialog(QDialog):
         m.mode = self.mode.currentData()
         m.loop = self.loop.isChecked()
         m.hold = self.hold.isChecked()
+        m.only_them = self.only_them.isChecked()
+        m.delay = self.delay.value() / 10
+        m.cooldown = self.cooldown.value() / 10
         m.hotkey = self.hotkey
         m.color = self.color
         m.fade_in, m.fade_out = self.fades()

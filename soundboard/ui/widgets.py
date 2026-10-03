@@ -171,6 +171,7 @@ class Pad(QAbstractButton):
     pick = Signal(str, bool)    # Ctrl+click / Ctrl+Space (False) or Shift+click (True)
     menu = Signal(str, QPoint)
     step = Signal(object, int, int)   # arrow key: this pad, columns, rows to move focus
+    single_click = False        # Settings: a click plays it (activated) instead of selecting
 
     def __init__(self, meta: SoundMeta, width: int):
         super().__init__()
@@ -358,10 +359,15 @@ class Pad(QAbstractButton):
                 self.pick.emit(self.meta.id, True)
             elif mods & Qt.ControlModifier:
                 self.pick.emit(self.meta.id, False)
+            elif Pad.single_click:
+                self.activated.emit(self.meta.id)
             else:
                 self.chosen.emit(self.meta.id)
 
     def mouseDoubleClickEvent(self, e):
+        if Pad.single_click:   # a quick second click is just another click
+            self.mousePressEvent(e)
+            return
         if e.button() == Qt.LeftButton and not e.modifiers() & (Qt.ShiftModifier |
                                                                   Qt.ControlModifier):
             self._press = None

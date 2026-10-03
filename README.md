@@ -150,7 +150,10 @@ too (say No if another program, like Voicemeeter, uses it).
 - **Categories:** the tabs above the pads (*+ Category* makes one). Right-click a
   pad → *Categories* to put it in any number of them; right-click a category to
   rename, export or delete it. The in-game overlay shows the same category, and
-  its **R** key (numpad **\***) switches to the next one.
+  its **R** key (numpad **\***) switches to the next one. Right-click a category to
+  give it a random-sound hotkey, or to *Play them all* (in order or shuffled). With
+  *Sound hotkeys only work in the category showing* (Settings → Hotkeys) each
+  category is its own set of keys: one key, a different sound per category.
 - **Remove can be undone:** *Removed “…” · Undo* stays up for 10 seconds, and the
   audio file then goes to the Recycle Bin rather than being deleted outright.
 - **Backup / share (*Backup* button, or Settings → General):** *Export everything*
@@ -161,8 +164,10 @@ too (say No if another program, like Voicemeeter, uses it).
   [docs/BACKUP-FORMAT.md](docs/BACKUP-FORMAT.md).
 - **Per sound:** global hotkey (works in-game) or MIDI pad, volume, loop, what
   pressing again does (restart / overlap / toggle), **Solo** (stops every other
-  sound first) and **Hold to play** (plays only while you hold its key or pad down,
-  like an air horn).
+  sound first), **Queue** (waits for the sounds playing to finish; right-click any
+  pad → *Play next* does it once), **Only others hear it** (not in your
+  headphones), a **wait** before it plays, a **cooldown** against spamming and
+  **Hold to play** (plays only while you hold its key or pad down, like an air horn).
 - **Effects on any sound** (right-click a pad → **Effects…**, or the *Effects* tab
   of **Edit…**): speed and pitch (separately, or together like a record player
   with *Tape mode*), **trim** (drag the start and end on the sound's waveform, or
@@ -184,6 +189,10 @@ too (say No if another program, like Voicemeeter, uses it).
 - **Global hotkeys** (set in **⚙ Settings → Hotkeys**, the overlay key in
   **⚙ Settings → Overlay**; all work in-game):
   - Stop all, and pause/resume all.
+  - A random sound (from the category showing), the last sound again, next /
+    previous category (beeps tell you which), sounds louder / quieter, your mic on /
+    off, the voice changer on / off or only while a key is held, and **all hotkeys
+    off / on** for when you need to type.
   - **In-game overlay** (by default the key left of <kbd>1</kbd>: <kbd>`</kbd> on a
     US keyboard; where that key types a letter, like ö or ñ, it's Alt + that key):
     a small panel of your sounds over the game. Number keys play them, and the game keeps your mouse
