@@ -1,5 +1,19 @@
 # Changelog
 
+## 1.6.4 — 2026-10-03
+
+- **A Sounds folder button** on the Sounds tab (also in the *Backup* menu) opens the
+  folder your sounds are kept in. Sound files you drag into that folder join the board
+  by themselves, once they've finished copying, including ones put there while the
+  app was closed.
+- **A short window keeps its pads**: below a certain height the window turns into
+  the mini player, which only kept the pads above it when two rows of them fit. With
+  big pads (or display scaling) that left an empty space above the player. One row
+  is enough now.
+- **Onion Watch 0.5.6** (Triggers tab, offered there as an update): the bottom bar's buttons have room around
+  them, *Duplicate* and *Delete* sit on the *Fine-tune* line instead of a row of their
+  own, and a trigger's pictures open big when clicked.
+
 ## 1.6.3 — 2026-10-03
 
 - **Custom voices are easy to find**: an *Add voices…* button right beside the Voice
