@@ -215,7 +215,8 @@ too (say No if another program, like Voicemeeter, uses it).
 - **Radio tab:** internet radio from all over the world, from the free
   [Radio Browser](https://www.radio-browser.info) directory. Click a dot on the
   world map to tune in (hover one for its country, genres, quality and how popular
-  it is; drag to move, scroll to zoom), or search by name, genre or country. The
+  it is; drag to move, scroll to zoom: zoomed in, the cities and towns with stations
+  are named), or search by name, genre, country or city. The
   map's **HD** button swaps it for a 3D globe you can spin (heavier: it runs a web
   engine); **2D** on the globe goes back. Star stations for
   *★ Favorites*. It plays in your headphones, goes out through

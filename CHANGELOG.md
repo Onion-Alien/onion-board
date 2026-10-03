@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- **City and town names on the radio maps:** zoom in on the flat map or the 3D
+  globe and the cities and towns that have stations are named, so you can find
+  your own place and its stations. Only the places in view are named, a few dozen
+  at most, and none while zoomed out, so the maps stay as light as before. Search
+  finds stations by city or region too.
 - **Offline from the first start:** the installer's *Your privacy* page has an
   *Offline mode* box. Ticked, it switches Offline mode on before the app first opens
   (`OnionBoard.exe --set-offline`), so it never goes online, not even once, and

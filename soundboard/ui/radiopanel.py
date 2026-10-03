@@ -325,7 +325,7 @@ class RadioTab(QWidget):
         top = QHBoxLayout()
         top.setSpacing(8)
         self.search = QLineEdit()
-        self.search.setPlaceholderText("Search radio stations, genres or countries…  "
+        self.search.setPlaceholderText("Search radio stations, genres, countries or cities…  "
                                        "(or click a dot on the map)")
         self.search.setClearButtonEnabled(True)
         self.search.textChanged.connect(self._on_text)
@@ -724,8 +724,8 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
         if self.flat is not None:
             self.flat.set_land(rings, labels)
 
-    _FLAT_CALLS = {"setStations": "set_points", "select": "select", "fly": "fly",
-                   "showMessage": "show_message", "setTheme": "set_theme"}
+    _FLAT_CALLS = {"setStations": "set_points", "setTowns": "set_towns", "select": "select",
+                   "fly": "fly", "showMessage": "show_message", "setTheme": "set_theme"}
 
     def _map(self, fn: str, *args):
         """Tell whichever map is showing: the flat map's method, or the globe page's
@@ -836,15 +836,18 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
         self._select_on_globe(fly=False)
 
     def _push_globe(self, force: bool = False):
-        """Pin the popular stations on the map — only those the filters let through. The
-        flat map takes them all, the globe the most listened (WebGL: fewer is smoother)."""
+        """Pin the popular stations on the map — only those the filters let through — and
+        name the cities and towns they're in. The flat map takes them all, the globe the
+        most listened (WebGL: fewer is smoother)."""
         shown = self._filtered(self._globe_list)
         if self._map_mode() == "globe":
             shown = shown[:radio.GLOBE_LIGHT]   # the list is most-listened first
         ids = [s.uuid for s in shown]
         if force or ids != self._globe_shown:
             self._globe_shown = ids
-            self._map("setStations", radio.globe_points(shown))
+            points = radio.globe_points(shown)
+            self._map("setStations", points)
+            self._map("setTowns", radio.town_labels(points))
 
     def _select_on_globe(self, fly: bool):
         st = self.player.station
