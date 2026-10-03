@@ -87,6 +87,7 @@ GLOW_STEPS = 4       # how many glow levels the taskbar / tray icon has while so
 ICON_GLOW_MS = 120   # ...and how often at most it changes
 MINI_SIZE = QSize(440, 380)   # below this the window becomes the mini player...
 MINI_PAD_ROWS = 2             # ...which has the pads above it when this many rows fit
+QUEUE_CHIPS = 5          # queued sounds shown by name above the pads (then "+n more")
 RANDOM = "__random__:"   # hotkey action prefix: a random sound from the category after it
 ALL = "All"          # the category tab that shows every sound
 VOICE_POLL_MS = 3000  # how often the game in front is looked at (soundboard.voicesdk)
@@ -743,14 +744,31 @@ class MainWindow(QMainWindow):
         return page
 
     def _update_chips(self, playing):
+        """The row above the pads: what's playing (when it's more than the player shows)
+        and the queue, each with its own ✕."""
         ids = tuple(s for s in self.pads if s in playing)
-        if ids != self._chip_ids:
-            self._chip_ids = ids
+        queue = tuple(self._queue)
+        if (ids, queue) != self._chip_ids:
+            self._chip_ids = (ids, queue)
             while self._chips_hl.count():
                 w = self._chips_hl.takeAt(0).widget()
                 if w:
                     w.deleteLater()
             self._chips = {}
+            if queue:
+                lbl = QLabel("Up next")
+                lbl.setObjectName("muted")
+                self._chips_hl.addWidget(lbl)
+                for i, sid in enumerate(queue[:QUEUE_CHIPS]):
+                    m = self.meta(sid)
+                    self._chips_hl.addWidget(self._chip(
+                        m.name if m else sid, "Waits for the sounds playing to finish",
+                        lambda _=False, s=sid: self.select(s),
+                        "Take it out of the queue", lambda _=False, i=i: self._unqueue(i)))
+                if len(queue) > QUEUE_CHIPS:
+                    more = QLabel(f"+{len(queue) - QUEUE_CHIPS} more")
+                    more.setObjectName("muted")
+                    self._chips_hl.addWidget(more)
             if len(ids) >= 2:
                 lbl = QLabel("Now playing")
                 lbl.setObjectName("muted")
@@ -777,14 +795,39 @@ class MainWindow(QMainWindow):
                     ch.addWidget(stop)
                     self._chips_hl.addWidget(chip)
                     self._chips[sid] = chip
+            if queue or len(ids) >= 2:
                 self._chips_hl.addStretch(1)
-            self.playing_row.setVisible(len(ids) >= 2)
+            self.playing_row.setVisible(len(ids) >= 2 or bool(queue))
         for sid, chip in self._chips.items():
             sel = "true" if sid == self.current else "false"
             if chip.property("sel") != sel:
                 chip.setProperty("sel", sel)
                 chip.style().unpolish(chip)
                 chip.style().polish(chip)
+
+    def _chip(self, text: str, tip: str, on_click, x_tip: str, on_x) -> QFrame:
+        """A queued sound's chip: its name, and a ✕."""
+        chip = QFrame()
+        chip.setObjectName("chip")
+        ch = QHBoxLayout(chip)
+        ch.setContentsMargins(4, 2, 2, 2)
+        ch.setSpacing(2)
+        name = QPushButton(chip.fontMetrics().elidedText(text, Qt.ElideRight, 150))
+        name.setObjectName("chipname")
+        name.setToolTip(tip)
+        name.clicked.connect(on_click)
+        x = QPushButton("✕")
+        x.setObjectName("chipstop")
+        x.setToolTip(x_tip)
+        x.setFixedSize(24, 24)
+        x.clicked.connect(on_x)
+        ch.addWidget(name)
+        ch.addWidget(x)
+        return chip
+
+    def _unqueue(self, i: int):
+        if 0 <= i < len(self._queue):
+            del self._queue[i]
 
     def _set_pp_icon(self, name: str):
         if name != self._pp_icon:
@@ -1093,9 +1136,13 @@ class MainWindow(QMainWindow):
         self._prepare_all()
 
     def _obs_name(self, name: str | None) -> str | None:
-        """The stream output's device, unless it's the cable or the headphones (OBS
-        would get everything twice, and they'd hear it twice)."""
-        return None if name in (None, self.cfg.main_device, self.cfg.mon_device) else name
+        """The stream output's device, unless it's the cable (or another end of the
+        same cable: everyone in the call would get everything twice) or the
+        headphones (you'd hear it twice)."""
+        if (name in (None, self.cfg.main_device, self.cfg.mon_device)
+                or eng.same_cable(name, self.cfg.main_device)):
+            return None
+        return name
 
     def set_obs_device(self, name: str | None):
         """Settings -> Audio -> Stream output (OBS): None switches it off."""
@@ -2138,8 +2185,8 @@ class MainWindow(QMainWindow):
                               else "Set a random-sound hotkey…")
         a_nohk = menu.addAction("Clear the random-sound hotkey") if hk else None
         a_rand = menu.addAction(icons.icon("play"), "Play a random sound from it")
-        a_all = menu.addAction("Play them all, in order")
-        a_shuf = menu.addAction("Play them all, shuffled")
+        a_all = menu.addAction(icons.icon("next"), "Play them all, in order")
+        a_shuf = menu.addAction(icons.icon("next"), "Play them all, shuffled")
         a_exp = menu.addAction(icons.icon("folder"), "Export as a sound pack…")
         menu.addSeparator()
         a_del = menu.addAction(icons.icon("trash", "danger_text"),

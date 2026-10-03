@@ -364,6 +364,16 @@ class SettingsDialog(QDialog):
             card, cv = self._card(group)
             for attr, _action, label, desc in actions:
                 self._hk_row(cv, attr, label, desc)
+            if group == "Categories":   # its keys and the per-category sets go together
+                scoped = QCheckBox("A set of sound hotkeys per category: sound hotkeys only "
+                                   "work in the category showing")
+                scoped.setToolTip("One key can play a different sound in each category: "
+                                  "switch category (its tab, or the keys above) and the same "
+                                  "keys play that category's sounds. Sounds in no category "
+                                  "always keep their keys.")
+                scoped.setChecked(self.mw.cfg.scoped_hotkeys)
+                scoped.toggled.connect(self.mw.set_scoped_hotkeys)
+                cv.addWidget(scoped)
             v.addWidget(card)
         card, cv = self._card("Auto push-to-talk (optional)",
                               "Only if you use push-to-talk in a game or Discord: set your "
@@ -373,22 +383,14 @@ class SettingsDialog(QDialog):
         v.addWidget(card)
         card, cv = self._card("Hotkey sounds",
                               "Short beeps in your headphones (only you hear them) when a hotkey "
-                              "starts or stops a recording or saves a clip — so you know it worked "
-                              "while you're in a game.")
+                              "does something you can't see in a game: switches category (one "
+                              "beep per place along, a low one for All), turns your mic, the "
+                              "voice changer or the hotkeys on (rising) or off (falling), changes "
+                              "the volume, or records or saves a clip.")
         cue = QCheckBox("Play hotkey beeps")
         cue.setChecked(self.mw.cfg.cue_sounds)
         cue.toggled.connect(lambda b: self.mw.set_option("cue_sounds", b))
         cv.addWidget(cue)
-        v.addWidget(card)
-        card, cv = self._card("A set of hotkeys per category",
-                              "One key can play a different sound in each category: switch "
-                              "category (its tab, or the Next category key above) and the "
-                              "same keys play that category's sounds. Sounds in no category "
-                              "always keep their keys.")
-        scoped = QCheckBox("Sound hotkeys only work in the category showing")
-        scoped.setChecked(self.mw.cfg.scoped_hotkeys)
-        scoped.toggled.connect(self.mw.set_scoped_hotkeys)
-        cv.addWidget(scoped)
         v.addWidget(card)
         note = QLabel("Per-sound hotkeys: right-click a pad → Set hotkey. "
                       "All hotkeys work while you're in a game.")
@@ -636,21 +638,23 @@ class SettingsDialog(QDialog):
         no_wheel(cb)
         cb.addItem("Off", None)
         for d in eng.list_devices("output"):
-            if d["name"] not in (c.main_device, c.mon_device):   # those already have a job
+            if (d["name"] not in (c.main_device, c.mon_device)   # those already have a job
+                    and not eng.same_cable(d["name"], c.main_device)):
                 cb.addItem(d["name"], d["name"])
         i = cb.findData(c.obs_device) if c.obs_device else 0
         cb.setCurrentIndex(max(i, 0))
         cb.activated.connect(lambda i: mw.set_obs_device(cb.itemData(i)))
-        row = QHBoxLayout()
-        row.addWidget(QLabel("Send to"))
-        row.addWidget(cb, 1)
-        cv.addLayout(row)
-        row = QHBoxLayout()
-        row.addWidget(QLabel("Volume"))
+        grid = QGridLayout()
+        grid.setHorizontalSpacing(10)
+        grid.setVerticalSpacing(6)
+        grid.addWidget(QLabel("Send to"), 0, 0)
+        grid.addWidget(cb, 0, 1, 1, 2)
+        grid.addWidget(QLabel("Volume"), 1, 0)
         vol = VolumeControl(c.obs_vol, tip="How loud the stream output is (only OBS hears it)")
         vol.changed.connect(lambda x: mw.set_option("obs_vol", x))
-        row.addWidget(vol, 1)
-        cv.addLayout(row)
+        grid.addWidget(vol, 1, 1)
+        grid.setColumnStretch(2, 1)   # the slider and its box stay together on the left
+        cv.addLayout(grid)
         voice = QCheckBox("Include my voice (with the voice changer, when it's on)")
         voice.setToolTip("Untick if OBS already records your mic on its own")
         voice.setChecked(c.obs_voice)

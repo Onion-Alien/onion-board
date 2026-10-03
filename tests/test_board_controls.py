@@ -224,3 +224,15 @@ def test_one_click_plays_a_pad(window, monkeypatch):
         assert played == ["s0"]
     finally:
         Pad.single_click = False
+
+
+def test_the_queue_shows_above_the_pads_and_can_be_trimmed(window, monkeypatch, calls):
+    w = window
+    w._ui_live = True
+    playing(monkeypatch, w, ["s0"])
+    w.queue_sound("s1")
+    w._update_chips({"s0": (0.5, False)})
+    assert not w.playing_row.isHidden()
+    w._unqueue(0)
+    w._update_chips({"s0": (0.5, False)})
+    assert w._queue == [] and w.playing_row.isHidden()

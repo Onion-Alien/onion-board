@@ -11,6 +11,16 @@
 - **A frozen window is noted down**: if Onion Board stops responding for 5 seconds,
   what it was doing is saved beside the crash reports, so a freeze can be fixed even
   when it can't be repeated. Nothing is shown or sent.
+- **The queue shows above the pads**: *Up next* lists the sounds waiting, each with a
+  ✕ to take it out (the status line that said so could be hidden).
+- **The stream output can't be another end of the cable you already send into** (VB-Cable's
+  "CABLE In 16ch" next to "CABLE Input"): everyone in the call would have heard
+  everything twice.
+- **Settings tidied**: the per-category hotkey sets are with the category keys; the
+  stream output's rows line up; *Hotkey sounds* says which keys beep.
+- **Onion Watch 0.5.5** (Triggers tab, offered there as an update): a cleaner trigger
+  card, one line until you open it, settings grouped into Watch for / Then / Fine-tune;
+  and sounds stop when their trigger or sound is removed.
 
 ## 1.6.0 — 2026-10-03
 

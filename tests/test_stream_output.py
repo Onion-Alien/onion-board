@@ -95,3 +95,19 @@ def test_stream_settings_are_saved_but_never_exported(app_dir):
     assert (back.obs_device, back.obs_voice) == ("CABLE-A Input", False)
     assert back.obs_vol <= 10.0                  # clamped to the volume box
     assert "obs_device" in backup.LOCAL_SETTINGS  # another PC has other devices
+
+
+def test_another_end_of_the_cable_in_use_is_never_the_stream_output(window, monkeypatch):  # noqa: F811
+    from soundboard import engine
+    assert engine.same_cable("CABLE In 16ch (VB-Audio Virtual Cable)",
+                             "CABLE Input (VB-Audio Virtual Cable)")
+    assert not engine.same_cable("CABLE-A Input (VB-Audio Cable A)",
+                                 "CABLE Input (VB-Audio Virtual Cable)")
+    assert not engine.same_cable("Speakers (Realtek(R) Audio)", "Speakers (Realtek(R) Audio)")
+    w = window
+    opened = []
+    monkeypatch.setattr(w.engine, "set_obs_device", opened.append)
+    w.cfg.main_device = "CABLE Input (VB-Audio Virtual Cable)"
+    w.set_obs_device("CABLE In 16ch (VB-Audio Virtual Cable)")
+    w.set_obs_device("CABLE-A Input (VB-Audio Cable A)")
+    assert opened == [None, "CABLE-A Input (VB-Audio Cable A)"]

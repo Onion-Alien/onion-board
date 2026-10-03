@@ -151,6 +151,18 @@ def virtual_mic_for(render_name: str | None) -> str | None:
     return None
 
 
+def same_cable(a: str | None, b: str | None) -> bool:
+    """Are `a` and `b` playback ends of one virtual cable? VB-Cable lists "CABLE Input"
+    and "CABLE In 16ch" (both "(VB-Audio Virtual Cable)"), and both come out of the
+    same "CABLE Output": the product name in brackets tells cables apart."""
+    if not (a and b and is_virtual(a) and is_virtual(b)):
+        return False
+    if a == b:
+        return True
+    pa, pb = (n[n.rfind("("):].lower() if "(" in n else None for n in (a, b))
+    return pa is not None and pa == pb
+
+
 def virtual_outputs() -> list[str]:
     """Playback devices that are virtual cables, best (has a mic side) first."""
     outs = [d["name"] for d in list_devices("output") if is_virtual(d["name"])]
