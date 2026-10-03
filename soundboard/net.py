@@ -804,7 +804,7 @@ class _Relay:
             if first or rest:
                 up.sendall(first + rest)
             self._pipe(c, up)
-        except OSError:
+        except (OSError, ValueError):   # ValueError: select() on a socket drop() closed
             pass
         finally:
             self._untrack(*(s for s in (c, up) if s is not None))
