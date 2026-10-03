@@ -625,6 +625,15 @@ class MainWindow(QMainWindow):
         tb.addWidget(more)
         tb.addWidget(self.btn_bin)
         self._label_bin()
+        # the most-used app-wide hotkeys in one click; the full list is in Settings
+        self.btn_keys = QPushButton()
+        self.btn_keys.setToolTip("Quick hotkeys: set the ones people use most, or open "
+                                 "every hotkey in Settings")
+        icons.set_icon(self.btn_keys, "keyboard")
+        km = QMenu(self.btn_keys)
+        km.aboutToShow.connect(lambda: self._fill_quick_hotkeys(km))
+        self.btn_keys.setMenu(km)
+        tb.addWidget(self.btn_keys)
         tb.addWidget(self.search, 1)
         tb.addWidget(self.btn_yt)
         size = QSlider(Qt.Horizontal)
@@ -1603,6 +1612,32 @@ class MainWindow(QMainWindow):
         setattr(self.cfg, attr, combo)
         self._save_now()
         self.register_hotkeys()
+
+    QUICK_HOTKEYS = ("stop_hotkey", "pause_hotkey", "random_hotkey", "last_hotkey",
+                     "mic_hotkey", "hotkeys_off_hotkey", "overlay_hotkey")
+
+    def _fill_quick_hotkeys(self, menu: QMenu):
+        """The Sounds tab's keyboard button: the common hotkeys with their keys (click
+        one to set it), then a way into Settings → Hotkeys for the rest."""
+        menu.clear()
+        labels = {attr: label for attr, _a, label, _d in HOTKEY_ACTIONS}
+        labels["ptt_key"] = "Auto push-to-talk key"
+        for attr in (*self.QUICK_HOTKEYS, "ptt_key"):
+            combo = getattr(self.cfg, attr)
+            key = pretty_key(combo) or ("Off" if attr == "ptt_key" else "not set")
+            menu.addAction(f"{labels[attr]}	{key}",
+                           lambda a=attr: self._quick_set_hotkey(a))
+        menu.addSeparator()
+        icons.set_icon(menu.addAction("All hotkeys…", lambda: self.open_settings("hotkeys")),
+                       "settings")
+
+    def _quick_set_hotkey(self, attr: str):
+        d = HotkeyDialog(self.hotkeys, self, pads=attr != "ptt_key")
+        if d.exec() and d.result_combo:
+            self.set_global_hotkey(attr, d.result_combo)
+        else:
+            self.register_hotkeys()   # the capture paused them
+        free_dialog(d)
 
     def open_settings(self, page: str = "privacy"):
         dlg = SettingsDialog(self, page)

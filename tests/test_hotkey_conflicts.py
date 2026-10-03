@@ -103,3 +103,29 @@ def test_a_sound_brought_back_gives_up_a_key_an_action_took_meanwhile(window, qa
             done()
         assert window.meta(sid).hotkey == "" and window.cfg.stop_hotkey == "f9"
         window.cfg.stop_hotkey = ""
+
+
+def test_the_sounds_tab_quick_hotkeys_menu(window, monkeypatch):  # noqa: F811
+    from PySide6.QtWidgets import QMenu
+    window.set_global_hotkey("stop_hotkey", "f9")
+    menu = QMenu()
+    window._fill_quick_hotkeys(menu)
+    texts = [a.text() for a in menu.actions()]
+    assert "Stop everything\tF9" in texts and texts[-1] == "All hotkeys…"
+
+    class Picked:   # the key capture, answered with F10
+        result_combo = "f10"
+
+        def __init__(self, *a, **k):
+            pass
+
+        def exec(self):
+            return True
+    monkeypatch.setattr(main, "HotkeyDialog", Picked)
+    monkeypatch.setattr(main, "free_dialog", lambda d: None)
+    next(a for a in menu.actions() if a.text().startswith("Stop")).trigger()
+    assert window.cfg.stop_hotkey == "f10"
+    pages = []
+    monkeypatch.setattr(window, "open_settings", pages.append)
+    menu.actions()[-1].trigger()
+    assert pages == ["hotkeys"]
