@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+- **A frozen window is noted down**: if Onion Board stops responding for 5 seconds,
+  what it was doing is saved beside the crash reports, so a freeze can be fixed even
+  when it can't be repeated. Nothing is shown or sent.
+
 ## 1.6.0 — 2026-10-03
 
 - **Stream output for OBS** (Settings → Audio): send what others hear to a device of
