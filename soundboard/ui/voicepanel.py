@@ -1287,7 +1287,7 @@ class ModulesList(QWidget):
         row = QHBoxLayout()
         b = QPushButton("Refresh")
         b.clicked.connect(lambda: busy.run_busy(b, "Checking…", self.refresh.emit, "✓ Up to date"))
-        o = QPushButton("Open add-ons folder")
+        o = QPushButton("Open folder")
         o.clicked.connect(lambda: SpeechPanel._open_folder(btn=o))
         row.addWidget(b)
         row.addWidget(o)
@@ -1299,29 +1299,41 @@ class ModulesList(QWidget):
             w = self.list.takeAt(0).widget()
             if w:
                 w.deleteLater()
-        if not infos:
-            self.list.addWidget(hint_label("No add-ons installed."))
-        for m in infos:
+        e = html.escape   # error text is often "<class ...>"-shaped
+
+        def row(text: str, tip: str):
+            lbl = hint_label(text)
+            lbl.setTextFormat(Qt.RichText)
+            lbl.setToolTip(tip)
+            self.list.addWidget(lbl)
+        # the Voice tab's own add-ons only: Onion Watch lives on the Triggers tab (and
+        # Settings → Add-ons), and the languages share one line
+        voice = [m for m in infos if m.kind != "triggers"]
+        langs = [m for m in voice if m.kind == "translation" and not m.error]
+        for m in voice:
+            if m in langs:
+                continue
             if m.error:
                 state = f"⚠ {m.error}"
             elif m.kind == "service" and not m.installed:
                 state = "not set up: run its install.bat"
-            elif m.kind == "translation":
-                state = ("downloaded" if m.installed else
-                         f"not downloaded ({translation.size_mb(m)} MB): pick it under "
-                         "Speak in")
             elif m.kind == "effects":
-                state = "loaded" if m.loaded else "not loaded"
-            elif m.kind == "triggers":
-                state = "on the Triggers tab"
+                state = "on" if m.loaded else "not loaded"
             else:
                 state = "ready"
-            e = html.escape   # error text is often "<class ...>"-shaped
-            lbl = hint_label(f"<b>{e(m.name)}</b> {e(m.version)} · {e(state)}<br>"
-                             f"{e(m.description)}")
-            lbl.setTextFormat(Qt.RichText)
-            lbl.setToolTip(str(m.path))
-            self.list.addWidget(lbl)
+            row(f"<b>{e(m.name)}</b> {e(m.version)} · {e(state)}",
+                f"{m.description}" + chr(10) + str(m.path))
+        if langs:
+            have = [m.language_name or m.name for m in langs if m.installed]
+            more = [m.language_name or m.name for m in langs if not m.installed]
+            parts = [f"{', '.join(have)} downloaded"] if have else []
+            if more:
+                parts.append(f"{', '.join(more)} can be downloaded under Speak in")
+            row(f"<b>Languages</b> · {e('; '.join(parts))}",
+                chr(10).join(f"{m.language_name or m.name}: {translation.size_mb(m)} MB"
+                          for m in langs))
+        if not voice:
+            self.list.addWidget(hint_label("No voice add-ons installed."))
 
 
 class VoicePanel(QWidget):
