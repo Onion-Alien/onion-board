@@ -1,15 +1,12 @@
 # Changelog
 
-## Unreleased
+## 1.6.5 — 2026-10-03
 
 - **Your headphones follow Windows' default output**: switch Windows from your
   headset to your speakers (or back) while the app is open and the sounds you hear
   move with it, instead of playing on the device you just switched away from. Picking
   a different headphones device by hand stops the following; picking Windows'
   default again turns it back on.
-
-## 1.6.4 — 2026-10-03
-
 - **The Radio tab is much lighter**: it opens on a flat world map instead of the 3D
   globe. The map is drawn by the app itself (no web engine running behind it) and
   only redraws while you drag, zoom or hover a dot. Hover a dot for the station,
@@ -21,6 +18,9 @@
   the live-tab dots stop moving until you come back. Level meters only redraw when
   their bar changes, pads on another tab skip their visualiser, and the Apps tab
   no longer reloads every program's icon each refresh.
+
+## 1.6.4 — 2026-10-03
+
 - **A Sounds folder button** on the Sounds tab (also in the *Backup* menu) opens the
   folder your sounds are kept in. Sound files you drag into that folder join the board
   by themselves, once they've finished copying, including ones put there while the

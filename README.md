@@ -24,7 +24,7 @@ Windows 10 or 11.
 [source code (zip)](../../archive/refs/heads/main.zip), only if you want to build
 it yourself.</sub>
 
-Version: **1.6.4**. See [CHANGELOG.md](CHANGELOG.md).
+Version: **1.6.5**. See [CHANGELOG.md](CHANGELOG.md).
 
 ![A quick tour: playing sounds, the radio globe spinning, a trigger catching "YOU DIED" in a game, and the voice changer](docs/screenshots/tour.webp)
 
