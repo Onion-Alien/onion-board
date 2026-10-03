@@ -1,6 +1,7 @@
 """The Radio tab's flat world map: the default view, painted by Qt itself.
 
-A plain map (land outlines, country names and a dot per station) costs nothing while
+A plain map (land outlines, country names, a dot per station and, zoomed in, the
+names of the cities and towns in view that have stations) costs nothing while
 it sits there: it only repaints when you drag, zoom, hover over a different dot or the
 stations change, and it needs no web engine. The whole world is drawn once per zoom
 level and a drag only slides that picture; zoomed in too far for one picture, just
@@ -27,6 +28,8 @@ ZOOM_MAX = 14.0
 HIT_PX = 7.0                        # how near the pointer a dot counts as under it
 WORLD_MAX_PX = 10_000_000           # biggest whole-world picture kept (device pixels)
 SETTLE_MS = 160                     # zooming: the old picture, stretched, until this idle
+TOWN_ZOOM = 2.0                     # city and town names show from this zoom in...
+TOWNS_IN_VIEW = 40                  # ...at most this many at once, only those in view
 
 
 def _mix(a: str, b: str, t: float) -> QColor:
@@ -47,6 +50,10 @@ class FlatMap(QWidget):
         self.setAttribute(Qt.WA_OpaquePaintEvent)
         self._land = QPainterPath()     # in (lon, -lat) degrees
         self._labels: list[tuple[str, float, float, float]] = []   # name, lon, lat, width°
+        self._towns: list[dict] = []    # radio.town_labels(): the places with stations
+        self._tlon = np.zeros(0)
+        self._tlat = np.zeros(0)
+        self._town_pm: dict[tuple, QPixmap] = {}   # each name drawn once, outlined
         self._points: list[dict] = []
         self._lon = np.zeros(0)
         self._lat = np.zeros(0)
@@ -112,6 +119,16 @@ class FlatMap(QWidget):
         if pts:
             self._msg = ""
         self._redraw()
+
+    def set_towns(self, towns: list[dict]):
+        """City and town names (radio.town_labels(), most stations first), shown once
+        zoomed in: the ones with the most stations get first claim on the space."""
+        self._towns = list(towns)
+        self._tlon = np.array([t["lo"] for t in self._towns], float)
+        self._tlat = np.array([t["la"] for t in self._towns], float)
+        if len(self._town_pm) > 4 * len(self._towns) + 200:
+            self._town_pm.clear()   # names the filters no longer show
+        self.update()
 
     def select(self, point: dict | None, go: bool = False):
         """Mark the playing station (one found by search is added); `go` brings it into view."""
@@ -181,6 +198,7 @@ class FlatMap(QWidget):
         """What's drawn changed (stations, land, theme): draw it again."""
         self._ver += 1
         self._world = self._view = None
+        self._town_pm.clear()
         self.update()
 
     # ------------------------------------------------------------------ painting
@@ -209,7 +227,11 @@ class FlatMap(QWidget):
             p.setBrush(_mix(t["bg"], t["text"], 0.14))
             p.drawPath(self._land)
             p.restore()
-        self._paint_labels(p, tr, s, rect)
+        font, pen = self._label_style()
+        p.setFont(font)
+        p.setPen(pen)
+        for box, name in self._label_boxes(tr, s, rect, QFontMetricsF(font)):
+            p.drawText(box, Qt.AlignCenter, name)
         if len(self._points):
             o = tr.map(QPointF(0, 0))
             xs, ys = o.x() + self._lon * s, o.y() - self._lat * s
@@ -225,23 +247,20 @@ class FlatMap(QWidget):
                 p.drawEllipse(QPointF(xs[i], ys[i]), r, r)
         p.restore()
 
-    def _paint_labels(self, p: QPainter, tr: QTransform, s: float, rect: QRectF):
-        """Country names, biggest first, each where it fits inside its country's width
-        and doesn't run into a name already drawn."""
-        if not self._labels:
-            return
-        t = theme.T
+    def _label_style(self) -> tuple[QFont, QColor]:
         font = QFont(self.font())
         font.setPointSizeF(max(7.0, font.pointSizeF() * 0.85))
-        fm = QFontMetricsF(font)
-        p.setFont(font)
-        p.setPen(_mix(t["bg"], t["text"], 0.62))
+        return font, _mix(theme.T["bg"], theme.T["text"], 0.62)
+
+    def _label_boxes(self, tr: QTransform, s: float, rect: QRectF, fm: QFontMetricsF):
+        """Where the country names go: (box, name), biggest first, each where it fits
+        inside its country's width and doesn't run into a name already placed."""
         taken: list[QRectF] = []
         h = fm.height()
         for name, lon, lat, width in self._labels:
-            w = fm.horizontalAdvance(name)
             if width * s < 30:   # sorted widest first: none of the rest fit either
                 break
+            w = fm.horizontalAdvance(name)
             c = tr.map(QPointF(lon, -lat))
             box = QRectF(c.x() - w / 2, c.y() - h / 2, w, h)
             if not box.intersects(rect) or width * s < w * 0.8:
@@ -250,7 +269,71 @@ class FlatMap(QWidget):
             if any(pad.intersects(o) for o in taken):
                 continue
             taken.append(pad)
-            p.drawText(box, Qt.AlignCenter, name)
+            yield box, name
+
+    def _town_pixmap(self, name: str, dpr: float) -> QPixmap:
+        """A city name drawn once, outlined in the land's colour so it reads over the
+        dots; after that it's only copied onto the screen."""
+        key = (name, dpr)
+        pm = self._town_pm.get(key)
+        if pm is None:
+            t = theme.T
+            font = QFont(self.font())
+            font.setPointSizeF(max(7.0, font.pointSizeF() * 0.8))
+            font.setWeight(QFont.DemiBold)
+            fm = QFontMetricsF(font)
+            w, h = fm.horizontalAdvance(name) + 6, fm.height() + 2
+            pm = QPixmap(max(1, round(w * dpr)), max(1, round(h * dpr)))
+            pm.setDevicePixelRatio(dpr)
+            pm.fill(Qt.transparent)
+            q = QPainter(pm)
+            q.setRenderHint(QPainter.Antialiasing)
+            path = QPainterPath()
+            path.addText(3, 1 + fm.ascent(), font, name)
+            halo = QPen(_mix(t["bg"], t["text"], 0.14), 3)
+            halo.setJoinStyle(Qt.RoundJoin)
+            q.strokePath(path, halo)
+            q.fillPath(path, _mix(t["bg"], t["text"], 0.9))
+            q.end()
+            self._town_pm[key] = pm
+        return pm
+
+    def _paint_towns(self, p: QPainter, dpr: float) -> int:
+        """City and town names just above their stations, on top of the map picture.
+        Nothing at all until zoomed in; then only the places in view are looked at, the
+        ones with the most stations first, each where it doesn't cover a country's name
+        or another town's, and at most TOWNS_IN_VIEW of them: a drag costs a few
+        copied pictures. Answers how many it drew."""
+        if not len(self._towns) or self.zoom < TOWN_ZOOM:
+            return 0
+        s = self._scale()
+        xs = self.width() / 2 + ((self._tlon - self.cx + 180) % 360 - 180) * s
+        ys = self.height() / 2 - (self._tlat - self.cy) * s
+        on = np.flatnonzero((xs > -60) & (xs < self.width() + 60)
+                            & (ys > 0) & (ys < self.height() + 20))
+        if not len(on):
+            return 0
+        rect = QRectF(self.rect())
+        fm = QFontMetricsF(self._label_style()[0])
+        taken = []
+        for k in self._copies():
+            tr = self._transform()
+            tr.translate(k, 0)
+            taken += [b.adjusted(-2, -1, 2, 1) for b, _n in self._label_boxes(tr, s, rect, fm)]
+        drawn = 0
+        for i in on:   # most stations first, like the list
+            pm = self._town_pixmap(self._towns[i]["n"], dpr)
+            size = pm.deviceIndependentSize()
+            box = QRectF(xs[i] - size.width() / 2, ys[i] - 3 - size.height(),
+                         size.width(), size.height())
+            if any(box.intersects(o) for o in taken):
+                continue
+            taken.append(box)
+            p.drawPixmap(box.topLeft(), pm)
+            drawn += 1
+            if drawn >= TOWNS_IN_VIEW:
+                break
+        return drawn
 
     def _world_key(self, dpr: float):
         s = self._scale()
@@ -320,6 +403,7 @@ class FlatMap(QWidget):
                 q.end()
                 self._view = (key, pm)
             p.drawPixmap(0, 0, self._view[1])
+        self._paint_towns(p, dpr)
         p.setRenderHint(QPainter.Antialiasing)
         if len(self._points):
             xs, ys = self._screen()

@@ -32,6 +32,7 @@ import json
 import logging
 import random
 import socket
+import statistics
 import threading
 import sys
 import time
@@ -274,7 +275,8 @@ class Station:
         return " · ".join(b for b in bits if b)
 
     def matches(self, words: list[str]) -> bool:
-        hay = " ".join((self.name, self.country, self.cc, " ".join(self.tags))).lower()
+        hay = " ".join((self.name, self.country, self.cc, self.state,
+                        " ".join(self.tags))).lower()
         return all(w in hay for w in words)
 
 
@@ -485,8 +487,8 @@ class RadioDirectory(QObject):
 
     # -- search
     def search(self, text: str):
-        """Stations whose name or tags contain `text`, most listened first. A newer
-        search makes an older one's results be dropped."""
+        """Stations whose name, tags or place (city / region) contain `text`, most
+        listened first. A newer search makes an older one's results be dropped."""
         text = search_text(text)
         self._search_gen += 1
         gen = self._search_gen
@@ -495,7 +497,8 @@ class RadioDirectory(QObject):
         q = quote(text)
         common = f"&hidebroken=true&order=clickcount&reverse=true&limit={SEARCH_LIMIT}"
         paths = (f"/json/stations/search?name={q}{common}",
-                 f"/json/stations/search?tag={q}{common}")
+                 f"/json/stations/search?tag={q}{common}",
+                 f"/json/stations/search?state={q}{common}")
         self._pending[gen] = [len(paths), [], ""]
 
         def part(raw=b"", err=""):
@@ -799,6 +802,44 @@ def globe_points(stations: list[Station]) -> list[dict]:
             for s in stations if s.lat is not None and s.lon is not None]
 
 
+TOWNS_MAX = 600            # city and town names the maps get (each shows only zoomed in)
+TOWN_SPREAD = 3.0          # a place's stations this far (degrees) from its middle are strays
+
+
+def town_labels(points: list[dict], limit: int = TOWNS_MAX) -> list[dict]:
+    """Cities, towns and regions to name on the maps when zoomed in, from the stations'
+    own place field ("s"): {"n": name, "la", "lo": where its stations are (median),
+    "k": how many}, the places with the most stations first. Only places that have
+    stations are named, so a name always has dots to click around it."""
+    groups: dict[tuple[str, str], list[dict]] = {}
+    for d in points:
+        name = " ".join(str(d.get("s") or "").split())
+        if not 2 <= len(name) <= 40 or not any(ch.isalpha() for ch in name):
+            continue
+        country = str(d.get("c") or "").strip().casefold()
+        if name.casefold() in (country, str(d.get("cc") or "").casefold()):
+            continue   # "France, France": the map already names the country
+        groups.setdefault((name.casefold(), str(d.get("cc") or "")), []).append(d)
+    out = []
+    for members in groups.values():
+        la = statistics.median(d["la"] for d in members)
+        lo = statistics.median(d["lo"] for d in members)
+        near = [d for d in members
+                if abs(d["la"] - la) <= TOWN_SPREAD and abs(d["lo"] - lo) <= TOWN_SPREAD]
+        if len(near) < max(1, len(members) / 2):
+            continue   # scattered all over: the name doesn't belong to one spot
+        spellings: dict[str, int] = {}
+        for d in near:
+            n = " ".join(str(d["s"]).split())
+            spellings[n] = spellings.get(n, 0) + 1
+        name = max(spellings, key=lambda n: (spellings[n], n))
+        out.append({"n": name, "la": round(statistics.median(d["la"] for d in near), 4),
+                    "lo": round(statistics.median(d["lo"] for d in near), 4),
+                    "k": len(near)})
+    out.sort(key=lambda t: (-t["k"], t["n"]))
+    return out[:limit]
+
+
 def globe_base_url() -> QUrl:
     """What globe_html's page is loaded relative to: its script, pictures and outlines."""
     return QUrl.fromLocalFile(str(ASSET_DIR) + "/")
@@ -856,12 +897,13 @@ html,body{{margin:0;height:100%;overflow:hidden;background:{bg};color:{text};
   text-shadow:0 0 3px #000,0 0 2px #000,0 1px 2px #000;opacity:.9;letter-spacing:.2px}}
 body.nogl .place{{visibility:hidden!important}}
 .place.big{{font-size:13px}} .place.isle{{font-weight:400;font-style:italic;opacity:.8}}
+.place.town{{font-size:10px;font-weight:600;opacity:.85;padding-bottom:18px}} /* above its dots */
 #hint{{position:absolute;left:10px;bottom:10px;font-size:11px;opacity:.55;pointer-events:none}}
 </style></head><body><div id="g"></div><div id="msg">Loading the globe…</div>
 <div id="zoom"><button id="zin" title="Zoom in (Ctrl +)">+</button>
 <button id="zout" title="Zoom out (Ctrl −)">−</button>
 <button id="look" title="Day / night Earth">☾</button>
-<button id="names" title="Country and island names on / off">Aa</button>
+<button id="names" title="Country, island and city names on / off">Aa</button>
 <button id="flat" title="Back to the flat map (lighter on your PC)">2D</button></div>
 <div id="hint">Drag to spin · scroll or Ctrl +/− to zoom · click a dot to play</div>
 <script>{qwebchannel_js}</script>
@@ -890,6 +932,7 @@ function wake(ms) {{
 function fitLoop() {{
   // the names are re-placed on every frame the globe draws (so, not while it sleeps)
   if (asleep || !W) {{ fitting = false; return; }}
+  pickTowns();
   fitNames();
   requestAnimationFrame(fitLoop);
 }}
@@ -974,7 +1017,12 @@ function setActive(on) {{
 // Country and island names. They're HTML on top of the globe, so they stay the same
 // readable size at any zoom; a name only shows once its country is wider on screen
 // than the name, so zoomed out you see the big countries and zooming in adds the rest.
-let places = [], showNames = true;
+// Zoomed in further, the cities and towns the stations are in (setTowns) are named too,
+// the ones with the most stations first. Only those in view are made into names (at
+// most TOWNS_IN_VIEW), so zoomed out they cost nothing.
+let countries = [], towns = [], places = [], showNames = true;
+const TOWN_PX = 14, TOWNS_IN_VIEW = 40;   // px per degree from which towns show; how many
+let townKey = "", townAt = 0, townT = 0;
 try {{ showNames = localStorage.getItem("names") !== "off"; }} catch (e) {{}}
 const namesBtn = document.getElementById("names");
 function labelPoint(ring) {{
@@ -1049,13 +1097,49 @@ function loadPlaces() {{
   }}).catch(() => setPlaces(extra));   // offline: the islands still get their names
 }}
 function setPlaces(list) {{
-  places = list.sort((a, b) => b.w - a.w);   // the biggest get first claim on the space
+  countries = list.sort((a, b) => b.w - a.w);   // the biggest get first claim on the space
+  showPlaces();
+}}
+function setTowns(list) {{
+  // [{{n, la, lo, k}}], most stations first: after the countries in the claim on space
+  towns = list.map((t, i) => ({{n: t.n, la: t.la, lo: t.lo, k: t.k, town: 1, i}}));
+  townKey = ""; townAt = 0;
+  showPlaces([]);
+  pickTowns();
+}}
+function pickTowns() {{
+  // the towns in view, when zoomed in far enough; at most a few times a second
+  if (!W) return;
+  const now = performance.now();
+  if (now - townAt < 200) {{
+    if (!townT) townT = setTimeout(() => {{ townT = 0; pickTowns(); }}, 220);
+    return;
+  }}
+  townAt = now;
+  const pov = W.pointOfView(), R = Math.PI / 180;
+  const pxDeg = innerHeight / (2 * pov.altitude * Math.tan(25 * R) * 57.3);
+  const pick = [];
+  if (showNames && pxDeg >= TOWN_PX) {{
+    // how far from the middle of the view the screen reaches, in degrees
+    const reach = Math.min(70, Math.hypot(innerWidth, innerHeight) / 2 / pxDeg);
+    const lim = Math.cos(reach * R), s0 = Math.sin(pov.lat * R), c0 = Math.cos(pov.lat * R);
+    for (const d of towns) {{
+      const facing = s0 * Math.sin(d.la * R) +
+                     c0 * Math.cos(d.la * R) * Math.cos((d.lo - pov.lng) * R);
+      if (facing >= lim && pick.push(d) >= TOWNS_IN_VIEW) break;
+    }}
+  }}
+  const key = pick.map(d => d.i).join(",");
+  if (key !== townKey) {{ townKey = key; showPlaces(pick); }}
+}}
+function showPlaces(near) {{
+  places = countries.concat(near || places.filter(d => d.town));
   if (W) {{ W.htmlElementsData(places); wake(3000); }}
   setTimeout(fitNames, 50);   // the globe makes the name elements on its next update
 }}
 function placeEl(d) {{
   const el = document.createElement("div");
-  el.className = "place" + (d.isle ? " isle" : d.w > 25 ? " big" : "");
+  el.className = "place" + (d.town ? " town" : d.isle ? " isle" : d.w > 25 ? " big" : "");
   el.style.visibility = "hidden";   // until fitNames decides
   el.textContent = d.n;
   d.el = el;
@@ -1075,8 +1159,8 @@ function fitNames() {{
     // cosine of the angle from the middle of the view: 1 facing us, 0 at the edge
     const facing = s0 * Math.sin(d.la * R) +
                    c0 * Math.cos(d.la * R) * Math.cos((d.lo - pov.lng) * R);
-    let show = showNames && facing > 0.45 &&
-               d.w * pxDeg * facing >= (d.isle ? 12 : d.n.length * 5.2);
+    let show = showNames && facing > 0.45 && (d.town ? pxDeg >= TOWN_PX :
+               d.w * pxDeg * facing >= (d.isle ? 12 : d.n.length * 5.2));
     if (show) {{
       if (!d.pw) {{ d.pw = d.el.offsetWidth; d.ph = d.el.offsetHeight; }}
       const p = W.getScreenCoords(d.la, d.lo, 0.01);
@@ -1089,7 +1173,7 @@ function fitNames() {{
 }}
 function applyNames() {{
   namesBtn.classList.toggle("on", showNames);
-  fitNames(); wake();
+  townAt = 0; pickTowns(); fitNames(); wake();
 }}
 namesBtn.onclick = () => {{
   showNames = !showNames;

@@ -239,6 +239,56 @@ def test_globe_page_names_countries_and_islands():
         assert name.isascii() and "<" not in name, name
 
 
+def _town(i, place, lat, lon, **kw):
+    return Station.from_api(api_station(i, state=place, geo_lat=lat, geo_long=lon, **kw))
+
+
+def test_town_names_come_from_where_the_stations_are():
+    pts = radio.globe_points([
+        _town(1, "Accra", 5.6, -0.2, country="Ghana", countrycode="GH"),
+        _town(2, "accra ", 5.62, -0.18, country="Ghana", countrycode="GH"),
+        _town(3, "Accra", 5.58, -0.22, country="Ghana", countrycode="GH"),
+        _town(4, "Kumasi", 6.7, -1.6, country="Ghana", countrycode="GH"),
+        _town(5, "Ghana", 7.0, -1.0, country="Ghana", countrycode="GH"),   # the country
+        _town(6, "Nowhere", 10, 10), _town(7, "Nowhere", -30, 100),       # scattered
+        _town(8, "", 1, 1), _town(9, "123", 2, 2)])
+    towns = radio.town_labels(pts)
+    assert [t["n"] for t in towns] == ["Accra", "Kumasi"]   # most stations first
+    assert towns[0]["k"] == 3 and (towns[0]["la"], towns[0]["lo"]) == (5.6, -0.2)
+    assert radio.town_labels(pts, limit=1) == towns[:1]
+    assert _town(1, "Accra", 5.6, -0.2).matches(["accra"])   # search finds the place
+
+
+def test_flat_map_names_towns_only_zoomed_in_and_only_in_view(qapp, monkeypatch):
+    from soundboard.ui import flatmap
+    m = flatmap.FlatMap()
+    m.resize(720, 284)
+    towns = [{"n": f"Town {i}", "la": 0.0, "lo": i * 3.0, "k": 100 - i} for i in range(60)]
+    towns.append({"n": "Far", "la": 0.0, "lo": -120.0, "k": 1})
+    m.set_towns(towns)
+    drawn = []
+    real = m._town_pixmap
+    monkeypatch.setattr(m, "_town_pixmap", lambda n, dpr: drawn.append(n) or real(n, dpr))
+    m.grab()
+    assert drawn == []                      # zoomed out: no names, nothing even looked at
+    m.zoom, m.cx, m.cy = 6.0, 10.0, 0.0
+    m.grab()
+    assert drawn and "Far" not in drawn     # only the places in view
+    assert "Town 0" in drawn and len(drawn) <= 60
+    pm = flatmap.QPixmap(720, 284)
+    p = flatmap.QPainter(pm)
+    shown = m._paint_towns(p, 1.0)
+    p.end()
+    assert 0 < shown <= flatmap.TOWNS_IN_VIEW      # never more than a handful at once
+
+
+def test_globe_names_towns_only_near_the_view():
+    page = radio.globe_html("", "#000000", "#111111", "#222222", "#333333")
+    assert "function setTowns(list)" in page and "pickTowns();" in page
+    assert "pick.push(d) >= TOWNS_IN_VIEW" in page   # a few near the view, never all
+    assert "pxDeg >= TOWN_PX" in page                # and none zoomed out
+
+
 def test_globe_names_never_float_without_the_globe():
     page = radio.globe_html("", "#000000", "#111111", "#222222", "#333333")
     # a lost WebGL picture hides the names until it's back and redrawn
@@ -434,6 +484,7 @@ def test_search_merges_name_and_tag_and_drops_stale_answers(qapp, server, tmp_pa
     assert res == [("rock", ["uuid-9"])]
     assert any("name=rock" in h for h in server.hits) and any("tag=rock" in h
                                                                for h in server.hits)
+    assert any("state=rock" in h for h in server.hits)   # cities and regions too
 
 
 # ---------------------------------------------------------------- player
@@ -580,7 +631,8 @@ def test_globe_pins_only_the_top_stations(tab, monkeypatch):
     monkeypatch.setattr(radio, "GLOBE_LIGHT", 2)
     tab.cfg.radio["map"] = "globe"
     tab._push_globe(force=True)
-    assert sent[-1].startswith("setStations(") and sent[-1].count('"id"') == 2
+    assert sent[-2].startswith("setStations(") and sent[-2].count('"id"') == 2
+    assert sent[-1].startswith("setTowns(")   # the places those stations are in
 
 
 def test_flat_map_is_the_default_and_hd_swaps_in_the_globe(qapp, app_dir, server, monkeypatch):
