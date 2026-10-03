@@ -674,6 +674,7 @@ class SettingsDialog(QDialog):
         v.addWidget(card)
         v.addWidget(self._background_card())
         v.addWidget(self._backup_card())
+        v.addWidget(self._addons_card())
         v.addWidget(self._feedback_card())
         v.addWidget(self._support_card())
         v.addStretch(1)
@@ -691,6 +692,39 @@ class SettingsDialog(QDialog):
         v.addWidget(self._remote_card())
         v.addStretch(1)
         return w
+
+    # ------------------------------------------------------------------ add-ons
+    def _addons_card(self):
+        """Onion Watch (the Triggers tab's add-on) can be removed from here too, not
+        only from the end of its own More menu."""
+        from soundboard import watchaddon
+        tab = self.mw.triggers
+        card, cv = self._card("Add-ons",
+                              "Onion Watch is the free add-on behind the Triggers tab. "
+                              "Removing it keeps your triggers for when you get it again.")
+        row = QHBoxLayout()
+        self.addon_label = QLabel()
+        self.addon_label.setWordWrap(True)
+        self.addon_remove = QPushButton("Remove Onion Watch…")
+        icons.set_icon(self.addon_remove, "trash", "danger_text")
+
+        def refresh():
+            info = tab.info
+            have = info is not None and watchaddon.removable(info, tab._base())
+            self.addon_label.setText(f"Onion Watch {info.version} is installed." if have else
+                                     "Onion Watch isn't installed. Get it from the Triggers "
+                                     "tab.")
+            self.addon_remove.setVisible(have)
+
+        def remove():
+            tab.remove()                    # asks first
+            refresh()
+        self.addon_remove.clicked.connect(remove)
+        refresh()
+        row.addWidget(self.addon_label, 1)
+        row.addWidget(self.addon_remove)
+        cv.addLayout(row)
+        return card
 
     # ------------------------------------------------------------------ support
     def _feedback_card(self):

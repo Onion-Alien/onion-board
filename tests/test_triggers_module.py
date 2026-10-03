@@ -181,3 +181,21 @@ def test_a_bad_new_copy_leaves_the_working_one_alone(tmp_path):
         with pytest.raises(ModuleError, match="isn't a zip file"):
             modules.install_zip(tmp_path / "junk.zip", "onion-watch", "triggers", base)
     assert [m.version for m in modules.discover([base])] == ["1.0"]
+
+
+def test_all_its_files_load_up_front_so_an_update_on_disk_cant_break_the_running_copy(
+        tmp_path, pkgname):
+    folder = make_module(tmp_path / "onion-watch", package=pkgname, body=(
+        "def later():\n"
+        f"    from {pkgname}.ui.extra import VALUE\n"
+        "    return VALUE\n"))
+    (folder / pkgname / "ui").mkdir()
+    (folder / pkgname / "ui" / "__init__.py").write_text("", encoding="utf-8")
+    (folder / pkgname / "ui" / "extra.py").write_text("VALUE = 'old'\n", encoding="utf-8")
+    (folder / pkgname / "ui" / "broken.py").write_text("raise RuntimeError('x')\n",
+                                                       encoding="utf-8")
+    (m,) = modules.discover([tmp_path])
+    entry = modules.load_package(m)                          # a broken file doesn't stop it
+    assert f"{pkgname}.ui.extra" in sys.modules
+    folder.rename(tmp_path / "gone")                         # replaced while running
+    assert entry.later() == "old"                            # a lazy import still works

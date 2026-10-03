@@ -271,6 +271,26 @@ def _forget(package: str):
         del sys.modules[name]
 
 
+def _load_all(package: str, pkg_dir: Path):
+    """Import every file of a loaded add-on now, not when a button first needs one.
+    The running copy then never reads its folder again, so an update installed
+    while the app runs (it's used after a restart) can't hand the old code a new
+    file, or none: a missing one crashed *Recently deleted*. A file that fails is
+    logged and left to fail where it's used, as it would have."""
+    for path in sorted(pkg_dir.rglob("*.py")):
+        rel = path.relative_to(pkg_dir).with_suffix("")
+        parts = [p for p in rel.parts if p != "__init__"]
+        if any(not p.isidentifier() for p in parts):
+            continue
+        name = ".".join([package, *parts])
+        if name in sys.modules:
+            continue
+        try:
+            importlib.import_module(name)
+        except Exception:  # noqa: BLE001 - one bad file can't stop the add-on loading
+            log.warning("module file %s didn't load", name, exc_info=True)
+
+
 def load_package(info: ModuleInfo):
     """Load a "triggers" module's package from its folder and return its `entry`
     module (which has create(host)). Loaded once per run: a copy already loaded
@@ -309,6 +329,7 @@ def load_package(info: ModuleInfo):
         raise ModuleError(f"failed to load: {e}") from e
     if not callable(getattr(entry, "create", None)):
         raise ModuleError(f"{info.entry} has no create()")
+    _load_all(info.package, pkg_dir)
     info.loaded = True
     log.info("loaded module %s %s from %s", info.id, info.version, info.path)
     return entry

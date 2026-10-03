@@ -36,7 +36,8 @@ def test_support_opens_the_project_page_not_an_address_in_the_app(window, monkey
 def test_each_page_opens_by_name_and_holds_its_cards(window):  # noqa: F811
     where = {"audio": ("DEVICES", "YOUR MIC", "WHO'S LISTENING", "AUDIO BUFFERING"),
              "hotkeys": ("HOTKEY SOUNDS",),
-             "general": ("WINDOW", "RUNNING IN THE BACKGROUND", "BACKUP", "FEEDBACK AND PROBLEMS",
+             "general": ("WINDOW", "RUNNING IN THE BACKGROUND", "BACKUP", "ADD-ONS",
+                         "FEEDBACK AND PROBLEMS",
                          "SUPPORT ONION BOARD"),
              "updates": ("APP UPDATES", "DOWNLOADER (YT-DLP)"),
              "remote": ("REMOTE CONTROL (STREAM DECK, SCRIPTS)",)}
@@ -81,4 +82,27 @@ def test_feedback_and_problem_buttons_only_open_the_browser(window, monkeypatch)
     monkeypatch.setattr(feedback, "FORM_URL", "")       # no form: feedback goes to GitHub too
     d.feedback_btn.click()
     assert opened[2] == opened[1]
+    d.close()
+
+
+def test_onion_watch_can_be_removed_from_settings(window, monkeypatch):  # noqa: F811
+    from types import SimpleNamespace
+
+    from soundboard import watchaddon
+    tab = window.triggers
+    d = SettingsDialog(window, "general")
+    assert not d.addon_remove.isVisibleTo(d) and "isn't installed" in d.addon_label.text()
+    d.close()
+    monkeypatch.setattr(tab, "info", SimpleNamespace(version="9.9"))
+    monkeypatch.setattr(watchaddon, "removable", lambda info, base: True)
+    removed = []
+
+    def fake_remove():
+        removed.append(True)
+        tab.info = None
+    monkeypatch.setattr(tab, "remove", fake_remove)
+    d = SettingsDialog(window, "general")
+    assert d.addon_remove.isVisibleTo(d) and "9.9 is installed" in d.addon_label.text()
+    d.addon_remove.click()
+    assert removed and not d.addon_remove.isVisibleTo(d)
     d.close()
