@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 1.6.0 — 2026-10-03
 
 - **Stream output for OBS** (Settings → Audio): send what others hear to a device of
   its own and add it to OBS as its own audio track — your sounds, screen triggers,
