@@ -516,3 +516,48 @@ def test_voice_tiles_reflow_in_a_narrow_window(qapp, monkeypatch):
     fx.setGeometry(0, 0, 1600, 600)
     assert fx._tile_cols == 3 and fx.btn_power.text() == POWER_TEXT[False]
     holder.hide()
+
+
+def test_voice_settings_never_wait_on_a_line_being_spoken(panel, monkeypatch):
+    """Dragging the voice volume (or any voice setting) while a translated line is
+    being synthesized mustn't wait on the speech engine: the UI thread never takes
+    SapiTTS's lock or waits on the Speaker (a report of the window going "Not
+    Responding" mid-line; this pins down that the settings path stays clear)."""
+    import threading
+    import time
+
+    p, _ = panel
+    s = p.speech
+    ctl = s.ctl
+    gate, busy = threading.Event(), threading.Event()
+
+    def stuck_synth(text, voice="", rate=0):
+        with ctl.tts._lock:            # as the real one holds it for the whole line
+            busy.set()
+            gate.wait(10)
+        return np.zeros(0, np.float32), tts.TTS_RATE
+
+    monkeypatch.setattr(ctl.tts, "synth", stuck_synth)
+    monkeypatch.setattr(type(ctl), "live", property(lambda self: True))
+    ctl.live_voice = "Microsoft Huihui Desktop"
+    try:
+        ctl.speaker.say("你好", ctl.live_voice)
+        assert busy.wait(5)
+        saved = []
+        s.changed.connect(saved.append)
+        worst = 0.0
+        edits = [lambda v=v: s.sl_gain.slider.setValue(v) for v in range(0, 201, 4)]
+        edits += [lambda: s.sl_rate.setValue(3), lambda: s.chk_mute.toggle(),
+                  lambda: s.cb_voice.setCurrentIndex(s.cb_voice.count() - 1),
+                  lambda: s.cb_lang.setCurrentIndex(s.cb_lang.findData("zh")),
+                  lambda: s.ed_lang.editingFinished.emit()]
+        for edit in edits:
+            t = time.monotonic()
+            edit()
+            worst = max(worst, time.monotonic() - t)
+        assert worst < 0.5, f"a settings edit waited {worst:.1f}s on the speech engine"
+        assert not gate.is_set() and ctl.tts._lock.locked()   # still mid-line throughout
+        assert ctl.gain == pytest.approx(2.0) and saved[-1]["gain"] == pytest.approx(2.0)
+        assert ctl.speaker.rate == 3
+    finally:
+        gate.set()

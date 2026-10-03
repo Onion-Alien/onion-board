@@ -292,6 +292,16 @@ def _save(rep: Report) -> Path | None:
         return None
 
 
+def save_freeze(seconds: float, stack: str) -> Path | None:
+    """A frozen window (hangwatch.py): its stack, saved beside the crash reports."""
+    from soundboard import __version__
+    text = "\n".join([f"Onion Board froze for {seconds:.0f} s",
+                      f"Version:  {__version__}",
+                      f"Time:     {time.strftime('%Y-%m-%d %H:%M:%S')}",
+                      "", "What it was doing", "-----------------", stack])
+    return _save(Report(title="froze", text=scrub(text), fatal=False))
+
+
 def _offer(rep: Report, sig: tuple):
     """Show the dialog on the UI thread, at most once per distinct bug and
     MAX_DIALOGS per run. A dialog already open collects further errors instead."""

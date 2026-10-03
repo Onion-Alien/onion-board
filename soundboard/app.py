@@ -180,6 +180,8 @@ def main():
     recheck = QTimer(w)
     recheck.timeout.connect(w.check_updates)
     recheck.start(6 * 3600 * 1000)
+    from soundboard.hangwatch import HangWatch
+    app.hangwatch = HangWatch(parent=app)   # a frozen window gets its stack logged
     code = app.exec()
     # w.shutdown already ran (aboutToQuit). Python's own teardown after this -- Qt,
     # the web view, COM, audio objects -- can hang with the window gone, leaving an
