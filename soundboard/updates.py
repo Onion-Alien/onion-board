@@ -75,7 +75,7 @@ def newer(latest: str, current: str = __version__) -> bool:
 
 def _get(url: str) -> dict:
     req = urllib.request.Request(url, headers={
-        "User-Agent": f"OnionBoard/{__version__} (update check)",
+        "User-Agent": "OnionBoard (update check)",   # no version: GitHub needs a name only
         "Accept": "application/vnd.github+json"})
     with urllib.request.urlopen(req, timeout=15) as r:
         return json.loads(r.read(LIMIT).decode("utf-8"))
@@ -189,7 +189,7 @@ def _sha256(path: Path) -> str:
 
 def _open(url: str):
     req = urllib.request.Request(url, headers={
-        "User-Agent": f"OnionBoard/{__version__} (update download)"})
+        "User-Agent": "OnionBoard (update download)"})
     return urllib.request.urlopen(req, timeout=30)
 
 

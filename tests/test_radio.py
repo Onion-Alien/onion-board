@@ -4,6 +4,8 @@ A local HTTP server on 127.0.0.1 stands in for Radio Browser and for a radio
 station (a synthesized tone served as a WAV stream), so nothing here touches the
 internet and nothing plays out loud (the player only hands audio to the engine).
 """
+import base64
+import hashlib
 import http.server
 import io
 import json
@@ -40,6 +42,16 @@ def test_station_from_api_keeps_the_useful_fields():
     assert s.cc == "JP" and s.tags == ["jazz", "lofi"] and s.bitrate == 128
     assert s.lat == pytest.approx(35.01) and s.lon == 139.0
     assert "Japan" in s.subtitle() and "128 kbps MP3" in s.subtitle()
+
+
+def test_station_plays_over_https_when_the_directory_lists_it():
+    https = Station.from_api(api_station(1, url="https://example.com/live.mp3"))
+    assert https.url == "https://example.com/live.mp3"   # the network can't see which station
+    playlist = Station.from_api(api_station(1, url="https://example.com/live.pls"))
+    assert playlist.url == "http://example.com/1.mp3"    # FFmpeg can't play a playlist
+    both = Station.from_api(api_station(1, url="https://a.example.com/x",
+                                        url_resolved="https://b.example.com/x.mp3"))
+    assert both.url == "https://b.example.com/x.mp3"     # resolved still wins when it's https
 
 
 @pytest.mark.parametrize("bad", [
@@ -176,10 +188,48 @@ def test_flat_map_hovers_clicks_and_follows_the_playing_station(qapp):
     assert m.zoom == 1
 
 
+def test_maps_ship_with_the_app_and_fetch_nothing():
+    """No CDN learns who opened the Radio tab: every file the maps use is in ASSET_DIR,
+    exactly the pinned version, and the page may only load from there."""
+    def sri(name):
+        raw = (radio.ASSET_DIR / name).read_bytes()
+        return "sha384-" + base64.b64encode(hashlib.sha384(raw).digest()).decode()
+    assert sri(radio.GLOBE_JS) == radio.GLOBE_SRI
+    assert sri(radio.COUNTRIES) == radio.COUNTRIES_SRI
+    for name in (radio.EARTH_DAY, radio.EARTH_NIGHT, "LICENSE.txt"):
+        assert (radio.ASSET_DIR / name).is_file(), name
+    page = radio.globe_html("", "#000000", "#111111", "#222222", "#333333")
+    assert "http://" not in page and "https://" not in page
+    assert radio.globe_base_url().isLocalFile()
+    assert radio.globe_base_url().toLocalFile().rstrip("/") == radio.ASSET_DIR.as_posix()
+
+
+def test_plays_are_counted_only_when_allowed(tab, monkeypatch):
+    counted = []
+    monkeypatch.setattr(tab.player, "play", lambda s: None)
+    monkeypatch.setattr(tab.dir, "count_click", counted.append)
+    s = tab._stations["uuid-0"]
+    tab.play(s)
+    assert counted == []                       # off by default (Settings > Privacy)
+    tab.cfg.radio["count_plays"] = True
+    tab.play(s)
+    assert counted == ["uuid-0"]
+
+
+def test_flat_map_outlines_come_from_the_app(qapp):
+    d = RadioDirectory(cache_dir=None)
+    got = []
+    d.outlines_ready.connect(lambda rings, labels: got.append((rings, labels)))
+    d.load_outlines()
+    assert process_events(qapp, lambda: got)
+    rings, labels = got[0]
+    assert len(rings) > 200 and any(n == "Japan" for n, *_ in labels)
+
+
 def test_globe_page_names_countries_and_islands():
     page = radio.globe_html("", "#000000", "#111111", "#222222", "#333333")
-    # the outlines are pinned like the globe itself, and names are text, never HTML
-    assert f'fetch("{radio.COUNTRIES}", {{integrity: "{radio.COUNTRIES_SRI}"}})' in page
+    # the outlines come from the app's own folder, and names are text, never HTML
+    assert f'localJson("{radio.COUNTRIES}")' in page
     assert "el.textContent = d.n" in page and 'id="names"' in page
     assert '"Tasmania"' in page and '"United States"' in page
     names = [p[0] for p in radio.PLACES]
@@ -232,7 +282,8 @@ def test_search_matching_covers_name_country_and_tags():
 def test_globe_page_is_pinned_and_colours_cant_inject():
     page = radio.globe_html("/*channel*/", "#000000;</style><script>x()</script>", "#123456",
                             "red", "#eeeeee")
-    assert radio.GLOBE_SRI in page and 'integrity="sha384-' in page
+    # the script is the app's own pinned copy (test_maps_ship_with_the_app_and_fetch_nothing)
+    assert f'<script src="{radio.GLOBE_JS}">' in page
     assert "Content-Security-Policy" in page and "default-src &#x27;none&#x27;" in page
     assert "x()" not in page and "#15171f" in page and "#123456" in page
 
@@ -599,7 +650,8 @@ def test_tab_plays_into_the_engine_and_clips_to_sounds(qapp, tab, server):
     tab.play(s)
     assert process_events(qapp, lambda: sum(map(len, tab.engine.chunks)) > SR, timeout=15)
     assert tab.btn_play.text() == "Stop" and "Station 0" in tab.info.text()
-    assert any(h.startswith("/json/url/uuid-0") for h in server.hits)   # counted a click
+    # Radio Browser isn't told what you play unless Settings > Privacy says it may be
+    assert not any(h.startswith("/json/url/") for h in server.hits)
     assert tab.cfg.radio["last"]["uuid"] == "uuid-0"
     assert tab.clip_last() and clips[0][1].startswith("Station 0")
     tab.btn_live.click()
@@ -639,8 +691,8 @@ def test_tab_favorites_are_saved(tab):
 
 
 def test_globe_click_reaches_the_tab_without_the_internet(qapp, app_dir, server, monkeypatch):
-    """The globe page loads (its CDN script blocked here, so it shows the fallback
-    message), and a click reported over the web channel plays that station."""
+    """The globe page loads with the internet blocked (its files ship with the app), and
+    a click reported over the web channel plays that station."""
     from PySide6.QtWebEngineCore import QWebEngineUrlRequestInterceptor
 
     from soundboard.ui.radiopanel import RadioTab
@@ -668,8 +720,10 @@ def test_globe_click_reaches_the_tab_without_the_internet(qapp, app_dir, server,
     assert process_events(qapp, lambda: t._globe_loaded and t._globe_list, timeout=20)
     page = t.view.page()
     out = []
-    page.runJavaScript("document.getElementById('msg').textContent", 0, out.append)
-    assert process_events(qapp, lambda: out) and "couldn't load" in out[0]
+    page.runJavaScript("typeof Globe + ' ' + document.getElementById('msg').textContent",
+                       0, out.append)
+    assert process_events(qapp, lambda: out) and out[0].startswith("function")
+    assert "couldn't load" not in out[0]
     page.runJavaScript("bridge && bridge.play('uuid-2')")
     assert process_events(qapp, lambda: played, timeout=5)
     assert played[0].uuid == "uuid-2"

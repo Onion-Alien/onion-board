@@ -31,6 +31,7 @@ if ($Clean) { $cleanArg = @("--clean") }
     --add-data "installer\install-vbcable.ps1;." `
     --add-data "assets\onionboard.ico;." `
     --add-data "assets\art;art" `
+    --add-data "assets\radio;radio" `
     --copy-metadata yt-dlp --collect-all yt_dlp_ejs `
     --paths . `
     main.py

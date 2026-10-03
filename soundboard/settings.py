@@ -751,6 +751,7 @@ class SettingsDialog(QDialog):
         one.toggled.connect(self.mw.set_single_click)
         cv.addWidget(one)
         v.addWidget(card)
+        v.addWidget(self._privacy_card())
         v.addWidget(self._background_card())
         v.addWidget(self._backup_card())
         v.addWidget(self._addons_card())
@@ -914,6 +915,28 @@ class SettingsDialog(QDialog):
         row.addWidget(imp)
         row.addStretch(1)
         cv.addLayout(row)
+        return card
+
+    # ------------------------------------------------------------------ privacy
+    def _privacy_card(self):
+        card, cv = self._card(
+            "Privacy",
+            "Onion Board has no account, tracking or analytics, and sends nothing to us. "
+            "Searches and downloads go straight to the site you pick (YouTube, SoundCloud, "
+            "TikTok, Myinstants), and a radio station plays straight from that station, "
+            "so those sites see your IP address like they would in a browser. The radio "
+            "maps and their pictures ship with the app: opening them contacts nobody.")
+        plays = QCheckBox("Tell Radio Browser which stations I play (it ranks stations by "
+                          "how often they're played)")
+        plays.setToolTip("Off: starting a station only contacts the station itself")
+        cfg = self.mw.cfg
+        plays.setChecked(bool(cfg.radio.get("count_plays", False)))
+
+        def count_plays(on: bool):
+            cfg.radio["count_plays"] = on
+            self.mw.set_option("radio", cfg.radio)   # saves
+        plays.toggled.connect(count_plays)
+        cv.addWidget(plays)
         return card
 
     # ------------------------------------------------------------------ app updates

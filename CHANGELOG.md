@@ -2,6 +2,13 @@
 
 ## 1.6.5 — 2026-10-03
 
+- **More private radio**: the radio maps (the country outlines, the 3D globe and its
+  Earth pictures) now come with the app instead of being downloaded, so opening the
+  Radio tab doesn't contact a CDN at all. Stations play over `https` when the
+  directory lists an `https` address for them. The app no longer tells Radio Browser
+  which stations you play unless you turn that on in the new **Privacy** section
+  (Settings → General), which also explains what the app sends where. Update checks
+  no longer send the app's version number.
 - **Your headphones follow Windows' default output**: switch Windows from your
   headset to your speakers (or back) while the app is open and the sounds you hear
   move with it, instead of playing on the device you just switched away from. Picking

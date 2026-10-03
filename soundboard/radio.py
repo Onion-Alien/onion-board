@@ -6,7 +6,7 @@ and no key. Most stations carry a latitude / longitude, which the globe uses.
 The app asks it for: the most-listened stations that have a location (the globe,
 cached for a day in radio_dir()), searches you type, and a "click" when you
 start a station (the directory's own popularity count, which it asks clients to
-send). Nothing else about you is sent.
+send; Settings > Privacy turns it off). Nothing else about you is sent.
 
 The player is Qt Multimedia (FFmpeg): it opens the stream (MP3, AAC, Ogg, HLS…)
 and decodes it, but never plays it itself. A QAudioBufferOutput hands the decoded
@@ -14,8 +14,9 @@ audio to the UI thread as 48 kHz stereo float, which goes into the engine
 (`Engine.feed_radio`) like the Browser tab's audio, so it can go out through
 your mic.
 
-The globe is globe.gl (MIT licence, three.js) in a web view, loaded from
-jsDelivr at a pinned version with a subresource-integrity hash. The page is ours;
+The globe is globe.gl (MIT licence, three.js) in a web view. It, the Earth pictures
+and the country outlines ship with the app (ASSET_DIR), so opening either map
+contacts nobody: no CDN learns who opened the Radio tab. The page is ours;
 station names from the directory are escaped before they're shown, the page
 can't navigate anywhere, and it reports clicks back over QWebChannel.
 """
@@ -30,8 +31,10 @@ import logging
 import random
 import socket
 import threading
+import sys
 import time
 from dataclasses import asdict, dataclass, field
+from pathlib import Path
 from urllib.parse import quote
 
 import numpy as np
@@ -39,7 +42,7 @@ from PySide6.QtCore import QObject, QTimer, QUrl, Signal
 from PySide6.QtMultimedia import QAudioBufferOutput, QAudioFormat, QMediaMetaData, QMediaPlayer
 from PySide6.QtNetwork import QNetworkAccessManager, QNetworkReply, QNetworkRequest
 
-from soundboard import __version__, library
+from soundboard import library
 from soundboard.engine import SR
 
 log = logging.getLogger(__name__)
@@ -53,19 +56,21 @@ SEARCH_LIMIT = 150
 SEARCH_MAX_CHARS = 80
 CACHE_S = 24 * 3600        # how long the globe's station list is reused
 TIMEOUT_MS = 15000
-USER_AGENT = f"OnionBoard/{__version__}"
+USER_AGENT = "OnionBoard"   # Radio Browser asks apps to name themselves; no version
 RETRIES = 3                # a dropped stream is reopened this many times in a row
 CONNECT_S = 20.0           # a station that sends no audio this long after opening is dead
 STALL_S = 8.0              # ...and one that goes quiet this long while playing is reopened
 
-GLOBE_JS = "https://cdn.jsdelivr.net/npm/globe.gl@2.46.2/dist/globe.gl.min.js"
+# The maps' files ship with the app: assets/radio in a source checkout, radio/ in the
+# frozen app (build.ps1 bundles it). Nothing is fetched from a CDN.
+ASSET_DIR = (Path(sys._MEIPASS) / "radio" if hasattr(sys, "_MEIPASS")
+             else Path(__file__).resolve().parent.parent / "assets" / "radio")
+GLOBE_JS = "globe.gl.min.js"                   # globe.gl 2.46.2 (MIT), includes three.js
 GLOBE_SRI = "sha384-1uolMBZ25k3zJcNwCLEv49+L+m2dZudqAzsoSAJfQTzDCSBxJzrMuZ2dkp/5JKiT"
-_IMG = "https://cdn.jsdelivr.net/npm/three-globe@2.45.2/example/img/"
-EARTH_DAY = _IMG + "earth-blue-marble.jpg"     # NASA Blue Marble (public domain)
-EARTH_NIGHT = _IMG + "earth-night.jpg"         # NASA Black Marble: city lights
+EARTH_DAY = "earth-blue-marble.jpg"            # NASA Blue Marble (public domain)
+EARTH_NIGHT = "earth-night.jpg"                # NASA Black Marble: city lights
 # Natural Earth country outlines (public domain), where the globe's country names go
-COUNTRIES = ("https://cdn.jsdelivr.net/npm/globe.gl@2.46.2/example/datasets/"
-             "ne_110m_admin_0_countries.geojson")
+COUNTRIES = "ne_110m_admin_0_countries.geojson"
 COUNTRIES_SRI = "sha384-hAVr+/g2HDlVDeHrAVqTIQV3tH1JE5AbtuvCSCcoeG+ZDteCU2XGaE5yLDiLP9m5"
 # The outlines are coarse and leave out small countries and islands. These are named
 # too: (name, lat, lon, width in degrees, which decides how far in you zoom to see it).
@@ -130,6 +135,20 @@ def _http(url: str) -> str:
     return "" if _local_ip(ip) else url
 
 
+PLAYLIST_EXTS = (".pls", ".m3u", ".asx", ".xspf")   # `url` is often one; FFmpeg can't play it
+
+
+def _stream_url(d: dict) -> str:
+    """The station's stream: `url_resolved` (the directory follows playlists for it),
+    but its listed `url` when only that one is https and it's a stream, not a playlist,
+    so the network in between sees a station host and not which station it is."""
+    resolved, listed = _http(d.get("url_resolved")), _http(d.get("url"))
+    if (resolved.lower().startswith("http://") and listed.lower().startswith("https://")
+            and not QUrl(listed).path().lower().endswith(PLAYLIST_EXTS)):
+        return listed
+    return resolved or listed
+
+
 def _local_ip(ip) -> bool:
     """Is this address this PC or the home network (or nowhere real)?"""
     ip = getattr(ip, "ipv4_mapped", None) or ip   # ::ffff:127.0.0.1
@@ -190,7 +209,7 @@ class Station:
         if not isinstance(d, dict):
             return None
         uuid = str(d.get("stationuuid") or "").strip()
-        url = _http(d.get("url_resolved")) or _http(d.get("url"))
+        url = _stream_url(d)
         name = " ".join(str(d.get("name") or "").split())[:120]
         if not uuid or not url or not name:
             return None
@@ -357,10 +376,6 @@ class RadioDirectory(QObject):
     def cache_path(self):
         return self.cache_dir / "stations.json"
 
-    @property
-    def outlines_path(self):
-        return self.cache_dir / "countries.geojson"
-
     # -- plumbing
     def _get(self, path: str, done, fail, attempt: int = 0):
         """GET `path` from a mirror; on a network error or a reply that isn't JSON,
@@ -443,39 +458,17 @@ class RadioDirectory(QObject):
 
     # -- the flat map's land
     def load_outlines(self):
-        """The country outlines, from the cache (they're pinned, so it never goes stale)
-        or jsDelivr. Answers [] when neither has them: the map shows just its dots."""
+        """The country outlines, from the copy that ships with the app. Answers [] when
+        it's missing or altered: the map shows just its dots."""
         try:
-            raw = self.outlines_path.read_bytes()
+            raw = (ASSET_DIR / COUNTRIES).read_bytes()
         except OSError:
             raw = b""
         rings = outline_rings(raw)
-        if rings:
-            labels = outline_labels(raw)
-            QTimer.singleShot(0, lambda: self.outlines_ready.emit(rings, labels))
-            return
-        req = QNetworkRequest(QUrl(COUNTRIES))
-        req.setHeader(QNetworkRequest.UserAgentHeader, USER_AGENT)
-        req.setTransferTimeout(TIMEOUT_MS)
-        reply = self.nam.get(req)
-
-        def finished():
-            reply.deleteLater()
-            raw = bytes(reply.readAll()) if reply.error() == QNetworkReply.NoError else b""
-            rings = outline_rings(raw)
-            if rings:
-                try:
-                    self.cache_dir.mkdir(parents=True, exist_ok=True)
-                    tmp = self.outlines_path.with_suffix(".tmp")
-                    tmp.write_bytes(raw)
-                    tmp.replace(self.outlines_path)
-                except OSError:
-                    log.warning("can't cache the map outlines", exc_info=True)
-            else:
-                log.info("map outlines unavailable: %s", reply.errorString() if not raw
-                         else "the file didn't match its pinned hash")
-            self.outlines_ready.emit(rings, outline_labels(raw) if rings else [])
-        reply.finished.connect(finished)
+        if not rings:
+            log.warning("map outlines unavailable: %s missing or altered", COUNTRIES)
+        labels = outline_labels(raw) if rings else []
+        QTimer.singleShot(0, lambda: self.outlines_ready.emit(rings, labels))
 
     # -- search
     def search(self, text: str):
@@ -745,6 +738,11 @@ def globe_points(stations: list[Station]) -> list[dict]:
             for s in stations if s.lat is not None and s.lon is not None]
 
 
+def globe_base_url() -> QUrl:
+    """What globe_html's page is loaded relative to: its script, pictures and outlines."""
+    return QUrl.fromLocalFile(str(ASSET_DIR) + "/")
+
+
 def globe_html(qwebchannel_js: str, bg: str, accent: str, hot: str, text: str) -> str:
     """The 3D globe page (the Radio tab's HD view; the flat map is the default). Colours
     are theme tokens (validated hex), scripts are pinned.
@@ -758,9 +756,11 @@ def globe_html(qwebchannel_js: str, bg: str, accent: str, hot: str, text: str) -
                                                          for ch in c[1:]) else fallback
     bg, accent = hexcol(bg, "#15171f"), hexcol(accent, "#7c5cff")
     hot, text = hexcol(hot, "#ff4d8d"), hexcol(text, "#e6e8f0")
-    csp = ("default-src 'none'; script-src 'unsafe-inline' https://cdn.jsdelivr.net; "
-           "img-src https://cdn.jsdelivr.net data: blob:; style-src 'unsafe-inline'; "
-           "connect-src https://cdn.jsdelivr.net data: blob:; worker-src blob:")
+    # the page is loaded with ASSET_DIR as its base (globe_base_url): files from there,
+    # nothing from the internet
+    csp = ("default-src 'none'; script-src 'unsafe-inline' file:; "
+           "img-src file: data: blob:; style-src 'unsafe-inline'; "
+           "connect-src file: data: blob:; worker-src blob:")
     return f"""<!doctype html><html><head><meta charset="utf-8">
 <meta http-equiv="Content-Security-Policy" content="{html.escape(csp)}">
 <style>
@@ -804,7 +804,7 @@ body.nogl .place{{visibility:hidden!important}}
 <button id="flat" title="Back to the flat map (lighter on your PC)">2D</button></div>
 <div id="hint">Drag to spin · scroll or Ctrl +/− to zoom · click a dot to play</div>
 <script>{qwebchannel_js}</script>
-<script src="{GLOBE_JS}" integrity="{GLOBE_SRI}" crossorigin="anonymous"></script>
+<script src="{GLOBE_JS}"></script>
 <script>
 "use strict";
 let ACCENT = "{accent}", HOT = "{hot}";
@@ -960,10 +960,21 @@ const area = ring => {{
   return Math.abs(a / 2) * Math.cos(ring[0][1] * Math.PI / 180);
 }};
 const RENAME = {json.dumps(COUNTRY_NAMES)};
+function localJson(name) {{
+  // a file next to the page; fetch() can't read file: URLs, XMLHttpRequest can
+  return new Promise((ok, fail) => {{
+    const x = new XMLHttpRequest();
+    x.open("GET", name);
+    x.responseType = "json";
+    x.onload = () => x.response ? ok(x.response) : fail();
+    x.onerror = fail;
+    x.send();
+  }});
+}}
 function loadPlaces() {{
   const extra = {json.dumps([{"n": n, "la": la, "lo": lo, "w": w, "isle": 1}
                              for n, la, lo, w in PLACES])};
-  fetch("{COUNTRIES}", {{integrity: "{COUNTRIES_SRI}"}}).then(r => r.json()).then(geo => {{
+  localJson("{COUNTRIES}").then(geo => {{
     const list = [];
     for (const f of geo.features) {{
       const p = f.properties, g = f.geometry;
@@ -1032,8 +1043,8 @@ catch (e) {{ /* no app to talk to (a plain browser): the globe still works */ }}
 
 function build() {{
   if (typeof Globe !== "function") {{
-    msg("The globe couldn't load (it needs the internet the first time). " +
-        "Search and the station list still work.");
+    msg("The globe couldn't load (its files are missing from the app's radio folder: " +
+        "reinstalling puts them back). Search and the station list still work.");
     return;
   }}
   try {{

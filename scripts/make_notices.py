@@ -54,11 +54,13 @@ libraries (avcodec, avformat, avutil, swresample, swscale) ship with PySide6 as
 separate, replaceable DLLs. Source code and licence: https://ffmpeg.org/legal.html
 
 {RULE}
-globe.gl  --  MIT (not bundled)
+globe.gl / three.js  --  MIT
 {RULE}
-The Radio tab's globe loads globe.gl (https://github.com/vasturiano/globe.gl),
-which includes three.js (MIT), from jsDelivr at a pinned version when the tab
-is opened. Earth images: NASA Visible Earth (public domain), via three-globe.
+The Radio tab's 3D globe is globe.gl 2.46.2 (https://github.com/vasturiano/globe.gl),
+which includes three.js (https://threejs.org), shipped in the app's radio folder.
+Their MIT licence texts are in radio\\LICENSE.txt. Earth images: NASA Visible
+Earth (public domain), via three-globe. Country outlines: Natural Earth (public
+domain).
 
 {RULE}
 PyInstaller bootloader  --  GPL-2.0-or-later with the PyInstaller exception

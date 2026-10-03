@@ -16,7 +16,7 @@ from string import Template
 
 import numpy as np
 from PySide6.QtCore import (QEvent, QFile, QIODevice, QObject, QRect, QRectF, QSize,
-                            Qt, QTimer, QUrl, Signal, Slot)
+                            Qt, QTimer, Signal, Slot)
 from PySide6.QtGui import (QColor, QFont, QFontMetrics, QGuiApplication, QPainter,
                            QPainterPath)
 from PySide6.QtWidgets import (QButtonGroup, QCheckBox, QComboBox, QFrame, QHBoxLayout,
@@ -763,7 +763,7 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
         self.view.setContextMenuPolicy(Qt.NoContextMenu)
         t = theme.T
         page.setHtml(radio.globe_html(_qwebchannel_js(), t["bg"], t["accent"], t["accent2"],
-                                      t["text"]), QUrl("about:blank"))
+                                      t["text"]), radio.globe_base_url())
         self.globe_layout.addWidget(self.view)
         app = QGuiApplication.instance()
         if app is not None and not self._app_state_hooked:
@@ -1030,7 +1030,8 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
             self.recorder.clear_replay()   # "Last 15s" is only ever this station
         self._fed_by = s
         self.player.play(s)
-        self.dir.count_click(s.uuid)
+        if self.cfg.radio.get("count_plays", False):   # Settings > Privacy, off by default
+            self.dir.count_click(s.uuid)
         self.cfg.radio["last"] = s.to_saved()
         self.recent = ([s] + [r for r in self.recent if r.uuid != s.uuid])[:RECENT_MAX]
         self.cfg.radio["recent"] = [r.to_saved() for r in self.recent]
