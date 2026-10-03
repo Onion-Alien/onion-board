@@ -1023,8 +1023,17 @@ class SettingsDialog(QDialog):
     def _connection(self):
         w, v = self._page()
         v.addWidget(self._connection_card())
+        v.addWidget(self._activity_card())
         v.addStretch(1)
         return w
+
+    def _activity_card(self):
+        """Network activity: every connection the app has made (soundboard.netlog)."""
+        from soundboard.ui.netactivity import NetActivity
+        card, cv = self._card("Network activity")
+        self.net_activity = NetActivity(card)
+        cv.addWidget(self.net_activity)
+        return card
 
     def _option(self, cv, text: str, hint: str, on: bool, changed):
         """A checkbox with a short label and its explanation underneath (a long label
