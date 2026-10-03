@@ -212,13 +212,13 @@ def test_refit_leaves_widgets_alone_when_nothing_crosses_an_edge(window, qapp):
     """Resizing only touches the steps at the edge it crossed, so a border drag
     doesn't show and hide half the window on every mouse move (it flashed)."""
     window.show()
-    window.resize(900, 700)
+    window.resize(950, 700)
     window._refit()
     flips = []
     orig = [s[2] for s in window._fit.steps]
     window._fit.steps = [(p, a, (lambda c, f=f: (flips.append(c), f(c))))
                          for (p, a, _), f in zip(window._fit.steps, orig)]
-    for w in range(900, 880, -2):                  # small moves, no edge crossed
+    for w in range(950, 930, -2):                  # small moves, no edge crossed
         window.resize(w, 700)
         window._refit()
     assert len(flips) <= 2

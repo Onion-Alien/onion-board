@@ -510,13 +510,21 @@ class MainWindow(QMainWindow):
         boxes, left to right the way the sound flows — your mic, what others hear,
         your own headphones. (Each tab's own volume sits in that tab's bar.)"""
         c = self.cfg
-        f, h = bar((12, 2, 12, 8))
-        h.setSpacing(14)
+        f = QFrame()
+        f.setObjectName("mixer")
+        h = QHBoxLayout(f)
+        h.setContentsMargins(0, 0, 0, 0)
+        h.setSpacing(8)
         self.mixer = f
         self._deck_titles: list[QWidget] = []
+        self._decks: list[QFrame] = []
 
         def group(icon: str, title: str, tip: str) -> tuple[QLabel, QHBoxLayout]:
-            box = QVBoxLayout()
+            deck = QFrame()
+            deck.setObjectName("deck")
+            self._decks.append(deck)
+            box = QVBoxLayout(deck)
+            box.setContentsMargins(12, 4, 12, 8)
             box.setSpacing(2)
             top = QWidget()
             top.setObjectName("decktop")
@@ -534,7 +542,7 @@ class MainWindow(QMainWindow):
             row = QHBoxLayout()
             row.setSpacing(8)
             box.addLayout(row)
-            h.addLayout(box)
+            h.addWidget(deck)
             return lbl, row
 
         self.mic_lbl, row = group("mic", "MY MIC",
@@ -546,14 +554,11 @@ class MainWindow(QMainWindow):
         self.chk_mic.setChecked(c.mic_enabled)
         self.chk_mic.toggled.connect(self.on_mic_toggle)
         row.addWidget(self.chk_mic)
-        self.mic_meter = Meter()
-        self.mic_meter.setFixedWidth(70)
-        self.mic_meter.setToolTip("Your mic level: it moves when you talk")
-        row.addWidget(self.mic_meter)
-        self.vol_mic = VolumeControl(c.mic_vol, tip="How loud your voice is for others")
+        self.vol_mic = VolumeControl(c.mic_vol, meter=True,
+                                     tip="How loud your voice is for others. The line "
+                                         "under it is your mic level: it moves when you talk")
+        self.mic_meter = self.vol_mic.meter
         row.addWidget(self.vol_mic)
-        sep1 = vsep()
-        h.addWidget(sep1)
 
         send_lbl, row = group("live", "WHAT OTHERS HEAR",
                               "Everything going out to Discord / the game right now: "
@@ -570,18 +575,16 @@ class MainWindow(QMainWindow):
         self.btn_check.toggled.connect(self.on_mic_check)
         icons.set_icon(self.btn_check, "ear", checked_color="#ffffff")
         row.addWidget(self.btn_check)
-        sep2 = vsep()
-        h.addWidget(sep2)
-        h.setStretch(h.indexOf(sep1) + 1, 1)   # the "what others hear" box takes the room
+        h.setStretch(1, 1)   # the "what others hear" box takes the room
 
         self.hp_lbl, row = group("headphones", "MY HEADPHONES  ·  ONLY YOU",
                                  "Only what YOU hear. Doesn't change anything for others.")
         self.vol_mon = VolumeControl(c.mon_vol, tip="Only what YOU hear — doesn't change "
                                                     "anything for others")
         row.addWidget(self.vol_mon)
-        self._mixer_hp = (sep2, self._deck_titles[-1], self.vol_mon)
+        self._mixer_hp = (self._decks[2],)
         self._mixer_send = (self.out_meter,)
-        self._mixer_others = (sep1, self._deck_titles[1])
+        self._mixer_others = (self._decks[1],)
 
         for box, key in ((self.vol_mic, "mic_vol"), (self.vol_mon, "mon_vol")):
             box.changed.connect(lambda v, key=key: self.set_option(key, v))
@@ -781,8 +784,6 @@ class MainWindow(QMainWindow):
         th.addWidget(sep)
         vol_icon = icon_label("volume", "Volume of all your sounds")
         th.addWidget(vol_icon)
-        vol_lbl = QLabel("Sounds volume")
-        th.addWidget(vol_lbl)
         self.vol_sound = VolumeControl(c.sound_vol, tip="How loud your sounds are — type up "
                                                         "to 1000% in the box")
         self.vol_sound.changed.connect(lambda v: self.set_option("sound_vol", v))
@@ -792,7 +793,7 @@ class MainWindow(QMainWindow):
         self.chk_monitor.setChecked(c.monitor_sounds)
         self.chk_monitor.toggled.connect(lambda b: self.set_option("monitor_sounds", b))
         th.addWidget(self.chk_monitor)
-        self._transport_vol = (sep, vol_icon, vol_lbl, self.vol_sound)
+        self._transport_vol = (sep, vol_icon, self.vol_sound)
         left.addWidget(f)
         self._set_pp_icon("play")
         return page
@@ -3834,7 +3835,6 @@ class MainWindow(QMainWindow):
         f.add(55, "w", r.hide(*self._mixer_hp))
         f.add(40, "w", r.hide(*self._transport_vol))
         f.add(50, "w", r.hide(self.np_name))
-        f.add(50, "w", r.hide(self.mic_meter))
         f.add(60, "w", r.hide(self.wordmark))
         f.add(60, "w", r.icon_only(self.btn_add))
         f.add(35, "w", r.hide(self.btn_more))   # also in Settings → General

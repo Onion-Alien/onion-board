@@ -401,7 +401,8 @@ QPushButton#danger { background:$danger_bg; border:1px solid $danger_border; col
 QPushButton#danger:hover { background:$danger_hover; }
 QPushButton#small { padding:2px 8px; font-size:8pt; }
 QPushButton#settings { padding:6px 14px; font-weight:600; }
-QFrame#transport { background:$panel; border-radius:12px; }
+QFrame#transport, QFrame#deck { background:$panel; border-radius:12px; }
+QFrame#mixer { background:transparent; }
 QFrame#card QPushButton#primary { background:$accent; color:$on_accent; border:none; padding:9px; }
 QFrame#card QPushButton#primary:hover { background:$accent_hi; }
 QFrame#vsep { background:$border; border:none; }
@@ -427,6 +428,10 @@ QAbstractSpinBox { background:$bg; border:1px solid $border; border-radius:6px; 
 QAbstractSpinBox:hover { border-color:$border_hi; }
 QAbstractSpinBox:focus { border-color:$accent; }
 QSpinBox::up-button, QSpinBox::down-button { width:0; }
+QSpinBox#pct, QFrame#card QSpinBox#pct { background:transparent; border-color:transparent;
+    padding:3px 2px; }
+QSpinBox#pct:hover, QFrame#card QSpinBox#pct:hover { background:$bg; border-color:$border_hi; }
+QSpinBox#pct:focus, QFrame#card QSpinBox#pct:focus { background:$bg; border-color:$accent; }
 QDoubleSpinBox, QSpinBox#stepper { padding-right:20px; }
 QDoubleSpinBox::up-button, QDoubleSpinBox::down-button,
 QSpinBox#stepper::up-button, QSpinBox#stepper::down-button {
@@ -450,7 +455,8 @@ QPushButton#micbanner { background:#e53935; color:white; font-weight:700; font-s
     border:none; border-radius:10px; padding:10px; }
 QPushButton#miccheck:checked { background:#e53935; border:1px solid #ff6b6b; color:white;
     font-weight:700; }
-QFrame#transport QLabel, QFrame#transport QCheckBox, QFrame#transport QSlider { background:transparent; }
+QFrame#transport QLabel, QFrame#transport QCheckBox, QFrame#transport QSlider,
+QFrame#deck QLabel, QFrame#deck QCheckBox, QFrame#deck QSlider { background:transparent; }
 QPushButton#round { padding:0; font-size:14pt; border-radius:10px; }
 QSlider#seek::groove:horizontal { height:6px; border-radius:3px; }
 QSlider#seek::sub-page:horizontal { border-radius:3px; }
@@ -745,7 +751,7 @@ def stylesheet(name: str | None = None) -> str:
         tokens["right" + key] = _chevron_url(colour, 10, False, side="right")
     css = STYLE.substitute(tokens)
     if tokens.get("texture") and (url := _texture_url(tokens["texture"], tokens["panel"])):
-        css += ("QFrame#card, QFrame#transport, QFrame#setcard "
+        css += ("QFrame#card, QFrame#transport, QFrame#deck, QFrame#setcard "
                 f'{{ background-image:url("{url}"); }}\n')
     return css
 

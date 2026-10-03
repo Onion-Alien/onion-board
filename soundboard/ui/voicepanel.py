@@ -780,12 +780,10 @@ class SpeechPanel(QWidget):
         row.addWidget(sep)
         vol_icon = icon_label("volume", "How loud the spoken voice is")
         row.addWidget(vol_icon)
-        vol_lbl = QLabel("Voice volume")
-        row.addWidget(vol_lbl)
         self.sl_gain = VolumeControl(self.s["gain"], slider_max=200, typed_max=400,
                                      tip="How loud the spoken voice is")
         row.addWidget(self.sl_gain)
-        self.say_vol_group = (sep, vol_icon, vol_lbl, self.sl_gain)
+        self.say_vol_group = (sep, vol_icon, self.sl_gain)
         self.say_stop = b_stop
 
         for sig in (self.cb_voice.currentIndexChanged, self.sl_rate.valueChanged,

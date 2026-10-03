@@ -15,7 +15,7 @@ from soundboard.eq import BAND_LABELS as EQ_LABELS
 from soundboard.eq import MAX_DB as EQ_MAX_DB
 from soundboard.eq import PRESETS as EQ_PRESETS
 from soundboard.ui import icons
-from soundboard.ui.widgets import EqCurve
+from soundboard.ui.widgets import EqCurve, Meter
 from soundboard.wheelguard import no_wheel
 
 
@@ -133,26 +133,45 @@ def icon_label(name: str, tip: str = "", color: str = "muted") -> QLabel:
     return lbl
 
 
+class _MeterSlider(QSlider):
+    """A slider with a thin level meter along its bottom edge: the volume and how
+    loud the thing it sets is right now, in one control."""
+
+    def __init__(self):
+        super().__init__(Qt.Horizontal)
+        self.setMinimumHeight(26)
+        self.meter = Meter(self)
+        self.meter.setFixedHeight(3)
+        self.meter.setAttribute(Qt.WA_TransparentForMouseEvents)
+
+    def resizeEvent(self, e):
+        super().resizeEvent(e)
+        self.meter.setGeometry(7, self.height() - 3, max(0, self.width() - 14), 3)
+
+
 class VolumeControl(QWidget):
-    """Slider to `slider_max` %, plus a box you can type an exact % into (up to
-    `typed_max`). `changed` carries the gain as a factor (1.0 = 100 %)."""
+    """Slider to `slider_max` %, plus a % you can click and type an exact value into
+    (up to `typed_max`). `changed` carries the gain as a factor (1.0 = 100 %).
+    With `meter`, the slider carries a level meter (`.meter`) under its groove."""
     changed = Signal(float)
 
     def __init__(self, value: float, slider_max: int = 300, typed_max: int = 1000,
-                 tip: str = ""):
+                 tip: str = "", meter: bool = False):
         super().__init__()
         self.slider_max = slider_max
         h = QHBoxLayout(self)
         h.setContentsMargins(0, 0, 0, 0)
-        h.setSpacing(6)
-        self.slider = QSlider(Qt.Horizontal)
+        h.setSpacing(4)
+        self.slider = _MeterSlider() if meter else QSlider(Qt.Horizontal)
+        self.meter = self.slider.meter if meter else None
         self.slider.setRange(0, slider_max)
         self.slider.setMinimumWidth(70)
         self.slider.setMaximumWidth(150)
         self.spin = QSpinBox()
+        self.spin.setObjectName("pct")   # reads as plain text until hovered / typed in
         self.spin.setRange(0, typed_max)
         self.spin.setSuffix(" %")
-        self.spin.setFixedWidth(74)
+        self.spin.setFixedWidth(58)
         self.spin.setAlignment(Qt.AlignRight)
         self.spin.setToolTip(f"Type an exact volume (0–{typed_max}%)")
         if tip:

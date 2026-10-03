@@ -67,11 +67,12 @@ class Meter(QWidget):
         r = self.rect()
         p.setPen(Qt.NoPen)
         p.setBrush(QColor(theme.T["groove"]))
-        p.drawRoundedRect(r, 4, 4)
+        rad = min(4.0, r.height() / 2)
+        p.drawRoundedRect(r, rad, rad)
         frac, col = self._bar()
         if frac > 0:
             p.setBrush(QColor(col))
-            p.drawRoundedRect(QRectF(0, 0, r.width() * frac, r.height()), 4, 4)
+            p.drawRoundedRect(QRectF(0, 0, r.width() * frac, r.height()), rad, rad)
 
 
 class EqCurve(QWidget):

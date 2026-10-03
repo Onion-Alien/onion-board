@@ -359,30 +359,30 @@ class RadioTab(QWidget):
         self.info.setObjectName("muted")
         v.addWidget(self.info)
 
-        # ---- control bar: play | live | meter | record | last 15 s | star | volume | hear
+        # ---- control bar: play, random, star | live ... record, last 15 s | volume | hear
         bar_, bh = bar()
         self.btn_play = QPushButton("Play")
         self.btn_play.setToolTip("Play the selected station / stop the radio")
         icons.set_icon(self.btn_play, "play")
         self.btn_play.clicked.connect(self._toggle_play)
         bh.addWidget(self.btn_play)
+        self.btn_random = QPushButton("🎲")
+        self.btn_random.setToolTip("Play a random station from the list showing (pick a "
+                                   "genre or country first to narrow it)")
+        self.btn_random.clicked.connect(self.play_random)
+        bh.addWidget(self.btn_random)
+        self.btn_fav = QPushButton("☆")
+        self.btn_fav.setToolTip("Star the selected station (★ Favorites)")
+        self.btn_fav.clicked.connect(lambda: self._toggle_fav())
+        bh.addWidget(self.btn_fav)
+        bh.addWidget(vsep())
         self.btn_live = QPushButton()
         self.btn_live.setObjectName("live")
         self.btn_live.setCheckable(True)
         icons.set_icon(self.btn_live, "live", checked_color="#ffffff")
         self.btn_live.toggled.connect(self._on_live)
         bh.addWidget(self.btn_live)
-        self.btn_random = QPushButton("🎲")
-        self.btn_random.setToolTip("Play a random station from the list showing (pick a "
-                                   "genre or country first to narrow it)")
-        self.btn_random.clicked.connect(self.play_random)
-        bh.addWidget(self.btn_random)
-        self.meter = meter_cls()
-        self.meter.setMinimumWidth(50)
-        self.meter.setToolTip("Radio level")
-        bh.addWidget(self.meter, 1)
-        sep1 = vsep()
-        bh.addWidget(sep1)
+        bh.addStretch(1)
         self.btn_rec = QPushButton("Record")
         self.btn_rec.setObjectName("rec")
         self.btn_rec.setCheckable(True)
@@ -396,24 +396,21 @@ class RadioTab(QWidget):
         icons.set_icon(self.btn_last, "history")
         self.btn_last.clicked.connect(self.clip_last)
         bh.addWidget(self.btn_last)
-        self.btn_fav = QPushButton("☆")
-        self.btn_fav.setToolTip("Star the selected station (★ Favorites)")
-        self.btn_fav.clicked.connect(lambda: self._toggle_fav())
-        bh.addWidget(self.btn_fav)
         sep2 = vsep()
         bh.addWidget(sep2)
-        vol_icon = icon_label("volume", "Radio volume (for them and for you)")
+        tip = ("Radio volume (for them and for you). The line under it is the radio's "
+               "level right now")
+        vol_icon = icon_label("volume", tip)
         bh.addWidget(vol_icon)
-        vol_lbl = QLabel("Radio volume")
-        bh.addWidget(vol_lbl)
         vol = cfg.radio.get("vol", 1.0)
         self.vol = VolumeControl(float(vol) if isinstance(vol, (int, float)) else 1.0,
-                                 tip="Radio volume (for them and for you)")
+                                 tip=tip, meter=True)
+        self.meter = self.vol.meter
         self.vol.changed.connect(self._on_vol)
         bh.addWidget(self.vol)
-        self._clip_group = (sep1, self.btn_rec, self.btn_last)
-        self._vol_group = (sep2, vol_icon, vol_lbl, self.vol)
-        self._live_short = self._play_short = False
+        self._clip_group = (self.btn_rec, self.btn_last)
+        self._vol_group = (sep2, vol_icon, self.vol)
+        self._play_short = False
         self.chk_hear = QCheckBox("Hear it myself")
         self.chk_hear.setToolTip("Also play the radio into your headphones")
         self.chk_hear.toggled.connect(self._on_hear)
@@ -1207,16 +1204,10 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
 
     def _label_live(self):
         on = self.btn_live.isChecked()
-        if self._live_short:
-            self.btn_live.setText("LIVE" if on else "Only me")
-        else:
-            self.btn_live.setText("LIVE — others hear it" if on else "Only me — click to go live")
-
-    def _short_live(self, short: bool):
-        from soundboard.ui import responsive
-        self._live_short = short
-        self._label_live()
-        responsive.touch(self.btn_live)
+        self.btn_live.setText("LIVE" if on else "Only me")
+        self.btn_live.setToolTip("Others hear the radio. Click so only you do." if on else
+                                 "Only you hear the radio. Click to go live: others hear "
+                                 "it too.")
 
     def fit_steps(self):
         """What the main window may hide here when it gets small (ui/responsive.py)."""
@@ -1238,10 +1229,8 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
                 (36, "w", r.icon_only(self.btn_last)),
                 (36, "w", play_icon),
                 (40, "w", r.hide(*self._vol_group)),
-                (44, "w", self._short_live),
                 (46, "w", r.hide(self.globe_box)),      # narrow: just the list
                 (50, "w", r.hide(*self._clip_group, self.btn_fav, self.btn_refresh)),
-                (75, "w", r.hide(self.meter)),         # tiny: just Play and LIVE
                 (20, "h", r.hide(self.info))]
 
     def _on_vol(self, gain: float):
