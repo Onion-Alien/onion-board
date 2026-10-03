@@ -46,7 +46,7 @@ def default_fx_spec() -> dict:
 
 def default_speech_settings() -> dict:
     return {"voice": "", "rate": 0, "gain": 1.0, "model": "base.en", "language": "en",
-            "mute_real_voice": True, "translate": ""}
+            "mute_real_voice": True, "voice_fx": True, "translate": ""}
 
 
 def translations(module_list: list[mods.ModuleInfo]) -> list[mods.ModuleInfo]:
@@ -476,6 +476,7 @@ class SpeechPanel(QWidget):
         controller.speaker.voice = self.s["voice"]
         controller.speaker.rate = int(self.s["rate"])
         controller.mute_real_voice = self.s["mute_real_voice"]
+        controller.voice_fx = self.s["voice_fx"]
         controller.on_event = self._event.emit
         self._event.connect(self._on_event)
         self._voices.connect(self._fill_voices)
@@ -673,6 +674,11 @@ class SpeechPanel(QWidget):
         self.chk_mute.setToolTip("Others hear only the spoken voice, not your real one.")
         self.chk_mute.setChecked(self.s["mute_real_voice"])
         ov.addWidget(self.chk_mute)
+        self.chk_fx = QCheckBox("Put the voice changer on the computer voice")
+        self.chk_fx.setToolTip("With a voice picked under Voice changer, the computer voice "
+                               "gets the same effect (a chipmunk computer voice, say).")
+        self.chk_fx.setChecked(self.s["voice_fx"])
+        ov.addWidget(self.chk_fx)
         self.b_update = QPushButton("Update speech recognition")
         self.b_update.setToolTip("Runs its install again: picks up what a newer Onion Board "
                                  "needs (translation, for one). Needs Python 3.12+.")
@@ -738,7 +744,7 @@ class SpeechPanel(QWidget):
 
         for sig in (self.cb_voice.currentIndexChanged, self.sl_rate.valueChanged,
                     self.sl_gain.changed, self.cb_model.currentIndexChanged,
-                    self.chk_mute.toggled):
+                    self.chk_mute.toggled, self.chk_fx.toggled):
             sig.connect(self._settings_edited)
         self.ed_lang.editingFinished.connect(self._settings_edited)
         self._fill_langs()
@@ -886,11 +892,13 @@ class SpeechPanel(QWidget):
                       gain=self.sl_gain.value(), model=self.cb_model.currentData(),
                       language=self.ed_lang.text().strip() or "en",
                       mute_real_voice=self.chk_mute.isChecked(),
+                      voice_fx=self.chk_fx.isChecked(),
                       translate=self.cb_lang.currentData() or "")
         self.ctl.speaker.voice = self.s["voice"]
         self.ctl.speaker.rate = self.s["rate"]
         self.ctl.gain = self.s["gain"]
         self.ctl.set_mute_real_voice(self.s["mute_real_voice"])
+        self.ctl.voice_fx = self.s["voice_fx"]
         self.changed.emit(dict(self.s))
 
     # ---- live

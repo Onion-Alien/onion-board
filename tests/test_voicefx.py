@@ -289,3 +289,20 @@ def test_effects_wait_for_the_mic_rate_before_starting(monkeypatch):
     assert c.errors == {} and c._effects == ()
     c.process(np.zeros((32, 2), np.float32), RATE)
     assert [e.type for e in c._effects] == ["test.needsrate"]
+
+
+def test_the_computer_voice_gets_the_voice_changer():
+    import numpy as np
+
+    from soundboard.voicefx import PRESETS, VoiceChain
+    rate = 48000
+    t = np.arange(rate) / rate
+    clip = (0.3 * np.sin(2 * np.pi * 220 * t)).astype(np.float32)
+    chain = VoiceChain()
+    effects = {k: {"on": True, **v} for k, v in PRESETS["Robot"].items()}
+    chain.configure({"enabled": False, "effects": effects})
+    assert chain.render(clip, rate) is clip            # changer off: untouched
+    chain.configure({"enabled": True, "effects": effects})
+    out = chain.render(clip, rate)
+    assert out.shape == clip.shape and np.all(np.isfinite(out))
+    assert not np.allclose(out, clip, atol=1e-3)       # changed

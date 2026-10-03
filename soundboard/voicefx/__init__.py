@@ -186,6 +186,40 @@ class VoiceChain:
         self.errors.clear()
         self._rebuild(self._rate)
 
+    def render(self, mono: np.ndarray, rate: int, block: int = 1024) -> np.ndarray:
+        """A whole clip (the computer voice's line) through the voice changer, with its
+        own fresh effects so the mic's running ones keep their state. Off, or no
+        effect on: the clip as it is. A failing effect is left out, as on the mic."""
+        if not self.enabled:
+            return mono
+        effects = []
+        for etype, cls in REGISTRY.items():
+            cfg = self._spec.get("effects", {}).get(etype)
+            if cfg and cfg.get("on") and etype not in self.errors:
+                try:
+                    effects.append(cls(rate, cfg))
+                except Exception:  # noqa: BLE001
+                    log.warning("voice effect %r couldn't start for the computer voice",
+                                etype, exc_info=True)
+        if not effects:
+            return mono
+        m = np.ascontiguousarray(mono, dtype=np.float32)
+        out = np.empty_like(m)
+        for i in range(0, len(m), block):
+            y = m[i:i + block]
+            for e in list(effects):
+                try:
+                    z = e.run(y, rate)
+                    if z.shape != y.shape or not np.all(np.isfinite(z)):
+                        raise ValueError("bad output")
+                    y = z.astype(np.float32, copy=False)
+                except Exception:  # noqa: BLE001
+                    effects.remove(e)
+                    log.warning("voice effect %r failed on the computer voice", e.type,
+                                exc_info=True)
+            out[i:i + len(y)] = y
+        return out
+
     # ------------------------------------------------------------ audio thread
     def process(self, x: np.ndarray, rate: int) -> np.ndarray:
         """(n, 2) float32 mic block -> (n, 2) float32. Called by the mic callback."""

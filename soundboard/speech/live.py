@@ -40,8 +40,9 @@ def clean_settings(raw) -> dict:
     for k in ("voice", "model", "language", "translate"):
         if k in out and not isinstance(out[k], str):
             del out[k]
-    if "mute_real_voice" in out and not isinstance(out["mute_real_voice"], bool):
-        del out["mute_real_voice"]
+    for k in ("mute_real_voice", "voice_fx"):
+        if k in out and not isinstance(out[k], bool):
+            del out[k]
     for k, lo, hi in (("rate", -10, 10), ("gain", 0.0, MAX_GAIN)):
         if k not in out:
             continue
@@ -64,6 +65,7 @@ class SpeechController:
                                lambda m: self.on_event({"type": "tts_error", "text": m}))
         self.host: ServiceHost | None = None
         self.mute_real_voice = True
+        self.voice_fx = True    # the voice changer's effects go on the computer voice too
         self.live_voice: str | None = None   # voice for live lines (None: the chosen one)
         self._ready = False     # the module said "ready": an error after that isn't fatal
 
@@ -76,6 +78,8 @@ class SpeechController:
         self.engine.stop(TTS_SID)
 
     def _play(self, stereo: np.ndarray, rate: int):
+        if self.voice_fx and self.chain.enabled:
+            stereo = np.repeat(self.chain.render(stereo[:, 0], rate)[:, None], 2, axis=1)
         # "overlap": the Speaker already spaces lines out; this never cuts one short
         if self.engine.play(TTS_SID, stereo, self.gain, mode="overlap", src_rate=rate) is None:
             # nothing open to play it on: say so rather than "speak" to nobody
