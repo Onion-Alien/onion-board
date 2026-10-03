@@ -378,8 +378,11 @@ class MainWindow(QMainWindow):
         self.btn_info.setToolTip("What's this tab for?")
         self.btn_info.clicked.connect(self._show_tab_info)
         self.tabs.setCornerWidget(self.btn_info, Qt.TopRightCorner)
-        self.tabs.currentChanged.connect(lambda _i: self.btn_info.setVisible(
-            self._current_tab_info() is not None))
+        self._update_info_btn = lambda *_: self.btn_info.setVisible(
+            self._current_tab_info() is not None)
+        self.tabs.currentChanged.connect(self._update_info_btn)
+        self.triggers.loaded.connect(self._update_info_btn)   # Onion Watch can arrive late
+        self._update_info_btn()
         self.tabs.setCurrentIndex(self.cfg.tab if 0 <= self.cfg.tab < self.tabs.count() else 0)
         self.tabs.currentChanged.connect(lambda i: self.set_option("tab", i))
         self.tabs.currentChanged.connect(lambda _i: self._update_status())
