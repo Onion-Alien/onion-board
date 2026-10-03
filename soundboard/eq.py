@@ -1,18 +1,30 @@
-"""7-band equalizer (RBJ biquads run through scipy's sosfilt, which is C-fast).
+"""7-band equalizer: matched peak / shelf biquads run by our own filter engine
+(soundboard.dsp).
+
+The bands are designed to follow the analog EQ they describe all the way up to
+Nyquist (dsp.matched_biquad), so the 6 kHz and 12 kHz bands sound the same at
+44.1 kHz as at 96 kHz instead of being squeezed by the bilinear transform. Moving a
+slider or switching a preset crossfades from the old curve to the new over ~20 ms
+(dsp.SmoothSos): no clicks or thumps, even on the bass shelf.
 
 One EQ instance per audio path (it keeps filter memory between blocks), all
 sharing the same band gains.
 """
 from __future__ import annotations
 
+import math
+
 import numpy as np
-from scipy.signal import sosfilt
+
+from soundboard import dsp
 
 # (centre Hz, kind): ends are shelves, the middle are bell/peaking filters
 BANDS = [(60, "lowshelf"), (150, "peak"), (400, "peak"), (1000, "peak"),
          (2500, "peak"), (6000, "peak"), (12000, "highshelf")]
 BAND_LABELS = ["60", "150", "400", "1k", "2.5k", "6k", "12k"]
 MAX_DB = 12
+PEAK_Q = 1.1                  # bell width (about 1.3 octaves)
+SHELF_SLOPE = 1 / math.sqrt(2)   # shelf steepness: the cookbook's slope 1
 
 # gains in dB per band, in BANDS order
 PRESETS: dict[str, list[float]] = {
@@ -31,54 +43,34 @@ PRESETS: dict[str, list[float]] = {
 }
 
 
-def _biquad(kind: str, f0: float, db: float, rate: int, q: float = 1.0) -> np.ndarray:
-    a = 10 ** (db / 40)
-    w0 = 2 * np.pi * min(f0, rate * 0.45) / rate
-    cw, sw = np.cos(w0), np.sin(w0)
-    if kind == "peak":
-        alpha = sw / (2 * q)
-        b = [1 + alpha * a, -2 * cw, 1 - alpha * a]
-        den = [1 + alpha / a, -2 * cw, 1 - alpha / a]
-    else:  # shelves, slope S = 1
-        alpha = sw / 2 * np.sqrt(2)
-        k = 2 * np.sqrt(a) * alpha
-        if kind == "lowshelf":
-            b = [a * ((a + 1) - (a - 1) * cw + k), 2 * a * ((a - 1) - (a + 1) * cw),
-                 a * ((a + 1) - (a - 1) * cw - k)]
-            den = [(a + 1) + (a - 1) * cw + k, -2 * ((a - 1) + (a + 1) * cw),
-                   (a + 1) + (a - 1) * cw - k]
-        else:
-            b = [a * ((a + 1) + (a - 1) * cw + k), -2 * a * ((a - 1) + (a + 1) * cw),
-                 a * ((a + 1) + (a - 1) * cw - k)]
-            den = [(a + 1) - (a - 1) * cw + k, 2 * ((a - 1) - (a + 1) * cw),
-                   (a + 1) - (a - 1) * cw - k]
-    b = np.array(b) / den[0]
-    den = np.array(den) / den[0]
-    return np.concatenate([b, den])
+def _is_flat(gains: list[float]) -> bool:
+    return all(abs(g) < 0.05 for g in gains)
+
+
+def _rows(gains: list[float], rate: int) -> np.ndarray:
+    """One float64 biquad row per band."""
+    return np.array([dsp.matched_biquad(kind, f, g, rate,
+                                        PEAK_Q if kind == "peak" else SHELF_SLOPE)
+                     for (f, kind), g in zip(BANDS, gains)])
 
 
 def design(gains: list[float], rate: int) -> np.ndarray | None:
     """Second-order sections for these band gains, or None if the EQ is flat.
 
-    Coefficients are designed in float64 and stored as float32 so sosfilt runs the
-    whole block in float32 (the audio format) instead of upcasting to float64 and
+    Coefficients are designed in float64 and stored as float32 so the filter runs
+    the whole block in float32 (the audio format) instead of upcasting to float64 and
     converting back every block. With a 60 Hz shelf at 48 kHz the poles sit at
     radius ~0.996: comfortably inside float32 precision (see tests/test_eq.py)."""
-    if all(abs(g) < 0.05 for g in gains):
+    if _is_flat(gains):
         return None
-    return np.array([_biquad(kind, f, g, rate, q=1.1 if kind == "peak" else 1.0)
-                     for (f, kind), g in zip(BANDS, gains)], dtype=np.float32)
+    return _rows(gains, rate).astype(np.float32)
 
 
 def response_db(gains: list[float], freqs: np.ndarray, rate: int = 48000) -> np.ndarray:
     """Magnitude response in dB at `freqs` (used to draw the curve)."""
-    sos = design(gains, rate)
-    if sos is None:
+    if _is_flat(gains):
         return np.zeros_like(freqs, dtype=float)
-    z = np.exp(-1j * 2 * np.pi * freqs / rate)
-    h = np.ones_like(z)
-    for s in sos:
-        h *= (s[0] + s[1] * z + s[2] * z * z) / (s[3] + s[4] * z + s[5] * z * z)
+    h = dsp.sos_response(_rows(gains, rate), freqs, rate)
     return 20 * np.log10(np.abs(h) + 1e-12)
 
 
@@ -87,25 +79,21 @@ class EQ:
 
     def __init__(self, rate: int):
         self.rate = rate
+        self._filter = dsp.SmoothSos()
         self._sos = None
-        self._zi = None
         self._gains = None
 
     def process(self, x: np.ndarray, gains: list[float] | None) -> np.ndarray:
         if gains is None:
-            self._zi = None
+            self._filter.reset()
+            self._sos = self._gains = None
             return x
         if gains != self._gains:
             self._gains = list(gains)
-            sos = design(self._gains, self.rate)
-            if sos is None or self._sos is None:
-                self._zi = None       # fresh start; otherwise keep memory = no click
-            self._sos = sos
-        if self._sos is None:
-            return x
-        if self._zi is None:
-            self._zi = np.zeros((len(self._sos), 2, x.shape[1]), np.float32)
+            self._sos = design(self._gains, self.rate)
+        if self._sos is None and self._filter.sos is None:
+            return self._filter.run(x, None)       # flat: straight through
         if x.dtype != np.float32:
             x = x.astype(np.float32)
-        y, self._zi = sosfilt(self._sos, x, axis=0, zi=self._zi)
-        return y   # float32 in, float32 sos and state -> float32 out, no conversion
+        # float32 in, float32 sos and state -> float32 out, no conversion
+        return self._filter.run(x, self._sos, axis=0)

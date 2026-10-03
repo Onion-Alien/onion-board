@@ -38,7 +38,9 @@ module's `install.bat` or `pip install -r requirements.txt`).
   `ONIONBOARD_ONION_WATCH_ZIP` set to it: *Get Onion Watch* and the update check
   then use that file instead of GitHub. The add-on may only import what the built
   app ships (it has no pip): the standard library, numpy, scipy and PySide6's
-  QtCore / QtGui / QtWidgets. Removing one of those from the build breaks it:
+  QtCore / QtGui / QtWidgets. The app's own code no longer imports scipy (its
+  filters are `soundboard/dsp.py`); `build.ps1` still bundles it with
+  `--hidden-import` for add-ons and modules. Removing one of those from the build breaks it:
   `OnionBoard.exe --selftest-addon <zip>` proves a build can run it (build.ps1 does
   that when `ONIONBOARD_ONION_WATCH_ZIP` is set).
 
