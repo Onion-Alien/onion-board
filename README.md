@@ -17,7 +17,7 @@ Windows 10 or 11.
 > - **Blue "Windows protected your PC" box**: click **More info → Run anyway**.
 >
 > The source code is all here if you'd rather check it or build it yourself. The latest installer's
-> [VirusTotal scan](https://www.virustotal.com/gui/file/a09eb0eb4fceb126b175a527c41a4531d95c3d302e8c0727f2d01ef64322947d): none of the 69 virus
+> [VirusTotal scan](https://www.virustotal.com/gui/file/e176c3297dce396411e1d49754b2f9889fc634a5454275a30c1d78eb56a8433d): none of the 68 virus
 > scanners that checked it found anything.
 
 <sub>Other downloads: [all versions](../../releases) ·
