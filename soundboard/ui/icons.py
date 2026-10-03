@@ -210,6 +210,20 @@ def _check(p, fill):
     p.drawLine(QPointF(11, 15.5), QPointF(16.5, 9))
 
 
+def _shield(p, fill):
+    """Privacy & security: a shield with a tick."""
+    path = QPainterPath(QPointF(12, 3))
+    path.lineTo(19.5, 6)
+    path.lineTo(19.5, 11.5)
+    path.cubicTo(QPointF(19.5, 16), QPointF(16.5, 19.3), QPointF(12, 21))
+    path.cubicTo(QPointF(7.5, 19.3), QPointF(4.5, 16), QPointF(4.5, 11.5))
+    path.lineTo(4.5, 6)
+    path.closeSubpath()
+    p.drawPath(path)
+    p.drawLine(QPointF(8.8, 12), QPointF(11, 14.3))
+    p.drawLine(QPointF(11, 14.3), QPointF(15.4, 9.6))
+
+
 def _warn(p, fill):
     path = QPainterPath(QPointF(12, 3.5))
     path.lineTo(21, 19.5)
@@ -390,6 +404,7 @@ SHAPES = {
     "settings": _gear, "history": _history, "leaf": _leaf, "live": _live,
     "back": _arrow("back"), "forward": _arrow("forward"), "reload": _reload,
     "speech": _speech, "cable": _cable, "check": _check, "warn": _warn, "folder": _folder,
+    "shield": _shield,
     "next": _next, "edit": _edit, "trash": _trash, "keyboard": _keyboard,
     "palette": _palette, "gamepad": _gamepad, "image": _image, "radio": _radio,
     "apps": _apps, "triggers": _eye, "fold": _chevron("right"), "fold_open": _chevron("down"),

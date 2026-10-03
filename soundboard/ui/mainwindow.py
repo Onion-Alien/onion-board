@@ -1604,7 +1604,7 @@ class MainWindow(QMainWindow):
         self._save_now()
         self.register_hotkeys()
 
-    def open_settings(self, page: str = "appearance"):
+    def open_settings(self, page: str = "privacy"):
         dlg = SettingsDialog(self, page)
         dlg.exec()
         free_dialog(dlg)

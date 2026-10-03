@@ -244,7 +244,7 @@ class ThemeCard(QPushButton):
 class SettingsDialog(QDialog):
     """All settings in one place. `mw` is the MainWindow; changes apply immediately."""
 
-    def __init__(self, mw, page: str = "appearance"):
+    def __init__(self, mw, page: str = "privacy"):
         super().__init__(mw)
         fit.watch(self)   # grows to fit its text (ui/fit.py)
         self.mw = mw
@@ -255,7 +255,9 @@ class SettingsDialog(QDialog):
         self.tabs = QTabWidget()
         self.tabs.setDocumentMode(True)
         self.hk_buttons: dict[str, list[QPushButton]] = {}
-        pages = (("appearance", "Appearance", "palette", self._appearance),
+        self._mirrors: dict[str, list[QCheckBox]] = {}   # one setting shown on two pages
+        pages = (("privacy", "Privacy && security", "shield", self._privacy),
+                 ("appearance", "Appearance", "palette", self._appearance),
                  ("audio", "Audio", "volume", self._audio),
                  ("hotkeys", "Hotkeys", "keyboard", self._hotkeys),
                  ("overlay", "Overlay", "gamepad", self._overlay),
@@ -265,7 +267,7 @@ class SettingsDialog(QDialog):
         for i, (_key, title, icon, build) in enumerate(pages):
             self.tabs.addTab(self._scroll(build()), title)
             icons.set_tab_icon(self.tabs, i, icon)
-        keys = [p[0] for p in pages]
+        keys = self._page_keys = [p[0] for p in pages]
         self.tabs.setCurrentIndex(keys.index(page) if page in keys else 0)
         lay.addWidget(self.tabs, 1)
         close = QPushButton("Done")
@@ -294,7 +296,9 @@ class SettingsDialog(QDialog):
         area on its own would open at its small default)."""
         screen = self.screen() or QApplication.primaryScreen()
         avail = screen.availableGeometry() if screen else None
-        width = 860
+        # wide enough to show every tab (the bar scrolls only when the screen is too
+        # narrow for that)
+        width = max(860, self.tabs.tabBar().sizeHint().width() + 40)
         need = 0
         for i in range(self.tabs.count()):
             lay = self.tabs.widget(i).widget().layout()
@@ -751,7 +755,6 @@ class SettingsDialog(QDialog):
         one.toggled.connect(self.mw.set_single_click)
         cv.addWidget(one)
         v.addWidget(card)
-        v.addWidget(self._privacy_card())
         v.addWidget(self._background_card())
         v.addWidget(self._backup_card())
         v.addWidget(self._addons_card())
@@ -917,49 +920,129 @@ class SettingsDialog(QDialog):
         cv.addLayout(row)
         return card
 
-    # ------------------------------------------------------------------ privacy
-    def _privacy_card(self):
-        card, cv = self._card(
-            "Privacy",
-            "Onion Board has no account, tracking or analytics, and sends nothing to us. "
-            "Searches and downloads go straight to the site you pick (YouTube, SoundCloud, "
-            "TikTok, Myinstants), and a radio station plays straight from that station, "
-            "so those sites see your IP address like they would in a browser, unless you "
-            "send it all through a proxy (Connection, below). The radio "
-            "maps and their pictures ship with the app: opening them contacts nobody.")
-        plays = QCheckBox("Tell Radio Browser which stations I play (it ranks stations by "
-                          "how often they're played)")
-        plays.setToolTip("Off: starting a station only contacts the station itself")
+    # ------------------------------------------------------------------ privacy & security
+    def _privacy(self):
+        w, v = self._page()
+        v.addWidget(self._sends_card())
+        v.addWidget(self._connection_card())
+        v.addWidget(self._online_card())
+        v.addStretch(1)
+        return w
+
+    def _option(self, cv, text: str, hint: str, on: bool, changed, mirror: str = ""):
+        """A checkbox with a short label and its explanation underneath (a long label
+        can't wrap, and would make the whole page wider than the window)."""
+        box = QCheckBox(text)
+        box.setChecked(on)
+        box.toggled.connect(changed)
+        if mirror:
+            self._mirror(mirror, box)
+        cv.addWidget(box)
+        h = QLabel(hint)
+        h.setObjectName("hint")
+        h.setWordWrap(True)
+        h.setContentsMargins(26, 0, 0, 4)   # under the box's text, not its tick
+        cv.addWidget(h)
+        return box
+
+    def _mirror(self, key: str, box: QCheckBox):
+        """The same setting shown on two pages: ticking one ticks the other."""
+        boxes = self._mirrors.setdefault(key, [])
+        boxes.append(box)
+
+        def follow(on: bool, me=box):
+            for b in boxes:
+                if b is not me and qt_valid(b) and b.isChecked() != on:
+                    b.blockSignals(True)
+                    b.setChecked(on)
+                    b.blockSignals(False)
+        box.toggled.connect(follow)
+
+    def _sends_card(self):
+        """What the app sends by itself, each one switchable."""
         cfg = self.mw.cfg
-        plays.setChecked(bool(cfg.radio.get("count_plays", False)))
+        card, cv = self._card(
+            "Privacy & security",
+            "Onion Board has no account, tracking or analytics, and sends nothing to us. "
+            "These are the only things it does online without you asking each time:")
+        self._option(cv, "Check for new versions of Onion Board",
+                     "Asks GitHub for the latest release once a day. Only the release list "
+                     "is read; nothing is downloaded until you press Update now.",
+                     cfg.update_check, self._updates_optin, mirror="update_check")
+        self._option(cv, "Update the downloader (yt-dlp) automatically",
+                     "Asks PyPI once a day, and after a failed download, for a newer yt-dlp. "
+                     "An update is code the app runs, so it's off unless you turn it on.",
+                     cfg.ytdlp_auto_optin,
+                     lambda b: self.mw.set_option("ytdlp_auto_optin", b), mirror="ytdlp_auto")
 
         def count_plays(on: bool):
             cfg.radio["count_plays"] = on
             self.mw.set_option("radio", cfg.radio)   # saves
-        plays.toggled.connect(count_plays)
-        cv.addWidget(plays)
-        self._connection_section(cv)
+        self.plays_box = self._option(
+            cv, "Tell Radio Browser which stations I play",
+            "Radio Browser ranks stations by how often they're played. Off: starting a "
+            "station only contacts the station itself.",
+            bool(cfg.radio.get("count_plays", False)), count_plays)
         return card
 
-    def _connection_section(self, cv):
+    def _online_card(self):
+        """What goes online only when you do something, and the app's local doors."""
+        card, cv = self._card(
+            "When you ask",
+            "Everything else goes online only when you do it: a search or a pasted link "
+            "goes to that site (YouTube, SoundCloud, TikTok, Myinstants), a radio station "
+            "plays straight from that station, and a download you press fetches that one "
+            "file. Those sites see your IP address like they would in a browser, unless "
+            "you use a proxy (Connection, above). The radio maps ship with the app: opening "
+            "them contacts nobody.")
+        remote = QLabel()
+        remote.setWordWrap(True)
+        on = self.mw.cfg.api_enabled
+        remote.setText("Remote control is <b>on</b>: scripts and a Stream Deck on this PC "
+                        "can play sounds with its key." if on else
+                        "Remote control is <b>off</b>: nothing else on this PC can control "
+                        "the app.")
+        go = QPushButton("Remote settings")
+        go.clicked.connect(lambda: self.tabs.setCurrentIndex(self._page_keys.index("remote")))
+        row = QHBoxLayout()
+        row.addWidget(remote, 1)
+        row.addWidget(go)
+        cv.addLayout(row)
+        full = QPushButton("Everything it contacts, and when")
+        full.setToolTip("Opens the full list (SECURITY.md) on GitHub, in your browser")
+        from soundboard.updates import REPO
+        full.clicked.connect(lambda: busy.open_url(
+            f"https://github.com/{REPO}/blob/main/SECURITY.md#what-the-app-does-on-the-network",
+            full, self))
+        row2 = QHBoxLayout()
+        row2.addWidget(full)
+        row2.addStretch(1)
+        cv.addLayout(row2)
+        return card
+
+    def _connection_card(self):
         """Connection: Direct, or everything through a proxy (soundboard.net). Applies
         at once; a proxy that can't be reached makes requests fail, never go direct."""
         from PySide6.QtWidgets import QButtonGroup, QLineEdit, QRadioButton
 
         from soundboard import net
         cfg = self.mw.cfg
-        head = QLabel("<b>Connection</b>")
-        cv.addWidget(head)
-        direct = QRadioButton("Direct: connect straight to each site")
-        via = QRadioButton("Through a proxy: everything the app fetches goes through it "
-                           "(searches, downloads, radio, updates), DNS lookups too")
-        via.setToolTip("If the proxy can't be reached, nothing is fetched: the app never "
-                       "falls back to a direct connection. This PC's own addresses "
-                       "(127.0.0.1) stay direct.")
-        group = QButtonGroup(cv.parentWidget() or self)
+        card, cv = self._card(
+            "Connection",
+            "Through a proxy, everything the app fetches (searches, downloads, radio, "
+            "updates) goes through it, and site names are looked up by the proxy, not on "
+            "this PC. If the proxy can't be reached, nothing is fetched: the app never "
+            "quietly goes direct. This PC's own addresses (127.0.0.1) stay direct.")
+        direct = QRadioButton("Direct")
+        direct.setToolTip("Connect straight to each site")
+        via = QRadioButton("Through a proxy")
+        group = QButtonGroup(card)
+        row = QHBoxLayout()
         for b in (direct, via):
             group.addButton(b)
-            cv.addWidget(b)
+            row.addWidget(b)
+        row.addStretch(1)
+        cv.addLayout(row)
         row = QHBoxLayout()
         addr = QLineEdit(cfg.net_proxy)
         addr.setPlaceholderText("socks5h://127.0.0.1:9050  or  http://host:8080")
@@ -1024,6 +1107,7 @@ class SettingsDialog(QDialog):
         self.net_direct, self.net_via, self.net_addr, self.net_test = direct, via, addr, test
         self.net_note = note
         show()
+        return card
 
     # ------------------------------------------------------------------ app updates
     def _updates_card(self):
@@ -1039,6 +1123,7 @@ class SettingsDialog(QDialog):
         chk = QCheckBox("Tell me when a new version is out (checks GitHub once a day)")
         chk.setChecked(self.mw.cfg.update_check)
         chk.toggled.connect(self._updates_optin)
+        self._mirror("update_check", chk)
         cv.addWidget(chk)
         row = QHBoxLayout()
         self.upd_label = QLabel()
@@ -1203,6 +1288,7 @@ class SettingsDialog(QDialog):
                         "PyPI's SHA-256 before it's used.")
         auto.setChecked(self.mw.cfg.ytdlp_auto_optin)
         auto.toggled.connect(lambda b: self.mw.set_option("ytdlp_auto_optin", b))
+        self._mirror("ytdlp_auto", auto)
         cv.addWidget(auto)
         row = QHBoxLayout()
         self.ytdlp_label = QLabel()

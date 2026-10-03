@@ -9,7 +9,13 @@
   which stations you play unless you turn that on in the new **Privacy** section
   (Settings → General), which also explains what the app sends where. Update checks
   no longer send the app's version number.
-- **Send everything through a proxy**: Settings → General → Privacy → *Connection*
+- **Privacy & security, the first tab in Settings**: what the app does online by
+  itself, each with its own switch (checking for new versions, updating yt-dlp,
+  telling Radio Browser what you play), the proxy setting below, and what goes online
+  only when you ask. The installer's last page points to it. The General page no
+  longer runs off the right edge of the window (the Remove Onion Watch button and the
+  ends of the hints were cut off).
+- **Send everything through a proxy**: Settings → Privacy & security → *Connection*
   can send everything the app fetches (searches, downloads, the radio directory and
   its stations, thumbnails, updates, add-ons, translation models) through a SOCKS5
   or HTTP proxy, such as Tor's `socks5h://127.0.0.1:9050`. Site names are looked up

@@ -35,7 +35,8 @@ def test_support_opens_the_project_page_not_an_address_in_the_app(window, monkey
 
 
 def test_each_page_opens_by_name_and_holds_its_cards(window):  # noqa: F811
-    where = {"audio": ("DEVICES", "YOUR MIC", "WHO'S LISTENING", "AUDIO BUFFERING"),
+    where = {"privacy": ("PRIVACY & SECURITY", "CONNECTION", "WHEN YOU ASK"),
+             "audio": ("DEVICES", "YOUR MIC", "WHO'S LISTENING", "AUDIO BUFFERING"),
              "hotkeys": ("HOTKEY SOUNDS",),
              "general": ("WINDOW", "RUNNING IN THE BACKGROUND", "BACKUP", "ADD-ONS",
                          "FEEDBACK AND PROBLEMS",
@@ -112,8 +113,9 @@ def test_onion_watch_can_be_removed_from_settings(window, monkeypatch):  # noqa:
 def test_connection_choice_applies_at_once_and_fails_closed(window, qapp, monkeypatch):  # noqa: F811
     from soundboard import net
     monkeypatch.setattr(window, "_save_later", lambda: None)
-    d = SettingsDialog(window, "general")
+    d = SettingsDialog(window)
     try:
+        assert d.tabs.currentIndex() == 0 and d._page_keys[0] == "privacy"
         assert d.net_direct.isChecked() and not d.net_addr.isEnabled()
         d.net_via.setChecked(True)                 # no address yet: nothing goes online
         assert window.cfg.net_mode == "proxy" and net.active() and net.proxy() is None
@@ -132,3 +134,49 @@ def test_connection_choice_applies_at_once_and_fails_closed(window, qapp, monkey
     finally:
         d.close()
         net.configure(net.DIRECT)
+
+
+def test_privacy_switches_match_their_twins_on_other_pages(window, monkeypatch):  # noqa: F811
+    """Update checks and yt-dlp's auto-update are on the Updates page too: ticking one
+    ticks the other, and the setting changes once."""
+    from PySide6.QtWidgets import QCheckBox
+    monkeypatch.setattr(window, "_save_later", lambda: None)
+    monkeypatch.setattr(window, "check_updates", lambda *a, **k: None)
+    d = SettingsDialog(window)
+    try:
+        def boxes(text):
+            return [b for b in d.findChildren(QCheckBox) if b.text().startswith(text)]
+        mine, theirs = boxes("Check for new versions")[0], boxes("Tell me when a new")[0]
+        assert mine.isChecked() == theirs.isChecked() == window.cfg.update_check
+        mine.setChecked(not mine.isChecked())
+        assert theirs.isChecked() == mine.isChecked() == window.cfg.update_check
+        auto, twin = boxes("Update the downloader")[0], boxes("Update it automatically")[0]
+        twin.setChecked(True)
+        assert auto.isChecked() and window.cfg.ytdlp_auto_optin
+        d.plays_box.setChecked(True)
+        assert window.cfg.radio["count_plays"] is True
+        remote = next(b for b in d.findChildren(QPushButton) if b.text() == "Remote settings")
+        remote.click()
+        assert d._page_keys[d.tabs.currentIndex()] == "remote"
+    finally:
+        d.close()
+
+
+def test_privacy_and_general_pages_fit_their_window(window, qapp):  # noqa: F811
+    """No row wider than the window: a checkbox or radio button can't wrap, and one too
+    long made the whole General page wider than its view, pushing Remove Onion Watch
+    and the ends of the hints off the right edge. (Offscreen text is drawn wider than
+    on Windows, so passing here leaves room.)"""
+    d = SettingsDialog(window)
+    d.show()
+    d.resize(860, 700)
+    try:
+        for key in ("privacy", "general"):
+            d.tabs.setCurrentIndex(d._page_keys.index(key))
+            for _ in range(3):
+                qapp.processEvents()
+            sa = d.tabs.currentWidget()
+            assert sa.widget().minimumSizeHint().width() <= sa.viewport().width(), key
+        assert "&&" in d.tabs.tabText(0)        # "&" alone would underline the next letter
+    finally:
+        d.close()

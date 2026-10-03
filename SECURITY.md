@@ -32,7 +32,7 @@ In scope, for example:
   claims to be (e.g. the VB-Cable signature check being bypassable).
 - Crafted audio / video files that cause code execution, not just a failed import.
 - Anything that sends the user's data off the machine without them asking.
-- With a proxy set (Settings → General → Privacy → *Connection*), any request the
+- With a proxy set (Settings → Privacy & security → *Connection*), any request the
   app makes that goes around it, or a DNS lookup of a site's name on this PC
   (see *Through a proxy* below for what it covers).
 - The proxy relay on `127.0.0.1` accepting a request without its per-launch secret.
@@ -60,7 +60,7 @@ So you know what normal looks like when auditing it:
 | When you click *Update now* / *Reset downloader* (Settings → Updates), or — only if you tick *Update it automatically*, off by default — once a day and after an *Add as sound* that failed | `pypi.org`, `files.pythonhosted.org` | checks for a newer `yt-dlp`; if there is one, downloads the `yt-dlp` and `yt-dlp-ejs` wheels, checks each against PyPI's SHA-256, and unpacks them into `%APPDATA%\OnionBoard\yt-dlp\`. That code then runs inside the app, like the bundled copy it replaces |
 | Unless you untick *Tell me when a new version is out* (Settings → Updates): once a day, 45 s after start (and every 6 hours after, for an app left running); or when you click *Check now* | `api.github.com` | asks for this project's latest release (version number, release page, the first lines of its notes, and its installer's download link and SHA-256). A newer version is only announced; nothing is downloaded until you click *Update now* |
 | You click *Update now* on a newer version (installed app only; a copy running from source only opens the release page) | `github.com` → GitHub's release download server (`release-assets.githubusercontent.com`) | downloads that release's `OnionBoardSetup.exe` (only from this project's own `github.com/…/releases/download/` link, HTTPS only) into `%APPDATA%\OnionBoard\updates\` and checks it against the SHA-256 GitHub lists for it; a file that doesn't match is deleted. When you click *Restart now* the app closes and runs it silently over the installed copy (never the virtual cable, FFmpeg or live-voice extras), then the installer opens the app again. Downloaded installers are removed on the next start |
-| You open the Radio tab (or start the app with Radio as the last tab you used: the app reopens it) | `*.api.radio-browser.info` | the station directory: the ~3000 most-listened stations with a location (cached for a day), your searches, and — only if you tick *Tell Radio Browser which stations I play* (Settings → General → Privacy, off by default) — a "click" when you start a station (Radio Browser's own popularity count). Nothing else about you is sent. The maps (country outlines, the 3D globe's `globe.gl`, its Earth pictures) ship with the app and load from its own folder: no CDN is contacted |
+| You open the Radio tab (or start the app with Radio as the last tab you used: the app reopens it) | `*.api.radio-browser.info` | the station directory: the ~3000 most-listened stations with a location (cached for a day), your searches, and — only if you tick *Tell Radio Browser which stations I play* (Settings → Privacy & security, off by default) — a "click" when you start a station (Radio Browser's own popularity count). Nothing else about you is sent. The maps (country outlines, the 3D globe's `globe.gl`, its Earth pictures) ship with the app and load from its own folder: no CDN is contacted |
 | You play a radio station | that station's stream server (the address listed for it in the directory; its `https` address when the directory lists one, so the network in between can't see which station) | the stream itself, decoded by Qt Multimedia (FFmpeg) and played through the app's audio engine |
 | You speak a line with a custom voice server you added (Voice tab → More options → *Custom voices*; a `.json` with a `"url"` in `%APPDATA%\OnionBoard\voices\`) | the address you gave it (normally a TTS server on your own PC, e.g. `127.0.0.1`) | sends the line's text (and the voice / model / API key you entered) and gets the spoken audio back. Nothing is sent until you add one |
 | You tick *Play M4A, AAC and video files* in the installer | `winget` (Microsoft's package source, then the FFmpeg build it points to) | installs `Gyan.FFmpeg.Essentials` |
@@ -80,7 +80,7 @@ So you know what normal looks like when auditing it:
 
 ### Through a proxy
 
-Settings → General → Privacy → *Connection* → *Through a proxy* sends what the app
+Settings → Privacy & security → *Connection* → *Through a proxy* sends what the app
 fetches through a SOCKS5 (`socks5h://host:port`; `socks5://` and a bare `host:port`
 mean the same) or HTTP (`http://host:port`, via `CONNECT`) proxy. All of it goes
 through `soundboard/net.py`:
