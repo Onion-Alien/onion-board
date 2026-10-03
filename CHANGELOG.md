@@ -31,9 +31,8 @@
   themselves when you're back (the game moves, you alt-tab back, it's gone, you touch
   the mouse or keys, or only on Stop), and characters and creatures cut out of a
   game as transparent PNGs are matched properly.
-- **Send feedback** (Settings → General): opens a short form in your browser, no
-  account needed, with your version filled in; *Report a problem on GitHub* is beside
-  it. Nothing is sent from the app.
+- **Send feedback and Report a problem** (Settings → General): open a bug report in
+  your browser with your version filled in. Nothing is sent from the app.
 - **Remove Onion Watch** from Settings → General → *Add-ons*, not only from the end of
   the Triggers tab's More menu.
 - **Fixed: Recently deleted on the Triggers tab could crash** with "No module named
