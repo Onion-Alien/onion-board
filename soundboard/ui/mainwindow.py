@@ -14,7 +14,8 @@ from pathlib import Path
 
 import numpy as np
 import sounddevice as sd
-from PySide6.QtCore import QEvent, QObject, QPropertyAnimation, QSize, Qt, QTimer, QUrl, Signal
+from PySide6.QtCore import (QEvent, QFileSystemWatcher, QObject, QPropertyAnimation, QSize, Qt,
+                            QTimer, QUrl, Signal)
 from PySide6.QtGui import QDesktopServices, QIcon
 from PySide6.QtWidgets import (QApplication, QCheckBox, QComboBox, QFileDialog, QFrame,
                                QGraphicsOpacityEffect, QGridLayout, QHBoxLayout, QInputDialog,
@@ -26,13 +27,14 @@ from soundboard import engine as eng
 from soundboard import theme, winkeys, ytdl
 from soundboard.engine import SR, Engine
 from soundboard.engine import is_virtual as is_virtual_cable
-from soundboard import (autostart, backup, destination, midi, remote, soundfx, thumbs,
-                        trash, updates, voicesdk)
+from soundboard import (autostart, backup, destination, library, midi, remote, soundfx,
+                        thumbs, trash, updates, voicesdk)
 from soundboard import shellicon, watchaddon
 from soundboard.replay import InstantReplay
 from soundboard.library import (AUDIO_EXTS, PAD_COLORS, RESOURCE_DIR, Config, SoundMeta,
                                 cache_keep, clean_tags, duplicate, fingerprint,
-                                import_file, load_original, load_sound, prune_cache, save_clip)
+                                import_file, load_original, load_sound, loose_sounds,
+                                prune_cache, save_clip)
 from soundboard.settings import HOTKEY_ACTIONS, HotkeyDialog, SettingsDialog, pretty_key
 from soundboard.shuffle import ShuffleBag
 from soundboard.testcheck import analyze as analyze_output
@@ -85,8 +87,9 @@ TICK_MS = 33         # the UI timer while the window is on screen (meters, visua
 TICK_IDLE_MS = 250   # ...and while it's in the tray or minimised (push-to-talk, watchdog)
 GLOW_STEPS = 4       # how many glow levels the taskbar / tray icon has while sound plays
 ICON_GLOW_MS = 120   # ...and how often at most it changes
+LOOSE_WAIT_MS = 1500   # a file dragged into the sounds folder is looked at again (ms)
 MINI_SIZE = QSize(440, 380)   # below this the window becomes the mini player...
-MINI_PAD_ROWS = 2             # ...which has the pads above it when this many rows fit
+MINI_PAD_ROWS = 1             # ...which has the pads above it when this many rows fit
 QUEUE_CHIPS = 5          # queued sounds shown by name above the pads (then "+n more")
 RANDOM = "__random__:"   # hotkey action prefix: a random sound from the category after it
 ALL = "All"          # the category tab that shows every sound
@@ -200,6 +203,7 @@ class MainWindow(QMainWindow):
             self.tabs.blockSignals(False)
         self._rebuild_pads()
         self._load_all()
+        self._watch_sounds_folder()
         self._fit_overlay_key()
         self.register_hotkeys()
         # Stream Deck / scripts (Settings → Remote), only if turned on
@@ -581,7 +585,7 @@ class MainWindow(QMainWindow):
         more = self.btn_more = QPushButton("Backup")
         more.setToolTip("Export your sounds and settings to a file, or import a backup "
                         "or sound pack")
-        icons.set_icon(more, "folder")
+        icons.set_icon(more, "history")
         mm = QMenu(more)
         icons.set_icon(mm.addAction("Import a backup or sound pack…", self.import_dialog),
                        "folder")
@@ -590,13 +594,21 @@ class MainWindow(QMainWindow):
         self._act_export_cat = mm.addAction("Export this category…", self.export_category)
         mm.addSeparator()
         icons.set_icon(mm.addAction("Recently deleted sounds…", self.show_deleted), "trash")
+        icons.set_icon(mm.addAction("Open the sounds folder", self.open_sounds_folder),
+                       "folder")   # here too, for when the window's too narrow for its button
         mm.aboutToShow.connect(lambda: self._act_export_cat.setEnabled(bool(self.cfg.category)))
         more.setMenu(mm)
         self.btn_bin = QPushButton()
         self.btn_bin.setToolTip("Sounds you removed: bring them back, exactly as they were")
         icons.set_icon(self.btn_bin, "trash")
         self.btn_bin.clicked.connect(self.show_deleted)
+        self.btn_folder = QPushButton("Sounds folder")
+        self.btn_folder.setToolTip("Open the folder your sounds are kept in. Sound files you "
+                                   "drag into it join the board by themselves.")
+        icons.set_icon(self.btn_folder, "folder")
+        self.btn_folder.clicked.connect(self.open_sounds_folder)
         tb.addWidget(add)
+        tb.addWidget(self.btn_folder)
         tb.addWidget(more)
         tb.addWidget(self.btn_bin)
         self._label_bin()
@@ -2278,6 +2290,51 @@ class MainWindow(QMainWindow):
         can still be undone."""
         return list(self.cfg.sounds) + [m for m, _i, _d in list(self._removed)]
 
+    def open_sounds_folder(self):
+        library.SOUNDS_DIR.mkdir(parents=True, exist_ok=True)
+        QDesktopServices.openUrl(QUrl.fromLocalFile(str(library.SOUNDS_DIR)))
+
+    def _watch_sounds_folder(self):
+        """Sound files dragged into the sounds folder in Explorer join the board,
+        even ones put there while the app was closed."""
+        self._loose_sizes: dict[Path, tuple[int, int]] = {}
+        self._loose_taken: set[Path] = set()   # imported or failed: not tried again
+        self._loose_timer = QTimer(self)
+        self._loose_timer.setSingleShot(True)
+        self._loose_timer.setInterval(LOOSE_WAIT_MS)
+        self._loose_timer.timeout.connect(self._take_loose)
+        try:
+            library.SOUNDS_DIR.mkdir(parents=True, exist_ok=True)
+        except OSError:
+            return
+        self._folder_watch = QFileSystemWatcher([str(library.SOUNDS_DIR)], self)
+        self._folder_watch.directoryChanged.connect(lambda _p: self._loose_timer.start())
+        self._loose_timer.start()
+
+    def _take_loose(self):
+        """Import the sounds folder's loose files once they're done copying in (the
+        same size on two looks in a row)."""
+        seen, ready = {}, []
+        for p in loose_sounds(self.cfg):
+            if p in self._loose_taken:
+                continue
+            try:
+                st = p.stat()
+            except OSError:
+                continue
+            sig = (st.st_size, st.st_mtime_ns)
+            if st.st_size and self._loose_sizes.get(p) == sig:
+                ready.append(p)
+            else:
+                seen[p] = sig
+        self._loose_sizes = seen
+        if seen:
+            self._loose_timer.start()   # still copying: look again
+        if ready:
+            self._loose_taken.update(ready)
+            log.info("adding %d sound(s) put in the sounds folder", len(ready))
+            self.import_files([str(p) for p in ready])
+
     def add_dialog(self):
         exts = " ".join(f"*{e}" for e in sorted(AUDIO_EXTS))
         files, _ = QFileDialog.getOpenFileNames(
@@ -2336,7 +2393,9 @@ class MainWindow(QMainWindow):
                     if fp:
                         known[fp] = meta.name   # the same file twice in one drop
                     self.engine.prepare(meta.id, data)
-                    self.bridge.imported.emit(meta, data, "")
+                    if Path(f).parent == library.SOUNDS_DIR and Path(meta.file) != Path(f):
+                        Path(f).unlink(missing_ok=True)   # dragged into the folder: now
+                    self.bridge.imported.emit(meta, data, "")   # it's in there as ours
                 except Exception as e:  # noqa: BLE001
                     log.warning("can't import %s: %s", f, e)
                     self.bridge.imported.emit(None, None, f"{Path(f).name}: {e}")
@@ -3483,6 +3542,8 @@ class MainWindow(QMainWindow):
         f.add(60, "w", r.hide(self.wordmark))
         f.add(60, "w", r.icon_only(self.btn_add))
         f.add(35, "w", r.hide(self.btn_more))   # also in Settings → General
+        f.add(15, "w", r.icon_only(self.btn_folder))
+        f.add(33, "w", r.hide(self.btn_folder))   # also in the Backup menu
         f.add(36, "w", r.icon_only(self.btn_cat_add))
         f.add(60, "w", self._tab_icons_only)
         f.add(70, "w", r.hide(self.btn_check, *self._mixer_others))

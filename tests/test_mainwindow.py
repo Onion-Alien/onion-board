@@ -392,6 +392,20 @@ def test_a_whole_row_of_pads_before_the_mixer(window, qapp):
         assert window._pads_scroll.height() >= window.pads["s0"].height()
 
 
+def test_the_mini_player_keeps_the_pads_while_one_row_fits(window, qapp):
+    """A wide, short window (big pads, 125 % scaling) showed the mini player with
+    nothing above it: the pads only came along when two rows fit."""
+    window.show()
+    window.tabs.setCurrentWidget(window.sounds_page)
+    window.set_pad_width(240)
+    window.resize(1100, 330)
+    window._refit()
+    size = window._pages.size()
+    assert window.is_mini()
+    assert window._mini_row(size) <= window._mini_pad_room(size) < 2 * window._mini_row(size)
+    assert window.grid.isVisibleTo(window)
+
+
 def test_the_window_shows_which_version_is_running(window, monkeypatch):
     from soundboard import __version__
     from soundboard.ui import mainwindow

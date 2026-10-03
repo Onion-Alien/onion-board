@@ -966,6 +966,19 @@ def recycle(path: Path) -> bool:
 USE_RECYCLE_BIN = True
 
 
+def loose_sounds(cfg: Config) -> list[Path]:
+    """Audio files put in the sounds folder by hand (dragged there in Explorer): not
+    one of the library's own files ("<id>_name"), and no sound's file."""
+    try:
+        files = list(SOUNDS_DIR.iterdir())
+    except OSError:
+        return []
+    used = {os.path.normcase(m.file) for m in cfg.sounds}
+    return sorted(p for p in files
+                  if p.suffix.lower() in AUDIO_EXTS and not _OUR_SOUND_FILE.match(p.name)
+                  and os.path.normcase(str(p)) not in used and p.is_file())
+
+
 def delete_file(meta: SoundMeta):
     """Remove a sound's files: the audio goes to the Recycle Bin (it's the one thing
     that can't be made again), its picture and decoded cache are deleted."""

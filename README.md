@@ -144,7 +144,8 @@ too (say No if another program, like Voicemeeter, uses it).
 
 ## What it can do
 
-- **Pads:** add by button or drag-and-drop (files or folders). Plays mp3, wav, ogg,
+- **Pads:** add by button, drag-and-drop (files or folders), or by dropping files into
+  the sounds folder (**Sounds folder** opens it; they join the board by themselves). Plays mp3, wav, ogg,
   flac, m4a and more, and pulls the audio out of video files. Search, reorder,
   resize, set colours.
 - **Categories:** the tabs above the pads (*+ Category* makes one). Right-click a
