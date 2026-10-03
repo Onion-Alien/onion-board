@@ -24,7 +24,7 @@ from collections.abc import Callable
 from dataclasses import dataclass
 from pathlib import Path
 
-from soundboard import __version__
+from soundboard import __version__, net
 from soundboard.library import APP_DIR
 
 log = logging.getLogger(__name__)
@@ -77,7 +77,7 @@ def _get(url: str) -> dict:
     req = urllib.request.Request(url, headers={
         "User-Agent": "OnionBoard (update check)",   # no version: GitHub needs a name only
         "Accept": "application/vnd.github+json"})
-    with urllib.request.urlopen(req, timeout=15) as r:
+    with net.urlopen(req, timeout=15) as r:
         return json.loads(r.read(LIMIT).decode("utf-8"))
 
 
@@ -190,7 +190,7 @@ def _sha256(path: Path) -> str:
 def _open(url: str):
     req = urllib.request.Request(url, headers={
         "User-Agent": "OnionBoard (update download)"})
-    return urllib.request.urlopen(req, timeout=30)
+    return net.urlopen(req, timeout=30)
 
 
 def download(rel: Release, progress: Callable[[int, int], None] | None = None,

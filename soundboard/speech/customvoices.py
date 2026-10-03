@@ -36,7 +36,7 @@ from pathlib import Path
 import numpy as np
 import soundfile as sf
 
-from soundboard import library
+from soundboard import library, net
 from soundboard.speech.tts import TTS_RATE, SapiTTS
 
 log = logging.getLogger(__name__)
@@ -124,7 +124,7 @@ class CustomVoice:
         if self.api_key:
             req.add_header("Authorization", f"Bearer {self.api_key}")
         try:
-            with urllib.request.urlopen(req, timeout=TIMEOUT_S) as r:  # noqa: S310 - http(s) only
+            with net.urlopen(req, timeout=TIMEOUT_S) as r:   # this PC's servers stay direct
                 return r.read(MAX_BYTES + 1)[:MAX_BYTES]
         except urllib.error.HTTPError as e:
             detail = e.read(300).decode("utf-8", "replace").strip()

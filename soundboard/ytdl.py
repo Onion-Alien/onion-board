@@ -41,7 +41,7 @@ from collections.abc import Callable
 from dataclasses import dataclass
 from pathlib import Path
 
-from soundboard import library
+from soundboard import library, net
 from soundboard.library import MAX_SECONDS
 
 log = logging.getLogger(__name__)
@@ -213,7 +213,7 @@ def _purge():
 
 def _get(url: str, limit: int) -> bytes:
     req = urllib.request.Request(url, headers={"User-Agent": "OnionBoard (yt-dlp updater)"})
-    with urllib.request.urlopen(req, timeout=30) as r:
+    with net.urlopen(req, timeout=30) as r:
         data = r.read(limit + 1)
     if len(data) > limit:
         raise DownloadError(f"{url} is unexpectedly large")
@@ -461,7 +461,7 @@ def _myinstants(query: str, count: int) -> list[Result]:
     url = f"{MYINSTANTS}/en/search/?name={urllib.parse.quote_plus(query)}"
     try:
         req = urllib.request.Request(url, headers=BROWSER_HEADERS)
-        with urllib.request.urlopen(req, timeout=20) as r:
+        with net.urlopen(req, timeout=20) as r:
             page = r.read(4 * 1024 * 1024).decode("utf-8", "replace")
     except Exception as e:  # noqa: BLE001 - offline, blocked…: show why
         raise FetchError(f"Myinstants didn't answer ({e})") from e
@@ -554,7 +554,7 @@ def _download_direct(url, dest, progress) -> tuple[Path, str]:
         raise DownloadError("That isn't a Myinstants sound link.")
     try:
         req = urllib.request.Request(url, headers=BROWSER_HEADERS)
-        with urllib.request.urlopen(req, timeout=30) as r, open(path, "wb") as f:
+        with net.urlopen(req, timeout=30) as r, open(path, "wb") as f:
             total, got = int(r.headers.get("Content-Length") or 0), 0
             while chunk := r.read(64 * 1024):
                 got += len(chunk)
@@ -596,7 +596,7 @@ def _opts(dest: Path | None = None, progress=None, thumbnail: bool = False) -> d
             if total:
                 progress(min(d.get("downloaded_bytes", 0) / total, 1.0))
 
-    return {
+    opts = {
         "format": "bestaudio/best",
         "outtmpl": str((dest or Path(tempfile.gettempdir())) / "%(id)s.%(ext)s"),
         "noplaylist": True,            # a video in a playlist: just that video
@@ -610,6 +610,10 @@ def _opts(dest: Path | None = None, progress=None, thumbnail: bool = False) -> d
         "progress_hooks": [hook],
         "logger": log,
     }
+    proxy = net.ytdlp_proxy()   # Settings > Privacy > Connection; None = direct
+    if proxy:
+        opts["proxy"] = proxy
+    return opts
 
 
 def _run(yt_dlp, url: str, dest: Path, progress) -> tuple[Path, str]:

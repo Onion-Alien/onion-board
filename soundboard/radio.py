@@ -42,7 +42,7 @@ from PySide6.QtCore import QObject, QTimer, QUrl, Signal
 from PySide6.QtMultimedia import QAudioBufferOutput, QAudioFormat, QMediaMetaData, QMediaPlayer
 from PySide6.QtNetwork import QNetworkAccessManager, QNetworkReply, QNetworkRequest
 
-from soundboard import library
+from soundboard import library, net
 from soundboard.engine import SR
 
 log = logging.getLogger(__name__)
@@ -369,6 +369,7 @@ class RadioDirectory(QObject):
         self.cache_dir = cache_dir or radio_dir()
         self.bases = list(bases)
         self.nam = QNetworkAccessManager(self)
+        net.apply_qt(self.nam)          # Settings > Privacy > Connection
         self._search_gen = 0
         self._pending: dict[int, list] = {}
 
@@ -386,11 +387,12 @@ class RadioDirectory(QObject):
         req.setTransferTimeout(TIMEOUT_MS)
         req.setAttribute(QNetworkRequest.RedirectPolicyAttribute,
                          QNetworkRequest.NoLessSafeRedirectPolicy)
+        started = time.monotonic()
         reply = self.nam.get(req)
 
         def finished():
             reply.deleteLater()
-            err = reply.errorString()
+            err = net.explain(reply.errorString(), started)
             if reply.error() == QNetworkReply.NoError:
                 raw = bytes(reply.readAll())
                 try:
@@ -570,6 +572,7 @@ class RadioPlayer(QObject):
         self._watch.setInterval(1000)
         self._watch.timeout.connect(self._check)
         self._looked_up.connect(self._on_looked_up)
+        net.on_change(self._on_connection)
 
     def _make(self):
         fmt = QAudioFormat()
@@ -601,6 +604,11 @@ class RadioPlayer(QObject):
         self._reconnecting = self._reopen_pending = False
         self._gen += 1
         host = QUrl(station.url).host()
+        if net.active():
+            # a lookup here would tell this PC's DNS server which station it is; the
+            # proxy resolves the name, and the relay refuses local addresses itself
+            self._open()
+            return
         try:
             ipaddress.ip_address(host)   # an address was already checked (_http)
         except ValueError:   # a name: where it leads is looked up first, off the UI thread
@@ -629,8 +637,21 @@ class RadioPlayer(QObject):
         self._watch.start()
         self._set_state("connecting")
         self._player.stop()
+        self._player.setSource(QUrl())   # the same URL again is ignored: really reopen it
         self._player.setSource(QUrl(self.station.url))
         self._player.play()
+
+    def _on_connection(self):
+        """The Connection setting changed: a playing station reconnects the new way at
+        once (FFmpeg reads the relay's address each time it opens a stream)."""
+        if self.station is not None and self._player is not None:
+            log.info("radio: reconnecting after a connection setting change")
+            self._gen += 1            # a reopen already scheduled does nothing
+            self._retries = 0
+            # the old stream's own error / end arrives after this: as a reconnect it
+            # only schedules another try instead of giving up
+            self._reconnecting, self._reopen_pending = True, False
+            self._open()
 
     def stop(self):
         self.station = None
@@ -707,7 +728,7 @@ class RadioPlayer(QObject):
         if self._player is not None:
             self._player.stop()
         self._set_state("error")
-        self.error.emit(msg)
+        self.error.emit(net.explain(msg, self._opened))
 
     def _reopen(self, gen: int):
         if gen != self._gen or self.station is None:

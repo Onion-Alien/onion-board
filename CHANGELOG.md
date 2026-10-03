@@ -9,6 +9,16 @@
   which stations you play unless you turn that on in the new **Privacy** section
   (Settings → General), which also explains what the app sends where. Update checks
   no longer send the app's version number.
+- **Send everything through a proxy**: Settings → General → Privacy → *Connection*
+  can send everything the app fetches (searches, downloads, the radio directory and
+  its stations, thumbnails, updates, add-ons, translation models) through a SOCKS5
+  or HTTP proxy, such as Tor's `socks5h://127.0.0.1:9050`. Site names are looked up
+  by the proxy, not on your PC. If the proxy can't be reached, nothing is fetched,
+  with a message saying why: the app never quietly goes direct. *Test* checks the
+  address first, and switching applies at once (a playing station reconnects the
+  new way).
+- A radio station that drops now really reconnects; before, the retry could end up
+  replaying what was already received instead of opening the stream again.
 - **Your headphones follow Windows' default output**: switch Windows from your
   headset to your speakers (or back) while the app is open and the sounds you hear
   move with it, instead of playing on the device you just switched away from. Picking

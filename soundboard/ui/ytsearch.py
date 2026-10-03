@@ -24,7 +24,7 @@ from PySide6.QtNetwork import QNetworkAccessManager, QNetworkRequest
 from PySide6.QtWidgets import (QButtonGroup, QFrame, QHBoxLayout, QLabel, QPushButton,
                                QScrollArea, QVBoxLayout, QWidget)
 
-from soundboard import theme, ytdl
+from soundboard import net, theme, ytdl
 from soundboard.bunny import H as BUN_H
 from soundboard.bunny import W as BUN_W
 from soundboard.ui import busy, icons
@@ -329,6 +329,7 @@ class SearchResults(QFrame):
         self._gen = 0
         self._rows: list[ResultRow] = []
         self.net = QNetworkAccessManager(self)
+        net.apply_qt(self.net)        # Settings > Privacy > Connection
         self._done.connect(self._on_done)
 
         v = QVBoxLayout(self)

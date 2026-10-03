@@ -32,6 +32,10 @@ In scope, for example:
   claims to be (e.g. the VB-Cable signature check being bypassable).
 - Crafted audio / video files that cause code execution, not just a failed import.
 - Anything that sends the user's data off the machine without them asking.
+- With a proxy set (Settings → General → Privacy → *Connection*), any request the
+  app makes that goes around it, or a DNS lookup of a site's name on this PC
+  (see *Through a proxy* below for what it covers).
+- The proxy relay on `127.0.0.1` accepting a request without its per-launch secret.
 
 Out of scope:
 
@@ -73,6 +77,51 @@ So you know what normal looks like when auditing it:
 | While a module runs (e.g. live voice) | `127.0.0.1` only | module link, guarded by a random per-launch secret |
 | You turn on *Remote control* (Settings → Remote; off by default) | listens on `127.0.0.1` only (port 7474 unless you change it) | lets a Stream Deck, AutoHotkey or a script on this PC play / stop / pause sounds and list them. Every request needs the key shown in Settings. Unlike the sockets above the key survives restarts (a Stream Deck button has to keep working), so it's stored in `config.json`; it's never exported with a backup or logged, and *New key* replaces it. Requests for any other `Host` are refused and no CORS headers are sent, so web pages can't use it |
 | Always | a local named pipe (`OnionBoard.App`) | single instance: a second launch asks the first to come to the front. It only accepts that one request |
+
+### Through a proxy
+
+Settings → General → Privacy → *Connection* → *Through a proxy* sends what the app
+fetches through a SOCKS5 (`socks5h://host:port`; `socks5://` and a bare `host:port`
+mean the same) or HTTP (`http://host:port`, via `CONNECT`) proxy. All of it goes
+through `soundboard/net.py`:
+
+| What | How it reaches the proxy |
+|---|---|
+| Update checks and downloads, the yt-dlp updater, Myinstants, translation models, Onion Watch, custom voice servers | `net.urlopen()`: connections are opened by the proxy, and site names are sent to it unresolved |
+| yt-dlp (searches, link look-ups, downloads, and the ffmpeg it may start) | its `proxy` option, set to the relay |
+| Radio Browser and search thumbnails (Qt's network managers) | an HTTP proxy setting pointing at the relay |
+| Radio streams (Qt Multimedia / FFmpeg), including redirects, HLS playlists and segments, and ICY titles | the `http_proxy` environment variable, pointing at the relay |
+| Programs the app starts while the proxy is on (`pip` installing a module, the live-voice helper's Hugging Face download / check) | `HTTP_PROXY` / `HTTPS_PROXY` / `ALL_PROXY`, pointing at the relay. A helper already running keeps the setting it started with |
+
+The relay is a small HTTP proxy inside the app that listens on `127.0.0.1` only,
+needs a random per-launch secret (Basic auth, compared with
+`secrets.compare_digest`) and makes every onward connection through the proxy. It
+refuses targets on this PC or the home network (loopback, private and link-local
+addresses, `.local`, `.lan`). Without the setting it isn't started.
+
+- **Fails closed.** If the proxy is unreachable, refuses, or its address can't be
+  used, the request fails with a message saying so. Nothing falls back to a
+  direct connection. A mode this version doesn't know (from a newer version's
+  `config.json`) counts as a proxy with no address: nothing goes online.
+- **DNS** goes through the proxy. While it's on, the radio player no longer looks a
+  station's name up on this PC to check it isn't on the home network (that would
+  tell your DNS server which station it is); the relay refuses home-network
+  addresses instead.
+- **Stays direct:** `127.0.0.1`, `::1` and `localhost` (a custom voice server on
+  this PC, module links, the remote-control API). A custom voice server elsewhere
+  on your network goes through the proxy like anything else.
+- **Switching** applies at once: Qt's network managers are switched and their kept
+  connections dropped, open relayed connections are closed, and a playing radio
+  station reconnects.
+- **The radio globe page** loads only the app's own files, and its web profile
+  refuses any `http`/`https`/`ws` request.
+- **Not covered**, because the app doesn't make these requests itself: pages it
+  opens in your web browser (*Support*, *Report on GitHub*, a release page), the
+  installer's downloads (VB-Cable, `winget`), Windows Update (*Install the … voice*)
+  and the VB-Cable installer the setup guide starts (Windows PowerShell uses
+  Windows' own proxy setting, not this one). The config keeps the proxy address
+  (with any password in it) in `config.json`. It's never exported with a backup
+  or written to the log.
 
 No telemetry, analytics or crash upload. The update check only reads the public
 release list, and nothing is installed unless you click *Update now*. *Export* only writes a zip where you save it; nothing is uploaded. Logs and

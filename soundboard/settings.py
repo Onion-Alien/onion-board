@@ -924,7 +924,8 @@ class SettingsDialog(QDialog):
             "Onion Board has no account, tracking or analytics, and sends nothing to us. "
             "Searches and downloads go straight to the site you pick (YouTube, SoundCloud, "
             "TikTok, Myinstants), and a radio station plays straight from that station, "
-            "so those sites see your IP address like they would in a browser. The radio "
+            "so those sites see your IP address like they would in a browser, unless you "
+            "send it all through a proxy (Connection, below). The radio "
             "maps and their pictures ship with the app: opening them contacts nobody.")
         plays = QCheckBox("Tell Radio Browser which stations I play (it ranks stations by "
                           "how often they're played)")
@@ -937,7 +938,92 @@ class SettingsDialog(QDialog):
             self.mw.set_option("radio", cfg.radio)   # saves
         plays.toggled.connect(count_plays)
         cv.addWidget(plays)
+        self._connection_section(cv)
         return card
+
+    def _connection_section(self, cv):
+        """Connection: Direct, or everything through a proxy (soundboard.net). Applies
+        at once; a proxy that can't be reached makes requests fail, never go direct."""
+        from PySide6.QtWidgets import QButtonGroup, QLineEdit, QRadioButton
+
+        from soundboard import net
+        cfg = self.mw.cfg
+        head = QLabel("<b>Connection</b>")
+        cv.addWidget(head)
+        direct = QRadioButton("Direct: connect straight to each site")
+        via = QRadioButton("Through a proxy: everything the app fetches goes through it "
+                           "(searches, downloads, radio, updates), DNS lookups too")
+        via.setToolTip("If the proxy can't be reached, nothing is fetched: the app never "
+                       "falls back to a direct connection. This PC's own addresses "
+                       "(127.0.0.1) stay direct.")
+        group = QButtonGroup(cv.parentWidget() or self)
+        for b in (direct, via):
+            group.addButton(b)
+            cv.addWidget(b)
+        row = QHBoxLayout()
+        addr = QLineEdit(cfg.net_proxy)
+        addr.setPlaceholderText("socks5h://127.0.0.1:9050  or  http://host:8080")
+        addr.setToolTip("A SOCKS5 proxy (host names are looked up by the proxy) or an "
+                        "HTTP proxy. Add user:password@ before the host if it needs a login.")
+        row.addWidget(addr, 1)
+        test = QPushButton("Test")
+        test.setToolTip("Connect to GitHub through this proxy (only to see that it works)")
+        row.addWidget(test)
+        cv.addLayout(row)
+        note = QLabel()
+        note.setObjectName("hint")
+        note.setWordWrap(True)
+        cv.addWidget(note)
+        (via if cfg.net_mode != net.DIRECT else direct).setChecked(True)
+
+        def show():
+            on = via.isChecked()
+            addr.setEnabled(on)
+            test.setEnabled(on)
+            if on:
+                try:
+                    net.parse(addr.text())
+                except ValueError as e:
+                    note.setText(f"{e}. Until it's fixed, nothing goes online.")
+                    return
+            note.setText(f"Now: {net.describe()}.")
+
+        def apply():
+            mode = net.PROXY if via.isChecked() else net.DIRECT
+            text = addr.text().strip()
+            if (mode, text) != (cfg.net_mode, cfg.net_proxy):
+                self.mw.set_option("net_mode", mode)     # saves
+                self.mw.set_option("net_proxy", text)
+                net.configure(mode, text)
+            show()
+
+        direct.toggled.connect(lambda _on: apply())
+        addr.editingFinished.connect(apply)
+
+        def run_test():
+            text = addr.text()
+            release = busy.hold(test, "Testing…")
+            relay = _Relay(self.mw)   # outlives this window if it's closed meanwhile
+
+            def finish(msg):
+                relay.deleteLater()
+                release("✓ Works" if msg.startswith("It works") else "✗ Failed")
+                if qt_valid(note):
+                    note.setText(msg)
+
+            relay.done.connect(finish)
+
+            def run():
+                try:
+                    msg = net.test(text)
+                except (ValueError, OSError) as e:
+                    msg = f"It didn't work: {e}"
+                relay.done.emit(msg)
+            threading.Thread(target=run, daemon=True, name="proxy-test").start()
+        test.clicked.connect(run_test)
+        self.net_direct, self.net_via, self.net_addr, self.net_test = direct, via, addr, test
+        self.net_note = note
+        show()
 
     # ------------------------------------------------------------------ app updates
     def _updates_card(self):

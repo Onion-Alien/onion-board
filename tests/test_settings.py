@@ -1,6 +1,7 @@
 """The Settings window's layout: pages scroll instead of squashing their rows."""
 from PySide6.QtWidgets import QLabel, QPushButton, QScrollArea
 
+from conftest import process_events
 from soundboard.settings import SettingsDialog
 from soundboard.ui import busy
 from test_mainwindow import window  # noqa: F401  (the real MainWindow fixture)
@@ -24,7 +25,6 @@ def test_a_short_window_scrolls_a_page_instead_of_squashing_it(window, qapp):  #
 
 
 def test_support_opens_the_project_page_not_an_address_in_the_app(window, monkeypatch):  # noqa: F811
-    from soundboard import settings
     opened = []
     monkeypatch.setattr(busy.QDesktopServices, "openUrl", lambda u: opened.append(u.toString()))
     d = SettingsDialog(window, "general")
@@ -70,7 +70,7 @@ def test_audio_page_picks_input_and_output_through_the_window(window, monkeypatc
 
 
 def test_feedback_and_problem_buttons_only_open_the_browser(window, monkeypatch):  # noqa: F811
-    from soundboard import __version__, feedback, settings
+    from soundboard import __version__, feedback
     opened = []
     monkeypatch.setattr(busy.QDesktopServices, "openUrl", lambda u: opened.append(u.toString()))
     d = SettingsDialog(window, "general")
@@ -107,3 +107,28 @@ def test_onion_watch_can_be_removed_from_settings(window, monkeypatch):  # noqa:
     d.addon_remove.click()
     assert removed and not d.addon_remove.isVisibleTo(d)
     d.close()
+
+
+def test_connection_choice_applies_at_once_and_fails_closed(window, qapp, monkeypatch):  # noqa: F811
+    from soundboard import net
+    monkeypatch.setattr(window, "_save_later", lambda: None)
+    d = SettingsDialog(window, "general")
+    try:
+        assert d.net_direct.isChecked() and not d.net_addr.isEnabled()
+        d.net_via.setChecked(True)                 # no address yet: nothing goes online
+        assert window.cfg.net_mode == "proxy" and net.active() and net.proxy() is None
+        assert "nothing goes online" in d.net_note.text()
+        d.net_addr.setText("socks5h://127.0.0.1:9050")
+        d.net_addr.editingFinished.emit()
+        assert window.cfg.net_proxy == "socks5h://127.0.0.1:9050"
+        assert net.proxy().port == 9050 and "127.0.0.1:9050" in d.net_note.text()
+        tested = []
+        monkeypatch.setattr(net, "test", lambda text: tested.append(text) or "It works: yes.")
+        d.net_test.click()
+        assert process_events(qapp, lambda: "It works" in d.net_note.text())
+        assert tested == ["socks5h://127.0.0.1:9050"]
+        d.net_direct.setChecked(True)
+        assert window.cfg.net_mode == "direct" and not net.active()
+    finally:
+        d.close()
+        net.configure(net.DIRECT)

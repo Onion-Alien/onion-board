@@ -41,6 +41,8 @@ FAV_MAX = 200
 RECENT_MAX = 30
 GREEN = "#13ce66"   # the playing station's highlight on dark themes
 ROW_H = 54
+# what the globe page may load: its own files and inline data, never the network
+LOCAL_SCHEMES = ("file", "data", "blob", "about", "qrc")
 
 # genre chips: a station is in a genre when one of its tags contains one of the words
 GENRES: tuple[tuple[str, tuple[str, ...]], ...] = (
@@ -734,8 +736,17 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
 
     def _make_globe(self):
         from PySide6.QtWebChannel import QWebChannel
-        from PySide6.QtWebEngineCore import QWebEnginePage, QWebEngineProfile
+        from PySide6.QtWebEngineCore import (QWebEnginePage, QWebEngineProfile,
+                                             QWebEngineUrlRequestInterceptor)
         from PySide6.QtWebEngineWidgets import QWebEngineView
+
+        class LocalOnly(QWebEngineUrlRequestInterceptor):
+            # the page and everything it loads ship with the app: a request for the
+            # network (a bug, or a station name that got past the escaping) is refused,
+            # so the map can't step around Settings > Privacy > Connection
+            def interceptRequest(self, info):
+                if info.requestUrl().scheme().lower() not in LOCAL_SCHEMES:
+                    info.block(True)
 
         class Page(QWebEnginePage):
             def createWindow(self, _type):
@@ -750,6 +761,8 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
             self.profile = QWebEngineProfile("soundboard-radio", self)   # caches the script
             self.profile.setPersistentStoragePath(str(store))
             self.profile.setCachePath(str(store / "cache"))
+            self._local_only = LocalOnly(self.profile)
+            self.profile.setUrlRequestInterceptor(self._local_only)
         self.view = QWebEngineView()
         page = Page(self.profile, self.view)
         self._bridge = _Bridge(self)
