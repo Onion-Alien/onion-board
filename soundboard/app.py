@@ -105,6 +105,27 @@ def get_tor() -> int:
     return 0
 
 
+def set_offline() -> int:
+    """`OnionBoard.exe --set-offline`: the installer's "Offline mode" box (or
+    /OFFLINE=1). Switches on Offline mode in config.json before the app's first start,
+    so it never goes online, not even once. Other settings are kept; nothing
+    connects. No window. Returns 0 once it's saved, 1 if it couldn't be."""
+    migrate_from_soundboard()   # an old %APPDATA%\Soundboard moves only while there's no config
+    applog.setup(APP_DIR)
+    from soundboard import library
+    cfg = library.Config.load()
+    if cfg.read_only:   # locked: saving would overwrite the newest settings with a backup
+        print("FAIL: config.json is locked by another program", file=sys.stderr)
+        return 1
+    cfg.net_offline = True
+    if not cfg.save():
+        print(f"FAIL: couldn't save {library.CONFIG_PATH}", file=sys.stderr)
+        return 1
+    log.info("--set-offline: Offline mode is on")
+    print("OK: Offline mode is on")
+    return 0
+
+
 def selftest_addon(path: str) -> int:
     """`OnionBoard.exe --selftest-addon OnionWatch-module.zip`: prove this build can
     run the Onion Watch add-on (it has no pip, so the add-on may only use what the
@@ -153,6 +174,8 @@ def main():
         sys.exit(selftest())
     if "--get-tor" in sys.argv:
         sys.exit(get_tor())
+    if "--set-offline" in sys.argv:
+        sys.exit(set_offline())
     if "--selftest-addon" in sys.argv:
         sys.exit(selftest_addon(sys.argv[sys.argv.index("--selftest-addon") + 1]))
     migrate_from_soundboard()

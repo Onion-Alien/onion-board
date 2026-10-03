@@ -83,7 +83,10 @@ So you know what normal looks like when auditing it:
 
 Settings → Privacy & security has a switch for each feature in the *Switch* column
 above, grouped into Sounds and radio, Voices, Updates and add-ons, and Setup downloads,
-and *Offline mode*, which switches them all off.
+and *Offline mode*, which switches them all off. The installer's *Your privacy* page
+has the same *Offline mode* box (or `/OFFLINE=1` for a silent install): it's written to
+`config.json` before the app first starts, so the app never goes online at all, and
+it unticks the installer's own downloads (VB-Cable, FFmpeg, live voice, Tor).
 Connection settings live on Settings → Connection; automatic update preferences
 live only on Settings → Updates. Changing a category does not change permissions.
 Off means fully off, in every

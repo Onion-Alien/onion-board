@@ -504,8 +504,12 @@ shortcuts and opens the app. Its *Pick what you want* page (Inno Setup tasks) co
 VB-Cable (downloaded and signature-checked by `installer\install-vbcable.ps1`), FFmpeg via winget
 (offered only when ffmpeg is missing and winget exists), the add-ons in `modules\`
 (copied to `{app}\modules`; *live-voice* then runs its `install.bat --quiet` when
-Python is present) and the Desktop shortcut. Silent installs use the defaults or the
-previous install's choices. The installer artwork is Bun the mascot, drawn in code by
+Python is present) and the Desktop shortcut. Before it, the *Your privacy* page
+says what the app connects to and has an *Offline mode* box: ticked, the installer
+runs `OnionBoard.exe --set-offline` (Offline mode in `config.json` before the first
+start) and unticks the boxes that download. Silent installs use the defaults or the
+previous install's choices; `/OFFLINE=1` is the Offline mode box, and skips the
+download boxes unless `/TASKS=` or `/MERGETASKS=` names them. The installer artwork is Bun the mascot, drawn in code by
 `soundboard/bunny.py` and rendered by `scripts\make_bunny.py` (`--preview` writes a sheet of
 every pose). Settings live in `%APPDATA%\OnionBoard\` either way.
 Every `config.json` save keeps the last three good copies next to it
