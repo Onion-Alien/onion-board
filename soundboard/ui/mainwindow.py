@@ -700,6 +700,7 @@ class MainWindow(QMainWindow):
         left.addWidget(scroll, 1)
         self._pads_home = (left, left.indexOf(scroll))   # the mini player borrows it
         self.ytresults.closed.connect(scroll.show)   # the results take the pads' place
+        self.ytresults.closed.connect(self._cat_row.show)   # ...and the categories' row
         self._pads_scroll = scroll
         # ---- "3 selected · Colour · Volume… · Delete": Ctrl / Shift+click picks pads
         self.selection = PadSelection(self, scroll)
@@ -1992,6 +1993,7 @@ class MainWindow(QMainWindow):
                 busy.flash(self.btn_yt, "Type something first")
             return
         self._pads_scroll.hide()
+        self._cat_row.hide()
 
     def on_search_enter(self):
         if ytdl.as_link(self.search.text()):
@@ -2263,7 +2265,13 @@ class MainWindow(QMainWindow):
     # A sound can be in any number of categories (SoundMeta.tags); the bar above the
     # pads shows one at a time. The overlay shows the same category's sounds.
     def _build_categories(self) -> QWidget:
-        w = QWidget()
+        # two layers: the window's fit hides the outer one when it's short, while web
+        # results showing in the pads' place hide the inner row (its tabs pick pads)
+        outer = QWidget()
+        ov = QVBoxLayout(outer)
+        ov.setContentsMargins(0, 0, 0, 0)
+        w = self._cat_row = QWidget()
+        ov.addWidget(w)
         h = QHBoxLayout(w)
         h.setContentsMargins(0, 0, 0, 0)
         h.setSpacing(4)
@@ -2276,17 +2284,20 @@ class MainWindow(QMainWindow):
         self.cat_tabs.customContextMenuRequested.connect(self._category_menu)
         self.cat_tabs.currentChanged.connect(self._on_category_tab)
         self.cat_tabs.tabMoved.connect(self._on_category_moved)
-        h.addWidget(self.cat_tabs, 1)
-        add = QPushButton("Category")
+        h.addWidget(self.cat_tabs)
+        # "+" right after the last tab, like a browser's new-tab button
+        add = QPushButton()
         add.setObjectName("small")
-        add.setToolTip("Make a category (a page of pads). Right-click a pad to put it in "
+        add.setAccessibleName("New category")
+        add.setToolTip("New category (a page of pads). Right-click a pad to put it in "
                        "one; right-click a category to rename or delete it.")
         icons.set_icon(add, "plus", size=12)
         add.clicked.connect(lambda: self.new_category())
-        h.addWidget(add)
+        h.addWidget(add, 0, Qt.AlignVCenter)
+        h.addStretch(1)
         self.btn_cat_add = add
         self._fill_categories()
-        return w
+        return outer
 
     def _fill_categories(self):
         tb = self.cat_tabs
@@ -3840,7 +3851,6 @@ class MainWindow(QMainWindow):
         f.add(35, "w", r.hide(self.btn_more))   # also in Settings → General
         f.add(15, "w", r.icon_only(self.btn_folder))
         f.add(33, "w", r.hide(self.btn_folder))   # also in the Backup menu
-        f.add(36, "w", r.icon_only(self.btn_cat_add))
         f.add(60, "w", self._tab_icons_only)
         f.add(70, "w", r.hide(self.btn_check, *self._mixer_others))
         f.add(80, "w", r.hide(self.pill))

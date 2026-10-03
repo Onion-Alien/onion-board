@@ -397,7 +397,7 @@ class ResultRow(QFrame):
 
 class SearchResults(QFrame):
     """`play(Result)` / `add(Result)` when a row's button is pressed; `closed()`
-    when "Back to my sounds" is (the owner shows its pads again). The site
+    when its "My sounds" back button is (the owner shows its pads again). The site
     buttons in the header pick where the search goes and re-run it there."""
     play = Signal(object)
     add = Signal(object)
@@ -418,6 +418,13 @@ class SearchResults(QFrame):
         v.setContentsMargins(0, 0, 0, 0)
         v.setSpacing(6)
         head = QHBoxLayout()
+        back = self.btn_back = QPushButton("My sounds")
+        back.setObjectName("small")
+        back.setToolTip("Close the search results and go back to your sounds")
+        icons.set_icon(back, "back", size=12)
+        back.clicked.connect(self.close_results)
+        head.addWidget(back)
+        head.addSpacing(8)
         self.site_btns: dict[str, QPushButton] = {}
         group = QButtonGroup(self)
         group.setExclusive(True)
@@ -432,11 +439,6 @@ class SearchResults(QFrame):
             head.addWidget(b)
             self.site_btns[key] = b
         head.addStretch(1)
-        close = QPushButton("Back to my sounds")
-        close.setObjectName("small")
-        close.setToolTip("Close the search results")
-        close.clicked.connect(self.close_results)
-        head.addWidget(close)
         v.addLayout(head)
         self.title = QLabel()
         self.title.setTextFormat(Qt.RichText)
