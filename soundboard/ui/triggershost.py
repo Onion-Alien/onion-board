@@ -98,11 +98,10 @@ class BoardHost:
         if m is None or data is None:
             return False
         eng = win.engine
-        if tag.startswith("hear:"):  # checking it on the card: to you, not the call
-            voice = f"{sid}{HEAR}{tag}"
-            v = eng.play(voice, data, win.gain_for(m), mode="restart", preview=True)
-            if v is None:            # no headphones open: where the board plays
-                v = eng.play(voice, data, win.gain_for(m), mode="restart")
+        if tag.startswith("hear:"):  # checking it on the card: like a pad's preview, to
+            # your headphones only (none open: nothing, never into the call or stream)
+            v = eng.play(f"{sid}{HEAR}{tag}", data, win.gain_for(m), mode="restart",
+                         preview=True)
             return v is not None
         if not loop:
             win.play(sid)            # like pressing its pad

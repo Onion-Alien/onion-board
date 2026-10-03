@@ -344,6 +344,14 @@ def test_a_sound_checked_on_a_card_plays_to_you_alone_and_stops_by_its_tag():
     assert win.engine.voices == {}
 
 
+def test_with_no_headphones_a_card_preview_goes_nowhere():
+    """Like a pad's preview: never into the call or the stream."""
+    win = FakeWindow(headphones=False)
+    host = BoardHost(win)
+    assert not host.play("s1", tag="hear:t1/s1")
+    assert win.engine.voices == {} and win.played == []
+
+
 def test_a_tagged_one_shot_stops_by_its_tag():
     """A trigger's sound plays like its pad; stopping its tag stops that pad (a
     sound taken off the trigger, or the trigger deleted, while it plays)."""
