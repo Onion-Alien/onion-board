@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 1.6.2 — 2026-10-03
 
 - **A tidier right-click menu on a sound**: short names in three groups (play, change,
   share / remove), with what each does in its tooltip. The hotkey shows in the menu
