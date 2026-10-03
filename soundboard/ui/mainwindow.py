@@ -1018,9 +1018,11 @@ class MainWindow(QMainWindow):
         e = self.engine
         e.sound_vol, e.mic_vol, e.mon_vol = c.sound_vol, c.mic_vol, c.mon_vol
         e.mic_enabled, e.monitor_sounds = c.mic_enabled, c.monitor_sounds
+        e.obs_vol, e.obs_voice = c.obs_vol, c.obs_voice
         e.set_mic_device(c.mic_device)
         e.set_main_device(c.main_device)
         e.set_mon_device(c.mon_device)
+        e.set_obs_device(self._obs_name(c.obs_device))
         self._check_cable_format()
         self._update_status()
 
@@ -1083,6 +1085,22 @@ class MainWindow(QMainWindow):
             self.engine.set_mon_device(name)
         else:
             self.engine.set_mic_device(name)
+        obs = self._obs_name(self.cfg.obs_device)   # never the cable or headphones too
+        if self.engine.names["obs"] != obs:
+            self.engine.set_obs_device(obs)
+        self._save_now()
+        self._update_status()
+        self._prepare_all()
+
+    def _obs_name(self, name: str | None) -> str | None:
+        """The stream output's device, unless it's the cable or the headphones (OBS
+        would get everything twice, and they'd hear it twice)."""
+        return None if name in (None, self.cfg.main_device, self.cfg.mon_device) else name
+
+    def set_obs_device(self, name: str | None):
+        """Settings -> Audio -> Stream output (OBS): None switches it off."""
+        self.cfg.obs_device = name
+        self.engine.set_obs_device(self._obs_name(name))
         self._save_now()
         self._update_status()
         self._prepare_all()
@@ -1123,7 +1141,8 @@ class MainWindow(QMainWindow):
                                     "Nothing picked — only you "
                                     "will hear sounds.</span>")
         self._update_flow()
-        errs = [f"{k}: {v}" for k, v in e.errors_snapshot().items()]
+        errs = [f"{'stream output' if k == 'obs' else k}: {v}"
+                for k, v in e.errors_snapshot().items()]
         if errs:
             self.status.setText(f"<span style='color:{theme.status('error')}'>"
                                 "Audio device problem — "
@@ -1744,7 +1763,7 @@ class MainWindow(QMainWindow):
         v = self.engine.play(sid, data, self.gain_for(m), loop=m.loop,
                              mode="restart" if m.mode == "queue" else m.mode,
                              fade_in=m.fade_in, fade_out=m.fade_out,
-                             only="main" if m.only_them else None)
+                             only=("main", "obs") if m.only_them else None)
         if v is None and not self.engine.active_outputs():
             self.status.setText(f"<span style='color:{theme.status('warn')}'>"
                                 "No audio device is open — pick one "

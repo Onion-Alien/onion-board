@@ -10,6 +10,8 @@ VB-Cable — so all rate conversion is done here with soxr instead):
           -> the same path again, each with its own rings, volume and switches
   main (output) = sounds + radio / programs (when live) + mic -> virtual cable (what others hear)
   mon  (output) = sounds + radio / programs [+ mic in test mode] -> your headphones
+  obs  (output, optional) = sounds + radio / programs (when live) [+ mic] -> a device
+       OBS captures: what others get, without the voice chat shaping, as its own track
 
 Sounds are stored at SR and resampled (cached) to each output's rate. Every
 playing Voice keeps its own position per output, so the two output devices
@@ -403,21 +405,26 @@ class AuxSource:
         # program that goes quiet stops sending at all, so start again quickly
         self.ring_main = Ring(prefill_s=0.05, max_s=0.6, track_drift=True, grow_to_s=0.25)
         self.ring_mon = Ring(prefill_s=0.05, max_s=0.6, track_drift=True, grow_to_s=0.25)
+        self.ring_obs = Ring(prefill_s=0.05, max_s=0.6, track_drift=True, grow_to_s=0.25)
         self._rs_main = StreamResampler(SR, SR)
         self._rs_mon = StreamResampler(SR, SR)
+        self._rs_obs = StreamResampler(SR, SR)
         self._heard = 0.0
         if rates:
             self.configure(rates)
 
-    def configure(self, rates: dict, outs=("main", "mon")):
+    def configure(self, rates: dict, outs=("main", "mon", "obs")):
         if "main" in outs:
             self._rs_main = StreamResampler(SR, rates["main"])
             self.ring_main.configure(rates["main"])
         if "mon" in outs:
             self._rs_mon = StreamResampler(SR, rates["mon"])
             self.ring_mon.configure(rates["mon"])
+        if "obs" in outs and "obs" in rates:
+            self._rs_obs = StreamResampler(SR, rates["obs"])
+            self.ring_obs.configure(rates["obs"])
 
-    def feed(self, x: np.ndarray, main: bool, mon: bool):
+    def feed(self, x: np.ndarray, main: bool, mon: bool, obs: bool = False):
         lvl = peak(x)
         if not np.isfinite(lvl):   # a program's capture can hand over a broken block
             x = finite(np.array(x, dtype=np.float32))
@@ -429,6 +436,8 @@ class AuxSource:
             self.ring_main.write(self._rs_main(x))
         if mon:
             self.ring_mon.write(self._rs_mon(x))
+        if obs:
+            self.ring_obs.write(self._rs_obs(x))
 
     def on_air(self) -> bool:
         return self.live and self.vol > 0 and time.monotonic() - self._heard < 0.5
@@ -514,19 +523,22 @@ class Engine:
         self._cache_lock = threading.Lock()
 
         self.latency = "low"      # sounddevice latency: 'low' or 'high' (safer)
-        self.names = {"main": None, "mon": None, "mic": None}   # device names for reopening
-        self._last_cb = {"main": 0.0, "mon": 0.0, "mic": 0.0}  # monotonic time of last callback
-        self._last_try = {"main": 0.0, "mon": 0.0, "mic": 0.0} # last (re)open attempt
-        self.xruns = {"main": 0, "mon": 0, "mic": 0}           # drop-outs reported by PortAudio
-        self.cb_errors = {"main": 0, "mon": 0, "mic": 0}       # exceptions inside a callback
-        self._cb_err_base = {"main": 0, "mon": 0, "mic": 0}    # cb_errors when the stream opened
-        self._cb_err_seen = {"main": 0, "mon": 0, "mic": 0}    # cb_errors at the last check_streams
+        keys = ("main", "mon", "mic", "obs")
+        self.names = dict.fromkeys(keys)          # device names for reopening
+        self._last_cb = dict.fromkeys(keys, 0.0)  # monotonic time of last callback
+        self._last_try = dict.fromkeys(keys, 0.0)   # last (re)open attempt
+        self.xruns = dict.fromkeys(keys, 0)       # drop-outs reported by PortAudio
+        self.cb_errors = dict.fromkeys(keys, 0)   # exceptions inside a callback
+        self._cb_err_base = dict.fromkeys(keys, 0)   # cb_errors when the stream opened
+        self._cb_err_seen = dict.fromkeys(keys, 0)   # cb_errors at the last check_streams
         self.stalls = 0                                       # streams reopened by the watchdog
 
         # live settings (read by audio callbacks; plain attribute writes are atomic)
         self.sound_vol = 1.0      # sounds -> others
         self.mic_vol = 1.0        # mic    -> others
         self.mon_vol = 0.7        # everything -> your headphones
+        self.obs_vol = 1.0        # everything -> the stream output (OBS)
+        self.obs_voice = True     # your mic goes to the stream output too (when sent)
         self.mic_enabled = True   # pass your mic through to the cable
         self.sending = True       # master switch: False sends silence to others
         self.mic_muted = False
@@ -550,16 +562,18 @@ class Engine:
         self.sound_keep_pitch = True  # speed changes leave the pitch alone
         self._spitch: dict[str, LivePitch] = {}
 
-        self.main_stream = self.mon_stream = self.mic_stream = None
-        self.rates = {"main": SR, "mon": SR, "mic": SR}
+        self.main_stream = self.mon_stream = self.mic_stream = self.obs_stream = None
+        self.rates = {"main": SR, "mon": SR, "mic": SR, "obs": SR}
         self.errors: dict[str, str] = {}
 
         # the mic's clock is its own device's: drift tracking switches itself on if it
         # turns out to wander from the output's (see Ring.auto_drift)
         self.ring_main = Ring(auto_drift=True)
         self.ring_mon = Ring(auto_drift=True)
+        self.ring_obs = Ring(auto_drift=True)
         self._rs_main = StreamResampler(SR, SR)
         self._rs_mon = StreamResampler(SR, SR)
+        self._rs_obs = StreamResampler(SR, SR)
 
         # internet radio (Radio tab): decoded by Qt Multimedia on the system clock,
         # which isn't the output devices' clock (up to ~1.5% apart), so these rings
@@ -571,14 +585,17 @@ class Engine:
         self.radio_monitor = True     # radio -> your headphones
         self.ring_rmain = Ring(prefill_s=0.1, max_s=0.6, track_drift=True, grow_to_s=0.3)
         self.ring_rmon = Ring(prefill_s=0.1, max_s=0.6, track_drift=True, grow_to_s=0.3)
+        self.ring_robs = Ring(prefill_s=0.1, max_s=0.6, track_drift=True, grow_to_s=0.3)
         self._rs_rmain = StreamResampler(SR, SR)
         self._rs_rmon = StreamResampler(SR, SR)
+        self._rs_robs = StreamResampler(SR, SR)
         self._radio_heard = 0.0
         self.aux: tuple[AuxSource, ...] = ()   # captured programs (Apps tab), see AuxSource
 
         self.level_main = 0.0
         self.level_mic = 0.0
         self.level_mon = 0.0
+        self.level_obs = 0.0
         self.level_radio = 0.0
         # anything playing — sounds, the radio, captured programs — wherever it goes
         # (to others or only to your headphones), without your mic: the logo's cue
@@ -685,6 +702,19 @@ class Engine:
                 log.warning("can't open headphone output %r: %s", name, e)
                 self.errors["mon"] = str(e)
 
+    def set_obs_device(self, name: str | None):
+        """The stream output: a device OBS captures (None = off)."""
+        self._close("obs_stream")
+        self.errors.pop("obs", None)
+        self.names["obs"] = name
+        self._last_try["obs"] = time.monotonic()
+        if name:
+            try:
+                self.obs_stream = self._open_out("obs", name, self._cb_obs)
+            except Exception as e:  # noqa: BLE001
+                log.warning("can't open stream output %r: %s", name, e)
+                self.errors["obs"] = str(e)
+
     def set_mic_device(self, name: str | None):
         self._close("mic_stream")
         self.errors.pop("mic", None)
@@ -725,6 +755,7 @@ class Engine:
         self.set_mic_device(self.names["mic"])
         self.set_main_device(self.names["main"])
         self.set_mon_device(self.names["mon"])
+        self.set_obs_device(self.names["obs"])
 
     def check_streams(self) -> list[str]:
         """Watchdog (call about once a second from the UI thread).
@@ -738,7 +769,8 @@ class Engine:
         touched = []
         for key, attr, setter in (("main", "main_stream", self.set_main_device),
                                   ("mon", "mon_stream", self.set_mon_device),
-                                  ("mic", "mic_stream", self.set_mic_device)):
+                                  ("mic", "mic_stream", self.set_mic_device),
+                                  ("obs", "obs_stream", self.set_obs_device)):
             n_err = self.cb_errors[key]
             if n_err != self._cb_err_seen[key]:
                 self._cb_err_seen[key] = n_err
@@ -771,6 +803,7 @@ class Engine:
         r = self.rates
         self._rs_main = StreamResampler(r["mic"], r["main"])
         self._rs_mon = StreamResampler(r["mic"], r["mon"])
+        self._rs_obs = StreamResampler(r["mic"], r["obs"])
 
     def _reconfigure_out(self, key: str):
         """Rebuild what feeds output `key` for its (new) rate. Only that output's
@@ -780,6 +813,10 @@ class Engine:
             self._rs_main = StreamResampler(r["mic"], r["main"])
             self._rs_rmain = StreamResampler(SR, r["main"])
             rings = (self.ring_main, self.ring_rmain)
+        elif key == "obs":
+            self._rs_obs = StreamResampler(r["mic"], r["obs"])
+            self._rs_robs = StreamResampler(SR, r["obs"])
+            rings = (self.ring_obs, self.ring_robs)
         else:
             self._rs_mon = StreamResampler(r["mic"], r["mon"])
             self._rs_rmon = StreamResampler(SR, r["mon"])
@@ -794,6 +831,9 @@ class Engine:
         if key == "main":
             rings = [self.ring_main, self.ring_rmain]
             rings += [a.ring_main for a in self.aux]
+        elif key == "obs":
+            rings = [self.ring_obs, self.ring_robs]
+            rings += [a.ring_obs for a in self.aux]
         else:
             rings = [self.ring_mon, self.ring_rmon]
             rings += [a.ring_mon for a in self.aux]
@@ -805,6 +845,7 @@ class Engine:
         self._reconfigure_mic_resamplers()
         self._reconfigure_out("main")
         self._reconfigure_out("mon")
+        self._reconfigure_out("obs")
 
     # ----------------------------------------------------------------- radio input
     def feed_radio(self, x: np.ndarray):
@@ -817,6 +858,8 @@ class Engine:
             self.ring_rmain.write(self._rs_rmain(x))
         if self.mon_stream is not None:
             self.ring_rmon.write(self._rs_rmon(x))
+        if self.obs_stream is not None:
+            self.ring_robs.write(self._rs_robs(x))
 
     def radio_on_air(self) -> bool:
         """True while the radio is audibly going out to others (drives auto push-to-talk)."""
@@ -838,7 +881,8 @@ class Engine:
 
     def feed_aux(self, src: AuxSource, x: np.ndarray):
         """Push a chunk ((n, 2) float32 at SR) of a captured program's audio."""
-        src.feed(x, self.main_stream is not None, self.mon_stream is not None)
+        src.feed(x, self.main_stream is not None, self.mon_stream is not None,
+                 self.obs_stream is not None)
 
     def aux_on_air(self) -> bool:
         """True while any captured program is audibly going out to others."""
@@ -847,7 +891,7 @@ class Engine:
     def _close(self, attr):
         s = getattr(self, attr)
         setattr(self, attr, None)
-        out = {"main_stream": "main", "mon_stream": "mon"}.get(attr)
+        out = {"main_stream": "main", "mon_stream": "mon", "obs_stream": "obs"}.get(attr)
         if out:  # voices can't finish on a device that's gone
             with self.lock:
                 for v in self.voices:
@@ -860,7 +904,7 @@ class Engine:
                 log.debug("closing %s raised", attr, exc_info=True)
 
     def shutdown(self):
-        for a in ("mic_stream", "main_stream", "mon_stream"):
+        for a in ("mic_stream", "main_stream", "mon_stream", "obs_stream"):
             self._close(a)
 
     def active_outputs(self) -> set:
@@ -869,6 +913,8 @@ class Engine:
             outs.add("main")
         if self.mon_stream is not None:
             outs.add("mon")
+        if self.obs_stream is not None:
+            outs.add("obs")
         return outs
 
     # ----------------------------------------------------------------- sample cache
@@ -916,15 +962,16 @@ class Engine:
     def play(self, sid: str, data: np.ndarray, gain: float, loop=False, mode="restart",
              preview=False, src_rate: int = SR, start: float = 0.0,
              fade_in: float = 0.0, fade_out: float = 0.0,
-             only: str | None = None) -> Voice | None:
+             only: str | tuple[str, ...] | None = None) -> Voice | None:
         """mode: 'restart' (stop previous instance), 'overlap', 'toggle' (stop if playing),
         'solo' (stop every other sound, then restart this one).
         fade_in / fade_out (seconds): a rise from silence at the start; a fall to silence
         when it's stopped and, for a one-shot, over its last fade_out seconds.
-        only: 'main' or 'mon' plays on that output alone (the voice chat check)."""
+        only: 'main' or 'mon' plays on that output alone (the voice chat check); a tuple
+        of outputs plays on those ('main', 'obs': others hear it, you don't)."""
         outs = self.active_outputs()
         if only is not None:
-            outs &= {only}
+            outs &= {only} if isinstance(only, str) else set(only)
         if preview:
             # previews are for your ears only; with no headphone device open they must
             # not fall through to the cable (everyone in the call would hear them)
@@ -1260,6 +1307,16 @@ class Engine:
             outdata.fill(0)
             self._guard("mon", e)
 
+    def _cb_obs(self, outdata, frames, t, status):
+        self._last_cb["obs"] = time.monotonic()
+        if is_xrun(status):
+            self.xruns["obs"] += 1
+        try:
+            self._obs(outdata, frames)
+        except Exception as e:  # noqa: BLE001
+            outdata.fill(0)
+            self._guard("obs", e)
+
     def _cb_mic(self, indata, frames, t, status):
         self._last_cb["mic"] = time.monotonic()
         if is_xrun(status):
@@ -1335,6 +1392,31 @@ class Engine:
         outdata[:] = mix
         self.level_mon = max(peak(mix), self.level_mon * 0.85)
 
+    def _obs(self, outdata, frames):
+        """The stream output: what others get (sounds, the live radio and programs,
+        your mic if obs_voice), clean: no voice chat shaping, no mono, its own volume."""
+        mix = self._sounds("obs", frames)
+        mix *= np.float32(self.sound_vol)
+        r = self.ring_robs.read(frames)
+        if r is not None and self.radio_live:
+            mix += r * np.float32(self.radio_vol)
+        for a in self.aux:
+            x = a.ring_obs.read(frames)
+            if x is not None and a.live:
+                mix += x * np.float32(a.vol)
+        mix = self._eq("obs", "sounds", finite(mix))
+        m = self.ring_obs.read(frames)
+        if m is not None and self.obs_voice and self.mic_enabled and not self.mic_muted:
+            mix += self._eq("obs", "voice", self._gated("obs", m) * np.float32(self.mic_vol))
+        if not self.sending:      # muted: the stream gets silence too
+            mix.fill(0)
+        mix *= np.float32(self.obs_vol)
+        if self.limiter_on:
+            mix = self._stage("obs", Limiter).process(mix)
+        soft_limit(mix)
+        outdata[:] = mix
+        self.level_obs = max(peak(mix), self.level_obs * 0.85)
+
     def _send_bus(self, out: str, mix: np.ndarray, m: np.ndarray | None) -> np.ndarray:
         """The sounds bus shaped for voice chat (EQ, destination mode, ducking under
         your voice, phase-aware mono), with the mic block `m` added on top."""
@@ -1385,3 +1467,5 @@ class Engine:
             self.ring_main.write(self._rs_main(x))
         if self.mic_check and self.mon_stream is not None:
             self.ring_mon.write(self._rs_mon(x))
+        if self.obs_voice and self.obs_stream is not None:
+            self.ring_obs.write(self._rs_obs(x))

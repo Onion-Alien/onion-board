@@ -407,7 +407,7 @@ def test_failed_start_closes_the_stream_and_keeps_the_rate(monkeypatch):
     e.set_main_device("busy")
     e.set_mic_device("busy mic")
     assert len(made) == 2 and all(s.closed for s in made)     # nothing leaked
-    assert e.rates == {"main": SR, "mon": SR, "mic": SR}
+    assert e.rates == {"main": SR, "mon": SR, "mic": SR, "obs": SR}
     assert "device busy" in e.errors["main"] and "device busy" in e.errors["mic"]
     assert e.main_stream is None and e.mic_stream is None
 

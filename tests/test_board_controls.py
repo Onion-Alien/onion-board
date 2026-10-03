@@ -185,7 +185,7 @@ def test_only_them_skips_my_headphones(window, calls):
     w.meta("s0").only_them = True
     w.play("s0")
     w.play("s1")
-    assert calls[0][1]["only"] == "main" and calls[1][1]["only"] is None
+    assert calls[0][1]["only"] == ("main", "obs") and calls[1][1]["only"] is None
 
 
 def test_new_sound_options_survive_a_save_and_a_backup(app_dir, tmp_path):

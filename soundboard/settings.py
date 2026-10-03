@@ -586,6 +586,7 @@ class SettingsDialog(QDialog):
         send.toggled.connect(self.mw.chk_mic.setChecked)   # the window applies it
         cv.addWidget(send)
         v.addWidget(card)
+        v.addWidget(self._stream_card())
         card, cv = self._card("Who's listening",
                               "Voice chat runs your sounds through a mono voice codec that drops "
                               "the sub-bass and, in some games, everything above 8-12 kHz. Pick "
@@ -616,6 +617,46 @@ class SettingsDialog(QDialog):
         v.addWidget(card)
         v.addStretch(1)
         return w
+
+    def _stream_card(self):
+        """The stream output: sounds (and your voice) on a device of their own for OBS."""
+        from soundboard import engine as eng
+        from soundboard.ui.panel import VolumeControl
+        mw = self.mw
+        c = mw.cfg
+        card, cv = self._card(
+            "Stream output (OBS)",
+            "Streaming? Send what others hear, clean (no voice chat shaping), to a device "
+            "of its own, and add it to OBS as its own audio track: your sounds, screen "
+            "triggers, live radio and programs, and your voice if you like. In OBS: "
+            "Sources → + → Audio Output Capture → pick the same device. A second virtual "
+            "cable (free: VB-Cable A+B from vb-audio.com) is ideal; then use Audio Input "
+            "Capture → its Output end. Any output you don't listen on works too.")
+        cb = QComboBox()
+        no_wheel(cb)
+        cb.addItem("Off", None)
+        for d in eng.list_devices("output"):
+            if d["name"] not in (c.main_device, c.mon_device):   # those already have a job
+                cb.addItem(d["name"], d["name"])
+        i = cb.findData(c.obs_device) if c.obs_device else 0
+        cb.setCurrentIndex(max(i, 0))
+        cb.activated.connect(lambda i: mw.set_obs_device(cb.itemData(i)))
+        row = QHBoxLayout()
+        row.addWidget(QLabel("Send to"))
+        row.addWidget(cb, 1)
+        cv.addLayout(row)
+        row = QHBoxLayout()
+        row.addWidget(QLabel("Volume"))
+        vol = VolumeControl(c.obs_vol, tip="How loud the stream output is (only OBS hears it)")
+        vol.changed.connect(lambda x: mw.set_option("obs_vol", x))
+        row.addWidget(vol, 1)
+        cv.addLayout(row)
+        voice = QCheckBox("Include my voice (with the voice changer, when it's on)")
+        voice.setToolTip("Untick if OBS already records your mic on its own")
+        voice.setChecked(c.obs_voice)
+        voice.toggled.connect(lambda b: mw.set_option("obs_voice", b))
+        cv.addWidget(voice)
+        return card
 
     def _devices_card(self):
         """Input / output pickers: the Setup tab's Devices combos, mirrored here so

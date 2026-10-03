@@ -181,6 +181,12 @@ too (say No if another program, like Voicemeeter, uses it).
   pad. Pads with effects show **FX**; *Reset* goes back to the original. The
   original file is never changed.
 - **Your mic on or off:** send your voice with the sounds, or sounds only.
+- **Stream output for OBS** (Settings → Audio → *Stream output*): what others hear,
+  without the voice chat shaping, on a device of its own (a second virtual cable such
+  as VB-Cable A+B, or any output you don't listen on). In OBS add it as an *Audio
+  Output Capture* (or, for a cable, *Audio Input Capture* of its Output end) and your
+  sounds and screen triggers are their own track, with their own volume. Your voice
+  goes with them unless you untick it.
 - **Transport bar:** play/pause, stop, a seek slider, and **speed & pitch while
   it plays** (the `1x` button: 0.25×–2×, ±12 semitones, keep the pitch or not).
   That's for listening and isn't saved; use Effects to keep a version.
@@ -431,7 +437,7 @@ the launcher the shortcuts and PyInstaller use. The app is the `soundboard` pack
 | `soundboard/ui/triggerstab.py` | the Triggers tab: Hoot (`ui/owl.py`) and *Get Onion Watch* until the add-on is installed, then the add-on's own tab, with a bar when an update is out and a button to remove it |
 | `soundboard/ui/triggershost.py` | Onion Board as the Onion Watch add-on's host: the board's sounds and playing them (a ringing trigger loops in the headphones), `Config.screen`, the trigger pictures' folder, the theme's colours |
 | `soundboard/ui/appspanel.py` | the Apps tab: one row per program (level, **Send**, volume, *Hear it myself*); programs you switch on are remembered by .exe and picked up again when they run |
-| `soundboard/engine.py` | real-time audio: 3 WASAPI streams (mic in, cable out, headphones out), mixing (sounds, radio and captured programs), pause/seek, live speed / pitch, limiter, watchdog |
+| `soundboard/engine.py` | real-time audio: WASAPI streams (mic in, cable out, headphones out, the optional stream output for OBS), mixing (sounds, radio and captured programs), pause/seek, live speed / pitch, limiter, watchdog |
 | `soundboard/eq.py` | 7-band biquad equalizer and presets |
 | `soundboard/radio.py` | Radio tab back end: the Radio Browser directory client (stations, search, a day's cache), the stream player (Qt Multimedia decodes, a `QAudioBufferOutput` hands 48 kHz PCM to the engine) and the globe page (globe.gl, pinned with SRI) |
 | `soundboard/ui/radiopanel.py` | the Radio tab: search bar, 3D globe (click a dot to play), station list, favourites, LIVE / record / last 15 s |

@@ -96,7 +96,8 @@ PAD_WIDTH_RANGE = (110, 240)  # the Sounds tab's pad-size slider
 # settings shown on a control with a fixed range: a value from a hand-edited config or
 # someone's backup is brought into it (Qt raises OverflowError on one past an int)
 SETTING_RANGES = {"sound_vol": (0.0, VOLUME_MAX), "mic_vol": (0.0, VOLUME_MAX),
-                  "mon_vol": (0.0, VOLUME_MAX), "pad_width": PAD_WIDTH_RANGE,
+                  "mon_vol": (0.0, VOLUME_MAX), "obs_vol": (0.0, VOLUME_MAX),
+                  "pad_width": PAD_WIDTH_RANGE,
                   "duck_db": (-24.0, 0.0), "replay_seconds": (5, 120)}
 
 
@@ -213,6 +214,11 @@ class Config:
     main_device: str | None = None
     mon_device: str | None = None
     mic_device: str | None = None
+    # the stream output: a device OBS captures, getting what others hear without the
+    # voice chat shaping (None = off; engine.Engine._obs)
+    obs_device: str | None = None
+    obs_vol: float = 1.0
+    obs_voice: bool = True            # your mic goes to the stream output too
     sound_vol: float = 1.0
     mic_vol: float = 1.0
     mon_vol: float = 0.7

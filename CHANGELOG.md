@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+- **Stream output for OBS** (Settings → Audio): send what others hear to a device of
+  its own and add it to OBS as its own audio track — your sounds, screen triggers,
+  live radio and programs, and your voice (with the voice changer) if you like. It's
+  clean: no voice chat shaping, still stereo, with its own volume. A second virtual
+  cable (VB-Cable A+B) or any output you don't listen on works. Sounds set to *Only
+  others hear it* go to the stream too.
 - **One key, a random sound from the category you're on.** The new *Next category*
   / *Previous category* hotkeys switch the category in-game, with a beep for each
   step along (one for the first, two for the second…; a low one for All). The
@@ -19,6 +25,8 @@
   headphones), *Wait first* (up to 10 s between the press and the sound) and
   *Cooldown* (presses are ignored for up to 60 s, so nobody can spam it).
 - **One click plays a pad**, if you'd rather (Settings → General). Off by default.
+- **Triggers tab: a sound clicked on a trigger card plays to you alone** (not into
+  the call), and stops when it's taken off the card or the trigger is deleted.
 - **Onion Watch 0.5.4** (Triggers tab, offered there as an update): alarms stop by
   themselves when you're back (the game moves, you alt-tab back, it's gone, you touch
   the mouse or keys, or only on Stop), and characters and creatures cut out of a
