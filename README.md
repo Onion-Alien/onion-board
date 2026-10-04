@@ -421,7 +421,8 @@ the launcher the shortcuts and PyInstaller use. The app is the `soundboard` pack
 | `soundboard/remote.py` | opt-in local control API for Stream Deck / scripts: HTTP on `127.0.0.1`, token-guarded, answered on the UI thread; also writes the AI setup prompt |
 | `soundboard/ui/linkbar.py` | the Sounds tab's link bar: a link pasted into *Search sounds* is looked up with yt-dlp, then added as a sound or played once |
 | `soundboard/ui/ytsearch.py` | the Sounds tab's web search: Enter in *Search sounds* shows YouTube or SoundCloud hits as a grid of cards (thumbnail, title, length) in place of the pads; *Play* / *Add* hand one to the link bar |
-| `soundboard/ui/speedpitch.py` | the live speed & pitch button and its popup (Sounds transport) |
+| `soundboard/ui/speedpitch.py` | the live speed & pitch button and its popup (Sounds transport), with the live effects column |
+| `soundboard/livefx.py` | live effects on every playing sound (the speed & pitch popup): bass, treble, muffle, reverb, echo, distortion and presets; not saved |
 | `soundboard/soundfx.py` | per-sound effects: trim, speed / pitch (phase vocoder + soxr), EQ, boost, reverse and any voice effect, rendered off the audio thread; the presets |
 | `soundboard/ui/trim.py` | the Effects tab's trim control: waveform with start / end handles and exact-time boxes |
 | `soundboard/backup.py` | export / import of the board as a plain zip (JSON + original audio + pictures), sound packs and single sounds; see `docs/BACKUP-FORMAT.md` |

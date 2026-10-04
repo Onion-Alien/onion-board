@@ -1,6 +1,9 @@
-"""Live speed / pitch control: a small button on a transport bar ("1x") that opens a
-popup with the sliders. It changes what's playing right now and isn't saved; to
+"""Live speed / pitch / effects: a small button on a transport bar ("1x") that opens
+a popup with the sliders. It changes what's playing right now and isn't saved; to
 keep a version of a sound, use its Edit → Effects tab instead.
+
+Two columns: speed & pitch on the left, the live effects (soundboard.livefx: bass,
+treble, muffle, reverb, echo, distortion, and presets that set several) on the right.
 
 The sane range (0.25–2x, ±12 st) is always there. The greyed-out **Redline**
 section under it unlocks the silly range (up to 10x, ±36 st) and shows a rev
@@ -11,12 +14,12 @@ import math
 
 from PySide6.QtCore import QPoint, QPointF, QRectF, Qt, Signal
 from PySide6.QtGui import QColor, QFont, QPainter, QPen
-from PySide6.QtWidgets import (QCheckBox, QFrame, QHBoxLayout, QLabel, QPushButton, QVBoxLayout,
-                               QWidget)
+from PySide6.QtWidgets import (QCheckBox, QFrame, QGridLayout, QHBoxLayout, QLabel, QPushButton,
+                               QVBoxLayout, QWidget)
 
-from soundboard import theme, voicefx
+from soundboard import livefx, theme, voicefx
 from soundboard.ui import icons
-from soundboard.ui.panel import hint_label
+from soundboard.ui.panel import hint_label, section_label
 from soundboard.ui.voicepanel import ParamSlider
 
 SPEED = voicefx.Param("speed", "Speed", 0.25, 2.0, 1.0, "x", 0.05)
@@ -28,6 +31,8 @@ REDLINE_PITCH = voicefx.Param("pitch", "Pitch", -36, 36, 0, " st", 1)
 REDLINE_QUICK = (3.0, 4.0, 6.0, 8.0, 10.0)
 RED = "#ff4d4f"
 NAME_W, VAL_W, GAP = 48, 52, 10         # popup slider columns: name | track | value
+FX_NAME_W = 70                          # the effects column: longer names
+COL_W = 340                             # each column
 
 
 def redline_speed(lo: float, hi: float) -> voicefx.Param:
@@ -111,8 +116,10 @@ class RevMeter(QWidget):
 
 
 class SpeedPitchButton(QPushButton):
-    """`changed(speed, semitones, keep_pitch)` fires on every edit."""
+    """`changed(speed, semitones, keep_pitch)` fires on every speed / pitch edit,
+    `fx_changed(amounts)` on every effects edit (livefx.clean: only knobs off 0)."""
     changed = Signal(float, float, bool)
+    fx_changed = Signal(dict)
 
     def __init__(self, what: str = "sounds", hint: str = "",
                  redline: tuple[float, float] = REDLINE_SPEED):
@@ -120,7 +127,7 @@ class SpeedPitchButton(QPushButton):
         super().__init__()
         self.setObjectName("small")
         self.setProperty("speedpitch", True)
-        self.setToolTip(f"Speed and pitch of the {what} playing now")
+        self.setToolTip(f"Speed, pitch and effects of the {what} playing now")
         self.setCursor(Qt.PointingHandCursor)
         self._speed_hi = redline_speed(*redline)
         redline = redline[1]
@@ -134,13 +141,13 @@ class SpeedPitchButton(QPushButton):
         # header: title on the left, Reset where it's easy to find
         head = QHBoxLayout()
         head.setSpacing(8)
-        title = QLabel("Speed & pitch")
+        title = QLabel("Live controls")
         title.setStyleSheet("font-weight:700; font-size:10.5pt;")
-        sub = QLabel(what.capitalize())
+        sub = QLabel(f"All {what}")
         sub.setObjectName("muted")
-        reset = QPushButton("Reset")
+        reset = QPushButton("Reset all")
         reset.setObjectName("small")
-        reset.setToolTip("Back to 1x and no pitch change")
+        reset.setToolTip("Back to 1x, no pitch change and no effects")
         reset.setCursor(Qt.PointingHandCursor)
         reset.clicked.connect(self.reset)
         head.addWidget(title)
@@ -150,6 +157,26 @@ class SpeedPitchButton(QPushButton):
         v.addLayout(head)
         v.addWidget(self._rule())
 
+        cols = QHBoxLayout()
+        cols.setSpacing(16)
+        left_w, right_w = QWidget(), QWidget()
+        for w in (left_w, right_w):
+            w.setObjectName("spcol")    # sits on the popup, no box of its own
+            w.setStyleSheet("QWidget#spcol { background:transparent; }")
+            w.setFixedWidth(COL_W)
+        cols.addWidget(left_w, 0, Qt.AlignTop)
+        divider = QFrame()
+        divider.setObjectName("vsep")
+        divider.setFixedWidth(1)
+        cols.addWidget(divider)
+        cols.addWidget(right_w, 0, Qt.AlignTop)
+        v.addLayout(cols)
+        self._effects(right_w)
+
+        outer, v = v, QVBoxLayout(left_w)     # the speed & pitch column
+        v.setContentsMargins(0, 0, 0, 0)
+        v.setSpacing(8)
+        v.addWidget(section_label("SPEED & PITCH"))
         self.speed = self._slider(SPEED, 1.0)
         self.pitch = self._slider(PITCH, 0.0)
         v.addWidget(self.speed)
@@ -198,11 +225,11 @@ class SpeedPitchButton(QPushButton):
         self.red_box.hide()
         v.addWidget(self.red_box)
 
+        v = outer
         if hint:
             v.addSpacing(2)
             v.addWidget(self._rule())
             v.addWidget(hint_label(hint))
-        self.pop.setFixedWidth(400)
 
         self.speed.changed.connect(self._edited)
         self.pitch.changed.connect(self._edited)
@@ -210,15 +237,43 @@ class SpeedPitchButton(QPushButton):
         self.clicked.connect(self._open)
         self._label()
 
+    def _effects(self, box: QWidget):
+        """The right column: one slider per live effect, then presets that set them."""
+        v = QVBoxLayout(box)
+        v.setContentsMargins(0, 0, 0, 0)
+        v.setSpacing(8)
+        v.addWidget(section_label("EFFECTS"))
+        self.fx = {}
+        for q in livefx.PARAMS:
+            s = self._slider(q, q.default, FX_NAME_W)
+            s.changed.connect(self._fx_edited)
+            self.fx[q.key] = s
+            v.addWidget(s)
+        grid = QGridLayout()
+        grid.setContentsMargins(0, 4, 0, 0)
+        grid.setHorizontalSpacing(4)
+        grid.setVerticalSpacing(4)
+        self.fx_presets = {}
+        for i, (name, amounts) in enumerate(livefx.PRESETS.items()):
+            b = QPushButton(name)
+            b.setObjectName("small")
+            b.setCheckable(True)
+            b.setCursor(Qt.PointingHandCursor)
+            b.setToolTip("Click again to turn it off")
+            b.clicked.connect(lambda on, a=amounts: self.set_fx(a if on else {}))
+            self.fx_presets[name] = b
+            grid.addWidget(b, i // 3, i % 3)
+        v.addLayout(grid)
+
     @staticmethod
-    def _slider(q: voicefx.Param, value: float) -> ParamSlider:
+    def _slider(q: voicefx.Param, value: float, name_w: int = NAME_W) -> ParamSlider:
         """A ParamSlider laid out for the popup: no effect-row indent, a fixed name
         column so both sliders (and the quick buttons) line up, a readable value."""
         s = ParamSlider(q, value)
         h = s.layout()
         h.setContentsMargins(0, 0, 0, 0)
         h.setSpacing(GAP)
-        h.itemAt(0).widget().setFixedWidth(NAME_W)
+        h.itemAt(0).widget().setFixedWidth(name_w)
         s.val.setObjectName("")
         s.val.setFixedWidth(VAL_W)
         return s
@@ -277,6 +332,23 @@ class SpeedPitchButton(QPushButton):
 
     def reset(self):
         self.set_values(1.0, 0.0, self.keep.isChecked())
+        self.set_fx({})
+
+    def fx_values(self) -> dict[str, float]:
+        return livefx.clean({k: s.value() for k, s in self.fx.items()})
+
+    def set_fx(self, amounts: dict):
+        """Set every effect knob (missing ones go to 0)."""
+        for k, s in self.fx.items():
+            s.set_value(amounts.get(k, 0.0))
+        self._fx_edited()
+
+    def _fx_edited(self):
+        now = self.fx_values()
+        for name, b in self.fx_presets.items():   # lit while the knobs match it
+            b.setChecked(now == livefx.clean(livefx.PRESETS[name]))
+        self._label()
+        self.fx_changed.emit(now)
 
     def _open(self):
         self.pop.adjustSize()
@@ -298,10 +370,13 @@ class SpeedPitchButton(QPushButton):
         txt = f"{s:g}x"
         if abs(p) >= 1e-3:
             txt += f" {p:+g}"
+        fx = bool(self.fx_values())
+        if fx:
+            txt += " · FX"
         self.setText(txt)
         hot = s > REDLINE_AT + 1e-6 or abs(p) > PITCH.hi
         # scoped to this button: unscoped, it would cascade into the popup (a child)
-        self.setStyleSheet("" if self.is_default() else
+        self.setStyleSheet("" if self.is_default() and not fx else
                            f"QPushButton[speedpitch=\"true\"] {{ font-weight:700; "
                            f"color:{RED if hot else theme.status('warn')}; }}")
 

@@ -21,7 +21,8 @@ Live speed / pitch (the ⏩ controls): sounds play at `sound_speed` by reading
 their data at a fractional rate (like a tape), and a pitch shifter on the sounds
 bus corrects the pitch back (`sound_keep_pitch`) and adds `sound_pitch`. The
 app's own playback (test recording, cue beeps, the setup tune, previews) is
-`fixed`: played at speed 1 and mixed in after the pitch shifter.
+`fixed`: played at speed 1 and mixed in after the pitch shifter. The live
+effects (`sound_fx`: bass, reverb, echo… soundboard.livefx) come after the pitch.
 Per-sound effects are baked in ahead of time instead (soundboard.soundfx).
 """
 from __future__ import annotations
@@ -36,7 +37,7 @@ import numpy as np
 import sounddevice as sd
 import soxr
 
-from soundboard import destination
+from soundboard import destination, livefx
 from soundboard.eq import EQ
 from soundboard.sendfx import Ducker, Limiter, SmartMono
 from soundboard.voicefx.builtin import PitchShift
@@ -582,7 +583,9 @@ class Engine:
         self.sound_speed = 1.0        # live playback speed of every sound (0.25..4)
         self.sound_pitch = 0.0        # live pitch of every sound, semitones
         self.sound_keep_pitch = True  # speed changes leave the pitch alone
+        self.sound_fx: dict = {}      # live effects on every sound (livefx), {} = none
         self._spitch: dict[str, LivePitch] = {}
+        self._sfx: dict[str, livefx.LiveFx] = {}
 
         self.main_stream = self.mon_stream = self.mic_stream = self.obs_stream = None
         self.rates = {"main": SR, "mon": SR, "mic": SR, "obs": SR}
@@ -1252,7 +1255,7 @@ class Engine:
     def _sounds(self, out: str, frames: int, previews_only=False) -> np.ndarray:
         """The sounds bus: sounds at the live speed through the live pitch, plus the
         app's own playback (fixed voices) as it is."""
-        mix = self._pitch(out, self._render(out, frames, previews_only))
+        mix = self._fx(out, self._pitch(out, self._render(out, frames, previews_only)))
         if any(v.fixed for v in self.voices):
             mix += self._render(out, frames, previews_only, fixed=True)
         return mix
@@ -1267,6 +1270,20 @@ class Engine:
         if f is None or f.rate != self.rates[out]:   # made at 0 st too: it needs the history
             f = self._spitch[out] = LivePitch(self.rates[out])
         return f.process(x, st)   # at 0 st it only keeps its history fresh
+
+    def _fx(self, out: str, x: np.ndarray) -> np.ndarray:
+        """Live effects on the sounds bus (livefx). Made when a knob comes off 0 and
+        dropped once they're all back at 0 and the last change has faded out."""
+        fx = self.sound_fx
+        f = self._sfx.get(out)
+        if f is None or f.rate != self.rates[out]:
+            if not fx:
+                return x
+            f = self._sfx[out] = livefx.LiveFx(self.rates[out])
+        y = f.process(x, fx)
+        if not fx and f.idle:
+            self._sfx.pop(out, None)
+        return y
 
     def _eq(self, out: str, part: str, x: np.ndarray) -> np.ndarray:
         """Run x through the EQ if it's on and aimed at `part` ('sounds' / 'voice')."""

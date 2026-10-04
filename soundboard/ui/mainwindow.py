@@ -791,6 +791,7 @@ class MainWindow(QMainWindow):
             "sounds", "Changes every sound while it plays. To save a version, "
                       "right-click a pad → Effects.")
         self.speed_btn.changed.connect(self.on_live_speed)
+        self.speed_btn.fx_changed.connect(lambda fx: setattr(self.engine, "sound_fx", fx))
         th.addWidget(self.speed_btn)
         sep = vsep()
         th.addWidget(sep)
