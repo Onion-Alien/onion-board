@@ -124,7 +124,7 @@ class NativeSplash:
         self._up = threading.Event()
         self.ok = False   # the window came up and showed its first frame
         self._switch = sys.getswitchinterval()
-        sys.setswitchinterval(SWITCH_S)
+        sys.setswitchinterval(min(SWITCH_S, self._switch))   # never coarser than the app's
         self._thread = threading.Thread(target=self._run, name="splash", daemon=True)
         self._thread.start()
         self._up.wait(1.0)   # the first frame is on screen (or it gave up)

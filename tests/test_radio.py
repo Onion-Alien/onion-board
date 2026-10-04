@@ -1017,3 +1017,28 @@ def test_the_dice_plays_another_listed_station(tab, monkeypatch):
     for _ in range(5):
         tab.btn_random.click()
     assert played and all(s.uuid in listed for s in played)
+
+
+def test_loads_gently_reads_what_json_loads_reads():
+    """The directory's answers are decoded an element at a time (one json.loads of
+    the station list held the GIL long enough to stutter the audio)."""
+    from soundboard.radio import loads_gently
+    big = json.dumps([api_station(i) for i in range(50)])
+    for text in (big, "[]", "{}", ' [1, 2 ,3] ', '{"a": [1, {"b": [2]}], "c": "x"}',
+                 '"s"', "3.5", "null", '[{"k": [1,2]}, [], {}]', '{"time": 1.0, "stations": []}'):
+        assert loads_gently(text) == json.loads(text)
+        assert loads_gently(text.encode()) == json.loads(text)
+    for bad in ("[1,]", "[1 2]", '{"a" 1}', "[1] x", "", '{"a": 1,}', "<html>", "{1: 2}"):
+        with pytest.raises(ValueError):
+            loads_gently(bad)
+
+
+def test_saved_station_list_is_still_plain_json(tmp_path):
+    """Written a station at a time, but the same file: older versions read it too."""
+    d = RadioDirectory(tmp_path)
+    stations = [Station.from_api(api_station(i)) for i in range(3)]
+    d._write_cache(stations)
+    raw = json.loads(d.cache_path.read_text(encoding="utf-8"))
+    assert [s["uuid"] for s in raw["stations"]] == [s.uuid for s in stations]
+    assert abs(raw["time"] - time.time()) < 60
+    assert [s.uuid for s in d._read_cache()[1]] == [s.uuid for s in stations]
