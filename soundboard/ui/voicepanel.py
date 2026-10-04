@@ -31,6 +31,7 @@ from soundboard.ui.panel import (VolumeControl, bar, card, hint_label, icon_labe
 from soundboard.ui.responsive import FitWidth
 from soundboard.ui.widgets import Meter
 from soundboard.wheelguard import no_wheel
+from soundboard import errors
 
 CUSTOM = "Custom"
 LIVE_MODULE = "live-voice"
@@ -854,7 +855,7 @@ class SpeechPanel(QWidget):
                                 f"{len(custom)} custom voice(s) loaded." if custom else "")
         self.lbl_custom.setVisible(bool(self.lbl_custom.text()))
         if error:
-            self._tts_error(f"Text-to-speech isn't available: {error}")
+            self._tts_error(f"Text-to-speech isn't available: {errors.plain(error)}")
 
     def show_custom_voices(self):
         """Open More options and bring its Custom voices part into view."""
@@ -911,7 +912,7 @@ class SpeechPanel(QWidget):
                 customvoices.save_server(name, url, ed_voice.text().strip(),
                                          ed_model.text().strip(), ed_key.text().strip())
             except OSError as e:
-                err.setText(f"Couldn't save it in the voices folder: {e}")
+                err.setText(f"Couldn't save it in the voices folder: {errors.plain(e)}")
                 err.show()
                 return
             self.s["voice"] = customvoices.PREFIX + name   # pick it once it's loaded
@@ -1050,10 +1051,10 @@ class SpeechPanel(QWidget):
             except winvoices.Cancelled:
                 self._voice_done.emit("cancelled", "")
             except RuntimeError as e:
-                self._voice_done.emit("", str(e))
+                self._voice_done.emit("", errors.plain(e))
             except Exception as e:  # noqa: BLE001 - the button must come back
                 applog.report(where="windows voice install")
-                self._voice_done.emit("", str(e) or type(e).__name__)
+                self._voice_done.emit("", errors.plain(e))
 
         threading.Thread(target=work, name="voice-install", daemon=True).start()
 
@@ -1061,7 +1062,8 @@ class SpeechPanel(QWidget):
         m, self._voice_installing = self._voice_installing, None
         name = (m.language_name or m.language) if m is not None else "the"
         if err:
-            self._voice_note = (f"\u26a0 Couldn't install the {name} voice: {err}. Press "
+            self._voice_note = (f"\u26a0 Couldn't install the {name} voice: "
+                                f"{errors.plain(err)}. Press "
                                 "Install to try again, or add it in Windows settings.")
         elif result == "cancelled":
             self._voice_note = (f"Windows' permission prompt was closed, so the {name} "
@@ -1143,10 +1145,10 @@ class SpeechPanel(QWidget):
             except translation.Cancelled:
                 self._dl_done.emit("cancelled")
             except RuntimeError as e:
-                self._dl_done.emit(str(e))
+                self._dl_done.emit(errors.plain(e))
             except Exception as e:  # noqa: BLE001 - the UI must never stay on "Downloading…"
                 applog.report(where="translation download")
-                self._dl_done.emit(str(e) or type(e).__name__)
+                self._dl_done.emit(errors.plain(e))
 
         threading.Thread(target=work, name="translation-download", daemon=True).start()
 
@@ -1170,7 +1172,8 @@ class SpeechPanel(QWidget):
         self._fill_langs()
         if err and m is not None:
             self.lbl_tr.setText("Download cancelled." if err == "cancelled"
-                                else f"\u26a0 {m.language_name}: {err}. Check your internet "
+                                else f"\u26a0 {m.language_name}: {errors.plain(err)}. "
+                                     "Check your internet "
                                      "connection and press Download again.")
         self.downloaded.emit()
 
@@ -1234,7 +1237,7 @@ class SpeechPanel(QWidget):
                 self._install_done.emit(ok, "")
             except Exception as e:  # noqa: BLE001 - the buttons must come back
                 applog.report(where="module install")
-                self._install_done.emit(False, str(e) or type(e).__name__)
+                self._install_done.emit(False, errors.plain(e))
 
         threading.Thread(target=work, name="module-install", daemon=True).start()
 
@@ -1272,7 +1275,7 @@ class SpeechPanel(QWidget):
             try:
                 self.ctl.start_live(self.module, args)
             except RuntimeError as e:
-                self._set_live_ui(False, f"⚠ {e}")
+                self._set_live_ui(False, f"⚠ {errors.plain(e)}")
                 return
             self._set_live_ui(True, "starting…")
         elif not on and self.ctl.live:
