@@ -197,6 +197,7 @@ class Overlay:
         self.page = 0
         self.is_open = False
         self.blind = False            # open without a window (exclusive fullscreen)
+        self.by_click = False         # opened from Settings: no key is held, acts like toggle
         self.flash: tuple[int, float] | None = None   # (tile, until) just picked
         self._window: OverlayWindow | None = None
         self._hold_vk: int | None = None
@@ -292,18 +293,31 @@ class Overlay:
         self.handle(self.PREFIX + what)
 
     # ------------------------------------------------------------------ open / close
+    @property
+    def toggling(self) -> bool:
+        """Open until closed (tap again, Esc, auto-hide), not until a key is let go."""
+        return self.s.mode == "toggle" or self.by_click
+
     def trigger(self):
         if not self.is_open:
             self.open()
-        elif self.s.mode == "toggle":
+        elif self.toggling:
             self.close()
         # hold mode: letting go closes it, a repeat press does nothing
 
-    def open(self):
+    def open_by_click(self):
+        """The Open overlay button: the same as the hotkey, minus the key to hold."""
+        if self.is_open:
+            self.close()
+        else:
+            self.open(by_click=True)
+
+    def open(self, by_click: bool = False):
         if self.is_open:
             return
         self._preview_end.stop()
         self.is_open = True
+        self.by_click = by_click
         self.flash = None
         self.blind = winkeys.exclusive_fullscreen()
         self.host.register_hotkeys()      # claims layer()
@@ -317,7 +331,7 @@ class Overlay:
             log.info("overlay opened at %s on %s", self.window.geometry().getRect(),
                      self.window.screen().name() if self.window.screen() else "?")
         self._hold_vk = None
-        if self.s.mode == "hold":
+        if not self.toggling:
             parsed = winkeys.parse(self.host.cfg.overlay_hotkey or "")
             if parsed:
                 self._hold_vk = parsed[1]
@@ -342,7 +356,7 @@ class Overlay:
 
     def _touch(self):
         """Something happened: push the auto-hide back."""
-        if self.is_open and self.s.mode == "toggle" and self.s.autohide \
+        if self.is_open and self.toggling and self.s.autohide \
                 and not self._close_soon.isActive():
             self._autohide.start(self.s.autohide * 1000)
 
@@ -356,7 +370,7 @@ class Overlay:
         self.flash = (tile, time.monotonic() + FLASH_S)
         if self._window is not None:
             self._window.update()
-        if self.s.mode == "toggle" and self.s.close_after_play:
+        if self.toggling and self.s.close_after_play:
             self._autohide.stop()
             self._close_soon.start(CLOSE_DELAY_MS)
         else:
