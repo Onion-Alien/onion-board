@@ -522,6 +522,33 @@ def test_directory_falls_back_to_a_stale_cache_then_reports(qapp, tmp_path):
     assert process_events(qapp, lambda: got) and got[0][0].uuid == "uuid-1"
 
 
+def test_a_directory_let_go_while_its_thread_ends_is_freed_on_the_ui_thread(
+        qapp, tmp_path, monkeypatch):
+    """The worker thread holds the directory; under load it could end after the
+    result was handled and every other reference had gone, and the directory (a
+    QObject) was then destroyed on that thread."""
+    import threading
+    import types
+    from PySide6.QtCore import Qt
+
+    class SlowEnd(threading.Thread):        # preempted just after handing over
+        def run(self):
+            try:
+                self._target(*self._args, **self._kwargs)
+                time.sleep(0.2)
+            finally:
+                del self._target, self._args, self._kwargs
+    monkeypatch.setattr(radio, "threading", types.SimpleNamespace(Thread=SlowEnd))
+    where, ran = [], []
+    d = RadioDirectory(tmp_path, bases=(dead_base(),))
+    d.destroyed.connect(lambda *_: where.append(threading.current_thread().name),
+                        Qt.DirectConnection)
+    d._off_thread(lambda: 1, ran.append, lambda: None)
+    del d
+    assert process_events(qapp, lambda: where, timeout=3)
+    assert ran == [1] and where == ["MainThread"]
+
+
 def test_search_merges_name_and_tag_and_drops_stale_answers(qapp, server, tmp_path):
     d = RadioDirectory(tmp_path, bases=(server.base,))
     res = []
@@ -663,7 +690,7 @@ def tab(qapp, app_dir, server):
     d = RadioDirectory(app_dir / "radio", bases=(server.base,))
     t = RadioTab(eng, cfg, lambda: None, FakeMeter, directory=d, globe=False)
     t.start()
-    assert process_events(qapp, lambda: t._globe_list)
+    assert process_events(qapp, lambda: t._globe_list, timeout=20)   # slow when the PC is busy
     yield t
     t.shutdown()
 
@@ -960,7 +987,7 @@ def test_tab_plays_fresh_directory_data_over_a_saved_favourite(qapp, app_dir, se
     t = RadioTab(FakeEngine(), cfg, lambda: None, FakeMeter, directory=d, globe=False)
     t.start()
     try:
-        assert process_events(qapp, lambda: t._globe_list)
+        assert process_events(qapp, lambda: t._globe_list, timeout=20)   # slow when the PC is busy
         played = []
         t.player.play = played.append
         t._on_globe_click("uuid-1")

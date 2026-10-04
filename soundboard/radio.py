@@ -455,6 +455,29 @@ def _refused(url: str) -> str:
     return why
 
 
+_kept: list[tuple[threading.Thread, QObject]] = []   # UI thread only (see _start_for)
+
+
+def _start_for(owner: QObject, target, name: str):
+    """Run `target` on a thread that works for `owner`. The thread holds `owner`
+    (through `target`), and a QObject must be destroyed on the UI thread: if every
+    other reference went while the thread was finishing (a closed tab, under load),
+    the thread's was the last one and `owner` was destroyed there, network manager
+    and all. So `owner` is also held here until the thread has ended, and let go of
+    on the UI thread."""
+    t = threading.Thread(target=target, daemon=True, name=name)
+    t.start()
+    if not _kept:
+        QTimer.singleShot(100, _let_go)
+    _kept.append((t, owner))
+
+
+def _let_go():
+    _kept[:] = [(t, o) for t, o in _kept if t.is_alive()]
+    if _kept:
+        QTimer.singleShot(100, _let_go)
+
+
 class RadioDirectory(QObject):
     """Talks to Radio Browser. Every call answers with a signal on the UI thread."""
     globe_ready = Signal(list)          # [Station] with a location, most listened first
@@ -493,7 +516,7 @@ class RadioDirectory(QObject):
                 self._call.emit(after)
             except RuntimeError:   # the Radio tab was closed meanwhile
                 pass
-        threading.Thread(target=run, daemon=True, name="radio-directory").start()
+        _start_for(self, run, "radio-directory")
 
     @property
     def cache_path(self):
@@ -783,8 +806,8 @@ class RadioPlayer(QObject):
         except ValueError:   # a name: where it leads is looked up first, off the UI thread
             self._set_state("connecting")
             gen = self._gen
-            threading.Thread(target=lambda: self._looked_up.emit(gen, _name_is_local(host)),
-                             daemon=True, name="radio-lookup").start()
+            _start_for(self, lambda: self._looked_up.emit(gen, _name_is_local(host)),
+                       "radio-lookup")
             return
         self._open()
 
