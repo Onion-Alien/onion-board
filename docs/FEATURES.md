@@ -180,7 +180,8 @@ The full list. The [README](../README.md) has the short version and how to get s
   commands (Streamer.bot), and **Copy AI prompt** gives ChatGPT / Claude everything
   it needs (the links, your sounds) to set up whatever tools you use with you.
 - **Your pads on your phone (Onion Pocket add-on, optional, off by default):**
-  with the Onion Pocket add-on installed, Settings → Remote has its card. Scan the
+  Settings → Remote → *Get Onion Pocket* downloads and installs it (from its GitHub
+  release, checked first); then its card is there. Scan the
   code with your phone's camera and your pads show up in its browser (iPhone or
   Android, nothing to install); a tap plays the sound on the PC. It has its own key
   (*Forget phones* makes a new one), only answers phones on your home network, and

@@ -35,15 +35,16 @@ def shown(monkeypatch):
     return out
 
 
-def test_an_upgraded_config_sees_it_once_and_its_button_opens_privacy(window, shown,
-                                                                      monkeypatch):
+def test_an_upgraded_config_sees_it_once_and_its_button_opens_the_newest_page(window, shown,
+                                                                              monkeypatch):
     opened = []
     monkeypatch.setattr(window, "open_settings", lambda page="privacy": opened.append(page))
     window.cfg.whats_new_seen = ""   # as loaded from an older version's config
-    shown.press = "privacy"
+    shown.press = "remote"
     window.after_update()
     assert len(shown) == 1 and any("Privacy & security" in t for t in shown[0])
-    assert opened == ["privacy"]
+    assert any("Onion Pocket" in t for t in shown[0])
+    assert opened == ["remote"]   # the newest note with a Settings page
     assert window.cfg.whats_new_seen == __version__
     window.after_update()   # the next start: nothing new
     assert len(shown) == 1

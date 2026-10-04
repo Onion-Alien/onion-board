@@ -39,6 +39,32 @@ Version **1.6.8** · Windows 10 / 11 · free, no account, no ads, no tracking ·
 
 The full list is in [docs/FEATURES.md](docs/FEATURES.md).
 
+## 📱 Your pads on your phone
+
+<img align="right" width="220" src="https://raw.githubusercontent.com/Onion-Alien/onion-pocket/main/docs/screenshots/phone.png" alt="Onion Pocket on a phone: colourful pads by category, two playing, Stop all and the volume at the bottom">
+
+With the free **[Onion Pocket](https://github.com/Onion-Alien/onion-pocket)** add-on,
+your phone becomes a remote for your board. Scan a QR code on your PC with your
+phone's camera, tap a pad, and it plays on the PC, into Discord or your game like
+any other pad.
+
+- **Nothing to download on your phone.** It opens in the phone's browser, on iPhone
+  or Android. No app, no account.
+- **One click to get it:** Settings → Remote → **Get Onion Pocket**. It comes
+  straight from its GitHub release and is checked before it's installed.
+- **Safe by default.** It's off until you switch it on, and only phones on your own
+  Wi-Fi can reach it, with their own key from the QR code. *Forget phones* locks
+  them all out again.
+- **It can't touch your mic.** A phone can play, stop and pause sounds, change the
+  volume and the category, and mute you. Never your mic, the voice changer or
+  your files.
+- Windows asks once to let phones through its firewall; that rule only covers your
+  home network. Use it at home rather than on public Wi-Fi.
+
+Optional: if you never get it, nothing changes.
+
+<br clear="right">
+
 ## Get started
 
 1. **[Download `OnionBoardSetup.exe`](../../releases/latest/download/OnionBoardSetup.exe)**

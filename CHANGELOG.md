@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 1.6.9 — 2026-10-04
 
 - Recently deleted keeps Close beside its other actions. Sound pad menus no longer
   include Preview, and Apps / Triggers information is centered on the tab row.
@@ -17,6 +17,10 @@
 - The control API's `/api/sounds` also gives each pad's colour.
 - Radio: a station (or its redirect) pointing at this PC (`127.0.0.1`, `localhost`)
   is refused in Direct mode too, as it already was through a proxy or Tor.
+- **Dozens of small fixes from a full code audit** (audio, voice and speech, network and Tor,
+  saved data, the main window and its panels). An update download that's cut off
+  part-way now says why in plain words, Settings opens faster without a stray little
+  window, and What's new no longer shows twice after going back a version.
 
 ## 1.6.8 — 2026-10-04
 
