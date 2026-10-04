@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.7.0 — 2026-10-04
+
+- **Pick your own highlight colour:** Settings → Appearance → *Highlight colour*. A
+  rainbow slider (previews while you drag), *More colours…* for any colour, and
+  *Theme's colour* to go back. It stays when you change theme, and changes in a
+  blink.
+- The play bar under your pads starts right after the sound's name: a short name
+  like *Pick a sound* no longer leaves a big empty gap before it.
+
 ## 1.6.9 — 2026-10-04
 
 - Recently deleted keeps Close beside its other actions. Sound pad menus no longer

@@ -27,6 +27,14 @@ class Note:
 
 # newest first; add one per release that has something worth telling
 NOTES = (
+    Note("1.7.0", "Your own highlight colour", (
+        ("palette", "Pick any colour",
+         "Settings → Appearance → Highlight colour: slide along the rainbow or pick any "
+         "colour for live tabs and the Live button. Theme's colour puts it back."),
+        ("play", "A longer play bar",
+         "The bar under your pads now starts right after the sound's name, so short "
+         "names don't leave a big empty gap."),
+    ), "appearance", "Open Appearance"),
     Note("1.6.9", "Your pads on your phone", (
         ("cable", "Onion Pocket, a free add-on",
          "Settings → Remote → Get Onion Pocket. Scan the code with your phone's camera "

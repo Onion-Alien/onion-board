@@ -40,11 +40,11 @@ def test_an_upgraded_config_sees_it_once_and_its_button_opens_the_newest_page(wi
     opened = []
     monkeypatch.setattr(window, "open_settings", lambda page="privacy": opened.append(page))
     window.cfg.whats_new_seen = ""   # as loaded from an older version's config
-    shown.press = "remote"
+    shown.press = "appearance"
     window.after_update()
     assert len(shown) == 1 and any("Privacy & security" in t for t in shown[0])
-    assert any("Onion Pocket" in t for t in shown[0])
-    assert opened == ["remote"]   # the newest note with a Settings page
+    assert any("highlight colour" in t for t in shown[0])
+    assert opened == ["appearance"]   # the newest note with a Settings page
     assert window.cfg.whats_new_seen == __version__
     window.after_update()   # the next start: nothing new
     assert len(shown) == 1
