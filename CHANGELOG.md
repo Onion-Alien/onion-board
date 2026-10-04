@@ -14,6 +14,8 @@
   nags. The setup guide's cable step has the same choice (*I don't use the
   cable*). The send device can't be your headphones (you'd hear everything twice,
   your own voice included), and *Nowhere* frees the cable to be the stream output.
+  While nothing goes out to others, the header's Live switch says so (*Only you
+  hear sounds*, or *Live — stream output only*) instead of *others hear you*.
 - **Watch a pad's video:** a sound made from a video file, or from a link added
   with *Also save the video* on, now has a **Video** button in the player. It
   opens the video in its own window, in step with the sound: it plays, pauses,
