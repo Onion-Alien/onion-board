@@ -497,6 +497,13 @@ QPushButton::menu-indicator:open { image:url("$up"); }
 QSlider::groove:horizontal { height:4px; background:$groove; border-radius:2px; }
 QSlider::sub-page:horizontal { background:$accent; border-radius:2px; }
 QSlider::handle:horizontal { background:white; border:1px solid $border; width:14px; height:14px; margin:-5px 0; border-radius:7px; }
+/* room for the whole handle: Qt sizes a slider to its groove, which cut the circle's top
+   and bottom off flat */
+QSlider:horizontal { min-height:20px; }
+QSlider:vertical { min-width:20px; }
+QSlider::handle:hover, QSlider::handle:pressed { border-color:$accent; }
+QSlider::handle:disabled { background:$inset; }
+QSlider::sub-page:horizontal:disabled, QSlider::add-page:vertical:disabled { background:$off; }
 QCheckBox::indicator { width:16px; height:16px; border-radius:4px; border:1px solid $off; background:$card; }
 QCheckBox::indicator:checked { background:$accent; border-color:$accent; image:url("$check"); }
 QCheckBox::indicator:hover { border-color:$border_hi; }
