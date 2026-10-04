@@ -134,6 +134,28 @@ def _table(headers: list[str], stretch: int) -> QTableWidget:
     return t
 
 
+class _Stack(QStackedWidget):
+    """Only as tall as the page on show: a plain QStackedWidget sizes to its tallest
+    page, which left the Simple table with the Detailed info box's height of blank
+    space under it."""
+
+    def __init__(self):
+        super().__init__()
+        self.currentChanged.connect(lambda _i: self.updateGeometry())
+
+    def sizeHint(self):
+        w = self.currentWidget()
+        if w is None:
+            return super().sizeHint()
+        return w.sizeHint().expandedTo(w.minimumSize()).boundedTo(w.maximumSize())
+
+    def minimumSizeHint(self):
+        w = self.currentWidget()
+        if w is None:
+            return super().minimumSizeHint()
+        return w.minimumSizeHint().expandedTo(w.minimumSize()).boundedTo(w.maximumSize())
+
+
 class NetActivity(QWidget):
     def __init__(self, parent: QWidget | None = None):
         super().__init__(parent)
@@ -194,7 +216,7 @@ class NetActivity(QWidget):
         dv.setContentsMargins(0, 0, 0, 0)
         dv.addWidget(self.conns)
         dv.addWidget(self.info)
-        self.stack = QStackedWidget()
+        self.stack = _Stack()
         self.stack.addWidget(self.servers)
         self.stack.addWidget(detail)
         v.addWidget(self.stack)
