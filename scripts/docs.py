@@ -107,7 +107,8 @@ def main():
     stamp(ROOT / "README.md", readme_block(r))
     stamp(ROOT / "docs" / "index.html", site_block(r))
     sitemap = ROOT / "docs" / "sitemap.xml"
-    today = datetime.date.today().isoformat()
+    # UTC, like the commit times and the CHANGELOG: a local date can give away the timezone
+    today = datetime.datetime.now(datetime.timezone.utc).date().isoformat()
     sitemap.write_text(re.sub(r"<lastmod>[^<]*</lastmod>", f"<lastmod>{today}</lastmod>",
                               sitemap.read_text(encoding="utf-8")), encoding="utf-8")
 
