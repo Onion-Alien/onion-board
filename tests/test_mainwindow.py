@@ -673,3 +673,31 @@ def test_ctrl_v_pastes_a_copied_picture_on_the_selected_pad(window):
     window.paste_picture()
     assert window.meta("s0").image and window.meta("s1").image != pic
     assert not library.Path(pic).exists()   # the old picture's file is gone
+
+
+def test_new_pads_never_flash_up_as_windows_of_their_own(qapp):
+    """A new pad has no parent until the grid takes it: shown before that, it popped
+    up on the desktop for a moment as a little blank window (behind the splash)."""
+    from PySide6.QtCore import QEvent, QObject
+
+    from soundboard.library import SoundMeta
+    from soundboard.ui.widgets import Pad, PadGrid
+
+    flashed = []
+
+    class Watch(QObject):
+        def eventFilter(self, o, e):
+            if e.type() == QEvent.Show and isinstance(o, Pad) and o.isWindow():
+                flashed.append(o)
+            return False
+
+    watch = Watch()
+    qapp.installEventFilter(watch)
+    try:
+        grid = PadGrid()
+        grid.set_pads([Pad(SoundMeta(id=f"s{i}", name=f"Sound {i}", file=""), 200)
+                       for i in range(3)])
+        assert not flashed
+        assert all(p.parent() is grid for p in grid.pads)
+    finally:
+        qapp.removeEventFilter(watch)
