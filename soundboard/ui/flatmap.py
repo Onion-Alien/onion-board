@@ -24,12 +24,14 @@ from PySide6.QtWidgets import QPushButton, QToolTip, QVBoxLayout, QWidget
 from soundboard import theme
 
 LAT_TOP, LAT_BOTTOM = 84.0, -58.0   # the inhabited world: no polar wastes
-ZOOM_MAX = 14.0
+ZOOM_MAX = 250.0                    # about street level: a city's stations come apart
 HIT_PX = 7.0                        # how near the pointer a dot counts as under it
 WORLD_MAX_PX = 10_000_000           # biggest whole-world picture kept (device pixels)
 SETTLE_MS = 160                     # zooming: the old picture, stretched, until this idle
 TOWN_ZOOM = 2.0                     # city and town names show from this zoom in...
 TOWNS_IN_VIEW = 40                  # ...at most this many at once, only those in view
+SPREAD_ZOOM = 4.0                   # stations on the very same spot fan out from here...
+SPREAD_PX = 2.4                     # ...this far apart (a spiral round the spot)
 
 
 def _mix(a: str, b: str, t: float) -> QColor:
@@ -37,6 +39,22 @@ def _mix(a: str, b: str, t: float) -> QColor:
     return QColor.fromRgbF(ca.redF() + (cb.redF() - ca.redF()) * t,
                            ca.greenF() + (cb.greenF() - ca.greenF()) * t,
                            ca.blueF() + (cb.blueF() - ca.blueF()) * t)
+
+
+def _fan_out(lon: np.ndarray, lat: np.ndarray) -> np.ndarray:
+    """For dots on the same spot (to ~100 m), an offset each in a sunflower spiral
+    round it, in steps of one: the last of them (the most listened, drawn on top)
+    keeps the middle. Dots alone on their spot get (0, 0)."""
+    fan = np.zeros((len(lon), 2))
+    groups: dict[tuple, list[int]] = {}
+    for i, key in enumerate(zip(np.round(lon, 3), np.round(lat, 3))):
+        groups.setdefault(key, []).append(i)
+    golden = np.pi * (3 - np.sqrt(5))
+    for idx in groups.values():
+        for n, i in enumerate(reversed(idx)):
+            r = np.sqrt(n)
+            fan[i] = (r * np.cos(n * golden), r * np.sin(n * golden))
+    return fan
 
 
 class FlatMap(QWidget):
@@ -58,6 +76,7 @@ class FlatMap(QWidget):
         self._lon = np.zeros(0)
         self._lat = np.zeros(0)
         self._r = np.zeros(0)           # dot radius before zoom
+        self._fan = np.zeros((0, 2))    # where a stacked dot goes round its spot (SPREAD_PX)
         self._current: str | None = None
         self._hover = -1
         self._msg = "Finding stations…"
@@ -115,6 +134,7 @@ class FlatMap(QWidget):
         k = np.array([d.get("k", 0) for d in pts], float)
         top = max(1.0, float(k.max())) if len(k) else 1.0
         self._r = 1.1 + 1.7 * np.sqrt(k / top)
+        self._fan = _fan_out(self._lon, self._lat)
         self._hover = -1
         if pts:
             self._msg = ""
@@ -191,8 +211,17 @@ class FlatMap(QWidget):
     def _screen(self) -> tuple[np.ndarray, np.ndarray]:
         """Each dot's spot on screen: its copy of the world nearest the middle."""
         s = self._scale()
-        return (self.width() / 2 + ((self._lon - self.cx + 180) % 360 - 180) * s,
-                self.height() / 2 - (self._lat - self.cy) * s)
+        dx, dy = self._spread()
+        return (self.width() / 2 + ((self._lon - self.cx + 180) % 360 - 180) * s + dx,
+                self.height() / 2 - (self._lat - self.cy) * s + dy)
+
+    def _spread(self) -> tuple[np.ndarray | float, np.ndarray | float]:
+        """Pixels to move each dot by: zoomed in, stations listed at the very same spot
+        (often a whole city's, at its centre) fan out so each can be seen and clicked."""
+        if self.zoom < SPREAD_ZOOM or not len(self._fan):
+            return 0.0, 0.0
+        k = SPREAD_PX * self._grow()
+        return self._fan[:, 0] * k, self._fan[:, 1] * k
 
     def _redraw(self):
         """What's drawn changed (stations, land, theme): draw it again."""
@@ -229,7 +258,8 @@ class FlatMap(QWidget):
             p.restore()
         if len(self._points):
             o = tr.map(QPointF(0, 0))
-            xs, ys = o.x() + self._lon * s, o.y() - self._lat * s
+            dx, dy = self._spread()
+            xs, ys = o.x() + self._lon * s + dx, o.y() - self._lat * s + dy
             on = ((xs > rect.left() - 8) & (xs < rect.right() + 8)
                   & (ys > rect.top() - 8) & (ys < rect.bottom() + 8))
             accent = QColor(t["accent"])

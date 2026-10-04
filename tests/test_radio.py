@@ -156,7 +156,7 @@ def test_flat_map_hovers_clicks_and_follows_the_playing_station(qapp):
     from PySide6.QtGui import QMouseEvent
     from PySide6.QtWidgets import QApplication
 
-    from soundboard.ui.flatmap import FlatMap
+    from soundboard.ui.flatmap import ZOOM_MAX, FlatMap
     m = FlatMap()
     m.resize(720, 284)          # 2 px per degree
     pts = radio.globe_points([Station.from_api(api_station(i, geo_lat=10 * i, geo_long=20 * i,
@@ -180,12 +180,38 @@ def test_flat_map_hovers_clicks_and_follows_the_playing_station(qapp):
     m.select(extra, go=True)    # one found by search joins the map, which turns to it
     assert len(m._points) == 4 and m.zoom > 1 and (m.cx, m.cy) == (-60, -20)
     m.grab()
-    m._zoom_by(100)
-    assert m.zoom == pytest.approx(14)
+    m._zoom_by(1000)
+    assert m.zoom == pytest.approx(ZOOM_MAX)
     m.mouseDoubleClickEvent(QMouseEvent(QMouseEvent.MouseButtonDblClick, QPointF(1, 1),
                                         QPointF(1, 1), Qt.LeftButton, Qt.LeftButton,
                                         Qt.NoModifier))
     assert m.zoom == 1
+
+
+
+def test_flat_map_fans_out_stations_on_the_same_spot(qapp):
+    """A whole city's stations listed at its centre come apart zoomed in, each its own
+    dot to click; zoomed out they stay one dot, and dots alone don't move."""
+    pts = [{"id": f"s{i}", "la": 50.0, "lo": 10.0, "k": i} for i in range(20)]
+    pts.append({"id": "alone", "la": 40.0, "lo": 0.0, "k": 5})
+    from soundboard.ui.flatmap import FlatMap
+    m = FlatMap()
+    m.resize(400, 300)
+    m.set_points(pts)
+    alone = [d["id"] for d in m._points].index("alone")
+    xs, ys = m._screen()
+    assert len({(round(x), round(y)) for x, y in zip(xs, ys)}) == 2
+    m.zoom, m.cx, m.cy = 50.0, 10.0, 50.0
+    xs, ys = m._screen()
+    spots = {(round(x), round(y)) for x, y in zip(xs, ys)}
+    assert len(spots) == 21
+    gap = min(np.hypot(xs[i] - xs[j], ys[i] - ys[j])
+              for i in range(21) for j in range(i) if alone not in (i, j))
+    assert gap >= 4                                   # far enough apart to tell apart
+    assert m._fan[alone].tolist() == [0, 0]
+    middle = [d["id"] for d, f in zip(m._points, m._fan) if not f.any()]
+    assert sorted(middle) == ["alone", "s19"]        # the busiest keeps the middle
+    m.grab()
 
 
 def test_maps_ship_with_the_app_and_fetch_nothing():
@@ -281,7 +307,8 @@ def test_a_tie_between_spellings_picks_the_capitalised_one():
 
 def test_flat_map_names_towns_only_zoomed_in_and_only_in_view(qapp, monkeypatch):
     from soundboard.ui import flatmap
-    m = flatmap.FlatMap()
+    from soundboard.ui.flatmap import FlatMap
+    m = FlatMap()
     m.resize(720, 284)
     towns = [{"n": f"Town {i}", "la": 0.0, "lo": i * 3.0, "k": 100 - i} for i in range(60)]
     towns.append({"n": "Far", "la": 0.0, "lo": -120.0, "k": 1})
