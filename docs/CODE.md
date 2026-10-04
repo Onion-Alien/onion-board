@@ -4,16 +4,35 @@ For people changing the code. Using the app needs none of this: the
 [README](../README.md) covers that. The edit → check → build → release loop is in
 [DEVELOPING.md](DEVELOPING.md); the rules are in [CONTRIBUTING.md](../CONTRIBUTING.md).
 
-## The virtual cable
+## Sending sounds to others: the virtual cable, or something else
 
-It's a free audio driver (VB-Audio Virtual Cable) that acts like a pipe: the app
-plays into one end and Discord or the game uses the other end as a microphone.
-It isn't included in this repo because VB-Audio's licence doesn't allow
-redistributing it. `installer\install-vbcable.ps1` downloads the current pack from
-[vb-audio.com](https://vb-audio.com/Cable/), checks the installer is signed by
-VB-Audio, and runs it. Windows asks for admin permission. The app's *Install the
-free virtual cable* button runs the same script. Other virtual cables
-(VB-Cable A/B, Voicemeeter) are detected too.
+Setup → Devices → *Send to others through* (also Settings → Audio → Devices) picks
+the route (`Config.route`, `library.ROUTES`):
+
+- **The virtual cable** (the default): a free audio driver (VB-Audio Virtual Cable)
+  that acts like a pipe: the app plays into one end and Discord or the game uses the
+  other end as a microphone. It isn't included in this repo because VB-Audio's
+  licence doesn't allow redistributing it. `installer\install-vbcable.ps1` downloads
+  the current pack from [vb-audio.com](https://vb-audio.com/Cable/), checks the
+  installer is signed by VB-Audio, and runs it. Windows asks for admin permission.
+  The app's *Install the free virtual cable* button runs the same script. Other
+  virtual cables (VB-Cable A/B, Voicemeeter) are detected too.
+- **Another device**: any output you pick by hand (Voicemeeter, a mixer, a capture
+  card, a second sound card, an output OBS captures). No cable is needed, the app
+  never swaps the cable in or asks to install it, and the send device can't be the
+  headphones.
+- **Nowhere**: only you hear the sounds, plus the optional stream output.
+
+The route belongs to this PC: backups don't carry it and resetting the audio devices
+puts it back to the cable. The rest of this page says "the cable" for the output
+that others hear, whichever route picked it.
+
+Optional: `winget install Gyan.FFmpeg.Essentials` adds m4a/aac/video support (the
+installer's *Play M4A, AAC and video files* box runs the same command). The app
+finds ffmpeg on `PATH` or in winget's `Links` folder.
+
+## Where things are stored
+
 
 Optional: `winget install Gyan.FFmpeg.Essentials` adds m4a/aac/video support (the
 installer's *Play M4A, AAC and video files* box runs the same command). The app
@@ -52,7 +71,7 @@ the launcher the shortcuts and PyInstaller use. The app is the `soundboard` pack
 | `soundboard/ui/trim.py` | the Effects tab's trim control: waveform with start / end handles and exact-time boxes |
 | `soundboard/backup.py` | export / import of the board as a plain zip (JSON + original audio + pictures), sound packs and single sounds; see [BACKUP-FORMAT.md](BACKUP-FORMAT.md) |
 | `soundboard/otherboards.py` | Import from another soundboard: what the readers share (Entry rows, the list of sources, the installer's queued-import note); only when the user asks (Backup menu, setup guide, the installer's boxes, or a dropped board file) |
-| `soundboard/soundpad.py`, `resanance.py`, `expboard.py` | the readers: Soundpad's `soundlist.spl` XML, Resanance's LiteDB 5 `Resanance.db` (read page by page, no LiteDB needed), EXP Soundboard's board JSON (found through Java's Preferences in the registry) |
+| `soundboard/soundpad.py`, `resanance.py`, `soundux.py`, `expboard.py` | the readers: Soundpad's `soundlist.spl` XML, Resanance's LiteDB 5 `Resanance.db` (read page by page, no LiteDB needed), Soundux's `config.json`, EXP Soundboard's board JSON (found through Java's Preferences in the registry) |
 | `soundboard/autostart.py` | *Start with Windows*: the per-user `Run` registry value (`--tray` starts it hidden) |
 | `soundboard/shellicon.py` | the app icon in the theme's colours outside its windows: writes `%APPDATA%\OnionBoard\icons\onionboard-<hash>.ico`, puts it on the main window's relaunch properties (taskbar right-click menu, a pin) and on this copy's own *Onion Board* Desktop / Start menu / taskbar-pin shortcuts |
 | `soundboard/updates.py` | "is there a newer version?" (GitHub Releases, once a day) and the self-update: downloads the release's installer, checks its SHA-256, runs it silently and reopens the app |
@@ -63,8 +82,9 @@ the launcher the shortcuts and PyInstaller use. The app is the `soundboard` pack
 | `soundboard/ui/art.py` | optional pictures from `assets/art` (voice tiles, the computer voice, its languages); emoji / painted icons when missing |
 | `soundboard/ui/responsive.py` | small windows: what hides, in which order, as the window shrinks |
 | `soundboard/ui/fit.py` | dialogs grow to fit their wrapped text instead of clipping it (`fit.watch(self)` in every dialog's `__init__`) |
-| `soundboard/ui/setupwizard.py` | the first-run guide with Bun (mic, headphones, cable, Discord) and the Steam help |
+| `soundboard/ui/setupwizard.py` | the first-run guide with Bun (mic, headphones, the virtual cable or another way out, Discord) and the Steam help |
 | `soundboard/ui/bunnywidget.py` | Bun animated: bobs, blinks, talks along with your mic and throws music notes |
+| `soundboard/ui/whatsnew.py` | the *What's new* window shown once after an update, with what the release added and a button to the settings it's about (`NOTES`, newest first: add one per release) |
 | `soundboard/ui/splash.py` | The start-up splash: Bun and a spinner mid-screen while a cold start loads |
 | `soundboard/ui/livedot.py` | the glowing dot (and green icon) on a tab whose feature is live, e.g. the Voice tab while your voice is being changed |
 | `soundboard/ui/logowidget.py` | the header logo animated: a breathing glow and sheen, flaring with embers while sounds play |
