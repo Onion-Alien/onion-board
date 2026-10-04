@@ -1,7 +1,27 @@
 # Changelog
 
-## Unreleased
+## 1.6.5 — 2026-10-04
 
+- **Sounds no longer stutter for the people you're talking to while the app is
+  busy.** Whenever the window was drawing, the radio was loading or Onion Watch was
+  checking the screen, what went into the virtual cable could break up: each piece
+  of audio waited its turn behind the rest of the app and took 15 ms to make
+  instead of half a millisecond, longer than it had. Starting a radio station made
+  it worst. It now keeps pace whatever else the app is doing.
+- **No more window freezes while you game:** the check for which game is in front
+  (for the voice chat suggestion) looked the game up on disk every 3 seconds, and a
+  drive that had gone to sleep froze the window for seconds at a time, with your
+  sound hotkeys waiting behind it. It doesn't touch the disk any more.
+- **The Radio tab doesn't freeze when it loads:** reading and saving the list of
+  stations took the window (and the sound) away for up to a second. It's done in
+  the background now.
+- **Pressing a pad is lighter:** the first press of a long sound on a 44.1 kHz
+  device no longer stops the window while the sound is converted (up to a second
+  for a long song), each press no longer works out the sound's make-up gain again,
+  and a press, a sound starting or stopping no longer redraws every pad on the
+  board.
+- **Myinstants search works again:** every search failed with "The site refused the
+  download (403)".
 - **No virtual cable needed: send your sounds anywhere.** Setup → Devices (and
   Settings → Audio → Devices) has **Send to others through**: *The virtual cable*
   (as before), *Another device* (Voicemeeter, a mixer, a capture card, a second
@@ -168,8 +188,6 @@
 - **Get Onion Watch:** retry a temporary GitHub gateway error once through the
   same connection and privacy gate, avoiding a cached failure. A persistent
   gateway error asks you to retry instead of blaming your internet connection.
-
-## 1.6.5 — 2026-10-03
 
 - **Switch off anything that goes online**: Settings → Privacy & security has a switch
   for each thing the app does online (finding and downloading sounds, with one per
