@@ -1136,6 +1136,7 @@ class SpeechPanel(QWidget):
                                        "voices (it also does this by itself)")
         self.b_voices_check.clicked.connect(self._recheck_voices_asked)
         self._voices_asked = False   # the button was pressed: say what it found
+        self._voices_again = False   # a reload was asked for while one ran
         self._voice_wait = False     # sent to Windows settings for a voice; look on return
         self.b_dl_remove = QPushButton("Delete download")
         self.b_dl_remove.setObjectName("small")
@@ -1156,6 +1157,9 @@ class SpeechPanel(QWidget):
         self.cb_voice = QComboBox()
         self.cb_voice.addItem("Loading voices…", "")
         self.cb_voice.setEnabled(False)
+        # the list shows a stand-in, not the saved voice (still loading, speech failed,
+        # or that voice isn't installed now): other settings changes keep the saved one
+        self._voice_standin = True
         grid.addWidget(self.cb_voice, 0, 1)
         # custom voices sit under More options: this gets you there from the list itself
         self.b_add_voices = QPushButton("Add voices…")
@@ -1331,7 +1335,8 @@ class SpeechPanel(QWidget):
         self.say_vol_group = (sep, vol_icon, self.sl_gain)
         self.say_stop = b_stop
 
-        for sig in (self.cb_voice.currentIndexChanged, self.sl_rate.valueChanged,
+        self.cb_voice.currentIndexChanged.connect(self._voice_picked)
+        for sig in (self.sl_rate.valueChanged,
                     self.sl_gain.changed, self.cb_model.currentIndexChanged,
                     self.chk_mute.toggled, self.chk_fx.toggled):
             sig.connect(self._settings_edited)
@@ -1371,7 +1376,9 @@ class SpeechPanel(QWidget):
         self.cb_voice.addItem("Windows default", "")
         for name in voices:
             self.cb_voice.addItem(customvoices.label(name), name)
-        self.cb_voice.setCurrentIndex(max(0, self.cb_voice.findData(self.s["voice"])))
+        found = self.cb_voice.findData(self.s["voice"])
+        self._voice_standin = found < 0
+        self.cb_voice.setCurrentIndex(max(0, found))
         self.cb_voice.setEnabled(bool(voices))
         self.cb_voice.blockSignals(False)
         # speak in the voice the list shows: a saved voice that's been uninstalled
@@ -1380,6 +1387,9 @@ class SpeechPanel(QWidget):
         self._loading_since = 0.0
         self.b_voices_check.setEnabled(True)
         self.b_voices_check.setText("Reload voices")
+        if self._voices_again:   # asked for while that load ran (e.g. a server was added)
+            self._voices_again = False
+            QTimer.singleShot(0, self, self._recheck_voices)
         if self._voices_asked:
             self._voices_asked = False
             busy.flash(self.b_voices_check,
@@ -1476,14 +1486,20 @@ class SpeechPanel(QWidget):
         self.tts_err.setText(f"⚠ {msg}")
         self.tts_err.show()
 
+    def _voice_picked(self, *_):
+        self._voice_standin = False   # the user chose this one
+        self._settings_edited()
+
     def _settings_edited(self, *_):
-        self.s.update(voice=self.cb_voice.currentData() or "", rate=self.sl_rate.value(),
+        if not self._voice_standin:
+            self.s["voice"] = self.cb_voice.currentData() or ""
+            self.ctl.speaker.voice = self.s["voice"]
+        self.s.update(rate=self.sl_rate.value(),
                       gain=self.sl_gain.value(), model=self.cb_model.currentData(),
                       language=self.ed_lang.text().strip() or "en",
                       mute_real_voice=self.chk_mute.isChecked(),
                       voice_fx=self.chk_fx.isChecked(),
                       translate=self.cb_lang.currentData() or "")
-        self.ctl.speaker.voice = self.s["voice"]
         self.ctl.speaker.rate = self.s["rate"]
         self.ctl.gain = self.s["gain"]
         self.ctl.set_mute_real_voice(self.s["mute_real_voice"])
@@ -1661,6 +1677,7 @@ class SpeechPanel(QWidget):
         """Look for Windows voices again, off the UI thread. Safe while talking: a line
         being spoken waits a second for the engine to come back."""
         if self._loading():
+            self._voices_again = True   # run once more when this load is done
             return
         self._loading_since = time.monotonic()
         self.b_voices_check.setEnabled(False)

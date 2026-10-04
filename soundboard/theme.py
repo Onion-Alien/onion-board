@@ -504,6 +504,9 @@ QSlider:vertical { min-width:20px; }
 QSlider::handle:hover, QSlider::handle:pressed { border-color:$accent; }
 QSlider::handle:disabled { background:$inset; }
 QSlider::sub-page:horizontal:disabled, QSlider::add-page:vertical:disabled { background:$off; }
+/* dim="true": a control that's live but does nothing right now (the EQ while it's off) */
+QSlider[dim="true"]::sub-page:horizontal, QSlider[dim="true"]::add-page:vertical { background:$off; }
+QComboBox[dim="true"] { color:$muted; }
 QCheckBox::indicator { width:16px; height:16px; border-radius:4px; border:1px solid $off; background:$card; }
 QCheckBox::indicator:checked { background:$accent; border-color:$accent; image:url("$check"); }
 QCheckBox::indicator:hover { border-color:$border_hi; }
@@ -847,11 +850,19 @@ _TEXT_COLOUR = re.compile(r"(?<![-\w])(color:\s*)(#[0-9a-fA-F]{6})(?![0-9a-fA-F]
 
 def _recolour_inline(widgets, old: dict[str, str]) -> None:
     """Only `color:` (text), never backgrounds or borders: those can be a sound's own
-    colour that merely matches a token."""
-    swap: dict[str, str] = {}
+    colour that merely matches a token.
+
+    Two tokens can share a hex in the old theme and part in the new one; the text
+    doesn't say which token wrote it, so that hex goes to the new colour most of those
+    tokens agree on, a tie to the one listed first in _INLINE_KEYS (the same result
+    every time, whatever order the themes list their tokens in)."""
+    votes: dict[str, dict[str, int]] = {}
     for k in _INLINE_KEYS:
         if k in old and k in T:
-            swap.setdefault(old[k].lower(), T[k])
+            new = votes.setdefault(old[k].lower(), {})
+            new[T[k]] = new.get(T[k], 0) + 1
+    # max() keeps the first of equal counts, and dicts keep _INLINE_KEYS order
+    swap = {a: max(c, key=c.get) for a, c in votes.items()}
     swap = {a: b for a, b in swap.items() if a != b.lower()}
     if not swap:
         return

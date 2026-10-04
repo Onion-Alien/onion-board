@@ -559,6 +559,7 @@ class OverlayWindow(QWidget):
     # ------------------------------------------------------------------ mouse
     def mouseMoveEvent(self, e):
         self.ov.keep_preview()
+        self.ov._touch()   # the mouse is on it: don't auto-hide from under it
         if self._press is not None and e.buttons() & Qt.LeftButton:
             at = e.globalPosition().toPoint()
             if self._grab is None and (at - self._press).manhattanLength() >= DRAG_START_PX:
@@ -708,6 +709,8 @@ class OverlayWindow(QWidget):
         # tiles
         now = time.monotonic()
         flash = ov.flash[0] if ov.flash and ov.flash[1] > now else None
+        if flash is None:
+            ov.flash = None   # over: set_playing needn't repaint for it any more
         for i in range(SLOTS):
             self._tile(p, f, self._tile_rect(i), i, sounds[i] if i < len(sounds) else None,
                        flash == i)

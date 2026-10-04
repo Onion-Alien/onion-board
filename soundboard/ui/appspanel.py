@@ -551,6 +551,8 @@ class AppsTab(QWidget):
                     row.set_sending(True)         # a remembered program just started
                 if row.sending:
                     self._start_capture(row)
+                if row.capture is None and row.rec is not None:
+                    self._finish_rec(row)         # reopening failed: nothing feeds the clip
             elif row.status_text and row.status_error:
                 row.set_status("")
         self.empty.setVisible(not self.rows)

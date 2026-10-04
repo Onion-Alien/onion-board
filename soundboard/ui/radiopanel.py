@@ -119,6 +119,7 @@ class _StationDelegate(QStyledItemDelegate):
     def __init__(self, tab: RadioTab):
         super().__init__(tab.list)
         self.tab = tab
+        self._skip_release = False   # the second release of a double-click on badge/star
 
     def sizeHint(self, opt, idx):
         return QSize(1, ROW_H if idx.data(Qt.UserRole) else 96)   # as wide as the list
@@ -245,11 +246,23 @@ class _StationDelegate(QStyledItemDelegate):
         p.restore()
 
     def editorEvent(self, ev, model, opt, idx):
-        if (ev.type() == QEvent.MouseButtonRelease and ev.button() == Qt.LeftButton
-                and idx.data(Qt.UserRole)):
+        if (ev.type() in (QEvent.MouseButtonRelease, QEvent.MouseButtonDblClick)
+                and ev.button() == Qt.LeftButton and idx.data(Qt.UserRole)):
             uuid = idx.data(Qt.UserRole)
             _card, avatar, star = self._rects(opt.rect)
             pos = ev.position().toPoint()
+            on_button = star.adjusted(-4, -4, 4, 4).contains(pos) or avatar.contains(pos)
+            if ev.type() == QEvent.MouseButtonDblClick:
+                # the first click already played / starred it: swallow the double-click
+                # (no "activated" play on top) and the release after it (no undo)
+                if on_button:
+                    self._skip_release = True
+                    return True
+                return super().editorEvent(ev, model, opt, idx)
+            if self._skip_release:
+                self._skip_release = False
+                if on_button:
+                    return True
             # after this event: both rebuild the list this row belongs to
             if star.adjusted(-4, -4, 4, 4).contains(pos):
                 QTimer.singleShot(0, lambda: self.tab._toggle_fav(uuid))

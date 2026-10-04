@@ -6,7 +6,7 @@ import pytest
 from soundboard import engine, library, winkeys
 from soundboard.library import Config
 from soundboard.ui import mainwindow as main
-from soundboard.ui import setupwizard
+from soundboard.ui import busy, setupwizard
 
 INS = ["Headset Mic (USB)", "Desk Mic", "CABLE Output (VB-Audio Virtual Cable)"]
 OUTS = ["Headphones (USB)", "Speakers", "CABLE Input (VB-Audio Virtual Cable)"]
@@ -299,7 +299,7 @@ def test_mid_install_the_guide_stays_put_and_a_reopened_one_picks_it_up(
     monkeypatch.setattr(setupwizard.subprocess, "Popen",
                         lambda a, **kw: (starts.append(a), proc)[1])
     wiz.install_cable()
-    assert not wiz.btn_next.isEnabled() and not wiz.btn_back.isEnabled()
+    assert busy.is_busy(wiz.btn_next) and busy.is_busy(wiz.btn_back)
     asked = []
     monkeypatch.setattr(setupwizard.QMessageBox, "question",
                         lambda *a: (asked.append(a), setupwizard.QMessageBox.StandardButton.No)[1])
@@ -312,7 +312,7 @@ def test_mid_install_the_guide_stays_put_and_a_reopened_one_picks_it_up(
         assert len(starts) == 1                    # never a second install
         proc.rc = 0
         again._tick()
-        assert again.btn_next.isEnabled() and setupwizard._installer is None
+        assert not busy.is_busy(again.btn_next) and setupwizard._installer is None
     finally:
         again.done(0)
     wiz._proc = None

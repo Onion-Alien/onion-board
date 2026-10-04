@@ -226,7 +226,7 @@ class SetupWizard(QDialog):
 
         nav = QHBoxLayout()
         self.btn_back = QPushButton("←  Back")
-        self.btn_back.clicked.connect(lambda: self.go(self.stack.currentIndex() - 1))
+        self.btn_back.clicked.connect(self.back_clicked)
         nav.addWidget(self.btn_back)
         nav.addStretch(1)
         self.btn_next = QPushButton("Next  →")
@@ -500,9 +500,11 @@ class SetupWizard(QDialog):
         i = self.stack.currentIndex()
         # while the cable installs, stay on its page: leaving it (or finishing) would
         # lose track of the installer
-        busy = self._proc is not None
-        self.btn_next.setEnabled(not busy)
-        self.btn_back.setEnabled(not busy)
+        # (greyed out with set_busy, not setEnabled: that would throw the keyboard focus
+        # to another control; the click handlers check too, for Enter on the dialog)
+        installing = self._proc is not None
+        busy.set_busy(self.btn_next, installing)
+        busy.set_busy(self.btn_back, installing)
         if i == self.PAGES - 1:
             self.btn_next.setText("Finish  ✓")
         elif i == 2 and not self.route_ok():
@@ -510,7 +512,13 @@ class SetupWizard(QDialog):
         else:
             self.btn_next.setText("Next  →")
 
+    def back_clicked(self):
+        if self._proc is None:
+            self.go(self.stack.currentIndex() - 1)
+
     def next_clicked(self):
+        if self._proc is not None:
+            return   # the cable is installing: stay on its page
         i = self.stack.currentIndex()
         if i == self.PAGES - 1:
             self.finish()
@@ -804,15 +812,16 @@ class SetupWizard(QDialog):
             return
         self.btn_copy.show()
         self.btn_discord.show()
+        esc = html.escape(name)
         self.discord_text.setText(
             "Onion Board now sends your voice and sounds into a new microphone called:"
-            f"<p style='font-size:15pt; font-weight:800; color:{_ok()}'>{name}</p>"
+            f"<p style='font-size:15pt; font-weight:800; color:{_ok()}'>{esc}</p>"
             "<b>In Discord:</b> click the ⚙ gear (User Settings) → <b>Voice &amp; Video</b> → "
-            f"<b>Input Device</b> → choose <b>{name}</b>, and set <b>Input Profile</b> to "
+            f"<b>Input Device</b> → choose <b>{esc}</b>, and set <b>Input Profile</b> to "
             "<b>Studio</b>. Left on, Discord's noise suppression treats your sounds as "
             "background noise and chops them up.<br><br>"
             f"<b>In a game:</b> open its audio / voice chat settings, set the microphone to "
-            f"<b>{name}</b> and turn off its noise suppression.")
+            f"<b>{esc}</b> and turn off its noise suppression.")
 
     def show_steam_guide(self):
         self.show_guide("steam")
@@ -884,7 +893,7 @@ class SteamGuide(QDialog):
             "the ⚙ gear.)</span></li>"
             "<li style='margin-bottom:8px'>On the left, click <b>Voice</b>.</li>"
             "<li style='margin-bottom:8px'>Click the <b>Voice Input Device</b> box and "
-            f"choose <b style='color:{_ok()}'>{mic_name}</b>.<br>"
+            f"choose <b style='color:{_ok()}'>{html.escape(mic_name)}</b>.<br>"
             "<span style='font-size:9pt'>Not in the list? Close Steam completely "
             "(right-click its icon by the clock → Exit) and open it again.</span></li>"
             "<li style='margin-bottom:8px'>Under <b>Advanced options</b>, turn "

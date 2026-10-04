@@ -400,7 +400,7 @@ class EqPanel(QWidget):
         self.chk_on.toggled.connect(lambda _on: self._emit())
         self.cb_target.currentIndexChanged.connect(lambda _i: self._emit())
         self.cb_preset.currentTextChanged.connect(self._on_preset)
-        self.curve.reset.connect(lambda: self.cb_preset.setCurrentText("Flat (off)"))
+        self.curve.reset.connect(self._reset)
         self._refresh(emit=False)
 
     # ---- state
@@ -450,11 +450,20 @@ class EqPanel(QWidget):
             return
         self._emit()
 
+    def _reset(self):
+        """Double-click on the curve: flat and off, even if it already says Flat."""
+        self.cb_preset.blockSignals(True)
+        self.cb_preset.setCurrentText("Flat (off)")
+        self.cb_preset.blockSignals(False)
+        self._on_preset("Flat (off)")
+
     def _on_preset(self, name):
         if name in EQ_PRESETS:
             self._set_sliders(EQ_PRESETS[name])
-            if name != "Flat (off)" and not self.chk_on.isChecked():
-                self.chk_on.setChecked(True)   # emits
+            # "Flat (off)" means off, like set_gains with flat gains; any other turns it on
+            on = name != "Flat (off)"
+            if self.chk_on.isChecked() != on:
+                self.chk_on.setChecked(on)   # emits
                 return
         self._emit()
 
@@ -462,7 +471,11 @@ class EqPanel(QWidget):
         gains, on, _target, _preset = self.state()
         self.curve.set_gains(gains, on)
         for w in self.sliders + [self.cb_target]:
-            w.setProperty("dim", not on)
+            if bool(w.property("dim")) != (not on):
+                w.setProperty("dim", not on)
+                w.style().unpolish(w)   # a property change alone doesn't restyle it
+                w.style().polish(w)
+                w.update()
         if emit:
             self.changed.emit(*self.state())
 
