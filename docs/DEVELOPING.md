@@ -215,6 +215,9 @@ Get-Process OnionBoard -ErrorAction SilentlyContinue      # is it running?
    adds two *Source code* files that people mistake for the app:
    `**[⬇ Download OnionBoardSetup.exe](https://github.com/Onion-Alien/onion-board/releases/download/vX.Y.Z/OnionBoardSetup.exe)**: the one file you need (Windows 10 / 11). Already have Onion Board? The *Update* button at the top of the app offers this version. (The *Source code* files are for developers.)`
    Keep it second, not first: the app's *Update* dialog shows the start of the notes
-   (`updates.summary` skips the ⬇ line, but older versions don't).
+   (`updates.summary` skips the ⬇ line, but 1.6.4 and older don't). Those show
+   whole paragraphs up to 420 characters, so make the headline paragraph at least
+   ~220 characters: then their dialog stops before the ⬇ line instead of telling
+   someone who's already updating to go and download the file.
    Never commit build output. Run `python scripts/check_sensitive.py --history`
    once more before pushing the release.

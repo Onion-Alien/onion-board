@@ -105,6 +105,9 @@ def test_from_source_it_only_opens_the_page(window, boxes, monkeypatch):
 
 
 def test_next_start_says_whether_the_update_worked(window, boxes):
+    window.cfg.setup_done = True
+    window.cfg.whats_new_seen = __version__   # What's new seen: the plain note
+    window.show()
     window.cfg.update_pending = __version__
     window.after_update()
     assert boxes.shown[-1][0] == "Updated" and window.cfg.update_pending == ""

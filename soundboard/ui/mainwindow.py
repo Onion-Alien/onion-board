@@ -3595,25 +3595,55 @@ class MainWindow(QMainWindow):
 
     def after_update(self):
         """At start: remove downloaded installers and, the first time after an update
-        was started, say whether it worked."""
+        was started, say whether it worked; then What's new, once per version."""
         pending, self.cfg.update_pending = self.cfg.update_pending, ""
         updates.cleanup()
-        if not pending:
-            return
-        self._save_later()
         from soundboard import __version__
-        if updates.finished(pending):
+        if pending:
+            self._save_later()
+            if not updates.finished(pending):
+                self._update_failed(pending)
+                return
             log.info("updated to %s", __version__)
-            box = QMessageBox(QMessageBox.Information, "Updated",
-                              f"Onion Board is up to date: version {__version__}.",
-                              QMessageBox.NoButton, self)
-            new = box.addButton("What's new", QMessageBox.HelpRole)
-            box.addButton(QMessageBox.Ok)
-            box.exec()
-            if box.clickedButton() is new:
-                QDesktopServices.openUrl(QUrl(
-                    f"https://github.com/{updates.REPO}/releases/tag/v{__version__}"))
+        self.whats_new(updated=bool(pending))
+
+    def whats_new(self, updated: bool = False):
+        """What's new in this version (ui/whatsnew.py), if they haven't seen it: once,
+        with a button to the settings it's about. Waits while the window is in the tray
+        or the setup guide is about to run. `updated`: the app updated itself."""
+        from soundboard import __version__
+        from soundboard.ui import whatsnew
+        if not self.cfg.setup_done:   # the guide comes first; this waits for next time
             return
+        if not self.isVisible():   # started with Windows, in the tray: when it's opened
+            self._whats_new_later = updated
+            return
+        notes = whatsnew.unseen(self.cfg.whats_new_seen)
+        if updates.newer(__version__, self.cfg.whats_new_seen or "0"):
+            self.cfg.whats_new_seen = __version__
+            self._save_later()
+        if notes:
+            dlg = whatsnew.WhatsNewDialog(self, notes, updated)
+            dlg.exec()
+            page = dlg.page
+            free_dialog(dlg)
+            if page:
+                self.open_settings(page)
+            return
+        if not updated:
+            return
+        box = QMessageBox(QMessageBox.Information, "Updated",
+                          f"Onion Board is up to date: version {__version__}.",
+                          QMessageBox.NoButton, self)
+        new = box.addButton("What's new", QMessageBox.HelpRole)
+        box.addButton(QMessageBox.Ok)
+        box.exec()
+        if box.clickedButton() is new:
+            QDesktopServices.openUrl(QUrl(
+                f"https://github.com/{updates.REPO}/releases/tag/v{__version__}"))
+
+    def _update_failed(self, pending: str):
+        from soundboard import __version__
         log.warning("the update to %s didn't finish (still %s)", pending, __version__)
         box = QMessageBox(QMessageBox.Warning, "The update didn't finish",
                           f"Onion Board {pending} wasn't installed; this is still "
@@ -3732,6 +3762,9 @@ class MainWindow(QMainWindow):
         if note:   # held back while the window was in the tray (see __init__)
             QTimer.singleShot(400, lambda: QMessageBox.warning(
                 self, "Settings were restored", note))
+        later, self._whats_new_later = getattr(self, "_whats_new_later", None), None
+        if later is not None:   # held back while the window was in the tray
+            QTimer.singleShot(700, lambda: self.whats_new(later))
 
     def hideEvent(self, ev):
         super().hideEvent(ev)
