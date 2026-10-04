@@ -295,7 +295,12 @@ too (say No if another program, like Voicemeeter, uses it).
   *Remote control* lets programs on this PC play your sounds: a Stream Deck
   (Bitfocus Companion, Touch Portal, its website buttons), AutoHotkey or a script.
   It only listens on this PC and needs the key shown there (*Copy link* gives a
-  ready-made "play a random sound" link).
+  ready-made "play a random sound" link). Besides playing and stopping sounds it can
+  mute you (a panic button), switch the voice changer and mic, change the volume and
+  category and save the instant replay; `/api/help` lists it all. New to it? The
+  **Streamer guide** there walks through Stream Deck keys, channel points and chat
+  commands (Streamer.bot), and **Copy AI prompt** gives ChatGPT / Claude everything
+  it needs (the links, your sounds) to set up whatever tools you use with you.
 - **Runs in the background:** closing the window keeps it in the tray (hotkeys and
   the overlay keep working; right-click the tray icon → *Quit*). Optionally
   **starts with Windows**, straight to the tray.
@@ -412,7 +417,7 @@ the launcher the shortcuts and PyInstaller use. The app is the `soundboard` pack
 | `soundboard/ui/busy.py` | click feedback for buttons: a greyed-out *Scanning…* while the work runs, then a short *✓ done* on the button (`run_busy`, `hold`, `flash`) |
 | `soundboard/ui/a11y.py` | screen-reader names for icon-only controls, taken from their tooltips as the focus moves |
 | `soundboard/shuffle.py` | the random-sound hotkeys' shuffle bag (every sound once before repeats, never twice in a row) |
-| `soundboard/remote.py` | opt-in local control API for Stream Deck / scripts: HTTP on `127.0.0.1`, token-guarded, answered on the UI thread |
+| `soundboard/remote.py` | opt-in local control API for Stream Deck / scripts: HTTP on `127.0.0.1`, token-guarded, answered on the UI thread; also writes the AI setup prompt |
 | `soundboard/ui/linkbar.py` | the Sounds tab's link bar: a link pasted into *Search sounds* is looked up with yt-dlp, then added as a sound or played once |
 | `soundboard/ui/ytsearch.py` | the Sounds tab's web search: Enter in *Search sounds* shows YouTube or SoundCloud hits as a grid of cards (thumbnail, title, length) in place of the pads; *Play* / *Add* hand one to the link bar |
 | `soundboard/ui/speedpitch.py` | the live speed & pitch button and its popup (Sounds transport) |
@@ -481,6 +486,7 @@ the launcher the shortcuts and PyInstaller use. The app is the `soundboard` pack
 | `soundboard/proxsim.py` | development tool: proximity chat on the listener's side (distance fade, walls, walkie-talkies and radios) from each game's published or decompiled defaults |
 | `soundboard/chatcheck.py` | the Discord check: a test sound, and how to tell from Discord's Mic Test playback whether its noise suppression, gate or gain control is changing your sounds |
 | `soundboard/ui/chatguide.py` | the Discord and game voice-chat guides (the settings that keep sounds clean) and the check that runs from them |
+| `soundboard/ui/streamguide.py` | the streamer guide for remote control (Stream Deck keys, channel points, chat commands, with the links to copy) and the prompt that lets an AI assistant set it up |
 | `soundboard/sendfx.py` | the send stage before the cable: phase-aware mono downmix, lookahead peak limiter, ducking under your voice |
 | `soundboard/cableformat.py` | reads both ends of the virtual cable's Windows format and sets them to 48 kHz, so the cable passes sound through unconverted |
 | `modules/` | add-ons shipped with the app: `retro-fx` (an effects module, the example to copy), `live-voice` (a service module with its own Python environment) and `translate-zh/es/fr/de/ru` (translation modules: a manifest naming a model that's downloaded only when picked) |
