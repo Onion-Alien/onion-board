@@ -17,6 +17,7 @@ from PySide6.QtCore import QPointF, QRectF, QSize, Qt, QTimer, Signal
 from PySide6.QtGui import QColor, QCursor, QFont, QImage, QPainter, QPainterPath, QPen
 from PySide6.QtWidgets import QSizePolicy, QWidget
 
+from soundboard import theme
 from soundboard.ui import appstate
 
 # drawn on a 100 x 120 canvas, scaled to the requested height
@@ -50,7 +51,7 @@ def _mix(a: float, b: float, k: float) -> float:
     return a + (b - a) * k
 
 
-def draw_owl(p: QPainter, rect: QRectF, look: float = 0.0, feather=FEATHER, dark=FEATHER_DARK,
+def draw_owl(p: QPainter, rect: QRectF, look: float = 0.0, feather=None, dark=None,
              *, look_y: float = 0.0, blink: float = 0.0, sad: float = 0.0,
              tufts: float = 0.0, clasp: float = 0.0, flap: float = 0.0,
              plead: float = 0.0, tear: float = 0.0):
@@ -60,7 +61,12 @@ def draw_owl(p: QPainter, rect: QRectF, look: float = 0.0, feather=FEATHER, dark
     the eyes, `tufts` droops the ear tufts by that many degrees (negative perks them
     up), `clasp` 0..1 brings the wings together in front (begging), `flap` 0..1 lifts
     them (joy), `plead` 0..1 makes the pupils big and shiny, and `tear` 0..1 rolls a
-    tear down his cheek (0 = none)."""
+    tear down his cheek (0 = none). His feathers are the current theme's accent
+    unless `feather` / `dark` are given (FEATHER / FEATHER_DARK are his own teal)."""
+    if feather is None:
+        feather = QColor(theme.T["accent"])
+    if dark is None:
+        dark = QColor(feather).darker(135)
     s = min(rect.width() / W, rect.height() / H)
     p.save()
     p.setRenderHint(QPainter.Antialiasing)
