@@ -511,7 +511,7 @@ QRadioButton::indicator:checked { image:url("$radio_on"); }
 QRadioButton::indicator:checked:hover { image:url("$radio_on_hover"); }
 QRadioButton::indicator:disabled { image:url("$radio_off"); }
 QRadioButton::indicator:checked:disabled { image:url("$radio_on_off"); }
-QListWidget#settingscategories { background:$panel; border:1px solid $border; }
+QListWidget#settingscategories { background:$panel; border:1px solid $border; outline:0; }
 QListWidget#settingscategories::item { padding:4px; }
 QListWidget#settingscategories::item:selected { background:$accent; color:$on_accent; }
 QListWidget#settingscategories::item:hover:!selected { background:$inset; }
