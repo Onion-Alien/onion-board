@@ -60,6 +60,7 @@ from pathlib import Path, PurePosixPath
 
 from soundboard import voicefx
 from soundboard import library, net
+from soundboard import errors
 
 log = logging.getLogger(__name__)
 
@@ -169,7 +170,7 @@ def _read(folder: Path) -> ModuleInfo | None:
     except (OSError, ValueError, KeyError, TypeError) as e:
         log.warning("bad module.json in %s: %s", folder, e)
         return ModuleInfo(id=folder.name, name=folder.name, version="?", description="",
-                          kind="?", path=folder, error=f"bad module.json: {e}")
+                          kind="?", path=folder, error=f"bad module.json: {errors.plain(e)}")
     if info.kind not in KINDS:
         info.error = f"unknown kind {info.kind!r}"
     elif info.kind == "effects" and not (folder / info.entry).is_file():
@@ -255,7 +256,7 @@ def load_effects(infos: list[ModuleInfo]) -> None:
             _LOADED[info.path] = api.effects
             log.info("loaded module %s %s: %s", info.id, info.version, ", ".join(api.effects))
         except Exception as e:  # noqa: BLE001
-            info.error = f"failed to load: {e}"
+            info.error = f"failed to load: {errors.plain(e)}"
             log.exception("module %s failed to load", info.id)
 
 
@@ -320,13 +321,13 @@ def load_package(info: ModuleInfo):
         except Exception as e:  # noqa: BLE001 - a bad add-on can't stop the app
             _forget(info.package)
             log.exception("module %s failed to load", info.id)
-            raise ModuleError(f"failed to load: {e}") from e
+            raise ModuleError(f"failed to load: {errors.plain(e)}") from e
     try:
         entry = importlib.import_module(info.entry)
     except Exception as e:  # noqa: BLE001
         _forget(info.package)
         log.exception("module %s failed to load", info.id)
-        raise ModuleError(f"failed to load: {e}") from e
+        raise ModuleError(f"failed to load: {errors.plain(e)}") from e
     if not callable(getattr(entry, "create", None)):
         raise ModuleError(f"{info.entry} has no create()")
     _load_all(info.package, pkg_dir)
@@ -365,7 +366,7 @@ def install_zip(path: Path, module_id: str, kind: str,
     try:
         z = zipfile.ZipFile(path)
     except (OSError, zipfile.BadZipFile) as e:
-        raise ModuleError(f"it isn't a zip file that can be opened ({e})") from e
+        raise ModuleError(f"it isn't a zip file that can be opened ({errors.plain(e)})") from e
     staging = base.parent / f"modules-new-{uuid.uuid4().hex[:8]}"
     try:
         with z:
@@ -375,7 +376,7 @@ def install_zip(path: Path, module_id: str, kind: str,
             except KeyError as e:
                 raise ModuleError("it has no module.json") from e
             except ValueError as e:
-                raise ModuleError(f"its module.json can't be read ({e})") from e
+                raise ModuleError(f"its module.json can't be read ({errors.plain(e)})") from e
             if not isinstance(d, dict) or d.get("id") != module_id or d.get("kind") != kind:
                 raise ModuleError(f"it isn't the {module_id} add-on")
             staging.mkdir(parents=True)
@@ -394,7 +395,7 @@ def install_zip(path: Path, module_id: str, kind: str,
                 os.rename(old, dest)           # put the working copy back
             raise
     except OSError as e:
-        raise ModuleError(f"it couldn't be installed ({e})") from e
+        raise ModuleError(f"it couldn't be installed ({errors.plain(e)})") from e
     finally:
         shutil.rmtree(staging, ignore_errors=True)
     info = _read(dest)
@@ -414,7 +415,7 @@ def uninstall(module_id: str, base: Path | None = None) -> None:
     try:
         os.rename(dest, gone)
     except OSError as e:
-        raise ModuleError(f"it couldn't be removed ({e})") from e
+        raise ModuleError(f"it couldn't be removed ({errors.plain(e)})") from e
     shutil.rmtree(gone, ignore_errors=True)
     log.info("removed module %s from %s", module_id, dest)
 
@@ -460,7 +461,7 @@ def install(info: ModuleInfo, on_line: Callable[[str], None]) -> bool:
                                  text=True, encoding="utf-8", errors="replace",
                                  creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0))
         except OSError as e:
-            on_line(f"couldn't run it: {e}")
+            on_line(f"couldn't run it: {errors.plain(e)}")
             return False
         # a step that hangs (a stuck download, a prompt nobody sees) is killed
         timed_out = threading.Event()

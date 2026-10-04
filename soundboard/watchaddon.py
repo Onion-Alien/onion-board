@@ -27,6 +27,7 @@ from pathlib import Path
 
 from soundboard import modules, net, updates
 from soundboard.modules import ModuleInfo
+from soundboard import errors
 
 log = logging.getLogger(__name__)
 
@@ -159,7 +160,7 @@ def check_update(dirs: list[Path] | None = None) -> Offer | None:
 
 def friendly(e: Exception) -> str:
     """An error from getting the add-on, as a sentence for the tab."""
-    text = str(e) or type(e).__name__
+    text = errors.plain(e)
     if isinstance(e, net.FeatureOff):
         return text
     if getattr(e, "code", None) in (502, 503, 504):

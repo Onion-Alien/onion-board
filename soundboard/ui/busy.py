@@ -21,6 +21,7 @@ from PySide6.QtGui import QDesktopServices
 from PySide6.QtWidgets import QApplication, QLabel, QWidget
 
 from soundboard import theme
+from soundboard import errors
 
 FLASH_MS = 2200
 _IDLE = "_busy_idle_text"
@@ -247,7 +248,7 @@ def open_folder(folder, btn=None, window: QWidget | None = None) -> bool:
         path = folder() if callable(folder) else folder
     except OSError as e:
         toast(window or (btn.window() if btn is not None else None),
-              f"Couldn't make the folder: {html.escape(str(e))}", "warn", 8000)
+              f"Couldn't make the folder: {html.escape(errors.plain(e))}", "warn", 8000)
         return False
     return open_url(QUrl.fromLocalFile(str(path)), btn, window, opened="✓ Opened",
                     failed="Couldn't open the folder")

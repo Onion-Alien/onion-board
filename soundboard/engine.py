@@ -40,6 +40,7 @@ from soundboard import destination
 from soundboard.eq import EQ
 from soundboard.sendfx import Ducker, Limiter, SmartMono
 from soundboard.voicefx.builtin import PitchShift
+from soundboard import errors
 
 log = logging.getLogger(__name__)
 
@@ -709,7 +710,7 @@ class Engine:
                 self.main_stream = self._open_out("main", name, self._cb_main)
             except Exception as e:  # noqa: BLE001
                 log.warning("can't open main output %r: %s", name, e)
-                self.errors["main"] = str(e)
+                self.errors["main"] = errors.plain(e)
 
     def set_mon_device(self, name: str | None):
         self._close("mon_stream")
@@ -721,7 +722,7 @@ class Engine:
                 self.mon_stream = self._open_out("mon", name, self._cb_mon)
             except Exception as e:  # noqa: BLE001
                 log.warning("can't open headphone output %r: %s", name, e)
-                self.errors["mon"] = str(e)
+                self.errors["mon"] = errors.plain(e)
 
     def set_obs_device(self, name: str | None):
         """The stream output: a device OBS captures (None = off)."""
@@ -734,7 +735,7 @@ class Engine:
                 self.obs_stream = self._open_out("obs", name, self._cb_obs)
             except Exception as e:  # noqa: BLE001
                 log.warning("can't open stream output %r: %s", name, e)
-                self.errors["obs"] = str(e)
+                self.errors["obs"] = errors.plain(e)
 
     def set_mic_device(self, name: str | None):
         self._close("mic_stream")
@@ -764,7 +765,7 @@ class Engine:
                 log.info("opened mic: %s @ %d Hz, %d ch", name, rate, chans)
             except Exception as e:  # noqa: BLE001
                 log.warning("can't open mic %r: %s", name, e)
-                self.errors["mic"] = str(e)
+                self.errors["mic"] = errors.plain(e)
                 if s is not None:
                     self._close_quietly(s, "mic")
                 if self.rates["mic"] != old_rate:
@@ -1313,7 +1314,7 @@ class Engine:
         self.cb_errors[key] += 1
         if self.cb_errors[key] - self._cb_err_base[key] == 1:
             log.error("exception in %s audio callback", key, exc_info=exc)
-            self.errors[key] = f"audio callback failed: {exc}"
+            self.errors[key] = f"audio callback failed: {errors.plain(exc)}"
 
     def _cb_main(self, outdata, frames, t, status):
         self._last_cb["main"] = time.monotonic()

@@ -57,6 +57,7 @@ from collections.abc import Callable
 from dataclasses import dataclass
 
 from soundboard import netlog
+from soundboard import errors
 
 log = logging.getLogger(__name__)
 
@@ -359,7 +360,7 @@ def _tor_proxy() -> Proxy:
     try:
         return _tor_gate(TOR_WAIT_S)
     except ProxyError as e:
-        raise _failed(str(e)) from None
+        raise _failed(errors.plain(e)) from None
 
 
 def describe() -> str:
@@ -490,7 +491,7 @@ def _via(via: Proxy, host: str, port: int, timeout: float | None,
             _http_connect(sock, via, host, port)
     except ProxyError as e:
         sock.close()
-        raise _failed(str(e)) from None
+        raise _failed(errors.plain(e)) from None
     except OSError as e:
         sock.close()
         raise _failed(f"{name or f'The proxy at {via.where}'} stopped answering "
@@ -711,7 +712,7 @@ class _HTTPSConnection(_Logged, http.client.HTTPSConnection):
             self.sock = self._context.wrap_socket(sock, server_hostname=self.host)
         except BaseException as e:
             sock.close()
-            self.entry.failed(f"secure connection failed ({e})")
+            self.entry.failed(f"secure connection failed ({errors.plain(e)})")
             raise
         self.entry.set_tls(_tls_text(self.sock))
 

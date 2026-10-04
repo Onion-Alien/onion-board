@@ -24,6 +24,7 @@ from soundboard import net, netlog, quality, theme, thumbs, ytdl
 from soundboard.library import (SR, decode, fingerprint, import_file, level_gain, to_int16)
 from soundboard.ui import busy, icons
 from soundboard.ui.widgets import fmt_time
+from soundboard import errors
 
 log = logging.getLogger(__name__)
 
@@ -74,6 +75,7 @@ class LinkBar(QFrame):
         self.info = QLabel()
         self.info.setTextFormat(Qt.RichText)
         self.info.setWordWrap(True)
+        errors.linkify(self.info)   # an error's "Report it" link
         h.addWidget(self.info, 1)
         self.btn_play = QPushButton("Play once")
         self.btn_play.setToolTip("Download it and play it through your mic once — it isn't "
@@ -253,7 +255,7 @@ class LinkBar(QFrame):
             self._msg.emit("found", url, ytdl.probe(url))
         except Exception as e:  # noqa: BLE001 - shown in the bar
             log.info("link lookup failed for %s: %s", url, e)
-            self._msg.emit("probe-error", url, str(e))
+            self._msg.emit("probe-error", url, errors.plain(e))
 
     def _work(self, kind, url, got, color, known, auto_update, direct=False, video=False):
         """Download (unless `got` already holds it), then import or decode."""
@@ -287,18 +289,21 @@ class LinkBar(QFrame):
                              "No video was saved: this site only gave the sound.")
                 except OSError as e:
                     log.warning("couldn't keep the video of %s: %s", url, e)
-                    saved = f"The video couldn't be saved ({e.strerror or e})."
+                    saved = f"The video couldn't be saved ({errors.plain(e)})."
             self._msg.emit("added", url, (meta, data, title, saved))
         except ytdl.TorBlocked as e:   # the bar offers to try it without Tor
             log.warning("link %s turned away over Tor for %s", kind, url)
-            self._msg.emit("blocked", url, (kind, f"Couldn't {'add' if kind == 'add' else 'play'}"
-                                                  f" it: {e}"))
+            self._msg.emit("blocked", url, (kind, html.escape(
+                f"Couldn't {'add' if kind == 'add' else 'play'} it: {e}")))
         except Exception as e:  # noqa: BLE001 - shown in the bar, logged
             log.warning("link %s failed for %s: %s", kind, url, e)
             hint = ("" if not isinstance(e, ytdl.FetchError) or auto_update else
                     " A newer yt-dlp may fix this: Settings → Updates → Update now.")
-            self._msg.emit("error", url, f"Couldn't {'add' if kind == 'add' else 'play'} "
-                                         f"it: {e}{hint}")
+            doing = "add" if kind == "add" else "play"
+            # rich text: the plain words, and a "Report it" link when it's one for us
+            self._msg.emit("error", url, errors.html(e, f"Couldn't {doing} it: ",
+                                                     where=f"Couldn't {doing} a link")
+                           + html.escape(hint))
         finally:
             if not keep and path is not None:
                 _drop_temp(path)
@@ -360,9 +365,9 @@ class LinkBar(QFrame):
             self.done.emit(url, "play", current)
         elif kind == "error":
             if current:
-                self._say(html.escape(payload), theme.status("error"))
+                self._say(payload, theme.status("error"))   # already rich text
             else:   # it was for a link no longer showing: don't lose the reason
-                busy.toast(self.window(), html.escape(payload), "error", 8000)
+                busy.toast(self.window(), payload, "error", 8000)
             self.done.emit(url, was or "add", False)
         if self._queued and self.url:
             queued, self._queued = self._queued, ""

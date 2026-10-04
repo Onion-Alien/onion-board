@@ -26,6 +26,7 @@ from pathlib import Path
 
 from soundboard import __version__, net
 from soundboard.library import APP_DIR
+from soundboard import errors
 
 log = logging.getLogger(__name__)
 
@@ -272,7 +273,7 @@ def fetch(url: str, sha256: str, dest: Path, trusted: tuple[str, ...], max_size:
         raise
     except OSError as e:   # offline, disk full, connection dropped…
         part.unlink(missing_ok=True)
-        raise UpdateError(f"the download failed ({e})") from e
+        raise UpdateError(f"the download failed ({errors.plain(e)})") from e
     log.info("downloaded %s (%d bytes, SHA-256 checked)", dest.name, done)
     return dest
 

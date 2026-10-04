@@ -29,6 +29,7 @@ import numpy as np
 import soxr
 
 from soundboard.speech import protocol
+from soundboard import errors
 
 log = logging.getLogger(__name__)
 
@@ -75,7 +76,7 @@ class ServiceHost:
                 creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0))
         except OSError as e:
             srv.close()
-            raise RuntimeError(f"couldn't start {self.name}: {e}") from e
+            raise RuntimeError(f"couldn't start {self.name}: {errors.plain(e)}") from e
         finally:
             if out is not subprocess.DEVNULL:
                 out.close()      # the child has its own handle
@@ -189,7 +190,7 @@ class ServiceHost:
             # anything (a JSON message nested too deep: RecursionError) ends the
             # session with "stopped", so the UI never stays on "listening", mic muted
             if not self._stop.is_set():
-                reason = str(e) or type(e).__name__
+                reason = errors.plain(e)
         self.connected = False
         if not self._stop.is_set():
             self.stop()         # it hung up on us: make sure the process goes too

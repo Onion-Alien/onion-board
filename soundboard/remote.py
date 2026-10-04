@@ -48,6 +48,8 @@ from urllib.parse import parse_qs, urlsplit
 
 from PySide6.QtCore import QObject, Qt, Signal
 
+from soundboard import errors
+
 if TYPE_CHECKING:
     from soundboard.ui.mainwindow import MainWindow
 
@@ -137,7 +139,7 @@ class RemoteControl(QObject):
         except OSError as e:
             self.error = (f"port {self.port} is already in use — pick another"
                           if getattr(e, "winerror", None) == 10048 or e.errno in (98, 10048)
-                          else str(e))
+                          else errors.plain(e))
             log.warning("control API couldn't listen on %s:%s: %s", HOST, self.port, e)
             return False
         self._server = srv

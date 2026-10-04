@@ -31,6 +31,7 @@ from soundboard.library import RESOURCE_DIR
 from soundboard.ui import busy, fit, icons
 from soundboard.ui.bunnywidget import BunnyWidget
 from soundboard.ui.widgets import Meter
+from soundboard import errors
 
 RESTART_NEEDED = 3010   # install-vbcable.ps1: installed, but Windows must restart first
 
@@ -599,7 +600,7 @@ class SetupWizard(QDialog):
                 creationflags=subprocess.CREATE_NO_WINDOW)
         except OSError as e:
             self.cable_status.setText(f"<span style='color:{_bad()}'>Couldn't start the cable "
-                                      f"installer ({e.strerror or e}).</span> Restart your PC "
+                                      f"installer ({errors.plain(e)}).</span> Restart your PC "
                                       "and try again, or install it yourself from "
                                       "vb-audio.com/Cable.")
             return
@@ -654,7 +655,7 @@ class SetupWizard(QDialog):
             busy.hold(self.btn_restart, "Restarting in a few seconds…")
         except OSError as e:
             self.cable_status.setText(f"<span style='color:{_bad()}'>Couldn't restart the PC "
-                                      f"({e.strerror or e}).</span> Restart it from the Start "
+                                      f"({errors.plain(e)}).</span> Restart it from the Start "
                                       "menu (Power → Restart); Onion Board will pick up here "
                                       "afterwards.")
 

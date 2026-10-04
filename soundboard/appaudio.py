@@ -28,6 +28,8 @@ from dataclasses import dataclass, field
 
 import numpy as np
 
+from soundboard import errors
+
 log = logging.getLogger(__name__)
 
 SR = 48000            # what the sink gets (the engine's storage rate)
@@ -784,7 +786,7 @@ class AppCapture:
                 self.error = _explain(e)
                 log.warning("app capture %s: %s", self.name, self.error)
         except Exception as e:  # noqa: BLE001
-            self.error = str(e) or type(e).__name__
+            self.error = errors.plain(e)
             log.exception("app capture %s failed", self.name)
         finally:
             self._ready.set()
@@ -914,4 +916,4 @@ def _explain(e: ComError) -> str:
     ok, why = supported()
     if not ok:
         return why
-    return f"Windows couldn't start the capture ({e}). Switch Send on to try again."
+    return f"Windows couldn't start the capture ({errors.plain(e)}). Switch Send on to try again."

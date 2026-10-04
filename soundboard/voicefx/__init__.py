@@ -22,6 +22,8 @@ from collections.abc import Callable
 
 import numpy as np
 
+from soundboard import errors
+
 log = logging.getLogger(__name__)
 
 
@@ -172,7 +174,7 @@ class VoiceChain:
             except Exception as ex:  # noqa: BLE001
                 # like a failing run(): the effect is left out and the voice panel
                 # shows why (runs on the mic thread too, when the mic's rate changes)
-                self.errors[etype] = str(ex) or type(ex).__name__
+                self.errors[etype] = errors.plain(ex)
                 log.error("voice effect %r failed to start; bypassed", etype, exc_info=ex)
                 continue
             new.append(e)
@@ -248,7 +250,7 @@ class VoiceChain:
                 m = y.astype(np.float32, copy=False)
             except Exception as ex:  # noqa: BLE001
                 # a broken effect is bypassed, never allowed to kill the mic stream
-                self.errors[e.type] = str(ex)
+                self.errors[e.type] = errors.plain(ex)
                 self._effects = tuple(f for f in self._effects if f is not e)
                 log.error("voice effect %r failed; bypassed", e.type, exc_info=ex)
         out = np.empty((len(m), 2), np.float32)

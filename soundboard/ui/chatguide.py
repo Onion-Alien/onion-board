@@ -22,6 +22,7 @@ from soundboard import chatcheck, theme
 from soundboard.ui import busy, fit, icons
 from soundboard.ui.bunnywidget import BunnyWidget
 from soundboard.ui.crashdialog import free_dialog
+from soundboard import errors
 
 log = logging.getLogger(__name__)
 
@@ -184,7 +185,7 @@ class ChatCheck(QObject):
             log.info("discord check: %s", {k: v for k, v in res.items()})
         except Exception as ex:  # noqa: BLE001
             log.exception("discord check failed")
-            res = {"issues": [], "error": f"The check failed: {ex}"}
+            res = {"issues": [], "error": f"The check failed: {errors.plain(ex)}"}
         self.done.emit(res)
 
 
@@ -271,7 +272,7 @@ class DiscordGuide(QDialog):
             self._check.start()
         except Exception as e:  # noqa: BLE001 - never leave the button stuck on "Checking…"
             log.exception("discord check couldn't start")
-            self._checked({"issues": [], "error": f"The check couldn't start: {e}"})
+            self._checked({"issues": [], "error": f"The check couldn't start: {errors.plain(e)}"})
 
     def _progress(self, text: str):
         self.result.setText(f"{text} (about {round(chatcheck.LENGTH_S + TAIL_S)} seconds; "

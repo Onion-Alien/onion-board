@@ -38,6 +38,7 @@ from collections.abc import Callable
 from pathlib import Path
 
 from soundboard import library, net, torget
+from soundboard import errors
 
 log = logging.getLogger(__name__)
 
@@ -555,7 +556,7 @@ class Tor:
         try:
             ctrl.signal("NEWNYM")
         except OSError as e:
-            return f"Tor didn't take it ({e})"
+            return f"Tor didn't take it ({errors.plain(e)})"
         self._last_newnym = time.monotonic()
         log.info("tor: new identity")
         return "New identity: new connections go out through a different route."
@@ -596,10 +597,10 @@ class Tor:
             port_file = root / "control-port"
             port_file.unlink(missing_ok=True)
         except ValueError as e:
-            self._fail(run_id, str(e))
+            self._fail(run_id, errors.plain(e))
             return None
         except OSError as e:
-            self._fail(run_id, f"couldn't write its settings ({e.strerror or e})")
+            self._fail(run_id, f"couldn't write its settings ({errors.plain(e)})")
             return None
         flags = subprocess.CREATE_NO_WINDOW if os.name == "nt" else 0
         try:
@@ -610,7 +611,7 @@ class Tor:
                 cwd=str(self._cwd or exe.parent), stdin=subprocess.DEVNULL,
                 stdout=subprocess.PIPE, stderr=subprocess.STDOUT, creationflags=flags)
         except OSError as e:
-            self._fail(run_id, f"tor.exe wouldn't start ({e.strerror or e}); an antivirus "
+            self._fail(run_id, f"tor.exe wouldn't start ({errors.plain(e)}); an antivirus "
                                "may have blocked it")
             return None
         try:
@@ -668,7 +669,7 @@ class Tor:
             socks = parse_listener(ctrl.getinfo("net/listeners/socks").get(
                 "net/listeners/socks", ""))
         except OSError as e:
-            return self._fail(run_id, f"couldn't talk to tor.exe ({e})")
+            return self._fail(run_id, f"couldn't talk to tor.exe ({errors.plain(e)})")
         if socks is None:
             ctrl.close()
             return self._fail(run_id, "tor.exe didn't open its SOCKS port")
@@ -689,7 +690,7 @@ class Tor:
             except OSError as e:
                 if run_id != self._run_id:
                     return
-                return self._fail(run_id, f"tor.exe stopped answering ({e})")
+                return self._fail(run_id, f"tor.exe stopped answering ({errors.plain(e)})")
             now = (phase["progress"], phase["summary"])
             if now != last:
                 last = now
