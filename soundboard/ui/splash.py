@@ -1,7 +1,7 @@
-"""The start-up splash: Bun in the middle of the screen with a spinner, from the
-moment the QApplication exists until the main window is up. No card behind him:
-Bun, the spinner and the caption float on the desktop, in the saved theme's
-colours (read straight from config.json; the rest of the settings load later).
+"""The start-up splash: Bun hopping about in the middle of the screen, from the
+moment the QApplication exists until the main window is up. Just Bun on the
+desktop (no card, spinner or caption), his headphones in the saved theme's accent
+(read straight from config.json; the rest of the settings load later).
 
 A cold start (first launch after a reboot, files not yet cached) can spend several
 seconds importing and building the window, all on the UI thread, so nothing would
@@ -21,15 +21,18 @@ import time
 
 from pathlib import Path
 
-from PySide6.QtCore import QEventLoop, QPointF, QRectF, Qt
-from PySide6.QtGui import (QColor, QCursor, QFont, QFontMetricsF, QGuiApplication, QPainter,
-                           QPainterPath, QPen)
+from PySide6.QtCore import QEventLoop, QRectF, Qt
+from PySide6.QtGui import QColor, QCursor, QGuiApplication, QPainter
 from PySide6.QtWidgets import QApplication, QWidget
 
 from soundboard import theme
 from soundboard.bunny import draw_bunny
 
-CARD_W, CARD_H = 260, 250
+CARD_W, CARD_H = 240, 190
+BUN_W, BUN_H = 90, 108
+HOP = 0.62       # seconds per hop
+HOP_PX = 26      # how high he gets
+ROAM_PX = 55     # how far he wanders either side of the middle
 FRAME = 1 / 30   # seconds between repaints while pumping
 # library.CONFIG_PATH, without importing library (numpy, soundfile...) this early
 CONFIG = Path(os.environ.get("APPDATA", Path.home())) / "OnionBoard" / "config.json"
@@ -49,36 +52,27 @@ class Splash(QWidget):
 
     def paintEvent(self, ev):
         t = time.monotonic() - self._t0
+        u = (t % HOP) / HOP                     # 0..1 through this hop
+        air = 4 * u * (1 - u)                   # 0 on the ground, 1 at the top
+        land = max(0.0, 1 - u / 0.18)           # just landed: squash, ears flop
+        wander = math.sin(t * 0.9)
+        facing = 1 if math.cos(t * 0.9) >= 0 else -1   # the way he's heading
+        stretch = 1 + 0.08 * air - 0.14 * land   # taller in the air, squat on landing
+        foot_x = self.width() / 2 + wander * ROAM_PX
+        foot_y = self.height() - 12
         p = QPainter(self)
         p.setRenderHint(QPainter.Antialiasing)
-        r = QRectF(self.rect())
-        t_ = theme.T
-        # Bun, bobbing gently (his headphones are the theme's accent)
-        bob = math.sin(t * 3.2) * 3
-        draw_bunny(p, QRectF(r.center().x() - 50, 22 + bob, 100, 120))
-        # the spinner: an arc chasing round, its length breathing in and out
-        ring = QRectF(r.center().x() - 16, 160, 32, 32)
-        p.setPen(QPen(QColor(t_["groove"]), 4))
-        p.setBrush(Qt.NoBrush)
-        p.drawEllipse(ring)
-        span = 70 + 160 * (0.5 + 0.5 * math.sin(t * 2.4))
-        pen = QPen(QColor(t_["accent"]), 4)
-        pen.setCapStyle(Qt.RoundCap)
-        p.setPen(pen)
-        p.drawArc(ring, int(-t * 360 * 16) % (360 * 16), int(span * 16))
-        # the caption, haloed in the theme's background so it reads on any desktop
-        f = QFont(self.font())
-        f.setFamily(t_.get("font", theme.FONT))
-        f.setPointSizeF(10)
-        f.setBold(True)
-        text = "Loading Onion Board"
-        x = r.center().x() - QFontMetricsF(f).horizontalAdvance(text + "...") / 2
-        path = QPainterPath()
-        path.addText(QPointF(x, 216), f, text + "." * (int(t * 2.5) % 4))
-        halo = QPen(QColor(t_["bg"]), 4)
-        halo.setJoinStyle(Qt.RoundJoin)
-        p.strokePath(path, halo)
-        p.fillPath(path, QColor(t_["text"]))
+        # a soft shadow on the ground, smaller while he's up
+        p.setPen(Qt.NoPen)
+        p.setBrush(QColor(0, 0, 0, round(70 - 40 * air)))
+        sw = 56 * (1 - 0.35 * air)
+        p.drawEllipse(QRectF(foot_x - sw / 2, foot_y - 4, sw, 8))
+        # Bun, squashed about his feet and mirrored to face where he's going
+        p.translate(foot_x, foot_y - HOP_PX * air)
+        p.scale(facing / stretch ** 0.5, stretch)
+        blink = 1.0 if (t % 2.7) > 2.55 else 0.0
+        draw_bunny(p, QRectF(-BUN_W / 2, -BUN_H, BUN_W, BUN_H),
+                   blink=blink, ears=14 * land - 6 * air)
         p.end()
 
 
