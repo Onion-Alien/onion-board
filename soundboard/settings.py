@@ -64,7 +64,8 @@ HOTKEY_GROUPS = [
          "Turns instant replay on: the last 30 seconds of everything your PC plays (a "
          "friend in Discord, the game, a video; not Onion Board's own sounds) are kept "
          "in memory, and this key adds them to your Sounds as a pad. Nothing is saved "
-         "until you press it. Clear the key to switch it off."),
+         "until you press it. Clear the key to switch it off. Only keep clips of people "
+         "who are fine with it: in some places, recording a call needs everyone's OK."),
     ]),
     ("Overlay", [
         ("overlay_hotkey", "__overlay__", "Open the in-game overlay",
@@ -72,6 +73,37 @@ HOTKEY_GROUPS = [
     ]),
 ]
 HOTKEY_ACTIONS = [a for _, group in HOTKEY_GROUPS for a in group]
+
+# Settings > About. The note is the author's own words, kept casual on purpose.
+NOTE = ("Hey, thanks for actually using this. Onion Board started because every soundboard "
+        "I tried was either ugly, full of ads, or quietly phoning home, so I made my own "
+        "and it kind of snowballed from there. It's just me building it, a lot of late "
+        "nights and a lot of testing, so if something's broken, ugly or confusing, tell "
+        "me. Honestly. I'd way rather hear \"this part is cooked\" than have you quietly "
+        "uninstall it.\n\nIt's free and it's staying free. Have fun with it, don't be a "
+        "menace with it, and go make your friends jump in voice chat.\n\n— OnionAlien")
+# Plain words, not a contract: the LICENSE file is the real terms.
+DISCLAIMER = (
+    "Onion Board is provided as is, with no warranty: use it at your own risk (the "
+    "LICENSE file has the full terms). In plain words:"
+    "<ul style='margin-left:-24px'>"
+    "<li><b>Your sounds are on you.</b> It comes with none of its own. Only download, "
+    "play or stream things you have the right to use, and follow the rules of the sites "
+    "you get them from.</li>"
+    "<li><b>Recording people.</b> Instant replay and radio clips record what your PC "
+    "plays. Some places need everyone's OK to record a call, so ask first.</li>"
+    "<li><b>Voices.</b> Don't use the voice changer or text-to-speech to pretend to be "
+    "a real person, to scam or to harass anyone.</li>"
+    "<li><b>Games and servers.</b> Some servers and games don't allow soundboards or "
+    "voice changers. Onion Board never changes a game's files or reads its memory, but whether a "
+    "server is OK with it is their call, and your account.</li>"
+    "<li><b>Your ears.</b> Keep an eye on the volume, yours and your friends'.</li>"
+    "<li><b>Names.</b> Discord, YouTube, VB-Audio and every other product named here "
+    "belong to their owners. Onion Board isn't affiliated with or endorsed by any of "
+    "them.</li>"
+    "<li><b>Other people's code.</b> Parts of Onion Board (Qt, yt-dlp and more) "
+    "come under their own licenses; THIRD-PARTY-NOTICES.txt next to the app lists "
+    "them.</li></ul>")
 
 
 def pretty_key(combo: str) -> str:
@@ -313,7 +345,8 @@ class SettingsDialog(QDialog):
                  ("overlay", "Overlay", "gamepad", self._overlay),
                  ("updates", "Updates", "reload", self._updates),
                  ("help", "Add-ons && help", "plus", self._help),
-                 ("remote", "Remote", "cable", self._remote))
+                 ("remote", "Remote", "cable", self._remote),
+                 ("about", "About", "star", self._about))
         self.categories = QListWidget()
         self.categories.setObjectName("settingscategories")
         self.categories.setAccessibleName("Settings categories")
@@ -907,6 +940,84 @@ class SettingsDialog(QDialog):
         v.addWidget(self._remote_easy_card())
         v.addStretch(1)
         return w
+
+    # ------------------------------------------------------------------ about
+    def _about(self):
+        w, v = self._page()
+        v.addWidget(self._about_card())
+        v.addWidget(self._contact_card())
+        v.addWidget(self._note_card())
+        v.addWidget(self._disclaimer_card())
+        v.addStretch(1)
+        return w
+
+    def _link_button(self, text: str, url: str, icon: str = "") -> QPushButton:
+        btn = QPushButton(text)
+        if icon:
+            icons.set_icon(btn, icon)
+        btn.clicked.connect(lambda: busy.open_url(
+            url, btn, opened="✓ Opened in your browser",
+            failed="Couldn't open your browser. The page is"))
+        return btn
+
+    def _about_card(self):
+        """The version (as the title bar shows it), and where the app and its licences
+        live."""
+        from soundboard.ui.mainwindow import version_text
+        from soundboard.updates import REPO
+        card, cv = self._card("Onion Board")
+        ver = self.about_version = QLabel(f"Version {version_text()}")
+        ver.setTextInteractionFlags(Qt.TextSelectableByMouse)
+        cv.addWidget(ver)
+        hint = QLabel("Free, with no ads, no account and no tracking. Made by OnionAlien. "
+                      "MIT license with the Commons Clause: use it for anything, share it "
+                      "for free, never sell it.")
+        hint.setObjectName("hint")
+        hint.setWordWrap(True)
+        cv.addWidget(hint)
+        row = _button_row()
+        row.addWidget(self._link_button("Website", "https://onion-alien.github.io/onion-board/",
+                                        "browser"))
+        row.addWidget(self._link_button("Source code", f"https://github.com/{REPO}"))
+        row.addWidget(self._link_button("Licenses", f"https://github.com/{REPO}#license"))
+        cv.addLayout(row)
+        return card
+
+    def _contact_card(self):
+        """Ways to reach the author. All of them only open a page in the browser:
+        nothing is sent from the app (feedback.py)."""
+        from soundboard import __version__, feedback
+        from soundboard.updates import REPO
+        card, cv = self._card("Get in touch",
+                              "Ideas, bugs, or just want to say hi? The feedback form needs "
+                              "no account. Found a security problem? Report it privately "
+                              "on GitHub, not in a public issue.")
+        row = _button_row()
+        send = self._link_button("Send feedback", feedback.feedback_url(__version__), "speech")
+        send.setObjectName("primary")
+        row.addWidget(send)
+        row.addWidget(self._link_button("Report a problem", feedback.problem_url(__version__)))
+        row.addWidget(self._link_button(
+            "Report a security issue", f"https://github.com/{REPO}/security/advisories/new",
+            "shield"))
+        cv.addLayout(row)
+        return card
+
+    def _note_card(self):
+        card, cv = self._card("A note from me")
+        note = QLabel(NOTE)
+        note.setWordWrap(True)
+        cv.addWidget(note)
+        return card
+
+    def _disclaimer_card(self):
+        card, cv = self._card("The boring bit")
+        text = QLabel(DISCLAIMER)
+        text.setObjectName("hint")
+        text.setWordWrap(True)
+        text.setTextFormat(Qt.RichText)
+        cv.addWidget(text)
+        return card
 
     # ------------------------------------------------------------------ add-ons
     def _addons_card(self):
