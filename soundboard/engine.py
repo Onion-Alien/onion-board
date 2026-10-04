@@ -8,7 +8,8 @@ VB-Cable — so all rate conversion is done here with soxr instead):
   radio   (48 kHz, pushed from the UI thread) -> resampler -> ring buffers -> main / monitor
   aux     (48 kHz, pushed from a capture thread: one per captured program, Apps tab)
           -> the same path again, each with its own rings, volume and switches
-  main (output) = sounds + radio / programs (when live) + mic -> virtual cable (what others hear)
+  main (output) = sounds + radio / programs (when live) + mic -> the send device: a virtual
+                  cable or any other output you picked (what others hear)
   mon  (output) = sounds + radio / programs [+ mic in test mode] -> your headphones
   obs  (output, optional) = sounds + radio / programs (when live) [+ mic] -> a device
        OBS captures: what others get, without the voice chat shaping, as its own track
@@ -217,7 +218,7 @@ class Ring:
         self.track_drift = track_drift
         # auto_drift: start without drift tracking, and switch it on once the ring has
         # had to skip or refill twice (the writer's clock really is off: a wireless
-        # headset's mic against the cable, say)
+        # headset's mic against the output clock, say)
         self.auto_drift = auto_drift
         # grow_to_s: a writer that stalls now and then (the radio) gets a bigger
         # cushion each time the ring runs dry, up to this, so it stops skipping
@@ -570,7 +571,7 @@ class Engine:
         self.mon_vol = 0.7        # everything -> your headphones
         self.obs_vol = 1.0        # everything -> the stream output (OBS)
         self.obs_voice = True     # your mic goes to the stream output too (when sent)
-        self.mic_enabled = True   # pass your mic through to the cable
+        self.mic_enabled = True   # pass your mic through to the send device
         self.sending = True       # master switch: False sends silence to others
         self.mic_muted = False
         self.monitor_sounds = True
@@ -582,11 +583,11 @@ class Engine:
         self.mic_check = False    # headphones also get your mic (= exactly what others hear)
         self.voice_chain = None   # voicefx.VoiceChain: voice changer / live speech tap on the mic
         # the send stage (soundboard.sendfx): what makes the mix survive voice chat
-        self.send_mono = True     # phase-aware mono into the cable (every voice chat is mono)
+        self.send_mono = True     # phase-aware mono into the send device (every voice chat is mono)
         self.duck_db = 0.0        # lower the sounds this much while you talk (0 = off)
         self.mic_gate = False     # mute your mic while a sound plays (only the sounds go out)
         self._gate: dict[str, float] = {}   # output -> the mic's current gate gain
-        self.limiter_on = True    # hold the cable's peaks at sendfx.CEILING_DB
+        self.limiter_on = True    # hold the send device's peaks at sendfx.CEILING_DB
         self._send: dict[tuple[str, str], object] = {}   # (out, kind) -> its sendfx stage
         self.sound_speed = 1.0        # live playback speed of every sound (0.25..4)
         self.sound_pitch = 0.0        # live pitch of every sound, semitones
@@ -638,7 +639,7 @@ class Engine:
         self._rec_frames_left = 0
         self.rec_done: tuple[np.ndarray, int] | None = None   # (audio, rate)
         self._mic_rec: list[np.ndarray] | None = None          # mic during a test (see _mic)
-        # a copy of every block sent into the cable while set to a list (the voice chat
+        # a copy of every block sent to the send device while set to a list (the voice chat
         # check compares it with what Discord plays back); None = off
         self.main_tap: list[np.ndarray] | None = None
 
@@ -1046,7 +1047,7 @@ class Engine:
             outs &= {only} if isinstance(only, str) else set(only)
         if preview:
             # previews are for your ears only; with no headphone device open they must
-            # not fall through to the cable (everyone in the call would hear them)
+            # not fall through to the send device (everyone in the call would hear them)
             outs = {"mon"} if "mon" in outs else set()
         if not outs:
             return None
@@ -1474,7 +1475,7 @@ class Engine:
         m = self.ring_mon.read(frames)
         if check:
             mix *= np.float32(self.sound_vol)
-        play = peak(mix)   # the main output sees the rest; this one counts with no cable too
+        play = peak(mix)   # the main output sees the rest; this one counts with no send device too
         r = self.ring_rmon.read(frames)
         if r is not None:
             play = max(play, peak(r) * self.radio_vol)

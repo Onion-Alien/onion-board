@@ -1,6 +1,6 @@
 """Per-program audio capture: tap one running program's sound (Spotify, a browser, a
 game, a call in another app) and push it into the engine so it goes out through
-the virtual cable like a sound, without touching what any other program plays.
+the send device like a sound, without touching what any other program plays.
 
 Windows 10 build 20348+ and Windows 11 have this built into WASAPI ("process
 loopback", what Discord's and OBS's application-audio capture use). It is a *copy*

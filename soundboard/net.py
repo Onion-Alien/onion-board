@@ -1,4 +1,4 @@
-"""Every outgoing connection the app makes, in one place (Settings > Privacy >
+"""Every outgoing connection the app makes, in one place (Settings >
 Connection), so all of it can go through a proxy with nothing leaking around it.
 
 Modes:
@@ -355,8 +355,8 @@ def set_tor_gate(fn: Callable[[float], Proxy] | None) -> None:
 
 def _tor_proxy() -> Proxy:
     if _tor_gate is None:
-        raise _failed(f"Not connecting: Tor isn't available. Pick another Connection in "
-                      f"{WHERE}.")
+        raise _failed("Not connecting: Tor isn't available. Pick another Connection in "
+                      "Settings > Connection.")
     try:
         return _tor_gate(TOR_WAIT_S)
     except ProxyError as e:
@@ -471,7 +471,7 @@ def _route(host: str, port: int, timeout: float | None, via: Proxy | None,
             return _via(_tor_proxy(), host, port, timeout, "Tor",
                         handshake=max(timeout or 0, TOR_HANDSHAKE_S)), "Tor"
         if _proxy is None:
-            raise _failed(f"Not connecting: the proxy address in Settings > Privacy isn't "
+            raise _failed(f"Not connecting: the proxy address in Settings > Connection isn't "
                           f"usable ({_bad})")
         via = _proxy
     return _via(via, host, port, timeout), _route_name(via, direct, host)

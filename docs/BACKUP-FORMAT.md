@@ -8,7 +8,7 @@ made or taken apart with any zip tool or script — no Onion Board needed.
 
 ```
 Onion Board backup 2026-09-27.zip
-├── onionboard.json               what's inside (only in a full export)
+├── onionboard.json               what's inside (a full export, a category or a sound pack)
 ├── settings.json                 the app's settings (only in a full export)
 └── sounds/
     ├── 001 Air horn/
@@ -79,14 +79,14 @@ Only `name` and `audio` are needed; everything else falls back to the defaults.
 
 | key | meaning |
 |---|---|
-| `audio` | file name of the audio, in the same folder. Any format the app plays (mp3, wav, ogg, flac, opus, m4a, aac, wma, aiff, webm, mp4, mkv, mov) |
-| `picture` | file name of the pad picture in the same folder (png, jpg, webp, gif, bmp), or `""` |
+| `audio` | file name of the audio, in the same folder. Any format the app plays (mp3, wav, ogg, flac, opus, m4a, aac, wma, aiff, aif, webm, mp4, mkv, mov) |
+| `picture` | file name of the pad picture in the same folder (png, jpg, jpeg, jfif, webp, gif, bmp), or `""` |
 | `volume` | 0–2 (1 = 100 %) |
 | `hotkey` | e.g. `ctrl+alt+1`, `f5`, `num 7`, or a MIDI pad: `midi:note 36:LPD8` (`note`, `cc` or `pc`, its number, the device name); dropped on import if something already uses it |
 | `mode` | `restart`, `overlap`, `toggle`, `solo` (stops the other sounds first) or `queue` (waits for the sounds playing to finish) |
 | `loop` | `true` / `false` |
 | `hold` | `true`: plays only while its hotkey / MIDI pad is held down |
-| `fade_in`, `fade_out` | seconds |
+| `fade_in`, `fade_out` | seconds (0–10) |
 | `only_them` | `true`: goes out to others but isn't played in your own headphones |
 | `delay` | seconds between the press and the sound (0–10) |
 | `cooldown` | seconds after it starts during which presses are ignored (0–60) |
@@ -99,10 +99,13 @@ Only `name` and `audio` are needed; everything else falls back to the defaults.
 ## `settings.json`
 
 The app's settings (`Config` in `soundboard/library.py`) minus anything that
-belongs to one PC or that must only be switched on by hand: audio devices, the
-setup-guide state, per-program Apps settings, and the network / downloaded-code
-settings (yt-dlp auto-update, the update check and its state). On import only known settings of the
-right type are used, and only if the user says yes.
+belongs to one PC or that must only be switched on by hand: audio devices, where
+sounds are sent (the cable / another device / nowhere route), the setup-guide state,
+per-program Apps settings, category hotkeys, the remote-control switch, port and
+key, the network settings (connection mode, proxy, Offline mode, Tor) and the
+downloaded-code settings (yt-dlp auto-update, the update check and its state). On
+import only known settings of the right type are used, and only if the user says
+yes.
 
 It also holds `saved_voices`, the voice changer's saved voices (kept in a file of
 their own in the app, so not a `Config` field), when there are any:
@@ -121,6 +124,7 @@ plain file names `sound.json` gives (no `/`, `\` or `..`) and written into the
 library under new names. Any one file is limited to 1 GiB (64 MiB for a picture,
 4 MiB for JSON), checked while unpacking, and a whole import to 8 GiB; before
 anything is written the declared sizes are checked against that and against the
-free disk space (leaving 256 MiB spare). Numbers must be finite (`NaN` /
+free disk space (leaving 256 MiB spare; a zip is unpacked first and then copied in,
+so it needs room twice over). Numbers must be finite (`NaN` /
 `Infinity` fall back to the default), and imported speech settings only accept the
 app's own model names. Pictures are re-encoded before use.

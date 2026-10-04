@@ -94,10 +94,11 @@ def analyze(out: np.ndarray, out_rate: int, mic: np.ndarray | None, mic_rate: in
         if diff > 6:
             pct = int(round(sound_vol * 100 * 10 ** (-(diff - 2) / 20) / 5) * 5)
             res["advice"] = (f"Sounds are {diff:.0f} dB louder than your voice — they'll drown "
-                             f"you out. Try the Sounds tab's volume around {max(pct, 5)}%.")
+                             "you out. Try the sounds volume (the speaker slider in the player "
+                             f"bar) around {max(pct, 5)}%.")
         elif diff < -12:
-            res["advice"] = ("Sounds are much quieter than your voice — turn the Sounds tab's "
-                             "volume up.")
+            res["advice"] = ("Sounds are much quieter than your voice — turn the sounds volume "
+                             "(the speaker slider in the player bar) up.")
     return res
 
 
@@ -107,8 +108,8 @@ def summary_html(r: dict, cable: str | None, mic_sent: bool = True) -> str:
     ok, bad, warn = theme.status("ok"), theme.status("error"), theme.status("warn")
     lines = []
     if not mic_sent:
-        lines.append((ok, "— Sounds only: your mic isn't sent (untick/tick “send” next to "
-                          "My mic to change that)"))
+        lines.append((ok, "— Sounds only: your mic isn't sent (tick “Others hear it” under "
+                          "MY MIC to change that)"))
     elif not r["talked"]:
         lines.append((warn, "⚠ Didn't hear you talk — talk during the test to check your mic"))
     elif r.get("replaced"):
@@ -117,8 +118,8 @@ def summary_html(r: dict, cable: str | None, mic_sent: bool = True) -> str:
     elif r["voice_in"]:
         lines.append((ok, "✓ Your VOICE is in the output"))
     else:
-        lines.append((bad, "✗ Your voice is NOT reaching the output — is “send” ticked "
-                           "next to My mic?"))
+        lines.append((bad, "✗ Your voice is NOT reaching the output — is “Others hear it” "
+                           "ticked under MY MIC?"))
     if r["sounds_in"]:
         lines.append((ok, "✓ SOUNDS are in the output"))
     else:

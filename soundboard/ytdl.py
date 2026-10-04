@@ -1,7 +1,7 @@
-"""Download the audio of the page open in the browser tab, with yt-dlp.
+"""Download the audio of a web link, with yt-dlp.
 
-Used by the browser tab's "Add as sound" button: yt-dlp fetches the best audio
-stream the site offers (YouTube, SoundCloud, and the other sites it supports) into
+Used by the Sounds tab's link bar ("Add as sound" / "Play once"): yt-dlp fetches the
+best audio stream the site offers (YouTube, SoundCloud, and the other sites it supports) into
 a temporary folder, and the file is then imported like a dropped file (so m4a /
 webm audio needs ffmpeg, as it does for a dropped file). Nothing is converted to
 MP3 on the way: the library stores it losslessly as a FLAC of what was decoded.
@@ -795,7 +795,7 @@ def _opts(dest: Path | None = None, progress=None, thumbnail: bool = False,
         "progress_hooks": [hook],
         "logger": log,
     }
-    # the relay, as this site: Settings > Privacy (the connection and the switches);
+    # the relay, as this site: Settings > Connection and Privacy & security;
     # `direct` is the user's "Try this one without Tor" (the switches still hold)
     opts["proxy"] = net.ytdlp_proxy(feature, direct=direct)
     if video:

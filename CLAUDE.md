@@ -15,13 +15,14 @@ published. Before writing or committing anything:
 - **Never copy content from outside the repo** (the author's other projects,
   parent-folder docs, memory files, shell history) into files here.
 - **Never commit secrets** or anything from `%APPDATA%\OnionBoard\` (config, logs,
-  browser profile, cache).
+  radio web cache, decoded-audio cache).
 - **Never add audio files, binaries, or third-party assets.** Tests synthesize audio
   with numpy; icons are drawn in code. The one exception is artwork made for this
   project (e.g. generated pictures) in `assets/art/` — see its README.
 - New network access must be added to the table in `SECURITY.md`. No telemetry.
-- Loopback sockets bind `127.0.0.1` and verify a per-launch secret with
-  `secrets.compare_digest`; never log the secret.
+- Loopback sockets bind `127.0.0.1` and verify a secret with `secrets.compare_digest`
+  (a per-launch one; the opt-in remote control API checks the key shown in Settings);
+  never log the secret.
 
 Run `python scripts/check_sensitive.py` before proposing a commit and fix anything it
 reports. Don't add `# sensitive-scan: allow` to silence it without telling the user why.
@@ -37,7 +38,8 @@ or installing anything. The short version:
 - Build: `powershell -ExecutionPolicy Bypass -File build.ps1` → `dist\OnionBoard\`
   and `dist\OnionBoardSetup.exe`. Rebuild after changing anything the app ships.
 - Reinstall headless: `dist\OnionBoardSetup.exe /VERYSILENT /SUPPRESSMSGBOXES
-  /NORESTART /CLOSEAPPLICATIONS` (a UAC prompt appears only if VB-Cable is missing).
+  /NORESTART /CLOSEAPPLICATIONS` (a UAC prompt appears only if VB-Cable is missing
+  and its box is ticked).
 - A `.venv` breaks if moved; recreate it instead.
 - Don't launch the GUI or anything that opens windows / grabs global hotkeys without
   asking first; the author may be mid-game.

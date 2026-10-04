@@ -1,4 +1,5 @@
-"""The last stage before the virtual cable: what makes a mix survive voice chat.
+"""The last stage before the send device (a virtual cable or any other output):
+what makes a mix survive voice chat.
 
 Measured with the codec bench (soundboard.codecsim) and the voice chat check:
 
@@ -28,7 +29,7 @@ import numpy as np
 from soundboard.dsp import butter, running_min, sosfilt
 
 F32 = np.float32
-CEILING_DB = -3.0          # peak level sent into the cable (room for the codec's overshoot)
+CEILING_DB = -3.0          # peak level sent to others (room for the codec's overshoot)
 LOOKAHEAD_S = 0.003        # the limiter's delay: how early it sees a peak coming
 RELEASE_DB_S = 40.0        # how fast its gain comes back up, dB per second
 DUCK_CHOICES = (0.0, -6.0, -12.0, -20.0)   # "lower sounds while I talk": off .. a lot

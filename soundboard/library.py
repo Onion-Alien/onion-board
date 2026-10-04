@@ -262,7 +262,7 @@ class Config:
     eq_preset: str = "Flat (off)"
     eq_gains: list[float] = field(default_factory=lambda: [0.0] * 7)
     dest: dict = field(default_factory=dict)   # who's listening (soundboard.destination)
-    send_mono: bool = True    # phase-aware mono into the cable (soundboard.sendfx.SmartMono)
+    send_mono: bool = True    # phase-aware mono for the send device (sendfx.SmartMono)
     duck_db: float = 0.0      # lower the sounds this much while you talk; 0 = off
     mic_gate: bool = False    # mute your mic while a sound plays (only the sound goes out)
     ptt_key: str = ""           # key held down while sounds play (game push-to-talk)
@@ -324,7 +324,7 @@ class Config:
     api_enabled: bool = False
     api_port: int = 7474
     api_token: str = ""
-    # Settings > Privacy > Connection (soundboard.net): "direct", "proxy" through
+    # Settings > Connection (soundboard.net): "direct", "proxy" through
     # net_proxy (socks5h://host:port or http://host:port), or "tor" (soundboard.tor)
     net_mode: str = "direct"
     net_proxy: str = ""

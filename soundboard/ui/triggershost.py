@@ -5,8 +5,8 @@ triggers in Config.screen and their pictures in %APPDATA%\\OnionBoard\\triggers
 (as the built-in Triggers tab did, so nothing moves), and gives it the theme's
 colours.
 
-A trigger's sound plays like pressing its pad (into the mic / cable mix, with the
-pad's volume and mode). A ringing trigger ("Ring until stopped") loops its sound
+A trigger's sound plays like pressing its pad (into what others hear, whichever way
+it's sent, with the pad's volume and mode). A ringing trigger ("Ring until stopped") loops its sound
 until it's stopped, under its own voice id (`<sound>:ring:<trigger>`), in your
 headphones when they're open (an alarm left ringing while you're away shouldn't
 go out to everyone in the call), else wherever the board plays.

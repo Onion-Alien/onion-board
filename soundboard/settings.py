@@ -724,7 +724,7 @@ class SettingsDialog(QDialog):
         card, cv = self._card("Your mic",
                               "Normally others hear your voice and your sounds together. Untick "
                               "this for sounds only: they hear the sounds but not your mic. "
-                              "(Same as the “send” box next to My mic.)")
+                              "(Same as the “Others hear it” box under My mic.)")
         send = QCheckBox("Send my mic to others")
         send.setChecked(self.mw.cfg.mic_enabled)
         send.toggled.connect(self.mw.chk_mic.setChecked)   # the window applies it
@@ -850,9 +850,9 @@ class SettingsDialog(QDialog):
         mw = self.mw
         card, cv = self._card("Devices",
                               "Your mic (input), where you listen (output) and where what "
-                              "others hear goes: the virtual cable, or another device "
-                              "(Voicemeeter, OBS, a mixer). Plugged something in? Press "
-                              "Re-scan.")
+                              "others hear goes: the virtual cable, another device "
+                              "(Voicemeeter, OBS, a mixer) or nowhere. Plugged something "
+                              "in? Press Re-scan.")
         grid = QGridLayout()
         grid.setHorizontalSpacing(10)
         grid.setVerticalSpacing(6)
@@ -924,8 +924,9 @@ class SettingsDialog(QDialog):
     def _reset_card(self):
         card, cv = self._card("Start over",
                               "Something's not right? Reset just the parts you pick: "
-                              "settings, hotkeys, sounds or the recycle bin. A restore "
-                              "point is saved first, so it can always be undone.")
+                              "settings, hotkeys, sounds, Recently deleted, Apps tab "
+                              "programs or audio devices. A restore point is saved "
+                              "first, so it can always be undone.")
         row = QHBoxLayout()
         rst = QPushButton("Reset…")
         icons.set_icon(rst, "reload")
@@ -1404,7 +1405,8 @@ class SettingsDialog(QDialog):
                       "search results show its thumbnails. Off: the search bar only "
                       "searches your own sounds.",
         "ytdlp_update": "Fetches a newer yt-dlp from PyPI when you press Update now or "
-                        "Reset downloader (Updates page).",
+                        "Reset downloader (Updates page), or by itself if you ticked "
+                        "Update automatically there.",
         "radio": "The station directory (Radio Browser) and the stations you play. Off: "
                  "the Radio tab contacts nobody.",
         "app_update": "Asks GitHub for the latest release, and downloads its installer "
@@ -1416,8 +1418,10 @@ class SettingsDialog(QDialog):
                   "works with a model it already has.",
         "voice_servers": "Voices in your voices folder that are a server on the "
                          "internet. Ones on this PC (127.0.0.1) always work.",
-        "setup_downloads": "The setup guide's Install button downloads VB-Cable from "
-                           "vb-audio.com. Off: install it yourself from there.",
+        "setup_downloads": "The setup guide's Install button downloads VB-Cable (the "
+                           "virtual cable) from vb-audio.com. Not needed if you send to "
+                           "another device or nowhere. Off: install it yourself from "
+                           "there.",
         "tor_download": "Get Tor / Update Tor (Connection page) downloads Tor from the "
                         "Tor Project (dist.torproject.org). Off: a Tor that's already "
                         "here still works.",

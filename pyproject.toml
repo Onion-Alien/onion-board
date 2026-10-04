@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "soundboard"
 dynamic = ["version"]
-description = "Gaming soundboard: mic + sounds + web search, mixed into a virtual mic"
+description = "Gaming soundboard: mic + sounds + web search, sent to your friends through a virtual cable or any output"
 readme = "README.md"
 requires-python = ">=3.12"
 license = "LicenseRef-MIT-Commons-Clause"

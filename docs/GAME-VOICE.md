@@ -44,8 +44,8 @@ Lethal Company's occlusion and walkie-talkie filters come from its decompiled
   also cut its damage (6.4 → 4.5). None beats the others everywhere, so they were
   left as they are. (Later rebuilt after the Valorant measurements: see below.)
 - **Windows' default mic.** Voice SDKs ask Windows for the *default communication
-  device*, which "Set as Default Device" doesn't change; the app's
-  *Game has no microphone setting?* steps now set both.
+  device*, which "Set as Default Device" doesn't change; the Setup tab's
+  *Game has no microphone setting?* steps (shown on the cable route) now set both.
 
 - **Steam voice, measured** (`scripts/steam_voice_roundtrip.py`): Steamworks reports
   24 kHz as its voice rate, confirming the 12 kHz ceiling. Its capture gates the
@@ -70,8 +70,8 @@ Lethal Company's occlusion and walkie-talkie filters come from its decompiled
   and speech-shaped noise were never transmitted. Its anti-cheat ignores injected key
   presses, so the app's *Auto push-to-talk* can't hold the key: hold it yourself.
 - **A bass-heavy song in Valorant**: sent raw it arrived 7 dB quieter, most of that the
-  lost sub-bass (the bottom band 8.5 dB down on the rest). Through the *Game*
-  destination mode the bass harmonics halved that loss (4 dB), but the mode's
+  lost sub-bass (the bottom band 8.5 dB down on the rest). Through the old *Game*
+  destination mode (today's *Vivox*) the bass harmonics halved that loss (4 dB), but the mode's
   compressor and limiter sent the song 11 dB quieter to begin with, so it was heard
   8.5 dB quieter than raw.
 - **Why, and the fix (99 songs, five pitch ranges, through the `vivox` model):** the

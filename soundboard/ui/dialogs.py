@@ -238,8 +238,8 @@ class EditDialog(QDialog):
         form.addRow("", self.hold)
 
         self.only_them = QCheckBox("Only others hear it — not played in my headphones")
-        self.only_them.setToolTip("It still goes out to Discord / the game; you just don't "
-                                  "hear it yourself (Preview still plays it to you)")
+        self.only_them.setToolTip("It still goes out to others (Discord, the game, OBS…); you just "
+                                  "don't hear it yourself (Preview still plays it to you)")
         self.only_them.setChecked(meta.only_them)
         form.addRow("", self.only_them)
 

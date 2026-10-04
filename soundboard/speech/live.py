@@ -6,7 +6,7 @@
 When live voice translates (a translation add-on), its lines come back already in
 that language and are spoken with `live_voice`, a voice that speaks it.
 
-Spoken lines are played like a sound (sid "tts"), so they go to the cable, your
+Spoken lines are played like a sound (sid "tts"), so they go to the send device, your
 headphones and auto push-to-talk exactly as a pad would. While live voice is on,
 the chain can also mute your real voice (`replace`), so others only hear the TTS.
 """

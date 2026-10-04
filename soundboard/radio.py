@@ -6,15 +6,15 @@ and no key. Most stations carry a latitude / longitude, which the globe uses.
 The app asks it for: the most-listened stations that have a location (the globe,
 cached for a day in radio_dir()), searches you type, and a "click" when you
 start a station (the directory's own popularity count, which it asks clients to
-send; Settings > Privacy turns it off). Nothing else about you is sent. With Radio
+send; Settings > Privacy & security turns it off). Nothing else about you is sent. With Radio
 switched off in Settings > Privacy & security none of it goes online (FEATURE): the
 tab shows an "off" panel instead and the relay refuses the directory and the streams.
 
 The player is Qt Multimedia (FFmpeg): it opens the stream (MP3, AAC, Ogg, HLS…)
 and decodes it, but never plays it itself. A QAudioBufferOutput hands the decoded
 audio to the UI thread as 48 kHz stereo float, which goes into the engine
-(`Engine.feed_radio`) like the Browser tab's audio, so it can go out through
-your mic.
+(`Engine.feed_radio`) like an app's captured audio (Apps tab), so it can go out
+with your sounds.
 
 The globe is globe.gl (MIT licence, three.js) in a web view. It, the Earth pictures
 and the country outlines ship with the app (ASSET_DIR), so opening either map
@@ -469,7 +469,7 @@ class RadioDirectory(QObject):
         self.cache_dir = cache_dir or radio_dir()
         self.bases = list(bases)
         self.nam = QNetworkAccessManager(self)
-        net.apply_qt(self.nam, FEATURE)   # Settings > Privacy: the connection and switch
+        net.apply_qt(self.nam, FEATURE)   # Settings > Connection and Privacy & security
         self._search_gen = 0
         self._pending: dict[int, list] = {}
         self._call.connect(self._run_call)

@@ -1,6 +1,6 @@
 """Codec round-trip bench: what does Discord / a game do to what we send?
 
-Everything the engine puts into the virtual cable goes through the listener's
+Everything the engine sends to others goes through the listener's
 voice pipeline: mono downmix, a resample to the codec's rate, Opus at a modest
 bitrate, back to 48 kHz on the other side. This module reproduces that path
 offline (libopus through ffmpeg, the same ffmpeg the importer uses) so a change

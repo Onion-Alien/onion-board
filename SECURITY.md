@@ -64,7 +64,7 @@ So you know what normal looks like when auditing it:
 | You play a radio station | that station's stream server (the address listed for it in the directory; its `https` address when the directory lists one, so the network in between can't see which station) | the stream itself, decoded by Qt Multimedia (FFmpeg) and played through the app's audio engine | `radio` |
 | You speak a line with a custom voice server you added (Voice tab → More options → *Custom voices*; a `.json` with a `"url"` in `%APPDATA%\OnionBoard\voices\`) | the address you gave it (normally a TTS server on your own PC, e.g. `127.0.0.1`) | sends the line's text (and the voice / model / API key you entered) and gets the spoken audio back. Nothing is sent until you add one | `voice_servers` |
 | You tick *Play M4A, AAC and video files* in the installer | `winget` (Microsoft's package source, then the FFmpeg build it points to) | installs `Gyan.FFmpeg.Essentials` | — (the installer) |
-| You install the virtual cable (its box is ticked by default in the installer; also the setup guide's button) | `vb-audio.com` | downloads VB-Cable; the installer's signature is checked before it runs | `setup_downloads` (not the installer's box) |
+| You install the virtual cable (its box is ticked by default in the installer, and you can untick it if you send sounds through another device; also the setup guide's and Setup tab's *Install the free virtual cable* button) | `vb-audio.com` | downloads VB-Cable; the installer's signature is checked before it runs | `setup_downloads` (not the installer's box) |
 | You press *Get Tor* / *Update Tor* (Settings → Connection), or tick *Private connection (Tor)* in the installer (unticked by default) | `dist.torproject.org` (through your proxy if *Connection* is set to one; when updating, through the Tor that's already there if Tor is picked) | downloads the Tor Project's Tor Expert Bundle for Windows (about 22 MB), checks it against the SHA-256 pinned in `soundboard/torget.py` (taken from the release's GPG-signed checksum list; a download that doesn't match is thrown away) and unpacks only `tor.exe`, `lyrebird.exe`, `pt_config.json` and their licence texts into `%APPDATA%\OnionBoard\tor\bin\`. The app doesn't ship Tor. Where Tor is blocked, this download often is too | `tor_download` |
 | Install from source (`scripts/install.ps1`) | PyPI, and `winget` if you accept installing Python | the app's `requirements.txt` | — |
 | You install a module (its Install button, its `install.bat`, or the installer's *live voice* box) | PyPI, via `pip`, plus whatever the module fetches | that module's `requirements.txt`; *live-voice* downloads a Whisper speech model from Hugging Face (via `faster-whisper`), and picking a different model in the Voice tab downloads that one the first time it starts. Each time live voice starts, `faster-whisper` also asks `huggingface.co` whether the model has changed (no audio or text is sent) | `addons` (pip); `voices` (the speech model) |
@@ -75,6 +75,7 @@ So you know what normal looks like when auditing it:
 | You press *Install the … voice* under *Speak in* (Voice tab) and say Yes to Windows' permission prompt | Windows Update (Microsoft) | Windows itself (`Add-WindowsCapability`, run elevated) downloads and installs its free text-to-speech voice for that language, the same as Settings → Speech → Add voices. The app only starts it and reads back whether it worked | `voices` |
 | You press *Support Onion Board* (Settings → Add-ons & help) | `github.com`, in your own web browser | opens this project's page at its Support section | — (your browser) |
 | You press *Report on GitHub* in the crash window | `github.com`, in your own web browser | opens a new-issue page; the report is only put on your clipboard, and nothing is posted unless you paste it and submit | — (your browser) |
+| You press *Send feedback*, *Report a problem* or *Report a security issue* (Settings → Add-ons & help, and Settings → About), a *Report it* link beside an error message, or *Website* / *Source code* / *Licenses* (Settings → About) | `tally.so` (the no-account feedback form), `github.com` or `onion-alien.github.io`, in your own web browser | opens that page with the app's version (and, for *Report it*, the error's text) filled in; the app sends nothing itself, and nothing is posted unless you submit it there | — (your browser) |
 | While a module runs (e.g. live voice) | `127.0.0.1` only | module link, guarded by a random per-launch secret | — (this PC) |
 | You turn on *Remote control* (Settings → Remote; off by default) | listens on `127.0.0.1` only (port 7474 unless you change it) | lets a Stream Deck, AutoHotkey or a script on this PC play / stop / pause sounds and list them. Every request needs the key shown in Settings. Unlike the sockets above the key survives restarts (a Stream Deck button has to keep working), so it's stored in `config.json`; it's never exported with a backup or logged, and *New key* replaces it. Requests for any other `Host` are refused and no CORS headers are sent, so web pages can't use it | — (this PC) |
 | Always | a local named pipe (`OnionBoard.App`) | single instance: a second launch asks the first to come to the front. It only accepts that one request | — (this PC) |
@@ -117,8 +118,8 @@ off, so it only uses a speech model it already has). Sounds from the web also ha
 switch per site (YouTube, SoundCloud, Myinstants, other links). Everything is on by
 default, except what was already opt-in (yt-dlp's automatic updates, play counts).
 
-Not covered: links you open in your own browser (Support, Report on GitHub,
-release pages), the installer's own downloads (FFmpeg, VB-Cable, live voice), and
+Not covered: links you open in your own browser (Support, feedback and report
+buttons, Report on GitHub, release pages), the installer's own downloads (FFmpeg, VB-Cable, live voice), and
 Windows Update installing a voice or the PowerShell VB-Cable download (they can't go
 through the app's connection, so their buttons are disabled while their switch is off).
 A custom voice that's a program you added may go online on its own; it gets the
@@ -162,7 +163,7 @@ addresses, `.local`, `.lan`). Without the setting it isn't started.
 - **The radio globe page** loads only the app's own files, and its web profile
   refuses any `http`/`https`/`ws` request.
 - **Not covered**, because the app doesn't make these requests itself: pages it
-  opens in your web browser (*Support*, *Report on GitHub*, a release page), the
+  opens in your web browser (*Support*, the feedback and report buttons, *Report on GitHub*, a release page), the
   installer's downloads (VB-Cable, `winget`), Windows Update (*Install the … voice*)
   and the VB-Cable installer the setup guide starts (Windows PowerShell uses
   Windows' own proxy setting, not this one). The config keeps the proxy address

@@ -23,16 +23,16 @@
 ;         the same). A failed download says so and leaves the app working without it
 ;       * Keep a history of network activity, unticked: runs OnionBoard.exe
 ;         --keep-netlog (config netlog_keep; soundboard/netlog.py keep())
-;       * Bring my sounds over from Soundpad / Resanance / Soundux / EXP Soundboard: each
-;         only there when that app's board is on this PC (Soundpad's
-;         %APPDATA%\Leppsoft\soundlist.spl, Soundux's %APPDATA%\Soundux\config.json,
-;         Resanance's
-;         %APPDATA%\Resanance\data\Resanance.db, EXP Soundboard's last board in the
-;         registry; soundboard/otherboards.py). Ticked, it leaves a note
-;         (%APPDATA%\OnionBoard\import-from) and the app's first start copies the
-;         sounds in. Silent installs only do it when /TASKS
-;         or /MERGETASKS names it: nobody saw the box
 ;       * a Desktop shortcut
+;   - a "Bring your sounds over" page (ImportPage in [Code]), only when another
+;     soundboard's board is on this PC: Soundpad's %APPDATA%\Leppsoft\soundlist.spl,
+;     Resanance's %APPDATA%\Resanance\data\Resanance.db, Soundux's
+;     %APPDATA%\Soundux\config.json, EXP Soundboard's last board in the registry
+;     (soundboard/otherboards.py). The last page before installing: a ticked box per
+;     app found. Ticked ones are written to %APPDATA%\OnionBoard\import-from and the
+;     app's first start copies the sounds in. Silent installs only do it for the apps
+;     /IMPORT= names (comma-separated keys: soundpad,resanance,soundux,expboard):
+;     nobody saw the boxes
 ;   - then opens Onion Board, whose Quick setup asks which mic they use and walks
 ;     them through Discord
 ;
@@ -40,6 +40,8 @@
 ; last install. /OFFLINE=1 is the Offline mode box: it also skips the boxes that
 ; download (VB-Cable, FFmpeg, live voice, Tor) unless /TASKS= or /MERGETASKS= names
 ; them. Neither the box nor /OFFLINE ever switches Offline mode off: that's in the app.
+; Compiled with /DPREVIEW it's a look at the import page only, for screenshots: every
+; other page is skipped, all four apps are offered, and it can't install.
 ; Built by build.ps1 (needs Inno Setup 6: winget install JRSoftware.InnoSetup).
 
 #define AppName "Onion Board"
@@ -106,10 +108,6 @@ Name: "ffmpeg"; Description: "Play M4A, AAC and video files (the free FFmpeg, ab
 Name: "livevoice"; Description: "Set up live voice-to-speech now (needs Python, about 300 MB)"; GroupDescription: "Extra features (optional)"; Flags: unchecked
 Name: "tor"; Description: "Private connection (Tor): hides your internet address (about 22 MB)"; GroupDescription: "Privacy (optional)"; Flags: unchecked
 Name: "keepnetlog"; Description: "Keep a history of what Onion Board connects to (on this PC only)"; GroupDescription: "Privacy (optional)"; Flags: unchecked
-Name: "soundpad"; Description: "Bring my sounds over from Soundpad (copies them with their names, categories and hotkeys; Soundpad keeps its own)"; GroupDescription: "Found another soundboard on this PC"; Check: HasSoundpad
-Name: "resanance"; Description: "Bring my sounds over from Resanance (copies them with their names, tabs and hotkeys; Resanance keeps its own)"; GroupDescription: "Found another soundboard on this PC"; Check: HasResanance
-Name: "soundux"; Description: "Bring my sounds over from Soundux (copies them with their names, tabs and hotkeys; Soundux keeps its own)"; GroupDescription: "Found another soundboard on this PC"; Check: HasSoundux
-Name: "expboard"; Description: "Bring my sounds over from EXP Soundboard (copies them with their hotkeys; EXP Soundboard keeps its own)"; GroupDescription: "Found another soundboard on this PC"; Check: HasExpBoard
 Name: "desktopicon"; Description: "Put an Onion Board shortcut on my Desktop"; GroupDescription: "Shortcuts"
 
 [InstallDelete]
@@ -185,6 +183,10 @@ var
   CableTicked: Boolean;        // the cable box was ticked on the first visit
   Bunny: TBitmapImage;
   TorCaption: String;          // the Tor box's own caption (Offline mode replaces it)
+  ImportPage: TWizardPage;     // "Bring your sounds over": only when one is found
+  ImportBoxes: array of TNewCheckBox;
+  ImportKeys: array of String; // soundboard/otherboards.py's key for each box
+  ImportTop: Integer;          // where the next box goes
 
 // "net_offline": true in %APPDATA%\OnionBoard\config.json: the app is in Offline mode
 // already (a reinstall). A plain text search: json.dumps writes it on one line.
@@ -266,6 +268,121 @@ end;
 
 // "Your privacy": what the app connects to, in plain words, before the boxes (so they
 // know what the Tor box is for when they get to it). Interactive installs only.
+function HasSoundpad: Boolean;
+begin
+  Result := FileExists(ExpandConstant('{userappdata}\Leppsoft\soundlist.spl'));
+end;
+
+function HasResanance: Boolean;
+begin
+  Result := FileExists(ExpandConstant('{userappdata}\Resanance\data\Resanance.db'));
+end;
+
+function HasSoundux: Boolean;
+begin
+  Result := FileExists(ExpandConstant('{userappdata}\Soundux\config.json'));
+end;
+
+// EXP Soundboard remembers its last board in Java's Preferences (soundboard/expboard.py)
+function HasExpBoard: Boolean;
+begin
+  Result := RegValueExists(HKCU, 'Software\JavaSoft\Prefs\/Expenosa''s /Soundboard',
+    'last/Soundboard/Used');
+end;
+
+// One app's box on the import page, with what comes over under it
+procedure AddImportBox(Key, AppName, What: String);
+var
+  Box: TNewCheckBox;
+  Note: TNewStaticText;
+  I: Integer;
+begin
+  I := GetArrayLength(ImportBoxes);
+  SetArrayLength(ImportBoxes, I + 1);
+  SetArrayLength(ImportKeys, I + 1);
+  Box := TNewCheckBox.Create(ImportPage);
+  Box.Parent := ImportPage.Surface;
+  Box.Top := ImportTop;
+  Box.Width := ImportPage.SurfaceWidth;
+  Box.Height := ScaleY(17);
+  Box.Caption := 'Bring my sounds over from ' + AppName;
+  Box.Checked := True;
+  Note := TNewStaticText.Create(ImportPage);
+  Note.Parent := ImportPage.Surface;
+  Note.AutoSize := False;
+  Note.WordWrap := True;
+  Note.Left := ScaleX(18);
+  Note.Width := ImportPage.SurfaceWidth - ScaleX(18);
+  Note.Top := Box.Top + Box.Height + ScaleY(2);
+  Note.ShowAccelChar := False;
+  Note.Caption := What;
+  Note.AdjustHeight;
+  ImportTop := Note.Top + Note.Height + ScaleY(12);
+  ImportBoxes[I] := Box;
+  ImportKeys[I] := Key;
+end;
+
+// The page before installing, when another soundboard is on this PC: a ticked box
+// for each one found. Skipped (ShouldSkipPage) when none is.
+procedure CreateImportPage;
+var
+  Body, Later: TNewStaticText;
+  Preview: Boolean;
+begin
+#ifdef PREVIEW
+  Preview := True;
+#else
+  Preview := False;
+#endif
+  ImportPage := CreateCustomPage(wpSelectTasks, 'Bring your sounds over',
+    'Found another soundboard on this PC');
+  Body := TNewStaticText.Create(ImportPage);
+  Body.Parent := ImportPage.Surface;
+  Body.AutoSize := False;
+  Body.WordWrap := True;
+  Body.Width := ImportPage.SurfaceWidth;
+  Body.ShowAccelChar := False;
+  Body.Caption := 'Onion Board can copy your sounds in from it the first time it opens, ' +
+    'so your board is ready straight away. Your other app keeps its own copies, and ' +
+    'nothing in it is changed.';
+  Body.AdjustHeight;
+  ImportTop := Body.Top + Body.Height + ScaleY(16);
+  if Preview or HasSoundpad then
+    AddImportBox('soundpad', 'Soundpad', 'With their names, categories and hotkeys.');
+  if Preview or HasResanance then
+    AddImportBox('resanance', 'Resanance', 'With their names, tabs and hotkeys.');
+  if Preview or HasSoundux then
+    AddImportBox('soundux', 'Soundux', 'With their names, tabs and hotkeys.');
+  if Preview or HasExpBoard then
+    AddImportBox('expboard', 'EXP Soundboard',
+      'With their hotkeys. EXP Soundboard doesn''t keep names, so each takes its file''s name.');
+  Later := TNewStaticText.Create(ImportPage);
+  Later.Parent := ImportPage.Surface;
+  Later.AutoSize := False;
+  Later.WordWrap := True;
+  Later.Width := ImportPage.SurfaceWidth;
+  Later.Top := ImportTop + ScaleY(4);
+  Later.ShowAccelChar := False;
+  Later.Caption := 'Rather do it later? In Onion Board: Backup > Import from another soundboard.';
+  Later.AdjustHeight;
+end;
+
+function ShouldSkipPage(PageID: Integer): Boolean;
+begin
+#ifdef PREVIEW
+  Result := PageID <> ImportPage.ID;
+#else
+  Result := (PageID = ImportPage.ID) and (GetArrayLength(ImportBoxes) = 0);
+#endif
+end;
+
+#ifdef PREVIEW
+function NextButtonClick(CurPageID: Integer): Boolean;
+begin
+  Result := False;   // a look at the page, never an install
+end;
+#endif
+
 procedure InitializeWizard;
 var
   Body, Link, Note: TNewStaticText;
@@ -320,6 +437,7 @@ begin
   Bunny := WizardForm.WizardSmallBitmapImage;
   BunnyRight := Bunny.Left + Bunny.Width;
   WizardForm.TasksList.ShowHint := True;
+  CreateImportPage;
 end;
 
 // Offline mode ticked: untick the boxes that download (once, so ticking one again
@@ -410,50 +528,19 @@ begin
   WizardForm.TasksList.Height := Bottom - WizardForm.TasksList.Top;
 end;
 
-function HasSoundpad: Boolean;
-begin
-  Result := FileExists(ExpandConstant('{userappdata}\Leppsoft\soundlist.spl'));
-end;
-
-function HasResanance: Boolean;
-begin
-  Result := FileExists(ExpandConstant('{userappdata}\Resanance\data\Resanance.db'));
-end;
-
-function HasSoundux: Boolean;
-begin
-  Result := FileExists(ExpandConstant('{userappdata}\Soundux\config.json'));
-end;
-
-// EXP Soundboard remembers its last board in Java's Preferences (soundboard/expboard.py)
-function HasExpBoard: Boolean;
-begin
-  Result := RegValueExists(HKCU, 'Software\JavaSoft\Prefs\/Expenosa''s /Soundboard',
-    'last/Soundboard/Used');
-end;
-
-// The "Bring my sounds over from …" boxes: one line per ticked one in a note for the
-// app's first start, which does the copying (soundboard/otherboards.py). Silent
-// installs only when /TASKS or /MERGETASKS names the box: nobody saw it.
-function ImportTicked(Task: String): Boolean;
-begin
-  Result := WizardIsTaskSelected(Task) and
-    (not WizardSilent or ListedIn('TASKS', Task) or ListedIn('MERGETASKS', Task));
-end;
-
+// The import page's boxes: one line per ticked one in a note for the app's first
+// start, which does the copying (soundboard/otherboards.py). A silent install only
+// for the apps /IMPORT= names: nobody saw the boxes.
 procedure QueueImports;
 var
   Keys: String;
+  I: Integer;
 begin
   Keys := '';
-  if ImportTicked('soundpad') then
-    Keys := Keys + 'soundpad' + #13#10;
-  if ImportTicked('resanance') then
-    Keys := Keys + 'resanance' + #13#10;
-  if ImportTicked('soundux') then
-    Keys := Keys + 'soundux' + #13#10;
-  if ImportTicked('expboard') then
-    Keys := Keys + 'expboard' + #13#10;
+  for I := 0 to GetArrayLength(ImportBoxes) - 1 do
+    if ImportBoxes[I].Checked and
+       (not WizardSilent or ListedIn('IMPORT', ImportKeys[I])) then
+      Keys := Keys + ImportKeys[I] + #13#10;
   if Keys = '' then
     exit;
   ForceDirectories(ExpandConstant('{userappdata}\OnionBoard'));

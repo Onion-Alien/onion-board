@@ -149,7 +149,7 @@ class _Plan:
     def square(self, r: int, i: int) -> np.ndarray:
         """(A^r)^(2^i), transposed; built on first use. Thread-safe: a longer list is
         built aside and swapped in whole. (Appending to the shared list wasn't: the
-        main output and the cable run the same plan on two audio threads, and both
+        main output and the send device run the same plan on two audio threads, and both
         appending the same square left [P, P², P², …] for good.)"""
         sq = self._squares.get(r)
         if sq is None or len(sq) <= i:

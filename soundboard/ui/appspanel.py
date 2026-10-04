@@ -1,8 +1,9 @@
 """The Apps tab: send one running program's sound (a music player, a browser, a
-game, a call in another app) out through your mic, without touching what any
-other program plays. Each program is a card: its level, a **Send** switch, its own
-volume and *Hear it myself*, and **Record**, which waits for the program to make a
-sound, records it until you click again and adds it to your Sounds as a pad.
+game, a call in another app) out to others (the cable, another device or the
+stream output, like your sounds), without touching what any other program plays.
+Each program is a card: its level, a **Send** switch, its own volume and *Hear it
+myself*, and **Record**, which waits for the program to make a sound, records it
+until you click again and adds it to your Sounds as a pad.
 
 The capture is Windows' per-process loopback (soundboard.appaudio), a *copy* of
 the program's audio: the program keeps playing on your speakers. Programs you
@@ -159,7 +160,8 @@ class AppRow(HoverCard):
         self.btn_send = QPushButton()
         self.btn_send.setObjectName("live")
         self.btn_send.setCheckable(True)
-        self.btn_send.setToolTip("Send this program's sound out through your mic")
+        self.btn_send.setToolTip("Send this program's sound out to others, the way your "
+                                 "sounds go (Setup tab)")
         icons.set_icon(self.btn_send, "live", checked_color="#ffffff")
         self.btn_send.toggled.connect(lambda on: self.send_toggled.emit(self, on))
         self.btn_rec = QPushButton("Record")
@@ -327,7 +329,10 @@ class AppsTab(QWidget):
         self.info = ("Send a program's sound",
                      "Pick a program that's playing — a music player, a browser, a game, "
                         "even a call in another app — and it goes out to whoever's listening, "
-                        "on its own volume. Only that program: nothing else you play is "
+                        "on its own volume, the same way your sounds do (through the cable "
+                        "or the other device you picked on the Setup tab, and the stream "
+                        "output). Sending to Nowhere: only the stream output gets it. Only "
+                        "that program: nothing else you play is "
                         "touched, and it keeps playing on your speakers as before. Programs "
                         "you switch on are remembered and picked up again next time they run.")
         self.warn = hint_label("")

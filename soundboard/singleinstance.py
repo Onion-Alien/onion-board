@@ -1,6 +1,6 @@
 """Only one Onion Board at a time.
 
-A second copy would fight the first over the virtual cable and the hotkeys, and
+A second copy would fight the first over the audio devices and the hotkeys, and
 every extra launch used to leave two more pythonw.exe processes lying around. The
 lock is a named mutex, which Windows frees automatically if the app crashes, so
 a stale lock can't keep it from starting. The second launch asks the first to

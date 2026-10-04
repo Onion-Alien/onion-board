@@ -205,7 +205,7 @@ class SapiTTS:
             data, sr = sf.read(path, dtype="float32", always_2d=False)
             return np.ascontiguousarray(data, np.float32), int(sr)
         finally:
-            Path(path).unlink(missing_ok=True)
+            _remove(path)
 
     def _readline(self, timeout: float) -> str:
         """The process's next line; "" if it ended. A process that doesn't answer in
@@ -217,6 +217,10 @@ class SapiTTS:
             p, self._proc = self._proc, None
             if p is not None:
                 p.kill()
+                try:   # let go of its .wav before that's deleted
+                    p.wait(timeout=2)
+                except subprocess.TimeoutExpired:
+                    pass
             raise RuntimeError("Windows speech stopped answering. It restarts on its own; "
                                "try the line again.") from None
         return (line or "").strip()
@@ -229,6 +233,16 @@ class SapiTTS:
                 p.wait(timeout=2)
             except Exception:  # noqa: BLE001
                 p.kill()
+
+
+def _remove(path: str):
+    """Delete a line's temporary .wav. One a stuck speech process still holds (it was
+    just killed, and Windows lets go a moment later) is left for the temp folder's
+    clean-up: it once failed the next line with WinError 32."""
+    try:
+        Path(path).unlink(missing_ok=True)
+    except OSError:
+        log.debug("couldn't delete %s", path, exc_info=True)
 
 
 def _pump(stream, out: queue.Queue):

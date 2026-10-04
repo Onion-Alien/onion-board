@@ -20,7 +20,8 @@ OPTIONS = [
     (reset.SOUNDS, "Clears the board. The sounds are kept in the restore point."),
     (reset.BIN, "Empties the bin. It's kept in the restore point."),
     (reset.PROGRAMS, "Forgets Apps tab volumes and hidden programs."),
-    (reset.DEVICES, "Forgets your mic, headphones and cable; the quick setup runs again."),
+    (reset.DEVICES, "Forgets your mic, headphones, where your sounds are sent and the "
+                     "stream output; the quick setup runs again."),
 ]
 
 
