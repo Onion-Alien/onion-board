@@ -265,7 +265,9 @@ class DiscordGuide(QDialog):
         self._check.progress.connect(self._progress)
 
     def check(self):
-        self.btn_check.setEnabled(False)
+        if busy.is_busy(self.btn_check):
+            return
+        busy.set_busy(self.btn_check, True)   # not setEnabled: that moves the focus away
         self.btn_check.setText("Checking…")
         self.result.setText("Starting…")
         self.result.show()
@@ -283,7 +285,7 @@ class DiscordGuide(QDialog):
                             "stay quiet for a moment)")
 
     def _checked(self, res: dict):
-        self.btn_check.setEnabled(True)
+        busy.set_busy(self.btn_check, False)
         self.btn_check.setText("Check again")
         self.result.setText(result_html(res, self.vm))
         self.result.show()

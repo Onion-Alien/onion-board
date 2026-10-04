@@ -23,6 +23,26 @@ def test_discord_guide_says_studio_and_names_the_mic(wizard):
     g.done(0)
 
 
+def test_check_keeps_the_focus_on_its_button(wizard, monkeypatch):
+    """Clicking Check Discord greys it out without setEnabled(False), which would move
+    the keyboard focus to the next control; a second click while checking does nothing."""
+    from soundboard.ui import busy
+    w, wiz = wizard
+    g = chatguide.DiscordGuide(wiz, w, "CABLE Output")
+    starts = []
+    monkeypatch.setattr(g, "_start_check", lambda: starts.append(1))
+    g.check()
+    assert busy.is_busy(g.btn_check) and g.btn_check.isEnabled()
+    assert g.btn_check.text() == "Checking…"
+    g.check()                        # a double click
+    from tests.conftest import process_events
+    process_events(chatguide.QApplication.instance(), lambda: starts, timeout=2)
+    g._checked({"issues": []})
+    assert not busy.is_busy(g.btn_check) and g.btn_check.text() == "Check again"
+    assert len(starts) == 1
+    g.done(0)
+
+
 def test_game_guide_and_freeing(wizard, monkeypatch):
     w, wiz = wizard
     wiz.go(3)
