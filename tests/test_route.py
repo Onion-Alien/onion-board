@@ -93,6 +93,7 @@ def test_the_headphones_are_never_what_others_hear(win, opened):
     assert opened["main"][-1] is None    # you'd hear everything twice, your voice too
     assert win.setup_state == "unrouted"
     assert "headphones" in win.setup_hint.text()
+    assert "Nowhere" in win.step_lbl.text() and "plugged in" not in win.step_lbl.text()
     assert "Not sending" in win.pill.text()
 
 
