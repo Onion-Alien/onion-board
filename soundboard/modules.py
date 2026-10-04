@@ -440,6 +440,9 @@ def install(info: ModuleInfo, on_line: Callable[[str], None]) -> bool:
     if not net.allowed("addons"):
         on_line(net.off_message("addons"))
         return False
+    from soundboard import netlog
+    netlog.cause("addons", f"You installed or updated the {netlog.quoted(info.name)} "
+                           "add-on")
     py = base_python()
     if py is None:
         on_line("Python isn't installed. Get it from python.org (tick \"Add python.exe to "

@@ -92,6 +92,9 @@ class SpeechController:
 
     def start_live(self, module: ModuleInfo, args: list[str] = ()):
         self.stop_live()
+        from soundboard import netlog
+        netlog.cause("voices", f"You started live voice ({module.name}): it may fetch "
+                               "its speech model")
         holder: list[ServiceHost] = []
         host = ServiceHost(module.resolved_command(list(args)),
                            lambda ev: self._event(ev, holder[0] if holder else None),

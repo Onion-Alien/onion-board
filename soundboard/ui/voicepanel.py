@@ -22,7 +22,7 @@ from PySide6.QtWidgets import (QButtonGroup, QCheckBox, QComboBox, QDialog, QMes
 from soundboard import applog
 from soundboard import modules as mods
 from soundboard import voicefx
-from soundboard import library, net, theme
+from soundboard import library, net, netlog, theme
 from soundboard.speech import customvoices, translation, winvoices
 from soundboard.speech.live import SpeechController, clean_settings
 from soundboard.ui import art, busy, icons
@@ -1142,6 +1142,7 @@ class SpeechPanel(QWidget):
         self.b_live.setEnabled(False)
         self._refresh_translation()
         self.lbl_tr.setText(f"Downloading {m.language_name}\u2026 0%")
+        netlog.cause("voices", f"You downloaded the {m.language_name} translation model")
 
         def work():
             try:

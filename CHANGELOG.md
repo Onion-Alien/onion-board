@@ -3,9 +3,10 @@
 ## Unreleased
 
 - **Network activity** (Settings → Connection): see every connection the app
-  makes, to check for yourself where it goes. *Simple* lists each server with
-  what it was for, how often and how much data; *Detailed* lists each connection
-  with its route (direct, proxy, Tor), result, bytes each way, and the request,
+  makes, to check for yourself where it goes, and why: each one says what caused
+  it (*You searched YouTube for “…”*, *You clicked Check now*, *Automatic update
+  check*). *Simple* lists each server with why and what it was for, how often and
+  how much data; *Detailed* lists each connection with its cause, route (direct, proxy, Tor), result, bytes each way, and the request,
   answer and encryption where the app can read them. Requests a switch turned
   away show as blocked. Kept in memory only: nothing is saved, logged or sent,
   and logins and key-like values in addresses are masked.

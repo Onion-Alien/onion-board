@@ -20,7 +20,7 @@ import numpy as np
 from PySide6.QtCore import Qt, QTimer, Signal
 from PySide6.QtWidgets import QFrame, QHBoxLayout, QLabel, QPushButton
 
-from soundboard import net, theme, thumbs, ytdl
+from soundboard import net, netlog, theme, thumbs, ytdl
 from soundboard.library import (SR, decode, fingerprint, import_file, level_gain, to_int16)
 from soundboard.ui import busy, icons
 from soundboard.ui.widgets import fmt_time
@@ -128,6 +128,8 @@ class LinkBar(QFrame):
 
     def _probe_now(self):
         if self.url:
+            netlog.cause(ytdl.FEATURE, "You pasted a link: looking up its name and "
+                                       "length")
             threading.Thread(target=self._probe, args=(self.url,), daemon=True,
                              name="link-probe").start()
 
@@ -219,6 +221,13 @@ class LinkBar(QFrame):
             got = None
         args = (kind, self.url, got, self._color_for(), self._known_for(),
                 bool(self.cfg.ytdlp_auto_optin), direct)
+        what = netlog.quoted(self.title) if self.title else "a link"
+        netlog.cause(ytdl.FEATURE, (f"You clicked Play on {what}" if kind == "play" else
+                                    f"You added {what} as a sound")
+                     + (" (without Tor)" if direct else ""))
+        # a failed download may update the downloader first (ytdl.download_audio)
+        netlog.cause(ytdl.UPDATE_FEATURE, f"A download of {what} failed: checking for a "
+                                          "newer downloader")
         threading.Thread(target=self._work, args=args, daemon=True, name="link-dl").start()
 
     def _play(self, data):

@@ -44,7 +44,9 @@ def start_ytdlp_check(cfg):
     """The daily "is there a newer yt-dlp?" check, off the UI thread (see ytdl.py)."""
     import threading
 
-    from soundboard import ytdl
+    from soundboard import netlog, ytdl
+    netlog.cause(ytdl.UPDATE_FEATURE, "Automatic daily check for a newer downloader "
+                                      "(yt-dlp), after start-up")
     threading.Thread(target=ytdl.auto_update, args=(cfg.ytdlp_auto_optin,), daemon=True,
                      name="ytdlp-update").start()
 

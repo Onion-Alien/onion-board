@@ -15,10 +15,12 @@ from test_net import site, socks  # noqa: F401  (fixtures)
 @pytest.fixture(autouse=True)
 def fresh():
     netlog.clear()
+    netlog._causes.clear()
     yield
     net.configure(net.DIRECT)
     net.configure_features([])
     netlog.clear()
+    netlog._causes.clear()
 
 
 def settled(state=netlog.CLOSED, timeout=5.0) -> list[netlog.Entry]:
@@ -156,10 +158,40 @@ def test_servers_group_connections():
     assert b.connections == b.blocked == 1
 
 
+def test_each_connection_says_what_caused_it():
+    """The latest cause() of a feature (sub-sites share their main one's) is stamped on
+    the connections it makes from then on; one already made keeps its own."""
+    first = netlog.begin("sounds_web", "i.ytimg.com", 443)
+    assert first.cause == "" and "Why: (not recorded)" in netlog.details(first)
+    netlog.cause("sounds_web.youtube", f"You searched YouTube for {netlog.quoted('cats')}")
+    netlog.cause("app_update", "Automatic update check")
+    a = netlog.begin("sounds_web.youtube", "www.youtube.com", 443)
+    b = netlog.begin("sounds_web", "i.ytimg.com", 443)
+    c = netlog.begin("app_update", "api.github.com", 443)
+    netlog.cause("sounds_web", "You clicked Play on “a video”")
+    d = netlog.begin("sounds_web", "i.ytimg.com", 443)
+    assert a.cause == b.cause == "You searched YouTube for “cats”"
+    assert c.cause == "Automatic update check" and first.cause == ""
+    assert d.cause == "You clicked Play on “a video”"
+    assert "Why: You searched YouTube for “cats”" in netlog.details(a)
+    [_gh, ytimg, _yt] = sorted(netlog.servers(), key=lambda s: s.host)
+    assert ytimg.causes == ["You clicked Play on “a video”", "You searched YouTube for “cats”"]
+    netlog.clear()                          # the list goes, the causes stand
+    assert netlog.begin("radio", "r.test", 80).cause == ""
+    assert netlog.begin("sounds_web", "x.test", 443).cause.startswith("You clicked Play")
+
+
+def test_quoted_cuts_long_text_short():
+    assert netlog.quoted("  lofi   beats ") == "“lofi beats”"
+    q = netlog.quoted("x" * 100, limit=20)
+    assert len(q) == 22 and q.endswith("…”")
+
+
 def test_the_view_shows_simple_and_detailed(qapp):
     from soundboard.ui.netactivity import NetActivity
     w = NetActivity()
     assert "Nothing has gone online" in w.summary.text() and not w.copy.isEnabled()
+    netlog.cause(F, "You clicked Check now")
     e = netlog.begin(F, "api.example.com", 443)
     e.connected("Tor")
     e.request("GET", "/latest?token=abc")
@@ -168,8 +200,11 @@ def test_the_view_shows_simple_and_detailed(qapp):
     w.refresh()
     assert "2 connection(s) to 2 server(s), 1 blocked" in w.summary.text()
     assert w.servers.rowCount() == 2 and w.servers.item(0, 0).text() == "radio.example.com"
+    assert w.servers.item(1, 1).text() == "You clicked Check now"
     w.detailed.setChecked(True)
     assert w.stack.currentIndex() == 1 and w.conns.rowCount() == 2
+    assert w.conns.item(1, 2).text() == "You clicked Check now"
+    assert w.conns.item(0, 2).text() == "—"
     w.conns.selectRow(1)
     text = w.info.toPlainText()
     assert "api.example.com:443" in text and "Route: Tor" in text
@@ -195,13 +230,13 @@ def test_the_view_updates_its_rows_in_place(qapp):
     w.refresh()
     w.conns.selectRow(0)
     cell = w.conns.item(0, 0)
-    assert w.conns.item(0, 4).data(_TONE) == "error"
-    assert "&lt;b&gt;bold" in w.conns.item(0, 4).toolTip()
+    assert w.conns.item(0, 5).data(_TONE) == "error"
+    assert "&lt;b&gt;bold" in w.conns.item(0, 5).toolTip()
     netlog.begin(F, "b.example.com", 443).connected("direct")
     w.refresh()
     assert w.conns.rowCount() == 2 and w.conns.item(0, 0) is cell   # reused
     assert w.conns.item(0, 1).text() == "b.example.com:443"
-    assert w.conns.item(0, 4).data(_TONE) is None                   # colour dropped
-    assert w.conns.item(1, 4).data(_TONE) == "error"
+    assert w.conns.item(0, 5).data(_TONE) is None                   # colour dropped
+    assert w.conns.item(1, 5).data(_TONE) == "error"
     assert "a.example.com:443" in w.info.toPlainText()               # still the pick
     w.deleteLater()

@@ -25,7 +25,7 @@ from PySide6.QtNetwork import QNetworkAccessManager, QNetworkRequest
 from PySide6.QtWidgets import (QButtonGroup, QFrame, QHBoxLayout, QLabel, QPushButton,
                                QScrollArea, QSizePolicy, QVBoxLayout, QWidget)
 
-from soundboard import net, theme, ytdl
+from soundboard import net, netlog, theme, ytdl
 from soundboard.bunny import H as BUN_H
 from soundboard.bunny import W as BUN_W
 from soundboard.ui import busy, icons
@@ -537,6 +537,8 @@ class SearchResults(QFrame):
         self._gen += 1
         self._clear()
         where = "TikTok sounds" if self.source == "tiktok" else self.site
+        netlog.cause(ytdl.FEATURE, f"You searched {where} for {netlog.quoted(query)}"
+                     + (" (without Tor)" if direct else ""))
         text = f"Searching {where} for <b>{html.escape(query)}</b>…"
         self.title.setText(text)
         self._loading(True, text)

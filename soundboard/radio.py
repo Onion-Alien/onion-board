@@ -46,7 +46,7 @@ from PySide6.QtCore import QObject, QTimer, QUrl, Signal
 from PySide6.QtMultimedia import QAudioBufferOutput, QAudioFormat, QMediaMetaData, QMediaPlayer
 from PySide6.QtNetwork import QNetworkAccessManager, QNetworkReply, QNetworkRequest
 
-from soundboard import library, net
+from soundboard import library, net, netlog
 from soundboard.engine import SR
 
 log = logging.getLogger(__name__)
@@ -439,6 +439,8 @@ class RadioDirectory(QObject):
         if cached is not None and not force and time.time() - cached[0] < CACHE_S:
             QTimer.singleShot(0, lambda: self.globe_ready.emit(cached[1]))
             return
+        netlog.cause(FEATURE, "You refreshed the radio station list" if force else
+                     "Radio tab: fetching the station list (saved for a day)")
         path = ("/json/stations/search?has_geo_info=true&hidebroken=true"
                 f"&order=clickcount&reverse=true&limit={GLOBE_LIMIT}")
 
@@ -503,6 +505,7 @@ class RadioDirectory(QObject):
         gen = self._search_gen
         if not text:
             return
+        netlog.cause(FEATURE, f"You searched radio stations for {netlog.quoted(text)}")
         q = quote(text)
         common = f"&hidebroken=true&order=clickcount&reverse=true&limit={SEARCH_LIMIT}"
         paths = (f"/json/stations/search?name={q}{common}",
@@ -621,6 +624,7 @@ class RadioPlayer(QObject):
         return self._state
 
     def play(self, station: Station):
+        netlog.cause(FEATURE, f"Playing the radio station {netlog.quoted(station.name)}")
         if not net.allowed(FEATURE):   # switched off: no lookup, no stream
             self.stop()
             self._set_state("error")

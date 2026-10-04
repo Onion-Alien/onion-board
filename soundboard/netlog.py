@@ -5,8 +5,9 @@ soundboard.net records here, so nothing that goes online is missed: urlopen() (t
 app's own requests) and the relay (FFmpeg, Qt, yt-dlp and the programs the app
 starts) both make their connections with net.connect(). Each entry says which
 feature asked, the server and port, the route (direct, the proxy, Tor or this PC),
-what happened (connected, blocked by a switch, failed and why), the bytes each way
-and, where the app can read it, the HTTP request line and answer and the TLS
+what happened (connected, blocked by a switch, failed and why), the bytes each way,
+why it went online (what you did, or what the app did by itself: see cause()) and,
+where the app can read it, the HTTP request line and answer and the TLS
 version. A request switched off in Settings > Privacy & security is listed as
 blocked: nothing was looked up or sent for it.
 
@@ -60,6 +61,7 @@ class Entry:
     received: int = 0
     requests: list[str] = field(default_factory=list)
     tls: str = ""
+    cause: str = ""              # why: what you did, or what the app did by itself
 
     # every change bumps the version, so the view knows to redraw
 
@@ -114,6 +116,7 @@ _entries: collections.deque[Entry] = collections.deque(maxlen=MAX_ENTRIES)
 _count = 0
 _versions = itertools.count(1)   # next() is atomic: `+= 1` from two threads can lose one
 _version = 0
+_causes: dict[str, str] = {}     # main feature -> its latest cause()
 
 
 def _changed() -> None:
@@ -126,12 +129,31 @@ def version() -> int:
     return _version
 
 
+def cause(feature: str, text: str) -> None:
+    """Why `feature` (a key of net.FEATURES, or "main.sub") is about to go online, in
+    the user's words: what they did ("You searched YouTube for “cats”") or what the
+    app does by itself ("Automatic update check"). Every connection the feature
+    makes from now on says so, until its next cause(): the relay, Qt and the
+    programs the app starts can't say which click they're serving, so the latest
+    one stands for them all."""
+    with _lock:
+        _causes[str(feature).partition(".")[0]] = " ".join(str(text).split())
+
+
+def quoted(text: str, limit: int = 60) -> str:
+    """A name or search for a cause(), in quotes, cut short if it's long."""
+    t = " ".join(str(text).split())
+    return f"“{t if len(t) <= limit else t[:limit - 1].rstrip() + '…'}”"
+
+
 def begin(feature, host: str, port: int, how: str = APP) -> Entry:
     """A connection about to be made (or refused) for `feature`."""
     global _count
+    feature = str(feature or "")
     with _lock:
         _count += 1
-        e = Entry(_count, time.time(), str(feature or ""), str(host), int(port), how)
+        e = Entry(_count, time.time(), feature, str(host), int(port), how,
+                  cause=_causes.get(feature.partition(".")[0], ""))
         _entries.append(e)
     _changed()
     return e
@@ -152,6 +174,7 @@ def entries() -> list[Entry]:
 
 
 def clear() -> None:
+    """Forget the list (the causes stand: they're for what's still to come)."""
     with _lock:
         _entries.clear()
     _changed()
@@ -205,6 +228,10 @@ def where(e: Entry) -> str:
     return f"{host}:{e.port}"
 
 
+def why(e: Entry) -> str:
+    return e.cause or "(not recorded)"
+
+
 def outcome(e: Entry) -> str:
     return {CONNECTING: "Connecting…", CONNECTED: "Open", CLOSED: "Done",
             BLOCKED: "Blocked", FAILED: "Failed"}[e.state]
@@ -215,6 +242,7 @@ class Server:
     """Everything sent to one server, for the simple view."""
     host: str
     features: list[str]
+    causes: list[str]            # most recent first
     connections: int
     blocked: int
     failed: int
@@ -229,10 +257,14 @@ def servers(items: list[Entry] | None = None) -> list[Server]:
     for e in entries() if items is None else items:
         s = by.get(e.host)
         if s is None:
-            s = by[e.host] = Server(e.host, [], 0, 0, 0, 0, 0, 0.0)
+            s = by[e.host] = Server(e.host, [], [], 0, 0, 0, 0, 0, 0.0)
         label = feature_label(e.feature)
         if label not in s.features:
             s.features.append(label)
+        if e.cause:
+            if e.cause in s.causes:
+                s.causes.remove(e.cause)
+            s.causes.insert(0, e.cause)   # entries come oldest first
         s.connections += 1
         s.blocked += e.state == BLOCKED
         s.failed += e.state == FAILED
@@ -247,6 +279,7 @@ def details(e: Entry) -> str:
     when = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(e.started))
     lines = [f"#{e.n}  {when}  {where(e)}",
              f"For: {feature_label(e.feature)}",
+             f"Why: {why(e)}",
              f"Made by: {HOW.get(e.how, e.how)}",
              f"Result: {outcome(e)}" + (f": {e.reason}" if e.reason else "")]
     if e.route:
