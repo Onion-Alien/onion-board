@@ -5,7 +5,7 @@ startup. Effects subclass `api.Effect`, declare their sliders as `api.Param`s an
 implement `run(x, rate)`: x is a 1-D float32 block of mic audio (about 10 ms);
 return a block of the same length. It runs on the audio thread, so keep it to
 numpy maths: no file or network access, no sleeping, no locks. Only import what
-Onion Board itself ships (numpy, scipy, the standard library).
+Onion Board itself ships (numpy, soxr, scipy.fft, the standard library).
 """
 import numpy as np
 

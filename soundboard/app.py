@@ -58,8 +58,9 @@ def selftest() -> int:
     build instead of a user's first launch. Prints OK and returns 0."""
     os.environ["QT_QPA_PLATFORM"] = "offscreen"
     os.environ.setdefault("QTWEBENGINE_CHROMIUM_FLAGS", "--mute-audio --disable-gpu")
-    # scipy: the app itself doesn't use it any more, but add-ons may (build.ps1)
-    for mod in ("numpy", "scipy.signal", "sounddevice", "soundfile", "soxr", "yt_dlp"):
+    # scipy.fft: the app itself doesn't use scipy, but Onion Watch's matcher does, and
+    # build.ps1 ships only that part of it
+    for mod in ("numpy", "scipy.fft", "sounddevice", "soundfile", "soxr", "yt_dlp"):
         __import__(mod)
     from PySide6.QtCore import QEventLoop, QTimer
     from PySide6.QtMultimedia import QMediaPlayer
@@ -165,10 +166,21 @@ def selftest_addon(path: str) -> int:
     for sub in ("ui.windowpicker", "ui.snip", "windows", "screenwatch"):   # the lazy ones
         importlib.import_module(f"{pkg}.{sub}")
     wins = sys.modules[f"{pkg}.windows"].list_windows()
-    mons = sys.modules[f"{pkg}.screenwatch"].monitors()
+    sw = sys.modules[f"{pkg}.screenwatch"]
+    mons = sw.monitors()
+    # its matcher, on a made-up screen: a piece of it is found where it was cut
+    import numpy as np
+    screen = np.random.default_rng(0).random((90, 160), np.float32) * 255
+    score, at = sw.match(screen, screen[30:50, 40:80])
     tab.shutdown()
+    if score < 0.99 or tuple(at) != (40, 30):
+        print(f"FAILED: Onion Watch's matcher found its picture at {at} ({score:.3f})")
+        return 1
+    # its FFTs are scipy.fft's when this build ships it (newer Onion Watch: imgops)
+    ops = sys.modules.get(f"{pkg}.imgops")
+    fft = "?" if ops is None else ("scipy.fft" if ops._sfft is not None else "numpy")
     print(f"OK: Onion Watch {info.version} runs in Onion Board {__version__} "
-          f"({len(wins)} windows, {len(mons)} screens seen)")
+          f"({len(wins)} windows, {len(mons)} screens seen, matching with {fft} FFTs)")
     return 0
 
 
