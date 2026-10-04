@@ -114,7 +114,7 @@ class FlatMap(QWidget):
         self._lat = np.array([d["la"] for d in pts], float)
         k = np.array([d.get("k", 0) for d in pts], float)
         top = max(1.0, float(k.max())) if len(k) else 1.0
-        self._r = 1.6 + 2.4 * np.sqrt(k / top)
+        self._r = 1.1 + 1.7 * np.sqrt(k / top)
         self._hover = -1
         if pts:
             self._msg = ""
@@ -227,11 +227,6 @@ class FlatMap(QWidget):
             p.setBrush(_mix(t["bg"], t["text"], 0.14))
             p.drawPath(self._land)
             p.restore()
-        font, pen = self._label_style()
-        p.setFont(font)
-        p.setPen(pen)
-        for box, name in self._label_boxes(tr, s, rect, QFontMetricsF(font)):
-            p.drawText(box, Qt.AlignCenter, name)
         if len(self._points):
             o = tr.map(QPointF(0, 0))
             xs, ys = o.x() + self._lon * s, o.y() - self._lat * s
@@ -245,13 +240,23 @@ class FlatMap(QWidget):
             for i in np.flatnonzero(on):
                 r = self._r[i] * grow
                 p.drawEllipse(QPointF(xs[i], ys[i]), r, r)
+        # country names last, outlined in the land's colour, so the dots don't hide them
+        font, colour = self._label_style()
+        fm = QFontMetricsF(font)
+        halo = QPen(_mix(t["bg"], t["text"], 0.14), 3)
+        halo.setJoinStyle(Qt.RoundJoin)
+        for box, name in self._label_boxes(tr, s, rect, fm):
+            path = QPainterPath()
+            path.addText(box.left(), box.top() + fm.ascent(), font, name)
+            p.strokePath(path, halo)
+            p.fillPath(path, colour)
         p.restore()
 
     def _label_style(self) -> tuple[QFont, QColor]:
         font = QFont(self.font())
         font.setPointSizeF(max(7.0, font.pointSizeF() * 0.85))
         font.setWeight(QFont.DemiBold)
-        return font, QColor(theme.T["text"])
+        return font, QColor(theme.T["text_hi"])
 
     def _label_boxes(self, tr: QTransform, s: float, rect: QRectF, fm: QFontMetricsF):
         """Where the country names go: (box, name), biggest first, each where it fits
