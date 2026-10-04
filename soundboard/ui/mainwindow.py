@@ -1983,7 +1983,7 @@ class MainWindow(QMainWindow):
             QMessageBox.information(self, info[0], info[1])
 
     def open_settings(self, page: str = "privacy"):
-        dlg = SettingsDialog(self, page)
+        dlg = SettingsDialog(self, page, lazy=True)
         dlg.exec()
         free_dialog(dlg)
         self.register_hotkeys()   # in case a capture was cancelled

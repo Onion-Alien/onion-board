@@ -328,7 +328,10 @@ class ThemeGrid(QWidget):
 class SettingsDialog(QDialog):
     """All settings in one place. `mw` is the MainWindow; changes apply immediately."""
 
-    def __init__(self, mw, page: str = "privacy"):
+    def __init__(self, mw, page: str = "privacy", lazy: bool = False):
+        """`lazy`: build only `page` now and each other page the first time it's shown.
+        Building all twelve under the app's style sheet took a second or two on every
+        click of the cog; the tests build them all at once."""
         super().__init__(mw)
         fit.watch(self)   # grows to fit its text (ui/fit.py)
         self.mw = mw
@@ -356,8 +359,14 @@ class SettingsDialog(QDialog):
         self.categories.setAccessibleName("Settings categories")
         self.categories.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.categories.setFixedWidth(196)
-        for i, (_key, title, icon, build) in enumerate(pages):
-            self.tabs.addTab(self._scroll(build()), title)
+        self._unbuilt: dict[int, object] = {}   # tab index -> its page's builder
+        for i, (key, title, icon, build) in enumerate(pages):
+            sa = self._scroll()
+            if lazy and key != page:
+                self._unbuilt[i] = build
+            else:
+                self._fill(sa, build())
+            self.tabs.addTab(sa, title)
             icons.set_tab_icon(self.tabs, i, icon)
             item = QListWidgetItem(icons.icon(icon), title.replace("&&", "&"))
             item.setData(Qt.UserRole, icon)
@@ -366,10 +375,12 @@ class SettingsDialog(QDialog):
         self._category_icons()
         self.tabs.tabBar().hide()
         self.categories.currentRowChanged.connect(self.tabs.setCurrentIndex)
+        self.tabs.currentChanged.connect(self._build_page)
         self.tabs.currentChanged.connect(self.categories.setCurrentRow)
         keys = self._page_keys = [p[0] for p in pages]
         self.categories.setCurrentRow(keys.index(page) if page in keys else 0)
         self.tabs.setCurrentIndex(keys.index(page) if page in keys else 0)
+        self._build_page(self.tabs.currentIndex())   # an unknown page: the first one
         content = QHBoxLayout()
         content.setSpacing(16)
         content.addWidget(self.categories)
@@ -396,20 +407,29 @@ class SettingsDialog(QDialog):
 
     # ------------------------------------------------------------------ pages
     @staticmethod
-    def _scroll(page: QWidget) -> QScrollArea:
+    def _scroll() -> QScrollArea:
         """Pages scroll: a tall one (Hotkeys) otherwise gets squashed, rows on top of
         each other, whenever the window can't grow to fit it (maximized, small screen)."""
         sa = QScrollArea()
         sa.setWidgetResizable(True)
         sa.setFrameShape(QScrollArea.NoFrame)
         sa.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        return sa
+
+    @staticmethod
+    def _fill(sa: QScrollArea, page: QWidget):
         for label in page.findChildren(QLabel):
             label.setWordWrap(True)
         for combo in page.findChildren(QComboBox):
             combo.setSizeAdjustPolicy(QComboBox.AdjustToMinimumContentsLengthWithIcon)
             combo.setMinimumContentsLength(6)
         sa.setWidget(page)
-        return sa
+
+    def _build_page(self, i: int):
+        """A lazy page, the first time it's shown."""
+        build = self._unbuilt.pop(i, None)
+        if build is not None:
+            self._fill(self.tabs.widget(i), build())
 
     def _initial_size(self):
         """Open big enough for the tallest page, as far as the screen allows (a scroll
@@ -419,8 +439,12 @@ class SettingsDialog(QDialog):
         # wide enough to show every tab (the bar scrolls only when the screen is too
         # narrow for that)
         width = 1020
-        need = 0
+        # a page not built yet counts as tall (most are): switching to it later doesn't
+        # resize the window
+        need = 10_000 if self._unbuilt else 0
         for i in range(self.tabs.count()):
+            if i in self._unbuilt:
+                continue
             lay = self.tabs.widget(i).widget().layout()
             need = max(need, lay.totalSizeHint().height(),
                        lay.totalHeightForWidth(width - 260) if lay.hasHeightForWidth() else 0)
@@ -1088,10 +1112,10 @@ class SettingsDialog(QDialog):
             tab.remove()                    # asks first
             refresh()
         self.addon_remove.clicked.connect(remove)
-        refresh()
         row.addWidget(self.addon_label, 1)
         row.addWidget(self.addon_remove)
         cv.addLayout(row)
+        refresh()   # in the card first: shown without a parent, it's a window of its own
         return card
 
     # ------------------------------------------------------------------ support
@@ -1564,12 +1588,13 @@ class SettingsDialog(QDialog):
         """Grey out what's under a switch that's off (everything, in Offline mode), and
         the buttons on other pages that would go online for it."""
         from soundboard import net, torget
-        body = getattr(self, "_net_body", None)
-        if body is None or not qt_valid(body):
-            return
-        self._net_body.setEnabled(not net.offline())
-        for key, sub in self._net_subs.items():
-            sub.setEnabled(key not in self.mw.cfg.net_off)
+        body = getattr(self, "_net_body", None)   # None until its page is first shown
+        if body is not None:
+            if not qt_valid(body):
+                return
+            body.setEnabled(not net.offline())
+            for key, sub in self._net_subs.items():
+                sub.setEnabled(key not in self.mw.cfg.net_off)
         for keys, attr in ((("app_update",), "upd_btn"), (("app_update",), "upd_chk"),
                            (("ytdlp_update",), "ytdlp_auto_box")):
             w = getattr(self, attr, None)
