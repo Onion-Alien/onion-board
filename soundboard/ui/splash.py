@@ -1,7 +1,8 @@
-"""The start-up splash: Bun hopping about in the middle of the screen, from the
-moment the QApplication exists until the main window is up. Just Bun on the
-desktop (no card, spinner or caption), his headphones in the saved theme's accent
-(read straight from config.json; the rest of the settings load later).
+"""The start-up splash: Bun sitting in the middle of the screen nodding along to his
+headphones, from the moment the QApplication exists until the main window is up. No
+card, spinner or caption: a soft glow in the theme's background colour behind him,
+his headphones and notes in its accent (the theme is read straight from config.json;
+the rest of the settings load later).
 
 A cold start (first launch after a reboot, files not yet cached) can spend several
 seconds importing and building the window, all on the UI thread. On Windows the
@@ -25,20 +26,22 @@ import threading
 import time
 from pathlib import Path
 
-from PySide6.QtCore import QEventLoop, QRectF, Qt
-from PySide6.QtGui import QColor, QCursor, QGuiApplication, QImage, QPainter
+from PySide6.QtCore import QEventLoop, QPointF, QRectF, Qt
+from PySide6.QtGui import (QColor, QCursor, QGuiApplication, QImage, QPainter,
+                           QRadialGradient)
 from PySide6.QtWidgets import QApplication, QWidget
 
 from soundboard import theme
-from soundboard.bunny import draw_bunny
+from soundboard.bunny import draw_bunny, music_note
 
 log = logging.getLogger(__name__)
 
-CARD_W, CARD_H = 420, 330   # logical px; the native window is this times the screen's scale
-BUN_W, BUN_H = 160, 192
-HOP = 0.62       # seconds per hop
-HOP_PX = 46      # how high he gets
-ROAM_PX = 95     # how far he wanders either side of the middle
+CARD_W, CARD_H = 320, 320   # logical px; the native window is this times the screen's scale
+BUN_W, BUN_H = 150, 180
+GLOW_R = 150     # the soft backdrop's radius
+BEAT = 0.9       # seconds per nod
+NOTES = 3        # notes in the air at once
+NOTE_S = 2.4     # seconds for a note to float up and fade
 FRAME = 1 / 30   # seconds between repaints while pumping (the Qt fallback)
 NATIVE_FPS = 60
 # while it's up, Python hands the GIL over every 0.5 ms instead of every 5: each frame
@@ -70,30 +73,47 @@ def _sprite(ears: float, blink: float, scale: float) -> QImage:
 
 
 def paint_frame(p: QPainter, t: float, w: float, h: float, scale: float = 1.0):
-    """One frame of Bun hopping, `t` seconds in, on a `w` x `h` (logical px) canvas
-    that `p` maps onto `scale` device px per logical px."""
-    u = (t % HOP) / HOP                     # 0..1 through this hop
-    air = 4 * u * (1 - u)                   # 0 on the ground, 1 at the top
-    land = max(0.0, 1 - u / 0.18)           # just landed: squash, ears flop
-    wander = math.sin(t * 0.9)
-    facing = 1 if math.cos(t * 0.9) >= 0 else -1   # the way he's heading
-    stretch = 1 + 0.08 * air - 0.14 * land   # taller in the air, squat on landing
-    foot_x = w / 2 + wander * ROAM_PX
-    foot_y = h - 18
+    """One frame of Bun sitting in the middle, nodding along to his headphones, `t`
+    seconds in, on a `w` x `h` (logical px) canvas that `p` maps onto `scale` device
+    px per logical px. He stays put and keeps his shape (no squash, no flipping): just
+    a nod, ears bouncing on the beat, a blink now and then and notes drifting up."""
+    beat = 2 * math.pi * t / BEAT
+    nod = math.sin(beat)
+    lift = 2.5 * (1 - math.cos(2 * beat)) / 2   # a little bounce on every beat
+    foot_x, foot_y = w / 2, h / 2 + BUN_H / 2 - 6
     p.setRenderHint(QPainter.Antialiasing)
     p.setRenderHint(QPainter.SmoothPixmapTransform)
-    # a soft shadow on the ground, smaller while he's up
     p.setPen(Qt.NoPen)
-    p.setBrush(QColor(0, 0, 0, round(70 - 40 * air)))
-    sw = BUN_W * 0.62 * (1 - 0.35 * air)
-    p.drawEllipse(QRectF(foot_x - sw / 2, foot_y - 7, sw, 14))
-    # Bun, squashed about his feet and mirrored to face where he's going
+    # a soft glow in the theme's background colour behind him, fading out to nothing,
+    # so he reads the same on any wallpaper without a hard-edged card
+    bg = QColor(theme.T["bg"])
+    glow = QRadialGradient(QPointF(w / 2, h / 2 + 8), GLOW_R)
+    for at, alpha in ((0.0, 235), (0.7, 220), (0.88, 110), (1.0, 0)):
+        c = QColor(bg)
+        c.setAlpha(alpha)
+        glow.setColorAt(at, c)
+    p.setBrush(glow)
+    p.drawEllipse(QPointF(w / 2, h / 2 + 8), GLOW_R, GLOW_R)
+    # his shadow on the floor
+    p.setBrush(QColor(0, 0, 0, 60))
+    p.drawEllipse(QRectF(foot_x - BUN_W * 0.3, foot_y - 6, BUN_W * 0.6, 12))
+    # notes floating up from his headphones
+    accent = QColor(theme.T["accent"])
+    for i in range(NOTES):
+        u = ((t / NOTE_S) + i / NOTES) % 1.0       # 0..1 through this note's rise
+        side = -1 if i % 2 == 0 else 1
+        x = foot_x + side * (BUN_W * 0.42 + 14 * u) + 5 * math.sin(u * 7 + i)
+        y = foot_y - BUN_H * 0.55 - 70 * u
+        c = QColor(accent)
+        c.setAlphaF(min(1.0, u * 5, (1 - u) * 2.2))
+        music_note(p, x - 5, y - 8, 1.35, c)
+    # Bun, nodding about his feet
     p.save()
-    p.translate(foot_x, foot_y - HOP_PX * air)
-    p.scale(facing / stretch ** 0.5, stretch)
-    blink = 1.0 if (t % 2.7) > 2.55 else 0.0
+    p.translate(foot_x, foot_y - lift)
+    p.rotate(3 * nod)
+    blink = 1.0 if (t % 3.1) > 2.95 else 0.0
     p.drawImage(QRectF(-BUN_W / 2, -BUN_H, BUN_W, BUN_H),
-                _sprite(14 * land - 6 * air, blink, scale))
+                _sprite(5 + 4 * math.sin(2 * beat), blink, scale))
     p.restore()
 
 

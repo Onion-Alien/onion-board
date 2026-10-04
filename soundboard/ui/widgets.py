@@ -797,8 +797,10 @@ class PadGrid(QWidget):
             if p.property("filtered"):
                 p.hide()
                 continue
-            p.show()
+            # into the grid first: a new pad has no parent yet, and showing it then
+            # flashed it up on the desktop as a little window of its own
             self.grid.addWidget(p, i // cols, i % cols)
+            p.show()
             i += 1
 
     def resizeEvent(self, e):
