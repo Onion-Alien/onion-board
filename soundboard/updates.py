@@ -132,11 +132,14 @@ def find_asset(data: dict, name: str, trusted: tuple[str, ...]) -> tuple[str, st
 def summary(body: str, limit: int = 420) -> str:
     """The start of a release's notes as plain text for the dialog: Markdown marks
     (**bold**, `code`, [links](…)) taken out, and whole paragraphs only, as many as
-    fit in `limit` characters (at least the first, cut at a sentence if it's long)."""
+    fit in `limit` characters (at least the first, cut at a sentence if it's long).
+    The "⬇ Download …" line for people on the release page is left out: it's for
+    installing, and the dialog is already updating."""
     text = re.sub(r"\[([^\]]*)\]\([^)]*\)", r"\1", body.replace("\r\n", "\n"))
     text = re.sub(r"\*\*|__|`", "", text)
     paras = [" ".join(line.strip() for line in p.splitlines())
              for p in re.split(r"\n\s*\n", text.strip()) if p.strip()]
+    paras = [p for p in paras if not p.startswith("⬇")]
     out: list[str] = []
     for p in paras:
         if out and len("\n\n".join(out + [p])) > limit:

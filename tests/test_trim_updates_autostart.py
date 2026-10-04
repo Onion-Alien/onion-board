@@ -330,6 +330,9 @@ def test_release_notes_become_plain_whole_paragraphs():
     assert "third paragraph" not in s                  # only whole paragraphs that fit
     long = updates.summary("First sentence here. " * 40)
     assert long.endswith(".") and len(long) <= 420
+    page = ("Drum pads.\n\n**[⬇ Download OnionBoardSetup.exe](https://example.com/x.exe)**: "
+            "the one file you need.\n\n- MIDI pads.")
+    assert updates.summary(page) == "Drum pads.\n\n- MIDI pads."   # the page's download line
 
 
 def test_installer_starts_without_the_frozen_apps_variables():

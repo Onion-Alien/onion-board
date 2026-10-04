@@ -211,5 +211,10 @@ Get-Process OnionBoard -ErrorAction SilentlyContinue      # is it running?
    see `installer/OnionBoard.iss`). A release with a broken installer reaches
    everyone who clicks *Update now*: install the built one over your own copy
    before publishing.
+   The notes start with a one-line headline, then a download line, because GitHub
+   adds two *Source code* files that people mistake for the app:
+   `**[⬇ Download OnionBoardSetup.exe](https://github.com/Onion-Alien/onion-board/releases/download/vX.Y.Z/OnionBoardSetup.exe)**: the one file you need (Windows 10 / 11). Already have Onion Board? The *Update* button at the top of the app offers this version. (The *Source code* files are for developers.)`
+   Keep it second, not first: the app's *Update* dialog shows the start of the notes
+   (`updates.summary` skips the ⬇ line, but older versions don't).
    Never commit build output. Run `python scripts/check_sensitive.py --history`
    once more before pushing the release.
