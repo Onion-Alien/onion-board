@@ -47,7 +47,8 @@ def test_mouse_near_perks_him_up(qapp):
 
 
 def test_click_cheers(qapp):
-    w = owl.OwlWidget(80, joy=("yay",))
+    w = owl.OwlWidget(80, lines=(), joy=("yay",))   # no begging line once joy ends
+    # (his first act is due 2-3.5 s in: a plead within the 2.4 s stepped here said one)
     w.resize(w.sizeHint())
     hits = []
     w.clicked.connect(lambda: hits.append(1))
