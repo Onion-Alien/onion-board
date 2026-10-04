@@ -147,12 +147,16 @@ class _Plan:
         return t, o, kk, apow
 
     def square(self, r: int, i: int) -> np.ndarray:
-        """(A^r)^(2^i), transposed; built on first use (append-only: thread-safe)."""
+        """(A^r)^(2^i), transposed; built on first use. Thread-safe: a longer list is
+        built aside and swapped in whole. (Appending to the shared list wasn't: the
+        main output and the cable run the same plan on two audio threads, and both
+        appending the same square left [P, P², P², …] for good.)"""
         sq = self._squares.get(r)
-        if sq is None:
-            sq = self._squares.setdefault(r, [self.ApowT[:, r]])
-        while len(sq) <= i:
-            sq.append(sq[-1] @ sq[-1])
+        if sq is None or len(sq) <= i:
+            sq = list(sq or [self.ApowT[:, r]])
+            while len(sq) <= i:
+                sq.append(sq[-1] @ sq[-1])
+            self._squares[r] = sq
         return sq[i]
 
     def run(self, x: np.ndarray, s: np.ndarray):
