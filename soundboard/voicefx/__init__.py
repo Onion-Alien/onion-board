@@ -223,7 +223,20 @@ class VoiceChain:
                                 etype, exc_info=True)
         if not effects:
             return mono
+        # the effects that delay the voice (pitch, formants, hiss removal) still hold
+        # the line's last ~60-80 ms when the clip runs out: run that much silence
+        # through after it, then drop the same amount from the start, so the whole
+        # line comes out, lined up and the same length as it went in
+        lag = 0
+        for e in effects:
+            try:
+                lag += max(0, int(round(float(e.latency()) * rate)))
+            except Exception:  # noqa: BLE001 - an add-on's: not counted
+                pass
         m = np.ascontiguousarray(mono, dtype=np.float32)
+        n = len(m)
+        if lag:
+            m = np.concatenate([m, np.zeros(lag, np.float32)])
         out = np.empty_like(m)
         for i in range(0, len(m), block):
             y = m[i:i + block]
@@ -238,7 +251,7 @@ class VoiceChain:
                     log.warning("voice effect %r failed on the computer voice", e.type,
                                 exc_info=True)
             out[i:i + len(y)] = y
-        return out
+        return out[lag:lag + n] if lag else out
 
     # ------------------------------------------------------------ audio thread
     def process(self, x: np.ndarray, rate: int) -> np.ndarray:

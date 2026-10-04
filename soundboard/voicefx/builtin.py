@@ -197,6 +197,7 @@ class Cleanup(Effect):
     HOLD_S = 0.2        # and stays open this long after you stop
     FLOOR_S = 1.5       # the room's noise: the quietest moment this far back
     FRAME_S = 0.0107    # hiss removal's frame (its added latency): 512 at 48 kHz
+    CREEP_DB = 3.0      # how fast (dB/s) the noise estimate rises while you talk
 
     def __init__(self, rate, values=None):
         super().__init__(rate, values)
@@ -211,6 +212,7 @@ class Cleanup(Effect):
         self.stft: _Stft | None = None
         self.noise: np.ndarray | None = None   # the noise's power per frequency
         self.prev_gain: np.ndarray | None = None
+        self.creep = 1.0
 
     def latency(self) -> float:
         if self.p["hiss"] <= 0:
@@ -270,7 +272,7 @@ class Cleanup(Effect):
             if gated or frame_db[f] < noise_db + 3:   # quiet: learn the noise
                 self.noise = 0.9 * self.noise + 0.1 * power[f]
             else:   # creeps up (~3 dB/s), so a louder room is learned even mid-talk
-                self.noise *= 1.0035
+                self.noise *= self.creep
             g = np.maximum(1 - over * self.noise / (power[f] + 1e-20), floor)
             g = np.convolve(g, (0.25, 0.5, 0.25), "same")     # less "musical noise"
             if self.prev_gain is not None:
@@ -288,6 +290,8 @@ class Cleanup(Effect):
         if self.p["hiss"] > 0:
             if self.stft is None:
                 self.stft = _Stft(_stft_size(rate, self.FRAME_S))
+                # per frame, so the rise is CREEP_DB a second at any rate
+                self.creep = 10 ** (self.CREEP_DB / 10 * self.stft.hop / rate)
             y = self.stft.run(y, self._dehiss)
         else:
             self.stft = None
@@ -685,9 +689,10 @@ class Tone(Effect):
 
     def run(self, x, rate):
         b, p, t = self.p["bass"], self.p["presence"], self.p["treble"]
-        if not (b or p or t) and self.f.sos is None:
+        if not (b or p or t) and self.f.f.idle:
             return x
-        # all at 0: fade out to straight through (then the line above skips it)
+        # all at 0: fade out to straight through (then, once the fade has run its
+        # course, the line above skips it; cutting it short would strand the fade)
         return self.f.run(x, (b, p, t), lambda: None if not (b or p or t) else np.vstack([
             _biquad("lowshelf", 160, rate, b), _biquad("peak", 2500, rate, p, 1.0),
             _biquad("highshelf", 6000, rate, t)]))
@@ -813,8 +818,9 @@ class Shout(Effect):
         target = min(max((self.env - self.p["threshold"]) / 6.0, 0.0), 1.0)
         a = np.linspace(self.amt, target, n + 1, dtype=F32)[1:]
         self.amt = target
-        y = self.bp.run(x, "bp", lambda: butter(2, [500, 4000], btype="band",
-                                                fs=rate).astype(F32))
+        # the top edge stays under Nyquist (an 8 kHz mic can't take a 4 kHz edge)
+        y = self.bp.run(x, "bp", lambda: butter(2, [500, min(4000, 0.45 * rate)],
+                                                btype="band", fs=rate).astype(F32))
         g = F32(10 ** (self.p["drive"] / 20))
         wet = np.tanh(y * g) * F32(0.5)
         return x * (1 - a) + wet * a

@@ -236,7 +236,9 @@ def _handshake(conn: socket.socket, token: str, timeout: float) -> dict | None:
             return None
         payload = protocol._exact(conn, n) if n else b""
         hello = protocol.decode_json(payload) if payload is not None else {}
-    except (OSError, ValueError):
+    except Exception:  # noqa: BLE001
+        # any bad hello (a dropped socket, junk, JSON nested too deep: RecursionError)
+        # is just a rejected caller; it mustn't end the serving thread
         return None
     if hello.get("type") != "hello" or not secrets.compare_digest(
             str(hello.get("token", "")).encode(), token.encode()):

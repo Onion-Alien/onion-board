@@ -432,6 +432,42 @@ def base_python() -> str | None:
     return None
 
 
+def _job_for(p: subprocess.Popen):
+    """A job object holding `p` and whatever it starts (Windows), or None."""
+    if os.name != "nt":
+        return None
+    from soundboard.tor import JobObject
+    job = None
+    try:
+        job = JobObject()
+        job.assign(p)
+        return job
+    except Exception as e:  # noqa: BLE001 - falls back to killing by process tree
+        log.warning("install step: no job object (%s); killing by process tree", e)
+        if job is not None:
+            job.close()
+        return None
+
+
+def _kill_tree(p: subprocess.Popen, job) -> None:
+    """Kill an install step and everything it started (by its job, or its process
+    tree by PID), so nothing is left holding its output pipe open."""
+    if job is not None:
+        job.close()             # kill-on-close: the step and all its children
+    elif os.name == "nt" and p.poll() is None:
+        try:
+            subprocess.run(["taskkill", "/T", "/F", "/PID", str(p.pid)],
+                           stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+                           stdin=subprocess.DEVNULL, timeout=15,
+                           creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0))
+        except (OSError, subprocess.SubprocessError):
+            pass
+    try:
+        p.kill()
+    except OSError:
+        pass
+
+
 def install(info: ModuleInfo, on_line: Callable[[str], None]) -> bool:
     """Run the module's "install" steps (module.json), streaming their output to
     `on_line`. Blocking: call from a worker thread. Returns True on success."""
@@ -463,12 +499,15 @@ def install(info: ModuleInfo, on_line: Callable[[str], None]) -> bool:
         except OSError as e:
             on_line(f"couldn't run it: {errors.plain(e)}")
             return False
-        # a step that hangs (a stuck download, a prompt nobody sees) is killed
+        # a step that hangs (a stuck download, a prompt nobody sees) is killed, with
+        # everything it started: a grandchild still holding the output pipe would
+        # keep the read below waiting for ever
+        job = _job_for(p)
         timed_out = threading.Event()
 
-        def watchdog(p=p, timed_out=timed_out):
+        def watchdog(p=p, timed_out=timed_out, job=job):
             timed_out.set()
-            p.kill()
+            _kill_tree(p, job)
 
         timer = threading.Timer(INSTALL_STEP_TIMEOUT_S, watchdog)
         timer.daemon = True
@@ -481,8 +520,10 @@ def install(info: ModuleInfo, on_line: Callable[[str], None]) -> bool:
         finally:
             timer.cancel()
             if p.poll() is None:
-                p.kill()
+                _kill_tree(p, job)
                 p.wait()
+            if job is not None:
+                job.close()
         if timed_out.is_set():
             on_line(f"stopped: it took over {INSTALL_STEP_TIMEOUT_S // 60:.0f} minutes. Check "
                     "your internet connection and press it again.")
