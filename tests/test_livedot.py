@@ -2,7 +2,7 @@
 colour), and the Voice panel driving it."""
 import pytest
 from PySide6.QtGui import QColor
-from PySide6.QtWidgets import QTabWidget, QWidget
+from PySide6.QtWidgets import QPushButton, QTabWidget, QWidget
 
 from soundboard import theme
 from soundboard.speech import tts
@@ -178,3 +178,21 @@ def test_your_own_highlight_colour_wins_over_every_theme(qapp):
         assert theme.live_override == "" and theme.T["live"] == theme.T["accent"]
     finally:
         theme.apply(qapp, "Dark", "")
+
+
+def test_a_theme_change_after_a_colour_pick_keeps_the_buttons_in_step(qapp):
+    """apply_live gives the live buttons their own stylesheet; a later theme change
+    must not leave them in the old colours."""
+    btn = QPushButton("Live")
+    btn.setObjectName("onair")
+    try:
+        theme.apply(qapp, "Lava", "")
+        theme.apply_live(qapp, "#3399ff")
+        assert "#3399ff" in btn.styleSheet()
+        theme.apply_live(qapp, "")
+        theme.apply(qapp, "Ocean")
+        assert theme.THEMES["Ocean"]["accent"] in btn.styleSheet()
+        assert "#ff5a1f" not in btn.styleSheet()
+    finally:
+        theme.apply(qapp, "Dark", "")
+        btn.deleteLater()

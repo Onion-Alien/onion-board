@@ -1792,10 +1792,16 @@ class MainWindow(QMainWindow):
         for m in self.cfg.sounds:
             self.engine.set_gain(m.id, self.gain_for(m))
 
-    def set_live_color(self, colour: str):
-        """The user's own highlight colour ("" = the theme's), applied to the whole app."""
-        self.set_option("live_color", theme.set_live(colour))
-        self.apply_theme(self.cfg.theme)
+    def set_live_color(self, colour: str) -> bool:
+        """The user's own highlight colour ("" = the theme's). Only what's drawn in it
+        is restyled (quick); False when it's the colour in use already."""
+        if theme.valid_colour(colour) == theme.live_override:
+            return False
+        self.set_option("live_color", theme.apply_live(QApplication.instance(), colour))
+        icons.retheme_live()
+        self.pill.setText("")   # forces _update_flow to repaint its icon
+        self._update_status()
+        return True
 
     def set_live_tab_tint(self, on: bool):
         self.set_option("live_tab_green", on)

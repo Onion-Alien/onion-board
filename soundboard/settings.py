@@ -5,7 +5,7 @@ from __future__ import annotations
 import logging
 import threading
 
-from PySide6.QtCore import QObject, QRectF, QSize, Qt, Signal
+from PySide6.QtCore import QObject, QRectF, QSize, Qt, QTimer, Signal
 from PySide6.QtGui import (QBrush, QColor, QFont, QIcon, QPainter, QPainterPath,
                            QPixmap)
 from PySide6.QtWidgets import (QApplication, QButtonGroup, QCheckBox, QColorDialog, QComboBox,
@@ -555,7 +555,14 @@ class SettingsDialog(QDialog):
         btns.addWidget(reset)
         btns.addStretch(1)
         cv.addLayout(btns)
-        self.hue_slider, self.hue_swatch, self.hue_reset = hue, swatch, reset
+        now = QLabel()
+        now.setObjectName("hint")
+        now.setWordWrap(True)
+        cv.addWidget(now)
+        self.hue_slider, self.hue_swatch, self.hue_reset, self.hue_now = hue, swatch, reset, now
+        # arrow keys / clicks on the strip come in bursts: apply once they stop
+        settle = QTimer(card, singleShot=True, interval=250)
+        self.hue_settle = settle
 
         def own(h: int) -> str:
             """Hue `h` at the strength / brightness of the current colour (a vivid one
@@ -567,37 +574,52 @@ class SettingsDialog(QDialog):
             return QColor.fromHsvF(h / 360, sat, val).name()
 
         def preview(colour: str = ""):
-            """Show `colour` on the swatch while dragging (restyling the whole app on
-            every step of a drag is slow); "" = what's applied."""
+            """Show `colour` on the swatch only (while dragging); "" = what's applied."""
             if colour:
                 on = max(("#ffffff", "#111111"), key=lambda c: theme._contrast(c, colour))
                 swatch.setStyleSheet(f"QPushButton#power:checked {{ background:{colour}; "
                                      f"border:1px solid {colour}; color:{on}; }}")
             else:
-                swatch.setStyleSheet("")
+                swatch.setStyleSheet(theme.live_sheet())
 
         def sync():
             hue.blockSignals(True)
             h = QColor(theme.T["live"]).hsvHue()
             hue.setValue(h if h >= 0 else 0)
             hue.blockSignals(False)
+            now.setText("Now: your own colour, in every theme."
+                        if theme.live_override else
+                        f"Now: {theme.current_name}'s own colour.")
             preview()
 
-        def use(colour: str):
-            self.mw.set_live_color(colour)
-            self._category_icons()
+        def use(colour: str, btn=None, done: str = "") -> bool:
+            settle.stop()
+            changed = self.mw.set_live_color(colour)
             sync()
+            if btn is not None and done:
+                busy.flash(btn, done)
+            return changed
 
-        hue.valueChanged.connect(lambda h: preview(own(h)) if hue.isSliderDown()
-                                 else use(own(h)))
+        def moved(h: int):
+            preview(own(h))
+            if not hue.isSliderDown():
+                settle.start()
+        hue.valueChanged.connect(moved)
         hue.sliderReleased.connect(lambda: use(own(hue.value())))
+        settle.timeout.connect(lambda: use(own(hue.value())))
 
         def pick():
             c = QColorDialog.getColor(QColor(theme.T["live"]), self, "Highlight colour")
             if c.isValid():
-                use(c.name())
+                use(c.name(), more, "✓ Changed")
+
+        def back():
+            if not theme.live_override:
+                busy.flash(reset, "✓ Already the theme's")
+            else:
+                use("", reset, "✓ Back to the theme's")
         more.clicked.connect(pick)
-        reset.clicked.connect(lambda: use(""))
+        reset.clicked.connect(back)
         self._sync_highlight = sync
         sync()
         return card

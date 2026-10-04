@@ -671,7 +671,6 @@ QPushButton#power:checked, QFrame#card QPushButton#power:checked { background:$l
 QPushButton#power:checked:hover, QFrame#card QPushButton#power:checked:hover { background:$live_hi; }
 QPushButton#live:checked { background:#e53935; border:1px solid #ff6b6b; color:white; }
 QPushButton#rec:checked { background:#e53935; border:1px solid #ff6b6b; color:white; font-weight:700; }
-QPushButton#lite:checked { background:$live; border:1px solid $live_hi; color:$on_live; font-weight:700; }
 QFrame#setcard { background:$panel; border-radius:12px; }
 QFrame#setcard QWidget { background:transparent; }
 QFrame#setcard QPushButton { background:$btn; }
@@ -714,6 +713,23 @@ QFrame#card QComboBox QAbstractItemView, QFrame#setcard QComboBox QAbstractItemV
 QFrame#card QComboBoxPrivateContainer, QFrame#setcard QComboBoxPrivateContainer,
 QFrame#card QMenu, QFrame#setcard QMenu { background:$card; }
 """)
+
+
+# The widgets drawn in the live colour (by objectName): a colour change restyles just
+# these (apply_live), not the whole app, which takes seconds on a full board.
+LIVE_NAMES = ("power", "onair", "pill")
+LIVE_STYLE = Template("""
+QPushButton#power:checked, QPushButton#onair:checked {
+    background:$live; border:1px solid $live_hi; color:$on_live; }
+QPushButton#power:checked:hover, QPushButton#onair:checked:hover { background:$live_hi; }
+QPushButton#pill[state="ok"] { color:$live_text; border:1px solid $live_border; }
+""")
+
+
+def live_sheet() -> str:
+    """The live rules in the current colours, as a widget's own stylesheet (it wins
+    over the app's, so it also beats the cards' generic `:checked` rules)."""
+    return LIVE_STYLE.substitute(T)
 
 
 def _check_image(colour: str, size: int) -> QImage:
@@ -973,9 +989,32 @@ def apply(app, name: str, live: str | None = None) -> str:
     app.setStyleSheet(stylesheet(name))
     widgets = app.allWidgets()
     _recolour_inline(widgets, old)
+    sheet = live_sheet()
+    for w in widgets:   # restyled by apply_live: keep them in step with the new theme
+        if w.objectName() in LIVE_NAMES and w.styleSheet():
+            w.setStyleSheet(sheet)
     for w in widgets:   # hand-painted widgets read T in paintEvent
         w.update()
     return name
+
+
+def apply_live(app, colour: str) -> str:
+    """Switch only the live highlight to `colour` ("" = the theme's): restyles the
+    LIVE_NAMES widgets and repaints, a fraction of a second where apply() takes
+    seconds. Returns the colour kept ("" for the theme's, or for a bad one)."""
+    old = dict(T)
+    set_live(colour)
+    T.clear()
+    T.update(tokens())
+    sheet = live_sheet()
+    widgets = app.allWidgets()
+    for w in widgets:
+        if w.objectName() in LIVE_NAMES:
+            w.setStyleSheet(sheet)
+    _recolour_inline(widgets, old)
+    for w in widgets:   # hand-painted widgets (a live tab's wash) read T in paintEvent
+        w.update()
+    return live_override
 
 
 # --------------------------------------------------------------------------- logo

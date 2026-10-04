@@ -622,6 +622,25 @@ def tab_icon_name(tabs, index: int) -> str | None:
     return None
 
 
+def retheme_live():
+    """Re-draw only the icons in the live colour (a live tab's, the mic pill's) after
+    the user picks a new one: retheme() re-draws every icon in the app."""
+    for ref, name, color, checked in _applied:
+        w = ref()
+        if w is not None and "live_text" in (color, checked):
+            try:
+                w.setIcon(icon(name, color, checked))
+            except RuntimeError:   # the C++ widget is gone
+                pass
+    for ref, index, name, tint, badge in _tabs:
+        t = ref()
+        if t is not None and (tint == "live_text" or badge):
+            try:
+                t.setTabIcon(index, _tab_icon(name, tint, badge))
+            except RuntimeError:
+                pass
+
+
 def retheme():
     _cache.clear()
     alive = []
