@@ -265,6 +265,7 @@ class Config:
     speech: dict = field(default_factory=dict)     # text-to-speech / live voice settings
     overlay: dict = field(default_factory=dict)    # in-game overlay (ui.overlay.OverlaySettings)
     radio: dict = field(default_factory=dict)      # Radio tab: vol, monitor, favorites, last
+    data: dict = field(default_factory=dict)       # Settings > Data & quality (soundboard.quality)
     apps: dict = field(default_factory=dict)       # Apps tab: exe -> {vol, monitor} to re-capture
     apps_hidden: list[str] = field(default_factory=list)   # Apps tab: programs taken off with ✕
     # Triggers tab: on, interval_ms, monitor (the screen for triggers that don't pick
