@@ -82,6 +82,7 @@ class WhatsNewDialog(QDialog):
         for note in notes:
             for icon, title, text in note.items:
                 lay.addWidget(self._item(icon, title, text))
+        lay.addStretch(1)   # any spare height goes here, not between the rows
         buttons = QHBoxLayout()
         notes_btn = QPushButton("Full release notes")
         notes_btn.setToolTip("This version's page on GitHub, in your browser")
@@ -103,6 +104,11 @@ class WhatsNewDialog(QDialog):
         else:
             close.setDefault(True)
         lay.addLayout(buttons)
+
+    def showEvent(self, ev):
+        super().showEvent(ev)
+        # Qt's first guess ignores how the hints wrap: as tall as the text, no taller
+        self.resize(self.width(), fit.needed_height(self, self.width()))
 
     def _item(self, icon: str, title: str, text: str) -> QWidget:
         row = QFrame()
