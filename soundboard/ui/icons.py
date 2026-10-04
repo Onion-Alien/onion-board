@@ -605,7 +605,11 @@ def set_tab_icon(tabs, index: int, name: str, tint: str | None = None, badge: bo
     """`tint` colours the icon in every state; None is the usual muted / accent.
     "art:<key>" shows that picture from ui/art.py instead of a painted icon. `badge`
     adds the small green "live" dot."""
-    tabs.setTabIcon(index, _tab_icon(name, tint, badge))
+    # on the bar itself: QTabWidget.setTabIcon also lays the whole widget out again and
+    # repaints every page under it (the live badge did that to the whole board each
+    # time a sound started or stopped); the bar asks for a layout only if it changed
+    # size, and widgets.SteadyTabs lets that through
+    tabs.tabBar().setTabIcon(index, _tab_icon(name, tint, badge))
     _tabs[:] = [e for e in _tabs if not (e[0]() is tabs and e[1] == index)]
     _tabs.append((weakref.ref(tabs), index, name, tint, badge))
 

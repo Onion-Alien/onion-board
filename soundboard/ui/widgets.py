@@ -6,12 +6,12 @@ import time
 from pathlib import Path
 
 import numpy as np
-from PySide6.QtCore import (QMimeData, QPoint, QPointF, QRectF, QSize, Qt, QVariantAnimation,
-                            Signal)
+from PySide6.QtCore import (QEvent, QMimeData, QObject, QPoint, QPointF, QRectF, QSize, Qt,
+                            QVariantAnimation, Signal)
 from PySide6.QtGui import (QColor, QDrag, QFont, QFontMetrics, QLinearGradient, QPainter,
                            QPainterPath, QPen)
-from PySide6.QtWidgets import (QAbstractButton, QGridLayout, QLabel, QScrollArea, QSlider, QStyle,
-                               QVBoxLayout, QWidget)
+from PySide6.QtWidgets import (QAbstractButton, QGridLayout, QLabel, QScrollArea, QSlider,
+                               QStackedWidget, QStyle, QTabWidget, QVBoxLayout, QWidget)
 
 from soundboard import midi, theme, thumbs
 from soundboard.eq import MAX_DB as EQ_MAX_DB
@@ -152,6 +152,41 @@ def fmt_pos(pos: float, total: float) -> str:
 FFT_N = 2048
 _HANN = np.hanning(FFT_N).astype(np.float32)
 _FREQS = np.fft.rfftfreq(FFT_N, 1 / SR)
+
+
+class SteadyTabs(QObject):
+    """Keeps a QTabWidget from repainting all of itself when nothing it lays out
+    changed. It answers every layout request from inside (a label's new text, a
+    chip in the now-playing row, a tab's new icon) by laying out its tab bar and page
+    area again and repainting everything under it: every pad on the board, 2-3
+    times a pad press. Only its own size, the tab bar's and corner's size hints and
+    the pages' minimum size matter to that layout; while those stay the same the
+    request is dropped (the page inside still lays itself out)."""
+
+    def __init__(self, tabs: QTabWidget):
+        super().__init__(tabs)
+        self._tabs = tabs
+        self._stack = tabs.findChild(QStackedWidget, "qt_tabwidget_stackedwidget",
+                                     Qt.FindDirectChildrenOnly)
+        self._last = None
+        tabs.installEventFilter(self)
+
+    def _state(self):
+        t, bar = self._tabs, self._tabs.tabBar()
+        corners = tuple(w.sizeHint() if w is not None and w.isVisible() else None
+                        for w in (t.cornerWidget(Qt.TopLeftCorner),
+                                  t.cornerWidget(Qt.TopRightCorner)))
+        return (t.size(), t.isVisible(), t.count(), t.currentIndex(), bar.sizeHint(),
+                bar.minimumSizeHint(), corners,
+                self._stack.minimumSizeHint() if self._stack is not None else None)
+
+    def eventFilter(self, obj, ev):
+        if obj is self._tabs and ev.type() == QEvent.LayoutRequest:
+            state = self._state()
+            if state == self._last:
+                return True
+            self._last = state
+        return False
 
 
 def spectrum(data: np.ndarray, frac: float, n: int) -> np.ndarray:
