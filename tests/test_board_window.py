@@ -54,6 +54,33 @@ def test_web_results_put_a_back_button_in_place_of_the_category_tabs(window, mon
     assert window.ytresults.isHidden()
 
 
+def test_my_sounds_shows_all_the_pads_not_the_ones_matching_the_web_search(
+        window, monkeypatch):
+    """The search box filters the pads too: back from a web search, the query still in
+    it hid every pad that didn't match it."""
+    window.tabs.setCurrentWidget(window.sounds_page)
+    window.show()
+    shown = lambda: sum(p.isVisibleTo(window) for p in window.grid.pads)  # noqa: E731
+    everything = shown()
+    assert everything
+    monkeypatch.setattr(window.ytresults, "available", lambda: True)
+
+    def search(q):
+        window.ytresults.query = q
+        window.ytresults.show()
+        return True
+    monkeypatch.setattr(window.ytresults, "search", search)
+    window.search.setText("cat meow")
+    window.search_youtube()
+    window.ytresults.btn_back.click()
+    assert window.search.text() == "" and shown() == everything
+    window.search.setText("cat meow")
+    window.search_youtube()
+    window.search.setText("boom")            # typed something else since: it stays
+    window.ytresults.btn_back.click()
+    assert window.search.text() == "boom"
+
+
 def test_rename_and_delete_category_keep_the_sounds(window, monkeypatch):
     from PySide6.QtWidgets import QMessageBox
     monkeypatch.setattr(QMessageBox, "question", lambda *a, **k: QMessageBox.Yes)
