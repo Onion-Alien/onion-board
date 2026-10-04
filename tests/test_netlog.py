@@ -240,3 +240,23 @@ def test_the_view_updates_its_rows_in_place(qapp):
     assert w.conns.item(1, 5).data(_TONE) == "error"
     assert "a.example.com:443" in w.info.toPlainText()               # still the pick
     w.deleteLater()
+
+
+def test_radio_switched_off_lists_what_it_refused(qapp, tmp_path):
+    """Radio's own gates (a station, a directory lookup) refuse before any connection
+    is tried: each is still listed as blocked, with the switch's message."""
+    from soundboard.radio import RadioDirectory, RadioPlayer, Station
+    net.configure_features([], offline=True)
+    errors, fails = [], []
+    p = RadioPlayer()
+    p.error.connect(errors.append)
+    p.play(Station(uuid="u1", name="Test FM", url="https://stream.example.com:8443/live"))
+    d = RadioDirectory(tmp_path, bases=("https://dir.example.com",))
+    d._get("/json/stations", lambda _raw: None, fails.append)
+    a, b = netlog.entries()
+    assert (a.host, a.port, a.state) == ("stream.example.com", 8443, netlog.BLOCKED)
+    assert (b.host, b.port, b.state) == ("dir.example.com", 443, netlog.BLOCKED)
+    assert a.cause == "Playing the radio station “Test FM”"
+    assert errors == [a.reason] and a.reason == net.off_message("radio")
+    p.deleteLater()
+    d.deleteLater()
