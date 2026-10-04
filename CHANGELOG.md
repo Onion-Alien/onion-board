@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 1.6.8 — 2026-10-04
+
 - **Searching YouTube no longer gets you taken for a bot so easily.** Since 1.6.5 every
   YouTube search looked up each result's likes and comments the way a Play does
   (the video page, then several of YouTube's player APIs and its player script):
