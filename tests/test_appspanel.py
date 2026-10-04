@@ -378,3 +378,39 @@ def test_programs_are_cards_several_across(tab, qapp, monkeypatch):
     qapp.processEvents()
     assert len({c.geometry().top() for c in cards}) == 3   # one per line when narrow
     tab.hide()
+
+
+def test_cards_settle_instead_of_jumping(tab, qapp, monkeypatch):
+    """A card that only just needs tightening is shorter tight than full: it settles
+    on one, instead of flipping between them on every relayout (the cards jumped up
+    and down in a big window)."""
+    import time
+
+    from PySide6.QtCore import QEvent, QObject
+
+    apps = [music(), App(200, "game.exe"), App(300, "call.exe")]
+    monkeypatch.setattr(appaudio, "list_apps", lambda: apps)
+    tab._on_apps(apps)
+    cards = [tab.rows[k] for k in ("music.exe", "game.exe", "call.exe")]
+
+    class Count(QObject):
+        n = 0
+
+        def eventFilter(self, obj, ev):
+            if ev.type() == QEvent.Resize:
+                Count.n += 1
+            return False
+    counter = Count()
+    for c in cards:
+        c.installEventFilter(counter)
+    tab.show()
+    for width in range(500, 1500, 20):   # some width lands each card on the edge
+        tab.resize(width, 500)
+        for _ in range(5):
+            qapp.processEvents()
+        Count.n = 0
+        end = time.monotonic() + 0.05
+        while time.monotonic() < end:
+            qapp.processEvents()
+        assert Count.n == 0, f"cards still resizing at {width} px"
+    tab.hide()

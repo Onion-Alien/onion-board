@@ -19,6 +19,7 @@ from soundboard.ui import busy, fit, icons
 from soundboard.ui import overlay as ovl
 from soundboard.wheelguard import no_wheel
 from soundboard.winkeys import Hotkeys
+from soundboard import errors
 
 # Global hotkey actions: (config attribute, action id, label, what it does).
 # Grouped for the Settings window; the action ids go to MainWindow.on_hotkey.
@@ -1633,10 +1634,10 @@ class SettingsDialog(QDialog):
                     torget.get(relay.progress.emit, before_unpack=tor.shutdown)
                     relay.done.emit("")
                 except torget.GetError as e:
-                    relay.done.emit(str(e))
+                    relay.done.emit(errors.plain(e))
                 except Exception as e:  # noqa: BLE001 - shown, never a stuck button
                     logging.getLogger(__name__).exception("Get Tor failed")
-                    relay.done.emit(f"Couldn't get Tor ({e}).")
+                    relay.done.emit(f"Couldn't get Tor ({errors.plain(e)}).")
 
             relay.progress.connect(progress)
             relay.done.connect(finish)
@@ -1662,7 +1663,7 @@ class SettingsDialog(QDialog):
                 try:
                     msg = net.test(text)
                 except (ValueError, OSError) as e:
-                    msg = f"It didn't work: {e}"
+                    msg = f"It didn't work: {errors.plain(e)}"
                 relay.done.emit(msg)
             threading.Thread(target=run, daemon=True, name="proxy-test").start()
         test.clicked.connect(run_test)
@@ -1723,7 +1724,7 @@ class SettingsDialog(QDialog):
         self._net_sync()
         asked, self._upd_asked = getattr(self, "_upd_asked", False), False
         if err:
-            self.upd_label.setText(f"Couldn't check: {err}")
+            self.upd_label.setText(f"Couldn't check: {errors.plain(err)}")
         elif rel is None:
             # a check the user didn't ask for may not have asked GitHub at all (done
             # today already, or the newer version was skipped): don't claim anything
@@ -1954,6 +1955,6 @@ class SettingsDialog(QDialog):
             try:
                 msg = job()
             except Exception as e:  # noqa: BLE001 - offline, PyPI down…
-                msg = f"Couldn't update: {e}."
+                msg = f"Couldn't update: {errors.plain(e)}."
             relay.done.emit(msg)
         threading.Thread(target=run, daemon=True, name="ytdlp-settings").start()

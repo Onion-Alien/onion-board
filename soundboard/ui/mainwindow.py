@@ -62,6 +62,7 @@ from soundboard.ui.widgets import (Meter, Pad, PadGrid, SeekSlider, expand_dropp
 from soundboard.wheelguard import no_wheel
 from soundboard.winkeys import Hotkeys
 
+from soundboard import errors
 log = logging.getLogger(__name__)
 
 
@@ -1412,7 +1413,7 @@ class MainWindow(QMainWindow):
             log.warning("couldn't start the cable installer", exc_info=True)
             QMessageBox.warning(
                 self, "Couldn't start the installer",
-                f"Windows wouldn't run PowerShell ({e.strerror or e}).\n\nYou can install "
+                f"Windows wouldn't run PowerShell ({errors.plain(e)}).\n\nYou can install "
                 "VB-Cable by hand: download it from vb-audio.com, unzip it, right-click "
                 "VBCABLE_Setup_x64.exe → Run as administrator → Install Driver.")
             return
@@ -2516,7 +2517,7 @@ class MainWindow(QMainWindow):
                     self.bridge.loaded.emit(m.id, data, "")
                 except Exception as e:  # noqa: BLE001
                     log.warning("can't load %s: %s", m.file, e)
-                    self.bridge.loaded.emit(m.id, None, str(e))
+                    self.bridge.loaded.emit(m.id, None, errors.plain(e))
             live = self._live_metas()   # as of now, not of the start
             prune_cache(cache_keep(live))
             thumbs.prune({m.image for m in live if m.image})
@@ -2645,13 +2646,14 @@ class MainWindow(QMainWindow):
                     except Exception as e:  # noqa: BLE001 - too big, no room, damaged
                         log.warning("can't unpack %s: %s", z, e)
                         # one message for the zip; the rest only count down
-                        self.bridge.imported.emit(None, None, f"{Path(z).name}: {e}")
+                        self.bridge.imported.emit(None, None, f"{Path(z).name}: {errors.plain(e)}")
                         for _ in names[1:]:
                             self.bridge.imported.emit(None, None, "")
                         continue
                     for _n, dest, err in res:
                         if dest is None:
-                            self.bridge.imported.emit(None, None, f"{Path(z).name} → {err}")
+                            self.bridge.imported.emit(None, None,
+                                                      f"{Path(z).name} → {errors.plain(err)}")
                         else:
                             todo.append(str(dest))
                 import_all(todo)
@@ -2672,7 +2674,7 @@ class MainWindow(QMainWindow):
                     self.bridge.imported.emit(meta, data, "")   # it's in there as ours
                 except Exception as e:  # noqa: BLE001
                     log.warning("can't import %s: %s", f, e)
-                    self.bridge.imported.emit(None, None, f"{Path(f).name}: {e}")
+                    self.bridge.imported.emit(None, None, f"{Path(f).name}: {errors.plain(e)}")
         threading.Thread(target=run, daemon=True, name="import").start()
         self.status.setText(f"Importing {count} file(s)…")
         busy.set_busy(self.btn_add, True)   # back in on_imported, when they're all in
@@ -2712,9 +2714,9 @@ class MainWindow(QMainWindow):
             log.exception("can't save clip")
             src = self.sender()
             if src is not None and hasattr(src, "clip_error"):
-                src.clip_error = str(e) or type(e).__name__   # the tab says so on its row
+                src.clip_error = errors.plain(e)   # the tab says so on its row
             else:
-                QMessageBox.warning(self, "Couldn't save clip", str(e))
+                errors.warn(self, "Couldn't save clip", e)
             return
         self._tag_new(meta)
         self.cfg.sounds.append(meta)
@@ -3097,7 +3099,7 @@ class MainWindow(QMainWindow):
         try:
             new = duplicate(m, name if name != m.name else f"{name} (edit)")
         except OSError as e:
-            QMessageBox.warning(self, "Couldn't copy the sound", str(e))
+            errors.warn(self, "Couldn't copy the sound", e)
             return
         d.apply(new)
         if new.name == m.name:
@@ -3133,7 +3135,7 @@ class MainWindow(QMainWindow):
                 self.bridge.loaded.emit(m.id, data, "")
             except Exception as e:  # noqa: BLE001
                 log.warning("can't apply effects to %s: %s", m.name, e)
-                self.bridge.loaded.emit(m.id, None, str(e))
+                self.bridge.loaded.emit(m.id, None, errors.plain(e))
             prune_cache(cache_keep(self._live_metas()))
         threading.Thread(target=run, daemon=True, name="fx-render").start()
 
@@ -3200,14 +3202,15 @@ class MainWindow(QMainWindow):
                 self.bridge.exported.emit(path, n, "")
             except Exception as e:  # noqa: BLE001 - disk full, no permission…
                 log.exception("export to %s failed", path)
-                self.bridge.exported.emit(path, 0, str(e))
+                self.bridge.exported.emit(path, 0, errors.plain(e))
         threading.Thread(target=run, daemon=True, name="export").start()
 
     def _on_exported(self, path: str, n: int, err: str):
         self._exporting = False
         self._update_status()
         if err:
-            QMessageBox.warning(self, "Export failed", f"Couldn't write {Path(path).name}:\n{err}")
+            QMessageBox.warning(self, "Export failed",
+                                f"Couldn't write {Path(path).name}:\n{errors.plain(err)}")
             return
         msg = (f"Exported {n} sound{'s' if n != 1 else ''} to "
                f"{html.escape(Path(path).name)}.")
@@ -3229,14 +3232,14 @@ class MainWindow(QMainWindow):
             pkg = backup.read(path)
         except backup.BackupError as e:
             QApplication.restoreOverrideCursor()
-            QMessageBox.warning(self, "Can't import", str(e))
+            errors.warn(self, "Can't import", e)
             return
         except Exception as e:  # noqa: BLE001 - a damaged or odd file, never a crash
             QApplication.restoreOverrideCursor()
             log.warning("couldn't read %s", path, exc_info=True)
             QMessageBox.warning(self, "Can't import",
                                 f"{Path(path).name} is damaged or in a format Onion Board "
-                                f"can't read ({type(e).__name__}: {e}).")
+                                f"can't read ({errors.plain(e)}).")
             return
         QApplication.restoreOverrideCursor()
         use_settings = False
@@ -3272,7 +3275,7 @@ class MainWindow(QMainWindow):
                 self.bridge.unpacked.emit(res, pkg, "")
             except Exception as e:  # noqa: BLE001
                 log.exception("import of %s failed", path)
-                self.bridge.unpacked.emit(None, pkg, str(e))
+                self.bridge.unpacked.emit(None, pkg, errors.plain(e))
         threading.Thread(target=run, daemon=True, name="import-pack").start()
 
     def _apply_backup_settings(self, raw: dict):
@@ -3399,7 +3402,7 @@ class MainWindow(QMainWindow):
                 rel = updates.check(self.cfg, force=force)
                 self.bridge.update.emit(rel, "", force)
             except Exception as e:  # noqa: BLE001 - offline etc.
-                self.bridge.update.emit(None, str(e) or type(e).__name__, force)
+                self.bridge.update.emit(None, errors.plain(e), force)
             if due:   # and the Onion Watch add-on, once it's installed (else nothing asked)
                 offer = watchaddon.check_update()
                 if offer is not None:
@@ -3489,10 +3492,10 @@ class MainWindow(QMainWindow):
                 path = updates.download(rel, progress, lambda: self._shut_down)
                 self.bridge.update_ready.emit(path, "")
             except updates.UpdateError as e:
-                self.bridge.update_ready.emit(None, str(e))
+                self.bridge.update_ready.emit(None, errors.plain(e))
             except Exception as e:  # noqa: BLE001 - never leave the pill stuck
                 log.exception("update download failed")
-                self.bridge.update_ready.emit(None, str(e) or type(e).__name__)
+                self.bridge.update_ready.emit(None, errors.plain(e))
         threading.Thread(target=run, daemon=True, name="update-download").start()
 
     def _on_update_progress(self, pct: int):
@@ -3508,7 +3511,8 @@ class MainWindow(QMainWindow):
             self._set_update_pill(f"Update: {rel.version}",
                                   f"Onion Board {rel.version} is out — click for details")
             box = QMessageBox(QMessageBox.Warning, "Couldn't update",
-                              f"Onion Board {rel.version} couldn't be downloaded: {err}.",
+                              f"Onion Board {rel.version} couldn't be downloaded: "
+                              f"{errors.plain(err)}.",
                               QMessageBox.NoButton, self)
             page = box.addButton("Open the download page", QMessageBox.AcceptRole)
             box.addButton("Close", QMessageBox.RejectRole)
@@ -3557,7 +3561,7 @@ class MainWindow(QMainWindow):
             self.cfg.update_pending = ""
             self._save_later()
             QMessageBox.warning(self, "Couldn't update",
-                                f"The installer couldn't be started ({e}). You can "
+                                f"The installer couldn't be started ({errors.plain(e)}). You can "
                                 "download it from the release page instead.")
             return
         self.quit_app()
@@ -3680,7 +3684,8 @@ class MainWindow(QMainWindow):
         except Exception as ex:  # noqa: BLE001
             log.exception("test analysis failed")
             self.test_result.setText(
-                f"<span style='color:{theme.status('error')}'>Test analysis failed: {ex}</span>")
+                f"<span style='color:{theme.status('error')}'>Test analysis failed: "
+                f"{errors.plain(ex)}</span>")
         self.test_result.show()
         return data, rate
 
