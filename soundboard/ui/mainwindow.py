@@ -3498,10 +3498,21 @@ class MainWindow(QMainWindow):
         if files:
             self.import_files(files)   # a plain zip of sounds is imported too
 
-    def import_soundpad(self, path: str = ""):
+    def import_queued(self):
+        """The installer's "Bring my sounds over from Soundpad" box, ticked: it left a
+        note for this start. The tick was their yes, so nothing is asked again."""
+        note = library.APP_DIR / soundpad.QUEUED_NAME
+        if note.is_file():
+            note.unlink(missing_ok=True)
+            self.import_soundpad(ask=False)
+
+    def import_soundpad(self, path: str = "", ask: bool = True):
         """Bring a Soundpad board over: its sound files (copied, Soundpad keeps its
-        own), names, categories and the hotkeys nothing here uses yet."""
+        own), names, categories and the hotkeys nothing here uses yet. `ask`: False
+        when they already said yes (the installer's box): no questions or pop-ups."""
         path = path or str(soundpad.default_list() or "")
+        if not path and not ask:
+            return   # Soundpad's list went away since the install
         if not path:
             path, _ = QFileDialog.getOpenFileName(
                 self, "Import from Soundpad: pick a saved sound list", str(Path.home()),
@@ -3511,9 +3522,22 @@ class MainWindow(QMainWindow):
         try:
             entries = soundpad.read(path)
         except (OSError, ValueError) as e:
-            errors.warn(self, "Couldn't read the Soundpad list", e)
+            if not ask:
+                log.warning("can't read Soundpad's list: %s", e)
+                self.toast(f"Couldn't bring your Soundpad sounds over: {errors.plain(e)}",
+                           "warn")
+            else:
+                errors.warn(self, "Couldn't read the Soundpad list", e)
             return
         ok, bad = soundpad.importable(entries)
+        if not ask:
+            if ok:
+                self.import_files([e.path for e in ok], {e.path: e for e in ok})
+            else:
+                self.toast("No Soundpad sounds to bring over: its sound files were moved "
+                           "or deleted" if entries else "Soundpad's sound list is empty",
+                           "warn")
+            return
         if not ok:
             QMessageBox.information(
                 self, "Import from Soundpad",

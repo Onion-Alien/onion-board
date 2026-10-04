@@ -114,3 +114,40 @@ def test_a_dropped_spl_goes_to_the_soundpad_import(main_window, monkeypatch):  #
     monkeypatch.setattr(main_window, "import_soundpad", got.append)
     main_window.import_files(["C:/x/list.SPL"])
     assert got == ["C:/x/list.SPL"]
+
+
+def test_the_installers_box_imports_on_first_start_without_asking(
+        main_window, qapp, tmp_path, monkeypatch):  # noqa: F811
+    """Ticked in the installer, it leaves a note; the first start does the import with
+    no question (the tick was the yes), and only once."""
+    w = main_window
+    monkeypatch.setenv("APPDATA", str(tmp_path))
+    _board(tmp_path)
+    note = library.APP_DIR / soundpad.QUEUED_NAME
+    note.parent.mkdir(parents=True, exist_ok=True)
+    note.write_text("soundpad", encoding="utf-8")
+    monkeypatch.setattr(QMessageBox, "question", lambda *a, **k: pytest.fail("asked"))
+    w.import_queued()
+    assert not note.exists()
+    assert process_events(qapp, lambda: not w._pending_imports and len(w.cfg.sounds) == 5)
+    w.import_queued()                            # no note: nothing happens
+    assert not w._pending_imports and len(w.cfg.sounds) == 5
+
+
+def test_a_queued_import_with_soundpad_gone_does_nothing(
+        main_window, tmp_path, monkeypatch):  # noqa: F811
+    monkeypatch.setenv("APPDATA", str(tmp_path))
+    note = library.APP_DIR / soundpad.QUEUED_NAME
+    note.parent.mkdir(parents=True, exist_ok=True)
+    note.write_text("soundpad", encoding="utf-8")
+    monkeypatch.setattr("PySide6.QtWidgets.QFileDialog.getOpenFileName",
+                        lambda *a, **k: pytest.fail("opened a file picker"))
+    main_window.import_queued()
+    assert not note.exists() and len(main_window.cfg.sounds) == 2
+
+
+def test_the_installer_offers_it_only_when_soundpad_is_there():
+    iss = (Path(__file__).parent.parent / "installer" / "OnionBoard.iss").read_text("utf-8")
+    task = next(ln for ln in iss.splitlines() if ln.startswith('Name: "soundpad"'))
+    assert "Check: HasSoundpad" in task and "Flags: unchecked" not in task
+    assert r"Leppsoft\soundlist.spl" in iss and soundpad.QUEUED_NAME in iss
