@@ -11,7 +11,8 @@
   the phone's browser (iPhone or Android, nothing to install): a tap plays the
   sound on the PC. Off by default; it has its own key, only answers phones on your
   home network, and never touches your mic. An add-on that fails to load gets a
-  card saying so, never an error box.
+  card saying so, never an error box. Windows' admin prompt for the
+  firewall rule names Onion Board, not "Windows Command Processor".
 - Settings: card headings line up with the text under them (they sat 3 px to the
   right).
 - The control API's `/api/sounds` also gives each pad's colour.

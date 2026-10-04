@@ -14,6 +14,11 @@ What the host gives it:
                       locked out) offering `actions`, serving `page` at /
   new_token()         a fresh random key
   warn(text)          a warning on the main window's status line
+  allow_firewall(name, port)
+                      Windows Firewall rule `name` for `port` and this app, Private
+                      networks and local subnet only, after Windows' admin prompt,
+                      which names Onion Board (soundboard.firewall). Waits; True if
+                      added. Newer than REMOTE_API 1's first hosts: check for it
   card(), button_row(), flash(), icon(), no_wheel()
                       Settings' own look, so the add-on's card matches the rest
 """
@@ -74,6 +79,11 @@ class RemoteHost:
     def warn(self, text: str):
         self.win.status.setText(f"<span style='color:{theme.status('warn')}'>"
                                 f"{html.escape(text)}</span>")
+
+    @staticmethod
+    def allow_firewall(name: str, port: int) -> bool:
+        from soundboard import firewall
+        return firewall.allow(name, port)
 
     # ------------------------------------------------------------------ Settings' look
     @staticmethod

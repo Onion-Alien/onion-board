@@ -6,6 +6,11 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
+if __name__ == "__main__" and sys.argv[1:2] == ["--firewall-rule"]:
+    # the admin copy a remote add-on asks for (soundboard.firewall): adds its rule, no app
+    from soundboard.firewall import cli
+    sys.exit(cli(sys.argv[2:]))
+
 from soundboard.app import main  # noqa: E402
 
 if __name__ == "__main__":
