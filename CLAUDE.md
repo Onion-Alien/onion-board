@@ -50,3 +50,6 @@ or installing anything. The short version:
   mangles UTF-8 (this codebase uses symbols like ⚙ ⏺ 🐰 in strings).
 - Audio callbacks never block or take the engine lock ([docs/CODE.md](docs/CODE.md) → *Audio notes*).
 - Code layout is the table in [docs/CODE.md](docs/CODE.md); keep it current when adding modules.
+- Never rewrite history already pushed to `main` (no filter-repo, rebase or force-push):
+  commits get new IDs, so every fork or branch that merges `main` sees them all as new
+  and conflicts. To clean up old commits, add a new commit instead.
