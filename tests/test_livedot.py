@@ -1,4 +1,5 @@
-"""The glowing "live" dot on a tab (and its green name), and the Voice panel driving it."""
+"""The "live" mark on a tab (a badge on its icon, optionally a green wash), and the
+Voice panel driving it."""
 import pytest
 from PySide6.QtGui import QColor
 from PySide6.QtWidgets import QTabBar, QTabWidget, QWidget
@@ -6,29 +7,55 @@ from PySide6.QtWidgets import QTabBar, QTabWidget, QWidget
 from soundboard import theme
 from soundboard.speech import tts
 from soundboard.ui import icons
-from soundboard.ui.livedot import LiveDot, LiveTabStyle, is_tab_live, live_color, set_tab_live
+from soundboard.ui.livedot import LiveTint, is_tab_live, live_color, set_tab_live, set_tint
 
 
-def test_dot_comes_and_goes_and_the_tooltip_is_restored(qapp):
+def entries(tabs):
+    return [(e[3], e[4]) for e in icons._tabs if e[0]() is tabs]
+
+
+def test_badge_comes_and_goes_and_the_tooltip_is_restored(qapp):
     tabs = QTabWidget()
     tabs.addTab(QWidget(), "Voice")
     tabs.setTabToolTip(0, "Change your voice")
     set_tab_live(tabs, 0, True, "ON", icon="voice")
     assert is_tab_live(tabs, 0)
-    assert [e[3] for e in icons._tabs if e[0]() is tabs] == ["#13ce66"]   # green, once
+    assert entries(tabs) == [(None, True)]                  # badge, no tint by default
     assert tabs.tabToolTip(0) == "ON\nChange your voice"
-    set_tab_live(tabs, 0, True, "ON")                     # idempotent
+    set_tab_live(tabs, 0, True, "ON")                       # idempotent, keeps its icon
     assert tabs.tabToolTip(0) == "ON\nChange your voice"
-    assert len(tabs.tabBar().findChildren(LiveTabStyle)) == 1   # one style per bar
-    set_tab_live(tabs, 0, False, icon="voice")
+    assert entries(tabs) == [(None, True)]
+    set_tab_live(tabs, 0, False)
     assert not is_tab_live(tabs, 0)
-    assert [e[3] for e in icons._tabs if e[0]() is tabs] == [None]
+    assert entries(tabs) == [(None, False)]
     assert tabs.tabToolTip(0) == "Change your voice"
-    LiveDot().grab()                                      # paints without error
 
 
-def live_pixels(bar: QTabBar, index: int) -> int:
-    """How many pixels of the live colour the tab is drawn with (its name's glyphs)."""
+def test_going_live_never_changes_a_tabs_size(qapp):
+    """The old dot sat beside the name: it widened the tab, shoved the ones after it
+    along and made the bar taller."""
+    tabs = QTabWidget()
+    for name in ("Sounds", "Voice", "Setup"):
+        tabs.addTab(QWidget(), name)
+        icons.set_tab_icon(tabs, tabs.count() - 1, "voice")
+    tabs.resize(500, 200)
+    tabs.show()
+    qapp.processEvents()
+    bar = tabs.tabBar()
+    before = [bar.tabRect(i) for i in range(3)], bar.sizeHint()
+    try:
+        for tint in (False, True):
+            set_tint(tabs, tint)
+            set_tab_live(tabs, 1, True, "ON")
+            qapp.processEvents()
+            assert ([bar.tabRect(i) for i in range(3)], bar.sizeHint()) == before
+            set_tab_live(tabs, 1, False)
+    finally:
+        tabs.close()
+
+
+def green_pixels(bar: QTabBar, index: int) -> int:
+    """How many pixels of the tab are close to the live colour (badge, wash)."""
     img = bar.grab().toImage()
     want = QColor(live_color())
     r = bar.tabRect(index)
@@ -37,30 +64,47 @@ def live_pixels(bar: QTabBar, index: int) -> int:
                       zip(img.pixelColor(x, y).getRgb()[:3], want.getRgb()[:3])))
 
 
-def test_a_live_tab_is_named_in_the_live_colour_under_the_theme(qapp):
-    """The theme's stylesheet colours every tab's name, which hides QTabBar's own
-    per-tab text colour: a live tab must still come out green, selected or not, in
-    the new theme's green after a theme change, and in the plain colour once off."""
+def wash_pixels(bar: QTabBar, index: int) -> int:
+    """Pixels inside the tab that the wash turned green-ish (green above red and blue)."""
+    img = bar.grab().toImage()
+    r = bar.tabRect(index).adjusted(4, 4, -4, -4)
+    n = 0
+    for y in range(r.top(), r.bottom() + 1):
+        for x in range(r.left(), r.right() + 1):
+            c = img.pixelColor(x, y)
+            n += c.green() > c.red() + 6 and c.green() > c.blue() + 6
+    return n
+
+
+def test_live_tab_has_a_badge_and_the_optional_wash(qapp):
     theme.apply(qapp, "Dark")
     tabs = QTabWidget()
     for name in ("Radio", "Apps"):
         tabs.addTab(QWidget(), name)
+        icons.set_tab_icon(tabs, tabs.count() - 1, name.lower())
     tabs.resize(400, 200)
     tabs.show()                                   # offscreen: nothing appears
     qapp.processEvents()
     bar = tabs.tabBar()
     try:
-        assert live_pixels(bar, 1) == 0
+        assert green_pixels(bar, 1) == 0
         set_tab_live(tabs, 1, True, "ON")
-        assert live_pixels(bar, 1) > 0 and live_pixels(bar, 0) == 0
-        tabs.setCurrentIndex(1)                   # a selected tab has its own colour rule
-        assert live_pixels(bar, 1) > 0
-        theme.apply(qapp, "Light")                # a darker green there
-        assert live_color() != "#13ce66" and live_pixels(bar, 1) > 0
+        qapp.processEvents()
+        assert green_pixels(bar, 1) > 0 and green_pixels(bar, 0) == 0     # the badge
+        plain = wash_pixels(bar, 1)
+        assert bar.findChild(LiveTint) is None                            # no wash by default
+        set_tint(tabs, True)
+        qapp.processEvents()
+        assert entries(tabs)[1] == ("ok_text", True)                      # green icon
+        assert wash_pixels(bar, 1) > plain + 200 and wash_pixels(bar, 0) == 0
+        set_tint(tabs, False)
+        qapp.processEvents()
+        assert entries(tabs)[1] == (None, True)
+        assert wash_pixels(bar, 1) == plain
         set_tab_live(tabs, 1, False)
-        assert live_pixels(bar, 1) == 0
+        qapp.processEvents()
+        assert green_pixels(bar, 1) == 0
     finally:
-        theme.apply(qapp, "Dark")
         tabs.close()
 
 
