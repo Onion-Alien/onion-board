@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+- **Watch a pad's video:** a sound made from a video file, or from a link added
+  with *Also save the video* on, now has a **Video** button in the player. It
+  opens the video in its own window, in step with the sound: it plays, pauses,
+  seeks and speeds up with it. The sound still goes out as normal; the video is
+  only on your screen. Older versions of the app leave the links alone.
+- **Settings → About:** the version, links to the website, source and license,
+  ways to get in touch (feedback form, bug report, private security report), a
+  note from the author, and the fine print in plain words. Instant replay's
+  hotkey hint now also says to only keep clips of people who are fine with it.
 - **Send feedback opens a form that needs no account:** Settings → Add-ons &
   help → Send feedback now opens a short form with your version filled in,
   instead of a GitHub bug report. The app still sends nothing itself.
