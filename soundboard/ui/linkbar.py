@@ -20,7 +20,7 @@ import numpy as np
 from PySide6.QtCore import Qt, QTimer, Signal
 from PySide6.QtWidgets import QFrame, QHBoxLayout, QLabel, QPushButton
 
-from soundboard import net, netlog, quality, theme, thumbs, ytdl
+from soundboard import net, netlog, quality, theme, thumbs, videos, ytdl
 from soundboard.library import (SR, decode, fingerprint, import_file, level_gain, to_int16)
 from soundboard.ui import busy, icons
 from soundboard.ui.widgets import fmt_time
@@ -285,6 +285,8 @@ class LinkBar(QFrame):
             if video:
                 try:
                     kept = ytdl.save_video(path, title or meta.name)
+                    if kept:
+                        videos.link(meta.id, kept)   # the player's Video button shows it
                     saved = (f"Video saved in {kept.parent}." if kept else
                              "No video was saved: this site only gave the sound.")
                 except OSError as e:
