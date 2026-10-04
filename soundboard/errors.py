@@ -88,8 +88,9 @@ _DOWNLOADER = [
     (r"private video|video is private", "That video is private."),
     (r"confirm your age|age.restricted|inappropriate for some users",
      "That video is age-restricted, so it can't be downloaded without signing in."),
-    (r"not a bot|confirm you.?re not", "The site wants to check you're not a robot. "
-     "Try again in a few minutes."),
+    (r"not a bot|confirm you.?re not", "The site wants to check you're not a robot. It "
+     "does that to an internet address it's had a lot of requests from (a VPN or a "
+     "shared network can be one). Waiting a while usually clears it."),
     (r"members.only|join this channel", "That's a members-only video."),
     (r"premieres in|live event will begin|this live event", "That video hasn't started yet."),
     (r"copyright", "That video was taken down over a copyright claim."),
