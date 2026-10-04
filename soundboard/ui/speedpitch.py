@@ -351,6 +351,11 @@ class SpeedPitchButton(QPushButton):
         self.fx_changed.emit(now)
 
     def _open(self):
+        # settle the layouts first: right after Redline hides its box, the column's
+        # and the popup's size hint (and the popup's minimum) still hold the old,
+        # taller height, so adjustSize alone would never shrink it back
+        self.red_box.parentWidget().layout().activate()
+        self.pop.layout().activate()
         self.pop.adjustSize()
         pos = self.mapToGlobal(QPoint(0, 0))
         # kept on the screen the button is on (a second monitor can sit left of or
