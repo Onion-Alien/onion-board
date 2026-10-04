@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- **A narrow window stays the whole app:** every tab now fits down to where the
+  mini player takes over (about 440 px wide). The tab icons' spacing alone held
+  it at about 480 px, so a narrow window turned into the mini player on whatever
+  tab you were on.
 - **Web search results that keep up with your clicks:** a result's *Play* or
   *Add* shows a progress bar on its card (and the percentage on the button), and
   the other cards wait until it's done, so a second click no longer cancels the

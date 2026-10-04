@@ -424,6 +424,24 @@ def test_the_whole_window_comes_back_after_the_mini_player(window, qapp):
     assert not window.is_mini()
 
 
+def test_every_tab_stays_the_whole_window_down_to_the_mini_size(window, qapp):
+    """The icon-only tabs' padding alone needed ~480 px, so a window the rest fits
+    (480 px is a 600 px window at 125 %) turned into the mini player."""
+    from soundboard.ui.mainwindow import MINI_SIZE
+
+    window.show()
+    window.resize(1000, 700)
+    window._refit()
+    for page in (window.sounds_page, window.radio_page, window.apps, window.voice,
+                 window.setup_page):
+        window.tabs.setCurrentWidget(page)
+        window.resize(MINI_SIZE.width() + 10, 700)
+        window._refit()
+        assert not window.is_mini(), type(page).__name__
+        window.resize(1000, 700)
+        window._refit()
+
+
 @pytest.mark.parametrize("theme_name", ["Dark", "Retro 98"])
 def test_restoring_a_large_window_keeps_search_results(window, qapp, theme_name):
     """Maximize/restore must keep the full app and the selected search view."""
