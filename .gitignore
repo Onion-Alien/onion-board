@@ -9,6 +9,7 @@ dist/
 *.egg-info/
 installer/*.bmp
 installer/*.png
+installer/version_info.txt
 .pytest_cache/
 .ruff_cache/
 

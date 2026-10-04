@@ -27,6 +27,10 @@ if (-not (Test-Path $py)) { throw "No .venv - run scripts\install.bat first." }
 
 $cleanArg = @()
 if ($Clean) { $cleanArg = @("--clean") }
+# The .exe's version info: Windows names the app by it (the firewall prompt, Task
+# Manager, Properties), so it says "Onion Board" and the real version.
+& $py scripts\version_info.py
+if ($LASTEXITCODE -ne 0) { throw "version_info.py failed" }
 # Of scipy only scipy.fft and scipy.ndimage ship (with the linalg and special they
 # import): the app doesn't use scipy, but Onion Watch (the Triggers tab add-on) does
 # its FFTs with scipy.fft, and released Onion Watch up to 0.5.6 needs scipy.ndimage
@@ -34,6 +38,7 @@ if ($Clean) { $cleanArg = @("--clean") }
 # on 0.5.6). scipy's __init__ names every subpackage, so the rest is excluded by name.
 & $py -m PyInstaller --noconfirm @cleanArg --windowed `
     --name OnionBoard --icon assets\onionboard.ico `
+    --version-file installer\version_info.txt `
     --add-data "installer\install-vbcable.ps1;." `
     --add-data "assets\onionboard.ico;." `
     --add-data "assets\art;art" `
