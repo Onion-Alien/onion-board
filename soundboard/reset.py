@@ -41,7 +41,7 @@ NAMES = {SETTINGS: "Settings", HOTKEYS: "Hotkeys", SOUND_KEYS: "Sound hotkeys",
          DEVICES: "Audio devices"}
 PARTS = tuple(NAMES)
 DEVICE_FIELDS = ("main_device", "mon_device", "mic_device", "obs_device",
-                 "mon_follows_default")
+                 "mon_follows_default", "route")
 PROGRAM_FIELDS = ("apps", "apps_hidden")
 # what "Settings" leaves alone: the other parts, what the user made (sounds,
 # categories, triggers, radio favourites) and the app's own bookkeeping

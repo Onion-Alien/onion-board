@@ -772,9 +772,10 @@ class SettingsDialog(QDialog):
         cb = QComboBox()
         no_wheel(cb)
         cb.addItem("Off", None)
+        main = mw._main_name()   # what others hear (None: sending nowhere frees it)
         for d in eng.list_devices("output"):
-            if (d["name"] not in (c.main_device, c.mon_device)   # those already have a job
-                    and not eng.same_cable(d["name"], c.main_device)):
+            if (d["name"] not in (main, c.mon_device)   # those already have a job
+                    and not eng.same_cable(d["name"], main)):
                 cb.addItem(d["name"], d["name"])
         i = cb.findData(c.obs_device) if c.obs_device else 0
         cb.setCurrentIndex(max(i, 0))
@@ -838,8 +839,10 @@ class SettingsDialog(QDialog):
         people find them where they look first. Picking goes through the window."""
         mw = self.mw
         card, cv = self._card("Devices",
-                              "Your mic (input) and where you listen (output). Plugged "
-                              "something in? Press Re-scan.")
+                              "Your mic (input), where you listen (output) and where what "
+                              "others hear goes: the virtual cable, or another device "
+                              "(Voicemeeter, OBS, a mixer). Plugged something in? Press "
+                              "Re-scan.")
         grid = QGridLayout()
         grid.setHorizontalSpacing(10)
         grid.setVerticalSpacing(6)
@@ -847,14 +850,18 @@ class SettingsDialog(QDialog):
         for r, (text, src, attr) in enumerate((
                 ("Input — my mic", mw.cb_mic, "mic_device"),
                 ("Output — my headphones", mw.cb_mon, "mon_device"),
-                ("Send into (the cable)", mw.cb_main, "main_device"))):
+                ("Send to others through", mw.cb_route, "route"),
+                (mw.main_label(), mw.cb_main, "main_device"))):
             cb = QComboBox()
             cb.setMinimumWidth(120)
             no_wheel(cb)
             cb.activated.connect(lambda i, src=src, attr=attr: self._pick_device(src, attr, i))
-            grid.addWidget(QLabel(text), r, 0)
+            label = QLabel(text)
+            grid.addWidget(label, r, 0)
             grid.addWidget(cb, r, 1)
             self.dev_combos.append((cb, src))
+            if src is mw.cb_main:
+                self.dev_main = (label, cb)   # relabelled / hidden with the route
         grid.setColumnStretch(1, 1)
         cv.addLayout(grid)
         ref = QPushButton("Re-scan devices")
@@ -870,10 +877,16 @@ class SettingsDialog(QDialog):
             for i in range(src.count()):
                 cb.addItem(src.itemText(i), src.itemData(i))
             cb.setCurrentIndex(src.currentIndex())
+        label, cb = self.dev_main
+        label.setText(self.mw.main_label())
+        for w in (label, cb):
+            w.setVisible(self.mw.cfg.route != "off")
 
     def _pick_device(self, src, attr, i):
         src.setCurrentIndex(i)
         self.mw.on_device(src, attr)
+        if attr == "route":   # it may have picked the cable, and shows or hides its row
+            self._sync_devices()
 
     def _general(self):
         w, v = self._page()
