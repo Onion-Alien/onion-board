@@ -68,7 +68,8 @@ def read(path: str | Path) -> list[Entry]:
         data = json.loads(path.read_bytes().decode("utf-8-sig", errors="replace"))
     except ValueError as e:
         raise ValueError("that isn't a Soundux config (it couldn't be read)") from e
-    tabs = data.get("data", {}).get("tabs") if isinstance(data, dict) else None
+    inner = data.get("data") if isinstance(data, dict) else None
+    tabs = inner.get("tabs") if isinstance(inner, dict) else None
     if not isinstance(tabs, list):
         raise ValueError("that isn't a Soundux config")
     tabs = [t for t in tabs if isinstance(t, dict) and isinstance(t.get("sounds"), list)]

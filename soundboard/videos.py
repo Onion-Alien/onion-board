@@ -17,6 +17,7 @@ import json
 import logging
 import tempfile
 import threading
+import time
 from pathlib import Path
 
 from soundboard import library
@@ -38,16 +39,34 @@ def is_video(path: str | Path) -> bool:
 
 
 def _load() -> dict[str, str]:
+    return _read()[0]
+
+
+def _read() -> tuple[dict[str, str], bool]:
+    """The links, and False when videos.json exists but couldn't be read (locked by
+    an antivirus or OneDrive, or damaged): then it mustn't be saved over, or every
+    link in it is lost. A damaged one is set aside first (videos.json.broken-<time>),
+    so linking can start it again."""
     try:
         raw = json.loads(_path().read_text(encoding="utf-8-sig"))
+        if not isinstance(raw, dict):
+            raise ValueError(f"videos.json is a {type(raw).__name__}")
     except FileNotFoundError:
-        return {}
-    except (OSError, ValueError):
+        return {}, True
+    except ValueError:
         log.warning("videos.json is unreadable; starting it again", exc_info=True)
-        return {}
-    if not isinstance(raw, dict):
-        return {}
-    return {k: v for k, v in raw.items() if isinstance(k, str) and isinstance(v, str) and v}
+        broken = _path().with_name(f"videos.json.broken-{time.strftime('%Y%m%d-%H%M%S')}")
+        try:
+            _path().replace(broken)
+        except OSError:
+            log.warning("couldn't set videos.json aside", exc_info=True)
+            return {}, False
+        return {}, True
+    except OSError:
+        log.warning("couldn't read videos.json", exc_info=True)
+        return {}, False
+    return {k: v for k, v in raw.items()
+            if isinstance(k, str) and isinstance(v, str) and v}, True
 
 
 def _save(links: dict[str, str]):
@@ -64,7 +83,10 @@ def _save(links: dict[str, str]):
 def link(sid: str, video: str | Path):
     """Remember that sound `sid` came from `video`."""
     with _lock:
-        links = _load()
+        links, ok = _read()
+        if not ok:
+            log.warning("videos.json couldn't be read: %s isn't linked", sid)
+            return
         links[sid] = str(Path(video).resolve())
         _save(links)
 
@@ -92,8 +114,8 @@ def link_import(sid: str, src: str | Path) -> bool:
 def copy_link(src_sid: str, new_sid: str):
     """A duplicated pad shows the same video."""
     with _lock:
-        links = _load()
-        if src_sid in links:
+        links, ok = _read()
+        if ok and src_sid in links:
             links[new_sid] = links[src_sid]
             _save(links)
 

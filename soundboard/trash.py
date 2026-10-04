@@ -58,32 +58,54 @@ def load() -> list[Item]:
 def _read(tries: int = 1) -> tuple[list[Item], bool]:
     """The bin, and False when its index exists but couldn't be read (locked by an
     antivirus or OneDrive): then it mustn't be saved over, or everything in it is lost.
-    A locked file is tried `tries` times."""
+    A locked file is tried `tries` times. A damaged one is set aside
+    (deleted.json.broken-<time>, its files stay in the folder) before the bin starts
+    over; if it can't be, it's treated as locked."""
     for n in range(tries):
         try:
             raw = json.loads(_index().read_text(encoding="utf-8"))
+            if not isinstance(raw, dict):
+                raise ValueError(f"the bin's list is a {type(raw).__name__}")
             break
         except FileNotFoundError:
             return [], True
-        except ValueError:
+        except ValueError:   # damaged for good: starting over is all that's left
             log.warning("couldn't read %s", _index(), exc_info=True)
-            return [], True   # damaged for good: starting over is all that's left
+            return [], _set_aside()
         except OSError:
             if n == tries - 1:
                 log.warning("couldn't read %s", _index(), exc_info=True)
                 return [], False
             time.sleep(0.1)
+    return _items(raw), True
+
+
+def _items(raw) -> list[Item]:
     items = []
     for d in raw.get("items", []) if isinstance(raw, dict) else []:
         try:
             it = Item(id=str(d["id"]), kind=str(d["kind"]), name=str(d.get("name", "")),
                       when=float(d.get("when", 0)), data=dict(d.get("data") or {}),
                       index=int(d.get("index", 0)))
-        except (KeyError, TypeError, ValueError):
+        except (KeyError, TypeError, ValueError, AttributeError):
             continue
         if it.kind in (SOUND, APP):
             items.append(it)
-    return items, True
+    return items
+
+
+def _set_aside() -> bool:
+    """Move a damaged index out of the way, so saving the bin doesn't overwrite it."""
+    broken = _index().with_name(f"deleted.json.broken-{time.strftime('%Y%m%d-%H%M%S')}")
+    try:
+        _index().replace(broken)
+    except FileNotFoundError:
+        return True
+    except OSError:
+        log.warning("couldn't set the damaged %s aside", _index(), exc_info=True)
+        return False
+    log.warning("set the damaged bin list aside as %s", broken.name)
+    return True
 
 
 def _save(items: list[Item]) -> None:
@@ -117,7 +139,7 @@ def _move(src: Path, dest_dir: Path) -> Path:
 def put_sound(meta: SoundMeta, index: int) -> None:
     """A sound came off the board: keep its files and its pad in the bin. Its decoded
     cache is just deleted (it's made again from the audio)."""
-    d = asdict(meta)
+    d = library._with_raw(asdict(meta), meta)   # a newer version's fields too
     try:
         p = Path(meta.file)
         if p.parent == library.SOUNDS_DIR and p.exists():
@@ -136,7 +158,9 @@ def put_sound(meta: SoundMeta, index: int) -> None:
     for c in library.CACHE_DIR.glob(f"{meta.id}*.npy"):
         if c.stem == meta.id or c.stem.startswith(meta.id + "."):
             c.unlink(missing_ok=True)
-    _add(Item(uuid.uuid4().hex[:12], SOUND, meta.name, time.time(), d, index))
+    item = Item(uuid.uuid4().hex[:12], SOUND, meta.name, time.time(), d, index)
+    if not _add(item):   # unlisted, it could never come back: removed instead, the
+        _destroy(item)   # audio to the Recycle Bin, as a removal used to
 
 
 def put_app(exe: str, spec: dict, name: str, hidden: bool = False) -> Item:
@@ -148,14 +172,16 @@ def put_app(exe: str, spec: dict, name: str, hidden: bool = False) -> Item:
     return item
 
 
-def _add(item: Item) -> None:
+def _add(item: Item) -> bool:
+    """False if the bin's list is locked: the rest of the bin is kept, unchanged."""
     with _lock:
         all_, ok = _read(tries=10)
-        if not ok:   # keep the rest of the bin; this one's files stay in its folder
+        if not ok:
             log.warning("the bin's list is locked: %s isn't listed in it", item.name)
-            return
+            return False
         all_.append(item)
         _save(_prune(all_))
+        return True
 
 
 def _in_bin(name: str) -> Path | None:
@@ -204,43 +230,67 @@ def take(item_id: str) -> Item | None:
         return item
 
 
-def adopt(src: Path) -> None:
+def adopt(src: Path) -> bool:
     """Put a bin that was set aside (a restore point's copy of this folder) back into
-    the bin, next to what's been deleted since."""
+    the bin, next to what's been deleted since. True once all of it is in (`src` can
+    go); False if some of it is still only in `src` (its list couldn't be read, the
+    bin's is locked, a file couldn't be moved): then `src` must be kept. Adopting the
+    same folder again only adds what isn't in the bin yet."""
+    whole = True
     try:
         raw = json.loads((src / "deleted.json").read_text(encoding="utf-8"))
-    except (OSError, ValueError):
+    except FileNotFoundError:
         raw = {}
+    except (OSError, ValueError):
+        log.warning("couldn't read %s", src / "deleted.json", exc_info=True)
+        raw, whole = {}, False
     with _lock:
         all_, ok = _read(tries=10)
         if not ok:
             log.warning("the bin's list is locked: %s stays where it is", src)
-            return
-        for d in raw.get("items", []) if isinstance(raw, dict) else []:
-            try:
-                it = Item(id=str(d["id"]), kind=str(d["kind"]), name=str(d.get("name", "")),
-                          when=float(d.get("when", 0)), data=dict(d.get("data") or {}),
-                          index=int(d.get("index", 0)))
-            except (KeyError, TypeError, ValueError):
+            return False
+        have = {i.id for i in all_}
+        for it in _items(raw):
+            if it.id in have:
                 continue
-            for k in ("file", "image"):
-                name = it.data.get(k, "")
-                if name and not Path(name).is_absolute() and (src / name).exists():
-                    it.data[k] = _move(src / name, folder()).name
+            try:
+                for k in ("file", "image"):
+                    name = it.data.get(k, "")
+                    if name and not Path(name).is_absolute() and (src / name).exists():
+                        it.data[k] = _move(src / name, folder()).name
+            except OSError:
+                log.warning("couldn't bring %s back into the bin", it.name, exc_info=True)
+                whole = False
+                if k == "image":   # the audio is in: the entry follows it, minus its picture
+                    it.data["image"] = ""
+                else:
+                    continue
             all_.append(it)
         all_.sort(key=lambda i: i.when)
         _save(_prune(all_))
+    try:   # anything still in src (a file no entry names) mustn't be deleted with it
+        left = [p for p in src.iterdir() if p.name != "deleted.json"]
+    except OSError:
+        return False
+    return whole and not left
 
 
 def meta_of(item: Item) -> SoundMeta | None:
-    """A taken sound entry as a pad again (fields a newer version wrote are dropped)."""
-    blank = SoundMeta(id="", name="", file="")
-    known = {k: v for k, v in item.data.items() if hasattr(blank, k)}
+    """A taken sound entry as a pad again (fields a newer version wrote are kept
+    aside, and written back when the settings are saved: see library._with_raw)."""
+    fields_ = SoundMeta.__dataclass_fields__
+    known = {k: v for k, v in item.data.items() if k in fields_}
     try:
         m = SoundMeta(**known)
     except TypeError:
         return None
     m.tags = library.clean_tags(m.tags)
+    extra = {k: v for k, v in item.data.items() if k not in fields_}
+    if extra:
+        m._raw_extra = extra
+    if m.mode not in library.MODES:   # a newer version's mode: played as restart
+        m._raw_kept = {"mode": ("restart", m.mode)}
+        m.mode = "restart"
     return m
 
 
@@ -257,7 +307,10 @@ def forget(item_id: str) -> None:
 
 def empty(kind: str | None = None) -> None:
     with _lock:
-        all_ = load()
+        all_, ok = _read(tries=10)
+        if not ok:   # saving [] would drop the entries that couldn't be read
+            log.warning("the bin's list is locked: not emptying it")
+            return
         keep = [i for i in all_ if kind is not None and i.kind != kind]
         for i in all_:
             if i not in keep:

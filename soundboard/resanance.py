@@ -153,6 +153,8 @@ def _bson(b: bytes, i: int) -> tuple[dict, int]:
     LiteDB row holds; anything else stops the document there."""
     size = struct.unpack_from("<i", b, i)[0]
     end = i + size
+    if size < 5:   # a damaged length mustn't send the reader backwards (forever)
+        raise ValueError("bad BSON document length")
     i += 4
     out: dict = {}
     while i < end - 1:
@@ -163,12 +165,17 @@ def _bson(b: bytes, i: int) -> tuple[dict, int]:
             i += 8
         elif t == 0x02:
             n = struct.unpack_from("<i", b, i)[0]
+            if n < 1 or i + 4 + n > end:
+                raise ValueError("bad BSON string length")
             out[name] = b[i + 4:i + 3 + n].decode("utf-8")
             i += 4 + n
         elif t in (0x03, 0x04):
             out[name], i = _bson(b, i)
         elif t == 0x05:
-            i += 5 + struct.unpack_from("<i", b, i)[0]
+            n = struct.unpack_from("<i", b, i)[0]
+            if n < 0 or i + 5 + n > end:
+                raise ValueError("bad BSON binary length")
+            i += 5 + n
         elif t == 0x07:
             i += 12
         elif t == 0x08:

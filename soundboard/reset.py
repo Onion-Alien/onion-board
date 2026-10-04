@@ -141,6 +141,7 @@ def reset(parts: list[str]) -> str:
         for f in fields(Config):
             if f.name not in KEEP and not f.name.endswith("_hotkey"):
                 setattr(cfg, f.name, getattr(fresh, f.name))
+                _forget_newer(cfg, f.name)
         cfg.radio = radio
     if HOTKEYS in parts:
         fresh = Config()
@@ -157,12 +158,19 @@ def reset(parts: list[str]) -> str:
         fresh = Config()
         for name in DEVICE_FIELDS:
             setattr(cfg, name, getattr(fresh, name))
+            _forget_newer(cfg, name)
         cfg.setup_done = False   # the quick setup guide picks them again
     if not cfg.save():
         return "Couldn't save the reset settings. Your restore point is in Settings > General."
     log.info("reset %s (restore point %s)", parts, point.id)
     return (f"Reset: {', '.join(NAMES[p] for p in parts)}. Changed your mind? "
             "Settings > General > Restore points.")
+
+
+def _forget_newer(cfg: Config, name: str) -> None:
+    """A reset setting is reset for a newer version too: its choice this one doesn't
+    know (library._with_raw) isn't written back over the default."""
+    getattr(cfg, "_raw_kept", {}).pop(name, None)
 
 
 def _keep_sounds(cfg: Config, point: Point) -> None:
@@ -192,26 +200,69 @@ def restore(point_id: str) -> str:
         return "Couldn't restore: the settings file was locked. Nothing was changed."
     old = Config.from_raw(json.loads((point.path / "config.json").read_text(encoding="utf-8")))
     _new_point("Before restoring", [], now, keep=point.id)   # so this can be undone too
-    for sub, home in (("sounds", library.SOUNDS_DIR), ("thumbs", library.THUMBS_DIR)):
-        src = point.path / sub
-        if src.is_dir():
-            home.mkdir(parents=True, exist_ok=True)
-            for f in src.iterdir():
-                if not (home / f.name).exists():
+    moved: list[tuple[Path, Path]] = []   # (where it was in the point, where it is now)
+    whole = True   # everything came out of the point: it can go
+    try:
+        for sub, home in (("sounds", library.SOUNDS_DIR), ("thumbs", library.THUMBS_DIR)):
+            src = point.path / sub
+            if src.is_dir():
+                home.mkdir(parents=True, exist_ok=True)
+                for f in src.iterdir():
+                    if (home / f.name).exists():   # left in the point, not lost with it
+                        log.warning("%s is in the library already; kept in the point", f.name)
+                        whole = False
+                        continue
                     shutil.move(str(f), home / f.name)
-    if (point.path / "deleted").is_dir():
-        trash.adopt(point.path / "deleted")
-    # the pad list as it was, minus sounds whose audio has gone since (deleted after
-    # the point was saved: they're in Recently deleted), plus sounds added since
-    ids = {m.id for m in old.sounds}
-    old.sounds = [m for m in old.sounds if Path(m.file).exists()]
-    old.sounds += [m for m in now.sounds if m.id not in ids]
-    library.merge_tags(now.categories, old.categories)   # appends the new ones
-    if not old.save():
+                    moved.append((f, home / f.name))
+        # the pad list as it was, minus sounds whose audio has gone since (deleted after
+        # the point was saved: they're in Recently deleted), plus sounds added since
+        ids = {m.id for m in old.sounds}
+        old.sounds = [m for m in old.sounds if Path(m.file).exists()]
+        old.sounds += [m for m in now.sounds if m.id not in ids]
+        library.merge_tags(now.categories, old.categories)   # appends the new ones
+        saved = old.save()
+    except Exception:
+        if not _put_back(moved):
+            log.exception("the restore failed partway")
+            return ("Couldn't finish restoring, and some of its sounds couldn't be put "
+                    "back in the restore point: they're in your library's sounds folder. "
+                    "The log has the details.")
+        raise   # put back as it was: "nothing was changed" is true
+    if not saved:
+        if not _put_back(moved):
+            return ("Couldn't save the restored settings, and some of its sounds are in "
+                    "your library's sounds folder now. The log has the details.")
         return "Couldn't save the restored settings. Nothing was changed."
-    _remove(point.path, recycle=False)
+    bin_note = ""
+    if (point.path / "deleted").is_dir():
+        try:   # the settings are restored now: a bin that won't come in stays in the point
+            done = trash.adopt(point.path / "deleted")
+        except Exception:  # noqa: BLE001
+            log.exception("couldn't bring Recently deleted back from %s", point.id)
+            done = False
+        if not done:
+            whole = False
+            bin_note = (" Some of Recently deleted couldn't be brought back: it's kept in "
+                        "this restore point.")
+    if whole:
+        _remove(point.path, recycle=False)
+    else:   # kept (and listed): what's left in it isn't lost
+        log.warning("restored %s, but kept it: some of it is still only in there", point.id)
     log.info("restored %s", point.id)
-    return f"Restored: {point.describe()} from {trash.ago(point.when)}."
+    return f"Restored: {point.describe()} from {trash.ago(point.when)}.{bin_note}"
+
+
+def _put_back(moved: list[tuple[Path, Path]]) -> bool:
+    """Undo a restore's moves (newest first). False if any file couldn't go back."""
+    ok = True
+    for was, now in reversed(moved):
+        try:
+            was.parent.mkdir(parents=True, exist_ok=True)
+            shutil.move(str(now), was)
+        except OSError:
+            log.warning("couldn't put %s back in the restore point", now, exc_info=True)
+            ok = False
+    return ok
 
 
 # --------------------------------------------------------------------------- points

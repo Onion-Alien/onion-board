@@ -96,6 +96,23 @@ def _typed(raw: dict, defaults, what: str) -> dict:
     return out
 
 
+# A newer version's settings, kept so this one's save writes them back (an older
+# version opening newer settings must lose nothing). Set on a loaded Config / SoundMeta
+# as plain attributes, not dataclass fields: asdict() and == never see them.
+#   _raw_extra  keys this version doesn't know, as they were
+#   _raw_kept   {key: (the value used instead, the value as it was)}: a choice this
+#               version doesn't know (a newer route, net_mode, mode), written back as
+#               it was unless it has been changed here since
+def _with_raw(d: dict, obj) -> dict:
+    """asdict(obj) `d` with obj's newer-version settings put back in."""
+    for k, v in getattr(obj, "_raw_extra", {}).items():
+        d.setdefault(k, v)
+    for k, (used, was) in getattr(obj, "_raw_kept", {}).items():
+        if d.get(k) == used:
+            d[k] = was
+    return d
+
+
 VOLUME_MAX = 10.0             # the mixer's volume boxes take up to 1000 %
 PAD_WIDTH_RANGE = (110, 240)  # the Sounds tab's pad-size slider
 # settings shown on a control with a fixed range: a value from a hand-edited config or
@@ -108,6 +125,9 @@ TOR_BRIDGES = ("", "snowflake", "obfs4")   # soundboard.tor.BRIDGES
 #            device OBS captures): no cable needed, and none is picked in its place
 #   off    - nowhere: sounds play in your headphones (and the stream output) only
 ROUTES = ("cable", "device", "off")
+# settings whose unknown value (a newer version's choice) clean_setting replaces with
+# a safe one: the value as it was is still written back (see _with_raw)
+NEWER_CHOICES = ("route", "net_mode", "tor_bridges")
 SETTING_RANGES = {"sound_vol": (0.0, VOLUME_MAX), "mic_vol": (0.0, VOLUME_MAX),
                   "mon_vol": (0.0, VOLUME_MAX), "obs_vol": (0.0, VOLUME_MAX),
                   "pad_width": PAD_WIDTH_RANGE, "app_card_width": (240, 480),
@@ -464,7 +484,7 @@ class Config:
         the next save drops them: keep a copy (config.json.newer) the first time."""
         try:
             version = int(raw.get("version", 1) or 1)
-        except (TypeError, ValueError):
+        except (TypeError, ValueError, OverflowError):   # 1e999 is inf
             return
         newer = CONFIG_PATH.with_name("config.json.newer")
         if version <= CONFIG_VERSION or newer.exists():
@@ -502,7 +522,10 @@ class Config:
         if not isinstance(raw, dict):   # e.g. a top-level [] - damaged, try the backups
             raise ValueError(f"config is a {type(raw).__name__}, not an object")
         raw = dict(raw)
-        version = max(1, int(raw.get("version", 1) or 1))   # nothing older than v1 exists
+        try:   # nothing older than v1 exists
+            version = max(1, int(raw.get("version", 1) or 1))
+        except OverflowError as e:   # "version": 1e999 reads as inf
+            raise ValueError(f"config version {raw.get('version')!r} isn't a number") from e
         for v in range(version, CONFIG_VERSION):
             raw = MIGRATIONS[v](raw)
         sounds = []
@@ -513,6 +536,9 @@ class Config:
                                                   for k in ("id", "name", "file")):
                 log.warning("skipped a damaged sound entry in the config: %r", s)
                 continue
+            extra = {k: v for k, v in s.items() if k not in SoundMeta.__dataclass_fields__}
+            kept = ({"mode": ("restart", s["mode"])}
+                    if isinstance(s.get("mode"), str) and s["mode"] not in MODES else {})
             s = _typed(s, blank, f"sound {s['name']!r}")
             for k in ("file", "image"):   # v0.1.0 stored full paths into the old folder
                 if s.get(k) and Path(s[k]).is_absolute() and Path(s[k]).is_relative_to(OLD_APP_DIR):
@@ -532,13 +558,20 @@ class Config:
             for k, lo, hi in (("volume", 0.0, 2.0), ("level_gain", 0.1, 6.0)):
                 if k in s:   # the Edit dialog's slider can't take any number
                     s[k] = min(max(s[k], lo), hi)
-            sounds.append(SoundMeta(**s))
+            m = SoundMeta(**s)
+            if extra:
+                m._raw_extra = extra
+            if kept:
+                m._raw_kept = kept
+            sounds.append(m)
         # configs from before the setup guide existed: whoever already picked an output
         # device has been set up by hand, so don't greet them with the guide
         raw.setdefault("setup_done", bool(raw.get("main_device")))
         # ...and from before What's new: everything in it is new to them
         raw.setdefault("whats_new_seen", "")
         known = _typed(raw, cls(), "config")
+        extra = {k: v for k, v in raw.items() if k not in cls.__dataclass_fields__}
+        kept = {}
         for k, v in list(known.items()):
             if v is None:   # a device: None is the system default
                 continue
@@ -546,8 +579,14 @@ class Config:
             if known[k] is None:
                 log.warning("ignored config setting %s=%r (out of range)", k, v)
                 del known[k]
+            elif k in NEWER_CHOICES and known[k] != v:
+                kept[k] = (known[k], v)
         known["version"] = CONFIG_VERSION
         cfg = cls(**known, sounds=sounds)
+        if extra:
+            cfg._raw_extra = extra
+        if kept:
+            cfg._raw_kept = kept
         cfg.categories = clean_tags(cfg.categories)
         for m in sounds:   # a category a sound is in always has a tab
             m.tags = merge_tags(m.tags, cfg.categories)
@@ -556,8 +595,10 @@ class Config:
         return cfg
 
     def to_raw(self) -> dict:
-        d = asdict(self)
+        d = _with_raw(asdict(self), self)
         d["version"] = CONFIG_VERSION
+        for s, m in zip(d["sounds"], self.sounds):
+            _with_raw(s, m)
         for s in d["sounds"]:   # files inside the library are stored by name only, so the
             p = Path(s["file"])  # whole %APPDATA%\OnionBoard folder can move or be restored
             if p.is_absolute() and p.parent == SOUNDS_DIR:
@@ -576,14 +617,21 @@ class Config:
             APP_DIR.mkdir(parents=True, exist_ok=True)
             text = json.dumps(self.to_raw(), indent=2)
             self._save_privacy()
+            damaged = False
             try:
-                if CONFIG_PATH.read_text(encoding="utf-8") == text:
+                old = CONFIG_PATH.read_text(encoding="utf-8-sig")
+                if old == text:
                     return True   # nothing changed: don't churn the backups
+                # a damaged file that couldn't be set aside isn't a backup: rotating it
+                # in would push out a good one
+                damaged = not isinstance(json.loads(old), dict)
+            except ValueError:   # includes UnicodeDecodeError
+                damaged = True
             except OSError:
                 pass
             tmp = CONFIG_PATH.with_suffix(".tmp")
             tmp.write_text(text, encoding="utf-8")
-            if CONFIG_PATH.exists():
+            if CONFIG_PATH.exists() and not damaged:
                 try:
                     _rotate_backups()
                 except OSError:   # a backup locked for a moment mustn't block the save
@@ -1028,7 +1076,8 @@ def duplicate(meta: SoundMeta, name: str) -> SoundMeta:
                      mode=meta.mode, loop=meta.loop, color=meta.color,
                      level_gain=meta.level_gain, duration=meta.duration,
                      fingerprint="", fx=dict(meta.fx), image=image, tags=list(meta.tags),
-                     fade_in=meta.fade_in, fade_out=meta.fade_out, hold=meta.hold)
+                     fade_in=meta.fade_in, fade_out=meta.fade_out, hold=meta.hold,
+                     only_them=meta.only_them, delay=meta.delay, cooldown=meta.cooldown)
 
 
 def recycle(path: Path) -> bool:
