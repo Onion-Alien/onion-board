@@ -213,13 +213,14 @@ class HoverCard(QFrame):
         super().leaveEvent(event)
 
 
-def card(title: str = "", hint: str = "") -> tuple[QFrame, QVBoxLayout]:
+def card(title: str = "", hint: str = "", *, roomy: bool = False) -> tuple[QFrame, QVBoxLayout]:
     """A titled card, the building block of the Voice and Setup pages."""
     f = QFrame()
     f.setObjectName("card")
     v = QVBoxLayout(f)
-    v.setContentsMargins(14, 8, 14, 14)
-    v.setSpacing(6)
+    f.setProperty("roomy", roomy)
+    v.setContentsMargins(*((18, 18, 18, 18) if roomy else (14, 8, 14, 14)))
+    v.setSpacing(12 if roomy else 6)
     if title:
         v.addWidget(section_label(title))
     if hint:

@@ -962,16 +962,16 @@ class MainWindow(QMainWindow):
         page.setFrameShape(QFrame.NoFrame)
         inner = QWidget()
         cols = self._setup_cols = QHBoxLayout(inner)
-        cols.setContentsMargins(0, 10, 4, 10)
-        cols.setSpacing(12)
+        cols.setContentsMargins(4, 12, 8, 12)
+        cols.setSpacing(16)
         lcol, rcol = QVBoxLayout(), QVBoxLayout()
         for col in (lcol, rcol):
-            col.setSpacing(12)
+            col.setSpacing(16)
             cols.addLayout(col, 1)
         page.setWidget(inner)
 
         # ---- how it works + the one thing to set in Discord
-        howcard, cv = card("YOUR VIRTUAL MIC")
+        howcard, cv = card("YOUR VIRTUAL MIC", roomy=True)
         self.how_title = cv.itemAt(0).widget()   # renamed when not using the cable
         self.flow_mic = QLabel()
         self.flow_snd = QLabel("Your sounds, radio and voice effects")
@@ -1004,31 +1004,34 @@ class MainWindow(QMainWindow):
         self.btn_rescan.clicked.connect(lambda: self.rescan_with_feedback(self.btn_rescan))
         icons.set_icon(self.btn_rescan, "reload")
         cv.addWidget(self.btn_rescan)
+        helpcard, hv = card("CONNECT YOUR CHAT",
+                            "Choose your app for the recommended microphone settings.", roomy=True)
         self.btn_chat = QPushButton("Make it sound clean in Discord")
         self.btn_chat.setToolTip("The Discord settings that stop it chopping up your sounds, "
                                  "and a check that listens to what Discord does to them")
         icons.set_icon(self.btn_chat, "headphones")
         self.btn_chat.clicked.connect(lambda: self.show_chat_guide("discord"))
-        cv.addWidget(self.btn_chat)
-        self.btn_game = QPushButton("…or in a game's voice chat")
+        hv.addWidget(self.btn_chat)
+        self.btn_game = QPushButton("Set up game voice chat")
         self.btn_game.clicked.connect(lambda: self.show_chat_guide("game"))
-        cv.addWidget(self.btn_game)
+        hv.addWidget(self.btn_game)
         self.btn_nomic = QPushButton("Game has no microphone setting?")
         self.btn_nomic.clicked.connect(self.open_windows_mic)
-        cv.addWidget(self.btn_nomic)
+        hv.addWidget(self.btn_nomic)
         guide = QPushButton("Step-by-step guide")
         guide.setToolTip("Walks you through mic, headphones, the cable and Discord")
         icons.set_icon(guide, "check")
         guide.clicked.connect(self.run_setup)
-        cv.addWidget(guide)
+        hv.addWidget(guide)
         lcol.addWidget(howcard)
+        lcol.addWidget(helpcard)
 
         # ---- devices
         devcard, av = card("DEVICES", "Already set up for you — only change these if "
-                                      "something's wrong.")
+                                      "something's wrong.", roomy=True)
         grid = QGridLayout()
         grid.setHorizontalSpacing(10)
-        grid.setVerticalSpacing(6)
+        grid.setVerticalSpacing(12)
         self.cb_main, self.cb_mon, self.cb_mic = QComboBox(), QComboBox(), QComboBox()
         # the cable, another device (Voicemeeter, OBS, a mixer) or nowhere (set_route)
         self.cb_route = QComboBox()
@@ -1076,31 +1079,31 @@ class MainWindow(QMainWindow):
         # ---- who's listening: shape the sounds for the voice chat on the other end
         destcard, dv = card("WHO'S LISTENING", "Where people hear you. Your sounds are "
                                                "shaped to come through that voice chat's "
-                                               "compression clearly.")
+                                               "compression clearly.", roomy=True)
         from soundboard.ui.destpanel import DestPanel
         self.dest_panel = DestPanel(self)
         dv.addWidget(self.dest_panel)
-        lcol.addWidget(destcard)
         lcol.addStretch(1)
 
         # ---- test
         testcard, tv = card("TEST IT", "Talk while a sound plays. Records what Discord / the "
                                        "game actually receives, plays it back, and tells you "
-                                       "if your voice + sounds are in it.")
+                                       "if your voice + sounds are in it.", roomy=True)
         self.btn_rec = QPushButton("Record 6s → play back")
         self.btn_rec.setObjectName("primary")
         icons.set_icon(self.btn_rec, "record", "on_accent")
         self.btn_rec.clicked.connect(self.start_test)
         tv.addWidget(self.btn_rec)
         # a live check right here, the same switch as the mixer's at the bottom
-        live = QHBoxLayout()
+        live = QVBoxLayout()
+        live.setSpacing(10)
         self.btn_check_test = QPushButton("Hear what they hear")
         self.btn_check_test.setObjectName("miccheck")
         self.btn_check_test.setCheckable(True)
         self.btn_check_test.setToolTip("A live check: plays your output (your mic and sounds) "
                                        "into your headphones. Click again to stop.")
         icons.set_icon(self.btn_check_test, "ear", checked_color="#ffffff")
-        live.addWidget(self.btn_check_test)
+        live.addWidget(self.btn_check_test, 0, Qt.AlignLeft)
         live.addWidget(hint_label("Live: hear exactly what they hear, in your headphones."), 1)
         tv.addLayout(live)
         self.test_result = QLabel()
@@ -1112,19 +1115,22 @@ class MainWindow(QMainWindow):
         rcol.addWidget(testcard)
 
         # ---- sound shaping
-        eqcard, ev = card()
+        eqcard, ev = card(roomy=True)
         self.eq = EqPanel(c.eq_enabled, c.eq_target, c.eq_preset, c.eq_gains)
         self.eq.changed.connect(self.on_eq)
         ev.addWidget(self.eq)
+        rcol.addWidget(eqcard)
+        rcol.addWidget(destcard)
+        utilitycard, uv = card("VOLUME & SHORTCUTS", roomy=True)
         self.chk_level = QCheckBox("Level volumes (all sounds equally loud)")
         self.chk_level.setChecked(c.level_volumes)
         self.chk_level.toggled.connect(self.on_level_toggle)
-        ev.addWidget(self.chk_level)
+        uv.addWidget(self.chk_level)
         hk = QPushButton("Hotkeys && auto push-to-talk…")
         hk.setToolTip("Opens Settings → Hotkeys")
         hk.clicked.connect(lambda: self.open_settings("hotkeys"))
-        ev.addWidget(hk, 0, Qt.AlignLeft)
-        rcol.addWidget(eqcard)
+        uv.addWidget(hk, 0, Qt.AlignLeft)
+        rcol.addWidget(utilitycard)
         rcol.addStretch(1)
         self.on_eq(*self.eq.state())   # push the saved EQ into the engine
         destination.apply(self.cfg, self.engine)   # ...and the destination mode (Who's listening)
