@@ -17,7 +17,7 @@ import numpy as np
 import sounddevice as sd
 from PySide6.QtCore import (QEvent, QFileSystemWatcher, QObject, QPropertyAnimation, QSize, Qt,
                             QTimer, QUrl, Signal)
-from PySide6.QtGui import QDesktopServices, QIcon
+from PySide6.QtGui import QDesktopServices, QIcon, QKeySequence, QShortcut
 from PySide6.QtWidgets import (QApplication, QCheckBox, QComboBox, QDialog, QFileDialog, QFrame,
                                QGraphicsOpacityEffect, QGridLayout, QHBoxLayout, QInputDialog,
                                QLabel, QLineEdit, QMainWindow, QMenu, QMessageBox, QPushButton,
@@ -29,7 +29,7 @@ from soundboard import theme, winkeys, ytdl
 from soundboard.engine import SR, Engine
 from soundboard.engine import is_virtual as is_virtual_cable
 from soundboard import (appaudio, autostart, backup, destination, library, midi, remote,
-                        soundfx, thumbs, trash, updates, voicesdk)
+                        soundfx, thumbs, trash, updates, videos, voicesdk)
 from soundboard import net, netlog, quality, shellicon, tor, watchaddon
 from soundboard.replay import InstantReplay
 from soundboard.library import (AUDIO_EXTS, PAD_COLORS, RESOURCE_DIR, Config, SoundMeta,
@@ -44,6 +44,7 @@ from soundboard.ui.crashdialog import free_dialog
 from soundboard.ui.dialogs import EditDialog
 from soundboard.ui import a11y, appstate, busy, icons, responsive, splash
 from soundboard.ui.speedpitch import SpeedPitchButton
+from soundboard.ui.videowindow import VideoWindow
 from soundboard.ui.panel import (EqPanel, VolumeControl, bar, card, hint_label, icon_label,
                                  vsep)
 from soundboard.ui.linkbar import PLAY_ID as LINK_ID
@@ -735,6 +736,10 @@ class MainWindow(QMainWindow):
         # ---- "3 selected · Colour · Volume… · Delete": Ctrl / Shift+click picks pads
         self.selection = PadSelection(self, scroll)
         left.addWidget(self.selection.bar)
+        # Ctrl+V with a copied picture: it goes on the selected pad (or the picked ones)
+        paste = QShortcut(QKeySequence.Paste, scroll)
+        paste.setContext(Qt.WidgetWithChildrenShortcut)
+        paste.activated.connect(self.paste_picture)
 
         # ---- "now playing" chips: shown while 2+ sounds overlap, so every one of
         # them can be stopped (■) or taken into the player (name) without clicking
@@ -806,6 +811,16 @@ class MainWindow(QMainWindow):
         th.addWidget(self.np_name)
         th.addWidget(self.seek, 1)
         th.addWidget(self.np_time)
+        # only for a pad made from a video (soundboard.videos): shows it in step
+        self.btn_video = QPushButton("Video")
+        self.btn_video.setToolTip("Watch this sound's video while it plays. The sound "
+                                  "still goes out as normal; the video is only for you.")
+        icons.set_icon(self.btn_video, "video", size=16)
+        self.btn_video.clicked.connect(self.show_video)
+        self.btn_video.hide()
+        self._video_for: tuple[str | None, Path | None] = ("", None)   # (sid, its video)
+        self._video_win: VideoWindow | None = None
+        th.addWidget(self.btn_video)
         self.speed_btn = SpeedPitchButton(
             "sounds", "Changes every sound while it plays. To save a version, "
                       "right-click a pad → Effects.")
@@ -2689,6 +2704,7 @@ class MainWindow(QMainWindow):
                         raise RuntimeError(f"already in your library as “{known[fp]}”")
                     meta, data = import_file(f, PAD_COLORS[(start + i) % len(PAD_COLORS)])
                     meta.image = thumbs.extract_art(f, meta.id)   # cover art / first frame
+                    videos.link_import(meta.id, f)   # the player can show a video file
                     if fp:
                         known[fp] = meta.name   # the same file twice in one drop
                     self.engine.prepare(meta.id, data)
@@ -2821,7 +2837,7 @@ class MainWindow(QMainWindow):
             a_nopic = pic.addAction("Remove picture")
         else:
             a_pic = add(("image",), "Add picture…", "Shown on the pad (you can also drop a "
-                        "picture on it)")
+                        "picture on it, or copy one, click the pad and press Ctrl+V)")
         menu.addSeparator()
         a_export = add(("folder",), "Export…", "Save it as a file to share with friends")
         a_del = add(("trash", "danger_text"), "Remove", "Goes to Recently deleted")
@@ -2872,6 +2888,28 @@ class MainWindow(QMainWindow):
             return
         self._save_now()
         self.pads[sid].update()
+
+    def paste_picture(self):
+        """Ctrl+V on the pads: the copied picture goes on the picked pads, or else
+        on the selected one."""
+        sids = [m.id for m in self.selection.sounds()] or (
+            [self.current] if self.current in self.pads else [])
+        if not sids:
+            return
+        img = thumbs.from_clipboard(QApplication.clipboard().mimeData())
+        if img is None:
+            self.status.setText("Nothing to paste: copy a picture first (in a browser: "
+                                "right-click it → Copy image), then press Ctrl+V on a pad.")
+            return
+        done = [sid for sid in sids if (m := self.meta(sid)) and thumbs.set_image(m, img)]
+        if not done:
+            return
+        self._save_now()
+        for sid in done:
+            self.pads[sid].update()
+        m = self.meta(done[0])
+        self.status.setText(f"Picture pasted on “{html.escape(m.name)}”." if len(done) == 1
+                            else f"Picture pasted on {len(done)} pads.")
 
     def ask_remove(self, sids: list[str]) -> bool:
         """Remove from the menu / picked pads: ask first. They go to Recently deleted."""
@@ -3124,6 +3162,7 @@ class MainWindow(QMainWindow):
         except OSError as e:
             errors.warn(self, "Couldn't copy the sound", e)
             return
+        videos.copy_link(m.id, new.id)
         d.apply(new)
         if new.name == m.name:
             new.name = f"{m.name} (edit)"[:40]
@@ -3908,6 +3947,7 @@ class MainWindow(QMainWindow):
     def _update_transport(self, playing):
         sid = self.current
         m = self.meta(sid) if sid else None
+        self._update_video(sid, m, playing)
         enabled = m is not None
         for w in (self.btn_pp, self.btn_st, self.seek, self.mini_pp, self.mini_st,
                   self.mini_seek):
@@ -3925,6 +3965,46 @@ class MainWindow(QMainWindow):
                 slider.blockSignals(False)
             self.np_time.setText(fmt_pos(frac * m.duration, m.duration))
             self.mini_time.setText(self.np_time.text())
+
+    def _video_of(self, sid: str | None) -> Path | None:
+        """The current sound's video, looked up once per selection."""
+        if self._video_for[0] != sid:
+            self._video_for = (sid, videos.get(sid) if sid else None)
+        return self._video_for[1]
+
+    def _update_video(self, sid, m, playing):
+        path = self._video_of(sid) if m else None
+        if self.btn_video.isHidden() == (path is not None):
+            self.btn_video.setVisible(path is not None)
+        w = self._video_win
+        if w is None or not w.isVisible():
+            return
+        if path is not None and w.sid != sid:   # a newly picked video pad takes it over
+            w.show_for(sid, m.name, path)
+        shown = self.meta(w.sid)
+        data = self.audio.get(w.sid)
+        if shown is None or data is None:
+            w.follow(None, 0.0)
+            return
+        w.follow(playing.get(w.sid), len(data) / SR, self.engine.sound_speed)
+
+    def show_video(self):
+        """The player's Video button: open the current sound's video (and play the
+        sound if it isn't playing)."""
+        sid = self.current
+        m = self.meta(sid) if sid else None
+        path = videos.get(sid) if m else None
+        self._video_for = (sid, path)
+        if path is None:
+            self.btn_video.hide()
+            self.toast("This sound's video isn't there any more", "warn")
+            return
+        if self._video_win is None:
+            self._video_win = VideoWindow(self)
+            self._video_win.setWindowIcon(self.windowIcon())
+        self._video_win.show_for(sid, m.name, path)
+        if self.engine.state(sid) is None:
+            self.toggle_play_pause()
 
     def _release_ptt(self) -> bool:
         """Let go of the PTT key we hold. False if Windows refused the key-up (an

@@ -651,3 +651,23 @@ def test_empty_status_line_takes_no_room(window):
     st.setText("")
     st.set_room(False)           # room again, but nothing to say
     assert not st.isVisible()
+
+
+def test_ctrl_v_pastes_a_copied_picture_on_the_selected_pad(window):
+    from PySide6.QtGui import QColor, QImage
+    window.select("s1")
+    QApplication.clipboard().setText("just words")
+    window.paste_picture()
+    assert not window.meta("s1").image and "copy a picture first" in window.status.text()
+    img = QImage(200, 120, QImage.Format_RGB32)
+    img.fill(QColor("#ff00ff"))
+    QApplication.clipboard().setImage(img)
+    window.paste_picture()
+    pic = window.meta("s1").image
+    assert pic and library.Path(pic).is_file() and not window.meta("s0").image
+    assert "Airhorn" in window.status.text()
+    window.selection.on_pick("s0", False)   # picked pads win over the selected one
+    window.selection.on_pick("s1", False)
+    window.paste_picture()
+    assert window.meta("s0").image and window.meta("s1").image != pic
+    assert not library.Path(pic).exists()   # the old picture's file is gone
