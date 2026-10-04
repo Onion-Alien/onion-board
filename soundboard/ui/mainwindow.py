@@ -29,7 +29,7 @@ from soundboard import theme, winkeys, ytdl
 from soundboard.engine import SR, Engine
 from soundboard.engine import is_virtual as is_virtual_cable
 from soundboard import (appaudio, autostart, backup, destination, library, midi, remote,
-                        soundfx, thumbs, trash, updates, videos, voicesdk)
+                        soundfx, soundpad, thumbs, trash, updates, videos, voicesdk)
 from soundboard import net, netlog, quality, shellicon, tor, watchaddon
 from soundboard.replay import InstantReplay
 from soundboard.library import (AUDIO_EXTS, PAD_COLORS, RESOURCE_DIR, Config, SoundMeta,
@@ -205,6 +205,9 @@ class MainWindow(QMainWindow):
         self._imported_ok = 0
         self._exporting = False
         self._import_errors: list[str] = []
+        # sound id -> the hotkey it had in another soundboard (Import from Soundpad),
+        # given to it once it's in if nothing here has that key
+        self._import_keys: dict[str, str] = {}
         self._rec_playing = False
         self.current: str | None = None   # sound shown in the transport bar
         self._link_meta: SoundMeta | None = None   # the link bar's Play once
@@ -659,6 +662,7 @@ class MainWindow(QMainWindow):
         mm = QMenu(more)
         icons.set_icon(mm.addAction("Import a backup or sound pack…", self.import_dialog),
                        "folder")
+        mm.addAction("Import from Soundpad…", self.import_soundpad)
         mm.addSeparator()
         mm.addAction("Export everything (sounds + settings)…", self.export_board)
         self._act_export_cat = mm.addAction("Export this category…", self.export_category)
@@ -2843,8 +2847,14 @@ class MainWindow(QMainWindow):
         if files:
             self.import_files(files)
 
-    def import_files(self, files):
+    def import_files(self, files, extras: dict[str, soundpad.Entry] | None = None):
+        """Add sound files (and zips / backups). `extras`: file -> its name, hotkey and
+        categories from another soundboard; those already here are skipped quietly."""
         files = [f for f in files if f]
+        extras = extras or {}
+        for f in [f for f in files if f.lower().endswith(".spl")]:
+            files.remove(f)   # a Soundpad sound list dropped on the window
+            self.import_soundpad(f)
         zips = {}   # a plain zip of sound files: unpacked, then imported like the rest
         # a backup / sound pack (a .zip, or a folder with its JSON) is unpacked instead
         for f in [f for f in files if self._is_package(f)]:
@@ -2887,8 +2897,16 @@ class MainWindow(QMainWindow):
                 try:
                     fp = fingerprint(f)
                     if fp and fp in known:
+                        if f in extras:
+                            self.bridge.imported.emit(None, None, "")   # already moved over
+                            continue
                         raise RuntimeError(f"already in your library as “{known[fp]}”")
                     meta, data = import_file(f, PAD_COLORS[(start + i) % len(PAD_COLORS)])
+                    if (x := extras.get(f)) is not None:
+                        meta.name = x.name or meta.name
+                        meta.tags = clean_tags(x.tags)
+                        if x.hotkey:
+                            self._import_keys[meta.id] = x.hotkey
                     meta.image = thumbs.extract_art(f, meta.id)   # cover art / first frame
                     videos.link_import(meta.id, f)   # the player can show a video file
                     if fp:
@@ -2909,6 +2927,12 @@ class MainWindow(QMainWindow):
         self._pending_imports -= 1
         if meta is not None:
             self._tag_new(meta)
+            for t in meta.tags:
+                if t not in self.cfg.categories:
+                    self.cfg.categories.append(t)
+            key = self._import_keys.pop(meta.id, "")
+            if key and not self._hotkey_taken(key):
+                meta.hotkey = key
             self.cfg.sounds.append(meta)
             self._index()
             self.audio[meta.id] = data
@@ -2919,6 +2943,8 @@ class MainWindow(QMainWindow):
             self._pending_imports = 0
             self._save_now()
             self._rebuild_pads()
+            self._fill_categories()   # categories and hotkeys from an Import from Soundpad
+            self.register_hotkeys()
             n, self._imported_ok = self._imported_ok, 0
             busy.set_busy(self.btn_add, False)
             if n:
@@ -3471,6 +3497,50 @@ class MainWindow(QMainWindow):
             "Zip file (*.zip)")
         if files:
             self.import_files(files)   # a plain zip of sounds is imported too
+
+    def import_soundpad(self, path: str = ""):
+        """Bring a Soundpad board over: its sound files (copied, Soundpad keeps its
+        own), names, categories and the hotkeys nothing here uses yet."""
+        path = path or str(soundpad.default_list() or "")
+        if not path:
+            path, _ = QFileDialog.getOpenFileName(
+                self, "Import from Soundpad: pick a saved sound list", str(Path.home()),
+                "Soundpad sound list (*.spl)")
+            if not path:
+                return
+        try:
+            entries = soundpad.read(path)
+        except (OSError, ValueError) as e:
+            errors.warn(self, "Couldn't read the Soundpad list", e)
+            return
+        ok, bad = soundpad.importable(entries)
+        if not ok:
+            QMessageBox.information(
+                self, "Import from Soundpad",
+                "No sounds to bring over: the sound files in Soundpad's list have been "
+                "moved or deleted." if entries else
+                "Soundpad's sound list is empty.")
+            return
+        keys = sum(1 for e in ok if e.hotkey)
+        cats = {t for e in ok for t in e.tags}
+        lines = [f"Found <b>{len(ok)}</b> sound{'s' if len(ok) != 1 else ''} in Soundpad"]
+        extra = [f"{len(cats)} categor{'ies' if len(cats) != 1 else 'y'}" if cats else "",
+                 f"{keys} hotkey{'s' if keys != 1 else ''}" if keys else ""]
+        if any(extra):
+            lines[0] += " with " + " and ".join(x for x in extra if x)
+        lines[0] += "."
+        lines.append("They're copied into Onion Board; Soundpad keeps its own. Ones "
+                     "already here are skipped, and a hotkey something here already "
+                     "uses is left off.")
+        if bad:
+            lines.append(f"{len(bad)} more can't be brought over (the file was moved or "
+                         "deleted, or isn't a sound): "
+                         + html.escape(", ".join(e.name for e in bad[:5]))
+                         + ("…" if len(bad) > 5 else ""))
+        if QMessageBox.question(self, "Import from Soundpad", "<br><br>".join(lines),
+                                QMessageBox.Yes | QMessageBox.No) != QMessageBox.Yes:
+            return
+        self.import_files([e.path for e in ok], {e.path: e for e in ok})
 
     def import_package(self, path: str):
         """Add the sounds from a backup / sound pack (ones already here are skipped).
