@@ -755,13 +755,24 @@ class _HTTPSHandler(urllib.request.HTTPSHandler):
                             feature=self.feature, direct=self.direct)
 
 
+def _tls_context() -> ssl.SSLContext:
+    """The TLS settings stock urllib uses (http.client._create_https_context): ALPN
+    http/1.1 and post-handshake auth on top of the defaults. Without them the
+    handshake looks different, and Cloudflare (in front of Myinstants) answered every
+    search with 403 though the request itself was the same."""
+    ctx = ssl.create_default_context()
+    ctx.set_alpn_protocols(["http/1.1"])
+    ctx.post_handshake_auth = True
+    return ctx
+
+
 def _opener(feature: str, direct: bool = False) -> urllib.request.OpenerDirector:
     """http / https only, connections made by connect() for `feature`: no ftp:// or
     file:// handler, and environment proxies are ignored (they point at the relay, and
     a redirect can't step around the setting)."""
     o = urllib.request.OpenerDirector()
     for h in (urllib.request.UnknownHandler(), _HTTPHandler(feature, direct),
-              _HTTPSHandler(feature, ssl.create_default_context(), direct),
+              _HTTPSHandler(feature, _tls_context(), direct),
               urllib.request.HTTPDefaultErrorHandler(), urllib.request.HTTPRedirectHandler(),
               urllib.request.HTTPErrorProcessor()):
         o.add_handler(h)
