@@ -290,15 +290,14 @@ def test_about_shows_the_version_and_only_opens_pages(window, monkeypatch):  # n
     d.close()
 
 
-def test_live_tabs_comes_first_on_appearance_as_a_switch(window, qapp):  # noqa: F811
-    from soundboard.ui.voicepanel import Switch
+def test_live_tabs_comes_first_on_appearance_tint_or_dot(window, qapp):  # noqa: F811
     d = SettingsDialog(window, "appearance")
-    page = next(sa.widget() for sa in d.findChildren(QScrollArea)
-                if any(isinstance(s, Switch) for s in sa.widget().findChildren(Switch)))
-    first = page.layout().itemAt(0).widget()
-    assert first.findChild(QLabel).text() == "LIVE TABS"
-    sw = first.findChild(Switch)
-    assert sw.isChecked() == window.cfg.live_tab_green
-    sw.click()
-    assert window.cfg.live_tab_green == sw.isChecked()
+    assert d.live_green.isChecked() == window.cfg.live_tab_green
+    card = d.live_green.parentWidget()
+    assert card.findChild(QLabel).text() == "LIVE TABS"
+    assert card.parentWidget().layout().itemAt(0).widget() is card    # first on the page
+    d.live_dot.click()
+    assert window.cfg.live_tab_green is False
+    d.live_green.click()
+    assert window.cfg.live_tab_green is True
     d.close()

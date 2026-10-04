@@ -3,10 +3,10 @@ while the voice changer is changing your mic, Radio while a station plays, Apps
 while a program's sound is sent, Triggers while the screen is watched), so it
 can't be left on by accident without you noticing from another tab.
 
-The mark is a small green badge drawn into the tab's icon, so a tab never changes
-size when it goes live (a dot beside the name used to widen it and shove the tabs
-after it along). Settings → Appearance can also tint live tabs green: a soft wash
-over the tab and a green icon."""
+Two ways to mark it (Settings → Appearance): a green tint, the default (a soft wash
+over the tab and a green icon), or a small green dot drawn into the tab's icon.
+Either way a tab never changes size when it goes live (a dot beside the name used to
+widen it and shove the tabs after it along)."""
 from __future__ import annotations
 
 from PySide6.QtCore import QEvent, QObject, Qt
@@ -17,6 +17,8 @@ from soundboard import theme
 from soundboard.ui import icons
 
 TINT_ICON = "ok_text"   # a tinted live tab's icon: the theme's "ok" green
+TAB_MARGIN_RIGHT = 4    # theme.py's QTabBar::tab margin-right: tabRect includes it,
+                        # the selected tab's underline doesn't
 
 
 def live_color() -> str:
@@ -53,7 +55,11 @@ class LiveTint(QWidget):
         p.setBrush(color)
         for i in range(bar.count()):
             if _live(bar, i):
-                p.drawRoundedRect(bar.tabRect(i).adjusted(1, 2, -1, 0), 6, 6)
+                # the tab's own box, the margin left out, so its edges line up with the
+                # selected tab's underline; rounded on top only (the bottom runs past
+                # the bar and is cut off flat, along the underline)
+                r = bar.tabRect(i).adjusted(0, 2, -TAB_MARGIN_RIGHT, 8)
+                p.drawRoundedRect(r, 6, 6)
 
 
 def _live(bar: QTabBar, index: int) -> bool:
@@ -65,12 +71,14 @@ def _tinted(tabs: QTabWidget) -> bool:
 
 
 def _show(tabs: QTabWidget, index: int, icon: str | None):
-    """Draw tab `index` as it is now: badge (and tint) while live, plain when not."""
+    """Draw tab `index` as it is now: tinted (or with the dot) while live, plain when
+    not. The two are either-or: a tinted tab gets no dot."""
     on = _live(tabs.tabBar(), index)
+    tint = on and _tinted(tabs)
     name = icon or icons.tab_icon_name(tabs, index)
     if name:
-        icons.set_tab_icon(tabs, index, name, TINT_ICON if on and _tinted(tabs) else None,
-                           badge=on)
+        icons.set_tab_icon(tabs, index, name, TINT_ICON if tint else None,
+                           badge=on and not tint)
 
 
 def _sync_tint(tabs: QTabWidget):
@@ -100,7 +108,8 @@ def set_tab_live(tabs: QTabWidget, index: int, on: bool, tip: str = "",
 
 
 def set_tint(tabs: QTabWidget, on: bool):
-    """Also tint live tabs green (Settings → Appearance), or go back to the badge only."""
+    """Mark live tabs with a green tint (True, the default) or the dot (Settings →
+    Appearance)."""
     tabs.setProperty("_live_tint", bool(on))
     for i in range(tabs.count()):
         if _live(tabs.tabBar(), i):

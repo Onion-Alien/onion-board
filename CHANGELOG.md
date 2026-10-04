@@ -41,8 +41,10 @@
   it plays and carries on from there when pressed again, like a media player,
   instead of starting it over. A sound that isn't playing still starts.
 - **Live tabs are green to start with:** a tab whose feature is on (a sound
-  playing, the voice changer, the radio) gets a soft green tint as well as its dot.
-  The switch for it is now first in Settings → Appearance, above the themes.
+  playing, the voice changer, the radio) gets a soft green tint and a green icon.
+  Prefer the old look? Settings → Appearance → *Live tabs* (now first, above the
+  themes) picks the tint or a small green dot, one or the other. The tint lines up
+  with the open tab's underline instead of sticking out past it.
 - **Tidier small things:** no blank pad windows flash up behind the splash on
   start, and Bun sits on the splash nodding to his headphones; Settings →
   Connection → Network activity has no empty space under its list, and *Open log*
