@@ -29,7 +29,7 @@ from soundboard.engine import SR, Engine
 from soundboard.engine import is_virtual as is_virtual_cable
 from soundboard import (appaudio, autostart, backup, destination, library, midi, remote,
                         soundfx, thumbs, trash, updates, voicesdk)
-from soundboard import net, netlog, shellicon, tor, watchaddon
+from soundboard import net, netlog, quality, shellicon, tor, watchaddon
 from soundboard.replay import InstantReplay
 from soundboard.library import (AUDIO_EXTS, PAD_COLORS, RESOURCE_DIR, Config, SoundMeta,
                                 cache_keep, clean_tags, duplicate, fingerprint,
@@ -121,6 +121,7 @@ class MainWindow(QMainWindow):
         self.setAcceptDrops(True)   # files dropped outside the pad grid: see dropEvent
         self.cfg = Config.load()
         net.configure_from(self.cfg)   # before anything goes online
+        quality.load(self.cfg.data)    # ...and how much it fetches when it does
         tor.configure_from(self.cfg)   # Connection = Tor: starts when something goes online
         self._tor_told = ""             # what the last Tor toast said (one per change)
         tor.qt_status().changed.connect(self._on_tor)

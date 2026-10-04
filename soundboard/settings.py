@@ -297,6 +297,7 @@ class SettingsDialog(QDialog):
         self.hk_buttons: dict[str, list[QPushButton]] = {}
         pages = (("privacy", "Privacy && security", "shield", self._privacy),
                  ("connection", "Connection", "radio", self._connection),
+                 ("data", "Data && quality", "wave", self._data),
                  ("general", "General", "settings", self._general),
                  ("appearance", "Appearance", "palette", self._appearance),
                  ("audio", "Audio", "volume", self._audio),
@@ -1011,6 +1012,171 @@ class SettingsDialog(QDialog):
         row.addStretch(1)
         cv.addLayout(row)
         return card
+
+    # ------------------------------------------------------------------ data & quality
+    def _data(self):
+        """Settings > Data & quality (soundboard.quality): download size, keeping the
+        video, radio bitrate and patience, search extras. Each applies at once."""
+        from PySide6.QtCore import QUrl
+        from PySide6.QtGui import QDesktopServices
+        from PySide6.QtWidgets import QFileDialog, QSizePolicy
+
+        from soundboard import library, quality
+        q = quality.current
+        w, v = self._page()
+        self._data_widgets = {}
+
+        card, cv = self._card("Low data mode",
+                              "For a phone hotspot, capped plan or slow internet: smaller "
+                              "downloads, lower-bitrate radio, more patience with stations "
+                              "that cut out, and no pictures or like counts in web search "
+                              "results. Or pick each one below.")
+        self.data_low = QCheckBox("Use less data")
+        self.data_low.toggled.connect(
+            lambda b: self._data_set(**(quality.LOW if b else quality.NORMAL)))
+        cv.addWidget(self.data_low)
+        v.addWidget(card)
+
+        card, cv = self._card("Downloads",
+                              "Sounds added from YouTube, SoundCloud and other links. "
+                              "Smaller files are about a third of the size (around 0.5 MB "
+                              "a minute instead of 1.5 MB) and still sound fine on a pad.")
+        grid = QGridLayout()
+        grid.setHorizontalSpacing(12)
+        grid.addWidget(QLabel("Quality"), 0, 0)
+        dl = QComboBox()
+        for key, (label, _fmt) in quality.DOWNLOADS.items():
+            dl.addItem(label, key)
+        dl.currentIndexChanged.connect(lambda _i: self._data_set(download=dl.currentData()))
+        grid.addWidget(dl, 0, 1)
+        grid.setColumnStretch(1, 1)
+        cv.addLayout(grid)
+        self._data_widgets["download"] = dl
+        has_ff = library._ffmpeg() is not None
+        self._data_widgets["save_video"] = self._option(
+            cv, "Also save the video",
+            "Add as sound keeps a copy of the video too (the pad is still just its "
+            "sound). Videos use a lot more data: about 5 to 25 MB a minute."
+            + ("" if has_ff else " Without ffmpeg installed only lower-quality "
+                                 "videos can be saved (usually 360p)."),
+            q.save_video, lambda b: self._data_set(save_video=b))
+        grid = QGridLayout()
+        grid.setHorizontalSpacing(12)
+        grid.setContentsMargins(26, 0, 0, 0)
+        grid.addWidget(QLabel("Video quality"), 0, 0)
+        vh = QComboBox()
+        for h in quality.VIDEO_HEIGHTS:
+            vh.addItem(f"Up to {h}p", h)
+        vh.currentIndexChanged.connect(lambda _i: self._data_set(video_height=vh.currentData()))
+        grid.addWidget(vh, 0, 1)
+        self._data_widgets["video_height"] = vh
+        grid.addWidget(QLabel("Save videos in"), 1, 0)
+        self.data_folder = QLabel()
+        self.data_folder.setObjectName("hint")
+        self.data_folder.setTextInteractionFlags(Qt.TextSelectableByMouse)
+        # a path has no spaces to wrap at: it gets cut short instead of widening the page
+        self.data_folder.setSizePolicy(QSizePolicy.Ignored, QSizePolicy.Preferred)
+        grid.addWidget(self.data_folder, 1, 1)
+        row = QHBoxLayout()
+        change = QPushButton("Change…")
+
+        def pick():
+            folder = QFileDialog.getExistingDirectory(self, "Save videos in",
+                                                      str(quality.current.videos()))
+            if folder:
+                self._data_set(video_dir=folder)
+        change.clicked.connect(pick)
+        row.addWidget(change)
+        show = QPushButton("Open folder")
+
+        def open_folder():
+            folder = quality.current.videos()
+            folder.mkdir(parents=True, exist_ok=True)
+            QDesktopServices.openUrl(QUrl.fromLocalFile(str(folder)))
+        show.clicked.connect(open_folder)
+        row.addWidget(show)
+        row.addStretch(1)
+        grid.addLayout(row, 2, 1)
+        grid.setColumnStretch(1, 1)
+        cv.addLayout(grid)
+        self._data_video_rows = (vh, change, show, self.data_folder)
+        v.addWidget(card)
+
+        card, cv = self._card("Radio",
+                              "Lower bitrates use less data: 128 kbps is about 58 MB an "
+                              "hour, 64 kbps about 29 MB and 32 kbps about 14 MB. With a "
+                              "limit, the map and search only show stations at or under it "
+                              "(and ones that don't say).")
+        grid = QGridLayout()
+        grid.setHorizontalSpacing(12)
+        grid.addWidget(QLabel("Stations"), 0, 0)
+        kb = QComboBox()
+        for kbps, label in quality.RADIO_KBPS.items():
+            kb.addItem(label, kbps)
+        kb.currentIndexChanged.connect(lambda _i: self._data_radio(kb.currentData()))
+        grid.addWidget(kb, 0, 1)
+        grid.setColumnStretch(1, 1)
+        cv.addLayout(grid)
+        self._data_widgets["radio_kbps"] = kb
+        self._data_widgets["patient"] = self._option(
+            cv, "Slow or patchy connection",
+            "Gives a station longer to start and to come back after it cuts out (on mobile "
+            "data or weak Wi-Fi) before the Radio tab gives up on it.",
+            q.patient, lambda b: self._data_set(patient=b))
+        v.addWidget(card)
+
+        card, cv = self._card("Sounds from the web")
+        self._data_widgets["web_extras"] = self._option(
+            cv, "Show pictures and like counts",
+            "Search results load each video's thumbnail and look up its likes and "
+            "comments. Off: just the titles, a lot less data per search.",
+            q.web_extras, lambda b: self._data_set(web_extras=b))
+        v.addWidget(card)
+        v.addStretch(1)
+        self._data_sync()
+        return w
+
+    _data_syncing = False
+
+    def _data_set(self, **kw):
+        from soundboard import quality
+        if self._data_syncing:
+            return
+        self.mw.set_option("data", quality.change(**kw))
+        self._data_sync()
+
+    def _data_radio(self, kbps):
+        """A new bitrate cap: the map's list follows (a lower cap trims the saved list,
+        a higher one fetches it again)."""
+        from soundboard import quality
+        if self._data_syncing:
+            return
+        old = quality.current.radio_kbps
+        self._data_set(radio_kbps=kbps)
+        tab = getattr(self.mw, "radio", None)
+        directory = getattr(tab, "dir", None)
+        if directory is not None and getattr(tab, "_started", False) and kbps != old:
+            directory.load_globe(force=not kbps or bool(old and kbps > old))
+
+    def _data_sync(self):
+        """Every control on the page shows quality.current."""
+        from soundboard import quality
+        q = quality.current
+        self._data_syncing = True
+        try:
+            self.data_low.setChecked(q.low_data)
+            for key, wdg in self._data_widgets.items():
+                val = getattr(q, key)
+                if isinstance(wdg, QComboBox):
+                    wdg.setCurrentIndex(max(0, wdg.findData(val)))
+                else:
+                    wdg.setChecked(val)
+            for wdg in self._data_video_rows:
+                wdg.setEnabled(q.save_video)
+            self.data_folder.setText(str(q.videos()))
+            self.data_folder.setToolTip(str(q.videos()))
+        finally:
+            self._data_syncing = False
 
     # ------------------------------------------------------------------ privacy & security
     def _privacy(self):

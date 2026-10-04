@@ -26,7 +26,7 @@ from PySide6.QtNetwork import QNetworkAccessManager, QNetworkRequest
 from PySide6.QtWidgets import (QButtonGroup, QFrame, QHBoxLayout, QLabel, QProgressBar,
                                QPushButton, QScrollArea, QSizePolicy, QVBoxLayout, QWidget)
 
-from soundboard import net, netlog, theme, ytdl
+from soundboard import net, netlog, quality, theme, ytdl
 from soundboard.bunny import H as BUN_H
 from soundboard.bunny import W as BUN_W
 from soundboard.ui import busy, icons
@@ -725,6 +725,10 @@ class SearchResults(QFrame):
             row.add.connect(self.add)
             self.rows.addWidget(row)
             self._rows.append(row)
+            if not quality.current.web_extras:   # Settings > Data & quality
+                row.waiting = False
+                row.show_stats()
+                continue
             if not r.thumb:
                 continue
             reply = self.net.get(QNetworkRequest(QUrl(r.thumb)))

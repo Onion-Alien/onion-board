@@ -20,7 +20,7 @@ import numpy as np
 from PySide6.QtCore import Qt, QTimer, Signal
 from PySide6.QtWidgets import QFrame, QHBoxLayout, QLabel, QPushButton
 
-from soundboard import net, netlog, theme, thumbs, ytdl
+from soundboard import net, netlog, quality, theme, thumbs, ytdl
 from soundboard.library import (SR, decode, fingerprint, import_file, level_gain, to_int16)
 from soundboard.ui import busy, icons
 from soundboard.ui.widgets import fmt_time
@@ -220,11 +220,13 @@ class LinkBar(QFrame):
         self._busy = kind
         self._buttons()
         got, self._got = self._got, None   # the worker owns (and deletes) it now
-        if got is not None and got[0] != self.url:
+        # Settings > Data & quality: Add as sound keeps the video too (Play never does)
+        video = kind == "add" and quality.current.save_video
+        if got is not None and (got[0] != self.url or video):
             _drop_temp(got[1])
             got = None
         args = (kind, self.url, got, self._color_for(), self._known_for(),
-                bool(self.cfg.ytdlp_auto_optin), direct)
+                bool(self.cfg.ytdlp_auto_optin), direct, video)
         what = netlog.quoted(self.title) if self.title else "a link"
         netlog.cause(ytdl.FEATURE, (f"You clicked Play on {what}" if kind == "play" else
                                     f"You added {what} as a sound")
@@ -253,7 +255,7 @@ class LinkBar(QFrame):
             log.info("link lookup failed for %s: %s", url, e)
             self._msg.emit("probe-error", url, str(e))
 
-    def _work(self, kind, url, got, color, known, auto_update, direct=False):
+    def _work(self, kind, url, got, color, known, auto_update, direct=False, video=False):
         """Download (unless `got` already holds it), then import or decode."""
         path = got[1] if got else None
         title = ""
@@ -262,7 +264,8 @@ class LinkBar(QFrame):
             if path is None:
                 path, title = ytdl.download_audio(
                     url, progress=lambda f: self._msg.emit("progress", url, f),
-                    auto_update=auto_update, **({"direct": True} if direct else {}))
+                    auto_update=auto_update, **({"direct": True} if direct else {}),
+                    **({"video": True} if video else {}))
                 self._msg.emit("title", url, title)
             self._msg.emit("progress", url, -1.0)
             if kind == "play":
@@ -276,7 +279,16 @@ class LinkBar(QFrame):
             if (pic := thumbs.find_in(Path(path).parent)) is not None:
                 meta.image = thumbs.store(pic, meta.id)   # the video's thumbnail
             self.engine.prepare(meta.id, data)
-            self._msg.emit("added", url, (meta, data, title))
+            saved = ""
+            if video:
+                try:
+                    kept = ytdl.save_video(path, title or meta.name)
+                    saved = (f"Video saved in {kept.parent}." if kept else
+                             "No video was saved: this site only gave the sound.")
+                except OSError as e:
+                    log.warning("couldn't keep the video of %s: %s", url, e)
+                    saved = f"The video couldn't be saved ({e.strerror or e})."
+            self._msg.emit("added", url, (meta, data, title, saved))
         except ytdl.TorBlocked as e:   # the bar offers to try it without Tor
             log.warning("link %s turned away over Tor for %s", kind, url)
             self._msg.emit("blocked", url, (kind, f"Couldn't {'add' if kind == 'add' else 'play'}"
@@ -327,13 +339,13 @@ class LinkBar(QFrame):
             self._added = url
         self._buttons()
         if kind == "added":
-            meta, data, title = payload
+            meta, data, title, saved = payload
             self._kept = (url, data)
             meta.name = (title or (current and self.title) or meta.name)[:40]
             self.sound_ready.emit(meta, data)
             if current:
-                self._say(f"✓ Added <b>{html.escape(meta.name)}</b> to your Sounds.",
-                          theme.status("ok"))
+                self._say(f"✓ Added <b>{html.escape(meta.name)}</b> to your Sounds."
+                          + (f" {html.escape(saved)}" if saved else ""), theme.status("ok"))
             else:   # another link is showing now: still say this one made it
                 busy.toast(self.window(), f"✓ Added <b>{html.escape(meta.name)}</b> to your "
                                           "Sounds.", "ok")

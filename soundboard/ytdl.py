@@ -41,13 +41,15 @@ from collections.abc import Callable
 from dataclasses import dataclass
 from pathlib import Path
 
-from soundboard import library, net
+from soundboard import library, net, quality
 from soundboard.library import MAX_SECONDS
 
 log = logging.getLogger(__name__)
 
 IMAGE_EXTS = {".jpg", ".jpeg", ".png", ".webp", ".gif", ".image"}   # thumbnails
 MAX_BYTES = 200 * 1024 * 1024   # an audio stream bigger than this isn't a sound
+VIDEO_MAX_BYTES = 1024 * 1024 * 1024   # ...and with the video kept (Settings > Data)
+VIDEO_EXTS = {".mp4", ".webm", ".mkv", ".mov"}
 PACKAGES = ("yt_dlp", "yt_dlp_ejs")
 PYPI = "https://pypi.org/pypi/{}/json"
 WHEEL_HOST = "https://files.pythonhosted.org/"
@@ -446,8 +448,11 @@ def clean_title(title: str) -> str:
 
 def download_audio(url: str, dest: Path | None = None,
                    progress: Callable[[float], None] | None = None,
-                   auto_update: bool = True, direct: bool = False) -> tuple[Path, str]:
-    """Download the best audio of `url` into `dest` (a new temp folder by default).
+                   auto_update: bool = True, direct: bool = False,
+                   video: bool = False) -> tuple[Path, str]:
+    """Download the audio of `url` into `dest` (a new temp folder by default), at
+    Settings > Data & quality's download quality; with `video`, the video with its
+    sound in one file (save_video() keeps a copy, the pad is still decoded from it).
 
     Returns (file, title). `progress` gets 0..1 while it downloads. If yt-dlp fails
     and no update check ran in the last hour, it updates yt-dlp and tries once more.
@@ -461,10 +466,12 @@ def download_audio(url: str, dest: Path | None = None,
             return _download_direct(url, dest, progress, direct=True)
         return _over_tor(lambda: _download_direct(url, dest, progress), url)
 
+    extra = {"video": True} if video else {}
+
     def fetch():
         if direct:
-            return _download(url, dest, progress, feature, direct=True)
-        return _over_tor(lambda: _download(url, dest, progress, feature), url)
+            return _download(url, dest, progress, feature, direct=True, **extra)
+        return _over_tor(lambda: _download(url, dest, progress, feature, **extra), url)
     try:
         return fetch()
     except FetchError as e:
@@ -677,15 +684,15 @@ def _ydl():
 
 
 def _download(url, dest, progress, feature: str = FEATURE,
-              direct: bool = False) -> tuple[Path, str]:
+              direct: bool = False, video: bool = False) -> tuple[Path, str]:
     with _ydl() as yt_dlp:
         if dest:
-            return _run(yt_dlp, url, Path(dest), progress, feature, direct)
+            return _run(yt_dlp, url, Path(dest), progress, feature, direct, video)
         # Our own temp folder: the caller only learns it on success, so a failed
         # download (up to the size cap) must not be left behind in %TEMP%.
         tmp = Path(tempfile.mkdtemp(prefix="sb-ytdl-"))
         try:
-            return _run(yt_dlp, url, tmp, progress, feature, direct)
+            return _run(yt_dlp, url, tmp, progress, feature, direct, video)
         except BaseException:
             shutil.rmtree(tmp, ignore_errors=True)
             raise
@@ -762,7 +769,7 @@ def _readable(e: Exception) -> FetchError:
 
 
 def _opts(dest: Path | None = None, progress=None, thumbnail: bool = False,
-          feature: str = FEATURE, direct: bool = False) -> dict:
+          feature: str = FEATURE, direct: bool = False, video: bool = False) -> dict:
     def hook(d):
         if progress and d.get("status") == "downloading":
             total = d.get("total_bytes") or d.get("total_bytes_estimate") or 0
@@ -770,7 +777,7 @@ def _opts(dest: Path | None = None, progress=None, thumbnail: bool = False,
                 progress(min(d.get("downloaded_bytes", 0) / total, 1.0))
 
     opts = {
-        "format": "bestaudio/best",
+        "format": quality.current.audio_format(),   # Settings > Data & quality
         "outtmpl": str((dest or Path(tempfile.gettempdir())) / "%(id)s.%(ext)s"),
         "noplaylist": True,            # a video in a playlist: just that video
         "writethumbnail": thumbnail,   # the pad's picture (soundboard.thumbs)
@@ -786,14 +793,40 @@ def _opts(dest: Path | None = None, progress=None, thumbnail: bool = False,
     # the relay, as this site: Settings > Privacy (the connection and the switches);
     # `direct` is the user's "Try this one without Tor" (the switches still hold)
     opts["proxy"] = net.ytdlp_proxy(feature, direct=direct)
+    if video:
+        ff = library._ffmpeg()
+        fmt = quality.current.video_format()
+        if ff:   # yt-dlp merges the best video and audio streams with it
+            opts.update(ffmpeg_location=ff, merge_output_format="mp4")
+        else:    # no merging: only files that already hold both
+            fmt = fmt.split("/", 2)[2]
+        opts.update(format=fmt, max_filesize=VIDEO_MAX_BYTES)
     return opts
 
 
+def save_video(path: Path, title: str) -> Path | None:
+    """Keep a downloaded video in Settings > Data & quality's videos folder, under its
+    title. None when `path` isn't a video (a download that fell back to audio)."""
+    path = Path(path)
+    if path.suffix.lower() not in VIDEO_EXTS:
+        return None
+    folder = quality.current.videos()
+    folder.mkdir(parents=True, exist_ok=True)
+    stem = re.sub(r'[<>:"/\\|?*\x00-\x1f]', "_", title).strip(" .")[:80] or "Video"
+    out = folder / f"{stem}{path.suffix.lower()}"
+    n = 2
+    while out.exists():
+        out = folder / f"{stem} ({n}){path.suffix.lower()}"
+        n += 1
+    shutil.copy2(path, out)
+    return out
+
+
 def _run(yt_dlp, url: str, dest: Path, progress, feature: str = FEATURE,
-         direct: bool = False) -> tuple[Path, str]:
+         direct: bool = False, video: bool = False) -> tuple[Path, str]:
     try:
         with yt_dlp.YoutubeDL(_opts(dest, progress, thumbnail=True, feature=feature,
-                                    direct=direct)) as ydl:
+                                    direct=direct, video=video)) as ydl:
             info = _check(ydl.extract_info(url, download=False))
             dur = info.get("duration") or 0
             if dur > MAX_SECONDS:

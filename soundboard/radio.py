@@ -46,7 +46,7 @@ from PySide6.QtCore import QObject, QTimer, QUrl, Signal
 from PySide6.QtMultimedia import QAudioBufferOutput, QAudioFormat, QMediaMetaData, QMediaPlayer
 from PySide6.QtNetwork import QNetworkAccessManager, QNetworkReply, QNetworkRequest
 
-from soundboard import library, net, netlog
+from soundboard import library, net, netlog, quality
 from soundboard.engine import SR
 
 log = logging.getLogger(__name__)
@@ -448,12 +448,15 @@ class RadioDirectory(QObject):
         cached = self._read_cache()
         self.globe_stale = ""   # set when a refresh failed and the saved list stands in
         if cached is not None and not force and time.time() - cached[0] < CACHE_S:
-            QTimer.singleShot(0, lambda: self.globe_ready.emit(cached[1]))
+            # a saved list from before a lower bitrate cap: trimmed here, not refetched
+            QTimer.singleShot(0, lambda: self.globe_ready.emit(fits(cached[1])))
             return
         netlog.cause(FEATURE, "You refreshed the radio station list" if force else
                      "Radio tab: fetching the station list (saved for a day)")
+        # Settings > Data & quality: low data mode asks for a third of the list
+        limit = quality.GLOBE_LOW if quality.current.low_data else GLOBE_LIMIT
         path = ("/json/stations/search?has_geo_info=true&hidebroken=true"
-                f"&order=clickcount&reverse=true&limit={GLOBE_LIMIT}")
+                f"&order=clickcount&reverse=true&limit={limit}{_kbps_query()}")
 
         def done(raw):
             stations = [s for s in parse_stations(raw) if s.lat is not None]
@@ -468,7 +471,7 @@ class RadioDirectory(QObject):
             log.warning("radio directory unavailable: %s", msg)
             if cached is not None:   # an old list beats none
                 self.globe_stale = msg or "no answer"
-                self.globe_ready.emit(cached[1])
+                self.globe_ready.emit(fits(cached[1]))
             else:
                 self.failed.emit("globe", msg)
         self._get(path, done, fail)
@@ -518,7 +521,8 @@ class RadioDirectory(QObject):
             return
         netlog.cause(FEATURE, f"You searched radio stations for {netlog.quoted(text)}")
         q = quote(text)
-        common = f"&hidebroken=true&order=clickcount&reverse=true&limit={SEARCH_LIMIT}"
+        common = (f"&hidebroken=true&order=clickcount&reverse=true&limit={SEARCH_LIMIT}"
+                  + _kbps_query())
         paths = (f"/json/stations/search?name={q}{common}",
                  f"/json/stations/search?tag={q}{common}",
                  f"/json/stations/search?state={q}{common}")
@@ -540,7 +544,7 @@ class RadioDirectory(QObject):
                 self.failed.emit("search", st[2])
                 return
             seen, merged = set(), []
-            for s in sorted(st[1], key=lambda s: -s.clicks):
+            for s in sorted(fits(st[1]), key=lambda s: -s.clicks):
                 if s.uuid not in seen:
                     seen.add(s.uuid)
                     merged.append(s)
@@ -552,6 +556,22 @@ class RadioDirectory(QObject):
         """Tell the directory a station was started (its popularity ranking)."""
         self._get(f"/json/url/{quote(uuid)}", lambda _raw: None,
                   lambda err: log.debug("radio click not counted: %s", err))
+
+
+def fits(stations: list[Station]) -> list[Station]:
+    """The stations within Settings > Data & quality's bitrate cap."""
+    return [s for s in stations if quality.radio_fits(s.bitrate)]
+
+
+def _kbps_query() -> str:
+    cap = quality.current.radio_kbps
+    return f"&bitrateMax={cap}" if cap else ""
+
+
+def _patience() -> float:
+    """Settings > Data & quality > slow connection: a station gets this many times
+    longer to start or come back, and twice the reopens."""
+    return 2.5 if quality.current.patient else 1.0
 
 
 # --------------------------------------------------------------------------- player
@@ -751,10 +771,10 @@ class RadioPlayer(QObject):
         over_tor = net.mode() == net.TOR
         if not self._got_audio and over_tor and not _tor_ready():
             self._opened = now   # Tor is still connecting: the station's time starts after
-        elif not self._got_audio and now - self._opened > (TOR_CONNECT_S if over_tor
-                                                           else CONNECT_S):
+        elif not self._got_audio and now - self._opened > (
+                TOR_CONNECT_S if over_tor else CONNECT_S) * _patience():
             self._retry("the station didn't answer")
-        elif self._got_audio and now - self._last_audio > STALL_S:
+        elif self._got_audio and now - self._last_audio > STALL_S * _patience():
             self._retry("the station stopped sending")
 
     def _on_error(self, _err, msg: str):
@@ -776,7 +796,7 @@ class RadioPlayer(QObject):
             return
         over_tor = net.mode() == net.TOR
         if (self._got_audio or self._reconnecting) and self._retries < (
-                TOR_RETRIES if over_tor else RETRIES):
+                TOR_RETRIES if over_tor else RETRIES) * (2 if quality.current.patient else 1):
             self._retries += 1
             self._reconnecting = self._reopen_pending = True
             delay = (1000 if over_tor else 500) * self._retries + random.randint(0, 300)
