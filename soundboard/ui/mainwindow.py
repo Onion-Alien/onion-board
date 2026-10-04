@@ -59,8 +59,8 @@ from soundboard.ui.triggershost import BoardHost
 from soundboard.ui.triggerstab import TriggersTab
 from soundboard.ui.radiopanel import RadioOff, RadioTab
 from soundboard.ui.voicepanel import VoicePanel
-from soundboard.ui.widgets import (Meter, Pad, PadGrid, SeekSlider, expand_dropped, fmt_pos,
-                                   pad_height, spectrum, SLIM_PAD_H)
+from soundboard.ui.widgets import (Meter, Pad, PadGrid, SeekSlider, SteadyTabs, expand_dropped,
+                                   fmt_pos, pad_height, spectrum, SLIM_PAD_H)
 from soundboard.wheelguard import no_wheel
 from soundboard.winkeys import Hotkeys
 from soundboard import errors
@@ -383,6 +383,7 @@ class MainWindow(QMainWindow):
         self.tabs.setDocumentMode(True)
         self.tabs.setIconSize(QSize(18, 18))
         self.tabs.tabBar().setUsesScrollButtons(False)   # small windows drop the tab text
+        SteadyTabs(self.tabs)   # a change inside a page doesn't repaint the whole board
         rv.addWidget(self.tabs, 1)
         self.sounds_page = self._build_sounds_page()
         self.tabs.addTab(self.sounds_page, "")
