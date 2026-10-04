@@ -74,14 +74,15 @@ def _zip_version(path: Path) -> str:
         return "?"
 
 
-def latest() -> Offer | None:
+def latest(cancelled: Callable[[], bool] | None = None) -> Offer | None:
     """The newest Onion Watch to install, or None when its latest release has no
     zip the app can check. Raises OSError / ValueError when GitHub can't be asked
-    (offline, rate-limited). Call off the UI thread."""
+    (offline, rate-limited), UpdateError("cancelled") when `cancelled` turns true
+    before a retry. Call off the UI thread."""
     lz = local_zip()
     if lz is not None:
         return Offer(_zip_version(lz), page=str(lz), local=lz)
-    data = updates._get(API, FEATURE)
+    data = updates._get(API, FEATURE, cancelled)
     ver = updates.parse_version(str(data.get("tag_name") or data.get("name") or ""))
     if ver is None:
         return None

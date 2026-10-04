@@ -289,7 +289,7 @@ class TriggersTab(QWidget):
 
         def run():
             try:
-                o = offer or watchaddon.latest()
+                o = offer or watchaddon.latest(lambda: self._cancel)
                 if o is None:
                     raise updates.UpdateError(
                         "there's no Onion Watch release the app can check. Try again later.")

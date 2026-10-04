@@ -74,8 +74,11 @@ def newer(latest: str, current: str = __version__) -> bool:
     return a is not None and b is not None and a > b
 
 
-def _get(url: str, feature: str = FEATURE) -> dict:
-    """A GitHub API answer, for `feature` (this update check, or the add-ons')."""
+def _get(url: str, feature: str = FEATURE,
+         cancelled: Callable[[], bool] | None = None) -> dict:
+    """A GitHub API answer, for `feature` (this update check, or the add-ons'). A
+    `cancelled` that turns true while a gateway error waits for its retry stops it
+    there (UpdateError("cancelled"), as download() does)."""
     headers = {
         "User-Agent": "OnionBoard (update check)",   # no version: GitHub needs a name only
         "Accept": "application/vnd.github+json"}
@@ -91,6 +94,8 @@ def _get(url: str, feature: str = FEATURE) -> dict:
             e.close()
             if attempt or e.code not in (502, 503, 504):
                 raise
+            if cancelled is not None and cancelled():
+                raise UpdateError("cancelled") from e
     raise AssertionError("release lookup exhausted without a result")
 
 

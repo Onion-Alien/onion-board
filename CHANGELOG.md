@@ -48,8 +48,9 @@
   accurately than before. scipy still ships for add-ons and modules that use it.
 - **Cleaner bottom bars:** My mic, What others hear and My headphones are three
   separate boxes. Each volume is a speaker icon, a slider and a plain % you can
-  still click and type into; the mic and radio level meters sit under their own
-  volume slider. The Radio bar groups Play, random and star together, and its
+  still click and type into (a typed volume applies on Enter, not digit by digit:
+  "150" no longer dips a live mic through 1 % and 15 % on the way); the mic and
+  radio level meters sit under their own volume slider. The Radio bar groups Play, random and star together, and its
   live button just says "Only me" or "LIVE".
 - **Sounds playback controls:** the empty selection says "Pick a sound" with a
   tooltip explaining the controls, so the instruction fits instead of cutting off.

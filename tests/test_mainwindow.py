@@ -447,6 +447,11 @@ def test_restoring_a_large_window_keeps_search_results(window, qapp, theme_name)
         for _ in range(2):
             window.showMaximized()
             qapp.processEvents()
+            # the offscreen screen is 800 x 800: be as big as a real maximized window
+            window.resize(1920, 1040)
+            window._refit()
+            qapp.processEvents()
+            assert not window.is_mini()
             window.showNormal()
             qapp.processEvents()
             assert not window.is_mini()
@@ -454,6 +459,36 @@ def test_restoring_a_large_window_keeps_search_results(window, qapp, theme_name)
             assert window.tabs.isVisibleTo(window)
     finally:
         theme.apply(qapp, old_theme)
+
+
+@pytest.mark.parametrize("theme_name", ["Dark", "Retro 98", "Comic Sans"])
+def test_card_titles_and_the_typed_percent_fit_the_themes_font(qapp, theme_name):
+    """Both used to size themselves before the theme's font arrived with its style
+    sheet: a title's second line lost its descenders, "1000 %" didn't fit Tahoma."""
+    from PySide6.QtWidgets import QVBoxLayout, QWidget
+
+    from soundboard import theme
+    from soundboard.ui.panel import VolumeControl
+    from soundboard.ui.ytsearch import ClampLabel
+
+    old = theme.current_name
+    try:
+        theme.apply(qapp, theme_name)
+        host = QWidget()
+        v = QVBoxLayout(host)
+        title, vol = ClampLabel("A title long enough to wrap " * 3), VolumeControl(1.0)
+        v.addWidget(title)
+        v.addWidget(vol)
+        host.resize(220, 200)
+        host.show()
+        qapp.processEvents()
+        assert title.height() == 2 * title.fontMetrics().lineSpacing() + 2
+        spin = vol.spin
+        assert spin.width() >= spin.fontMetrics().horizontalAdvance("1000 %") + 10
+        assert not spin.keyboardTracking()   # typing "150" isn't 1 %, 15 %, 150 %
+        host.deleteLater()
+    finally:
+        theme.apply(qapp, old)
 
 
 def test_a_whole_row_of_pads_before_the_mixer(window, qapp):
