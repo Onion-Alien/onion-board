@@ -39,3 +39,20 @@ def test_splash_follows_the_saved_theme(qapp, tmp_path, monkeypatch):
     finally:
         splash.close()
         theme.set_current(theme.DEFAULT)
+
+
+def test_frames_draw_at_any_scale(qapp):
+    """The native splash paints paint_frame() at the monitor's own scale."""
+    from PySide6.QtCore import Qt
+    from PySide6.QtGui import QImage, QPainter
+    for k in (1.0, 1.25, 2.0):
+        img = QImage(round(splash.CARD_W * k), round(splash.CARD_H * k),
+                     QImage.Format_ARGB32_Premultiplied)
+        img.fill(Qt.transparent)
+        p = QPainter(img)
+        p.scale(k, k)
+        splash.paint_frame(p, 0.3, splash.CARD_W, splash.CARD_H)
+        p.end()
+        assert img.pixelColor(0, 0).alpha() == 0
+        assert any(img.pixelColor(x, img.height() // 2).alpha() == 255
+                   for x in range(img.width()))   # Bun is in there, solid
