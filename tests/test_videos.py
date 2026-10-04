@@ -183,3 +183,20 @@ def test_a_moved_video_takes_the_button_away(window, app_dir):
     (app_dir / "clips" / "vid.mp4").unlink()
     w.btn_video.click()
     assert w.btn_video.isHidden() and w._video_win is None
+
+
+def test_a_build_without_qt_video_still_starts_and_just_hides_the_button(window, monkeypatch):
+    import builtins
+    real = builtins.__import__
+
+    def no_video(name, *a, **k):
+        if name == "soundboard.ui.videowindow":
+            raise ImportError("No module named 'PySide6.QtMultimediaWidgets'")
+        return real(name, *a, **k)
+
+    monkeypatch.setattr(builtins, "__import__", no_video)
+    w = window
+    w.select("vid")
+    w._update_transport({})
+    w.btn_video.click()
+    assert w.btn_video.isHidden() and w._video_win is None
