@@ -193,7 +193,7 @@ def owl_image(height: int, look: float = 0.5) -> QImage:
     img = QImage(w, h, QImage.Format_ARGB32_Premultiplied)
     img.fill(Qt.transparent)
     p = QPainter(img)
-    draw_owl(p, QRectF(0, 0, w, h), look)
+    draw_owl(p, QRectF(0, 0, w, h), look, FEATHER, FEATHER_DARK)   # artwork: his own teal
     p.end()
     return img
 
