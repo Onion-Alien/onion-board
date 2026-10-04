@@ -7,9 +7,10 @@ import threading
 from PySide6.QtCore import QObject, QRectF, QSize, Qt, Signal
 from PySide6.QtGui import (QBrush, QColor, QFont, QIcon, QPainter, QPainterPath,
                            QPixmap)
-from PySide6.QtWidgets import (QApplication, QCheckBox, QComboBox, QDialog, QFrame, QGridLayout,
+from PySide6.QtWidgets import (QApplication, QButtonGroup, QCheckBox, QComboBox, QDialog, QFrame,
+                               QGridLayout,
                                QHBoxLayout, QLabel, QLayout, QListWidget, QListWidgetItem,
-                               QPushButton, QScrollArea, QSlider, QTabWidget,
+                               QPushButton, QRadioButton, QScrollArea, QSlider, QTabWidget,
                                QVBoxLayout, QWidget)
 
 from shiboken6 import isValid as qt_valid
@@ -454,22 +455,24 @@ class SettingsDialog(QDialog):
     def _appearance(self):
         w, v = self._page()
         self.theme_cards = []
-        from soundboard.ui.voicepanel import Switch   # (it imports this module, by way of widgets)
         # first, above the themes (it sat under every theme card, out of sight)
         card, cv = self._card("Live tabs",
                               "A tab whose feature is on right now (a sound playing, the "
-                              "voice changer, the radio…) gets a small green dot on its icon.")
-        row = QHBoxLayout()
-        tint = Switch("Gives live tabs a soft green background and a green icon, "
-                      "easier to spot from across the room")
-        tint.setAccessibleName("Tint live tabs green")
-        tint.setChecked(self.mw.cfg.live_tab_green)
-        tint.toggled.connect(self.mw.set_live_tab_tint)
-        label = QLabel("Tint live tabs green")
-        label.setBuddy(tint)
-        row.addWidget(tint)
-        row.addWidget(label)
-        row.addStretch(1)
+                              "voice changer, the radio…) is marked, so nothing is left on "
+                              "without you noticing.")
+        row = QVBoxLayout()   # one under the other: side by side made the page too wide
+        green = QRadioButton("Tint the tab green")
+        green.setToolTip("A soft green background and a green icon, easy to spot from "
+                         "across the room")
+        dot = QRadioButton("A small green dot on its icon")
+        dot.setToolTip("Quieter: only a dot on the tab's icon")
+        modes = QButtonGroup(card)
+        for b in (green, dot):
+            modes.addButton(b)
+            row.addWidget(b)
+        (green if self.mw.cfg.live_tab_green else dot).setChecked(True)
+        green.toggled.connect(self.mw.set_live_tab_tint)
+        self.live_green, self.live_dot = green, dot
         cv.addLayout(row)
         v.addWidget(card)
         hints = {"Classic": "Changes the whole app instantly.",

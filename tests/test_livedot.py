@@ -7,7 +7,8 @@ from PySide6.QtWidgets import QTabBar, QTabWidget, QWidget
 from soundboard import theme
 from soundboard.speech import tts
 from soundboard.ui import icons
-from soundboard.ui.livedot import LiveTint, is_tab_live, live_color, set_tab_live, set_tint
+from soundboard.ui.livedot import (TAB_MARGIN_RIGHT, LiveTint, is_tab_live, live_color,
+                                   set_tab_live, set_tint)
 
 
 def entries(tabs):
@@ -95,8 +96,15 @@ def test_live_tab_has_a_badge_and_the_optional_wash(qapp):
         assert bar.findChild(LiveTint) is None                            # no wash by default
         set_tint(tabs, True)
         qapp.processEvents()
-        assert entries(tabs)[1] == ("ok_text", True)                      # green icon
+        assert entries(tabs)[1] == ("ok_text", False)   # green icon, no dot: either-or
         assert wash_pixels(bar, 1) > plain + 200 and wash_pixels(bar, 0) == 0
+        # the wash lines up with the tab's own box (the selected tab's underline),
+        # not its margin: nothing green past its right edge
+        r = bar.tabRect(1)
+        img = bar.grab().toImage()
+        edge = r.right() - TAB_MARGIN_RIGHT + 2
+        assert all(QColor(img.pixel(edge, y)).green() <= QColor(img.pixel(edge, y)).red() + 8
+                   for y in range(r.top() + 8, r.bottom() - 2))
         set_tint(tabs, False)
         qapp.processEvents()
         assert entries(tabs)[1] == (None, True)
