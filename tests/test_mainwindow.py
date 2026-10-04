@@ -442,6 +442,36 @@ def test_every_tab_stays_the_whole_window_down_to_the_mini_size(window, qapp):
         window._refit()
 
 
+def test_the_mini_player_shows_the_pads_whatever_is_in_the_search_box(window, qapp):
+    """A web search's words stay in the search box, which also filters the pads: the
+    mini player (no search box) was blank. And a board with every pad filtered out
+    says so instead of showing nothing."""
+    from soundboard.ui.widgets import PadGrid
+
+    window.show()
+    window.tabs.setCurrentWidget(window.apps)
+    window.resize(1000, 700)
+    window._refit()
+    window.search.setText("idiot test")             # matches none of the sounds
+    assert not any(p.isVisibleTo(window) for p in window.grid.pads)
+    window.tabs.setCurrentWidget(window.sounds_page)
+    qapp.processEvents()
+    assert window.grid.empty.isVisibleTo(window)
+    assert window.grid.empty_text.text() == PadGrid.NO_MATCH
+    window.tabs.setCurrentWidget(window.apps)
+    window.resize(360, 700)
+    window._refit()
+    assert window.is_mini()
+    assert all(p.isVisibleTo(window) for p in window.grid.pads)
+    assert not window.grid.empty.isVisibleTo(window)
+    window.resize(1000, 700)
+    window._refit()
+    assert not window.is_mini()
+    assert window.search.text() == "idiot test"     # still filtering the whole window
+    assert not any(p.property("filtered") is False and p.isVisibleTo(window)
+                   for p in window.grid.pads)
+
+
 @pytest.mark.parametrize("theme_name", ["Dark", "Retro 98"])
 def test_restoring_a_large_window_keeps_search_results(window, qapp, theme_name):
     """Maximize/restore must keep the full app and the selected search view."""

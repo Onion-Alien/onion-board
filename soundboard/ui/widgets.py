@@ -639,6 +639,9 @@ class PadGrid(QWidget):
     reorder = Signal(str, int)   # sound id, new index
     files_dropped = Signal(list)
     image_dropped = Signal(str, str)   # sound id, picture file dropped on its pad
+    HOW_TO = ("Drop sound files here\nor click  ＋ Add sounds\n\n"
+              "mp3 · wav · ogg · flac\nm4a · even video files")
+    NO_MATCH = "No sounds match the search\nor this category"
 
     def __init__(self):
         super().__init__()
@@ -665,8 +668,7 @@ class PadGrid(QWidget):
             joy_lines=("yay!!", "↑ Add sounds!", "hehe!"))
         self.bun.setToolTip("Bun is waiting for some sounds")
         ev.addWidget(self.bun, 0, Qt.AlignHCenter)
-        self.empty_text = QLabel("Drop sound files here\nor click  ＋ Add sounds\n\n"
-                                 "mp3 · wav · ogg · flac\nm4a · even video files")
+        self.empty_text = QLabel(self.HOW_TO)
         self.empty_text.setAlignment(Qt.AlignCenter)   # short lines: fits the mini player
         self.empty_text.setObjectName("empty")
         ev.addWidget(self.empty_text)
@@ -738,7 +740,12 @@ class PadGrid(QWidget):
             it = self.grid.takeAt(0)
             if it.widget() and it.widget() is not self.empty:
                 it.widget().setParent(self)
-        if not self.pads:
+        shown = [p for p in self.pads if not p.property("filtered")]
+        if not shown:
+            # every pad filtered out showed nothing at all: Bun says why instead
+            for p in self.pads:
+                p.hide()
+            self.empty_text.setText(self.NO_MATCH if self.pads else self.HOW_TO)
             # across the whole width, however wide that is now (a fixed width here kept
             # the grid as wide as the window once was: a shrunk window showed nothing)
             self.grid.setAlignment(Qt.AlignTop)
@@ -747,6 +754,7 @@ class PadGrid(QWidget):
             return
         self.grid.setAlignment(Qt.AlignTop | Qt.AlignLeft)
         self.empty.hide()
+        self.empty_text.setText(self.HOW_TO)
         i = 0
         for p in self.pads:
             if p.property("filtered"):

@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- **The mini player always shows your sounds:** a web search's words stay in the
+  search box, which also filters the pads, so a window made small afterwards
+  showed a blank mini player (no pads, not even Bun). The mini player now shows
+  every pad, and a board whose pads are all filtered out says so instead of
+  showing nothing.
 - **A narrow window stays the whole app:** every tab now fits down to where the
   mini player takes over (about 440 px wide). The tab icons' spacing alone held
   it at about 480 px, so a narrow window turned into the mini player on whatever

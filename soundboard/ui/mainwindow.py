@@ -2265,7 +2265,9 @@ class MainWindow(QMainWindow):
         """Show the pads that match the search box (name or category) and are in the
         category picked above the pads."""
         self.linkbar.set_text(text)
-        t = "" if self.linkbar.url else text.strip().lower()   # a link filters nothing
+        # a link filters nothing, and nor does the box in the mini player, which hides
+        # it: a web search's words left there showed a blank mini player
+        t = "" if self.linkbar.url or self.is_mini() else text.strip().lower()
         cat = self.cfg.category
         for m in self.cfg.sounds:
             p = self.pads.get(m.id)
@@ -3975,6 +3977,7 @@ class MainWindow(QMainWindow):
                 home.insertWidget(index, scroll, 1)
                 scroll.setVisible(self.ytresults.isHidden())   # results take the pads' place
             self._pages.setCurrentIndex(1 if on else 0)
+            self.apply_filter(self.search.text())
         finally:
             self.setUpdatesEnabled(True)
 
