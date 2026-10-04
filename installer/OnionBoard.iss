@@ -23,10 +23,13 @@
 ;         the same). A failed download says so and leaves the app working without it
 ;       * Keep a history of network activity, unticked: runs OnionBoard.exe
 ;         --keep-netlog (config netlog_keep; soundboard/netlog.py keep())
-;       * Bring my sounds over from Soundpad: only there when Soundpad's sound list
-;         (%APPDATA%\Leppsoft\soundlist.spl) is on this PC. Ticked, it leaves a note
-;         (%APPDATA%\OnionBoard\import-soundpad) and the app's first start copies the
-;         sounds in (soundboard/soundpad.py). Silent installs only do it when /TASKS
+;       * Bring my sounds over from Soundpad / Resanance / EXP Soundboard: each only
+;         there when that app's board is on this PC (Soundpad's
+;         %APPDATA%\Leppsoft\soundlist.spl, Resanance's
+;         %APPDATA%\Resanance\data\Resanance.db, EXP Soundboard's last board in the
+;         registry; soundboard/otherboards.py). Ticked, it leaves a note
+;         (%APPDATA%\OnionBoard\import-from) and the app's first start copies the
+;         sounds in. Silent installs only do it when /TASKS
 ;         or /MERGETASKS names it: nobody saw the box
 ;       * a Desktop shortcut
 ;   - then opens Onion Board, whose Quick setup asks which mic they use and walks
@@ -102,7 +105,9 @@ Name: "ffmpeg"; Description: "Play M4A, AAC and video files (the free FFmpeg, ab
 Name: "livevoice"; Description: "Set up live voice-to-speech now (needs Python, about 300 MB)"; GroupDescription: "Extra features (optional)"; Flags: unchecked
 Name: "tor"; Description: "Private connection (Tor): hides your internet address (about 22 MB)"; GroupDescription: "Privacy (optional)"; Flags: unchecked
 Name: "keepnetlog"; Description: "Keep a history of what Onion Board connects to (on this PC only)"; GroupDescription: "Privacy (optional)"; Flags: unchecked
-Name: "soundpad"; Description: "Bring my sounds over from Soundpad (copies them with their names, categories and hotkeys; Soundpad keeps its own)"; GroupDescription: "Found Soundpad on this PC"; Check: HasSoundpad
+Name: "soundpad"; Description: "Bring my sounds over from Soundpad (copies them with their names, categories and hotkeys; Soundpad keeps its own)"; GroupDescription: "Found another soundboard on this PC"; Check: HasSoundpad
+Name: "resanance"; Description: "Bring my sounds over from Resanance (copies them with their names, tabs and hotkeys; Resanance keeps its own)"; GroupDescription: "Found another soundboard on this PC"; Check: HasResanance
+Name: "expboard"; Description: "Bring my sounds over from EXP Soundboard (copies them with their hotkeys; EXP Soundboard keeps its own)"; GroupDescription: "Found another soundboard on this PC"; Check: HasExpBoard
 Name: "desktopicon"; Description: "Put an Onion Board shortcut on my Desktop"; GroupDescription: "Shortcuts"
 
 [InstallDelete]
@@ -407,15 +412,42 @@ begin
   Result := FileExists(ExpandConstant('{userappdata}\Leppsoft\soundlist.spl'));
 end;
 
-// The Soundpad box: a note for the app's first start, which does the copying
-procedure QueueSoundpad;
+function HasResanance: Boolean;
 begin
-  if not WizardIsTaskSelected('soundpad') then
-    exit;
-  if WizardSilent and not (ListedIn('TASKS', 'soundpad') or ListedIn('MERGETASKS', 'soundpad')) then
+  Result := FileExists(ExpandConstant('{userappdata}\Resanance\data\Resanance.db'));
+end;
+
+// EXP Soundboard remembers its last board in Java's Preferences (soundboard/expboard.py)
+function HasExpBoard: Boolean;
+begin
+  Result := RegValueExists(HKCU, 'Software\JavaSoft\Prefs\/Expenosa''s /Soundboard',
+    'last/Soundboard/Used');
+end;
+
+// The "Bring my sounds over from …" boxes: one line per ticked one in a note for the
+// app's first start, which does the copying (soundboard/otherboards.py). Silent
+// installs only when /TASKS or /MERGETASKS names the box: nobody saw it.
+function ImportTicked(Task: String): Boolean;
+begin
+  Result := WizardIsTaskSelected(Task) and
+    (not WizardSilent or ListedIn('TASKS', Task) or ListedIn('MERGETASKS', Task));
+end;
+
+procedure QueueImports;
+var
+  Keys: String;
+begin
+  Keys := '';
+  if ImportTicked('soundpad') then
+    Keys := Keys + 'soundpad' + #13#10;
+  if ImportTicked('resanance') then
+    Keys := Keys + 'resanance' + #13#10;
+  if ImportTicked('expboard') then
+    Keys := Keys + 'expboard' + #13#10;
+  if Keys = '' then
     exit;
   ForceDirectories(ExpandConstant('{userappdata}\OnionBoard'));
-  SaveStringToFile(ExpandConstant('{userappdata}\OnionBoard\import-soundpad'), 'soundpad', False);
+  SaveStringToFile(ExpandConstant('{userappdata}\OnionBoard\import-from'), Keys, False);
 end;
 
 function WingetPath(Param: String): String;
@@ -567,7 +599,7 @@ end;
 procedure CurStepChanged(CurStep: TSetupStep);
 begin
   if CurStep = ssPostInstall then
-    QueueSoundpad;
+    QueueImports;
   if (CurStep = ssPostInstall) and MayDownload('vbcable') then
     InstallCable;
   if (CurStep = ssPostInstall) and MayDownload('tor') then

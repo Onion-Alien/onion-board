@@ -18,28 +18,15 @@ from __future__ import annotations
 
 import os
 import xml.etree.ElementTree as ET
-from dataclasses import dataclass, field
 from pathlib import Path
 
-from soundboard.library import AUDIO_EXTS
+from soundboard.otherboards import Entry, Source, vk_hotkey
 
 LIST_NAME = "soundlist.spl"
-# left in our app folder by the installer's "Bring my sounds over from Soundpad" box,
-# for the app's first start to do it (soundboard.ui.mainwindow import_queued)
-QUEUED_NAME = "import-soundpad"
 MAX_BYTES = 50 * 1024 * 1024   # a list of tens of thousands of sounds is ~10 MB
 
 # keyModifiers, as Windows' RegisterHotKey takes them (what Soundpad passes it)
 _ALT, _CTRL, _SHIFT, _WIN = 0x1, 0x2, 0x4, 0x8
-
-
-@dataclass
-class Entry:
-    path: str                 # absolute path of the sound file
-    name: str
-    hotkey: str = ""          # in our "ctrl+alt+s" form, "" if none or not one we know
-    tags: list[str] = field(default_factory=list)   # its categories, leaf names
-    exists: bool = True
 
 
 def default_list() -> Path | None:
@@ -53,16 +40,12 @@ def default_list() -> Path | None:
 
 def hotkey(key: str | None, mods: str | None) -> str:
     """Soundpad's key (a Windows virtual-key code) + keyModifiers -> 'ctrl+1'."""
-    from soundboard import winkeys   # Win32; only needed once there's a key
     try:
         vk, m = int(key or 0), int(mods or 0)
     except ValueError:
         return ""
-    if not 0 < vk < 0xFF or vk in winkeys.MODIFIER_VKS or vk in (1, 2, 4, 5, 6):
-        return ""   # nothing, a bare modifier, or a mouse button (not a key we register)
-    flags = ((winkeys.MOD_ALT if m & _ALT else 0) | (winkeys.MOD_CONTROL if m & _CTRL else 0)
-             | (winkeys.MOD_SHIFT if m & _SHIFT else 0) | (winkeys.MOD_WIN if m & _WIN else 0))
-    return winkeys.combo_name(flags, vk)
+    return vk_hotkey(vk, ctrl=bool(m & _CTRL), alt=bool(m & _ALT), shift=bool(m & _SHIFT),
+                     win=bool(m & _WIN))
 
 
 def read(path: str | Path) -> list[Entry]:
@@ -113,9 +96,4 @@ def _tag(node, entries: list[Entry]):
         _tag(cat, entries)
 
 
-def importable(entries: list[Entry]) -> tuple[list[Entry], list[Entry]]:
-    """(the ones whose file is there and plays, the ones that are missing or not audio)."""
-    ok, bad = [], []
-    for e in entries:
-        (ok if e.exists and Path(e.path).suffix.lower() in AUDIO_EXTS else bad).append(e)
-    return ok, bad
+SOURCE = Source("soundpad", "Soundpad", (".spl",), default_list, read)
