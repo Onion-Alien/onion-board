@@ -208,6 +208,10 @@ def test_a_cut_update_download_says_why_in_plain_words(slow, monkeypatch, tmp_pa
             self.r = net.urlopen(f"http://slow.test:{site.port}/big", timeout=10,
                                  feature=updates.FEATURE)
             self.headers, self.read = self.r.headers, self.r.read
+            # the setting changes mid-download: timed from here, not from before
+            # fetch(), or a slow machine switched before the download opened (it then
+            # went direct, and slow.test, the proxy's own name, couldn't be looked up)
+            threading.Timer(0.3, lambda: net.configure(net.DIRECT)).start()
 
         def geturl(self):
             return "https://example.com/x"
@@ -218,7 +222,6 @@ def test_a_cut_update_download_says_why_in_plain_words(slow, monkeypatch, tmp_pa
         def __exit__(self, *a):
             self.r.close()
     monkeypatch.setattr(updates, "_open", lambda url, feature: Https())
-    threading.Timer(0.3, lambda: net.configure(net.DIRECT)).start()
     with pytest.raises(updates.UpdateError) as e:
         updates.fetch("https://example.com/x", "0" * 64, tmp_path / "f.bin",
                       ("https://example.com/",), 2_000_000, "a file")
