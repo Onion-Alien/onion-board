@@ -163,3 +163,18 @@ def test_every_theme_has_its_own_readable_live_colour(name):
     assert theme._contrast(t["live_text"], t["bg"]) >= 4.5
     css = theme.stylesheet(name)
     assert "#13a35a" not in css and "$" not in css
+
+
+def test_your_own_highlight_colour_wins_over_every_theme(qapp):
+    try:
+        theme.apply(qapp, "Lava", "#3399ff")
+        assert theme.T["live"] == "#3399ff" and theme.T["accent"] == "#ff5a1f"
+        assert "#3399ff" in theme.stylesheet()
+        theme.apply(qapp, "Flashbang")                     # kept when the theme changes
+        assert theme.T["live"] == "#3399ff"
+        assert theme._contrast(theme.T["live_text"], theme.T["bg"]) >= 4.5
+        assert theme._contrast(theme.T["on_live"], "#3399ff") >= 3
+        theme.apply(qapp, "Flashbang", "not a colour")     # a damaged setting: the theme's
+        assert theme.live_override == "" and theme.T["live"] == theme.T["accent"]
+    finally:
+        theme.apply(qapp, "Dark", "")

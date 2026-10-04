@@ -2,6 +2,7 @@
 from contextlib import contextmanager
 
 from PySide6.QtCore import QEvent, QObject
+from PySide6.QtGui import QColor
 from PySide6.QtWidgets import QApplication, QLabel, QPushButton, QScrollArea
 
 from conftest import process_events
@@ -376,3 +377,24 @@ def test_card_headings_line_up_with_the_text_under_them(qapp, window):  # noqa: 
         qapp.processEvents()
         assert _ink_left(h) is not None and _ink_left(h) <= 1, h.text()
     d.close()
+
+
+def test_highlight_colour_slides_saves_and_resets(window, qapp):  # noqa: F811
+    from soundboard import theme
+    d = SettingsDialog(window, "appearance")
+    try:
+        d.hue_slider.setValue(210)                          # a click / arrow key: applied
+        picked = window.cfg.live_color
+        assert picked and theme.T["live"] == picked
+        assert 200 <= QColor(picked).hsvHue() <= 220
+        d.hue_slider.setSliderDown(True)                    # dragging: only the preview
+        d.hue_slider.setValue(20)
+        assert window.cfg.live_color == picked and d.hue_swatch.styleSheet()
+        d.hue_slider.setSliderDown(False)                   # let go: applied
+        assert 10 <= QColor(window.cfg.live_color).hsvHue() <= 30
+        assert not d.hue_swatch.styleSheet()
+        d.hue_reset.click()
+        assert window.cfg.live_color == "" and theme.T["live"] == theme.T["accent"]
+    finally:
+        window.set_live_color("")
+        d.close()

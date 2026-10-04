@@ -281,6 +281,7 @@ class Config:
     overlay_key_checked: bool = False   # "`" looked at against the keyboard layout once
     cue_sounds: bool = True           # beep in the headphones when a hotkey records / saves
     theme: str = "Dark"
+    live_color: str = ""   # own colour for the "it's on" highlights ("" = the theme's)
     eq_enabled: bool = False
     eq_target: str = "voice"          # voice | sounds | all
     eq_preset: str = "Flat (off)"

@@ -161,7 +161,8 @@ class MainWindow(QMainWindow):
         tor.qt_status().changed.connect(self._on_tor)
         app = QApplication.instance()
         if app is not None:   # before the UI is built, so everything polishes in-theme
-            self.cfg.theme = theme.apply(app, self.cfg.theme)
+            self.cfg.theme = theme.apply(app, self.cfg.theme, self.cfg.live_color)
+            self.cfg.live_color = theme.live_override
             app.commitDataRequest.connect(self._on_session_end)   # log-off / installer
         self.engine = Engine()
         self.audio: dict[str, np.ndarray] = {}
@@ -1790,6 +1791,11 @@ class MainWindow(QMainWindow):
         self.set_option("level_volumes", b)
         for m in self.cfg.sounds:
             self.engine.set_gain(m.id, self.gain_for(m))
+
+    def set_live_color(self, colour: str):
+        """The user's own highlight colour ("" = the theme's), applied to the whole app."""
+        self.set_option("live_color", theme.set_live(colour))
+        self.apply_theme(self.cfg.theme)
 
     def set_live_tab_tint(self, on: bool):
         self.set_option("live_tab_green", on)
