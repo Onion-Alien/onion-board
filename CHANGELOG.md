@@ -21,12 +21,14 @@
   are gone.
 - **A smaller download: only the part of scipy that's used ships.** The app's own
   code no longer uses scipy, and the Triggers tab (Onion Watch) needs only its FFTs,
-  so the build bundles scipy.fft and leaves out the rest (signal, ndimage and what
-  they pull in). The Triggers tab needs an Onion Watch newer than 0.5.6: 0.5.6 and
-  older use scipy.ndimage and won't load (*Get Onion Watch* fetches the newest). Its
-  matcher is also a little quicker: 50 pictures are checked about every 300 ms at its
-  1% CPU share. Third-party effects modules that import other parts of scipy have to
-  bring their own replacement; numpy, soxr and scipy.fft are still there.
+  so the build bundles scipy.fft and leaves out the rest (signal, ndimage, stats,
+  optimize and the others): the installer is about 16 MB smaller (198 → 182 MB)
+  and the installed app 35 MB. The Triggers tab needs an Onion Watch newer than
+  0.5.6: 0.5.6 and older use scipy.ndimage and won't load (*Get Onion Watch*
+  fetches the newest). Its matcher is also a little quicker: 50 pictures are
+  checked about every 300 ms at its 1% CPU share. Third-party effects modules that
+  import other parts of scipy have to bring their own replacement; numpy, soxr and
+  scipy.fft are still there.
 - **Network activity** (Settings → Connection): see every connection the app
   makes, to check for yourself where it goes, and why: each one says what caused
   it (*You searched YouTube for “…”*, *You clicked Check now*, *Automatic update

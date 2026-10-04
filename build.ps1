@@ -26,8 +26,9 @@ if (-not (Test-Path $py)) { throw "No .venv - run scripts\install.bat first." }
 
 $cleanArg = @()
 if ($Clean) { $cleanArg = @("--clean") }
-# Of scipy only scipy.fft ships: the app doesn't use scipy, but Onion Watch's matcher
-# (the Triggers tab add-on) does its FFTs with it. The rest stays out.
+# Of scipy only scipy.fft ships (with the linalg and special it imports): the app
+# doesn't use scipy, but Onion Watch's matcher (the Triggers tab add-on) does its FFTs
+# with it. scipy's __init__ names every subpackage, so the rest is excluded by name.
 & $py -m PyInstaller --noconfirm @cleanArg --windowed `
     --name OnionBoard --icon assets\onionboard.ico `
     --add-data "installer\install-vbcable.ps1;." `
@@ -37,6 +38,9 @@ if ($Clean) { $cleanArg = @("--clean") }
     --copy-metadata yt-dlp --collect-all yt_dlp_ejs `
     --hidden-import scipy.fft `
     --exclude-module scipy.signal --exclude-module scipy.ndimage `
+    --exclude-module scipy.stats --exclude-module scipy.optimize `
+    --exclude-module scipy.interpolate --exclude-module scipy.integrate `
+    --exclude-module scipy.sparse --exclude-module scipy.spatial `
     --paths . `
     main.py
 if ($LASTEXITCODE -ne 0) { throw "PyInstaller failed" }
