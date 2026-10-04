@@ -226,11 +226,10 @@ class VoiceFxPanel(QWidget):
         self._own = self._preset == CUSTOM and self._custom == effects
         v = QVBoxLayout(self)
         v.setContentsMargins(0, 0, 0, 0)
-        v.setSpacing(8)
+        v.setSpacing(12)
         v.addWidget(section_label("VOICE CHANGER"))
-        v.addWidget(hint_label("Changes your real voice as you talk, live. There's nothing "
-                               "to start: while it's on, Discord and your game hear the "
-                               "changed voice every time you speak."))
+        v.addWidget(hint_label("Change your mic live in Discord and games. Pick a voice "
+                               "to turn it on, then use Hear my voice to try it."))
 
         # ---- the switch
         self.btn_power = QPushButton()
@@ -287,7 +286,7 @@ class VoiceFxPanel(QWidget):
         # ---- pick a voice
         v.addWidget(QLabel("<b>Pick a voice</b>"))
         grid = self._tile_grid = QGridLayout()
-        grid.setSpacing(6)
+        grid.setSpacing(10)
         self._tile_cols = self.COLS
         self._short = False   # the switch's short text (a narrow window)
         self.tiles = QButtonGroup(self)
@@ -775,18 +774,16 @@ class SpeechPanel(QWidget):
 
         v = QVBoxLayout(self)
         v.setContentsMargins(0, 0, 0, 0)
-        v.setSpacing(6)
+        v.setSpacing(12)
 
         # ---- live voice to speech: the main event
         v.addWidget(section_label("TALK AS A COMPUTER VOICE"))
-        v.addWidget(hint_label("Press Start and talk normally. Each sentence you say is typed "
-                               "out on this PC and read aloud by the computer voice below, a "
-                               "second or two after you finish it, so others hear that voice "
-                               "instead of yours. Press Stop when you're done."))
+        v.addWidget(hint_label("Pick a voice and press Start. Your speech is transcribed on "
+                               "this PC, then read aloud in that voice after a short delay."))
         self.live_box = QWidget()
         lv = QVBoxLayout(self.live_box)
         lv.setContentsMargins(0, 0, 0, 0)
-        lv.setSpacing(6)
+        lv.setSpacing(12)
         # speak in another language: English in, the chosen language out
         trow = QHBoxLayout()
         self.lbl_lang = QLabel("Speak in")
@@ -841,6 +838,8 @@ class SpeechPanel(QWidget):
 
         # ---- the voice (shared by live and typed speech): set before you press Start
         grid = QGridLayout()
+        grid.setHorizontalSpacing(12)
+        grid.setVerticalSpacing(14)
         grid.addWidget(QLabel("Voice"), 0, 0)
         self.cb_voice = QComboBox()
         self.cb_voice.addItem("Loading voices…", "")
@@ -855,6 +854,7 @@ class SpeechPanel(QWidget):
         grid.addWidget(self.b_add_voices, 0, 2)
         grid.addWidget(QLabel("Speed"), 1, 0)
         self.sl_rate = QSlider(Qt.Horizontal)
+        self.sl_rate.setMinimumHeight(28)
         self.sl_rate.setRange(-10, 10)
         self.sl_rate.setValue(int(self.s["rate"]))
         grid.addWidget(self.sl_rate, 1, 1)
@@ -864,7 +864,7 @@ class SpeechPanel(QWidget):
         self.start_box = QWidget()   # Start and its state: shown with live_box
         lv = QVBoxLayout(self.start_box)
         lv.setContentsMargins(0, 0, 0, 0)
-        lv.setSpacing(6)
+        lv.setSpacing(12)
         self.b_live = QPushButton("Start talking as the voice")
         icons.set_icon(self.b_live, "mic", "on_accent", "on_accent")
         self.b_live.setCheckable(True)
@@ -882,17 +882,18 @@ class SpeechPanel(QWidget):
         lrow.addWidget(section_label("WHAT THE VOICE SAID"))
         lrow.addStretch(1)
         b_clear = QPushButton("Clear")
-        b_clear.setObjectName("small")
+        b_clear.setMinimumHeight(32)
         lrow.addWidget(b_clear)
         v.addLayout(lrow)
         self.said_log = QPlainTextEdit()
+        self.said_log.setObjectName("speechlog")
         self.said_log.setReadOnly(True)
         self.said_log.setMaximumBlockCount(500)
         # short while empty (a tall blank box pushed More options far down), growing
         # with what's said up to a few lines, then it scrolls
         def fit_log():
             fm = self.said_log.fontMetrics()
-            lines = min(5, max(1, self.said_log.document().blockCount()))
+            lines = min(5, max(2, self.said_log.document().blockCount()))
             pad = self.said_log.frameWidth() * 2 + 16
             self.said_log.setFixedHeight(lines * fm.lineSpacing() + pad)
         self.said_log.textChanged.connect(fit_log)
@@ -903,12 +904,14 @@ class SpeechPanel(QWidget):
 
         self.missing = QWidget()
         mv = QVBoxLayout(self.missing)
-        mv.setContentsMargins(0, 0, 0, 0)
+        mv.setContentsMargins(0, 8, 0, 0)
+        mv.setSpacing(12)
         self.lbl_missing = hint_label("")
         mv.addWidget(self.lbl_missing)
         mrow = QHBoxLayout()
-        self.b_install = QPushButton("Install speech recognition (one time, ~300 MB)")
+        self.b_install = QPushButton("Install speech recognition")
         icons.set_icon(self.b_install, "plus")
+        self.b_install.setToolTip("One-time download, about 300 MB. Requires Python 3.12+.")
         self.b_install.clicked.connect(self._install)
         mrow.addWidget(self.b_install)
         b_open = QPushButton("Open folder")
@@ -1477,7 +1480,7 @@ class SpeechPanel(QWidget):
     def _on_install_done(self, ok: bool, err: str = ""):
         self._installing = False
         self.b_install.setEnabled(True)
-        self.b_install.setText("Install speech recognition (one time, ~300 MB)")
+        self.b_install.setText("Install speech recognition")
         self.b_update.setEnabled(not self.ctl.live)
         self.b_update.setText("Update speech recognition")
         self.b_live.setEnabled(self._dl_busy is None)
@@ -1566,9 +1569,10 @@ class ModulesList(QWidget):
         super().__init__()
         v = QVBoxLayout(self)
         v.setContentsMargins(0, 0, 0, 0)
-        v.setSpacing(4)
+        v.setSpacing(12)
         v.addWidget(section_label("ADD-ONS"))
         self.list = QVBoxLayout()
+        self.list.setSpacing(10)
         v.addLayout(self.list)
         row = QHBoxLayout()
         b = QPushButton("Refresh")
@@ -1650,11 +1654,11 @@ class VoicePanel(QWidget):
         scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         page = FitWidth()   # the voice changer fits itself to the width (_fit_width)
         cols = self._cols = QHBoxLayout(page)
-        cols.setContentsMargins(0, 2, 4, 2)
-        cols.setSpacing(12)
+        cols.setContentsMargins(4, 4, 8, 12)
+        cols.setSpacing(16)
         lcol, rcol = QVBoxLayout(), QVBoxLayout()
         for col in (lcol, rcol):
-            col.setSpacing(12)
+            col.setSpacing(16)
             cols.addLayout(col, 1)
         scroll.setWidget(page)
         outer.addWidget(scroll, 1)
@@ -1663,25 +1667,25 @@ class VoicePanel(QWidget):
         # left on from last time, it changed your mic the moment the app opened.
         self.fx = VoiceFxPanel({**voicefx.clean_spec(fx_spec), "enabled": False})
         self.fx.changed.connect(self._fx_changed)
-        fx_card, fv = card()
+        fx_card, fv = card(roomy=True)
         fv.addWidget(self.fx)
         lcol.addWidget(fx_card)
         lcol.addStretch(1)
 
-        # right: talk as a computer voice, then add-ons
+        # Right: computer voice and its add-ons.
         self.controller = SpeechController(engine, self.chain, lambda ev: None)
         self.speech = SpeechPanel(self.controller, speech or {}, self.modules)
         self.speech.changed.connect(self.speech_changed)
         self.speech.changed.connect(lambda _s: self._emit_active())   # the tab's picture
         self.speech.downloaded.connect(lambda: self.addons.show_modules(self.modules))
         self.speech.live_changed.connect(lambda _on: self._emit_active())
-        live_card, lv = card()
+        live_card, lv = card(roomy=True)
         lv.addWidget(self.speech)
         rcol.addWidget(live_card)
         self.addons = ModulesList()
         self.addons.refresh.connect(self.rescan_modules)
         self.addons.show_modules(self.modules)
-        add_card, av = card()
+        add_card, av = card(roomy=True)
         av.addWidget(self.addons)
         rcol.addWidget(add_card)
         rcol.addStretch(1)
