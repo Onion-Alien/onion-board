@@ -262,6 +262,7 @@ class MainWindow(QMainWindow):
         # Stream Deck / scripts (Settings → Remote), only if turned on
         self.remote = remote.RemoteControl(lambda a, p: remote.dispatch(self, a, p), self)
         self.apply_remote()
+        self.remote_addons = self._load_remote_addons()
         a11y.label_tree(self, force=True)   # names for the icon-only buttons
 
         self.timer = QTimer(self)
@@ -3822,6 +3823,35 @@ class MainWindow(QMainWindow):
                                 f"{html.escape(err)}.</span>")
         return err
 
+    def _load_remote_addons(self) -> list:
+        """[(ModuleInfo, add-on or None)] for every "remote" add-on (soundboard.modules),
+        e.g. Onion Pocket. One that fails is noted on its info (Settings → Remote shows
+        it) and never stops the app."""
+        from soundboard import modules
+        from soundboard.ui.remotehost import RemoteHost
+        out = []
+        for info in modules.discover():
+            if info.kind != "remote":
+                continue
+            addon = None
+            if not info.error:
+                try:
+                    addon = modules.load_package(info).create(RemoteHost(self, info.id))
+                except Exception as e:  # noqa: BLE001 - a bad add-on can't stop the app
+                    log.exception("remote add-on %s didn't start", info.id)
+                    info.error = str(e) if isinstance(e, modules.ModuleError) \
+                        else f"failed to start: {errors.plain(e)}"
+            out.append((info, addon))
+        return out
+
+    def _stop_remote_addons(self):
+        for info, addon in self.remote_addons:
+            if addon is not None:
+                try:
+                    addon.stop()
+                except Exception:  # noqa: BLE001
+                    log.exception("remote add-on %s didn't stop cleanly", info.id)
+
     def set_autostart(self, on: bool) -> bool:
         return autostart.set_enabled(on, self.cfg.autostart_hidden)
 
@@ -4585,6 +4615,7 @@ class MainWindow(QMainWindow):
                      self._release_ptt,
                      self._stop_capture, self.cfg.save, self.overlay.shutdown,
                      self.hotkeys.stop, self.replay.stop, self.remote.stop,
+                     self._stop_remote_addons,
                      self.radio.shutdown, tor.shutdown, self.apps.shutdown,
                      self.triggers.shutdown,
                      self.linkbar.shutdown,

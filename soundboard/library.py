@@ -347,6 +347,9 @@ class Config:
     api_enabled: bool = False
     api_port: int = 7474
     api_token: str = ""
+    # "remote" add-ons' own settings (soundboard.ui.remotehost), by add-on id: Onion
+    # Pocket's on / off, port and key
+    remote_addons: dict = field(default_factory=dict)
     # Settings > Connection (soundboard.net): "direct", "proxy" through
     # net_proxy (socks5h://host:port or http://host:port), or "tor" (soundboard.tor)
     net_mode: str = "direct"

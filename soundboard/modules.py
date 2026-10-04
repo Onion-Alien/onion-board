@@ -4,7 +4,7 @@
         module.json      {"id", "name", "version", "description", "kind", ...}
         ...
 
-Three kinds:
+The kinds:
 
   "effects"  An `entry` Python file loaded into the app. Its `register(api)` adds
              voice effects with `api.register_effect(EffectSubclass)`. It may only
@@ -35,6 +35,12 @@ Three kinds:
              the standard library, checked before it's loaded. Like "effects", it
              may only import what the app ships.
 
+  "remote"   Another way to control the board, such as the phone remote. Packaged
+             like "triggers" (`package`, `entry`, `api_version`, `imports`), but
+             `create(host)` gets soundboard.ui.remotehost.RemoteHost (version
+             REMOTE_API) and returns an object with `card(parent)` (its card on
+             Settings → Remote) and `stop()`. Loaded at start-up.
+
 Modules are searched for in %APPDATA%\\OnionBoard\\modules (where users drop
 downloads) and in the `modules` folder next to the app (or the repo root when
 running from source).
@@ -64,9 +70,11 @@ from soundboard import errors
 
 log = logging.getLogger(__name__)
 
-KINDS = ("effects", "service", "translation", "triggers")
+KINDS = ("effects", "service", "translation", "triggers", "remote")
 INSTALL_STEP_TIMEOUT_S = 30 * 60     # one install step (pip) before it's given up on
 TRIGGERS_API = (1, 1)   # the oldest and newest "triggers" api_version this app can host
+REMOTE_API = (1, 1)     # ...and "remote" api_version
+PACKAGE_KINDS = {"triggers": TRIGGERS_API, "remote": REMOTE_API}   # loaded as packages
 MAX_ZIP_FILES = 2000                  # a module zip with more is refused
 MAX_ZIP_UNPACKED = 200 << 20          # ...or that would unpack to more than this
 _NAME = re.compile(r"[A-Za-z_][A-Za-z0-9_]*")
@@ -182,20 +190,20 @@ def _read(folder: Path) -> ModuleInfo | None:
             and str(info.download.get("url", "")).startswith("https://")
             and re.fullmatch(r"[0-9a-f]{64}", str(info.download.get("sha256", "")))):
         info.error = "needs a language code and an https download with its sha256"
-    elif info.kind == "triggers":
-        info.error = _triggers_error(info)
+    elif info.kind in PACKAGE_KINDS:
+        info.error = _package_error(info)
     return info
 
 
-def _triggers_error(info: ModuleInfo) -> str:
-    """Why a "triggers" module can't be loaded ("" if it can be tried)."""
+def _package_error(info: ModuleInfo) -> str:
+    """Why a "triggers" / "remote" module can't be loaded ("" if it can be tried)."""
     pkg, entry = info.package, info.entry
     if not (_NAME.fullmatch(pkg) and (info.path / pkg / "__init__.py").is_file()):
         return f"package {pkg!r} not found"
     if not (entry == pkg or entry.startswith(pkg + ".")) or not all(
             _NAME.fullmatch(p) for p in entry.split(".")):
         return f"entry {entry!r} isn't a module of {pkg!r}"
-    low, high = TRIGGERS_API
+    low, high = PACKAGE_KINDS[info.kind]
     if info.api_version > high:
         return "it needs a newer Onion Board: update Onion Board first"
     if info.api_version < low:
@@ -293,12 +301,12 @@ def _load_all(package: str, pkg_dir: Path):
 
 
 def load_package(info: ModuleInfo):
-    """Load a "triggers" module's package from its folder and return its `entry`
-    module (which has create(host)). Loaded once per run: a copy already loaded
+    """Load a "triggers" or "remote" module's package from its folder and return its
+    `entry` module (which has create(host)). Loaded once per run: a copy already loaded
     from the same folder, at the same version, is reused; a different one needs a
     restart (Python can't swap a package it's running). Raises ModuleError."""
-    if info.kind != "triggers":
-        raise ModuleError(f"{info.name} isn't a Triggers add-on")
+    if info.kind not in PACKAGE_KINDS:
+        raise ModuleError(f"{info.name} isn't an add-on that loads into the app")
     if info.error:
         raise ModuleError(info.error)
     missing = [m for m in info.imports if not _importable(m)]

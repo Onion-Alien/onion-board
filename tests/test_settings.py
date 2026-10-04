@@ -300,4 +300,31 @@ def test_live_tabs_comes_first_on_appearance_tint_or_dot(window, qapp):  # noqa:
     assert window.cfg.live_tab_green is False
     d.live_green.click()
     assert window.cfg.live_tab_green is True
+
+
+def _ink_left(lbl) -> int | None:
+    """The first column of a label's picture with text in it."""
+    img = lbl.grab().toImage()
+    bg = img.pixelColor(img.width() - 1, img.height() - 1)
+    for x in range(img.width()):
+        for y in range(img.height()):
+            c = img.pixelColor(x, y)
+            diff = abs(c.red() - bg.red()) + abs(c.green() - bg.green())
+            if diff + abs(c.blue() - bg.blue()) > 60:
+                return x
+    return None
+
+
+def test_card_headings_line_up_with_the_text_under_them(qapp, window):  # noqa: F811
+    """A heading's padding-top made Qt indent its text 3 px past the card's text."""
+    d = SettingsDialog(window, "remote")
+    d.show()
+    process_events(qapp, lambda: False, timeout=0.2)
+    page = d.tabs.currentWidget().widget()
+    heads = [lb for lb in page.findChildren(QLabel) if lb.objectName() == "section"]
+    assert heads
+    for h in heads:
+        h.setText("HELLO")                     # one shape: no letter's own bearing to compare
+        qapp.processEvents()
+        assert _ink_left(h) is not None and _ink_left(h) <= 1, h.text()
     d.close()

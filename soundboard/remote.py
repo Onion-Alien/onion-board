@@ -14,7 +14,7 @@ Every endpoint takes GET or POST and answers JSON (ENDPOINTS below is the list;
 /api/help returns it, so a script or an AI assistant can look it up):
 
     /api/status                  version, what's playing, category, live / voice / mic
-    /api/sounds                  [{id, name, hotkey, categories, playing}]
+    /api/sounds                  [{id, name, hotkey, categories, color, playing}]
     /api/categories              ["Memes", ...]
     /api/play?id=… or ?name=…    play a pad (name: exact, any case)
     /api/stop?id=… or ?name=…    stop one sound;  /api/stop alone stops everything
@@ -30,6 +30,14 @@ Every endpoint takes GET or POST and answers JSON (ENDPOINTS below is the list;
     /api/replay                  save the instant replay as a pad
     /api/help                    this list
 
+The same server, given `lan=True`, is what "remote" add-ons such as Onion Pocket
+get (soundboard.ui.remotehost): it listens on this PC's address on the home network
+instead, with the add-on's own key, a shorter list of actions, and a page served at
+/ without a key (the page holds nothing; Onion Pocket hands the phone its key in the
+link's #fragment, which browsers never send). It answers only addresses on the local
+network, and an address that gets the key wrong FAIL_LIMIT times in a row is ignored
+for LOCK_S seconds.
+
 The HTTP side runs on its own thread; each request is handed to the UI thread
 (`RemoteControl.request`) and answered from there, so it never touches the
 window's state from another thread.
@@ -37,10 +45,12 @@ window's state from another thread.
 from __future__ import annotations
 
 import difflib
+import ipaddress
 import json
 import logging
 import secrets
 import threading
+import time
 from dataclasses import dataclass, field
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from typing import TYPE_CHECKING
@@ -59,11 +69,13 @@ HOST = "127.0.0.1"
 DEFAULT_PORT = 7474
 ANSWER_S = 3.0          # how long a request waits for the UI thread
 IDLE_S = 10.0           # a client that connects and goes quiet is dropped after this
+FAIL_LIMIT = 5          # lan: wrong keys in a row from one address before it's locked out
+LOCK_S = 60.0           # lan: ...for this long
 # every endpoint, in the order they're listed (the 404 answer, /api/help, the
 # setup prompt and Settings all read this)
 ENDPOINTS = {
     "status": "version, what's playing, the category showing, live / voice / mic / volume",
-    "sounds": "every sound: [{id, name, hotkey, categories, playing}]",
+    "sounds": "every sound: [{id, name, hotkey, categories, color, playing}]",
     "categories": "the category names",
     "play": "play one sound: ?name=Airhorn (exact name, any case) or ?id=…",
     "stop": "stop one sound (?name= or ?id=); with neither, stop everything",
@@ -107,46 +119,58 @@ class _Server(ThreadingHTTPServer):
 
 class RemoteControl(QObject):
     """Starts / stops the server. `dispatch(action, params) -> (status, body)` runs on
-    the UI thread for every authorised request."""
+    the UI thread for every authorised request whose action is in `actions`. `page`,
+    (body, headers), is answered at / with no key. `lan` makes it the phone remote's
+    server: local-network peers only, and wrong keys lock an address out."""
     request = Signal(object)
 
-    def __init__(self, dispatch, parent=None):
+    def __init__(self, dispatch, parent=None, *, actions=ACTIONS, page=None,
+                 lan: bool = False, name: str = "control API"):
         super().__init__(parent)
         self.dispatch = dispatch
+        self.actions = tuple(actions)
+        self.page = page
+        self.lan = lan
+        self.name = name
+        self.host = HOST
         self.token = ""
         self.port = 0
         self.error = ""
         self._server: _Server | None = None
+        self._fails: dict[str, tuple[int, float]] = {}   # peer -> (wrong keys, locked until)
+        self._fails_lock = threading.Lock()
         self.request.connect(self._on_request, Qt.QueuedConnection)
 
     @property
     def running(self) -> bool:
         return self._server is not None
 
-    def start(self, port: int, token: str) -> bool:
-        """(Re)start on `port`. False (and `error` says why) if it can't listen."""
+    def start(self, port: int, token: str, host: str = HOST) -> bool:
+        """(Re)start on `host`:`port`. False (and `error` says why) if it can't listen."""
         self.stop()
-        self.token, self.port, self.error = token, int(port), ""
+        self.token, self.port, self.error, self.host = token, int(port), "", host
+        with self._fails_lock:
+            self._fails.clear()
         if not token:
             self.error = "no token"
             return False
         try:
-            srv = _Server((HOST, self.port), _handler_for(self))
+            srv = _Server((self.host, self.port), _handler_for(self))
         except (OverflowError, ValueError) as e:   # a port outside 0-65535
             self.error = f"port {self.port} isn't a valid port — pick one from 1024 to 65535"
-            log.warning("control API couldn't listen on %s:%s: %s", HOST, self.port, e)
+            log.warning("%s couldn't listen on %s:%s: %s", self.name, self.host, self.port, e)
             return False
         except OSError as e:
             self.error = (f"port {self.port} is already in use — pick another"
                           if getattr(e, "winerror", None) == 10048 or e.errno in (98, 10048)
                           else errors.plain(e))
-            log.warning("control API couldn't listen on %s:%s: %s", HOST, self.port, e)
+            log.warning("%s couldn't listen on %s:%s: %s", self.name, self.host, self.port, e)
             return False
         self._server = srv
         self.port = srv.server_address[1]   # (port 0 = any free one, for the tests)
         threading.Thread(target=srv.serve_forever, kwargs={"poll_interval": 0.25},
-                         daemon=True, name="control-api").start()
-        log.info("control API listening on %s:%s", HOST, self.port)
+                         daemon=True, name=self.name.replace(" ", "-")).start()
+        log.info("%s listening on %s:%s", self.name, self.host, self.port)
         return True
 
     def stop(self):
@@ -154,7 +178,7 @@ class RemoteControl(QObject):
         if srv is not None:
             srv.shutdown()
             srv.server_close()
-            log.info("control API stopped")
+            log.info("%s stopped", self.name)
 
     def _on_request(self, job: Job):
         with job.lock:
@@ -164,7 +188,7 @@ class RemoteControl(QObject):
         try:
             job.status, job.body = self.dispatch(job.action, job.params)
         except Exception:  # noqa: BLE001 - a bad request must never take the app down
-            log.exception("control API request %s failed", job.action)
+            log.exception("%s request %s failed", self.name, job.action)
             job.status, job.body = 500, {"error": "internal error (see the log)"}
         job.done.set()
 
@@ -178,7 +202,45 @@ class RemoteControl(QObject):
         return bool(self.token) and secrets.compare_digest(given.encode(), self.token.encode())
 
     def host_ok(self, host: str) -> bool:
+        if self.host != HOST:
+            return host in (f"{self.host}:{self.port}", self.host)
         return host in (f"{HOST}:{self.port}", f"localhost:{self.port}", HOST, "localhost")
+
+    def peer_ok(self, peer: str) -> bool:
+        """On the lan: only addresses on a local network (a port forwarded from the
+        internet, or a VPN's range, gets nothing)."""
+        if not self.lan:
+            return True
+        try:
+            ip = ipaddress.ip_address(peer)
+        except ValueError:
+            return False
+        return ip.is_private or ip.is_link_local
+
+    def locked(self, peer: str) -> bool:
+        if not self.lan:
+            return False
+        with self._fails_lock:
+            return self._fails.get(peer, (0, 0.0))[1] > time.monotonic()
+
+    def failed(self, peer: str):
+        """A wrong key from `peer`: FAIL_LIMIT in a row lock it out for LOCK_S."""
+        if not self.lan:
+            return
+        with self._fails_lock:
+            if len(self._fails) > 1024:   # a scan of the whole network: start over
+                self._fails.clear()
+            n = self._fails.get(peer, (0, 0.0))[0] + 1
+            self._fails[peer] = ((0, time.monotonic() + LOCK_S) if n >= FAIL_LIMIT
+                                 else (n, 0.0))
+            if n >= FAIL_LIMIT:
+                log.warning("%s: an address got the key wrong %d times, ignored for %ds",
+                            self.name, n, LOCK_S)   # (no address: logs go in bug reports)
+
+    def succeeded(self, peer: str):
+        if self.lan:
+            with self._fails_lock:
+                self._fails.pop(peer, None)
 
 
 def _handler_for(ctl: RemoteControl):
@@ -199,17 +261,35 @@ def _handler_for(ctl: RemoteControl):
             self.end_headers()
             self.wfile.write(data)
 
+        def _page(self):
+            body, headers = ctl.page
+            self.send_response(200)
+            for k, v in headers.items():
+                self.send_header(k, v)
+            self.send_header("Content-Length", str(len(body)))
+            self.end_headers()
+            self.wfile.write(body)
+
         def _go(self):
             url = urlsplit(self.path)
             query = parse_qs(url.query, keep_blank_values=True)
+            peer = self.client_address[0]
+            if not ctl.peer_ok(peer):
+                return self._answer(403, {"error": "only this network"})
             if not ctl.host_ok(self.headers.get("Host", "")):
                 return self._answer(403, {"error": "wrong host"})
+            if ctl.page and url.path in ("/", "/index.html") and self.command == "GET":
+                return self._page()
+            if ctl.locked(peer):
+                return self._answer(429, {"error": "too many wrong keys: wait a minute"})
             if not ctl.authorised(self.headers, query):
+                ctl.failed(peer)
                 return self._answer(401, {"error": "missing or wrong token"})
+            ctl.succeeded(peer)
             action = url.path.strip("/").removeprefix("api/").removeprefix("api")
-            if action not in ACTIONS:
+            if action not in ctl.actions:
                 return self._answer(404, {"error": "unknown endpoint",
-                                          "endpoints": [f"/api/{a}" for a in ACTIONS]})
+                                          "endpoints": [f"/api/{a}" for a in ctl.actions]})
             params = {k: v[0] for k, v in query.items() if k != "token"}
             job = Job(action, params)
             ctl.request.emit(job)
@@ -260,7 +340,8 @@ def dispatch(mw: MainWindow, action: str, params: dict) -> tuple[int, object]:
                      "volume": mw.vol_sound.spin.value()}
     if action == "sounds":
         return 200, [{"id": m.id, "name": m.name, "hotkey": m.hotkey,
-                      "categories": list(m.tags), "playing": m.id in playing}
+                      "categories": list(m.tags), "color": m.color,
+                      "playing": m.id in playing}
                      for m in cfg.sounds]
     if action == "categories":
         return 200, list(cfg.categories)

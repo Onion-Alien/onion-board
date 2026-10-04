@@ -2,6 +2,7 @@
 general options."""
 from __future__ import annotations
 
+import logging
 import threading
 
 from PySide6.QtCore import QObject, QRectF, QSize, Qt, Signal
@@ -21,6 +22,8 @@ from soundboard.ui import overlay as ovl
 from soundboard.wheelguard import no_wheel
 from soundboard.winkeys import Hotkeys
 from soundboard import errors
+
+log = logging.getLogger(__name__)
 
 # Global hotkey actions: (config attribute, action id, label, what it does).
 # Grouped for the Settings window; the action ids go to MainWindow.on_hotkey.
@@ -974,6 +977,8 @@ class SettingsDialog(QDialog):
     def _remote(self):
         w, v = self._page()
         v.addWidget(self._remote_card())
+        for card in self._remote_addon_cards():
+            v.addWidget(card)
         v.addWidget(self._remote_easy_card())
         v.addStretch(1)
         return w
@@ -2048,6 +2053,25 @@ class SettingsDialog(QDialog):
         refresh()
         self.remote_on = on   # the streamer guide can turn it on: keep the box in step
         return card
+
+    def _remote_addon_cards(self) -> list:
+        """The cards of the "remote" add-ons (soundboard.modules), e.g. Onion Pocket;
+        one that's broken gets a card saying so, never an error box."""
+        out = []
+        for info, addon in getattr(self.mw, "remote_addons", []):
+            if addon is not None:
+                try:
+                    out.append(addon.card(self))
+                    continue
+                except Exception as e:  # noqa: BLE001 - an add-on can't break Settings
+                    log.exception("add-on %s couldn't make its card", info.id)
+                    info.error = f"its settings failed: {errors.plain(e)}"
+            card, cv = self._card(info.name)
+            lbl = QLabel(f"{info.name} {info.version} didn't load: {info.error}")
+            lbl.setWordWrap(True)
+            cv.addWidget(lbl)
+            out.append(card)
+        return out
 
     def _remote_easy_card(self):
         """The easy way in: the streamer guide, and a prompt for an AI assistant."""

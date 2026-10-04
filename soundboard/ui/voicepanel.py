@@ -1927,7 +1927,7 @@ class ModulesList(QWidget):
             self.list.addWidget(lbl)
         # the Voice tab's own add-ons only: Onion Watch lives on the Triggers tab (and
         # Settings → Add-ons), and the languages share one line
-        voice = [m for m in infos if m.kind != "triggers"]
+        voice = [m for m in infos if m.kind not in ("triggers", "remote")]
         langs = [m for m in voice if m.kind == "translation" and not m.error]
         for m in voice:
             if m in langs:

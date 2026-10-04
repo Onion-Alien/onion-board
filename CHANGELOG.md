@@ -5,6 +5,16 @@
 - Recently deleted keeps Close beside its other actions. Sound pad menus no longer
   include Preview, and Apps / Triggers information is centered on the tab row.
 - Newer Onion Watch cards can show each sound's volume and hotkey.
+- **Remote add-ons, for Onion Pocket (your pads on your phone):** a new kind of
+  add-on, "remote", whose card sits on Settings → Remote. With the Onion Pocket
+  add-on installed, scan its code with your phone's camera and your pads appear in
+  the phone's browser (iPhone or Android, nothing to install): a tap plays the
+  sound on the PC. Off by default; it has its own key, only answers phones on your
+  home network, and never touches your mic. An add-on that fails to load gets a
+  card saying so, never an error box.
+- Settings: card headings line up with the text under them (they sat 3 px to the
+  right).
+- The control API's `/api/sounds` also gives each pad's colour.
 
 ## 1.6.8 — 2026-10-04
 

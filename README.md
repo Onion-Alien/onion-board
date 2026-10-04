@@ -27,7 +27,8 @@ Version **1.6.8** · Windows 10 / 11 · free, no account, no ads, no tracking ·
   installer offers to set up. Or send them to any other output you pick (Voicemeeter,
   a mixer, a capture card, OBS), or nowhere, so only you hear them. Your mic goes
   along, or tick it off and send only sounds.
-- **Hotkeys that work in-game**, MIDI pads, an in-game overlay, Stream Deck support.
+- **Hotkeys that work in-game**, MIDI pads, an in-game overlay, Stream Deck support,
+  and your pads on your phone with the optional Onion Pocket add-on.
 - **Add sounds from anywhere**: drag in files, or search YouTube and SoundCloud
   inside the app.
 - **Effects on any sound**: trim, speed, pitch, bass boost, reverse. One-click

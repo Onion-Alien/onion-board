@@ -67,7 +67,7 @@ LOCAL_SETTINGS = {"version", "sounds", "categories", "category", "main_device", 
                   "mic_device", "obs_device", "route", "setup_done", "tab", "apps", "screen",
                   "ytdlp_auto_optin", "update_check", "update_checked", "update_skip",
                   "update_pending", "category_hotkeys", "api_enabled", "api_port",
-                  "api_token", "net_mode", "net_proxy",
+                  "api_token", "remote_addons", "net_mode", "net_proxy",
                   "net_off", "net_offline", "tor_bridges", "data"}
 # per-sound fields that are written to sound.json (the paths are replaced by names)
 SOUND_FIELDS = ("name", "volume", "hotkey", "mode", "loop", "color", "level_gain",

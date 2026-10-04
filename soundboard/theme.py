@@ -380,7 +380,8 @@ QFrame#card QWidget { background:transparent; }
 QFrame#card[interactive="true"] { border:1px solid transparent; }
 QFrame#card[interactive="true"][hovered="true"] { background:$card_hi; border-color:$border_hi; }
 QFrame#card[interactive="true"]:focus { background:$card_hi; border-color:$accent; }
-QLabel#section { color:$section; font-size:8pt; font-weight:700; letter-spacing:1px; padding-top:8px; }
+QLabel#section { color:$section; font-size:8pt; font-weight:700; letter-spacing:1px; padding-top:8px;
+                 qproperty-indent:0; }  /* padding alone makes Qt indent the text 3 px */
 QLabel#hint, QLabel#muted { color:$muted; }
 QLabel#hint { font-size:8.5pt; }
 QLabel[tone="ok"], QLabel#hint[tone="ok"] { color:$ok_text; }
