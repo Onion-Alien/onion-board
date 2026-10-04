@@ -86,6 +86,7 @@ TABS = (("Sounds", "Your sound buttons: click one to play it"),
 
 
 UNDO_S = 10          # how long "Removed … · Undo" stays up
+CHIPS_ROW_H = 30      # the now-playing row: a chip's 24 px ■ button, its margins and border
 TICK_MS = 33         # the UI timer while the window is on screen (meters, visualisers)
 TICK_BG_MS = 100     # ...while it's on screen but another program is in front (a game)
 TICK_IDLE_MS = 250   # ...and while it's in the tray or minimised (push-to-talk, watchdog)
@@ -908,6 +909,13 @@ class MainWindow(QMainWindow):
                     self._chips[sid] = chip
             if queue or len(ids) >= 2:
                 self._chips_hl.addStretch(1)
+            # a steady height: the chips are rebuilt with every overlapping sound, and
+            # a row that shrank and grew back each time resized and repainted the
+            # whole board under it. It only ever grows (a bigger font).
+            self.playing_row.ensurePolished()
+            self.playing_row.setFixedHeight(max(
+                CHIPS_ROW_H, self.playing_row.minimumHeight(),
+                self._chips_hl.sizeHint().height()))
             self.playing_row.setVisible(len(ids) >= 2 or bool(queue))
         for sid, chip in self._chips.items():
             sel = "true" if sid == self.current else "false"
