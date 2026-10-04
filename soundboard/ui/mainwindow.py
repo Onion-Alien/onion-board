@@ -3861,9 +3861,38 @@ class MainWindow(QMainWindow):
 
     def load_remote_addon(self, info):
         """Start a remote add-on installed while the app runs (Settings → Remote's
-        *Get Onion Pocket*), in place of any copy of it that didn't load. Its object,
+        *Get Onion Pocket*, or its *Update* button), in place of any copy of it. A
+        running copy is stopped first (its server lets go of the port) and its package
+        forgotten, so the new version's code loads; its settings in
+        Config.remote_addons are the board's and stay as they are. If the new one
+        doesn't start, the old one is started again and stays. The add-on's object,
         or None."""
+        from soundboard import modules
+        old = next(((i, a) for i, a in self.remote_addons if i.id == info.id), None)
+        saved = {}
+        if old is not None and old[1] is not None:
+            try:
+                old[1].stop()
+            except Exception:  # noqa: BLE001
+                log.exception("remote add-on %s didn't stop cleanly", info.id)
+            pkg = old[0].package
+            saved = {n: m for n, m in sys.modules.items()
+                     if pkg and (n == pkg or n.startswith(pkg + "."))}
+            modules._forget(pkg)
         addon = self._start_remote_addon(info)
+        if addon is None and saved:
+            log.warning("remote add-on %s %s didn't start (%s): keeping %s",
+                        info.id, info.version, info.error, old[0].version)
+            if info.package:
+                modules._forget(info.package)
+            sys.modules.update(saved)
+            try:
+                restart = getattr(old[1], "apply", None)
+                if callable(restart):
+                    restart()
+            except Exception:  # noqa: BLE001
+                log.exception("remote add-on %s didn't start again", info.id)
+            return None
         self.remote_addons = [(i, a) for i, a in self.remote_addons if i.id != info.id]
         self.remote_addons.append((info, addon))
         return addon

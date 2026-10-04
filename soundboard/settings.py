@@ -2,8 +2,10 @@
 general options."""
 from __future__ import annotations
 
+import html
 import logging
 import threading
+import time
 
 from PySide6.QtCore import QObject, QRectF, QSize, Qt, QTimer, Signal
 from PySide6.QtGui import (QBrush, QColor, QFont, QIcon, QPainter, QPainterPath,
@@ -2195,6 +2197,8 @@ class SettingsDialog(QDialog):
         for info, addon in getattr(self.mw, "remote_addons", []):
             card = self._addon_card(info, addon)
             if card is not None:
+                if info.id == pocketaddon.MODULE_ID:
+                    self._pocket_update(card, info)
                 out.append(card)
                 have.add(info.id)
         if pocketaddon.MODULE_ID not in have and pocketaddon.offered():
@@ -2211,6 +2215,101 @@ class SettingsDialog(QDialog):
             log.exception("add-on %s couldn't make its card", info.id)
             info.error = f"its settings failed: {errors.plain(e)}"
             return None
+
+    POCKET_CHECK_S = 3600   # how often Settings → Remote asks GitHub for a newer one
+
+    def _pocket_update(self, card, info):
+        """*Update Onion Pocket to X* on its card (soundboard.pocketaddon), once GitHub
+        says a newer one is out: asked on a thread when Settings → Remote opens, at most
+        once an hour (the answer is kept on the main window). Clicking it downloads the
+        new one, and the main window swaps it in for the running copy, settings and
+        all; then its new card takes this one's place. Optional and quiet: if anything
+        fails, the old copy keeps running and the button just says it didn't work."""
+        from soundboard import net, netlog, pocketaddon, updates
+        mw = self.mw
+        lay = card.layout()
+        if lay is None:
+            return
+
+        class Relay(QObject):
+            found = Signal(object)
+            done = Signal(object)
+
+        btn = QPushButton()
+        btn.setObjectName("primary")
+        btn.hide()
+        row = _button_row()
+        row.addWidget(btn)
+        lay.addLayout(row)
+        found = Relay(card)
+        state = {}
+
+        def show(offer):
+            if offer is None or not qt_valid(btn) or not updates.newer(offer.version,
+                                                                       info.version):
+                return
+            state["offer"] = offer
+            btn.setText(f"Update Onion Pocket to {offer.version}")
+            btn.setToolTip(f"You have {info.version}. Downloads it from GitHub and "
+                           "restarts Onion Pocket: paired phones stay paired.")
+            btn.show()
+
+        def checked(offer):
+            mw.pocket_offer = offer
+            show(offer)
+
+        def finish(new, relay):
+            relay.deleteLater()
+            addon = mw.load_remote_addon(new) if new is not None else None
+            if new is not None:
+                mw.pocket_offer = None      # installed: on disk now, whatever happens
+            if not qt_valid(btn):
+                return                      # Settings was closed: it's loaded anyway
+            if addon is None:
+                state["release"]("Couldn't update it right now")
+                if new is not None:
+                    btn.hide()
+                return
+            box = card.parentWidget().layout() if card.parentWidget() else None
+            fresh = self._addon_card(new, addon)
+            if fresh is not None and box is not None:
+                box.insertWidget(box.indexOf(card), fresh)
+                card.hide()
+                card.deleteLater()
+            else:
+                state["release"]()
+                btn.hide()
+            busy.toast(self, f"✓ Onion Pocket {html.escape(new.version)} is in.", "ok")
+
+        def run():
+            offer = state.get("offer")
+            if offer is None:
+                return
+            state["release"] = busy.hold(btn, "Updating Onion Pocket…")
+            netlog.cause(pocketaddon.FEATURE, "You clicked to update Onion Pocket "
+                                              "(Settings > Remote)")
+            relay = Relay(mw)   # the main window's: it's swapped in even if Settings closes
+            relay.done.connect(lambda new: finish(new, relay))
+            threading.Thread(target=lambda: relay.done.emit(pocketaddon.get(offer=offer)),
+                             daemon=True, name="onion-pocket-update").start()
+
+        btn.clicked.connect(run)
+        found.found.connect(checked)
+        self.pocket_update = btn
+        offer = getattr(mw, "pocket_offer", None)
+        if offer is not None:
+            show(offer)
+        elif (time.time() - getattr(mw, "pocket_checked", 0.0) >= self.POCKET_CHECK_S
+              and (pocketaddon.local_zip() is not None or net.allowed(pocketaddon.FEATURE))):
+            mw.pocket_checked = time.time()
+            netlog.cause(pocketaddon.FEATURE, "Settings > Remote: is a newer Onion Pocket out?")
+            def ask():
+                offer = pocketaddon.check_update(info)
+                try:
+                    found.found.emit(offer)
+                except RuntimeError:        # Settings was closed meanwhile
+                    pass
+            threading.Thread(target=ask, daemon=True, name="onion-pocket-check").start()
 
     def _get_pocket_card(self):
         """*Get Onion Pocket* (soundboard.pocketaddon): downloads, installs and starts

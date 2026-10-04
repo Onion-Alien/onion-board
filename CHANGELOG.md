@@ -1,5 +1,14 @@
 # Changelog
 
+## Unreleased
+
+- **Onion Pocket updates itself from Settings:** when a newer Onion Pocket is out,
+  Settings → Remote shows *Update Onion Pocket to …* on its card. One click downloads
+  it (checked like before) and swaps it in while Onion Board runs: your phones stay
+  paired, and the port and on/off stay as they were. If it can't update, the old
+  one keeps working. (Onion Pocket 0.1.1 stops Onion Board freezing while Windows'
+  firewall prompt is up.)
+
 ## 1.7.0 — 2026-10-04
 
 - **Pick your own highlight colour:** Settings → Appearance → *Highlight colour*. A
