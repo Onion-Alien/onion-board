@@ -222,6 +222,11 @@ class Local2:
                 if not kind:
                     self.send_error(404)
                     return
+                if kind == "redirect":   # body: where to
+                    self.send_response(302)
+                    self.send_header("Location", body.decode())
+                    self.end_headers()
+                    return
                 self.send_response(200)
                 self.send_header("Content-Type", kind)
                 self.send_header("Content-Length", str(len(body)))
@@ -319,27 +324,34 @@ def test_ffmpeg_in_direct_mode_only_reaches_a_station_through_the_relay(qapp, lo
         p.stop()
 
 
+@pytest.mark.real_this_pc
 @pytest.mark.parametrize("mode", MODES)
-def test_a_station_redirecting_to_this_pc_still_goes_through_the_relay(mode, qapp, sites,
-                                                                     socks):
-    """FFmpeg has no no_proxy list: a redirect to 127.0.0.1 is the relay's to judge too.
-    Through a proxy it's refused (nothing the radio plays lives on this PC); in Direct
-    mode it's let through, as before the relay ran, but logged."""
+def test_a_station_redirecting_to_this_pc_is_refused(mode, qapp, sites, socks, local2,
+                                                     monkeypatch):
+    """FFmpeg has no no_proxy list: a redirect to 127.0.0.1 is the relay's to judge too,
+    and it refuses it in every mode (nothing the radio plays lives on this PC). In
+    Direct mode the station on 127.0.0.2 stands in for one on the internet."""
     net.configure(mode, socks.url())
     sites.routes["/s.wav"] = (wav_bytes(30.0), "audio/wav")
-    sites.routes["/go"] = (f"http://127.0.0.1:{sites.port}/s.wav".encode(), "redirect")
+    to_pc = f"http://127.0.0.1:{sites.port}/s.wav".encode()
+    if mode == net.PROXY:
+        sites.routes["/go"] = (to_pc, "redirect")
+        start_url = sites.url("station", "/go")
+    else:
+        local_target = net._local_target
+        monkeypatch.setattr(net, "_local_target",
+                            lambda host: host != "127.0.0.2" and local_target(host))
+        local2.routes["/go"] = (to_pc, "redirect")
+        start_url = local2.url("/go")
     start = len(net.relay_seen())
-    p, chunks, errors = play(qapp, sites.url("station", "/go")
-                             if mode == net.PROXY else f"http://127.0.0.1:{sites.port}/go")
+    p, chunks, errors = play(qapp, start_url)
     try:
         seen = net.relay_seen()[start:]
-        if mode == net.PROXY:
-            assert not chunks and errors
-            assert ("radio", "127.0.0.1", "local") in seen
-            assert "/s.wav" not in sites.paths()            # never reached directly
-        else:
-            assert not errors and chunks
-            assert [h for f, h, how in seen if how == "ok"].count("127.0.0.1") >= 2
+        assert not chunks and errors
+        assert ("radio", "127.0.0.1", "local") in seen
+        assert "/s.wav" not in sites.paths()            # never reached directly
+        if mode == net.DIRECT:
+            assert ("radio", "127.0.0.2", "ok") in seen and local2.hits == ["/go"]
     finally:
         p.stop()
 

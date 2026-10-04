@@ -73,6 +73,9 @@ HEAD_LIMIT = 64 * 1024              # a request head bigger than this isn't FFmp
 ENV_KEYS = ("http_proxy", "https_proxy", "all_proxy", "no_proxy")
 LOOPBACK_NAMES = ("localhost", "localhost.")
 DIRECT_LOGIN = "direct-"   # relay login "direct-<feature>": not through the proxy / Tor
+# features with nothing on this PC: the relay refuses them 127.x / localhost in every
+# mode (every station comes from Radio Browser, so one leading here is a redirect)
+NEVER_THIS_PC = frozenset({"radio"})
 
 # Everything that goes online, by the key its requests carry: its switch in Settings >
 # Privacy & security (cfg.net_off lists the ones switched off).
@@ -1029,10 +1032,12 @@ class _Relay:
                 self.seen.append((feature, host, "off"))
                 netlog.blocked(feature, host, int(port), off_message(feature), netlog.RELAY)
                 return self._refuse(c, 403, str(_failed(off_message(feature))))
-            if _local_target(host) and not (_mode == DIRECT and is_loopback(host)):
+            if _local_target(host) and not (_mode == DIRECT and is_loopback(host)
+                                            and feature not in NEVER_THIS_PC):
                 # nothing the app fetches through the relay lives on this PC or the
                 # home network; a stream redirecting there is refused. (In Direct mode
-                # this PC stays reachable, as it was before the relay ran in it.)
+                # this PC stays reachable, as it was before the relay ran in it, except
+                # for the features in NEVER_THIS_PC.)
                 self.seen.append((feature, host, "local"))
                 why = f"Not connecting to {host}: it's on this PC or your home network"
                 netlog.blocked(feature, host, int(port), why, netlog.RELAY)

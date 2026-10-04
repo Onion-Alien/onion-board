@@ -66,6 +66,11 @@ if os.environ.get("ONIONBOARD_TEST_REAL_AUDIO") != "1":
         os.environ["QTWEBENGINE_CHROMIUM_FLAGS"] = f"{flags} --mute-audio".strip()
 
 
+def pytest_configure(config):
+    config.addinivalue_line("markers", "real_this_pc: the relay refuses radio 127.x "
+                            "(net.NEVER_THIS_PC) as in the app")
+
+
 def pytest_xdist_auto_num_workers(config):
     """`-n auto` (pyproject's addopts): the whole suite runs on 4 workers, about a
     quarter of the time; a file or two runs in this process, where starting workers
@@ -143,6 +148,16 @@ def _never_update_for_real(monkeypatch, tmp_path):
     monkeypatch.setattr(updates, "_get", offline)
     monkeypatch.setattr(updates, "_open", offline)
     monkeypatch.setattr(updates, "start_install", no_installer)
+
+
+@pytest.fixture(autouse=True)
+def _test_servers_stand_in_for_the_internet(monkeypatch, request):
+    """The tests' radio stations and Radio Browser run on 127.0.0.x, standing in for
+    internet hosts, so the relay's NEVER_THIS_PC refusal is off unless a test asks for
+    it with @pytest.mark.real_this_pc."""
+    if request.node.get_closest_marker("real_this_pc") is None:
+        from soundboard import net
+        monkeypatch.setattr(net, "NEVER_THIS_PC", frozenset())
 
 
 @pytest.fixture(autouse=True)
