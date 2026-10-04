@@ -866,6 +866,7 @@ class SettingsDialog(QDialog):
     def _remote(self):
         w, v = self._page()
         v.addWidget(self._remote_card())
+        v.addWidget(self._remote_easy_card())
         v.addStretch(1)
         return w
 
@@ -1788,10 +1789,10 @@ class SettingsDialog(QDialog):
         state.setWordWrap(True)
         crow.addWidget(state, 1)
         cv.addLayout(crow)
-        help_ = QLabel("Endpoints: /api/play?name=Airhorn · /api/play?id=… · /api/stop · "
-                       "/api/pause · /api/random?category=Memes · /api/sounds · "
-                       "/api/status. Send the key as ?token=…, an X-Token header or "
-                       "Authorization: Bearer ….")
+        help_ = QLabel("Endpoints: " + " · ".join(f"/api/{a}" for a in remote.ENDPOINTS)
+                       + ". E.g. /api/play?name=Airhorn, /api/random?category=Memes, "
+                       "/api/live?on=toggle. Send the key as ?token=…, an X-Token header "
+                       "or Authorization: Bearer …. /api/help describes each one.")
         help_.setObjectName("hint")
         help_.setWordWrap(True)
         help_.setTextInteractionFlags(Qt.TextSelectableByMouse)
@@ -1838,6 +1839,52 @@ class SettingsDialog(QDialog):
         new.clicked.connect(new_key)
         copy.clicked.connect(copy_link)
         refresh()
+        self.remote_on = on   # the streamer guide can turn it on: keep the box in step
+        return card
+
+    def _remote_easy_card(self):
+        """The easy way in: the streamer guide, and a prompt for an AI assistant."""
+        from soundboard.ui.crashdialog import free_dialog
+        from soundboard.ui.streamguide import StreamerGuide, copy_prompt
+        mw = self.mw
+        card, cv = self._card("Set it up the easy way",
+                              "New to this? The streamer guide shows how to put your sounds "
+                              "on Stream Deck keys, channel points and chat commands, step by "
+                              "step. Or copy a ready-made message for ChatGPT, Claude or any "
+                              "AI chat: it explains Onion Board's links and lists your "
+                              "sounds, so the AI can set up whatever tools you use with you.")
+        # one under the other: side by side they'd widen a narrow Settings window
+        guide = QPushButton("Streamer guide…")
+        guide.setObjectName("primary")
+        cv.addWidget(guide, 0, Qt.AlignLeft)
+        ai = QPushButton("Copy AI prompt")
+        icons.set_icon(ai, "copy")
+        ai.setToolTip("Paste it into ChatGPT / Claude and say which tools you use")
+        cv.addWidget(ai, 0, Qt.AlignLeft)
+        with_key = QCheckBox("Put my key in the prompt")
+        with_key.setToolTip("Saves pasting it in yourself. The key only works on this PC, "
+                            "but it's still a password: leave this off if you'd rather the "
+                            "AI never sees it")
+        cv.addWidget(with_key)
+        state = QLabel()
+        state.setObjectName("hint")
+        state.setWordWrap(True)
+        cv.addWidget(state)
+
+        def open_guide():
+            g = StreamerGuide(self, mw)
+            g.exec()
+            free_dialog(g)
+            box = getattr(self, "remote_on", None)
+            if box is not None and box.isChecked() != mw.cfg.api_enabled:
+                box.setChecked(mw.cfg.api_enabled)   # turned on there
+
+        def copy_ai():
+            state.setText(copy_prompt(mw, with_key.isChecked()))
+            busy.flash(ai, "✓ Copied")
+
+        guide.clicked.connect(open_guide)
+        ai.clicked.connect(copy_ai)
         return card
 
     # ------------------------------------------------------------------ yt-dlp

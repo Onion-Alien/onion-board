@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+- **Remote control for streamers, the easy way:** Settings → Remote has a
+  **Streamer guide** (Stream Deck keys, channel points and chat commands through
+  Streamer.bot, a panic button, with each link ready to copy) and **Copy AI
+  prompt**, a message for ChatGPT / Claude that explains the links and lists your
+  sounds so it can set up whatever tools you use with you (your key stays out of
+  it unless you tick the box). The API can now also mute you (`/api/live`), switch
+  the voice changer and mic, set the volume and category, replay the last sound
+  and save the instant replay; `/api/help` lists every endpoint, and a mistyped
+  sound name answers with what it probably meant.
 - **The mini player always shows your sounds:** a web search's words stay in the
   search box, which also filters the pads, so a window made small afterwards
   showed a blank mini player (no pads, not even Bun). The mini player now shows

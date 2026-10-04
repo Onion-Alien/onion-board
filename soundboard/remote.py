@@ -10,9 +10,10 @@ launch), is never exported with a backup, and is never logged; Settings can make
 new one. Requests whose Host isn't this PC's loopback are refused (DNS rebinding),
 and no CORS headers are sent, so a web page can't read anything back.
 
-Every endpoint takes GET or POST and answers JSON:
+Every endpoint takes GET or POST and answers JSON (ENDPOINTS below is the list;
+/api/help returns it, so a script or an AI assistant can look it up):
 
-    /api/status                  version, what's playing, the category showing
+    /api/status                  version, what's playing, category, live / voice / mic
     /api/sounds                  [{id, name, hotkey, categories, playing}]
     /api/categories              ["Memes", ...]
     /api/play?id=… or ?name=…    play a pad (name: exact, any case)
@@ -20,6 +21,14 @@ Every endpoint takes GET or POST and answers JSON:
     /api/pause                   pause everything / resume
     /api/random[?category=…]     a random sound (default: the category showing;
                                  category= with nothing after it: any sound)
+    /api/last                    play the last sound again
+    /api/category?name=… / ?step=next|prev   show a category (name= blank: All)
+    /api/volume?set=0-100 / ?step=up|down    the sounds' volume
+    /api/live, /api/voice, /api/mic [?on=1|0|toggle]
+                                 the Live / Muted switch, the voice changer, "others
+                                 hear my mic" (no on=: toggle)
+    /api/replay                  save the instant replay as a pad
+    /api/help                    this list
 
 The HTTP side runs on its own thread; each request is handed to the UI thread
 (`RemoteControl.request`) and answered from there, so it never touches the
@@ -27,6 +36,7 @@ window's state from another thread.
 """
 from __future__ import annotations
 
+import difflib
 import json
 import logging
 import secrets
@@ -47,7 +57,27 @@ HOST = "127.0.0.1"
 DEFAULT_PORT = 7474
 ANSWER_S = 3.0          # how long a request waits for the UI thread
 IDLE_S = 10.0           # a client that connects and goes quiet is dropped after this
-ACTIONS = ("status", "sounds", "categories", "play", "stop", "pause", "random")
+# every endpoint, in the order they're listed (the 404 answer, /api/help, the
+# setup prompt and Settings all read this)
+ENDPOINTS = {
+    "status": "version, what's playing, the category showing, live / voice / mic / volume",
+    "sounds": "every sound: [{id, name, hotkey, categories, playing}]",
+    "categories": "the category names",
+    "play": "play one sound: ?name=Airhorn (exact name, any case) or ?id=…",
+    "stop": "stop one sound (?name= or ?id=); with neither, stop everything",
+    "pause": "pause everything, or resume if it's all paused",
+    "random": "a random sound from ?category=… (default: the one showing; "
+              "category= blank: any sound)",
+    "last": "play the last sound again",
+    "category": "show a category: ?name=Memes (name= blank: All) or ?step=next / prev",
+    "volume": "the sounds' volume: ?set=0-100 or ?step=up / down (10 % a step)",
+    "live": "the Live / Muted switch (Muted: others hear nothing): ?on=1 / 0 / toggle",
+    "voice": "the voice changer on / off: ?on=1 / 0 / toggle",
+    "mic": "whether others hear your mic: ?on=1 / 0 / toggle",
+    "replay": "save the instant replay (the last seconds you heard) as a new sound",
+    "help": "this list",
+}
+ACTIONS = tuple(ENDPOINTS)
 
 
 def new_token() -> str:
@@ -196,14 +226,36 @@ def _handler_for(ctl: RemoteControl):
 
 # --------------------------------------------------------------------------- the app side
 
+def on_value(params: dict, now: bool) -> bool | None:
+    """?on=1 / 0 / toggle (or nothing: toggle) -> the new state; None if it's neither."""
+    v = (params.get("on") or "toggle").strip().lower()
+    if v in ("1", "true", "on", "yes"):
+        return True
+    if v in ("0", "false", "off", "no"):
+        return False
+    return not now if v == "toggle" else None
+
+
+BAD_ON = {"error": "on= takes 1, 0 or toggle"}
+
+
 def dispatch(mw: MainWindow, action: str, params: dict) -> tuple[int, object]:
     """Carry out one request on the window (UI thread)."""
     cfg = mw.cfg
     playing = mw.engine.playing()
+    if action == "help":
+        return 200, {"endpoints": {f"/api/{a}": d for a, d in ENDPOINTS.items()},
+                     "key": "send it as ?token=…, an X-Token header or Authorization: "
+                            "Bearer …"}
     if action == "status":
         from soundboard import __version__
         return 200, {"version": __version__, "category": cfg.category,
-                     "playing": [s for s in playing if s in mw.pads]}
+                     "playing": [s for s in playing if s in mw.pads],
+                     "paused": bool(playing) and all(p for _, p in playing.values()),
+                     "live": bool(mw.engine.sending),
+                     "voice": mw.voice.fx.btn_power.isChecked(),
+                     "mic": bool(cfg.mic_enabled),
+                     "volume": mw.vol_sound.spin.value()}
     if action == "sounds":
         return 200, [{"id": m.id, "name": m.name, "hotkey": m.hotkey,
                       "categories": list(m.tags), "playing": m.id in playing}
@@ -214,20 +266,92 @@ def dispatch(mw: MainWindow, action: str, params: dict) -> tuple[int, object]:
         return 200, {"paused": mw.engine.pause_all()}
     if action == "random":
         cat = params.get("category")
-        if cat and cat not in cfg.categories:
-            return 404, {"error": f"no category called {cat!r}"}
+        if cat:
+            cat = find_category(cfg, cat)
+            if cat is None:
+                return 404, {"error": f"no category called {params['category']!r}",
+                             "categories": list(cfg.categories)}
         sid = mw.play_random(cat)
         if sid is None:
             return 404, {"error": "no sound to play there"}
         return 200, {"playing": sid, "name": mw.meta(sid).name}
+    if action == "last":
+        sid = getattr(mw, "_last_sid", None)
+        if sid is None or mw.meta(sid) is None:
+            return 404, {"error": "nothing has played yet"}
+        if sid not in mw.audio:
+            return 409, {"error": "that sound hasn't loaded (yet)"}
+        mw.play(sid)
+        return 200, {"playing": sid, "name": mw.meta(sid).name}
+    if action == "category":
+        step = (params.get("step") or "").strip().lower()
+        if step:
+            if step not in ("next", "prev", "previous"):
+                return 400, {"error": "step= takes next or prev"}
+            mw.step_category(1 if step == "next" else -1)
+        elif "name" in params:
+            name = params["name"].strip()
+            match = find_category(cfg, name)
+            if name and name.lower() != "all" and match is None:
+                return 404, {"error": f"no category called {name!r}",
+                             "categories": list(cfg.categories)}
+            mw.set_category(match or "")
+        else:
+            return 400, {"error": "say which: ?name=… or ?step=next / prev"}
+        return 200, {"category": cfg.category}
+    if action == "volume":
+        spin = mw.vol_sound.spin
+        step = (params.get("step") or "").strip().lower()
+        if "set" in params:
+            try:
+                new = round(float(params["set"]))
+            except ValueError:
+                return 400, {"error": "set= takes a number, 0-100"}
+        elif step in ("up", "down", "+", "-"):
+            new = (round(spin.value() / 10) + (1 if step in ("up", "+") else -1)) * 10
+        else:
+            return 400, {"error": "say how: ?set=0-100 or ?step=up / down"}
+        spin.setValue(min(max(new, 0), spin.maximum()))   # -> set_option("sound_vol")
+        return 200, {"volume": spin.value()}
+    if action == "live":
+        on = on_value(params, bool(mw.engine.sending))
+        if on is None:
+            return 400, BAD_ON
+        mw.set_sending(on)
+        return 200, {"live": bool(mw.engine.sending)}
+    if action == "voice":
+        on = on_value(params, mw.voice.fx.btn_power.isChecked())
+        if on is None:
+            return 400, BAD_ON
+        mw._set_voice(on)
+        return 200, {"voice": mw.voice.fx.btn_power.isChecked()}
+    if action == "mic":
+        on = on_value(params, bool(cfg.mic_enabled))
+        if on is None:
+            return 400, BAD_ON
+        mw.chk_mic.setChecked(on)   # -> on_mic_toggle
+        return 200, {"mic": bool(cfg.mic_enabled)}
+    if action == "replay":
+        from soundboard.engine import SR
+        if len(mw.replay.clip()) < int(0.2 * SR):
+            return 409, {"error": mw.replay.error or "nothing has played on this PC lately"}
+        mw.save_replay()
+        return 200, {"saved": True}
     # play / stop: one sound, by id or name
     if action == "stop" and not ("id" in params or "name" in params):
         mw.stop_all()
         return 200, {"stopped": "all"}
     m = find_sound(mw, params)
     if m is None:
-        return 404 if params else 400, {"error": "no such sound" if params
-                                         else "say which: ?id=… or ?name=…"}
+        if not params:
+            return 400, {"error": "say which: ?id=… or ?name=…"}
+        body = {"error": "no such sound"}
+        if params.get("name"):   # a typo'd button: say what it probably meant
+            close = difflib.get_close_matches(params["name"].strip(),
+                                              [s.name for s in cfg.sounds], 3, 0.5)
+            if close:
+                body["did_you_mean"] = close
+        return 404, body
     if action == "stop":
         mw.engine.stop(m.id)
         return 200, {"stopped": m.id}
@@ -235,6 +359,12 @@ def dispatch(mw: MainWindow, action: str, params: dict) -> tuple[int, object]:
         return 409, {"error": "that sound hasn't loaded (yet)"}
     mw.play(m.id)
     return 200, {"playing": m.id, "name": m.name}
+
+
+def find_category(cfg, name: str) -> str | None:
+    """A category by name, any case; None if there's no such one."""
+    name = name.strip().lower()
+    return next((c for c in cfg.categories if c.lower() == name), None)
 
 
 def find_sound(mw: MainWindow, params: dict):
@@ -259,3 +389,90 @@ def apply(mw: MainWindow, ctl: RemoteControl) -> str:
         return ""
     ctl.start(cfg.api_port, cfg.api_token)
     return ctl.error
+
+
+# --------------------------------------------------------------------------- AI setup prompt
+
+KEY_PLACEHOLDER = "YOUR-KEY"
+PROMPT_SOUNDS = 120     # a big library: list this many names, the AI can ask for the rest
+
+
+def setup_prompt(cfg, port: int, token: str = "") -> str:
+    """A message to paste into ChatGPT / Claude / any AI assistant so it can walk
+    someone through wiring their Stream Deck, Streamer.bot, Touch Portal… to the
+    control API: the address, every endpoint, their own sounds and categories, and
+    how each common tool sends a request. Without `token` the key is a placeholder
+    the person fills in themselves."""
+    from urllib.parse import quote
+
+    key = token or KEY_PLACEHOLDER
+    base = f"http://{HOST}:{port}"
+    sounds = list(cfg.sounds)
+    names = [f"- {m.name}" + (f"  (categories: {', '.join(m.tags)})" if m.tags else "")
+             for m in sounds[:PROMPT_SOUNDS]]
+    if len(sounds) > PROMPT_SOUNDS:
+        names.append(f"- … and {len(sounds) - PROMPT_SOUNDS} more (GET /api/sounds lists "
+                     "them all)")
+    example = sounds[0].name if sounds else "Airhorn"
+    cat = cfg.categories[0] if cfg.categories else "Memes"
+    endpoints = "\n".join(f"- /api/{a} — {d}" for a, d in ENDPOINTS.items())
+    key_note = ("" if token else
+                f"\nMy key isn't in this message: write {KEY_PLACEHOLDER} wherever it goes "
+                "and remind me to replace it with the key from Settings → Remote (click "
+                "Show).\n")
+    return f"""\
+I use Onion Board, a free Windows soundboard. Its "Remote control" feature lets other \
+programs on my PC control it over a small local HTTP API. Please help me set up my \
+streaming tools to use it. Ask me first which tools I use (Stream Deck, Streamer.bot, \
+Touch Portal, Bitfocus Companion, SAMMI, Mix It Up, AutoHotkey, a macro pad…) and what \
+I want the buttons / triggers to do, then give me exact click-by-click steps for each \
+one, with the full URLs ready to copy.
+
+HOW THE API WORKS
+- Address: {base}  (it only listens on this PC: tools on another computer or phone \
+can't reach it, so they must run on this PC)
+- Every request needs my key, as ?token=KEY in the URL (simplest: works anywhere a URL \
+can be opened), an X-Token: KEY header, or Authorization: Bearer KEY.
+- GET or POST both work; every answer is JSON. The Host header must be 127.0.0.1 or \
+localhost.
+- Sound and category names must match exactly (any case) and be URL-encoded: a space is \
+%20, & is %26. A wrong name answers 404 with "did_you_mean".
+- Errors: 401 = wrong / missing key, 404 = no such sound / category, 409 = not \
+loaded yet, 503 = the app was busy (safe to retry). If nothing answers at all, Onion \
+Board isn't running or "Enable remote control" is off.
+- Test it first by opening {base}/api/status?token={key} in a browser.
+{key_note}
+ENDPOINTS
+{endpoints}
+
+EXAMPLES
+- Play a sound: {base}/api/play?name={quote(example)}&token={key}
+- Random sound from a category: {base}/api/random?category={quote(cat)}&token={key}
+- Stop everything: {base}/api/stop?token={key}
+- Panic button (others hear nothing until pressed again): \
+{base}/api/live?on=toggle&token={key}
+- Voice changer on / off: {base}/api/voice?on=toggle&token={key}
+
+WHERE EACH TOOL SENDS A REQUEST (as far as I know — correct me if a tool has changed)
+- Elgato Stream Deck app: System → Website action, paste the URL, tick "GET request in \
+background" so no browser opens. (Or a free "API Request" plugin from the Marketplace.)
+- Streamer.bot: an Action with the sub-action Core → Network → Fetch URL; triggers such \
+as Twitch → Channel Reward → Reward Redemption, chat commands, cheers / bits, raids, \
+follows. Fetch URL runs in the background.
+- Touch Portal: the "HTTP Get" action (or a web-request plugin).
+- Bitfocus Companion: the "Generic HTTP" connection, a GET action with the full URL \
+(Companion must run on this PC).
+- SAMMI / Mix It Up: their "HTTP request" / "Web Request" command, GET.
+- AutoHotkey v2: whr := ComObject("WinHttp.WinHttpRequest.5.1"), \
+whr.Open("GET", url), whr.Send() — bound to a key.
+- Anything else that can open a URL or run a command: curl -s "URL".
+
+MY SETUP RIGHT NOW
+- Port: {port}
+- Categories: {", ".join(cfg.categories) or "(none yet: every sound is in All)"}
+- Sounds ({len(sounds)}):
+{chr(10).join(names) or "- (none yet)"}
+
+Keep the steps beginner-friendly. Don't suggest exposing the API to the internet, \
+port-forwarding it or running it on another machine: it's meant for this PC only.
+"""

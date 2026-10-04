@@ -45,7 +45,7 @@ def test_each_page_opens_by_name_and_holds_its_cards(window):  # noqa: F811
              "help": ("ADD-ONS", "FEEDBACK AND PROBLEMS",
                          "SUPPORT ONION BOARD"),
              "updates": ("APP UPDATES", "DOWNLOADER (YT-DLP)"),
-             "remote": ("REMOTE CONTROL (STREAM DECK, SCRIPTS)",)}
+             "remote": ("REMOTE CONTROL (STREAM DECK, SCRIPTS)", "SET IT UP THE EASY WAY")}
     for page, titles in where.items():
         d = SettingsDialog(window, page)
         shown = {lb.text() for lb in d.tabs.currentWidget().widget().findChildren(QLabel)}
@@ -253,3 +253,22 @@ def test_switching_radio_off_swaps_the_tab_and_stops_a_station(window, monkeypat
     finally:
         net.configure_features()
     assert isinstance(window.radio, RadioTab)   # back on: built again
+
+
+def test_remote_page_copies_an_ai_prompt_with_the_key_only_when_ticked(window):  # noqa: F811
+    from PySide6.QtWidgets import QApplication, QCheckBox
+    window.cfg.api_enabled, window.cfg.api_token = True, "key-for-the-ai-test"
+    d = SettingsDialog(window, "remote")
+    try:
+        ai = next(b for b in d.findChildren(QPushButton) if b.text() == "Copy AI prompt")
+        ai.click()
+        text = QApplication.clipboard().text()
+        assert "/api/play" in text and "key-for-the-ai-test" not in text
+        next(b for b in d.findChildren(QCheckBox) if b.text().startswith("Put my key")
+             ).setChecked(True)
+        ai.click()
+        assert "token=key-for-the-ai-test" in QApplication.clipboard().text()
+    finally:
+        d.close()
+        window.cfg.api_enabled = False
+        window.apply_remote()

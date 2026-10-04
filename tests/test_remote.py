@@ -150,3 +150,107 @@ def test_a_port_out_of_range_is_reported_not_raised(qapp):
     c = remote.RemoteControl(lambda a, p: (200, {}))
     assert not c.start(70000, TOKEN) and "isn't a valid port" in c.error
     assert not c.running
+
+
+def test_help_lists_every_endpoint(qapp, window):
+    status, body = remote.dispatch(window, "help", {})
+    assert status == 200 and set(body["endpoints"]) == {f"/api/{a}" for a in remote.ACTIONS}
+    assert remote.ACTIONS == tuple(remote.ENDPOINTS)
+
+
+def test_window_streamer_endpoints(qapp, window):
+    """The hotkey actions a streamer wants on a button: live / mute, voice, mic, volume,
+    category, last sound, and the answers when a name is wrong."""
+    w = window
+    w.audio["s1"] = np.zeros((480, 2), np.float32)
+    played = []
+    w.play = played.append
+    d = lambda action, **p: remote.dispatch(w, action, p)   # noqa: E731
+
+    assert d("last") == (404, {"error": "nothing has played yet"})
+    w._last_sid = "s1"
+    assert d("last")[0] == 200 and played == ["s1"]
+
+    status, body = d("play", name="airhron")
+    assert status == 404 and body["did_you_mean"] == ["Airhorn"]
+
+    live = bool(w.engine.sending)
+    assert d("live") == (200, {"live": not live})            # no on=: toggle
+    assert d("live", on="1") == (200, {"live": True}) and w.btn_air.isChecked()
+    assert d("live", on="0") == (200, {"live": False}) and not w.engine.sending
+    assert d("live", on="maybe")[0] == 400
+    d("live", on="1")
+
+    assert d("voice", on="on") == (200, {"voice": True})
+    assert d("voice", on="off") == (200, {"voice": False})
+    mic = bool(w.cfg.mic_enabled)
+    assert d("mic", on="toggle") == (200, {"mic": not mic})
+    d("mic", on="1" if mic else "0")
+
+    assert d("volume", set="40") == (200, {"volume": 40})
+    assert d("volume", step="up") == (200, {"volume": 50})
+    assert d("volume", step="down")[1] == {"volume": 40}
+    assert d("volume", set="loud")[0] == 400 and d("volume")[0] == 400
+    assert d("volume", set="-5")[1] == {"volume": 0}
+
+    w.new_category(name="Memes")
+    assert d("category", name="memes") == (200, {"category": "Memes"})
+    assert d("category", name="") == (200, {"category": ""})
+    assert d("category", name="Nope")[0] == 404
+    assert d("category", step="sideways")[0] == 400 and d("category")[0] == 400
+
+    s = d("status")[1]
+    assert {"live", "voice", "mic", "volume", "paused"} <= set(s) and s["volume"] == 0
+
+
+def test_setup_prompt_holds_the_api_and_the_sounds_but_the_key_only_if_asked(window):
+    cfg = window.cfg
+    cfg.api_token = "secret-key-xyz"
+    p = remote.setup_prompt(cfg, 7474)
+    assert "secret-key-xyz" not in p and remote.KEY_PLACEHOLDER in p
+    assert "http://127.0.0.1:7474" in p and "/api/play?name=Boom" in p
+    assert "- Airhorn" in p and all(f"/api/{a}" in p for a in remote.ACTIONS)
+    assert "Streamer.bot" in p and "Stream Deck" in p
+    p = remote.setup_prompt(cfg, 7474, cfg.api_token)
+    assert "token=secret-key-xyz" in p and remote.KEY_PLACEHOLDER not in p
+
+
+def test_streamer_guide_turns_it_on_and_copies_working_links(qapp, window):
+    from PySide6.QtWidgets import QApplication
+
+    from soundboard.ui import streamguide
+    w = window
+    w.cfg.api_port = 0
+    g = streamguide.StreamerGuide(w, w)
+    try:
+        assert not g.btn_play.isEnabled() and g.btn_on.isVisibleTo(g)
+        g.turn_on()
+        assert w.remote.running and w.cfg.api_enabled and not g.btn_on.isVisibleTo(g)
+        g.sound.setCurrentText("Airhorn")
+        g.btn_play.click()
+        url = QApplication.clipboard().text()
+        assert url.startswith("http://127.0.0.1:") and "/api/play?name=Airhorn&token=" in url
+        assert url.endswith(w.cfg.api_token)
+        panic = next(b for b in g.link_btns if b.text() == "Panic mute")
+        panic.click()
+        assert "/api/live?on=toggle&token=" in QApplication.clipboard().text()
+    finally:
+        g.close()
+        w.cfg.api_enabled = False
+        w.apply_remote()
+
+
+def test_the_real_window_answers_over_http(qapp, window):
+    w = window
+    w.cfg.api_enabled, w.cfg.api_port = True, 0
+    assert w.apply_remote() == ""
+    try:
+        auth = {"X-Token": w.cfg.api_token}
+        status, body = call(qapp, w.remote, "/api/help", auth)
+        assert status == 200 and "/api/live" in body["endpoints"]
+        status, body = call(qapp, w.remote, "/api/volume?step=up", auth)
+        assert status == 200 and body["volume"] == w.vol_sound.spin.value()
+        assert call(qapp, w.remote, "/api/play?name=Nope", auth)[0] == 404
+    finally:
+        w.cfg.api_enabled = False
+        w.apply_remote()
