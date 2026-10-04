@@ -2055,23 +2055,71 @@ class SettingsDialog(QDialog):
         return card
 
     def _remote_addon_cards(self) -> list:
-        """The cards of the "remote" add-ons (soundboard.modules), e.g. Onion Pocket;
-        one that's broken gets a card saying so, never an error box."""
-        out = []
+        """The cards of the "remote" add-ons (soundboard.modules), e.g. Onion Pocket.
+        They're optional: one that's broken is left out (it's in the log), never an
+        error box. Without a working Onion Pocket, a card offering to get it."""
+        from soundboard import pocketaddon
+        out, have = [], set()
         for info, addon in getattr(self.mw, "remote_addons", []):
-            if addon is not None:
-                try:
-                    out.append(addon.card(self))
-                    continue
-                except Exception as e:  # noqa: BLE001 - an add-on can't break Settings
-                    log.exception("add-on %s couldn't make its card", info.id)
-                    info.error = f"its settings failed: {errors.plain(e)}"
-            card, cv = self._card(info.name)
-            lbl = QLabel(f"{info.name} {info.version} didn't load: {info.error}")
-            lbl.setWordWrap(True)
-            cv.addWidget(lbl)
-            out.append(card)
+            card = self._addon_card(info, addon)
+            if card is not None:
+                out.append(card)
+                have.add(info.id)
+        if pocketaddon.MODULE_ID not in have and pocketaddon.offered():
+            out.append(self._get_pocket_card())
         return out
+
+    def _addon_card(self, info, addon):
+        if addon is None:
+            log.info("remote add-on %s left out of Settings: %s", info.id, info.error)
+            return None
+        try:
+            return addon.card(self)
+        except Exception as e:  # noqa: BLE001 - an add-on can't break Settings
+            log.exception("add-on %s couldn't make its card", info.id)
+            info.error = f"its settings failed: {errors.plain(e)}"
+            return None
+
+    def _get_pocket_card(self):
+        """*Get Onion Pocket* (soundboard.pocketaddon): downloads, installs and starts
+        it, then its own card takes this one's place. If that fails, this card just
+        goes away; Onion Pocket is optional."""
+        from soundboard import netlog, pocketaddon
+
+        class Relay(QObject):
+            done = Signal(object)
+
+        card, cv = self._card("Onion Pocket: your pads on your phone",
+                              "Scan a code with your phone's camera and tap a pad on the "
+                              "phone to play it here. iPhone or Android, in the browser: "
+                              "nothing to install on the phone. A free add-on from GitHub.")
+        get = QPushButton("Get Onion Pocket")
+        row = _button_row()
+        row.addWidget(get)
+        cv.addLayout(row)
+        relay = Relay(card)
+
+        def finish(info):
+            if not qt_valid(card):
+                return
+            addon = self.mw.load_remote_addon(info) if info is not None else None
+            new = self._addon_card(info, addon) if addon is not None else None
+            lay = card.parentWidget().layout() if card.parentWidget() else None
+            if new is not None and lay is not None:
+                lay.insertWidget(lay.indexOf(card), new)
+            card.hide()
+            card.deleteLater()
+
+        def run():
+            busy.hold(get, "Getting Onion Pocket…")
+            netlog.cause(pocketaddon.FEATURE, "You clicked to get Onion Pocket "
+                                              "(Settings > Remote)")
+            threading.Thread(target=lambda: relay.done.emit(pocketaddon.get()),
+                             daemon=True, name="onion-pocket").start()
+        relay.done.connect(finish)
+        get.clicked.connect(run)
+        self.get_pocket = get
+        return card
 
     def _remote_easy_card(self):
         """The easy way in: the streamer guide, and a prompt for an AI assistant."""

@@ -3825,24 +3825,34 @@ class MainWindow(QMainWindow):
 
     def _load_remote_addons(self) -> list:
         """[(ModuleInfo, add-on or None)] for every "remote" add-on (soundboard.modules),
-        e.g. Onion Pocket. One that fails is noted on its info (Settings → Remote shows
-        it) and never stops the app."""
+        e.g. Onion Pocket. One that fails is noted on its info (and the log;
+        Settings → Remote leaves it out) and never stops the app."""
+        from soundboard import modules
+        return [(info, self._start_remote_addon(info))
+                for info in modules.discover() if info.kind == "remote"]
+
+    def _start_remote_addon(self, info):
+        """The add-on's object, or None (the reason noted on `info`)."""
         from soundboard import modules
         from soundboard.ui.remotehost import RemoteHost
-        out = []
-        for info in modules.discover():
-            if info.kind != "remote":
-                continue
-            addon = None
-            if not info.error:
-                try:
-                    addon = modules.load_package(info).create(RemoteHost(self, info.id))
-                except Exception as e:  # noqa: BLE001 - a bad add-on can't stop the app
-                    log.exception("remote add-on %s didn't start", info.id)
-                    info.error = str(e) if isinstance(e, modules.ModuleError) \
-                        else f"failed to start: {errors.plain(e)}"
-            out.append((info, addon))
-        return out
+        if info.error:
+            return None
+        try:
+            return modules.load_package(info).create(RemoteHost(self, info.id))
+        except Exception as e:  # noqa: BLE001 - a bad add-on can't stop the app
+            log.exception("remote add-on %s didn't start", info.id)
+            info.error = str(e) if isinstance(e, modules.ModuleError) \
+                else f"failed to start: {errors.plain(e)}"
+            return None
+
+    def load_remote_addon(self, info):
+        """Start a remote add-on installed while the app runs (Settings → Remote's
+        *Get Onion Pocket*), in place of any copy of it that didn't load. Its object,
+        or None."""
+        addon = self._start_remote_addon(info)
+        self.remote_addons = [(i, a) for i, a in self.remote_addons if i.id != info.id]
+        self.remote_addons.append((info, addon))
+        return addon
 
     def _stop_remote_addons(self):
         for info, addon in self.remote_addons:

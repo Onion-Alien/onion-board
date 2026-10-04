@@ -1,6 +1,6 @@
 """Remote add-ons (soundboard.modules kind "remote", soundboard.ui.remotehost), with a
 tiny add-on made for the test: found and loaded at start-up, its card on Settings →
-Remote, a "didn't load" card for a broken one, and the lan server it gets from the
+Remote, a broken one left out of Settings, and the lan server it gets from the
 host: its page with no key, the API with its key, only its actions, wrong-key
 lock-out, only local peers. A real server on a free 127.0.0.1 port stands in for the
 PC's address on the Wi-Fi."""
@@ -164,5 +164,5 @@ def test_a_broken_remote_add_on_never_stops_the_app(qapp, window, tmp_path,  # n
     window.remote_addons = loaded
     d = SettingsDialog(window, "remote")
     texts = " ".join(lb.text() for lb in d.tabs.currentWidget().widget().findChildren(QLabel))
-    assert "Broken 1 didn't load" in texts
+    assert "Broken" not in texts and "boom" not in texts   # optional: just left out
     d.close()
