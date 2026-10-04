@@ -1,6 +1,8 @@
 """Bun's animated widget: talking opens his mouth and throws notes, silence closes
 it again, and the plain drawing still works with every pose."""
 
+import time
+
 from PySide6.QtCore import QRectF
 from PySide6.QtGui import QImage, QPainter
 
@@ -12,7 +14,10 @@ def _run(qapp, b, steps, level=None):
     for _ in range(steps):
         if level is not None:
             b.set_level(level)
-        b._last -= 0.035   # pretend a frame's worth of time passed
+        # exactly a frame's worth of time passed: only the pretend time, not however
+        # long the test took since the last step (painting every frame on a slow
+        # machine moved the act on, ending it between sawdust puffs)
+        b._last = time.monotonic() - 0.035
         b._step()
 
 
