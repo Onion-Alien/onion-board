@@ -27,6 +27,14 @@ class Note:
 
 # newest first; add one per release that has something worth telling
 NOTES = (
+    Note("1.7.1", "Onion Pocket stays up to date", (
+        ("cable", "Update Onion Pocket from Settings",
+         "When a newer Onion Pocket is out, Settings → Remote offers it in one click. "
+         "Your phones stay paired."),
+        ("triggers", "Alarms on your phone",
+         "While an Onion Watch trigger rings, its pad lights up on your phone, and "
+         "stopping it there stops the alarm."),
+    ), "remote", "Open Remote"),
     Note("1.7.0", "Your own highlight colour", (
         ("palette", "Pick any colour",
          "Settings → Appearance → Highlight colour: slide along the rainbow or pick any "

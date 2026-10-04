@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 1.7.1 — 2026-10-04
 
 - **Onion Pocket updates itself from Settings:** when a newer Onion Pocket is out,
   Settings → Remote shows *Update Onion Pocket to …* on its card. One click downloads
@@ -8,6 +8,9 @@
   paired, and the port and on/off stay as they were. If it can't update, the old
   one keeps working. (Onion Pocket 0.1.1 stops Onion Board freezing while Windows'
   firewall prompt is up.)
+- Your phone shows an Onion Watch alarm: while a trigger rings, its pad lights up in
+  Onion Pocket (and the Stream Deck API's status), and stopping that sound stops the
+  alarm too.
 
 ## 1.7.0 — 2026-10-04
 
