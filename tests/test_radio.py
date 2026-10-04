@@ -259,6 +259,26 @@ def test_town_names_come_from_where_the_stations_are():
     assert _town(1, "Accra", 5.6, -0.2).matches(["accra"])   # search finds the place
 
 
+def test_search_ignores_accents_and_case():
+    for place, typed in (("Zürich", "zurich"), ("İstanbul", "istanbul"),
+                         ("São Paulo", "sao paulo"), ("Kraków", "KRAKOW")):
+        assert _town(1, place, 0, 0).matches(radio.fold(typed).split()), place
+    assert not _town(1, "Zürich", 0, 0).matches(["bern"])
+
+
+def test_a_place_on_the_180_line_is_one_place():
+    pts = radio.globe_points([_town(1, "Taveuni", -16.8, 179.95, countrycode="FJ"),
+                              _town(2, "Taveuni", -16.9, -179.98, countrycode="FJ"),
+                              _town(3, "Taveuni", -16.85, 179.9, countrycode="FJ")])
+    [t] = radio.town_labels(pts)
+    assert t["k"] == 3 and 179 < abs(t["lo"]) <= 180
+
+
+def test_a_tie_between_spellings_picks_the_capitalised_one():
+    pts = radio.globe_points([_town(1, "accra", 5.6, -0.2), _town(2, "Accra", 5.6, -0.2)])
+    assert [t["n"] for t in radio.town_labels(pts)] == ["Accra"]
+
+
 def test_flat_map_names_towns_only_zoomed_in_and_only_in_view(qapp, monkeypatch):
     from soundboard.ui import flatmap
     m = flatmap.FlatMap()
@@ -287,6 +307,8 @@ def test_globe_names_towns_only_near_the_view():
     assert "function setTowns(list)" in page and "pickTowns();" in page
     assert "pick.push(d) >= TOWNS_IN_VIEW" in page   # a few near the view, never all
     assert "pxDeg >= TOWN_PX" in page                # and none zoomed out
+    # picked no further out than a name is shown (facing > 0.45 in fitNames)
+    assert "Math.max(0.45, Math.cos(reach * R))" in page and "facing > 0.45" in page
 
 
 def test_globe_names_never_float_without_the_globe():

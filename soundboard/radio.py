@@ -36,6 +36,7 @@ import statistics
 import threading
 import sys
 import time
+import unicodedata
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
 from urllib.parse import quote
@@ -275,9 +276,17 @@ class Station:
         return " · ".join(b for b in bits if b)
 
     def matches(self, words: list[str]) -> bool:
-        hay = " ".join((self.name, self.country, self.cc, self.state,
-                        " ".join(self.tags))).lower()
+        """Every one of `words` (folded with fold()) is in its name, place or tags."""
+        hay = fold(" ".join((self.name, self.country, self.cc, self.state,
+                             " ".join(self.tags))))
         return all(w in hay for w in words)
+
+
+def fold(text: str) -> str:
+    """Text to search in, or for: lower case without accents, so "zurich" finds
+    "Zürich" and "istanbul" finds "İstanbul"."""
+    return "".join(ch for ch in unicodedata.normalize("NFKD", text.casefold())
+                   if not unicodedata.combining(ch))
 
 
 def search_text(text: str) -> str:
@@ -822,20 +831,27 @@ def town_labels(points: list[dict], limit: int = TOWNS_MAX) -> list[dict]:
         groups.setdefault((name.casefold(), str(d.get("cc") or "")), []).append(d)
     out = []
     for members in groups.values():
+        # a place on the 180° line (Fiji, Chukotka) has stations at 179.9 and -179.9:
+        # take its middle with the west side moved round, so they're neighbours
+        lons = [d["lo"] for d in members]
+        wrap = max(lons) - min(lons) > 180
+        lon = (lambda d: d["lo"] + 360 if d["lo"] < 0 else d["lo"]) if wrap else \
+            (lambda d: d["lo"])
         la = statistics.median(d["la"] for d in members)
-        lo = statistics.median(d["lo"] for d in members)
+        lo = statistics.median(lon(d) for d in members)
         near = [d for d in members
-                if abs(d["la"] - la) <= TOWN_SPREAD and abs(d["lo"] - lo) <= TOWN_SPREAD]
+                if abs(d["la"] - la) <= TOWN_SPREAD and abs(lon(d) - lo) <= TOWN_SPREAD]
         if len(near) < max(1, len(members) / 2):
             continue   # scattered all over: the name doesn't belong to one spot
         spellings: dict[str, int] = {}
         for d in near:
             n = " ".join(str(d["s"]).split())
             spellings[n] = spellings.get(n, 0) + 1
-        name = max(spellings, key=lambda n: (spellings[n], n))
+        # the most used spelling; on a tie, a capitalised one ("Accra" over "accra")
+        name = max(spellings, key=lambda n: (spellings[n], n[:1].isupper(), n))
+        mid = statistics.median(lon(d) for d in near)
         out.append({"n": name, "la": round(statistics.median(d["la"] for d in near), 4),
-                    "lo": round(statistics.median(d["lo"] for d in near), 4),
-                    "k": len(near)})
+                    "lo": round(mid - 360 if mid > 180 else mid, 4), "k": len(near)})
     out.sort(key=lambda t: (-t["k"], t["n"]))
     return out[:limit]
 
@@ -1122,7 +1138,9 @@ function pickTowns() {{
   if (showNames && pxDeg >= TOWN_PX) {{
     // how far from the middle of the view the screen reaches, in degrees
     const reach = Math.min(70, Math.hypot(innerWidth, innerHeight) / 2 / pxDeg);
-    const lim = Math.cos(reach * R), s0 = Math.sin(pov.lat * R), c0 = Math.cos(pov.lat * R);
+    // no further out than fitNames shows a name (0.45), or the slots go to hidden ones
+    const lim = Math.max(0.45, Math.cos(reach * R));
+    const s0 = Math.sin(pov.lat * R), c0 = Math.cos(pov.lat * R);
     for (const d of towns) {{
       const facing = s0 * Math.sin(d.la * R) +
                      c0 * Math.cos(d.la * R) * Math.cos((d.lo - pov.lng) * R);

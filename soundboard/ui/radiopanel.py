@@ -953,7 +953,7 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
         self._refresh_info()
 
     def _local_matches(self) -> list[Station]:
-        words = self._query.lower().split()
+        words = radio.fold(self._query).split()
         seen, out = set(), []
         for s in self.favorites + self._globe_list:
             if s.uuid not in seen and s.matches(words):
