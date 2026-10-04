@@ -293,6 +293,23 @@ def test_mainwindow_live_speed_button_drives_the_engine(window):
     assert (e.sound_speed, e.sound_pitch) == (1.0, 0.0)
 
 
+def test_live_effects_drive_the_engine(window):
+    b, e = window.speed_btn, window.engine
+    assert e.sound_fx == {} and "FX" not in b.text()
+    b.fx["bass"].set_value(9)
+    b.fx["bass"].changed.emit()
+    assert e.sound_fx == {"bass": 9} and "FX" in b.text()
+    b.fx_presets["Concert hall"].click()                     # a preset replaces them all
+    assert e.sound_fx == {"reverb": 0.55} and b.fx_presets["Concert hall"].isChecked()
+    b.fx_presets["Concert hall"].click()                     # clicked again: off
+    assert e.sound_fx == {}
+    b.set_fx({"echo": 0.5})
+    b.set_values(1.5, 2, True)
+    b.reset()                                                # Reset all clears the effects
+    assert e.sound_fx == {} and (e.sound_speed, e.sound_pitch) == (1.0, 0.0)
+    assert "FX" not in b.text()
+
+
 def test_speed_redline_unlocks_the_silly_range(window):
     b, e = window.speed_btn, window.engine
     assert b.speed.q.hi == 2.0 and b.red_box.isHidden()

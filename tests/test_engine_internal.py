@@ -73,6 +73,25 @@ def test_live_speed_still_applies_to_sounds_playing_alongside():
     assert abs(snd.pos["mon"] - 9600) < 2 and cue.pos["mon"] == 4800
 
 
+def test_live_effects_shape_the_sounds_but_not_the_apps_own_playback():
+    def level(sid, fx):
+        e = engine_with("main", "mon")
+        e.sound_fx = fx
+        e.play(sid, sine(8000, 0.5), 1.0, preview=sid.startswith("__"))
+        out = np.zeros((480, 2), np.float32)
+        blocks = []
+        for _ in range(40):
+            e._mon(out, 480)
+            blocks.append(out.copy())
+        y = np.concatenate(blocks)[4800:]
+        return float(np.sqrt(np.mean(y ** 2))), e
+    dry, _ = level("a", {})
+    muffled, e = level("a", {"muffle": 1.0})
+    assert muffled < 0.1 * dry and "mon" in e._sfx
+    cue, _ = level("__cue__", {"muffle": 1.0})
+    assert cue > 0.8 * dry
+
+
 # ---------------------------------------------------------------- Record-6s test
 
 def _speech(seconds=7.0, seed=0):
