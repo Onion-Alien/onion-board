@@ -981,6 +981,40 @@ def test_tab_reload_updates_stations_already_known(qapp, tab, server):
     assert played[0].url == "http://example.com/NEW.mp3"
 
 
+def test_filter_boxes_wrap_instead_of_cutting_their_words(qapp):
+    """A narrow panel (beside the map): "All countries" / "Any quality" / "Default
+    order" in full on more rows, not "All coun" / "Any qua" in one."""
+    from PySide6.QtCore import QRect
+    from PySide6.QtWidgets import QComboBox
+
+    from soundboard.ui.radiopanel import QUALITIES, SORTS, _FilterRow
+    boxes = [QComboBox(), QComboBox(), QComboBox()]
+    boxes[0].addItem("All countries")
+    for label, _ in QUALITIES:
+        boxes[1].addItem(label)
+    for label, _ in SORTS:
+        boxes[2].addItem(label)
+    row = _FilterRow(boxes)
+
+    def lay_out(width):   # what a resize to `width` does, without a window to resize
+        row._arrange(row.rows_for(width))
+        row.layout().activate()
+        row.layout().setGeometry(QRect(0, 0, width, row.layout().sizeHint().height()))
+        return row.rows
+
+    seen = {w: lay_out(w) for w in (900, 520, 420, 300, 230)}
+    for width in seen:
+        lay_out(width)
+        for c in boxes:
+            if width >= row.needs(c):   # it fits on a row of its own at least
+                assert c.width() >= row.needs(c), (width, row.rows, c.currentText(), c.width())
+    assert seen[900] == 1 and seen[230] == 3 and len(set(seen.values())) == 3, seen
+    boxes[0].addItem("Bosnia and Herzegovina")   # a long country picked: more room
+    boxes[0].setCurrentIndex(1)
+    lay_out(520)
+    assert boxes[0].width() >= row.needs(boxes[0])
+
+
 def test_tab_radio_volume_zero_is_remembered(qapp, app_dir, server):
     from soundboard.ui.radiopanel import RadioTab
     cfg = Config()
