@@ -1,6 +1,6 @@
 # Contributing
 
-Thanks for helping. Setup and code layout are in the [README](README.md);
+Thanks for helping. Setup is in [docs/DEVELOPING.md](docs/DEVELOPING.md) and code layout in [docs/CODE.md](docs/CODE.md);
 this file is the rules.
 
 ## Before you open a PR
@@ -60,5 +60,5 @@ privately, see [SECURITY.md](SECURITY.md)) and we'll rewrite the branch.
 
 - Match the code around you: comment density, naming, how things are split.
 - Line length 100, `ruff` config in `pyproject.toml`.
-- Audio callbacks never block and never take the engine lock (see README → *Audio notes*).
+- Audio callbacks never block and never take the engine lock (see [docs/CODE.md](docs/CODE.md) → *Audio notes*).
 - Add a CHANGELOG entry under *Unreleased* for anything a user would notice.

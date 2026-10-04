@@ -25,7 +25,7 @@ module's `install.bat` or `pip install -r requirements.txt`).
 
 ## 2. Change the code
 
-- Layout: README → *Code layout*. Rules: [CONTRIBUTING.md](../CONTRIBUTING.md).
+- Layout: [CODE.md](CODE.md) → *Code layout*. Rules: [CONTRIBUTING.md](../CONTRIBUTING.md).
 - Real-time audio callbacks never block and never take the engine lock.
 - Anything user-visible goes in `CHANGELOG.md` under *Unreleased*.
 - The Triggers tab is the [Onion Watch](https://github.com/Onion-Alien/onion-watch)

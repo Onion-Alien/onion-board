@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Onion Board: free soundboard for Discord and games (Windows)</title>
-<meta name="description" content="Free Windows soundboard: play sounds into Discord and games through your mic, with a clean stream output for OBS, hotkeys per category, a sound queue, MIDI pad support, instant replay, a voice changer, text-to-speech, an in-game overlay, and screen triggers that play a sound when something shows up, like YOU DIED.">
+<meta name="description" content="Free Windows soundboard: play sounds into Discord and games through your mic. In-game hotkeys, an overlay, effects, a voice changer, text-to-speech, instant replay, and screen triggers that play a sound when something shows up, like YOU DIED.">
 <meta property="og:title" content="Onion Board: free soundboard for Discord and games">
 <meta property="og:description" content="Play sounds through your mic in Discord and games. Voice changer, text-to-speech, and screen triggers that play a sound when you die.">
 <meta property="og:image" content="https://onion-alien.github.io/onion-board/screenshots/sounds.png">
@@ -24,39 +24,38 @@
 <style>
   :root {
     --bg: #0f1016; --card: #1a1b24; --edge: #2a2b38; --text: #ececf3; --muted: #a3a4b8;
-    --accent: #7c5cff; --accent2: #ff5c8a; --green: #13ce66;
+    --accent: #7c5cff; --accent2: #ff5c8a;
   }
   * { box-sizing: border-box; }
   body { margin: 0; background: var(--bg); color: var(--text);
          font: 17px/1.55 "Segoe UI", system-ui, -apple-system, sans-serif; }
   a { color: #a996ff; }
-  .wrap { max-width: 1040px; margin: 0 auto; padding: 0 16px; }
-  header { text-align: center; padding: 56px 0 24px; }
-  h1 { font-size: clamp(34px, 6vw, 56px); margin: 0 0 8px; letter-spacing: 0.02em; }
+  .wrap { max-width: 960px; margin: 0 auto; padding: 0 16px; }
+  header { text-align: center; padding: 48px 0 8px; }
+  h1 { font-size: clamp(34px, 6vw, 52px); margin: 0 0 6px; }
   h1 span { background: linear-gradient(90deg, var(--accent), var(--accent2));
             -webkit-background-clip: text; background-clip: text; color: transparent; }
-  .tag { color: var(--muted); font-size: clamp(18px, 2.6vw, 22px); max-width: 700px; margin: 0 auto 28px; }
+  .tag { color: var(--muted); font-size: clamp(17px, 2.4vw, 20px); max-width: 620px; margin: 0 auto 24px; }
   .dl { display: inline-block; background: var(--accent); color: #fff; text-decoration: none;
-        font-weight: 700; font-size: 20px; padding: 16px 30px; border-radius: 14px;
+        font-weight: 700; font-size: 19px; padding: 14px 28px; border-radius: 12px;
         box-shadow: 0 8px 30px rgba(124, 92, 255, 0.35); }
   .dl:hover { background: #8d71ff; }
-  .small { color: var(--muted); font-size: 14px; margin-top: 12px; }
-  .hero { margin: 32px auto 8px; border-radius: 14px; border: 1px solid var(--edge);
-          max-width: 100%; height: auto; display: block; }
-  h2 { font-size: 28px; margin: 56px 0 16px; text-align: center; }
-  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; }
-  .card { background: var(--card); border: 1px solid var(--edge); border-radius: 14px; padding: 18px 20px; }
-  .card h3 { margin: 0 0 6px; font-size: 19px; }
-  .card p { margin: 0; color: var(--muted); }
-  .new { color: var(--green); font-size: 13px; font-weight: 700; margin-left: 6px; }
-  .shots img { width: 100%; border-radius: 12px; border: 1px solid var(--edge); display: block; }
+  .small { color: var(--muted); font-size: 14px; margin: 12px 0 0; }
+  img { max-width: 100%; height: auto; display: block; border-radius: 10px; border: 1px solid var(--edge); }
+  .hero { margin: 28px auto 0; }
+  h2 { font-size: 24px; margin: 48px 0 14px; text-align: center; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; }
+  .card { background: var(--card); border: 1px solid var(--edge); border-radius: 12px; padding: 14px 16px; }
+  .card b { display: block; margin-bottom: 2px; }
+  .card span { color: var(--muted); font-size: 15px; }
+  .shots { grid-template-columns: repeat(auto-fit, minmax(380px, 1fr)); gap: 18px; }
   .shots figure { margin: 0; }
   .shots figcaption { color: var(--muted); font-size: 15px; margin-top: 6px; }
-  ol.steps { max-width: 720px; margin: 0 auto; padding-left: 22px; }
-  ol.steps li { margin: 8px 0; }
-  .note { max-width: 720px; margin: 20px auto 0; background: var(--card); border: 1px solid var(--edge);
-          border-radius: 12px; padding: 14px 18px; color: var(--muted); font-size: 15px; }
+  ol.steps { max-width: 640px; margin: 0 auto; padding-left: 22px; }
+  ol.steps li { margin: 6px 0; }
+  .note { max-width: 640px; margin: 16px auto 0; color: var(--muted); font-size: 14px; }
   footer { text-align: center; color: var(--muted); font-size: 14px; padding: 48px 0 40px; }
+  @media (max-width: 440px) { .shots { grid-template-columns: 1fr; } }
 </style>
 <script data-goatcounter="https://onionalien.goatcounter.com/count"
         async src="https://gc.zgo.at/count.js"></script>
@@ -65,100 +64,57 @@
 <div class="wrap">
   <header>
     <h1><span>Onion Board</span></h1>
-    <p class="tag">A free soundboard for Windows. Press a button or a hotkey, even in-game, and your
-      friends in Discord or your game hear the sound through your mic.</p>
+    <p class="tag">A free soundboard for Windows. Press a pad or a hotkey, even in-game, and
+      your friends in Discord or your game hear it through your mic.</p>
     <a class="dl" href="https://github.com/Onion-Alien/onion-board/releases/latest/download/OnionBoardSetup.exe" data-goatcounter-click="download-home-top">⬇ Download for Windows</a>
-    <p class="small">Free · Windows 10 and 11 · one installer, no account, no ads, no tracking</p>
-    <p class="small"><a href="https://www.virustotal.com/gui/file/4267e4cf1ebdff01fcfacfea926fb13a1d88fdb82cce048f473b8155d8560ac6">VirusTotal scan of 1.6.5</a> · 68 of 68 scanners clean</p>
-    <p class="small"><a id="ver" href="https://github.com/Onion-Alien/onion-board/releases/latest">Latest version 1.6.5 · what's new</a></p>
-    <img class="hero" src="screenshots/tour.webp" width="1100" height="736"
-         alt="A quick tour: playing sounds, the radio globe, a trigger catching YOU DIED, and the voice changer">
+    <!-- release -->
+    <p class="small">Version 1.6.5 · Windows 10 / 11 · free, no account, no ads, no tracking<br>
+      <a href="https://www.virustotal.com/gui/file/4267e4cf1ebdff01fcfacfea926fb13a1d88fdb82cce048f473b8155d8560ac6">VirusTotal: 68 of 68 clean</a> ·
+      <a href="https://github.com/Onion-Alien/onion-board/releases/latest">what's new</a></p>
+    <!-- /release -->
+    <img class="hero" src="screenshots/sounds.png" width="1770" height="1080" alt="Onion Board's sound pads">
   </header>
 
   <h2>What it does</h2>
   <div class="grid">
-    <div class="card"><h3>Sounds into Discord and games</h3><p>Your sounds go out through your mic
-      (via a free virtual cable the installer sets up). Your voice goes along with them, or send only the sounds.</p></div>
-    <div class="card"><h3>Stream output for OBS<span class="new">NEW</span></h3><p>Streaming?
-      Your sounds, screen triggers and voice go clean (no voice chat squashing, still stereo) to
-      a device of their own, so they're their own audio track in OBS with their own volume.</p></div>
-    <div class="card"><h3>A hotkey for everything<span class="new">NEW</span></h3><p>Switch
-      category in-game and one key plays a random sound from it. Give each category its own set
-      of keys, replay the last sound, turn sounds up or down, your mic or voice changer on or off,
-      or every hotkey off while you type.</p></div>
-    <div class="card"><h3>Queue, wait and cooldown<span class="new">NEW</span></h3><p>Queue a
-      sound to play after the one playing, or play a whole category in order or shuffled. Make a
-      sound wait for the punchline, stop friends spamming it with a cooldown, or send it to
-      everyone but you.</p></div>
-    <div class="card"><h3>Instant replay</h3><p>Someone says something
-      funny in Discord? Press one key and the last 30 seconds you heard become a pad, ready to
-      play back at them. Kept only in memory until you press it.</p></div>
-    <div class="card"><h3>MIDI pads</h3><p>Hit a pad on an Akai LPD8,
-      a Launchpad or any USB MIDI controller to play a sound, no extra software. Hold-to-play
-      sounds stop when you let go; macro keypads work too.</p></div>
-    <div class="card"><h3>Screen triggers</h3><p>A sound the moment something shows up in your
-      game, like "YOU DIED", a rare spawn or a queue popping. It watches the game's own window, even behind other
-      windows, and can ring until you stop it. One click adds it: it's the free
-      <a href="https://onion-alien.github.io/onion-watch/">Onion Watch</a> add-on, also its own app.</p></div>
-    <div class="card"><h3>Hotkeys and in-game overlay</h3><p>Global hotkeys work while you play. Press
-      a key for a small panel of pads over your game, then a number to play one.</p></div>
-    <div class="card"><h3>Voice changer and text-to-speech</h3><p>Robot, radio, echo, pitch and more
-      on your live voice, or type and a computer voice says it, in Windows' voices or your own
-      (Kokoro, AllTalk, Piper and other local voices). Live voice-to-speech and translation too.</p></div>
-    <div class="card"><h3>Effects on any sound</h3><p>Trim, speed, pitch, bass boost, reverse, reverb.
-      One-click presets like Ear rape, Nightcore, Slowed + reverb.</p></div>
-    <div class="card"><h3>Add sounds from anywhere</h3><p>Drag in files, or search YouTube and SoundCloud
-      right in the app and add the audio as a pad.</p></div>
-    <div class="card"><h3>Internet radio and app audio</h3><p>Radio from around the world on a 3D globe,
-      or send one program's sound (music, a video) to your friends.</p></div>
-    <div class="card"><h3>Sounds as good on their end</h3><p>Sent in smart mono with room for the
-      call's compression, and a one-click check that tells you which Discord setting is chopping
-      your sounds up.</p></div>
-    <div class="card"><h3>Stream Deck and scripts</h3><p>Optional: let a Stream Deck, Touch Portal,
-      AutoHotkey or a script on your PC play your sounds, guarded by a key only you have.</p></div>
-    <div class="card"><h3>Make it yours</h3><p>31 themes (a few of them memes), pictures and colours on your pads,
-      categories, backups you can take to a new PC, and sound packs to share with friends.</p></div>
+    <div class="card"><b>🎤 Sounds through your mic</b><span>Into Discord or any game, with your voice or without it.</span></div>
+    <div class="card"><b>⌨️ Hotkeys that work in-game</b><span>Plus an overlay, MIDI pads and Stream Deck.</span></div>
+    <div class="card"><b>🔎 Sounds from anywhere</b><span>Drag in files, or search YouTube and SoundCloud in the app.</span></div>
+    <div class="card"><b>🎛️ Effects on any sound</b><span>Trim, speed, pitch, bass boost. One-click Ear rape and Nightcore.</span></div>
+    <div class="card"><b>🤖 Voice changer and TTS</b><span>Change your voice live, or type and a computer voice says it.</span></div>
+    <div class="card"><b>💀 Screen triggers</b><span>A sound the moment "YOU DIED" shows up, via the free <a href="https://onion-alien.github.io/onion-watch/">Onion Watch</a> add-on.</span></div>
+    <div class="card"><b>⏪ Instant replay</b><span>One key turns the last 30 seconds you heard into a pad.</span></div>
+    <div class="card"><b>📻 And more</b><span>World radio, app audio, a clean OBS output, 31 themes. <a href="https://github.com/Onion-Alien/onion-board/blob/main/docs/FEATURES.md">Full list</a></span></div>
   </div>
 
-  <h2>Screenshots</h2>
+  <h2>A closer look</h2>
   <div class="grid shots">
-    <figure><img src="screenshots/sounds.png" alt="The Sounds tab" loading="lazy"><figcaption>Your sound pads, in categories</figcaption></figure>
-    <figure><img src="screenshots/triggers.png" alt="The Triggers tab" loading="lazy"><figcaption>Triggers: a sound when something appears</figcaption></figure>
     <figure><img src="screenshots/voice.png" alt="The Voice tab" loading="lazy"><figcaption>Voice changer and text-to-speech</figcaption></figure>
-    <figure><img src="screenshots/overlay.png" alt="The in-game overlay" loading="lazy"><figcaption>The in-game overlay</figcaption></figure>
+    <figure><img src="screenshots/triggers.png" alt="The Triggers tab" loading="lazy"><figcaption>Triggers: a sound when something shows up in your game</figcaption></figure>
+    <figure><img src="screenshots/apps.png" alt="The Apps tab" loading="lazy"><figcaption>Send one program's sound to your friends</figcaption></figure>
+    <figure><img src="screenshots/setup.png" alt="The Setup tab" loading="lazy"><figcaption>Setup shows at a glance whether they can hear you</figcaption></figure>
   </div>
 
   <h2>Get started</h2>
   <ol class="steps">
     <li><a href="https://github.com/Onion-Alien/onion-board/releases/latest/download/OnionBoardSetup.exe" data-goatcounter-click="download-home-steps">Download <code>OnionBoardSetup.exe</code></a> and run it.</li>
-    <li>A short guide asks which mic and headphones you use and sets everything up.</li>
-    <li>In Discord (or your game), pick <b>CABLE Output</b> as your microphone, and set Discord's
-      <b>Input Profile</b> to <b>Studio</b> so it doesn't treat your sounds as noise.</li>
+    <li>Bun the bunny asks which mic and headphones you use and sets the rest up.</li>
+    <li>In Discord or your game, pick <b>CABLE Output</b> as your microphone
+      (and set Discord's <b>Input Profile</b> to <b>Studio</b>, so it doesn't filter your sounds out).</li>
   </ol>
-  <p class="note">Windows or your browser may warn you about the download. That's normal for a free
-    app from a small developer: the installer isn't "code-signed", which costs hundreds a year.
-    Click <b>More info → Run anyway</b> (or <b>⋯ → Keep</b> in Edge / Chrome). The full source code is
-    <a href="https://github.com/Onion-Alien/onion-board">on GitHub</a> if you'd like to check it.</p>
+  <p class="note">Windows may warn you about the download. That's normal for a free app that isn't
+    code-signed: click <b>More info → Run anyway</b> (or <b>⋯ → Keep</b> in Edge / Chrome). The full
+    source is <a href="https://github.com/Onion-Alien/onion-board">on GitHub</a>.</p>
 
   <footer>
     <a href="https://github.com/Onion-Alien/onion-board">Source code</a> ·
     <a href="https://github.com/Onion-Alien/onion-board/releases">All versions</a> ·
     <a href="https://tally.so/r/rjxjyM">Send feedback</a> ·
     <a href="https://github.com/Onion-Alien/onion-board/issues">Report a problem</a><br>
-    <a href="discord-soundboard/">How to play sounds through your mic in Discord</a> ·
+    <a href="discord-soundboard/">Play sounds through your mic in Discord</a> ·
     <a href="free-soundpad-alternative/">Free Soundpad and Voicemod alternative</a><br>
-    Onion Board is free to use. The app collects nothing. This site counts visits with GoatCounter: no cookies, nothing personal.
+    The app collects nothing. This site counts visits with GoatCounter: no cookies, nothing personal.
   </footer>
 </div>
-<script>
-  // The newest version's number, straight from GitHub (the link works without it too).
-  fetch("https://api.github.com/repos/Onion-Alien/onion-board/releases/latest")
-    .then(r => r.ok ? r.json() : null)
-    .then(r => {
-      const v = r && /^v?(\d+\.\d+\.\d+)$/.exec(r.tag_name || "");
-      if (v) document.getElementById("ver").textContent = `Latest version ${v[1]} · what's new`;
-    })
-    .catch(() => {});
-</script>
 </body>
 </html>
