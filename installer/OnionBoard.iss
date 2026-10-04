@@ -21,6 +21,8 @@
 ;         (soundboard/torget.py: SHA-256 pinned, the saved proxy used) into
 ;         %APPDATA%\OnionBoard\tor\bin (Settings > Privacy's "Get Tor" button does
 ;         the same). A failed download says so and leaves the app working without it
+;       * Keep a history of network activity, unticked: runs OnionBoard.exe
+;         --keep-netlog (config netlog_keep; soundboard/netlog.py keep())
 ;       * a Desktop shortcut
 ;   - then opens Onion Board, whose Quick setup asks which mic they use and walks
 ;     them through Discord
@@ -95,6 +97,7 @@ Name: "vbcable"; Description: "The free virtual cable (VB-Cable): lets Discord a
 Name: "ffmpeg"; Description: "Play M4A, AAC and video files (installs the free FFmpeg, about 100 MB)"; GroupDescription: "Extras"; Check: CanOfferFfmpeg
 Name: "livevoice"; Description: "Set up live voice-to-speech now: you talk, others hear a text-to-speech voice. Needs Python from python.org; downloads about 300 MB. (You can also do this later from the Voice tab.)"; GroupDescription: "Extras"; Flags: unchecked
 Name: "tor"; Description: "Private connection (Tor): hides your address from the sites you search and download from and the radio stations you play. Slower. Downloads Tor from the Tor Project (about 22 MB). It stays off until you pick it in Settings > Privacy & security."; GroupDescription: "Privacy (optional)"; Flags: unchecked
+Name: "keepnetlog"; Description: "Keep a history of everything Onion Board connects to, between starts (Settings > Connection > Network activity). Saved on this PC only; without it the list is forgotten when the app closes."; GroupDescription: "Privacy (optional)"; Flags: unchecked
 Name: "desktopicon"; Description: "Put an Onion Board shortcut on my Desktop"; GroupDescription: "Shortcuts"
 
 [InstallDelete]
@@ -119,6 +122,11 @@ Name: "{autoprograms}\{#AppName}"; Filename: "{app}\{#AppExeName}.exe"; AppUserM
 Filename: "{app}\{#AppExeName}.exe"; Parameters: "--set-offline"; \
   StatusMsg: "Switching on Offline mode..."; \
   Check: OfflineChosen; AfterInstall: CheckOffline; Flags: runhidden waituntilterminated
+; "Keep a history" before the first start too, so its first connections are kept.
+; Unticking the box never switches it off: that's in the app (it deletes the file).
+Filename: "{app}\{#AppExeName}.exe"; Parameters: "--keep-netlog"; \
+  StatusMsg: "Switching on the network activity history..."; \
+  Tasks: keepnetlog; Flags: runhidden waituntilterminated
 ; The virtual cable is installed from CurStepChanged in [Code], so its exit code can
 ; ask for a restart.
 Filename: "{code:WingetPath}"; \

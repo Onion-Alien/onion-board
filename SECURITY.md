@@ -84,8 +84,12 @@ connection the app makes or refuses while it runs (`soundboard/netlog.py`):
 server, feature, why (what you did that caused it, or the app's own timer), route,
 result, bytes, and the HTTP request line, answer and TLS
 version where the app can read them (inside a radio or yt-dlp `https` tunnel it
-can't). The list is kept in memory only (at most 1000 entries): it's never written
-to disk or the log, and it never holds proxy passwords, the relay's secret, request
+can't). The list is kept in memory only (at most 1000 entries) unless you tick
+*Keep a history between starts* there (or the installer's box for it; off by
+default): then each connection is also saved to
+`%APPDATA%\OnionBoard\network-activity.jsonl` as it ends and listed again on the
+next start (Clear empties it; unticking deletes it). It's never written to the
+log or sent anywhere, and it never holds proxy passwords, the relay's secret, request
 headers or bodies; query values whose names look like keys or tokens are masked.
 `tor.exe`'s own connections to the Tor network and everything under *Not covered*
 below aren't in it.

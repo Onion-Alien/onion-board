@@ -11,8 +11,11 @@ where the app can read it, the HTTP request line and answer and the TLS
 version. A request switched off in Settings > Privacy & security is listed as
 blocked: nothing was looked up or sent for it.
 
-Kept in memory only, at most MAX_ENTRIES: never written to disk or to the log, and
-gone when the app closes. Never recorded: proxy passwords, the relay's per-launch
+Kept in memory only, at most MAX_ENTRIES, and gone when the app closes: unless
+"Keep a history" is on (Settings > Connection, or the installer's box: config
+netlog_keep), when each connection is also added to FILE_NAME in the app's folder as
+it ends, and the next start lists them again (see keep()). Never written to the app's
+log. Never recorded: proxy passwords, the relay's per-launch
 secret, request headers and bodies. Query values that look like keys or tokens are
 masked (see redact()).
 
@@ -26,14 +29,22 @@ from __future__ import annotations
 import collections
 import dataclasses
 import itertools
+import json
+import logging
+import os
 import re
 import threading
 import time
 import urllib.parse
 from dataclasses import dataclass, field
+from pathlib import Path
+
+log = logging.getLogger(__name__)
 
 MAX_ENTRIES = 1000
 MAX_REQUESTS = 20               # request lines kept per connection
+FILE_NAME = "network-activity.jsonl"   # the kept history: one connection per line
+MAX_FILE_BYTES = 5 * 1024 * 1024       # then it moves to FILE_NAME + ".old" (one kept)
 
 CONNECTING, CONNECTED, CLOSED, BLOCKED, FAILED = (
     "connecting", "connected", "closed", "blocked", "failed")
@@ -73,15 +84,18 @@ class Entry:
         """Turned away before anything was looked up or sent."""
         self.state, self.reason, self.ended = BLOCKED, reason, self.started
         _changed()
+        _save(self)
 
     def failed(self, reason: str) -> None:
         self.state, self.reason, self.ended = FAILED, reason, time.time()
         _changed()
+        _save(self)
 
     def closed(self) -> None:
         if self.state in (CONNECTING, CONNECTED):
             self.state, self.ended = CLOSED, time.time()
             _changed()
+            _save(self)
 
     def add_sent(self, n: int) -> None:
         self.sent += n
@@ -174,10 +188,135 @@ def entries() -> list[Entry]:
 
 
 def clear() -> None:
-    """Forget the list (the causes stand: they're for what's still to come)."""
+    """Forget the list, and the kept history on disk (the causes stand: they're for
+    what's still to come)."""
     with _lock:
         _entries.clear()
+        path = _keep_path
+    if path is not None:
+        _remove(path)
     _changed()
+
+
+# --------------------------------------------------------------------------- kept history
+
+_keep_path: Path | None = None   # FILE_NAME while "Keep a history" is on
+_file_lock = threading.Lock()
+_FIELDS = {f.name for f in dataclasses.fields(Entry)}
+
+
+def keeping() -> bool:
+    return _keep_path is not None
+
+
+def keep(path: Path | None) -> None:
+    """Keep a history in `path` (FILE_NAME in the app's folder), or stop (None).
+
+    On: what's saved there from earlier starts is listed again (oldest first, before
+    this run's), and the file is rewritten with the whole list, so ticking it later in
+    a run saves what's been listed so far. Off: stops saving and deletes the file, so
+    nothing is left on disk; this run's list stays, and ticking it again saves it
+    back."""
+    global _keep_path, _count
+    old = _keep_path
+    if path is None:
+        with _lock:
+            _keep_path = None
+        if old is not None:
+            _remove(old)
+        _changed()
+        return
+    path = Path(path)
+    saved = [] if path == old else _read(path)
+    with _lock:
+        seen = {(e.started, e.host, e.port) for e in saved}
+        merged = saved + [e for e in _entries if (e.started, e.host, e.port) not in seen]
+        merged = merged[-MAX_ENTRIES:]
+        for i, e in enumerate(merged, 1):   # one numbering across the runs
+            e.n = i
+        _count = len(merged)
+        _entries.clear()
+        _entries.extend(merged)
+        _keep_path = path
+        ended = [e for e in merged if e.state not in (CONNECTING, CONNECTED)]
+    _rewrite(path, ended)
+    _changed()
+
+
+def flush() -> None:
+    """At quit: save the connections still open (a radio stream, say) as they stand."""
+    with _lock:
+        still_open = [e for e in _entries if e.state in (CONNECTING, CONNECTED)]
+    for e in still_open:
+        _save(e)
+
+
+def _line(e: Entry) -> str:
+    return json.dumps(dataclasses.asdict(e), ensure_ascii=False) + "\n"
+
+
+def _save(e: Entry) -> None:
+    """Add one connection to the kept history (from whichever thread ended it)."""
+    path = _keep_path
+    if path is None:
+        return
+    with _file_lock:
+        try:
+            path.parent.mkdir(parents=True, exist_ok=True)
+            if path.exists() and path.stat().st_size > MAX_FILE_BYTES:
+                os.replace(path, path.with_name(path.name + ".old"))
+            with open(path, "a", encoding="utf-8") as f:
+                f.write(_line(e))
+        except OSError:
+            log.warning("couldn't add to the network activity history", exc_info=True)
+
+
+def _rewrite(path: Path, items: list[Entry]) -> None:
+    with _file_lock:
+        try:
+            path.parent.mkdir(parents=True, exist_ok=True)
+            tmp = path.with_name(path.name + ".tmp")
+            tmp.write_text("".join(_line(e) for e in items), encoding="utf-8")
+            os.replace(tmp, path)
+            path.with_name(path.name + ".old").unlink(missing_ok=True)
+        except OSError:
+            log.warning("couldn't save the network activity history", exc_info=True)
+
+
+def _read(path: Path) -> list[Entry]:
+    """The last MAX_ENTRIES connections saved in `path` (and its .old), oldest first.
+    A damaged line is skipped; one still open when the app closed is listed as done;
+    one saved twice (open at quit, then closed) is listed once, as it was last."""
+    items: dict[tuple, Entry] = {}
+    for p in (path.with_name(path.name + ".old"), path):
+        try:
+            text = p.read_text(encoding="utf-8", errors="replace")
+        except OSError:
+            continue
+        for line in text.splitlines():
+            try:
+                raw = json.loads(line)
+                e = Entry(**{k: v for k, v in raw.items() if k in _FIELDS})
+                e.started, e.ended = float(e.started), float(e.ended)
+                e.port, e.sent, e.received = int(e.port), int(e.sent), int(e.received)
+                e.requests = [str(r) for r in e.requests][:MAX_REQUESTS]
+            except (ValueError, TypeError, AttributeError):
+                continue
+            if e.state in (CONNECTING, CONNECTED):
+                e.state, e.ended = CLOSED, e.ended or e.started
+                e.reason = e.reason or "still open when the app closed"
+            if e.state in (CLOSED, BLOCKED, FAILED):
+                items[(e.started, e.host, e.port)] = e
+    return list(items.values())[-MAX_ENTRIES:]
+
+
+def _remove(path: Path) -> None:
+    with _file_lock:
+        for p in (path, path.with_name(path.name + ".old")):
+            try:
+                p.unlink(missing_ok=True)
+            except OSError:
+                log.warning("couldn't delete %s", p.name, exc_info=True)
 
 
 # --------------------------------------------------------------------------- for the view
@@ -296,6 +435,7 @@ def details(e: Entry) -> str:
 def as_text(items: list[Entry] | None = None) -> str:
     """The whole list, for the clipboard."""
     items = entries() if items is None else items
-    head = (f"Onion Board network activity: {len(items)} connection(s). Kept in "
-            "memory only; review before sharing (it shows the sites you used).")
+    kept = "Kept on this PC between starts" if keeping() else "Kept in memory only"
+    head = (f"Onion Board network activity: {len(items)} connection(s). {kept}; "
+            "review before sharing (it shows the sites you used).")
     return "\n\n".join([head] + [details(e) for e in items])
