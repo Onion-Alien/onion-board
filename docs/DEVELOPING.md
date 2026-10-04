@@ -92,7 +92,8 @@ py -3.13 -m venv .venv-bench
 .venv-bench\Scripts\python scripts\codec_bench.py --library --defaults
 ```
 
-The real-world checks play test signals into the virtual cable, so they aren't
+The real-world checks play test signals into the virtual cable (they need it
+installed, even if you normally send your sounds elsewhere), so they aren't
 headless: mute your mic in the app and stay out of calls that use the cable.
 `game_capture.py` (which device Windows gives a game, its resampling, ducking;
 with no flags it only reports), `steam_voice_roundtrip.py` (Steam's own voice
@@ -201,7 +202,7 @@ Get-Process OnionBoard -ErrorAction SilentlyContinue      # is it running?
 - Themed app icons: `%APPDATA%\OnionBoard\icons\` (the shortcuts point at one;
   deleting it leaves them blank until the next start writes it again).
 - Never copy any of these into the repo. The log contains the user's paths, and
-  `browser\` holds their logins.
+  `config.json` can hold a proxy password and the remote control key.
 
 ## 7. Commit and release
 

@@ -78,8 +78,8 @@ class LinkBar(QFrame):
         errors.linkify(self.info)   # an error's "Report it" link
         h.addWidget(self.info, 1)
         self.btn_play = QPushButton("Play once")
-        self.btn_play.setToolTip("Download it and play it through your mic once — it isn't "
-                                 "added to your Sounds")
+        self.btn_play.setToolTip("Download it and play it once, like a pad (others hear it "
+                                 "too) — it isn't added to your Sounds")
         icons.set_icon(self.btn_play, "play", size=14)
         self.btn_play.clicked.connect(self.play_once)
         self.btn_add = QPushButton("Add as sound")

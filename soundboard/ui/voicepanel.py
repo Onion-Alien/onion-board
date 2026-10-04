@@ -228,8 +228,9 @@ class VoiceFxPanel(QWidget):
         v.setContentsMargins(0, 0, 0, 0)
         v.setSpacing(12)
         v.addWidget(section_label("VOICE CHANGER"))
-        v.addWidget(hint_label("Change your mic live in Discord and games. Pick a voice "
-                               "to turn it on, then use Hear my voice to try it."))
+        v.addWidget(hint_label("Change your mic live for whoever you send sounds to (Discord, a "
+                               "game, OBS). Pick a voice to turn it on, then use Hear my "
+                               "voice to try it."))
 
         # ---- the switch
         self.btn_power = QPushButton()

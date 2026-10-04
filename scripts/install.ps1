@@ -85,11 +85,11 @@ if ($cable) {
     Write-Host "Virtual cable found: $(($cable | Select-Object -First 1).Name)" -ForegroundColor Green
 } else {
     Write-Host ""
-    Write-Host "No virtual cable found. It's what lets Discord / games hear your sounds." -ForegroundColor Yellow
+    Write-Host "No virtual cable found. It's the usual way for Discord / games to hear your sounds (you can send them through Voicemeeter, a mixer or OBS instead)." -ForegroundColor Yellow
     if (Ask "Install VB-Cable (free, from vb-audio.com) now?") {
         & (Join-Path $root "installer\install-vbcable.ps1")
     } else {
-        Write-Host "No problem - the app has an Install button for it too."
+        Write-Host "No problem - the app can install it later, or send sounds through another device (Setup tab)."
     }
 }
 

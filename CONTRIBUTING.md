@@ -35,11 +35,11 @@ in a later commit.
    those. In code, docs and tests use `%APPDATA%`, `Path.home()`, `example.com`,
    and made-up names.
 3. **No files from your own app data.** Don't commit `config.json`, `onionboard.log`,
-   anything from `%APPDATA%\OnionBoard\` (the `browser\` folder holds your logins).
+   anything from `%APPDATA%\OnionBoard\` (`config.json` can hold a proxy password and the remote control key; the log holds your paths).
 4. **No audio you don't have the rights to.** Tests generate their audio in code
    (`numpy`); keep it that way. No copyrighted sound effects, music or clips.
 5. **No bundled third-party binaries.** Dependencies come from PyPI via
-   `requirements.txt`; VB-Cable is downloaded at install time because its licence
+   `requirements.txt`; VB-Cable is downloaded when someone chooses to install it because its licence
    forbids redistribution. Don't add `.exe`, `.dll` or driver files.
 6. **Assets must be ours.** Icons and artwork are drawn in code (`theme.py`,
    `icons.py`, `bunny.py`), except pictures made for this project in `assets/art/`
@@ -49,7 +49,8 @@ in a later commit.
    internet goes in the table in [SECURITY.md](SECURITY.md#what-the-app-does-on-the-network)
    in the same PR. No telemetry.
 8. **Loopback stays locked.** Local sockets bind to `127.0.0.1` only and must
-   check a per-launch secret with `secrets.compare_digest`. Never log the secret or
+   check a secret with `secrets.compare_digest`: a per-launch one, or, for the
+   opt-in remote control API, the key shown in Settings. Never log the secret or
    a URL containing it.
 
 If you commit something sensitive by accident, **don't just delete it in a new

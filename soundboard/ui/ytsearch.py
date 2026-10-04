@@ -4,7 +4,7 @@ hits (thumbnail, title, channel, length) from the site searches in ytdl.SOURCES
 (YouTube, YouTube Music, SoundCloud, TikTok sounds, Myinstants), with no web page
 and no video. While one runs the list makes way for a loading view: Bun or Hoot
 (picked at random each time) over a sliding bar and "Searching YouTube for ...".
-▶ plays one once and ＋ adds it as a
+Play plays one once and Add adds it as a
 pad; both hand the page to the link bar (ui/linkbar.py), which downloads just its
 audio. Sites without a search (Instagram, X…) work by pasting a link into the
 search box instead.
@@ -574,7 +574,7 @@ class SearchResults(QFrame):
         self._quiet.set()
         self._stats.connect(self._on_stats)
         self.net = QNetworkAccessManager(self)
-        net.apply_qt(self.net, "sounds_web")   # thumbnails: Settings > Privacy
+        net.apply_qt(self.net, "sounds_web")   # thumbnails: Settings > Privacy & security
         self._done.connect(self._on_done)
 
         v = QVBoxLayout(self)

@@ -29,20 +29,24 @@ class Note:
 NOTES = (
     Note("1.6.5", "Your privacy, your call", (
         ("shield", "A switch for everything that goes online",
-         "Settings > Privacy & security lists each thing Onion Board connects to: sound "
+         "Settings → Privacy & security lists each thing Onion Board connects to: sound "
          "search per site, radio, update checks, add-ons, voice downloads. Switch off what "
          "you don't use, or turn on Offline mode and it never goes online."),
         ("cable", "Hide your address",
-         "Send the app's connections through your own proxy, or through Tor (an optional "
-         "download from the Tor Project), so sites and radio stations don't see where "
-         "you are."),
+         "Settings → Connection: send the app's connections through your own proxy, or "
+         "through Tor (an optional download from the Tor Project), so sites and radio "
+         "stations don't see where you are."),
         ("radio", "See every connection",
-         "Settings > Connection > Network activity shows each connection the app makes "
+         "Settings → Connection → Network activity shows each connection the app makes "
          "and why. Saving that history between starts is up to you."),
         ("wave", "Quieter by default",
          "The radio maps ship with the app, secure streams come first, the radio only "
          "counts your plays if you ask it to, and update checks no longer send your "
          "version."),
+        ("live", "No virtual cable needed",
+         "Setup → Devices → Send to others through: the virtual cable (as before), "
+         "another device (Voicemeeter, a mixer, anything OBS captures) or nowhere (only "
+         "you hear your sounds). With the last two it never asks you to install the cable."),
     ), "privacy", "Open Privacy && security"),
 )
 

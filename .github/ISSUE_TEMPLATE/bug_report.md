@@ -10,9 +10,9 @@ labels: bug
 
 **Steps to reproduce**
 
-**Version** (title bar or Settings) and **Windows version**:
+**Version** (title bar or Settings → About) and **Windows version**:
 
-**Audio setup** (mic, headphones, which virtual cable):
+**Audio setup** (mic, headphones, and where sounds go: the virtual cable, another device, or nowhere):
 
 **Log**
 

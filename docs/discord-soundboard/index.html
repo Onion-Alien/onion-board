@@ -32,7 +32,10 @@
     sounds together and sends the mix into a <b>virtual cable</b>, a free audio driver that
     shows up as an extra mic called <code>CABLE Output</code>. You pick that as your mic in
     Discord, and your friends hear your voice and your sounds together.</p>
-  <p>Onion Board's installer sets the cable up for you, so there's nothing else to download.</p>
+  <p>Onion Board's installer can set the cable up for you (the box is ticked by default), so there's
+    nothing else to download. Don't want the cable? Under <b>Send to others through</b> on the Setup
+    tab, pick <b>Another device</b> (Voicemeeter, a mixer, a capture card, a second sound card) and
+    send the sounds there instead.</p>
 
   <h2>Setup, step by step</h2>
   <ol>
@@ -50,7 +53,7 @@
     focus, so you can fire a sound without tabbing out. There's also a small in-game overlay:
     press its key and a panel of pads appears over your game.</p>
   <p>The same setup works in any game with voice chat: set the game's microphone to
-    <code>CABLE Output</code> instead of Discord's.</p>
+    <code>CABLE Output</code> (or whichever mic your other device feeds) instead of Discord's.</p>
 
   <h2>Where to get sounds</h2>
   <ul>
@@ -61,10 +64,11 @@
 
   <h2>Common problems</h2>
   <ul>
-    <li><b>Friends hear nothing:</b> Discord's Input Device isn't <code>CABLE Output</code>.</li>
+    <li><b>Friends hear nothing:</b> Discord's Input Device isn't <code>CABLE Output</code>. (If you
+      chose <b>Another device</b>, it's the mic that device feeds. <b>Nowhere</b> sends nothing to others.)</li>
     <li><b>Sounds cut in and out:</b> set Input Profile to <b>Studio</b>, or turn off noise suppression.
       Onion Board's Setup tab has a check that tells you which Discord setting is chopping your sounds.</li>
-    <li><b>They hear sounds but not your voice:</b> tick <b>send</b> next to <i>My mic</i> at the bottom of the window.</li>
+    <li><b>They hear sounds but not your voice:</b> tick <b>Others hear it</b> in the <i>My mic</i> section at the bottom of the window.</li>
     <li><b>Only want the sounds, not your voice?</b> Untick that same box.</li>
   </ul>
 

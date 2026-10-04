@@ -34,7 +34,7 @@ def tune_runtime_for_audio():
     doesn't wait once: numpy lets go of the GIL in every operation on more than 500
     values (a stereo block is 960), and each time another thread busy in Python (the
     window painting, a station list being read, Onion Watch) takes it, the callback
-    waits a whole interval to get it back. At 1 ms the cable's callback took 15 ms
+    waits a whole interval to get it back. At 1 ms the send output's callback took 15 ms
     instead of 0.5 whenever anything else ran Python: a stutter in what others
     hear. At 0.2 ms it takes ~1 ms, and the busy thread loses nothing it would
     otherwise keep (test_engine: test_callback_keeps_pace_beside_busy_python).
@@ -295,7 +295,7 @@ def main():
     from PySide6.QtCore import QTimer
     if "--resume-setup" in sys.argv:   # back after the restart the cable asked for
         QTimer.singleShot(400, lambda: w.run_setup(resumed=True))
-    elif not w.cfg.setup_done:   # first launch: walk them through mic, headphones, cable
+    elif not w.cfg.setup_done:   # first launch: the setup wizard
         QTimer.singleShot(400, w.run_setup)
     if reset_note:
         QTimer.singleShot(900, lambda: w.toast(reset_note, "warn" if "Couldn't" in reset_note

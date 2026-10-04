@@ -1,5 +1,5 @@
 """Picking several pads at once (Ctrl+click, Shift+click, Ctrl+A) and changing them
-together: delete (one Undo brings them all back), colour, volume, fades, categories.
+together: remove (one Undo brings them all back), colour, volume, fades, categories.
 
 A pick is separate from the sound shown in the transport bar (MainWindow.current):
 clicking a pad still plays it, and the pick stays until Esc, the bar's ✕, or the
@@ -31,6 +31,11 @@ def swatch(color: str, size: int = 14) -> QIcon:
     p.drawEllipse(1, 1, size - 2, size - 2)
     p.end()
     return QIcon(pm)
+
+
+def count(n: int) -> str:
+    """"1 sound" / "3 sounds"."""
+    return f"{n} sound{'s' if n != 1 else ''}"
 
 
 class PadSelection(QObject):
@@ -69,7 +74,7 @@ class PadSelection(QObject):
             b.setToolTip(tip)
             b.clicked.connect(lambda _=False, b=b, fn=fn: fn(b))
             h.addWidget(b)
-        rm = QPushButton("Delete")
+        rm = QPushButton("Remove")
         rm.setObjectName("small")
         rm.setToolTip("Remove the picked sounds (Undo brings them back)")
         icons.set_icon(rm, "trash", "danger_text", size=12)
@@ -88,7 +93,7 @@ class PadSelection(QObject):
 
     def _refresh(self):
         n = len(self.picked)
-        self.lbl.setText(f"{n} sound{'s' if n != 1 else ''} selected · Ctrl+click adds or "
+        self.lbl.setText(f"{count(n)} selected · Ctrl+click adds or "
                          "removes one, Shift+click a range")
         self.bar.setVisible(n > 0)
         for sid, pad in self.mw.pads.items():
@@ -140,16 +145,17 @@ class PadSelection(QObject):
         """Right-click on a picked pad: the actions for all of them."""
         n = len(self.picked)
         m = QMenu(self.mw)
-        m.addSection(f"{n} sounds")
+        m.addSection(count(n))
         self._fill_colors(m.addMenu(swatch(PAD_COLORS[0]), "Colour"))
         m.addAction(icons.icon("volume"), "Volume…", self.ask_volume)
         m.addAction("Fade in / out…", self.ask_fades)
         self._fill_cats(m.addMenu("Categories"))
         m.addAction(icons.icon("folder"), "Export…",
-                    lambda: self.mw.export_sounds(self.sounds(), f"{n} sounds"))
+                    lambda: self.mw.export_sounds(
+                        self.sounds(), count(n)))
         m.addSeparator()
         m.addAction("Clear selection", self.clear)
-        m.addAction(icons.icon("trash", "danger_text"), f"Remove {n} sounds", self.delete)
+        m.addAction(icons.icon("trash", "danger_text"), f"Remove {count(n)}", self.delete)
         m.exec(pos)
 
     def _popup(self, button: QPushButton, fill):
@@ -190,7 +196,7 @@ class PadSelection(QObject):
     def _said(self, what: str):
         """Volume and fades don't show on the pads: say the change happened."""
         n = len(self.sounds())
-        self.mw.toast(f"{what} on {n} sound{'s' if n != 1 else ''}", "ok")
+        self.mw.toast(f"{what} on {count(n)}", "ok")
 
     def set_color(self, color: str):
         for m in self.sounds():
@@ -211,7 +217,7 @@ class PadSelection(QObject):
             return
         vols = {round(m.volume * 100) for m in sounds}
         start = vols.pop() if len(vols) == 1 else 100
-        v, ok = QInputDialog.getInt(self.mw, "Volume", f"Volume for {len(sounds)} sounds (%):",
+        v, ok = QInputDialog.getInt(self.mw, "Volume", f"Volume for {count(len(sounds))} (%):",
                                     start, 0, 200, 5)
         if ok:
             self.set_volume(v / 100)
@@ -233,7 +239,7 @@ class PadSelection(QObject):
         for label, attr in (("Fade in", "fade_in"), ("Fade out", "fade_out")):
             vals = {getattr(m, attr) for m in sounds}
             v, ok = QInputDialog.getDouble(
-                self.mw, label, f"{label} for {len(sounds)} sounds (seconds, 0 = off):",
+                self.mw, label, f"{label} for {count(len(sounds))} (seconds, 0 = off):",
                 vals.pop() if len(vals) == 1 else 0.0, 0.0, MAX_FADE_S, 1)
             if not ok:
                 return
@@ -252,8 +258,8 @@ class PadSelection(QObject):
         self.mw._save_now()
         self.mw._fill_categories()
         self.mw.apply_filter(self.mw.search.text())
-        self.mw.toast(f"✓ Added {n} sound{'s' if n != 1 else ''} to {html.escape(name)}" if on
-                      else f"Took {n} sound{'s' if n != 1 else ''} out of {html.escape(name)}")
+        self.mw.toast(f"✓ Added {count(n)} to {html.escape(name)}" if on
+                      else f"Took {count(n)} out of {html.escape(name)}")
 
     def new_category(self, *_):
         keep = set(self.picked)   # the new, empty category shows: that unpicks them

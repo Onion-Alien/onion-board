@@ -92,8 +92,8 @@ def result_html(res: dict, vm: str) -> str:
         "gate": (
             "<b>Quiet parts of your sounds are cut off</b> (fades, quiet intros). Switch "
             "<b>Input Mode</b> to <b>Push to Talk</b> and turn on <b>Auto push-to-talk</b> "
-            "here, or turn off <b>Automatically determine input sensitivity</b> and drag "
-            "the slider almost all the way left."),
+            "(Settings → Hotkeys), or turn off <b>Automatically determine input "
+            "sensitivity</b> and drag the slider almost all the way left."),
         "agc": (
             "<b>Automatic gain control is pumping your volume.</b> Set <b>Input Profile</b> "
             "to <b>Studio</b> (or turn off <b>Automatic Gain Control</b>)."),
@@ -127,7 +127,7 @@ class ChatCheck(QObject):
             return
         e = self.engine
         if e.main_stream is None:
-            self.done.emit({"issues": [], "error": "Set up the virtual cable first "
+            self.done.emit({"issues": [], "error": "Pick where your sounds go first "
                                                    "(Setup tab → Step-by-step guide)."})
             return
         from soundboard import appaudio
@@ -220,8 +220,8 @@ class DiscordGuide(QDialog):
             "Discord? Set <b>Noise Suppression</b> to <b>None</b> and turn off <b>Echo "
             "Cancellation</b> and <b>Automatic Gain Control</b>.</span></li>"
             "<li style='margin-bottom:8px'><b>Input Mode</b>: <b>Push to Talk</b> works best "
-            "(set the same key under Auto push-to-talk here and Onion Board holds it for "
-            "you while a sound plays). On <b>Voice Activity</b>, turn off "
+            "(set the same key under Settings → Hotkeys → Auto push-to-talk and Onion "
+            "Board holds it for you while a sound plays). On <b>Voice Activity</b>, turn off "
             "<b>Automatically determine input sensitivity</b> and drag the slider almost "
             "all the way left, or quiet parts of your sounds get cut.</li>"
             "<li>Click <b>Let's Check</b> in Discord, then <b>Check Discord</b> below. "
@@ -309,18 +309,18 @@ class GameGuide(QDialog):
             "<ol style='margin-left:-20px'>"
             f"<li style='margin-bottom:8px'><b>Microphone / Input device</b>: "
             f"<b style='color:{_ok()}'>{html.escape(vm)}</b>. No such setting? Use "
-            "<b>My game has no microphone setting</b> on the Setup tab.</li>"
+            "<b>Game has no microphone setting?</b> on the Setup tab.</li>"
             "<li style='margin-bottom:8px'>Turn <b>off</b> anything called <b>noise "
             "suppression</b>, <b>noise cancellation</b>, <b>denoiser</b>, <b>background "
             "sound removal</b>, <b>voice clarity</b> or <b>automatic gain</b>. The AI "
             "denoisers (VRChat, Minecraft's Simple Voice Chat) wipe out music almost "
             "completely.</li>"
             "<li style='margin-bottom:8px'><b>Push to talk</b> instead of open mic or voice "
-            "activation, with the same key under <b>Auto push-to-talk</b> here: voice "
-            "activation cuts the quiet parts of sounds, and some games send only speech "
-            "on it, never music. Some games' anti-cheat ignores keys other programs press: "
-            "if your mic doesn't open for a sound, <b>hold your push-to-talk key "
-            "yourself</b> while it plays.</li>"
+            "activation, with the same key under <b>Settings → Hotkeys → Auto "
+            "push-to-talk</b>: voice activation cuts the quiet parts of sounds, and some "
+            "games send only speech on it, never music. Some games' anti-cheat ignores "
+            "keys other programs press: if your mic doesn't open for a sound, "
+            "<b>hold your push-to-talk key yourself</b> while it plays.</li>"
             "<li>On the Setup tab, set <b>Who's listening</b> to the voice chat your game "
             "is built on, so your sounds are shaped for it: <b>Vivox</b> (Valorant, "
             "League of Legends, Rainbow Six Siege, Overwatch 2), <b>Epic Online "

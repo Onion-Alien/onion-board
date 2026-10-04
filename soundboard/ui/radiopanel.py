@@ -1,6 +1,6 @@
 """The Radio tab: internet radio from all over the world, picked on a world map or
-by searching, played through the engine so it can go out through your mic like
-the Browser tab's audio. The directory, player and globe page are in radio.py; the
+by searching, played through the engine so it can go out to others like your
+sounds do (LIVE). The directory, player and globe page are in radio.py; the
 flat map (the default view) is ui/flatmap.py, the 3D globe its HD option.
 
 Nothing touches the network until the tab is first opened.
@@ -331,7 +331,7 @@ class _FilterRow(QWidget):
 
 
 class RadioTab(QWidget):
-    clip_ready = Signal(object, str)   # audio, suggested name (like BrowserTab's)
+    clip_ready = Signal(object, str)   # audio, suggested name (like AppsTab's)
     active_changed = Signal(bool)      # a station started / stopped (for the tab's live dot)
 
     def __init__(self, engine, cfg, save_cb, meter_cls, directory: RadioDirectory | None = None,
@@ -488,7 +488,7 @@ class RadioTab(QWidget):
         bh.addWidget(self.chk_hear)
         v.addWidget(bar_)
 
-        # LIVE always starts off, like the Browser tab's
+        # LIVE always starts off
         self._on_live(False)
         self._on_vol(self.vol.value())
         hear = bool(cfg.radio.get("monitor", True))
@@ -816,7 +816,7 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
         class LocalOnly(QWebEngineUrlRequestInterceptor):
             # the page and everything it loads ship with the app: a request for the
             # network (a bug, or a station name that got past the escaping) is refused,
-            # so the map can't step around Settings > Privacy > Connection
+            # so the map can't step around Settings > Connection
             def interceptRequest(self, info):
                 if info.requestUrl().scheme().lower() not in LOCAL_SCHEMES:
                     info.block(True)

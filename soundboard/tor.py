@@ -500,7 +500,7 @@ class Tor:
         waits up to `timeout`; raises net.ProxyError (nothing is sent) otherwise."""
         if not self.exe:
             raise net.ProxyError(f"Not connecting: {NOT_INSTALLED} Or pick another "
-                                 f"Connection in {net.WHERE}.")
+                                 "connection in Settings > Connection.")
         with self._cond:
             if not self.enabled:
                 raise net.ProxyError("Not connecting: Tor is switched off")

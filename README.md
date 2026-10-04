@@ -1,8 +1,8 @@
 # Onion Board
 
 A free soundboard for Windows. Press a pad or a hotkey, even in-game, and **your
-friends in Discord or your game hear the sound through your mic**, with your voice
-or without it.
+friends in Discord or your game hear the sound**, with your voice or without it.
+Or send it to your stream, or keep it to your own headphones.
 
 ## ⬇️ [Download Onion Board for Windows](../../releases/latest/download/OnionBoardSetup.exe)
 
@@ -23,8 +23,10 @@ Version **1.6.5** · Windows 10 / 11 · free, no account, no ads, no tracking ·
 
 ## What it does
 
-- **Sounds into Discord and games** through a free virtual cable the installer sets up.
-  Your mic goes along, or tick it off and send only sounds.
+- **Sounds into Discord and games.** The easy default is a free virtual cable the
+  installer offers to set up. Or send them to any other output you pick (Voicemeeter,
+  a mixer, a capture card, OBS), or nowhere, so only you hear them. Your mic goes
+  along, or tick it off and send only sounds.
 - **Hotkeys that work in-game**, MIDI pads, an in-game overlay, Stream Deck support.
 - **Add sounds from anywhere**: drag in files, or search YouTube and SoundCloud
   inside the app.
@@ -39,12 +41,23 @@ The full list is in [docs/FEATURES.md](docs/FEATURES.md).
 ## Get started
 
 1. **[Download `OnionBoardSetup.exe`](../../releases/latest/download/OnionBoardSetup.exe)**
-   and double-click it. Leave the boxes as they are and click **Install**, then
-   **Yes** when Windows asks (that's the virtual cable).
-2. **Answer Bun the bunny's four questions**: your mic, your headphones, the cable.
-3. **In Discord or your game, set your microphone to `CABLE Output`.**
-   (Discord: *User Settings → Voice & Video → Input Device*, and set *Input Profile*
-   to **Studio** so it doesn't filter your sounds out.)
+   and double-click it. Leave the boxes as they are and click through to **Install**,
+   then **Yes** when Windows asks (that's the free virtual cable; untick it if you'll
+   send sounds to another device or nowhere).
+2. **Follow Bun the bunny's four steps**: your mic, your headphones, where your
+   sounds go, and what to set in Discord or your game.
+3. **Pick where your sounds go** (step 3 of Bun's guide, or later on the *Setup* tab →
+   Devices → *Send to others through*):
+   - **The virtual cable** (the default): in Discord or your game, set your
+     microphone to `CABLE Output`. (Discord: *User Settings → Voice & Video → Input
+     Device*, and set *Input Profile* to **Studio** so it doesn't filter your sounds
+     out.)
+   - **Another device**: any output but your headphones, such as Voicemeeter, a
+     mixer, a capture card or a second sound card. Nothing is installed. In OBS add
+     it as an *Audio Output Capture*; in Voicemeeter or a mixer, send that input on
+     to wherever it should go.
+   - **Nowhere**: only you hear your sounds (and the *Stream output* if you set one).
+     Nothing to change in Discord or your game.
 4. **Drag sounds onto the window** and double-click a pad to play it. Right-click a
    pad for a hotkey or **Effects…**.
 
@@ -54,12 +67,15 @@ The full list is in [docs/FEATURES.md](docs/FEATURES.md).
 
 ### Something's not right?
 
-- **Friends hear nothing:** their mic must be **`CABLE Output`**, and the *Your mic
-  in Discord / games* pill in Onion Board should be green.
+- **Friends hear nothing:** the pill at the top should be green. With the cable, it
+  reads *Your mic in Discord / games* and their app's microphone must be `CABLE
+  Output`. With another device, it reads *Sending to:* and whatever sits on the other
+  end (OBS, Voicemeeter, your mixer) must be picking that device up. With *Nowhere*,
+  only you hear sounds, on purpose.
 - **They hear sounds but not you:** tick **Others hear it** under *My mic*.
-- **Check it yourself:** *Setup → Record 6s → play back* records exactly what others get.
-- **Using Voicemeeter, a mixer or OBS instead of the cable?** *Setup → Devices →
-  Send to others through → Another device*.
+- **Check it yourself:** *Setup → Record 6s → play back* records what others get (it
+  needs the cable or another device, not *Nowhere*).
+- **Switch how sounds go out any time:** *Setup → Devices → Send to others through*.
 - **Still stuck?** [Open an issue](../../issues/new/choose) and attach
   `%APPDATA%\OnionBoard\onionboard.log` (skim it first: it has your device names).
 
@@ -75,6 +91,8 @@ version needs its own name.
 Onion Board comes with no sounds. Only play what you have the right to use. It isn't
 affiliated with YouTube, SoundCloud, Myinstants, Discord, VB-Audio or any other
 service it mentions.
+
+### Support Onion Board
 
 **Chip in** (crypto only for now; trust only the addresses on
 `github.com/Onion-Alien/onion-board`):

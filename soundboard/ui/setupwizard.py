@@ -1,12 +1,12 @@
-"""Quick setup: the four questions a first-time user has to answer, one per page,
+"""Quick setup: the four steps a first-time user goes through, one per page,
 in plain words. Shown on the very first launch (and from the Setup tab's
 Step-by-step guide button any time after).
 
   1. Which microphone do you talk into?   (live level bar: "talk, it should move")
   2. Where do you listen?                 (test sound)
-  3. The virtual cable                    (checks it's there; installs it if not;
-                                           or another device / nowhere instead)
-  4. Tell Discord / your game             (the one setting outside the app)
+  3. Where your sounds go                 (the virtual cable: checks it's there, installs
+                                           it if not; or another device / nowhere instead)
+  4. Tell Discord / your game / OBS       (the one setting outside the app)
 
 Every choice is applied to the engine as it's made, so the level bar and the test
 sound use the real devices. The window's own device boxes are refreshed at the end.
@@ -334,11 +334,12 @@ class SetupWizard(QDialog):
         p = QWidget()
         v = QVBoxLayout(p)
         self.bun_cable = BunnyWidget("plug")
-        v.addLayout(_header("The virtual cable",
-                            _label("This is a free add-on that works like an invisible "
-                                   "microphone. Onion Board puts <b>your sounds</b> (and your "
-                                   "voice, if you send it) into it, and Discord or your game "
-                                   "listens to it."),
+        v.addLayout(_header("Where do your sounds go?",
+                            _label("Usually into a <b>virtual cable</b>: a free add-on that "
+                                   "works like an invisible microphone. Onion Board puts "
+                                   "<b>your sounds</b> (and your voice, if you send it) into "
+                                   "it, and Discord or your game listens to it. Not using a "
+                                   "cable? Use the button below."),
                             self.bun_cable))
         self.cable_status = _label("")
         self.cable_status.setStyleSheet("font-size:12pt; padding:12px;")
@@ -427,14 +428,16 @@ class SetupWizard(QDialog):
         p = QWidget()
         v = QVBoxLayout(p)
         self.discord_text = _label("")
-        v.addLayout(_header("Last step: tell Discord or your game", self.discord_text,
-                            BunnyWidget("star", celebrate=True)))
+        head = _header("Last step: tell Discord or your game", self.discord_text,
+                       BunnyWidget("star", celebrate=True))
+        self.discord_title = head.itemAt(0).layout().itemAt(0).widget()
+        v.addLayout(head)
         row = QHBoxLayout()
         self.btn_copy = QPushButton("Copy the name")
         icons.set_icon(self.btn_copy, "copy")
         self.btn_copy.clicked.connect(self.copy_name)
         row.addWidget(self.btn_copy)
-        nomic = self.btn_nomic = QPushButton("My game has no microphone setting")
+        nomic = self.btn_nomic = QPushButton("Game has no microphone setting?")
         nomic.clicked.connect(self.win.open_windows_mic)
         row.addWidget(nomic)
         row.addStretch(1)
@@ -766,6 +769,10 @@ class SetupWizard(QDialog):
         self._vm = name or dev or "CABLE Output"
         for b in (self.btn_steam, self.btn_game, self.btn_nomic):   # mic settings: not
             b.setVisible(bool(name) or cfg.route == "cable")      # without a mic end to pick
+        self.discord_title.setText(
+            "Last step: nothing to tell" if cfg.route == "off" else
+            "Last step: pick it up where it arrives" if cfg.route == "device" and dev
+            and not name else "Last step: tell Discord or your game")
         if cfg.route == "off":
             self.discord_text.setText(
                 "Your sounds play only for you: in your headphones, where OBS's "

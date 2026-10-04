@@ -75,7 +75,7 @@ the launcher the shortcuts and PyInstaller use. The app is the `soundboard` pack
 | `soundboard/autostart.py` | *Start with Windows*: the per-user `Run` registry value (`--tray` starts it hidden) |
 | `soundboard/shellicon.py` | the app icon in the theme's colours outside its windows: writes `%APPDATA%\OnionBoard\icons\onionboard-<hash>.ico`, puts it on the main window's relaunch properties (taskbar right-click menu, a pin) and on this copy's own *Onion Board* Desktop / Start menu / taskbar-pin shortcuts |
 | `soundboard/updates.py` | "is there a newer version?" (GitHub Releases, once a day) and the self-update: downloads the release's installer, checks its SHA-256, runs it silently and reopens the app |
-| `soundboard/feedback.py` | where *Send feedback* and *Report a problem* (Settings → Add-ons & help) go: a no-account form or a GitHub issue, opened in the browser with the version filled in; the app sends nothing |
+| `soundboard/feedback.py` | where *Send feedback* and *Report a problem* (Settings → Add-ons & help, and Settings → About) go: a no-account form or a GitHub issue, opened in the browser with the version filled in; the app sends nothing |
 | `soundboard/errors.py` | other libraries' errors (yt-dlp, libsndfile, PortAudio, Windows, network) in plain words, minus their "report this to us" lines and command-line tips; the original stays in the log and in the report. Ones the user can't fix get a *Report it* link/button: a pre-filled issue on this repo, opened in the browser |
 | `soundboard/hangwatch.py` | notes down a frozen window: if the UI thread stops answering for 5 s, its stack goes into the log and a report beside the crash reports (nothing shown or sent) |
 | `soundboard/ui/icons.py` | the line icons, drawn in code and recoloured with the theme |
@@ -108,7 +108,7 @@ the launcher the shortcuts and PyInstaller use. The app is the `soundboard` pack
 | `soundboard/ui/triggerstab.py` | the Triggers tab: Hoot (`ui/owl.py`) and *Get Onion Watch* until the add-on is installed, then the add-on's own tab, with a bar when an update is out and a button to remove it |
 | `soundboard/ui/triggershost.py` | Onion Board as the Onion Watch add-on's host: the board's sounds and playing them (a ringing trigger loops in the headphones), `Config.screen`, the trigger pictures' folder, the theme's colours |
 | `soundboard/ui/appspanel.py` | the Apps tab: one card per program (level, **Send**, volume, *Hear it myself*); programs you switch on are remembered by .exe and picked up again when they run |
-| `soundboard/engine.py` | real-time audio: WASAPI streams (mic in, cable out, headphones out, the optional stream output for OBS), mixing (sounds, radio and captured programs), pause/seek, live speed / pitch, limiter, watchdog |
+| `soundboard/engine.py` | real-time audio: WASAPI streams (mic in, what others hear out (the cable or another device), headphones out, the optional stream output for OBS), mixing (sounds, radio and captured programs), pause/seek, live speed / pitch, limiter, watchdog |
 | `soundboard/eq.py` | 7-band equalizer and presets: matched peak / shelf bands that keep their analog shape up to Nyquist; a change crossfades in (no clicks) |
 | `soundboard/dsp.py` | the app's own filter maths (it no longer imports scipy): `sosfilt` / `lfilter` run as block matrix products with a parallel prefix scan for the state (float64 state, so float32 audio stays accurate), Butterworth design, matched EQ bands, `SmoothSos` (click-free design changes), an O(n) running minimum |
 | `soundboard/net.py` | every outgoing connection (Settings → Privacy & security): direct, or through a SOCKS5 / HTTP proxy with names resolved by the proxy and no fallback to direct; and the per-feature switches and Offline mode, which refuse a switched-off feature's requests before any lookup. `urlopen(feature=…)` for urllib, and a loopback relay (per-launch secret, the feature as its user name) for FFmpeg, yt-dlp, Qt's network managers and child processes, in every mode |
@@ -141,7 +141,7 @@ the launcher the shortcuts and PyInstaller use. The app is the `soundboard` pack
 | `soundboard/chatcheck.py` | the Discord check: a test sound, and how to tell from Discord's Mic Test playback whether its noise suppression, gate or gain control is changing your sounds |
 | `soundboard/ui/chatguide.py` | the Discord and game voice-chat guides (the settings that keep sounds clean) and the check that runs from them |
 | `soundboard/ui/streamguide.py` | the streamer guide for remote control (Stream Deck keys, channel points, chat commands, with the links to copy) and the prompt that lets an AI assistant set it up |
-| `soundboard/sendfx.py` | the send stage before the cable: phase-aware mono downmix, lookahead peak limiter, ducking under your voice |
+| `soundboard/sendfx.py` | the send stage before what others hear (the cable or another device): phase-aware mono downmix, lookahead peak limiter, ducking under your voice |
 | `soundboard/cableformat.py` | reads both ends of the virtual cable's Windows format and sets them to 48 kHz, so the cable passes sound through unconverted |
 | `modules/` | add-ons shipped with the app: `retro-fx` (an effects module, the example to copy), `live-voice` (a service module with its own Python environment) and `translate-zh/es/fr/de/ru` (translation modules: a manifest naming a model that's downloaded only when picked) |
 | `build.ps1`, `installer/` | the PyInstaller build and the Inno Setup installer (`installer/OnionBoard.iss`); `installer/install-vbcable.ps1` downloads VB-Cable, checks its signature and installs it (used by the app and the installer) |
@@ -201,19 +201,21 @@ the newest backup is used, so the pad list is never silently reset.
   for echo / reverb tails, and a module effect that throws is skipped.
 - **Live speed / pitch** (the `1x` buttons) works differently, because it has to be
   instant. Sounds are read at a fractional rate with cubic interpolation (like a
-  tape). A pitch shifter on the sounds bus (a crossfaded two-head delay line, 70 ms
-  window) then puts the pitch back when *keep pitch* is on, and adds the pitch
-  slider on top.
+  tape). A pitch shifter on the sounds bus (the voice changer's WSOLA pitch effect,
+  one per channel: 30 ms pieces spliced where the waveforms line up, then resampled;
+  about 50 ms of delay; switching it on or off crossfades) then puts the pitch back
+  when *Keep pitch when changing speed* is on, and adds the pitch slider on top.
 - Radio recordings are spooled to a 16-bit WAV as they happen instead of growing in
   RAM, and the resampled copies kept for non-48 kHz devices are capped at 512 MB (LRU).
   A press never waits for a copy: until it's made (on a thread) the sound is read
   from the 48 kHz original at the device's rate, like the live speed does.
-- **The send stage** (`soundboard/sendfx.py`) is the last thing before the cable.
+- **The send stage** (`soundboard/sendfx.py`) is the last thing before what others hear (the cable,
+  or the device the route picked).
   Everything Discord and games send is one channel, so the sounds are downmixed
   here first, per band: a band that is mostly out of phase between left and right
   is summed with the right channel flipped, and wide stereo gets back the power a
   plain average loses (a plain average took out-of-phase bass down 25 dB). Your
-  mic is never touched by it. Then a lookahead peak limiter (3 ms) holds the cable
+  mic is never touched by it. Then a lookahead peak limiter (3 ms) holds the send
   at -3 dBFS, because Opus puts peaks back up by ~2.5 dB and the listener's decoder
   clips them; it turns the level down around a peak instead of bending the
   waveform. Optionally the sounds duck under your voice while the mic hears you.
@@ -221,7 +223,7 @@ the newest backup is used, so the pad list is never silently reset.
   Windows' built-in `auto_convert` resampler was measured garbling VB-Cable audio
   (about 70% junk), so it's never used.
 - *Send my mic* off (sounds only) keeps the mic stream open, so the meter, the tests
-  and live voice-to-speech still hear it; only its mix into the cable is skipped.
+  and live voice-to-speech still hear it; only its mix into what others hear is skipped.
 - Virtual cables are hidden from the app's mic list. Picking the cable as the app's
   own mic makes a feedback loop (a loud screech).
 - Hotkeys use Windows' `RegisterHotKey`, not a keyboard hook. The app is never in
@@ -237,7 +239,7 @@ the newest backup is used, so the pad list is never silently reset.
   **⚙ Settings → Audio → Audio buffering: Safer** trades a little delay for bigger
   buffers if a device keeps crackling.
 - A stream whose callback stops (headset unplugged, sample rate changed, PC woke from
-  sleep) is reopened automatically within about a second; a device that failed to open
+  sleep) is reopened automatically after 1.5 s of silence from it; a device that failed to open
   is retried every few seconds.
 - The audio callbacks never take the engine lock: the voice list is an immutable tuple
   swapped by the UI thread. An exception inside a callback is logged once and that

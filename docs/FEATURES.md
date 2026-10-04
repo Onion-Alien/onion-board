@@ -11,14 +11,18 @@ The full list. The [README](../README.md) has the short version and how to get s
   rename, export or delete it. The in-game overlay shows the same category, and
   its **R** key (numpad **\***) switches to the next one. Right-click a category to
   give it a random-sound hotkey, or to *Play them all* (in order or shuffled). With
-  *Sound hotkeys only work in the category showing* (Settings → Hotkeys) each
-  category is its own set of keys: one key, a different sound per category.
-- **Remove can be undone:** *Removed “…” · Undo* stays up for 10 seconds, and the
-  audio file then goes to the Recycle Bin rather than being deleted outright.
+  *Use hotkeys per category* (Settings → Hotkeys) each category is its own set of
+  keys: one key, a different sound per category.
+- **Remove can be undone:** *Removed “…” · Undo* stays up for 10 seconds. After that
+  the sound waits in **Recently deleted** (the *Backup* menu, or the bin button that
+  shows while it holds sounds) for 30 days, and *Bring back* returns it exactly as it
+  was. Only when it ages out does its audio file go to the Recycle Bin.
 - **Backup / share (*Backup* button, or Settings → General):** *Export everything*
   writes every sound (picture, effects, hotkey, categories) and your settings to
-  one `.zip`; import it on a new PC. A category or a single pad exports as a sound
-  pack to share; importing skips sounds you already have. The format is a plain
+  one `.zip`; import it on a new PC (which audio devices and where sounds go stay
+  per PC). A category or a single pad exports as a sound pack to share; importing
+  skips sounds you already have. *Import from another soundboard* brings sounds over
+  from Soundpad, Resanance, Soundux or EXP Soundboard. The format is a plain
   zip of JSON and the original audio files — see
   [BACKUP-FORMAT.md](BACKUP-FORMAT.md).
 - **Per sound:** global hotkey (works in-game) or MIDI pad, volume, loop, what
@@ -40,12 +44,14 @@ The full list. The [README](../README.md) has the short version and how to get s
   pad. Pads with effects show **FX**; *Reset* goes back to the original. The
   original file is never changed.
 - **Your mic on or off:** send your voice with the sounds, or sounds only.
-- **No virtual cable? Send it anywhere** (Setup → Devices → *Send to others
-  through*): the virtual cable (the default), **another device** (Voicemeeter, a
-  mixer, a capture card, any output OBS captures as an *Audio Output Capture*) or
-  **nowhere** (only you hear your sounds, and the stream output if you set one).
-  With another device the app never puts the cable back, never asks you to
-  install it, and shows green once it's sending.
+- **Where your sounds go** (Setup → Devices → *Send to others through*, also in
+  Settings → Audio): **the virtual cable** (the default; the installer offers it, and
+  Discord or the game uses its *CABLE Output* as a mic), **another device** (any output
+  but your headphones: Voicemeeter, a mixer, a capture card, a second sound card, any
+  output OBS captures as an *Audio Output Capture*) or **nowhere** (only you hear your
+  sounds, and the stream output if you set one). With another device the app never puts
+  the cable back, never asks you to install it, and the header pill turns green once
+  it's sending. With nowhere nothing nags. The choice is per PC and isn't in backups.
 - **Stream output for OBS** (Settings → Audio → *Stream output*): what others hear,
   without the voice chat shaping, on a device of its own (a second virtual cable such
   as VB-Cable A+B, or any output you don't listen on). In OBS add it as an *Audio
@@ -55,8 +61,9 @@ The full list. The [README](../README.md) has the short version and how to get s
 - **Transport bar:** play/pause, stop, a seek slider, and **speed & pitch while
   it plays** (the `1x` button: 0.25×–2×, ±12 semitones, keep the pitch or not).
   That's for listening and isn't saved; use Effects to keep a version.
-- **Any window size:** shrink it down to 300 × 300 and it stays usable. Less
-  important controls tuck away as it gets smaller and come back when it grows.
+- **Any window size:** less important controls tuck away as it gets smaller and come
+  back when it grows. Small enough (below roughly 440 × 380) it becomes a mini
+  player with your pads and the play / stop controls, down to 260 × 120.
 - **Global hotkeys** (set in **⚙ Settings → Hotkeys**, the overlay key in
   **⚙ Settings → Overlay**; all work in-game):
   - Stop all, and pause/resume all.
@@ -126,9 +133,10 @@ The full list. The [README](../README.md) has the short version and how to get s
 - **Test mode:**
   - **Hear what they hear:** your mic plus the sounds exactly as others get them
     (a red banner shows while it's on).
-  - **Record 6s → play back:** records the virtual cable's output, plays it back,
-    and reports whether your voice and sounds are in it and whether the balance
-    is off.
+  - **Record 6s → play back:** records what goes out (the cable's output end, or the
+    mix sent to another device), plays it back, and reports whether your voice and
+    sounds are in it and whether the balance is off. Not available when sounds go
+    nowhere.
 - **Search YouTube and SoundCloud** from the Sounds tab: Enter in *Search sounds*
   lists results (thumbnail, title, length) in place of the pads; *Play* plays one
   once, *Add* keeps it as a pad (only the audio is downloaded, via
@@ -143,10 +151,12 @@ The full list. The [README](../README.md) has the short version and how to get s
   and Meme (Flashbang, Deep Fried, Retro 98, Comic Sans…); they switch live —
   plus hotkeys, overlay, window and audio options. A category sidebar keeps every
   page visible: **Privacy & security** groups online permissions and Offline mode;
-  **Connection** holds Direct, proxy and Tor; **Updates** holds update scheduling
-  and maintenance; **General** holds window, startup and backups; **Add-ons & help**
-  holds Onion Watch, feedback and support. The other categories are Appearance,
-  Audio, Hotkeys, Overlay and Remote. Changes apply immediately.
+  **Connection** holds Direct, proxy and Tor; **Data & quality** holds download
+  sizes, radio quality and search extras; **Updates** holds update scheduling
+  and maintenance; **General** holds window, startup, backups and *Start over*;
+  **Add-ons & help** holds Onion Watch, feedback and support; **About** holds the
+  version and links. The other categories are Appearance, Audio, Hotkeys, Overlay
+  and Remote. Changes apply immediately.
 - **MIDI pads and macro keypads:** a pad controller (Akai LPD8 / MPD, Launchpad,
   any USB MIDI keyboard) works without extra software: set a hotkey and hit a pad
   instead of pressing a key. Pads work for sounds, stop / pause, random sounds and
@@ -167,13 +177,15 @@ The full list. The [README](../README.md) has the short version and how to get s
   it needs (the links, your sounds) to set up whatever tools you use with you.
 - **Runs in the background:** closing the window keeps it in the tray (hotkeys and
   the overlay keep working; right-click the tray icon → *Quit*). Optionally
-  **starts with Windows**, straight to the tray.
+  **starts when you sign in**, straight to the tray (Settings → General).
 - **Updates itself:** once a day it checks GitHub for a new version (untick it in
   Settings → Updates). *Update now* downloads it, checks it's the file GitHub lists,
   and on *Restart now* installs it and reopens the app, keeping your sounds and
   settings. Nothing is downloaded until you click.
 
 ## How it works
+
+With the virtual cable (the default way):
 
 ```
 🎤 your mic ── send ✓ / ✗ ──┐
@@ -186,5 +198,6 @@ into one end, and Discord or the game uses the other end as a microphone. You he
 the sounds in your own headphones separately.
 
 Not using the cable? Setup → Devices → **Send to others through** → *Another
-device* sends the same mix into whatever you pick instead (Voicemeeter, a mixer,
-OBS), or *Nowhere* keeps it to your headphones and the stream output.
+device* sends the same mix into whatever output you pick instead (Voicemeeter, a
+mixer, a capture card, OBS), or *Nowhere* keeps it to your headphones and the
+stream output.

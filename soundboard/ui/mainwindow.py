@@ -82,7 +82,7 @@ TABS = (("Sounds", "Your sound buttons: click one to play it"),
         ("Apps", "Send another program's sound (music player, game…)"),
         ("Triggers", "Play a sound when something shows up on your screen (“YOU DIED”…)"),
         ("Voice", "Change your voice, or talk as a computer voice"),
-        ("Setup", "Connect to Discord / games, pick devices, test it"))
+        ("Setup", "Pick where your sounds go (Discord, games, OBS…), test it"))
 
 
 UNDO_S = 10          # how long "Removed … · Undo" stays up
@@ -600,11 +600,11 @@ class MainWindow(QMainWindow):
         row.addWidget(self.vol_mic)
 
         send_lbl, row = group("live", "WHAT OTHERS HEAR",
-                              "Everything going out to Discord / the game right now: "
-                              "your mic plus whatever is live")
+                              "Everything going out to others right now (Discord, a game, "
+                              "OBS…): your mic plus whatever is live")
         self.out_meter = Meter()
         self.out_meter.setMinimumWidth(60)
-        self.out_meter.setToolTip("Level of what Discord / the game receives")
+        self.out_meter.setToolTip("Level of what others receive (Discord, the game, OBS…)")
         row.addWidget(self.out_meter, 1)
         self.btn_check = QPushButton("Hear what they hear")
         self.btn_check.setObjectName("miccheck")
@@ -1037,7 +1037,8 @@ class MainWindow(QMainWindow):
         self.btn_nomic.clicked.connect(self.open_windows_mic)
         hv.addWidget(self.btn_nomic)
         guide = QPushButton("Step-by-step guide")
-        guide.setToolTip("Walks you through mic, headphones, the cable and Discord")
+        guide.setToolTip("Walks you through mic, headphones, where your sounds go "
+                        "(the cable, another device or nowhere) and Discord")
         icons.set_icon(guide, "check")
         guide.clicked.connect(self.run_setup)
         hv.addWidget(guide)
@@ -1104,9 +1105,10 @@ class MainWindow(QMainWindow):
         lcol.addStretch(1)
 
         # ---- test
-        testcard, tv = card("TEST IT", "Talk while a sound plays. Records what Discord, the "
-                                       "game or OBS actually receives, plays it back, and "
-                                       "tells you if your voice + sounds are in it.", roomy=True)
+        testcard, tv = card("TEST IT", "Talk while a sound plays. Records what goes out to "
+                                       "others (what Discord, the game or OBS receives), plays "
+                                       "it back, and tells you if your voice + sounds are in "
+                                       "it.", roomy=True)
         self.btn_rec = QPushButton("Record 6s → play back")
         self.btn_rec.setObjectName("primary")
         icons.set_icon(self.btn_rec, "record", "on_accent")
@@ -1550,7 +1552,8 @@ class MainWindow(QMainWindow):
             step = (f"<b style='color:{theme.status('warn')}'>"
                     "One-time setup:</b> install the free virtual "
                     "cable. It's what lets Discord and games hear your sounds — without it, "
-                    "only you can hear them.")
+                    "only you can hear them. Use Voicemeeter, a mixer or OBS instead? Pick "
+                    "<b>Another device</b> under <b>Send to others through</b>.")
         elif vm and e.main_stream is not None:
             state = "ok"
             out = (f"<b style='color:{ok}'>{vm}</b> — your new mic "
@@ -2147,8 +2150,8 @@ class MainWindow(QMainWindow):
         if not on:
             tip = "Click to go live again: others hear you and your sounds"
         elif others:
-            tip = ("Click to mute: nothing at all goes out to Discord / the game (you "
-                   "still hear everything)")
+            tip = ("Click to mute: nothing at all goes out to others (Discord, the game, "
+                   "OBS…). You still hear everything")
         elif stream:
             tip = ("Nothing goes out to others, only to the stream output. Click to mute "
                    "that too (you still hear everything)")
@@ -2354,7 +2357,7 @@ class MainWindow(QMainWindow):
             m = self.meta(self._queue[0])
             more = f" (+{len(self._queue) - 1} more)" if len(self._queue) > 1 else ""
             self.status.setText(f"Up next: “{html.escape(m.name if m else '?')}”{more} · "
-                                "Stop everything clears the queue")
+                                "Stop all clears the queue")
         elif self.status.text().startswith("Up next:"):   # the queue ran out / was cleared
             self._update_status()
 
@@ -3821,7 +3824,7 @@ class MainWindow(QMainWindow):
         info = html.escape(rel.notes).replace("\n", "<br>") if rel.notes else ""
         installable = updates.can_install() and bool(rel.asset_url)
         if installable:
-            info += ("<p>Update now downloads it in the background (about 140 MB); you "
+            info += ("<p>Update now downloads it in the background (about 180 MB); you "
                      "choose when the app restarts to install it. Your sounds and "
                      "settings stay as they are.</p>")
         elif not updates.can_install():
@@ -4041,7 +4044,8 @@ class MainWindow(QMainWindow):
                 "Setup → Devices → Send to others through." if route == "off" else
                 "Pick the device to send to first (Setup tab → Devices → Send to)."
                 if route == "device" else
-                "Set up the virtual cable first (Setup tab → Step-by-step guide).")
+                "Set up the virtual cable first (Setup tab → Step-by-step guide), or pick "
+                "another device under Send to others through.")
             return
         # Capture the far end of the virtual cable too, so the test hears exactly
         # what Discord / the game hears (not just our internal mix).
@@ -4186,8 +4190,8 @@ class MainWindow(QMainWindow):
                 self.btn_rec.setEnabled(True)
                 self.btn_rec.setText("Record 6s → play back")
                 self.test_result.setText(f"<span style='color:{theme.status('error')}'>"
-                                         "The test stopped: the "
-                                         "virtual cable's output went away. Check Devices "
+                                         "The test stopped: the send "
+                                         "device's output went away. Check Devices "
                                          "and try again.</span>")
                 self.test_result.show()
         elif e.rec_done is not None:
