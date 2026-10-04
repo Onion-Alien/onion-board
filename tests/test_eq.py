@@ -58,9 +58,73 @@ def test_switching_off_then_on_restarts_state_cleanly():
     f = eq.EQ(48000)
     x = np.ones((100, 2), np.float32)
     f.process(x, eq.PRESETS["Music — bass boost"])
-    assert f.process(x, None) is x           # off: passthrough
+    for _ in range(11):                      # off: fades to dry over ~1024 samples
+        f.process(x, None)
+    assert f.idle and f.process(x, None) is x   # then passthrough
     y = f.process(x, eq.PRESETS["Music — bass boost"])
     assert np.all(np.isfinite(y))
+
+
+def _bend(v):
+    """The largest bend in a waveform (second difference): where a click shows."""
+    return np.max(np.abs(np.diff(v, 2)))
+
+
+def _sine(n, hz=80, rate=48000):
+    t = np.arange(n) / rate
+    return np.stack([np.sin(2 * np.pi * hz * t)] * 2, 1).astype(np.float32) * 0.5
+
+
+def test_a_change_fades_over_its_full_length_even_in_small_blocks():
+    """At 64-frame blocks the fade used to end with its block: 1.3 ms, still a click.
+    Now it runs the whole ~20 ms, so tiny and big blocks sound the same."""
+    x = _sine(9600)
+    before, after = [0, 0, 0, 0, 0, 0, 0], [12, 12, 0, 0, 0, 0, 0]
+
+    def run(block):
+        f, out = eq.EQ(48000), []
+        for i in range(0, 4800, block):
+            out.append(f.process(x[i:i + block], before))
+        for i in range(4800, 9600, block):
+            out.append(f.process(x[i:i + block], after))
+        return np.concatenate(out)[:, 0]
+    small, big = run(64), run(4800)
+    assert np.allclose(small, big, atol=1e-4)            # the same fade either way
+    steady = _bend(big[200:4700])
+    assert _bend(small[4790:5900]) < 3 * steady           # no click at the change
+
+
+def test_turning_the_eq_off_and_on_fades_instead_of_clicking():
+    """Unticking EQ (gains None) used to switch straight to the dry sound and a
+    re-enabled EQ started at full strength: both clicked on a bass boost."""
+    x = _sine(19200)
+    boost = [12, 12, 0, 0, 0, 0, 0]
+    f, out = eq.EQ(48000, fade_in=True), []
+    for i in range(0, 19200, 64):
+        gains = boost if i < 4800 or i >= 9600 else None    # on, off, on again
+        out.append(f.process(x[i:i + 64], gains))
+    y = np.concatenate(out)[:, 0]
+    steady = _bend(y[2000:4700])
+    for at in (0, 4800, 9600):
+        assert _bend(y[max(at - 10, 0):at + 1500]) < 3 * steady, at
+    assert np.allclose(y[7000:9600], x[7000:9600, 0], atol=1e-6)   # off: dry
+    assert not f.idle
+
+
+def test_the_engine_fades_its_eq_out_before_dropping_it():
+    from soundboard.engine import Engine
+    e = Engine.__new__(Engine)
+    e._eqs, e.rates = {}, {"main": 48000}
+    e.eq_gains, e.eq_target = [12, 12, 0, 0, 0, 0, 0], "all"
+    x = _sine(64)
+    e._eq("main", "sounds", x)
+    assert ("main", "sounds") in e._eqs
+    e.eq_gains = None
+    e._eq("main", "sounds", x)
+    assert ("main", "sounds") in e._eqs                  # still fading out
+    for _ in range(40):   # the fade in ends first (1024 samples), then the fade out
+        y = e._eq("main", "sounds", x)
+    assert ("main", "sounds") not in e._eqs and y is x   # done: dropped, passthrough
 
 
 def test_bands_follow_the_analog_eq_up_to_nyquist():

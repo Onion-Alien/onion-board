@@ -77,21 +77,34 @@ def response_db(gains: list[float], freqs: np.ndarray, rate: int = 48000) -> np.
 class EQ:
     """Stateful stereo EQ for one audio path at one sample rate."""
 
-    def __init__(self, rate: int):
+    def __init__(self, rate: int, fade_in: bool = False):
+        """`fade_in`: switched on mid-stream, so the first block fades in from the dry
+        signal instead of jumping to the EQ'd one."""
         self.rate = rate
         self._filter = dsp.SmoothSos()
+        self._filter.fresh = not fade_in
         self._sos = None
         self._gains = None
 
+    @property
+    def idle(self) -> bool:
+        """Off (or flat) and done fading: passing audio through untouched."""
+        return self._filter.idle
+
     def process(self, x: np.ndarray, gains: list[float] | None) -> np.ndarray:
+        """`gains` None: off. The EQ'd sound fades back to the dry one (a switch
+        straight to it clicked), then the audio passes through untouched (idle)."""
         if gains is None:
-            self._filter.reset()
             self._sos = self._gains = None
-            return x
+            if self._filter.idle:
+                return x
+            if x.dtype != np.float32:
+                x = x.astype(np.float32)
+            return self._filter.run(x, None, axis=0)
         if gains != self._gains:
             self._gains = list(gains)
             self._sos = design(self._gains, self.rate)
-        if self._sos is None and self._filter.sos is None:
+        if self._sos is None and self._filter.idle:
             return self._filter.run(x, None)       # flat: straight through
         if x.dtype != np.float32:
             x = x.astype(np.float32)

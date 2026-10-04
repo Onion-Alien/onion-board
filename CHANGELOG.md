@@ -41,7 +41,8 @@
   within ~0.3 dB at every sample rate. The drawn EQ curve shows the same thing.
 - **No more clicks when you move an EQ slider:** changing a band, a preset or a voice
   effect's knob crossfades from the old sound to the new over ~20 ms instead of
-  switching at once. Turning the EQ on or back to flat fades too.
+  switching at once, however small the audio buffer. Turning the EQ on or off,
+  setting it back to flat or pointing it at something else fades too.
 - **Our own filter engine:** all of the app's audio filters (EQ, voice effects,
   destination modes, the smart mono downmix, the limiter's look-ahead) now run on
   Onion Board's own code instead of scipy, and float32 audio is filtered more
