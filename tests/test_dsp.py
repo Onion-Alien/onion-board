@@ -164,7 +164,22 @@ def test_smooth_sos_starts_directly_then_crossfades_changes():
     y = f.run(x, None)                                         # off: fade to dry
     assert y[0, 0] < 0.51 and np.allclose(y[500:], 1.0)
     assert np.all(np.diff(y[:500, 0]) >= 0)
-    assert f.run(x, None) is x                                 # then straight through
+    assert f.idle and f.run(x, None) is x                      # then straight through
+
+
+def test_smooth_sos_fades_across_blocks_and_queues_a_change_made_mid_fade():
+    f = dsp.SmoothSos(fade=500)
+    gain = [np.array([[g, 0, 0, 1, 0, 0]], np.float32) for g in (0.5, 0.25)]
+    one = np.ones((50, 1), np.float32)
+    f.run(one, gain[0])
+    ys = [f.run(one, None) for _ in range(5)]                  # fading to dry...
+    assert f.fading
+    ys += [f.run(one, gain[1]) for _ in range(5)]              # ...a new design waits
+    y = np.concatenate(ys)[:, 0]
+    assert np.all(np.diff(y[:500]) >= 0) and np.isclose(y[499], 1.0)   # one smooth fade
+    assert not f.fading or f.sos is gain[1]
+    y = np.concatenate([f.run(one, gain[1]) for _ in range(11)])[:, 0]
+    assert np.all(np.diff(y) <= 1e-7) and np.isclose(y[-1], 0.25)     # then the next
 
 
 def test_a_filter_bank_equals_one_sosfilt_per_filter_block_by_block():

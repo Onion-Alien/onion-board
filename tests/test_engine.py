@@ -511,7 +511,8 @@ def test_play_gives_up_when_every_output_went_away_or_changed_rate(monkeypatch):
 def test_eq_and_destination_drop_their_state_when_turned_off():
     e = engine_with("main")
     x = np.zeros((64, 2), np.float32)
-    e._eqs[("main", "sounds")] = object()
+    from soundboard.eq import EQ
+    e._eqs[("main", "sounds")] = EQ(e.rates["main"])   # idle: nothing left to fade out
     e._dests["main"] = object()
     e.eq_gains = None
     e.dest = None

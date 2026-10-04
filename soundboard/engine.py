@@ -1271,12 +1271,19 @@ class Engine:
         """Run x through the EQ if it's on and aimed at `part` ('sounds' / 'voice')."""
         g = self.eq_gains
         key = (out, part)
-        if g is None or self.eq_target not in (part, "all"):
-            self._eqs.pop(key, None)   # stale filter state would click when it's back on
-            return x
         f = self._eqs.get(key)
+        if g is None or self.eq_target not in (part, "all"):
+            # off here: fade back to the dry sound (switching straight to it clicked),
+            # then drop the filter, so its old memory can't click when it's back on
+            if f is None:
+                return x
+            y = f.process(x, None) if f.rate == self.rates[out] else x
+            if f.idle or y is x:
+                self._eqs.pop(key, None)
+            return y
         if f is None or f.rate != self.rates[out]:
-            f = self._eqs[key] = EQ(self.rates[out])
+            # switched on mid-stream: fade in from the dry sound, as it fades out
+            f = self._eqs[key] = EQ(self.rates[out], fade_in=f is None)
         return f.process(x, g)
 
     def _stage(self, out: str, kind: type):

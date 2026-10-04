@@ -498,11 +498,16 @@ class SmoothSos:
 
     `run(x, sos)` filters each block, carrying the state over so blocks join without
     a seam. Pass the same array object while the design stays put; when `sos` is a
-    different object than last block's (or None: straight through), the block
-    crossfades from the old filter's output to the new one's over its first `fade`
-    samples instead of switching at once: dragging an EQ slider or turning a knob
-    doesn't click, even on a bass shelf. The very first block of a stream starts
-    directly (there's nothing to fade from)."""
+    different object than last block's (or None: straight through), the output
+    crossfades from the old filter's to the new one's over `fade` samples instead of
+    switching at once: dragging an EQ slider or turning a knob doesn't click, even on
+    a bass shelf. The fade runs its full length however small the blocks are (the old
+    filter keeps running, with its own memory, until it's done: at 64-frame blocks a
+    fade that ended with its block lasted 1.3 ms and still clicked). A design that
+    comes in mid-fade waits for it to end, then fades in the same way, so dragging a
+    slider moves the sound in ~20 ms steps, each one smooth. The very first block of a
+    stream starts directly (there's nothing to fade from), unless `fresh` is cleared
+    (an EQ switched on mid-stream fades in from the dry signal)."""
 
     def __init__(self, fade: int = 1024):
         self.fade = fade
@@ -512,6 +517,17 @@ class SmoothSos:
         self.sos = None
         self.zi = None
         self.fresh = True
+        self._old = self._old_zi = None   # the design fading out (None: dry)
+        self._pos = -1                    # samples into the fade; -1: not fading
+
+    @property
+    def fading(self) -> bool:
+        return self._pos >= 0
+
+    @property
+    def idle(self) -> bool:
+        """Straight through, with no fade under way: safe to drop."""
+        return self.sos is None and not self.fading
 
     def _zeros(self, sos, x, axis):
         shape = list(x.shape)
@@ -519,34 +535,36 @@ class SmoothSos:
         dt = _work_dtype(x, sos)
         return np.zeros([len(sos)] + shape, dt)
 
+    def _filt(self, sos, x, axis, zi):
+        if sos is None:
+            return x, None
+        return sosfilt(sos, x, axis=axis, zi=zi)
+
     def run(self, x: np.ndarray, sos, axis: int = 0) -> np.ndarray:
-        old, zi = self.sos, self.zi
-        if sos is old:
-            if self.fresh and x.shape[axis]:
-                self.fresh = False
-            if sos is None:
-                return x
-            y, self.zi = sosfilt(sos, x, axis=axis, zi=zi)
-            return y
         n = x.shape[axis]
         if n == 0:
-            return x                       # take the change with the next real block
-        same_shape = old is not None and sos is not None and len(old) == len(sos)
-        self.sos = sos
-        if sos is None:
-            new_y, self.zi = x, None
-        else:
+            return x                       # take any change with the next real block
+        if sos is not self.sos and not self.fading:
+            old, zi = self.sos, self.zi
+            same_shape = old is not None and sos is not None and len(old) == len(sos)
+            self.sos = sos
             # the new design picks up the old one's memory (it describes the same
             # recent signal), which keeps its start-up transient small
-            z0 = zi if same_shape else self._zeros(sos, x, axis)
-            new_y, self.zi = sosfilt(sos, x, axis=axis, zi=z0)
-        if self.fresh:
-            self.fresh = False
+            self.zi = None if sos is None else (
+                zi.copy() if same_shape else self._zeros(sos, x, axis))
+            if not self.fresh:
+                self._old, self._old_zi, self._pos = old, zi, 0
+        self.fresh = False
+        new_y, self.zi = self._filt(self.sos, x, axis, self.zi)
+        if not self.fading:
             return new_y
-        old_y = x if old is None else sosfilt(old, x, axis=axis, zi=zi)[0]
-        k = min(n, self.fade)
-        ramp = np.ones(n, np.float64)
-        ramp[:k] = 0.5 - 0.5 * np.cos(np.pi * np.arange(1, k + 1) / k)   # raised cosine
+        old_y, self._old_zi = self._filt(self._old, x, axis, self._old_zi)
+        k = np.arange(self._pos + 1, self._pos + n + 1, dtype=np.float64)
+        ramp = 0.5 - 0.5 * np.cos(np.pi * np.minimum(k, self.fade) / self.fade)
+        self._pos += n
+        if self._pos >= self.fade:          # done: the old design stops here
+            self._old = self._old_zi = None
+            self._pos = -1
         shape = [1] * x.ndim
         shape[axis] = n
         ramp = ramp.astype(np.result_type(new_y, old_y)).reshape(shape)
