@@ -27,6 +27,7 @@ REDLINE_SPEED = (0.1, 10.0)             # sounds
 REDLINE_PITCH = voicefx.Param("pitch", "Pitch", -36, 36, 0, " st", 1)
 REDLINE_QUICK = (3.0, 4.0, 6.0, 8.0, 10.0)
 RED = "#ff4d4f"
+NAME_W, VAL_W, GAP = 48, 52, 10         # popup slider columns: name | track | value
 
 
 def redline_speed(lo: float, hi: float) -> voicefx.Param:
@@ -42,7 +43,7 @@ class RevMeter(QWidget):
         super().__init__()
         self.top = top
         self.speed = 1.0
-        self.setFixedHeight(118)
+        self.setFixedHeight(132)
         self.setMinimumWidth(200)
 
     def set_value(self, speed: float):
@@ -118,6 +119,7 @@ class SpeedPitchButton(QPushButton):
         """`redline`: the (slowest, fastest) speed once Redline is unlocked."""
         super().__init__()
         self.setObjectName("small")
+        self.setProperty("speedpitch", True)
         self.setToolTip(f"Speed and pitch of the {what} playing now")
         self.setCursor(Qt.PointingHandCursor)
         self._speed_hi = redline_speed(*redline)
@@ -126,52 +128,81 @@ class SpeedPitchButton(QPushButton):
         self.pop = QFrame(self, Qt.Popup)
         self.pop.setObjectName("transport")
         v = QVBoxLayout(self.pop)
-        v.setContentsMargins(12, 10, 12, 10)
-        v.setSpacing(6)
-        title = QLabel(f"Speed & pitch — {what}")
-        title.setStyleSheet("font-weight:700;")
-        v.addWidget(title)
-        self.speed = ParamSlider(SPEED, 1.0)
-        self.pitch = ParamSlider(PITCH, 0.0)
+        v.setContentsMargins(16, 12, 16, 14)
+        v.setSpacing(8)
+
+        # header: title on the left, Reset where it's easy to find
+        head = QHBoxLayout()
+        head.setSpacing(8)
+        title = QLabel("Speed & pitch")
+        title.setStyleSheet("font-weight:700; font-size:10.5pt;")
+        sub = QLabel(what.capitalize())
+        sub.setObjectName("muted")
+        reset = QPushButton("Reset")
+        reset.setObjectName("small")
+        reset.setToolTip("Back to 1x and no pitch change")
+        reset.setCursor(Qt.PointingHandCursor)
+        reset.clicked.connect(self.reset)
+        head.addWidget(title)
+        head.addWidget(sub)
+        head.addStretch(1)
+        head.addWidget(reset)
+        v.addLayout(head)
+        v.addWidget(self._rule())
+
+        self.speed = self._slider(SPEED, 1.0)
+        self.pitch = self._slider(PITCH, 0.0)
         v.addWidget(self.speed)
         v.addLayout(self._quick_row(QUICK))
+        v.addSpacing(2)
         v.addWidget(self.pitch)
         self.keep = QCheckBox("Keep pitch when changing speed")
         self.keep.setChecked(True)
         self.keep.setToolTip("Off: slower is also deeper and faster is higher, like a tape")
         v.addWidget(self.keep)
 
-        # --- Redline: greyed out until you ask for it
-        self.redline = QPushButton(f"Redline — up to {redline:g}x")
+        # --- Redline: its own section, locked until you ask for it
+        v.addSpacing(2)
+        v.addWidget(self._rule())
+        red_row = QHBoxLayout()
+        red_row.setSpacing(8)
+        red_text = QVBoxLayout()
+        red_text.setSpacing(0)
+        red_name = QLabel("Redline")
+        red_name.setStyleSheet("font-weight:700;")
+        red_sub = QLabel(f"Up to {redline:g}x speed and ±{REDLINE_PITCH.hi:g} st pitch")
+        red_sub.setObjectName("hint")
+        red_text.addWidget(red_name)
+        red_text.addWidget(red_sub)
+        red_row.addLayout(red_text, 1)
+        self.redline = QPushButton("Unlock")
         icons.set_icon(self.redline, "shield", size=14)
         self.redline.setObjectName("small")
         self.redline.setCheckable(True)
+        self.redline.setCursor(Qt.PointingHandCursor)
+        self.redline.setMinimumWidth(84)
         self.redline.setToolTip(f"Unlock silly speeds (up to {redline:g}x) and pitch "
                                 f"(±{REDLINE_PITCH.hi:g} st)")
-        self.redline.setStyleSheet(f"QPushButton:!checked {{ color:{theme.T['faint']}; }}")
         self.redline.toggled.connect(self.set_redline)
-        v.addWidget(self.redline)
+        red_row.addWidget(self.redline, 0, Qt.AlignVCenter)
+        v.addLayout(red_row)
         self.red_box = QWidget()
+        self.red_box.setObjectName("redbox")    # sits on the popup, no box of its own
+        self.red_box.setStyleSheet("QWidget#redbox { background:transparent; }")
         rv = QVBoxLayout(self.red_box)
-        rv.setContentsMargins(0, 0, 0, 0)
-        rv.setSpacing(4)
+        rv.setContentsMargins(0, 4, 0, 0)
+        rv.setSpacing(6)
         self.meter = RevMeter(redline)
         rv.addWidget(self.meter)
         rv.addLayout(self._quick_row(tuple(s for s in REDLINE_QUICK if s <= redline)))
         self.red_box.hide()
         v.addWidget(self.red_box)
 
-        row = QHBoxLayout()
         if hint:
-            row.addWidget(hint_label(hint), 1)
-        else:
-            row.addStretch(1)
-        reset = QPushButton("Reset")
-        reset.setObjectName("small")
-        reset.clicked.connect(self.reset)
-        row.addWidget(reset)
-        v.addLayout(row)
-        self.pop.setMinimumWidth(360)
+            v.addSpacing(2)
+            v.addWidget(self._rule())
+            v.addWidget(hint_label(hint))
+        self.pop.setFixedWidth(400)
 
         self.speed.changed.connect(self._edited)
         self.pitch.changed.connect(self._edited)
@@ -179,12 +210,36 @@ class SpeedPitchButton(QPushButton):
         self.clicked.connect(self._open)
         self._label()
 
+    @staticmethod
+    def _slider(q: voicefx.Param, value: float) -> ParamSlider:
+        """A ParamSlider laid out for the popup: no effect-row indent, a fixed name
+        column so both sliders (and the quick buttons) line up, a readable value."""
+        s = ParamSlider(q, value)
+        h = s.layout()
+        h.setContentsMargins(0, 0, 0, 0)
+        h.setSpacing(GAP)
+        h.itemAt(0).widget().setFixedWidth(NAME_W)
+        s.val.setObjectName("")
+        s.val.setFixedWidth(VAL_W)
+        return s
+
+    @staticmethod
+    def _rule() -> QFrame:
+        line = QFrame()
+        line.setObjectName("vsep")       # the bar divider's colour, laid flat
+        line.setFixedHeight(1)
+        return line
+
     def _quick_row(self, speeds) -> QHBoxLayout:
+        """Preset speeds, under the slider track so they read as part of it."""
         q = QHBoxLayout()
+        q.setContentsMargins(NAME_W + GAP, 0, 0, 0)
         q.setSpacing(4)
         for s in speeds:
             b = QPushButton(f"{s:g}x")
             b.setObjectName("small")
+            b.setCursor(Qt.PointingHandCursor)
+            b.setToolTip(f"Play at {s:g}x speed")
             b.clicked.connect(lambda _=False, s=s: self.speed.set_value(s) or self._edited())
             q.addWidget(b)
         return q
@@ -195,6 +250,7 @@ class SpeedPitchButton(QPushButton):
             self.redline.setChecked(on)   # comes back here through toggled
             return
         icons.set_icon(self.redline, "wave" if on else "shield", size=14)
+        self.redline.setText("On" if on else "Unlock")
         self.speed.set_param(self._speed_hi if on else SPEED)
         self.pitch.set_param(REDLINE_PITCH if on else PITCH)
         self.red_box.setVisible(on)
@@ -244,8 +300,10 @@ class SpeedPitchButton(QPushButton):
             txt += f" {p:+g}"
         self.setText(txt)
         hot = s > REDLINE_AT + 1e-6 or abs(p) > PITCH.hi
+        # scoped to this button: unscoped, it would cascade into the popup (a child)
         self.setStyleSheet("" if self.is_default() else
-                           f"font-weight:700; color:{RED if hot else theme.status('warn')};")
+                           f"QPushButton[speedpitch=\"true\"] {{ font-weight:700; "
+                           f"color:{RED if hot else theme.status('warn')}; }}")
 
     def _edited(self):
         self._label()
