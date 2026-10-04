@@ -200,15 +200,10 @@ class _StationDelegate(QStyledItemDelegate):
             p.drawText(avatar, Qt.AlignCenter, s.cc or (s.name[:1].upper() or "?"))
 
         # star
-        f = QFont(opt.font)
-        f.setPointSizeF(13)
-        p.setFont(f)
         if fav:
-            p.setPen(QColor("#ffc53d"))
-            p.drawText(star, Qt.AlignCenter, "★")
+            icons.icon("star_filled", "accent").paint(p, star.adjusted(3, 3, -3, -3))
         elif hover or sel:
-            p.setPen(QColor(t["faint"]))
-            p.drawText(star, Qt.AlignCenter, "☆")
+            icons.icon("star", "muted").paint(p, star.adjusted(3, 3, -3, -3))
 
         # bitrate pill
         right = star.left() - 6
@@ -366,13 +361,19 @@ class RadioTab(QWidget):
         icons.set_icon(self.btn_play, "play")
         self.btn_play.clicked.connect(self._toggle_play)
         bh.addWidget(self.btn_play)
-        self.btn_random = QPushButton("🎲")
+        self.btn_random = QPushButton()
+        self.btn_random.setObjectName("iconbutton")
+        self.btn_random.setAccessibleName("Play a random station")
+        icons.set_icon(self.btn_random, "shuffle")
         self.btn_random.setToolTip("Play a random station from the list showing (pick a "
                                    "genre or country first to narrow it)")
         self.btn_random.clicked.connect(self.play_random)
         bh.addWidget(self.btn_random)
-        self.btn_fav = QPushButton("☆")
-        self.btn_fav.setToolTip("Star the selected station (★ Favorites)")
+        self.btn_fav = QPushButton()
+        self.btn_fav.setObjectName("iconbutton")
+        self.btn_fav.setAccessibleName("Favorite station")
+        self.btn_fav.setToolTip("Add the selected station to Favorites")
+        icons.set_icon(self.btn_fav, "star")
         self.btn_fav.clicked.connect(lambda: self._toggle_fav())
         bh.addWidget(self.btn_fav)
         bh.addWidget(vsep())
@@ -398,8 +399,7 @@ class RadioTab(QWidget):
         bh.addWidget(self.btn_last)
         sep2 = vsep()
         bh.addWidget(sep2)
-        tip = ("Radio volume (for them and for you). The line under it is the radio's "
-               "level right now")
+        tip = "Radio volume (for them and for you). The dot shows audio activity."
         vol_icon = icon_label("volume", tip)
         bh.addWidget(vol_icon)
         vol = cfg.radio.get("vol", 1.0)
@@ -479,7 +479,8 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
         sh.setContentsMargins(3, 3, 3, 3)
         sh.setSpacing(2)
         self.btn_popular = QPushButton("Popular")
-        self.btn_favs = QPushButton("★ Favorites")
+        self.btn_favs = QPushButton("Favorites")
+        icons.set_icon(self.btn_favs, "star", "muted")
         self.btn_recent = QPushButton("Recent")
         self._mode = QButtonGroup(self)
         for b in (self.btn_popular, self.btn_favs, self.btn_recent):
@@ -1140,7 +1141,9 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
                                  or bool(self.cfg.radio.get("last")))
         s = self.selected() or self.player.station
         fav = s is not None and s.uuid in self._fav_ids
-        self.btn_fav.setText("★" if fav else "☆")
+        icons.set_icon(self.btn_fav, "star_filled" if fav else "star",
+                       "accent" if fav else "text")
+        self.btn_fav.setToolTip("Remove from Favorites" if fav else "Add to Favorites")
         self.btn_fav.setEnabled(s is not None)
 
     def _no_stations_text(self) -> str:
@@ -1218,7 +1221,7 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
         """What the main window may hide here when it gets small (ui/responsive.py)."""
         from soundboard.ui import responsive as r
         def star_only(compact):
-            self.btn_favs.setText("★" if compact else "★ Favorites")
+            self.btn_favs.setText("" if compact else "Favorites")
             r.touch(self.btn_favs)
 
         def play_icon(compact):

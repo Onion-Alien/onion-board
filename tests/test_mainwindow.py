@@ -216,12 +216,15 @@ def test_refit_leaves_widgets_alone_when_nothing_crosses_an_edge(window, qapp):
     window._refit()
     flips = []
     orig = [s[2] for s in window._fit.steps]
-    window._fit.steps = [(p, a, (lambda c, f=f: (flips.append(c), f(c))))
-                         for (p, a, _), f in zip(window._fit.steps, orig)]
+    window._fit.steps = [(p, a, (lambda c, f=f, i=i: (flips.append((i, c)), f(c))))
+                         for i, ((p, a, _), f) in enumerate(zip(window._fit.steps, orig))]
     for w in range(950, 930, -2):                  # small moves, no edge crossed
         window.resize(w, 700)
         window._refit()
-    assert len(flips) <= 2
+    # New controls may move an edge into this interval. Each step may tighten once;
+    # repeatedly undoing/reapplying it is the flashing this test guards against.
+    assert len(flips) == len({i for i, _ in flips})
+    assert all(compact for _, compact in flips)
 
 
 def test_maximizing_doesnt_grow_what_the_window_needs(window, qapp):

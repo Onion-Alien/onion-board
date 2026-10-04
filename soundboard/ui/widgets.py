@@ -506,7 +506,7 @@ class Pad(QAbstractButton):
             flags = ("FX " if self.meta.fx else "") + \
                 ("⟳ " if self.meta.loop else "") + \
                 {"overlap": "⧉ ", "toggle": "⏯ ", "solo": "◉ "}.get(self.meta.mode, "") + \
-                ("✋ " if self.meta.hold else "")
+                ("hold " if self.meta.hold else "")
             p.setPen(muted)
             right = "❚❚ paused" if self.paused else f"{flags}{self.meta.duration:.1f}s"
             p.drawText(foot, Qt.AlignRight | Qt.AlignVCenter, right)

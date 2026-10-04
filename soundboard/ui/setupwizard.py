@@ -28,7 +28,7 @@ from soundboard import theme
 from soundboard.engine import SR
 from soundboard import library, net
 from soundboard.library import RESOURCE_DIR
-from soundboard.ui import busy, fit
+from soundboard.ui import busy, fit, icons
 from soundboard.ui.bunnywidget import BunnyWidget
 from soundboard.ui.widgets import Meter
 
@@ -272,7 +272,7 @@ class SetupWizard(QDialog):
         p = QWidget()
         v = QVBoxLayout(p)
         self.bun_mic = BunnyWidget("mic")
-        v.addLayout(_header("🎤  Which microphone do you talk into?",
+        v.addLayout(_header("Which microphone do you talk into?",
                             _label("Pick the mic you use for gaming (your headset or desk "
                                    "mic). <b>Say something</b> — the bar below should move "
                                    "(and Bun talks along) when you talk."),
@@ -305,7 +305,7 @@ class SetupWizard(QDialog):
         p = QWidget()
         v = QVBoxLayout(p)
         self.bun_phones = BunnyWidget("headphones")
-        v.addLayout(_header("🎧  Where do you listen?",
+        v.addLayout(_header("Where do you listen?",
                             _label("Pick your headphones or speakers, then press <b>Play a "
                                    "test sound</b>. Only you hear this."),
                             self.bun_phones))
@@ -317,7 +317,8 @@ class SetupWizard(QDialog):
         lst, _ = self._choice_list(outs, cur,
                                    lambda n: self._pick_headphones(n, by_user=True))
         v.addWidget(lst, 1)
-        play = self.btn_test = QPushButton("🔊  Play a test sound")
+        play = self.btn_test = QPushButton("Play a test sound")
+        icons.set_icon(play, "volume")
         play.setStyleSheet("padding:10px; font-size:11pt;")
         play.clicked.connect(self.test_sound)
         v.addWidget(play)
@@ -329,7 +330,7 @@ class SetupWizard(QDialog):
         p = QWidget()
         v = QVBoxLayout(p)
         self.bun_cable = BunnyWidget("plug")
-        v.addLayout(_header("🔌  The virtual cable",
+        v.addLayout(_header("The virtual cable",
                             _label("This is a free add-on that works like an invisible "
                                    "microphone. Onion Board puts <b>your sounds</b> (and your "
                                    "voice, if you send it) into it, and Discord or your game "
@@ -371,10 +372,11 @@ class SetupWizard(QDialog):
         p = QWidget()
         v = QVBoxLayout(p)
         self.discord_text = _label("")
-        v.addLayout(_header("🎮  Last step: tell Discord or your game", self.discord_text,
+        v.addLayout(_header("Last step: tell Discord or your game", self.discord_text,
                             BunnyWidget("star", celebrate=True)))
         row = QHBoxLayout()
-        self.btn_copy = QPushButton("📋  Copy the name")
+        self.btn_copy = QPushButton("Copy the name")
+        icons.set_icon(self.btn_copy, "copy")
         self.btn_copy.clicked.connect(self.copy_name)
         row.addWidget(self.btn_copy)
         nomic = QPushButton("My game has no microphone setting")
@@ -382,19 +384,22 @@ class SetupWizard(QDialog):
         row.addWidget(nomic)
         row.addStretch(1)
         v.addLayout(row)
-        self.btn_discord = QPushButton("🎧  Discord: make my sounds come through clean")
+        self.btn_discord = QPushButton("Discord: make my sounds come through clean")
+        icons.set_icon(self.btn_discord, "headphones", "on_accent")
         self.btn_discord.setObjectName("primary")
         self.btn_discord.setToolTip("The Discord settings that stop it chopping up your "
                                     "sounds, and a check that listens to what Discord does")
         self.btn_discord.clicked.connect(lambda: self.show_guide("discord"))
         v.addWidget(self.btn_discord)
         games = QHBoxLayout()
-        self.btn_steam = QPushButton("🎮  Steam games (CS2, Dota 2, Deadlock…)")
+        self.btn_steam = QPushButton("Steam games (CS2, Dota 2, Deadlock…)")
+        icons.set_icon(self.btn_steam, "gamepad")
         self.btn_steam.setToolTip("Games that use Steam voice chat take the mic from "
                                   "Steam's own settings")
         self.btn_steam.clicked.connect(self.show_steam_guide)
         games.addWidget(self.btn_steam)
-        self.btn_game = QPushButton("🎮  Other games")
+        self.btn_game = QPushButton("Other games")
+        icons.set_icon(self.btn_game, "gamepad")
         self.btn_game.setToolTip("Valorant, Fortnite, Apex, Rust… the voice chat settings "
                                  "that matter")
         self.btn_game.clicked.connect(lambda: self.show_guide("game"))
@@ -493,7 +498,7 @@ class SetupWizard(QDialog):
             return
         self.win.engine.play("__setup__", test_tune(), 1.0, preview=True)
         self.bun_phones.burst()
-        busy.flash(self.btn_test, "🔊  Playing… hear it?", 1500)
+        busy.flash(self.btn_test, "Playing… hear it?", 1500)
 
     def cable_ok(self) -> bool:
         return bool(eng.virtual_outputs())
@@ -508,7 +513,7 @@ class SetupWizard(QDialog):
         if not busy and self.bun_cable.building:
             self.bun_cable.stop_building(self.cable_ok())
         if busy:
-            self.cable_status.setText("🔨  <b>Bun is setting it up for you…</b>")
+            self.cable_status.setText("<b>Bun is setting it up for you…</b>")
             self.cable_steps.setText(self._steps_html())
             self.btn_cable.hide()
             self.btn_recheck.hide()
@@ -524,7 +529,7 @@ class SetupWizard(QDialog):
             if self._resumed:   # back from the restart, and it worked
                 self._resumed = False
                 self.bun_cable.stop_building(True)
-                self.cable_status.setText(f"<b style='color:{_ok()}'>👋 Welcome back — the cable "
+                self.cable_status.setText(f"<b style='color:{_ok()}'>Welcome back — the cable "
                                           "works now!</b> Press Next for the last step.")
             else:
                 self.cable_status.setText(f"<b style='color:{_ok()}'>✓ Installed and "
@@ -540,7 +545,7 @@ class SetupWizard(QDialog):
                                       "a <b>restart</b> to finish setting it up. Restart "
                                       "whenever suits you: Onion Board will open by itself "
                                       "afterwards and pick up right here.")
-            self.btn_cable.setText("🔨  Try once more without restarting")
+            self.btn_cable.setText("Try once more without restarting")
             self.btn_cable.setVisible(not self._needs_restart)   # it just tried that
             self.btn_recheck.show()
             self.btn_restart.show()
@@ -733,7 +738,7 @@ class SteamGuide(QDialog):
         v = QVBoxLayout(self)
         v.setContentsMargins(24, 20, 24, 18)
         v.setSpacing(12)
-        v.addLayout(_header("🎮  Steam games", _label(
+        v.addLayout(_header("Steam games", _label(
             "Games that use <b>Steam's voice chat</b> (like <b>Counter-Strike 2</b>, "
             "<b>Dota 2</b> and <b>Deadlock</b>) don't have their own mic setting. "
             "They use the mic you pick <b>in Steam</b>. Do this once:"),
@@ -766,7 +771,8 @@ class SteamGuide(QDialog):
             "Onion Board will then hold it down for you while a sound plays.",
             "font-size:10pt;"))
         row = QHBoxLayout()
-        copy = QPushButton("📋  Copy the mic name")
+        copy = QPushButton("Copy the mic name")
+        icons.set_icon(copy, "copy")
         copy.clicked.connect(lambda: (QApplication.clipboard().setText(mic_name),
                                       busy.flash(copy, "✓  Copied")))
         row.addWidget(copy)

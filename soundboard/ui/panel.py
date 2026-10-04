@@ -7,6 +7,7 @@ from __future__ import annotations
 import math
 
 from PySide6.QtCore import QEvent, QPoint, QRect, QSize, Qt, Signal
+from PySide6.QtGui import QColor, QPainter
 from PySide6.QtWidgets import (QCheckBox, QComboBox, QFrame, QGridLayout, QHBoxLayout, QLabel,
                                QLayout, QSlider, QSpinBox, QVBoxLayout, QWidget)
 
@@ -187,6 +188,31 @@ class CardGrid(QLayout):
         return y - self._gap - rect.y()
 
 
+class HoverCard(QFrame):
+    """A card whose hover surface stays active over its child labels and controls."""
+
+    def __init__(self):
+        super().__init__()
+        self.setObjectName("card")
+        self.setProperty("interactive", True)
+        self.setProperty("hovered", False)
+
+    def _hover(self, on: bool):
+        if self.property("hovered") != on:
+            self.setProperty("hovered", on)
+            self.style().unpolish(self)
+            self.style().polish(self)
+            self.update()
+
+    def enterEvent(self, event):
+        self._hover(True)
+        super().enterEvent(event)
+
+    def leaveEvent(self, event):
+        self._hover(False)
+        super().leaveEvent(event)
+
+
 def card(title: str = "", hint: str = "") -> tuple[QFrame, QVBoxLayout]:
     """A titled card, the building block of the Voice and Setup pages."""
     f = QFrame()
@@ -210,20 +236,23 @@ def icon_label(name: str, tip: str = "", color: str = "muted") -> QLabel:
     return lbl
 
 
-class _MeterSlider(QSlider):
-    """A slider with a thin level meter along its bottom edge: the volume and how
-    loud the thing it sets is right now, in one control."""
+class _LevelDot(Meter):
+    """Audio activity beside a volume control, without a second slider-like track."""
 
     def __init__(self):
-        super().__init__(Qt.Horizontal)
-        self.setMinimumHeight(26)
-        self.meter = Meter(self)
-        self.meter.setFixedHeight(3)
-        self.meter.setAttribute(Qt.WA_TransparentForMouseEvents)
+        super().__init__()
+        self.setFixedSize(6, 6)
+        self.setAccessibleName("Audio activity")
+        self.setToolTip("Audio activity: green is signal, amber is loud, red is near clipping")
 
-    def resizeEvent(self, e):
-        super().resizeEvent(e)
-        self.meter.setGeometry(7, self.height() - 3, max(0, self.width() - 14), 3)
+    def paintEvent(self, e):
+        frac, color = self._bar()
+        p = QPainter(self)
+        p.setRenderHint(QPainter.Antialiasing)
+        p.setPen(Qt.NoPen)
+        p.setBrush(QColor(color if frac > 0 else theme.T["groove"]))
+        p.drawEllipse(self.rect())
+        p.end()
 
 
 class _Pct(QSpinBox):
@@ -246,7 +275,7 @@ class _Pct(QSpinBox):
 class VolumeControl(QWidget):
     """Slider to `slider_max` %, plus a % you can click and type an exact value into
     (up to `typed_max`). `changed` carries the gain as a factor (1.0 = 100 %).
-    With `meter`, the slider carries a level meter (`.meter`) under its groove."""
+    With `meter`, a small audio-activity dot (`.meter`) sits beside the slider."""
     changed = Signal(float)
 
     def __init__(self, value: float, slider_max: int = 300, typed_max: int = 1000,
@@ -256,8 +285,10 @@ class VolumeControl(QWidget):
         h = QHBoxLayout(self)
         h.setContentsMargins(0, 0, 0, 0)
         h.setSpacing(4)
-        self.slider = _MeterSlider() if meter else QSlider(Qt.Horizontal)
-        self.meter = self.slider.meter if meter else None
+        self.slider = QSlider(Qt.Horizontal)
+        self.meter = _LevelDot() if meter else None
+        if self.meter is not None:
+            h.addWidget(self.meter)
         self.slider.setRange(0, slider_max)
         self.slider.setMinimumWidth(70)
         self.slider.setMaximumWidth(150)

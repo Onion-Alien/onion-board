@@ -560,8 +560,8 @@ class MainWindow(QMainWindow):
         self.chk_mic.toggled.connect(self.on_mic_toggle)
         row.addWidget(self.chk_mic)
         self.vol_mic = VolumeControl(c.mic_vol, meter=True,
-                                     tip="How loud your voice is for others. The line "
-                                         "under it is your mic level: it moves when you talk")
+                                     tip="How loud your voice is for others. The dot "
+                                         "shows activity when you talk")
         self.mic_meter = self.vol_mic.meter
         row.addWidget(self.vol_mic)
 

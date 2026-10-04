@@ -51,7 +51,7 @@ def _put(t: QTableWidget, r: int, c: int, text: str, tip: str = "", align=None,
         t.setItem(r, c, it)
     elif it.text() != text:
         it.setText(text)
-    tip = _tip(tip)
+    tip = _tip(tip or text)
     if it.toolTip() != tip:
         it.setToolTip(tip)
     if align is not None and it.textAlignment() != align:
@@ -62,19 +62,46 @@ def _put(t: QTableWidget, r: int, c: int, text: str, tip: str = "", align=None,
     return it
 
 
+class ActivityTable(QTableWidget):
+    """Bounded columns: long server names cannot displace every later column."""
+
+    def __init__(self, headers, stretch):
+        super().__init__(0, len(headers))
+        self._widths = ([150, 180, 125, 100, 130, 80] if stretch == 1 else
+                        [80, 150, 180, 120, 85, 100, 80, 90])
+
+    def resizeEvent(self, event):
+        super().resizeEvent(event)
+        total = sum(self._widths)
+        scale = max(1.0, self.viewport().width() / total)
+        for i, width in enumerate(self._widths):
+            self.setColumnWidth(i, int(width * scale))
+
+
 def _table(headers: list[str], stretch: int) -> QTableWidget:
-    t = QTableWidget(0, len(headers))
+    t = ActivityTable(headers, stretch)
+    t.setObjectName("activitytable")
     t.setHorizontalHeaderLabels(headers)
     t.verticalHeader().setVisible(False)
     t.setSelectionBehavior(QAbstractItemView.SelectRows)
     t.setSelectionMode(QAbstractItemView.SingleSelection)
     t.setEditTriggers(QAbstractItemView.NoEditTriggers)
     t.setWordWrap(False)
+    t.setShowGrid(False)
+    t.setAlternatingRowColors(True)
+    t.setHorizontalScrollMode(QAbstractItemView.ScrollPerPixel)
+    t.setHorizontalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+    t.setTextElideMode(Qt.ElideRight)
     t.setMinimumHeight(220)
+    t.setMaximumHeight(320)
+    t.verticalHeader().setDefaultSectionSize(34)
     h = t.horizontalHeader()
-    for i in range(len(headers)):
-        h.setSectionResizeMode(i, QHeaderView.Stretch if i == stretch
-                               else QHeaderView.ResizeToContents)
+    h.setMinimumSectionSize(64)
+    h.setSectionResizeMode(QHeaderView.Interactive)
+    h.setStretchLastSection(True)
+    h.setDefaultAlignment(Qt.AlignLeft | Qt.AlignVCenter)
+    for i, width in enumerate(t._widths):
+        t.setColumnWidth(i, width)
     return t
 
 

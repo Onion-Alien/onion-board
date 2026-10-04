@@ -99,7 +99,7 @@ NET_MODES = ("direct", "proxy", "tor")   # soundboard.net.MODES
 TOR_BRIDGES = ("", "snowflake", "obfs4")   # soundboard.tor.BRIDGES
 SETTING_RANGES = {"sound_vol": (0.0, VOLUME_MAX), "mic_vol": (0.0, VOLUME_MAX),
                   "mon_vol": (0.0, VOLUME_MAX), "obs_vol": (0.0, VOLUME_MAX),
-                  "pad_width": PAD_WIDTH_RANGE,
+                  "pad_width": PAD_WIDTH_RANGE, "app_card_width": (240, 480),
                   "duck_db": (-24.0, 0.0), "replay_seconds": (5, 120)}
 
 
@@ -254,6 +254,7 @@ class Config:
     ptt_key: str = ""           # key held down while sounds play (game push-to-talk)
     always_on_top: bool = False
     pad_width: int = 150
+    app_card_width: int = 300
     tab: int = 0     # 0 = sounds, 1 = radio, 2 = apps, 3 = triggers, 4 = voice, 5 = setup
     # fetch newer yt-dlp versions from PyPI by itself: opt-in, since that's code the app
     # runs (named *_optin so configs saved while it defaulted to on start off again)

@@ -377,6 +377,9 @@ QWidget { background:$bg; color:$text; font-family:'$font'; font-size:10pt; }
 QDialog { background:$bg; }
 QFrame#card { background:$panel; border-radius:12px; }
 QFrame#card QWidget { background:transparent; }
+QFrame#card[interactive="true"] { border:1px solid transparent; }
+QFrame#card[interactive="true"][hovered="true"] { background:$card_hi; border-color:$border_hi; }
+QFrame#card[interactive="true"]:focus { background:$card_hi; border-color:$accent; }
 QLabel#section { color:$section; font-size:8pt; font-weight:700; letter-spacing:1px; padding-top:8px; }
 QLabel#hint, QLabel#muted { color:$muted; }
 QLabel#hint { font-size:8.5pt; }
@@ -391,12 +394,15 @@ QLabel#wordmark { font-size:13pt; font-weight:800; letter-spacing:2px; color:$te
 QLabel#tagline { color:$muted; font-size:8.5pt; background:transparent; }
 QPushButton { background:$btn; border:1px solid $border; border-radius:8px; padding:7px 12px; }
 QPushButton:hover { background:$btn_hover; }
+QPushButton:focus { border-color:$accent; }
+QPushButton#iconbutton { padding:7px 10px; min-width:18px; }
 QPushButton:pressed { background:$btn_press; }
 QPushButton:checked { background:$accent; border-color:$accent; color:$on_accent; }
 QPushButton:disabled { color:$muted; }
 QPushButton[busy="true"], QPushButton#primary[busy="true"] { color:$muted; }
 QPushButton#primary { background:$accent; border:none; color:$on_accent; font-weight:600; }
 QPushButton#primary:hover { background:$accent_hi; }
+QPushButton#primary:focus { border:1px solid $text_hi; }
 QPushButton#danger { background:$danger_bg; border:1px solid $danger_border; color:$danger_text; font-weight:600; }
 QPushButton#danger:hover { background:$danger_hover; }
 QPushButton#small { padding:2px 8px; font-size:8pt; }
@@ -472,6 +478,9 @@ QComboBox::down-arrow:on { image:url("$up"); }
 QComboBox::down-arrow:disabled { image:url("$down_off"); }
 QComboBox:disabled, QLineEdit:disabled { color:$muted; background:$inset; }
 QFrame#card QComboBox, QFrame#card QPushButton, QFrame#card QLineEdit { background:$card; }
+QFrame#card QPushButton:hover:!checked { background:$btn_hover; border-color:$border_hi; }
+QFrame#card QPushButton#primary:hover { background:$accent_hi; }
+QFrame#card QPushButton:focus { border-color:$accent; }
 QFrame#card QComboBox:disabled, QFrame#card QLineEdit:disabled { background:$inset; }
 QFrame#card QAbstractSpinBox { background:$bg; }
 QFrame#card QPushButton:checked { background:$accent; }
@@ -548,6 +557,27 @@ QPushButton#rec:checked { background:#e53935; border:1px solid #ff6b6b; color:wh
 QPushButton#lite:checked { background:#13a35a; border:1px solid #13ce66; color:white; font-weight:700; }
 QFrame#setcard { background:$panel; border-radius:12px; }
 QFrame#setcard QWidget { background:transparent; }
+QFrame#setcard QPushButton { background:$btn; }
+QFrame#setcard QPushButton:hover { background:$btn_hover; border-color:$border_hi; }
+QFrame#setcard QPushButton:checked { background:$accent; color:$on_accent; }
+QFrame#setcard QPushButton#primary { background:$accent; color:$on_accent; border:none; }
+QFrame#setcard QPushButton#primary:hover { background:$accent_hi; }
+QTableView, QFrame#setcard QTableView { background:$card; alternate-background-color:$card_hi;
+    color:$text; border:1px solid $border; border-radius:6px;
+    selection-background-color:$accent; selection-color:$on_accent; }
+QTableView::item { padding:5px 8px; border:none; }
+QTableView::item:hover { background:$btn_hover; }
+QTableView::item:selected { background:$accent; color:$on_accent; }
+QHeaderView, QFrame#setcard QHeaderView { background:$btn; color:$text; }
+QHeaderView::section, QFrame#setcard QHeaderView::section { background:$btn; color:$text;
+    padding:8px; border:none; border-bottom:1px solid $border; font-weight:600; }
+QTableCornerButton::section { background:$btn; border:none; }
+QFrame#setcard QPlainTextEdit { background:$card; color:$text;
+    border:1px solid $border; border-radius:6px; padding:8px;
+    selection-background-color:$accent; selection-color:$on_accent; }
+QProgressBar#downloadprogress, QFrame#card QProgressBar#downloadprogress {
+    background:$groove; border:none; border-radius:2px; }
+QProgressBar#downloadprogress::chunk { background:$accent; border-radius:2px; }
 QPushButton#hkbtn { min-width:150px; font-weight:600; }
 QPushButton#themecard { background:$panel; border:2px solid $border; border-radius:12px; padding:0; }
 QPushButton#themecard:hover { border-color:$border_hi; }

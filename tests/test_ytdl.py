@@ -712,8 +712,8 @@ def test_result_counts_come_from_the_search_or_one_look_up_per_video(monkeypatch
     assert not ytdl.needs_stats(sc)
     assert [fmt_count(n) for n in (999, 1234, 12_345, 4_553_746, 2_000_000_000)] == [
         "999", "1.2K", "12K", "4.6M", "2B"]
-    assert stats_text(yt, waiting=True)[0] == "498M views · 👍 … · 💬 …"
-    assert stats_text(sc) == ("374K views · 👍 6.2K · 💬 28",
+    assert stats_text(yt, waiting=True)[0] == "498M views · … likes · … comments"
+    assert stats_text(sc) == ("374K views · 6.2K likes · 28 comments",
                               "373,794 views, 6,152 likes, 28 comments")
     seen = {}
 
@@ -747,12 +747,18 @@ def test_a_download_locks_the_other_cards_and_shows_its_progress(qapp, monkeypat
     panel._on_done(0, hits, "")
     a, b, c = panel._rows
     panel.mark(hits[0].url, "add")                   # Add on the first card
+    assert a.bar.maximum() == 1000 and a.bar.value() == 0
+    assert "0%" in a.btn_add.text()
     assert busy.is_busy(a.btn_add) and not busy.is_busy(a.btn_play)   # Play after it: fine
     assert all(busy.is_busy(x) for r in (b, c) for x in (r.btn_play, r.btn_add))
     assert not panel._quiet.is_set()                 # like counts wait for downloads
     panel.progress(hits[0].url, 0.42)
     assert a.bar.isVisibleTo(a) and a.bar.value() == 420 and "42%" in a.btn_add.text()
     panel.mark(hits[0].url, "play")                  # ...and Play on it too
+    assert a.bar.value() == 420                      # no reset for a shared download
+    panel.progress(hits[0].url, -1)                  # conversion is a separate phase
+    assert a.bar.maximum() == 1000 and a.bar.value() == 420
+    assert "Processing" in a.btn_play.text()
     panel.mark(hits[0].url, "add", True)
     assert a.btn_add.text() == "✓ Added" and a.bar.isVisibleTo(a)   # still playing
     assert busy.is_busy(b.btn_play)

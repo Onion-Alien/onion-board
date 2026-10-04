@@ -250,7 +250,8 @@ class FlatMap(QWidget):
     def _label_style(self) -> tuple[QFont, QColor]:
         font = QFont(self.font())
         font.setPointSizeF(max(7.0, font.pointSizeF() * 0.85))
-        return font, _mix(theme.T["bg"], theme.T["text"], 0.62)
+        font.setWeight(QFont.DemiBold)
+        return font, QColor(theme.T["text"])
 
     def _label_boxes(self, tr: QTransform, s: float, rect: QRectF, fm: QFontMetricsF):
         """Where the country names go: (box, name), biggest first, each where it fits
@@ -280,7 +281,7 @@ class FlatMap(QWidget):
             t = theme.T
             font = QFont(self.font())
             font.setPointSizeF(max(7.0, font.pointSizeF() * 0.8))
-            font.setWeight(QFont.DemiBold)
+            font.setWeight(QFont.Normal)
             fm = QFontMetricsF(font)
             w, h = fm.horizontalAdvance(name) + 6, fm.height() + 2
             pm = QPixmap(max(1, round(w * dpr)), max(1, round(h * dpr)))
@@ -293,7 +294,7 @@ class FlatMap(QWidget):
             halo = QPen(_mix(t["bg"], t["text"], 0.14), 3)
             halo.setJoinStyle(Qt.RoundJoin)
             q.strokePath(path, halo)
-            q.fillPath(path, _mix(t["bg"], t["text"], 0.9))
+            q.fillPath(path, _mix(t["bg"], t["text"], 0.68))
             q.end()
             self._town_pm[key] = pm
         return pm

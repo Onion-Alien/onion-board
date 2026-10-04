@@ -25,7 +25,7 @@ from soundboard import voicefx
 from soundboard import library, net, netlog, theme
 from soundboard.speech import customvoices, translation, winvoices
 from soundboard.speech.live import SpeechController, clean_settings
-from soundboard.ui import art, busy, icons
+from soundboard.ui import busy, icons
 from soundboard.ui.panel import (VolumeControl, bar, card, hint_label, icon_label,
                                  section_label, vsep)
 from soundboard.ui.responsive import FitWidth
@@ -33,7 +33,6 @@ from soundboard.ui.widgets import Meter
 from soundboard.wheelguard import no_wheel
 
 CUSTOM = "Custom"
-TILE_ART = 30     # px: a voice tile's picture (when there is one, see ui/art.py)
 LIVE_MODULE = "live-voice"
 IDLE_HINT = "Press Start, then just talk."
 MODELS = [("Fast (base.en)", "base.en"), ("Fastest (tiny.en)", "tiny.en"),
@@ -170,10 +169,12 @@ class EffectRow(QWidget):
         self.err.setVisible(bool(msg))
 
 
-PRESET_ICONS = voicefx.PRESET_ICONS
-POWER_TEXT = {False: "Voice changer is OFF  —  pick a voice below to turn it on",
-              True: "ON  —  everyone hears your changed voice"}
+POWER_TEXT = {False: "Voice changer is OFF", True: "Voice changer is ON"}
 POWER_SHORT = {False: "Voice changer is OFF", True: "ON  —  everyone hears it"}   # narrow
+VOICE_ICONS = {"Walkie-talkie": "radio", "Old telephone": "speech",
+               "Megaphone": "volume", "Stadium announcer": "volume",
+               "Podcast voice": "mic", "Demon": "voice", "Ghost": "voice",
+               "Alien": "voice", CUSTOM: "sliders"}
 
 
 class VoiceFxPanel(QWidget):
@@ -223,7 +224,7 @@ class VoiceFxPanel(QWidget):
         # need to try a voice is up here, next to the voice tiles
         top = QHBoxLayout()
         top.setSpacing(8)
-        top.addWidget(self.btn_power, 3)
+        top.addWidget(self.btn_power)
         self.btn_hear = QPushButton("Hear my voice")
         self.btn_hear.setObjectName("miccheck")
         self.btn_hear.setCheckable(True)
@@ -266,7 +267,8 @@ class VoiceFxPanel(QWidget):
         prow = QHBoxLayout()
         prow.addWidget(QLabel("<b>Pick a voice</b>"))
         prow.addStretch(1)
-        self.btn_random = QPushButton("🎲  Random voice")
+        self.btn_random = QPushButton("Random voice")
+        icons.set_icon(self.btn_random, "shuffle", size=14)
         self.btn_random.setObjectName("small")
         self.btn_random.setCursor(Qt.PointingHandCursor)
         self.btn_random.setToolTip("A random silly mix of effects, as “My own mix”. Click "
@@ -284,16 +286,11 @@ class VoiceFxPanel(QWidget):
         names = list(voicefx.PRESETS) + [CUSTOM]
         for i, name in enumerate(names):
             title = "My own mix" if name == CUSTOM else name
-            pic = art.icon(art.voice_key(name))
-            if pic is not None:
-                b = QPushButton(pic, title)
-                b.setIconSize(QSize(TILE_ART, TILE_ART))
-                b.setProperty("art", True)
-            else:
-                b = QPushButton(f"{PRESET_ICONS.get(name, '🎛️')}  {title}" if name != CUSTOM
-                                else f"🎚️  {title}")
+            b = QPushButton(title)
+            icons.set_icon(b, VOICE_ICONS.get(name, "wave"), size=18)
             b.setObjectName("voicetile")
             b.setCheckable(True)
+            b.setMaximumWidth(210)
             b.setCursor(Qt.PointingHandCursor)
             b.setToolTip("Your own settings from Fine-tune below" if name == CUSTOM else
                          f"Sound like: {name}. Click to turn the voice changer on with it.")
@@ -632,16 +629,12 @@ class SpeechPanel(QWidget):
         lv.setContentsMargins(0, 0, 0, 0)
         lv.setSpacing(6)
         self.b_live = QPushButton("Start talking as the voice")
-        if (pic := art.icon(art.COMPUTER_VOICE)) is not None:
-            self.b_live.setIcon(pic)
-            self.b_live.setIconSize(QSize(26, 26))
-        else:
-            icons.set_icon(self.b_live, "mic", "on_accent", "on_accent")
+        icons.set_icon(self.b_live, "mic", "on_accent", "on_accent")
         self.b_live.setCheckable(True)
         self.b_live.setMinimumHeight(40)
         self.b_live.setObjectName("primary")
         self.b_live.toggled.connect(self._toggle_live)
-        lv.addWidget(self.b_live)
+        lv.addWidget(self.b_live, 0, Qt.AlignLeft)
         self.lbl_state = QLabel(IDLE_HINT)
         self.lbl_state.setTextFormat(Qt.PlainText)   # shows the module's error text
         self.lbl_state.setObjectName("muted")
@@ -964,15 +957,11 @@ class SpeechPanel(QWidget):
         self.cb_lang.blockSignals(True)
         self.cb_lang.clear()
         self.cb_lang.addItem("English (as you say it)", "")
-        if (pic := art.icon(art.language_key("en"))) is not None:
-            self.cb_lang.setItemIcon(0, pic)
         for m in self.langs:
             name = m.language_name or m.language
             self.cb_lang.addItem(name if m.installed
                                  else f"{name}  (download {translation.size_mb(m)} MB)",
                                  m.language)
-            if (pic := art.icon(art.language_key(m.language))) is not None:
-                self.cb_lang.setItemIcon(self.cb_lang.count() - 1, pic)
         self.cb_lang.setIconSize(QSize(20, 20))
         self.cb_lang.setCurrentIndex(max(0, self.cb_lang.findData(self.s["translate"])))
         self.cb_lang.blockSignals(False)
@@ -1504,17 +1493,8 @@ class VoicePanel(QWidget):
         self.active_changed.emit(self.is_active())
 
     def tab_icon(self) -> str:
-        """The Voice tab's icon (icons.set_tab_icon name): while something here is on,
-        the picture of who's talking for you (the translated language, the computer
-        voice, or the voice changer's voice) when there is one; else the mask."""
-        if self.speech.b_live.isChecked():
-            key = art.first(art.language_key(self.speech.cb_lang.currentData() or ""),
-                            art.COMPUTER_VOICE)
-        elif self.fx.btn_power.isChecked():
-            key = art.first(art.voice_key(self.fx.preset))
-        else:
-            key = ""
-        return f"art:{key}" if key else "voice"
+        """A consistent line icon; the live dot indicates whether voice is active."""
+        return "voice"
 
     def poll(self):
         """Call from the UI's status timer: surfaces effects the chain had to bypass."""

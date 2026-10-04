@@ -58,6 +58,22 @@ def music(pid=100, active=True):
     return App(pid, "music.exe", r"C:\Programs\music.exe", "Music Thing", active, 0.3, ["Speakers"])
 
 
+def test_card_size_reflows_and_survives_reopening(tab, qapp):
+    tab.resize(1060, 640)
+    tab.show()
+    tab._on_apps([App(100 + i, f"player{i}.exe") for i in range(4)])
+    tab.card_size.setValue(240)
+    qapp.processEvents()
+    small_columns = tab.grid.columns(tab.list.width())
+    tab.card_size.setValue(480)
+    qapp.processEvents()
+    assert tab.grid.columns(tab.list.width()) < small_columns
+    assert tab.cfg.app_card_width == 480 and tab.saved
+    reopened = AppsTab(Engine(), tab.cfg, lambda: None, Meter)
+    assert reopened.card_size.value() == 480 and reopened.grid.min_w == 480
+    reopened.shutdown()
+
+
 def test_rows_follow_running_programs_and_send_captures_into_the_engine(tab):
     assert tab.empty.isVisibleTo(tab)
     tab._on_apps([music(), App(200, "game.exe")])

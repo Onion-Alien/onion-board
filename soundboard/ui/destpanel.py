@@ -169,7 +169,7 @@ class DestPanel(QWidget):
         key = self._suggested()
         if key:
             self.suggest_text.setText(
-                f"🎮 The game you have open uses {voicesdk.NAMES.get(key, key)} for voice "
+                f"The game you have open uses {voicesdk.NAMES.get(key, key)} for voice "
                 f"chat: <b>{destination.BUILTIN_BY_KEY[key].label}</b> suits it.")
         self.suggest.setVisible(bool(key))
 

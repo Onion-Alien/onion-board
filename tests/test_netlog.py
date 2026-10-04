@@ -260,3 +260,26 @@ def test_radio_switched_off_lists_what_it_refused(qapp, tmp_path):
     assert errors == [a.reason] and a.reason == net.off_message("radio")
     p.deleteLater()
     d.deleteLater()
+
+
+def test_activity_columns_stay_bounded_and_last_column_is_reachable(qapp):
+    from soundboard.ui.netactivity import _put, _table
+    from PySide6.QtCore import Qt
+    from PySide6.QtWidgets import QAbstractItemView
+
+    table = _table(["Server", "Why", "Used for", "Connections", "Data", "Last"], 1)
+    table.resize(580, 260)
+    table.setRowCount(1)
+    for col in range(6):
+        _put(table, 0, col, "A very long value " * 20)
+    table.show()
+    qapp.processEvents()
+    assert table.columnWidth(0) < 250
+    assert table.item(0, 0).toolTip()
+    assert table.horizontalScrollBar().maximum() > 0
+    table.scrollToItem(table.item(0, 5), QAbstractItemView.PositionAtCenter)
+    qapp.processEvents()
+    rect = table.visualItemRect(table.item(0, 5))
+    assert table.viewport().rect().intersects(rect)
+    assert table.textElideMode() == Qt.ElideRight
+    table.close()
