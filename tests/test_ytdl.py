@@ -574,6 +574,10 @@ def test_results_spin_while_searching_and_offer_every_site(qapp, monkeypatch):
     assert panel.spinner.running()
     panel.close_results()                        # closing stops it too
     assert not panel.spinner.running()
+    # its search thread still reports back: let it, before the panel is freed (else it
+    # emits on a deleted widget, a segfault in whichever test runs next)
+    assert process_events(qapp, lambda: not any(
+        t.name == "web-search" for t in threading.enumerate()), 5)
 
 
 def test_searching_shows_a_centred_mascot_then_the_results(qapp, monkeypatch):
