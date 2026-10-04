@@ -204,6 +204,34 @@ def take(item_id: str) -> Item | None:
         return item
 
 
+def adopt(src: Path) -> None:
+    """Put a bin that was set aside (a restore point's copy of this folder) back into
+    the bin, next to what's been deleted since."""
+    try:
+        raw = json.loads((src / "deleted.json").read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        raw = {}
+    with _lock:
+        all_, ok = _read(tries=10)
+        if not ok:
+            log.warning("the bin's list is locked: %s stays where it is", src)
+            return
+        for d in raw.get("items", []) if isinstance(raw, dict) else []:
+            try:
+                it = Item(id=str(d["id"]), kind=str(d["kind"]), name=str(d.get("name", "")),
+                          when=float(d.get("when", 0)), data=dict(d.get("data") or {}),
+                          index=int(d.get("index", 0)))
+            except (KeyError, TypeError, ValueError):
+                continue
+            for k in ("file", "image"):
+                name = it.data.get(k, "")
+                if name and not Path(name).is_absolute() and (src / name).exists():
+                    it.data[k] = _move(src / name, folder()).name
+            all_.append(it)
+        all_.sort(key=lambda i: i.when)
+        _save(_prune(all_))
+
+
 def meta_of(item: Item) -> SoundMeta | None:
     """A taken sound entry as a pad again (fields a newer version wrote are dropped)."""
     blank = SoundMeta(id="", name="", file="")

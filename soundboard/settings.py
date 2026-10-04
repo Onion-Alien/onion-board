@@ -854,8 +854,30 @@ class SettingsDialog(QDialog):
         v.addWidget(card)
         v.addWidget(self._background_card())
         v.addWidget(self._backup_card())
+        v.addWidget(self._reset_card())
         v.addStretch(1)
         return w
+
+    def _reset_card(self):
+        card, cv = self._card("Start over",
+                              "Something's not right? Reset just the parts you pick: "
+                              "settings, hotkeys, sounds or the recycle bin. A restore "
+                              "point is saved first, so it can always be undone.")
+        row = QHBoxLayout()
+        rst = QPushButton("Reset…")
+        icons.set_icon(rst, "reload")
+        rst.clicked.connect(lambda: self._open_reset(points=False))
+        pts = QPushButton("Restore points…")
+        pts.clicked.connect(lambda: self._open_reset(points=True))
+        row.addWidget(rst)
+        row.addWidget(pts)
+        row.addStretch(1)
+        cv.addLayout(row)
+        return card
+
+    def _open_reset(self, points: bool):
+        from soundboard.ui.resetguide import ResetGuide, RestorePoints
+        (RestorePoints if points else ResetGuide)(self.mw, self).exec()
 
     def _help(self):
         w, v = self._page()

@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+- **Reset, with an undo:** Settings → General → Start over opens a short guide:
+  tick what to reset (settings, hotkeys and optionally each sound's hotkey,
+  sounds, Recently deleted, programs, audio devices), check the summary, and the
+  app restarts with just those parts back to the start. A restore point is saved
+  first, holding the settings and any sounds or bin it cleared, so **Restore
+  points…** puts it all back (sounds added since are kept). The last 5 are kept.
 - **Remote control for streamers, the easy way:** Settings → Remote has a
   **Streamer guide** (Stream Deck keys, channel points and chat commands through
   Streamer.bot, a panic button, with each link ready to copy) and **Copy AI
