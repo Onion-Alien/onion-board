@@ -336,6 +336,24 @@ def test_every_tab_has_its_own_label(window):
     assert window.tabs.tabText(2) == "Apps"
 
 
+def test_sounds_tab_lights_up_while_a_sound_plays(window, monkeypatch):
+    tabs, i = window.tabs, window.tabs.indexOf(window.sounds_page)
+    playing = {}
+    monkeypatch.setattr(window.engine, "playing", lambda: dict(playing))
+    window.tick()
+    assert not is_tab_live(tabs, i)
+    playing["s0"] = (0.3, False)
+    window.tick()
+    assert is_tab_live(tabs, i) and tabs.tabToolTip(i).startswith("● ON")
+    playing["s0"] = (0.3, True)                  # paused: not live
+    window.tick()
+    assert not is_tab_live(tabs, i)
+    playing.clear()
+    playing["__test__"] = (0.1, False)           # the mic test's playback isn't a sound
+    window.tick()
+    assert not is_tab_live(tabs, i) and not tabs.tabToolTip(i).startswith("●")
+
+
 def test_radio_and_apps_light_their_tabs_while_they_send_sound(window):
     tabs = window.tabs
     for panel in (window.radio, window.apps):

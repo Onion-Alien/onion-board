@@ -1,8 +1,8 @@
 """A glowing, gently pulsing dot that marks a tab whose feature is live right now
-(the Voice tab while the voice changer is changing your mic, Radio while a station
-plays, Apps while a program's sound is sent, Triggers while the screen is watched),
-so it can't be left on by accident without you noticing from another tab. The tab's
-name is drawn in the live colour too."""
+(Sounds while a sound plays, Voice while the voice changer is changing your mic,
+Radio while a station plays, Apps while a program's sound is sent, Triggers while
+the screen is watched), so it can't be left on by accident without you noticing
+from another tab. The tab's name is drawn in the live colour too."""
 from __future__ import annotations
 
 import math
