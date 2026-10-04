@@ -49,7 +49,7 @@ class DeletedDialog(QDialog):
         lay.addLayout(row)
         box = QDialogButtonBox(QDialogButtonBox.Close)
         box.rejected.connect(self.reject)
-        lay.addWidget(box)
+        row.addWidget(box)
         self.fill()
 
     def fill(self):

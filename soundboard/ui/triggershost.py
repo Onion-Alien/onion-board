@@ -64,6 +64,13 @@ class BoardHost:
         self.win._save_later()
 
     # ------------------------------------------------------------------ sounds
+    def sound_details(self, sid: str) -> str:
+        """Optional detail for newer trigger cards; keeps the existing host API."""
+        meta = self.win.meta(sid)
+        if meta is None:
+            return "Sound unavailable"
+        return f"{meta.name}: {meta.volume:.0%} · Hotkey: {meta.hotkey or 'none'}"
+
     def sounds(self) -> list[tuple[str, str]]:
         return [(m.id, m.name) for m in self.win.cfg.sounds]
 

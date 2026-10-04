@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Recently deleted keeps Close beside its other actions. Sound pad menus no longer
+  include Preview, and Apps / Triggers information is centered on the tab row.
+- Newer Onion Watch cards can show each sound's volume and hotkey.
+
 ## 1.6.8 — 2026-10-04
 
 - **Searching YouTube no longer gets you taken for a bot so easily.** Since 1.6.5 every

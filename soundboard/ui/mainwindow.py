@@ -59,8 +59,8 @@ from soundboard.ui.triggershost import BoardHost
 from soundboard.ui.triggerstab import TriggersTab
 from soundboard.ui.radiopanel import RadioOff, RadioTab
 from soundboard.ui.voicepanel import VoicePanel
-from soundboard.ui.widgets import (Meter, Pad, PadGrid, SeekSlider, SteadyTabs, expand_dropped,
-                                   fmt_pos, pad_height, spectrum, SLIM_PAD_H)
+from soundboard.ui.widgets import (Meter, Pad, PadGrid, SeekSlider, SteadyTabs, TabInfoCorner,
+                                   expand_dropped, fmt_pos, pad_height, spectrum, SLIM_PAD_H)
 from soundboard.wheelguard import no_wheel
 from soundboard.winkeys import Hotkeys
 from soundboard import errors
@@ -418,7 +418,8 @@ class MainWindow(QMainWindow):
         self.btn_info.setCursor(Qt.PointingHandCursor)
         self.btn_info.setToolTip("What's this tab for?")
         self.btn_info.clicked.connect(self._show_tab_info)
-        self.tabs.setCornerWidget(self.btn_info, Qt.TopRightCorner)
+        info_corner = TabInfoCorner(self.tabs, self.btn_info)
+        self.tabs.setCornerWidget(info_corner, Qt.TopRightCorner)
         self._update_info_btn = lambda *_: self.btn_info.setVisible(
             self._current_tab_info() is not None)
         self.tabs.currentChanged.connect(self._update_info_btn)
@@ -3033,7 +3034,6 @@ class MainWindow(QMainWindow):
             a.setToolTip(tip or text)
             return a
         a_stop = add(("stop",), "Stop") if self.engine.state(sid) else None
-        a_prev = add(("headphones",), "Preview", "Plays it to you alone, not into the call")
         a_next = add(("play",), "Play next", "Plays it after the sounds playing now")
         menu.addSeparator()
         a_edit = add(("edit",), "Edit…", "Name, volume, hotkey, what a press does, loop, "
@@ -3080,8 +3080,6 @@ class MainWindow(QMainWindow):
             self.export_sounds([m], m.name)
         elif act == a_stop:
             self.engine.stop(sid)
-        elif act == a_prev:
-            self.preview(sid)
         elif act == a_next:
             self.queue_sound(sid)
         elif act == a_edit:

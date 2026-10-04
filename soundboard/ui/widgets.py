@@ -216,6 +216,22 @@ _HANN = np.hanning(FFT_N).astype(np.float32)
 _FREQS = np.fft.rfftfreq(FFT_N, 1 / SR)
 
 
+class TabInfoCorner(QWidget):
+    """Give Qt's corner the tab row's height so its button is vertically centered."""
+
+    def __init__(self, tabs, button):
+        super().__init__()
+        self.tabs = tabs
+        layout = QVBoxLayout(self)
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.addWidget(button, 0, Qt.AlignVCenter)
+
+    def sizeHint(self):
+        size = super().sizeHint()
+        size.setHeight(max(size.height(), self.tabs.tabBar().sizeHint().height()))
+        return size
+
+
 class SteadyTabs(QObject):
     """Keeps a QTabWidget from repainting all of itself when nothing it lays out
     changed. It answers every layout request from inside (a label's new text, a
