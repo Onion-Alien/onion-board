@@ -717,3 +717,24 @@ def test_callback_keeps_pace_beside_busy_python():
         th.join()
         sys.setswitchinterval(old)
     assert np.median(took) < 0.005   # 10 ms is the whole budget; it was 15 ms
+
+
+def test_hear_my_voice_alone_leaves_the_sounds_out_of_your_headphones():
+    e = engine_with("main", "mon")
+    e.mic_check = e.mon_voice_only = True
+    e.ring_mon.prefill = 0
+    e.play("s", tone(), 1.0)
+    out = np.zeros((480, 2), np.float32)
+    e._mon(out, 480)
+    assert not out.any()                      # a sound playing: not heard here
+    e._mic(np.full((480, 1), 0.25, np.float32))
+    e._mon(out, 480)
+    assert out.max() == pytest.approx(0.25 * e.mic_vol * e.mon_vol, rel=0.05)
+    e.mon_voice_only = False                  # the mixer's Hear what they hear: everything
+    e._mon(out, 480)
+    assert out.any()
+
+
+def test_device_delay_is_unknown_until_the_streams_are_open():
+    e = Engine()
+    assert e.device_delay() is None

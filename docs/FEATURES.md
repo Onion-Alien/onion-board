@@ -92,9 +92,13 @@ The full list. The [README](../README.md) has the short version and how to get s
   engine); **2D** on the globe goes back. Star stations for
   *★ Favorites*. It plays in your headphones, goes out through
   your mic when you press **LIVE**, and can *Record* or save the *Last 15s* as a pad.
-- **Voice tab:** voice changer (pitch, robot, radio, echo, reverb, distortion,
-  8-bit bitcrusher, plus add-on effects; it starts off every time the app
-  opens, and a big ON / OFF button shows which it is), text-to-speech with Windows' built-in
+- **Voice tab:** voice changer (20 ready voices, from Female / Male voice and Demon to
+  Autotune, Talkbox, Masked caller and Dark lord; pitch with a natural-sound mode and a
+  voice-size control, autotune, mic clean-up (noise gate + hiss removal), monster growl,
+  robot / talkbox, helmet, shout blowout, radio with walkie-talkie clicks, echo, reverb,
+  distortion, 8-bit bitcrusher, plus add-on effects; it shows how much delay the voice
+  adds, starts off every time the app opens, and a big ON / OFF button shows which it
+  is), text-to-speech with Windows' built-in
   voices or your own (*More options → Custom voices*: a TTS server on your PC such as
   Kokoro or AllTalk — any OpenAI-style `/v1/audio/speech` address — a TTS program, or
   Piper voice packs dropped into the voices folder), and **live voice-to-speech**:

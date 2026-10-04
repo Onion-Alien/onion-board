@@ -12,7 +12,7 @@ import sys
 from pathlib import Path
 
 from PySide6.QtCore import QPointF, QRectF, Qt
-from PySide6.QtGui import (QColor, QIcon, QImage, QLinearGradient, QPainter, QPainterPath,
+from PySide6.QtGui import (QColor, QFont, QIcon, QImage, QLinearGradient, QPainter, QPainterPath,
                            QPixmap)
 
 ART_DIR = (Path(sys._MEIPASS) / "art" if hasattr(sys, "_MEIPASS")
@@ -131,6 +131,41 @@ def random_icon() -> QIcon:
                 ic.addPixmap(pm, mode, QIcon.Off)
         _icons["dice"] = ic
     return _icons["dice"]
+
+
+def _mystery(size: int) -> QPixmap:
+    """The picture of a voice that has none yet: a white question mark on a slate
+    rounded square, painted like the Random voice die."""
+    pm = QPixmap(size, size)
+    pm.fill(Qt.transparent)
+    p = QPainter(pm)
+    p.setRenderHint(QPainter.Antialiasing)
+    bg = QLinearGradient(0, 0, size, size)
+    bg.setColorAt(0, QColor("#5b6478"))
+    bg.setColorAt(1, QColor("#343a4a"))
+    p.setPen(Qt.NoPen)
+    p.setBrush(bg)
+    p.drawRoundedRect(QRectF(0, 0, size, size), size * ROUND, size * ROUND)
+    f = QFont()
+    f.setBold(True)
+    f.setPixelSize(max(6, int(size * 0.62)))
+    p.setFont(f)
+    p.setPen(QColor("#ffffff"))
+    p.drawText(QRectF(0, 0, size, size), Qt.AlignCenter, "?")
+    p.end()
+    return pm
+
+
+def mystery_icon() -> QIcon:
+    """For a voice tile without a picture of its own (yet)."""
+    if "mystery" not in _icons:
+        ic = QIcon()
+        for s in SIZES:
+            pm = _mystery(s)
+            for mode in (QIcon.Normal, QIcon.Active, QIcon.Selected):
+                ic.addPixmap(pm, mode, QIcon.Off)
+        _icons["mystery"] = ic
+    return _icons["mystery"]
 
 
 def first(*keys: str) -> str:

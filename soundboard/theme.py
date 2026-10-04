@@ -559,8 +559,22 @@ QFrame#card[roomy="true"] QPushButton#fold { padding:8px 10px; text-align:left; 
 QFrame#card[roomy="true"] QComboBox { padding:9px 12px; }
 QPlainTextEdit#speechlog { background:$bg; border:1px solid $border; border-radius:8px; padding:8px; }
 
-QWidget#fxrow { border:1px solid transparent; border-radius:8px; }
-QWidget#fxrow[fresh="true"] { background:$card_hi; border-color:$accent; }
+QFrame#fxcard { background:$card; border:1px solid $border; border-radius:12px; }
+QFrame#fxcard:hover { border-color:$border_hi; }
+QFrame#fxcard[on="true"] { border-color:$accent; }
+QFrame#fxcard[hero="true"] { background:$card; }
+QFrame#fxcard[fresh="true"] { background:$card_hi; border:2px solid $accent_hi; }
+QFrame#fxcard QLabel, QFrame#fxcard QCheckBox { background:transparent; }
+QLabel#fxname { font-weight:700; font-size:10pt; color:$text_hi; }
+QLabel#fxdesc { color:$muted; font-size:8.5pt; }
+QLabel#fxparam { color:$text; font-size:9pt; }
+QLabel#fxvalue { color:$accent_hi; font-size:9pt; font-weight:700; }
+QLabel#fxend { color:$faint; font-size:7.5pt; }
+QLabel#fxgroup { color:$section; font-size:8pt; font-weight:700; letter-spacing:1px; padding-top:6px; }
+QPushButton#fxreset, QFrame#card QPushButton#fxreset, QFrame#card[roomy="true"] QPushButton#fxreset { background:transparent; border:none; color:$muted; padding:2px 6px; min-height:0; font-size:8pt; }
+QPushButton#fxreset:hover, QFrame#card QPushButton#fxreset:hover, QFrame#card[roomy="true"] QPushButton#fxreset:hover { color:$text; background:transparent; }
+QLabel#pill { background:$inset; border:1px solid $border; border-radius:10px; padding:3px 10px; color:$muted; font-size:8.5pt; font-weight:600; }
+QLabel#pill[slow="true"] { color:$warn_text; border-color:$warn_text; }
 QPushButton#fold { background:transparent; border:none; color:$muted; padding:3px 6px; font-size:8.5pt; font-weight:600; }
 QPushButton#fold:hover, QPushButton#fold:checked { color:$text; background:transparent; }
 QFrame#card QPushButton#fold, QFrame#card QPushButton#fold:checked { background:transparent; }

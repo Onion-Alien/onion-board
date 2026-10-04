@@ -12,8 +12,8 @@ import re
 import threading
 import time
 
-from PySide6.QtCore import QSize, Qt, QTimer, Signal
-from PySide6.QtGui import QGuiApplication
+from PySide6.QtCore import QRectF, QSize, Qt, QTimer, Signal
+from PySide6.QtGui import QColor, QGuiApplication, QPainter
 from PySide6.QtWidgets import (QButtonGroup, QCheckBox, QComboBox, QDialog, QMessageBox,
                                QDialogButtonBox, QFormLayout, QFrame, QGridLayout,
                                QHBoxLayout, QInputDialog, QLabel, QLineEdit, QMenu,
@@ -60,28 +60,116 @@ def translations(module_list: list[mods.ModuleInfo]) -> list[mods.ModuleInfo]:
 
 # =========================================================================== voice changer
 
+class Switch(QCheckBox):
+    """An on/off switch (a pill with a knob) that behaves like a checkbox."""
+
+    def __init__(self, tip: str = ""):
+        super().__init__()
+        self.setCursor(Qt.PointingHandCursor)
+        self.setToolTip(tip)
+        self.setFixedSize(38, 22)
+
+    def sizeHint(self):
+        return QSize(38, 22)
+
+    def hitButton(self, pos):
+        return self.rect().contains(pos)
+
+    def paintEvent(self, _e):
+        p = QPainter(self)
+        p.setRenderHint(QPainter.Antialiasing)
+        on = self.isChecked()
+        r = QRectF(self.rect()).adjusted(1, 3, -1, -3)
+        track = QColor(theme.T["accent"] if on else theme.T["groove"])
+        if not self.isEnabled():
+            track.setAlpha(110)
+        p.setPen(Qt.NoPen)
+        p.setBrush(track)
+        p.drawRoundedRect(r, r.height() / 2, r.height() / 2)
+        d = r.height() - 4
+        x = r.right() - d - 2 if on else r.left() + 2
+        p.setBrush(QColor(theme.T["on_accent"] if on else theme.T["text"]))
+        p.drawEllipse(QRectF(x, r.top() + 2, d, d))
+        if self.hasFocus():
+            p.setBrush(Qt.NoBrush)
+            p.setPen(QColor(theme.T["accent_hi"]))
+            p.drawRoundedRect(r.adjusted(-1, -1, 1, 1), r.height() / 2 + 1, r.height() / 2 + 1)
+
+
+def _is_switch(q: voicefx.Param) -> bool:
+    """A 0/1 parameter with a step of 1 is an on/off choice, shown as a switch."""
+    return q.lo == 0 and q.hi == 1 and q.step == 1
+
+
 class ParamSlider(QWidget):
+    """One effect setting. Compact (the speed & pitch popup, a sound's effects): name,
+    slider and value on one row. Otherwise (the Voice tab's effect cards): name and
+    value on top, the slider, and (when the parameter names them) what its two ends
+    mean underneath. A 0/1 setting is a switch instead (`slider` is then None)."""
     changed = Signal()
 
-    def __init__(self, q: voicefx.Param, value: float):
+    def __init__(self, q: voicefx.Param, value: float, compact: bool = True):
         super().__init__()
         self.q = q
         self.steps = max(1, int(round((q.hi - q.lo) / q.step))) if q.step else 200
-        self.setMinimumHeight(26)
-        h = QHBoxLayout(self)
-        h.setContentsMargins(22, 0, 0, 0)
-        name = QLabel(q.label)
-        name.setFixedWidth(78)
+        self.slider: QSlider | None = None
+        self.switch: Switch | None = None
+        self.name = QLabel(q.label)
+        self.name.setObjectName("fxparam")
+        self.val = QLabel()
+        self.val.setObjectName("fxvalue")
+        self.val.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        if compact:
+            self.setMinimumHeight(26)
+            h = QHBoxLayout(self)
+            h.setContentsMargins(22, 0, 0, 0)
+            self.name.setObjectName("")
+            self.name.setFixedWidth(78)
+            self.slider = QSlider(Qt.Horizontal)
+            self.slider.setRange(0, self.steps)
+            self.val.setFixedWidth(64)
+            self.val.setObjectName("eqlabel")
+            h.addWidget(self.name)
+            h.addWidget(self.slider, 1)
+            h.addWidget(self.val)
+            no_wheel(self.slider)
+            self.set_value(value)
+            self.slider.valueChanged.connect(self._moved)
+            return
+        if _is_switch(q):
+            h = QHBoxLayout(self)
+            h.setContentsMargins(0, 2, 0, 2)
+            self.switch = Switch(q.label)
+            h.addWidget(self.name)
+            h.addStretch(1)
+            h.addWidget(self.switch)
+            self.val.hide()
+            self.set_value(value)
+            self.switch.toggled.connect(self._moved)
+            return
+        v = QVBoxLayout(self)
+        v.setContentsMargins(0, 2, 0, 2)
+        v.setSpacing(2)
+        top = QHBoxLayout()
+        top.setSpacing(6)
+        top.addWidget(self.name)
+        top.addStretch(1)
+        top.addWidget(self.val)
+        v.addLayout(top)
         self.slider = QSlider(Qt.Horizontal)
         self.slider.setRange(0, self.steps)
-        self.val = QLabel()
-        self.val.setFixedWidth(64)
-        self.val.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
-        self.val.setObjectName("eqlabel")
-        h.addWidget(name)
-        h.addWidget(self.slider, 1)
-        h.addWidget(self.val)
+        self.slider.setMinimumWidth(90)
         no_wheel(self.slider)
+        v.addWidget(self.slider)
+        if any(q.ends):
+            ends = QHBoxLayout()
+            for i, word in enumerate(q.ends):
+                lbl = QLabel(word)
+                lbl.setObjectName("fxend")
+                ends.addWidget(lbl)
+                if i == 0:
+                    ends.addStretch(1)
+            v.addLayout(ends)
         self.set_value(value)
         self.slider.valueChanged.connect(self._moved)
 
@@ -90,70 +178,154 @@ class ParamSlider(QWidget):
         v = self.value()
         self.q = q
         self.steps = max(1, int(round((q.hi - q.lo) / q.step))) if q.step else 200
-        self.slider.blockSignals(True)
-        self.slider.setRange(0, self.steps)
-        self.slider.blockSignals(False)
+        if self.slider is not None:
+            self.slider.blockSignals(True)
+            self.slider.setRange(0, self.steps)
+            self.slider.blockSignals(False)
         self.set_value(v)
 
     def value(self) -> float:
+        if self.switch is not None:
+            return 1.0 if self.switch.isChecked() else 0.0
         return self.q.lo + (self.q.hi - self.q.lo) * self.slider.value() / self.steps
 
     def set_value(self, v: float):
         v = self.q.clamp(v)
+        if self.switch is not None:
+            self.switch.blockSignals(True)
+            self.switch.setChecked(v >= 0.5)
+            self.switch.blockSignals(False)
+            return
         span = (self.q.hi - self.q.lo) or 1.0
         self.slider.blockSignals(True)
         self.slider.setValue(int(round((v - self.q.lo) / span * self.steps)))
         self.slider.blockSignals(False)
         self._label()
 
-    def _label(self):
-        v = self.value()
+    def text(self) -> str:
+        v = round(self.value(), 3)
         if self.q.unit:
-            txt = f"{v:+g}{self.q.unit}" if self.q.lo < 0 else f"{v:g}{self.q.unit}"
-        else:
-            txt = f"{round(v * 100)}%" if self.q.hi <= 1 else f"{v:g}"
-        self.val.setText(txt)
+            return f"{v:+g}{self.q.unit}" if self.q.lo < 0 else f"{v:g}{self.q.unit}"
+        if self.q.hi <= 1 and self.q.lo >= 0:
+            return f"{round(v * 100)}%"
+        return f"{v:+g}" if self.q.lo < 0 else f"{v:g}"
+
+    def _label(self):
+        self.val.setText(self.text())
 
     def _moved(self, _v):
         self._label()
         self.changed.emit()
 
 
-class EffectRow(QWidget):
+# the app's own line icons (ui/icons.py), like everywhere else
+FX_ICONS = {"cleanup": "shield", "pitch": "mic", "growl": "wave", "robot": "keyboard",
+            "compressor": "volume", "tone": "sliders", "radio": "radio", "distortion": "live",
+            "shout": "speech", "helmet": "voice", "chorus": "shuffle", "echo": "history",
+            "reverb": "headphones"}
+# the Voice tab's "Make it yours" strip (always in view) and the effect cards' groups;
+# an effect from an add-on goes under Add-ons
+HERO = ("pitch", "cleanup")
+HERO_TITLES = {"pitch": "Pitch & voice"}
+GROUPS = (("Change the voice", ("growl", "robot")),
+          ("Character", ("compressor", "tone", "radio", "distortion", "shout", "helmet")),
+          ("Room", ("chorus", "echo", "reverb")))
+ADDON_GROUP = "Add-ons"
+# your own setting, not part of a voice: picking or saving a voice leaves it as it is
+KEEP = frozenset({"cleanup"})
+
+
+class EffectRow(QFrame):
+    """One effect as a card: icon, name, an on/off switch, what it does, and its
+    settings while it's on. `hero` (Pitch, Clean up my mic): the settings always
+    show, and moving one switches the effect on."""
     changed = Signal()
 
-    def __init__(self, cls: type[voicefx.Effect], cfg: dict):
+    def __init__(self, cls: type[voicefx.Effect], cfg: dict, hero: bool = False):
         super().__init__()
         self.cls = cls
-        self.setObjectName("fxrow")
-        self.setAttribute(Qt.WA_StyledBackground)   # so [fresh] can paint a background
+        self.hero = hero
+        self.setObjectName("fxcard")
+        self.setProperty("hero", hero)
+        self.setAttribute(Qt.WA_StyledBackground)   # so [on] / [fresh] can paint
         v = QVBoxLayout(self)
-        v.setContentsMargins(6, 2, 6, 2)
-        v.setSpacing(2)
-        self.chk = QCheckBox(cls.name)
-        self.chk.setToolTip(cls.description)
+        v.setContentsMargins(12, 10, 12, 10)
+        v.setSpacing(6)
+        head = QHBoxLayout()
+        head.setSpacing(8)
+        icon = QLabel()
+        icons.set_label_icon(icon, FX_ICONS.get(cls.type, "sliders"), "accent_hi", size=16)
+        icon.setObjectName("fxicon")
+        head.addWidget(icon)
+        title = QLabel(HERO_TITLES.get(cls.type, cls.name))
+        title.setObjectName("fxname")
+        head.addWidget(title)
+        head.addStretch(1)
+        self.btn_reset = QPushButton("Reset")
+        self.btn_reset.setObjectName("fxreset")
+        self.btn_reset.setCursor(Qt.PointingHandCursor)
+        self.btn_reset.setToolTip(f"Put {cls.name}'s settings back to how they start")
+        self.btn_reset.clicked.connect(self.reset)
+        head.addWidget(self.btn_reset)
+        self.chk = Switch(f"Turn {cls.name} on or off")
         self.chk.setChecked(bool(cfg.get("on")))
-        v.addWidget(self.chk)
+        head.addWidget(self.chk)
+        v.addLayout(head)
+        self.desc = hint_label(cls.description)
+        self.desc.setObjectName("fxdesc")
+        v.addWidget(self.desc)
         self.err = hint_label("")
         theme.set_tone(self.err, "error")
         self.err.hide()
         v.addWidget(self.err)
         self.body = QWidget()
-        b = QVBoxLayout(self.body)
-        b.setContentsMargins(0, 0, 0, 4)
-        b.setSpacing(2)
+        grid = QGridLayout(self.body)
+        grid.setContentsMargins(0, 2, 0, 0)
+        grid.setHorizontalSpacing(18)
+        grid.setVerticalSpacing(8)
         self.sliders = []
-        for q in cls.params:
-            s = ParamSlider(q, cfg.get(q.key, q.default))
-            s.changed.connect(self.changed)
-            b.addWidget(s)
+        cols = 2 if hero and len(cls.params) > 2 else 1
+        for i, q in enumerate(cls.params):
+            s = ParamSlider(q, cfg.get(q.key, q.default), compact=False)
+            s.changed.connect(self._slid)
+            grid.addWidget(s, i // cols, i % cols)
             self.sliders.append(s)
+        for c in range(cols):
+            grid.setColumnStretch(c, 1)
         v.addWidget(self.body)
-        self.body.setVisible(self.chk.isChecked())
         self.chk.toggled.connect(self._toggled)
+        self._show()
 
-    def _toggled(self, on):
-        self.body.setVisible(on)
+    def _show(self):
+        on = self.chk.isChecked()
+        self.body.setVisible(on or self.hero)
+        self.btn_reset.setVisible(on)
+        if bool(self.property("on")) != on:
+            self.setProperty("on", on)
+            self.style().unpolish(self)
+            self.style().polish(self)
+
+    def _toggled(self, _on):
+        self._show()
+        self.changed.emit()
+
+    def _slid(self):
+        if self.hero and not self.chk.isChecked():
+            self.chk.blockSignals(True)
+            self.chk.setChecked(True)     # moving its slider means you want it
+            self.chk.blockSignals(False)
+            self._show()
+        self.changed.emit()
+
+    def mousePressEvent(self, e):
+        # a click on an off card's free space turns it on (it's mostly empty then)
+        if e.button() == Qt.LeftButton and not self.chk.isChecked() and not self.hero:
+            self.chk.setChecked(True)
+            return
+        super().mousePressEvent(e)
+
+    def reset(self):
+        self.load({"on": self.chk.isChecked()})
         self.changed.emit()
 
     def state(self) -> dict:
@@ -165,9 +337,9 @@ class EffectRow(QWidget):
         self.chk.blockSignals(True)
         self.chk.setChecked(bool(cfg and cfg.get("on", True)))
         self.chk.blockSignals(False)
-        self.body.setVisible(self.chk.isChecked())
         for s in self.sliders:
             s.set_value((cfg or {}).get(s.q.key, s.q.default))
+        self._show()
 
     def set_error(self, msg: str):
         self.err.setText(f"⚠ Turned off after an error: {msg}" if msg else "")
@@ -197,11 +369,14 @@ class VoiceFxPanel(QWidget):
     way to hear yourself, and (folded away) the individual effects for fine-tuning.
 
     `changed(spec)` with spec = {"enabled", "preset", "effects": {type: {...}}}.
-    `hear_toggled(bool)` asks the window to switch "Hear what they hear" on or off.
+    `hear_toggled(bool)` asks the window to switch "Hear what they hear" on or off;
+    `voice_only(bool)` says whether that should be your voice alone (Hear my voice)
+    or everything (switched on from the mixer).
     `chat_help()` asks for the Discord guide; `tip_dismissed()` means "Got it" on the
     Discord notice (the window remembers it)."""
     changed = Signal(dict)
     hear_toggled = Signal(bool)
+    voice_only = Signal(bool)    # Hear my voice: only the voice, not the sounds
     chat_help = Signal()
     tip_dismissed = Signal()
 
@@ -250,11 +425,12 @@ class VoiceFxPanel(QWidget):
         self.btn_hear.setObjectName("miccheck")
         self.btn_hear.setCheckable(True)
         self.btn_hear.setMinimumHeight(42)
-        self.btn_hear.setToolTip("Hear my voice (only me): plays your mic, changed, into your "
-                                 "headphones, the same as “Hear what they hear”. Click again "
-                                 "to stop.")
+        self.btn_hear.setToolTip("Hear my voice (only me): plays your changed voice into your "
+                                 "headphones, without your sounds, so you can tune it. "
+                                 "(The mixer's “Hear what they hear” plays everything.) "
+                                 "Click again to stop.")
         icons.set_icon(self.btn_hear, "ear", checked_color="#ffffff")
-        self.btn_hear.toggled.connect(self.hear_toggled)
+        self.btn_hear.toggled.connect(self._hear)
         top.addWidget(icon_label("mic", "Your mic level"))
         self.meter = Meter()
         self.meter.setMinimumWidth(60)
@@ -296,9 +472,10 @@ class VoiceFxPanel(QWidget):
         self._saved_tiles: list[QPushButton] = []
         for name in list(voicefx.PRESETS) + [CUSTOM]:
             title = "My own mix" if name == CUSTOM else name
-            b = self._make_tile(name, title, art.icon(art.voice_key(name)),
-                                VOICE_ICONS.get(name, "wave"))
-            b.setToolTip("Your own settings from Fine-tune below" if name == CUSTOM else
+            pic = art.icon(art.voice_key(name)) or (art.mystery_icon() if name != CUSTOM
+                                                    else None)
+            b = self._make_tile(name, title, pic, VOICE_ICONS.get(name, "wave"))
+            b.setToolTip("Your own settings from All effects below" if name == CUSTOM else
                          f"Sound like: {name}. Click to turn the voice changer on with it.")
         # the dice goes last, after your saved voices: it's not a voice but a way to
         # make one, so it isn't checkable
@@ -309,7 +486,7 @@ class VoiceFxPanel(QWidget):
         self.btn_random.setProperty("art", True)
         self.btn_random.setMaximumWidth(210)
         self.btn_random.setCursor(Qt.PointingHandCursor)
-        self.btn_random.setToolTip("A random silly mix of effects, as “My own mix”. Fine-tune "
+        self.btn_random.setToolTip("A random silly mix of effects, as “My own mix”. All effects "
                                    "opens with what it changed lit up. Click again for "
                                    "another.")
         self.btn_random.clicked.connect(lambda: self.randomize())
@@ -319,20 +496,23 @@ class VoiceFxPanel(QWidget):
         self.undo_bar = UndoBar("Bring the voice back, as it was")
         v.addWidget(self.undo_bar)
 
-        # ---- fine-tune (folded away)
-        self.btn_more = QPushButton("Fine-tune effects")
-        self.btn_more.setObjectName("fold")
-        self.btn_more.setCheckable(True)
-        self.btn_more.toggled.connect(self._show_more)
-        v.addWidget(self.btn_more, 0, Qt.AlignLeft)
-        self.more = QWidget()
-        self.box = QVBoxLayout(self.more)
-        self.box.setContentsMargins(0, 0, 0, 0)
-        self.box.setSpacing(4)
-        self.box.addWidget(hint_label("Tick effects and drag their sliders to make your own "
-                                      "voice. Changing anything here switches to "
-                                      "“My own mix”. Like it? Save it as a voice of its own "
-                                      "and it gets a button above."))
+        # ---- make it yours: the settings people reach for, always in view
+        self.tweak = QFrame()
+        self.tweak.setObjectName("tweak")
+        tv = QVBoxLayout(self.tweak)
+        tv.setContentsMargins(0, 4, 0, 0)
+        tv.setSpacing(10)
+        head = QHBoxLayout()
+        head.setSpacing(8)
+        head.addWidget(QLabel("<b>Make it yours</b>"))
+        head.addStretch(1)
+        self.delay = QLabel()
+        self.delay.setObjectName("pill")
+        head.addWidget(self.delay)
+        tv.addLayout(head)
+        self.hero_box = QVBoxLayout()
+        self.hero_box.setSpacing(10)
+        tv.addLayout(self.hero_box)
         srow = QHBoxLayout()
         srow.setSpacing(6)
         self.btn_save = QPushButton("Save as a voice…")
@@ -349,10 +529,39 @@ class VoiceFxPanel(QWidget):
         self.btn_bin.clicked.connect(self.show_deleted)
         srow.addWidget(self.btn_bin)
         srow.addStretch(1)
-        self.box.addLayout(srow)
+        tv.addLayout(srow)
+        v.addWidget(self.tweak)
+
+        # ---- every effect, as cards in groups (folded away)
+        self.btn_more = QPushButton("All effects")
+        self.btn_more.setObjectName("fold")
+        self.btn_more.setCheckable(True)
+        self.btn_more.toggled.connect(self._show_more)
+        v.addWidget(self.btn_more, 0, Qt.AlignLeft)
+        self.more = QWidget()
+        self.box = QVBoxLayout(self.more)
+        self.box.setContentsMargins(0, 0, 0, 0)
+        self.box.setSpacing(8)
+        self.box.addWidget(hint_label("Switch effects on and drag their sliders to build your "
+                                      "own voice. Changing anything switches to “My own "
+                                      "mix”; like it? Save it as a voice and it gets a "
+                                      "button above."))
+        self._groups: dict[str, tuple[QLabel, QGridLayout]] = {}
+        for title, _types in (*GROUPS, (ADDON_GROUP, ())):
+            lbl = QLabel(title)
+            lbl.setObjectName("fxgroup")
+            g = QGridLayout()
+            g.setHorizontalSpacing(10)
+            g.setVerticalSpacing(10)
+            self.box.addWidget(lbl)
+            self.box.addLayout(g)
+            self._groups[title] = (lbl, g)
+        self._fx_cols = 2
         v.addWidget(self.more)
         self.rows: dict[str, EffectRow] = {}
         self._spec_effects = dict(spec.get("effects", {}))
+        self._delay_cache: dict = {}
+        self._device_ms: float | None = None
         self.add_new_effects()
         self._fresh_timer = QTimer(self)
         self._fresh_timer.setSingleShot(True)
@@ -377,20 +586,22 @@ class VoiceFxPanel(QWidget):
         fx = voicefx.PRESETS.get(name)
         saved = self.store.voices.get(name)
         self._based_on = name if saved is not None else ""
+        # (Clean up my mic is yours, not the voice's: it stays as it is)
+        rows = {t: r for t, r in self.rows.items() if t not in KEEP}
         if fx is not None:
             self._own = False
-            for t, r in self.rows.items():
+            for t, r in rows.items():
                 r.load({"on": True, **fx[t]} if t in fx else None)
         elif saved is not None:   # stored whole, "on" and all, like Fine-tune's rows
             self._own = False
-            for t, r in self.rows.items():
+            for t, r in rows.items():
                 r.load(saved.get(t))
         elif name == CUSTOM:
             if not mine and self._custom:
-                for t, r in self.rows.items():
+                for t, r in rows.items():
                     r.load(self._custom.get(t))
             self._own = True
-            self.btn_more.setChecked(True)   # your own mix lives in Fine-tune
+            self.btn_more.setChecked(True)   # your own mix lives in All effects
         self.btn_power.blockSignals(True)
         self.btn_power.setChecked(True)
         self.btn_power.blockSignals(False)
@@ -405,11 +616,13 @@ class VoiceFxPanel(QWidget):
         """A random mix for the lols: the pitch moved well away from normal plus one
         or two other effects at random settings, as "My own mix"."""
         rng = rng or random.Random()
-        others = [t for t in self.rows if t != "pitch"]
+        others = [t for t in self.rows if t != "pitch" and t not in KEEP]
         chosen = set(rng.sample(others, min(len(others), rng.randint(1, 2))))
         if "pitch" in self.rows:
             chosen.add("pitch")
         for t, r in self.rows.items():
+            if t in KEEP:
+                continue
             if t not in chosen:
                 r.load(None)
                 continue
@@ -420,6 +633,7 @@ class VoiceFxPanel(QWidget):
             if t == "pitch":
                 cfg["semitones"] = rng.choice((-1, 1)) * rng.uniform(4, 12)
                 cfg["mix"] = 1.0
+                cfg["tune"] = rng.choice((0.0, 0.0, 1.0))   # sometimes autotuned
             r.load(cfg)
         self._own = True
         self._custom = {t: r.state() for t, r in self.rows.items()}
@@ -625,10 +839,66 @@ class VoiceFxPanel(QWidget):
         return added
 
     def set_hearing(self, on: bool):
-        """Mirror the window's "Hear what they hear" state."""
+        """Mirror the window's "Hear what they hear" state. Switched on over there,
+        you hear everything they hear, not only your voice."""
+        if on and not self.btn_hear.isChecked():
+            self.voice_only.emit(False)
         self.btn_hear.blockSignals(True)
         self.btn_hear.setChecked(on)
         self.btn_hear.blockSignals(False)
+
+    def _hear(self, on: bool):
+        self.voice_only.emit(on)      # first: the window switches the monitor on next
+        self.hear_toggled.emit(on)
+
+    def set_device_delay(self, ms: float | None):
+        """Your sound devices' own delay (mic in + send device out), from the engine."""
+        if ms != self._device_ms:
+            self._device_ms = ms
+            self._show_delay()
+
+    def effects_delay(self) -> float:
+        """Milliseconds the effects that are on add (worked out from their settings, so
+        it's known before the mic has sent anything)."""
+        if not self.btn_power.isChecked():
+            return 0.0
+        total = 0.0
+        for t, r in self.rows.items():
+            if not r.chk.isChecked():
+                continue
+            st = r.state()
+            key = (t, tuple(sorted(st.items())))
+            if key not in self._delay_cache:
+                if len(self._delay_cache) > 256:
+                    self._delay_cache.clear()
+                try:
+                    self._delay_cache[key] = max(0.0, float(r.cls(48000, st).latency()))
+                except Exception:  # noqa: BLE001 - an add-on's effect: not counted
+                    self._delay_cache[key] = 0.0
+            total += self._delay_cache[key]
+        return total * 1000
+
+    def _show_delay(self):
+        on = self.btn_power.isChecked()
+        self.delay.setVisible(on)
+        if not on:
+            return
+        fx = self.effects_delay()
+        dev = self._device_ms
+        total = fx + (dev or 0.0)
+        self.delay.setText(f"{total:.0f} ms delay")
+        parts = [f"{fx:.0f} ms from the effects"]
+        if dev is not None:
+            parts.append(f"{dev:.0f} ms from your sound devices")
+        self.delay.setToolTip("How far behind your real voice the changed one is: "
+                              + " + ".join(parts) + ". Under about 100 ms feels normal "
+                              "to talk over; pitch effects cost the most, the rest "
+                              "almost nothing.")
+        slow = total > 120
+        if bool(self.delay.property("slow")) != slow:
+            self.delay.setProperty("slow", slow)
+            self.delay.style().unpolish(self.delay)
+            self.delay.style().polish(self.delay)
 
     def set_level(self, level: float):
         self.meter.set_level(level)
@@ -639,19 +909,46 @@ class VoiceFxPanel(QWidget):
         self._refresh()
 
     def add_new_effects(self):
-        """Add rows for effect types registered since (modules loaded later)."""
+        """Add cards for effect types registered since (modules loaded later)."""
+        added = False
         for etype, cls in voicefx.REGISTRY.items():
             if etype in self.rows:
                 continue
-            r = EffectRow(cls, self._spec_effects.get(etype, {}))
-            r.changed.connect(self._edited)
-            self.box.addWidget(r)
+            cfg = self._spec_effects.get(etype)
+            if cfg is None:
+                # mic clean-up starts on: it only makes changed voices sound better
+                cfg = {"on": True} if etype in KEEP else {}
+            r = EffectRow(cls, cfg, hero=etype in HERO)
+            r.changed.connect(lambda t=etype: self._edited(t))
+            if etype in HERO:
+                self.hero_box.insertWidget(min(HERO.index(etype), self.hero_box.count()), r)
             self.rows[etype] = r
+            added = True
+        if added:
+            self._place_cards()
+
+    def _place_cards(self):
+        """The effect cards into their groups' grids, `_fx_cols` a row."""
+        cols = self._fx_cols
+        placed = set(HERO)
+        for _title, types in GROUPS:
+            placed.update(types)
+        for title, (lbl, g) in self._groups.items():
+            types = dict(GROUPS).get(title) or [t for t in self.rows if t not in placed]
+            cards = [self.rows[t] for t in types if t in self.rows]
+            for c in cards:
+                g.removeWidget(c)
+            for i, c in enumerate(cards):
+                g.addWidget(c, i // cols, i % cols, Qt.AlignTop)
+            for c in range(2):
+                g.setColumnStretch(c, 1 if c < cols else 0)
+            lbl.setVisible(bool(cards))
 
     def _mine(self) -> bool:
         """Is Fine-tune showing your own mix? A nudged preset counts only while you
         haven't made one."""
-        made = any(isinstance(e, dict) and e.get("on") for e in self._custom.values())
+        made = any(isinstance(e, dict) and e.get("on")
+                   for t, e in self._custom.items() if t not in KEEP)
         return self._preset == CUSTOM and (self._own or not made)
 
     def spec(self) -> dict:
@@ -677,12 +974,19 @@ class VoiceFxPanel(QWidget):
         self.more.setVisible(on)
         icons.set_icon(self.btn_more, "fold_open" if on else "fold", "muted", "text", size=12)
 
+    def _count_on(self) -> int:
+        return sum(r.chk.isChecked() for t, r in self.rows.items() if t not in HERO)
+
     def resizeEvent(self, e):
         super().resizeEvent(e)
         # only a new width: fewer voices a row makes it taller, and refitting on that
         # can flip it back and forth (the Apps tab's cards jumped up and down that way)
         if e.size().width() != e.oldSize().width():
             self._fit_width(self.width())
+            cols = 2 if self.width() >= 600 else 1
+            if cols != self._fx_cols:
+                self._fx_cols = cols
+                self._place_cards()
 
     def _fit_width(self, width: int):
         """Narrow: the switch's shorter text, then fewer voices a row, down to one."""
@@ -710,8 +1014,15 @@ class VoiceFxPanel(QWidget):
         for name, b in self._tile.items():
             b.setChecked(on and name == self._preset)
         self.tiles.setExclusive(True)
+        n = self._count_on()
+        self.btn_more.setText(f"All effects  ·  {n} on" if n else "All effects")
+        self._show_delay()
 
-    def _edited(self):
+    def _edited(self, etype: str = ""):
+        if etype in KEEP:     # your mic clean-up: the voice you picked stays picked
+            self._refresh()
+            self._emit()
+            return
         self._preset = CUSTOM
         if not self.btn_power.isChecked() and any(r.chk.isChecked() for r in self.rows.values()):
             self.btn_power.blockSignals(True)
@@ -1669,6 +1980,7 @@ class VoicePanel(QWidget):
         # left on from last time, it changed your mic the moment the app opened.
         self.fx = VoiceFxPanel({**voicefx.clean_spec(fx_spec), "enabled": False})
         self.fx.changed.connect(self._fx_changed)
+        self.fx.voice_only.connect(lambda on: setattr(engine, "mon_voice_only", on))
         fx_card, fv = card(roomy=True)
         fv.addWidget(self.fx)
         lcol.addWidget(fx_card)
@@ -1711,6 +2023,11 @@ class VoicePanel(QWidget):
         if self.isVisible():
             e = self.engine
             self.fx.set_level(e.level_mic if e.mic_stream is not None else 0.0)
+            self._ticks = getattr(self, "_ticks", 0) + 1
+            if self._ticks % 20 == 1:       # the devices' delay: once a second is plenty
+                delay = getattr(e, "device_delay", None)
+                s = delay() if callable(delay) else None
+                self.fx.set_device_delay(None if s is None else s * 1000)
 
     def fit_steps(self):
         """What the main window may hide here when it gets small (ui/responsive.py)."""

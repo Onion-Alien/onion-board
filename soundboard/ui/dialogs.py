@@ -84,6 +84,8 @@ class EffectsPanel(QWidget):
         for etype, cls in voicefx.REGISTRY.items():
             if etype == "pitch":   # the Pitch slider above does this, better
                 continue
+            if etype == "cleanup":   # a mic's room noise: nothing to clean in a sound
+                continue
             row = EffectRow(cls, {})
             row.changed.connect(self._edited)
             self.rows[etype] = row
