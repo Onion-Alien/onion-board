@@ -27,7 +27,7 @@ from PySide6.QtWidgets import (QApplication, QButtonGroup, QCheckBox, QDialog, Q
 from soundboard import engine as eng
 from soundboard import theme
 from soundboard.engine import SR
-from soundboard import library, net
+from soundboard import library, net, soundpad
 from soundboard.library import RESOURCE_DIR
 from soundboard.ui import busy, fit, icons
 from soundboard.ui.bunnywidget import BunnyWidget
@@ -460,6 +460,16 @@ class SetupWizard(QDialog):
         self.btn_game.clicked.connect(lambda: self.show_guide("game"))
         games.addWidget(self.btn_game)
         v.addLayout(games)
+        # coming from Soundpad: their board in one click (only offered when it's here;
+        # nothing is read until they click)
+        self.btn_soundpad = QPushButton("Bring my Soundpad sounds over")
+        icons.set_icon(self.btn_soundpad, "folder")
+        self.btn_soundpad.setToolTip("Copies the sounds in Soundpad's list into Onion Board, "
+                                     "with their names, categories and hotkeys. Soundpad "
+                                     "keeps its own.")
+        self.btn_soundpad.clicked.connect(lambda: self.win.import_soundpad())
+        self.btn_soundpad.setVisible(soundpad.default_list() is not None)
+        v.addWidget(self.btn_soundpad)
         v.addStretch(1)
         v.addWidget(_label("That's it. Add sounds by dragging files onto the window, then "
                            "click one to play it. You can open this guide again any time "
