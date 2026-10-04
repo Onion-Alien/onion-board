@@ -36,6 +36,9 @@ def _board(tmp_path) -> Path:
   <Sound hash="3" url="{other}" title="" key="0"/>
   <Sound hash="4" url="gone.mp3" title="Gone"/>
   <Categories>
+    <Category name="My Sounds" recordings="true" icon="stock_icon_cat_home">
+      <Sound id="0"/><Sound id="1"/><Sound id="2"/><Sound id="3"/>
+    </Category>
     <Category type="1" icon="stock_icon_cat_list" hidden="true"><Sound id="0"/></Category>
     <Category name="Memes">
       <Sound id="0"/><Sound id="1"/><Sound id="9"/>
@@ -58,8 +61,12 @@ def test_reads_names_paths_categories_and_hotkeys(tmp_path):
     assert len(ok) == 3 and [e.name for e in bad] == ["Gone"]
 
 
+# keyModifiers checked against Soundpad 4.0.35 itself (its Hotkey column): 1 Alt, 2 Ctrl,
+# 4 Shift, 8 Win, 6 Ctrl+Shift
 @pytest.mark.parametrize("key,mods,want", [
-    ("13", "0", "enter"), ("96", "8", "windows+num 0"), ("16", "0", ""),   # bare shift
+    ("49", "1", "alt+1"), ("50", "2", "ctrl+2"), ("51", "4", "shift+3"),
+    ("52", "8", "windows+4"), ("53", "6", "ctrl+shift+5"), ("13", "0", "enter"),
+    ("96", "8", "windows+num 0"), ("16", "0", ""),   # bare shift
     ("1", "0", ""), ("x", "0", ""), (None, None, "")])                    # mouse, junk
 def test_hotkeys(key, mods, want):
     assert soundpad.hotkey(key, mods) == want
