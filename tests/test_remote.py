@@ -117,6 +117,23 @@ def test_window_endpoints(qapp, window):
     assert d("status")[1]["version"]
 
 
+def test_a_ringing_watch_alarm_shows_as_its_pad_and_stops_with_it(qapp, window):
+    from soundboard.ui import triggershost
+    assert remote.RING == triggershost.RING
+    w = window
+    ring = f"s0{remote.RING}trigger1"
+    w.engine.playing = lambda: {ring: (0.3, False)}
+    stopped = []
+    w.engine.stop = stopped.append
+    d = lambda action, **p: remote.dispatch(w, action, p)   # noqa: E731
+    assert d("status")[1]["playing"] == ["s0"]
+    assert [s["playing"] for s in d("sounds")[1]] == [True, False]
+    assert d("stop", id="s0") == (200, {"stopped": "s0"}) and stopped == ["s0", ring]
+    stopped.clear()
+    d("stop", id="s1")                   # another pad: the alarm rings on
+    assert stopped == ["s1"]
+
+
 def test_window_starts_it_only_when_turned_on(qapp, window):
     w = window
     assert not w.remote.running and w.cfg.api_token == ""

@@ -321,10 +321,21 @@ def on_value(params: dict, now: bool) -> bool | None:
 BAD_ON = {"error": "on= takes 1, 0 or toggle"}
 
 
+# An Onion Watch alarm rings its pad as the voice "<sound id>:ring:<trigger>"
+# (soundboard.ui.triggershost.RING): a phone or Stream Deck sees it as the pad playing.
+RING = ":ring:"
+
+
+def pad_of(voice: str) -> str:
+    """The sound a playing voice is: an alarm's ring is its pad's."""
+    return voice.split(RING, 1)[0]
+
+
 def dispatch(mw: MainWindow, action: str, params: dict) -> tuple[int, object]:
     """Carry out one request on the window (UI thread)."""
     cfg = mw.cfg
     playing = mw.engine.playing()
+    sounding = list(dict.fromkeys(pad_of(v) for v in playing))
     if action == "help":
         return 200, {"endpoints": {f"/api/{a}": d for a, d in ENDPOINTS.items()},
                      "key": "send it as ?token=…, an X-Token header or Authorization: "
@@ -332,7 +343,7 @@ def dispatch(mw: MainWindow, action: str, params: dict) -> tuple[int, object]:
     if action == "status":
         from soundboard import __version__
         return 200, {"version": __version__, "category": cfg.category,
-                     "playing": [s for s in playing if s in mw.pads],
+                     "playing": [s for s in sounding if s in mw.pads],
                      "paused": bool(playing) and all(p for _, p in playing.values()),
                      "live": bool(mw.engine.sending),
                      "voice": mw.voice.fx.btn_power.isChecked(),
@@ -341,7 +352,7 @@ def dispatch(mw: MainWindow, action: str, params: dict) -> tuple[int, object]:
     if action == "sounds":
         return 200, [{"id": m.id, "name": m.name, "hotkey": m.hotkey,
                       "categories": list(m.tags), "color": m.color,
-                      "playing": m.id in playing}
+                      "playing": m.id in sounding}
                      for m in cfg.sounds]
     if action == "categories":
         return 200, list(cfg.categories)
@@ -437,6 +448,9 @@ def dispatch(mw: MainWindow, action: str, params: dict) -> tuple[int, object]:
         return 404, body
     if action == "stop":
         mw.engine.stop(m.id)
+        for v in playing:   # and a Watch alarm ringing it (its bar clears by itself)
+            if v.startswith(m.id + RING):
+                mw.engine.stop(v)
         return 200, {"stopped": m.id}
     if m.id not in mw.audio:
         return 409, {"error": "that sound hasn't loaded (yet)"}
