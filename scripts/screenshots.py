@@ -1,6 +1,8 @@
 """Render the README screenshots into docs/screenshots/.
 
-    .venv\\Scripts\\python scripts/screenshots.py [--theme Dark]
+    .venv\\Scripts\\python scripts/screenshots.py [--theme "Retro 98"]
+
+scripts/docs.py runs this along with the README / site version line.
 
 Runs on Qt's offscreen platform: no window appears, no audio device is opened, no
 hotkey is registered. Everything shown is made up here -- demo sounds synthesized
@@ -42,6 +44,7 @@ from soundboard import appaudio, autostart, engine, library, winkeys  # noqa: E4
 
 winkeys.key_char = conftest.us_key_char   # hotkeys drawn as on a US keyboard
 
+THEME = "Retro 98"   # the README and site pictures all use this theme
 OUTS = ["CABLE Input (VB-Audio Virtual Cable)", "Headphones (USB Audio Device)",
         "Speakers (Realtek(R) Audio)"]
 INS = ["CABLE Output (VB-Audio Virtual Cable)", "Microphone (USB Audio Device)"]
@@ -171,7 +174,7 @@ def demo_triggers(tmp: Path) -> list[dict]:
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--theme", default="Dark")
+    ap.add_argument("--theme", default=THEME)
     ap.add_argument("--out", type=Path, default=ROOT / "docs" / "screenshots")
     args = ap.parse_args()
     args.out.mkdir(parents=True, exist_ok=True)

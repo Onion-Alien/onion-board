@@ -140,6 +140,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--out", type=Path, required=True)
     ap.add_argument("--mp4", type=Path)
+    ap.add_argument("--theme", default=screenshots.THEME)
     args = ap.parse_args()
 
     app = QApplication([])
@@ -149,7 +150,7 @@ def main():
     screenshots.fake_machine(tmp)
     for name, fn in real.items():               # outputs: silent streams, not stubs
         setattr(engine.Engine, name, fn)
-    screenshots.demo_config(tmp, "Dark")
+    screenshots.demo_config(tmp, args.theme)
     if not screenshots.install_onion_watch():   # the Triggers tab is the Onion Watch add-on
         raise SystemExit("set ONIONBOARD_ONION_WATCH_ZIP to an OnionWatch-module.zip first")
 

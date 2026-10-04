@@ -43,5 +43,5 @@ or installing anything. The short version:
   asking first; the author may be mid-game.
 - Edit files with UTF-8-safe tools. Windows PowerShell 5.1 `Get-Content`/`Set-Content`
   mangles UTF-8 (this codebase uses symbols like ⚙ ⏺ 🐰 in strings).
-- Audio callbacks never block or take the engine lock (README → *Audio notes*).
-- Code layout is in the README table; keep it current when adding modules.
+- Audio callbacks never block or take the engine lock ([docs/CODE.md](docs/CODE.md) → *Audio notes*).
+- Code layout is the table in [docs/CODE.md](docs/CODE.md); keep it current when adding modules.
