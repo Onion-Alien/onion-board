@@ -272,3 +272,19 @@ def test_remote_page_copies_an_ai_prompt_with_the_key_only_when_ticked(window): 
         d.close()
         window.cfg.api_enabled = False
         window.apply_remote()
+
+
+def test_about_shows_the_version_and_only_opens_pages(window, monkeypatch):  # noqa: F811
+    from soundboard.ui.mainwindow import version_text
+    opened = []
+    monkeypatch.setattr(busy.QDesktopServices, "openUrl", lambda u: opened.append(u.toString()))
+    d = SettingsDialog(window, "about")
+    page = d.tabs.currentWidget().widget()
+    shown = {lb.text() for lb in page.findChildren(QLabel)}
+    assert {"ONION BOARD", "GET IN TOUCH", "A NOTE FROM ME", "THE BORING BIT"} <= shown
+    assert d.about_version.text() == f"Version {version_text()}"
+    for b in page.findChildren(QPushButton):
+        b.click()
+    assert opened and all(u.startswith("https://") for u in opened)
+    assert any("/security/advisories/new" in u for u in opened)
+    d.close()

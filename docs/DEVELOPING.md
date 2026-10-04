@@ -41,10 +41,16 @@ module's `install.bat` or `pip install -r requirements.txt`).
   PySide6's QtCore / QtGui / QtWidgets. The app's own code doesn't import scipy (its
   filters are `soundboard/dsp.py`); `build.ps1` bundles only scipy.fft, with
   `--hidden-import`, for Onion Watch's matcher (which falls back to numpy's slower FFTs
-  without it). The rest of scipy (signal, ndimage…) isn't shipped. Removing scipy.fft
-  from the build makes the Triggers tab slower; check it still runs:
-  `OnionBoard.exe --selftest-addon <zip>` proves a build can run it (build.ps1 does
-  that when `ONIONBOARD_ONION_WATCH_ZIP` is set).
+  without it), and scipy.ndimage, which released Onion Watch 0.5.6 imports (its
+  module.json lists it, so without it the Triggers tab refuses to load for everyone
+  still on 0.5.6). The rest of scipy (signal, stats…) isn't shipped. **Never drop a
+  part a released Onion Watch lists in its `imports`:** `RELEASED_WATCH_IMPORTS` in
+  `tests/test_triggers_module.py` fails the tests if `build.ps1` stops shipping one;
+  add each new release's list there. Removing scipy.fft from the build makes the
+  Triggers tab slower; check it still runs: `OnionBoard.exe --selftest-addon <zip>`
+  proves a build can run it (build.ps1 does that when `ONIONBOARD_ONION_WATCH_ZIP` is
+  set). Before a release, run it on the newest *released* Onion Watch zip from
+  GitHub too, not only one built from its main.
 
 ## 3. Check it (headless)
 

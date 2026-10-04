@@ -327,6 +327,20 @@ def test_speed_redline_unlocks_the_silly_range(window):
     b.meter.grab()                                           # paints without errors
 
 
+def test_speed_popup_shrinks_back_when_redline_locks(window, qapp):
+    b = window.speed_btn
+    b.click()
+    qapp.processEvents()
+    closed = b.pop.height()
+    b.redline.click()
+    qapp.processEvents()
+    assert b.pop.height() > closed                           # room for the rev meter
+    b.redline.click()
+    qapp.processEvents()
+    assert b.pop.height() == closed                          # and gives it back
+    b.pop.hide()
+
+
 def test_every_tab_has_its_own_label(window):
     texts = [window.tabs.tabText(i) for i in range(window.tabs.count())]
     assert texts == [t for t, _ in main.TABS] and len(set(texts)) == len(texts)
@@ -614,3 +628,46 @@ def test_the_window_shows_which_version_is_running(window, monkeypatch):
     assert window.windowTitle() == f"Onion Board {__version__} from source"
     monkeypatch.setattr("sys.frozen", True, raising=False)
     assert mainwindow.version_text() == __version__     # the installed app: just the number
+
+
+def test_empty_status_line_takes_no_room(window):
+    """No message, no row: the mixer sits at the bottom with only the margin under it."""
+    window.resize(1200, 800)
+    window.show()
+    QApplication.processEvents()
+    st = window.status
+    window.status.setText("")
+    QApplication.processEvents()
+    assert not st.isVisible()
+    gap = window._full.height() - window.mixer.geometry().bottom()
+    assert gap <= 12
+    st.setText("1 audio drop-out since start")
+    assert st.isVisible()
+    st.set_room(True)            # window too short: stays hidden, even for a new message
+    st.setText("Category: All")
+    assert not st.isVisible()
+    st.set_room(False)
+    assert st.isVisible()
+    st.setText("")
+    st.set_room(False)           # room again, but nothing to say
+    assert not st.isVisible()
+
+
+def test_ctrl_v_pastes_a_copied_picture_on_the_selected_pad(window):
+    from PySide6.QtGui import QColor, QImage
+    window.select("s1")
+    QApplication.clipboard().setText("just words")
+    window.paste_picture()
+    assert not window.meta("s1").image and "copy a picture first" in window.status.text()
+    img = QImage(200, 120, QImage.Format_RGB32)
+    img.fill(QColor("#ff00ff"))
+    QApplication.clipboard().setImage(img)
+    window.paste_picture()
+    pic = window.meta("s1").image
+    assert pic and library.Path(pic).is_file() and not window.meta("s0").image
+    assert "Airhorn" in window.status.text()
+    window.selection.on_pick("s0", False)   # picked pads win over the selected one
+    window.selection.on_pick("s1", False)
+    window.paste_picture()
+    assert window.meta("s0").image and window.meta("s1").image != pic
+    assert not library.Path(pic).exists()   # the old picture's file is gone
