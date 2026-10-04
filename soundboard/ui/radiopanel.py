@@ -674,6 +674,8 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
         return "globe" if self.cfg.radio.get("map") == "globe" else "flat"
 
     def _make_map(self):
+        if self.view is not None or self.flat is not None:
+            return   # start()'s queued call after a map was already made: never two
         if self._map_mode() == "globe":
             self._make_globe()
         else:

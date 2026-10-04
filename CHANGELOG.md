@@ -21,7 +21,8 @@
 - **Tidier search results and category tabs:** web search results open with a
   *← My sounds* back button at the start of their header (it was *Back to my
   sounds*, alone at the far right), and the category tabs step aside while the
-  results show, since they only pick pads. New categories are made with a small
+  results show, since they only pick pads. It brings back all your sounds: the web
+  search left in the search box used to filter them down to the ones matching it. New categories are made with a small
   *+* right after the last tab instead of a *+ Category* button across the window.
 - **City and town names on the radio maps:** zoom in on the flat map or the 3D
   globe and the cities and towns that have stations are named, so you can find

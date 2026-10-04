@@ -706,6 +706,7 @@ class MainWindow(QMainWindow):
         self._pads_home = (left, left.indexOf(scroll))   # the mini player borrows it
         self.ytresults.closed.connect(scroll.show)   # the results take the pads' place
         self.ytresults.closed.connect(self._cat_row.show)   # ...and the categories' row
+        self.ytresults.closed.connect(self._results_closed)
         self._pads_scroll = scroll
         # ---- "3 selected · Colour · Volume… · Delete": Ctrl / Shift+click picks pads
         self.selection = PadSelection(self, scroll)
@@ -2251,6 +2252,14 @@ class MainWindow(QMainWindow):
         self.grid.set_pads(ordered)
         self.apply_filter(self.search.text())
         self._update_status()
+
+    def _results_closed(self):
+        """"My sounds": all of them. The search box also filters the pads, so the web
+        search still in it left a board of only the pads matching "cat meow" (often
+        none, with nothing saying why). Something else typed in it since stays."""
+        query = " ".join(self.ytresults.query.split())
+        if query and " ".join(self.search.text().split()) == query:
+            self.search.clear()
 
     def apply_filter(self, text):
         """Show the pads that match the search box (name or category) and are in the
