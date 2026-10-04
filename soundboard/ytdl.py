@@ -531,6 +531,9 @@ class Result:
     source: str = "youtube"
     link: str = ""     # the page to download (YouTube's is built from the id)
     art: str = ""      # thumbnail / cover art (YouTube's is built from the id)
+    views: int | None = None      # None: the site didn't say (yet: see stats)
+    likes: int | None = None
+    comments: int | None = None
 
     @property
     def url(self) -> str:
@@ -615,7 +618,7 @@ def _youtube_hit(e: dict) -> Result | None:
         return None   # a channel or playlist, not a video
     return Result(vid, str(e.get("title") or vid),
                   str(e.get("channel") or e.get("uploader") or ""),
-                  float(e.get("duration") or 0))
+                  float(e.get("duration") or 0), views=_count(e.get("view_count")))
 
 
 def _soundcloud_hit(e: dict) -> Result | None:
@@ -628,7 +631,36 @@ def _soundcloud_hit(e: dict) -> Result | None:
     art = re.sub(r"-(mini|tiny|small|badge|t\d+x\d+|large)\.(jpg|png)$", r"-t300x300.\2", art)
     return Result(str(e.get("id") or link), str(e.get("title") or "Track"),
                   str(e.get("uploader") or ""), float(e.get("duration") or 0),
-                  "soundcloud", link, art)
+                  "soundcloud", link, art, _count(e.get("view_count")),
+                  _count(e.get("like_count")), _count(e.get("comment_count")))
+
+
+def _count(v) -> int | None:
+    try:
+        return max(0, int(v)) if v is not None else None
+    except (TypeError, ValueError):
+        return None
+
+
+def needs_stats(r: Result) -> bool:
+    """A YouTube hit: its search entry has the views but not likes / comments."""
+    return r.source in ("youtube", "ytmusic", "tiktok") and not r.link and r.likes is None
+
+
+def stats(r: Result) -> tuple[int | None, int | None, int | None]:
+    """(views, likes, comments) of a hit, from its page (one look-up, nothing
+    downloaded). Tried once: no new Tor identities for a nicety; raises like probe."""
+    feature = _gate(r.source)
+    with _ydl() as yt_dlp:
+        try:
+            opts = {k: v for k, v in _opts(feature=feature).items()
+                    if k not in ("format", "outtmpl")}
+            with yt_dlp.YoutubeDL(opts) as ydl:
+                info = ydl.extract_info(r.url, download=False, process=False) or {}
+        except Exception as e:  # noqa: BLE001 - yt-dlp raises many kinds
+            raise _readable(e) from e
+    return (_count(info.get("view_count")), _count(info.get("like_count")),
+            _count(info.get("comment_count")))
 
 
 @contextlib.contextmanager

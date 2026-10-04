@@ -683,6 +683,7 @@ class MainWindow(QMainWindow):
         self.ytresults.play.connect(lambda r: self._from_youtube(r, play=True))
         self.ytresults.add.connect(lambda r: self._from_youtube(r, play=False))
         self.linkbar.done.connect(lambda url, kind, ok: self.ytresults.mark(url, kind, ok))
+        self.linkbar.progress.connect(self.ytresults.progress)
         left.addWidget(self.ytresults, 1)
 
         self.grid = PadGrid()

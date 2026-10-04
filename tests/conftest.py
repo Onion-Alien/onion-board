@@ -305,3 +305,14 @@ def _free_test_windows():
             except RuntimeError:   # already gone on the C++ side
                 pass
     app.sendPostedEvents(None, QEvent.DeferredDelete)
+
+
+@pytest.fixture(autouse=True)
+def _no_result_stats_lookups(monkeypatch):
+    """Web search cards look up each YouTube hit's likes and comments on a thread
+    (ytsearch.SearchResults): never the real site from a test."""
+    from soundboard import ytdl
+
+    def offline(r):
+        raise ytdl.FetchError("offline in tests")
+    monkeypatch.setattr(ytdl, "stats", offline)
