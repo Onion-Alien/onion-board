@@ -1,5 +1,17 @@
 # Changelog
 
+## Unreleased
+
+- **Bring your board over from another soundboard.** Coming from Soundpad,
+  Resanance, Soundux or EXP Soundboard? The installer spots it and offers a box,
+  "Bring my sounds over from …"; leave it ticked and the first start copies your
+  sounds in with their names, categories (tabs) and hotkeys. Your old app keeps its
+  own copies and nothing of it is changed. Already installed: **Backup → Import from
+  another soundboard**, the button in the setup guide, or drop its saved board file
+  (a Soundpad `.spl`, for one) on the window. Sounds already on your board are
+  skipped, and a hotkey something here already uses is left off. Nothing is looked
+  at until you tick the box or click Import.
+
 ## 1.6.5 — 2026-10-04
 
 - **Sounds no longer stutter for the people you're talking to while the app is

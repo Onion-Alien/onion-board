@@ -1,6 +1,6 @@
 """Import from another soundboard: what the readers for each one share.
 
-Each reader (soundpad.py, expboard.py, resanance.py) finds that app's saved board on
+Each reader (soundpad.py, resanance.py, soundux.py, expboard.py) finds that app's saved board on
 this PC and turns it into Entry rows: the user's own sound files with their names,
 hotkeys and categories. Nothing is read until the user asks for an import (the
 Backup menu, the setup guide, the installer's box, or a board file dropped on the
@@ -48,8 +48,8 @@ def importable(entries: list[Entry]) -> tuple[list[Entry], list[Entry]]:
 
 
 def sources() -> list[Source]:
-    from soundboard import expboard, resanance, soundpad
-    return [soundpad.SOURCE, expboard.SOURCE, resanance.SOURCE]
+    from soundboard import expboard, resanance, soundpad, soundux
+    return [soundpad.SOURCE, resanance.SOURCE, soundux.SOURCE, expboard.SOURCE]
 
 
 def by_key(key: str) -> Source | None:

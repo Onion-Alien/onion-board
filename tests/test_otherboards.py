@@ -1,4 +1,4 @@
-"""Import from Resanance and EXP Soundboard (Soundpad is test_soundpad.py): reading
+"""Import from Resanance, Soundux and EXP Soundboard (Soundpad is test_soundpad.py): reading
 their saved boards, and the parts every import shares."""
 import json
 import struct
@@ -8,7 +8,7 @@ import numpy as np
 import pytest
 import soundfile as sf
 
-from soundboard import expboard, otherboards, resanance
+from soundboard import expboard, otherboards, resanance, soundux
 from soundboard.library import SR
 
 PAGE = resanance.PAGE
@@ -180,6 +180,57 @@ def test_exp_not_a_board(tmp_path):
         expboard.read(p)
 
 
+# ---------------------------------------------------------------- Soundux
+def _soundux_config(tmp_path, tabs=2) -> Path:
+    m, s = tmp_path / "Memes", tmp_path / "Songs"
+    memes = {"id": 1, "name": "Memes", "path": str(m), "sortMode": 0, "sounds": [
+        {"id": 1, "name": "airhorn.mp3", "path": str(_wav(m / "airhorn.mp3")),
+         "hotkeys": [162, 49], "hotkeySequence": "Ctrl + 1", "isFavorite": False,
+         "localVolume": None, "remoteVolume": None, "modifiedDate": 0},
+        {"id": 2, "name": "bruh", "path": str(_wav(m / "bruh.wav")),
+         "hotkeys": [{"key": 112, "type": 0}, {"key": 165, "type": 0}], "modifiedDate": 0},
+        {"id": 3, "name": "gone", "path": str(m / "gone.mp3"), "hotkeys": [],
+         "modifiedDate": 0}]}
+    songs = {"id": 2, "name": "Songs", "path": str(s), "sounds": [
+        {"id": 4, "name": "midi pad", "path": str(_wav(s / "song.flac")),
+         "hotkeys": [{"key": 36, "type": 2}], "modifiedDate": 0},
+        {"id": 5, "name": "chord", "path": str(_wav(s / "chord.ogg")),
+         "hotkeys": [65, 66], "modifiedDate": 0}]}
+    cfg = tmp_path / "Soundux" / "config.json"
+    cfg.parent.mkdir(parents=True, exist_ok=True)
+    cfg.write_text(json.dumps({"data": {"height": 600, "soundIdCounter": 6,
+                                        "tabs": [memes, songs][:tabs], "width": 800},
+                               "settings": {"theme": 0}}), encoding="utf-8")
+    return cfg
+
+
+def test_soundux_reads_tabs_names_and_hotkeys(tmp_path):
+    rows = soundux.read(_soundux_config(tmp_path))
+    assert [e.name for e in rows] == ["airhorn", "bruh", "gone", "midi pad", "chord"]
+    # 162 = left Ctrl, 165 = right Alt; a MIDI note and a two-key chord have no hotkey
+    assert [e.hotkey for e in rows] == ["ctrl+1", "alt+f1", "", "", ""]
+    assert [e.tags for e in rows] == [["Memes"]] * 3 + [["Songs"]] * 2
+    assert [e.exists for e in rows] == [True, True, False, True, True]
+
+
+def test_soundux_one_tab_is_no_category(tmp_path):
+    assert {tuple(e.tags) for e in soundux.read(_soundux_config(tmp_path, tabs=1))} == {()}
+
+
+def test_soundux_finds_its_config(tmp_path, monkeypatch):
+    monkeypatch.setenv("APPDATA", str(tmp_path))
+    assert soundux.default_config() is None
+    cfg = _soundux_config(tmp_path)
+    assert soundux.default_config() == cfg
+
+
+def test_soundux_not_a_config(tmp_path):
+    p = tmp_path / "config.json"
+    p.write_text('{"data": {}}', encoding="utf-8")
+    with pytest.raises(ValueError):
+        soundux.read(p)
+
+
 # ---------------------------------------------------------------- shared
 def test_dropped_files_go_to_the_right_reader(tmp_path):
     board = _exp_board(tmp_path)
@@ -188,6 +239,7 @@ def test_dropped_files_go_to_the_right_reader(tmp_path):
     assert otherboards.for_file("C:/x/list.spl").key == "soundpad"
     assert otherboards.for_file("C:/x/Resanance.db").key == "resanance"
     assert otherboards.for_file(str(board)).key == "expboard"
+    assert otherboards.for_file(str(_soundux_config(tmp_path))).key == "soundux"
     assert otherboards.for_file(str(other)) is None     # a .json that isn't a board
     assert otherboards.for_file("C:/x/song.mp3") is None
 
