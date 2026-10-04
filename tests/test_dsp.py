@@ -179,3 +179,29 @@ def test_a_filter_bank_equals_one_sosfilt_per_filter_block_by_block():
         y, state = dsp.sosfilt_bank(bank, x[:, i:i + 480], state)
         got.append(y)
     assert np.allclose(np.concatenate(got, axis=-1), want, atol=1e-10)
+
+
+def test_a_plan_shared_by_two_audio_threads_stays_right():
+    """The main output and the cable run the same plan on their own threads: both
+    building a square at once used to leave [P, P², P², …] for good."""
+    import sys
+    import threading
+    old = sys.getswitchinterval()
+    sys.setswitchinterval(1e-6)   # switch threads as often as possible
+    try:
+        for k in range(100):
+            p = dsp._Plan([dsp._sections_ss(dsp.butter(8, 0.01 + k * 1e-6))],
+                          np.dtype(np.float64))
+            go = threading.Barrier(4)
+            threads = [threading.Thread(target=lambda go=go, p=p: (go.wait(),
+                                                                   p.square(64, 5)))
+                       for _ in range(4)]
+            for t in threads:
+                t.start()
+            for t in threads:
+                t.join()
+            sq = p._squares[64]
+            assert len(sq) == 6
+            assert np.allclose(sq[2], sq[1] @ sq[1])
+    finally:
+        sys.setswitchinterval(old)
