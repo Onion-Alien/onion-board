@@ -204,6 +204,25 @@ def test_new_sound_options_survive_a_save_and_a_backup(app_dir, tmp_path):
     assert {"only_them", "delay", "cooldown"} <= set(backup.SOUND_FIELDS)
 
 
+def test_space_on_a_playing_pad_pauses_it_instead_of_restarting(window, monkeypatch):
+    from PySide6.QtTest import QTest
+    w = window
+    played, paused = [], []
+    monkeypatch.setattr(w, "play", played.append)
+    state = {}
+    monkeypatch.setattr(w.engine, "state", lambda sid: state.get(sid))
+    monkeypatch.setattr(w.engine, "set_paused", lambda sid, p: paused.append((sid, p)))
+    pad = w.pads["s0"]
+    QTest.keyClick(pad, Qt.Key_Space)
+    assert played == ["s0"] and paused == []        # not playing: Space plays it
+    state["s0"] = (0.3, False)                      # playing
+    QTest.keyClick(pad, Qt.Key_Space)
+    assert played == ["s0"] and paused == [("s0", True)] and w.current == "s0"
+    state["s0"] = (0.3, True)                       # paused: Space resumes it
+    QTest.keyClick(pad, Qt.Key_Space)
+    assert paused[-1] == ("s0", False) and played == ["s0"]
+
+
 def test_one_click_plays_a_pad(window, monkeypatch):
     w = window
     played = []

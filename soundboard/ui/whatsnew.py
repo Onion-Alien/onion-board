@@ -35,8 +35,8 @@ NOTES = (
          "Every slider jumps straight to where you click its bar; no need to grab the "
          "circle."),
         ("check", "Fixes",
-         "Getting Onion Watch shows its real progress instead of a full bar, and no "
-         "blank windows flash up on start."),
+         "Space pauses the sound you're on instead of restarting it, live tabs glow "
+         "green, and getting Onion Watch shows its real progress."),
     )),
     Note("1.6.6", "Coming from another soundboard?", (
         ("sounds", "Bring your sounds over",

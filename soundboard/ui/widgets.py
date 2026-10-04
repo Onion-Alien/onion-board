@@ -288,9 +288,10 @@ class Pad(QAbstractButton):
     """One sound's button, painted by hand. It's a QAbstractButton so screen readers
     see a button with the sound's name, and it works from the keyboard: Tab / arrows
     to move, Enter or Space to play, Ctrl+Space to pick, the Menu key for its menu."""
-    activated = Signal(str)     # play it (a double-click, Enter / Space, a screen reader's press)
+    activated = Signal(str)     # play it (a double-click, Enter, a screen reader's press)
     chosen = Signal(str)        # a single click: select it (transport bar) without playing
     pick = Signal(str, bool)    # Ctrl+click / Ctrl+Space (False) or Shift+click (True)
+    space = Signal(str)         # Space: pause / resume it if it's playing, else play it
     menu = Signal(str, QPoint)
     step = Signal(object, int, int)   # arrow key: this pad, columns, rows to move focus
     single_click = False        # Settings: a click plays it (activated) instead of selecting
@@ -378,6 +379,9 @@ class Pad(QAbstractButton):
                   Qt.Key_Down: (0, 1)}
         if k == Qt.Key_Space and mods & Qt.ControlModifier:
             self.pick.emit(self.meta.id, False)
+        elif k == Qt.Key_Space and not mods:
+            if not e.isAutoRepeat():
+                self.space.emit(self.meta.id)
         elif k in (Qt.Key_Return, Qt.Key_Enter):
             self.activated.emit(self.meta.id)
         elif k == Qt.Key_Menu or (k == Qt.Key_F10 and mods & Qt.ShiftModifier):
@@ -385,7 +389,7 @@ class Pad(QAbstractButton):
         elif k in arrows and not mods & (Qt.ControlModifier | Qt.AltModifier):
             self.step.emit(self, *arrows[k])
         else:
-            super().keyPressEvent(e)   # Space plays (QAbstractButton's click)
+            super().keyPressEvent(e)
 
     def _fit_name(self, room: QRectF) -> tuple[QFont, Qt.AlignmentFlag, str]:
         """The name's font, flags and text so it fits the pad: wrapped over two lines,

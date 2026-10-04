@@ -209,8 +209,15 @@ def test_the_view_has_totals_and_open_log(qapp, path):
     done("b.example.com")
     done("c.example.net")
     w.refresh(force=True)
-    assert w.totals.isEnabled() and not w.open_log.isEnabled()   # nothing saved
+    # nothing saved: Open log shows this run's list in a window, writing nothing
+    assert w.totals.isEnabled() and w.open_log.isEnabled()
     assert "Keep a history" in w.open_log.toolTip()
+    w._open_log()
+    from soundboard.ui.netactivity import LogDialog
+    shown = [d for d in qapp.topLevelWidgets() if isinstance(d, LogDialog)]
+    assert shown and "c.example.net" in shown[-1].text.toPlainText()
+    assert netlog.kept_file() is None
+    shown[-1].close()
     netlog.keep(path)
     w.refresh(force=True)
     assert w.open_log.isEnabled() and netlog.kept_file() == path

@@ -288,3 +288,17 @@ def test_about_shows_the_version_and_only_opens_pages(window, monkeypatch):  # n
     assert opened and all(u.startswith("https://") for u in opened)
     assert any("/security/advisories/new" in u for u in opened)
     d.close()
+
+
+def test_live_tabs_comes_first_on_appearance_as_a_switch(window, qapp):  # noqa: F811
+    from soundboard.ui.voicepanel import Switch
+    d = SettingsDialog(window, "appearance")
+    page = next(sa.widget() for sa in d.findChildren(QScrollArea)
+                if any(isinstance(s, Switch) for s in sa.widget().findChildren(Switch)))
+    first = page.layout().itemAt(0).widget()
+    assert first.findChild(QLabel).text() == "LIVE TABS"
+    sw = first.findChild(Switch)
+    assert sw.isChecked() == window.cfg.live_tab_green
+    sw.click()
+    assert window.cfg.live_tab_green == sw.isChecked()
+    d.close()
