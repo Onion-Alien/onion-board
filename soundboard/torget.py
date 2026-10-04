@@ -90,7 +90,7 @@ def download(progress: Callable[[int, int], None] | None = None) -> bytes:
     buf = io.BytesIO()
     try:
         with net.urlopen(req, timeout=TIMEOUT_S, feature=FEATURE) as r:
-            total = int(r.headers.get("Content-Length") or 0)
+            total = _length(r.headers.get("Content-Length"))
             if total > MAX_BYTES:
                 raise GetError(f"The download is {total / 1e6:.0f} MB, far bigger than "
                                "Tor: not taking it.")
@@ -118,6 +118,14 @@ def download(progress: Callable[[int, int], None] | None = None) -> bytes:
     return buf.getvalue()
 
 
+def _length(header) -> int:
+    """Content-Length as a number; 0 (unknown) when it's missing or isn't one."""
+    try:
+        return max(int(str(header or 0).strip()), 0)
+    except ValueError:
+        return 0
+
+
 def unpack(data: bytes, dest: Path | None = None) -> Path:
     """Unpack the kept files from a checked tarball into `dest` (the bin folder by
     default), replacing what's there. Only the named members are read, each written to
@@ -143,7 +151,12 @@ def unpack(data: bytes, dest: Path | None = None) -> Path:
         shutil.rmtree(old, ignore_errors=True)
         if dest.exists():
             dest.rename(old)   # fails while tor.exe in it is running
-        tmp.rename(dest)
+        try:
+            tmp.rename(dest)
+        except OSError:
+            if old.exists() and not dest.exists():
+                old.rename(dest)   # put the working copy back
+            raise
         shutil.rmtree(old, ignore_errors=True)
     except GetError:
         shutil.rmtree(tmp, ignore_errors=True)
@@ -169,8 +182,9 @@ def get(progress: Callable[[int, int], None] | None = None,
                        "the download. Pick Direct or Through a proxy, then Get Tor.")
     log.info("downloading Tor %s (%s)", VERSION, net.describe())
     data = download(progress)
-    if before_unpack:
-        before_unpack()
-    dest = unpack(data)
+    with tor.hold():   # nothing restarts tor.exe from the folder while it's swapped
+        if before_unpack:
+            before_unpack()
+        dest = unpack(data)
     log.info("Tor %s unpacked into the tor\\bin folder", VERSION)
     return dest

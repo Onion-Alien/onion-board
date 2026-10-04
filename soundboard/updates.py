@@ -231,6 +231,14 @@ def download(rel: Release, progress: Callable[[int, int], None] | None = None,
     return dest
 
 
+def _length(header) -> int:
+    """Content-Length as a number; 0 (unknown) when it's missing or isn't one."""
+    try:
+        return max(int(str(header or 0).strip()), 0)
+    except ValueError:
+        return 0
+
+
 def fetch(url: str, sha256: str, dest: Path, trusted: tuple[str, ...], max_size: int,
           what: str, size: int = 0, progress: Callable[[int, int], None] | None = None,
           cancelled: Callable[[], bool] | None = None, feature: str = FEATURE) -> Path:
@@ -253,12 +261,14 @@ def fetch(url: str, sha256: str, dest: Path, trusted: tuple[str, ...], max_size:
         with _open(url, feature) as r, open(part, "wb") as f:
             if not r.geturl().startswith("https://"):
                 raise UpdateError("the download was redirected off HTTPS")
-            total = int(r.headers.get("Content-Length") or size or 0)
+            total = _length(r.headers.get("Content-Length")) or size or 0
             if total > max_size:
                 raise UpdateError(f"the download is far bigger than {what}")
             while chunk := r.read(CHUNK):
                 if cancelled is not None and cancelled():
                     raise UpdateError("cancelled")
+                if not net.allowed(feature):   # switched off (or Offline) meanwhile
+                    raise UpdateError(net.off_message(feature))
                 done += len(chunk)
                 if done > max_size:
                     raise UpdateError(f"the download is far bigger than {what}")

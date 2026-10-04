@@ -23,6 +23,7 @@ waits, then fails. Nothing ever goes direct instead.
 """
 from __future__ import annotations
 
+import contextlib
 import ctypes
 import json
 import logging
@@ -54,6 +55,8 @@ NEWNYM_EVERY_S = 10.0         # tor ignores (delays) NEWNYM more often than this
 STOP_WAIT_S = 3.0
 STILL_MOVING_S = 60.0         # a request keeps waiting past its time while Tor progresses
 LOG_LINES = 40
+UPDATING = ("Not connecting: Tor is being updated. Nothing was sent without it: try "
+            "again in a moment.")
 
 
 def bundle_dirs() -> list[Path]:
@@ -455,7 +458,7 @@ class Tor:
         if not net.any_allowed():
             return
         with self._cond:
-            if not self.enabled or self.state in (STARTING, READY):
+            if not self.enabled or self.state in (STARTING, READY) or _holds:
                 return
             self._run_id += 1
             run_id = self._run_id
@@ -504,6 +507,8 @@ class Tor:
         with self._cond:
             if not self.enabled:
                 raise net.ProxyError("Not connecting: Tor is switched off")
+            if _holds:   # its files are being replaced: it mustn't start from them now
+                raise net.ProxyError(UPDATING)
             if (self.state == FAILED
                     and time.monotonic() - self._failed_at < RETRY_AFTER_FAIL_S):
                 raise net.ProxyError(f"Couldn't connect to Tor ({self.message}). Nothing "
@@ -528,13 +533,19 @@ class Tor:
                             break
                         left = STILL_MOVING_S
                     self._cond.wait(min(left, 1.0))
+                proc = self._proc
+                if self.state == READY and proc is not None and proc.poll() is not None:
+                    # died since it connected; the watcher marks it failed any moment
+                    raise net.ProxyError("Couldn't connect to Tor (tor.exe stopped). "
+                                         "Nothing was sent without it.")
                 if self.state == READY and self.socks_port:
                     return net.Proxy("socks5", "127.0.0.1", self.socks_port)
                 if self.state == FAILED:
                     raise net.ProxyError(f"Couldn't connect to Tor ({self.message}). "
                                          "Nothing was sent without it.")
                 if self.state == OFF:
-                    raise net.ProxyError("Not connecting: Tor was switched off")
+                    raise net.ProxyError(UPDATING if _holds else
+                                         "Not connecting: Tor was switched off")
                 raise net.ProxyError(f"Tor is still connecting ({self.progress}%). Nothing "
                                      "was sent without it: try again in a moment.")
         finally:
@@ -698,7 +709,7 @@ class Tor:
             if phase["progress"] >= 100:
                 self._set(run_id, READY, 100, "connected")
                 log.info("tor connected (SOCKS on 127.0.0.1:%d)", socks)
-                return
+                return self._watch(run_id, proc)
             self._set(run_id, progress=phase["progress"],
                       message=phase["summary"] or "connecting")
             if time.monotonic() > deadline:
@@ -707,6 +718,18 @@ class Tor:
                         ". If Tor is blocked where you are, try “Hide that I'm using Tor”")
                 return self._fail(run_id, f"it took too long ({why}){hint}")
             time.sleep(POLL_S)
+
+    def _watch(self, run_id: int, proc: subprocess.Popen):
+        """Once connected: if tor.exe goes away (crashed, killed), say so, so requests
+        get a clear failure (and a restart) instead of a dead SOCKS port."""
+        while run_id == self._run_id:
+            try:
+                proc.wait(POLL_S)
+            except subprocess.TimeoutExpired:
+                continue
+            if run_id == self._run_id:
+                self._fail(run_id, self._why_exited(proc))
+            return
 
 
 # --------------------------------------------------------------------------- the app's one Tor
@@ -755,6 +778,28 @@ def new_identity() -> str:
 def shutdown() -> None:
     if _tor is not None:
         _tor.stop()
+
+
+_holds = 0   # hold()s in progress: Tor neither starts nor hands out its port
+_hold_lock = threading.Lock()
+
+
+@contextlib.contextmanager
+def hold():
+    """Keep Tor stopped while its files are replaced (Get Tor's update): it's stopped
+    now, and requests meanwhile are refused instead of starting tor.exe from the
+    folder being swapped. Released, the next request starts it as usual."""
+    global _holds
+    with _hold_lock:
+        _holds += 1
+    try:
+        shutdown()
+        yield
+    finally:
+        with _hold_lock:
+            _holds -= 1
+        if _tor is not None:
+            _tor._changed()
 
 
 _status = None
