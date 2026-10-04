@@ -19,6 +19,11 @@
   on the installer's *Pick what you want* page) and every connection is saved on
   this PC and listed again next time, up to the last 1000. Off by default; nothing
   is sent anywhere, Clear empties it, and unticking it deletes the file.
+- **Network activity totals:** **Totals…** beside Simple / Detailed opens a table
+  of how much data went to each site (or each server): connections, sent,
+  received, first and last time, sortable, and Copy pastes it into a spreadsheet.
+  With a kept history it adds up the whole saved file, not just the 1000 the list
+  shows. **Open log** opens that file.
 - **Reset, with an undo:** Settings → General → Start over opens a short guide:
   tick what to reset (settings, hotkeys and optionally each sound's hotkey,
   sounds, Recently deleted, programs, audio devices), check the summary, and the
