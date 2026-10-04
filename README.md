@@ -571,6 +571,8 @@ the newest backup is used, so the pad list is never silently reset.
   slider on top.
 - Radio recordings are spooled to a 16-bit WAV as they happen instead of growing in
   RAM, and the resampled copies kept for non-48 kHz devices are capped at 512 MB (LRU).
+  A press never waits for a copy: until it's made (on a thread) the sound is read
+  from the 48 kHz original at the device's rate, like the live speed does.
 - **The send stage** (`soundboard/sendfx.py`) is the last thing before the cable.
   Everything Discord and games send is one channel, so the sounds are downmixed
   here first, per band: a band that is mostly out of phase between left and right

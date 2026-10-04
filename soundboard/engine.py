@@ -491,6 +491,10 @@ class Voice:
     # power share each destination low cut takes from this sound (destination.cut_shares):
     # its make-up gain while a mode with that cut is on
     cut_share: dict = field(default_factory=dict)
+    # out -> source frames per output frame: 1 when `data` was made at that output's
+    # rate; otherwise the source is read at this rate (the resampled copy wasn't
+    # ready when it started, and playing must never wait for one: see Engine.play)
+    step: dict = field(default_factory=dict)
 
     def __post_init__(self):
         self.pos = {o: 0 for o in self.data}
@@ -544,6 +548,10 @@ class Engine:
         self._cache: OrderedDict[tuple[str, int], tuple[np.ndarray, np.ndarray]] = OrderedDict()
         self._cache_bytes = 0
         self._cache_lock = threading.Lock()
+        self._resampling: set[tuple[str, int]] = set()   # cache keys being made on a thread
+        # sid -> (source array, src rate, destination.cut_shares): worked out once per
+        # sound (at load, by prepare), not on every press
+        self._shares: dict[str, tuple[np.ndarray, int, dict]] = {}
 
         self.latency = "low"      # sounddevice latency: 'low' or 'high' (safer)
         keys = ("main", "mon", "mic", "obs")
@@ -973,12 +981,51 @@ class Engine:
                 self._cache_bytes -= dropped.nbytes
         return out
 
+    def _cached(self, sid: str, data: np.ndarray, rate: int, src_rate: int) -> np.ndarray | None:
+        """data_for's answer if it's ready without any work, else None."""
+        if rate == src_rate:
+            return data
+        with self._cache_lock:
+            hit = self._cache.get((sid.split(":")[0], rate))
+        return hit[1] if hit and hit[0] is data else None
+
+    def _resample_soon(self, sid: str, data: np.ndarray, rate: int, src_rate: int):
+        """Make data_for's copy on a thread (once per sound and rate at a time)."""
+        key = (sid.split(":")[0], rate)
+        with self._cache_lock:
+            if key in self._resampling:
+                return
+            self._resampling.add(key)
+
+        def run():
+            try:
+                self.data_for(sid, data, rate, src_rate)
+            except Exception:  # noqa: BLE001 - the next press reads the source again
+                log.debug("resampling %s failed", sid, exc_info=True)
+            finally:
+                with self._cache_lock:
+                    self._resampling.discard(key)
+
+        threading.Thread(target=run, daemon=True, name="resample").start()
+
+    def cut_shares(self, sid: str, data: np.ndarray, src_rate: int = SR) -> dict:
+        """destination.cut_shares of a sound, worked out once (~12 ms for a song)."""
+        key = sid.split(":")[0]
+        hit = self._shares.get(key)
+        if hit is not None and hit[0] is data and hit[1] == src_rate:
+            return hit[2]
+        shares = destination.cut_shares(data, src_rate)
+        self._shares[key] = (data, src_rate, shares)
+        return shares
+
     def prepare(self, sid: str, data: np.ndarray):
         """Pre-resample for the currently open outputs (call off the UI thread)."""
+        self.cut_shares(sid, data)
         for o in self.active_outputs():
             self.data_for(sid, data, self.rates[o])
 
     def forget(self, sid: str):
+        self._shares.pop(sid, None)
         with self._cache_lock:
             for k in [k for k in self._cache if k[0] == sid]:
                 self._cache_bytes -= self._cache.pop(k)[1].nbytes
@@ -1016,10 +1063,20 @@ class Engine:
                             and not is_fixed(v.sid)):
                         v.stopping = True
         rates_used = {o: self.rates[o] for o in outs}
-        per_out = {o: self.data_for(sid, data, rates_used[o], src_rate) for o in outs}
+        # this runs on the UI thread (or a hotkey's): resampling a song for a 44.1 kHz
+        # device takes up to a second, so a copy that isn't ready yet is made on a
+        # thread for next time and this press reads the source at the output's rate
+        per_out, step = {}, {}
+        for o in outs:
+            d = self._cached(sid, data, rates_used[o], src_rate)
+            if d is None:
+                self._resample_soon(sid, data, rates_used[o], src_rate)
+                d, step[o] = data, src_rate / rates_used[o]
+            per_out[o] = d
         v = Voice(sid, per_out, gain, loop, preview=preview, rates=rates_used,
                   fade_in=max(0.0, float(fade_in)), fade_out=max(0.0, float(fade_out)),
-                  fixed=is_fixed(sid), cut_share=destination.cut_shares(data, src_rate))
+                  fixed=is_fixed(sid), cut_share=self.cut_shares(sid, data, src_rate),
+                  step=step)
         if start > 0:
             v.seek(start)
             for o in v.data:     # not shared yet: apply it now, so progress() is right
@@ -1168,6 +1225,8 @@ class Engine:
                 g = g * np.float32(v.makeup(dest.lowcut))
             g0 = v.gate[out]
             rate = self.rates[out]
+            st = v.step.get(out, 1.0)
+            vspeed = speed * st   # source frames per output frame
             if v.stopping:  # fade out (10 ms, or the sound's own fade-out), then done
                 if g0 <= 0.0 or v.paused or not n:
                     v.done.add(out)
@@ -1180,14 +1239,14 @@ class Engine:
                 # the start's fade-in; pause, resume and seek take 10 ms
                 ramp = int(v.fade_in * rate) if out in v.fading and target else fade
             # a one-shot's fade-out before its natural end
-            tail = int(v.fade_out * rate) if v.fade_out > 0 and not v.loop else 0
+            tail = int(v.fade_out * rate * st) if v.fade_out > 0 and not v.loop else 0
             p_start = float(p)
-            near_end = tail and n - p_start < tail + frames * max(speed, 1.0) + 1
+            near_end = tail and n - p_start < tail + frames * max(vspeed, 1.0) + 1
             shaped = g0 != target or near_end
             if shaped:
                 dst_final = dst
                 dst = np.zeros((frames, CH), np.float32)
-            if abs(speed - 1.0) < 1e-4:
+            if abs(vspeed - 1.0) < 1e-4:
                 p = int(p)
                 w = 0
                 while w < frames:
@@ -1201,7 +1260,7 @@ class Engine:
                     w += take
                     p += take
             else:
-                p = self._render_speed(dst, data, float(p), speed, g, v.loop)
+                p = self._render_speed(dst, data, float(p), vspeed, g, v.loop)
             v.pos[out] = p
             if shaped:
                 if g0 != target:   # a straight line from g0 towards target, `ramp` long
@@ -1214,7 +1273,7 @@ class Engine:
                 else:
                     env = np.full(frames, target, np.float32)
                 if near_end:
-                    at = p_start + speed * np.arange(frames, dtype=np.float32)
+                    at = p_start + vspeed * np.arange(frames, dtype=np.float32)
                     env = env * np.clip((n - at) / tail, 0.0, 1.0)
                 dst_final += dst * env[:, None]
                 if v.stopping and v.gate[out] <= 0.0:
