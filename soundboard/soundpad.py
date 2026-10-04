@@ -25,7 +25,8 @@ from soundboard.otherboards import Entry, Source, vk_hotkey
 LIST_NAME = "soundlist.spl"
 MAX_BYTES = 50 * 1024 * 1024   # a list of tens of thousands of sounds is ~10 MB
 
-# keyModifiers, as Windows' RegisterHotKey takes them (what Soundpad passes it)
+# keyModifiers, as Windows' RegisterHotKey takes them (checked against Soundpad 4.0.35's
+# own Hotkey column: 1 Alt, 2 Ctrl, 4 Shift, 8 Win)
 _ALT, _CTRL, _SHIFT, _WIN = 0x1, 0x2, 0x4, 0x8
 
 
@@ -79,7 +80,12 @@ def read(path: str | Path) -> list[Entry]:
     cats = root.find("Categories")
     if cats is not None:
         _tag(cats, entries)
-    return [e for e in entries if e.path]
+    entries = [e for e in entries if e.path]
+    # its home category ("My Sounds") has every sound in it: no use as a category here
+    every = set.intersection(*(set(e.tags) for e in entries)) if entries else set()
+    for e in entries:
+        e.tags = [t for t in e.tags if t not in every]
+    return entries
 
 
 def _tag(node, entries: list[Entry]):
