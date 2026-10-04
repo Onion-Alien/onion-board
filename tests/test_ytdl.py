@@ -151,6 +151,8 @@ def pypi(app_dir, monkeypatch):
     monkeypatch.setattr(ytdl, "_get", get)
     monkeypatch.setattr(ytdl, "bundled_version", lambda: "2026.8.19")
     saved = {n: m for n, m in sys.modules.items() if n.partition(".")[0] in ytdl.PACKAGES}
+    if ytdl._finder in sys.meta_path:   # an earlier test's search put it in: start without
+        sys.meta_path.remove(ytdl._finder)
     yield state
     if ytdl._finder in sys.meta_path:
         sys.meta_path.remove(ytdl._finder)

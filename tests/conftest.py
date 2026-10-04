@@ -66,6 +66,16 @@ if os.environ.get("ONIONBOARD_TEST_REAL_AUDIO") != "1":
         os.environ["QTWEBENGINE_CHROMIUM_FLAGS"] = f"{flags} --mute-audio".strip()
 
 
+def pytest_xdist_auto_num_workers(config):
+    """`-n auto` (pyproject's addopts): the whole suite runs on 4 workers, about a
+    quarter of the time; a file or two runs in this process, where starting workers
+    would cost more than it saves. `-n 2` / `-n 0` on the command line override it."""
+    picked = [a for a in config.args if Path(a.split("::")[0]).suffix == ".py"]
+    if picked and len(picked) == len(config.args) and len(picked) <= 2:
+        return 0
+    return min(4, os.cpu_count() or 1)
+
+
 @pytest.fixture(scope="session")
 def qapp():
     from PySide6.QtWidgets import QApplication

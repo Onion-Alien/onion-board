@@ -72,7 +72,9 @@ They're safe to run while someone is using the PC.
 
 To iterate faster, run just the file you touched, e.g.
 `.venv\Scripts\python -m pytest -q tests\test_engine.py`, and the full suite
-before committing. You don't need to rebuild to see a change: `scripts\run.bat` runs
+before committing. The full suite runs on 4 workers (pytest-xdist, about a minute);
+one or two files run in a single process. `-n 2` caps the workers (say, while a
+game is running) and `-n 0` turns them off. You don't need to rebuild to see a change: `scripts\run.bat` runs
 from source.
 
 ### What voice chat does to the sounds (the bench)

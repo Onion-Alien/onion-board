@@ -31,7 +31,7 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-dev = ["pytest==9.1.1", "ruff==0.16.9", "pyinstaller==6.22.3"]
+dev = ["pytest==9.1.1", "pytest-xdist==3.8.0", "ruff==0.16.9", "pyinstaller==6.22.3"]
 
 [project.urls]
 Homepage = "https://github.com/Onion-Alien/onion-board"
@@ -71,4 +71,4 @@ ignore = [
 # ---------------------------------------------------------------- pytest
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-addopts = "-q -rfE"   # -rfE: the failures and errors, listed at the end
+addopts = "-q -rfE -n auto"   # -rfE: failures and errors listed at the end; -n: see conftest

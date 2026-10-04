@@ -9,6 +9,7 @@ Direct mode their proof is a test site on 127.0.0.2: not in no_proxy, so they ca
 reach it through the relay, whose log (net.relay_seen) says what it let through."""
 import http.server
 import json
+import socketserver
 import threading
 import types
 
@@ -192,6 +193,13 @@ def test_setup_downloads_off_never_starts_the_cable_installer(monkeypatch):
 
 # ---------------------------------------------------------------- C++: Qt and FFmpeg
 
+class _NoNameServer(http.server.ThreadingHTTPServer):
+    def server_bind(self):
+        # HTTPServer's own asks DNS for 127.0.0.2's name (socket.getfqdn): 5 s on Windows
+        socketserver.TCPServer.server_bind(self)
+        self.server_name, self.server_port = self.server_address[:2]
+
+
 class Local2:
     """A test site on 127.0.0.2: FFmpeg's no_proxy doesn't cover it, and Qt always
     goes through the relay, so they can only reach it through the relay."""
@@ -222,7 +230,7 @@ class Local2:
                 except OSError:
                     pass
 
-        self.httpd = http.server.ThreadingHTTPServer(("127.0.0.2", 0), H)
+        self.httpd = _NoNameServer(("127.0.0.2", 0), H)
         self.port = self.httpd.server_address[1]
         threading.Thread(target=self.httpd.serve_forever, daemon=True).start()
 
