@@ -100,6 +100,23 @@ ALL = "All"          # the category tab that shows every sound
 VOICE_POLL_MS = 3000  # how often the game in front is looked at (soundboard.voicesdk)
 
 
+class StatusLine(QLabel):
+    """The status message under the mixer. Hidden while there's nothing to say, so
+    the window doesn't keep an empty row at the bottom, and while the window is too
+    short for it (set_room)."""
+
+    room = True
+
+    def setText(self, text: str):
+        super().setText(text)
+        self.setVisible(self.room and bool(text))
+
+    def set_room(self, compact: bool):
+        self.room = not compact
+        self.setVisible(self.room and bool(self.text()))
+        responsive.touch(self)
+
+
 class Bridge(QObject):
     loaded = Signal(str, object, str)          # id, data|None, error
     exported = Signal(str, int, str)           # file, sounds written, error
@@ -435,9 +452,10 @@ class MainWindow(QMainWindow):
         self.voice.fx.tip_dismissed.connect(
             lambda: self.set_option("voice_discord_tip_shown", True))
 
-        self.status = QLabel()
+        self.status = StatusLine()
         self.status.setWordWrap(True)
         self.status.setObjectName("muted")
+        self.status.hide()
         rv.addWidget(self.status)
         self._pages.addWidget(self._build_mini())
 
@@ -3953,7 +3971,7 @@ class MainWindow(QMainWindow):
         f.extend(self.voice.fit_steps())
         f.extend(self.triggers.fit_steps())
         # height: the status line, then the whole mixer strip
-        f.add(10, "h", r.hide(self.status))
+        f.add(10, "h", self.status.set_room)
         f.add(30, "h", r.hide(*self._deck_titles))
         f.add(40, "h", r.hide(self.mixer))
         f.add(50, "h", r.hide(self.cat_bar))   # the overlay's category key still works
