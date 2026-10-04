@@ -47,7 +47,7 @@ class _Base:
     def _guarded(self, c):
         try:
             self._serve(c)
-        except OSError:
+        except (OSError, ValueError):   # ValueError: select() on a socket stop() closed
             pass
         finally:
             with contextlib.suppress(OSError):
