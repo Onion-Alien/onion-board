@@ -98,7 +98,9 @@ class Fitter:
     def __init__(self, root: QWidget):
         self.root = root
         self.steps: list[Step] = []
-        self._at: dict[int, int] = {}   # applied step index -> the size it was applied at
+        # applied step index -> the (width, height) it was applied at, and whether it
+        # went for the other axis' sake (the diagonal pass in fit)
+        self._at: dict[int, tuple[int, int, bool]] = {}
 
     def add(self, priority: int, axis: str, apply: Callable[[bool], None]):
         self.reset()
@@ -108,6 +110,13 @@ class Fitter:
     def extend(self, steps: list[Step]):
         for s in steps:
             self.add(*s)
+
+    def remove(self, steps: list[Step]):
+        """Drop steps (by their apply function), e.g. those of a panel being replaced.
+        Everything is undone first, so call it while the old panel still exists."""
+        gone = {id(s[2]) for s in steps}
+        self.reset()
+        self.steps = [s for s in self.steps if id(s[2]) not in gone]
 
     def reset(self):
         """Undo every step (everything shows again)."""
@@ -142,24 +151,28 @@ class Fitter:
                     if not self._over(size, axis):
                         break
                     apply(True)
-                    self._at[i] = dim[axis]
+                    self._at[i] = (dim["w"], dim["h"], False)
             # still over (a diagonal drag): the other axis' steps can help too (hiding
             # the mixer narrows the window), so try them before anyone calls it too small
-            for i, (_, ax, apply) in enumerate(self.steps):
+            for i, (_, _ax, apply) in enumerate(self.steps):
                 if not (self._over(size, "w") or self._over(size, "h")):
                     break
                 if i not in self._at:
                     apply(True)
-                    self._at[i] = dim[ax]
+                    self._at[i] = (dim["w"], dim["h"], True)
             for axis in ("w", "h"):   # grown: bring back what fits again, last-hidden first
                 for i in sorted((i for i in self._at if self.steps[i][1] == axis),
                                 reverse=True):
-                    if dim[axis] <= self._at[i]:
+                    w, h, cross = self._at[i]
+                    grown = dim[axis] > (w if axis == "w" else h)
+                    if cross:   # hidden for the other axis: that one growing counts too
+                        grown = grown or (dim["h"] > h if axis == "w" else dim["w"] > w)
+                    if not grown:
                         break   # no bigger than when it had to go
                     self.steps[i][2](False)
                     if self._over(size, "w") or self._over(size, "h"):
                         self.steps[i][2](True)
-                        self._at[i] = dim[axis]
+                        self._at[i] = (dim["w"], dim["h"], cross)
                         break
                     del self._at[i]
         finally:

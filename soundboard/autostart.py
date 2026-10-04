@@ -96,5 +96,10 @@ def refresh(hidden: bool):
     """Point an existing entry at this copy of the app (it may have moved, or the
     'start in the tray' choice changed). Does nothing if start with Windows is off."""
     cur = current()
-    if cur is not None and cur != command(hidden):
-        set_enabled(True, hidden)
+    if cur is None or cur == command(hidden) or winreg is None:
+        return
+    try:   # only the Run value: a Task Manager "off" the user chose stays off
+        with winreg.CreateKey(winreg.HKEY_CURRENT_USER, RUN_KEY) as k:
+            winreg.SetValueEx(k, VALUE, 0, winreg.REG_SZ, command(hidden))
+    except OSError:
+        log.warning("couldn't update start with Windows", exc_info=True)

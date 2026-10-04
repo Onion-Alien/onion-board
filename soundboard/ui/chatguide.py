@@ -150,8 +150,12 @@ class ChatCheck(QObject):
             return
         self.running = True
         e.main_tap = []
-        sig = chatcheck.test_signal()
-        e.play(CHECK_SID, sig, 1.0, mode="restart", src_rate=chatcheck.SR, only="main")
+        try:
+            sig = chatcheck.test_signal()
+            e.play(CHECK_SID, sig, 1.0, mode="restart", src_rate=chatcheck.SR, only="main")
+        except Exception:
+            self._stop()   # no capture or tap left running (the caller says it failed)
+            raise
         self._t0 = time.monotonic()
         self.progress.emit("Listening to Discord…")
         self._timer.start(int((chatcheck.LENGTH_S + TAIL_S) * 1000))

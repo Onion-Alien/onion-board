@@ -111,6 +111,8 @@ class LinkBar(QFrame):
         url = ytdl.as_link(text)
         if url == self.url:
             return
+        if self._queued:   # a pick waiting its turn is dropped: its row stops waiting
+            self.done.emit(self.url, self._queued, False)
         self.url = url
         self.title = ""
         self._queued = ""

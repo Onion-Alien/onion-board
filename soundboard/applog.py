@@ -339,7 +339,14 @@ def _show_dialog(rep: Report):
         _state["dialogs"] += 1
         _state["open"] = rep
         dlg = CrashDialog(rep, _state["log_path"], parent=QApplication.activeWindow())
-        dlg.finished.connect(lambda _r: _state.__setitem__("open", None))
+        def closed(*_a, rep=rep):
+            if _state["open"] is rep:
+                _state["open"] = None
+        dlg.finished.connect(closed)
+        # its parent (the window in front then, maybe a dialog) can be deleted with it
+        # still open, and then finished never comes: later errors would be held forever
+        if hasattr(dlg, "destroyed"):
+            dlg.destroyed.connect(closed)
         _state["dialog"] = dlg   # keep it alive while it's shown
         if rep.fatal:
             dlg.exec()
