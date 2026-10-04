@@ -7,10 +7,11 @@ lines, answer and encryption. It redraws once a second while it's on screen, and
 only when something changed."""
 from __future__ import annotations
 
+import html
 import time
 
 from PySide6.QtCore import Qt, QTimer
-from PySide6.QtGui import QColor, QFontDatabase
+from PySide6.QtGui import QBrush, QColor, QFontDatabase
 from PySide6.QtWidgets import (QAbstractItemView, QApplication, QButtonGroup, QHBoxLayout,
                                QHeaderView, QLabel, QPlainTextEdit, QPushButton,
                                QRadioButton, QStackedWidget, QTableWidget,
@@ -29,13 +30,35 @@ def _when(t: float) -> str:
     return time.strftime("%H:%M:%S", time.localtime(t))
 
 
-def _item(text: str, tip: str = "", align=None) -> QTableWidgetItem:
-    it = QTableWidgetItem(text)
-    it.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
-    if tip:
+_TONE = Qt.UserRole + 1   # the status colour a cell is drawn in (None: the default)
+
+
+def _tip(text: str) -> str:
+    """A tooltip shown as plain text: a reason can quote a server, and Qt renders "<b>"
+    in a tooltip."""
+    return f"<p style='white-space:pre-wrap'>{html.escape(text)}</p>" if text else ""
+
+
+def _put(t: QTableWidget, r: int, c: int, text: str, tip: str = "", align=None,
+         tone: str | None = None) -> QTableWidgetItem:
+    """Cell (r, c) says `text`. The item already there is reused and only what changed
+    is set: while a radio stream counts its bytes, building new items would mean a
+    thousand new rows every second."""
+    it = t.item(r, c)
+    if it is None:
+        it = QTableWidgetItem(text)
+        it.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
+        t.setItem(r, c, it)
+    elif it.text() != text:
+        it.setText(text)
+    tip = _tip(tip)
+    if it.toolTip() != tip:
         it.setToolTip(tip)
-    if align is not None:
+    if align is not None and it.textAlignment() != align:
         it.setTextAlignment(align)
+    if it.data(_TONE) != tone:
+        it.setData(_TONE, tone)
+        it.setForeground(QColor(theme.status(tone)) if tone else QBrush())
     return it
 
 
@@ -80,6 +103,15 @@ class NetActivity(QWidget):
             row.addWidget(b)
         self.simple.setChecked(True)
         row.addStretch(1)
+        v.addLayout(row)
+
+        # Copy and Clear beside the summary (it wraps), not after the view buttons: all
+        # four in a row made the Connection page wider than a small Settings window
+        row = QHBoxLayout()
+        self.summary = QLabel()
+        self.summary.setObjectName("hint")
+        self.summary.setWordWrap(True)
+        row.addWidget(self.summary, 1)
         self.copy = QPushButton("Copy")
         self.copy.setToolTip("Copy the detailed list as text. It shows the sites you used: "
                              "read it before sharing it")
@@ -88,11 +120,6 @@ class NetActivity(QWidget):
         row.addWidget(self.copy)
         row.addWidget(self.clear)
         v.addLayout(row)
-
-        self.summary = QLabel()
-        self.summary.setObjectName("hint")
-        self.summary.setWordWrap(True)
-        v.addWidget(self.summary)
 
         self.servers = _table(["Server", "Used for", "Connections", "Data", "Last"], 1)
         self.conns = _table(["Time", "Server", "For", "Route", "Result", "Sent",
@@ -135,6 +162,7 @@ class NetActivity(QWidget):
 
     def _mode(self, _on=None):
         self.stack.setCurrentIndex(0 if self.simple.isChecked() else 1)
+        self.refresh(force=True)   # only the table on show is kept up to date
 
     def refresh(self, force: bool = False):
         ver = netlog.version()
@@ -152,8 +180,10 @@ class NetActivity(QWidget):
                 + (f", {blocked} blocked by a switch" if blocked else "") + ".")
         self.copy.setEnabled(bool(self._entries))
         self.clear.setEnabled(bool(self._entries))
-        self._fill_servers(servers)
-        self._fill_conns()
+        if self.simple.isChecked():
+            self._fill_servers(servers)
+        else:
+            self._fill_conns()
 
     def _fill_servers(self, servers: list[netlog.Server]):
         t = self.servers
@@ -165,15 +195,13 @@ class NetActivity(QWidget):
                                                    (s.failed, "failed")) if k]
             if extra:
                 count += f" ({', '.join(extra)})"
-            cells = [_item(s.host), _item(", ".join(s.features), "\n".join(s.features)),
-                     _item(count, align=right),
-                     _item(f"↑ {netlog.size(s.sent)}  ↓ {netlog.size(s.received)}",
-                           "Sent / received", right),
-                     _item(_when(s.last))]
-            for c, it in enumerate(cells):
-                if s.blocked == s.connections:
-                    it.setForeground(QColor(theme.status("warn")))
-                t.setItem(r, c, it)
+            tone = "warn" if s.blocked == s.connections else None
+            _put(t, r, 0, s.host, tone=tone)
+            _put(t, r, 1, ", ".join(s.features), "\n".join(s.features), tone=tone)
+            _put(t, r, 2, count, align=right, tone=tone)
+            _put(t, r, 3, f"↑ {netlog.size(s.sent)}  ↓ {netlog.size(s.received)}",
+                 "Sent / received", right, tone)
+            _put(t, r, 4, _when(s.last), tone=tone)
 
     def _fill_conns(self):
         t = self.conns
@@ -182,18 +210,17 @@ class NetActivity(QWidget):
         t.setRowCount(len(self._entries))
         right = Qt.AlignRight | Qt.AlignVCenter
         tone = {netlog.BLOCKED: "warn", netlog.FAILED: "error"}
+        t.clearSelection()   # new rows push the others down: pick it again by number
         for r, e in enumerate(self._entries):
-            result = netlog.outcome(e)
             label = netlog.feature_label(e.feature)
-            cells = [_item(_when(e.started)), _item(netlog.where(e)), _item(label, label),
-                     _item(e.route or "—"), _item(result, e.reason),
-                     _item(netlog.size(e.sent), align=right),
-                     _item(netlog.size(e.received), align=right)]
-            cells[0].setData(Qt.UserRole, e.n)
-            for c, it in enumerate(cells):
-                if e.state in tone:
-                    it.setForeground(QColor(theme.status(tone[e.state])))
-                t.setItem(r, c, it)
+            color = tone.get(e.state)
+            _put(t, r, 0, _when(e.started), tone=color).setData(Qt.UserRole, e.n)
+            _put(t, r, 1, netlog.where(e), tone=color)
+            _put(t, r, 2, label, label, tone=color)
+            _put(t, r, 3, e.route or "—", tone=color)
+            _put(t, r, 4, netlog.outcome(e), e.reason, tone=color)
+            _put(t, r, 5, netlog.size(e.sent), align=right, tone=color)
+            _put(t, r, 6, netlog.size(e.received), align=right, tone=color)
             if e.n == picked:
                 t.selectRow(r)
         t.blockSignals(False)
