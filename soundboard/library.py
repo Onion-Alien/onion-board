@@ -102,6 +102,12 @@ PAD_WIDTH_RANGE = (110, 240)  # the Sounds tab's pad-size slider
 # someone's backup is brought into it (Qt raises OverflowError on one past an int)
 NET_MODES = ("direct", "proxy", "tor")   # soundboard.net.MODES
 TOR_BRIDGES = ("", "snowflake", "obfs4")   # soundboard.tor.BRIDGES
+# where what others hear goes (Config.route; Setup -> Devices -> Send to others through):
+#   cable  - a virtual cable, whose other end Discord / the game uses as its mic
+#   device - any output picked by hand (Voicemeeter, a mixer, a second sound card, a
+#            device OBS captures): no cable needed, and none is picked in its place
+#   off    - nowhere: sounds play in your headphones (and the stream output) only
+ROUTES = ("cable", "device", "off")
 SETTING_RANGES = {"sound_vol": (0.0, VOLUME_MAX), "mic_vol": (0.0, VOLUME_MAX),
                   "mon_vol": (0.0, VOLUME_MAX), "obs_vol": (0.0, VOLUME_MAX),
                   "pad_width": PAD_WIDTH_RANGE, "app_card_width": (240, 480),
@@ -119,6 +125,8 @@ def clean_setting(k: str, v):
     if k == "net_off":   # feature keys (strings); unknown ones are kept, so a newer
         # version's switch stays off after a downgrade and an upgrade
         return list(dict.fromkeys(x for x in v if isinstance(x, str) and x))
+    if k == "route":   # a newer version's route: back to the cable, the safe default
+        return v if v in ROUTES else "cable"
     if k == "tor_bridges":   # an unknown kind: still hide Tor, with the default bridge
         return v if v in TOR_BRIDGES else "snowflake"
     if k == "eq_gains":   # one finite gain per band, within the EQ's sliders
@@ -225,6 +233,7 @@ class SoundMeta:
 @dataclass
 class Config:
     version: int = CONFIG_VERSION
+    route: str = "cable"      # where main_device's audio goes: ROUTES
     main_device: str | None = None
     mon_device: str | None = None
     # the headphones are Windows' default output, and move with it when it changes

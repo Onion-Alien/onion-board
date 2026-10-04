@@ -126,6 +126,8 @@ The same switch is in **⚙ Settings → Audio → Your mic** and in the setup g
 - **Friends can't hear anything:** check Discord or the game uses
   **`CABLE Output`** as its mic, and that Onion Board's *"Your mic in Discord /
   games"* pill is green.
+- **Using Voicemeeter, a mixer or OBS instead of the cable?** Setup → Devices →
+  *Send to others through* → **Another device**, then pick it under *Send to*.
 - **They hear sounds but not you:** tick **send** next to *My mic*.
 - **Check it yourself:** the *Setup* tab's **Record 6s → play back** records
   exactly what others get and tells you whether your voice and sounds are in it.
@@ -182,6 +184,12 @@ too (say No if another program, like Voicemeeter, uses it).
   pad. Pads with effects show **FX**; *Reset* goes back to the original. The
   original file is never changed.
 - **Your mic on or off:** send your voice with the sounds, or sounds only.
+- **No virtual cable? Send it anywhere** (Setup → Devices → *Send to others
+  through*): the virtual cable (the default), **another device** (Voicemeeter, a
+  mixer, a capture card, any output OBS captures as an *Audio Output Capture*) or
+  **nowhere** (only you hear your sounds, and the stream output if you set one).
+  With another device the app never puts the cable back, never asks you to
+  install it, and shows green once it's sending.
 - **Stream output for OBS** (Settings → Audio → *Stream output*): what others hear,
   without the voice chat shaping, on a device of its own (a second virtual cable such
   as VB-Cable A+B, or any output you don't listen on). In OBS add it as an *Audio
@@ -320,6 +328,10 @@ too (say No if another program, like Voicemeeter, uses it).
 The virtual cable is a free audio driver that works like a pipe: Onion Board plays
 into one end, and Discord or the game uses the other end as a microphone. You hear
 the sounds in your own headphones separately.
+
+Not using the cable? Setup → Devices → **Send to others through** → *Another
+device* sends the same mix into whatever you pick instead (Voicemeeter, a mixer,
+OBS), or *Nowhere* keeps it to your headphones and the stream output.
 
 ### Use it responsibly
 

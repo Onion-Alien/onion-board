@@ -64,7 +64,7 @@ STORED = {".mp3", ".ogg", ".opus", ".m4a", ".aac", ".flac", ".wma", ".webm", ".m
 # settings that belong to this PC, or that must only ever be switched on by hand
 # (they make the app go online / run downloaded code): never exported or imported
 LOCAL_SETTINGS = {"version", "sounds", "categories", "category", "main_device", "mon_device",
-                  "mic_device", "obs_device", "setup_done", "tab", "apps", "screen",
+                  "mic_device", "obs_device", "route", "setup_done", "tab", "apps", "screen",
                   "ytdlp_auto_optin", "update_check", "update_checked", "update_skip",
                   "update_pending", "category_hotkeys", "api_enabled", "api_port",
                   "api_token", "net_mode", "net_proxy",
