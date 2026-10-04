@@ -304,7 +304,7 @@ def load_package(info: ModuleInfo):
     missing = [m for m in info.imports if not _importable(m)]
     if missing:
         raise ModuleError(f"it needs {', '.join(missing)}, which this Onion Board doesn't have: "
-                          "update Onion Board")
+                          f"update {info.name} or Onion Board")
     pkg_dir = info.path / info.package
     have = sys.modules.get(info.package)
     if have is not None:
