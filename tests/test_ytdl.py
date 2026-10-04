@@ -587,7 +587,7 @@ def test_searching_shows_a_centred_mascot_then_the_results(qapp, monkeypatch):
     panel.search("bruh")
     qapp.processEvents()
     view = panel.loading
-    assert view.isVisible() and not panel.scroll.isVisible() and not panel.hint.isVisible()
+    assert view.isVisible() and not panel.scroll.isVisible()
     assert view.kind in ("bunny", "owl")
     assert isinstance(view.mascot, OwlWidget if view.kind == "owl" else BunnyWidget)
     assert view.mascot.isVisible() and view.bar.ticking()
@@ -613,7 +613,8 @@ def test_searching_shows_a_centred_mascot_then_the_results(qapp, monkeypatch):
     gate.set()
     assert process_events(qapp, lambda: not view.running(), 5)
     assert not view.isVisible() and not view.bar.ticking()
-    assert panel.scroll.isVisible() and panel.title.isVisible() and len(panel._rows) == 1
+    assert panel.scroll.isVisible() and len(panel._rows) == 1
+    assert not panel.title.isVisible()   # results need no caption
     panel.close_results()
 
 
@@ -693,3 +694,81 @@ def test_add_on_a_second_result_while_one_downloads_adds_both(qapp, window, monk
     gate.set()
     assert process_events(qapp, lambda: len(window.cfg.sounds) == 4, 10)
     assert [m.name for m in window.cfg.sounds[-2:]] == ["one", "ond"]
+
+
+_real_stats = ytdl.stats   # conftest swaps it for an offline stand-in in every test
+
+
+def test_result_counts_come_from_the_search_or_one_look_up_per_video(monkeypatch):
+    from soundboard.ui.ytsearch import fmt_count, stats_text
+    yt = ytdl._youtube_hit({"id": "HEXWRTEbj1I", "title": "What Is Love",
+                            "view_count": 497635348})
+    assert (yt.views, yt.likes, yt.comments) == (497635348, None, None)
+    assert ytdl.needs_stats(yt)
+    sc = ytdl._soundcloud_hit({"id": "1", "title": "t", "webpage_url":
+                               "https://soundcloud.com/a/b", "view_count": 373794,
+                               "like_count": 6152, "comment_count": 28})
+    assert (sc.views, sc.likes, sc.comments) == (373794, 6152, 28)
+    assert not ytdl.needs_stats(sc)
+    assert [fmt_count(n) for n in (999, 1234, 12_345, 4_553_746, 2_000_000_000)] == [
+        "999", "1.2K", "12K", "4.6M", "2B"]
+    assert stats_text(yt, waiting=True)[0] == "498M views · 👍 … · 💬 …"
+    assert stats_text(sc) == ("374K views · 👍 6.2K · 💬 28",
+                              "373,794 views, 6,152 likes, 28 comments")
+    seen = {}
+
+    class YoutubeDL:
+        def __init__(self, opts):
+            seen["opts"] = opts
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *a):
+            return False
+
+        def extract_info(self, url, download=True, process=True):
+            seen.update(url=url, download=download, process=process)
+            return {"view_count": 5, "like_count": 4, "comment_count": None}
+    monkeypatch.setitem(sys.modules, "yt_dlp", types.SimpleNamespace(YoutubeDL=YoutubeDL))
+    monkeypatch.setattr(ytdl, "install", lambda *a, **k: None)
+    assert _real_stats(yt) == (5, 4, None)
+    assert seen["url"] == yt.url and not seen["download"] and not seen["process"]
+    assert "format" not in seen["opts"]
+
+
+def test_a_download_locks_the_other_cards_and_shows_its_progress(qapp, monkeypatch):
+    from soundboard.ui import busy
+    from soundboard.ui.ytsearch import SearchResults
+    hits = [ytdl.Result(f"vid{i}xxxxxx", f"Song {i}", "c", 60, "myinstants",
+                        f"https://example.com/{i}.mp3") for i in range(3)]
+    panel = SearchResults()
+    panel.query = "song"
+    panel._on_done(0, hits, "")
+    a, b, c = panel._rows
+    panel.mark(hits[0].url, "add")                   # Add on the first card
+    assert busy.is_busy(a.btn_add) and not busy.is_busy(a.btn_play)   # Play after it: fine
+    assert all(busy.is_busy(x) for r in (b, c) for x in (r.btn_play, r.btn_add))
+    assert not panel._quiet.is_set()                 # like counts wait for downloads
+    panel.progress(hits[0].url, 0.42)
+    assert a.bar.isVisibleTo(a) and a.bar.value() == 420 and "42%" in a.btn_add.text()
+    panel.mark(hits[0].url, "play")                  # ...and Play on it too
+    panel.mark(hits[0].url, "add", True)
+    assert a.btn_add.text() == "✓ Added" and a.bar.isVisibleTo(a)   # still playing
+    assert busy.is_busy(b.btn_play)
+    panel.mark(hits[0].url, "play", True)
+    assert not a.bar.isVisibleTo(a) and busy.is_busy(a.btn_add)       # added stays added
+    assert not any(busy.is_busy(x) for r in (b, c) for x in (r.btn_play, r.btn_add))
+    assert panel._quiet.is_set()
+
+
+def test_play_after_add_plays_the_added_audio_without_downloading_again(
+        qapp, window, monkeypatch, tmp_path):  # noqa: F811
+    calls = fake_link_download(monkeypatch, tmp_path)
+    monkeypatch.setattr(window.engine, "play", lambda *a, **kw: object())
+    had = len(window.cfg.sounds)
+    window.linkbar.open("https://www.youtube.com/watch?v=HEXWRTEbj1I", "What Is Love", 60)
+    assert window.linkbar.add()
+    assert window.linkbar.play_once()                # pressed while Add downloads: waits
+    assert process_events(qapp, lambda: window.current == "__link__", 5)
+    assert len(calls) == 1 and len(window.cfg.sounds) == had + 1

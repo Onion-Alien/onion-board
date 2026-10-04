@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+- **Web search results that keep up with your clicks:** a result's *Play* or
+  *Add* shows a progress bar on its card (and the percentage on the button), and
+  the other cards wait until it's done, so a second click no longer cancels the
+  first one (which then never played). *Add* then *Play* on the same card plays
+  as soon as it's added, without downloading it again. Cards show views, likes
+  and comments (YouTube's likes and comments fill in a moment later; YouTube
+  hides dislike counts). The caption over the results and the paste-a-link hint
+  are gone.
 - **Network activity** (Settings → Connection): see every connection the app
   makes, to check for yourself where it goes, and why: each one says what caused
   it (*You searched YouTube for “…”*, *You clicked Check now*, *Automatic update

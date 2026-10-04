@@ -14,6 +14,7 @@ from __future__ import annotations
 import html
 import logging
 import math
+import queue
 import random
 import threading
 import time
@@ -22,8 +23,8 @@ from PySide6.QtCore import QEvent, QPointF, QRectF, QSize, QTimer, QUrl, Qt, Sig
 from PySide6.QtGui import (QColor, QLinearGradient, QPainter, QPainterPath, QPixmap,
                            QTextLayout)
 from PySide6.QtNetwork import QNetworkAccessManager, QNetworkRequest
-from PySide6.QtWidgets import (QButtonGroup, QFrame, QHBoxLayout, QLabel, QPushButton,
-                               QScrollArea, QSizePolicy, QVBoxLayout, QWidget)
+from PySide6.QtWidgets import (QButtonGroup, QFrame, QHBoxLayout, QLabel, QProgressBar,
+                               QPushButton, QScrollArea, QSizePolicy, QVBoxLayout, QWidget)
 
 from soundboard import net, netlog, theme, ytdl
 from soundboard.bunny import H as BUN_H
@@ -41,14 +42,36 @@ log = logging.getLogger(__name__)
 
 THUMB_W, THUMB_H = 128, 72   # the pictures' shape (16:9); they fill the card's width
 CARD_MIN_W = 210             # results are cards, as many across as fit at this width
-PASTE_HINT = ("Instagram, X, Reddit, a TikTok you already have…? Copy the video's link "
-              "and paste it in the search box.")
+STATS_WORKERS = 2            # likes / comments looked up this many at a time
 TIPS = {"youtube": "Search YouTube",
         "ytmusic": "Search YouTube Music: songs, the official versions",
         "soundcloud": "Search SoundCloud",
         "tiktok": "Find TikTok sounds (TikTok's own search needs an account, so this "
                   "looks for them on YouTube, where they get reposted)",
         "myinstants": "Search Myinstants: short meme sound buttons"}
+
+
+def fmt_count(n: int) -> str:
+    """1234 -> "1.2K", 4553746 -> "4.6M" (YouTube's way of rounding)."""
+    for size, unit in ((1_000_000_000, "B"), (1_000_000, "M"), (1_000, "K")):
+        if n >= size:
+            v = n / size
+            return (f"{v:.1f}".rstrip("0").rstrip(".") if v < 10 else f"{v:.0f}") + unit
+    return str(n)
+
+
+def stats_text(r: ytdl.Result, waiting: bool = False) -> tuple[str, str]:
+    """(the card's line, its tooltip) for a hit's views, likes and comments: nothing
+    for what the site didn't say, "…" for likes / comments still being looked up."""
+    parts, tip = [], []
+    for n, icon, word in ((r.views, "", "views"), (r.likes, "👍 ", "likes"),
+                          (r.comments, "💬 ", "comments")):
+        if n is not None:
+            parts.append(f"{icon}{fmt_count(n)}" + (" views" if word == "views" else ""))
+            tip.append(f"{n:,} {word}")
+        elif waiting and word != "views":
+            parts.append(f"{icon}…")
+    return " · ".join(parts), ", ".join(tip)
 
 
 class LoadingBar(QWidget):
@@ -301,6 +324,11 @@ class ClampLabel(QLabel):
         self.setSizePolicy(QSizePolicy.Ignored, QSizePolicy.Fixed)
         self._fit()
 
+    def set_full(self, text: str, tip: str = ""):
+        self.full = text
+        self.setToolTip(tip or text)
+        self.update()
+
     def _fit(self):
         self.setFixedHeight(self.fontMetrics().lineSpacing() * self.lines + 2)
 
@@ -357,6 +385,11 @@ class ResultRow(QFrame):
                               lines=1, bold=False)
         self.sub.setObjectName("muted")
         v.addWidget(self.sub)
+        self.stats = ClampLabel("", lines=1, bold=False)
+        self.stats.setObjectName("muted")
+        v.addWidget(self.stats)
+        self.waiting = ytdl.needs_stats(r)   # likes / comments still to look up
+        self.show_stats()
         v.addStretch(1)
         h = QHBoxLayout()
         h.setSpacing(6)
@@ -373,6 +406,18 @@ class ResultRow(QFrame):
             b.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
             h.addWidget(b)
         v.addLayout(h)
+        # the download's progress; its space is kept while hidden so the cards don't jump
+        self.bar = QProgressBar()
+        self.bar.setTextVisible(False)
+        self.bar.setFixedHeight(5)
+        pol = self.bar.sizePolicy()
+        pol.setRetainSizeWhenHidden(True)
+        self.bar.setSizePolicy(pol)
+        self.bar.hide()
+        v.addWidget(self.bar)
+        self._release = {}      # "play" / "add" -> busy.hold's release while it's fetched
+        self._added = False
+        self._locked = False
         self.setCursor(Qt.PointingHandCursor)
         self.setToolTip("Double-click to play")
 
@@ -387,23 +432,67 @@ class ResultRow(QFrame):
             self.play.emit(self.result)
         super().mouseDoubleClickEvent(e)
 
+    def show_stats(self):
+        text, tip = stats_text(self.result, self.waiting)
+        self.stats.set_full(text, tip)
+        self.stats.setVisible(bool(text))
+
+    def _btn(self, kind: str) -> QPushButton:
+        return self.btn_add if kind == "add" else self.btn_play
+
     def set_busy(self, kind: str):
-        """Its audio is being fetched: that button greys out until set_done."""
-        btn = self.btn_add if kind == "add" else self.btn_play
-        self._release = getattr(self, "_release", {})
-        if kind not in self._release and btn.isEnabled():
-            self._release[kind] = busy.hold(btn, "Adding…" if kind == "add" else "Loading…")
+        """Its audio is being fetched: that button greys out until set_done, and the
+        bar under the buttons fills as it downloads."""
+        if kind in self._release or (kind == "add" and self._added):
+            return
+        btn = self._btn(kind)
+        if self._locked:
+            busy.set_busy(btn, False)
+        self._release[kind] = busy.hold(btn, "Adding…" if kind == "add" else "Loading…")
+        self.bar.setRange(0, 0)   # sliding until the first percentage comes in
+        self.bar.show()
+
+    def set_progress(self, frac: float):
+        """0..1 of its audio downloaded, or below 0 while it's being converted."""
+        if not self._release:
+            return
+        if frac < 0:
+            self.bar.setRange(0, 0)
+        else:
+            self.bar.setRange(0, 1000)
+            self.bar.setValue(int(frac * 1000))
+        for kind in self._release:
+            word = "Adding…" if kind == "add" else "Loading…"
+            self._btn(kind).setText(word if frac < 0 else f"{word} {frac:.0%}")
 
     def set_done(self, kind: str, ok: bool):
-        release = getattr(self, "_release", {}).pop(kind, None)
+        release = self._release.pop(kind, None)
+        if not self._release:
+            self.bar.hide()
         if release is None:
             return
         if kind == "add" and ok:
             release()
+            self._added = True
             self.btn_add.setText("✓ Added")   # added once is enough
             busy.set_busy(self.btn_add, True)
         else:
             release(None if ok else ("Didn't add" if kind == "add" else "Didn't play"))
+            if self._locked:
+                busy.set_busy(self._btn(kind), True)
+
+    def set_locked(self, on: bool):
+        """Another card's download is running: this one's buttons wait for it (one at a
+        time, so a click never cancels the one before it)."""
+        if on == self._locked:
+            return
+        self._locked = on
+        for kind in ("play", "add"):
+            if kind in self._release or (kind == "add" and self._added):
+                continue
+            busy.set_busy(self._btn(kind), on)
+        self.setToolTip("Wait for the other download to finish" if on
+                        else "Double-click to play")
 
     def set_thumb(self, pm: QPixmap):
         self.thumb.set_pixmap(pm)
@@ -417,6 +506,7 @@ class SearchResults(QFrame):
     add = Signal(object)
     closed = Signal()
     _done = Signal(int, object, str)   # worker -> UI: (search number, results, error)
+    _stats = Signal(int, object, object)   # worker -> UI: (search number, Result, counts)
 
     def __init__(self):
         super().__init__()
@@ -424,6 +514,12 @@ class SearchResults(QFrame):
         self.source = "youtube"
         self._gen = 0
         self._rows: list[ResultRow] = []
+        self._fetching: dict[str, set[str]] = {}   # url -> {"play", "add"} downloading
+        self._todo: queue.Queue = queue.Queue()     # (search number, Result) for stats
+        self._workers: list[threading.Thread] = []
+        self._quiet = threading.Event()   # set while nothing downloads: stats may run
+        self._quiet.set()
+        self._stats.connect(self._on_stats)
         self.net = QNetworkAccessManager(self)
         net.apply_qt(self.net, "sounds_web")   # thumbnails: Settings > Privacy
         self._done.connect(self._on_done)
@@ -469,10 +565,6 @@ class SearchResults(QFrame):
         row.addWidget(self.direct_btn)
         row.addStretch(1)
         v.addLayout(row)
-        self.hint = QLabel(PASTE_HINT)
-        self.hint.setObjectName("muted")
-        self.hint.setWordWrap(True)
-        v.addWidget(self.hint)
         self.loading = SearchingView()      # takes the list's place while searching
         self.spinner = self.loading         # start / stop / running()
         v.addWidget(self.loading, 1)
@@ -556,8 +648,8 @@ class SearchResults(QFrame):
         self.closed.emit()
 
     def _loading(self, on: bool, text: str = ""):
-        """The loading view in place of the title, hint and list (on), or those back."""
-        for w in (self.title, self.hint, self.scroll):
+        """The loading view in place of the title and list (on), or those back."""
+        for w in (self.title, self.scroll):
             w.setVisible(not on)
         if on:
             self.loading.start(text)
@@ -565,13 +657,36 @@ class SearchResults(QFrame):
             self.loading.stop()
 
     def mark(self, url: str, kind: str, ok: bool | None = None):
-        """A row's Play / Add: busy (ok None) while its audio is fetched, then done."""
+        """A row's Play / Add: busy (ok None) while its audio is fetched, then done.
+        Meanwhile the other rows' buttons wait: the link bar does one link at a time,
+        and a second pick used to replace the first, which then never played."""
+        if ok is None:
+            self._fetching.setdefault(url, set()).add(kind)
+        elif url in self._fetching:
+            self._fetching[url].discard(kind)
+            if not self._fetching[url]:
+                del self._fetching[url]
         for r in self._rows:
             if r.result.url == url:
                 if ok is None:
                     r.set_busy(kind)
                 else:
                     r.set_done(kind, ok)
+        self._lock_rows()
+
+    def progress(self, url: str, frac: float):
+        """The link bar's download of `url`: 0..1, or below 0 while it's converted."""
+        for r in self._rows:
+            if r.result.url == url:
+                r.set_progress(frac)
+
+    def _lock_rows(self):
+        for r in self._rows:
+            r.set_locked(bool(self._fetching) and r.result.url not in self._fetching)
+        if self._fetching:   # downloads first: the like counts wait
+            self._quiet.clear()
+        else:
+            self._quiet.set()
 
     def _clear(self):
         for r in self._rows:
@@ -603,8 +718,7 @@ class SearchResults(QFrame):
         if not results:
             self.title.setText(f"No {self.site} results for <b>{q}</b>.")
             return
-        self.title.setText(f"<b>{q}</b> <span style='color:{theme.T['muted']}'>· ▶ plays it "
-                           "once, Add keeps it</span>")
+        self.title.hide()   # the cards say it all; the title is for "no results" / errors
         for r in results:
             row = ResultRow(r)
             row.play.connect(self.play)
@@ -616,6 +730,43 @@ class SearchResults(QFrame):
             reply = self.net.get(QNetworkRequest(QUrl(r.thumb)))
             reply.finished.connect(lambda reply=reply, row=row, g=gen: self._on_thumb(
                 reply, row, g))
+        self._lock_rows()
+        for row in self._rows:
+            if row.waiting:
+                self._todo.put((gen, row.result))
+        while len(self._workers) < STATS_WORKERS and not self._todo.empty():
+            t = threading.Thread(target=self._stats_work, daemon=True,
+                                 name=f"web-stats-{len(self._workers)}")
+            self._workers.append(t)
+            t.start()
+
+    def _stats_work(self):
+        """Likes and comments for the hits that came without them, a couple at a time,
+        never while a Play / Add downloads. A newer search drops the rest."""
+        while True:
+            gen, r = self._todo.get()
+            self._quiet.wait()
+            if gen != self._gen:
+                continue
+            try:
+                netlog.cause(ytdl.FEATURE, "Likes and comments for your search "
+                                           f"{netlog.quoted(self.query)}")
+                counts = ytdl.stats(r)
+            except Exception as e:  # noqa: BLE001 - the card just keeps its views
+                log.info("no stats for %s: %s", r.url, e)
+                counts = (None, None, None)
+            self._stats.emit(gen, r, counts)
+
+    def _on_stats(self, gen: int, r, counts):
+        if gen != self._gen:
+            return
+        views, likes, comments = counts
+        r.views = r.views if views is None else views
+        r.likes, r.comments = likes, comments
+        for row in self._rows:
+            if row.result is r:
+                row.waiting = False
+                row.show_stats()
 
     def _on_thumb(self, reply, row: ResultRow, gen: int):
         data = reply.readAll()

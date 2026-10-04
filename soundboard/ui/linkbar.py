@@ -46,6 +46,7 @@ class LinkBar(QFrame):
     played = Signal(str, object, float)   # Play once started: (title, int16 audio, gain)
     _msg = Signal(str, str, object)   # worker -> UI: (kind, url, payload)
     done = Signal(str, str, bool)     # (url, "add" | "play", it worked): a search row's busy end
+    progress = Signal(str, float)     # (url, 0..1 downloaded, or -1 while it's converted)
 
     def __init__(self, engine, cfg, color_for, known_for):
         """`color_for()` gives the next pad colour, `known_for()` {fingerprint: name}
@@ -58,6 +59,7 @@ class LinkBar(QFrame):
         self._text = ""               # the search box's text last seen
         self._busy = ""               # "", "add" or "play": one download at a time
         self._got = None              # (url, file, int16 audio) of the last download
+        self._kept = None             # (url, int16 audio) of the last add: Play after it is instant
         self._queued = ""             # "add" / "play" asked for while another download ran
         self._msg.connect(self._on_msg)
         # a link typed by hand is a new "link" at every keystroke: look up only the
@@ -189,8 +191,10 @@ class LinkBar(QFrame):
             return False
         if self._busy:
             return self._queue("play")
-        if self._got is not None and self._got[0] == self.url:
-            self._play(self._got[2])
+        have = next((g for g in (self._got, self._kept)
+                     if g is not None and g[0] == self.url), None)
+        if have is not None:
+            self._play(have[-1])
             self.done.emit(self.url, "play", True)
             return True
         self._start("play")
@@ -306,6 +310,7 @@ class LinkBar(QFrame):
                 self.title = self.title or payload
             return
         if kind == "progress":
+            self.progress.emit(url, payload)
             if current:
                 t = ("Adding…" if self._busy == "add" else "Loading…")
                 t = t if payload < 0 else f"{t} {payload:.0%}"
@@ -323,6 +328,7 @@ class LinkBar(QFrame):
         self._buttons()
         if kind == "added":
             meta, data, title = payload
+            self._kept = (url, data)
             meta.name = (title or (current and self.title) or meta.name)[:40]
             self.sound_ready.emit(meta, data)
             if current:
