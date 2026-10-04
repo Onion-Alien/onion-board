@@ -162,6 +162,71 @@ def test_the_view_says_whether_its_kept(qapp, path):
     assert ":" in _when(0) and len(_when(0)) > 8   # another day: the date too
 
 
+# --------------------------------------------------------------------------- totals
+
+def test_site_groups_subdomains():
+    assert netlog.site("r3---sn-abc.googlevideo.com") == "googlevideo.com"
+    assert netlog.site("www.bbc.co.uk") == "bbc.co.uk"
+    assert netlog.site("example.com") == "example.com"
+    assert netlog.site("127.0.0.1") == "127.0.0.1"
+    assert netlog.site("::1") == "::1"
+    assert netlog.site("localhost") == "localhost"
+
+
+def test_totals_add_up_every_saved_connection_not_just_the_list(path, monkeypatch):
+    monkeypatch.setattr(netlog, "MAX_ENTRIES", 3)
+    netlog.keep(path)
+    for i in range(5):
+        done(f"h{i}.example.com")
+    netlog.blocked("radio", "radio.example.org", 80, "switched off")
+    restart(path)
+    assert len(netlog.entries()) == 3              # the list: only the last few
+    items = netlog.history()
+    assert len(items) == 6                         # the totals: the whole file
+    a, b = netlog.totals(items)
+    assert (a.name, a.connections, a.sent, a.received) == ("example.com", 5, 50, 100)
+    assert len(a.hosts) == 5 and a.first <= a.last
+    assert (b.name, b.blocked, b.data) == ("example.org", 1, 0)
+    per_server = netlog.totals(items, by_site=False)
+    assert len(per_server) == 6
+    text = netlog.totals_text([a, b], "head")
+    assert text.splitlines()[0] == "head"
+    assert text.splitlines()[2].split("\t")[:6] == ["example.com", "5", "0", "0", "50",
+                                                    "100"]
+
+
+def test_totals_without_a_history_are_this_runs_list():
+    done("a.example.com")
+    assert netlog.kept_file() is None
+    assert [e.host for e in netlog.history()] == ["a.example.com"]
+
+
+def test_the_view_has_totals_and_open_log(qapp, path):
+    from soundboard.ui.netactivity import NetActivity, TotalsDialog
+    w = NetActivity()
+    assert not w.totals.isEnabled() and not w.open_log.isEnabled()
+    done("a.example.com")
+    done("b.example.com")
+    done("c.example.net")
+    w.refresh(force=True)
+    assert w.totals.isEnabled() and not w.open_log.isEnabled()   # nothing saved
+    assert "Keep a history" in w.open_log.toolTip()
+    netlog.keep(path)
+    w.refresh(force=True)
+    assert w.open_log.isEnabled() and netlog.kept_file() == path
+    d = TotalsDialog()
+    assert d.table.rowCount() == 2 and d.table.item(0, 0).text() == "example.com"
+    assert "3 connection(s) to 2 site(s)" in d.summary.text()
+    assert d.table.item(0, 1).text() == "2"
+    d.by_site.setChecked(False)
+    assert d.table.rowCount() == 3
+    assert d.table.horizontalHeaderItem(0).text() == "Server"
+    d._copy()
+    assert "c.example.net" in qapp.clipboard().text()
+    d.deleteLater()
+    w.deleteLater()
+
+
 # --------------------------------------------------------------------------- the switch
 
 @pytest.fixture

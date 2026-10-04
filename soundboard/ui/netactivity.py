@@ -4,16 +4,23 @@ connection the app makes, to check for yourself where it goes.
 Simple: one row per server (what it was for, why, how often, how much). Detailed: one
 row per connection (why: what you did that made it, route, result, bytes each way)
 and, for the picked one, its request lines, answer and encryption. It redraws once a
-second while it's on screen, and only when something changed."""
+second while it's on screen, and only when something changed.
+
+Totals opens a window adding it all up per site (or per server): with a kept history,
+over the whole saved file, not just the last 1000 the list shows. Open log opens that
+file."""
 from __future__ import annotations
 
 import html
+import subprocess
+import sys
 import time
 
-from PySide6.QtCore import Qt, QTimer
-from PySide6.QtGui import QBrush, QColor, QFontDatabase
-from PySide6.QtWidgets import (QAbstractItemView, QApplication, QButtonGroup, QHBoxLayout,
-                               QHeaderView, QLabel, QPlainTextEdit, QPushButton,
+from PySide6.QtCore import Qt, QTimer, QUrl
+from PySide6.QtGui import QBrush, QColor, QDesktopServices, QFontDatabase
+from PySide6.QtWidgets import (QAbstractItemView, QApplication, QButtonGroup, QCheckBox,
+                               QDialog, QHBoxLayout, QHeaderView, QLabel,
+                               QPlainTextEdit, QPushButton,
                                QRadioButton, QStackedWidget, QTableWidget,
                                QTableWidgetItem, QVBoxLayout, QWidget)
 
@@ -178,10 +185,24 @@ class NetActivity(QWidget):
         self.stack.addWidget(detail)
         v.addWidget(self.stack)
 
+        # under the table, on their own row: beside either row above, the page got
+        # wider than a small Settings window
+        row = QHBoxLayout()
+        self.totals = QPushButton("Totals…")
+        self.totals.setToolTip("How much data went to each site, added up over the whole "
+                               "history")
+        self.open_log = QPushButton("Open log")
+        row.addWidget(self.totals)
+        row.addWidget(self.open_log)
+        row.addStretch(1)
+        v.addLayout(row)
+
         self.simple.toggled.connect(self._mode)
         self.conns.itemSelectionChanged.connect(self._pick)
         self.copy.clicked.connect(self._copy)
         self.clear.clicked.connect(self._clear)
+        self.totals.clicked.connect(self._show_totals)
+        self.open_log.clicked.connect(self._open_log)
         self._timer = QTimer(self)
         self._timer.setInterval(REFRESH_MS)
         self._timer.timeout.connect(self.refresh)
@@ -223,6 +244,14 @@ class NetActivity(QWidget):
                 + (f", {blocked} blocked by a switch" if blocked else "") + ".")
         self.copy.setEnabled(bool(self._entries))
         self.clear.setEnabled(bool(self._entries))
+        self.totals.setEnabled(bool(self._entries))
+        has_file = netlog.kept_file() is not None
+        self.open_log.setEnabled(has_file)
+        tip = (f"Open {netlog.FILE_NAME}, the saved history (one connection per line)"
+               if has_file else "Nothing is saved: tick Keep a history between starts "
+               "(below) to keep a log on this PC")
+        if self.open_log.toolTip() != tip:
+            self.open_log.setToolTip(tip)
         if self.simple.isChecked():
             self._fill_servers(servers)
         else:
@@ -293,7 +322,144 @@ class NetActivity(QWidget):
         self.copy.setText("✓ Copied")
         QTimer.singleShot(1500, self.copy, lambda: self.copy.setText("Copy"))
 
+    def _show_totals(self):
+        dlg = TotalsDialog(self)
+        dlg.setAttribute(Qt.WA_DeleteOnClose)
+        dlg.show()
+
+    def _open_log(self):
+        path = netlog.kept_file()
+        if path is None:
+            return
+        # Notepad: a .jsonl file usually has nothing set to open it
+        if sys.platform == "win32":
+            try:
+                subprocess.Popen(["notepad.exe", str(path)])
+                return
+            except OSError:
+                pass
+        QDesktopServices.openUrl(QUrl.fromLocalFile(str(path)))
+
     def _clear(self):
         netlog.clear()
         self.info.clear()
         self.refresh(force=True)
+
+
+class _Num(QTableWidgetItem):
+    """A cell that sorts by the number behind it, not its text ("2 KB" < "10 KB")."""
+
+    def __lt__(self, other):
+        return (self.data(Qt.UserRole) or 0) < (other.data(Qt.UserRole) or 0)
+
+
+class TotalsDialog(QDialog):
+    """Network activity added up: per site (or per server), the connections and the data
+    each way, over the whole kept history (or this run's list when none is kept)."""
+
+    COLUMNS = ["Site", "Connections", "Sent", "Received", "Total", "First", "Last"]
+
+    def __init__(self, parent: QWidget | None = None):
+        super().__init__(parent)
+        self.setWindowTitle("Network activity totals")
+        self.resize(820, 520)
+        v = QVBoxLayout(self)
+        self.summary = QLabel()
+        self.summary.setObjectName("hint")
+        self.summary.setWordWrap(True)
+        v.addWidget(self.summary)
+        self.by_site = QCheckBox("Group servers by site (googlevideo.com, not each "
+                                 "r3---sn-abc.googlevideo.com)")
+        self.by_site.setChecked(True)
+        v.addWidget(self.by_site)
+        t = self.table = QTableWidget(0, len(self.COLUMNS))
+        t.setObjectName("activitytable")
+        t.setHorizontalHeaderLabels(self.COLUMNS)
+        t.verticalHeader().setVisible(False)
+        t.setSelectionBehavior(QAbstractItemView.SelectRows)
+        t.setEditTriggers(QAbstractItemView.NoEditTriggers)
+        t.setShowGrid(False)
+        t.setAlternatingRowColors(True)
+        t.setWordWrap(False)
+        t.verticalHeader().setDefaultSectionSize(30)
+        h = t.horizontalHeader()
+        h.setSectionResizeMode(QHeaderView.Interactive)
+        h.setSectionResizeMode(0, QHeaderView.Stretch)
+        h.setDefaultAlignment(Qt.AlignLeft | Qt.AlignVCenter)
+        h.setSortIndicator(4, Qt.DescendingOrder)   # the most data first
+        for i, width in enumerate([0, 130, 90, 90, 90, 110, 110]):
+            if width:
+                t.setColumnWidth(i, width)
+        v.addWidget(t, 1)
+        row = QHBoxLayout()
+        row.addStretch(1)
+        self.copy = QPushButton("Copy")
+        self.copy.setToolTip("Copy the table (pastes into a spreadsheet). It shows the "
+                             "sites you used: read it before sharing it")
+        close = QPushButton("Close")
+        row.addWidget(self.copy)
+        row.addWidget(close)
+        v.addLayout(row)
+        self.by_site.toggled.connect(self.refresh)
+        self.copy.clicked.connect(self._copy)
+        close.clicked.connect(self.close)
+        self._rows: list[netlog.Total] = []
+        self._head = ""
+        self.refresh()
+
+    def refresh(self, _on=None):
+        items = netlog.history()
+        by_site = self.by_site.isChecked()
+        self._rows = rows = netlog.totals(items, by_site)
+        sent = sum(r.sent for r in rows)
+        received = sum(r.received for r in rows)
+        what = "site(s)" if by_site else "server(s)"
+        if not items:
+            self._head = "Nothing has gone online yet."
+        else:
+            since = time.strftime("%d %b %Y %H:%M", time.localtime(items[0].started))
+            scope = ("in the saved history" if netlog.keeping() else
+                     "since the app started (tick Keep a history to add up across "
+                     "starts)")
+            self._head = (f"{len(items)} connection(s) to {len(rows)} {what} {scope}, "
+                          f"from {since}: ↑ {netlog.size(sent)} sent, "
+                          f"↓ {netlog.size(received)} received, "
+                          f"{netlog.size(sent + received)} in all.")
+        self.summary.setText(self._head)
+        t = self.table
+        t.horizontalHeaderItem(0).setText("Site" if by_site else "Server")
+        t.setSortingEnabled(False)
+        t.setRowCount(len(rows))
+        right = Qt.AlignRight | Qt.AlignVCenter
+        for r, row in enumerate(rows):
+            count = str(row.connections)
+            extra = [f"{k} {w}" for k, w in ((row.blocked, "blocked"),
+                                             (row.failed, "failed")) if k]
+            if extra:
+                count += f" ({', '.join(extra)})"
+            tone = "warn" if row.blocked == row.connections else None
+            cells = [(row.name, None, "\n".join(row.hosts)),
+                     (count, row.connections, ""),
+                     (netlog.size(row.sent), row.sent, f"{row.sent:,} bytes sent"),
+                     (netlog.size(row.received), row.received,
+                      f"{row.received:,} bytes received"),
+                     (netlog.size(row.data), row.data, f"{row.data:,} bytes in all"),
+                     (_when(row.first), row.first, ""), (_when(row.last), row.last, "")]
+            for c, (text, num, tip) in enumerate(cells):
+                it = QTableWidgetItem(text) if num is None else _Num(text)
+                if num is not None:
+                    it.setData(Qt.UserRole, num)
+                    if c <= 4:
+                        it.setTextAlignment(right)
+                it.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
+                it.setToolTip(_tip(tip or text))
+                if tone:
+                    it.setForeground(QColor(theme.status(tone)))
+                t.setItem(r, c, it)
+        t.setSortingEnabled(True)
+        self.copy.setEnabled(bool(rows))
+
+    def _copy(self):
+        QApplication.clipboard().setText(netlog.totals_text(self._rows, self._head))
+        self.copy.setText("✓ Copied")
+        QTimer.singleShot(1500, self.copy, lambda: self.copy.setText("Copy"))

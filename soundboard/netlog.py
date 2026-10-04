@@ -212,11 +212,12 @@ def keeping() -> bool:
 def keep(path: Path | None) -> None:
     """Keep a history in `path` (FILE_NAME in the app's folder), or stop (None).
 
-    On: what's saved there from earlier starts is listed again (oldest first, before
-    this run's), and the file is rewritten with the whole list, so ticking it later in
-    a run saves what's been listed so far. Off: stops saving and deletes the file, so
-    nothing is left on disk; this run's list stays, and ticking it again saves it
-    back."""
+    On: the last MAX_ENTRIES saved there from earlier starts are listed again (oldest
+    first, before this run's), and what this run listed before is added to the file,
+    so ticking it later in a run saves what's been listed so far. The file itself
+    keeps everything (for the totals: history()) until it passes MAX_FILE_BYTES and
+    moves to .old. Off: stops saving and deletes the file, so nothing is left on disk;
+    this run's list stays, and ticking it again saves it back."""
     global _keep_path, _count
     old = _keep_path
     if path is None:
@@ -227,19 +228,21 @@ def keep(path: Path | None) -> None:
         _changed()
         return
     path = Path(path)
-    saved = [] if path == old else _read(path)
+    if path == old:
+        return
+    saved = _read(path)
     with _lock:
         seen = {(e.started, e.host, e.port) for e in saved}
-        merged = saved + [e for e in _entries if (e.started, e.host, e.port) not in seen]
-        merged = merged[-MAX_ENTRIES:]
+        new = [e for e in _entries if (e.started, e.host, e.port) not in seen]
+        merged = (saved + new)[-MAX_ENTRIES:]
         for i, e in enumerate(merged, 1):   # one numbering across the runs
             e.n = i
         _count = len(merged)
         _entries.clear()
         _entries.extend(merged)
         _keep_path = path
-        ended = [e for e in merged if e.state not in (CONNECTING, CONNECTED)]
-    _rewrite(path, ended)
+        ended = [e for e in new if e.state not in (CONNECTING, CONNECTED)]
+    _add(path, ended)
     _changed()
 
 
@@ -258,7 +261,15 @@ def _line(e: Entry) -> str:
 def _save(e: Entry) -> None:
     """Add one connection to the kept history (from whichever thread ended it)."""
     path = _keep_path
-    if path is None:
+    if path is not None:
+        _add(path, [e])
+
+
+def _add(path: Path, items: list[Entry]) -> None:
+    """Add connections to the end of the file, moving it to .old first once it's
+    passed MAX_FILE_BYTES (the one .old before it goes): at most about twice that on
+    disk."""
+    if not items:
         return
     with _file_lock:
         try:
@@ -266,27 +277,16 @@ def _save(e: Entry) -> None:
             if path.exists() and path.stat().st_size > MAX_FILE_BYTES:
                 os.replace(path, path.with_name(path.name + ".old"))
             with open(path, "a", encoding="utf-8") as f:
-                f.write(_line(e))
+                f.write("".join(_line(e) for e in items))
         except OSError:
             log.warning("couldn't add to the network activity history", exc_info=True)
 
 
-def _rewrite(path: Path, items: list[Entry]) -> None:
-    with _file_lock:
-        try:
-            path.parent.mkdir(parents=True, exist_ok=True)
-            tmp = path.with_name(path.name + ".tmp")
-            tmp.write_text("".join(_line(e) for e in items), encoding="utf-8")
-            os.replace(tmp, path)
-            path.with_name(path.name + ".old").unlink(missing_ok=True)
-        except OSError:
-            log.warning("couldn't save the network activity history", exc_info=True)
-
-
-def _read(path: Path) -> list[Entry]:
-    """The last MAX_ENTRIES connections saved in `path` (and its .old), oldest first.
-    A damaged line is skipped; one still open when the app closed is listed as done;
-    one saved twice (open at quit, then closed) is listed once, as it was last."""
+def _read(path: Path, everything: bool = False) -> list[Entry]:
+    """The last MAX_ENTRIES connections saved in `path` (and its .old), oldest first
+    (everything: all of them). A damaged line is skipped; one still open when the app
+    closed is listed as done; one saved twice (open at quit, then closed) is listed
+    once, as it was last."""
     items: dict[tuple, Entry] = {}
     for p in (path.with_name(path.name + ".old"), path):
         try:
@@ -307,7 +307,27 @@ def _read(path: Path) -> list[Entry]:
                 e.reason = e.reason or "still open when the app closed"
             if e.state in (CLOSED, BLOCKED, FAILED):
                 items[(e.started, e.host, e.port)] = e
-    return list(items.values())[-MAX_ENTRIES:]
+    found = list(items.values())
+    return found if everything else found[-MAX_ENTRIES:]
+
+
+def kept_file() -> Path | None:
+    """The kept history's file, while "Keep a history" is on and it's been written."""
+    path = _keep_path
+    return path if path is not None and path.is_file() else None
+
+
+def history() -> list[Entry]:
+    """Everything there is to add up, oldest first: with a kept history, every
+    connection saved in it (not just the last MAX_ENTRIES the list shows) and this
+    run's still open; without one, this run's list."""
+    path = _keep_path
+    live = entries()
+    if path is None:
+        return live
+    saved = _read(path, everything=True)
+    seen = {(e.started, e.host, e.port) for e in saved}
+    return saved + [e for e in live if (e.started, e.host, e.port) not in seen]
 
 
 def _remove(path: Path) -> None:
@@ -411,6 +431,72 @@ def servers(items: list[Entry] | None = None) -> list[Server]:
         s.received += e.received
         s.last = max(s.last, e.started)
     return sorted(by.values(), key=lambda s: s.last, reverse=True)
+
+
+_TWO_PART = {"co", "com", "net", "org", "gov", "ac", "edu"}   # bbc.co.uk, abc.net.au
+
+
+def site(host: str) -> str:
+    """The site a server belongs to: "r3---sn-abc.googlevideo.com" → "googlevideo.com",
+    "www.bbc.co.uk" → "bbc.co.uk". An IP address or a one-word name stays as it is."""
+    host = host.lower().rstrip(".")
+    labels = host.split(".")
+    if ":" in host or len(labels) <= 2 or labels[-1].isdigit():
+        return host
+    keep = 3 if len(labels[-1]) == 2 and labels[-2] in _TWO_PART else 2
+    return ".".join(labels[-keep:])
+
+
+@dataclass
+class Total:
+    """Everything sent to one site (or one server), for the totals window."""
+    name: str
+    hosts: list[str]
+    connections: int = 0
+    blocked: int = 0
+    failed: int = 0
+    sent: int = 0
+    received: int = 0
+    first: float = 0.0
+    last: float = 0.0
+
+    @property
+    def data(self) -> int:
+        return self.sent + self.received
+
+
+def totals(items: list[Entry], by_site: bool = True) -> list[Total]:
+    """`items` added up per site (by_site) or per server, the most data first."""
+    by: dict[str, Total] = {}
+    for e in items:
+        name = site(e.host) if by_site else e.host
+        t = by.get(name)
+        if t is None:
+            t = by[name] = Total(name, [], first=e.started, last=e.started)
+        if e.host not in t.hosts:
+            t.hosts.append(e.host)
+        t.connections += 1
+        t.blocked += e.state == BLOCKED
+        t.failed += e.state == FAILED
+        t.sent += e.sent
+        t.received += e.received
+        t.first, t.last = min(t.first, e.started), max(t.last, e.started)
+    return sorted(by.values(), key=lambda t: (-t.data, -t.connections, t.name))
+
+
+def totals_text(rows: list[Total], head: str) -> str:
+    """The totals as a tab-separated table, for the clipboard (pastes into a
+    spreadsheet)."""
+    day = "%Y-%m-%d %H:%M"
+    lines = [head, "\t".join(["Site", "Connections", "Blocked", "Failed", "Sent (bytes)",
+                              "Received (bytes)", "First", "Last", "Servers"])]
+    for t in rows:
+        lines.append("\t".join([t.name, str(t.connections), str(t.blocked), str(t.failed),
+                                str(t.sent), str(t.received),
+                                time.strftime(day, time.localtime(t.first)),
+                                time.strftime(day, time.localtime(t.last)),
+                                " ".join(t.hosts)]))
+    return "\n".join(lines)
 
 
 def details(e: Entry) -> str:

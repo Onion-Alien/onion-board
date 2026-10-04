@@ -1239,7 +1239,7 @@ class SettingsDialog(QDialog):
         self.netlog_keep_box = self._option(
             cv, "Keep a history between starts",
             "Saves this list on this PC (network-activity.jsonl in the app's folder) and "
-            "shows it again next time, up to the last 1000 connections. Nothing is "
+            "shows it again next time (the last 1000; Totals adds up all of it). Nothing is "
             "sent anywhere. Unticking it deletes the saved file; Clear empties it.",
             self.mw.cfg.netlog_keep, self._set_netlog_keep)
         return card

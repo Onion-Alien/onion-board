@@ -88,7 +88,9 @@ can't). The list is kept in memory only (at most 1000 entries) unless you tick
 *Keep a history between starts* there (or the installer's box for it; off by
 default): then each connection is also saved to
 `%APPDATA%\OnionBoard\network-activity.jsonl` as it ends and listed again on the
-next start (Clear empties it; unticking deletes it). It's never written to the
+next start (Clear empties it; unticking deletes it). The file keeps more than the
+list shows, for *Totals…*: up to about 10 MB (at 5 MB it moves to `.old`, and the
+`.old` before it goes). It's never written to the
 log or sent anywhere, and it never holds proxy passwords, the relay's secret, request
 headers or bodies; query values whose names look like keys or tokens are masked.
 `tor.exe`'s own connections to the Tor network and everything under *Not covered*
