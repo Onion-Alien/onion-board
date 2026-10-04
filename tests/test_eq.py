@@ -51,7 +51,12 @@ def test_state_carries_between_blocks_without_a_seam():
     whole = eq.EQ(48000).process(x, gains)
     f = eq.EQ(48000)
     parts = np.concatenate([f.process(x[:4800], gains), f.process(x[4800:], gains)])
-    assert np.allclose(whole, parts, atol=1e-5)
+    # float32 state: the split rounds differently by up to ~1e-5 (-98 dB), and how much
+    # depends on the CPU's vector path (it failed on one CI runner, passed on the next).
+    # A real seam, the state lost at the split, is ~0.77.
+    assert np.allclose(whole, parts, atol=1e-4)
+    lost = eq.EQ(48000).process(x[4800:], gains)
+    assert np.abs(lost - whole[4800:]).max() > 0.1   # ...which this test would catch
 
 
 def test_switching_off_then_on_restarts_state_cleanly():
