@@ -445,3 +445,16 @@ def test_child_processes_get_their_own_features_login(monkeypatch):
     net.configure_features(["voices"])
     env = net.child_env("voices")
     assert env["http_proxy"] == net.relay_url("voices") and env["HF_HUB_OFFLINE"] == "1"
+
+
+def test_https_handshake_matches_stock_urllib():
+    """Cloudflare (Myinstants) refused the app's searches with 403 because its TLS
+    handshake lacked what stock urllib sends: ALPN http/1.1 and post-handshake auth."""
+    import http.client
+    https = next(h for h in net._opener("search").handlers
+                 if isinstance(h, urllib.request.HTTPSHandler))
+    ours = https._context
+    stock = http.client._create_https_context(http.client.HTTPConnection._http_vsn)
+    assert ours.post_handshake_auth is True and stock.post_handshake_auth is True
+    assert ours.verify_mode == stock.verify_mode and ours.check_hostname
+    assert ours.minimum_version == stock.minimum_version
