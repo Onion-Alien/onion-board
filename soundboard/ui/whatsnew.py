@@ -27,6 +27,15 @@ class Note:
 
 # newest first; add one per release that has something worth telling
 NOTES = (
+    Note("1.6.6", "Coming from another soundboard?", (
+        ("sounds", "Bring your sounds over",
+         "Backup → Import from another soundboard copies in your Soundpad, Resanance, "
+         "Soundux or EXP Soundboard sounds, with their names, categories and hotkeys. "
+         "Your old app keeps its own copies."),
+        ("check", "Fixes",
+         "Quitting with Onion Watch watching no longer ends in a crash report, and the "
+         "Triggers tab counts all your triggers past 50."),
+    )),
     Note("1.6.5", "Your privacy, your call", (
         ("shield", "A switch for everything that goes online",
          "Settings → Privacy & security lists each thing Onion Board connects to: sound "
