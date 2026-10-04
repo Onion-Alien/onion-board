@@ -517,7 +517,7 @@ def icon(name: str, color: str | None = None, checked_color: str | None = None) 
 # --------------------------------------------------------------------------- live retheme
 
 _applied: list[tuple[weakref.ref, str, str | None, str | None]] = []
-_tabs: list[tuple[weakref.ref, int, str, str | None]] = []
+_tabs: list[tuple[weakref.ref, int, str, str | None, bool]] = []
 
 
 def set_icon(widget, name: str, color: str | None = None, checked_color: str | None = None,
@@ -554,26 +554,68 @@ def set_item_icons(combo, names: list[str]):
     _items.append((weakref.ref(combo), names))
 
 
-def _tab_icon(name: str, tint: str | None) -> QIcon:
+def _tab_icon(name: str, tint: str | None, badge: bool = False) -> QIcon:
     if name.startswith("art:"):   # a picture (ui/art.py): its own colours, whatever the tint
         from soundboard.ui import art
-        return art.icon(name[4:]) or QIcon()
-    if tint is None:
-        return icon(name, "muted", "accent")
-    ic = QIcon()   # one colour whatever the tab's state (e.g. green while it's live)
+        ic = art.icon(name[4:]) or QIcon()
+    elif tint is None:
+        ic = icon(name, "muted", "accent")
+    else:
+        ic = QIcon()   # one colour whatever the tab's state (e.g. green while it's live)
+        for s in SIZES:
+            pm = pixmap(name, s, theme.T.get(tint, tint))
+            for mode in (QIcon.Normal, QIcon.Selected, QIcon.Active):
+                ic.addPixmap(pm, mode, QIcon.Off)
+    return _with_badge(ic) if badge and not ic.isNull() else ic
+
+
+def _with_badge(ic: QIcon) -> QIcon:
+    """`ic` with a small "live" dot on its top-right corner, cut out of the picture by
+    a thin gap so it reads on any background. Drawn into the icon itself, so the
+    tab it's on keeps its size."""
+    out = QIcon()
+    color = QColor(theme.status("ok"))
     for s in SIZES:
-        pm = pixmap(name, s, theme.T.get(tint, tint))
-        for mode in (QIcon.Normal, QIcon.Selected, QIcon.Active):
-            ic.addPixmap(pm, mode, QIcon.Off)
-    return ic
+        r = s * 0.2
+        gap = max(1.0, s / 12)
+        c = QPointF(s - r, r)
+        for state in (QIcon.Off, QIcon.On):   # On: the current tab
+            for mode in (QIcon.Normal, QIcon.Selected, QIcon.Active, QIcon.Disabled):
+                # at a ratio of 1: on a scaled screen the plain pixmap() comes back bigger,
+                # with its own ratio, and the badge landed off its edge
+                pm = QPixmap(ic.pixmap(QSize(s, s), 1.0, mode, state))
+                if pm.size() != QSize(s, s):
+                    pm = pm.scaled(s, s, Qt.KeepAspectRatio, Qt.SmoothTransformation)
+                pm.setDevicePixelRatio(1.0)
+                p = QPainter(pm)
+                p.setRenderHint(QPainter.Antialiasing)
+                p.setPen(Qt.NoPen)
+                p.setCompositionMode(QPainter.CompositionMode_Clear)
+                p.setBrush(Qt.black)
+                p.drawEllipse(c, r + gap, r + gap)
+                p.setCompositionMode(QPainter.CompositionMode_SourceOver)
+                p.setBrush(color)
+                p.drawEllipse(c, r, r)
+                p.end()
+                out.addPixmap(pm, mode, state)
+    return out
 
 
-def set_tab_icon(tabs, index: int, name: str, tint: str | None = None):
+def set_tab_icon(tabs, index: int, name: str, tint: str | None = None, badge: bool = False):
     """`tint` colours the icon in every state; None is the usual muted / accent.
-    "art:<key>" shows that picture from ui/art.py instead of a painted icon."""
-    tabs.setTabIcon(index, _tab_icon(name, tint))
+    "art:<key>" shows that picture from ui/art.py instead of a painted icon. `badge`
+    adds the small green "live" dot."""
+    tabs.setTabIcon(index, _tab_icon(name, tint, badge))
     _tabs[:] = [e for e in _tabs if not (e[0]() is tabs and e[1] == index)]
-    _tabs.append((weakref.ref(tabs), index, name, tint))
+    _tabs.append((weakref.ref(tabs), index, name, tint, badge))
+
+
+def tab_icon_name(tabs, index: int) -> str | None:
+    """The icon name a tab was last given with set_tab_icon, or None."""
+    for ref, i, name, _tint, _badge in _tabs:
+        if ref() is tabs and i == index:
+            return name
+    return None
 
 
 def retheme():
@@ -604,10 +646,10 @@ def retheme():
                 set_label_icon(lbl, name, color, size)
             except RuntimeError:
                 pass
-    for ref, index, name, tint in _tabs:
+    for ref, index, name, tint, badge in _tabs:
         t = ref()
         if t is not None:
             try:
-                t.setTabIcon(index, _tab_icon(name, tint))
+                t.setTabIcon(index, _tab_icon(name, tint, badge))
             except RuntimeError:
                 pass

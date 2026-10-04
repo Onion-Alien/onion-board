@@ -50,6 +50,7 @@ from soundboard.ui.panel import (EqPanel, VolumeControl, bar, card, hint_label, 
 from soundboard.ui.linkbar import PLAY_ID as LINK_ID
 from soundboard.ui.linkbar import LinkBar
 from soundboard.ui.livedot import is_tab_live, set_tab_live
+from soundboard.ui.livedot import set_tint as set_live_tint
 from soundboard.ui.logowidget import LogoWidget, glow_icon
 from soundboard.ui.ytsearch import SearchResults
 from soundboard.ui.padbatch import PadSelection
@@ -422,9 +423,10 @@ class MainWindow(QMainWindow):
         self.tabs.setCurrentIndex(self.cfg.tab if 0 <= self.cfg.tab < self.tabs.count() else 0)
         self.tabs.currentChanged.connect(lambda i: self.set_option("tab", i))
         self.tabs.currentChanged.connect(lambda _i: self._update_status())
-        # a glowing dot (and a green name) on a tab while its feature is live — the
-        # voice changer, a radio station, a program being sent, the screen watched —
-        # so it's never left on without you noticing
+        # a green badge on a tab's icon (and, if picked in Settings, a green wash) while
+        # its feature is live — the voice changer, a radio station, a program being
+        # sent, the screen watched — so it's never left on without you noticing
+        set_live_tint(self.tabs, self.cfg.live_tab_tint)
         vi = self.tabs.indexOf(self.voice)
         self.voice.active_changed.connect(lambda on: set_tab_live(
             self.tabs, vi, on, "● ON: others hear your changed / computer voice",
@@ -1742,6 +1744,10 @@ class MainWindow(QMainWindow):
         self.set_option("level_volumes", b)
         for m in self.cfg.sounds:
             self.engine.set_gain(m.id, self.gain_for(m))
+
+    def set_live_tab_tint(self, on: bool):
+        self.set_option("live_tab_tint", on)
+        set_live_tint(self.tabs, on)
 
     def on_top_toggle(self, b):
         self.set_option("always_on_top", b)

@@ -467,6 +467,16 @@ class SettingsDialog(QDialog):
                 self.theme_cards.append(c)
             cv.addWidget(ThemeGrid(cards))
             v.addWidget(card)
+        card, cv = self._card("Live tabs",
+                              "A tab whose feature is on right now (a sound playing, the "
+                              "voice changer, the radio…) gets a small green dot on its icon.")
+        tint = QCheckBox("Also tint live tabs green")
+        tint.setToolTip("Gives live tabs a soft green background and a green icon, "
+                        "easier to spot from across the room")
+        tint.setChecked(self.mw.cfg.live_tab_tint)
+        tint.toggled.connect(self.mw.set_live_tab_tint)
+        cv.addWidget(tint)
+        v.addWidget(card)
         v.addStretch(1)
         return w
 
