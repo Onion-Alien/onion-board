@@ -199,3 +199,26 @@ def test_all_its_files_load_up_front_so_an_update_on_disk_cant_break_the_running
     assert f"{pkgname}.ui.extra" in sys.modules
     folder.rename(tmp_path / "gone")                         # replaced while running
     assert entry.later() == "old"                            # a lazy import still works
+
+
+# What each released Onion Watch lists in its module.json "imports" from outside the
+# standard library and PySide6. The built app has no pip: dropping one of these from
+# build.ps1 breaks the Triggers tab for everyone still on that release (0.5.6 needs
+# scipy.ndimage). Add each new release's list here.
+RELEASED_WATCH_IMPORTS = {
+    "0.5.6": ["numpy", "scipy.fft", "scipy.ndimage"],
+}
+
+
+def test_the_build_ships_what_every_released_onion_watch_imports():
+    from pathlib import Path
+    import re
+    build = (Path(__file__).resolve().parent.parent / "build.ps1").read_text(encoding="utf-8")
+    hidden = set(re.findall(r"--hidden-import\s+(\S+)", build))
+    excluded = set(re.findall(r"--exclude-module\s+(\S+)", build))
+    for version, needs in RELEASED_WATCH_IMPORTS.items():
+        for name in needs:
+            assert not any(name == x or name.startswith(x + ".") for x in excluded), (
+                f"build.ps1 excludes {name}, which Onion Watch {version} needs")
+            if name.startswith("scipy."):   # scipy parts ship only when named
+                assert name in hidden, f"build.ps1 doesn't ship {name} (Onion Watch {version})"
