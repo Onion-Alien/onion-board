@@ -564,3 +564,160 @@ def test_voice_settings_never_wait_on_a_line_being_spoken(panel, monkeypatch):
         assert ctl.speaker.rate == 3
     finally:
         gate.set()
+
+
+# ---------------------------------------------------------------- random, saved voices
+
+def _ask(monkeypatch, *answers):
+    """QInputDialog.getText answers, in order (None = Cancel)."""
+    from PySide6.QtWidgets import QInputDialog
+    left = list(answers)
+    asked = []
+
+    def get_text(parent, title, label, mode, text):
+        asked.append(text)
+        a = left.pop(0)
+        return ("", False) if a is None else (a, True)
+    monkeypatch.setattr(QInputDialog, "getText", staticmethod(get_text))
+    return asked
+
+
+def _grid_order(fx):
+    g = fx._tile_grid
+    return [w.text() for w in sorted((g.itemAt(i).widget() for i in range(g.count())),
+                                     key=lambda w: g.getItemPosition(g.indexOf(w))[:2])]
+
+
+def test_random_voice_opens_fine_tune_with_what_it_set_lit_up(panel):
+    import random
+    p, _ = panel
+    assert not p.fx.btn_more.isChecked()
+    p.fx.randomize(random.Random(3))
+    assert p.fx.btn_more.isChecked() and p.fx.preset == "Custom"
+    on = {t for t, r in p.fx.rows.items() if r.chk.isChecked()}
+    lit = {t for t, r in p.fx.rows.items() if r.is_fresh()}
+    assert lit == on and "pitch" in lit
+    p.fx.pick("Robot")                       # gone as soon as you move on...
+    assert not any(r.is_fresh() for r in p.fx.rows.values())
+    p.fx.randomize(random.Random(4))
+    p.fx._fresh_timer.timeout.emit()         # ...or after a few seconds
+    assert not any(r.is_fresh() for r in p.fx.rows.values())
+
+
+def test_random_voice_is_the_last_tile_and_voices_have_pictures(panel):
+    from soundboard.ui import art
+    p, _ = panel
+    order = _grid_order(p.fx)
+    assert order[-1] == "Random voice" and order[-2] == "My own mix"
+    assert not p.fx.btn_random.isCheckable() and p.fx.btn_random not in p.fx.tiles.buttons()
+    assert not p.fx.btn_random.icon().isNull()
+    if art.exists(art.voice_key("Robot")):          # the repo's pictures are used
+        assert p.fx._tile["Robot"].property("art")
+
+
+def test_save_as_a_voice_makes_a_tile_that_comes_back(panel, monkeypatch, qapp):
+    p, _ = panel
+    p.fx.pick("Chipmunk")
+    row = p.fx.rows["pitch"]
+    row.sliders[0].slider.setValue(row.sliders[0].slider.value() - 3)
+    mine = p.fx.spec()["effects"]
+    asked = _ask(monkeypatch, "Squeaky")
+    p.fx.btn_save.click()
+    assert asked == ["My voice"]
+    assert p.fx.preset == "Squeaky" and p.fx._tile["Squeaky"].isChecked()
+    assert _grid_order(p.fx)[-2:] == ["Squeaky", "Random voice"]
+    assert p.fx.spec()["custom"] == mine           # "My own mix" is still that mix
+    p.fx.pick("Robot")
+    p.fx.pick("Squeaky")
+    assert p.fx.spec()["effects"] == mine
+    # a restart: the tile is there and still the one that's on
+    from soundboard.ui.voicepanel import VoiceFxPanel
+    again = VoiceFxPanel(p.fx.spec())
+    assert again.preset == "Squeaky" and "Squeaky" in again._tile
+    again.deleteLater()
+
+
+def test_saving_again_offers_the_voice_you_started_from(panel, monkeypatch):
+    from PySide6.QtWidgets import QMessageBox
+    p, _ = panel
+    _ask(monkeypatch, "Squeaky")
+    p.fx.save_voice()
+    row = p.fx.rows["pitch"]
+    row.chk.setChecked(True)                       # a nudge: shows as Custom
+    assert p.fx.preset == "Custom"
+    asked = _ask(monkeypatch, "Squeaky")
+    monkeypatch.setattr(QMessageBox, "question", lambda *a: QMessageBox.Yes)   # replace
+    p.fx.save_voice()
+    assert asked == ["Squeaky"] and list(p.fx.store.voices) == ["Squeaky"]
+    assert p.fx.store.voices["Squeaky"]["pitch"]["on"] is True
+
+
+def test_built_in_names_are_taken(panel, monkeypatch):
+    from PySide6.QtWidgets import QMessageBox
+    p, _ = panel
+    said = []
+    monkeypatch.setattr(QMessageBox, "information", lambda *a: said.append(a[2]))
+    _ask(monkeypatch, "robot", "Random voice", None)
+    p.fx.save_voice()
+    assert len(said) == 2 and not p.fx.store.voices
+
+
+def test_delete_a_saved_voice_then_undo_or_bring_it_back(panel, monkeypatch):
+    p, _ = panel
+    _ask(monkeypatch, "One", "Two")
+    p.fx.save_voice()
+    p.fx.save_voice()
+    assert p.fx.preset == "Two"
+    sound = p.fx.spec()["effects"]
+    p.fx.delete_voice("One")
+    assert "One" not in p.fx._tile and p.fx.undo_bar.isVisibleTo(p.fx)
+    p.fx.undo_bar.undo()
+    assert list(p.fx.store.voices) == ["One", "Two"]
+    p.fx.delete_voice("Two")                       # the one that's on: you still sound
+    assert p.fx.preset == "Custom" and p.fx.spec()["effects"] == sound   # the same
+    p.fx.undo_bar.undo()
+    assert p.fx.preset == "Two"
+    # past Undo, "Recently deleted" still has it
+    p.fx.delete_voice("One")
+    p.fx.undo_bar.finish()
+    assert not p.fx.btn_bin.isHidden()
+    from soundboard.ui import deleted
+    seen = []
+
+    def fake_exec(dlg):
+        seen.append(dlg.list.item(0).text())
+        dlg.list.setCurrentRow(0)
+        dlg.bring_back()
+    monkeypatch.setattr(deleted.DeletedDialog, "exec", fake_exec)
+    p.fx.show_deleted()
+    assert seen[0].startswith("One") and "One" in p.fx._tile
+    assert p.fx.btn_bin.isHidden()
+
+
+def test_rename_a_saved_voice(panel, monkeypatch):
+    p, _ = panel
+    _ask(monkeypatch, "One", "Better name")
+    p.fx.save_voice()
+    p.fx.rename_voice("One")
+    assert list(p.fx.store.voices) == ["Better name"] and p.fx.preset == "Better name"
+    p.fx.btn_power.setChecked(True)
+    assert p.fx._tile["Better name"].isChecked()
+
+
+def test_tiles_reflow_with_saved_voices(qapp, app_dir, monkeypatch):
+    from PySide6.QtWidgets import QWidget
+
+    from soundboard import savedvoices
+    from soundboard.ui.voicepanel import VoiceFxPanel
+    store = savedvoices.Store()
+    for n in ("A", "B"):
+        store.put(n, {})
+    holder = QWidget()
+    fx = VoiceFxPanel({}, store)
+    fx.setParent(holder)
+    holder.show()
+    fx.setGeometry(0, 0, 260, 1600)
+    qapp.processEvents()
+    assert _grid_order(fx)[-3:] == ["A", "B", "Random voice"]
+    assert max(b.geometry().right() for b in fx.tiles.buttons()) <= fx.width()
+    holder.hide()

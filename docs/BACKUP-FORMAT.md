@@ -104,6 +104,16 @@ setup-guide state, per-program Apps settings, and the network / downloaded-code
 settings (yt-dlp auto-update, the update check and its state). On import only known settings of the
 right type are used, and only if the user says yes.
 
+It also holds `saved_voices`, the voice changer's saved voices (kept in a file of
+their own in the app, so not a `Config` field), when there are any:
+
+```json
+"saved_voices": [{"name": "Squeaky robot", "effects": {"pitch": {"on": true, "semitones": 6.0}}}]
+```
+
+On import, voices whose name isn't taken yet are added; ones already there are left
+as they are.
+
 ## Safety
 
 Import never uses a name from the archive as a path. Files are looked up by the

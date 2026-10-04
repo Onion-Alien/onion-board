@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+- **Save your own voices:** Voice → Fine-tune effects has **Save as a voice…**.
+  Name the mix and it gets its own button under *Pick a voice*, next to the
+  built-in ones; right-click it to rename or delete it. A deleted voice can be put
+  back with Undo, or from *Recently deleted* for 30 days. Saved voices go along
+  with a backup's settings, and older versions of the app leave them alone.
+- **Random voice shows what it did:** the dice is now the last voice button
+  instead of a small button in the corner, and rolling it opens Fine-tune with
+  the effects it set lit up for a few seconds.
+- **The voice pictures are back** on the voice changer's buttons.
 - **Keep the network activity list between starts:** tick *Keep a history
   between starts* under Settings → Connection → Network activity (or the new box
   on the installer's *Pick what you want* page) and every connection is saved on

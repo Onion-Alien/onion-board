@@ -34,7 +34,7 @@ from pathlib import Path, PurePosixPath
 
 import soundfile as sf
 
-from soundboard import __version__, library, voicefx
+from soundboard import __version__, library, savedvoices, voicefx
 from soundboard.library import (AUDIO_EXTS, Config, SoundMeta, clean_fade, clean_setting,
                                 clean_tags, fits_type)
 from soundboard.speech.live import clean_settings as clean_speech_settings
@@ -46,6 +46,7 @@ FORMAT = "onionboard-board"
 FORMAT_VERSION = 1
 MANIFEST = "onionboard.json"
 SETTINGS = "settings.json"
+SAVED_VOICES = "saved_voices"   # settings.json: the voice changer's saved voices
 SOUND_JSON = "sound.json"
 PICTURE_EXTS = {".png", ".jpg", ".jpeg", ".webp", ".gif", ".bmp", ".jfif"}
 MAX_FILE = 1 << 30          # 1 GiB for any one file in an archive
@@ -132,9 +133,13 @@ def export(dest: str | Path, sounds: list[SoundMeta], cfg: Config | None = None,
 
 
 def settings_of(cfg: Config) -> dict:
-    """The app's settings as they're exported: everything except LOCAL_SETTINGS."""
+    """The app's settings as they're exported: everything except LOCAL_SETTINGS, plus
+    the voice changer's saved voices (kept in a file of their own, savedvoices.py)."""
     raw = cfg.to_raw()
-    return {k: v for k, v in raw.items() if k not in LOCAL_SETTINGS}
+    out = {k: v for k, v in raw.items() if k not in LOCAL_SETTINGS}
+    if voices := savedvoices.saved():
+        out[SAVED_VOICES] = voices
+    return out
 
 
 def _original_name(audio: Path) -> str:

@@ -547,6 +547,8 @@ QPushButton#voicetile { text-align:left; padding:9px 10px; border-radius:10px; }
 QPushButton#voicetile:checked { background:$accent; color:$on_accent; border:1px solid $accent_hi; font-weight:700; }
 QPushButton#voicetile[art="true"] { padding:5px 10px 5px 6px; }
 QPushButton#voicetile:hover:!checked { border-color:$border_hi; }
+QWidget#fxrow { border:1px solid transparent; border-radius:8px; }
+QWidget#fxrow[fresh="true"] { background:$card_hi; border-color:$accent; }
 QPushButton#fold { background:transparent; border:none; color:$muted; padding:3px 6px; font-size:8.5pt; font-weight:600; }
 QPushButton#fold:hover, QPushButton#fold:checked { color:$text; background:transparent; }
 QFrame#card QPushButton#fold, QFrame#card QPushButton#fold:checked { background:transparent; }

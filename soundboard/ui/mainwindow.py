@@ -3283,6 +3283,8 @@ class MainWindow(QMainWindow):
 
     def _apply_backup_settings(self, raw: dict):
         changed = backup.apply_settings(self.cfg, raw)
+        if self.voice.fx.merge_saved(raw.get(backup.SAVED_VOICES)):   # their own file
+            changed.append("saved voices")
         if "theme" in changed:
             self.apply_theme(self.cfg.theme)
         self._save_now()
