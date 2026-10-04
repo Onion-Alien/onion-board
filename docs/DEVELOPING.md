@@ -37,10 +37,12 @@ module's `install.bat` or `pip install -r requirements.txt`).
   (`scripts\build_module.py` there) and start Onion Board with
   `ONIONBOARD_ONION_WATCH_ZIP` set to it: *Get Onion Watch* and the update check
   then use that file instead of GitHub. The add-on may only import what the built
-  app ships (it has no pip): the standard library, numpy, scipy and PySide6's
-  QtCore / QtGui / QtWidgets. The app's own code no longer imports scipy (its
-  filters are `soundboard/dsp.py`); `build.ps1` still bundles it with
-  `--hidden-import` for add-ons and modules. Removing one of those from the build breaks it:
+  app ships (it has no pip): the standard library, numpy, soxr, scipy.fft and
+  PySide6's QtCore / QtGui / QtWidgets. The app's own code doesn't import scipy (its
+  filters are `soundboard/dsp.py`); `build.ps1` bundles only scipy.fft, with
+  `--hidden-import`, for Onion Watch's matcher (which falls back to numpy's slower FFTs
+  without it). The rest of scipy (signal, ndimage…) isn't shipped. Removing scipy.fft
+  from the build makes the Triggers tab slower; check it still runs:
   `OnionBoard.exe --selftest-addon <zip>` proves a build can run it (build.ps1 does
   that when `ONIONBOARD_ONION_WATCH_ZIP` is set).
 

@@ -8,7 +8,7 @@ Three kinds:
 
   "effects"  An `entry` Python file loaded into the app. Its `register(api)` adds
              voice effects with `api.register_effect(EffectSubclass)`. It may only
-             import what the app itself ships (numpy, scipy, soxr, the stdlib…),
+             import what the app itself ships (numpy, soxr, scipy.fft, the stdlib…),
              because the packaged app has no pip.
 
   "service"  A separate program the app launches and talks to over a loopback

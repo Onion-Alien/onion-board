@@ -19,6 +19,14 @@
   and comments (YouTube's likes and comments fill in a moment later; YouTube
   hides dislike counts). The caption over the results and the paste-a-link hint
   are gone.
+- **A smaller download: only the part of scipy that's used ships.** The app's own
+  code no longer uses scipy, and the Triggers tab (Onion Watch) needs only its FFTs,
+  so the build bundles scipy.fft and leaves out the rest (signal, ndimage and what
+  they pull in). The Triggers tab needs an Onion Watch newer than 0.5.6: 0.5.6 and
+  older use scipy.ndimage and won't load (*Get Onion Watch* fetches the newest). Its
+  matcher is also a little quicker: 50 pictures are checked about every 300 ms at its
+  1% CPU share. Third-party effects modules that import other parts of scipy have to
+  bring their own replacement; numpy, soxr and scipy.fft are still there.
 - **Network activity** (Settings → Connection): see every connection the app
   makes, to check for yourself where it goes, and why: each one says what caused
   it (*You searched YouTube for “…”*, *You clicked Check now*, *Automatic update
@@ -67,7 +75,7 @@
 - **Our own filter engine:** all of the app's audio filters (EQ, voice effects,
   destination modes, the smart mono downmix, the limiter's look-ahead) now run on
   Onion Board's own code instead of scipy, and float32 audio is filtered more
-  accurately than before. scipy still ships for add-ons and modules that use it.
+  accurately than before.
 - **Cleaner bottom bars:** My mic, What others hear and My headphones are three
   separate boxes. Each volume is a speaker icon, a slider and a plain % you can
   still click and type into (a typed volume applies on Enter, not digit by digit:
