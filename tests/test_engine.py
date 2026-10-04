@@ -678,3 +678,42 @@ def test_cut_shares_is_worked_out_once_per_sound(monkeypatch):
     assert len(calls) == 2
     e.forget("a")
     assert "a" not in e._shares
+
+
+def test_callback_keeps_pace_beside_busy_python():
+    """numpy lets go of the GIL in every operation on a stereo block; with another
+    thread busy in Python, the cable's callback used to wait a switch interval to get
+    it back each time (15 ms a block at 1 ms, over its 10 ms budget). With the app's
+    interval it stays near its own cost."""
+    import sys
+    import threading
+
+    from soundboard.app import SWITCH_S
+    e = engine_with("main", send_stage=True)
+    for i in range(3):
+        e.play(f"s{i}", (tone(5.0) * 20000).astype(np.int16), 0.5, mode="overlap")
+    out = np.zeros((480, 2), np.float32)
+    old = sys.getswitchinterval()
+    stop = threading.Event()
+
+    def busy():
+        x = 0
+        while not stop.is_set():
+            for i in range(1000):
+                x += i * i
+
+    sys.setswitchinterval(SWITCH_S)
+    th = threading.Thread(target=busy, daemon=True)
+    th.start()
+    try:
+        took = []
+        for _ in range(60):
+            t = time.perf_counter()
+            e._cb_main(out, 480, None, 0)
+            took.append(time.perf_counter() - t)
+            time.sleep(0.003)
+    finally:
+        stop.set()
+        th.join()
+        sys.setswitchinterval(old)
+    assert np.median(took) < 0.005   # 10 ms is the whole budget; it was 15 ms
