@@ -306,3 +306,127 @@ def test_the_computer_voice_gets_the_voice_changer():
     out = chain.render(clip, rate)
     assert out.shape == clip.shape and np.all(np.isfinite(out))
     assert not np.allclose(out, clip, atol=1e-3)       # changed
+
+
+# --------------------------------------------------------------------------- new voices
+
+SR = 48000
+
+
+def _vowel(f0=120.0, secs=1.5):
+    """A buzzy vowel: a pulse train through three formant resonators."""
+    from soundboard.dsp import lfilter
+    n = int(SR * secs)
+    ph = np.cumsum(np.full(n, f0 / SR))
+    x = (np.diff(np.floor(ph), prepend=0) > 0).astype(np.float64)
+    y = np.zeros(n)
+    for f, bw in ((700, 80), (1220, 90), (2600, 120)):
+        r = np.exp(-np.pi * bw / SR)
+        y += lfilter([1 - r], [1, -2 * r * np.cos(2 * np.pi * f / SR), r * r], x)
+    return (y / np.max(np.abs(y)) * 0.3).astype(np.float32)
+
+
+def _run(etype, cfg, x, block=480):
+    e = voicefx.REGISTRY[etype](SR, cfg)
+    return np.concatenate([e.run(x[i:i + block], SR) for i in range(0, len(x) - block + 1, block)])
+
+
+def _centroid(y):
+    sp = np.abs(np.fft.rfft(y[SR // 2:]))
+    f = np.fft.rfftfreq(len(y) - SR // 2, 1 / SR)
+    return float((sp * f).sum() / sp.sum())
+
+
+def _f0(y):
+    from soundboard.voicefx.builtin import _PitchTracker
+    tr = _PitchTracker(SR)
+    v = [tr.update(y[i:i + 480]) for i in range(SR // 2, len(y) - 480, 480)]
+    return float(np.median([a for a in v if a > 0]))
+
+
+def test_natural_sound_moves_the_pitch_but_keeps_the_voice_shape():
+    x = _vowel()
+    cartoon = _run("pitch", {"semitones": 5}, x)
+    natural = _run("pitch", {"semitones": 5, "natural": 1}, x)
+    assert _f0(cartoon) == pytest.approx(120 * 2 ** (5 / 12), rel=0.03)
+    assert _f0(natural) == pytest.approx(120 * 2 ** (5 / 12), rel=0.03)
+    c0 = _centroid(x)
+    assert _centroid(cartoon) > c0 * 1.12            # formants went up with the pitch
+    assert abs(_centroid(natural) / c0 - 1) < 0.06   # ...or stayed where they were
+
+
+def test_voice_size_alone_keeps_the_pitch():
+    x = _vowel()
+    bigger = _run("pitch", {"size": 4}, x)
+    assert _f0(bigger) == pytest.approx(120, rel=0.03)
+    assert _centroid(bigger) < _centroid(x) * 0.95
+
+
+def test_old_pitch_settings_sound_as_before():
+    """No natural / size keys (old saves, sounds, music): no formant stage, old delay."""
+    e = voicefx.REGISTRY["pitch"](SR, {"semitones": 5})
+    assert e.latency() < 0.045
+    _run("pitch", {"semitones": 5}, _vowel(secs=0.3))
+    assert e.fstage is None
+
+
+def test_autotune_snaps_to_a_note():
+    x = _vowel(f0=120.0)                              # between A#2 and B2
+    y = _run("pitch", {"tune": 1}, x)
+    assert _f0(y) == pytest.approx(123.47, rel=0.01)  # B2
+
+
+def test_cleanup_quietens_the_pauses_not_the_voice():
+    rng = np.random.default_rng(0)
+    voice = _vowel(secs=1.0)
+    x = np.concatenate([voice, np.zeros(SR)]).astype(np.float32)
+    x += (rng.standard_normal(len(x)) * 0.004).astype(np.float32)
+    y = _run("cleanup", {}, x)
+    d = int(SR * voicefx.REGISTRY["cleanup"](SR, {}).latency())
+    pause = y[SR + SR // 2:]
+    talk = y[SR // 4 + d:SR - SR // 10]
+    noise_db = 20 * np.log10(np.sqrt(np.mean(pause ** 2)))
+    assert noise_db < -60                              # was about -48 dB
+    loss = np.sqrt(np.mean(talk ** 2)) / np.sqrt(np.mean(voice[SR // 4:SR - SR // 10] ** 2))
+    assert loss > 0.7
+
+
+@pytest.mark.parametrize("etype,cfg", [
+    ("growl", {"amount": 1}), ("helmet", {}), ("shout", {"threshold": -30}),
+    ("robot", {"follow": 1}), ("radio", {"squelch": 1}), ("cleanup", {"hiss": 1}),
+    ("pitch", {"semitones": -7, "natural": 1, "size": 3, "tune": 0.5})])
+def test_new_effects_give_finite_audio_of_the_same_length(etype, cfg):
+    for block in (64, 480, 1024):
+        y = _run(etype, cfg, _vowel(secs=0.5), block)
+        assert y.dtype == np.float32 and np.all(np.isfinite(y))
+        assert len(y) == (int(SR * 0.5) // block) * block
+        assert np.max(np.abs(y)) < 2.0
+
+
+def test_growl_adds_an_octave_below():
+    y = _run("growl", {"amount": 1, "tone": 1000}, _vowel(f0=200.0))
+    sp = np.abs(np.fft.rfft(y[SR // 4:]))
+    f = np.fft.rfftfreq(len(y) - SR // 4, 1 / SR)
+    sub = sp[(f > 95) & (f < 105)].max()
+    assert sub > 0.05 * sp[(f > 195) & (f < 205)].max()
+
+
+def test_walkie_talkie_clicks_when_you_start_and_stop():
+    x = np.concatenate([np.zeros(SR // 2), _vowel(secs=0.5), np.zeros(SR)]).astype(np.float32)
+    y = _run("radio", {"squelch": 1, "noise": 0}, x)
+    start = y[SR // 2:SR // 2 + 1500]
+    tail = y[SR + int(SR * 0.3):SR + int(SR * 0.6)]
+    assert np.max(np.abs(tail)) > 0.02                 # the "kshh" after you let go
+    assert np.max(np.abs(start)) > 0.05
+
+
+def test_every_preset_runs_and_reports_its_delay():
+    x = np.stack([_vowel(secs=0.4)] * 2, 1)
+    for name, fx in voicefx.PRESETS.items():
+        ch = voicefx.VoiceChain()
+        ch.configure({"enabled": True, "effects": {t: {"on": True, **c} for t, c in fx.items()}})
+        for i in range(0, len(x) - 479, 480):
+            y = ch.process(x[i:i + 480], SR)
+            assert np.all(np.isfinite(y))
+        assert not ch.errors, name
+        assert 0 <= ch.latency() < 0.1, name

@@ -1,5 +1,33 @@
 # Changelog
 
+## Unreleased
+
+- **A much better voice changer.**
+  - **Sounds like a person, not a cartoon:** pitch now has *Natural sound*, which
+    keeps the shape of your voice where a real person's would be, and *Voice size*
+    (a bigger or smaller throat). Deep voice and Demon stop sounding muddy, and the
+    new *Female voice* and *Male voice* sound like someone else instead of a
+    chipmunk or a giant. Pitch also moves in half steps.
+  - **Clean up my mic**, on to start with: a noise gate that learns your room by
+    itself and hiss removal, before any effect. Fan hum and hiss used to come out
+    as warble; between words the noise now drops from about -48 dB to -70 dB.
+  - **New voices:** Female voice, Male voice, Talkbox, Autotune, Masked caller,
+    Anonymous, Dark lord and Hothead (talk normally, shout and it blows out like a
+    megaphone). Walkie-talkie now clicks when you start talking and goes "kshh"
+    when you stop.
+  - **New effects:** Autotune (gentle to full T-Pain), Monster growl (a voice an
+    octave below yours, no extra delay), Helmet, Shout blowout, and Robot's
+    *Follow my pitch* (a talkbox that sings the note you speak).
+  - **Shows the delay:** a label tells you how far behind your real voice the
+    changed one is. The pitch voices cost about 50-70 ms; the rest about 10 ms.
+  - **Hear my voice is just your voice:** it no longer plays your sounds in your
+    headphones too (the mixer's *Hear what they hear* still plays everything).
+  - **A tidier Voice tab:** *Make it yours* keeps pitch, voice size, autotune and
+    mic clean-up in view under the voices; every other effect is a card with an
+    on/off switch, grouped, with what it does written on it and a Reset.
+  - Your saved voices and older settings load as before and sound the same: the
+    new controls start where the old sound was.
+
 ## 1.6.6 — 2026-10-04
 
 - **Bring your board over from another soundboard.** Coming from Soundpad,

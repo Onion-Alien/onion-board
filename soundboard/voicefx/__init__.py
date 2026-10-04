@@ -36,6 +36,7 @@ class Param:
     default: float
     unit: str = ""
     step: float = 0.0     # 0 = continuous (the UI picks ~200 steps)
+    ends: tuple[str, str] = ("", "")   # words under the slider's two ends, if any
 
     def clamp(self, v) -> float:
         try:
@@ -72,6 +73,11 @@ class Effect:
 
     def run(self, x: np.ndarray, rate: int) -> np.ndarray:
         raise NotImplementedError
+
+    def latency(self) -> float:
+        """Seconds this effect delays the voice with its current settings (shown in
+        the Voice tab). Most effects work sample by sample: 0."""
+        return 0.0
 
 
 REGISTRY: dict[str, type[Effect]] = {}
@@ -183,6 +189,18 @@ class VoiceChain:
     @property
     def active(self) -> bool:
         return (self.enabled and bool(self._effects)) or self.tap is not None or self.replace
+
+    def latency(self) -> float:
+        """Seconds the effects that are on add to your voice right now."""
+        if not self.enabled:
+            return 0.0
+        total = 0.0
+        for e in self._effects:
+            try:
+                total += max(0.0, float(e.latency()))
+            except Exception:  # noqa: BLE001 - an add-on's: just not counted
+                pass
+        return total
 
     def clear_errors(self):
         self.errors.clear()

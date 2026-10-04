@@ -44,16 +44,17 @@ def test_preset_turns_the_changer_on_and_configures_the_chain(panel):
     assert spec["enabled"] and spec["preset"] == "Robot"
     assert spec["effects"]["robot"]["on"] and not spec["effects"]["pitch"]["on"]
     p.chain.process(np.zeros((32, 2), np.float32), 48000)
-    assert [e.type for e in p.chain._effects] == ["robot", "compressor", "reverb"]
+    # mic clean-up is your own setting (on to start with), ahead of the voice's effects
+    assert [e.type for e in p.chain._effects] == ["cleanup", "robot", "compressor", "reverb"]
 
 
 def test_editing_a_slider_switches_to_custom(panel):
     p, _ = panel
     p.fx.pick("Chipmunk")
     row = p.fx.rows["pitch"]
-    row.sliders[0].slider.setValue(row.sliders[0].slider.value() - 3)
+    row.sliders[0].slider.setValue(row.sliders[0].slider.value() - 3)   # half steps
     assert p.fx.preset == "Custom"
-    assert p.fx.spec()["effects"]["pitch"]["semitones"] == 5
+    assert p.fx.spec()["effects"]["pitch"]["semitones"] == 6.5
 
 
 def test_power_switch_and_hear_button(panel):
@@ -594,7 +595,7 @@ def test_random_voice_opens_fine_tune_with_what_it_set_lit_up(panel):
     assert not p.fx.btn_more.isChecked()
     p.fx.randomize(random.Random(3))
     assert p.fx.btn_more.isChecked() and p.fx.preset == "Custom"
-    on = {t for t, r in p.fx.rows.items() if r.chk.isChecked()}
+    on = {t for t, r in p.fx.rows.items() if r.chk.isChecked() and t != "cleanup"}
     lit = {t for t, r in p.fx.rows.items() if r.is_fresh()}
     assert lit == on and "pitch" in lit
     p.fx.pick("Robot")                       # gone as soon as you move on...
@@ -721,3 +722,64 @@ def test_tiles_reflow_with_saved_voices(qapp, app_dir, monkeypatch):
     assert _grid_order(fx)[-3:] == ["A", "B", "Random voice"]
     assert max(b.geometry().right() for b in fx.tiles.buttons()) <= fx.width()
     holder.hide()
+
+
+def test_mic_cleanup_stays_as_you_set_it_whatever_voice_you_pick(panel):
+    p, _ = panel
+    clean = p.fx.rows["cleanup"]
+    assert clean.chk.isChecked()                  # on to start with
+    p.fx.pick("Robot")
+    clean.chk.setChecked(False)                   # switched off: Robot stays picked
+    assert p.fx.preset == "Robot"
+    for name in ("Chipmunk", "Custom"):
+        p.fx.pick(name)
+        assert not clean.chk.isChecked()
+    import random
+    p.fx.randomize(random.Random(1))
+    assert not clean.chk.isChecked()
+    assert not p.fx.spec()["effects"]["cleanup"]["on"]
+
+
+def test_moving_a_pitch_slider_switches_pitch_on(panel):
+    p, _ = panel
+    row = p.fx.rows["pitch"]
+    assert not row.chk.isChecked() and not row.body.isHidden()   # always in view
+    size = next(s for s in row.sliders if s.q.key == "size")
+    size.slider.setValue(size.slider.value() + 4)
+    spec = p.fx.spec()
+    assert spec["enabled"] and spec["effects"]["pitch"]["on"]
+    assert spec["effects"]["pitch"]["size"] == 2
+
+
+def test_delay_shows_what_the_effects_and_devices_add(panel):
+    p, _ = panel
+    fx = p.fx
+    assert fx.delay.isHidden()                    # off: no delay to speak of
+    fx.pick("Robot")                              # no pitch: only the clean-up's frame
+    small = fx.effects_delay()
+    fx.pick("Deep voice")                         # pitch + natural formants cost the most
+    big = fx.effects_delay()
+    assert 5 < small < 20 and 50 < big < 100
+    fx.set_device_delay(30.0)
+    assert not fx.delay.isHidden() and f"{big + 30:.0f} ms" in fx.delay.text()
+
+
+def test_hear_my_voice_is_the_voice_alone(panel):
+    p, eng = panel
+    p.fx.btn_hear.setChecked(True)
+    assert eng.mon_voice_only is True
+    p.fx.btn_hear.setChecked(False)
+    p.fx.set_hearing(True)                        # the mixer's "Hear what they hear"
+    assert eng.mon_voice_only is False
+
+
+def test_switch_settings_and_cards_round_trip(panel):
+    p, _ = panel
+    p.fx.pick("Walkie-talkie")
+    radio = p.fx.rows["radio"]
+    squelch = next(s for s in radio.sliders if s.q.key == "squelch")
+    assert squelch.switch is not None and squelch.slider is None and squelch.value() == 1
+    squelch.switch.setChecked(False)
+    assert p.fx.spec()["effects"]["radio"]["squelch"] == 0
+    radio.reset()
+    assert p.fx.spec()["effects"]["radio"]["low"] == voicefx.defaults("radio")["low"]

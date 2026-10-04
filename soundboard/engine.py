@@ -581,6 +581,7 @@ class Engine:
         self._dests: dict[str, object] = {}        # out -> destination.Processor
         self._eqs: dict[tuple[str, str], EQ] = {}
         self.mic_check = False    # headphones also get your mic (= exactly what others hear)
+        self.mon_voice_only = False   # ...but only your (changed) voice: the Voice tab's
         self.voice_chain = None   # voicefx.VoiceChain: voice changer / live speech tap on the mic
         # the send stage (soundboard.sendfx): what makes the mix survive voice chat
         self.send_mono = True     # phase-aware mono into the send device (every voice chat is mono)
@@ -1469,6 +1470,9 @@ class Engine:
 
     def _mon(self, outdata, frames):
         check = self.mic_check and self.sending   # muted: they hear nothing, so neither do you
+        if check and self.mon_voice_only:
+            self._mon_voice(outdata, frames)
+            return
         # in mic check you hear the real output mix: sounds at their outgoing
         # level plus your mic, so you can judge the balance while a song plays
         mix = self._sounds("mon", frames, previews_only=not (check or self.monitor_sounds))
@@ -1497,6 +1501,33 @@ class Engine:
         soft_limit(mix)
         outdata[:] = mix
         self.level_mon = max(peak(mix), self.level_mon * 0.85)
+
+    def _mon_voice(self, outdata, frames):
+        """Hear my voice: your changed voice alone in your headphones (previews still
+        play), to tune a voice without your sounds over it."""
+        mix = self._sounds("mon", frames, previews_only=True)
+        self.ring_rmon.read(frames)        # keep the others' rings drained meanwhile
+        for a in self.aux:
+            a.ring_mon.read(frames)
+        m = self.ring_mon.read(frames)
+        if m is not None and self.mic_enabled and not self.mic_muted:
+            mix += m * np.float32(self.mic_vol)
+        mix = finite(mix)
+        mix *= np.float32(self.mon_vol)
+        soft_limit(mix)
+        outdata[:] = mix
+        self.level_mon = max(peak(mix), self.level_mon * 0.85)
+
+    def device_delay(self) -> float | None:
+        """Seconds your mic and send device add on their own (what the drivers report,
+        plus the mic ring's cushion), or None while they aren't open."""
+        try:
+            mic, out = self.mic_stream, self.main_stream
+            if mic is None or out is None:
+                return None
+            return float(mic.latency) + float(out.latency) + 0.015
+        except Exception:  # noqa: BLE001 - a stream closing meanwhile
+            return None
 
     def _obs(self, outdata, frames):
         """The stream output: what others get (sounds, the live radio and programs,

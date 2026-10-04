@@ -45,6 +45,255 @@ class _Filter:
         return self.f.run(x, self.sos).astype(F32, copy=False)
 
 
+
+class _Stft:
+    """Streaming short-time Fourier processing for one mono stream: `run(x, fn)`
+    cuts the input into Hann-windowed frames (hop = n/4), hands all the frames that
+    are ready to fn((frames, bins) complex) -> same shape, and overlap-adds the
+    result. Always returns len(x) samples; the delay is exactly n samples (one frame,
+    because a frame can only be processed once all of it has arrived)."""
+
+    def __init__(self, n: int):
+        self.n = n = max(64, n - n % 4)
+        self.hop = n // 4
+        self.win = (0.5 - 0.5 * np.cos(2 * np.pi * np.arange(n) / n)).astype(F32)
+        self.norm = F32(self.hop / float(np.sum(self.win ** 2)))
+        self.buf = np.zeros(n - self.hop, F32)     # the last frame's overlap
+        self.acc = np.zeros(n, F32)                 # overlap-add still being summed
+        self.out = np.zeros(self.hop, F32)          # finished output, not yet handed back
+
+    def run(self, x: np.ndarray, fn) -> np.ndarray:
+        n, hop = self.n, self.hop
+        buf = np.concatenate([self.buf, x])
+        frames = (len(buf) - n) // hop + 1 if len(buf) >= n else 0
+        done = [self.out]
+        if frames > 0:
+            idx = np.arange(n)[None, :] + hop * np.arange(frames)[:, None]
+            spec = np.fft.rfft(buf[idx] * self.win, axis=1)
+            y = np.fft.irfft(fn(spec), n, axis=1).astype(F32) * (self.win * self.norm)
+            acc = np.concatenate([self.acc, np.zeros(hop * frames, F32)])
+            for f in range(frames):
+                acc[f * hop:f * hop + n] += y[f]
+            done.append(acc[:hop * frames])
+            self.acc = acc[hop * frames:].copy()
+            buf = buf[hop * frames:]
+        self.buf = buf.copy()
+        out = np.concatenate(done)
+        self.out = out[len(x):].copy()
+        return out[:len(x)]
+
+
+def _stft_size(rate: int, seconds: float) -> int:
+    return max(64, int(rate * seconds) // 4 * 4)
+
+
+class _PitchTracker:
+    """The voice's pitch, block by block (YIN on the last ~32 ms, decimated to about
+    12 kHz so it costs next to nothing). `update(x)` returns Hz, or 0 while there's
+    no clear pitch (silence, breath, s and f sounds)."""
+
+    LO_HZ, HI_HZ = 65.0, 1000.0
+
+    def __init__(self, rate: int):
+        self.dec = max(1, int(rate // 12000))
+        self.sr = rate / self.dec
+        self.tmin = max(2, int(self.sr / self.HI_HZ))
+        self.tmax = int(self.sr / self.LO_HZ) + 1
+        self.hist = np.zeros(2 * self.tmax * self.dec, F32)
+        self.f0 = 0.0
+
+    @property
+    def window(self) -> int:
+        """Input samples one measurement looks at."""
+        return len(self.hist)
+
+    def update(self, x: np.ndarray) -> float:
+        h, n = self.hist, len(x)
+        if n >= len(h):
+            h[:] = x[n - len(h):]
+        else:
+            h[:-n] = h[n:]
+            h[-n:] = x
+        return self.measure(h)
+
+    def measure(self, h: np.ndarray) -> float:
+        """Pitch of exactly `window` samples."""
+        w = h.reshape(-1, self.dec).mean(axis=1).astype(np.float64)
+        w -= w.mean()
+        if float(np.sqrt(np.mean(w * w))) < 3e-3:      # about -50 dBFS: nothing to track
+            self.f0 = 0.0
+            return 0.0
+        tmax, size = self.tmax, len(w) - self.tmax
+        cs = np.concatenate([[0.0], np.cumsum(w * w)])
+        e0 = cs[size]
+        et = cs[size:size + tmax] - cs[:tmax]          # energy of w[t : t + size]
+        m = 1 << int(np.ceil(np.log2(len(w) + size)))
+        r = np.fft.irfft(np.fft.rfft(w, m) * np.conj(np.fft.rfft(w[:size], m)), m)[:tmax]
+        d = np.maximum(e0 + et - 2 * r, 0.0)
+        d[0] = 0.0
+        cm = d[1:] * np.arange(1, tmax) / np.maximum(np.cumsum(d[1:]), 1e-12)
+        cm = np.concatenate([[1.0], cm])
+        cand = np.flatnonzero(cm[self.tmin:] < 0.2)
+        if len(cand):
+            t = int(cand[0]) + self.tmin
+            while t + 1 < tmax and cm[t + 1] < cm[t]:
+                t += 1
+        else:
+            t = int(np.argmin(cm[self.tmin:])) + self.tmin
+            if cm[t] > 0.35:
+                self.f0 = 0.0
+                return 0.0
+        if 0 < t < tmax - 1:                            # parabolic: between two lags
+            a, b, c = cm[t - 1], cm[t], cm[t + 1]
+            den = a - 2 * b + c
+            tt = t + (0.5 * (a - c) / den if abs(den) > 1e-12 else 0.0)
+        else:
+            tt = float(t)
+        self.f0 = self.sr / tt
+        return self.f0
+
+
+def _snap(hz: float) -> float:
+    """The nearest note (equal temperament, A = 440 Hz)."""
+    return 440.0 * 2.0 ** (round(12 * np.log2(hz / 440.0)) / 12)
+
+
+def _envelope_shift(spec: np.ndarray, factor: float, lifter: int) -> np.ndarray:
+    """Move each frame's spectral envelope (the voice's formants: the size and shape
+    of the throat and mouth) by `factor` along the frequency axis while keeping its
+    fine structure (the pitch's harmonics). The envelope is the low part of the
+    cepstrum; each bin is scaled by envelope(f / factor) / envelope(f)."""
+    n = 2 * (spec.shape[1] - 1)
+    logm = np.log(np.abs(spec) + 1e-7)
+    cep = np.fft.irfft(logm, n, axis=1)
+    cep[:, lifter:n - lifter + 1] = 0.0
+    env = np.fft.rfft(cep, axis=1).real
+    k = np.arange(spec.shape[1]) / factor
+    i0 = np.minimum(k.astype(np.int64), spec.shape[1] - 1)
+    i1 = np.minimum(i0 + 1, spec.shape[1] - 1)
+    f = np.minimum(k - i0, 1.0)
+    warped = env[:, i0] * (1 - f) + env[:, i1] * f
+    return spec * np.exp(np.clip(warped - env, -3.5, 3.5))
+
+
+# --------------------------------------------------------------------------- clean-up
+
+@register
+class Cleanup(Effect):
+    """Your mic, cleaned before any other effect touches it: rumble below 80 Hz
+    filtered out, a noise gate that closes between words (it learns your room's
+    noise level by itself), and hiss removal (a spectral filter that learns the
+    noise's sound while you're quiet). Pitch shifting and distortion turn steady
+    noise into warble and fizz, so this is most of what makes a changed voice
+    sound clean."""
+
+    type = "cleanup"
+    name = "Clean up my mic"
+    description = "Removes hum, hiss and room noise before the other effects."
+    params = (Param("gate", "Noise gate", 0, 1, 0.6, "", 0, ("off", "strong")),
+              Param("hiss", "Hiss removal", 0, 1, 0.5, "", 0, ("off", "strong")))
+
+    SUB_S = 0.0025      # the gate decides every 2.5 ms
+    HOLD_S = 0.2        # and stays open this long after you stop
+    FLOOR_S = 1.5       # the room's noise: the quietest moment this far back
+    FRAME_S = 0.0107    # hiss removal's frame (its added latency): 512 at 48 kHz
+
+    def __init__(self, rate, values=None):
+        super().__init__(rate, values)
+        rate = rate or 48000
+        self.hp = _Filter()
+        self.sub = max(16, int(rate * self.SUB_S))
+        self.floor_db = -70.0
+        self.mins: list[tuple[float, float]] = []   # (seconds, quietest dB) per block
+        self.open = False
+        self.held = 0.0
+        self.g = 1.0
+        self.stft: _Stft | None = None
+        self.noise: np.ndarray | None = None   # the noise's power per frequency
+        self.prev_gain: np.ndarray | None = None
+
+    def latency(self) -> float:
+        if self.p["hiss"] <= 0:
+            return 0.0
+        return (self.stft.n if self.stft else _stft_size(self.rate, self.FRAME_S)) / self.rate
+
+    def _gate(self, x, rate):
+        """Downward expander, decided per 2.5 ms piece and ramped sample by sample."""
+        strength = self.p["gate"]
+        n, sub = len(x), self.sub
+        pieces = max(1, n // sub)
+        edges = np.linspace(0, n, pieces + 1).astype(int)
+        lv = np.array([np.sqrt(np.mean(x[a:b] ** 2) + 1e-12)
+                       for a, b in zip(edges[:-1], edges[1:])])
+        db = 20 * np.log10(lv)
+        dt = n / rate
+        # the noise floor: the quietest moment of the last FLOOR_S (between words you
+        # always drop to the room's noise), so it learns a noisy room straight away
+        # and follows it if it gets louder or quieter
+        self.mins.append((dt, max(float(db.min()), -90.0)))
+        span = sum(t for t, _ in self.mins)
+        while len(self.mins) > 1 and span - self.mins[0][0] >= self.FLOOR_S:
+            span -= self.mins.pop(0)[0]
+        self.floor_db = min(min(m for _, m in self.mins), -38.0)
+        open_at, close_at = max(self.floor_db + 9, -60), max(self.floor_db + 5, -64)
+        closed_g = 10 ** (-30 * strength / 20)
+        gains = np.empty(pieces)
+        g = self.g
+        for i, d in enumerate(db):
+            piece = (edges[i + 1] - edges[i]) / rate
+            if d > open_at:
+                self.open, self.held = True, 0.0
+            elif self.open and d < close_at:
+                self.held += piece
+                if self.held > self.HOLD_S:
+                    self.open = False
+            target = 1.0 if self.open else closed_g
+            tau = 0.002 if target > g else 0.06
+            g = target + (g - target) * np.exp(-piece / tau)
+            gains[i] = g
+        ramp = np.interp(np.arange(n), np.r_[-1, edges[1:] - 1], np.r_[self.g, gains])
+        self.g = float(g)
+        return (x * ramp).astype(F32)
+
+    def _dehiss(self, spec):
+        strength = self.p["hiss"]
+        power = (spec.real ** 2 + spec.imag ** 2).astype(np.float64)
+        if self.noise is None:   # start low: what you say first mustn't count as noise
+            self.noise = power.mean(axis=0) * 1e-3 + 1e-12
+        frame_db = 10 * np.log10(power.mean(axis=1) + 1e-20)
+        out = np.empty_like(spec)
+        over = 1.0 + strength            # subtract a bit more than the estimate
+        floor = 10 ** (-18 * strength / 20)
+        for f in range(len(spec)):
+            noise_db = 10 * np.log10(self.noise.mean() + 1e-20)
+            gated = self.p["gate"] > 0 and not self.open
+            if gated or frame_db[f] < noise_db + 3:   # quiet: learn the noise
+                self.noise = 0.9 * self.noise + 0.1 * power[f]
+            else:   # creeps up (~3 dB/s), so a louder room is learned even mid-talk
+                self.noise *= 1.0035
+            g = np.maximum(1 - over * self.noise / (power[f] + 1e-20), floor)
+            g = np.convolve(g, (0.25, 0.5, 0.25), "same")     # less "musical noise"
+            if self.prev_gain is not None:
+                g = np.maximum(g, 0.6 * self.prev_gain)      # fades out, never snaps
+            self.prev_gain = g
+            out[f] = spec[f] * g
+        return out
+
+    def run(self, x, rate):
+        y = self.hp.run(x, "hp", lambda: butter(2, 80, btype="high", fs=rate).astype(F32))
+        if self.p["gate"] > 0:
+            y = self._gate(y, rate)
+        else:
+            self.open = True
+        if self.p["hiss"] > 0:
+            if self.stft is None:
+                self.stft = _Stft(_stft_size(rate, self.FRAME_S))
+            y = self.stft.run(y, self._dehiss)
+        else:
+            self.stft = None
+        return y
+
+
 # --------------------------------------------------------------------------- pitch
 
 @register
@@ -59,6 +308,16 @@ class PitchShift(Effect):
     the pitch and the formants together (the chipmunk / giant sound people expect
     from a voice changer). Latency is about SEQ + SEEK + one block, ~50 ms.
 
+    Natural sound and Voice size move the formants on their own (_envelope_shift,
+    one more ~20 ms frame): Natural 100% puts them back where your own voice has
+    them, so a pitch change sounds like another person rather than a cartoon, and
+    Voice size makes the throat behind the voice bigger or smaller. Both at 0 (the
+    default, and what sounds and music use) skip that stage entirely.
+
+    Autotune snaps the voice to the nearest note: a pitch tracker on the input picks
+    the correction, which glides in (slow: natural tuning) or jumps (100%: the hard
+    T-Pain effect).
+
     While bypassed (0 st) it keeps the last HIST_S of input, and switching on
     stretches that first, so the output doesn't go silent for the latency.
     Switching on or off crossfades dry <-> wet over XF_MS (no click).
@@ -66,8 +325,12 @@ class PitchShift(Effect):
 
     type = "pitch"
     name = "Pitch"
-    description = "Higher (chipmunk) or lower (giant) voice."
-    params = (Param("semitones", "Pitch", -12, 12, 0, " st", 1),
+    description = ("Higher or lower; a cartoon or a real-sounding person; a bigger or "
+                   "smaller throat; autotune.")
+    params = (Param("semitones", "Pitch", -12, 12, 0, " st", 0.5, ("lower", "higher")),
+              Param("natural", "Natural sound", 0, 1, 0, "", 0, ("cartoon", "real person")),
+              Param("size", "Voice size", -12, 12, 0, "", 0.5, ("smaller", "bigger")),
+              Param("tune", "Autotune", 0, 1, 0, "", 0, ("off", "robotic")),
               Param("mix", "Mix", 0, 1, 1))
 
     SEQ_MS = 30.0       # one sequence of voice, copied to the output
@@ -75,6 +338,8 @@ class PitchShift(Effect):
     OVL_MS = 7.0        # crossfade between one sequence and the next
     XF_MS = 10.0        # dry <-> wet crossfade when it switches on or off
     HIST_S = 0.35       # input kept while bypassed (enough to prime it at -24 st)
+    FORMANT_S = 0.02    # the formant stage's frame (its added latency)
+    LIFTER_S = 0.0011   # cepstrum kept as the envelope: shorter than any voice's period
 
     def __init__(self, rate, values=None):
         super().__init__(rate, values)
@@ -89,6 +354,11 @@ class PitchShift(Effect):
         self.xf = max(1, int(rate * self.XF_MS / 1000))
         self.wet_g = 0.0        # 0 = dry, 1 = wet
         self.ratio, self.mix = 1.0, 1.0
+        self.formant = 1.0      # formant correction applied after the shift (1 = none)
+        self.fstage: _Stft | None = None
+        self.lifter = max(8, int(rate * self.LIFTER_S))
+        self.tracker: _PitchTracker | None = None
+        self.tune_st = 0.0      # autotune's correction right now, in semitones
         self._reset(1.0)
 
     def _need(self, tempo: float) -> int:
@@ -102,7 +372,9 @@ class PitchShift(Effect):
         # The stretcher can only start once it has a sequence's worth of input, so the
         # resampler starts that far behind (the effect's latency); the head start is
         # exactly what keeps it fed afterwards, whatever the mic's block size.
-        self.stretched = np.zeros(int(self._need(1 / ratio) * ratio) + 4, F32)
+        # (autotune moves the ratio as you talk: a little more head start for that)
+        head = self._need(1 / ratio) * ratio * (1.08 if self.p.get("tune", 0) > 0 else 1.0)
+        self.stretched = np.zeros(int(head) + 4, F32)
         self.rs_phase = 0.0
         self.pads = 0                           # times the resampler still had to wait
 
@@ -173,18 +445,66 @@ class PitchShift(Effect):
         keep = max(head - int(len(self.inb) * ratio), 0)
         self.stretched = self.stretched[len(self.stretched) - keep:]
 
+    def _target(self, x, rate) -> tuple[float, float]:
+        """(pitch ratio, formant correction) for this block."""
+        p = self.p
+        base = 2.0 ** (p["semitones"] / 12.0)
+        tune = p.get("tune", 0.0)
+        if tune > 0:
+            if self.tracker is None:
+                self.tracker = _PitchTracker(rate)
+            # the shifter plays what you said ~40 ms ago, so measure the pitch there
+            tr = self.tracker
+            recent = np.concatenate([self.hist, x])
+            lag = int(self._need(1.0 / max(base, 1e-3))) - tr.window // 2
+            end = min(len(recent), max(tr.window, len(recent) - max(lag, 0)))
+            f0 = tr.measure(recent[end - tr.window:end])
+            if f0 > 0:
+                note = 12 * np.log2(f0 * base / 440.0)
+                want = round(note) - note
+                tau = 0.005 + 0.15 * (1 - tune)          # 100%: jumps (T-Pain)
+                a = 1.0 if tune >= 0.98 else 1 - np.exp(-len(x) / (rate * tau))
+                self.tune_st += (want - self.tune_st) * a
+        else:
+            self.tune_st = 0.0
+        ratio = base * 2.0 ** (self.tune_st / 12.0)
+        # where the formants should end up, relative to your own voice: following the
+        # pitch (a cartoon) or staying put (a real person), then made bigger/smaller
+        want = base ** (1.0 - p.get("natural", 0.0)) * 2.0 ** (-p.get("size", 0.0) / 12.0)
+        return ratio, want / ratio
+
+    def _wants_formants(self) -> bool:
+        p = self.p
+        base = 2.0 ** (p["semitones"] / 12.0)
+        shift = base ** -p.get("natural", 0.0) * 2.0 ** (-p.get("size", 0.0) / 12)
+        return abs(np.log2(shift)) > 1e-3
+
+    def latency(self) -> float:
+        p = self.p
+        if not (self.running or abs(p["semitones"]) >= 0.01 or p.get("size", 0)
+                or p.get("tune", 0) > 0):
+            return 0.0
+        ratio = 2.0 ** (p["semitones"] / 12.0)
+        s = self._need(1 / ratio) / self.rate
+        if self.fstage is not None or self._wants_formants():
+            n = self.fstage.n if self.fstage else _stft_size(self.rate, self.FORMANT_S)
+            s += n / self.rate
+        return s
+
     def run(self, x, rate):
-        st, mix = self.p["semitones"], self.p["mix"]
-        on = abs(st) >= 0.01 and mix > 0
+        p = self.p
+        mix = p["mix"]
+        on = (abs(p["semitones"]) >= 0.01 or abs(p.get("size", 0)) >= 0.01
+              or p.get("tune", 0) > 0) and mix > 0
         if not on and not self.running:
             self._remember(x)
             return x
         if on:
-            ratio = 2.0 ** (st / 12.0)
+            ratio, formant = self._target(x, rate)
             if not self.running:
                 self.running = True
                 self._prime(ratio, rate)
-            self.ratio, self.mix = ratio, mix
+            self.ratio, self.mix, self.formant = ratio, mix, formant
         ratio, mix = self.ratio, self.mix       # switching off: fade out at the old ones
         self._remember(x)
         self.inb = np.concatenate([self.inb, x])
@@ -192,6 +512,12 @@ class PitchShift(Effect):
         if chunks:
             self._add_stretched(chunks, ratio, rate)
         wet = self._resample(ratio, len(x))
+        if self.fstage is None and abs(np.log2(self.formant)) > 1e-3:
+            self.fstage = _Stft(_stft_size(rate, self.FORMANT_S))
+        if self.fstage is not None:   # once on, it stays on: its delay mustn't jump
+            c = self.formant
+            wet = self.fstage.run(wet, lambda spec: spec if abs(np.log2(c)) <= 1e-3
+                                  else _envelope_shift(spec, c, self.lifter))
         if mix < 1:
             wet = x * F32(1 - mix) + wet * F32(mix)
         g0, target = self.wet_g, 1.0 if on else 0.0
@@ -202,7 +528,48 @@ class PitchShift(Effect):
         self.wet_g = float(env[-1]) if len(x) else g0
         if not on and self.wet_g <= 0.0:
             self.running = False
+            self.fstage = None
+            self.tune_st = 0.0
         return x + (wet - x) * env
+
+
+# --------------------------------------------------------------------------- growl
+
+@register
+class Growl(Effect):
+    """A second voice an octave below yours, the way an octave pedal makes one: a
+    square wave that flips at every other cycle of your voice (so it runs at half
+    your pitch) multiplied with the voice. No delay, nothing to track: demons and
+    monsters."""
+
+    type = "growl"
+    name = "Monster growl"
+    description = "Adds a rough voice an octave below yours."
+    params = (Param("amount", "Growl", 0, 1, 0.5, "", 0, ("subtle", "monster")),
+              Param("tone", "Tone", 300, 3000, 1200, " Hz", 50, ("dark", "raspy")))
+
+    def __init__(self, rate, values=None):
+        super().__init__(rate, values)
+        self.track = _Filter()
+        self.tone = _Filter()
+        self.sign = 1.0
+        self.parity = 0
+
+    def run(self, x, rate):
+        lo = self.track.run(x, "t", lambda: butter(2, 350, btype="low", fs=rate).astype(F32))
+        level = float(np.sqrt(np.mean(lo * lo)) + 1e-9)
+        s = np.where(np.abs(lo) > level * 0.3, np.sign(lo), 0.0)
+        s[0] = s[0] or self.sign
+        idx = np.where(s != 0, np.arange(len(s)), 0)
+        s = s[np.maximum.accumulate(idx)]              # hold the last sign (hysteresis)
+        rising = np.diff(np.r_[self.sign, s]) > 0
+        flips = np.cumsum(rising) + self.parity
+        sq = np.where(flips % 2 == 0, 1.0, -1.0).astype(F32)
+        self.sign, self.parity = float(s[-1]), int(flips[-1] % 2)
+        tone = self.p["tone"]
+        sub = self.tone.run(x * sq, round(tone), lambda: butter(
+            2, min(tone, rate * 0.45), btype="low", fs=rate).astype(F32))
+        return x + sub * F32(1.6 * self.p["amount"])
 
 
 # --------------------------------------------------------------------------- robot
@@ -217,6 +584,7 @@ class Robot(Effect):
     name = "Robot"
     description = "Your words spoken by a buzzing synthesizer (vocoder)."
     params = (Param("freq", "Buzz pitch", 40, 400, 100, " Hz", 1),
+              Param("follow", "Follow my pitch", 0, 1, 0, "", 1),
               Param("noise", "Breath", 0, 1, 0.2),
               Param("mix", "Mix", 0, 1, 1))
 
@@ -237,9 +605,11 @@ class Robot(Effect):
         self.harmonics = np.arange(1, int(hi / self.params[0].lo) + 1, dtype=np.float64)
         self.phase = 0.0
         self.rng = np.random.default_rng(1)
+        self.tracker: _PitchTracker | None = None
+        self.f = float(self.p["freq"])
 
     def _carrier(self, n: int, rate: int) -> np.ndarray:
-        f, nz = self.p["freq"], self.p["noise"]
+        f, nz = self.f, self.p["noise"]
         k = self.harmonics[: int(min(self.HI_HZ, rate * 0.42) / f)]
         ph = self.phase + 2 * np.pi * f / rate * np.arange(1, n + 1)
         self.phase = float(ph[-1] % (2 * np.pi))
@@ -249,6 +619,15 @@ class Robot(Effect):
 
     def run(self, x, rate):
         n = len(x)
+        if self.p.get("follow", 0) >= 0.5:
+            # talkbox: the buzz sings the note you're speaking, snapped to the scale
+            if self.tracker is None:
+                self.tracker = _PitchTracker(rate)
+            f0 = self.tracker.update(x)
+            if f0 > 0:
+                self.f = min(max(_snap(f0), self.params[0].lo), self.params[0].hi)
+        else:
+            self.f = float(self.p["freq"])
         pair = np.stack([x, self._carrier(n, rate)])
         y, self.state = sosfilt_bank(self.bank, pair, self.state)   # (bands, 2, n)
         bands = np.concatenate([y[:, 0], y[:, 1]])                 # voice's, then carrier's
@@ -326,13 +705,49 @@ class Radio(Effect):
     params = (Param("low", "Low cut", 150, 1200, 400, " Hz", 10),
               Param("high", "High cut", 1500, 7000, 3000, " Hz", 50),
               Param("drive", "Crunch", 0, 24, 6, " dB", 1),
-              Param("noise", "Static", 0, 0.05, 0.004))
+              Param("noise", "Static", 0, 0.05, 0.004),
+              Param("squelch", "Click when I talk", 0, 1, 0, "", 1))
+
+    HOLD_S = 0.3         # quiet this long = you let go of the talk button
 
     def __init__(self, rate, values=None):
         super().__init__(rate, values)
         self.bp = _Filter()
         self.bp_noise = _Filter()
         self.rng = np.random.default_rng()
+        self.talking = False
+        self.quiet = 0.0
+        self.pending = np.zeros(0, F32)    # a click or a burst still playing out
+
+    def _burst(self, rate, secs, level, click=False) -> np.ndarray:
+        n = int(rate * secs)
+        t = np.arange(n) / rate
+        env = np.exp(-t / (secs * (0.15 if click else 0.35)))
+        z = self.rng.standard_normal(n) * env * level
+        if click:   # the key: a sharp tick with a little tone in it
+            z += np.sin(2 * np.pi * 1800 * t) * env * level * 1.5
+        return z.astype(F32)
+
+    def _squelch(self, x, rate) -> np.ndarray:
+        """Walkie-talkie clicks: a key click when you start talking and the "kshh"
+        of letting go of the button when you stop."""
+        n = len(x)
+        level = 20 * np.log10(float(np.sqrt(np.mean(x * x))) + 1e-9)
+        if level > -42:
+            if not self.talking:
+                self.talking = True
+                self.pending = self._burst(rate, 0.03, 0.25, click=True)
+            self.quiet = 0.0
+        elif self.talking:
+            self.quiet += n / rate
+            if self.quiet > self.HOLD_S:
+                self.talking = False
+                self.pending = self._burst(rate, 0.18, 0.12)
+        add = np.zeros(n, F32)
+        k = min(n, len(self.pending))
+        add[:k] = self.pending[:k]
+        self.pending = self.pending[k:]
+        return add
 
     def run(self, x, rate):
         lo, hi = self.p["low"], self.p["high"]
@@ -347,6 +762,8 @@ class Radio(Effect):
         if self.p["noise"] > 0:
             hiss = self.rng.standard_normal(len(y)).astype(F32) * F32(self.p["noise"] * 3)
             y += self.bp_noise.run(hiss, (lo, hi), design)
+        if self.p.get("squelch", 0) >= 0.5:
+            y = y + self._squelch(x, rate)
         return y
 
 
@@ -368,6 +785,76 @@ class Distortion(Effect):
         y = np.tanh(x * g) * F32(self.p["level"])
         tone = self.p["tone"]
         return self.lp.run(y, tone, lambda: _one_pole_lowpass(tone, rate))
+
+
+@register
+class Shout(Effect):
+    """Reacts to how loud you are: talk normally and nothing happens, shout and the
+    voice blows out like a megaphone (band-limited and overdriven), fading back as
+    you calm down."""
+
+    type = "shout"
+    name = "Shout blowout"
+    description = "Shout and your voice blows out like a megaphone."
+    params = (Param("threshold", "Kicks in at", -40, -3, -16, " dB", 1, ("whisper", "yell")),
+              Param("drive", "Crunch", 0, 30, 14, " dB", 1))
+
+    def __init__(self, rate, values=None):
+        super().__init__(rate, values)
+        self.bp = _Filter()
+        self.env = -90.0
+        self.amt = 0.0
+
+    def run(self, x, rate):
+        n = len(x)
+        level = 20 * np.log10(float(np.max(np.abs(x))) + 1e-9)
+        tau = 0.01 if level > self.env else 0.25
+        self.env = level + (self.env - level) * float(np.exp(-n / (rate * tau)))
+        target = min(max((self.env - self.p["threshold"]) / 6.0, 0.0), 1.0)
+        a = np.linspace(self.amt, target, n + 1, dtype=F32)[1:]
+        self.amt = target
+        y = self.bp.run(x, "bp", lambda: butter(2, [500, 4000], btype="band",
+                                                fs=rate).astype(F32))
+        g = F32(10 ** (self.p["drive"] / 20))
+        wet = np.tanh(y * g) * F32(0.5)
+        return x * (1 - a) + wet * a
+
+
+@register
+class Helmet(Effect):
+    """A very short echo fed back on itself (a comb filter): the boxy, metallic ring
+    of talking inside a helmet, a mask or a tin can."""
+
+    type = "helmet"
+    name = "Helmet"
+    description = "Talking inside a helmet, mask or metal box."
+    params = (Param("size", "Helmet size", 0.5, 8, 2.5, " ms", 0.1, ("tin can", "big helmet")),
+              Param("ring", "Metal ring", 0, 0.9, 0.55),
+              Param("mix", "Mix", 0, 1, 0.5))
+
+    def __init__(self, rate, values=None):
+        super().__init__(rate, values)
+        self.hist = np.zeros(self._len(), F32)
+
+    def _len(self) -> int:
+        return max(2, int(self.rate * self.p["size"] / 1000))
+
+    def run(self, x, rate):
+        d = self._len()
+        if d != len(self.hist):
+            self.hist = np.zeros(d, F32)
+        fb, mix = F32(self.p["ring"]), F32(self.p["mix"])
+        out = np.empty_like(x)
+        hist, n, i = self.hist, len(x), 0
+        while i < n:
+            c = min(d, n - i)
+            v = x[i:i + c] + fb * hist[:c]
+            out[i:i + c] = v
+            hist = np.concatenate([hist[c:], v])
+            i += c
+        self.hist = hist
+        wet = out * F32(1 - float(fb) * 0.7)      # about as loud as the dry voice
+        return x * (1 - mix) + wet * mix
 
 
 # --------------------------------------------------------------------------- space
@@ -539,21 +1026,48 @@ def _allpass(x, xh, yh, g):
 
 # name -> the effects that are on, with their settings (everything else is off).
 # Kept short on purpose: every voice here should sound like the thing it's named
-# after, straight away, on a normal headset mic.
+# after, straight away, on a normal headset mic. "natural": 1 keeps the voice's
+# formants where a real person's would be (a different person, not a cartoon).
+# Clean up my mic isn't part of any voice: it stays as you set it.
 PRESETS: dict[str, dict[str, dict]] = {
     "Chipmunk":          {"pitch": {"semitones": 8},
                           "compressor": {"threshold": -24, "ratio": 2.5, "boost": 5}},
-    "Deep voice":        {"pitch": {"semitones": -4},
+    "Deep voice":        {"pitch": {"semitones": -4, "natural": 1, "size": 2},
                           "compressor": {"threshold": -22, "ratio": 3, "boost": 6},
-                          "tone": {"bass": 4, "presence": 2, "treble": -2}},
-    "Demon":             {"pitch": {"semitones": -8},
-                          "compressor": {"threshold": -24, "ratio": 4, "boost": 9},
-                          "distortion": {"drive": 8, "tone": 3500, "level": 0.8},
-                          "chorus": {"rate": 0.4, "depth": 6, "mix": 0.25},
-                          "reverb": {"size": 0.8, "tone": 2500, "mix": 0.35}},
+                          "tone": {"bass": 3, "presence": 2, "treble": -1}},
+    "Female voice":      {"pitch": {"semitones": 5, "natural": 1, "size": -2.5},
+                          "compressor": {"threshold": -24, "ratio": 2.5, "boost": 5},
+                          "tone": {"bass": -3, "presence": 2, "treble": 2}},
+    "Male voice":        {"pitch": {"semitones": -5, "natural": 1, "size": 2.5},
+                          "compressor": {"threshold": -22, "ratio": 3, "boost": 6},
+                          "tone": {"bass": 3, "presence": 1, "treble": -1}},
+    "Demon":             {"pitch": {"semitones": -6, "natural": 1, "size": 5},
+                          "growl": {"amount": 0.7, "tone": 900},
+                          "compressor": {"threshold": -24, "ratio": 4, "boost": 8},
+                          "distortion": {"drive": 6, "tone": 3500, "level": 0.8},
+                          "reverb": {"size": 0.8, "tone": 2500, "mix": 0.3}},
     "Robot":             {"robot": {"freq": 100, "noise": 0.2, "mix": 1},
                           "compressor": {"threshold": -24, "ratio": 3, "boost": 10},
                           "reverb": {"size": 0.25, "tone": 6000, "mix": 0.12}},
+    "Talkbox":           {"robot": {"freq": 110, "follow": 1, "noise": 0.05, "mix": 1},
+                          "compressor": {"threshold": -24, "ratio": 3, "boost": 10},
+                          "chorus": {"rate": 0.6, "depth": 3, "mix": 0.3}},
+    "Autotune":          {"pitch": {"semitones": 0, "tune": 1},
+                          "compressor": {"threshold": -22, "ratio": 3, "boost": 5},
+                          "reverb": {"size": 0.35, "tone": 6000, "mix": 0.18}},
+    "Masked caller":     {"pitch": {"semitones": -6, "natural": 0.6, "size": 2},
+                          "compressor": {"threshold": -26, "ratio": 5, "boost": 8},
+                          "radio": {"low": 200, "high": 5000, "drive": 6, "noise": 0.0},
+                          "distortion": {"drive": 4, "tone": 4000, "level": 0.8}},
+    "Anonymous":         {"pitch": {"semitones": -4, "natural": 1, "size": -4},
+                          "compressor": {"threshold": -24, "ratio": 3, "boost": 6},
+                          "chorus": {"rate": 0.2, "depth": 2, "mix": 0.2}},
+    "Dark lord":         {"pitch": {"semitones": -3, "natural": 1, "size": 3},
+                          "compressor": {"threshold": -26, "ratio": 4, "boost": 8},
+                          "tone": {"bass": 4, "presence": 1, "treble": -3},
+                          "helmet": {"size": 3, "ring": 0.6, "mix": 0.45},
+                          "reverb": {"size": 0.2, "tone": 4000, "mix": 0.1}},
+    "Hothead":           {"shout": {"threshold": -14, "drive": 16}},
     "Alien":             {"pitch": {"semitones": 5, "mix": 0.6},
                           "compressor": {"threshold": -24, "ratio": 3, "boost": 13},
                           "chorus": {"rate": 4.0, "depth": 3, "mix": 0.6},
@@ -564,7 +1078,8 @@ PRESETS: dict[str, dict[str, dict]] = {
                           "echo": {"delay": 300, "feedback": 0.45, "mix": 0.3, "tone": 2500},
                           "reverb": {"size": 0.9, "tone": 2500, "mix": 0.4}},
     "Walkie-talkie":     {"compressor": {"threshold": -30, "ratio": 8, "boost": 16},
-                          "radio": {"low": 450, "high": 2700, "drive": 10, "noise": 0.01}},
+                          "radio": {"low": 450, "high": 2700, "drive": 10, "noise": 0.01,
+                                    "squelch": 1}},
     "Old telephone":     {"compressor": {"threshold": -25, "ratio": 4, "boost": 10},
                           "radio": {"low": 300, "high": 3400, "drive": 4, "noise": 0.002}},
     "Megaphone":         {"compressor": {"threshold": -28, "ratio": 6, "boost": 8},
@@ -583,7 +1098,9 @@ PRESETS: dict[str, dict[str, dict]] = {
                           "tone": {"bass": 3, "presence": 3, "treble": 1}},
 }
 
-PRESET_ICONS = {"Chipmunk": "🐿️", "Deep voice": "🐻", "Demon": "👹", "Robot": "🤖",
-                "Alien": "👽", "Ghost": "👻", "Walkie-talkie": "📻", "Old telephone": "☎️",
-                "Megaphone": "📢", "Stadium announcer": "🏟️", "Cave": "🦇",
-                "Podcast voice": "🎙️"}
+PRESET_ICONS = {"Chipmunk": "🐿️", "Deep voice": "🐻", "Female voice": "👩", "Male voice": "👨",
+                "Demon": "👹", "Robot": "🤖", "Talkbox": "🎹", "Autotune": "🎤",
+                "Masked caller": "🔪", "Anonymous": "🕶️", "Dark lord": "⛑️",
+                "Hothead": "😡", "Alien": "👽", "Ghost": "👻", "Walkie-talkie": "📻",
+                "Old telephone": "☎️", "Megaphone": "📢", "Stadium announcer": "🏟️",
+                "Cave": "🦇", "Podcast voice": "🎙️"}
