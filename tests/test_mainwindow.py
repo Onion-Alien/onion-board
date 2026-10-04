@@ -327,6 +327,20 @@ def test_speed_redline_unlocks_the_silly_range(window):
     b.meter.grab()                                           # paints without errors
 
 
+def test_speed_popup_shrinks_back_when_redline_locks(window, qapp):
+    b = window.speed_btn
+    b.click()
+    qapp.processEvents()
+    closed = b.pop.height()
+    b.redline.click()
+    qapp.processEvents()
+    assert b.pop.height() > closed                           # room for the rev meter
+    b.redline.click()
+    qapp.processEvents()
+    assert b.pop.height() == closed                          # and gives it back
+    b.pop.hide()
+
+
 def test_every_tab_has_its_own_label(window):
     texts = [window.tabs.tabText(i) for i in range(window.tabs.count())]
     assert texts == [t for t, _ in main.TABS] and len(set(texts)) == len(texts)
@@ -614,3 +628,26 @@ def test_the_window_shows_which_version_is_running(window, monkeypatch):
     assert window.windowTitle() == f"Onion Board {__version__} from source"
     monkeypatch.setattr("sys.frozen", True, raising=False)
     assert mainwindow.version_text() == __version__     # the installed app: just the number
+
+
+def test_empty_status_line_takes_no_room(window):
+    """No message, no row: the mixer sits at the bottom with only the margin under it."""
+    window.resize(1200, 800)
+    window.show()
+    QApplication.processEvents()
+    st = window.status
+    window.status.setText("")
+    QApplication.processEvents()
+    assert not st.isVisible()
+    gap = window._full.height() - window.mixer.geometry().bottom()
+    assert gap <= 12
+    st.setText("1 audio drop-out since start")
+    assert st.isVisible()
+    st.set_room(True)            # window too short: stays hidden, even for a new message
+    st.setText("Category: All")
+    assert not st.isVisible()
+    st.set_room(False)
+    assert st.isVisible()
+    st.setText("")
+    st.set_room(False)           # room again, but nothing to say
+    assert not st.isVisible()
