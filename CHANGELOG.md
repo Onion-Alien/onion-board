@@ -7,6 +7,17 @@
   showed a blank mini player (no pads, not even Bun). The mini player now shows
   every pad, and a board whose pads are all filtered out says so instead of
   showing nothing.
+- **UI polish:** consistent painted icons replace emoji controls and search stats;
+  search and app cards highlight on hover, with keyboard focus and playback on
+  search cards. Compact voice controls, an Apps card-size slider that remembers
+  its setting, and activity dots beside volume sliders reduce visual clutter.
+  Country names now lead the flat map's label hierarchy, with quieter town names.
+- **Honest download progress:** audio cards stay at 0% while preparing, show real
+  download progress, and keep that progress visible while processing the audio.
+- **Readable network activity:** theme-aware headers and alternating rows,
+  bounded resizable columns, full-text tooltips and horizontal scrolling keep
+  long entries from hiding the rest of the log.
+
 - **A narrow window stays the whole app:** every tab now fits down to where the
   mini player takes over (about 440 px wide). The tab icons' spacing alone held
   it at about 480 px, so a narrow window turned into the mini player on whatever

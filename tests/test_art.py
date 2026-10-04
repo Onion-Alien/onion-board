@@ -81,18 +81,18 @@ def panel(qapp, art_dir, monkeypatch):
     p.deleteLater()
 
 
-def test_tiles_use_pictures_when_there_are_some(panel):
+def test_voice_tiles_use_consistent_line_icons(panel):
     robot, demon = panel.fx._tile["Robot"], panel.fx._tile["Demon"]
     assert robot.text() == "Robot" and not robot.icon().isNull()
-    assert demon.text().endswith("Demon") and demon.text() != "Demon"   # keeps its emoji
+    assert demon.text() == "Demon" and not demon.icon().isNull()
 
 
-def test_voice_tab_icon_follows_what_is_on(panel):
+def test_voice_tab_keeps_its_icon_and_reports_live_state(panel):
     assert panel.tab_icon() == "voice"                 # nothing on: the painted mask
     seen = []
     panel.active_changed.connect(seen.append)
     panel.fx.pick("Robot")
-    assert panel.tab_icon() == "art:voice-robot"
+    assert panel.tab_icon() == "voice"
     assert seen and seen[-1] is True
     panel.fx.pick("Demon")                             # no picture for it
     assert panel.tab_icon() == "voice"

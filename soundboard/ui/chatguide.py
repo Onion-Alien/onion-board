@@ -19,7 +19,7 @@ from PySide6.QtWidgets import (QApplication, QDialog, QHBoxLayout, QLabel, QPush
                                QVBoxLayout)
 
 from soundboard import chatcheck, theme
-from soundboard.ui import busy, fit
+from soundboard.ui import busy, fit, icons
 from soundboard.ui.bunnywidget import BunnyWidget
 from soundboard.ui.crashdialog import free_dialog
 
@@ -202,7 +202,7 @@ class DiscordGuide(QDialog):
         v = QVBoxLayout(self)
         v.setContentsMargins(24, 20, 24, 18)
         v.setSpacing(12)
-        v.addLayout(_header("🎧  Discord: sound clean", _label(
+        v.addLayout(_header("Discord: sound clean", _label(
             "Discord cleans up your mic for <b>talking</b>. Left on, that cleanup treats "
             "music and sound effects as background noise and chops them up, so your "
             "sounds reach your friends muffled and cut off. Two minutes, once:"),
@@ -231,7 +231,8 @@ class DiscordGuide(QDialog):
         self.result.hide()
         v.addWidget(self.result)
         row = QHBoxLayout()
-        copy = QPushButton("📋  Copy the mic name")
+        copy = QPushButton("Copy the mic name")
+        icons.set_icon(copy, "copy")
         copy.clicked.connect(lambda: (QApplication.clipboard().setText(vm),
                                       busy.flash(copy, "✓  Copied")))
         row.addWidget(copy)
@@ -299,7 +300,7 @@ class GameGuide(QDialog):
         v = QVBoxLayout(self)
         v.setContentsMargins(24, 20, 24, 18)
         v.setSpacing(12)
-        v.addLayout(_header("🎮  Game voice chat", _label(
+        v.addLayout(_header("Game voice chat", _label(
             "Games squeeze voice chat harder than Discord, and many clean up the mic the "
             "same way. In the game's <b>Audio</b> or <b>Voice chat</b> settings:"),
             BunnyWidget("headphones")))
@@ -328,7 +329,8 @@ class GameGuide(QDialog):
             "names the engine when it can tell. Otherwise <b>Vivox</b> suits most "
             "games.</li></ol>"))
         row = QHBoxLayout()
-        copy = QPushButton("📋  Copy the mic name")
+        copy = QPushButton("Copy the mic name")
+        icons.set_icon(copy, "copy")
         copy.clicked.connect(lambda: (QApplication.clipboard().setText(vm),
                                       busy.flash(copy, "✓  Copied")))
         row.addWidget(copy)

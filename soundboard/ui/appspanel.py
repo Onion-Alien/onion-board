@@ -19,7 +19,8 @@ import time
 from PySide6.QtCore import QFileInfo, QObject, QSize, Qt, QTimer, Signal
 from PySide6.QtGui import QPainter
 from PySide6.QtWidgets import (QCheckBox, QFileIconProvider, QFrame, QHBoxLayout, QLabel,
-                               QPushButton, QScrollArea, QSizePolicy, QVBoxLayout, QWidget)
+                               QPushButton, QScrollArea, QSizePolicy, QSlider,
+                               QVBoxLayout, QWidget)
 
 from soundboard import appaudio, library, theme, trash
 from soundboard.engine import SR
@@ -27,8 +28,9 @@ from soundboard.library import MAX_SECONDS, trim_silence
 from soundboard.recorder import ArmedRecorder
 from soundboard.ui import icons
 from soundboard.ui.bunnywidget import BunnyWidget
-from soundboard.ui.panel import CardGrid, UndoBar, VolumeControl, hint_label
+from soundboard.ui.panel import CardGrid, HoverCard, UndoBar, VolumeControl, hint_label
 from soundboard.ui.responsive import FitWidth
+from soundboard.wheelguard import no_wheel
 
 log = logging.getLogger(__name__)
 
@@ -95,7 +97,7 @@ class ElidedLabel(QLabel):
         p.drawText(r, int(self.alignment() | Qt.AlignVCenter), shown)
 
 
-class AppRow(QFrame):
+class AppRow(HoverCard):
     """One program, as a card: icon and name, its level, Send and Record, volume and
     Hear it myself."""
     send_toggled = Signal(object, bool)     # row, on
@@ -106,7 +108,6 @@ class AppRow(QFrame):
 
     def __init__(self, exe: str, meter_cls, vol: float = 1.0, hear: bool = False):
         super().__init__()
-        self.setObjectName("card")
         self.exe = exe
         self.app: appaudio.App | None = None
         self.capture: appaudio.AppCapture | None = None
@@ -320,7 +321,21 @@ class AppsTab(QWidget):
                                 "“Hear it myself”")
         icons.set_icon(self.btn_bin, "trash")
         self.btn_bin.clicked.connect(self.show_forgotten)
-        v.addWidget(self.btn_bin, 0, Qt.AlignLeft)
+        toolbar = QHBoxLayout()
+        toolbar.addWidget(self.btn_bin)
+        toolbar.addStretch(1)
+        size_label = QLabel("Card size")
+        size_label.setObjectName("muted")
+        toolbar.addWidget(size_label)
+        self.card_size = QSlider(Qt.Horizontal)
+        self.card_size.setRange(240, 480)
+        self.card_size.setValue(cfg.app_card_width)
+        self.card_size.setFixedWidth(100)
+        self.card_size.setAccessibleName("App card size")
+        self.card_size.setToolTip("App card size: smaller fits more programs across")
+        no_wheel(self.card_size)
+        toolbar.addWidget(self.card_size)
+        v.addLayout(toolbar)
         self.undo_bar = UndoBar("Remember the program again, as it was")
         v.addWidget(self.undo_bar)
         self.scroll = QScrollArea()
@@ -331,7 +346,8 @@ class AppsTab(QWidget):
         self.list_layout = QVBoxLayout(self.list)
         self.list_layout.setContentsMargins(0, 0, 6, 0)
         self.list_layout.setSpacing(6)
-        self.grid = CardGrid(min_w=CARD_MIN_W, gap=10)   # one card per program
+        self.grid = CardGrid(min_w=self.card_size.value(), gap=10)
+        self.card_size.valueChanged.connect(self._set_card_size)
         # nothing playing: Bun waits, a bit glum, above the how-to
         self.empty = QWidget()
         ev = QVBoxLayout(self.empty)
@@ -371,6 +387,14 @@ class AppsTab(QWidget):
         self._label_bin()
         if self.rows:   # remembered programs are picked up even if this tab is never opened
             QTimer.singleShot(1500, self.start)
+
+    def _set_card_size(self, width: int):
+        self.cfg.app_card_width = width
+        self.grid.min_w = width
+        self.grid.invalidate()
+        self.list.updateGeometry()
+        self.list_layout.activate()
+        self._save()
 
     # ------------------------------------------------------------------ lifecycle
     def showEvent(self, ev):

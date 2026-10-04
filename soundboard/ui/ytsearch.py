@@ -34,7 +34,7 @@ from soundboard.ui.bunnywidget import BunnyWidget
 from soundboard.ui.owl import H as OWL_H
 from soundboard.ui.owl import W as OWL_W
 from soundboard.ui.owl import OwlWidget
-from soundboard.ui.panel import CardGrid
+from soundboard.ui.panel import CardGrid, HoverCard
 from soundboard.ui.responsive import FitWidth
 from soundboard.ui.widgets import fmt_time
 
@@ -64,13 +64,12 @@ def stats_text(r: ytdl.Result, waiting: bool = False) -> tuple[str, str]:
     """(the card's line, its tooltip) for a hit's views, likes and comments: nothing
     for what the site didn't say, "…" for likes / comments still being looked up."""
     parts, tip = [], []
-    for n, icon, word in ((r.views, "", "views"), (r.likes, "👍 ", "likes"),
-                          (r.comments, "💬 ", "comments")):
+    for n, word in ((r.views, "views"), (r.likes, "likes"), (r.comments, "comments")):
         if n is not None:
-            parts.append(f"{icon}{fmt_count(n)}" + (" views" if word == "views" else ""))
+            parts.append(f"{fmt_count(n)} {word}")
             tip.append(f"{n:,} {word}")
         elif waiting and word != "views":
-            parts.append(f"{icon}…")
+            parts.append(f"… {word}")
     return " · ".join(parts), ", ".join(tip)
 
 
@@ -363,7 +362,43 @@ class ClampLabel(QLabel):
         p.end()
 
 
-class ResultRow(QFrame):
+class StatsLabel(ClampLabel):
+    """Compact metadata with the same painted symbols as the app's controls."""
+
+    def __init__(self):
+        super().__init__("", lines=1, bold=False)
+        self.fields = []
+
+    def set_stats(self, result, waiting):
+        self.fields = [(icon, fmt_count(n) if n is not None else "…")
+                       for n, icon in ((result.views, "triggers"), (result.likes, "like"),
+                                       (result.comments, "speech"))
+                       if n is not None or (waiting and icon != "triggers")]
+        text, tip = stats_text(result, waiting)
+        self.set_full(text, tip)
+        self.setAccessibleName(text)
+        self.setVisible(bool(text))
+
+    def paintEvent(self, e):
+        p = QPainter(self)
+        p.setFont(self.font())
+        p.setPen(QColor(theme.T["muted"]))
+        fm = self.fontMetrics()
+        side = max(12, min(16, fm.height()))
+        x = 0
+        for icon, text in self.fields:
+            room = self.width() - x - side - 5
+            if room < fm.horizontalAdvance("…"):
+                break
+            icons.icon(icon, "muted").paint(p, x, (self.height() - side) // 2, side, side)
+            x += side + 5
+            shown = fm.elidedText(text, Qt.ElideRight, room)
+            p.drawText(QPointF(x, (self.height() - fm.height()) / 2 + fm.ascent()), shown)
+            x += fm.horizontalAdvance(shown) + 14
+        p.end()
+
+
+class ResultRow(HoverCard):
     """One hit as a card: picture, title, channel and length, Play and Add."""
     play = Signal(object)
     add = Signal(object)
@@ -371,7 +406,8 @@ class ResultRow(QFrame):
     def __init__(self, r: ytdl.Result):
         super().__init__()
         self.result = r
-        self.setObjectName("card")
+        self.setFocusPolicy(Qt.StrongFocus)
+        self.setAccessibleName(r.title)
         v = QVBoxLayout(self)
         v.setContentsMargins(8, 8, 8, 8)
         v.setSpacing(6)
@@ -385,7 +421,7 @@ class ResultRow(QFrame):
                               lines=1, bold=False)
         self.sub.setObjectName("muted")
         v.addWidget(self.sub)
-        self.stats = ClampLabel("", lines=1, bold=False)
+        self.stats = StatsLabel()
         self.stats.setObjectName("muted")
         v.addWidget(self.stats)
         self.waiting = ytdl.needs_stats(r)   # likes / comments still to look up
@@ -408,6 +444,10 @@ class ResultRow(QFrame):
         v.addLayout(h)
         # the download's progress; its space is kept while hidden so the cards don't jump
         self.bar = QProgressBar()
+        self.bar.setObjectName("downloadprogress")
+        self.bar.setRange(0, 1000)
+        self.bar.setValue(0)
+        self.bar.setAccessibleName("Audio download progress")
         self.bar.setTextVisible(False)
         self.bar.setFixedHeight(5)
         pol = self.bar.sizePolicy()
@@ -432,10 +472,16 @@ class ResultRow(QFrame):
             self.play.emit(self.result)
         super().mouseDoubleClickEvent(e)
 
+    def keyPressEvent(self, e):
+        if e.key() in (Qt.Key_Return, Qt.Key_Enter, Qt.Key_Space):
+            if not busy.is_busy(self.btn_play):
+                self.play.emit(self.result)
+            e.accept()
+            return
+        super().keyPressEvent(e)
+
     def show_stats(self):
-        text, tip = stats_text(self.result, self.waiting)
-        self.stats.set_full(text, tip)
-        self.stats.setVisible(bool(text))
+        self.stats.set_stats(self.result, self.waiting)
 
     def _btn(self, kind: str) -> QPushButton:
         return self.btn_add if kind == "add" else self.btn_play
@@ -448,8 +494,13 @@ class ResultRow(QFrame):
         btn = self._btn(kind)
         if self._locked:
             busy.set_busy(btn, False)
-        self._release[kind] = busy.hold(btn, "Adding…" if kind == "add" else "Loading…")
-        self.bar.setRange(0, 0)   # sliding until the first percentage comes in
+        if not self._release:
+            self.bar.setValue(0)
+            self.bar.setToolTip("Preparing audio download · 0%")
+        text = ("Processing…" if self.bar.toolTip() == "Processing audio…" else
+                f"{'Adding' if kind == 'add' else 'Loading'}… {self.bar.value() / 10:.0f}%"
+                if self.bar.value() else "Preparing… 0%")
+        self._release[kind] = busy.hold(btn, text)
         self.bar.show()
 
     def set_progress(self, frac: float):
@@ -457,13 +508,14 @@ class ResultRow(QFrame):
         if not self._release:
             return
         if frac < 0:
-            self.bar.setRange(0, 0)
+            self.bar.setToolTip("Processing audio…")
         else:
-            self.bar.setRange(0, 1000)
-            self.bar.setValue(int(frac * 1000))
+            self.bar.setValue(max(self.bar.value(), min(1000, int(frac * 1000))))
+            self.bar.setToolTip(f"Downloading audio · {self.bar.value() / 10:.0f}%")
         for kind in self._release:
             word = "Adding…" if kind == "add" else "Loading…"
-            self._btn(kind).setText(word if frac < 0 else f"{word} {frac:.0%}")
+            self._btn(kind).setText("Processing…" if frac < 0 else
+                                    f"{word} {self.bar.value() / 10:.0f}%")
 
     def set_done(self, kind: str, ok: bool):
         release = self._release.pop(kind, None)

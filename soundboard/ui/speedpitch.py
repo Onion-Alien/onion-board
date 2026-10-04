@@ -15,6 +15,7 @@ from PySide6.QtWidgets import (QCheckBox, QFrame, QHBoxLayout, QLabel, QPushButt
                                QWidget)
 
 from soundboard import theme, voicefx
+from soundboard.ui import icons
 from soundboard.ui.panel import hint_label
 from soundboard.ui.voicepanel import ParamSlider
 
@@ -141,7 +142,8 @@ class SpeedPitchButton(QPushButton):
         v.addWidget(self.keep)
 
         # --- Redline: greyed out until you ask for it
-        self.redline = QPushButton(f"🔒  Redline — up to {redline:g}x")
+        self.redline = QPushButton(f"Redline — up to {redline:g}x")
+        icons.set_icon(self.redline, "shield", size=14)
         self.redline.setObjectName("small")
         self.redline.setCheckable(True)
         self.redline.setToolTip(f"Unlock silly speeds (up to {redline:g}x) and pitch "
@@ -192,7 +194,7 @@ class SpeedPitchButton(QPushButton):
         if self.redline.isChecked() != on:
             self.redline.setChecked(on)   # comes back here through toggled
             return
-        self.redline.setText(("🔥" if on else "🔒") + self.redline.text()[1:])
+        icons.set_icon(self.redline, "wave" if on else "shield", size=14)
         self.speed.set_param(self._speed_hi if on else SPEED)
         self.pitch.set_param(REDLINE_PITCH if on else PITCH)
         self.red_box.setVisible(on)

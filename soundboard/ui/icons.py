@@ -397,8 +397,52 @@ def _chevron(direction):
     return draw
 
 
+def _shuffle(p, fill):
+    for points in (((3, 6), (7, 6), (17, 18), (21, 18)),
+                   ((3, 18), (7, 18), (17, 6), (21, 6))):
+        path = QPainterPath(QPointF(*points[0]))
+        for pt in points[1:]:
+            path.lineTo(*pt)
+        p.drawPath(path)
+    for y in (6, 18):
+        p.drawLine(QPointF(18, y - 3), QPointF(21, y))
+        p.drawLine(QPointF(21, y), QPointF(18, y + 3))
+
+
+def _star(p, fill, solid=False):
+    path = QPainterPath()
+    for i in range(10):
+        a = -math.pi / 2 + i * math.pi / 5
+        r = 9 if i % 2 == 0 else 4.2
+        point = QPointF(12 + r * math.cos(a), 12 + r * math.sin(a))
+        path.moveTo(point) if i == 0 else path.lineTo(point)
+    path.closeSubpath()
+    fill(path) if solid else p.drawPath(path)
+
+
+def _like(p, fill):
+    p.drawRoundedRect(QRectF(3, 10, 4, 11), 1, 1)
+    path = QPainterPath(QPointF(7, 11))
+    for pt in ((11, 6), (12, 2), (15, 3), (15, 9), (20, 9),
+               (21, 11), (19, 20), (17, 21), (7, 21)):
+        path.lineTo(*pt)
+    path.closeSubpath()
+    p.drawPath(path)
+
+
+def _copy(p, fill):
+    p.drawRoundedRect(QRectF(8, 8, 12, 13), 2, 2)
+    path = QPainterPath(QPointF(5, 16))
+    for pt in ((3, 16), (3, 3), (15, 3), (15, 5)):
+        path.lineTo(*pt)
+    p.drawPath(path)
+
+
 SHAPES = {
-    "sounds": _grid, "browser": _globe, "voice": _mask, "setup": _sliders, "wave": _wave,
+    "shuffle": _shuffle, "star": _star,
+    "star_filled": lambda p, fill: _star(p, fill, True), "like": _like, "copy": _copy,
+    "sounds": _grid, "browser": _globe, "voice": _mask, "setup": _sliders,
+    "sliders": _sliders, "wave": _wave,
     "mic": _mic, "headphones": _headphones, "volume": _volume, "ear": _ear,
     "play": _play, "pause": _pause, "stop": _stop, "record": _record, "plus": _plus,
     "settings": _gear, "history": _history, "leaf": _leaf, "live": _live,
