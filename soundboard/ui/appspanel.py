@@ -85,12 +85,19 @@ class _Lister(QObject):
 
 class ElidedLabel(QLabel):
     """A one-line label that ends in "…" when it doesn't fit (the full text in its
-    tooltip), instead of being cut off mid-word."""
+    tooltip), instead of being cut off mid-word. With `hide_overflow` it shows nothing
+    instead: for interface text half a phrase only looks broken."""
+
+    def __init__(self, text: str = "", hide_overflow: bool = False):
+        super().__init__(text)
+        self.hide_overflow = hide_overflow
 
     def paintEvent(self, e):
         text = self.text()
         r = self.contentsRect()
         shown = self.fontMetrics().elidedText(text, Qt.ElideRight, r.width())
+        if shown != text and self.hide_overflow:
+            shown = ""
         self.setToolTip(text if shown != text else "")
         p = QPainter(self)
         p.setPen(self.palette().color(self.foregroundRole()))

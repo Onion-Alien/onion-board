@@ -510,18 +510,19 @@ class Pad(QAbstractButton):
             p.setPen(muted)
             right = "❚❚ paused" if self.paused else f"{flags}{self.meta.duration:.1f}s"
             p.drawText(foot, Qt.AlignRight | Qt.AlignVCenter, right)
-            if self.meta.hotkey:
-                hk = (midi.short(self.meta.hotkey) if midi.is_midi(self.meta.hotkey)
-                      else pretty_key(self.meta.hotkey))
-                fm = p.fontMetrics()
-                w = min(fm.horizontalAdvance(hk) + 12, foot.width() * 0.68)
+            hk = self.meta.hotkey and (midi.short(self.meta.hotkey)
+                                       if midi.is_midi(self.meta.hotkey)
+                                       else pretty_key(self.meta.hotkey))
+            fm = p.fontMetrics()
+            # a cut-off key ("Ctrl+Al…") says nothing: no badge on a pad too narrow
+            if hk and fm.horizontalAdvance(hk) + 12 <= foot.width() * 0.68:
+                w = fm.horizontalAdvance(hk) + 12
                 badge = QRectF(foot.left(), foot.top() + 1, w, foot.height() - 2)
                 p.setPen(Qt.NoPen)
                 p.setBrush(QColor(T["badge"]))
                 p.drawRoundedRect(badge, 5, 5)
                 p.setPen(QColor(T["badge_text"]))
-                p.drawText(badge, Qt.AlignCenter,
-                           fm.elidedText(hk, Qt.ElideRight, int(badge.width()) - 8))
+                p.drawText(badge, Qt.AlignCenter, hk)
 
 
     def _paint_slim(self):
@@ -670,6 +671,7 @@ class PadGrid(QWidget):
         ev.addWidget(self.bun, 0, Qt.AlignHCenter)
         self.empty_text = QLabel(self.HOW_TO)
         self.empty_text.setAlignment(Qt.AlignCenter)   # short lines: fits the mini player
+        self.empty_text.setWordWrap(True)   # and wraps rather than losing both ends
         self.empty_text.setObjectName("empty")
         ev.addWidget(self.empty_text)
         self._cols = 0

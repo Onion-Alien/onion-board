@@ -62,8 +62,8 @@ from soundboard.ui.widgets import (Meter, Pad, PadGrid, SeekSlider, expand_dropp
                                    pad_height, spectrum, SLIM_PAD_H)
 from soundboard.wheelguard import no_wheel
 from soundboard.winkeys import Hotkeys
-
 from soundboard import errors
+
 log = logging.getLogger(__name__)
 
 
@@ -468,7 +468,7 @@ class MainWindow(QMainWindow):
         for b in (self.mini_pp, self.mini_st):
             b.setFixedSize(34, 30)
             top.addWidget(b)
-        self.mini_name = ElidedLabel(self.np_name.text())
+        self.mini_name = ElidedLabel(self.np_name.text(), hide_overflow=True)
         self.mini_name.setTextFormat(Qt.PlainText)   # sound names are user / web text
         self.mini_name.setStyleSheet("font-weight:600;")
         self.mini_name.setMinimumWidth(30)
@@ -512,7 +512,7 @@ class MainWindow(QMainWindow):
     def _set_np_name(self, text: str):
         self.np_name.setText(self.np_name.fontMetrics().elidedText(text, Qt.ElideRight, 186))
         self.np_name.setToolTip(text)
-        self.mini_name.setText(text)   # elides itself to whatever room it has
+        self.mini_name.setText(text)   # hides itself when it has no room
 
     def _build_mixer(self) -> QFrame:
         """The levels strip along the bottom, the same on every tab: three labelled

@@ -49,6 +49,30 @@ def test_overlapping_flashes_restore_the_original_label(qapp):
     process_events(qapp, lambda: btn.text() == "Copy")
 
 
+def test_a_done_label_is_never_cut_off(qapp):
+    """A "✓ Stopped" stands in for the button's icon, and where the layout can't make
+    room for it (a full header) it's just the tick, never "✓ Stoppe"."""
+    from PySide6.QtWidgets import QHBoxLayout, QWidget
+    from soundboard.ui import icons
+    host = QWidget()
+    lay = QHBoxLayout(host)
+    btn = QPushButton("Stop all")
+    icons.set_icon(btn, "stop", size=14)
+    lay.addWidget(btn)
+    host.show()
+    busy.flash(btn, "✓ Stopped", ms=200)
+    assert btn.icon().isNull()
+    assert process_events(qapp, lambda: btn.width() >= btn.sizeHint().width())
+    assert btn.text() == "✓ Stopped"
+    assert process_events(qapp, lambda: btn.text() == "Stop all")
+    assert not btn.icon().isNull()
+    host.setFixedWidth(60)   # no room to grow
+    busy.flash(btn, "✓ Stopped with a much longer message", ms=200)
+    assert process_events(qapp, lambda: btn.text() == "✓")
+    assert process_events(qapp, lambda: btn.text() == "Stop all")
+    host.close()
+
+
 def test_hold_release(qapp):
     btn = QPushButton("Check")
     release = busy.hold(btn, "Checking…")
