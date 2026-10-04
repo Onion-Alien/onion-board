@@ -93,6 +93,7 @@ def test_the_headphones_are_never_what_others_hear(win, opened):
     assert opened["main"][-1] is None    # you'd hear everything twice, your voice too
     assert win.setup_state == "unrouted"
     assert "headphones" in win.setup_hint.text()
+    assert "Nowhere" in win.step_lbl.text() and "plugged in" not in win.step_lbl.text()
     assert "Not sending" in win.pill.text()
 
 
@@ -108,6 +109,23 @@ def test_nowhere_closes_the_send_and_frees_the_cable_for_the_stream_output(win, 
     win.set_route("cable")
     assert opened["main"][-1] == CABLE and opened["obs"][-1] is None
     assert not win.main_row[1].isHidden() and win.main_row[1].text() == "Send into (the cable)"
+
+
+def test_the_live_switch_never_says_others_hear_you_while_nothing_is_sent(win):
+    win._air_size = 0                    # the full label
+    win.set_sending(True)
+    assert win.btn_air.text() == "Live — others hear you"
+    win.set_route("device", PHONES)      # the headphones: nothing is sent
+    assert win.btn_air.text() == "Only you hear sounds"
+    win.set_route("off")
+    assert win.btn_air.text() == "Only you hear sounds"
+    win.set_obs_device("Speakers")       # muting still silences the stream output
+    assert win.btn_air.text() == "Live — stream output only"
+    win.btn_air.setChecked(False)
+    assert win.btn_air.text() == "Muted — others hear nothing"
+    win.btn_air.setChecked(True)
+    win.set_route("cable")
+    assert win.btn_air.text() == "Live — others hear you"
 
 
 def test_the_route_picker_and_its_settings_mirror(win, opened):
