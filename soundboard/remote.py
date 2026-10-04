@@ -416,7 +416,10 @@ def setup_prompt(cfg, port: int, token: str = "") -> str:
         names.append(f"- … and {len(sounds) - PROMPT_SOUNDS} more (GET /api/sounds lists "
                      "them all)")
     example = sounds[0].name if sounds else "Airhorn"
-    cat = cfg.categories[0] if cfg.categories else "Memes"
+    # a category of theirs, or none: a made-up one would answer 404
+    cat = cfg.categories[0] if cfg.categories else ""
+    rnd = (f"Random sound from a category: {base}/api/random?category={quote(cat)}&token={key}"
+           if cat else f"Random sound (any of them): {base}/api/random?category=&token={key}")
     endpoints = "\n".join(f"- /api/{a} — {d}" for a, d in ENDPOINTS.items())
     key_note = ("" if token else
                 f"\nMy key isn't in this message: write {KEY_PLACEHOLDER} wherever it goes "
@@ -449,7 +452,7 @@ ENDPOINTS
 
 EXAMPLES
 - Play a sound: {base}/api/play?name={quote(example)}&token={key}
-- Random sound from a category: {base}/api/random?category={quote(cat)}&token={key}
+- {rnd}
 - Stop everything: {base}/api/stop?token={key}
 - Panic button (others hear nothing until pressed again): \
 {base}/api/live?on=toggle&token={key}

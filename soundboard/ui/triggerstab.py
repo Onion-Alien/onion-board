@@ -183,13 +183,19 @@ class TriggersTab(QWidget):
         except (AttributeError, RuntimeError):
             return None
 
+    def _trigger_count(self) -> int:
+        """How many triggers are saved: Onion Watch 0.6+ keeps those past the 50th
+        under "more_triggers" (older versions never read that key)."""
+        s = self.host.screen
+        return len(s.get("triggers") or []) + len(s.get("more_triggers") or [])
+
     def _base(self):
         """The modules folder Onion Watch is installed into."""
         return self._dirs[0] if self._dirs else None
 
     def _label_get(self, error: str = ""):
         """The Hoot page's words: first time, or after it failed to load."""
-        n = len(self.host.screen.get("triggers") or [])
+        n = self._trigger_count()
         broken = self.info is not None and self.panel is None and not self._busy
         self.title.setText("Onion Watch couldn't start" if broken and error else
                            "Get Onion Watch for the Triggers tab")
@@ -349,7 +355,7 @@ class TriggersTab(QWidget):
 
     # ------------------------------------------------------------------ removing it
     def confirm_remove(self) -> bool:
-        n = len(self.host.screen.get("triggers") or [])
+        n = self._trigger_count()
         kept = (f" Your {plural(n, 'trigger')} and {'its' if n == 1 else 'their'} pictures "
                 "are kept for when you get it again." if n else "")
         return QMessageBox.question(
@@ -396,7 +402,7 @@ class TriggersTab(QWidget):
         self.info = None
         self._label_get()
         self.stack.setCurrentWidget(self.get_page)
-        n = len(self.host.screen.get("triggers") or [])
+        n = self._trigger_count()
         busy.toast(self, "✓ Onion Watch removed." + (" Your triggers are kept." if n else ""),
                    "ok")
 

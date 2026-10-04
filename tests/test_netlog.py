@@ -276,6 +276,15 @@ def test_activity_columns_stay_bounded_and_last_column_is_reachable(qapp):
     qapp.processEvents()
     assert table.columnWidth(0) < 250
     assert table.item(0, 0).toolTip()
+    # Settings' default width (a ~460 px table): the columns give way, so Last shows
+    # unscrolled
+    for width in (580, 462):
+        table.resize(width, 260)
+        qapp.processEvents()
+        assert table.horizontalScrollBar().maximum() == 0, width
+        assert all(table.columnWidth(c) >= 64 for c in range(6))
+    table.resize(380, 260)   # narrower than even that: it scrolls instead
+    qapp.processEvents()
     assert table.horizontalScrollBar().maximum() > 0
     table.scrollToItem(table.item(0, 5), QAbstractItemView.PositionAtCenter)
     qapp.processEvents()

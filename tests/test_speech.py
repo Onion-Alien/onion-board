@@ -537,6 +537,10 @@ def test_windows_speech_that_stops_answering_is_restarted():
         def kill(self):
             self.killed = True
 
+        def wait(self, timeout=None):   # it's waited for so it lets go of its .wav
+            assert self.killed
+            return 1
+
     t, proc = SapiTTS(), Proc()
     t._proc, t._out = proc, queue.Queue()
     with pytest.raises(RuntimeError, match="stopped answering"):

@@ -16,9 +16,10 @@
 #   -NoInstaller  stop after the app folder; skips the slow Inno Setup compression
 param([string]$AppDir, [string]$InstallerDir, [switch]$Clean, [switch]$NoInstaller)
 $ErrorActionPreference = "Stop"
-# relative to where the caller ran us, not to the repo (we cd into it below)
-if ($AppDir) { $AppDir = [IO.Path]::GetFullPath((Join-Path (Get-Location) $AppDir)) }
-if ($InstallerDir) { $InstallerDir = [IO.Path]::GetFullPath((Join-Path (Get-Location) $InstallerDir)) }
+# relative to where the caller ran us, not to the repo (we cd into it below); an
+# absolute one (E:\out) stays as it is, which Join-Path got wrong
+if ($AppDir) { $AppDir = [IO.Path]::GetFullPath([IO.Path]::Combine((Get-Location).Path, $AppDir)) }
+if ($InstallerDir) { $InstallerDir = [IO.Path]::GetFullPath([IO.Path]::Combine((Get-Location).Path, $InstallerDir)) }
 Set-Location $PSScriptRoot
 
 $py = ".venv\Scripts\python.exe"

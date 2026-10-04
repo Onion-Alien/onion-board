@@ -215,6 +215,15 @@ def test_setup_prompt_holds_the_api_and_the_sounds_but_the_key_only_if_asked(win
     assert "token=secret-key-xyz" in p and remote.KEY_PLACEHOLDER not in p
 
 
+def test_setup_prompts_random_link_names_only_a_real_category(window):
+    cfg = window.cfg
+    cfg.categories = []   # a made-up "Memes" there answered 404
+    p = remote.setup_prompt(cfg, 7474)
+    assert "/api/random?category=&token=" in p and "category=Memes" not in p
+    cfg.categories = ["Game sounds"]
+    assert "/api/random?category=Game%20sounds&token=" in remote.setup_prompt(cfg, 7474)
+
+
 def test_streamer_guide_turns_it_on_and_copies_working_links(qapp, window):
     from PySide6.QtWidgets import QApplication
 

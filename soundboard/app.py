@@ -62,6 +62,29 @@ def wait_for_exit(pid: list[str], seconds: float = 30.0):
         log.debug("couldn't wait for the old copy", exc_info=True)
 
 
+def end_process(code: int):
+    """End this process at once with `code`, running nothing else first. os._exit
+    alone isn't enough on Windows: ExitProcess still runs every DLL's detach code
+    and static destructors, and with other threads still alive (Onion Watch's
+    watcher, the speech worker, an FFT pool) PySide6's crashed in them, so a clean
+    quit ended in an access violation and a Windows "stopped working" report.
+    TerminateProcess skips all of that; the settings are already saved."""
+    try:
+        sys.stdout and sys.stdout.flush()
+        sys.stderr and sys.stderr.flush()
+    except (OSError, ValueError):
+        pass
+    if sys.platform == "win32":
+        try:
+            k32 = ctypes.WinDLL("kernel32")
+            k32.GetCurrentProcess.restype = ctypes.c_void_p
+            k32.TerminateProcess.argtypes = (ctypes.c_void_p, ctypes.c_uint)
+            k32.TerminateProcess(k32.GetCurrentProcess(), code & 0xFFFFFFFF)
+        except (OSError, AttributeError):
+            pass
+    os._exit(code)
+
+
 def start_ytdlp_check(cfg):
     """The daily "is there a newer yt-dlp?" check, off the UI thread (see ytdl.py)."""
     import threading
@@ -317,4 +340,4 @@ def main():
     # invisible copy that still holds the single-instance lock, so every new launch
     # says "already running". Nothing left needs it: flush the log and end here.
     logging.shutdown()
-    os._exit(code)
+    end_process(code)
