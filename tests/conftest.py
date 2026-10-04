@@ -326,3 +326,5 @@ def _no_result_stats_lookups(monkeypatch):
     def offline(r):
         raise ytdl.FetchError("offline in tests")
     monkeypatch.setattr(ytdl, "stats", offline)
+    monkeypatch.setattr(ytdl, "_stats_paused_until", 0.0)   # a test's bot check stays in it
+    monkeypatch.setattr("soundboard.ui.ytsearch.STATS_GAP", 0)

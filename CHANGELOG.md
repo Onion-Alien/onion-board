@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+- **Searching YouTube no longer gets you taken for a bot so easily.** Since 1.6.5 every
+  YouTube search looked up each result's likes and comments the way a Play does
+  (the video page, then several of YouTube's player APIs and its player script):
+  dozens of requests within seconds, enough for YouTube to answer the next *Play*
+  or *Add* with "Sign in to confirm you're not a bot". Each look-up is now a single
+  page, one at a time, a second apart, and they stop for 30 minutes the moment
+  YouTube asks for a bot check or slows requests down (your own *Play* and *Add*
+  still go through). The message no longer suggests updating yt-dlp, which can't
+  help with that, and says what causes it.
+
 ## 1.6.7 — 2026-10-04
 
 - **A much better voice changer.**

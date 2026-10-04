@@ -17,6 +17,7 @@ import math
 import queue
 import random
 import threading
+import time
 
 from PySide6.QtCore import QEvent, QPointF, QRectF, QSize, QUrl, Qt, Signal
 from PySide6.QtGui import (QColor, QPainter, QPainterPath, QPixmap,
@@ -42,7 +43,8 @@ log = logging.getLogger(__name__)
 
 THUMB_W, THUMB_H = 128, 72   # the pictures' shape (16:9); they fill the card's width
 CARD_MIN_W = 210             # results are cards, as many across as fit at this width
-STATS_WORKERS = 2            # likes / comments looked up this many at a time
+STATS_WORKERS = 1            # likes / comments looked up this many at a time
+STATS_GAP = 1.0              # ...and this many seconds apart: a burst looks like a bot
 TIPS = {"youtube": "Search YouTube",
         "ytmusic": "Search YouTube Music: songs, the official versions",
         "soundcloud": "Search SoundCloud",
@@ -737,11 +739,19 @@ class SearchResults(QFrame):
             t.start()
 
     def _stats_work(self):
-        """Likes and comments for the hits that came without them, a couple at a time,
-        never while a Play / Add downloads. A newer search drops the rest."""
+        """Likes and comments for the hits that came without them, one at a time and
+        STATS_GAP apart, never while a Play / Add downloads, and not at all while the
+        site is pushing back (ytdl.stats_paused). A newer search drops the rest."""
         while True:
             gen, r = self._todo.get()
             self._quiet.wait()
+            if gen != self._gen:
+                continue
+            if ytdl.stats_paused():   # the card keeps its views, without "…"
+                self._stats.emit(gen, r, (None, None, None))
+                continue
+            time.sleep(STATS_GAP)
+            self._quiet.wait()        # a Play / Add clicked meanwhile goes first
             if gen != self._gen:
                 continue
             try:

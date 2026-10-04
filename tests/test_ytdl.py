@@ -737,6 +737,41 @@ def test_result_counts_come_from_the_search_or_one_look_up_per_video(monkeypatch
     assert _real_stats(yt) == (5, 4, None)
     assert seen["url"] == yt.url and not seen["download"] and not seen["process"]
     assert "format" not in seen["opts"]
+    # one page, no other player client or JS player: a search mustn't look like a bot
+    assert seen["opts"]["extractor_args"] == ytdl.STATS_ARGS
+    assert seen["opts"]["ignore_no_formats_error"]
+
+
+def test_a_bot_check_pauses_the_likes_look_ups(monkeypatch):
+    yt = ytdl._youtube_hit({"id": "HEXWRTEbj1I", "title": "What Is Love"})
+    calls = []
+
+    class YoutubeDL:
+        def __init__(self, opts):
+            self.logger = opts["logger"]
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *a):
+            return False
+
+        def extract_info(self, url, download=True, process=True):
+            calls.append(url)   # yt-dlp only warns: the look-up carries on without it
+            self.logger.warning("[youtube] Sign in to confirm you’re not a bot.")
+            return {"view_count": 5}
+    monkeypatch.setitem(sys.modules, "yt_dlp", types.SimpleNamespace(YoutubeDL=YoutubeDL))
+    monkeypatch.setattr(ytdl, "install", lambda *a, **k: None)
+    assert not ytdl.stats_paused()
+    assert _real_stats(yt) == (5, None, None)
+    assert ytdl.stats_paused()
+    with pytest.raises(ytdl.DownloadError):   # paused: the site isn't asked again
+        _real_stats(yt)
+    assert len(calls) == 1
+    monkeypatch.setattr(ytdl, "_stats_paused_until", 0.0)
+    ytdl._readable(RuntimeError("ERROR: [youtube] x: Sign in to confirm you're not a bot"))
+    assert ytdl.stats_paused()                # a Play's bot check pauses them too
+    ytdl._readable(RuntimeError("ERROR: HTTP Error 404: Not Found"))
 
 
 def test_a_download_locks_the_other_cards_and_shows_its_progress(qapp, monkeypatch):
