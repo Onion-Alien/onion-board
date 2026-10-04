@@ -23,7 +23,8 @@ from PySide6.QtGui import (QColor, QFont, QFontMetrics, QGuiApplication, QPainte
 from PySide6.QtWidgets import (QButtonGroup, QCheckBox, QComboBox, QFrame, QHBoxLayout,
                                QLabel, QLineEdit, QListWidget, QListWidgetItem,
                                QPushButton, QSizePolicy, QSplitter, QStyle,
-                               QStyledItemDelegate, QVBoxLayout, QWidget)
+                               QStyledItemDelegate, QStyleOptionComboBox, QVBoxLayout,
+                               QWidget)
 
 from soundboard import library, radio, theme
 from soundboard.engine import SR
@@ -257,6 +258,76 @@ class _StationDelegate(QStyledItemDelegate):
                 QTimer.singleShot(0, lambda: self.tab._play_or_stop(uuid))
                 return True
         return super().editorEvent(ev, model, opt, idx)
+
+
+class _FilterRow(QWidget):
+    """The country / quality / sort boxes: side by side while their words fit, else
+    country on a row of its own above the other two, else one box a row. Squeezed
+    into one row they read "All coun", "Any qua" in a narrow window."""
+
+    GAP = 6
+
+    def __init__(self, combos: list[QComboBox]):
+        super().__init__()
+        self.combos = combos
+        self.rows = 0
+        v = QVBoxLayout(self)
+        v.setContentsMargins(0, 0, 0, 0)
+        v.setSpacing(self.GAP)
+        self._lines = []
+        for _ in combos:
+            h = QHBoxLayout()
+            h.setSpacing(self.GAP)
+            v.addLayout(h)
+            self._lines.append(h)
+        self._arrange(1)
+        for c in combos:   # a longer choice picked may need another row
+            c.currentIndexChanged.connect(lambda _i: self._arrange(self.rows_for(self.width())))
+
+    @staticmethod
+    def needs(c: QComboBox) -> int:
+        """The width that shows the box's longest choice in full, arrow included (for
+        a long list, like every country, the first choice and the one showing)."""
+        fm = c.fontMetrics()
+        texts = ([c.itemText(i) for i in range(c.count())] if c.count() <= 10
+                 else [c.itemText(0), c.currentText()])
+        text = max((fm.horizontalAdvance(t) for t in texts), default=0)
+        opt = QStyleOptionComboBox()
+        c.initStyleOption(opt)
+        full = c.style().sizeFromContents(QStyle.CT_ComboBox, opt, QSize(text, fm.height()), c)
+        return max(c.minimumSizeHint().width(), full.width())
+
+    def fits(self, idx: list[int], width: int) -> bool:
+        """Whether these boxes side by side in `width` each get their words' room
+        (_arrange shares a row out in proportion to what each box needs)."""
+        return sum(self.needs(self.combos[i]) for i in idx) + self.GAP * (len(idx) - 1) <= width
+
+    def rows_for(self, width: int) -> int:
+        every = list(range(len(self.combos)))
+        if self.fits(every, width):
+            return 1
+        if self.fits(every[1:], width):
+            return 2
+        return len(every)
+
+    def _arrange(self, rows: int):
+        if rows != self.rows:
+            self.rows = rows
+            for h in self._lines:
+                while h.count():
+                    h.takeAt(0)
+            for i, c in enumerate(self.combos):
+                line = 0 if rows == 1 else (min(i, 1) if rows == 2 else i)
+                self._lines[line].addWidget(c)
+            self.updateGeometry()
+        for c in self.combos:   # a box's share of its row: what its words need
+            for h in self._lines:
+                if h.indexOf(c) >= 0:
+                    h.setStretch(h.indexOf(c), self.needs(c))
+
+    def resizeEvent(self, e):
+        super().resizeEvent(e)
+        self._arrange(self.rows_for(self.width()))
 
 
 class RadioTab(QWidget):
@@ -520,8 +591,6 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
         fv = QVBoxLayout(self.filter_box)
         fv.setContentsMargins(0, 0, 0, 0)
         fv.setSpacing(8)
-        row = QHBoxLayout()
-        row.setSpacing(6)
         self.cmb_country = QComboBox()
         self.cmb_country.setToolTip("Only stations from this country")
         self.cmb_country.setSizeAdjustPolicy(QComboBox.AdjustToMinimumContentsLengthWithIcon)
@@ -529,20 +598,18 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
         self.cmb_country.addItem("All countries", "")
         self.cmb_country.activated.connect(
             lambda _i: self.set_country(self.cmb_country.currentData() or ""))
-        row.addWidget(self.cmb_country, 3)
         self.cmb_quality = QComboBox()
         self.cmb_quality.setToolTip("Only stations streaming at least this bitrate")
         for label, kbps in QUALITIES:
             self.cmb_quality.addItem(label, kbps)
         self.cmb_quality.activated.connect(lambda _i: self._on_filter())
-        row.addWidget(self.cmb_quality, 2)
         self.cmb_sort = QComboBox()
         self.cmb_sort.setToolTip("Sort the list")
         for label, _key in SORTS:
             self.cmb_sort.addItem(label)
         self.cmb_sort.activated.connect(lambda _i: self._show_list())
-        row.addWidget(self.cmb_sort, 2)
-        fv.addLayout(row)
+        self.filter_row = _FilterRow([self.cmb_country, self.cmb_quality, self.cmb_sort])
+        fv.addWidget(self.filter_row)
         row = QHBoxLayout()
         row.setContentsMargins(2, 0, 4, 0)
         self.count_label = QLabel()
