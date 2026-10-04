@@ -63,6 +63,21 @@ def test_switching_addons_off_during_retry_prevents_another_connection(monkeypat
     assert calls == [watchaddon.API]
 
 
+def test_cancel_during_a_gateway_error_stops_before_the_retry(monkeypatch):
+    calls, cancel = [], []
+
+    def open_(req, **kw):
+        calls.append(req.full_url)
+        cancel.append(True)   # the user presses Cancel while the first answer is awaited
+        raise urllib.error.HTTPError(req.full_url, 504, "Gateway Timeout", {}, None)
+
+    monkeypatch.setattr(net, "urlopen", open_)
+    monkeypatch.setattr(watchaddon, "local_zip", lambda: None)
+    with pytest.raises(updates.UpdateError, match="cancelled"):
+        watchaddon.latest(lambda: bool(cancel))
+    assert calls == [watchaddon.API]
+
+
 def test_addon_gateway_error_does_not_blame_the_users_connection():
     err = urllib.error.HTTPError(watchaddon.API, 504, "Gateway Timeout", {}, None)
     assert "temporarily unavailable" in watchaddon.friendly(err)

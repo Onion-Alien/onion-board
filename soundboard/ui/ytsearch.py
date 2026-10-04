@@ -18,7 +18,7 @@ import random
 import threading
 import time
 
-from PySide6.QtCore import QPointF, QRectF, QSize, QTimer, QUrl, Qt, Signal
+from PySide6.QtCore import QEvent, QPointF, QRectF, QSize, QTimer, QUrl, Qt, Signal
 from PySide6.QtGui import (QColor, QLinearGradient, QPainter, QPainterPath, QPixmap,
                            QTextLayout)
 from PySide6.QtNetwork import QNetworkAccessManager, QNetworkRequest
@@ -238,6 +238,7 @@ class Thumb(QWidget):
     def __init__(self):
         super().__init__()
         self._pm: QPixmap | None = None
+        self._scaled: QPixmap | None = None   # _pm at this size: not scaled per paint
         self._icon = icons.icon("wave", "muted").pixmap(QSize(32, 32))
         self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
         policy = self.sizePolicy()
@@ -257,7 +258,7 @@ class Thumb(QWidget):
         return QSize(THUMB_W, THUMB_H)
 
     def set_pixmap(self, pm: QPixmap):
-        self._pm = pm
+        self._pm, self._scaled = pm, None
         self.update()
 
     def has_picture(self) -> bool:
@@ -276,8 +277,11 @@ class Thumb(QWidget):
             p.drawPixmap((w - self._icon.width()) // 2, (h - self._icon.height()) // 2,
                          self._icon)
         else:
-            pm = self._pm.scaled(w, h, Qt.KeepAspectRatioByExpanding,
-                                 Qt.SmoothTransformation)
+            pm = self._scaled
+            if pm is None or not (pm.width() >= w and pm.height() >= h and
+                                  (pm.width() == w or pm.height() == h)):
+                pm = self._scaled = self._pm.scaled(w, h, Qt.KeepAspectRatioByExpanding,
+                                                    Qt.SmoothTransformation)
             p.drawPixmap((w - pm.width()) // 2, (h - pm.height()) // 2, pm)
         p.end()
 
@@ -295,7 +299,17 @@ class ClampLabel(QLabel):
         self.setFont(f)
         self.setToolTip(text)
         self.setSizePolicy(QSizePolicy.Ignored, QSizePolicy.Fixed)
-        self.setFixedHeight(self.fontMetrics().lineSpacing() * lines + 2)
+        self._fit()
+
+    def _fit(self):
+        self.setFixedHeight(self.fontMetrics().lineSpacing() * self.lines + 2)
+
+    def changeEvent(self, e):
+        # the theme's font comes with its style sheet, after __init__ (and changes with
+        # the theme): sized by the font it had then, the last line lost its descenders
+        super().changeEvent(e)
+        if e.type() in (QEvent.FontChange, QEvent.StyleChange):
+            self._fit()
 
     def paintEvent(self, e):
         p = QPainter(self)

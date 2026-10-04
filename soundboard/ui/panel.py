@@ -6,7 +6,7 @@ from __future__ import annotations
 
 import math
 
-from PySide6.QtCore import QPoint, QRect, QSize, Qt, Signal
+from PySide6.QtCore import QEvent, QPoint, QRect, QSize, Qt, Signal
 from PySide6.QtWidgets import (QCheckBox, QComboBox, QFrame, QGridLayout, QHBoxLayout, QLabel,
                                QLayout, QSlider, QSpinBox, QVBoxLayout, QWidget)
 
@@ -226,6 +226,23 @@ class _MeterSlider(QSlider):
         self.meter.setGeometry(7, self.height() - 3, max(0, self.width() - 14), 3)
 
 
+class _Pct(QSpinBox):
+    """The typeable %: as wide as its longest value in the font the theme gives it
+    (known only once styled: "1000 %" in Retro 98's Tahoma didn't fit a fixed 58 px).
+    Typing sets the volume once, on Enter or leaving it: as each digit came in,
+    "150" went 1 %, 15 %, 150 % (a dip on a live mic) and saved three times."""
+
+    def __init__(self):
+        super().__init__()
+        self.setKeyboardTracking(False)
+
+    def changeEvent(self, e):
+        super().changeEvent(e)
+        if e.type() in (QEvent.FontChange, QEvent.StyleChange):
+            text = f"{self.maximum()}{self.suffix()}"
+            self.setFixedWidth(max(58, self.fontMetrics().horizontalAdvance(text) + 14))
+
+
 class VolumeControl(QWidget):
     """Slider to `slider_max` %, plus a % you can click and type an exact value into
     (up to `typed_max`). `changed` carries the gain as a factor (1.0 = 100 %).
@@ -244,11 +261,11 @@ class VolumeControl(QWidget):
         self.slider.setRange(0, slider_max)
         self.slider.setMinimumWidth(70)
         self.slider.setMaximumWidth(150)
-        self.spin = QSpinBox()
+        self.spin = _Pct()
         self.spin.setObjectName("pct")   # reads as plain text until hovered / typed in
         self.spin.setRange(0, typed_max)
         self.spin.setSuffix(" %")
-        self.spin.setFixedWidth(58)
+        self.spin.setFixedWidth(58)   # until it's styled (_Pct)
         self.spin.setAlignment(Qt.AlignRight)
         self.spin.setToolTip(f"Type an exact volume (0–{typed_max}%)")
         if tip:
