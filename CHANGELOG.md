@@ -34,7 +34,9 @@
 - **Restoring a maximized window no longer makes it the mini player:** the Radio
   tab's genre chips asked for room as if each sat on its own line (~300 px)
   whenever the window was big enough to show them, and every tab counts towards
-  what the window needs.
+  what the window needs. Widening a narrow window (e.g. 640 to 900 px with search
+  results showing) could do the same: the window judged what fits by sizes Qt
+  hadn't re-measured yet, brought back the long status pill, then found it too wide.
 - **Get Onion Watch:** Hoot stands in the middle of his side of the card.
 - **Better EQ:** the 7-band EQ and the voice *Tone* effect now follow the analog EQ
   curve they describe all the way up the treble. The 6 kHz and 12 kHz bands used to
