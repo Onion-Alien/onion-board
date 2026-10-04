@@ -1,5 +1,7 @@
 """The start-up splash: Bun in the middle of the screen with a spinner, from the
-moment the QApplication exists until the main window is up.
+moment the QApplication exists until the main window is up. No card behind him:
+Bun, the spinner and the caption float on the desktop, in the saved theme's
+colours (read straight from config.json; the rest of the settings load later).
 
 A cold start (first launch after a reboot, files not yet cached) can spend several
 seconds importing and building the window, all on the UI thread, so nothing would
@@ -10,23 +12,27 @@ MainWindow calls `pump()` between its slower steps. Without a splash on screen
 """
 from __future__ import annotations
 
+import json
 import math
+import os
 import sys
 import threading
 import time
 
-from PySide6.QtCore import QEventLoop, QRectF, Qt
-from PySide6.QtGui import QColor, QCursor, QFont, QGuiApplication, QPainter, QPen
+from pathlib import Path
+
+from PySide6.QtCore import QEventLoop, QPointF, QRectF, Qt
+from PySide6.QtGui import (QColor, QCursor, QFont, QFontMetricsF, QGuiApplication, QPainter,
+                           QPainterPath, QPen)
 from PySide6.QtWidgets import QApplication, QWidget
 
+from soundboard import theme
 from soundboard.bunny import draw_bunny
 
 CARD_W, CARD_H = 260, 250
-CARD = QColor("#1e1a2b")
-CARD_EDGE = QColor("#3a3352")
-TEXT = QColor("#d9d2e6")
-ARC = (QColor("#7c5cff"), QColor("#ff4d8d"))   # the logo's colours
 FRAME = 1 / 30   # seconds between repaints while pumping
+# library.CONFIG_PATH, without importing library (numpy, soundfile...) this early
+CONFIG = Path(os.environ.get("APPDATA", Path.home())) / "OnionBoard" / "config.json"
 
 _splash: Splash | None = None
 _last = 0.0
@@ -45,29 +51,34 @@ class Splash(QWidget):
         t = time.monotonic() - self._t0
         p = QPainter(self)
         p.setRenderHint(QPainter.Antialiasing)
-        r = QRectF(self.rect()).adjusted(1, 1, -1, -1)
-        p.setPen(QPen(CARD_EDGE, 1.5))
-        p.setBrush(CARD)
-        p.drawRoundedRect(r, 22, 22)
-        # Bun, bobbing gently
+        r = QRectF(self.rect())
+        t_ = theme.T
+        # Bun, bobbing gently (his headphones are the theme's accent)
         bob = math.sin(t * 3.2) * 3
         draw_bunny(p, QRectF(r.center().x() - 50, 22 + bob, 100, 120))
         # the spinner: an arc chasing round, its length breathing in and out
         ring = QRectF(r.center().x() - 16, 160, 32, 32)
-        p.setPen(QPen(CARD_EDGE, 4))
+        p.setPen(QPen(QColor(t_["groove"]), 4))
         p.setBrush(Qt.NoBrush)
         p.drawEllipse(ring)
         span = 70 + 160 * (0.5 + 0.5 * math.sin(t * 2.4))
-        pen = QPen(ARC[0], 4)
+        pen = QPen(QColor(t_["accent"]), 4)
         pen.setCapStyle(Qt.RoundCap)
         p.setPen(pen)
         p.drawArc(ring, int(-t * 360 * 16) % (360 * 16), int(span * 16))
-        p.setPen(TEXT)
+        # the caption, haloed in the theme's background so it reads on any desktop
         f = QFont(self.font())
+        f.setFamily(t_.get("font", theme.FONT))
         f.setPointSizeF(10)
-        p.setFont(f)
-        p.drawText(QRectF(r.left(), 200, r.width(), 24), Qt.AlignCenter,
-                   "Loading Onion Board" + "." * (int(t * 2.5) % 4))
+        f.setBold(True)
+        text = "Loading Onion Board"
+        x = r.center().x() - QFontMetricsF(f).horizontalAdvance(text + "...") / 2
+        path = QPainterPath()
+        path.addText(QPointF(x, 216), f, text + "." * (int(t * 2.5) % 4))
+        halo = QPen(QColor(t_["bg"]), 4)
+        halo.setJoinStyle(Qt.RoundJoin)
+        p.strokePath(path, halo)
+        p.fillPath(path, QColor(t_["text"]))
         p.end()
 
 
@@ -84,6 +95,10 @@ class _PumpOnImport:
 def show() -> Splash:
     """Put the splash up, centred on the screen the mouse is on."""
     global _splash
+    try:
+        theme.set_current(json.loads(CONFIG.read_text(encoding="utf-8-sig")).get("theme", ""))
+    except Exception:  # noqa: BLE001 - first launch, or unreadable: the default theme
+        pass
     _splash = Splash()
     screen = QGuiApplication.screenAt(QCursor.pos()) or QGuiApplication.primaryScreen()
     if screen is not None:

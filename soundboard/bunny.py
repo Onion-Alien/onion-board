@@ -9,6 +9,8 @@ from __future__ import annotations
 from PySide6.QtCore import QPointF, QRectF, Qt
 from PySide6.QtGui import QColor, QImage, QPainter, QPainterPath, QPen, QPixmap
 
+from soundboard import theme
+
 # drawn on a 100 x 120 canvas, scaled to the requested height
 W, H = 100.0, 120.0
 
@@ -17,8 +19,7 @@ FUR_SHADE = QColor("#ece3da")
 INK = QColor("#2b2340")
 PINK = QColor("#ffb3c7")
 CHEEK = QColor(255, 128, 160, 110)
-PHONES = QColor("#7c5cff")       # the app's accent purple
-PHONES_HI = QColor("#a48bff")
+# his headphones are the current theme's accent (theme.T, read at paint time)
 
 PROPS = (None, "mic", "headphones", "plug", "star", "hammer")
 WOOD = QColor("#c98a4b")
@@ -44,6 +45,8 @@ def draw_bunny(p: QPainter, rect: QRectF, prop: str | None = None, *,
     the mouth (talking), `ears` tilts both ears outward by that many degrees,
     `swing` 0..1 brings the hammer down (0 = raised, 1 = striking the plank), and
     `sad` 0..1 worries his brows, wets his eyes and turns his smile down."""
+    phones = QColor(theme.T["accent"])
+    phones_hi = phones.lighter(140)
     s = min(rect.width() / W, rect.height() / H)
     p.save()
     p.setRenderHint(QPainter.Antialiasing)
@@ -76,14 +79,14 @@ def draw_bunny(p: QPainter, rect: QRectF, prop: str | None = None, *,
     p.setBrush(Qt.NoBrush)
     p.setPen(QPen(INK, 8.5, Qt.SolidLine, Qt.RoundCap))
     p.drawPath(band)
-    p.setPen(QPen(PHONES, 5, Qt.SolidLine, Qt.RoundCap))
+    p.setPen(QPen(phones, 5, Qt.SolidLine, Qt.RoundCap))
     p.drawPath(band)
     for x in (10, 80):
         p.setPen(ink)
-        p.setBrush(PHONES)
+        p.setBrush(phones)
         p.drawRoundedRect(QRectF(x, 54, 11, 22), 5, 5)
         p.setPen(Qt.NoPen)
-        p.setBrush(PHONES_HI)
+        p.setBrush(phones_hi)
         p.drawRoundedRect(QRectF(x + 2.5, 57, 3, 10), 1.5, 1.5)
 
     # face
@@ -155,7 +158,7 @@ def _draw_prop(p: QPainter, prop: str | None, ink: QPen, swing: float = 0.0):
     elif prop == "plug":        # holding a cable with a plug
         cable = QPainterPath(QPointF(80, 104))
         cable.cubicTo(QPointF(96, 112), QPointF(98, 92), QPointF(90, 86))
-        p.setPen(QPen(PHONES, 3, Qt.SolidLine, Qt.RoundCap))
+        p.setPen(QPen(QColor(theme.T["accent"]), 3, Qt.SolidLine, Qt.RoundCap))
         p.setBrush(Qt.NoBrush)
         p.drawPath(cable)
         p.setPen(ink)
@@ -193,7 +196,8 @@ def _draw_prop(p: QPainter, prop: str | None, ink: QPen, swing: float = 0.0):
         _ellipse(p, 80, 92, 12, 10, FUR, ink)
 
 
-def _music_note(p: QPainter, x, y, k, col: QColor = PHONES):
+def _music_note(p: QPainter, x, y, k, col: QColor | None = None):
+    col = col or QColor(theme.T["accent"])
     p.setPen(QPen(col, 2.2 * k, Qt.SolidLine, Qt.RoundCap))
     p.drawLine(QPointF(x + 4 * k, y), QPointF(x + 4 * k, y + 12 * k))
     p.drawLine(QPointF(x + 4 * k, y), QPointF(x + 9 * k, y + 3 * k))

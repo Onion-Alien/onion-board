@@ -24,3 +24,18 @@ def test_show_pump_close(qapp):
     assert splash._splash is None
     assert splash._PumpOnImport not in sys.meta_path
     splash.close()   # twice is fine (start-up failure path, then the normal one)
+
+
+def test_splash_follows_the_saved_theme(qapp, tmp_path, monkeypatch):
+    from soundboard import theme
+    cfg = tmp_path / "config.json"
+    cfg.write_text('{"theme": "Toxic"}', encoding="utf-8")
+    monkeypatch.setattr(splash, "CONFIG", cfg)
+    try:
+        s = splash.show()
+        assert theme.current_name == "Toxic"
+        img = s.grab().toImage()
+        assert img.pixelColor(0, 0).alpha() == 0   # no card behind Bun any more
+    finally:
+        splash.close()
+        theme.set_current(theme.DEFAULT)
