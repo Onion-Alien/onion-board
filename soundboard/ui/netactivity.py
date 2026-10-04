@@ -84,13 +84,27 @@ class ActivityTable(QTableWidget):
         super().__init__(0, len(headers))
         self._widths = ([150, 180, 125, 100, 130, 80] if stretch == 1 else
                         [80, 150, 180, 120, 85, 100, 80, 90])
+        # how far each column may shrink when the table is narrower than all of them
+        # (Settings' default width): cut text ends in "…" and is whole in the cell's
+        # tooltip, while a column pushed out behind a scroll bar was just missing
+        self._mins = ([70, 64, 64, 72, 110, 72] if stretch == 1 else
+                      [64] * len(self._widths))
 
     def resizeEvent(self, event):
         super().resizeEvent(event)
+        for i, width in enumerate(self.fitted_widths(self.viewport().width())):
+            self.setColumnWidth(i, width)
+
+    def fitted_widths(self, room: int) -> list[int]:
+        """The columns' widths in `room` px: they share any spare room; short of it,
+        each gives up the same share of what it has above its minimum, and only below
+        all the minimums does the table scroll."""
         total = sum(self._widths)
-        scale = max(1.0, self.viewport().width() / total)
-        for i, width in enumerate(self._widths):
-            self.setColumnWidth(i, int(width * scale))
+        if room >= total:
+            return [int(w * room / total) for w in self._widths]
+        least = sum(self._mins)
+        f = max(0.0, (room - least) / (total - least))
+        return [int(m + (w - m) * f) for w, m in zip(self._widths, self._mins)]
 
 
 def _table(headers: list[str], stretch: int) -> QTableWidget:

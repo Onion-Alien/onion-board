@@ -125,6 +125,15 @@ def test_without_the_add_on_it_shows_hoot_and_keeps_the_triggers(qapp, tmp_path)
     assert TriggersTab(FakeHost(), [tmp_path / "m"]).kept.isHidden()
 
 
+def test_triggers_past_the_50th_are_counted_too(qapp, tmp_path):
+    # Onion Watch 0.6+ keeps those under "more_triggers"
+    screen = two_triggers()
+    screen["triggers"] = [{"id": str(i)} for i in range(50)]
+    screen["more_triggers"] = [{"id": f"m{i}"} for i in range(70)]
+    tab = TriggersTab(FakeHost(screen), [tmp_path / "modules"])
+    assert tab.kept.text().startswith("Your 120 triggers and their pictures are kept")
+
+
 def test_get_installs_it_and_loads_it_into_the_tab(qapp, tmp_path, addon_zip, monkeypatch):
     monkeypatch.setenv(watchaddon.LOCAL_ENV, str(addon_zip()))
     monkeypatch.setattr(updates, "_get", lambda url, *_f: pytest.fail("asked GitHub"))

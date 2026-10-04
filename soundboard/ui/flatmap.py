@@ -458,10 +458,15 @@ class FlatMap(QWidget):
                 p.setPen(QPen(QColor(t["bg"]), 1.5))
                 p.setBrush(hot)
                 p.drawEllipse(c, 5, 5)
-        if self._msg:
-            p.setPen(QColor(t["muted"]))
-            p.drawText(self.rect().adjusted(24, 24, -24, -24), Qt.AlignCenter | Qt.TextWordWrap,
-                       self._msg)
+        if self._msg:   # on a card of its own, not over the country names
+            area = QRectF(self.rect().adjusted(24, 24, -24, -24))
+            flags = Qt.AlignCenter | Qt.TextWordWrap
+            box = p.boundingRect(area, flags, self._msg).adjusted(-14, -8, 14, 8)
+            p.setPen(QPen(QColor(t["border"]), 1))
+            p.setBrush(QColor(t["card"]))
+            p.drawRoundedRect(box, 8, 8)
+            p.setPen(QColor(t["text"]))
+            p.drawText(area, flags, self._msg)
         p.end()
 
     # ------------------------------------------------------------------ input

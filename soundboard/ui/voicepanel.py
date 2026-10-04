@@ -1607,7 +1607,8 @@ class ModulesList(QWidget):
             if m.error:
                 state = f"⚠ {m.error}"
             elif m.kind == "service" and not m.installed:
-                state = "not set up: run its install.bat"
+                state = ("not set up yet: press Install speech recognition above"
+                         if m.id == LIVE_MODULE else "not set up yet")
             elif m.kind == "effects":
                 state = "on" if m.loaded else "not loaded"
             else:
