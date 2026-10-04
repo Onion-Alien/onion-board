@@ -24,6 +24,9 @@ from pathlib import Path
 from soundboard.library import AUDIO_EXTS
 
 LIST_NAME = "soundlist.spl"
+# left in our app folder by the installer's "Bring my sounds over from Soundpad" box,
+# for the app's first start to do it (soundboard.ui.mainwindow import_queued)
+QUEUED_NAME = "import-soundpad"
 MAX_BYTES = 50 * 1024 * 1024   # a list of tens of thousands of sounds is ~10 MB
 
 # keyModifiers, as Windows' RegisterHotKey takes them (what Soundpad passes it)

@@ -301,6 +301,7 @@ def main():
         QTimer.singleShot(900, lambda: w.toast(reset_note, "warn" if "Couldn't" in reset_note
                                                else "ok"))
     QTimer.singleShot(30_000, lambda: start_ytdlp_check(w.cfg))
+    QTimer.singleShot(500, w.import_queued)   # the installer's "from Soundpad" box
     QTimer.singleShot(600, w.after_update)   # "Updated to …" after an update restarted it
     # new versions (updates.py): unless unticked, at most once a day, also for an app
     # left running for days

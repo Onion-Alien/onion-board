@@ -23,6 +23,11 @@
 ;         the same). A failed download says so and leaves the app working without it
 ;       * Keep a history of network activity, unticked: runs OnionBoard.exe
 ;         --keep-netlog (config netlog_keep; soundboard/netlog.py keep())
+;       * Bring my sounds over from Soundpad: only there when Soundpad's sound list
+;         (%APPDATA%\Leppsoft\soundlist.spl) is on this PC. Ticked, it leaves a note
+;         (%APPDATA%\OnionBoard\import-soundpad) and the app's first start copies the
+;         sounds in (soundboard/soundpad.py). Silent installs only do it when /TASKS
+;         or /MERGETASKS names it: nobody saw the box
 ;       * a Desktop shortcut
 ;   - then opens Onion Board, whose Quick setup asks which mic they use and walks
 ;     them through Discord
@@ -97,6 +102,7 @@ Name: "ffmpeg"; Description: "Play M4A, AAC and video files (the free FFmpeg, ab
 Name: "livevoice"; Description: "Set up live voice-to-speech now (needs Python, about 300 MB)"; GroupDescription: "Extra features (optional)"; Flags: unchecked
 Name: "tor"; Description: "Private connection (Tor): hides your internet address (about 22 MB)"; GroupDescription: "Privacy (optional)"; Flags: unchecked
 Name: "keepnetlog"; Description: "Keep a history of what Onion Board connects to (on this PC only)"; GroupDescription: "Privacy (optional)"; Flags: unchecked
+Name: "soundpad"; Description: "Bring my sounds over from Soundpad (copies them with their names, categories and hotkeys; Soundpad keeps its own)"; GroupDescription: "Found Soundpad on this PC"; Check: HasSoundpad
 Name: "desktopicon"; Description: "Put an Onion Board shortcut on my Desktop"; GroupDescription: "Shortcuts"
 
 [InstallDelete]
@@ -396,6 +402,22 @@ begin
   WizardForm.TasksList.Height := Bottom - WizardForm.TasksList.Top;
 end;
 
+function HasSoundpad: Boolean;
+begin
+  Result := FileExists(ExpandConstant('{userappdata}\Leppsoft\soundlist.spl'));
+end;
+
+// The Soundpad box: a note for the app's first start, which does the copying
+procedure QueueSoundpad;
+begin
+  if not WizardIsTaskSelected('soundpad') then
+    exit;
+  if WizardSilent and not (ListedIn('TASKS', 'soundpad') or ListedIn('MERGETASKS', 'soundpad')) then
+    exit;
+  ForceDirectories(ExpandConstant('{userappdata}\OnionBoard'));
+  SaveStringToFile(ExpandConstant('{userappdata}\OnionBoard\import-soundpad'), 'soundpad', False);
+end;
+
 function WingetPath(Param: String): String;
 begin
   Result := ExpandConstant('{localappdata}\Microsoft\WindowsApps\winget.exe');
@@ -544,6 +566,8 @@ end;
 
 procedure CurStepChanged(CurStep: TSetupStep);
 begin
+  if CurStep = ssPostInstall then
+    QueueSoundpad;
   if (CurStep = ssPostInstall) and MayDownload('vbcable') then
     InstallCable;
   if (CurStep = ssPostInstall) and MayDownload('tor') then
