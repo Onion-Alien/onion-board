@@ -17,7 +17,7 @@ import numpy as np
 import sounddevice as sd
 from PySide6.QtCore import (QEvent, QFileSystemWatcher, QObject, QPropertyAnimation, QSize, Qt,
                             QTimer, QUrl, Signal)
-from PySide6.QtGui import QDesktopServices, QIcon
+from PySide6.QtGui import QDesktopServices, QIcon, QKeySequence, QShortcut
 from PySide6.QtWidgets import (QApplication, QCheckBox, QComboBox, QDialog, QFileDialog, QFrame,
                                QGraphicsOpacityEffect, QGridLayout, QHBoxLayout, QInputDialog,
                                QLabel, QLineEdit, QMainWindow, QMenu, QMessageBox, QPushButton,
@@ -102,6 +102,23 @@ VOICE_POLL_MS = 3000  # how often the game in front is looked at (soundboard.voi
 ROUTE_CHOICES = (("The virtual cable (Discord, games)", "cable"),
                  ("Another device (Voicemeeter, OBS, a mixer…)", "device"),
                  ("Nowhere: only me (and the stream output)", "off"))
+
+
+class StatusLine(QLabel):
+    """The status message under the mixer. Hidden while there's nothing to say, so
+    the window doesn't keep an empty row at the bottom, and while the window is too
+    short for it (set_room)."""
+
+    room = True
+
+    def setText(self, text: str):
+        super().setText(text)
+        self.setVisible(self.room and bool(text))
+
+    def set_room(self, compact: bool):
+        self.room = not compact
+        self.setVisible(self.room and bool(self.text()))
+        responsive.touch(self)
 
 
 class Bridge(QObject):
@@ -439,9 +456,10 @@ class MainWindow(QMainWindow):
         self.voice.fx.tip_dismissed.connect(
             lambda: self.set_option("voice_discord_tip_shown", True))
 
-        self.status = QLabel()
+        self.status = StatusLine()
         self.status.setWordWrap(True)
         self.status.setObjectName("muted")
+        self.status.hide()
         rv.addWidget(self.status)
         self._pages.addWidget(self._build_mini())
 
@@ -721,6 +739,10 @@ class MainWindow(QMainWindow):
         # ---- "3 selected · Colour · Volume… · Delete": Ctrl / Shift+click picks pads
         self.selection = PadSelection(self, scroll)
         left.addWidget(self.selection.bar)
+        # Ctrl+V with a copied picture: it goes on the selected pad (or the picked ones)
+        paste = QShortcut(QKeySequence.Paste, scroll)
+        paste.setContext(Qt.WidgetWithChildrenShortcut)
+        paste.activated.connect(self.paste_picture)
 
         # ---- "now playing" chips: shown while 2+ sounds overlap, so every one of
         # them can be stopped (■) or taken into the player (name) without clicking
@@ -2943,7 +2965,7 @@ class MainWindow(QMainWindow):
             a_nopic = pic.addAction("Remove picture")
         else:
             a_pic = add(("image",), "Add picture…", "Shown on the pad (you can also drop a "
-                        "picture on it)")
+                        "picture on it, or copy one, click the pad and press Ctrl+V)")
         menu.addSeparator()
         a_export = add(("folder",), "Export…", "Save it as a file to share with friends")
         a_del = add(("trash", "danger_text"), "Remove", "Goes to Recently deleted")
@@ -2994,6 +3016,28 @@ class MainWindow(QMainWindow):
             return
         self._save_now()
         self.pads[sid].update()
+
+    def paste_picture(self):
+        """Ctrl+V on the pads: the copied picture goes on the picked pads, or else
+        on the selected one."""
+        sids = [m.id for m in self.selection.sounds()] or (
+            [self.current] if self.current in self.pads else [])
+        if not sids:
+            return
+        img = thumbs.from_clipboard(QApplication.clipboard().mimeData())
+        if img is None:
+            self.status.setText("Nothing to paste: copy a picture first (in a browser: "
+                                "right-click it → Copy image), then press Ctrl+V on a pad.")
+            return
+        done = [sid for sid in sids if (m := self.meta(sid)) and thumbs.set_image(m, img)]
+        if not done:
+            return
+        self._save_now()
+        for sid in done:
+            self.pads[sid].update()
+        m = self.meta(done[0])
+        self.status.setText(f"Picture pasted on “{html.escape(m.name)}”." if len(done) == 1
+                            else f"Picture pasted on {len(done)} pads.")
 
     def ask_remove(self, sids: list[str]) -> bool:
         """Remove from the menu / picked pads: ask first. They go to Recently deleted."""
@@ -4098,7 +4142,7 @@ class MainWindow(QMainWindow):
         f.extend(self.voice.fit_steps())
         f.extend(self.triggers.fit_steps())
         # height: the status line, then the whole mixer strip
-        f.add(10, "h", r.hide(self.status))
+        f.add(10, "h", self.status.set_room)
         f.add(30, "h", r.hide(*self._deck_titles))
         f.add(40, "h", r.hide(self.mixer))
         f.add(50, "h", r.hide(self.cat_bar))   # the overlay's category key still works
