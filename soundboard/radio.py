@@ -375,6 +375,16 @@ def parse_stations(raw: bytes | str) -> list[Station]:
 
 # --------------------------------------------------------------------------- directory
 
+def _refused(url: str) -> str:
+    """Radio switched off (or Offline mode): `url` listed as blocked in Network
+    activity (netlog), as a connection refused before anything was looked up. The
+    message, for the user."""
+    q = QUrl(url)
+    why = net.off_message(FEATURE)
+    netlog.blocked(FEATURE, q.host(), q.port(443 if q.scheme() == "https" else 80), why)
+    return why
+
+
 class RadioDirectory(QObject):
     """Talks to Radio Browser. Every call answers with a signal on the UI thread."""
     globe_ready = Signal(list)          # [Station] with a location, most listened first
@@ -400,10 +410,11 @@ class RadioDirectory(QObject):
     def _get(self, path: str, done, fail, attempt: int = 0):
         """GET `path` from a mirror; on a network error or a reply that isn't JSON,
         try the next mirror."""
-        if not net.allowed(FEATURE):   # switched off: nothing is asked
-            QTimer.singleShot(0, lambda: fail(net.off_message(FEATURE)))
-            return None
         base = self.bases[attempt % len(self.bases)]
+        if not net.allowed(FEATURE):   # switched off: nothing is asked
+            why = _refused(base + path)
+            QTimer.singleShot(0, lambda: fail(why))
+            return None
         req = QNetworkRequest(QUrl(base + path))
         req.setHeader(QNetworkRequest.UserAgentHeader, USER_AGENT)
         req.setTransferTimeout(TIMEOUT_MS)
@@ -626,9 +637,10 @@ class RadioPlayer(QObject):
     def play(self, station: Station):
         netlog.cause(FEATURE, f"Playing the radio station {netlog.quoted(station.name)}")
         if not net.allowed(FEATURE):   # switched off: no lookup, no stream
+            why = _refused(station.url)
             self.stop()
             self._set_state("error")
-            self.error.emit(net.off_message(FEATURE))
+            self.error.emit(why)
             return
         if self._player is None:
             self._make()
