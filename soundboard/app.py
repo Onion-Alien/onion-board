@@ -205,6 +205,8 @@ def main():
     except Exception:  # noqa: BLE001
         log.debug("SetCurrentProcessExplicitAppUserModelID failed", exc_info=True)
     app = QApplication(sys.argv)
+    from soundboard.ui import quietbox
+    quietbox.install(app)   # no Windows ding from tips and warnings
     applog.ui_ready()
     if not claim_single_instance():
         log.info("another Onion Board is running; asked it to come to the front")
