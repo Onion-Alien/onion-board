@@ -44,6 +44,10 @@ CONFIG_PATH = APP_DIR / "config.json"
 # from before them drops them when it saves, and the next newer start takes them back
 PRIVACY_KEYS = ("net_mode", "net_proxy", "net_off", "net_offline", "netlog_keep",
                 "tor_bridges")
+# ...and which What's new was seen, which those versions drop too (it showed again after
+# going back a version and returning). Versions that read privacy.json take only
+# PRIVACY_KEYS from it, so the extra key is safe for them.
+SIDE_KEYS = PRIVACY_KEYS + ("whats_new_seen",)
 CONFIG_VERSION = 4
 LOAD_TRIES = 12      # ~10 s of retries while config.json is locked
 CONFIG_BACKUPS = 3   # config.json.1 … .3, rotated on every save that changes something
@@ -447,7 +451,8 @@ class Config:
     def _restore_privacy(self):
         """config.json was saved by a version without Privacy & security (an older one
         opened after this, or before it ever ran): take its switches back from
-        privacy.json, so a switched-off feature or Tor doesn't quietly come back on."""
+        privacy.json, so a switched-off feature or Tor doesn't quietly come back on
+        (and What's new already seen doesn't show again)."""
         try:
             raw = json.loads(_privacy_path().read_text(encoding="utf-8"))
         except FileNotFoundError:
@@ -457,7 +462,7 @@ class Config:
             return
         if not isinstance(raw, dict):
             return
-        kept = _typed({k: v for k, v in raw.items() if k in PRIVACY_KEYS}, Config(), "privacy")
+        kept = _typed({k: v for k, v in raw.items() if k in SIDE_KEYS}, Config(), "privacy")
         for k, v in kept.items():
             v = clean_setting(k, v)
             if v is not None:
@@ -466,9 +471,9 @@ class Config:
                  _privacy_path().name)
 
     def _save_privacy(self):
-        """Keep privacy.json in step with config.json (see PRIVACY_KEYS)."""
+        """Keep privacy.json in step with config.json (see SIDE_KEYS)."""
         path = _privacy_path()
-        text = json.dumps({k: getattr(self, k) for k in PRIVACY_KEYS}, indent=2)
+        text = json.dumps({k: getattr(self, k) for k in SIDE_KEYS}, indent=2)
         try:
             if path.read_text(encoding="utf-8") == text:
                 return

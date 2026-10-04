@@ -111,6 +111,24 @@ def test_privacy_survives_an_older_version_saving_over_it(app_dir):
         "tor", ["radio", "sounds_web.youtube"], True, True, "snowflake", "socks5h://h:1")
 
 
+def test_whats_new_seen_survives_an_older_version_saving_over_it(app_dir):
+    """Seen on this version, back to 1.6.4 (which drops whats_new_seen with the privacy
+    settings), then this version again: What's new doesn't show a second time."""
+    Config(whats_new_seen=__version__).save()
+    side = json.loads((app_dir / "privacy.json").read_text(encoding="utf-8"))
+    assert side["whats_new_seen"] == __version__
+    raw = json.loads(library.CONFIG_PATH.read_text(encoding="utf-8"))
+    for k in library.SIDE_KEYS:   # what 1.6.4 writes back
+        raw.pop(k)
+    _write(raw)
+    back = Config.load()
+    assert back.whats_new_seen == __version__ and whatsnew.unseen(back.whats_new_seen) == []
+    # a first upgrade from an old version (no side copy yet) still gets What's new
+    (app_dir / "privacy.json").unlink()
+    _write(raw)
+    assert Config.load().whats_new_seen == ""
+
+
 def test_a_config_with_its_own_privacy_settings_wins(app_dir):
     Config(net_off=["radio"]).save()
     raw = json.loads(library.CONFIG_PATH.read_text(encoding="utf-8"))
