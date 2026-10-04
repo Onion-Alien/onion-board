@@ -439,7 +439,10 @@ class VoiceFxPanel(QWidget):
 
     def resizeEvent(self, e):
         super().resizeEvent(e)
-        self._fit_width(self.width())
+        # only a new width: fewer voices a row makes it taller, and refitting on that
+        # can flip it back and forth (the Apps tab's cards jumped up and down that way)
+        if e.size().width() != e.oldSize().width():
+            self._fit_width(self.width())
 
     def _fit_width(self, width: int):
         """Narrow: the switch's shorter text, then fewer voices a row, down to one."""

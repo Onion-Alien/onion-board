@@ -19,7 +19,7 @@ import time
 from PySide6.QtCore import QFileInfo, QObject, QSize, Qt, QTimer, Signal
 from PySide6.QtGui import QPainter
 from PySide6.QtWidgets import (QCheckBox, QFileIconProvider, QFrame, QHBoxLayout, QLabel,
-                               QPushButton, QScrollArea, QSizePolicy, QSlider,
+                               QLayout, QPushButton, QScrollArea, QSizePolicy, QSlider,
                                QVBoxLayout, QWidget)
 
 from soundboard import appaudio, library, theme, trash
@@ -191,13 +191,24 @@ class AppRow(HoverCard):
 
     def resizeEvent(self, e):
         super().resizeEvent(e)
-        self._fit_width(self.width())
+        # only a new width: tightening changes the card's height (the typed volume is
+        # taller than the slider), and refitting on that made the cards flip between
+        # tight and full forever, jumping up and down
+        if e.size().width() != e.oldSize().width():
+            self._fit_width(self.width())
+
+    def _needs(self) -> int:
+        """The card's narrowest width as it is now, measured fresh: the rows cache
+        their sizes, and a stale one picked a different tightness on each pass."""
+        for lay in self.findChildren(QLayout):
+            lay.invalidate()
+        return self.minimumSizeHint().width() + self.NAME_ROOM
 
     def _fit_width(self, width: int):
         want = 0
         while want < len(self._TIGHTEN):
             self._set_tight(want)
-            if self.minimumSizeHint().width() + self.NAME_ROOM <= width:
+            if self._needs() <= width:
                 break
             want += 1
         self._set_tight(want)
