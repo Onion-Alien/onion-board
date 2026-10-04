@@ -2,7 +2,7 @@
 
 Where they come from: the video thumbnail yt-dlp saves next to a downloaded link
 (YouTube, TikTok and the other sites it supports), the cover art / first frame of an
-imported file (needs ffmpeg), or any image the user picks or drops on a pad.
+imported file (needs ffmpeg), or any image the user picks, drops or pastes on a pad.
 
 Everything here uses QImage, which is safe off the UI thread (the download and
 import workers call store()). Only pixmap() needs the UI thread.
@@ -43,11 +43,12 @@ def find_in(folder: Path) -> Path | None:
         return None
 
 
-def store(src: str | Path, sid: str) -> str:
-    """Scale an image down into THUMBS_DIR for sound `sid`; returns its path, or ""
-    if it can't be read. A new file name every time, so a cached pixmap of the
-    previous picture is never shown for the new one."""
-    img = QImage(str(src))
+def store(src: str | Path | QImage, sid: str) -> str:
+    """Scale an image (a file, or a QImage from the clipboard) down into THUMBS_DIR
+    for sound `sid`; returns its path, or "" if it can't be read. A new file name
+    every time, so a cached pixmap of the previous picture is never shown for the
+    new one."""
+    img = src if isinstance(src, QImage) else QImage(str(src))
     if img.isNull():
         log.info("couldn't read %s as a picture", src)
         return ""
@@ -85,7 +86,25 @@ def extract_art(src: str, sid: str) -> str:
         return store(out, sid) if out.is_file() else ""
 
 
-def set_image(meta: SoundMeta, src: str | Path) -> bool:
+def from_clipboard(mime) -> QImage | None:
+    """The picture on the clipboard (QMimeData): a copied image ("Copy image" in a
+    browser, a screenshot), or a picture file copied in Explorer. None if neither."""
+    if mime is None:
+        return None
+    if mime.hasImage():
+        img = QImage(mime.imageData())
+        if not img.isNull():
+            return img
+    if mime.hasUrls():
+        for url in mime.urls():
+            if url.isLocalFile() and is_image(url.toLocalFile()):
+                img = QImage(url.toLocalFile())
+                if not img.isNull():
+                    return img
+    return None
+
+
+def set_image(meta: SoundMeta, src: str | Path | QImage) -> bool:
     """Give a sound a new picture (the old one's file is removed)."""
     new = store(src, meta.id)
     if not new:

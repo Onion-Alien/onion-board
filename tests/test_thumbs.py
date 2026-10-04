@@ -182,3 +182,19 @@ def test_playing_pad_gets_visualizer_levels(qapp, window, monkeypatch):  # noqa:
     monkeypatch.setattr(window.engine, "playing", lambda: {})
     window.tick()
     assert pad.bands is None and pad.progress is None
+
+
+def test_from_clipboard_takes_a_copied_image_or_a_copied_picture_file(qapp, tmp_path):
+    from PySide6.QtCore import QMimeData, QUrl
+    img = QImage(40, 30, QImage.Format_RGB32)
+    img.fill(QColor("#0000ff"))
+    copied = QMimeData()
+    copied.setImageData(img)
+    assert thumbs.from_clipboard(copied).size() == img.size()
+    files = QMimeData()
+    files.setUrls([QUrl.fromLocalFile(str(tmp_path / "notes.txt")),
+                   QUrl.fromLocalFile(str(make_image(tmp_path / "p.png", 64, 48)))])
+    assert thumbs.from_clipboard(files).width() == 64
+    text = QMimeData()
+    text.setText("hello")
+    assert thumbs.from_clipboard(text) is None and thumbs.from_clipboard(None) is None
