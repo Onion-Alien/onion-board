@@ -2,6 +2,18 @@
 
 ## Unreleased
 
+- **No virtual cable needed: send your sounds anywhere.** Setup → Devices (and
+  Settings → Audio → Devices) has **Send to others through**: *The virtual cable*
+  (as before), *Another device* (Voicemeeter, a mixer, a capture card, a second
+  sound card or any output OBS captures) or *Nowhere* (only you hear them, plus the
+  stream output). With another device, Onion Board sends into the one you pick and
+  never swaps the cable back in, stops asking you to install the cable, and the
+  header pill turns green once it's sending (*Sending to: …*); the Setup tab says
+  how to pick it up in OBS. *Nowhere* is for streamers whose OBS takes the sounds
+  from Desktop Audio or the stream output: nothing goes out as a mic, and nothing
+  nags. The setup guide's cable step has the same choice (*I don't use the
+  cable*). The send device can't be your headphones (you'd hear everything twice,
+  your own voice included), and *Nowhere* frees the cable to be the stream output.
 - **Send feedback opens a form that needs no account:** Settings → Add-ons &
   help → Send feedback now opens a short form with your version filled in,
   instead of a GitHub bug report. The app still sends nothing itself.

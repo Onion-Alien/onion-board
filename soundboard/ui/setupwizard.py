@@ -4,7 +4,8 @@ Step-by-step guide button any time after).
 
   1. Which microphone do you talk into?   (live level bar: "talk, it should move")
   2. Where do you listen?                 (test sound)
-  3. The virtual cable                    (checks it's there; installs it if not)
+  3. The virtual cable                    (checks it's there; installs it if not;
+                                           or another device / nowhere instead)
   4. Tell Discord / your game             (the one setting outside the app)
 
 Every choice is applied to the engine as it's made, so the level bar and the test
@@ -33,6 +34,8 @@ from soundboard.ui.bunnywidget import BunnyWidget
 from soundboard.ui.widgets import Meter
 from soundboard import errors
 
+# step 3's "I don't use the cable" list: this choice sends nowhere (Config.route "off")
+NOWHERE = "Nowhere: only me (and the stream output)"
 RESTART_NEEDED = 3010   # install-vbcable.ps1: installed, but Windows must restart first
 
 # install-vbcable.ps1 -StatusFile writes "<step>|<text>"; these are the steps as the
@@ -357,7 +360,7 @@ class SetupWizard(QDialog):
         self.btn_recheck = QPushButton("⟳  Check again")
         self.btn_recheck.clicked.connect(lambda: busy.run_busy(
             self.btn_recheck, "Checking…", self.recheck_cable,
-            lambda _r: None if self.cable_ok() else "Still not found — checked just now",
+            lambda _r: None if self.route_ok() else "Still not found — checked just now",
             ms=3500))
         v.addWidget(self.btn_recheck)
         self.btn_restart = QPushButton("⟲  Restart my PC now")
@@ -366,8 +369,59 @@ class SetupWizard(QDialog):
         self.btn_restart.clicked.connect(self.restart_pc)
         self.btn_restart.hide()
         v.addWidget(self.btn_restart)
+        # streamers and Voicemeeter / mixer users: send somewhere else instead
+        self.btn_other = QPushButton("I don't use the cable (Voicemeeter, OBS, a mixer…)")
+        self.btn_other.setToolTip("Send your sounds to another device instead, or nowhere "
+                                  "(only you, and the stream output)")
+        self.btn_other.clicked.connect(lambda: self._show_other(True))
+        v.addWidget(self.btn_other, 0, Qt.AlignLeft)
+        self.other_box = QWidget()
+        self.other_lay = QVBoxLayout(self.other_box)
+        self.other_lay.setContentsMargins(0, 0, 0, 0)
+        self.other_box.hide()
+        v.addWidget(self.other_box, 1)
+        self.btn_use_cable = QPushButton("Use the virtual cable after all")
+        icons.set_icon(self.btn_use_cable, "cable")
+        self.btn_use_cable.clicked.connect(lambda: self._pick_route("cable"))
+        self.btn_use_cable.hide()
+        v.addWidget(self.btn_use_cable, 0, Qt.AlignLeft)
         v.addStretch(1)
         return p
+
+    def _show_other(self, on: bool):
+        """The list of other places to send to: every output but your headphones (you'd
+        hear everything twice), and nowhere. Filled when shown, after step 2's pick."""
+        while self.other_lay.count():
+            w = self.other_lay.takeAt(0).widget()
+            if w is not None:
+                w.deleteLater()
+        self.other_box.setVisible(on)
+        self.btn_other.setVisible(not on and self._proc is None)
+        if not on:
+            return
+        cfg = self.win.cfg
+        self.other_lay.addWidget(_label(
+            "Pick where your sounds go instead. Onion Board plays them (and your voice, if "
+            "you send it) into that device, and whatever listens to it gets them: OBS "
+            "(<b>Audio Output Capture</b>), Voicemeeter, a mixer or a capture card.",
+            "font-size:10pt;"))
+        outs = [d["name"] for d in eng.list_devices("output") if d["name"] != cfg.mon_device]
+        cur = (NOWHERE if cfg.route == "off" else
+               cfg.main_device if cfg.route == "device" else None)
+        lst, _ = self._choice_list(outs + [NOWHERE], cur, self._pick_route)
+        self.other_lay.addWidget(lst, 1)
+
+    def _pick_route(self, choice: str):
+        """Step 3: the cable ("cable"), nowhere (NOWHERE) or another device (its name).
+        Applied at once, and kept even if the guide is closed (like a picked mic)."""
+        if choice == "cable":
+            self.win.set_route("cable")
+            self._show_other(False)
+        elif choice == NOWHERE:
+            self.win.set_route("off")
+        else:
+            self.win.set_route("device", choice)
+        self.recheck_cable(rescan=False)
 
     def _page_discord(self) -> QWidget:
         p = QWidget()
@@ -380,7 +434,7 @@ class SetupWizard(QDialog):
         icons.set_icon(self.btn_copy, "copy")
         self.btn_copy.clicked.connect(self.copy_name)
         row.addWidget(self.btn_copy)
-        nomic = QPushButton("My game has no microphone setting")
+        nomic = self.btn_nomic = QPushButton("My game has no microphone setting")
         nomic.clicked.connect(self.win.open_windows_mic)
         row.addWidget(nomic)
         row.addStretch(1)
@@ -436,7 +490,7 @@ class SetupWizard(QDialog):
         self.btn_back.setEnabled(not busy)
         if i == self.PAGES - 1:
             self.btn_next.setText("Finish  ✓")
-        elif i == 2 and not self.cable_ok():
+        elif i == 2 and not self.route_ok():
             self.btn_next.setText("Skip for now  →")
         else:
             self.btn_next.setText("Next  →")
@@ -450,7 +504,7 @@ class SetupWizard(QDialog):
 
     def finish(self):
         cfg = self.win.cfg
-        cfg.setup_done = self.cable_ok()   # without the cable, offer the guide again next time
+        cfg.setup_done = self.route_ok()   # without the cable, offer the guide again next time
         cfg.mic_enabled = self.chk_send.isChecked()
         self.win.chk_mic.setChecked(cfg.mic_enabled)
         cfg.save()
@@ -504,6 +558,17 @@ class SetupWizard(QDialog):
     def cable_ok(self) -> bool:
         return bool(eng.virtual_outputs())
 
+    def route_ok(self) -> bool:
+        """Step 3 is done: the cable is there, another device is sending, or sending
+        nowhere was picked on purpose."""
+        route = self.win.cfg.route
+        if route == "off":
+            return True
+        if route == "device":   # picked, and it opened
+            return (self.win._main_name() is not None
+                    and "main" not in self.win.engine.errors_snapshot())
+        return self.cable_ok()
+
     def recheck_cable(self, rescan: bool = True):
         if rescan:
             self.win.refresh_devices()   # picks up a driver installed while we're open
@@ -513,15 +578,38 @@ class SetupWizard(QDialog):
         self.cable_steps.setVisible(busy)
         if not busy and self.bun_cable.building:
             self.bun_cable.stop_building(self.cable_ok())
+        route = self.win.cfg.route
+        self.btn_use_cable.setVisible(not busy and route != "cable")
+        self.btn_other.setVisible(not busy and self.other_box.isHidden())
         if busy:
             self.cable_status.setText("<b>Bun is setting it up for you…</b>")
             self.cable_steps.setText(self._steps_html())
             self.btn_cable.hide()
             self.btn_recheck.hide()
+            self.other_box.hide()
+        elif route != "cable":
+            if self.other_box.isHidden():
+                self._show_other(True)
+            dev = self.win._main_name()
+            if route == "off":
+                self.cable_status.setText(f"<b style='color:{_ok()}'>✓ Sending nowhere.</b> "
+                                          "Only you hear your sounds (and the stream output, "
+                                          "if you set one in Settings → Audio).")
+            elif self.route_ok():
+                self.cable_status.setText(f"<b style='color:{_ok()}'>✓ Sending to "
+                                          f"{html.escape(dev)}.</b> Press Next.")
+            elif dev:
+                self.cable_status.setText(f"<b style='color:{_bad()}'>Couldn't open "
+                                          f"{html.escape(dev)}.</b> Is it plugged in? Pick "
+                                          "another one, or press Next to carry on.")
+            else:
+                self.cable_status.setText("Pick the device your sounds should go to.")
+            self.btn_cable.hide()
+            self.btn_recheck.hide()
         elif self.cable_ok():
             if not eng.is_virtual(self.win.cfg.main_device):
                 self.win.cfg.main_device = eng.virtual_outputs()[0]
-            self.win.engine.set_main_device(self.win.cfg.main_device)
+            self.win.engine.set_main_device(self.win._main_name())
             # both ends of the cable on 48 kHz: it then passes the sound through as is
             self.win._check_cable_format()
             if self.win.cable_bad:
@@ -660,13 +748,38 @@ class SetupWizard(QDialog):
                                       "afterwards.")
 
     def _fill_discord(self):
-        name = eng.virtual_mic_for(self.win.cfg.main_device)
-        self._vm = name or "CABLE Output"
+        cfg = self.win.cfg
+        dev = self.win._main_name()
+        name = eng.virtual_mic_for(dev)
+        self._vm = name or dev or "CABLE Output"
+        for b in (self.btn_steam, self.btn_game, self.btn_nomic):   # mic settings: not
+            b.setVisible(bool(name) or cfg.route == "cable")      # without a mic end to pick
+        if cfg.route == "off":
+            self.discord_text.setText(
+                "Your sounds play only for you: in your headphones, where OBS's "
+                "<b>Desktop Audio</b> picks them up, and on the <b>stream output</b> if you "
+                "set one (Settings → Audio → Stream output).<br><br>Nothing to change in "
+                "Discord or your game. To send your sounds to them later, go to the Setup "
+                "tab → Devices → <b>Send to others through</b>.")
+            self.btn_copy.hide()
+            self.btn_discord.hide()
+            return
+        if cfg.route == "device" and dev and not name:
+            self.btn_copy.show()
+            self.btn_discord.hide()
+            self.discord_text.setText(
+                "Onion Board sends your sounds (and your voice, if you send it) to:"
+                f"<p style='font-size:15pt; font-weight:800; color:{_ok()}'>"
+                f"{html.escape(dev)}</p>"
+                "<b>In OBS:</b> Sources → + → <b>Audio Output Capture</b> → pick it. "
+                "<b>In Voicemeeter or a mixer:</b> send that input on to wherever it should "
+                "go (Discord, your stream, a recording).")
+            return
         if not name:
             self.discord_text.setText(
                 f"<span style='color:{_bad()}'>The virtual cable isn't set up yet, so only you "
-                "will hear your sounds.</span> Go <b>Back</b> to install it, or finish now and "
-                "this guide will open again next time.")
+                "will hear your sounds.</span> Go <b>Back</b> to install it (or pick another "
+                "device there), or finish now and this guide will open again next time.")
             self.btn_copy.hide()
             self.btn_discord.hide()
             return
