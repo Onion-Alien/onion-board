@@ -64,7 +64,7 @@ DisableProgramGroupPage=yes
 DisableReadyPage=yes
 DisableWelcomePage=no
 WizardStyle=modern
-WizardSizePercent=110
+WizardSizePercent=110,100
 SetupIconFile=..\assets\onionboard.ico
 ; Bun the mascot, rendered by scripts\make_bunny.py (build.ps1 runs it)
 WizardImageFile=wizard-1x.bmp,wizard-2x.bmp
@@ -84,20 +84,19 @@ CloseApplications=yes
 
 [Messages]
 WelcomeLabel1=Let's set up Onion Board
-WelcomeLabel2=This puts Onion Board on your PC and adds the free "virtual cable" it needs, so Discord and your games can hear your sounds.%n%nOn the next page you can tick any extras you want. When Windows asks for permission, click Yes.%n%nDid Windows or your browser warn you before this opened ("Windows protected your PC", "not commonly downloaded")? That's normal for a free app that isn't code-signed, and you got past it fine. Next time: More info, then Run anyway.%n%nClick Next to start.
+WelcomeLabel2=This puts Onion Board on your PC and adds the free "virtual cable" it needs, so Discord and your games can hear your sounds.%n%nNext you'll see what it connects to online, then you can tick any extras you want. When Windows asks for permission, click Yes.%n%nDid Windows or your browser warn you before this opened ("Windows protected your PC", "not commonly downloaded")? That's normal for a free app that isn't code-signed, and you got past it fine. Next time: More info, then Run anyway.
 WizardSelectTasks=Pick what you want
-SelectTasksDesc=Tick the things you'd like. If you're not sure, leave them as they are.
-SelectTasksLabel2=The ticked boxes are what most people want. Click Install when you're ready.
+SelectTasksDesc=Tick what you'd like. If you're not sure, leave the boxes as they are.
 FinishedHeadingLabel=All done!
 FinishedLabel=Onion Board is installed. It will open now and ask you a few easy questions (which mic you use, where you listen).%n%nYou can find it later on your Desktop or in the Start menu.%n%nPrivacy: no account, ads or tracking. Settings > Privacy & security shows everything the app does online, lets you switch those things off, and can send all of it through a proxy or Tor.
 FinishedRestartLabel=Onion Board is installed. To finish setting up the virtual cable, Windows needs to restart your PC.%n%nAfter the restart, open Onion Board from the Start menu and it will pick up where it left off.
 
 [Tasks]
-Name: "vbcable"; Description: "The free virtual cable (VB-Cable): lets Discord and games hear your sounds. Needed unless you already have one."; GroupDescription: "Needed"
-Name: "ffmpeg"; Description: "Play M4A, AAC and video files (installs the free FFmpeg, about 100 MB)"; GroupDescription: "Extras"; Check: CanOfferFfmpeg
-Name: "livevoice"; Description: "Set up live voice-to-speech now: you talk, others hear a text-to-speech voice. Needs Python from python.org; downloads about 300 MB. (You can also do this later from the Voice tab.)"; GroupDescription: "Extras"; Flags: unchecked
-Name: "tor"; Description: "Private connection (Tor): hides your address from the sites you search and download from and the radio stations you play. Slower. Downloads Tor from the Tor Project (about 22 MB). It stays off until you pick it in Settings > Privacy & security."; GroupDescription: "Privacy (optional)"; Flags: unchecked
-Name: "keepnetlog"; Description: "Keep a history of everything Onion Board connects to, between starts (Settings > Connection > Network activity). Saved on this PC only; without it the list is forgotten when the app closes."; GroupDescription: "Privacy (optional)"; Flags: unchecked
+Name: "vbcable"; Description: "The free virtual cable (VB-Cable), so Discord and games hear your sounds"; GroupDescription: "Needed for Discord and games"
+Name: "ffmpeg"; Description: "Play M4A, AAC and video files (the free FFmpeg, about 100 MB)"; GroupDescription: "Extra features (optional)"; Check: CanOfferFfmpeg
+Name: "livevoice"; Description: "Set up live voice-to-speech now (needs Python, about 300 MB)"; GroupDescription: "Extra features (optional)"; Flags: unchecked
+Name: "tor"; Description: "Private connection (Tor): hides your internet address (about 22 MB)"; GroupDescription: "Privacy (optional)"; Flags: unchecked
+Name: "keepnetlog"; Description: "Keep a history of what Onion Board connects to (on this PC only)"; GroupDescription: "Privacy (optional)"; Flags: unchecked
 Name: "desktopicon"; Description: "Put an Onion Board shortcut on my Desktop"; GroupDescription: "Shortcuts"
 
 [InstallDelete]
@@ -168,7 +167,11 @@ var
   PrivacyPage: TWizardPage;
   OfflineBox: TNewCheckBox;
   OfflineApplied: Boolean;     // the download boxes were unticked for Offline mode
-  TasksLabelText: String;      // the Pick what you want page's own label
+  PagesBottom: Integer;        // where the pages end (LayoutHeader keeps it)
+  BunnyRight: Integer;         // the bunny's right edge in the header
+  CableTicked: Boolean;        // the cable box was ticked on the first visit
+  Bunny: TBitmapImage;
+  TorCaption: String;          // the Tor box's own caption (Offline mode replaces it)
 
 // "net_offline": true in %APPDATA%\OnionBoard\config.json: the app is in Offline mode
 // already (a reinstall). A plain text search: json.dumps writes it on one line.
@@ -263,20 +266,16 @@ begin
   Body.AutoSize := False;
   Body.WordWrap := True;
   Body.Width := PrivacyPage.SurfaceWidth;
+  Body.ShowAccelChar := False;
   Body.Caption :=
-    'No account, no ads, no tracking. On its own, Onion Board only goes online to ' +
-    'check for updates, and you can switch that off.' + #13#10#13#10 +
+    'No account, no ads, no tracking. On its own, Onion Board only goes online once a ' +
+    'day, to check for a new version (of the app, and of Onion Watch if you add it). ' +
+    'Nothing downloads until you click Update, and you can switch the check off.' + #13#10#13#10 +
     'Everything else happens only when you use it:' + #13#10 +
-    Bullet + 'Searching for sounds and downloading them goes to YouTube, SoundCloud ' +
-    'and Myinstants.' + #13#10 +
-    Bullet + 'The radio uses Radio Browser (a free list of stations) and the stations ' +
-    'you play.' + #13#10 +
-    Bullet + 'Add-on modules are optional: skip their boxes on the next page, or ' +
-    'remove them later.' + #13#10#13#10 +
-    'Like any website, those sites can see your internet address. The "Private ' +
-    'connection (Tor)" box on the next page hides it from them. It''s slower, it ' +
-    'downloads Tor from the Tor Project, and it stays off until you pick it in ' +
-    'Settings > Privacy & security.';
+    Bullet + 'Sounds: searching and downloading go to YouTube, SoundCloud or Myinstants.' + #13#10 +
+    Bullet + 'Radio: Radio Browser (a free list of stations) and the stations you play.' + #13#10 +
+    Bullet + 'Voices and add-ons: they download when you press their buttons.' + #13#10#13#10 +
+    'Those sites can see your internet address. The Tor box on the next page hides it.';
   Body.AdjustHeight;
   Link := TNewStaticText.Create(PrivacyPage);
   Link.Parent := PrivacyPage.Surface;
@@ -285,13 +284,13 @@ begin
   Link.Font.Color := clHotLight;
   Link.Font.Style := [fsUnderline];
   Link.OnClick := @OpenPrivacyLink;
-  Link.Top := Body.Top + Body.Height + ScaleY(12);
+  Link.Top := Body.Top + Body.Height + ScaleY(10);
   OfflineBox := TNewCheckBox.Create(PrivacyPage);
   OfflineBox.Parent := PrivacyPage.Surface;
-  OfflineBox.Top := Link.Top + Link.Height + ScaleY(14);
+  OfflineBox.Top := Link.Top + Link.Height + ScaleY(18);
   OfflineBox.Width := PrivacyPage.SurfaceWidth;
   OfflineBox.Height := ScaleY(17);
-  OfflineBox.Caption := 'Offline mode: Onion Board never goes online, from its first start';
+  OfflineBox.Caption := 'Offline mode: Onion Board never goes online at all';
   OfflineBox.Checked := (ExpandConstant('{param:OFFLINE|0}') = '1') or ConfigIsOffline;
   Note := TNewStaticText.Create(PrivacyPage);
   Note.Parent := PrivacyPage.Surface;
@@ -300,34 +299,101 @@ begin
   Note.Left := ScaleX(18);
   Note.Width := PrivacyPage.SurfaceWidth - ScaleX(18);
   Note.Top := OfflineBox.Top + OfflineBox.Height + ScaleY(2);
-  Note.Caption := 'No update checks, no searching or downloading. Unticks the boxes on the ' +
-    'next page that download things. Switch it off any time in Settings > Privacy & security.';
+  Note.ShowAccelChar := False;
+  Note.Caption := 'No update checks, searching, radio or downloads, from its first start. ' +
+    'Switch it off any time in Settings > Privacy & security.';
   Note.AdjustHeight;
-  TasksLabelText := WizardForm.SelectTasksLabel.Caption;
+  PagesBottom := WizardForm.InnerNotebook.Top + WizardForm.InnerNotebook.Height;
+  Bunny := WizardForm.WizardSmallBitmapImage;
+  BunnyRight := Bunny.Left + Bunny.Width;
+  WizardForm.TasksList.ShowHint := True;
 end;
 
 // Offline mode ticked: untick the boxes that download (once, so ticking one again
-// sticks) and grey out Tor. Unticked again: back to the defaults.
+// sticks) and grey out Tor, saying why. Unticked again: back to the defaults.
+// The header, just tall enough for the page's heading and subheading (the subheading
+// sized to its own text, not two lines), and the page starting close under it.
+// Inno's own header is as tall as the bunny, which left a big gap there; the whole
+// bunny is scaled down to fit (an image can't hang over the page below it).
+procedure LayoutHeader;
+var
+  Name, Desc: TNewStaticText;
+  PanelH: Integer;
+begin
+  Name := WizardForm.PageNameLabel;
+  Desc := WizardForm.PageDescriptionLabel;
+  Name.Top := ScaleY(12);
+  Desc.Top := Name.Top + Name.Height + ScaleY(2);
+  Desc.AdjustHeight;
+  PanelH := Desc.Top + Desc.Height + ScaleY(8);
+  WizardForm.MainPanel.Height := PanelH;
+  WizardForm.Bevel1.Top := PanelH;
+  WizardForm.InnerNotebook.Top := PanelH;
+  WizardForm.InnerNotebook.Height := PagesBottom - WizardForm.InnerNotebook.Top;
+  Bunny.Stretch := True;
+  Bunny.Top := ScaleY(4);
+  Bunny.Height := PanelH - ScaleY(8);
+  Bunny.Width := Bunny.Height;
+  Bunny.Left := BunnyRight - Bunny.Width;
+end;
+
 procedure CurPageChanged(CurPageID: Integer);
 var
   I: Integer;
+  Lbl: TNewStaticText;
+  Bottom: Integer;
 begin
+  if (CurPageID <> wpWelcome) and (CurPageID <> wpFinished) then
+    LayoutHeader;
   if (CurPageID <> wpSelectTasks) or WizardSilent then
     exit;
+  // The cable is what makes the app work: ticked on the first visit even if the last
+  // install unticked it (Inno remembers boxes). Installing skips a cable that works.
+  if not CableTicked and not OfflineChosen then
+    WizardSelectTasks('vbcable');
+  CableTicked := True;
   if OfflineChosen and not OfflineApplied then
     WizardSelectTasks('!vbcable,!ffmpeg,!livevoice,!tor')
   else if OfflineApplied and not OfflineChosen then
     WizardSelectTasks('vbcable,ffmpeg');
   OfflineApplied := OfflineChosen;
   for I := 0 to WizardForm.TasksList.Items.Count - 1 do
-    if Pos('(Tor)', WizardForm.TasksList.ItemCaption[I]) > 0 then
+    if (Pos('(Tor)', WizardForm.TasksList.ItemCaption[I]) > 0) then
+    begin
+      if TorCaption = '' then
+        TorCaption := WizardForm.TasksList.ItemCaption[I];
       WizardForm.TasksList.ItemEnabled[I] := not OfflineChosen;
+      if OfflineChosen then
+        WizardForm.TasksList.ItemCaption[I] := 'Private connection (Tor): off, because ' +
+          'Offline mode is ticked'
+      else
+        WizardForm.TasksList.ItemCaption[I] := TorCaption;
+    end;
+  // The list can't give one box its own tooltip, so in Offline mode the whole list
+  // explains the greyed-out Tor box.
   if OfflineChosen then
-    WizardForm.SelectTasksLabel.Caption := 'Offline mode is on, so the boxes that ' +
-      'download things are unticked. Ticking one lets this installer download it; ' +
-      'Onion Board itself stays offline.'
+    WizardForm.TasksList.Hint := 'Tor is greyed out because Offline mode is ticked (one ' +
+      'page back). In Offline mode Onion Board never goes online, so it would never use ' +
+      'Tor. Go Back and untick Offline mode to pick it.'
   else
-    WizardForm.SelectTasksLabel.Caption := TasksLabelText;
+    WizardForm.TasksList.Hint := '';
+  // A line above the boxes only in Offline mode (the heading says the rest), wrapped
+  // to fit, with the list right under it.
+  Lbl := WizardForm.SelectTasksLabel;
+  Bottom := WizardForm.TasksList.Top + WizardForm.TasksList.Height;
+  Lbl.Visible := OfflineChosen;
+  if OfflineChosen then
+  begin
+    Lbl.Caption := 'Offline mode is on, so the boxes that download things are ' +
+      'unticked. Tick one and this installer downloads it; Onion Board itself stays ' +
+      'offline.';
+    Lbl.WordWrap := True;
+    Lbl.AdjustHeight;
+    WizardForm.TasksList.Top := Lbl.Top + Lbl.Height + ScaleY(8);
+  end
+  else
+    WizardForm.TasksList.Top := Lbl.Top;
+  WizardForm.TasksList.Height := Bottom - WizardForm.TasksList.Top;
 end;
 
 function WingetPath(Param: String): String;
