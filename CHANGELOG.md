@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 1.6.7 — 2026-10-04
+
 - **A much better voice changer.**
   - **Sounds like a person, not a cartoon:** pitch now has *Natural sound*, which
     keeps the shape of your voice where a real person's would be, and *Voice size*
