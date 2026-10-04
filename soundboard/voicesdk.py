@@ -167,10 +167,17 @@ def foreground_process() -> tuple[int, str]:
 
 def _is_system(path: str) -> bool:
     """Windows' own programs (the taskbar, Alt+Tab, the desktop): passing through
-    them on the way from a game to this app shouldn't count as leaving the game."""
-    sysdir = _system_dir()
+    them on the way from a game to this app shouldn't count as leaving the game.
+
+    Runs on the UI thread every VOICE_POLL_MS, so it only compares strings: the
+    foreground lookup already gives a full path, and resolving it on disk froze the
+    window for 6 s when the game's drive was asleep."""
+    win = os.environ.get("SystemRoot") or os.environ.get("windir")
+    if not win or not path:
+        return False
     try:
-        return bool(sysdir) and sysdir in Path(path).resolve().parents
+        sysdir = os.path.normcase(os.path.abspath(win)).rstrip("\\/") + os.sep
+        return os.path.normcase(os.path.abspath(path)).startswith(sysdir)
     except (OSError, ValueError):
         return False
 

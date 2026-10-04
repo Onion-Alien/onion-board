@@ -108,3 +108,21 @@ def test_watcher_scans_each_exe_once():
         w.poll()
         _join_scans()
     assert calls == ["C:/Games/U/u.exe"] and w.suggestion == "unity"
+
+
+def test_is_system_never_touches_the_disk(monkeypatch):
+    """It runs on the UI thread every few seconds: resolving the game's exe on a
+    sleeping drive froze the window for 6 s."""
+    import os
+
+    def boom(*a, **k):
+        raise AssertionError("disk access on the UI thread")
+
+    monkeypatch.setenv("SystemRoot", r"C:\Windows")
+    monkeypatch.setattr(os.path, "realpath", boom)
+    monkeypatch.setattr(Path, "resolve", boom)
+    assert voicesdk._is_system(r"C:\Windows\explorer.exe")
+    assert voicesdk._is_system(r"c:\windows\System32\dwm.exe")
+    assert not voicesdk._is_system(r"C:\WindowsApps\game.exe")
+    assert not voicesdk._is_system(r"E:\Games\Shooter\shooter.exe")
+    assert not voicesdk._is_system("")

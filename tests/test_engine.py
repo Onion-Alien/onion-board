@@ -481,14 +481,14 @@ def test_empty_looped_sound_finishes():
 def test_play_skips_an_output_closed_while_it_resampled(monkeypatch):
     e = engine_with("main", "mon")
     e.rates["mon"] = 44100
-    real = e.data_for
+    real = e._cached
 
     def slow(sid, data, rate, src_rate=SR):
         if rate == 44100:
             e._close("mon_stream")   # the watchdog, between picking outputs and adding the voice
         return real(sid, data, rate, src_rate)
 
-    monkeypatch.setattr(e, "data_for", slow)
+    monkeypatch.setattr(e, "_cached", slow)
     v = e.play("a", tone(), 1.0)
     assert "mon" in v.done and not v.finished
     e._close("main_stream")
@@ -497,13 +497,13 @@ def test_play_skips_an_output_closed_while_it_resampled(monkeypatch):
 
 def test_play_gives_up_when_every_output_went_away_or_changed_rate(monkeypatch):
     e = engine_with("main")
-    real = e.data_for
+    real = e._cached
 
     def slow(sid, data, rate, src_rate=SR):
         e.rates["main"] = 44100      # reopened at another rate meanwhile
         return real(sid, data, rate, src_rate)
 
-    monkeypatch.setattr(e, "data_for", slow)
+    monkeypatch.setattr(e, "_cached", slow)
     assert e.play("a", tone(), 1.0) is None
     assert e.voices == ()
 
@@ -621,3 +621,60 @@ def test_is_virtual_cables(name):
 ])
 def test_is_virtual_leaves_real_headsets(name):
     assert not eng.is_virtual(name)
+
+
+def _wait_resampled(e, key, timeout=10.0):
+    end = time.monotonic() + timeout
+    while key not in e._cache and time.monotonic() < end:
+        time.sleep(0.01)
+    assert key in e._cache
+
+
+def test_play_never_resamples_on_the_calling_thread(monkeypatch):
+    """A 44.1 kHz device and a sound not resampled yet: the press plays at once from
+    the source (read at the output's rate) and the copy is made on a thread."""
+    e = engine_with("main")
+    e.rates["main"] = 44100
+    x = tone(2.0)
+    v = e.play("a", x, 1.0)
+    assert v.data["main"] is x and v.step["main"] == pytest.approx(SR / 44100)
+    out = np.zeros((4410, 2), np.float32)
+    e._main(out, 4410)   # 0.1 s at 44.1 kHz: still the 440 Hz tone, same level
+    ref = eng.resample(x, SR, 44100)[:4410]
+    assert np.max(np.abs(out[200:] - ref[200:])) < 0.01
+    assert v.pos["main"] == pytest.approx(4410 * SR / 44100, abs=1)
+    _wait_resampled(e, ("a", 44100))
+    v2 = e.play("a", x, 1.0)       # next press: the cached copy
+    assert v2.step == {} and len(v2.data["main"]) == round(len(x) * 44100 / SR)
+
+
+def test_a_stepped_voice_ends_and_seeks_like_any_other():
+    e = engine_with("main")
+    e.rates["main"] = 44100
+    x = tone(0.2)
+    v = e.play("a", x, 1.0, fade_out=0.05)
+    assert e.state("a") is not None
+    e.seek("a", 0.5)
+    e._main(np.zeros((441, 2), np.float32), 441)
+    assert 0.5 <= v.progress() < 0.6
+    for _ in range(20):
+        e._main(np.zeros((441, 2), np.float32), 441)
+    assert v.finished
+
+
+def test_cut_shares_is_worked_out_once_per_sound(monkeypatch):
+    calls = []
+    real = eng.destination.cut_shares
+    monkeypatch.setattr(eng.destination, "cut_shares",
+                        lambda d, r: calls.append(1) or real(d, r))
+    e = engine_with("main")
+    x = tone(1.0)
+    e.prepare("a", x)
+    for _ in range(3):
+        e.play("a", x, 1.0)
+    assert len(calls) == 1
+    y = tone(1.0)                  # new audio for the sound (effects re-rendered)
+    e.play("a", y, 1.0)
+    assert len(calls) == 2
+    e.forget("a")
+    assert "a" not in e._shares
