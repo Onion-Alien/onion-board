@@ -331,6 +331,45 @@ THEMES: dict[str, dict[str, str]] = {
         texture="grid",
     ),
 }
+
+
+def _contrast(a: str, b: str) -> float:
+    """WCAG contrast ratio of two colours (1 = same, 21 = black on white)."""
+    def lum(hex_: str) -> float:
+        c = QColor(hex_)
+        ch = [v / 255 for v in (c.red(), c.green(), c.blue())]
+        ch = [v / 12.92 if v <= 0.03928 else ((v + 0.055) / 1.055) ** 2.4 for v in ch]
+        return 0.2126 * ch[0] + 0.7152 * ch[1] + 0.0722 * ch[2]
+    hi, lo = sorted((lum(a), lum(b)), reverse=True)
+    return (hi + 0.05) / (lo + 0.05)
+
+
+def _mix(a: str, b: str, t: float) -> str:
+    """`a` moved fraction `t` of the way to `b`."""
+    ca, cb = QColor(a), QColor(b)
+    return QColor(*(round(x + (y - x) * t) for x, y in (
+        (ca.red(), cb.red()), (ca.green(), cb.green()), (ca.blue(), cb.blue())))).name()
+
+
+def _add_live_tokens(t: dict[str, str]) -> None:
+    """The "it's on" highlight (voice changer on, live on air, the mic pill when it's
+    connected, a live tab's tint): the theme's own accent, not one green for every
+    theme. `live` / `live_hi` / `on_live` fill a switched-on button; `live_text` is
+    the same colour where it's drawn on the background (text, icons, a tab's wash),
+    moved towards the theme's text colour until it reads there (Flashbang's yellow
+    on white, Onion's purple on purple). A theme can set any of these itself."""
+    t.setdefault("live", t["accent"])
+    t.setdefault("live_hi", t["accent_hi"])
+    t.setdefault("on_live", t["on_accent"])
+    if "live_text" not in t:
+        t["live_text"] = next(c for c in (_mix(t["live"], t["text_hi"], i / 10) for i in range(11))
+                              if _contrast(c, t["bg"]) >= 4.5 or c == t["text_hi"])
+    t.setdefault("live_border", _mix(t["live_text"], t["bg"], 0.45))
+
+
+for _t in THEMES.values():
+    _add_live_tokens(_t)
+
 DEFAULT = "Dark"
 # How the Settings window groups the theme cards. Every theme is in exactly one group.
 GROUPS: list[tuple[str, list[str]]] = [
@@ -423,11 +462,11 @@ QFrame#chip QPushButton#chipstop { border-radius:12px; padding:0; }
 QFrame#chip QPushButton#chipstop:hover { background:$danger_bg; }
 QLabel#iconlabel { background:transparent; }
 QPushButton#pill { border-radius:15px; padding:5px 14px; font-weight:600; }
-QPushButton#pill[state="ok"] { color:$ok_text; border:1px solid $ok_border; }
+QPushButton#pill[state="ok"] { color:$live_text; border:1px solid $live_border; }
 QPushButton#onair { border-radius:15px; padding:5px 14px; font-weight:700;
     background:$danger_bg; border:1px solid $danger_border; color:$danger_text; }
-QPushButton#onair:checked { background:#13a35a; border:1px solid #13ce66; color:white; }
-QPushButton#onair:checked:hover { background:#16b865; }
+QPushButton#onair:checked { background:$live; border:1px solid $live_hi; color:$on_live; }
+QPushButton#onair:checked:hover { background:$live_hi; }
 QWidget#decktop { background:transparent; }
 QLabel#decktitle { color:$section; font-size:8pt; font-weight:700; letter-spacing:1px; }
 QPushButton#pill[state="warn"] { background:$warn_bg; color:$warn_text; border:1px solid $warn_text; }
@@ -590,10 +629,11 @@ QPushButton#fold { background:transparent; border:none; color:$muted; padding:3p
 QPushButton#fold:hover, QPushButton#fold:checked { color:$text; background:transparent; }
 QFrame#card QPushButton#fold, QFrame#card QPushButton#fold:checked { background:transparent; }
 QPushButton#power { font-weight:700; }
-QPushButton#power:checked, QFrame#card QPushButton#power:checked { background:#13a35a; border:1px solid #13ce66; color:white; }
+QPushButton#power:checked, QFrame#card QPushButton#power:checked { background:$live; border:1px solid $live_hi; color:$on_live; }
+QPushButton#power:checked:hover, QFrame#card QPushButton#power:checked:hover { background:$live_hi; }
 QPushButton#live:checked { background:#e53935; border:1px solid #ff6b6b; color:white; }
 QPushButton#rec:checked { background:#e53935; border:1px solid #ff6b6b; color:white; font-weight:700; }
-QPushButton#lite:checked { background:#13a35a; border:1px solid #13ce66; color:white; font-weight:700; }
+QPushButton#lite:checked { background:$live; border:1px solid $live_hi; color:$on_live; font-weight:700; }
 QFrame#setcard { background:$panel; border-radius:12px; }
 QFrame#setcard QWidget { background:transparent; }
 QFrame#setcard QPushButton { background:$btn; }
@@ -845,7 +885,7 @@ def stylesheet(name: str | None = None) -> str:
 # Text colours code writes straight into a label's rich text or a widget's own stylesheet
 # (status(), T["faint"]...): a live theme switch swaps the old theme's for the new one's.
 _INLINE_KEYS = ("ok_text", "warn_text", "error_text", "danger_text", "text", "text_hi",
-                "muted", "faint", "section", "accent", "accent_hi")
+                "muted", "faint", "section", "accent", "accent_hi", "live_text")
 _TEXT_COLOUR = re.compile(r"(?<![-\w])(color:\s*)(#[0-9a-fA-F]{6})(?![0-9a-fA-F])")
 
 

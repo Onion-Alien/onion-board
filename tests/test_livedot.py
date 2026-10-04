@@ -1,8 +1,8 @@
-"""The "live" mark on a tab (a badge on its icon, optionally a green wash), and the
-Voice panel driving it."""
+"""The "live" mark on a tab (a badge on its icon, optionally a wash in the theme's live
+colour), and the Voice panel driving it."""
 import pytest
 from PySide6.QtGui import QColor
-from PySide6.QtWidgets import QTabBar, QTabWidget, QWidget
+from PySide6.QtWidgets import QTabWidget, QWidget
 
 from soundboard import theme
 from soundboard.speech import tts
@@ -55,25 +55,17 @@ def test_going_live_never_changes_a_tabs_size(qapp):
         tabs.close()
 
 
-def green_pixels(bar: QTabBar, index: int) -> int:
-    """How many pixels of the tab are close to the live colour (badge, wash)."""
-    img = bar.grab().toImage()
-    want = QColor(live_color())
-    r = bar.tabRect(index)
-    return sum(1 for y in range(r.top(), r.bottom() + 1) for x in range(r.left(), r.right() + 1)
-               if all(abs(a - b) < 40 for a, b in
-                      zip(img.pixelColor(x, y).getRgb()[:3], want.getRgb()[:3])))
-
-
-def wash_pixels(bar: QTabBar, index: int) -> int:
-    """Pixels inside the tab that the wash turned green-ish (green above red and blue)."""
-    img = bar.grab().toImage()
-    r = bar.tabRect(index).adjusted(4, 4, -4, -4)
+def washed(before, after, rect) -> int:
+    """Pixels inside `rect` the wash moved towards the live colour: it's the theme's
+    own colour, so "green-ish" (as it was when it was always green) doesn't say it."""
+    live = QColor(live_color())
     n = 0
-    for y in range(r.top(), r.bottom() + 1):
-        for x in range(r.left(), r.right() + 1):
-            c = img.pixelColor(x, y)
-            n += c.green() > c.red() + 6 and c.green() > c.blue() + 6
+    for y in range(rect.top(), rect.bottom() + 1):
+        for x in range(rect.left(), rect.right() + 1):
+            a, b = before.pixelColor(x, y), after.pixelColor(x, y)
+            moved = [(q - p, w - p) for p, q, w in zip(a.getRgb()[:3], b.getRgb()[:3],
+                                                       live.getRgb()[:3])]
+            n += any(d for d, _ in moved) and sum(d * w for d, w in moved) > 0
     return n
 
 
@@ -88,30 +80,32 @@ def test_live_tab_has_a_badge_and_the_optional_wash(qapp):
     qapp.processEvents()
     bar = tabs.tabBar()
     try:
-        assert green_pixels(bar, 1) == 0
+        idle = bar.grab().toImage()
         set_tab_live(tabs, 1, True, "ON")
         qapp.processEvents()
-        assert green_pixels(bar, 1) > 0 and green_pixels(bar, 0) == 0     # the badge
-        plain = wash_pixels(bar, 1)
+        plain = bar.grab().toImage()
+        assert washed(idle, plain, bar.tabRect(1)) > 0                    # the badge
+        assert washed(idle, plain, bar.tabRect(0)) == 0
         assert bar.findChild(LiveTint) is None                            # no wash by default
         set_tint(tabs, True)
         qapp.processEvents()
-        assert entries(tabs)[1] == ("ok_text", False)   # green icon, no dot: either-or
-        assert wash_pixels(bar, 1) > plain + 200 and wash_pixels(bar, 0) == 0
+        assert entries(tabs)[1] == ("live_text", False)   # coloured icon, no dot: either-or
+        tinted = bar.grab().toImage()
+        assert washed(plain, tinted, bar.tabRect(1).adjusted(4, 4, -4, -4)) > 200
+        assert washed(plain, tinted, bar.tabRect(0)) == 0
         # the wash lines up with the tab's own box (the selected tab's underline),
-        # not its margin: nothing green past its right edge
+        # not its margin: nothing tinted past its right edge
         r = bar.tabRect(1)
-        img = bar.grab().toImage()
         edge = r.right() - TAB_MARGIN_RIGHT + 2
-        assert all(QColor(img.pixel(edge, y)).green() <= QColor(img.pixel(edge, y)).red() + 8
+        assert all(plain.pixel(edge, y) == tinted.pixel(edge, y)
                    for y in range(r.top() + 8, r.bottom() - 2))
         set_tint(tabs, False)
         qapp.processEvents()
         assert entries(tabs)[1] == (None, True)
-        assert wash_pixels(bar, 1) == plain
+        assert bar.grab().toImage() == plain
         set_tab_live(tabs, 1, False)
         qapp.processEvents()
-        assert green_pixels(bar, 1) == 0
+        assert bar.grab().toImage() == idle
     finally:
         tabs.close()
 
@@ -157,3 +151,15 @@ def test_random_voice_is_a_silly_own_mix(panel):
         assert 2 <= len(on) <= 3
         if "compressor" in on:
             assert on["compressor"]["boost"] <= 9
+
+
+@pytest.mark.parametrize("name", list(theme.THEMES))
+def test_every_theme_has_its_own_readable_live_colour(name):
+    """The "it's on" highlight follows the theme (it was the same green in every one):
+    a switched-on button is the accent, and the live text / tab wash reads on the
+    background."""
+    t = theme.THEMES[name]
+    assert t["live"] == t["accent"] and t["on_live"] == t["on_accent"]
+    assert theme._contrast(t["live_text"], t["bg"]) >= 4.5
+    css = theme.stylesheet(name)
+    assert "#13a35a" not in css and "$" not in css

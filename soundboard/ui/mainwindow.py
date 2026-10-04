@@ -437,7 +437,7 @@ class MainWindow(QMainWindow):
         self.tabs.setCurrentIndex(self.cfg.tab if 0 <= self.cfg.tab < self.tabs.count() else 0)
         self.tabs.currentChanged.connect(lambda i: self.set_option("tab", i))
         self.tabs.currentChanged.connect(lambda _i: self._update_status())
-        # a green badge on a tab's icon (and, if picked in Settings, a green wash) while
+        # a badge on a tab's icon (or, by default, a wash) in the theme's live colour while
         # its feature is live — the voice changer, a radio station, a program being
         # sent, the screen watched — so it's never left on without you noticing
         set_live_tint(self.tabs, self.cfg.live_tab_green)
@@ -1610,8 +1610,8 @@ class MainWindow(QMainWindow):
         if self.pill.text() != pill:
             good = state in ("ok", "off")
             self.pill.setText(pill)
-            self.pill.setIcon(icons.icon("headphones", "ok_text") if state == "off" else
-                              icons.icon("check", "ok_text") if good else
+            self.pill.setIcon(icons.icon("headphones", "live_text") if state == "off" else
+                              icons.icon("check", "live_text") if good else
                               icons.icon("warn", "warn_text"))
             self.pill.setProperty("state", "ok" if good else "warn")
             self.pill.style().unpolish(self.pill)

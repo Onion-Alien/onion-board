@@ -488,10 +488,10 @@ class SettingsDialog(QDialog):
                               "voice changer, the radio…) is marked, so nothing is left on "
                               "without you noticing.")
         row = QVBoxLayout()   # one under the other: side by side made the page too wide
-        green = QRadioButton("Tint the tab green")
-        green.setToolTip("A soft green background and a green icon, easy to spot from "
+        green = QRadioButton("Tint the tab")
+        green.setToolTip("A soft wash and a coloured icon in the theme's colour, easy to spot from "
                          "across the room")
-        dot = QRadioButton("A small green dot on its icon")
+        dot = QRadioButton("A small dot on its icon")
         dot.setToolTip("Quieter: only a dot on the tab's icon")
         modes = QButtonGroup(card)
         for b in (green, dot):

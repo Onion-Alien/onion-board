@@ -3,8 +3,9 @@ while the voice changer is changing your mic, Radio while a station plays, Apps
 while a program's sound is sent, Triggers while the screen is watched), so it
 can't be left on by accident without you noticing from another tab.
 
-Two ways to mark it (Settings → Appearance): a green tint, the default (a soft wash
-over the tab and a green icon), or a small green dot drawn into the tab's icon.
+Two ways to mark it (Settings → Appearance): a tint, the default (a soft wash over
+the tab and a coloured icon), or a small dot drawn into the tab's icon. Both use the
+theme's "live" colour (its accent).
 Either way a tab never changes size when it goes live (a dot beside the name used to
 widen it and shove the tabs after it along)."""
 from __future__ import annotations
@@ -16,19 +17,18 @@ from PySide6.QtWidgets import QTabBar, QTabWidget, QWidget
 from soundboard import theme
 from soundboard.ui import icons
 
-TINT_ICON = "ok_text"   # a tinted live tab's icon: the theme's "ok" green
+TINT_ICON = "live_text"   # a tinted live tab's icon: the theme's live colour
 TAB_MARGIN_RIGHT = 4    # theme.py's QTabBar::tab margin-right: tabRect includes it,
                         # the selected tab's underline doesn't
 
 
 def live_color() -> str:
-    """The live green: the theme's "ok" colour (the light themes darken it so it can
-    be read)."""
-    return theme.status("ok")
+    """The theme's live colour, as it reads on the background."""
+    return theme.T["live_text"]
 
 
 class LiveTint(QWidget):
-    """The green wash over a bar's live tabs: a see-through child laid over the whole
+    """The wash over a bar's live tabs: a see-through child laid over the whole
     bar, so it takes no room and clicks go straight through to the tabs."""
 
     ALPHA = 0.14

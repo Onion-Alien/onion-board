@@ -41,7 +41,6 @@ LIST_MAX = 300             # rows shown at once
 SEARCH_DELAY_MS = 450      # typing pause before the directory is asked
 FAV_MAX = 200
 RECENT_MAX = 30
-GREEN = "#13ce66"   # the playing station's highlight on dark themes
 ROW_H = 54
 # what the globe page may load: its own files and inline data, never the network
 LOCAL_SCHEMES = ("file", "data", "blob", "about", "qrc")
@@ -221,8 +220,7 @@ class _StationDelegate(QStyledItemDelegate):
             p.setBrush(QColor(t["badge"]))
             p.drawRoundedRect(pill, 9, 9)
             p.setFont(f)
-            hi = GREEN if QColor(t["bg"]).lightness() < 128 else "#0b7a43"
-            p.setPen(QColor(hi if s.bitrate >= 256 else t["badge_text"]))
+            p.setPen(QColor(t["live_text"] if s.bitrate >= 256 else t["badge_text"]))
             p.drawText(pill, Qt.AlignCenter, pill_txt)
             right = int(pill.left()) - 8
 
