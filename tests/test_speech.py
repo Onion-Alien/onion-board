@@ -343,11 +343,42 @@ class FakeEngine:
         self.stopped.append(sid)
 
 
+_controllers: list[SpeechController] = []
+
+
+@pytest.fixture(autouse=True)
+def _shut_controllers_down():
+    """Each controller's speaker runs a thread: end it with the test, not the run."""
+    yield
+    while _controllers:
+        _controllers.pop().shutdown()
+
+
 def controller(events=None):
     eng = FakeEngine()
     c = SpeechController(eng, VoiceChain(), (events if events is not None else []).append)
     c.tts = c.speaker.tts = FakeTTS()
+    _controllers.append(c)
     return c, eng
+
+
+def speaker_threads() -> int:
+    return sum(t.name == "tts-speaker" for t in threading.enumerate())
+
+
+def test_shutting_the_controller_down_ends_its_speaker_thread():
+    before = speaker_threads()
+    c, eng = controller()
+    assert speaker_threads() == before + 1
+    c.say("one")
+    assert wait_for(lambda: len(eng.played) == 1)
+    c.say("two")                    # still waiting out "one" when the shutdown comes
+    c.shutdown()
+    assert speaker_threads() == before
+    assert not c.speaker._thread.is_alive()
+    c.say("three")                  # a late line after the shutdown is just dropped
+    time.sleep(0.1)
+    assert len(eng.played) == 1
 
 
 def test_typed_text_is_spoken_in_order_as_a_sound():

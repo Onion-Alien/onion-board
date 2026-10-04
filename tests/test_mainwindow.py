@@ -393,6 +393,21 @@ def test_mute_switch_silences_what_others_hear(window, monkeypatch):
     assert e.sending and window.btn_air.isChecked() and "Live" in window.btn_air.text()
 
 
+def test_closing_the_window_ends_its_computer_voice_thread(window):
+    """Every window's computer voice runs a speaker thread. Left behind by each closed
+    window, a full test run piled up dozens of them."""
+    import threading
+
+    def speakers():
+        return sum(t.name == "tts-speaker" for t in threading.enumerate())
+    t = window.voice.controller.speaker._thread
+    assert t.is_alive()
+    before = speakers()
+    window.close()
+    assert not t.is_alive()
+    assert speakers() == before - 1
+
+
 def test_an_installer_or_log_off_really_closes_the_app(window, monkeypatch):
     """Closing normally hides to the tray; but when Windows asks the app to close
     (log-off, or an installer through the Restart Manager) hiding would veto it and
@@ -409,19 +424,22 @@ def test_an_installer_or_log_off_really_closes_the_app(window, monkeypatch):
         def showMessage(self, *a):
             pass
 
-    monkeypatch.setattr(window, "tray", Tray())
-    monkeypatch.setattr(window, "shutdown", lambda: None)
-    monkeypatch.setattr(main.QTimer, "singleShot", staticmethod(lambda *a: None))
-    window.cfg.tray = True
-    ev = QCloseEvent()
-    window.closeEvent(ev)
-    assert not ev.isAccepted()                  # the ✕ button: off to the tray
-    app = QApplication.instance()          # Windows' request reaches the window...
-    assert app.receivers("2commitDataRequest(QSessionManager&)") >= 1
-    window._on_session_end()               # ...(emitting it here needs a real session)
-    ev = QCloseEvent()
-    window.closeEvent(ev)
-    assert ev.isAccepted()
+    # its own context: the window fixture's close must find the real shutdown again,
+    # or the window's threads (computer voice and all) are never stopped
+    with monkeypatch.context() as mp:
+        mp.setattr(window, "tray", Tray())
+        mp.setattr(window, "shutdown", lambda: None)
+        mp.setattr(main.QTimer, "singleShot", staticmethod(lambda *a: None))
+        window.cfg.tray = True
+        ev = QCloseEvent()
+        window.closeEvent(ev)
+        assert not ev.isAccepted()                  # the ✕ button: off to the tray
+        app = QApplication.instance()          # Windows' request reaches the window...
+        assert app.receivers("2commitDataRequest(QSessionManager&)") >= 1
+        window._on_session_end()               # ...(emitting it here needs a real session)
+        ev = QCloseEvent()
+        window.closeEvent(ev)
+        assert ev.isAccepted()
 
 
 def test_pads_fit_the_width_with_no_sideways_scrolling(window, qapp):

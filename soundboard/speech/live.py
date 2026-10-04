@@ -156,5 +156,5 @@ class SpeechController:
 
     def shutdown(self):
         self.stop_live()
-        self.speaker.stop()
+        self.speaker.close()
         self.tts.close()

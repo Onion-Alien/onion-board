@@ -272,7 +272,9 @@ class Speaker:
         self._cancel = threading.Event()
         self._gen = 0           # bumped by stop(); a line from an older gen is dropped
         self._busy_until = 0.0
-        threading.Thread(target=self._run, name="tts-speaker", daemon=True).start()
+        self._closed = False
+        self._thread = threading.Thread(target=self._run, name="tts-speaker", daemon=True)
+        self._thread.start()
 
     def say(self, text: str, voice: str | None = None):
         """Queue a line; `voice` overrides `self.voice` for this line only."""
@@ -287,15 +289,24 @@ class Speaker:
         self._cancel.set()
         self._busy_until = 0.0
 
+    def close(self, timeout: float = 2.0):
+        """Stop for good: drop the queue and end the background thread (a line being
+        synthesized right now finishes first, at most `timeout` is waited for it)."""
+        self._closed = True
+        self.stop()
+        self._wake.set()
+        if self._thread is not threading.current_thread():
+            self._thread.join(timeout)
+
     @property
     def busy(self) -> bool:
         return bool(self._q) or time.monotonic() < self._busy_until
 
     def _run(self):
-        while True:
+        while not self._closed:
             self._wake.wait()
             self._wake.clear()
-            while True:
+            while not self._closed:
                 gen = self._gen     # read before popping, so a stop() in between is seen
                 try:
                     text, voice = self._q.popleft()
