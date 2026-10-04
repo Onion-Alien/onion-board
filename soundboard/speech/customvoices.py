@@ -38,6 +38,7 @@ import soundfile as sf
 
 from soundboard import library, net, netlog
 from soundboard.speech.tts import TTS_RATE, SapiTTS
+from soundboard import errors
 
 log = logging.getLogger(__name__)
 
@@ -133,7 +134,7 @@ class CustomVoice:
             detail = e.read(300).decode("utf-8", "replace").strip()
             raise RuntimeError(f"{self.name}: the server said {e.code} {detail}".strip()) from None
         except net.FeatureOff as e:
-            raise RuntimeError(f"{self.name}: {e}") from None
+            raise RuntimeError(f"{self.name}: {errors.plain(e)}") from None
         except (urllib.error.URLError, OSError) as e:
             why = getattr(e, "reason", e)
             raise RuntimeError(f"{self.name}: couldn't reach {self.url} ({why}). "
@@ -161,7 +162,8 @@ class CustomVoice:
             except subprocess.TimeoutExpired:
                 raise RuntimeError(f"{self.name}: the program took too long") from None
             except OSError as e:
-                raise RuntimeError(f"{self.name}: couldn't start {self.command[0]} ({e})") from None
+                raise RuntimeError(f"{self.name}: couldn't start {self.command[0]} "
+                                   f"({errors.plain(e)})") from None
             data = Path(out).read_bytes()
             if r.returncode or not data:
                 err = r.stderr.decode("utf-8", "replace").strip().splitlines()
@@ -224,7 +226,7 @@ def load(d: Path | None = None) -> tuple[list[CustomVoice], list[str]]:
                 api_key=str(raw.get("api_key", "")), language=_lang(raw.get("language")),
                 cwd=d))
         except (OSError, ValueError) as e:
-            problems.append(f"{f.name}: {e}")
+            problems.append(f"{f.name}: {errors.plain(e)}")
     onnx = sorted(d.glob("*.onnx"))
     if onnx:
         exe = _piper_exe(d)

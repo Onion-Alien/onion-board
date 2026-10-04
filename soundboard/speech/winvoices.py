@@ -19,6 +19,7 @@ import tempfile
 from pathlib import Path
 
 from soundboard import net
+from soundboard import errors
 
 INSTALL_TIMEOUT_S = 30 * 60      # a slow Windows Update download
 ERROR_CANCELLED = 1223           # the UAC prompt was answered No
@@ -161,7 +162,7 @@ def install(lang: str, timeout: float = INSTALL_TIMEOUT_S) -> str:
         except subprocess.TimeoutExpired:
             raise RuntimeError("Windows took too long downloading the voice") from None
         except OSError as e:
-            raise RuntimeError(f"couldn't start PowerShell: {e}") from None
+            raise RuntimeError(f"couldn't start PowerShell: {errors.plain(e)}") from None
         answer = out.read_text(encoding="utf-8-sig") if out.exists() else ""
         return outcome(r.returncode, r.stdout or "", answer)
     finally:

@@ -102,7 +102,7 @@ def test_download_audio_errors_are_readable(monkeypatch, tmp_path):
     fake_yt_dlp(monkeypatch, {}, fail="ERROR: \x1b[0;31mVideo unavailable\x1b[0m")
     with pytest.raises(ytdl.DownloadError) as e:
         ytdl.download_audio("https://youtu.be/x", tmp_path, auto_update=False)
-    assert str(e.value) == "Video unavailable"
+    assert str(e.value) == "That video isn't available any more."   # errors.describe
     assert isinstance(e.value, ytdl.FetchError)   # yt-dlp's fault: an update may help
 
 
@@ -333,7 +333,7 @@ def test_probe_returns_title_and_duration_without_downloading(monkeypatch):
     with pytest.raises(ytdl.DownloadError, match="playlist"):
         ytdl.probe("https://youtu.be/x")
     fake_yt_dlp(monkeypatch, {}, fail="ERROR: Unsupported URL: https://example.com")
-    with pytest.raises(ytdl.FetchError, match="^Unsupported URL"):
+    with pytest.raises(ytdl.FetchError, match="^That link isn.t from a site"):
         ytdl.probe("https://example.com")
 
 
@@ -451,7 +451,7 @@ def test_search_lists_videos_and_skips_live_and_junk(monkeypatch):
     assert r[0].thumb == "https://i.ytimg.com/vi/HEXWRTEbj1I/mqdefault.jpg"
     assert ytdl.search("   ") == []
     fake_yt_dlp(monkeypatch, {}, fail="ERROR: network down")
-    with pytest.raises(ytdl.FetchError, match="^network down"):
+    with pytest.raises(ytdl.FetchError, match="^The downloader ran into a problem: network down"):
         ytdl.search("x")
 
 

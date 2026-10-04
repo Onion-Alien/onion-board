@@ -31,6 +31,7 @@ from collections.abc import Callable
 from pathlib import Path
 
 from soundboard import library, net
+from soundboard import errors
 
 log = logging.getLogger(__name__)
 
@@ -102,7 +103,7 @@ def download(progress: Callable[[int, int], None] | None = None) -> bytes:
                 if progress:
                     progress(buf.tell(), total)
     except net.ProxyError as e:   # FeatureOff included: switched off, nothing sent
-        raise GetError(str(e)) from None
+        raise GetError(errors.plain(e)) from None
     except urllib.error.HTTPError as e:
         raise GetError(f"dist.torproject.org said {e.code} {e.reason}. {BLOCKED_HINT}") from None
     except (urllib.error.URLError, OSError) as e:

@@ -23,6 +23,7 @@ from collections.abc import Callable
 from pathlib import Path, PurePosixPath
 
 from soundboard import library, net
+from soundboard import errors
 
 log = logging.getLogger(__name__)
 
@@ -80,7 +81,7 @@ def download(info, on_progress: Callable[[int, int], None] = lambda done, total:
             raise RuntimeError("the download didn't match its checksum, so it wasn't used")
         _unpack(part, model_dir(info))
     except OSError as e:
-        raise RuntimeError(f"download failed: {e}") from e
+        raise RuntimeError(f"download failed: {errors.plain(e)}") from e
     finally:
         try:
             part.unlink(missing_ok=True)

@@ -37,6 +37,7 @@ from soundboard.ui.owl import OwlWidget
 from soundboard.ui.panel import CardGrid, HoverCard
 from soundboard.ui.responsive import FitWidth
 from soundboard.ui.widgets import fmt_time
+from soundboard import errors
 
 log = logging.getLogger(__name__)
 
@@ -605,6 +606,7 @@ class SearchResults(QFrame):
         self.title = QLabel()
         self.title.setTextFormat(Qt.RichText)
         self.title.setWordWrap(True)
+        errors.linkify(self.title)   # an error's "Report it" link
         v.addWidget(self.title)
         # Tor mode, after the site turned Tor away even over new routes: only this click
         # runs the search without Tor (ytdl.TorBlocked)
@@ -751,10 +753,11 @@ class SearchResults(QFrame):
             self._done.emit(gen, ytdl.search(query, source=source, **more), "")
         except ytdl.TorBlocked as e:   # offered without Tor, never done unasked
             log.info("%s search turned away over Tor", source)
-            self._done.emit(gen, "blocked", str(e))
+            self._done.emit(gen, "blocked", html.escape(str(e)))
         except Exception as e:  # noqa: BLE001 - shown in the panel
             log.info("%s search failed for %r: %s", source, query, e)
-            self._done.emit(gen, [], str(e) or "Search failed")
+            # rich text: the plain words, and a "Report it" link when it's one for us
+            self._done.emit(gen, [], errors.html(e, where=f"Searching {source}"))
 
     def _on_done(self, gen: int, results, err: str):
         if gen != self._gen:
@@ -764,7 +767,7 @@ class SearchResults(QFrame):
         if err:
             red = theme.status("error")
             self.title.setText(f"<span style='color:{red}'>Couldn't search {self.site}: "
-                               f"{html.escape(err)}</span>")
+                               f"{err}</span>")   # rich text from _work
             self.direct_btn.setVisible(results == "blocked")
             return
         if not results:

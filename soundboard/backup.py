@@ -38,6 +38,7 @@ from soundboard import __version__, library, voicefx
 from soundboard.library import (AUDIO_EXTS, Config, SoundMeta, clean_fade, clean_setting,
                                 clean_tags, fits_type)
 from soundboard.speech.live import clean_settings as clean_speech_settings
+from soundboard import errors
 
 log = logging.getLogger(__name__)
 
@@ -431,7 +432,7 @@ def install(pkg: Package, known_fingerprints: set[str], color_for=None) -> Impor
                                     budget)
             except (OSError, BackupError, zipfile.BadZipFile) as e:
                 log.warning("import of %s failed", ps.folder, exc_info=True)
-                out.failed.append(f"{name}: {e}")
+                out.failed.append(f"{name}: {errors.plain(e)}")
                 continue
             except Exception:  # noqa: BLE001 - one odd sound mustn't stop the rest
                 log.warning("import of %s failed", ps.folder, exc_info=True)

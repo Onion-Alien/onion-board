@@ -30,6 +30,7 @@ from soundboard import modules, net, netlog, theme, updates, watchaddon
 from soundboard.ui import busy, icons
 from soundboard.ui.owl import OwlWidget
 from soundboard.ui.panel import card, hint_label, section_label
+from soundboard import errors
 
 log = logging.getLogger(__name__)
 
@@ -332,7 +333,7 @@ class TriggersTab(QWidget):
         self.bar.hide()
         if update:
             if error:
-                self.update_text.setText(f"Onion Watch wasn't updated: {error}")
+                self.update_text.setText(f"Onion Watch wasn't updated: {errors.plain(error)}")
             else:
                 self.offer = None
                 self.btn_update.hide()
@@ -388,7 +389,7 @@ class TriggersTab(QWidget):
         except modules.ModuleError as e:
             log.warning("Onion Watch couldn't be removed: %s", e)
             QMessageBox.warning(self, "Onion Watch wasn't removed",
-                                f"Onion Watch wasn't removed: {e}")
+                                f"Onion Watch wasn't removed: {errors.plain(e)}")
             self.load()                     # it's still there: put its tab back
             return
         log.info("Onion Watch %s was removed", info.version)

@@ -28,6 +28,8 @@ from collections.abc import Callable
 import numpy as np
 import soundfile as sf
 
+from soundboard import errors
+
 log = logging.getLogger(__name__)
 
 TTS_RATE = 22050
@@ -171,7 +173,7 @@ class SapiTTS:
                 self._start()
                 self.error = ""
             except (OSError, RuntimeError) as e:
-                self.error = str(e)
+                self.error = errors.plain(e)
                 log.warning("text-to-speech unavailable: %s", e)
             return self.voices
 
@@ -291,7 +293,7 @@ class Speaker:
                                               self.rate)
                 except Exception as e:  # noqa: BLE001
                     log.warning("text-to-speech failed: %s", e)
-                    self.on_error(str(e))
+                    self.on_error(errors.plain(e))
                     continue
                 if gen != self._gen:
                     continue
@@ -303,7 +305,7 @@ class Speaker:
                     self.play(np.repeat(mono[:, None], 2, axis=1), sr)
                 except Exception as e:  # noqa: BLE001 - keep speaking the next lines
                     log.warning("couldn't play a spoken line: %s", e)
-                    self.on_error(str(e))
+                    self.on_error(errors.plain(e))
                     continue
                 dur = len(mono) / sr
                 self._busy_until = time.monotonic() + dur

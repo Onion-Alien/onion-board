@@ -43,6 +43,7 @@ from pathlib import Path
 
 from soundboard import library, net, quality
 from soundboard.library import MAX_SECONDS
+from soundboard import errors
 
 log = logging.getLogger(__name__)
 
@@ -183,7 +184,7 @@ def _over_tor(fn, target: str):
         except SwitchedOff:
             raise
         except DownloadError as e:
-            if not blocked_by_site(str(e)):
+            if not blocked_by_site(f"{e} {getattr(e, 'raw', '')}"):
                 raise
             if not site_allowed(target):   # switched off meanwhile: no more tries
                 raise SwitchedOff(net.off_message(site_feature(target))) from None
@@ -369,7 +370,7 @@ def update(force: bool = False) -> str:
             except OSError as e:   # put the copy in use back, or downloads break
                 if old.exists():
                     old.rename(_pkg_dir())
-                raise DownloadError(f"couldn't swap in the new yt-dlp ({e})") from e
+                raise DownloadError(f"couldn't swap in the new yt-dlp ({errors.plain(e)})") from e
             shutil.rmtree(old, ignore_errors=True)
             _save_state(version=latest)
             _purge()
@@ -395,7 +396,7 @@ def reset() -> str:
     except Exception as e:  # noqa: BLE001
         log.warning("yt-dlp reinstall failed: %s", e)
         v = bundled_version()
-        return (f"Cleared, but couldn't download a fresh copy ({e}). "
+        return (f"Cleared, but couldn't download a fresh copy ({errors.plain(e)}). "
                 + (f"Using the built-in yt-dlp {v}." if v else "Try again when you're online."))
 
 
@@ -607,7 +608,7 @@ def _myinstants(query: str, count: int, direct: bool = False) -> list[Result]:
     except net.FeatureOff as e:
         raise SwitchedOff(str(e)) from None
     except Exception as e:  # noqa: BLE001 - offline, blocked…: show why
-        raise FetchError(f"Myinstants didn't answer ({e})") from e
+        raise FetchError(f"Myinstants didn't answer ({errors.plain(e)})") from e
     out = []
     for m in re.finditer(r"onclick=\"play\('(/media/sounds/[^']+?\.mp3)'.*?"
                          r'class="instant-link[^"]*">([^<]+)</a>', page, re.S):
@@ -749,7 +750,7 @@ def _download_direct(url, dest, progress, direct: bool = False) -> tuple[Path, s
     except Exception as e:  # noqa: BLE001 - network: show why
         if not dest:
             shutil.rmtree(tmp, ignore_errors=True)
-        raise DownloadError(f"Download failed ({e})") from e
+        raise DownloadError(f"Download failed ({errors.plain(e)})") from e
     return path, _direct_title(url)
 
 
@@ -763,9 +764,13 @@ def _check(info: dict) -> dict:
 
 
 def _readable(e: Exception) -> FetchError:
-    msg = re.sub(r"^ERROR:\s*", "", str(e)).strip()
-    msg = re.sub(r"\x1b\[[0-9;]*m", "", msg)   # colour codes
-    return FetchError(msg or "Download failed")
+    """yt-dlp's error in plain words (errors.describe): no "[youtube] id:" prefix,
+    command-line tips or "report this on yt-dlp's GitHub"; one we can't explain is
+    marked for reporting to us. The original text stays in `.raw`."""
+    p = errors.describe(e, downloader=True)
+    out = FetchError(p.text)
+    out.problem, out.raw = p, str(e)
+    return out
 
 
 def _opts(dest: Path | None = None, progress=None, thumbnail: bool = False,
