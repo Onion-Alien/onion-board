@@ -3988,7 +3988,7 @@ class MainWindow(QMainWindow):
                                   f"Onion Board {rel.version} is out — click for details")
             box = QMessageBox(QMessageBox.Warning, "Couldn't update",
                               f"Onion Board {rel.version} couldn't be downloaded: "
-                              f"{errors.plain(err)}.",
+                              f"{errors.plain(err).rstrip('.')}.",
                               QMessageBox.NoButton, self)
             page = box.addButton("Open the download page", QMessageBox.AcceptRole)
             box.addButton("Close", QMessageBox.RejectRole)

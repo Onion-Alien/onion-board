@@ -197,6 +197,36 @@ def test_an_open_download_stops_when_the_setting_changes(slow, change):
     r.close()
 
 
+def test_a_cut_update_download_says_why_in_plain_words(slow, monkeypatch, tmp_path):
+    """The reason (setting changed / switched off) is the message, not wrapped in
+    "the download failed (...)"; nothing is kept."""
+    site, socks = slow
+    net.configure(net.PROXY, socks.url())
+
+    class Https:   # the test site is plain http; fetch only takes https
+        def __init__(self):
+            self.r = net.urlopen(f"http://slow.test:{site.port}/big", timeout=10,
+                                 feature=updates.FEATURE)
+            self.headers, self.read = self.r.headers, self.r.read
+
+        def geturl(self):
+            return "https://example.com/x"
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *a):
+            self.r.close()
+    monkeypatch.setattr(updates, "_open", lambda url, feature: Https())
+    threading.Timer(0.3, lambda: net.configure(net.DIRECT)).start()
+    with pytest.raises(updates.UpdateError) as e:
+        updates.fetch("https://example.com/x", "0" * 64, tmp_path / "f.bin",
+                      ("https://example.com/",), 2_000_000, "a file")
+    assert str(e.value).startswith("Stopped: the connection setting changed")
+    assert "download failed" not in str(e.value)
+    assert not list(tmp_path.iterdir())
+
+
 def test_an_untouched_download_carries_on(slow):
     site, socks = slow
     net.configure(net.PROXY, socks.url())

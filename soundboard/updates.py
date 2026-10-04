@@ -284,6 +284,9 @@ def fetch(url: str, sha256: str, dest: Path, trusted: tuple[str, ...], max_size:
     except UpdateError:
         part.unlink(missing_ok=True)
         raise
+    except net.ProxyError as e:   # switched off / Offline / the connection changed: its
+        part.unlink(missing_ok=True)   # message already says so, in the user's words
+        raise UpdateError(str(e)) from e
     except OSError as e:   # offline, disk full, connection dropped…
         part.unlink(missing_ok=True)
         raise UpdateError(f"the download failed ({errors.plain(e)})") from e
