@@ -537,6 +537,14 @@ class SettingsDialog(QDialog):
                               "go back to the game the moment it closes.")
         self._hk_row(cv, "overlay_hotkey", "Overlay hotkey", "")
         cv.addWidget(self._ov_combo("mode", ovl.MODES, s.mode))
+        test = QPushButton("Open overlay")
+        test.setToolTip("Opens it now, the same as the hotkey: pick a sound with its keys "
+                        "or a click. Esc, this button or the hotkey closes it")
+        test.clicked.connect(lambda: self.mw.overlay.open_by_click())
+        row = QHBoxLayout()
+        row.addStretch(1)
+        row.addWidget(test)
+        cv.addLayout(row)
         v.addWidget(card)
 
         card, cv = self._card("Pick sounds",

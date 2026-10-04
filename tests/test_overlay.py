@@ -148,6 +148,19 @@ def test_hold_mode_closes_on_release_and_claims_modified_keys(make, monkeypatch,
     assert not ov.is_open
 
 
+def test_open_button_works_in_hold_mode_without_a_held_key(make, monkeypatch, qapp):
+    monkeypatch.setattr(winkeys, "is_down", lambda vk: False)   # nothing is held
+    ov = make({"mode": "hold", "autohide": 0}, hotkey="ctrl+alt+o")
+    ov.open_by_click()
+    process_events(qapp, lambda: False, timeout=0.3)
+    assert ov.is_open and ov.layer()["1"] == "__ov:slot:0"   # stays up, keys claimed
+    ov.handle(Overlay.ACTION)                           # the hotkey closes it, like toggle
+    assert not ov.is_open
+    ov.open_by_click()
+    ov.open_by_click()                                  # the button again closes it
+    assert not ov.is_open
+
+
 def test_autohide(make, qapp):
     ov = make({"autohide": 1})
     ov.open()
