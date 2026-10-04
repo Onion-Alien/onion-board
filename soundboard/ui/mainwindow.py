@@ -44,7 +44,6 @@ from soundboard.ui.crashdialog import free_dialog
 from soundboard.ui.dialogs import EditDialog
 from soundboard.ui import a11y, appstate, busy, icons, responsive, splash
 from soundboard.ui.speedpitch import SpeedPitchButton
-from soundboard.ui.videowindow import VideoWindow
 from soundboard.ui.panel import (EqPanel, VolumeControl, bar, card, hint_label, icon_label,
                                  vsep)
 from soundboard.ui.linkbar import PLAY_ID as LINK_ID
@@ -825,7 +824,7 @@ class MainWindow(QMainWindow):
         self.btn_video.clicked.connect(self.show_video)
         self.btn_video.hide()
         self._video_for: tuple[str | None, Path | None] = ("", None)   # (sid, its video)
-        self._video_win: VideoWindow | None = None
+        self._video_win = None   # ui/videowindow.VideoWindow, made on first use
         th.addWidget(self.btn_video)
         self.speed_btn = SpeedPitchButton(
             "sounds", "Changes every sound while it plays. To save a version, "
@@ -4151,6 +4150,13 @@ class MainWindow(QMainWindow):
             self.toast("This sound's video isn't there any more", "warn")
             return
         if self._video_win is None:
+            try:   # imported here: a build missing QtMultimediaWidgets must still start
+                from soundboard.ui.videowindow import VideoWindow
+            except ImportError:
+                log.exception("can't show videos")
+                self.btn_video.hide()
+                self.toast("Videos can't be shown in this copy of Onion Board", "warn")
+                return
             self._video_win = VideoWindow(self)
             self._video_win.setWindowIcon(self.windowIcon())
         self._video_win.show_for(sid, m.name, path)
