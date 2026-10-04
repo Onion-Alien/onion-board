@@ -122,6 +122,8 @@ class MainWindow(QMainWindow):
         self.setWindowTitle(self.title)
         self.setAcceptDrops(True)   # files dropped outside the pad grid: see dropEvent
         self.cfg = Config.load()
+        if self.cfg.netlog_keep:   # the kept network history: listed, and saved from now
+            netlog.keep(library.APP_DIR / netlog.FILE_NAME)
         net.configure_from(self.cfg)   # before anything goes online
         quality.load(self.cfg.data)    # ...and how much it fetches when it does
         tor.configure_from(self.cfg)   # Connection = Tor: starts when something goes online
@@ -4064,7 +4066,8 @@ class MainWindow(QMainWindow):
                      self.radio.shutdown, tor.shutdown, self.apps.shutdown,
                      self.triggers.shutdown,
                      self.linkbar.shutdown,
-                     self.voice.shutdown, self.engine.shutdown, shellicon.detach):
+                     self.voice.shutdown, self.engine.shutdown, shellicon.detach,
+                     netlog.flush):   # last: what's still open, once the rest closed
             try:
                 step()
             except Exception:  # noqa: BLE001 - keep shutting the rest down

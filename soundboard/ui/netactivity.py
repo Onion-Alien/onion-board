@@ -20,14 +20,22 @@ from PySide6.QtWidgets import (QAbstractItemView, QApplication, QButtonGroup, QH
 from soundboard import netlog, theme
 
 REFRESH_MS = 1000
+_TOR = ("Tor's own connections to the Tor network aren't listed one by one: with Tor, "
+        "everything here leaves through it.")
 NOTE = ("Every connection the app makes while it's open, and every one a switch "
         "turned away. Kept in memory only: nothing here is saved, logged or sent, and "
-        "closing the app forgets it. Tor's own connections to the Tor network aren't "
-        "listed one by one: with Tor, everything here leaves through it.")
+        "closing the app forgets it. " + _TOR)
+NOTE_KEPT = ("Every connection the app makes while it's open, and every one a switch "
+             "turned away. Kept on this PC between starts (Keep a history, below), "
+             "never logged or sent. " + _TOR)
 
 
 def _when(t: float) -> str:
-    return time.strftime("%H:%M:%S", time.localtime(t))
+    """The time, and the day too when it wasn't today (a kept history spans days)."""
+    lt = time.localtime(t)
+    if lt[:3] == time.localtime()[:3]:
+        return time.strftime("%H:%M:%S", lt)
+    return time.strftime("%d %b %H:%M", lt)
 
 
 _TONE = Qt.UserRole + 1   # the status colour a cell is drawn in (None: the default)
@@ -113,7 +121,7 @@ class NetActivity(QWidget):
         v.setContentsMargins(0, 0, 0, 0)
         v.setSpacing(8)
 
-        note = QLabel(NOTE)
+        self.note = note = QLabel(NOTE)
         note.setObjectName("hint")
         note.setWordWrap(True)
         v.addWidget(note)
@@ -144,7 +152,8 @@ class NetActivity(QWidget):
         self.copy.setToolTip("Copy the detailed list as text. It shows the sites you used: "
                              "read it before sharing it")
         self.clear = QPushButton("Clear")
-        self.clear.setToolTip("Forget the list so far")
+        self.clear.setToolTip("Forget the list so far (and the saved history, if "
+                              "it's kept)")
         row.addWidget(self.copy)
         row.addWidget(self.clear)
         v.addLayout(row)
@@ -201,8 +210,13 @@ class NetActivity(QWidget):
         self._entries = list(reversed(netlog.entries()))   # newest first
         servers = netlog.servers(self._entries)
         blocked = sum(e.state == netlog.BLOCKED for e in self._entries)
+        kept = netlog.keeping()
+        note = NOTE_KEPT if kept else NOTE
+        if self.note.text() != note:
+            self.note.setText(note)
         if not self._entries:
-            self.summary.setText("Nothing has gone online since the app started.")
+            self.summary.setText("Nothing has gone online yet." if kept else
+                                 "Nothing has gone online since the app started.")
         else:
             self.summary.setText(
                 f"{len(self._entries)} connection(s) to {len(servers)} server(s)"

@@ -144,6 +144,27 @@ def set_offline() -> int:
     return 0
 
 
+def keep_netlog() -> int:
+    """`OnionBoard.exe --keep-netlog`: the installer's "Keep a history of network
+    activity" box (or /KEEPNETLOG=1). Switches on netlog_keep in config.json before
+    the app's first start, so its first connections are kept too. Other settings are
+    kept; nothing connects. No window. Returns 0 once it's saved, 1 if it couldn't be."""
+    migrate_from_soundboard()
+    applog.setup(APP_DIR)
+    from soundboard import library
+    cfg = library.Config.load()
+    if cfg.read_only:
+        print("FAIL: config.json is locked by another program", file=sys.stderr)
+        return 1
+    cfg.netlog_keep = True
+    if not cfg.save():
+        print(f"FAIL: couldn't save {library.CONFIG_PATH}", file=sys.stderr)
+        return 1
+    log.info("--keep-netlog: network activity is kept between starts")
+    print("OK: network activity is kept between starts")
+    return 0
+
+
 def selftest_addon(path: str) -> int:
     """`OnionBoard.exe --selftest-addon OnionWatch-module.zip`: prove this build can
     run the Onion Watch add-on (it has no pip, so the add-on may only use what the
@@ -205,6 +226,8 @@ def main():
         sys.exit(get_tor())
     if "--set-offline" in sys.argv:
         sys.exit(set_offline())
+    if "--keep-netlog" in sys.argv:
+        sys.exit(keep_netlog())
     if "--selftest-addon" in sys.argv:
         sys.exit(selftest_addon(sys.argv[sys.argv.index("--selftest-addon") + 1]))
     migrate_from_soundboard()

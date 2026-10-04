@@ -314,6 +314,8 @@ class Config:
     # features switched off (opt-out: everything's on by default), and Offline mode
     net_off: list[str] = field(default_factory=list)
     net_offline: bool = False
+    # Network activity's "Keep a history" (soundboard.netlog.keep): off = memory only
+    netlog_keep: bool = False
     # "Hide that I'm using Tor": "" (off), "snowflake" or "obfs4" bridges
     tor_bridges: str = ""
     sounds: list[SoundMeta] = field(default_factory=list)

@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- **Keep the network activity list between starts:** tick *Keep a history
+  between starts* under Settings → Connection → Network activity (or the new box
+  on the installer's *Pick what you want* page) and every connection is saved on
+  this PC and listed again next time, up to the last 1000. Off by default; nothing
+  is sent anywhere, Clear empties it, and unticking it deletes the file.
 - **Reset, with an undo:** Settings → General → Start over opens a short guide:
   tick what to reset (settings, hotkeys and optionally each sound's hotkey,
   sounds, Recently deleted, programs, audio devices), check the summary, and the
