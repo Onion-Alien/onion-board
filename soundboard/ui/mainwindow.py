@@ -798,7 +798,10 @@ class MainWindow(QMainWindow):
         self.np_name = QLabel("Pick a sound")
         self.np_name.setToolTip("Select a sound pad to use these playback controls.")
         self.np_name.setTextFormat(Qt.PlainText)   # sound names are user / web text
-        self.np_name.setFixedWidth(190)
+        # fixed in both directions (the row's height, set by its buttons): a label that
+        # can grow makes Qt lay out the whole page again on every new text, and the
+        # name changes with every pad press (every pad on the board was repainted)
+        self.np_name.setFixedSize(190, 34)
         self.np_name.setStyleSheet("font-weight:600;")
         self.seek = SeekSlider(Qt.Horizontal)
         self.seek.setRange(0, 1000)
