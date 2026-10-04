@@ -15,7 +15,7 @@ from __future__ import annotations
 from collections.abc import Callable
 
 from PySide6.QtCore import QSize
-from PySide6.QtWidgets import QBoxLayout, QPushButton, QWidget
+from PySide6.QtWidgets import QBoxLayout, QLayout, QPushButton, QWidget
 
 Step = tuple[int, str, Callable[[bool], None]]   # (priority, "w" / "h", apply(compact))
 
@@ -115,8 +115,18 @@ class Fitter:
             self.steps[i][2](False)
         self._at.clear()
 
+    def need(self) -> QSize:
+        """The smallest size the root's content fits now, measured fresh: a step that
+        changed a text deep in a row (the status pill getting its long words back)
+        left a nested layout's cached size behind, so growing 640 -> 900 px wide with
+        search results brought back more than fits and the main window fell into the
+        mini player. ~250 layouts: well under a millisecond."""
+        for lay in self.root.findChildren(QLayout):
+            lay.invalidate()
+        return self.root.minimumSizeHint()
+
     def _over(self, size: QSize, axis: str) -> bool:
-        need = self.root.minimumSizeHint()
+        need = self.need()
         return (need.width() > size.width() if axis == "w"
                 else need.height() > size.height())
 
