@@ -3873,6 +3873,7 @@ class MainWindow(QMainWindow):
         f.add(60, "w", self._tab_icons_only)
         f.add(70, "w", r.hide(self.btn_check, *self._mixer_others))
         f.add(80, "w", r.hide(self.pill))
+        f.add(85, "w", self._tabs_tight)   # else the icons alone held it at ~480 px
         f.extend(self.radio.fit_steps())
         f.extend(self.voice.fit_steps())
         f.extend(self.triggers.fit_steps())
@@ -3900,6 +3901,14 @@ class MainWindow(QMainWindow):
                 if is_tab_live(self.tabs, i) and cur.endswith(old):   # keep its "● ON" line
                     base = cur[:len(cur) - len(old)] + base
             self.tabs.setTabToolTip(i, base)
+
+    def _tabs_tight(self, compact: bool):
+        """Icon-only tabs packed close: their padding was the widest thing left, so a
+        window the rest fits turned into the mini player."""
+        bar = self.tabs.tabBar()
+        bar.setStyleSheet("QTabBar::tab { padding:8px 6px; margin-right:0px; }"
+                          if compact else "")
+        responsive.touch(bar)
 
     def _refit(self):
         size = self._pages.size()
