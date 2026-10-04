@@ -11,8 +11,9 @@ import re
 import sys
 from pathlib import Path
 
-from PySide6.QtCore import QRectF, Qt
-from PySide6.QtGui import QIcon, QImage, QPainter, QPainterPath, QPixmap
+from PySide6.QtCore import QPointF, QRectF, Qt
+from PySide6.QtGui import (QColor, QIcon, QImage, QLinearGradient, QPainter, QPainterPath,
+                           QPixmap)
 
 ART_DIR = (Path(sys._MEIPASS) / "art" if hasattr(sys, "_MEIPASS")
            else Path(__file__).resolve().parents[2] / "assets" / "art")
@@ -82,6 +83,54 @@ def icon(key: str) -> QIcon | None:
                 ic.addPixmap(pm, mode, QIcon.On)
         _icons[key] = ic
     return _icons[key]
+
+
+def _dice(size: int) -> QPixmap:
+    """The "Random voice" tile's picture, painted: a white die on a purple-to-pink
+    rounded square, so it sits with the voices' pictures without being a file."""
+    pm = QPixmap(size, size)
+    pm.fill(Qt.transparent)
+    p = QPainter(pm)
+    p.setRenderHint(QPainter.Antialiasing)
+    s = size / 24
+    bg = QLinearGradient(0, 0, size, size)
+    bg.setColorAt(0, QColor("#7c4dff"))
+    bg.setColorAt(1, QColor("#ff4f9a"))
+    p.setPen(Qt.NoPen)
+    p.setBrush(bg)
+    p.drawRoundedRect(QRectF(0, 0, size, size), size * ROUND, size * ROUND)
+    p.translate(size / 2, size / 2)
+    p.rotate(-12)
+    die = QRectF(-7.5 * s, -7.5 * s, 15 * s, 15 * s)
+    p.setBrush(QColor(0, 0, 0, 60))   # a soft shadow under the die
+    p.drawRoundedRect(die.translated(0.8 * s, 1.4 * s), 3.2 * s, 3.2 * s)
+    face = QLinearGradient(die.topLeft(), die.bottomRight())
+    face.setColorAt(0, QColor("#ffffff"))
+    face.setColorAt(1, QColor("#e4dcff"))
+    p.setBrush(face)
+    p.drawRoundedRect(die, 3.2 * s, 3.2 * s)
+    p.setBrush(QColor("#3b2a7a"))
+    r = 1.45 * s
+    for x, y in ((-3.6, -3.6), (3.6, -3.6), (0, 0), (-3.6, 3.6), (3.6, 3.6)):
+        p.drawEllipse(QPointF(x * s, y * s), r, r)
+    p.end()
+    return pm
+
+
+def random_icon() -> QIcon:
+    """The "Random voice" tile's icon: assets/art/voice-random.png if there is one,
+    else the painted die."""
+    pic = icon("voice-random")
+    if pic is not None:
+        return pic
+    if "dice" not in _icons:
+        ic = QIcon()
+        for s in SIZES:
+            pm = _dice(s)
+            for mode in (QIcon.Normal, QIcon.Active, QIcon.Selected):
+                ic.addPixmap(pm, mode, QIcon.Off)
+        _icons["dice"] = ic
+    return _icons["dice"]
 
 
 def first(*keys: str) -> str:

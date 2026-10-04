@@ -26,7 +26,8 @@ EXTS = {".png", ".jpg", ".jpeg", ".webp"}
 KEYS = ["voice-chipmunk", "voice-deep-voice", "voice-demon", "voice-robot", "voice-alien",
         "voice-ghost", "voice-walkie-talkie", "voice-old-telephone", "voice-megaphone",
         "voice-stadium-announcer", "voice-cave", "voice-podcast-voice", "voice-custom",
-        "voice-computer", "lang-en", "lang-de", "lang-es", "lang-fr", "lang-ru", "lang-zh"]
+        "voice-random", "voice-computer",
+        "lang-en", "lang-de", "lang-es", "lang-fr", "lang-ru", "lang-zh"]
 
 
 def key_for(name: str) -> str:

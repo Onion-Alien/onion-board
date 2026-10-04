@@ -1,4 +1,5 @@
-"""The "Recently deleted" window: what's in the bin (soundboard.trash), newest first,
+"""The "Recently deleted" window: what's in the bin (soundboard.trash, or another bin
+shaped like it, such as the saved voices' in soundboard.savedvoices), newest first,
 with Bring back and Delete for good."""
 from __future__ import annotations
 
@@ -15,17 +16,18 @@ from soundboard.ui.panel import hint_label
 
 
 class DeletedDialog(QDialog):
-    """`restore(item)` puts a taken-out entry back and returns whether it could."""
+    """`restore(item)` puts a taken-out entry back and returns whether it could.
+    `source` has trash's items(kind) / take(id) / forget(id) and KEEP_DAYS."""
 
     def __init__(self, kind: str, what: str, restore: Callable[[trash.Item], bool],
-                 parent=None):
+                 parent=None, source=trash):
         super().__init__(parent)
         fit.watch(self)
-        self.kind, self.what, self.restore = kind, what, restore
+        self.kind, self.what, self.restore, self.source = kind, what, restore, source
         self.setWindowTitle(f"Recently deleted {what}")
         lay = QVBoxLayout(self)
         self.hint = hint_label(f"{what.capitalize()} you delete are kept here for "
-                               f"{trash.KEEP_DAYS} days, so you can bring them back.")
+                               f"{source.KEEP_DAYS} days, so you can bring them back.")
         lay.addWidget(self.hint)
         self.list = QListWidget()
         self.list.setSelectionMode(QAbstractItemView.ExtendedSelection)
@@ -52,7 +54,7 @@ class DeletedDialog(QDialog):
 
     def fill(self):
         self.list.clear()
-        for it in trash.items(self.kind):
+        for it in self.source.items(self.kind):
             li = QListWidgetItem(f"{it.name}    ·    deleted {trash.ago(it.when)}")
             li.setData(Qt.UserRole, it.id)
             self.list.addItem(li)
@@ -76,7 +78,7 @@ class DeletedDialog(QDialog):
     def bring_back(self):
         failed = []
         for iid in self._picked():
-            it = trash.take(iid)
+            it = self.source.take(iid)
             if it is None or not self.restore(it):
                 failed.append(it.name if it else "One of them")
         self.fill()
@@ -96,5 +98,5 @@ class DeletedDialog(QDialog):
                 "This can't be undone.") != QMessageBox.Yes:
             return
         for iid in ids:
-            trash.forget(iid)
+            self.source.forget(iid)
         self.fill()
