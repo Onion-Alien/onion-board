@@ -189,6 +189,7 @@ class MainWindow(QMainWindow):
         self._seeking = False
         self._tick_n = 0                  # ticks since start (the watchdog runs ~once a second)
         self._ui_live = True              # the window is on screen (see _set_tick_rate)
+        self._sounds_live = False         # the Sounds tab's live dot is shown
         self._icon_step, self._icon_next = -1, 0.0   # the icons' glow step (_glow_icons)
         self._xruns_shown = 0             # drop-out count last written to the status line
         self._talk_until = 0.0            # "hearing you" indicator holds until this time
@@ -3806,6 +3807,11 @@ class MainWindow(QMainWindow):
         if self._queue and not any(sid in self._meta for sid in playing):
             self._next_in_queue()
             playing = e.playing()
+        live = any(sid in self._meta and not paused for sid, (_p, paused) in playing.items())
+        if live != self._sounds_live:   # the Sounds tab glows while a sound plays
+            self._sounds_live = live
+            set_tab_live(self.tabs, self.tabs.indexOf(self.sounds_page), live,
+                         "● ON: a sound is playing", "sounds")
         pace = self._tick_pace()
         if self.timer.interval() != pace:
             self.timer.start(pace)
