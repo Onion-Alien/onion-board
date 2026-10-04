@@ -30,6 +30,7 @@ from pathlib import Path
 KEEP_MODULES = frozenset({
     "QtCore", "QtGui", "QtWidgets", "QtNetwork", "QtPrintSupport",
     "QtWebChannel", "QtWebEngineCore", "QtWebEngineWidgets", "QtMultimedia",
+    "QtMultimediaWidgets",
 })
 KEEP_LOCALES = frozenset({"en-US.pak"})
 # platform plugins: the real one, and offscreen for `OnionBoard.exe --selftest`

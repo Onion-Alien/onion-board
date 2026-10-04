@@ -85,3 +85,14 @@ def test_main_dry_run_deletes_nothing(tmp_path, monkeypatch, capsys):
     assert pb.main([str(app)]) == 0
     assert not (app / "_internal" / "PySide6" / "qml").exists()
     assert (app / "_internal" / "PySide6" / "Qt6Quick.dll").exists()
+
+
+def test_every_qt_module_the_app_imports_is_kept():
+    """A PySide6 module imported anywhere in soundboard/ but missing from KEEP_MODULES
+    is deleted from the build, and the frozen app can't start (the video window's
+    QtMultimediaWidgets once failed the build's self-test this way)."""
+    import re
+    used = set()
+    for f in (ROOT / "soundboard").rglob("*.py"):
+        used |= set(re.findall(r"PySide6\.(Qt\w+)", f.read_text(encoding="utf-8")))
+    assert used - pb.KEEP_MODULES == set()
