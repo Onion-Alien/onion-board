@@ -139,6 +139,20 @@ def test_mic_check_button_keeps_its_label(window):
     assert window.btn_check.text() == "Hear what they hear"
 
 
+def test_seek_bar_starts_right_after_a_short_name(window, qapp):
+    window.resize(946, 876)
+    window.show()
+    qapp.processEvents()
+    window._set_np_name("Pick a sound")
+    gap = window.seek.x() - window.np_name.geometry().right()
+    assert gap <= 14, gap
+    hint = window._name_seek.sizeHint()
+    window._set_np_name("A very long sound name that never fits in the player bar")
+    assert window.np_name.width() <= 190
+    assert window._name_seek.sizeHint() == hint   # no page relayout on a new name
+    assert window.seek.width() > 100
+
+
 def test_no_pad_hint_line_under_the_player(window):
     window.tabs.setCurrentWidget(window.sounds_page)
     assert "click to play" not in window.status.text()

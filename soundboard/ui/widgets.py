@@ -138,6 +138,46 @@ class SeekSlider(QSlider):
         super().mousePressEvent(e)
 
 
+class NameAndSeek(QWidget):
+    """The player's sound name with its seek slider right after it: the name is only
+    as wide as its text (up to ``max_name``) and the slider takes the rest. Placed by
+    hand, so a new name never changes this widget's size hint: the name changes with
+    every pad press, and a hint change would lay out the whole page again."""
+
+    GAP = 10
+
+    def __init__(self, name: QLabel, seek: QWidget, max_name: int, parent=None):
+        super().__init__(parent)
+        self.name, self.seek, self.max_name = name, seek, max_name
+        name.setParent(self)
+        seek.setParent(self)
+
+    def sizeHint(self):
+        return QSize(self.max_name + 120, max(self.name.height(), self.seek.sizeHint().height()))
+
+    def minimumSizeHint(self):
+        return QSize(160, self.sizeHint().height())
+
+    def relayout(self):
+        h = self.height()
+        fm = self.name.fontMetrics()
+        w = min(self.max_name, fm.horizontalAdvance(self.name.text()) + 4,
+                max(0, self.width() - 60 - self.GAP))
+        self.name.setGeometry(0, 0, w, h)
+        sh = self.seek.sizeHint().height()
+        x = w + self.GAP
+        self.seek.setGeometry(x, (h - sh) // 2, max(0, self.width() - x), sh)
+
+    def resizeEvent(self, e):
+        super().resizeEvent(e)
+        self.relayout()
+
+    def changeEvent(self, e):
+        super().changeEvent(e)
+        if e.type() in (QEvent.FontChange, QEvent.StyleChange):
+            self.relayout()
+
+
 class LoadingBar(QWidget):
     """An indeterminate progress bar: an accent pill gliding back and forth along a
     rounded groove. Theme colours are read on every paint, and the timer only runs

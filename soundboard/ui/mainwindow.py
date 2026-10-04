@@ -59,8 +59,9 @@ from soundboard.ui.triggershost import BoardHost
 from soundboard.ui.triggerstab import TriggersTab
 from soundboard.ui.radiopanel import RadioOff, RadioTab
 from soundboard.ui.voicepanel import VoicePanel
-from soundboard.ui.widgets import (Meter, Pad, PadGrid, SeekSlider, SteadyTabs, TabInfoCorner,
-                                   expand_dropped, fmt_pos, pad_height, spectrum, SLIM_PAD_H)
+from soundboard.ui.widgets import (Meter, NameAndSeek, Pad, PadGrid, SeekSlider, SteadyTabs,
+                                   TabInfoCorner, expand_dropped, fmt_pos, pad_height, spectrum,
+                                   SLIM_PAD_H)
 from soundboard.wheelguard import no_wheel
 from soundboard.winkeys import Hotkeys
 from soundboard import errors
@@ -553,6 +554,7 @@ class MainWindow(QMainWindow):
     def _set_np_name(self, text: str):
         self.np_name.setText(self.np_name.fontMetrics().elidedText(text, Qt.ElideRight, 186))
         self.np_name.setToolTip(text)
+        self._name_seek.relayout()
         self.mini_name.setText(text)   # hides itself when it has no room
 
     def _build_mixer(self) -> QFrame:
@@ -817,10 +819,10 @@ class MainWindow(QMainWindow):
         self.np_name = QLabel("Pick a sound")
         self.np_name.setToolTip("Select a sound pad to use these playback controls.")
         self.np_name.setTextFormat(Qt.PlainText)   # sound names are user / web text
-        # fixed in both directions (the row's height, set by its buttons): a label that
-        # can grow makes Qt lay out the whole page again on every new text, and the
-        # name changes with every pad press (every pad on the board was repainted)
-        self.np_name.setFixedSize(190, 34)
+        # the row's height, set by its buttons; its width follows the text inside
+        # NameAndSeek, which never asks the page for a new layout (the name changes
+        # with every pad press, and a relayout repainted every pad on the board)
+        self.np_name.setFixedHeight(34)
         self.np_name.setStyleSheet("font-weight:600;")
         self.seek = SeekSlider(Qt.Horizontal)
         self.seek.setRange(0, 1000)
@@ -835,8 +837,8 @@ class MainWindow(QMainWindow):
         self.np_time.setObjectName("muted")
         th.addWidget(self.btn_pp)
         th.addWidget(self.btn_st)
-        th.addWidget(self.np_name)
-        th.addWidget(self.seek, 1)
+        self._name_seek = NameAndSeek(self.np_name, self.seek, 190)
+        th.addWidget(self._name_seek, 1)
         th.addWidget(self.np_time)
         # only for a pad made from a video (soundboard.videos): shows it in step
         self.btn_video = QPushButton("Video")
