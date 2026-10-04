@@ -513,7 +513,9 @@ class OwlWidget(QWidget):
         f.setBold(True)
         p.setFont(f)
         fm = p.fontMetrics()
-        tw = min(fm.horizontalAdvance(text), self.width() - 20)
+        if fm.horizontalAdvance(text) > self.width() - 20:
+            return   # no room for the whole line: say nothing rather than half of it
+        tw = fm.horizontalAdvance(text)
         pad = 7
         bw, bh = tw + 2 * pad, fm.height() + 2 * pad - 4
         x = max(2.0, min(body.right() + 2, self.width() - bw - 2))
@@ -529,5 +531,4 @@ class OwlWidget(QWidget):
         p.setBrush(BUBBLE)
         p.drawPath(shape)
         p.setPen(INK)
-        p.drawText(box.adjusted(pad, 0, -pad, 0), Qt.AlignCenter,
-                   fm.elidedText(text, Qt.ElideRight, round(tw)))
+        p.drawText(box.adjusted(pad, 0, -pad, 0), Qt.AlignCenter, text)

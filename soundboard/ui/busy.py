@@ -17,7 +17,7 @@ import html
 from collections.abc import Callable
 
 from PySide6.QtCore import QEvent, QObject, Qt, QTimer, QUrl
-from PySide6.QtGui import QDesktopServices
+from PySide6.QtGui import QDesktopServices, QIcon
 from PySide6.QtWidgets import QApplication, QLabel, QWidget
 
 from soundboard import theme
@@ -45,6 +45,9 @@ def _restore(btn, serial: int):
             return   # a newer flash / busy state owns the label now
         btn.setText(_idle_text(btn))
         btn.setProperty(_IDLE, None)
+        if btn.property("icon_before") is not None:
+            btn.setIcon(btn.property("icon_before"))
+            btn.setProperty("icon_before", None)
         if btn.property("min_w_before") is not None:   # let it shrink again (small windows)
             btn.setMinimumWidth(btn.property("min_w_before"))
             btn.setProperty("min_w_before", None)
@@ -60,12 +63,37 @@ def _keep_width(btn):
     btn.setMinimumWidth(max(btn.minimumWidth(), btn.sizeHint().width()))
 
 
+def _set_label(btn, text: str, serial: int):
+    """Show ``text``, never cut off: a "✓ done" stands in for the button's own icon
+    (side by side they only crowd it), and if the label still won't fit the room the
+    layout gives it (a full header can't widen the button), it's trimmed to its "✓"
+    or the normal label stays."""
+    if text[:1] in "✓✗" and not btn.icon().isNull():
+        if btn.property("icon_before") is None:
+            btn.setProperty("icon_before", btn.icon())
+        btn.setIcon(QIcon())
+    btn.setText(text)   # wider: it gets the room only if the layout has some spare
+
+    def check():
+        try:
+            if btn.property(_SERIAL) != serial or not btn.isVisible():
+                return
+            if btn.width() < btn.sizeHint().width():
+                short = text[:1] if text[:1] in "✓✗" else _idle_text(btn)
+                btn.setText(short)
+                if not short.strip() and btn.property("icon_before") is not None:
+                    btn.setIcon(btn.property("icon_before"))
+        except RuntimeError:   # the button was deleted meanwhile
+            pass
+    QTimer.singleShot(0, check)   # after the layout has had its say
+
+
 def flash(btn, text: str, ms: int = FLASH_MS):
     """Show ``text`` on the button for ``ms``, then its normal label again."""
     btn.setProperty(_IDLE, _idle_text(btn))
     _keep_width(btn)
     serial = _bump(btn)
-    btn.setText(text)
+    _set_label(btn, text, serial)
     QTimer.singleShot(ms, lambda: _restore(btn, serial))
 
 
@@ -114,7 +142,7 @@ def hold(btn, text: str) -> Callable[..., None]:
     btn.setProperty(_IDLE, _idle_text(btn))
     _keep_width(btn)
     serial = _bump(btn)
-    btn.setText(text)
+    _set_label(btn, text, serial)
     set_busy(btn, True)
     btn.repaint()
     done = []
