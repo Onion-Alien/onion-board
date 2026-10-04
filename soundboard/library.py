@@ -26,6 +26,7 @@ import numpy as np
 import soundfile as sf
 import soxr
 
+from soundboard import __version__
 from soundboard.engine import SR
 from soundboard.eq import BANDS as EQ_BANDS
 from soundboard.eq import MAX_DB as EQ_MAX_DB
@@ -39,6 +40,10 @@ SOUNDS_DIR = APP_DIR / "sounds"
 CACHE_DIR = APP_DIR / "cache"
 THUMBS_DIR = APP_DIR / "thumbs"   # pad pictures (soundboard.thumbs)
 CONFIG_PATH = APP_DIR / "config.json"
+# privacy.json beside config.json: a copy of the Privacy & security settings: a version
+# from before them drops them when it saves, and the next newer start takes them back
+PRIVACY_KEYS = ("net_mode", "net_proxy", "net_off", "net_offline", "netlog_keep",
+                "tor_bridges")
 CONFIG_VERSION = 4
 LOAD_TRIES = 12      # ~10 s of retries while config.json is locked
 CONFIG_BACKUPS = 3   # config.json.1 … .3, rotated on every save that changes something
@@ -282,6 +287,9 @@ class Config:
     update_checked: float = 0.0       # time.time() of the last check
     update_skip: str = ""             # a version the user said to skip
     update_pending: str = ""          # the version an update is installing (see updates.py)
+    # the newest version whose What's new (ui/whatsnew.py) was shown; a first start has
+    # nothing to catch up on, a config without it is from an older version
+    whats_new_seen: str = __version__
     random_hotkey: str = ""           # plays a random sound from the category showing
     last_hotkey: str = ""             # plays the last sound played again
     next_cat_hotkey: str = ""         # shows the next category (random key + overlay follow)
@@ -356,6 +364,8 @@ class Config:
             try:
                 cfg = cls.from_raw(raw)
                 cls._keep_newer(raw)
+                if isinstance(raw, dict) and "net_off" not in raw:
+                    cfg._restore_privacy()
                 return cfg
             except (TypeError, ValueError, KeyError, AttributeError) as e:
                 err = e
@@ -397,6 +407,43 @@ class Config:
                          "Onion Board started with default settings. Your sound files are "
                          f"still in {SOUNDS_DIR}.{kept}")
         return cfg
+
+    def _restore_privacy(self):
+        """config.json was saved by a version without Privacy & security (an older one
+        opened after this, or before it ever ran): take its switches back from
+        privacy.json, so a switched-off feature or Tor doesn't quietly come back on."""
+        try:
+            raw = json.loads(_privacy_path().read_text(encoding="utf-8"))
+        except FileNotFoundError:
+            return
+        except (OSError, ValueError):
+            log.warning("couldn't read %s", _privacy_path(), exc_info=True)
+            return
+        if not isinstance(raw, dict):
+            return
+        kept = _typed({k: v for k, v in raw.items() if k in PRIVACY_KEYS}, Config(), "privacy")
+        for k, v in kept.items():
+            v = clean_setting(k, v)
+            if v is not None:
+                setattr(self, k, v)
+        log.info("an older version saved the settings: privacy settings restored from %s",
+                 _privacy_path().name)
+
+    def _save_privacy(self):
+        """Keep privacy.json in step with config.json (see PRIVACY_KEYS)."""
+        path = _privacy_path()
+        text = json.dumps({k: getattr(self, k) for k in PRIVACY_KEYS}, indent=2)
+        try:
+            if path.read_text(encoding="utf-8") == text:
+                return
+        except OSError:
+            pass
+        try:
+            tmp = path.with_suffix(".tmp")
+            tmp.write_text(text, encoding="utf-8")
+            tmp.replace(path)
+        except OSError:
+            log.warning("couldn't save %s", path, exc_info=True)
 
     @classmethod
     def _keep_newer(cls, raw: dict):
@@ -476,6 +523,8 @@ class Config:
         # configs from before the setup guide existed: whoever already picked an output
         # device has been set up by hand, so don't greet them with the guide
         raw.setdefault("setup_done", bool(raw.get("main_device")))
+        # ...and from before What's new: everything in it is new to them
+        raw.setdefault("whats_new_seen", "")
         known = _typed(raw, cls(), "config")
         for k, v in list(known.items()):
             if v is None:   # a device: None is the system default
@@ -513,6 +562,7 @@ class Config:
         try:
             APP_DIR.mkdir(parents=True, exist_ok=True)
             text = json.dumps(self.to_raw(), indent=2)
+            self._save_privacy()
             try:
                 if CONFIG_PATH.read_text(encoding="utf-8") == text:
                     return True   # nothing changed: don't churn the backups
@@ -582,6 +632,10 @@ def merge_tags(tags: list[str], categories: list[str]) -> list[str]:
             c = by_lower[t.lower()] = t
         out.append(c)
     return out
+
+
+def _privacy_path() -> Path:
+    return CONFIG_PATH.with_name("privacy.json")
 
 
 def _rotate_backups():
