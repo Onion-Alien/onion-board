@@ -350,6 +350,16 @@ def _image(p, fill):
     p.drawPath(path)
 
 
+def _video(p, fill):
+    """A video camera: the body and its lens cone."""
+    p.drawRoundedRect(QRectF(2.5, 6.5, 13, 11), 2.5, 2.5)
+    path = QPainterPath(QPointF(15.5, 10.5))
+    for pt in ((21.5, 7), (21.5, 17), (15.5, 13.5)):
+        path.lineTo(*pt)
+    path.closeSubpath()
+    p.drawPath(path)
+
+
 def _apps(p, fill):
     """The Apps tab: a window with a small sound wave leaving it."""
     p.drawRoundedRect(QRectF(3, 4, 14, 12), 2.5, 2.5)
@@ -450,7 +460,7 @@ SHAPES = {
     "speech": _speech, "cable": _cable, "check": _check, "warn": _warn, "folder": _folder,
     "shield": _shield,
     "next": _next, "edit": _edit, "trash": _trash, "keyboard": _keyboard,
-    "palette": _palette, "gamepad": _gamepad, "image": _image, "radio": _radio,
+    "palette": _palette, "gamepad": _gamepad, "image": _image, "video": _video, "radio": _radio,
     "apps": _apps, "triggers": _eye, "fold": _chevron("right"), "fold_open": _chevron("down"),
 }
 
