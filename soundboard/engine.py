@@ -270,15 +270,13 @@ class Ring:
                 self.buf[: n - k] = x[k:]
             self.w = end % self.cap
             self.count = min(self.count + n, self.cap)
-            if self.count > self.max_fill:
-                drop = self.count - self.prefill
-                self.r = (self.r + drop) % self.cap
-                self.count -= drop
+            if self.count > self.max_fill:   # (always so once unread frames were overwritten)
+                # keep the newest `prefill` frames: they end at w (r + count only
+                # equals w if nothing unread was overwritten, so count back from w)
+                self.r = (self.w - self.prefill) % self.cap
+                self.count = self.prefill
                 self.overflows += 1
                 self._glitched()
-                self._fade_in = True
-            elif self.count == self.cap:
-                self.r = self.w
                 self._fade_in = True
 
     def read(self, n: int) -> np.ndarray | None:
@@ -528,7 +526,10 @@ class Voice:
             self.gate[out] = 0.0   # fade in from the new spot (no click)
 
     def progress(self) -> float:
-        for o, d in self.data.items():
+        # an output that's done stops moving (and never takes its seek): read a live one
+        live = [o for o in self.data if o not in self.done]
+        for o in live + [o for o in self.data if o in self.done]:
+            d = self.data[o]
             if len(d):
                 frac = self.seek_to.get(o)   # a seek the callback hasn't taken yet
                 return frac if frac is not None else (self.pos[o] % len(d)) / len(d)
@@ -1194,9 +1195,11 @@ class Engine:
 
     # ----------------------------------------------------------------- callbacks
     def _render(self, out: str, frames: int, previews_only=False,
-                fixed=False) -> np.ndarray:
+                fixed=False, makeup=True) -> np.ndarray:
         """Mix the voices playing on `out`: the sounds (at the live speed) or, with
-        `fixed`, the app's own playback (always at speed 1)."""
+        `fixed`, the app's own playback (always at speed 1). `makeup`: this mix goes
+        through _dest, so give back what its low cut takes (paths that skip _dest
+        must not get the boost without the cut)."""
         buf = np.zeros((frames, CH), np.float32)
         silent = None   # scratch for voices that must advance but not be heard
         fade = int(FADE_S * self.rates[out])
@@ -1223,7 +1226,7 @@ class Engine:
             # for the gain); float32 is used by cues, previews of test recordings…
             g = np.float32(v.gain) * (I16_SCALE if data.dtype == np.int16 else np.float32(1))
             dest = self.dest
-            if dest is not None and dest.lowcut:
+            if makeup and dest is not None and dest.lowcut:
                 g = g * np.float32(v.makeup(dest.lowcut))
             g0 = v.gate[out]
             rate = self.rates[out]
@@ -1313,12 +1316,15 @@ class Engine:
             return p % n
         return p if p < n - 1 else n
 
-    def _sounds(self, out: str, frames: int, previews_only=False) -> np.ndarray:
+    def _sounds(self, out: str, frames: int, previews_only=False,
+                makeup=True) -> np.ndarray:
         """The sounds bus: sounds at the live speed through the live pitch, plus the
-        app's own playback (fixed voices) as it is."""
-        mix = self._fx(out, self._pitch(out, self._render(out, frames, previews_only)))
+        app's own playback (fixed voices) as it is. makeup=False where the bus skips
+        _dest (the stream output, hear-my-voice)."""
+        mix = self._fx(out, self._pitch(out, self._render(out, frames, previews_only,
+                                                          makeup=makeup)))
         if any(v.fixed for v in self.voices):
-            mix += self._render(out, frames, previews_only, fixed=True)
+            mix += self._render(out, frames, previews_only, fixed=True, makeup=makeup)
         return mix
 
     def _pitch(self, out: str, x: np.ndarray) -> np.ndarray:
@@ -1505,7 +1511,7 @@ class Engine:
     def _mon_voice(self, outdata, frames):
         """Hear my voice: your changed voice alone in your headphones (previews still
         play), to tune a voice without your sounds over it."""
-        mix = self._sounds("mon", frames, previews_only=True)
+        mix = self._sounds("mon", frames, previews_only=True, makeup=False)   # no _dest here
         self.ring_rmon.read(frames)        # keep the others' rings drained meanwhile
         for a in self.aux:
             a.ring_mon.read(frames)
@@ -1532,7 +1538,7 @@ class Engine:
     def _obs(self, outdata, frames):
         """The stream output: what others get (sounds, the live radio and programs,
         your mic if obs_voice), clean: no voice chat shaping, no mono, its own volume."""
-        mix = self._sounds("obs", frames)
+        mix = self._sounds("obs", frames, makeup=False)   # clean: no _dest, so no makeup
         mix *= np.float32(self.sound_vol)
         r = self.ring_robs.read(frames)
         if r is not None and self.radio_live:

@@ -178,7 +178,8 @@ def _addr(buf: bytearray) -> int:
 
 def fix(ends: list[CableEnd]) -> bool:
     """Set every end that isn't at RATE; True if all of them are now."""
-    return all(set_rate(e) for e in ends if not e.ok)
+    results = [set_rate(e) for e in ends if not e.ok]   # try every end, then combine
+    return all(results)
 
 
 __all__ = ["RATE", "CableEnd", "cable_ends", "fix", "pair", "set_rate"]

@@ -235,7 +235,7 @@ def _co_init() -> bool:
         return False   # the thread is already STA (Qt's main thread): calls still work
     if hr < 0:
         raise ComError(hr, "CoInitializeEx")
-    return hr == S_OK   # S_FALSE = already initialised on this thread, still ours to balance
+    return True   # S_OK or S_FALSE (already initialised here): both need a CoUninitialize
 
 
 def _enumerator() -> Com:

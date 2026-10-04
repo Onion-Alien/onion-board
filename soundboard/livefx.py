@@ -3,8 +3,9 @@
 Like the live speed and pitch they change every sound while it plays, aren't
 saved, and leave the app's own playback (test recording, cues, previews) alone.
 Each knob is one amount; the effect behind it is a voicefx building block run
-once per channel. At 0 a knob costs nothing: its effect is dropped, so turning
-it back up starts from silence instead of an old tail.
+once per channel. At 0 a knob costs nothing: its effect fades out to the dry
+sound (FADE samples, like the filter knobs' crossfade) and is then dropped, so
+turning it back up starts from silence instead of an old tail.
 
 `Engine.sound_fx` holds the amounts ({key: value}, missing = 0), swapped whole by
 the UI and read once per block on the audio thread."""
@@ -36,6 +37,7 @@ PRESETS: dict[str, dict[str, float]] = {
 }
 
 MUFFLE_TOP, MUFFLE_LOW = 18000.0, 350.0     # lowpass cutoff at 0 and at full muffle
+FADE = 1024    # samples an effect takes to fade out once its knob hits 0 (as SmoothSos)
 
 
 def clean(fx) -> dict[str, float]:
@@ -91,6 +93,8 @@ class LiveFx:
         self.rate = rate
         self.shelf = _Shelf(rate)
         self._fx: dict[str, tuple] = {}      # key -> one effect per channel
+        self._last: dict[str, float] = {}    # key -> its last amount (for the fade-out)
+        self._gone: dict[str, int] = {}      # key -> samples into its fade-out
 
     @property
     def idle(self) -> bool:
@@ -110,24 +114,46 @@ class LiveFx:
             out[:, c] = e.run(np.ascontiguousarray(x[:, c]), self.rate)
         return out
 
+    def _knob(self, key: str, a: float, y: np.ndarray, run) -> np.ndarray:
+        """One effect knob: `run(a, y)` is its output at amount `a`. Once the knob
+        hits 0 it keeps running at its last amount while the output crossfades back
+        to the dry `y` (dropping it at once clicked and cut the echo's tail off)."""
+        if a:
+            self._gone.pop(key, None)
+            self._last[key] = a
+            return run(a, y)
+        if key not in self._fx:
+            return y
+        pos = self._gone.get(key, 0)
+        n = len(y)
+        wet = run(self._last[key], y)
+        ramp = np.clip(1 - (pos + np.arange(1, n + 1, dtype=F32)) / F32(FADE), 0, 1)
+        out = (y + (wet - y) * ramp[:, None]).astype(F32, copy=False)
+        if pos + n >= FADE:
+            self._fx.pop(key, None)
+            self._last.pop(key, None)
+            self._gone.pop(key, None)
+        else:
+            self._gone[key] = pos + n
+        return out
+
+    def _crunch(self, a: float, y: np.ndarray) -> np.ndarray:
+        d = self._run(self._pair("crunch", Distortion, {
+            "drive": 6 + 24 * a, "tone": 9000 - 3000 * a, "level": 0.5}), y)
+        return y * F32(1 - a) + d * F32(a)
+
+    def _echo(self, a: float, y: np.ndarray) -> np.ndarray:
+        return self._run(self._pair("echo", Echo, {
+            "delay": 300, "feedback": 0.25 + 0.4 * a, "mix": 0.75 * a,
+            "tone": 7000}), y)
+
+    def _reverb(self, a: float, y: np.ndarray) -> np.ndarray:
+        return self._run(self._pair("reverb", Reverb, {
+            "size": 0.5 + 0.35 * a, "tone": 6000, "mix": a}), y)
+
     def process(self, x: np.ndarray, fx: dict) -> np.ndarray:
         g = {q.key: float(fx.get(q.key, 0.0)) for q in PARAMS}
         y = self.shelf.process(x, (g["bass"], g["treble"], g["muffle"]))
-        if a := g["crunch"]:
-            d = self._run(self._pair("crunch", Distortion, {
-                "drive": 6 + 24 * a, "tone": 9000 - 3000 * a, "level": 0.5}), y)
-            y = y * F32(1 - a) + d * F32(a)
-        else:
-            self._fx.pop("crunch", None)
-        if a := g["echo"]:
-            y = self._run(self._pair("echo", Echo, {
-                "delay": 300, "feedback": 0.25 + 0.4 * a, "mix": 0.75 * a,
-                "tone": 7000}), y)
-        else:
-            self._fx.pop("echo", None)
-        if a := g["reverb"]:
-            y = self._run(self._pair("reverb", Reverb, {
-                "size": 0.5 + 0.35 * a, "tone": 6000, "mix": a}), y)
-        else:
-            self._fx.pop("reverb", None)
-        return y
+        y = self._knob("crunch", g["crunch"], y, self._crunch)
+        y = self._knob("echo", g["echo"], y, self._echo)
+        return self._knob("reverb", g["reverb"], y, self._reverb)
