@@ -7,7 +7,7 @@ import soundfile as sf
 from PySide6.QtWidgets import QMessageBox
 
 from conftest import process_events
-from soundboard import library, soundpad
+from soundboard import library, otherboards, soundpad
 from soundboard.library import SR
 from test_mainwindow import window as main_window  # noqa: F401 - the real window, offscreen
 
@@ -54,7 +54,7 @@ def test_reads_names_paths_categories_and_hotkeys(tmp_path):
     assert [e.tags for e in entries] == [["Memes"], ["Memes", "Loud"], ["Loud"], []]
     # keyModifiers are RegisterHotKey's: 2 = ctrl, 5 = alt + shift; key 0 = none
     assert [e.hotkey for e in entries] == ["ctrl+1", "alt+shift+f1", "", ""]
-    ok, bad = soundpad.importable(entries)
+    ok, bad = otherboards.importable(entries)
     assert len(ok) == 3 and [e.name for e in bad] == ["Gone"]
 
 
@@ -90,7 +90,7 @@ def test_import_brings_the_board_over(main_window, qapp, tmp_path, monkeypatch):
     asked = []
     monkeypatch.setattr(QMessageBox, "question",
                         lambda _p, _t, text, *a: asked.append(text) or QMessageBox.Yes)
-    w.import_soundpad()
+    w.import_other(soundpad.SOURCE)
     assert "<b>3</b> sounds" in asked[0] and "2 categories" in asked[0]
     assert "2 hotkeys" in asked[0] and "Gone" in asked[0]
     assert process_events(qapp, lambda: not w._pending_imports and len(w.cfg.sounds) == 5)
@@ -104,16 +104,16 @@ def test_import_brings_the_board_over(main_window, qapp, tmp_path, monkeypatch):
     assert (tmp_path / "My sounds" / "bruh.wav").is_file()   # Soundpad's own stay put
     assert not w._import_errors
 
-    w.import_soundpad()                          # again: nothing doubled, no error list
+    w.import_other(soundpad.SOURCE)                          # again: nothing doubled, no error list
     assert process_events(qapp, lambda: not w._pending_imports)
     assert len(w.cfg.sounds) == 5 and not w._import_errors
 
 
 def test_a_dropped_spl_goes_to_the_soundpad_import(main_window, monkeypatch):  # noqa: F811
     got = []
-    monkeypatch.setattr(main_window, "import_soundpad", got.append)
+    monkeypatch.setattr(main_window, "import_other", lambda src, f: got.append((src.key, f)))
     main_window.import_files(["C:/x/list.SPL"])
-    assert got == ["C:/x/list.SPL"]
+    assert got == [("soundpad", "C:/x/list.SPL")]
 
 
 def test_the_installers_box_imports_on_first_start_without_asking(
@@ -123,7 +123,7 @@ def test_the_installers_box_imports_on_first_start_without_asking(
     w = main_window
     monkeypatch.setenv("APPDATA", str(tmp_path))
     _board(tmp_path)
-    note = library.APP_DIR / soundpad.QUEUED_NAME
+    note = library.APP_DIR / otherboards.QUEUED_NAME
     note.parent.mkdir(parents=True, exist_ok=True)
     note.write_text("soundpad", encoding="utf-8")
     monkeypatch.setattr(QMessageBox, "question", lambda *a, **k: pytest.fail("asked"))
@@ -137,7 +137,7 @@ def test_the_installers_box_imports_on_first_start_without_asking(
 def test_a_queued_import_with_soundpad_gone_does_nothing(
         main_window, tmp_path, monkeypatch):  # noqa: F811
     monkeypatch.setenv("APPDATA", str(tmp_path))
-    note = library.APP_DIR / soundpad.QUEUED_NAME
+    note = library.APP_DIR / otherboards.QUEUED_NAME
     note.parent.mkdir(parents=True, exist_ok=True)
     note.write_text("soundpad", encoding="utf-8")
     monkeypatch.setattr("PySide6.QtWidgets.QFileDialog.getOpenFileName",
@@ -150,4 +150,4 @@ def test_the_installer_offers_it_only_when_soundpad_is_there():
     iss = (Path(__file__).parent.parent / "installer" / "OnionBoard.iss").read_text("utf-8")
     task = next(ln for ln in iss.splitlines() if ln.startswith('Name: "soundpad"'))
     assert "Check: HasSoundpad" in task and "Flags: unchecked" not in task
-    assert r"Leppsoft\soundlist.spl" in iss and soundpad.QUEUED_NAME in iss
+    assert r"Leppsoft\soundlist.spl" in iss and otherboards.QUEUED_NAME in iss
