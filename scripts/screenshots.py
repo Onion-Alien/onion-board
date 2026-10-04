@@ -59,6 +59,15 @@ SOUNDS = [("Airhorn", "F1", "Memes"), ("Vine Boom", "F2", "Memes"),
           ("Oof", "", "Memes"), ("Record Scratch", "", "Music"),
           ("Dun Dun Dunn", "", "Memes"), ("Laugh Track", "", "Reactions"),
           ("Bonk", "F5", "Memes")]
+# Pad pictures, drawn in code: sound name -> (emoji, top colour, bottom colour)
+PICTURES = {"Airhorn": ("📯", "#ffb347", "#ff6a3d"),
+            "Sad Trombone": ("🎺", "#5b8def", "#2c3e91"),
+            "Drumroll": ("🥁", "#ff6b81", "#b5179e"),
+            "Applause": ("👏", "#ffd166", "#f4a261"),
+            "Crickets": ("🦗", "#7bd389", "#2d6a4f"),
+            "Victory Fanfare": ("🏆", "#ffe066", "#e09f3e"),
+            "Laugh Track": ("😂", "#a0e7e5", "#4ea8de"),
+            "Bonk": ("🔨", "#c77dff", "#7b2cbf")}
 # Triggers tab: (name, picture (see trigger_picture), sound index, wait, live match %)
 TRIGGERS = [("Died", "died", 2, 1.5, 12),
             ("Boss beaten", "victory", 9, 0.0, 91),
@@ -121,9 +130,32 @@ def demo_config(tmp: Path, theme: str):
         sf.write(path, np.stack([y, y], 1), library.SR)
         sounds.append(library.SoundMeta(id=f"s{i}", name=name, file=str(path), hotkey=key,
                                         color=library.PAD_COLORS[i % len(library.PAD_COLORS)],
-                                        tags=[tag]))
+                                        tags=[tag], image=pad_picture(tmp, name)))
     library.Config(sounds=sounds, categories=["Memes", "Reactions", "Music"],
                    setup_done=True, theme=theme, screen={"triggers": demo_triggers(tmp)}).save()
+
+
+def pad_picture(tmp: Path, name: str) -> str:
+    """A made-up pad picture (see PICTURES): an emoji on a gradient, or "" for none."""
+    if name not in PICTURES:
+        return ""
+    from PySide6.QtCore import QRectF, Qt
+    from PySide6.QtGui import QColor, QFont, QImage, QLinearGradient, QPainter
+    emoji, top, bottom = PICTURES[name]
+    img = QImage(256, 256, QImage.Format_RGB32)
+    p = QPainter(img)
+    p.setRenderHint(QPainter.Antialiasing)
+    g = QLinearGradient(0, 0, 0, 256)
+    g.setColorAt(0, QColor(top))
+    g.setColorAt(1, QColor(bottom))
+    p.fillRect(img.rect(), g)
+    p.setFont(QFont("Segoe UI Emoji", 120))
+    p.drawText(QRectF(0, 0, 256, 256), Qt.AlignCenter, emoji)
+    p.end()
+    path = tmp / "thumbs" / f"{name}.png"
+    path.parent.mkdir(parents=True, exist_ok=True)
+    img.save(str(path))
+    return str(path)
 
 
 def trigger_picture(kind: str):

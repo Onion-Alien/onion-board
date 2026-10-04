@@ -8,7 +8,8 @@
 The version comes from soundboard/__init__.py; the VirusTotal scan is remembered in
 docs/release.json, so it only needs passing once per release. The line is rewritten
 between the <!-- release --> markers in README.md and docs/index.html, and the
-sitemap's dates are set to today.
+sitemap's dates are set to today. Every screenshot link gets ?v=<hash of the picture>,
+so nobody is shown an old cached copy after the pictures change.
 
 Screenshots are screenshots.py (offscreen, made-up data, the Retro 98 theme). Set
 ONIONBOARD_ONION_WATCH_ZIP to an OnionWatch-module.zip to include the Triggers tab.
@@ -16,6 +17,7 @@ ONIONBOARD_ONION_WATCH_ZIP to an OnionWatch-module.zip to include the Triggers t
 """
 import argparse
 import datetime
+import hashlib
 import json
 import os
 import re
@@ -63,6 +65,28 @@ def stamp(path: Path, block: str):
     print("stamped", path.relative_to(ROOT))
 
 
+PAGES = [ROOT / "README.md", ROOT / "docs" / "index.html",
+         ROOT / "docs" / "discord-soundboard" / "index.html",
+         ROOT / "docs" / "free-soundpad-alternative" / "index.html"]
+
+
+def bust_caches():
+    """Give each screenshot link a ?v=<hash of the picture>, so browsers and GitHub's
+    image proxy fetch a changed picture instead of showing the old one they kept."""
+    def tag(m):
+        pic = SHOTS / m.group(2)
+        if not pic.exists():
+            return m.group(0)
+        h = hashlib.sha1(pic.read_bytes()).hexdigest()[:8]
+        return f"{m.group(1)}{m.group(2)}?v={h}"
+    for page in PAGES:
+        text = page.read_text(encoding="utf-8")
+        new = re.sub(r"(screenshots/)([\w-]+\.(?:png|webp))(?:\?v=\w+)?", tag, text)
+        if new != text:
+            page.write_text(new, encoding="utf-8")
+            print("re-linked pictures in", page.relative_to(ROOT))
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--vt", nargs=2, metavar=("SHA256", "CLEAN/TOTAL"),
@@ -102,6 +126,7 @@ def main():
     if args.tour:
         subprocess.run([sys.executable, str(ROOT / "scripts" / "tour.py"),
                         "--out", str(SHOTS / "tour.webp")], cwd=ROOT, check=True)
+    bust_caches()
 
 
 if __name__ == "__main__":
