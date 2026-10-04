@@ -207,6 +207,7 @@ def test_all_its_files_load_up_front_so_an_update_on_disk_cant_break_the_running
 # scipy.ndimage). Add each new release's list here.
 RELEASED_WATCH_IMPORTS = {
     "0.5.6": ["numpy", "scipy.fft", "scipy.ndimage"],
+    "0.6.0": ["numpy"],
 }
 
 
