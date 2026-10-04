@@ -278,16 +278,21 @@ def test_every_mode_points_ffmpeg_at_the_relay_as_the_radio(socks, monkeypatch):
     monkeypatch.setenv("HTTP_PROXY", "http://users-own:1")
     monkeypatch.delenv("HTTPS_PROXY", raising=False)
     monkeypatch.delenv("ALL_PROXY", raising=False)
-    monkeypatch.delenv("NO_PROXY", raising=False)
+    monkeypatch.setenv("NO_PROXY", "localhost,127.0.0.1,users-own.example")
     for mode in (net.PROXY, net.DIRECT):
         net.configure(mode, socks.url())
         assert os.environ["HTTP_PROXY"] == os.environ["HTTPS_PROXY"] == net.relay_url("radio")
-        assert "127.0.0.1" in os.environ["NO_PROXY"]
+        # nothing FFmpeg goes straight to: a station redirecting to this PC (127.0.0.1)
+        # would step around the relay
+        assert "NO_PROXY" not in os.environ
     assert net.ytdlp_proxy("sounds_web") == net.relay_url("sounds_web")
     # a program that outlives the app (the update installer) gets the user's own
     own = net.own_env()
     assert own["http_proxy"] == "http://users-own:1"
-    assert not {k.upper() for k in own} & {"HTTPS_PROXY", "NO_PROXY", "ALL_PROXY"}
+    assert own["no_proxy"] == "localhost,127.0.0.1,users-own.example"
+    assert not {k.upper() for k in own} & {"HTTPS_PROXY", "ALL_PROXY"}
+    # a child process that goes online still reaches this PC directly
+    assert "127.0.0.1" in net.child_env("addons")["no_proxy"]
 
 
 def test_a_change_reaches_listeners_and_qt_and_drops_relayed_connections(qapp, site, socks):

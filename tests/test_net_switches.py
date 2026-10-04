@@ -5,8 +5,9 @@ message, while the other features keep working. Offline mode: nothing at all.
 Python-side traffic is caught by fakeproxy.no_leaks (any connection or lookup off
 this PC fails the test), the fake SOCKS proxy's log and the test site's hit log.
 FFmpeg (radio) and Qt (the station directory, thumbnails) connect from C++, so in
-Direct mode their proof is a test site on 127.0.0.2: not in no_proxy, so they can only
-reach it through the relay, whose log (net.relay_seen) says what it let through."""
+Direct mode their proof is a test site on 127.0.0.2: FFmpeg has no no_proxy and Qt is
+given the relay, so they can only reach it through the relay, whose log
+(net.relay_seen) says what it let through."""
 import http.server
 import json
 import socketserver
@@ -201,8 +202,8 @@ class _NoNameServer(http.server.ThreadingHTTPServer):
 
 
 class Local2:
-    """A test site on 127.0.0.2: FFmpeg's no_proxy doesn't cover it, and Qt always
-    goes through the relay, so they can only reach it through the relay."""
+    """A test site on 127.0.0.2: FFmpeg has no no_proxy, and Qt always goes through
+    the relay, so they can only reach it through the relay."""
 
     def __init__(self):
         self.hits = []
@@ -314,6 +315,31 @@ def test_ffmpeg_in_direct_mode_only_reaches_a_station_through_the_relay(qapp, lo
         assert "Radio was switched off" in errors[0] and p.station is None
         process_events(qapp, lambda: False, timeout=1.5)
         assert len(local2.hits) == hits                    # nothing reopened it
+    finally:
+        p.stop()
+
+
+@pytest.mark.parametrize("mode", MODES)
+def test_a_station_redirecting_to_this_pc_still_goes_through_the_relay(mode, qapp, sites,
+                                                                     socks):
+    """FFmpeg has no no_proxy list: a redirect to 127.0.0.1 is the relay's to judge too.
+    Through a proxy it's refused (nothing the radio plays lives on this PC); in Direct
+    mode it's let through, as before the relay ran, but logged."""
+    net.configure(mode, socks.url())
+    sites.routes["/s.wav"] = (wav_bytes(30.0), "audio/wav")
+    sites.routes["/go"] = (f"http://127.0.0.1:{sites.port}/s.wav".encode(), "redirect")
+    start = len(net.relay_seen())
+    p, chunks, errors = play(qapp, sites.url("station", "/go")
+                             if mode == net.PROXY else f"http://127.0.0.1:{sites.port}/go")
+    try:
+        seen = net.relay_seen()[start:]
+        if mode == net.PROXY:
+            assert not chunks and errors
+            assert ("radio", "127.0.0.1", "local") in seen
+            assert "/s.wav" not in sites.paths()            # never reached directly
+        else:
+            assert not errors and chunks
+            assert [h for f, h, how in seen if how == "ok"].count("127.0.0.1") >= 2
     finally:
         p.stop()
 

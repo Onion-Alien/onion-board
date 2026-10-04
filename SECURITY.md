@@ -119,6 +119,13 @@ off, so it only uses a speech model it already has). Sounds from the web also ha
 switch per site (YouTube, SoundCloud, Myinstants, other links). Everything is on by
 default, except what was already opt-in (yt-dlp's automatic updates, play counts).
 
+A change applies to what's already running, not only to what starts next: switching
+a feature off, turning on *Offline mode* or changing the Connection setting cuts that
+feature's open connections, so a download in progress (an update, a model, a sound)
+stops instead of finishing the old way, and a playing radio station stops (or, after
+a Connection change, reconnects the new way). The update download also checks its
+switch between chunks.
+
 Not covered: links you open in your own browser (Support, feedback and report
 buttons, Report on GitHub, release pages), the installer's own downloads (FFmpeg, VB-Cable, live voice), and
 Windows Update installing a voice or the PowerShell VB-Cable download (they can't go
@@ -145,7 +152,17 @@ The relay is a small HTTP proxy inside the app that listens on `127.0.0.1` only,
 needs a random per-launch secret (Basic auth, compared with
 `secrets.compare_digest`) and makes every onward connection through the proxy. It
 refuses targets on this PC or the home network (loopback, private and link-local
-addresses, `.local`, `.lan`). Without the setting it isn't started.
+addresses, `.local`, `.lan`).
+
+In Direct mode the relay still carries FFmpeg's and Qt's connections (that's where
+their switches are enforced). There, names are looked up on this PC anyway, so the
+relay looks a name up first and refuses one that leads to this PC or the home network:
+a radio station (or a stream redirect) whose name resolves to `127.0.0.1` or a router
+address isn't played. FFmpeg's environment has no `no_proxy` list, so a redirect to
+`127.0.0.1` or `localhost` goes through the relay too instead of straight to this PC:
+through a proxy the relay refuses it; in Direct mode it lets it through (this PC stays
+reachable there), but the radio's switch still applies and it's listed in Network
+activity.
 
 - **Fails closed.** If the proxy is unreachable, refuses, or its address can't be
   used, the request fails with a message saying so. Nothing falls back to a
@@ -157,7 +174,8 @@ addresses, `.local`, `.lan`). Without the setting it isn't started.
   addresses instead.
 - **Stays direct:** `127.0.0.1`, `::1` and `localhost` (a custom voice server on
   this PC, module links, the remote-control API). A custom voice server elsewhere
-  on your network goes through the proxy like anything else.
+  on your network goes through the proxy like anything else. Radio streams are the
+  exception: nothing a station sends the player to on this PC is reached.
 - **Switching** applies at once: Qt's network managers are switched and their kept
   connections dropped, open relayed connections are closed, and a playing radio
   station reconnects.

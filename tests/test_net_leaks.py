@@ -45,6 +45,12 @@ class Sites:
                     self.send_error(404)
                     return
                 body, kind = hit
+                if kind == "redirect":   # body: where to
+                    self.send_response(302)
+                    self.send_header("Location", body.decode())
+                    self.send_header("Content-Length", "0")
+                    self.end_headers()
+                    return
                 self.send_response(200)
                 self.send_header("Content-Type", kind)
                 self.send_header("Content-Length", str(len(body)))

@@ -1214,7 +1214,13 @@ def relay_seen() -> list[tuple[str, str, str]]:
 def _set_env():
     """FFmpeg finds the relay in http_proxy & co., with the radio's login: the only
     FFmpeg in this process is the radio player. The user's own values are kept for
-    own_env()."""
+    own_env().
+
+    No no_proxy: FFmpeg would connect straight to anything it lists, so a station
+    redirecting to 127.0.0.1 / localhost would step around the relay (and its switch
+    and home-network checks). Nothing else in this process reads these variables:
+    urlopen() ignores them, Qt is given the relay itself (apply_qt), and the child
+    processes that go online get child_env(), which keeps this PC direct."""
     global _env_saved
     if _env_saved is None:
         _env_saved = {k: os.environ.get(k) for k in ENV_KEYS}
@@ -1222,7 +1228,7 @@ def _set_env():
     os.environ["http_proxy"] = url
     os.environ["https_proxy"] = url
     os.environ["all_proxy"] = url
-    os.environ["no_proxy"] = "localhost,127.0.0.1,::1"
+    os.environ.pop("no_proxy", None)
 
 
 def _without_proxy_vars(env: dict[str, str]) -> dict[str, str]:
