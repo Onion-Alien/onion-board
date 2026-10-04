@@ -10,7 +10,8 @@ from urllib.parse import quote, urlencode
 
 from soundboard.updates import REPO
 
-FORM_URL = ""   # the no-account feedback form; empty = fall back to GitHub issues
+# the no-account feedback form; empty = fall back to GitHub issues
+FORM_URL = "https://tally.so/r/rjxjyM"
 ISSUE_URL = f"https://github.com/{REPO}/issues/new"
 
 

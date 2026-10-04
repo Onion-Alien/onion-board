@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- **Send feedback opens a form that needs no account:** Settings → Add-ons &
+  help → Send feedback now opens a short form with your version filled in,
+  instead of a GitHub bug report. The app still sends nothing itself.
 - **Save your own voices:** Voice → Fine-tune effects has **Save as a voice…**.
   Name the mix and it gets its own button under *Pick a voice*, next to the
   built-in ones; right-click it to rename or delete it. A deleted voice can be put
