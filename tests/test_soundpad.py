@@ -155,6 +155,5 @@ def test_a_queued_import_with_soundpad_gone_does_nothing(
 
 def test_the_installer_offers_it_only_when_soundpad_is_there():
     iss = (Path(__file__).parent.parent / "installer" / "OnionBoard.iss").read_text("utf-8")
-    task = next(ln for ln in iss.splitlines() if ln.startswith('Name: "soundpad"'))
-    assert "Check: HasSoundpad" in task and "Flags: unchecked" not in task
+    assert "if Preview or HasSoundpad then" in iss
     assert r"Leppsoft\soundlist.spl" in iss and otherboards.QUEUED_NAME in iss

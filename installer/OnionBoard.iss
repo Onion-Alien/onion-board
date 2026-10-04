@@ -120,7 +120,9 @@ Type: filesandordirs; Name: "{app}\_internal"
 [Files]
 ; Includes the add-ons in {app}\modules (build.ps1 copies them in; see soundboard/modules.py).
 ; live-voice's own .venv is made later, by the "livevoice" task or the Voice tab's button.
+#ifndef PREVIEW
 Source: "..\dist\OnionBoard\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+#endif
 
 [Icons]
 Name: "{autodesktop}\{#AppName}"; Filename: "{app}\{#AppExeName}.exe"; AppUserModelID: "OnionBoard.App"; Tasks: desktopicon
@@ -317,7 +319,7 @@ begin
   Note.ShowAccelChar := False;
   Note.Caption := What;
   Note.AdjustHeight;
-  ImportTop := Note.Top + Note.Height + ScaleY(12);
+  ImportTop := Note.Top + Note.Height + ScaleY(8);
   ImportBoxes[I] := Box;
   ImportKeys[I] := Key;
 end;
@@ -346,7 +348,7 @@ begin
     'so your board is ready straight away. Your other app keeps its own copies, and ' +
     'nothing in it is changed.';
   Body.AdjustHeight;
-  ImportTop := Body.Top + Body.Height + ScaleY(16);
+  ImportTop := Body.Top + Body.Height + ScaleY(12);
   if Preview or HasSoundpad then
     AddImportBox('soundpad', 'Soundpad', 'With their names, categories and hotkeys.');
   if Preview or HasResanance then
@@ -379,7 +381,7 @@ end;
 #ifdef PREVIEW
 function NextButtonClick(CurPageID: Integer): Boolean;
 begin
-  Result := False;   // a look at the page, never an install
+  Result := CurPageID <> ImportPage.ID;   // a look at the page, never an install
 end;
 #endif
 
@@ -476,6 +478,9 @@ var
 begin
   if (CurPageID <> wpWelcome) and (CurPageID <> wpFinished) then
     LayoutHeader;
+  // the import page is the last before installing (there's no Ready page)
+  if CurPageID = ImportPage.ID then
+    WizardForm.NextButton.Caption := SetupMessage(msgButtonInstall);
   if (CurPageID <> wpSelectTasks) or WizardSilent then
     exit;
   // The cable is how Discord and games hear the sounds by default: ticked on the first

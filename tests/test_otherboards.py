@@ -244,10 +244,10 @@ def test_dropped_files_go_to_the_right_reader(tmp_path):
     assert otherboards.for_file("C:/x/song.mp3") is None
 
 
-def test_every_source_has_an_installer_box_that_queues_it():
+def test_every_source_has_a_box_on_the_installers_import_page():
     iss = (Path(__file__).parent.parent / "installer" / "OnionBoard.iss").read_text("utf-8")
     for src in otherboards.sources():
-        task = next(ln for ln in iss.splitlines() if ln.startswith(f'Name: "{src.key}"'))
-        assert "Check: Has" in task and "Flags: unchecked" not in task
-        assert f"ImportTicked('{src.key}')" in iss
+        assert f"AddImportBox('{src.key}'" in iss
+    assert "(GetArrayLength(ImportBoxes) = 0)" in iss   # skipped when none is found
+    assert "ListedIn('IMPORT'" in iss                  # silent installs: only if named
     assert otherboards.QUEUED_NAME in iss
