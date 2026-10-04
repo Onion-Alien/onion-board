@@ -40,6 +40,20 @@ def tune_runtime_for_audio():
     gc.set_threshold(50_000, 20, 20)
 
 
+def wait_for_exit(pid: list[str], seconds: float = 30.0):
+    """Wait for the copy that restarted us to finish quitting (it still holds the
+    single-instance lock and is saving its settings)."""
+    try:
+        k32 = ctypes.WinDLL("kernel32", use_last_error=True)
+        k32.OpenProcess.restype = ctypes.c_void_p
+        h = k32.OpenProcess(0x00100000, False, int(pid[0]))   # SYNCHRONIZE
+        if h:
+            k32.WaitForSingleObject(ctypes.c_void_p(h), int(seconds * 1000))
+            k32.CloseHandle(ctypes.c_void_p(h))
+    except (ValueError, IndexError, OSError, AttributeError):
+        log.debug("couldn't wait for the old copy", exc_info=True)
+
+
 def start_ytdlp_check(cfg):
     """The daily "is there a newer yt-dlp?" check, off the UI thread (see ytdl.py)."""
     import threading
@@ -208,6 +222,8 @@ def main():
     from soundboard.ui import quietbox
     quietbox.install(app)   # no Windows ding from tips and warnings
     applog.ui_ready()
+    if "--restart-after" in sys.argv:   # restarted by the app (Settings > Reset)
+        wait_for_exit(sys.argv[sys.argv.index("--restart-after") + 1:][:1])
     if not claim_single_instance():
         log.info("another Onion Board is running; asked it to come to the front")
         sys.exit(0)
@@ -225,6 +241,8 @@ def main():
     from soundboard import theme
     app.setWindowIcon(theme.app_icon())   # every window, and the taskbar button
 
+    from soundboard import reset
+    reset_note = reset.run_pending()   # a reset / restore asked for: before the settings load
     from soundboard.ui.mainwindow import MainWindow   # after the QApplication exists
     try:
         w = holder["w"] = MainWindow()
@@ -244,6 +262,9 @@ def main():
         QTimer.singleShot(400, lambda: w.run_setup(resumed=True))
     elif not w.cfg.setup_done:   # first launch: walk them through mic, headphones, cable
         QTimer.singleShot(400, w.run_setup)
+    if reset_note:
+        QTimer.singleShot(900, lambda: w.toast(reset_note, "warn" if "Couldn't" in reset_note
+                                               else "ok"))
     QTimer.singleShot(30_000, lambda: start_ytdlp_check(w.cfg))
     QTimer.singleShot(600, w.after_update)   # "Updated to …" after an update restarted it
     # new versions (updates.py): unless unticked, at most once a day, also for an app

@@ -4,6 +4,7 @@ from __future__ import annotations
 import copy
 import html
 import logging
+import os
 import subprocess
 import sys
 import tempfile
@@ -17,7 +18,7 @@ import sounddevice as sd
 from PySide6.QtCore import (QEvent, QFileSystemWatcher, QObject, QPropertyAnimation, QSize, Qt,
                             QTimer, QUrl, Signal)
 from PySide6.QtGui import QDesktopServices, QIcon
-from PySide6.QtWidgets import (QApplication, QCheckBox, QComboBox, QFileDialog, QFrame,
+from PySide6.QtWidgets import (QApplication, QCheckBox, QComboBox, QDialog, QFileDialog, QFrame,
                                QGraphicsOpacityEffect, QGridLayout, QHBoxLayout, QInputDialog,
                                QLabel, QLineEdit, QMainWindow, QMenu, QMessageBox, QPushButton,
                                QScrollArea, QSizePolicy, QSlider, QStackedWidget,
@@ -3360,6 +3361,28 @@ class MainWindow(QMainWindow):
     def quit_app(self):
         self._quitting = True
         self.close()
+
+    def restart_app(self):
+        """Quit and start again (a reset or restore point runs at start-up: see
+        soundboard.reset). The new copy waits for this one to be gone first."""
+        for w in QApplication.topLevelWidgets():   # Settings, the guide
+            if isinstance(w, QDialog) and w.isVisible():
+                w.reject()
+        skip = {autostart.TRAY_ARG, "--resume-setup"}
+        args = [a for a in sys.argv[1 if getattr(sys, "frozen", False) else 0:]
+                if a not in skip]
+        if "--restart-after" in args:   # restarted before: drop the old pid
+            i = args.index("--restart-after")
+            del args[i:i + 2]
+        try:
+            subprocess.Popen([sys.executable, *args, "--restart-after", str(os.getpid())],
+                             creationflags=0x00000008 | 0x00000200,   # detached, own group
+                             close_fds=True)
+        except OSError:
+            log.exception("couldn't start the app again")
+            self.toast("Close Onion Board and open it again to finish.", "warn")
+            return
+        self.quit_app()
 
     def _on_session_end(self, _manager=None):
         """Windows is logging off, shutting down, or an installer / updater asked the
