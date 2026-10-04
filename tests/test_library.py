@@ -220,3 +220,10 @@ def test_non_finite_numbers_in_a_config_fall_back_to_defaults():
     assert not library.fits_type(1.0, float("nan"))
     assert not library.fits_type(1.0, float("inf"))
     assert library.fits_type(1.0, 2)
+
+
+def test_live_tabs_are_tinted_green_by_default_even_after_1_6_6():
+    # 1.6.5-1.6.6 saved live_tab_tint=False, their default: it doesn't keep it off
+    assert Config.from_raw({"live_tab_tint": False}).live_tab_green
+    assert Config().live_tab_green
+    assert Config.from_raw({"live_tab_green": False}).live_tab_green is False

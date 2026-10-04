@@ -222,6 +222,26 @@ def test_preview_claims_no_keys(make, qapp):
     assert not ov.window.isVisible()
 
 
+def test_any_click_or_key_ends_the_preview(make, qapp):
+    """It's only to look at: under the modal Settings a click on it dinged."""
+    from PySide6.QtCore import Qt
+    from PySide6.QtTest import QTest
+    from PySide6.QtWidgets import QPushButton
+    ov = make()
+    ov.preview(seconds=30)
+    assert ov._previewing and ov.window.isVisible()
+    other = QPushButton("x")
+    other.show()
+    QTest.mouseClick(other, Qt.LeftButton)
+    process_events(qapp, lambda: not ov.window.isVisible(), timeout=2)
+    assert not ov.window.isVisible() and not ov._previewing
+    ov.preview(seconds=30)
+    QTest.keyClick(other, Qt.Key_A)
+    process_events(qapp, lambda: not ov.window.isVisible(), timeout=2)
+    assert not ov.window.isVisible()
+    other.close()
+
+
 # ---------------------------------------------------------------- wired into the app
 
 from test_mainwindow import window  # noqa: E402,F401  (the real MainWindow fixture)

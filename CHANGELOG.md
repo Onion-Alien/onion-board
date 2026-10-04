@@ -37,9 +37,20 @@
   used to sit full while nothing seemed to happen. It now glides while the app asks
   GitHub for the newest version, installs and starts it, shows the download's real
   percentage in between, and the button says which step it's on.
+- **Space pauses the sound you're on:** with a pad selected, Space pauses it while
+  it plays and carries on from there when pressed again, like a media player,
+  instead of starting it over. A sound that isn't playing still starts.
+- **Live tabs are green to start with:** a tab whose feature is on (a sound
+  playing, the voice changer, the radio) gets a soft green tint as well as its dot.
+  The switch for it is now first in Settings → Appearance, above the themes.
 - **Tidier small things:** no blank pad windows flash up behind the splash on
   start, and Bun sits on the splash nodding to his headphones; Settings →
-  Connection → Network activity has no empty space under its Simple list.
+  Connection → Network activity has no empty space under its list, and *Open log*
+  works without a saved history (it shows this run's list, still not saved);
+  *Start in the tray* is only ticked once *Start when I sign in* is on; the
+  overlay's *Show preview* closes on any click or key instead of making Windows
+  ding at every click while it's up; *Check now* in Settings → Updates sits on
+  the left with its result beside it, not alone on a line of its own.
 
 ## 1.6.6 — 2026-10-04
 

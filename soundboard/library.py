@@ -267,7 +267,10 @@ class Config:
     mic_gate: bool = False    # mute your mic while a sound plays (only the sound goes out)
     ptt_key: str = ""           # key held down while sounds play (game push-to-talk)
     always_on_top: bool = False
-    live_tab_tint: bool = False   # live tabs get a green wash, not just their icon's badge
+    # live tabs get a green wash, not just their icon's badge. On by default since
+    # 1.6.7: a new name, so 1.6.5-1.6.6's saved live_tab_tint=False (the old default,
+    # never picked by anyone) doesn't keep it off; older versions just ignore it
+    live_tab_green: bool = True
     pad_width: int = 150
     app_card_width: int = 300
     tab: int = 0     # 0 = sounds, 1 = radio, 2 = apps, 3 = triggers, 4 = voice, 5 = setup

@@ -27,10 +27,10 @@ import time
 from dataclasses import asdict, dataclass
 
 from PySide6.QtCore import (QEasingCurve, QPoint, QPointF, QPropertyAnimation, QRect, QRectF,
-                            QSize, Qt, QTimer)
+                            QEvent, QObject, QSize, Qt, QTimer)
 from PySide6.QtGui import (QColor, QFont, QGuiApplication, QPainter, QPainterPath, QPen,
                            QPolygonF)
-from PySide6.QtWidgets import QWidget
+from PySide6.QtWidgets import QApplication, QWidget
 
 from soundboard import theme, winkeys
 
@@ -212,6 +212,8 @@ class Overlay:
         self._preview_end = QTimer()
         self._preview_end.setSingleShot(True)
         self._preview_end.timeout.connect(self._end_preview)
+        self._previewing = False
+        self._preview_watch = _AnyInput(self._end_preview)
         self.listeners: list = []     # called (no args) after a drag changed the settings
 
     @property
@@ -316,6 +318,7 @@ class Overlay:
         if self.is_open:
             return
         self._preview_end.stop()
+        self._set_previewing(False)
         self.is_open = True
         self.by_click = by_click
         self.flash = None
@@ -410,11 +413,26 @@ class Overlay:
             self._window.present()        # new size / position
 
     def preview(self, seconds: float = 3.0):
-        """Show the overlay (without claiming any keys) so its look can be judged."""
+        """Show the overlay (without claiming any keys) so its look can be judged. Only
+        to look at: clicks pass through it, and any click or key in the app ends it
+        (Settings is modal, so a click on the overlay itself only made Windows ding).
+        Open the real overlay to try it or drag it."""
         if self.is_open:
             return
         self.window.present(follow_game=False)
+        self._set_previewing(True)
         self._preview_end.start(int(seconds * 1000))
+
+    def _set_previewing(self, on: bool):
+        if on == self._previewing:
+            return
+        self._previewing = on
+        app = QApplication.instance()
+        if app is not None:
+            (app.installEventFilter if on else app.removeEventFilter)(self._preview_watch)
+        w = self._window
+        if w is not None and QGuiApplication.platformName() == "windows":
+            winkeys.set_click_through(int(w.winId()), on)
 
     def keep_preview(self):
         """The mouse is on the preview (say, dragging it into place): keep it up."""
@@ -441,6 +459,8 @@ class Overlay:
         self._touch()
 
     def _end_preview(self):
+        self._preview_end.stop()
+        self._set_previewing(False)
         if not self.is_open and self._window is not None:
             self._window.dismiss()
 
@@ -453,11 +473,25 @@ class Overlay:
     def shutdown(self):
         for t in (self._autohide, self._close_soon, self._hold, self._preview_end):
             t.stop()
+        self._set_previewing(False)
         self.is_open = False
         if self._window is not None:
             self._window.close()
             self._window.deleteLater()
             self._window = None
+
+
+class _AnyInput(QObject):
+    """Calls `done` on the first click or key press anywhere in the app."""
+
+    def __init__(self, done):
+        super().__init__()
+        self._done = done
+
+    def eventFilter(self, obj, e):
+        if e.type() in (QEvent.MouseButtonPress, QEvent.KeyPress):
+            QTimer.singleShot(0, self._done)   # not from inside the event's delivery
+        return False
 
 
 class OverlayWindow(QWidget):

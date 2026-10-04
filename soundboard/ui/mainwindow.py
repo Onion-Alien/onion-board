@@ -430,7 +430,7 @@ class MainWindow(QMainWindow):
         # a green badge on a tab's icon (and, if picked in Settings, a green wash) while
         # its feature is live — the voice changer, a radio station, a program being
         # sent, the screen watched — so it's never left on without you noticing
-        set_live_tint(self.tabs, self.cfg.live_tab_tint)
+        set_live_tint(self.tabs, self.cfg.live_tab_green)
         vi = self.tabs.indexOf(self.voice)
         self.voice.active_changed.connect(lambda on: set_tab_live(
             self.tabs, vi, on, "● ON: others hear your changed / computer voice",
@@ -1776,7 +1776,7 @@ class MainWindow(QMainWindow):
             self.engine.set_gain(m.id, self.gain_for(m))
 
     def set_live_tab_tint(self, on: bool):
-        self.set_option("live_tab_tint", on)
+        self.set_option("live_tab_green", on)
         set_live_tint(self.tabs, on)
 
     def on_top_toggle(self, b):
@@ -2388,6 +2388,15 @@ class MainWindow(QMainWindow):
             self.engine.play(sid, data, self.gain_for(m), loop=m.loop, mode="restart", start=frac,
                              fade_in=m.fade_in if frac == 0 else 0.0, fade_out=m.fade_out)
 
+    def space_pad(self, sid: str):
+        """Space on a pad: pause or resume it while it's playing (or paused), like a
+        media player; play it when it isn't."""
+        if self.engine.state(sid):
+            self.select(sid)
+            self.engine.set_paused(sid, not self.engine.state(sid)[1])
+        else:
+            self.play(sid)
+
     def stop_current(self):
         if self.current:
             self.engine.stop(self.current)
@@ -2476,6 +2485,7 @@ class MainWindow(QMainWindow):
             if p is None:
                 p = Pad(m, self.cfg.pad_width)
                 p.activated.connect(self.play)
+                p.space.connect(self.space_pad)
                 p.chosen.connect(self.select)
                 p.pick.connect(self.selection.on_pick)
                 p.step.connect(self.grid.focus_step)

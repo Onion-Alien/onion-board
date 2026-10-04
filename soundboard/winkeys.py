@@ -391,6 +391,14 @@ def make_overlay(hwnd: int):
                               | WS_EX_TOPMOST) & ~WS_EX_TRANSPARENT)
 
 
+def set_click_through(hwnd: int, on: bool):
+    """Let clicks pass through the window to whatever is under it (the preview: it's
+    only to look at, and under the modal Settings window a click on it just dinged)."""
+    h = wt.HWND(hwnd)
+    ex = _GetLong(h, GWL_EXSTYLE)
+    _SetLong(h, GWL_EXSTYLE, ex | WS_EX_TRANSPARENT if on else ex & ~WS_EX_TRANSPARENT)
+
+
 def raise_topmost(hwnd: int):
     """Put the window back on top without activating it (games that make themselves
     topmost can otherwise end up above it)."""
