@@ -36,7 +36,7 @@ from pathlib import Path
 import numpy as np
 import soundfile as sf
 
-from soundboard import library, net
+from soundboard import library, net, netlog
 from soundboard.speech.tts import TTS_RATE, SapiTTS
 
 log = logging.getLogger(__name__)
@@ -107,6 +107,8 @@ class CustomVoice:
     def synth(self, text: str, rate: int = 0) -> tuple[np.ndarray, int]:
         """`text` spoken: (float32 mono, sample rate). `rate` is -10..10 like Windows'."""
         speed = 2 ** (max(-10, min(10, rate)) / 10)
+        netlog.cause("voice_servers", f"Speaking with your custom voice "
+                                      f"{netlog.quoted(label(self.name))}")
         data = self._fetch(text, speed) if self.url else self._run(text, speed)
         return decode(data)
 

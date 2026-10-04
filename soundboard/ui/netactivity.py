@@ -1,10 +1,10 @@
 """Settings > Connection > Network activity: the list soundboard.netlog keeps of every
 connection the app makes, to check for yourself where it goes.
 
-Simple: one row per server (what it was for, how often, how much). Detailed: one row
-per connection (route, result, bytes each way) and, for the picked one, its request
-lines, answer and encryption. It redraws once a second while it's on screen, and
-only when something changed."""
+Simple: one row per server (what it was for, why, how often, how much). Detailed: one
+row per connection (why: what you did that made it, route, result, bytes each way)
+and, for the picked one, its request lines, answer and encryption. It redraws once a
+second while it's on screen, and only when something changed."""
 from __future__ import annotations
 
 import html
@@ -93,10 +93,11 @@ class NetActivity(QWidget):
 
         row = QHBoxLayout()
         self.simple = QRadioButton("Simple")
-        self.simple.setToolTip("One row per server: what it was for and how often")
+        self.simple.setToolTip("One row per server: what it was for, why, and how often")
         self.detailed = QRadioButton("Detailed")
-        self.detailed.setToolTip("One row per connection: route, result, bytes, and the "
-                                 "requests the app could read")
+        self.detailed.setToolTip("One row per connection: what you did that made it, "
+                                 "route, result, bytes, and the requests the app could "
+                                 "read")
         group = QButtonGroup(self)
         for b in (self.simple, self.detailed):
             group.addButton(b)
@@ -121,8 +122,9 @@ class NetActivity(QWidget):
         row.addWidget(self.clear)
         v.addLayout(row)
 
-        self.servers = _table(["Server", "Used for", "Connections", "Data", "Last"], 1)
-        self.conns = _table(["Time", "Server", "For", "Route", "Result", "Sent",
+        self.servers = _table(["Server", "Why", "Used for", "Connections", "Data",
+                               "Last"], 1)
+        self.conns = _table(["Time", "Server", "Why", "For", "Route", "Result", "Sent",
                              "Received"], 2)
         self.info = QPlainTextEdit()
         self.info.setReadOnly(True)
@@ -196,12 +198,16 @@ class NetActivity(QWidget):
             if extra:
                 count += f" ({', '.join(extra)})"
             tone = "warn" if s.blocked == s.connections else None
+            why = s.causes[0] if s.causes else "—"
+            if len(s.causes) > 1:
+                why += f" (+{len(s.causes) - 1} more)"
             _put(t, r, 0, s.host, tone=tone)
-            _put(t, r, 1, ", ".join(s.features), "\n".join(s.features), tone=tone)
-            _put(t, r, 2, count, align=right, tone=tone)
-            _put(t, r, 3, f"↑ {netlog.size(s.sent)}  ↓ {netlog.size(s.received)}",
+            _put(t, r, 1, why, "\n".join(s.causes), tone=tone)
+            _put(t, r, 2, ", ".join(s.features), "\n".join(s.features), tone=tone)
+            _put(t, r, 3, count, align=right, tone=tone)
+            _put(t, r, 4, f"↑ {netlog.size(s.sent)}  ↓ {netlog.size(s.received)}",
                  "Sent / received", right, tone)
-            _put(t, r, 4, _when(s.last), tone=tone)
+            _put(t, r, 5, _when(s.last), tone=tone)
 
     def _fill_conns(self):
         t = self.conns
@@ -216,11 +222,12 @@ class NetActivity(QWidget):
             color = tone.get(e.state)
             _put(t, r, 0, _when(e.started), tone=color).setData(Qt.UserRole, e.n)
             _put(t, r, 1, netlog.where(e), tone=color)
-            _put(t, r, 2, label, label, tone=color)
-            _put(t, r, 3, e.route or "—", tone=color)
-            _put(t, r, 4, netlog.outcome(e), e.reason, tone=color)
-            _put(t, r, 5, netlog.size(e.sent), align=right, tone=color)
-            _put(t, r, 6, netlog.size(e.received), align=right, tone=color)
+            _put(t, r, 2, e.cause or "—", e.cause, tone=color)
+            _put(t, r, 3, label, label, tone=color)
+            _put(t, r, 4, e.route or "—", tone=color)
+            _put(t, r, 5, netlog.outcome(e), e.reason, tone=color)
+            _put(t, r, 6, netlog.size(e.sent), align=right, tone=color)
+            _put(t, r, 7, netlog.size(e.received), align=right, tone=color)
             if e.n == picked:
                 t.selectRow(r)
         t.blockSignals(False)

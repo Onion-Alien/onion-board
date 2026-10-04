@@ -29,7 +29,7 @@ from soundboard.engine import SR, Engine
 from soundboard.engine import is_virtual as is_virtual_cable
 from soundboard import (appaudio, autostart, backup, destination, library, midi, remote,
                         soundfx, thumbs, trash, updates, voicesdk)
-from soundboard import net, shellicon, tor, watchaddon
+from soundboard import net, netlog, shellicon, tor, watchaddon
 from soundboard.replay import InstantReplay
 from soundboard.library import (AUDIO_EXTS, PAD_COLORS, RESOURCE_DIR, Config, SoundMeta,
                                 cache_keep, clean_tags, duplicate, fingerprint,
@@ -3365,13 +3365,17 @@ class MainWindow(QMainWindow):
         autostart.refresh(hidden)
 
     # ------------------------------------------------------------------ updates
-    def check_updates(self, force: bool = False):
+    def check_updates(self, force: bool = False, why: str = ""):
         """Look for a newer release on a thread (see updates.py). Without `force` only
-        if the box is ticked, and at most once a day."""
+        if the box is ticked, and at most once a day. `why`: the click that asked, for
+        Network activity (none: the app's own timer)."""
         if not force and not self.cfg.update_check:
             return
 
         due = force or time.time() - self.cfg.update_checked >= updates.EVERY_S
+        why = why or "Automatic update check (at most once a day)"
+        netlog.cause(updates.FEATURE, why)
+        netlog.cause(watchaddon.FEATURE, f"{why}: Onion Watch add-on")
 
         def run():
             try:
@@ -3452,6 +3456,7 @@ class MainWindow(QMainWindow):
             self.toast(html.escape(net.off_message(updates.FEATURE)), "warn")
             return
         self._downloading = True
+        netlog.cause(updates.FEATURE, f"You clicked to download Onion Board {rel.version}")
         self._set_update_pill("Downloading update…",
                               f"Downloading Onion Board {rel.version}", enabled=False)
         last = [-1]

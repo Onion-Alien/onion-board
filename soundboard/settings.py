@@ -1457,6 +1457,9 @@ class SettingsDialog(QDialog):
                     self._net_sync()
 
             def work():
+                from soundboard import netlog
+                netlog.cause(torget.FEATURE, "You clicked to download Tor (Settings > "
+                                             "Connection)")
                 try:
                     # a running Tor may have carried the download: stopped before its
                     # files are swapped, the next connection starts the new one
@@ -1487,6 +1490,8 @@ class SettingsDialog(QDialog):
             relay.done.connect(finish)
 
             def run():
+                from soundboard import netlog
+                netlog.cause(net.TEST, "You clicked Test (Settings > Connection)")
                 try:
                     msg = net.test(text)
                 except (ValueError, OSError) as e:
@@ -1536,13 +1541,13 @@ class SettingsDialog(QDialog):
     def _updates_optin(self, on: bool):
         self.mw.set_option("update_check", on)
         if on:
-            self.mw.check_updates()
+            self.mw.check_updates(why="You turned on update checks")
 
     def _updates_check(self):
         self._upd_asked = True
         self.upd_btn.setEnabled(False)
         self.upd_label.setText("Checking…")
-        self.mw.check_updates(force=True)
+        self.mw.check_updates(force=True, why="You clicked Check now (Settings > Updates)")
 
     def _updates_done(self, rel, err: str):
         if not qt_valid(self.upd_label):
@@ -1699,7 +1704,7 @@ class SettingsDialog(QDialog):
             b = QPushButton(text)
             b.setToolTip(tip)
             b.setProperty("tip", tip)
-            b.clicked.connect(lambda _=False, j=job: self._ytdlp_run(j))
+            b.clicked.connect(lambda _=False, j=job, t=text: self._ytdlp_run(j, t))
             row.addWidget(b)
             self.ytdlp_btns.append(b)
         cv.addLayout(row)
@@ -1713,7 +1718,10 @@ class SettingsDialog(QDialog):
         now = f"In use: yt-dlp {v} ({where})." if v else "yt-dlp isn't installed."
         self.ytdlp_label.setText(f"{msg} {now}".strip())
 
-    def _ytdlp_run(self, job):
+    def _ytdlp_run(self, job, button: str = ""):
+        from soundboard import netlog
+        netlog.cause(ytdl.UPDATE_FEATURE, f"You clicked {button} (Settings > Updates)"
+                     if button else "You asked to update the downloader")
         for b in self.ytdlp_btns:
             b.setEnabled(False)
         self.ytdlp_label.setText("Working…")

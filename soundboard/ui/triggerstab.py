@@ -26,7 +26,7 @@ from PySide6.QtCore import Qt, Signal
 from PySide6.QtWidgets import (QHBoxLayout, QMessageBox, QProgressBar, QPushButton,
                                QStackedWidget, QVBoxLayout, QWidget)
 
-from soundboard import modules, net, theme, updates, watchaddon
+from soundboard import modules, net, netlog, theme, updates, watchaddon
 from soundboard.ui import busy, icons
 from soundboard.ui.owl import OwlWidget
 from soundboard.ui.panel import card, hint_label, section_label
@@ -283,6 +283,7 @@ class TriggersTab(QWidget):
         self.bar.show()
         self.error.hide()
         self.update_text.setText("Downloading Onion Watch…")
+        netlog.cause(watchaddon.FEATURE, "You clicked to get Onion Watch (Triggers tab)")
         self._busy_label("Downloading…")
         busy.set_busy(self.btn_cancel, False)
         self.btn_cancel.setText("Cancel")
