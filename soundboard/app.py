@@ -201,6 +201,10 @@ def main():
     # would otherwise find nobody answering (the window is looked up when asked)
     holder = {}
     app.instance_server = listen_for_second_launch(app, lambda: holder.get("w"))  # kept alive
+    from soundboard.autostart import TRAY_ARG
+    from soundboard.ui import splash
+    if TRAY_ARG not in sys.argv:   # a cold start can take seconds: show Bun meanwhile
+        splash.show()
     app.setStyle("Fusion")
     from soundboard.ui import a11y
     a11y.install(app)   # screen-reader names for icon-only controls, as focus moves
@@ -211,15 +215,16 @@ def main():
     try:
         w = holder["w"] = MainWindow()
     except Exception:  # noqa: BLE001 - tell the user why nothing appeared, then quit
+        splash.close()
         applog.report(where="starting up", fatal=True)
         sys.exit(1)
     # Windows logging off / shutting down while the window is hidden in the tray never
     # calls closeEvent: still let go of push-to-talk and save the settings
     app.aboutToQuit.connect(w.shutdown)
-    from soundboard.autostart import TRAY_ARG
     if (not (TRAY_ARG in sys.argv and w.can_hide())   # started with Windows: tray only
             or app.instance_server.show_requested):    # ...unless launched again since
         w.show()
+    splash.close()
     from PySide6.QtCore import QTimer
     if "--resume-setup" in sys.argv:   # back after the restart the cable asked for
         QTimer.singleShot(400, lambda: w.run_setup(resumed=True))

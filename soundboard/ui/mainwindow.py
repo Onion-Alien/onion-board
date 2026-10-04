@@ -41,7 +41,7 @@ from soundboard.testcheck import analyze as analyze_output
 from soundboard.testcheck import summary_html
 from soundboard.ui.crashdialog import free_dialog
 from soundboard.ui.dialogs import EditDialog
-from soundboard.ui import a11y, appstate, busy, icons, responsive
+from soundboard.ui import a11y, appstate, busy, icons, responsive, splash
 from soundboard.ui.speedpitch import SpeedPitchButton
 from soundboard.ui.panel import (EqPanel, VolumeControl, bar, card, hint_label, icon_label,
                                  vsep)
@@ -205,13 +205,17 @@ class MainWindow(QMainWindow):
         self.cable_bad = []               # cable ends not at 48 kHz (_check_cable_format)
         self._default_out = appaudio.default_output_name()   # see _follow_default_output
         self._build_ui()
+        splash.pump()
         self._init_devices()
+        splash.pump()
         if self.setup_state != "ok":
             self.tabs.blockSignals(True)
             self.tabs.setCurrentWidget(self.setup_page)
             self.tabs.blockSignals(False)
         self._rebuild_pads()
+        splash.pump()
         self._load_all()
+        splash.pump()
         self._watch_sounds_folder()
         self._fit_overlay_key()
         self.register_hotkeys()
