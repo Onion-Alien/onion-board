@@ -22,7 +22,7 @@ from __future__ import annotations
 import logging
 import threading
 
-from PySide6.QtCore import Qt, Signal
+from PySide6.QtCore import Qt, QTimer, Signal
 from PySide6.QtWidgets import (QHBoxLayout, QMessageBox, QProgressBar, QPushButton,
                                QStackedWidget, QVBoxLayout, QWidget)
 
@@ -30,6 +30,7 @@ from soundboard import modules, net, netlog, theme, updates, watchaddon
 from soundboard.ui import busy, icons
 from soundboard.ui.owl import OwlWidget
 from soundboard.ui.panel import card, hint_label, section_label
+from soundboard.ui.widgets import LoadingBar
 from soundboard import errors
 
 log = logging.getLogger(__name__)
@@ -48,7 +49,8 @@ def plural(n: int, word: str) -> str:
 class TriggersTab(QWidget):
     active_changed = Signal(bool)          # watching or not (the tab's live dot)
     loaded = Signal()                      # the add-on's tab is in
-    _progress = Signal(int, int)           # from the download thread
+    _progress = Signal(int, int)           # from the download thread (done, total)
+    _step = Signal(str)                    # from it too: what it's doing, with no number
     _finished = Signal(object, str, bool)  # ModuleInfo | None, error, was an update
 
     def __init__(self, host, dirs=None):
@@ -63,6 +65,7 @@ class TriggersTab(QWidget):
         self._cancel = False
         self._compact: dict[str, bool] = {}          # fit steps applied (see fit_steps)
         self._progress.connect(self._on_progress)
+        self._step.connect(self._on_step)
         self._finished.connect(self._on_finished)
 
         v = QVBoxLayout(self)
@@ -132,11 +135,20 @@ class TriggersTab(QWidget):
         buttons.addWidget(self.btn_remove_broken)
         buttons.addStretch(1)
         text.addLayout(buttons)
+        # the download's real progress, and a pill gliding along while there's no
+        # number to show (asking GitHub for the newest, installing, starting it): one
+        # bar that just sat full looked like nothing was happening
         self.bar = QProgressBar()
+        self.bar.setObjectName("downloadprogress")
+        self.bar.setAccessibleName("Onion Watch download progress")
+        self.bar.setRange(0, 1000)
         self.bar.setTextVisible(False)
-        self.bar.setFixedHeight(8)
+        self.bar.setFixedHeight(6)
         self.bar.hide()
         text.addWidget(self.bar)
+        self.working = LoadingBar()
+        self.working.hide()
+        text.addWidget(self.working)
         self.privacy = hint_label(
             "It's downloaded from Onion Watch's page on GitHub only when you click, and "
             "checked before it's installed. It only looks at your screen: it never "
@@ -286,12 +298,9 @@ class TriggersTab(QWidget):
         self.btn_get.setEnabled(False)
         self.btn_update.setEnabled(False)
         self.btn_cancel.show()
-        self.bar.setRange(0, 0)           # busy until the size is known
-        self.bar.show()
         self.error.hide()
-        self.update_text.setText("Downloading Onion Watch…")
         netlog.cause(watchaddon.FEATURE, "You clicked to get Onion Watch (Triggers tab)")
-        self._busy_label("Downloading…")
+        self._on_step("Finding the newest…" if offer is None else "Downloading…")
         busy.set_busy(self.btn_cancel, False)
         self.btn_cancel.setText("Cancel")
 
@@ -301,7 +310,9 @@ class TriggersTab(QWidget):
                 if o is None:
                     raise updates.UpdateError(
                         "there's no Onion Watch release the app can check. Try again later.")
+                self._step.emit("Downloading…")
                 path = watchaddon.fetch(o, self._progress.emit, lambda: self._cancel)
+                self._step.emit("Installing…")
                 info = watchaddon.install(path, self._base())
                 self._finished.emit(info, "", update)
             except Exception as e:  # noqa: BLE001 - offline, 404, bad zip…
@@ -319,18 +330,42 @@ class TriggersTab(QWidget):
         on the get page; an update from the bar only has its own button and text)."""
         (self.btn_update if self.panel is not None else self.btn_get).setText(text)
 
+    def _on_step(self, text: str):
+        """A step with no number to show: the gliding pill, and what it's doing."""
+        if not self._busy:
+            return
+        self.bar.hide()
+        self.bar.setValue(0)
+        self.working.show()
+        self.working.start()
+        self._busy_label(text)
+        self.update_text.setText(f"{text[:-1]} Onion Watch…")
+
     def _on_progress(self, done: int, total: int):
-        if total > 0:
-            self.bar.setRange(0, 1000)
-            self.bar.setValue(int(done * 1000 / total))
-            pct = int(done * 100 / total)
-            self._busy_label(f"Downloading… {pct}%")
-            self.update_text.setText(f"Downloading Onion Watch… {pct}%")
-            if done >= total:
-                self._busy_label("Installing…")
+        if total <= 0 or not self._busy:
+            return              # size unknown: the pill keeps gliding
+        self.working.stop()
+        self.working.hide()
+        self.bar.show()
+        self.bar.setValue(max(self.bar.value(), min(1000, int(done * 1000 / total))))
+        pct = self.bar.value() // 10
+        self._busy_label(f"Downloading… {pct}%")
+        self.update_text.setText(f"Downloading Onion Watch… {pct}%")
 
     def _on_finished(self, info, error: str, update: bool):
+        if not error and not update:
+            # loading it takes a moment on this thread: say so, and let that paint
+            # before it starts (the bar would otherwise sit at its last frame)
+            self.btn_cancel.hide()
+            self._on_step("Starting…")
+            QTimer.singleShot(30, lambda: self._finish(info, error, update))
+            return
+        self._finish(info, error, update)
+
+    def _finish(self, info, error: str, update: bool):
         self._busy = False
+        self.working.stop()
+        self.working.hide()
         self.btn_get.setEnabled(True)
         self.btn_update.setEnabled(True)
         self.btn_update.setText("Update")

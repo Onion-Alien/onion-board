@@ -159,6 +159,28 @@ def test_get_installs_it_and_loads_it_into_the_tab(qapp, tmp_path, addon_zip, mo
     assert host.calls == ["sounds_changed"]
 
 
+def test_getting_it_shows_each_step_and_the_real_download_progress(qapp, tmp_path):
+    """Not a bar that sits full: a gliding pill while there's no number (asking
+    GitHub, installing, starting), and the download's real share in between."""
+    tab = TriggersTab(FakeHost(), [tmp_path / "modules"])
+    tab._busy = True
+    tab._on_step("Finding the newest…")
+    assert tab.working.running() and tab.bar.isHidden()
+    assert tab.btn_get.text() == "Finding the newest…"
+    tab._on_progress(0, 0)                  # size unknown: still gliding
+    assert tab.working.running() and tab.bar.isHidden()
+    tab._on_progress(30, 100)
+    assert not tab.working.running() and not tab.bar.isHidden()
+    assert tab.bar.value() == 300 and tab.btn_get.text() == "Downloading… 30%"
+    tab._on_progress(20, 100)               # never goes backwards
+    assert tab.bar.value() == 300
+    tab._on_step("Installing…")
+    assert tab.working.running() and tab.bar.isHidden()
+    assert tab.btn_get.text() == "Installing…"
+    tab._finish(None, "Cancelled", False)
+    assert not tab.working.running() and tab.working.isHidden() and tab.bar.isHidden()
+
+
 def test_an_installed_add_on_loads_on_start(qapp, tmp_path, addon_zip):
     watchaddon.install(addon_zip(), tmp_path / "modules")
     tab = TriggersTab(FakeHost(), [tmp_path / "modules"])

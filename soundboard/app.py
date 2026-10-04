@@ -293,7 +293,19 @@ def main():
     from soundboard.ui import splash
     if TRAY_ARG not in sys.argv:   # a cold start can take seconds: show Bun meanwhile
         splash.show()
-    app.setStyle("Fusion")
+    from PySide6.QtCore import Qt
+    from PySide6.QtWidgets import QProxyStyle, QStyle
+
+    class _Style(QProxyStyle):
+        """Fusion, but a click anywhere on a slider's bar moves it there (not a page
+        step towards it), on every slider in the app."""
+
+        def styleHint(self, hint, opt=None, widget=None, ret=None):
+            if hint == QStyle.SH_Slider_AbsoluteSetButtons:
+                return Qt.LeftButton.value
+            return super().styleHint(hint, opt, widget, ret)
+
+    app.setStyle(_Style("Fusion"))
     from soundboard.ui import a11y
     a11y.install(app)   # screen-reader names for icon-only controls, as focus moves
     from soundboard import theme

@@ -17,10 +17,9 @@ import math
 import queue
 import random
 import threading
-import time
 
-from PySide6.QtCore import QEvent, QPointF, QRectF, QSize, QTimer, QUrl, Qt, Signal
-from PySide6.QtGui import (QColor, QLinearGradient, QPainter, QPainterPath, QPixmap,
+from PySide6.QtCore import QEvent, QPointF, QRectF, QSize, QUrl, Qt, Signal
+from PySide6.QtGui import (QColor, QPainter, QPainterPath, QPixmap,
                            QTextLayout)
 from PySide6.QtNetwork import QNetworkAccessManager, QNetworkRequest
 from PySide6.QtWidgets import (QButtonGroup, QFrame, QHBoxLayout, QLabel, QProgressBar,
@@ -36,7 +35,7 @@ from soundboard.ui.owl import W as OWL_W
 from soundboard.ui.owl import OwlWidget
 from soundboard.ui.panel import CardGrid, HoverCard
 from soundboard.ui.responsive import FitWidth
-from soundboard.ui.widgets import fmt_time
+from soundboard.ui.widgets import LoadingBar, fmt_time
 from soundboard import errors
 
 log = logging.getLogger(__name__)
@@ -72,68 +71,6 @@ def stats_text(r: ytdl.Result, waiting: bool = False) -> tuple[str, str]:
         elif waiting and word != "views":
             parts.append(f"… {word}")
     return " · ".join(parts), ", ".join(tip)
-
-
-class LoadingBar(QWidget):
-    """An indeterminate progress bar: an accent pill gliding back and forth along a
-    rounded groove. Theme colours are read on every paint, and the timer only runs
-    while it's started and on screen."""
-
-    def __init__(self, parent=None):
-        super().__init__(parent)
-        self.setFixedHeight(6)
-        self._t0 = time.monotonic()
-        self._on = False
-        self._timer = QTimer(self)
-        self._timer.setInterval(1000 // 30)
-        self._timer.timeout.connect(self.update)
-
-    def start(self):
-        self._on = True
-        self._t0 = time.monotonic()
-        if self.isVisible():
-            self._timer.start()
-
-    def stop(self):
-        self._on = False
-        self._timer.stop()
-
-    def running(self) -> bool:
-        return self._on
-
-    def ticking(self) -> bool:
-        return self._timer.isActive()
-
-    def showEvent(self, ev):
-        if self._on:
-            self._timer.start()
-        super().showEvent(ev)
-
-    def hideEvent(self, ev):
-        self._timer.stop()
-        super().hideEvent(ev)
-
-    def sizeHint(self) -> QSize:
-        return QSize(240, 6)
-
-    def paintEvent(self, _e):
-        p = QPainter(self)
-        p.setRenderHint(QPainter.Antialiasing)
-        r = QRectF(self.rect())
-        rad = r.height() / 2
-        p.setPen(Qt.NoPen)
-        p.setBrush(QColor(theme.T.get("groove", "#343849")))
-        p.drawRoundedRect(r, rad, rad)
-        # the pill eases from one end to the other and back, stretching mid-glide
-        k = 0.5 - 0.5 * math.cos((time.monotonic() - self._t0) * math.pi / 0.9)
-        w = r.width() * (0.28 + 0.14 * math.sin(k * math.pi))
-        x = r.left() + (r.width() - w) * k
-        g = QLinearGradient(x, 0, x + w, 0)
-        g.setColorAt(0, QColor(theme.T.get("accent", "#7c5cff")))
-        g.setColorAt(1, QColor(theme.T.get("accent2", theme.T.get("accent_hi", "#8d71ff"))))
-        p.setBrush(g)
-        p.drawRoundedRect(QRectF(x, r.top(), w, r.height()), rad, rad)
-        p.end()
 
 
 class _BusyOwl(OwlWidget):

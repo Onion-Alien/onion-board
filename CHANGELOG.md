@@ -27,6 +27,17 @@
     on/off switch, grouped, with what it does written on it and a Reset.
   - Your saved voices and older settings load as before and sound the same: the
     new controls start where the old sound was.
+- **Sliders jump to where you click:** click anywhere on a slider's bar (volume,
+  seek, speed, fades, everything) and it goes straight there, instead of creeping
+  a step towards it; you no longer have to grab the circle. The circles are no
+  longer cut off flat at the top and bottom, and light up when you point at them.
+- **Getting Onion Watch shows real progress:** the bar under *Get Onion Watch*
+  used to sit full while nothing seemed to happen. It now glides while the app asks
+  GitHub for the newest version, installs and starts it, shows the download's real
+  percentage in between, and the button says which step it's on.
+- **Tidier small things:** no blank pad windows flash up behind the splash on
+  start, and Bun sits on the splash nodding to his headphones; Settings →
+  Connection → Network activity has no empty space under its Simple list.
 
 ## 1.6.6 — 2026-10-04
 
