@@ -119,6 +119,27 @@ def test_key_like_query_values_are_masked():
     assert netlog.redact("/plain") == "/plain"
 
 
+def test_a_login_in_an_absolute_url_is_masked():
+    """A proxy client (FFmpeg, Qt) sends the whole URL, login included."""
+    url = login("user", "pw", "radio.example.com:8000/live?token=t&x=1", "http")
+    assert netlog.redact(url) == "http://•••@radio.example.com:8000/live?token=•••&x=1"
+    assert netlog.redact("http://radio.example.com/a@b") == "http://radio.example.com/a@b"
+    e = netlog.begin(F, "radio.example.com", 80, netlog.RELAY)
+    url = login("me", "s3cret", "radio.example.com/", "http")
+    net._sniff(e, f"GET {url} HTTP/1.1\r\n\r\n".encode(), from_site=False)
+    assert e.requests and "s3cret" not in netlog.as_text()
+
+
+def test_an_unexpected_error_doesnt_leave_it_connecting(monkeypatch):
+    def broken(*a, **k):
+        raise UnicodeError("label too long")   # what IDNA raises for a bad host name
+    monkeypatch.setattr(net, "_route", broken)
+    with pytest.raises(UnicodeError):
+        net.connect("x" * 70 + ".example.com", 443, feature=F)
+    [e] = netlog.entries()
+    assert e.state == netlog.FAILED and "label too long" in e.reason
+
+
 def test_the_list_is_capped():
     for i in range(netlog.MAX_ENTRIES + 5):
         netlog.begin(F, f"h{i}.test", 443)
@@ -159,4 +180,28 @@ def test_the_view_shows_simple_and_detailed(qapp):
     assert "api.example.com" in qapp.clipboard().text()
     w._clear()
     assert netlog.entries() == [] and w.conns.rowCount() == 0
+    w.deleteLater()
+
+
+def test_the_view_updates_its_rows_in_place(qapp):
+    """New connections push the rows down; the redraw reuses the cells, keeps the pick
+    on the same connection and drops a colour a row no longer has. Tooltips are plain
+    text (a reason can quote a server)."""
+    from soundboard.ui.netactivity import _TONE, NetActivity
+    w = NetActivity()
+    w.detailed.setChecked(True)
+    a = netlog.begin(F, "a.example.com", 443)
+    a.failed("<b>bold</b> refusal")
+    w.refresh()
+    w.conns.selectRow(0)
+    cell = w.conns.item(0, 0)
+    assert w.conns.item(0, 4).data(_TONE) == "error"
+    assert "&lt;b&gt;bold" in w.conns.item(0, 4).toolTip()
+    netlog.begin(F, "b.example.com", 443).connected("direct")
+    w.refresh()
+    assert w.conns.rowCount() == 2 and w.conns.item(0, 0) is cell   # reused
+    assert w.conns.item(0, 1).text() == "b.example.com:443"
+    assert w.conns.item(0, 4).data(_TONE) is None                   # colour dropped
+    assert w.conns.item(1, 4).data(_TONE) == "error"
+    assert "a.example.com:443" in w.info.toPlainText()               # still the pick
     w.deleteLater()

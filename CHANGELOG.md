@@ -8,7 +8,7 @@
   with its route (direct, proxy, Tor), result, bytes each way, and the request,
   answer and encryption where the app can read them. Requests a switch turned
   away show as blocked. Kept in memory only: nothing is saved, logged or sent,
-  and key-like values in addresses are masked.
+  and logins and key-like values in addresses are masked.
 - **Tidier search results and category tabs:** web search results open with a
   *← My sounds* back button at the start of their header (it was *Back to my
   sounds*, alone at the far right), and the category tabs step aside while the

@@ -24,6 +24,7 @@ from __future__ import annotations
 
 import collections
 import dataclasses
+import itertools
 import re
 import threading
 import time
@@ -66,6 +67,11 @@ class Entry:
         self.route, self.state = route, CONNECTED
         _changed()
 
+    def refused(self, reason: str) -> None:
+        """Turned away before anything was looked up or sent."""
+        self.state, self.reason, self.ended = BLOCKED, reason, self.started
+        _changed()
+
     def failed(self, reason: str) -> None:
         self.state, self.reason, self.ended = FAILED, reason, time.time()
         _changed()
@@ -106,12 +112,13 @@ class Entry:
 _lock = threading.Lock()
 _entries: collections.deque[Entry] = collections.deque(maxlen=MAX_ENTRIES)
 _count = 0
+_versions = itertools.count(1)   # next() is atomic: `+= 1` from two threads can lose one
 _version = 0
 
 
 def _changed() -> None:
     global _version
-    _version += 1
+    _version = next(_versions)
 
 
 def version() -> int:
@@ -133,8 +140,7 @@ def begin(feature, host: str, port: int, how: str = APP) -> Entry:
 def blocked(feature, host: str, port: int, reason: str, how: str = APP) -> Entry:
     """A request refused before anything was looked up or sent."""
     e = begin(feature, host, port, how)
-    e.state, e.reason, e.ended = BLOCKED, reason, e.started
-    _changed()
+    e.refused(reason)
     return e
 
 
@@ -167,10 +173,16 @@ def feature_label(feature: str) -> str:
 
 def redact(target: str) -> str:
     """A request target with the values of key/token/password-like query parameters
-    masked."""
+    masked, and the login in front of the host of a whole URL (a proxy client sends
+    the whole URL)."""
     path, q, query = target.partition("?")
+    scheme, sep, rest = path.partition("://")
+    if sep and "/" not in scheme:
+        netloc, slash, tail = rest.partition("/")
+        if "@" in netloc:
+            path = f"{scheme}://•••@{netloc.rpartition('@')[2]}{slash}{tail}"
     if not q:
-        return target
+        return path
     parts = []
     for item in query.split("&"):
         name, eq, _value = item.partition("=")

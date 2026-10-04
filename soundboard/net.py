@@ -426,13 +426,17 @@ def _open(host: str, port: int, timeout: float | None = CONNECT_TIMEOUT_S,
         if not known(feature) or not (via is None and is_loopback(host)):
             check(feature)   # before the Tor gate: a switched-off feature never starts Tor
     except FeatureOff as e:
-        entry.state, entry.reason, entry.ended = netlog.BLOCKED, str(e), entry.started
+        entry.refused(str(e))
+        raise
+    except BaseException as e:   # never leave it "Connecting…" for good
+        entry.failed(str(e) or type(e).__name__)
         raise
     try:
         sock, route = _route(host, port, timeout, via, direct)
-    except OSError as e:
+    except BaseException as e:   # OSError, or e.g. a host name IDNA can't encode
         entry.route = _route_name(via, direct, host)
-        entry.failed(str(e) if isinstance(e, ProxyError) else _why(e))
+        entry.failed(str(e) if isinstance(e, ProxyError)
+                     else _why(e) if isinstance(e, OSError) else str(e) or type(e).__name__)
         raise
     entry.connected(route)
     return sock, entry
