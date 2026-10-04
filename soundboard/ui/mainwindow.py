@@ -1454,6 +1454,7 @@ class MainWindow(QMainWindow):
             self.setup_hint.setText(f"<span style='color:{theme.status('warn')}'>"
                                     "Nothing picked — only you "
                                     "will hear sounds.</span>")
+        self.set_sending(self.btn_air.isChecked())   # its label follows the route
         self._update_flow()
         errs = [f"{'stream output' if k == 'obs' else k}: {v}"
                 for k, v in e.errors_snapshot().items()]
@@ -2109,12 +2110,31 @@ class MainWindow(QMainWindow):
         if self.btn_air.isChecked() != on:
             self.btn_air.setChecked(on)   # comes back here
             return
-        text = (("Live — others hear you", "Live", "") if on else
-                ("Muted — others hear nothing", "Muted", ""))[self._air_size]
-        self.btn_air.setText(text)
-        self.btn_air.setToolTip(
-            "Click to mute: nothing at all goes out to Discord / the game (you still hear "
-            "everything)" if on else "Click to go live again: others hear you and your sounds")
+        # sending nowhere (or the send device is the headphones): Live doesn't claim
+        # others hear you; muting still silences the stream output, if there is one
+        others = self._main_name() is not None
+        stream = bool(self.engine.names["obs"])
+        if not on:
+            text = ("Muted — others hear nothing", "Muted", "")
+        elif others:
+            text = ("Live — others hear you", "Live", "")
+        elif stream:
+            text = ("Live — stream output only", "Live", "")
+        else:
+            text = ("Only you hear sounds", "Only you", "")
+        self.btn_air.setText(text[self._air_size])
+        if not on:
+            tip = "Click to go live again: others hear you and your sounds"
+        elif others:
+            tip = ("Click to mute: nothing at all goes out to Discord / the game (you "
+                   "still hear everything)")
+        elif stream:
+            tip = ("Nothing goes out to others, only to the stream output. Click to mute "
+                   "that too (you still hear everything)")
+        else:
+            tip = ("Nothing goes out to others: pick where to send on the Setup tab "
+                   "(Send to others through)")
+        self.btn_air.setToolTip(tip)
         if hasattr(self, "mini_air"):
             self.mini_air.setChecked(on)
             self.mini_air.setToolTip(self.btn_air.toolTip())
