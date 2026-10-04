@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 1.6.6 — 2026-10-04
 
 - **Bring your board over from another soundboard.** Coming from Soundpad,
   Resanance, Soundux or EXP Soundboard? The installer spots it and offers a box,
@@ -11,6 +11,19 @@
   (a Soundpad `.spl`, for one) on the window. Sounds already on your board are
   skipped, and a hotkey something here already uses is left off. Nothing is looked
   at until you tick the box or click Import.
+- **Quitting no longer crashes with Onion Watch watching:** closing the app with the
+  Triggers tab watching could end in a Windows "stopped working" report after
+  everything was already saved. It now ends cleanly.
+- **The Triggers tab counts every trigger:** with more than 50 it said "Your 50
+  triggers…".
+- **Tidier small things:** the radio map's "Finding stations…" sits on a card
+  instead of over the country names; the radio's filter boxes wrap onto more rows
+  instead of reading "All coun"; Settings → Connection → Network activity fits its
+  columns, Last included, without a scroll bar; the Voice tab points at the *Install
+  speech recognition* button instead of an install.bat; the AI setup prompt's
+  random-sound link no longer names a "Memes" category you don't have (it answered
+  "not found"); and a computer-voice line no longer fails right after Windows speech
+  had to be restarted.
 
 ## 1.6.5 — 2026-10-04
 
