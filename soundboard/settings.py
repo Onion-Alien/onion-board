@@ -89,6 +89,13 @@ def pretty_key(combo: str) -> str:
     return "+".join(part(p.strip()) for p in combo.split("+"))
 
 
+def _button_row():
+    """Buttons side by side at their own width, wrapping onto a second line only when
+    Settings is too narrow (stacked full-width buttons looked like a form)."""
+    from soundboard.ui.panel import Flow   # panel imports this module
+    return Flow(gap=8)
+
+
 class HotkeyDialog(QDialog):
     """Asks for a key combo, or (with `pads`) a hit on a MIDI pad controller."""
 
@@ -555,8 +562,9 @@ class SettingsDialog(QDialog):
         after.setChecked(s.close_after_play)
         after.toggled.connect(lambda b: self._ov_set("close_after_play", b))
         cv.addWidget(after)
-        row = QVBoxLayout()
-        row.addWidget(QLabel("Hide when untouched for"))
+        row = QHBoxLayout()
+        row.setSpacing(12)
+        row.addWidget(QLabel("Auto-hide after"))
         row.addWidget(self._ov_combo("autohide", ovl.AUTOHIDE, s.autohide), 1)
         cv.addLayout(row)
         self.ov_toggle_only = (after, row.itemAt(1).widget())
@@ -772,7 +780,7 @@ class SettingsDialog(QDialog):
             "running on your PC (Kokoro, AllTalk, any OpenAI-style one), a TTS program, or "
             "Piper voice packs dropped into the voices folder. They join the Voice list on "
             "the Voice tab.")
-        row = QVBoxLayout()
+        row = _button_row()   # one line, wrapping only when the window is narrow
         add = QPushButton("Add a voice server…")
         icons.set_icon(add, "plus")
         add.clicked.connect(speech._add_voice_server)
@@ -789,7 +797,6 @@ class SettingsDialog(QDialog):
             speech.show_custom_voices()
         show.clicked.connect(go)
         row.addWidget(show)
-        row.addStretch(1)
         cv.addLayout(row)
         return card
 
@@ -943,7 +950,7 @@ class SettingsDialog(QDialog):
                               "Found a bug, missing something, or just want to say hi? It "
                               "opens in your browser, and nothing is sent unless you submit "
                               "it there.")
-        row = QVBoxLayout()
+        row = _button_row()
         send = QPushButton("Send feedback")
         send.setObjectName("primary")
         send.clicked.connect(lambda: busy.open_url(
@@ -957,7 +964,6 @@ class SettingsDialog(QDialog):
             failed="Couldn't open your browser. The page is"))
         row.addWidget(send)
         row.addWidget(bug)
-        row.addStretch(1)
         cv.addLayout(row)
         self.feedback_btn, self.problem_btn = send, bug
         return card
@@ -1109,7 +1115,7 @@ class SettingsDialog(QDialog):
         # a path has no spaces to wrap at: it gets cut short instead of widening the page
         self.data_folder.setSizePolicy(QSizePolicy.Ignored, QSizePolicy.Preferred)
         grid.addWidget(self.data_folder, 1, 1)
-        row = QHBoxLayout()
+        row = _button_row()
         change = QPushButton("Change…")
 
         def pick():
@@ -1127,7 +1133,6 @@ class SettingsDialog(QDialog):
             QDesktopServices.openUrl(QUrl.fromLocalFile(str(folder)))
         show.clicked.connect(open_folder)
         row.addWidget(show)
-        row.addStretch(1)
         grid.addLayout(row, 2, 1)
         grid.setColumnStretch(1, 1)
         cv.addLayout(grid)
@@ -1812,15 +1817,13 @@ class SettingsDialog(QDialog):
         key.setAccessibleName("Key")
         row.addWidget(key, 1, 1)
         show = QPushButton("Show")
-        show.setObjectName("small")
         show.setCheckable(True)
         show.toggled.connect(lambda b: key.setEchoMode(QLineEdit.Normal if b
                                                        else QLineEdit.Password))
-        row.addWidget(show, 2, 0)
+        row.addWidget(show, 1, 2)
         new = QPushButton("New key")
-        new.setObjectName("small")
         new.setToolTip("Make a new key: anything using the old one stops working")
-        row.addWidget(new, 2, 1)
+        row.addWidget(new, 1, 3)
         cv.addLayout(row)
         crow = QHBoxLayout()
         copy = QPushButton("Copy an example link")
@@ -1896,14 +1899,16 @@ class SettingsDialog(QDialog):
                               "step. Or copy a ready-made message for ChatGPT, Claude or any "
                               "AI chat: it explains Onion Board's links and lists your "
                               "sounds, so the AI can set up whatever tools you use with you.")
-        # one under the other: side by side they'd widen a narrow Settings window
+        # side by side, wrapping (not widening the window) when Settings is narrow
+        btns = _button_row()
         guide = QPushButton("Streamer guide…")
         guide.setObjectName("primary")
-        cv.addWidget(guide, 0, Qt.AlignLeft)
+        btns.addWidget(guide)
         ai = QPushButton("Copy AI prompt")
         icons.set_icon(ai, "copy")
         ai.setToolTip("Paste it into ChatGPT / Claude and say which tools you use")
-        cv.addWidget(ai, 0, Qt.AlignLeft)
+        btns.addWidget(ai)
+        cv.addLayout(btns)
         with_key = QCheckBox("Put my key in the prompt")
         with_key.setToolTip("Saves pasting it in yourself. The key only works on this PC, "
                             "but it's still a password: leave this off if you'd rather the "
@@ -1947,7 +1952,7 @@ class SettingsDialog(QDialog):
         auto.setToolTip("Off by default: an update is code the app runs. It's checked against "
                         "PyPI's SHA-256 before it's used.")
         self.ytdlp_auto_box = auto
-        row = QVBoxLayout()
+        row = _button_row()
         self.ytdlp_label = QLabel()
         self.ytdlp_label.setObjectName("hint")
         self.ytdlp_label.setWordWrap(True)
