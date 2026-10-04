@@ -497,16 +497,20 @@ QPushButton::menu-indicator:open { image:url("$up"); }
 QSlider::groove:horizontal { height:4px; background:$groove; border-radius:2px; }
 QSlider::sub-page:horizontal { background:$accent; border-radius:2px; }
 QSlider::handle:horizontal { background:white; border:1px solid $border; width:14px; height:14px; margin:-5px 0; border-radius:7px; }
-QCheckBox::indicator, QRadioButton::indicator { width:16px; height:16px; border-radius:4px; border:1px solid $off; background:$card; }
-QRadioButton::indicator { border-radius:8px; }
-QCheckBox::indicator:checked, QRadioButton::indicator:checked { background:$accent; border-color:$accent; }
-QCheckBox::indicator:checked { image:url("$check"); }
-QRadioButton::indicator:checked { image:url("$radio_dot"); }
-QCheckBox::indicator:hover, QRadioButton::indicator:hover { border-color:$border_hi; }
-QCheckBox::indicator:checked:hover, QRadioButton::indicator:checked:hover { background:$accent_hi; border-color:$accent_hi; }
-QCheckBox::indicator:disabled, QRadioButton::indicator:disabled { background:$inset; border-color:$border; }
+QCheckBox::indicator { width:16px; height:16px; border-radius:4px; border:1px solid $off; background:$card; }
+QCheckBox::indicator:checked { background:$accent; border-color:$accent; image:url("$check"); }
+QCheckBox::indicator:hover { border-color:$border_hi; }
+QCheckBox::indicator:checked:hover { background:$accent_hi; border-color:$accent_hi; }
+QCheckBox::indicator:disabled { background:$inset; border-color:$border; }
 QCheckBox::indicator:checked:disabled { image:url("$check_off"); }
-QRadioButton::indicator:checked:disabled { image:url("$radio_dot_off"); }
+/* radio circles are whole pictures: a stylesheet border-radius:8px on a 16px box
+   clips the ring flat on its left edge */
+QRadioButton::indicator { width:16px; height:16px; border:none; background:transparent; image:url("$radio"); }
+QRadioButton::indicator:hover { image:url("$radio_hover"); }
+QRadioButton::indicator:checked { image:url("$radio_on"); }
+QRadioButton::indicator:checked:hover { image:url("$radio_on_hover"); }
+QRadioButton::indicator:disabled { image:url("$radio_off"); }
+QRadioButton::indicator:checked:disabled { image:url("$radio_on_off"); }
 QListWidget#settingscategories { background:$panel; border:1px solid $border; }
 QListWidget#settingscategories::item { padding:4px; }
 QListWidget#settingscategories::item:selected { background:$accent; color:$on_accent; }
@@ -633,23 +637,36 @@ def _check_url(colour: str) -> str:
     return base.as_posix()
 
 
-def _radio_dot_url(colour: str) -> str:
-    """A contrasting centre dot, including a sharp high-DPI copy."""
+def _radio_image(ring: str, fill: str, dot: str, size: int) -> QImage:
+    """A whole radio circle: a 1px ring (scaled with `size`) around `fill`, plus a centre
+    dot when `dot` is set. Kept half a pixel inside the edge so no side gets clipped."""
+    img = QImage(size, size, QImage.Format_ARGB32)
+    img.fill(Qt.transparent)
+    p = QPainter(img)
+    p.setRenderHint(QPainter.Antialiasing)
+    pen_w = size / 16
+    p.setPen(QPen(QColor(ring), pen_w))
+    p.setBrush(QColor(fill))
+    r = size / 2 - pen_w / 2 - size / 64
+    p.drawEllipse(QPointF(size / 2, size / 2), r, r)
+    if dot:
+        p.setPen(Qt.NoPen)
+        p.setBrush(QColor(dot))
+        p.drawEllipse(QPointF(size / 2, size / 2), size * 0.22, size * 0.22)
+    p.end()
+    return img
+
+
+def _radio_url(ring: str, fill: str, dot: str = "") -> str:
+    """The radio circle as a file for `image:`, plus a sharp high-DPI copy."""
     folder = Path(tempfile.gettempdir()) / "onionboard-ui"
-    base = folder / f"radio-dot-{colour.lstrip('#')}.png"
+    name = "-".join(c.lstrip("#") for c in (ring, fill, dot) if c)
+    base = folder / f"radio2-{name}.png"
     try:
         folder.mkdir(exist_ok=True)
-        for path, size in ((base, 14), (base.with_name(base.stem + "@2x.png"), 28)):
+        for path, size in ((base, 16), (base.with_name(base.stem + "@2x.png"), 32)):
             if not path.exists():
-                img = QImage(size, size, QImage.Format_ARGB32)
-                img.fill(Qt.transparent)
-                p = QPainter(img)
-                p.setRenderHint(QPainter.Antialiasing)
-                p.setPen(Qt.NoPen)
-                p.setBrush(QColor(colour))
-                p.drawEllipse(QPointF(size / 2, size / 2), size / 4, size / 4)
-                p.end()
-                img.save(str(path))
+                _radio_image(ring, fill, dot, size).save(str(path))
     except OSError:
         return ""
     return base.as_posix()
@@ -772,8 +789,12 @@ def stylesheet(name: str | None = None) -> str:
     tokens.setdefault("font", FONT)
     tokens["check"] = _check_url(tokens["on_accent"])
     tokens["check_off"] = _check_url(tokens["muted"])   # ticked but greyed out: on $inset
-    tokens["radio_dot"] = _radio_dot_url(tokens["on_accent"])
-    tokens["radio_dot_off"] = _radio_dot_url(tokens["muted"])
+    tokens["radio"] = _radio_url(tokens["off"], tokens["card"])
+    tokens["radio_hover"] = _radio_url(tokens["border_hi"], tokens["card"])
+    tokens["radio_on"] = _radio_url(tokens["accent"], tokens["accent"], tokens["on_accent"])
+    tokens["radio_on_hover"] = _radio_url(tokens["accent_hi"], tokens["accent_hi"], tokens["on_accent"])
+    tokens["radio_off"] = _radio_url(tokens["border"], tokens["inset"])
+    tokens["radio_on_off"] = _radio_url(tokens["border"], tokens["inset"], tokens["muted"])
     for key, colour in (("", tokens["muted"]), ("_off", tokens["off"])):
         tokens["down" + key] = _chevron_url(colour, 10, up=False)
         tokens["up" + key] = _chevron_url(colour, 10, up=True)
