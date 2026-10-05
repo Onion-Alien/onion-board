@@ -251,6 +251,40 @@ def test_a_capture_opens_without_freezing_the_window_and_can_fail_later(tab):
     FakeCapture.slow = False
 
 
+def test_a_program_can_go_to_the_stream_only(qapp, monkeypatch):
+    """Music for the viewers but not the call: the choice shows once a stream output
+    is set, and is remembered with the program."""
+    monkeypatch.setattr(appaudio, "AppCapture", FakeCapture)
+    FakeCapture.made, FakeCapture.fail, FakeCapture.slow = [], False, False
+    cfg = Config()
+    e = Engine()
+    t = AppsTab(e, cfg, lambda: None, Meter)
+    try:
+        t._on_apps([music()])
+        row = t.rows["music.exe"]
+        assert row.cb_to.isHidden()                  # no stream output: nothing to pick
+        e.names["obs"] = "Stream (fake)"
+        t._on_apps([music()])
+        assert not row.cb_to.isHidden()
+        row.btn_send.setChecked(True)
+        assert row.src.live and row.src.stream       # both, by default
+        row.cb_to.setCurrentIndex(appspanel.TO_KEYS.index("stream"))
+        assert not row.src.live and row.src.stream
+        assert not e.aux_on_air()                    # the call doesn't hear it: no push-to-talk
+        assert cfg.apps["music.exe"]["to"] == "stream"
+    finally:
+        t.shutdown()
+    e.names["obs"] = None
+    t = AppsTab(e, cfg, lambda: None, Meter)
+    try:
+        row = t.rows["music.exe"]
+        assert row.to == "stream" and not row.cb_to.isHidden()   # set: stays in sight
+        t._on_apps([music()])
+        assert row.sending and not row.src.live and row.src.stream
+    finally:
+        t.shutdown()
+
+
 def test_shutdown_stops_every_capture(tab):
     tab._on_apps([music(), App(200, "game.exe")])
     for row in tab.rows.values():

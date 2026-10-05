@@ -424,6 +424,7 @@ class AuxSource:
         self.key = key
         self.vol = 1.0
         self.live = True        # -> others (the whole point of capturing a program)
+        self.stream = True      # -> the stream output (Apps tab: Call + stream / Stream only)
         self.monitor = False    # -> your headphones (the program already plays there)
         self.level = 0.0
         # the program's audio clock is its device's, not ours: track drift; and a
@@ -1632,7 +1633,7 @@ class Engine:
             mix += r * np.float32(self.radio_vol)
         for a in self.aux:
             x = a.ring_obs.read(frames)
-            if x is not None and a.live:
+            if x is not None and a.stream:
                 mix += x * np.float32(a.vol)
         mix = self._eq("obs", "sounds", finite(mix))
         m = self.ring_obs.read(frames)

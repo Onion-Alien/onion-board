@@ -19,7 +19,7 @@ import time
 
 from PySide6.QtCore import QFileInfo, QObject, QSize, Qt, QTimer, Signal
 from PySide6.QtGui import QPainter
-from PySide6.QtWidgets import (QCheckBox, QFileIconProvider, QFrame, QHBoxLayout, QLabel,
+from PySide6.QtWidgets import (QCheckBox, QComboBox, QFileIconProvider, QFrame, QHBoxLayout, QLabel,
                                QLayout, QPushButton, QScrollArea, QSizePolicy, QSlider,
                                QVBoxLayout, QWidget)
 
@@ -42,6 +42,13 @@ MAX_REMEMBERED = 30
 CARD_MIN_W = 300        # programs are cards, as many across as fit at this width
 MAX_VOL = 10.0          # 1000 %, the most the volume box takes
 CONNECTING = "Connecting…"   # a card's status while its capture is starting
+# where a sent program goes (cfg.apps[exe]["to"]): the choice shows once a stream
+# output is set (Settings → Audio), or while it's set to anything but both
+TO = (("both", "Call + stream", "Others in the call and your stream output both get it"),
+      ("call", "Call only", "Only others in the call get it, not your stream output"),
+      ("stream", "Stream only", "Only your stream output gets it (music for your viewers), "
+                                "not the call"))
+TO_KEYS = tuple(k for k, *_ in TO)
 
 
 def saved_volume(v) -> float:
@@ -106,6 +113,12 @@ class ElidedLabel(QLabel):
         p.drawText(r, int(self.alignment() | Qt.AlignVCenter), shown)
 
 
+def _route(src, to: str):
+    """Point a sent program (engine.AuxSource) at the call, the stream or both."""
+    src.live = to in ("both", "call")
+    src.stream = to in ("both", "stream")
+
+
 class AppRow(HoverCard):
     """One program, as a card: icon and name, its level, Send and Record, volume and
     Hear it myself."""
@@ -113,9 +126,11 @@ class AppRow(HoverCard):
     rec_toggled = Signal(object, bool)
     vol_changed = Signal(object, float)
     hear_toggled = Signal(object, bool)
+    to_changed = Signal(object, str)        # row, one of TO_KEYS
     forget = Signal(object)
 
-    def __init__(self, exe: str, meter_cls, vol: float = 1.0, hear: bool = False):
+    def __init__(self, exe: str, meter_cls, vol: float = 1.0, hear: bool = False,
+                 to: str = "both"):
         super().__init__()
         self.exe = exe
         self.app: appaudio.App | None = None
@@ -177,6 +192,16 @@ class AppRow(HoverCard):
         for b in (self.btn_send, self.btn_rec):
             b.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
             buttons.addWidget(b)
+        self.cb_to = QComboBox()
+        for i, (key, label, tip) in enumerate(TO):
+            self.cb_to.addItem(label, key)
+            self.cb_to.setItemData(i, tip, Qt.ToolTipRole)
+        self.cb_to.setToolTip("Where this program's sound goes when Send is on")
+        self.cb_to.setCurrentIndex(TO_KEYS.index(to) if to in TO_KEYS else 0)
+        self.cb_to.currentIndexChanged.connect(lambda _i: self.to_changed.emit(self, self.to))
+        no_wheel(self.cb_to)
+        self.cb_to.setVisible(self.to != "both")
+        buttons.addWidget(self.cb_to)
         v.addLayout(buttons)
         mix = QHBoxLayout()
         mix.setSpacing(8)
@@ -239,6 +264,16 @@ class AppRow(HoverCard):
     @property
     def sending(self) -> bool:
         return self.btn_send.isChecked()
+
+    @property
+    def to(self) -> str:
+        """Where it goes when sent: one of TO_KEYS."""
+        return self.cb_to.currentData() or "both"
+
+    def show_to(self, stream_output: bool):
+        """The call / stream choice: only worth showing with a stream output set
+        (or when it's already set to something else)."""
+        self.cb_to.setVisible(stream_output or self.to != "both")
 
     def _label_send(self):
         self.btn_send.setText("" if "send" in self._TIGHTEN[:self._tight]
@@ -399,7 +434,8 @@ class AppsTab(QWidget):
 
         for exe, spec in list(cfg.apps.items())[:MAX_REMEMBERED]:   # remembered programs
             if isinstance(spec, dict):
-                self._row(exe, saved_volume(spec.get("vol", 1.0)), bool(spec.get("monitor")))
+                self._row(exe, saved_volume(spec.get("vol", 1.0)), bool(spec.get("monitor")),
+                          str(spec.get("to", "both")))
 
         self.lister = _Lister(self)
         self.lister.ready.connect(self._on_apps)
@@ -483,15 +519,17 @@ class AppsTab(QWidget):
             self.active_changed.emit(bool(now))
 
     # ------------------------------------------------------------------ rows
-    def _row(self, exe: str, vol: float = 1.0, hear: bool = False) -> AppRow:
+    def _row(self, exe: str, vol: float = 1.0, hear: bool = False, to: str = "both") -> AppRow:
         key = exe.lower()
         row = self.rows.get(key)
         if row is None:
-            row = self.rows[key] = AppRow(exe, self._meter_cls, vol, hear)
+            row = self.rows[key] = AppRow(exe, self._meter_cls, vol, hear, to)
+            row.show_to(self._stream_output())
             row.send_toggled.connect(self._on_send)
             row.rec_toggled.connect(self._on_rec)
             row.vol_changed.connect(self._on_vol)
             row.hear_toggled.connect(self._on_hear)
+            row.to_changed.connect(self._on_to)
             row.forget.connect(self._on_forget)
             self.grid.addWidget(row)
             self.empty.setVisible(False)
@@ -509,6 +547,9 @@ class AppsTab(QWidget):
         return {str(e).lower() for e in self.cfg.apps_hidden}
 
     def _on_apps(self, apps: list):
+        stream = self._stream_output()   # set or cleared in Settings meanwhile
+        for row in self.rows.values():
+            row.show_to(stream)
         by_exe: dict[str, appaudio.App] = {}
         hidden = self._hidden()
         for app in apps:
@@ -646,6 +687,7 @@ class AppsTab(QWidget):
         src = self.engine.add_aux(key)
         src.vol = row.vol.value()
         src.monitor = row.chk_hear.isChecked()
+        _route(src, row.to)
         row.src = src
         if not self._open_capture(row):
             row.src = None
@@ -727,8 +769,10 @@ class AppsTab(QWidget):
 
     # ------------------------------------------------------------------ controls
     def _remember(self, row: AppRow):
-        self.cfg.apps[row.exe.lower()] = {"vol": row.vol.value(),
-                                          "monitor": row.chk_hear.isChecked()}
+        spec = {"vol": row.vol.value(), "monitor": row.chk_hear.isChecked()}
+        if row.to != "both":
+            spec["to"] = row.to
+        self.cfg.apps[row.exe.lower()] = spec
         while len(self.cfg.apps) > MAX_REMEMBERED:
             self.cfg.apps.pop(next(iter(self.cfg.apps)))
         self._save()
@@ -755,6 +799,17 @@ class AppsTab(QWidget):
             row.src.vol = v
         if row.exe.lower() in self.cfg.apps:
             self._remember(row)
+
+    def _on_to(self, row: AppRow, to: str):
+        if row.src is not None:
+            _route(row.src, to)
+        if row.exe.lower() in self.cfg.apps:
+            self._remember(row)
+        self._report_active()
+
+    def _stream_output(self) -> bool:
+        """A stream output is set (Settings → Audio → Stream output)."""
+        return bool(self.engine.names.get("obs"))
 
     def _on_hear(self, row: AppRow, on: bool):
         if row.src is not None:
@@ -817,7 +872,8 @@ class AppsTab(QWidget):
         app = old.app if old is not None else None
         if old is not None and not old.sending:
             self._drop_row(old)   # built again with the remembered volume
-        row = self._row(exe, saved_volume(spec.get("vol", 1.0)), bool(spec.get("monitor")))
+        row = self._row(exe, saved_volume(spec.get("vol", 1.0)), bool(spec.get("monitor")),
+                        str(spec.get("to", "both")))
         row.set_app(app)
         self._label_bin()
         if not self._started:
