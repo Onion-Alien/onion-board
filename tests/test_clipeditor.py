@@ -281,3 +281,26 @@ def test_paints_in_every_state(tab, qapp):
     ed.wave.grab()                      # selection and playhead
     ed.resize(200, 200)                 # narrow: icons only
     assert ed.btn_play.text() == ""
+
+
+def test_live_view_shows_only_what_was_heard(tab, qapp):
+    row = opened(tab, qapp)
+    ed = row.editor
+    row.capture.sink(tone(2.0))
+    ed.peaks()
+    assert ed.view[1] - ed.view[0] == clipeditor.LIVE_MIN_S * SR   # short: at least 10 s
+    row.capture.sink(tone(38.0))
+    ed.peaks()
+    assert ed.view[1] - ed.view[0] == pytest.approx(40 * SR, abs=BIN)   # no empty minute
+    row.capture.sink(tone(50.0))
+    ed.peaks()
+    assert ed.view[1] - ed.view[0] == row.listen.cols * BIN            # full: the last minute
+
+
+def test_buttons_wake_up_when_the_first_sound_arrives(tab, qapp):
+    row = opened(tab, qapp)
+    ed = row.editor
+    assert not ed.btn_play.isEnabled() and not ed.btn_save.isEnabled()
+    row.capture.sink(tone(1.0))
+    ed._tick()
+    assert ed.btn_play.isEnabled() and ed.btn_save.isEnabled() and ed.btn_send.isEnabled()

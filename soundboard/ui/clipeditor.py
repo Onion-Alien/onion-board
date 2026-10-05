@@ -30,6 +30,7 @@ TICK_MS = 50            # redraw pace while live or playing (20 a second)
 MIN_VIEW = 256          # frames: the furthest it zooms in
 STEP_DB = 3.0           # Louder / Quieter
 NARROW_PX = 380         # below this the buttons keep only their icons
+LIVE_MIN_S = 10         # live, the view shows what's been heard, at least this wide
 _ids = itertools.count(1)
 clipboard: np.ndarray | None = None   # Ctrl+C in one card, Ctrl+V in any other
 
@@ -384,8 +385,16 @@ class ClipEditor(QWidget):
             self._peaks = None
         self._sync()
 
+    def live_span(self) -> int:
+        """Frames the live view spans: what's been heard so far (no empty minute
+        waiting to fill), at least LIVE_MIN_S, at most the whole buffer."""
+        if self.buf is None:
+            return int(LIVE_MIN_S * SR)
+        most = self.buf.cols * BIN
+        return min(max(self.buf.filled * BIN, int(LIVE_MIN_S * SR)), most)
+
     def window_s(self) -> float:
-        return (self.buf.cols * BIN / SR) if self.buf is not None else 60.0
+        return self.live_span() / SR
 
     def length(self) -> int:
         if self.take is not None:
@@ -401,7 +410,7 @@ class ClipEditor(QWidget):
             return np.zeros(0, np.float32)
         wave, _total = self.buf.peaks()
         n = len(wave) * BIN
-        self.view = (n - self.buf.cols * BIN, n)   # live: the window ends at "now"
+        self.view = (n - self.live_span(), n)   # live: the window ends at "now"
         return wave
 
     def freeze(self, keep_view: bool = False) -> Take | None:
@@ -420,7 +429,7 @@ class ClipEditor(QWidget):
         self.take.select(n, n)
         self._stash = None
         self._peaks = None
-        self.view = (float(n - self.buf.cols * BIN), float(n))   # nothing moves under the mouse
+        self.view = (float(n - self.live_span()), float(n))   # nothing moves under the mouse
         if not keep_view:
             self.fit()
         self._sync()
@@ -447,7 +456,7 @@ class ClipEditor(QWidget):
     # ---------------------------------------------------------- view
     def _clamp_view(self, v0: float, v1: float):
         n = self.length()
-        most = max(n, self.buf.cols * BIN if self.buf is not None else n, MIN_VIEW)
+        most = max(n, self.live_span() if self.buf is not None else n, MIN_VIEW)
         span = min(max(v1 - v0, MIN_VIEW), most)
         v0 = min(max(v0, min(0.0, n - span)), max(0.0, n - span))
         self.view = (v0, v0 + span)
@@ -679,7 +688,9 @@ class ClipEditor(QWidget):
             if total != self._live_total:   # nothing new heard: nothing to redraw
                 self._live_total = total
                 self.wave.update()
-                if not self._msg:
+                if self.btn_play.isEnabled() != (self.length() > 0):
+                    self._sync()   # the first sound heard: Play / Save / Send wake up
+                elif not self._msg:
                     self.info.setText(self._describe())
         else:
             self._run_timer()
