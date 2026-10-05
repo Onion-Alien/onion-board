@@ -96,6 +96,15 @@ def fake_machine(tmp: Path):
     for setter, attr in (("set_main_device", "main_stream"), ("set_mon_device", "mon_stream"),
                          ("set_mic_device", "mic_stream")):
         setattr(engine.Engine, setter, lambda self, n, _a=attr: setattr(self, _a, _Stream()))
+    # straight into the mic, set up and live (the website shows it working, not this
+    # PC's own state): on the made-up mic, its effect running, nothing to fix
+    from soundboard import directmic
+    directmic.status = lambda mic_name=None: "ready"
+    directmic.installed_on = lambda: ["{demo}"]
+    directmic.endpoint_for = lambda name: "{demo}"
+    engine.Engine.effect_alive = lambda self: True
+    engine.Engine.direct_apps = lambda self: 2
+    engine.Engine.set_tap_device = lambda self, n: setattr(self, "tap_name", n)
     appaudio.list_apps = lambda: [
         appaudio.App(pid=1000 + i, exe=exe, title=title, active=on, peak=0.4 if on else 0.0,
                      devices=[OUTS[1]], session_pids={1000 + i})
@@ -132,7 +141,8 @@ def demo_config(tmp: Path, theme: str):
                                         color=library.PAD_COLORS[i % len(library.PAD_COLORS)],
                                         tags=[tag], image=pad_picture(tmp, name)))
     library.Config(sounds=sounds, categories=["Memes", "Reactions", "Music"],
-                   setup_done=True, theme=theme, screen={"triggers": demo_triggers(tmp)}).save()
+                   setup_done=True, theme=theme, screen={"triggers": demo_triggers(tmp)},
+                   route="mic", mic_first=True).save()
 
 
 def pad_picture(tmp: Path, name: str) -> str:
