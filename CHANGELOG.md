@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- **Switching to the Radio tab no longer freezes the app.** Since 1.8.0 the flat
+  map threw its drawing away whenever you left the tab and drew the whole world
+  again on the way back, freezing the window each time (longer on big screens).
+  Now it keeps the drawing for a minute, and any redraw happens a slice at a time
+  so nothing waits for it.
 - **Smoother everywhere, less CPU.** Nothing should feel laggy now:
   - Sounds: clearing the search or going back to "All" on a big board no longer
     stalls; typing in search, dragging Pad size and scrolling a board of pad

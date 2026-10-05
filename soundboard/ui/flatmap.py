@@ -42,6 +42,7 @@ BASE_ZOOM = 0.5                     # the whole world, small: what shows till a 
 # cable 10-20 ms late (a skip) even with every call under 1 ms. A slice, then a break.
 SLICE_S = 0.0015
 SLICE_GAP_MS = 4
+FORGET_MS = 60_000   # hidden this long: let the drawn tiles go (back sooner: no redraw)
 SETTLE_MS = 120                     # zooming: the old tiles, stretched, until this idle
 TOWN_ZOOM = 2.0                     # city and town names show from this zoom in...
 TOWNS_IN_VIEW = 40                  # ...at most this many at once, only those in view
@@ -130,6 +131,10 @@ class FlatMap(QWidget):
         self._slice.setTimerType(Qt.PreciseTimer)
         self._slice.setInterval(SLICE_GAP_MS)
         self._slice.timeout.connect(self._draw_slice)
+        self._forget = QTimer(self)       # hidden a while: let the drawn tiles go
+        self._forget.setSingleShot(True)
+        self._forget.setInterval(FORGET_MS)
+        self._forget.timeout.connect(self._forget_tiles)
 
         box = QVBoxLayout(self)
         box.setContentsMargins(0, 0, 10, 10)
@@ -281,13 +286,24 @@ class FlatMap(QWidget):
         self.update()
 
     def hideEvent(self, e):
-        """Off screen (another tab, the Radio tab's globe instead): let the tiles go
-        (tens of MB zoomed in). They're drawn again the next time it shows."""
+        """Off screen (another tab, the Radio tab's globe instead): after FORGET_MS let
+        the tiles go (tens of MB zoomed in). Not at once: flicking between tabs would
+        draw them all again on every return, a freeze each time."""
+        self._stop_build()
+        self._forget.start()
+        super().hideEvent(e)
+
+    def showEvent(self, e):
+        self._forget.stop()
+        super().showEvent(e)
+
+    def _forget_tiles(self):
+        if self.isVisible():
+            return
         self._stop_build()
         self._tiles.clear()
         self._stable = None
         self._town_pm.clear()
-        super().hideEvent(e)
 
     # ------------------------------------------------------------------ painting
     def _grow(self) -> float:
@@ -649,10 +665,8 @@ class FlatMap(QWidget):
         p.fillRect(self.rect(), QColor(t["bg"]))
         cur = self._level()
         slots = self._slots(cur)
-        if not self._tiles:   # nothing to stand in (the first time): the view's now
-            for _k, i, j in slots:
-                if (cur, i, j) not in self._tiles:
-                    self._tile_now((cur, i, j))
+        # nothing to stand in (the first time): just the sea and the dots, the land
+        # comes in a slice at a time a moment later; nothing waits for all of it
         shown, missing = [], QRegion()
         for k, i, j in slots:
             pm = self._tiles.get((cur, i, j))

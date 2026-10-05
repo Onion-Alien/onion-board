@@ -38,6 +38,18 @@ def quietest(measure, limit, tries=5):
     return best
 
 
+def drawn_now(m):
+    """Paint m with the tiles in view drawn all at once (a shown map draws them a
+    slice at a time), and return the picture."""
+    m.grab()
+    cur = m._level()
+    for _k, i, j in m._slots(cur):
+        if (cur, i, j) not in m._tiles:
+            m._tile_now((cur, i, j))
+    m._stop_build()
+    return m.grab()
+
+
 def world_map(rings, labels, zoom=2.0):
     m = FlatMap()
     m.resize(1200, 700)
@@ -58,9 +70,9 @@ def test_the_land_is_drawn_in_small_parts(qapp):
 
 def test_the_map_looks_the_same_drawn_in_parts(qapp, monkeypatch):
     rings, labels = outlines()
-    parts = world_map(rings, labels).grab().toImage()
+    parts = drawn_now(world_map(rings, labels)).toImage()
     monkeypatch.setattr(flatmap, "LAND_PART", 10**9)   # the whole world as one path
-    whole = world_map(rings, labels).grab().toImage()
+    whole = drawn_now(world_map(rings, labels)).toImage()
     a = np.frombuffer(parts.constBits(), np.uint8)
     b = np.frombuffer(whole.constBits(), np.uint8)
     assert a.shape == b.shape
@@ -93,7 +105,7 @@ def test_drawing_the_world_lets_the_audio_threads_run(qapp):
         th.start()
         try:
             time.sleep(0.05)
-            m.grab()                     # draws the whole world at this zoom
+            drawn_now(m)                 # draws the whole world at this zoom
         finally:
             stop.set()
             th.join()
@@ -161,7 +173,7 @@ def test_a_new_zoom_is_drawn_in_slices_beside_the_audio(qapp):
     rings, labels = outlines()
     m = world_map(rings, labels, zoom=1.0)
     m.show()
-    m.grab()                                   # the first time: the view's tiles at once
+    drawn_now(m)                               # the view's tiles, all at once
     first = set(m._tiles)
     m.zoom = 2.5
     m.grab()
@@ -181,8 +193,9 @@ def test_a_new_zoom_is_drawn_in_slices_beside_the_audio(qapp):
     assert worst < 0.006, f"the cable was {worst * 1000:.0f} ms late"
     sliced = m.grab().toImage()
     m.hide()
+    m._forget.timeout.emit()                   # let the tiles go...
     m.show()
-    whole = m.grab().toImage()                 # drawn afresh, all at once
+    whole = drawn_now(m).toImage()             # ...and draw them afresh, all at once
     a = np.frombuffer(sliced.constBits(), np.uint8)
     b = np.frombuffer(whole.constBits(), np.uint8)
     assert a.shape == b.shape and np.array_equal(a, b)
