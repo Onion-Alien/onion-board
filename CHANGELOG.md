@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- A removed long sound's audio no longer stays on disk for 10 minutes or more when
+  it was still playing (or just brought back with Undo) as it was removed.
 - **Switching to the Radio tab no longer freezes the app.** Since 1.8.0 the flat
   map threw its drawing away whenever you left the tab and drew the whole world
   again on the way back, freezing the window each time (longer on big screens).

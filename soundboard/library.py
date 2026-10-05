@@ -40,6 +40,9 @@ OLD_APP_DIR = Path(os.environ.get("APPDATA", Path.home())) / "Soundboard"
 SOUNDS_DIR = APP_DIR / "sounds"
 CACHE_DIR = APP_DIR / "cache"
 CACHE_GRACE_S = 600   # prune_cache leaves a new sound's cache this long (an import in flight)
+# cache files a delete was refused for (still mapped, see _unlink): not new imports, so
+# prune_cache retries them at once instead of after CACHE_GRACE_S
+_refused: set[Path] = set()
 THUMBS_DIR = APP_DIR / "thumbs"   # pad pictures (soundboard.thumbs)
 CONFIG_PATH = APP_DIR / "config.json"
 # privacy.json beside config.json: a copy of the Privacy & security settings: a version
@@ -997,6 +1000,7 @@ def store_cached(sid: str, data: np.ndarray, fx_key: str = "") -> np.ndarray:
         tmp = dest.with_suffix(".tmp.npy")
         np.save(tmp, i16)
         tmp.replace(dest)
+        _refused.discard(dest)   # a new file there: in use again, not a leftover
     except OSError:   # e.g. dest is mapped by audio still in use: prune_cache tidies up
         log.warning("couldn't write cache for %s", sid, exc_info=True)
         return i16
@@ -1051,7 +1055,8 @@ def prune_cache(keep: set[str]):
     for p in files:
         if p.stem in keep:
             continue
-        fresh = p.name.split(".")[0] not in ids or p.name.endswith(".tmp.npy")
+        fresh = ((p.name.split(".")[0] not in ids or p.name.endswith(".tmp.npy"))
+                 and p not in _refused)
         try:
             if fresh and time.time() - p.stat().st_mtime < CACHE_GRACE_S:
                 continue
@@ -1063,13 +1068,16 @@ def prune_cache(keep: set[str]):
 def _unlink(p: Path) -> bool:
     """Delete a cache file. False if it can't go yet: Windows refuses while a mapped
     array still points into it (a sound just removed, still on its way out of the
-    engine). It isn't in cache_keep any more, so a later prune_cache takes it."""
+    engine). It isn't in cache_keep any more, so the next prune_cache takes it (at
+    once, not after CACHE_GRACE_S: it's in _refused)."""
     try:
         p.unlink(missing_ok=True)
-        return True
     except OSError:
         log.debug("cache file %s is still in use; left for later", p.name)
+        _refused.add(p)
         return False
+    _refused.discard(p)
+    return True
 
 
 def unlink_cache(sid: str) -> None:
