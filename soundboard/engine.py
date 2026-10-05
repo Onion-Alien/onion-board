@@ -210,15 +210,22 @@ class Ring:
     # Running dry or skipping ahead is a jump in the waveform, heard as a crack. The
     # frames around it are faded over this long instead, so it's a soft dip.
     FADE_S = 0.004
+    # auto_drift's early estimate: the writer's frames against the reader's, fitted
+    # every EST_CHECK_S once there are EST_MIN_S of them. Tracking starts after two fits
+    # in a row say the same side, by at least DRIFT_MIN and well beyond their own noise
+    # (a ring that is on time never starts: no stretching, no pitch wobble).
+    EST_CHECK_S, EST_MIN_S, EST_MAX_S = 1.0, 2.0, 30.0
+    DRIFT_MIN = 0.00005
 
     def __init__(self, rate: int = SR, prefill_s: float = 0.015, max_s: float = 0.08,
                  track_drift: bool = False, grow_to_s: float = 0.0, auto_drift: bool = False):
         self.lock = threading.Lock()
         self.prefill_s, self.max_s = prefill_s, max_s
         self.track_drift = track_drift
-        # auto_drift: start without drift tracking, and switch it on once the ring has
-        # had to skip or refill twice (the writer's clock really is off: a wireless
-        # headset's mic against the output clock, say)
+        # auto_drift: start without drift tracking, and switch it on as soon as the
+        # writer's clock is measured to be off (a wireless headset's mic or a USB
+        # interface against the output clock), before the ring ever runs dry or
+        # skips; failing that, once it has had to skip or refill twice
         self.auto_drift = auto_drift
         # grow_to_s: a writer that stalls now and then (the radio) gets a bigger
         # cushion each time the ring runs dry, up to this, so it stops skipping
@@ -242,9 +249,65 @@ class Ring:
             self._acc = 0.0      # fractional frames carried between reads
             self._integ = 0.0    # learned clock offset
             self._last = np.zeros((1, CH), np.float32)   # the frame before the next read
+            self.rate = rate
+            self._est_reset()
+
+    def _est_reset(self):
+        """Start the clock estimate over (a gap, a skip, a restart: the old fit is moot)."""
+        self._wrote = 0          # frames written since the estimate started
+        self._ex = 0             # frames read since then (the reader's clock)
+        self._sums = [0.0] * 6   # n, Σx, Σd, Σxx, Σxd, Σdd with d = written - read
+        self._est_next = int(self.rate * self.EST_MIN_S)
+        self._est_side = 0       # the side the last fit came out on (+1 fast, -1 slow)
+        self.drift_est = 1.0     # the last fit's writer/reader clock ratio
+
+    def _mic_err(self, n: int) -> float:
+        """The drift controller's error for a mic ring, aimed at the fill a read finds
+        right after priming: the cushion plus the read (aimed at the bare cushion, it
+        read the ring dry again and again: the mic's is only 1.5 blocks). The fill a
+        read finds swings by a whole block as the two clocks' blocks slide past each
+        other (every 20 s at 0.05% apart), so the mic's gains are gentler than the
+        radio's: with those it wobbled by up to 1% (now 0.1%, 0.4% at worst). (Averaging
+        the fill instead lags the loop, and it swings.)"""
+        aim = self.prefill + n
+        return float(np.clip((self.count - aim) / aim, -1, 1))
+
+    def _estimate(self, n: int):
+        """After a read of n frames: fit the writer's clock against the reader's and
+        switch drift tracking on, seeded with the fit, once it's clearly off."""
+        self._ex += n
+        x, d = float(self._ex), float(self._wrote - self._ex)
+        sm = self._sums
+        sm[0] += 1
+        sm[1] += x
+        sm[2] += d
+        sm[3] += x * x
+        sm[4] += x * d
+        sm[5] += d * d
+        if self._ex < self._est_next:
+            return
+        self._est_next = self._ex + int(self.rate * self.EST_CHECK_S)
+        k, sx, sd, sxx, sxd, sdd = sm
+        vxx, vxd, vdd = sxx - sx * sx / k, sxd - sx * sd / k, sdd - sd * sd / k
+        if k < 8 or vxx <= 0:
+            return
+        slope = vxd / vxx                                 # writer/reader ratio - 1
+        se = (max(vdd - slope * vxd, 0.0) / (k - 2) / vxx) ** 0.5
+        self.drift_est = 1.0 + slope
+        side = (slope > 0) - (slope < 0)
+        if abs(slope) < max(self.DRIFT_MIN, 6 * se):
+            side = 0
+        if side and side == self._est_side:
+            lim = self.DRIFT_MAX
+            self._integ = float(np.clip(slope, -lim, lim))   # read at the writer's pace
+            self.track_drift = True
+        self._est_side = side
+        if self._ex >= self.rate * self.EST_MAX_S:   # on time so far: start a fresh fit
+            self._est_reset()
 
     def _glitched(self):
         """Count toward switching drift tracking on (auto_drift)."""
+        self._est_reset()
         if self.auto_drift and not self.track_drift and self.underruns + self.overflows >= 2:
             self.track_drift = True
 
@@ -253,6 +316,7 @@ class Ring:
             self.r = self.w = self.count = 0
             self.primed = False
             self._fade_in = True
+            self._est_reset()
 
     def write(self, x: np.ndarray):
         with self.lock:
@@ -270,6 +334,8 @@ class Ring:
                 self.buf[: n - k] = x[k:]
             self.w = end % self.cap
             self.count = min(self.count + n, self.cap)
+            if self.primed:
+                self._wrote += n
             if self.count > self.max_fill:   # (always so once unread frames were overwritten)
                 # keep the newest `prefill` frames: they end at w (r + count only
                 # equals w if nothing unread was overwritten, so count back from w)
@@ -286,14 +352,20 @@ class Ring:
                     return None
                 self.primed = True
                 self._fade_in = True
+                self._est_reset()
             m = n
             if self.track_drift:
                 # PI control: the integral learns the steady clock offset, so the fill
                 # settles back at the full prefill cushion instead of hovering near empty
-                err = float(np.clip((self.count - self.prefill) / max(self.prefill, 1), -1, 1))
                 lim = self.DRIFT_MAX
-                self._integ = float(np.clip(self._integ + err * 0.0002, -lim, lim))
-                want = 1.0 + float(np.clip(err * lim * 0.5 + self._integ, -lim, lim))
+                if self.auto_drift:
+                    err, kp, ki = self._mic_err(n), 0.004, 0.00005
+                else:
+                    err = float(np.clip((self.count - self.prefill) / max(self.prefill, 1),
+                                        -1, 1))
+                    kp, ki = lim * 0.5, 0.0002
+                self._integ = float(np.clip(self._integ + err * ki, -lim, lim))
+                want = 1.0 + float(np.clip(err * kp + self._integ, -lim, lim))
                 self.ratio += (want - self.ratio) * 0.05          # glide, no audible warble
                 self._acc += n * self.ratio
                 m = max(1, int(self._acc))
@@ -332,6 +404,8 @@ class Ring:
                 self._fade_in = False
                 k = min(self.fade, n)
                 out[:k] *= np.linspace(0, 1, k, dtype=np.float32)[:, None]
+            if self.auto_drift and not self.track_drift:
+                self._estimate(n)
             return out
 
     def _peek_at(self, k: int) -> np.ndarray:

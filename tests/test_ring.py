@@ -1,4 +1,5 @@
 import numpy as np
+import pytest
 
 from soundboard.engine import CH, SR, Ring
 
@@ -129,3 +130,66 @@ def test_auto_drift_switches_on_after_two_glitches():
         r.write(np.zeros((int(SR * 0.03), 2), np.float32))
     assert r.overflows >= 2 and r.track_drift
     assert not Ring(prefill_s=0.01, max_s=0.02).track_drift
+
+
+def clocks(ring, off, seconds, block=480, jitter=0.002, seed=1, ratios=None):
+    """Run a writer whose clock is `off` fast (0.0005 = 0.05%) into `ring` against a
+    reader on the ring's clock, both handing over `block` frames on their own
+    schedule, each callback up to `jitter` s late. Returns the reads that came back
+    empty after the first (the audible gaps). `ratios` collects the read speed."""
+    rng = np.random.default_rng(seed)
+    period = block / SR
+    tw = tr = 0.0
+    x = np.zeros((block, CH), np.float32)
+    gaps = 0
+    while tr < seconds:
+        lw = tw + rng.uniform(0, jitter)
+        lr = tr + rng.uniform(0, jitter)
+        if lw <= lr:
+            ring.write(x)
+            tw += period / (1 + off)
+        else:
+            if ring.read(block) is None and tr > 0.1:
+                gaps += 1
+            if ratios is not None:
+                ratios.append(ring.ratio)
+            tr += period
+    return gaps
+
+
+def test_auto_drift_catches_a_fast_or_slow_mic_before_any_glitch():
+    """A wireless headset's mic 0.05% off the output clock used to click twice before
+    drift tracking switched on; now it's measured within seconds and never clicks."""
+    for off in (0.0005, -0.0005):
+        r = Ring(auto_drift=True)          # the mic rings' settings
+        speed = []
+        assert clocks(r, off, 180, ratios=speed) == 0
+        assert r.underruns == 0 and r.overflows == 0
+        assert r.track_drift
+        assert np.mean(speed[-6000:]) == pytest.approx(1 + off, abs=0.0001)   # its pace
+        assert np.std(speed[-6000:]) < 0.002                  # no audible wobble
+
+
+def test_auto_drift_leaves_an_on_time_ring_alone():
+    """Same clock on both sides (a USB headset's mic and headphones): no stretching,
+    however long it plays and whatever the callbacks' timing noise."""
+    for seed in range(3):
+        r = Ring(auto_drift=True)
+        assert clocks(r, 0.0, 120, jitter=0.004, seed=seed) == 0
+        assert not r.track_drift and r.ratio == 1.0
+        assert r.underruns == 0 and r.overflows == 0
+
+
+def test_without_the_estimate_a_slow_mic_would_click():
+    """The case the estimate exists for: a plain ring runs dry on the same writer."""
+    r = Ring()
+    clocks(r, -0.0005, 180)
+    assert r.underruns >= 1
+
+
+def test_a_tracking_mic_ring_holds_its_small_cushion():
+    """Drift tracking aimed at the bare cushion, which for the mic (1.5 blocks) read the
+    ring dry: once it was on, a 0.05% slow mic ran dry over a hundred times in 3 min."""
+    for off in (0.0005, -0.0005):
+        r = Ring(auto_drift=True, track_drift=True)
+        assert clocks(r, off, 120) == 0 and r.underruns == r.overflows == 0
