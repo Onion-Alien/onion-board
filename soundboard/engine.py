@@ -544,6 +544,44 @@ class DirectFifo:
         return out
 
 
+class CableTap:
+    """Straight into my mic, and the virtual cable too: a copy of what others hear is
+    played into the cable, so a voice app still set to the cable's far end keeps
+    hearing everything. The send mix is made on the mic's clock and the cable plays on
+    its own, so it goes through a Ring that tracks the drift between them."""
+
+    def __init__(self, name: str, latency="low"):
+        idx = find_device("output", name)
+        if idx is None:
+            raise RuntimeError(f"device not found: {name}")
+        self.name = name
+        self.rate = int(sd.query_devices(idx)["default_samplerate"])
+        self.ring = Ring(self.rate, prefill_s=0.03, max_s=0.2, auto_drift=True)
+        self._rs = StreamResampler(SR, self.rate)
+        self.last_cb = time.monotonic()
+        self.stream = sd.OutputStream(device=idx, samplerate=self.rate, channels=CH,
+                                      dtype="float32", latency=latency, callback=self._cb)
+        self.stream.start()
+
+    def write(self, mix: np.ndarray):
+        self.ring.write(self._rs(mix))
+
+    def _cb(self, outdata, frames, t, status):
+        self.last_cb = time.monotonic()
+        x = self.ring.read(frames)
+        if x is None:
+            outdata.fill(0)
+        else:
+            outdata[:] = x
+
+    def close(self):
+        try:
+            self.stream.stop()
+            self.stream.close()
+        except Exception:  # noqa: BLE001 - a device that's gone
+            log.debug("closing the cable tap raised", exc_info=True)
+
+
 class StreamResampler:
     """Chunk-by-chunk resampler for live mic audio (identity when rates match)."""
 
@@ -861,6 +899,10 @@ class Engine:
         self.direct_mode = directmic.MODE_REPLACE   # the send mix replaces the mic
         self.direct_lead_s = directmic.LEAD_S
         self.fifo_direct = DirectFifo()
+        # ...and the cable gets the same, for a voice app still set to it (CableTap)
+        self.tap: CableTap | None = None
+        self.tap_name: str | None = None
+        self._tap_try = 0.0
         self.rates = {"main": SR, "mon": SR, "mic": SR, "obs": SR}
         self.errors: dict[str, str] = {}
 
@@ -972,6 +1014,33 @@ class Engine:
         """The mic effect is running: a program is recording the mic it's on."""
         s = self.main_stream
         return isinstance(s, directmic.DirectMicStream) and s.effect_alive()
+
+    def set_tap_device(self, name: str | None):
+        """Also play what others hear into `name` (the virtual cable) while it goes
+        straight into the mic; None = don't."""
+        old, self.tap = self.tap, None
+        if old is not None:
+            old.close()
+        self.tap_name = name
+        self._tap_try = time.monotonic()
+        if name:
+            try:
+                self.tap = CableTap(name, BUFFER.get(self.latency, "low"))
+                log.info("also sending into %s", name)
+            except Exception as e:  # noqa: BLE001 - the mic still works; retried
+                log.warning("can't also send into %s: %s", name, e)
+
+    def _check_tap(self, now: float):
+        """The cable tap's own watchdog (see check_streams)."""
+        name = self.tap_name
+        if not name:
+            return
+        if self.tap is None:
+            if now - self._tap_try >= RETRY_S:
+                self.set_tap_device(name)
+        elif now - self.tap.last_cb > STALL_S:
+            log.warning("cable tap stalled; reopening %s", name)
+            self.set_tap_device(name)
 
     def direct_apps(self) -> int:
         """Apps whose mic stream carries the board right now (its own one too)."""
@@ -1121,6 +1190,7 @@ class Engine:
         check), so the UI can refresh its status from errors_snapshot()."""
         now = time.monotonic()
         touched = []
+        self._check_tap(now)
         for key, attr, setter in (("main", "main_stream", self.set_main_device),
                                   ("mon", "mon_stream", self.set_mon_device),
                                   ("mic", "mic_stream", self.set_mic_device),
@@ -1263,6 +1333,7 @@ class Engine:
     def shutdown(self):
         for a in ("mic_stream", "main_stream", "mon_stream", "obs_stream"):
             self._close(a)
+        self.set_tap_device(None)
 
     def active_outputs(self) -> set:
         outs = set()
@@ -1870,6 +1941,9 @@ class Engine:
         soft_limit(mix)
         outdata[:] = mix
         self.level_main = max(peak(mix), self.level_main * 0.85)
+        cable = self.tap
+        if cable is not None and self.main_direct:
+            cable.write(mix)
         tap = self.main_tap
         if tap is not None:
             tap.append(mix.copy())

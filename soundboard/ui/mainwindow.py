@@ -338,6 +338,8 @@ class MainWindow(QMainWindow):
         self.voice_hints: list[profiles.Hint] = []   # everything seen, for the simple modes
         self.mode_why = ""    # why the simple mode picked the shaping it uses
         self.listeners = voicesdk.Listeners() if sys.platform == "win32" else None
+        # who's still set to the cable while sounds go straight into the mic (_cable_tip)
+        self._cable_watch = voicesdk.Listeners() if sys.platform == "win32" else None
         self.voice_watch = voicesdk.Watcher() if sys.platform == "win32" else None
         self._voice_timer = QTimer(self)
         self._voice_timer.timeout.connect(self._voice_tick)
@@ -1140,11 +1142,11 @@ class MainWindow(QMainWindow):
         self.btn_usecable.clicked.connect(self.use_cable_instead)
         icons.set_icon(self.btn_usecable, "cable")
         self.btn_usecable.hide()
-        cv.addWidget(self.btn_usecable)
         self.mic_attached.connect(self._mic_attached)
         self._attaching = False
         icons.set_icon(self.btn_install, "cable", "on_accent")
         cv.addWidget(self.btn_install)
+        cv.addWidget(self.btn_usecable)   # (under the mic's own button: the second way)
         self.btn_rescan = QPushButton("I've installed it — check again")
         self.btn_rescan.clicked.connect(lambda: self.rescan_with_feedback(self.btn_rescan))
         icons.set_icon(self.btn_rescan, "reload")
@@ -1610,10 +1612,23 @@ class MainWindow(QMainWindow):
         never the headphones (you'd hear everything twice, your own voice included)."""
         c = self.cfg
         if c.route == "mic":
-            return directmic.DEVICE if directmic.status() != "missing" else None
+            if directmic.works(directmic.status()):
+                return directmic.DEVICE
+            # not on the mic yet (or Windows took it off): the cable meanwhile, so
+            # a voice app set to it still hears you
+            cable = self._cable_out()
+            return cable if cable != c.mon_device else None
         if c.route == "off" or not c.main_device or c.main_device == c.mon_device:
             return None
         return c.main_device
+
+    def _cable_out(self) -> str | None:
+        """The virtual cable's input (what plays into it): the one picked, else the
+        first one installed."""
+        c = self.cfg
+        if c.main_device and is_virtual_cable(c.main_device):
+            return c.main_device
+        return next(iter(eng.virtual_outputs()), None)
 
     def _apply_send_outputs(self, force_main: bool = False):
         """(Re)open what others hear and the stream output for the current devices and
@@ -1623,6 +1638,12 @@ class MainWindow(QMainWindow):
         if force_main or e.names["main"] != main:
             e.set_main_device(main)
             self._check_cable_format()
+        # straight into the mic: the cable gets the same, for a voice app still on it
+        tap = self._cable_out() if main == directmic.DEVICE else None
+        if tap == self.cfg.mon_device:
+            tap = None
+        if e.tap_name != tap:
+            e.set_tap_device(tap)
         obs = self._obs_name(self.cfg.obs_device)   # never the cable or headphones too
         if e.names["obs"] != obs:
             e.set_obs_device(obs)
@@ -1742,20 +1763,19 @@ class MainWindow(QMainWindow):
         elif route == "mic" and directmic.needs_repair(direct):
             state = "missing"
             out = f"Into your mic  <b style='color:{bad}'>✗ needs a quick repair</b>"
-            step = (f"<b style='color:{warn}'>One click:</b> "
-                    + ("Windows took Onion Board off your mic (a driver or Windows update "
-                       "does that). " if direct == "wiped" else
-                       "this version of Onion Board brings an update for your mic. ")
-                    + "Windows asks for permission once, and your sounds are back in your "
-                    "mic.")
-        elif route == "mic" and direct != "ready":
+            step = (f"<b style='color:{warn}'>One click:</b> Windows took Onion Board off "
+                    "your mic (a driver or Windows update does that). Windows asks for "
+                    "permission once, and your sounds are back in your mic."
+                    + self._meanwhile())
+        elif route == "mic" and not directmic.works(direct):
             state = "missing"
-            out = (f"Into your mic  <b style='color:{bad}'>✗ not set up yet</b>"
+            out = (f"Into your mic  <b style='color:{warn}'>one click to go</b>"
                    if direct == "missing" else
-                   f"Into your mic  <b style='color:{bad}'>✗ set up on another mic</b>")
-            step = (f"<b style='color:{warn}'>One click:</b> put Onion Board on your mic. "
-                    "Windows asks for permission once; after that Discord and games hear "
-                    "your sounds through your normal mic, with nothing to set there.")
+                   f"Into your mic  <b style='color:{warn}'>set up on another mic</b>")
+            step = (f"<b style='color:{warn}'>One click:</b> put your sounds straight into "
+                    "your mic. Windows asks for permission once; after that Discord and "
+                    "games hear them through your normal mic, with nothing to set there."
+                    + self._meanwhile())
         elif route == "mic" and e.main_stream is not None and self._direct_not_running():
             state = "unrouted"
             out = (f"Into your mic  <b style='color:{bad}'>✗ Windows isn't running "
@@ -1769,10 +1789,15 @@ class MainWindow(QMainWindow):
             apps = e.direct_apps()
             out = (f"<b style='color:{ok}'>{name}</b> — your sounds are in it "
                    f"<b style='color:{ok}'>✓</b>"
-                   + (f"  <b style='color:{ok}'>(live)</b>" if apps else ""))
+                   + (f"  <b style='color:{ok}'>(live)</b>" if apps else "")
+                   + ("  <span>· also on the virtual cable</span>"
+                      if e.tap is not None else ""))
             step = ("<b>Nothing to set.</b> Discord and games keep your normal mic, and "
                     "your sounds are in it. If sounds get chopped up, switch off the "
-                    "voice app's noise suppression (Discord: <b>Input Profile → Studio</b>).")
+                    "voice app's noise suppression (Discord: <b>Input Profile → Studio</b>)."
+                    + (" A newer version of the mic part is ready: <b>Update</b> below "
+                       "(one Windows prompt) whenever suits you."
+                       if direct == "outdated" else ""))
         elif route == "mic":
             state = "unrouted"
             out = f"Into your mic  <b style='color:{bad}'>✗ can't reach it</b>"
@@ -1841,19 +1866,27 @@ class MainWindow(QMainWindow):
         self.flow_mic.setText(mic)
         self.flow_out.setText(out)
         self.step_lbl.setText(step)
-        self.btn_install.setVisible(state == "missing" or (route == "mic" and state != "ok"))
+        update = route == "mic" and state == "ok" and direct == "outdated"
+        self.btn_install.setVisible(state == "missing" or update
+                                    or (route == "mic" and state != "ok"))
         self.btn_install.setEnabled(not self._attaching)
         self.btn_install.setText(
             "Install the free virtual cable" if route != "mic" else
-            "Put Onion Board on my mic" if direct in ("missing", "other") else
+            "Update the mic part (one click)" if update else
+            "Put my sounds straight into my mic" if direct in ("missing", "other") else
             "Repair (one click)")
         icons.set_icon(self.btn_install, "mic" if route == "mic" else "cable", "on_accent")
+        # the mic is the main way: on the cable route the cable's button comes second
+        self._set_primary(self.btn_install, route == "mic" and not update)   # (optional)
+        self._set_primary(self.btn_attach, route == "cable")
         self.btn_usecable.setVisible(route == "mic" and state != "ok" and not self._attaching)
         if route == "mic":
             self._direct_shown = self._direct_health()
         self._cable_follow_switch()
         self.btn_rescan.setVisible(state == "missing" and route != "mic")
         self.btn_attach.setVisible(route == "cable" and not self._attaching)
+        if route == "mic":
+            self._cable_tip()
         mic_side = state == "ok" and bool(vm)   # Discord / the game picks a mic: help with it
         self.btn_nomic.setVisible(mic_side)
         self.btn_chat.setVisible(mic_side)
@@ -1872,7 +1905,8 @@ class MainWindow(QMainWindow):
         elif route == "mic" and directmic.needs_repair(direct):
             pill = "Repair needed" if short else "One click needed — repair your mic"
         elif route == "mic":
-            pill = "Setup needed" if short else "One click needed — put it on your mic"
+            pill = ("One click" if short
+                    else "One click: put your sounds straight into your mic")
         elif state == "ok" and not vm:
             pill = "Connected" if short else f"Sending to:  {dev}"
         elif state == "ok":
@@ -1883,9 +1917,9 @@ class MainWindow(QMainWindow):
         elif route == "device":
             pill = ("Not connected" if short
                     else "Not sending — pick a device on the Setup tab")
-        else:
+        else:   # (the Setup tab offers straight into the mic first)
             pill = ("Not connected" if short
-                    else "Not connected to the virtual cable — click to fix")
+                    else "Not connected — click to fix")
         if self.pill.text() != pill:
             good = state in ("ok", "off")
             self.pill.setText(pill)
@@ -1932,6 +1966,39 @@ class MainWindow(QMainWindow):
                            "headset's USB dongle or the virtual cable.", "warn")
         self._show_route()
         self._update_status()
+
+    def _meanwhile(self) -> str:
+        """While it isn't on the mic yet: do others still hear you through the cable?"""
+        e = self.engine
+        if e.main_stream is not None and e.names["main"] not in (None, directmic.DEVICE):
+            return (" Meanwhile your sounds still go through the virtual cable, so a "
+                    "voice app set to it still hears you.")
+        return ""
+
+    @staticmethod
+    def _set_primary(btn, on: bool):
+        name = "primary" if on else ""
+        if btn.objectName() != name:
+            btn.setObjectName(name)
+            btn.style().unpolish(btn)
+            btn.style().polish(btn)
+
+    def _cable_tip(self):
+        """Once: straight into the mic works, and a voice app is still set to the
+        cable's far end. It still hears you (the cable gets the same), but its normal
+        mic is the simpler setting."""
+        c = self.cfg
+        if c.cable_tip_done or self.engine.tap is None or self._cable_watch is None:
+            return
+        far = eng.virtual_mic_for(self.engine.tap_name)
+        apps = set(voicesdk.VOICE_APPS.values())
+        heard = [h for h in self._cable_watch.poll(far) if h in apps]
+        if heard:
+            c.cable_tip_done = True
+            self._save_now()
+            self.toast(f"{heard[0][1]} still uses the virtual cable as its mic. It still "
+                       "hears you, but you can set its input back to your normal mic: "
+                       "your sounds are in it now.")
 
     def use_cable_instead(self):
         """Straight into my mic isn't working here: send through the virtual cable (set

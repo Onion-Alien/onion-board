@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+- **Straight into your mic is now the main way, for everyone.** Updating moves
+  settings that used the virtual cable to *Straight into my mic* (once: pick the
+  cable again on the Setup tab and it stays). Already set up on your mic? Nothing to
+  do. Not yet? The Setup tab leads with one click (Windows asks for permission once),
+  and until you click it your sounds keep going through the cable. Nobody goes
+  silent: while your sounds go into your mic, the virtual cable (if you have one)
+  gets them too, so a voice app still set to *CABLE Output* keeps hearing you, and
+  the app tells you once that you can set it back to your normal mic. The header
+  no longer sends mic users to the cable, and an older copy of the mic part keeps
+  working, with its update offered instead of demanded.
 - **A rare crash when the PC was busy is fixed.** Python tidied up its memory on
   whichever thread happened to be running, sometimes a sound or network thread, and
   that could free a part of the window while it was still ticking. It now tidies up

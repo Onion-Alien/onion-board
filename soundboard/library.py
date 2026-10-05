@@ -266,7 +266,11 @@ class SoundMeta:
 @dataclass
 class Config:
     version: int = CONFIG_VERSION
-    route: str = "cable"      # where what others hear goes: ROUTES ("mic" on a first start)
+    route: str = "cable"      # where what others hear goes: ROUTES ("mic": see mic_first)
+    # straight into my mic became the main way in 1.9.1: settings on the cable were
+    # moved to it once (from_raw); after that a route picked by hand stays as picked
+    mic_first: bool = False
+    cable_tip_done: bool = False   # told once that a voice app is still on the cable
     main_device: str | None = None
     mon_device: str | None = None
     # the headphones are Windows' default output, and move with it when it changes
@@ -476,6 +480,7 @@ class Config:
         version keep the route they had (the cable, unless they chose another)."""
         cfg = cls()
         cfg.route = "mic"
+        cfg.mic_first = True
         return cfg
 
     def _restore_privacy(self):
@@ -550,6 +555,14 @@ class Config:
             raise ValueError(f"config version {raw.get('version')!r} isn't a number") from e
         for v in range(version, CONFIG_VERSION):
             raw = MIGRATIONS[v](raw)
+        if not raw.get("mic_first"):
+            # once: the cable route moves to straight into my mic, the main way now (the
+            # cable still gets everything until the mic is set up, and alongside it
+            # after). main_device stays the cable, so an older version opening these
+            # settings still sends through it. Another device or nowhere stays put.
+            if raw.get("route", "cable") == "cable":
+                raw["route"] = "mic"
+            raw["mic_first"] = True
         sounds = []
         blank = SoundMeta(id="", name="", file="")
         raw_sounds = raw.pop("sounds", [])
