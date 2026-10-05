@@ -24,10 +24,14 @@ class Recorder:
     The manual recording is spooled to a 16-bit WAV on disk as it happens instead
     of being held in RAM: at the 15-minute cap that is 172 MB on disk versus
     345 MB of float32 chunks *plus* another 345 MB to concatenate them. If the
-    spool file can't be opened it falls back to memory."""
+    spool file can't be opened it falls back to memory.
+
+    The replay buffer itself is only made on the first push, and release_replay()
+    gives it back: instant replay's 120 s one is ~46 MB."""
 
     def __init__(self, spool_path=None, seconds: int = CLIP_S):
-        self.replay = np.zeros((int(seconds * SR), 2), np.float32)
+        self._frames = max(1, int(seconds * SR))
+        self.replay: np.ndarray | None = None
         self.w = 0
         self.filled = 0
         # looked up now, not at import, so tests that re-point APP_DIR are honoured
@@ -44,7 +48,9 @@ class Recorder:
 
     def _push(self, x: np.ndarray):
         n = len(x)
-        cap = len(self.replay)
+        cap = self._frames
+        if self.replay is None:
+            self.replay = np.zeros((cap, 2), np.float32)
         if n >= cap:
             x, n = x[-cap:], cap
         end = self.w + n
@@ -78,7 +84,15 @@ class Recorder:
         with self._lock:
             self.w = self.filled = 0
 
+    def release_replay(self):
+        """Forget the replay buffer and free its memory (the next push makes it again)."""
+        with self._lock:
+            self.replay = None
+            self.w = self.filled = 0
+
     def _last(self) -> np.ndarray:
+        if self.replay is None:
+            return np.zeros((0, 2), np.float32)
         if self.filled < len(self.replay):
             return self.replay[:self.filled].copy()
         return np.concatenate([self.replay[self.w:], self.replay[:self.w]])

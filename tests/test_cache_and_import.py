@@ -1,4 +1,7 @@
 """Phase 2: bounded decoding, the int16 cache, imports, clips and dedupe."""
+import os
+import time
+
 import numpy as np
 import pytest
 import soundfile as sf
@@ -74,6 +77,8 @@ def test_load_sound_decodes_once_then_uses_the_cache(app_dir, monkeypatch):
 def test_prune_cache_removes_orphans_only(app_dir):
     store_cached("keep", np.zeros((10, 2), np.float32))
     store_cached("gone", np.zeros((10, 2), np.float32))
+    old = time.time() - library.CACHE_GRACE_S - 60   # a fresh one is left alone a while
+    os.utime(cache_path("gone"), (old, old))
     prune_cache({"keep"})
     assert cache_path("keep").exists() and not cache_path("gone").exists()
 

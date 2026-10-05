@@ -83,7 +83,7 @@ class InstantReplay(QObject):
             self._stop()
             self.error = ""
             with self._lock:
-                self._rec.clear_replay()
+                self._rec.release_replay()   # its memory too, not just what it held
             self.state_changed.emit()
 
     def clip(self) -> np.ndarray:
@@ -99,6 +99,8 @@ class InstantReplay(QObject):
 
     # -- capture
     def _push(self, x: np.ndarray):   # the capture thread
+        if not self._enabled:   # a late chunk from a capture being stopped: no new buffer
+            return
         with self._lock:
             self._rec.push(x)
 

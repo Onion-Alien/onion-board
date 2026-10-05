@@ -38,6 +38,7 @@ APP_DIR = Path(os.environ.get("APPDATA", Path.home())) / "OnionBoard"
 OLD_APP_DIR = Path(os.environ.get("APPDATA", Path.home())) / "Soundboard"
 SOUNDS_DIR = APP_DIR / "sounds"
 CACHE_DIR = APP_DIR / "cache"
+CACHE_GRACE_S = 600   # prune_cache leaves a new sound's cache this long (an import in flight)
 THUMBS_DIR = APP_DIR / "thumbs"   # pad pictures (soundboard.thumbs)
 CONFIG_PATH = APP_DIR / "config.json"
 # privacy.json beside config.json: a copy of the Privacy & security settings: a version
@@ -813,7 +814,12 @@ def to_int16(data: np.ndarray) -> np.ndarray:
     """float32 [-1, 1] -> int16 (the in-memory / cached format). int16 passes through."""
     if data.dtype == np.int16:
         return data
-    return np.ascontiguousarray(np.clip(np.rint(data * I16), -I16 - 1, I16).astype(np.int16))
+    # one float copy, rounded and clipped in place: a 15-minute song is ~350 MB of
+    # float32, and each temporary would be another
+    y = data * I16
+    np.rint(y, out=y)
+    np.clip(y, -I16 - 1, I16, out=y)
+    return np.ascontiguousarray(y.astype(np.int16))
 
 
 def to_float32(data: np.ndarray) -> np.ndarray:
@@ -895,11 +901,18 @@ def cache_keep(sounds: list[SoundMeta]) -> set[str]:
 
 def prune_cache(keep: set[str]):
     """Delete cache files that aren't in `keep` (see cache_keep): removed sounds and
-    effects versions that were replaced."""
+    effects versions that were replaced. Recent files of a sound `keep` doesn't know
+    are left alone, like thumbs.prune does: an import still running has stored its
+    cache (or is writing its .tmp.npy) before the sound joins the library."""
+    ids = {k.split(".")[0] for k in keep}
     try:
         for p in CACHE_DIR.glob("*.npy"):
-            if p.stem not in keep:
-                p.unlink(missing_ok=True)
+            if p.stem in keep:
+                continue
+            fresh = p.name.split(".")[0] not in ids or p.name.endswith(".tmp.npy")
+            if fresh and time.time() - p.stat().st_mtime < CACHE_GRACE_S:
+                continue
+            p.unlink(missing_ok=True)
     except OSError:
         log.debug("cache prune failed", exc_info=True)
 
@@ -926,32 +939,52 @@ def peaks(data: np.ndarray, n: int) -> np.ndarray:
     if not len(data) or n <= 0:
         return np.zeros(max(n, 0), np.float32)
     scale = 1 / I16 if data.dtype == np.int16 else 1.0
-    edges = np.linspace(0, len(data), n + 1).astype(np.int64)
-    out = np.zeros(n, np.float32)
-    for i in range(n):
-        a, b = edges[i], max(edges[i + 1], edges[i] + 1)
-        seg = data[a:min(b, len(data))]
-        if len(seg):
-            out[i] = float(np.abs(seg).max()) * scale
+    starts = np.linspace(0, len(data), n + 1).astype(np.int64)[:-1]
+    at = np.minimum(starts, len(data) - 1)   # more slices than frames: the last ones are empty
+    # max and min, not abs: abs of an int16 -32768 is still -32768. Per channel, then
+    # both: numpy's max(axis=1) over two columns is many times slower
+    hi = np.maximum(np.maximum.reduceat(data[:, 0], at), np.maximum.reduceat(data[:, -1], at))
+    lo = np.minimum(np.minimum.reduceat(data[:, 0], at), np.minimum.reduceat(data[:, -1], at))
+    hi, lo = hi.astype(np.float32), lo.astype(np.float32)
+    out = np.maximum(hi, -lo) * np.float32(scale)
+    out[starts >= len(data)] = 0.0
     return np.clip(out, 0.0, 1.0)
+
+
+PEAK_READS = 4      # original_peaks: short reads per waveform column of a long sound...
+PEAK_CHUNK = 1024   # ...of this many frames (4 KB of int16 stereo: one page each)
 
 
 def original_peaks(meta: SoundMeta, n: int = 400) -> tuple[np.ndarray, float]:
     """(waveform peaks, length in seconds) of a sound as imported, for the trim
-    control. Read from the cache without loading it (every few frames of a long
-    one: plenty for n columns). No cache yet: no peaks, the length from the file."""
+    control. Read from the cache without loading it: a long one gives a few short
+    reads spread over each column, plenty to draw it. No cache yet: no peaks, the
+    length from the file."""
     p = cache_path(meta.id)
     try:
         if p.exists():
             data = np.load(p, mmap_mode="r")
-            step = max(1, len(data) // 400_000)
-            return peaks(np.asarray(data[::step]), n), len(data) / SR
+            return _sampled_peaks(data, n), len(data) / SR
     except Exception:  # noqa: BLE001
         log.debug("couldn't read the cache of %s for its waveform", meta.id, exc_info=True)
     try:
         return np.zeros(0, np.float32), original_frames(meta) / SR
     except Exception:  # noqa: BLE001 - the file is gone: nothing to trim
         return np.zeros(0, np.float32), 0.0
+
+
+def _sampled_peaks(data: np.ndarray, n: int) -> np.ndarray:
+    """peaks() of a memory-mapped (m, 2) array, touching only PEAK_READS chunks of
+    PEAK_CHUNK frames per column (every frame of a short one). A plain stride over
+    the whole file would still read every page of it."""
+    if n <= 0 or len(data) <= n * PEAK_READS * PEAK_CHUNK:
+        return peaks(np.asarray(data), n)
+    edges = np.linspace(0, len(data), n + 1)
+    width = edges[1] - edges[0]
+    offsets = (np.arange(PEAK_READS) + 0.5) * (width / PEAK_READS) - PEAK_CHUNK / 2
+    starts = np.clip((edges[:-1, None] + offsets).astype(np.int64), 0, len(data) - PEAK_CHUNK)
+    picked = np.asarray(data[(starts[..., None] + np.arange(PEAK_CHUNK)).ravel()])
+    return peaks(picked, n)   # n equal slices of it = each column's own chunks
 
 
 def fingerprint(path: str) -> str:
