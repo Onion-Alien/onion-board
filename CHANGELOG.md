@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+## 1.9.2 — 2026-10-05
+
+- **Straight into my mic is steadier.** If Onion Board crashes or freezes, your
+  mic no longer stutters for a moment when it comes back; it just carries on.
+  After a short hiccup, the small safety delay it adds now goes back down on its
+  own while the board keeps running. Mics that run at 44.1 kHz or 16 kHz sound
+  cleaner, and setting it up or removing it is safer. Already using it? The
+  Setup tab offers the update with one click (your current one keeps working
+  until then).
+
 ## 1.9.1 — 2026-10-05
 
 - **Straight into your mic is now the main way, for everyone.** Updating moves
