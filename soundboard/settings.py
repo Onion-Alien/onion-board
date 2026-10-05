@@ -690,6 +690,7 @@ class SettingsDialog(QDialog):
                       "All hotkeys work while you're in a game.")
         note.setObjectName("hint")
         note.setWordWrap(True)
+        note.setContentsMargins(14, 0, 14, 0)   # in line with the cards' text
         v.addWidget(note)
         v.addStretch(1)
         self._refresh_hk()
@@ -751,13 +752,13 @@ class SettingsDialog(QDialog):
                               "The game keeps your keyboard and mouse, and the overlay's keys "
                               "go back to the game the moment it closes.")
         self._hk_row(cv, "overlay_hotkey", "Overlay hotkey", "")
-        cv.addWidget(self._ov_combo("mode", ovl.MODES, s.mode))
         test = QPushButton("Open overlay")
         test.setToolTip("Opens it now, the same as the hotkey: pick a sound with its keys "
                         "or a click. Esc, this button or the hotkey closes it")
         test.clicked.connect(lambda: self.mw.overlay.open_by_click())
-        row = QHBoxLayout()
-        row.addStretch(1)
+        row = QHBoxLayout()   # beside how the key works: two lines, not three
+        row.setSpacing(8)
+        row.addWidget(self._ov_combo("mode", ovl.MODES, s.mode), 1)
         row.addWidget(test)
         cv.addLayout(row)
         v.addWidget(card)
@@ -807,8 +808,7 @@ class SettingsDialog(QDialog):
         prev.setToolTip("Shows the overlay for a few seconds, to see how it looks; any "
                         "click or key closes it")
         prev.clicked.connect(lambda: self.mw.overlay.preview(6))
-        row = QHBoxLayout()
-        row.addStretch(1)
+        row = _button_row()
         row.addWidget(prev)
         cv.addLayout(row)
         v.addWidget(card)
@@ -820,6 +820,7 @@ class SettingsDialog(QDialog):
                       "switches your weapon, use the numpad.")
         note.setObjectName("hint")
         note.setWordWrap(True)
+        note.setContentsMargins(14, 0, 14, 0)   # in line with the cards' text
         v.addWidget(note)
         v.addStretch(1)
         self._ov_sync()
@@ -1221,7 +1222,6 @@ class SettingsDialog(QDialog):
         card, cv = self._card("Add-ons",
                               "Onion Watch is the free add-on behind the Triggers tab. "
                               "Removing it keeps your triggers for when you get it again.")
-        row = QHBoxLayout()
         self.addon_label = QLabel()
         self.addon_label.setWordWrap(True)
         self.addon_remove = QPushButton("Remove Onion Watch…")
@@ -1239,8 +1239,11 @@ class SettingsDialog(QDialog):
             tab.remove()                    # asks first
             refresh()
         self.addon_remove.clicked.connect(remove)
-        row.addWidget(self.addon_label, 1)
+        # the button under the text, on the left, like every other card's (far right
+        # beside the text, it looked lost)
+        row = _button_row()
         row.addWidget(self.addon_remove)
+        cv.addWidget(self.addon_label)
         cv.addLayout(row)
         refresh()   # in the card first: shown without a parent, it's a window of its own
         return card
@@ -1758,20 +1761,17 @@ class SettingsDialog(QDialog):
                         "the app.")
         go = QPushButton("Remote settings")
         go.clicked.connect(lambda: self.tabs.setCurrentIndex(self._page_keys.index("remote")))
-        row = QHBoxLayout()
-        row.addWidget(remote, 1)
-        row.addWidget(go)
-        cv.addLayout(row)
+        cv.addWidget(remote)
         full = QPushButton("Network details")
         full.setToolTip("Opens the full list (SECURITY.md) on GitHub, in your browser")
         from soundboard.updates import REPO
         full.clicked.connect(lambda: busy.open_url(
             f"https://github.com/{REPO}/blob/main/SECURITY.md#what-the-app-does-on-the-network",
             full, self))
-        row2 = QHBoxLayout()
-        row2.addWidget(full)
-        row2.addStretch(1)
-        cv.addLayout(row2)
+        row = _button_row()   # both under the text, on the left
+        row.addWidget(go)
+        row.addWidget(full)
+        cv.addLayout(row)
         return card
 
     def _connection_card(self):
