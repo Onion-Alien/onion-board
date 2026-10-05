@@ -147,9 +147,9 @@ def explain(cfg_dest: dict | None, why: str = "") -> str:
     if p is CLEAN:
         return "Clean: your sounds go out exactly as mixed."
     using = "Off (no shaping)" if m is destination.OFF else m.label
-    line = f"{p.label}: shaping for {using}"
+    line = f"{p.label}: shaping for {using}."
     if why:
-        line += f", because {why[0].lower()}{why[1:]}"
+        line += f" {why}."
     elif auto_picks(p):
-        line += " (nothing detected yet, so the last one used)"
-    return line + "."
+        line += " Nothing detected yet, so it keeps the last one used."
+    return line

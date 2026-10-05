@@ -150,7 +150,7 @@ def test_the_sounds_tab_has_a_mode_dropdown_that_follows_the_picker(window):  # 
     assert window.engine.dest is not None and window.engine.dest.key == "discord"
     assert window.cfg.dest == {"mode": "discord", "simple": "voice", "auto": False}
     assert window._save_timer.isActive()
-    assert "Voice chat: shaping for Discord" in mode.toolTip()
+    assert "Voice chat: shaping for Discord." in mode.toolTip()
     window.dest_panel.refresh()                       # the Setup tab shows it
     assert window.dest_panel.buttons["voice"].isChecked()
     assert window.dest_panel.advanced.isHidden()      # the full list is Advanced's
@@ -215,7 +215,7 @@ def test_game_mode_picks_the_shaping_by_itself(window, monkeypatch):  # noqa: F8
     window._poll_voice()
     assert window.engine.dest.key == "unity" and window.cfg.dest["simple"] == "game"
     assert toasts and "Game mode" in toasts[-1] and "Unity" in toasts[-1]
-    assert "because the game you have open uses" in panel.now.text()
+    assert "The game you have open uses" in panel.now.text()
     assert panel.suggest.isHidden()
     window.voice_watch.key = None                     # the game closed: keeps it
     window._poll_voice()

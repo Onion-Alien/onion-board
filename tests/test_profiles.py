@@ -82,7 +82,7 @@ def test_every_mode_says_what_it_does():
         assert p.label and p.summary and len(p.details) > 60
     assert profiles.explain({}) == "Clean: your sounds go out exactly as mixed."
     s = profiles.explain({"mode": "unity", "simple": "game"}, "The game uses Photon")
-    assert s.startswith("Game: shaping for Unity voice") and "because the game uses" in s
-    assert "nothing detected yet" in profiles.explain({"mode": "discord"})
+    assert s == "Game: shaping for Unity voice (Photon / Dissonance). The game uses Photon."
+    assert "Nothing detected yet" in profiles.explain({"mode": "discord"})
     assert profiles.explain({"mode": "steam", "simple": "advanced"}) == (
         "Advanced: shaping for Steam voice.")
