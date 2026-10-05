@@ -26,12 +26,26 @@ from soundboard import theme
 LAT_TOP, LAT_BOTTOM = 84.0, -58.0   # the inhabited world: no polar wastes
 ZOOM_MAX = 250.0                    # about street level: a city's stations come apart
 HIT_PX = 7.0                        # how near the pointer a dot counts as under it
+LAND_PART = 400                     # outline points per drawn part (set_land)
+FILL_PX = 1_000_000                 # device pixels per filled band (_fill)
 WORLD_MAX_PX = 10_000_000           # biggest whole-world picture kept (device pixels)
 SETTLE_MS = 160                     # zooming: the old picture, stretched, until this idle
 TOWN_ZOOM = 2.0                     # city and town names show from this zoom in...
 TOWNS_IN_VIEW = 40                  # ...at most this many at once, only those in view
 SPREAD_ZOOM = 4.0                   # stations on the very same spot fan out from here...
 SPREAD_PX = 2.4                     # ...this far apart (a spiral round the spot)
+
+
+def _fill(p: QPainter, rect: QRectF, colour: QColor):
+    """p.fillRect in bands of about FILL_PX device pixels: Qt keeps Python's lock while
+    it fills, and the whole world picture in one go held up the audio for ~10 ms."""
+    dpr = p.device().devicePixelRatioF()
+    band = max(1.0, FILL_PX / max(1.0, rect.width() * dpr * dpr))
+    y = rect.top()
+    while y < rect.bottom():
+        h = min(band, rect.bottom() - y)
+        p.fillRect(QRectF(rect.left(), y, rect.width(), h), colour)
+        y += h
 
 
 def _mix(a: str, b: str, t: float) -> QColor:
@@ -66,7 +80,7 @@ class FlatMap(QWidget):
         self.setMouseTracking(True)
         self.setMinimumSize(120, 80)
         self.setAttribute(Qt.WA_OpaquePaintEvent)
-        self._land = QPainterPath()     # in (lon, -lat) degrees
+        self._land: list[QPainterPath] = []   # in (lon, -lat) degrees, in parts (set_land)
         self._labels: list[tuple[str, float, float, float]] = []   # name, lon, lat, width°
         self._towns: list[dict] = []    # radio.town_labels(): the places with stations
         self._tlon = np.zeros(0)
@@ -115,14 +129,22 @@ class FlatMap(QWidget):
         """The countries' outlines, and their names: (name, lon, lat, width in degrees),
         each shown once there's room for it at the zoom."""
         self._labels = sorted(labels or [], key=lambda x: -x[3])   # big countries first
-        path = QPainterPath()
-        path.setFillRule(Qt.WindingFill)
+        # in parts of a few hundred points: Qt holds Python's lock while it draws a
+        # path, and the whole world in one took 10-30 ms, long enough to hold up the
+        # audio threads (a sound skipped each time the map was redrawn at a new zoom).
+        # A part takes about 1 ms, and all of them less than the one did.
+        self._land = []
+        path, n = None, 0
         for ring in rings:
+            if path is None or n + len(ring) > LAND_PART:
+                path, n = QPainterPath(), 0
+                path.setFillRule(Qt.WindingFill)
+                self._land.append(path)
             path.moveTo(ring[0][0], -ring[0][1])
             for x, y in ring[1:]:
                 path.lineTo(x, -y)
             path.closeSubpath()
-        self._land = path
+            n += len(ring)
         self._redraw()
 
     def set_points(self, points: list[dict]):
@@ -239,7 +261,7 @@ class FlatMap(QWidget):
         pixels); only what falls in `rect` (pixels) matters."""
         t = theme.T
         world = tr.mapRect(QRectF(-180, -LAT_TOP, 360, LAT_TOP - LAT_BOTTOM))
-        p.fillRect(world, _mix(t["bg"], t["accent"], 0.06))
+        _fill(p, world.intersected(rect), _mix(t["bg"], t["accent"], 0.06))
         p.save()
         p.setClipRect(world.intersected(rect))
         p.setPen(QPen(_mix(t["bg"], t["text"], 0.07), 1))
@@ -249,12 +271,13 @@ class FlatMap(QWidget):
         for lat in (-30, 0, 30, 60):
             y = tr.map(QPointF(0, -lat)).y()
             p.drawLine(QPointF(world.left(), y), QPointF(world.right(), y))
-        if not self._land.isEmpty():
+        if self._land:
             p.save()
             p.setTransform(tr, True)
             p.setPen(QPen(_mix(t["bg"], t["text"], 0.3), 0.8 / s))
             p.setBrush(_mix(t["bg"], t["text"], 0.14))
-            p.drawPath(self._land)
+            for part in self._land:
+                p.drawPath(part)
             p.restore()
         if len(self._points):
             o = tr.map(QPointF(0, 0))
@@ -392,8 +415,10 @@ class FlatMap(QWidget):
             w, h = 360 * s, (LAT_TOP - LAT_BOTTOM) * s
             pm = QPixmap(max(1, round(w * dpr)), max(1, round(h * dpr)))
             pm.setDevicePixelRatio(dpr)
-            pm.fill(QColor(theme.T["bg"]))
             p = QPainter(pm)
+            p.setCompositionMode(QPainter.CompositionMode_Source)
+            _fill(p, QRectF(0, 0, pm.width() / dpr, pm.height() / dpr), QColor(theme.T["bg"]))
+            p.setCompositionMode(QPainter.CompositionMode_SourceOver)
             p.setRenderHint(QPainter.Antialiasing)
             tr = QTransform()
             tr.translate(180 * s, LAT_TOP * s)
