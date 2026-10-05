@@ -145,3 +145,46 @@ def test_live_pitch_resampler_keeps_the_top_end():
     f = np.fft.rfftfreq(len(y), 1 / SR)
     assert abs(spec[np.abs(f - 4500) < 20].max() - 20 * np.log10(0.5)) < 0.4
     assert spec[np.abs(f - 4500) > 200].max() < -35
+
+
+def thd_db(y, f0):
+    """Harmonics 2..19 of f0 against f0 itself, in dB (after the first half second)."""
+    y = y[SR // 2:]
+    w = np.hanning(len(y))
+    sp = np.abs(np.fft.rfft(y * w))
+    fr = np.fft.rfftfreq(len(y), 1 / SR)
+
+    def at(f):
+        return sp[np.abs(fr - f) < 3].max()
+    return 20 * np.log10(np.sqrt(sum(at(k * f0) ** 2 for k in range(2, 20))) / at(f0))
+
+
+def test_limiter_holds_through_bass_instead_of_riding_it():
+    # a 45 Hz bass 6 dB over the ceiling: without a hold the gain crept back up between
+    # its peaks and came down at each one, -38.5 dB of distortion (gritty 808s)
+    from soundboard.sendfx import Limiter
+    t = np.arange(SR * 2) / SR
+    x = np.stack([np.sin(2 * np.pi * 45 * t) * 1.4] * 2, 1).astype(np.float32)
+    lim = Limiter(SR)
+    y = np.concatenate([lim.process(x[i:i + BLOCK]) for i in range(0, len(x), BLOCK)])
+    assert thd_db(y[:, 0], 45) < -80
+
+
+def test_headphones_turn_overlapping_loud_sounds_down_instead_of_bending_them():
+    # two loud pads at once in the headphones went over full scale and through the
+    # tanh waveshaper: -20 dB of distortion (10%). Now a limiter turns them down.
+    e = engine_main()
+    e.mon_stream, e.monitor_sounds, e.mon_vol = object(), True, 1.0
+    t = np.arange(SR * 2) / SR
+    tone = np.stack([np.sin(2 * np.pi * 220 * t) * 0.65] * 2, 1).astype(np.float32)
+    e.dest = None
+    e.play("a", tone, 1.0, mode="overlap", only="mon")
+    e.play("b", tone, 1.0, mode="overlap", only="mon")
+    out = np.zeros((BLOCK, 2), np.float32)
+    y = []
+    for _ in range(len(t) // BLOCK - 2):
+        e._mon(out, BLOCK)
+        y.append(out[:, 0].copy())
+    y = np.concatenate(y)
+    assert np.max(np.abs(y)) <= 10 ** (-0.3 / 20) + 1e-6
+    assert thd_db(y, 220) < -60

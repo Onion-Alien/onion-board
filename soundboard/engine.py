@@ -41,7 +41,7 @@ import soxr
 from soundboard import destination, livefx, mapped
 from soundboard.dsp import hermite
 from soundboard.eq import EQ
-from soundboard.sendfx import Ducker, Limiter, SmartMono
+from soundboard.sendfx import Ducker, Limiter, SafetyLimiter, SmartMono
 from soundboard.voicefx.builtin import PitchShift
 from soundboard import errors
 
@@ -1795,7 +1795,7 @@ class Engine:
         elif not self._bus_quiet("mon", mix):
             mix = self._dest("mon", self._eq("mon", "sounds", mix))
         mix = self._vol("mon", "out", mix, self.mon_vol)
-        soft_limit(mix)
+        mix = self._stage("mon", SafetyLimiter).process(mix)
         outdata[:] = mix
         self.level_mon = max(peak(mix), self.level_mon * 0.85)
 
@@ -1811,7 +1811,7 @@ class Engine:
             on = self.mic_enabled and not self.mic_muted
             mix += self._vol("mon", "mic", m, self.mic_vol if on else 0.0)
         mix = self._vol("mon", "out", finite(mix), self.mon_vol)
-        soft_limit(mix)
+        mix = self._stage("mon", SafetyLimiter).process(mix)
         outdata[:] = mix
         self.level_mon = max(peak(mix), self.level_mon * 0.85)
 
@@ -1847,7 +1847,7 @@ class Engine:
         mix = self._vol("obs", "out", mix, self.obs_vol if self.sending else 0.0)
         if self.limiter_on:
             mix = self._stage("obs", Limiter).process(mix)
-        soft_limit(mix)
+        mix = self._stage("obs", SafetyLimiter).process(mix)
         outdata[:] = mix
         self.level_obs = max(peak(mix), self.level_obs * 0.85)
 
