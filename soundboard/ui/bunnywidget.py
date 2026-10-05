@@ -50,7 +50,7 @@ BEG = 2.8          # how long a begging line stays up, seconds
 
 
 class _Note:
-    __slots__ = ("x", "y", "vx", "vy", "age", "life", "size", "col", "spin")
+    __slots__ = ("x", "y", "vx", "vy", "age", "life", "size", "col", "spin", "calm")
 
     def __init__(self, x, y, rng: random.Random, strength: float = 1.0):
         self.x, self.y = x, y
@@ -60,6 +60,7 @@ class _Note:
         self.size = rng.uniform(0.75, 1.15)
         self.col = QColor(rng.choice(NOTE_COLORS))
         self.spin = rng.uniform(-25, 25)
+        self.calm = False   # the headphones' slow trickle: fine at the idle frame rate
 
 
 class _Puff:
@@ -226,7 +227,7 @@ class BunnyWidget(QWidget):
         w = self.bun_h * W / H
         return QRectF((self.width() - w) / 2, (self.height() - self.bun_h) / 2, w, self.bun_h)
 
-    def _spawn(self, strength: float = 1.0):
+    def _spawn(self, strength: float = 1.0, calm: bool = False):
         r = self._bun_rect()
         # out of one of the headphone cups (or the mic, when he's holding one),
         # drifting outward so they never cross his face
@@ -236,6 +237,7 @@ class BunnyWidget(QWidget):
         fx, fy, side = self._rng.choice(spots)
         n = _Note(r.left() + r.width() * fx, r.top() + r.height() * fy, self._rng, strength)
         n.vx = side * abs(n.vx) + side * 8
+        n.calm = calm
         self.notes.append(n)
 
     def _puff(self, x, y, spread: float, r: float, life: float):
@@ -300,7 +302,7 @@ class BunnyWidget(QWidget):
             self._note_debt += dt * 0.7   # something's always playing in his headphones
             if self._note_debt >= 1:
                 self._note_debt = 0.0
-                self._spawn(0.5)
+                self._spawn(0.5, calm=True)   # not "busy": he'd never idle in them
         for n in self.notes:
             n.age += dt
             n.x += n.vx * dt
@@ -334,12 +336,13 @@ class BunnyWidget(QWidget):
             self._timer.setInterval(want)
 
     def busy(self, now: float | None = None) -> bool:
-        """Anything moving faster than the slow bob: talking, notes, dust, the build
-        act, a hop, a line in his bubble, sparkles, or a blink / ear flick / sigh going
-        on or due before the next idle frame."""
+        """Anything moving faster than the slow bob: talking, notes (not the headphones'
+        trickle), dust, the build act, a hop, a line in his bubble, sparkles, or a
+        blink / ear flick / sigh going on or due before the next idle frame."""
         now = time.monotonic() if now is None else now
-        if (self._level > TALK or self._mouth > 0.01 or self._bounce > 0.1 or self.notes
-                or self.puffs or self.building or self.say or self._hopeful or self.celebrate):
+        if (self._level > TALK or self._mouth > 0.01 or self._bounce > 0.1
+                or any(not n.calm for n in self.notes) or self.puffs or self.building
+                or self.say or self._hopeful or self.celebrate):
             return True
         target = 0.0 if self._joy_at >= 0 and now - self._joy_at < 1.4 else self.sad
         if abs(target - self._sad) > 0.01:   # cheering up or settling back

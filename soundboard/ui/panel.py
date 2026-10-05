@@ -318,7 +318,9 @@ class VolumeControl(QWidget):
 
     def _paint(self, pct):
         col = ("" if pct <= 100 else f"color:{theme.status('warn' if pct <= 300 else 'error')};")
-        self.spin.setStyleSheet(f"{col} font-weight:600;")   # normal: the theme's text colour
+        sheet = f"{col} font-weight:600;"   # normal: the theme's text colour
+        if sheet != self.spin.styleSheet():   # each set re-polishes it: only on a change
+            self.spin.setStyleSheet(sheet)
 
     def _from_slider(self, pct):
         self.spin.blockSignals(True)

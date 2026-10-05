@@ -38,6 +38,7 @@ log = logging.getLogger(__name__)
 
 CONNECT_TIMEOUT_S = 30.0
 SEND_TIMEOUT_S = 5.0        # a module that stops reading can't wedge a send forever
+QUIT_WAIT_S = 0.5           # stop(): how long "quit" waits for a busy sender
 QUEUE_BLOCKS = 400          # ~4 s of 10 ms mic blocks
 HELLO_TIMEOUT_S = 5.0       # a connection has this long to say hello
 HELLO_MAX = 4096            # bytes: the first frame, before we know who's calling
@@ -96,24 +97,35 @@ class ServiceHost:
                          daemon=True).start()
 
     def stop(self):
-        """Never blocks for long (the UI calls it): a module that won't quit is
-        killed from a background thread."""
+        """Never blocks (the UI calls it): "quit" is sent, the link closed and a
+        module that won't quit killed, all from a background thread."""
         self._stop.set()
-        self.send_json({"type": "quit"}, wait=0.25)
         s, self._sock = self._sock, None
+        p, self._proc = self._proc, None
+        self.connected = False
+        self._drain()
+        if s is not None or p is not None:
+            threading.Thread(target=self._reap, args=(p, s), name=f"{self.name}-reap",
+                             daemon=True).start()
+
+    def _reap(self, p: subprocess.Popen | None, s: socket.socket | None = None):
         if s is not None:
+            # after the frame the sender may be in the middle of (it holds the lock;
+            # it stops at the next one), so "quit" arrives whole. A sender stuck in a
+            # send: no quit, the link is just closed (and the module killed below)
+            if self._send_lock.acquire(timeout=QUIT_WAIT_S):
+                try:
+                    protocol.send_json(s, {"type": "quit"})
+                except OSError:
+                    pass
+                finally:
+                    self._send_lock.release()
             try:
                 s.close()
             except OSError:
                 pass
-        p, self._proc = self._proc, None
-        self.connected = False
-        if p is not None:
-            threading.Thread(target=self._reap, args=(p,), name=f"{self.name}-reap",
-                             daemon=True).start()
-        self._drain()
-
-    def _reap(self, p: subprocess.Popen):
+        if p is None:
+            return
         try:
             p.wait(timeout=2)
         except subprocess.TimeoutExpired:
@@ -150,7 +162,8 @@ class ServiceHost:
 
     # ------------------------------------------------------------ threads
     def send_json(self, obj: dict, wait: float = -1):
-        """Send a message; with `wait` (seconds) give up if the sender is stuck."""
+        """Send a message now; with `wait` (seconds) give up if the sender is stuck.
+        Not from the UI thread: it waits on the sender's lock (feed_json instead)."""
         s = self._sock
         if s is None or not self._send_lock.acquire(timeout=wait):
             return
@@ -243,6 +256,8 @@ class ServiceHost:
                 except queue.Empty:
                     break
             for x, rate in blocks:
+                if self._stop.is_set():     # stop(): its "quit" goes next, nothing after
+                    return
                 if rate < 0:            # feed_json
                     try:
                         with self._send_lock:

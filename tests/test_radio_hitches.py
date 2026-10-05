@@ -1,11 +1,13 @@
 """The Radio tab mustn't hold up the audio threads: Qt keeps Python's lock through
 each call into it, so one long call (drawing the whole map, loading the decoder) is
 a sound skipping on the cable."""
+import os
 import threading
 import time
 from pathlib import Path
 
 import numpy as np
+import pytest
 
 from soundboard import radio
 from soundboard.ui import flatmap
@@ -15,6 +17,13 @@ from soundboard.ui.flatmap import LAND_PART, FlatMap
 def outlines():
     raw = (radio.ASSET_DIR / radio.COUNTRIES).read_bytes()
     return radio.outline_rings(raw), radio.outline_labels(raw)
+
+
+# Hosted CI runners (2 shared cores, other test workers beside it) stall a thread
+# 10-15 ms on their own, as much as the hitch these measure: the timing tests there
+# fail on unchanged code. They run on a real PC, where a hitch is the only stall.
+real_pc_timing = pytest.mark.skipif(bool(os.environ.get("CI")),
+                                    reason="wall-clock audio timing: too noisy on CI")
 
 
 def quietest(measure, limit, tries=5):
@@ -58,6 +67,7 @@ def test_the_map_looks_the_same_drawn_in_parts(qapp, monkeypatch):
     assert np.mean(np.abs(a.astype(int) - b) > 8) < 0.002   # a few edge pixels at most
 
 
+@real_pc_timing
 def test_drawing_the_world_lets_the_audio_threads_run(qapp):
     """Qt keeps Python's lock while it draws a path: the whole world as one path held
     every other thread for 10-30 ms each time the map was drawn at a new zoom, and the
@@ -142,6 +152,7 @@ def audio_late_while(work):
     return max(took)
 
 
+@real_pc_timing
 def test_a_new_zoom_is_drawn_in_slices_beside_the_audio(qapp):
     """Every call under 1 ms still made the cable 10-20 ms late as a station started
     (the map flies to it): the audio thread waits out one draw call per numpy step,

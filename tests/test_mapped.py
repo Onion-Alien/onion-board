@@ -107,9 +107,13 @@ def test_remove_undo_and_bin_with_mapped_sounds(window, qapp, map_all):  # noqa:
     assert process_events(qapp, lambda: "s1" in window.audio)
     window.remove_sound("s1")
     window._finish_removals()                    # into the bin: the cache goes
-    gc.collect()
-    prune_cache(library.cache_keep(window._live_metas()))
-    assert not cache_path("s1").exists()
+    keep = library.cache_keep(window._live_metas())
+
+    def pruned():   # once the fading voice and undo's prepare thread let go of it
+        gc.collect()
+        prune_cache(keep)
+        return not cache_path("s1").exists()
+    assert process_events(qapp, pruned)
     assert [i.name for i in trash.items(trash.SOUND)]
 
 

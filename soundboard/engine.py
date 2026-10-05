@@ -764,6 +764,10 @@ class Engine:
         # sid -> (source array, src rate, destination.cut_shares): worked out once per
         # sound (at load, by prepare), not on every press
         self._shares: dict[str, tuple[np.ndarray, int, dict]] = {}
+        # sid -> times forget() was called: a prepare still running when its sound is
+        # removed mustn't put the audio back afterwards (it'd hold a mapped cache file
+        # open, so the file couldn't be deleted until the app closed)
+        self._forgets: dict[str, int] = {}
 
         self.latency = "low"      # sounddevice latency: 'low' or 'high' (safer)
         keys = ("main", "mon", "mic", "obs")
@@ -1192,6 +1196,7 @@ class Engine:
         # allocated at a freed one's address (e.g. successive test recordings)
         if hit and hit[0] is data:
             return hit[1]
+        gen = self._forgets.get(key[0], 0)
         if data.dtype == np.int16:   # library audio: resample in float, keep the copy compact
             f = data.astype(np.float32)   # in place from here: a song's float copy is
             f *= I16_SCALE                # ~70 MB, and each temporary would be another
@@ -1209,6 +1214,8 @@ class Engine:
         else:
             out = resample(data, src_rate, rate)
         with self._cache_lock:
+            if self._forgets.get(key[0], 0) != gen:
+                return out   # forgotten meanwhile: use it, don't keep it
             old = self._cache.pop(key, None)
             if old is not None:
                 self._cache_bytes -= old[1].nbytes
@@ -1252,8 +1259,11 @@ class Engine:
         hit = self._shares.get(key)
         if hit is not None and hit[0] is data and hit[1] == src_rate:
             return hit[2]
+        gen = self._forgets.get(key, 0)
         shares = destination.cut_shares(data, src_rate)
-        self._shares[key] = (data, src_rate, shares)
+        with self._cache_lock:
+            if self._forgets.get(key, 0) == gen:   # not forgotten meanwhile
+                self._shares[key] = (data, src_rate, shares)
         return shares
 
     def prepare(self, sid: str, data: np.ndarray):
@@ -1272,8 +1282,9 @@ class Engine:
             self.data_for(sid, data, rate)
 
     def forget(self, sid: str):
-        self._shares.pop(sid, None)
         with self._cache_lock:
+            self._forgets[sid] = self._forgets.get(sid, 0) + 1
+            self._shares.pop(sid, None)
             for k in [k for k in self._cache if k[0] == sid]:
                 self._cache_bytes -= self._cache.pop(k)[1].nbytes
 
