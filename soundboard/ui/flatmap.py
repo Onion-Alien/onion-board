@@ -36,6 +36,7 @@ WORLD_MAX_PX = 10_000_000           # biggest whole-world picture kept (device p
 # late (a skip) even with every call under 1 ms. A slice, then a break for them.
 SLICE_S = 0.0015
 SLICE_GAP_MS = 4
+FORGET_MS = 60_000   # hidden this long: let the drawn world go (back sooner: no redraw)
 SETTLE_MS = 160                     # zooming: the old picture, stretched, until this idle
 TOWN_ZOOM = 2.0                     # city and town names show from this zoom in...
 TOWNS_IN_VIEW = 40                  # ...at most this many at once, only those in view
@@ -120,6 +121,10 @@ class FlatMap(QWidget):
         self._slice.setTimerType(Qt.PreciseTimer)
         self._slice.setInterval(SLICE_GAP_MS)
         self._slice.timeout.connect(self._draw_slice)
+        self._forget = QTimer(self)       # hidden a while: let the drawn world go
+        self._forget.setSingleShot(True)
+        self._forget.setInterval(FORGET_MS)
+        self._forget.timeout.connect(self._forget_world)
 
         box = QVBoxLayout(self)
         box.setContentsMargins(0, 0, 10, 10)
@@ -269,11 +274,22 @@ class FlatMap(QWidget):
         self.update()
 
     def hideEvent(self, e):
-        """Off screen (another tab, the Radio tab's globe instead): let the drawn world
-        go (~40 MB at a big zoom). It's drawn again the next time it shows."""
+        """Off screen (another tab, the Radio tab's globe instead): after FORGET_MS let
+        the drawn world go (~40 MB at a big zoom). Not at once: flicking between tabs
+        would draw the whole world again on every return, a freeze each time."""
+        self._forget.start()
+        super().hideEvent(e)
+
+    def showEvent(self, e):
+        self._forget.stop()
+        super().showEvent(e)
+
+    def _forget_world(self):
+        if self.isVisible():
+            return
+        self._stop_build()
         self._world = self._view = None
         self._town_pm.clear()
-        super().hideEvent(e)
 
     # ------------------------------------------------------------------ painting
     def _grow(self) -> float:
@@ -445,17 +461,13 @@ class FlatMap(QWidget):
             return old[1]
         if old is not None and self._settle.isActive() and old[0][1:] == key[1:]:
             return old[1]
-        if old is None:   # nothing to show meanwhile (the first time): all of it now
-            pm, steps = self._world_steps(key)
-            for _ in steps:
-                pass
-            self._world = (key, pm)
-            return pm
         if self._build is None or self._build[0] != key:
             self._stop_build()
             self._build = (key, *self._world_steps(key))
             self._slice.start()
-        return old[1]
+        # the last one meanwhile; the first time, just the sea and the dots: the land
+        # comes in a moment later, but nothing ever waits for all of it at once
+        return old[1] if old is not None else None
 
     def _world_steps(self, key) -> tuple[QPixmap, object]:
         """A blank picture for the world at `key`, and the steps that draw it."""
@@ -525,6 +537,8 @@ class FlatMap(QWidget):
                     p.drawPixmap(target, world, QRectF(world.rect()))
                 else:
                     p.drawPixmap(target.topLeft(), world)
+        elif self._build is not None:
+            pass   # the first world picture is still being drawn a slice at a time
         else:   # zoomed far in: draw the part in view (kept while nothing moves)
             key = (self.cx, self.cy, self.size(), dpr, round(self._scale(), 6), self._ver)
             if self._view is None or self._view[0] != key:

@@ -29,6 +29,20 @@ def quietest(measure, limit, tries=5):
     return best
 
 
+def drawn_now(m):
+    """Paint m with its world picture drawn all at once (a shown map draws it a slice
+    at a time), and return the picture."""
+    m.grab()
+    b = m._build
+    if b is not None:
+        for _ in b[2]:
+            pass
+        m._build = None
+        m._slice.stop()
+        m._world = (b[0], b[1])
+    return m.grab()
+
+
 def world_map(rings, labels, zoom=2.0):
     m = FlatMap()
     m.resize(1200, 700)
@@ -49,9 +63,9 @@ def test_the_land_is_drawn_in_small_parts(qapp):
 
 def test_the_map_looks_the_same_drawn_in_parts(qapp, monkeypatch):
     rings, labels = outlines()
-    parts = world_map(rings, labels).grab().toImage()
+    parts = drawn_now(world_map(rings, labels)).toImage()
     monkeypatch.setattr(flatmap, "LAND_PART", 10**9)   # the whole world as one path
-    whole = world_map(rings, labels).grab().toImage()
+    whole = drawn_now(world_map(rings, labels)).toImage()
     a = np.frombuffer(parts.constBits(), np.uint8)
     b = np.frombuffer(whole.constBits(), np.uint8)
     assert a.shape == b.shape
@@ -83,7 +97,7 @@ def test_drawing_the_world_lets_the_audio_threads_run(qapp):
         th.start()
         try:
             time.sleep(0.05)
-            m.grab()                     # draws the whole world at this zoom
+            drawn_now(m)                 # draws the whole world at this zoom
         finally:
             stop.set()
             th.join()
@@ -150,7 +164,7 @@ def test_a_new_zoom_is_drawn_in_slices_beside_the_audio(qapp):
     rings, labels = outlines()
     m = world_map(rings, labels, zoom=1.0)
     m.show()
-    m.grab()                                   # the first picture: all of it at once
+    drawn_now(m)
     first = m._world[1]
     m.zoom = 2.5
     shown = m._world_pixmap(m.devicePixelRatioF())
@@ -169,8 +183,10 @@ def test_a_new_zoom_is_drawn_in_slices_beside_the_audio(qapp):
     assert m._build is None and m._world[1] is not first
     assert worst < 0.006, f"the cable was {worst * 1000:.0f} ms late"
     sliced = m._world[1].toImage()
-    m._world = None
-    whole = m._world_pixmap(m.devicePixelRatioF()).toImage()   # all at once
+    pm, steps = m._world_steps(m._world[0])
+    for _ in steps:   # all at once
+        pass
+    whole = pm.toImage()
     a = np.frombuffer(sliced.constBits(), np.uint8)
     b = np.frombuffer(whole.constBits(), np.uint8)
     assert a.shape == b.shape and np.array_equal(a, b)

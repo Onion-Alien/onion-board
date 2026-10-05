@@ -1203,17 +1203,41 @@ def test_phone_remote_lists_searches_and_drives_the_radio(qapp, tab, server, mon
                                  "radio", {}) == (409, remote.RADIO_OFF)
 
 
-def test_the_flat_map_lets_its_picture_go_while_hidden(qapp):
+def _drawn(qapp, m):
+    """Paint, then let the world picture finish its slices."""
+    m.grab()
+    end = time.monotonic() + 5
+    while m._build is not None and time.monotonic() < end:
+        qapp.processEvents()
+        time.sleep(0.001)
+    m.grab()
+
+
+def test_the_flat_map_keeps_its_picture_while_tabs_flick_and_lets_it_go_later(qapp):
+    """1.8.0 let the world picture go the moment the map hid and drew all of it again
+    on the UI thread as it came back: flicking Sounds <-> Radio froze the app every
+    time. Now it's kept for FORGET_MS, and a redraw is a slice at a time."""
     from soundboard.ui.flatmap import FlatMap
     m = FlatMap()
     m.resize(400, 300)
     m.set_points([{"id": "a", "la": 50.0, "lo": 10.0, "k": 1}])
     m.show()
     m.grab()
-    assert m._world is not None
+    assert m._world is None and m._build is not None   # never all at once, even the first
+    _drawn(qapp, m)
+    world = m._world
+    assert world is not None
+    for _ in range(5):                                 # flicking tabs: nothing redrawn
+        m.hide()
+        qapp.processEvents()
+        m.show()
+        m.grab()
+        assert m._world is world and m._build is None
     m.hide()
-    assert m._world is None and m._view is None    # tens of MB, while nobody sees it
+    assert m._world is world and m._forget.isActive()
+    m._forget.timeout.emit()                           # hidden a while
+    assert m._world is None and m._view is None        # tens of MB, while nobody sees it
     m.show()
-    m.grab()
-    assert m._world is not None                    # drawn again when it shows
+    _drawn(qapp, m)
+    assert m._world is not None                        # drawn again when it shows
     m.close()
