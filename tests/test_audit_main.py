@@ -3,7 +3,6 @@ switch, start with Windows vs Task Manager, the status line's text, hotkeys and
 categories, the effects preview, the crash dialog's state, loose empty files, the
 link bar's queue and the Discord check's clean-up. Offscreen, fake devices."""
 import numpy as np
-import pytest
 import shiboken6
 from PySide6.QtCore import QEvent, QSize, Qt
 from PySide6.QtWidgets import QDialog, QVBoxLayout, QWidget

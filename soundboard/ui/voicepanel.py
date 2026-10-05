@@ -2204,7 +2204,11 @@ class VoicePanel(QWidget):
 
     def _apply_scan(self, found, voices):
         self._scanning = False
-        self.rescan_modules(found, voices)
+        try:
+            self.rescan_modules(found, voices)
+        except Exception:
+            self.addons.shown.emit()   # never leave Refresh stuck on "Checking…"
+            raise
 
     def shutdown(self):
         self._meter_timer.stop()

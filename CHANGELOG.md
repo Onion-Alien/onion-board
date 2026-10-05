@@ -2,6 +2,23 @@
 
 ## Unreleased
 
+- **Smoother everywhere, less CPU.** Nothing should feel laggy now:
+  - Sounds: clearing the search or going back to "All" on a big board no longer
+    stalls; typing in search, dragging Pad size and scrolling a board of pad
+    pictures stay smooth.
+  - Radio: typing in the station search no longer stutters (the list updates when
+    you pause typing); genre, country and quality filters, play, stop and starring
+    a station are faster.
+  - Setup → Discord check and the Apps tab (switching a program off, Stop all,
+    removing a program) no longer freeze the window, for up to several seconds.
+  - Speed & pitch and volume sliders drag smoothly; changing the AI voice, its pitch
+    or "Match the voice", or stopping it, no longer freezes the window for a moment;
+    Voice tab sliders, presets and Refresh do less work.
+  - The window appears sooner at startup (Onion Watch loads just after it).
+  - Less CPU while idle, in the in-game overlay (none for paused sounds), on the
+    Apps tab while hidden or behind a game, and in the setup guide. Bun in
+    headphones rests between notes.
+
 ## 1.8.0 — 2026-10-05
 
 - **AI voices (optional add-on):** talk, and others hear a different person: your

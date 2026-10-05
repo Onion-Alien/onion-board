@@ -839,6 +839,21 @@ def test_add_ons_refresh_scans_the_disk_off_the_ui_thread(panel, qapp, monkeypat
     assert [m.id for m in p.modules] == [m.id for m in real()]
 
 
+def test_add_ons_refresh_lets_go_of_the_button_when_the_scan_fails(panel, monkeypatch):
+    from soundboard.ui import busy
+    p, _ = panel
+
+    def boom(*a):
+        raise OSError("disk gone")
+    monkeypatch.setattr(p, "rescan_modules", boom)
+    b = p.addons.b_refresh
+    busy.hold_until(b, "Checking…", p.addons.shown)   # what Refresh does, minus the worker
+    assert busy.is_busy(b)
+    with pytest.raises(OSError):
+        p._apply_scan(None, None)
+    assert not busy.is_busy(b)
+
+
 def test_resizing_within_one_shape_does_no_layout_passes(panel, monkeypatch):
     p, _ = panel
     fx = p.fx
