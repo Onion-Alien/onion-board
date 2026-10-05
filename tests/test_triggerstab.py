@@ -125,6 +125,49 @@ def test_without_the_add_on_it_shows_hoot_and_keeps_the_triggers(qapp, tmp_path)
     assert TriggersTab(FakeHost(), [tmp_path / "m"]).kept.isHidden()
 
 
+def test_a_deferred_tab_loads_the_add_on_only_when_asked(qapp, tmp_path, pkg, monkeypatch):
+    """The window builds the tab with defer=True and loads Onion Watch once it's up:
+    loading it took up to a second before the window could show."""
+    make_module(tmp_path / "modules" / "onion-watch", package=pkg, board=PANEL)
+    host = FakeHost(two_triggers())
+    loads = []
+    real = watchaddon.installed
+    monkeypatch.setattr(watchaddon, "installed", lambda d: loads.append(1) or real(d))
+    tab = TriggersTab(host, [tmp_path / "modules"], defer=True)
+    assert not loads and tab.pending and tab.panel is None
+    assert tab.stack.currentWidget() is tab.wait_page   # blank, not "Get Onion Watch"
+    assert not tab.needs_nudge()                         # not known yet
+    tab.load()
+    assert loads == [1] and not tab.pending
+    assert tab.stack.currentWidget() is tab.board_page and tab.panel is not None
+    tab.shutdown()
+
+
+def test_the_window_loads_onion_watch_after_it_is_built(qapp, app_dir, monkeypatch):
+    from PySide6.QtCore import QEvent
+    from soundboard import engine, winkeys
+    from soundboard.library import Config
+    from soundboard.ui import mainwindow as main
+    for name in ("set_main_device", "set_mon_device", "set_mic_device"):
+        monkeypatch.setattr(engine.Engine, name, lambda self, n: None)
+    monkeypatch.setattr(winkeys.Hotkeys, "register", lambda self, m: None)
+    loads = []
+    monkeypatch.setattr(TriggersTab, "load", lambda self, *a: loads.append(self) or
+                        setattr(self, "pending", False))
+    Config().save()
+    w = main.MainWindow()
+    try:
+        assert not loads and w.triggers.pending          # not while the window is built
+        assert process_events(qapp, lambda: bool(loads), timeout=5)
+        w.load_triggers()
+        assert loads == [w.triggers]                     # once
+    finally:
+        w._load_thread.join(15)
+        w.close()
+        w.deleteLater()
+        qapp.sendPostedEvents(None, QEvent.DeferredDelete)
+
+
 def test_triggers_past_the_50th_are_counted_too(qapp, tmp_path):
     # Onion Watch 0.6+ keeps those under "more_triggers"
     screen = two_triggers()
