@@ -804,6 +804,7 @@ def test_moving_the_window_keeps_the_globe_drawing(qapp, tab, monkeypatch):
 
 def test_tab_search_shows_local_matches_then_the_directory(qapp, tab, server):
     tab.search.setText("japan")                     # known locally (country)
+    tab.flush_typing()
     assert tab.list.count() == 5
     tab.search.setText("rock")
     tab._search_now()
@@ -915,6 +916,35 @@ def test_tab_search_failure_says_so_and_can_be_retried(qapp, tab):
     assert tab._results is None and "Searching" in tab.list.item(0).text()
 
 
+def test_tab_search_lists_after_a_typing_pause_without_refolding(qapp, tab, monkeypatch):
+    """Typing doesn't rebuild the list on every key, and each station's search text is
+    folded once, not once per keystroke (3000 stations: ~20 ms a pass)."""
+    folds = []
+    real = radio.fold
+    for s in tab._globe_list:
+        s.matches(["warm the cache"])
+    monkeypatch.setattr(radio, "fold", lambda text: folds.append(text) or real(text))
+    monkeypatch.setattr(tab.dir, "search", lambda text: None)   # no directory answers
+    tab.search.setText("sta")
+    tab.search.setText("station 3")
+    assert tab.list.count() == 5 and folds == []     # nothing yet: still typing
+    assert process_events(qapp, lambda: tab.list.count() == 1)   # the pause: listed
+    assert folds == ["station 3"]                    # the words, not every station
+    tab.search.setText("station 4")
+    tab._search_now()                                # Enter: at once, no pause
+    assert tab.list.count() == 1 and "Station 4" in tab.list.item(0).text()
+    tab.search.setText("")                           # clearing is at once too
+    assert tab.list.count() == 5
+
+
+def test_station_search_and_map_data_follow_changed_fields():
+    s = Station.from_api(api_station(1, name="Zürich FM"))
+    assert s.matches(["zurich"]) and radio.globe_points([s])[0]["n"] == "Zürich FM"
+    s.name, s.tags = "Bern FM", ["rock"]
+    assert s.matches(["bern"]) and not s.matches(["zurich"])
+    assert s.genre_hay == "rock" and radio.globe_points([s])[0]["n"] == "Bern FM"
+
+
 def test_tab_takes_results_for_a_query_cut_to_the_search_limit(tab):
     long = "rock " * 30
     tab.search.setText(long)
@@ -958,6 +988,49 @@ def test_tab_filters_by_genre_country_and_quality(tab):
     assert tab.list.count() == 1 and "No stations match" in tab.list.item(0).text()
     tab.clear_filters()
     assert tab.list.count() == 5 and not tab.btn_clear.isVisibleTo(tab)
+
+
+def test_tab_map_keeps_towns_per_filter_until_new_stations(tab, monkeypatch):
+    calls = []
+    real = radio.town_labels
+    monkeypatch.setattr(radio, "town_labels", lambda pts: calls.append(1) or real(pts))
+    tab._globe_list[0].tags = ["rock"]
+    tab.set_genre("Rock")
+    tab.set_genre("")                                 # shown before: not worked out again
+    tab.set_genre("Rock")
+    assert len(calls) == 1
+    tab._on_globe_stations(list(tab._globe_list))     # a new list: new points and towns
+    assert len(calls) == 2
+
+
+def test_tab_play_stop_and_star_relabel_rows_without_rebuilding(tab, monkeypatch):
+    from PySide6.QtCore import Qt
+    tab.player.play = lambda s: setattr(tab.player, "station", s)
+    tab.player.stop = lambda: setattr(tab.player, "station", None)
+    tab.list.item(0).setData(Qt.UserRole + 1, "same row")
+    kept = lambda: tab.list.item(0).data(Qt.UserRole + 1) == "same row"   # noqa: E731
+    tab.play(tab._stations["uuid-0"])
+    row = tab.list.item(0)
+    assert kept() and row.text().startswith("▶ Station 0") and row.font().bold()
+    tab._toggle_fav("uuid-0")
+    assert kept() and tab.list.item(0).text().startswith("▶ ★ Station 0")
+    tab.stop()
+    row = tab.list.item(0)
+    assert kept() and row.text().startswith("★ Station 0") and not row.font().bold()
+    tab.btn_favs.click()                              # Favorites: starring changes the rows
+    tab._toggle_fav("uuid-0")
+    assert "No favorites" in tab.list.item(0).text()
+
+
+def test_station_rows_paint_without_making_fonts_each_time(tab, monkeypatch):
+    from soundboard.ui import radiopanel
+    tab.list.resize(400, 300)
+    tab.list.grab()
+    made = []
+    real = radiopanel.QFont
+    monkeypatch.setattr(radiopanel, "QFont", lambda *a: made.append(1) or real(*a))
+    assert not tab.list.grab().isNull()
+    assert made == []
 
 
 def test_tab_remembers_recently_played_stations(tab):
