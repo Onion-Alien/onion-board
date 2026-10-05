@@ -1,3 +1,5 @@
+<p align="right"><img src="https://visitor-badge.laobi.icu/badge?page_id=Onion-Alien.onion-board" alt="visitors"></p>
+
 # Onion Board
 
 A free soundboard for Windows. Press a pad or a hotkey, even in-game, and **your
