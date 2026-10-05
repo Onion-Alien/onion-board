@@ -101,6 +101,7 @@ class Fitter:
         # applied step index -> the (width, height) it was applied at, and whether it
         # went for the other axis' sake (the diagonal pass in fit)
         self._at: dict[int, tuple[int, int, bool]] = {}
+        self._layouts: list[QLayout] | None = None   # the root's, while fit() runs
 
     def add(self, priority: int, axis: str, apply: Callable[[bool], None]):
         self.reset()
@@ -130,7 +131,8 @@ class Fitter:
         left a nested layout's cached size behind, so growing 640 -> 900 px wide with
         search results brought back more than fits and the main window fell into the
         mini player. ~250 layouts: well under a millisecond."""
-        for lay in self.root.findChildren(QLayout):
+        lays = self._layouts
+        for lay in self.root.findChildren(QLayout) if lays is None else lays:
             lay.invalidate()
         return self.root.minimumSizeHint()
 
@@ -143,6 +145,10 @@ class Fitter:
         """Apply as few steps as it takes for the content to fit `size`."""
         dim = {"w": size.width(), "h": size.height()}
         self.root.setUpdatesEnabled(False)
+        # found once for the whole fit, not on each need(): with a few hundred pads the
+        # search through every widget took longer than the measuring (a step only
+        # shows, hides or retitles things, so the layouts stay the same meanwhile)
+        self._layouts = self.root.findChildren(QLayout)
         try:
             for axis in ("h", "w"):   # hiding the mixer (height) narrows the window too
                 for i, (_, ax, apply) in enumerate(self.steps):
@@ -176,6 +182,7 @@ class Fitter:
                         break
                     del self._at[i]
         finally:
+            self._layouts = None
             self.root.setUpdatesEnabled(True)
 
     def compact_count(self) -> int:
