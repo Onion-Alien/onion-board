@@ -421,6 +421,7 @@ public:
     // IAudioProcessingObject
     HRESULT STDMETHODCALLTYPE Reset() override {
         m_synced = false;
+        m_played = false;
         return m_child ? m_child->Reset() : S_OK;
     }
     HRESULT STDMETHODCALLTYPE GetLatency(HNSTIME *pTime) override {
@@ -504,6 +505,7 @@ public:
         m_channels = f ? f->nChannels : 0;
         m_rate = f ? f->nSamplesPerSec : 0;
         m_synced = false;
+        m_played = false;
         m_locked = true;
         m_w = 0.0f;
         m_mg = 1.0f;
@@ -846,6 +848,13 @@ private:
         // the board only just started (or came back): wait until it's a lead ahead
         if (board && !m_synced && (double)wp < m_lead + frames * step + 2.0) board = false;
         bool fresh = false;
+        // Back after the board was late (or quit without a word): never step back onto
+        // audio already sent. That replayed the last lead's worth over and over (a
+        // stutter) until the board counted as gone. Wait instead until it has a lead of
+        // new audio past where this left off; the mic carries on meanwhile.
+        if (board && !m_synced && m_played && (double)wp - m_lead < m_pos
+                && m_pos <= (double)wp)
+            board = false;
         if (board && (!m_synced || m_pos > (double)wp ||
                       (double)wp - m_pos > m_lead + 0.1 * m_boardRate ||
                       (double)wp - m_pos > cap * 0.5)) {
@@ -910,7 +919,10 @@ private:
                 }
                 any = any || s != 0.0f || keep != 1.0f;
             }
-            if (have) m_pos = pos;
+            if (have) {
+                m_pos = pos;
+                m_played = true;
+            }
             // On time for a while after a hiccup: read closer to the board again (less
             // delay), skipping a stretch only where it's quiet on both sides of the jump
             if (have && !late && m_okBlocks > SHRINK_AFTER && m_lead > m_leadBase + 0.5) {
@@ -919,7 +931,9 @@ private:
                 uint32_t look = (uint32_t)d + 2 * (uint32_t)m_half + 2;
                 float quiet = QUIET / (g > 1.0f ? g : 1.0f);
                 if (fabsf(sLast) < QUIET && peakOf(m_pos - m_half - 1, look) < quiet
-                        && (double)wp - (m_pos + d) >= need + frames * step) {
+                        // (enough for the next block once the board has written it,
+                        // as it does right after each mic block: the normal lead)
+                        && (double)wp - (m_pos + d) >= need) {
                     m_pos += d;
                     m_lead -= d;
                     m_okBlocks = SHRINK_AFTER - 10;   // the next one can follow soon
@@ -962,6 +976,7 @@ private:
     bool m_float = false;
     bool m_locked = false;
     bool m_synced = false;
+    bool m_played = false;     // m_pos is where the board's audio was last read up to
     double m_pos = 0;
     double m_lead = 0;
     double m_leadBase = 0;

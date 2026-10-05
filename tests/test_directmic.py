@@ -658,6 +658,60 @@ def test_replace_mode_falls_back_to_the_mic_when_the_board_stops(ring_file):
     assert rms.min() > 0.1, np.round(rms[rms.argmin() - 4:rms.argmin() + 4], 3)   # no gap
 
 
+def ramp(seconds):
+    """A board whose send mix is a ramp from 0.1 to 0.45 over `seconds`: every ring
+    frame has its own value, so a replayed stretch shows."""
+    pos = [0]
+    total = seconds * dm.RATE
+
+    def cb(out, frames, t, status):
+        n = np.arange(pos[0], pos[0] + frames)
+        out[:] = (0.1 + 0.35 * np.minimum(n, total) / total).astype(np.float32)[:, None]
+        pos[0] += frames
+    return cb, pos
+
+
+def _dips(y):
+    """Stretches where the board's ramp is (nearly) gone from y: the mic took over."""
+    low = np.abs(y) < 0.01
+    return int(np.sum(low[1:] & ~low[:-1]) + low[0])
+
+
+@needs_host
+@pytest.mark.parametrize("how", ["killed", "frozen"])
+@realtime
+def test_a_dead_or_frozen_board_never_repeats_itself(ring_file, how):
+    """The board killed (no word to the effect: its last writes just stop) or frozen for
+    150 ms: the mic (silent here) fades back in once, and nothing the board already sent
+    is played again. That used to stutter the last 25 ms over and over for 0.2 s."""
+    cb, pos = ramp(3)
+
+    def board(out, frames, t, status):
+        cb(out, frames, t, status)
+        if how == "frozen" and 0.8 * dm.RATE <= pos[0] < 0.8 * dm.RATE + frames:
+            time.sleep(0.15)
+
+    def during(s):
+        if how == "killed":
+            time.sleep(0.8)
+            s._stop.set()   # the board's thread stops, the ring stays "on": a crash
+
+    (x,), _, _ = _run_host(ring_file, 48000, 1, 2.0, callback=board, mode=dm.MODE_REPLACE,
+                           during=during)
+    y = x[int(0.3 * 48000):, 0]
+    assert _dips(y) == 1, _dips(y)   # once: it went to the mic (and came back, frozen)
+    first = int(np.argmax(np.abs(y) < 0.01))
+    last_sent = float(y[:first].max())
+    later = y[first:]
+    steady = np.abs(np.diff(later)) < 5e-5   # full level, not a fade
+    replayed = (later[1:] > 0.01) & (later[1:] < last_sent - 0.003) & steady
+    assert not replayed.any(), np.where(replayed)[0][:5] / 48
+    if how == "killed":
+        assert np.abs(later).max() < 0.01   # the mic alone from then on
+    else:
+        assert np.abs(x[int(1.7 * 48000):, 0]).min() > 0.1   # the board is back
+
+
 @needs_host
 def test_effect_survives_a_hostile_ring(ring_file):
     """Anyone signed in can write the ring: NaN, huge values and nonsense header
@@ -741,8 +795,9 @@ def test_board_ignores_a_nonsense_mic_rate(ring_file):
 
 
 @needs_host
+@pytest.mark.parametrize("stall", [0.03, 0.08])
 @realtime
-def test_delay_shrinks_back_after_a_hiccup(ring_file):
+def test_delay_shrinks_back_after_a_hiccup(ring_file, stall):
     """The board late once: the effect reads further behind it (more delay) to ride it
     out, then, once the board has kept time for a while, closes the gap again in a quiet
     moment, back to the normal delay."""
@@ -756,7 +811,7 @@ def test_delay_shrinks_back_after_a_hiccup(ring_file):
         phase[0] += frames
         if phase[0] > 0.6 * dm.RATE and not hiccup[0]:
             hiccup[0] = True
-            time.sleep(0.08)   # the board stalls (a GIL hog, a page fault storm)
+            time.sleep(stall)   # the board stalls (a GIL hog, a page fault storm)
 
     leads = {}
 
