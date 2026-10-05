@@ -729,6 +729,38 @@ def buffer_to_array(buf) -> np.ndarray:
     return np.ascontiguousarray(x, np.float32)
 
 
+_preloaded = False
+
+
+def _decoder_files() -> list[Path]:
+    """Qt's FFmpeg libraries and its media plugin, in the order they need each other."""
+    import PySide6
+    base = Path(PySide6.__file__).parent
+    found = [f for pat in ("avutil-*.dll", "swresample-*.dll", "avcodec-*.dll",
+                           "avformat-*.dll", "swscale-*.dll") for f in sorted(base.glob(pat))]
+    return found + sorted((base / "plugins" / "multimedia").glob("ffmpeg*.dll"))
+
+
+def preload_decoder():
+    """Load Qt's FFmpeg libraries on a thread, once. Qt loads them when the first
+    player is made, on the UI thread and holding Python's lock: 10-60 ms (the files
+    are big), long enough to hold up the audio threads, so a sound playing skipped as
+    the first station started. Loaded here, that player is made in ~4 ms."""
+    global _preloaded
+    if _preloaded or sys.platform != "win32":
+        return
+    _preloaded = True
+
+    def load():
+        import ctypes
+        try:
+            for f in _decoder_files():
+                ctypes.WinDLL(str(f))   # (ctypes lets go of the lock while it loads)
+        except OSError as e:   # Qt finds them itself later, as before
+            log.debug("radio: preloading the decoder failed: %s", e)
+    threading.Thread(target=load, daemon=True, name="radio-preload").start()
+
+
 class RadioPlayer(QObject):
     """Plays one stream at a time into `audio` (48 kHz stereo float32 chunks).
     `audio` is emitted on Qt's decoding thread, so a busy window can't hold the sound
@@ -762,6 +794,7 @@ class RadioPlayer(QObject):
         self._first_audio.connect(self._on_first_audio)
         self._conn = 0               # net.generation() when the stream was opened
         net.on_change(self._on_connection)
+        preload_decoder()
 
     def _make(self):
         fmt = QAudioFormat()

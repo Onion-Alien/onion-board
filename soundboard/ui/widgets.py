@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import math
 import time
+from functools import lru_cache
 from pathlib import Path
 
 import numpy as np
@@ -320,14 +321,23 @@ def spectrum(data: np.ndarray, frac: float, n: int) -> np.ndarray:
     if data.dtype == np.int16:
         mono /= 32768.0
     mag = np.abs(np.fft.rfft(mono * _HANN)) * (4.0 / FFT_N)   # full-scale sine ~ 1
-    edges = np.geomspace(50, 14000, n + 1)
-    idx = np.clip(np.searchsorted(_FREQS, edges), 1, len(mag) - 1)
-    out = np.empty(n, np.float32)
-    for i in range(n):
-        a, b = idx[i], max(idx[i + 1], idx[i] + 1)
-        out[i] = np.sqrt(np.mean(mag[a:b] ** 2))
-    db = 20 * np.log10(out + 1e-9) + np.linspace(0, 14, n)   # music falls off up high
+    start, count, tilt = _band_plan(n)
+    # each band's RMS from a running sum of the power: no Python loop over bands
+    power = np.concatenate(([0.0], np.cumsum(mag.astype(np.float64) ** 2)))
+    out = np.sqrt((power[start + count] - power[start]) / count)
+    db = 20 * np.log10(out + 1e-9) + tilt
     return np.clip((db + 62) / 52, 0.0, 1.0).astype(np.float32)
+
+
+@lru_cache(maxsize=16)
+def _band_plan(n: int):
+    """Where spectrum()'s `n` log-spaced bands start in the FFT, how many bins each
+    covers (at least one), and the lift each gets because music falls off up high."""
+    edges = np.geomspace(50, 14000, n + 1)
+    idx = np.clip(np.searchsorted(_FREQS, edges), 1, len(_FREQS) - 1)
+    start = idx[:-1]
+    count = np.maximum(idx[1:], start + 1) - start
+    return start, count, np.linspace(0, 14, n)
 
 
 MINI_PAD_MIN_W = 96   # the mini player's two-a-row pads get no smaller than this
@@ -620,7 +630,7 @@ class Pad(QAbstractButton):
             p.setPen(Qt.NoPen)
             p.setBrush(QColor(T["accent"]))
             p.drawEllipse(c)
-            tick = QPen(QColor("#ffffff"), 2.2)
+            tick = QPen(QColor(T["on_accent"]), 2.2)   # white vanished on yellow accents
             tick.setCapStyle(Qt.RoundCap)
             p.setPen(tick)
             p.drawPolyline([QPointF(c.left() + 5, c.center().y()),
@@ -657,7 +667,7 @@ class Pad(QAbstractButton):
             p.drawText(foot, Qt.AlignLeft | Qt.AlignVCenter,
                        "applying effects…" if self.state == "rendering" else "loading…")
         elif self.state == "error":
-            p.setPen(QColor("#ff6b6b"))
+            p.setPen(QColor("#ff6b6b" if on_pic else T["error_text"]))   # readable on light
             p.drawText(foot, Qt.AlignLeft | Qt.AlignVCenter, "can't load file")
         else:
             flags = ("FX " if self.meta.fx else "") + \

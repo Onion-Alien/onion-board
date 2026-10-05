@@ -18,7 +18,8 @@ he went, and he comes back with a hammer and a plank and hammers away until
 
 The widget is bigger than Bun himself so there's room around him for the notes,
 which also gives him even breathing room in a layout. The timer only runs while
-he's on screen.
+he's on screen, and slows to a few frames a second while only the gentle bob and ear
+sway move (see `busy`).
 """
 from __future__ import annotations
 
@@ -42,6 +43,8 @@ DASH_END, CLOUD_END, BACK_END = 0.45, 1.6, 2.1
 SWING = 0.55     # one hammer blow, seconds
 TALK = 0.05        # mic level that counts as talking (same as the wizard's "Hearing you")
 FPS = 30
+FAST_MS = 1000 // FPS
+IDLE_MS = 100      # at rest only the slow bob and ear sway move: a few frames a second do
 BUBBLE = QColor("#fffaf0")
 BEG = 2.8          # how long a begging line stays up, seconds
 
@@ -114,7 +117,7 @@ class BunnyWidget(QWidget):
         self._act_t = -1.0         # seconds into build(), or -1 when not building
         self._blows = 0            # hammer blows landed so far
         self._timer = QTimer(self)
-        self._timer.setInterval(1000 // FPS)
+        self._timer.setInterval(FAST_MS)
         self._timer.timeout.connect(self._step)
         appstate.pause_in_background(self, self._resume, self._timer.stop)
 
@@ -130,11 +133,19 @@ class BunnyWidget(QWidget):
     def set_level(self, level: float):
         """The live mic level, 0..1. Call it as often as you like (the wizard: 25/s)."""
         self._level = max(float(level), self._level * 0.8)
+        if self._level > TALK:
+            self._wake()
 
     def burst(self, n: int = 6):
         """Throw a handful of notes out at once."""
         for _ in range(n):
             self._spawn(1.3)
+        self._wake()
+
+    def _wake(self):
+        """Something started moving: back to full speed at once if he's idling."""
+        if self._timer.isActive() and self._timer.interval() != FAST_MS:
+            self._timer.start(FAST_MS)
 
     def hope(self, on: bool):
         """Cheer him up (True) or let him go back to his mood at rest (False)."""
@@ -172,6 +183,7 @@ class BunnyWidget(QWidget):
             return
         self._act_t, self._blows = 0.0, 0
         self.celebrate = False
+        self._wake()
 
     def stop_building(self, ok: bool):
         """End the act: celebrate if `ok`, otherwise go back to the usual pose."""
@@ -180,6 +192,7 @@ class BunnyWidget(QWidget):
         self.celebrate = ok or self._home_celebrate
         if ok:
             self.burst(8)
+        self._wake()
 
     def act_phase(self) -> str | None:
         """'dash' (running off), 'cloud' (off screen), 'back', 'hammer', or None."""
@@ -202,7 +215,7 @@ class BunnyWidget(QWidget):
 
     def _resume(self):
         self._last = time.monotonic()
-        self._timer.start()
+        self._timer.start(FAST_MS)
 
     def hideEvent(self, ev):
         self._timer.stop()
@@ -316,6 +329,29 @@ class BunnyWidget(QWidget):
             self._say(self.lines, BEG)
             self._next_beg = now + BEG + self._rng.uniform(3, 6)
         self.update()
+        want = FAST_MS if self.busy(now) else IDLE_MS
+        if self._timer.interval() != want:
+            self._timer.setInterval(want)
+
+    def busy(self, now: float | None = None) -> bool:
+        """Anything moving faster than the slow bob: talking, notes, dust, the build
+        act, a hop, a line in his bubble, sparkles, or a blink / ear flick / sigh going
+        on or due before the next idle frame."""
+        now = time.monotonic() if now is None else now
+        if (self._level > TALK or self._mouth > 0.01 or self._bounce > 0.1 or self.notes
+                or self.puffs or self.building or self.say or self._hopeful or self.celebrate):
+            return True
+        target = 0.0 if self._joy_at >= 0 and now - self._joy_at < 1.4 else self.sad
+        if abs(target - self._sad) > 0.01:   # cheering up or settling back
+            return True
+        soon = now + IDLE_MS / 1000
+        if self._next_blink <= soon or self._next_flick <= soon:
+            return True
+        if self._sad > 0.3 and self._next_sigh <= soon:
+            return True
+        return any(at >= 0 and now - at < span for at, span in (
+            (self._blink_at, 0.16), (self._flick_at, 0.5), (self._sigh_at, 1.6),
+            (self._beg_at, BEG), (self._joy_at, 1.4)))
 
     def pose(self, now: float | None = None) -> dict:
         """Blink / mouth / ears / vertical offset for the current moment."""

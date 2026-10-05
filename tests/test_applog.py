@@ -229,3 +229,54 @@ def test_two_reports_in_the_same_second_keep_both_files(tmp_path, monkeypatch):
     assert a.path != b.path
     assert a.path.read_text(encoding="utf-8") == a.text
     assert b.path.read_text(encoding="utf-8") == b.text
+
+
+def test_same_bug_again_skips_the_file_and_logs_one_counted_line(fresh, monkeypatch):
+    """A paint handler or timer can throw every frame: only the first one costs a
+    traceback, a log read and a file; the rest are counted on a rate-limited line."""
+    log_path, shown = fresh
+    folder = log_path.parent / applog.REPORTS_DIR
+    lines = []
+    monkeypatch.setattr(applog.log, "error", lambda fmt, *a: lines.append(fmt % a))
+    monkeypatch.setattr(applog.log, "critical", lambda *a, **k: None)
+    built = []
+    real_build = applog.build_report
+    monkeypatch.setattr(applog, "build_report",
+                        lambda *a, **k: built.append(1) or real_build(*a, **k))
+    now = [1000.0]
+    monkeypatch.setattr(applog.time, "monotonic", lambda: now[0])
+
+    def boom():
+        raise KeyError("x")
+    reps = []
+    for _ in range(50):
+        try:
+            boom()
+        except KeyError:
+            reps.append(applog.report())
+    assert reps[0] is not None and reps[1:] == [None] * 49
+    assert len(built) == 1 and len(list(folder.glob("crash-*.txt"))) == 1
+    assert len(shown) == 1
+    assert len(lines) == 1 and "1 time since" in lines[0]   # the first repeat
+    now[0] += applog.REPEAT_LOG_S
+    try:
+        boom()
+    except KeyError:
+        applog.report()
+    assert len(lines) == 2 and "49 times since" in lines[1]
+
+
+def test_a_fatal_repeat_is_still_reported(fresh):
+    _, shown = fresh
+    applog.report(_raise(ValueError("a")))
+    rep = applog.report(_raise(ValueError("a")), fatal=True)
+    assert rep is not None and rep.path is not None and shown[-1] is rep
+
+
+def test_open_dialog_lists_at_most_max_extra(fresh):
+    first = applog.report(_raise(ValueError("a")))
+    applog._state["open"] = first
+    for i in range(applog.MAX_EXTRA + 10):
+        # same line, new exception type each time: a new bug each time
+        applog.report(_raise(type(f"E{i}", (Exception,), {})(str(i))))
+    assert len(first.extra) == applog.MAX_EXTRA

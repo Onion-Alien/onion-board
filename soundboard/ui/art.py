@@ -15,10 +15,11 @@ from PySide6.QtCore import QPointF, QRectF, Qt
 from PySide6.QtGui import (QColor, QFont, QIcon, QImage, QLinearGradient, QPainter, QPainterPath,
                            QPixmap)
 
+from soundboard.ui import icons
+
 ART_DIR = (Path(sys._MEIPASS) / "art" if hasattr(sys, "_MEIPASS")
            else Path(__file__).resolve().parents[2] / "assets" / "art")
 COMPUTER_VOICE = "voice-computer"
-SIZES = (16, 20, 24, 28, 32, 40, 48, 64)
 ROUND = 0.24      # corner radius, as a fraction of the side
 
 _images: dict[str, QImage | None] = {}
@@ -74,14 +75,8 @@ def icon(key: str) -> QIcon | None:
     """The picture as an icon (every state looks the same), or None."""
     if not exists(key):
         return None
-    if key not in _icons:
-        ic = QIcon()
-        for s in SIZES:
-            pm = pixmap(key, s)
-            for mode in (QIcon.Normal, QIcon.Active, QIcon.Selected):
-                ic.addPixmap(pm, mode, QIcon.Off)
-                ic.addPixmap(pm, mode, QIcon.On)
-        _icons[key] = ic
+    if key not in _icons:   # drawn at the exact size shown (sharp on scaled screens)
+        _icons[key] = icons.sharp_icon(lambda px, _mode, _state: pixmap(key, px))
     return _icons[key]
 
 
@@ -124,12 +119,7 @@ def random_icon() -> QIcon:
     if pic is not None:
         return pic
     if "dice" not in _icons:
-        ic = QIcon()
-        for s in SIZES:
-            pm = _dice(s)
-            for mode in (QIcon.Normal, QIcon.Active, QIcon.Selected):
-                ic.addPixmap(pm, mode, QIcon.Off)
-        _icons["dice"] = ic
+        _icons["dice"] = icons.sharp_icon(lambda px, _mode, _state: _dice(px))
     return _icons["dice"]
 
 
@@ -159,12 +149,7 @@ def _mystery(size: int) -> QPixmap:
 def mystery_icon() -> QIcon:
     """For a voice tile without a picture of its own (yet)."""
     if "mystery" not in _icons:
-        ic = QIcon()
-        for s in SIZES:
-            pm = _mystery(s)
-            for mode in (QIcon.Normal, QIcon.Active, QIcon.Selected):
-                ic.addPixmap(pm, mode, QIcon.Off)
-        _icons["mystery"] = ic
+        _icons["mystery"] = icons.sharp_icon(lambda px, _mode, _state: _mystery(px))
     return _icons["mystery"]
 
 

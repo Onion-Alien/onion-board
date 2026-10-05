@@ -141,7 +141,11 @@ class VoiceChain:
 
     `tap` (optional) receives every raw mono block before the effects run; the live
     voice-to-speech feature uses it to listen. With `replace` set the chain outputs
-    silence, so only the synthetic voice is heard."""
+    silence, so only the synthetic voice is heard.
+
+    `source` (optional, the AI voice: soundboard.speech.aivoice.VoiceSource) has
+    `process(mono, rate) -> mono` and `latency()`: its output replaces your voice,
+    and the effects that are on then run on that."""
 
     def __init__(self):
         self.enabled = False
@@ -150,6 +154,7 @@ class VoiceChain:
         self._rate = 0
         self.tap: Callable[[np.ndarray, int], None] | None = None
         self.replace = False
+        self.source = None
         self.errors: dict[str, str] = {}      # effect type -> message (effect bypassed)
 
     # ------------------------------------------------------------ UI thread
@@ -188,13 +193,20 @@ class VoiceChain:
 
     @property
     def active(self) -> bool:
-        return (self.enabled and bool(self._effects)) or self.tap is not None or self.replace
+        return ((self.enabled and bool(self._effects)) or self.tap is not None or self.replace
+                or self.source is not None)
 
     def latency(self) -> float:
-        """Seconds the effects that are on add to your voice right now."""
-        if not self.enabled:
-            return 0.0
+        """Seconds the effects that are on (and the AI voice) add to your voice right now."""
         total = 0.0
+        src = self.source
+        if src is not None:
+            try:
+                total += max(0.0, float(src.latency()))
+            except Exception:  # noqa: BLE001
+                pass
+        if not self.enabled:
+            return total
         for e in self._effects:
             try:
                 total += max(0.0, float(e.latency()))
@@ -259,9 +271,9 @@ class VoiceChain:
         if rate != self._rate:          # first block, or the mic changed rate
             self._rate = rate
             self._rebuild(rate)
-        tap, replace = self.tap, self.replace
+        tap, replace, src = self.tap, self.replace, self.source
         effects = self._effects if self.enabled else ()
-        if not effects and tap is None and not replace:
+        if not effects and tap is None and not replace and src is None:
             return x
         m = x[:, 0] if x.shape[1] == 1 else (x[:, 0] + x[:, 1]) * np.float32(0.5)
         m = np.ascontiguousarray(m, dtype=np.float32)
@@ -273,6 +285,19 @@ class VoiceChain:
                 log.error("voice tap failed; detached", exc_info=ex)
         if replace:
             return np.zeros_like(x)
+        if src is not None:
+            try:
+                y = src.process(m, rate)
+                if y.shape != m.shape:
+                    raise ValueError(f"returned {y.shape}")
+                m = y.astype(np.float32, copy=False)
+            except Exception as ex:  # noqa: BLE001
+                # never your real voice by accident: silence for this block, and the
+                # source is dropped (the AI voice panel shows it stopped)
+                self.source = None
+                self.errors["ai-voice"] = errors.plain(ex)
+                log.error("AI voice failed; detached", exc_info=ex)
+                return np.zeros_like(x)
         for e in effects:
             try:
                 y = e.run(m, rate)

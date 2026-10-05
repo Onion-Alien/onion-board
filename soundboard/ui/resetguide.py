@@ -209,6 +209,7 @@ class RestorePoints(QDialog):
         self.btn_restore = QPushButton("Restore")
         self.btn_restore.setObjectName("primary")
         self.btn_restore.clicked.connect(self.restore)
+        self.btn_restore.setDefault(True)   # Enter restores (it was Delete, the first button)
         row.addWidget(self.btn_restore)
         lay.addLayout(row)
         self.fill()

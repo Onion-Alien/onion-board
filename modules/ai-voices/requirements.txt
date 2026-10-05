@@ -1,0 +1,4 @@
+# Pinned: `pip install -r` runs automatically when the module is installed,
+# so an unpinned line would pull whatever version is newest that day.
+onnxruntime==1.30.0
+numpy==2.5.3

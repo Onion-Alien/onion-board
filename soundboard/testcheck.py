@@ -129,4 +129,5 @@ def summary_html(r: dict, cable: str | None, mic_sent: bool = True) -> str:
     src = (f"Checked the real {cable} — exactly what Discord / the game receives."
            if cable else "Checked the app's output mix.")
     body = "<br>".join(f"<span style='color:{c}'>{t}</span>" for c, t in lines)
-    return f"{body}<br><span style='color:#8a90a6'>{src}</span>"
+    muted = theme.T["muted"]   # a fixed grey was unreadable on the light themes
+    return f"{body}<br><span style='color:{muted}'>{src}</span>"

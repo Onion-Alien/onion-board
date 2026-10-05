@@ -30,7 +30,7 @@ from soundboard import library, radio, theme
 from soundboard.engine import SR
 from soundboard.library import MAX_SECONDS, trim_silence
 from soundboard.radio import RadioDirectory, RadioPlayer, Station
-from soundboard.ui import busy, icons
+from soundboard.ui import appstate, busy, icons
 from soundboard.ui.panel import Flow as _Flow
 from soundboard.ui.panel import VolumeControl, bar, icon_label, vsep
 
@@ -515,6 +515,7 @@ class RadioTab(QWidget):
         self._search_timer.timeout.connect(self._search_now)
         self.timer = QTimer(self)
         self.timer.timeout.connect(self._tick)   # runs while shown, or while recording
+        appstate.slow_in_background(self, self.timer, 50)   # behind a game: 4 a second
         # the window being dragged keeps the globe drawing (a few wakes a second, not one
         # per move event): a move to another screen loses a sleeping globe's picture
         self._wake_timer = QTimer(self)
@@ -728,7 +729,7 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
     # ------------------------------------------------------------------ first open
     def showEvent(self, e):
         super().showEvent(e)
-        self.timer.start(50)
+        self.timer.start(appstate.interval(50))
         self.start()
         self._wake_globe()   # back from another tab: draw the globe under its names
 
@@ -1389,7 +1390,7 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
     def _on_rec(self, on: bool):
         if on:
             self.recorder.start()
-            self.timer.start(50)   # the length cap is checked on the tick
+            self.timer.start(appstate.interval(50))   # the length cap is checked on the tick
             return
         if not self.isVisible():
             self.timer.stop()

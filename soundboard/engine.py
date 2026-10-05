@@ -715,6 +715,7 @@ class Engine:
         self._gate: dict[str, float] = {}   # output -> the mic's current gate gain
         self.limiter_on = True    # hold the send device's peaks at sendfx.CEILING_DB
         self._send: dict[tuple[str, str], object] = {}   # (out, kind) -> its sendfx stage
+        self._quiet: dict[str, int] = {}   # out -> frames of silence on its sounds bus
         self.sound_speed = 1.0        # live playback speed of every sound (0.25..4)
         self.sound_pitch = 0.0        # live pitch of every sound, semitones
         self.sound_keep_pitch = True  # speed changes leave the pitch alone
@@ -1104,8 +1105,16 @@ class Engine:
         if hit and hit[0] is data:
             return hit[1]
         if data.dtype == np.int16:   # library audio: resample in float, keep the copy compact
-            out = resample(data.astype(np.float32) * I16_SCALE, src_rate, rate)
-            out = np.clip(np.rint(out * 32767.0), -32768, 32767).astype(np.int16)
+            f = data.astype(np.float32)   # in place from here: a song's float copy is
+            f *= I16_SCALE                # ~70 MB, and each temporary would be another
+            out = resample(f, src_rate, rate)
+            del f
+            if not out.flags.writeable:
+                out = out.copy()
+            out *= 32767.0
+            np.rint(out, out=out)
+            np.clip(out, -32768, 32767, out=out)
+            out = out.astype(np.int16)
         else:
             out = resample(data, src_rate, rate)
         with self._cache_lock:
@@ -1157,10 +1166,19 @@ class Engine:
         return shares
 
     def prepare(self, sid: str, data: np.ndarray):
-        """Pre-resample for the currently open outputs (call off the UI thread)."""
+        """Pre-resample for the currently open outputs (call off the UI thread), as
+        long as the copies fit in CACHE_BUDGET. Past it, each new copy would only push
+        out an earlier one: a big board on a 44.1 kHz headset resampled every song at
+        every start and threw most of them away. Those are made when pressed instead
+        (play reads the source at the device's rate meanwhile)."""
         self.cut_shares(sid, data)
         for o in self.active_outputs():
-            self.data_for(sid, data, self.rates[o])
+            rate = self.rates[o]
+            if self._cached(sid, data, rate, SR) is None:
+                need = data.nbytes * rate / SR
+                if self._cache_bytes + need > CACHE_BUDGET:
+                    continue
+            self.data_for(sid, data, rate)
 
     def forget(self, sid: str):
         self._shares.pop(sid, None)
@@ -1663,7 +1681,7 @@ class Engine:
             mix = self._send_bus("mon", mix, m)
             if self.limiter_on:
                 mix = self._stage("mon", Limiter).process(mix)
-        else:
+        elif not self._bus_quiet("mon", mix):
             mix = self._dest("mon", self._eq("mon", "sounds", mix))
         mix *= np.float32(self.mon_vol)
         soft_limit(mix)
@@ -1726,17 +1744,34 @@ class Engine:
         """The sounds bus shaped for voice chat (EQ, destination mode, ducking under
         your voice, phase-aware mono), with the mic block `m` added on top."""
         mic_on = m is not None and self.mic_enabled and not self.mic_muted
-        mix = self._dest(out, self._eq(out, "sounds", mix))
+        quiet = self._bus_quiet(out, mix)
+        if not quiet:
+            mix = self._dest(out, self._eq(out, "sounds", mix))
         if self.duck_db < 0 or (out, "Ducker") in self._send:
             g = self._stage(out, Ducker).process(m if mic_on else None, len(mix), self.duck_db)
             if not isinstance(g, float):
                 mix = mix * g
-        if self.send_mono:
+        # a mode that already made the bus mono (every built-in one) needs no second pass
+        if self.send_mono and not quiet and not (self.dest is not None and self.dest.mono):
             mix = self._stage(out, SmartMono).process(mix)
         if mic_on:
             m = self._gated(out, m)
             mix += self._eq(out, "voice", m * np.float32(self.mic_vol))
         return mix
+
+    QUIET_S = 0.5   # this long with nothing on a sounds bus: its filters have rung out
+
+    def _bus_quiet(self, out: str, mix: np.ndarray) -> bool:
+        """True once the sounds bus of `out` has carried only zeros for QUIET_S. Its EQ,
+        mode shaping and mono downmix would only be filtering silence then (~1 ms of
+        every 10 ms block in a voice chat mode, with nothing playing), so they're
+        skipped; their state has long decayed, and the next sound picks them up."""
+        if mix.any():
+            self._quiet[out] = 0
+            return False
+        n = self._quiet.get(out, 0) + len(mix)
+        self._quiet[out] = n
+        return n > self.QUIET_S * self.rates[out]
 
     GATE_S = 0.04    # how fast the mic fades out / back in around a sound
 

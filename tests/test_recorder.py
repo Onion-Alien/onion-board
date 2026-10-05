@@ -48,3 +48,14 @@ def test_recording_falls_back_to_memory_if_spool_cannot_open(tmp_path):
     r.push(chunk(0))
     data = r.stop()
     assert np.array_equal(data, chunk(0))
+
+
+def test_replay_buffer_is_made_on_first_push_and_can_be_freed(tmp_path):
+    r = Recorder(tmp_path / "spool.wav")
+    assert r.replay is None and len(r.last()) == 0     # nothing allocated yet
+    r.push(chunk(0))
+    assert r.replay is not None and np.array_equal(r.last(), chunk(0))
+    r.release_replay()
+    assert r.replay is None and len(r.last()) == 0
+    r.push(chunk(5))
+    assert np.array_equal(r.last(), chunk(5))

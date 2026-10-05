@@ -34,7 +34,7 @@ from soundboard.clipedit import LiveBuffer
 from soundboard.engine import SR
 from soundboard.library import MAX_SECONDS, trim_silence
 from soundboard.recorder import ArmedRecorder
-from soundboard.ui import icons
+from soundboard.ui import appstate, icons
 from soundboard.ui.bunnywidget import BunnyWidget
 from soundboard.ui.clipeditor import ClipEditor
 from soundboard.ui.panel import CardGrid, HoverCard, UndoBar, VolumeControl, hint_label
@@ -351,7 +351,7 @@ class AppRow(HoverCard):
             self.sub.setText(text)
             theme.set_tone(self.sub, "error" if error else "")
         else:
-            self.sub.setStyleSheet("")
+            theme.set_tone(self.sub, "")   # an error line was red: back to normal
             if self.app is not None:
                 self.set_app(self.app)   # back to the program's own line
 
@@ -500,6 +500,7 @@ class AppsTab(QWidget):
         self.timer.timeout.connect(self.lister.refresh)
         self.meter_timer = QTimer(self)
         self.meter_timer.timeout.connect(self._meters)
+        appstate.slow_in_background(self, self.meter_timer, METER_MS)   # behind a game
         self.peaks = appaudio.PeakWatcher()   # live levels; the list is only re-read every 1.5 s
         self._started = False
         self._label_bin()
@@ -519,7 +520,7 @@ class AppsTab(QWidget):
         super().showEvent(ev)
         self.start()
         self.timer.start(REFRESH_MS)
-        self.meter_timer.start(METER_MS)
+        self.meter_timer.start(appstate.interval(METER_MS))
         self.peaks.start()
 
     def hideEvent(self, ev):
@@ -865,7 +866,8 @@ class AppsTab(QWidget):
             row.set_recording(False)
             return
         row.btn_rec.setText("Waiting for sound…")
-        self.meter_timer.start(METER_MS)   # also enforces the length cap while hidden
+        # also enforces the length cap while hidden
+        self.meter_timer.start(appstate.interval(METER_MS))
 
     def _finish_rec(self, row: AppRow, save: bool = True):
         rec, row.rec = row.rec, None

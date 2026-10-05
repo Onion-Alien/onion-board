@@ -33,11 +33,13 @@ REPORTS_DIR = "crash-reports"
 KEEP_REPORTS = 10
 LOG_TAIL_LINES = 60
 MAX_DIALOGS = 3   # per run: a bug that fires every frame mustn't bury the user in popups
+MAX_EXTRA = 20    # later errors listed on an open (or held-back) report
+REPEAT_LOG_S = 60.0   # the same bug again: one short log line a minute at most
 
 log = logging.getLogger("crash")
 
 _state = {"log_path": None, "version": "?", "dialogs": 0, "seen": set(), "open": None,
-          "bridge": None, "pending": None}
+          "bridge": None, "pending": None, "saved": set(), "repeats": {}}
 
 
 @dataclass
@@ -134,7 +136,7 @@ def report(exc_info=None, where: str = "", fatal: bool = False) -> Report | None
 
     Safe to call from any thread and from inside an `except` block (with no
     argument it reports the exception being handled). Returns the Report, or
-    None if there was nothing to report. Never raises."""
+    None if there was nothing to report (or it was the same bug again). Never raises."""
     try:
         if exc_info is None:
             exc_info = sys.exc_info()
@@ -143,10 +145,18 @@ def report(exc_info=None, where: str = "", fatal: bool = False) -> Report | None
         t, v, tb = exc_info
         if t is None:
             return None
+        sig = _signature(t, tb)
+        saved = _state.setdefault("saved", set())
+        if not fatal and sig in saved:
+            # a paint handler or timer can throw every frame: the first report has
+            # it all, so skip the traceback, log tail and file for the rest
+            _repeat(t, v, where, sig)
+            return None
+        saved.add(sig)
         log.critical("Unhandled exception%s", f" in {where}" if where else "", exc_info=exc_info)
         rep = build_report(exc_info, where, fatal)
         rep.path = _save(rep)
-        _offer(rep, _signature(t, tb))
+        _offer(rep, sig)
         return rep
     except Exception:  # noqa: BLE001 - the crash reporter must never crash
         try:
@@ -252,6 +262,28 @@ def _signature(t, tb) -> tuple:
     return (t.__name__, last.filename if last else "", last.lineno if last else 0)
 
 
+def _repeat(t, v, where: str, sig: tuple):
+    """Count a bug already reported this run; log one short line about it at most
+    every REPEAT_LOG_S seconds, saying how often it came back since the last one."""
+    repeats = _state.setdefault("repeats", {})
+    count, last = repeats.get(sig, (0, None))
+    count += 1
+    now = time.monotonic()
+    if last is not None and now - last < REPEAT_LOG_S:
+        repeats[sig] = (count, last)
+        return
+    repeats[sig] = (0, now)
+    msg = f"{t.__name__}: {v}"
+    log.error("Same error again%s (%d time%s since the last line): %s",
+              f" in {where}" if where else "", count, "" if count == 1 else "s",
+              msg if len(msg) <= 200 else msg[:197] + "…")
+
+
+def _add_extra(rep: Report, title: str):
+    if len(rep.extra) < MAX_EXTRA:
+        rep.extra.append(title)
+
+
 def _log_tail(path: Path | None, n: int) -> str:
     if path is None:
         return ""
@@ -307,7 +339,7 @@ def _offer(rep: Report, sig: tuple):
     MAX_DIALOGS per run. A dialog already open collects further errors instead."""
     open_rep = _state["open"]
     if open_rep is not None and not rep.fatal:
-        open_rep.extra.append(rep.title)
+        _add_extra(open_rep, rep.title)
         return
     if not rep.fatal and (sig in _state["seen"] or _state["dialogs"] >= MAX_DIALOGS):
         return
@@ -332,7 +364,7 @@ def _show_dialog(rep: Report):
             if _state["pending"] is None:
                 _state["pending"] = rep
             else:
-                _state["pending"].extra.append(rep.title)
+                _add_extra(_state["pending"], rep.title)
             log.info("crash report held back until Onion Board is in front: %s", rep.title)
             return
         from soundboard.ui.crashdialog import CrashDialog

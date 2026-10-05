@@ -64,7 +64,10 @@ class ModeCombo(QComboBox):
         super().__init__()
         self.mw = mw
         self.setAccessibleName("Who's listening")
-        self.setSizeAdjustPolicy(QComboBox.AdjustToContents)
+        # sized for a short label, not the longest one ("Unity voice (Photon /
+        # Dissonance)"): "Off" sat in a box twice its width; the list opens wide enough
+        self.setSizeAdjustPolicy(QComboBox.AdjustToMinimumContentsLengthWithIcon)
+        self.setMinimumContentsLength(12)
         no_wheel(self)
         self.currentIndexChanged.connect(self._picked)
         sig = getattr(mw, "voice_engine", None)
@@ -87,6 +90,7 @@ class ModeCombo(QComboBox):
             self.addItem("Off" if d is destination.OFF else d.label, d.key)
             self.setItemData(self.count() - 1, d.note, Qt.ToolTipRole)
         self.setCurrentIndex(max(0, self.findData(current.key)))
+        self.view().setMinimumWidth(self.view().sizeHintForColumn(0) + 32)   # long names whole
         self.blockSignals(False)
         self.setToolTip("Who's listening: shapes your sounds for the voice chat on the "
                         f"other end. Now: {current.label}. More options on the Setup tab.")

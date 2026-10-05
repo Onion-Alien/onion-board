@@ -4,16 +4,20 @@
     ---                                   --------------
     listen on 127.0.0.1:<random>
     launch  argv --port P --token T  -->  connect, send hello{token}
-    mic tap -> deque -> sender thread -->  audio frames (int16 mono 16 kHz)
+    mic tap -> queue -> sender thread -->  audio frames (int16 mono 16 kHz)
     reader thread -> on_event(dict)  <--  status / ready / vad / final / error
 
-`feed()` is called from the audio thread, so it only appends to a bounded deque (no
-locks, no I/O); a sender thread drains it, resamples to 16 kHz and writes to the
+`feed()` is called from the audio thread, so it only puts the block on a queue (no
+I/O, never waits); a sender thread sleeps on that queue until a block arrives (no
+polling: no wake-ups while nothing is sent), drains it, resamples to 16 kHz and writes to the
 socket. If the module falls behind, the oldest audio is dropped, never the mic.
+A module that sends audio back (b"B", the AI voices add-on) hands it to `on_audio`
+on the reader thread.
 """
 from __future__ import annotations
 
 import logging
+import queue
 import secrets
 import socket
 import struct
@@ -21,7 +25,6 @@ import subprocess
 import sys
 import threading
 import time
-from collections import deque
 from pathlib import Path
 from collections.abc import Callable
 
@@ -43,13 +46,21 @@ HELLO_MAX = 4096            # bytes: the first frame, before we know who's calli
 class ServiceHost:
     def __init__(self, argv: list[str], on_event: Callable[[dict], None],
                  cwd: Path | None = None, log_path: Path | None = None, name: str = "module",
-                 env: dict[str, str] | None = None):
+                 env: dict[str, str] | None = None,
+                 on_audio: Callable[[bytes], None] | None = None,
+                 make_resampler: Callable[[int, int], object] | None = None):
+        """`make_resampler(src, dst)`: a streaming resampler (resample_chunk) for the
+        mic -> 16 kHz; default soxr's HQ, which lets its output out in ~30 ms lumps (fine
+        for speech recognition; the AI voice uses soundboard.speech.resample)."""
         self.argv, self.cwd, self.log_path, self.name = argv, cwd, log_path, name
+        self.on_audio, self.make_resampler = on_audio, make_resampler
         self.env = env          # None: this process's (soundboard.net.child_env makes one)
         self.on_event = on_event
         self._proc: subprocess.Popen | None = None
         self._sock: socket.socket | None = None
-        self._q: deque[tuple[np.ndarray, int]] = deque(maxlen=QUEUE_BLOCKS)
+        # SimpleQueue: put() never blocks (safe on the audio thread) and the sender's
+        # get() sleeps until there's something, so an idle link costs no CPU
+        self._q: queue.SimpleQueue[tuple] = queue.SimpleQueue()
         self._stop = threading.Event()
         self._send_lock = threading.Lock()
         self.connected = False
@@ -100,7 +111,7 @@ class ServiceHost:
         if p is not None:
             threading.Thread(target=self._reap, args=(p,), name=f"{self.name}-reap",
                              daemon=True).start()
-        self._q.clear()
+        self._drain()
 
     def _reap(self, p: subprocess.Popen):
         try:
@@ -108,6 +119,13 @@ class ServiceHost:
         except subprocess.TimeoutExpired:
             log.warning("%s didn't quit; killing it", self.name)
             p.kill()
+
+    def _drain(self):
+        try:
+            while True:
+                self._q.get_nowait()
+        except queue.Empty:
+            pass
 
     @property
     def running(self) -> bool:
@@ -117,9 +135,18 @@ class ServiceHost:
     def feed(self, mono: np.ndarray, rate: int):
         """Mic tap (audio thread): hand over a block; never blocks."""
         if self.connected:
-            if len(self._q) == self._q.maxlen:
-                self.dropped += 1
-            self._q.append((mono.copy(), rate))
+            if self._q.qsize() >= QUEUE_BLOCKS:      # nobody's reading: drop the oldest
+                try:
+                    self._q.get_nowait()
+                    self.dropped += 1
+                except queue.Empty:
+                    pass
+            self._q.put((mono.copy(), rate))
+
+    def feed_json(self, obj: dict):
+        """A small message, queued in order with the audio (audio thread: never blocks)."""
+        if self.connected:
+            self._q.put((obj, -1))
 
     # ------------------------------------------------------------ threads
     def send_json(self, obj: dict, wait: float = -1):
@@ -186,6 +213,8 @@ class ServiceHost:
                     break
                 if msg[0] == protocol.JSON:
                     self.on_event(protocol.decode_json(msg[1]))
+                elif msg[0] == protocol.VOICE and self.on_audio is not None:
+                    self.on_audio(msg[1])
         except Exception as e:  # noqa: BLE001
             # anything (a JSON message nested too deep: RecursionError) ends the
             # session with "stopped", so the UI never stays on "listening", mic muted
@@ -204,16 +233,28 @@ class ServiceHost:
     def _send_audio(self, conn: socket.socket):
         rs, rs_rate = None, 0
         while self.connected and not self._stop.is_set():
-            if not self._q:
-                time.sleep(0.02)
-                continue
-            blocks = []
-            while self._q:
-                blocks.append(self._q.popleft())
+            try:
+                blocks = [self._q.get(timeout=0.25)]      # wakes as soon as a block is put
+            except queue.Empty:
+                continue                                  # (looks at connected / stop again)
+            while True:
+                try:
+                    blocks.append(self._q.get_nowait())
+                except queue.Empty:
+                    break
             for x, rate in blocks:
+                if rate < 0:            # feed_json
+                    try:
+                        with self._send_lock:
+                            protocol.send_json(conn, x)
+                    except OSError:
+                        return
+                    continue
                 if rate != rs_rate:
-                    rs, rs_rate = soxr.ResampleStream(rate, protocol.AUDIO_RATE, 1,
-                                                      dtype="float32", quality="HQ"), rate
+                    rs = (self.make_resampler(rate, protocol.AUDIO_RATE) if self.make_resampler
+                          else soxr.ResampleStream(rate, protocol.AUDIO_RATE, 1,
+                                                   dtype="float32", quality="HQ"))
+                    rs_rate = rate
                 y = x if rate == protocol.AUDIO_RATE else rs.resample_chunk(x)
                 pcm = np.clip(np.rint(y * 32767), -32768, 32767).astype("<i2").tobytes()
                 try:

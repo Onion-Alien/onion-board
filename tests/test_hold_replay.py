@@ -107,9 +107,29 @@ def test_instant_replay_with_nothing_heard_adds_nothing(window, qapp, monkeypatc
 
 def test_replay_keeps_only_the_last_seconds(qapp):
     r = rp.InstantReplay(seconds=2, capture_cls=FakeCapture)
+    r._enabled = True   # (as if its capture were running)
     r._push(noise(1.0) * 0 + 0.5)
     r._push(noise(3.0))
-    assert len(r.clip()) <= 2 * SR
+    assert 0 < len(r.clip()) <= 2 * SR
+
+
+def test_replay_buffer_is_freed_when_switched_off(qapp, monkeypatch):
+    """A 120 s buffer is ~46 MB: none until it's on, none once it's off again, and a
+    late chunk from the capture being stopped doesn't make a new one."""
+    monkeypatch.setattr(rp.appaudio, "supported", lambda: (True, ""))
+    r = rp.InstantReplay(seconds=120, capture_cls=FakeCapture)
+    assert r._rec.replay is None
+    r.set_enabled(True)
+    r._push(noise(1.0))
+    assert r._rec.replay is not None and len(r.clip())
+    r.set_enabled(False)
+    assert r._rec.replay is None and len(r.clip()) == 0
+    r._push(noise(1.0))
+    assert r._rec.replay is None
+    r.set_enabled(True)                       # on again: a fresh buffer
+    r._push(noise(1.0))
+    assert r._rec.replay is not None
+    r.stop()
 
 
 def test_replay_says_why_when_windows_cant(qapp, monkeypatch):

@@ -16,7 +16,6 @@ import tempfile
 import threading
 from pathlib import Path
 
-import numpy as np
 from PySide6.QtCore import Qt, QTimer, Signal
 from PySide6.QtWidgets import QFrame, QHBoxLayout, QLabel, QPushButton
 
@@ -59,8 +58,10 @@ class LinkBar(QFrame):
         self.title = ""
         self._text = ""               # the search box's text last seen
         self._busy = ""               # "", "add" or "play": one download at a time
-        self._got = None              # (url, file, int16 audio) of the last download
-        self._kept = None             # (url, int16 audio) of the last add: Play after it is instant
+        self._got = None              # (url, file, int16 audio, gain) of the last download
+        # (url, int16 audio, gain) of the last add: Play after it is instant. Dropped with
+        # the link, like _got: a 15-minute song is ~170 MB
+        self._kept = None
         self._queued = ""             # "add" / "play" asked for while another download ran
         self._msg.connect(self._on_msg)
         # a link typed by hand is a new "link" at every keystroke: look up only the
@@ -176,6 +177,7 @@ class LinkBar(QFrame):
         if self._got is not None:
             _drop_temp(self._got[1])
             self._got = None
+        self._kept = None
 
     def shutdown(self):
         self.engine.stop(PLAY_ID)
@@ -198,7 +200,7 @@ class LinkBar(QFrame):
         have = next((g for g in (self._got, self._kept)
                      if g is not None and g[0] == self.url), None)
         if have is not None:
-            self._play(have[-1])
+            self._play(*have[-2:])
             self.done.emit(self.url, "play", True)
             return True
         self._start("play")
@@ -240,8 +242,10 @@ class LinkBar(QFrame):
                                           "newer downloader")
         threading.Thread(target=self._work, args=args, daemon=True, name="link-dl").start()
 
-    def _play(self, data):
-        gain = level_gain(data.astype(np.float32) / 32768) if self.cfg.level_volumes else 1.0
+    def _play(self, data, gain: float):
+        """`gain` is the levelling gain the worker worked out (a float copy of a
+        whole song is too slow and too big for the UI thread)."""
+        gain = gain if self.cfg.level_volumes else 1.0
         v = self.engine.play(PLAY_ID, data, gain, mode="restart")
         if v is None:
             self._say("No audio device is open — pick one in Setup.", theme.status("warn"))
@@ -273,7 +277,9 @@ class LinkBar(QFrame):
                 self._msg.emit("title", url, title)
             self._msg.emit("progress", url, -1.0)
             if kind == "play":
-                self._msg.emit("play", url, (path, to_int16(decode(str(path)))))
+                audio = decode(str(path))
+                self._msg.emit("play", url, (path, to_int16(audio), level_gain(audio)))
+                del audio
                 keep = True   # the UI keeps it so Add as sound needn't download again
                 return
             fp = fingerprint(str(path))
@@ -351,7 +357,8 @@ class LinkBar(QFrame):
         self._buttons()
         if kind == "added":
             meta, data, title, saved = payload
-            self._kept = (url, data)
+            if current:   # one for a link no longer showing would never be played
+                self._kept = (url, data, meta.level_gain)
             meta.name = (title or (current and self.title) or meta.name)[:40]
             self.sound_ready.emit(meta, data)
             if current:
@@ -362,10 +369,10 @@ class LinkBar(QFrame):
                                           "Sounds.", "ok")
             self.done.emit(url, "add", True)
         elif kind == "play":
-            path, data = payload
+            path, data, gain = payload
             if current:
-                self._got = (url, Path(path), data)
-                self._play(data)
+                self._got = (url, Path(path), data, gain)
+                self._play(data, gain)
             else:
                 _drop_temp(path)
             self.done.emit(url, "play", current)

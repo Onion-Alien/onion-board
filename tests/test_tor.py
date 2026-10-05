@@ -297,6 +297,10 @@ def test_a_request_waits_on_while_tor_is_still_getting_somewhere(tmp_path, monke
 def test_a_stuck_bootstrap_fails_closed(fake_tor, monkeypatch):
     t = fake_tor("stall")
     t.configure(True)
+    # the fake is a Python process that can take seconds to boot on a busy PC: let it
+    # reach its stuck 45% first, or the request below times out still at 0%
+    t.start()
+    assert _wait(lambda: t.progress == 45)
     with pytest.raises(net.ProxyError, match=r"still connecting \(45%\)"):
         t.gate(1.0)                                  # waits, then fails: never direct
     assert t.state == tor.STARTING and t.progress == 45

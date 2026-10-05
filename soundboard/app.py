@@ -85,6 +85,40 @@ def end_process(code: int):
     os._exit(code)
 
 
+# %TEMP% folders of ours that can be left behind: a download the app was closed (or
+# crashed) in the middle of, and an add-on self-test. Only these exact prefixes.
+TEMP_LEFTOVERS = ("sb-ytdl-", "onionboard-selftest-")
+TEMP_MAX_AGE_S = 24 * 3600
+
+
+def clean_temp_leftovers(now: float | None = None) -> int:
+    """Delete TEMP_LEFTOVERS folders in %TEMP% untouched for a day (a running
+    download's is newer). Returns how many went. Run off the UI thread."""
+    import shutil
+    import tempfile
+    import time
+    from pathlib import Path
+    now = time.time() if now is None else now
+    gone = 0
+    try:
+        for p in Path(tempfile.gettempdir()).iterdir():
+            if not p.name.startswith(TEMP_LEFTOVERS):
+                continue
+            try:
+                if (p.is_symlink() or getattr(p, "is_junction", lambda: False)()
+                        or not p.is_dir() or now - p.stat().st_mtime < TEMP_MAX_AGE_S):
+                    continue
+                shutil.rmtree(p, ignore_errors=True)
+                gone += not p.exists()
+            except OSError:
+                continue
+    except OSError:
+        log.debug("couldn't look through the temp folder", exc_info=True)
+    if gone:
+        log.info("removed %d old temp folder(s)", gone)
+    return gone
+
+
 def start_ytdlp_check(cfg):
     """The daily "is there a newer yt-dlp?" check, off the UI thread (see ytdl.py)."""
     import threading
@@ -201,15 +235,25 @@ def selftest_addon(path: str) -> int:
     run the Onion Watch add-on (it has no pip, so the add-on may only use what the
     build ships). Installs the zip into a temp folder, loads it the way the Triggers
     tab does, builds its tab on a stand-in board, and lists windows and screens with
-    it. No window, no device, no network. Prints OK and returns 0."""
-    import importlib
+    it. No window, no device, no network. Prints OK and returns 0. The temp folder
+    goes afterwards (a build check runs this often)."""
+    import shutil
     import tempfile
     from pathlib import Path
     os.environ["QT_QPA_PLATFORM"] = "offscreen"
     _app = QApplication(sys.argv)   # noqa: F841 - kept while the tab is built
-    from soundboard import modules, theme
     tmp = Path(tempfile.mkdtemp(prefix="onionboard-selftest-"))
-    info = modules.install_zip(Path(path), "onion-watch", "triggers", tmp / "modules")
+    try:
+        return _selftest_addon_in(Path(path), tmp)
+    finally:
+        shutil.rmtree(tmp, ignore_errors=True)
+
+
+def _selftest_addon_in(path, tmp) -> int:
+    import importlib
+
+    from soundboard import modules, theme
+    info = modules.install_zip(path, "onion-watch", "triggers", tmp / "modules")
     entry = modules.load_package(info)
 
     class Host:   # the stand-in board: onionwatch.host.Host, nothing played
@@ -272,6 +316,8 @@ def main():
     for msg in MIGRATION_ERRORS:
         log.error("%s", msg)
     tune_runtime_for_audio()
+    import threading
+    threading.Thread(target=clean_temp_leftovers, daemon=True, name="temp-clean").start()
     try:
         ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID("OnionBoard.App")
     except Exception:  # noqa: BLE001

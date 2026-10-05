@@ -6,7 +6,9 @@ Windows.Media.SpeechSynthesis: Katja for German, Helena for Spanish…). Both ar
 .NET / WinRT APIs, so a single hidden PowerShell process is kept running
 and handed one line per sentence. It writes a WAV file and answers "OK", and
 `SapiTTS.synth` reads that file back. Starting PowerShell takes about a second, so
-it is started once, on first use (or ahead of time with `warm_up`).
+it is started once, on first use (or ahead of time with `warm_up`), and kept while
+it's used: after IDLE_CLOSE_S without a line it is closed (it holds ~85 MB), and the
+next line starts it again.
 
 `Speaker` queues sentences and plays them one after another through a callback,
 so a second line never talks over the first.
@@ -35,6 +37,8 @@ log = logging.getLogger(__name__)
 TTS_RATE = 22050
 START_TIMEOUT_S = 30.0      # PowerShell + loading the speech APIs; a cold start is slow
 LINE_TIMEOUT_S = 30.0       # one sentence to a WAV file takes well under a second
+IDLE_CLOSE_S = 300.0        # the helper unused this long is closed until the next line
+IDLE_CHECK_S = 30.0         # how often that's looked at
 
 _SCRIPT = r"""
 # stdout as UTF-8 without a BOM (a pipe otherwise gets the OEM code page, e.g. IBM437)
@@ -135,6 +139,9 @@ class SapiTTS:
         self.voices: list[str] = []
         self.voice_langs: dict[str, str] = {}   # voice name -> its language, like "de-DE"
         self.error = ""
+        self._clock = time.monotonic
+        self._used = 0.0                    # when the helper last started or spoke
+        self._idle_thread: threading.Thread | None = None
 
     def _start(self):
         if self._proc is not None and self._proc.poll() is None:
@@ -157,6 +164,31 @@ class SapiTTS:
             raise RuntimeError(f"Windows speech didn't start: {line or 'no answer'}")
         self.voices, self.voice_langs = parse_voices(line[5:])
         log.info("Windows speech ready: %s", ", ".join(self.voices) or "no voices")
+        self._used = self._clock()
+        if self._idle_thread is None:   # (the lock is held: see close_if_idle)
+            self._idle_thread = threading.Thread(target=self._idle_loop, name="tts-idle",
+                                                 daemon=True)
+            self._idle_thread.start()
+
+    def _idle_loop(self):
+        while True:
+            time.sleep(IDLE_CHECK_S)
+            if self.close_if_idle():
+                return
+
+    def close_if_idle(self) -> bool:
+        """Close the helper if it hasn't spoken for IDLE_CLOSE_S (the voice list is
+        kept; the next line starts it again). True once no helper is running: the
+        watcher then ends, and the next start begins a new one."""
+        with self._lock:
+            if self._proc is not None and self._clock() - self._used >= IDLE_CLOSE_S:
+                log.info("Windows speech unused for %.0f min: closed until the next line",
+                         IDLE_CLOSE_S / 60)
+                self.close()
+            if self._proc is None:
+                self._idle_thread = None
+                return True
+            return False
 
     def voice_for(self, lang: str, prefer: str = "") -> str:
         """A voice that speaks `lang` ("de", "zh"…): `prefer` if it does, else the
@@ -198,6 +230,7 @@ class SapiTTS:
                 self._proc.stdin.write(req + "\n")
                 self._proc.stdin.flush()
                 ans = self._readline(LINE_TIMEOUT_S)
+                self._used = self._clock()
             if ans != "OK":
                 if not ans:
                     self.close()

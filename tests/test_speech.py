@@ -12,7 +12,7 @@ import numpy as np
 import pytest
 
 from soundboard import modules, voicefx
-from soundboard.speech import protocol
+from soundboard.speech import protocol, service
 from soundboard.speech.live import SpeechController
 from soundboard.speech.service import ServiceHost
 from soundboard.voicefx import VoiceChain
@@ -308,7 +308,7 @@ def test_feed_never_blocks_and_drops_oldest_when_nobody_reads():
     for _ in range(5000):
         h.feed(np.zeros(480, np.float32), 48000)
     assert time.perf_counter() - t0 < 0.5
-    assert len(h._q) == h._q.maxlen and h.dropped > 0
+    assert h._q.qsize() == service.QUEUE_BLOCKS and h.dropped > 0
 
 
 # ---------------------------------------------------------------- controller
@@ -605,6 +605,63 @@ def test_windows_speech_output_that_isnt_utf8_cant_kill_the_reader(monkeypatch):
     with pytest.raises(RuntimeError, match="Zugriff verweigert"):
         t.synth("hello")                                  # an answer, not "stopped"
     t._proc = None
+
+
+def test_windows_speech_unused_for_a_while_is_closed_and_comes_back(monkeypatch):
+    """The hidden PowerShell holds ~85 MB: it's let go after IDLE_CLOSE_S without a
+    line, and the next line starts it again without the caller noticing."""
+    import base64
+    import queue
+
+    import soundfile as sf
+
+    from soundboard.speech import tts
+    started = []
+
+    class Proc:
+        def __init__(self, args, **kw):
+            started.append(self)
+            self.lines = queue.Queue()
+            self.lines.put("READY Zira\ten-US\n")
+            self.stdout = iter(self.lines.get, None)
+            self.closed = False
+            proc = self
+
+            class Stdin:
+                def write(self, req):   # "- 0 <b64 path> <b64 text>": a short WAV, then OK
+                    path = base64.b64decode(req.split()[2]).decode()
+                    sf.write(path, np.full(220, 0.1, np.float32), tts.TTS_RATE)
+                    proc.lines.put("OK\n")
+
+                def flush(self):
+                    pass
+
+                def close(self):
+                    proc.closed = True
+                    proc.lines.put(None)
+            self.stdin = Stdin()
+
+        def poll(self):
+            return 0 if self.closed else None
+
+        def wait(self, timeout=None):
+            return 0
+
+    monkeypatch.setattr(tts.subprocess, "Popen", Proc)
+    monkeypatch.setattr(tts, "IDLE_CHECK_S", 3600)   # the watcher thread stays out of it
+    now = [1000.0]
+    t = tts.SapiTTS()
+    t._clock = lambda: now[0]
+    assert t.warm_up() == ["Zira"] and len(started) == 1
+    now[0] += tts.IDLE_CLOSE_S - 10
+    assert len(t.synth("hello")[0]) == 220            # a line resets the idle time
+    now[0] += tts.IDLE_CLOSE_S - 10
+    assert not t.close_if_idle() and not started[0].closed
+    now[0] += 20
+    assert t.close_if_idle() and started[0].closed and t._proc is None
+    assert t.voices == ["Zira"]                       # the list stays for the menus
+    assert len(t.synth("again")[0]) == 220 and len(started) == 2   # started again
+    t.close()
 
 
 def test_an_install_step_that_hangs_is_killed(tmp_path, monkeypatch):

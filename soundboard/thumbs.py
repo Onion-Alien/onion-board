@@ -14,6 +14,7 @@ import subprocess
 import tempfile
 import time
 import uuid
+from collections import OrderedDict
 from pathlib import Path
 
 from PySide6.QtCore import Qt
@@ -117,20 +118,34 @@ def set_image(meta: SoundMeta, src: str | Path | QImage) -> bool:
 def clear(meta: SoundMeta):
     if meta.image and Path(meta.image).parent == library.THUMBS_DIR:
         Path(meta.image).unlink(missing_ok=True)
+        forget(meta.image)
     meta.image = ""
 
 
-_pixmaps: dict[str, QPixmap | None] = {}
+# the most recently drawn pictures (up to ~0.6 MB each). Enough for every pad on
+# screen at once; the oldest give way, so a long session doesn't keep every picture
+# it ever showed.
+MAX_CACHED = 128
+_pixmaps: OrderedDict[str, QPixmap | None] = OrderedDict()
 
 
 def pixmap(path: str) -> QPixmap | None:
     """The picture as a QPixmap (cached; UI thread only). None if it's missing."""
     if not path:
         return None
-    if path not in _pixmaps:
-        pm = QPixmap(path)
-        _pixmaps[path] = None if pm.isNull() else pm
+    if path in _pixmaps:
+        _pixmaps.move_to_end(path)
+        return _pixmaps[path]
+    pm = QPixmap(path)
+    _pixmaps[path] = None if pm.isNull() else pm
+    while len(_pixmaps) > MAX_CACHED:
+        _pixmaps.popitem(last=False)
     return _pixmaps[path]
+
+
+def forget(path: str):
+    """Drop a picture from the cache (it was replaced or removed; UI thread only)."""
+    _pixmaps.pop(path, None)
 
 
 def prune(keep: set[str]):

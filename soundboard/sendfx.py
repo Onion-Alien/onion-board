@@ -26,7 +26,7 @@ from __future__ import annotations
 
 import numpy as np
 
-from soundboard.dsp import butter, running_min, sosfilt
+from soundboard.dsp import butter, running_min, sosfilt_bank
 
 F32 = np.float32
 CEILING_DB = -3.0          # peak level sent to others (room for the codec's overshoot)
@@ -58,6 +58,16 @@ class Limiter:
         if n == 0:
             return x
         la = self.la
+        if (self.env_db == 0.0 and float(self.need.min()) == 1.0
+                and float(self.box.min()) == 1.0 and float(np.abs(x).max()) <= self.ceiling):
+            # Nothing near the ceiling now or in the lookahead (the delay line's
+            # samples are covered by `need`): the gain is exactly 1, so the block
+            # only goes through the delay. Most of the time, e.g. just the mic.
+            buf = np.concatenate([self.delay, x.astype(F32, copy=False)])
+            self.delay = buf[n:]
+            self.need = np.ones(2 * la, F32)
+            self.reduction_db = 0.0
+            return buf[:n]
         pk = np.max(np.abs(x), axis=1)
         need = np.minimum(F32(1), self.ceiling / np.maximum(pk, F32(1e-9))).astype(F32)
         # all needed gains so far: [older history | this block]
@@ -123,25 +133,22 @@ class SmartMono:
         lo2 = butter(2, self.SPLITS[1] / nyq, "low")
         hi2 = butter(2, self.SPLITS[1] / nyq, "high")
         # LR4 = the Butterworth pair run twice; the low band also runs through the
-        # upper split's all-pass (its LP + HP) so all three bands stay in phase
-        self._sos = {
-            "low": np.vstack([lo, lo]),
-            "mid": np.vstack([hi, hi, lo2, lo2]),
-            "high": np.vstack([hi, hi, hi2, hi2]),
-        }
-        self._ap = (np.vstack([lo2, lo2]), np.vstack([hi2, hi2]))
-        self._zi = {k: np.zeros((len(s), 2, 2)) for k, s in self._sos.items()}
-        self._zap = [np.zeros((len(s), 2, 2)) for s in self._ap]
-        self.bands = {k: _Band() for k in self._sos}
+        # upper split's all-pass (its LP + HP) so all three bands stay in phase.
+        # Four cascades of four sections, run side by side in one call (five
+        # separate filter calls cost four times as much on the audio thread):
+        # low = [0] + [1] (its LP and HP halves of that all-pass), mid, high.
+        self._bank = np.stack([
+            np.vstack([lo, lo, lo2, lo2]),
+            np.vstack([lo, lo, hi2, hi2]),
+            np.vstack([hi, hi, lo2, lo2]),
+            np.vstack([hi, hi, hi2, hi2]),
+        ])
+        self._state = None
+        self.bands = {k: _Band() for k in ("low", "mid", "high")}
 
     def _split(self, x: np.ndarray) -> dict:
-        out = {}
-        for k, sos in self._sos.items():
-            out[k], self._zi[k] = sosfilt(sos, x, axis=0, zi=self._zi[k])
-        a, self._zap[0] = sosfilt(self._ap[0], out["low"], axis=0, zi=self._zap[0])
-        b, self._zap[1] = sosfilt(self._ap[1], out["low"], axis=0, zi=self._zap[1])
-        out["low"] = a + b
-        return out
+        y, self._state = sosfilt_bank(self._bank, x.T, self._state)   # (4, 2, n)
+        return {"low": (y[0] + y[1]).T, "mid": y[2].T, "high": y[3].T}
 
     def process(self, x: np.ndarray) -> np.ndarray:
         n = len(x)

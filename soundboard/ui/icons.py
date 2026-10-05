@@ -11,7 +11,8 @@ import math
 import weakref
 
 from PySide6.QtCore import QPointF, QRectF, QSize, Qt
-from PySide6.QtGui import QColor, QIcon, QPainter, QPainterPath, QPen, QPixmap, QTransform
+from PySide6.QtGui import (QColor, QIcon, QIconEngine, QPainter, QPainterPath, QPen, QPixmap,
+                           QTransform)
 
 from soundboard import theme
 
@@ -499,27 +500,93 @@ def pixmap(name: str, size: int, color: str) -> QPixmap:
     return pm
 
 
+class SharpEngine(QIconEngine):
+    """Draws the picture at exactly the size and screen scale it's shown at.
+
+    Pixmaps made ahead of time at a few sizes (16, 20, 24...) get shrunk to the
+    18 / 14 / 12 px the app asks for, and to 22 / 18 / 15 px on a 125 % screen,
+    which blurs thin lines. This draws each size the first time it's needed, once.
+    `draw(px, mode, state)` returns a `px`-pixel square QPixmap."""
+
+    def __init__(self, draw):
+        super().__init__()
+        self._draw = draw
+        self._made: dict[tuple, QPixmap] = {}
+
+    def _get(self, px: int, mode, state) -> QPixmap:
+        key = (px, mode, state)
+        pm = self._made.get(key)
+        if pm is None:
+            pm = self._made[key] = self._draw(px, mode, state)
+        return pm
+
+    def scaledPixmap(self, size, mode, state, scale):
+        side = max(1, min(size.width(), size.height()))
+        pm = QPixmap(self._get(max(1, round(side * scale)), mode, state))
+        pm.setDevicePixelRatio(scale)
+        return pm
+
+    def pixmap(self, size, mode, state):
+        return self.scaledPixmap(size, mode, state, 1.0)
+
+    def paint(self, painter, rect, mode, state):
+        scale = painter.device().devicePixelRatioF() if painter.device() else 1.0
+        painter.drawPixmap(rect, self.scaledPixmap(rect.size(), mode, state, scale))
+
+    def actualSize(self, size, mode, state):
+        side = min(size.width(), size.height())
+        return QSize(side, side)
+
+    def availableSizes(self, mode=QIcon.Normal, state=QIcon.Off):
+        return [QSize(s, s) for s in SIZES]
+
+    def clone(self):
+        # a copy (QIcon detaching, e.g. on addPixmap, which this engine ignores): Qt
+        # deletes it, but PySide drops the Python side as soon as this returns, so
+        # keep it here (rare: the app never adds pixmaps to these icons)
+        c = SharpEngine(self._draw)
+        _clones.append(c)
+        return c
+
+    def key(self):
+        return "onionboard-sharp"
+
+
+_clones: list[SharpEngine] = []
+
+
+def sharp_icon(draw) -> QIcon:
+    """A QIcon drawn by `draw(px, mode, state) -> QPixmap` at the exact size shown."""
+    return QIcon(SharpEngine(draw))   # the QIcon owns the engine
+
+
 _cache: dict[tuple, QIcon] = {}
 
 
-def icon(name: str, color: str | None = None, checked_color: str | None = None) -> QIcon:
+def icon(name: str, color: str | None = None, checked_color: str | None = None,
+         selected: str = "accent") -> QIcon:
     """`color`/`checked_color` are theme token names (e.g. "text", "on_accent") or
-    literal colours ("#ff4d4f")."""
+    literal colours ("#ff4d4f"). `selected` colours the current tab / a highlighted
+    list item (accent, not Qt's washed-out tint)."""
     def resolve(c):
         return theme.T.get(c, c)
     normal = resolve(color or "text")
     on = resolve(checked_color or "on_accent")
-    key = (name, normal, on)
+    sel = resolve(selected)
+    muted = resolve("muted")
+    key = (name, normal, on, sel)
     if key not in _cache:
-        ic = QIcon()
-        for s in SIZES:
-            ic.addPixmap(pixmap(name, s, normal), QIcon.Normal, QIcon.Off)
-            ic.addPixmap(pixmap(name, s, resolve("muted")), QIcon.Disabled, QIcon.Off)
-            ic.addPixmap(pixmap(name, s, on), QIcon.Normal, QIcon.On)
-            # the current tab / a highlighted item: accent, not Qt's washed-out tint
-            ic.addPixmap(pixmap(name, s, resolve("accent")), QIcon.Selected, QIcon.Off)
-            ic.addPixmap(pixmap(name, s, normal), QIcon.Active, QIcon.Off)
-        _cache[key] = ic
+        def draw(px, mode, state):
+            if mode == QIcon.Disabled:
+                col = muted
+            elif state == QIcon.On:
+                col = on
+            elif mode == QIcon.Selected:
+                col = sel
+            else:
+                col = normal
+            return pixmap(name, px, col)
+        _cache[key] = sharp_icon(draw)
     return _cache[key]
 
 
@@ -563,18 +630,28 @@ def set_item_icons(combo, names: list[str]):
     _items.append((weakref.ref(combo), names))
 
 
+_tab_cache: dict[tuple, QIcon] = {}
+
+
 def _tab_icon(name: str, tint: str | None, badge: bool = False) -> QIcon:
+    """A tab's icon, kept: the live tabs are re-iconed on every sound start and stop,
+    and a badged one paints 40 pictures."""
+    key = (name, theme.T.get(tint, tint) if tint else None, badge, theme.T["live_text"],
+           theme.T["muted"], theme.T["accent"])
+    if key not in _tab_cache:
+        _tab_cache[key] = _make_tab_icon(name, tint, badge)
+    return _tab_cache[key]
+
+
+def _make_tab_icon(name: str, tint: str | None, badge: bool = False) -> QIcon:
     if name.startswith("art:"):   # a picture (ui/art.py): its own colours, whatever the tint
         from soundboard.ui import art
         ic = art.icon(name[4:]) or QIcon()
     elif tint is None:
         ic = icon(name, "muted", "accent")
     else:
-        ic = QIcon()   # one colour whatever the tab's state (e.g. the live colour while it's live)
-        for s in SIZES:
-            pm = pixmap(name, s, theme.T.get(tint, tint))
-            for mode in (QIcon.Normal, QIcon.Selected, QIcon.Active):
-                ic.addPixmap(pm, mode, QIcon.Off)
+        col = theme.T.get(tint, tint)   # one colour whatever the tab's state (e.g. live)
+        ic = sharp_icon(lambda px, _mode, _state: pixmap(name, px, col))
     return _with_badge(ic) if badge and not ic.isNull() else ic
 
 
@@ -652,6 +729,7 @@ def retheme_live():
 
 def retheme():
     _cache.clear()
+    _tab_cache.clear()
     alive = []
     for ref, name, color, checked in _applied:
         w = ref()

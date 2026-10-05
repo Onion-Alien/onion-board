@@ -16,6 +16,7 @@ import re
 import shutil
 import subprocess
 import sys
+import threading
 import time
 import uuid
 from dataclasses import asdict, dataclass, field
@@ -38,6 +39,7 @@ APP_DIR = Path(os.environ.get("APPDATA", Path.home())) / "OnionBoard"
 OLD_APP_DIR = Path(os.environ.get("APPDATA", Path.home())) / "Soundboard"
 SOUNDS_DIR = APP_DIR / "sounds"
 CACHE_DIR = APP_DIR / "cache"
+CACHE_GRACE_S = 600   # prune_cache leaves a new sound's cache this long (an import in flight)
 THUMBS_DIR = APP_DIR / "thumbs"   # pad pictures (soundboard.thumbs)
 CONFIG_PATH = APP_DIR / "config.json"
 # privacy.json beside config.json: a copy of the Privacy & security settings: a version
@@ -475,22 +477,6 @@ class Config:
         log.info("an older version saved the settings: privacy settings restored from %s",
                  _privacy_path().name)
 
-    def _save_privacy(self):
-        """Keep privacy.json in step with config.json (see SIDE_KEYS)."""
-        path = _privacy_path()
-        text = json.dumps({k: getattr(self, k) for k in SIDE_KEYS}, indent=2)
-        try:
-            if path.read_text(encoding="utf-8") == text:
-                return
-        except OSError:
-            pass
-        try:
-            tmp = path.with_suffix(".tmp")
-            tmp.write_text(text, encoding="utf-8")
-            tmp.replace(path)
-        except OSError:
-            log.warning("couldn't save %s", path, exc_info=True)
-
     @classmethod
     def _keep_newer(cls, raw: dict):
         """A config written by a newer version has fields this one doesn't know, and
@@ -622,18 +608,62 @@ class Config:
 
     def save(self) -> bool:
         """Write atomically, keeping the last CONFIG_BACKUPS good copies. Returns
-        False (and logs) instead of raising: this runs from a timer on the UI thread."""
+        False (and logs) instead of raising. Blocks while the disk is slow (an
+        antivirus scan can take seconds): the window saves through Saver instead."""
         if self.read_only:
             log.warning("not saving settings: config.json was locked at startup")
             return False
+        return _write(self.snapshot())
+
+    def snapshot(self) -> tuple[int, dict, str]:
+        """Everything save() writes, copied now (on the thread that changes the config)
+        so another thread can write it. The number orders snapshots: an older one is
+        never written over a newer one."""
+        global _snap_seq
+        with _write_lock:
+            _snap_seq += 1
+            seq = _snap_seq
+        return (seq, self.to_raw(),
+                json.dumps({k: getattr(self, k) for k in SIDE_KEYS}, indent=2))
+
+
+_write_lock = threading.Lock()   # one writer at a time: Saver's thread or a direct save()
+_snap_seq = 0       # the last snapshot's number (Config.snapshot)
+_written_seq = 0    # ...and the newest one written
+
+
+def _write_privacy(text: str):
+    path = _privacy_path()
+    try:
+        if path.read_text(encoding="utf-8") == text:
+            return
+    except OSError:
+        pass
+    try:
+        tmp = path.with_suffix(".tmp")
+        tmp.write_text(text, encoding="utf-8")
+        tmp.replace(path)
+    except OSError:
+        log.warning("couldn't save %s", path, exc_info=True)
+
+
+def _write(snap: tuple[int, dict, str]) -> bool:
+    """Write a Config.snapshot() to config.json (+ privacy.json), unless a newer one
+    is already there."""
+    global _written_seq
+    seq, raw, privacy = snap
+    with _write_lock:
+        if seq < _written_seq:
+            return True   # a newer snapshot got there first
         try:
             APP_DIR.mkdir(parents=True, exist_ok=True)
-            text = json.dumps(self.to_raw(), indent=2)
-            self._save_privacy()
+            text = json.dumps(raw, indent=2)
+            _write_privacy(privacy)
             damaged = False
             try:
                 old = CONFIG_PATH.read_text(encoding="utf-8-sig")
                 if old == text:
+                    _written_seq = seq
                     return True   # nothing changed: don't churn the backups
                 # a damaged file that couldn't be set aside isn't a backup: rotating it
                 # in would push out a good one
@@ -650,11 +680,73 @@ class Config:
                 except OSError:   # a backup locked for a moment mustn't block the save
                     log.warning("couldn't rotate the config backups", exc_info=True)
             tmp.replace(CONFIG_PATH)
+            _written_seq = seq
             return True
         except OSError:
             log.exception("couldn't save settings to %s", CONFIG_PATH)
             return False
 
+
+class Saver:
+    """Saves a Config on a background thread, so a slow disk (an antivirus scan of
+    the new file took 2-7 s) doesn't freeze the window. save() copies the settings
+    right away; the newest copy is the one written, and `done(ok)` is called on the
+    saver's thread after each write."""
+
+    def __init__(self, cfg: Config, done=None):
+        self.cfg = cfg
+        self._done = done
+        self._cond = threading.Condition()
+        self._pending: tuple | None = None
+        self._busy = False
+        self._thread: threading.Thread | None = None
+
+    def save(self):
+        if self.cfg.read_only:   # logs it; nothing to write
+            if self._done:
+                self._done(self.cfg.save())
+            return
+        snap = self.cfg.snapshot()
+        with self._cond:
+            self._pending = snap
+            if self._thread is None or not self._thread.is_alive():
+                self._thread = threading.Thread(target=self._run, name="config-save",
+                                                daemon=True)
+                self._thread.start()
+            self._cond.notify_all()
+
+    def _run(self):
+        while True:
+            with self._cond:
+                while self._pending is None:
+                    if not self._cond.wait(30):
+                        self._thread = None   # idle: the next save starts a new one
+                        return
+                snap, self._pending, self._busy = self._pending, None, True
+            try:
+                ok = _write(snap)
+            except Exception:  # noqa: BLE001 - a save must never kill the saver
+                log.exception("saving settings failed")
+                ok = False
+            with self._cond:
+                self._busy = False
+                self._cond.notify_all()
+            if self._done:
+                try:
+                    self._done(ok)
+                except Exception:  # noqa: BLE001
+                    log.exception("after saving settings")
+
+    def flush(self, timeout: float = 10.0) -> bool:
+        """Wait until everything handed to save() is written. True when it is."""
+        end = time.monotonic() + timeout
+        with self._cond:
+            while self._pending is not None or self._busy:
+                left = end - time.monotonic()
+                if left <= 0:
+                    return False
+                self._cond.wait(left)
+        return True
 
 MAX_FADE_S = 10.0
 MAX_DELAY_S = 10.0      # a sound's "wait before playing"
@@ -813,7 +905,12 @@ def to_int16(data: np.ndarray) -> np.ndarray:
     """float32 [-1, 1] -> int16 (the in-memory / cached format). int16 passes through."""
     if data.dtype == np.int16:
         return data
-    return np.ascontiguousarray(np.clip(np.rint(data * I16), -I16 - 1, I16).astype(np.int16))
+    # one float copy, rounded and clipped in place: a 15-minute song is ~350 MB of
+    # float32, and each temporary would be another
+    y = data * I16
+    np.rint(y, out=y)
+    np.clip(y, -I16 - 1, I16, out=y)
+    return np.ascontiguousarray(y.astype(np.int16))
 
 
 def to_float32(data: np.ndarray) -> np.ndarray:
@@ -895,11 +992,18 @@ def cache_keep(sounds: list[SoundMeta]) -> set[str]:
 
 def prune_cache(keep: set[str]):
     """Delete cache files that aren't in `keep` (see cache_keep): removed sounds and
-    effects versions that were replaced."""
+    effects versions that were replaced. Recent files of a sound `keep` doesn't know
+    are left alone, like thumbs.prune does: an import still running has stored its
+    cache (or is writing its .tmp.npy) before the sound joins the library."""
+    ids = {k.split(".")[0] for k in keep}
     try:
         for p in CACHE_DIR.glob("*.npy"):
-            if p.stem not in keep:
-                p.unlink(missing_ok=True)
+            if p.stem in keep:
+                continue
+            fresh = p.name.split(".")[0] not in ids or p.name.endswith(".tmp.npy")
+            if fresh and time.time() - p.stat().st_mtime < CACHE_GRACE_S:
+                continue
+            p.unlink(missing_ok=True)
     except OSError:
         log.debug("cache prune failed", exc_info=True)
 
@@ -926,32 +1030,52 @@ def peaks(data: np.ndarray, n: int) -> np.ndarray:
     if not len(data) or n <= 0:
         return np.zeros(max(n, 0), np.float32)
     scale = 1 / I16 if data.dtype == np.int16 else 1.0
-    edges = np.linspace(0, len(data), n + 1).astype(np.int64)
-    out = np.zeros(n, np.float32)
-    for i in range(n):
-        a, b = edges[i], max(edges[i + 1], edges[i] + 1)
-        seg = data[a:min(b, len(data))]
-        if len(seg):
-            out[i] = float(np.abs(seg).max()) * scale
+    starts = np.linspace(0, len(data), n + 1).astype(np.int64)[:-1]
+    at = np.minimum(starts, len(data) - 1)   # more slices than frames: the last ones are empty
+    # max and min, not abs: abs of an int16 -32768 is still -32768. Per channel, then
+    # both: numpy's max(axis=1) over two columns is many times slower
+    hi = np.maximum(np.maximum.reduceat(data[:, 0], at), np.maximum.reduceat(data[:, -1], at))
+    lo = np.minimum(np.minimum.reduceat(data[:, 0], at), np.minimum.reduceat(data[:, -1], at))
+    hi, lo = hi.astype(np.float32), lo.astype(np.float32)
+    out = np.maximum(hi, -lo) * np.float32(scale)
+    out[starts >= len(data)] = 0.0
     return np.clip(out, 0.0, 1.0)
+
+
+PEAK_READS = 4      # original_peaks: short reads per waveform column of a long sound...
+PEAK_CHUNK = 1024   # ...of this many frames (4 KB of int16 stereo: one page each)
 
 
 def original_peaks(meta: SoundMeta, n: int = 400) -> tuple[np.ndarray, float]:
     """(waveform peaks, length in seconds) of a sound as imported, for the trim
-    control. Read from the cache without loading it (every few frames of a long
-    one: plenty for n columns). No cache yet: no peaks, the length from the file."""
+    control. Read from the cache without loading it: a long one gives a few short
+    reads spread over each column, plenty to draw it. No cache yet: no peaks, the
+    length from the file."""
     p = cache_path(meta.id)
     try:
         if p.exists():
             data = np.load(p, mmap_mode="r")
-            step = max(1, len(data) // 400_000)
-            return peaks(np.asarray(data[::step]), n), len(data) / SR
+            return _sampled_peaks(data, n), len(data) / SR
     except Exception:  # noqa: BLE001
         log.debug("couldn't read the cache of %s for its waveform", meta.id, exc_info=True)
     try:
         return np.zeros(0, np.float32), original_frames(meta) / SR
     except Exception:  # noqa: BLE001 - the file is gone: nothing to trim
         return np.zeros(0, np.float32), 0.0
+
+
+def _sampled_peaks(data: np.ndarray, n: int) -> np.ndarray:
+    """peaks() of a memory-mapped (m, 2) array, touching only PEAK_READS chunks of
+    PEAK_CHUNK frames per column (every frame of a short one). A plain stride over
+    the whole file would still read every page of it."""
+    if n <= 0 or len(data) <= n * PEAK_READS * PEAK_CHUNK:
+        return peaks(np.asarray(data), n)
+    edges = np.linspace(0, len(data), n + 1)
+    width = edges[1] - edges[0]
+    offsets = (np.arange(PEAK_READS) + 0.5) * (width / PEAK_READS) - PEAK_CHUNK / 2
+    starts = np.clip((edges[:-1, None] + offsets).astype(np.int64), 0, len(data) - PEAK_CHUNK)
+    picked = np.asarray(data[(starts[..., None] + np.arange(PEAK_CHUNK)).ravel()])
+    return peaks(picked, n)   # n equal slices of it = each column's own chunks
 
 
 def fingerprint(path: str) -> str:

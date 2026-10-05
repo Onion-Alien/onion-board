@@ -25,8 +25,9 @@ from soundboard import modules as mods
 from soundboard import voicefx
 from soundboard import library, net, netlog, savedvoices, theme
 from soundboard.speech import customvoices, translation, winvoices
+from soundboard.speech.aivoice import AiVoiceController
 from soundboard.speech.live import SpeechController, clean_settings
-from soundboard.ui import art, busy, icons
+from soundboard.ui import appstate, art, busy, icons
 from soundboard.ui.panel import (UndoBar, VolumeControl, bar, card, hint_label, icon_label,
                                  section_label, vsep)
 from soundboard.ui.responsive import FitWidth
@@ -2010,6 +2011,18 @@ class VoicePanel(QWidget):
         self.speech.changed.connect(lambda _s: self._emit_active())   # the tab's picture
         self.speech.downloaded.connect(lambda: self.addons.show_modules(self.modules))
         self.speech.live_changed.connect(lambda _on: self._emit_active())
+        # AI voices first: the live voice changer; then the computer voice
+        from soundboard.ui.aivoicepanel import AiVoicePanel
+        self.ai_controller = AiVoiceController(self.chain, lambda ev: None)
+        saved = speech.get("ai") if isinstance(speech, dict) else None   # may be damaged
+        self.ai = AiVoicePanel(self.ai_controller, saved, self.modules)
+        self.ai.changed.connect(self._ai_changed)
+        self.ai.live_changed.connect(self._ai_live)
+        self.ai.modules_changed.connect(self.rescan_modules)
+        ai_card, aiv = card(roomy=True)
+        aiv.addWidget(self.ai)
+        rcol.addWidget(ai_card)
+        self.speech.live_changed.connect(self._speech_live)
         live_card, lv = card(roomy=True)
         lv.addWidget(self.speech)
         rcol.addWidget(live_card)
@@ -2027,10 +2040,11 @@ class VoicePanel(QWidget):
         # the voice changer's mic meter (only while the tab is showing)
         self._meter_timer = QTimer(self)
         self._meter_timer.timeout.connect(self._meter)
+        appstate.slow_in_background(self, self._meter_timer, 50)   # behind a game
 
     def showEvent(self, e):
         super().showEvent(e)
-        self._meter_timer.start(50)
+        self._meter_timer.start(appstate.interval(50))
 
     def hideEvent(self, e):
         super().hideEvent(e)
@@ -2064,9 +2078,23 @@ class VoicePanel(QWidget):
         self.fx_changed.emit(spec)
         self._emit_active()
 
+    def _ai_changed(self, s: dict):
+        self.speech.s["ai"] = s            # kept with the speech settings
+        self.speech_changed.emit(dict(self.speech.s))
+
+    def _ai_live(self, on: bool):
+        if on:                             # one replacement for your voice at a time
+            self.speech.b_live.setChecked(False)
+        self._emit_active()
+
+    def _speech_live(self, on: bool):
+        if on:
+            self.ai.stop()
+
     def is_active(self) -> bool:
         """Something here is changing what others hear from your mic."""
-        return self.fx.btn_power.isChecked() or self.speech.b_live.isChecked()
+        return (self.fx.btn_power.isChecked() or self.speech.b_live.isChecked()
+                or self.ai.is_on())
 
     def _emit_active(self):
         self.active_changed.emit(self.is_active())
@@ -2087,9 +2115,11 @@ class VoicePanel(QWidget):
         self.fx.add_new_effects()
         self.chain.configure(self.fx.spec())
         self.speech.set_modules(self.modules)
+        self.ai.set_modules(self.modules)
         self.addons.show_modules(self.modules)
 
     def shutdown(self):
         self._meter_timer.stop()
+        self.ai.shutdown()
         self.controller.shutdown()
         self.engine.voice_chain = None

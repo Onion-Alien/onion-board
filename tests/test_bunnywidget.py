@@ -113,3 +113,25 @@ def test_sad_bun_begs_in_a_bubble_and_cheers_when_clicked(qapp):
     assert b.say == "yay"
     _run(qapp, b, 15)
     assert b.pose()["sad"] < 0.3             # happy while cheering
+
+def test_idles_at_a_few_frames_a_second_and_wakes_for_talking(qapp):
+    from soundboard.ui import bunnywidget
+    b = BunnyWidget("plug")
+    b._timer.start(bunnywidget.FAST_MS)   # as if on screen
+    far = time.monotonic() + 60
+    b._next_blink = b._next_flick = b._next_sigh = far
+    _run(qapp, b, 2)
+    assert not b.busy()
+    assert b._timer.interval() == bunnywidget.IDLE_MS
+    b.set_level(0.4)                      # talking: full speed at once
+    assert b._timer.interval() == bunnywidget.FAST_MS
+    _run(qapp, b, 5, level=0.4)
+    assert b._timer.interval() == bunnywidget.FAST_MS
+    b._next_blink = time.monotonic()      # a blink due: fast frames so it shows
+    b._level = 0.0
+    assert b.busy()
+    b.notes.clear()
+    b._timer.setInterval(bunnywidget.IDLE_MS)
+    b.burst(2)
+    assert b._timer.interval() == bunnywidget.FAST_MS
+    b._timer.stop()
