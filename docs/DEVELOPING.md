@@ -225,7 +225,11 @@ Get-Process OnionBoard -ErrorAction SilentlyContinue      # is it running?
    `releases/latest/download/OnionBoardSetup.exe`, and installed copies update
    themselves from the latest release's `OnionBoardSetup.exe` (`soundboard/updates.py`
    only installs it when GitHub lists its SHA-256, and runs it with `/RELAUNCH=1`,
-   see `installer/OnionBoard.iss`). A release with a broken installer reaches
+   see `installer/OnionBoard.iss`). Upload the same file a second time as
+   `OnionBoardSetup-update.exe` (`gh release upload vX.Y.Z
+   "dist\OnionBoardSetup.exe#OnionBoardSetup-update.exe"` doesn't rename it: copy it
+   to that name first): *Update now* fetches that one when a release has it, so
+   GitHub's download counts tell updates apart from new downloads. A release with a broken installer reaches
    everyone who clicks *Update now*: install the built one over your own copy
    before publishing.
    The notes start with a one-line headline, then a download line, because GitHub

@@ -47,7 +47,7 @@ in a later commit.
    a licence that allows redistribution, noted in the PR.
 7. **No new network calls without saying so.** Anything that talks to the
    internet goes in the table in [SECURITY.md](SECURITY.md#what-the-app-does-on-the-network)
-   in the same PR. No telemetry.
+   in the same PR. No telemetry beyond the opt-out anonymous usage count (`soundboard/usage.py`).
 8. **Loopback stays locked.** Local sockets bind to `127.0.0.1` only and must
    check a secret with `secrets.compare_digest`: a per-launch one, or, for the
    opt-in remote control API, the key shown in Settings. Never log the secret or

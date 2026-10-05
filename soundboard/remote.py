@@ -35,7 +35,8 @@ Every endpoint takes GET or POST and answers JSON (ENDPOINTS below is the list;
     /api/effects?bass=6&echo=0.3… / ?preset=Canyon / ?reset=1
                                  the live effects on every sound
     /api/reset                   back to 1x, no pitch change, no effects
-    /api/mode[?set=discord]      who's listening (the voice chat mode); alone: the list
+    /api/mode[?simple=game|?set=discord]   who's listening: a sound mode (Game, Voice
+                                 chat, Clean, Advanced) or one exact voice chat mode
     /api/stations?list=popular|favorites|recent|search[&q=…]   radio stations
     /api/radio?id=… / ?on=1|0|toggle         play a station / play or stop the radio
     /api/radio_random, /api/radio_star[?id=…], /api/radio_live, /api/radio_hear,
@@ -110,8 +111,9 @@ ENDPOINTS = {
                "(-12 to 12 dB) &muffle= &reverb= &echo= &crunch= (0-1), or ?preset=Canyon, "
                "or ?reset=1; alone: the knobs and presets there are",
     "reset": "live speed, pitch and effects back to normal",
-    "mode": "who's listening (the voice chat your sounds are shaped for): ?set=discord; "
-            "alone: the modes there are",
+    "mode": "who's listening (the voice chat your sounds are shaped for): "
+            "?simple=game / voice / clean / advanced, or one exact mode with "
+            "?set=discord; alone: the modes there are",
     "stations": "radio stations: ?list=popular / favorites / recent, or ?list=search&q=jazz "
                 "(ask again for the stations found online)",
     "radio": "the radio: ?id=… plays that station; ?on=1 / 0 / toggle plays the last one or "
@@ -604,30 +606,42 @@ def dispatch_live(mw: MainWindow, action: str, params: dict) -> tuple[int, objec
 # --------------------------------------------------------------------------- who's listening
 
 def mode_state(mw: MainWindow, full: bool = True) -> dict:
-    from soundboard import destination
+    from soundboard import destination, profiles
     d = mw.cfg.dest if isinstance(mw.cfg.dest, dict) else {}
     now = destination.resolve(d)
-    out = {"mode": now.key, "mode_label": now.label}
+    p = profiles.current(d)
+    out = {"mode": now.key, "mode_label": now.label, "simple": p.key,
+           "simple_label": p.label,
+           "explain": profiles.explain(d, getattr(mw, "mode_why", ""))}
     if full:
         out["modes"] = [{"key": m.key, "label": m.label, "note": m.note}
                         for m in destination.all_modes(d.get("custom"))]
+        out["simples"] = [{"key": q.key, "label": q.label, "summary": q.summary,
+                           "details": q.details} for q in profiles.PROFILES]
     return out
 
 
 def dispatch_mode(mw: MainWindow, params: dict) -> tuple[int, object]:
-    """Picked through the Sounds tab's "Listening:" dropdown, which applies and saves it."""
-    from soundboard import destination
-    if "set" in params:
+    """?simple= picks a simple mode (Game, Voice chat, Clean, Advanced); ?set= one exact
+    destination mode, which is Advanced (or Clean, for Off). Both apply and save, and
+    the Sounds tab's dropdown and the Setup tab's picker show it."""
+    from soundboard import destination, profiles
+    from soundboard.ui import destpanel
+    if "simple" in params:
+        want = params["simple"].strip().lower()
+        p = next((q for q in profiles.PROFILES if want in (q.key, q.label.lower())), None)
+        if p is None:
+            return 404, {"error": f"no sound mode called {params['simple']!r}",
+                         **mode_state(mw)}
+        destpanel.set_simple(mw, p.key)
+    elif "set" in params:
         d = mw.cfg.dest if isinstance(mw.cfg.dest, dict) else {}
         want = params["set"].strip().lower()
         match = next((m for m in destination.all_modes(d.get("custom"))
                       if want in (m.key.lower(), m.label.lower())), None)
         if match is None:
             return 404, {"error": f"no mode called {params['set']!r}", **mode_state(mw)}
-        mw.mode_combo._picked(mw.mode_combo.findData(match.key))
-        panel = getattr(mw, "dest_panel", None)   # the Setup tab's picker
-        if panel is not None and hasattr(panel, "refresh"):
-            panel.refresh()
+        destpanel.set_exact(mw, match.key)
     return 200, mode_state(mw)
 
 

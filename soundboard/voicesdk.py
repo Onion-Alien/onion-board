@@ -275,7 +275,9 @@ class Listeners:
         self._busy = False
         self.found: tuple = ()
 
-    def poll(self, device: str | None) -> tuple:
+    def poll(self, device) -> tuple:
+        """`device`: a recording device's name, or several (a tuple: straight into my
+        mic looks at the mic and the cable's far end both)."""
         if not device:
             self.found = ()
         elif not self._busy:
@@ -287,7 +289,8 @@ class Listeners:
     def look(self, device: str) -> tuple:
         """One look, on the calling thread (poll runs it on its own)."""
         voice, games = [], []
-        for app in self._list(device):
+        devices = device if isinstance(device, tuple) else (device,)
+        for app in [a for d in devices if d for a in self._list(d)]:
             hit = VOICE_APPS.get(app.exe.lower())
             if hit:
                 voice.append(hit)

@@ -36,6 +36,10 @@ if ($LASTEXITCODE -ne 0) { throw "version_info.py failed" }
 # its FFTs with scipy.fft, and released Onion Watch up to 0.5.6 needs scipy.ndimage
 # too: without it their Triggers tab won't load (~1 MB; keep it while anyone may be
 # on 0.5.6). scipy's __init__ names every subpackage, so the rest is excluded by name.
+# Straight into my mic: the Windows audio effect (native\directmic), built with
+# MinGW-w64 (winget install BrechtSanders.WinLibs.POSIX.UCRT), bundled as directmic\.
+& $py scripts\build_directmic.py
+if ($LASTEXITCODE -ne 0) { throw "build_directmic.py failed (is MinGW-w64's g++ installed?)" }
 & $py -m PyInstaller --noconfirm @cleanArg --windowed `
     --name OnionBoard --icon assets\onionboard.ico `
     --version-file installer\version_info.txt `
@@ -43,6 +47,7 @@ if ($LASTEXITCODE -ne 0) { throw "version_info.py failed" }
     --add-data "assets\onionboard.ico;." `
     --add-data "assets\art;art" `
     --add-data "assets\radio;radio" `
+    --add-binary "build\directmic\obmic.dll;directmic" `
     --copy-metadata yt-dlp --collect-all yt_dlp_ejs `
     --hidden-import scipy.fft --hidden-import scipy.ndimage `
     --exclude-module scipy.signal `

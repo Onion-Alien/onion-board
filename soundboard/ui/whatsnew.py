@@ -27,6 +27,17 @@ class Note:
 
 # newest first; add one per release that has something worth telling
 NOTES = (
+    Note("1.9.0", "No virtual cable needed", (
+        ("mic", "Straight into your mic",
+         "Setup → Straight into my mic instead: one click, and Discord and games hear "
+         "your sounds through the mic they already use. Nothing to pick there."),
+        ("sliders", "Everything still works",
+         "Voice changer, mic volume, gate, ducking and mute all work the same, and the "
+         "virtual cable is still there if you'd rather keep it."),
+        ("check", "Simpler and smoother",
+         "Who's listening is now four modes: Game, Voice chat, Clean and Advanced. And "
+         "searching, scrolling, sliders and the Radio tab no longer lag."),
+    ), "", ""),
     Note("1.8.0", "AI voices and a clip editor", (
         ("voice", "Talk as someone else",
          "Voice tab → Get AI voices: six characters that turn your voice into theirs, "

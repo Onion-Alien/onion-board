@@ -901,12 +901,11 @@ class SettingsDialog(QDialog):
         v.addWidget(self._stream_card())
         v.addWidget(self._voices_card())
         card, cv = self._card("Who's listening",
-                              "Voice chat runs your sounds through a mono voice codec that drops "
-                              "the sub-bass and, in some games, everything above 8-12 kHz. Pick "
-                              "the voice chat your game is built on and they're shaped to survive "
-                              "it: the lost bass becomes harmonics that get through, each sound "
-                              "gets back the level the bass took, and you hear the same thing "
-                              "they do. Off sends them exactly as mixed.")
+                              "Voice chat squashes your sounds: mono, no deep bass, and in some "
+                              "games nothing above 8-12 kHz. Pick where people hear you and "
+                              "they're shaped to get through it. Game and Voice chat work out "
+                              "the exact voice chat by themselves; Clean sends them exactly as "
+                              "mixed; Advanced lets you pick it yourself.")
         from soundboard.ui.destpanel import DestPanel
         dest = DestPanel(self.mw)
         dest.chk_gate.setText("Mute mic during sounds")
@@ -1163,7 +1162,7 @@ class SettingsDialog(QDialog):
         ver = self.about_version = QLabel(f"Version {version_text()}")
         ver.setTextInteractionFlags(Qt.TextSelectableByMouse)
         cv.addWidget(ver)
-        hint = QLabel("Free, with no ads, no account and no tracking. Made by OnionAlien. "
+        hint = QLabel("Free, with no ads and no account. Made by OnionAlien. "
                       "MIT license with the Commons Clause: use it for anything, share it "
                       "for free, never sell it.")
         hint.setObjectName("hint")
@@ -1281,7 +1280,7 @@ class SettingsDialog(QDialog):
         with someone else's details swapped in is easy to spot."""
         from soundboard.updates import REPO
         card, cv = self._card("Support Onion Board",
-                              "Onion Board is free, with no ads and no tracking. If it made "
+                              "Onion Board is free, with no ads and no account. If it made "
                               "your games or calls more fun, you can chip in. Entirely "
                               "optional. The button opens the project's GitHub page.")
         btn = QPushButton("♥  Support Onion Board")
@@ -1605,6 +1604,11 @@ class SettingsDialog(QDialog):
         "tor_download": "Get Tor / Update Tor (Connection page) downloads Tor from the "
                         "Tor Project (dist.torproject.org). Off: a Tor that's already "
                         "here still works.",
+        "usage_stats": "Once a day, the installed app sends an anonymous \"still here\" "
+                       "to our counter (goatcounter.com): the version number and a random "
+                       "ID made on this PC, so nobody is counted twice. Nothing else: no "
+                       "name, sounds, settings or games. It's how we know if anyone uses "
+                       "Onion Board. Off: nothing is sent.",
     }
 
     def _switches_card(self):
@@ -1615,8 +1619,9 @@ class SettingsDialog(QDialog):
         cfg = self.mw.cfg
         card, cv = self._card(
             "What goes online",
-            "Onion Board has no account, tracking or analytics, and sends nothing to us. "
-            "These are the only things that go online. Switch off what you don't want: "
+            "Onion Board has no account or ads. The only thing it sends us is the "
+            "anonymous usage count below, if it's on. These are the only things that go "
+            "online. Switch off what you don't want: "
             "off means it makes no connection at all, whatever the Connection setting.")
         self.offline_box = self._option(
             cv, "Offline mode",
@@ -1634,11 +1639,13 @@ class SettingsDialog(QDialog):
             ("Voices", ("voices", "voice_servers")),
             ("Updates and add-ons", ("app_update", "ytdlp_update", "addons")),
             ("Setup downloads", ("setup_downloads", "tor_download")),
+            ("Usage count", ("usage_stats",)),
         )
         labels = {"sounds_web": "Online sounds", "app_update": "App updates",
                   "ytdlp_update": "Downloader updates", "addons": "Add-on downloads",
                   "voices": "Voice and model downloads", "voice_servers": "Online voice servers",
-                  "setup_downloads": "Virtual cable download", "tor_download": "Tor download"}
+                  "setup_downloads": "Virtual cable download", "tor_download": "Tor download",
+                  "usage_stats": "Count me in"}
         for title, keys in groups:
             section, sv = self._card(title)
             for key in keys:

@@ -99,15 +99,16 @@ WelcomeLabel2=This puts Onion Board on your PC and can add the free "virtual cab
 WizardSelectTasks=Pick what you want
 SelectTasksDesc=Tick what you'd like. If you're not sure, leave the boxes as they are.
 FinishedHeadingLabel=All done!
-FinishedLabel=Onion Board is installed. It will open now and ask you a few easy questions (which mic you use, where you listen, how your sounds reach Discord or your game).%n%nYou can find it later on your Desktop or in the Start menu.%n%nPrivacy: no account, ads or tracking. Settings > Privacy & security shows everything the app does online, lets you switch those things off, and can send all of it through a proxy or Tor.
+FinishedLabel=Onion Board is installed. It will open now and ask you a few easy questions (which mic you use, where you listen, how your sounds reach Discord or your game).%n%nYou can find it later on your Desktop or in the Start menu.%n%nPrivacy: no account or ads. The only thing counted is the anonymous "still here" if you left Count me in ticked. Settings > Privacy & security shows everything the app does online, lets you switch those things off, and can send all of it through a proxy or Tor.
 FinishedRestartLabel=Onion Board is installed. To finish setting up the virtual cable, Windows needs to restart your PC.%n%nAfter the restart, open Onion Board from the Start menu and it will pick up where it left off.
 
 [Tasks]
-Name: "vbcable"; Description: "The free virtual cable (VB-Cable), so Discord and games hear your sounds"; GroupDescription: "Needed for Discord and games (untick it if you'll send sounds through Voicemeeter, a mixer or OBS)"
+Name: "vbcable"; Description: "The free virtual cable (VB-Cable), so Discord and games hear your sounds"; GroupDescription: "Needed for Discord and games (untick it if you use Voicemeeter, a mixer or OBS)"
 Name: "ffmpeg"; Description: "Play M4A, AAC and video files (the free FFmpeg, about 100 MB)"; GroupDescription: "Extra features (optional)"; Check: CanOfferFfmpeg
 Name: "livevoice"; Description: "Set up live voice-to-speech now (needs Python, about 300 MB)"; GroupDescription: "Extra features (optional)"; Flags: unchecked
 Name: "tor"; Description: "Private connection (Tor): hides your internet address (about 22 MB)"; GroupDescription: "Privacy (optional)"; Flags: unchecked
 Name: "keepnetlog"; Description: "Keep a history of what Onion Board connects to (on this PC only)"; GroupDescription: "Privacy (optional)"; Flags: unchecked
+Name: "countme"; Description: "Count me in: an anonymous ""still here"" once a day, so we know people use it"; GroupDescription: "Privacy (optional)"
 Name: "desktopicon"; Description: "Put an Onion Board shortcut on my Desktop"; GroupDescription: "Shortcuts"
 
 [InstallDelete]
@@ -139,6 +140,15 @@ Filename: "{app}\{#AppExeName}.exe"; Parameters: "--set-offline"; \
 Filename: "{app}\{#AppExeName}.exe"; Parameters: "--keep-netlog"; \
   StatusMsg: "Switching on the network activity history..."; \
   Tasks: keepnetlog; Flags: runhidden waituntilterminated
+; "Count me in" (soundboard/usage.py): unticked, it's switched off before the first
+; start, so nothing is ever sent. Ticked on a page the user saw, it's switched on (an
+; old install had it off); a silent update never switches it on.
+Filename: "{app}\{#AppExeName}.exe"; Parameters: "--usage-count off"; \
+  StatusMsg: "Switching off the usage count..."; \
+  Tasks: not countme; Flags: runhidden waituntilterminated
+Filename: "{app}\{#AppExeName}.exe"; Parameters: "--usage-count on"; \
+  StatusMsg: "Switching on the usage count..."; \
+  Tasks: countme; Check: not WizardSilent; Flags: runhidden waituntilterminated
 ; The virtual cable is installed from CurStepChanged in [Code], so its exit code can
 ; ask for a restart.
 Filename: "{code:WingetPath}"; \
@@ -158,6 +168,12 @@ Filename: "{app}\{#AppExeName}.exe"; Description: "Open Onion Board now"; Flags:
 ; setup inherits, and an app started straight from setup with them crashed on
 ; start (1.3.3 -> 1.4.0: "Importing the numpy C-extensions failed").
 Filename: "{win}\explorer.exe"; Parameters: """{app}\{#AppExeName}.exe"""; Flags: nowait; Check: Relaunch
+
+[UninstallRun]
+; Straight into my mic: take Onion Board off the mic first, so every mic is exactly as
+; it was. Windows asks for permission once, and only if it's on a mic at all.
+Filename: "{app}\{#AppExeName}.exe"; Parameters: "--direct-mic remove"; \
+  RunOnceId: "DirectMicRemove"; Flags: runhidden waituntilterminated
 
 [Registry]
 ; "Start with Windows" (Settings -> General) writes this value; nothing is created at
@@ -391,6 +407,10 @@ var
   Bullet: String;
 begin
   Bullet := '  ' + #$2022 + '  ';
+  // The box list stops 11 px short of its page: down to the page's bottom, eleven rows
+  // (with FFmpeg offered and Count me in) fit without a scrollbar.
+  WizardForm.TasksList.Height := WizardForm.TasksList.Parent.ClientHeight -
+    WizardForm.TasksList.Top;
   PrivacyPage := CreateCustomPage(wpWelcome, 'Your privacy',
     'What Onion Board connects to, and when');
   Body := TNewStaticText.Create(PrivacyPage);
@@ -400,9 +420,9 @@ begin
   Body.Width := PrivacyPage.SurfaceWidth;
   Body.ShowAccelChar := False;
   Body.Caption :=
-    'No account, no ads, no tracking. On its own, Onion Board only goes online once a ' +
-    'day, to check for a new version (of the app, and of Onion Watch if you add it). ' +
-    'Nothing downloads until you click Update, and you can switch the check off.' + #13#10#13#10 +
+    'No account, no ads. On its own, Onion Board only goes online once a day: to ' +
+    'check for updates, and to send an anonymous "still here" if Count me in is ' +
+    'ticked. Nothing downloads until you click Update, and you can switch both off.' + #13#10#13#10 +
     'Everything else happens only when you use it:' + #13#10 +
     Bullet + 'Sounds: searching and downloading go to YouTube, SoundCloud or Myinstants.' + #13#10 +
     Bullet + 'Radio: Radio Browser (a free list of stations) and the stations you play.' + #13#10 +

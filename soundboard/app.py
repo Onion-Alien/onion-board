@@ -262,6 +262,28 @@ def keep_netlog() -> int:
     return 0
 
 
+def set_usage_count(on: bool) -> int:
+    """`OnionBoard.exe --usage-count on|off`: the installer's "Count me in" box. Off
+    adds the usage count to the switched-off features in config.json before the
+    app's first start, so it never sends one; on takes it out (only a box the user
+    saw: a silent update never passes on). Other settings are kept; nothing
+    connects. No window. Returns 0 once it's saved, 1 if it couldn't be."""
+    migrate_from_soundboard()
+    applog.setup(APP_DIR)
+    from soundboard import library
+    cfg = library.Config.load()
+    if cfg.read_only:
+        print("FAIL: config.json is locked by another program", file=sys.stderr)
+        return 1
+    cfg.net_off = [k for k in cfg.net_off if k != "usage_stats"] + ([] if on else ["usage_stats"])
+    if not cfg.save():
+        print(f"FAIL: couldn't save {library.CONFIG_PATH}", file=sys.stderr)
+        return 1
+    log.info("--usage-count: %s", "on" if on else "off")
+    print(f"OK: the anonymous usage count is {'on' if on else 'off'}")
+    return 0
+
+
 def selftest_addon(path: str) -> int:
     """`OnionBoard.exe --selftest-addon OnionWatch-module.zip`: prove this build can
     run the Onion Watch add-on (it has no pip, so the add-on may only use what the
@@ -335,6 +357,9 @@ def main():
         sys.exit(set_offline())
     if "--keep-netlog" in sys.argv:
         sys.exit(keep_netlog())
+    if "--usage-count" in sys.argv:
+        i = sys.argv.index("--usage-count")
+        sys.exit(set_usage_count(sys.argv[i + 1:i + 2] == ["on"]))
     if "--selftest-addon" in sys.argv:
         try:
             sys.exit(selftest_addon(sys.argv[sys.argv.index("--selftest-addon") + 1]))
@@ -420,8 +445,10 @@ def main():
     # new versions (updates.py): unless unticked, at most once a day, also for an app
     # left running for days
     QTimer.singleShot(45_000, w.check_updates)
+    QTimer.singleShot(60_000, w.send_usage)   # the anonymous daily count (usage.py)
     recheck = QTimer(w)
     recheck.timeout.connect(w.check_updates)
+    recheck.timeout.connect(w.send_usage)
     recheck.start(6 * 3600 * 1000)
     from soundboard.hangwatch import HangWatch
     app.hangwatch = HangWatch(parent=app)   # a frozen window gets its stack logged

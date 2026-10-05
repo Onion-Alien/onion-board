@@ -6,11 +6,26 @@
   whichever thread happened to be running, sometimes a sound or network thread, and
   that could free a part of the window while it was still ticking. It now tidies up
   on the window's own thread only (which also keeps that work off the audio threads).
-- **Switching to the Radio tab no longer freezes the app.** Since 1.8.0 the flat
-  map threw its drawing away whenever you left the tab and drew the whole world
-  again on the way back, freezing the window each time (longer on big screens).
-  Now it keeps the drawing for a minute, and any redraw happens a slice at a time
-  so nothing waits for it.
+
+## 1.9.0 — 2026-10-05
+
+- **No virtual cable needed any more:** *Straight into my mic* puts your sounds into
+  the mic Discord and your games already use. One click and one Windows permission
+  prompt, and there's nothing to pick in Discord or the game. Your voice changer, mic
+  volume, voice EQ, gate, ducking and mute all still work; your mic meter and mic
+  check hear only you; Discord and a game can use the mic at the same time. If
+  Onion Board closes, your mic is just your mic again. New users start with it;
+  if you already use the virtual cable, nothing changes until you click *Straight
+  into my mic instead* on the Setup tab. If a Windows update takes it off your mic,
+  the Setup tab offers a one-click repair (or the cable). Uninstalling Onion Board
+  puts your mic back exactly as it was.
+- **Simpler sound modes:** *Who's listening* is now four modes: **Game**, **Voice
+  chat**, **Clean** and **Advanced**. Game and Voice chat work out the exact voice
+  chat by themselves (the game's own voice engine, or the app listening to the
+  virtual cable) and shape your sounds for it; Clean sends them exactly as mixed;
+  Advanced is the full list and your custom modes, as before. *What do these do?*
+  explains each one and what it's doing right now, and every mode's tooltip says
+  it too. Your old choice carries over, and older versions still read it.
 - **Smoother everywhere, less CPU.** Nothing should feel laggy now:
   - Sounds: clearing the search or going back to "All" on a big board no longer
     stalls; typing in search, dragging Pad size and scrolling a board of pad
@@ -27,6 +42,19 @@
   - Less CPU while idle, in the in-game overlay (none for paused sounds), on the
     Apps tab while hidden or behind a game, and in the setup guide. Bun in
     headphones rests between notes.
+- **Switching to the Radio tab no longer freezes the app.** Since 1.8.0 the flat
+  map threw its drawing away whenever you left the tab and drew the whole world
+  again on the way back, freezing the window each time (longer on big screens).
+  Now it keeps the drawing for a minute, and any redraw happens a slice at a time
+  so nothing waits for it.
+- **Anonymous usage count:** once a day the installed app sends a "still here"
+  with just its version number and a random ID made on your PC, so we can see if
+  anyone uses Onion Board. No name, sounds, settings or games. New installs have it
+  on (the installer's *Count me in* box); if you installed an earlier version it
+  stays off unless you switch it on. Settings → Privacy & security → *Count me in*
+  turns it on or off at any time, and Offline mode, a proxy and Tor apply to it too.
+- A removed long sound's audio no longer stays on disk for 10 minutes or more when
+  it was still playing (or just brought back with Undo) as it was removed.
 
 ## 1.8.0 — 2026-10-05
 

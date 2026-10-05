@@ -56,6 +56,19 @@ def test_never_taller_than_the_screen(qapp):
 def test_setup_wizard_last_page_text_is_not_squashed(qapp, wizard):  # noqa: F811
     w, wiz = wizard
     w.cfg.main_device = "CABLE Input (VB-Audio Virtual Cable)"
+    _last_page_fits(qapp, wiz)
+
+
+def test_setup_wizard_last_page_fits_straight_into_the_mic(qapp, wizard, monkeypatch):  # noqa: F811
+    from soundboard import directmic
+    w, wiz = wizard
+    w.cfg.route = "mic"
+    monkeypatch.setattr(directmic, "status", lambda name=None: "ready")
+    w.cfg.mic_device = "Microphone (A Very Long Gaming Headset Name With A Model Number)"
+    _last_page_fits(qapp, wiz)
+
+
+def _last_page_fits(qapp, wiz):
     wiz.resize(wiz.minimumSize())
     wiz.show()
     wiz.go(3)

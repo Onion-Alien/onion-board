@@ -90,6 +90,7 @@ FEATURES = {
     "voice_servers": "Custom voice servers",
     "setup_downloads": "Install the virtual cable from the app",
     "tor_download": "Download Tor from the app",
+    "usage_stats": "Anonymous usage count",
 }
 # "sounds_web.<site>": the sites sounds come from, each with its own switch under it
 SITES = {"youtube": "YouTube", "soundcloud": "SoundCloud", "myinstants": "Myinstants",
@@ -106,6 +107,7 @@ _OFF_WHAT = {
     "voice_servers": "Custom voice servers are",
     "setup_downloads": "Installing the virtual cable from the app is",
     "tor_download": "Downloading Tor from the app is",
+    "usage_stats": "The anonymous usage count is",
 }
 WHERE = "Settings > Privacy & security"
 

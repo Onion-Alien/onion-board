@@ -34,6 +34,9 @@ REPO = "Onion-Alien/onion-board"
 API = f"https://api.github.com/repos/{REPO}/releases/latest"
 RELEASES = f"https://github.com/{REPO}/releases/latest"
 ASSET = "OnionBoardSetup.exe"
+# the same file uploaded a second time for *Update now* to fetch, so GitHub's download
+# counts tell updates apart from downloads off the website; releases without it: ASSET
+UPDATE_ASSET = "OnionBoardSetup-update.exe"
 # the only place an installer is ever fetched from (GitHub then redirects to its CDN)
 DOWNLOADS = f"https://github.com/{REPO}/releases/download/"
 # ...or under the project's name before it was renamed (GitHub redirects the old one)
@@ -101,9 +104,13 @@ def _get(url: str, feature: str = FEATURE,
 
 
 def _installer(data: dict) -> tuple[str, str, int]:
-    """The release's OnionBoardSetup.exe: (download link, SHA-256, size), or blanks
-    when it has none from this project, or no checksum to hold it to."""
-    return find_asset(data, ASSET, (DOWNLOADS, OLD_DOWNLOADS))
+    """The release's installer for *Update now* (UPDATE_ASSET, else its
+    OnionBoardSetup.exe): (download link, SHA-256, size), or blanks when it has none
+    from this project, or no checksum to hold it to."""
+    return (find_asset(data, UPDATE_ASSET, (DOWNLOADS, OLD_DOWNLOADS))
+            if any(isinstance(a, dict) and a.get("name") == UPDATE_ASSET
+                   for a in data.get("assets") or [])
+            else find_asset(data, ASSET, (DOWNLOADS, OLD_DOWNLOADS)))
 
 
 def find_asset(data: dict, name: str, trusted: tuple[str, ...]) -> tuple[str, str, int]:

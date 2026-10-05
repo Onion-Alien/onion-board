@@ -146,7 +146,7 @@ def test_unknown_and_missing_fields_are_tolerated(app_dir):
 
 
 def test_missing_config_gives_defaults(app_dir):
-    assert Config.load() == Config()
+    assert Config.load() == Config.first_start()   # (straight into the mic: new users)
 
 
 def test_corrupt_config_without_backups_gives_defaults_and_is_logged(app_dir, caplog):

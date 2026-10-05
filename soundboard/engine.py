@@ -38,7 +38,7 @@ import numpy as np
 import sounddevice as sd
 import soxr
 
-from soundboard import destination, livefx, mapped
+from soundboard import destination, directmic, livefx, mapped
 from soundboard.dsp import hermite
 from soundboard.eq import EQ
 from soundboard.sendfx import Ducker, Limiter, SafetyLimiter, SmartMono
@@ -505,6 +505,45 @@ class Ring:
         return np.concatenate([self.buf[self.r:], self.buf[: n - k]])
 
 
+class DirectFifo:
+    """The clean mic on its way to what others hear, in "straight into my mic" mode.
+    Writer and reader run on the same clock (the mic's) one right after the other, so
+    unlike Ring there's no cushion: a read takes what's there. Short (a resampler's
+    start-up delay), it's padded once with silence at the front; then every read finds
+    what it needs. A pile-up beyond MAX_S (a stall) is dropped down to one read."""
+
+    MAX_S = 0.03
+
+    def __init__(self, rate: int = SR):
+        self.rate = rate
+        self.parts: list[np.ndarray] = []
+        self.count = 0
+
+    def clear(self):
+        self.parts, self.count = [], 0
+
+    def write(self, x: np.ndarray):
+        if len(x):
+            self.parts.append(x)
+            self.count += len(x)
+
+    def read(self, n: int) -> np.ndarray | None:
+        if not self.count:
+            return None
+        buf = self.parts[0] if len(self.parts) == 1 else np.concatenate(self.parts)
+        if len(buf) > n + self.MAX_S * self.rate:
+            buf = buf[-n:]
+        if len(buf) >= n:
+            out, rest = buf[:n], buf[n:]
+        else:
+            out = np.zeros((n, buf.shape[1]), np.float32)
+            out[n - len(buf):] = buf
+            rest = buf[:0]
+        self.parts = [rest] if len(rest) else []
+        self.count = len(rest)
+        return out
+
+
 class StreamResampler:
     """Chunk-by-chunk resampler for live mic audio (identity when rates match)."""
 
@@ -815,6 +854,13 @@ class Engine:
         self._sfx: dict[str, livefx.LiveFx] = {}
 
         self.main_stream = self.mon_stream = self.mic_stream = self.obs_stream = None
+        # "straight into my mic" (soundboard.directmic): what others hear goes into the
+        # real mic inside Windows. The board's mic is then the clean mic the effect hands
+        # over (never its own sounds coming back), and the send mix runs on its clock.
+        self.main_direct = False
+        self.direct_mode = directmic.MODE_REPLACE   # the send mix replaces the mic
+        self.direct_lead_s = directmic.LEAD_S
+        self.fifo_direct = DirectFifo()
         self.rates = {"main": SR, "mon": SR, "mic": SR, "obs": SR}
         self.errors: dict[str, str] = {}
 
@@ -871,6 +917,8 @@ class Engine:
         return int(sd.query_devices(idx)["default_samplerate"])
 
     def _open_out(self, key, name, callback):
+        if key == "main" and name == directmic.DEVICE:
+            return self._open_direct(callback)
         idx = find_device("output", name)
         if idx is None:
             raise RuntimeError(f"device not found: {name}")
@@ -898,6 +946,50 @@ class Engine:
         self._resume_voices(key, rate)
         log.info("opened %s output: %s @ %d Hz (latency %s)", key, name, rate, self.latency)
         return s
+
+    def _open_direct(self, callback):
+        """What others hear -> straight into the real mic (soundboard.directmic)."""
+        try:
+            s = directmic.DirectMicStream(callback, mic_callback=self._mic_direct,
+                                          mode=self.direct_mode, lead_s=self.direct_lead_s)
+        except FileNotFoundError:
+            raise RuntimeError("Onion Board isn't attached to your mic yet") from None
+        self.fifo_direct.clear()
+        self._last_cb["main"] = time.monotonic()
+        s.start()
+        self._stream_opened("main")
+        rate = directmic.RATE
+        if rate != self.rates["main"]:
+            self.rates["main"] = rate
+            self._reconfigure_out("main")
+        else:
+            self._clear_out("main")
+        self._resume_voices("main", rate)
+        log.info("opened main output: straight into the mic")
+        return s
+
+    def effect_alive(self) -> bool:
+        """The mic effect is running: a program is recording the mic it's on."""
+        s = self.main_stream
+        return isinstance(s, directmic.DirectMicStream) and s.effect_alive()
+
+    def direct_apps(self) -> int:
+        """Apps whose mic stream carries the board right now (its own one too)."""
+        s = self.direct_stream()
+        return s.apps() if s is not None else 0
+
+    def direct_stream(self):
+        s = self.main_stream
+        return s if self.main_direct and isinstance(s, directmic.DirectMicStream) else None
+
+    def _mic_direct(self, x: np.ndarray, rate: int):
+        """A block of the clean mic, from the mic effect (its stream's thread)."""
+        if rate != self.rates["mic"]:
+            log.info("mic rate %d -> %d (the mic effect's)", self.rates["mic"], rate)
+            self.rates["mic"] = rate
+            self._reconfigure_mic_resamplers()
+        self._last_cb["mic"] = time.monotonic()
+        self._mic(x, direct=True)
 
     def _resume_voices(self, key: str, rate: int):
         """Output `key` was reopened: sounds still playing on another output pick
@@ -942,6 +1034,7 @@ class Engine:
         self._close("main_stream")
         self.errors.pop("main", None)
         self.names["main"] = name
+        self.main_direct = name == directmic.DEVICE
         self._last_try["main"] = time.monotonic()
         if name:
             try:
@@ -1737,6 +1830,12 @@ class Engine:
         if is_xrun(status):
             self.xruns["mic"] += 1
         try:
+            d = self.direct_stream()
+            if d is not None and d.mic_live:
+                # this block went through the mic effect, sounds and all: the clean one
+                # came from the effect already; take it now rather than at the next poll
+                d.pump()
+                return
             self._mic(indata)
         except Exception as e:  # noqa: BLE001
             self._guard("mic", e)
@@ -1756,7 +1855,14 @@ class Engine:
                 g = a.gain("main", lowcut) if a.live else 0.0
                 mix += self._vol("main", ("aux", a.key), x, g)
         self.level_play = max(play, self.level_play * 0.85)
-        mix = self._send_bus("main", finite(mix), self.ring_main.read(frames))
+        if self.main_direct:
+            mic = self.fifo_direct.read(frames)
+            mix = self._send_bus("main", finite(mix), mic,
+                                 add_mic=self.direct_mode == directmic.MODE_REPLACE)
+            if self.direct_mode == directmic.MODE_ADD:   # the effect keeps the real mic
+                self._direct_mic_gain()
+        else:
+            mix = self._send_bus("main", finite(mix), self.ring_main.read(frames))
         # muted: others get silence (faded, not cut), nothing else changes
         mix = self._vol("main", "send", mix, 1.0 if self.sending else 0.0)
         if self.limiter_on:
@@ -1869,9 +1975,11 @@ class Engine:
         outdata[:] = mix
         self.level_obs = max(peak(mix), self.level_obs * 0.85)
 
-    def _send_bus(self, out: str, mix: np.ndarray, m: np.ndarray | None) -> np.ndarray:
+    def _send_bus(self, out: str, mix: np.ndarray, m: np.ndarray | None,
+                  add_mic: bool = True) -> np.ndarray:
         """The sounds bus shaped for voice chat (EQ, destination mode, ducking under
-        your voice, phase-aware mono), with the mic block `m` added on top."""
+        your voice, phase-aware mono), with the mic block `m` added on top (unless not
+        `add_mic`: the mic effect's add mode, where Windows keeps the mic itself)."""
         mic_on = m is not None and self.mic_enabled and not self.mic_muted
         quiet = self._bus_quiet(out, mix)
         if not quiet:
@@ -1883,10 +1991,21 @@ class Engine:
         # a mode that already made the bus mono (every built-in one) needs no second pass
         if self.send_mono and not quiet and not (self.dest is not None and self.dest.mono):
             mix = self._stage(out, SmartMono).process(mix)
-        if mic_on:
+        if mic_on and add_mic:
             m = self._gated(out, m)
             mix += self._eq(out, "voice", self._vol(out, "mic", m, self.mic_vol))
+        elif mic_on:
+            self._gated(out, m)   # (keeps the gate's level current for _direct_mic_gain)
         return mix
+
+    def _direct_mic_gain(self):
+        """Add mode: the real mic's level, applied by the mic effect (mute, mic volume,
+        the gate while a sound plays, and nothing at all while sending is off)."""
+        d = self.direct_stream()
+        if d is None:
+            return
+        on = self.mic_enabled and not self.mic_muted and self.sending
+        d.set_mic_gain(self.mic_vol * self._gate.get("main", 1.0) if on else 0.0)
 
     def _vol(self, out: str, what, x: np.ndarray, v: float) -> np.ndarray:
         """x times the volume v, gliding over the block from where the last block of
@@ -1956,7 +2075,7 @@ class Engine:
             x[:, d] = x[:, 1 - d]
         return x
 
-    def _mic(self, indata):
+    def _mic(self, indata, direct: bool = False):
         x = indata
         two = x.shape[1] >= 2
         x = np.repeat(x, 2, axis=1) if x.shape[1] == 1 else x[:, :2]
@@ -1972,7 +2091,10 @@ class Engine:
         if raw is not None:     # a test: the real mic (did you talk?) and what's sent
             rec.append(np.stack([raw, x[:, 0]], 1))
         if self.main_stream is not None:
-            self.ring_main.write(self._rs_main(x))
+            if not self.main_direct:
+                self.ring_main.write(self._rs_main(x))
+            elif direct:   # straight into the mic: the same stretch goes out right after
+                self.fifo_direct.write(self._rs_main(x))
         fed = self.mic_check and self.mon_stream is not None
         if fed:
             self.ring_mon.write(self._rs_mon(x))
