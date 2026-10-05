@@ -573,3 +573,15 @@ def test_forgetting_and_bringing_back_a_second_program_of_a_name(tab, monkeypatc
     assert "player.exe" not in tab.cfg.apps        # the other one is left as it was
     tab._on_apps([player(100, "Music"), player(200, "Tools")])
     assert tab.rows[key].sending and not tab.rows["player.exe"].sending
+
+
+def test_card_buttons_say_which_program_they_are_for(qapp):
+    """A screen reader hears "Send Music", not three cards' worth of "Send"."""
+    from soundboard.ui.appspanel import AppRow
+    row = AppRow("music.exe", Meter)
+    assert row.btn_send.accessibleName() == "Send Music"
+    row.set_app(music())
+    name = row.name.text()
+    assert row.btn_send.accessibleName() == f"Send {name}"
+    assert row.btn_rec.accessibleName() == f"Record {name}"
+    assert row.btn_forget.accessibleName() == f"Forget {name}"

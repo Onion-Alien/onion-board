@@ -363,3 +363,24 @@ def test_stretch_result_does_not_depend_on_the_chunk_size(chunk):
         a = soundfx.stretch(x, factor, chunk=chunk)
         b = soundfx.stretch(x, factor, chunk=10_000)          # everything in one go
         assert a.shape == b.shape and np.abs(a - b).max() < 1e-4
+
+
+def test_edit_dialog_colour_swatches_are_named_and_exclusive(qapp):
+    """Each swatch says its colour (tooltip, screen reader) and is a checkable button
+    in an exclusive group, so the chosen one reads as checked."""
+    from soundboard.library import PAD_COLORS
+    from soundboard.ui.dialogs import EditDialog
+    from soundboard.winkeys import Hotkeys
+    m = SoundMeta(id="a", name="Boom", file="x.wav", color=PAD_COLORS[2])
+    d = EditDialog(m, Hotkeys(), lambda *a: None)
+    assert d.swatch_group.exclusive()
+    names = [b.accessibleName() for b, _ in d.swatches]
+    assert names[0] == "Purple colour" and len(set(names)) == len(PAD_COLORS)
+    assert all(b.toolTip() and b.isCheckable() for b, _ in d.swatches)
+    assert [b.isChecked() for b, _ in d.swatches] == [c == PAD_COLORS[2] for c in PAD_COLORS]
+    d.swatches[4][0].click()
+    assert d.color == PAD_COLORS[4] and d.swatch_group.checkedButton() is d.swatches[4][0]
+    assert ":focus" in d.swatches[0][0].styleSheet()     # keyboard focus is drawn
+    d.apply()
+    assert m.color == PAD_COLORS[4]
+    d.deleteLater()

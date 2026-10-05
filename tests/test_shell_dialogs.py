@@ -164,6 +164,22 @@ def test_setup_tab_uses_the_themes_status_colours(qapp, win):
         win.apply_theme("Dark")
 
 
+def test_clicking_the_theme_already_on_does_nothing(qapp, win, monkeypatch):
+    """Restyling every widget for the same theme froze the app: a click that only
+    ticks its card again."""
+    win.apply_theme("Dark")
+    d = settings.SettingsDialog(win, "appearance")
+    calls = []
+    monkeypatch.setattr(win, "apply_theme", calls.append)
+    card = next(c for c in d.theme_cards if c.name == "Dark")
+    card.click()   # a checkable card: this unticks it
+    assert calls == [] and card.isChecked()
+    other = next(c for c in d.theme_cards if c.name != "Dark")
+    other.click()
+    assert calls == [other.name]
+    d.close()
+
+
 def test_a_live_theme_switch_leaves_no_old_text_colours(qapp, win):
     """Colours written into a label's text or a widget's own stylesheet when it was
     built (a warning, a red error, the over-100% volume) follow a live theme switch,

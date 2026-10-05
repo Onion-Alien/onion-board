@@ -373,6 +373,8 @@ class Tor:
         self._proc: subprocess.Popen | None = None
         self._job: JobObject | None = None
         self._ctrl: ControlClient | None = None
+        self._stopped = threading.Event()   # clear while a stopped tor.exe is still exiting
+        self._stopped.set()
         self._run_id = 0
         self._failed_at = 0.0
         self._moved_at = 0.0          # when the bootstrap progress last went up
@@ -444,10 +446,10 @@ class Tor:
         restart = enabled and bridges != self.bridges and self.state in (STARTING, READY)
         self.enabled, self.bridges = enabled, bridges
         if not enabled:
-            self.stop()
+            self.stop(wait=False)   # (the Settings window: it waited up to 3 s)
         elif restart:
-            self.stop()
-            self.start()
+            self.stop(wait=False)
+            self.start()            # its tor.exe waits for the old one to go
         else:
             self._changed()
 
@@ -469,8 +471,9 @@ class Tor:
         threading.Thread(target=self._run, args=(run_id,), daemon=True,
                          name="tor-start").start()
 
-    def stop(self) -> None:
-        """Stop tor.exe (and lyrebird) and wait briefly for it to go."""
+    def stop(self, wait: bool = True) -> None:
+        """Stop tor.exe (and lyrebird) and wait briefly for it to go. wait=False: it's
+        off at once and goes on a thread (a start meanwhile waits for it there)."""
         with self._cond:
             self._run_id += 1
             proc, job, ctrl = self._proc, self._job, self._ctrl
@@ -479,6 +482,23 @@ class Tor:
             self.state, self.progress, self.socks_port = OFF, 0, None
             self.message = ""
             self._cond.notify_all()
+        if wait or (proc is None and ctrl is None and job is None):
+            self._end(proc, job, ctrl)
+        else:
+            self._stopped.clear()
+
+            def run():
+                try:
+                    self._end(proc, job, ctrl)
+                finally:
+                    self._stopped.set()
+            threading.Thread(target=run, daemon=True, name="tor-stop").start()
+        if was != OFF:
+            log.info("tor stopped")
+            self._changed()
+
+    def _end(self, proc, job, ctrl) -> None:
+        """stop()'s slow part: ask tor.exe to go, wait for it, then make sure."""
         if ctrl is not None:
             try:
                 ctrl.signal("SHUTDOWN")   # a client exits straight away
@@ -494,9 +514,6 @@ class Tor:
             job.close()                   # kills whatever is left in it
         if proc is not None and proc.poll() is None:
             proc.kill()
-        if was != OFF:
-            log.info("tor stopped")
-            self._changed()
 
     def gate(self, timeout: float) -> net.Proxy:
         """net's way in: Tor's SOCKS port once it's connected. Starts Tor if needed and
@@ -655,6 +672,11 @@ class Tor:
         return f"tor.exe stopped (exit code {proc.returncode})"
 
     def _run(self, run_id: int):
+        # a Tor stopped a moment ago (a bridge change) may still be exiting: two on the
+        # same data folder would clash
+        self._stopped.wait(STOP_WAIT_S + 2)
+        if run_id != self._run_id:
+            return
         launched = self._launch(run_id)
         if launched is None:
             return
@@ -672,6 +694,7 @@ class Tor:
             port = read_control_port(port_file)
             if port is None:
                 time.sleep(0.1)
+        ctrl = None
         try:
             ctrl = ControlClient(port)
             cookie = (self.root / "data" / "control_auth_cookie").read_bytes()
@@ -680,6 +703,8 @@ class Tor:
             socks = parse_listener(ctrl.getinfo("net/listeners/socks").get(
                 "net/listeners/socks", ""))
         except OSError as e:
+            if ctrl is not None:   # a refused login: don't leave the socket open
+                ctrl.close()
             return self._fail(run_id, f"couldn't talk to tor.exe ({errors.plain(e)})")
         if socks is None:
             ctrl.close()

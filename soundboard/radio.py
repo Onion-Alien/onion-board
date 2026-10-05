@@ -783,6 +783,7 @@ class RadioPlayer(QObject):
         self._reconnecting = False   # a stream that played dropped: reopen until it's back
         self._reopen_pending = False  # a reopen is scheduled: ignore further trouble till then
         self._gen = 0                # bumped by play/stop so a stale reopen does nothing
+        self._first_sent = -1        # the generation _first_audio was last sent for
         self._state = "stopped"
         self._opened = self._last_audio = 0.0
         # FFmpeg can sit on a station that never answers (or stops sending) for
@@ -865,6 +866,7 @@ class RadioPlayer(QObject):
 
     def _open(self):
         self._got_audio = False
+        self._first_sent = -1   # a reopen keeps the generation: say so again
         self._opened = time.monotonic()
         self._watch.start()
         self._set_state("connecting")
@@ -923,7 +925,8 @@ class RadioPlayer(QObject):
         if buf.format().sampleRate() != SR:   # Qt was asked for SR; this shouldn't happen
             return
         self._last_audio = time.monotonic()
-        if not self._got_audio:
+        if not self._got_audio and self._first_sent != gen:
+            self._first_sent = gen   # once: every buffer until the UI thread got it sent it
             self._first_audio.emit(gen)
         self.audio.emit(x)
 

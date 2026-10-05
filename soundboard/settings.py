@@ -155,6 +155,16 @@ class HotkeyDialog(QDialog):
         self.pads_note.setObjectName("hint")
         self.pads_note.setWordWrap(True)
         lay.addWidget(self.pads_note)
+        # a way out on screen too (Esc and the title bar's ✕ were the only ones); it
+        # takes no focus, so the keys pressed here all go to the capture
+        cancel = QPushButton("Cancel")
+        cancel.setFocusPolicy(Qt.NoFocus)
+        cancel.setAutoDefault(False)
+        cancel.clicked.connect(self.reject)
+        row = QHBoxLayout()
+        row.addStretch(1)
+        row.addWidget(cancel)
+        lay.addLayout(row)
         self._warned_vk = None
         self.setMinimumWidth(340)
         hotkeys.pause()   # so pressing an existing hotkey here doesn't trigger it
@@ -625,6 +635,10 @@ class SettingsDialog(QDialog):
         return card
 
     def _pick_theme(self, name: str):
+        if name == theme.current_name:   # already on: restyling every widget again froze
+            for c in self.theme_cards:   # the app for nothing (a click unticks the card)
+                c.setChecked(c.name == name)
+            return
         self.mw.apply_theme(name)
         self._category_icons()
         if getattr(self, "net_activity", None) is not None:
@@ -697,10 +711,14 @@ class SettingsDialog(QDialog):
         b = QPushButton()
         b.setObjectName("hkbtn")
         b.clicked.connect(lambda _=False, a=attr: self._capture(a))
+        # each row's buttons say which hotkey they're for (a screen reader read every
+        # row as "Click to set…" and "Clear")
+        b.setAccessibleName(f"{label} hotkey")
         row.addWidget(b)
         x = QPushButton("✕")
         x.setObjectName("small")
-        x.setToolTip("Clear")
+        x.setToolTip(f"Clear the {label} hotkey")
+        x.setAccessibleName(f"Clear the {label} hotkey")
         x.clicked.connect(lambda _=False, a=attr: self._set_hk(a, ""))
         row.addWidget(x)
         lay.addLayout(row)

@@ -536,8 +536,14 @@ class Pad(QAbstractButton):
             md = QMimeData()
             md.setData(PAD_MIME, self.meta.id.encode())
             drag.setMimeData(md)
-            drag.setPixmap(self.grab().scaled(self.width() // 2, self.height() // 2,
-                                              Qt.KeepAspectRatio, Qt.SmoothTransformation))
+            # half the pad's size on screen: grab() is in real pixels, so scaling it to
+            # half the logical size made a 40 % preview on a 125 % screen
+            shot = self.grab()
+            dpr = shot.devicePixelRatio()
+            half = shot.scaled(round(self.width() / 2 * dpr), round(self.height() / 2 * dpr),
+                               Qt.KeepAspectRatio, Qt.SmoothTransformation)
+            half.setDevicePixelRatio(dpr)
+            drag.setPixmap(half)
             drag.exec(Qt.MoveAction)
 
     def mouseReleaseEvent(self, e):

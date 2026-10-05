@@ -14,6 +14,20 @@
   effects still work on top of it.
 - Live voice-to-speech hands your mic to its helper without polling: no wake-ups at
   all while nothing is sent.
+- **Much less memory for long sounds:** sounds over about 30 seconds stay on disk
+  until they play instead of all being loaded at start-up (a board of 100 songs
+  held about 3.5 GB). A pressed sound is read in first, so it starts and plays
+  as smoothly as before, even from a slow drive.
+- Lighter on the CPU: Hoot (the Triggers tab's owl) draws 10 frames a second
+  while he only sways, live echo and helmet effects, sped-up sounds and a sent
+  program's level check do less work, the settings backups are rotated at most
+  once an hour, and download progress updates the window 10 times a second
+  instead of hundreds.
+- The flat radio map lets go of its picture (tens of MB) while it's hidden.
+- Switching Tor off in Settings no longer freezes the window for up to 3 seconds.
+- Smaller fixes: a relayed connection whose other end stopped reading is closed
+  after 5 minutes instead of holding on for good; Tor's control connection is
+  closed when its login fails; animations no longer restart in a minimised window.
 - **Clip editor on the Apps tab:** open *Clip editor* under a program's card and it
   keeps that program's last minute as a live, scrolling waveform. Press on it to
   freeze, drag across the bit you want, and press Space to hear it in your

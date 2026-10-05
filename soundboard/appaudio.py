@@ -264,12 +264,17 @@ def _render_devices(en: Com, flow: int = E_RENDER) -> list[Com]:
             what="EnumAudioEndpoints")
     devs = []
     with Com(coll.value) as c:
-        n = c_uint()
-        c.call(3, (POINTER(c_uint),), byref(n), what="GetCount")
-        for i in range(n.value):
-            d = c_void_p()
-            c.call(4, (c_uint, POINTER(c_void_p)), i, byref(d), what="Item")
-            devs.append(Com(d.value))
+        try:
+            n = c_uint()
+            c.call(3, (POINTER(c_uint),), byref(n), what="GetCount")
+            for i in range(n.value):
+                d = c_void_p()
+                c.call(4, (c_uint, POINTER(c_void_p)), i, byref(d), what="Item")
+                devs.append(Com(d.value))
+        except Exception:   # the ones already got would never be released
+            for d in devs:
+                d.release()
+            raise
     return devs
 
 

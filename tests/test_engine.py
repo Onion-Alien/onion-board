@@ -402,7 +402,7 @@ def fake_devices(monkeypatch, rate=44100, start_fails=False):
 
     class Stream:
         def __init__(self, **kw):
-            self.closed = False
+            self.closed, self.kw = False, kw
             made.append(self)
 
         def start(self):
@@ -422,6 +422,19 @@ def fake_devices(monkeypatch, rate=44100, start_fails=False):
     monkeypatch.setattr(eng.sd, "OutputStream", Stream)
     monkeypatch.setattr(eng.sd, "InputStream", Stream)
     return made
+
+
+def test_safer_buffering_asks_for_a_real_buffer(monkeypatch):
+    # Windows rounds "high" (10 ms) up to the same buffer as "low": Safer must ask for
+    # a number of seconds, on the outputs and the mic alike
+    made = fake_devices(monkeypatch)
+    e = Engine()
+    e.set_main_device("cable")
+    e.latency = "high"
+    e.set_mon_device("headphones")
+    e.set_mic_device("mic")
+    assert made[0].kw["latency"] == "low"
+    assert made[1].kw["latency"] == made[2].kw["latency"] == eng.BUFFER["high"] >= 0.03
 
 
 def test_failed_start_closes_the_stream_and_keeps_the_rate(monkeypatch):

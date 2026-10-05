@@ -3,9 +3,9 @@
 from __future__ import annotations
 
 from PySide6.QtCore import Qt, Signal
-from PySide6.QtWidgets import (QCheckBox, QComboBox, QDialog, QDialogButtonBox, QFormLayout,
-                               QHBoxLayout, QLabel, QLineEdit, QPushButton, QScrollArea, QSlider,
-                               QTabWidget, QVBoxLayout, QWidget)
+from PySide6.QtWidgets import (QButtonGroup, QCheckBox, QComboBox, QDialog, QDialogButtonBox,
+                               QFormLayout, QHBoxLayout, QLabel, QLineEdit, QPushButton,
+                               QScrollArea, QSlider, QTabWidget, QVBoxLayout, QWidget)
 
 from soundboard import soundfx, theme, voicefx
 from soundboard.eq import PRESETS as EQ_PRESETS
@@ -20,6 +20,11 @@ from soundboard.wheelguard import no_wheel
 from soundboard.winkeys import Hotkeys
 
 CUSTOM = "Custom"
+# what the pad colour swatches are called (tooltip and screen reader)
+COLOUR_NAMES = {"#7c5cff": "Purple", "#ff5c8a": "Pink", "#1fb6ff": "Blue",
+                "#13ce66": "Green", "#ffb020": "Yellow", "#ff7849": "Orange",
+                "#00c2b2": "Teal", "#e056fd": "Magenta", "#5c7cfa": "Indigo",
+                "#94a3b8": "Grey"}
 SPEED = voicefx.Param("speed", "Speed", *soundfx.SPEED_RANGE, 1.0, "x", 0.05)
 PITCH = voicefx.Param("pitch", "Pitch", *soundfx.PITCH_RANGE, 0.0, " st", 1)
 BOOST = voicefx.Param("gain_db", "Boost", *soundfx.GAIN_RANGE, 0.0, " dB", 1)
@@ -262,10 +267,16 @@ class EditDialog(QDialog):
         crow = QHBoxLayout()
         crow.setSpacing(6)
         self.swatches = []
+        self.swatch_group = QButtonGroup(self)   # exclusive: one colour is checked
         for c in PAD_COLORS:
             b = QPushButton()
             b.setFixedSize(24, 24)
+            b.setCheckable(True)
+            name = COLOUR_NAMES.get(c, c)
+            b.setToolTip(name)
+            b.setAccessibleName(f"{name} colour")
             b.clicked.connect(lambda _=False, c=c: self._set_color(c))
+            self.swatch_group.addButton(b)
             self.swatches.append((b, c))
             crow.addWidget(b)
         crow.addStretch()
@@ -346,10 +357,17 @@ class EditDialog(QDialog):
 
     def _set_color(self, c):
         self.color = c
+        t = theme.T
         for b, col in self.swatches:
-            border = (f"3px solid {theme.T['text']}" if col == c
-                      else f"1px solid {theme.T['border']}")
-            b.setStyleSheet(f"background:{col}; border:{border}; border-radius:12px;")
+            b.setChecked(col == c)
+            # its own sheet outranks the theme's :focus rule, so focus is drawn here:
+            # an accent ring, thick when it's also the chosen colour
+            b.setStyleSheet(
+                f"QPushButton {{ background:{col}; border:1px solid {t['border']};"
+                f" border-radius:12px; }}"
+                f"QPushButton:checked {{ border:3px solid {t['text']}; }}"
+                f"QPushButton:focus {{ border:2px solid {t['accent']}; }}"
+                f"QPushButton:checked:focus {{ border:3px solid {t['accent']}; }}")
 
     def _set_hk(self, combo):
         self.hotkey = combo

@@ -3,8 +3,8 @@
     .venv\\Scripts\\python scripts\\prepare_art.py <folder of pictures>
 
 Each picture whose file name starts with a key from assets/art/README.md (e.g.
-"voice-chipmunk.png", "voice-chipmunk (2).jpg", "lang-zh_final.webp") is
-centre-cropped to a square, shrunk to 256 px and saved as assets/art/<key>.png.
+"voice-chipmunk.png", "voice-chipmunk (2).jpg", "voice-demon_final.webp") is
+centre-cropped to a square, shrunk to 128 px and saved as assets/art/<key>.png.
 Anything else in the folder is listed and skipped. Pictures already in assets/art
 are replaced.
 """
@@ -20,14 +20,13 @@ from PySide6.QtGui import QGuiApplication, QImage  # noqa: E402
 
 ROOT = Path(__file__).resolve().parent.parent
 ART = ROOT / "assets" / "art"
-SIDE = 256
+SIDE = 128   # shown at 30 px at most: sharp up to 400 % screen scaling
 EXTS = {".png", ".jpg", ".jpeg", ".webp"}
 
 KEYS = ["voice-chipmunk", "voice-deep-voice", "voice-demon", "voice-robot", "voice-alien",
         "voice-ghost", "voice-walkie-talkie", "voice-old-telephone", "voice-megaphone",
         "voice-stadium-announcer", "voice-cave", "voice-podcast-voice", "voice-custom",
-        "voice-random", "voice-computer",
-        "lang-en", "lang-de", "lang-es", "lang-fr", "lang-ru", "lang-zh",
+        "voice-random",
         # the voices added later, which show a "?" until they get theirs
         "voice-female-voice", "voice-male-voice", "voice-talkbox", "voice-autotune",
         "voice-masked-caller", "voice-anonymous", "voice-dark-lord", "voice-hothead"]

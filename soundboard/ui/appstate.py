@@ -29,8 +29,8 @@ class _Pauser(QObject):
     def on_state(self, state):
         if state != Qt.ApplicationActive:
             self._stop()
-        elif self._widget.isVisible():
-            self._start()
+        elif self._widget.isVisible() and not self._widget.window().isMinimized():
+            self._start()   # (a minimised window's widgets are still "visible")
 
 
 def pause_in_background(widget: QWidget, start: Callable[[], None],

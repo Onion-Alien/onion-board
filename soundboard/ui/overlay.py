@@ -28,8 +28,8 @@ from dataclasses import asdict, dataclass
 
 from PySide6.QtCore import (QEasingCurve, QPoint, QPointF, QPropertyAnimation, QRect, QRectF,
                             QEvent, QObject, QSize, Qt, QTimer)
-from PySide6.QtGui import (QColor, QFont, QGuiApplication, QPainter, QPainterPath, QPen,
-                           QPolygonF)
+from PySide6.QtGui import (QColor, QFont, QFontMetrics, QGuiApplication, QPainter, QPainterPath,
+                           QPen, QPolygonF)
 from PySide6.QtWidgets import QApplication, QWidget
 
 from soundboard import theme, winkeys
@@ -195,6 +195,7 @@ class Overlay:
         self.host = host
         self.s = OverlaySettings.from_dict(settings)
         self.page = 0
+        self._sounds: tuple | None = None   # (key, sounds()) cached
         self.is_open = False
         self.blind = False            # open without a window (exclusive fullscreen)
         self.by_click = False         # opened from Settings: no key is held, acts like toggle
@@ -228,9 +229,19 @@ class Overlay:
 
     # ------------------------------------------------------------------ pages
     def sounds(self) -> list:
-        """The sounds of the category the Sounds tab shows (all of them for "")."""
-        cat = self.host.cfg.category
-        return [m for m in self.host.cfg.sounds if not cat or cat in m.tags]
+        """The sounds of the category the Sounds tab shows (all of them for ""). Kept
+        until sounds_changed() or the category / sound list changes: a paint asks
+        several times, and a big library made each ask a full pass."""
+        cfg = self.host.cfg
+        key = (cfg.category, id(cfg.sounds), len(cfg.sounds))
+        if self._sounds is None or self._sounds[0] != key:
+            cat = cfg.category
+            self._sounds = (key, [m for m in cfg.sounds if not cat or cat in m.tags])
+        return self._sounds[1]
+
+    def sounds_changed(self):
+        """A sound was added, removed, moved or put in / out of a category."""
+        self._sounds = None
 
     def pages(self) -> int:
         return max(1, math.ceil(len(self.sounds()) / SLOTS))
@@ -697,14 +708,20 @@ class OverlayWindow(QWidget):
         title = f"Page {ov.page + 1} of {n}" if n > 1 else "Sounds"
         if cat:
             title = f"{cat}  ·  {title}" if n > 1 else cat
-        p.drawText(head, Qt.AlignLeft | Qt.AlignVCenter, title)
+        hint = f"{key_label(ks['prev'])}  ‹  ›  {key_label(ks['next'])}" if n > 1 else ""
+        small = QFont(f)
+        small.setBold(False)
+        small.setPointSizeF(8.5)
+        # a long category name ran into the page keys: it's cut with "…" before them
+        room = head.width() - (QFontMetrics(small).horizontalAdvance(hint) + 12 if hint else 0)
+        p.drawText(head, Qt.AlignLeft | Qt.AlignVCenter,
+                   p.fontMetrics().elidedText(title, Qt.ElideRight, max(0, int(room))))
         f.setBold(False)
         f.setPointSizeF(8.5)
         p.setFont(f)
         p.setPen(QColor(T["muted"]))
-        if n > 1:
-            p.drawText(head, Qt.AlignRight | Qt.AlignVCenter,
-                       f"{key_label(ks['prev'])}  ‹  ›  {key_label(ks['next'])}")
+        if hint:
+            p.drawText(head, Qt.AlignRight | Qt.AlignVCenter, hint)
 
         # tiles
         now = time.monotonic()
@@ -799,7 +816,7 @@ class OverlayWindow(QWidget):
             p.setPen(QPen(QColor(T["border"]), 1, Qt.DashLine))
             p.setBrush(Qt.NoBrush)
             p.drawPath(path)
-            p.setPen(QColor(T["faint"]))
+            p.setPen(QColor(T["muted"]))   # faint was unreadable (2.6:1) in some themes
             f.setBold(False)
             f.setPointSizeF(8.5)
             p.setFont(f)

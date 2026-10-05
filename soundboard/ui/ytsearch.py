@@ -84,6 +84,9 @@ class _BusyOwl(OwlWidget):
         self._next_act = math.inf
         self.setToolTip("")
 
+    def busy(self) -> bool:
+        return True   # always scanning: never the slow idle frames
+
     def pose(self) -> dict:
         d = super().pose()
         d["sad"] = 0.0
@@ -262,6 +265,7 @@ class ClampLabel(QLabel):
     def __init__(self, text: str, lines: int = 2, bold: bool = True):
         super().__init__()
         self.full, self.lines = text, lines
+        self._wrap: tuple = (None, [])   # (key, lines) from _wrapped()
         f = self.font()
         f.setBold(bold)
         self.setFont(f)
@@ -284,10 +288,12 @@ class ClampLabel(QLabel):
         if e.type() in (QEvent.FontChange, QEvent.StyleChange):
             self._fit()
 
-    def paintEvent(self, e):
-        p = QPainter(self)
-        p.setPen(self.palette().color(self.foregroundRole()))
-        p.setFont(self.font())
+    def _wrapped(self) -> list[tuple[str, float]]:
+        """The lines to draw and their tops. Kept by (text, width, font): a page of
+        cards repaints on every hover and scroll, and wrapping is the slow part."""
+        key = (self.full, self.width(), self.font().key(), self.lines)
+        if self._wrap[0] == key:
+            return self._wrap[1]
         fm = self.fontMetrics()
         layout = QTextLayout(self.full, self.font())
         layout.beginLayout()
@@ -300,11 +306,22 @@ class ClampLabel(QLabel):
             shown.append((line.textStart(), line.textLength(), y))
             y += fm.lineSpacing()
         layout.endLayout()
+        out = []
         for i, (start, length, ly) in enumerate(shown):
             text = self.full[start:start + length].rstrip()
             if i == len(shown) - 1 and start + length < len(self.full):
                 text = fm.elidedText(self.full[start:], Qt.ElideRight, self.width())
-            p.drawText(QPointF(0, ly + fm.ascent()), text)
+            out.append((text, ly))
+        self._wrap = (key, out)
+        return out
+
+    def paintEvent(self, e):
+        p = QPainter(self)
+        p.setPen(self.palette().color(self.foregroundRole()))
+        p.setFont(self.font())
+        ascent = self.fontMetrics().ascent()
+        for text, ly in self._wrapped():
+            p.drawText(QPointF(0, ly + ascent), text)
         p.end()
 
 

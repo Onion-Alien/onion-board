@@ -1,9 +1,9 @@
-"""Optional pictures: the voice changer's voices, the computer voice, its languages.
+"""Optional pictures: the voice changer's voices.
 
 They're PNGs in assets/art (bundled as art/ in the installed build), named by key:
-`voice-chipmunk.png`, `voice-custom.png`, `voice-computer.png`, `lang-zh.png`...
-(assets/art/README.md lists them all). A missing picture is fine: the tile keeps
-its emoji and the tab its painted icon, so the app never depends on them.
+`voice-chipmunk.png`, `voice-custom.png`... (assets/art/README.md lists them all).
+A missing picture is fine: the tile shows a painted "?" and the tab its painted
+icon, so the app never depends on them.
 """
 from __future__ import annotations
 
@@ -19,7 +19,6 @@ from soundboard.ui import icons
 
 ART_DIR = (Path(sys._MEIPASS) / "art" if hasattr(sys, "_MEIPASS")
            else Path(__file__).resolve().parents[2] / "assets" / "art")
-COMPUTER_VOICE = "voice-computer"
 ROUND = 0.24      # corner radius, as a fraction of the side
 
 _images: dict[str, QImage | None] = {}
@@ -33,10 +32,6 @@ def slug(text: str) -> str:
 
 def voice_key(preset: str) -> str:
     return "voice-" + slug(preset)
-
-
-def language_key(code: str) -> str:
-    return "lang-" + slug(code)
 
 
 def _image(key: str) -> QImage | None:

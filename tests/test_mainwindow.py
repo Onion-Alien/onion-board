@@ -733,3 +733,44 @@ def test_new_pads_never_flash_up_as_windows_of_their_own(qapp):
         assert all(p.parent() is grid for p in grid.pads)
     finally:
         qapp.removeEventFilter(watch)
+
+
+def test_the_mic_banner_and_a_row_of_playing_sounds_dont_force_the_mini_player(window):
+    """Both used to be as wide as all their text: the banner ~780 px, four
+    overlapping sounds' chips ~900 px, so a window a bit narrower became the mini
+    player in the middle of a session. The chips wrap onto more lines."""
+    window.show()
+    window.tabs.setCurrentWidget(window.sounds_page)
+    window.resize(800, 600)
+    window._refit()
+    assert not window.is_mini()
+    window.mic_banner.show()
+    ids = list(window.pads)
+    window._queue[:] = ids * 3
+    window._update_chips(set(ids))
+    window._refit()
+    assert window.playing_row.isVisibleTo(window)
+    assert not window.is_mini()
+    assert window.mic_banner.width() <= 800 and window.mic_banner.text()
+    # every playing sound keeps its chip (to stop it): the row wraps instead
+    assert set(window._chips) == set(ids)
+    row = window.playing_row.rect()
+    for chip in window._chips.values():
+        assert chip.isVisibleTo(window) and row.contains(chip.geometry())
+
+
+def test_clamp_label_wraps_once_per_text_width_and_font(qapp):
+    """Cards repaint on every hover and scroll: the wrapped lines are kept until the
+    text, width or font changes."""
+    from soundboard.ui.ytsearch import ClampLabel
+    lbl = ClampLabel("A title long enough to wrap " * 3)
+    lbl.resize(160, lbl.height())
+    lines = lbl._wrapped()
+    assert len(lines) == 2 and lines[-1][0].endswith("…")
+    assert lbl._wrapped() is lines
+    lbl.resize(400, lbl.height())
+    assert lbl._wrapped() is not lines
+    wide = lbl._wrapped()
+    lbl.set_full("Short")
+    assert lbl._wrapped() is not wide and [t for t, _ in lbl._wrapped()] == ["Short"]
+    lbl.deleteLater()

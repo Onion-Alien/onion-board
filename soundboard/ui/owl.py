@@ -35,6 +35,8 @@ BUBBLE = QColor("#fffaf0")
 SPARKLE_COLORS = ("#ffcf40", "#ff8fae", "#1fb6ff", "#a48bff")
 EYES = (36, 64)
 FPS = 30
+FAST_MS = 1000 // FPS
+IDLE_MS = 100     # just swaying and bobbing (no act, blink, glance or mouse): 10 fps do
 
 
 def _e(p, cx, cy, w, h, fill, pen=None, angle=0.0):
@@ -271,7 +273,7 @@ class OwlWidget(QWidget):
         self._glance = (0.0, 0.7)  # where he looks when left alone
         self._next_glance = 1.5
         self._timer = QTimer(self)
-        self._timer.setInterval(1000 // FPS)
+        self._timer.setInterval(FAST_MS)
         self._timer.timeout.connect(self._tick)
         appstate.pause_in_background(self, self._resume, self._timer.stop)
 
@@ -289,7 +291,7 @@ class OwlWidget(QWidget):
 
     def _resume(self):
         self._last = time.monotonic()
-        self._timer.start()
+        self._timer.start(FAST_MS)
 
     def hideEvent(self, ev):
         self._timer.stop()
@@ -306,6 +308,8 @@ class OwlWidget(QWidget):
         self._joy_t = 0.0
         self.act = None
         self.say = self._rng.choice(self.joy_lines) if self.joy_lines else ""
+        if self._timer.isActive() and self._timer.interval() != FAST_MS:
+            self._timer.start(FAST_MS)   # the hop starts now, not on the next idle frame
 
     # ------------------------------------------------------------------ time
     def _owl_rect(self) -> QRectF:
@@ -319,6 +323,23 @@ class OwlWidget(QWidget):
         self.step(min(0.1, now - self._last))
         self._last = now
         self.update()
+        want = FAST_MS if self.busy() else IDLE_MS
+        if self._timer.interval() != want:
+            self._timer.setInterval(want)
+
+    def busy(self) -> bool:
+        """Anything moving faster than the slow sway and bob: an act, a hop, a line in
+        his bubble, the mouse near, a blink, his eyes on their way somewhere, or one of
+        those due before the next idle frame."""
+        if self.act or self._joy_t >= 0 or self.say or self._near > 0.02:
+            return True
+        soon = self.t + IDLE_MS / 1000
+        if 0 <= self.t - self._blink_t < 0.18 or self._next_blink <= soon:
+            return True
+        if self._next_act <= soon or self._next_glance <= soon:
+            return True
+        gx, gy = self._glance
+        return abs(self._look[0] - gx) + abs(self._look[1] - gy) > 0.02
 
     def _mouse(self) -> tuple[float, float] | None:
         """The cursor relative to his face, in owl heights, if it's in this window."""

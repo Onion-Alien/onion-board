@@ -14,6 +14,7 @@ feed either view the same way.
 from __future__ import annotations
 
 import html
+import time
 
 import numpy as np
 from PySide6.QtCore import QPointF, QRectF, Qt, QTimer, Signal
@@ -29,6 +30,12 @@ HIT_PX = 7.0                        # how near the pointer a dot counts as under
 LAND_PART = 400                     # outline points per drawn part (set_land)
 FILL_PX = 1_000_000                 # device pixels per filled band (_fill)
 WORLD_MAX_PX = 10_000_000           # biggest whole-world picture kept (device pixels)
+# A new world picture (zoom, new dots, theme) is drawn a slice at a time while the old
+# one shows: Qt keeps Python's lock through each draw call, and the audio threads wait
+# out one call per numpy step, so 20-40 ms of drawing in one go made the cable 10-20 ms
+# late (a skip) even with every call under 1 ms. A slice, then a break for them.
+SLICE_S = 0.0015
+SLICE_GAP_MS = 4
 SETTLE_MS = 160                     # zooming: the old picture, stretched, until this idle
 TOWN_ZOOM = 2.0                     # city and town names show from this zoom in...
 TOWNS_IN_VIEW = 40                  # ...at most this many at once, only those in view
@@ -38,7 +45,8 @@ SPREAD_PX = 2.4                     # ...this far apart (a spiral round the spot
 
 def _fill(p: QPainter, rect: QRectF, colour: QColor):
     """p.fillRect in bands of about FILL_PX device pixels: Qt keeps Python's lock while
-    it fills, and the whole world picture in one go held up the audio for ~10 ms."""
+    it fills, and the whole world picture in one go held up the audio for ~10 ms.
+    A step per band (FlatMap._world_steps)."""
     dpr = p.device().devicePixelRatioF()
     band = max(1.0, FILL_PX / max(1.0, rect.width() * dpr * dpr))
     y = rect.top()
@@ -46,6 +54,7 @@ def _fill(p: QPainter, rect: QRectF, colour: QColor):
         h = min(band, rect.bottom() - y)
         p.fillRect(QRectF(rect.left(), y, rect.width(), h), colour)
         y += h
+        yield
 
 
 def _mix(a: str, b: str, t: float) -> QColor:
@@ -105,6 +114,12 @@ class FlatMap(QWidget):
         self._settle.setSingleShot(True)
         self._settle.setInterval(SETTLE_MS)
         self._settle.timeout.connect(self.update)
+        self._build: tuple | None = None  # (key, picture, its steps): the next world
+        self._slice = QTimer(self)        # draws the next slice of it
+        self._slice.setSingleShot(True)
+        self._slice.setTimerType(Qt.PreciseTimer)
+        self._slice.setInterval(SLICE_GAP_MS)
+        self._slice.timeout.connect(self._draw_slice)
 
         box = QVBoxLayout(self)
         box.setContentsMargins(0, 0, 10, 10)
@@ -246,11 +261,19 @@ class FlatMap(QWidget):
         return self._fan[:, 0] * k, self._fan[:, 1] * k
 
     def _redraw(self):
-        """What's drawn changed (stations, land, theme): draw it again."""
+        """What's drawn changed (stations, land, theme): draw it again (the world
+        picture a slice at a time, the old one showing till then)."""
         self._ver += 1
-        self._world = self._view = None
+        self._view = None
         self._town_pm.clear()
         self.update()
+
+    def hideEvent(self, e):
+        """Off screen (another tab, the Radio tab's globe instead): let the drawn world
+        go (~40 MB at a big zoom). It's drawn again the next time it shows."""
+        self._world = self._view = None
+        self._town_pm.clear()
+        super().hideEvent(e)
 
     # ------------------------------------------------------------------ painting
     def _grow(self) -> float:
@@ -259,9 +282,14 @@ class FlatMap(QWidget):
     def _paint_map(self, p: QPainter, tr: QTransform, s: float, rect: QRectF):
         """The sea, grid, land, names and dots, through `tr` ((lon, -lat) degrees to
         pixels); only what falls in `rect` (pixels) matters."""
+        for _ in self._map_steps(p, tr, s, rect):
+            pass
+
+    def _map_steps(self, p: QPainter, tr: QTransform, s: float, rect: QRectF):
+        """_paint_map a draw call or so per step."""
         t = theme.T
         world = tr.mapRect(QRectF(-180, -LAT_TOP, 360, LAT_TOP - LAT_BOTTOM))
-        _fill(p, world.intersected(rect), _mix(t["bg"], t["accent"], 0.06))
+        yield from _fill(p, world.intersected(rect), _mix(t["bg"], t["accent"], 0.06))
         p.save()
         p.setClipRect(world.intersected(rect))
         p.setPen(QPen(_mix(t["bg"], t["text"], 0.07), 1))
@@ -278,6 +306,7 @@ class FlatMap(QWidget):
             p.setBrush(_mix(t["bg"], t["text"], 0.14))
             for part in self._land:
                 p.drawPath(part)
+                yield
             p.restore()
         if len(self._points):
             o = tr.map(QPointF(0, 0))
@@ -290,9 +319,11 @@ class FlatMap(QWidget):
             p.setPen(Qt.NoPen)
             p.setBrush(accent)
             grow = self._grow()
-            for i in np.flatnonzero(on):
+            for k, i in enumerate(np.flatnonzero(on), 1):
                 r = self._r[i] * grow
                 p.drawEllipse(QPointF(xs[i], ys[i]), r, r)
+                if k % 200 == 0:
+                    yield
         # country names last, outlined in the land's colour, so the dots don't hide them
         font, colour = self._label_style()
         fm = QFontMetricsF(font)
@@ -303,6 +334,7 @@ class FlatMap(QWidget):
             path.addText(box.left(), box.top() + fm.ascent(), font, name)
             p.strokePath(path, halo)
             p.fillPath(path, colour)
+            yield
         p.restore()
 
     def _label_style(self) -> tuple[QFont, QColor]:
@@ -403,30 +435,74 @@ class FlatMap(QWidget):
 
     def _world_pixmap(self, dpr: float) -> QPixmap | None:
         """The whole world at this zoom, drawn once: dragging only slides it. While the
-        wheel is still zooming, the last one (it's stretched to fit)."""
+        wheel is still zooming, the last one (it's stretched to fit); while the next
+        one is drawn a slice at a time (SLICE_S), the last one too."""
         key = self._world_key(dpr)
         if key is None:
             return None
-        if (self._settle.isActive() and self._world is not None
-                and self._world[0][1:] == key[1:]):
-            return self._world[1]
-        if self._world is None or self._world[0] != key:
-            s = self._scale()
-            w, h = 360 * s, (LAT_TOP - LAT_BOTTOM) * s
-            pm = QPixmap(max(1, round(w * dpr)), max(1, round(h * dpr)))
-            pm.setDevicePixelRatio(dpr)
-            p = QPainter(pm)
-            p.setCompositionMode(QPainter.CompositionMode_Source)
-            _fill(p, QRectF(0, 0, pm.width() / dpr, pm.height() / dpr), QColor(theme.T["bg"]))
-            p.setCompositionMode(QPainter.CompositionMode_SourceOver)
-            p.setRenderHint(QPainter.Antialiasing)
-            tr = QTransform()
-            tr.translate(180 * s, LAT_TOP * s)
-            tr.scale(s, s)
-            self._paint_map(p, tr, s, QRectF(0, 0, w, h))
-            p.end()
+        old = self._world
+        if old is not None and old[0] == key:
+            return old[1]
+        if old is not None and self._settle.isActive() and old[0][1:] == key[1:]:
+            return old[1]
+        if old is None:   # nothing to show meanwhile (the first time): all of it now
+            pm, steps = self._world_steps(key)
+            for _ in steps:
+                pass
             self._world = (key, pm)
-        return self._world[1]
+            return pm
+        if self._build is None or self._build[0] != key:
+            self._stop_build()
+            self._build = (key, *self._world_steps(key))
+            self._slice.start()
+        return old[1]
+
+    def _world_steps(self, key) -> tuple[QPixmap, object]:
+        """A blank picture for the world at `key`, and the steps that draw it."""
+        s, dpr = key[0], key[1]
+        w, h = 360 * s, (LAT_TOP - LAT_BOTTOM) * s
+        pm = QPixmap(max(1, round(w * dpr)), max(1, round(h * dpr)))
+        pm.setDevicePixelRatio(dpr)
+
+        def steps():
+            p = QPainter(pm)
+            try:
+                p.setCompositionMode(QPainter.CompositionMode_Source)
+                yield from _fill(p, QRectF(0, 0, pm.width() / dpr, pm.height() / dpr),
+                                 QColor(theme.T["bg"]))
+                p.setCompositionMode(QPainter.CompositionMode_SourceOver)
+                p.setRenderHint(QPainter.Antialiasing)
+                tr = QTransform()
+                tr.translate(180 * s, LAT_TOP * s)
+                tr.scale(s, s)
+                yield from self._map_steps(p, tr, s, QRectF(0, 0, w, h))
+            finally:
+                p.end()
+        return pm, steps()
+
+    def _draw_slice(self):
+        """Draw the next world picture for about SLICE_S, then let the others run."""
+        b = self._build
+        if b is None:
+            return
+        if not self.isVisible():   # off screen: drawn afresh when it shows
+            self._stop_build()
+            return
+        key, pm, steps = b
+        end = time.perf_counter() + SLICE_S
+        for _ in steps:
+            if time.perf_counter() >= end:
+                self._slice.start()
+                return
+        self._build = None
+        self._world = (key, pm)
+        self.update()
+
+    def _stop_build(self):
+        if self._build is not None:
+            self._build[2].close()   # ends its painter
+            self._build = None
+        self._slice.stop()
 
     def paintEvent(self, _e):
         self._clamp()
