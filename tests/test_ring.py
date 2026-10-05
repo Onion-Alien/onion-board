@@ -170,6 +170,21 @@ def test_auto_drift_catches_a_fast_or_slow_mic_before_any_glitch():
         assert np.std(speed[-6000:]) < 0.002                  # no audible wobble
 
 
+def test_auto_drift_rides_out_a_big_drift_without_a_click():
+    """0.2% off (a cheap USB mic or a Bluetooth headset): tracking starts with the fill
+    at the top of its one-block swing, and the old integral took that for drift, wound
+    up to 4x the real offset and read the ring dry ~10 s in (in about half the runs)."""
+    for off in (0.002, -0.002):
+        for seed in range(5):
+            r = Ring(auto_drift=True)
+            speed = []
+            assert clocks(r, off, 60, seed=seed, ratios=speed) == 0, (off, seed)
+            assert r.underruns == 0 and r.overflows == 0, (off, seed)
+            assert r.track_drift
+            assert np.std(speed[-3000:]) < 0.002                  # no audible wobble
+            assert np.mean(speed[-3000:]) == pytest.approx(1 + off, abs=0.0005)
+
+
 def test_auto_drift_leaves_an_on_time_ring_alone():
     """Same clock on both sides (a USB headset's mic and headphones): no stretching,
     however long it plays and whatever the callbacks' timing noise."""

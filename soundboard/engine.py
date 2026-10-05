@@ -220,6 +220,7 @@ class Ring:
     # (a ring that is on time never starts: no stretching, no pitch wobble).
     EST_CHECK_S, EST_MIN_S, EST_MAX_S = 1.0, 2.0, 30.0
     DRIFT_MIN = 0.00005
+    MIC_KP, MIC_KI = 0.004, 0.000005   # the mic rings' drift controller (see _mic_err)
 
     def __init__(self, rate: int = SR, prefill_s: float = 0.015, max_s: float = 0.08,
                  track_drift: bool = False, grow_to_s: float = 0.0, auto_drift: bool = False):
@@ -271,8 +272,12 @@ class Ring:
         read the ring dry again and again: the mic's is only 1.5 blocks). The fill a
         read finds swings by a whole block as the two clocks' blocks slide past each
         other (every 20 s at 0.05% apart), so the mic's gains are gentler than the
-        radio's: with those it wobbled by up to 1% (now 0.1%, 0.4% at worst). (Averaging
-        the fill instead lags the loop, and it swings.)"""
+        radio's: with those it wobbled by up to 1% (now 0.05%, 0.35% at worst). (Averaging
+        the fill instead lags the loop, and it swings.) The integral is slow (MIC_KI):
+        tracking often starts with the fill at the top of that swing, and a faster one
+        took it for drift and wound up to 4x the real offset, reading the ring dry (a
+        0.2% fast mic clicked ~10 s in, in half the runs). The seed and kp carry the
+        start; the integral only trims what's left, over ~30 s."""
         aim = self.prefill + n
         return min(max((self.count - aim) / aim, -1.0), 1.0)   # (np.clip: ~5 us a number)
 
@@ -363,7 +368,7 @@ class Ring:
                 # settles back at the full prefill cushion instead of hovering near empty
                 lim = self.DRIFT_MAX
                 if self.auto_drift:
-                    err, kp, ki = self._mic_err(n), 0.004, 0.00005
+                    err, kp, ki = self._mic_err(n), self.MIC_KP, self.MIC_KI
                 else:
                     err = min(max((self.count - self.prefill) / max(self.prefill, 1),
                                   -1.0), 1.0)
