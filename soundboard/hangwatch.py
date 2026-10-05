@@ -49,10 +49,10 @@ class HangWatch(QObject):
             if reported:
                 continue
             reported = True
-            self.reports += 1
             frame = sys._current_frames().get(self._ui)
             stack = "".join(traceback.format_stack(frame)) if frame else "(no stack)"
             log.warning("the window hasn't responded for %.0f s; it's doing:\n%s",
                         stuck, stack)
             from soundboard import applog
             self.saved = applog.save_freeze(stuck, stack)
+            self.reports += 1           # last: a report counts once it's logged and saved

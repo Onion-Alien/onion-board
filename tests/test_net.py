@@ -10,6 +10,7 @@ import urllib.request
 
 import pytest
 
+from conftest import closed_port, ipv4_only
 from fakeproxy import HttpConnect, Socks5, no_leaks
 from soundboard import net
 
@@ -47,7 +48,7 @@ class Site:
                 self.wfile.write(body)
 
         self.httpd = http.server.ThreadingHTTPServer(("127.0.0.1", 0), H)
-        self.port = self.httpd.server_address[1]
+        self.port = ipv4_only(self.httpd.server_address[1])
         threading.Thread(target=self.httpd.serve_forever, daemon=True).start()
 
     def close(self):
@@ -70,11 +71,7 @@ def socks(site):
 
 
 def dead_port():
-    s = socket.socket()
-    s.bind(("127.0.0.1", 0))
-    port = s.getsockname()[1]
-    s.close()
-    return port
+    return closed_port()          # refused at once, not after Windows' ~2 s
 
 
 # ---------------------------------------------------------------- addresses

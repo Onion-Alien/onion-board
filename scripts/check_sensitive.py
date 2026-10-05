@@ -118,16 +118,38 @@ def scan_worktree(rules, staged: bool) -> list[str]:
     return hits
 
 
-def scan_history(rules) -> list[str]:
-    hits, seen = [], set()
+def git_in(stdin: bytes, *args: str) -> bytes:
+    return subprocess.run(["git", *args], cwd=ROOT, input=stdin, capture_output=True,
+                          check=True).stdout
+
+
+def history_blobs():
+    """(path, sha, bytes) for every file version ever committed, read by one
+    `git cat-file --batch` instead of two git processes per object (minutes -> s)."""
+    paths = {}
     for line in git("rev-list", "--all", "--objects").decode().splitlines():
         sha, _, path = line.partition(" ")
-        if not path or sha in seen or path in SELF:
-            continue
-        seen.add(sha)
-        if git("cat-file", "-t", sha).strip() != b"blob":
-            continue
-        text = decode(git("cat-file", "-p", sha))
+        if path and path not in SELF:
+            paths.setdefault(sha, path)
+    check = git_in("\n".join(paths).encode(), "cat-file",
+                   "--batch-check=%(objectname) %(objecttype) %(objectsize)")
+    blobs = []
+    for line in check.decode().splitlines():
+        sha, kind, size = line.split()
+        if kind == "blob" and int(size) <= MAX_BYTES:   # bigger: decode() skips them
+            blobs.append(sha)
+    out, pos = git_in("\n".join(blobs).encode(), "cat-file", "--batch"), 0
+    for sha in blobs:
+        end = out.index(b"\n", pos)
+        size = int(out[pos:end].split()[2])
+        yield paths[sha], sha, out[end + 1:end + 1 + size]
+        pos = end + 1 + size + 1                         # the data's own newline
+
+
+def scan_history(rules) -> list[str]:
+    hits = []
+    for path, sha, data in history_blobs():
+        text = decode(data)
         if text is not None:
             hits += scan_text(f"{path}@{sha[:8]}", text, rules)
     log = git("log", "--all", "--format=%H%x00%an <%ae>%x00%cn <%ce>%x00%B%x01").decode()

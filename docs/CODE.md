@@ -106,6 +106,7 @@ the launcher the shortcuts and PyInstaller use. The app is the `soundboard` pack
 | `soundboard/feedback.py` | where *Send feedback* and *Report a problem* (Settings → Add-ons & help, and Settings → About) go: a no-account form or a GitHub issue, opened in the browser with the version filled in; the app sends nothing |
 | `soundboard/errors.py` | other libraries' errors (yt-dlp, libsndfile, PortAudio, Windows, network) in plain words, minus their "report this to us" lines and command-line tips; the original stays in the log and in the report. Ones the user can't fix get a *Report it* link/button: a pre-filled issue on this repo, opened in the browser |
 | `soundboard/hangwatch.py` | notes down a frozen window: if the UI thread stops answering for 5 s, its stack goes into the log and a report beside the crash reports (nothing shown or sent) |
+| `soundboard/uigc.py` | Python's garbage collection on the UI thread only: a collection on another thread could free a Qt object with a running timer there and crash the app |
 | `soundboard/ui/icons.py` | the line icons, drawn in code and recoloured with the theme |
 | `soundboard/ui/art.py` | optional pictures from `assets/art` (voice tiles, the computer voice, its languages); emoji / painted icons when missing |
 | `soundboard/ui/responsive.py` | small windows: what hides, in which order, as the window shrinks |

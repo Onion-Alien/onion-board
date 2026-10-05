@@ -16,7 +16,7 @@ import numpy as np
 import pytest
 import soundfile as sf
 
-from conftest import process_events
+from conftest import closed_port, process_events
 from fakeproxy import Socks5, no_leaks
 from soundboard import net, updates
 from soundboard.engine import SR
@@ -271,14 +271,9 @@ def test_hls_playlists_and_segments_go_through_the_proxy(qapp, sites, socks):
 
 
 def test_radio_fails_closed_with_a_readable_reason(qapp, sites, monkeypatch):
-    import socket
-    s = socket.socket()
-    s.bind(("127.0.0.1", 0))
-    dead = s.getsockname()[1]
-    s.close()
-    # Windows takes ~2 s to refuse a connection to a closed port, even on 127.0.0.1:
-    # with FFmpeg slow to start on a busy machine, a 3 s watchdog said "the station
-    # didn't answer" before the relay knew why. The answer still comes after ~2 s.
+    dead = closed_port()
+    # FFmpeg can be slow to start on a busy machine: a 3 s watchdog said "the
+    # station didn't answer" before the relay knew why.
     monkeypatch.setattr("soundboard.radio.CONNECT_S", 12.0)
     net.configure(net.PROXY, f"socks5h://127.0.0.1:{dead}")
     try:

@@ -11,8 +11,13 @@ from soundboard.hangwatch import HangWatch
 HANG_S = 1.0
 
 
-def frozen_in_a_long_wait(seconds):
+def frozen_in_a_long_wait(hw, seconds, cap=10.0):
+    """Block the UI thread for `seconds`, and on past that until the watch has
+    reported (a loaded CI runner can starve its thread well past the freeze)."""
     time.sleep(seconds)
+    end = time.monotonic() + cap
+    while hw.reports == 0 and time.monotonic() < end:
+        time.sleep(0.05)
 
 
 def settle(qapp):
@@ -37,7 +42,7 @@ def test_a_frozen_window_logs_what_it_was_doing_once(qapp, caplog, tmp_path, mon
     settle(qapp)
     hw = HangWatch(hang_s=HANG_S)
     try:
-        frozen_in_a_long_wait(HANG_S * 2)          # the UI thread blocks: no beats
+        frozen_in_a_long_wait(hw, HANG_S * 2)      # the UI thread blocks: no beats
         assert hw.reports == 1
         assert "frozen_in_a_long_wait" in caplog.text
         assert hw.saved.parent == tmp_path / applog.REPORTS_DIR

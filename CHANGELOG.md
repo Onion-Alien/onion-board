@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- **A rare crash when the PC was busy is fixed.** Python tidied up its memory on
+  whichever thread happened to be running, sometimes a sound or network thread, and
+  that could free a part of the window while it was still ticking. It now tidies up
+  on the window's own thread only (which also keeps that work off the audio threads).
+
 ## 1.9.0 — 2026-10-05
 
 - **No virtual cable needed any more:** *Straight into my mic* puts your sounds into

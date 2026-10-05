@@ -14,6 +14,13 @@ ROOT = Path(__file__).resolve().parent.parent
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
+# Garbage collection on the main thread only, as in the app (soundboard.uigc): a
+# collection on a test server's or the relay's thread freed a leftover Qt object with
+# a running timer there, and its next tick crashed the worker (access violation).
+import gc  # noqa: E402
+
+gc.disable()
+
 
 class _SilentOutputStream:
     """Stands in for sounddevice.OutputStream: the callback runs on a thread at the
@@ -66,6 +73,59 @@ if os.environ.get("ONIONBOARD_TEST_REAL_AUDIO") != "1":
         os.environ["QTWEBENGINE_CHROMIUM_FLAGS"] = f"{flags} --mute-audio".strip()
 
 
+
+# Windows takes ~2 s to refuse a connection to a closed port, even on 127.0.0.1 (it
+# retries the SYN twice). A test that wants "nothing is listening there" takes a port
+# from closed_port(): connecting to it is refused at once, with the same error. A
+# server listening on 127.0.0.1 only calls ipv4_only(port), so "localhost" (::1
+# first) is refused there at once too, not after the same ~2 s.
+_CLOSED_PORTS: set[int] = set()
+_V4_ONLY_PORTS: set[int] = set()
+
+
+def closed_port() -> int:
+    import socket
+    s = socket.socket()
+    s.bind(("127.0.0.1", 0))
+    port = s.getsockname()[1]
+    s.close()
+    _CLOSED_PORTS.add(port)
+    return port
+
+
+def ipv4_only(port: int) -> int:
+    _V4_ONLY_PORTS.add(port)
+    return port
+
+
+def _refuse_closed_ports_at_once():
+    import socket
+    connect, connect_ex = socket.socket.connect, socket.socket.connect_ex
+
+    def closed(addr):
+        if not (isinstance(addr, tuple) and len(addr) >= 2):
+            return False
+        return ((addr[1] in _CLOSED_PORTS and addr[0] in ("127.0.0.1", "::1", "localhost"))
+                or (addr[1] in _V4_ONLY_PORTS and addr[0] == "::1"))
+
+    def refusal():
+        return OSError(0, "No connection could be made because the target machine "
+                       "actively refused it", None, 10061)   # ConnectionRefusedError
+
+    def fast_connect(self, addr):
+        if closed(addr):
+            raise refusal()
+        return connect(self, addr)
+
+    def fast_connect_ex(self, addr):
+        return 10061 if closed(addr) else connect_ex(self, addr)
+
+    socket.socket.connect = fast_connect
+    socket.socket.connect_ex = fast_connect_ex
+
+
+_refuse_closed_ports_at_once()
+
 def pytest_configure(config):
     config.addinivalue_line("markers", "real_this_pc: the relay refuses radio 127.x "
                             "(net.NEVER_THIS_PC) as in the app")
@@ -86,7 +146,19 @@ def qapp():
     from PySide6.QtWidgets import QApplication
     app = QApplication.instance() or QApplication([])
     app.setStyle("Fusion")
+    if not hasattr(app, "_collector"):   # collects while a test spins the event loop
+        from soundboard.uigc import UiCollector
+        app._collector = UiCollector(parent=app)
     return app
+
+
+@pytest.fixture(autouse=True)
+def _collect_on_the_main_thread():
+    """What a test left in reference cycles is collected here, on the main thread
+    (automatic collection is off: see the top of this file)."""
+    yield
+    from soundboard.uigc import collect_due
+    collect_due()
 
 
 def process_events(app, until, timeout=8.0, step=0.02):
