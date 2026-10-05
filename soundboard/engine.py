@@ -642,7 +642,11 @@ class Engine:
 
         self._rec_buf: list[np.ndarray] | None = None
         self._rec_frames_left = 0
-        self.rec_done: tuple[np.ndarray, int] | None = None   # (audio, rate)
+        self._rec_done: tuple[list, int] | np.ndarray | None = None   # see rec_done
+        self._mic_pow = [0.0, 0.0]   # each mic channel's recent power (_mic_channels)
+        self._mic_dead: int | None = None   # the mic channel found dead, if one is
+        self._mon_fed = False        # the mic wrote to ring_mon last block (mic check)
+        self._obs_fed = False        # ...and to ring_obs (your voice on the stream output)
         self._mic_rec: list[np.ndarray] | None = None          # mic during a test (see _mic)
         # a copy of every block sent to the send device while set to a list (the voice chat
         # check compares it with what Discord plays back); None = off
@@ -1177,6 +1181,21 @@ class Engine:
                        for v in self.voices)
 
     # ----------------------------------------------------------------- test record
+    @property
+    def rec_done(self) -> tuple[np.ndarray, int] | None:
+        """(audio, rate) of the finished test recording, or None."""
+        done = self._rec_done
+        if done is None:
+            return None
+        blocks, rate = done
+        if isinstance(blocks, list):
+            done = self._rec_done = (np.concatenate(blocks), rate)
+        return done
+
+    @rec_done.setter
+    def rec_done(self, value):
+        self._rec_done = value
+
     def start_test_record(self, seconds: float):
         self.rec_done = None
         self._rec_frames_left = int(seconds * self.rates["main"])
@@ -1482,7 +1501,9 @@ class Engine:
             self._rec_frames_left -= frames
             if self._rec_frames_left <= 0 and self._rec_buf is rec:   # not cancelled
                 self._rec_buf = None
-                self.rec_done = (np.concatenate(rec), self.rates["main"])
+                # joined by whoever reads rec_done: seconds of audio is too much
+                # to copy in an audio callback
+                self._rec_done = (rec, self.rates["main"])
 
     def _mon(self, outdata, frames):
         check = self.mic_check and self.sending   # muted: they hear nothing, so neither do you
@@ -1511,6 +1532,8 @@ class Engine:
         finite(mix)
         if check:   # you hear what others get: the same send stage, your mic in it
             mix = self._send_bus("mon", mix, m)
+            if self.limiter_on:
+                mix = self._stage("mon", Limiter).process(mix)
         else:
             mix = self._dest("mon", self._eq("mon", "sounds", mix))
         mix *= np.float32(self.mon_vol)
@@ -1604,10 +1627,36 @@ class Engine:
             return m
         return m * np.linspace(g0, g1, len(m), dtype=np.float32)[:, None]
 
+    MIC_DEAD = 0.01   # a mic channel under this share of the other's power (-20 dB) is dead
+    MIC_ALIVE = 0.05  # ...and alive again above this (-13 dB): no flapping in between
+
+    def _mic_channels(self, x: np.ndarray) -> np.ndarray:
+        """A two-channel mic with one live input (an audio interface's input 1, a
+        headset adapter): the live channel is copied over the dead one. Otherwise
+        voice chat's mono mix would halve it (-6 dB), and mic check is one-sided."""
+        p = np.einsum("ij,ij->j", x, x)   # each channel's power, in one go
+        a = self._mic_pow
+        a[0] += (float(p[0]) - a[0]) * 0.05   # ~0.2 s at 10 ms blocks
+        a[1] += (float(p[1]) - a[1]) * 0.05
+        if a[0] + a[1] > 1e-6 * len(x):   # the mic hears something (about -60 dBFS)
+            d = self._mic_dead
+            if d is not None and a[d] > a[1 - d] * self.MIC_ALIVE:
+                d = None
+            if d is None:
+                d = 0 if a[0] < a[1] * self.MIC_DEAD else 1 if a[1] < a[0] * self.MIC_DEAD else None
+            self._mic_dead = d
+        d = self._mic_dead
+        if d is not None:
+            x[:, d] = x[:, 1 - d]
+        return x
+
     def _mic(self, indata):
         x = indata
+        two = x.shape[1] >= 2
         x = np.repeat(x, 2, axis=1) if x.shape[1] == 1 else x[:, :2]
         x = np.ascontiguousarray(x, dtype=np.float32)
+        if two:   # a copy (it may still be a view of PortAudio's buffer): written to
+            x = self._mic_channels(x.copy() if np.shares_memory(x, indata) else x)
         self.level_mic = max(peak(x), self.level_mic * 0.85)
         rec = self._mic_rec
         raw = x[:, 0].copy() if rec is not None and self._rec_buf is not None else None
@@ -1618,7 +1667,15 @@ class Engine:
             rec.append(np.stack([raw, x[:, 0]], 1))
         if self.main_stream is not None:
             self.ring_main.write(self._rs_main(x))
-        if self.mic_check and self.mon_stream is not None:
+        fed = self.mic_check and self.mon_stream is not None
+        if fed:
             self.ring_mon.write(self._rs_mon(x))
-        if self.obs_voice and self.obs_stream is not None:
+        elif self._mon_fed:   # mic check stopped: an emptied ring isn't clock drift
+            self.ring_mon.clear()
+        self._mon_fed = fed
+        fed = self.obs_voice and self.obs_stream is not None
+        if fed:
             self.ring_obs.write(self._rs_obs(x))
+        elif self._obs_fed:
+            self.ring_obs.clear()
+        self._obs_fed = fed
