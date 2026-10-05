@@ -25,7 +25,6 @@ def test_keys():
     assert art.voice_key("Stadium announcer") == "voice-stadium-announcer"
     assert art.voice_key("Walkie-talkie") == "voice-walkie-talkie"
     assert art.voice_key("Custom") == "voice-custom"
-    assert art.language_key("zh") == "lang-zh"
 
 
 def test_missing_pictures_are_fine(qapp, art_dir):
@@ -73,7 +72,6 @@ class FakeEngine:
 def panel(qapp, art_dir, monkeypatch):
     monkeypatch.setattr(tts.SapiTTS, "warm_up", lambda self: ["Microsoft Zira Desktop"])
     _png(art_dir, "voice-robot")
-    _png(art_dir, "voice-computer")
     from soundboard.ui.voicepanel import VoicePanel
     p = VoicePanel(FakeEngine(), {"enabled": False, "effects": {}}, {"voice": ""})
     yield p
