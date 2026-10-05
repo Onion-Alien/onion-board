@@ -494,6 +494,9 @@ class Voice:
     # rate; otherwise the source is read at this rate (the resampled copy wasn't
     # ready when it started, and playing must never wait for one: see Engine.play)
     step: dict = field(default_factory=dict)
+    # outs whose stream closed under it mid-play (a rescan, a stalled device): done
+    # there for now, but a reopen at the same rate resumes it from its own position
+    cut: set = field(default_factory=set)
 
     def __post_init__(self):
         self.pos = {o: 0 for o in self.data}
@@ -680,9 +683,10 @@ class Engine:
         return s
 
     def _resume_voices(self, key: str, rate: int):
-        """Output `key` was reopened: sounds still playing on the other output pick
-        up here again, at the same spot (with a short fade in). Data made for
-        another rate is useless, so those stay done."""
+        """Output `key` was reopened: sounds still playing on another output pick
+        up here again, at the same spot (with a short fade in); sounds this output
+        was cut from while every output was closed (a device rescan) pick up where
+        they were cut. Data made for another rate is useless, so those stay done."""
         with self.lock:
             for v in self.voices:
                 if (key not in v.done or v.stopping or not len(v.data.get(key, ()))
@@ -691,11 +695,14 @@ class Engine:
                 other = next((o for o in v.data if o != key and o not in v.done
                               and len(v.data[o])), None)
                 if other is None:
-                    continue
+                    if key not in v.cut:
+                        continue
+                    other = key   # nothing else playing it: its own spot
                 d = v.data[other]
                 frac = v.seek_to.get(other)
                 if frac is None:
                     frac = (v.pos[other] % len(d)) / len(d)
+                v.cut.discard(key)
                 v.seek_to.pop(key, None)
                 v.pos[key] = int(frac * len(v.data[key]))
                 v.gate[key] = 0.0
@@ -932,6 +939,8 @@ class Engine:
         if out:  # voices can't finish on a device that's gone
             with self.lock:
                 for v in self.voices:
+                    if out in v.data and out not in v.done:
+                        v.cut.add(out)
                     v.done.add(out)
         if s is not None:
             try:

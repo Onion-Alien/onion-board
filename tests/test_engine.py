@@ -444,6 +444,33 @@ def test_reopened_output_resumes_sounds_still_playing_on_the_other(monkeypatch):
     assert np.abs(e._render("mon", 480)).max() > 0.4
 
 
+def test_a_device_rescan_keeps_sounds_playing_where_they_were(monkeypatch):
+    """Plugging in headphones rescans the devices, which closes every stream at
+    once: the sounds used to end there."""
+    e = engine_with("main", "mon")
+    v = e.play("a", tone(2.0), 1.0)
+    done = e.play("b", tone(0.01), 1.0)
+    for _ in range(10):
+        e._render("main", 480)
+        e._render("mon", 480)
+    at = v.pos["main"]
+    assert done.finished
+    e.shutdown()                                 # the rescan: everything closed
+    assert v.finished
+    fake_devices(monkeypatch, rate=SR)
+    e.set_main_device("cable")
+    assert "main" not in v.done and v.pos["main"] == at
+    e.set_mon_device("headphones")
+    assert "mon" not in v.done and v.pos["mon"] == at
+    assert done.finished                         # what had ended stays ended
+    e._render("main", 480)
+    assert np.abs(e._render("main", 480)).max() > 0.4
+    e.shutdown()
+    fake_devices(monkeypatch, rate=44100)        # back at another rate: its data is
+    e.set_main_device("cable")                   # useless, so it stays done
+    assert "main" in v.done
+
+
 def test_reopened_output_at_another_rate_leaves_sounds_done(monkeypatch):
     e = engine_with("main", "mon")
     v = e.play("a", tone(1.0), 1.0, loop=True)
