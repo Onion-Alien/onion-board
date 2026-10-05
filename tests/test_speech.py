@@ -501,6 +501,23 @@ def test_stop_never_waits_on_a_stuck_sender():
         b.close()
 
 
+def test_stop_still_says_quit_whole_then_hangs_up():
+    h = ServiceHost(["unused"], lambda e: None)
+    a, b = socket.socketpair()
+    try:
+        h._sock, h.connected = a, True
+        h._send_lock.acquire()                # the sender is finishing a frame
+        h.stop()                              # returns at once ...
+        assert not h.connected and h._sock is None
+        h._send_lock.release()                # ... and "quit" follows that frame
+        b.settimeout(5)
+        kind, payload = protocol.recv(b)
+        assert kind == protocol.JSON and protocol.decode_json(payload) == {"type": "quit"}
+        assert protocol.recv(b) is None       # then the link is closed
+    finally:
+        b.close()
+
+
 def test_helper_exits_when_its_model_cant_load():
     try:
         import faster_whisper  # noqa: F401

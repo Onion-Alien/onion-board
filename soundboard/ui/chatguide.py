@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import html
 import logging
+import threading
 import time
 
 import numpy as np
@@ -30,6 +31,7 @@ DISCORD_EXES = ("discord.exe", "discordptb.exe", "discordcanary.exe", "discordde
 DISCORD_VOICE_URL = "discord://-/settings/voice"
 CHECK_SID = "__check__"
 TAIL_S = chatcheck.MAX_LAG_S + 0.8     # keep listening this long after the test ends
+CONNECT_S = 6.0                         # how long Windows gets to open the capture
 
 
 def _ok() -> str:
@@ -107,19 +109,32 @@ def result_html(res: dict, vm: str) -> str:
 class ChatCheck(QObject):
     """Runs one Discord check: captures Discord's playback, plays the test signal into
     the cable only, taps what we really sent, then compares the two. `done` carries
-    the chatcheck.analyze() result (with 'error' set when it couldn't run)."""
+    the chatcheck.analyze() result (with 'error' set when it couldn't run).
+
+    Nothing slow runs on the window's thread: finding Discord and the comparison run
+    on a worker, and Windows opening the capture (up to seconds) is polled."""
 
     done = Signal(dict)
     progress = Signal(str)
+    _found = Signal(object, object, int)   # (App or None, test signal, run): from the worker
+    _analyzed = Signal(dict, int)     # (result, run): from the worker
 
     def __init__(self, engine, parent=None):
         super().__init__(parent)
         self.engine = engine
         self._cap = None
         self._heard: list[np.ndarray] = []
+        self._sig = None   # the test sound (made on the worker: 0.2 s of numpy)
+        self._run = 0   # which check: a worker's late answer to a cancelled one is dropped
+        self._deadline = 0.0
         self._timer = QTimer(self)
         self._timer.setSingleShot(True)
         self._timer.timeout.connect(self._finish)
+        self._poll = QTimer(self)   # Windows opening the capture (start(wait=False))
+        self._poll.setInterval(50)
+        self._poll.timeout.connect(self._poll_ready)
+        self._found.connect(self._on_found)
+        self._analyzed.connect(self._on_analyzed)
         self.running = False
 
     def start(self):
@@ -135,27 +150,68 @@ class ChatCheck(QObject):
         if not can:
             self.done.emit({"issues": [], "error": why})
             return
+        self.running = True
+        self._run += 1
+        threading.Thread(target=self._find, args=(self._run,), name="chatcheck-find",
+                         daemon=True).start()
+
+    def _find(self, run: int):
+        """On the worker: listing the programs walks every process and window, and
+        making the test sound takes a moment too."""
         app = find_discord()
+        self._emit(self._found, app, chatcheck.test_signal() if app is not None else None, run)
+
+    def _emit(self, signal, *args):
+        try:
+            signal.emit(*args)
+        except RuntimeError:   # the dialog closed meanwhile
+            pass
+
+    def _on_found(self, app, sig, run: int):
+        if run != self._run or not self.running:
+            return
+        self._sig = sig
         if app is None:
+            self.running = False
             self.done.emit({"issues": [], "error": (
                 "Couldn't find Discord playing anything. Open Discord → ⚙ User Settings → "
                 "Voice & Video, click Let's Check, then check again.")})
             return
+        from soundboard import appaudio
         self._heard = []
-        self._cap = appaudio.AppCapture(app.pid, self._heard.append, name=app.name)
-        if not self._cap.start():
-            err = self._cap.error or "Couldn't listen to Discord."
-            self._cap = None
+        cap = appaudio.AppCapture(app.pid, self._heard.append, name=app.name)
+        if not cap.start(wait=False):
+            self.running = False
+            self.done.emit({"issues": [], "error": cap.error or "Couldn't listen to Discord."})
+            return
+        self._cap = cap
+        self._deadline = time.monotonic() + CONNECT_S
+        self._poll.start()
+
+    def _poll_ready(self):
+        """Windows has opened the capture (or failed to): play the test."""
+        cap = self._cap
+        if cap is None:
+            self._poll.stop()
+            return
+        if not cap.error and not cap.ready and time.monotonic() < self._deadline:
+            return
+        self._poll.stop()
+        if not cap.ready:
+            err = cap.error or "Windows didn't answer in time. Check again to retry."
+            self._stop()
             self.done.emit({"issues": [], "error": err})
             return
-        self.running = True
+        e = self.engine
         e.main_tap = []
         try:
-            sig = chatcheck.test_signal()
-            e.play(CHECK_SID, sig, 1.0, mode="restart", src_rate=chatcheck.SR, only="main")
-        except Exception:
-            self._stop()   # no capture or tap left running (the caller says it failed)
-            raise
+            e.play(CHECK_SID, self._sig, 1.0, mode="restart", src_rate=chatcheck.SR, only="main")
+        except Exception as ex:  # noqa: BLE001 - no capture or tap left running
+            log.exception("discord check couldn't start")
+            self._stop()
+            self.done.emit({"issues": [], "error": f"The check couldn't start: "
+                                                   f"{errors.plain(ex)}"})
+            return
         self._t0 = time.monotonic()
         self.progress.emit("Listening to Discord…")
         self._timer.start(int((chatcheck.LENGTH_S + TAIL_S) * 1000))
@@ -163,7 +219,9 @@ class ChatCheck(QObject):
     def cancel(self):
         if not self.running:
             return
+        self._run += 1
         self._timer.stop()
+        self._poll.stop()
         self._stop()
 
     def _stop(self):
@@ -171,17 +229,22 @@ class ChatCheck(QObject):
         self.engine.stop(CHECK_SID)
         cap, self._cap = self._cap, None
         if cap is not None:
-            cap.stop()
+            cap.stop(wait=False)   # it may still be inside Windows' capture request
         tap, self.engine.main_tap = self.engine.main_tap, None
         return tap
 
     def _finish(self):
         tap = self._stop()
+        self.running = True   # until the comparison is back
+        heard, rate, run = list(self._heard), self.engine.rates["main"], self._run
+        threading.Thread(target=self._analyze, args=(tap, heard, rate, run),
+                         name="chatcheck-analyze", daemon=True).start()
+
+    def _analyze(self, tap, heard, rate, run: int):
+        """On the worker: the comparison takes tens of ms."""
         try:
-            rate = self.engine.rates["main"]
             sent = np.concatenate(tap) if tap else np.zeros((0, 2), np.float32)
-            heard = (np.concatenate(self._heard) if self._heard
-                     else np.zeros((0, 2), np.float32))
+            heard = np.concatenate(heard) if heard else np.zeros((0, 2), np.float32)
             if rate != chatcheck.SR and len(sent):
                 import soxr
                 sent = soxr.resample(sent, rate, chatcheck.SR).astype(np.float32)
@@ -190,6 +253,12 @@ class ChatCheck(QObject):
         except Exception as ex:  # noqa: BLE001
             log.exception("discord check failed")
             res = {"issues": [], "error": f"The check failed: {errors.plain(ex)}"}
+        self._emit(self._analyzed, res, run)
+
+    def _on_analyzed(self, res: dict, run: int):
+        if run != self._run or not self.running:
+            return
+        self.running = False
         self.done.emit(res)
 
 

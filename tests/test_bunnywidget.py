@@ -135,3 +135,19 @@ def test_idles_at_a_few_frames_a_second_and_wakes_for_talking(qapp):
     b.burst(2)
     assert b._timer.interval() == bunnywidget.FAST_MS
     b._timer.stop()
+
+
+def test_headphones_trickle_lets_him_idle(qapp):
+    b = BunnyWidget("headphones")
+    b.resize(b.sizeHint())
+    for _ in range(90):                 # ~3 s of silence: a note from his headphones
+        _run(qapp, b, 1)
+        if b.notes:
+            break
+    assert b.notes and all(n.calm for n in b.notes)
+    now = time.monotonic()
+    b._next_blink = b._next_flick = now + 60
+    b._blink_at = b._flick_at = -1
+    assert not b.busy(now)              # so the slow frame rate, not 30 fps forever
+    b.burst(2)
+    assert b.busy(now)

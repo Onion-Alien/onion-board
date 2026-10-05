@@ -29,7 +29,7 @@ from dataclasses import asdict, dataclass
 from PySide6.QtCore import (QEasingCurve, QPoint, QPointF, QPropertyAnimation, QRect, QRectF,
                             QEvent, QObject, QSize, Qt, QTimer)
 from PySide6.QtGui import (QColor, QFont, QFontMetrics, QGuiApplication, QPainter, QPainterPath,
-                           QPen, QPolygonF)
+                           QPen, QPixmap, QPolygonF)
 from PySide6.QtWidgets import QApplication, QWidget
 
 from soundboard import theme, winkeys
@@ -530,6 +530,8 @@ class OverlayWindow(QWidget):
         self._press: QPoint | None = None     # where a press on an empty part was
         self._grab: QPoint | None = None      # while dragging: that point − window pos
         self._placed_on = None                # the screen present() put it on
+        self._cache_key: tuple | None = None  # what the cached layers were drawn from
+        self._layers: tuple[QPixmap, QPixmap] | None = None
 
     # ------------------------------------------------------------------ geometry
     def _k(self) -> float:
@@ -674,17 +676,101 @@ class OverlayWindow(QWidget):
             self.hide()
 
     def set_playing(self, playing: dict):
-        if playing or self.playing or self.ov.flash:
-            self.playing = dict(playing)
-            self.update()
+        """Called ~30x/s while open. Repaints only what changed: a tile whose bar moved
+        a pixel or more, or that started, stopped or was paused, and the footer when
+        its buttons light up or flip to Resume. A paused sound's bar doesn't move, so it
+        costs nothing. (Repainting all of it every tick took ~2 ms a frame.)"""
+        if not (playing or self.playing or self.ov.flash):
+            return
+        old, self.playing = self.playing, dict(playing)
+        if self.ov.flash or self._static_key() != self._cache_key:
+            self.update()   # a pick's flash, the footer, a page flip, a sound loaded …
+            return
+        px = self.TILE_W * self._k()
+        for i, meta in enumerate(self.ov.page_sounds()[:SLOTS]):
+            was, now = old.get(meta.id), self.playing.get(meta.id)
+            if was == now:
+                continue
+            if was is not None and now is not None and was[1] == now[1] \
+                    and abs(was[0] - now[0]) * px < 1:
+                self.playing[meta.id] = was   # under a pixel: keep what's drawn
+                continue
+            self.update(self._scaled(self._tile_rect(i)))
+
+    def _scaled(self, r: QRectF) -> QRect:
+        """A rect in painted (unscaled) units → widget pixels, with room for the border."""
+        k = self._k()
+        return QRectF(r.left() * k, r.top() * k, r.width() * k,
+                      r.height() * k).toAlignedRect().adjusted(-2, -2, 2, 2)
 
     # ------------------------------------------------------------------ paint
+    # The parts that don't move are drawn once into two cached layers: `under` (panel,
+    # header, footer, tile cards) and `over` (each tile's strip, key and name). A
+    # paint just stacks under → progress bars → over → tile borders.
+    THEMED = ("bg", "border", "text_hi", "muted", "card", "card_hi", "accent", "badge",
+              "badge_text")
+
+    def _flash(self) -> int | None:
+        ov = self.ov
+        return ov.flash[0] if ov.flash and ov.flash[1] > time.monotonic() else None
+
+    def _static_key(self) -> tuple:
+        """Everything the cached layers are drawn from."""
+        ov = self.ov
+        cfg, T = ov.host.cfg, theme.T
+        return (self.width(), self.height(), self.devicePixelRatioF(), self.font().key(),
+                ov.s.scale, ov.s.opacity, ov.s.mode, ov.s.keys, ov.page, ov.pages(),
+                cfg.category, bool(cfg.categories), bool(ov.sounds()),
+                tuple(T.get(t) for t in self.THEMED),
+                tuple((m.id, m.name, m.color, m.id in ov.host.audio)
+                      for m in ov.page_sounds()),
+                self._hover, self._flash(), bool(self.playing), self._all_paused())
+
+    def _layer(self, draw) -> QPixmap:
+        dpr = self.devicePixelRatioF()
+        pm = QPixmap(max(1, round(self.width() * dpr)), max(1, round(self.height() * dpr)))
+        pm.setDevicePixelRatio(dpr)
+        pm.fill(Qt.transparent)
+        p = QPainter(pm)
+        p.setRenderHint(QPainter.Antialiasing)
+        p.scale(self._k(), self._k())
+        draw(p)
+        p.end()
+        return pm
+
     def paintEvent(self, e):
-        ov, T, k = self.ov, theme.T, self._k()
+        ov, k = self.ov, self._k()
+        now = time.monotonic()
+        flash = self._flash()
+        if flash is None:
+            ov.flash = None   # over: set_playing needn't repaint for it any more
+        key = self._static_key()
+        if key != self._cache_key:
+            self._layers = (self._layer(lambda p: self._paint_under(p, flash)),
+                            self._layer(self._paint_over))
+            self._cache_key = key
+        under, over = self._layers
+        dirty = e.rect()
+        tiles = [(i, self._tile_rect(i), m) for i, m in enumerate(ov.page_sounds()[:SLOTS])]
+        tiles = [t for t in tiles if dirty.intersects(self._scaled(t[1]))]
         p = QPainter(self)
         p.setRenderHint(QPainter.Antialiasing)
+        p.drawPixmap(0, 0, under)
         p.scale(k, k)
-        W, H = self.width() / k, self.height() / k
+        for _, r, meta in tiles:
+            self._tile_bar(p, r, meta)
+        p.resetTransform()
+        p.drawPixmap(0, 0, over)
+        p.scale(k, k)
+        for i, r, meta in tiles:
+            self._tile_edge(p, r, i, meta, flash == i)
+        p.end()
+        if flash is not None:
+            QTimer.singleShot(int((ov.flash[1] - now) * 1000) + 20, self.update)
+
+    def _paint_under(self, p: QPainter, flash: int | None):
+        ov, T = self.ov, theme.T
+        W, H = self.width() / self._k(), self.height() / self._k()
         panel = QPainterPath()
         panel.addRoundedRect(QRectF(0.5, 0.5, W - 1, H - 1), 14, 14)
         bg = QColor(T["bg"])
@@ -723,16 +809,10 @@ class OverlayWindow(QWidget):
         if hint:
             p.drawText(head, Qt.AlignRight | Qt.AlignVCenter, hint)
 
-        # tiles
-        now = time.monotonic()
-        flash = ov.flash[0] if ov.flash and ov.flash[1] > now else None
-        if flash is None:
-            ov.flash = None   # over: set_playing needn't repaint for it any more
+        # tiles: an empty slot whole, a sound's card (the bar and the rest go on top)
         for i in range(SLOTS):
-            self._tile(p, f, self._tile_rect(i), i, sounds[i] if i < len(sounds) else None,
-                       flash == i)
-        if flash is not None:
-            QTimer.singleShot(int((ov.flash[1] - now) * 1000) + 20, self.update)
+            self._tile_under(p, f, self._tile_rect(i), i,
+                             sounds[i] if i < len(sounds) else None, flash == i)
 
         # footer: the other keys
         foot = QRectF(self.PAD + 2, H - self.PAD - self.FOOT + 6, W - 2 * self.PAD - 4,
@@ -760,7 +840,11 @@ class OverlayWindow(QWidget):
             close = "let go to close" if ov.s.mode == "hold" else "Esc  close"
             p.drawText(rest, Qt.AlignLeft | Qt.AlignVCenter, cat_key.strip())
             p.drawText(rest, Qt.AlignRight | Qt.AlignVCenter, close)
-        p.end()
+
+    def _paint_over(self, p: QPainter):
+        f = QFont(self.font())
+        for i, meta in enumerate(self.ov.page_sounds()[:SLOTS]):
+            self._tile_over(p, f, self._tile_rect(i), i, meta)
 
     def _button(self, p: QPainter, f: QFont, name: str, icon: str, text: str, key: str,
                 live: bool):
@@ -807,11 +891,15 @@ class OverlayWindow(QWidget):
             p.setPen(QColor(T["badge_text"]))
             p.drawText(cap, Qt.AlignCenter, key)
 
-    def _tile(self, p: QPainter, f: QFont, r: QRectF, i: int, meta, flash: bool):
-        T = theme.T
+    @staticmethod
+    def _path(r: QRectF) -> QPainterPath:
         path = QPainterPath()
         path.addRoundedRect(r, 9, 9)
-        key = key_label(self.ov.keyset["slots"][i])
+        return path
+
+    def _tile_under(self, p: QPainter, f: QFont, r: QRectF, i: int, meta, flash: bool):
+        T = theme.T
+        path = self._path(r)
         if meta is None:
             p.setPen(QPen(QColor(T["border"]), 1, Qt.DashLine))
             p.setBrush(Qt.NoBrush)
@@ -820,36 +908,34 @@ class OverlayWindow(QWidget):
             f.setBold(False)
             f.setPointSizeF(8.5)
             p.setFont(f)
-            p.drawText(r.adjusted(10, 6, -8, -6), Qt.AlignLeft | Qt.AlignTop, key)
+            p.drawText(r.adjusted(10, 6, -8, -6), Qt.AlignLeft | Qt.AlignTop,
+                       key_label(self.ov.keyset["slots"][i]))
             return
-        accent = QColor(meta.color)
         card = QColor(T["card_hi"] if flash else T["card"])
         card.setAlpha(240)
         p.fillPath(path, card)
+
+    def _tile_bar(self, p: QPainter, r: QRectF, meta):
+        """How far the sound has got, over the card and under its name."""
         prog, paused = self.playing.get(meta.id, (None, False))
-        if prog is not None:
-            fill = QColor(accent)
-            fill.setAlpha(45 if paused else 85)
-            p.save()
-            p.setClipPath(path)
-            p.fillRect(QRectF(r.left(), r.top(), r.width() * max(prog, 0.02), r.height()), fill)
-            p.restore()
+        if prog is None:
+            return
+        fill = QColor(meta.color)
+        fill.setAlpha(45 if paused else 85)
+        p.save()
+        p.setClipPath(self._path(r))
+        p.fillRect(QRectF(r.left(), r.top(), r.width() * max(prog, 0.02), r.height()), fill)
+        p.restore()
+
+    def _tile_over(self, p: QPainter, f: QFont, r: QRectF, i: int, meta):
+        T = theme.T
         # colour strip down the left edge
         p.save()
-        p.setClipPath(path)
-        p.fillRect(QRectF(r.left(), r.top(), 4, r.height()), accent)
+        p.setClipPath(self._path(r))
+        p.fillRect(QRectF(r.left(), r.top(), 4, r.height()), QColor(meta.color))
         p.restore()
-        if flash:
-            p.setPen(QPen(QColor(T["text_hi"]), 2.2))
-        elif self._hover == f"slot:{i}":
-            p.setPen(QPen(QColor(T["accent"]), 1.6))
-        elif prog is not None:
-            p.setPen(QPen(accent, 2, Qt.DashLine if paused else Qt.SolidLine))
-        else:
-            p.setPen(QPen(QColor(T["border"]), 1))
-        p.setBrush(Qt.NoBrush)
-        p.drawPath(path)
         # key badge
+        key = key_label(self.ov.keyset["slots"][i])
         f.setBold(True)
         f.setPointSizeF(8.5)
         p.setFont(f)
@@ -867,3 +953,17 @@ class OverlayWindow(QWidget):
         p.setPen(QColor(T["text_hi"] if ready else T["muted"]))
         p.drawText(r.adjusted(11, 27, -8, -5), Qt.AlignLeft | Qt.AlignTop | Qt.TextWordWrap,
                    meta.name if ready else f"{meta.name} (loading)")
+
+    def _tile_edge(self, p: QPainter, r: QRectF, i: int, meta, flash: bool):
+        T = theme.T
+        prog, paused = self.playing.get(meta.id, (None, False))
+        if flash:
+            p.setPen(QPen(QColor(T["text_hi"]), 2.2))
+        elif self._hover == f"slot:{i}":
+            p.setPen(QPen(QColor(T["accent"]), 1.6))
+        elif prog is not None:
+            p.setPen(QPen(QColor(meta.color), 2, Qt.DashLine if paused else Qt.SolidLine))
+        else:
+            p.setPen(QPen(QColor(T["border"]), 1))
+        p.setBrush(Qt.NoBrush)
+        p.drawPath(self._path(r))

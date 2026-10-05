@@ -28,8 +28,9 @@ def _old_peaks(data, n):
 
 def test_to_int16_is_unchanged():
     rng = np.random.default_rng(1)
-    x = (rng.standard_normal((5000, 2)) * 0.7).astype(np.float32)   # some past ±1
-    x[:4] = [[1.0, -1.0], [2.0, -2.0], [0.5 / library.I16, -0.5 / library.I16], [0, 0]]
+    # (within ±1: past it, a limiter turns the peaks down first: test_audio_quality)
+    x = (rng.standard_normal((5000, 2)) * 0.7).clip(-1, 1).astype(np.float32)
+    x[:4] = [[1.0, -1.0], [-1.0, 1.0], [0.5 / library.I16, -0.5 / library.I16], [0, 0]]
     for data in (x, x[::2], x.astype(np.float64)):
         got = library.to_int16(data)
         assert got.dtype == np.int16 and got.flags.c_contiguous

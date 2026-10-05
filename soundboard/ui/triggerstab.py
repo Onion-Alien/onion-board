@@ -53,11 +53,14 @@ class TriggersTab(QWidget):
     _step = Signal(str)                    # from it too: what it's doing, with no number
     _finished = Signal(object, str, bool)  # ModuleInfo | None, error, was an update
 
-    def __init__(self, host, dirs=None):
-        """`host` is the BoardHost; `dirs` where to look for the add-on (tests)."""
+    def __init__(self, host, dirs=None, defer: bool = False):
+        """`host` is the BoardHost; `dirs` where to look for the add-on (tests).
+        `defer`: don't load the add-on yet, the window calls load() once it's up
+        (loading it takes up to a second, and the window used to wait for it)."""
         super().__init__()
         self.host = host
         self._dirs = dirs
+        self.pending = defer               # load() hasn't run yet
         self.panel = None                  # the add-on's tab, once loaded
         self.info: modules.ModuleInfo | None = None
         self.offer: watchaddon.Offer | None = None   # a newer version to update to
@@ -87,7 +90,12 @@ class TriggersTab(QWidget):
         self.btn_remove = self._remove_button()
         self.foot.addWidget(self.btn_remove)
         self.stack.addWidget(self.board_page)
-        self.load()
+        if defer:   # blank meanwhile, not Hoot asking to be installed
+            self.wait_page = QWidget()
+            self.stack.addWidget(self.wait_page)
+            self.stack.setCurrentWidget(self.wait_page)
+        else:
+            self.load()
 
     # ------------------------------------------------------------------ pages
     def _build_get_page(self):
@@ -244,6 +252,7 @@ class TriggersTab(QWidget):
     def load(self, error: str = "") -> bool:
         """Put the installed add-on's tab in, if it's there and loads. False (Hoot
         stays, saying why) otherwise."""
+        self.pending = False
         if self.panel is not None:
             return True
         self.info = watchaddon.installed(self._dirs)
@@ -457,7 +466,8 @@ class TriggersTab(QWidget):
         """Triggers were being watched before the add-on existed and it isn't in:
         worth pointing at the tab once."""
         s = self.host.screen
-        return (self.panel is None and bool(s.get("on")) and bool(s.get("triggers"))
+        return (self.panel is None and not self.pending
+                and bool(s.get("on")) and bool(s.get("triggers"))
                 and not s.get("board_nudged"))
 
     def nudged(self):

@@ -91,6 +91,9 @@ CHIPS_ROW_H = 30      # the now-playing row: a chip's 24 px ■ button, its marg
 TICK_MS = 33         # the UI timer while the window is on screen (meters, visualisers)
 TICK_BG_MS = 100     # ...while it's on screen but another program is in front (a game)
 TICK_IDLE_MS = 250   # ...and while it's in the tray or minimised (push-to-talk, watchdog)
+TICK_QUIET_MS = 100  # on screen with nothing moving: no sound, radio, recording or level
+LEVEL_QUIET = 0.003  # a level below this (-50 dB) shows as nothing on the meters
+TRIGGERS_LOAD_MS = 50   # Onion Watch loads this long after the window is built
 GLOW_STEPS = 4       # how many glow levels the taskbar / tray icon has while sound plays
 ICON_GLOW_MS = 120   # ...and how often at most it changes
 ICON_GLOW_BG_MS = 400   # ...while another program (a game) is in front
@@ -108,6 +111,8 @@ LOOSE_EMPTY_LOOKS = 20   # an empty file that long (~30 s) waits for the folder 
 MINI_SIZE = QSize(440, 380)   # below this the window becomes the mini player...
 MINI_PAD_ROWS = 1             # ...which has the pads above it when this many rows fit
 QUEUE_CHIPS = 5          # queued sounds shown by name above the pads (then "+n more")
+SEARCH_WAIT_MS = 100     # typing in the search box filters the pads once it pauses this long
+PAD_SIZE_WAIT_MS = 50    # dragging Pad size re-lays the pads at most this often
 RANDOM = "__random__:"   # hotkey action prefix: a random sound from the category after it
 ALL = "All"          # the category tab that shows every sound
 VOICE_POLL_MS = 3000  # how often the game in front is looked at (soundboard.voicesdk)
@@ -192,6 +197,7 @@ class MainWindow(QMainWindow):
     update_done = Signal(object, str)   # an update check finished: Release|None, error
     config_saved = Signal(bool)         # the background save finished: ok
     voice_engine = Signal(object)       # the voice engine of the game in front (a mode key|None)
+    default_found = Signal(object)      # Windows' default output, asked on a thread (str|None)
 
     def __init__(self):
         super().__init__()
@@ -271,6 +277,7 @@ class MainWindow(QMainWindow):
         self._seeking = False
         self._tick_n = 0                  # ticks since start (the watchdog runs ~once a second)
         self._ui_live = True              # the window is on screen (see _set_tick_rate)
+        self._tick_busy = True            # something moves with the tick (see _busy)
         self._sounds_live = False         # the Sounds tab's live dot is shown
         self._icon_step, self._icon_next = -1, 0.0   # the icons' glow step (_glow_icons)
         self._tray_step = -1              # ...and the tray icon's
@@ -338,6 +345,8 @@ class MainWindow(QMainWindow):
         self._default_timer.timeout.connect(self._default_tick)
         self._default_timer.timeout.connect(self._recover_devices)
         self._default_at = 0.0   # when Windows' default was last looked at (_default_tick)
+        self._default_asking = False   # ...and a thread is asking it now
+        self.default_found.connect(self._on_default_found)
         self._recover_n, self._recover_at = 0, 0.0   # see _recover_devices
         self._gone_n = 0   # checks in a row that found the failing device unplugged
         if sys.platform == "win32":
@@ -470,7 +479,7 @@ class MainWindow(QMainWindow):
         self.apps.clip_ready.connect(self.on_clip)
         self.tabs.addTab(self.apps, "")
         # the Onion Watch add-on, or Hoot and its download button until it's installed
-        self.triggers = TriggersTab(BoardHost(self))
+        self.triggers = TriggersTab(BoardHost(self), defer=True)   # see load_triggers
         self.tabs.addTab(self.triggers, "")
         self.voice = VoicePanel(self.engine, self.cfg.voice_fx, self.cfg.speech)
         self.voice.fx_changed.connect(lambda spec: self.set_option("voice_fx", spec))
@@ -515,8 +524,7 @@ class MainWindow(QMainWindow):
         self.triggers.active_changed.connect(lambda on: set_tab_live(
             self.tabs, ti, on, "● ON: watching your screen", "triggers"))
         set_tab_live(self.tabs, ti, self.triggers.is_active(), icon="triggers")
-        if self.triggers.needs_nudge():
-            self._nudge_triggers(ti)
+        QTimer.singleShot(TRIGGERS_LOAD_MS, self, self.load_triggers)
         self._radio_live(self.radio.is_active())
         self._search_follow_switch()
         net.on_change(self._follow_switches)
@@ -726,8 +734,14 @@ class MainWindow(QMainWindow):
                                "TikTok, Myinstants…). Or paste a link (YouTube, SoundCloud, "
                                "TikTok, most media sites) to add or play it")
         self.search.setClearButtonEnabled(True)
-        # typing regrids only when the pads shown change (35 ms a key with 600 pads)
-        self.search.textChanged.connect(lambda t: self.apply_filter(t, lazy=True))
+        # typing regrids only when the pads shown change (35 ms a key with 600 pads),
+        # and only once it pauses (_on_search_text); text set by the app filters at once
+        self._search_wait = QTimer(self, singleShot=True, interval=SEARCH_WAIT_MS)
+        self._search_wait.timeout.connect(
+            lambda: self.apply_filter(self.search.text(), lazy=True))
+        self._search_typed = None
+        self.search.textEdited.connect(self._on_search_edited)
+        self.search.textChanged.connect(self._on_search_text)
         self.search.returnPressed.connect(self.on_search_enter)
         self.btn_yt = QPushButton("Search")
         self.btn_yt.setToolTip("Search YouTube, SoundCloud, TikTok sounds, Myinstants… for "
@@ -784,7 +798,11 @@ class MainWindow(QMainWindow):
         size.setValue(c.pad_width)
         size.setFixedWidth(90)
         size.setToolTip("Pad size")
-        size.valueChanged.connect(self.set_pad_width)
+        # a drag re-lays every pad at most every PAD_SIZE_WAIT_MS, not on each step
+        self._pad_size_wait = QTimer(self, singleShot=True, interval=PAD_SIZE_WAIT_MS)
+        self._pad_size_wait.timeout.connect(lambda: self.set_pad_width(size.value()))
+        size.valueChanged.connect(lambda _v: self._pad_size_wait.isActive()
+                                  or self._pad_size_wait.start())
         no_wheel(size)
         # Who's listening, one click away (the full picker is on the Setup tab)
         from soundboard.ui.destpanel import ModeCombo
@@ -1392,19 +1410,38 @@ class MainWindow(QMainWindow):
         """The timer's look at Windows' default output (a COM call): only while the
         headphones follow it, as nothing else uses the answer (picking a device by hand
         looks again), and every few seconds rather than constantly while the window is
-        in the tray or minimised."""
-        if not self.cfg.mon_follows_default:
+        in the tray or minimised. Asked on a thread (it took ~5 ms of the UI thread every
+        1.5 s); the answer comes back through default_found."""
+        if not self.cfg.mon_follows_default or self._default_asking:
             return
         now = time.monotonic()
         if not self._ui_live and now - self._default_at < DEFAULT_POLL_IDLE_S:
             return
         self._default_at = now
-        self._follow_default_output()
+        self._default_asking = True
+        threading.Thread(target=self._ask_default, daemon=True, name="default-output").start()
 
-    def _follow_default_output(self):
+    def _ask_default(self):
+        try:
+            name = appaudio.default_output_name()
+        except Exception:  # noqa: BLE001 - never let the poll's thread die loudly
+            log.debug("asking for Windows' default output failed", exc_info=True)
+            name = None
+        try:
+            self.default_found.emit(name)
+        except RuntimeError:   # the window is gone (quitting)
+            pass
+
+    def _on_default_found(self, name):
+        self._default_asking = False
+        if self.cfg.mon_follows_default:   # not picked by hand meanwhile
+            self._follow_default_output(name)
+
+    def _follow_default_output(self, *found: str | None):
         """Windows' default output changed (headphones → speakers): the headphones
-        output moves with it, unless another device was picked for it by hand."""
-        now = appaudio.default_output_name()
+        output moves with it, unless another device was picked for it by hand.
+        `found`: its name, already asked (on a thread); asked now if not given."""
+        now = found[0] if found else appaudio.default_output_name()
         if not now or now == self._default_out:
             return
         self._default_out = now
@@ -2032,6 +2069,7 @@ class MainWindow(QMainWindow):
         self.show()
 
     def set_pad_width(self, w):
+        self._pad_size_wait.stop()
         self.cfg.pad_width = w
         self.grid.set_pad_width(w)
         self._save_later()
@@ -2305,6 +2343,7 @@ class MainWindow(QMainWindow):
             self.save_replay()
         elif action == "__pause__":
             self.engine.pause_all()
+            self._wake()
         elif action == "__random__":
             self.play_random()
         elif action.startswith(RANDOM):
@@ -2443,6 +2482,16 @@ class MainWindow(QMainWindow):
         self.apps.stop_all()
         self.triggers.cancel_pending()
 
+    def load_triggers(self):
+        """Put the Onion Watch add-on into the Triggers tab. It took 0.4-1 s on the UI
+        thread, so it waits until the window is up: a 0 ms timer would still run before
+        Windows' first paint message, a TRIGGERS_LOAD_MS one runs after it. Runs once."""
+        if not self.triggers.pending or self._shut_down:
+            return
+        self.triggers.load()
+        if self.triggers.needs_nudge():
+            self._nudge_triggers(self.tabs.indexOf(self.triggers))
+
     def _nudge_triggers(self, index: int):
         """Triggers were being watched before they moved into the Onion Watch add-on,
         which isn't installed: tint the tab and say so once, until the tab is opened."""
@@ -2486,6 +2535,7 @@ class MainWindow(QMainWindow):
         """Enter / the Search button: search the site the results header has
         picked (ytdl.SOURCES) for the search box's text (a pasted link is the
         link bar's instead)."""
+        self.flush_search()
         text = self.search.text()
         if ytdl.as_link(text) or not self.ytresults.available():
             return
@@ -2498,6 +2548,7 @@ class MainWindow(QMainWindow):
         self._cat_row.hide()
 
     def on_search_enter(self):
+        self.flush_search()   # a link pasted a moment ago: the link bar has it now
         if ytdl.as_link(self.search.text()):
             self.linkbar.add()
         else:
@@ -2557,6 +2608,7 @@ class MainWindow(QMainWindow):
                              mode="restart" if m.mode == "queue" else m.mode,
                              fade_in=m.fade_in, fade_out=m.fade_out,
                              only=("main", "obs") if m.only_them else None)
+        self._wake()
         if v is None and not self.engine.active_outputs():
             self.status.setText(f"<span style='color:{theme.status('warn')}'>"
                                 "No audio device is open — pick one "
@@ -2642,12 +2694,14 @@ class MainWindow(QMainWindow):
         st = self.engine.state(sid)
         if st:
             self.engine.set_paused(sid, not st[1])
+            self._wake()
             return
         m, data = self.meta(sid), self.audio.get(sid)
         if m and data is not None:
             frac = 0.0 if self.start_frac >= 0.995 else self.start_frac
             self.engine.play(sid, data, self.gain_for(m), loop=m.loop, mode="restart", start=frac,
                              fade_in=m.fade_in if frac == 0 else 0.0, fade_out=m.fade_out)
+            self._wake()
 
     def space_pad(self, sid: str):
         """Space on a pad: pause or resume it while it's playing (or paused), like a
@@ -2655,6 +2709,7 @@ class MainWindow(QMainWindow):
         if self.engine.state(sid):
             self.select(sid)
             self.engine.set_paused(sid, not self.engine.state(sid)[1])
+            self._wake()
         else:
             self.play(sid)
 
@@ -2779,9 +2834,27 @@ class MainWindow(QMainWindow):
         if query and " ".join(self.search.text().split()) == query:
             self.search.clear()
 
+    def _on_search_edited(self, text: str):
+        # typed: Qt sends this just before textChanged (the box's clear button sends
+        # it just after; that change has filtered at once, and the next one is unequal)
+        self._search_typed = text
+
+    def _on_search_text(self, text: str):
+        typed, self._search_typed = self._search_typed == text, None
+        if typed:
+            self._search_wait.start()   # each key restarts it: filter once typing pauses
+        else:
+            self.apply_filter(text, lazy=True)
+
+    def flush_search(self):
+        """Filter the pads for the search box now, if typing left that waiting."""
+        if self._search_wait.isActive():
+            self.apply_filter(self.search.text(), lazy=True)
+
     def apply_filter(self, text, lazy: bool = False):
         """Show the pads that match the search box (name or category) and are in the
         category picked above the pads. `lazy`: skip the regrid when no pad changed."""
+        self._search_wait.stop()   # this is the filter typing was waiting for
         self.linkbar.set_text(text)
         if getattr(self, "overlay", None) is not None:   # every sounds / category edit ends here
             self.overlay.sounds_changed()
@@ -4533,11 +4606,32 @@ class MainWindow(QMainWindow):
             self._set_tick_rate()
 
     def _tick_pace(self) -> int:
+        if not self._ui_live and not self.overlay.is_open:
+            return TICK_IDLE_MS
+        if not self._tick_busy:   # nothing moves: 10 ticks a second instead of 30
+            return TICK_QUIET_MS
         if self.overlay.is_open:   # the in-game overlay shows what's playing, over the game
             return TICK_MS
-        if not self._ui_live:
-            return TICK_IDLE_MS
         return TICK_MS if appstate.active() else TICK_BG_MS
+
+    def _wake(self):
+        """A sound started or resumed: full pace now, not after a quiet tick (auto
+        push-to-talk presses its key from the tick)."""
+        if not self._tick_busy:
+            self._tick_busy = True
+            pace = self._tick_pace()
+            if self.timer.interval() != pace:
+                self.timer.start(pace)
+
+    def _busy(self, playing) -> bool:
+        """Something on screen moves with the tick: a sound playing (not paused), the
+        radio, the test recording, a meter or the mic level still showing."""
+        e = self.engine
+        return (any(not paused for _p, paused in playing.values())
+                or self.radio.is_active() or e.recording or e.rec_done is not None
+                or self._rec_playing or bool(self._queue) or bool(e.aux)
+                or max(e.level_play, e.level_main,
+                       e.level_mic if e.mic_stream is not None else 0.0) > LEVEL_QUIET)
 
     def _set_tick_rate(self, *_):
         live = self.isVisible() and not self.isMinimized()
@@ -4572,6 +4666,7 @@ class MainWindow(QMainWindow):
             self._sounds_live = live
             set_tab_live(self.tabs, self.tabs.indexOf(self.sounds_page), live,
                          "● ON: a sound is playing", "sounds")
+        self._tick_busy = self._busy(playing)
         pace = self._tick_pace()
         if self.timer.interval() != pace:
             self.timer.start(pace)

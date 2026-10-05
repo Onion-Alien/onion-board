@@ -916,15 +916,45 @@ def decode(path: str) -> np.ndarray:
 
 
 def to_int16(data: np.ndarray) -> np.ndarray:
-    """float32 [-1, 1] -> int16 (the in-memory / cached format). int16 passes through."""
+    """float32 [-1, 1] -> int16 (the in-memory / cached format). int16 passes through.
+    Peaks over full scale (loud MP3 / AAC masters decode up to ~+1.5 dB, and resampling
+    adds a little) are turned down by a limiter first: clipped here, the flat tops
+    would be in the cache for good, crackling on every kick and snare."""
     if data.dtype == np.int16:
         return data
+    if len(data) and float(np.max(np.abs(data))) > 1.0:
+        data = _under_full_scale(data)
     # one float copy, rounded and clipped in place: a 15-minute song is ~350 MB of
     # float32, and each temporary would be another
     y = data * I16
     np.rint(y, out=y)
     np.clip(y, -I16 - 1, I16, out=y)
     return np.ascontiguousarray(y.astype(np.int16))
+
+
+def _under_full_scale(data: np.ndarray, chunk: int = SR) -> np.ndarray:
+    """(n, 2) audio through a lookahead limiter just under 0 dBFS (sendfx.Limiter: no
+    distortion, the level elsewhere untouched), a second at a time."""
+    from soundboard.sendfx import Limiter
+    if data.ndim != 2 or data.shape[1] != 2:
+        return data              # (only stereo is stored; anything else just clips)
+    lim = Limiter(SR, ceiling_db=-0.05)
+    n = len(data)
+    out = np.empty((n, 2), np.float32)
+    at, skip = 0, lim.la         # the limiter's first `la` samples are its delay line
+
+    def put(y):
+        nonlocal at, skip
+        d = min(skip, len(y))
+        y, skip = y[d:], skip - d
+        k = min(len(y), n - at)
+        out[at:at + k] = y[:k]
+        at += k
+
+    for i in range(0, n, chunk):
+        put(lim.process(np.asarray(data[i:i + chunk], np.float32)))
+    put(lim.process(np.zeros((lim.la, 2), np.float32)))   # push the delay out
+    return out
 
 
 def to_float32(data: np.ndarray) -> np.ndarray:

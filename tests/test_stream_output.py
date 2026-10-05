@@ -2,6 +2,7 @@
 import numpy as np
 
 from soundboard.library import Config
+from soundboard.sendfx import SafetyLimiter
 from test_engine import engine_with, tone
 from test_mainwindow import window  # noqa: F401  (the real MainWindow)
 
@@ -18,10 +19,13 @@ def test_sounds_reach_the_stream_output_clean_and_at_its_volume():
     d = tone(0.05) * np.array([1.0, 0.0], np.float32)   # left only
     v = e.play("a", d, 1.0)
     assert v.outs == {"main", "mon", "obs"}
+    la = SafetyLimiter(48000).la     # the stream ends in a limiter: 3 ms behind
     out = block(e, "obs")
-    assert np.allclose(out, d[:480]) and not out[:, 1].any()   # still stereo, untouched
+    assert not out[:la].any() and not out[:, 1].any()           # still stereo,
+    assert np.allclose(out[la:], d[:480 - la])                  # untouched
     e.obs_vol = 0.5
-    assert np.allclose(block(e, "obs"), d[480:960] * 0.5)
+    block(e, "obs")                  # (a volume change glides over a block)
+    assert np.allclose(block(e, "obs")[la:], d[960:1440 - la] * 0.5)
 
 
 def test_previews_stay_off_the_stream_and_only_them_skips_the_headphones():
@@ -38,6 +42,9 @@ def test_stream_gets_the_mic_only_when_asked_and_sent():
     e._mic(mic)
     assert block(e, "obs").any()
     e.mic_enabled = False            # "send my mic" unticked: not to the stream either
+    for _ in range(2):               # (it fades out over a block, then the limiter's 3 ms)
+        e._mic(mic)
+        block(e, "obs")
     e._mic(mic)
     assert not block(e, "obs").any()
     e.mic_enabled, e.obs_voice = True, False   # OBS records the mic itself

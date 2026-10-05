@@ -320,14 +320,15 @@ class AiVoiceController:
         # on straight away: until the voice is ready the backup covers your mic
         self.chain.source = src
 
+    # queued in order with the mic audio: a direct send waited (up to 250 ms, on the
+    # UI thread) for the sender to finish the audio it was writing
     def set_voice(self, voice: str, pitch: float = 0.0):
         if self.host is not None:
-            self.host.send_json({"type": "config", "voice": voice, "pitch": float(pitch)},
-                                wait=0.25)
+            self.host.feed_json({"type": "config", "voice": voice, "pitch": float(pitch)})
 
     def set_auto_pitch(self, on: bool):
         if self.host is not None:
-            self.host.send_json({"type": "config", "auto_pitch": bool(on)}, wait=0.25)
+            self.host.feed_json({"type": "config", "auto_pitch": bool(on)})
 
     def set_backup(self, backup: str):
         self.backup = backup if backup in BACKUPS else "voice"

@@ -37,6 +37,8 @@ from soundboard import errors
 # step 3's "I don't use the cable" list: this choice sends nowhere (Config.route "off")
 NOWHERE = "Nowhere: only me (and the stream output)"
 RESTART_NEEDED = 3010   # install-vbcable.ps1: installed, but Windows must restart first
+TICK_MS = 40            # the mic page's meter
+SLOW_TICK_MS = 250      # the other pages: only the cable installer to keep up with
 
 # install-vbcable.ps1 -StatusFile writes "<step>|<text>"; these are the steps as the
 # guide shows them, in order ("wake" only happens if the cable needs a nudge)
@@ -240,7 +242,7 @@ class SetupWizard(QDialog):
 
         self.timer = QTimer(self)
         self.timer.timeout.connect(self._tick)
-        self.timer.start(40)
+        self.timer.start(TICK_MS)
         if self._proc is not None:   # still installing from a guide closed mid-way
             self.bun_cable.build()
         self.go(2 if resumed or self._proc is not None else 0)
@@ -495,6 +497,7 @@ class SetupWizard(QDialog):
         self.stack.setCurrentIndex(i)
         self.progress.setText(f"Step {i + 1} of {self.PAGES}")
         self.btn_back.setVisible(i > 0)
+        self.timer.setInterval(TICK_MS if i == 0 else SLOW_TICK_MS)
         if i == 2:
             self.cable_status.setText("Checking the cable…")
             self.cable_status.repaint()   # the check can take a moment (it may reopen devices)
@@ -730,9 +733,13 @@ class SetupWizard(QDialog):
         self.bun_cable.build()
         self.recheck_cable(rescan=False)
 
-    @staticmethod
-    def _status_file():
-        library.APP_DIR.mkdir(parents=True, exist_ok=True)
+    _status_dir = None   # the folder made already (not on every tick)
+
+    @classmethod
+    def _status_file(cls):
+        if cls._status_dir != library.APP_DIR:
+            library.APP_DIR.mkdir(parents=True, exist_ok=True)
+            cls._status_dir = library.APP_DIR
         return library.APP_DIR / "cable-install-status.txt"
 
     def _read_cable_step(self):
@@ -843,13 +850,13 @@ class SetupWizard(QDialog):
         busy.flash(self.btn_copy, "✓  Copied")
 
     def _tick(self):
-        e = self.win.engine
-        lvl = e.level_mic if e.mic_stream is not None else 0.0
-        self.mic_meter.set_level(lvl)
-        self.bun_mic.set_level(lvl)
-        if lvl > 0.05:
-            self._mic_peak_seen = True
-        if self.stack.currentIndex() == 0:
+        if self.stack.currentIndex() == 0:   # the mic page: its meter and Bun
+            e = self.win.engine
+            lvl = e.level_mic if e.mic_stream is not None else 0.0
+            self.mic_meter.set_level(lvl)
+            self.bun_mic.set_level(lvl)
+            if lvl > 0.05:
+                self._mic_peak_seen = True
             if e.mic_stream is None and self._no_mics:
                 self.mic_heard.setText(f"<span style='color:{_bad()}'>No microphone was found."
                                        "</span> Plug one in, then open this guide again "

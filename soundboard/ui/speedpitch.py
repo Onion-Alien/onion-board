@@ -380,10 +380,14 @@ class SpeedPitchButton(QPushButton):
             txt += " · FX"
         self.setText(txt)
         hot = s > REDLINE_AT + 1e-6 or abs(p) > PITCH.hi
-        # scoped to this button: unscoped, it would cascade into the popup (a child)
-        self.setStyleSheet("" if self.is_default() and not fx else
-                           f"QPushButton[speedpitch=\"true\"] {{ font-weight:700; "
-                           f"color:{RED if hot else theme.status('warn')}; }}")
+        # scoped to this button: unscoped, it would cascade into the popup (a child).
+        # Only when the look changes: each set re-polishes the popup's ~90 widgets too
+        # (6-9 ms a slider step)
+        sheet = ("" if self.is_default() and not fx else
+                 f"QPushButton[speedpitch=\"true\"] {{ font-weight:700; "
+                 f"color:{RED if hot else theme.status('warn')}; }}")
+        if sheet != self.styleSheet():
+            self.setStyleSheet(sheet)
 
     def _edited(self):
         self._label()

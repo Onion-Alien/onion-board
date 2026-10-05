@@ -189,6 +189,34 @@ def test_a_quiet_program_is_handed_over_as_silence():
     assert not any(x.any() for x in got)
 
 
+def test_stop_without_waiting_returns_at_once_and_feeds_nothing_more(monkeypatch):
+    """Windows can take seconds to open a capture, deaf to the stop flag meanwhile:
+    stop(wait=False) mustn't wait for that (it froze the window), and the old thread
+    hands nothing to the sink after it, so a new capture can take over at once."""
+    import threading
+    opening = threading.Event()
+    let_go = threading.Event()
+
+    def run(self):   # stands in for the Windows side: no real capture
+        opening.set()
+        let_go.wait(5)                     # "inside ActivateAudioInterfaceAsync"
+        self._ready.set()
+        while self._hand_over(np.zeros((480, 2), np.float32)):
+            time.sleep(0.005)
+    monkeypatch.setattr(appaudio.AppCapture, "_run", run)
+    monkeypatch.setattr(appaudio, "_win", True)
+    monkeypatch.setattr(appaudio, "is_running", lambda pid, started=None: True)
+    monkeypatch.setattr(appaudio, "process_started", lambda pid: 1)
+    got = []
+    cap = appaudio.AppCapture(4242, got.append, name="slow")
+    assert cap.start(wait=False) and opening.wait(2)
+    cap.stop(wait=False)
+    assert cap._thread.is_alive()          # returned while the thread still waits
+    let_go.set()
+    cap.join(2)
+    assert not cap._thread.is_alive() and got == [] and cap.frames == 0
+
+
 def test_capture_of_a_missing_process_fails_politely():
     got = []
     cap = appaudio.AppCapture(4_000_000_000 - 1, got.append, name="nobody")

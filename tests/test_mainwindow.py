@@ -35,6 +35,7 @@ def window(qapp, app_dir, monkeypatch):
     # temp paths are still patched in, never after the fixture is torn down
     w._load_thread.join(15)
     assert not w._load_thread.is_alive()
+    w.load_triggers()   # now, not on its timer in the middle of a test
     yield w
     w.close()
     w._load_thread.join(15)   # a test may have started another load (e.g. Undo) just now

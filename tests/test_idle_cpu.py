@@ -1,33 +1,58 @@
 """The window's background work stays cheap: polls whose answer nobody uses are
 skipped or slowed down, and animations stop while nobody can see them."""
+import threading
 import time
 
 from PySide6.QtCore import QAbstractAnimation
 from PySide6.QtWidgets import QApplication
 
+from conftest import process_events
 from soundboard import appaudio
 from test_mainwindow import window  # noqa: F401 - the real window, offscreen
 
 
-def test_windows_default_output_is_only_asked_while_followed(window, monkeypatch):  # noqa: F811
+def test_windows_default_output_is_only_asked_while_followed(window, monkeypatch, qapp):  # noqa: F811
     asked = []
     monkeypatch.setattr(appaudio, "default_output_name",
-                        lambda: asked.append(1) or "Speakers (Realtek Audio)")
+                        lambda: asked.append(threading.current_thread())
+                        or "Speakers (Realtek Audio)")
+    followed = []
+    monkeypatch.setattr(window, "_follow_default_output", lambda *a: followed.append(a))
+
+    def tick():
+        window._default_tick()
+        process_events(qapp, lambda: not window._default_asking, timeout=5)
     window._default_timer.stop()
     window.cfg.mon_follows_default = False
-    window._default_tick()
+    tick()
     assert not asked                                  # a device picked by hand: not used
     window.cfg.mon_follows_default = True
     window._ui_live = True
-    window._default_tick()
-    window._default_tick()
+    tick()
+    tick()
     assert len(asked) == 2                            # on screen: every tick
+    assert threading.main_thread() not in asked       # asked on a thread, not the UI's
+    assert followed == [("Speakers (Realtek Audio)",)] * 2   # the answer back on the UI's
     window._ui_live = False
-    window._default_tick()
+    tick()
     assert len(asked) == 2                            # in the tray: every few seconds
     window._default_at -= 10
-    window._default_tick()
+    tick()
     assert len(asked) == 3
+
+
+def test_a_slow_default_output_answer_isnt_asked_twice(window, monkeypatch, qapp):  # noqa: F811
+    go, asked = threading.Event(), []
+    monkeypatch.setattr(appaudio, "default_output_name",
+                        lambda: asked.append(1) or go.wait(5) and None)
+    window._default_timer.stop()
+    window.cfg.mon_follows_default = True
+    window._ui_live = True
+    window._default_tick()
+    window._default_tick()                            # the first is still asking
+    go.set()
+    process_events(qapp, lambda: not window._default_asking, timeout=5)
+    assert len(asked) == 1
 
 
 def test_an_unplugged_device_is_looked_for_less_often(window, monkeypatch):  # noqa: F811
@@ -84,3 +109,34 @@ def test_mic_check_pulse_pauses_while_hidden(window):  # noqa: F811
     window.hide()
     assert window._pulse.state() == QAbstractAnimation.Paused
     window._pulse.stop()
+
+
+def test_the_ui_tick_slows_down_while_nothing_moves(window, monkeypatch, qapp):  # noqa: F811
+    from soundboard.ui import mainwindow as main
+    assert process_events(qapp, lambda: "s0" in window.audio)
+    e = window.engine
+    playing = {}
+    monkeypatch.setattr(e, "playing", lambda: dict(playing))
+    monkeypatch.setattr(main.appstate, "active", lambda: True)   # the app is in front
+    monkeypatch.setattr(window, "isVisible", lambda: True)
+    window._ui_live = True
+    e.level_play = e.level_main = e.level_mic = 0.0
+    window.tick()
+    assert window.timer.interval() == main.TICK_QUIET_MS    # 10 a second, not 30
+    window.play("s0")                                       # back to full pace at once
+    assert window.timer.interval() == main.TICK_MS
+    playing["s0"] = (0.5, True)                             # paused: nothing moves
+    e.level_play = e.level_main = 0.0
+    window._tick_busy = False
+    window.tick()
+    assert window.timer.interval() == main.TICK_QUIET_MS
+    playing["s0"] = (0.5, False)
+    window.tick()
+    assert window.timer.interval() == main.TICK_MS
+    playing.clear()
+    e.level_main = 0.5                                      # a meter still falling
+    window.tick()
+    assert window.timer.interval() == main.TICK_MS
+    for _ in range(80):                                     # ...until it shows nothing
+        window.tick()
+    assert window.timer.interval() == main.TICK_QUIET_MS
