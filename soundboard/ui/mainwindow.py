@@ -147,6 +147,12 @@ class Bridge(QObject):
     preview = Signal(str, object, float, int)  # id, audio with unsaved effects|None, gain, gen
 
 
+def is_hands_free(name: str | None) -> bool:
+    """A Bluetooth headset's phone-call mic ("Headset (… Hands-Free AG Audio)")."""
+    n = (name or "").lower()
+    return "hands-free" in n or "hands free" in n
+
+
 def _listed(name: str, names) -> bool:
     """`name` (as the app saved it) is one of `names` (Windows' own), spacing aside."""
     squash = " ".join(name.split()).lower()
@@ -1397,6 +1403,12 @@ class MainWindow(QMainWindow):
         self._apply_send_outputs(force_main=attr == "main_device")
         self._save_now()
         self._update_status()
+        if attr == "mic_device" and is_hands_free(name):   # after: it'd be overwritten
+            self.status.setText(
+                f"<span style='color:{theme.status('warn')}'>That's a Bluetooth headset's "
+                "phone-call mic: while it's open, Windows switches the headset to call "
+                "quality, so everything you hear sounds muffled. A wired mic, or the "
+                "headset's own USB dongle, sounds much better.</span>")
         self._prepare_all()
 
     def set_route(self, route: str, device: str | None = None):

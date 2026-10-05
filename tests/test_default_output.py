@@ -98,3 +98,16 @@ def test_a_listed_device_that_wont_open_gets_a_rescan_with_backoff(window, monke
     e.errors.pop("mic")                                # it opened: the wait starts over
     window._recover_devices()
     assert window._recover_n == 0
+
+
+def test_picking_a_bluetooth_hands_free_mic_warns_about_call_quality(window, monkeypatch):
+    from soundboard.ui import mainwindow
+    monkeypatch.setattr(eng.Engine, "set_mic_device", lambda self, n: None)
+    assert mainwindow.is_hands_free("Headset (WH-1000XM4 Hands-Free AG Audio)")
+    assert not mainwindow.is_hands_free("Microphone (USB Mic)")
+    cb = window.cb_mic
+    cb.addItem("Headset (WH-1000XM4 Hands-Free AG Audio)",
+               "Headset (WH-1000XM4 Hands-Free AG Audio)")
+    cb.setCurrentIndex(cb.count() - 1)
+    window.on_device(cb, "mic_device")
+    assert "phone-call mic" in window.status.text()
