@@ -1199,6 +1199,9 @@ class Engine:
             del f
             if not out.flags.writeable:
                 out = out.copy()
+            if len(out) and float(np.max(np.abs(out))) > 1.0:   # resampling overshot
+                from soundboard.library import _under_full_scale   # (it imports us)
+                out = _under_full_scale(out)
             out *= 32767.0
             np.rint(out, out=out)
             np.clip(out, -32768, 32767, out=out)
@@ -1840,9 +1843,13 @@ class Engine:
                 mix += self._vol("obs", ("aux", a.key), x, a.vol if a.stream else 0.0)
         mix = self._eq("obs", "sounds", finite(mix))
         m = self.ring_obs.read(frames)
-        if m is not None and self.obs_voice and self.mic_enabled and not self.mic_muted:
-            m = self._vol("obs", "mic", self._gated("obs", m), self.mic_vol)
-            mix += self._eq("obs", "voice", m)
+        if m is None:
+            self._glides[("obs", "mic")] = 0.0   # nothing coming: it fades in when it does
+        else:
+            on = self.obs_voice and self.mic_enabled and not self.mic_muted
+            if on or self._glides.get(("obs", "mic"), 0.0):   # on, or still fading out
+                m = self._vol("obs", "mic", self._gated("obs", m), self.mic_vol if on else 0.0)
+                mix += self._eq("obs", "voice", m)
         # muted: the stream gets silence too (faded, not cut)
         mix = self._vol("obs", "out", mix, self.obs_vol if self.sending else 0.0)
         if self.limiter_on:

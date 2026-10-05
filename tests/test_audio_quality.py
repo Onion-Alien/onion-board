@@ -188,3 +188,19 @@ def test_headphones_turn_overlapping_loud_sounds_down_instead_of_bending_them():
     y = np.concatenate(y)
     assert np.max(np.abs(y)) <= 10 ** (-0.3 / 20) + 1e-6
     assert thd_db(y, 220) < -60
+
+
+def test_loud_masters_are_stored_without_flat_tops():
+    # a loud master decodes ~1 dB over full scale: clipped into the 16-bit cache, every
+    # peak had a flat top (crackle). It's turned down around the peaks instead.
+    from soundboard.library import to_int16
+    t = np.arange(SR * 2) / SR
+    x = np.stack([np.sin(2 * np.pi * 220 * t) * 1.12] * 2, 1).astype(np.float32)
+    y = to_int16(x).astype(np.float32) / 32767
+    assert len(y) == len(x)
+    assert np.max(np.abs(y)) < 1.0 and thd_db(y[:, 0], 220) < -60
+    q = np.stack([np.sin(2 * np.pi * 220 * t) * 0.5] * 2, 1).astype(np.float32)
+    assert np.array_equal(to_int16(q), np.rint(q * 32767).astype(np.int16))   # untouched
+    # the limiter's delay is taken back out: the sound lines up with the original
+    k = SR // 2
+    assert np.corrcoef(y[k:k + 4800, 0], x[k:k + 4800, 0])[0, 1] > 0.999
