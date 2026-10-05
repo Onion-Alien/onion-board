@@ -179,6 +179,16 @@ def test_a_capture_that_errors_says_so_and_stops_sending(tab):
     assert row.sending and "Switch Send on" not in row.sub.text()
 
 
+def test_clearing_an_error_line_takes_the_red_off(qapp):
+    from soundboard.ui.appspanel import AppRow
+    row = AppRow("music.exe", Meter)
+    row.set_app(music())
+    row.set_status("It failed", error=True)
+    assert row.sub.property("tone") == "error"
+    row.set_status("")
+    assert row.sub.property("tone") == "" and row.sub.text() != "It failed"
+
+
 def test_remembered_programs_start_from_the_config_and_auto_send(qapp, monkeypatch):
     monkeypatch.setattr(appaudio, "AppCapture", FakeCapture)
     FakeCapture.made, FakeCapture.fail, FakeCapture.slow = [], False, False

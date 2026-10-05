@@ -333,7 +333,7 @@ class AppRow(HoverCard):
             self.sub.setText(text)
             theme.set_tone(self.sub, "error" if error else "")
         else:
-            self.sub.setStyleSheet("")
+            theme.set_tone(self.sub, "")   # an error line was red: back to normal
             if self.app is not None:
                 self.set_app(self.app)   # back to the program's own line
 

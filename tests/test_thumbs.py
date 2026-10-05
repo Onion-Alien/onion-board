@@ -41,6 +41,26 @@ def test_set_image_replaces_and_clear_removes_the_file(qapp, app_dir, tmp_path):
     assert m.image == "" and not list(library.THUMBS_DIR.iterdir())
 
 
+def test_picture_cache_forgets_replaced_pictures_and_stays_small(qapp, app_dir, tmp_path,
+                                                                  monkeypatch):
+    m = SoundMeta(id="s1", name="n", file="f.wav")
+    thumbs.set_image(m, make_image(tmp_path / "a.png"))
+    old = m.image
+    assert thumbs.pixmap(old) is not None and old in thumbs._pixmaps
+    thumbs.set_image(m, make_image(tmp_path / "b.png"))
+    assert old not in thumbs._pixmaps                  # the replaced one is let go
+    monkeypatch.setattr(thumbs, "MAX_CACHED", 3)
+    pics = [str(make_image(tmp_path / f"p{i}.png", 40, 30)) for i in range(5)]
+    for p in pics:
+        assert thumbs.pixmap(p) is not None
+    thumbs.pixmap(pics[2])                             # drawn again: kept longest
+    thumbs.pixmap(m.image)
+    assert len(thumbs._pixmaps) == 3
+    assert pics[2] in thumbs._pixmaps and m.image in thumbs._pixmaps
+    assert pics[0] not in thumbs._pixmaps
+    assert thumbs.pixmap(pics[0]) is not None          # reloads when needed again
+
+
 def test_image_is_stored_relative_and_survives_a_round_trip(qapp, app_dir, tmp_path):
     m = SoundMeta(id="s1", name="n", file=str(library.SOUNDS_DIR / "s1.wav"))
     thumbs.set_image(m, make_image(tmp_path / "a.png"))
@@ -97,6 +117,37 @@ def test_spectrum_of_silence_and_the_very_end_is_flat():
     noise = (np.random.default_rng(1).standard_normal((SR, 2)) * 3000).astype(np.int16)
     assert spectrum(noise, 1.0, 12).max() == 0.0          # past the end: nothing left
     assert len(spectrum(None, 0.5, 10)) == 10
+
+
+def _spectrum_one_band_at_a_time(data, frac, n):
+    """The plain version of spectrum(): a loop over the bands (what it used to be)."""
+    from soundboard.ui.widgets import _FREQS, _HANN, FFT_N
+    pos = int(min(max(frac, 0.0), 1.0) * len(data))
+    seg = data[pos:pos + FFT_N]
+    if len(seg) < FFT_N:
+        seg = np.concatenate([seg, np.zeros((FFT_N - len(seg), 2), seg.dtype)])
+    mono = seg.mean(axis=1, dtype=np.float32)
+    if data.dtype == np.int16:
+        mono /= 32768.0
+    mag = np.abs(np.fft.rfft(mono * _HANN)) * (4.0 / FFT_N)
+    idx = np.clip(np.searchsorted(_FREQS, np.geomspace(50, 14000, n + 1)), 1, len(mag) - 1)
+    out = np.empty(n, np.float32)
+    for i in range(n):
+        a, b = idx[i], max(idx[i + 1], idx[i] + 1)
+        out[i] = np.sqrt(np.mean(mag[a:b] ** 2))
+    db = 20 * np.log10(out + 1e-9) + np.linspace(0, 14, n)
+    return np.clip((db + 62) / 52, 0.0, 1.0).astype(np.float32)
+
+
+def test_spectrum_matches_the_band_by_band_sum():
+    rng = np.random.default_rng(7)
+    for n in (1, 5, 16, 28, 48):
+        loud = (rng.standard_normal((SR, 2)) * rng.uniform(10, 20000)).astype(np.int16)
+        quiet = (rng.standard_normal((SR // 2, 2)) * 1e-3).astype(np.float32)
+        for data in (loud, quiet):
+            for frac in (0.0, 0.37, 0.99):
+                got, want = spectrum(data, frac, n), _spectrum_one_band_at_a_time(data, frac, n)
+                assert np.abs(got - want).max() < 1e-5
 
 
 def test_pad_bars_jump_up_and_fall_back(qapp):
