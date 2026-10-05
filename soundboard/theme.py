@@ -373,8 +373,24 @@ def _add_live_tokens(t: dict[str, str], colour: str = "") -> None:
     t.setdefault("live_border", _mix(t["live_text"], t["bg"], 0.45))
 
 
+def _add_hover_token(t: dict[str, str]) -> None:
+    """accent_hover: a filled accent button's hover colour, its accent_hi made just dark
+    (or light) enough for its on_accent text to read (4.5:1). White on a lightened
+    accent was 3.2-4.2:1 in ten themes, the default Dark among them. accent_hi itself
+    stays as it is: it's also text and borders on the panels."""
+    if "accent_hover" in t:
+        return
+    # light text: darker; dark text: lighter
+    on = t["on_accent"]
+    away = "#000000" if _contrast(on, "#000000") > _contrast(on, "#ffffff") else "#ffffff"
+    t["accent_hover"] = next(
+        (c for c in (_mix(t["accent_hi"], away, i / 20) for i in range(13))
+         if _contrast(c, t["on_accent"]) >= 4.5), t["accent_hi"])
+
+
 for _t in THEMES.values():
     _add_live_tokens(_t)
+    _add_hover_token(_t)
 
 DEFAULT = "Dark"
 # How the Settings window groups the theme cards. Every theme is in exactly one group.
@@ -472,7 +488,7 @@ QPushButton:checked { background:$accent; border-color:$accent; color:$on_accent
 QPushButton:disabled { color:$muted; }
 QPushButton[busy="true"], QPushButton#primary[busy="true"] { color:$muted; }
 QPushButton#primary { background:$accent; border:none; color:$on_accent; font-weight:600; }
-QPushButton#primary:hover { background:$accent_hi; }
+QPushButton#primary:hover { background:$accent_hover; }
 QPushButton#primary:focus { border:1px solid $text_hi; }
 QPushButton#danger { background:$danger_bg; border:1px solid $danger_border; color:$danger_text; font-weight:600; }
 QPushButton#danger:hover { background:$danger_hover; }
@@ -485,7 +501,7 @@ QPushButton#settings { padding:6px 14px; font-weight:600; }
 QFrame#transport, QFrame#deck { background:$panel; border-radius:12px; }
 QFrame#mixer { background:transparent; }
 QFrame#card QPushButton#primary { background:$accent; color:$on_accent; border:none; padding:9px; }
-QFrame#card QPushButton#primary:hover { background:$accent_hi; }
+QFrame#card QPushButton#primary:hover { background:$accent_hover; }
 QFrame#vsep { background:$border; border:none; }
 QLabel#toast { background:$panel; border:1px solid $border_hi;
                border-radius:12px; padding:8px 14px; }
@@ -554,7 +570,7 @@ QComboBox::down-arrow:disabled { image:url("$down_off"); }
 QComboBox:disabled, QLineEdit:disabled { color:$muted; background:$inset; }
 QFrame#card QComboBox, QFrame#card QPushButton, QFrame#card QLineEdit { background:$card; }
 QFrame#card QPushButton:hover:!checked { background:$btn_hover; border-color:$border_hi; }
-QFrame#card QPushButton#primary:hover { background:$accent_hi; }
+QFrame#card QPushButton#primary:hover { background:$accent_hover; }
 QFrame#card QPushButton:focus { border-color:$accent; }
 QFrame#card QComboBox:disabled, QFrame#card QLineEdit:disabled { background:$inset; }
 QFrame#card QAbstractSpinBox { background:$bg; }
@@ -585,7 +601,7 @@ QComboBox[dim="true"] { color:$muted; }
 QCheckBox::indicator { width:16px; height:16px; border-radius:4px; border:1px solid $off; background:$card; }
 QCheckBox::indicator:checked { background:$accent; border-color:$accent; image:url("$check"); }
 QCheckBox::indicator:hover { border-color:$border_hi; }
-QCheckBox::indicator:checked:hover { background:$accent_hi; border-color:$accent_hi; }
+QCheckBox::indicator:checked:hover { background:$accent_hover; border-color:$accent_hover; }
 QCheckBox::indicator:disabled { background:$inset; border-color:$border; }
 QCheckBox::indicator:checked:disabled { image:url("$check_off"); }
 /* radio circles are whole pictures: a stylesheet border-radius:8px on a 16px box
@@ -682,7 +698,7 @@ QFrame#setcard QPushButton:hover { background:$btn_hover; border-color:$border_h
 QFrame#setcard QPushButton:checked { background:$accent; color:$on_accent; }
 QFrame#setcard QPushButton#primary { background:$accent; color:$on_accent; border:none; }
 QFrame#setcard QPushButton#power:checked { background:$live; border:1px solid $live_hi; color:$on_live; }
-QFrame#setcard QPushButton#primary:hover { background:$accent_hi; }
+QFrame#setcard QPushButton#primary:hover { background:$accent_hover; }
 QTableView, QFrame#setcard QTableView { background:$card; alternate-background-color:$card_hi;
     color:$text; border:1px solid $border; border-radius:6px;
     selection-background-color:$accent; selection-color:$on_accent; }
