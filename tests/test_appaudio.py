@@ -125,6 +125,30 @@ def test_peak_watcher_reads_meters_between_scans_and_releases_them(monkeypatch):
 
 
 @pytest.mark.skipif(not WIN, reason="Windows only")
+@pytest.mark.skipif(not WIN, reason="Windows processes")
+def test_a_reused_pid_is_not_taken_for_the_program_it_used_to_be(monkeypatch):
+    me = os.getpid()
+    real = appaudio.process_path(me)
+    assert real and os.path.basename(real).lower().startswith("python")
+    # pretend this pid used to be Spotify's: a fresh process list says otherwise
+    monkeypatch.setitem(appaudio._names, me, r"C:\Apps\Spotify.exe")
+    assert appaudio.process_path(me, os.path.basename(real).lower()) == real
+    # and a pid gone from the process list is forgotten, not kept forever
+    monkeypatch.setitem(appaudio._names, 4_000_000_001, r"C:\Apps\Spotify.exe")
+    appaudio.forget_dead_pids({me: (0, "python.exe")})
+    assert 4_000_000_001 not in appaudio._names
+
+
+@pytest.mark.skipif(not WIN, reason="Windows processes")
+def test_is_running_tells_a_newer_process_on_the_same_pid_apart():
+    me = os.getpid()
+    started = appaudio.process_started(me)
+    assert started
+    assert appaudio.is_running(me) and appaudio.is_running(me, started)
+    assert not appaudio.is_running(me, started - 1)   # "the old one" exited
+    assert not appaudio.is_running(4_000_000_001)     # no such process
+
+
 def test_capture_of_a_missing_process_fails_politely():
     got = []
     cap = appaudio.AppCapture(4_000_000_000 - 1, got.append, name="nobody")

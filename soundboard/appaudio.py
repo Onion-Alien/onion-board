@@ -70,6 +70,7 @@ if _win:
         (_k32.OpenProcess, c_void_p, (c_ulong, c_int, c_ulong)),
         (_k32.CloseHandle, c_int, (c_void_p,)),
         (_k32.GetExitCodeProcess, c_int, (c_void_p, c_void_p)),
+        (_k32.GetProcessTimes, c_int, (c_void_p, c_void_p, c_void_p, c_void_p, c_void_p)),
         (_k32.QueryFullProcessImageNameW, c_int, (c_void_p, c_ulong, c_void_p, c_void_p)),
         (_k32.CreateToolhelp32Snapshot, c_void_p, (c_ulong, c_ulong)),
         (_k32.Process32FirstW, c_int, (c_void_p, c_void_p)),
@@ -89,6 +90,10 @@ if _win:
         (_ole32.PropVariantClear, c_long, (c_void_p,)),
     ):
         _f.restype, _f.argtypes = _res, _args
+    # its own copy, so OpenProcess's error code is kept for ctypes.get_last_error()
+    _k32le = ctypes.WinDLL("kernel32", use_last_error=True)
+    _k32le.OpenProcess.restype = c_void_p
+    _k32le.OpenProcess.argtypes = (c_ulong, c_int, c_ulong)
 
 
 def supported() -> tuple[bool, str]:
@@ -291,13 +296,19 @@ def _cotaskmem_str(p: c_void_p) -> str:
 
 # --------------------------------------------------------------------------- processes
 
-_names: dict[int, str] = {}   # pid -> full image path (a pid can be reused, but rarely mid-list)
+_names: dict[int, str] = {}   # pid -> full image path; see forget_dead_pids
+_names_lock = threading.Lock()
 
 
-def process_path(pid: int) -> str:
-    """Full path of the process's .exe ('' if it can't be opened)."""
-    if pid in _names:
-        return _names[pid]
+def process_path(pid: int, exe: str = "") -> str:
+    """Full path of the process's .exe ('' if it can't be opened). `exe`, the name a
+    fresh process list gives this pid, catches a pid Windows has handed to another
+    program since it was cached."""
+    with _names_lock:
+        path = _names.get(pid)
+    if path is not None and (not exe or not path
+                             or os.path.basename(path).lower() == exe.lower()):
+        return path
     path = ""
     h = _k32.OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, False, pid)
     if h:
@@ -308,22 +319,53 @@ def process_path(pid: int) -> str:
                 path = buf.value
         finally:
             _k32.CloseHandle(h)
-    _names[pid] = path
+    with _names_lock:
+        _names[pid] = path
     return path
 
 
-def is_running(pid: int) -> bool:
-    """False once the process has exited. A process we may not open (a service, a
-    game guarded by anti-cheat) counts as running: we can't tell."""
+def forget_dead_pids(table: dict[int, tuple[int, str]]):
+    """Drops cached paths of pids missing from a fresh process list: Windows reuses
+    pids, and a stale entry would put a remembered program's name (and its auto-send)
+    on whatever new process gets the number."""
+    with _names_lock:
+        for pid in [p for p in _names if p not in table]:
+            del _names[pid]
+
+
+def process_started(pid: int) -> int | None:
+    """When the process started (FILETIME ticks), None if it can't be opened. With
+    the pid it names one process for good: a reused pid starts at another time."""
     h = _k32.OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, False, pid)
     if not h:
-        return ctypes.get_last_error() == 5 or _k32.GetLastError() == 5   # ERROR_ACCESS_DENIED
+        return None
     try:
-        code = c_ulong()
-        return bool(_k32.GetExitCodeProcess(h, byref(code))) and code.value == STILL_ACTIVE
+        t = [ctypes.c_ulonglong() for _ in range(4)]
+        if not _k32.GetProcessTimes(h, *(byref(x) for x in t)):
+            return None
+        return t[0].value
     finally:
         _k32.CloseHandle(h)
 
+
+def is_running(pid: int, started: int | None = None) -> bool:
+    """False once the process has exited, or (with `started`, from process_started)
+    once its pid belongs to a newer process. A process we may not open (a service, a
+    game guarded by anti-cheat) counts as running: we can't tell."""
+    h = _k32le.OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, False, pid)
+    if not h:
+        return ctypes.get_last_error() == 5   # ERROR_ACCESS_DENIED
+    try:
+        code = c_ulong()
+        if not (_k32.GetExitCodeProcess(h, byref(code)) and code.value == STILL_ACTIVE):
+            return False
+        if started is not None:
+            t = [ctypes.c_ulonglong() for _ in range(4)]
+            if _k32.GetProcessTimes(h, *(byref(x) for x in t)) and t[0].value != started:
+                return False
+        return True
+    finally:
+        _k32.CloseHandle(h)
 
 class _PROCESSENTRY32W(Structure):
     _fields_ = [("dwSize", c_ulong), ("cntUsage", c_ulong), ("th32ProcessID", c_ulong),
@@ -459,6 +501,7 @@ def _list_apps(meters: dict | None = None) -> list[App]:
     (root pid -> [Com]) for the caller to read and release; window titles are skipped."""
     me = os.getpid()
     table = _process_table()
+    forget_dead_pids(table)
     apps: dict[int, App] = {}
     with _enumerator() as en:
         devices = _render_devices(en)
@@ -522,7 +565,8 @@ def _read_session(c: Com, dname: str, me: int, table, apps: dict[int, App],
         root = pid.value
     app = apps.get(root)
     if app is None:
-        path = process_path(pid.value) or process_path(root)
+        path = (process_path(pid.value, table.get(pid.value, (0, ""))[1])
+                or process_path(root, table.get(root, (0, ""))[1]))
         exe = os.path.basename(path) or table.get(root, (0, ""))[1] or f"pid {root}"
         app = apps[root] = App(root, exe, path)
     app.session_pids.add(pid.value)
@@ -744,6 +788,7 @@ class AppCapture:
         self.frames = 0              # captured so far, at 48 kHz
         self._stop = threading.Event()
         self._ready = threading.Event()
+        self._started: int | None = None   # process_started: a reused pid isn't ours
         self._thread = threading.Thread(target=self._run, name=f"appcapture-{pid}", daemon=True)
 
     # -- lifecycle
@@ -755,6 +800,7 @@ class AppCapture:
             self.error = "That program isn't running any more."
             self.ended = True
             return False
+        self._started = process_started(self.pid)
         self._thread.start()
         if not self._ready.wait(timeout):
             self.error = "Windows didn't answer in time. Switch Send on to try again."
@@ -896,7 +942,7 @@ class AppCapture:
             now = time.monotonic()
             if now >= next_alive:
                 next_alive = now + 1.0
-                if not is_running(self.pid):
+                if not is_running(self.pid, self._started):
                     self.ended = True
                     return
 
