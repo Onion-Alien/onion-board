@@ -17,6 +17,7 @@ from soundboard.ui.widgets import Meter
 class FakeCapture:
     made = []
     fail = False
+    slow = False   # Windows still opening it (start(wait=False) returned already)
 
     def __init__(self, pid, sink, include_tree=True, name=""):
         self.pid, self.sink, self.name = pid, sink, name
@@ -25,12 +26,16 @@ class FakeCapture:
         self.started = self.stopped = False
         FakeCapture.made.append(self)
 
-    def start(self, timeout=0):
+    def start(self, timeout=0, wait=True):
         if FakeCapture.fail:
             self.error = "Windows refused (fake)."
             return False
         self.started = True
         return True
+
+    @property
+    def ready(self):
+        return self.started and self.error is None and not FakeCapture.slow
 
     def stop(self):
         self.stopped = True
@@ -45,7 +50,7 @@ def tab(qapp, monkeypatch):
     monkeypatch.setattr(appaudio, "AppCapture", FakeCapture)
     monkeypatch.setattr(appaudio, "list_apps", lambda: [])
     FakeCapture.made = []
-    FakeCapture.fail = False
+    FakeCapture.fail = FakeCapture.slow = False
     cfg = Config()
     saved = []
     t = AppsTab(Engine(), cfg, lambda: saved.append(1), Meter)
@@ -174,7 +179,7 @@ def test_a_capture_that_errors_says_so_and_stops_sending(tab):
 
 def test_remembered_programs_start_from_the_config_and_auto_send(qapp, monkeypatch):
     monkeypatch.setattr(appaudio, "AppCapture", FakeCapture)
-    FakeCapture.made, FakeCapture.fail = [], False
+    FakeCapture.made, FakeCapture.fail, FakeCapture.slow = [], False, False
     cfg = Config()
     cfg.apps = {"music.exe": {"vol": 0.8, "monitor": True}}
     t = AppsTab(Engine(), cfg, lambda: None, Meter)
@@ -224,6 +229,26 @@ def test_a_failed_capture_reports_and_is_not_remembered(tab):
     FakeCapture.fail = False
     row.btn_send.setChecked(True)                # trying again clears it
     assert row.sending and "refused" not in row.sub.text()
+
+
+def test_a_capture_opens_without_freezing_the_window_and_can_fail_later(tab):
+    FakeCapture.slow = True                      # Windows takes its time
+    tab._on_apps([music()])
+    row = tab.rows["music.exe"]
+    row.btn_send.setChecked(True)
+    assert row.sending and "Connecting" in row.sub.text()
+    assert "music.exe" not in tab.cfg.apps       # remembered once it's really up
+    FakeCapture.slow = False
+    tab._meters()
+    assert "Connecting" not in row.sub.text() and "music.exe" in tab.cfg.apps
+    row.btn_send.setChecked(False)
+    FakeCapture.slow = True
+    row.btn_send.setChecked(True)
+    row.capture.error = "Windows refused (fake, late)."
+    tab._meters()
+    assert not row.sending and row.capture is None and "late" in row.sub.text()
+    assert "music.exe" not in tab.cfg.apps and tab.engine.aux == ()
+    FakeCapture.slow = False
 
 
 def test_shutdown_stops_every_capture(tab):

@@ -815,7 +815,10 @@ class AppCapture:
         self._thread = threading.Thread(target=self._run, name=f"appcapture-{pid}", daemon=True)
 
     # -- lifecycle
-    def start(self, timeout: float = 6.0) -> bool:
+    def start(self, timeout: float = 6.0, wait: bool = True) -> bool:
+        """With wait=False it returns once the thread is going: `ready` turns True
+        when Windows has started the capture, or `error` says why it couldn't (opening
+        it can take seconds, which mustn't freeze the window)."""
         if not _win:
             self.error = supported()[1]
             return False
@@ -825,6 +828,8 @@ class AppCapture:
             return False
         self._started = process_started(self.pid)
         self._thread.start()
+        if not wait:
+            return True
         if not self._ready.wait(timeout):
             self.error = "Windows didn't answer in time. Switch Send on to try again."
             self._stop.set()
@@ -839,6 +844,11 @@ class AppCapture:
     @property
     def running(self) -> bool:
         return self._thread.is_alive() and self.error is None and not self.ended
+
+    @property
+    def ready(self) -> bool:
+        """Windows has started the capture (start(wait=False) returns before)."""
+        return self._ready.is_set() and self.error is None
 
     # -- the thread
     def _run(self):

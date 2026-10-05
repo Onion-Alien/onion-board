@@ -41,6 +41,7 @@ METER_MS = 60
 MAX_REMEMBERED = 30
 CARD_MIN_W = 300        # programs are cards, as many across as fit at this width
 MAX_VOL = 10.0          # 1000 %, the most the volume box takes
+CONNECTING = "Connecting…"   # a card's status while its capture is starting
 
 
 def saved_volume(v) -> float:
@@ -119,6 +120,7 @@ class AppRow(HoverCard):
         self.exe = exe
         self.app: appaudio.App | None = None
         self.capture: appaudio.AppCapture | None = None
+        self.remember_pending = False   # Send clicked: remembered once the capture is up
         self.src = None                 # engine.AuxSource while sending
         self.rec: ArmedRecorder | None = None   # while Record is on
         self.status_text = ""
@@ -532,13 +534,9 @@ class AppsTab(QWidget):
                 continue
             appeared = row.app is None
             row.set_app(app)
-            cap = row.capture
-            if cap is not None and cap.error:     # the capture died: say so, don't retry blindly
-                self._stop_capture(row)
-                row.set_sending(False)
-                row.set_status(cap.error, error=True)
-                log.warning("capturing %s stopped: %s", row.exe, cap.error)
+            if self._poll_capture(row):           # the capture died: said so, no blind retry
                 continue
+            cap = row.capture
             if cap is not None and (cap.ended or cap.pid != app.pid):
                 rec, row.rec = row.rec, None      # a recording carries on across the restart
                 self._stop_capture(row)           # it closed / restarted / the device changed
@@ -558,7 +556,33 @@ class AppsTab(QWidget):
         self.empty.setVisible(not self.rows)
         self._report_active()
 
+    def _poll_capture(self, row: AppRow) -> bool:
+        """A capture started without waiting (start(wait=False)): clears *Connecting…*
+        once it's up, or stops it and says why. True if it failed."""
+        cap = row.capture
+        if cap is None:
+            return False
+        if cap.error:
+            row.remember_pending = False
+            self._stop_capture(row)
+            row.set_sending(False)
+            row.set_status(cap.error, error=True)
+            log.warning("capturing %s stopped: %s", row.exe, cap.error)
+            self._report_active()
+            return True
+        if cap.ready:
+            if row.status_text == CONNECTING:
+                row.set_status("")
+            if row.remember_pending:
+                row.remember_pending = False
+                self._remember(row)
+        return False
+
     def _meters(self):
+        for row in list(self.rows.values()):
+            if row.capture is not None and (row.remember_pending or row.status_text == CONNECTING
+                                            or row.capture.error):
+                self._poll_capture(row)
         if not self.isVisible() and not any(r.rec for r in self.rows.values()):
             self.meter_timer.stop()   # hidden, nothing to cap: showEvent restarts it
             return
@@ -599,7 +623,7 @@ class AppsTab(QWidget):
             return False
         cap = appaudio.AppCapture(row.app.pid, lambda x, r=row: self._sink(r, x),
                                   name=row.app.name)
-        if not cap.start():
+        if not cap.start(wait=False):   # opening it can take seconds: see _poll_capture
             row.set_status(cap.error or "Couldn't capture it.", error=True)
             log.warning("capturing %s failed: %s", row.exe, cap.error)
             return False
@@ -617,8 +641,7 @@ class AppsTab(QWidget):
         """Send on: the program's audio goes into the mix."""
         if row.app is None or row.src is not None:
             return
-        row.set_status("Connecting…")   # opening its audio can take a moment
-        row.sub.repaint()
+        row.set_status(CONNECTING)   # opening its audio can take a moment (_poll_capture)
         key = ("app", row.exe.lower())
         src = self.engine.add_aux(key)
         src.vol = row.vol.value()
@@ -629,8 +652,8 @@ class AppsTab(QWidget):
             self.engine.remove_aux(key)
             row.set_sending(False)
             return
-        row.set_status("")
         row.set_sending(True)
+        self._poll_capture(row)
 
     def _stop_send(self, row: AppRow):
         """Send off; the capture stays open while Record is on."""
@@ -715,8 +738,10 @@ class AppsTab(QWidget):
         if on:
             self._start_capture(row)
             if row.capture is not None:
-                self._remember(row)
+                row.remember_pending = True
+                self._poll_capture(row)
         else:
+            row.remember_pending = False
             self._stop_send(row)
             self.cfg.apps.pop(row.exe.lower(), None)
             self._save()
