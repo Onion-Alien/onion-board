@@ -1382,6 +1382,7 @@ class MainWindow(QMainWindow):
         e.obs_vol, e.obs_voice = c.obs_vol, c.obs_voice
         e.set_mic_device(c.mic_device)
         e.set_main_device(self._main_name())
+        e.set_tap_device(self._tap_name())
         e.set_mon_device(c.mon_device)
         e.set_obs_device(self._obs_name(c.obs_device))
         self._check_cable_format()
@@ -1638,15 +1639,20 @@ class MainWindow(QMainWindow):
         if force_main or e.names["main"] != main:
             e.set_main_device(main)
             self._check_cable_format()
-        # straight into the mic: the cable gets the same, for a voice app still on it
-        tap = self._cable_out() if main == directmic.DEVICE else None
-        if tap == self.cfg.mon_device:
-            tap = None
+        tap = self._tap_name()
         if e.tap_name != tap:
             e.set_tap_device(tap)
         obs = self._obs_name(self.cfg.obs_device)   # never the cable or headphones too
         if e.names["obs"] != obs:
             e.set_obs_device(obs)
+
+    def _tap_name(self) -> str | None:
+        """Straight into the mic: the cable gets the same (engine.CableTap), for a voice
+        app still set to it. None otherwise, or if the cable is the headphones."""
+        if self._main_name() != directmic.DEVICE:
+            return None
+        tap = self._cable_out()
+        return None if tap == self.cfg.mon_device else tap
 
     def _obs_name(self, name: str | None) -> str | None:
         """The stream output's device, unless it's what others hear (or another end of
@@ -1654,7 +1660,7 @@ class MainWindow(QMainWindow):
         headphones (you'd hear it twice). Sending nowhere frees the cable for it."""
         main = self._main_name()
         if (name in (None, main, self.cfg.mon_device)
-                or eng.same_cable(name, main)):
+                or eng.same_cable(name, main) or eng.same_cable(name, self._tap_name())):
             return None
         return name
 
@@ -1988,11 +1994,12 @@ class MainWindow(QMainWindow):
         cable's far end. It still hears you (the cable gets the same), but its normal
         mic is the simpler setting."""
         c = self.cfg
-        if c.cable_tip_done or self.engine.tap is None or self._cable_watch is None:
+        watch = getattr(self, "_cable_watch", None)   # (not made yet while starting up)
+        if c.cable_tip_done or self.engine.tap is None or watch is None:
             return
         far = eng.virtual_mic_for(self.engine.tap_name)
         apps = set(voicesdk.VOICE_APPS.values())
-        heard = [h for h in self._cable_watch.poll(far) if h in apps]
+        heard = [h for h in watch.poll(far) if h in apps]
         if heard:
             c.cable_tip_done = True
             self._save_now()
