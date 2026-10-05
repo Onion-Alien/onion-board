@@ -169,6 +169,12 @@ Filename: "{app}\{#AppExeName}.exe"; Description: "Open Onion Board now"; Flags:
 ; start (1.3.3 -> 1.4.0: "Importing the numpy C-extensions failed").
 Filename: "{win}\explorer.exe"; Parameters: """{app}\{#AppExeName}.exe"""; Flags: nowait; Check: Relaunch
 
+[UninstallRun]
+; Straight into my mic: take Onion Board off the mic first, so every mic is exactly as
+; it was. Windows asks for permission once, and only if it's on a mic at all.
+Filename: "{app}\{#AppExeName}.exe"; Parameters: "--direct-mic remove"; \
+  RunOnceId: "DirectMicRemove"; Flags: runhidden waituntilterminated
+
 [Registry]
 ; "Start with Windows" (Settings -> General) writes this value; nothing is created at
 ; install, but uninstalling removes it so Windows doesn't try to start a removed app.

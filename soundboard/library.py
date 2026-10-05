@@ -134,7 +134,10 @@ TOR_BRIDGES = ("", "snowflake", "obfs4")   # soundboard.tor.BRIDGES
 #   device - any output picked by hand (Voicemeeter, a mixer, a second sound card, a
 #            device OBS captures): no cable needed, and none is picked in its place
 #   off    - nowhere: sounds play in your headphones (and the stream output) only
-ROUTES = ("cable", "device", "off")
+#   mic    - straight into your real mic (the mic effect, soundboard.directmic): Discord
+#            and games keep their normal mic, no cable. New users start with it
+#            (Config.first_start); the cable is the fallback.
+ROUTES = ("cable", "device", "off", "mic")
 # settings whose unknown value (a newer version's choice) clean_setting replaces with
 # a safe one: the value as it was is still written back (see _with_raw)
 NEWER_CHOICES = ("route", "net_mode", "tor_bridges")
@@ -263,7 +266,7 @@ class SoundMeta:
 @dataclass
 class Config:
     version: int = CONFIG_VERSION
-    route: str = "cable"      # where main_device's audio goes: ROUTES
+    route: str = "cable"      # where what others hear goes: ROUTES ("mic" on a first start)
     main_device: str | None = None
     mon_device: str | None = None
     # the headphones are Windows' default output, and move with it when it changes
@@ -407,7 +410,7 @@ class Config:
             except FileNotFoundError as e:
                 if not any(CONFIG_PATH.with_name(f"config.json.{i}").exists()
                            for i in range(1, CONFIG_BACKUPS + 1)):
-                    return cls()   # a first start
+                    return cls.first_start()
                 err, missing = e, True
                 break
             except ValueError as e:
@@ -464,6 +467,15 @@ class Config:
         cfg.load_note = (f"Your settings file was {what} and no backup could be read, so "
                          "Onion Board started with default settings. Your sound files are "
                          f"still in {SOUNDS_DIR}.{kept}")
+        return cfg
+
+    @classmethod
+    def first_start(cls) -> Config:
+        """A new user's settings: what others hear goes straight into their mic (one
+        click to set up, nothing to pick in Discord). Settings saved by any earlier
+        version keep the route they had (the cable, unless they chose another)."""
+        cfg = cls()
+        cfg.route = "mic"
         return cfg
 
     def _restore_privacy(self):

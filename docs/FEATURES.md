@@ -45,8 +45,12 @@ The full list. The [README](../README.md) has the short version and how to get s
   original file is never changed.
 - **Your mic on or off:** send your voice with the sounds, or sounds only.
 - **Where your sounds go** (Setup → Devices → *Send to others through*, also in
-  Settings → Audio): **the virtual cable** (the default; the installer offers it, and
-  Discord or the game uses its *CABLE Output* as a mic), **another device** (any output
+  Settings → Audio): **straight into your mic** (new users start here: one click and
+  one Windows permission prompt, then Discord and games hear your sounds through the
+  mic they already use, with nothing to pick there; voice changer, mic volume, gate,
+  ducking and mute all still work, and the Setup tab offers a one-click repair if a
+  Windows update takes it off), **the virtual cable** (the fallback; the installer
+  offers it, and Discord or the game uses its *CABLE Output* as a mic), **another device** (any output
   but your headphones: Voicemeeter, a mixer, a capture card, a second sound card, any
   output OBS captures as an *Audio Output Capture*) or **nowhere** (only you hear your
   sounds, and the stream output if you set one). With another device the app never puts
@@ -204,7 +208,20 @@ The full list. The [README](../README.md) has the short version and how to get s
 
 ## How it works
 
-With the virtual cable (the default way):
+Straight into your mic (the default for new users):
+
+```
+🎤 your mic ──► Windows' audio engine ──► Onion Board's effect ──► Discord / game (same mic)
+                                              ▲         │ clean mic
+🔊 your sounds ─► Onion Board mixes them ─────┘         ▼ (your voice changer, gate, volume…)
+```
+
+Onion Board puts a small Windows audio effect on your mic (like Equalizer APO or
+Soundpad do). It hands Onion Board your clean voice, and puts back what you send:
+your processed voice plus your sounds, about 20 ms later. Close Onion Board and your
+mic is just your mic again.
+
+With the virtual cable:
 
 ```
 🎤 your mic ── send ✓ / ✗ ──┐

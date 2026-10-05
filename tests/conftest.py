@@ -125,6 +125,21 @@ def _never_touch_real_appdata(monkeypatch, tmp_path):
 
 
 @pytest.fixture(autouse=True)
+def _never_touch_the_real_mic(monkeypatch, tmp_path):
+    """Straight into my mic (soundboard.directmic): no test writes the real shared file
+    the mic effect reads, runs the admin step, or sees this PC's own install."""
+    from soundboard import directmic
+
+    def no_admin(*_a, **_k):
+        raise AssertionError("a test tried to run the mic effect's admin step")
+    monkeypatch.setattr(directmic, "data_dir", lambda: tmp_path / "guard" / "OnionBoard" / "Mic")
+    monkeypatch.setattr(directmic, "ring_path", lambda: tmp_path / "guard" / "ring2.bin")
+    monkeypatch.setattr(directmic, "_elevated", no_admin)
+    monkeypatch.setattr(directmic, "installed_on", lambda: [])
+    directmic.forget_status()
+
+
+@pytest.fixture(autouse=True)
 def _never_touch_real_shortcuts(monkeypatch):
     """The theme re-icons the app's Desktop / Start menu shortcuts: never the
     developer's real ones (offscreen already skips it; this is the second lock)."""
