@@ -12,7 +12,7 @@ labels: bug
 
 **Version** (title bar or Settings → About) and **Windows version**:
 
-**Audio setup** (mic, headphones, and where sounds go: the virtual cable, another device, or nowhere):
+**Audio setup** (mic, headphones, and where sounds go: straight into my mic, the virtual cable, another device, or nowhere):
 
 **Log**
 

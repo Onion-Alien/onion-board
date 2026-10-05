@@ -65,8 +65,8 @@ the route (`Config.route`, `library.ROUTES`):
 - **Nowhere**: only you hear the sounds, plus the optional stream output.
 
 The route belongs to this PC: backups don't carry it and resetting the audio devices
-puts it back to straight into the mic. The rest of this page says "the cable" for the output
-that others hear, whichever route picked it.
+puts it back to straight into the mic. The rest of this page says "what others hear" for
+whichever of these the route picked.
 
 Optional: `winget install Gyan.FFmpeg.Essentials` adds m4a/aac/video support (the
 installer's *Play M4A, AAC and video files* box runs the same command). The app
@@ -121,7 +121,7 @@ the launcher the shortcuts and PyInstaller use. The app is the `soundboard` pack
 | `soundboard/ui/art.py` | optional pictures from `assets/art` (voice tiles, the computer voice, its languages); emoji / painted icons when missing |
 | `soundboard/ui/responsive.py` | small windows: what hides, in which order, as the window shrinks |
 | `soundboard/ui/fit.py` | dialogs grow to fit their wrapped text instead of clipping it (`fit.watch(self)` in every dialog's `__init__`) |
-| `soundboard/ui/setupwizard.py` | the first-run guide with Bun (mic, headphones, the virtual cable or another way out, Discord) and the Steam help |
+| `soundboard/ui/setupwizard.py` | the first-run guide with Bun (mic, headphones, where your sounds go: straight into your mic, or the cable or another way out, then Discord) and the Steam help |
 | `soundboard/ui/bunnywidget.py` | Bun animated: bobs, blinks, talks along with your mic and throws music notes |
 | `soundboard/ui/whatsnew.py` | the *What's new* window shown once after an update, with what the release added and a button to the settings it's about (`NOTES`, newest first: add one per release) |
 | `soundboard/ui/splash.py` | The start-up splash: Bun and a spinner mid-screen while a cold start loads |
@@ -154,7 +154,7 @@ the launcher the shortcuts and PyInstaller use. The app is the `soundboard` pack
 | `soundboard/ui/appspanel.py` | the Apps tab: one card per program (level, **Send**, where it goes once a stream output is set: call, stream or both, volume, *Hear it myself*, and its *Clip editor*); programs you switch on are remembered by .exe and folder (a second program of the same name gets its own card, in `cfg.apps_paths`) and picked up again when they run |
 | `soundboard/directmic.py` | straight into my mic: the shared ring with the mic effect, `DirectMicStream` (the send output on the mic's clock), status / repair checks, and the one-prompt admin install / uninstall |
 | `native/directmic/` | the mic effect (`obmic.cpp`, runs inside Windows' audio engine) and `testhost.cpp`, which loads it like Windows does for the tests |
-| `soundboard/engine.py` | real-time audio: WASAPI streams (mic in, what others hear out (the cable or another device), headphones out, the optional stream output for OBS), mixing (sounds, radio and captured programs), pause/seek, live speed / pitch, limiter, watchdog |
+| `soundboard/engine.py` | real-time audio: WASAPI streams (mic in, what others hear out (your mic, the cable or another device), headphones out, the optional stream output for OBS), mixing (sounds, radio and captured programs), pause/seek, live speed / pitch, limiter, watchdog |
 | `soundboard/eq.py` | 7-band equalizer and presets: matched peak / shelf bands that keep their analog shape up to Nyquist; a change crossfades in (no clicks) |
 | `soundboard/dsp.py` | the app's own filter maths (it no longer imports scipy): `sosfilt` / `lfilter` run as block matrix products with a parallel prefix scan for the state (float64 state, so float32 audio stays accurate), Butterworth design, matched EQ bands, `SmoothSos` (click-free design changes), an O(n) running minimum |
 | `soundboard/net.py` | every outgoing connection (Settings → Privacy & security): direct, or through a SOCKS5 / HTTP proxy with names resolved by the proxy and no fallback to direct; and the per-feature switches and Offline mode, which refuse a switched-off feature's requests before any lookup. `urlopen(feature=…)` for urllib, and a loopback relay (per-launch secret, the feature as its user name) for FFmpeg, yt-dlp, Qt's network managers and child processes, in every mode |
@@ -191,7 +191,7 @@ the launcher the shortcuts and PyInstaller use. The app is the `soundboard` pack
 | `soundboard/chatcheck.py` | the Discord check: a test sound, and how to tell from Discord's Mic Test playback whether its noise suppression, gate or gain control is changing your sounds |
 | `soundboard/ui/chatguide.py` | the Discord and game voice-chat guides (the settings that keep sounds clean) and the check that runs from them |
 | `soundboard/ui/streamguide.py` | the streamer guide for remote control (Stream Deck keys, channel points, chat commands, with the links to copy) and the prompt that lets an AI assistant set it up |
-| `soundboard/sendfx.py` | the send stage before what others hear (the cable or another device): phase-aware mono downmix, lookahead peak limiter, ducking under your voice |
+| `soundboard/sendfx.py` | the send stage before what others hear (your mic, the cable or another device): phase-aware mono downmix, lookahead peak limiter, ducking under your voice |
 | `soundboard/cableformat.py` | reads both ends of the virtual cable's Windows format and sets them to 48 kHz, so the cable passes sound through unconverted |
 | `modules/` | add-ons shipped with the app: `retro-fx` (an effects module, the example to copy), `live-voice` (a service module with its own Python environment) and `translate-zh/es/fr/de/ru` (translation modules: a manifest naming a model that's downloaded only when picked). Remote add-ons such as Onion Pocket are installed into `%APPDATA%\OnionBoard\modules`. `ai-voices` (real-time voice conversion: onnxruntime + a Beatrice 2 model, see its README) lives here too but isn't built into the app: it's downloaded from its own release (`scripts/make_ai_voices_zip.py` packs it) |
 | `build.ps1`, `installer/` | the PyInstaller build and the Inno Setup installer (`installer/OnionBoard.iss`); `installer/install-vbcable.ps1` downloads VB-Cable, checks its signature and installs it (used by the app and the installer) |
@@ -259,8 +259,8 @@ the newest backup is used, so the pad list is never silently reset.
   RAM, and the resampled copies kept for non-48 kHz devices are capped at 512 MB (LRU).
   A press never waits for a copy: until it's made (on a thread) the sound is read
   from the 48 kHz original at the device's rate, like the live speed does.
-- **The send stage** (`soundboard/sendfx.py`) is the last thing before what others hear (the cable,
-  or the device the route picked).
+- **The send stage** (`soundboard/sendfx.py`) is the last thing before what others hear (your mic,
+  the cable, or the device the route picked).
   Everything Discord and games send is one channel, so the sounds are downmixed
   here first, per band: a band that is mostly out of phase between left and right
   is summed with the right channel flipped, and wide stereo gets back the power a
