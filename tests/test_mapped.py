@@ -65,8 +65,7 @@ def test_a_mapped_sound_plays_the_same_as_one_in_ram(app_dir, map_all):
     assert np.abs(outs[0]).max() > 0.1 and np.array_equal(outs[0], outs[1])
 
 
-def test_deleting_a_sound_whose_audio_is_still_held_doesnt_fail(app_dir, map_all, monkeypatch):
-    monkeypatch.setattr(library, "CACHE_GRACE_S", 0)
+def test_deleting_a_sound_whose_audio_is_still_held_doesnt_fail(app_dir, map_all):
     store_cached("x", song(1.0))
     store_cached("x", song(1.0), "fx1")
     held = load_cached("x")                    # e.g. a voice still fading out
@@ -74,8 +73,8 @@ def test_deleting_a_sound_whose_audio_is_still_held_doesnt_fail(app_dir, map_all
     assert not cache_path("x", "fx1").exists()
     del held
     gc.collect()
-    prune_cache(set())                         # later, once it's let go
-    assert not cache_path("x").exists()
+    prune_cache(set())                         # later, once it's let go: at once,
+    assert not cache_path("x").exists()        # not after the grace a new import gets
 
 
 def test_replacing_a_mapped_cache_file_doesnt_fail(app_dir, map_all):
@@ -106,10 +105,14 @@ def test_remove_undo_and_bin_with_mapped_sounds(window, qapp, map_all):  # noqa:
     window.undo_remove()                         # undo keeps the mapped audio
     assert process_events(qapp, lambda: "s1" in window.audio)
     window.remove_sound("s1")
-    window._finish_removals()                    # into the bin: the cache goes
+    # undo's prepare thread (or a fading voice) may still hold the audio when the
+    # removal finishes, as on a loaded CI runner: always so here
+    held = window._removed[-1][2]
+    window._finish_removals()                    # into the bin: the cache goes...
     keep = library.cache_keep(window._live_metas())
+    del held
 
-    def pruned():   # once the fading voice and undo's prepare thread let go of it
+    def pruned():   # ...or, if it was refused, the next prune once it's let go
         gc.collect()
         prune_cache(keep)
         return not cache_path("s1").exists()
