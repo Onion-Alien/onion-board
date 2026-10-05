@@ -34,6 +34,7 @@ log = logging.getLogger(__name__)
 
 SR = 48000            # what the sink gets (the engine's storage rate)
 MIN_BUILD = 20348     # first Windows build with process loopback
+GAP_S = 0.03          # no packets from the program this long: it's quiet, send silence
 
 S_OK = 0
 E_NOINTERFACE = -2147467262
@@ -942,12 +943,26 @@ class AppCapture:
             client.release()
             _k32.CloseHandle(evt)
 
+    def _hand_over(self, x: np.ndarray) -> bool:
+        self.frames += len(x)
+        try:
+            self.sink(x)
+            return True
+        except Exception:  # noqa: BLE001
+            from soundboard import applog
+            applog.report(where=f"sending {self.name}'s audio")
+            # surfaces on the Apps tab, which stops the capture and shows this
+            self.error = "Sending this program's sound failed. Switch Send on to try again."
+            return False
+
     def _loop(self, cap: Com, fmt: WAVEFORMATEX, is_float: bool, evt):
         align = fmt.nBlockAlign
         n, frames, flags, data = c_uint(), c_uint(), c_ulong(), c_void_p()
         next_alive = time.monotonic() + 1.0
+        heard = time.monotonic()   # when the audio handed over so far ends, in real time
         while not self._stop.is_set():
             _k32.WaitForSingleObject(evt, 20)
+            got = False
             while True:
                 cap.call(5, (POINTER(c_uint),), byref(n), what="GetNextPacketSize")
                 if not n.value:
@@ -963,16 +978,20 @@ class AppCapture:
                                           fmt, is_float)
                 finally:
                     cap.call(4, (c_uint,), frames.value, what="ReleaseBuffer")
-                self.frames += len(x)
-                try:
-                    self.sink(x)
-                except Exception:  # noqa: BLE001
-                    from soundboard import applog
-                    applog.report(where=f"sending {self.name}'s audio")
-                    # surfaces on the Apps tab, which stops the capture and shows this
-                    self.error = "Sending this program's sound failed. Switch Send on to try again."
+                got = True
+                if not self._hand_over(x):
                     return
             now = time.monotonic()
+            if got:
+                heard = now
+            elif now - heard > GAP_S:
+                # a program with nothing to play sends no packets at all: hand over
+                # the silence ourselves, or the engine's cushion for it runs dry, grows
+                # (more delay), and stays grown
+                x = np.zeros((int((now - heard) * SR), 2), np.float32)
+                heard += len(x) / SR
+                if len(x) and not self._hand_over(x):
+                    return
             if now >= next_alive:
                 next_alive = now + 1.0
                 if not is_running(self.pid, self._started):

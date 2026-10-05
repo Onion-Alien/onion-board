@@ -14,6 +14,7 @@ from soundboard import appaudio
 from soundboard.appaudio import GUID, WAVEFORMATEX, App, to_stereo_f32
 
 WIN = sys.platform == "win32"
+SR = appaudio.SR
 
 
 def test_guid_bytes_keep_zero_bytes():
@@ -147,6 +148,35 @@ def test_is_running_tells_a_newer_process_on_the_same_pid_apart():
     assert appaudio.is_running(me) and appaudio.is_running(me, started)
     assert not appaudio.is_running(me, started - 1)   # "the old one" exited
     assert not appaudio.is_running(4_000_000_001)     # no such process
+
+
+@pytest.mark.skipif(not WIN, reason="Windows events")
+def test_a_quiet_program_is_handed_over_as_silence():
+    """A program with nothing to play sends no packets at all: the engine's cushion
+    for it ran dry, grew by half each time, and kept the extra delay for good."""
+    import threading
+
+    class NoPackets:
+        def call(self, i, types, *args, what=""):
+            if i == 5:                                 # GetNextPacketSize: nothing
+                args[0]._obj.value = 0
+
+    got = []
+    cap = appaudio.AppCapture(os.getpid(), got.append, name="quiet")
+    evt = appaudio._k32.CreateEventW(None, False, False, None)
+    fmt = appaudio._format("f32")
+    th = threading.Thread(target=cap._loop, args=(NoPackets(), fmt, True, evt), daemon=True)
+    t0 = time.monotonic()
+    th.start()
+    time.sleep(0.4)
+    cap._stop.set()
+    th.join(2)
+    took = time.monotonic() - t0
+    appaudio._k32.CloseHandle(evt)
+    n = sum(len(x) for x in got)
+    assert not th.is_alive() and cap.error is None
+    assert took * SR - 0.1 * SR < n <= took * SR   # the gap, in real time
+    assert not any(x.any() for x in got)
 
 
 def test_capture_of_a_missing_process_fails_politely():
