@@ -218,6 +218,7 @@ def test_image_dropped_on_a_pad_becomes_its_picture(qapp, window, tmp_path):  # 
     window.grid.image_dropped.emit("s0", str(make_image(tmp_path / "a.png")))
     qapp.processEvents()   # drops are handled after the drop returns (queued)
     m = window.meta("s0")
+    assert window._saver.flush(10)   # settings are written on a background thread
     assert m.image and Config.load().sounds[0].image == m.image
 
 

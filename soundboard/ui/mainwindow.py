@@ -167,6 +167,7 @@ def _listed(name: str, names) -> bool:
 
 class MainWindow(QMainWindow):
     update_done = Signal(object, str)   # an update check finished: Release|None, error
+    config_saved = Signal(bool)         # the background save finished: ok
     voice_engine = Signal(object)       # the voice engine of the game in front (a mode key|None)
 
     def __init__(self):
@@ -264,6 +265,9 @@ class MainWindow(QMainWindow):
         self._save_timer = QTimer(self)
         self._save_timer.setSingleShot(True)
         self._save_timer.timeout.connect(self._save_now)
+        # written on a background thread: a slow disk froze the window for seconds
+        self._saver = library.Saver(self.cfg, done=self.config_saved.emit)
+        self.config_saved.connect(self._on_saved)
 
         self.setup_state = ""
         self._pill_short = False          # the header pill's short text (narrow window)
@@ -1926,9 +1930,15 @@ class MainWindow(QMainWindow):
             self.toast(html.escape(say[1]), say[2])
 
     def _save_now(self):
-        """The debounced save. A failure (disk full, antivirus lock) is logged by
-        Config.save; here it's shown once so the user knows settings aren't sticking."""
-        if self.cfg.save():
+        """The debounced save: the settings are copied now and written on the saver's
+        thread (library.Saver), then _on_saved says how it went."""
+        self._saver.cfg = self.cfg
+        self._saver.save()
+
+    def _on_saved(self, ok: bool):
+        """A failure (disk full, antivirus lock) is logged by the writer; here it's
+        shown once so the user knows settings aren't sticking."""
+        if ok:
             self._save_failed_shown = False
         elif not self._save_failed_shown:
             self._save_failed_shown = True
