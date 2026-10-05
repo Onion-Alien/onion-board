@@ -873,3 +873,56 @@ def test_resizing_within_one_shape_does_no_layout_passes(panel, monkeypatch):
     assert len(shapes) == tried
     fx._fit_width(1100)
     assert (fx._short, fx._tile_cols) == (False, fx.COLS)
+
+
+def test_a_slider_step_lays_nothing_out_and_its_value_always_fits(panel, qapp):
+    """The value next to a slider is as wide as its widest value: one that changed
+    width laid out the card, its neighbours and the page again on every step."""
+    from PySide6.QtCore import QEvent, QObject
+    p, _ = panel
+    p.resize(1100, 800)
+    p.show()
+    p.fx.btn_more.setChecked(True)
+    p.fx.pick("Robot")
+    qapp.processEvents()
+    row = p.fx.rows["robot"]
+    s = row.sliders[0]
+    s.slider.setValue(s.slider.maximum())   # the first edit: Robot -> My own mix
+    qapp.processEvents()
+    hint = s.val.sizeHint()
+    fm = s.val.fontMetrics()
+
+    seen = []
+
+    class Layouts(QObject):
+        def eventFilter(self, o, e):
+            if e.type() == QEvent.LayoutRequest and o in (s, row, row.body):
+                seen.append(o)
+            return False
+    watch = Layouts()
+    qapp.installEventFilter(watch)
+    try:
+        for v in range(s.slider.minimum(), s.slider.maximum() + 1, 7):
+            s.slider.setValue(v)
+            qapp.processEvents()
+            assert s.val.sizeHint() == hint
+            assert fm.horizontalAdvance(s.val.text()) <= s.val.contentsRect().width()
+    finally:
+        qapp.removeEventFilter(watch)
+    assert seen == []   # was the slider's row, its card and up the page, every step
+    assert s.val.text() == s.text() and s.slider.accessibleDescription() == s.text()
+
+
+def test_every_value_a_slider_shows_fits_its_label(panel):
+    from soundboard.ui.voicepanel import param_text
+    p, _ = panel
+    p.show()
+    for row in p.fx.rows.values():
+        for s in row.sliders:
+            if s.slider is None:
+                continue
+            s.val.ensurePolished()
+            fm, room = s.val.fontMetrics(), s.val.sizeHint().width()
+            for i in range(s.steps + 1):
+                v = s.q.lo + (s.q.hi - s.q.lo) * i / s.steps
+                assert fm.horizontalAdvance(param_text(s.q, v)) <= room, (s.q.key, v)

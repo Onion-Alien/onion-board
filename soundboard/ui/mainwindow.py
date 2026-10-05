@@ -5185,8 +5185,7 @@ class MainWindow(QMainWindow):
             narrow = self.width() < 860   # two cards side by side get cramped below this
             for apply in self._stack_cols:
                 apply(narrow)
-            self._fit.fit(size)
-            need = self._fit.need()   # even the smallest layout won't fit
+            need = self._fit.fit(size)   # even the smallest layout won't fit
             mini = need.width() > size.width() or need.height() > size.height()
             if mini and not self.is_mini():
                 log.info("mini player at %dx%d: the window needs %dx%d (tab %s)",

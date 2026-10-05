@@ -6,13 +6,14 @@ and emit plain dicts (`changed`) that the main window stores in the config.
 """
 from __future__ import annotations
 
+import functools
 import html
 import random
 import re
 import threading
 import time
 
-from PySide6.QtCore import QRectF, QSize, Qt, QTimer, Signal
+from PySide6.QtCore import QEvent, QRectF, QSize, Qt, QTimer, Signal
 from PySide6.QtGui import QColor, QGuiApplication, QPainter
 from PySide6.QtWidgets import (QButtonGroup, QCheckBox, QComboBox, QDialog, QMessageBox,
                                QDialogButtonBox, QFormLayout, QFrame, QGridLayout,
@@ -98,6 +99,80 @@ class Switch(QCheckBox):
             p.drawRoundedRect(r.adjusted(-1, -1, 1, 1), r.height() / 2 + 1, r.height() / 2 + 1)
 
 
+def param_text(q: voicefx.Param, v: float) -> str:
+    """How a setting's value reads next to its slider."""
+    v = round(v, 3)
+    if q.unit:
+        return f"{v:+g}{q.unit}" if q.lo < 0 else f"{v:g}{q.unit}"
+    if q.hi <= 1 and q.lo >= 0:
+        return f"{round(v * 100)}%"
+    return f"{v:+g}" if q.lo < 0 else f"{v:g}"
+
+
+_DIGITS = str.maketrans("0123456789", "0000000000")
+
+
+@functools.lru_cache(maxsize=256)
+def _value_shapes(lo: float, hi: float, unit: str, steps: int) -> tuple[str, ...]:
+    """Every different shape a slider's value takes (digits as 0: "-00.0 st"), so its
+    label can be as wide as the widest of them. Once per kind of setting."""
+    q = voicefx.Param("", "", lo, hi, lo, unit)
+    return tuple(sorted({param_text(q, lo + (hi - lo) * i / steps).translate(_DIGITS)
+                         for i in range(steps + 1)}))
+
+
+class _ValueLabel(QLabel):
+    """An effect card's value. As wide as the widest value its slider can show, and a
+    new value only repaints it: QLabel.setText asks for a new layout every time, and a
+    value that changed width (9 dB -> 10 dB) laid out its card, the cards around it
+    and the page again (7-8 layout passes a slider step)."""
+
+    def __init__(self, shapes: tuple[str, ...]):
+        super().__init__()
+        self._text = ""
+        self.shapes = shapes
+        self._hint = QSize()   # measured on use: the style sheet sets the font
+
+    def set_shapes(self, shapes: tuple[str, ...]):
+        self.shapes = shapes
+        self._hint = QSize()
+        self.updateGeometry()
+
+    def setText(self, text: str):
+        if text != self._text:
+            self._text = text
+            self.update()
+
+    def text(self) -> str:
+        return self._text
+
+    def sizeHint(self):
+        if not self._hint.isValid():
+            fm = self.fontMetrics()
+            zero = max("0123456789", key=fm.horizontalAdvance)   # the widest digit stands in
+            w = max((fm.horizontalAdvance(s.replace("0", zero)) for s in self.shapes),
+                    default=0)
+            m = self.contentsMargins()
+            pad = 2 * self.margin()
+            self._hint = QSize(w + m.left() + m.right() + pad,
+                               fm.height() + m.top() + m.bottom() + pad)
+        return QSize(self._hint)
+
+    def minimumSizeHint(self):
+        return self.sizeHint()
+
+    def changeEvent(self, e):
+        super().changeEvent(e)
+        if e.type() in (QEvent.FontChange, QEvent.StyleChange):
+            self._hint = QSize()
+            self.updateGeometry()
+
+    def paintEvent(self, _e):
+        p = QPainter(self)
+        p.setPen(self.palette().color(self.foregroundRole()))
+        p.drawText(self.contentsRect(), int(self.alignment()), self._text)
+
+
 def _is_switch(q: voicefx.Param) -> bool:
     """A 0/1 parameter with a step of 1 is an on/off choice, shown as a switch."""
     return q.lo == 0 and q.hi == 1 and q.step == 1
@@ -118,7 +193,9 @@ class ParamSlider(QWidget):
         self.switch: Switch | None = None
         self.name = QLabel(q.label)
         self.name.setObjectName("fxparam")
-        self.val = QLabel()
+        # the effect cards' value, a slider's: as wide as its widest value
+        self.val = (_ValueLabel(_value_shapes(q.lo, q.hi, q.unit, self.steps))
+                    if not compact and not _is_switch(q) else QLabel())
         self.val.setObjectName("fxvalue")
         self.val.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         if compact:
@@ -184,6 +261,8 @@ class ParamSlider(QWidget):
             self.slider.blockSignals(True)
             self.slider.setRange(0, self.steps)
             self.slider.blockSignals(False)
+        if isinstance(self.val, _ValueLabel):
+            self.val.set_shapes(_value_shapes(q.lo, q.hi, q.unit, self.steps))
         self.set_value(v)
 
     def value(self) -> float:
@@ -205,12 +284,7 @@ class ParamSlider(QWidget):
         self._label()
 
     def text(self) -> str:
-        v = round(self.value(), 3)
-        if self.q.unit:
-            return f"{v:+g}{self.q.unit}" if self.q.lo < 0 else f"{v:g}{self.q.unit}"
-        if self.q.hi <= 1 and self.q.lo >= 0:
-            return f"{round(v * 100)}%"
-        return f"{v:+g}" if self.q.lo < 0 else f"{v:g}"
+        return param_text(self.q, self.value())
 
     def _label(self):
         self.val.setText(self.text())
@@ -308,10 +382,14 @@ class EffectRow(QFrame):
             grid.setColumnStretch(c, 1)
         v.addWidget(self.body)
         self.chk.toggled.connect(self._toggled)
+        self._shown: bool | None = None   # the on/off the card last showed
         self._show()
 
     def _show(self):
         on = self.chk.isChecked()
+        if on == self._shown:
+            return   # a voice pick loads all 13 cards: only those it switched need showing
+        self._shown = on
         self.body.setVisible(on or self.hero)
         self.btn_reset.setVisible(on)
         if bool(self.property("on")) != on:
