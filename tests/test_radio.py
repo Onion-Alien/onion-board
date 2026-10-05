@@ -1283,10 +1283,10 @@ def test_the_flat_map_lets_its_picture_go_while_hidden(qapp):
     m.set_points([{"id": "a", "la": 50.0, "lo": 10.0, "k": 1}])
     m.show()
     m.grab()
-    assert m._world is not None
+    assert m._tiles
     m.hide()
-    assert m._world is None and m._view is None    # tens of MB, while nobody sees it
+    assert not m._tiles and not m.busy()           # tens of MB, while nobody sees it
     m.show()
     m.grab()
-    assert m._world is not None                    # drawn again when it shows
+    assert m._tiles                                # drawn again when it shows
     m.close()
