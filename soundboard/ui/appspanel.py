@@ -3,7 +3,10 @@ game, a call in another app) out to others (the cable, another device or the
 stream output, like your sounds), without touching what any other program plays.
 Each program is a card: its level, a **Send** switch, its own volume and *Hear it
 myself*, and **Record**, which waits for the program to make a sound, records it
-until you click again and adds it to your Sounds as a pad.
+until you click again and adds it to your Sounds as a pad. Folded away at the
+bottom of each card is its *Clip editor* (soundboard.ui.clipeditor): opened, it
+keeps the program's last minute as a live waveform to cut bits out of; closed,
+nothing of it runs.
 
 The capture is Windows' per-process loopback (soundboard.appaudio), a *copy* of
 the program's audio: the program keeps playing on your speakers. Programs you
@@ -27,11 +30,13 @@ from PySide6.QtWidgets import (QCheckBox, QComboBox, QFileIconProvider, QFrame, 
                                QVBoxLayout, QWidget)
 
 from soundboard import appaudio, library, theme, trash
+from soundboard.clipedit import LiveBuffer
 from soundboard.engine import SR
 from soundboard.library import MAX_SECONDS, trim_silence
 from soundboard.recorder import ArmedRecorder
 from soundboard.ui import icons
 from soundboard.ui.bunnywidget import BunnyWidget
+from soundboard.ui.clipeditor import ClipEditor
 from soundboard.ui.panel import CardGrid, HoverCard, UndoBar, VolumeControl, hint_label
 from soundboard.ui.responsive import FitWidth
 from soundboard.wheelguard import no_wheel
@@ -147,6 +152,7 @@ class AppRow(HoverCard):
     vol_changed = Signal(object, float)
     hear_toggled = Signal(object, bool)
     to_changed = Signal(object, str)        # row, one of TO_KEYS
+    clip_toggled = Signal(object, bool)     # row, the clip editor opened / closed
     forget = Signal(object)
 
     def __init__(self, exe: str, meter_cls, vol: float = 1.0, hear: bool = False,
@@ -161,6 +167,8 @@ class AppRow(HoverCard):
         self.remember_pending = False   # Send clicked: remembered once the capture is up
         self.src = None                 # engine.AuxSource while sending
         self.rec: ArmedRecorder | None = None   # while Record is on
+        self.listen: LiveBuffer | None = None   # while the clip editor is open
+        self.editor: ClipEditor | None = None   # made the first time it's opened
         self.status_text = ""
         self.status_error = False
         v = QVBoxLayout(self)
@@ -239,6 +247,15 @@ class AppRow(HoverCard):
         self.chk_hear.toggled.connect(lambda on: self.hear_toggled.emit(self, on))
         mix.addWidget(self.chk_hear)
         v.addLayout(mix)
+        self.btn_clip = QPushButton("Clip editor")
+        self.btn_clip.setObjectName("fold")
+        self.btn_clip.setCheckable(True)
+        self.btn_clip.setToolTip("Keep this program's last minute as a waveform you can cut "
+                                 "bits out of, play, save as sounds or send straight back. "
+                                 "It only listens while it's open.")
+        icons.set_icon(self.btn_clip, "fold", "muted", "text", size=12)
+        self.btn_clip.toggled.connect(lambda on: self.clip_toggled.emit(self, on))
+        v.addWidget(self.btn_clip, 0, Qt.AlignLeft)
         self._tight = 0   # how many of _TIGHTEN are applied (a narrow window)
         self._label_send()
         self.set_app(None)
@@ -322,7 +339,8 @@ class AppRow(HoverCard):
             self.sub.setText("Not running — it'll be picked up when it starts")
         self.btn_send.setEnabled(running)
         self.btn_rec.setEnabled(running)
-        self.btn_forget.setVisible(not running or not self.sending)
+        self.btn_clip.setEnabled(running or self.btn_clip.isChecked())
+        self.btn_forget.setVisible((not running or not self.sending) and self.listen is None)
         self.setEnabled(True)
         self.name.setEnabled(running)
 
@@ -342,7 +360,14 @@ class AppRow(HoverCard):
         self.btn_send.setChecked(on)
         self.btn_send.blockSignals(False)
         self._label_send()
-        self.btn_forget.setVisible(not on or self.app is None)
+        self.btn_forget.setVisible((not on or self.app is None) and self.listen is None)
+
+    def set_clip_open(self, on: bool):
+        self.btn_clip.blockSignals(True)
+        self.btn_clip.setChecked(on)
+        self.btn_clip.blockSignals(False)
+        icons.set_icon(self.btn_clip, "fold_open" if on else "fold", "muted", "text", size=12)
+        self.btn_forget.setVisible((not self.sending or self.app is None) and not on)
 
     def set_recording(self, on: bool):
         self.btn_rec.blockSignals(True)
@@ -520,6 +545,8 @@ class AppsTab(QWidget):
         self.lister.stop()
         for row in list(self.rows.values()):
             self._stop_capture(row, save=False)
+            if row.editor is not None:
+                row.editor.shutdown()
 
     def stop_all(self):
         """Stop all: switch every program off (they stay remembered). A recording
@@ -563,6 +590,7 @@ class AppsTab(QWidget):
             row.vol_changed.connect(self._on_vol)
             row.hear_toggled.connect(self._on_hear)
             row.to_changed.connect(self._on_to)
+            row.clip_toggled.connect(self._on_clip)
             row.forget.connect(self._on_forget)
             self.grid.addWidget(row)
             self.empty.setVisible(False)
@@ -570,6 +598,9 @@ class AppsTab(QWidget):
 
     def _drop_row(self, row: AppRow):
         self._stop_capture(row)
+        self._close_clip(row)
+        if row.editor is not None:
+            row.editor.shutdown()
         self.rows.pop(row.key, None)
         self.grid.removeWidget(row)
         row.deleteLater()
@@ -663,7 +694,7 @@ class AppsTab(QWidget):
             if app is None:                       # not running
                 self._stop_capture(row)
                 row.set_sending(False)
-                if not remembered:
+                if not remembered and row.listen is None and not self._has_take(row):
                     self._drop_row(row)
                     continue
                 row.set_app(None)
@@ -687,6 +718,8 @@ class AppsTab(QWidget):
                     self._start_capture(row)
                 if row.capture is None and row.rec is not None:
                     self._finish_rec(row)         # reopening failed: nothing feeds the clip
+                if row.capture is None and row.listen is not None:
+                    self._open_capture(row)       # the clip editor keeps listening
             elif row.status_text and row.status_error:
                 row.set_status("")
         self._label_folders()
@@ -752,6 +785,9 @@ class AppsTab(QWidget):
         rec = row.rec
         if rec is not None:
             rec.push(x)
+        listen = row.listen
+        if listen is not None:
+            listen.push(x)
 
     def _open_capture(self, row: AppRow) -> bool:
         if row.capture is not None:
@@ -798,7 +834,7 @@ class AppsTab(QWidget):
         src, row.src = row.src, None
         if src is not None:
             self.engine.remove_aux(src.key)
-        if row.rec is None:
+        if row.rec is None and row.listen is None:
             self._close_capture(row)
 
     def _stop_capture(self, row: AppRow, save: bool = True):
@@ -841,7 +877,7 @@ class AppsTab(QWidget):
             row.sub.repaint()
         heard = rec.triggered
         data = rec.stop()
-        if row.src is None:
+        if row.src is None and row.listen is None:
             self._close_capture(row)
         if not save:
             return
@@ -850,13 +886,69 @@ class AppsTab(QWidget):
             self._flash(row, "Too short to keep." if heard
                         else "Nothing was recorded: it didn't make a sound.")
             return
+        error = self._add_clip(row, data)
+        if error:   # the window couldn't save it
+            row.set_status(f"Couldn't save the clip: {error}", error=True)
+            return
+        self._flash(row, f"✓ Saved a {len(data) / SR:.1f}s clip to your Sounds.")
+
+    def _add_clip(self, row: AppRow, data) -> str:
+        """Hand a clip to the window to become a sound; why it couldn't, or ""."""
         name = (row.app.name if row.app else row.name.text())[:30] or "App"
         self.clip_error = ""
         self.clip_ready.emit(data, f"{name} {time.strftime('%H.%M.%S')}")
-        if self.clip_error:   # the window couldn't save it
-            row.set_status(f"Couldn't save the clip: {self.clip_error}", error=True)
+        return self.clip_error
+
+    # ------------------------------------------------------------------ clip editor
+    # Opt-in per card: nothing is built, kept or drawn until its Clip editor is
+    # opened, and closing it stops listening (an edited take stays for next time).
+    def _has_take(self, row: AppRow) -> bool:
+        return row.editor is not None and row.editor.take is not None
+
+    def _on_clip(self, row: AppRow, on: bool):
+        if not on:
+            self._close_clip(row)
             return
-        self._flash(row, f"✓ Saved a {len(data) / SR:.1f}s clip to your Sounds.")
+        if row.listen is not None:
+            return
+        if row.app is None and not self._has_take(row):
+            row.set_clip_open(False)
+            return
+        if row.editor is None:
+            row.editor = ClipEditor(self.engine, self.cfg, row)
+            row.editor.save_clip.connect(lambda data, whole, r=row: self._save_edit(r, data, whole))
+            row.layout().addWidget(row.editor)
+        row.set_clip_open(True)
+        row.editor.show()
+        if row.app is not None:
+            row.listen = LiveBuffer()
+            if not self._open_capture(row):
+                row.listen = None
+        row.editor.set_buffer(row.listen)
+        row.btn_forget.setVisible(False)
+        self._poll_capture(row)
+
+    def _close_clip(self, row: AppRow):
+        row.set_clip_open(False)
+        listen, row.listen = row.listen, None
+        if row.editor is not None:
+            row.editor.set_buffer(None)   # stops playing; an unedited take is let go
+            row.editor.hide()
+        if listen is not None and row.src is None and row.rec is None:
+            self._close_capture(row)
+        row.set_sending(row.sending)      # the ✕ comes back
+
+    def _save_edit(self, row: AppRow, data, whole: bool):
+        if whole:   # nothing picked out: the dead air at its ends goes
+            data = trim_silence(data)
+        if len(data) < int(0.05 * SR):
+            row.editor.flash("Nothing but silence there.")
+            return
+        error = self._add_clip(row, data)
+        if error:
+            row.editor.flash(f"Couldn't save it: {error}", error=True)
+        else:
+            row.editor.flash(f"✓ Saved {len(data) / SR:.2f}s to your Sounds.")
 
     def _flash(self, row: AppRow, text: str):
         row.set_status(text)

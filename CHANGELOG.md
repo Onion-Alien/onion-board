@@ -1,5 +1,16 @@
 # Changelog
 
+## Unreleased
+
+- **Clip editor on the Apps tab:** open *Clip editor* under a program's card and it
+  keeps that program's last minute as a live, scrolling waveform. Press on it to
+  freeze, drag across the bit you want, and press Space to hear it in your
+  headphones, Enter to save it as a sound, or **Send** to play it straight back to
+  whoever's listening. Cut, copy and paste (also between programs), delete, keep
+  only the selection, fades, louder / quieter, reverse, silence and undo are in its
+  **Edit** menu and on the usual keys; Ctrl+scroll zooms. It's off until you open
+  it: a closed editor doesn't listen, keep audio or draw anything.
+
 ## 1.7.2 — 2026-10-05
 
 - Tab help now uses a crisp, theme-aware information icon in a larger square
