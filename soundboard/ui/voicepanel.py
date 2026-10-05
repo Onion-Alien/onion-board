@@ -27,7 +27,7 @@ from soundboard import library, net, netlog, savedvoices, theme
 from soundboard.speech import customvoices, translation, winvoices
 from soundboard.speech.aivoice import AiVoiceController
 from soundboard.speech.live import SpeechController, clean_settings
-from soundboard.ui import art, busy, icons
+from soundboard.ui import appstate, art, busy, icons
 from soundboard.ui.panel import (UndoBar, VolumeControl, bar, card, hint_label, icon_label,
                                  section_label, vsep)
 from soundboard.ui.responsive import FitWidth
@@ -2040,10 +2040,11 @@ class VoicePanel(QWidget):
         # the voice changer's mic meter (only while the tab is showing)
         self._meter_timer = QTimer(self)
         self._meter_timer.timeout.connect(self._meter)
+        appstate.slow_in_background(self, self._meter_timer, 50)   # behind a game
 
     def showEvent(self, e):
         super().showEvent(e)
-        self._meter_timer.start(50)
+        self._meter_timer.start(appstate.interval(50))
 
     def hideEvent(self, e):
         super().hideEvent(e)
