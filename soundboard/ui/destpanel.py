@@ -1,20 +1,21 @@
-"""Who's listening (on the Setup tab, and in Settings -> Audio): pick the
-destination mode that shapes the sounds bus for the voice chat on the other end
-(soundboard.destination), and an editor for custom modes (describe any other
-codec by the same knobs)."""
+"""Who's listening (on the Setup tab, and in Settings -> Audio): the simple modes
+(Game, Voice chat, Clean, Advanced: soundboard.profiles) that pick the destination
+mode shaping the sounds bus for the voice chat on the other end
+(soundboard.destination), Advanced's full picker, and an editor for custom modes
+(describe any other codec by the same knobs)."""
 from __future__ import annotations
 
 import html
 
-from PySide6.QtCore import Qt, Signal
-from PySide6.QtWidgets import (QCheckBox, QComboBox, QDialog, QDialogButtonBox, QFormLayout,
-                               QHBoxLayout, QLabel, QLineEdit, QListWidget, QPushButton, QSlider,
-                               QVBoxLayout, QWidget)
+from PySide6.QtCore import Qt, QTimer, Signal
+from PySide6.QtWidgets import (QButtonGroup, QCheckBox, QComboBox, QDialog, QDialogButtonBox,
+                               QFormLayout, QHBoxLayout, QLabel, QLineEdit, QListWidget,
+                               QPushButton, QSlider, QVBoxLayout, QWidget)
 
-from soundboard import destination, voicesdk
+from soundboard import destination, profiles, voicesdk
 from soundboard.destination import CEILINGS, LOWCUTS, Dest
 from soundboard.ui import fit
-from soundboard.ui.panel import UndoBar, hint_label
+from soundboard.ui.panel import Flow, UndoBar, hint_label
 from soundboard.wheelguard import no_wheel
 
 
@@ -56,44 +57,110 @@ def lowcut_label(hz: int) -> str:
     return "Keep it (no cut)" if not hz else f"Cut under {hz} Hz, give the level back"
 
 
+def _dest_cfg(mw) -> dict:
+    d = mw.cfg.dest
+    if not isinstance(d, dict):
+        d = mw.cfg.dest = {}
+    return d
+
+
+def mode_tip(p: profiles.Profile) -> str:
+    """A simple mode's tooltip: who it's for, then what it does."""
+    return f"<b>{p.label}</b>: {html.escape(p.summary)}<br><br>{html.escape(p.details)}"
+
+
+def set_simple(mw, key: str) -> profiles.Profile:
+    """Switch to simple mode `key`: picks its shaping from what's seen, applies, saves."""
+    d = _dest_cfg(mw)
+    mw.mode_why = profiles.pick(d, key, getattr(mw, "voice_hints", ()))
+    destination.apply(mw.cfg, mw.engine)
+    mw._save_later()
+    _refresh_views(mw)
+    return profiles.BY_KEY[key]
+
+
+def set_exact(mw, mode_key: str):
+    """One destination mode by name (the remote's ?set=, Advanced's picker): Off is
+    Clean, anything else is Advanced with that mode, so nothing switches it."""
+    d = _dest_cfg(mw)
+    d["mode"] = mode_key
+    d["simple"] = profiles.CLEAN.key if mode_key == "off" else profiles.ADVANCED.key
+    mw.mode_why = ""
+    destination.apply(mw.cfg, mw.engine)
+    mw._save_later()
+    _refresh_views(mw)
+
+
+def _refresh_views(mw):
+    for name in ("mode_combo", "dest_panel"):
+        w = getattr(mw, name, None)
+        if w is not None and hasattr(w, "refresh"):
+            w.refresh()
+
+
+class ModesHelp(QDialog):
+    """What do these do?: every simple mode in plain words, and what it's doing now."""
+
+    def __init__(self, mw, parent=None):
+        super().__init__(parent or mw)
+        fit.watch(self)
+        self.setWindowTitle("Sound modes: what each one does")
+        self.setMinimumWidth(520)
+        v = QVBoxLayout(self)
+        v.setSpacing(10)
+        now = QLabel("<b>Right now:</b> " + html.escape(
+            profiles.explain(_dest_cfg(mw), getattr(mw, "mode_why", ""))))
+        now.setWordWrap(True)
+        v.addWidget(now)
+        for p in profiles.PROFILES:
+            lbl = QLabel(f"<b>{p.label}</b> &nbsp;<i>{html.escape(p.summary)}</i><br>"
+                         f"{html.escape(p.details)}")
+            lbl.setWordWrap(True)
+            lbl.setTextFormat(Qt.RichText)
+            v.addWidget(lbl)
+        v.addWidget(hint_label(profiles.SHARED))
+        bb = QDialogButtonBox(QDialogButtonBox.Close)
+        bb.rejected.connect(self.accept)
+        v.addWidget(bb)
+
+
 class ModeCombo(QComboBox):
-    """Who's listening as one small dropdown (the Sounds tab's top bar): the same
-    setting as DestPanel's picker, so either one changes it for both."""
+    """Who's listening as one small dropdown (the Sounds tab's top bar): the simple
+    modes, the same setting as DestPanel's buttons. Each one's tooltip says what it
+    does."""
 
     def __init__(self, mw):
         super().__init__()
         self.mw = mw
         self.setAccessibleName("Who's listening")
-        # sized for a short label, not the longest one ("Unity voice (Photon /
-        # Dissonance)"): "Off" sat in a box twice its width; the list opens wide enough
         self.setSizeAdjustPolicy(QComboBox.AdjustToMinimumContentsLengthWithIcon)
-        self.setMinimumContentsLength(12)
+        self.setMinimumContentsLength(10)
         no_wheel(self)
         self.currentIndexChanged.connect(self._picked)
         sig = getattr(mw, "voice_engine", None)
         if sig is not None:
-            sig.connect(self._on_voice_engine)   # *Pick the mode by itself* switched it
+            sig.connect(self._on_voice_engine)   # a simple mode picked new shaping
         self.refresh()
 
-    def _cfg(self) -> dict:
-        d = self.mw.cfg.dest
-        if not isinstance(d, dict):
-            d = self.mw.cfg.dest = {}
-        return d
-
     def refresh(self):
-        cfg = self._cfg()
-        current = destination.resolve(cfg)
+        d = _dest_cfg(self.mw)
+        p = profiles.current(d)
         self.blockSignals(True)
         self.clear()
-        for d in destination.all_modes(cfg.get("custom")):
-            self.addItem("Off" if d is destination.OFF else d.label, d.key)
-            self.setItemData(self.count() - 1, d.note, Qt.ToolTipRole)
-        self.setCurrentIndex(max(0, self.findData(current.key)))
+        for q in profiles.PROFILES:
+            label = q.label
+            if q is profiles.ADVANCED:
+                label = (f"Advanced: {destination.resolve(d).label}"
+                         if p is q else "Advanced…")
+            self.addItem(label, q.key)
+            self.setItemData(self.count() - 1, mode_tip(q), Qt.ToolTipRole)
+        self.setCurrentIndex(max(0, self.findData(p.key)))
         self.view().setMinimumWidth(self.view().sizeHintForColumn(0) + 32)   # long names whole
         self.blockSignals(False)
-        self.setToolTip("Who's listening: shapes your sounds for the voice chat on the "
-                        f"other end. Now: {current.label}. More options on the Setup tab.")
+        self.setToolTip(
+            f"Who's listening: {html.escape(profiles.explain(d, getattr(self.mw, 'mode_why', '')))}"
+            "<br><br>Hover a mode in the list to see what it does. More in Settings → "
+            "Audio → Who's listening.")
 
     def showEvent(self, e):
         super().showEvent(e)
@@ -104,17 +171,17 @@ class ModeCombo(QComboBox):
 
     def _picked(self, i: int):
         key = self.itemData(i)
-        if key is None:
+        if key not in profiles.BY_KEY:
             return
-        self._cfg()["mode"] = key
-        destination.apply(self.mw.cfg, self.mw.engine)
-        self.mw._save_later()
-        self.refresh()   # its tooltip names the new mode
+        set_simple(self.mw, key)
+        if key == profiles.ADVANCED.key:   # its knobs live in Settings
+            QTimer.singleShot(0, lambda: self.mw.open_settings("audio"))
 
 
 class DestPanel(QWidget):
-    """Mode picker + description + the custom-modes button. Applies to the engine
-    and saves through the main window straight away."""
+    """The simple modes as buttons, what the picked one is doing, a "What do these
+    do?" box, Advanced's full picker (shown in Advanced only) and the send options.
+    Applies to the engine and saves through the main window straight away."""
 
     def __init__(self, mw):
         super().__init__()
@@ -122,18 +189,29 @@ class DestPanel(QWidget):
         v = QVBoxLayout(self)
         v.setContentsMargins(0, 0, 0, 0)
         v.setSpacing(6)
-        row = QHBoxLayout()
-        self.combo = QComboBox()
-        no_wheel(self.combo)
-        row.addWidget(self.combo, 1)
-        custom = QPushButton("Custom modes…")
-        custom.setToolTip("Describe another codec or service by what it does to the sound")
-        custom.clicked.connect(self.edit_custom)
-        row.addWidget(custom)
+        row = Flow(gap=4)   # wraps in a narrow window instead of widening it
+        self.group = QButtonGroup(self)
+        self.group.setExclusive(True)
+        self.buttons: dict[str, QPushButton] = {}
+        for p in profiles.PROFILES:
+            b = QPushButton(p.label)
+            b.setCheckable(True)
+            b.setToolTip(mode_tip(p))
+            b.setAccessibleName(f"{p.label} mode")
+            b.setAccessibleDescription(p.summary)
+            self.group.addButton(b)
+            self.buttons[p.key] = b
+            row.addWidget(b)
         v.addLayout(row)
-        self.desc = hint_label("")
-        v.addWidget(self.desc)
-        # the game in front ships a voice engine we know (soundboard.voicesdk)
+        self.now = hint_label("")
+        v.addWidget(self.now)
+        help_btn = QPushButton("What do these do?")
+        help_btn.setObjectName("small")
+        help_btn.setToolTip("Every mode in plain words, and what it's doing right now")
+        help_btn.clicked.connect(self.show_help)
+        v.addWidget(help_btn, 0, Qt.AlignLeft)
+        # a hint that something else is in use: Discord listening while in Game, say,
+        # or (Advanced) the game in front ships a voice engine we know
         self.suggest = QWidget()
         sr = QVBoxLayout(self.suggest)   # stacked: side by side it widened the Setup tab
         sr.setContentsMargins(0, 0, 0, 0)
@@ -141,19 +219,36 @@ class DestPanel(QWidget):
         self.suggest_text = hint_label("")
         sr.addWidget(self.suggest_text)
         self.suggest_btn = QPushButton("Use it")
-        self.suggest_btn.setToolTip("Switch Who's listening to the mode for this game's "
-                                    "voice chat")
+        self.suggest_btn.setToolTip("Switch to the mode that suits what's listening")
         self.suggest_btn.setObjectName("small")
         self.suggest_btn.clicked.connect(self._use_suggestion)
         sr.addWidget(self.suggest_btn, 0, Qt.AlignLeft)
         self.suggest.hide()
         v.addWidget(self.suggest)
+
+        # Advanced: every mode by name, custom modes, switching between all of them
+        self.advanced = QWidget()
+        av = QVBoxLayout(self.advanced)
+        av.setContentsMargins(0, 0, 0, 0)
+        av.setSpacing(6)
+        arow = QHBoxLayout()
+        self.combo = QComboBox()
+        no_wheel(self.combo)
+        arow.addWidget(self.combo, 1)
+        custom = QPushButton("Custom modes…")
+        custom.setToolTip("Describe another codec or service by what it does to the sound")
+        custom.clicked.connect(self.edit_custom)
+        arow.addWidget(custom)
+        av.addLayout(arow)
+        self.desc = hint_label("")
+        av.addWidget(self.desc)
         self.chk_auto = QCheckBox("Pick the mode by itself")
         self.chk_auto.setToolTip(
             "When Discord, TeamSpeak, Mumble or a game with a known voice chat is "
             "listening to the virtual cable, use its mode without asking. With nothing "
             "listening, the mode stays as it is.")
-        v.addWidget(self.chk_auto)
+        av.addWidget(self.chk_auto)
+        v.addWidget(self.advanced)
         sig = getattr(mw, "voice_engine", None)
         if sig is not None:
             sig.connect(self._on_voice_engine)   # a bound slot: gone with the panel
@@ -179,6 +274,7 @@ class DestPanel(QWidget):
                                  "keyboard.")
         v.addWidget(self.chk_gate)
         self.refresh()
+        self.group.buttonClicked.connect(self._simple_clicked)
         self.combo.currentIndexChanged.connect(self._picked)
         self.chk_auto.toggled.connect(self._auto_changed)
         self.chk_mono.toggled.connect(self._send_changed)
@@ -186,13 +282,12 @@ class DestPanel(QWidget):
         self.chk_gate.toggled.connect(self._send_changed)
 
     def _cfg(self) -> dict:
-        d = self.mw.cfg.dest
-        if not isinstance(d, dict):
-            d = self.mw.cfg.dest = {}
-        return d
+        return _dest_cfg(self.mw)
 
     def refresh(self):
         cfg = self._cfg()
+        p = profiles.current(cfg)
+        self.buttons[p.key].setChecked(True)
         current = destination.resolve(cfg).key
         self.combo.blockSignals(True)
         self.combo.clear()
@@ -217,25 +312,48 @@ class DestPanel(QWidget):
         self.refresh()   # the other copy (Setup tab / Settings) may have changed it
 
     def _show(self):
-        d = destination.resolve(self._cfg())
-        self.desc.setText(describe(d))
+        cfg = self._cfg()
+        p = profiles.current(cfg)
+        self.now.setText(html.escape(profiles.explain(cfg, getattr(self.mw, "mode_why", ""))))
+        self.advanced.setVisible(p is profiles.ADVANCED)
+        self.desc.setText(describe(destination.resolve(cfg)))
         self._show_suggestion()
         combo = getattr(self.mw, "mode_combo", None)   # the Sounds tab's dropdown
         if combo is not None:
             combo.refresh()
 
+    def show_help(self):
+        dlg = ModesHelp(self.mw, self)
+        dlg.exec()
+
+    def _simple_clicked(self, b):
+        key = next(k for k, w in self.buttons.items() if w is b)
+        if key == profiles.current(self._cfg()).key:
+            return
+        set_simple(self.mw, key)
+        self.refresh()
+
+    def _better(self):
+        """(simple mode key, hint) when something seen suits another simple mode."""
+        p = profiles.current(self._cfg())
+        h = profiles.better(p, getattr(self.mw, "voice_hints", ()))
+        return (h.simple, h) if h else (None, None)
+
     def _suggested(self) -> str | None:
-        """The mode the game in front calls for, if it isn't the one picked."""
+        """Advanced: the mode the game in front calls for, if it isn't the one picked."""
+        if profiles.current(self._cfg()) is not profiles.ADVANCED:
+            return None
         key = getattr(self.mw, "voice_suggestion", None)
         if key not in destination.BUILTIN_BY_KEY:
             return None
         return None if destination.resolve(self._cfg()).key == key else key
 
     def _on_voice_engine(self, _key):
-        self.refresh()   # *Pick the mode by itself* may have just changed the mode
+        self.refresh()   # a simple mode or *Pick the mode by itself* may have switched
 
     def _auto_changed(self, on: bool):
         self._cfg()["auto"] = bool(on)
+        self._cfg()["simple"] = profiles.ADVANCED.key   # it's Advanced's switch
         self.mw._save_later()
         if on:
             self.mw._auto_dest()
@@ -243,23 +361,35 @@ class DestPanel(QWidget):
 
     def _show_suggestion(self):
         key = self._suggested()
+        simple, hint = self._better()
         if key:
             why = html.escape(getattr(self.mw, "voice_why", "") or (
                 f"The game you have open uses {voicesdk.NAMES.get(key, key)} for voice chat"))
             self.suggest_text.setText(
                 f"{why}: <b>{destination.BUILTIN_BY_KEY[key].label}</b> suits it.")
-        self.suggest.setVisible(bool(key))
+        elif simple:
+            self.suggest_text.setText(
+                f"{html.escape(hint.why)}: <b>{profiles.BY_KEY[simple].label}</b> mode "
+                "suits it.")
+        self.suggest.setVisible(bool(key or simple))
 
     def _use_suggestion(self):
         key = self._suggested()
         if key:
             self.combo.setCurrentIndex(max(0, self.combo.findData(key)))
+            return
+        simple, _hint = self._better()
+        if simple:
+            set_simple(self.mw, simple)
+            self.refresh()
 
     def _picked(self, i: int):
         key = self.combo.itemData(i)
         if key is None:
             return
-        self._cfg()["mode"] = key
+        d = self._cfg()
+        d["mode"] = key
+        d["simple"] = profiles.ADVANCED.key   # picked by name: stays exactly that
         destination.apply(self.mw.cfg, self.mw.engine)
         self.mw._save_later()
         self._show()

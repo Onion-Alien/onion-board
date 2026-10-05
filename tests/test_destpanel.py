@@ -1,5 +1,6 @@
 """Settings → Audio → Who's listening, and the custom-mode editor."""
-from PySide6.QtWidgets import QComboBox
+from PySide6.QtCore import Qt
+from PySide6.QtWidgets import QApplication, QComboBox, QLabel
 
 from soundboard import destination
 from soundboard.library import Config
@@ -140,19 +141,93 @@ def test_the_setup_tab_has_the_picker_and_settings_follows_it(window):  # noqa: 
 def test_the_sounds_tab_has_a_mode_dropdown_that_follows_the_picker(window):  # noqa: F811
     mode = window.mode_combo
     assert window.sounds_page.isAncestorOf(mode)
-    assert mode.itemText(mode.findData("off")) == "Off"
-    assert mode.findData("webrtc") >= 0 and mode.currentData() == "off"
-    mode.setCurrentIndex(mode.findData("webrtc"))     # picked on the Sounds tab
-    assert window.engine.dest is not None and window.engine.dest.key == "webrtc"
-    assert window.cfg.dest["mode"] == "webrtc" and window._save_timer.isActive()
-    assert "Browser, Zoom, Teams" in mode.toolTip()
+    assert [mode.itemData(i) for i in range(mode.count())] == [
+        "game", "voice", "clean", "advanced"]
+    assert mode.currentData() == "clean" and mode.itemText(3) == "Advanced…"
+    for i in range(mode.count()):                     # each one says what it does
+        assert len(mode.itemData(i, Qt.ToolTipRole)) > 80
+    mode.setCurrentIndex(mode.findData("voice"))      # picked on the Sounds tab
+    assert window.engine.dest is not None and window.engine.dest.key == "discord"
+    assert window.cfg.dest == {"mode": "discord", "simple": "voice", "auto": False}
+    assert window._save_timer.isActive()
+    assert "Voice chat: shaping for Discord." in mode.toolTip()
     window.dest_panel.refresh()                       # the Setup tab shows it
-    assert window.dest_panel.combo.currentData() == "webrtc"
+    assert window.dest_panel.buttons["voice"].isChecked()
+    assert window.dest_panel.advanced.isHidden()      # the full list is Advanced's
     d = SettingsDialog(window, "audio")               # changed in Settings: it follows
     _dest_combo(d.tabs.currentWidget()).setCurrentIndex(
         _dest_combo(d.tabs.currentWidget()).findData("steam"))
-    assert mode.currentData() == "steam"
+    assert mode.currentData() == "advanced" and mode.itemText(3) == "Advanced: Steam voice"
     d.close()
+
+
+def test_picking_advanced_on_the_sounds_tab_opens_its_settings(window, monkeypatch):  # noqa: F811
+    opened = []
+    monkeypatch.setattr(window, "open_settings", lambda page="privacy": opened.append(page))
+    window.mode_combo.setCurrentIndex(window.mode_combo.findData("advanced"))
+    QApplication.processEvents()
+    assert opened == ["audio"] and window.cfg.dest["simple"] == "advanced"
+    assert window.engine.dest is None                 # kept the mode it had (Off)
+
+
+def test_mode_buttons_switch_and_show_what_they_do(window):  # noqa: F811
+    panel = window.dest_panel
+    assert panel.buttons["clean"].isChecked() and panel.advanced.isHidden()
+    assert "exactly as mixed" in panel.now.text()
+    panel.buttons["game"].click()
+    assert window.cfg.dest["simple"] == "game" and window.engine.dest.key == "game"
+    assert "Game: shaping for Vivox" in panel.now.text()
+    assert window.mode_combo.currentData() == "game"
+    panel.buttons["advanced"].click()
+    assert not panel.advanced.isHidden() and window.engine.dest.key == "game"
+    assert panel.combo.currentData() == "game"
+    panel.buttons["clean"].click()
+    assert window.engine.dest is None and window.cfg.dest["mode"] == "off"
+
+
+def test_what_do_these_do_lists_every_mode(window):  # noqa: F811
+    from soundboard import profiles
+    from soundboard.ui.destpanel import ModesHelp
+    window.dest_panel.buttons["voice"].click()
+    dlg = ModesHelp(window)
+    text = " ".join(lbl.text() for lbl in dlg.findChildren(QLabel))
+    assert "Right now:" in text and "Voice chat: shaping for Discord" in text
+    for p in profiles.PROFILES:
+        assert p.label in text and p.details[:40] in text
+    dlg.accept()
+
+
+def test_game_mode_picks_the_shaping_by_itself(window, monkeypatch):  # noqa: F811
+    from soundboard import engine as eng
+    monkeypatch.setattr(eng, "virtual_mic_for", lambda name: "CABLE Output (fake)")
+    toasts = []
+    monkeypatch.setattr(window, "toast", lambda text, kind="": toasts.append(text))
+    panel = window.dest_panel
+    panel.buttons["game"].click()
+
+    class Watch:
+        key = "unity"
+
+        def poll(self):
+            return self.key
+    window.voice_watch = Watch()
+    window.listeners = Heard()
+    window._poll_voice()
+    assert window.engine.dest.key == "unity" and window.cfg.dest["simple"] == "game"
+    assert toasts and "Game mode" in toasts[-1] and "Unity" in toasts[-1]
+    assert "The game you have open uses" in panel.now.text()
+    assert panel.suggest.isHidden()
+    window.voice_watch.key = None                     # the game closed: keeps it
+    window._poll_voice()
+    assert window.engine.dest.key == "unity"
+    # Discord listening while in Game: suggested, never switched
+    window.listeners.found = (("discord", "Discord"),)
+    window._poll_voice()
+    assert window.engine.dest.key == "unity" and not panel.suggest.isHidden()
+    assert "Voice chat" in panel.suggest_text.text()
+    panel.suggest_btn.click()
+    assert window.cfg.dest["simple"] == "voice" and window.engine.dest.key == "discord"
+    assert panel.suggest.isHidden() and panel.buttons["voice"].isChecked()
 
 
 def test_custom_editor_opens_with_a_damaged_custom_list(window):  # noqa: F811
@@ -231,8 +306,12 @@ def test_the_program_listening_to_the_cable_beats_the_game_in_front(window, monk
     window.listeners.found = (("discord", "Discord"),)   # ...but Discord has the cable
     window._poll_voice()
     assert window.voice_suggestion == "discord"
-    assert "Discord is listening" in panel.suggest_text.text()
+    assert "Discord is listening" in panel.suggest_text.text()   # Clean: Voice chat suits
+    assert "<b>Voice chat</b> mode" in panel.suggest_text.text()
     assert window.engine.dest is None              # only suggested
+    panel.buttons["advanced"].click()              # Advanced suggests one exact mode
+    assert "Discord is listening" in panel.suggest_text.text()
+    assert "<b>Discord</b> suits it" in panel.suggest_text.text()
     window.listeners.found = (("discord", "Discord"), ("game", "Valorant"))
     window._poll_voice()
     assert window.voice_suggestion == "game"       # both: the game in front wins

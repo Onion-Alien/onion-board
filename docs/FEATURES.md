@@ -127,6 +127,11 @@ The full list. The [README](../README.md) has the short version and how to get s
   your triggers are kept for when you get it again.
   Everything happens on your PC: the screen is never saved or sent anywhere. If
   a game still shows up black, set it to Borderless or Windowed fullscreen.
+- **Sound modes** (Sounds tab's *Listening* box, Setup → *Who's listening*,
+  Settings → Audio): **Game** and **Voice chat** shape your sounds for the voice
+  chat on the other end, working out which one by themselves; **Clean** sends them
+  as mixed; **Advanced** picks an exact voice chat or your own custom mode.
+  *What do these do?* explains each.
 - **Mute my mic while a sound plays** (Setup → *Who's listening*): others hear
   only the sound, clean, and your mic comes back the moment it ends. Or the
   opposite, *While I talk, lower my sounds*.

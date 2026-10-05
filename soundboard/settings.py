@@ -901,12 +901,11 @@ class SettingsDialog(QDialog):
         v.addWidget(self._stream_card())
         v.addWidget(self._voices_card())
         card, cv = self._card("Who's listening",
-                              "Voice chat runs your sounds through a mono voice codec that drops "
-                              "the sub-bass and, in some games, everything above 8-12 kHz. Pick "
-                              "the voice chat your game is built on and they're shaped to survive "
-                              "it: the lost bass becomes harmonics that get through, each sound "
-                              "gets back the level the bass took, and you hear the same thing "
-                              "they do. Off sends them exactly as mixed.")
+                              "Voice chat squashes your sounds: mono, no deep bass, and in some "
+                              "games nothing above 8-12 kHz. Pick where people hear you and "
+                              "they're shaped to get through it. Game and Voice chat work out "
+                              "the exact voice chat by themselves; Clean sends them exactly as "
+                              "mixed; Advanced lets you pick it yourself.")
         from soundboard.ui.destpanel import DestPanel
         dest = DestPanel(self.mw)
         dest.chk_gate.setText("Mute mic during sounds")

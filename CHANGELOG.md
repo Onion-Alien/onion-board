@@ -23,6 +23,13 @@
   - Less CPU while idle, in the in-game overlay (none for paused sounds), on the
     Apps tab while hidden or behind a game, and in the setup guide. Bun in
     headphones rests between notes.
+- **Simpler sound modes:** *Who's listening* is now four modes: **Game**, **Voice
+  chat**, **Clean** and **Advanced**. Game and Voice chat work out the exact voice
+  chat by themselves (the game's own voice engine, or the app listening to the
+  virtual cable) and shape your sounds for it; Clean sends them exactly as mixed;
+  Advanced is the full list and your custom modes, as before. *What do these do?*
+  explains each one and what it's doing right now, and every mode's tooltip says
+  it too. Your old choice carries over, and older versions still read it.
 
 ## 1.8.0 — 2026-10-05
 
