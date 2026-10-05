@@ -79,6 +79,91 @@ def test_drawing_the_world_lets_the_audio_threads_run(qapp):
     assert max(gaps) < 0.010, f"held up {max(gaps) * 1000:.0f} ms"
 
 
+def audio_late_while(work):
+    """How late the real cable callback (a looping song and the radio playing) was at
+    worst while work() ran on this thread, on a 10 ms schedule like a device's."""
+    import sys
+
+    import sounddevice as sd
+
+    from soundboard.app import SWITCH_S
+    from soundboard.engine import Engine
+    e = Engine()
+    e.main_stream = e.mon_stream = object()    # stands in for open outputs: no device
+    t = np.arange(48000 * 5) / 48000
+    x = 0.3 * np.sin(2 * np.pi * 330 * t)
+    e.play("song", (np.stack([x, x], 1) * 32767).astype(np.int16), 0.5, loop=True)
+    e.radio_live = True
+    took, stop = [], threading.Event()
+
+    def audio():
+        out = np.zeros((480, 2), np.float32)
+        due = time.perf_counter()
+        while not stop.is_set():
+            due += 0.01
+            time.sleep(max(0.0, due - time.perf_counter()))
+            if e.ring_rmain.count < 4800:
+                e.ring_rmain.write(np.full((4800, 2), 0.05, np.float32))
+            e._cb_main(out, 480, None, sd.CallbackFlags())
+            took.append(time.perf_counter() - due)   # finished this long after it was due
+
+    old = sys.getswitchinterval()
+    sys.setswitchinterval(SWITCH_S)
+    th = threading.Thread(target=audio, daemon=True)
+    th.start()
+    try:
+        time.sleep(0.05)
+        work()
+        time.sleep(0.03)
+    finally:
+        stop.set()
+        th.join()
+        sys.setswitchinterval(old)
+    assert e.voices and not any(e.cb_errors.values())
+    return max(took)
+
+
+def test_a_new_zoom_is_drawn_in_slices_beside_the_audio(qapp):
+    """Every call under 1 ms still made the cable 10-20 ms late as a station started
+    (the map flies to it): the audio thread waits out one draw call per numpy step,
+    and the new zoom's world was 20-40 ms of them in a row. Now a slice at a time,
+    the old picture showing meanwhile, and the same picture at the end."""
+    rings, labels = outlines()
+    m = world_map(rings, labels, zoom=1.0)
+    m.show()
+    m.grab()                                   # the first picture: all of it at once
+    first = m._world[1]
+    m.zoom = 2.5
+    shown = m._world_pixmap(m.devicePixelRatioF())
+    assert shown is first and m._build is not None      # the old one, while it's drawn
+
+    def fly_about():
+        for zoom in (2.2, 2.4, 2.6, 2.8):   # each a whole-world picture (WORLD_MAX_PX)
+            m.zoom = zoom
+            m._world_pixmap(m.devicePixelRatioF())
+            end = time.monotonic() + 5
+            while m._build is not None and time.monotonic() < end:
+                qapp.processEvents()
+                time.sleep(0.0005)   # the event loop waiting (without Python's lock)
+
+    worst = audio_late_while(fly_about)
+    assert m._build is None and m._world[1] is not first
+    assert worst < 0.006, f"the cable was {worst * 1000:.0f} ms late"
+    sliced = m._world[1].toImage()
+    m._world = None
+    whole = m._world_pixmap(m.devicePixelRatioF()).toImage()   # all at once
+    a = np.frombuffer(sliced.constBits(), np.uint8)
+    b = np.frombuffer(whole.constBits(), np.uint8)
+    assert a.shape == b.shape and np.array_equal(a, b)
+    m.zoom = 2.3
+    m._world_pixmap(m.devicePixelRatioF())
+    m.hide()
+    qapp.processEvents()
+    time.sleep(0.01)
+    qapp.processEvents()
+    assert m._build is None                    # off screen: not drawn after all
+
+
 def test_the_decoder_is_loaded_off_the_ui_thread_once(qapp, monkeypatch):
     """Qt loaded FFmpeg (avcodec and co, tens of MB) as the first station started, on
     the UI thread and holding Python's lock: 10-60 ms, and the sounds playing skipped."""

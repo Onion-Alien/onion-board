@@ -51,6 +51,10 @@ CH = 2
 FADE_S = 0.010  # fade when a sound is stopped early (no clicks)
 STALL_S = 1.5   # a stream whose callback hasn't run for this long is dead: reopen it
 RETRY_S = 5.0   # how often to retry a device that failed to open
+# What each Audio buffering choice asks PortAudio for. Windows' shared mode never goes
+# below its own 10 ms period, so 'low' and PortAudio's 'high' (10 ms) both came out as
+# 22 ms with ~10 ms to spare per block; asking for a number buys real room.
+BUFFER = {"low": "low", "high": 0.04}
 I16_SCALE = np.float32(1 / 32767.0)   # int16 sound data -> float
 CACHE_BUDGET = 512 << 20               # bytes of resampled copies kept for non-48 kHz devices
 # the app's own playback: the test recording, cue beeps, the setup wizard's tune. With
@@ -788,7 +792,7 @@ class Engine:
         if chans < CH:
             raise RuntimeError("mono output devices aren't supported")
         s = sd.OutputStream(device=idx, samplerate=rate, channels=CH, dtype="float32",
-                            latency=self.latency, callback=callback)
+                            latency=BUFFER.get(self.latency, "low"), callback=callback)
         self._last_cb[key] = time.monotonic()
         try:
             s.start()
@@ -899,7 +903,8 @@ class Engine:
                 rate = self._native_rate(idx)
                 chans = min(2, sd.query_devices(idx)["max_input_channels"])
                 s = sd.InputStream(device=idx, samplerate=rate, channels=chans, dtype="float32",
-                                   latency=self.latency, callback=self._cb_mic)
+                                   latency=BUFFER.get(self.latency, "low"),
+                                   callback=self._cb_mic)
                 # the mic callback resamples with these from its first block, so they're
                 # set before start (cheap: no ring is touched) and undone if it fails
                 if rate != old_rate:
