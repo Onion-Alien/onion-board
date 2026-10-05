@@ -912,7 +912,7 @@ class SteamGuide(QDialog):
             "<li style='margin-bottom:8px'>Click <b>Start microphone test</b> and play a "
             "sound in Onion Board. You should hear it back.</li>"
             "<li style='margin-bottom:8px'>On the Setup tab, set <b>Who's listening</b> "
-            "to <b>Steam voice</b>.</li>"
+            "to <b>Advanced</b>, then <b>Steam voice</b>.</li>"
             "<li>Restart the game if it was already open.</li>"
             "</ol>"))
         v.addWidget(_label(

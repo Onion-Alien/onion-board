@@ -327,14 +327,11 @@ class GameGuide(QDialog):
             "games send only speech on it, never music. Some games' anti-cheat ignores "
             "keys other programs press: if your mic doesn't open for a sound, "
             "<b>hold your push-to-talk key yourself</b> while it plays.</li>"
-            "<li>On the Setup tab, set <b>Who's listening</b> to the voice chat your game "
-            "is built on, so your sounds are shaped for it: <b>Vivox</b> (Valorant, "
-            "League of Legends, Rainbow Six Siege, Overwatch 2), <b>Epic Online "
-            "Services</b> (Fortnite), <b>Steam voice</b> (CS2, Dota 2), <b>Unity "
-            "voice</b> (Phasmophobia, Lethal Company) or <b>Low bandwidth</b> for older "
-            "and console titles. Not sure? Start the game and switch back: the picker "
-            "names the engine when it can tell. Otherwise <b>Vivox</b> suits most "
-            "games.</li></ol>"))
+            "<li>On the Setup tab, set <b>Who's listening</b> to <b>Game</b>. While the "
+            "game is open it recognises Vivox and Unity voice chat and shapes your "
+            "sounds for it by itself. For <b>Steam voice</b> (CS2, Dota 2), <b>Epic "
+            "Online Services</b> (Fortnite) or <b>Low bandwidth</b> (older and console "
+            "titles), choose <b>Advanced</b> and pick it.</li></ol>"))
         row = QHBoxLayout()
         copy = QPushButton("Copy the mic name")
         icons.set_icon(copy, "copy")
@@ -384,9 +381,8 @@ class MeetingGuide(QDialog):
             f"Guilded in a web page): the call's own settings → Microphone: {mic}, and "
             "turn off <b>Noise cancellation</b> / <b>noise suppression</b> where the site "
             "has it.</li>"
-            "<li>On the Setup tab, set <b>Who's listening</b> to <b>Browser, Zoom, "
-            "Teams</b>. With <b>Pick the mode by "
-            "itself</b> ticked it switches when the call starts.</li></ol>"))
+            "<li>On the Setup tab, set <b>Who's listening</b> to <b>Voice chat</b>. It "
+            "picks the browser shaping by itself once the call is listening.</li></ol>"))
         row = QHBoxLayout()
         copy = QPushButton("Copy the mic name")
         icons.set_icon(copy, "copy")

@@ -30,7 +30,7 @@ from soundboard.engine import SR, Engine
 from soundboard.engine import is_virtual as is_virtual_cable
 from soundboard import (appaudio, autostart, backup, destination, library, midi, remote,
                         otherboards, soundfx, thumbs, trash, updates, videos, voicesdk)
-from soundboard import net, netlog, quality, shellicon, tor, watchaddon
+from soundboard import net, netlog, profiles, quality, shellicon, tor, watchaddon
 from soundboard.replay import InstantReplay
 from soundboard.library import (AUDIO_EXTS, PAD_COLORS, RESOURCE_DIR, Config, SoundMeta,
                                 cache_keep, clean_tags, duplicate, fingerprint,
@@ -324,6 +324,8 @@ class MainWindow(QMainWindow):
         # which voice chat the game you're playing uses: a hint by Who's listening
         self.voice_suggestion: str | None = None
         self.voice_why = ""   # why it's suggested, for the hint ("Discord is listening…")
+        self.voice_hints: list[profiles.Hint] = []   # everything seen, for the simple modes
+        self.mode_why = ""    # why the simple mode picked the shaping it uses
         self.listeners = voicesdk.Listeners() if sys.platform == "win32" else None
         self.voice_watch = voicesdk.Watcher() if sys.platform == "win32" else None
         self._voice_timer = QTimer(self)
@@ -1192,9 +1194,9 @@ class MainWindow(QMainWindow):
         lcol.addWidget(devcard)
 
         # ---- who's listening: shape the sounds for the voice chat on the other end
-        destcard, dv = card("WHO'S LISTENING", "Where people hear you. Your sounds are "
-                                               "shaped to come through that voice chat's "
-                                               "compression clearly.", roomy=True)
+        destcard, dv = card("WHO'S LISTENING", "Where people hear you: a game, a voice "
+                                               "chat app, or a stream. Your sounds are "
+                                               "shaped to come through clearly.", roomy=True)
         from soundboard.ui.destpanel import DestPanel
         self.dest_panel = DestPanel(self)
         dv.addWidget(self.dest_panel)
@@ -1836,6 +1838,7 @@ class MainWindow(QMainWindow):
         d = self.cfg.dest if isinstance(self.cfg.dest, dict) else {}
         now = time.monotonic()
         if (not self._ui_live and not d.get("auto")
+                and not profiles.auto_picks(profiles.current(d))
                 and now - self._voice_at < VOICE_POLL_IDLE_S):
             return
         self._voice_at = now
@@ -1843,33 +1846,58 @@ class MainWindow(QMainWindow):
 
     def _poll_voice(self):
         """Which Who's listening mode suits: the program recording the cable's far end
-        (voicesdk.Listeners), else the voice engine of the game in front. Switches to it
-        when the picker's *Pick the mode by itself* is ticked."""
+        (voicesdk.Listeners), else the voice engine of the game in front. The simple
+        modes (soundboard.profiles) pick within their family from all of it; in
+        Advanced, *Pick the mode by itself* switches to the one suggested."""
         key = self.voice_watch.poll() if self.voice_watch is not None else None
         why = (f"The game you have open uses {voicesdk.NAMES.get(key, key)} for voice "
                "chat") if key else ""
         heard = ()
         if self.listeners is not None:
             heard = self.listeners.poll(eng.virtual_mic_for(self._main_name()))
+        # for the simple modes, in order: voice chat apps on the cable, the game in
+        # front, games on the cable (a per-program list would go first)
+        apps = set(voicesdk.VOICE_APPS.values())
+        hints = [profiles.Hint(h[0], f"{h[1]} is listening to the virtual cable",
+                               profiles.VOICE.key) for h in heard if h in apps]
+        if key:
+            hints.append(profiles.Hint(key, why, profiles.GAME.key))
+        hints += [profiles.Hint(h[0], f"{h[1]} is listening to the virtual cable",
+                                profiles.GAME.key) for h in heard if h not in apps]
         if heard:   # the game in front, if it's one of them; else the first
             key, name = next((h for h in heard if h[0] == key), heard[0])
             why = f"{name} is listening to the virtual cable"
-        if key != self.voice_suggestion or why != self.voice_why:
-            self.voice_suggestion, self.voice_why = key, why
+        if (key != self.voice_suggestion or why != self.voice_why
+                or hints != self.voice_hints):
+            self.voice_suggestion, self.voice_why, self.voice_hints = key, why, hints
             self._auto_dest()
             self.voice_engine.emit(key)
 
     def _auto_dest(self):
-        """*Pick the mode by itself*: the suggested mode, as soon as it's suggested.
-        Nothing listening keeps the mode it has."""
+        """Game and Voice chat: the shaping that suits what's seen, as soon as it's
+        seen. Advanced with *Pick the mode by itself*: the suggested mode. Nothing seen
+        keeps the mode it has."""
         d = self.cfg.dest if isinstance(self.cfg.dest, dict) else {}
+        self.cfg.dest = d
+        p = profiles.current(d)
+        if profiles.auto_picks(p):
+            was = destination.resolve(d).key
+            key, self.mode_why = profiles.choose(p, self.voice_hints, was)
+            if key == was:
+                return
+            d["simple"], d["mode"] = p.key, key
+            mode = destination.apply(self.cfg, self.engine)
+            self._save_later()
+            log.info("who's listening: %s mode switched to %s (%s)", p.key, key,
+                     self.mode_why)
+            self.toast(f"{p.label} mode: shaping for {mode.label}. {self.mode_why}.")
+            return
         key = self.voice_suggestion
         if not d.get("auto") or key not in destination.BUILTIN_BY_KEY:
             return
         if destination.resolve(d).key == key:
             return
         d["mode"] = key
-        self.cfg.dest = d
         mode = destination.apply(self.cfg, self.engine)
         self._save_later()
         log.info("who's listening: switched to %s (%s)", key, self.voice_why)
