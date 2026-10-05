@@ -28,8 +28,8 @@ from dataclasses import asdict, dataclass
 
 from PySide6.QtCore import (QEasingCurve, QPoint, QPointF, QPropertyAnimation, QRect, QRectF,
                             QEvent, QObject, QSize, Qt, QTimer)
-from PySide6.QtGui import (QColor, QFont, QGuiApplication, QPainter, QPainterPath, QPen,
-                           QPolygonF)
+from PySide6.QtGui import (QColor, QFont, QFontMetrics, QGuiApplication, QPainter, QPainterPath,
+                           QPen, QPolygonF)
 from PySide6.QtWidgets import QApplication, QWidget
 
 from soundboard import theme, winkeys
@@ -697,14 +697,20 @@ class OverlayWindow(QWidget):
         title = f"Page {ov.page + 1} of {n}" if n > 1 else "Sounds"
         if cat:
             title = f"{cat}  ·  {title}" if n > 1 else cat
-        p.drawText(head, Qt.AlignLeft | Qt.AlignVCenter, title)
+        hint = f"{key_label(ks['prev'])}  ‹  ›  {key_label(ks['next'])}" if n > 1 else ""
+        small = QFont(f)
+        small.setBold(False)
+        small.setPointSizeF(8.5)
+        # a long category name ran into the page keys: it's cut with "…" before them
+        room = head.width() - (QFontMetrics(small).horizontalAdvance(hint) + 12 if hint else 0)
+        p.drawText(head, Qt.AlignLeft | Qt.AlignVCenter,
+                   p.fontMetrics().elidedText(title, Qt.ElideRight, max(0, int(room))))
         f.setBold(False)
         f.setPointSizeF(8.5)
         p.setFont(f)
         p.setPen(QColor(T["muted"]))
-        if n > 1:
-            p.drawText(head, Qt.AlignRight | Qt.AlignVCenter,
-                       f"{key_label(ks['prev'])}  ‹  ›  {key_label(ks['next'])}")
+        if hint:
+            p.drawText(head, Qt.AlignRight | Qt.AlignVCenter, hint)
 
         # tiles
         now = time.monotonic()

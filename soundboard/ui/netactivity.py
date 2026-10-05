@@ -25,6 +25,7 @@ from PySide6.QtWidgets import (QAbstractItemView, QApplication, QButtonGroup, QC
                                QTableWidgetItem, QVBoxLayout, QWidget)
 
 from soundboard import netlog, theme
+from soundboard.ui import fit
 
 REFRESH_MS = 1000
 _TOR = ("Tor's own connections to the Tor network aren't listed one by one: with Tor, "
@@ -406,6 +407,7 @@ class LogDialog(QDialog):
 
     def __init__(self, text: str, parent: QWidget | None = None):
         super().__init__(parent)
+        fit.watch(self)   # grows to fit its text (ui/fit.py)
         self.setWindowTitle("Network activity log (this run, not saved)")
         self.resize(820, 520)
         v = QVBoxLayout(self)
@@ -430,6 +432,7 @@ class TotalsDialog(QDialog):
 
     def __init__(self, parent: QWidget | None = None):
         super().__init__(parent)
+        fit.watch(self)   # grows to fit its text (ui/fit.py)
         self.setWindowTitle("Network activity totals")
         self.resize(820, 520)
         v = QVBoxLayout(self)

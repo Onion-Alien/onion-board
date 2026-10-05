@@ -37,6 +37,7 @@ from soundboard import errors
 
 CUSTOM = "Custom"
 TILE_ART = 30     # px: a voice tile's picture (when there is one, see ui/art.py)
+TILE_MAX_W = 210  # px: a voice tile at its widest
 LIVE_MODULE = "live-voice"
 IDLE_HINT = "Press Start, then just talk."
 MODELS = [("Fast (base.en)", "base.en"), ("Fastest (tiny.en)", "tiny.en"),
@@ -220,6 +221,15 @@ class ParamSlider(QWidget):
     def _moved(self, _v):
         self._label()
         self.changed.emit()
+
+
+def _enable(w, on: bool, why: str = ""):
+    """setEnabled, and while it's off a tooltip saying why (a greyed control with no
+    reason looked broken); its own tooltip comes back once it's on again."""
+    if w.property("_tip") is None:
+        w.setProperty("_tip", w.toolTip())
+    w.setEnabled(on)
+    w.setToolTip(w.property("_tip") if on or not why else why)
 
 
 # the app's own line icons (ui/icons.py), like everywhere else
@@ -488,7 +498,7 @@ class VoiceFxPanel(QWidget):
         self.btn_random.setIcon(art.random_icon())
         self.btn_random.setIconSize(QSize(TILE_ART, TILE_ART))
         self.btn_random.setProperty("art", True)
-        self.btn_random.setMaximumWidth(210)
+        self.btn_random.setMaximumWidth(TILE_MAX_W)
         self.btn_random.setCursor(Qt.PointingHandCursor)
         self.btn_random.setToolTip("A random silly mix of effects, as “My own mix”. All effects "
                                    "opens with what it changed lit up. Click again for "
@@ -677,7 +687,7 @@ class VoiceFxPanel(QWidget):
     def _make_tile(self, name: str, title: str, pic, line_icon: str) -> QPushButton:
         """A checkable voice tile: its picture when there is one (ui/art.py), else a
         line icon."""
-        b = QPushButton(title)
+        b = QPushButton()
         if pic is not None:
             b.setIcon(pic)
             b.setIconSize(QSize(TILE_ART, TILE_ART))
@@ -686,7 +696,15 @@ class VoiceFxPanel(QWidget):
             icons.set_icon(b, line_icon, size=18)
         b.setObjectName("voicetile")
         b.setCheckable(True)
-        b.setMaximumWidth(210)
+        b.setMaximumWidth(TILE_MAX_W)
+        # a saved voice's name (up to 32 characters) was cut mid-word at the tile's
+        # edge, and an "&" in it vanished (Qt reads it as a shortcut marker)
+        room = TILE_MAX_W - b.iconSize().width() - 40
+        shown = b.fontMetrics().elidedText(title, Qt.ElideRight, room)
+        b.setText(shown.replace("&", "&&"))
+        b.setAccessibleName(title)
+        if shown != title:
+            b.setToolTip(title)
         b.setCursor(Qt.PointingHandCursor)
         b.clicked.connect(lambda _=False, n=name: self.pick(n))
         self.tiles.addButton(b)
@@ -1572,7 +1590,8 @@ class SpeechPanel(QWidget):
             self.b_dl.show()
             # downloading voices switched off in Settings > Privacy: greyed, saying why
             self.b_dl.setEnabled(not live and net.allowed("voices"))
-            self.b_dl.setToolTip("" if net.allowed("voices") else net.off_message("voices"))
+            self.b_dl.setToolTip(net.off_message("voices") if not net.allowed("voices") else
+                                 "Stop the computer voice to download this" if live else "")
             return
         self.b_dl_remove.setVisible(not live)
         if not self.ctl.tts.voices:        # still loading, or no speech at all
@@ -1701,8 +1720,8 @@ class SpeechPanel(QWidget):
         if m is None or self._dl_busy is not None:
             return
         self._dl_busy, self._dl_cancel = m, False
-        self.cb_lang.setEnabled(False)
-        self.b_live.setEnabled(False)
+        _enable(self.cb_lang, False, "Waiting for the download to finish")
+        _enable(self.b_live, False, "Waiting for the download to finish")
         self._refresh_translation()
         self.lbl_tr.setText(f"Downloading {m.language_name}\u2026 0%")
         netlog.cause("voices", f"You downloaded the {m.language_name} translation model")
@@ -1735,8 +1754,8 @@ class SpeechPanel(QWidget):
 
     def _on_dl_done(self, err: str):
         m, self._dl_busy = self._dl_busy, None
-        self.cb_lang.setEnabled(not self.ctl.live)
-        self.b_live.setEnabled(not self._installing)
+        _enable(self.cb_lang, not self.ctl.live, "Stop the computer voice to change this")
+        _enable(self.b_live, not self._installing, "Waiting for the install to finish")
         self.b_dl_cancel.setEnabled(True)
         self._fill_langs()
         if err and m is not None:
@@ -1814,9 +1833,9 @@ class SpeechPanel(QWidget):
         self._installing = False
         self.b_install.setEnabled(True)
         self.b_install.setText("Install speech recognition")
-        self.b_update.setEnabled(not self.ctl.live)
+        _enable(self.b_update, not self.ctl.live, "Stop the computer voice to change this")
         self.b_update.setText("Update speech recognition")
-        self.b_live.setEnabled(self._dl_busy is None)
+        _enable(self.b_live, self._dl_busy is None, "Waiting for the download to finish")
         if ok:
             self.lbl_install.hide()
             self._refresh_module()
@@ -1858,8 +1877,10 @@ class SpeechPanel(QWidget):
         self.b_live.setText("Stop the computer voice" if on else "Start talking as the voice")
         self.live_changed.emit(on)
         for w in (self.cb_model, self.ed_lang, self.cb_lang):
-            w.setEnabled(not on)
-        self.b_update.setEnabled(not on and not self._installing)
+            _enable(w, not on, "Stop the computer voice to change this")
+        _enable(self.b_update, not on and not self._installing,
+                "Stop the computer voice to change this" if on
+                else "Waiting for the install to finish")
         self.lbl_state.setText(state)
         self._refresh_translation()
 

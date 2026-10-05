@@ -15,6 +15,7 @@ from PySide6.QtWidgets import (QDialog, QHBoxLayout, QLabel, QPlainTextEdit, QPu
                                QVBoxLayout)
 import shiboken6
 
+from soundboard.ui import fit
 from soundboard.updates import REPO
 
 ISSUE_URL = f"https://github.com/{REPO}/issues/new"
@@ -32,6 +33,7 @@ def issue_url(title: str) -> str:
 class CrashDialog(QDialog):
     def __init__(self, rep, log_path: Path | None, parent=None):
         super().__init__(parent)
+        fit.watch(self)   # grows to fit its text (ui/fit.py)
         self.rep, self.log_path = rep, log_path
         self.setWindowTitle("Onion Board hit a problem")
         self.setAttribute(Qt.WidgetAttribute.WA_DeleteOnClose)
