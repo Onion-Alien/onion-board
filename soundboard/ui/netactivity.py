@@ -26,6 +26,7 @@ from PySide6.QtWidgets import (QAbstractItemView, QApplication, QButtonGroup, QC
 
 from soundboard import netlog, theme
 from soundboard.ui import fit
+from soundboard.ui.panel import Flow
 
 REFRESH_MS = 1000
 _TOR = ("Tor's own connections to the Tor network aren't listed one by one: with Tor, "
@@ -187,22 +188,16 @@ class NetActivity(QWidget):
         row.addStretch(1)
         v.addLayout(row)
 
-        # Copy and Clear beside the summary (it wraps), not after the view buttons: all
-        # four in a row made the Connection page wider than a small Settings window
-        row = QHBoxLayout()
         self.summary = QLabel()
         self.summary.setObjectName("hint")
         self.summary.setWordWrap(True)
-        row.addWidget(self.summary, 1)
+        v.addWidget(self.summary)
         self.copy = QPushButton("Copy")
         self.copy.setToolTip("Copy the detailed list as text. It shows the sites you used: "
                              "read it before sharing it")
         self.clear = QPushButton("Clear")
         self.clear.setToolTip("Forget the list so far (and the saved history, if "
                               "it's kept)")
-        row.addWidget(self.copy)
-        row.addWidget(self.clear)
-        v.addLayout(row)
 
         self.servers = _table(["Server", "Why", "Used for", "Connections", "Data",
                                "Last"], 1)
@@ -227,16 +222,16 @@ class NetActivity(QWidget):
         self.stack.addWidget(detail)
         v.addWidget(self.stack)
 
-        # under the table, on their own row: beside either row above, the page got
-        # wider than a small Settings window
-        row = QHBoxLayout()
+        # all four under the table, on the left like every other card's buttons, wrapping
+        # in a small Settings window (Copy and Clear far right beside the summary looked
+        # out of line with Totals and Open log)
+        row = Flow(gap=8)
         self.totals = QPushButton("Totals…")
         self.totals.setToolTip("How much data went to each site, added up over the whole "
                                "history")
         self.open_log = QPushButton("Open log")
-        row.addWidget(self.totals)
-        row.addWidget(self.open_log)
-        row.addStretch(1)
+        for b in (self.copy, self.clear, self.totals, self.open_log):
+            row.addWidget(b)
         v.addLayout(row)
 
         self.simple.toggled.connect(self._mode)
