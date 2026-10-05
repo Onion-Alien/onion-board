@@ -7,7 +7,7 @@ Or send it to your stream, or keep it to your own headphones.
 ## ⬇️ [Download Onion Board for Windows](../../releases/latest/download/OnionBoardSetup.exe)
 
 <!-- release -->
-Version **1.7.1** · Windows 10 / 11 · free, no account, no ads, no tracking ·
+Version **1.7.2** · Windows 10 / 11 · free, no account, no ads, no tracking ·
 [VirusTotal: 68 of 68 clean](https://www.virustotal.com/gui/file/2115334287abfef0051c8d21437265cbffe877f004254eddb15d38dfe537c21a) ·
 [what's new](CHANGELOG.md)
 <!-- /release -->
@@ -41,12 +41,14 @@ The full list is in [docs/FEATURES.md](docs/FEATURES.md).
 
 ## 📱 Your pads on your phone
 
-<img align="right" width="220" src="https://raw.githubusercontent.com/Onion-Alien/onion-pocket/main/docs/screenshots/phone.png" alt="Onion Pocket on a phone: colourful pads by category, two playing, Stop all and the volume at the bottom">
+<img align="right" width="220" src="https://raw.githubusercontent.com/Onion-Alien/onion-pocket/main/docs/screenshots/phone.png" alt="Onion Pocket on a phone: colourful pads by category, two playing, Stop all and the volume, and the Pads, Radio and Sound tabs at the bottom">
 
 With the free **[Onion Pocket](https://github.com/Onion-Alien/onion-pocket)** add-on,
 your phone becomes a remote for your board. Scan a QR code on your PC with your
 phone's camera, tap a pad, and it plays on the PC, into Discord or your game like
-any other pad.
+any other pad. Its **Radio** tab runs the radio (your favourites, popular stations,
+search, live or just for you) and its **Sound** tab changes the speed, pitch, bass
+and effects of what's playing, and who's listening.
 
 - **Nothing to download on your phone.** It opens in the phone's browser, on iPhone
   or Android. No app, no account.
@@ -55,8 +57,8 @@ any other pad.
 - **Safe by default.** It's off until you switch it on, and only phones on your own
   Wi-Fi can reach it, with their own key from the QR code. *Forget phones* locks
   them all out again.
-- **It can't touch your mic.** A phone can play, stop and pause sounds, change the
-  volume and the category, and mute you. Never your mic, the voice changer or
+- **It can't touch your mic.** A phone can play your pads, run the radio, change the
+  live speed, pitch and effects, and mute you. Never your mic, the voice changer or
   your files.
 - Windows asks once to let phones through its firewall; that rule only covers your
   home network. Use it at home rather than on public Wi-Fi.

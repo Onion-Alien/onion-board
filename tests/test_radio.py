@@ -1128,3 +1128,58 @@ def test_saved_station_list_is_still_plain_json(tmp_path):
     assert [s["uuid"] for s in raw["stations"]] == [s.uuid for s in stations]
     assert abs(raw["time"] - time.time()) < 60
     assert [s.uuid for s in d._read_cache()[1]] == [s.uuid for s in stations]
+
+
+def test_phone_remote_lists_searches_and_drives_the_radio(qapp, tab, server, monkeypatch):
+    """soundboard.remote's radio actions, on the tab itself: what a phone sees and does."""
+    from types import SimpleNamespace
+
+    from soundboard import remote
+    played = []
+    monkeypatch.setattr(tab.player, "play", lambda s: (played.append(s.uuid),
+                                                      setattr(tab.player, "station", s)))
+    monkeypatch.setattr(tab.player, "stop", lambda: setattr(tab.player, "station", None))
+    mw = SimpleNamespace(radio=tab, engine=tab.engine)
+    d = lambda action, **p: remote.dispatch_radio(mw, action, p)   # noqa: E731
+
+    st, body = d("stations", list="popular")
+    assert st == 200 and len(body["stations"]) == 5 and not body["loading"]
+    assert d("stations", list="favorites")[1]["stations"] == []
+    assert d("stations", list="sideways")[0] == 400
+    assert remote.radio_state(mw)["on"] is False
+    assert d("radio")[0] == 404                       # nothing has played yet
+
+    st, state = d("radio", id="uuid-2")
+    assert st == 200 and played == ["uuid-2"] and state["station"]["id"] == "uuid-2"
+    assert d("radio", id="nope")[0] == 404
+    assert d("stations", list="recent")[1]["stations"][0]["playing"] is True
+    assert d("radio_star") == (200, {"id": "uuid-2", "fav": True})   # the one playing
+    assert d("radio_star", on="1")[1]["fav"] is True                 # already: stays
+    assert [s["id"] for s in d("stations", list="favorites")[1]["stations"]] == ["uuid-2"]
+    assert tab.cfg.radio["favorites"][0]["uuid"] == "uuid-2"
+
+    assert d("radio", on="0")[1]["on"] is False
+    assert d("radio", on="1")[1]["station"]["id"] == "uuid-2"         # the last one again
+    assert d("radio", on="maybe")[0] == 400
+    assert d("radio_random", list="favorites")[0] == 404              # only the one playing
+    assert d("radio_random", list="popular")[1]["station"]["id"] != "uuid-2"
+
+    assert d("radio_live", on="1")[1]["live"] is True and tab.btn_live.isChecked()
+    assert d("radio_hear", on="0")[1]["hear"] is False and tab.engine.radio_monitor is False
+    assert d("radio_volume", set="30")[1]["volume"] == 30
+    assert tab.engine.radio_vol == pytest.approx(0.3)
+    assert d("radio_volume", step="up")[1]["volume"] == 40
+
+    st, body = d("stations", list="search", q="japan")     # known here: at once
+    assert len(body["stations"]) == 5 and body["loading"]
+    st, body = d("stations", list="search", q="rock")
+    assert body["loading"] and body["stations"] == []
+    assert process_events(qapp, lambda: not d("stations", list="search",
+                                              q="rock")[1]["loading"])
+    assert [s["name"] for s in d("stations", list="search", q="rock")[1]["stations"]] == \
+        ["Rock Radio"]
+    assert tab._results is None and tab.search.text() == ""   # the tab's own search untouched
+    assert d("radio", id="uuid-9")[0] == 200                   # a station found that way plays
+
+    assert remote.dispatch_radio(SimpleNamespace(radio=object(), engine=tab.engine),
+                                 "radio", {}) == (409, remote.RADIO_OFF)

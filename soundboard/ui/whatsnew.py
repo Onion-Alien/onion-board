@@ -27,6 +27,14 @@ class Note:
 
 # newest first; add one per release that has something worth telling
 NOTES = (
+    Note("1.7.2", "The radio and the sound on your phone", (
+        ("radio", "Run the radio from your phone",
+         "Onion Pocket 0.2.0 has a Radio tab: your favourite, recent and popular stations "
+         "or a search, play and stop, a random station, go live, and the radio's volume."),
+        ("sliders", "Speed, pitch and effects too",
+         "Its Sound tab changes the speed, pitch, bass and effects of what's playing, and "
+         "who's listening. Stream Deck buttons can do all of it as well (/api/help)."),
+    ), "remote", "Open Remote"),
     Note("1.7.1", "Onion Pocket stays up to date", (
         ("cable", "Update Onion Pocket from Settings",
          "When a newer Onion Pocket is out, Settings → Remote offers it in one click. "

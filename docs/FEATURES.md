@@ -175,7 +175,8 @@ The full list. The [README](../README.md) has the short version and how to get s
   It only listens on this PC and needs the key shown there (*Copy link* gives a
   ready-made "play a random sound" link). Besides playing and stopping sounds it can
   mute you (a panic button), switch the voice changer and mic, change the volume and
-  category and save the instant replay; `/api/help` lists it all. New to it? The
+  category, save the instant replay, change the live speed, pitch and effects,
+  switch who's listening and run the radio; `/api/help` lists it all. New to it? The
   **Streamer guide** there walks through Stream Deck keys, channel points and chat
   commands (Streamer.bot), and **Copy AI prompt** gives ChatGPT / Claude everything
   it needs (the links, your sounds) to set up whatever tools you use with you.
