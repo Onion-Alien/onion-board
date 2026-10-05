@@ -49,8 +49,8 @@ The full list. The [README](../README.md) has the short version and how to get s
   one Windows permission prompt, then Discord and games hear your sounds through the
   mic they already use, with nothing to pick there; voice changer, mic volume, gate,
   ducking and mute all still work, and the Setup tab offers a one-click repair if a
-  Windows update takes it off), **the virtual cable** (the fallback; the installer
-  offers it, and Discord or the game uses its *CABLE Output* as a mic), **another device** (any output
+  Windows update takes it off), **the virtual cable** (the fallback; the Setup tab
+  and the installer offer it, unticked, and Discord or the game uses its *CABLE Output* as a mic), **another device** (any output
   but your headphones: Voicemeeter, a mixer, a capture card, a second sound card, any
   output OBS captures as an *Audio Output Capture*) or **nowhere** (only you hear your
   sounds, and the stream output if you set one). With another device the app never puts
@@ -146,7 +146,7 @@ The full list. The [README](../README.md) has the short version and how to get s
 - **Test mode:**
   - **Hear what they hear:** your mic plus the sounds exactly as others get them
     (a red banner shows while it's on).
-  - **Record 6s → play back:** records what goes out (the cable's output end, or the
+  - **Record 6s → play back:** records what goes out (your mic, the cable's output end, or the
     mix sent to another device), plays it back, and reports whether your voice and
     sounds are in it and whether the balance is off. Not available when sounds go
     nowhere.
@@ -208,7 +208,7 @@ The full list. The [README](../README.md) has the short version and how to get s
 
 ## How it works
 
-Straight into your mic (the default for new users):
+Straight into your mic (the default):
 
 ```
 🎤 your mic ──► Windows' audio engine ──► Onion Board's effect ──► Discord / game (same mic)

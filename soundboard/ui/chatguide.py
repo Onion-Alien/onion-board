@@ -19,7 +19,7 @@ from PySide6.QtCore import QObject, Qt, QTimer, Signal
 from PySide6.QtWidgets import (QApplication, QDialog, QHBoxLayout, QLabel, QPushButton,
                                QVBoxLayout)
 
-from soundboard import chatcheck, theme
+from soundboard import chatcheck, directmic, theme
 from soundboard.ui import busy, fit, icons
 from soundboard.ui.bunnywidget import BunnyWidget
 from soundboard.ui.crashdialog import free_dialog
@@ -71,7 +71,13 @@ def find_discord():
     return found[0] if found else None
 
 
-def result_html(res: dict, vm: str) -> str:
+def on_mic(mw) -> bool:
+    """Straight into my mic, and it's on the mic: voice apps keep the mic they have."""
+    cfg = mw.cfg
+    return cfg.route == "mic" and directmic.works(directmic.status(cfg.mic_device))
+
+
+def result_html(res: dict, vm: str, kept: bool = False) -> str:
     """What the check found, and what to switch in Discord for each finding."""
     ok, warn = _ok(), _warn()
     issues = res.get("issues", [])
@@ -84,7 +90,8 @@ def result_html(res: dict, vm: str) -> str:
     fixes = {
         "not_heard": (
             "Discord didn't play the test back. In Discord → <b>Voice &amp; Video</b>, set "
-            f"<b>Input Device</b> to <b>{vm}</b>, click <b>Let's Check</b> (the bar should "
+            f"<b>Input Device</b> to {'your normal mic, ' if kept else ''}<b>{vm}</b>, "
+            "click <b>Let's Check</b> (the bar should "
             "move when you play a sound here), then check again. If that's all set, noise "
             "suppression is removing your sounds completely: set <b>Input Profile</b> to "
             "<b>Studio</b>."),
@@ -267,10 +274,10 @@ class ChatCheck(QObject):
 class DiscordGuide(QDialog):
     """The Discord settings that matter for sounds, with the check built in."""
 
-    def __init__(self, parent, mw, vm: str):
+    def __init__(self, parent, mw, vm: str, kept: bool = False):
         super().__init__(parent)
         fit.watch(self)
-        self.mw, self.vm = mw, vm
+        self.mw, self.vm, self.kept = mw, vm, kept
         self.setWindowTitle("Discord — make your sounds come through clean")
         self.setMinimumWidth(640)
         v = QVBoxLayout(self)
@@ -285,8 +292,11 @@ class DiscordGuide(QDialog):
             "<ol style='margin-left:-20px'>"
             "<li style='margin-bottom:8px'>In Discord, click the ⚙ gear next to your name "
             "(<b>User Settings</b>) → <b>Voice &amp; Video</b>.</li>"
-            "<li style='margin-bottom:8px'><b>Input Device</b>: choose "
-            f"<b style='color:{_ok()}'>{html.escape(vm)}</b>.</li>"
+            + (f"<li style='margin-bottom:8px'><b>Input Device</b>: keep your normal mic "
+               f"(<b style='color:{_ok()}'>{html.escape(vm)}</b>). Your sounds are already "
+               "in it.</li>" if kept else
+               "<li style='margin-bottom:8px'><b>Input Device</b>: choose "
+               f"<b style='color:{_ok()}'>{html.escape(vm)}</b>.</li>") +
             "<li style='margin-bottom:8px'><b>Input Profile</b>: choose <b>Studio</b>. That "
             "switches off noise suppression, echo cancellation and automatic gain "
             "control in one go.<br><span style='font-size:9pt'>No Input Profile in your "
@@ -309,6 +319,7 @@ class DiscordGuide(QDialog):
         icons.set_icon(copy, "copy")
         copy.clicked.connect(lambda: (QApplication.clipboard().setText(vm),
                                       busy.flash(copy, "✓  Copied")))
+        copy.setVisible(not kept)   # straight into the mic: nothing to pick
         row.addWidget(copy)
         opn = QPushButton("Open Discord")
         opn.setToolTip("Opens Discord's Voice & Video settings")
@@ -356,7 +367,7 @@ class DiscordGuide(QDialog):
     def _checked(self, res: dict):
         busy.set_busy(self.btn_check, False)
         self.btn_check.setText("Check again")
-        self.result.setText(result_html(res, self.vm))
+        self.result.setText(result_html(res, self.vm, self.kept))
         self.result.show()
 
     def done(self, r):   # noqa: A003 - QDialog.done
@@ -368,7 +379,7 @@ class GameGuide(QDialog):
     """In-game voice chat (Valorant, Fortnite, Apex, Rust, … and consoles' party chat
     through a PC game): the same idea, in words that fit most games' menus."""
 
-    def __init__(self, parent, mw, vm: str):
+    def __init__(self, parent, mw, vm: str, kept: bool = False):
         super().__init__(parent)
         fit.watch(self)
         self.setWindowTitle("Game voice chat — make your sounds come through clean")
@@ -382,9 +393,12 @@ class GameGuide(QDialog):
             BunnyWidget("headphones")))
         v.addWidget(_label(
             "<ol style='margin-left:-20px'>"
-            f"<li style='margin-bottom:8px'><b>Microphone / Input device</b>: "
-            f"<b style='color:{_ok()}'>{html.escape(vm)}</b>. No such setting? Use "
-            "<b>Game has no microphone setting?</b> on the Setup tab.</li>"
+            + (f"<li style='margin-bottom:8px'><b>Microphone / Input device</b>: keep your "
+               f"normal mic (<b style='color:{_ok()}'>{html.escape(vm)}</b>). Your sounds "
+               "are already in it.</li>" if kept else
+               f"<li style='margin-bottom:8px'><b>Microphone / Input device</b>: "
+               f"<b style='color:{_ok()}'>{html.escape(vm)}</b>. No such setting? Use "
+               "<b>Game has no microphone setting?</b> on the Setup tab.</li>") +
             "<li style='margin-bottom:8px'>Turn <b>off</b> anything called <b>noise "
             "suppression</b>, <b>noise cancellation</b>, <b>denoiser</b>, <b>background "
             "sound removal</b>, <b>voice clarity</b> or <b>automatic gain</b>. The AI "
@@ -406,6 +420,7 @@ class GameGuide(QDialog):
         icons.set_icon(copy, "copy")
         copy.clicked.connect(lambda: (QApplication.clipboard().setText(vm),
                                       busy.flash(copy, "✓  Copied")))
+        copy.setVisible(not kept)   # straight into the mic: nothing to pick
         row.addWidget(copy)
         ptt = QPushButton("Auto push-to-talk…")
         ptt.clicked.connect(lambda: mw.open_settings("hotkeys"))
@@ -422,7 +437,7 @@ class MeetingGuide(QDialog):
     """Calls in other apps: Zoom, Microsoft Teams, and calls in a web page (Google
     Meet, Discord in a browser). Their menus differ, so each gets its own few lines."""
 
-    def __init__(self, parent, mw, vm: str):
+    def __init__(self, parent, mw, vm: str, kept: bool = False):
         super().__init__(parent)
         fit.watch(self)
         self.setWindowTitle("Zoom, Teams and browser calls — make your sounds come through "
@@ -433,7 +448,9 @@ class MeetingGuide(QDialog):
         v.setSpacing(12)
         v.addLayout(_header("Zoom, Teams and browser calls", _label(
             "Meeting apps clean up the mic for speech and treat music as background "
-            "noise. Pick the cable as the mic and turn that cleanup down:"),
+            "noise. " + ("Your sounds are already in your mic: keep it, and turn that "
+                         "cleanup down:" if kept else
+                         "Pick the mic below and turn that cleanup down:")),
             BunnyWidget("headphones")))
         mic = f"<b style='color:{_ok()}'>{html.escape(vm)}</b>"
         v.addWidget(_label(
@@ -457,6 +474,7 @@ class MeetingGuide(QDialog):
         icons.set_icon(copy, "copy")
         copy.clicked.connect(lambda: (QApplication.clipboard().setText(vm),
                                       busy.flash(copy, "✓  Copied")))
+        copy.setVisible(not kept)   # straight into the mic: nothing to pick
         row.addWidget(copy)
         row.addStretch(1)
         done = QPushButton("Done")
@@ -467,15 +485,19 @@ class MeetingGuide(QDialog):
 
 
 def show_guide(which: str, parent, mw, vm: str):
-    """Open one guide modally: 'discord', 'game', 'meeting' or 'steam'."""
+    """Open one guide modally: 'discord', 'game', 'meeting' or 'steam'. Straight into
+    the mic, the guides name the user's own mic (there's nothing to switch to)."""
+    kept = on_mic(mw)
+    if kept:
+        vm = mw.cfg.mic_device or "your mic"
     if which == "steam":
         from soundboard.ui.setupwizard import SteamGuide
         g = SteamGuide(parent, vm)
     elif which == "game":
-        g = GameGuide(parent, mw, vm)
+        g = GameGuide(parent, mw, vm, kept)
     elif which == "meeting":
-        g = MeetingGuide(parent, mw, vm)
+        g = MeetingGuide(parent, mw, vm, kept)
     else:
-        g = DiscordGuide(parent, mw, vm)
+        g = DiscordGuide(parent, mw, vm, kept)
     g.exec()
     free_dialog(g)

@@ -382,7 +382,7 @@ class SetupWizard(QDialog):
         self.btn_restart.hide()
         v.addWidget(self.btn_restart)
         # streamers and Voicemeeter / mixer users: send somewhere else instead
-        self.btn_other = QPushButton("I don't use the cable (Voicemeeter, OBS, a mixer…)")
+        self.btn_other = QPushButton("Send somewhere else (Voicemeeter, OBS, a mixer…)")
         self.btn_other.setToolTip("Send your sounds to another device instead, or nowhere "
                                   "(only you, and the stream output)")
         self.btn_other.clicked.connect(lambda: self._show_other(True))
@@ -507,7 +507,7 @@ class SetupWizard(QDialog):
         self.btn_back.setVisible(i > 0)
         self.timer.setInterval(TICK_MS if i == 0 else SLOW_TICK_MS)
         if i == 2:
-            self.cable_status.setText("Checking the cable…")
+            self.cable_status.setText("Checking…")
             self.cable_status.repaint()   # the check can take a moment (it may reopen devices)
             self.recheck_cable(rescan=False)
         elif i == 3:
@@ -730,7 +730,8 @@ class SetupWizard(QDialog):
             self.btn_recheck.show()
         else:
             self.cable_status.setText(f"<b style='color:{_bad()}'>Not installed yet.</b> "
-                                      "Without it, only you can hear your sounds.")
+                                      "Without it, only you can hear your sounds. Or put "
+                                      "them straight into your mic: nothing to install.")
             self.btn_cable.setText("⬇  Install it now (free)")
             self.btn_cable.show()
             self.btn_recheck.hide()

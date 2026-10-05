@@ -245,7 +245,7 @@ class DestPanel(QWidget):
         self.chk_auto = QCheckBox("Pick the mode by itself")
         self.chk_auto.setToolTip(
             "When Discord, TeamSpeak, Mumble or a game with a known voice chat is "
-            "listening to the virtual cable, use its mode without asking. With nothing "
+            "listening to your mic (or the cable), use its mode without asking. With nothing "
             "listening, the mode stays as it is.")
         av.addWidget(self.chk_auto)
         v.addWidget(self.advanced)

@@ -1017,8 +1017,9 @@ class SettingsDialog(QDialog):
         mw = self.mw
         card, cv = self._card("Devices",
                               "Your mic (input), where you listen (output) and where what "
-                              "others hear goes: the virtual cable, another device "
-                              "(Voicemeeter, OBS, a mixer) or nowhere. Plugged something "
+                              "others hear goes: straight into your mic, the virtual "
+                              "cable, another device (Voicemeeter, OBS, a mixer) or "
+                              "nowhere. Plugged something "
                               "in? Press Re-scan.")
         grid = QGridLayout()
         grid.setHorizontalSpacing(10)
@@ -1598,9 +1599,9 @@ class SettingsDialog(QDialog):
         "voice_servers": "Voices in your voices folder that are a server on the "
                          "internet. Ones on this PC (127.0.0.1) always work.",
         "setup_downloads": "The setup guide's Install button downloads VB-Cable (the "
-                           "virtual cable) from vb-audio.com. Not needed if you send to "
-                           "another device or nowhere. Off: install it yourself from "
-                           "there.",
+                           "virtual cable) from vb-audio.com. Not needed if your sounds go "
+                           "straight into your mic, to another device or nowhere. Off: "
+                           "install it yourself from there.",
         "tor_download": "Get Tor / Update Tor (Connection page) downloads Tor from the "
                         "Tor Project (dist.torproject.org). Off: a Tor that's already "
                         "here still works.",

@@ -11,7 +11,9 @@
 ;     again: the installer downloads those, the app stays offline; Tor is skipped,
 ;     since the app never starts it while offline)
 ;   - a "Pick what you want" page of checkboxes:
-;       * the free VB-Cable virtual cable (downloaded from vb-audio.com,
+;       * the free VB-Cable virtual cable, unticked: sounds go straight into the mic
+;         by default (soundboard/directmic.py, set up by the app's Quick setup), and
+;         the cable is only the fallback way (downloaded from vb-audio.com,
 ;         signature-checked by install-vbcable.ps1; Windows asks "Yes" once)
 ;       * FFmpeg for m4a / aac / video files (via winget; hidden when ffmpeg is
 ;         already there or winget isn't)
@@ -33,8 +35,8 @@
 ;     app's first start copies the sounds in. Silent installs only do it for the apps
 ;     /IMPORT= names (comma-separated keys: soundpad,resanance,soundux,expboard):
 ;     nobody saw the boxes
-;   - then opens Onion Board, whose Quick setup asks which mic they use and walks
-;     them through Discord
+;   - then opens Onion Board, whose Quick setup asks which mic they use, puts the
+;     sounds straight into it (Windows asks "Yes" once) and walks them through Discord
 ;
 ; Silent installs (/VERYSILENT) use each box's default, or the choices from the
 ; last install. /OFFLINE=1 is the Offline mode box: it also skips the boxes that
@@ -95,15 +97,15 @@ CloseApplications=yes
 
 [Messages]
 WelcomeLabel1=Let's set up Onion Board
-WelcomeLabel2=This puts Onion Board on your PC and can add the free "virtual cable", the pipe that lets Discord and your games hear your sounds (you can skip it if you'd rather send your sounds through Voicemeeter, a mixer or OBS).%n%nNext you'll see what it connects to online, then you can tick any extras you want. When Windows asks for permission, click Yes.%n%nDid Windows or your browser warn you before this opened ("Windows protected your PC", "not commonly downloaded")? That's normal for a free app that isn't code-signed, and you got past it fine. Next time: More info, then Run anyway.
+WelcomeLabel2=This puts Onion Board on your PC. Your sounds go straight into your own mic, so Discord and your games hear them without changing anything there. No virtual cable or extra driver to install.%n%nNext you'll see what it connects to online, then you can tick any extras you want. When Windows asks for permission, click Yes.%n%nDid Windows or your browser warn you before this opened ("Windows protected your PC", "not commonly downloaded")? That's normal for a free app that isn't code-signed, and you got past it fine. Next time: More info, then Run anyway.
 WizardSelectTasks=Pick what you want
 SelectTasksDesc=Tick what you'd like. If you're not sure, leave the boxes as they are.
 FinishedHeadingLabel=All done!
-FinishedLabel=Onion Board is installed. It will open now and ask you a few easy questions (which mic you use, where you listen, how your sounds reach Discord or your game).%n%nYou can find it later on your Desktop or in the Start menu.%n%nPrivacy: no account or ads. The only thing counted is the anonymous "still here" if you left Count me in ticked. Settings > Privacy & security shows everything the app does online, lets you switch those things off, and can send all of it through a proxy or Tor.
+FinishedLabel=Onion Board is installed. It will open now and ask you a few easy questions (which mic you use, where you listen), then put your sounds straight into that mic.%n%nYou can find it later on your Desktop or in the Start menu.%n%nPrivacy: no account or ads. The only thing counted is the anonymous "still here" if you left Count me in ticked. Settings > Privacy & security shows everything the app does online, lets you switch those things off, and can send all of it through a proxy or Tor.
 FinishedRestartLabel=Onion Board is installed. To finish setting up the virtual cable, Windows needs to restart your PC.%n%nAfter the restart, open Onion Board from the Start menu and it will pick up where it left off.
 
 [Tasks]
-Name: "vbcable"; Description: "The free virtual cable (VB-Cable), so Discord and games hear your sounds"; GroupDescription: "Needed for Discord and games (untick it if you use Voicemeeter, a mixer or OBS)"
+Name: "vbcable"; Description: "The free virtual cable (VB-Cable): only if you'd rather send sounds through a cable than your mic"; GroupDescription: "Other ways to send your sounds (optional)"; Flags: unchecked
 Name: "ffmpeg"; Description: "Play M4A, AAC and video files (the free FFmpeg, about 100 MB)"; GroupDescription: "Extra features (optional)"; Check: CanOfferFfmpeg
 Name: "livevoice"; Description: "Set up live voice-to-speech now (needs Python, about 300 MB)"; GroupDescription: "Extra features (optional)"; Flags: unchecked
 Name: "tor"; Description: "Private connection (Tor): hides your internet address (about 22 MB)"; GroupDescription: "Privacy (optional)"; Flags: unchecked
@@ -198,7 +200,7 @@ var
   OfflineApplied: Boolean;     // the download boxes were unticked for Offline mode
   PagesBottom: Integer;        // where the pages end (LayoutHeader keeps it)
   BunnyRight: Integer;         // the bunny's right edge in the header
-  CableTicked: Boolean;        // the cable box was ticked on the first visit
+  CableUnticked: Boolean;      // the cable box was unticked on the first visit
   Bunny: TBitmapImage;
   TorCaption: String;          // the Tor box's own caption (Offline mode replaces it)
   ImportPage: TWizardPage;     // "Bring your sounds over": only when one is found
@@ -503,16 +505,16 @@ begin
     WizardForm.NextButton.Caption := SetupMessage(msgButtonInstall);
   if (CurPageID <> wpSelectTasks) or WizardSilent then
     exit;
-  // The cable is how Discord and games hear the sounds by default: ticked on the first
-  // visit even if the last install unticked it (Inno remembers boxes). Installing skips
-  // a cable that works. Someone sending through another device unticks it.
-  if not CableTicked and not OfflineChosen then
-    WizardSelectTasks('vbcable');
-  CableTicked := True;
+  // The cable isn't needed (sounds go straight into the mic), so its box is unticked
+  // even if an old install ticked it (Inno remembers boxes); someone who wants the
+  // cable ticks it. Silent installs keep what the last install chose.
+  if not CableUnticked then
+    WizardSelectTasks('!vbcable');
+  CableUnticked := True;
   if OfflineChosen and not OfflineApplied then
     WizardSelectTasks('!vbcable,!ffmpeg,!livevoice,!tor')
   else if OfflineApplied and not OfflineChosen then
-    WizardSelectTasks('vbcable,ffmpeg');
+    WizardSelectTasks('ffmpeg');
   OfflineApplied := OfflineChosen;
   for I := 0 to WizardForm.TasksList.Items.Count - 1 do
     if (Pos('(Tor)', WizardForm.TasksList.ItemCaption[I]) > 0) then
@@ -677,7 +679,7 @@ begin
   begin
     if Mine = '1' then Default := MB_DEFBUTTON1 else Default := MB_DEFBUTTON2;
     if MsgBox('Also remove the virtual cable (VB-Cable)?' + #13#10#13#10 +
-        'Onion Board used it to send your sounds into Discord and games. Choose No if ' +
+        'Onion Board doesn''t need it (your sounds go straight into your mic). Choose No if ' +
         'another program uses it too (Voicemeeter, another soundboard...).' + #13#10#13#10 +
         'Windows will ask for permission, and may want a restart afterwards.',
         mbConfirmation, MB_YESNO or Default) = IDYES then

@@ -1108,7 +1108,7 @@ class MainWindow(QMainWindow):
         arrow.setObjectName("muted")
         self.flow_out = QLabel()
         for ic, w in (("mic", self.flow_mic), ("volume", self.flow_snd), ("", arrow),
-                      ("cable", self.flow_out)):
+                      ("live", self.flow_out)):   # mic or cable alike
             w.setTextFormat(Qt.RichText)
             w.setWordWrap(True)
             row = QHBoxLayout()
@@ -1172,7 +1172,7 @@ class MainWindow(QMainWindow):
         hv.addWidget(self.btn_nomic)
         guide = QPushButton("Step-by-step guide")
         guide.setToolTip("Walks you through mic, headphones, where your sounds go "
-                        "(the cable, another device or nowhere) and Discord")
+                        "(your mic, the cable, another device or nowhere) and Discord")
         icons.set_icon(guide, "check")
         guide.clicked.connect(self.run_setup)
         hv.addWidget(guide)
@@ -1190,9 +1190,10 @@ class MainWindow(QMainWindow):
         self.cb_route = QComboBox()
         for text, key in ROUTE_CHOICES:
             self.cb_route.addItem(text, key)
-        self.cb_route.setToolTip("Where what others hear goes. Not using the virtual cable? "
-                                 "Pick another device (Voicemeeter, a mixer, a device OBS "
-                                 "captures) or nowhere (only you, and the stream output).")
+        self.cb_route.setToolTip("Where what others hear goes: straight into your mic "
+                                 "(easiest), the virtual cable, another device (Voicemeeter, "
+                                 "a mixer, a device OBS captures) or nowhere (only you, and "
+                                 "the stream output).")
         self.main_row = []   # the "send into" row: relabelled or hidden with the route
         for r, (ic, text, cb) in enumerate((
                 ("live", "Send to others through", self.cb_route),
@@ -1853,8 +1854,9 @@ class MainWindow(QMainWindow):
             step = (f"<b style='color:{theme.status('warn')}'>"
                     "One-time setup:</b> install the free virtual "
                     "cable. It's what lets Discord and games hear your sounds — without it, "
-                    "only you can hear them. Use Voicemeeter, a mixer or OBS instead? Pick "
-                    "<b>Another device</b> under <b>Send to others through</b>.")
+                    "only you can hear them. Easier: pick <b>Straight into my mic</b> under "
+                    "<b>Send to others through</b> (nothing to install). Use Voicemeeter, a "
+                    "mixer or OBS? Pick <b>Another device</b> there.")
         elif vm and e.main_stream is not None:
             state = "ok"
             out = (f"<b style='color:{ok}'>{vm}</b> — your new mic "
@@ -1893,12 +1895,13 @@ class MainWindow(QMainWindow):
         self.btn_attach.setVisible(route == "cable" and not self._attaching)
         if route == "mic":
             self._cable_tip()
-        mic_side = state == "ok" and bool(vm)   # Discord / the game picks a mic: help with it
-        self.btn_nomic.setVisible(mic_side)
+        # Discord / the game picks a mic, or keeps its own one: help with its settings
+        mic_side = state == "ok" and (bool(vm) or route == "mic")
+        self.btn_nomic.setVisible(mic_side and route != "mic")   # (no mic to switch to)
         self.btn_chat.setVisible(mic_side)
         self.btn_game.setVisible(mic_side)
         self.btn_meeting.setVisible(mic_side)
-        self.btn_cablefix.setVisible(mic_side and bool(self.cable_bad))
+        self.btn_cablefix.setVisible(state == "ok" and bool(vm) and bool(self.cable_bad))
         # "off" was picked on purpose: it's set up, as far as the rest of the app goes
         self.setup_state = "ok" if state == "off" else state
         short = self._pill_short
@@ -2164,7 +2167,7 @@ class MainWindow(QMainWindow):
                                 profiles.GAME.key) for h in heard if h not in apps]
         if heard:   # the game in front, if it's one of them; else the first
             key, name = next((h for h in heard if h[0] == key), heard[0])
-            why = f"{name} is listening to the virtual cable"
+            why = f"{name} is listening to {where}"
         if (key != self.voice_suggestion or why != self.voice_why
                 or hints != self.voice_hints):
             self.voice_suggestion, self.voice_why, self.voice_hints = key, why, hints
@@ -4781,8 +4784,8 @@ class MainWindow(QMainWindow):
                 "Setup → Devices → Send to others through." if route == "off" else
                 "Pick the device to send to first (Setup tab → Devices → Send to)."
                 if route == "device" else
-                "Put Onion Board on your mic first (Setup tab → Put Onion Board on my "
-                "mic), or use the virtual cable." if route == "mic" else
+                "Put your sounds in your mic first (Setup tab → Put my sounds straight "
+                "into my mic), or use the virtual cable." if route == "mic" else
                 "Set up the virtual cable first (Setup tab → Step-by-step guide), or pick "
                 "another device under Send to others through.")
             return

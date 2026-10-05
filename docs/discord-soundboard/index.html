@@ -28,20 +28,22 @@
   <p class="small">Windows 10 and 11 · no account, no ads, anonymous usage count you can switch off</p>
 
   <h2>How it works</h2>
-  <p>Discord can only listen to one microphone. So a soundboard mixes your real mic and your
-    sounds together and sends the mix into a <b>virtual cable</b>, a free audio driver that
-    shows up as an extra mic called <code>CABLE Output</code>. You pick that as your mic in
-    Discord, and your friends hear your voice and your sounds together.</p>
-  <p>Onion Board's installer can set the cable up for you (the box is ticked by default), so there's
-    nothing else to download. Don't want the cable? Under <b>Send to others through</b> on the Setup
-    tab, pick <b>Another device</b> (Voicemeeter, a mixer, a capture card, a second sound card) and
-    send the sounds there instead.</p>
+  <p>Discord can only listen to one microphone. So Onion Board puts your sounds <b>straight into
+    your real mic</b>: one click in the app (Windows asks for permission once), and everything that
+    listens to your mic, Discord and your games included, hears your voice and your sounds together.
+    There's no extra mic to pick and no virtual cable to install.</p>
+  <p>Rather use a <b>virtual cable</b> (a free audio driver that shows up as an extra mic called
+    <code>CABLE Output</code>)? Pick <b>The virtual cable</b> under <b>Send to others through</b> on the
+    Setup tab and Onion Board sets it up for you; then pick <code>CABLE Output</code> as your mic in
+    Discord. Or pick <b>Another device</b> (Voicemeeter, a mixer, a capture card, a second sound
+    card) and send the sounds there instead.</p>
 
   <h2>Setup, step by step</h2>
   <ol>
-    <li><a href="https://github.com/Onion-Alien/onion-board/releases/latest/download/OnionBoardSetup.exe" data-goatcounter-click="download-discord-guide-steps">Download <code>OnionBoardSetup.exe</code></a> and run it. Leave the virtual cable box ticked.</li>
-    <li>Onion Board opens with a short guide. Pick the mic you talk into and the headphones you listen on.</li>
-    <li>In Discord, open <b>User Settings → Voice &amp; Video</b> and set <b>Input Device</b> to <code>CABLE Output</code>.</li>
+    <li><a href="https://github.com/Onion-Alien/onion-board/releases/latest/download/OnionBoardSetup.exe" data-goatcounter-click="download-discord-guide-steps">Download <code>OnionBoardSetup.exe</code></a> and run it.</li>
+    <li>Onion Board opens with a short guide. Pick the mic you talk into and the headphones you listen on,
+      then click <b>Put my sounds straight into my mic</b> and <b>Yes</b> when Windows asks.</li>
+    <li>In Discord, open <b>User Settings → Voice &amp; Video</b>. Keep <b>Input Device</b> on your normal mic.</li>
     <li>In the same place, set <b>Input Profile</b> to <b>Studio</b>. Otherwise Discord's noise
       suppression treats music and sound effects as background noise and cuts them out.</li>
     <li>Drag sound files onto the Onion Board window and double-click a pad. Everyone in the call hears it.</li>
@@ -52,8 +54,8 @@
   <p>Right-click a pad and give it a <b>hotkey</b>. Hotkeys work even while a fullscreen game has
     focus, so you can fire a sound without tabbing out. There's also a small in-game overlay:
     press its key and a panel of pads appears over your game.</p>
-  <p>The same setup works in any game with voice chat: set the game's microphone to
-    <code>CABLE Output</code> (or whichever mic your other device feeds) instead of Discord's.</p>
+  <p>The same setup works in any game with voice chat: your sounds are already in your mic, so the
+    game hears them too. (On the virtual cable, set the game's microphone to <code>CABLE Output</code>.)</p>
 
   <h2>Where to get sounds</h2>
   <ul>
@@ -64,8 +66,10 @@
 
   <h2>Common problems</h2>
   <ul>
-    <li><b>Friends hear nothing:</b> Discord's Input Device isn't <code>CABLE Output</code>. (If you
-      chose <b>Another device</b>, it's the mic that device feeds. <b>Nowhere</b> sends nothing to others.)</li>
+    <li><b>Friends hear nothing:</b> check the pill at the top of Onion Board is green, and that Discord's
+      Input Device is the same mic you picked in Onion Board. (On the virtual cable it must be
+      <code>CABLE Output</code>; with <b>Another device</b>, the mic that device feeds. <b>Nowhere</b>
+      sends nothing to others.)</li>
     <li><b>Sounds cut in and out:</b> set Input Profile to <b>Studio</b>, or turn off noise suppression.
       Onion Board's Setup tab has a check that tells you which Discord setting is chopping your sounds.</li>
     <li><b>They hear sounds but not your voice:</b> tick <b>Others hear it</b> in the <i>My mic</i> section at the bottom of the window.</li>

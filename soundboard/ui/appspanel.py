@@ -432,8 +432,8 @@ class AppsTab(QWidget):
         self.info = ("Send a program's sound",
                      "Pick a program that's playing — a music player, a browser, a game, "
                         "even a call in another app — and it goes out to whoever's listening, "
-                        "on its own volume, the same way your sounds do (through the cable "
-                        "or the other device you picked on the Setup tab, and the stream "
+                        "on its own volume, the same way your sounds do (your mic, the "
+                        "cable or the device you picked on the Setup tab, and the stream "
                         "output). Sending to Nowhere: only the stream output gets it. Only "
                         "that program: nothing else you play is "
                         "touched, and it keeps playing on your speakers as before. Programs "
