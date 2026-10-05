@@ -1,5 +1,20 @@
 # Changelog
 
+## Unreleased
+
+- **AI voices (optional add-on):** talk, and others hear a different person: your
+  words, timing and tone in another voice, live, on your own PC's CPU. Pick one of
+  six characters on the Voice tab (Bear, Max, Brick, Sage, Nova, Pixie); *Match the
+  voice* moves your pitch to where that voice sits, and a slider goes higher or
+  lower. About one CPU core while you talk, nothing while you're quiet, roughly
+  75 ms behind you. It isn't in the app or its installer: *Get AI voices* downloads
+  it (about 40 MB plus a 15 MB runtime, needs Python 3.12+), and *Remove AI voices*
+  takes it all off again. If it ever stops, a built-in voice preset covers you so
+  your real voice isn't heard (or pick your own voice / silence). The voice changer's
+  effects still work on top of it.
+- Live voice-to-speech hands your mic to its helper without polling: no wake-ups at
+  all while nothing is sent.
+
 ## 1.7.2 — 2026-10-05
 
 - Tab help now uses a crisp, theme-aware information icon in a larger square

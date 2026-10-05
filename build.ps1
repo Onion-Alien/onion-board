@@ -68,7 +68,9 @@ if ($env:ONIONBOARD_ONION_WATCH_ZIP) {
 
 # Add-ons ship with the app (source only; a module's own .venv is made on the user's PC
 # by its Install button). modules.py looks for them in the folder next to the exe.
-foreach ($m in Get-ChildItem modules -Directory) {
+# AI voices don't: they're an optional download (soundboard\aiaddon.py,
+# scripts\make_ai_voices_zip.py).
+foreach ($m in Get-ChildItem modules -Directory | Where-Object Name -ne "ai-voices") {
     robocopy $m.FullName "dist\OnionBoard\modules\$($m.Name)" /E /XD .venv __pycache__ /XF *.pyc /NFL /NDL /NJH /NJS /NP | Out-Null
     if ($LASTEXITCODE -ge 8) { throw "copying module $($m.Name) failed" }
 }

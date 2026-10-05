@@ -7,12 +7,15 @@ the module connects back. Every message is a frame:
 
     b"J"  a UTF-8 JSON object (both directions)
     b"A"  app -> module: mic audio, int16 mono at AUDIO_RATE
+    b"B"  module -> app: your converted voice, int16 mono at the rate the module
+          gave in its "ready" message (the AI voices add-on)
 
 The module's first frame must be {"type": "hello", "token": T}; the app drops a
 connection that gets it wrong (any local program could otherwise connect).
 
 Messages a module sends: hello, status {text}, ready, vad {speaking},
-partial {text}, final {text}, error {text}. The app sends: config {...}, quit.
+partial {text}, final {text}, stats {...}, error {text}. The app sends: config {...},
+quit.
 
 Service modules ship their own copy of this file (they run in their own Python and
 can't import the app); tests/test_speech.py checks the copies still agree.
@@ -25,6 +28,7 @@ import struct
 
 JSON = b"J"
 AUDIO = b"A"
+VOICE = b"B"
 AUDIO_RATE = 16000
 MAX_FRAME = 16 << 20
 _HEAD = struct.Struct("<cI")

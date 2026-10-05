@@ -12,7 +12,7 @@ import numpy as np
 import pytest
 
 from soundboard import modules, voicefx
-from soundboard.speech import protocol
+from soundboard.speech import protocol, service
 from soundboard.speech.live import SpeechController
 from soundboard.speech.service import ServiceHost
 from soundboard.voicefx import VoiceChain
@@ -308,7 +308,7 @@ def test_feed_never_blocks_and_drops_oldest_when_nobody_reads():
     for _ in range(5000):
         h.feed(np.zeros(480, np.float32), 48000)
     assert time.perf_counter() - t0 < 0.5
-    assert len(h._q) == h._q.maxlen and h.dropped > 0
+    assert h._q.qsize() == service.QUEUE_BLOCKS and h.dropped > 0
 
 
 # ---------------------------------------------------------------- controller
