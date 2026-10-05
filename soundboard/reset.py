@@ -42,7 +42,7 @@ NAMES = {SETTINGS: "Settings", HOTKEYS: "Hotkeys", SOUND_KEYS: "Sound hotkeys",
 PARTS = tuple(NAMES)
 DEVICE_FIELDS = ("main_device", "mon_device", "mic_device", "obs_device",
                  "mon_follows_default", "route")
-PROGRAM_FIELDS = ("apps", "apps_hidden")
+PROGRAM_FIELDS = ("apps", "apps_paths", "apps_hidden")
 # what "Settings" leaves alone: the other parts, what the user made (sounds,
 # categories, triggers, radio favourites) and the app's own bookkeeping
 KEEP = {"version", "sounds", "categories", "category", "category_hotkeys", "screen",
@@ -153,7 +153,7 @@ def reset(parts: list[str]) -> str:
         for m in cfg.sounds:
             m.hotkey = ""
     if PROGRAMS in parts:
-        cfg.apps, cfg.apps_hidden = {}, []
+        cfg.apps, cfg.apps_paths, cfg.apps_hidden = {}, {}, []
     if DEVICES in parts:
         fresh = Config()
         for name in DEVICE_FIELDS:

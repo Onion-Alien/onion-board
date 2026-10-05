@@ -163,11 +163,14 @@ def put_sound(meta: SoundMeta, index: int) -> None:
         _destroy(item)   # audio to the Recycle Bin, as a removal used to
 
 
-def put_app(exe: str, spec: dict, name: str, hidden: bool = False) -> Item:
+def put_app(exe: str, spec: dict, name: str, hidden: bool = False, path: str = "") -> Item:
     """A program was forgotten: keep what was remembered about it (`spec`, maybe
-    empty), and whether it was also taken off the Apps tab's list (`hidden`)."""
-    item = Item(uuid.uuid4().hex[:12], APP, name or exe, time.time(),
-                {"exe": exe, "spec": dict(spec), "hidden": hidden})
+    empty), and whether it was also taken off the Apps tab's list (`hidden`). `path`:
+    it was another program of that name, remembered by its folder (cfg.apps_paths)."""
+    data = {"exe": exe, "spec": dict(spec), "hidden": hidden}
+    if path:
+        data["path"] = path
+    item = Item(uuid.uuid4().hex[:12], APP, name or exe, time.time(), data)
     _add(item)
     return item
 

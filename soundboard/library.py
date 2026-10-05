@@ -310,7 +310,11 @@ class Config:
     overlay: dict = field(default_factory=dict)    # in-game overlay (ui.overlay.OverlaySettings)
     radio: dict = field(default_factory=dict)      # Radio tab: vol, monitor, favorites, last
     data: dict = field(default_factory=dict)       # Settings > Data & quality (soundboard.quality)
-    apps: dict = field(default_factory=dict)       # Apps tab: exe -> {vol, monitor} to re-capture
+    apps: dict = field(default_factory=dict)       # Apps tab: exe -> {vol, monitor, to, path}
+    # Apps tab: a second program with the same .exe name in another folder, by its path
+    # (appspanel.path_key) -> {vol, monitor, to, exe}. Its own key, so older versions
+    # keep it untouched and only ever see the first program of each name in `apps`
+    apps_paths: dict = field(default_factory=dict)
     apps_hidden: list[str] = field(default_factory=list)   # Apps tab: programs taken off with ✕
     # Triggers tab: on, interval_ms, monitor (the screen for triggers that don't pick
     # their own), triggers (the Onion Watch add-on's Trigger.to_raw)

@@ -60,6 +60,11 @@ AUDIOCLIENT_ACTIVATION_TYPE_PROCESS_LOOPBACK = 1
 VIRTUAL_AUDIO_DEVICE_PROCESS_LOOPBACK = "VAD\\Process_Loopback"
 # Windows' own sounds and helpers: never something you'd want to send to a call
 SYSTEM_EXES = {"svchost.exe", "audiodg.exe", "explorer.exe", "shellexperiencehost.exe"}
+# shared helpers that play audio for whichever program started them (the new Teams,
+# Steam's store and overlay, launchers built on CEF / Qt WebEngine): their sound is
+# that program's, so they're folded into it instead of showing up on their own
+HELPER_EXES = {"msedgewebview2.exe", "steamwebhelper.exe", "cefsharp.browsersubprocess.exe",
+               "qtwebengineprocess.exe", "epicwebhelper.exe", "upc_webhelper.exe"}
 
 _win = sys.platform == "win32"
 if _win:
@@ -396,11 +401,22 @@ def _process_table() -> dict[int, tuple[int, str]]:
 def root_pid(pid: int, table: dict[int, tuple[int, str]] | None = None) -> int:
     """The topmost ancestor with the same .exe name. Browsers and chat apps play
     their audio from a helper child process that comes and goes; capturing the main
-    process *and its tree* keeps following them."""
+    process *and its tree* keeps following them. A shared helper (HELPER_EXES) goes
+    to the program that started it, unless that's Windows itself."""
     table = table if table is not None else _process_table()
     if pid not in table:
         return pid
     exe = table[pid][1]
+    if exe in HELPER_EXES:
+        seen, host = {pid}, pid
+        while table[host][1] in HELPER_EXES:
+            parent = table[host][0]
+            if parent in seen or parent not in table or table[parent][1] in SYSTEM_EXES:
+                break
+            seen.add(parent)
+            host = parent
+        if table[host][1] not in HELPER_EXES:
+            pid, exe = host, table[host][1]
     seen = {pid}
     while True:
         parent = table[pid][0]
@@ -610,8 +626,9 @@ def _read_session(c: Com, dname: str, me: int, table, apps: dict[int, App],
         root = pid.value
     app = apps.get(root)
     if app is None:
-        path = (process_path(pid.value, table.get(pid.value, (0, ""))[1])
-                or process_path(root, table.get(root, (0, ""))[1]))
+        exe = table.get(pid.value, (0, ""))[1]
+        path = (process_path(root, table.get(root, (0, ""))[1])   # a helper's host, not it
+                or (process_path(pid.value, exe) if exe not in HELPER_EXES else ""))
         exe = os.path.basename(path) or table.get(root, (0, ""))[1] or f"pid {root}"
         app = apps[root] = App(root, exe, path)
     app.session_pids.add(pid.value)

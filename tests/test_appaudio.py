@@ -75,6 +75,16 @@ def test_root_pid_walks_up_same_exe_only():
     assert appaudio.root_pid(5, loop) in (5, 6)
 
 
+def test_a_shared_helper_is_folded_into_the_program_that_started_it():
+    table = {1: (0, "explorer.exe"), 30: (1, "ms-teams.exe"),
+             31: (30, "msedgewebview2.exe"), 32: (31, "msedgewebview2.exe"),
+             40: (1, "steam.exe"), 41: (40, "steamwebhelper.exe"),
+             50: (1, "msedgewebview2.exe"), 51: (50, "msedgewebview2.exe")}
+    assert appaudio.root_pid(32, table) == 30      # its sound is the new Teams'
+    assert appaudio.root_pid(41, table) == 40
+    assert appaudio.root_pid(51, table) == 50      # started by Windows: stays itself
+
+
 @pytest.mark.skipif(not WIN, reason="Windows only")
 def test_list_apps_runs_and_never_lists_this_process():
     apps = appaudio.list_apps()
