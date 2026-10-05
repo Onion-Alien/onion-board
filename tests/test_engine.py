@@ -304,7 +304,10 @@ def test_aux_source_goes_to_the_cable_and_only_to_headphones_when_asked():
     e.feed_aux(src, np.full((480, 2), 0.25, np.float32))
     out.fill(0)
     e._main(out, 480)
-    assert not out.any()
+    assert out[0, 0] > 0.2 and out[-1, 0] == 0             # switched off: it fades, no click
+    e.feed_aux(src, np.full((480, 2), 0.25, np.float32))
+    e._main(out, 480)
+    assert not out.any()                                     # ...and then it's gone
 
 
 def test_aux_source_volume_on_air_and_removal():
@@ -597,6 +600,9 @@ def test_a_low_cut_gives_each_sound_back_its_own_sub_bass():
 
     def render(dest):
         e.dest = dest
+        for v in e.voices:
+            v.pos["main"] = 0
+        e._render("main", 480)   # a new make-up glides in over one block
         for v in e.voices:
             v.pos["main"] = 0
         return e._render("main", 480)

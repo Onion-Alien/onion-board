@@ -159,6 +159,7 @@ def test_engine_ducks_sounds_under_the_mic():
         e.ring_main.write(_talk(0.05, seed=i))
         e._main(out, BLOCK)
     e.mic_vol = 0.0     # measure the sounds alone on the last block
-    e.ring_main.write(_talk(0.05, seed=99))
-    e._main(out, BLOCK)
+    for i in (98, 99):  # (the mic fades out over the first)
+        e.ring_main.write(_talk(0.05, seed=i))
+        e._main(out, BLOCK)
     assert db(rms(out[-200:]) / before) < -15   # past the limiter's delay: sounds alone

@@ -27,9 +27,11 @@ def test_int16_round_trip_is_transparent():
     assert np.max(np.abs(to_float32(i) - x)) < 0.5 / 32767 + 1e-6     # rounded, not truncated
 
 
-def test_int16_clips_instead_of_wrapping():
+def test_int16_never_wraps():
+    # (over full scale it's turned down by a limiter, not clipped: test_audio_quality)
     x = np.array([[2.0, -2.0]], np.float32)
-    assert list(to_int16(x)[0]) == [32767, -32768]
+    left, right = to_int16(x)[0]
+    assert 32000 < left <= 32767 and -32768 <= right < -32000
 
 
 # ---------------------------------------------------------------- decoding
