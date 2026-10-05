@@ -22,7 +22,7 @@ from soundboard import theme
 from soundboard.clipedit import BIN, LiveBuffer, Take, bin_peaks
 from soundboard.engine import SR
 from soundboard.library import level_gain
-from soundboard.ui import icons
+from soundboard.ui import appstate, icons
 
 PAD = 4                 # the waveform's inner margin, px
 EDGE_PX = 6             # how close to a selection edge a press grabs it
@@ -317,6 +317,7 @@ class ClipEditor(QWidget):
 
         self.timer = QTimer(self)
         self.timer.timeout.connect(self._tick)
+        appstate.slow_in_background(self, self.timer, TICK_MS)   # 4 a second behind a game
         self._sync()
 
     # ---------------------------------------------------------- menu
@@ -662,7 +663,7 @@ class ClipEditor(QWidget):
         want = self.isVisible() and (
             (self.take is None and self.buf is not None) or self._play is not None)
         if want and not self.timer.isActive():
-            self.timer.start(TICK_MS)
+            self.timer.start(appstate.interval(TICK_MS))
         elif not want and self.timer.isActive():
             self.timer.stop()
 
