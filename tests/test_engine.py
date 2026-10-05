@@ -326,6 +326,29 @@ def test_aux_source_volume_on_air_and_removal():
     assert not out.any()
 
 
+def test_a_sent_program_gets_its_bass_level_back_like_a_sound():
+    """A mode's low cut takes a bass-heavy song's sub-bass: a pad is given that level
+    back, and a program sent from the Apps tab now is too."""
+    from soundboard import destination
+    e = engine_with("main")
+    e.dest = destination.BUILTIN_BY_KEY["discord"]
+    src = e.add_aux(("app", "music.exe"))
+    t = np.arange(SR * 3) / SR
+    song = (0.4 * np.sin(2 * np.pi * 45 * t) + 0.1 * np.sin(2 * np.pi * 1000 * t))
+    song = np.stack([song, song], 1).astype(np.float32)
+    for i in range(0, len(song), 480):
+        e.feed_aux(src, song[i:i + 480])
+    pad = destination.makeup(destination.cut_shares(song, SR)[e.dest.lowcut])
+    assert pad > 2.0                                       # mostly sub-bass: a big make-up
+    for _ in range(100):                                   # glides there, never steps
+        g = src.gain("main", e.dest.lowcut)
+    assert g == pytest.approx(pad, rel=0.05)
+    assert src.gain("main", 0) < g                         # no mode, no make-up
+    e.dest = None
+    out = np.zeros((480, 2), np.float32)
+    e._main(out, 480)                                      # and none is used without one
+
+
 # ---------------------------------------------------------------- audit fixes
 
 def test_cancelled_test_record_never_finishes():

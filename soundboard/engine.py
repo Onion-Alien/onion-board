@@ -417,6 +417,9 @@ class AuxSource:
     ring has one writer), read by the output callbacks. Comes and goes at runtime:
     Engine.aux is a tuple replaced under the lock, like the voices."""
 
+    MAKEUP_WINDOW_S = 4.0   # how much of its recent audio the make-up is measured on
+    MAKEUP_EVERY_S = 2.0    # ...and how often
+
     def __init__(self, key, rates: dict | None = None):
         self.key = key
         self.vol = 1.0
@@ -432,6 +435,13 @@ class AuxSource:
         self._rs_mon = StreamResampler(SR, SR)
         self._rs_obs = StreamResampler(SR, SR)
         self._heard = 0.0
+        # the power each destination low cut takes from it (destination.cut_shares),
+        # measured on its last few seconds now and then: its make-up gain, as a
+        # sound's (Voice.makeup), so a bass-heavy song isn't quieter sent this way
+        self.cut_share: dict = {}
+        self._hist = np.zeros((int(SR * self.MAKEUP_WINDOW_S), CH), np.float32)
+        self._hist_w = self._hist_n = self._since = 0
+        self._gain: dict = {}   # out -> the make-up gain it's gliding at
         if rates:
             self.configure(rates)
 
@@ -455,6 +465,8 @@ class AuxSource:
         if lvl > 0.003:
             self._heard = time.monotonic()
         if main:
+            self._measure(x)
+        if main:
             self.ring_main.write(self._rs_main(x))
         if mon:
             self.ring_mon.write(self._rs_mon(x))
@@ -463,6 +475,40 @@ class AuxSource:
 
     def on_air(self) -> bool:
         return self.live and self.vol > 0 and time.monotonic() - self._heard < 0.5
+
+    def _measure(self, x: np.ndarray):
+        """Keep its recent audio and, every MAKEUP_EVERY_S, re-measure cut_share
+        (capture thread: a few ms, never on an audio callback)."""
+        h, n = self._hist, len(x)
+        if n >= len(h):
+            x, n = x[-len(h):], len(h)
+        end = self._hist_w + n
+        if end <= len(h):
+            h[self._hist_w:end] = x
+        else:
+            k = len(h) - self._hist_w
+            h[self._hist_w:] = x[:k]
+            h[:n - k] = x[k:]
+        self._hist_w = end % len(h)
+        self._hist_n = min(self._hist_n + n, len(h))
+        self._since += n
+        if self._since < SR * self.MAKEUP_EVERY_S or self._hist_n < SR:
+            return
+        self._since = 0
+        recent = np.roll(h, -self._hist_w, axis=0)[len(h) - self._hist_n:]
+        new = destination.cut_shares(recent, SR)
+        if new:   # silence measures nothing: keep what it had
+            old = self.cut_share
+            self.cut_share = {c: 0.5 * old.get(c, v) + 0.5 * v for c, v in new.items()}
+
+    def gain(self, out: str, lowcut: int) -> float:
+        """Its volume times the make-up for `lowcut` (0: none), gliding to a new
+        value over a few blocks so a re-measure never steps (audio callback)."""
+        want = self.vol * (destination.makeup(self.cut_share.get(lowcut, 0.0)) if lowcut else 1.0)
+        g = self._gain.get(out, want)
+        g += (want - g) * 0.1
+        self._gain[out] = g
+        return g
 
 
 @dataclass(eq=False)
@@ -1408,6 +1454,12 @@ class Engine:
             f = self._send[key] = kind(self.rates[out])
         return f
 
+    def _lowcut(self) -> int:
+        """The destination mode's low cut (Hz), 0 with none: captured programs get
+        the make-up for it (AuxSource.gain), as sounds do (Voice.makeup)."""
+        d = self.dest
+        return d.lowcut if d is not None else 0
+
     def _dest(self, out: str, x: np.ndarray) -> np.ndarray:
         """Shape the sounds bus for whoever is listening (soundboard.destination)."""
         d = self.dest
@@ -1477,12 +1529,13 @@ class Engine:
             play = max(play, peak(r) * self.radio_vol)
             if self.radio_live:
                 mix += r * np.float32(self.radio_vol)
+        lowcut = self._lowcut()
         for a in self.aux:
             x = a.ring_main.read(frames)
             if x is not None:
                 play = max(play, peak(x) * a.vol)
                 if a.live:
-                    mix += x * np.float32(a.vol)
+                    mix += x * np.float32(a.gain("main", lowcut))
         self.level_play = max(play, self.level_play * 0.85)
         mix = self._send_bus("main", finite(mix), self.ring_main.read(frames))
         if not self.sending:      # muted: others get silence, nothing else changes
@@ -1522,12 +1575,13 @@ class Engine:
             play = max(play, peak(r) * self.radio_vol)
             if self.radio_monitor or (check and self.radio_live):
                 mix += r * np.float32(self.radio_vol)
+        lowcut = self._lowcut()   # the headphones get the mode's shaping too (_dest)
         for a in self.aux:
             x = a.ring_mon.read(frames)
             if x is not None:
                 play = max(play, peak(x) * a.vol)
                 if a.monitor or (check and a.live):
-                    mix += x * np.float32(a.vol)
+                    mix += x * np.float32(a.gain("mon", lowcut))
         self.level_play = max(play, self.level_play)   # _main decays it; no main: the UI does
         finite(mix)
         if check:   # you hear what others get: the same send stage, your mic in it
