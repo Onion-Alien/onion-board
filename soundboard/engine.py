@@ -1177,6 +1177,7 @@ class Engine:
         """Close and reopen every stream with the same devices (after a latency change)."""
         self.set_mic_device(self.names["mic"])
         self.set_main_device(self.names["main"])
+        self.set_tap_device(self.tap_name)
         self.set_mon_device(self.names["mon"])
         self.set_obs_device(self.names["obs"])
 

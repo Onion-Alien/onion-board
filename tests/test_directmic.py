@@ -732,3 +732,71 @@ def test_engine_feeds_the_cable_only_while_straight_into_the_mic(ring_file, monk
     finally:
         e.tap = None
         e.shutdown()
+
+
+def test_the_cable_copy_opens_at_start(window, monkeypatch):  # noqa: F811
+    """Starting up on the mic route opens the cable copy too (not only after a device
+    change): a voice app still set to the cable hears you from the first second."""
+    w = window
+    _routes(w, monkeypatch, "outdated")
+    opened = []
+    monkeypatch.setattr(type(w.engine), "set_tap_device",
+                        lambda self, name: (opened.append(name), setattr(self, "tap_name", name)))
+    w._init_devices()
+    assert opened[-1] == CABLE_IN
+    # the stream output never goes to that same cable (everyone would get it twice)
+    assert w._obs_name("CABLE Input (VB-Audio Virtual Cable)") is None
+
+
+def test_reopening_every_stream_reopens_the_cable_copy(monkeypatch):
+    from soundboard.engine import Engine
+    e = Engine()
+    seen = []
+    monkeypatch.setattr(Engine, "set_tap_device", lambda self, name: seen.append(name))
+    e.tap_name = CABLE_IN
+    for name in ("set_mic_device", "set_main_device", "set_mon_device", "set_obs_device"):
+        monkeypatch.setattr(Engine, name, lambda self, n: None)
+    e.reopen_all()
+    assert seen == [CABLE_IN]
+
+
+def test_window_starts_on_the_mic_with_the_cable_copy(qapp, app_dir, monkeypatch):
+    """A whole start-up on the mic route with the effect working and a cable there
+    (an upgraded 1.9.0 cable config): no crash, live in the mic, the copy opened."""
+    from soundboard import engine as eng
+    from soundboard import library, winkeys
+    from soundboard.ui import mainwindow as main
+    monkeypatch.setattr(dm, "status", lambda name=None: "outdated")
+    monkeypatch.setattr(eng, "virtual_outputs", lambda: [CABLE_IN])
+    for name in ("set_main_device", "set_mon_device", "set_mic_device"):
+        monkeypatch.setattr(eng.Engine, name, lambda self, n, _k=name: setattr(
+            self, "names", {**self.names, _k.split("_")[1]: n}))
+    opened = []
+
+    class Tap:   # an open cable copy (so the one-time tip runs during start-up too)
+        def write(self, mix):
+            pass
+
+        def close(self):
+            pass
+
+    def set_tap(self, n):
+        opened.append(n)
+        self.tap_name, self.tap = n, (Tap() if n else None)
+    monkeypatch.setattr(eng.Engine, "set_tap_device", set_tap)
+    monkeypatch.setattr(winkeys.Hotkeys, "register", lambda self, m: None)
+    raw = library.Config(setup_done=True, main_device=CABLE_IN).to_raw()
+    raw["route"] = "cable"
+    raw.pop("mic_first")   # saved by 1.9.0
+    import json
+    library.CONFIG_PATH.write_text(json.dumps(raw), encoding="utf-8")
+    w = main.MainWindow()
+    try:
+        assert w.cfg.route == "mic" and w.cfg.mic_first
+        assert w.engine.names["main"] == dm.DEVICE and opened and opened[-1] == CABLE_IN
+        w._pill_short = False
+        w._update_flow()
+        assert "virtual cable" not in w.pill.text()
+    finally:
+        w._load_thread.join(15)
+        w.close()
