@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 1.8.0 — 2026-10-05
+
 - **AI voices (optional add-on):** talk, and others hear a different person: your
   words, timing and tone in another voice, live, on your own PC's CPU. Pick one of
   six characters on the Voice tab (Bear, Max, Brick, Sage, Nova, Pixie); *Match the
