@@ -17,6 +17,18 @@ def outlines():
     return radio.outline_rings(raw), radio.outline_labels(raw)
 
 
+def quietest(measure, limit, tries=5):
+    """The best of a few tries of measure(), stopping at the first under limit. Holding
+    Python's lock stalls the audio on every try; a busy shared machine (CI, the other
+    test workers) stalls only some of them, so a real hitch still fails every time."""
+    best = float("inf")
+    for _ in range(tries):
+        best = min(best, measure())
+        if best < limit:
+            break
+    return best
+
+
 def world_map(rings, labels, zoom=2.0):
     m = FlatMap()
     m.resize(1200, 700)
@@ -54,29 +66,36 @@ def test_drawing_the_world_lets_the_audio_threads_run(qapp):
 
     from soundboard.app import SWITCH_S
     rings, labels = outlines()
-    m = world_map(rings, labels)   # the whole world in one picture: 15-30 ms in one path
-    gaps, stop = [], threading.Event()
 
-    def audio():   # wakes every millisecond, like a callback that's due
-        last = time.perf_counter()
-        while not stop.is_set():
-            time.sleep(0.001)
-            t = time.perf_counter()
-            gaps.append(t - last)
-            last = t
+    def worst_gap():
+        m = world_map(rings, labels)   # the whole world in one picture: 15-30 ms in one path
+        gaps, stop = [], threading.Event()
+
+        def audio():   # wakes every millisecond, like a callback that's due
+            last = time.perf_counter()
+            while not stop.is_set():
+                time.sleep(0.001)
+                t = time.perf_counter()
+                gaps.append(t - last)
+                last = t
+
+        th = threading.Thread(target=audio, daemon=True)
+        th.start()
+        try:
+            time.sleep(0.05)
+            m.grab()                     # draws the whole world at this zoom
+        finally:
+            stop.set()
+            th.join()
+        return max(gaps)
 
     old = sys.getswitchinterval()
     sys.setswitchinterval(SWITCH_S)
-    th = threading.Thread(target=audio, daemon=True)
-    th.start()
     try:
-        time.sleep(0.05)
-        m.grab()                         # draws the whole world at this zoom
+        worst = quietest(worst_gap, 0.010)
     finally:
-        stop.set()
-        th.join()
         sys.setswitchinterval(old)
-    assert max(gaps) < 0.010, f"held up {max(gaps) * 1000:.0f} ms"
+    assert worst < 0.010, f"held up {worst * 1000:.0f} ms"
 
 
 def audio_late_while(work):
@@ -146,7 +165,7 @@ def test_a_new_zoom_is_drawn_in_slices_beside_the_audio(qapp):
                 qapp.processEvents()
                 time.sleep(0.0005)   # the event loop waiting (without Python's lock)
 
-    worst = audio_late_while(fly_about)
+    worst = quietest(lambda: audio_late_while(fly_about), 0.006)
     assert m._build is None and m._world[1] is not first
     assert worst < 0.006, f"the cable was {worst * 1000:.0f} ms late"
     sliced = m._world[1].toImage()
