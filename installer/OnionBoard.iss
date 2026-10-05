@@ -103,12 +103,12 @@ FinishedLabel=Onion Board is installed. It will open now and ask you a few easy 
 FinishedRestartLabel=Onion Board is installed. To finish setting up the virtual cable, Windows needs to restart your PC.%n%nAfter the restart, open Onion Board from the Start menu and it will pick up where it left off.
 
 [Tasks]
-Name: "vbcable"; Description: "The free virtual cable (VB-Cable), so Discord and games hear your sounds"; GroupDescription: "Needed for Discord and games (untick it if you'll send sounds through Voicemeeter, a mixer or OBS)"
+Name: "vbcable"; Description: "The free virtual cable (VB-Cable), so Discord and games hear your sounds"; GroupDescription: "Needed for Discord and games (untick it if you use Voicemeeter, a mixer or OBS)"
 Name: "ffmpeg"; Description: "Play M4A, AAC and video files (the free FFmpeg, about 100 MB)"; GroupDescription: "Extra features (optional)"; Check: CanOfferFfmpeg
 Name: "livevoice"; Description: "Set up live voice-to-speech now (needs Python, about 300 MB)"; GroupDescription: "Extra features (optional)"; Flags: unchecked
 Name: "tor"; Description: "Private connection (Tor): hides your internet address (about 22 MB)"; GroupDescription: "Privacy (optional)"; Flags: unchecked
 Name: "keepnetlog"; Description: "Keep a history of what Onion Board connects to (on this PC only)"; GroupDescription: "Privacy (optional)"; Flags: unchecked
-Name: "countme"; Description: "Count me in: once a day, send an anonymous ""still here"" (the version number and a random ID, nothing else) so we know people use it"; GroupDescription: "Privacy (optional)"
+Name: "countme"; Description: "Count me in: an anonymous ""still here"" once a day, so we know people use it"; GroupDescription: "Privacy (optional)"
 Name: "desktopicon"; Description: "Put an Onion Board shortcut on my Desktop"; GroupDescription: "Shortcuts"
 
 [InstallDelete]
@@ -401,6 +401,10 @@ var
   Bullet: String;
 begin
   Bullet := '  ' + #$2022 + '  ';
+  // The box list stops 11 px short of its page: down to the page's bottom, eleven rows
+  // (with FFmpeg offered and Count me in) fit without a scrollbar.
+  WizardForm.TasksList.Height := WizardForm.TasksList.Parent.ClientHeight -
+    WizardForm.TasksList.Top;
   PrivacyPage := CreateCustomPage(wpWelcome, 'Your privacy',
     'What Onion Board connects to, and when');
   Body := TNewStaticText.Create(PrivacyPage);
@@ -411,9 +415,8 @@ begin
   Body.ShowAccelChar := False;
   Body.Caption :=
     'No account, no ads. On its own, Onion Board only goes online once a day: to ' +
-    'check for a new version (of the app, and of Onion Watch if you add it), and to ' +
-    'send an anonymous "still here" count if you leave Count me in ticked. ' +
-    'Nothing downloads until you click Update, and you can switch the check off.' + #13#10#13#10 +
+    'check for updates, and to send an anonymous "still here" if Count me in is ' +
+    'ticked. Nothing downloads until you click Update, and you can switch both off.' + #13#10#13#10 +
     'Everything else happens only when you use it:' + #13#10 +
     Bullet + 'Sounds: searching and downloading go to YouTube, SoundCloud or Myinstants.' + #13#10 +
     Bullet + 'Radio: Radio Browser (a free list of stations) and the stations you play.' + #13#10 +
