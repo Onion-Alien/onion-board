@@ -280,3 +280,54 @@ def test_the_real_window_answers_over_http(qapp, window):
     finally:
         w.cfg.api_enabled = False
         w.apply_remote()
+
+
+def test_live_speed_pitch_and_effects_go_through_the_popup(qapp, window):
+    """A phone moves the PC's own sliders: the engine and the ⏩ button follow."""
+    w = window
+    d = lambda action, **p: remote.dispatch(w, action, p)   # noqa: E731
+    s = d("status")[1]
+    assert (s["speed"], s["pitch"], s["keep_pitch"], s["effects"]) == (1.0, 0.0, True, {})
+
+    assert d("speed", set="1.5")[1]["speed"] == 1.5 and w.engine.sound_speed == 1.5
+    assert d("speed", step="up")[1]["speed"] == 2.0                 # the next quick speed
+    assert d("speed", step="up")[1]["speed"] == 2.0                 # the top of the range
+    assert d("speed", step="down")[1]["speed"] == 1.5
+    assert d("speed", set="9")[1]["speed"] == 2.0                   # no Redline from a phone
+    assert d("speed", set="fast")[0] == 400 and d("speed")[0] == 400
+    assert d("speed", keep="0")[1]["keep_pitch"] is False and not w.engine.sound_keep_pitch
+    assert d("pitch", set="-3")[1]["pitch"] == -3 and w.engine.sound_pitch == -3
+    assert d("pitch", step="up")[1]["pitch"] == -2
+    assert w.speed_btn.text().startswith("2x -2")      # the PC's button shows it
+
+    assert d("effects", bass="6", echo="5")[1]["effects"] == {"bass": 6.0, "echo": 1.0}
+    assert w.engine.sound_fx == {"bass": 6.0, "echo": 1.0}
+    assert d("effects", bass="loud")[0] == 400
+    body = d("effects")[1]                                         # alone: what there is
+    assert "Canyon" in body["presets"] and body["effects"] == {"bass": 6.0, "echo": 1.0}
+    assert {"key": "bass", "label": "Bass", "lo": -12, "hi": 18, "unit": "dB"} in body["knobs"]
+    body = d("effects", preset="canyon")[1]
+    assert body["preset"] == "Canyon" and w.speed_btn.fx_presets["Canyon"].isChecked()
+    assert d("effects", preset="Nope")[0] == 404
+    assert d("effects", reset="1")[1]["effects"] == {}
+
+    d("effects", bass="3")
+    s = d("reset")[1]
+    assert (s["speed"], s["pitch"], s["effects"]) == (1.0, 0.0, {})
+    assert w.engine.sound_speed == 1.0 and w.engine.sound_fx == {}
+
+
+def test_mode_lists_and_switches_whos_listening(qapp, window):
+    w = window
+    d = lambda action, **p: remote.dispatch(w, action, p)   # noqa: E731
+    st, body = d("mode")
+    assert st == 200 and body["mode"] == "off"
+    assert {"off", "discord", "steam"} <= {m["key"] for m in body["modes"]}
+    assert d("mode", set="Discord")[1]["mode"] == "discord"
+    assert w.cfg.dest["mode"] == "discord" and w.engine.dest.key == "discord"
+    assert w.mode_combo.currentData() == "discord"
+    assert d("mode", set="steam voice")[1]["mode"] == "steam"         # by its label too
+    assert d("mode", set="nope")[0] == 404 and w.cfg.dest["mode"] == "steam"
+    s = d("status")[1]
+    assert s["mode"] == "steam" and s["mode_label"] == "Steam voice"
+    assert "radio" in s and "available" in s["radio"]

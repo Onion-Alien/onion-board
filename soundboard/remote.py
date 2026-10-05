@@ -28,6 +28,18 @@ Every endpoint takes GET or POST and answers JSON (ENDPOINTS below is the list;
                                  the Live / Muted switch, the voice changer, "others
                                  hear my mic" (no on=: toggle)
     /api/replay                  save the instant replay as a pad
+    /api/speed?set=0.25-2 / ?step=up|down [&keep=1|0|toggle]
+    /api/pitch?set=-12-12 / ?step=up|down
+                                 the live speed / pitch of every sound (keep: speed
+                                 changes leave the pitch alone)
+    /api/effects?bass=6&echo=0.3… / ?preset=Canyon / ?reset=1
+                                 the live effects on every sound
+    /api/reset                   back to 1x, no pitch change, no effects
+    /api/mode[?set=discord]      who's listening (the voice chat mode); alone: the list
+    /api/stations?list=popular|favorites|recent|search[&q=…]   radio stations
+    /api/radio?id=… / ?on=1|0|toggle         play a station / play or stop the radio
+    /api/radio_random, /api/radio_star[?id=…], /api/radio_live, /api/radio_hear,
+    /api/radio_volume            the Radio tab's other controls
     /api/help                    this list
 
 The same server, given `lan=True`, is what "remote" add-ons such as Onion Pocket
@@ -48,6 +60,8 @@ import difflib
 import ipaddress
 import json
 import logging
+import math
+import random
 import secrets
 import threading
 import time
@@ -89,6 +103,26 @@ ENDPOINTS = {
     "voice": "the voice changer on / off: ?on=1 / 0 / toggle",
     "mic": "whether others hear your mic: ?on=1 / 0 / toggle",
     "replay": "save the instant replay (the last seconds you heard) as a new sound",
+    "speed": "the live speed of every sound: ?set=0.25-2 or ?step=up / down (the quick "
+             "speeds); &keep=1 / 0 / toggle: speed changes leave the pitch alone",
+    "pitch": "the live pitch of every sound: ?set=-12 to 12 (semitones) or ?step=up / down",
+    "effects": "the live effects on every sound: any of ?bass= (-12 to 18 dB) &treble= "
+               "(-12 to 12 dB) &muffle= &reverb= &echo= &crunch= (0-1), or ?preset=Canyon, "
+               "or ?reset=1; alone: the knobs and presets there are",
+    "reset": "live speed, pitch and effects back to normal",
+    "mode": "who's listening (the voice chat your sounds are shaped for): ?set=discord; "
+            "alone: the modes there are",
+    "stations": "radio stations: ?list=popular / favorites / recent, or ?list=search&q=jazz "
+                "(ask again for the stations found online)",
+    "radio": "the radio: ?id=… plays that station; ?on=1 / 0 / toggle plays the last one or "
+             "stops it",
+    "radio_random": "play a random station: ?list=popular / favorites / recent (default: "
+                    "the list showing on the Radio tab)",
+    "radio_star": "star / unstar a station in Favorites: ?id=… (default: the one playing), "
+                  "&on=1 / 0 / toggle",
+    "radio_live": "whether others hear the radio: ?on=1 / 0 / toggle",
+    "radio_hear": "whether you hear the radio yourself: ?on=1 / 0 / toggle",
+    "radio_volume": "the radio's volume: ?set=0-100 or ?step=up / down (10 % a step)",
     "help": "this list",
 }
 ACTIONS = tuple(ENDPOINTS)
@@ -348,7 +382,9 @@ def dispatch(mw: MainWindow, action: str, params: dict) -> tuple[int, object]:
                      "live": bool(mw.engine.sending),
                      "voice": mw.voice.fx.btn_power.isChecked(),
                      "mic": bool(cfg.mic_enabled),
-                     "volume": mw.vol_sound.spin.value()}
+                     "volume": mw.vol_sound.spin.value(),
+                     **live_state(mw), **mode_state(mw, full=False),
+                     "radio": radio_state(mw)}
     if action == "sounds":
         return 200, [{"id": m.id, "name": m.name, "hotkey": m.hotkey,
                       "categories": list(m.tags), "color": m.color,
@@ -394,19 +430,14 @@ def dispatch(mw: MainWindow, action: str, params: dict) -> tuple[int, object]:
             return 400, {"error": "say which: ?name=… or ?step=next / prev"}
         return 200, {"category": cfg.category}
     if action == "volume":
-        spin = mw.vol_sound.spin
-        step = (params.get("step") or "").strip().lower()
-        if "set" in params:
-            try:
-                new = round(float(params["set"]))
-            except ValueError:
-                return 400, {"error": "set= takes a number, 0-100"}
-        elif step in ("up", "down", "+", "-"):
-            new = (round(spin.value() / 10) + (1 if step in ("up", "+") else -1)) * 10
-        else:
-            return 400, {"error": "say how: ?set=0-100 or ?step=up / down"}
-        spin.setValue(min(max(new, 0), spin.maximum()))   # -> set_option("sound_vol")
-        return 200, {"volume": spin.value()}
+        err = set_volume(mw.vol_sound.spin, params)   # -> set_option("sound_vol")
+        return err or (200, {"volume": mw.vol_sound.spin.value()})
+    if action in LIVE_ACTIONS:
+        return dispatch_live(mw, action, params)
+    if action == "mode":
+        return dispatch_mode(mw, params)
+    if action in RADIO_ACTIONS:
+        return dispatch_radio(mw, action, params)
     if action == "live":
         on = on_value(params, bool(mw.engine.sending))
         if on is None:
@@ -456,6 +487,262 @@ def dispatch(mw: MainWindow, action: str, params: dict) -> tuple[int, object]:
         return 409, {"error": "that sound hasn't loaded (yet)"}
     mw.play(m.id)
     return 200, {"playing": m.id, "name": m.name}
+
+
+def set_volume(spin, params: dict) -> tuple[int, dict] | None:
+    """?set=0-100 / ?step=up|down (10 % a step) on a volume box: an error answer, or
+    None once it's set."""
+    step = (params.get("step") or "").strip().lower()
+    if "set" in params:
+        try:
+            new = round(float(params["set"]))
+        except ValueError:
+            return 400, {"error": "set= takes a number, 0-100"}
+    elif step in ("up", "down", "+", "-"):
+        new = (round(spin.value() / 10) + (1 if step in ("up", "+") else -1)) * 10
+    else:
+        return 400, {"error": "say how: ?set=0-100 or ?step=up / down"}
+    spin.setValue(min(max(new, 0), spin.maximum()))
+    return None
+
+
+def number(params: dict, key: str, lo: float, hi: float) -> float | None:
+    """params[key] as a number kept within lo..hi; None if it isn't one."""
+    try:
+        v = float(params[key])
+    except (KeyError, TypeError, ValueError):
+        return None
+    return None if math.isnan(v) else min(max(v, lo), hi)
+
+
+# --------------------------------------------------------------------------- live controls
+# The speed / pitch / effects popup on the Sounds tab's transport bar
+# (ui/speedpitch.SpeedPitchButton). Requests go through the popup itself, so the PC's
+# sliders always show what's playing.
+
+LIVE_ACTIONS = ("speed", "pitch", "effects", "reset")
+
+
+def live_state(mw: MainWindow) -> dict:
+    from soundboard import livefx
+    b = mw.speed_btn
+    speed, pitch, keep = b.values()
+    fx = b.fx_values()
+    preset = next((n for n, a in livefx.PRESETS.items() if livefx.clean(a) == fx), "")
+    return {"speed": round(speed, 3), "pitch": round(pitch, 2), "keep_pitch": keep,
+            "effects": {k: round(v, 3) for k, v in fx.items()}, "preset": preset}
+
+
+def dispatch_live(mw: MainWindow, action: str, params: dict) -> tuple[int, object]:
+    from soundboard import livefx
+    from soundboard.ui import speedpitch as sp
+    b = mw.speed_btn
+    speed, pitch, keep = b.values()
+    if action == "reset":
+        b.reset()
+        return 200, live_state(mw)
+    if action == "effects":
+        if (params.get("reset") or "").strip() not in ("", "0"):
+            b.set_fx({})
+            return 200, live_state(mw)
+        if "preset" in params:
+            name = params["preset"].strip().lower()
+            match = next((n for n in livefx.PRESETS if n.lower() == name), None)
+            if match is None and name not in ("", "none", "off"):
+                return 404, {"error": f"no preset called {params['preset']!r}",
+                             "presets": list(livefx.PRESETS)}
+            b.set_fx(livefx.PRESETS[match] if match else {})
+            return 200, live_state(mw)
+        knobs = {q.key: q for q in livefx.PARAMS}
+        given = [k for k in params if k in knobs]
+        if not given:   # what there is to set
+            return 200, {**live_state(mw), "presets": list(livefx.PRESETS),
+                         "knobs": [{"key": q.key, "label": q.label, "lo": q.lo, "hi": q.hi,
+                                    "unit": q.unit.strip()} for q in livefx.PARAMS]}
+        amounts = b.fx_values()
+        for k in given:
+            v = number(params, k, knobs[k].lo, knobs[k].hi)
+            if v is None:
+                return 400, {"error": f"{k}= takes a number, {knobs[k].lo:g} to "
+                                      f"{knobs[k].hi:g}"}
+            amounts[k] = v
+        b.set_fx(amounts)
+        return 200, live_state(mw)
+    # speed / pitch
+    if "keep" in params:
+        k = on_value({"on": params["keep"]}, keep)
+        if k is None:
+            return 400, {"error": "keep= takes 1, 0 or toggle"}
+        keep = k
+    step = (params.get("step") or "").strip().lower()
+    q, now = (sp.SPEED, speed) if action == "speed" else (sp.PITCH, pitch)
+    if "set" in params:
+        v = number(params, "set", q.lo, q.hi)
+        if v is None:
+            return 400, {"error": f"set= takes a number, {q.lo:g} to {q.hi:g}"}
+    elif step in ("up", "down", "+", "-"):
+        up = step in ("up", "+")
+        if action == "speed":   # the next quick speed (0.5, 0.75, 1, 1.25, 1.5, 2)
+            ladder = [s for s in sp.QUICK if (s > now + 1e-6 if up else s < now - 1e-6)]
+            v = (min(ladder) if up else max(ladder)) if ladder else now
+        else:
+            v = round(now) + (1 if up else -1)
+        if q.lo <= now <= q.hi:          # a Redline value set on the PC stays as it is
+            v = min(max(v, q.lo), q.hi)
+    elif "keep" in params:
+        v = now
+    else:
+        return 400, {"error": f"say how: ?set={q.lo:g} to {q.hi:g} or ?step=up / down"}
+    if action == "speed":
+        speed = v
+    else:
+        pitch = v
+    b.set_values(speed, pitch, keep)
+    return 200, live_state(mw)
+
+
+# --------------------------------------------------------------------------- who's listening
+
+def mode_state(mw: MainWindow, full: bool = True) -> dict:
+    from soundboard import destination
+    d = mw.cfg.dest if isinstance(mw.cfg.dest, dict) else {}
+    now = destination.resolve(d)
+    out = {"mode": now.key, "mode_label": now.label}
+    if full:
+        out["modes"] = [{"key": m.key, "label": m.label, "note": m.note}
+                        for m in destination.all_modes(d.get("custom"))]
+    return out
+
+
+def dispatch_mode(mw: MainWindow, params: dict) -> tuple[int, object]:
+    """Picked through the Sounds tab's "Listening:" dropdown, which applies and saves it."""
+    from soundboard import destination
+    if "set" in params:
+        d = mw.cfg.dest if isinstance(mw.cfg.dest, dict) else {}
+        want = params["set"].strip().lower()
+        match = next((m for m in destination.all_modes(d.get("custom"))
+                      if want in (m.key.lower(), m.label.lower())), None)
+        if match is None:
+            return 404, {"error": f"no mode called {params['set']!r}", **mode_state(mw)}
+        mw.mode_combo._picked(mw.mode_combo.findData(match.key))
+        panel = getattr(mw, "dest_panel", None)   # the Setup tab's picker
+        if panel is not None and hasattr(panel, "refresh"):
+            panel.refresh()
+    return 200, mode_state(mw)
+
+
+# --------------------------------------------------------------------------- the radio
+# The Radio tab (ui/radiopanel.RadioTab) does the work, so the PC shows what was picked.
+# With Radio switched off in Settings > Privacy & security there's no radio at all.
+
+RADIO_ACTIONS = ("stations", "radio", "radio_random", "radio_star", "radio_live",
+                 "radio_hear", "radio_volume")
+STATIONS_MAX = 100      # stations in one answer
+RADIO_LISTS = ("popular", "favorites", "favourites", "recent")
+RADIO_OFF = {"error": "the radio is switched off in Onion Board's Settings > Privacy & "
+                      "security"}
+
+
+def _radio_tab(mw: MainWindow):
+    from soundboard.ui.radiopanel import RadioTab
+    r = getattr(mw, "radio", None)
+    return r if isinstance(r, RadioTab) else None
+
+
+def station_dict(r, s) -> dict:
+    now = r.player.station
+    return {"id": s.uuid, "name": s.name, "country": s.country, "tags": list(s.tags[:3]),
+            "bitrate": s.bitrate, "fav": s.uuid in r._fav_ids,
+            "playing": now is not None and now.uuid == s.uuid}
+
+
+def radio_state(mw: MainWindow) -> dict:
+    r = _radio_tab(mw)
+    if r is None:
+        return {"available": False}
+    st = r.player.station
+    return {"available": True, "on": st is not None,
+            "connecting": st is not None and r.player.status == "connecting",
+            "station": station_dict(r, st) if st is not None else None,
+            "title": r._title if st is not None else "",
+            "live": bool(mw.engine.radio_live), "hear": r.chk_hear.isChecked(),
+            "volume": r.vol.spin.value(), "last": bool(r.cfg.radio.get("last"))}
+
+
+def dispatch_radio(mw: MainWindow, action: str, params: dict) -> tuple[int, object]:
+    r = _radio_tab(mw)
+    if r is None:
+        return 409, RADIO_OFF
+    if action == "stations":
+        which = (params.get("list") or "popular").strip().lower()
+        if which not in RADIO_LISTS + ("search",):
+            return 400, {"error": "list= takes popular, favorites, recent or search"}
+        stations, loading, error = r.phone_list(which, params.get("q") or "")
+        return 200, {"list": which, "loading": loading, "error": error,
+                     "stations": [station_dict(r, s) for s in stations[:STATIONS_MAX]]}
+    if action == "radio":
+        if params.get("id"):
+            s = r._stations.get(params["id"])
+            if s is None:
+                return 404, {"error": "no such station (list them with /api/stations)"}
+            r.play(s)
+        elif "on" in params or not params:
+            on = on_value(params, r.is_active())
+            if on is None:
+                return 400, BAD_ON
+            if on and not r.is_active():
+                from soundboard.radio import Station
+                s = Station.from_saved(r.cfg.radio.get("last") or {})
+                if s is None:
+                    return 404, {"error": "no station has played yet: pick one"}
+                r.play(r._stations.setdefault(s.uuid, s))
+            elif not on:
+                r.stop()
+        else:
+            return 400, {"error": "say which: ?id=… or ?on=1 / 0 / toggle"}
+        return 200, radio_state(mw)
+    if action == "radio_random":
+        which = (params.get("list") or "").strip().lower()
+        if not which:
+            r.start()
+            r.play_random()
+            if not r.is_active():
+                return 404, {"error": "no station to pick from yet"}
+            return 200, radio_state(mw)
+        if which not in RADIO_LISTS:
+            return 400, {"error": "list= takes popular, favorites or recent"}
+        now = r.player.station
+        pool = [s for s in r.phone_list(which, "")[0] if now is None or s.uuid != now.uuid]
+        if not pool:
+            return 404, {"error": "no station to pick from there"}
+        r.play(random.choice(pool))
+        return 200, radio_state(mw)
+    if action == "radio_star":
+        s = r._stations.get(params["id"]) if params.get("id") else r.player.station
+        if s is None:
+            return 404, {"error": "no such station" if params.get("id") else
+                         "nothing is playing: say which with ?id=…"}
+        on = on_value(params, s.uuid in r._fav_ids)
+        if on is None:
+            return 400, BAD_ON
+        if on != (s.uuid in r._fav_ids):
+            r._toggle_fav(s.uuid)
+            r._update_buttons()
+        return 200, {"id": s.uuid, "fav": s.uuid in r._fav_ids}
+    if action == "radio_live":
+        on = on_value(params, bool(mw.engine.radio_live))
+        if on is None:
+            return 400, BAD_ON
+        r._on_live(on)
+        return 200, radio_state(mw)
+    if action == "radio_hear":
+        on = on_value(params, r.chk_hear.isChecked())
+        if on is None:
+            return 400, BAD_ON
+        r.chk_hear.setChecked(on)   # -> _on_hear
+        return 200, radio_state(mw)
+    err = set_volume(r.vol.spin, params)   # radio_volume -> _on_vol
+    return err or (200, radio_state(mw))
 
 
 def find_category(cfg, name: str) -> str | None:

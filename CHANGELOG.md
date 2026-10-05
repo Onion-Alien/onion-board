@@ -1,9 +1,18 @@
 # Changelog
 
-## Unreleased
+## 1.7.2 — 2026-10-05
 
 - Tab help now uses a crisp, theme-aware information icon in a larger square
   button, with consistent hover and keyboard-focus styling across tabs.
+
+- **More to control from your phone and Stream Deck:** the control API (and so
+  Onion Pocket) can now change the live speed, pitch and effects (bass, treble,
+  reverb, echo… and the presets), switch who's listening (Discord, Steam voice…),
+  and run the radio: list your favourite, recent and popular stations or search,
+  play / stop, a random station, star one, go live, hear it yourself, and its
+  volume. Changes made this way show on the PC's own sliders and buttons.
+  Onion Pocket 0.2.0 puts it all on your phone: new **Radio** and **Sound**
+  tabs (Settings → Remote offers the update).
 
 ## 1.7.1 — 2026-10-04
 
