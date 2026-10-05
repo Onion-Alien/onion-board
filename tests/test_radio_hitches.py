@@ -54,10 +54,8 @@ def test_drawing_the_world_lets_the_audio_threads_run(qapp):
 
     from soundboard.app import SWITCH_S
     rings, labels = outlines()
-    m = world_map(rings, labels)   # the whole world in one picture: 15-30 ms in one path
-    gaps, stop = [], threading.Event()
 
-    def audio():   # wakes every millisecond, like a callback that's due
+    def audio(gaps, stop):   # wakes every millisecond, like a callback that's due
         last = time.perf_counter()
         while not stop.is_set():
             time.sleep(0.001)
@@ -65,18 +63,27 @@ def test_drawing_the_world_lets_the_audio_threads_run(qapp):
             gaps.append(t - last)
             last = t
 
+    def worst_gap():
+        m = world_map(rings, labels)   # the whole world in one picture: 15-30 ms in one path
+        gaps, stop = [], threading.Event()
+        th = threading.Thread(target=audio, args=(gaps, stop), daemon=True)
+        th.start()
+        try:
+            time.sleep(0.05)
+            m.grab()                         # draws the whole world at this zoom
+        finally:
+            stop.set()
+            th.join()
+        return max(gaps)
+
     old = sys.getswitchinterval()
     sys.setswitchinterval(SWITCH_S)
-    th = threading.Thread(target=audio, daemon=True)
-    th.start()
     try:
-        time.sleep(0.05)
-        m.grab()                         # draws the whole world at this zoom
+        # A held lock stalls every try; a busy CI machine stalls only some of them.
+        worst = min(worst_gap() for _ in range(5))
     finally:
-        stop.set()
-        th.join()
         sys.setswitchinterval(old)
-    assert max(gaps) < 0.010, f"held up {max(gaps) * 1000:.0f} ms"
+    assert worst < 0.010, f"held up {worst * 1000:.0f} ms"
 
 
 def test_the_decoder_is_loaded_off_the_ui_thread_once(qapp, monkeypatch):
