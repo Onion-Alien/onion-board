@@ -635,6 +635,10 @@ class SettingsDialog(QDialog):
         return card
 
     def _pick_theme(self, name: str):
+        if name == theme.current_name:   # already on: restyling every widget again froze
+            for c in self.theme_cards:   # the app for nothing (a click unticks the card)
+                c.setChecked(c.name == name)
+            return
         self.mw.apply_theme(name)
         self._category_icons()
         if getattr(self, "net_activity", None) is not None:
