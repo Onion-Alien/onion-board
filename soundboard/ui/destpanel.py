@@ -56,6 +56,58 @@ def lowcut_label(hz: int) -> str:
     return "Keep it (no cut)" if not hz else f"Cut under {hz} Hz, give the level back"
 
 
+class ModeCombo(QComboBox):
+    """Who's listening as one small dropdown (the Sounds tab's top bar): the same
+    setting as DestPanel's picker, so either one changes it for both."""
+
+    def __init__(self, mw):
+        super().__init__()
+        self.mw = mw
+        self.setAccessibleName("Who's listening")
+        self.setSizeAdjustPolicy(QComboBox.AdjustToContents)
+        no_wheel(self)
+        self.currentIndexChanged.connect(self._picked)
+        sig = getattr(mw, "voice_engine", None)
+        if sig is not None:
+            sig.connect(self._on_voice_engine)   # *Pick the mode by itself* switched it
+        self.refresh()
+
+    def _cfg(self) -> dict:
+        d = self.mw.cfg.dest
+        if not isinstance(d, dict):
+            d = self.mw.cfg.dest = {}
+        return d
+
+    def refresh(self):
+        cfg = self._cfg()
+        current = destination.resolve(cfg)
+        self.blockSignals(True)
+        self.clear()
+        for d in destination.all_modes(cfg.get("custom")):
+            self.addItem("Off" if d is destination.OFF else d.label, d.key)
+            self.setItemData(self.count() - 1, d.note, Qt.ToolTipRole)
+        self.setCurrentIndex(max(0, self.findData(current.key)))
+        self.blockSignals(False)
+        self.setToolTip("Who's listening: shapes your sounds for the voice chat on the "
+                        f"other end. Now: {current.label}. More options on the Setup tab.")
+
+    def showEvent(self, e):
+        super().showEvent(e)
+        self.refresh()   # changed on the Setup tab or in Settings meanwhile
+
+    def _on_voice_engine(self, _key):
+        self.refresh()
+
+    def _picked(self, i: int):
+        key = self.itemData(i)
+        if key is None:
+            return
+        self._cfg()["mode"] = key
+        destination.apply(self.mw.cfg, self.mw.engine)
+        self.mw._save_later()
+        self.refresh()   # its tooltip names the new mode
+
+
 class DestPanel(QWidget):
     """Mode picker + description + the custom-modes button. Applies to the engine
     and saves through the main window straight away."""
@@ -164,6 +216,9 @@ class DestPanel(QWidget):
         d = destination.resolve(self._cfg())
         self.desc.setText(describe(d))
         self._show_suggestion()
+        combo = getattr(self.mw, "mode_combo", None)   # the Sounds tab's dropdown
+        if combo is not None:
+            combo.refresh()
 
     def _suggested(self) -> str | None:
         """The mode the game in front calls for, if it isn't the one picked."""

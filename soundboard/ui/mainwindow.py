@@ -740,6 +740,14 @@ class MainWindow(QMainWindow):
         size.setToolTip("Pad size")
         size.valueChanged.connect(self.set_pad_width)
         no_wheel(size)
+        # Who's listening, one click away (the full picker is on the Setup tab)
+        from soundboard.ui.destpanel import ModeCombo
+        mode_lbl = QLabel("Listening:")
+        mode_lbl.setObjectName("muted")
+        self.mode_combo = ModeCombo(self)
+        tb.addWidget(mode_lbl)
+        tb.addWidget(self.mode_combo)
+        self._mode_pick = (mode_lbl, self.mode_combo)
         size_lbl = QLabel("Pad size")
         size_lbl.setObjectName("muted")
         tb.addWidget(size_lbl)
@@ -4577,6 +4585,8 @@ class MainWindow(QMainWindow):
         f = self._fit = r.Fitter(self._full)
         f.add(10, "w", r.hide(self.tagline))
         f.add(10, "w", r.hide(*self._pad_size))
+        f.add(16, "w", r.hide(self._mode_pick[0]))   # the dropdown's tooltip says what it is
+        f.add(38, "w", r.hide(self._mode_pick[1]))   # also on the Setup tab
         f.add(12, "w", r.hide(*self._mixer_send))
         f.add(14, "w", r.hide(self.np_time))
         f.add(45, "w", r.hide(self.speed_btn))
