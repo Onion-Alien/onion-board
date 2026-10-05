@@ -195,6 +195,16 @@ static const double LEAD_DEFAULT_S = 0.02;       // how far behind the board to 
 static const double LEAD_MAX_S = 0.12;
 static const double LEAD_STEP_S = 0.005;         // added after each time the board was late
 static const double FADE_S = 0.01;               // crossfade between the mic and the board
+static const uint32_t SHRINK_AFTER = 200;        // blocks on time before the lead shrinks back
+static const double SHRINK_MAX_S = 0.02;         // the most one quiet skip takes back
+static const float QUIET = 0.004f;               // (-48 dBFS) a skip this quiet can't be heard
+// The board's 48 kHz into a mic at another rate: a windowed-sinc (Kaiser) low-pass and
+// resampler, from a table made in LockForProcess. Linear interpolation folded the
+// board's highs back down as noise on 44.1 / 16 kHz mics.
+static const int PHASES = 128;                   // table rows (interpolated between)
+static const double SINC_ATTEN_DB = 80.0;
+static const double SINC_PASS = 0.9;             // of the lower Nyquist: passband edge
+static const double PI_ = 3.14159265358979323846;
 
 enum { MODE_ADD = 0, MODE_REPLACE = 1 };
 enum { SLOT_REPLACING = 1, SLOT_PUBLISHING = 2 };
@@ -231,6 +241,7 @@ struct RingHeader {                // offset
     volatile uint32_t lead;        // 68  board: frames to read behind it (0 = default)
     volatile uint64_t mic_tick;    // 72  GetTickCount64 of the last clean-mic block
     volatile uint32_t effect_version;  // 80  EFFECT_VERSION of the running effect
+    uint32_t board_pid;            // 84  the board writing (another board backs off)
 };
 #pragma pack(pop)
 
@@ -338,6 +349,16 @@ static bool isFloat32(const WAVEFORMATEX *f) {
 static inline float clean(float x) {   // NaN / inf / out of range from the ring: tamed
     if (!(x == x)) return 0.0f;
     return x > 1.0f ? 1.0f : x < -1.0f ? -1.0f : x;
+}
+
+static double besselI0(double x) {
+    double sum = 1.0, term = 1.0;
+    for (int k = 1; k < 64; k++) {
+        term *= (x / (2.0 * k)) * (x / (2.0 * k));
+        sum += term;
+        if (term < sum * 1e-12) break;
+    }
+    return sum;
 }
 
 class OnionMicAPO : public IAudioProcessingObject,
@@ -486,15 +507,17 @@ public:
         m_locked = true;
         m_w = 0.0f;
         m_mg = 1.0f;
+        m_okBlocks = 0;
+        if (m_ring && m_rate) makeKernel();
         if (m_ring && m_rate) {
             double lead = LEAD_DEFAULT_S * m_ring->rate;
             m_leadBase = lead;
             m_lead = lead;
             claimSlot();
         }
-        logf("lock: %u Hz, %u ch, float %d, max %u frames, ring %s, slot %d", m_rate, m_channels,
-             (int)m_float, out[0]->u32MaxFrameCount, m_ring ? "open" : "missing",
-             m_slot ? (int)(m_slot - slots()) : -1);
+        logf("lock: %u Hz, %u ch, float %d, max %u frames, ring %s, slot %d, resampler %d taps",
+             m_rate, m_channels, (int)m_float, out[0]->u32MaxFrameCount,
+             m_ring ? "open" : "missing", m_slot ? (int)(m_slot - slots()) : -1, 2 * m_half);
         return S_OK;
     }
     HRESULT STDMETHODCALLTYPE UnlockForProcess() override {
@@ -533,6 +556,7 @@ private:
         if (m_childConfig) m_childConfig->Release();
         if (m_childRT) m_childRT->Release();
         if (m_child) m_child->Release();
+        if (m_kernel) HeapFree(GetProcessHeap(), 0, m_kernel);
         if (m_ring) UnmapViewOfFile(m_ring);
         if (m_map) CloseHandle(m_map);
         if (m_file != INVALID_HANDLE_VALUE) CloseHandle(m_file);
@@ -604,6 +628,82 @@ private:
             return;
         }
         m_child = child;
+    }
+
+    // The resampler's table: PHASES + 1 rows of 2 * m_half taps. Row p, tap j weighs ring
+    // frame k - m_half + 1 + j for a position k + p / PHASES (then delayed by m_half).
+    // Same rate: no table (whole positions read the ring as it is).
+    void makeKernel() {
+        if (m_kernel) HeapFree(GetProcessHeap(), 0, m_kernel);
+        m_kernel = NULL;
+        m_half = 0;
+        if (m_rate == m_boardRate) return;
+        double r = m_rate < m_boardRate ? (double)m_rate / m_boardRate : 1.0;
+        double fc = 0.5 * r * (1.0 + SINC_PASS) / 2.0;      // cutoff mid-transition
+        double df = 0.5 * r * (1.0 - SINC_PASS);            // transition width
+        double beta = 0.1102 * (SINC_ATTEN_DB - 8.7);
+        int taps = (int)ceil((SINC_ATTEN_DB - 8.0) / (2.285 * 2.0 * PI_ * df)) + 1;
+        int half = (taps + 1) / 2;
+        if (half < 4) half = 4;
+        if (half > 512) half = 512;
+        size_t n = (size_t)(PHASES + 1) * 2 * half;
+        float *k = (float *)HeapAlloc(GetProcessHeap(), 0, n * sizeof(float));
+        if (!k) {
+            problemf("no memory for the resampler: linear instead");
+            return;
+        }
+        double i0b = besselI0(beta);
+        for (int p = 0; p <= PHASES; p++) {
+            float *row = k + (size_t)p * 2 * half;
+            double sum = 0.0;
+            for (int j = 0; j < 2 * half; j++) {
+                double t = (double)(j - half + 1) - (double)p / PHASES;
+                double u = t / half;
+                double w = u * u < 1.0 ? besselI0(beta * sqrt(1.0 - u * u)) / i0b : 0.0;
+                double x = 2.0 * fc * t;
+                double sinc = fabs(x) < 1e-9 ? 1.0 : sin(PI_ * x) / (PI_ * x);
+                row[j] = (float)(2.0 * fc * sinc * w);
+                sum += row[j];
+            }
+            for (int j = 0; j < 2 * half; j++) row[j] = (float)(row[j] / sum);   // DC: 1
+        }
+        m_kernel = k;
+        m_half = half;
+    }
+
+    // The board's audio at ring position `pos` (in ring frames, fractional).
+    inline float sample(double pos) const {
+        if (m_kernel) {
+            double x = pos - m_half;
+            double fk = floor(x);
+            uint64_t k = (uint64_t)(int64_t)fk;
+            float pf = (float)(x - fk) * PHASES;
+            int pi = (int)pf;
+            if (pi >= PHASES) pi = PHASES - 1;
+            if (pi < 0) pi = 0;
+            float fr = pf - (float)pi;
+            const float *a = m_kernel + (size_t)pi * 2 * m_half, *b = a + 2 * m_half;
+            uint64_t first = k - (uint64_t)m_half + 1;
+            float acc = 0.0f;
+            for (int j = 0; j < 2 * m_half; j++)
+                acc += m_data[(first + j) & m_mask] * (a[j] + (b[j] - a[j]) * fr);
+            return clean(acc);
+        }
+        uint64_t k = (uint64_t)pos;
+        float f = (float)(pos - (double)k);
+        float a = clean(m_data[k & m_mask]), b = clean(m_data[(k + 1) & m_mask]);
+        return a + (b - a) * f;
+    }
+
+    // Peak of the board's audio over ring frames [from, from + n).
+    float peakOf(double from, uint32_t n) const {
+        uint64_t k = (uint64_t)(int64_t)floor(from);
+        float pk = 0.0f;
+        for (uint32_t i = 0; i < n; i++) {
+            float v = fabsf(clean(m_data[(k + i) & m_mask]));
+            if (v > pk) pk = v;
+        }
+        return pk;
     }
 
     void openRing() {
@@ -730,6 +830,9 @@ private:
         bool silent = o->u32BufferFlags != BUFFER_VALID;
         uint64_t wp = h->write_pos;
         bool board = h->enabled && now - h->board_tick <= BOARD_STALE_MS;
+        // positions are tracked in doubles: past 2^52 frames (thousands of years at
+        // 48 kHz, so only junk) they'd stop counting. The board starts over from 0.
+        if (wp > (1ull << 52)) board = false;
         bool replaceMode = h->mode == MODE_REPLACE;
         double step = (double)m_boardRate / (double)m_rate;   // ring frames per mic frame
         double cap = (double)(m_mask + 1);
@@ -767,6 +870,8 @@ private:
             if (m_slot) m_slot->underruns = m_slot->underruns + 1;
         }
         m_late = late;
+        if (late || !board) m_okBlocks = 0;
+        else if (m_okBlocks < 0x7fffffff) m_okBlocks++;
         float wTarget = board && ahead && replaceMode ? 1.0f : 0.0f;
         float mgTarget = 1.0f;
         if (board && !replaceMode) {
@@ -777,6 +882,7 @@ private:
         if (!(g >= 0.0f && g < 16.0f)) g = 1.0f;
         float ramp = 1.0f / (float)(FADE_S * m_rate);
         float w = m_w, mg = m_mg;
+        float sLast = 1.0f;
         bool any = false;
         if (have || w > 0.0f || mg != 1.0f || mgTarget != 1.0f) {
             if (silent) {   // a silent buffer's contents are undefined: start from zero
@@ -786,10 +892,7 @@ private:
             for (UINT32 i = 0; i < frames; i++) {
                 float s = 0.0f;
                 if (have) {
-                    uint64_t k = (uint64_t)pos;
-                    float f = (float)(pos - (double)k);
-                    float a = clean(m_data[k & m_mask]), b = clean(m_data[(k + 1) & m_mask]);
-                    s = (a + (b - a) * f) * g;
+                    s = sample(pos) * g;
                     pos += step;
                 }
                 w += w < wTarget ? ramp : w > wTarget ? -ramp : 0.0f;
@@ -798,6 +901,7 @@ private:
                 mg += mg < mgTarget ? ramp : mg > mgTarget ? -ramp : 0.0f;
                 if (fabsf(mg - mgTarget) < ramp) mg = mgTarget;
                 float keep = (1.0f - w) * mg;
+                sLast = s;
                 if (replaceMode) s *= w;   // crossfade: the board's voice in, the mic out
                 float *p = buf + (size_t)i * ch;
                 for (UINT32 c = 0; c < ch; c++) {
@@ -807,6 +911,20 @@ private:
                 any = any || s != 0.0f || keep != 1.0f;
             }
             if (have) m_pos = pos;
+            // On time for a while after a hiccup: read closer to the board again (less
+            // delay), skipping a stretch only where it's quiet on both sides of the jump
+            if (have && !late && m_okBlocks > SHRINK_AFTER && m_lead > m_leadBase + 0.5) {
+                double d = m_lead - m_leadBase;
+                if (d > SHRINK_MAX_S * m_boardRate) d = SHRINK_MAX_S * m_boardRate;
+                uint32_t look = (uint32_t)d + 2 * (uint32_t)m_half + 2;
+                float quiet = QUIET / (g > 1.0f ? g : 1.0f);
+                if (fabsf(sLast) < QUIET && peakOf(m_pos - m_half - 1, look) < quiet
+                        && (double)wp - (m_pos + d) >= need + frames * step) {
+                    m_pos += d;
+                    m_lead -= d;
+                    m_okBlocks = SHRINK_AFTER - 10;   // the next one can follow soon
+                }
+            }
         }
         m_w = w;
         m_mg = mg;
@@ -848,6 +966,9 @@ private:
     double m_lead = 0;
     double m_leadBase = 0;
     bool m_late = false;
+    uint32_t m_okBlocks = 0;   // blocks the board was on time for, in a row
+    float *m_kernel = NULL;    // the resampler's table (makeKernel); NULL = same rate
+    int m_half = 0;            // its half width, in ring frames
     float m_w = 0.0f;    // 0 = the mic, 1 = the board's voice (MODE_REPLACE), crossfaded
     float m_mg = 1.0f;   // the mic's level (MODE_ADD)
 };

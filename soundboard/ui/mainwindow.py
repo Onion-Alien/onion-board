@@ -1956,10 +1956,13 @@ class MainWindow(QMainWindow):
         directmic.forget_status()
         if err:
             log.warning("not put on the mic: %s", err)
+            # the route stays on the mic: until it's set up, the cable carries the
+            # sounds meanwhile (_main_name), and the one-click stays on offer
             if self.cfg.route == "mic" and eng.virtual_outputs():
-                self.set_route("cable")   # sounds still reach Discord and games meanwhile
-                err += ("\n\nYour sounds go through the virtual cable for now. Try again "
+                err += ("\n\nYour sounds go through the virtual cable meanwhile. Try again "
                         "any time from the Setup tab.")
+            else:
+                err += "\n\nTry again any time from the Setup tab."
             QMessageBox.warning(self, "Couldn't put Onion Board on your mic", err)
         else:
             log.info("on the mic now: %s", mic)

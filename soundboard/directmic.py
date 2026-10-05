@@ -21,6 +21,8 @@ folder lets the audio engine's account and signed-in users read and write it):
   68  u32 lead (board): ring frames the effect reads behind the board (0 = 20 ms)
   72  u64 the clean mic's last block (GetTickCount64)
   80  u32 the running effect's version
+  84  u32 the process id of the board writing (another board backs off; the effect
+      doesn't read it)
   256 SLOTS slots of 64 bytes, one per app recording the mic (SLOT below)
   HEADER: f32[capacity] what others hear, mono, at `rate`
   then:   f32[mic capacity][2] the clean mic, at the mic's rate
@@ -82,14 +84,15 @@ BLOCK = 480                 # frames rendered per engine call (10 ms)
 ALIVE_MS = 250              # effect heard from this recently: it's running
 MIC_LIVE_MS = 150           # the clean mic arrived this recently: the board runs on it
 POLL_S = 0.002
+OTHER_BOARD_MS = 1000       # another board wrote this recently: it's still running
 
 HEAD = np.dtype({
     "names": ["magic", "version", "rate", "capacity", "write_pos", "board_tick", "enabled",
               "mode", "gain", "mic_gain", "mic_capacity", "publisher", "mic_write_pos",
-              "mic_rate", "lead", "mic_tick", "effect_version"],
+              "mic_rate", "lead", "mic_tick", "effect_version", "board_pid"],
     "formats": ["<u4", "<u4", "<u4", "<u4", "<u8", "<u8", "<u4", "<u4", "<f4", "<f4", "<u4",
-                "<i4", "<u8", "<u4", "<u4", "<u8", "<u4"],
-    "offsets": [0, 4, 8, 12, 16, 24, 32, 36, 40, 44, 48, 52, 56, 64, 68, 72, 80],
+                "<i4", "<u8", "<u4", "<u4", "<u8", "<u4", "<u4"],
+    "offsets": [0, 4, 8, 12, 16, 24, 32, 36, 40, 44, 48, 52, 56, 64, 68, 72, 80, 84],
     "itemsize": SLOT_OFFSET})
 SLOT = np.dtype({
     "names": ["owner", "rate", "channels", "flags", "tick", "read_pos", "lead", "underruns",
@@ -253,7 +256,7 @@ class RingWriter:
     def mic_live(self, now: int | None = None) -> bool:
         """The clean mic is arriving."""
         now = _tick() if now is None else now
-        return now - int(self._mtick[0]) < MIC_LIVE_MS and self.mic_rate > 0
+        return now - int(self._mtick[0]) < MIC_LIVE_MS and 8000 <= self.mic_rate <= 384000
 
     def effect_format(self) -> tuple[int, int]:
         s = self.live_slots()
@@ -269,6 +272,17 @@ class RingWriter:
     def late(self) -> int:
         """Times, summed over the running instances, the board was late for them."""
         return int(self.live_slots()["underruns"].sum())
+
+    def claim(self):
+        """This board writes the ring from now on. Another board still writing it (a
+        second copy of the app on its own profile) keeps it: two writing at once would
+        put both mixes, chopped up, on the mic."""
+        pid, me = int(self._get("board_pid")), os.getpid()
+        if pid and pid != me and self._get("enabled") \
+                and _tick() - int(self._btick[0]) < OTHER_BOARD_MS and _pid_alive(pid):
+            raise RuntimeError("Another Onion Board is already sending into your mic. "
+                               "Close it, and this one takes over.")
+        self._set("board_pid", me)
 
     def set_enabled(self, on: bool):
         self._set("enabled", 1 if on else 0)
@@ -298,6 +312,8 @@ class RingWriter:
         if n > CAPACITY:
             mono, n = mono[-CAPACITY:], CAPACITY
         pos = self.write_pos
+        if pos > 1 << 52:   # junk (the effect ignores it): start counting over
+            pos = 0
         i = pos & (CAPACITY - 1)
         first = min(n, CAPACITY - i)
         self.data[i:i + first] = mono[:first]
@@ -315,9 +331,12 @@ class RingWriter:
             return self.mic[i:i + n].copy()
         return np.concatenate([self.mic[i:], self.mic[:n - first]])
 
-    def close(self):
+    def close(self, owner: bool = True):
+        """`owner`: this board was writing the ring (switch it off on the way out)."""
         try:
-            self._set("enabled", 0)
+            if owner and int(self._get("board_pid")) in (0, os.getpid()):
+                self._set("enabled", 0)
+                self._set("board_pid", 0)
         except (ValueError, TypeError, AttributeError, KeyError):
             pass
         for name in ("h", "slots", "data", "mic", "_wp", "_btick", "_mwp", "_mtick",
@@ -349,6 +368,11 @@ class DirectMicStream:
         if path is None:
             make_ring()
         self._ring = RingWriter(path)
+        try:
+            self._ring.claim()
+        except RuntimeError:
+            self._ring.close(owner=False)
+            raise
         self._ring.set_mode(mode)
         self._ring.set_lead(lead_s)
         self.mode = mode
@@ -480,6 +504,24 @@ class DirectMicStream:
             log.exception("mic effect feed stopped")
 
 
+def _pid_alive(pid: int) -> bool:
+    """A process with this id is running (one we may not look into counts as running)."""
+    if sys.platform != "win32":
+        return True
+    k32 = ctypes.WinDLL("kernel32", use_last_error=True)
+    k32.OpenProcess.restype = ctypes.c_void_p
+    h = k32.OpenProcess(0x1000, False, pid)   # PROCESS_QUERY_LIMITED_INFORMATION
+    if not h:
+        return ctypes.get_last_error() == 5   # access denied: someone else's, running
+    try:
+        code = ctypes.c_ulong()
+        k32.GetExitCodeProcess.argtypes = [ctypes.c_void_p, ctypes.POINTER(ctypes.c_ulong)]
+        return bool(k32.GetExitCodeProcess(ctypes.c_void_p(h), ctypes.byref(code))) \
+            and code.value == 259   # STILL_ACTIVE
+    finally:
+        k32.CloseHandle(ctypes.c_void_p(h))
+
+
 # ---------------------------------------------------------------------- the mics
 
 def capture_endpoints() -> list[dict]:
@@ -607,14 +649,15 @@ def effect_in_place(guid: str) -> bool:
     try:
         with winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE,
                             rf"{CAPTURE_KEY}\{guid}\FxProperties") as k:
-            for pid in (SFX, LFX, COMPOSITE_SFX):
-                v = _value(k, FX % pid)
-                vals = v if isinstance(v, list) else [v]
-                if any(isinstance(x, str) and x.upper() == CLSID for x in vals):
-                    return True
+            return any(_is_ours(_value(k, FX % pid)) for pid in (SFX, LFX, COMPOSITE_SFX))
     except OSError:
-        pass
-    return False
+        return False
+
+
+def _is_ours(value) -> bool:
+    """An effect slot's value (one CLSID, or a list of them) holds this effect."""
+    vals = value if isinstance(value, list) else [value]
+    return any(isinstance(x, str) and x.upper() == CLSID for x in vals)
 
 
 def registered_dll() -> Path | None:
@@ -729,6 +772,17 @@ class _BackupKey:
     def set(self, name, kind, value):
         winreg.SetValueEx(self.h, name, 0, kind, value)
 
+    def set_raw(self, name, kind, data: bytes):
+        """A value of any kind, byte for byte (winreg converts only the kinds it knows)."""
+        from ctypes import wintypes
+        advapi = ctypes.WinDLL("advapi32", use_last_error=True)
+        fn = advapi.RegSetValueExW
+        fn.argtypes = [wintypes.HKEY, wintypes.LPCWSTR, wintypes.DWORD, wintypes.DWORD,
+                       ctypes.c_char_p, wintypes.DWORD]
+        err = fn(self.h, name, 0, kind, data, len(data))
+        if err:
+            raise ctypes.WinError(err)
+
     def delete(self, name):
         try:
             winreg.DeleteValue(self.h, name)
@@ -755,6 +809,23 @@ def _run(cmd: list[str]) -> int:
     if r.returncode:
         log.warning("%s -> %s %s", " ".join(cmd), r.returncode, (r.stdout + r.stderr).strip())
     return r.returncode
+
+
+def _audio_comes_back():
+    """A small helper that starts Windows' audio again once this process ends, however
+    it ends: killed half-way or crashed, the PC must never be left without sound.
+    (Starting a service that's already running does nothing.)"""
+    script = (f"Wait-Process -Id {os.getpid()} -ErrorAction SilentlyContinue; "
+              "Start-Service AudioEndpointBuilder; Start-Service Audiosrv")
+    cmd = ["powershell", "-NoProfile", "-NonInteractive", "-Command", script]
+    for flags in (_CREATE_NO_WINDOW | 0x01000000, _CREATE_NO_WINDOW):   # out of our job
+        try:
+            subprocess.Popen(cmd, creationflags=flags, stdin=subprocess.DEVNULL,
+                             stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            return
+        except OSError:
+            continue
+    log.warning("no helper to bring the audio back if this stops half-way")
 
 
 def _audio_service(start: bool):
@@ -818,7 +889,7 @@ def _original(values: dict[int, object], pid: int) -> str:
     old = values.get(pid)
     if not old and pid == SFX and not values.get(EFX):
         old = values.get(LFX)
-    return old if isinstance(old, str) else ""
+    return old if isinstance(old, str) and not _is_ours(old) else ""
 
 
 def _install_endpoint(guid: str, slot: str | None):
@@ -831,22 +902,10 @@ def _install_endpoint(guid: str, slot: str | None):
         kind, pid = pick_slot(values) if not slot else ("wrap", SLOTS_FX[slot])
         state.set("FxCreated", winreg.REG_DWORD, 1 if fx.created else 0)
         state.set("Slot", winreg.REG_DWORD, pid)
-        # every value this touches, as it was ("" = wasn't there), to put back later
-        before = {}
-        for name in (FX % pid, MODES_KEY % SFX, FX % LFX, FX % GFX, DISABLE_SYSFX):
-            v = fx.get(name)
-            before[name] = v
-        saved = []
-        for name, v in before.items():
-            if v is None:
-                saved.append(f"{name}=")
-            elif v[1] == winreg.REG_MULTI_SZ:
-                saved.append(f"{name}=multi:" + "|".join(v[0]))
-            elif v[1] == winreg.REG_DWORD:
-                saved.append(f"{name}=dword:{int(v[0])}")
-            else:
-                saved.append(f"{name}=sz:{v[0]}")
-        state.set("Before", winreg.REG_MULTI_SZ, saved)
+        # every value this touches, as it was, to put back later (written before anything
+        # changes, so a step cut off half-way can still be undone)
+        names = (FX % pid, MODES_KEY % SFX, FX % LFX, FX % GFX, DISABLE_SYSFX)
+        state.set("Before", winreg.REG_MULTI_SZ, [_note(n, fx.get(n)) for n in names])
         if kind == "composite":
             cur = list(values[COMPOSITE_SFX] or [])
             fx.set(FX % pid, winreg.REG_MULTI_SZ,
@@ -866,7 +925,51 @@ def _install_endpoint(guid: str, slot: str | None):
     log.info("mic effect on %s (slot %s)", guid, pid)
 
 
+def _note(name: str, v) -> str:
+    """One value as it was, for the "Before" notes: `name=` (wasn't there),
+    `name=sz:...`, `name=multi:a|b`, `name=dword:N`, or `name=raw:<type>:<hex>` for any
+    other kind, so it goes back exactly as it was. This effect's own CLSID is never
+    noted as an original (notes lost while it was on the mic): it's left out."""
+    if v is None:
+        return f"{name}="
+    value, kind = v
+    if kind == winreg.REG_MULTI_SZ and all(isinstance(x, str) for x in value or []):
+        return f"{name}=multi:" + "|".join(x for x in value or [] if x.upper() != CLSID)
+    if kind == winreg.REG_DWORD:
+        return f"{name}=dword:{int(value)}"
+    if kind == winreg.REG_SZ and isinstance(value, str):
+        return f"{name}=" if value.upper() == CLSID else f"{name}=sz:{value}"
+    if isinstance(value, bytes):
+        raw = value
+    elif isinstance(value, int):
+        raw = value.to_bytes(8 if kind == winreg.REG_QWORD else 4, "little", signed=value < 0)
+    elif value is None:
+        raw = b""
+    else:
+        raw = (str(value) + "\0").encode("utf-16-le")
+    return f"{name}=raw:{kind}:{raw.hex()}"
+
+
+def _put_back(fx, item: str):
+    """Undo one "Before" note (see _note)."""
+    name, _, value = item.partition("=")
+    if not value:
+        fx.delete(name)
+    elif value.startswith("multi:"):
+        fx.set(name, winreg.REG_MULTI_SZ, value[6:].split("|") if value[6:] else [])
+    elif value.startswith("dword:"):
+        fx.set(name, winreg.REG_DWORD, int(value[6:]))
+    elif value.startswith("raw:"):
+        kind, _, data = value[4:].partition(":")
+        fx.set_raw(name, int(kind), bytes.fromhex(data))
+    else:
+        fx.set(name, winreg.REG_SZ, value.removeprefix("sz:"))
+
+
 def _uninstall_endpoint(guid: str):
+    """Put one mic back as it was before _install_endpoint. If Windows already took the
+    effect off (a driver update or "Reset sound settings" rewrote the mic's effects),
+    what's there now is the driver's own and stays: the notes are only dropped."""
     base = rf"{CAPTURE_KEY}\{guid}"
     with _StateKey(rf"{ENDPOINTS_KEY}\{guid}") as state:
         before = (state.get("Before") or ([],))[0] or []
@@ -881,17 +984,14 @@ def _uninstall_endpoint(guid: str):
                 before.append(f"{FX % 0}=")
     try:
         with _BackupKey(base + r"\FxProperties", create=False) as fx:
-            for item in before:
-                name, _, value = item.partition("=")
-                if not value:
-                    fx.delete(name)
-                elif value.startswith("multi:"):
-                    fx.set(name, winreg.REG_MULTI_SZ, value[6:].split("|") if value[6:] else [])
-                elif value.startswith("dword:"):
-                    fx.set(name, winreg.REG_DWORD, int(value[6:]))
-                else:
-                    fx.set(name, winreg.REG_SZ, value.removeprefix("sz:"))
-        if created:
+            ours = any(_is_ours((fx.get(FX % p) or (None,))[0])
+                       for p in (SFX, LFX, COMPOSITE_SFX))
+            if ours:
+                for item in before:
+                    _put_back(fx, item)
+            else:
+                log.info("%s: Windows already took the effect off; left as it is", guid)
+        if created and ours:
             _delete_if_empty(base + r"\FxProperties")
     except FileNotFoundError:
         pass   # the mic is gone
@@ -929,6 +1029,7 @@ def admin_install(guid: str, slot: str | None = None) -> int:
         log.error("no effect DLL at %s", dll)
         return 3
     _enable_privileges("SeBackupPrivilege", "SeRestorePrivilege")
+    _audio_comes_back()
     _audio_service(False)
     try:
         # a name of its own per version: a copy Windows still holds can't block it
@@ -951,6 +1052,7 @@ def admin_install(guid: str, slot: str | None = None) -> int:
 
 def admin_uninstall() -> int:
     _enable_privileges("SeBackupPrivilege", "SeRestorePrivilege")
+    _audio_comes_back()
     _audio_service(False)
     try:
         for guid in installed_on():
