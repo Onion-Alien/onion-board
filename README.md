@@ -9,18 +9,18 @@ Or send it to your stream, or keep it to your own headphones.
 ## ⬇️ [Download Onion Board for Windows](../../releases/latest/download/OnionBoardSetup.exe)
 
 <!-- release -->
-Version **1.8.0** · Windows 10 / 11 · free, no account, no ads, anonymous usage count you can switch off ·
-[VirusTotal: 68 of 68 clean](https://www.virustotal.com/gui/file/3fdbbb28e226d326210edd0ac5769d763ae31fd7637dac68b06df852e836be1c) ·
+Version **1.9.0** · Windows 10 / 11 · free, no account, no ads, anonymous usage count you can switch off ·
+[VirusTotal: 69 of 69 clean](https://www.virustotal.com/gui/file/c19238cbe0e32c81066dc8dae6084aafe5925e0dfc4cee31a25c7062a22c7967) ·
 [what's new](CHANGELOG.md)
 <!-- /release -->
 
-![Onion Board's sound pads](docs/screenshots/sounds.png?v=98627e2c)
+![Onion Board's sound pads](docs/screenshots/sounds.png?v=40b665fb)
 
 | | |
 |---|---|
-| ![Voice changer and text-to-speech](docs/screenshots/voice.png?v=96465201) | ![Screen triggers](docs/screenshots/triggers.png?v=7a4f009b) |
+| ![Voice changer and text-to-speech](docs/screenshots/voice.png?v=ea48680a) | ![Screen triggers](docs/screenshots/triggers.png?v=5a7e3f8b) |
 | **Voice**: change your voice live, or type and a computer voice says it | **Triggers**: a sound the moment "YOU DIED" shows up in your game |
-| ![Send a program's sound](docs/screenshots/apps.png?v=c3da8321) | ![Setup at a glance](docs/screenshots/setup.png?v=17983aac) |
+| ![Send a program's sound](docs/screenshots/apps.png?v=ddf57f61) | ![Setup at a glance](docs/screenshots/setup.png?v=a211385e) |
 | **Apps**: send one program's sound (music, a video) to your friends | **Setup**: one look tells you whether others can hear you |
 
 ## What it does
