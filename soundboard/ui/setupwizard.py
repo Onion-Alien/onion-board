@@ -24,6 +24,7 @@ from PySide6.QtWidgets import (QApplication, QButtonGroup, QCheckBox, QDialog, Q
                                QHBoxLayout, QLabel, QMessageBox, QProgressBar, QPushButton,
                                QRadioButton, QScrollArea, QStackedWidget, QVBoxLayout, QWidget)
 
+from soundboard import directmic
 from soundboard import engine as eng
 from soundboard import theme
 from soundboard.engine import SR
@@ -338,12 +339,19 @@ class SetupWizard(QDialog):
         v = QVBoxLayout(p)
         self.bun_cable = BunnyWidget("plug")
         v.addLayout(_header("Where do your sounds go?",
-                            _label("Usually into a <b>virtual cable</b>: a free add-on that "
-                                   "works like an invisible microphone. Onion Board puts "
-                                   "<b>your sounds</b> (and your voice, if you send it) into "
-                                   "it, and Discord or your game listens to it. Not using a "
-                                   "cable? Use the button below."),
+                            _label("Straight into <b>your mic</b>: one click, and Discord "
+                                   "and games hear your sounds through the mic they already "
+                                   "use. Nothing to install from the internet, nothing to "
+                                   "pick in Discord. (Or use a free <b>virtual cable</b> "
+                                   "instead.)"),
                             self.bun_cable))
+        self.btn_attach = QPushButton("Put Onion Board on my mic")
+        icons.set_icon(self.btn_attach, "mic", "on_accent")
+        self.btn_attach.setObjectName("primary")
+        self.btn_attach.setStyleSheet("padding:12px; font-size:12pt;")
+        self.btn_attach.clicked.connect(self.attach_mic)
+        v.addWidget(self.btn_attach)
+        self.win.mic_attached.connect(lambda *_: self.recheck_cable(rescan=False))
         self.cable_status = _label("")
         self.cable_status.setStyleSheet("font-size:12pt; padding:12px;")
         v.addWidget(self.cable_status)
@@ -592,11 +600,13 @@ class SetupWizard(QDialog):
         return bool(eng.virtual_outputs())
 
     def route_ok(self) -> bool:
-        """Step 3 is done: the cable is there, another device is sending, or sending
-        nowhere was picked on purpose."""
+        """Step 3 is done: the cable is there, the mic effect is on the mic, another
+        device is sending, or sending nowhere was picked on purpose."""
         route = self.win.cfg.route
         if route == "off":
             return True
+        if route == "mic":
+            return directmic.status(self.win.cfg.mic_device) == "ready"
         if route == "device":   # picked, and it opened
             return (self.win._main_name() is not None
                     and "main" not in self.win.engine.errors_snapshot())
@@ -612,8 +622,41 @@ class SetupWizard(QDialog):
         if not busy and self.bun_cable.building:
             self.bun_cable.stop_building(self.cable_ok())
         route = self.win.cfg.route
-        self.btn_use_cable.setVisible(not busy and route != "cable")
+        # (straight into the mic has its own "...instead" button, below)
+        self.btn_use_cable.setVisible(not busy and route not in ("cable", "mic"))
+        primary = "" if route == "mic" else "primary"   # one main button: the mic's
+        if self.btn_cable.objectName() != primary:
+            self.btn_cable.setObjectName(primary)
+            self.btn_cable.setStyleSheet("padding:8px;" if route == "mic"
+                                         else "padding:12px; font-size:12pt;")
+            self.btn_cable.style().unpolish(self.btn_cable)
+            self.btn_cable.style().polish(self.btn_cable)
         self.btn_other.setVisible(not busy and self.other_box.isHidden())
+        attaching = self.win._attaching
+        self.btn_attach.setVisible(not busy and not (route == "mic" and self.route_ok()))
+        self.btn_attach.setEnabled(not attaching)
+        state = directmic.status(self.win.cfg.mic_device)
+        self.btn_attach.setText("Setting up… click Yes when Windows asks" if attaching
+                                else "Repair (one click)" if directmic.needs_repair(state)
+                                else "Put Onion Board on my mic")
+        if route == "mic" and not busy and not self._cable_tries and not self._needs_restart:
+            self.other_box.hide()
+            if self.route_ok():
+                self.cable_status.setText(f"<b style='color:{_ok()}'>✓ On your "
+                                          "mic.</b> Discord and games hear your sounds "
+                                          "through it — press Next.")
+            elif directmic.needs_repair(state):
+                self.cable_status.setText("Onion Board was on your mic but needs a quick "
+                                          "repair: <b>one click</b>, and Windows asks for "
+                                          "permission once.")
+            else:
+                self.cable_status.setText("Windows asks for permission once, and your "
+                                          "PC's sound drops out for a second.")
+            self.btn_cable.setText("Use the virtual cable instead")
+            self.btn_cable.show()
+            self.btn_recheck.hide()
+            self._update_next()
+            return
         if busy:
             self.cable_status.setText("<b>Bun is setting it up for you…</b>")
             self.cable_steps.setText(self._steps_html())
@@ -700,7 +743,14 @@ class SetupWizard(QDialog):
             self.btn_recheck.show()   # for after installing it by hand
         self._update_next()
 
+    def attach_mic(self):
+        self.win.attach_mic()
+        self.recheck_cable(rescan=False)
+
     def install_cable(self):
+        if self.win.cfg.route == "mic" and self.cable_ok():   # "...instead", and it's there
+            self._pick_route("cable")
+            return
         script = RESOURCE_DIR / "install-vbcable.ps1"
         if not net.allowed("setup_downloads"):
             self.cable_status.setText(html.escape(net.off_message("setup_downloads")))
@@ -712,6 +762,8 @@ class SetupWizard(QDialog):
         global _installer
         if self._proc is not None:
             return   # one install at a time
+        if self.win.cfg.route == "mic":   # "Use the virtual cable instead"
+            self.win.set_route("cable")
         try:
             status = self._status_file()
             status.unlink(missing_ok=True)
@@ -792,6 +844,9 @@ class SetupWizard(QDialog):
         for b in (self.btn_steam, self.btn_game, self.btn_meeting,   # mic settings: not
                   self.btn_nomic):
             b.setVisible(bool(name) or cfg.route == "cable")      # without a mic end to pick
+        if cfg.route == "mic":
+            self._fill_direct()
+            return
         self.discord_title.setText(
             "Last step: nothing to tell" if cfg.route == "off" else
             "Last step: pick it up where it arrives" if cfg.route == "device" and dev
@@ -837,6 +892,31 @@ class SetupWizard(QDialog):
             "background noise and chops them up.<br><br>"
             f"<b>In a game:</b> open its audio / voice chat settings, set the microphone to "
             f"<b>{esc}</b> and turn off its noise suppression.")
+
+    def _fill_direct(self):
+        """Straight into my mic: Discord and games keep the mic they have."""
+        cfg = self.win.cfg
+        self.btn_copy.hide()
+        if directmic.status(cfg.mic_device) != "ready":
+            self.discord_title.setText("Last step: tell Discord or your game")
+            self.discord_text.setText(
+                f"<span style='color:{_bad()}'>Onion Board isn't on your mic yet, so only "
+                "you will hear your sounds.</span> Go <b>Back</b> and click <b>Put Onion "
+                "Board on my mic</b> (or use the virtual cable), or finish now and this "
+                "guide will open again next time.")
+            self.btn_discord.hide()
+            return
+        self.discord_title.setText("Last step: nothing to pick")
+        self.btn_discord.show()
+        mic = html.escape(cfg.mic_device or "your mic")
+        self.discord_text.setText(
+            "Discord and your games keep using the mic they already have:"
+            f"<p style='font-size:15pt; font-weight:800; color:{_ok()}'>{mic}</p>"
+            "Your sounds are in it now, so there's nothing to pick anywhere.<br><br>"
+            "<b>One thing worth doing in Discord:</b> ⚙ User Settings → <b>Voice &amp; "
+            "Video</b> → <b>Input Profile</b> → <b>Studio</b>. Left on, its noise "
+            "suppression treats your sounds as background noise and chops them up. "
+            "<b>In a game:</b> turn off its noise suppression if your sounds cut out.")
 
     def show_steam_guide(self):
         self.show_guide("steam")

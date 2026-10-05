@@ -31,6 +31,15 @@ In scope, for example:
 - The installer or `installer/install-vbcable.ps1` running something that isn't what it
   claims to be (e.g. the VB-Cable signature check being bypassable).
 - Crafted audio / video files that cause code execution, not just a failed import.
+- *Straight into my mic*: its effect DLL runs inside Windows' audio engine
+  (`audiodg.exe`, as LOCAL SERVICE). Anything another local user or program can write
+  into `%ProgramData%\OnionBoard\MicPlugin\ring2.bin` (signed-in users may write it,
+  by design) that crashes the audio engine, runs code in it, or reads or writes outside
+  the file is in scope; the effect takes the sizes once and checks every sample. So is
+  the admin step (`--direct-mic install / uninstall`) installing any DLL but the app's
+  own copy, or leaving a mic's effect settings changed after an uninstall. Others on
+  the PC hearing or changing what goes into your mic through that file is a known part
+  of the design (anyone signed in can already record and play audio).
 - Anything that sends the user's data off the machine without them asking.
 - With a proxy set (Settings → Connection), any request the
   app makes that goes around it, or a DNS lookup of a site's name on this PC

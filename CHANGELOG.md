@@ -31,6 +31,16 @@
   - Less CPU while idle, in the in-game overlay (none for paused sounds), on the
     Apps tab while hidden or behind a game, and in the setup guide. Bun in
     headphones rests between notes.
+- **No virtual cable needed any more:** *Straight into my mic* puts your sounds into
+  the mic Discord and your games already use. One click and one Windows permission
+  prompt, and there's nothing to pick in Discord or the game. Your voice changer, mic
+  volume, voice EQ, gate, ducking and mute all still work; your mic meter and mic
+  check hear only you; Discord and a game can use the mic at the same time. If
+  Onion Board closes, your mic is just your mic again. New users start with it;
+  if you already use the virtual cable, nothing changes until you click *Straight
+  into my mic instead* on the Setup tab. If a Windows update takes it off your mic,
+  the Setup tab offers a one-click repair (or the cable). Uninstalling Onion Board
+  puts your mic back exactly as it was.
 - **Simpler sound modes:** *Who's listening* is now four modes: **Game**, **Voice
   chat**, **Clean** and **Advanced**. Game and Voice chat work out the exact voice
   chat by themselves (the game's own voice engine, or the app listening to the

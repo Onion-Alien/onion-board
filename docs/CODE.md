@@ -4,12 +4,39 @@ For people changing the code. Using the app needs none of this: the
 [README](../README.md) covers that. The edit → check → build → release loop is in
 [DEVELOPING.md](DEVELOPING.md); the rules are in [CONTRIBUTING.md](../CONTRIBUTING.md).
 
-## Sending sounds to others: the virtual cable, or something else
+## Sending sounds to others: straight into your mic, the virtual cable, or something else
 
 Setup → Devices → *Send to others through* (also Settings → Audio → Devices) picks
 the route (`Config.route`, `library.ROUTES`):
 
-- **The virtual cable** (the default): a free audio driver (VB-Audio Virtual Cable)
+- **Straight into my mic** (new users start here, `Config.first_start`): Onion Board
+  puts a small Windows audio effect on the real mic (`native/directmic/obmic.cpp`, an
+  "APO" like Equalizer APO's, built with MinGW by `scripts/build_directmic.py`), so
+  Discord and games hear the sounds through the mic they already use. Soundpad works
+  the same way. One admin prompt sets it up (`main.py --direct-mic install <endpoint>`,
+  `soundboard/directmic.py`'s admin part): the DLL goes to `Program Files\Onion Board
+  Mic`, is registered, and takes the mic's stream-effect slot (SFX; Windows runs only
+  stream effects in front of each app's recording, after the mic's own endpoint
+  effect). An effect the driver had in that slot is saved and run first, inside ours.
+  Every value changed is noted under `HKLM\SOFTWARE\OnionBoard\MicPlugin` so
+  `--direct-mic uninstall` (and the uninstaller's `--direct-mic remove`) puts the mic
+  back exactly.
+
+  Board ↔ effect: `%ProgramData%\OnionBoard\MicPlugin\ring2.bin`, a shared file
+  (layout in `directmic.py`'s docstring). The effect publishes the **clean mic**
+  (before anything of the board's) and the board takes its mic from there: the meter,
+  mic check, OBS voice and voice changer never hear its own sounds come back. For each
+  stretch of clean mic the board renders the same stretch of what others hear
+  (`DirectMicStream`, on the mic's clock: no drift), and in *replace* mode (the
+  default) the effect puts that whole send mix, processed voice included, in place of
+  the mic about 20 ms later, so every mic feature works as with the cable. Each app
+  recording the mic runs its own instance with its own slot in the file. Whenever the
+  board is late or gone the mic fades back in over what the board had already sent.
+  `directmic.status()` notices a mic Windows took the effect off ('wiped') or one with
+  an older copy of it ('outdated'); the Setup tab offers a one-click repair, or the
+  cable. Tests run the real DLL in `testhost.exe`, which loads it the way Windows does.
+- **The virtual cable** (the fallback, and what settings from before the mic route
+  keep): a free audio driver (VB-Audio Virtual Cable)
   that acts like a pipe: the app plays into one end and Discord or the game uses the
   other end as a microphone. It isn't included in this repo because VB-Audio's
   licence doesn't allow redistributing it. `installer\install-vbcable.ps1` downloads
@@ -114,6 +141,8 @@ the launcher the shortcuts and PyInstaller use. The app is the `soundboard` pack
 | `soundboard/ui/triggerstab.py` | the Triggers tab: Hoot (`ui/owl.py`) and *Get Onion Watch* until the add-on is installed, then the add-on's own tab, with a bar when an update is out and a button to remove it |
 | `soundboard/ui/triggershost.py` | Onion Board as the Onion Watch add-on's host: the board's sounds and playing them (a ringing trigger loops in the headphones), `Config.screen`, the trigger pictures' folder, the theme's colours |
 | `soundboard/ui/appspanel.py` | the Apps tab: one card per program (level, **Send**, where it goes once a stream output is set: call, stream or both, volume, *Hear it myself*, and its *Clip editor*); programs you switch on are remembered by .exe and folder (a second program of the same name gets its own card, in `cfg.apps_paths`) and picked up again when they run |
+| `soundboard/directmic.py` | straight into my mic: the shared ring with the mic effect, `DirectMicStream` (the send output on the mic's clock), status / repair checks, and the one-prompt admin install / uninstall |
+| `native/directmic/` | the mic effect (`obmic.cpp`, runs inside Windows' audio engine) and `testhost.cpp`, which loads it like Windows does for the tests |
 | `soundboard/engine.py` | real-time audio: WASAPI streams (mic in, what others hear out (the cable or another device), headphones out, the optional stream output for OBS), mixing (sounds, radio and captured programs), pause/seek, live speed / pitch, limiter, watchdog |
 | `soundboard/eq.py` | 7-band equalizer and presets: matched peak / shelf bands that keep their analog shape up to Nyquist; a change crossfades in (no clicks) |
 | `soundboard/dsp.py` | the app's own filter maths (it no longer imports scipy): `sosfilt` / `lfilter` run as block matrix products with a parallel prefix scan for the state (float64 state, so float32 audio stays accurate), Butterworth design, matched EQ bands, `SmoothSos` (click-free design changes), an O(n) running minimum |

@@ -187,7 +187,8 @@ def test_setup_downloads_off_never_starts_the_cable_installer(monkeypatch):
     monkeypatch.setattr(setupwizard.subprocess, "Popen", lambda *a, **k: pytest.fail("ran"))
     told = []
     fake = types.SimpleNamespace(cable_status=types.SimpleNamespace(setText=told.append),
-                                 _proc=None)
+                                 _proc=None,
+                                 win=types.SimpleNamespace(cfg=types.SimpleNamespace(route="cable")))
     setupwizard.SetupWizard.install_cable(fake)
     assert told and "vb-audio.com" in told[0]
 
