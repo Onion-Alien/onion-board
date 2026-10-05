@@ -72,6 +72,8 @@ def test_sends_still_get_the_makeup():
     v.cut_share = {80: 0.75}
     with_makeup = np.abs(e._render("main", 480)).max()
     v.pos["main"] = 0
+    e._render("main", 480, makeup=False)   # the gain glides to the new one over a block
+    v.pos["main"] = 0
     without = np.abs(e._render("main", 480, makeup=False)).max()
     assert with_makeup > 1.5 * without
 
