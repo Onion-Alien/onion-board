@@ -195,6 +195,23 @@ game by the same library scan as above. It beats the game in front (playing Valo
 while talking in Discord suggests Discord; when both record the cable, the game in
 front wins). A browser recording the cable gets the new *Browser voice (WebRTC)* mode:
 the same 80 Hz cut as Epic Online Services, whose cleanup is the same WebRTC code (in
-the sweep above the browser profile measured −1.4 dB at 80 Hz and −1.3 at 90; it hasn't
-had the 99-song run yet). With *Pick the mode by itself* ticked, the picker uses
+the sweep above the browser profile measured −1.4 dB at 80 Hz and −1.3 at 90; the
+99-song numbers are below). With *Pick the mode by itself* ticked, the picker uses
 it as soon as it's found; with nothing listening the mode stays as it is.
+
+**Browser, Zoom and Teams on all 99 songs** (2026-10; same measure as the table above:
+median dB against the song played straight in, no mode → the Browser mode):
+
+| Program | super low | low | medium | high | super high | all |
+|---|---|---|---|---|---|---|
+| Browser (WebRTC) | −5.8 → **−1.6** | −4.2 → **−1.1** | −3.0 → **−1.6** | −1.7 → **−0.9** | +0.9 → **+1.2** | −2.4 → **−0.5** |
+| Zoom | −2.0 → **+0.3** | −0.8 → **−0.1** | −1.0 → **−0.3** | −0.9 → **−0.3** | +0.8 → **+2.0** | −1.0 → **+0.3** |
+| Teams | −2.0 → **+0.3** | −0.8 → **−0.1** | −1.0 → **−0.3** | −0.9 → **−0.3** | +0.9 → **+2.0** | −1.0 → **+0.3** |
+
+The level comes out right on all three, but Zoom's and Teams' AI noise suppression
+chops and pumps songs whatever is sent (mid-band pumping ~15 dB with or without the
+mode, against ~4 through a browser). A 16 kHz ceiling, a 60 or 90 Hz cut or a
+compressor changed nothing worth having, so they share the Browser mode ("Browser,
+Zoom, Teams") and the fix is a settings guide for turning their noise suppression down.
+The Zoom and Teams profiles are estimates: 32 kHz, with RNNoise standing in for their
+own suppressors.
