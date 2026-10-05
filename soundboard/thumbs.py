@@ -5,7 +5,7 @@ Where they come from: the video thumbnail yt-dlp saves next to a downloaded link
 imported file (needs ffmpeg), or any image the user picks, drops or pastes on a pad.
 
 Everything here uses QImage, which is safe off the UI thread (the download and
-import workers call store()). Only pixmap() needs the UI thread.
+import workers call store()). Only pixmap() and fitted() need the UI thread.
 """
 from __future__ import annotations
 
@@ -18,7 +18,7 @@ from collections import OrderedDict
 from pathlib import Path
 
 from PySide6.QtCore import Qt
-from PySide6.QtGui import QImage, QPixmap
+from PySide6.QtGui import QColor, QImage, QLinearGradient, QPainter, QPainterPath, QPixmap
 
 from soundboard import library
 from soundboard.library import SoundMeta
@@ -122,30 +122,97 @@ def clear(meta: SoundMeta):
     meta.image = ""
 
 
-# the most recently drawn pictures (up to ~0.6 MB each). Enough for every pad on
-# screen at once; the oldest give way, so a long session doesn't keep every picture
-# it ever showed.
+# the most recently drawn pictures, as loaded (up to ~0.6 MB each): enough for a
+# screen of pads, so a new pad size rescales them without reading the files again.
+# The oldest give way, so a long session doesn't keep every picture it ever showed.
+# Pads draw fitted() copies, so these are only read to make one.
 MAX_CACHED = 128
+MAX_BYTES = 48 << 20
 _pixmaps: OrderedDict[str, QPixmap | None] = OrderedDict()
+_bytes = 0
+
+# pictures already scaled and cropped to a pad's size (in real pixels) with its shade
+# drawn on: a pad paints one with a plain copy, where scaling the picture on every paint
+# made scrolling a board of pictures stutter (77 ms a step). A few screens' worth even
+# of the biggest (a 240 px pad on a 200 % screen is ~0.6 MB, a 150 px one at 100 %
+# 50 KB); the oldest give way.
+MAX_FITTED_BYTES = 64 << 20
+_fitted: OrderedDict[tuple, QPixmap] = OrderedDict()
+_fitted_bytes = 0
+
+
+def _size(pm: QPixmap | None) -> int:
+    return 0 if pm is None else pm.width() * pm.height() * max(1, pm.depth() // 8)
 
 
 def pixmap(path: str) -> QPixmap | None:
     """The picture as a QPixmap (cached; UI thread only). None if it's missing."""
+    global _bytes
     if not path:
         return None
     if path in _pixmaps:
         _pixmaps.move_to_end(path)
         return _pixmaps[path]
     pm = QPixmap(path)
-    _pixmaps[path] = None if pm.isNull() else pm
-    while len(_pixmaps) > MAX_CACHED:
-        _pixmaps.popitem(last=False)
-    return _pixmaps[path]
+    pm = None if pm.isNull() else pm
+    _pixmaps[path] = pm
+    _bytes += _size(pm)
+    while len(_pixmaps) > 1 and (len(_pixmaps) > MAX_CACHED or _bytes > MAX_BYTES):
+        _bytes -= _size(_pixmaps.popitem(last=False)[1])
+    return pm
+
+
+def fitted(path: str, w: int, h: int, dpr: float,
+           shade: tuple[tuple[float, int], ...] = (), radius: float = 0) -> QPixmap | None:
+    """The picture cropped to fill `w` x `h` real pixels (a pad at device pixel ratio
+    `dpr`), darkened top to bottom by `shade`: (position 0..1, black's alpha) stops,
+    its corners rounded by `radius` (logical pixels; outside them it's see-through).
+    Cached by all of those, so a new size, screen or shade makes a new one, and a new
+    picture has a new path (store()). None if it's missing. UI thread only."""
+    global _fitted_bytes
+    if not path or w <= 0 or h <= 0:
+        return None
+    key = (path, w, h, round(dpr, 3), shade, radius)
+    pm = _fitted.get(key)
+    if pm is not None:
+        _fitted.move_to_end(key)
+        return pm
+    src = pixmap(path)
+    if src is None:
+        return None
+    big = src.scaled(w, h, Qt.KeepAspectRatioByExpanding, Qt.SmoothTransformation)
+    pm = QPixmap(w, h)
+    pm.fill(Qt.transparent if radius else Qt.black)
+    p = QPainter(pm)
+    p.drawPixmap((w - big.width()) // 2, (h - big.height()) // 2, big)
+    if shade:
+        grad = QLinearGradient(0, 0, 0, h)
+        for at, alpha in shade:
+            grad.setColorAt(at, QColor(0, 0, 0, alpha))
+        p.fillRect(0, 0, w, h, grad)
+    if radius:   # cut the corners away, smoothly (a clip path's edge is jagged)
+        corners = QPainterPath()
+        corners.addRect(0, 0, w, h)
+        rounded = QPainterPath()
+        rounded.addRoundedRect(0, 0, w, h, radius * dpr, radius * dpr)
+        p.setRenderHint(QPainter.Antialiasing)
+        p.setCompositionMode(QPainter.CompositionMode_Clear)
+        p.fillPath(corners.subtracted(rounded), Qt.black)
+    p.end()
+    pm.setDevicePixelRatio(dpr)
+    _fitted[key] = pm
+    _fitted_bytes += _size(pm)
+    while len(_fitted) > 1 and _fitted_bytes > MAX_FITTED_BYTES:
+        _fitted_bytes -= _size(_fitted.popitem(last=False)[1])
+    return pm
 
 
 def forget(path: str):
-    """Drop a picture from the cache (it was replaced or removed; UI thread only)."""
-    _pixmaps.pop(path, None)
+    """Drop a picture from the caches (it was replaced or removed; UI thread only)."""
+    global _bytes, _fitted_bytes
+    _bytes -= _size(_pixmaps.pop(path, None))
+    for key in [k for k in _fitted if k[0] == path]:
+        _fitted_bytes -= _size(_fitted.pop(key))
 
 
 def prune(keep: set[str]):

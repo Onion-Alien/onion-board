@@ -111,6 +111,8 @@ LOOSE_EMPTY_LOOKS = 20   # an empty file that long (~30 s) waits for the folder 
 MINI_SIZE = QSize(440, 380)   # below this the window becomes the mini player...
 MINI_PAD_ROWS = 1             # ...which has the pads above it when this many rows fit
 QUEUE_CHIPS = 5          # queued sounds shown by name above the pads (then "+n more")
+SEARCH_WAIT_MS = 100     # typing in the search box filters the pads once it pauses this long
+PAD_SIZE_WAIT_MS = 50    # dragging Pad size re-lays the pads at most this often
 RANDOM = "__random__:"   # hotkey action prefix: a random sound from the category after it
 ALL = "All"          # the category tab that shows every sound
 VOICE_POLL_MS = 3000  # how often the game in front is looked at (soundboard.voicesdk)
@@ -730,8 +732,14 @@ class MainWindow(QMainWindow):
                                "TikTok, Myinstants…). Or paste a link (YouTube, SoundCloud, "
                                "TikTok, most media sites) to add or play it")
         self.search.setClearButtonEnabled(True)
-        # typing regrids only when the pads shown change (35 ms a key with 600 pads)
-        self.search.textChanged.connect(lambda t: self.apply_filter(t, lazy=True))
+        # typing regrids only when the pads shown change (35 ms a key with 600 pads),
+        # and only once it pauses (_on_search_text); text set by the app filters at once
+        self._search_wait = QTimer(self, singleShot=True, interval=SEARCH_WAIT_MS)
+        self._search_wait.timeout.connect(
+            lambda: self.apply_filter(self.search.text(), lazy=True))
+        self._search_typed = None
+        self.search.textEdited.connect(self._on_search_edited)
+        self.search.textChanged.connect(self._on_search_text)
         self.search.returnPressed.connect(self.on_search_enter)
         self.btn_yt = QPushButton("Search")
         self.btn_yt.setToolTip("Search YouTube, SoundCloud, TikTok sounds, Myinstants… for "
@@ -788,7 +796,11 @@ class MainWindow(QMainWindow):
         size.setValue(c.pad_width)
         size.setFixedWidth(90)
         size.setToolTip("Pad size")
-        size.valueChanged.connect(self.set_pad_width)
+        # a drag re-lays every pad at most every PAD_SIZE_WAIT_MS, not on each step
+        self._pad_size_wait = QTimer(self, singleShot=True, interval=PAD_SIZE_WAIT_MS)
+        self._pad_size_wait.timeout.connect(lambda: self.set_pad_width(size.value()))
+        size.valueChanged.connect(lambda _v: self._pad_size_wait.isActive()
+                                  or self._pad_size_wait.start())
         no_wheel(size)
         # Who's listening, one click away (the full picker is on the Setup tab)
         from soundboard.ui.destpanel import ModeCombo
@@ -2029,6 +2041,7 @@ class MainWindow(QMainWindow):
         self.show()
 
     def set_pad_width(self, w):
+        self._pad_size_wait.stop()
         self.cfg.pad_width = w
         self.grid.set_pad_width(w)
         self._save_later()
@@ -2494,6 +2507,7 @@ class MainWindow(QMainWindow):
         """Enter / the Search button: search the site the results header has
         picked (ytdl.SOURCES) for the search box's text (a pasted link is the
         link bar's instead)."""
+        self.flush_search()
         text = self.search.text()
         if ytdl.as_link(text) or not self.ytresults.available():
             return
@@ -2506,6 +2520,7 @@ class MainWindow(QMainWindow):
         self._cat_row.hide()
 
     def on_search_enter(self):
+        self.flush_search()   # a link pasted a moment ago: the link bar has it now
         if ytdl.as_link(self.search.text()):
             self.linkbar.add()
         else:
@@ -2791,9 +2806,27 @@ class MainWindow(QMainWindow):
         if query and " ".join(self.search.text().split()) == query:
             self.search.clear()
 
+    def _on_search_edited(self, text: str):
+        # typed: Qt sends this just before textChanged (the box's clear button sends
+        # it just after; that change has filtered at once, and the next one is unequal)
+        self._search_typed = text
+
+    def _on_search_text(self, text: str):
+        typed, self._search_typed = self._search_typed == text, None
+        if typed:
+            self._search_wait.start()   # each key restarts it: filter once typing pauses
+        else:
+            self.apply_filter(text, lazy=True)
+
+    def flush_search(self):
+        """Filter the pads for the search box now, if typing left that waiting."""
+        if self._search_wait.isActive():
+            self.apply_filter(self.search.text(), lazy=True)
+
     def apply_filter(self, text, lazy: bool = False):
         """Show the pads that match the search box (name or category) and are in the
         category picked above the pads. `lazy`: skip the regrid when no pad changed."""
+        self._search_wait.stop()   # this is the filter typing was waiting for
         self.linkbar.set_text(text)
         if getattr(self, "overlay", None) is not None:   # every sounds / category edit ends here
             self.overlay.sounds_changed()
