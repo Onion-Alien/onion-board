@@ -2,35 +2,8 @@
 
 ## Unreleased
 
-- A removed long sound's audio no longer stays on disk for 10 minutes or more when
-  it was still playing (or just brought back with Undo) as it was removed.
-- **Switching to the Radio tab no longer freezes the app.** Since 1.8.0 the flat
-  map threw its drawing away whenever you left the tab and drew the whole world
-  again on the way back, freezing the window each time (longer on big screens).
-  Now it keeps the drawing for a minute, and any redraw happens a slice at a time
-  so nothing waits for it.
-- **Anonymous usage count:** once a day the installed app sends a "still here"
-  with just its version number and a random ID made on your PC, so we can see if
-  anyone uses Onion Board. No name, sounds, settings or games. New installs have it
-  on (the installer's *Count me in* box); if you installed an earlier version it
-  stays off unless you switch it on. Settings → Privacy & security → *Count me in*
-  turns it on or off at any time, and Offline mode, a proxy and Tor apply to it too.
-- **Smoother everywhere, less CPU.** Nothing should feel laggy now:
-  - Sounds: clearing the search or going back to "All" on a big board no longer
-    stalls; typing in search, dragging Pad size and scrolling a board of pad
-    pictures stay smooth.
-  - Radio: typing in the station search no longer stutters (the list updates when
-    you pause typing); genre, country and quality filters, play, stop and starring
-    a station are faster.
-  - Setup → Discord check and the Apps tab (switching a program off, Stop all,
-    removing a program) no longer freeze the window, for up to several seconds.
-  - Speed & pitch and volume sliders drag smoothly; changing the AI voice, its pitch
-    or "Match the voice", or stopping it, no longer freezes the window for a moment;
-    Voice tab sliders, presets and Refresh do less work.
-  - The window appears sooner at startup (Onion Watch loads just after it).
-  - Less CPU while idle, in the in-game overlay (none for paused sounds), on the
-    Apps tab while hidden or behind a game, and in the setup guide. Bun in
-    headphones rests between notes.
+## 1.9.0 — 2026-10-05
+
 - **No virtual cable needed any more:** *Straight into my mic* puts your sounds into
   the mic Discord and your games already use. One click and one Windows permission
   prompt, and there's nothing to pick in Discord or the game. Your voice changer, mic
@@ -48,6 +21,35 @@
   Advanced is the full list and your custom modes, as before. *What do these do?*
   explains each one and what it's doing right now, and every mode's tooltip says
   it too. Your old choice carries over, and older versions still read it.
+- **Smoother everywhere, less CPU.** Nothing should feel laggy now:
+  - Sounds: clearing the search or going back to "All" on a big board no longer
+    stalls; typing in search, dragging Pad size and scrolling a board of pad
+    pictures stay smooth.
+  - Radio: typing in the station search no longer stutters (the list updates when
+    you pause typing); genre, country and quality filters, play, stop and starring
+    a station are faster.
+  - Setup → Discord check and the Apps tab (switching a program off, Stop all,
+    removing a program) no longer freeze the window, for up to several seconds.
+  - Speed & pitch and volume sliders drag smoothly; changing the AI voice, its pitch
+    or "Match the voice", or stopping it, no longer freezes the window for a moment;
+    Voice tab sliders, presets and Refresh do less work.
+  - The window appears sooner at startup (Onion Watch loads just after it).
+  - Less CPU while idle, in the in-game overlay (none for paused sounds), on the
+    Apps tab while hidden or behind a game, and in the setup guide. Bun in
+    headphones rests between notes.
+- **Switching to the Radio tab no longer freezes the app.** Since 1.8.0 the flat
+  map threw its drawing away whenever you left the tab and drew the whole world
+  again on the way back, freezing the window each time (longer on big screens).
+  Now it keeps the drawing for a minute, and any redraw happens a slice at a time
+  so nothing waits for it.
+- **Anonymous usage count:** once a day the installed app sends a "still here"
+  with just its version number and a random ID made on your PC, so we can see if
+  anyone uses Onion Board. No name, sounds, settings or games. New installs have it
+  on (the installer's *Count me in* box); if you installed an earlier version it
+  stays off unless you switch it on. Settings → Privacy & security → *Count me in*
+  turns it on or off at any time, and Offline mode, a proxy and Tor apply to it too.
+- A removed long sound's audio no longer stays on disk for 10 minutes or more when
+  it was still playing (or just brought back with Undo) as it was removed.
 
 ## 1.8.0 — 2026-10-05
 
