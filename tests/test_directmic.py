@@ -741,8 +741,9 @@ def test_board_ignores_a_nonsense_mic_rate(ring_file):
 
 
 @needs_host
+@pytest.mark.parametrize("stall", [0.03, 0.08])
 @realtime
-def test_delay_shrinks_back_after_a_hiccup(ring_file):
+def test_delay_shrinks_back_after_a_hiccup(ring_file, stall):
     """The board late once: the effect reads further behind it (more delay) to ride it
     out, then, once the board has kept time for a while, closes the gap again in a quiet
     moment, back to the normal delay."""
@@ -756,7 +757,7 @@ def test_delay_shrinks_back_after_a_hiccup(ring_file):
         phase[0] += frames
         if phase[0] > 0.6 * dm.RATE and not hiccup[0]:
             hiccup[0] = True
-            time.sleep(0.08)   # the board stalls (a GIL hog, a page fault storm)
+            time.sleep(stall)   # the board stalls (a GIL hog, a page fault storm)
 
     leads = {}
 

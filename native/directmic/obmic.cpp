@@ -919,7 +919,9 @@ private:
                 uint32_t look = (uint32_t)d + 2 * (uint32_t)m_half + 2;
                 float quiet = QUIET / (g > 1.0f ? g : 1.0f);
                 if (fabsf(sLast) < QUIET && peakOf(m_pos - m_half - 1, look) < quiet
-                        && (double)wp - (m_pos + d) >= need + frames * step) {
+                        // (enough for the next block once the board has written it,
+                        // as it does right after each mic block: the normal lead)
+                        && (double)wp - (m_pos + d) >= need) {
                     m_pos += d;
                     m_lead -= d;
                     m_okBlocks = SHRINK_AFTER - 10;   // the next one can follow soon
