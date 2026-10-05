@@ -24,7 +24,7 @@ import time
 import zlib
 
 from PySide6.QtCore import QFileInfo, QObject, QSize, Qt, QTimer, Signal
-from PySide6.QtGui import QPainter
+from PySide6.QtGui import QFont, QPainter
 from PySide6.QtWidgets import (QCheckBox, QComboBox, QFileIconProvider, QFrame, QHBoxLayout, QLabel,
                                QLayout, QPushButton, QScrollArea, QSizePolicy, QSlider,
                                QVBoxLayout, QWidget)
@@ -132,7 +132,9 @@ class ElidedLabel(QLabel):
         shown = self.fontMetrics().elidedText(text, Qt.ElideRight, r.width())
         if shown != text and self.hide_overflow:
             shown = ""
-        self.setToolTip(text if shown != text else "")
+        tip = text if shown != text else ""
+        if tip != self.toolTip():   # every paint (meters, hover): only when it changes
+            self.setToolTip(tip)
         p = QPainter(self)
         p.setPen(self.palette().color(self.foregroundRole()))
         p.drawText(r, int(self.alignment() | Qt.AlignVCenter), shown)
@@ -183,7 +185,9 @@ class AppRow(HoverCard):
         names = QVBoxLayout()
         names.setSpacing(1)
         self.name = ElidedLabel(exe)
-        self.name.setStyleSheet("font-weight:600;")
+        bold = self.name.font()   # not a style sheet: each one re-styles the widget
+        bold.setWeight(QFont.DemiBold)
+        self.name.setFont(bold)
         self.sub = ElidedLabel()
         self.sub.setObjectName("hint")
         for lbl in (self.name, self.sub):   # long titles give way instead of widening the card
@@ -508,6 +512,8 @@ class AppsTab(QWidget):
         self.meter_timer.timeout.connect(self._meters)
         appstate.slow_in_background(self, self.meter_timer, METER_MS)   # behind a game
         self.peaks = appaudio.PeakWatcher()   # live levels; the list is only re-read every 1.5 s
+        # behind a game nobody watches the levels: the meters fall back to the list's
+        appstate.pause_in_background(self, self.peaks.start, self.peaks.stop)
         self._started = False
         self._label_bin()
         if self.rows:   # remembered programs are picked up even if this tab is never opened
@@ -525,15 +531,15 @@ class AppsTab(QWidget):
     def showEvent(self, ev):
         super().showEvent(ev)
         self.start()
-        self.timer.start(REFRESH_MS)
+        self._pace_list()
         self.meter_timer.start(appstate.interval(METER_MS))
-        self.peaks.start()
+        if appstate.active():
+            self.peaks.start()
 
     def hideEvent(self, ev):
         super().hideEvent(ev)
         self.peaks.stop()
-        if self._started:
-            self.timer.start(REFRESH_HIDDEN_MS)
+        self._pace_list()
 
     def start(self):
         """Begin watching for programs (also called before the tab is first shown,
@@ -542,8 +548,26 @@ class AppsTab(QWidget):
             return
         self._started = True
         # the meters run while shown / recording; the list is re-read slowly until then
-        self.timer.start(REFRESH_MS if self.isVisible() else REFRESH_HIDDEN_MS)
+        self._pace_list()
         self.lister.refresh()
+
+    def _watching(self) -> bool:
+        """Something to keep an eye on while the tab is hidden: a remembered program
+        (picked up when it starts) or a captured one (let go when it closes)."""
+        return any(row.capture is not None or self._spec(key) is not None
+                   for key, row in self.rows.items())
+
+    def _pace_list(self):
+        """Re-read the list every 1.5 s while shown, every 5 s while hidden, and not
+        at all while hidden with nothing remembered or captured."""
+        if not self._started:
+            return
+        ms = (REFRESH_MS if self.isVisible() else
+              REFRESH_HIDDEN_MS if self._watching() else 0)
+        if not ms:
+            self.timer.stop()
+        elif not self.timer.isActive() or self.timer.interval() != ms:
+            self.timer.start(ms)
 
     def shutdown(self):
         self.timer.stop()
@@ -736,6 +760,8 @@ class AppsTab(QWidget):
         self._label_folders()
         self.empty.setVisible(not self.rows)
         self._report_active()
+        if not self.isVisible():
+            self._pace_list()   # the last captured program closed: stop re-reading
 
     def _poll_capture(self, row: AppRow) -> bool:
         """A capture started without waiting (start(wait=False)): clears *Connecting…*
@@ -1100,6 +1126,7 @@ class AppsTab(QWidget):
         self._label_bin()
         if not self._started:
             self.start()
+        self._pace_list()
         return True
 
     def retheme(self):

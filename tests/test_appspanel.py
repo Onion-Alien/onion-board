@@ -320,6 +320,81 @@ def test_send_off_does_not_wait_for_the_capture_to_end(tab):
     assert getattr(second, "joined", None) is not None and tab._stopping == []
 
 
+def test_hidden_tab_stops_rereading_when_there_is_nothing_to_watch(tab, qapp):
+    """Shown: the list is re-read every 1.5 s. Hidden: every 5 s while a program is
+    remembered or captured, not at all otherwise."""
+    tab._on_apps([music()])
+    tab.show()
+    assert tab.timer.isActive() and tab.timer.interval() == appspanel.REFRESH_MS
+    tab.hide()
+    assert not tab.timer.isActive()                # nothing remembered or sent
+    tab.show()
+    tab.rows["music.exe"].btn_send.setChecked(True)
+    tab.hide()
+    assert tab.timer.isActive() and tab.timer.interval() == appspanel.REFRESH_HIDDEN_MS
+    tab.stop_all()                                 # still remembered: still watched
+    tab._on_apps([music()])
+    assert tab.timer.isActive()
+    tab._on_send(tab.rows["music.exe"], False)     # Send off: forgotten
+    tab._on_apps([music()])                        # the next re-read: nothing left
+    assert not tab.timer.isActive()
+
+
+def test_level_watcher_pauses_behind_a_game(qapp, monkeypatch):
+    from PySide6.QtCore import Qt
+    calls = []
+
+    class Watcher:
+        def start(self):
+            calls.append("start")
+
+        def stop(self):
+            calls.append("stop")
+
+        def peak(self, pid):
+            return None
+    monkeypatch.setattr(appaudio, "PeakWatcher", Watcher)
+    monkeypatch.setattr(appaudio, "AppCapture", FakeCapture)
+    monkeypatch.setattr(appaudio, "list_apps", lambda: [])
+    monkeypatch.setattr(appspanel.appstate, "active", lambda: True)
+    t = AppsTab(Engine(), Config(), lambda: None, Meter)
+    try:
+        t.show()
+        assert calls == ["start"]
+        calls.clear()
+        qapp.applicationStateChanged.emit(Qt.ApplicationInactive)   # a game in front
+        assert calls == ["stop"]
+        qapp.applicationStateChanged.emit(Qt.ApplicationActive)
+        assert calls == ["stop", "start"]
+    finally:
+        t.shutdown()
+        t.hide()
+
+
+def test_card_names_are_bold_without_a_style_sheet_and_tips_change_only_when_needed(qapp):
+    from PySide6.QtGui import QFont
+    row = appspanel.AppRow("music.exe", Meter)
+    assert row.name.styleSheet() == "" and row.name.font().weight() == QFont.DemiBold
+    lbl = appspanel.ElidedLabel("A window title far too long to fit in the card " * 3)
+    lbl.resize(80, 20)
+    lbl.show()
+    qapp.processEvents()
+    assert lbl.toolTip().startswith("A window title")
+    set_tips = []
+    real = appspanel.ElidedLabel.setToolTip
+    appspanel.ElidedLabel.setToolTip = lambda self, t: (set_tips.append(t), real(self, t))
+    try:
+        for _ in range(5):
+            lbl.repaint()
+        assert set_tips == []                      # unchanged: left alone
+        lbl.setText("short")
+        lbl.repaint()
+        assert set_tips == [""]
+    finally:
+        appspanel.ElidedLabel.setToolTip = real
+        lbl.hide()
+
+
 def test_shutdown_stops_every_capture(tab):
     tab._on_apps([music(), App(200, "game.exe")])
     for row in tab.rows.values():
