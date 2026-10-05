@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 1.9.1 — 2026-10-05
+
 - **Straight into your mic is now the main way, for everyone.** Updating moves
   settings that used the virtual cable to *Straight into my mic* (once: pick the
   cable again on the Setup tab and it stays). Already set up on your mic? Nothing to
