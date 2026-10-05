@@ -47,7 +47,7 @@ PROGRAM_FIELDS = ("apps", "apps_paths", "apps_hidden")
 # categories, triggers, radio favourites) and the app's own bookkeeping
 KEEP = {"version", "sounds", "categories", "category", "category_hotkeys", "screen",
         "setup_done", "ptt_key", "update_checked", "update_pending", "update_skip",
-        "stats_id", "stats_sent",
+        "stats_id", "stats_sent", "mic_first",
         *DEVICE_FIELDS, *PROGRAM_FIELDS}
 RADIO_KEEP = ("favorites", "recent")
 
@@ -159,7 +159,7 @@ def reset(parts: list[str]) -> str:
     if PROGRAMS in parts:
         cfg.apps, cfg.apps_paths, cfg.apps_hidden = {}, {}, []
     if DEVICES in parts:
-        fresh = Config()
+        fresh = Config.first_start()   # (what others hear: straight into the mic)
         for name in DEVICE_FIELDS:
             setattr(cfg, name, getattr(fresh, name))
             _forget_newer(cfg, name)

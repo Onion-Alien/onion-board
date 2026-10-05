@@ -577,7 +577,14 @@ def status(mic_name: str | None = None) -> str:
 
 
 def needs_repair(state: str) -> bool:
-    return state in ("wiped", "outdated")
+    """Windows took it off the mic: it has to be put back (one prompt)."""
+    return state == "wiped"
+
+
+def works(state: str) -> bool:
+    """On the mic and working. An older copy of the effect ('outdated') still works:
+    the update is offered, not forced."""
+    return state in ("ready", "outdated")
 
 
 def _status(mic_name: str | None) -> str:

@@ -468,7 +468,7 @@ def test_new_users_are_offered_their_mic_first(mic_wizard, monkeypatch):
     w, wiz = mic_wizard
     assert w.cfg.route == "mic"
     wiz.go(2)
-    assert not wiz.btn_attach.isHidden() and "on my mic" in wiz.btn_attach.text()
+    assert not wiz.btn_attach.isHidden() and "straight into my mic" in wiz.btn_attach.text()
     assert "permission once" in wiz.cable_status.text()
     assert "instead" in wiz.btn_cable.text()
     wiz.go(3)   # not on the mic yet: the last page says so

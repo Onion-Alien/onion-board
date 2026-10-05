@@ -27,6 +27,14 @@ class Note:
 
 # newest first; add one per release that has something worth telling
 NOTES = (
+    Note("1.9.1", "Your sounds go straight into your mic", (
+        ("mic", "The main way now, for everyone",
+         "Onion Board puts your sounds into the mic Discord and games already use. On the "
+         "Setup tab it's one click (Windows asks once); until then nothing changes."),
+        ("cable", "The cable keeps working",
+         "If you have the virtual cable, it still gets everything too, so a voice app set "
+         "to it keeps hearing you. You can set it back to your normal mic any time."),
+    ), "", ""),
     Note("1.9.0", "No virtual cable needed", (
         ("mic", "Straight into your mic",
          "Setup → Straight into my mic instead: one click, and Discord and games hear "

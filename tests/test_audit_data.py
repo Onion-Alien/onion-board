@@ -99,7 +99,8 @@ def test_resetting_devices_drops_a_newer_route(app_dir):
     library.CONFIG_PATH.write_text(json.dumps(raw), encoding="utf-8")
     reset.schedule_reset([reset.DEVICES])
     reset.run_pending()
-    assert json.loads(library.CONFIG_PATH.read_text(encoding="utf-8"))["route"] == "cable"
+    # back to the default for this PC: straight into the mic (the main way since 1.9.1)
+    assert json.loads(library.CONFIG_PATH.read_text(encoding="utf-8"))["route"] == "mic"
 
 
 # --------------------------------------------------------------------------- videos

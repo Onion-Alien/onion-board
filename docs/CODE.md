@@ -35,9 +35,12 @@ the route (`Config.route`, `library.ROUTES`):
   `directmic.status()` notices a mic Windows took the effect off ('wiped') or one with
   an older copy of it ('outdated'); the Setup tab offers a one-click repair, or the
   cable. Tests run the real DLL in `testhost.exe`, which loads it the way Windows does.
-- **The virtual cable** (the fallback, and what settings from before the mic route
-  keep): a free audio driver (VB-Audio Virtual Cable)
-  that acts like a pipe: the app plays into one end and Discord or the game uses the
+- **The virtual cable** (the fallback). Settings on the cable route moved to the mic
+  route once in 1.9.1 (`Config.mic_first`); a route picked after that stays. While the
+  mic isn't set up yet the mic route sends through the cable, and once it is, the
+  cable still gets the same mix (`engine.CableTap`, drift-tracked onto the cable's
+  clock), so a voice app still set to the cable keeps working. The cable itself is a
+  free audio driver (VB-Audio Virtual Cable) that acts like a pipe: the app plays into one end and Discord or the game uses the
   other end as a microphone. It isn't included in this repo because VB-Audio's
   licence doesn't allow redistributing it. `installer\install-vbcable.ps1` downloads
   the current pack from [vb-audio.com](https://vb-audio.com/Cable/), checks the

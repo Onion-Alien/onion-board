@@ -31,7 +31,7 @@ def test_saved_mode_is_applied_at_startup(qapp, app_dir, monkeypatch):
     for name in ("set_main_device", "set_mon_device", "set_mic_device"):
         monkeypatch.setattr(engine.Engine, name, lambda self, n, _k=name: None)
     monkeypatch.setattr(winkeys.Hotkeys, "register", lambda self, m: None)
-    Config(dest={"mode": "discord"}).save()
+    Config(dest={"mode": "discord"}, mic_first=True).save()   # (on the cable)
     w = main.MainWindow()
     try:
         w._load_thread.join(15)

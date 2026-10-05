@@ -345,7 +345,7 @@ class SetupWizard(QDialog):
                                    "pick in Discord. (Or use a free <b>virtual cable</b> "
                                    "instead.)"),
                             self.bun_cable))
-        self.btn_attach = QPushButton("Put Onion Board on my mic")
+        self.btn_attach = QPushButton("Put my sounds straight into my mic")
         icons.set_icon(self.btn_attach, "mic", "on_accent")
         self.btn_attach.setObjectName("primary")
         self.btn_attach.setStyleSheet("padding:12px; font-size:12pt;")
@@ -606,7 +606,7 @@ class SetupWizard(QDialog):
         if route == "off":
             return True
         if route == "mic":
-            return directmic.status(self.win.cfg.mic_device) == "ready"
+            return directmic.works(directmic.status(self.win.cfg.mic_device))
         if route == "device":   # picked, and it opened
             return (self.win._main_name() is not None
                     and "main" not in self.win.engine.errors_snapshot())
@@ -638,7 +638,7 @@ class SetupWizard(QDialog):
         state = directmic.status(self.win.cfg.mic_device)
         self.btn_attach.setText("Setting up… click Yes when Windows asks" if attaching
                                 else "Repair (one click)" if directmic.needs_repair(state)
-                                else "Put Onion Board on my mic")
+                                else "Put my sounds straight into my mic")
         if route == "mic" and not busy and not self._cable_tries and not self._needs_restart:
             self.other_box.hide()
             if self.route_ok():
@@ -897,13 +897,13 @@ class SetupWizard(QDialog):
         """Straight into my mic: Discord and games keep the mic they have."""
         cfg = self.win.cfg
         self.btn_copy.hide()
-        if directmic.status(cfg.mic_device) != "ready":
+        if not directmic.works(directmic.status(cfg.mic_device)):
             self.discord_title.setText("Last step: tell Discord or your game")
             self.discord_text.setText(
                 f"<span style='color:{_bad()}'>Onion Board isn't on your mic yet, so only "
-                "you will hear your sounds.</span> Go <b>Back</b> and click <b>Put Onion "
-                "Board on my mic</b> (or use the virtual cable), or finish now and this "
-                "guide will open again next time.")
+                "you will hear your sounds.</span> Go <b>Back</b> and click <b>Put my "
+                "sounds straight into my mic</b> (or use the virtual cable), or finish now "
+                "and this guide will open again next time.")
             self.btn_discord.hide()
             return
         self.discord_title.setText("Last step: nothing to pick")
