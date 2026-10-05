@@ -421,6 +421,11 @@ class RadioTab(QWidget):
         self._rows_playing: str | None = None   # the station the list's rows say plays
         # shown ids: [points, towns, the globe's JS for them (made when first sent)]
         self._map_cache: dict[tuple, list] = {}
+        # (genre, min kbps): the popular stations they let through, worked out once per
+        # filter change for both the list and the map (and kept for going back to one)
+        self._popular_cache: dict[tuple, list[Station]] = {}
+        self._popular_of: list[Station] | None = None   # ...of this list
+        self._countries_shown: tuple | None = None   # what the country menu was filled with
         self._type_timer = QTimer(self)   # the list follows typing after a short pause
         self._type_timer.setSingleShot(True)
         self._type_timer.setInterval(TYPE_DELAY_MS)
@@ -726,6 +731,27 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
                 and (not place or _country(s) == place)
                 and (not kbps or s.bitrate >= kbps)]
 
+    def _popular_filtered(self, country: bool = True) -> list[Station]:
+        """_filtered(self._globe_list): the genre and quality pass is done once per
+        filter choice and kept (read it, don't change it); the country is picked out of
+        that (cheap)."""
+        if self._popular_of is not self._globe_list:   # a new list: nothing kept is true
+            self._popular_of = self._globe_list
+            self._popular_cache.clear()
+        key = (self._genre, self._min_kbps())
+        got = self._popular_cache.pop(key, None)
+        if got is None:
+            got = self._filtered(self._globe_list, country=False)
+        self._popular_cache[key] = got
+        while len(self._popular_cache) > MAP_CACHE:
+            self._popular_cache.pop(next(iter(self._popular_cache)))
+        if country and self._country:
+            return [s for s in got if _country(s) == self._country]
+        return got
+
+    def _popular_showing(self) -> bool:
+        return not (self._query or self.btn_favs.isChecked() or self.btn_recent.isChecked())
+
     def _source(self) -> list[Station]:
         """The list before filters: search results, favourites, recent or popular."""
         if self._query:
@@ -751,12 +777,15 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
                 counts[c] = counts.get(c, 0) + 1
         if self._country and self._country not in counts:
             counts[self._country] = 0          # keep the chosen one listed
+        rows = tuple(sorted(counts.items(), key=lambda kv: (-kv[1], kv[0].lower())))
         cmb = self.cmb_country
         cmb.blockSignals(True)
-        cmb.clear()
-        cmb.addItem("All countries", "")
-        for c, n in sorted(counts.items(), key=lambda kv: (-kv[1], kv[0].lower())):
-            cmb.addItem(f"{c}  ({n:,})", c)
+        if rows != self._countries_shown:   # the same counts: the menu is already right
+            self._countries_shown = rows
+            cmb.clear()
+            cmb.addItem("All countries", "")
+            for c, n in rows:
+                cmb.addItem(f"{c}  ({n:,})", c)
         cmb.setCurrentIndex(max(0, cmb.findData(self._country)))
         cmb.blockSignals(False)
 
@@ -959,7 +988,7 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
         """Pin the popular stations on the map — only those the filters let through — and
         name the cities and towns they're in. The flat map takes them all, the globe the
         most listened (WebGL: fewer is smoother)."""
-        shown = self._filtered(self._globe_list)
+        shown = self._popular_filtered()
         if self._map_mode() == "globe":
             shown = shown[:radio.GLOBE_LIGHT]   # the list is most-listened first
         ids = [s.uuid for s in shown]
@@ -1166,7 +1195,8 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
     def _show_list(self):
         self._type_timer.stop()    # whatever was typed is in this one
         source = self._source()    # once: a search goes through every known station
-        others = self._filtered(source, country=False)
+        others = (self._popular_filtered(country=False) if self._popular_showing()
+                  else self._filtered(source, country=False))
         self._fill_countries(others, filtered=True)
         every = self._sorted([s for s in others if _country(s) == self._country]
                              if self._country else others)

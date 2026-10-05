@@ -998,6 +998,25 @@ def test_tab_map_keeps_towns_per_filter_until_new_stations(tab, monkeypatch):
     assert len(calls) == 2
 
 
+def test_tab_filter_change_goes_through_the_stations_once(tab, monkeypatch):
+    """The list, the country menu and the map share one genre/quality pass over the
+    popular stations (3000 of them: ~3 ms a pass), and a country menu with the same
+    counts isn't filled again."""
+    passes, fills = [], []
+    real = tab._filtered
+    monkeypatch.setattr(tab, "_filtered", lambda *a, **k: passes.append(1) or real(*a, **k))
+    monkeypatch.setattr(tab.cmb_country, "clear", lambda: fills.append(1))
+    tab._globe_list[0].tags = ["rock"]
+    tab.set_genre("Rock")
+    assert len(passes) == 1 and tab.list.count() == 1 and len(fills) == 1
+    tab.set_genre("")
+    tab.set_genre("Rock")                       # both chosen before: no new pass
+    assert len(passes) == 1 and tab.list.count() == 1
+    fills.clear()
+    tab.set_country(tab._globe_list[0].country)   # the same counts: menu kept
+    assert len(passes) == 1 and fills == [] and tab.list.count() == 1
+
+
 def test_tab_play_stop_and_star_relabel_rows_without_rebuilding(tab, monkeypatch):
     from PySide6.QtCore import Qt
     tab.player.play = lambda s: setattr(tab.player, "station", s)
