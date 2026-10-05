@@ -860,3 +860,28 @@ def test_the_finished_test_recording_is_joined_off_the_audio_thread():
     assert isinstance(e._rec_done[0], list)      # the callback only handed it over
     data, rate = e.rec_done
     assert data.shape == (960, 2) and rate == e.rates["main"]
+
+
+def test_quiet_sounds_bus_skips_its_filters_then_wakes_for_a_sound(monkeypatch):
+    """With nothing playing, the send stage stops filtering silence after QUIET_S (a
+    voice chat mode cost ~1 ms of every 10 ms block on zeros); a sound brings it back
+    at once, shaped as before."""
+    from soundboard import destination
+    e = engine_with("main")
+    e.dest = destination.BUILTIN_BY_KEY["discord"]
+    calls = []
+    real = destination.Processor.process
+
+    def counted(self, x, d):
+        calls.append(len(x))
+        return real(self, x, d)
+    monkeypatch.setattr(destination.Processor, "process", counted)
+    out = np.zeros((480, 2), np.float32)
+    for _ in range(int(e.QUIET_S * SR / 480) + 5):
+        e._main(out, 480)
+    n = len(calls)
+    e._main(out, 480)
+    assert len(calls) == n and np.all(out == 0)    # skipped: only silence
+    e.play("a", tone(0.05), 1.0)
+    e._main(out, 480)
+    assert len(calls) == n + 1 and np.abs(out).max() > 0.01
