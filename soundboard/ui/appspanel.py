@@ -325,6 +325,10 @@ class AppRow(HoverCard):
         self.btn_forget.setVisible(not running or not self.sending)
         self.setEnabled(True)
         self.name.setEnabled(running)
+        name = self.name.text()   # a screen reader hears whose card each button is on
+        self.btn_send.setAccessibleName(f"Send {name}")
+        self.btn_rec.setAccessibleName(f"Record {name}")
+        self.btn_forget.setAccessibleName(f"Forget {name}")
 
     def set_status(self, text: str, error: bool = False):
         self.status_text = text

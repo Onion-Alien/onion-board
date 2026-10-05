@@ -195,6 +195,7 @@ class Overlay:
         self.host = host
         self.s = OverlaySettings.from_dict(settings)
         self.page = 0
+        self._sounds: tuple | None = None   # (key, sounds()) cached
         self.is_open = False
         self.blind = False            # open without a window (exclusive fullscreen)
         self.by_click = False         # opened from Settings: no key is held, acts like toggle
@@ -228,9 +229,19 @@ class Overlay:
 
     # ------------------------------------------------------------------ pages
     def sounds(self) -> list:
-        """The sounds of the category the Sounds tab shows (all of them for "")."""
-        cat = self.host.cfg.category
-        return [m for m in self.host.cfg.sounds if not cat or cat in m.tags]
+        """The sounds of the category the Sounds tab shows (all of them for ""). Kept
+        until sounds_changed() or the category / sound list changes: a paint asks
+        several times, and a big library made each ask a full pass."""
+        cfg = self.host.cfg
+        key = (cfg.category, id(cfg.sounds), len(cfg.sounds))
+        if self._sounds is None or self._sounds[0] != key:
+            cat = cfg.category
+            self._sounds = (key, [m for m in cfg.sounds if not cat or cat in m.tags])
+        return self._sounds[1]
+
+    def sounds_changed(self):
+        """A sound was added, removed, moved or put in / out of a category."""
+        self._sounds = None
 
     def pages(self) -> int:
         return max(1, math.ceil(len(self.sounds()) / SLOTS))

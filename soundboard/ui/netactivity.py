@@ -249,6 +249,9 @@ class NetActivity(QWidget):
         self._timer.setInterval(REFRESH_MS)
         self._timer.timeout.connect(self.refresh)
         self._entries: list[netlog.Entry] = []
+        self._conn_ns: list[int] = []     # the Detailed rows' entries (Entry.n), top down
+        self._conn_done: set[int] = set()   # ones drawn finished: not looked at again
+        self._conn_theme: tuple = ()
         self.refresh()
 
     # only while it's on screen
@@ -299,7 +302,7 @@ class NetActivity(QWidget):
         if self.simple.isChecked():
             self._fill_servers(servers)
         else:
-            self._fill_conns()
+            self._fill_conns(force)
 
     def _fill_servers(self, servers: list[netlog.Server]):
         t = self.servers
@@ -323,15 +326,41 @@ class NetActivity(QWidget):
                  "Sent / received", right, tone)
             _put(t, r, 5, _when(s.last), tone=tone)
 
-    def _fill_conns(self):
+    def _fill_conns(self, force: bool = False):
+        """New connections go in as rows at the top; only rows still open (and ones
+        not drawn finished yet) are looked at again. Redrawing by position shifted
+        every row down one, so each new connection rewrote every cell."""
         t = self.conns
         picked = self._picked_n()
         t.blockSignals(True)
-        t.setRowCount(len(self._entries))
+        keep = {e.n for e in self._entries}
+        for r in reversed(range(len(self._conn_ns))):   # the oldest fell off, or Clear
+            if self._conn_ns[r] not in keep:
+                t.removeRow(r)
+                del self._conn_ns[r]
+        top = self._conn_ns[0] if self._conn_ns else 0
+        new = [e.n for e in self._entries if e.n > top]   # newest first, like the list
+        for _ in new:
+            t.insertRow(0)
+        self._conn_ns[:0] = new
+        if t.rowCount() != len(self._entries) or self._conn_ns != [e.n for e in self._entries]:
+            t.setRowCount(len(self._entries))   # out of step somehow: redraw it all
+            self._conn_ns = [e.n for e in self._entries]
+            force = True
+        theme_key = (theme.status("warn"), theme.status("error"))
+        if force or theme_key != self._conn_theme:   # a theme switch recolours them all
+            self._conn_theme = theme_key
+            self._conn_done.clear()
         right = Qt.AlignRight | Qt.AlignVCenter
         tone = {netlog.BLOCKED: "warn", netlog.FAILED: "error"}
         t.clearSelection()   # new rows push the others down: pick it again by number
         for r, e in enumerate(self._entries):
+            if e.n in self._conn_done:
+                if e.n == picked:
+                    t.selectRow(r)
+                continue
+            if e.state not in (netlog.CONNECTING, netlog.CONNECTED):
+                self._conn_done.add(e.n)   # finished: it won't change again
             label = netlog.feature_label(e.feature)
             color = tone.get(e.state)
             _put(t, r, 0, _when(e.started), tone=color).setData(Qt.UserRole, e.n)

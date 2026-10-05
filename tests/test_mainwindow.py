@@ -757,3 +757,20 @@ def test_the_mic_banner_and_a_row_of_playing_sounds_dont_force_the_mini_player(w
     row = window.playing_row.rect()
     for chip in window._chips.values():
         assert chip.isVisibleTo(window) and row.contains(chip.geometry())
+
+
+def test_clamp_label_wraps_once_per_text_width_and_font(qapp):
+    """Cards repaint on every hover and scroll: the wrapped lines are kept until the
+    text, width or font changes."""
+    from soundboard.ui.ytsearch import ClampLabel
+    lbl = ClampLabel("A title long enough to wrap " * 3)
+    lbl.resize(160, lbl.height())
+    lines = lbl._wrapped()
+    assert len(lines) == 2 and lines[-1][0].endswith("…")
+    assert lbl._wrapped() is lines
+    lbl.resize(400, lbl.height())
+    assert lbl._wrapped() is not lines
+    wide = lbl._wrapped()
+    lbl.set_full("Short")
+    assert lbl._wrapped() is not wide and [t for t, _ in lbl._wrapped()] == ["Short"]
+    lbl.deleteLater()

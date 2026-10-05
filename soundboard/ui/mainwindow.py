@@ -2755,6 +2755,8 @@ class MainWindow(QMainWindow):
         """Show the pads that match the search box (name or category) and are in the
         category picked above the pads. `lazy`: skip the regrid when no pad changed."""
         self.linkbar.set_text(text)
+        if getattr(self, "overlay", None) is not None:   # every sounds / category edit ends here
+            self.overlay.sounds_changed()
         # a link filters nothing, and nor does the box in the mini player, which hides
         # it: a web search's words left there showed a blank mini player
         t = "" if self.linkbar.url or self.is_mini() else text.strip().lower()

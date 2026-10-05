@@ -219,9 +219,9 @@ def test_the_view_shows_simple_and_detailed(qapp):
 
 
 def test_the_view_updates_its_rows_in_place(qapp):
-    """New connections push the rows down; the redraw reuses the cells, keeps the pick
-    on the same connection and drops a colour a row no longer has. Tooltips are plain
-    text (a reason can quote a server)."""
+    """A new connection goes in as a row at the top: the rows below move down with
+    their cells, the pick stays on the same connection, and only rows still open are
+    redrawn. Tooltips are plain text (a reason can quote a server)."""
     from soundboard.ui.netactivity import _TONE, NetActivity
     w = NetActivity()
     w.detailed.setChecked(True)
@@ -232,13 +232,24 @@ def test_the_view_updates_its_rows_in_place(qapp):
     cell = w.conns.item(0, 0)
     assert w.conns.item(0, 5).data(_TONE) == "error"
     assert "&lt;b&gt;bold" in w.conns.item(0, 5).toolTip()
-    netlog.begin(F, "b.example.com", 443).connected("direct")
+    b = netlog.begin(F, "b.example.com", 443)
+    b.connected("direct")
     w.refresh()
-    assert w.conns.rowCount() == 2 and w.conns.item(0, 0) is cell   # reused
+    assert w.conns.rowCount() == 2 and w.conns.item(1, 0) is cell   # moved down, kept
     assert w.conns.item(0, 1).text() == "b.example.com:443"
-    assert w.conns.item(0, 5).data(_TONE) is None                   # colour dropped
+    assert w.conns.item(0, 5).data(_TONE) is None
     assert w.conns.item(1, 5).data(_TONE) == "error"
     assert "a.example.com:443" in w.info.toPlainText()               # still the pick
+    w.conns.item(1, 1).setText("untouched")   # a finished row isn't looked at again
+    b.add_received(5000)
+    w.refresh()
+    assert w.conns.item(0, 7).text() == netlog.size(5000)            # an open one is
+    assert w.conns.item(1, 1).text() == "untouched"
+    b.closed()
+    netlog.clear()
+    netlog.begin(F, "c.example.com", 443)
+    w.refresh()
+    assert w.conns.rowCount() == 1 and w.conns.item(0, 1).text() == "c.example.com:443"
     w.deleteLater()
 
 

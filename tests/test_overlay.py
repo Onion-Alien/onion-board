@@ -360,3 +360,20 @@ def test_settings_overlay_tab_shows_a_drag(window):  # noqa: F811
     finally:
         d.accept()                                       # Done
     assert d._ov_dragged not in window.overlay.listeners
+
+
+def test_sounds_are_kept_until_the_list_or_category_changes(make):
+    """A paint asks for sounds() several times: it's worked out once, and again after
+    a sound is added or a category is picked or edited."""
+    ov = make(n=3)
+    first = ov.sounds()
+    assert ov.sounds() is first and len(first) == 3
+    ov.host.cfg.sounds.append(ov.host.cfg.sounds[0].__class__(id="new", name="N", file="x"))
+    assert len(ov.sounds()) == 4                         # a new sound shows
+    ov.host.cfg.categories = ["Memes"]
+    ov.host.cfg.sounds[1].tags.append("Memes")
+    ov.host.cfg.category = "Memes"
+    assert [m.id for m in ov.sounds()] == ["s1"]         # the category changed
+    ov.host.cfg.sounds[2].tags.append("Memes")
+    ov.sounds_changed()                                  # MainWindow.apply_filter
+    assert [m.id for m in ov.sounds()] == ["s1", "s2"]
