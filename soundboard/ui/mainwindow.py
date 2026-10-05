@@ -1744,7 +1744,7 @@ class MainWindow(QMainWindow):
     def _poll_voice(self):
         """Which Who's listening mode suits: the program recording the cable's far end
         (voicesdk.Listeners), else the voice engine of the game in front. Switches to it
-        when the picker's *Switch to it by itself* is ticked."""
+        when the picker's *Pick the mode by itself* is ticked."""
         key = self.voice_watch.poll() if self.voice_watch is not None else None
         why = (f"The game you have open uses {voicesdk.NAMES.get(key, key)} for voice "
                "chat") if key else ""
@@ -1760,7 +1760,7 @@ class MainWindow(QMainWindow):
             self.voice_engine.emit(key)
 
     def _auto_dest(self):
-        """*Switch to it by itself*: the suggested mode, as soon as it's suggested.
+        """*Pick the mode by itself*: the suggested mode, as soon as it's suggested.
         Nothing listening keeps the mode it has."""
         d = self.cfg.dest if isinstance(self.cfg.dest, dict) else {}
         key = self.voice_suggestion

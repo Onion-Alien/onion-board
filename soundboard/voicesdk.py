@@ -22,7 +22,7 @@ plays (soundboard.appaudio.recording_apps), so a voice chat app is named by its 
 (VOICE_APPS) and a game by the files in its folder, as above.
 
 The result is a suggestion by the picker, and the mode is switched for you only
-when *Switch to it by itself* is ticked there (`dest["auto"]`).
+when *Pick the mode by itself* is ticked there (`dest["auto"]`).
 """
 from __future__ import annotations
 
@@ -45,8 +45,16 @@ ORDER = ("game", "unity")
 NAMES = {"game": "Vivox", "unity": "Photon or Dissonance"}   # for the hint
 # voice chat programs that record the cable, by exe: (mode key, name for the hint).
 # TeamSpeak and Mumble sit with Vivox's mode (Opus mono, a high-pass ~80 Hz: see
-# destination.BUILTIN). Browsers, Zoom and Teams have no mode of their own yet.
+# destination.BUILTIN). A browser recording the cable is a call in a web page (Meet,
+# Discord in a browser): the browser mode. Zoom and Teams aren't measured yet.
 VOICE_APPS = {
+    "chrome.exe": ("webrtc", "Your browser"),
+    "msedge.exe": ("webrtc", "Your browser"),
+    "firefox.exe": ("webrtc", "Your browser"),
+    "brave.exe": ("webrtc", "Your browser"),
+    "opera.exe": ("webrtc", "Your browser"),
+    "opera_gx.exe": ("webrtc", "Your browser"),
+    "vivaldi.exe": ("webrtc", "Your browser"),
     "discord.exe": ("discord", "Discord"),
     "discordptb.exe": ("discord", "Discord"),
     "discordcanary.exe": ("discord", "Discord"),

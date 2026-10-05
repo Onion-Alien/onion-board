@@ -197,8 +197,8 @@ def test_one_mode_per_voice_engine_and_old_keys_still_resolve():
     for key in ("off", "discord", "steam", "game", "game_lo"):
         assert resolve({"mode": key}).key == key
     assert resolve({"mode": "game"}).label == "Vivox"
-    assert [d.key for d in BUILTIN] == ["off", "discord", "game", "eos", "steam", "unity",
-                                        "game_lo"]
+    assert [d.key for d in BUILTIN] == ["off", "discord", "game", "eos", "webrtc", "steam",
+                                        "unity", "game_lo"]
     for d in BUILTIN[1:]:
         # tuned on the bench: the cut and make-up, harmonics, never a compressor
         assert d.mono and d.lowcut in (80, 90) and d.bass > 0 and d.comp == 0, d.key
@@ -208,6 +208,7 @@ def test_one_mode_per_voice_engine_and_old_keys_still_resolve():
     from soundboard import voicesdk
     assert set(voicesdk.SIGNATURES.values()) <= set(destination.BUILTIN_BY_KEY)
     assert set(voicesdk.NAMES) <= set(destination.BUILTIN_BY_KEY)
+    assert {k for k, _ in voicesdk.VOICE_APPS.values()} <= set(destination.BUILTIN_BY_KEY)
 
 
 def test_apply_sets_engine_dest():

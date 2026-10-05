@@ -92,7 +92,7 @@ class DestPanel(QWidget):
         sr.addWidget(self.suggest_btn, 0, Qt.AlignLeft)
         self.suggest.hide()
         v.addWidget(self.suggest)
-        self.chk_auto = QCheckBox("Switch to the mode that suits by itself")
+        self.chk_auto = QCheckBox("Pick the mode by itself")
         self.chk_auto.setToolTip(
             "When Discord, TeamSpeak, Mumble or a game with a known voice chat is "
             "listening to the virtual cable, use its mode without asking. With nothing "
@@ -173,7 +173,7 @@ class DestPanel(QWidget):
         return None if destination.resolve(self._cfg()).key == key else key
 
     def _on_voice_engine(self, _key):
-        self.refresh()   # *Switch … by itself* may have just changed the mode
+        self.refresh()   # *Pick the mode by itself* may have just changed the mode
 
     def _auto_changed(self, on: bool):
         self._cfg()["auto"] = bool(on)

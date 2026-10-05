@@ -118,6 +118,10 @@ BUILTIN: tuple[Dest, ...] = (
     Dest("eos", "Epic Online Services", 0, 0.8, 0.0, True, lowcut=80,
          note="Fortnite and other games on Epic's voice chat. Opus mono with "
               "WebRTC-style noise suppression: turn that off in the game if it lets you."),
+    Dest("webrtc", "Browser voice (WebRTC)", 0, 0.8, 0.0, True, lowcut=80,
+         note="Calls in a web browser: Google Meet, Discord or Guilded in a browser, "
+              "web games. Opus ~32 kbps mono, full band, with the browser's high-pass, "
+              "noise suppression and gain control."),
     Dest("steam", "Steam voice", 12000, 0.8, 0.0, True, lowcut=80,
          note="CS2, Dota 2, TF2 and other games on Steam's voice chat. Opus fed "
               "24 kHz mono: nothing above 12 kHz gets through."),

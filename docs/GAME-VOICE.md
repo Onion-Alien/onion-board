@@ -193,5 +193,8 @@ the same way it lists the ones playing, so the program recording the virtual cab
 far end names the listener directly: Discord, TeamSpeak and Mumble by their exe, a
 game by the same library scan as above. It beats the game in front (playing Valorant
 while talking in Discord suggests Discord; when both record the cable, the game in
-front wins). With *Switch to the mode that suits by itself* ticked, the picker uses
+front wins). A browser recording the cable gets the new *Browser voice (WebRTC)* mode:
+the same 80 Hz cut as Epic Online Services, whose cleanup is the same WebRTC code (in
+the sweep above the browser profile measured −1.4 dB at 80 Hz and −1.3 at 90; it hasn't
+had the 99-song run yet). With *Pick the mode by itself* ticked, the picker uses
 it as soon as it's found; with nothing listening the mode stays as it is.
