@@ -20,8 +20,8 @@ from PySide6.QtCore import (QAbstractAnimation, QEvent, QFileSystemWatcher, QObj
 from PySide6.QtGui import QDesktopServices, QIcon, QKeySequence, QShortcut
 from PySide6.QtWidgets import (QApplication, QCheckBox, QComboBox, QDialog, QFileDialog, QFrame,
                                QGraphicsOpacityEffect, QGridLayout, QHBoxLayout, QInputDialog,
-                               QLabel, QLineEdit, QMainWindow, QMenu, QMessageBox, QPushButton,
-                               QScrollArea, QSizePolicy, QSlider, QStackedWidget,
+                               QLabel, QLayout, QLineEdit, QMainWindow, QMenu, QMessageBox,
+                               QPushButton, QScrollArea, QSizePolicy, QSlider, QStackedWidget,
                                QSystemTrayIcon, QTabBar, QTabWidget, QVBoxLayout, QWidget)
 
 from soundboard import engine as eng
@@ -139,6 +139,29 @@ class StatusLine(QLabel):
         self.room = not compact
         self.setVisible(self.room and bool(self.text()))
         responsive.touch(self)
+
+
+class BannerButton(QPushButton):
+    """A one-line button that never makes the window wider: in less room it shows
+    `short`, and in less than that its text is cut with "…". A banner as wide as its
+    whole text pushed a ~750 px window into the mini player, banner and all."""
+
+    def __init__(self, text: str, short: str):
+        super().__init__(text)
+        self._full, self._short = text, short
+        self.setSizePolicy(QSizePolicy.Ignored, QSizePolicy.Fixed)
+        self.setToolTip(text)
+
+    def resizeEvent(self, e):
+        super().resizeEvent(e)
+        room = self.width() - self.iconSize().width() - 48   # icon, padding, gap
+        fm = self.fontMetrics()
+        if fm.horizontalAdvance(self._full) <= room:
+            text = self._full
+        else:
+            text = fm.elidedText(self._short, Qt.ElideRight, max(0, room))
+        if text != self.text():
+            self.setText(text)
 
 
 class Bridge(QObject):
@@ -407,8 +430,9 @@ class MainWindow(QMainWindow):
         rv.addLayout(head)
         self._paint_logo()
 
-        self.mic_banner = QPushButton("YOU'RE HEARING YOUR MIC OUTPUT  —  mic + sounds, "
-                                      "exactly what others hear   ·   click to turn off")
+        self.mic_banner = BannerButton("YOU'RE HEARING YOUR MIC OUTPUT  —  mic + sounds, "
+                                       "exactly what others hear   ·   click to turn off",
+                                       "HEARING YOUR MIC OUTPUT  ·  click to turn off")
         self.mic_banner.setObjectName("micbanner")
         self.mic_banner.setCursor(Qt.PointingHandCursor)
         self.mic_banner.clicked.connect(lambda: self.btn_check.setChecked(False))
@@ -822,6 +846,10 @@ class MainWindow(QMainWindow):
         self._chips_hl = QHBoxLayout(self.playing_row)
         self._chips_hl.setContentsMargins(0, 0, 0, 0)
         self._chips_hl.setSpacing(6)
+        # never wider than the window gives it: four overlapping sounds' chips (~900 px)
+        # turned a narrower window into the mini player; the last ones are cut instead
+        self._chips_hl.setSizeConstraint(QLayout.SetNoConstraint)
+        self.playing_row.setSizePolicy(QSizePolicy.Ignored, QSizePolicy.Fixed)
         self._chips: dict[str, QWidget] = {}
         self._chip_ids: tuple = ()
         self.playing_row.hide()
@@ -952,7 +980,7 @@ class MainWindow(QMainWindow):
                 lbl = QLabel("Now playing")
                 lbl.setObjectName("muted")
                 self._chips_hl.addWidget(lbl)
-                for sid in ids:
+                for sid in ids[:QUEUE_CHIPS]:
                     m = self.meta(sid)
                     chip = QFrame()
                     chip.setObjectName("chip")
@@ -974,6 +1002,10 @@ class MainWindow(QMainWindow):
                     ch.addWidget(stop)
                     self._chips_hl.addWidget(chip)
                     self._chips[sid] = chip
+                if len(ids) > QUEUE_CHIPS:
+                    more = QLabel(f"+{len(ids) - QUEUE_CHIPS} more")
+                    more.setObjectName("muted")
+                    self._chips_hl.addWidget(more)
             if queue or len(ids) >= 2:
                 self._chips_hl.addStretch(1)
             # a steady height: the chips are rebuilt with every overlapping sound, and
