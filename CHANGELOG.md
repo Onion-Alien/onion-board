@@ -7,6 +7,12 @@
   again on the way back, freezing the window each time (longer on big screens).
   Now it keeps the drawing for a minute, and any redraw happens a slice at a time
   so nothing waits for it.
+- **Anonymous usage count:** once a day the installed app sends a "still here"
+  with just its version number and a random ID made on your PC, so we can see if
+  anyone uses Onion Board. No name, sounds, settings or games. New installs have it
+  on (the installer's *Count me in* box); if you installed an earlier version it
+  stays off unless you switch it on. Settings → Privacy & security → *Count me in*
+  turns it on or off at any time, and Offline mode, a proxy and Tor apply to it too.
 - **Smoother everywhere, less CPU.** Nothing should feel laggy now:
   - Sounds: clearing the search or going back to "All" on a big board no longer
     stalls; typing in search, dragging Pad size and scrolling a board of pad
