@@ -77,6 +77,12 @@ one or two files run in a single process. `-n 2` caps the workers (say, while a
 game is running) and `-n 0` turns them off. You don't need to rebuild to see a change: `scripts\run.bat` runs
 from source.
 
+Keeping it fast: Windows takes ~2 s to refuse a connection to a closed port, even
+on 127.0.0.1, and `localhost` tries `::1` first. A test that needs "nothing is
+listening" takes its port from `conftest.closed_port()` (refused at once), and a
+test server on 127.0.0.1 only marks its port with `conftest.ipv4_only()`.
+`--durations=20` shows what's slow.
+
 ### What voice chat does to the sounds (the bench)
 
 `scripts\codec_bench.py` runs sounds through each voice chat's codec, and with
@@ -207,8 +213,10 @@ Get-Process OnionBoard -ErrorAction SilentlyContinue      # is it running?
 ## 7. Commit and release
 
 1. Section 3 passes. The pre-commit hook re-runs the secrets scan.
-2. Commit, then push. CI (`.github/workflows/checks.yml`) runs the secrets scan
-   over the full history, gitleaks, ruff and pytest.
+2. Commit, push, and open a pull request (main takes changes by PR only). CI
+   (`.github/workflows/checks.yml`) runs on the PR and on main after a merge: the
+   secrets scan over the full history, gitleaks, ruff and pytest. A newer push to
+   the PR cancels its unfinished run.
 3. For a release: bump `__version__`, move *Unreleased* in the CHANGELOG under
    the version, build, then upload `dist\OnionBoardSetup.exe` to a GitHub Release
    with its SHA-256 (`certutil -hashfile dist\OnionBoardSetup.exe SHA256`).

@@ -1,11 +1,20 @@
 name: checks
 
 on:
+  # main takes changes by pull request only, so a branch is checked once, as its
+  # PR (push + pull_request ran every PR twice); main is checked after each merge.
   push:
+    branches: [main]
   pull_request:
+  workflow_dispatch:
 
 permissions:
   contents: read
+
+# A newer push to the same PR replaces its unfinished run. main's runs all finish.
+concurrency:
+  group: checks-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   secrets:
@@ -34,13 +43,25 @@ jobs:
 
   test:
     runs-on: windows-latest
+    timeout-minutes: 20   # a hung test fails the run instead of holding it for hours
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-python@v7
+        id: py
         with:
           python-version: "3.13"
-      - run: pip install -r requirements.txt -r requirements-dev.txt
-      - run: ruff check .
-      - run: python -m pytest
+      # The installed packages are kept between runs (installing them took ~90 s);
+      # a change to either requirements file, or a new Python, starts a fresh venv.
+      - uses: actions/cache@v6
+        id: venv
+        with:
+          path: .venv
+          key: venv-${{ runner.os }}-${{ steps.py.outputs.python-version }}-${{ hashFiles('requirements.txt', 'requirements-dev.txt') }}
+      - if: steps.venv.outputs.cache-hit != 'true'
+        run: |
+          python -m venv .venv
+          .venv\Scripts\python -m pip install -r requirements.txt -r requirements-dev.txt
+      - run: .venv\Scripts\ruff check .
+      - run: .venv\Scripts\python -m pytest
         env:
           QT_QPA_PLATFORM: offscreen

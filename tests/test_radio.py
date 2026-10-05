@@ -17,7 +17,7 @@ import pytest
 import soundfile as sf
 from PySide6.QtWidgets import QWidget
 
-from conftest import process_events
+from conftest import closed_port, process_events
 from soundboard import radio
 from soundboard.engine import SR, Engine
 from soundboard.library import Config
@@ -484,12 +484,7 @@ def server():
 
 
 def dead_base():
-    import socket
-    s = socket.socket()
-    s.bind(("127.0.0.1", 0))
-    port = s.getsockname()[1]
-    s.close()
-    return f"http://127.0.0.1:{port}"
+    return f"http://127.0.0.1:{closed_port()}"
 
 
 def test_directory_loads_the_globe_caches_it_and_fails_over(qapp, server, tmp_path):

@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- **A rare crash when the PC was busy is fixed.** Python tidied up its memory on
+  whichever thread happened to be running, sometimes a sound or network thread, and
+  that could free a part of the window while it was still ticking. It now tidies up
+  on the window's own thread only (which also keeps that work off the audio threads).
 - **Switching to the Radio tab no longer freezes the app.** Since 1.8.0 the flat
   map threw its drawing away whenever you left the tab and drew the whole world
   again on the way back, freezing the window each time (longer on big screens).

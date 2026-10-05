@@ -8,6 +8,7 @@ from http.server import BaseHTTPRequestHandler, HTTPServer
 import numpy as np
 import pytest
 import soundfile as sf
+from conftest import closed_port
 
 from soundboard import library
 from soundboard.speech import customvoices, tts
@@ -120,7 +121,7 @@ def test_server_errors_say_what_happened(server):
     with pytest.raises(RuntimeError, match="500 model not loaded"):
         CustomVoice("S", url=url + "/fail").synth("hi")
     with pytest.raises(RuntimeError, match="Is the server running"):
-        CustomVoice("S", url="http://127.0.0.1:9/v1/audio/speech").synth("hi")
+        CustomVoice("S", url=f"http://127.0.0.1:{closed_port()}/v1/audio/speech").synth("hi")
 
 
 def test_a_program_voice_writes_its_wav(tmp_path):

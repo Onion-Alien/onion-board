@@ -42,8 +42,8 @@ def tune_runtime_for_audio():
 
     The garbage collector's gen-0 threshold is 700 allocations; numpy blocks in
     the callbacks are Python objects, so every few blocks a collection ran *on the
-    audio thread*. Raising the threshold makes collections rarer (and they still
-    run mostly on the UI thread, where a pause costs nothing).
+    audio thread*. Raising the threshold makes collections rarer, and main() then
+    runs them on the UI thread only (uigc.UiCollector), where a pause costs nothing.
     """
     sys.setswitchinterval(SWITCH_S)
     gc.set_threshold(50_000, 20, 20)
@@ -425,6 +425,8 @@ def main():
     recheck.start(6 * 3600 * 1000)
     from soundboard.hangwatch import HangWatch
     app.hangwatch = HangWatch(parent=app)   # a frozen window gets its stack logged
+    from soundboard.uigc import UiCollector
+    app.collector = UiCollector(parent=app)  # garbage collection on this thread only
     code = app.exec()
     # w.shutdown already ran (aboutToQuit). Python's own teardown after this -- Qt,
     # the web view, COM, audio objects -- can hang with the window gone, leaving an
