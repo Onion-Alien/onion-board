@@ -577,6 +577,8 @@ def test_who_is_listening_looks_at_the_mic_itself(window, monkeypatch):  # noqa:
     monkeypatch.setattr(eng, "virtual_outputs", lambda: [])
     assert w._heard_device() == ("Microphone (Test Headset)",)
     monkeypatch.setattr(eng, "virtual_outputs", lambda: ["CABLE Input (VB-Audio Virtual Cable)"])
+    monkeypatch.setattr(eng, "virtual_mic_for",   # (no real cable needed: CI has none)
+                        lambda name: name and name.replace("Input", "Output"))
     # a voice app still set to the cable counts too
     assert w._heard_device() == ("Microphone (Test Headset)",
                                  "CABLE Output (VB-Audio Virtual Cable)")
