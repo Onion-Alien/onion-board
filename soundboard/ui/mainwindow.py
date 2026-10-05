@@ -20,7 +20,7 @@ from PySide6.QtCore import (QAbstractAnimation, QEvent, QFileSystemWatcher, QObj
 from PySide6.QtGui import QDesktopServices, QIcon, QKeySequence, QShortcut
 from PySide6.QtWidgets import (QApplication, QCheckBox, QComboBox, QDialog, QFileDialog, QFrame,
                                QGraphicsOpacityEffect, QGridLayout, QHBoxLayout, QInputDialog,
-                               QLabel, QLayout, QLineEdit, QMainWindow, QMenu, QMessageBox,
+                               QLabel, QLineEdit, QMainWindow, QMenu, QMessageBox,
                                QPushButton, QScrollArea, QSizePolicy, QSlider, QStackedWidget,
                                QSystemTrayIcon, QTabBar, QTabWidget, QVBoxLayout, QWidget)
 
@@ -44,8 +44,8 @@ from soundboard.ui.crashdialog import free_dialog
 from soundboard.ui.dialogs import EditDialog
 from soundboard.ui import a11y, appstate, busy, icons, responsive, splash
 from soundboard.ui.speedpitch import SpeedPitchButton
-from soundboard.ui.panel import (EqPanel, VolumeControl, bar, card, hint_label, icon_label,
-                                 vsep)
+from soundboard.ui.panel import (EqPanel, Flow, VolumeControl, bar, card, hint_label,
+                                 icon_label, vsep)
 from soundboard.ui.linkbar import PLAY_ID as LINK_ID
 from soundboard.ui.linkbar import LinkBar
 from soundboard.ui.livedot import is_tab_live, set_tab_live
@@ -843,13 +843,10 @@ class MainWindow(QMainWindow):
         # them can be stopped (■) or taken into the player (name) without clicking
         # its pad, which would restart it
         self.playing_row = QWidget()
-        self._chips_hl = QHBoxLayout(self.playing_row)
-        self._chips_hl.setContentsMargins(0, 0, 0, 0)
-        self._chips_hl.setSpacing(6)
-        # never wider than the window gives it: four overlapping sounds' chips (~900 px)
-        # turned a narrower window into the mini player; the last ones are cut instead
-        self._chips_hl.setSizeConstraint(QLayout.SetNoConstraint)
-        self.playing_row.setSizePolicy(QSizePolicy.Ignored, QSizePolicy.Fixed)
+        # wraps onto more lines: one line of four overlapping sounds' chips (~900 px)
+        # turned a narrower window into the mini player, and every playing sound must
+        # stay reachable, so none are left out
+        self._chips_hl = Flow(self.playing_row, gap=6)
         self._chips: dict[str, QWidget] = {}
         self._chip_ids: tuple = ()
         self.playing_row.hide()
@@ -908,7 +905,10 @@ class MainWindow(QMainWindow):
         self.seek.valueChanged.connect(self._seek_preview)
         no_wheel(self.seek)
         self.np_time = QLabel("0:00 / 0:00")
-        self.np_time.setFixedWidth(84)
+        # room for a long sound's "75:12 / 112:40" in this font (84 px cut it, and
+        # "12:34 / 45:67" too in the Consolas themes)
+        self.np_time.setFixedWidth(
+            self.np_time.fontMetrics().horizontalAdvance("888:88 / 888:88") + 4)
         self.np_time.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         self.np_time.setObjectName("muted")
         th.addWidget(self.btn_pp)
@@ -980,7 +980,7 @@ class MainWindow(QMainWindow):
                 lbl = QLabel("Now playing")
                 lbl.setObjectName("muted")
                 self._chips_hl.addWidget(lbl)
-                for sid in ids[:QUEUE_CHIPS]:
+                for sid in ids:
                     m = self.meta(sid)
                     chip = QFrame()
                     chip.setObjectName("chip")
@@ -1002,19 +1002,10 @@ class MainWindow(QMainWindow):
                     ch.addWidget(stop)
                     self._chips_hl.addWidget(chip)
                     self._chips[sid] = chip
-                if len(ids) > QUEUE_CHIPS:
-                    more = QLabel(f"+{len(ids) - QUEUE_CHIPS} more")
-                    more.setObjectName("muted")
-                    self._chips_hl.addWidget(more)
-            if queue or len(ids) >= 2:
-                self._chips_hl.addStretch(1)
-            # a steady height: the chips are rebuilt with every overlapping sound, and
-            # a row that shrank and grew back each time resized and repainted the
-            # whole board under it. It only ever grows (a bigger font).
-            self.playing_row.ensurePolished()
-            self.playing_row.setFixedHeight(max(
-                CHIPS_ROW_H, self.playing_row.minimumHeight(),
-                self._chips_hl.sizeHint().height()))
+            # at least a line high, taller when the chips wrap (the Flow's height for
+            # its width); a row that shrank and grew back with every overlapping
+            # sound resized and repainted the whole board under it
+            self.playing_row.setMinimumHeight(CHIPS_ROW_H)
             self.playing_row.setVisible(len(ids) >= 2 or bool(queue))
         for sid, chip in self._chips.items():
             sel = "true" if sid == self.current else "false"
@@ -1165,11 +1156,17 @@ class MainWindow(QMainWindow):
                 ("headphones", "My headphones", self.cb_mon),
                 ("mic", "My real mic", self.cb_mic))):
             row = (icon_label(ic), QLabel(text), cb)
+            row[1].setBuddy(cb)   # a screen reader reads the label as the box's name
             for col, w in enumerate(row):
                 grid.addWidget(w, r, col)
             if cb is self.cb_main:
                 self.main_row = row
             cb.setMinimumWidth(120)
+            # sized for a short name, not the longest device ("Headphones (2- Arctis Nova
+            # Pro Wireless Game)" gave the Setup tab a sideways scroll bar); the list
+            # opens wide enough for whole names
+            cb.setSizeAdjustPolicy(QComboBox.AdjustToMinimumContentsLengthWithIcon)
+            cb.setMinimumContentsLength(16)
         grid.setColumnStretch(2, 1)
         av.addLayout(grid)
         self.setup_hint = hint_label("")
@@ -1474,6 +1471,7 @@ class MainWindow(QMainWindow):
             cb.addItem(n, n)
         i = cb.findData(current) if current else 0
         cb.setCurrentIndex(i if i >= 0 else 0)
+        cb.view().setMinimumWidth(cb.view().sizeHintForColumn(0) + 32)   # whole names
         cb.blockSignals(False)
 
     def on_device(self, cb, attr):

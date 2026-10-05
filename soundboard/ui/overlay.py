@@ -799,7 +799,7 @@ class OverlayWindow(QWidget):
             p.setPen(QPen(QColor(T["border"]), 1, Qt.DashLine))
             p.setBrush(Qt.NoBrush)
             p.drawPath(path)
-            p.setPen(QColor(T["faint"]))
+            p.setPen(QColor(T["muted"]))   # faint was unreadable (2.6:1) in some themes
             f.setBold(False)
             f.setPointSizeF(8.5)
             p.setFont(f)

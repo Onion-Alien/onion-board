@@ -532,9 +532,9 @@ QSpinBox#stepper::down-arrow:disabled, QSpinBox#stepper::down-arrow:off { image:
 QSlider::groove:vertical { width:4px; background:$groove; border-radius:2px; }
 QSlider::add-page:vertical { background:$accent; border-radius:2px; }
 QSlider::handle:vertical { background:white; border:1px solid $border_hi; width:14px; height:14px; margin:0 -5px; border-radius:7px; }
-QPushButton#micbanner { background:#e53935; color:white; font-weight:700; font-size:11pt;
+QPushButton#micbanner { background:#d32f2f; color:white; font-weight:700; font-size:11pt;
     border:none; border-radius:10px; padding:10px; }
-QPushButton#miccheck:checked { background:#e53935; border:1px solid #ff6b6b; color:white;
+QPushButton#miccheck:checked { background:#d32f2f; border:1px solid #ff6b6b; color:white;
     font-weight:700; }
 QFrame#transport QLabel, QFrame#transport QCheckBox, QFrame#transport QSlider,
 QFrame#deck QLabel, QFrame#deck QCheckBox, QFrame#deck QSlider { background:transparent; }
@@ -559,7 +559,7 @@ QFrame#card QPushButton:focus { border-color:$accent; }
 QFrame#card QComboBox:disabled, QFrame#card QLineEdit:disabled { background:$inset; }
 QFrame#card QAbstractSpinBox { background:$bg; }
 QFrame#card QPushButton:checked { background:$accent; }
-QFrame#card QPushButton#miccheck:checked { background:#e53935; }
+QFrame#card QPushButton#miccheck:checked { background:#d32f2f; }
 QComboBox QAbstractItemView { background:$card; color:$text; border:1px solid $border_hi;
     padding:4px; outline:0; selection-background-color:$accent; selection-color:$on_accent; }
 QComboBox QAbstractItemView::item { min-height:28px; padding:0 10px; border-radius:6px; }
@@ -661,7 +661,7 @@ QLabel#fxname { font-weight:700; font-size:10pt; color:$text_hi; }
 QLabel#fxdesc { color:$muted; font-size:8.5pt; }
 QLabel#fxparam { color:$text; font-size:9pt; }
 QLabel#fxvalue { color:$accent_hi; font-size:9pt; font-weight:700; }
-QLabel#fxend { color:$faint; font-size:7.5pt; }
+QLabel#fxend { color:$muted; font-size:7.5pt; }   /* faint was 2.6:1 on some */
 QLabel#fxgroup { color:$section; font-size:8pt; font-weight:700; letter-spacing:1px; padding-top:6px; }
 QPushButton#fxreset, QFrame#card QPushButton#fxreset, QFrame#card[roomy="true"] QPushButton#fxreset { background:transparent; border:none; color:$muted; padding:2px 6px; min-height:0; font-size:8pt; }
 QPushButton#fxreset:hover, QFrame#card QPushButton#fxreset:hover, QFrame#card[roomy="true"] QPushButton#fxreset:hover { color:$text; background:transparent; }
@@ -673,8 +673,8 @@ QFrame#card QPushButton#fold, QFrame#card QPushButton#fold:checked { background:
 QPushButton#power { font-weight:700; }
 QPushButton#power:checked, QFrame#card QPushButton#power:checked { background:$live; border:1px solid $live_hi; color:$on_live; }
 QPushButton#power:checked:hover, QFrame#card QPushButton#power:checked:hover { background:$live_hi; }
-QPushButton#live:checked { background:#e53935; border:1px solid #ff6b6b; color:white; }
-QPushButton#rec:checked { background:#e53935; border:1px solid #ff6b6b; color:white; font-weight:700; }
+QPushButton#live:checked { background:#d32f2f; border:1px solid #ff6b6b; color:white; }
+QPushButton#rec:checked { background:#d32f2f; border:1px solid #ff6b6b; color:white; font-weight:700; }
 QFrame#setcard { background:$panel; border-radius:12px; }
 QFrame#setcard QWidget { background:transparent; }
 QFrame#setcard QPushButton { background:$btn; }

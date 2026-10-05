@@ -213,6 +213,9 @@ class ParamSlider(QWidget):
 
     def _label(self):
         self.val.setText(self.text())
+        if self.slider is not None:   # a screen reader said only "slider, 40"
+            self.slider.setAccessibleName(self.q.label)
+            self.slider.setAccessibleDescription(self.text())
 
     def _moved(self, _v):
         self._label()
