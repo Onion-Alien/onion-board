@@ -1,6 +1,8 @@
 """The headphones output follows Windows' default output: switch Windows from the
 headset to the speakers with the app open and the sounds come out of the speakers,
 unless another device was picked for the headphones by hand."""
+import time
+
 import pytest
 
 from soundboard import appaudio
@@ -67,3 +69,32 @@ def test_the_default_when_the_app_starts(window, monkeypatch):
     window._default_out = "Speakers (Realtek Audio)"   # changed while the app was closed
     window._init_devices()
     assert window.cfg.mon_device == OUTS[1]
+
+
+def test_a_listed_device_that_wont_open_gets_a_rescan_with_backoff(window, monkeypatch):
+    """Plugged in after the app started, or its format changed in Windows: PortAudio's
+    old list can't open it, however often the engine retries."""
+    from soundboard.ui import mainwindow
+    scans = []
+    monkeypatch.setattr(window, "refresh_devices", lambda: scans.append(1) or "")
+    e = window.engine
+    monkeypatch.setitem(e.names, "mic", "Microphone (USB Mic)")
+    monkeypatch.setitem(e.errors, "mic", "device not found")
+    e.mic_stream = None
+    windows = {"input": set()}
+    monkeypatch.setattr(appaudio, "endpoint_names", lambda kind: windows.get(kind, set()))
+    window._recover_devices()
+    assert not scans                                   # unplugged: nothing to re-scan for
+    windows["input"] = {"Microphone  (USB Mic)"}       # Windows lists it now
+    window._recover_devices()
+    assert len(scans) == 1
+    window._recover_devices()
+    assert len(scans) == 1                             # waits before the next try
+    window._recover_at = 0.0                           # the wait is over
+    window._recover_devices()
+    assert len(scans) == 2
+    assert window._recover_at - time.monotonic() == pytest.approx(
+        mainwindow.RECOVER_WAIT_S[1], abs=5)
+    e.errors.pop("mic")                                # it opened: the wait starts over
+    window._recover_devices()
+    assert window._recover_n == 0

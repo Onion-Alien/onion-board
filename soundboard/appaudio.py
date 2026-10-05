@@ -43,7 +43,7 @@ RPC_E_CHANGED_MODE = -2147417850
 VT_BLOB = 0x41
 VT_LPWSTR = 31
 STGM_READ = 0
-E_RENDER, DEVICE_STATE_ACTIVE = 0, 1
+E_RENDER, E_CAPTURE, DEVICE_STATE_ACTIVE = 0, 1, 1
 E_CONSOLE = 0   # ERole: the default device (not the communications one)
 AUDCLNT_SHAREMODE_SHARED = 0
 AUDCLNT_STREAMFLAGS_LOOPBACK = 0x00020000
@@ -252,9 +252,9 @@ def _enumerator() -> Com:
     return Com(out.value)
 
 
-def _render_devices(en: Com) -> list[Com]:
+def _render_devices(en: Com, flow: int = E_RENDER) -> list[Com]:
     coll = c_void_p()
-    en.call(3, (c_int, c_ulong, POINTER(c_void_p)), E_RENDER, DEVICE_STATE_ACTIVE, byref(coll),
+    en.call(3, (c_int, c_ulong, POINTER(c_void_p)), flow, DEVICE_STATE_ACTIVE, byref(coll),
             what="EnumAudioEndpoints")
     devs = []
     with Com(coll.value) as c:
@@ -474,6 +474,29 @@ def default_output_name() -> str | None:
                 return _device_name(dev) or None
     except ComError:
         log.debug("no default playback device", exc_info=True)
+        return None
+    finally:
+        if own:
+            _ole32.CoUninitialize()
+
+
+def endpoint_names(kind: str) -> set[str] | None:
+    """Names of Windows' active playback ('output') or recording ('input') devices,
+    asked now (PortAudio's list is from when it started or was last re-scanned).
+    None if Windows can't be asked."""
+    if not _win:
+        return None
+    own = _co_init()
+    try:
+        with _enumerator() as en:
+            devs = _render_devices(en, E_CAPTURE if kind == "input" else E_RENDER)
+        try:
+            return {n for n in map(_device_name, devs) if n}
+        finally:
+            for d in devs:
+                d.release()
+    except ComError:
+        log.debug("listing %s devices failed", kind, exc_info=True)
         return None
     finally:
         if own:

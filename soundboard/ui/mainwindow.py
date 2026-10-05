@@ -94,6 +94,10 @@ TICK_IDLE_MS = 250   # ...and while it's in the tray or minimised (push-to-talk,
 GLOW_STEPS = 4       # how many glow levels the taskbar / tray icon has while sound plays
 ICON_GLOW_MS = 120   # ...and how often at most it changes
 DEFAULT_POLL_MS = 1500   # how often Windows' default output is checked
+# a device that won't open while Windows lists it: re-scan, then wait this long
+# (seconds) before the next re-scan, so one that really won't open isn't re-scanned
+# over and over (each re-scan reopens every stream)
+RECOVER_WAIT_S = (20, 40, 80, 160, 300)
 LOOSE_WAIT_MS = 1500   # a file dragged into the sounds folder is looked at again (ms)
 LOOSE_EMPTY_LOOKS = 20   # an empty file that long (~30 s) waits for the folder to change
 MINI_SIZE = QSize(440, 380)   # below this the window becomes the mini player...
@@ -141,6 +145,12 @@ class Bridge(QObject):
     watch_update = Signal(object)              # a newer Onion Watch: watchaddon.Offer
     imported = Signal(object, object, str)     # meta|None, data|None, error/filename
     preview = Signal(str, object, float, int)  # id, audio with unsaved effects|None, gain, gen
+
+
+def _listed(name: str, names) -> bool:
+    """`name` (as the app saved it) is one of `names` (Windows' own), spacing aside."""
+    squash = " ".join(name.split()).lower()
+    return any(" ".join(n.split()).lower() == squash for n in names)
 
 
 class MainWindow(QMainWindow):
@@ -281,6 +291,8 @@ class MainWindow(QMainWindow):
         # the headphones follow Windows' default output when it changes
         self._default_timer = QTimer(self)
         self._default_timer.timeout.connect(self._follow_default_output)
+        self._default_timer.timeout.connect(self._recover_devices)
+        self._recover_n, self._recover_at = 0, 0.0   # see _recover_devices
         if sys.platform == "win32":
             self._default_timer.start(DEFAULT_POLL_MS)
         self._init_fit()
@@ -1266,6 +1278,35 @@ class MainWindow(QMainWindow):
         idx = eng.find_device("output", self._default_out)
         name = eng.list_name(idx) if idx is not None else None
         return None if name is None or is_virtual_cable(name) else name
+
+    def _recover_devices(self):
+        """A device the app uses won't open, but Windows lists it: PortAudio's device
+        list is out of date (it was plugged in after the last scan, or its format was
+        changed in Windows' sound settings), and the engine's retries can't fix that.
+        Re-scan, waiting longer each time it doesn't help (RECOVER_WAIT_S)."""
+        e = self.engine
+        failing = [(k, e.names[k]) for k in ("main", "mon", "mic", "obs")
+                   if e.names.get(k) and getattr(e, f"{k}_stream") is None
+                   and k in e.errors_snapshot()]
+        if not failing:
+            self._recover_n = 0
+            return
+        now = time.monotonic()
+        if now < self._recover_at:
+            return
+        listed: dict[str, set[str] | None] = {}
+        for key, name in failing:
+            kind = "input" if key == "mic" else "output"
+            if kind not in listed:
+                listed[kind] = appaudio.endpoint_names(kind)
+            if _listed(name, listed[kind] or ()):
+                break
+        else:
+            return   # really gone (unplugged): the engine's retries pick it up again
+        self._recover_at = now + RECOVER_WAIT_S[min(self._recover_n, len(RECOVER_WAIT_S) - 1)]
+        self._recover_n += 1
+        log.info("%s device %r is listed by Windows but won't open: re-scanning", key, name)
+        self.refresh_devices()
 
     def _follow_default_output(self):
         """Windows' default output changed (headphones → speakers): the headphones

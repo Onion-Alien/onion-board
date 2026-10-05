@@ -195,6 +195,8 @@ def _never_look_at_the_real_foreground():
         mp.setattr(voicesdk, "foreground_process", lambda: (0, ""))
         # ...nor which output Windows has as its default (the headphones follow it)
         mp.setattr(appaudio, "default_output_name", lambda: None)
+        # ...nor which devices it has (a failing device is re-scanned when it's listed)
+        mp.setattr(appaudio, "endpoint_names", lambda kind: None)
         yield
 
 
