@@ -74,7 +74,7 @@ def test_live_pitch_switching_on_and_off_has_no_gap_or_click():
     peaks = np.abs(y).reshape(-1, 480, 2).max(axis=(1, 2))
     assert peaks.min() > 0.3, peaks.round(2)
     assert np.abs(np.diff(y, axis=0)).max() < 0.1
-    assert not any(e.running for e in lp._ch)        # faded back to the dry signal
+    assert not lp.shift.running                      # faded back to the dry signal
     assert np.array_equal(y[-480:], x[len(sts) * 480 - 480:len(sts) * 480])
 
 

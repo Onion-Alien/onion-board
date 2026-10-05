@@ -108,3 +108,40 @@ def test_per_sound_gain_glides():
     e.set_gain("dc", 0.0)
     b = e._render("main", BLOCK)[:, 0]
     assert np.max(np.abs(np.diff(np.concatenate([a, b])))) < 0.01 and b[-1] == 0
+
+
+def test_live_pitch_keeps_left_and_right_lined_up():
+    # music with stereo width: the right channel 0.3 ms behind the left. Each channel
+    # spliced on its own moved that gap around at every splice (a smeared image, and
+    # flanging once a call folds it to mono); linked, it stays where it was.
+    from soundboard.engine import LivePitch
+    rng = np.random.default_rng(1)
+    t = np.arange(SR * 2) / SR
+    mono = sum(np.sin(2 * np.pi * f * t + rng.uniform(0, 6)) for f in (196, 247, 294, 392, 523))
+    mono = (mono / 5 + 0.05 * rng.standard_normal(len(t))).astype(np.float32)
+    d = 14   # frames
+    x = np.stack([mono[d:], mono[:-d]], 1) * np.float32(0.5)
+    lp = LivePitch(SR)
+    y = np.concatenate([lp.process(x[i:i + BLOCK], 3.0) for i in range(0, len(x) - BLOCK, BLOCK)])
+    lags = []
+    for s in range(SR // 2, len(y) - 2048, 1024):
+        a, b = y[s:s + 2048, 0], y[s:s + 2048, 1]
+        c = [float(np.dot(a[30:-30], b[30 + k:len(b) - 30 + k])) for k in range(-30, 31)]
+        lags.append(int(np.argmax(c)) - 30)
+    # pitched up 3 st, the 14-frame gap plays as ~11 frames, and stays there
+    assert max(lags) - min(lags) <= 1, lags
+
+
+def test_live_pitch_resampler_keeps_the_top_end():
+    # 9 kHz shifted down an octave. Linear interpolation lost 0.8 dB of it and left an
+    # image at -27.5 dB; cubic: 0.2 dB and -40 dB.
+    from soundboard.engine import LivePitch
+    x = np.stack([np.sin(2 * np.pi * 9000 * np.arange(SR) / SR)] * 2, 1).astype(np.float32)
+    lp = LivePitch(SR)
+    y = np.concatenate([lp.process(x[i:i + BLOCK] * np.float32(0.5), -12.0)
+                        for i in range(0, len(x) - BLOCK, BLOCK)])[SR // 4:, 0]
+    w = np.hanning(len(y))
+    spec = 20 * np.log10(np.abs(np.fft.rfft(y * w)) / (w.sum() / 2) + 1e-12)
+    f = np.fft.rfftfreq(len(y), 1 / SR)
+    assert abs(spec[np.abs(f - 4500) < 20].max() - 20 * np.log10(0.5)) < 0.4
+    assert spec[np.abs(f - 4500) > 200].max() < -35

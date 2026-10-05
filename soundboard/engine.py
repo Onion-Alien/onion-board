@@ -39,6 +39,7 @@ import sounddevice as sd
 import soxr
 
 from soundboard import destination, livefx, mapped
+from soundboard.dsp import hermite
 from soundboard.eq import EQ
 from soundboard.sendfx import Ducker, Limiter, SmartMono
 from soundboard.voicefx.builtin import PitchShift
@@ -192,15 +193,6 @@ def resample(data: np.ndarray, src: int, dst: int) -> np.ndarray:
 
 
 # --------------------------------------------------------------------------- helpers
-
-def hermite(p0, p1, p2, p3, f):
-    """4-point cubic (Catmull-Rom) interpolation between p1 and p2 at fraction f.
-    Linear interpolation dulls the top end and leaves images around it (measured
-    -20 dB against a proper resampler on music); this is much cleaner for the
-    cost of two more reads."""
-    return p1 + 0.5 * f * (p2 - p0 + f * (2 * p0 - 5 * p1 + 4 * p2 - p3
-                                          + f * (3 * (p1 - p2) + p3 - p0)))
-
 
 # A loop's end is crossfaded into its start over this long, so a loop not cut at a zero
 # crossing doesn't tick on every pass. After the first pass it plays [xf, n): the
@@ -556,24 +548,21 @@ def is_xrun(status) -> bool:
 
 
 class LivePitch:
-    """Stereo real-time pitch shifter (one voicefx PitchShift per channel). Keeps
-    its recent input while bypassed, so switching it on or off crossfades
-    instead of dropping out for its latency."""
+    """Stereo real-time pitch shifter (a voicefx PitchShift on both channels at once,
+    spliced at the same places: see its `channels`). Keeps its recent input while
+    bypassed, so switching it on or off crossfades instead of dropping out for its
+    latency."""
 
     def __init__(self, rate: int):
         self.rate = rate
-        self._ch = (PitchShift(rate), PitchShift(rate))
+        self.shift = PitchShift(rate, channels=CH)
         self._st = 0.0
 
     def process(self, x: np.ndarray, semitones: float) -> np.ndarray:
         if semitones != self._st:
-            self._st = semitones
-            for e in self._ch:     # set directly: past the voice changer's ±12 limit
-                e.p = {"semitones": float(semitones), "mix": 1.0}
-        out = np.empty_like(x)
-        for c, e in enumerate(self._ch):
-            out[:, c] = e.run(np.ascontiguousarray(x[:, c]), self.rate)
-        return out
+            self._st = semitones   # set directly: past the voice changer's ±12 limit
+            self.shift.p = {"semitones": float(semitones), "mix": 1.0}
+        return self.shift.run(x, self.rate)
 
 
 # --------------------------------------------------------------------------- voices

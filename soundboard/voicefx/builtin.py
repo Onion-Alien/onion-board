@@ -13,7 +13,8 @@ space. The presets at the bottom are built from these building blocks.
 from __future__ import annotations
 
 import numpy as np
-from soundboard.dsp import SmoothSos, butter, lfilter, matched_biquad, sosfilt, sosfilt_bank
+from soundboard.dsp import (SmoothSos, butter, hermite, lfilter, matched_biquad, sosfilt,
+                             sosfilt_bank)
 from soundboard.voicefx import Effect, Param, register
 
 F32 = np.float32
@@ -374,16 +375,23 @@ class PitchShift(Effect):
     FORMANT_S = 0.02    # the formant stage's frame (its added latency)
     LIFTER_S = 0.0011   # cepstrum kept as the envelope: shorter than any voice's period
 
-    def __init__(self, rate, values=None):
+    def __init__(self, rate, values=None, channels: int = 0):
+        """channels: 0 for a mono voice ((n,) blocks); 2 for stereo (n, 2) blocks, cut
+        and spliced at the same places in both channels (the engine's live pitch on
+        music: channels spliced on their own smear the stereo picture, and flange
+        once a call folds them to mono)."""
         super().__init__(rate, values)
+        self.shape = (channels,) if channels else ()
         self.seq = int(rate * self.SEQ_MS / 1000)
         self.seek = int(rate * self.SEEK_MS / 1000)
         self.ovl = int(rate * self.OVL_MS / 1000)
         self.fade_in = np.linspace(0, 1, self.ovl, endpoint=False, dtype=F32)
+        if channels:
+            self.fade_in = self.fade_in[:, None]
         self.fade_out = F32(1) - self.fade_in
         self.aa = _Filter()
         self.running = False
-        self.hist = np.zeros(int(rate * self.HIST_S), F32)
+        self.hist = np.zeros((int(rate * self.HIST_S),) + self.shape, F32)
         self.xf = max(1, int(rate * self.XF_MS / 1000))
         self.wet_g = 0.0        # 0 = dry, 1 = wet
         self.ratio, self.mix = 1.0, 1.0
@@ -399,15 +407,16 @@ class PitchShift(Effect):
         return max(self.seek + self.seq, int((self.seq - self.ovl) * tempo) + 2)
 
     def _reset(self, ratio: float):
-        self.inb = np.zeros(0, F32)             # mic audio waiting to be stretched
-        self.mid = np.zeros(self.ovl, F32)      # tail of the last sequence, to line up the next
+        self.inb = np.zeros((0,) + self.shape, F32)   # mic audio waiting to be stretched
+        self.mid = np.zeros((self.ovl,) + self.shape, F32)   # the last sequence's tail
         self.skip = 0.0                         # fractional input position carried over
         # The stretcher can only start once it has a sequence's worth of input, so the
         # resampler starts that far behind (the effect's latency); the head start is
         # exactly what keeps it fed afterwards, whatever the mic's block size.
         # (autotune moves the ratio as you talk: a little more head start for that)
         head = self._need(1 / ratio) * ratio * (1.08 if self.p.get("tune", 0) > 0 else 1.0)
-        self.stretched = np.zeros(int(head) + 4, F32)
+        # (its first sample is the one before the resampler's position: _resample)
+        self.stretched = np.zeros((int(head) + 5,) + self.shape, F32)
         self.rs_phase = 0.0
         self.pads = 0                           # times the resampler still had to wait
 
@@ -419,8 +428,13 @@ class PitchShift(Effect):
         out = []
         while len(self.inb) >= need:
             cand = self.inb[:seek + ovl]
-            corr = np.correlate(cand, self.mid, "valid")          # seek + 1 candidates
-            cs = np.cumsum(cand.astype(np.float64) ** 2)
+            if cand.ndim == 1:
+                corr = np.correlate(cand, self.mid, "valid")      # seek + 1 candidates
+                cs = np.cumsum(cand.astype(np.float64) ** 2)
+            else:   # all channels together: one splice point for all of them
+                corr = sum(np.correlate(cand[:, c], self.mid[:, c], "valid")
+                           for c in range(cand.shape[1]))
+                cs = np.cumsum((cand.astype(np.float64) ** 2).sum(1))
             energy = cs[ovl - 1:] - np.concatenate([[0.0], cs[:seek]])
             k = int(np.argmax(corr / np.sqrt(energy + 1e-9)))
             s = self.inb[k:k + seq]
@@ -434,15 +448,19 @@ class PitchShift(Effect):
         return out
 
     def _resample(self, ratio: float, n: int) -> np.ndarray:
+        """n samples read from `stretched` at `ratio` (cubic: linear dulled the top
+        and left images). stretched[0] is the sample before position 0."""
         buf, ph = self.stretched, self.rs_phase
-        need = int(ph + (n - 1) * ratio) + 2
+        need = int(1 + ph + (n - 1) * ratio) + 3
         if len(buf) < need:                      # the stretcher isn't ahead yet: wait
-            buf = np.concatenate([buf, np.zeros(need - len(buf), F32)])
+            buf = np.concatenate([buf, np.zeros((need - len(buf),) + buf.shape[1:], F32)])
             self.pads += 1
-        pos = ph + ratio * np.arange(n, dtype=np.float64)
+        pos = 1 + ph + ratio * np.arange(n, dtype=np.float64)
         i = pos.astype(np.int64)
         f = (pos - i).astype(F32)
-        y = buf[i] * (1 - f) + buf[i + 1] * f
+        if buf.ndim == 2:
+            f = f[:, None]
+        y = hermite(buf[i - 1], buf[i], buf[i + 1], buf[i + 2], f)
         nph = ph + n * ratio
         cut = int(nph)
         self.stretched, self.rs_phase = buf[cut:], nph - cut
@@ -489,6 +507,8 @@ class PitchShift(Effect):
             # the shifter plays what you said ~40 ms ago, so measure the pitch there
             tr = self.tracker
             recent = np.concatenate([self.hist, x])
+            if recent.ndim == 2:
+                recent = recent.mean(1)
             lag = int(self._need(1.0 / max(base, 1e-3))) - tr.window // 2
             end = min(len(recent), max(tr.window, len(recent) - max(lag, 0)))
             f0 = tr.measure(recent[end - tr.window:end])
@@ -559,6 +579,8 @@ class PitchShift(Effect):
         step = (1.0 / self.xf) * (1 if target > g0 else -1)
         env = np.clip(g0 + step * np.arange(1, len(x) + 1), 0.0, 1.0).astype(F32)
         self.wet_g = float(env[-1]) if len(x) else g0
+        if x.ndim == 2:
+            env = env[:, None]
         if not on and self.wet_g <= 0.0:
             self.running = False
             self.fstage = None
