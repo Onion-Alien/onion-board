@@ -46,7 +46,7 @@ VOICE = Profile(
     "voice", "Voice chat",
     "Discord, calls in a browser, Zoom, Teams, TeamSpeak.",
     "Shapes your sounds for a voice chat app: Discord, or a call in a browser, Zoom "
-    "or Teams, picked by which one is listening to the virtual cable. Mono, the "
+    "or Teams, picked by which one is listening to you. Mono, the "
     "deep bass turned into harmonics that get through, each sound's level given "
     "back. If it can't tell, it keeps the last one it used (Discord at first).",
     ("discord", "webrtc", "game"), "discord")
