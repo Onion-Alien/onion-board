@@ -166,6 +166,16 @@ PROFILES: dict[str, Profile] = {p.key: p for p in (
             cleanup=("webrtc_ns", "webrtc_agc"), gate_db=-40,
             note="Opus Voice quality 6 (28.7 kbps); background-noise removal and AGC on",
             games="TeamSpeak 3 / 5", confidence="estimate"),
+    Profile("zoom", "Zoom meeting", 32000, 1, 40, cleanup=("rnnoise", "webrtc_agc"),
+            note="32 kHz (16 kHz ceiling) unless Original sound is on; its own ML noise "
+                 "suppression (RNNoise stands in) and gain control; no voice gate. "
+                 "The bitrate is a guess",
+            games="Zoom", confidence="estimate"),
+    Profile("teams", "Microsoft Teams meeting", 32000, 1, 36, cleanup=("rnnoise", "webrtc_agc"),
+            note="Satin, super-wideband at 32 kHz (16 kHz ceiling), 6-36 kbps, modelled "
+                 "with Opus; ML noise suppression on Auto (RNNoise stands in) and gain "
+                 "control; no voice gate",
+            games="Microsoft Teams", confidence="estimate"),
     Profile("console_party", "Xbox / PlayStation party", 48000, 1, 32, cleanup=WEBRTC_CLEANUP,
             note="platform voice with its own noise suppression and AGC; nothing public",
             games="Xbox app / party chat, PlayStation party, Sea of Thieves",

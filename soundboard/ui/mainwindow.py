@@ -1066,6 +1066,11 @@ class MainWindow(QMainWindow):
         self.btn_game = QPushButton("Set up game voice chat")
         self.btn_game.clicked.connect(lambda: self.show_chat_guide("game"))
         hv.addWidget(self.btn_game)
+        self.btn_meeting = QPushButton("Zoom, Teams or a browser call")
+        self.btn_meeting.setToolTip("The settings in Zoom, Microsoft Teams and calls in a "
+                                    "web page that stop them treating your sounds as noise")
+        self.btn_meeting.clicked.connect(lambda: self.show_chat_guide("meeting"))
+        hv.addWidget(self.btn_meeting)
         self.btn_nomic = QPushButton("Game has no microphone setting?")
         self.btn_nomic.clicked.connect(self.open_windows_mic)
         hv.addWidget(self.btn_nomic)
@@ -1646,6 +1651,7 @@ class MainWindow(QMainWindow):
         self.btn_nomic.setVisible(mic_side)
         self.btn_chat.setVisible(mic_side)
         self.btn_game.setVisible(mic_side)
+        self.btn_meeting.setVisible(mic_side)
         self.btn_cablefix.setVisible(mic_side and bool(self.cable_bad))
         # "off" was picked on purpose: it's set up, as far as the rest of the app goes
         self.setup_state = "ok" if state == "off" else state

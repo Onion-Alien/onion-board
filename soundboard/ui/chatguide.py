@@ -352,13 +352,64 @@ class GameGuide(QDialog):
         v.addLayout(row)
 
 
+class MeetingGuide(QDialog):
+    """Calls in other apps: Zoom, Microsoft Teams, and calls in a web page (Google
+    Meet, Discord in a browser). Their menus differ, so each gets its own few lines."""
+
+    def __init__(self, parent, mw, vm: str):
+        super().__init__(parent)
+        fit.watch(self)
+        self.setWindowTitle("Zoom, Teams and browser calls — make your sounds come through "
+                            "clean")
+        self.setMinimumWidth(600)
+        v = QVBoxLayout(self)
+        v.setContentsMargins(24, 20, 24, 18)
+        v.setSpacing(12)
+        v.addLayout(_header("Zoom, Teams and browser calls", _label(
+            "Meeting apps clean up the mic for speech and treat music as background "
+            "noise. Pick the cable as the mic and turn that cleanup down:"),
+            BunnyWidget("headphones")))
+        mic = f"<b style='color:{_ok()}'>{html.escape(vm)}</b>"
+        v.addWidget(_label(
+            "<ol style='margin-left:-20px'>"
+            f"<li style='margin-bottom:8px'><b>Zoom</b>: Settings → Audio → Microphone: "
+            f"{mic}. Untick <b>Automatically adjust microphone volume</b>, set "
+            "<b>Background noise suppression</b> to <b>Low</b>, or pick <b>Original sound "
+            "for musicians</b> (then turn it on in the meeting, top left).</li>"
+            f"<li style='margin-bottom:8px'><b>Microsoft Teams</b>: Settings → Devices → "
+            f"Microphone: {mic}. Set <b>Noise suppression</b> to <b>Off</b> or <b>Low</b>, "
+            "or switch on <b>Music mode</b> / <b>High fidelity music mode</b> if it's "
+            "there.</li>"
+            f"<li style='margin-bottom:8px'><b>In a browser</b> (Google Meet, Discord or "
+            f"Guilded in a web page): the call's own settings → Microphone: {mic}, and "
+            "turn off <b>Noise cancellation</b> / <b>noise suppression</b> where the site "
+            "has it.</li>"
+            "<li>On the Setup tab, set <b>Who's listening</b> to <b>Browser, Zoom, "
+            "Teams</b>. With <b>Pick the mode by "
+            "itself</b> ticked it switches when the call starts.</li></ol>"))
+        row = QHBoxLayout()
+        copy = QPushButton("Copy the mic name")
+        icons.set_icon(copy, "copy")
+        copy.clicked.connect(lambda: (QApplication.clipboard().setText(vm),
+                                      busy.flash(copy, "✓  Copied")))
+        row.addWidget(copy)
+        row.addStretch(1)
+        done = QPushButton("Done")
+        done.setObjectName("primary")
+        done.clicked.connect(self.accept)
+        row.addWidget(done)
+        v.addLayout(row)
+
+
 def show_guide(which: str, parent, mw, vm: str):
-    """Open one guide modally: 'discord', 'game' or 'steam'."""
+    """Open one guide modally: 'discord', 'game', 'meeting' or 'steam'."""
     if which == "steam":
         from soundboard.ui.setupwizard import SteamGuide
         g = SteamGuide(parent, vm)
     elif which == "game":
         g = GameGuide(parent, mw, vm)
+    elif which == "meeting":
+        g = MeetingGuide(parent, mw, vm)
     else:
         g = DiscordGuide(parent, mw, vm)
     g.exec()

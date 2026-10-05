@@ -49,12 +49,18 @@ def test_game_guide_and_freeing(wizard, monkeypatch):
     g = chatguide.GameGuide(wiz, w, "CABLE Output")
     assert "noise" in _text(g).lower()
     g.setParent(None)
-    for cls in (chatguide.DiscordGuide, chatguide.GameGuide, setupwizard.SteamGuide):
+    g = chatguide.MeetingGuide(wiz, w, "CABLE Output")
+    text = _text(g)
+    assert all(app in text for app in ("Zoom", "Teams", "browser", "Who's listening"))
+    g.setParent(None)
+    for cls in (chatguide.DiscordGuide, chatguide.GameGuide, chatguide.MeetingGuide,
+                setupwizard.SteamGuide):
         monkeypatch.setattr(cls, "exec", lambda self: 0)
-    for which in ("discord", "game", "steam"):
+    for which in ("discord", "game", "meeting", "steam"):
         wiz.show_guide(which)
     assert not wiz.findChildren(chatguide.DiscordGuide)
     assert not wiz.findChildren(chatguide.GameGuide)
+    assert not wiz.findChildren(chatguide.MeetingGuide)
 
 
 def test_result_text_covers_every_issue():
@@ -73,7 +79,7 @@ def test_error_text_and_device_names_are_shown_as_typed(wizard):
     html = chatguide.result_html({"issues": [], "error": "bad <b>value</b>"}, vm)
     assert "bad &lt;b&gt;value&lt;/b&gt;" in html
     w, wiz = wizard
-    for cls in (chatguide.DiscordGuide, chatguide.GameGuide):
+    for cls in (chatguide.DiscordGuide, chatguide.GameGuide, chatguide.MeetingGuide):
         g = cls(wiz, w, vm)
         assert "Mic &lt;USB&gt; &amp; Co" in _text(g) and vm not in _text(g)
         g.done(0)

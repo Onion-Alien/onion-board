@@ -462,6 +462,12 @@ class SetupWizard(QDialog):
                                  "that matter")
         self.btn_game.clicked.connect(lambda: self.show_guide("game"))
         games.addWidget(self.btn_game)
+        self.btn_meeting = QPushButton("Zoom, Teams, browser")
+        icons.set_icon(self.btn_meeting, "headphones")
+        self.btn_meeting.setToolTip("Calls in Zoom, Microsoft Teams or a web page (Google "
+                                    "Meet): the settings that matter")
+        self.btn_meeting.clicked.connect(lambda: self.show_guide("meeting"))
+        games.addWidget(self.btn_meeting)
         v.addLayout(games)
         # coming from another soundboard: their board in one click (only offered for
         # ones whose board is here; nothing is read until they click)
@@ -775,7 +781,8 @@ class SetupWizard(QDialog):
         dev = self.win._main_name()
         name = eng.virtual_mic_for(dev)
         self._vm = name or dev or "CABLE Output"
-        for b in (self.btn_steam, self.btn_game, self.btn_nomic):   # mic settings: not
+        for b in (self.btn_steam, self.btn_game, self.btn_meeting,   # mic settings: not
+                  self.btn_nomic):
             b.setVisible(bool(name) or cfg.route == "cable")      # without a mic end to pick
         self.discord_title.setText(
             "Last step: nothing to tell" if cfg.route == "off" else
