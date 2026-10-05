@@ -37,8 +37,12 @@ class FakeCapture:
     def ready(self):
         return self.started and self.error is None and not FakeCapture.slow
 
-    def stop(self):
+    def stop(self, wait=True):
         self.stopped = True
+        self.waited = wait
+
+    def join(self, timeout=3.0):
+        self.joined = timeout
 
     @property
     def running(self):
@@ -295,6 +299,25 @@ def test_a_program_can_go_to_the_stream_only(qapp, monkeypatch):
         assert row.sending and not row.src.live and row.src.stream
     finally:
         t.shutdown()
+
+
+def test_send_off_does_not_wait_for_the_capture_to_end(tab):
+    """Send off / Stop all / ✕ ask the capture to stop without waiting for its thread
+    (up to 3 s while Windows was still opening it); Send on again starts a fresh one
+    straight away, and quitting waits for the old ones."""
+    tab._on_apps([music()])
+    row = tab.rows["music.exe"]
+    row.btn_send.setChecked(True)
+    first = row.capture
+    row.btn_send.setChecked(False)
+    assert first.stopped and first.waited is False and row.capture is None
+    row.btn_send.setChecked(True)
+    assert row.capture is not first and row.capture.started and row.sending
+    second = row.capture
+    tab.stop_all()
+    assert second.stopped and second.waited is False
+    tab.shutdown()
+    assert getattr(second, "joined", None) is not None and tab._stopping == []
 
 
 def test_shutdown_stops_every_capture(tab):

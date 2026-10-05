@@ -414,6 +414,7 @@ class AppsTab(QWidget):
         if not isinstance(cfg.apps_paths, dict):
             cfg.apps_paths = {}
         self.rows: dict[str, AppRow] = {}     # exe (lower) or path_key -> row
+        self._stopping: list[appaudio.AppCapture] = []   # stopped, maybe not ended yet
         self._sending: tuple[str, ...] = ()   # the programs being sent, as last reported
         v = QVBoxLayout(self)
         v.setContentsMargins(0, 8, 0, 0)
@@ -553,6 +554,10 @@ class AppsTab(QWidget):
             self._stop_capture(row, save=False)
             if row.editor is not None:
                 row.editor.shutdown()
+        end = time.monotonic() + 3.0   # all of them together, not 3 s each
+        for cap in self._stopping:
+            cap.join(max(0.0, end - time.monotonic()))
+        self._stopping = []
 
     def stop_all(self):
         """Stop all: switch every program off (they stay remembered). A recording
@@ -813,7 +818,10 @@ class AppsTab(QWidget):
     def _close_capture(self, row: AppRow):
         cap, row.capture = row.capture, None
         if cap is not None:
-            cap.stop()
+            # without waiting: a capture Windows is still opening takes up to 5 s to
+            # notice (that froze the window); shutdown() waits for the stragglers
+            cap.stop(wait=False)
+            self._stopping = [c for c in self._stopping if c.running] + [cap]
         row.meter.set_level(0.0)
 
     def _start_capture(self, row: AppRow):

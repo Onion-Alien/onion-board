@@ -6,6 +6,7 @@ import pytest
 from soundboard import appaudio, cableformat, chatcheck
 from soundboard.ui import chatguide, setupwizard
 from tests import test_setupwizard as _sw
+from tests.conftest import process_events
 
 devices, wizard = _sw.devices, _sw.wizard   # the guide's fixtures, shared
 
@@ -94,7 +95,8 @@ def test_check_without_discord_explains(wizard, monkeypatch):
     c = chatguide.ChatCheck(w.engine)
     c.done.connect(got.append)
     c.start()
-    assert got and "Let's Check" in got[0]["error"]
+    assert process_events(chatguide.QApplication.instance(), lambda: got, timeout=5)
+    assert "Let's Check" in got[0]["error"] and not c.running
     w.engine.main_stream = None
 
 
@@ -102,14 +104,24 @@ class _FakeCapture:
     """Plays Discord: 'captures' whatever the engine tapped, 0.3 s late, halved."""
 
     engine = None
+    made = []
+    opening = False   # Windows still opening it (start(wait=False) returned already)
 
     def __init__(self, pid, sink, include_tree=True, name=""):
         self.sink, self.error = sink, None
+        self.waited = None
+        _FakeCapture.made.append(self)
 
-    def start(self):
+    def start(self, timeout=6.0, wait=True):
+        self.start_waited = wait
         return True
 
-    def stop(self):
+    @property
+    def ready(self):
+        return not _FakeCapture.opening
+
+    def stop(self, wait=True):
+        self.waited = wait
         tap = np.concatenate(self.engine.main_tap or [np.zeros((1, 2), np.float32)])
         self.sink(np.zeros((int(0.3 * chatcheck.SR), 2), np.float32))
         self.sink(tap * 0.5)
@@ -130,13 +142,63 @@ def test_check_runs_end_to_end_with_a_clean_discord(wizard, monkeypatch):
     c = chatguide.ChatCheck(e)
     c.done.connect(got.append)
     c.start()
+    app = chatguide.QApplication.instance()
+    assert process_events(app, lambda: played, timeout=5)
     assert played == ["main"] and c.running
     # what the main output would have sent while the test played
     e.main_tap.extend(np.array_split(chatcheck.test_signal(), 200))
     c._timer.stop()
     c._finish()
-    assert got and got[0]["issues"] == [] and not c.running
+    assert c.running and not got                  # the comparison runs on a worker
+    assert process_events(app, lambda: got, timeout=10)
+    assert got[0]["issues"] == [] and not c.running
     assert e.main_tap is None
+    e.main_stream = None
+
+
+def test_check_never_waits_on_the_window_thread(wizard, monkeypatch):
+    """Finding Discord runs on a worker, the capture is started without waiting and
+    polled, and stopping it doesn't wait either (Windows can take seconds to open
+    it). Cancelling while it opens drops the check without a result."""
+    import threading
+    w, _ = wizard
+    e = w.engine
+    e.main_stream = object()
+    monkeypatch.setattr(appaudio, "supported", lambda: (True, ""))
+    where = []
+
+    def find():
+        where.append(threading.current_thread() is threading.main_thread())
+        return appaudio.App(pid=4242, exe="Discord.exe")
+    monkeypatch.setattr(chatguide, "find_discord", find)
+    _FakeCapture.engine, _FakeCapture.made, _FakeCapture.opening = e, [], True
+    monkeypatch.setattr(appaudio, "AppCapture", _FakeCapture)
+    played = []
+    monkeypatch.setattr(e, "play", lambda *a, **k: played.append(1))
+    got = []
+    c = chatguide.ChatCheck(e)
+    c.done.connect(got.append)
+    c.start()
+    app = chatguide.QApplication.instance()
+    assert process_events(app, lambda: _FakeCapture.made, timeout=5)
+    assert where == [False]
+    cap = _FakeCapture.made[0]
+    assert cap.start_waited is False
+    process_events(app, lambda: False, timeout=0.2)
+    assert not played and c.running              # still opening: nothing played yet
+    e.main_tap = []
+    c.cancel()
+    assert cap.waited is False and not c.running and e.main_tap is None
+    _FakeCapture.opening = False
+    process_events(app, lambda: False, timeout=0.2)
+    assert not played and not got
+    # a check whose capture never opens gives up with a message
+    _FakeCapture.opening = True
+    monkeypatch.setattr(chatguide, "CONNECT_S", 0.1)
+    c.start()
+    assert process_events(app, lambda: got, timeout=5)
+    assert "in time" in got[0]["error"] and not played and not c.running
+    _FakeCapture.opening = False
     e.main_stream = None
 
 

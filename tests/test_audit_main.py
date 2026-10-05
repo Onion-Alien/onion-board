@@ -206,17 +206,20 @@ def test_link_bar_new_text_ends_a_queued_pick(qapp):
 
 # --------------------------------------------------------------------------- discord check
 
-def test_discord_check_cleans_up_when_play_fails(monkeypatch):
+def test_discord_check_cleans_up_when_play_fails(qapp, monkeypatch):
+    from tests.conftest import process_events
     stopped = []
 
     class Cap:
+        ready = True
+
         def __init__(self, *a, **k):
             self.error = None
 
-        def start(self):
+        def start(self, timeout=6.0, wait=True):
             return True
 
-        def stop(self):
+        def stop(self, wait=True):
             stopped.append(1)
 
     class Eng:
@@ -234,6 +237,9 @@ def test_discord_check_cleans_up_when_play_fails(monkeypatch):
                         lambda: appaudio.App(pid=4242, exe="Discord.exe"))
     e = Eng()
     c = chatguide.ChatCheck(e)
-    with pytest.raises(RuntimeError):
-        c.start()
+    got = []
+    c.done.connect(got.append)
+    c.start()
+    assert process_events(qapp, lambda: got, timeout=5)
+    assert "couldn't start" in got[0]["error"] and "no device" in got[0]["error"]
     assert not c.running and e.main_tap is None and stopped

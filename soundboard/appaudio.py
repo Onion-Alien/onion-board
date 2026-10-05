@@ -880,10 +880,18 @@ class AppCapture:
             return False
         return self.error is None
 
-    def stop(self):
+    def stop(self, wait: bool = True):
+        """With wait=False it only asks the thread to end: it can be inside Windows'
+        capture request for seconds, which mustn't freeze the window. The sink gets
+        nothing more either way, so a new capture of the same program can start at
+        once; `join()` waits for the old thread later (on the way out)."""
         self._stop.set()
+        if wait:
+            self.join(3)
+
+    def join(self, timeout: float = 3.0):
         if self._thread.is_alive() and threading.current_thread() is not self._thread:
-            self._thread.join(3)
+            self._thread.join(timeout)
 
     @property
     def running(self) -> bool:
@@ -987,6 +995,8 @@ class AppCapture:
             _k32.CloseHandle(evt)
 
     def _hand_over(self, x: np.ndarray) -> bool:
+        if self._stop.is_set():   # stopped without waiting: the sink isn't ours any more
+            return False
         self.frames += len(x)
         try:
             self.sink(x)
