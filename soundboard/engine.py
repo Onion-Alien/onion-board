@@ -885,7 +885,8 @@ class Engine:
 
     # ----------------------------------------------------------------- radio input
     def feed_radio(self, x: np.ndarray):
-        """Push a chunk of radio audio ((n, 2) float32 at SR). Call from the UI thread."""
+        """Push a chunk of radio audio ((n, 2) float32 at SR). Called from one thread at
+        a time (the radio's decoding thread), like feed_aux."""
         lvl = peak(x)
         self.level_radio = max(lvl * self.radio_vol, self.level_radio)
         if lvl > 0.003:

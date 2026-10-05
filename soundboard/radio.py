@@ -43,7 +43,7 @@ from pathlib import Path
 from urllib.parse import quote
 
 import numpy as np
-from PySide6.QtCore import QObject, QTimer, QUrl, Signal
+from PySide6.QtCore import QObject, Qt, QTimer, QUrl, Signal
 from PySide6.QtMultimedia import QAudioBufferOutput, QAudioFormat, QMediaMetaData, QMediaPlayer
 from PySide6.QtNetwork import QNetworkAccessManager, QNetworkReply, QNetworkRequest
 
@@ -730,12 +730,16 @@ def buffer_to_array(buf) -> np.ndarray:
 
 
 class RadioPlayer(QObject):
-    """Plays one stream at a time into `audio` (48 kHz stereo float32 chunks)."""
+    """Plays one stream at a time into `audio` (48 kHz stereo float32 chunks).
+    `audio` is emitted on Qt's decoding thread, so a busy window can't hold the sound
+    up: connect it with Qt.DirectConnection to something thread-safe (the engine's
+    feed, the recorder), or Qt queues it to the window like any other signal."""
     audio = Signal(object)
     state = Signal(str)          # connecting | playing | stopped | error
     error = Signal(str)
     now_playing = Signal(str)    # the stream's own title (song / show), when it sends one
     _looked_up = Signal(int, bool)   # (play generation, the host is local): lookup thread
+    _first_audio = Signal(int)       # play generation: decoding thread -> UI thread
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -755,6 +759,7 @@ class RadioPlayer(QObject):
         self._watch.setInterval(1000)
         self._watch.timeout.connect(self._check)
         self._looked_up.connect(self._on_looked_up)
+        self._first_audio.connect(self._on_first_audio)
         self._conn = 0               # net.generation() when the stream was opened
         net.on_change(self._on_connection)
 
@@ -767,7 +772,9 @@ class RadioPlayer(QObject):
         self._out = QAudioBufferOutput(fmt, self)
         # no QAudioOutput: Qt decodes (at real-time pace) but never plays it itself
         self._player.setAudioBufferOutput(self._out)
-        self._out.audioBufferReceived.connect(self._on_buffer)
+        # straight on the decoding thread: queued to the window, the chunks waited out
+        # every busy moment there and the radio ran dry (it skipped)
+        self._out.audioBufferReceived.connect(self._on_buffer, Qt.DirectConnection)
         self._player.errorOccurred.connect(self._on_error)
         self._player.mediaStatusChanged.connect(self._on_status)
         self._player.metaDataChanged.connect(self._on_meta)
@@ -872,8 +879,11 @@ class RadioPlayer(QObject):
             self.state.emit(st)
 
     def _on_buffer(self, buf):
+        """On Qt's decoding thread. The player's own state changes on the UI thread
+        (_on_first_audio)."""
         if self.station is None:
             return
+        gen = self._gen
         x = buffer_to_array(buf)
         if not len(x):
             return
@@ -881,11 +891,17 @@ class RadioPlayer(QObject):
             return
         self._last_audio = time.monotonic()
         if not self._got_audio:
-            self._got_audio = True
-            self._retries = 0
-            self._reconnecting = False
-            self._set_state("playing")
+            self._first_audio.emit(gen)
         self.audio.emit(x)
+
+    def _on_first_audio(self, gen: int):
+        if gen != self._gen or self.station is None or self._got_audio:
+            return
+        self._last_audio = time.monotonic()
+        self._got_audio = True
+        self._retries = 0
+        self._reconnecting = False
+        self._set_state("playing")
 
     def _check(self):
         if self.station is None:

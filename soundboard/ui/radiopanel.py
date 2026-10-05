@@ -357,7 +357,8 @@ class RadioTab(QWidget):
         self.dir.results.connect(self._on_results)
         self.dir.failed.connect(self._on_failed)
         self.player = RadioPlayer(self)
-        self.player.audio.connect(self._on_audio)
+        # on the decoding thread: a busy window mustn't hold the radio up
+        self.player.audio.connect(self._on_audio, Qt.DirectConnection)
         self.player.state.connect(self._on_state)
         self.player.error.connect(self._on_error)
         self.player.now_playing.connect(self._on_now_playing)
@@ -1189,6 +1190,7 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
             self.play(s)
 
     def _on_audio(self, x: np.ndarray):
+        """On the radio's decoding thread: only thread-safe calls here."""
         self.engine.feed_radio(x)
         self.recorder.push(x)
 
