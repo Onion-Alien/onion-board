@@ -12,6 +12,7 @@ from __future__ import annotations
 import logging
 import os
 import threading
+import time
 
 import numpy as np
 from PySide6.QtCore import QObject, QTimer, Signal
@@ -23,6 +24,7 @@ from soundboard.recorder import Recorder
 log = logging.getLogger(__name__)
 
 RETRY_MS = 3000        # a capture that ended (the output device changed) starts again
+MAX_BACKOFF_S = 60.0   # one that failed to start waits longer each time, up to this
 
 
 class InstantReplay(QObject):
@@ -41,6 +43,10 @@ class InstantReplay(QObject):
         self._cap = None
         self._enabled = False
         self._starting = False
+        # failed starts in a row, and when the next try may go: each failed try can
+        # leave Windows' late answer object behind (appaudio._Handler), so they back off
+        self._fails = 0
+        self._next_try = 0.0
         self._lock = threading.Lock()
         self._timer = QTimer(self)
         self._timer.setInterval(RETRY_MS)
@@ -69,6 +75,7 @@ class InstantReplay(QObject):
                 self.error = why
                 self.state_changed.emit()
                 return
+            self._fails, self._next_try = 0, 0.0
             self._start()
             self._timer.start()
         else:
@@ -114,6 +121,12 @@ class InstantReplay(QObject):
                 cap.stop()
             return
         self._cap = cap
+        if cap is None:
+            self._fails += 1
+            wait = min(MAX_BACKOFF_S, RETRY_MS / 1000 * 2 ** (self._fails - 1))
+            self._next_try = time.monotonic() + wait
+        else:
+            self._fails, self._next_try = 0, 0.0
         if error != self.error:
             if error:
                 log.warning("instant replay: %s", error)
@@ -126,6 +139,8 @@ class InstantReplay(QObject):
             threading.Thread(target=cap.stop, name="replay-stop", daemon=True).start()
 
     def _check(self):
+        if time.monotonic() < self._next_try:
+            return
         if self._enabled and not self._starting and not self.running:
             self._stop()
             self._start()

@@ -1,6 +1,8 @@
 """Hold-to-play sounds, pads' MIDI hotkeys in the window, and instant replay (the
 last seconds of what you heard saved as a pad). The real MainWindow, headless; the
 replay's capture is a fake."""
+import time
+
 import numpy as np
 import pytest
 
@@ -115,3 +117,25 @@ def test_replay_says_why_when_windows_cant(qapp, monkeypatch):
     r = rp.InstantReplay(capture_cls=FakeCapture)
     r.set_enabled(True)
     assert r.error == "needs Windows 11" and not r.running
+
+
+def test_replay_that_cant_start_backs_off(qapp, monkeypatch):
+    """Each failed try can leave Windows' late answer behind: no retry every 3 s forever."""
+    monkeypatch.setattr(rp.appaudio, "supported", lambda: (True, ""))
+    r = rp.InstantReplay(capture_cls=FakeCapture)
+    starts = []
+    monkeypatch.setattr(r, "_start", lambda: starts.append(1))
+    r._enabled = True
+    for n in range(1, 6):
+        r._on_started(None, "Windows didn't answer in time.")
+        assert r._fails == n
+        wait = r._next_try - time.monotonic()
+        assert wait == pytest.approx(min(rp.MAX_BACKOFF_S, 3 * 2 ** (n - 1)), abs=0.5)
+        r._check()
+        assert not starts                     # still waiting
+    r._next_try = 0.0
+    r._check()
+    assert starts                             # the wait is over: tries again
+    r._on_started(FakeCapture(1, None), "")   # it worked: the next failure waits 3 s again
+    assert r._fails == 0
+    r.stop()
