@@ -783,3 +783,78 @@ def test_switch_settings_and_cards_round_trip(panel):
     assert p.fx.spec()["effects"]["radio"]["squelch"] == 0
     radio.reset()
     assert p.fx.spec()["effects"]["radio"]["low"] == voicefx.defaults("radio")["low"]
+
+
+def test_a_slider_step_rebuilds_the_chain_once_and_redraws_the_tab_only_on_a_flip(
+        panel, monkeypatch):
+    p, _ = panel
+    p.chain.process(np.zeros((480, 2), np.float32), 48000)   # a rate: configure builds
+    sent = []
+    p.active_changed.connect(sent.append)
+    p.fx.pick("Robot")
+    assert sent == [True]
+    rebuilds = []
+    real = voicefx.VoiceChain._rebuild
+    monkeypatch.setattr(voicefx.VoiceChain, "_rebuild",
+                        lambda self, rate: (rebuilds.append(rate), real(self, rate)))
+    s = p.fx.rows["robot"].sliders[0].slider
+    for v in range(s.minimum(), s.minimum() + 10):
+        s.setValue(v)
+    assert len(rebuilds) == 10 and sent == [True]   # was 2 rebuilds + a send a step
+    p.chain.errors["robot"] = "boom"                # a bypassed effect: another go
+    s.setValue(s.value() + 1)
+    assert not p.chain.errors and len(rebuilds) == 11
+    p.fx.btn_power.setChecked(False)
+    assert sent == [True, False]
+
+
+def test_effects_that_never_delay_the_voice_arent_built_to_ask(panel, monkeypatch):
+    p, _ = panel
+    built = []
+    for etype, cls in voicefx.REGISTRY.items():
+        real = cls.__init__
+        monkeypatch.setattr(cls, "__init__", lambda self, *a, _r=real, _t=etype, **k: (
+            built.append(_t), _r(self, *a, **k))[1])
+    p.fx.pick("Robot")                  # no mic yet: only the delay readout builds any
+    assert p.fx.effects_delay() > 0
+    assert "robot" not in built         # its latency() is the base one: always 0
+    assert all(voicefx.REGISTRY[t].latency is not voicefx.Effect.latency for t in built)
+
+
+def test_add_ons_refresh_scans_the_disk_off_the_ui_thread(panel, qapp, monkeypatch):
+    import threading
+
+    from soundboard.ui import busy
+    from soundboard.ui import voicepanel as vp
+    p, _ = panel
+    real, where = vp.mods.discover, []
+    monkeypatch.setattr(vp.mods, "discover",
+                        lambda *a: (where.append(threading.current_thread()), real(*a))[1])
+    b = p.addons.b_refresh
+    b.click()
+    assert busy.is_busy(b)
+    b.click()                           # a double click doesn't scan twice
+    assert process_events(qapp, lambda: not busy.is_busy(b))
+    assert len(where) == 1 and where[0] is not threading.main_thread()
+    assert [m.id for m in p.modules] == [m.id for m in real()]
+
+
+def test_resizing_within_one_shape_does_no_layout_passes(panel, monkeypatch):
+    p, _ = panel
+    fx = p.fx
+    fx._fit_width(1100)
+    shapes = []
+    real = type(fx)._set_shape
+    monkeypatch.setattr(type(fx), "_set_shape",
+                        lambda self, *a: (shapes.append(a), real(self, *a))[1])
+    for w in range(1100, 1000, -4):     # roomy all the way: nothing to try
+        fx._fit_width(w)                # what each resize step does
+    assert shapes == []
+    fx._fit_width(250)                  # narrower than anything: tried, then left alone
+    tried = len(shapes)
+    assert tried and (fx._short, fx._tile_cols) == (True, 1)
+    for w in range(250, 200, -4):
+        fx._fit_width(w)
+    assert len(shapes) == tried
+    fx._fit_width(1100)
+    assert (fx._short, fx._tile_cols) == (False, fx.COLS)

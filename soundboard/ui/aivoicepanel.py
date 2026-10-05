@@ -199,10 +199,11 @@ class AiVoicePanel(QWidget):
         self.set_modules(module_list)
 
     # ------------------------------------------------------------ modules
-    def set_modules(self, module_list: list[mods.ModuleInfo]):
+    def set_modules(self, module_list: list[mods.ModuleInfo], voices: list[dict] | None = None):
+        """`voices`: the add-on's read_voices(), when a worker already read them."""
         self.module = next((m for m in module_list
                             if m.id == aivoice.MODULE_ID and not m.error), None)
-        self.voices = read_voices(self.module)
+        self.voices = read_voices(self.module) if voices is None else voices
         self.cb_voice.blockSignals(True)
         self.cb_voice.clear()
         for vo in self.voices:

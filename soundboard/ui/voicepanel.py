@@ -480,6 +480,8 @@ class VoiceFxPanel(QWidget):
         grid.setSpacing(10)
         self._tile_cols = self.COLS
         self._short = False   # the switch's short text (a narrow window)
+        self._fit_hi = None   # the width the next roomier shape needed at the last fit
+        self._fit_squeezed = False   # ...and none fitted: one voice a row regardless
         self.tiles = QButtonGroup(self)
         self.tiles.setExclusive(True)
         self._tile: dict[str, QPushButton] = {}
@@ -888,6 +890,8 @@ class VoiceFxPanel(QWidget):
         for t, r in self.rows.items():
             if not r.chk.isChecked():
                 continue
+            if r.cls.latency is voicefx.Effect.latency:
+                continue   # never delays the voice: no throwaway effect to ask (Robot's ~1 ms)
             st = r.state()
             key = (t, tuple(sorted(st.items())))
             if key not in self._delay_cache:
@@ -1012,10 +1016,22 @@ class VoiceFxPanel(QWidget):
 
     def _fit_width(self, width: int):
         """Narrow: the switch's shorter text, then fewer voices a row, down to one."""
+        # the shape on now still fits and the roomier one didn't at this width: nothing
+        # to try (each try is a layout pass, and a drag-resize sends one per pixel)
+        if self._fit_hi is not None and width < self._fit_hi and (
+                self._fit_squeezed or self.minimumSizeHint().width() <= width):
+            return
+        hi = float("inf")
         for short, cols in ((False, self.COLS), (True, self.COLS), (True, 2), (True, 1)):
             self._set_shape(short, cols)
-            if self.minimumSizeHint().width() <= width:
+            need = self.minimumSizeHint().width()
+            if need <= width:
+                self._fit_hi, self._fit_squeezed = hi, False
                 return
+            if cols > 1:
+                hi = need
+        # even one a row is too wide: it stays that way until the two-a-row one fits
+        self._fit_hi, self._fit_squeezed = hi, True
 
     def _set_shape(self, short: bool, cols: int):
         if short != self._short:
@@ -1028,6 +1044,7 @@ class VoiceFxPanel(QWidget):
         self.layout().activate()
 
     def _refresh(self):
+        self._fit_hi = None   # the switch's text may be another length: fit afresh
         on = self.btn_power.isChecked()
         self.btn_power.setText((POWER_SHORT if self._short else POWER_TEXT)[on])
         self.tip.setVisible(on and self._tip_enabled)
@@ -1917,7 +1934,10 @@ class SpeechPanel(QWidget):
 # =========================================================================== add-ons list
 
 class ModulesList(QWidget):
+    """`refresh` asks for a rescan (the Voice tab does it off the UI thread); the
+    button stays on "Checking…" until the next show_modules()."""
     refresh = Signal()
+    shown = Signal()
 
     def __init__(self):
         super().__init__()
@@ -1929,14 +1949,20 @@ class ModulesList(QWidget):
         self.list.setSpacing(10)
         v.addLayout(self.list)
         row = QHBoxLayout()
-        b = QPushButton("Refresh")
-        b.clicked.connect(lambda: busy.run_busy(b, "Checking…", self.refresh.emit, "✓ Up to date"))
+        b = self.b_refresh = QPushButton("Refresh")
+        b.clicked.connect(self._refresh)
         o = QPushButton("Open folder")
         o.clicked.connect(lambda: SpeechPanel._open_folder(btn=o))
         row.addWidget(b)
         row.addWidget(o)
         row.addStretch(1)
         v.addLayout(row)
+
+    def _refresh(self):
+        if busy.is_busy(self.b_refresh):
+            return   # already checking: a double click mustn't start it twice
+        busy.hold_until(self.b_refresh, "Checking…", self.shown, lambda: "✓ Up to date")
+        self.refresh.emit()
 
     def show_modules(self, infos: list[mods.ModuleInfo]):
         while self.list.count():
@@ -1979,6 +2005,7 @@ class ModulesList(QWidget):
                           for m in langs))
         if not voice:
             self.list.addWidget(hint_label("No voice add-ons installed."))
+        self.shown.emit()
 
 
 class VoicePanel(QWidget):
@@ -1991,10 +2018,12 @@ class VoicePanel(QWidget):
     fx_changed = Signal(dict)
     speech_changed = Signal(dict)
     active_changed = Signal(bool)   # the voice changer or the computer voice is on / off
+    _scanned = Signal(object, object)   # the Refresh button's worker: (modules, AI voices)
 
     def __init__(self, engine, fx_spec: dict | None = None, speech: dict | None = None):
         super().__init__()
         self.engine = engine
+        self._active = None              # last is_active() sent out (active_changed)
         self.chain = voicefx.VoiceChain()
         engine.voice_chain = self.chain
         self.modules = mods.discover()
@@ -2051,7 +2080,9 @@ class VoicePanel(QWidget):
         lv.addWidget(self.speech)
         rcol.addWidget(live_card)
         self.addons = ModulesList()
-        self.addons.refresh.connect(self.rescan_modules)
+        self.addons.refresh.connect(self._rescan_in_background)
+        self._scanned.connect(self._apply_scan)
+        self._scanning = False
         self.addons.show_modules(self.modules)
         add_card, av = card(roomy=True)
         av.addWidget(self.addons)
@@ -2096,7 +2127,8 @@ class VoicePanel(QWidget):
         return [r.stack(self._cols)]
 
     def _fx_changed(self, spec: dict):
-        self.chain.clear_errors()          # give a bypassed effect another go after an edit
+        if self.chain.errors:              # give a bypassed effect another go after an edit
+            self.chain.errors.clear()      # (configure rebuilds; clear_errors() would twice)
         self.chain.configure(spec)
         self.fx.show_errors({})
         self.fx_changed.emit(spec)
@@ -2121,7 +2153,11 @@ class VoicePanel(QWidget):
                 or self.ai.is_on())
 
     def _emit_active(self):
-        self.active_changed.emit(self.is_active())
+        # only when it flips: every slider step lands here, and each send redraws the tab
+        on = self.is_active()
+        if on != self._active:
+            self._active = on
+            self.active_changed.emit(on)
 
     def tab_icon(self) -> str:
         """A consistent line icon; the live dot indicates whether voice is active."""
@@ -2133,14 +2169,42 @@ class VoicePanel(QWidget):
         if errors:
             self.fx.show_errors(errors)
 
-    def rescan_modules(self):
-        self.modules = mods.discover()
+    def rescan_modules(self, found: list | None = None, ai_voices: list | None = None):
+        """`found` / `ai_voices`: already read from disk by _rescan_in_background."""
+        self.modules = mods.discover() if found is None else found
         mods.load_effects(self.modules)
         self.fx.add_new_effects()
         self.chain.configure(self.fx.spec())
         self.speech.set_modules(self.modules)
-        self.ai.set_modules(self.modules)
+        self.ai.set_modules(self.modules, ai_voices)
         self.addons.show_modules(self.modules)
+
+    def _rescan_in_background(self):
+        """The add-ons' Refresh button: the folder scan and voices.json read on a
+        worker (17 ms of disk on a slow drive), the rest back on the UI thread."""
+        if self._scanning:
+            return
+        self._scanning = True
+
+        def work():
+            from soundboard.speech import aivoice
+            from soundboard.ui.aivoicepanel import read_voices
+            found = voices = None
+            try:
+                found = mods.discover()
+                voices = read_voices(next((m for m in found if m.id == aivoice.MODULE_ID
+                                           and not m.error), None))
+            except Exception:  # noqa: BLE001 - scanned again on the UI thread instead
+                found = voices = None
+            try:
+                self._scanned.emit(found, voices)
+            except RuntimeError:   # the tab was closed meanwhile
+                pass
+        threading.Thread(target=work, daemon=True, name="addon-scan").start()
+
+    def _apply_scan(self, found, voices):
+        self._scanning = False
+        self.rescan_modules(found, voices)
 
     def shutdown(self):
         self._meter_timer.stop()
