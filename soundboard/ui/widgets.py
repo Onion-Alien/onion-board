@@ -350,6 +350,30 @@ def pad_height(width: int) -> int:
     return int(width * 0.62)
 
 
+# a picture on a pad is darkened towards the bottom so the text reads on it:
+# (where 0..1, black's alpha), lighter while the mouse is over it
+PAD_RADIUS = 12      # a pad card's rounded corners
+PIC_SHADE = ((0.0, 100), (0.55, 150), (1.0, 205))
+PIC_SHADE_HOVER = ((0.0, 70), (0.55, 120), (1.0, 205))
+
+_PAD_COLOURS = ("card", "card_hi", "border", "border_hi", "accent", "on_accent", "text_hi",
+                "muted", "error_text", "badge", "badge_text")
+_pad_palette: list = [None, {}]   # (the theme's values, QColor for each) - see pad_colours
+_SHADOW, _WHITE = QColor(0, 0, 0, 200), QColor("#ffffff")   # text on a picture
+_WHITE_DIM, _WHITE_MUTED = QColor(255, 255, 255, 170), QColor(255, 255, 255, 200)
+_ERROR_ON_PIC = QColor("#ff6b6b")
+
+
+def pad_colours() -> dict[str, QColor]:
+    """The theme colours a pad paints with, as QColors made once per theme (a few
+    hundred pads each made a dozen every paint)."""
+    key = tuple(theme.T[k] for k in _PAD_COLOURS)
+    if key != _pad_palette[0]:
+        _pad_palette[0] = key
+        _pad_palette[1] = {k: QColor(v) for k, v in zip(_PAD_COLOURS, key)}
+    return _pad_palette[1]
+
+
 class Pad(QAbstractButton):
     """One sound's button, painted by hand. It's a QAbstractButton so screen readers
     see a button with the sound's name, and it works from the keyboard: Tab / arrows
@@ -384,6 +408,9 @@ class Pad(QAbstractButton):
         self._kbd_focus = False  # focus came from the keyboard: draw the focus ring
         self._described = None
         self._name_fit = None    # (what it was fitted to, how) - see _fit_name
+        self._font_key = self.font().key()
+        self._accent = (None, None)   # (meta.color, its QColor)
+        self._foot = (None, None)     # (what the footer shows, its font, text and badge)
         self.setFixedSize(width, pad_height(width))
         self.setCursor(Qt.PointingHandCursor)
         self.setAttribute(Qt.WA_Hover)
@@ -457,11 +484,16 @@ class Pad(QAbstractButton):
         else:
             super().keyPressEvent(e)
 
+    def changeEvent(self, e):
+        if e.type() == QEvent.FontChange:
+            self._font_key = self.font().key()
+        super().changeEvent(e)
+
     def _fit_name(self, room: QRectF) -> tuple[QFont, Qt.AlignmentFlag, str]:
         """The name's font, flags and text so it fits the pad: wrapped over two lines,
         then a size smaller, then on one line cut short with "…" (small pads cut
         words in half and lost the line below)."""
-        key = (self.meta.name, room.width(), room.height(), self.font().key())
+        key = (self.meta.name, room.width(), room.height(), self._font_key)
         if self._name_fit is None or self._name_fit[0] != key:
             name = self.meta.name
             wrap = Qt.AlignLeft | Qt.AlignVCenter | Qt.TextWordWrap
@@ -480,8 +512,36 @@ class Pad(QAbstractButton):
                 one = Qt.AlignLeft | Qt.AlignVCenter
                 self._name_fit = (key, (f, one, fm.elidedText(name, Qt.ElideRight,
                                                               box.width())))
-        f, flags, name = self._name_fit[1]
-        return QFont(f), flags, name   # a copy: the footer changes the one it's given
+        return self._name_fit[1]
+
+    def _accent_colour(self) -> QColor:
+        if self._accent[0] != self.meta.color:
+            self._accent = (self.meta.color, QColor(self.meta.color))
+        return self._accent[1]
+
+    def _footer(self, foot: QRectF, name_font: QFont):
+        """(font, the right-hand text, the hotkey badge's (text, width) or None): only
+        worked out again when something it shows changes."""
+        m = self.meta
+        key = (m.fx, m.loop, m.mode, m.hold, m.duration, m.hotkey, self.paused,
+               foot.width(), self._font_key)
+        if self._foot[0] != key:
+            f = QFont(name_font)
+            f.setBold(False)
+            f.setPointSizeF(8.5)
+            flags = ("FX " if m.fx else "") + ("⟳ " if m.loop else "") + \
+                {"overlap": "⧉ ", "toggle": "⏯ ", "solo": "◉ "}.get(m.mode, "") + \
+                ("hold " if m.hold else "")
+            right = "❚❚ paused" if self.paused else f"{flags}{m.duration:.1f}s"
+            hk = m.hotkey and (midi.short(m.hotkey) if midi.is_midi(m.hotkey)
+                               else pretty_key(m.hotkey))
+            badge = None
+            fm = QFontMetrics(f)
+            # a cut-off key ("Ctrl+Al…") says nothing: no badge on a pad too narrow
+            if hk and fm.horizontalAdvance(hk) + 12 <= foot.width() * 0.68:
+                badge = (hk, fm.horizontalAdvance(hk) + 12)
+            self._foot = (key, (f, right, badge))
+        return self._foot[1]
 
     @property
     def n_bands(self) -> int:
@@ -578,33 +638,37 @@ class Pad(QAbstractButton):
             return
         p = QPainter(self)
         p.setRenderHint(QPainter.Antialiasing)
-        p.setRenderHint(QPainter.SmoothPixmapTransform)
         r = QRectF(self.rect()).adjusted(2, 2, -2, -2)
         if self._down:
             r.adjust(1.5, 1.5, -1.5, -1.5)
-        accent = QColor(self.meta.color)
-        T = theme.T
-        lo, hi, k = QColor(T["card"]), QColor(T["card_hi"]), self._hover_k
-        base = QColor.fromRgbF(lo.redF() + (hi.redF() - lo.redF()) * k,
-                               lo.greenF() + (hi.greenF() - lo.greenF()) * k,
-                               lo.blueF() + (hi.blueF() - lo.blueF()) * k)
+        accent = self._accent_colour()
+        C = pad_colours()
+        lo, hi, k = C["card"], C["card_hi"], self._hover_k
+        if k <= 0.0:
+            base = lo
+        elif k >= 1.0:
+            base = hi
+        else:
+            base = QColor.fromRgbF(lo.redF() + (hi.redF() - lo.redF()) * k,
+                                   lo.greenF() + (hi.greenF() - lo.greenF()) * k,
+                                   lo.blueF() + (hi.blueF() - lo.blueF()) * k)
         if self._down:
             base = base.darker(108)
         path = QPainterPath()
-        path.addRoundedRect(r, 12, 12)
+        path.addRoundedRect(r, PAD_RADIUS, PAD_RADIUS)
         p.fillPath(path, base)
-        pic = thumbs.pixmap(self.meta.image)
+        pic = self._picture(r)
         playing = self.progress is not None
         now = time.monotonic()
         if not playing:
             self._play_t = None
         elif self._play_t is None:
             self._play_t = now
-        p.save()
-        p.setClipPath(path)
-        if pic is not None:
-            self._paint_picture(p, r, pic)
+        if pic is not None:   # already the pad's size, shade and corners: a plain copy
+            p.drawPixmap(r.topLeft(), pic)
         if playing:
+            p.save()
+            p.setClipPath(path)
             flash = 1 - (now - self._play_t) / 0.35
             if flash > 0:   # a quick wash of its colour as it starts
                 wash = QColor(accent)
@@ -613,7 +677,7 @@ class Pad(QAbstractButton):
             self._paint_visualizer(p, r, accent)
             # progress: a thin accent line along the bottom edge
             p.fillRect(QRectF(r.left(), r.bottom() - 3, r.width() * self.progress, 3), accent)
-        p.restore()
+            p.restore()
         p.setBrush(Qt.NoBrush)
         if playing:
             glow = QColor(accent)   # breathes while it plays
@@ -625,18 +689,18 @@ class Pad(QAbstractButton):
                 pen.setStyle(Qt.DashLine)
             p.setPen(pen)
         elif self.picked:
-            p.setPen(QPen(QColor(T["accent"]), 2.4))
+            p.setPen(QPen(C["accent"], 2.4))
         elif self.selected:
-            p.setPen(QPen(QColor(T["border_hi"]), 1.6))
+            p.setPen(QPen(C["border_hi"], 1.6))
         else:
-            p.setPen(QPen(QColor(T["border"]), 1.2))
+            p.setPen(QPen(C["border"], 1.2))
         p.drawPath(path)
         if self.picked:   # a tick in the corner, so it reads as picked while playing too
             c = QRectF(r.right() - 24, r.top() + 6, 18, 18)
             p.setPen(Qt.NoPen)
-            p.setBrush(QColor(T["accent"]))
+            p.setBrush(C["accent"])
             p.drawEllipse(c)
-            tick = QPen(QColor(T["on_accent"]), 2.2)   # white vanished on yellow accents
+            tick = QPen(C["on_accent"], 2.2)   # white vanished on yellow accents
             tick.setCapStyle(Qt.RoundCap)
             p.setPen(tick)
             p.drawPolyline([QPointF(c.left() + 5, c.center().y()),
@@ -644,7 +708,7 @@ class Pad(QAbstractButton):
                             QPointF(c.right() - 4, c.top() + 5)])
             p.setBrush(Qt.NoBrush)
         if self.hasFocus() and self._kbd_focus:
-            p.setPen(QPen(QColor(T["text_hi"]), 1.4, Qt.DashLine))
+            p.setPen(QPen(C["text_hi"], 1.4, Qt.DashLine))
             p.drawRoundedRect(r.adjusted(3, 3, -3, -3), 10, 10)
         # accent bar
         p.setPen(Qt.NoPen)
@@ -656,47 +720,47 @@ class Pad(QAbstractButton):
         f, flags, name = self._fit_name(text_r)
         p.setFont(f)
         if on_pic:   # a soft shadow keeps it readable on any picture
-            p.setPen(QColor(0, 0, 0, 200))
+            p.setPen(_SHADOW)
             p.drawText(text_r.translated(1, 1), flags, name)
-            p.setPen(QColor("#ffffff") if self.state == "ready" else QColor(255, 255, 255, 170))
+            p.setPen(_WHITE if self.state == "ready" else _WHITE_DIM)
         else:
-            p.setPen(QColor(T["text_hi"] if self.state == "ready" else T["muted"]))
+            p.setPen(C["text_hi"] if self.state == "ready" else C["muted"])
         p.drawText(text_r, flags, name)
-        muted = QColor(255, 255, 255, 200) if on_pic else QColor(T["muted"])
+        muted = _WHITE_MUTED if on_pic else C["muted"]
         # footer: hotkey + duration / state
-        f.setBold(False)
-        f.setPointSizeF(8.5)
-        p.setFont(f)
         foot = r.adjusted(10, r.height() - 24, -10, -6)
+        f, right, badge = self._footer(foot, f)
+        p.setFont(f)
         if self.state in ("loading", "rendering"):
             p.setPen(muted)
             p.drawText(foot, Qt.AlignLeft | Qt.AlignVCenter,
                        "applying effects…" if self.state == "rendering" else "loading…")
         elif self.state == "error":
-            p.setPen(QColor("#ff6b6b" if on_pic else T["error_text"]))   # readable on light
+            p.setPen(_ERROR_ON_PIC if on_pic else C["error_text"])   # readable on light
             p.drawText(foot, Qt.AlignLeft | Qt.AlignVCenter, "can't load file")
         else:
-            flags = ("FX " if self.meta.fx else "") + \
-                ("⟳ " if self.meta.loop else "") + \
-                {"overlap": "⧉ ", "toggle": "⏯ ", "solo": "◉ "}.get(self.meta.mode, "") + \
-                ("hold " if self.meta.hold else "")
             p.setPen(muted)
-            right = "❚❚ paused" if self.paused else f"{flags}{self.meta.duration:.1f}s"
             p.drawText(foot, Qt.AlignRight | Qt.AlignVCenter, right)
-            hk = self.meta.hotkey and (midi.short(self.meta.hotkey)
-                                       if midi.is_midi(self.meta.hotkey)
-                                       else pretty_key(self.meta.hotkey))
-            fm = p.fontMetrics()
-            # a cut-off key ("Ctrl+Al…") says nothing: no badge on a pad too narrow
-            if hk and fm.horizontalAdvance(hk) + 12 <= foot.width() * 0.68:
-                w = fm.horizontalAdvance(hk) + 12
-                badge = QRectF(foot.left(), foot.top() + 1, w, foot.height() - 2)
+            if badge is not None:
+                hk, w = badge
+                box = QRectF(foot.left(), foot.top() + 1, w, foot.height() - 2)
                 p.setPen(Qt.NoPen)
-                p.setBrush(QColor(T["badge"]))
-                p.drawRoundedRect(badge, 5, 5)
-                p.setPen(QColor(T["badge_text"]))
-                p.drawText(badge, Qt.AlignCenter, hk)
+                p.setBrush(C["badge"])
+                p.drawRoundedRect(box, 5, 5)
+                p.setPen(C["badge_text"])
+                p.drawText(box, Qt.AlignCenter, hk)
 
+    def _picture(self, r: QRectF):
+        """The pad's picture fitted to `r` in real pixels with its shade drawn on, or
+        None. thumbs.fitted caches it by picture, size, screen and shade, so a resize,
+        a press, a new picture, another screen or the mouse over it each get their own
+        and nothing is scaled on an ordinary paint."""
+        if not self.meta.image:
+            return None
+        dpr = self.devicePixelRatioF()
+        return thumbs.fitted(self.meta.image, math.ceil(r.width() * dpr),
+                             math.ceil(r.height() * dpr), dpr,
+                             PIC_SHADE_HOVER if self.hover else PIC_SHADE, PAD_RADIUS)
 
     def _paint_slim(self):
         """A one-line row: accent dot, name, duration; progress along the bottom."""
@@ -762,20 +826,6 @@ class Pad(QAbstractButton):
         p.drawText(text_r, Qt.AlignLeft | Qt.AlignVCenter,
                    p.fontMetrics().elidedText(self.meta.name, Qt.ElideRight,
                                               int(text_r.width())))
-
-    def _paint_picture(self, p: QPainter, r: QRectF, pic):
-        """The picture, cropped to fill the pad, darkened towards the bottom for the text."""
-        dpr = pic.devicePixelRatio() or 1.0
-        pw, ph = pic.width() / dpr, pic.height() / dpr
-        scale = max(r.width() / pw, r.height() / ph)
-        w, h = pw * scale, ph * scale
-        p.drawPixmap(QRectF(r.center().x() - w / 2, r.center().y() - h / 2, w, h), pic,
-                     QRectF(pic.rect()))
-        shade = QLinearGradient(r.topLeft(), r.bottomLeft())
-        shade.setColorAt(0.0, QColor(0, 0, 0, 70 if self.hover else 100))
-        shade.setColorAt(0.55, QColor(0, 0, 0, 120 if self.hover else 150))
-        shade.setColorAt(1.0, QColor(0, 0, 0, 205))
-        p.fillRect(r, shade)
 
     def _paint_visualizer(self, p: QPainter, r: QRectF, accent: QColor):
         """Spectrum bars rising from the bottom, behind the text."""
@@ -849,6 +899,7 @@ class PadGrid(QWidget):
         ev.addWidget(self.empty_text)
         self._cols = 0
         self._shape = None       # (columns, pad width) last laid out
+        self._placed = None      # (columns, the pads shown) in the grid now
 
     def minimumSizeHint(self):
         # never wider than the scroll area around it: the pads fit themselves to its
@@ -861,7 +912,7 @@ class PadGrid(QWidget):
 
     def set_pads(self, pads):
         self.pads = pads
-        self._shape = None
+        self._shape = self._placed = None
         self.relayout(force=True)
 
     def set_pad_width(self, w: int):
@@ -908,14 +959,30 @@ class PadGrid(QWidget):
             return
         self._shape = (cols, w)
         self._cols = cols
+        # the grid switched off while the pads move: each show() / addWidget() into a
+        # live layout laid the whole grid out again (85-145 ms clearing a search with
+        # 600 pads); once at the end instead
+        self.grid.setEnabled(False)
+        try:
+            self._place(cols, w)
+        finally:
+            self.grid.setEnabled(True)
+            self.grid.activate()
+
+    def _place(self, cols: int, w: int):
+        h = self.pad_h(w)
         for p in self.pads:
-            if p.width() != w or p.height() != self.pad_h(w):
-                p.setFixedSize(w, self.pad_h(w))
+            if p.width() != w or p.height() != h:
+                p.setFixedSize(w, h)
+        shown = [p for p in self.pads if not p.property("filtered")]
+        placed = (cols, tuple(map(id, shown)))
+        if shown and placed == self._placed:
+            return   # the same pads in the same columns: only their size changed
+        self._placed = placed if shown else None
         while self.grid.count():
             it = self.grid.takeAt(0)
             if it.widget() and it.widget() is not self.empty:
                 it.widget().setParent(self)
-        shown = [p for p in self.pads if not p.property("filtered")]
         if not shown:
             # every pad filtered out showed nothing at all: Bun says why instead
             for p in self.pads:

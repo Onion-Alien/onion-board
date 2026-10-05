@@ -193,6 +193,32 @@ def test_window_shows_and_paints(make, qapp):
     assert not w.isVisible()
 
 
+def test_ticks_repaint_only_tiles_that_moved(make, qapp, monkeypatch):
+    """A tick repaints just the tiles whose bar moved a pixel; a paused sound, or a bar
+    that moved less, costs nothing. The static parts are drawn once, not per frame."""
+    ov = make()
+    ov.open()
+    w = ov.window
+    ov.tick({"s0": (0.1, False), "s4": (0.5, True)})
+    w.grab()                                             # draws the cached layers
+    updates, rebuilt = [], []
+    monkeypatch.setattr(w, "update", lambda *a: updates.append(a))
+    orig = w._paint_under
+    monkeypatch.setattr(w, "_paint_under", lambda *a: (rebuilt.append(1), orig(*a)))
+    ov.tick({"s0": (0.1, False), "s4": (0.5, True)})   # nothing moved
+    ov.tick({"s0": (0.102, False), "s4": (0.5, True)})  # well under a pixel
+    assert updates == []
+    ov.tick({"s0": (0.3, False), "s4": (0.5, True)})
+    assert len(updates) == 1 and updates[0][0] == w._scaled(w._tile_rect(0))
+    w.grab()
+    assert rebuilt == []                                 # bars only: layers reused
+    updates.clear()
+    ov.tick({"s4": (0.5, True)})                         # s0 ended: footer says Resume
+    assert updates == [()]                               # a full repaint
+    w.grab()
+    assert rebuilt == [1]
+
+
 def test_clicks_play_tiles_and_pause_stop(make, qapp):
     from PySide6.QtCore import QPoint, Qt
     from PySide6.QtTest import QTest

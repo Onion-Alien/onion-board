@@ -363,3 +363,31 @@ def test_ai_voice_and_the_computer_voice_take_turns(qapp, monkeypatch, app_dir):
     finally:
         p.shutdown()
         p.deleteLater()
+
+
+def test_voice_settings_are_queued_with_the_audio_not_sent_from_the_ui_thread():
+    import socket
+
+    from soundboard.speech.service import ServiceHost
+    c = AiVoiceController(VoiceChain(), lambda ev: None)
+    h = ServiceHost(["unused"], lambda e: None)
+    a, b = socket.socketpair()
+    try:
+        h._sock, h.connected = a, True
+        c.host = h
+        h._send_lock.acquire()                # the sender is stuck in a send
+        h.feed(np.zeros(BLOCK, np.float32), RATE)
+        t0 = time.monotonic()
+        c.set_voice("nova", 2.0)
+        c.set_auto_pitch(False)
+        assert time.monotonic() - t0 < 0.1    # was 250 ms each, waiting on that lock
+        queued = [h._q.get_nowait() for _ in range(h._q.qsize())]
+        assert [x for x, rate in queued if rate < 0] == [
+            {"type": "config", "voice": "nova", "pitch": 2.0},
+            {"type": "config", "auto_pitch": False}]
+        assert queued[0][1] == RATE           # in order, after the audio before them
+    finally:
+        h._send_lock.release()
+        c.host = None
+        h.stop()
+        b.close()

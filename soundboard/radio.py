@@ -39,6 +39,7 @@ import sys
 import time
 import unicodedata
 from dataclasses import asdict, dataclass, field
+from functools import cached_property
 from pathlib import Path
 from urllib.parse import quote
 
@@ -278,9 +279,39 @@ class Station:
 
     def matches(self, words: list[str]) -> bool:
         """Every one of `words` (folded with fold()) is in its name, place or tags."""
-        hay = fold(" ".join((self.name, self.country, self.cc, self.state,
-                             " ".join(self.tags))))
+        hay = self.search_hay
         return all(w in hay for w in words)
+
+    # Worked out once per station, not on every keystroke or filter change (folding
+    # 3000 stations' text took ~20 ms a pass). Setting any field drops them, so they
+    # are worked out again from the new data.
+    _DERIVED = ("search_hay", "genre_hay", "map_point")
+
+    def __setattr__(self, name, value):
+        object.__setattr__(self, name, value)
+        d = self.__dict__
+        for k in Station._DERIVED:
+            d.pop(k, None)
+
+    @cached_property
+    def search_hay(self) -> str:
+        """Its name, place and tags folded with fold(): what a search looks in."""
+        return fold(" ".join((self.name, self.country, self.cc, self.state,
+                              " ".join(self.tags))))
+
+    @cached_property
+    def genre_hay(self) -> str:
+        """Its tags in lower case, one per line (a genre word never spans two)."""
+        return "\n".join(t.lower() for t in self.tags)
+
+    @cached_property
+    def map_point(self) -> dict:
+        """globe_points()'s dict for it (it must have lat and lon). Shared: don't change it."""
+        return {"id": self.uuid, "n": self.name, "c": self.country, "cc": self.cc,
+                "s": self.state, "l": self.language, "t": self.tags[:6], "co": self.codec,
+                "b": self.bitrate, "v": self.votes, "tr": self.trend, "h": self.hls,
+                "ck": self.checked, "ch": self.changed, "la": round(self.lat, 4),
+                "lo": round(self.lon, 4), "k": self.clicks}
 
 
 def fold(text: str) -> str:
@@ -1017,12 +1048,9 @@ def _tor_ready() -> bool:
 # --------------------------------------------------------------------------- globe page
 
 def globe_points(stations: list[Station]) -> list[dict]:
-    """What the globe needs per station (short keys: this is sent as one JSON blob)."""
-    return [{"id": s.uuid, "n": s.name, "c": s.country, "cc": s.cc, "s": s.state,
-             "l": s.language, "t": s.tags[:6], "co": s.codec, "b": s.bitrate,
-             "v": s.votes, "tr": s.trend, "h": s.hls, "ck": s.checked, "ch": s.changed,
-             "la": round(s.lat, 4), "lo": round(s.lon, 4), "k": s.clicks}
-            for s in stations if s.lat is not None and s.lon is not None]
+    """What the globe needs per station (short keys: this is sent as one JSON blob).
+    The dicts are each station's own, made once: read them, don't change them."""
+    return [s.map_point for s in stations if s.lat is not None and s.lon is not None]
 
 
 TOWNS_MAX = 600            # city and town names the maps get (each shows only zoomed in)

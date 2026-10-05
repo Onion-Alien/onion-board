@@ -1,13 +1,17 @@
 """Per-sound fade in / fade out in the engine (Voice.fade_in / fade_out)."""
 import numpy as np
 
-from soundboard.engine import SR
+from soundboard.engine import SR, START_FADE_S
 from tests.test_engine import engine_with
 
 
 def dc(seconds=1.0, level=0.5):
-    """A constant signal: the output is the fade envelope times `level`."""
+    """A constant signal: the output is the fade envelope times `level`. (It starts
+    away from zero, so without a fade-in of its own it rises over START_FADE_S.)"""
     return np.full((int(seconds * SR), 2), level, np.float32)
+
+
+RISE = int(START_FADE_S * SR) + 1
 
 
 def run(e, blocks, n=480):
@@ -32,7 +36,8 @@ def test_fade_in_rises_from_silence_over_its_length():
 def test_no_fades_is_unchanged():
     e = engine_with("main")
     e.play("a", dc(), 1.0)
-    assert np.allclose(run(e, 2), 0.5)
+    y = run(e, 2)
+    assert np.allclose(y[RISE:], 0.5) and y[0] < 0.01   # only the 2 ms anti-pop rise
 
 
 def test_stop_fades_out_over_the_sounds_fade_out():
@@ -51,7 +56,7 @@ def test_one_shot_fades_before_its_natural_end():
     e = engine_with("main")
     e.play("a", dc(0.2), 1.0, fade_out=0.05)     # 9600 frames, last 2400 fade
     y = run(e, 22)
-    assert np.allclose(y[:7000], 0.5)
+    assert np.allclose(y[RISE:7000], 0.5)
     assert 0.2 < y[9600 - 1200] < 0.3
     assert y[9599] < 0.01 and np.all(y[9600:] == 0)
 
@@ -59,7 +64,7 @@ def test_one_shot_fades_before_its_natural_end():
 def test_loop_does_not_fade_at_each_wrap():
     e = engine_with("main")
     e.play("a", dc(0.05), 1.0, loop=True, fade_out=0.02)
-    assert np.allclose(run(e, 20), 0.5)
+    assert np.allclose(run(e, 20)[RISE:], 0.5)
 
 
 def test_stop_all_skips_the_fade_out():

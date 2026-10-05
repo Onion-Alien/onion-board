@@ -6,7 +6,7 @@ import pytest
 import soundfile as sf
 
 from soundboard import library, soundfx
-from soundboard.engine import SR, Engine
+from soundboard.engine import SR, Engine, loop_xf
 from soundboard.library import SoundMeta
 
 
@@ -245,7 +245,8 @@ def test_live_speed_loops_and_half_speed():
     out = np.zeros((6000, 2), np.float32)
     e._main(out, 6000)
     assert not v.finished and 0 <= v.pos["main"] < len(d)
-    assert abs(v.pos["main"] - (3000 % len(d))) < 2
+    xf = loop_xf(len(d), SR)                            # (the loop's crossfade at the seam)
+    assert abs(v.pos["main"] - (xf + (3000 - xf) % (len(d) - xf))) < 2
 
 
 def test_render_speed_interpolates():

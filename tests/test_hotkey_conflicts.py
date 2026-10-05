@@ -34,7 +34,10 @@ def test_the_overlay_follows_whats_playing_with_the_window_in_the_tray(window, m
     seen = []
     monkeypatch.setattr(window.overlay, "tick", seen.append)
     window.tick()
-    assert seen and window.timer.interval() == main.TICK_MS   # full pace for the overlay
+    assert seen and window.timer.interval() == main.TICK_QUIET_MS   # nothing playing
+    monkeypatch.setattr(window.engine, "playing", lambda: {"s0": (0.5, False)})
+    window.tick()
+    assert window.timer.interval() == main.TICK_MS   # full pace for the overlay
     window.on_hotkey("__ov:close")
     window.tick()
     assert window.timer.interval() == main.TICK_IDLE_MS

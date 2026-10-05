@@ -419,3 +419,23 @@ def _close(qapp, w, wiz):
     wiz.deleteLater()
     w.deleteLater()
     qapp.sendPostedEvents(None, QEvent.DeferredDelete)
+
+
+def test_only_the_mic_page_ticks_fast_and_the_folder_is_made_once(wizard, devices,
+                                                                   monkeypatch):
+    """The 40 ms tick is for the mic meter: the other pages tick every 250 ms, and
+    following the cable installer doesn't make its folder again on every tick."""
+    w, wiz = wizard
+    assert wiz.stack.currentIndex() == 0 and wiz.timer.interval() == setupwizard.TICK_MS
+    wiz.go(3)
+    assert wiz.timer.interval() == setupwizard.SLOW_TICK_MS
+    wiz.go(0)
+    assert wiz.timer.interval() == setupwizard.TICK_MS
+    made = []
+    real = type(library.APP_DIR).mkdir
+    monkeypatch.setattr(type(library.APP_DIR), "mkdir",
+                        lambda self, *a, **k: (made.append(self), real(self, *a, **k)))
+    setupwizard.SetupWizard._status_dir = None
+    for _ in range(5):
+        wiz._read_cable_step()
+    assert made == [library.APP_DIR]

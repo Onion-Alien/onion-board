@@ -32,6 +32,11 @@ F32 = np.float32
 CEILING_DB = -3.0          # peak level sent to others (room for the codec's overshoot)
 LOOKAHEAD_S = 0.003        # the limiter's delay: how early it sees a peak coming
 RELEASE_DB_S = 40.0        # how fast its gain comes back up, dB per second
+# ...but only once nothing has needed the cut for this long: longer than half a cycle
+# of the lowest bass, so the gain doesn't creep up between a bass note's peaks and
+# come back down at each one (that rides the waveform: a gritty edge on 808s)
+HOLD_S = 0.015
+SAFETY_DB = -0.3           # headphones / stream: just never clip (SafetyLimiter)
 DUCK_CHOICES = (0.0, -6.0, -12.0, -20.0)   # "lower sounds while I talk": off .. a lot
 
 
@@ -50,6 +55,8 @@ class Limiter:
         self.need = np.ones(2 * self.la, F32)          # recent per-sample needed gains
         self.box = np.ones(self.la, F32)               # the box filter's history
         self.env_db = 0.0                              # released gain at the last sample
+        self.hold = max(1, int(HOLD_S * rate))
+        self.fhist = np.ones(self.hold - 1, F32)        # the box filter's last outputs
         self.rel = RELEASE_DB_S / rate                 # dB per sample
         self.reduction_db = 0.0                        # deepest gain cut in the last block
 
@@ -59,7 +66,8 @@ class Limiter:
             return x
         la = self.la
         if (self.env_db == 0.0 and float(self.need.min()) == 1.0
-                and float(self.box.min()) == 1.0 and float(np.abs(x).max()) <= self.ceiling):
+                and float(self.box.min()) == 1.0 and float(self.fhist.min(initial=1.0)) == 1.0
+                and float(np.abs(x).max()) <= self.ceiling):
             # Nothing near the ceiling now or in the lookahead (the delay line's
             # samples are covered by `need`): the gain is exactly 1, so the block
             # only goes through the delay. Most of the time, e.g. just the mic.
@@ -82,6 +90,11 @@ class Limiter:
         c = np.concatenate([[0.0], np.cumsum(seq, dtype=np.float64)])
         fast = ((c[la:] - c[:-la]) / la)[1:].astype(F32)   # n values
         self.box = seq[-la:]
+        # hold: the smallest gain of the last `hold` samples, before any release
+        if self.hold > 1:
+            seq = np.concatenate([self.fhist, fast])
+            self.fhist = seq[len(seq) - (self.hold - 1):]
+            fast = running_min(seq, self.hold)
         # release: env_db[i] = min(fast_db[i], env_db[i-1] + rel)
         fast_db = 20 * np.log10(np.maximum(fast, F32(1e-6)))
         idx = np.arange(1, n + 1, dtype=np.float64)
@@ -234,3 +247,12 @@ class Ducker:
 
 
 __all__ = ["CEILING_DB", "DUCK_CHOICES", "Ducker", "Limiter", "SmartMono"]
+
+
+class SafetyLimiter(Limiter):
+    """The last stage of the headphones and the stream output: transparent up to
+    SAFETY_DB, so overlapping loud sounds are turned down a moment instead of bent
+    by a waveshaper (soft_limit's curve, -30 dB of distortion)."""
+
+    def __init__(self, rate: int):
+        super().__init__(rate, ceiling_db=SAFETY_DB)

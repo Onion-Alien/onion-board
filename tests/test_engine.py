@@ -304,7 +304,10 @@ def test_aux_source_goes_to_the_cable_and_only_to_headphones_when_asked():
     e.feed_aux(src, np.full((480, 2), 0.25, np.float32))
     out.fill(0)
     e._main(out, 480)
-    assert not out.any()
+    assert out[0, 0] > 0.2 and out[-1, 0] == 0             # switched off: it fades, no click
+    e.feed_aux(src, np.full((480, 2), 0.25, np.float32))
+    e._main(out, 480)
+    assert not out.any()                                     # ...and then it's gone
 
 
 def test_aux_source_volume_on_air_and_removal():
@@ -599,6 +602,9 @@ def test_a_low_cut_gives_each_sound_back_its_own_sub_bass():
         e.dest = dest
         for v in e.voices:
             v.pos["main"] = 0
+        e._render("main", 480)   # a new make-up glides in over one block
+        for v in e.voices:
+            v.pos["main"] = 0
         return e._render("main", 480)
     plain = render(None)
     game = destination.BUILTIN_BY_KEY["game"]
@@ -741,6 +747,26 @@ def test_cut_shares_is_worked_out_once_per_sound(monkeypatch):
     assert len(calls) == 2
     e.forget("a")
     assert "a" not in e._shares
+
+
+def test_a_prepare_still_running_when_the_sound_is_removed_keeps_nothing(monkeypatch):
+    """Undo starts a prepare on a thread; removing the sound again before it ends
+    used to let it put the audio back after forget, holding a mapped cache file open
+    (so it couldn't be deleted) until the app closed."""
+    e = engine_with("main")
+    e.rates["main"] = 44100
+    real_shares, real_resample = eng.destination.cut_shares, eng.resample
+    monkeypatch.setattr(eng.destination, "cut_shares",
+                        lambda d, r: e.forget("a") or real_shares(d, r))
+    monkeypatch.setattr(eng, "resample",
+                        lambda d, a, b: e.forget("a") or real_resample(d, a, b))
+    x = tone(1.0)
+    e.prepare("a", x)                  # removed mid-way, twice
+    assert "a" not in e._shares and ("a", 44100) not in e._cache
+    monkeypatch.setattr(eng.destination, "cut_shares", real_shares)
+    monkeypatch.setattr(eng, "resample", real_resample)
+    e.prepare("a", x)                  # back again (undo): kept as usual
+    assert "a" in e._shares and ("a", 44100) in e._cache
 
 
 def test_callback_keeps_pace_beside_busy_python():

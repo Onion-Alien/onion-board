@@ -37,8 +37,12 @@ class FakeCapture:
     def ready(self):
         return self.started and self.error is None and not FakeCapture.slow
 
-    def stop(self):
+    def stop(self, wait=True):
         self.stopped = True
+        self.waited = wait
+
+    def join(self, timeout=3.0):
+        self.joined = timeout
 
     @property
     def running(self):
@@ -48,7 +52,7 @@ class FakeCapture:
 @pytest.fixture
 def tab(qapp, monkeypatch):
     monkeypatch.setattr(appaudio, "AppCapture", FakeCapture)
-    monkeypatch.setattr(appaudio, "list_apps", lambda: [])
+    monkeypatch.setattr(appaudio, "list_apps", lambda strict=False: [])
     FakeCapture.made = []
     FakeCapture.fail = FakeCapture.slow = False
     cfg = Config()
@@ -116,6 +120,30 @@ def test_unremembered_program_that_closes_is_dropped(tab):
     tab._on_apps([App(200, "game.exe")])
     tab._on_apps([])
     assert tab.rows == {} and tab.empty.isVisibleTo(tab)
+
+
+def test_quiet_program_still_running_keeps_its_card(tab):
+    # browsers and chat apps close their audio session when they go quiet: the card
+    # stays while the process runs (it used to vanish and pop back)
+    tab._on_apps([music(), App(200, "game.exe")], {100: "music.exe", 200: "game.exe"})
+    tab._on_apps([App(200, "game.exe")], {100: "music.exe", 200: "game.exe"})
+    row = tab.rows["music.exe"]
+    assert set(tab.rows) == {"music.exe", "game.exe"}
+    assert row.app is not None and row.app.peak == 0 and "playing on" not in row.sub.text()
+    assert row.btn_send.isEnabled()
+    tab._on_apps([], {200: "game.exe"})          # music closed for real
+    assert set(tab.rows) == {"game.exe"}
+    tab._on_apps([], {200: "other.exe"})         # pid reused by another program
+    assert tab.rows == {}
+
+
+def test_quiet_sent_program_keeps_sending(tab):
+    tab._on_apps([music()], {100: "music.exe"})
+    row = tab.rows["music.exe"]
+    row.btn_send.setChecked(True)
+    cap = row.capture
+    tab._on_apps([], {100: "music.exe"})         # its session closed, the process didn't
+    assert row.sending and row.capture is cap and not cap.stopped
 
 
 def test_tab_reports_programs_being_sent_for_the_live_dot(tab):
@@ -214,7 +242,7 @@ def test_remembered_programs_start_from_the_config_and_auto_send(qapp, monkeypat
 
 def test_a_damaged_remembered_volume_does_not_stop_the_app_starting(qapp, monkeypatch):
     """A hand-edited or damaged config ("loud", NaN, huge) used to crash the window."""
-    monkeypatch.setattr(appaudio, "list_apps", lambda: [])
+    monkeypatch.setattr(appaudio, "list_apps", lambda strict=False: [])
     cfg = Config()
     cfg.apps = {"a.exe": {"vol": "loud"}, "b.exe": {"vol": float("nan")},
                 "c.exe": {"vol": 1e9}, "d.exe": {"vol": -2}, "e.exe": {"vol": None},
@@ -297,6 +325,100 @@ def test_a_program_can_go_to_the_stream_only(qapp, monkeypatch):
         t.shutdown()
 
 
+def test_send_off_does_not_wait_for_the_capture_to_end(tab):
+    """Send off / Stop all / ✕ ask the capture to stop without waiting for its thread
+    (up to 3 s while Windows was still opening it); Send on again starts a fresh one
+    straight away, and quitting waits for the old ones."""
+    tab._on_apps([music()])
+    row = tab.rows["music.exe"]
+    row.btn_send.setChecked(True)
+    first = row.capture
+    row.btn_send.setChecked(False)
+    assert first.stopped and first.waited is False and row.capture is None
+    row.btn_send.setChecked(True)
+    assert row.capture is not first and row.capture.started and row.sending
+    second = row.capture
+    tab.stop_all()
+    assert second.stopped and second.waited is False
+    tab.shutdown()
+    assert getattr(second, "joined", None) is not None and tab._stopping == []
+
+
+def test_hidden_tab_stops_rereading_when_there_is_nothing_to_watch(tab, qapp):
+    """Shown: the list is re-read every 1.5 s. Hidden: every 5 s while a program is
+    remembered or captured, not at all otherwise."""
+    tab._on_apps([music()])
+    tab.show()
+    assert tab.timer.isActive() and tab.timer.interval() == appspanel.REFRESH_MS
+    tab.hide()
+    assert not tab.timer.isActive()                # nothing remembered or sent
+    tab.show()
+    tab.rows["music.exe"].btn_send.setChecked(True)
+    tab.hide()
+    assert tab.timer.isActive() and tab.timer.interval() == appspanel.REFRESH_HIDDEN_MS
+    tab.stop_all()                                 # still remembered: still watched
+    tab._on_apps([music()])
+    assert tab.timer.isActive()
+    tab._on_send(tab.rows["music.exe"], False)     # Send off: forgotten
+    tab._on_apps([music()])                        # the next re-read: nothing left
+    assert not tab.timer.isActive()
+
+
+def test_level_watcher_pauses_behind_a_game(qapp, monkeypatch):
+    from PySide6.QtCore import Qt
+    calls = []
+
+    class Watcher:
+        def start(self):
+            calls.append("start")
+
+        def stop(self):
+            calls.append("stop")
+
+        def peak(self, pid):
+            return None
+    monkeypatch.setattr(appaudio, "PeakWatcher", Watcher)
+    monkeypatch.setattr(appaudio, "AppCapture", FakeCapture)
+    monkeypatch.setattr(appaudio, "list_apps", lambda: [])
+    monkeypatch.setattr(appspanel.appstate, "active", lambda: True)
+    t = AppsTab(Engine(), Config(), lambda: None, Meter)
+    try:
+        t.show()
+        assert calls == ["start"]
+        calls.clear()
+        qapp.applicationStateChanged.emit(Qt.ApplicationInactive)   # a game in front
+        assert calls == ["stop"]
+        qapp.applicationStateChanged.emit(Qt.ApplicationActive)
+        assert calls == ["stop", "start"]
+    finally:
+        t.shutdown()
+        t.hide()
+
+
+def test_card_names_are_bold_without_a_style_sheet_and_tips_change_only_when_needed(qapp):
+    from PySide6.QtGui import QFont
+    row = appspanel.AppRow("music.exe", Meter)
+    assert row.name.styleSheet() == "" and row.name.font().weight() == QFont.DemiBold
+    lbl = appspanel.ElidedLabel("A window title far too long to fit in the card " * 3)
+    lbl.resize(80, 20)
+    lbl.show()
+    qapp.processEvents()
+    assert lbl.toolTip().startswith("A window title")
+    set_tips = []
+    real = appspanel.ElidedLabel.setToolTip
+    appspanel.ElidedLabel.setToolTip = lambda self, t: (set_tips.append(t), real(self, t))
+    try:
+        for _ in range(5):
+            lbl.repaint()
+        assert set_tips == []                      # unchanged: left alone
+        lbl.setText("short")
+        lbl.repaint()
+        assert set_tips == [""]
+    finally:
+        appspanel.ElidedLabel.setToolTip = real
+        lbl.hide()
+
+
 def test_shutdown_stops_every_capture(tab):
     tab._on_apps([music(), App(200, "game.exe")])
     for row in tab.rows.values():
@@ -314,7 +436,7 @@ def test_windows_only_warning(qapp, monkeypatch):
 
 
 def test_lister_hands_results_to_the_ui_thread(qapp, monkeypatch):
-    monkeypatch.setattr(appaudio, "list_apps", lambda: [music()])
+    monkeypatch.setattr(appaudio, "list_apps", lambda strict=False: [music()])
     got = []
     lister = appspanel._Lister()
     lister.ready.connect(got.append)
@@ -325,13 +447,13 @@ def test_lister_hands_results_to_the_ui_thread(qapp, monkeypatch):
             break
         import time
         time.sleep(0.02)
-    assert got and got[0][0].exe == "music.exe"
+    assert got and got[0][0][0].exe == "music.exe" and isinstance(got[0][1], dict)
     lister.stop()
 
 
 def test_a_listing_failure_skips_the_update(qapp, monkeypatch):
-    def boom():
-        raise OSError("COM hiccup")
+    def boom(strict=False):
+        raise appaudio.ComError("COM hiccup")
     monkeypatch.setattr(appaudio, "list_apps", boom)
     got = []
     lister = appspanel._Lister()
@@ -436,7 +558,7 @@ def test_cards_tighten_when_narrow_and_keep_the_meter(qapp):
 def test_programs_are_cards_several_across(tab, qapp, monkeypatch):
     """A wide window shows the programs side by side, an equal-width card each."""
     apps = [music(), App(200, "game.exe"), App(300, "call.exe")]
-    monkeypatch.setattr(appaudio, "list_apps", lambda: apps)   # still running when shown
+    monkeypatch.setattr(appaudio, "list_apps", lambda strict=False: apps)   # running when shown
     tab._on_apps(apps)
     tab.resize(1200, 600)
     tab.show()
@@ -460,7 +582,7 @@ def test_cards_settle_instead_of_jumping(tab, qapp, monkeypatch):
     from PySide6.QtCore import QEvent, QObject
 
     apps = [music(), App(200, "game.exe"), App(300, "call.exe")]
-    monkeypatch.setattr(appaudio, "list_apps", lambda: apps)
+    monkeypatch.setattr(appaudio, "list_apps", lambda strict=False: apps)
     tab._on_apps(apps)
     cards = [tab.rows[k] for k in ("music.exe", "game.exe", "call.exe")]
 

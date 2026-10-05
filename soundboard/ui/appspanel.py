@@ -15,6 +15,7 @@ next time they run.
 """
 from __future__ import annotations
 
+import dataclasses
 import logging
 import math
 import os
@@ -24,7 +25,7 @@ import time
 import zlib
 
 from PySide6.QtCore import QFileInfo, QObject, QSize, Qt, QTimer, Signal
-from PySide6.QtGui import QPainter
+from PySide6.QtGui import QFont, QPainter
 from PySide6.QtWidgets import (QCheckBox, QComboBox, QFileIconProvider, QFrame, QHBoxLayout, QLabel,
                                QLayout, QPushButton, QScrollArea, QSizePolicy, QSlider,
                                QVBoxLayout, QWidget)
@@ -103,15 +104,19 @@ class _Lister(QObject):
 
     def _work(self):
         try:
-            apps = appaudio.list_apps()
-        except Exception:  # noqa: BLE001
+            apps = appaudio.list_apps(strict=True)
+            alive = appaudio.running()
+        except appaudio.ComError:
             # skip this round: an empty list would stop every capture and drop the rows
+            log.debug("listing programs failed", exc_info=True)
+            return
+        except Exception:  # noqa: BLE001
             log.exception("listing programs failed")
             return
         finally:
             self._busy = False
         if not self._stopped:
-            self.ready.emit(apps)
+            self.ready.emit((apps, alive))
 
     def stop(self):
         self._stopped = True
@@ -132,7 +137,9 @@ class ElidedLabel(QLabel):
         shown = self.fontMetrics().elidedText(text, Qt.ElideRight, r.width())
         if shown != text and self.hide_overflow:
             shown = ""
-        self.setToolTip(text if shown != text else "")
+        tip = text if shown != text else ""
+        if tip != self.toolTip():   # every paint (meters, hover): only when it changes
+            self.setToolTip(tip)
         p = QPainter(self)
         p.setPen(self.palette().color(self.foregroundRole()))
         p.drawText(r, int(self.alignment() | Qt.AlignVCenter), shown)
@@ -183,7 +190,9 @@ class AppRow(HoverCard):
         names = QVBoxLayout()
         names.setSpacing(1)
         self.name = ElidedLabel(exe)
-        self.name.setStyleSheet("font-weight:600;")
+        bold = self.name.font()   # not a style sheet: each one re-styles the widget
+        bold.setWeight(QFont.DemiBold)
+        self.name.setFont(bold)
         self.sub = ElidedLabel()
         self.sub.setObjectName("hint")
         for lbl in (self.name, self.sub):   # long titles give way instead of widening the card
@@ -223,7 +232,7 @@ class AppRow(HoverCard):
         for b in (self.btn_send, self.btn_rec):
             b.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
             buttons.addWidget(b)
-        self.cb_to = QComboBox()
+        self.cb_to = QComboBox(self)   # hidden/shown before its row is laid out: no flash
         for i, (key, label, tip) in enumerate(TO):
             self.cb_to.addItem(label, key)
             self.cb_to.setItemData(i, tip, Qt.ToolTipRole)
@@ -414,6 +423,7 @@ class AppsTab(QWidget):
         if not isinstance(cfg.apps_paths, dict):
             cfg.apps_paths = {}
         self.rows: dict[str, AppRow] = {}     # exe (lower) or path_key -> row
+        self._stopping: list[appaudio.AppCapture] = []   # stopped, maybe not ended yet
         self._sending: tuple[str, ...] = ()   # the programs being sent, as last reported
         v = QVBoxLayout(self)
         v.setContentsMargins(0, 8, 0, 0)
@@ -500,13 +510,15 @@ class AppsTab(QWidget):
         self._label_folders()
 
         self.lister = _Lister(self)
-        self.lister.ready.connect(self._on_apps)
+        self.lister.ready.connect(lambda listed: self._on_apps(*listed))
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.lister.refresh)
         self.meter_timer = QTimer(self)
         self.meter_timer.timeout.connect(self._meters)
         appstate.slow_in_background(self, self.meter_timer, METER_MS)   # behind a game
         self.peaks = appaudio.PeakWatcher()   # live levels; the list is only re-read every 1.5 s
+        # behind a game nobody watches the levels: the meters fall back to the list's
+        appstate.pause_in_background(self, self.peaks.start, self.peaks.stop)
         self._started = False
         self._label_bin()
         if self.rows:   # remembered programs are picked up even if this tab is never opened
@@ -524,15 +536,15 @@ class AppsTab(QWidget):
     def showEvent(self, ev):
         super().showEvent(ev)
         self.start()
-        self.timer.start(REFRESH_MS)
+        self._pace_list()
         self.meter_timer.start(appstate.interval(METER_MS))
-        self.peaks.start()
+        if appstate.active():
+            self.peaks.start()
 
     def hideEvent(self, ev):
         super().hideEvent(ev)
         self.peaks.stop()
-        if self._started:
-            self.timer.start(REFRESH_HIDDEN_MS)
+        self._pace_list()
 
     def start(self):
         """Begin watching for programs (also called before the tab is first shown,
@@ -541,8 +553,26 @@ class AppsTab(QWidget):
             return
         self._started = True
         # the meters run while shown / recording; the list is re-read slowly until then
-        self.timer.start(REFRESH_MS if self.isVisible() else REFRESH_HIDDEN_MS)
+        self._pace_list()
         self.lister.refresh()
+
+    def _watching(self) -> bool:
+        """Something to keep an eye on while the tab is hidden: a remembered program
+        (picked up when it starts) or a captured one (let go when it closes)."""
+        return any(row.capture is not None or self._spec(key) is not None
+                   for key, row in self.rows.items())
+
+    def _pace_list(self):
+        """Re-read the list every 1.5 s while shown, every 5 s while hidden, and not
+        at all while hidden with nothing remembered or captured."""
+        if not self._started:
+            return
+        ms = (REFRESH_MS if self.isVisible() else
+              REFRESH_HIDDEN_MS if self._watching() else 0)
+        if not ms:
+            self.timer.stop()
+        elif not self.timer.isActive() or self.timer.interval() != ms:
+            self.timer.start(ms)
 
     def shutdown(self):
         self.timer.stop()
@@ -553,6 +583,10 @@ class AppsTab(QWidget):
             self._stop_capture(row, save=False)
             if row.editor is not None:
                 row.editor.shutdown()
+        end = time.monotonic() + 3.0   # all of them together, not 3 s each
+        for cap in self._stopping:
+            cap.join(max(0.0, end - time.monotonic()))
+        self._stopping = []
 
     def stop_all(self):
         """Stop all: switch every program off (they stay remembered). A recording
@@ -673,7 +707,10 @@ class AppsTab(QWidget):
                 row.name.setToolTip(row.app.path if row.app is not None else row.path)
                 row.set_app(row.app)
 
-    def _on_apps(self, apps: list):
+    def _on_apps(self, apps: list, alive: dict[int, str] | None = None):
+        """`apps` the programs with an audio session; `alive` every running process
+        (pid -> exe), when known. Browsers and chat apps close their session when they
+        go quiet: while the process still runs, its card stays (and keeps sending)."""
         stream = self._stream_output()   # set or cleared in Settings meanwhile
         for row in self.rows.values():
             row.show_to(stream)
@@ -690,6 +727,10 @@ class AppsTab(QWidget):
             self._row(app.exe, key=key)
         for key, row in list(self.rows.items()):
             app = by_key.get(key)
+            if (app is None and alive is not None and row.app is not None
+                    and alive.get(row.app.pid) == row.app.exe.lower()):
+                # quiet, not closed: no level, no "playing on"
+                app = dataclasses.replace(row.app, active=False, peak=0.0, devices=[])
             if app is not None and app.path:
                 row.path = path_key(app.path)
                 spec = self._spec(key)
@@ -731,6 +772,8 @@ class AppsTab(QWidget):
         self._label_folders()
         self.empty.setVisible(not self.rows)
         self._report_active()
+        if not self.isVisible():
+            self._pace_list()   # the last captured program closed: stop re-reading
 
     def _poll_capture(self, row: AppRow) -> bool:
         """A capture started without waiting (start(wait=False)): clears *Connecting…*
@@ -813,7 +856,10 @@ class AppsTab(QWidget):
     def _close_capture(self, row: AppRow):
         cap, row.capture = row.capture, None
         if cap is not None:
-            cap.stop()
+            # without waiting: a capture Windows is still opening takes up to 5 s to
+            # notice (that froze the window); shutdown() waits for the stragglers
+            cap.stop(wait=False)
+            self._stopping = [c for c in self._stopping if c.running] + [cap]
         row.meter.set_level(0.0)
 
     def _start_capture(self, row: AppRow):
@@ -1092,6 +1138,7 @@ class AppsTab(QWidget):
         self._label_bin()
         if not self._started:
             self.start()
+        self._pace_list()
         return True
 
     def retheme(self):

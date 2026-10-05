@@ -39,8 +39,9 @@ import sounddevice as sd
 import soxr
 
 from soundboard import destination, livefx, mapped
+from soundboard.dsp import hermite
 from soundboard.eq import EQ
-from soundboard.sendfx import Ducker, Limiter, SmartMono
+from soundboard.sendfx import Ducker, Limiter, SafetyLimiter, SmartMono
 from soundboard.voicefx.builtin import PitchShift
 from soundboard import errors
 
@@ -193,13 +194,88 @@ def resample(data: np.ndarray, src: int, dst: int) -> np.ndarray:
 
 # --------------------------------------------------------------------------- helpers
 
-def hermite(p0, p1, p2, p3, f):
-    """4-point cubic (Catmull-Rom) interpolation between p1 and p2 at fraction f.
-    Linear interpolation dulls the top end and leaves images around it (measured
-    -20 dB against a proper resampler on music); this is much cleaner for the
-    cost of two more reads."""
-    return p1 + 0.5 * f * (p2 - p0 + f * (2 * p0 - 5 * p1 + 4 * p2 - p3
-                                          + f * (3 * (p1 - p2) + p3 - p0)))
+# A loop's end is crossfaded into its start over this long, so a loop not cut at a zero
+# crossing doesn't tick on every pass. After the first pass it plays [xf, n): the
+# blended end leads straight on from the start's xf-th frame, no gap and no jump.
+LOOP_XF_S = 0.005
+
+
+def loop_xf(n: int, rate: int) -> int:
+    """The loop crossfade, in frames, for a sound of n frames (0: too short for one)."""
+    xf = int(LOOP_XF_S * rate)
+    return xf if n > 4 * xf else 0
+
+
+def loop_wrap(p, n: int, xf: int):
+    """A position that ran past the end of a loop, brought back into [xf, n)."""
+    return p if p < n else xf + (p - xf) % (n - xf)
+
+
+def span(data: np.ndarray, k0: int, k1: int, loop: bool, xf: int = 0) -> np.ndarray:
+    """Frames k0..k1 of `data` as float32 (not scaled), counted along the sound as it
+    plays: a one-shot is silent before its start and after its end; a loop wraps, with
+    its end crossfaded into its start over `xf` frames (see LOOP_XF_S)."""
+    n = len(data)
+    if not loop:
+        out = np.zeros((k1 - k0,) + data.shape[1:], np.float32)
+        a, b = max(k0, 0), min(k1, n)
+        if a < b:
+            out[a - k0:b - k0] = data[a:b]
+        return out
+    head = n - xf   # where the blend into the start begins
+    if 0 <= k0 and k1 <= head:
+        return data[k0:k1].astype(np.float32)
+    k = np.arange(k0, k1)
+    r = np.where(k < xf, k, xf + (k - xf) % head)
+    out = data[np.maximum(r, 0)].astype(np.float32)
+    if xf:
+        m = r >= head
+        if m.any():
+            a = ((r[m] - head) / xf).astype(np.float32)[:, None]
+            out[m] += (data[r[m] - head].astype(np.float32) - out[m]) * a
+    out[k < 0] = 0
+    return out
+
+
+# Speeding a sound up reads it faster than it was made: anything above the output's
+# Nyquist / speed would fold back down as metallic hash (cymbals, "s" sounds). A
+# windowed-sinc lowpass takes it out first. Linear phase, centred: no delay, and
+# stateless, so seeks, loops and speed changes need nothing special.
+AA_DB = 70.0
+
+
+def _aa_taps(speed: float) -> np.ndarray:
+    """Lowpass for reading at `speed` (> 1): flat to 0.4 / speed (19 kHz heard at
+    48 kHz), AA_DB down from 0.6 / speed (what would fold back under ~19 kHz)."""
+    key = round(speed, 3)
+    h = _AA_CACHE.get(key)
+    if h is None:
+        width = 0.2 / key                                  # cycles per source frame
+        beta = 0.1102 * (AA_DB - 8.7)
+        taps = int(np.ceil((AA_DB - 8) / (2.285 * 2 * np.pi * width))) | 1
+        t = np.arange(taps) - taps // 2
+        h = (np.sinc(t / key) / key * np.kaiser(taps, beta)).astype(np.float32)
+        h /= h.sum()
+        if len(_AA_CACHE) > 64:
+            _AA_CACHE.clear()
+        _AA_CACHE[key] = h
+    return h
+
+
+_AA_CACHE: dict[float, np.ndarray] = {}
+
+# A sound that starts away from zero (a clip trimmed mid-waveform, a start position
+# part-way in) would jump from silence to that level: a pop. It rises over this instead,
+# too short to soften a drum hit.
+START_FADE_S = 0.002
+
+
+def _hard_start(data: np.ndarray) -> bool:
+    """True if `data` begins far enough from zero to pop (about -34 dBFS)."""
+    if not len(data):
+        return False
+    lim = 650 if data.dtype == np.int16 else 0.02
+    return bool(np.max(np.abs(data[0].astype(np.float32))) > lim)
 
 
 class Ring:
@@ -472,24 +548,21 @@ def is_xrun(status) -> bool:
 
 
 class LivePitch:
-    """Stereo real-time pitch shifter (one voicefx PitchShift per channel). Keeps
-    its recent input while bypassed, so switching it on or off crossfades
-    instead of dropping out for its latency."""
+    """Stereo real-time pitch shifter (a voicefx PitchShift on both channels at once,
+    spliced at the same places: see its `channels`). Keeps its recent input while
+    bypassed, so switching it on or off crossfades instead of dropping out for its
+    latency."""
 
     def __init__(self, rate: int):
         self.rate = rate
-        self._ch = (PitchShift(rate), PitchShift(rate))
+        self.shift = PitchShift(rate, channels=CH)
         self._st = 0.0
 
     def process(self, x: np.ndarray, semitones: float) -> np.ndarray:
         if semitones != self._st:
-            self._st = semitones
-            for e in self._ch:     # set directly: past the voice changer's ±12 limit
-                e.p = {"semitones": float(semitones), "mix": 1.0}
-        out = np.empty_like(x)
-        for c, e in enumerate(self._ch):
-            out[:, c] = e.run(np.ascontiguousarray(x[:, c]), self.rate)
-        return out
+            self._st = semitones   # set directly: past the voice changer's ±12 limit
+            self.shift.p = {"semitones": float(semitones), "mix": 1.0}
+        return self.shift.run(x, self.rate)
 
 
 # --------------------------------------------------------------------------- voices
@@ -629,6 +702,8 @@ class Voice:
     # outs whose stream closed under it mid-play (a rescan, a stalled device): done
     # there for now, but a reopen at the same rate resumes it from its own position
     cut: set = field(default_factory=set)
+    # out -> the gain its last block ended at (_render glides from there to a new one)
+    gnow: dict = field(default_factory=dict)
 
     def __post_init__(self):
         self.pos = {o: 0 for o in self.data}
@@ -689,6 +764,10 @@ class Engine:
         # sid -> (source array, src rate, destination.cut_shares): worked out once per
         # sound (at load, by prepare), not on every press
         self._shares: dict[str, tuple[np.ndarray, int, dict]] = {}
+        # sid -> times forget() was called: a prepare still running when its sound is
+        # removed mustn't put the audio back afterwards (it'd hold a mapped cache file
+        # open, so the file couldn't be deleted until the app closed)
+        self._forgets: dict[str, int] = {}
 
         self.latency = "low"      # sounddevice latency: 'low' or 'high' (safer)
         keys = ("main", "mon", "mic", "obs")
@@ -727,6 +806,7 @@ class Engine:
         self.limiter_on = True    # hold the send device's peaks at sendfx.CEILING_DB
         self._send: dict[tuple[str, str], object] = {}   # (out, kind) -> its sendfx stage
         self._quiet: dict[str, int] = {}   # out -> frames of silence on its sounds bus
+        self._glides: dict = {}   # (out, what) -> the volume its last block ended at (_vol)
         self.sound_speed = 1.0        # live playback speed of every sound (0.25..4)
         self.sound_pitch = 0.0        # live pitch of every sound, semitones
         self.sound_keep_pitch = True  # speed changes leave the pitch alone
@@ -1116,6 +1196,7 @@ class Engine:
         # allocated at a freed one's address (e.g. successive test recordings)
         if hit and hit[0] is data:
             return hit[1]
+        gen = self._forgets.get(key[0], 0)
         if data.dtype == np.int16:   # library audio: resample in float, keep the copy compact
             f = data.astype(np.float32)   # in place from here: a song's float copy is
             f *= I16_SCALE                # ~70 MB, and each temporary would be another
@@ -1123,6 +1204,9 @@ class Engine:
             del f
             if not out.flags.writeable:
                 out = out.copy()
+            if len(out) and float(np.max(np.abs(out))) > 1.0:   # resampling overshot
+                from soundboard.library import _under_full_scale   # (it imports us)
+                out = _under_full_scale(out)
             out *= 32767.0
             np.rint(out, out=out)
             np.clip(out, -32768, 32767, out=out)
@@ -1130,6 +1214,8 @@ class Engine:
         else:
             out = resample(data, src_rate, rate)
         with self._cache_lock:
+            if self._forgets.get(key[0], 0) != gen:
+                return out   # forgotten meanwhile: use it, don't keep it
             old = self._cache.pop(key, None)
             if old is not None:
                 self._cache_bytes -= old[1].nbytes
@@ -1173,8 +1259,11 @@ class Engine:
         hit = self._shares.get(key)
         if hit is not None and hit[0] is data and hit[1] == src_rate:
             return hit[2]
+        gen = self._forgets.get(key, 0)
         shares = destination.cut_shares(data, src_rate)
-        self._shares[key] = (data, src_rate, shares)
+        with self._cache_lock:
+            if self._forgets.get(key, 0) == gen:   # not forgotten meanwhile
+                self._shares[key] = (data, src_rate, shares)
         return shares
 
     def prepare(self, sid: str, data: np.ndarray):
@@ -1193,8 +1282,9 @@ class Engine:
             self.data_for(sid, data, rate)
 
     def forget(self, sid: str):
-        self._shares.pop(sid, None)
         with self._cache_lock:
+            self._forgets[sid] = self._forgets.get(sid, 0) + 1
+            self._shares.pop(sid, None)
             for k in [k for k in self._cache if k[0] == sid]:
                 self._cache_bytes -= self._cache.pop(k)[1].nbytes
 
@@ -1243,6 +1333,8 @@ class Engine:
             per_out[o] = d
         for d in {id(d): d for d in per_out.values()}.values():
             mapped.warm(d, int(start * len(d)))   # a long sound on disk: read it in first
+        if fade_in <= 0 and (start > 0 or _hard_start(data)):
+            fade_in = START_FADE_S   # starts mid-waveform: a tiny rise instead of a pop
         v = Voice(sid, per_out, gain, loop, preview=preview, rates=rates_used,
                   fade_in=max(0.0, float(fade_in)), fade_out=max(0.0, float(fade_out)),
                   fixed=is_fixed(sid), cut_share=self.cut_shares(sid, data, src_rate),
@@ -1432,25 +1524,35 @@ class Engine:
             tail = int(v.fade_out * rate * st) if v.fade_out > 0 and not v.loop else 0
             p_start = float(p)
             near_end = tail and n - p_start < tail + frames * max(vspeed, 1.0) + 1
-            shaped = g0 != target or near_end
+            # a gain change (its slider, or the mode's make-up) glides over the block
+            # instead of stepping, which crackles on held notes and bass
+            g_was = v.gnow.get(out, g)
+            v.gnow[out] = g
+            glide = g_was != g
+            if glide:
+                g_top = np.float32(max(abs(g_was), abs(g)))
+                if not g_top:
+                    glide = False
+                else:
+                    g_env = np.linspace(g_was / g_top, g / g_top, frames + 1,
+                                        dtype=np.float32)[1:]
+                    g = g_top
+            shaped = g0 != target or near_end or glide
             if shaped:
                 dst_final = dst
                 dst = np.zeros((frames, CH), np.float32)
+            xf = loop_xf(n, rate) if v.loop else 0
             if abs(vspeed - 1.0) < 1e-4:
                 p = int(p)
-                w = 0
-                while w < frames:
-                    if p >= n:
-                        if v.loop and n:
-                            p = 0
-                        else:
-                            break
-                    take = min(frames - w, n - p)
-                    dst[w:w + take] += data[p:p + take] * g
-                    w += take
+                if v.loop:
+                    dst += span(data, p, p + frames, True, xf) * g
+                    p = loop_wrap(p + frames, n, xf)
+                elif p < n:
+                    take = min(frames, n - p)
+                    dst[:take] += data[p:p + take] * g
                     p += take
             else:
-                p = self._render_speed(dst, data, float(p), vspeed, g, v.loop)
+                p = self._render_speed(dst, data, float(p), vspeed, g, v.loop, xf)
             v.pos[out] = p
             if shaped:
                 if g0 != target:   # a straight line from g0 towards target, `ramp` long
@@ -1462,6 +1564,8 @@ class Engine:
                         v.fading.discard(out)
                 else:
                     env = np.full(frames, target, np.float32)
+                if glide:
+                    env = env * g_env
                 if near_end:
                     at = p_start + vspeed * np.arange(frames, dtype=np.float32)
                     env = env * np.clip((n - at) / tail, 0.0, 1.0)
@@ -1473,40 +1577,39 @@ class Engine:
         return buf
 
     @staticmethod
-    def _render_speed(dst, data, p: float, speed: float, g, loop: bool):
-        """Add `data` read from position p at `speed` (linear interpolation) into
-        dst; returns the new position (len(data) once a one-shot has ended)."""
+    def _render_speed(dst, data, p: float, speed: float, g, loop: bool, xf: int = 0):
+        """Add `data` read from position p at `speed` (cubic interpolation, lowpassed
+        first when faster than 1: _aa_taps) into dst; returns the new position
+        (len(data) once a one-shot has ended). A loop wraps through its crossfade
+        (`xf` frames: span)."""
         n = len(data)
         if n < 2:
             return n
-        pos = p + speed * np.arange(len(dst), dtype=np.float64)
-        if loop:
-            pos %= n
+        pos = p + speed * np.arange(len(dst), dtype=np.float64)   # along the sound as played
+        if not loop:
+            pos = pos[:int(np.searchsorted(pos, n - 1))]   # frames before the end
+        if len(pos):
             i = pos.astype(np.int64)
-            h, j, k = (i - 1) % n, (i + 1) % n, (i + 2) % n
-        else:
-            m = int(np.searchsorted(pos, n - 1))   # frames before the end
-            pos = pos[:m]
-            i = pos.astype(np.int64)
-            h, j, k = np.maximum(i - 1, 0), i + 1, np.minimum(i + 2, n - 1)
-        f = (pos - i).astype(np.float32)[:, None]
-        if len(i) and 1 <= i[0] <= i[-1] and i[-1] + 2 < n:
-            # no wrap: convert the few frames used once and gather from that (four
+            f = (pos - i).astype(np.float32)[:, None]
+            h = _aa_taps(speed) if speed > 1.0 + 1e-4 else None
+            pad = 1 + (len(h) // 2 if h is not None else 0)
+            lo = int(i[0]) - pad
+            # only the few frames this block uses are converted and filtered (four
             # gathers straight from a song's int16 cost ~70 us per sound and output)
-            lo = int(i[0]) - 1
-            w = data[lo:int(i[-1]) + 3].astype(np.float32)
+            w = span(data, lo, int(i[-1]) + 2 + pad, loop, xf)
+            if h is not None:
+                for c in range(w.shape[1]):
+                    w[:, c] = np.convolve(w[:, c], h, "same")
             i0 = i - lo
             p0, p1, p2, p3 = w[i0 - 1], w[i0], w[i0 + 1], w[i0 + 2]
-        else:
-            p0, p1, p2, p3 = (data[x].astype(np.float32) for x in (h, i, j, k))
-        if not loop:   # past either end: continue the line (a ramp stays a ramp)
-            first, last = i == 0, i + 2 > n - 1
-            p0[first] = 2 * p1[first] - p2[first]
-            p3[last] = 2 * p2[last] - p1[last]
-        dst[:len(pos)] += hermite(p0, p1, p2, p3, f) * g
+            if not loop:   # past either end: continue the line (a ramp stays a ramp)
+                first, last = i == 0, i + 2 > n - 1
+                p0[first] = 2 * p1[first] - p2[first]
+                p3[last] = 2 * p2[last] - p1[last]
+            dst[:len(pos)] += hermite(p0, p1, p2, p3, f) * g
         p += speed * len(dst)
         if loop:
-            return p % n
+            return loop_wrap(p, n, xf)
         return p if p < n - 1 else n
 
     def _sounds(self, out: str, frames: int, previews_only=False,
@@ -1639,25 +1742,23 @@ class Engine:
             self._guard("mic", e)
 
     def _main(self, outdata, frames):
-        mix = self._sounds("main", frames)
-        mix *= np.float32(self.sound_vol)
+        mix = self._vol("main", "sounds", self._sounds("main", frames), self.sound_vol)
         play = peak(mix)
         r = self.ring_rmain.read(frames)
         if r is not None:
             play = max(play, peak(r) * self.radio_vol)
-            if self.radio_live:
-                mix += r * np.float32(self.radio_vol)
+            mix += self._vol("main", "radio", r, self.radio_vol if self.radio_live else 0.0)
         lowcut = self._lowcut()
         for a in self.aux:
             x = a.ring_main.read(frames)
             if x is not None:
                 play = max(play, peak(x) * a.vol)
-                if a.live:
-                    mix += x * np.float32(a.gain("main", lowcut))
+                g = a.gain("main", lowcut) if a.live else 0.0
+                mix += self._vol("main", ("aux", a.key), x, g)
         self.level_play = max(play, self.level_play * 0.85)
         mix = self._send_bus("main", finite(mix), self.ring_main.read(frames))
-        if not self.sending:      # muted: others get silence, nothing else changes
-            mix.fill(0)
+        # muted: others get silence (faded, not cut), nothing else changes
+        mix = self._vol("main", "send", mix, 1.0 if self.sending else 0.0)
         if self.limiter_on:
             mix = self._stage("main", Limiter).process(mix)
         soft_limit(mix)
@@ -1685,21 +1786,20 @@ class Engine:
         # level plus your mic, so you can judge the balance while a song plays
         mix = self._sounds("mon", frames, previews_only=not (check or self.monitor_sounds))
         m = self.ring_mon.read(frames)
-        if check:
-            mix *= np.float32(self.sound_vol)
+        mix = self._vol("mon", "sounds", mix, self.sound_vol if check else 1.0)
         play = peak(mix)   # the main output sees the rest; this one counts with no send device too
         r = self.ring_rmon.read(frames)
         if r is not None:
             play = max(play, peak(r) * self.radio_vol)
-            if self.radio_monitor or (check and self.radio_live):
-                mix += r * np.float32(self.radio_vol)
+            on = self.radio_monitor or (check and self.radio_live)
+            mix += self._vol("mon", "radio", r, self.radio_vol if on else 0.0)
         lowcut = self._lowcut()   # the headphones get the mode's shaping too (_dest)
         for a in self.aux:
             x = a.ring_mon.read(frames)
             if x is not None:
                 play = max(play, peak(x) * a.vol)
-                if a.monitor or (check and a.live):
-                    mix += x * np.float32(a.gain("mon", lowcut))
+                on = a.monitor or (check and a.live)
+                mix += self._vol("mon", ("aux", a.key), x, a.gain("mon", lowcut) if on else 0.0)
         self.level_play = max(play, self.level_play)   # _main decays it; no main: the UI does
         finite(mix)
         if check:   # you hear what others get: the same send stage, your mic in it
@@ -1708,8 +1808,8 @@ class Engine:
                 mix = self._stage("mon", Limiter).process(mix)
         elif not self._bus_quiet("mon", mix):
             mix = self._dest("mon", self._eq("mon", "sounds", mix))
-        mix *= np.float32(self.mon_vol)
-        soft_limit(mix)
+        mix = self._vol("mon", "out", mix, self.mon_vol)
+        mix = self._stage("mon", SafetyLimiter).process(mix)
         outdata[:] = mix
         self.level_mon = max(peak(mix), self.level_mon * 0.85)
 
@@ -1721,11 +1821,11 @@ class Engine:
         for a in self.aux:
             a.ring_mon.read(frames)
         m = self.ring_mon.read(frames)
-        if m is not None and self.mic_enabled and not self.mic_muted:
-            mix += m * np.float32(self.mic_vol)
-        mix = finite(mix)
-        mix *= np.float32(self.mon_vol)
-        soft_limit(mix)
+        if m is not None:
+            on = self.mic_enabled and not self.mic_muted
+            mix += self._vol("mon", "mic", m, self.mic_vol if on else 0.0)
+        mix = self._vol("mon", "out", finite(mix), self.mon_vol)
+        mix = self._stage("mon", SafetyLimiter).process(mix)
         outdata[:] = mix
         self.level_mon = max(peak(mix), self.level_mon * 0.85)
 
@@ -1744,24 +1844,28 @@ class Engine:
         """The stream output: what others get (sounds, the live radio and programs,
         your mic if obs_voice), clean: no voice chat shaping, no mono, its own volume."""
         mix = self._sounds("obs", frames, makeup=False)   # clean: no _dest, so no makeup
-        mix *= np.float32(self.sound_vol)
+        mix = self._vol("obs", "sounds", mix, self.sound_vol)
         r = self.ring_robs.read(frames)
-        if r is not None and self.radio_live:
-            mix += r * np.float32(self.radio_vol)
+        if r is not None:
+            mix += self._vol("obs", "radio", r, self.radio_vol if self.radio_live else 0.0)
         for a in self.aux:
             x = a.ring_obs.read(frames)
-            if x is not None and a.stream:
-                mix += x * np.float32(a.vol)
+            if x is not None:
+                mix += self._vol("obs", ("aux", a.key), x, a.vol if a.stream else 0.0)
         mix = self._eq("obs", "sounds", finite(mix))
         m = self.ring_obs.read(frames)
-        if m is not None and self.obs_voice and self.mic_enabled and not self.mic_muted:
-            mix += self._eq("obs", "voice", self._gated("obs", m) * np.float32(self.mic_vol))
-        if not self.sending:      # muted: the stream gets silence too
-            mix.fill(0)
-        mix *= np.float32(self.obs_vol)
+        if m is None:
+            self._glides[("obs", "mic")] = 0.0   # nothing coming: it fades in when it does
+        else:
+            on = self.obs_voice and self.mic_enabled and not self.mic_muted
+            if on or self._glides.get(("obs", "mic"), 0.0):   # on, or still fading out
+                m = self._vol("obs", "mic", self._gated("obs", m), self.mic_vol if on else 0.0)
+                mix += self._eq("obs", "voice", m)
+        # muted: the stream gets silence too (faded, not cut)
+        mix = self._vol("obs", "out", mix, self.obs_vol if self.sending else 0.0)
         if self.limiter_on:
             mix = self._stage("obs", Limiter).process(mix)
-        soft_limit(mix)
+        mix = self._stage("obs", SafetyLimiter).process(mix)
         outdata[:] = mix
         self.level_obs = max(peak(mix), self.level_obs * 0.85)
 
@@ -1781,8 +1885,21 @@ class Engine:
             mix = self._stage(out, SmartMono).process(mix)
         if mic_on:
             m = self._gated(out, m)
-            mix += self._eq(out, "voice", m * np.float32(self.mic_vol))
+            mix += self._eq(out, "voice", self._vol(out, "mic", m, self.mic_vol))
         return mix
+
+    def _vol(self, out: str, what, x: np.ndarray, v: float) -> np.ndarray:
+        """x times the volume v, gliding over the block from where the last block of
+        (out, what) ended. A slider moved, a mute or a switch thrown would otherwise
+        step the level in one sample: a crackle while dragging, a click on mute."""
+        key = (out, what)
+        v = float(v)
+        g0 = self._glides.get(key, v)
+        self._glides[key] = v
+        if g0 == v:
+            return x if v == 1.0 else x * np.float32(v)
+        env = np.linspace(g0, v, len(x) + 1, dtype=np.float32)[1:]
+        return x * (env[:, None] if x.ndim == 2 else env)
 
     QUIET_S = 0.5   # this long with nothing on a sounds bus: its filters have rung out
 
