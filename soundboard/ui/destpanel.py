@@ -4,6 +4,8 @@ destination mode that shapes the sounds bus for the voice chat on the other end
 codec by the same knobs)."""
 from __future__ import annotations
 
+import html
+
 from PySide6.QtCore import Qt, Signal
 from PySide6.QtWidgets import (QCheckBox, QComboBox, QDialog, QDialogButtonBox, QFormLayout,
                                QHBoxLayout, QLabel, QLineEdit, QListWidget, QPushButton, QSlider,
@@ -90,6 +92,12 @@ class DestPanel(QWidget):
         sr.addWidget(self.suggest_btn, 0, Qt.AlignLeft)
         self.suggest.hide()
         v.addWidget(self.suggest)
+        self.chk_auto = QCheckBox("Switch to the mode that suits by itself")
+        self.chk_auto.setToolTip(
+            "When Discord, TeamSpeak, Mumble or a game with a known voice chat is "
+            "listening to the virtual cable, use its mode without asking. With nothing "
+            "listening, the mode stays as it is.")
+        v.addWidget(self.chk_auto)
         sig = getattr(mw, "voice_engine", None)
         if sig is not None:
             sig.connect(self._on_voice_engine)   # a bound slot: gone with the panel
@@ -116,6 +124,7 @@ class DestPanel(QWidget):
         v.addWidget(self.chk_gate)
         self.refresh()
         self.combo.currentIndexChanged.connect(self._picked)
+        self.chk_auto.toggled.connect(self._auto_changed)
         self.chk_mono.toggled.connect(self._send_changed)
         self.cb_duck.currentIndexChanged.connect(self._send_changed)
         self.chk_gate.toggled.connect(self._send_changed)
@@ -136,13 +145,14 @@ class DestPanel(QWidget):
         self.combo.setCurrentIndex(max(0, self.combo.findData(current)))
         self.combo.blockSignals(False)
         c = self.mw.cfg
-        for w in (self.chk_mono, self.cb_duck, self.chk_gate):
+        for w in (self.chk_mono, self.cb_duck, self.chk_gate, self.chk_auto):
             w.blockSignals(True)
+        self.chk_auto.setChecked(bool(cfg.get("auto")))
         self.chk_gate.setChecked(bool(c.mic_gate))
         self.chk_mono.setChecked(bool(c.send_mono))
         i = min(range(len(DUCK_LABELS)), key=lambda k: abs(DUCK_LABELS[k][1] - c.duck_db))
         self.cb_duck.setCurrentIndex(i)
-        for w in (self.chk_mono, self.cb_duck, self.chk_gate):
+        for w in (self.chk_mono, self.cb_duck, self.chk_gate, self.chk_auto):
             w.blockSignals(False)
         self._show()
 
@@ -163,14 +173,22 @@ class DestPanel(QWidget):
         return None if destination.resolve(self._cfg()).key == key else key
 
     def _on_voice_engine(self, _key):
-        self._show_suggestion()
+        self.refresh()   # *Switch … by itself* may have just changed the mode
+
+    def _auto_changed(self, on: bool):
+        self._cfg()["auto"] = bool(on)
+        self.mw._save_later()
+        if on:
+            self.mw._auto_dest()
+            self.refresh()
 
     def _show_suggestion(self):
         key = self._suggested()
         if key:
+            why = html.escape(getattr(self.mw, "voice_why", "") or (
+                f"The game you have open uses {voicesdk.NAMES.get(key, key)} for voice chat"))
             self.suggest_text.setText(
-                f"The game you have open uses {voicesdk.NAMES.get(key, key)} for voice "
-                f"chat: <b>{destination.BUILTIN_BY_KEY[key].label}</b> suits it.")
+                f"{why}: <b>{destination.BUILTIN_BY_KEY[key].label}</b> suits it.")
         self.suggest.setVisible(bool(key))
 
     def _use_suggestion(self):

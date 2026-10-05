@@ -16,8 +16,13 @@ Not detectable, so never suggested: Epic Online Services (EOSSDK ships in games 
 only use it for accounts or achievements, single-player ones included), Steam voice
 (steam_api is in nearly every Steam game), Unreal's built-in voice and Discord.
 
-The result is only ever a suggestion by the picker; the mode is never switched for
-you.
+Better than the game in front: the program actually recording the virtual cable's
+far end (Listeners). Windows lists who records a device the same way it lists who
+plays (soundboard.appaudio.recording_apps), so a voice chat app is named by its exe
+(VOICE_APPS) and a game by the files in its folder, as above.
+
+The result is a suggestion by the picker, and the mode is switched for you only
+when *Switch to it by itself* is ticked there (`dest["auto"]`).
 """
 from __future__ import annotations
 
@@ -38,6 +43,18 @@ PREFIXES = {"photonvoice": "unity"}   # PhotonVoice.dll, PhotonVoice.API.dll, â€
 # next to Photon's): the one found first in this order
 ORDER = ("game", "unity")
 NAMES = {"game": "Vivox", "unity": "Photon or Dissonance"}   # for the hint
+# voice chat programs that record the cable, by exe: (mode key, name for the hint).
+# TeamSpeak and Mumble sit with Vivox's mode (Opus mono, a high-pass ~80 Hz: see
+# destination.BUILTIN). Browsers, Zoom and Teams have no mode of their own yet.
+VOICE_APPS = {
+    "discord.exe": ("discord", "Discord"),
+    "discordptb.exe": ("discord", "Discord"),
+    "discordcanary.exe": ("discord", "Discord"),
+    "ts3client_win64.exe": ("game", "TeamSpeak"),
+    "ts3client_win32.exe": ("game", "TeamSpeak"),
+    "teamspeak.exe": ("game", "TeamSpeak"),
+    "mumble.exe": ("game", "Mumble"),
+}
 # folders that hold game data, never a voice library: not worth listing on a slow disk
 SKIP_DIRS = {"content", "paks", "movies", "videos", "streamingassets", "localization",
              "logs", "saved", "shadercache", "screenshots", "__pycache__", ".git"}
@@ -229,5 +246,54 @@ class Watcher:
         return self.suggestion
 
 
-__all__ = ["NAMES", "ORDER", "SIGNATURES", "Watcher", "engine_of_files", "foreground_process",
-           "install_root", "scan"]
+class Listeners:
+    """Who records the cable's far end, as [(mode key, program name)], voice chat
+    programs (VOICE_APPS) first, then games by their files. poll() is cheap: the
+    sessions are listed (and a new game's folder scanned, once) on a thread, and it
+    returns what the last look found."""
+
+    def __init__(self, lister=None, scanner=None):
+        if lister is None:
+            from soundboard.appaudio import recording_apps
+            lister = recording_apps
+        self._list = lister
+        self._scan = scanner or (lambda path: scan(path))
+        self._cache: dict[str, str | None] = {}   # exe path -> mode key (games)
+        self._busy = False
+        self.found: tuple = ()
+
+    def poll(self, device: str | None) -> tuple:
+        if not device:
+            self.found = ()
+        elif not self._busy:
+            self._busy = True
+            threading.Thread(target=self._look, args=(device,), daemon=True,
+                             name="voicesdk-listeners").start()
+        return self.found
+
+    def look(self, device: str) -> tuple:
+        """One look, on the calling thread (poll runs it on its own)."""
+        voice, games = [], []
+        for app in self._list(device):
+            hit = VOICE_APPS.get(app.exe.lower())
+            if hit:
+                voice.append(hit)
+            elif app.path:
+                if app.path not in self._cache:
+                    self._cache[app.path] = self._scan(app.path)
+                key = self._cache[app.path]
+                if key:
+                    games.append((key, app.name))
+        return tuple(dict.fromkeys(voice + games))
+
+    def _look(self, device: str):
+        try:
+            self.found = self.look(device)
+        except Exception:  # noqa: BLE001 - only a hint
+            self.found = ()
+        finally:
+            self._busy = False
+
+
+__all__ = ["NAMES", "ORDER", "SIGNATURES", "VOICE_APPS", "Listeners", "Watcher",
+           "engine_of_files", "foreground_process", "install_root", "scan"]

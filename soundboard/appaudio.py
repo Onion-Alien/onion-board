@@ -520,18 +520,39 @@ def list_apps() -> list[App]:
             _ole32.CoUninitialize()
 
 
-def _list_apps(meters: dict | None = None) -> list[App]:
+def recording_apps(device: str) -> list[App]:
+    """The programs recording from the recording device named `device` (who listens
+    to the virtual cable's far end: Discord, a game, OBS), this process excluded.
+    Safe from any thread."""
+    if not _win or not device:
+        return []
+    own = _co_init()
+    try:
+        return _list_apps(flow=E_CAPTURE, only=device)
+    except ComError:
+        log.debug("listing recording sessions failed", exc_info=True)
+        return []
+    finally:
+        if own:
+            _ole32.CoUninitialize()
+
+
+def _list_apps(meters: dict | None = None, flow: int = E_RENDER,
+               only: str | None = None) -> list[App]:
     """With `meters`, also keeps each session's IAudioMeterInformation there
-    (root pid -> [Com]) for the caller to read and release; window titles are skipped."""
+    (root pid -> [Com]) for the caller to read and release; window titles are skipped.
+    `flow` E_CAPTURE lists recording sessions instead, `only` on one device."""
     me = os.getpid()
     table = _process_table()
     forget_dead_pids(table)
     apps: dict[int, App] = {}
     with _enumerator() as en:
-        devices = _render_devices(en)
+        devices = _render_devices(en, flow)
     try:
         for dev in devices:
             dname = _device_name(dev)
+            if only is not None and dname != only:
+                continue
             mgr = c_void_p()
             try:
                 dev.call(3, (POINTER(GUID), c_ulong, c_void_p, POINTER(c_void_p)),

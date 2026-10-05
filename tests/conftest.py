@@ -197,6 +197,8 @@ def _never_look_at_the_real_foreground():
         mp.setattr(appaudio, "default_output_name", lambda: None)
         # ...nor which devices it has (a failing device is re-scanned when it's listed)
         mp.setattr(appaudio, "endpoint_names", lambda kind: None)
+        # ...nor who records the cable (Who's listening suggests a mode from it)
+        mp.setattr(appaudio, "recording_apps", lambda device: [])
         yield
 
 

@@ -187,3 +187,11 @@ to check). Not suggested, because the files can't tell: Epic Online Services
 (`EOSSDK-Win64-Shipping.dll` was also in a single-player game with no voice chat at
 all), Steam voice (`steam_api64.dll` is in nearly every Steam game) and
 Unreal's built-in voice.
+
+**Who's actually listening** (2026-10). Windows lists the programs recording a device
+the same way it lists the ones playing, so the program recording the virtual cable's
+far end names the listener directly: Discord, TeamSpeak and Mumble by their exe, a
+game by the same library scan as above. It beats the game in front (playing Valorant
+while talking in Discord suggests Discord; when both record the cable, the game in
+front wins). With *Switch to the mode that suits by itself* ticked, the picker uses
+it as soon as it's found; with nothing listening the mode stays as it is.

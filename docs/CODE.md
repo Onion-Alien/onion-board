@@ -133,7 +133,7 @@ the launcher the shortcuts and PyInstaller use. The app is the `soundboard` pack
 | `soundboard/ui/crashdialog.py` | the "Onion Board hit a problem" dialog: the report, *Copy report*, *Report on GitHub* (copies it, opens a new issue in the browser), *Open folder* |
 | `soundboard/testcheck.py` | analysis for the Record-6s test (finds your voice in the output by cross-correlation) |
 | `soundboard/destination.py` | destination modes (Setup tab / Settings → *Who's listening*), one per voice chat engine: shapes the sounds bus for the listener's voice codec — sub-bass harmonics, a low cut with each sound's level given back, codec ceiling, gentle compressor (custom modes), mono |
-| `soundboard/voicesdk.py` | which voice chat engine the game in front uses, from the voice libraries in its install folder (the exe path is read with the least access Windows has; nothing touches the game): a suggestion by *Who's listening*, never a switch |
+| `soundboard/voicesdk.py` | which *Who's listening* mode suits: first the program recording the virtual cable's far end (`Listeners`: Discord, TeamSpeak and Mumble by name, a game by its files), else the voice engine of the game in front, from the voice libraries in its install folder (the exe path is read with the least access Windows has; nothing touches the game). A suggestion, switched to by itself only when the picker's box says so |
 | `soundboard/ui/deleted.py` | the Recently deleted window (Bring back / Delete for good) |
 | `soundboard/ui/resetguide.py` | the Reset guide (pick → check → reset and restart) and the Restore points window |
 | `soundboard/ui/destpanel.py` | the mode picker and the custom-modes editor |

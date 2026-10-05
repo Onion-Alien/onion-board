@@ -190,3 +190,57 @@ def test_the_game_in_front_suggests_its_voice_engine(window):  # noqa: F811
     other = next(p for p in d.findChildren(DestPanel))
     assert not other.suggest.isHidden()
     d.close()
+
+
+class Heard:
+    """Stands in for voicesdk.Listeners: who records the cable's far end."""
+    found = ()
+
+    def poll(self, device):
+        return self.found if device else ()
+
+
+def test_the_program_listening_to_the_cable_beats_the_game_in_front(window, monkeypatch):  # noqa: F811
+    from soundboard import engine as eng
+    monkeypatch.setattr(eng, "virtual_mic_for", lambda name: "CABLE Output (fake)")
+    panel = window.dest_panel
+
+    class Watch:
+        def poll(self):
+            return "game"                          # Valorant in front...
+    window.voice_watch = Watch()
+    window.listeners = Heard()
+    window.listeners.found = (("discord", "Discord"),)   # ...but Discord has the cable
+    window._poll_voice()
+    assert window.voice_suggestion == "discord"
+    assert "Discord is listening" in panel.suggest_text.text()
+    assert window.engine.dest is None              # only suggested
+    window.listeners.found = (("discord", "Discord"), ("game", "Valorant"))
+    window._poll_voice()
+    assert window.voice_suggestion == "game"       # both: the game in front wins
+    assert "Valorant is listening" in panel.suggest_text.text()
+
+
+def test_switch_by_itself_follows_whoever_listens(window, monkeypatch):  # noqa: F811
+    from soundboard import engine as eng
+    monkeypatch.setattr(eng, "virtual_mic_for", lambda name: "CABLE Output (fake)")
+    toasts = []
+    monkeypatch.setattr(window, "toast", lambda text, kind="": toasts.append(text))
+    panel = window.dest_panel
+    window.voice_watch = None
+    window.listeners = Heard()
+    panel.chk_auto.setChecked(True)
+    assert window.cfg.dest["auto"] is True and window.engine.dest is None
+    window.listeners.found = (("discord", "Discord"),)
+    window._poll_voice()
+    assert window.cfg.dest["mode"] == "discord" and window.engine.dest.key == "discord"
+    assert panel.combo.currentData() == "discord" and panel.suggest.isHidden()
+    assert toasts and "Discord" in toasts[-1]
+    window.listeners.found = ()                    # Discord closed: the mode stays
+    window._poll_voice()
+    assert window.engine.dest.key == "discord"
+    panel.chk_auto.setChecked(False)
+    window.listeners.found = (("game", "TeamSpeak"),)
+    window._poll_voice()
+    assert window.engine.dest.key == "discord"     # off: back to only suggesting
+    assert not panel.suggest.isHidden()

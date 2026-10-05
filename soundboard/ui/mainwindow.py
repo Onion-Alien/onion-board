@@ -289,6 +289,8 @@ class MainWindow(QMainWindow):
         QApplication.instance().applicationStateChanged.connect(self._set_tick_rate)
         # which voice chat the game you're playing uses: a hint by Who's listening
         self.voice_suggestion: str | None = None
+        self.voice_why = ""   # why it's suggested, for the hint ("Discord is listening…")
+        self.listeners = voicesdk.Listeners() if sys.platform == "win32" else None
         self.voice_watch = voicesdk.Watcher() if sys.platform == "win32" else None
         self._voice_timer = QTimer(self)
         self._voice_timer.timeout.connect(self._poll_voice)
@@ -1740,10 +1742,38 @@ class MainWindow(QMainWindow):
         self._save_later()
 
     def _poll_voice(self):
+        """Which Who's listening mode suits: the program recording the cable's far end
+        (voicesdk.Listeners), else the voice engine of the game in front. Switches to it
+        when the picker's *Switch to it by itself* is ticked."""
         key = self.voice_watch.poll() if self.voice_watch is not None else None
-        if key != self.voice_suggestion:
-            self.voice_suggestion = key
+        why = (f"The game you have open uses {voicesdk.NAMES.get(key, key)} for voice "
+               "chat") if key else ""
+        heard = ()
+        if self.listeners is not None:
+            heard = self.listeners.poll(eng.virtual_mic_for(self._main_name()))
+        if heard:   # the game in front, if it's one of them; else the first
+            key, name = next((h for h in heard if h[0] == key), heard[0])
+            why = f"{name} is listening to the virtual cable"
+        if key != self.voice_suggestion or why != self.voice_why:
+            self.voice_suggestion, self.voice_why = key, why
+            self._auto_dest()
             self.voice_engine.emit(key)
+
+    def _auto_dest(self):
+        """*Switch to it by itself*: the suggested mode, as soon as it's suggested.
+        Nothing listening keeps the mode it has."""
+        d = self.cfg.dest if isinstance(self.cfg.dest, dict) else {}
+        key = self.voice_suggestion
+        if not d.get("auto") or key not in destination.BUILTIN_BY_KEY:
+            return
+        if destination.resolve(d).key == key:
+            return
+        d["mode"] = key
+        self.cfg.dest = d
+        mode = destination.apply(self.cfg, self.engine)
+        self._save_later()
+        log.info("who's listening: switched to %s (%s)", key, self.voice_why)
+        self.toast(f"Who's listening: {mode.label}. {self.voice_why}.")
 
     def _save_later(self):
         self._save_timer.start(400)

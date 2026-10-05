@@ -126,3 +126,21 @@ def test_is_system_never_touches_the_disk(monkeypatch):
     assert not voicesdk._is_system(r"C:\WindowsApps\game.exe")
     assert not voicesdk._is_system(r"E:\Games\Shooter\shooter.exe")
     assert not voicesdk._is_system("")
+
+
+def test_listeners_name_voice_apps_first_and_scan_each_game_once():
+    from soundboard.appaudio import App
+    apps = [App(1, "game.exe", r"C:\Games\Thing\game.exe", active=True),
+            App(2, "Discord.exe", r"C:\Apps\Discord\Discord.exe", active=True),
+            App(3, "obs64.exe", r"C:\Apps\obs\obs64.exe", active=True)]
+    scans = []
+
+    def scanner(path):
+        scans.append(path)
+        return "game" if "Thing" in path else None
+
+    lis = voicesdk.Listeners(lister=lambda device: apps, scanner=scanner)
+    assert lis.look("CABLE Output") == (("discord", "Discord"), ("game", "Game"))
+    assert lis.look("CABLE Output") == (("discord", "Discord"), ("game", "Game"))
+    assert sorted(scans) == [r"C:\Apps\obs\obs64.exe", r"C:\Games\Thing\game.exe"]
+    assert lis.poll(None) == ()                    # no cable: nobody to name
