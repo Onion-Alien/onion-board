@@ -18,9 +18,13 @@ the route (`Config.route`, `library.ROUTES`):
   Mic`, is registered, and takes the mic's stream-effect slot (SFX; Windows runs only
   stream effects in front of each app's recording, after the mic's own endpoint
   effect). An effect the driver had in that slot is saved and run first, inside ours.
-  Every value changed is noted under `HKLM\SOFTWARE\OnionBoard\MicPlugin` so
-  `--direct-mic uninstall` (and the uninstaller's `--direct-mic remove`) puts the mic
-  back exactly.
+  Every value changed is noted under `HKLM\SOFTWARE\OnionBoard\MicPlugin`, before
+  anything changes and kind for kind, so `--direct-mic uninstall` (and the
+  uninstaller's `--direct-mic remove`) puts the mic back exactly, even after a set-up
+  that was killed half-way. If Windows already took the effect off (a driver update,
+  "Reset sound settings"), what the driver put there stays and only the notes go. The
+  admin step stops Windows' audio for a moment; a helper started first brings it back
+  whenever that process ends, killed or not.
 
   Board ↔ effect: `%ProgramData%\OnionBoard\MicPlugin\ring2.bin`, a shared file
   (layout in `directmic.py`'s docstring). The effect publishes the **clean mic**
@@ -31,7 +35,14 @@ the route (`Config.route`, `library.ROUTES`):
   default) the effect puts that whole send mix, processed voice included, in place of
   the mic about 20 ms later, so every mic feature works as with the cable. Each app
   recording the mic runs its own instance with its own slot in the file. Whenever the
-  board is late or gone the mic fades back in over what the board had already sent.
+  board is late or gone the mic fades back in over what the board had already sent;
+  after such a hiccup the effect reads a little further behind the board, and closes
+  that gap again in a quiet moment once the board keeps time. A mic at another rate
+  than 48 kHz gets the board's mix through a windowed-sinc resampler (no fold-back of
+  the highs on 44.1 / 16 kHz mics). Only one board writes the file at a time
+  (`board_pid`: a second copy of the app says so instead). Nothing read from the file
+  is trusted (anyone signed in can write it); `test_effect_survives_a_fuzzed_ring`
+  checks that.
   `directmic.status()` notices a mic Windows took the effect off ('wiped') or one with
   an older copy of it ('outdated'); the Setup tab offers a one-click repair, or the
   cable. Tests run the real DLL in `testhost.exe`, which loads it the way Windows does.
@@ -54,7 +65,7 @@ the route (`Config.route`, `library.ROUTES`):
 - **Nowhere**: only you hear the sounds, plus the optional stream output.
 
 The route belongs to this PC: backups don't carry it and resetting the audio devices
-puts it back to the cable. The rest of this page says "the cable" for the output
+puts it back to straight into the mic. The rest of this page says "the cable" for the output
 that others hear, whichever route picked it.
 
 Optional: `winget install Gyan.FFmpeg.Essentials` adds m4a/aac/video support (the
@@ -63,10 +74,6 @@ finds ffmpeg on `PATH` or in winget's `Links` folder.
 
 ## Where things are stored
 
-
-Optional: `winget install Gyan.FFmpeg.Essentials` adds m4a/aac/video support (the
-installer's *Play M4A, AAC and video files* box runs the same command). The app
-finds ffmpeg on `PATH` or in winget's `Links` folder.
 Settings and imported sounds live in `%APPDATA%\OnionBoard\`. Its `cache\` folder
 holds each sound decoded and ready to play (int16 at 48 kHz), so later starts don't
 decode anything; it's safe to delete and is rebuilt as needed. The `icons\` folder

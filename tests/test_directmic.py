@@ -99,6 +99,35 @@ def test_ring_rejects_other_versions(ring_file):
         dm.RingWriter(ring_file)
 
 
+def test_a_second_board_backs_off(ring_file, monkeypatch):
+    """Two copies of the app (one on a test profile) never both write the mic's ring:
+    the second one says so, and takes over once the first one has gone."""
+    first = dm.DirectMicStream(lambda out, *a: out.fill(0.5), ring_file)
+    first.start()
+    try:
+        time.sleep(0.05)
+        other = os.getpid() + 1
+        monkeypatch.setattr(dm.os, "getpid", lambda: other)   # another process
+        with pytest.raises(RuntimeError, match="Another Onion Board"):
+            dm.DirectMicStream(lambda out, *a: out.fill(0.1), ring_file)
+        w = dm.RingWriter(ring_file)
+        assert w._get("enabled") == 1   # the first one's ring was left alone
+        w.close(owner=False)
+    finally:
+        monkeypatch.undo()
+        first.close()
+    monkeypatch.setattr(dm.os, "getpid", lambda: other)
+    second = dm.DirectMicStream(lambda out, *a: out.fill(0.1), ring_file)   # first gone
+    second.close()
+    # a board that crashed (its process is gone) doesn't block the next one
+    w = dm.RingWriter(ring_file)
+    w._set("board_pid", 0x7FFFFFF0)
+    w.set_enabled(True)
+    third = dm.DirectMicStream(lambda out, *a: out.fill(0.1), ring_file)
+    third.close()
+    w.close(owner=False)
+
+
 def test_make_ring_replaces_an_old_layout(tmp_path):
     p = tmp_path / "ring2.bin"
     assert dm.make_ring(p) and p.stat().st_size == dm.FILE_BYTES
@@ -133,6 +162,212 @@ def test_pick_slot(values, expected):
 ])
 def test_original_effect_kept(values, pid, expected):
     assert dm._original(values, pid) == expected
+
+
+# ---------------------------------------------------------------------- putting it on / off
+
+class Killed(BaseException):
+    """The admin step killed half-way (nothing after it runs)."""
+
+
+class FakeReg:
+    """The registry keys the admin step touches, {path: {name: (value, kind)}}; with
+    `kill_at` set, the kill_at-th write never happens (the process died there)."""
+
+    def __init__(self, keys=None):
+        self.keys = {k.lower(): dict(v) for k, v in (keys or {}).items()}
+        self.writes = 0
+        self.kill_at = None
+
+    def write(self):
+        self.writes += 1
+        if self.kill_at is not None and self.writes >= self.kill_at:
+            raise Killed
+
+    def key(self, path, create=True):
+        reg, k = self, path.lower()
+
+        class Key:
+            created = k not in reg.keys
+            if created and not create:
+                raise FileNotFoundError(path)
+
+            def __init__(self):
+                if self.created:
+                    reg.write()
+                    reg.keys[k] = {}
+                self.vals = reg.keys[k]
+
+            def get(self, name):
+                return self.vals.get(name)
+
+            def set(self, name, kind, value):
+                reg.write()
+                self.vals[name] = (value, kind)
+
+            def set_raw(self, name, kind, data):
+                reg.write()
+                value = (data.decode("utf-16-le").rstrip("\0") if kind == 2 else
+                         int.from_bytes(data, "little") if kind == 11 else data)
+                self.vals[name] = (value, kind)
+
+            def delete(self, name):
+                reg.write()
+                self.vals.pop(name, None)
+
+            def __enter__(self):
+                return self
+
+            def __exit__(self, *exc):
+                pass
+
+        return Key()
+
+    def delete_key(self, root, path):
+        self.write()
+        self.keys.pop(path.lower(), None)
+
+    def installed_on(self):
+        top = dm.ENDPOINTS_KEY.lower() + "\\"
+        return [k[len(top):] for k in self.keys if k.startswith(top)]
+
+    def mics(self):
+        """The mics' effect settings (an empty key counts as none)."""
+        top = dm.CAPTURE_KEY.lower()
+        return {k: v for k, v in self.keys.items() if k.startswith(top) and v}
+
+
+@pytest.fixture
+def fake_reg(monkeypatch):
+    reg = FakeReg()
+    monkeypatch.setattr(dm, "_BackupKey", lambda path, create=True: reg.key(path, create))
+    monkeypatch.setattr(dm, "_StateKey", lambda path: reg.key(path))
+    monkeypatch.setattr(dm, "installed_on", reg.installed_on)
+    monkeypatch.setattr(dm.winreg, "DeleteKey", reg.delete_key)
+    monkeypatch.setattr(dm, "_delete_if_empty",
+                        lambda path: None if reg.keys.get(path.lower()) else
+                        reg.keys.pop(path.lower(), None))
+    return reg
+
+
+GUID = "{11111111-2222-3333-4444-555555555555}"
+FXKEY = rf"{dm.CAPTURE_KEY}\{GUID}\FxProperties"
+SZ, MULTI, DWORD, BINARY, EXPAND, QWORD = 1, 7, 4, 3, 2, 11
+MICS = {
+    "no effects at all": None,
+    "a stream effect": {dm.FX % 5: ("{S}", SZ), dm.MODES_KEY % 5: ([dm.MODE_DEFAULT], MULTI)},
+    "a G733 (EFX + old LFX)": {dm.FX % 7: ("{E}", SZ), dm.FX % 1: ("{E}", SZ),
+                               dm.MODES_KEY % 7: ([dm.MODE_DEFAULT], MULTI)},
+    "old-style effects only": {dm.FX % 1: ("{L}", SZ), dm.FX % 2: ("{G}", SZ)},
+    "a stream effect list": {dm.FX % 13: (["{X}", "{Y}"], MULTI), dm.FX % 5: ("{S}", SZ)},
+    "enhancements off, odd kinds": {dm.DISABLE_SYSFX: (1, DWORD), dm.FX % 1: (b"\x01\x02", BINARY),
+                                    dm.FX % 2: ("%x%\\{G}", EXPAND), dm.FX % 5: (7, QWORD)},
+}
+
+
+def _mic(reg, values):
+    if values is not None:
+        reg.keys[FXKEY.lower()] = dict(values)
+
+
+def _all_ours(reg):
+    return [n for v in reg.mics().values() for n, (x, _) in v.items() if dm._is_ours(x)]
+
+
+@pytest.mark.parametrize("mic", MICS)
+def test_taking_it_off_puts_the_mic_back_exactly(fake_reg, mic):
+    _mic(fake_reg, MICS[mic])
+    before = fake_reg.mics()
+    dm._install_endpoint(GUID, None)
+    assert _all_ours(fake_reg) and fake_reg.installed_on() == [GUID.lower()]
+    dm._uninstall_endpoint(GUID)
+    assert fake_reg.mics() == before and not fake_reg.installed_on()
+    dm._install_endpoint(GUID, None)   # again (an update), via admin_install's way
+    for guid in fake_reg.installed_on():
+        dm._uninstall_endpoint(guid)
+    dm._install_endpoint(GUID, None)
+    dm._uninstall_endpoint(GUID)
+    assert fake_reg.mics() == before
+
+
+@pytest.mark.parametrize("mic", MICS)
+def test_a_set_up_cut_off_anywhere_can_be_undone(fake_reg, mic):
+    """The admin step killed at every write in turn: taking it off afterwards always
+    leaves the mic exactly as it was (the notes are written before any change)."""
+    _mic(fake_reg, MICS[mic])
+    before = {k: dict(v) for k, v in fake_reg.keys.items()}
+    dm._install_endpoint(GUID, None)
+    total = fake_reg.writes
+    for n in range(1, total + 1):
+        fake_reg.keys = {k: dict(v) for k, v in before.items()}
+        fake_reg.writes, fake_reg.kill_at = 0, n
+        with pytest.raises(Killed):
+            dm._install_endpoint(GUID, None)
+        fake_reg.kill_at = None
+        for guid in fake_reg.installed_on():
+            dm._uninstall_endpoint(guid)
+        assert fake_reg.mics() == {k: v for k, v in before.items() if v}, n
+        assert not _all_ours(fake_reg) and not fake_reg.installed_on()
+
+
+def test_repair_after_windows_reset_keeps_the_new_driver_effects(fake_reg):
+    """A driver update / "Reset sound settings" rewrote the mic's effects: repairing and
+    later taking it off leave the driver's new ones, not the stale ones from before."""
+    _mic(fake_reg, MICS["a stream effect"])
+    dm._install_endpoint(GUID, None)
+    fake_reg.keys[FXKEY.lower()] = {dm.FX % 5: ("{NEW}", SZ)}   # Windows reset it
+    for guid in fake_reg.installed_on():   # what admin_install does: repair
+        dm._uninstall_endpoint(guid)
+    assert fake_reg.mics()[FXKEY.lower()] == {dm.FX % 5: ("{NEW}", SZ)}
+    dm._install_endpoint(GUID, None)
+    assert fake_reg.keys[dm.ENDPOINTS_KEY.lower() + "\\" + GUID.lower()]["Original"][0] == "{NEW}"
+    dm._uninstall_endpoint(GUID)
+    assert fake_reg.mics()[FXKEY.lower()] == {dm.FX % 5: ("{NEW}", SZ)}
+
+
+def test_lost_notes_never_leave_the_effect_behind(fake_reg):
+    """Our notes gone (someone cleaned the registry) while the effect is on the mic: a
+    new set-up doesn't note the effect itself as the mic's own, so taking it off never
+    leaves a dead effect on the mic."""
+    _mic(fake_reg, MICS["a stream effect"])
+    dm._install_endpoint(GUID, None)
+    fake_reg.keys.pop(dm.ENDPOINTS_KEY.lower() + "\\" + GUID.lower())
+    dm._install_endpoint(GUID, None)
+    notes = fake_reg.keys[dm.ENDPOINTS_KEY.lower() + "\\" + GUID.lower()]
+    assert notes["Original"][0] == ""
+    dm._uninstall_endpoint(GUID)
+    assert not _all_ours(fake_reg)
+
+
+def test_a_mic_that_is_gone_is_just_forgotten(fake_reg):
+    _mic(fake_reg, MICS["a stream effect"])
+    dm._install_endpoint(GUID, None)
+    fake_reg.keys.pop(FXKEY.lower())   # the driver reinstalled: a new endpoint GUID
+    dm._uninstall_endpoint(GUID)
+    assert not fake_reg.installed_on()
+
+
+def test_admin_step_brings_the_audio_back_whatever_happens(fake_reg, monkeypatch, tmp_path):
+    """The audio service is stopped during the admin step: the helper that starts it
+    again is running before it stops, and a failure still starts it."""
+    calls = []
+    dll = tmp_path / "obmic.dll"
+    dll.write_bytes(b"dll")
+    monkeypatch.setattr(dm, "bundled_dll", lambda: dll)
+    monkeypatch.setattr(dm, "install_dir", lambda: tmp_path / "pf")
+    monkeypatch.setattr(dm, "_enable_privileges", lambda *a: None)
+    monkeypatch.setattr(dm, "_audio_comes_back", lambda: calls.append("helper"))
+    monkeypatch.setattr(dm, "_audio_service", lambda start: calls.append(start))
+    monkeypatch.setattr(dm, "_register_com", lambda path: calls.append("com"))
+    monkeypatch.setattr(dm, "_make_ring", lambda: None)
+    _mic(fake_reg, MICS["a stream effect"])
+    assert dm.admin_install(GUID) == 0
+    assert calls == ["helper", False, "com", True]
+    calls.clear()
+    fake_reg.kill_at = fake_reg.writes + 1
+    with pytest.raises(Killed):
+        dm.admin_install(GUID)
+    assert calls[:2] == ["helper", False] and calls[-1] is True
 
 
 # ---------------------------------------------------------------------- the stream
@@ -447,6 +682,144 @@ def test_effect_survives_a_hostile_ring(ring_file):
 
 
 @needs_host
+@pytest.mark.parametrize("seed", [1, 2, 3, 4])
+def test_effect_survives_a_fuzzed_ring(ring_file, seed):
+    """Every header field and slot overwritten with random values, many times a second,
+    while the board and the effect run: nothing crashes, nothing but sound in range
+    comes out, and once the ring is sane again the effect is back to normal."""
+    rng = np.random.default_rng(seed)
+    fields = [n for n in dm.HEAD.names if n not in ("magic", "version", "capacity",
+                                                    "mic_capacity", "rate")]
+
+    def junk(kind):
+        if kind.kind == "f":
+            return rng.choice([np.nan, np.inf, -np.inf, -1e30, 1e30, rng.normal() * 10, 0.5])
+        top = np.iinfo(kind).max
+        return rng.choice([0, 1, top, rng.integers(0, top, dtype=np.uint64 if kind.kind == "u"
+                                                    else np.int64) if top > 2**31 else
+                           rng.integers(0, top)])
+
+    def during(s):
+        ring = s._ring
+        t0 = time.monotonic()
+        while time.monotonic() - t0 < 1.2:
+            for name in rng.choice(fields, 4):
+                v = ring._f_fields[name]
+                try:
+                    with np.errstate(invalid="ignore"):
+                        v[0] = junk(v.dtype)
+                except (OverflowError, ValueError):
+                    v[0] = 0
+            raw = ring.slots.view(np.uint8)
+            raw[:] = rng.integers(0, 256, raw.shape, dtype=np.uint8) if rng.random() < 0.3 \
+                else raw
+            time.sleep(0.003)
+        # sane again (what the board itself keeps setting)
+        for name, v in (("enabled", 1), ("mode", dm.MODE_ADD), ("gain", 1.0), ("mic_gain", 1.0),
+                        ("lead", 0), ("publisher", 0), ("mic_rate", 48000)):
+            ring._set(name, v)
+        ring.slots.view(np.uint8)[:] = 0
+
+    (x,), _, _ = _run_host(ring_file, 48000, 2, 3.0, mic=0.1, during=during)
+    assert np.all(np.isfinite(x)) and np.abs(x).max() <= 1.0
+    y = x[int(2.2 * 48000):, 0]
+    assert abs(y.mean() - 0.1) < 0.02 and y.max() > 0.5, (y.mean(), y.max())
+
+
+def test_board_ignores_a_nonsense_mic_rate(ring_file):
+    """A ring claiming a 1 Hz mic would make the board render a gigantic stretch for a
+    handful of mic frames (a hang): such a rate doesn't count as a live mic."""
+    w = dm.RingWriter(ring_file)
+    try:
+        w._set("mic_rate", 1)
+        w._mtick[0] = dm._tick()
+        assert not w.mic_live()
+        w._set("mic_rate", 48000)
+        assert w.mic_live()
+    finally:
+        w.close()
+
+
+@needs_host
+@realtime
+def test_delay_shrinks_back_after_a_hiccup(ring_file):
+    """The board late once: the effect reads further behind it (more delay) to ride it
+    out, then, once the board has kept time for a while, closes the gap again in a quiet
+    moment, back to the normal delay."""
+    phase = [0]
+    hiccup = [False]
+
+    def bursts(out, frames, t, status):   # 100 ms of tone, 100 ms of silence
+        n = np.arange(phase[0], phase[0] + frames)
+        on = (n // 4800) % 2 == 0
+        out[:] = (0.4 * on * np.sin(2 * np.pi * 440 * n / dm.RATE)).astype(np.float32)[:, None]
+        phase[0] += frames
+        if phase[0] > 0.6 * dm.RATE and not hiccup[0]:
+            hiccup[0] = True
+            time.sleep(0.08)   # the board stalls (a GIL hog, a page fault storm)
+
+    leads = {}
+
+    def during(s):
+        time.sleep(1.5)
+        leads["after"] = int(s._ring.live_slots()["lead"].max())
+        time.sleep(3.5)
+        leads["end"] = int(s._ring.live_slots()["lead"].max())
+        leads["late"] = s.late()
+
+    (x,), _, _ = _run_host(ring_file, 48000, 1, 6.0, callback=bursts, mode=dm.MODE_REPLACE,
+                           during=during)
+    base = int(dm.LEAD_S * dm.RATE)
+    assert leads["after"] > base, leads             # it rode the hiccup out
+    assert leads["end"] == base, leads              # ...and came back
+    assert np.all(np.isfinite(x)) and np.abs(x).max() <= 0.41
+
+
+@needs_host
+@pytest.mark.parametrize("rate, tone, most", [
+    (16000, 12000, -60),    # above a 16 kHz mic's top: must not fold back down as noise
+    (16000, 20000, -60),
+    (44100, 23000, -60),
+])
+def test_highs_above_the_mic_rate_dont_fold_back(ring_file, rate, tone, most):
+    phase = [0]
+
+    def hi(out, frames, t, status):
+        n = np.arange(phase[0], phase[0] + frames)
+        out[:] = (0.5 * np.sin(2 * np.pi * tone * n / dm.RATE)).astype(np.float32)[:, None]
+        phase[0] += frames
+
+    (x,), _, _ = _run_host(ring_file, rate, 1, 1.5, callback=hi, mode=dm.MODE_REPLACE)
+    y = x[int(0.6 * rate):, 0]
+    level = 20 * np.log10(np.sqrt(np.mean(y ** 2)) / (0.5 / np.sqrt(2)) + 1e-12)
+    assert level < most, level
+
+
+@needs_host
+@pytest.mark.parametrize("rate, tone", [(16000, 1000), (16000, 6500), (44100, 1000),
+                                        (44100, 19000)])
+@realtime
+def test_tones_in_the_mics_range_come_through_clean(ring_file, rate, tone):
+    phase = [0]
+
+    def sine(out, frames, t, status):
+        n = np.arange(phase[0], phase[0] + frames)
+        out[:] = (0.5 * np.sin(2 * np.pi * tone * n / dm.RATE)).astype(np.float32)[:, None]
+        phase[0] += frames
+
+    (x,), _, _ = _run_host(ring_file, rate, 1, 1.5, callback=sine, mode=dm.MODE_REPLACE)
+    y = x[int(0.6 * rate):, 0]
+    win = np.blackman(len(y))
+    spec = np.abs(np.fft.rfft(y * win)) ** 2
+    f = np.fft.rfftfreq(len(y), 1 / rate)
+    near = np.abs(f - tone) < 40
+    thdn = 10 * np.log10(spec[~near].sum() / spec[near].sum())
+    assert thdn < -60, thdn
+    rms = np.sqrt(np.mean(y ** 2))
+    assert abs(20 * np.log10(rms / (0.5 / np.sqrt(2)))) < 0.5   # level kept
+
+
+@needs_host
 def test_more_apps_than_slots(ring_file):
     """Past SLOTS apps the rest still get the mic (and the sounds, from no slot)."""
     outs, _, stats = _run_host(ring_file, 48000, 1, 1.0, instances=dm.SLOTS + 2)
@@ -672,6 +1045,22 @@ def test_on_the_mic_the_cable_gets_the_same(window, monkeypatch, state):  # noqa
     _routes(w, monkeypatch, state, cables=())
     w._apply_send_outputs()
     assert opened[-1] is None
+
+
+@pytest.mark.parametrize("cables", [(CABLE_IN,), ()])
+def test_saying_no_to_windows_keeps_the_mic_on_offer(window, monkeypatch, cables):  # noqa: F811
+    """The admin prompt turned down: the route stays on the mic (one click still on
+    offer), and the cable, if there is one, carries the sounds meanwhile."""
+    from PySide6.QtWidgets import QMessageBox
+    w = window
+    _routes(w, monkeypatch, "missing", cables)
+    said = []
+    monkeypatch.setattr(QMessageBox, "warning", lambda *a: said.append(a[2]))
+    w._mic_attached("My mic", "Windows' admin prompt was turned down (or didn't finish).")
+    assert w.cfg.route == "mic" and w._main_name() == (cables[0] if cables else None)
+    assert ("virtual cable meanwhile" in said[0]) == bool(cables)
+    assert "Try again" in said[0]
+    assert "mic" in w.pill.text().lower()
 
 
 def test_the_banner_never_sends_mic_users_to_the_cable(window, monkeypatch):  # noqa: F811
