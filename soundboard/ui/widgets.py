@@ -630,7 +630,7 @@ class Pad(QAbstractButton):
             p.setPen(Qt.NoPen)
             p.setBrush(QColor(T["accent"]))
             p.drawEllipse(c)
-            tick = QPen(QColor("#ffffff"), 2.2)
+            tick = QPen(QColor(T["on_accent"]), 2.2)   # white vanished on yellow accents
             tick.setCapStyle(Qt.RoundCap)
             p.setPen(tick)
             p.drawPolyline([QPointF(c.left() + 5, c.center().y()),
@@ -667,7 +667,7 @@ class Pad(QAbstractButton):
             p.drawText(foot, Qt.AlignLeft | Qt.AlignVCenter,
                        "applying effects…" if self.state == "rendering" else "loading…")
         elif self.state == "error":
-            p.setPen(QColor("#ff6b6b"))
+            p.setPen(QColor("#ff6b6b" if on_pic else T["error_text"]))   # readable on light
             p.drawText(foot, Qt.AlignLeft | Qt.AlignVCenter, "can't load file")
         else:
             flags = ("FX " if self.meta.fx else "") + \

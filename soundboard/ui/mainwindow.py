@@ -689,12 +689,15 @@ class MainWindow(QMainWindow):
         add.clicked.connect(self.add_dialog)
         icons.set_icon(add, "plus", "on_accent")
         self.search = QLineEdit()
-        self.search.setPlaceholderText("Search sounds… Enter searches the web (YouTube, TikTok, "
-                                       "Myinstants…), or paste a link")
-        self.search.setToolTip("Type to filter your sounds, or paste a link (YouTube, "
-                               "SoundCloud, TikTok, most media sites) to add or play it")
+        # short, so it isn't cut to "Search sounds… …" at normal widths; the tooltip
+        # has the rest
+        self.search.setPlaceholderText("Search sounds or paste a link")
+        self.search.setToolTip("Type to filter your sounds; Enter searches the web (YouTube, "
+                               "TikTok, Myinstants…). Or paste a link (YouTube, SoundCloud, "
+                               "TikTok, most media sites) to add or play it")
         self.search.setClearButtonEnabled(True)
-        self.search.textChanged.connect(self.apply_filter)
+        # typing regrids only when the pads shown change (35 ms a key with 600 pads)
+        self.search.textChanged.connect(lambda t: self.apply_filter(t, lazy=True))
         self.search.returnPressed.connect(self.on_search_enter)
         self.btn_yt = QPushButton("Search")
         self.btn_yt.setToolTip("Search YouTube, SoundCloud, TikTok sounds, Myinstants… for "
@@ -952,8 +955,8 @@ class MainWindow(QMainWindow):
                     ch = QHBoxLayout(chip)
                     ch.setContentsMargins(4, 2, 2, 2)
                     ch.setSpacing(2)
-                    name = QPushButton(chip.fontMetrics().elidedText(
-                        m.name if m else sid, Qt.ElideRight, 150))
+                    name = QPushButton(chip.fontMetrics().elidedText(   # && : "R&B" not "RB"
+                        m.name if m else sid, Qt.ElideRight, 150).replace("&", "&&"))
                     name.setObjectName("chipname")
                     name.setToolTip("Show this sound in the player (keeps playing)")
                     name.clicked.connect(lambda _=False, s=sid: self.select(s))
@@ -991,7 +994,8 @@ class MainWindow(QMainWindow):
         ch = QHBoxLayout(chip)
         ch.setContentsMargins(4, 2, 2, 2)
         ch.setSpacing(2)
-        name = QPushButton(chip.fontMetrics().elidedText(text, Qt.ElideRight, 150))
+        name = QPushButton(chip.fontMetrics().elidedText(text, Qt.ElideRight, 150)
+                           .replace("&", "&&"))   # "R&B", not "RB" with a shortcut
         name.setObjectName("chipname")
         name.setToolTip(tip)
         name.clicked.connect(on_click)
@@ -2707,21 +2711,25 @@ class MainWindow(QMainWindow):
         if query and " ".join(self.search.text().split()) == query:
             self.search.clear()
 
-    def apply_filter(self, text):
+    def apply_filter(self, text, lazy: bool = False):
         """Show the pads that match the search box (name or category) and are in the
-        category picked above the pads."""
+        category picked above the pads. `lazy`: skip the regrid when no pad changed."""
         self.linkbar.set_text(text)
         # a link filters nothing, and nor does the box in the mini player, which hides
         # it: a web search's words left there showed a blank mini player
         t = "" if self.linkbar.url or self.is_mini() else text.strip().lower()
         cat = self.cfg.category
+        changed = False
         for m in self.cfg.sounds:
             p = self.pads.get(m.id)
             if p:
                 hit = not t or t in m.name.lower() or any(t in g.lower() for g in m.tags)
-                p.setProperty("filtered", not hit or bool(cat and cat not in m.tags))
-        self.grid.relayout(force=True)
-        self.selection.sync()
+                hide = not hit or bool(cat and cat not in m.tags)
+                changed = changed or bool(p.property("filtered")) != hide
+                p.setProperty("filtered", hide)
+        if changed or not lazy:
+            self.grid.relayout(force=True)
+            self.selection.sync()
 
     # ------------------------------------------------------------------ categories
     # A sound can be in any number of categories (SoundMeta.tags); the bar above the
@@ -4703,6 +4711,7 @@ class MainWindow(QMainWindow):
     def _tab_icons_only(self, compact: bool):
         for i, (text, tip) in enumerate(TABS):
             self.tabs.setTabText(i, "" if compact else text)
+            self.tabs.tabBar().setAccessibleTabName(i, text)   # icon-only tabs aren't silent
             base = f"{text}: {tip}" if compact else tip
             old = self.tabs.property(f"_tip{i}")   # set_tab_live's copy of the plain tip
             if old is not None:

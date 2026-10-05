@@ -1,8 +1,10 @@
 # Artwork
 
 Small pictures the app shows when they're here (`soundboard/ui/art.py`). Every one
-is optional: without it the voice tile keeps its emoji and the Voice tab its
-painted icon.
+is optional: without it a voice tile shows a painted "?" and the Voice tab its
+painted icon. Still to make: `voice-female-voice`, `voice-male-voice`,
+`voice-talkbox`, `voice-autotune`, `voice-masked-caller`, `voice-anonymous`,
+`voice-dark-lord`, `voice-hothead`.
 
 They're square PNGs, 256 px, shown with rounded corners at 16–40 px, so a bold
 silhouette on a plain background reads best. `scripts/prepare_art.py <folder>`

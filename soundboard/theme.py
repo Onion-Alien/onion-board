@@ -531,7 +531,7 @@ QDoubleSpinBox::down-arrow:disabled, QDoubleSpinBox::down-arrow:off,
 QSpinBox#stepper::down-arrow:disabled, QSpinBox#stepper::down-arrow:off { image:url("$down_small_off"); }
 QSlider::groove:vertical { width:4px; background:$groove; border-radius:2px; }
 QSlider::add-page:vertical { background:$accent; border-radius:2px; }
-QSlider::handle:vertical { background:white; border:1px solid $border; width:14px; height:14px; margin:0 -5px; border-radius:7px; }
+QSlider::handle:vertical { background:white; border:1px solid $border_hi; width:14px; height:14px; margin:0 -5px; border-radius:7px; }
 QPushButton#micbanner { background:#e53935; color:white; font-weight:700; font-size:11pt;
     border:none; border-radius:10px; padding:10px; }
 QPushButton#miccheck:checked { background:#e53935; border:1px solid #ff6b6b; color:white;
@@ -571,7 +571,7 @@ QPushButton::menu-indicator { image:url("$down"); width:9px; height:9px;
 QPushButton::menu-indicator:open { image:url("$up"); }
 QSlider::groove:horizontal { height:4px; background:$groove; border-radius:2px; }
 QSlider::sub-page:horizontal { background:$accent; border-radius:2px; }
-QSlider::handle:horizontal { background:white; border:1px solid $border; width:14px; height:14px; margin:-5px 0; border-radius:7px; }
+QSlider::handle:horizontal { background:white; border:1px solid $border_hi; width:14px; height:14px; margin:-5px 0; border-radius:7px; }
 /* room for the whole handle: Qt sizes a slider to its groove, which cut the circle's top
    and bottom off flat */
 QSlider:horizontal { min-height:20px; }
@@ -716,6 +716,14 @@ QFrame#card QFrame#chip QPushButton#chipstop:hover { background:$danger_bg; colo
 QFrame#card QComboBox QAbstractItemView, QFrame#setcard QComboBox QAbstractItemView,
 QFrame#card QComboBoxPrivateContainer, QFrame#setcard QComboBoxPrivateContainer,
 QFrame#card QMenu, QFrame#setcard QMenu { background:$card; }
+/* keyboard focus shows on every control in every theme: these come last because a
+   rule with more ids (QFrame#card QPushButton#primary) outranks a plain :focus one */
+QFrame#card QPushButton#primary:focus, QFrame#setcard QPushButton#primary:focus,
+QPushButton:checked:focus, QFrame#card QPushButton:checked:focus,
+QFrame#setcard QPushButton:checked:focus { border:1px solid $text_hi; }
+QCheckBox::indicator:focus { border-color:$accent; }
+QCheckBox::indicator:checked:focus { border-color:$text_hi; }
+QSlider::handle:horizontal:focus, QSlider::handle:vertical:focus { border:2px solid $accent; }
 """)
 
 
@@ -990,6 +998,10 @@ def apply(app, name: str, live: str | None = None) -> str:
     if live is not None:
         set_live(live)
     name = set_current(name)
+    # cleared first: Qt swapping one app-wide sheet straight for another re-styles every
+    # widget the slow way (0.6-1.3 s with ~1000 widgets); empty and then the new sheet
+    # gives the same look in about a quarter of the time. No paint happens in between.
+    app.setStyleSheet("")
     app.setStyleSheet(stylesheet(name))
     widgets = app.allWidgets()
     _recolour_inline(widgets, old)

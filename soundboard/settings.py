@@ -8,7 +8,7 @@ import threading
 import time
 
 from PySide6.QtCore import QObject, QRectF, QSize, Qt, QTimer, Signal
-from PySide6.QtGui import (QBrush, QColor, QFont, QIcon, QPainter, QPainterPath,
+from PySide6.QtGui import (QBrush, QColor, QFont, QPainter, QPainterPath,
                            QPixmap)
 from PySide6.QtWidgets import (QApplication, QButtonGroup, QCheckBox, QColorDialog, QComboBox,
                                QDialog, QFrame,
@@ -339,7 +339,9 @@ class SettingsDialog(QDialog):
         fit.watch(self)   # grows to fit its text (ui/fit.py)
         self.mw = mw
         self.setWindowTitle("Settings")
-        self.setMinimumSize(720, 600)
+        # short enough for a 1366x768 laptop at 125 % (the pages scroll): at 600 the
+        # Done button sat below the screen
+        self.setMinimumSize(720, 420)
         lay = QVBoxLayout(self)
         lay.setContentsMargins(16, 14, 16, 14)
         self.tabs = QTabWidget()
@@ -402,11 +404,7 @@ class SettingsDialog(QDialog):
         for i in range(self.categories.count()):
             item = self.categories.item(i)
             name = item.data(Qt.UserRole)
-            icon = QIcon(icons.icon(name))
-            for size in icons.SIZES:
-                icon.addPixmap(icons.pixmap(name, size, theme.T["on_accent"]),
-                               QIcon.Selected, QIcon.Off)
-            item.setIcon(icon)
+            item.setIcon(icons.icon(name, selected="on_accent"))
 
     # ------------------------------------------------------------------ pages
     @staticmethod
@@ -629,6 +627,8 @@ class SettingsDialog(QDialog):
     def _pick_theme(self, name: str):
         self.mw.apply_theme(name)
         self._category_icons()
+        if getattr(self, "net_activity", None) is not None:
+            self.net_activity.refresh(force=True)   # its status colours are per theme
         self._sync_highlight()   # the theme's own colour, unless you picked one
         for c in self.theme_cards:
             c.setChecked(c.name == name)

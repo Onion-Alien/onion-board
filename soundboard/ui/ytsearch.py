@@ -19,7 +19,7 @@ import random
 import threading
 import time
 
-from PySide6.QtCore import QEvent, QPointF, QRectF, QSize, QUrl, Qt, Signal
+from PySide6.QtCore import QEvent, QPointF, QRect, QRectF, QSize, QUrl, Qt, Signal
 from PySide6.QtGui import (QColor, QPainter, QPainterPath, QPixmap,
                            QTextLayout)
 from PySide6.QtNetwork import QNetworkAccessManager, QNetworkRequest
@@ -201,7 +201,6 @@ class Thumb(QWidget):
         super().__init__()
         self._pm: QPixmap | None = None
         self._scaled: QPixmap | None = None   # _pm at this size: not scaled per paint
-        self._icon = icons.icon("wave", "muted").pixmap(QSize(32, 32))
         self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
         policy = self.sizePolicy()
         policy.setHeightForWidth(True)
@@ -236,15 +235,22 @@ class Thumb(QWidget):
         p.setClipPath(path)
         if self._pm is None:
             p.fillPath(path, QColor(128, 128, 128, 40))   # reads on light and dark
-            p.drawPixmap((w - self._icon.width()) // 2, (h - self._icon.height()) // 2,
-                         self._icon)
+            # the theme's colour now (it was fixed when the card was made), centred by
+            # its size on screen, not its pixel count (off-centre on a scaled screen)
+            icons.icon("wave", "muted").paint(p, QRect((w - 32) // 2, (h - 32) // 2, 32, 32))
         else:
+            # scaled to the screen's real pixels, so it isn't stretched (soft) at 125 %
+            dpr = self.devicePixelRatioF()
+            pw, ph = round(w * dpr), round(h * dpr)
             pm = self._scaled
-            if pm is None or not (pm.width() >= w and pm.height() >= h and
-                                  (pm.width() == w or pm.height() == h)):
-                pm = self._scaled = self._pm.scaled(w, h, Qt.KeepAspectRatioByExpanding,
+            if pm is None or pm.devicePixelRatio() != dpr or not (
+                    pm.width() >= pw and pm.height() >= ph and
+                    (pm.width() == pw or pm.height() == ph)):
+                pm = self._scaled = self._pm.scaled(pw, ph, Qt.KeepAspectRatioByExpanding,
                                                     Qt.SmoothTransformation)
-            p.drawPixmap((w - pm.width()) // 2, (h - pm.height()) // 2, pm)
+                pm.setDevicePixelRatio(dpr)
+            size = pm.deviceIndependentSize()
+            p.drawPixmap(QPointF((w - size.width()) / 2, (h - size.height()) / 2), pm)
         p.end()
 
 

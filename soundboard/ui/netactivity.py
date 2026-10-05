@@ -71,9 +71,11 @@ def _put(t: QTableWidget, r: int, c: int, text: str, tip: str = "", align=None,
         it.setToolTip(tip)
     if align is not None and it.textAlignment() != align:
         it.setTextAlignment(align)
-    if it.data(_TONE) != tone:
+    colour = QColor(theme.status(tone)) if tone else None
+    # the colour is checked too, not just the tone: a theme switch changes it
+    if it.data(_TONE) != tone or (colour is not None and it.foreground().color() != colour):
         it.setData(_TONE, tone)
-        it.setForeground(QColor(theme.status(tone)) if tone else QBrush())
+        it.setForeground(colour if colour is not None else QBrush())
     return it
 
 

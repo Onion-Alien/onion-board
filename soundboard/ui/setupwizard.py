@@ -234,6 +234,7 @@ class SetupWizard(QDialog):
         self.btn_next.setMinimumWidth(160)
         self.btn_next.setStyleSheet("padding:10px 18px; font-size:11pt;")
         self.btn_next.clicked.connect(self.next_clicked)
+        self.btn_next.setDefault(True)   # Enter moves on (not "Play a test sound")
         nav.addWidget(self.btn_next)
         v.addLayout(nav)
 
