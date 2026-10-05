@@ -30,7 +30,7 @@ from soundboard.engine import SR, Engine
 from soundboard.engine import is_virtual as is_virtual_cable
 from soundboard import (appaudio, autostart, backup, destination, library, midi, remote,
                         otherboards, soundfx, thumbs, trash, updates, videos, voicesdk)
-from soundboard import net, netlog, profiles, quality, shellicon, tor, watchaddon
+from soundboard import net, netlog, profiles, quality, shellicon, tor, usage, watchaddon
 from soundboard.replay import InstantReplay
 from soundboard.library import (AUDIO_EXTS, PAD_COLORS, RESOURCE_DIR, Config, SoundMeta,
                                 cache_keep, clean_tags, duplicate, fingerprint,
@@ -177,6 +177,7 @@ class Bridge(QObject):
     update_progress = Signal(int)              # percent of the new version downloaded
     update_ready = Signal(object, str)         # its installer's Path|None, error
     watch_update = Signal(object)              # a newer Onion Watch: watchaddon.Offer
+    counted = Signal()                         # the daily usage count was sent (usage.py)
     imported = Signal(object, object, str)     # meta|None, data|None, error/filename
     preview = Signal(str, object, float, int)  # id, audio with unsaved effects|None, gain, gen
 
@@ -241,6 +242,7 @@ class MainWindow(QMainWindow):
         self.bridge.update_progress.connect(self._on_update_progress)
         self.bridge.update_ready.connect(self._on_update_ready)
         self.bridge.watch_update.connect(lambda offer: self.triggers.offer_update(offer))
+        self.bridge.counted.connect(self._save_later)   # stats_sent
         self._removed: list[tuple[SoundMeta, int, np.ndarray | None]] = []   # undo-able
         self._render_gen: dict[str, int] = {}   # sid -> newest effects render (_rerender)
         self.shuffle = ShuffleBag()       # the random-sound hotkeys
@@ -4249,6 +4251,10 @@ class MainWindow(QMainWindow):
                     self.bridge.watch_update.emit(offer)
         threading.Thread(target=run, daemon=True, name="update-check").start()
 
+    def send_usage(self):
+        """The anonymous daily usage count, if it's due and switched on (usage.py)."""
+        usage.maybe_send(self.cfg, self.bridge.counted.emit)
+
     def _on_update(self, rel, err: str, asked: bool):
         self._save_later()   # update_checked
         busy = self._downloading or self._update_file is not None
@@ -4318,6 +4324,7 @@ class MainWindow(QMainWindow):
             return
         self._downloading = True
         netlog.cause(updates.FEATURE, f"You clicked to download Onion Board {rel.version}")
+        usage.maybe_send(self.cfg, event=usage.update_event(rel.version))
         self._set_update_pill("Downloading update…",
                               f"Downloading Onion Board {rel.version}", enabled=False)
         last = [-1]

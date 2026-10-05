@@ -99,7 +99,7 @@ WelcomeLabel2=This puts Onion Board on your PC and can add the free "virtual cab
 WizardSelectTasks=Pick what you want
 SelectTasksDesc=Tick what you'd like. If you're not sure, leave the boxes as they are.
 FinishedHeadingLabel=All done!
-FinishedLabel=Onion Board is installed. It will open now and ask you a few easy questions (which mic you use, where you listen, how your sounds reach Discord or your game).%n%nYou can find it later on your Desktop or in the Start menu.%n%nPrivacy: no account, ads or tracking. Settings > Privacy & security shows everything the app does online, lets you switch those things off, and can send all of it through a proxy or Tor.
+FinishedLabel=Onion Board is installed. It will open now and ask you a few easy questions (which mic you use, where you listen, how your sounds reach Discord or your game).%n%nYou can find it later on your Desktop or in the Start menu.%n%nPrivacy: no account or ads. The only thing counted is the anonymous "still here" if you left Count me in ticked. Settings > Privacy & security shows everything the app does online, lets you switch those things off, and can send all of it through a proxy or Tor.
 FinishedRestartLabel=Onion Board is installed. To finish setting up the virtual cable, Windows needs to restart your PC.%n%nAfter the restart, open Onion Board from the Start menu and it will pick up where it left off.
 
 [Tasks]
@@ -108,6 +108,7 @@ Name: "ffmpeg"; Description: "Play M4A, AAC and video files (the free FFmpeg, ab
 Name: "livevoice"; Description: "Set up live voice-to-speech now (needs Python, about 300 MB)"; GroupDescription: "Extra features (optional)"; Flags: unchecked
 Name: "tor"; Description: "Private connection (Tor): hides your internet address (about 22 MB)"; GroupDescription: "Privacy (optional)"; Flags: unchecked
 Name: "keepnetlog"; Description: "Keep a history of what Onion Board connects to (on this PC only)"; GroupDescription: "Privacy (optional)"; Flags: unchecked
+Name: "countme"; Description: "Count me in: once a day, send an anonymous ""still here"" (the version number and a random ID, nothing else) so we know people use it"; GroupDescription: "Privacy (optional)"
 Name: "desktopicon"; Description: "Put an Onion Board shortcut on my Desktop"; GroupDescription: "Shortcuts"
 
 [InstallDelete]
@@ -139,6 +140,15 @@ Filename: "{app}\{#AppExeName}.exe"; Parameters: "--set-offline"; \
 Filename: "{app}\{#AppExeName}.exe"; Parameters: "--keep-netlog"; \
   StatusMsg: "Switching on the network activity history..."; \
   Tasks: keepnetlog; Flags: runhidden waituntilterminated
+; "Count me in" (soundboard/usage.py): unticked, it's switched off before the first
+; start, so nothing is ever sent. Ticked on a page the user saw, it's switched on (an
+; old install had it off); a silent update never switches it on.
+Filename: "{app}\{#AppExeName}.exe"; Parameters: "--usage-count off"; \
+  StatusMsg: "Switching off the usage count..."; \
+  Tasks: not countme; Flags: runhidden waituntilterminated
+Filename: "{app}\{#AppExeName}.exe"; Parameters: "--usage-count on"; \
+  StatusMsg: "Switching on the usage count..."; \
+  Tasks: countme; Check: not WizardSilent; Flags: runhidden waituntilterminated
 ; The virtual cable is installed from CurStepChanged in [Code], so its exit code can
 ; ask for a restart.
 Filename: "{code:WingetPath}"; \
@@ -400,8 +410,9 @@ begin
   Body.Width := PrivacyPage.SurfaceWidth;
   Body.ShowAccelChar := False;
   Body.Caption :=
-    'No account, no ads, no tracking. On its own, Onion Board only goes online once a ' +
-    'day, to check for a new version (of the app, and of Onion Watch if you add it). ' +
+    'No account, no ads. On its own, Onion Board only goes online once a day: to ' +
+    'check for a new version (of the app, and of Onion Watch if you add it), and to ' +
+    'send an anonymous "still here" count if you leave Count me in ticked. ' +
     'Nothing downloads until you click Update, and you can switch the check off.' + #13#10#13#10 +
     'Everything else happens only when you use it:' + #13#10 +
     Bullet + 'Sounds: searching and downloading go to YouTube, SoundCloud or Myinstants.' + #13#10 +

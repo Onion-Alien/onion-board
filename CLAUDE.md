@@ -22,7 +22,7 @@ published. Before writing or committing anything:
 - **Never add audio files, binaries, or third-party assets.** Tests synthesize audio
   with numpy; icons are drawn in code. The one exception is artwork made for this
   project (e.g. generated pictures) in `assets/art/` — see its README.
-- New network access must be added to the table in `SECURITY.md`. No telemetry.
+- New network access must be added to the table in `SECURITY.md`. No telemetry beyond the opt-out anonymous usage count (`soundboard/usage.py`).
 - Loopback sockets bind `127.0.0.1` and verify a secret with `secrets.compare_digest`
   (a per-launch one; the opt-in remote control API checks the key shown in Settings);
   never log the secret.

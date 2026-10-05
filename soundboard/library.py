@@ -374,6 +374,11 @@ class Config:
     netlog_keep: bool = False
     # "Hide that I'm using Tor": "" (off), "snowflake" or "obfs4" bridges
     tor_bridges: str = ""
+    # the anonymous usage count (soundboard.usage; its switch is "usage_stats" in
+    # net_off): this PC's random ID, made on the first send, and when the last daily
+    # one went. A config without stats_id is from before the count existed.
+    stats_id: str = ""
+    stats_sent: float = 0.0
     sounds: list[SoundMeta] = field(default_factory=list)
 
     # set by load() when the settings weren't read cleanly, for the window to tell the
@@ -414,6 +419,8 @@ class Config:
                 cls._keep_newer(raw)
                 if isinstance(raw, dict) and "net_off" not in raw:
                     cfg._restore_privacy()
+                    if "stats_id" not in raw and "usage_stats" not in cfg.net_off:
+                        cfg.net_off.append("usage_stats")   # as from_raw: off for them
                 return cfg
             except (TypeError, ValueError, KeyError, AttributeError) as e:
                 err = e
@@ -569,6 +576,16 @@ class Config:
         raw.setdefault("setup_done", bool(raw.get("main_device")))
         # ...and from before What's new: everything in it is new to them
         raw.setdefault("whats_new_seen", "")
+        # ...and from before the usage count: they installed an app that sent nothing,
+        # so it starts switched off for them (new installs: on, unless the installer's
+        # box was unticked)
+        if "stats_id" not in raw:
+            raw["stats_id"] = ""
+            off = raw.get("net_off")
+            if isinstance(off, list) and "usage_stats" not in off:
+                raw["net_off"] = [*off, "usage_stats"]
+            elif "net_off" not in raw:
+                raw["net_off"] = ["usage_stats"]
         known = _typed(raw, cls(), "config")
         extra = {k: v for k, v in raw.items() if k not in cls.__dataclass_fields__}
         kept = {}
