@@ -403,6 +403,11 @@ def _process_table() -> dict[int, tuple[int, str]]:
     return table
 
 
+def running() -> dict[int, str]:
+    """pid -> exe name (lower case) of every running process; {} off Windows."""
+    return {pid: exe for pid, (_, exe) in _process_table().items()} if _win else {}
+
+
 def root_pid(pid: int, table: dict[int, tuple[int, str]] | None = None) -> int:
     """The topmost ancestor with the same .exe name. Browsers and chat apps play
     their audio from a helper child process that comes and goes; capturing the main
@@ -525,15 +530,18 @@ def endpoint_names(kind: str) -> set[str] | None:
             _ole32.CoUninitialize()
 
 
-def list_apps() -> list[App]:
+def list_apps(strict: bool = False) -> list[App]:
     """Every program with a live audio session on any playback device, this
-    process excluded and grouped by process tree. Safe from any thread."""
+    process excluded and grouped by process tree. Safe from any thread. A failed
+    listing is [] (or raises ComError with `strict`: [] would read as "nothing plays")."""
     if not _win:
         return []
     own = _co_init()
     try:
         return _list_apps()
     except ComError:
+        if strict:
+            raise
         log.debug("listing audio sessions failed", exc_info=True)
         return []
     finally:

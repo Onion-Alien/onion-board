@@ -15,6 +15,7 @@ next time they run.
 """
 from __future__ import annotations
 
+import dataclasses
 import logging
 import math
 import os
@@ -103,15 +104,19 @@ class _Lister(QObject):
 
     def _work(self):
         try:
-            apps = appaudio.list_apps()
-        except Exception:  # noqa: BLE001
+            apps = appaudio.list_apps(strict=True)
+            alive = appaudio.running()
+        except appaudio.ComError:
             # skip this round: an empty list would stop every capture and drop the rows
+            log.debug("listing programs failed", exc_info=True)
+            return
+        except Exception:  # noqa: BLE001
             log.exception("listing programs failed")
             return
         finally:
             self._busy = False
         if not self._stopped:
-            self.ready.emit(apps)
+            self.ready.emit((apps, alive))
 
     def stop(self):
         self._stopped = True
@@ -223,7 +228,7 @@ class AppRow(HoverCard):
         for b in (self.btn_send, self.btn_rec):
             b.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
             buttons.addWidget(b)
-        self.cb_to = QComboBox()
+        self.cb_to = QComboBox(self)   # hidden/shown before its row is laid out: no flash
         for i, (key, label, tip) in enumerate(TO):
             self.cb_to.addItem(label, key)
             self.cb_to.setItemData(i, tip, Qt.ToolTipRole)
@@ -500,7 +505,7 @@ class AppsTab(QWidget):
         self._label_folders()
 
         self.lister = _Lister(self)
-        self.lister.ready.connect(self._on_apps)
+        self.lister.ready.connect(lambda listed: self._on_apps(*listed))
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.lister.refresh)
         self.meter_timer = QTimer(self)
@@ -673,7 +678,10 @@ class AppsTab(QWidget):
                 row.name.setToolTip(row.app.path if row.app is not None else row.path)
                 row.set_app(row.app)
 
-    def _on_apps(self, apps: list):
+    def _on_apps(self, apps: list, alive: dict[int, str] | None = None):
+        """`apps` the programs with an audio session; `alive` every running process
+        (pid -> exe), when known. Browsers and chat apps close their session when they
+        go quiet: while the process still runs, its card stays (and keeps sending)."""
         stream = self._stream_output()   # set or cleared in Settings meanwhile
         for row in self.rows.values():
             row.show_to(stream)
@@ -690,6 +698,10 @@ class AppsTab(QWidget):
             self._row(app.exe, key=key)
         for key, row in list(self.rows.items()):
             app = by_key.get(key)
+            if (app is None and alive is not None and row.app is not None
+                    and alive.get(row.app.pid) == row.app.exe.lower()):
+                # quiet, not closed: no level, no "playing on"
+                app = dataclasses.replace(row.app, active=False, peak=0.0, devices=[])
             if app is not None and app.path:
                 row.path = path_key(app.path)
                 spec = self._spec(key)

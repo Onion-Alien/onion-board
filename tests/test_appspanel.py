@@ -48,7 +48,7 @@ class FakeCapture:
 @pytest.fixture
 def tab(qapp, monkeypatch):
     monkeypatch.setattr(appaudio, "AppCapture", FakeCapture)
-    monkeypatch.setattr(appaudio, "list_apps", lambda: [])
+    monkeypatch.setattr(appaudio, "list_apps", lambda strict=False: [])
     FakeCapture.made = []
     FakeCapture.fail = FakeCapture.slow = False
     cfg = Config()
@@ -116,6 +116,30 @@ def test_unremembered_program_that_closes_is_dropped(tab):
     tab._on_apps([App(200, "game.exe")])
     tab._on_apps([])
     assert tab.rows == {} and tab.empty.isVisibleTo(tab)
+
+
+def test_quiet_program_still_running_keeps_its_card(tab):
+    # browsers and chat apps close their audio session when they go quiet: the card
+    # stays while the process runs (it used to vanish and pop back)
+    tab._on_apps([music(), App(200, "game.exe")], {100: "music.exe", 200: "game.exe"})
+    tab._on_apps([App(200, "game.exe")], {100: "music.exe", 200: "game.exe"})
+    row = tab.rows["music.exe"]
+    assert set(tab.rows) == {"music.exe", "game.exe"}
+    assert row.app is not None and row.app.peak == 0 and "playing on" not in row.sub.text()
+    assert row.btn_send.isEnabled()
+    tab._on_apps([], {200: "game.exe"})          # music closed for real
+    assert set(tab.rows) == {"game.exe"}
+    tab._on_apps([], {200: "other.exe"})         # pid reused by another program
+    assert tab.rows == {}
+
+
+def test_quiet_sent_program_keeps_sending(tab):
+    tab._on_apps([music()], {100: "music.exe"})
+    row = tab.rows["music.exe"]
+    row.btn_send.setChecked(True)
+    cap = row.capture
+    tab._on_apps([], {100: "music.exe"})         # its session closed, the process didn't
+    assert row.sending and row.capture is cap and not cap.stopped
 
 
 def test_tab_reports_programs_being_sent_for_the_live_dot(tab):
@@ -214,7 +238,7 @@ def test_remembered_programs_start_from_the_config_and_auto_send(qapp, monkeypat
 
 def test_a_damaged_remembered_volume_does_not_stop_the_app_starting(qapp, monkeypatch):
     """A hand-edited or damaged config ("loud", NaN, huge) used to crash the window."""
-    monkeypatch.setattr(appaudio, "list_apps", lambda: [])
+    monkeypatch.setattr(appaudio, "list_apps", lambda strict=False: [])
     cfg = Config()
     cfg.apps = {"a.exe": {"vol": "loud"}, "b.exe": {"vol": float("nan")},
                 "c.exe": {"vol": 1e9}, "d.exe": {"vol": -2}, "e.exe": {"vol": None},
@@ -314,7 +338,7 @@ def test_windows_only_warning(qapp, monkeypatch):
 
 
 def test_lister_hands_results_to_the_ui_thread(qapp, monkeypatch):
-    monkeypatch.setattr(appaudio, "list_apps", lambda: [music()])
+    monkeypatch.setattr(appaudio, "list_apps", lambda strict=False: [music()])
     got = []
     lister = appspanel._Lister()
     lister.ready.connect(got.append)
@@ -325,13 +349,13 @@ def test_lister_hands_results_to_the_ui_thread(qapp, monkeypatch):
             break
         import time
         time.sleep(0.02)
-    assert got and got[0][0].exe == "music.exe"
+    assert got and got[0][0][0].exe == "music.exe" and isinstance(got[0][1], dict)
     lister.stop()
 
 
 def test_a_listing_failure_skips_the_update(qapp, monkeypatch):
-    def boom():
-        raise OSError("COM hiccup")
+    def boom(strict=False):
+        raise appaudio.ComError("COM hiccup")
     monkeypatch.setattr(appaudio, "list_apps", boom)
     got = []
     lister = appspanel._Lister()
@@ -436,7 +460,7 @@ def test_cards_tighten_when_narrow_and_keep_the_meter(qapp):
 def test_programs_are_cards_several_across(tab, qapp, monkeypatch):
     """A wide window shows the programs side by side, an equal-width card each."""
     apps = [music(), App(200, "game.exe"), App(300, "call.exe")]
-    monkeypatch.setattr(appaudio, "list_apps", lambda: apps)   # still running when shown
+    monkeypatch.setattr(appaudio, "list_apps", lambda strict=False: apps)   # running when shown
     tab._on_apps(apps)
     tab.resize(1200, 600)
     tab.show()
@@ -460,7 +484,7 @@ def test_cards_settle_instead_of_jumping(tab, qapp, monkeypatch):
     from PySide6.QtCore import QEvent, QObject
 
     apps = [music(), App(200, "game.exe"), App(300, "call.exe")]
-    monkeypatch.setattr(appaudio, "list_apps", lambda: apps)
+    monkeypatch.setattr(appaudio, "list_apps", lambda strict=False: apps)
     tab._on_apps(apps)
     cards = [tab.rows[k] for k in ("music.exe", "game.exe", "call.exe")]
 
