@@ -477,6 +477,10 @@ QPushButton#primary:focus { border:1px solid $text_hi; }
 QPushButton#danger { background:$danger_bg; border:1px solid $danger_border; color:$danger_text; font-weight:600; }
 QPushButton#danger:hover { background:$danger_hover; }
 QPushButton#small { padding:2px 8px; font-size:8pt; }
+QPushButton#tabinfo { padding:0; border-radius:8px; background:transparent; border:1px solid transparent; }
+QPushButton#tabinfo:hover { background:$btn_hover; border-color:$border_hi; }
+QPushButton#tabinfo:pressed { background:$btn_press; border-color:$accent; }
+QPushButton#tabinfo:focus { border-color:$accent; }
 QPushButton#settings { padding:6px 14px; font-weight:600; }
 QFrame#transport, QFrame#deck { background:$panel; border-radius:12px; }
 QFrame#mixer { background:transparent; }

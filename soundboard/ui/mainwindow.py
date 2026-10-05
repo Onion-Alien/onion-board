@@ -444,8 +444,11 @@ class MainWindow(QMainWindow):
             icons.set_tab_icon(self.tabs, i, text.lower())
         self.tab_info["apps"] = self.apps.info
         # one ⓘ at the end of the tab bar: the tab's explanation, instead of a banner
-        self.btn_info = QPushButton("ⓘ")
-        self.btn_info.setObjectName("small")
+        self.btn_info = QPushButton()
+        self.btn_info.setObjectName("tabinfo")
+        self.btn_info.setFixedSize(32, 32)
+        self.btn_info.setAccessibleName("About this tab")
+        icons.set_icon(self.btn_info, "info", size=20)
         self.btn_info.setCursor(Qt.PointingHandCursor)
         self.btn_info.setToolTip("What's this tab for?")
         self.btn_info.clicked.connect(self._show_tab_info)

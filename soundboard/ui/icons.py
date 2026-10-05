@@ -210,6 +210,15 @@ def _check(p, fill):
     p.drawLine(QPointF(11, 15.5), QPointF(16.5, 9))
 
 
+def _info(p, fill):
+    """Tab help: a clean circular outline and a font-independent information mark."""
+    p.drawEllipse(QRectF(3, 3, 18, 18))
+    dot = QPainterPath()
+    dot.addEllipse(QPointF(12, 7.5), 1.1, 1.1)
+    fill(dot)
+    p.drawLine(QPointF(12, 11), QPointF(12, 16.5))
+
+
 def _shield(p, fill):
     """Privacy & security: a shield with a tick."""
     path = QPainterPath(QPointF(12, 3))
@@ -458,7 +467,7 @@ SHAPES = {
     "settings": _gear, "history": _history, "leaf": _leaf, "live": _live,
     "back": _arrow("back"), "forward": _arrow("forward"), "reload": _reload,
     "speech": _speech, "cable": _cable, "check": _check, "warn": _warn, "folder": _folder,
-    "shield": _shield,
+    "shield": _shield, "info": _info,
     "next": _next, "edit": _edit, "trash": _trash, "keyboard": _keyboard,
     "palette": _palette, "gamepad": _gamepad, "image": _image, "video": _video, "radio": _radio,
     "apps": _apps, "triggers": _eye, "fold": _chevron("right"), "fold_open": _chevron("down"),

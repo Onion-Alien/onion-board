@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+- Tab help now uses a crisp, theme-aware information icon in a larger square
+  button, with consistent hover and keyboard-focus styling across tabs.
+
 ## 1.7.1 — 2026-10-04
 
 - **Onion Pocket updates itself from Settings:** when a newer Onion Pocket is out,
