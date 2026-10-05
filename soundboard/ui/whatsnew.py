@@ -27,6 +27,14 @@ class Note:
 
 # newest first; add one per release that has something worth telling
 NOTES = (
+    Note("1.9.3", "Your mic, start to finish", (
+        ("check", "No cable box ticked for you",
+         "The installer no longer ticks the virtual cable: your sounds go straight into "
+         "your mic. Tick it only if you'd rather use the cable."),
+        ("mic", "Guides that name your mic",
+         "The setup guide and the Discord and game steps now say to keep your own mic, "
+         "and name it, instead of telling you to pick CABLE Output."),
+    ), "", ""),
     Note("1.9.1", "Your sounds go straight into your mic", (
         ("mic", "The main way now, for everyone",
          "Onion Board puts your sounds into the mic Discord and games already use. On the "

@@ -173,8 +173,10 @@ dist\OnionBoardSetup.exe /VERYSILENT /SUPPRESSMSGBOXES /NORESTART /CLOSEAPPLICAT
   `%APPDATA%\OnionBoard\config.json`, other settings kept) and skips VB-Cable,
   FFmpeg, live voice and Tor unless `/TASKS=` or `/MERGETASKS=` names them (Tor
   never: the app doesn't start it while offline). It never switches Offline mode off.
-- The installer runs `install-vbcable.ps1 -Silent` (bundled as
-  `_internal\install-vbcable.ps1`). It exits straight away if a virtual cable is
+- Sounds go straight into the mic by default, so the installer's cable box is
+  unticked (a silent install keeps what the last install chose). Only when it's
+  ticked (`/MERGETASKS=vbcable`) does the installer run `install-vbcable.ps1 -Silent`
+  (bundled as `_internal\install-vbcable.ps1`). It exits straight away if a virtual cable is
   already present. If none is, VB-Cable is downloaded and Windows shows a **UAC prompt** — that part can't be headless, so tell the user
   to expect it.
 - Restart handling: after setup the script waits for the CABLE devices. If Windows
