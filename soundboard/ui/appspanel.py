@@ -347,6 +347,7 @@ class AppRow(HoverCard):
         self.btn_send.setAccessibleName(f"Send {name}")
         self.btn_rec.setAccessibleName(f"Record {name}")
         self.btn_forget.setAccessibleName(f"Forget {name}")
+        self.btn_clip.setAccessibleName(f"Clip editor for {name}")
 
     def set_status(self, text: str, error: bool = False):
         self.status_text = text

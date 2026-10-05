@@ -585,3 +585,4 @@ def test_card_buttons_say_which_program_they_are_for(qapp):
     assert row.btn_send.accessibleName() == f"Send {name}"
     assert row.btn_rec.accessibleName() == f"Record {name}"
     assert row.btn_forget.accessibleName() == f"Forget {name}"
+    assert row.btn_clip.accessibleName() == f"Clip editor for {name}"
