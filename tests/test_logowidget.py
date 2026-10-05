@@ -51,10 +51,11 @@ from test_mainwindow import window  # noqa: E402,F401  (the real MainWindow fixt
 
 
 def test_main_window_icon_glows_while_the_radio_plays(window):  # noqa: F811
-    from PySide6.QtWidgets import QApplication
-    plain = QApplication.windowIcon().cacheKey()
+    window.show()   # a hidden window's icon stays plain (nobody sees it)
+    plain = window.windowIcon().cacheKey()
     window.engine.level_play = 0.9
     window._glow_icons(window.engine.level_play, 1e9)
-    assert window._icon_step == 4 and QApplication.windowIcon().cacheKey() != plain
+    # the window's own icon (the taskbar's): the app-wide one isn't swapped per step
+    assert window._icon_step == 4 and window.windowIcon().cacheKey() != plain
     window._glow_icons(0.0, 2e9)
     assert window._icon_step == 0
