@@ -38,7 +38,7 @@ import numpy as np
 import sounddevice as sd
 import soxr
 
-from soundboard import destination, livefx
+from soundboard import destination, livefx, mapped
 from soundboard.eq import EQ
 from soundboard.sendfx import Ducker, Limiter, SmartMono
 from soundboard.voicefx.builtin import PitchShift
@@ -274,7 +274,7 @@ class Ring:
         radio's: with those it wobbled by up to 1% (now 0.1%, 0.4% at worst). (Averaging
         the fill instead lags the loop, and it swings.)"""
         aim = self.prefill + n
-        return float(np.clip((self.count - aim) / aim, -1, 1))
+        return min(max((self.count - aim) / aim, -1.0), 1.0)   # (np.clip: ~5 us a number)
 
     def _estimate(self, n: int):
         """After a read of n frames: fit the writer's clock against the reader's and
@@ -303,7 +303,7 @@ class Ring:
             side = 0
         if side and side == self._est_side:
             lim = self.DRIFT_MAX
-            self._integ = float(np.clip(slope, -lim, lim))   # read at the writer's pace
+            self._integ = min(max(slope, -lim), lim)   # read at the writer's pace
             self.track_drift = True
         self._est_side = side
         if self._ex >= self.rate * self.EST_MAX_S:   # on time so far: start a fresh fit
@@ -365,11 +365,11 @@ class Ring:
                 if self.auto_drift:
                     err, kp, ki = self._mic_err(n), 0.004, 0.00005
                 else:
-                    err = float(np.clip((self.count - self.prefill) / max(self.prefill, 1),
-                                        -1, 1))
+                    err = min(max((self.count - self.prefill) / max(self.prefill, 1),
+                                  -1.0), 1.0)
                     kp, ki = lim * 0.5, 0.0002
-                self._integ = float(np.clip(self._integ + err * ki, -lim, lim))
-                want = 1.0 + float(np.clip(err * kp + self._integ, -lim, lim))
+                self._integ = min(max(self._integ + err * ki, -lim), lim)
+                want = 1.0 + min(max(err * kp + self._integ, -lim), lim)
                 self.ratio += (want - self.ratio) * 0.05          # glide, no audible warble
                 self._acc += n * self.ratio
                 m = max(1, int(self._acc))
@@ -574,8 +574,10 @@ class AuxSource:
         if self._since < SR * self.MAKEUP_EVERY_S or self._hist_n < SR:
             return
         self._since = 0
-        recent = np.roll(h, -self._hist_w, axis=0)[len(h) - self._hist_n:]
-        new = destination.cut_shares(recent, SR)
+        # the last _hist_n frames, read from the ring in place (np.roll copied all
+        # 1.5 MB of it every time)
+        new = destination.cut_shares(h, SR, at=(self._hist_w - self._hist_n) % len(h),
+                                     length=self._hist_n)
         if new:   # silence measures nothing: keep what it had
             old = self.cut_share
             self.cut_share = {c: 0.5 * old.get(c, v) + 0.5 * v for c, v in new.items()}
@@ -1234,6 +1236,8 @@ class Engine:
                 self._resample_soon(sid, data, rates_used[o], src_rate)
                 d, step[o] = data, src_rate / rates_used[o]
             per_out[o] = d
+        for d in {id(d): d for d in per_out.values()}.values():
+            mapped.warm(d, int(start * len(d)))   # a long sound on disk: read it in first
         v = Voice(sid, per_out, gain, loop, preview=preview, rates=rates_used,
                   fade_in=max(0.0, float(fade_in)), fade_out=max(0.0, float(fade_out)),
                   fixed=is_fixed(sid), cut_share=self.cut_shares(sid, data, src_rate),
@@ -1280,10 +1284,13 @@ class Engine:
     def seek(self, sid: str, frac: float) -> bool:
         with self.lock:
             v = self._current(sid)
-            if v is None:
-                return False
+        if v is None:
+            return False
+        for d in {id(d): d for d in v.data.values()}.values():
+            mapped.warm(d, int(frac * len(d)))   # before the audio thread jumps there
+        with self.lock:
             v.seek(frac)
-            return True
+        return True
 
     def state(self, sid: str) -> tuple[float, bool] | None:
         """(progress 0..1, paused) of the newest live voice for sid, or None."""
@@ -1478,7 +1485,15 @@ class Engine:
             i = pos.astype(np.int64)
             h, j, k = np.maximum(i - 1, 0), i + 1, np.minimum(i + 2, n - 1)
         f = (pos - i).astype(np.float32)[:, None]
-        p0, p1, p2, p3 = (data[x].astype(np.float32) for x in (h, i, j, k))
+        if len(i) and 1 <= i[0] <= i[-1] and i[-1] + 2 < n:
+            # no wrap: convert the few frames used once and gather from that (four
+            # gathers straight from a song's int16 cost ~70 us per sound and output)
+            lo = int(i[0]) - 1
+            w = data[lo:int(i[-1]) + 3].astype(np.float32)
+            i0 = i - lo
+            p0, p1, p2, p3 = w[i0 - 1], w[i0], w[i0 + 1], w[i0 + 2]
+        else:
+            p0, p1, p2, p3 = (data[x].astype(np.float32) for x in (h, i, j, k))
         if not loop:   # past either end: continue the line (a ramp stays a ramp)
             first, last = i == 0, i + 2 > n - 1
             p0[first] = 2 * p1[first] - p2[first]

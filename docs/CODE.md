@@ -128,6 +128,7 @@ the launcher the shortcuts and PyInstaller use. The app is the `soundboard` pack
 | `soundboard/ui/flatmap.py` | the Radio tab's flat world map (the default view, painted by Qt, no web engine); the 3D globe is its HD option |
 | `soundboard/ui/appstate.py` | stops decorative animations (logo, mascots, live dot) while another program is in front |
 | `soundboard/recorder.py` | the Radio tab's clip recorder: a rolling last-15-seconds buffer plus a recording spooled to disk |
+| `soundboard/mapped.py` | long sounds stay on disk: decoded cache files over ~30 s (or past a RAM budget) are memory-mapped, and warmed (first second read, the rest prefetched) before they play |
 | `soundboard/library.py` | decoding (bounded to 15 min), the int16 decoded-audio cache (plus each sound's rendered effects version), loudness levelling, duplicating a sound, imports and clips (FLAC), versioned config with backups |
 | `soundboard/theme.py` | colour themes (tokens → stylesheet, also read by the painted widgets) and the logo |
 | `soundboard/settings.py` | Settings window, global hotkey actions, hotkey capture dialog |

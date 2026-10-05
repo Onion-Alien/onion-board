@@ -84,6 +84,9 @@ class _BusyOwl(OwlWidget):
         self._next_act = math.inf
         self.setToolTip("")
 
+    def busy(self) -> bool:
+        return True   # always scanning: never the slow idle frames
+
     def pose(self) -> dict:
         d = super().pose()
         d["sad"] = 0.0

@@ -46,6 +46,35 @@ class _Filter:
 
 
 
+class _Line:
+    """A delay line of `d` samples, as a ring: take() the oldest c (c <= d), then
+    put() c new ones in their place. Was a np.concatenate of the whole line per
+    block (a 1 s echo copied 190 KB every few ms)."""
+
+    def __init__(self, d: int):
+        self.buf = np.zeros(d, F32)
+        self.at = 0     # the oldest sample
+
+    def __len__(self) -> int:
+        return len(self.buf)
+
+    def take(self, c: int) -> np.ndarray:
+        """The oldest c samples (a view when they don't wrap: use before put)."""
+        a, d = self.at, len(self.buf)
+        if a + c <= d:
+            return self.buf[a:a + c]
+        return np.concatenate([self.buf[a:], self.buf[:a + c - d]])
+
+    def put(self, v: np.ndarray) -> None:
+        """Replace the oldest len(v) samples with v (the newest)."""
+        a, d, c = self.at, len(self.buf), len(v)
+        k = min(c, d - a)
+        self.buf[a:a + k] = v[:k]
+        if c > k:
+            self.buf[:c - k] = v[k:]
+        self.at = (a + c) % d
+
+
 class _Stft:
     """Streaming short-time Fourier processing for one mono stream: `run(x, fn)`
     cuts the input into Hann-windowed frames (hop = n/4), hands all the frames that
@@ -840,7 +869,7 @@ class Helmet(Effect):
 
     def __init__(self, rate, values=None):
         super().__init__(rate, values)
-        self.hist = np.zeros(self._len(), F32)
+        self.hist = _Line(self._len())
 
     def _len(self) -> int:
         return max(2, int(self.rate * self.p["size"] / 1000))
@@ -848,17 +877,16 @@ class Helmet(Effect):
     def run(self, x, rate):
         d = self._len()
         if d != len(self.hist):
-            self.hist = np.zeros(d, F32)
+            self.hist = _Line(d)
         fb, mix = F32(self.p["ring"]), F32(self.p["mix"])
         out = np.empty_like(x)
         hist, n, i = self.hist, len(x), 0
         while i < n:
             c = min(d, n - i)
-            v = x[i:i + c] + fb * hist[:c]
+            v = x[i:i + c] + fb * hist.take(c)
             out[i:i + c] = v
-            hist = np.concatenate([hist[c:], v])
+            hist.put(v)
             i += c
-        self.hist = hist
         wet = out * F32(1 - float(fb) * 0.7)      # about as loud as the dry voice
         return x * (1 - mix) + wet * mix
 
@@ -914,7 +942,7 @@ class Echo(Effect):
 
     def __init__(self, rate, values=None):
         super().__init__(rate, values)
-        self.hist = np.zeros(self._len(), F32)
+        self.hist = _Line(self._len())
         self.lp = _Filter()
 
     def _len(self) -> int:
@@ -923,19 +951,18 @@ class Echo(Effect):
     def run(self, x, rate):
         d = self._len()
         if d != len(self.hist):      # delay slider moved: start a fresh line
-            self.hist = np.zeros(d, F32)
+            self.hist = _Line(d)
         fb, mix, tone = F32(self.p["feedback"]), F32(self.p["mix"]), self.p["tone"]
         out = np.empty_like(x)
         hist, n, i = self.hist, len(x), 0
         while i < n:
             c = min(d, n - i)
-            delayed = hist[:c]
+            delayed = hist.take(c)
             if tone < 12000:         # each repeat comes back a little darker
                 delayed = self.lp.run(delayed, tone, lambda: _one_pole_lowpass(tone, rate))
             out[i:i + c] = x[i:i + c] + mix * delayed
-            hist = np.concatenate([hist[c:], x[i:i + c] + fb * delayed])
+            hist.put(x[i:i + c] + fb * delayed)
             i += c
-        self.hist = hist
         return out
 
 

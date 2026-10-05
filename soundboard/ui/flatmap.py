@@ -268,6 +268,13 @@ class FlatMap(QWidget):
         self._town_pm.clear()
         self.update()
 
+    def hideEvent(self, e):
+        """Off screen (another tab, the Radio tab's globe instead): let the drawn world
+        go (~40 MB at a big zoom). It's drawn again the next time it shows."""
+        self._world = self._view = None
+        self._town_pm.clear()
+        super().hideEvent(e)
+
     # ------------------------------------------------------------------ painting
     def _grow(self) -> float:
         return min(2.0, 1 + (self.zoom - 1) * 0.15)   # dots get a little bigger zoomed in

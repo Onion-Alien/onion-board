@@ -819,3 +819,11 @@ def test_play_after_add_plays_the_added_audio_without_downloading_again(
     assert window.linkbar.play_once()                # pressed while Add downloads: waits
     assert process_events(qapp, lambda: window.current == "__link__", 5)
     assert len(calls) == 1 and len(window.cfg.sounds) == had + 1
+
+
+def test_download_progress_is_reported_at_most_ten_times_a_second():
+    seen = []
+    hook = ytdl._opts(progress=seen.append)["progress_hooks"][0]
+    for k in range(1, 1001):            # a fast download: a thousand blocks at once
+        hook({"status": "downloading", "downloaded_bytes": k, "total_bytes": 1000})
+    assert seen[0] == 0.001 and seen[-1] == 1.0 and len(seen) <= 3

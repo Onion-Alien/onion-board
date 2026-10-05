@@ -95,7 +95,8 @@ def test_v3_config_moves_voice_and_setup_past_the_new_triggers_tab(old, new):
     assert Config.from_raw({"version": 3, "tab": old}).tab == new
 
 
-def test_save_keeps_rotating_backups_only_when_something_changed(app_dir):
+def test_save_keeps_rotating_backups_only_when_something_changed(app_dir, monkeypatch):
+    monkeypatch.setattr(library, "ROTATE_EVERY_S", 0)
     c = Config()
     for vol in (0.1, 0.2, 0.3, 0.4, 0.5):
         c.sound_vol = vol
@@ -105,6 +106,20 @@ def test_save_keeps_rotating_backups_only_when_something_changed(app_dir):
     assert backups == ["config.json.1", "config.json.2", "config.json.3"]
     assert json.loads((app_dir / "config.json.1").read_text())["sound_vol"] == 0.4
     assert json.loads((app_dir / "config.json.3").read_text())["sound_vol"] == 0.2
+
+
+def test_backups_rotate_at_most_once_an_hour(app_dir, monkeypatch):
+    c = Config()
+    for vol in (0.1, 0.2, 0.3, 0.4):
+        c.sound_vol = vol
+        c.save()                         # 0.1 is there when 0.2 is saved: one rotation
+    assert sorted(p.name for p in app_dir.glob("config.json.*")) == ["config.json.1"]
+    assert json.loads((app_dir / "config.json.1").read_text())["sound_vol"] == 0.1
+    monkeypatch.setattr(library, "_rotated", {library.CONFIG_PATH: -1e9})   # an hour on
+    c.sound_vol = 0.5
+    c.save()
+    assert json.loads((app_dir / "config.json.1").read_text())["sound_vol"] == 0.4
+    assert json.loads((app_dir / "config.json.2").read_text())["sound_vol"] == 0.1
 
 
 def test_corrupt_config_is_set_aside_and_recovered_from_backup(app_dir, caplog):

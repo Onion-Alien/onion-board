@@ -262,3 +262,32 @@ def test_capture_hears_a_helper_process_tone():
     freqs = np.fft.rfftfreq(len(seg), 1 / appaudio.SR)
     assert abs(freqs[np.argmax(np.abs(np.fft.rfft(seg)))] - 440) < 5
     assert 0.002 < np.abs(x).max() < 0.01
+
+
+def test_device_list_releases_what_it_got_when_an_item_fails(monkeypatch):
+    released = []
+
+    class FakeCom:
+        def __init__(self, ptr):
+            self.ptr = ptr
+
+        def call(self, slot, argtypes, *args, what=""):
+            out = args[-1]._obj
+            if what == "Item" and args[0] == 2:
+                raise appaudio.ComError(-1, what)
+            out.value = 3 if what == "GetCount" else 100 + (args[0] if what == "Item" else 0)
+            return 0
+
+        def release(self):
+            released.append(self.ptr)
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *_):
+            self.release()
+
+    monkeypatch.setattr(appaudio, "Com", FakeCom)
+    with pytest.raises(appaudio.ComError):
+        appaudio._render_devices(FakeCom(1))
+    assert sorted(released) == [100, 100, 101]   # the list (ptr 100) and both devices

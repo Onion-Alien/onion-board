@@ -3501,8 +3501,10 @@ class MainWindow(QMainWindow):
         (soundboard.trash), where they can still be brought back for a while."""
         self._undo_timer.stop()
         self.undo_bar.hide()
-        done, self._removed = self._removed, []
-        for m, i, _d in done:
+        # let go of their audio first: Windows won't delete a mapped cache file
+        # (soundboard.mapped) while an array still points into it
+        done, self._removed = [(m, i) for m, i, _d in self._removed], []
+        for m, i in done:
             trash.put_sound(m, i)
         if done:
             self._label_bin()

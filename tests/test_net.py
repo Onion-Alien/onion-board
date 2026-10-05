@@ -463,3 +463,31 @@ def test_https_handshake_matches_stock_urllib():
     assert ours.post_handshake_auth is True and stock.post_handshake_auth is True
     assert ours.verify_mode == stock.verify_mode and ours.check_hostname
     assert ours.minimum_version == stock.minimum_version
+
+
+def test_the_relay_cuts_a_side_that_stopped_reading(monkeypatch):
+    monkeypatch.setattr(net, "PIPE_SEND_S", 0.5)
+    a, client = socket.socketpair()
+    b, site = socket.socketpair()
+    for s in (b, site):
+        s.setsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF, 4096)
+        s.setsockopt(socket.SOL_SOCKET, socket.SO_SNDBUF, 4096)
+    done = threading.Event()
+
+    def run():
+        with pytest.raises(OSError):
+            net._Relay._pipe(a, b)
+        done.set()
+    threading.Thread(target=run, daemon=True).start()
+    client.setblocking(False)
+    chunk = b"x" * 65536
+    for _ in range(400):            # the site never reads what the client sends
+        try:
+            client.send(chunk)
+        except BlockingIOError:
+            pass
+        if done.wait(0.01):
+            break
+    assert done.wait(5)             # timed out instead of waiting for ever
+    for s in (a, b, client, site):
+        s.close()

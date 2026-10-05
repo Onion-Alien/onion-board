@@ -27,7 +27,7 @@ import numpy as np
 import soundfile as sf
 import soxr
 
-from soundboard import __version__
+from soundboard import __version__, mapped
 from soundboard.engine import SR
 from soundboard.eq import BANDS as EQ_BANDS
 from soundboard.eq import MAX_DB as EQ_MAX_DB
@@ -52,7 +52,8 @@ PRIVACY_KEYS = ("net_mode", "net_proxy", "net_off", "net_offline", "netlog_keep"
 SIDE_KEYS = PRIVACY_KEYS + ("whats_new_seen",)
 CONFIG_VERSION = 4
 LOAD_TRIES = 12      # ~10 s of retries while config.json is locked
-CONFIG_BACKUPS = 3   # config.json.1 … .3, rotated on every save that changes something
+CONFIG_BACKUPS = 3   # config.json.1 … .3, rotated on a save that changes something...
+ROTATE_EVERY_S = 3600   # ...at most once an hour (the first change of a session always)
 # where install-vbcable.ps1 lives: installer/ in a source checkout, or the frozen
 # app's _internal folder (PyInstaller's _MEIPASS; build.ps1 bundles it at its root)
 RESOURCE_DIR = (Path(sys._MEIPASS) if hasattr(sys, "_MEIPASS")
@@ -674,9 +675,10 @@ def _write(snap: tuple[int, dict, str]) -> bool:
                 pass
             tmp = CONFIG_PATH.with_suffix(".tmp")
             tmp.write_text(text, encoding="utf-8")
-            if CONFIG_PATH.exists() and not damaged:
+            if CONFIG_PATH.exists() and not damaged and _rotate_due():
                 try:
                     _rotate_backups()
+                    _rotated[CONFIG_PATH] = time.monotonic()
                 except OSError:   # a backup locked for a moment mustn't block the save
                     log.warning("couldn't rotate the config backups", exc_info=True)
             tmp.replace(CONFIG_PATH)
@@ -804,6 +806,18 @@ def _privacy_path() -> Path:
     return CONFIG_PATH.with_name("privacy.json")
 
 
+_rotated: dict[Path, float] = {}   # config path -> when its backups last rotated
+
+
+def _rotate_due() -> bool:
+    """Rotate the backups now? A volume slider dragged about saves many times a
+    minute: rotating on each one copied the file every time and soon pushed out
+    every copy older than a few seconds. Once an hour keeps .1 the settings as
+    they were when this session (or hour) began."""
+    last = _rotated.get(CONFIG_PATH)
+    return last is None or time.monotonic() - last >= ROTATE_EVERY_S
+
+
 def _rotate_backups():
     """config.json -> .1, .1 -> .2, … (the oldest falls off)."""
     for i in range(CONFIG_BACKUPS, 0, -1):
@@ -928,12 +942,13 @@ def cache_path(sid: str, fx_key: str = "") -> Path:
 
 
 def load_cached(sid: str, fx_key: str = "") -> np.ndarray | None:
-    """The cached int16 audio for a sound, or None if there is none (or it's damaged)."""
+    """The cached int16 audio for a sound, or None if there is none (or it's damaged).
+    A long one stays on disk, memory-mapped (soundboard.mapped)."""
     p = cache_path(sid, fx_key)
     if not p.exists():
         return None
     try:
-        data = np.load(p)
+        data = mapped.load(p)
         if data.dtype == np.int16 and data.ndim == 2 and data.shape[1] == 2:
             return data
         log.warning("cache %s has the wrong shape/dtype; ignoring it", p.name)
@@ -943,7 +958,8 @@ def load_cached(sid: str, fx_key: str = "") -> np.ndarray | None:
 
 
 def store_cached(sid: str, data: np.ndarray, fx_key: str = "") -> np.ndarray:
-    """Write a sound's audio to the cache (atomically) and return it as int16."""
+    """Write a sound's audio to the cache (atomically) and return it as int16 (a long
+    one mapped from the file written, soundboard.mapped)."""
     i16 = to_int16(data)
     try:
         CACHE_DIR.mkdir(parents=True, exist_ok=True)
@@ -951,9 +967,10 @@ def store_cached(sid: str, data: np.ndarray, fx_key: str = "") -> np.ndarray:
         tmp = dest.with_suffix(".tmp.npy")
         np.save(tmp, i16)
         tmp.replace(dest)
-    except OSError:
+    except OSError:   # e.g. dest is mapped by audio still in use: prune_cache tidies up
         log.warning("couldn't write cache for %s", sid, exc_info=True)
-    return i16
+        return i16
+    return mapped.adopt(i16, dest)   # a long one: the file, not this copy
 
 
 def load_original(meta: SoundMeta) -> np.ndarray:
@@ -997,15 +1014,43 @@ def prune_cache(keep: set[str]):
     cache (or is writing its .tmp.npy) before the sound joins the library."""
     ids = {k.split(".")[0] for k in keep}
     try:
-        for p in CACHE_DIR.glob("*.npy"):
-            if p.stem in keep:
-                continue
-            fresh = p.name.split(".")[0] not in ids or p.name.endswith(".tmp.npy")
-            if fresh and time.time() - p.stat().st_mtime < CACHE_GRACE_S:
-                continue
-            p.unlink(missing_ok=True)
+        files = list(CACHE_DIR.glob("*.npy"))
     except OSError:
         log.debug("cache prune failed", exc_info=True)
+        return
+    for p in files:
+        if p.stem in keep:
+            continue
+        fresh = p.name.split(".")[0] not in ids or p.name.endswith(".tmp.npy")
+        try:
+            if fresh and time.time() - p.stat().st_mtime < CACHE_GRACE_S:
+                continue
+        except OSError:
+            continue
+        _unlink(p)
+
+
+def _unlink(p: Path) -> bool:
+    """Delete a cache file. False if it can't go yet: Windows refuses while a mapped
+    array still points into it (a sound just removed, still on its way out of the
+    engine). It isn't in cache_keep any more, so a later prune_cache takes it."""
+    try:
+        p.unlink(missing_ok=True)
+        return True
+    except OSError:
+        log.debug("cache file %s is still in use; left for later", p.name)
+        return False
+
+
+def unlink_cache(sid: str) -> None:
+    """Delete every cache file of a sound (its original and effects versions)."""
+    try:
+        files = list(CACHE_DIR.glob(f"{sid}*.npy"))
+    except OSError:
+        return
+    for c in files:
+        if c.stem == sid or c.stem.startswith(sid + "."):
+            _unlink(c)
 
 
 def original_frames(meta: SoundMeta) -> int:
@@ -1267,8 +1312,6 @@ def delete_file(meta: SoundMeta):
             p.unlink(missing_ok=True)
         if meta.image and Path(meta.image).parent == THUMBS_DIR:
             Path(meta.image).unlink(missing_ok=True)
-        for c in CACHE_DIR.glob(f"{meta.id}*.npy"):
-            if c.stem == meta.id or c.stem.startswith(meta.id + "."):
-                c.unlink(missing_ok=True)
     except OSError:
         log.warning("couldn't delete %s", p, exc_info=True)
+    unlink_cache(meta.id)

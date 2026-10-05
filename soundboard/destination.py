@@ -180,22 +180,33 @@ def _cut_power(hz: int, rate: int, n: int) -> np.ndarray:
     return (np.abs(h) ** 2).astype(np.float64)
 
 
-def cut_shares(data: np.ndarray, rate: int) -> dict[int, float]:
+def cut_shares(data: np.ndarray, rate: int, at: int = 0,
+               length: int | None = None) -> dict[int, float]:
     """How much of a sound's power each of LOWCUTS takes away: {cut Hz: 0..1}.
 
     Measured over the loud part of the sound (up to 128 spread-out frames of ~170 ms,
     so a long song costs the same few milliseconds as a short clip), through the
     cut's real filter response. The engine works this out once when a sound starts
-    (Engine.play) and turns it into that sound's make-up gain (makeup)."""
-    if data.ndim != 2 or len(data) < 1024:
+    (Engine.play) and turns it into that sound's make-up gain (makeup).
+
+    `at` / `length`: `data` is a ring buffer and the sound is `length` frames of it
+    from `at` on, wrapping round (AuxSource: no copy of the ring in time order)."""
+    size = len(data)
+    length = size if length is None else length
+    if data.ndim != 2 or length < 1024:
         return {}
     n = 8192 if rate >= 32000 else 4096
-    if len(data) < n:
-        n = 1 << int(math.log2(len(data)))
-    k = len(data) // n
+    if length < n:
+        n = 1 << int(math.log2(length))
+    k = length // n
     starts = np.linspace(0, k - 1, min(k, 128)).astype(np.int64) * n
+
+    def frame(s):
+        p = (at + int(s)) % size
+        return data[p:p + n] if p + n <= size else np.concatenate([data[p:], data[:p + n - size]])
+
     # only the frames used are read (a whole song's mono mix would cost 100+ ms)
-    frames = np.stack([data[s:s + n] for s in starts]).astype(F32)   # (m, n, 2)
+    frames = np.stack([frame(s) for s in starts]).astype(F32)   # (m, n, 2)
     frames = (frames[:, :, 0] + frames[:, :, 1]) * F32(
         0.5 / 32768.0 if data.dtype == np.int16 else 0.5)
     frames *= np.hanning(n).astype(F32)

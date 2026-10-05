@@ -49,6 +49,7 @@ log = logging.getLogger(__name__)
 
 IMAGE_EXTS = {".jpg", ".jpeg", ".png", ".webp", ".gif", ".image"}   # thumbnails
 MAX_BYTES = 200 * 1024 * 1024   # an audio stream bigger than this isn't a sound
+PROGRESS_EVERY_S = 0.1          # download progress to the UI: at most 10 a second
 VIDEO_MAX_BYTES = 1024 * 1024 * 1024   # ...and with the video kept (Settings > Data)
 VIDEO_EXTS = {".mp4", ".webm", ".mkv", ".mov"}
 PACKAGES = ("yt_dlp", "yt_dlp_ejs")
@@ -831,11 +832,20 @@ def _readable(e: Exception) -> FetchError:
 
 def _opts(dest: Path | None = None, progress=None, thumbnail: bool = False,
           feature: str = FEATURE, direct: bool = False, video: bool = False) -> dict:
+    last = [-1.0]
+
     def hook(d):
         if progress and d.get("status") == "downloading":
             total = d.get("total_bytes") or d.get("total_bytes_estimate") or 0
             if total:
-                progress(min(d.get("downloaded_bytes", 0) / total, 1.0))
+                # yt-dlp calls this for every block (hundreds a second on a fast
+                # line), each a signal to the UI thread: PROGRESS_EVERY_S is plenty
+                f = min(d.get("downloaded_bytes", 0) / total, 1.0)
+                now = time.monotonic()
+                if f < 1.0 and now - last[0] < PROGRESS_EVERY_S:
+                    return
+                last[0] = now
+                progress(f)
 
     opts = {
         "format": quality.current.audio_format(),   # Settings > Data & quality

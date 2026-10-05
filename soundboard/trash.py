@@ -155,9 +155,7 @@ def put_sound(meta: SoundMeta, index: int) -> None:
             d["image"] = _move(Path(meta.image), folder()).name
     except OSError:   # the audio is in the bin already: the picture stays where it is
         log.warning("couldn't move %s to the bin", meta.image, exc_info=True)
-    for c in library.CACHE_DIR.glob(f"{meta.id}*.npy"):
-        if c.stem == meta.id or c.stem.startswith(meta.id + "."):
-            c.unlink(missing_ok=True)
+    library.unlink_cache(meta.id)
     item = Item(uuid.uuid4().hex[:12], SOUND, meta.name, time.time(), d, index)
     if not _add(item):   # unlisted, it could never come back: removed instead, the
         _destroy(item)   # audio to the Recycle Bin, as a removal used to

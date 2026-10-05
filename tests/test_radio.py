@@ -612,6 +612,24 @@ def test_radio_keeps_flowing_while_the_window_is_busy(qapp, server):
         p.stop()
 
 
+def test_first_audio_is_sent_once_however_long_the_window_takes(qapp, server):
+    from PySide6.QtCore import Qt
+    p = RadioPlayer()
+    sent = []
+    p._first_audio.connect(sent.append, Qt.DirectConnection)
+    p.play(Station(uuid="u", name="Tone FM", url=server.base + "/stream.wav"))
+    try:
+        t0 = time.monotonic()
+        while not sent and time.monotonic() - t0 < 15:
+            qapp.processEvents()
+            time.sleep(0.01)
+        time.sleep(0.5)                    # busy: many more buffers, the first not seen
+        assert len(sent) == 1
+        assert process_events(qapp, lambda: p.status == "playing", timeout=5)
+    finally:
+        p.stop()
+
+
 def test_player_reports_a_dead_station(qapp, monkeypatch):
     monkeypatch.setattr(radio, "CONNECT_S", 1.5)   # FFmpeg alone can wait for minutes
     p = RadioPlayer()
@@ -1183,3 +1201,19 @@ def test_phone_remote_lists_searches_and_drives_the_radio(qapp, tab, server, mon
 
     assert remote.dispatch_radio(SimpleNamespace(radio=object(), engine=tab.engine),
                                  "radio", {}) == (409, remote.RADIO_OFF)
+
+
+def test_the_flat_map_lets_its_picture_go_while_hidden(qapp):
+    from soundboard.ui.flatmap import FlatMap
+    m = FlatMap()
+    m.resize(400, 300)
+    m.set_points([{"id": "a", "la": 50.0, "lo": 10.0, "k": 1}])
+    m.show()
+    m.grab()
+    assert m._world is not None
+    m.hide()
+    assert m._world is None and m._view is None    # tens of MB, while nobody sees it
+    m.show()
+    m.grab()
+    assert m._world is not None                    # drawn again when it shows
+    m.close()

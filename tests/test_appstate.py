@@ -23,3 +23,16 @@ def test_a_running_timer_slows_down_behind_a_game_and_back(qapp, monkeypatch):
     front[0] = False
     qapp.applicationStateChanged.emit(Qt.ApplicationInactive)
     assert not t.isActive()   # a stopped timer stays stopped
+
+
+def test_an_animation_stays_paused_in_a_minimised_window(qapp):
+    w = QWidget()
+    calls = []
+    appstate.pause_in_background(w, lambda: calls.append("start"), lambda: calls.append("stop"))
+    w.show()
+    qapp.applicationStateChanged.emit(Qt.ApplicationActive)
+    assert calls == ["start"]
+    w.showMinimized()
+    qapp.applicationStateChanged.emit(Qt.ApplicationActive)   # still "visible", minimised
+    assert calls == ["start"]
+    w.close()

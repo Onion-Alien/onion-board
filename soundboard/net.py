@@ -67,6 +67,7 @@ CONNECT_TIMEOUT_S = 20.0
 TOR_WAIT_S = 120.0                  # a connection waits this long for Tor to connect
 TOR_HANDSHAKE_S = 60.0              # Tor opening a circuit to the site
 TEST_HOST = ("api.github.com", 443)   # the Test button's target: the update check's host
+PIPE_SEND_S = 300.0                # a relayed side that takes nothing for this long is cut
 HEAD_LIMIT = 64 * 1024              # a request head bigger than this isn't FFmpeg / Qt
 # the relay's address for FFmpeg (radio) and, with their own feature's login, for child
 # processes (pip, the live-voice helper)
@@ -1121,8 +1122,11 @@ class _Relay:
         """Carry bytes both ways between the client `a` and the site `b`, counting them
         into `entry`. What a tunnel carries is the client's own: the relay only tells
         whether it's encrypted (TLS) and, for plain HTTP, reads the status line."""
-        a.settimeout(None)
-        b.settimeout(None)
+        # recv only runs once select says there's data; the timeout is for sendall: a
+        # side that stopped reading (a client gone without closing) held this thread and
+        # the site's connection for good
+        a.settimeout(PIPE_SEND_S)
+        b.settimeout(PIPE_SEND_S)
         pair = {a: b, b: a}
         first = {a: tunnel, b: True}   # the first bytes each way not yet looked at
         while True:

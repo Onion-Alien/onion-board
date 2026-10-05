@@ -185,9 +185,7 @@ def _keep_sounds(cfg: Config, point: Point) -> None:
                     trash._move(p, point.path / sub)
                 except OSError:
                     log.warning("couldn't keep %s in the restore point", p, exc_info=True)
-        for c in library.CACHE_DIR.glob(f"{m.id}*.npy"):
-            if c.stem == m.id or c.stem.startswith(m.id + "."):
-                c.unlink(missing_ok=True)
+        library.unlink_cache(m.id)
 
 
 # --------------------------------------------------------------------------- restore
