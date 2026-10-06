@@ -114,7 +114,7 @@ Name: "ffmpeg"; Description: "Play M4A, AAC and video files (the free FFmpeg, ab
 Name: "livevoice"; Description: "Set up live voice-to-speech now (needs Python, about 300 MB)"; GroupDescription: "Extra features (optional)"; Flags: unchecked
 Name: "tor"; Description: "Private connection (Tor): hides your internet address (about 22 MB)"; GroupDescription: "Privacy (optional)"; Flags: unchecked
 Name: "keepnetlog"; Description: "Keep a history of what Onion Board connects to (on this PC only)"; GroupDescription: "Privacy (optional)"; Flags: unchecked
-Name: "countme"; Description: "Count me in: an anonymous ""still here"" once a day, so we know people use it"; GroupDescription: "Privacy (optional)"
+Name: "countme"; Description: "Count me in: an anonymous ""still here"" once a day, and crash counts"; GroupDescription: "Privacy (optional)"
 Name: "desktopicon"; Description: "Put an Onion Board shortcut on my Desktop"; GroupDescription: "Shortcuts"
 
 [InstallDelete]
@@ -198,6 +198,7 @@ Type: filesandordirs; Name: "{app}\modules"
 [Code]
 const
   PrivacyURL = 'https://github.com/Onion-Alien/onion-board/blob/main/SECURITY.md#what-the-app-does-on-the-network';
+  UninstallFeedbackURL = 'https://tally.so/r/rjxjyM';   // feedback.py's FORM_URL
 
 var
   PrivacyPage: TWizardPage;
@@ -816,8 +817,23 @@ var
   Setup, Mine: String;
   Code, Default: Integer;
 begin
+  // Done: one optional question, never in a silent uninstall. Only the browser opens
+  // the page (soundboard/feedback.py's form); nothing is sent unless they submit it.
+  if (CurUninstallStep = usPostUninstall) and not UninstallSilent then
+  begin
+    if MsgBox('Onion Board has been removed.' + #13#10#13#10 +
+        'Would you tell us why? It opens a short form in your browser (no account, ' +
+        'one question). Choose No to skip.', mbConfirmation, MB_YESNO) = IDYES then
+      ShellExec('open', UninstallFeedbackURL + '?version={#AppVersion}&from=uninstall',
+        '', '', SW_SHOWNORMAL, ewNoWait, Code);
+    exit;
+  end;
   if CurUninstallStep <> usUninstall then
     exit;
+  // the anonymous usage count's "uninstall/<version>" (soundboard/usage.py): the app
+  // sends it only if the count is switched on, and gives up after 15 s offline
+  Exec(ExpandConstant('{app}\{#AppExeName}.exe'), '--uninstall-count', '', SW_HIDE,
+       ewWaitUntilTerminated, Code);
   Setup := CableSetup;
   Mine := '';
   RegQueryStringValue(HKCU, 'Software\OnionBoard', 'InstalledCable', Mine);

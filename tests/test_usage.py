@@ -199,3 +199,122 @@ def test_update_now_fetches_its_own_copy_of_the_installer():
     assert updates._installer(both)[0].endswith("/" + updates.UPDATE_ASSET)
     old = {"assets": [asset(updates.ASSET, "a")]}   # a release from before it
     assert updates._installer(old) == (updates.DOWNLOADS + "v9/" + updates.ASSET, "a" * 64, 5)
+
+
+# -- tabs, problems and uninstall ------------------------------------------------------
+
+@pytest.fixture(autouse=True)
+def _no_pending():
+    usage._pending.clear()
+    yield
+    usage._pending.clear()
+
+
+def test_the_daily_count_says_which_tabs_were_opened_then_forgets_them(sent):
+    cfg = Config(stats_sent=1.0)
+    usage.tab_opened(cfg, "radio")
+    usage.tab_opened(cfg, "voice")
+    usage.tab_opened(cfg, "radio")          # once
+    usage.tab_opened(cfg, "my secret tab")  # not a tab we know: never sent
+    usage.maybe_send(cfg)
+    paths = [h["path"] for h in _hits(sent[0][0])]
+    assert paths == [f"/app/{__version__}", "tab/radio", "tab/voice"]
+    assert cfg.stats_tabs == []
+    usage.tab_opened(cfg, "sounds")
+    usage.maybe_send(cfg)                  # the same day: kept for tomorrow
+    assert len(sent) == 1 and cfg.stats_tabs == ["sounds"]
+
+
+def _report(app_dir, name, text, mtime):
+    import os
+    folder = app_dir / applog.REPORTS_DIR
+    folder.mkdir(parents=True, exist_ok=True)
+    f = folder / name
+    f.write_text(text, encoding="utf-8")
+    os.utime(f, (mtime, mtime))
+    return f
+
+
+def test_new_crash_and_freeze_reports_are_counted_once_never_sent(sent, app_dir):
+    cfg = Config(stats_sent=1e18, stats_problems_seen=1000.0)   # daily not due
+    _report(app_dir, "crash-old.txt", "Onion Board crash report\nVersion:  1.0.0\n", 900)
+    _report(app_dir, "crash-a.txt", "Onion Board crash report\nVersion:  1.9.6\n"
+            "Fatal:    yes (the app could not continue)\n\nError\nC:\\Users\\Bob\\x", 2000)
+    _report(app_dir, "crash-b.txt", "Onion Board crash report\nVersion:  1.9.6\n", 2001)
+    _report(app_dir, "crash-c.txt", "Onion Board froze for 12 s\nVersion:  1.9.7\n", 2002)
+    saved = []
+    usage.maybe_send(cfg, lambda: saved.append(1), app_dir=app_dir)
+    hits = _hits(sent[0][0])
+    assert [h["path"] for h in hits] == ["crash/1.9.6", "error/1.9.6", "freeze/1.9.7"]
+    assert "Bob" not in sent[0][0].data.decode()
+    assert cfg.stats_problems_seen == 2002 and saved == [1]
+    usage.maybe_send(cfg, app_dir=app_dir)   # nothing new: nothing sent
+    assert len(sent) == 1
+
+
+def test_reports_from_before_counting_existed_arent_sent(sent, app_dir):
+    cfg = Config(stats_sent=1e18)   # stats_problems_seen 0: an update to this version
+    _report(app_dir, "crash-a.txt", "Onion Board crash report\nVersion:  1.9.5\n", 2000)
+    usage.maybe_send(cfg, app_dir=app_dir)
+    assert sent == [] and cfg.stats_problems_seen > 2000
+
+
+def test_a_bug_in_a_loop_is_at_most_a_few_hits(sent, app_dir):
+    cfg = Config(stats_sent=1e18, stats_problems_seen=1.0)
+    for i in range(30):
+        _report(app_dir, f"crash-{i:02}.txt", "Onion Board crash report\nVersion:  2.0.0\n",
+                100 + i)
+    usage.maybe_send(cfg, app_dir=app_dir)
+    assert len(_hits(sent[0][0])) == usage.MAX_PROBLEMS
+    assert cfg.stats_problems_seen == 129
+
+
+def test_a_run_that_never_closed_itself_is_an_unclean_exit(sent, app_dir):
+    assert usage.mark_running(app_dir) == ""       # first run
+    assert usage.mark_running(app_dir) == f"unclean-exit/{__version__}"   # never stopped
+    usage.mark_stopped(app_dir)
+    assert usage.mark_running(app_dir) == ""       # stopped cleanly
+    usage.note(f"unclean-exit/{__version__}")
+    cfg = Config(stats_sent=1e18, stats_problems_seen=1.0)
+    usage.maybe_send(cfg, app_dir=app_dir)
+    assert [h["path"] for h in _hits(sent[0][0])] == [f"unclean-exit/{__version__}"]
+    assert usage._pending == []
+
+
+def test_problems_follow_the_switch(sent, app_dir):
+    cfg = Config(stats_sent=1e18, stats_problems_seen=1.0)
+    _report(app_dir, "crash-a.txt", "Onion Board crash report\nVersion:  2.0.0\n", 2000)
+    usage.note("unclean-exit/2.0.0")
+    net.configure_features(off=["usage_stats"])
+    usage.maybe_send(cfg, app_dir=app_dir)
+    assert sent == []
+
+
+def test_uninstall_count_command_line(sent, app_dir, monkeypatch):
+    cfg = Config()
+    cfg.stats_id = "a" * 32
+    cfg.save()
+    assert app.uninstall_count() == 0
+    assert [h["path"] for h in _hits(sent[0][0])] == [f"uninstall/{__version__}"]
+    assert _hits(sent[0][0])[0]["session"] == "a" * 32
+
+
+def test_uninstall_count_sends_nothing_when_switched_off_or_never_counted(sent, app_dir):
+    assert app.uninstall_count() == 0   # no config: never counted
+    cfg = Config()
+    cfg.stats_id = "a" * 32
+    cfg.net_off = ["usage_stats"]
+    cfg.save()
+    assert app.uninstall_count() == 0
+    cfg.net_off, cfg.net_offline = [], True
+    cfg.save()
+    assert app.uninstall_count() == 0
+    assert sent == []
+
+
+def test_uninstall_count_never_fails_the_uninstall(sent, app_dir, monkeypatch):
+    cfg = Config()
+    cfg.stats_id = "a" * 32
+    cfg.save()
+    monkeypatch.setattr(usage, "send", lambda p: 1 / 0)
+    assert app.uninstall_count() == 0

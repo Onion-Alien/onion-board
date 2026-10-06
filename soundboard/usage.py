@@ -4,9 +4,15 @@ Once a day the installed app sends one "still here" to the project's GoatCounter
 (a privacy-friendly counter): the version number and a random ID made on this PC, so
 the same person isn't counted twice. Also a one-off "first start" (with where they
 heard about the app, if they picked it on the installer's last page), and "updated" when
-*Update now* installs a new version. Nothing else: no name, sounds, settings, devices,
-games or IP address in the message (GoatCounter sees the connection's address like any
-site does, and isn't sent it to keep or look up).
+*Update now* installs a new version. With the daily one: which tabs were opened since the
+last one (their names only). Soon after a start: how many problems there were since the
+last send, as counts, never the report itself: a crash report or a freeze saved
+(`crash/<version>`, `error/<version>`, `freeze/<version>`), or the last run ending
+without the app closing itself (`unclean-exit/<version>`: a hard crash, ended in Task
+Manager, a power cut). And `uninstall/<version>` when the uninstaller removes it.
+Nothing else: no name, sounds, settings, devices, games or IP address in the message
+(GoatCounter sees the connection's address like any site does, and isn't sent it to
+keep or look up).
 
 On unless switched off: the installer's "Count me in" box, or Settings > Privacy &
 security > Usage count (soundboard.net, so it also obeys Offline mode, a proxy and
@@ -25,6 +31,7 @@ import threading
 import time
 import urllib.request
 import uuid
+from pathlib import Path
 
 from soundboard import __version__, net, netlog
 
@@ -45,6 +52,11 @@ HEARD_ALIASES = {"yt": "youtube", "you tube": "youtube", "youtube.com": "youtube
                  "twitter.com": "twitter", "tiktok.com": "tiktok", "tik tok": "tiktok"}
 HEARD_MAX = 24   # characters of a typed answer, after tidying
 TIMEOUT_S = 15
+# the tabs whose use is counted (mainwindow.TABS); anything else is never sent
+TABS = ("sounds", "radio", "apps", "triggers", "voice", "setup")
+RUNNING = "running.txt"     # in the app folder while the app runs (mark_running)
+MAX_PROBLEMS = 10           # problem events per send: a bug in a loop isn't 1000 hits
+VERSION_RE = r"[0-9][0-9A-Za-z.\-]{0,20}"
 
 
 def enabled() -> bool:
@@ -89,21 +101,108 @@ def heard_tag(text: str) -> str:
     return "other-" + "-".join(words)
 
 
-def hits(cfg, now: float, event: str = "") -> list[dict]:
+def _event(name: str, sid: str) -> dict:
+    return {"path": name, "title": name, "event": True, "session": sid}
+
+
+def hits(cfg, now: float, event: str = "", extra=()) -> list[dict]:
     """What a send would say: the daily "still here" for this version if one is due
-    (and "first-start" the first time ever), or the one `event`."""
+    (with "first-start" the first time ever, and the tabs opened since the last one),
+    or the one `event`. `extra` (problem events) go now, due or not."""
     sid = install_id(cfg)
     if event:
-        return [{"path": event, "title": event, "event": True, "session": sid}]
+        return [_event(event, sid)]
+    out = [_event(e, sid) for e in extra]
     if now - cfg.stats_sent < EVERY_S:
-        return []
-    out = [{"path": f"/app/{__version__}", "title": f"Onion Board {__version__}",
-            "session": sid}]
+        return out
+    out.insert(0, {"path": f"/app/{__version__}", "title": f"Onion Board {__version__}",
+                   "session": sid})
     if not cfg.stats_sent:
         heard = heard_tag(cfg.stats_heard)
-        first = f"first-start/heard-{heard}" if heard else "first-start"
-        out.append({"path": first, "title": first, "event": True, "session": sid})
+        out.append(_event(f"first-start/heard-{heard}" if heard else "first-start", sid))
+    out += [_event(f"tab/{t}", sid) for t in cfg.stats_tabs if t in TABS]
     return out
+
+
+def tab_opened(cfg, key: str) -> None:
+    """Remember that tab `key` was opened, for the next daily count."""
+    tabs = cfg.stats_tabs if isinstance(cfg.stats_tabs, list) else []
+    if key in TABS and key not in tabs:
+        cfg.stats_tabs = [*tabs, key]
+
+
+def _report_event(path: Path) -> str:
+    """`crash/1.9.6`, `error/1.9.6` or `freeze/1.9.6` for a saved report (applog.py)."""
+    try:
+        with open(path, encoding="utf-8", errors="replace") as f:
+            head = f.read(600)
+    except OSError:
+        return ""
+    m = re.search(rf"^Version:\s*({VERSION_RE})\s*$", head, re.M)
+    ver = m.group(1) if m else __version__
+    if "froze for" in head.split("\n", 1)[0]:
+        return f"freeze/{ver}"
+    return f"{'crash' if re.search(r'^Fatal:', head, re.M) else 'error'}/{ver}"
+
+
+def problems(app_dir: Path, since: float) -> tuple[list[str], float]:
+    """Events for the crash / freeze reports saved in app_dir after `since` (a file
+    time), and the newest such time. Only the kind and version are read out."""
+    from soundboard.applog import REPORTS_DIR
+    out, newest = [], since
+    try:
+        files = sorted((f.stat().st_mtime, f.name, f)
+                       for f in (app_dir / REPORTS_DIR).glob("crash-*.txt"))
+    except OSError:
+        return [], since
+    for mtime, _name, f in files:
+        if mtime <= since:
+            continue
+        newest = max(newest, mtime)
+        ev = _report_event(f)
+        if ev and len(out) < MAX_PROBLEMS:
+            out.append(ev)
+    return out, newest
+
+
+def mark_running(app_dir: Path) -> str:
+    """At start: note that the app is running. Returns `unclean-exit/<version>` when the
+    last run never got to mark_stopped (it crashed hard, was ended in Task Manager, or
+    the PC lost power), else ""."""
+    path = app_dir / RUNNING
+    event = ""
+    try:
+        old = path.read_text(encoding="utf-8").strip()
+        if re.fullmatch(VERSION_RE, old):
+            event = f"unclean-exit/{old}"
+    except OSError:
+        pass
+    try:
+        path.write_text(__version__, encoding="utf-8")
+    except OSError:
+        pass
+    return event
+
+
+def mark_stopped(app_dir: Path) -> None:
+    """At a real quit (MainWindow.shutdown, also when Windows ends the session)."""
+    try:
+        (app_dir / RUNNING).unlink(missing_ok=True)
+    except OSError:
+        pass
+
+
+_pending: list[str] = []   # an unclean exit found at start, for the next send
+
+
+def note(event: str) -> None:
+    """Send `event` with the next count."""
+    if event:
+        _pending.append(event)
+
+
+def uninstall_event() -> str:
+    return f"uninstall/{__version__}"
 
 
 def update_event(to: str) -> str:
@@ -125,21 +224,48 @@ def send(payload: list[dict]) -> bool:
         return False
 
 
-def maybe_send(cfg, saved=None, event: str = "") -> None:
+def maybe_send(cfg, saved=None, event: str = "", app_dir: Path | None = None) -> None:
     """The daily count if it's due (or `event` now), on a thread, when it's allowed.
-    `saved()` is called on that thread after cfg.stats_sent changed."""
+    Problems since the last send go too, due or not: note()d ones, and with `app_dir`
+    the reports saved there. `saved()` is called on that thread after cfg changed."""
     if not enabled() or not net.allowed(FEATURE):
         return
     now = time.time()
-    payload = hits(cfg, now, event)
+    extra, taken, newest = [], 0, 0.0
+    if not cfg.stats_problems_seen:   # first run with this: older reports aren't news
+        cfg.stats_problems_seen = now
+    if not event:
+        taken = len(_pending)
+        extra = _pending[:taken]
+        if app_dir is not None:
+            found, newest = problems(app_dir, cfg.stats_problems_seen)
+            extra += found
+        extra = extra[:MAX_PROBLEMS]
+    payload = hits(cfg, now, event, extra)
     if not payload:
         return
+    daily = not event and not payload[0].get("event")
+    tabs = [h["path"][4:] for h in payload if h["path"].startswith("tab/")]
     netlog.cause(FEATURE, "Anonymous usage count" + (f" ({event})" if event
-                                                     else " (once a day)"))
+                                                     else " (once a day)" if daily
+                                                     else " (problems)"))
 
     def run():
-        if send(payload) and not event:
+        if not send(payload) or event:
+            return
+        if daily:
             cfg.stats_sent = now
-            if saved is not None:
-                saved()
+            cfg.stats_tabs = [t for t in cfg.stats_tabs if t not in tabs]
+        del _pending[:taken]
+        cfg.stats_problems_seen = max(cfg.stats_problems_seen, newest)
+        if saved is not None:
+            saved()
     threading.Thread(target=run, daemon=True, name="usage-count").start()
+
+
+def send_now(cfg, event: str) -> bool:
+    """Send one `event` and wait for it (the uninstaller's `--uninstall-count`)."""
+    if not enabled() or not net.allowed(FEATURE):
+        return False
+    netlog.cause(FEATURE, f"Anonymous usage count ({event})")
+    return send(hits(cfg, time.time(), event))

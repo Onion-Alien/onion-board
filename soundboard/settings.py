@@ -1981,9 +1981,11 @@ class SettingsDialog(QDialog):
                         "here still works.",
         "usage_stats": "Once a day, the installed app sends an anonymous \"still here\" "
                        "to our counter (goatcounter.com): the version number and a random "
-                       "ID made on this PC, so nobody is counted twice. Nothing else: no "
+                       "ID made on this PC, so nobody is counted twice, and which tabs you "
+                       "opened. If it crashed or froze, how many times (a count, never "
+                       "the report), and once when you uninstall. Nothing else: no "
                        "name, sounds, settings or games. It's how we know if anyone uses "
-                       "Onion Board. Off: nothing is sent.",
+                       "Onion Board, and if it's working for them. Off: nothing is sent.",
     }
 
     def _switches_card(self):
