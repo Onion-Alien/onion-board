@@ -106,7 +106,17 @@ class Flow(QLayout):
         return size
 
     def _place(self, rect: QRect, move: bool) -> int:
+        """Each item is centred on its line's height: a label beside taller chips
+        ("Now playing" before the sounds' ■ chips) sat at their top edge instead."""
         x, y, line = rect.x(), rect.y(), 0
+        row: list = []   # (item, x, hint) of the line being filled
+
+        def put():
+            if move:
+                for it, ix, hint in row:
+                    it.setGeometry(QRect(QPoint(ix, y + (line - hint.height()) // 2), hint))
+            row.clear()
+
         for it in self._items:
             if it.isEmpty():
                 continue
@@ -114,11 +124,12 @@ class Flow(QLayout):
             if hint.width() > rect.width() > 0:   # wider than the whole row: as narrow
                 hint.setWidth(max(rect.width(), it.minimumSize().width()))   # as it goes
             if line and x + hint.width() > rect.right() + 1:
+                put()
                 x, y, line = rect.x(), y + line + self._gap, 0
-            if move:
-                it.setGeometry(QRect(QPoint(x, y), hint))
+            row.append((it, x, hint))
             x += hint.width() + self._gap
             line = max(line, hint.height())
+        put()
         return y + line - rect.y()
 
 
