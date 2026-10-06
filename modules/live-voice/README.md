@@ -38,4 +38,5 @@ Argos Translate package index (mostly OPUS-MT, CC BY 4.0).
 It runs as its own process and talks to the app over a local socket (see
 `protocol.py`). The app sends it 16 kHz mic audio and it sends back text. If it
 crashes, your mic and sounds keep working. What you say never leaves your PC
-(only the one-time model download goes online).
+(only the one-time model download goes online, plus `faster-whisper` asking
+Hugging Face at each start whether the model changed; no audio or text is sent).

@@ -25,7 +25,8 @@ published. Before writing or committing anything:
 - New network access must be added to the table in `SECURITY.md`. No telemetry beyond the opt-out anonymous usage count (`soundboard/usage.py`).
 - Loopback sockets bind `127.0.0.1` and verify a secret with `secrets.compare_digest`
   (a per-launch one; the opt-in remote control API checks the key shown in Settings);
-  never log the secret.
+  never log the secret. The opt-in server for remote add-ons (Onion Pocket) is the one
+  exception: local-network addresses only, its own key.
 
 Run `python scripts/check_sensitive.py` before proposing a commit and fix anything it
 reports. Don't add `# sensitive-scan: allow` to silence it without telling the user why.
@@ -39,10 +40,14 @@ or installing anything. The short version:
 - Checks: `.venv\Scripts\ruff check .` and `.venv\Scripts\python -m pytest`
   (tests use Qt's offscreen platform — no windows, devices or hotkeys).
 - Build: `powershell -ExecutionPolicy Bypass -File build.ps1` → `dist\OnionBoard\`
-  and `dist\OnionBoardSetup.exe`. Rebuild after changing anything the app ships.
+  and `dist\OnionBoardSetup.exe` (needs MinGW-w64's g++ for the mic effect in
+  `native\directmic\`). Rebuild after changing anything the app ships.
 - Reinstall headless: `dist\OnionBoardSetup.exe /VERYSILENT /SUPPRESSMSGBOXES
   /NORESTART /CLOSEAPPLICATIONS` (a UAC prompt appears only if VB-Cable is missing
   and its box is ticked).
+- *Straight into my mic*'s set-up, `OnionBoard.exe --direct-mic …` and uninstalling
+  (when the mic effect is on a mic) ask for admin, change the mic's Windows audio settings and restart Windows' audio:
+  never run them without asking.
 - A `.venv` breaks if moved; recreate it instead.
 - Don't launch the GUI or anything that opens windows / grabs global hotkeys without
   asking first; the author may be mid-game.

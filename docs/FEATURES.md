@@ -45,16 +45,19 @@ The full list. The [README](../README.md) has the short version and how to get s
   original file is never changed.
 - **Your mic on or off:** send your voice with the sounds, or sounds only.
 - **Where your sounds go** (Setup → Devices → *Send to others through*, also in
-  Settings → Audio): **straight into your mic** (new users start here: one click and
-  one Windows permission prompt, then Discord and games hear your sounds through the
-  mic they already use, with nothing to pick there; voice changer, mic volume, gate,
-  ducking and mute all still work, and the Setup tab offers a one-click repair if a
-  Windows update takes it off), **the virtual cable** (the fallback; the Setup tab
-  and the installer offer it, unticked, and Discord or the game uses its *CABLE Output* as a mic), **another device** (any output
+  Settings → Audio): **straight into your mic** (the default for everyone, and
+  updating from the cable moves you here once: one click and one Windows permission
+  prompt, then Discord and games hear your sounds through the mic they already use,
+  with nothing to pick there; voice changer, mic volume, gate, ducking and mute all
+  still work, and the Setup tab offers a one-click repair if a Windows update takes it
+  off), **the virtual cable** (the backup: *Use the virtual cable instead* on the
+  Setup tab, or the installer's box, unticked; Discord or the game uses its *CABLE
+  Output* as a mic. Once your sounds are in your mic, the Setup tab offers to remove
+  the cable), **another device** (any output
   but your headphones: Voicemeeter, a mixer, a capture card, a second sound card, any
   output OBS captures as an *Audio Output Capture*) or **nowhere** (only you hear your
   sounds, and the stream output if you set one). With another device the app never puts
-  the cable back, never asks you to install it, and the header pill turns green once
+  the cable back, never asks you to install it, and the header pill gets a tick once
   it's sending. With nowhere nothing nags. The choice is per PC and isn't in backups.
 - **Stream output for OBS** (Settings → Audio → *Stream output*): what others hear,
   without the voice chat shaping, on a device of its own (a second virtual cable such
@@ -96,13 +99,29 @@ The full list. The [README](../README.md) has the short version and how to get s
   engine); **2D** on the globe goes back. Star stations for
   *★ Favorites*. It plays in your headphones, goes out through
   your mic when you press **LIVE**, and can *Record* or save the *Last 15s* as a pad.
+- **Apps tab:** send one program's sound (a music player, a browser, a video, a
+  call in another app) to whoever's listening, without touching any other program.
+  Each program is a card with its level, a **Send** switch, its own volume, *Hear it
+  myself* and **Record** (waits for the program to make a sound, then adds it to your
+  Sounds as a pad). Programs you switched on are picked up again next time they run.
+  Under each card, the **Clip editor** keeps that program's last minute as a live
+  waveform: freeze it, drag across the bit you want, Space to hear it, **Send** to
+  play it to others, or **Save** to keep it in *Saved clips* at the bottom of the tab
+  (double-click plays, F2 renames, right-click adds it to your Sounds, sends, copies
+  or deletes it with Undo). Cut, copy, paste, fades, louder / quieter, reverse and
+  undo are in its *Edit* menu; Ctrl+C there and Ctrl+V on the Sounds tab makes a new
+  sound; the big-view button gives one program the whole tab. A closed editor
+  doesn't listen or keep anything.
 - **Voice tab:** voice changer (20 ready voices, from Female / Male voice and Demon to
   Autotune, Talkbox, Masked caller and Dark lord; pitch with a natural-sound mode and a
   voice-size control, autotune, mic clean-up (noise gate + hiss removal), monster growl,
   robot / talkbox, helmet, shout blowout, radio with walkie-talkie clicks, echo, reverb,
-  distortion, 8-bit bitcrusher, plus add-on effects; it shows how much delay the voice
-  adds, starts off every time the app opens, and a big ON / OFF button shows which it
-  is), text-to-speech with Windows' built-in
+  distortion, 8-bit bitcrusher, plus add-on effects; *Save as a voice…* keeps your own
+  mix as a voice button, and the dice picks a random one; it shows how much delay the
+  voice adds, starts off every time the app opens, and a big ON / OFF button shows
+  which it is), **AI voices** (optional: *Get AI voices* downloads about 55 MB, needs
+  Python 3.12+; six characters turn your voice into someone else's, live on your own
+  CPU, about 75 ms behind you; *Remove AI voices* takes it all off again), text-to-speech with Windows' built-in
   voices or your own (*More options → Custom voices*: a TTS server on your PC such as
   Kokoro or AllTalk — any OpenAI-style `/v1/audio/speech` address — a TTS program, or
   Piper voice packs dropped into the voices folder), and **live voice-to-speech**:
@@ -162,7 +181,7 @@ The full list. The [README](../README.md) has the short version and how to get s
 - **⚙ Settings:** 31 themes in four groups — Classic (Dark, Light, true-black
   Midnight, High Contrast…), Colourful, Wild (Synthwave, Hacker, Amber Terminal…)
   and Meme (Flashbang, Deep Fried, Retro 98, Comic Sans…); they switch live —
-  plus hotkeys, overlay, window and audio options. A category sidebar keeps every
+  your own highlight colour, how live tabs show (a tint or a dot, in the highlight colour), plus hotkeys, overlay, window and audio options. A category sidebar keeps every
   page visible: **Privacy & security** groups online permissions and Offline mode;
   **Connection** holds Direct, proxy and Tor; **Data & quality** holds download
   sizes, radio quality and search extras; **Updates** holds update scheduling
@@ -198,6 +217,13 @@ The full list. The [README](../README.md) has the short version and how to get s
   can play, stop and mute sounds, never touch your mic. Meant for your home Wi-Fi,
   not public Wi-Fi. When a newer Onion Pocket is out, its card offers *Update Onion
   Pocket to …*: one click and the new one runs, phones still paired.
+- **Privacy:** Settings → Privacy & security has a switch for each thing the app
+  does online, and **Offline mode** switches them all off (the installer can set it
+  before the first start). Everything can go through a SOCKS5 / HTTP proxy or
+  **Tor** (*Get Tor* downloads the Tor Project's own, checked first), and never
+  quietly goes direct if that fails. **Network activity** (Settings → Connection)
+  lists every connection the app makes and why. By itself it only checks for updates
+  and sends an anonymous daily count (version + a random ID); each has its own switch.
 - **Runs in the background:** closing the window keeps it in the tray (hotkeys and
   the overlay keep working; right-click the tray icon → *Quit*). Optionally
   **starts when you sign in**, straight to the tray (Settings → General).

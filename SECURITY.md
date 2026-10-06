@@ -28,16 +28,20 @@ In scope, for example:
   control*, off by default) without its key, from another machine, or through a
   web page (e.g. DNS rebinding), or making it do more than play / stop / pause
   sounds and list them.
+- The phone remote's server (Onion Pocket, off by default) answering without its key,
+  from outside the local network, or doing more than the actions it lists.
 - The installer or `installer/install-vbcable.ps1` running something that isn't what it
   claims to be (e.g. the VB-Cable signature check being bypassable).
 - Crafted audio / video files that cause code execution, not just a failed import.
-- *Straight into my mic*: its effect DLL runs inside Windows' audio engine
+- *Straight into my mic* (how sounds reach others by default; see [below](#what-straight-into-my-mic-changes-on-your-pc)):
+  its effect DLL runs inside Windows' audio engine
   (`audiodg.exe`, as LOCAL SERVICE). Anything another local user or program can write
   into `%ProgramData%\OnionBoard\MicPlugin\ring2.bin` (signed-in users may write it,
   by design) that crashes the audio engine, runs code in it, or reads or writes outside
   the file is in scope; the effect takes the sizes once and checks every sample. So is
   the admin step (`--direct-mic install / uninstall`) installing any DLL but the app's
-  own copy, or leaving a mic's effect settings changed after an uninstall. Others on
+  own copy, touching any device but a mic Windows lists, or leaving a mic's effect
+  settings changed after an uninstall. Others on
   the PC hearing or changing what goes into your mic through that file is a known part
   of the design (anyone signed in can already record and play audio).
 - Anything that sends the user's data off the machine without them asking.
@@ -81,7 +85,7 @@ So you know what normal looks like when auditing it:
 | You click *Get Onion Watch* on the Triggers tab | `api.github.com` | asks for the Onion Watch project's latest release (version number, release page, the first lines of its notes, and its add-on zip's download link and SHA-256) | `addons` |
 | Right after that, or when you click *Update* on the Triggers tab | `github.com` → GitHub's release download server (`release-assets.githubusercontent.com`) | downloads `OnionWatch-module.zip` (only from `github.com/Onion-Alien/onion-watch/releases/download/`, HTTPS only) into `%APPDATA%\OnionBoard\updates\`, checks it against the SHA-256 GitHub lists for it, and unpacks it into `%APPDATA%\OnionBoard\modules\onion-watch\` only if every file stays inside that folder. That code then runs inside the app, like any module. The zip is deleted afterwards | `addons` |
 | Once Onion Watch is installed, with the daily update check above (only while *Check once a day* is ticked) | `api.github.com` | asks for Onion Watch's latest release too. A newer one is only offered on the Triggers tab; nothing is downloaded until you click *Update* | `addons` |
-| You pick a language under *Speak in* (Voice tab) and press its *Download* button | `argos-net.com` | downloads that language's translation model (65–195 MB) once, checks it against the SHA-256 in its add-on's `module.json`, and unpacks only the model files into `%APPDATA%\OnionBoard\translation\`. Translating what you say then happens on your PC | `voices` |
+| You pick a language under *Speak in* (Voice tab) and press its *Download* button | `argos-net.com` | downloads that language's translation model (65–196 MB) once, checks it against the SHA-256 in its add-on's `module.json`, and unpacks only the model files into `%APPDATA%\OnionBoard\translation\`. Translating what you say then happens on your PC | `voices` |
 | You press *Install the … voice* under *Speak in* (Voice tab) and say Yes to Windows' permission prompt | Windows Update (Microsoft) | Windows itself (`Add-WindowsCapability`, run elevated) downloads and installs its free text-to-speech voice for that language, the same as Settings → Speech → Add voices. The app only starts it and reads back whether it worked | `voices` |
 | You press *Support Onion Board* (Settings → Add-ons & help) | `github.com`, in your own web browser | opens this project's page at its Support section | — (your browser) |
 | You press *Report on GitHub* in the crash window | `github.com`, in your own web browser | opens a new-issue page; the report is only put on your clipboard, and nothing is posted unless you paste it and submit | — (your browser) |
@@ -262,6 +266,43 @@ No telemetry, analytics or crash upload beyond the anonymous usage count above
 release list, and nothing is installed unless you click *Update now*. *Export* only writes a zip where you save it; nothing is uploaded. Logs and
 settings stay in
 `%APPDATA%\OnionBoard\`.
+
+## What *Straight into my mic* changes on your PC
+
+Sounds reach Discord and games through your own mic by default: a small Windows audio
+effect (`native/directmic/obmic.cpp`, built from source with the app; `soundboard/directmic.py`)
+mixes them into the mic. It's the one part of the app that needs admin, and it never
+goes online.
+
+- **Setting it up** (one click in the setup guide or on the Setup tab, then Windows'
+  admin prompt; a one-click repair the same way if Windows takes it off): the app runs its own exe again as admin with
+  `--direct-mic install <mic id>`. The id must be a recording device Windows lists,
+  and the DLL copied is always the one inside the app, never a path from the command
+  line. That step copies it to `%ProgramFiles%\Onion Board Mic\` (which only admins
+  can change; the file is named after its SHA-256), registers it as an audio effect under
+  `HKLM\SOFTWARE\Classes` (`CLSID\{C55E76FE-…}` and
+  `AudioEngine\AudioProcessingObjects`), and puts it in that one mic's stream-effect
+  slot (`MMDevices\Audio\Capture\<mic>\FxProperties`). An effect the mic's driver
+  had there is kept and run first, inside ours. Every value is noted under
+  `HKLM\SOFTWARE\OnionBoard\MicPlugin` before it changes. Windows' audio stops for a
+  few seconds while this happens; a helper started first brings it back however the
+  admin step ends. It logs to `%ProgramData%\OnionBoard\directmic-admin.log`.
+- **The shared file**: `%ProgramData%\OnionBoard\MicPlugin\` gives write access to
+  LOCAL SERVICE (the audio engine), WRITE RESTRICTED and signed-in users (besides
+  admins and SYSTEM), and none to store apps. The board writes what others hear there, and the effect writes the
+  clean mic back, so the board's meter and voice changer hear only you. Every app
+  recording that mic runs its own copy of the effect. When the board is closed or
+  late, the effect crossfades back to the plain mic.
+- **Taking it off**: uninstalling Onion Board runs `--direct-mic remove`, which asks
+  for admin only if the effect is on a mic, then does what `--direct-mic uninstall`
+  (as admin) does: put every mic's values back from the notes, unregister the effect and
+  delete `Onion Board Mic` and the notes. If Windows already took the effect off (a
+  driver update, *Reset sound settings*), what's there now stays. The shared file and
+  the admin log stay in `%ProgramData%\OnionBoard\`.
+- **The virtual cable**, the fallback, is VB-Audio's own signed driver: installed by
+  `installer/install-vbcable.ps1` only when you ask, and removed by VB-Audio's own
+  uninstaller (Setup tab → *Remove the virtual cable*, or the uninstaller's question),
+  both after Windows' admin prompt.
 
 ## For users filing bug reports
 

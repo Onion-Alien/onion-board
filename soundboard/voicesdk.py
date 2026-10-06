@@ -16,10 +16,11 @@ Not detectable, so never suggested: Epic Online Services (EOSSDK ships in games 
 only use it for accounts or achievements, single-player ones included), Steam voice
 (steam_api is in nearly every Steam game), Unreal's built-in voice and Discord.
 
-Better than the game in front: the program actually recording the virtual cable's
-far end (Listeners). Windows lists who records a device the same way it lists who
-plays (soundboard.appaudio.recording_apps), so a voice chat app is named by its exe
-(VOICE_APPS) and a game by the files in its folder, as above.
+Better than the game in front: the program actually recording your mic (straight
+into my mic) or the virtual cable's far end (Listeners). Windows lists who records
+a device the same way it lists who plays (soundboard.appaudio.recording_apps), so a
+voice chat app is named by its exe (VOICE_APPS) and a game by the files in its
+folder, as above.
 
 The result is a suggestion by the picker, and the mode is switched for you only
 when *Pick the mode by itself* is ticked there (`dest["auto"]`).
@@ -260,8 +261,8 @@ class Watcher:
 
 
 class Listeners:
-    """Who records the cable's far end, as [(mode key, program name)], voice chat
-    programs (VOICE_APPS) first, then games by their files. poll() is cheap: the
+    """Who records the mic or the cable's far end, as [(mode key, program name)],
+    voice chat programs (VOICE_APPS) first, then games by their files. poll() is cheap: the
     sessions are listed (and a new game's folder scanned, once) on a thread, and it
     returns what the last look found."""
 
