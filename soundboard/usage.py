@@ -2,7 +2,8 @@
 
 Once a day the installed app sends one "still here" to the project's GoatCounter
 (a privacy-friendly counter): the version number and a random ID made on this PC, so
-the same person isn't counted twice. Also a one-off "first start", and "updated" when
+the same person isn't counted twice. Also a one-off "first start" (with where they
+heard about the app, if they picked it on the installer's last page), and "updated" when
 *Update now* installs a new version. Nothing else: no name, sounds, settings, devices,
 games or IP address in the message (GoatCounter sees the connection's address like any
 site does, and isn't sent it to keep or look up).
@@ -15,6 +16,7 @@ from __future__ import annotations
 
 import json
 import logging
+import re
 import sys
 import threading
 import time
@@ -31,6 +33,14 @@ ENDPOINT = "https://onionalien.goatcounter.com/api/v0/count"
 # read or change anything; "" sends nothing
 TOKEN = "1mdp7aoiksvjn2e3oitmjdaqd1u33msk6p74g7samuec2tufwr"  # gitleaks:allow (count-only)
 EVERY_S = 24 * 3600
+# the installer's "Where did you hear about Onion Board?" picks; Other's typed answer
+# goes through heard_tag() too, and anything else is sent as "other-<words>" or not at all
+HEARD = ("youtube", "reddit", "github", "google", "friend")
+HEARD_ALIASES = {"yt": "youtube", "you tube": "youtube", "youtube.com": "youtube",
+                 "reddit.com": "reddit", "github.com": "github", "a friend": "friend",
+                 "friends": "friend", "google.com": "google", "x": "twitter",
+                 "twitter.com": "twitter", "tiktok.com": "tiktok", "tik tok": "tiktok"}
+HEARD_MAX = 24   # characters of a typed answer, after tidying
 TIMEOUT_S = 15
 
 
@@ -46,6 +56,35 @@ def install_id(cfg) -> str:
     return cfg.stats_id
 
 
+def _wordlike(w: str) -> bool:
+    """A word, a short name ("tv") or a number: not keyboard mashing ("asdfgh")."""
+    return w.isdigit() or ((len(w) <= 3 or bool(re.search(r"[aeiouy]", w)))
+                           and not re.search(r"[^aeiouy\d]{5}", w))
+
+
+def heard_tag(text: str) -> str:
+    """The installer's answer as a short tag for the first-start event: one of HEARD,
+    "other-<a-few-words>" for a typed answer that reads like a name (a site, an app,
+    "discord server"), or "" for none. Typed text that doesn't look like that is
+    dropped, not sent: an email address, a link with a path, a number (a phone),
+    symbols, keyboard mashing or more than three words."""
+    t = " ".join(str(text or "").lower().split())
+    t = HEARD_ALIASES.get(t, t)
+    if t in HEARD:
+        return t
+    if (not t or len(t) > HEARD_MAX or "@" in t or "/" in t
+            or not re.fullmatch(r"[a-z0-9 .\-]+", t) or re.search(r"\d{3}", t)):
+        return ""
+    words = re.findall(r"[a-z0-9]+", t.replace(".com", ""))
+    if not 1 <= len(words) <= 3 or not all(_wordlike(w) for w in words):
+        return ""
+    for w in words:   # "a youtube video", "my friend", "google search"
+        w = HEARD_ALIASES.get(w, w)
+        if w in HEARD:
+            return w
+    return "other-" + "-".join(words)
+
+
 def hits(cfg, now: float, event: str = "") -> list[dict]:
     """What a send would say: the daily "still here" for this version if one is due
     (and "first-start" the first time ever), or the one `event`."""
@@ -57,8 +96,9 @@ def hits(cfg, now: float, event: str = "") -> list[dict]:
     out = [{"path": f"/app/{__version__}", "title": f"Onion Board {__version__}",
             "session": sid}]
     if not cfg.stats_sent:
-        out.append({"path": "first-start", "title": "first-start", "event": True,
-                    "session": sid})
+        heard = heard_tag(cfg.stats_heard)
+        first = f"first-start/heard-{heard}" if heard else "first-start"
+        out.append({"path": first, "title": first, "event": True, "session": sid})
     return out
 
 

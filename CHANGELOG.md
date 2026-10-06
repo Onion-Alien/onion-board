@@ -19,6 +19,11 @@
   a pad to a new place and saving do less work, so they stay smooth with hundreds of
   sounds.
 
+- **"Where did you hear about Onion Board?"** A new install with *Count me in*
+  ticked asks on the installer's last page: YouTube, Reddit, GitHub, Google, a
+  friend, or Other. Your pick goes once with the anonymous first-start count;
+  *Rather not say* is picked unless you change it.
+
 ## 1.9.2 — 2026-10-05
 
 - **Straight into my mic is steadier.** If Onion Board crashes or freezes, your
