@@ -77,10 +77,13 @@ def _fan_out(lon: np.ndarray, lat: np.ndarray) -> np.ndarray:
     keeps the middle. Dots alone on their spot get (0, 0)."""
     fan = np.zeros((len(lon), 2))
     groups: dict[tuple, list[int]] = {}
-    for i, key in enumerate(zip(np.round(lon, 3), np.round(lat, 3))):
+    # plain floats: grouping 3000 numpy numbers one by one took ~3 ms a filter change
+    for i, key in enumerate(zip(np.round(lon, 3).tolist(), np.round(lat, 3).tolist())):
         groups.setdefault(key, []).append(i)
     golden = np.pi * (3 - np.sqrt(5))
     for idx in groups.values():
+        if len(idx) < 2:
+            continue   # alone on its spot: stays (0, 0)
         for n, i in enumerate(reversed(idx)):
             r = np.sqrt(n)
             fan[i] = (r * np.cos(n * golden), r * np.sin(n * golden))

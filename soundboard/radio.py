@@ -33,7 +33,6 @@ import logging
 import random
 import re
 import socket
-import statistics
 import threading
 import sys
 import time
@@ -1057,6 +1056,13 @@ TOWNS_MAX = 600            # city and town names the maps get (each shows only z
 TOWN_SPREAD = 3.0          # a place's stations this far (degrees) from its middle are strays
 
 
+def _median(values) -> float:
+    """statistics.median, without its overhead: town_labels takes thousands of them."""
+    v = sorted(values)
+    i = len(v) // 2
+    return v[i] if len(v) % 2 else (v[i - 1] + v[i]) / 2
+
+
 def town_labels(points: list[dict], limit: int = TOWNS_MAX) -> list[dict]:
     """Cities, towns and regions to name on the maps when zoomed in, from the stations'
     own place field ("s"): {"n": name, "la", "lo": where its stations are (median),
@@ -1079,8 +1085,8 @@ def town_labels(points: list[dict], limit: int = TOWNS_MAX) -> list[dict]:
         wrap = max(lons) - min(lons) > 180
         lon = (lambda d: d["lo"] + 360 if d["lo"] < 0 else d["lo"]) if wrap else \
             (lambda d: d["lo"])
-        la = statistics.median(d["la"] for d in members)
-        lo = statistics.median(lon(d) for d in members)
+        la = _median(d["la"] for d in members)
+        lo = _median(lon(d) for d in members)
         near = [d for d in members
                 if abs(d["la"] - la) <= TOWN_SPREAD and abs(lon(d) - lo) <= TOWN_SPREAD]
         if len(near) < max(1, len(members) / 2):
@@ -1091,8 +1097,8 @@ def town_labels(points: list[dict], limit: int = TOWNS_MAX) -> list[dict]:
             spellings[n] = spellings.get(n, 0) + 1
         # the most used spelling; on a tie, a capitalised one ("Accra" over "accra")
         name = max(spellings, key=lambda n: (spellings[n], n[:1].isupper(), n))
-        mid = statistics.median(lon(d) for d in near)
-        out.append({"n": name, "la": round(statistics.median(d["la"] for d in near), 4),
+        mid = _median(lon(d) for d in near)
+        out.append({"n": name, "la": round(_median(d["la"] for d in near), 4),
                     "lo": round(mid - 360 if mid > 180 else mid, 4), "k": len(near)})
     out.sort(key=lambda t: (-t["k"], t["n"]))
     return out[:limit]
