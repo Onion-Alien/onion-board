@@ -517,6 +517,30 @@ def test_directory_falls_back_to_a_stale_cache_then_reports(qapp, tmp_path):
     assert process_events(qapp, lambda: got) and got[0][0].uuid == "uuid-1"
 
 
+def test_a_day_old_station_list_shows_at_once_and_is_refreshed_behind_it(
+        qapp, server, tmp_path, monkeypatch):
+    """Over a day old, the saved list used to wait for the directory (seconds on an
+    empty map, longer over Tor). Now it shows straight away and the fresh list
+    replaces it when it comes; if the directory can't be reached, it just stays."""
+    d = RadioDirectory(tmp_path, bases=(server.base,))
+    d._write_cache([Station.from_api(api_station(1))])
+    monkeypatch.setattr(radio, "CACHE_S", -1)                   # every list is old
+    got = []
+    d.globe_ready.connect(got.append)
+    d.load_globe()
+    assert process_events(qapp, lambda: len(got) == 2)
+    assert [s.uuid for s in got[0]] == ["uuid-1"]               # the saved one, at once
+    assert len(got[1]) == 5                                     # then the fresh one
+    dead = RadioDirectory(tmp_path / "x", bases=(dead_base(),))
+    dead._write_cache([Station.from_api(api_station(1))])
+    got, fails = [], []
+    dead.globe_ready.connect(got.append)
+    dead.failed.connect(lambda kind, msg: fails.append(kind))
+    dead.load_globe()
+    assert process_events(qapp, lambda: dead.globe_stale)
+    assert len(got) == 1 and not fails                          # no error over a list
+
+
 def test_a_directory_let_go_while_its_thread_ends_is_freed_on_the_ui_thread(
         qapp, tmp_path, monkeypatch):
     """The worker thread holds the directory; under load it could end after the
@@ -1323,7 +1347,9 @@ def test_the_flat_map_keeps_its_picture_while_tabs_flick_and_lets_it_go_later(qa
     m.hide()
     assert m._tiles and m._forget.isActive()
     m._forget.timeout.emit()                           # hidden a while
-    assert not m._tiles and not m.busy()               # tens of MB, while nobody sees it
+    # tens of MB, while nobody sees it; just the whole world's land is kept (to show
+    # the moment it's back)
+    assert {key[0][3:] for key in m._tiles} == {("land",)} and not m.busy()
     m.show()
     _drawn(qapp, m)
     assert m._tiles                                    # drawn again when it shows

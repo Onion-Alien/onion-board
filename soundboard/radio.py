@@ -597,10 +597,15 @@ class RadioDirectory(QObject):
                          lambda: self._load_globe(None, force))
 
     def _load_globe(self, cached, force: bool):
-        if cached is not None and not force and time.time() - cached[0] < CACHE_S:
+        quiet = False   # the saved list is showing: the fresh one just replaces it
+        if cached is not None and not force:
             # a saved list from before a lower bitrate cap: trimmed here, not refetched
             self.globe_ready.emit(fits(cached[1]))
-            return
+            if time.time() - cached[0] < CACHE_S:
+                return
+            # over a day old: shown straight away all the same (waiting a few seconds
+            # on an empty map for the directory was worse), and fetched afresh
+            quiet = True
         netlog.cause(FEATURE, "You refreshed the radio station list" if force else
                      "Radio tab: fetching the station list (saved for a day)")
         # Settings > Data & quality: low data mode asks for a third of the list
@@ -623,7 +628,9 @@ class RadioDirectory(QObject):
 
         def fail(msg):
             log.warning("radio directory unavailable: %s", msg)
-            if cached is not None:   # an old list beats none
+            if quiet:   # the old list is up already
+                self.globe_stale = msg or "no answer"
+            elif cached is not None:   # an old list beats none
                 self.globe_stale = msg or "no answer"
                 self.globe_ready.emit(fits(cached[1]))
             else:

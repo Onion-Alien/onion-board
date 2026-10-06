@@ -7,16 +7,18 @@ waveform scrolls (newest on the right). The first press on it freezes what's
 there into a take to edit (soundboard.clipedit.Take); the program keeps being
 kept behind it, and **Live** goes back. Drag selects; Space plays the selection
 in your headphones; Ctrl+X / C / V, Delete, Ctrl+Z work as in any editor; Enter
-saves it to your Sounds and **Send** plays it to whoever's listening."""
+keeps it in the tab's Saved clips (soundboard.ui.clipshelf) and **Send** plays it
+to whoever's listening. A copied bit also marks the system clipboard (MIME), so
+Ctrl+V on the Sounds tab adds it as a sound."""
 from __future__ import annotations
 
 import itertools
 
 import numpy as np
-from PySide6.QtCore import QLineF, QRectF, QSize, Qt, QTimer, Signal
+from PySide6.QtCore import QLineF, QMimeData, QRectF, QSize, Qt, QTimer, Signal
 from PySide6.QtGui import QAction, QColor, QKeySequence, QPainter, QPen
-from PySide6.QtWidgets import (QHBoxLayout, QLabel, QMenu, QPushButton, QSizePolicy,
-                               QVBoxLayout, QWidget)
+from PySide6.QtWidgets import (QApplication, QHBoxLayout, QLabel, QMenu, QPushButton,
+                               QSizePolicy, QVBoxLayout, QWidget)
 
 from soundboard import theme
 from soundboard.clipedit import BIN, LiveBuffer, Take, bin_peaks
@@ -31,8 +33,32 @@ MIN_VIEW = 256          # frames: the furthest it zooms in
 STEP_DB = 3.0           # Louder / Quieter
 NARROW_PX = 380         # below this the buttons keep only their icons
 LIVE_MIN_S = 10         # live, the view shows what's been heard, at least this wide
+WAVE_H = 84             # the waveform's height; in the big view it takes what there is
 _ids = itertools.count(1)
 clipboard: np.ndarray | None = None   # Ctrl+C in one card, Ctrl+V in any other
+MIME = "application/x-onionboard-clip"   # on the system clipboard while `clipboard` is the copy
+
+
+def set_clipboard(data: np.ndarray):
+    """Copy audio: for any card's editor, and (marked on the system clipboard, so
+    the newest copy wins over a picture) for Ctrl+V on the Sounds tab."""
+    global clipboard
+    clipboard = np.array(data, np.float32)
+    md = QMimeData()
+    md.setData(MIME, b"1")
+    md.setText(f"Onion Board clip ({fmt(len(clipboard))})")
+    try:
+        QApplication.clipboard().setMimeData(md)
+    except Exception:  # noqa: BLE001 - another program holding the clipboard
+        pass
+
+
+def pasted_clip() -> np.ndarray | None:
+    """The copied audio, if it's still what's on the system clipboard."""
+    if clipboard is None:
+        return None
+    md = QApplication.clipboard().mimeData()
+    return clipboard if md is not None and md.hasFormat(MIME) else None
 
 
 def fmt(frames: float) -> str:
@@ -66,7 +92,7 @@ class ClipWave(QWidget):
     def __init__(self, editor: ClipEditor):
         super().__init__(editor)
         self.ed = editor
-        self.setMinimumHeight(84)
+        self.setMinimumHeight(WAVE_H)
         self.setFocusPolicy(Qt.StrongFocus)
         self.setCursor(Qt.IBeamCursor)
         self.setAccessibleName("Clip waveform")
@@ -258,6 +284,7 @@ class ClipEditor(QWidget):
     open; `save_clip(audio, whole)` asks for the audio to become a sound (`whole`:
     nothing was selected, so dead air at its ends may be trimmed)."""
     save_clip = Signal(object, bool)
+    big_toggled = Signal(bool)   # the Big view button: this card takes the whole tab
 
     def __init__(self, engine, cfg, parent=None):
         super().__init__(parent)
@@ -301,18 +328,28 @@ class ClipEditor(QWidget):
                                self._live_clicked)
         self.btn_play = button("Play", "play", "Play the selection in your headphones only "
                                "(Space)", self.toggle_play)
-        self.btn_save = button("Save", "plus", "Save the selection to your Sounds (Enter)",
-                               self.save)
+        self.btn_save = button("Save clip", "plus", "Keep the selection in Saved clips, "
+                               "under the cards (Enter). From there: play it, name it, or "
+                               "add it to your Sounds.", self.save)
         self.btn_send = button("Send", "live", "Play the selection to whoever's listening, "
                                "right now, without saving it", self.toggle_send)
         self.btn_edit = button("Edit", "edit", "Cut, copy, paste, fades, louder / quieter, "
                                "reverse, undo", lambda: None)
         self.btn_edit.setMenu(self._make_menu())
         bar.addStretch(1)
+        self.btn_big = QPushButton()
+        self.btn_big.setObjectName("small")
+        self.btn_big.setCheckable(True)
+        self.btn_big.setToolTip("Big view: this program's editor takes the whole tab")
+        self.btn_big.setAccessibleName("Big view")
+        icons.set_icon(self.btn_big, "expand", size=13)
+        self.btn_big.toggled.connect(self.big_toggled)
+        bar.addWidget(self.btn_big)
         v.addLayout(bar)
         self.info = QLabel()
         self.info.setObjectName("hint")
         self.info.setTextFormat(Qt.PlainText)
+        self.info.setWordWrap(True)   # a long message wraps, never cut off
         self.info.setSizePolicy(QSizePolicy.Ignored, QSizePolicy.Preferred)
         v.addWidget(self.info)
 
@@ -502,13 +539,12 @@ class ClipEditor(QWidget):
             self._sync()
 
     def copy(self) -> bool:
-        global clipboard
         take = self.freeze()
         if take is None or not len(take):
             return False
-        clipboard = take.selected()
-        self.flash(f"Copied {fmt(len(clipboard))}. Ctrl+V pastes it here or in another "
-                   "program's editor.")
+        set_clipboard(take.selected())
+        self.flash(f"Copied {fmt(len(clipboard))}. Ctrl+V pastes it here, in another "
+                   "program's editor, or on the Sounds tab as a new sound.")
         return True
 
     def cut(self) -> bool:
@@ -604,6 +640,16 @@ class ClipEditor(QWidget):
                        else "Nothing heard yet.")
             return
         self.save_clip.emit(np.array(data, np.float32), whole)
+
+    def set_big(self, on: bool):
+        """The big view (AppsTab sizes the waveform to the room it has)."""
+        self.btn_big.blockSignals(True)
+        self.btn_big.setChecked(on)
+        self.btn_big.blockSignals(False)
+        self.btn_big.setToolTip("Back to the cards" if on else
+                                "Big view: this program's editor takes the whole tab")
+        if not on:
+            self.wave.setMinimumHeight(WAVE_H)
 
     # ---------------------------------------------------------- state
     def flash(self, text: str, error: bool = False, ms: int = 5000):

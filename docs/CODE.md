@@ -168,6 +168,8 @@ the launcher the shortcuts and PyInstaller use. The app is the `soundboard` pack
 | `soundboard/ui/flatmap.py` | the Radio tab's flat world map (the default view, painted by Qt, no web engine); the 3D globe is its HD option |
 | `soundboard/ui/appstate.py` | stops decorative animations (logo, mascots, live dot) while another program is in front |
 | `soundboard/ui/clipeditor.py` | the Apps tab's clip editor, folded away under each card until opened: the live waveform of the program's last minute, drag to select, play in your headphones / save as a sound / send out, the Edit menu and its keys |
+| `soundboard/ui/clipshelf.py` | the Apps tab's *Saved clips* list under the cards: what the clip editor's Save keeps; double-click plays, F2 renames, right-click adds to Sounds / sends / copies / deletes (Undo bar) |
+| `soundboard/clipshelf.py` | the saved clips without the window: FLACs in `%APPDATA%\OnionBoard\clips` and their `index.json`; deleted ones' files are tidied on the next start |
 | `soundboard/clipedit.py` | the clip editor without the window: `LiveBuffer` (the last minute and its waveform, filled on the capture thread) and `Take` (cut, paste, fades, gain, reverse, with undo capped by memory) |
 | `soundboard/recorder.py` | the Radio tab's clip recorder: a rolling last-15-seconds buffer plus a recording spooled to disk |
 | `soundboard/mapped.py` | long sounds stay on disk: decoded cache files over ~30 s (or past a RAM budget) are memory-mapped, and warmed (first second read, the rest prefetched) before they play |

@@ -125,12 +125,15 @@ class Flow(QLayout):
 class CardGrid(QLayout):
     """Lays its widgets out as a grid of equal-width cards, as many across as fit
     at `min_w` each (at most `max_cols`), stretched to fill the row. Each row is as
-    tall as its tallest card (the search results, the Apps tab)."""
+    tall as its tallest card; the cards in it too, unless `even` is off (the Apps
+    tab: one card's open clip editor mustn't stretch its neighbours)."""
 
-    def __init__(self, parent=None, min_w: int = 240, gap: int = 10, max_cols: int = 0):
+    def __init__(self, parent=None, min_w: int = 240, gap: int = 10, max_cols: int = 0,
+                 even: bool = True):
         super().__init__(parent)
         self._items, self._gap = [], gap
         self.min_w, self.max_cols = min_w, max_cols
+        self.even = even   # False: each card keeps its own height, top-aligned in its row
         self.setContentsMargins(0, 0, 0, 0)
 
     def addItem(self, item):
@@ -178,12 +181,13 @@ class CardGrid(QLayout):
         y = rect.y()
         for i in range(0, len(shown), cols):
             line = shown[i:i + cols]
-            h = max(it.heightForWidth(cw) if it.hasHeightForWidth() else it.sizeHint().height()
-                    for it in line)
-            h = max(h, *(it.minimumSize().height() for it in line))
+            hs = [max(it.heightForWidth(cw) if it.hasHeightForWidth() else it.sizeHint().height(),
+                      it.minimumSize().height()) for it in line]
+            h = max(hs)
             if move:
                 for j, it in enumerate(line):
-                    it.setGeometry(QRect(rect.x() + j * (cw + self._gap), y, cw, h))
+                    it.setGeometry(QRect(rect.x() + j * (cw + self._gap), y, cw,
+                                         h if self.even else hs[j]))
             y += h + self._gap
         return y - self._gap - rect.y()
 
