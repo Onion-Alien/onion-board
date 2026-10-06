@@ -1169,12 +1169,11 @@ PRESETS: dict[str, dict[str, dict]] = {
     # the voice and a copy 7 st down blended (deep and high at once, no one clear
     # pitch), both with a much smaller throat so it isn't your voice any more, thin
     # on bass and top, strong in the mids, and a metallic ring over it
-    "Secret detective":  {"pitch": {"semitones": -7, "size": -7, "mix": 0.5, "gap": 0,
-                                    "blur": 0.6},
+    "Secret detective":  {"pitch": {"semitones": -7, "size": -7, "mix": 0.5},
                           "compressor": {"threshold": -26, "ratio": 5, "boost": 9},
                           "tone": {"bass": -10, "mid": 7, "presence": 3, "treble": -9},
                           "radio": {"low": 150, "high": 6700, "drive": 0, "noise": 0.0},
-                          "helmet": {"size": 1.8, "ring": 0.25, "mix": 0.4}},
+                          "helmet": {"size": 1.8, "ring": 0.49, "mix": 0.79}},
     "Dark lord":         {"pitch": {"semitones": -3, "natural": 1, "size": 3},
                           "compressor": {"threshold": -26, "ratio": 4, "boost": 8},
                           "tone": {"bass": 4, "presence": 1, "treble": -3},
