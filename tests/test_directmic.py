@@ -1238,12 +1238,13 @@ def test_a_working_mic_offers_to_remove_the_cable(window, monkeypatch):  # noqa:
     _working_on_the_mic(w, monkeypatch)
     w._update_flow()
     assert "virtual cable" not in w.flow_out.text()
-    assert "don't need the virtual cable" in w.step_lbl.text()
+    assert "don't need the virtual cable" in w.rmcable_note.text()
+    assert not w.rmcable_note.isHidden() and "cable" not in w.step_lbl.text().lower()
     assert not w.btn_rmcable.isHidden()
     for cables, vbcable in (((), True), ((CABLE_IN,), False)):   # none, or not VB-Cable's
         _working_on_the_mic(w, monkeypatch, cables, vbcable)
         w._update_flow()
-        assert w.btn_rmcable.isHidden() and "virtual cable" not in w.step_lbl.text()
+        assert w.btn_rmcable.isHidden() and w.rmcable_note.isHidden()
 
 
 def test_removing_the_cable(window, monkeypatch):  # noqa: F811
@@ -1263,7 +1264,7 @@ def test_removing_the_cable(window, monkeypatch):  # noqa: F811
     assert w._cable_gone and w._tap_name() is None and not busy.is_busy(w.btn_rmcable)
     assert "Restart" in said[-1][0]
     w._update_flow()
-    assert w.btn_rmcable.isHidden() and "virtual cable" not in w.step_lbl.text()
+    assert w.btn_rmcable.isHidden() and w.rmcable_note.isHidden()
 
 
 @pytest.mark.parametrize("state", ["ready", "missing", "wiped"])

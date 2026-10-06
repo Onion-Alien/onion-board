@@ -1159,6 +1159,13 @@ class MainWindow(QMainWindow):
         self.btn_rmcable.hide()
         self.cable_removed.connect(self._cable_removed)
         self._cable_gone = False   # removed this session (Windows lists it till a restart)
+        self.rmcable_note = hint_label(
+            "<b>You don't need the virtual cable any more</b> — it was only the backup. "
+            "Remove it, or keep it if another program uses it (Voicemeeter, another "
+            "soundboard).")
+        self.rmcable_note.setTextFormat(Qt.RichText)
+        self.rmcable_note.hide()
+        cv.addWidget(self.rmcable_note)
         cv.addWidget(self.btn_rmcable, 0, Qt.AlignLeft)
         self.btn_rescan = QPushButton("I've installed it — check again")
         self.btn_rescan.clicked.connect(lambda: self.rescan_with_feedback(self.btn_rescan))
@@ -1828,11 +1835,7 @@ class MainWindow(QMainWindow):
                     "voice app's noise suppression (Discord: <b>Input Profile → Studio</b>)."
                     + (" A newer version of the mic part is ready: <b>Update</b> below "
                        "(one Windows prompt) whenever suits you."
-                       if direct == "outdated" else "")
-                    + ("<br><br><b>You don't need the virtual cable any more.</b> It was "
-                       "only the backup. Remove it below, or keep it if another program "
-                       "uses it (Voicemeeter, another soundboard)."
-                       if self._spare_cable() else ""))
+                       if direct == "outdated" else ""))
         elif route == "mic":
             state = "unrouted"
             out = f"Into your mic  <b style='color:{bad}'>✗ can't reach it</b>"
@@ -1923,7 +1926,9 @@ class MainWindow(QMainWindow):
         self._set_primary(self.btn_install, route == "mic" and not update)   # (optional)
         self._set_primary(self.btn_attach, route == "cable")
         self.btn_usecable.setVisible(route == "mic" and state != "ok" and not mic_busy)
-        self.btn_rmcable.setVisible(route == "mic" and state == "ok" and self._spare_cable())
+        spare = route == "mic" and state == "ok" and self._spare_cable()
+        self.btn_rmcable.setVisible(spare)
+        self.rmcable_note.setVisible(spare)
         if route == "mic":
             self._direct_shown = self._direct_health()
         self._cable_follow_switch()
