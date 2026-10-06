@@ -186,7 +186,7 @@ def clean_setting(k: str, v):
         return clean_programs(v)
     if k == "net_mode":   # a mode this version doesn't know (a newer one's): fail
         return v if v in NET_MODES else "proxy"   # closed, never quietly direct
-    if k in ("net_off", "tabs_off"):   # keys (strings); unknown ones are kept, so a
+    if k in ("net_off", "tabs_off", "tips_seen"):   # keys (strings); unknown ones kept, so a
         # newer version's switch stays off after a downgrade and an upgrade
         return list(dict.fromkeys(x for x in v if isinstance(x, str) and x))
     if k == "route":   # a newer version's route: back to the cable, the safe default
@@ -355,6 +355,10 @@ class Config:
     ytdlp_auto_optin: bool = False
     latency: str = "low"              # audio buffering: 'low' | 'high' (safer on flaky devices)
     setup_done: bool = False          # the quick-setup guide has been completed
+    # "Did you know?" tips (soundboard.tips): on / off, the ones shown, the day of the last
+    tips_on: bool = True
+    tips_seen: list = field(default_factory=list)
+    tip_day: str = ""
     voice_discord_tip_shown: bool = False   # "Got it" on the voice changer's Studio notice
     voice_fx: dict = field(default_factory=dict)   # voice changer (see ui.voicepanel)
     speech: dict = field(default_factory=dict)     # text-to-speech / live voice settings
