@@ -901,6 +901,11 @@ class Engine:
         self.fifo_direct = DirectFifo()
         # ...and the cable gets the same, for a voice app still set to it (CableTap)
         self.tap: CableTap | None = None
+        # Setup -> Devices -> Also send to: a copy of what others hear into each of these
+        # (set_copy_devices). A new tuple each change: the audio thread reads it once.
+        self.copies: tuple[CableTap, ...] = ()
+        self.copy_names: tuple[str, ...] = ()
+        self._copy_try: dict[str, float] = {}
         self.tap_name: str | None = None
         self._tap_try = 0.0
         self.rates = {"main": SR, "mon": SR, "mic": SR, "obs": SR}
@@ -1029,6 +1034,48 @@ class Engine:
                 log.info("also sending into %s", name)
             except Exception as e:  # noqa: BLE001 - the mic still works; retried
                 log.warning("can't also send into %s: %s", name, e)
+
+    def set_copy_devices(self, names):
+        """Also play what others hear into each of `names` (Setup -> Devices -> Also send
+        to: Voicemeeter, OBS, a second cable...). Ones already open stay open; one that
+        won't open is retried by check_streams."""
+        names = tuple(dict.fromkeys(n for n in names if n))
+        keep = {t.name: t for t in self.copies if t.name in names}
+        old, self.copies = self.copies, tuple(keep.values())
+        self.copy_names = names
+        for t in old:
+            if t.name not in keep:
+                t.close()
+        for n in names:
+            if n not in keep:
+                self._open_copy(n)
+
+    def _open_copy(self, name: str):
+        self._copy_try[name] = time.monotonic()
+        try:
+            t = CableTap(name, BUFFER.get(self.latency, "low"))
+        except Exception as e:  # noqa: BLE001 - the rest still works; retried
+            log.warning("can't also send into %s: %s", name, e)
+            return
+        log.info("also sending into %s", name)
+        self.copies = (*self.copies, t)
+
+    def copies_down(self) -> list[str]:
+        """The "Also send to" devices that aren't open (unplugged, or busy)."""
+        up = {t.name for t in self.copies}
+        return [n for n in self.copy_names if n not in up]
+
+    def _check_copies(self, now: float):
+        """The "Also send to" copies' watchdog (see check_streams)."""
+        for t in self.copies:
+            if now - t.last_cb > STALL_S:
+                log.warning("copy to %s stalled; reopening", t.name)
+                self.copies = tuple(c for c in self.copies if c is not t)
+                t.close()
+                self._open_copy(t.name)
+        for n in self.copies_down():
+            if now - self._copy_try.get(n, 0.0) >= RETRY_S:
+                self._open_copy(n)
 
     def _check_tap(self, now: float):
         """The cable tap's own watchdog (see check_streams)."""
@@ -1178,6 +1225,9 @@ class Engine:
         self.set_mic_device(self.names["mic"])
         self.set_main_device(self.names["main"])
         self.set_tap_device(self.tap_name)
+        copies = self.copy_names
+        self.set_copy_devices(())
+        self.set_copy_devices(copies)
         self.set_mon_device(self.names["mon"])
         self.set_obs_device(self.names["obs"])
 
@@ -1192,6 +1242,7 @@ class Engine:
         now = time.monotonic()
         touched = []
         self._check_tap(now)
+        self._check_copies(now)
         for key, attr, setter in (("main", "main_stream", self.set_main_device),
                                   ("mon", "mon_stream", self.set_mon_device),
                                   ("mic", "mic_stream", self.set_mic_device),
@@ -1335,6 +1386,7 @@ class Engine:
         for a in ("mic_stream", "main_stream", "mon_stream", "obs_stream"):
             self._close(a)
         self.set_tap_device(None)
+        self.set_copy_devices(())
 
     def active_outputs(self) -> set:
         outs = set()
@@ -1945,6 +1997,8 @@ class Engine:
         cable = self.tap
         if cable is not None and self.main_direct:
             cable.write(mix)
+        for c in self.copies:   # Also send to
+            c.write(mix)
         tap = self.main_tap
         if tap is not None:
             tap.append(mix.copy())

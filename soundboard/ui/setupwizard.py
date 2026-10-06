@@ -36,7 +36,7 @@ from soundboard.ui.widgets import Meter
 from soundboard import errors
 
 # step 3's "I don't use the cable" list: this choice sends nowhere (Config.route "off")
-NOWHERE = "Nowhere: only me (and the stream output)"
+NOWHERE = "Nobody: only I hear them"
 RESTART_NEEDED = 3010   # install-vbcable.ps1: installed, but Windows must restart first
 TICK_MS = 40            # the mic page's meter
 SLOW_TICK_MS = 250      # the other pages: only the cable installer to keep up with
@@ -858,7 +858,7 @@ class SetupWizard(QDialog):
                 "<b>Desktop Audio</b> picks them up, and on the <b>stream output</b> if you "
                 "set one (Settings → Audio → Stream output).<br><br>Nothing to change in "
                 "Discord or your game. To send your sounds to them later, go to the Setup "
-                "tab → Devices → <b>Send to others through</b>.")
+                "tab → Devices → <b>Send my sounds to</b> → <b>My mic</b>.")
             self.btn_copy.hide()
             self.btn_discord.hide()
             return

@@ -6,7 +6,7 @@ For people changing the code. Using the app needs none of this: the
 
 ## Sending sounds to others: straight into your mic, the virtual cable, or something else
 
-Setup → Devices → *Send to others through* (also Settings → Audio → Devices) picks
+Setup → Devices → *Send my sounds to* (also Settings → Audio → Devices) picks
 the route (`Config.route`, `library.ROUTES`):
 
 - **Straight into my mic** (new users start here, `Config.first_start`): Onion Board
@@ -58,11 +58,11 @@ the route (`Config.route`, `library.ROUTES`):
   installer is signed by VB-Audio, and runs it. Windows asks for admin permission.
   The app's *Install the free virtual cable* button runs the same script. Other
   virtual cables (VB-Cable A/B, Voicemeeter) are detected too.
-- **Another device**: any output you pick by hand (Voicemeeter, a mixer, a capture
+- **Another device** (`device`): any output you pick by name (Voicemeeter, a mixer, a capture
   card, a second sound card, an output OBS captures). No cable is needed, the app
   never swaps the cable in or asks to install it, and the send device can't be the
   headphones.
-- **Nowhere**: only you hear the sounds, plus the optional stream output.
+- **Nobody** (`off`): only you hear the sounds, plus the optional stream output.
 
 The route belongs to this PC: backups don't carry it and resetting the audio devices
 puts it back to straight into the mic. The rest of this page says "what others hear" for
@@ -152,6 +152,7 @@ the launcher the shortcuts and PyInstaller use. The app is the `soundboard` pack
 | `soundboard/appaudio.py` | the Apps tab's capture: lists the programs with an audio session (WASAPI sessions, over ctypes) and taps one program's audio with Windows' per-process loopback (a copy: the program still plays on your speakers), pushed into the engine as its own source |
 | `soundboard/ui/triggerstab.py` | the Triggers tab: Hoot (`ui/owl.py`) and *Get Onion Watch* until the add-on is installed, then the add-on's own tab, with a bar when an update is out and a button to remove it |
 | `soundboard/ui/triggershost.py` | Onion Board as the Onion Watch add-on's host: the board's sounds and playing them (a ringing trigger loops in the headphones), `Config.screen`, the trigger pictures' folder, the theme's colours |
+| `soundboard/ui/alsosend.py` | Setup → Devices → *Also send to* (`cfg.also_send`): a row per extra output with a − button, and **+ Add a device**; each gets a copy of what others hear (`Engine.set_copy_devices`, one `CableTap` each). Also built into Settings → Audio |
 | `soundboard/ui/appspanel.py` | the Apps tab: one card per program (level, **Send**, where it goes once a stream output is set: call, stream or both, volume, *Hear it myself*, and its *Clip editor*); programs you switch on are remembered by .exe and folder (a second program of the same name gets its own card, in `cfg.apps_paths`) and picked up again when they run |
 | `soundboard/directmic.py` | straight into my mic: the shared ring with the mic effect, `DirectMicStream` (the send output on the mic's clock), status / repair checks, and the one-prompt admin install / uninstall |
 | `native/directmic/` | the mic effect (`obmic.cpp`, runs inside Windows' audio engine) and `testhost.cpp`, which loads it like Windows does for the tests |

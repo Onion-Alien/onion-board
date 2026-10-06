@@ -1074,11 +1074,9 @@ class SettingsDialog(QDialog):
         people find them where they look first. Picking goes through the window."""
         mw = self.mw
         card, cv = self._card("Devices",
-                              "Your mic (input), where you listen (output) and where what "
-                              "others hear goes: straight into your mic, the virtual "
-                              "cable, another device (Voicemeeter, OBS, a mixer) or "
-                              "nowhere. Plugged something "
-                              "in? Press Re-scan.")
+                              "Your mic (input) and where you listen (output). Your "
+                              "sounds go into your mic unless you pick somewhere else "
+                              "to send them. Plugged something in? Press Re-scan.")
         grid = QGridLayout()
         grid.setHorizontalSpacing(10)
         grid.setVerticalSpacing(6)
@@ -1086,20 +1084,24 @@ class SettingsDialog(QDialog):
         for r, (text, src, attr) in enumerate((
                 ("Input — my mic", mw.cb_mic, "mic_device"),
                 ("Output — my headphones", mw.cb_mon, "mon_device"),
-                ("Send to others through", mw.cb_route, "route"),
-                (mw.main_label(), mw.cb_main, "main_device"))):
+                ("Send my sounds to", mw.cb_route, "route"))):
             cb = QComboBox()
             cb.setMinimumWidth(120)
+            # sized for a short name, the list opens wide enough for whole ones (device
+            # names in "Send my sounds to" made the page scroll sideways)
+            cb.setSizeAdjustPolicy(QComboBox.AdjustToMinimumContentsLengthWithIcon)
+            cb.setMinimumContentsLength(16)
             no_wheel(cb)
             cb.activated.connect(lambda i, src=src, attr=attr: self._pick_device(src, attr, i))
             label = QLabel(text)
             grid.addWidget(label, r, 0)
             grid.addWidget(cb, r, 1)
             self.dev_combos.append((cb, src))
-            if src is mw.cb_main:
-                self.dev_main = (label, cb)   # relabelled / hidden with the route
         grid.setColumnStretch(1, 1)
         cv.addLayout(grid)
+        from soundboard.ui import alsosend   # (its panel import imports this module)
+        # once the grid is in the card: a row added before would be its own window
+        alsosend.build(mw, grid, grid.rowCount(), icons_col=False)   # kept up to date by mw
         ref = QPushButton("Re-scan devices")
         icons.set_icon(ref, "reload")
         ref.clicked.connect(lambda: mw.rescan_with_feedback(ref, self._sync_devices))
@@ -1113,16 +1115,12 @@ class SettingsDialog(QDialog):
             for i in range(src.count()):
                 cb.addItem(src.itemText(i), src.itemData(i))
             cb.setCurrentIndex(src.currentIndex())
-        label, cb = self.dev_main
-        label.setText(self.mw.main_label())
-        for w in (label, cb):   # like the Setup tab: only a device / the cable is picked
-            w.setVisible(self.mw.cfg.route not in ("off", "mic"))
+            cb.view().setMinimumWidth(cb.view().sizeHintForColumn(0) + 32)   # whole names
 
     def _pick_device(self, src, attr, i):
         src.setCurrentIndex(i)
         self.mw.on_device(src, attr)
-        if attr == "route":   # it may have picked the cable, and shows or hides its row
-            self._sync_devices()
+        self._sync_devices()   # "Send my sounds to" never offers the headphones
 
     def _general(self):
         w, v = self._page()

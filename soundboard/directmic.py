@@ -1,5 +1,5 @@
 """The mic effect: what others hear goes straight into your real mic, no virtual cable.
-Setup -> Devices -> Send to others through -> "Straight into my mic".
+Setup -> Devices -> Send my sounds to -> "My mic".
 
 How: a small Windows audio effect (native/directmic/obmic.cpp, an "APO" like Equalizer
 APO's) runs inside Windows' audio engine on one microphone, in front of every app that
