@@ -7,7 +7,7 @@ import logging
 import threading
 import time
 
-from PySide6.QtCore import QObject, QRectF, QSize, Qt, QTimer, Signal
+from PySide6.QtCore import QObject, QRectF, QSignalBlocker, QSize, Qt, QTimer, Signal
 from PySide6.QtGui import (QBrush, QColor, QFont, QPainter, QPainterPath,
                            QPixmap)
 from PySide6.QtWidgets import (QApplication, QButtonGroup, QCheckBox, QColorDialog, QComboBox,
@@ -406,6 +406,8 @@ class SettingsDialog(QDialog):
         super().__init__(mw)
         fit.watch(self)   # grows to fit its text (ui/fit.py)
         self.mw = mw
+        if hasattr(mw, "tab_switched"):
+            mw.tab_switched.connect(self._tab_switched)
         self.setWindowTitle("Settings")
         # short enough for a 1366x768 laptop at 125 % (the pages scroll): at 600 the
         # Done button sat below the screen
@@ -958,8 +960,7 @@ class SettingsDialog(QDialog):
         cv.addWidget(send)
         v.addWidget(card)
         v.addWidget(self._stream_card())
-        if self.mw.tab_on("voice"):   # they're added on the Voice tab
-            v.addWidget(self._voices_card())
+        v.addWidget(self._voices_card())
         card, cv = self._card("Who's listening",
                               "Voice chat squashes your sounds: mono, no deep bass, and in some "
                               "games nothing above 8-12 kHz. Pick where people hear you and "
@@ -1041,10 +1042,11 @@ class SettingsDialog(QDialog):
 
     def _voices_card(self):
         """Custom text-to-speech voices live on the Voice tab (under More options); this
-        card is where people look for them first."""
+        card is where people look for them first. Hidden while the tab is switched off
+        (Settings > Tabs), and its buttons reach the Voice tab there now: switched off
+        and on again while Settings is open, that's a new one."""
         from soundboard.speech import customvoices
         mw = self.mw
-        speech = mw.voice.speech
         card, cv = self._card(
             "Custom voices (text-to-speech)",
             "Your own voices for typed lines and Talk as a computer voice: a TTS server "
@@ -1054,7 +1056,7 @@ class SettingsDialog(QDialog):
         row = _button_row()   # one line, wrapping only when the window is narrow
         add = QPushButton("Add a voice server…")
         icons.set_icon(add, "plus")
-        add.clicked.connect(speech._add_voice_server)
+        add.clicked.connect(lambda: mw.tab_on("voice") and mw.voice.speech._add_voice_server())
         row.addWidget(add)
         folder = QPushButton("Open voices folder")
         folder.setToolTip("Voice packs and voice settings go here; README.txt in it says how")
@@ -1063,12 +1065,17 @@ class SettingsDialog(QDialog):
         show = QPushButton("Show on the Voice tab")
 
         def go():
+            if not mw.tab_on("voice"):
+                return
             self.accept()
             mw.tabs.setCurrentWidget(mw.voice)
-            speech.show_custom_voices()
+            mw.voice.speech.show_custom_voices()
         show.clicked.connect(go)
         row.addWidget(show)
         cv.addLayout(row)
+        self.voices_card, self.voices_show = card, show
+        if not mw.tab_on("voice"):   # (never show() it here: not in its page yet, it'd
+            card.hide()              # flash up as a little window of its own)
         return card
 
     def _devices_card(self):
@@ -1177,6 +1184,19 @@ class SettingsDialog(QDialog):
         v.addWidget(card)
         v.addStretch(1)
         return w
+
+    def _tab_switched(self, key: str, on: bool):
+        """A tab was switched off or on (here, or by importing settings): its box, and
+        the other pages' parts that belong to it (built already, they'd still point at
+        the tab that was there)."""
+        box = getattr(self, "tab_boxes", {}).get(key)
+        if box is not None and box.isChecked() != on:
+            with QSignalBlocker(box):
+                box.setChecked(on)
+        if key == "triggers" and hasattr(self, "_watch_refresh"):
+            self._watch_refresh()
+        if key == "voice" and hasattr(self, "voices_card"):
+            self.voices_card.setVisible(on)
 
     def _reset_card(self):
         card, cv = self._card("Start over",
@@ -1410,22 +1430,29 @@ class SettingsDialog(QDialog):
     # ---- Onion Watch (the Triggers tab's add-on, soundboard.watchaddon)
     def _watch_block(self, grid):
         from soundboard import watchaddon
-        tab = self.mw.triggers
         status, b = self._addon_block(grid, "Onion Watch", "the Triggers tab")
         self.addon_label, self.addon_remove = status, b["remove"]
         self.watch_buttons = b
-        if not self.mw.tab_on("triggers"):   # nothing of it is loaded
-            status.setText("The Triggers tab is switched off (Settings > Tabs).")
-            for btn in b.values():
-                btn.hide()
-            return
         state = {}
+
+        def tab():
+            """The Triggers tab there now: switched off and on again (Settings > Tabs)
+            while this is open, it's a new one; switched off, None (nothing of it is
+            loaded)."""
+            return self.mw.triggers if self.mw.tab_on("triggers") else None
 
         def refresh(note: str = ""):
             if not qt_valid(status):
                 return
-            info = tab.info
-            have = info is not None and watchaddon.removable(info, tab._base())
+            t = tab()
+            if t is None:
+                status.setText("The Triggers tab is switched off (Settings > Tabs).")
+                for btn in b.values():
+                    btn.hide()
+                return
+            b["report"].setVisible(True)   # back on (Settings > Tabs)
+            info = t.info
+            have = info is not None and watchaddon.removable(info, t._base())
             status.setText(note or (f"Version {info.version} is installed." if have else
                                     "Onion Watch isn't installed."))
             b["get"].setVisible(not have)
@@ -1437,14 +1464,17 @@ class SettingsDialog(QDialog):
 
         def run_get(offer, btn, text):
             """tab.get() does the work (and shows it on the Triggers tab too)."""
-            if tab._busy:
+            t = tab()
+            if t is None:
+                return
+            if t._busy:
                 busy.flash(btn, "Already downloading")
                 return
-            tab.offer = offer
+            t.offer = offer
             release = busy.hold(btn, text)
 
             def finished(info, error, _update):
-                tab._finished.disconnect(finished)
+                t._finished.disconnect(finished)
                 if not qt_valid(btn):
                     return
                 release("✗ Didn't work" if error else "✓ Done")
@@ -1454,24 +1484,28 @@ class SettingsDialog(QDialog):
                               "start using it." if _update else ""))
                 QTimer.singleShot(0, lambda: refresh() if not error and not _update
                                   else None)
-            tab._finished.connect(finished)
-            tab.get()
+            t._finished.connect(finished)
+            t.get()
 
         def check():
             if state.get("offer") is not None:      # "Update to X"
                 run_get(state["offer"], b["check"], "Updating…")
                 return
-            info = tab.info
+            if tab() is None:
+                return
+            info = tab().info
 
             def found(offer):
                 state["offer"] = offer
-                tab.offer_update(offer)
+                if tab() is not None:
+                    tab().offer_update(offer)
                 refresh()
             self._addon_check(b["check"], watchaddon.FEATURE, watchaddon.latest,
                               info.version if info else "0", found)
 
         def remove():
-            tab.remove()                    # asks first
+            if tab() is not None:
+                tab().remove()              # asks first
             refresh()
 
         b["get"].clicked.connect(lambda: run_get(None, b["get"], "Getting it…"))
@@ -1479,8 +1513,10 @@ class SettingsDialog(QDialog):
         b["reinstall"].clicked.connect(lambda: run_get(None, b["reinstall"],
                                                        "Reinstalling…"))
         b["report"].clicked.connect(lambda: self._addon_report(
-            b["report"], f"Onion Watch {tab.info.version}" if tab.info else "Onion Watch"))
+            b["report"], f"Onion Watch {tab().info.version}"
+            if tab() is not None and tab().info else "Onion Watch"))
         b["remove"].clicked.connect(remove)
+        self._watch_refresh = refresh   # the Tabs page switched Triggers off or on
         refresh()   # in the card first: shown without a parent, it's a window of its own
 
     @staticmethod

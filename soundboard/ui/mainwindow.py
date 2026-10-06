@@ -207,6 +207,7 @@ class MainWindow(QMainWindow):
     config_saved = Signal(bool)         # the background save finished: ok
     voice_engine = Signal(object)       # the voice engine of the game in front (a mode key|None)
     default_found = Signal(object)      # Windows' default output, asked on a thread (str|None)
+    tab_switched = Signal(str, bool)    # Settings > Tabs: a tab (taboff.KEYS) off / on again
 
     def __init__(self):
         super().__init__()
@@ -2425,6 +2426,7 @@ class MainWindow(QMainWindow):
         self.tabs.setTabVisible(i, on)
         self._update_info_btn()
         log.info("tab %s switched %s", key, "on" if on else "off")
+        self.tab_switched.emit(key, on)
 
     def _swap_tab(self, key: str):
         """Put a freshly made `key` tab (or its stand-in) in place of the one there."""
@@ -2827,9 +2829,10 @@ class MainWindow(QMainWindow):
             on = not self.voice.fx.btn_power.isChecked()
             self._voice_was = None
             self._set_voice(on)
-            self.cue("start" if on else "stop")
+            # the Voice tab switched off: nothing went on, so no "on" beep either
+            self.cue("fail" if not self.tab_on("voice") else "start" if on else "stop")
         elif action == "__voicehold__":
-            if self._voice_was is None:
+            if self._voice_was is None and self.tab_on("voice"):
                 self._voice_was = self.voice.fx.btn_power.isChecked()
             self._set_voice(True)
         elif action == "__replay__":
@@ -3000,12 +3003,17 @@ class MainWindow(QMainWindow):
         def seen(i: int):
             if self.tabs.widget(i) is self.triggers:
                 self.tabs.currentChanged.disconnect(seen)
+                self._nudge_seen = None
                 self.triggers.nudged()
                 icons.set_tab_icon(self.tabs, index, "triggers")
+        if getattr(self, "_nudge_seen", None) is not None:   # the tab made again (Settings
+            self.tabs.currentChanged.disconnect(self._nudge_seen)   # > Tabs): one hook
+            self._nudge_seen = None
         if self.tabs.currentWidget() is self.triggers:
             self.triggers.nudged()
             icons.set_tab_icon(self.tabs, index, "triggers")
         else:
+            self._nudge_seen = seen
             self.tabs.currentChanged.connect(seen)
 
     # ------------------------------------------------------------------ sounds
@@ -4547,7 +4555,15 @@ class MainWindow(QMainWindow):
         threading.Thread(target=run, daemon=True, name="import-pack").start()
 
     def _apply_backup_settings(self, raw: dict):
+        was_off = list(self.cfg.tabs_off)
         changed = backup.apply_settings(self.cfg, raw)
+        if "tabs_off" in changed:   # the tabs follow now: a list saying one thing while
+            # the window shows another left the Voice tab unreachable, and Settings
+            # crashed reaching into a stand-in
+            off, self.cfg.tabs_off = self.cfg.tabs_off, was_off
+            for key in taboff.KEYS:
+                self.set_tab_on(key, key not in off)
+            self.set_option("tabs_off", off)   # with a newer version's keys
         if self.voice.fx.merge_saved(raw.get(backup.SAVED_VOICES)):   # their own file
             changed.append("saved voices")
         if "theme" in changed:

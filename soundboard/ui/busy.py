@@ -248,6 +248,17 @@ def hold_until(btn, text: str, signal, done: Callable[..., str | None] | None = 
     signal.connect(slot)
 
 
+def emit(signal, *args) -> bool:
+    """From a worker thread: hand a result to the widget that started it, unless that
+    widget was deleted meanwhile (its tab switched off in Settings > Tabs, the app
+    closing). Emitting on a deleted one raises, and in a worker that's a crash report."""
+    try:
+        signal.emit(*args)
+        return True
+    except RuntimeError:   # "Signal source has been deleted"
+        return False
+
+
 def open_url(url, btn=None, window: QWidget | None = None, opened: str = "",
              failed: str = "") -> bool:
     """Open a link / folder (a QUrl or str) and say so: ``opened`` flashes on ``btn``

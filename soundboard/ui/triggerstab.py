@@ -319,14 +319,15 @@ class TriggersTab(QWidget):
                 if o is None:
                     raise updates.UpdateError(
                         "there's no Onion Watch release the app can check. Try again later.")
-                self._step.emit("Downloading…")
-                path = watchaddon.fetch(o, self._progress.emit, lambda: self._cancel)
-                self._step.emit("Installing…")
+                busy.emit(self._step, "Downloading…")
+                path = watchaddon.fetch(o, lambda *a: busy.emit(self._progress, *a),
+                                        lambda: self._cancel)
+                busy.emit(self._step, "Installing…")
                 info = watchaddon.install(path, self._base())
-                self._finished.emit(info, "", update)
+                busy.emit(self._finished, info, "", update)
             except Exception as e:  # noqa: BLE001 - offline, 404, bad zip…
                 log.info("getting Onion Watch failed: %s", e)
-                self._finished.emit(None, watchaddon.friendly(e), update)
+                busy.emit(self._finished, None, watchaddon.friendly(e), update)
         threading.Thread(target=run, daemon=True, name="onion-watch").start()
 
     def cancel(self):
