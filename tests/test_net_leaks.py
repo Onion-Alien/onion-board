@@ -29,6 +29,7 @@ class Sites:
 
     def __init__(self):
         self.hits: list[tuple[str, str]] = []    # (Host header, path)
+        self.posts: list[tuple[str, bytes]] = []  # (path, body)
         self.routes: dict[str, tuple[bytes, str]] = {}
         srv = self
 
@@ -62,6 +63,14 @@ class Sites:
 
             do_HEAD = do_GET
 
+            def do_POST(self):
+                body = self.rfile.read(int(self.headers.get("Content-Length") or 0))
+                srv.hits.append((self.headers.get("Host", ""), self.path))
+                srv.posts.append((self.path, body))
+                self.send_response(202 if self.path in srv.routes else 404)
+                self.send_header("Content-Length", "0")
+                self.end_headers()
+
         self.httpd = http.server.ThreadingHTTPServer(("127.0.0.1", 0), H)
         self.port = self.httpd.server_address[1]
         threading.Thread(target=self.httpd.serve_forever, daemon=True).start()
@@ -81,7 +90,7 @@ class Sites:
 REAL_GET, REAL_OPEN = updates._get, updates._open
 
 NAMES = ("api.github", "pypi", "myinstants", "radio", "station", "cdn", "thumbs",
-         "models", "media")
+         "models", "media", "counter")
 
 
 @pytest.fixture
@@ -169,6 +178,111 @@ def test_a_custom_voice_server_on_this_pc_stays_direct(sites, socks, guard):
     v = customvoices.CustomVoice(name="Local", url=f"http://127.0.0.1:{sites.port}/tts?t={{text}}")
     data, rate = v.synth("hi")
     assert rate == 24000 and socks.asked == []
+
+
+def test_ai_voices_and_onion_pocket_release_checks(sites, socks, guard, monkeypatch,
+                                                   app_dir):
+    from soundboard import aiaddon, pocketaddon
+    monkeypatch.setattr(updates, "_get", REAL_GET)
+    for mod, path in ((aiaddon, "/ai/release"), (pocketaddon, "/pocket/latest")):
+        sites.routes[path] = (json.dumps({"name": "x 1.0.0", "tag_name": "v1.0.0",
+                                          "assets": []}).encode(), "application/json")
+        monkeypatch.setattr(mod, "API", sites.url("api.github", path))
+        monkeypatch.setattr(mod, "local_zip", lambda: None)
+        assert mod.latest() is None      # no zip to offer: only the request matters
+    assert {"/ai/release", "/pocket/latest"} <= set(sites.paths())
+    assert socks.hosts_asked() == {"api.github.test"}
+
+
+@pytest.fixture
+def counter(sites, monkeypatch):
+    """The usage count, really sent (net.urlopen isn't stubbed) to a stand-in for
+    GoatCounter that only the fake proxy / Tor can reach."""
+    import sys
+
+    from soundboard import usage
+    sites.routes["/api/v0/count"] = (b"", "")
+    monkeypatch.setattr(usage, "ENDPOINT", sites.url("counter", "/api/v0/count"))
+    monkeypatch.setattr(usage, "TOKEN", "count-only-key")
+    monkeypatch.setattr(sys, "frozen", True, raising=False)
+    monkeypatch.setattr(usage, "threading", types.SimpleNamespace(Thread=_Inline))
+    net.configure_features()
+    yield usage
+    net.configure_features()
+
+
+class _Inline:
+    def __init__(self, target, **kw):
+        self.target = target
+
+    def start(self):
+        self.target()
+
+
+def test_usage_count_through_the_proxy(sites, socks, guard, counter):
+    from soundboard.library import Config
+    cfg = Config()
+    counter.maybe_send(cfg)
+    assert cfg.stats_sent > 0 and socks.hosts_asked() == {"counter.test"}
+    ((path, body),) = sites.posts
+    hits = json.loads(body)["hits"]
+    # only what SECURITY.md says: the version, first start, and the random ID
+    assert all(set(h) <= {"path", "title", "event", "session"} for h in hits)
+    assert {h["session"] for h in hits} == {cfg.stats_id}
+
+
+@pytest.mark.parametrize("why", ["switched off", "offline", "off while waiting"])
+def test_usage_count_switched_off_never_reaches_the_counter(sites, socks, guard, counter,
+                                                            monkeypatch, why):
+    """Not just maybe_send's own check: net refuses it too, so a count already on its
+    way when the switch goes off (or anything calling send() directly) stops."""
+    from soundboard.library import Config
+    cfg = Config()
+    if why == "off while waiting":
+        def thread(target, **kw):     # switched off between the check and the send
+            net.configure_features(["usage_stats"])
+            return _Inline(target)
+        monkeypatch.setattr(counter, "threading", types.SimpleNamespace(Thread=thread))
+    else:
+        net.configure_features(["usage_stats"], offline=(why == "offline"))
+        assert counter.send(counter.hits(cfg, 1e9)) is False
+    counter.maybe_send(cfg)
+    counter.maybe_send(cfg, event="update-now/x")
+    assert sites.posts == [] and socks.asked == [] and cfg.stats_sent == 0.0
+
+
+def test_ai_voice_model_download_goes_through_the_relay(sites, socks, tmp_path):
+    """The AI voices helper fetches a missing model with plain urllib in its own
+    process: child_env("addons") must point it at the relay (so the proxy, Tor and the
+    switch hold), and with add-ons switched off it must reach nothing."""
+    import shutil
+    import subprocess
+    import sys
+    from pathlib import Path
+    src = Path(__file__).resolve().parent.parent / "modules" / "ai-voices"
+    for name in ("helper.py", "protocol.py"):
+        shutil.copy(src / name, tmp_path / name)
+    # https, as voices.json requires: the TLS handshake fails against the plain test
+    # server, but only after the proxy was asked for models.test
+    (tmp_path / "voices.json").write_text(json.dumps({"model": {
+        "url": f"https://models.test:{sites.port}/model.zip", "sha256": "0" * 64,
+        "bytes": 10}}), encoding="utf-8")
+
+    def run():
+        return subprocess.run([sys.executable, "helper.py", "--download"], cwd=tmp_path,
+                              env=net.child_env("addons"), capture_output=True, text=True,
+                              timeout=60)
+    r = run()
+    assert r.returncode != 0 and "models.test" in socks.hosts_asked()
+    socks.asked.clear()
+    net.configure_features(["addons"])
+    try:
+        r = run()
+    finally:
+        net.configure_features()
+    assert r.returncode != 0 and socks.asked == []
+    assert ("addons", "models.test", "off") in [
+        (f, h.split(":")[0], res) for f, h, res in net.relay_seen()]
 
 
 # ---------------------------------------------------------------- yt-dlp (the real one)

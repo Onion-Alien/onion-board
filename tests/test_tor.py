@@ -472,6 +472,27 @@ def test_every_python_connection_goes_through_tor(tor_socks, monkeypatch, app_di
     assert p.hosts_asked() == {"api.github.test", "myinstants.test"}
 
 
+def test_usage_count_goes_through_tor(tor_socks, monkeypatch, app_dir):
+    """The anonymous count is sent by the real net.urlopen: with Tor picked it reaches
+    the counter only through Tor's SOCKS port, never looked up or connected here."""
+    import types
+
+    from soundboard import usage
+    from soundboard.library import Config
+    sites, p = tor_socks
+    sites.routes["/api/v0/count"] = (b"", "")
+    monkeypatch.setattr(usage, "ENDPOINT", sites.url("counter", "/api/v0/count"))
+    monkeypatch.setattr(usage, "TOKEN", "count-only-key")
+    monkeypatch.setattr(sys, "frozen", True, raising=False)
+    monkeypatch.setattr(usage, "threading", types.SimpleNamespace(
+        Thread=lambda target, **kw: types.SimpleNamespace(start=target)))
+    cfg = Config()
+    with no_leaks(monkeypatch) as leaks:
+        usage.maybe_send(cfg)
+    assert leaks == [] and cfg.stats_sent > 0
+    assert p.hosts_asked() == {"counter.test"} and len(sites.posts) == 1
+
+
 def test_ytdlp_goes_through_tor(tor_socks, monkeypatch, app_dir):
     from test_radio import wav_bytes
     sites, p = tor_socks

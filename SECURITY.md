@@ -160,11 +160,11 @@ through `soundboard/net.py`:
 
 | What | How it reaches the proxy |
 |---|---|
-| Update checks and downloads, the yt-dlp updater, Myinstants, translation models, Onion Watch, custom voice servers | `net.urlopen()`: connections are opened by the proxy, and site names are sent to it unresolved |
+| Update checks and downloads, the yt-dlp updater, Myinstants, translation models, Onion Watch, AI voices, Onion Pocket, Tor's download, custom voice servers, the usage count | `net.urlopen()`: connections are opened by the proxy, and site names are sent to it unresolved |
 | yt-dlp (searches, link look-ups, downloads, and the ffmpeg it may start) | its `proxy` option, set to the relay |
 | Radio Browser and search thumbnails (Qt's network managers) | an HTTP proxy setting pointing at the relay |
 | Radio streams (Qt Multimedia / FFmpeg), including redirects, HLS playlists and segments, and ICY titles | the `http_proxy` environment variable, pointing at the relay |
-| Programs the app starts while the proxy is on (`pip` installing a module, the live-voice helper's Hugging Face download / check) | `HTTP_PROXY` / `HTTPS_PROXY` / `ALL_PROXY`, pointing at the relay. A helper already running keeps the setting it started with |
+| Programs the app starts while the proxy is on (`pip` installing a module, the AI voices helper's model download, the live-voice helper's Hugging Face download / check) | `HTTP_PROXY` / `HTTPS_PROXY` / `ALL_PROXY`, pointing at the relay. A helper already running keeps the setting it started with |
 
 The relay is a small HTTP proxy inside the app that listens on `127.0.0.1` only,
 needs a random per-launch secret (Basic auth, compared with
