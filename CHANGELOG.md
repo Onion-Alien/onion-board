@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+- **Switch category when a program is in front.** Right-click a category tab →
+  *Show this when a program is in front…* and pick your game (or any program). When
+  it comes to the front, the board and the overlay show that category by themselves
+  (and its hotkeys, with *hotkeys per category*); when it closes, the board goes back
+  to what it showed before. Pick another category by hand and it stays. All the
+  programs you've set are listed in *Settings → General*, with a switch for all of it.
+- **The search box keeps its room** on the Sounds tab in mid-size windows.
 - **Record a sound with your mic.** New **Record** button next to *Add sounds*:
   record your own voice (or, while the voice changer is on, your changed voice),
   then drag the ends to cut it, listen in your headphones, name it and *Save*. The

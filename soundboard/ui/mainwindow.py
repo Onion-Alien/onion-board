@@ -29,8 +29,8 @@ from soundboard import engine as eng
 from soundboard import theme, winkeys, ytdl
 from soundboard.engine import SR, Engine
 from soundboard.engine import is_virtual as is_virtual_cable
-from soundboard import (appaudio, autostart, backup, destination, library, midi, remote,
-                        otherboards, soundfx, thumbs, trash, updates, videos, voicesdk)
+from soundboard import (appaudio, autostart, backup, catswitch, destination, library, midi,
+                        remote, otherboards, soundfx, thumbs, trash, updates, videos, voicesdk)
 from soundboard import directmic, net, netlog, profiles, quality, shellicon, tor, usage, watchaddon
 from soundboard.replay import InstantReplay
 from soundboard.library import (AUDIO_EXTS, PAD_COLORS, RESOURCE_DIR, Config, SoundMeta,
@@ -122,6 +122,7 @@ SEARCH_WAIT_MS = 100     # typing in the search box filters the pads once it pau
 PAD_SIZE_WAIT_MS = 50    # dragging Pad size re-lays the pads at most this often
 RANDOM = "__random__:"   # hotkey action prefix: a random sound from the category after it
 ALL = "All"          # the category tab that shows every sound
+SEARCH_MIN_W = 220    # the Sounds tab's search box, until the window gets narrow
 VOICE_POLL_MS = 3000  # how often the game in front is looked at (soundboard.voicesdk)
 VOICE_POLL_IDLE_S = 15   # ...while nobody sees the hint and nothing switches by itself
 # Setup -> Devices -> Send my sounds to (Config.route, library.ROUTES): the mic, nobody,
@@ -212,6 +213,7 @@ class MainWindow(QMainWindow):
     voice_engine = Signal(object)       # the voice engine of the game in front (a mode key|None)
     default_found = Signal(object)      # Windows' default output, asked on a thread (str|None)
     tab_switched = Signal(str, bool)    # Settings > Tabs: a tab (taboff.KEYS) off / on again
+    category_programs_changed = Signal()   # a program -> category rule added / removed
 
     def __init__(self):
         super().__init__()
@@ -359,6 +361,12 @@ class MainWindow(QMainWindow):
         self._voice_at = 0.0   # when _poll_voice last ran (see _voice_tick)
         if self.voice_watch is not None:
             self._voice_timer.start(VOICE_POLL_MS)
+        # Switch category when a program is in front: a cheap look at the window in
+        # front each second, only while a rule exists (and runs while the board is hidden)
+        self.cat_switch = catswitch.Switcher()
+        self._cat_timer = QTimer(self, interval=catswitch.POLL_MS)
+        self._cat_timer.timeout.connect(self._cat_tick)
+        self._update_cat_timer()
         # the headphones follow Windows' default output when it changes
         self._default_timer = QTimer(self)
         self._default_timer.timeout.connect(self._default_tick)
@@ -775,6 +783,7 @@ class MainWindow(QMainWindow):
                                "TikTok, Myinstants…). Or paste a link (YouTube, SoundCloud, "
                                "TikTok, most media sites) to add or play it")
         self.search.setClearButtonEnabled(True)
+        self.search.setMinimumWidth(SEARCH_MIN_W)   # until the window gets narrow (_init_fit)
         # typing regrids only when the pads shown change (35 ms a key with 600 pads),
         # and only once it pauses (_on_search_text); text set by the app filters at once
         self._search_wait = QTimer(self, singleShot=True, interval=SEARCH_WAIT_MS)
@@ -3515,8 +3524,11 @@ class MainWindow(QMainWindow):
             i = tb.addTab(c.replace("&", "&&"))   # a lone & would be a shortcut key
             tb.setTabData(i, c)                   # the real name; All's data stays None
             hk = self.cfg.category_hotkeys.get(c)
+            progs = catswitch.programs_for(self.cfg.category_programs, c)
             tb.setTabToolTip(i, f"{n} sound{'s' if n != 1 else ''}"
                              + (f" · {pretty_key(hk)} plays a random one" if hk else "")
+                             + (f" · shows by itself when {', '.join(progs)} is in front"
+                                if progs else "")
                              + " · right-click to rename, delete or give it a "
                                "random-sound hotkey · drag to reorder")
         cat = self.cfg.category
@@ -3619,6 +3631,13 @@ class MainWindow(QMainWindow):
         self.cfg.categories[self.cfg.categories.index(old)] = new
         if old in self.cfg.category_hotkeys:
             self.cfg.category_hotkeys[new] = self.cfg.category_hotkeys.pop(old)
+        for exe, cat in self.cfg.category_programs.items():   # its programs come along
+            if cat == old:
+                self.cfg.category_programs[exe] = new
+        if self.cat_switch.shown == old:
+            self.cat_switch.shown = new
+        if self.cat_switch.before == old:
+            self.cat_switch.before = new
         self.shuffle.forget(old)
         for m in self._live_metas():   # removed ones too, or Undo brings `old` back
             m.tags = [new if t == old else t for t in m.tags]
@@ -3641,6 +3660,9 @@ class MainWindow(QMainWindow):
             return
         self.cfg.categories.remove(name)
         self.cfg.category_hotkeys.pop(name, None)
+        self.cfg.category_programs = {exe: cat for exe, cat
+                                      in self.cfg.category_programs.items() if cat != name}
+        self._update_cat_timer()
         self.shuffle.forget(name)
         for m in self._live_metas():   # removed ones too, or Undo brings it back
             if name in m.tags:
@@ -3669,6 +3691,10 @@ class MainWindow(QMainWindow):
         a_shuf = menu.addAction(icons.icon("next"), "Play them all, shuffled")
         a_exp = menu.addAction(icons.icon("folder"), "Export as a sound pack…")
         menu.addSeparator()
+        a_prog = menu.addAction(icons.icon("apps"), "Show this when a program is in front…")
+        a_unprog = {menu.addAction(f"Stop showing this for {exe}"): exe
+                    for exe in catswitch.programs_for(self.cfg.category_programs, name)}
+        menu.addSeparator()
         a_del = menu.addAction(icons.icon("trash", "danger_text"),
                                "Delete category (keeps the sounds)")
         act = menu.exec(self.cat_tabs.mapToGlobal(pos))
@@ -3689,6 +3715,70 @@ class MainWindow(QMainWindow):
             self.export_sounds([m for m in self.cfg.sounds if name in m.tags], name)
         elif act == a_del:
             self.delete_category(name)
+        elif act == a_prog:
+            self.pick_category_programs(name)
+        elif act in a_unprog:
+            self.remove_category_program(a_unprog[act])
+
+    # ------------------------------------------------------------ program -> category
+    def _update_cat_timer(self):
+        on = bool(self.cfg.category_programs_on and self.cfg.category_programs)
+        if on and not self._cat_timer.isActive():
+            self._cat_timer.start()
+        elif not on:
+            self._cat_timer.stop()
+            self.cat_switch.reset()
+
+    def _cat_tick(self):
+        sw = self.cat_switch.poll(self.cfg.category_programs, self.cfg.category,
+                                  self.cfg.categories)
+        if sw is None:
+            return
+        self.set_category(sw.category)
+        names = ["", *self.cfg.categories]
+        n = names.index(sw.category) if sw.category in names else 0
+        self.cue((523,) if n == 0 else ((784, 0) * min(n, 5))[:-1])   # as step_category
+        shown = html.escape(sw.category or ALL)
+        self.toast(f"Back to “{shown}” ({html.escape(sw.exe)} closed)" if sw.back
+                   else f"Switched to “{shown}” ({html.escape(sw.exe)} is in front)")
+
+    def pick_category_programs(self, name: str):
+        """A category's menu → Show this when a program is in front…"""
+        from soundboard.ui.programpick import ProgramPicker
+        d = ProgramPicker(name, dict(self.cfg.category_programs), self)
+        picked = d.picked if d.exec() else []
+        free_dialog(d)
+        for exe in picked:
+            self.add_category_program(name, exe, quiet=True)
+        if picked:
+            self.toast(f"✓ “{html.escape(name)}” shows by itself when "
+                       f"{html.escape(', '.join(picked))} is in front", "ok")
+
+    def add_category_program(self, name: str, exe: str, quiet: bool = False):
+        exe = catswitch.exe_name(exe)
+        if not exe or name not in self.cfg.categories:
+            return
+        self.cfg.category_programs[exe] = name   # one category per program
+        self._category_programs_changed()
+        if not quiet:
+            self.toast(f"✓ “{html.escape(name)}” shows by itself when "
+                       f"{html.escape(exe)} is in front", "ok")
+
+    def remove_category_program(self, exe: str):
+        if self.cfg.category_programs.pop(exe, None) is not None:
+            self._category_programs_changed()
+
+    def set_category_programs_on(self, on: bool):
+        self.cfg.category_programs_on = bool(on)
+        self._category_programs_changed()
+
+    def _category_programs_changed(self):
+        self.cat_switch.reset()
+        self.cat_switch.front_pid = 0   # the program in front now counts as arriving
+        self._update_cat_timer()
+        self._save_now()
+        self._fill_categories()
+        self.category_programs_changed.emit()
 
     def _tag_new(self, meta: SoundMeta):
         """A sound added while a category is showing goes into it (so it doesn't seem
@@ -4664,7 +4754,13 @@ class MainWindow(QMainWindow):
 
     def _apply_backup_settings(self, raw: dict):
         was_off = list(self.cfg.tabs_off)
+        had_programs = dict(self.cfg.category_programs)
         changed = backup.apply_settings(self.cfg, raw)
+        if "category_programs" in changed:   # added to the rules here, not in their place
+            self.cfg.category_programs = {**had_programs, **self.cfg.category_programs}
+            self.cat_switch.reset()
+            self._update_cat_timer()
+            self._fill_categories()
         if "tabs_off" in changed:   # the tabs follow now: a list saying one thing while
             # the window shows another left the Voice tab unreachable, and Settings
             # crashed reaching into a stand-in
@@ -5617,6 +5713,9 @@ class MainWindow(QMainWindow):
         f.add(60, "w", r.hide(self.wordmark))
         f.add(60, "w", r.icon_only(self.btn_add))
         f.add(13, "w", r.icon_only(self.btn_record))
+        # the search box keeps room to type in until the buttons beside it have shrunk
+        f.add(62, "w", lambda tight: (self.search.setMinimumWidth(0 if tight else SEARCH_MIN_W),
+                                      r.touch(self.search)))
         f.add(35, "w", r.hide(self.btn_more))   # also in Settings → General
         f.add(15, "w", r.icon_only(self.btn_folder))
         f.add(33, "w", r.hide(self.btn_folder))   # also in the Backup menu

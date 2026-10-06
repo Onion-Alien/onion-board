@@ -33,7 +33,8 @@ Version **1.9.6** · Windows 10 / 11 · free, no account, no ads, anonymous usag
 - **One-click sounds**: search YouTube, SoundCloud and Myinstants inside the app and
   add a sound in one click, drag in files, or record one with your mic.
 - **Hotkeys that work in-game**, an in-game overlay, MIDI pads, Stream Deck support,
-  and your pads on your phone with the optional Onion Pocket add-on.
+  and your pads on your phone with the optional Onion Pocket add-on. Open your game
+  and the board switches to that game's sounds by itself.
 - **Bring your board over** from Soundpad, Resanance, Soundux or EXP Soundboard:
   sounds, names, categories and hotkeys, in one click.
 - **Effects on any sound**: trim, speed, pitch, bass boost, reverse. One-click

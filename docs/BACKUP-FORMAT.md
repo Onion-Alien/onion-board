@@ -108,7 +108,8 @@ switch, port and key, remote add-ons' settings (Onion Pocket), the network setti
 & quality settings, the usage count's ID and state, and the downloaded-code settings
 (yt-dlp auto-update, the update check and its state). On
 import only known settings of the right type are used, and only if the user says
-yes.
+yes. `category_programs` (`{"game.exe": "Category"}`, *Switch category when a program
+is in front*) is added to the rules already there rather than replacing them.
 
 It also holds `saved_voices`, the voice changer's saved voices (kept in a file of
 their own in the app, so not a `Config` field), when there are any:
