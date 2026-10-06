@@ -569,6 +569,8 @@ def dispatch(mw: MainWindow, action: str, params: dict) -> tuple[int, object]:
         mw.set_sending(on)
         return 200, {"live": bool(mw.engine.sending)}
     if action == "voice":
+        if not mw.tab_on("voice"):
+            return 409, VOICE_OFF
         on = on_value(params, mw.voice.fx.btn_power.isChecked())
         if on is None:
             return 400, BAD_ON
@@ -775,8 +777,9 @@ RADIO_ACTIONS = ("stations", "radio", "radio_random", "radio_star", "radio_live"
                  "radio_hear", "radio_volume")
 STATIONS_MAX = 100      # stations in one answer
 RADIO_LISTS = ("popular", "favorites", "favourites", "recent")
-RADIO_OFF = {"error": "the radio is switched off in Onion Board's Settings > Privacy & "
-                      "security"}
+RADIO_OFF = {"error": "the radio is switched off in Onion Board's Settings (Privacy & "
+                      "security, or Tabs)"}
+VOICE_OFF = {"error": "the Voice tab is switched off in Onion Board's Settings > Tabs"}
 
 
 def _radio_tab(mw: MainWindow):

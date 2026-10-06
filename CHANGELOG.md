@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased
+
+- **Switch off the tabs you don't use.** New *Settings → Tabs*: untick Radio, Apps,
+  Triggers or Voice and that tab is gone from the window and doesn't load at all,
+  next start included, so nothing of it runs in the background. Tick it again any
+  time and it's back straight away. Sounds and Setup always stay.
+
 ## 1.9.4 — 2026-10-06
 
 - **Simpler Devices card.** *Setup → Devices* is now just *My headphones*, *My

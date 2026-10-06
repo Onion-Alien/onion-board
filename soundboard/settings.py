@@ -419,6 +419,7 @@ class SettingsDialog(QDialog):
                  ("connection", "Connection", "radio", self._connection),
                  ("data", "Data && quality", "wave", self._data),
                  ("general", "General", "settings", self._general),
+                 ("tabs", "Tabs", "sounds", self._tabs),
                  ("appearance", "Appearance", "palette", self._appearance),
                  ("audio", "Audio", "volume", self._audio),
                  ("hotkeys", "Hotkeys", "keyboard", self._hotkeys),
@@ -957,7 +958,8 @@ class SettingsDialog(QDialog):
         cv.addWidget(send)
         v.addWidget(card)
         v.addWidget(self._stream_card())
-        v.addWidget(self._voices_card())
+        if self.mw.tab_on("voice"):   # they're added on the Voice tab
+            v.addWidget(self._voices_card())
         card, cv = self._card("Who's listening",
                               "Voice chat squashes your sounds: mono, no deep bass, and in some "
                               "games nothing above 8-12 kHz. Pick where people hear you and "
@@ -1142,6 +1144,37 @@ class SettingsDialog(QDialog):
         v.addWidget(self._background_card())
         v.addWidget(self._backup_card())
         v.addWidget(self._reset_card())
+        v.addStretch(1)
+        return w
+
+    # Settings > Tabs: what each tab that can be switched off is for (taboff.KEYS)
+    TAB_HINTS = {
+        "radio": "Internet radio stations from around the world.",
+        "apps": "Send another program's sound (a music player, a game) to others.",
+        "triggers": "Play a sound when something shows up on your screen (Onion Watch).",
+        "voice": "The voice changer, AI voices and talking as a computer voice. Off: "
+                 "your mic goes out as it is.",
+    }
+
+    def _tabs(self):
+        w, v = self._page()
+        card, cv = self._card(
+            "Tabs",
+            "Switch off the tabs you don't use. A switched-off tab is gone from the "
+            "window and doesn't load at all, so nothing of it runs in the background. "
+            "Switch it back on any time.")
+        from soundboard.ui.mainwindow import TABS
+        self.tab_boxes: dict[str, QCheckBox] = {}
+        for text, _tip in TABS:
+            key = text.lower()
+            if key in self.TAB_HINTS:
+                self.tab_boxes[key] = self._option(
+                    cv, text, self.TAB_HINTS[key], self.mw.tab_on(key),
+                    lambda on, k=key: self.mw.set_tab_on(k, on))
+            else:   # Sounds and Setup: the board itself, and where it sends
+                box = self._option(cv, text, "Always on.", True, lambda _on: None)
+                box.setEnabled(False)
+        v.addWidget(card)
         v.addStretch(1)
         return w
 
@@ -1381,6 +1414,11 @@ class SettingsDialog(QDialog):
         status, b = self._addon_block(grid, "Onion Watch", "the Triggers tab")
         self.addon_label, self.addon_remove = status, b["remove"]
         self.watch_buttons = b
+        if not self.mw.tab_on("triggers"):   # nothing of it is loaded
+            status.setText("The Triggers tab is switched off (Settings > Tabs).")
+            for btn in b.values():
+                btn.hide()
+            return
         state = {}
 
         def refresh(note: str = ""):
