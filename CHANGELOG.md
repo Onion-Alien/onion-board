@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- **"Did you know?" tips.** Once the setup guide is done, Onion Board shows a short
+  tip about one feature at most once a day, with a *Show me* button that takes you
+  there. Never while a game is up, and each tip only once. *Show tips* in
+  *Settings → General* turns them off.
 - **Record a sound with your mic.** New **Record** button next to *Add sounds*:
   record your own voice (or, while the voice changer is on, your changed voice),
   then drag the ends to cut it, listen in your headphones, name it and *Save*. The

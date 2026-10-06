@@ -31,7 +31,8 @@ from soundboard.engine import SR, Engine
 from soundboard.engine import is_virtual as is_virtual_cable
 from soundboard import (appaudio, autostart, backup, destination, library, midi, remote,
                         otherboards, soundfx, thumbs, trash, updates, videos, voicesdk)
-from soundboard import directmic, net, netlog, profiles, quality, shellicon, tor, usage, watchaddon
+from soundboard import (directmic, net, netlog, profiles, quality, shellicon, tips, tor, usage,
+                        watchaddon)
 from soundboard.replay import InstantReplay
 from soundboard.library import (AUDIO_EXTS, PAD_COLORS, RESOURCE_DIR, Config, SoundMeta,
                                 cache_keep, clean_tags, duplicate, fingerprint,
@@ -118,6 +119,8 @@ SEARCH_WAIT_MS = 100     # typing in the search box filters the pads once it pau
 PAD_SIZE_WAIT_MS = 50    # dragging Pad size re-lays the pads at most this often
 RANDOM = "__random__:"   # hotkey action prefix: a random sound from the category after it
 ALL = "All"          # the category tab that shows every sound
+TIP_DELAY_MS = 8000    # the first tip waits this long after the start
+TIP_RETRY_MS = 60_000  # ...and is tried again this often while it can't show
 VOICE_POLL_MS = 3000  # how often the game in front is looked at (soundboard.voicesdk)
 VOICE_POLL_IDLE_S = 15   # ...while nobody sees the hint and nothing switches by itself
 # Setup -> Devices -> Send my sounds to (Config.route, library.ROUTES): the mic, nobody,
@@ -355,6 +358,11 @@ class MainWindow(QMainWindow):
         self._voice_at = 0.0   # when _poll_voice last ran (see _voice_tick)
         if self.voice_watch is not None:
             self._voice_timer.start(VOICE_POLL_MS)
+        # a tip once things have settled; tried again now and then while the window is
+        # hidden or a game is up, until one has been shown this start
+        self._tip_timer = QTimer(self, interval=TIP_RETRY_MS)
+        self._tip_timer.timeout.connect(self._maybe_tip)
+        QTimer.singleShot(TIP_DELAY_MS, self, self._start_tips)
         # the headphones follow Windows' default output when it changes
         self._default_timer = QTimer(self)
         self._default_timer.timeout.connect(self._default_tick)
@@ -500,6 +508,31 @@ class MainWindow(QMainWindow):
         uh.addWidget(hide)
         self.urgent_bar.hide()
         rv.addWidget(self.urgent_bar)
+
+        # "Did you know?": one tip per start (soundboard.tips), with a Show me
+        self.tip_bar = QFrame()
+        self.tip_bar.setObjectName("tipbar")
+        th = QHBoxLayout(self.tip_bar)
+        th.setContentsMargins(12, 6, 6, 6)
+        th.setSpacing(8)
+        self.tip_lbl = QLabel()
+        self.tip_lbl.setTextFormat(Qt.PlainText)
+        self.tip_lbl.setWordWrap(True)
+        th.addWidget(self.tip_lbl, 1)
+        self.tip_btn = QPushButton("Show me")
+        self.tip_btn.setObjectName("small")
+        self.tip_btn.clicked.connect(self._tip_show_me)
+        th.addWidget(self.tip_btn)
+        hide = QPushButton("✕")
+        hide.setObjectName("urgenthide")
+        hide.setAccessibleName("Hide the tip")
+        hide.setToolTip("Hide this tip (Settings → General turns tips off)")
+        hide.setFixedSize(28, 28)
+        hide.clicked.connect(self.tip_bar.hide)
+        th.addWidget(hide)
+        self.tip_bar.hide()
+        self.tip: tips.Tip | None = None
+        rv.addWidget(self.tip_bar)
 
         # ---- tabs
         self.tab_info: dict[str, tuple[str, str]] = {}   # page attr -> (title, text) for ⓘ
@@ -2779,6 +2812,63 @@ class MainWindow(QMainWindow):
         info = self._current_tab_info()
         if info:
             QMessageBox.information(self, info[0], info[1])
+
+    # ------------------------------------------------------------------ tips
+    def _start_tips(self):
+        if not self._maybe_tip():
+            self._tip_timer.start()
+
+    def _game_up(self) -> bool:
+        return self.overlay.is_open or tips.fullscreen_in_front()
+
+    def _maybe_tip(self) -> bool:
+        """Show today's tip if it's time. True when there's nothing more to try this
+        start (one shown, or none due)."""
+        tip = tips.due(self.cfg, self.tab_on)
+        if tip is None:
+            self._tip_timer.stop()
+            return True
+        if not self.isVisible() or self.isMinimized() or self._game_up():
+            return False
+        self.show_tip(tip)
+        self._tip_timer.stop()
+        return True
+
+    def show_tip(self, tip: tips.Tip):
+        self.tip = tip
+        self.tip_lbl.setText(f"💡 Did you know? {tip.text}")
+        self.tip_bar.show()
+        if tip.key not in self.cfg.tips_seen:
+            self.cfg.tips_seen.append(tip.key)
+        self.cfg.tip_day = tips.today()
+        self._save_later()
+
+    def _tip_show_me(self):
+        tip, self.tip = self.tip, None
+        self.tip_bar.hide()
+        if tip is None:
+            return
+        kind, _, where = tip.show.partition(":")
+        if kind == "tab":
+            self.tabs.setCurrentIndex(TAB_INDEX[where])
+        elif kind == "settings":
+            self.open_settings(where)
+        elif kind == "search":
+            self.tabs.setCurrentWidget(self.sounds_page)
+            self.search.setFocus()
+        elif kind == "record" and hasattr(self, "record_dialog"):
+            self.tabs.setCurrentWidget(self.sounds_page)
+            self.record_dialog()
+        elif kind == "deleted":
+            self.show_deleted()
+        else:
+            self.tabs.setCurrentWidget(self.sounds_page)
+
+    def set_tips_on(self, on: bool):
+        self.cfg.tips_on = bool(on)
+        if not on:
+            self.tip_bar.hide()
+        self._save_later()
 
     def open_settings(self, page: str = "privacy"):
         dlg = SettingsDialog(self, page, lazy=True)

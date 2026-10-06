@@ -112,6 +112,7 @@ the launcher the shortcuts and PyInstaller use. The app is the `soundboard` pack
 | `soundboard/ui/speedpitch.py` | the live speed & pitch button and its popup (Sounds transport), with the live effects column |
 | `soundboard/livefx.py` | live effects on every playing sound (the speed & pitch popup): bass, treble, muffle, reverb, echo, distortion and presets; not saved |
 | `soundboard/soundfx.py` | per-sound effects: trim, speed / pitch (phase vocoder + soxr), EQ, boost, reverse and any voice effect, rendered off the audio thread; the presets |
+| `soundboard/tips.py` | *Did you know?* tips: the list (each with where *Show me* goes), which one is due (after setup, once a day, never during a game), and the fullscreen-in-front check; the main window shows the bar |
 | `soundboard/ui/recordmic.py` | the Sounds tab's *Record a sound* window: a mic take (`Engine.start_mic_take`, spooled by `recorder.MicTake`), raw or through the voice changer, trimmed and added as a pad |
 | `soundboard/ui/trim.py` | the Effects tab's trim control: waveform with start / end handles and exact-time boxes |
 | `soundboard/backup.py` | export / import of the board as a plain zip (JSON + original audio + pictures), sound packs and single sounds; see [BACKUP-FORMAT.md](BACKUP-FORMAT.md) |

@@ -1147,6 +1147,10 @@ class SettingsDialog(QDialog):
         hint.setObjectName("hint")
         hint.setWordWrap(True)
         cv.addWidget(hint)
+        if hasattr(self.mw, "set_tips_on"):
+            self.box_tips = self._option(
+                cv, "Show tips", "A short “Did you know?” about a feature, at most once "
+                "a day, never while a game is up.", self.mw.cfg.tips_on, self.mw.set_tips_on)
         v.addWidget(card)
         v.addWidget(self._background_card())
         v.addWidget(self._backup_card())
