@@ -34,6 +34,9 @@ NOTES = (
         ("mic", "Guides that name your mic",
          "The setup guide and the Discord and game steps now say to keep your own mic, "
          "and name it, instead of telling you to pick CABLE Output."),
+        ("cable", "Don't need the cable? Remove it",
+         "Once your sounds are in your mic, the Setup tab offers to uninstall the "
+         "virtual cable. Keep it if another program uses it."),
     ), "", ""),
     Note("1.9.1", "Your sounds go straight into your mic", (
         ("mic", "The main way now, for everyone",
