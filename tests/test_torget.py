@@ -197,3 +197,47 @@ def test_settings_get_tor_button_follows_its_switch(window, qapp, served):  # no
 
 
 from test_mainwindow import window  # noqa: E402, F401  (the real MainWindow fixture)
+
+
+def test_once_dist_drops_this_version_the_archive_is_used(served, app_dir, monkeypatch):
+    """dist.torproject.org keeps only the latest few versions: a 404 there falls back
+    to archive.torproject.org, checked against the same SHA-256."""
+    import urllib.error
+    calls = []
+    real = net.urlopen
+
+    def gone_from_dist(req, timeout=30, feature=None, direct=False):
+        calls.append(req.full_url)
+        if req.full_url == torget.URL:
+            raise urllib.error.HTTPError(req.full_url, 404, "Not Found", {}, None)
+        return real(req, timeout=timeout, feature=feature, direct=direct)
+    monkeypatch.setattr(net, "urlopen", gone_from_dist)
+    torget.get()
+    assert calls == [torget.URL, torget.ARCHIVE_URL]
+    assert torget.ARCHIVE_URL.startswith("https://archive.torproject.org/")
+    assert torget.installed()
+
+
+def test_other_http_errors_dont_fall_back(monkeypatch, app_dir):
+    import urllib.error
+    calls = []
+
+    def forbidden(req, timeout=30, feature=None, direct=False):
+        calls.append(req.full_url)
+        raise urllib.error.HTTPError(req.full_url, 403, "Forbidden", {}, None)
+    monkeypatch.setattr(net, "urlopen", forbidden)
+    monkeypatch.setattr(tor, "bundle_dirs", lambda: [torget.bin_dir()])
+    with pytest.raises(torget.GetError, match="dist.torproject.org said 403"):
+        torget.get()
+    assert calls == [torget.URL]
+
+
+def test_gone_from_both_says_so(monkeypatch, app_dir):
+    import urllib.error
+
+    def gone(req, timeout=30, feature=None, direct=False):
+        raise urllib.error.HTTPError(req.full_url, 404, "Not Found", {}, None)
+    monkeypatch.setattr(net, "urlopen", gone)
+    monkeypatch.setattr(tor, "bundle_dirs", lambda: [torget.bin_dir()])
+    with pytest.raises(torget.GetError, match="archive.torproject.org said 404"):
+        torget.get()

@@ -288,6 +288,27 @@ def set_usage_count(on: bool, heard: str = "") -> int:
     return 0
 
 
+def uninstall_count() -> int:
+    """`OnionBoard.exe --uninstall-count`: the uninstaller's one "uninstall/<version>"
+    for the anonymous usage count, only if it's switched on (and not Offline mode),
+    through the saved Connection setting. No window. Always returns 0: an uninstall
+    never waits on, or fails for, this."""
+    try:
+        applog.setup(APP_DIR)
+        from soundboard import library, net, usage
+        cfg = library.Config.load()
+        if not cfg.stats_id:   # never counted (switched off, or from before the count)
+            return 0
+        net.configure_from(cfg)
+        if net.mode() == net.TOR:   # Tor isn't running: don't start it
+            return 0
+        sent = usage.send_now(cfg, usage.uninstall_event())
+        log.info("--uninstall-count: %s", "sent" if sent else "not sent")
+    except Exception:  # noqa: BLE001 - never in the uninstaller's way
+        log.warning("--uninstall-count failed", exc_info=True)
+    return 0
+
+
 def selftest_addon(path: str) -> int:
     """`OnionBoard.exe --selftest-addon OnionWatch-module.zip`: prove this build can
     run the Onion Watch add-on (it has no pip, so the add-on may only use what the
@@ -366,6 +387,8 @@ def main():
         j = sys.argv.index("--heard-from") if "--heard-from" in sys.argv else -1
         heard = sys.argv[j + 1] if 0 <= j < len(sys.argv) - 1 else ""
         sys.exit(set_usage_count(sys.argv[i + 1:i + 2] == ["on"], heard))
+    if "--uninstall-count" in sys.argv:
+        sys.exit(uninstall_count())
     if "--selftest-addon" in sys.argv:
         try:
             sys.exit(selftest_addon(sys.argv[sys.argv.index("--selftest-addon") + 1]))
@@ -433,6 +456,8 @@ def main():
     # Windows logging off / shutting down while the window is hidden in the tray never
     # calls closeEvent: still let go of push-to-talk and save the settings
     app.aboutToQuit.connect(w.shutdown)
+    from soundboard import usage
+    usage.note(usage.mark_running(APP_DIR))   # the last run ended without closing itself?
     if (not (TRAY_ARG in sys.argv and w.can_hide())   # started with Windows: tray only
             or app.instance_server.show_requested):    # ...unless launched again since
         w.show()

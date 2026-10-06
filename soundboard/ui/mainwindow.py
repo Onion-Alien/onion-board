@@ -549,6 +549,8 @@ class MainWindow(QMainWindow):
         tab = self.cfg.tab if 0 <= self.cfg.tab < self.tabs.count() else 0
         self.tabs.setCurrentIndex(tab if self.tabs.isTabVisible(tab) else 0)
         self.tabs.currentChanged.connect(lambda i: self.set_option("tab", i))
+        self.tabs.currentChanged.connect(self._count_tab)   # names only (usage.py)
+        self._count_tab(self.tabs.currentIndex())
         self.tabs.currentChanged.connect(lambda _i: self._update_status())
         self.tabs.currentChanged.connect(self._focus_sounds_page)
         # a badge on a tab's icon (or, by default, a wash) in the theme's live colour while
@@ -4845,7 +4847,14 @@ class MainWindow(QMainWindow):
 
     def send_usage(self):
         """The anonymous daily usage count, if it's due and switched on (usage.py)."""
-        usage.maybe_send(self.cfg, self.bridge.counted.emit)
+        usage.maybe_send(self.cfg, self.bridge.counted.emit, app_dir=library.APP_DIR)
+
+    def _mark_stopped(self):
+        usage.mark_stopped(library.APP_DIR)
+
+    def _count_tab(self, i: int):
+        if 0 <= i < len(TABS):
+            usage.tab_opened(self.cfg, TABS[i][0].lower())
 
     def _on_update(self, rel, err: str, asked: bool):
         self._save_later()   # update_checked
@@ -5698,7 +5707,8 @@ class MainWindow(QMainWindow):
                      self.triggers.shutdown,
                      self.linkbar.shutdown,
                      self.voice.shutdown, self.engine.shutdown, shellicon.detach,
-                     netlog.flush):   # last: what's still open, once the rest closed
+                     netlog.flush,   # what's still open, once the rest closed
+                     self._mark_stopped):   # last: this run ended cleanly (usage.py)
             try:
                 step()
             except Exception:  # noqa: BLE001 - keep shutting the rest down

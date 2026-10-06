@@ -411,6 +411,10 @@ class Config:
     # the installer's "Where did you hear about Onion Board?", sent once with the
     # first-start event (usage.heard_tag tidies it, or drops it)
     stats_heard: str = ""
+    # tabs opened since the last daily count, and the newest crash / freeze report
+    # already counted (its file time)
+    stats_tabs: list[str] = field(default_factory=list)
+    stats_problems_seen: float = 0.0
     sounds: list[SoundMeta] = field(default_factory=list)
 
     # set by load() when the settings weren't read cleanly, for the window to tell the
