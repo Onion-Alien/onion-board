@@ -950,7 +950,7 @@ def test_the_voice_thats_on_speaks_the_language_picked(panel, monkeypatch):
     de = SimpleNamespace(language="de", language_name="German")
     monkeypatch.setattr(sp, "translating", lambda: de)
     p._sync_translate()
-    assert asked[-1] == "" and "Turn on a voice" in sp.lbl_bg.text()
+    assert asked[-1] == "" and "Turn on the AI voice" in sp.lbl_bg.text()
     p.fx.pick("Robot")
     assert asked[-1] == "fx" and sp.ctl.fx_always and sp.ctl.dub is None
     assert "German, a few seconds late" in p._heads["fx"].pill.text()

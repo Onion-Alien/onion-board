@@ -1179,13 +1179,15 @@ class SpeechPanel(QWidget):
         v.setSpacing(12)
 
         # ---- live voice to speech
-        self.title = section_label("TEXT-TO-SPEECH VOICE")
+        self.title = section_label("SPEAK ANOTHER LANGUAGE")
         v.addWidget(self.title)
-        v.addWidget(hint_label("Pick a voice and press Start. What you say is written down on "
-                               "this PC, then read aloud in that voice a moment later. "
-                               "Or type a line at the bottom."))
-        # Speak in (another language) belongs to every voice on the tab: VoicePanel
-        # puts lang_box at the top. English in, the chosen language out.
+        self.lbl_intro = hint_label(
+            "Talk in English and others hear another language. The AI voice or the voice "
+            "changer says it when one of them is on; otherwise press Start and a computer "
+            "voice does. Or type a line at the bottom.")
+        v.addWidget(self.lbl_intro)
+        # Speak in belongs to every voice on the tab (VoicePanel._sync_translate).
+        # English in, the chosen language out.
         self.bg_for = ""             # translating for the "ai" voice or the "fx" changer
         self._bg_key: tuple = ()     # (who, language) the running helper was started for
         self._bg_failed: tuple = ()  # the key it last stopped with an error for
@@ -1251,13 +1253,16 @@ class SpeechPanel(QWidget):
         tb.addStretch(1)
         tv.addLayout(tb)
         lv.addWidget(self.tr_box)
+        v.addWidget(self.lang_box)
 
         # ---- the voice (shared by live and typed speech): set before you press Start
         grid = QGridLayout()
         grid.setHorizontalSpacing(12)
         grid.setVerticalSpacing(14)
-        grid.addWidget(QLabel("Voice"), 0, 0)
+        grid.addWidget(QLabel("Computer voice"), 0, 0)
         self.cb_voice = QComboBox()
+        self.cb_voice.setToolTip("Speaks for you when no AI voice or voice changer is on, "
+                                 "and says lines you type")
         self.cb_voice.addItem("Loading voices…", "")
         self.cb_voice.setEnabled(False)
         # the list shows a stand-in, not the saved voice (still loading, speech failed,
@@ -1284,7 +1289,7 @@ class SpeechPanel(QWidget):
         lv = QVBoxLayout(self.start_box)
         lv.setContentsMargins(0, 0, 0, 0)
         lv.setSpacing(12)
-        self.b_live = QPushButton("Start talking as the voice")
+        self.b_live = QPushButton("Start the computer voice")
         icons.set_icon(self.b_live, "mic", "on_accent", "on_accent")
         self.b_live.setCheckable(True)
         self.b_live.setMinimumHeight(40)
@@ -1338,7 +1343,7 @@ class SpeechPanel(QWidget):
         mrow.addWidget(b_open)
         mrow.addStretch(1)
         mv.addLayout(mrow)
-        v.addWidget(self.missing)
+        v.insertWidget(v.indexOf(self.lang_box) + 1, self.missing)   # first thing to do
         # install / update progress: outside `missing`, which is hidden for an update
         self.lbl_install = hint_label("")
         self.lbl_install.hide()
@@ -1368,12 +1373,12 @@ class SpeechPanel(QWidget):
         grid.setColumnStretch(1, 1)
         ov.addLayout(grid)
         no_wheel(self.cb_voice, self.sl_rate, self.cb_model)
-        self.chk_mute = QCheckBox("Mute my real mic while the text-to-speech voice is on")
+        self.chk_mute = QCheckBox("Mute my real mic while the computer voice is on")
         self.chk_mute.setToolTip("Others hear only the spoken voice, not your real one.")
         self.chk_mute.setChecked(self.s["mute_real_voice"])
         ov.addWidget(self.chk_mute)
-        self.chk_fx = QCheckBox("Put the voice changer on the text-to-speech voice")
-        self.chk_fx.setToolTip("With a voice picked under Voice changer, the text-to-speech voice "
+        self.chk_fx = QCheckBox("Put the voice changer on the computer voice")
+        self.chk_fx.setToolTip("With a voice picked under Voice changer, the computer voice "
                                "gets the same effect (a chipmunk robot voice, say).")
         self.chk_fx.setChecked(self.s["voice_fx"])
         ov.addWidget(self.chk_fx)
@@ -1678,7 +1683,7 @@ class SpeechPanel(QWidget):
             self.lbl_delay.setText(
                 f"⏱ Others hear you in {name} a few seconds late: each sentence is "
                 "written down, translated, then spoken once you've finished it. It works "
-                "with the AI voice, the voice changer and text-to-speech; your real voice "
+                "with the AI voice, the voice changer and the computer voice; your real voice "
                 "is muted meanwhile.")
         self.lbl_delay.setVisible(m is not None)
         busy = self._dl_busy is not None
@@ -1867,7 +1872,7 @@ class SpeechPanel(QWidget):
 
     def _on_dl_done(self, err: str):
         m, self._dl_busy = self._dl_busy, None
-        _enable(self.cb_lang, not self.ctl.live, "Stop the text-to-speech voice to change this")
+        _enable(self.cb_lang, not self.ctl.live, "Stop the computer voice to change this")
         _enable(self.b_live, not self._installing, "Waiting for the install to finish")
         self.b_dl_cancel.setEnabled(True)
         self._fill_langs()
@@ -1915,8 +1920,9 @@ class SpeechPanel(QWidget):
                 "The live-voice add-on is missing from this copy of Onion Board. Run the "
                 "installer again (it comes with every install), then press Refresh below.")
         elif not ok:
-            self.lbl_missing.setText("Live voice needs its speech recognition installed first "
-                                     "(runs on this PC; what you say never leaves it). "
+            self.lbl_missing.setText("Speaking another language needs speech recognition "
+                                     "installed first (runs on this PC; what you say never "
+                                     "leaves it). "
                                      "Needs Python 3.12+ from python.org.")
             self.lbl_missing.setToolTip(str(m.path))
 
@@ -1946,7 +1952,7 @@ class SpeechPanel(QWidget):
         self._installing = False
         self.b_install.setEnabled(True)
         self.b_install.setText("Install speech recognition")
-        _enable(self.b_update, not self.ctl.live, "Stop the text-to-speech voice to change this")
+        _enable(self.b_update, not self.ctl.live, "Stop the computer voice to change this")
         self.b_update.setText("Update speech recognition")
         _enable(self.b_live, self._dl_busy is None, "Waiting for the download to finish")
         if ok:
@@ -1978,7 +1984,7 @@ class SpeechPanel(QWidget):
         if on and not self.ctl.live:
             m = self._lang()
             if m is not None and not m.installed:
-                self._set_live_ui(False, f"Download {m.language_name} first (at the top).")
+                self._set_live_ui(False, f"Download {m.language_name} first (above).")
                 return
             try:
                 self.ctl.start_live(self.module, self._live_args())
@@ -2037,12 +2043,12 @@ class SpeechPanel(QWidget):
         self.b_live.blockSignals(True)
         self.b_live.setChecked(on)
         self.b_live.blockSignals(False)
-        self.b_live.setText("Stop the text-to-speech voice" if on else "Start talking as the voice")
+        self.b_live.setText("Stop the computer voice" if on else "Start the computer voice")
         self.live_changed.emit(on)
         for w in (self.cb_model, self.ed_lang, self.cb_lang):
-            _enable(w, not on, "Stop the text-to-speech voice to change this")
+            _enable(w, not on, "Stop the computer voice to change this")
         _enable(self.b_update, not on and not self._installing,
-                "Stop the text-to-speech voice to change this" if on
+                "Stop the computer voice to change this" if on
                 else "Waiting for the install to finish")
         self.lbl_state.setText(state)
         self._refresh_translation()
@@ -2296,14 +2302,14 @@ class VoicePanel(QWidget):
         lcol.addWidget(self._fold_card("fx", self.fx))
         lcol.addStretch(1)
 
-        # Right: computer voice and its add-ons.
+        # Top: Speak another language (and the computer voice); right: AI voices, add-ons.
         self.controller = SpeechController(engine, self.chain, lambda ev: None)
         self.speech = SpeechPanel(self.controller, speech or {}, self.modules)
         self.speech.changed.connect(self.speech_changed)
         self.speech.changed.connect(lambda _s: self._emit_active())   # the tab's picture
         self.speech.downloaded.connect(lambda: self.addons.show_modules(self.modules))
         self.speech.live_changed.connect(lambda _on: self._emit_active())
-        # AI voices first: the live voice changer; then the computer voice
+        # AI voices: the live voice changer
         from soundboard.ui.aivoicepanel import AiVoicePanel
         self.ai_controller = AiVoiceController(self.chain, lambda ev: None)
         saved = speech.get("ai") if isinstance(speech, dict) else None   # may be damaged
@@ -2314,18 +2320,7 @@ class VoicePanel(QWidget):
         rcol.addWidget(self._fold_card("ai", self.ai))
         self.speech.live_changed.connect(self._speech_live)
         self.speech.lang_changed.connect(self._emit_active)
-        rcol.addWidget(self._fold_card("tts", self.speech))
-        lang = QWidget()
-        lgv = QVBoxLayout(lang)
-        lgv.setContentsMargins(0, 0, 0, 0)
-        lgv.setSpacing(8)
-        lang.title = section_label("SPEAK ANOTHER LANGUAGE")
-        lgv.addWidget(lang.title)
-        lgv.addWidget(self.speech.lang_box)
-        self.lang_note = hint_label("")
-        lgv.addWidget(self.lang_note)
-        self._lang_card = self._fold_card("lang", lang)
-        self._top.addWidget(self._lang_card)
+        self._top.addWidget(self._fold_card("speak", self.speech))
         self.addons = ModulesList()
         self.addons.refresh.connect(self._rescan_in_background)
         self._scanned.connect(self._apply_scan)
@@ -2424,19 +2419,8 @@ class VoicePanel(QWidget):
             sp._bg_note("")               # "turn on a voice": one is on now
         sp.translate_for(who)
         if m is not None and not fg and not who and not sp.lbl_bg.text().startswith("\u26a0"):
-            sp._bg_note("Turn on a voice below (AI voice, voice changer, or Start under "
-                        f"Text-to-speech) to speak {m.language_name or m.language}.")
-        self._lang_shown()
-
-    def _lang_shown(self):
-        """The Speak in card's own words when there's nothing to pick from yet."""
-        sp = self.speech
-        ok = sp.module is not None and sp.module.installed
-        self.lang_note.setText(
-            "Talk in English and others hear another language, in whichever voice below "
-            "is on." if ok and sp.langs else
-            "Needs speech recognition first: install it under Text-to-speech voice below.")
-        self.lang_note.setVisible(not (ok and sp.langs and sp._lang() is not None))
+            sp._bg_note("Turn on the AI voice or the voice changer below, or press Start "
+                        f"for the computer voice, to speak {m.language_name or m.language}.")
 
     # ---- cards that fold away
     def _fold_card(self, key: str, panel: QWidget) -> QFrame:
@@ -2470,9 +2454,8 @@ class VoicePanel(QWidget):
                        self.speech.b_live.isChecked())
         self._heads["fx"].set_state(fx, late if fx and not ai and not tts else "")
         self._heads["ai"].set_state(ai, late if ai and not tts else "")
-        self._heads["tts"].set_state(tts, late if tts else "")
-        lh = self._heads["lang"]
-        lh.set_state(False, "" if lh.is_open() else lang)   # open: the list says it
+        sh = self._heads["speak"]   # open, the list says the language
+        sh.set_state(tts, lang if not sh.is_open() or tts else "")
 
     def tab_icon(self) -> str:
         """A consistent line icon; the live dot indicates whether voice is active."""
