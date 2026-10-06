@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 1.9.4 — 2026-10-06
 
 - **Clip editor copy and paste do what you'd expect.** A click places the cursor
   (a slight wobble of the mouse no longer picks a sliver), Ctrl+V always says
@@ -10,6 +10,20 @@
   plays, it keeps only what the program actually played: silence before it
   isn't kept, and long gaps close up to half a second.
 
+## 1.9.3 — 2026-10-06
+
+- **Your mic, start to finish.** The installer no longer ticks the virtual cable,
+  and the setup guide and the Discord and game steps name your own mic instead of
+  CABLE Output. The Setup tab stops saying your sounds are "also on the virtual
+  cable" and no longer warns you to pick a cable while your mic is working. The
+  cable is only offered as the backup: *Use the virtual cable instead*.
+- **Remove the virtual cable.** Once your sounds are in your mic, the Setup tab
+  offers to uninstall VB-Cable (one Windows prompt). Keep it if another program
+  uses it. The mic button also shows when it's busy setting up.
+- **No crash when the Apps tab closes mid-scan.** Switching the Apps tab off, or
+  quitting, while it was reading the list of programs could crash the app.
+- **Radio: no grid while zooming.** Zooming the map no longer flashes a bare grid,
+  and you can move round the map while stations are still loading.
 - **Clip editor: saved clips get a list.** Save in an app's clip editor now keeps
   the bit in *Saved clips* at the bottom of the Apps tab: double-click plays it,
   F2 renames it, right-click adds it to your Sounds, sends it, copies it or
@@ -21,7 +35,6 @@
   buttons gives that program the whole tab and a tall waveform. Card size goes
   much wider too, and opening one card's editor no longer stretches the cards
   beside it.
-
 - **The Sounds tab is lighter on a big board.** Scrolling draws only the pads that
   come into view instead of every pad on screen, and switching categories, dragging
   a pad to a new place and saving do less work, so they stay smooth with hundreds of

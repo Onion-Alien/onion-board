@@ -27,6 +27,14 @@ class Note:
 
 # newest first; add one per release that has something worth telling
 NOTES = (
+    Note("1.9.4", "A clip editor that behaves", (
+        ("edit", "Copy and paste you can see",
+         "A click in the clip editor places the cursor, Ctrl+V says what it pasted and "
+         "where, and pasting straight after copying puts a second copy in after it."),
+        ("wave", "No more minutes of silence",
+         "Left open while nothing plays, the editor keeps only what the program actually "
+         "played: long gaps close up to half a second."),
+    )),
     Note("1.9.3", "Your mic, start to finish", (
         ("check", "No cable box ticked for you",
          "The installer no longer ticks the virtual cable: your sounds go straight into "
@@ -34,6 +42,9 @@ NOTES = (
         ("mic", "Guides that name your mic",
          "The setup guide and the Discord and game steps now say to keep your own mic, "
          "and name it, instead of telling you to pick CABLE Output."),
+        ("cable", "Don't need the cable? Remove it",
+         "Once your sounds are in your mic, the Setup tab offers to uninstall the "
+         "virtual cable. Keep it if another program uses it."),
     ), "", ""),
     Note("1.9.1", "Your sounds go straight into your mic", (
         ("mic", "The main way now, for everyone",

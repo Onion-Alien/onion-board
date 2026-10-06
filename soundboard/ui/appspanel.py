@@ -525,8 +525,11 @@ class AppsTab(QWidget):
         self._label_folders()
 
         self.peaks = appaudio.PeakWatcher()   # live levels; the list is only re-read every 1.5 s
-        self.lister = _Lister(self, self.peaks)
-        self.lister.ready.connect(lambda listed: self._on_apps(*listed))
+        # no Qt parent: a listing still running when the panel goes (Apps tab off,
+        # quitting) must not emit from a deleted object; the thread keeps it alive,
+        # and the bound slot drops the result once the panel is gone
+        self.lister = _Lister(None, self.peaks)
+        self.lister.ready.connect(self._on_listed)
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.lister.refresh)
         self.meter_timer = QTimer(self)
@@ -726,6 +729,9 @@ class AppsTab(QWidget):
                 row.folder = folder
                 row.name.setToolTip(row.app.path if row.app is not None else row.path)
                 row.set_app(row.app)
+
+    def _on_listed(self, listed):
+        self._on_apps(*listed)
 
     def _on_apps(self, apps: list, alive: dict[int, str] | None = None):
         """`apps` the programs with an audio session; `alive` every running process
