@@ -409,3 +409,30 @@ def test_off_from_the_start_then_on_and_off_again(qapp, app_dir, monkeypatch, fa
         w._load_thread.join(15)
         w.deleteLater()
         qapp.sendPostedEvents(None, QEvent.DeferredDelete)
+
+
+def test_a_new_user_starts_with_the_basic_tabs():
+    cfg = Config.first_start()
+    assert cfg.tabs_off == ["radio", "apps", "triggers"]   # Sounds, Voice and Setup
+    assert Config().tabs_off == []   # settings saved before keep every tab they had
+
+
+def test_more_tabs_lists_the_switched_off_ones_and_adds_one(window, monkeypatch):
+    w = window
+    assert w.btn_more_tabs.isHidden()                      # every tab on: nothing to add
+    w.set_tab_on("radio", False)
+    w.set_tab_on("triggers", False)
+    assert not w.btn_more_tabs.isHidden()
+    menu = w.btn_more_tabs.menu()
+    menu.aboutToShow.emit()
+    texts = [a.text() for a in menu.actions() if not a.isSeparator()]
+    assert texts[0].startswith("Radio: ") and texts[1].startswith("Triggers: ")
+    assert texts[-1] == "Choose tabs in Settings…" and len(texts) == 3
+    opened = []
+    monkeypatch.setattr(w, "open_settings", lambda page="privacy": opened.append(page))
+    menu.actions()[-1].trigger()
+    assert opened == ["tabs"]
+    menu.actions()[1].trigger()                            # Triggers
+    assert w.tab_on("triggers") and w.tabs.currentIndex() == main.TAB_INDEX["triggers"]
+    w.set_tab_on("radio", True)
+    assert w.btn_more_tabs.isHidden()

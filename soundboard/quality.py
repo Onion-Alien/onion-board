@@ -1,8 +1,8 @@
 """Settings > Data & quality: how much the app downloads and streams.
 
 For slow, capped or mobile connections: smaller downloads, lower-bitrate radio
-stations, more patience before a stream counts as dead, and no result pictures or
-like counts in Sounds from the web. Also whether "Add as sound" keeps the video.
+stations, more patience before a stream counts as dead, and no result pictures in
+Sounds from the web. Also whether "Add as sound" keeps the video.
 
 `current` is what the rest of the app reads (soundboard.ytdl, soundboard.radio,
 ui.ytsearch); the Settings window changes it with change() and the config keeps it
@@ -40,7 +40,7 @@ class Prefs:
     video_dir: str = ""           # "" = default_video_dir()
     radio_kbps: int = 0           # a RADIO_KBPS key
     patient: bool = False         # slow connection: wait longer, retry more (radio)
-    web_extras: bool = True       # search result pictures + like / comment counts
+    web_extras: bool = True       # search result pictures
 
     def audio_format(self) -> str:
         return DOWNLOADS.get(self.download, DOWNLOADS["best"])[1]

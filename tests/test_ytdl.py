@@ -702,80 +702,22 @@ def test_add_on_a_second_result_while_one_downloads_adds_both(qapp, window, monk
     assert [m.name for m in window.cfg.sounds[-2:]] == ["one", "ond"]
 
 
-_real_stats = ytdl.stats   # conftest swaps it for an offline stand-in in every test
-
-
-def test_result_counts_come_from_the_search_or_one_look_up_per_video(monkeypatch):
+def test_result_counts_are_only_what_the_search_gave():
     from soundboard.ui.ytsearch import fmt_count, stats_text
     yt = ytdl._youtube_hit({"id": "HEXWRTEbj1I", "title": "What Is Love",
                             "view_count": 497635348})
     assert (yt.views, yt.likes, yt.comments) == (497635348, None, None)
-    assert ytdl.needs_stats(yt)
     sc = ytdl._soundcloud_hit({"id": "1", "title": "t", "webpage_url":
                                "https://soundcloud.com/a/b", "view_count": 373794,
                                "like_count": 6152, "comment_count": 28})
     assert (sc.views, sc.likes, sc.comments) == (373794, 6152, 28)
-    assert not ytdl.needs_stats(sc)
     assert [fmt_count(n) for n in (999, 1234, 12_345, 4_553_746, 2_000_000_000)] == [
         "999", "1.2K", "12K", "4.6M", "2B"]
-    assert stats_text(yt, waiting=True)[0] == "498M views · … likes · … comments"
+    # no video page is fetched for the rest: what the search didn't say isn't shown
+    assert stats_text(yt) == ("498M views", "497,635,348 views")
     assert stats_text(sc) == ("374K views · 6.2K likes · 28 comments",
                               "373,794 views, 6,152 likes, 28 comments")
-    seen = {}
-
-    class YoutubeDL:
-        def __init__(self, opts):
-            seen["opts"] = opts
-
-        def __enter__(self):
-            return self
-
-        def __exit__(self, *a):
-            return False
-
-        def extract_info(self, url, download=True, process=True):
-            seen.update(url=url, download=download, process=process)
-            return {"view_count": 5, "like_count": 4, "comment_count": None}
-    monkeypatch.setitem(sys.modules, "yt_dlp", types.SimpleNamespace(YoutubeDL=YoutubeDL))
-    monkeypatch.setattr(ytdl, "install", lambda *a, **k: None)
-    assert _real_stats(yt) == (5, 4, None)
-    assert seen["url"] == yt.url and not seen["download"] and not seen["process"]
-    assert "format" not in seen["opts"]
-    # one page, no other player client or JS player: a search mustn't look like a bot
-    assert seen["opts"]["extractor_args"] == ytdl.STATS_ARGS
-    assert seen["opts"]["ignore_no_formats_error"]
-
-
-def test_a_bot_check_pauses_the_likes_look_ups(monkeypatch):
-    yt = ytdl._youtube_hit({"id": "HEXWRTEbj1I", "title": "What Is Love"})
-    calls = []
-
-    class YoutubeDL:
-        def __init__(self, opts):
-            self.logger = opts["logger"]
-
-        def __enter__(self):
-            return self
-
-        def __exit__(self, *a):
-            return False
-
-        def extract_info(self, url, download=True, process=True):
-            calls.append(url)   # yt-dlp only warns: the look-up carries on without it
-            self.logger.warning("[youtube] Sign in to confirm you’re not a bot.")
-            return {"view_count": 5}
-    monkeypatch.setitem(sys.modules, "yt_dlp", types.SimpleNamespace(YoutubeDL=YoutubeDL))
-    monkeypatch.setattr(ytdl, "install", lambda *a, **k: None)
-    assert not ytdl.stats_paused()
-    assert _real_stats(yt) == (5, None, None)
-    assert ytdl.stats_paused()
-    with pytest.raises(ytdl.DownloadError):   # paused: the site isn't asked again
-        _real_stats(yt)
-    assert len(calls) == 1
-    monkeypatch.setattr(ytdl, "_stats_paused_until", 0.0)
-    ytdl._readable(RuntimeError("ERROR: [youtube] x: Sign in to confirm you're not a bot"))
-    assert ytdl.stats_paused()                # a Play's bot check pauses them too
-    ytdl._readable(RuntimeError("ERROR: HTTP Error 404: Not Found"))
+    assert not hasattr(ytdl, "stats")
 
 
 def test_a_download_locks_the_other_cards_and_shows_its_progress(qapp, monkeypatch):
@@ -792,7 +734,6 @@ def test_a_download_locks_the_other_cards_and_shows_its_progress(qapp, monkeypat
     assert "0%" in a.btn_add.text()
     assert busy.is_busy(a.btn_add) and not busy.is_busy(a.btn_play)   # Play after it: fine
     assert all(busy.is_busy(x) for r in (b, c) for x in (r.btn_play, r.btn_add))
-    assert not panel._quiet.is_set()                 # like counts wait for downloads
     panel.progress(hits[0].url, 0.42)
     assert a.bar.isVisibleTo(a) and a.bar.value() == 420 and "42%" in a.btn_add.text()
     panel.mark(hits[0].url, "play")                  # ...and Play on it too
@@ -806,7 +747,6 @@ def test_a_download_locks_the_other_cards_and_shows_its_progress(qapp, monkeypat
     panel.mark(hits[0].url, "play", True)
     assert not a.bar.isVisibleTo(a) and busy.is_busy(a.btn_add)       # added stays added
     assert not any(busy.is_busy(x) for r in (b, c) for x in (r.btn_play, r.btn_add))
-    assert panel._quiet.is_set()
 
 
 def test_play_after_add_plays_the_added_audio_without_downloading_again(

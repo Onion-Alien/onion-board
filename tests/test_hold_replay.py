@@ -76,8 +76,13 @@ def test_instant_replay_runs_only_while_its_hotkey_is_set(window, qapp, monkeypa
     monkeypatch.setattr(w.replay, "_capture_cls", FakeCapture)
     monkeypatch.setattr(rp.appaudio, "supported", lambda: (True, ""))
     assert not w.replay.enabled
+    toasts = []
+    monkeypatch.setattr(w, "toast", lambda text, kind="": toasts.append(text))
     w.set_global_hotkey("replay_hotkey", "ctrl+alt+r")
     assert w.replay.enabled
+    assert len(toasts) == 1 and "everyone's OK" in toasts[0]   # recording people: ask
+    w.set_global_hotkey("replay_hotkey", "ctrl+alt+t")
+    assert len(toasts) == 1                                    # only when it goes on
     assert process_events(qapp, lambda: w.replay.running)
     cap = FakeCapture.made[-1]
     import os

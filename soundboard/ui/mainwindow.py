@@ -90,6 +90,10 @@ TAB_INDEX = {text.lower(): i for i, (text, _tip) in enumerate(TABS)}
 
 
 UNDO_S = 10          # how long "Removed … · Undo" stays up
+# shown when instant replay goes on: it records whoever is talking in a call
+REPLAY_NOTE = ("Instant replay is on: your key keeps the last seconds you heard. In some "
+               "places recording a call needs everyone's OK, so only keep clips of people "
+               "who are fine with it.")
 CHIPS_ROW_H = 30      # the now-playing row: a chip's 24 px ■ button, its margins and border
 TICK_MS = 33         # the UI timer while the window is on screen (meters, visualisers)
 TICK_BG_MS = 100     # ...while it's on screen but another program is in front (a game)
@@ -548,7 +552,19 @@ class MainWindow(QMainWindow):
         self.btn_info.setCursor(Qt.PointingHandCursor)
         self.btn_info.setToolTip("What's this tab for?")
         self.btn_info.clicked.connect(self._show_tab_info)
-        info_corner = TabInfoCorner(self.tabs, self.btn_info)
+        # + More tabs: the tabs switched off (a new user starts with the basic ones), one
+        # click to add one; only there while one is off
+        self.btn_more_tabs = QPushButton("More tabs")
+        self.btn_more_tabs.setObjectName("moretabs")
+        icons.set_icon(self.btn_more_tabs, "plus")
+        self.btn_more_tabs.setCursor(Qt.PointingHandCursor)
+        self.btn_more_tabs.setToolTip("Add a tab: radio, sending a program's sound, screen "
+                                      "triggers…")
+        mt = QMenu(self.btn_more_tabs)
+        mt.aboutToShow.connect(lambda: self._fill_more_tabs(mt))
+        self.btn_more_tabs.setMenu(mt)
+        self._update_more_tabs()
+        info_corner = TabInfoCorner(self.tabs, self.btn_more_tabs, self.btn_info)
         self.tabs.setCornerWidget(info_corner, Qt.TopRightCorner)
         self._update_info_btn = lambda *_: self.btn_info.setVisible(
             self._current_tab_info() is not None)
@@ -2439,6 +2455,27 @@ class MainWindow(QMainWindow):
         v.active_changed.connect(lambda on, k=key: self._tab_live(k, on))
         return v
 
+    def _update_more_tabs(self):
+        self.btn_more_tabs.setVisible(any(not self.tab_on(k) for k in taboff.KEYS))
+
+    def _fill_more_tabs(self, menu: QMenu):
+        """+ More tabs: each tab that's switched off, with what it's for (click: it's
+        added and opened), then Settings > Tabs to pick them all."""
+        menu.clear()
+        for key in taboff.KEYS:
+            if self.tab_on(key):
+                continue
+            text, tip = TABS[TAB_INDEX[key]]
+            act = menu.addAction(icons.icon(key), f"{text}: {tip}")
+            act.triggered.connect(lambda _c=False, k=key: self._add_tab(k))
+        menu.addSeparator()
+        act = menu.addAction(icons.icon("settings"), "Choose tabs in Settings…")
+        act.triggered.connect(lambda: self.open_settings("tabs"))
+
+    def _add_tab(self, key: str):
+        self.set_tab_on(key, True)
+        self.tabs.setCurrentIndex(TAB_INDEX[key])
+
     def _tab_live(self, key: str, on: bool):
         """The live badge on the Voice, Triggers or Apps tab."""
         page = getattr(self, key)
@@ -2468,6 +2505,7 @@ class MainWindow(QMainWindow):
             self._swap_tab(key)
         self.tabs.setTabVisible(i, on)
         self._update_info_btn()
+        self._update_more_tabs()
         log.info("tab %s switched %s", key, "on" if on else "off")
         self.tab_switched.emit(key, on)
 
@@ -2749,6 +2787,8 @@ class MainWindow(QMainWindow):
             self._clear_category_hotkey(combo)
             if attr != "ptt_key" and self.cfg.ptt_key == combo:
                 self.cfg.ptt_key = ""
+        if attr == "replay_hotkey" and combo and not self.cfg.replay_hotkey:
+            self.toast(REPLAY_NOTE)   # instant replay just went on
         setattr(self.cfg, attr, combo)
         self._save_now()
         self.register_hotkeys()

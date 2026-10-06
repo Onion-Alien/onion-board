@@ -7,6 +7,11 @@ out") is an urgent fix: the app shows it as a banner across the window instead o
 the small Update pill, and "Skip this version" doesn't hide it. Only the newest release
 is looked at, so keep that line in the next release's notes while the fix still matters.
 
+Any other release settles for SETTLE_S before the app offers it: a fix that follows it
+the same day replaces it, so people get one prompt instead of several. While the
+newest one settles, the newest settled release newer than this copy is offered
+instead. "Check now" always offers the newest.
+
 A newer version is only announced. Nothing is downloaded until the user presses
 *Update now*: then the release's OnionBoardSetup.exe is fetched from the project's own
 GitHub release, checked against the SHA-256 GitHub lists for it, and run silently over
@@ -27,6 +32,7 @@ import time
 import urllib.request
 from collections.abc import Callable
 from dataclasses import dataclass
+from datetime import datetime
 from pathlib import Path
 
 from soundboard import __version__, net
@@ -38,6 +44,7 @@ log = logging.getLogger(__name__)
 REPO = "Onion-Alien/onion-board"
 API = f"https://api.github.com/repos/{REPO}/releases/latest"
 RELEASES = f"https://github.com/{REPO}/releases/latest"
+RECENT = f"https://api.github.com/repos/{REPO}/releases?per_page=10"
 ASSET = "OnionBoardSetup.exe"
 # the same file uploaded a second time for *Update now* to fetch, so GitHub's download
 # counts tell updates apart from downloads off the website; releases without it: ASSET
@@ -49,6 +56,7 @@ OLD_DOWNLOADS = "https://github.com/Onion-Alien/onionboard/releases/download/"
 UPDATES_DIR = APP_DIR / "updates"
 INSTALL_LOG = UPDATES_DIR / "install.log"
 EVERY_S = 6 * 3600       # so an urgent fix reaches people the same day
+SETTLE_S = 24 * 3600     # how long any other release is out before it's offered
 LIMIT = 1 << 20          # the API's answer is a few KB
 MAX_SIZE = 400 << 20     # the installer is ~180 MB
 CHUNK = 1 << 20
@@ -69,6 +77,7 @@ class Release:
     sha256: str = ""      # that file's SHA-256 (lowercase hex), as GitHub lists it
     size: int = 0
     urgent: str = ""      # why it's an urgent fix (its "Urgent: …" line); "" = it isn't
+    published: float = 0.0   # when it came out (epoch seconds); 0 = unknown
 
 
 def parse_version(text: str) -> tuple[int, ...] | None:
@@ -183,9 +192,36 @@ def summary(body: str, limit: int = 420) -> str:
     return "\n\n".join(out)
 
 
+def _published(data: dict) -> float:
+    """A release's published_at ("2026-10-06T20:39:15Z") as epoch seconds; 0 if none."""
+    try:
+        return datetime.fromisoformat(
+            str(data.get("published_at") or "").replace("Z", "+00:00")).timestamp()
+    except ValueError:
+        return 0.0
+
+
+def settled(rel: Release, now: float | None = None) -> bool:
+    """Out long enough to offer: urgent fixes and releases of unknown age right away."""
+    return (bool(rel.urgent) or not rel.published
+            or (time.time() if now is None else now) - rel.published >= SETTLE_S)
+
+
 def latest() -> Release | None:
     """The newest published release (drafts and pre-releases aren't 'latest')."""
-    data = _get(API)
+    return _release(_get(API))
+
+
+def latest_settled() -> Release | None:
+    """The newest release that has settled (see SETTLE_S), from the last few."""
+    data = _get(RECENT)
+    found = [r for d in (data if isinstance(data, list) else [])
+             if isinstance(d, dict) and not d.get("draft") and not d.get("prerelease")
+             and (r := _release(d)) is not None and settled(r)]
+    return max(found, key=lambda r: parse_version(r.version), default=None)
+
+
+def _release(data: dict) -> Release | None:
     tag = str(data.get("tag_name") or data.get("name") or "")
     ver = parse_version(tag)
     if ver is None:
@@ -195,13 +231,13 @@ def latest() -> Release | None:
         url = RELEASES   # only ever open the project's own page
     body = str(data.get("body") or "")
     return Release(".".join(map(str, ver)), url, summary(body), *_installer(data),
-                   urgent=urgent(body))
+                   urgent=urgent(body), published=_published(data))
 
 
 def check(cfg, force: bool = False) -> Release | None:
     """A newer release than this one, or None. Without `force` it only asks if the
     box is ticked, at most every EVERY_S, and stays quiet about a version they
-    skipped (unless it's an urgent fix).
+    skipped (unless it's an urgent fix), or about one still settling (SETTLE_S).
     Network errors are logged and read as 'nothing new'. Switched off in Settings >
     Privacy & security, the daily check skips itself silently (a forced one raises
     net.FeatureOff). Call off the UI thread."""
@@ -210,6 +246,9 @@ def check(cfg, force: bool = False) -> Release | None:
         return None
     try:
         rel = latest()
+        if not force and rel is not None and newer(rel.version) and not settled(rel):
+            log.info("%s is still settling: looking for an older one", rel.version)
+            rel = latest_settled()
     except Exception as e:  # noqa: BLE001 - offline, rate-limited, GitHub down…
         log.info("update check failed: %s", e)
         if force:

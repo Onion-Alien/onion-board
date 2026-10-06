@@ -1216,7 +1216,7 @@ class SettingsDialog(QDialog):
             "Tabs",
             "Switch off the tabs you don't use. A switched-off tab is gone from the "
             "window and doesn't load at all, so nothing of it runs in the background. "
-            "Switch it back on any time.")
+            "Switch it back on any time, here or with + More tabs beside the tabs.")
         from soundboard.ui.mainwindow import TABS
         self.tab_boxes: dict[str, QCheckBox] = {}
         for text, _tip in TABS:
@@ -1803,7 +1803,7 @@ class SettingsDialog(QDialog):
         card, cv = self._card("Low data mode",
                               "For a phone hotspot, capped plan or slow internet: smaller "
                               "downloads, lower-bitrate radio, more patience with stations "
-                              "that cut out, and no pictures or like counts in web search "
+                              "that cut out, and no pictures in web search "
                               "results. Or pick each one below.")
         self.data_low = QCheckBox("Use less data")
         self.data_low.toggled.connect(
@@ -1900,9 +1900,9 @@ class SettingsDialog(QDialog):
 
         card, cv = self._card("Sounds from the web")
         self._data_widgets["web_extras"] = self._option(
-            cv, "Show pictures and like counts",
-            "Search results load each video's thumbnail and look up its likes and "
-            "comments. Off: just the titles, a lot less data per search.",
+            cv, "Show pictures",
+            "Search results load each video's thumbnail. Off: just the titles, "
+            "a lot less data per search.",
             q.web_extras, lambda b: self._data_set(web_extras=b))
         v.addWidget(card)
         v.addStretch(1)
