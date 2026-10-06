@@ -14,6 +14,10 @@ If the helper falls behind, the last 5 ms fade out; if nothing comes back for
 300 ms while you talk (it crashed or hung), the backup takes over with a 10 ms
 crossfade: a built-in voice preset by default, so your real voice still isn't
 heard. "mic" (your own voice) and "mute" are the other backups.
+
+Speaking another language (`dub_on`): the helper gets the translated computer
+voice's lines (`dub()`) instead of your mic, so the AI voice says them; your mic
+only feeds the speech recognition (VoiceChain.tap) and is never heard.
 """
 from __future__ import annotations
 
@@ -122,6 +126,9 @@ class VoiceSource:
         self._was_talking = False
         self.underruns = 0
         self.dropped = 0
+        self.dub_on = False                   # lines from dub() stand in for the mic
+        self._dub: deque[np.ndarray] = deque()   # at the mic's rate
+        self._dub_head = np.zeros(0, np.float32)
 
     # ------------------------------------------------------------ reader thread
     def push(self, pcm: bytes):
@@ -139,11 +146,46 @@ class VoiceSource:
             self._ring.append(y)
             self._ring_n += len(y)
 
+    # ------------------------------------------------------------ speaker thread
+    def dub(self, mono: np.ndarray, rate: int):
+        """A translated line to say in the AI voice (while `dub_on`). Queued at the
+        mic's rate; the speaker waits the line's length before sending the next."""
+        to = self.rate
+        if not to or not len(mono):
+            return
+        y = np.asarray(mono, np.float32)
+        if rate != to:
+            rs = resample.make(rate, to)
+            y = np.concatenate([rs.resample_chunk(y),
+                                rs.resample_chunk(np.zeros(rate // 50, np.float32))])
+        self._dub.append(y.astype(np.float32, copy=False))
+
+    def clear_dub(self):
+        self._dub.clear()
+        self._dub_head = np.zeros(0, np.float32)   # (the audio thread may keep one block)
+
+    def _take_dub(self, n: int) -> np.ndarray:
+        out = np.zeros(n, np.float32)
+        got = 0
+        while got < n:
+            if not len(self._dub_head):
+                if not self._dub:
+                    break
+                self._dub_head = self._dub.popleft()
+                continue
+            k = min(n - got, len(self._dub_head))
+            out[got:got + k] = self._dub_head[:k]
+            self._dub_head = self._dub_head[k:]
+            got += k
+        return out
+
     # ------------------------------------------------------------ audio thread
     def process(self, m: np.ndarray, rate: int) -> np.ndarray:
         """Mono mic block -> mono voice block of the same length."""
         self.rate = rate
         n = len(m)
+        if self.dub_on:                       # the translated lines, never your mic
+            m = self._take_dub(n)
         dt = n / rate
         talking = self.gate.update(m, rate)
         if self.ready and not self.dead:
@@ -290,6 +332,7 @@ class AiVoiceController:
         self.host: ServiceHost | None = None
         self.source: VoiceSource | None = None
         self.backup = "voice"
+        self.dub_on = False
 
     @property
     def running(self) -> bool:
@@ -311,6 +354,7 @@ class AiVoiceController:
                            make_resampler=resample.make)
         holder.append(host)
         src = VoiceSource(host.feed, lambda: host.feed_json({"type": "quiet"}), self.backup)
+        src.dub_on = self.dub_on
         self.host, self.source = host, src
         try:
             host.start()
@@ -329,6 +373,29 @@ class AiVoiceController:
     def set_auto_pitch(self, on: bool):
         if self.host is not None:
             self.host.feed_json({"type": "config", "auto_pitch": bool(on)})
+
+    def set_dub(self, on: bool):
+        """Speaking another language: the AI voice says the translated lines (dub())
+        instead of converting your mic."""
+        self.dub_on = bool(on)
+        src = self.source
+        if src is not None:
+            src.dub_on = self.dub_on
+            if not on:
+                src.clear_dub()
+
+    def dub(self, mono: np.ndarray, rate: int) -> bool:
+        """False when there's no AI voice running to say it."""
+        src = self.source
+        if src is None or not self.dub_on:
+            return False
+        src.dub(mono, rate)
+        return True
+
+    def clear_dub(self):
+        src = self.source
+        if src is not None:
+            src.clear_dub()
 
     def set_backup(self, backup: str):
         self.backup = backup if backup in BACKUPS else "voice"

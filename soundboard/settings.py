@@ -1041,7 +1041,7 @@ class SettingsDialog(QDialog):
         return card
 
     def _voices_card(self):
-        """Custom text-to-speech voices live on the Voice tab (under More options); this
+        """Custom text-to-speech voices live on the Voice tab (behind Add voices…); this
         card is where people look for them first. Hidden while the tab is switched off
         (Settings > Tabs), and its buttons reach the Voice tab there now: switched off
         and on again while Settings is open, that's a new one."""
@@ -1049,7 +1049,7 @@ class SettingsDialog(QDialog):
         mw = self.mw
         card, cv = self._card(
             "Custom voices (text-to-speech)",
-            "Your own voices for typed lines and Talk as a computer voice: a TTS server "
+            "Your own voices for typed lines and the text-to-speech voice: a TTS server "
             "running on your PC (Kokoro, AllTalk, any OpenAI-style one), a TTS program, or "
             "Piper voice packs dropped into the voices folder. They join the Voice list on "
             "the Voice tab.")

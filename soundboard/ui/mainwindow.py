@@ -84,7 +84,7 @@ TABS = (("Sounds", "Your sound buttons: click one to play it"),
         ("Radio", "Internet radio stations from around the world"),
         ("Apps", "Send another program's sound (music player, game…)"),
         ("Triggers", "Play a sound when something shows up on your screen (“YOU DIED”…)"),
-        ("Voice", "Change your voice, or talk as a computer voice"),
+        ("Voice", "Change your voice, speak another language, or use text-to-speech"),
         ("Setup", "Pick where your sounds go (Discord, games, OBS…), test it"))
 TAB_INDEX = {text.lower(): i for i, (text, _tip) in enumerate(TABS)}
 
