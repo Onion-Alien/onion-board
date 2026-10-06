@@ -311,3 +311,39 @@ def test_onion_pocket_can_be_removed_from_its_card_and_add_ons(qapp, window,  # 
     assert d.pocket_remove_addons.isHidden()   # Add-ons: not installed
     assert d.get_pocket.isVisibleTo(d)                     # Remote offers it again
     d.close()
+
+
+def test_add_ons_card_checks_reinstalls_and_reports(qapp, window,  # noqa: F811
+                                                    monkeypatch):
+    """Settings → Add-ons & help, Onion Pocket's row: Check for updates turns into
+    Update to X when GitHub has a newer one, Reinstall swaps in a fresh copy, and
+    Report a problem opens a bug report naming the add-on and its version."""
+
+    from soundboard import feedback, library, net, pocketaddon
+    from soundboard.ui import busy
+    base = library.APP_DIR / "modules"
+    info = _module(base, pocketaddon.MODULE_ID, "pocket_addons_card_test", ADDON)
+    monkeypatch.setattr(modules, "discover", lambda dirs=None: [modules._read(info.path)])
+    monkeypatch.setattr(net, "allowed", lambda feature: True)
+    window.pocket_checked = 1e18
+    window.remote_addons = window._load_remote_addons()
+    d = SettingsDialog(window, "help")
+    b = d.pocket_buttons
+    assert b["get"].isHidden() and not b["check"].isHidden()
+    monkeypatch.setattr(pocketaddon, "latest",
+                        lambda cancelled=None: pocketaddon.Offer("2", "u", "s"))
+    b["check"].click()
+    assert process_events(qapp, lambda: b["check"].text() == "Update to 2", timeout=3)
+    got = []
+    monkeypatch.setattr(pocketaddon, "get", lambda offer=None, **k: got.append(offer)
+                        or modules._read(info.path))
+    b["reinstall"].click()
+    assert process_events(qapp, lambda: got and not busy.is_busy(b["reinstall"]), timeout=3)
+    assert got == [None] and len(window.remote_addons) == 1
+    opened = []
+    monkeypatch.setattr(busy, "open_url", lambda url, *a, **k: opened.append(url))
+    b["report"].click()
+    assert "title=Onion%20Pocket%3A%20" in opened[0] and "Onion%20Pocket%201" in opened[0]
+    assert "title" not in feedback.problem_url("1.0")
+    d.close()
+    window._stop_remote_addons()

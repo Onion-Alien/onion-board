@@ -21,8 +21,14 @@ def feedback_url(version: str) -> str:
     return problem_url(version)
 
 
-def problem_url(version: str) -> str:
-    body = (f"**Onion Board version:** {version}\n\n"
-            "**What happened?**\n\n\n"
+def problem_url(version: str, addon: str = "") -> str:
+    """A new bug report; `addon` ("Onion Pocket 0.2.2") when it's about an add-on:
+    it goes in the title and under the app's version."""
+    body = (f"**Onion Board version:** {version}\n"
+            + (f"**Add-on:** {addon}\n" if addon else "")
+            + "\n**What happened?**\n\n\n"
             "**What did you expect?**\n\n")
-    return f"{ISSUE_URL}?labels=bug&body={quote(body)}"
+    name, _, ver = addon.rpartition(" ")
+    name = name if ver[:1].isdigit() else addon     # "Onion Pocket", not its version
+    title = f"&title={quote(name + ': ')}" if addon else ""
+    return f"{ISSUE_URL}?labels=bug{title}&body={quote(body)}"

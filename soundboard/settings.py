@@ -251,6 +251,64 @@ class _ProgressRelay(_Relay):
     progress = Signal(int, int)
 
 
+class _AddonGrid(QWidget):
+    """Settings → Add-ons: each add-on's name, status line and buttons, the buttons in
+    shared columns so they line up from one add-on to the next. As many columns as
+    fit (4, else 2, else 1): it never makes the page wider than its window."""
+    GAP = 8
+
+    def __init__(self, cols: int):
+        super().__init__()
+        self.grid = QGridLayout(self)
+        self.grid.setContentsMargins(0, 0, 0, 0)
+        self.grid.setHorizontalSpacing(self.GAP)
+        self.grid.setVerticalSpacing(6)
+        self.max_cols = self.cols = cols
+        self.rows: list[tuple[QLabel, QLabel, list[list[QPushButton]]]] = []
+
+    def add(self, title: QLabel, status: QLabel, cells: list[list[QPushButton]]):
+        for cell in cells:
+            for b in cell:
+                b.setMinimumWidth(40)    # the columns decide; resizeEvent keeps it readable
+        self.rows.append((title, status, cells))
+        self._place()
+
+    def _need(self, cols: int) -> int:
+        w = max((b.sizeHint().width() for _t, _s, cells in self.rows
+                 for cell in cells for b in cell), default=0)
+        return cols * w + (cols - 1) * self.GAP
+
+    def _place(self):
+        g, cols = self.grid, self.cols
+        while g.count():
+            g.takeAt(0)
+        for r in range(g.rowCount()):
+            g.setRowMinimumHeight(r, 0)
+        r = 0
+        for i, (title, status, cells) in enumerate(self.rows):
+            if i:
+                g.setRowMinimumHeight(r, 6)      # a gap between add-ons
+                r += 1
+            g.addWidget(title, r, 0, 1, cols)
+            g.addWidget(status, r + 1, 0, 1, cols)
+            r += 2
+            for n, cell in enumerate(cells):
+                for b in cell:
+                    g.addWidget(b, r + n // cols, n % cols)
+            r += (len(cells) + cols - 1) // cols
+        for c in range(self.max_cols):
+            g.setColumnStretch(c, 1 if c < cols else 0)
+
+    def resizeEvent(self, e):
+        cols = self.max_cols
+        while cols > 1 and self._need(cols) > e.size().width():
+            cols //= 2
+        if cols != self.cols:
+            self.cols = cols
+            self._place()
+        super().resizeEvent(e)
+
+
 class ThemeCard(QPushButton):
     """A clickable mini-preview of a theme."""
 
@@ -1113,11 +1171,18 @@ class SettingsDialog(QDialog):
 
     def _help(self):
         w, v = self._page()
-        card = self._addons_card()
-        self._pocket_addon_row(card.layout())
-        v.addWidget(card)
-        v.addWidget(self._feedback_card())
-        v.addWidget(self._support_card())
+        col = QWidget()
+        col.setMaximumWidth(self.ADDONS_W)
+        cl = QVBoxLayout(col)
+        cl.setContentsMargins(0, 0, 0, 0)
+        cl.setSpacing(12)
+        cl.addWidget(self._addons_card())
+        cl.addWidget(self._feedback_card())
+        cl.addWidget(self._support_card())
+        row = QHBoxLayout()
+        row.addWidget(col, 1)
+        row.addStretch(0)
+        v.addLayout(row)
         v.addStretch(1)
         return w
 
@@ -1216,41 +1281,274 @@ class SettingsDialog(QDialog):
         return card
 
     # ------------------------------------------------------------------ add-ons
+    ADDONS_W = 760   # the Add-ons & help page's cards stop growing here (a wide window
+    #                  stretched them into long thin bars with the buttons far apart)
+
+    class _AddonRelay(QObject):
+        """A check for a newer add-on, back on the UI thread: (offer, error text)."""
+        done = Signal(object, str)
+
     def _addons_card(self):
-        """Onion Watch (the Triggers tab's add-on) can be removed from here too, not
-        only from the end of its own More menu."""
+        """Every add-on in one place, each with the same row of buttons in the same
+        order: Check for updates (Update to X once one is out), Reinstall (a fresh
+        copy of the newest; the user's triggers / paired phones are the board's and
+        stay), Report a problem, Remove… Not installed: Get it, and Report a problem.
+        One grid for all of them (_AddonGrid): the buttons share columns, so they line
+        up from one add-on to the next, folding to two columns in a narrow window."""
+        card, cv = self._card("Add-ons",
+                              "Free add-ons from GitHub. Removing or reinstalling one "
+                              "keeps your triggers and paired phones.")
+        grid = _AddonGrid(len(self.ADDON_COLUMNS))
+        cv.addWidget(grid)      # in the card first: a button shown without a parent
+        self._watch_block(grid)  # is a window of its own
+        self._pocket_block(grid)
+        return card
+
+    # the button columns, in order; "get" stands in for "check" while it isn't in
+    ADDON_COLUMNS = (("check", "get"), ("report",), ("reinstall",), ("remove",))
+
+    def _addon_block(self, grid, name: str, blurb: str):
+        """An add-on's name and what it's for, a status line, and its buttons, as rows
+        of the Add-ons grid. (status label, {key: button})."""
+        title = QLabel(f"<b>{html.escape(name)}</b> · {html.escape(blurb)}")
+        title.setTextFormat(Qt.RichText)
+        title.setWordWrap(True)
+        status = QLabel()
+        status.setObjectName("hint")
+        status.setWordWrap(True)
+        btns = {}
+        for key, text, icon in (("get", f"Get {name}", ""),
+                                ("check", "Check for updates", "reload"),
+                                ("reinstall", "Reinstall", ""),
+                                ("report", "Report a problem", ""),
+                                ("remove", "Remove…", "trash")):
+            b = QPushButton(text)
+            if icon:
+                icons.set_icon(b, icon, "danger_text" if key == "remove" else None)
+            btns[key] = b
+        btns["get"].setObjectName("primary")
+        btns["reinstall"].setToolTip(f"Downloads the newest {name} again and puts it in "
+                                     "place of this one. Your own things are kept.")
+        btns["report"].setToolTip("Opens a bug report on GitHub in your browser, with "
+                                  "the versions filled in")
+        grid.add(title, status, [[btns[k] for k in keys] for keys in self.ADDON_COLUMNS])
+        return status, btns
+
+    def _addon_report(self, btn, what: str):
+        from soundboard import __version__, feedback
+        busy.open_url(feedback.problem_url(__version__, what), btn,
+                      opened="✓ Opened in your browser",
+                      failed="Couldn't open your browser. The page is")
+
+    def _addon_check(self, btn, feature: str, latest, newer_than: str, on_offer):
+        """Check for updates: asks GitHub on a thread (`latest()` -> offer or None);
+        a newer one calls `on_offer(offer)`, else the button says it's up to date."""
+        from soundboard import net, netlog, updates
+        if not net.allowed(feature):
+            busy.flash(btn, "Add-on downloads are off (Privacy)", 4000)
+            return
+        release = busy.hold(btn, "Checking…")
+        relay = self._AddonRelay(self)
+        netlog.cause(feature, "You clicked Check for updates (Settings > Add-ons)")
+
+        def done(offer, error):
+            relay.deleteLater()
+            if not qt_valid(btn):
+                return
+            if error:
+                release("Couldn't check")
+                busy.toast(self, html.escape(error), "warn")
+            elif offer is not None and updates.newer(offer.version, newer_than):
+                release()
+                on_offer(offer)
+            else:
+                release("✓ Up to date")
+
+        def ask():
+            try:
+                offer, error = latest(), ""
+            except Exception as e:  # noqa: BLE001 - offline, rate-limited, switched off…
+                offer, error = None, f"Couldn't reach GitHub ({errors.plain(e)})."
+            try:
+                relay.done.emit(offer, error)
+            except RuntimeError:        # Settings was closed meanwhile
+                pass
+        relay.done.connect(done)
+        threading.Thread(target=ask, daemon=True, name="addon-check").start()
+
+    # ---- Onion Watch (the Triggers tab's add-on, soundboard.watchaddon)
+    def _watch_block(self, grid):
         from soundboard import watchaddon
         tab = self.mw.triggers
-        card, cv = self._card("Add-ons",
-                              "Onion Watch is the free add-on behind the Triggers tab, and "
-                              "Onion Pocket puts your pads on your phone. Removing one "
-                              "keeps your triggers and paired phones for when you get it "
-                              "again.")
-        self.addon_label = QLabel()
-        self.addon_label.setWordWrap(True)
-        self.addon_remove = QPushButton("Remove Onion Watch…")
-        icons.set_icon(self.addon_remove, "trash", "danger_text")
+        status, b = self._addon_block(grid, "Onion Watch", "the Triggers tab")
+        self.addon_label, self.addon_remove = status, b["remove"]
+        self.watch_buttons = b
+        state = {}
 
-        def refresh():
+        def refresh(note: str = ""):
+            if not qt_valid(status):
+                return
             info = tab.info
             have = info is not None and watchaddon.removable(info, tab._base())
-            self.addon_label.setText(f"Onion Watch {info.version} is installed." if have else
-                                     "Onion Watch isn't installed. Get it from the Triggers "
-                                     "tab.")
-            self.addon_remove.setVisible(have)
+            status.setText(note or (f"Version {info.version} is installed." if have else
+                                    "Onion Watch isn't installed."))
+            b["get"].setVisible(not have)
+            for k in ("check", "reinstall", "remove"):
+                b[k].setVisible(have)
+            if not have:
+                state.pop("offer", None)
+            self._label_update(b["check"], state.get("offer"))
+
+        def run_get(offer, btn, text):
+            """tab.get() does the work (and shows it on the Triggers tab too)."""
+            if tab._busy:
+                busy.flash(btn, "Already downloading")
+                return
+            tab.offer = offer
+            release = busy.hold(btn, text)
+
+            def finished(info, error, _update):
+                tab._finished.disconnect(finished)
+                if not qt_valid(btn):
+                    return
+                release("✗ Didn't work" if error else "✓ Done")
+                state.pop("offer", None)
+                refresh(f"Onion Watch wasn't installed: {errors.plain(error)}" if error
+                        else (f"Version {info.version} is in. Restart Onion Board to "
+                              "start using it." if _update else ""))
+                QTimer.singleShot(0, lambda: refresh() if not error and not _update
+                                  else None)
+            tab._finished.connect(finished)
+            tab.get()
+
+        def check():
+            if state.get("offer") is not None:      # "Update to X"
+                run_get(state["offer"], b["check"], "Updating…")
+                return
+            info = tab.info
+
+            def found(offer):
+                state["offer"] = offer
+                tab.offer_update(offer)
+                refresh()
+            self._addon_check(b["check"], watchaddon.FEATURE, watchaddon.latest,
+                              info.version if info else "0", found)
 
         def remove():
             tab.remove()                    # asks first
             refresh()
-        self.addon_remove.clicked.connect(remove)
-        # the button under the text, on the left, like every other card's (far right
-        # beside the text, it looked lost)
-        row = _button_row()
-        row.addWidget(self.addon_remove)
-        cv.addWidget(self.addon_label)
-        cv.addLayout(row)
+
+        b["get"].clicked.connect(lambda: run_get(None, b["get"], "Getting it…"))
+        b["check"].clicked.connect(check)
+        b["reinstall"].clicked.connect(lambda: run_get(None, b["reinstall"],
+                                                       "Reinstalling…"))
+        b["report"].clicked.connect(lambda: self._addon_report(
+            b["report"], f"Onion Watch {tab.info.version}" if tab.info else "Onion Watch"))
+        b["remove"].clicked.connect(remove)
         refresh()   # in the card first: shown without a parent, it's a window of its own
-        return card
+
+    @staticmethod
+    def _label_update(btn, offer):
+        """Check for updates, or *Update to X* (primary) once a newer one is found."""
+        text = f"Update to {offer.version}" if offer is not None else "Check for updates"
+        if btn.text() != text and not busy.is_busy(btn):
+            btn.setText(text)
+            btn.setObjectName("primary" if offer is not None else "")
+            btn.style().unpolish(btn)
+            btn.style().polish(btn)
+
+    # ---- Onion Pocket (the phone remote, soundboard.pocketaddon)
+    def _pocket_block(self, grid):
+        from soundboard import pocketaddon, updates
+        status, b = self._addon_block(grid, "Onion Pocket", "your pads on your phone")
+        self.pocket_remove_addons = b["remove"]
+        self.pocket_buttons = b
+        state = {}
+
+        def refresh(note: str = ""):
+            if not qt_valid(status):
+                return
+            info = self._pocket_info()
+            have = info is not None and pocketaddon.removable(info)
+            if info is not None and info.error and have:
+                note = note or f"Version {info.version} is installed but didn't start: " \
+                               f"{info.error}. Reinstall it, or report the problem."
+            status.setText(note or (f"Version {info.version} is installed. Its settings "
+                                    "are on the Remote page." if have else
+                                    "Onion Pocket isn't installed."))
+            b["get"].setVisible(not have and pocketaddon.offered())
+            for k in ("check", "reinstall", "remove"):
+                b[k].setVisible(have)
+            offer = state.get("offer")
+            if not have or (offer is not None and info is not None
+                            and not updates.newer(offer.version, info.version)):
+                state.pop("offer", None)
+            self._label_update(b["check"], state.get("offer"))
+
+        def check():
+            if state.get("offer") is not None:      # "Update to X"
+                self._pocket_install(b["check"], state["offer"], "Updating…")
+                return
+            info = self._pocket_info()
+
+            def found(offer):
+                state["offer"] = offer
+                self.mw.pocket_offer = offer
+                refresh()
+            self._addon_check(b["check"], pocketaddon.FEATURE, pocketaddon.latest,
+                              info.version if info else "0", found)
+
+        b["get"].clicked.connect(lambda: self._pocket_install(b["get"], None,
+                                                              "Getting it…"))
+        b["check"].clicked.connect(check)
+        b["reinstall"].clicked.connect(lambda: self._pocket_install(b["reinstall"], None,
+                                                                    "Reinstalling…"))
+        b["report"].clicked.connect(lambda: self._addon_report(
+            b["report"], f"Onion Pocket {i.version}" if (i := self._pocket_info())
+            else "Onion Pocket"))
+        b["remove"].clicked.connect(lambda: self._remove_pocket(b["remove"]))
+        self._pocket_refresh = refresh
+        refresh()
+
+    def _pocket_install(self, btn, offer, text: str):
+        """Get / reinstall / update Onion Pocket from the Add-ons card: downloads it
+        (pocketaddon.get), the main window swaps it in for any running copy (paired
+        phones stay), and its card on Settings → Remote is replaced by the new one's."""
+        from soundboard import netlog, pocketaddon
+
+        class Relay(QObject):
+            done = Signal(object)
+
+        release = busy.hold(btn, text)
+        netlog.cause(pocketaddon.FEATURE, "You clicked to get Onion Pocket "
+                                          "(Settings > Add-ons)")
+        relay = Relay(self.mw)   # the main window's: it's loaded even if Settings closes
+
+        def finish(new):
+            relay.deleteLater()
+            addon = self.mw.load_remote_addon(new) if new is not None else None
+            if new is not None:
+                self.mw.pocket_offer = None
+            if not qt_valid(btn):
+                return
+            if addon is None:
+                release("✗ Didn't work")
+                busy.toast(self, "Couldn't get Onion Pocket right now. Check your "
+                                 "internet connection and try again.", "warn")
+                self._pocket_changed()
+                return
+            release("✓ Done")
+            if getattr(self, "_pocket_slot", None) is not None:
+                fresh = self._addon_card(new, addon)
+                if fresh is not None:
+                    self._pocket_remove_button(fresh, new)
+                self._swap_pocket_slot(fresh)
+            self._pocket_changed()
+            busy.toast(self, f"✓ Onion Pocket {html.escape(new.version)} is in.", "ok")
+
+        relay.done.connect(finish)
+        threading.Thread(target=lambda: relay.done.emit(pocketaddon.get(offer=offer)),
+                         daemon=True, name="onion-pocket-addons").start()
 
     # ------------------------------------------------------------------ support
     def _feedback_card(self):
@@ -2244,33 +2542,6 @@ class SettingsDialog(QDialog):
         from soundboard import pocketaddon
         return next((i for i, _a in getattr(self.mw, "remote_addons", [])
                      if i.id == pocketaddon.MODULE_ID), None)
-
-    def _pocket_addon_row(self, cv):
-        """Onion Pocket on the Add-ons card: its version and *Remove Onion Pocket…*,
-        like Onion Watch's above it."""
-        from soundboard import pocketaddon
-        label = QLabel()
-        label.setWordWrap(True)
-        btn = QPushButton("Remove Onion Pocket…")
-        icons.set_icon(btn, "trash", "danger_text")
-
-        def refresh():
-            if not qt_valid(label):
-                return
-            info = self._pocket_info()
-            have = info is not None and pocketaddon.removable(info)
-            label.setText(f"Onion Pocket {info.version} is installed." if have else
-                          "Onion Pocket isn't installed. Get it from Settings → Remote.")
-            btn.setVisible(have)
-
-        btn.clicked.connect(lambda: self._remove_pocket(btn))
-        self._pocket_refresh = refresh
-        row = _button_row()
-        row.addWidget(btn)
-        cv.addWidget(label)
-        cv.addLayout(row)
-        refresh()
-        self.pocket_remove_addons = btn
 
     def _pocket_remove_button(self, card, info):
         """*Remove Onion Pocket…* at the foot of its own card on Settings → Remote."""

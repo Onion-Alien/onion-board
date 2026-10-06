@@ -43,9 +43,10 @@ NOTES = (
         ("shield", "Your phone's key never crosses the Wi-Fi",
          "With Onion Pocket 0.2.2 each tap is signed instead of carrying the key, so "
          "nobody on your Wi-Fi can copy it or replay a tap. Older versions still work."),
-        ("trash", "Onion Pocket can be removed",
-         "Settings → Remote and Settings → Add-ons & help now have Remove Onion Pocket. "
-         "Your paired phones are kept if you get it again."),
+        ("plus", "Add-ons in one place",
+         "Settings → Add-ons & help lists Onion Watch and Onion Pocket, each with Check "
+         "for updates, Report a problem, Reinstall and Remove. Your triggers and "
+         "paired phones are kept."),
     )),
     Note("1.9.3", "Your mic, start to finish", (
         ("check", "No cable box ticked for you",
