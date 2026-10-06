@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased
+
+- **A simpler first window.** A new install starts with just Sounds, Voice and Setup.
+  The other tabs wait under **+ More tabs** beside the tabs: click one and it's added
+  and opened. *Choose tabs in Settings…* in the same menu shows them all. Your tabs
+  stay as they are if you already use Onion Board.
+
 ## 1.9.6 — 2026-10-06
 
 - **New voice: Secret detective.** A disguised TV voice: yours plus a copy a fifth
