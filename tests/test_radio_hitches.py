@@ -54,6 +54,7 @@ def world_map(rings, labels, zoom=2.0):
     m = FlatMap()
     m.resize(1200, 700)
     m.set_land(rings, labels)
+    m.set_loading(False)   # no stations: Bun would wait on it (and move between grabs)
     m.zoom = zoom
     return m
 
@@ -230,6 +231,80 @@ def test_a_drag_only_copies_tiles_at_any_zoom(qapp):
             m.repaint()
         assert drawn == [], f"zoom {zoom}: drew {len(drawn)} tiles while dragging"
         m.close()
+
+
+def test_a_new_zoom_shows_all_at_once_never_tile_by_tile(qapp):
+    """While a new zoom was drawn, its tiles showed one by one over the old ones
+    stretched tile by tile, and each stretched tile blurred into the background at
+    its edges: a grid of squares over the map. Now the last view stands in as one
+    picture, and the new zoom shows when all of it is drawn."""
+    rings, labels = outlines()
+    m = world_map(rings, labels, zoom=2.0)
+    m.set_points([{"id": f"s{i}", "la": -40.0 + i, "lo": -100.0 + 2 * i, "k": i}
+                  for i in range(80)])
+    m._reveal_t0 = None                        # (the first stations' pop-in: not here)
+    m.show()
+
+    def done():
+        m.grab()                               # (offscreen, repaint() may not paint)
+        end = time.monotonic() + 5
+        while m.busy() and time.monotonic() < end:
+            qapp.processEvents()
+            time.sleep(0.0005)
+        m.grab()
+        assert m._stable is not None and m._stable[0] == m._level()
+
+    done()
+    m._zoom_by(1.6)
+    def look():
+        img = m.grab().toImage()   # kept: constBits() points into it
+        return hash(bytes(img.constBits()))
+
+    seen = [look()]   # each different picture shown, in turn (this one starts it)
+    assert m.busy()
+    end = time.monotonic() + 5
+    while m.busy() and time.monotonic() < end:
+        h = look()
+        if not seen or seen[-1] != h:
+            seen.append(h)
+        for _ in range(5):
+            qapp.processEvents()
+            time.sleep(0.001)
+    assert not m.busy()
+    done()
+    final = look()
+    if seen[-1] != final:
+        seen.append(final)
+    # the old view (stretched), then the new one all at once (the ring round it may
+    # still be drawing then): nothing in between
+    assert len(seen) == 2, f"{len(seen)} different pictures"
+    m.close()
+
+
+def test_bun_waits_on_the_map_and_the_first_stations_pop_in(qapp):
+    from soundboard.ui import flatmap
+    m = FlatMap()
+    m.resize(600, 400)
+    m.show()
+    qapp.processEvents()
+    assert m._loading.isVisible()              # the map is there (it drags) with Bun on it
+    m.set_points([{"id": f"s{i}", "la": 0.0, "lo": float(i), "k": i} for i in range(50)])
+    assert not m._loading.isVisible() and m.revealing()
+    t = time.monotonic() - m._reveal_t0
+    shown = flatmap._pop((t - m._delay) / flatmap.POP_S)
+    assert (shown < 0.05).sum() > 40           # not all at once...
+    assert m._delay[-10:].mean() < m._delay[:10].mean()   # ...the most listened first
+    m.repaint()                                # (drawn live till they're all in)
+    end = time.monotonic() + flatmap.REVEAL_S + 2
+    while m.revealing() and time.monotonic() < end:
+        qapp.processEvents()
+        time.sleep(0.005)
+    assert not m.revealing()
+    m.set_points([])
+    m.show_message("The station directory can't be reached right now.")
+    m.set_loading(True)
+    assert not m._loading.isVisible()          # a message says what's wrong instead
+    m.close()
 
 
 def test_the_decoder_is_loaded_off_the_ui_thread_once(qapp, monkeypatch):
