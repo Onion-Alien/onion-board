@@ -287,6 +287,9 @@ def _never_look_at_the_real_foreground():
     from soundboard import appaudio, voicesdk
     with pytest.MonkeyPatch.context() as mp:
         mp.setattr(voicesdk, "foreground_process", lambda: (0, ""))
+        # ...nor whether it fills the screen (no tip during a game, soundboard.tips)
+        from soundboard import tips
+        mp.setattr(tips, "fullscreen_in_front", lambda: False)
         # ...nor which output Windows has as its default (the headphones follow it)
         mp.setattr(appaudio, "default_output_name", lambda: None)
         # ...nor which devices it has (a failing device is re-scanned when it's listed)

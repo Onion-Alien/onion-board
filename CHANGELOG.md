@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- **"Did you know?" tips.** Once the setup guide is done, Onion Board shows a short
+  tip about one feature at most once a day, with a *Show me* button that takes you
+  there. Never while a game is up, and each tip only once. *Show tips* in
+  *Settings → General* turns them off.
 - **Switch category when a program is in front.** Right-click a category tab →
   *Show this when a program is in front…* and pick your game (or any program). When
   it comes to the front, the board and the overlay show that category by themselves
