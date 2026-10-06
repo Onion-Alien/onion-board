@@ -14,10 +14,8 @@ from __future__ import annotations
 import html
 import logging
 import math
-import queue
 import random
 import threading
-import time
 
 from PySide6.QtCore import QEvent, QPointF, QRect, QRectF, QSize, QUrl, Qt, Signal
 from PySide6.QtGui import (QColor, QPainter, QPainterPath, QPixmap,
@@ -43,8 +41,6 @@ log = logging.getLogger(__name__)
 
 THUMB_W, THUMB_H = 128, 72   # the pictures' shape (16:9); they fill the card's width
 CARD_MIN_W = 210             # results are cards, as many across as fit at this width
-STATS_WORKERS = 1            # likes / comments looked up this many at a time
-STATS_GAP = 1.0              # ...and this many seconds apart: a burst looks like a bot
 TIPS = {"youtube": "Search YouTube",
         "ytmusic": "Search YouTube Music: songs, the official versions",
         "soundcloud": "Search SoundCloud",
@@ -62,16 +58,15 @@ def fmt_count(n: int) -> str:
     return str(n)
 
 
-def stats_text(r: ytdl.Result, waiting: bool = False) -> tuple[str, str]:
-    """(the card's line, its tooltip) for a hit's views, likes and comments: nothing
-    for what the site didn't say, "…" for likes / comments still being looked up."""
+def stats_text(r: ytdl.Result) -> tuple[str, str]:
+    """(the card's line, its tooltip) for a hit's views, likes and comments, as its
+    search entry gave them: nothing for what it didn't say. No video page is fetched
+    for more (a look-up per hit is scraping, and the kind that gets you bot-checked)."""
     parts, tip = [], []
     for n, word in ((r.views, "views"), (r.likes, "likes"), (r.comments, "comments")):
         if n is not None:
             parts.append(f"{fmt_count(n)} {word}")
             tip.append(f"{n:,} {word}")
-        elif waiting and word != "views":
-            parts.append(f"… {word}")
     return " · ".join(parts), ", ".join(tip)
 
 
@@ -332,12 +327,12 @@ class StatsLabel(ClampLabel):
         super().__init__("", lines=1, bold=False)
         self.fields = []
 
-    def set_stats(self, result, waiting):
-        self.fields = [(icon, fmt_count(n) if n is not None else "…")
+    def set_stats(self, result):
+        self.fields = [(icon, fmt_count(n))
                        for n, icon in ((result.views, "triggers"), (result.likes, "like"),
                                        (result.comments, "speech"))
-                       if n is not None or (waiting and icon != "triggers")]
-        text, tip = stats_text(result, waiting)
+                       if n is not None]
+        text, tip = stats_text(result)
         self.set_full(text, tip)
         self.setAccessibleName(text)
         self.setVisible(bool(text))
@@ -387,8 +382,7 @@ class ResultRow(HoverCard):
         self.stats = StatsLabel()
         self.stats.setObjectName("muted")
         v.addWidget(self.stats)
-        self.waiting = ytdl.needs_stats(r)   # likes / comments still to look up
-        self.show_stats()
+        self.stats.set_stats(r)
         v.addStretch(1)
         h = QHBoxLayout()
         h.setSpacing(6)
@@ -442,9 +436,6 @@ class ResultRow(HoverCard):
             e.accept()
             return
         super().keyPressEvent(e)
-
-    def show_stats(self):
-        self.stats.set_stats(self.result, self.waiting)
 
     def _btn(self, kind: str) -> QPushButton:
         return self.btn_add if kind == "add" else self.btn_play
@@ -521,7 +512,6 @@ class SearchResults(QFrame):
     add = Signal(object)
     closed = Signal()
     _done = Signal(int, object, str)   # worker -> UI: (search number, results, error)
-    _stats = Signal(int, object, object)   # worker -> UI: (search number, Result, counts)
 
     def __init__(self):
         super().__init__()
@@ -530,11 +520,6 @@ class SearchResults(QFrame):
         self._gen = 0
         self._rows: list[ResultRow] = []
         self._fetching: dict[str, set[str]] = {}   # url -> {"play", "add"} downloading
-        self._todo: queue.Queue = queue.Queue()     # (search number, Result) for stats
-        self._workers: list[threading.Thread] = []
-        self._quiet = threading.Event()   # set while nothing downloads: stats may run
-        self._quiet.set()
-        self._stats.connect(self._on_stats)
         self.net = QNetworkAccessManager(self)
         net.apply_qt(self.net, "sounds_web")   # thumbnails: Settings > Privacy & security
         self._done.connect(self._on_done)
@@ -699,10 +684,6 @@ class SearchResults(QFrame):
     def _lock_rows(self):
         for r in self._rows:
             r.set_locked(bool(self._fetching) and r.result.url not in self._fetching)
-        if self._fetching:   # downloads first: the like counts wait
-            self._quiet.clear()
-        else:
-            self._quiet.set()
 
     def _clear(self):
         for r in self._rows:
@@ -742,60 +723,12 @@ class SearchResults(QFrame):
             row.add.connect(self.add)
             self.rows.addWidget(row)
             self._rows.append(row)
-            if not quality.current.web_extras:   # Settings > Data & quality
-                row.waiting = False
-                row.show_stats()
-                continue
-            if not r.thumb:
+            if not quality.current.web_extras or not r.thumb:   # Settings > Data & quality
                 continue
             reply = self.net.get(QNetworkRequest(QUrl(r.thumb)))
             reply.finished.connect(lambda reply=reply, row=row, g=gen: self._on_thumb(
                 reply, row, g))
         self._lock_rows()
-        for row in self._rows:
-            if row.waiting:
-                self._todo.put((gen, row.result))
-        while len(self._workers) < STATS_WORKERS and not self._todo.empty():
-            t = threading.Thread(target=self._stats_work, daemon=True,
-                                 name=f"web-stats-{len(self._workers)}")
-            self._workers.append(t)
-            t.start()
-
-    def _stats_work(self):
-        """Likes and comments for the hits that came without them, one at a time and
-        STATS_GAP apart, never while a Play / Add downloads, and not at all while the
-        site is pushing back (ytdl.stats_paused). A newer search drops the rest."""
-        while True:
-            gen, r = self._todo.get()
-            self._quiet.wait()
-            if gen != self._gen:
-                continue
-            if ytdl.stats_paused():   # the card keeps its views, without "…"
-                self._stats.emit(gen, r, (None, None, None))
-                continue
-            time.sleep(STATS_GAP)
-            self._quiet.wait()        # a Play / Add clicked meanwhile goes first
-            if gen != self._gen:
-                continue
-            try:
-                netlog.cause(ytdl.FEATURE, "Likes and comments for your search "
-                                           f"{netlog.quoted(self.query)}")
-                counts = ytdl.stats(r)
-            except Exception as e:  # noqa: BLE001 - the card just keeps its views
-                log.info("no stats for %s: %s", r.url, e)
-                counts = (None, None, None)
-            self._stats.emit(gen, r, counts)
-
-    def _on_stats(self, gen: int, r, counts):
-        if gen != self._gen:
-            return
-        views, likes, comments = counts
-        r.views = r.views if views is None else views
-        r.likes, r.comments = likes, comments
-        for row in self._rows:
-            if row.result is r:
-                row.waiting = False
-                row.show_stats()
 
     def _on_thumb(self, reply, row: ResultRow, gen: int):
         data = reply.readAll()
