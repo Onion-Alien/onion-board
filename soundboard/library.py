@@ -355,7 +355,7 @@ class Config:
     category: str = ""                # the category the Sounds tab shows; "" = all
     tray: bool = True                 # closing the window keeps the app in the tray
     autostart_hidden: bool = True     # started with Windows: straight to the tray
-    # look at GitHub Releases for a newer version, at most once a day (soundboard.updates).
+    # look at GitHub Releases for a newer version, at most every 6 hours (soundboard.updates).
     # Was the opt-in update_check_optin, off by default: renamed so every config starts on
     update_check: bool = True
     update_checked: float = 0.0       # time.time() of the last check

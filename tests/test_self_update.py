@@ -117,3 +117,62 @@ def test_next_start_says_whether_the_update_worked(window, boxes):
     n = len(boxes.shown)
     window.after_update()                  # nothing pending: nothing to say
     assert len(boxes.shown) == n
+
+
+# --------------------------------------------------------------------------- urgent fixes
+
+def _urgent():
+    rel = _rel()
+    rel.urgent = "sounds cut out after an hour"
+    return rel
+
+
+def test_a_normal_update_has_no_banner(window, boxes):
+    window._on_update(_rel(), "", False)
+    assert window.urgent_bar.isHidden() and not window.btn_update.isHidden()
+
+
+def test_an_urgent_fix_gets_a_banner_and_no_skip(window, boxes, qapp, monkeypatch, tmp_path):
+    setup = tmp_path / "OnionBoardSetup-99.0.0.exe"
+    setup.write_bytes(b"MZ")
+    monkeypatch.setattr(updates, "can_install", lambda: True)
+    monkeypatch.setattr(updates, "download", lambda rel, p, c: setup)
+    monkeypatch.setattr(window, "quit_app", lambda: None)
+    window._on_update(_urgent(), "", False)          # the timed check found it
+    assert not window.urgent_bar.isHidden()
+    assert "sounds cut out after an hour" in window.urgent_lbl.text()
+    assert window.urgent_btn.text() == "Update now"
+
+    window.btn_update.click()                        # the pill's dialog: no Skip
+    title, buttons = boxes.shown[-1]
+    assert title == "Important fix available" and "Skip this version" not in buttons
+
+    boxes.answers = {"Install the update": "Later"}
+    window.urgent_btn.click()                        # the banner's Update now
+    assert process_events(qapp, lambda: window._update_file is not None)
+    assert not window.urgent_bar.isHidden()
+    assert window.urgent_btn.text() == "Restart to update"
+
+
+def test_hiding_the_banner_lasts_until_the_next_start(window, boxes):
+    window._on_update(_urgent(), "", False)
+    window.urgent_bar.findChild(type(window.urgent_btn), "urgenthide").click()
+    assert window.urgent_bar.isHidden()
+    window._on_update(_urgent(), "", False)          # found again 6 hours later
+    assert window.urgent_bar.isHidden()
+    assert not window.btn_update.isHidden()          # the pill stays
+
+
+def test_an_urgent_onion_watch_fix_gets_the_banner_too(window, monkeypatch):
+    from soundboard import watchaddon
+    calls = []
+    monkeypatch.setattr(window.triggers, "offer_update", lambda o: calls.append(o))
+    window._on_watch_update(watchaddon.Offer("9.9.9", notes="Fixes."))
+    assert window.urgent_bar.isHidden() and len(calls) == 1   # a normal one: the tab only
+    window._on_watch_update(watchaddon.Offer("9.9.9", urgent="triggers stop firing"))
+    assert not window.urgent_bar.isHidden() and len(calls) == 2
+    assert "Onion Watch 9.9.9" in window.urgent_lbl.text()
+    assert window.urgent_btn.text() == "Update Onion Watch"
+    window.urgent_btn.click()                        # off to its tab, banner gone
+    assert window.tabs.currentWidget() is window.triggers
+    assert window.urgent_bar.isHidden()

@@ -145,7 +145,7 @@ The full list. The [README](../README.md) has the short version and how to get s
   appears, or rings until you stop it. Its sounds play through the board like a
   pad; a ringing one loops in your headphones. Triggers from before the add-on
   (Onion Board 1.4 and older) carry over as they were. When a newer Onion Watch
-  is out, the tab offers it (only while *Check once a day* is
+  is out, the tab offers it (only while *Check for updates* is
   ticked). *Remove Onion Watch…* in its *More* menu uninstalls it (after asking);
   your triggers are kept for when you get it again.
   Everything happens on your PC: the screen is never saved or sent anywhere. If
@@ -227,10 +227,13 @@ The full list. The [README](../README.md) has the short version and how to get s
 - **Runs in the background:** closing the window keeps it in the tray (hotkeys and
   the overlay keep working; right-click the tray icon → *Quit*). Optionally
   **starts when you sign in**, straight to the tray (Settings → General).
-- **Updates itself:** once a day it checks GitHub for a new version (untick it in
+- **Updates itself:** every few hours it checks GitHub for a new version (untick it in
   Settings → Updates). *Update now* downloads it, checks it's the file GitHub lists,
   and on *Restart now* installs it and reopens the app, keeping your sounds and
-  settings. Nothing is downloaded until you click.
+  settings. Nothing is downloaded until you click. An **important fix** (a release
+  whose notes have an `Urgent: …` line, for Onion Board or Onion Watch) shows as a
+  banner across the window with the reason and an *Update now* button; it can be
+  hidden until the next start, but not skipped for good.
 
 ## How it works
 

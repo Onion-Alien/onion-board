@@ -199,7 +199,7 @@ def test_update_preferences_have_one_home_and_privacy_links_to_it(window, monkey
     try:
         def boxes(text):
             return [b for b in d.findChildren(QCheckBox) if b.text().startswith(text)]
-        assert len(boxes("Check once a day")) == len(boxes("Update automatically")) == 1
+        assert len(boxes("Check for updates")) == len(boxes("Update automatically")) == 1
         d.upd_chk.setChecked(not d.upd_chk.isChecked())
         assert d.upd_chk.isChecked() == window.cfg.update_check
         d.ytdlp_auto_box.setChecked(True)

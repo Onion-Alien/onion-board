@@ -75,7 +75,7 @@ def test_version_compare(latest, current, want):
     assert updates.newer(latest, current) is want
 
 
-def test_check_on_by_default_and_once_a_day(monkeypatch):
+def test_check_on_by_default_and_every_6_hours(monkeypatch):
     calls = []
     monkeypatch.setattr(updates, "latest",
                         lambda: calls.append(1) or updates.Release("99.0.0", "https://x"))
@@ -88,6 +88,39 @@ def test_check_on_by_default_and_once_a_day(monkeypatch):
     assert updates.check(cfg, force=True).version == "99.0.0"    # "Check now" still asks
     cfg.update_checked, cfg.update_skip = 0, "99.0.0"
     assert updates.check(cfg) is None                            # skipped version
+    cfg.update_checked -= updates.EVERY_S - 60
+    assert updates.check(cfg) is None and len(calls) == 3        # not 6 hours yet
+    assert updates.EVERY_S == 6 * 3600
+
+
+def test_an_urgent_fix_shows_even_when_skipped(monkeypatch):
+    monkeypatch.setattr(updates, "latest", lambda: updates.Release(
+        "99.0.0", "https://x", urgent="fixes sounds cutting out"))
+    cfg = Config(update_skip="99.0.0")
+    assert updates.check(cfg).urgent == "fixes sounds cutting out"
+
+
+@pytest.mark.parametrize("body, want", [
+    ("Urgent: fixes sounds cutting out\n\nMore.", "fixes sounds cutting out"),
+    ("Headline\n\n**Urgent:** the mic stops after an hour", "the mic stops after an hour"),
+    ("> URGENT - crash with [two monitors](https://x)", "crash with two monitors"),
+    ("- urgent — `hotkeys` stop working", "hotkeys stop working"),
+    ("Fixes an urgent bug: crashes", ""),            # only at the start of a line
+    ("Nothing urgent here.", ""),
+    ("", ""),
+])
+def test_urgent_line(body, want):
+    assert updates.urgent(body) == want
+
+
+def test_an_urgent_release_keeps_its_line_out_of_the_notes(monkeypatch):
+    monkeypatch.setattr(updates, "_get", lambda url, *_f: {
+        "tag_name": "v2.1.0", "html_url": "https://github.com/x",
+        "body": "Big fix.\r\n\r\nUrgent: sounds cut out\r\n\r\nDetails."})
+    rel = updates.latest()
+    assert rel.urgent == "sounds cut out" and rel.notes == "Big fix.\n\nDetails."
+    assert updates.urgent("Urgent: " + "word " * 60).endswith("…")
+    assert len(updates.urgent("Urgent: " + "word " * 60)) <= 160
 
 
 def test_latest_only_links_to_github(monkeypatch):

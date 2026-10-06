@@ -2,7 +2,7 @@
 it and installing it into %APPDATA%\\OnionBoard\\modules\\onion-watch.
 
 Nothing here runs until the user asks for it: the tab's *Get Onion Watch* button,
-or its *Update* button once it's installed and the app's own daily update check
+or its *Update* button once it's installed and the app's own update check
 (only while "Tell me when a new version is out" is ticked) found a newer one. The
 file is taken only from the project's own github.com/…/releases/download/ link,
 over HTTPS, and kept only if it matches the SHA-256 GitHub lists for it
@@ -13,7 +13,9 @@ ONIONBOARD_ONION_WATCH_ZIP=<path to an OnionWatch-module.zip> makes both use tha
 file instead of GitHub, to try a build before it's released.
 
 "Get and update add-ons" switched off in Settings > Privacy & security stops all of
-it (net.FeatureOff); the daily check then skips itself without a word.
+it (net.FeatureOff); the timed check then skips itself without a word. An "Urgent: …"
+line in a release's notes makes it an urgent fix (updates.urgent): the board then shows
+a banner for it too, not only the Triggers tab's bar.
 """
 from __future__ import annotations
 
@@ -54,6 +56,7 @@ class Offer:
     page: str = RELEASES   # its release page
     notes: str = ""
     local: Path | None = None   # a zip on this PC instead (LOCAL_ENV)
+    urgent: str = ""       # why it's an urgent fix; "" = it isn't (updates.urgent)
 
 
 def local_zip() -> Path | None:
@@ -93,8 +96,9 @@ def latest(cancelled: Callable[[], bool] | None = None) -> Offer | None:
     page = str(data.get("html_url") or RELEASES)
     if not page.startswith(PAGE + "/"):
         page = RELEASES     # only ever open the project's own page
-    return Offer(".".join(map(str, ver)), url, sha, size, page,
-                 updates.summary(str(data.get("body") or "")))
+    body = str(data.get("body") or "")
+    return Offer(".".join(map(str, ver)), url, sha, size, page, updates.summary(body),
+                 urgent=updates.urgent(body))
 
 
 def fetch(offer: Offer, progress: Callable[[int, int], None] | None = None,
@@ -143,7 +147,7 @@ def remove(info: ModuleInfo, base: Path | None = None) -> None:
 def check_update(dirs: list[Path] | None = None) -> Offer | None:
     """A newer Onion Watch than the one installed, or None (also when it isn't
     installed: then nothing is asked). Errors are logged, not raised. Call off the
-    UI thread; the app calls it with its own daily update check."""
+    UI thread; the app calls it with its own update check."""
     info = installed(dirs)
     if info is None or not net.allowed(FEATURE):   # switched off: skip, silently
         return None
