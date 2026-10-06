@@ -385,6 +385,36 @@ def test_voice_size_reshapes_the_blended_in_voice_too():
     assert _centroid(y) > _centroid(x) * 1.05
 
 
+def _onset(y, thr=0.05):
+    return int(np.argmax(np.abs(y) > thr * np.max(np.abs(y))))
+
+
+def test_gap_between_voices_lines_the_blended_in_voice_up():
+    """Below 100% Mix your own voice used to come out ~40 ms before the shifted one
+    (a slapback echo). Gap 0 holds it back to line up; no key (old saves) keeps it."""
+    x = np.concatenate([np.zeros(SR // 4, np.float32), _vowel(secs=0.6)])
+    wet = _run("pitch", {"semitones": -7, "mix": 1}, x)
+    old = _run("pitch", {"semitones": -7, "mix": 0.0001}, x)
+    together = _run("pitch", {"semitones": -7, "mix": 0.0001, "gap": 0}, x)
+    assert _onset(old) == pytest.approx(_onset(x), abs=48)
+    assert _onset(wet) - _onset(old) > SR * 0.03
+    assert _onset(together) == pytest.approx(_onset(wet), abs=SR * 0.004)
+
+
+def test_blur_puts_a_tail_on_the_new_voice_only():
+    """Blur reverbs the shifted voice, not the blended-in own voice; no key = none."""
+    x = np.concatenate([_vowel(secs=0.4), np.zeros(SR // 2, np.float32)])
+    tail = slice(int(SR * 0.55), int(SR * 0.75))   # after the voice and the shift's delay
+
+    def level(cfg):
+        return float(np.sqrt(np.mean(_run("pitch", cfg, x)[tail] ** 2)))
+
+    assert level({"semitones": -7}) < 1e-4
+    assert level({"semitones": -7, "blur": 0.6}) > 1e-3
+    # at almost 0% Mix only your own voice is left: Blur doesn't touch it
+    assert level({"semitones": -7, "mix": 0.001, "blur": 0.6}) < 1e-4
+
+
 def test_old_pitch_settings_sound_as_before():
     """No natural / size keys (old saves, sounds, music): no formant stage, old delay."""
     e = voicefx.REGISTRY["pitch"](SR, {"semitones": 5})

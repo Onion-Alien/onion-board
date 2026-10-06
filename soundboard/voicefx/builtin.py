@@ -366,7 +366,9 @@ class PitchShift(Effect):
               Param("natural", "Natural sound", 0, 1, 0, "", 0, ("cartoon", "real person")),
               Param("size", "Voice size", -12, 12, 0, "", 0.5, ("smaller", "bigger")),
               Param("tune", "Autotune", 0, 1, 0, "", 0, ("off", "robotic")),
-              Param("mix", "Mix", 0, 1, 1))
+              Param("mix", "Mix", 0, 1, 1),
+              Param("gap", "Gap between voices", 0, 1, 1, "", 0, ("together", "echo")),
+              Param("blur", "Blur on the new voice", 0, 1, 0, "", 0, ("clear", "blurry")))
 
     SEQ_MS = 30.0       # one sequence of voice, copied to the output
     SEEK_MS = 10.0      # how far the splice point may move to line up
@@ -375,6 +377,10 @@ class PitchShift(Effect):
     HIST_S = 0.35       # input kept while bypassed (enough to prime it at -24 st)
     FORMANT_S = 0.02    # the formant stage's frame (its added latency)
     LIFTER_S = 0.0011   # cepstrum kept as the envelope: shorter than any voice's period
+    GAP_MAX_S = 0.15    # longest the blended-in voice can be held back to line up
+    GAP_PER_OCTAVE_S = 0.0073   # the shifted voice's extra delay per octave down
+    BLUR_SIZE, BLUR_TONE = 0.0, 9000.0   # the room Blur puts round the shifted voice: small
+    BLUR_SCOOP_HZ, BLUR_SCOOP_DB = 500.0, 20.0   # ...minus its middle
 
     def __init__(self, rate, values=None, channels: int = 0):
         """channels: 0 for a mono voice ((n,) blocks); 2 for stereo (n, 2) blocks, cut
@@ -399,6 +405,8 @@ class PitchShift(Effect):
         self.formant = 1.0      # formant correction applied after the shift (1 = none)
         self.fstage: _Stft | None = None
         self.dstage: _Stft | None = None   # Voice size on the unshifted voice (Mix < 100%)
+        self.dhist = np.zeros(int(rate * self.GAP_MAX_S), F32)   # blended-in voice, held back
+        self.verb: Reverb | None = None     # Blur: a reverb on the shifted voice only
         self.lifter = max(8, int(rate * self.LIFTER_S))
         self.tracker: _PitchTracker | None = None
         self.tune_st = 0.0      # autotune's correction right now, in semitones
@@ -546,6 +554,22 @@ class PitchShift(Effect):
             s += n / self.rate
         return s
 
+    def _hold_back(self, dry, rate):
+        """The shifted voice comes out ~40-80 ms after your own: below 100% Mix that
+        is a slapback echo under the voice. Gap between voices at 0 holds your own
+        voice back by the difference so the two line up; 1 (old saves) leaves it."""
+        h, n = self.dhist, len(dry)
+        buf = np.concatenate([h, dry])
+        self.dhist = buf[-len(h):]
+        # (lower pitches come out a little later than latency(), higher ones earlier:
+        # each stretched sequence plays slower or faster than it was said, ~7 ms/octave)
+        lag = ((self.latency() + self.GAP_PER_OCTAVE_S * np.log2(1.0 / self.ratio)) * rate
+               - (self.dstage.n if self.dstage is not None else 0))
+        k = min(int(round((1.0 - self.p.get("gap", 1.0)) * max(lag, 0.0))), len(h))
+        if k <= 0:
+            return dry
+        return buf[len(buf) - n - k:len(buf) - k]
+
     def run(self, x, rate):
         p = self.p
         mix = p["mix"]
@@ -573,6 +597,17 @@ class PitchShift(Effect):
             c = self.formant
             wet = self.fstage.run(wet, lambda spec: spec if abs(np.log2(c)) <= 1e-3
                                   else _envelope_shift(spec, c, self.lifter))
+        blur = p.get("blur", 0.0)
+        if self.verb is None and blur > 0:
+            self.verb = Reverb(rate, {"size": self.BLUR_SIZE, "tone": self.BLUR_TONE, "mix": 1})
+            self.verb_eq = _Filter()
+        if self.verb is not None:     # once on, it stays on: its tail mustn't cut off
+            # the room alone (Reverb at full Mix gives 0.4 dry + 0.8 room), with its
+            # middle scooped out so the words stay clear and only lows and highs smear
+            room = (self.verb.run(wet, rate) - F32(0.4) * wet) * F32(1.25)
+            room = self.verb_eq.run(room, "scoop", lambda: _biquad(
+                "peak", self.BLUR_SCOOP_HZ, rate, -self.BLUR_SCOOP_DB, 0.7))
+            wet = wet + room * F32(blur)
         if mix < 1:
             # Voice size reshapes the blended-in voice too, or your own voice stays
             # recognisable under the effect
@@ -582,6 +617,7 @@ class PitchShift(Effect):
             if self.dstage is not None:
                 dry = self.dstage.run(x, lambda spec: spec if abs(np.log2(d)) <= 1e-3
                                       else _envelope_shift(spec, d, self.lifter))
+            dry = self._hold_back(dry, rate)
             wet = dry * F32(1 - mix) + wet * F32(mix)
         g0, target = self.wet_g, 1.0 if on else 0.0
         if g0 == target:
@@ -593,7 +629,8 @@ class PitchShift(Effect):
             env = env[:, None]
         if not on and self.wet_g <= 0.0:
             self.running = False
-            self.fstage = self.dstage = None
+            self.fstage = self.dstage = self.verb = None
+            self.dhist[:] = 0
             self.tune_st = 0.0
         return x + (wet - x) * env
 
@@ -1132,11 +1169,12 @@ PRESETS: dict[str, dict[str, dict]] = {
     # the voice and a copy 7 st down blended (deep and high at once, no one clear
     # pitch), both with a much smaller throat so it isn't your voice any more, thin
     # on bass and top, strong in the mids, and a metallic ring over it
-    "Secret detective":  {"pitch": {"semitones": -7, "size": -7, "mix": 0.5},
+    "Secret detective":  {"pitch": {"semitones": -7, "size": -7, "mix": 0.5, "gap": 0,
+                                    "blur": 0.6},
                           "compressor": {"threshold": -26, "ratio": 5, "boost": 9},
                           "tone": {"bass": -10, "mid": 7, "presence": 3, "treble": -9},
                           "radio": {"low": 150, "high": 6700, "drive": 0, "noise": 0.0},
-                          "helmet": {"size": 1.8, "ring": 0.49, "mix": 0.79}},
+                          "helmet": {"size": 1.8, "ring": 0.25, "mix": 0.4}},
     "Dark lord":         {"pitch": {"semitones": -3, "natural": 1, "size": 3},
                           "compressor": {"threshold": -26, "ratio": 4, "boost": 8},
                           "tone": {"bass": 4, "presence": 1, "treble": -3},
