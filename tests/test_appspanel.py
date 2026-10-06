@@ -454,6 +454,26 @@ def test_lister_hands_results_to_the_ui_thread(qapp, monkeypatch):
     lister.stop()
 
 
+def test_a_listing_that_finishes_after_the_panel_is_gone_is_dropped(qapp, monkeypatch):
+    """The Apps tab switched off (or the app quitting) while a listing runs: its
+    thread finishing afterwards must not emit from a deleted object (an access
+    violation that took the whole process down)."""
+    from PySide6.QtCore import QEvent
+    monkeypatch.setattr(appaudio, "AppCapture", FakeCapture)
+    monkeypatch.setattr(appaudio, "list_apps", lambda strict=False, **_: [])
+    t = AppsTab(Engine(), Config(), lambda: None, Meter)
+    shown = []
+    monkeypatch.setattr(t, "_on_apps", lambda *a: shown.append(a))
+    lister = t.lister
+    t.peaks.stop()
+    t.deleteLater()   # gone without shutdown(): the listing is still "running"
+    qapp.sendPostedEvents(None, QEvent.DeferredDelete)
+    lister._listed([music()], {100: "music.exe"})   # the worker thread finishing late
+    qapp.processEvents()
+    assert shown == []
+    lister.stop()
+
+
 def test_lister_takes_the_list_from_the_level_watcher_while_it_runs(qapp, monkeypatch):
     def walked(**_):
         raise AssertionError("listed again on a thread of its own")

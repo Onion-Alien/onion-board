@@ -10,6 +10,8 @@
 - **Remove the virtual cable.** Once your sounds are in your mic, the Setup tab
   offers to uninstall VB-Cable (one Windows prompt). Keep it if another program
   uses it. The mic button also shows when it's busy setting up.
+- **No crash when the Apps tab closes mid-scan.** Switching the Apps tab off, or
+  quitting, while it was reading the list of programs could crash the app.
 - **Radio: no grid while zooming.** Zooming the map no longer flashes a bare grid,
   and you can move round the map while stations are still loading.
 - **Clip editor: saved clips get a list.** Save in an app's clip editor now keeps
