@@ -34,6 +34,7 @@ def sent(app_dir, monkeypatch):
     monkeypatch.setattr(net, "urlopen", urlopen)
     monkeypatch.setattr(usage, "TOKEN", "count-only-key")
     monkeypatch.setattr(sys, "frozen", True, raising=False)
+    monkeypatch.delenv("ONIONBOARD_NO_STATS", raising=False)
     monkeypatch.setattr(usage, "threading", SimpleNamespace(Thread=_Inline))
     net.configure_features()
     yield out
@@ -104,7 +105,7 @@ def test_update_now_is_one_event(sent):
     assert cfg.stats_sent == 1.0   # not the daily one
 
 
-@pytest.mark.parametrize("why", ["switched off", "offline", "source", "no key"])
+@pytest.mark.parametrize("why", ["switched off", "offline", "source", "no key", "dev pc"])
 def test_nothing_is_sent(sent, monkeypatch, why):
     cfg = Config()
     if why == "switched off":
@@ -113,6 +114,8 @@ def test_nothing_is_sent(sent, monkeypatch, why):
         net.configure_features(offline=True)
     elif why == "source":
         monkeypatch.delattr(sys, "frozen")
+    elif why == "dev pc":
+        monkeypatch.setenv("ONIONBOARD_NO_STATS", "1")
     else:
         monkeypatch.setattr(usage, "TOKEN", "")
     usage.maybe_send(cfg)

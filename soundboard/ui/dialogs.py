@@ -57,8 +57,8 @@ class EffectsPanel(QWidget):
         v.addWidget(section_label("TRIM"))
         peaks, length = original_peaks(meta) if meta is not None else ([], 0.0)
         self.trim = TrimPanel(peaks, length)
-        self.trim.setVisible(length > 0)
-        v.addWidget(self.trim)
+        v.addWidget(self.trim)              # in the layout first: shown with no parent,
+        self.trim.setVisible(length > 0)    # it flashed up as a window of its own
         if length <= 0:
             v.addWidget(hint_label("Trimming works once the sound has loaded."))
 
