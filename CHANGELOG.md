@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- **Record a sound with your mic.** New **Record** button next to *Add sounds*:
+  record your own voice (or, while the voice changer is on, your changed voice),
+  then drag the ends to cut it, listen in your headphones, name it and *Save*. The
+  quiet bits at both ends are already cut off. Up to 15 minutes; nobody hears you
+  while you record.
 - **A simpler first window.** A new install starts with just Sounds, Voice and Setup.
   The other tabs wait under **+ More tabs** beside the tabs: click one and it's added
   and opened. *Choose tabs in Settings…* in the same menu shows them all. Your tabs
