@@ -1,5 +1,13 @@
 # Changelog
 
+## Unreleased
+
+- **Record a sound with your mic.** New **Record** button next to *Add sounds*:
+  record your own voice (or, while the voice changer is on, your changed voice),
+  then drag the ends to cut it, listen in your headphones, name it and *Save*. The
+  quiet bits at both ends are already cut off. Up to 15 minutes; nobody hears you
+  while you record.
+
 ## 1.9.6 — 2026-10-06
 
 - **New voice: Secret detective.** A disguised TV voice: yours plus a copy a fifth

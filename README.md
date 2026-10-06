@@ -32,8 +32,8 @@ Version **1.9.6** · Windows 10 / 11 · free, no account, no ads, anonymous usag
   so only you hear them. Your voice goes along, or tick it off and send only sounds.
 - **Hotkeys that work in-game**, MIDI pads, an in-game overlay, Stream Deck support,
   and your pads on your phone with the optional Onion Pocket add-on.
-- **Add sounds from anywhere**: drag in files, or search YouTube and SoundCloud
-  inside the app.
+- **Add sounds from anywhere**: drag in files, search YouTube and SoundCloud
+  inside the app, or record one with your mic.
 - **Effects on any sound**: trim, speed, pitch, bass boost, reverse. One-click
   *Ear rape*, *Nightcore*, *Slowed + reverb*.
 - **Voice changer, text-to-speech** and live voice-to-speech, plus optional **AI
