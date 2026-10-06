@@ -345,7 +345,8 @@ class PitchShift(Effect):
     Natural sound and Voice size move the formants on their own (_envelope_shift,
     one more ~20 ms frame): Natural 100% puts them back where your own voice has
     them, so a pitch change sounds like another person rather than a cartoon, and
-    Voice size makes the throat behind the voice bigger or smaller. Both at 0 (the
+    Voice size makes the throat behind the voice bigger or smaller (below 100% Mix
+    it reshapes the blended-in own voice as well, in its own frame). Both at 0 (the
     default, and what sounds and music use) skip that stage entirely.
 
     Autotune snaps the voice to the nearest note: a pitch tracker on the input picks
@@ -397,6 +398,7 @@ class PitchShift(Effect):
         self.ratio, self.mix = 1.0, 1.0
         self.formant = 1.0      # formant correction applied after the shift (1 = none)
         self.fstage: _Stft | None = None
+        self.dstage: _Stft | None = None   # Voice size on the unshifted voice (Mix < 100%)
         self.lifter = max(8, int(rate * self.LIFTER_S))
         self.tracker: _PitchTracker | None = None
         self.tune_st = 0.0      # autotune's correction right now, in semitones
@@ -572,7 +574,15 @@ class PitchShift(Effect):
             wet = self.fstage.run(wet, lambda spec: spec if abs(np.log2(c)) <= 1e-3
                                   else _envelope_shift(spec, c, self.lifter))
         if mix < 1:
-            wet = x * F32(1 - mix) + wet * F32(mix)
+            # Voice size reshapes the blended-in voice too, or your own voice stays
+            # recognisable under the effect
+            dry, d = x, 2.0 ** (-p.get("size", 0.0) / 12.0)
+            if self.dstage is None and abs(np.log2(d)) > 1e-3:
+                self.dstage = _Stft(_stft_size(rate, self.FORMANT_S))
+            if self.dstage is not None:
+                dry = self.dstage.run(x, lambda spec: spec if abs(np.log2(d)) <= 1e-3
+                                      else _envelope_shift(spec, d, self.lifter))
+            wet = dry * F32(1 - mix) + wet * F32(mix)
         g0, target = self.wet_g, 1.0 if on else 0.0
         if g0 == target:
             return wet
@@ -583,7 +593,7 @@ class PitchShift(Effect):
             env = env[:, None]
         if not on and self.wet_g <= 0.0:
             self.running = False
-            self.fstage = None
+            self.fstage = self.dstage = None
             self.tune_st = 0.0
         return x + (wet - x) * env
 
@@ -729,8 +739,9 @@ class Compressor(Effect):
 class Tone(Effect):
     type = "tone"
     name = "Tone"
-    description = "Bass, presence and treble, like the EQ on a mixer."
+    description = "Bass, mid, presence and treble, like the EQ on a mixer."
     params = (Param("bass", "Bass", -12, 12, 0, " dB", 1),
+              Param("mid", "Mid", -12, 12, 0, " dB", 1),
               Param("presence", "Presence", -12, 12, 0, " dB", 1),
               Param("treble", "Treble", -12, 12, 0, " dB", 1))
 
@@ -739,14 +750,14 @@ class Tone(Effect):
         self.f = _Filter()
 
     def run(self, x, rate):
-        b, p, t = self.p["bass"], self.p["presence"], self.p["treble"]
-        if not (b or p or t) and self.f.f.idle:
+        b, m, p, t = self.p["bass"], self.p["mid"], self.p["presence"], self.p["treble"]
+        if not (b or m or p or t) and self.f.f.idle:
             return x
         # all at 0: fade out to straight through (then, once the fade has run its
         # course, the line above skips it; cutting it short would strand the fade)
-        return self.f.run(x, (b, p, t), lambda: None if not (b or p or t) else np.vstack([
-            _biquad("lowshelf", 160, rate, b), _biquad("peak", 2500, rate, p, 1.0),
-            _biquad("highshelf", 6000, rate, t)]))
+        return self.f.run(x, (b, m, p, t), lambda: None if not (b or m or p or t) else np.vstack([
+            _biquad("lowshelf", 160, rate, b), _biquad("peak", 1000, rate, m, 1.0),
+            _biquad("peak", 2500, rate, p, 1.0), _biquad("highshelf", 6000, rate, t)]))
 
 
 # --------------------------------------------------------------------------- tone
@@ -1117,6 +1128,15 @@ PRESETS: dict[str, dict[str, dict]] = {
     "Anonymous":         {"pitch": {"semitones": -4, "natural": 1, "size": -4},
                           "compressor": {"threshold": -24, "ratio": 3, "boost": 6},
                           "chorus": {"rate": 0.2, "depth": 2, "mix": 0.2}},
+    # the hidden detective talking through a TV, matched line by line to the show:
+    # the voice and a copy 7 st down blended (deep and high at once, no one clear
+    # pitch), both with a much smaller throat so it isn't your voice any more, thin
+    # on bass and top, strong in the mids, and a metallic ring over it
+    "Secret detective":  {"pitch": {"semitones": -7, "size": -7, "mix": 0.5},
+                          "compressor": {"threshold": -26, "ratio": 5, "boost": 9},
+                          "tone": {"bass": -10, "mid": 7, "presence": 3, "treble": -9},
+                          "radio": {"low": 150, "high": 6700, "drive": 0, "noise": 0.0},
+                          "helmet": {"size": 1.8, "ring": 0.49, "mix": 0.79}},
     "Dark lord":         {"pitch": {"semitones": -3, "natural": 1, "size": 3},
                           "compressor": {"threshold": -26, "ratio": 4, "boost": 8},
                           "tone": {"bass": 4, "presence": 1, "treble": -3},
@@ -1155,7 +1175,8 @@ PRESETS: dict[str, dict[str, dict]] = {
 
 PRESET_ICONS = {"Chipmunk": "🐿️", "Deep voice": "🐻", "Female voice": "👩", "Male voice": "👨",
                 "Demon": "👹", "Robot": "🤖", "Talkbox": "🎹", "Autotune": "🎤",
-                "Masked caller": "🔪", "Anonymous": "🕶️", "Dark lord": "⛑️",
+                "Masked caller": "🔪", "Anonymous": "🕶️", "Secret detective": "🕵️",
+                "Dark lord": "⛑️",
                 "Hothead": "😡", "Alien": "👽", "Ghost": "👻", "Walkie-talkie": "📻",
                 "Old telephone": "☎️", "Megaphone": "📢", "Stadium announcer": "🏟️",
                 "Cave": "🦇", "Podcast voice": "🎙️"}

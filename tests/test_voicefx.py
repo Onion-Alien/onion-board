@@ -362,6 +362,29 @@ def test_voice_size_alone_keeps_the_pitch():
     assert _centroid(bigger) < _centroid(x) * 0.95
 
 
+def test_tone_mid_lifts_the_middle_only():
+    t = np.arange(SR) / SR
+    x = sum(np.sin(2 * np.pi * f * t) for f in (150, 1000, 7000)).astype(np.float32) * 0.1
+    y = _run("tone", {"mid": 9}, x)[SR // 2:]
+    sp_x = np.abs(np.fft.rfft(x[SR // 2:SR // 2 + len(y)]))
+    sp_y = np.abs(np.fft.rfft(y))
+    k = len(y) / SR
+    gain = {f: 20 * np.log10(sp_y[int(f * k)] / sp_x[int(f * k)]) for f in (150, 1000, 7000)}
+    assert gain[1000] == pytest.approx(9, abs=0.5)
+    assert abs(gain[150]) < 1.5 and abs(gain[7000]) < 1.5
+    # old saves have no "mid": it stays flat
+    assert voicefx.REGISTRY["tone"](SR, {"bass": 3}).p["mid"] == 0
+
+
+def test_voice_size_reshapes_the_blended_in_voice_too():
+    """Below 100% Mix your own voice is blended back in: Voice size changes it as
+    well, or the speaker stays recognisable under the effect."""
+    x = _vowel()
+    y = _run("pitch", {"size": -4, "mix": 0.01}, x)   # almost all blended-in voice
+    assert _f0(y) == pytest.approx(120, rel=0.03)
+    assert _centroid(y) > _centroid(x) * 1.05
+
+
 def test_old_pitch_settings_sound_as_before():
     """No natural / size keys (old saves, sounds, music): no formant stage, old delay."""
     e = voicefx.REGISTRY["pitch"](SR, {"semitones": 5})
