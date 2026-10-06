@@ -59,11 +59,10 @@ def test_editing_a_slider_switches_to_custom(panel):
     assert p.fx.spec()["effects"]["pitch"]["semitones"] == 6.5
 
 
-def test_power_switch_and_hear_button(panel):
+def test_power_switch(panel):
     p, _ = panel
-    seen, hear = [], []
+    seen = []
     p.fx_changed.connect(seen.append)
-    p.fx.hear_toggled.connect(hear.append)
     assert not p.fx.btn_power.isChecked() and "OFF" in p.fx.btn_power.text()
     p.fx.pick("Deep voice")                  # picking a voice turns it on
     assert p.fx.btn_power.isChecked() and "ON" in p.fx.btn_power.text()
@@ -71,10 +70,7 @@ def test_power_switch_and_hear_button(panel):
     p.fx.btn_power.setChecked(False)         # the switch turns it off, voice kept
     assert not seen[-1]["enabled"] and seen[-1]["preset"] == "Deep voice"
     assert not p.fx._tile["Deep voice"].isChecked()   # nothing looks selected while off
-    p.fx.btn_hear.setChecked(True)
-    assert hear == [True]
-    p.fx.set_hearing(False)                  # mirrored from the window: no echo back
-    assert hear == [True] and not p.fx.btn_hear.isChecked()
+    assert not hasattr(p.fx, "btn_hear")     # one switch for hearing it: the mixer's
 
 
 def test_saved_spec_loads_back(qapp, monkeypatch):
@@ -764,15 +760,6 @@ def test_delay_shows_what_the_effects_and_devices_add(panel):
     assert 5 < small < 20 and 50 < big < 100
     fx.set_device_delay(30.0)
     assert not fx.delay.isHidden() and f"{big + 30:.0f} ms" in fx.delay.text()
-
-
-def test_hear_my_voice_is_the_voice_alone(panel):
-    p, eng = panel
-    p.fx.btn_hear.setChecked(True)
-    assert eng.mon_voice_only is True
-    p.fx.btn_hear.setChecked(False)
-    p.fx.set_hearing(True)                        # the mixer's "Hear what they hear"
-    assert eng.mon_voice_only is False
 
 
 def test_switch_settings_and_cards_round_trip(panel):

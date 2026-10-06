@@ -550,8 +550,7 @@ QSlider::add-page:vertical { background:$accent; border-radius:2px; }
 QSlider::handle:vertical { background:white; border:1px solid $border_hi; width:14px; height:14px; margin:0 -5px; border-radius:7px; }
 QPushButton#micbanner { background:#d32f2f; color:white; font-weight:700; font-size:11pt;
     border:none; border-radius:10px; padding:10px; }
-QPushButton#miccheck:checked { background:#d32f2f; border:1px solid #ff6b6b; color:white;
-    font-weight:700; }
+QPushButton#miccheck:checked { background:#d32f2f; border:1px solid #ff6b6b; color:white; }
 QFrame#transport QLabel, QFrame#transport QCheckBox, QFrame#transport QSlider,
 QFrame#deck QLabel, QFrame#deck QCheckBox, QFrame#deck QSlider { background:transparent; }
 QPushButton#round { padding:0; font-size:14pt; border-radius:10px; }
