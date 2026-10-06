@@ -69,8 +69,10 @@ class RemoteHost:
         unknown = set(actions) - set(remote.ACTIONS)
         if unknown:
             raise ValueError(f"no such actions: {', '.join(sorted(unknown))}")
-        return remote.RemoteControl(self.dispatch, self.win, actions=actions, page=page,
-                                    lan=True, name=name)
+        srv = remote.RemoteControl(self.dispatch, self.win, actions=actions, page=page,
+                                   lan=True, name=name)
+        srv.closed.connect(lambda why: self.warn(f"{name} is off: {why}."))
+        return srv
 
     @staticmethod
     def new_token() -> str:
