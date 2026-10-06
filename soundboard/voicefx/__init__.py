@@ -125,6 +125,10 @@ def clean_spec(raw) -> dict:
     out["effects"] = effects(raw.get("effects"))
     if isinstance(raw.get("custom"), dict):   # "My own mix", kept while a preset is on
         out["custom"] = effects(raw["custom"])
+    size = raw.get("panel_size")   # the Make it yours window's [width, height]
+    if isinstance(size, list) and len(size) == 2 and all(
+            isinstance(n, int) and not isinstance(n, bool) for n in size):
+        out["panel_size"] = [min(max(size[0], 360), 4000), min(max(size[1], 300), 4000)]
     return out
 
 

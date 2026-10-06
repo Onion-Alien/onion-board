@@ -20,6 +20,7 @@ from PySide6.QtWidgets import (QButtonGroup, QCheckBox, QComboBox, QDialog, QMes
                                QHBoxLayout, QInputDialog, QLabel, QLineEdit, QMenu,
                                QPlainTextEdit, QPushButton, QScrollArea, QSlider,
                                QVBoxLayout, QWidget)
+from shiboken6 import isValid as qt_valid
 
 from soundboard import applog
 from soundboard import modules as mods
@@ -311,7 +312,7 @@ FX_ICONS = {"cleanup": "shield", "pitch": "mic", "growl": "wave", "robot": "keyb
             "compressor": "volume", "tone": "sliders", "radio": "radio", "distortion": "live",
             "shout": "speech", "helmet": "voice", "chorus": "shuffle", "echo": "history",
             "reverb": "headphones"}
-# the Voice tab's "Make it yours" strip (always in view) and the effect cards' groups;
+# the Voice tab's "Make it yours" window's top and the effect cards' groups;
 # an effect from an add-on goes under Add-ons
 HERO = ("pitch", "cleanup")
 HERO_TITLES = {"pitch": "Pitch & voice"}
@@ -553,32 +554,52 @@ class VoiceFxPanel(QWidget):
             pic = art.icon(art.voice_key(name)) or (art.mystery_icon() if name != CUSTOM
                                                     else None)
             b = self._make_tile(name, title, pic, VOICE_ICONS.get(name, "wave"))
-            b.setToolTip("Your own settings from All effects below" if name == CUSTOM else
-                         f"Sound like: {name}. Click to turn the voice changer on with it.")
-        # the dice goes last, after your saved voices: it's not a voice but a way to
-        # make one, so it isn't checkable
-        self.btn_random = QPushButton("Random voice")
-        self.btn_random.setObjectName("voicetile")
-        self.btn_random.setIcon(art.random_icon())
-        self.btn_random.setIconSize(QSize(TILE_ART, TILE_ART))
-        self.btn_random.setProperty("art", True)
-        self.btn_random.setMaximumWidth(TILE_MAX_W)
-        self.btn_random.setCursor(Qt.PointingHandCursor)
-        self.btn_random.setToolTip("A random silly mix of effects, as “My own mix”. All effects "
-                                   "opens with what it changed lit up. Click again for "
-                                   "another.")
-        self.btn_random.clicked.connect(lambda: self.randomize())
+            b.setToolTip("Your own settings: Make it yours… opens them" if name == CUSTOM
+                         else f"Sound like: {name}. Click to turn the voice changer on "
+                              "with it.")
         for c in range(self.COLS):
             grid.setColumnStretch(c, 1)
         v.addLayout(grid)
         self.undo_bar = UndoBar("Bring the voice back, as it was")
         v.addWidget(self.undo_bar)
+        # everything for making your own voice opens in a window of its own (on the
+        # card it made the tab scroll forever)
+        self.btn_tweak = QPushButton("Make it yours…")
+        icons.set_icon(self.btn_tweak, "sliders")
+        self.btn_tweak.setToolTip("Pitch, Randomize, every effect, and your saved voices: "
+                                  "build your own voice in a window beside the app")
+        self.btn_tweak.clicked.connect(self.open_tweak)
+        v.addWidget(self.btn_tweak, 0, Qt.AlignLeft)
 
-        # ---- make it yours: the settings people reach for, always in view
+        # ---- the "Make it yours" window: not modal, so the voices stay clickable
+        self.dlg = QDialog(self)
+        self.dlg.setWindowTitle("Make it yours")
+        self.dlg.setModal(False)
+        self.dlg.setWindowFlag(Qt.WindowContextHelpButtonHint, False)
+        self.dlg.finished.connect(self._tweak_closed)
+        self.dlg.installEventFilter(self)
+        self.destroyed.connect(self.dlg.deleteLater)   # (it may belong to the window)
+        size = spec.get("panel_size")
+        self._dlg_size = QSize(*size) if size else None
+        dv = QVBoxLayout(self.dlg)
+        dv.setContentsMargins(0, 0, 0, 10)
+        dv.setSpacing(8)
+        self._scroll = QScrollArea()
+        self._scroll.setWidgetResizable(True)
+        self._scroll.setFrameShape(QFrame.NoFrame)
+        self._scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        page = QFrame()
+        page.setObjectName("card")   # painted like the tab's cards (sliders see-through)
+        pv = QVBoxLayout(page)
+        pv.setContentsMargins(16, 14, 16, 12)
+        pv.setSpacing(10)
+        self._scroll.setWidget(page)
+        dv.addWidget(self._scroll, 1)
+
         self.tweak = QFrame()
         self.tweak.setObjectName("tweak")
         tv = QVBoxLayout(self.tweak)
-        tv.setContentsMargins(0, 4, 0, 0)
+        tv.setContentsMargins(0, 0, 0, 0)
         tv.setSpacing(10)
         head = QHBoxLayout()
         head.setSpacing(8)
@@ -593,37 +614,59 @@ class VoiceFxPanel(QWidget):
         tv.addLayout(self.hero_box)
         srow = QHBoxLayout()
         srow.setSpacing(6)
+        self.btn_random = QPushButton("Randomize")
+        self.btn_random.setIcon(art.random_icon())
+        self.btn_random.setIconSize(QSize(16, 16))
+        self.btn_random.setToolTip("A random silly mix of effects, as “My own mix”: what it "
+                                   "changed lights up below. Click again for another.")
+        self.btn_random.clicked.connect(lambda: self.randomize())
+        srow.addWidget(self.btn_random)
         self.btn_save = QPushButton("Save as a voice…")
         icons.set_icon(self.btn_save, "plus")
         self.btn_save.setToolTip("Keep these settings as a voice with a name: it gets its own "
                                  "button under “Pick a voice”.")
         self.btn_save.clicked.connect(self.save_voice)
         srow.addWidget(self.btn_save)
+        srow.addStretch(1)
+        tv.addLayout(srow)
+        # saved voices: share one as a line of text, add one a friend sent
+        vrow = QHBoxLayout()
+        vrow.setSpacing(6)
+        self.btn_share = QPushButton("Copy share code")
+        icons.set_icon(self.btn_share, "copy")
+        self.btn_share.setObjectName("small")
+        self.btn_share.setToolTip("Copy the saved voice that's on as a short code to paste to "
+                                  "a friend: just its name and settings")
+        self.btn_share.clicked.connect(lambda: self.copy_code(self._preset))
+        vrow.addWidget(self.btn_share)
+        self.btn_import = QPushButton("Import a code…")
+        icons.set_icon(self.btn_import, "plus")
+        self.btn_import.setObjectName("small")
+        self.btn_import.setToolTip("Add a voice someone sent you as a code (it starts "
+                                   "with “OB1-”)")
+        self.btn_import.clicked.connect(lambda: self.import_code())
+        vrow.addWidget(self.btn_import)
         self.btn_bin = QPushButton("Recently deleted")
         icons.set_icon(self.btn_bin, "trash")
         self.btn_bin.setObjectName("small")
         self.btn_bin.setToolTip("Saved voices you deleted, kept for "
                                 f"{savedvoices.KEEP_DAYS} days so you can bring them back")
         self.btn_bin.clicked.connect(self.show_deleted)
-        srow.addWidget(self.btn_bin)
-        srow.addStretch(1)
-        tv.addLayout(srow)
-        v.addWidget(self.tweak)
+        vrow.addWidget(self.btn_bin)
+        vrow.addStretch(1)
+        tv.addLayout(vrow)
+        pv.addWidget(self.tweak)
 
-        # ---- every effect, as cards in groups (folded away)
-        self.btn_more = QPushButton("All effects")
-        self.btn_more.setObjectName("fold")
-        self.btn_more.setCheckable(True)
-        self.btn_more.toggled.connect(self._show_more)
-        v.addWidget(self.btn_more, 0, Qt.AlignLeft)
+        # ---- every effect, as cards in groups
         self.more = QWidget()
         self.box = QVBoxLayout(self.more)
-        self.box.setContentsMargins(0, 0, 0, 0)
+        self.box.setContentsMargins(0, 6, 0, 0)
         self.box.setSpacing(8)
+        self.box.addWidget(QLabel("<b>All effects</b>"))
         self.box.addWidget(hint_label("Switch effects on and drag their sliders to build your "
                                       "own voice. Changing anything switches to “My own "
                                       "mix”; like it? Save it as a voice and it gets a "
-                                      "button above."))
+                                      "button of its own."))
         self._groups: dict[str, tuple[QLabel, QGridLayout]] = {}
         for title, _types in (*GROUPS, (ADDON_GROUP, ())):
             lbl = QLabel(title)
@@ -635,7 +678,17 @@ class VoiceFxPanel(QWidget):
             self.box.addLayout(g)
             self._groups[title] = (lbl, g)
         self._fx_cols = 2
-        v.addWidget(self.more)
+        pv.addWidget(self.more)
+        pv.addStretch(1)
+        done = QHBoxLayout()
+        done.setContentsMargins(16, 0, 16, 0)
+        done.addStretch(1)
+        btn_done = QPushButton("Done")
+        btn_done.setObjectName("primary")
+        btn_done.clicked.connect(self.dlg.close)
+        done.addWidget(btn_done)
+        dv.addLayout(done)
+
         self.rows: dict[str, EffectRow] = {}
         self._spec_effects = dict(spec.get("effects", {}))
         self._delay_cache: dict = {}
@@ -644,7 +697,6 @@ class VoiceFxPanel(QWidget):
         self._fresh_timer = QTimer(self)
         self._fresh_timer.setSingleShot(True)
         self._fresh_timer.timeout.connect(self._clear_fresh)
-        self._show_more(False)
         self._fill_saved()
         self._refresh()
 
@@ -679,7 +731,7 @@ class VoiceFxPanel(QWidget):
                 for t, r in rows.items():
                     r.load(self._custom.get(t))
             self._own = True
-            self.btn_more.setChecked(True)   # your own mix lives in All effects
+            self.open_tweak()   # your own mix lives in Make it yours
         self.btn_power.blockSignals(True)
         self.btn_power.setChecked(True)
         self.btn_power.blockSignals(False)
@@ -722,8 +774,8 @@ class VoiceFxPanel(QWidget):
         self.btn_power.blockSignals(False)
         self._refresh()
         self._emit()
-        # show what it did: Fine-tune opens with the effects it set lit up for a while
-        self.btn_more.setChecked(True)
+        # show what it did: Make it yours opens with the effects it set lit up for a while
+        self.open_tweak()
         for t, r in self.rows.items():
             r.set_fresh(t in chosen)
         self._fresh_timer.start(self.FRESH_MS)
@@ -737,15 +789,53 @@ class VoiceFxPanel(QWidget):
             r.set_fresh(False)
 
     def _scroll_to_fresh(self):
-        """Inside the tab's scroll area, bring the lit-up effects into view."""
+        """Inside Make it yours, bring the lit-up effects into view."""
         fresh = [r for r in self.rows.values() if r.is_fresh()]
-        area = self.parentWidget()
-        while area is not None and not isinstance(area, QScrollArea):
-            area = area.parentWidget()
-        if area is None or not fresh:
-            return
-        area.ensureWidgetVisible(fresh[-1], 0, 24)
-        area.ensureWidgetVisible(fresh[0], 0, 24)
+        if fresh:
+            self._scroll.ensureWidgetVisible(fresh[-1], 0, 24)
+            self._scroll.ensureWidgetVisible(fresh[0], 0, 24)
+
+    # ------------------------------------------------------------------ the window
+    DLG_SIZE = QSize(660, 720)
+
+    def open_tweak(self):
+        """Show the Make it yours window (at the size you left it), or bring it up."""
+        if not self.dlg.isVisible():
+            # owned by the app's window, not this panel: inside a card the theme makes
+            # every widget see-through (QFrame#card QWidget), the window included
+            if self.dlg.parentWidget() is not self.window():
+                self.dlg.setParent(self.window(), self.dlg.windowFlags())
+            size = self._dlg_size or self.DLG_SIZE
+            screen = (self.screen() or QGuiApplication.primaryScreen()).availableGeometry()
+            self.dlg.resize(min(size.width(), screen.width()),
+                            min(size.height(), screen.height()))
+            self.dlg.show()
+        self.dlg.raise_()
+        self.dlg.activateWindow()
+
+    def _tweak_closed(self, _result=0):
+        self._clear_fresh()
+        self._emit()   # its size goes into the settings, for next time
+
+    def hideEvent(self, e):
+        super().hideEvent(e)
+        # the app went to the tray (not just another tab): Make it yours goes with it
+        if self.dlg.isVisible():
+            QTimer.singleShot(0, self.dlg, self._close_if_app_hidden)   # (dropped if it's gone)
+
+    def _close_if_app_hidden(self):
+        if qt_valid(self) and not self.window().isVisible():
+            self.dlg.close()
+
+    def eventFilter(self, obj, e):
+        if obj is self.dlg and e.type() == QEvent.Resize:
+            if self.dlg.isVisible():
+                self._dlg_size = QSize(e.size())
+            cols = 2 if e.size().width() >= 600 else 1
+            if cols != self._fx_cols:
+                self._fx_cols = cols
+                self._place_cards()
+        return super().eventFilter(obj, e)
 
     # ------------------------------------------------------------------ saved voices
     def _make_tile(self, name: str, title: str, pic, line_icon: str) -> QPushButton:
@@ -776,11 +866,12 @@ class VoiceFxPanel(QWidget):
         return b
 
     def _fill_saved(self):
-        """(Re)make the saved voices' tiles, between "My own mix" and the dice."""
+        """(Re)make the saved voices' tiles, after "My own mix"."""
         for b in self._saved_tiles:
             self.tiles.removeButton(b)
             self._tile_grid.removeWidget(b)
             self._tile = {n: t for n, t in self._tile.items() if t is not b}
+            b.hide()   # until it's gone it would paint over the regrown grid
             b.deleteLater()
         self._saved_tiles = []
         for name in self.store.voices:
@@ -798,7 +889,7 @@ class VoiceFxPanel(QWidget):
     def _place_tiles(self):
         g, cols = self._tile_grid, self._tile_cols
         order = [self._tile[n] for n in list(voicefx.PRESETS) + [CUSTOM]] \
-            + self._saved_tiles + [self.btn_random]
+            + self._saved_tiles
         for b in order:
             g.removeWidget(b)
         for i, b in enumerate(order):
@@ -810,22 +901,22 @@ class VoiceFxPanel(QWidget):
         """A name for a saved voice, or "" if cancelled. Built-in voices' names are
         taken; so is another saved voice's, unless you agree to replace it (`keep` is
         the voice being renamed, whose own name is fine)."""
-        builtin = {n.casefold() for n in (*voicefx.PRESETS, CUSTOM, "My own mix",
-                                          "Random voice")}
+        builtin = self._builtin_names()
         while True:
-            name, ok = QInputDialog.getText(self, title, "Name:", QLineEdit.Normal, text)
+            name, ok = QInputDialog.getText(self._parent(), title, "Name:", QLineEdit.Normal, text)
             name = savedvoices.clean_name(name) if ok else ""
             if not name:
                 return ""
             if name.casefold() in builtin:
-                QMessageBox.information(self, title, f"“{name}” is a built-in voice's name. "
+                QMessageBox.information(self._parent(), title,
+                                        f"“{name}” is a built-in voice's name. "
                                         "Pick another one.")
                 text = name
                 continue
             other = self.store.find(name)
             if other is None or other == keep:
                 return name
-            if QMessageBox.question(self, title, f"You already have a voice called "
+            if QMessageBox.question(self._parent(), title, f"You already have a voice called "
                                     f"“{other}”. Replace it?") == QMessageBox.Yes:
                 return other
             text = name
@@ -835,7 +926,7 @@ class VoiceFxPanel(QWidget):
         tile of its own (picked straight away)."""
         suggestion = self._based_on or self.store.free_name("My voice")
         if self.store.full() and self.store.find(suggestion) is None:
-            QMessageBox.information(self, "Save as a voice",
+            QMessageBox.information(self._parent(), "Save as a voice",
                                     f"You have {savedvoices.MAX_VOICES} saved voices, the "
                                     "most there can be. Delete one (right-click it) first.")
             return
@@ -854,9 +945,74 @@ class VoiceFxPanel(QWidget):
     def _saved_menu(self, name: str, at):
         m = QMenu(self)
         m.addAction(icons.icon("edit"), "Rename…", lambda: self.rename_voice(name))
+        m.addAction(icons.icon("copy"), "Copy share code", lambda: self.copy_code(name))
         m.addAction(icons.icon("trash", "danger_text"), "Delete",
                     lambda: self.delete_voice(name))
         m.exec(at)
+
+    def _parent(self) -> QWidget:
+        """Where a question goes: over Make it yours while it's open."""
+        return self.dlg if self.dlg.isVisible() else self
+
+    def copy_code(self, name: str) -> str:
+        """A saved voice as a share code, onto the clipboard. Returns the code."""
+        effects = self.store.voices.get(name)
+        if effects is None:
+            return ""
+        code = savedvoices.share_code(name, effects)
+        QGuiApplication.clipboard().setText(code)
+        if self.dlg.isVisible() and name == self._preset:
+            busy.flash(self.btn_share, "✓ Copied")
+        else:
+            self.undo_bar.finish()
+            self._note(f"Copied “{name}” as a share code")
+        return code
+
+    def _note(self, text: str):
+        """A short line where Undo shows, with nothing to undo."""
+        self.undo_bar.show_for(text, None)
+        self.undo_bar.btn_undo.hide()
+
+    def import_code(self, text: str | None = None) -> str:
+        """Add a voice from a share code (asked for if not given) as a new saved voice,
+        renamed if the name's taken, and turn it on. Returns its name ("" if not)."""
+        title = "Import a voice code"
+        if text is None:
+            text, ok = QInputDialog.getText(self._parent(), title,
+                                            "Paste the code someone sent you:",
+                                            QLineEdit.Normal, "")
+            if not ok or not text.strip():
+                return ""
+        try:
+            name, effects, notes = savedvoices.read_code(text)
+        except savedvoices.CodeError as e:
+            QMessageBox.warning(self._parent(), title, str(e))
+            return ""
+        if self.store.full():
+            QMessageBox.information(self._parent(), title,
+                                    f"You have {savedvoices.MAX_VOICES} saved voices, the "
+                                    "most there can be. Delete one (right-click it) first.")
+            return ""
+        if name.casefold() in self._builtin_names():
+            name = f"{name[:savedvoices.MAX_NAME - 9]} (shared)"
+        name = self.store.free_name(name)
+        on = [voicefx.REGISTRY[t].name for t in effects]
+        ask = (f"Add the voice “{html.escape(name)}”?<br><br>Effects: "
+               + (html.escape(", ".join(on)) if on else "none (your normal voice)")
+               + "".join(f"<br><br>{html.escape(n)}" for n in notes))
+        if QMessageBox.question(self._parent(), title, ask) != QMessageBox.Yes:
+            return ""
+        name = self.store.put(name, effects)
+        self._fill_saved()
+        self.pick(name)
+        if self.dlg.isVisible():
+            busy.flash(self.btn_import, "✓ Added")
+        return name
+
+    @staticmethod
+    def _builtin_names() -> set[str]:
+        return {n.casefold() for n in (*voicefx.PRESETS, CUSTOM, "My own mix",
+                                       "Random voice")}
 
     def rename_voice(self, old: str):
         new = self._ask_name("Rename voice", old, keep=old)
@@ -889,6 +1045,7 @@ class VoiceFxPanel(QWidget):
             self._based_on = ""
         self._fill_saved()
         self._emit()
+        self.undo_bar.btn_undo.show()   # (a note hides it)
         self.undo_bar.show_for(f"Deleted the voice “{name}”",
                                lambda: self._undelete(item.id, was_on))
 
@@ -1030,7 +1187,9 @@ class VoiceFxPanel(QWidget):
         effects = {t: r.state() for t, r in self.rows.items()}
         return {"enabled": self.btn_power.isChecked(), "preset": self._preset,
                 "effects": effects,
-                "custom": effects if self._mine() else self._custom}
+                "custom": effects if self._mine() else self._custom,
+                **({"panel_size": [self._dlg_size.width(), self._dlg_size.height()]}
+                   if self._dlg_size else {})}
 
     def show_errors(self, errors: dict[str, str]):
         for t, r in self.rows.items():
@@ -1045,10 +1204,6 @@ class VoiceFxPanel(QWidget):
         self.set_tip_enabled(False)
         self.tip_dismissed.emit()
 
-    def _show_more(self, on: bool):
-        self.more.setVisible(on)
-        icons.set_icon(self.btn_more, "fold_open" if on else "fold", "muted", "text", size=12)
-
     def _count_on(self) -> int:
         return sum(r.chk.isChecked() for t, r in self.rows.items() if t not in HERO)
 
@@ -1058,10 +1213,6 @@ class VoiceFxPanel(QWidget):
         # can flip it back and forth (the Apps tab's cards jumped up and down that way)
         if e.size().width() != e.oldSize().width():
             self._fit_width(self.width())
-            cols = 2 if self.width() >= 600 else 1
-            if cols != self._fx_cols:
-                self._fx_cols = cols
-                self._place_cards()
 
     def _fit_width(self, width: int):
         """Narrow: the switch's shorter text, then fewer voices a row, down to one."""
@@ -1103,7 +1254,10 @@ class VoiceFxPanel(QWidget):
             b.setChecked(on and name == self._preset)
         self.tiles.setExclusive(True)
         n = self._count_on()
-        self.btn_more.setText(f"All effects  ·  {n} on" if n else "All effects")
+        self.btn_tweak.setText(f"Make it yours…  ·  {n} on" if n else "Make it yours…")
+        mine = self._preset in self.store.voices
+        _enable(self.btn_share, mine, "Turn on one of your saved voices to share it "
+                                      "(or right-click its button)")
         self._show_delay()
 
     def _edited(self, etype: str = ""):

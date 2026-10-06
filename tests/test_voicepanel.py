@@ -590,9 +590,10 @@ def _grid_order(fx):
 def test_random_voice_opens_fine_tune_with_what_it_set_lit_up(panel):
     import random
     p, _ = panel
-    assert not p.fx.btn_more.isChecked()
+    assert not p.fx.dlg.isVisible()
+    p.fx.btn_random.click()                  # the dice is in Make it yours
+    assert p.fx.dlg.isVisible() and p.fx.preset == "Custom"
     p.fx.randomize(random.Random(3))
-    assert p.fx.btn_more.isChecked() and p.fx.preset == "Custom"
     on = {t for t, r in p.fx.rows.items() if r.chk.isChecked() and t != "cleanup"}
     lit = {t for t, r in p.fx.rows.items() if r.is_fresh()}
     assert lit == on and "pitch" in lit
@@ -603,12 +604,12 @@ def test_random_voice_opens_fine_tune_with_what_it_set_lit_up(panel):
     assert not any(r.is_fresh() for r in p.fx.rows.values())
 
 
-def test_random_voice_is_the_last_tile_and_voices_have_pictures(panel):
+def test_my_own_mix_is_the_last_tile_and_voices_have_pictures(panel):
     from soundboard.ui import art
     p, _ = panel
     order = _grid_order(p.fx)
-    assert order[-1] == "Random voice" and order[-2] == "My own mix"
-    assert not p.fx.btn_random.isCheckable() and p.fx.btn_random not in p.fx.tiles.buttons()
+    assert order[-1] == "My own mix" and "Random voice" not in order
+    assert p.fx.btn_random.window() is p.fx.dlg     # Randomize lives in Make it yours
     assert not p.fx.btn_random.icon().isNull()
     if art.exists(art.voice_key("Robot")):          # the repo's pictures are used
         assert p.fx._tile["Robot"].property("art")
@@ -624,7 +625,7 @@ def test_save_as_a_voice_makes_a_tile_that_comes_back(panel, monkeypatch, qapp):
     p.fx.btn_save.click()
     assert asked == ["My voice"]
     assert p.fx.preset == "Squeaky" and p.fx._tile["Squeaky"].isChecked()
-    assert _grid_order(p.fx)[-2:] == ["Squeaky", "Random voice"]
+    assert _grid_order(p.fx)[-2:] == ["My own mix", "Squeaky"]
     assert p.fx.spec()["custom"] == mine           # "My own mix" is still that mix
     p.fx.pick("Robot")
     p.fx.pick("Squeaky")
@@ -717,7 +718,7 @@ def test_tiles_reflow_with_saved_voices(qapp, app_dir, monkeypatch):
     holder.show()
     fx.setGeometry(0, 0, 260, 1600)
     qapp.processEvents()
-    assert _grid_order(fx)[-3:] == ["A", "B", "Random voice"]
+    assert _grid_order(fx)[-3:] == ["My own mix", "A", "B"]
     assert max(b.geometry().right() for b in fx.tiles.buttons()) <= fx.width()
     holder.hide()
 
@@ -871,7 +872,7 @@ def test_a_slider_step_lays_nothing_out_and_its_value_always_fits(panel, qapp):
     p, _ = panel
     p.resize(1100, 800)
     p.show()
-    p.fx.btn_more.setChecked(True)
+    p.fx.open_tweak()
     p.fx.pick("Robot")
     qapp.processEvents()
     row = p.fx.rows["robot"]
@@ -915,3 +916,98 @@ def test_every_value_a_slider_shows_fits_its_label(panel):
             for i in range(s.steps + 1):
                 v = s.q.lo + (s.q.hi - s.q.lo) * i / s.steps
                 assert fm.horizontalAdvance(param_text(s.q, v)) <= room, (s.q.key, v)
+
+
+# ---------------------------------------------------------------- Make it yours window
+
+def test_the_card_is_just_the_switch_the_voices_and_one_button(panel):
+    p, _ = panel
+    fx = p.fx
+    on_card = [w for w in (fx.btn_power, fx.meter, fx.btn_tweak, *fx.tiles.buttons())]
+    assert all(w.window() is not fx.dlg for w in on_card)
+    for w in (fx.hero_box.parentWidget(), fx.btn_random, fx.btn_save, fx.btn_share,
+              fx.btn_import, fx.btn_bin, fx.more, *fx.rows.values()):
+        assert w.window() is fx.dlg
+    assert not fx.dlg.isModal() and not fx.dlg.isVisible()
+    fx.btn_tweak.click()
+    assert fx.dlg.isVisible()
+    fx.pick("Robot")                                  # the voices still work beside it
+    assert fx.preset == "Robot" and fx.btn_tweak.text().endswith("on")
+    fx.dlg.close()
+
+
+def test_my_own_mix_opens_make_it_yours(panel):
+    p, _ = panel
+    p.fx.pick("Custom")
+    assert p.fx.dlg.isVisible()
+    p.fx.dlg.close()
+
+
+def test_make_it_yours_remembers_its_size(panel, qapp):
+    from soundboard.ui.voicepanel import VoiceFxPanel
+    p, _ = panel
+    seen = []
+    p.fx.changed.connect(seen.append)
+    p.fx.open_tweak()
+    p.fx.dlg.resize(520, 480)
+    qapp.processEvents()
+    assert p.fx._fx_cols == 1                         # narrow: one effect a row
+    p.fx.dlg.close()
+    assert seen[-1]["panel_size"] == [520, 480]
+    again = VoiceFxPanel(voicefx.clean_spec(seen[-1]))
+    again.open_tweak()
+    assert (again.dlg.width(), again.dlg.height()) == (520, 480)
+    again.dlg.close()
+    again.deleteLater()
+
+
+def test_copy_and_import_a_share_code(panel, monkeypatch, qapp):
+    from PySide6.QtGui import QGuiApplication
+    from PySide6.QtWidgets import QMessageBox
+    p, _ = panel
+    p.fx.pick("Chipmunk")
+    _ask(monkeypatch, "Squeaky")
+    p.fx.save_voice()
+    assert p.fx.btn_share.isEnabled()                # a saved voice is on
+    code = p.fx.copy_code("Squeaky")
+    assert QGuiApplication.clipboard().text() == code and code.startswith("OB1-")
+    sound = p.fx.spec()["effects"]
+    p.fx.pick("Robot")
+    assert not p.fx.btn_share.isEnabled()
+    asked = []
+    monkeypatch.setattr(QMessageBox, "question",
+                        lambda *a: asked.append(a[2]) or QMessageBox.Yes)
+    _ask(monkeypatch, code)
+    p.fx.btn_import.click()
+    # the name was taken: it comes in alongside, on, and sounding the same
+    assert "Squeaky (2)" in asked[0] and p.fx.preset == "Squeaky (2)"
+    assert list(p.fx.store.voices) == ["Squeaky", "Squeaky (2)"]
+    strip = {t: e for t, e in sound.items() if t != "cleanup"}
+    assert {t: e for t, e in p.fx.spec()["effects"].items() if t != "cleanup"} == strip
+
+
+def test_importing_junk_says_why_and_adds_nothing(panel, monkeypatch):
+    from PySide6.QtWidgets import QMessageBox
+    p, _ = panel
+    said = []
+    monkeypatch.setattr(QMessageBox, "warning", lambda *a: said.append(a[2]))
+    assert p.fx.import_code("OB1-not-a-real-code") == ""
+    assert said and not p.fx.store.voices
+    # a built-in voice's name gets "(shared)"; saying No adds nothing
+    from soundboard import savedvoices
+    code = savedvoices.share_code("Robot", {"robot": {"on": True}})
+    monkeypatch.setattr(QMessageBox, "question", lambda *a: QMessageBox.No)
+    assert p.fx.import_code(code) == "" and not p.fx.store.voices
+    monkeypatch.setattr(QMessageBox, "question", lambda *a: QMessageBox.Yes)
+    assert p.fx.import_code(code) == "Robot (shared)"
+
+
+def test_copy_from_a_tile_with_the_window_closed_says_so(panel, monkeypatch):
+    p, _ = panel
+    _ask(monkeypatch, "Mine", "Other")
+    p.fx.save_voice()
+    p.fx.save_voice()
+    p.fx.copy_code("Mine")
+    assert p.fx.undo_bar.isVisibleTo(p.fx) and p.fx.undo_bar.btn_undo.isHidden()
+    p.fx.delete_voice("Mine")                        # a real Undo shows its button again
+    assert not p.fx.undo_bar.btn_undo.isHidden()
