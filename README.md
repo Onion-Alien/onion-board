@@ -77,6 +77,15 @@ Optional: if you never get it, nothing changes.
 
 1. **[Download `OnionBoardSetup.exe`](../../releases/latest/download/OnionBoardSetup.exe)**
    and double-click it. Leave the boxes as they are and click through to **Install**.
+
+   Or, if you use [winget](https://learn.microsoft.com/windows/package-manager/winget/),
+   install it from a terminal with no clicks (and update it later with
+   `winget upgrade OnionAlien.OnionBoard`; new versions reach winget a day or two
+   after the release):
+
+   ```
+   winget install OnionAlien.OnionBoard
+   ```
 2. **Follow Bun the bunny's four steps**: your mic, your headphones, where your
    sounds go, and what to set in Discord or your game.
 3. **Pick where your sounds go** (step 3 of Bun's guide, or later on the *Setup* tab →
