@@ -1837,8 +1837,9 @@ class MainWindow(QMainWindow):
             step = ("<b>Nothing to set.</b> Discord and games keep your normal mic, and "
                     "your sounds are in it. If sounds get chopped up, switch off the "
                     "voice app's noise suppression (Discord: <b>Input Profile → Studio</b>)."
-                    + (" A newer version of the mic part is ready: <b>Update</b> below "
-                       "(one Windows prompt) whenever suits you."
+                    + ("<br><br><b>Optional:</b> your mic part works, and a newer "
+                       "version is here. It's not needed — update below whenever suits "
+                       "you (Windows asks once, and your sound drops out for a second)."
                        if direct == "outdated" else ""))
         elif route == "mic":
             state = "unrouted"
@@ -1921,7 +1922,7 @@ class MainWindow(QMainWindow):
         if not busy.is_busy(self.btn_install):
             self.btn_install.setText(
                 "Install the free virtual cable" if route != "mic" else
-                "Update the mic part (one click)" if update else
+                "Optional: update the mic part" if update else
                 "Put my sounds straight into my mic" if direct in ("missing", "other") else
                 "Repair (one click)")
             icons.set_icon(self.btn_install, "mic" if route == "mic" else "cable",

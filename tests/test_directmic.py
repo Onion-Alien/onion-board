@@ -1110,6 +1110,30 @@ def test_on_the_mic_the_setup_tab_never_talks_about_the_cable(window, monkeypatc
         w.engine.main_stream = w.engine.tap = None
 
 
+def test_an_older_working_mic_part_offers_the_update_as_optional(window, monkeypatch):  # noqa: F811
+    """Sounds in the mic with an older mic part: the tab says it's all set, and the
+    update is plainly optional (not a primary button, not a "needs fixing")."""
+    w = window
+    _routes(w, monkeypatch, "outdated", cables=())
+    monkeypatch.setattr(w, "_direct_not_running", lambda: False)
+
+    class S:
+        def stop(self):
+            pass
+        close = stop
+    w.engine.main_stream = S()
+    try:
+        w._show_route()
+        w._update_status()
+        assert w.setup_state == "ok"
+        step = w.step_lbl.text()
+        assert "Nothing to set" in step and "Optional" in step
+        assert w.btn_install.text().startswith("Optional")
+        assert w.btn_install.objectName() != "primary"
+    finally:
+        w.engine.main_stream = None
+
+
 @pytest.mark.parametrize("state", ["ready", "outdated"])
 def test_on_the_mic_the_cable_gets_the_same(window, monkeypatch, state):  # noqa: F811
     w = window

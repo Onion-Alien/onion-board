@@ -25,6 +25,9 @@
 - **No more minutes of silence in the clip editor.** Left open while nothing
   plays, it keeps only what the program actually played: silence before it
   isn't kept, and long gaps close up to half a second.
+- **Setup tab: the mic-part update reads as optional.** When your sounds are
+  already in your mic, a newer mic part no longer sits next to "Nothing to set"
+  as if something were wrong: it's marked optional, on its own line and button.
 
 ## 1.9.3 — 2026-10-06
 
