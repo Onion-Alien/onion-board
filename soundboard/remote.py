@@ -50,8 +50,9 @@ instead, with the add-on's own key, a shorter list of actions, and a page served
 link's #fragment, which browsers never send). It answers only addresses on the local
 network, takes the key only in a header (never ?token=, which would end up in a
 browser's history), and an address that gets the key wrong FAIL_LIMIT times in a row
-is ignored for LOCK_S seconds. Either server keeps at most MAX_CONNECTIONS open at
-once (PEER_CONNECTIONS from one address).
+is ignored for LOCK_S seconds. It never listens on a network Windows calls Public
+(a café's Wi-Fi), whatever Windows Firewall says (soundboard.netcategory). Either
+server keeps at most MAX_CONNECTIONS open at once (PEER_CONNECTIONS from one address).
 
 The HTTP side runs on its own thread; each request is handed to the UI thread
 (`RemoteControl.request`) and answered from there, so it never touches the
@@ -73,9 +74,9 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from typing import TYPE_CHECKING
 from urllib.parse import parse_qs, urlsplit
 
-from PySide6.QtCore import QObject, Qt, Signal
+from PySide6.QtCore import QObject, Qt, QTimer, Signal
 
-from soundboard import errors
+from soundboard import errors, netcategory
 
 if TYPE_CHECKING:
     from soundboard.ui.mainwindow import MainWindow
@@ -90,6 +91,10 @@ FAIL_LIMIT = 5          # lan: wrong keys in a row from one address before it's 
 LOCK_S = 60.0           # lan: ...for this long
 MAX_CONNECTIONS = 32    # connections open at once; more are closed straight away
 PEER_CONNECTIONS = 8    # ...and from any one address (a phone uses one or two)
+NETWORK_CHECK_S = 30.0  # lan: how often it checks the network is still not Public
+PUBLIC_NETWORK = ("Windows calls this network Public (like a café's or a hotel's Wi-Fi), "
+                  "so phones are turned away. At home, set it to Private in Windows "
+                  "Settings → Network & internet, then turn this off and on again")
 # every endpoint, in the order they're listed (the 404 answer, /api/help, the
 # setup prompt and Settings all read this)
 ENDPOINTS = {
@@ -200,8 +205,11 @@ class RemoteControl(QObject):
     """Starts / stops the server. `dispatch(action, params) -> (status, body)` runs on
     the UI thread for every authorised request whose action is in `actions`. `page`,
     (body, headers), is answered at / with no key. `lan` makes it the phone remote's
-    server: local-network peers only, and wrong keys lock an address out."""
+    server: local-network peers only, wrong keys lock an address out, and never on a
+    network Windows calls Public (checked when it starts and every NETWORK_CHECK_S
+    after: `closed` says why when that stops it)."""
     request = Signal(object)
+    closed = Signal(str)   # lan: stopped by itself, and why
 
     def __init__(self, dispatch, parent=None, *, actions=ACTIONS, page=None,
                  lan: bool = False, name: str = "control API"):
@@ -219,6 +227,9 @@ class RemoteControl(QObject):
         self._fails: dict[str, tuple[int, float]] = {}   # peer -> (wrong keys, locked until)
         self._fails_lock = threading.Lock()
         self.request.connect(self._on_request, Qt.QueuedConnection)
+        self._network = QTimer(self)
+        self._network.setInterval(int(NETWORK_CHECK_S * 1000))
+        self._network.timeout.connect(self._check_network)
 
     @property
     def running(self) -> bool:
@@ -232,6 +243,10 @@ class RemoteControl(QObject):
             self._fails.clear()
         if not token:
             self.error = "no token"
+            return False
+        if self.lan and netcategory.category(host) == netcategory.PUBLIC:
+            self.error = PUBLIC_NETWORK
+            log.info("%s not started: the network is Public", self.name)
             return False
         try:
             srv = _Server((self.host, self.port), _handler_for(self))
@@ -250,9 +265,21 @@ class RemoteControl(QObject):
         threading.Thread(target=srv.serve_forever, kwargs={"poll_interval": 0.25},
                          daemon=True, name=self.name.replace(" ", "-")).start()
         log.info("%s listening on %s:%s", self.name, self.host, self.port)
+        if self.lan:
+            self._network.start()
         return True
 
+    def _check_network(self):
+        """lan: the network turned Public (or the PC moved to a Public one keeping its
+        address) while it listens: stop."""
+        if self.running and netcategory.category(self.host) == netcategory.PUBLIC:
+            self.stop()
+            self.error = PUBLIC_NETWORK
+            log.info("%s stopped: the network is Public now", self.name)
+            self.closed.emit(PUBLIC_NETWORK)
+
     def stop(self):
+        self._network.stop()
         srv, self._server = self._server, None
         if srv is not None:
             srv.shutdown()

@@ -9,6 +9,10 @@
 - **Phone remote: the key stays out of web addresses.** The phone key is only
   accepted in a request header, never in the address, so it can't end up in a
   browser's history. Stream Deck links on this PC still work as before.
+- **Phone remote: never on public Wi-Fi.** If Windows calls the network Public
+  (a café's or a hotel's Wi-Fi), the phone remote doesn't listen at all, even
+  if Windows Firewall would let it through, and it turns itself off if the
+  network becomes Public while it runs.
 - **Clip editor copy and paste do what you'd expect.** A click places the cursor
   (a slight wobble of the mouse no longer picks a sliver), Ctrl+V always says
   what it pasted and where, and pasting right after copying puts a second copy

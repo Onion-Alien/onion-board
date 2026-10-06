@@ -206,3 +206,32 @@ def test_a_flood_of_connections_cant_pile_up_threads(qapp, loaded, monkeypatch):
         s.close()
     assert process_events(qapp, lambda: not srv._server._open, timeout=3)
     assert call(qapp, srv, "/")[0] == 200
+
+
+def test_never_on_a_network_windows_calls_public(qapp, window, loaded,  # noqa: F811
+                                                 monkeypatch):
+    """A café's Wi-Fi: no server, whatever Windows Firewall would let in; and one
+    already listening stops when its network turns Public, saying so."""
+    from soundboard import netcategory
+    srv = loaded.server
+    monkeypatch.setattr(netcategory, "category", lambda ip: netcategory.PUBLIC)
+    assert not srv.start(0, "add-on-key", "127.0.0.1") and not srv.running
+    assert srv.error == remote.PUBLIC_NETWORK
+    monkeypatch.setattr(netcategory, "category", lambda ip: None)   # can't tell: on
+    assert srv.start(0, "add-on-key", "127.0.0.1")
+    monkeypatch.setattr(netcategory, "category", lambda ip: netcategory.PRIVATE)
+    srv._check_network()
+    assert srv.running
+    monkeypatch.setattr(netcategory, "category", lambda ip: netcategory.PUBLIC)
+    srv._check_network()
+    assert not srv.running and srv.error == remote.PUBLIC_NETWORK
+    assert "Public" in window.status.text()
+    loop = remote.RemoteControl(lambda a, p: (200, {}))   # Stream Deck side: 127.0.0.1
+    assert loop.start(0, "k") and loop.running
+    loop.stop()
+
+
+def test_the_network_category_never_raises():
+    from soundboard import netcategory
+    assert netcategory.category("203.0.113.9") is None   # no adapter has it
+    assert netcategory.category("not an address") is None
