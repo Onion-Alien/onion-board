@@ -26,6 +26,7 @@ def test_the_version_file_matches_soundboards_version(tmp_path):
     text = out.read_text(encoding="utf-8")
     s = strings(text)
     assert s["FileDescription"] == s["ProductName"] == "Onion Board"
+    assert s["CompanyName"] == "Onion Alien"
     assert s["OriginalFilename"] == "OnionBoard.exe"
     assert s["FileVersion"] == s["ProductVersion"] == soundboard.__version__
     nums = vi.numbers(soundboard.__version__)

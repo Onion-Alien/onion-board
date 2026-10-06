@@ -16,6 +16,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 OUT = ROOT / "installer" / "version_info.txt"
 NAME = "Onion Board"
+PUBLISHER = "Onion Alien"
 EXE = "OnionBoard.exe"
 COPYRIGHT = "Copyright (C) Onion Board contributors"
 
@@ -32,7 +33,7 @@ def render(version: str) -> str:
     """PyInstaller's version-file format (a VSVersionInfo expression)."""
     nums = numbers(version)
     strings = {
-        "CompanyName": NAME,
+        "CompanyName": PUBLISHER,
         "FileDescription": NAME,
         "FileVersion": version,
         "InternalName": "OnionBoard",

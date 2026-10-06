@@ -30,12 +30,15 @@ Version **1.9.6** · Windows 10 / 11 · free, no account, no ads, anonymous usag
   use, with no virtual cable to install. Or, as a backup, the free virtual cable; or
   any other output you pick (Voicemeeter, a mixer, a capture card, OBS); or nowhere,
   so only you hear them. Your voice goes along, or tick it off and send only sounds.
-- **Hotkeys that work in-game**, MIDI pads, an in-game overlay, Stream Deck support,
-  and your pads on your phone with the optional Onion Pocket add-on.
-- **Add sounds from anywhere**: drag in files, or search YouTube and SoundCloud
-  inside the app.
+- **One-click sounds**: search YouTube, SoundCloud and Myinstants inside the app and
+  add a sound in one click, drag in files, or record one with your mic.
+- **Hotkeys that work in-game**, an in-game overlay, MIDI pads, Stream Deck support,
+  and your pads on your phone with the optional Onion Pocket add-on. Open your game
+  and the board switches to that game's sounds by itself.
+- **Bring your board over** from Soundpad, Resanance, Soundux or EXP Soundboard:
+  sounds, names, categories and hotkeys, in one click.
 - **Effects on any sound**: trim, speed, pitch, bass boost, reverse. One-click
-  *Ear rape*, *Nightcore*, *Slowed + reverb*.
+  *Deep fried*, *Nightcore*, *Slowed + reverb*.
 - **Voice changer, text-to-speech** and live voice-to-speech, plus optional **AI
   voices** that make you sound like someone else, live on your own PC.
 - **Instant replay**: one key turns the last 30 seconds you heard into a pad.
@@ -131,6 +134,21 @@ Optional: if you never get it, nothing changes.
   `%APPDATA%\OnionBoard\onionboard.log` (skim it first: it has your device names).
 
 Your sounds and settings live in `%APPDATA%\OnionBoard\` and survive reinstalls.
+
+### Is it safe?
+
+- **Why Windows warns you:** the app isn't code-signed yet, so Windows doesn't know
+  it. Every release is scanned on VirusTotal (the link is at the top).
+- **What needs admin:** only the one-click *straight into my mic* step. It adds a
+  small audio effect to your mic inside Windows' audio engine, backs up that mic's
+  settings first, and puts them back when you switch it off or uninstall. The details
+  are in [SECURITY.md](SECURITY.md#what-straight-into-my-mic-changes-on-your-pc).
+- **What goes online:** only what you ask for (searches, downloads, the radio), an
+  update check, and an anonymous daily count you can switch off. Every request is
+  listed in [SECURITY.md](SECURITY.md#what-the-app-does-on-the-network), and the app
+  shows each one live under *Settings → Connection → Network activity*.
+- **Getting rid of it:** uninstall it like any app. Your mic goes back the way it was;
+  your own sounds stay in `%APPDATA%\OnionBoard\` until you delete them.
 
 <a id="license"></a>
 

@@ -14,10 +14,13 @@ library somewhere else get their own file.
 """
 from __future__ import annotations
 
+import base64
 import json
 import logging
+import math
 import time
 import uuid
+import zlib
 from pathlib import Path
 
 from soundboard import library, trash, voicefx
@@ -67,6 +70,107 @@ def saved() -> list[dict]:
         return []
     voices = raw.get("voices") if isinstance(raw, dict) else None
     return [{"name": n, "effects": e} for n, e in clean_list(voices)]
+
+
+# ---------------------------------------------------------------- share codes
+# A saved voice as a line of text to paste to a friend: "OB1-" + base64url (no
+# padding) of zlib-compressed compact JSON {"n": name, "e": {type: {"on", param...}}}.
+# Only the name and the effects' numbers go in: no paths, nothing about this PC.
+# Effects that are off and settings left at their default are left out (they load
+# that way anyway), so codes stay short.
+CODE_PREFIX = "OB"
+CODE_VERSION = 1
+MAX_CODE = 4096        # characters of code (a full 13-effect voice is ~300)
+MAX_JSON = 16384       # bytes it may unpack to (a zip bomb stops here)
+# your mic clean-up is yours, not the voice's (ui.voicepanel.KEEP): never shared
+NOT_SHARED = frozenset({"cleanup"})
+
+
+class CodeError(ValueError):
+    """A share code that can't be read; str() says why, in plain words."""
+
+
+def share_code(name: str, effects: dict) -> str:
+    out = {}
+    for etype, cfg in clean_effects(effects).items():
+        cls = voicefx.REGISTRY.get(etype)
+        if cls is None or etype in NOT_SHARED or not cfg.get("on"):
+            continue
+        d = {}
+        for q in cls.params:
+            if q.key in cfg:
+                v = q.clamp(cfg[q.key])
+                if v != q.default:
+                    d[q.key] = round(v, 4)
+        out[etype] = d
+    raw = json.dumps({"n": clean_name(name) or "My voice", "e": out},
+                     separators=(",", ":"), ensure_ascii=False).encode("utf-8")
+    body = base64.urlsafe_b64encode(zlib.compress(raw, 9)).rstrip(b"=").decode("ascii")
+    return f"{CODE_PREFIX}{CODE_VERSION}-{body}"
+
+
+def read_code(text) -> tuple[str, dict, list[str]]:
+    """(name, effects, notes) from a share code, or CodeError. Every number is put
+    inside its slider's range; effects this version doesn't have are left out and
+    named in `notes`."""
+    code = "".join(str(text or "").split())   # pasted over two lines, spaces around
+    if not code:
+        raise CodeError("There's no code there.")
+    if len(code) > MAX_CODE:
+        raise CodeError("That's far too long to be a voice code.")
+    head, dash, body = code.partition("-")
+    version = head[len(CODE_PREFIX):]
+    if not dash or not head.upper().startswith(CODE_PREFIX) \
+            or not (version.isascii() and version.isdecimal()):
+        raise CodeError("That isn't a voice code (they start with “OB1-”).")
+    if int(version) > CODE_VERSION:
+        raise CodeError("That code was made by a newer version of the app. Update to "
+                        "use it.")
+    try:
+        packed = base64.urlsafe_b64decode(body + "=" * (-len(body) % 4))
+        unzip = zlib.decompressobj()
+        raw = unzip.decompress(packed, MAX_JSON)
+        if unzip.unconsumed_tail:
+            raise CodeError("That code unpacks to far too much to be a voice.")
+        if not unzip.eof:
+            raise ValueError("cut short")
+        data = json.loads(raw.decode("utf-8"))
+    except CodeError:
+        raise
+    except (ValueError, zlib.error, RecursionError):
+        raise CodeError("That code is damaged or cut short. Copy the whole thing "
+                        "and try again.") from None
+    if not isinstance(data, dict) or not isinstance(data.get("n"), str) \
+            or not isinstance(data.get("e"), dict):
+        raise CodeError("That code is damaged: it doesn't hold a voice.")
+    name = clean_name(data["n"]) or "Shared voice"
+    effects, unknown = {}, []
+    for etype, cfg in data["e"].items():
+        cls = voicefx.REGISTRY.get(etype) if isinstance(etype, str) else None
+        if cls is None:
+            unknown.append(str(etype)[:40])
+            continue
+        if etype in NOT_SHARED:
+            continue
+        if not isinstance(cfg, dict):
+            raise CodeError("That code is damaged: an effect's settings are missing.")
+        d = {"on": True}
+        for q in cls.params:
+            v = cfg.get(q.key)
+            if isinstance(v, (int, float)) and not isinstance(v, bool):
+                try:
+                    v = float(v)
+                except OverflowError:   # an integer too big to be a number here
+                    continue
+                if math.isfinite(v):
+                    d[q.key] = q.clamp(v)
+        effects[etype] = d
+    notes = []
+    if unknown:
+        notes.append("Left out effects this version doesn't have: "
+                     + ", ".join(unknown[:5]) + ("…" if len(unknown) > 5 else "")
+                     + ". Updating the app may add them.")
+    return name, effects, notes
 
 
 class Store:

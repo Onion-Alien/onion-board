@@ -1148,11 +1148,58 @@ class SettingsDialog(QDialog):
         hint.setWordWrap(True)
         cv.addWidget(hint)
         v.addWidget(card)
+        v.addWidget(self._programs_card())
         v.addWidget(self._background_card())
         v.addWidget(self._backup_card())
         v.addWidget(self._reset_card())
         v.addStretch(1)
         return w
+
+    def _programs_card(self):
+        """Switch category when a program is in front: every rule in one place."""
+        card, cv = self._card(
+            "Switch category by program",
+            "Right-click a category tab → Show this when a program is in front… and the "
+            "board shows that category by itself whenever the program is in front.")
+        self.box_programs = self._option(
+            cv, "Switch by itself",
+            "When the program closes, the board goes back to what it showed before.",
+            self.mw.cfg.category_programs_on, self.mw.set_category_programs_on)
+        self.programs_list = QVBoxLayout()
+        self.programs_list.setSpacing(4)
+        cv.addLayout(self.programs_list)
+        self._fill_programs()
+        if hasattr(self.mw, "category_programs_changed"):
+            self.mw.category_programs_changed.connect(self._fill_programs)
+        return card
+
+    def _fill_programs(self):
+        lay = self.programs_list
+        while lay.count():
+            w = lay.takeAt(0).widget()
+            if w is not None:
+                w.deleteLater()
+        rules = self.mw.cfg.category_programs
+        if not rules:
+            none = QLabel("No programs set yet.")
+            none.setObjectName("muted")
+            lay.addWidget(none)
+        for exe, cat in sorted(rules.items()):
+            row = QWidget()
+            h = QHBoxLayout(row)
+            h.setContentsMargins(0, 0, 0, 0)
+            missing = cat not in self.mw.cfg.categories
+            lbl = QLabel(f"{exe}  →  “{cat}”" + ("  (no such category now)" if missing
+                                                   else ""))
+            lbl.setObjectName("muted" if missing else "")
+            h.addWidget(lbl, 1)
+            rm = QPushButton("Remove")
+            rm.setObjectName("small")
+            rm.setToolTip(f"Stop switching to “{cat}” when {exe} is in front")
+            icons.set_icon(rm, "trash", "danger_text", size=12)
+            rm.clicked.connect(lambda _c=False, e=exe: self.mw.remove_category_program(e))
+            h.addWidget(rm)
+            lay.addWidget(row)
 
     # Settings > Tabs: what each tab that can be switched off is for (taboff.KEYS)
     TAB_HINTS = {
@@ -1169,7 +1216,7 @@ class SettingsDialog(QDialog):
             "Tabs",
             "Switch off the tabs you don't use. A switched-off tab is gone from the "
             "window and doesn't load at all, so nothing of it runs in the background. "
-            "Switch it back on any time.")
+            "Switch it back on any time, here or with + More tabs beside the tabs.")
         from soundboard.ui.mainwindow import TABS
         self.tab_boxes: dict[str, QCheckBox] = {}
         for text, _tip in TABS:
@@ -1756,7 +1803,7 @@ class SettingsDialog(QDialog):
         card, cv = self._card("Low data mode",
                               "For a phone hotspot, capped plan or slow internet: smaller "
                               "downloads, lower-bitrate radio, more patience with stations "
-                              "that cut out, and no pictures or like counts in web search "
+                              "that cut out, and no pictures in web search "
                               "results. Or pick each one below.")
         self.data_low = QCheckBox("Use less data")
         self.data_low.toggled.connect(
@@ -1853,9 +1900,9 @@ class SettingsDialog(QDialog):
 
         card, cv = self._card("Sounds from the web")
         self._data_widgets["web_extras"] = self._option(
-            cv, "Show pictures and like counts",
-            "Search results load each video's thumbnail and look up its likes and "
-            "comments. Off: just the titles, a lot less data per search.",
+            cv, "Show pictures",
+            "Search results load each video's thumbnail. Off: just the titles, "
+            "a lot less data per search.",
             q.web_extras, lambda b: self._data_set(web_extras=b))
         v.addWidget(card)
         v.addStretch(1)
@@ -1981,9 +2028,11 @@ class SettingsDialog(QDialog):
                         "here still works.",
         "usage_stats": "Once a day, the installed app sends an anonymous \"still here\" "
                        "to our counter (goatcounter.com): the version number and a random "
-                       "ID made on this PC, so nobody is counted twice. Nothing else: no "
+                       "ID made on this PC, so nobody is counted twice, and which tabs you "
+                       "opened. If it crashed or froze, how many times (a count, never "
+                       "the report), and once when you uninstall. Nothing else: no "
                        "name, sounds, settings or games. It's how we know if anyone uses "
-                       "Onion Board. Off: nothing is sent.",
+                       "Onion Board, and if it's working for them. Off: nothing is sent.",
     }
 
     def _switches_card(self):

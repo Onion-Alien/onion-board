@@ -9,7 +9,7 @@ import threading
 import numpy as np
 import soundfile as sf
 
-from soundboard.engine import SR
+from soundboard.engine import SR, resample
 from soundboard import library
 from soundboard.library import MAX_SECONDS
 
@@ -204,3 +204,104 @@ class ArmedRecorder:
             self._stopped = True
             self._pre = []
             return self._rec.stop()
+
+
+class MicTake:
+    """Record a sound with the mic (the Sounds tab's Record): the engine's take
+    (Engine.start_mic_take) moved onto a 16-bit WAV on disk by pump() on the UI thread
+    as it comes, so a long one doesn't sit in RAM; at the mic's own rate, capped at
+    MAX_SECONDS. stop() gives it back as (n, 2) float32 at SR."""
+
+    def __init__(self, engine, processed: bool = False, spool_path=None):
+        self.engine = engine
+        self.rate = int(engine.rates["mic"])
+        self.frames = 0
+        self.rate_changed = False   # the mic switched rate mid-take: it ends there
+        self.spool_path = spool_path or library.APP_DIR / "mictake.tmp.wav"
+        self._mem: list[np.ndarray] | None = None
+        try:
+            self.spool_path.parent.mkdir(parents=True, exist_ok=True)
+            self._spool: sf.SoundFile | None = sf.SoundFile(
+                str(self.spool_path), "w", self.rate, 2, subtype="PCM_16")
+        except Exception:  # noqa: BLE001
+            log.warning("can't open the mic take's spool %s; keeping it in memory",
+                        self.spool_path, exc_info=True)
+            self._spool, self._mem = None, []
+        self._blocks = engine.start_mic_take(processed)
+
+    @property
+    def seconds(self) -> float:
+        return self.frames / self.rate
+
+    @property
+    def full(self) -> bool:
+        return self.frames >= MAX_SECONDS * self.rate or self.rate_changed
+
+    def pump(self) -> int:
+        """Move what the mic sent since the last call to the spool; returns its frames."""
+        blocks = self._blocks
+        n = len(blocks)
+        if not n or self.full:
+            return 0
+        if self.engine.rates["mic"] != self.rate:
+            self.rate_changed = True
+            return 0
+        chunk = blocks[:n]
+        del blocks[:n]          # the audio thread only appends: this can't lose a block
+        x = np.concatenate(chunk)[:int(MAX_SECONDS * self.rate) - self.frames]
+        self._write(x)
+        self.frames += len(x)
+        return len(x)
+
+    def _write(self, x: np.ndarray):
+        if self._spool is not None:
+            try:
+                self._spool.write(x)
+                return
+            except Exception:  # noqa: BLE001 - disk full etc.: the rest in memory
+                log.warning("mic take spool failed; continuing in memory", exc_info=True)
+                self._mem = [self._read_back()]
+        self._mem.append(x)
+
+    def _read_back(self) -> np.ndarray:
+        """Close the spool and read it (then delete it)."""
+        spool, self._spool = self._spool, None
+        data = np.zeros((0, 2), np.float32)
+        try:
+            spool.close()
+            data, _ = sf.read(str(self.spool_path), dtype="float32", always_2d=True)
+        except Exception:  # noqa: BLE001
+            log.warning("can't read back the mic take", exc_info=True)
+        self._unlink()
+        return data
+
+    def _unlink(self):
+        try:
+            self.spool_path.unlink(missing_ok=True)
+        except OSError:
+            pass
+
+    def stop(self) -> np.ndarray:
+        """End it: (n, 2) float32 at SR (empty if the mic sent nothing)."""
+        self.engine.stop_mic_take()
+        self.pump()
+        if self._spool is not None:
+            data = self._read_back()
+        else:
+            data = np.concatenate(self._mem) if self._mem else np.zeros((0, 2), np.float32)
+            self._mem = None
+        return resample(data, self.rate, SR)
+
+    def cancel(self):
+        """Throw it away."""
+        if self.engine.taking and self.engine._take is self._blocks:
+            self.engine.stop_mic_take()
+        self._blocks = []
+        if self._spool is not None:
+            try:
+                self._spool.close()
+            except Exception:  # noqa: BLE001
+                log.debug("closing the mic take's spool raised", exc_info=True)
+            self._spool = None
+            self._unlink()
+        self._mem = None

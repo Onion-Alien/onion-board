@@ -26,6 +26,7 @@ import logging
 import shutil
 import tarfile
 import urllib.error
+import urllib.parse
 import urllib.request
 from collections.abc import Callable
 from pathlib import Path
@@ -38,6 +39,10 @@ log = logging.getLogger(__name__)
 VERSION = "15.0.24"
 TARBALL = f"tor-expert-bundle-windows-x86_64-{VERSION}.tar.gz"
 URL = f"https://dist.torproject.org/torbrowser/{VERSION}/{TARBALL}"
+# dist.torproject.org keeps only the latest few versions; once this one is gone from it
+# (404), the Tor Project's archive still has it. The same SHA256 is checked either way.
+ARCHIVE_URL = f"https://archive.torproject.org/tor-package-archive/torbrowser/{VERSION}/{TARBALL}"
+GONE = (404, 410)
 SHA256 = "e9dc6ccc93cd6afa507193f4de284d6424233ff5102155cd2c94b259e8a22b65"
 MAX_BYTES = 100_000_000       # the tarball is about 22 MB; anything far bigger isn't it
 CHUNK = 256 * 1024
@@ -83,9 +88,27 @@ def installed(dest: Path | None = None) -> bool:
 
 
 def download(progress: Callable[[int, int], None] | None = None) -> bytes:
-    """The tarball, checked against SHA256. `progress(done, total)` is called as it
-    arrives (total 0 when the server doesn't say). Raises GetError."""
-    req = urllib.request.Request(URL, headers={"User-Agent": "OnionBoard"})
+    """The tarball, checked against SHA256: from dist.torproject.org, or from the
+    archive once dist no longer has this version. `progress(done, total)` is called as
+    it arrives (total 0 when the server doesn't say). Raises GetError."""
+    try:
+        return _download(URL, progress)
+    except _Gone:
+        log.info("tor download: Tor %s is gone from dist.torproject.org, using the archive",
+                 VERSION)
+    try:
+        return _download(ARCHIVE_URL, progress)
+    except _Gone as e:
+        raise GetError(f"archive.torproject.org said {e}. {BLOCKED_HINT}") from None
+
+
+class _Gone(Exception):
+    """The server says the file isn't there (404 / 410)."""
+
+
+def _download(url: str, progress) -> bytes:
+    host = urllib.parse.urlsplit(url).hostname
+    req = urllib.request.Request(url, headers={"User-Agent": "OnionBoard"})
     h = hashlib.sha256()
     buf = io.BytesIO()
     try:
@@ -105,10 +128,12 @@ def download(progress: Callable[[int, int], None] | None = None) -> bytes:
     except net.ProxyError as e:   # FeatureOff included: switched off, nothing sent
         raise GetError(errors.plain(e)) from None
     except urllib.error.HTTPError as e:
-        raise GetError(f"dist.torproject.org said {e.code} {e.reason}. {BLOCKED_HINT}") from None
+        if e.code in GONE:
+            raise _Gone(f"{e.code} {e.reason}") from None
+        raise GetError(f"{host} said {e.code} {e.reason}. {BLOCKED_HINT}") from None
     except (urllib.error.URLError, OSError) as e:
         why = getattr(e, "reason", None) or e
-        raise GetError(f"Couldn't reach dist.torproject.org ({why}). {BLOCKED_HINT}") from None
+        raise GetError(f"Couldn't reach {host} ({why}). {BLOCKED_HINT}") from None
     got = h.hexdigest()
     if got != SHA256:
         log.warning("tor download: SHA-256 %s, expected %s", got, SHA256)
