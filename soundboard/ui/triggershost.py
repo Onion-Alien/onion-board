@@ -142,6 +142,16 @@ class BoardHost:
     def ringing(self) -> list[str]:
         return [sid.split(RING, 1)[1] for sid in self._ring_voices()]
 
+    def playing(self) -> list[str]:
+        """The tags of every trigger sound playing now (Onion Watch's Playing now
+        bar; optional in the add-on API): rings, card previews, and the pads its
+        one-shots pressed while they still play."""
+        now = set(self.win.engine.playing())
+        tags = [sid.split(RING, 1)[1] for sid in now if RING in sid]
+        tags += [sid.split(HEAR, 1)[1] for sid in now if HEAR in sid]
+        tags += [tag for tag, sids in self._pressed.items() if now & set(sids)]
+        return tags
+
     # ------------------------------------------------------------------ the rest
     def palette(self) -> dict[str, str]:
         return dict(theme.T)

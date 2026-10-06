@@ -404,6 +404,17 @@ def test_the_board_plays_a_trigger_like_its_pad_and_rings_in_the_headphones():
     assert host.ringing() == [] and not host.play("gone")
 
 
+def test_the_host_says_which_trigger_sounds_still_play():
+    win = FakeWindow()
+    host = BoardHost(win)
+    assert host.play("s1", tag="t1/s1")                 # a one-shot: its pad
+    win.engine.voices["s1"] = False                     # ...still playing
+    assert host.play("s1", loop=True, tag="t2")
+    assert sorted(host.playing()) == ["t1/s1", "t2"]
+    del win.engine.voices["s1"]                         # the pad's sound ended
+    assert host.playing() == ["t2"]
+
+
 def test_with_no_headphones_a_ring_plays_where_the_board_plays():
     win = FakeWindow(headphones=False)
     host = BoardHost(win)
