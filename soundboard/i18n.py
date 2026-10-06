@@ -52,7 +52,7 @@ _catalog: dict[str, str | list[str]] = {}
 
 
 # ------------------------------------------------------------------ looking up
-def _(text: str, **kw) -> str:
+def _(text: str, /, **kw) -> str:
     """`text` in the current language, its `{placeholders}` filled from `kw`."""
     if _lang == PSEUDO:
         out = pseudo(text)
@@ -62,7 +62,7 @@ def _(text: str, **kw) -> str:
     return _fill(out, kw) if kw else out
 
 
-def ngettext(singular: str, plural: str, n: int, **kw) -> str:
+def ngettext(singular: str, plural: str, n: int, /, **kw) -> str:
     """The form for `n` ("1 sound" / "{n} sounds"); `{n}` is filled in too."""
     kw.setdefault("n", n)
     if _lang == PSEUDO:

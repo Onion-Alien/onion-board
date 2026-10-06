@@ -167,3 +167,8 @@ def test_startup_reads_the_setting_or_the_env(langs, tmp_path, monkeypatch):
     assert i18n.startup(tmp_path) == "en"
     monkeypatch.setenv("ONIONBOARD_LANG", "xx")
     assert i18n.startup(tmp_path) == "xx"
+
+
+def test_any_placeholder_name_works():
+    assert _("{text} and {singular}", text="a", singular="b") == "a and b"
+    assert ngettext("{n} {text}", "{n} {text}s", 2, text="cat", plural="x") == "2 cats"
