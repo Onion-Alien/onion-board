@@ -48,8 +48,10 @@ get (soundboard.ui.remotehost): it listens on this PC's address on the home netw
 instead, with the add-on's own key, a shorter list of actions, and a page served at
 / without a key (the page holds nothing; Onion Pocket hands the phone its key in the
 link's #fragment, which browsers never send). It answers only addresses on the local
-network, and an address that gets the key wrong FAIL_LIMIT times in a row is ignored
-for LOCK_S seconds.
+network, takes the key only in a header (never ?token=, which would end up in a
+browser's history), and an address that gets the key wrong FAIL_LIMIT times in a row
+is ignored for LOCK_S seconds. Either server keeps at most MAX_CONNECTIONS open at
+once (PEER_CONNECTIONS from one address).
 
 The HTTP side runs on its own thread; each request is handed to the UI thread
 (`RemoteControl.request`) and answered from there, so it never touches the
@@ -86,6 +88,8 @@ ANSWER_S = 3.0          # how long a request waits for the UI thread
 IDLE_S = 10.0           # a client that connects and goes quiet is dropped after this
 FAIL_LIMIT = 5          # lan: wrong keys in a row from one address before it's locked out
 LOCK_S = 60.0           # lan: ...for this long
+MAX_CONNECTIONS = 32    # connections open at once; more are closed straight away
+PEER_CONNECTIONS = 8    # ...and from any one address (a phone uses one or two)
 # every endpoint, in the order they're listed (the 404 answer, /api/help, the
 # setup prompt and Settings all read this)
 ENDPOINTS = {
@@ -149,8 +153,47 @@ class Job:
 
 
 class _Server(ThreadingHTTPServer):
+    """One thread per connection, but only so many: past MAX_CONNECTIONS open at once,
+    or PEER_CONNECTIONS from one address, a new one is closed straight away. Without
+    that, a device on the Wi-Fi with no key could open thousands of connections (each
+    a thread fighting the audio thread for Python) and stall the app's sound."""
     daemon_threads = True
     allow_reuse_address = False   # Windows: reuse would let two apps share the port
+
+    def __init__(self, *args, **kwargs):
+        self._open: dict[str, int] = {}   # peer -> connections open now
+        self._open_lock = threading.Lock()
+        super().__init__(*args, **kwargs)
+
+    def process_request(self, request, client_address):
+        peer = client_address[0]
+        with self._open_lock:
+            full = (sum(self._open.values()) >= MAX_CONNECTIONS
+                    or self._open.get(peer, 0) >= PEER_CONNECTIONS)
+            if not full:
+                self._open[peer] = self._open.get(peer, 0) + 1
+        if full:
+            self.shutdown_request(request)
+            return
+        try:
+            super().process_request(request, client_address)
+        except BaseException:   # no thread started: give the slot back
+            self._release(peer)
+            raise
+
+    def process_request_thread(self, request, client_address):
+        try:
+            super().process_request_thread(request, client_address)
+        finally:
+            self._release(client_address[0])
+
+    def _release(self, peer: str):
+        with self._open_lock:
+            n = self._open.get(peer, 0) - 1
+            if n > 0:
+                self._open[peer] = n
+            else:
+                self._open.pop(peer, None)
 
 
 class RemoteControl(QObject):
@@ -234,7 +277,9 @@ class RemoteControl(QObject):
         auth = headers.get("Authorization", "")
         if auth.lower().startswith("bearer "):
             given = auth[7:].strip()
-        given = given or headers.get("X-Token", "") or (query.get("token") or [""])[0]
+        given = given or headers.get("X-Token", "")
+        if not self.lan:   # the phone page sends a header: on the Wi-Fi a key in the
+            given = given or (query.get("token") or [""])[0]   # URL is never taken
         return bool(self.token) and secrets.compare_digest(given.encode(), self.token.encode())
 
     def host_ok(self, host: str) -> bool:
