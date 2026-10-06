@@ -198,6 +198,7 @@ def _listed(name: str, names) -> bool:
 class MainWindow(QMainWindow):
     update_done = Signal(object, str)   # an update check finished: Release|None, error
     mic_attached = Signal(str, str)     # attach_mic finished: the mic, error ("" = done)
+    cable_removed = Signal(str)         # remove_cable finished: error ("" = done)
     config_saved = Signal(bool)         # the background save finished: ok
     voice_engine = Signal(object)       # the voice engine of the game in front (a mode key|None)
     default_found = Signal(object)      # Windows' default output, asked on a thread (str|None)
@@ -1148,9 +1149,28 @@ class MainWindow(QMainWindow):
         self.btn_usecable.hide()
         self.mic_attached.connect(self._mic_attached)
         self._attaching = False
+        self._attach_release = None   # busy.hold on btn_install while it's being set up
+        self._settle_until = 0.0      # just set up: Windows is still loading it
         icons.set_icon(self.btn_install, "cable", "on_accent")
         cv.addWidget(self.btn_install)
         cv.addWidget(self.btn_usecable)   # (under the mic's own button: the second way)
+        # straight into the mic works: the cable is only a fallback, so offer to remove it
+        self.btn_rmcable = QPushButton("Remove the virtual cable")
+        self.btn_rmcable.setToolTip("Uninstalls VB-Cable. Your sounds go straight into "
+                                    "your mic, so Onion Board doesn't need it")
+        icons.set_icon(self.btn_rmcable, "cable")
+        self.btn_rmcable.clicked.connect(self.remove_cable)
+        self.btn_rmcable.hide()
+        self.cable_removed.connect(self._cable_removed)
+        self._cable_gone = False   # removed this session (Windows lists it till a restart)
+        self.rmcable_note = hint_label(
+            "<b>You don't need the virtual cable any more</b> — it was only the backup. "
+            "Remove it, or keep it if another program uses it (Voicemeeter, another "
+            "soundboard).")
+        self.rmcable_note.setTextFormat(Qt.RichText)
+        self.rmcable_note.hide()
+        cv.addWidget(self.rmcable_note)
+        cv.addWidget(self.btn_rmcable, 0, Qt.AlignLeft)
         self.btn_rescan = QPushButton("I've installed it — check again")
         self.btn_rescan.clicked.connect(lambda: self.rescan_with_feedback(self.btn_rescan))
         icons.set_icon(self.btn_rescan, "reload")
@@ -1630,8 +1650,10 @@ class MainWindow(QMainWindow):
 
     def _cable_out(self) -> str | None:
         """The virtual cable's input (what plays into it): the one picked, else the
-        first one installed."""
+        first one installed. None once removed (Windows lists it till a restart)."""
         c = self.cfg
+        if getattr(self, "_cable_gone", False):
+            return None
         if c.main_device and is_virtual_cable(c.main_device):
             return c.main_device
         return next(iter(eng.virtual_outputs()), None)
@@ -1770,11 +1792,20 @@ class MainWindow(QMainWindow):
         any_cable = bool(eng.virtual_outputs())
         direct = directmic.status(self.cfg.mic_device) if route == "mic" else ""
         warn = theme.status("warn")
+        # just set up: until Windows has it running, say so (not "Repair" straight away)
+        settling = (route == "mic" and not self._attaching
+                    and time.monotonic() < self._settle_until)
         if route == "mic" and self._attaching:
             state = "missing"
             out = "Into your mic  <b>setting up…</b>"
             step = ("Click <b>Yes</b> when Windows asks for permission. Your PC's sound "
                     "drops out for a second while Windows reloads it.")
+        elif settling and not (e.main_stream is not None and directmic.works(direct)
+                               and e.effect_alive()):
+            state = "missing"
+            out = "Into your mic  <b>starting…</b>"
+            step = ("Windows is reloading your sound with Onion Board on your mic. This "
+                    "takes a few seconds.")
         elif route == "mic" and directmic.needs_repair(direct):
             state = "missing"
             out = f"Into your mic  <b style='color:{bad}'>✗ needs a quick repair</b>"
@@ -1879,19 +1910,29 @@ class MainWindow(QMainWindow):
         self.flow_out.setText(out)
         self.step_lbl.setText(step)
         update = route == "mic" and state == "ok" and direct == "outdated"
+        # setting up, or Windows still loading it: the button stays "Setting up…" and
+        # takes no clicks (attach_mic holds it) until it works or the wait is over
+        mic_busy = route == "mic" and (self._attaching or (settling and state != "ok"))
+        if self._attach_release is not None and not mic_busy:
+            release, self._attach_release = self._attach_release, None
+            release()
         self.btn_install.setVisible(state == "missing" or update
                                     or (route == "mic" and state != "ok"))
-        self.btn_install.setEnabled(not self._attaching)
-        self.btn_install.setText(
-            "Install the free virtual cable" if route != "mic" else
-            "Update the mic part (one click)" if update else
-            "Put my sounds straight into my mic" if direct in ("missing", "other") else
-            "Repair (one click)")
-        icons.set_icon(self.btn_install, "mic" if route == "mic" else "cable", "on_accent")
+        if not busy.is_busy(self.btn_install):
+            self.btn_install.setText(
+                "Install the free virtual cable" if route != "mic" else
+                "Update the mic part (one click)" if update else
+                "Put my sounds straight into my mic" if direct in ("missing", "other") else
+                "Repair (one click)")
+            icons.set_icon(self.btn_install, "mic" if route == "mic" else "cable",
+                           "on_accent")
         # the mic is the main way: on the cable route the cable's button comes second
         self._set_primary(self.btn_install, route == "mic" and not update)   # (optional)
         self._set_primary(self.btn_attach, route == "cable")
-        self.btn_usecable.setVisible(route == "mic" and state != "ok" and not self._attaching)
+        self.btn_usecable.setVisible(route == "mic" and state != "ok" and not mic_busy)
+        spare = route == "mic" and state == "ok" and self._spare_cable()
+        self.btn_rmcable.setVisible(spare)
+        self.rmcable_note.setVisible(spare)
         if route == "mic":
             self._direct_shown = self._direct_health()
         self._cable_follow_switch()
@@ -1913,6 +1954,8 @@ class MainWindow(QMainWindow):
             pill = "Only you" if short else "Not sending to others (only you hear sounds)"
         elif state == "ok" and route == "mic":
             pill = "Connected" if short else "In your mic — Discord / games hear your sounds"
+        elif mic_busy:
+            pill = "Setting up…" if short else "Setting up your mic…"
         elif route == "mic" and state != "missing":
             pill = "Not working" if short else "Not reaching your mic — click to fix"
         elif route == "mic" and directmic.needs_repair(direct):
@@ -1953,6 +1996,8 @@ class MainWindow(QMainWindow):
             self.toast("Pick your mic first (Setup tab → Devices).", "warn")
             return
         self._attaching = True
+        if self._attach_release is None:   # released by _update_flow once it works
+            self._attach_release = busy.hold(self.btn_install, "Setting up…")
         self._update_flow()
         log.info("attaching the mic effect to %s", mic)
         threading.Thread(target=lambda: self.mic_attached.emit(mic, directmic.install(mic) or ""),
@@ -1962,6 +2007,9 @@ class MainWindow(QMainWindow):
         self._attaching = False
         directmic.forget_status()
         if err:
+            if self._attach_release is not None:
+                release, self._attach_release = self._attach_release, None
+                release("✗ Didn't work")
             log.warning("not put on the mic: %s", err)
             # the route stays on the mic: until it's set up, the cable carries the
             # sounds meanwhile (_main_name), and the one-click stays on offer
@@ -1969,6 +2017,10 @@ class MainWindow(QMainWindow):
             QMessageBox.warning(self, "Couldn't put Onion Board on your mic", err)
         else:
             log.info("on the mic now: %s", mic)
+            # Windows takes a few seconds to load it: "starting…" meanwhile, then a
+            # redraw when the wait is over (it works by then, or Repair comes back)
+            self._settle_until = time.monotonic() + self.SETTLE_S
+            QTimer.singleShot(int(self.SETTLE_S * 1000) + 200, self._update_flow)
             self.cfg.route = "cable"   # so set_route() applies "mic" in full
             self.set_route("mic")
             self.toast("Done — Discord and games hear your sounds through your mic now.")
@@ -2025,10 +2077,44 @@ class MainWindow(QMainWindow):
         changes (checked about once a second)."""
         e = self.engine
         h = (directmic.status(self.cfg.mic_device), e.main_stream is not None,
-             self._direct_not_running(), bool(e.direct_apps()))
+             self._direct_not_running(), bool(e.direct_apps()),
+             time.monotonic() < self._settle_until and e.effect_alive())   # "starting…" ends
         return h
 
     DIRECT_GRACE_S = 4.0   # the board's own mic open this long, and still no sign of it
+    SETTLE_S = 20.0        # after setting it up: how long Windows gets to load it
+
+    def _spare_cable(self) -> bool:
+        """Straight into the mic, and VB-Cable still installed: it's only the fallback
+        now, so the Setup tab offers to remove it."""
+        if self._cable_gone or not eng.virtual_outputs():
+            return False
+        from soundboard import cableremove
+        return cableremove.setup_exe() is not None
+
+    def remove_cable(self):
+        """Setup tab → Remove the virtual cable: VB-Audio's uninstaller, as admin (it
+        waits for Windows' prompt, so it runs on a thread)."""
+        if busy.is_busy(self.btn_rmcable):
+            return
+        from soundboard import cableremove
+        self._rmcable_release = busy.hold(self.btn_rmcable,
+                                          "Removing… click Yes when Windows asks")
+        threading.Thread(target=lambda: self.cable_removed.emit(cableremove.remove() or ""),
+                         daemon=True, name="cable-remove").start()
+
+    def _cable_removed(self, err: str):
+        if err:
+            log.warning("virtual cable not removed: %s", err)
+            self._rmcable_release("✗ Not removed")
+            self.toast(f"The virtual cable wasn't removed: {html.escape(err)}", "warn")
+            return
+        self._rmcable_release()
+        self._cable_gone = True   # stop sending into it now (Windows lists it till a restart)
+        self._apply_send_outputs()
+        self.toast("✓ The virtual cable is removed. Restart your PC to finish: until then "
+                   "Windows still lists “CABLE Input” / “CABLE Output”.", "ok")
+        self._update_status()
 
     def _direct_not_running(self) -> bool:
         """Set up on the mic, the board's own mic stream open on it for a while, and the

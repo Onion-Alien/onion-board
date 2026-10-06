@@ -1159,6 +1159,142 @@ def test_the_banner_never_sends_mic_users_to_the_cable(window, monkeypatch):  # 
     assert w.btn_attach.objectName() == "primary" and w.btn_install.objectName() != "primary"
 
 
+class _NoThread:
+    """threading.Thread stand-in: counts starts; runs the target there and then if
+    `run`, else never (the admin prompt still waiting)."""
+    started = 0
+    run = False
+
+    def __init__(self, target=None, **_kw):
+        self.target = target
+
+    def start(self):
+        type(self).started += 1
+        if type(self).run:
+            self.target()
+
+
+def _no_threads(monkeypatch, run=False):
+    from soundboard.ui import mainwindow as mw
+    t = type("T", (_NoThread,), {"started": 0, "run": run})
+    monkeypatch.setattr(mw.threading, "Thread", t)
+    return t
+
+
+def test_setting_up_the_mic_shows_it_and_takes_one_click(window, monkeypatch):  # noqa: F811
+    """Clicking the one-click button: it says "Setting up…" and ignores more clicks
+    until Windows has it running, instead of offering Repair again straight away."""
+    from soundboard.ui import busy
+    w = window
+    w._pill_short = False
+    _routes(w, monkeypatch, "missing")
+    w.cfg.mic_device = "My mic"
+    threads = _no_threads(monkeypatch)
+    w.attach_mic()
+    assert busy.is_busy(w.btn_install) and w.btn_install.text() == "Setting up…"
+    assert not w.btn_install.isHidden() and w.btn_usecable.isHidden()
+    assert "setting up" in w.pill.text().lower()
+    w.attach_mic()
+    w.btn_install.click()   # spam-clicked: still the one admin prompt
+    assert threads.started == 1
+    # done: Windows loads it, and until the effect runs it's "starting…", still held
+    monkeypatch.setattr(dm, "status", lambda name=None: "ready")
+    monkeypatch.setattr(type(w.engine), "effect_alive", lambda self: False)
+    w._mic_attached("My mic", "")
+    assert "starting" in w.flow_out.text() and busy.is_busy(w.btn_install)
+    assert "Repair" not in w.btn_install.text() and w.btn_usecable.isHidden()
+    w._settle_until = 0.0   # the wait is over: the button is a button again
+    w._update_flow()
+    assert not busy.is_busy(w.btn_install) and w._attach_release is None
+
+
+def test_turning_windows_down_lets_go_of_the_button(window, monkeypatch):  # noqa: F811
+    from PySide6.QtWidgets import QMessageBox
+    from soundboard.ui import busy
+    w = window
+    _routes(w, monkeypatch, "missing")
+    w.cfg.mic_device = "My mic"
+    _no_threads(monkeypatch)
+    monkeypatch.setattr(QMessageBox, "warning", lambda *a: None)
+    w.attach_mic()
+    w._mic_attached("My mic", "Windows' admin prompt was turned down (or didn't finish).")
+    assert not busy.is_busy(w.btn_install) and w._attach_release is None
+
+
+def _working_on_the_mic(w, monkeypatch, cables=(CABLE_IN,), vbcable=True):
+    from pathlib import Path
+    from soundboard import cableremove
+    _routes(w, monkeypatch, "ready", cables)
+    monkeypatch.setattr(w.engine, "main_stream", object())
+    monkeypatch.setattr(w, "_direct_not_running", lambda: False)
+    monkeypatch.setattr(cableremove, "setup_exe",
+                        lambda: Path("VBCABLE_Setup_x64.exe") if vbcable else None)
+
+
+def test_a_working_mic_offers_to_remove_the_cable(window, monkeypatch):  # noqa: F811
+    """Straight into the mic works: the cable is only the fallback, so it's offered for
+    removal (and no "also on the virtual cable" on the mic's line)."""
+    w = window
+    _working_on_the_mic(w, monkeypatch)
+    w._update_flow()
+    assert "virtual cable" not in w.flow_out.text()
+    assert "don't need the virtual cable" in w.rmcable_note.text()
+    assert not w.rmcable_note.isHidden() and "cable" not in w.step_lbl.text().lower()
+    assert not w.btn_rmcable.isHidden()
+    for cables, vbcable in (((), True), ((CABLE_IN,), False)):   # none, or not VB-Cable's
+        _working_on_the_mic(w, monkeypatch, cables, vbcable)
+        w._update_flow()
+        assert w.btn_rmcable.isHidden() and w.rmcable_note.isHidden()
+
+
+def test_removing_the_cable(window, monkeypatch):  # noqa: F811
+    from soundboard import cableremove
+    from soundboard.ui import busy
+    w = window
+    _working_on_the_mic(w, monkeypatch)
+    said = []
+    monkeypatch.setattr(w, "toast", lambda text, kind="": said.append((text, kind)))
+    _no_threads(monkeypatch, run=True)
+    monkeypatch.setattr(cableremove, "remove", lambda: "Windows' admin prompt was turned down")
+    w.remove_cable()
+    assert not w._cable_gone and not busy.is_busy(w.btn_rmcable)
+    assert said[-1][1] == "warn"
+    monkeypatch.setattr(cableremove, "remove", lambda: None)
+    w.remove_cable()
+    assert w._cable_gone and w._tap_name() is None and not busy.is_busy(w.btn_rmcable)
+    assert "Restart" in said[-1][0]
+    w._update_flow()
+    assert w.btn_rmcable.isHidden() and w.rmcable_note.isHidden()
+
+
+@pytest.mark.parametrize("state", ["ready", "missing", "wiped"])
+def test_no_cable_or_speaker_hint_on_the_mic(window, monkeypatch, state):  # noqa: F811
+    """Straight into the mic has no "send into" device: the Devices card never warns
+    "that's a normal speaker, only you will hear the sounds" (it said so on 1.9.2)."""
+    w = window
+    _routes(w, monkeypatch, state)
+    w._update_status()
+    hint = w.setup_hint.text()
+    assert "speaker" not in hint and "virtual cable" not in hint and "only you" not in hint
+
+
+def test_cable_remover_finds_vb_audios_setup(tmp_path, monkeypatch):
+    from soundboard import cableremove
+    monkeypatch.setenv("ProgramFiles", str(tmp_path))
+    monkeypatch.setenv("ProgramFiles(x86)", str(tmp_path / "x86"))
+    assert cableremove.setup_exe() is None
+    assert "isn't on this PC" in cableremove.remove()
+    exe = tmp_path / "VB" / "CABLE" / "VBCABLE_Setup_x64.exe"
+    exe.parent.mkdir(parents=True)
+    exe.write_bytes(b"")
+    assert cableremove.setup_exe() == exe
+    ran = []
+    monkeypatch.setattr(dm, "run_elevated", lambda *a, **k: ran.append(a) or 0)
+    assert cableremove.remove() is None and ran == [(str(exe), "-u -h")]
+    monkeypatch.setattr(dm, "run_elevated", lambda *a, **k: None)
+    assert "turned down" in cableremove.remove()
+
+
 def test_cable_tap_plays_the_send_mix_on_the_cables_clock(monkeypatch):
     from soundboard import engine as eng
     monkeypatch.setattr(eng, "find_device", lambda kind, name: 7)

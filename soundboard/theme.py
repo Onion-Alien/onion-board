@@ -740,6 +740,11 @@ QFrame#setcard QPushButton:checked:focus { border:1px solid $text_hi; }
 QCheckBox::indicator:focus { border-color:$accent; }
 QCheckBox::indicator:checked:focus { border-color:$text_hi; }
 QSlider::handle:horizontal:focus, QSlider::handle:vertical:focus { border:2px solid $accent; }
+/* a busy accent button looks busy in a card too (busy.hold: "Setting up…") */
+QPushButton#primary[busy="true"], QPushButton#primary[busy="true"]:hover,
+QFrame#card QPushButton#primary[busy="true"], QFrame#card QPushButton#primary[busy="true"]:hover,
+QFrame#setcard QPushButton#primary[busy="true"],
+QFrame#setcard QPushButton#primary[busy="true"]:hover { background:$inset; color:$muted; }
 """)
 
 
