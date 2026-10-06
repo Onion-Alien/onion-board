@@ -27,6 +27,17 @@ class Note:
 
 # newest first; add one per release that has something worth telling
 NOTES = (
+    Note("1.9.5", "Only the tabs you use", (
+        ("sounds", "Switch off the tabs you don't use",
+         "Settings → Tabs: untick Radio, Apps, Triggers or Voice and that tab is gone and "
+         "doesn't load at all, so nothing of it runs. Tick it again to bring it back."),
+        ("mic", "No voice gaps in your mic",
+         "With your sounds going straight into your mic, your voice no longer drops out "
+         "or stutters when the PC is busy."),
+        ("check", "Trigger sounds clear on time",
+         "With Onion Watch 0.8.0, its Playing now bar clears the moment a trigger's "
+         "sound ends."),
+    ), "tabs", "Open Tabs"),
     Note("1.9.4", "A clip editor that behaves", (
         ("edit", "Copy and paste you can see",
          "A click in the clip editor places the cursor, Ctrl+V says what it pasted and "

@@ -1,11 +1,16 @@
 # Changelog
 
-## Unreleased
+## 1.9.5 — 2026-10-06
 
 - **Switch off the tabs you don't use.** New *Settings → Tabs*: untick Radio, Apps,
   Triggers or Voice and that tab is gone from the window and doesn't load at all,
   next start included, so nothing of it runs in the background. Tick it again any
   time and it's back straight away. Sounds and Setup always stay.
+- **No voice gaps in Straight into my mic.** When the board ran late (a busy PC),
+  your voice could drop out or stutter for the people listening. It now stays
+  smooth.
+- **Onion Watch's Playing now bar clears on time.** The Triggers tab tells Onion
+  Watch (0.8.0 or newer) the moment a trigger's sound ends, instead of it guessing.
 
 ## 1.9.4 — 2026-10-06
 
