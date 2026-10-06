@@ -540,7 +540,7 @@ class Result:
     source: str = "youtube"
     link: str = ""     # the page to download (YouTube's is built from the id)
     art: str = ""      # thumbnail / cover art (YouTube's is built from the id)
-    views: int | None = None      # None: the site didn't say (yet: see stats)
+    views: int | None = None      # None: the search entry didn't say
     likes: int | None = None
     comments: int | None = None
 
@@ -651,81 +651,6 @@ def _count(v) -> int | None:
         return None
 
 
-def needs_stats(r: Result) -> bool:
-    """A YouTube hit: its search entry has the views but not likes / comments."""
-    return r.source in ("youtube", "ytmusic", "tiktok") and not r.link and r.likes is None
-
-
-# Likes and comments are a nicety, looked up for every YouTube hit of a search. Done
-# like a Play (the video page, then each player client's API, its JS player…) that
-# was dozens of requests a search, enough for YouTube to take the user for a bot and
-# answer "Sign in to confirm you're not a bot" to their next Play. So a look-up is one
-# page and nothing else (STATS_ARGS), and the first sign of a site pushing back (a
-# bot check or a rate limit, in a look-up or a download) pauses them for STATS_PAUSE.
-STATS_ARGS = {"youtube": {"player_client": ["web"],          # the page's own player data
-                          "player_skip": ["configs", "js"]}}  # no other client, no JS
-STATS_PAUSE = 30 * 60
-_stats_paused_until = 0.0
-
-
-def stats_paused() -> bool:
-    return time.monotonic() < _stats_paused_until
-
-
-def _pause_stats(why: str):
-    global _stats_paused_until
-    if not stats_paused():
-        log.info("site pushed back (%s): no likes / comments look-ups for %d min",
-                 why[:120], STATS_PAUSE // 60)
-    _stats_paused_until = time.monotonic() + STATS_PAUSE
-
-
-class _Watch:
-    """yt-dlp's logger for a look-up: passes on to ours, and notes a bot check or a
-    rate limit it only warns about (a look-up carries on without the player data)."""
-
-    def __init__(self):
-        self.pushback = ""
-
-    def debug(self, msg):
-        log.debug(msg)
-
-    def info(self, msg):
-        log.info(msg)
-
-    def warning(self, msg):
-        if blocked_by_site(msg):
-            self.pushback = self.pushback or msg
-        log.warning(msg)
-
-    def error(self, msg):
-        log.error(msg)
-
-
-def stats(r: Result) -> tuple[int | None, int | None, int | None]:
-    """(views, likes, comments) of a hit, from its page (one request, nothing
-    downloaded). Tried once: no new Tor identities for a nicety; raises like probe,
-    and while stats_paused() without asking the site."""
-    feature = _gate(r.source)
-    if stats_paused():
-        raise DownloadError("likes and comments are paused: the site pushed back")
-    watch = _Watch()
-    with _ydl() as yt_dlp:
-        try:
-            opts = {k: v for k, v in _opts(feature=feature).items()
-                    if k not in ("format", "outtmpl")}
-            opts.update(logger=watch, extractor_args=STATS_ARGS,
-                        ignore_no_formats_error=True)   # no player data needed
-            with yt_dlp.YoutubeDL(opts) as ydl:
-                info = ydl.extract_info(r.url, download=False, process=False) or {}
-        except Exception as e:  # noqa: BLE001 - yt-dlp raises many kinds
-            raise _readable(e) from e
-    if watch.pushback:
-        _pause_stats(watch.pushback)
-    return (_count(info.get("view_count")), _count(info.get("like_count")),
-            _count(info.get("comment_count")))
-
-
 @contextlib.contextmanager
 def _ydl():
     """The yt_dlp module, in shared use (an update never swaps it mid-use)."""
@@ -822,8 +747,6 @@ def _readable(e: Exception) -> FetchError:
     """yt-dlp's error in plain words (errors.describe): no "[youtube] id:" prefix,
     command-line tips or "report this on yt-dlp's GitHub"; one we can't explain is
     marked for reporting to us. The original text stays in `.raw`."""
-    if blocked_by_site(str(e)):
-        _pause_stats(str(e))   # the nicety waits; the user's own clicks don't
     p = errors.describe(e, downloader=True)
     out = FetchError(p.text)
     out.problem, out.raw = p, str(e)

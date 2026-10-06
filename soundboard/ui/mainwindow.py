@@ -90,6 +90,10 @@ TAB_INDEX = {text.lower(): i for i, (text, _tip) in enumerate(TABS)}
 
 
 UNDO_S = 10          # how long "Removed … · Undo" stays up
+# shown when instant replay goes on: it records whoever is talking in a call
+REPLAY_NOTE = ("Instant replay is on: your key keeps the last seconds you heard. In some "
+               "places recording a call needs everyone's OK, so only keep clips of people "
+               "who are fine with it.")
 CHIPS_ROW_H = 30      # the now-playing row: a chip's 24 px ■ button, its margins and border
 TICK_MS = 33         # the UI timer while the window is on screen (meters, visualisers)
 TICK_BG_MS = 100     # ...while it's on screen but another program is in front (a game)
@@ -2735,6 +2739,8 @@ class MainWindow(QMainWindow):
             self._clear_category_hotkey(combo)
             if attr != "ptt_key" and self.cfg.ptt_key == combo:
                 self.cfg.ptt_key = ""
+        if attr == "replay_hotkey" and combo and not self.cfg.replay_hotkey:
+            self.toast(REPLAY_NOTE)   # instant replay just went on
         setattr(self.cfg, attr, combo)
         self._save_now()
         self.register_hotkeys()

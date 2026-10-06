@@ -37,7 +37,7 @@ The full list. The [README](../README.md) has the short version and how to get s
   type exact times — keep one line out of a 4-minute video), a 7-band EQ, a boost
   up to +36 dB that clips on purpose,
   play backwards, and every voice effect (echo, reverb, distortion, radio, robot,
-  add-on effects too). One-click presets: **Ear rape**, Bass boosted,
+  add-on effects too). One-click presets: **Deep fried**, Bass boosted,
   Slowed + reverb, Nightcore, Chipmunk, Demon, Fast / Slow-mo (same pitch), Old
   radio, Reversed. *Preview* plays it to you only; **Save** changes that pad,
   **Save as new sound** keeps the original and adds the edited version as its own
@@ -87,7 +87,7 @@ The full list. The [README](../README.md) has the short version and how to get s
     plays (a friend in Discord, the game, a video; not Onion Board's own sounds)
     are kept in memory. Press it after something funny and it becomes a pad.
     Nothing is saved or sent anywhere until you press it; clear the key to switch
-    it off. Needs Windows 11 or Windows 10 build 20348+.
+    it off. Needs Windows 11, or Windows 10 version 2004 or newer.
   - Hotkeys can beep in your headphones (only you hear it), so you know they
     worked.
 - **Radio tab:** internet radio from all over the world, from the free

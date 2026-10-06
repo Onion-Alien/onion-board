@@ -343,7 +343,7 @@ def _preset(**kw) -> dict:
 # name -> full settings (applied over everything in the Edit dialog)
 PRESETS: dict[str, dict] = {
     "None (original)": neutral(),
-    "Ear rape 🔊":       _preset(gain_db=24, eq=[12, 12, 8, 6, 10, 10, 6],
+    "Deep fried 🔊":     _preset(gain_db=24, eq=[12, 12, 8, 6, 10, 10, 6],
                                 effects={"distortion": {"on": True, "drive": 30,
                                                         "tone": 9000, "level": 1}}),
     "Bass boosted":      _preset(gain_db=6, eq=[12, 10, 3, 0, 0, 0, 0]),
