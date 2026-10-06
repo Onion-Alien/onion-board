@@ -754,6 +754,10 @@ class MainWindow(QMainWindow):
         add.setToolTip("Add sound files (or drag them onto the window)")
         add.clicked.connect(self.add_dialog)
         icons.set_icon(add, "plus", "on_accent")
+        self.btn_record = QPushButton("Record")
+        self.btn_record.setToolTip("Record a sound with your mic and add it to your sounds")
+        icons.set_icon(self.btn_record, "record", "#ff4d4f")
+        self.btn_record.clicked.connect(self.record_dialog)
         self.search = QLineEdit()
         # short, so it isn't cut to "Search sounds… …" at normal widths; the tooltip
         # has the rest
@@ -805,6 +809,7 @@ class MainWindow(QMainWindow):
         icons.set_icon(self.btn_folder, "folder")
         self.btn_folder.clicked.connect(self.open_sounds_folder)
         tb.addWidget(add)
+        tb.addWidget(self.btn_record)
         tb.addWidget(self.btn_folder)
         tb.addWidget(more)
         tb.addWidget(self.btn_bin)
@@ -3973,8 +3978,9 @@ class MainWindow(QMainWindow):
                 QMessageBox.warning(self, "Some files weren't added",
                                     "<p>" + "<br>".join(html.escape(e) for e in errs) + "</p>")
 
-    def on_clip(self, data, name):
-        """A clip recorded in the Radio or Apps tab becomes a normal sound pad."""
+    def on_clip(self, data, name) -> SoundMeta | None:
+        """A clip recorded in the Radio or Apps tab (or with the mic) becomes a normal
+        sound pad."""
         try:
             meta, data = save_clip(data, name, PAD_COLORS[len(self.cfg.sounds) % len(PAD_COLORS)])
         except Exception as e:  # noqa: BLE001
@@ -3984,7 +3990,7 @@ class MainWindow(QMainWindow):
                 src.clip_error = errors.plain(e)   # the tab says so on its row
             else:
                 errors.warn(self, "Couldn't save clip", e)
-            return
+            return None
         self._tag_new(meta)
         self.cfg.sounds.append(meta)
         self._index()
@@ -3994,6 +4000,39 @@ class MainWindow(QMainWindow):
         self._rebuild_pads()
         self.status.setText(f"Added “{html.escape(meta.name)}” ({meta.duration:.1f}s) to Sounds — "
                             "right-click it there to rename or set a hotkey.")
+        return meta
+
+    def record_dialog(self):
+        """Sounds tab → Record: record a sound with the mic."""
+        from soundboard.ui.recordmic import RecordDialog
+        voice = getattr(self, "voice", None)
+
+        def voice_on() -> bool:
+            on = getattr(voice, "is_active", None)
+            return bool(on()) if on is not None else False
+
+        def open_devices():
+            self.tabs.setCurrentWidget(self.setup_page)
+
+        d = RecordDialog(self.engine, voice_on, lambda: [m.name for m in self.cfg.sounds],
+                         self.add_recording, open_devices, self)
+        d.exec()
+        free_dialog(d)
+
+    def add_recording(self, data, name) -> bool:
+        """A mic recording becomes a pad: selected, scrolled to, and a toast says so."""
+        meta = self.on_clip(data, name)
+        if meta is None:
+            return False
+        self.select(meta.id)
+
+        def reveal():   # once the grid has laid the new pad out
+            pad = self.pads.get(meta.id)
+            if pad is not None:
+                self._pads_scroll.ensureWidgetVisible(pad)
+        QTimer.singleShot(0, self._pads_scroll, reveal)   # not after the window's gone
+        self.toast(f"✓ Added “{html.escape(meta.name)}”", "ok")
+        return True
 
     def on_downloaded(self, meta, data):
         """"Add as sound" (link bar / web search) finished: already decoded, stored and
@@ -5631,6 +5670,7 @@ class MainWindow(QMainWindow):
         f.add(50, "w", r.hide(self.np_name))
         f.add(60, "w", r.hide(self.wordmark))
         f.add(60, "w", r.icon_only(self.btn_add))
+        f.add(13, "w", r.icon_only(self.btn_record))
         f.add(35, "w", r.hide(self.btn_more))   # also in Settings → General
         f.add(15, "w", r.icon_only(self.btn_folder))
         f.add(33, "w", r.hide(self.btn_folder))   # also in the Backup menu

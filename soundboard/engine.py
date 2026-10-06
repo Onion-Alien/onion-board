@@ -973,6 +973,10 @@ class Engine:
         self._mon_fed = False        # the mic wrote to ring_mon last block (mic check)
         self._obs_fed = False        # ...and to ring_obs (your voice on the stream output)
         self._mic_rec: list[np.ndarray] | None = None          # mic during a test (see _mic)
+        # Record a sound: the mic's blocks while set to a list (start_mic_take); the UI
+        # thread moves them to disk as they come. Separate from the test's _mic_rec
+        self._take: list[np.ndarray] | None = None
+        self._take_fx = False        # the take is the mic after the voice changer
         # a copy of every block sent to the send device while set to a list (the voice chat
         # check compares it with what Discord plays back); None = off
         self.main_tap: list[np.ndarray] | None = None
@@ -1718,6 +1722,25 @@ class Engine:
     def recording(self) -> bool:
         return self._rec_buf is not None
 
+    def start_mic_take(self, processed: bool = False) -> list[np.ndarray]:
+        """Record a sound with the mic: from now on every mic block (the raw mic, or with
+        `processed` the mic after the voice changer) is appended, as a copy at the mic's
+        rate (`rates["mic"]`), to the list returned. The caller takes blocks off its
+        front as it goes (`del blocks[:n]`: safe against the audio thread's append) and
+        ends it with stop_mic_take(). A test recording running meanwhile is untouched."""
+        self._take_fx = processed
+        self._take = blocks = []
+        return blocks
+
+    def stop_mic_take(self) -> list[np.ndarray]:
+        """End the take; returns its list (with any blocks not yet taken off it)."""
+        blocks, self._take = self._take, None
+        return blocks if blocks is not None else []
+
+    @property
+    def taking(self) -> bool:
+        return self._take is not None
+
     # ----------------------------------------------------------------- callbacks
     def _render(self, out: str, frames: int, previews_only=False,
                 fixed=False, makeup=True) -> np.ndarray:
@@ -2249,11 +2272,16 @@ class Engine:
         self.level_mic = max(peak(x), self.level_mic * 0.85)
         rec = self._mic_rec
         raw = x[:, 0].copy() if rec is not None and self._rec_buf is not None else None
+        take = self._take   # Record a sound: one copy and one append, nothing more
+        if take is not None and not self._take_fx:
+            take.append(x.copy())
         chain = self.voice_chain
         if chain is not None:   # after the meter: that judges the real mic
             x = chain.process(x, self.rates["mic"])
         if raw is not None:     # a test: the real mic (did you talk?) and what's sent
             rec.append(np.stack([raw, x[:, 0]], 1))
+        if take is not None and self._take_fx:
+            take.append(x.copy())
         if self.main_stream is not None:
             if not self.main_direct:
                 self.ring_main.write(self._rs_main(x))
