@@ -118,6 +118,7 @@ SEARCH_WAIT_MS = 100     # typing in the search box filters the pads once it pau
 PAD_SIZE_WAIT_MS = 50    # dragging Pad size re-lays the pads at most this often
 RANDOM = "__random__:"   # hotkey action prefix: a random sound from the category after it
 ALL = "All"          # the category tab that shows every sound
+SEARCH_MIN_W = 220    # the Sounds tab's search box, until the window gets narrow
 VOICE_POLL_MS = 3000  # how often the game in front is looked at (soundboard.voicesdk)
 VOICE_POLL_IDLE_S = 15   # ...while nobody sees the hint and nothing switches by itself
 # Setup -> Devices -> Send my sounds to (Config.route, library.ROUTES): the mic, nobody,
@@ -766,6 +767,7 @@ class MainWindow(QMainWindow):
                                "TikTok, Myinstants…). Or paste a link (YouTube, SoundCloud, "
                                "TikTok, most media sites) to add or play it")
         self.search.setClearButtonEnabled(True)
+        self.search.setMinimumWidth(SEARCH_MIN_W)   # until the window gets narrow (_init_fit)
         # typing regrids only when the pads shown change (35 ms a key with 600 pads),
         # and only once it pauses (_on_search_text); text set by the app filters at once
         self._search_wait = QTimer(self, singleShot=True, interval=SEARCH_WAIT_MS)
@@ -5671,6 +5673,9 @@ class MainWindow(QMainWindow):
         f.add(60, "w", r.hide(self.wordmark))
         f.add(60, "w", r.icon_only(self.btn_add))
         f.add(13, "w", r.icon_only(self.btn_record))
+        # the search box keeps room to type in until the buttons beside it have shrunk
+        f.add(62, "w", lambda tight: (self.search.setMinimumWidth(0 if tight else SEARCH_MIN_W),
+                                      r.touch(self.search)))
         f.add(35, "w", r.hide(self.btn_more))   # also in Settings → General
         f.add(15, "w", r.icon_only(self.btn_folder))
         f.add(33, "w", r.hide(self.btn_folder))   # also in the Backup menu
