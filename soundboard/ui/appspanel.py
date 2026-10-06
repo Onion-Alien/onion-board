@@ -6,7 +6,8 @@ myself*, and **Record**, which waits for the program to make a sound, records it
 until you click again and adds it to your Sounds as a pad. Folded away at the
 bottom of each card is its *Clip editor* (soundboard.ui.clipeditor): opened, it
 keeps the program's last minute as a live waveform to cut bits out of; closed,
-nothing of it runs.
+nothing of it runs. Its Save puts the bit in *Saved clips* under the cards
+(soundboard.ui.clipshelf), and its Big view button gives one card the whole tab.
 
 The capture is Windows' per-process loopback (soundboard.appaudio), a *copy* of
 the program's audio: the program keeps playing on your speakers. Programs you
@@ -30,14 +31,15 @@ from PySide6.QtWidgets import (QCheckBox, QComboBox, QFileIconProvider, QFrame, 
                                QLayout, QPushButton, QScrollArea, QSizePolicy, QSlider,
                                QVBoxLayout, QWidget)
 
-from soundboard import appaudio, library, theme, trash
+from soundboard import appaudio, errors, library, theme, trash
 from soundboard.clipedit import LiveBuffer
 from soundboard.engine import SR
 from soundboard.library import MAX_SECONDS, trim_silence
 from soundboard.recorder import ArmedRecorder
 from soundboard.ui import appstate, icons
 from soundboard.ui.bunnywidget import BunnyWidget
-from soundboard.ui.clipeditor import ClipEditor
+from soundboard.ui.clipeditor import WAVE_H, ClipEditor
+from soundboard.ui.clipshelf import ClipShelf
 from soundboard.ui.panel import CardGrid, HoverCard, UndoBar, VolumeControl, hint_label
 from soundboard.ui.responsive import FitWidth
 from soundboard.wheelguard import no_wheel
@@ -49,6 +51,7 @@ REFRESH_HIDDEN_MS = 5000   # ...and while it isn't (a remembered program still g
 METER_MS = 60
 MAX_REMEMBERED = 30
 CARD_MIN_W = 300        # programs are cards, as many across as fit at this width
+CARD_MAX_W = 900        # the Card size slider's widest: one big card across most windows
 MAX_VOL = 10.0          # 1000 %, the most the volume box takes
 CONNECTING = "Connecting…"   # a card's status while its capture is starting
 # where a sent program goes (cfg.apps[exe]["to"], cfg.apps_paths[path]["to"]): the
@@ -461,7 +464,7 @@ class AppsTab(QWidget):
         size_label.setObjectName("muted")
         toolbar.addWidget(size_label)
         self.card_size = QSlider(Qt.Horizontal)
-        self.card_size.setRange(240, 480)
+        self.card_size.setRange(240, CARD_MAX_W)
         self.card_size.setValue(cfg.app_card_width)
         self.card_size.setFixedWidth(100)
         self.card_size.setAccessibleName("App card size")
@@ -479,7 +482,7 @@ class AppsTab(QWidget):
         self.list_layout = QVBoxLayout(self.list)
         self.list_layout.setContentsMargins(0, 0, 6, 0)
         self.list_layout.setSpacing(6)
-        self.grid = CardGrid(min_w=self.card_size.value(), gap=10)
+        self.grid = CardGrid(min_w=self.card_size.value(), gap=10, even=False)
         self.card_size.valueChanged.connect(self._set_card_size)
         # nothing playing: Bun waits, a bit glum, above the how-to
         self.empty = QWidget()
@@ -499,6 +502,11 @@ class AppsTab(QWidget):
         self.list_layout.addStretch(1)
         self.scroll.setWidget(self.list)
         v.addWidget(self.scroll, 1)
+        self.big: AppRow | None = None   # the card in the big view (the rest are hidden)
+        # what the clip editors' Save keeps, under the cards
+        self.shelf = ClipShelf(engine, cfg, self)
+        self.shelf.add_to_sounds.connect(self._shelf_to_sounds)
+        v.addWidget(self.shelf)
 
         ok, why = appaudio.supported()
         if not ok:
@@ -586,6 +594,7 @@ class AppsTab(QWidget):
         self.meter_timer.stop()
         self.peaks.stop()
         self.lister.stop()
+        self.shelf.shutdown()
         for row in list(self.rows.values()):
             self._stop_capture(row, save=False)
             if row.editor is not None:
@@ -640,12 +649,16 @@ class AppsTab(QWidget):
             row.clip_toggled.connect(self._on_clip)
             row.forget.connect(self._on_forget)
             self.grid.addWidget(row)
+            if self.big is not None:
+                row.hide()   # another card has the big view
             self.empty.setVisible(False)
         return row
 
     def _drop_row(self, row: AppRow):
         self._stop_capture(row)
         self._close_clip(row)
+        if self.big is row:
+            self._set_big(row, False)
         if row.editor is not None:
             row.editor.shutdown()
         self.rows.pop(row.key, None)
@@ -977,6 +990,7 @@ class AppsTab(QWidget):
         if row.editor is None:
             row.editor = ClipEditor(self.engine, self.cfg, row)
             row.editor.save_clip.connect(lambda data, whole, r=row: self._save_edit(r, data, whole))
+            row.editor.big_toggled.connect(lambda on, r=row: self._set_big(r, on))
             row.layout().addWidget(row.editor)
         row.set_clip_open(True)
         row.editor.show()
@@ -989,6 +1003,8 @@ class AppsTab(QWidget):
         self._poll_capture(row)
 
     def _close_clip(self, row: AppRow):
+        if self.big is row:
+            self._set_big(row, False)
         row.set_clip_open(False)
         listen, row.listen = row.listen, None
         if row.editor is not None:
@@ -1004,11 +1020,53 @@ class AppsTab(QWidget):
         if len(data) < int(0.05 * SR):
             row.editor.flash("Nothing but silence there.")
             return
-        error = self._add_clip(row, data)
-        if error:
-            row.editor.flash(f"Couldn't save it: {error}", error=True)
-        else:
-            row.editor.flash(f"✓ Saved {len(data) / SR:.2f}s to your Sounds.")
+        src = (row.app.name if row.app else row.name.text())[:30] or "App"
+        try:
+            self.shelf.add(data, f"{src} {time.strftime('%H.%M.%S')}", src)
+        except Exception as e:  # noqa: BLE001 - the disk is full, the folder is locked
+            log.exception("can't keep the clip")
+            row.editor.flash(f"Couldn't save it: {errors.plain(e)}", error=True)
+            return
+        row.editor.flash(f"✓ Kept {len(data) / SR:.2f}s in Saved clips below: double-click "
+                         "plays it, right-click adds it to your Sounds.")
+
+    def _shelf_to_sounds(self, data, name: str):
+        self.clip_error = ""
+        self.clip_ready.emit(data, name)
+        self.shelf.error = self.clip_error
+
+    # ------------------------------------------------------------------ big view
+    # One card's clip editor gets the whole tab: the other cards hide, the card is as
+    # wide as the tab and the waveform as tall as the room left.
+    def _set_big(self, row: AppRow, on: bool):
+        if on and row.editor is None:
+            return
+        self.big = row if on else None
+        for r in self.rows.values():
+            r.setVisible(on is False or r is row)
+        if row.editor is not None:
+            row.editor.set_big(on)
+        self.grid.max_cols = 1 if on else 0   # the one card shown, the tab's width
+        self.card_size.setEnabled(not on)
+        self.grid.invalidate()
+        self._fit_big()
+        if not on:
+            self.scroll.ensureWidgetVisible(row)
+
+    def _fit_big(self):
+        row = self.big
+        if row is None or row.editor is None:
+            return
+        wave = row.editor.wave
+        rest = row.sizeHint().height() - max(wave.minimumHeight(), wave.sizeHint().height())
+        room = self.scroll.viewport().height() - rest - 12
+        wave.setMinimumHeight(max(WAVE_H, room))
+        self.list_layout.activate()
+
+    def resizeEvent(self, e):
+        super().resizeEvent(e)
+        if self.big is not None:
+            QTimer.singleShot(0, self._fit_big)
 
     def _flash(self, row: AppRow, text: str):
         row.set_status(text)
