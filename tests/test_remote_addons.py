@@ -166,3 +166,43 @@ def test_a_broken_remote_add_on_never_stops_the_app(qapp, window, tmp_path,  # n
     texts = " ".join(lb.text() for lb in d.tabs.currentWidget().widget().findChildren(QLabel))
     assert "Broken" not in texts and "boom" not in texts   # optional: just left out
     d.close()
+
+
+def test_the_key_never_goes_in_the_url_on_the_wifi(qapp, loaded):
+    srv = loaded.server
+    assert srv.start(0, "add-on-key", "127.0.0.1")
+    assert call(qapp, srv, "/api/status?token=add-on-key")[0] == 401
+    assert api(qapp, srv, "/api/status", "add-on-key")[0] == 200
+    loop = remote.RemoteControl(lambda a, p: (200, {}))   # Stream Deck side unchanged
+    loop.token = "k"
+    assert loop.authorised({}, {"token": ["k"]})
+
+
+def test_a_flood_of_connections_cant_pile_up_threads(qapp, loaded, monkeypatch):
+    """A device on the Wi-Fi with no key opening connection after connection: past
+    the limit they're closed straight away, and once they go a phone gets in again."""
+    import socket
+    monkeypatch.setattr(remote, "PEER_CONNECTIONS", 3)
+    srv = loaded.server
+    assert srv.start(0, "add-on-key", "127.0.0.1")
+    before = threading.active_count()
+    held = [socket.create_connection((srv.host, srv.port), timeout=5) for _ in range(20)]
+    for s in held:
+        s.sendall(b"GET / HTTP/1.1\r\n")   # half a request: its thread waits for more
+    assert process_events(qapp, lambda: threading.active_count() - before >= 3, timeout=2)
+    process_events(qapp, lambda: False, timeout=0.3)
+    assert threading.active_count() - before <= 3
+    closed = waiting = 0
+    for s in held:
+        s.settimeout(0.2)
+        try:
+            closed += s.recv(1) == b""
+        except TimeoutError:   # one of the few let in, still waiting for its request
+            waiting += 1
+        except OSError:        # reset: closed too
+            closed += 1
+    assert waiting <= 3 and closed == 20 - waiting
+    for s in held:
+        s.close()
+    assert process_events(qapp, lambda: not srv._server._open, timeout=3)
+    assert call(qapp, srv, "/")[0] == 200
