@@ -187,36 +187,40 @@ def test_the_guide_can_send_nowhere_and_go_back_to_the_cable(wizard, devices):  
     assert wiz.other_box.isHidden() and wiz.btn_use_cable.isHidden()
 
 
-def test_also_send_to_copies_what_others_hear_into_more_devices(win, monkeypatch):
-    """Streamers: more devices at once, each getting a copy (never the headphones, never
-    the one already picked), off while sending to nobody, and in Settings too."""
+def test_also_send_to_copies_what_others_hear_into_more_devices(win, monkeypatch, devices):  # noqa: F811
+    """Streamers: + adds a row per extra device, − takes it off, each one gets a copy
+    (never the headphones, never one that gets it already), none while sending to
+    nobody, and the same rows in Settings."""
     copies = []
     monkeypatch.setattr(engine.Engine, "set_copy_devices",
                         lambda self, names: (copies.append(list(names)),
                                              setattr(self, "copy_names", tuple(names))))
     win.set_route("cable")
-    menu = win.btn_also.menu()
-    menu.aboutToShow.emit()
-    offered = [a.text() for a in menu.actions()]
-    assert "Speakers" in offered and PHONES not in offered and CABLE not in offered
-    assert win.btn_also.text().strip().startswith("Nothing else")
-    win.set_also_send("Speakers", True)
-    assert copies[-1] == ["Speakers"] and win.cfg.also_send == ["Speakers"]
-    assert win.btn_also.text().strip() == "Speakers"
-    win.set_also_send(PHONES, True)        # the headphones: you'd hear it twice
-    assert copies[-1] == ["Speakers"]
+    rows = win.also_rows
+    assert rows.boxes == [] and not rows.add.isHidden()
+    assert rows.free() == ["Speakers"]   # not the headphones, not the cable it's on
+    rows.add.click()
+    assert win.cfg.also_send == ["Speakers"] and copies[-1] == ["Speakers"]
+    assert [b.currentData() for b in rows.boxes] == ["Speakers"]
+    assert rows.add.isHidden()           # nothing left to add
     d = SettingsDialog(win, "audio")
-    assert d.dev_also.text().strip() == "Speakers"
-    d.close()
-    win.set_route("off")                   # nobody: nothing goes anywhere
-    assert copies[-1] == [] and all(w.isHidden() for w in win.also_row)
+    mirror = [v for v in win.also_views if v is not rows]
+    assert len(mirror) == 1 and [b.currentData() for b in mirror[0].boxes] == ["Speakers"]
+    win.set_route("off")                 # nobody: nothing goes anywhere
+    assert copies[-1] == [] and rows.boxes == [] and rows.add.isHidden()
     win.set_route("cable")
-    assert copies[-1] == ["Speakers"] and not win.btn_also.isHidden()
-    win.set_route("device", "Speakers")    # picked as the main one: not twice
+    assert copies[-1] == ["Speakers"] and len(rows.boxes) == 1
+    win.set_route("device", "Speakers")  # picked as the main one: not twice
     assert copies[-1] == []
     win.set_route("cable")
-    win.set_also_send("Speakers", False)
-    assert copies[-1] == [] and win.cfg.also_send == [PHONES]
+    minus = rows.widgets[-1]
+    assert minus.text() == "−"
+    minus.click()                        # −
+    assert win.cfg.also_send == [] and copies[-1] == [] and rows.boxes == []
+    assert [b for b in mirror[0].boxes] == [] and not rows.add.isHidden()
+    d.close()
+    win.set_also_send_at(0, PHONES)      # the headphones: you'd hear it twice
+    assert copies[-1] == []
 
 
 def test_engine_copies_open_close_retry_and_get_the_send_mix(monkeypatch):

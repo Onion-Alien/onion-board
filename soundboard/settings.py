@@ -1087,23 +1087,21 @@ class SettingsDialog(QDialog):
                 ("Send my sounds to", mw.cb_route, "route"))):
             cb = QComboBox()
             cb.setMinimumWidth(120)
+            # sized for a short name, the list opens wide enough for whole ones (device
+            # names in "Send my sounds to" made the page scroll sideways)
+            cb.setSizeAdjustPolicy(QComboBox.AdjustToMinimumContentsLengthWithIcon)
+            cb.setMinimumContentsLength(16)
             no_wheel(cb)
             cb.activated.connect(lambda i, src=src, attr=attr: self._pick_device(src, attr, i))
             label = QLabel(text)
             grid.addWidget(label, r, 0)
             grid.addWidget(cb, r, 1)
             self.dev_combos.append((cb, src))
-        self.dev_also = QPushButton()   # the Setup tab's "Also send to", same menu
-        self.dev_also.setToolTip(mw.btn_also.toolTip())
-        mw.attach_also_menu(self.dev_also)
-        self.dev_also.menu().aboutToHide.connect(   # after the tick is applied
-            lambda: QTimer.singleShot(0, self.dev_also, self._sync_devices))
-        r = grid.rowCount()
-        self.dev_also_label = QLabel("Also send to")
-        grid.addWidget(self.dev_also_label, r, 0)
-        grid.addWidget(self.dev_also, r, 1)
         grid.setColumnStretch(1, 1)
         cv.addLayout(grid)
+        from soundboard.ui import alsosend   # (its panel import imports this module)
+        # once the grid is in the card: a row added before would be its own window
+        alsosend.build(mw, grid, grid.rowCount(), icons_col=False)   # kept up to date by mw
         ref = QPushButton("Re-scan devices")
         icons.set_icon(ref, "reload")
         ref.clicked.connect(lambda: mw.rescan_with_feedback(ref, self._sync_devices))
@@ -1117,10 +1115,7 @@ class SettingsDialog(QDialog):
             for i in range(src.count()):
                 cb.addItem(src.itemText(i), src.itemData(i))
             cb.setCurrentIndex(src.currentIndex())
-        if hasattr(self, "dev_also"):   # built after the first sync
-            self.dev_also.setText("   " + self.mw.also_text())   # (as the Setup tab)
-            for w in (self.dev_also_label, self.dev_also):
-                w.setVisible(self.mw.cfg.route != "off")
+            cb.view().setMinimumWidth(cb.view().sizeHintForColumn(0) + 32)   # whole names
 
     def _pick_device(self, src, attr, i):
         src.setCurrentIndex(i)

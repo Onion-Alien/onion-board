@@ -42,7 +42,7 @@ from soundboard.testcheck import analyze as analyze_output
 from soundboard.testcheck import summary_html
 from soundboard.ui.crashdialog import free_dialog
 from soundboard.ui.dialogs import EditDialog
-from soundboard.ui import a11y, appstate, busy, clipeditor, icons, responsive, splash
+from soundboard.ui import a11y, alsosend, appstate, busy, clipeditor, icons, responsive, splash
 from soundboard.ui.speedpitch import SpeedPitchButton
 from soundboard.ui.panel import (EqPanel, Flow, VolumeControl, bar, card, hint_label,
                                  icon_label, vsep)
@@ -121,10 +121,6 @@ VOICE_POLL_IDLE_S = 15   # ...while nobody sees the hint and nothing switches by
 # or one of the output devices by name (ROUTE_DEVICE + its name: "cable" for a virtual
 # cable, "device" for anything else)
 SEND_TO = "Send my sounds to"
-ALSO_TO = "Also send to"   # more devices at once (Config.also_send)
-# Qt drops a left-aligned button's padding once it has a menu: the text is indented so
-# it lines up with the device boxes above it
-MENU_PAD = "   "
 ROUTE_CHOICES = (("My mic (normal)", "mic"),
                  ("Nobody: only I hear them", "off"))
 ROUTE_DEVICE = "device:"
@@ -1229,25 +1225,14 @@ class MainWindow(QMainWindow):
                                  "hears your mic hears them. Only pick something else to "
                                  "send them somewhere instead: Voicemeeter, a mixer, a "
                                  "device OBS captures, or a virtual cable.")
-        # more places at once (streamers): ticked in a menu, each gets a copy
-        self.btn_also = QPushButton()
-        self.btn_also.setToolTip("Streaming, or using more than one app? Tick more devices "
-                                 "here and each one gets a copy of what others hear too: "
-                                 "Voicemeeter, a device OBS captures, a second cable...")
-        self.attach_also_menu(self.btn_also)
-        self.also_row = []   # hidden while sending to nobody
         for r, (ic, text, cb) in enumerate((
                 ("headphones", "My headphones", self.cb_mon),
                 ("mic", "My mic", self.cb_mic),
-                ("live", SEND_TO, self.cb_route),
-                ("live", ALSO_TO, self.btn_also))):
+                ("live", SEND_TO, self.cb_route))):
             row = (icon_label(ic), QLabel(text), cb)
             row[1].setBuddy(cb)   # a screen reader reads the label as the box's name
             for col, w in enumerate(row):
                 grid.addWidget(w, r, col)
-            if cb is self.btn_also:
-                self.also_row = row
-                continue
             cb.setMinimumWidth(120)
             # sized for a short name, not the longest device ("Headphones (2- Arctis Nova
             # Pro Wireless Game)" gave the Setup tab a sideways scroll bar); the list
@@ -1258,6 +1243,9 @@ class MainWindow(QMainWindow):
         av.addLayout(grid)
         self.cb_main.setParent(devcard)   # never a window of its own
         self.cb_main.hide()
+        # more places at once (streamers): a row per extra device, + and − (alsosend)
+        self.also_views = []
+        self.also_rows = alsosend.build(self, grid, 3, icons_col=True)
         self.setup_hint = hint_label("")
         self.setup_hint.setTextFormat(Qt.RichText)
         av.addWidget(self.setup_hint)
@@ -1669,9 +1657,8 @@ class MainWindow(QMainWindow):
         cb.setCurrentIndex(max(0, cb.findData(key)))
         cb.view().setMinimumWidth(cb.view().sizeHintForColumn(0) + 32)   # whole names
         cb.blockSignals(False)
-        self.btn_also.setText(MENU_PAD + self.also_text())
-        for w in self.also_row:
-            w.setVisible(route != "off")
+        for v in list(getattr(self, "also_views", ())):   # (not built yet at start)
+            v.rebuild()
         self.how_title.setText("YOUR VIRTUAL MIC" if route == "cable" else
                                "YOUR MIC" if route == "mic" else "WHERE YOUR SOUNDS GO")
 
@@ -1726,8 +1713,7 @@ class MainWindow(QMainWindow):
         c = self.cfg
         if c.route == "off":
             return []
-        taken = [t for t in (self._main_name(), self._tap_name(),
-                             self._obs_name(c.obs_device)) if t]
+        taken = self.sending_to()
         out = []
         for n in c.also_send:
             if (isinstance(n, str) and n and n != c.mon_device and n not in out
@@ -1735,45 +1721,25 @@ class MainWindow(QMainWindow):
                 out.append(n)
         return out
 
-    def also_text(self) -> str:
-        """The "Also send to" button: what's ticked, or that it's just the one."""
-        names = self._copy_names()
-        return ", ".join(names) if names else "Nothing else (tick more…)"
+    def sending_to(self) -> list[str]:
+        """The devices that get what others hear already: the picked one, the cable
+        alongside the mic, and the stream output ("Also send to" can't add them again)."""
+        return [t for t in (self._main_name(), self._tap_name(),
+                            self._obs_name(self.cfg.obs_device)) if t]
 
-    def attach_also_menu(self, btn):
-        """`btn` opens the "Also send to" menu: every output but the headphones and the
-        one already picked, ticked when it gets a copy (Setup tab and Settings)."""
-        menu = QMenu(btn)
-        btn.setObjectName("devmenu")   # styled like the device boxes (theme)
-
-        def fill():
-            menu.clear()
-            menu.setMinimumWidth(btn.width())
-            c = self.cfg
-            main = c.main_device if c.route in ("cable", "device") else None
-            names = [d["name"] for d in eng.list_devices("output")]
-            names += [n for n in c.also_send if isinstance(n, str) and n not in names]
-            has = [t for t in (self._main_name(), self._tap_name(),
-                               self._obs_name(c.obs_device)) if t]
-            for n in names:
-                if n in (c.mon_device, main):
-                    continue
-                if any(n == t or eng.same_cable(n, t) for t in has):
-                    menu.addAction(f"{n}  (gets it already)").setEnabled(False)
-                    continue
-                a = menu.addAction(n)
-                a.setCheckable(True)
-                a.setChecked(n in c.also_send)
-                a.toggled.connect(lambda on, n=n: self.set_also_send(n, on))
-            if menu.isEmpty():
-                menu.addAction("No other devices").setEnabled(False)
-        menu.aboutToShow.connect(fill)
-        btn.setMenu(menu)
-
-    def set_also_send(self, name: str, on: bool):
-        """Tick / untick `name` under Setup -> Devices -> Also send to."""
+    def set_also_send_at(self, i: int, name: str | None):
+        """Setup -> Devices -> Also send to: row `i` sends to `name` (one past the last
+        row adds one; None removes that row)."""
         c = self.cfg
-        c.also_send = [n for n in c.also_send if n != name] + ([name] if on else [])
+        lst = list(c.also_send)
+        if name is None:
+            if i < len(lst):
+                del lst[i]
+        elif i < len(lst):
+            lst[i] = name
+        else:
+            lst.append(name)
+        c.also_send = list(dict.fromkeys(lst))
         log.info("also send to: %s", c.also_send)
         self._apply_send_outputs()
         self._show_route()

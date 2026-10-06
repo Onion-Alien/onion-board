@@ -114,6 +114,8 @@ Optional: if you never get it, nothing changes.
 - **Check it yourself:** *Setup → Record 6s → play back* records what others get (it
   works any way but *Nobody*).
 - **Switch how sounds go out any time:** *Setup → Devices → Send my sounds to*.
+- **More than one place at once** (streamers): *Setup → Devices → Also send to →
+  + Add a device*, once per extra output that should get a copy (− takes one off).
 - **Have the virtual cable from before?** Once your sounds are in your mic, the
   *Setup* tab offers to remove it. Keep it if another program uses it.
 - **Still stuck?** [Open an issue](../../issues/new/choose) and attach

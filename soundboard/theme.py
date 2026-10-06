@@ -648,7 +648,6 @@ QTabBar QToolButton::left-arrow:disabled { image:url("$left_off"); }
 QTabBar QToolButton::right-arrow:disabled { image:url("$right_off"); }
 QTabBar::tear { width:0; border:none; }
 QPushButton#live { font-weight:700; }
-QPushButton#devmenu { text-align:left; }
 QPushButton#voicetile { text-align:left; padding:9px 10px; border-radius:10px; }
 QPushButton#voicetile:checked { background:$accent; color:$on_accent; border:1px solid $accent_hi; font-weight:700; }
 QPushButton#voicetile[art="true"] { padding:5px 10px 5px 6px; }
@@ -658,7 +657,6 @@ QFrame#card[roomy="true"] QPushButton { padding:9px 14px; min-height:18px; }
 QFrame#card[roomy="true"] QPushButton#primary { padding:10px 16px; }
 QFrame#card[roomy="true"] QPushButton#voicetile { padding:7px 12px; text-align:left; }
 QFrame#card[roomy="true"] QPushButton#fold { padding:8px 10px; text-align:left; }
-QFrame#card[roomy="true"] QPushButton#devmenu { padding:9px 12px; text-align:left; }
 QFrame#card[roomy="true"] QComboBox { padding:9px 12px; }
 QSlider#hue::groove:horizontal { height:12px; border-radius:6px; border:1px solid $border;
     background:qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #ff0000, stop:0.167 #ffff00,

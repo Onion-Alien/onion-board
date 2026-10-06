@@ -2,6 +2,15 @@
 
 ## 1.9.4 — 2026-10-06
 
+- **Simpler Devices card.** *Setup → Devices* is now just *My headphones*, *My
+  mic*, and *Send my sounds to*, which is *My mic* unless you pick something else:
+  *Nobody* (only you hear them) or any device by name (Voicemeeter, a device OBS
+  captures, a virtual cable). The old two-step "Send to others through" + "Send
+  into (the cable)" pair is gone.
+- **Send your sounds to more than one place at once.** New *Also send to* under
+  Devices (and in Settings → Audio): **+ Add a device** for each extra output (− takes
+  one off), and each gets a copy of what others hear, for example your mic for
+  Discord plus Voicemeeter and a device OBS captures for the stream.
 - **A sound from web search can't get lost any more.** Played a pad, then a search
   result over it, then stopped the pad? The search's sound kept playing with no way
   to reach it but Stop all. Now it gets its own chip in the *Now playing* row (with
