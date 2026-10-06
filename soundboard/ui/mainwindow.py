@@ -117,11 +117,17 @@ RANDOM = "__random__:"   # hotkey action prefix: a random sound from the categor
 ALL = "All"          # the category tab that shows every sound
 VOICE_POLL_MS = 3000  # how often the game in front is looked at (soundboard.voicesdk)
 VOICE_POLL_IDLE_S = 15   # ...while nobody sees the hint and nothing switches by itself
-# Setup -> Devices -> Send to others through (Config.route, library.ROUTES)
-ROUTE_CHOICES = (("Straight into my mic (no cable)", "mic"),
-                 ("The virtual cable (Discord, games)", "cable"),
-                 ("Another device (Voicemeeter, OBS, a mixer…)", "device"),
-                 ("Nowhere: only me (and the stream output)", "off"))
+# Setup -> Devices -> Send my sounds to (Config.route, library.ROUTES): the mic, nobody,
+# or one of the output devices by name (ROUTE_DEVICE + its name: "cable" for a virtual
+# cable, "device" for anything else)
+SEND_TO = "Send my sounds to"
+ALSO_TO = "Also send to"   # more devices at once (Config.also_send)
+# Qt drops a left-aligned button's padding once it has a menu: the text is indented so
+# it lines up with the device boxes above it
+MENU_PAD = "   "
+ROUTE_CHOICES = (("My mic (normal)", "mic"),
+                 ("Nobody: only I hear them", "off"))
+ROUTE_DEVICE = "device:"
 
 
 class StatusLine(QLabel):
@@ -1216,26 +1222,32 @@ class MainWindow(QMainWindow):
         grid.setHorizontalSpacing(10)
         grid.setVerticalSpacing(12)
         self.cb_main, self.cb_mon, self.cb_mic = QComboBox(), QComboBox(), QComboBox()
-        # the cable, another device (Voicemeeter, OBS, a mixer) or nowhere (set_route)
+        # your mic (the normal way), nobody, or a device by name (set_route). cb_main
+        # isn't shown: it keeps the device list the picked device is checked against.
         self.cb_route = QComboBox()
-        for text, key in ROUTE_CHOICES:
-            self.cb_route.addItem(text, key)
-        self.cb_route.setToolTip("Where what others hear goes: straight into your mic "
-                                 "(easiest), the virtual cable, another device (Voicemeeter, "
-                                 "a mixer, a device OBS captures) or nowhere (only you, and "
-                                 "the stream output).")
-        self.main_row = []   # the "send into" row: relabelled or hidden with the route
+        self.cb_route.setToolTip("Normally your sounds go into your mic, so everyone who "
+                                 "hears your mic hears them. Only pick something else to "
+                                 "send them somewhere instead: Voicemeeter, a mixer, a "
+                                 "device OBS captures, or a virtual cable.")
+        # more places at once (streamers): ticked in a menu, each gets a copy
+        self.btn_also = QPushButton()
+        self.btn_also.setToolTip("Streaming, or using more than one app? Tick more devices "
+                                 "here and each one gets a copy of what others hear too: "
+                                 "Voicemeeter, a device OBS captures, a second cable...")
+        self.attach_also_menu(self.btn_also)
+        self.also_row = []   # hidden while sending to nobody
         for r, (ic, text, cb) in enumerate((
-                ("live", "Send to others through", self.cb_route),
-                ("cable", "Send into (the cable)", self.cb_main),
                 ("headphones", "My headphones", self.cb_mon),
-                ("mic", "My real mic", self.cb_mic))):
+                ("mic", "My mic", self.cb_mic),
+                ("live", SEND_TO, self.cb_route),
+                ("live", ALSO_TO, self.btn_also))):
             row = (icon_label(ic), QLabel(text), cb)
             row[1].setBuddy(cb)   # a screen reader reads the label as the box's name
             for col, w in enumerate(row):
                 grid.addWidget(w, r, col)
-            if cb is self.cb_main:
-                self.main_row = row
+            if cb is self.btn_also:
+                self.also_row = row
+                continue
             cb.setMinimumWidth(120)
             # sized for a short name, not the longest device ("Headphones (2- Arctis Nova
             # Pro Wireless Game)" gave the Setup tab a sideways scroll bar); the list
@@ -1244,6 +1256,8 @@ class MainWindow(QMainWindow):
             cb.setMinimumContentsLength(16)
         grid.setColumnStretch(2, 1)
         av.addLayout(grid)
+        self.cb_main.setParent(devcard)   # never a window of its own
+        self.cb_main.hide()
         self.setup_hint = hint_label("")
         self.setup_hint.setTextFormat(Qt.RichText)
         av.addWidget(self.setup_hint)
@@ -1416,6 +1430,7 @@ class MainWindow(QMainWindow):
         e.set_tap_device(self._tap_name())
         e.set_mon_device(c.mon_device)
         e.set_obs_device(self._obs_name(c.obs_device))
+        e.set_copy_devices(self._copy_names())
         self._check_cable_format()
         self._update_status()
 
@@ -1572,7 +1587,12 @@ class MainWindow(QMainWindow):
     def on_device(self, cb, attr):
         name = cb.currentData()
         if attr == "route":
-            self.set_route(name)
+            if name and name.startswith(ROUTE_DEVICE):   # a device by name
+                dev = name[len(ROUTE_DEVICE):] or None
+                self.set_route("cable" if dev is None or is_virtual_cable(dev) else "device",
+                               dev)
+            else:
+                self.set_route(name)
             return
         setattr(self.cfg, attr, name)
         if attr == "mon_device":
@@ -1587,6 +1607,8 @@ class MainWindow(QMainWindow):
                 self.attach_mic()   # it follows you to the new mic
         self._apply_send_outputs(force_main=attr == "main_device")
         self._save_now()
+        if attr == "mon_device":
+            self._show_route()   # the headphones aren't offered as where sounds go
         self._update_status()
         if attr == "mic_device" and is_hands_free(name):   # after: it'd be overwritten
             self.status.setText(
@@ -1597,10 +1619,11 @@ class MainWindow(QMainWindow):
         self._prepare_all()
 
     def set_route(self, route: str, device: str | None = None):
-        """Setup -> Devices -> Send to others through: the virtual cable, another device
-        (Voicemeeter, a mixer, a device OBS captures) or nowhere (only you, and the
-        stream output). `device`: send into that one too (the setup guide picks both at
-        once). Otherwise the picked device is kept, so switching back restores it."""
+        """Setup -> Devices -> Send my sounds to: your mic, the virtual cable, another
+        device (Voicemeeter, a mixer, a device OBS captures) or nobody (only you, and the
+        stream output). `device`: send into that one too (the picker and the setup guide
+        pick both at once). Otherwise the picked device is kept, so switching back
+        restores it."""
         c = self.cfg
         if route not in library.ROUTES or (route == c.route and device is None):
             self._show_route()
@@ -1625,19 +1648,32 @@ class MainWindow(QMainWindow):
         self._prepare_all()
 
     def _show_route(self):
-        """The Setup tab follows the route: its picker, and the "send into" row (named
-        for the cable or not, hidden when sending nowhere)."""
-        route = self.cfg.route
-        self.cb_route.setCurrentIndex(max(0, self.cb_route.findData(route)))
-        self.main_row[1].setText(self.main_label())
-        for w in self.main_row:
-            w.setVisible(route not in ("off", "mic"))
+        """The Setup tab follows the route: "Send my sounds to" lists your mic, nobody
+        and every output but the headphones, with the current one picked."""
+        c, cb = self.cfg, self.cb_route
+        route = c.route
+        cb.blockSignals(True)
+        cb.clear()
+        for text, key in ROUTE_CHOICES:
+            cb.addItem(text, key)
+        names = [d["name"] for d in eng.list_devices("output")]
+        target = c.main_device if route in ("cable", "device") else None
+        if route in ("cable", "device") and target not in names:
+            names.append(target)   # unplugged, or no cable yet: still shown as picked
+        for n in names:
+            if n is None:
+                cb.addItem("A virtual cable (not installed yet)", ROUTE_DEVICE)
+            elif n != c.mon_device or n == target:
+                cb.addItem(n, ROUTE_DEVICE + n)
+        key = route if route in ("mic", "off") else ROUTE_DEVICE + (target or "")
+        cb.setCurrentIndex(max(0, cb.findData(key)))
+        cb.view().setMinimumWidth(cb.view().sizeHintForColumn(0) + 32)   # whole names
+        cb.blockSignals(False)
+        self.btn_also.setText(MENU_PAD + self.also_text())
+        for w in self.also_row:
+            w.setVisible(route != "off")
         self.how_title.setText("YOUR VIRTUAL MIC" if route == "cable" else
                                "YOUR MIC" if route == "mic" else "WHERE YOUR SOUNDS GO")
-
-    def main_label(self) -> str:
-        """What the "send into" device row is called for the current route."""
-        return "Send into (the cable)" if self.cfg.route == "cable" else "Send to"
 
     def _main_name(self) -> str | None:
         """The device that gets what others hear: none when sending nowhere, and
@@ -1678,6 +1714,71 @@ class MainWindow(QMainWindow):
         obs = self._obs_name(self.cfg.obs_device)   # never the cable or headphones too
         if e.names["obs"] != obs:
             e.set_obs_device(obs)
+        copies = self._copy_names()
+        if list(e.copy_names) != copies:
+            e.set_copy_devices(copies)
+
+    def _copy_names(self) -> list[str]:
+        """Setup -> Devices -> Also send to: the devices that get a copy of what others
+        hear. None while sending to nobody; never the headphones (you'd hear it twice),
+        and never a device that gets it already (what others hear, the cable alongside
+        the mic, the stream output, or another end of one of those cables)."""
+        c = self.cfg
+        if c.route == "off":
+            return []
+        taken = [t for t in (self._main_name(), self._tap_name(),
+                             self._obs_name(c.obs_device)) if t]
+        out = []
+        for n in c.also_send:
+            if (isinstance(n, str) and n and n != c.mon_device and n not in out
+                    and not any(n == t or eng.same_cable(n, t) for t in taken)):
+                out.append(n)
+        return out
+
+    def also_text(self) -> str:
+        """The "Also send to" button: what's ticked, or that it's just the one."""
+        names = self._copy_names()
+        return ", ".join(names) if names else "Nothing else (tick more…)"
+
+    def attach_also_menu(self, btn):
+        """`btn` opens the "Also send to" menu: every output but the headphones and the
+        one already picked, ticked when it gets a copy (Setup tab and Settings)."""
+        menu = QMenu(btn)
+        btn.setObjectName("devmenu")   # styled like the device boxes (theme)
+
+        def fill():
+            menu.clear()
+            menu.setMinimumWidth(btn.width())
+            c = self.cfg
+            main = c.main_device if c.route in ("cable", "device") else None
+            names = [d["name"] for d in eng.list_devices("output")]
+            names += [n for n in c.also_send if isinstance(n, str) and n not in names]
+            has = [t for t in (self._main_name(), self._tap_name(),
+                               self._obs_name(c.obs_device)) if t]
+            for n in names:
+                if n in (c.mon_device, main):
+                    continue
+                if any(n == t or eng.same_cable(n, t) for t in has):
+                    menu.addAction(f"{n}  (gets it already)").setEnabled(False)
+                    continue
+                a = menu.addAction(n)
+                a.setCheckable(True)
+                a.setChecked(n in c.also_send)
+                a.toggled.connect(lambda on, n=n: self.set_also_send(n, on))
+            if menu.isEmpty():
+                menu.addAction("No other devices").setEnabled(False)
+        menu.aboutToShow.connect(fill)
+        btn.setMenu(menu)
+
+    def set_also_send(self, name: str, on: bool):
+        """Tick / untick `name` under Setup -> Devices -> Also send to."""
+        c = self.cfg
+        c.also_send = [n for n in c.also_send if n != name] + ([name] if on else [])
+        log.info("also send to: %s", c.also_send)
+        self._apply_send_outputs()
+        self._show_route()
+        self._save_now()
+        self._update_status()
 
     def _tap_name(self) -> str | None:
         """Straight into the mic: the cable gets the same (engine.CableTap), for a voice
@@ -1730,11 +1831,11 @@ class MainWindow(QMainWindow):
             self.setup_hint.setText(f"<span style='color:{theme.status('warn')}'>"
                                     "That's your headphones too, so nothing is sent "
                                     "(you'd hear everything twice). Pick another device, "
-                                    "or pick <b>Nowhere</b>: your sounds already play in "
+                                    "or pick <b>Nobody</b>: your sounds already play in "
                                     "your headphones, where OBS's Desktop Audio picks "
                                     "them up.</span>")
         elif c.route == "mic":
-            self.setup_hint.setText("Your sounds go straight into <b>My real mic</b>, so "
+            self.setup_hint.setText("Your sounds go straight into <b>My mic</b>, so "
                                     "Discord and games hear them through the mic they "
                                     "already use.")
         elif self.virtual_mic:
@@ -1754,13 +1855,19 @@ class MainWindow(QMainWindow):
         elif main:
             self.setup_hint.setText(f"<span style='color:{theme.status('warn')}'>"
                                     "That's a normal speaker/headphone "
-                                    "device, so only you will hear the sounds. Pick a virtual "
-                                    "cable here, or under <b>Send to others through</b> pick "
-                                    "<b>Another device</b> if that's on purpose.</span>")
+                                    "device, so only you will hear the sounds. Set <b>Send "
+                                    "my sounds to</b> back to <b>My mic</b>, unless that's "
+                                    "on purpose.</span>")
         else:
             self.setup_hint.setText(f"<span style='color:{theme.status('warn')}'>"
                                     "Nothing picked — only you "
                                     "will hear sounds.</span>")
+        down = [n for n in self.engine.copies_down() if n in self._copy_names()]
+        if down:
+            self.setup_hint.setText(
+                self.setup_hint.text() + f"<br><span style='color:{theme.status('warn')}'>"
+                "Can't open " + ", ".join(f"<b>{html.escape(n)}</b>" for n in down)
+                + " (under Also send to). Plugged in? It's tried again by itself.</span>")
         self.set_sending(self.btn_air.isChecked())   # its label follows the route
         self._update_flow()
         errs = [f"{'stream output' if k == 'obs' else k}: {v}"
@@ -1859,8 +1966,8 @@ class MainWindow(QMainWindow):
             step = ("<b>Nothing goes out as a mic</b>, so Discord and games don't hear your "
                     "sounds. They play in your headphones (OBS's <b>Desktop Audio</b> picks "
                     "them up there) and on the <b>stream output</b> if you set one "
-                    "(Settings → Audio). To send them out, change <b>Send to others "
-                    "through</b> under Devices.")
+                    "(Settings → Audio). To send them out, set <b>Send my sounds to</b> "
+                    "back to <b>My mic</b> under Devices.")
         elif route == "device" and dev and e.main_stream is not None and not vm:
             state = "ok"
             name = html.escape(dev)
@@ -1880,10 +1987,10 @@ class MainWindow(QMainWindow):
                 out = f"Sending  <b style='color:{bad}'>✗ no device picked</b>"
             almost = f"<b style='color:{theme.status('warn')}'>Almost:</b> under <b>Devices</b>, "
             step = almost + (
-                "set “Send to” to another device than your headphones, or set <b>Send to "
-                "others through</b> to <b>Nowhere</b>." if self.cfg.main_device and dev is None
-                else "set “Send to” to the device that should get your sounds (and check "
-                "it's plugged in).")
+                "set <b>Send my sounds to</b> to another device than your headphones, or "
+                "to <b>My mic</b>." if self.cfg.main_device and dev is None
+                else "set <b>Send my sounds to</b> to the device that should get your "
+                "sounds (and check it's plugged in), or to <b>My mic</b>.")
         elif route == "device":   # another virtual cable: its other end is the mic
             state = "ok"
             out = (f"<b style='color:{ok}'>{vm}</b> — your new mic "
@@ -1896,9 +2003,9 @@ class MainWindow(QMainWindow):
             step = (f"<b style='color:{theme.status('warn')}'>"
                     "One-time setup:</b> install the free virtual "
                     "cable. It's what lets Discord and games hear your sounds — without it, "
-                    "only you can hear them. Easier: pick <b>Straight into my mic</b> under "
-                    "<b>Send to others through</b> (nothing to install). Use Voicemeeter, a "
-                    "mixer or OBS? Pick <b>Another device</b> there.")
+                    "only you can hear them. Easier: set <b>Send my sounds to</b> to "
+                    "<b>My mic</b> (nothing to install). Voicemeeter, a mixer or OBS? Pick "
+                    "that device there.")
         elif vm and e.main_stream is not None:
             state = "ok"
             out = (f"<b style='color:{ok}'>{vm}</b> — your new mic "
@@ -1912,7 +2019,7 @@ class MainWindow(QMainWindow):
             out = f"Virtual mic  <b style='color:{bad}'>✗ not connected</b>"
             step = (f"<b style='color:{theme.status('warn')}'>"
                     "Almost:</b> under <b>Devices</b>, set "
-                    "“Send into (the cable)” to your virtual cable.")
+                    "<b>Send my sounds to</b> to your virtual cable, or to <b>My mic</b>.")
         self.flow_mic.setText(mic)
         self.flow_out.setText(out)
         self.step_lbl.setText(step)
@@ -2806,7 +2913,7 @@ class MainWindow(QMainWindow):
                    "that too (you still hear everything)")
         else:
             tip = ("Nothing goes out to others: pick where to send on the Setup tab "
-                   "(Send to others through)")
+                   "(Send my sounds to)")
         self.btn_air.setToolTip(tip)
         if hasattr(self, "mini_air"):
             self.mini_air.setChecked(on)
@@ -4920,13 +5027,14 @@ class MainWindow(QMainWindow):
             QMessageBox.information(
                 self, "Test",
                 "Sending to others is off, so there's nothing to record. Change it under "
-                "Setup → Devices → Send to others through." if route == "off" else
-                "Pick the device to send to first (Setup tab → Devices → Send to)."
+                "Setup → Devices → Send my sounds to." if route == "off" else
+                "Pick the device to send to first (Setup tab → Devices → Send my sounds "
+                "to)."
                 if route == "device" else
                 "Put your sounds in your mic first (Setup tab → Put my sounds straight "
                 "into my mic), or use the virtual cable." if route == "mic" else
                 "Set up the virtual cable first (Setup tab → Step-by-step guide), or pick "
-                "another device under Send to others through.")
+                "another device under Send my sounds to.")
             return
         # Capture the far end of the virtual cable too, so the test hears exactly
         # what Discord / the game hears (not just our internal mix).

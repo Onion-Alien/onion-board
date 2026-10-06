@@ -80,19 +80,19 @@ Optional: if you never get it, nothing changes.
 2. **Follow Bun the bunny's four steps**: your mic, your headphones, where your
    sounds go, and what to set in Discord or your game.
 3. **Pick where your sounds go** (step 3 of Bun's guide, or later on the *Setup* tab →
-   Devices → *Send to others through*):
-   - **Straight into my mic** (the default): click **Put my sounds straight into my
+   Devices → *Send my sounds to*):
+   - **My mic** (the default): click **Put my sounds straight into my
      mic** and **Yes** when Windows asks (once). Discord and games keep your normal
      mic, so there's nothing to pick there. In Discord, set *User Settings → Voice &
      Video → Input Profile* to **Studio** so it doesn't filter your sounds out.
-   - **The virtual cable** (the backup, if your mic won't take it): installs the free
+   - **A virtual cable** (the backup, if your mic won't take it; pick it by name): installs the free
      VB-Cable; in Discord or your game, set your microphone to `CABLE Output` (and
      Discord's *Input Profile* to **Studio**).
-   - **Another device**: any output but your headphones, such as Voicemeeter, a
+   - **Any other device** by name: any output but your headphones, such as Voicemeeter, a
      mixer, a capture card or a second sound card. Nothing is installed. In OBS add
      it as an *Audio Output Capture*; in Voicemeeter or a mixer, send that input on
      to wherever it should go.
-   - **Nowhere**: only you hear your sounds (and the *Stream output* if you set one).
+   - **Nobody**: only you hear your sounds (and the *Stream output* if you set one).
      Nothing to change in Discord or your game.
 4. **Drag sounds onto the window** and double-click a pad to play it. Right-click a
    pad for a hotkey or **Effects…**.
@@ -108,12 +108,12 @@ Optional: if you never get it, nothing changes.
   game must be using that same mic. With the cable, it reads *Your mic in Discord /
   games* and their app's microphone must be `CABLE Output`. With another device, it
   reads *Sending to:* and whatever sits on the other end (OBS, Voicemeeter, your
-  mixer) must be picking that device up. With *Nowhere*, only you hear sounds, on
+  mixer) must be picking that device up. With *Nobody*, only you hear sounds, on
   purpose.
 - **They hear sounds but not you:** tick **Others hear it** under *My mic*.
 - **Check it yourself:** *Setup → Record 6s → play back* records what others get (it
-  works any way but *Nowhere*).
-- **Switch how sounds go out any time:** *Setup → Devices → Send to others through*.
+  works any way but *Nobody*).
+- **Switch how sounds go out any time:** *Setup → Devices → Send my sounds to*.
 - **Have the virtual cable from before?** Once your sounds are in your mic, the
   *Setup* tab offers to remove it. Keep it if another program uses it.
 - **Still stuck?** [Open an issue](../../issues/new/choose) and attach

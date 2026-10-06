@@ -444,7 +444,7 @@ class AppsTab(QWidget):
                         "even a call in another app — and it goes out to whoever's listening, "
                         "on its own volume, the same way your sounds do (your mic, the "
                         "cable or the device you picked on the Setup tab, and the stream "
-                        "output). Sending to Nowhere: only the stream output gets it. Only "
+                        "output). Sending to Nobody: only the stream output gets it. Only "
                         "that program: nothing else you play is "
                         "touched, and it keeps playing on your speakers as before. Programs "
                         "you switch on are remembered and picked up again next time they run.")

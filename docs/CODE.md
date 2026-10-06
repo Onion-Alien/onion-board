@@ -6,7 +6,7 @@ For people changing the code. Using the app needs none of this: the
 
 ## Sending sounds to others: straight into your mic, the virtual cable, or something else
 
-Setup → Devices → *Send to others through* (also Settings → Audio → Devices) picks
+Setup → Devices → *Send my sounds to* (also Settings → Audio → Devices) picks
 the route (`Config.route`, `library.ROUTES`):
 
 - **Straight into my mic** (new users start here, `Config.first_start`): Onion Board
@@ -58,11 +58,11 @@ the route (`Config.route`, `library.ROUTES`):
   installer is signed by VB-Audio, and runs it. Windows asks for admin permission.
   The app's *Install the free virtual cable* button runs the same script. Other
   virtual cables (VB-Cable A/B, Voicemeeter) are detected too.
-- **Another device**: any output you pick by hand (Voicemeeter, a mixer, a capture
+- **Another device** (`device`): any output you pick by name (Voicemeeter, a mixer, a capture
   card, a second sound card, an output OBS captures). No cable is needed, the app
   never swaps the cable in or asks to install it, and the send device can't be the
   headphones.
-- **Nowhere**: only you hear the sounds, plus the optional stream output.
+- **Nobody** (`off`): only you hear the sounds, plus the optional stream output.
 
 The route belongs to this PC: backups don't carry it and resetting the audio devices
 puts it back to straight into the mic. The rest of this page says "what others hear" for

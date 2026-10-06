@@ -1074,11 +1074,9 @@ class SettingsDialog(QDialog):
         people find them where they look first. Picking goes through the window."""
         mw = self.mw
         card, cv = self._card("Devices",
-                              "Your mic (input), where you listen (output) and where what "
-                              "others hear goes: straight into your mic, the virtual "
-                              "cable, another device (Voicemeeter, OBS, a mixer) or "
-                              "nowhere. Plugged something "
-                              "in? Press Re-scan.")
+                              "Your mic (input) and where you listen (output). Your "
+                              "sounds go into your mic unless you pick somewhere else "
+                              "to send them. Plugged something in? Press Re-scan.")
         grid = QGridLayout()
         grid.setHorizontalSpacing(10)
         grid.setVerticalSpacing(6)
@@ -1086,8 +1084,7 @@ class SettingsDialog(QDialog):
         for r, (text, src, attr) in enumerate((
                 ("Input — my mic", mw.cb_mic, "mic_device"),
                 ("Output — my headphones", mw.cb_mon, "mon_device"),
-                ("Send to others through", mw.cb_route, "route"),
-                (mw.main_label(), mw.cb_main, "main_device"))):
+                ("Send my sounds to", mw.cb_route, "route"))):
             cb = QComboBox()
             cb.setMinimumWidth(120)
             no_wheel(cb)
@@ -1096,8 +1093,15 @@ class SettingsDialog(QDialog):
             grid.addWidget(label, r, 0)
             grid.addWidget(cb, r, 1)
             self.dev_combos.append((cb, src))
-            if src is mw.cb_main:
-                self.dev_main = (label, cb)   # relabelled / hidden with the route
+        self.dev_also = QPushButton()   # the Setup tab's "Also send to", same menu
+        self.dev_also.setToolTip(mw.btn_also.toolTip())
+        mw.attach_also_menu(self.dev_also)
+        self.dev_also.menu().aboutToHide.connect(   # after the tick is applied
+            lambda: QTimer.singleShot(0, self.dev_also, self._sync_devices))
+        r = grid.rowCount()
+        self.dev_also_label = QLabel("Also send to")
+        grid.addWidget(self.dev_also_label, r, 0)
+        grid.addWidget(self.dev_also, r, 1)
         grid.setColumnStretch(1, 1)
         cv.addLayout(grid)
         ref = QPushButton("Re-scan devices")
@@ -1113,16 +1117,15 @@ class SettingsDialog(QDialog):
             for i in range(src.count()):
                 cb.addItem(src.itemText(i), src.itemData(i))
             cb.setCurrentIndex(src.currentIndex())
-        label, cb = self.dev_main
-        label.setText(self.mw.main_label())
-        for w in (label, cb):   # like the Setup tab: only a device / the cable is picked
-            w.setVisible(self.mw.cfg.route not in ("off", "mic"))
+        if hasattr(self, "dev_also"):   # built after the first sync
+            self.dev_also.setText("   " + self.mw.also_text())   # (as the Setup tab)
+            for w in (self.dev_also_label, self.dev_also):
+                w.setVisible(self.mw.cfg.route != "off")
 
     def _pick_device(self, src, attr, i):
         src.setCurrentIndex(i)
         self.mw.on_device(src, attr)
-        if attr == "route":   # it may have picked the cable, and shows or hides its row
-            self._sync_devices()
+        self._sync_devices()   # "Send my sounds to" never offers the headphones
 
     def _general(self):
         w, v = self._page()
