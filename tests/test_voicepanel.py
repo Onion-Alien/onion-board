@@ -9,6 +9,8 @@ from tests.conftest import process_events
 
 class FakeEngine:
     voice_chain = None
+    mic_stream = None   # a shown panel's meter asks: no mic here
+    level_mic = 0.0
 
     def play(self, *a, **k):
         pass
