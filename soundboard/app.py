@@ -402,6 +402,8 @@ def main():
     for msg in MIGRATION_ERRORS:
         log.error("%s", msg)
     tune_runtime_for_audio()
+    from soundboard import i18n
+    i18n.startup(APP_DIR)   # before any window or module-level text is made
     import threading
     threading.Thread(target=clean_temp_leftovers, daemon=True, name="temp-clean").start()
     try:
