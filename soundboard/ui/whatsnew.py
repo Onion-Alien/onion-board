@@ -34,6 +34,9 @@ NOTES = (
         ("wave", "No more minutes of silence",
          "Left open while nothing plays, the editor keeps only what the program actually "
          "played: long gaps close up to half a second."),
+        ("shield", "A sturdier phone remote",
+         "Onion Pocket's connection can't be flooded by another device on your Wi-Fi, "
+         "and its key never goes in a web address."),
     )),
     Note("1.9.3", "Your mic, start to finish", (
         ("check", "No cable box ticked for you",
