@@ -278,7 +278,8 @@ def test_finished_compares_versions(pending, current, want):
 def test_cleanup_removes_downloaded_installers_only():
     updates.UPDATES_DIR.mkdir(parents=True)
     for name in ("OnionBoardSetup-9.0.0.exe", "OnionBoardSetup-9.0.1.exe.part",
-                 "install.log"):
+                 "AiVoices-module-1.0.0.zip.part", "OnionWatch-module-0.8.2.zip",
+                 "OnionPocket-module-0.2.0.zip", "install.log"):
         (updates.UPDATES_DIR / name).write_bytes(b"x")
     updates.cleanup()
     assert [p.name for p in updates.UPDATES_DIR.iterdir()] == ["install.log"]

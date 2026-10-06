@@ -384,10 +384,13 @@ def finished(pending: str, current: str = __version__) -> bool:
 
 
 def cleanup() -> None:
-    """Remove downloaded installers (and half-downloads). One still running, just
-    after it reopened the app, is locked: it goes next time."""
-    for p in UPDATES_DIR.glob("OnionBoardSetup-*"):
-        try:
-            p.unlink()
-        except OSError:
-            pass
+    """Remove downloaded installers and add-on zips (and half-downloads), so updates
+    never pile up on the disk. An add-on zip is normally deleted once it's installed;
+    this catches one cut off by a crash or a closed app. One still running or still
+    being written is locked: it goes next time. install.log stays."""
+    for pattern in ("OnionBoardSetup-*", "*-module-*.zip", "*-module-*.zip.part"):
+        for p in UPDATES_DIR.glob(pattern):
+            try:
+                p.unlink()
+            except OSError:
+                pass
