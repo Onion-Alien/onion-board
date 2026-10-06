@@ -156,6 +156,13 @@ class BoardHost:
     def palette(self) -> dict[str, str]:
         return dict(theme.T)
 
+    def language(self) -> str:
+        """The board's language ("en", "de", "pt-BR", the pseudo-language "xx"…), so the
+        add-on can show in it too. Optional: an add-on asks with getattr (older boards
+        don't have it), so the api version stays the same."""
+        from soundboard import i18n
+        return i18n.current()
+
     def notify(self, title: str, body: str):
         """A tray notification, only while the board isn't in front (hidden in the
         tray, or behind the game)."""

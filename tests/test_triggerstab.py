@@ -481,6 +481,7 @@ def test_notifications_only_while_the_board_is_not_in_front():
     host.notify("Won", "It just showed up.")
     assert win.tray.shown == [("Died", "It just showed up.")]
     assert host.palette()["accent"] and host.data_dir.name
+    assert host.language() == "en"   # the board's language, for the add-on
     host.save()
     assert win.saves == 1
 
