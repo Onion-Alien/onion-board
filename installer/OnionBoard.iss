@@ -57,7 +57,7 @@
 AppId={{6B0B6E2F-6D63-4C1B-9E0B-5B8E3C2A71D4}
 AppName={#AppName}
 AppVersion={#AppVersion}
-AppPublisher=Onion Board
+AppPublisher=Onion Alien
 AppPublisherURL=https://github.com/Onion-Alien/onion-board
 AppSupportURL=https://github.com/Onion-Alien/onion-board/issues
 AppUpdatesURL=https://github.com/Onion-Alien/onion-board/releases
@@ -70,7 +70,7 @@ AppContact=https://github.com/Onion-Alien/onion-board/issues
 VersionInfoVersion={#AppVersion}
 VersionInfoProductName={#AppName}
 VersionInfoProductVersion={#AppVersion}
-VersionInfoCompany=Onion Board
+VersionInfoCompany=Onion Alien
 VersionInfoDescription={#AppName} Setup
 VersionInfoCopyright=Copyright (C) Onion Board contributors
 DefaultDirName={localappdata}\Programs\{#AppExeName}
