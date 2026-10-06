@@ -1,4 +1,4 @@
-<p align="right"><img src="https://visitor-badge.laobi.icu/badge?page_id=Onion-Alien.onion-board" alt="visitors"></p>
+<p align="right"><img src="https://hits.sh/github.com/Onion-Alien/onion-board.svg?view=total&label=total%20visits&color=6b8e23" alt="total visits"></p>
 
 # Onion Board
 
