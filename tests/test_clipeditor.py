@@ -195,7 +195,7 @@ def test_cut_and_paste_into_another_programs_editor(tab, qapp):
     assert len(eb.take) == pytest.approx(1.0 * SR, abs=BIN)
 
 
-def test_edit_menu_actions_and_shortcuts_exist():
+def test_edit_menu_actions_and_shortcuts_exist(qapp):   # a widget needs the app first
     ed = ClipEditor(FakeEngine(), Config())
     names = set(ed.actions_by_name)
     assert {"cut", "copy", "paste", "delete", "undo", "redo", "fade_in", "fade_out",
