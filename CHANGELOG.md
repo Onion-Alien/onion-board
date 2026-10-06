@@ -7,6 +7,10 @@
   then drag the ends to cut it, listen in your headphones, name it and *Save*. The
   quiet bits at both ends are already cut off. Up to 15 minutes; nobody hears you
   while you record.
+- **A simpler first window.** A new install starts with just Sounds, Voice and Setup.
+  The other tabs wait under **+ More tabs** beside the tabs: click one and it's added
+  and opened. *Choose tabs in Settings…* in the same menu shows them all. Your tabs
+  stay as they are if you already use Onion Board.
 
 ## 1.9.6 — 2026-10-06
 

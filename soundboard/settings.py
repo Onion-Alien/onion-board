@@ -1169,7 +1169,7 @@ class SettingsDialog(QDialog):
             "Tabs",
             "Switch off the tabs you don't use. A switched-off tab is gone from the "
             "window and doesn't load at all, so nothing of it runs in the background. "
-            "Switch it back on any time.")
+            "Switch it back on any time, here or with + More tabs beside the tabs.")
         from soundboard.ui.mainwindow import TABS
         self.tab_boxes: dict[str, QCheckBox] = {}
         for text, _tip in TABS:

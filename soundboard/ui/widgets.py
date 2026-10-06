@@ -11,8 +11,9 @@ from PySide6.QtCore import (QEvent, QMimeData, QObject, QPoint, QPointF, QRectF,
                             QTimer, QVariantAnimation, Signal)
 from PySide6.QtGui import (QColor, QDrag, QFont, QFontMetrics, QLinearGradient, QPainter,
                            QPainterPath, QPen)
-from PySide6.QtWidgets import (QAbstractButton, QGridLayout, QLabel, QScrollArea, QSlider,
-                               QStackedWidget, QStyle, QTabWidget, QVBoxLayout, QWidget)
+from PySide6.QtWidgets import (QAbstractButton, QGridLayout, QHBoxLayout, QLabel, QScrollArea,
+                               QSlider, QStackedWidget, QStyle, QTabWidget, QVBoxLayout,
+                               QWidget)
 
 from soundboard import midi, theme, thumbs
 from soundboard.eq import MAX_DB as EQ_MAX_DB
@@ -258,14 +259,16 @@ _FREQS = np.fft.rfftfreq(FFT_N, 1 / SR)
 
 
 class TabInfoCorner(QWidget):
-    """Give Qt's corner the tab row's height so its button is vertically centered."""
+    """Give Qt's corner the tab row's height so its buttons are vertically centered."""
 
-    def __init__(self, tabs, button):
+    def __init__(self, tabs, *buttons):
         super().__init__()
         self.tabs = tabs
-        layout = QVBoxLayout(self)
+        layout = QHBoxLayout(self)
         layout.setContentsMargins(0, 0, 0, 0)
-        layout.addWidget(button, 0, Qt.AlignVCenter)
+        layout.setSpacing(4)
+        for button in buttons:
+            layout.addWidget(button, 0, Qt.AlignVCenter)
 
     def sizeHint(self):
         size = super().sizeHint()
