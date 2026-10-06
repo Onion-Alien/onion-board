@@ -6,6 +6,12 @@ The full list. The [README](../README.md) has the short version and how to get s
   the sounds folder (**Sounds folder** opens it; they join the board by themselves). Plays mp3, wav, ogg,
   flac, m4a and more, and pulls the audio out of video files. Search, reorder,
   resize, set colours.
+- **Record a sound with your mic:** the **Record** button next to *Add sounds*.
+  Record your own voice, or your voice through the voice changer while it's on;
+  after *Stop* the quiet ends are already cut off, drag the start and end to cut
+  more, *Preview* plays it in your headphones only, then name it and *Save* to add
+  the pad (it joins the category showing). Up to 15 minutes, spooled to disk as it
+  records; nobody hears you while you record.
 - **Categories:** the tabs above the pads (the *+* after the last tab makes one). Right-click a
   pad → *Categories* to put it in any number of them; right-click a category to
   rename, export or delete it. The in-game overlay shows the same category, and

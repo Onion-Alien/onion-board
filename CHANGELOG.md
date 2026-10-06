@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+- **Record a sound with your mic.** New **Record** button next to *Add sounds*:
+  record your own voice (or, while the voice changer is on, your changed voice),
+  then drag the ends to cut it, listen in your headphones, name it and *Save*. The
+  quiet bits at both ends are already cut off. Up to 15 minutes; nobody hears you
+  while you record.
+- **A simpler first window.** A new install starts with just Sounds, Voice and Setup.
+  The other tabs wait under **+ More tabs** beside the tabs: click one and it's added
+  and opened. *Choose tabs in Settings…* in the same menu shows them all. Your tabs
+  stay as they are if you already use Onion Board.
 - **Instant replay and the Apps tab work on Windows 10.** They needed a Windows 10
   build normal PCs never get; any Windows 10 updated to version 2004 or newer works.
 - **Fewer update prompts.** A new version is offered once it's been out a day, so a

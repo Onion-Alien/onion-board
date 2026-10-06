@@ -58,7 +58,8 @@ Out of scope:
   module escaping into something the user never installed is. The same goes for
   custom voice programs (a `"command"` in `%APPDATA%\OnionBoard\voices\`, or the
   `piper.exe` there): they're programs you chose to run.
-- Games' anti-cheat reacting to global hotkeys or `SendInput` (auto push-to-talk).
+- Games' anti-cheat reacting to global hotkeys or `SendInput` (auto push-to-talk);
+  see [Anti-cheat](#anti-cheat) for what the app does and doesn't touch.
 - Chromium bugs in Qt WebEngine that are already fixed upstream. Tell us if
   the pinned PySide6 is behind on security releases, though — that's in scope.
 
@@ -303,6 +304,32 @@ goes online.
   `installer/install-vbcable.ps1` only when you ask, and removed by VB-Audio's own
   uninstaller (Setup tab → *Remove the virtual cable*, or the uninstaller's question),
   both after Windows' admin prompt.
+
+## Anti-cheat
+
+Onion Board never touches a game's process: it doesn't inject code into it, read
+or write its memory, hook it, or install a kernel driver of its own. What it does
+use is plain Windows APIs that any desktop app can call:
+
+| Feature | What it does | Touches the game? |
+| --- | --- | --- |
+| *Straight into my mic* | an audio effect DLL that Windows loads into its own audio engine (`audiodg.exe`), not into the game ([details](#what-straight-into-my-mic-changes-on-your-pc)). It isn't code-signed | no |
+| Hotkeys | `RegisterHotKey`: Windows tells the app when one of its own key combos is pressed. No keyboard or mouse hook | no |
+| Auto push-to-talk | `SendInput` holds the push-to-talk key you set, only while a sound is going out | sends that one key, like a keyboard would |
+| MIDI pads | reads the controller through Windows' MIDI API | no |
+| Overlay | a separate always-on-top window that never takes focus, drawn by the app itself | no (drawn on top, not inside) |
+| Onion Watch screen triggers (add-on) | copies the game window's picture (`PrintWindow`, or the screen through `BitBlt` / DXGI desktop duplication) and compares it with your pictures. It plays sounds; it never presses keys itself | reads pixels only |
+| App audio / game detection | Windows' per-app audio capture, and `OpenProcess` with `PROCESS_QUERY_LIMITED_INFORMATION` (the least access there is, as Task Manager uses) just to read a program's name and whether it's still running. A refused handle is treated as "running" | a name-only handle, closed at once |
+
+None of the anti-cheats checked (Riot Vanguard, Easy Anti-Cheat, BattlEye, FACEIT)
+publish a rule against any of this: their published rules target vulnerable or blocked
+kernel drivers, code loaded into the game, and cheats or macros that play the game
+for you. The app hasn't been tested in-game against them, and no one can promise what
+an anti-cheat will do next, so if one ever complains, please
+[open an issue](https://github.com/Onion-Alien/onion-board/issues).
+Two sensible habits: set your push-to-talk key to the game's push-to-talk only (never
+a key that moves or shoots), and don't build Onion Watch triggers that react to
+gameplay in a way that helps you play.
 
 ## For users filing bug reports
 

@@ -544,7 +544,19 @@ class MainWindow(QMainWindow):
         self.btn_info.setCursor(Qt.PointingHandCursor)
         self.btn_info.setToolTip("What's this tab for?")
         self.btn_info.clicked.connect(self._show_tab_info)
-        info_corner = TabInfoCorner(self.tabs, self.btn_info)
+        # + More tabs: the tabs switched off (a new user starts with the basic ones), one
+        # click to add one; only there while one is off
+        self.btn_more_tabs = QPushButton("More tabs")
+        self.btn_more_tabs.setObjectName("moretabs")
+        icons.set_icon(self.btn_more_tabs, "plus")
+        self.btn_more_tabs.setCursor(Qt.PointingHandCursor)
+        self.btn_more_tabs.setToolTip("Add a tab: radio, sending a program's sound, screen "
+                                      "triggers…")
+        mt = QMenu(self.btn_more_tabs)
+        mt.aboutToShow.connect(lambda: self._fill_more_tabs(mt))
+        self.btn_more_tabs.setMenu(mt)
+        self._update_more_tabs()
+        info_corner = TabInfoCorner(self.tabs, self.btn_more_tabs, self.btn_info)
         self.tabs.setCornerWidget(info_corner, Qt.TopRightCorner)
         self._update_info_btn = lambda *_: self.btn_info.setVisible(
             self._current_tab_info() is not None)
@@ -751,6 +763,10 @@ class MainWindow(QMainWindow):
         add.setToolTip("Add sound files (or drag them onto the window)")
         add.clicked.connect(self.add_dialog)
         icons.set_icon(add, "plus", "on_accent")
+        self.btn_record = QPushButton("Record")
+        self.btn_record.setToolTip("Record a sound with your mic and add it to your sounds")
+        icons.set_icon(self.btn_record, "record", "#ff4d4f")
+        self.btn_record.clicked.connect(self.record_dialog)
         self.search = QLineEdit()
         # short, so it isn't cut to "Search sounds… …" at normal widths; the tooltip
         # has the rest
@@ -802,6 +818,7 @@ class MainWindow(QMainWindow):
         icons.set_icon(self.btn_folder, "folder")
         self.btn_folder.clicked.connect(self.open_sounds_folder)
         tb.addWidget(add)
+        tb.addWidget(self.btn_record)
         tb.addWidget(self.btn_folder)
         tb.addWidget(more)
         tb.addWidget(self.btn_bin)
@@ -2429,6 +2446,27 @@ class MainWindow(QMainWindow):
         v.active_changed.connect(lambda on, k=key: self._tab_live(k, on))
         return v
 
+    def _update_more_tabs(self):
+        self.btn_more_tabs.setVisible(any(not self.tab_on(k) for k in taboff.KEYS))
+
+    def _fill_more_tabs(self, menu: QMenu):
+        """+ More tabs: each tab that's switched off, with what it's for (click: it's
+        added and opened), then Settings > Tabs to pick them all."""
+        menu.clear()
+        for key in taboff.KEYS:
+            if self.tab_on(key):
+                continue
+            text, tip = TABS[TAB_INDEX[key]]
+            act = menu.addAction(icons.icon(key), f"{text}: {tip}")
+            act.triggered.connect(lambda _c=False, k=key: self._add_tab(k))
+        menu.addSeparator()
+        act = menu.addAction(icons.icon("settings"), "Choose tabs in Settings…")
+        act.triggered.connect(lambda: self.open_settings("tabs"))
+
+    def _add_tab(self, key: str):
+        self.set_tab_on(key, True)
+        self.tabs.setCurrentIndex(TAB_INDEX[key])
+
     def _tab_live(self, key: str, on: bool):
         """The live badge on the Voice, Triggers or Apps tab."""
         page = getattr(self, key)
@@ -2458,6 +2496,7 @@ class MainWindow(QMainWindow):
             self._swap_tab(key)
         self.tabs.setTabVisible(i, on)
         self._update_info_btn()
+        self._update_more_tabs()
         log.info("tab %s switched %s", key, "on" if on else "off")
         self.tab_switched.emit(key, on)
 
@@ -3891,8 +3930,9 @@ class MainWindow(QMainWindow):
                 QMessageBox.warning(self, "Some files weren't added",
                                     "<p>" + "<br>".join(html.escape(e) for e in errs) + "</p>")
 
-    def on_clip(self, data, name):
-        """A clip recorded in the Radio or Apps tab becomes a normal sound pad."""
+    def on_clip(self, data, name) -> SoundMeta | None:
+        """A clip recorded in the Radio or Apps tab (or with the mic) becomes a normal
+        sound pad."""
         try:
             meta, data = save_clip(data, name, PAD_COLORS[len(self.cfg.sounds) % len(PAD_COLORS)])
         except Exception as e:  # noqa: BLE001
@@ -3902,7 +3942,7 @@ class MainWindow(QMainWindow):
                 src.clip_error = errors.plain(e)   # the tab says so on its row
             else:
                 errors.warn(self, "Couldn't save clip", e)
-            return
+            return None
         self._tag_new(meta)
         self.cfg.sounds.append(meta)
         self._index()
@@ -3912,6 +3952,39 @@ class MainWindow(QMainWindow):
         self._rebuild_pads()
         self.status.setText(f"Added “{html.escape(meta.name)}” ({meta.duration:.1f}s) to Sounds — "
                             "right-click it there to rename or set a hotkey.")
+        return meta
+
+    def record_dialog(self):
+        """Sounds tab → Record: record a sound with the mic."""
+        from soundboard.ui.recordmic import RecordDialog
+        voice = getattr(self, "voice", None)
+
+        def voice_on() -> bool:
+            on = getattr(voice, "is_active", None)
+            return bool(on()) if on is not None else False
+
+        def open_devices():
+            self.tabs.setCurrentWidget(self.setup_page)
+
+        d = RecordDialog(self.engine, voice_on, lambda: [m.name for m in self.cfg.sounds],
+                         self.add_recording, open_devices, self)
+        d.exec()
+        free_dialog(d)
+
+    def add_recording(self, data, name) -> bool:
+        """A mic recording becomes a pad: selected, scrolled to, and a toast says so."""
+        meta = self.on_clip(data, name)
+        if meta is None:
+            return False
+        self.select(meta.id)
+
+        def reveal():   # once the grid has laid the new pad out
+            pad = self.pads.get(meta.id)
+            if pad is not None:
+                self._pads_scroll.ensureWidgetVisible(pad)
+        QTimer.singleShot(0, self._pads_scroll, reveal)   # not after the window's gone
+        self.toast(f"✓ Added “{html.escape(meta.name)}”", "ok")
+        return True
 
     def on_downloaded(self, meta, data):
         """"Add as sound" (link bar / web search) finished: already decoded, stored and
@@ -5543,6 +5616,7 @@ class MainWindow(QMainWindow):
         f.add(50, "w", r.hide(self.np_name))
         f.add(60, "w", r.hide(self.wordmark))
         f.add(60, "w", r.icon_only(self.btn_add))
+        f.add(13, "w", r.icon_only(self.btn_record))
         f.add(35, "w", r.hide(self.btn_more))   # also in Settings → General
         f.add(15, "w", r.icon_only(self.btn_folder))
         f.add(33, "w", r.hide(self.btn_folder))   # also in the Backup menu

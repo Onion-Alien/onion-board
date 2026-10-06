@@ -31,7 +31,7 @@ Version **1.9.6** · Windows 10 / 11 · free, no account, no ads, anonymous usag
   any other output you pick (Voicemeeter, a mixer, a capture card, OBS); or nowhere,
   so only you hear them. Your voice goes along, or tick it off and send only sounds.
 - **One-click sounds**: search YouTube, SoundCloud and Myinstants inside the app and
-  add a sound in one click, or drag in files.
+  add a sound in one click, drag in files, or record one with your mic.
 - **Hotkeys that work in-game**, an in-game overlay, MIDI pads, Stream Deck support,
   and your pads on your phone with the optional Onion Pocket add-on.
 - **Bring your board over** from Soundpad, Resanance, Soundux or EXP Soundboard:
