@@ -126,7 +126,7 @@ the launcher the shortcuts and PyInstaller use. The app is the `soundboard` pack
 | `soundboard/ui/bunnywidget.py` | Bun animated: bobs, blinks, talks along with your mic and throws music notes |
 | `soundboard/ui/whatsnew.py` | the *What's new* window shown once after an update, with what the release added and a button to the settings it's about (`NOTES`, newest first: add one per release) |
 | `soundboard/ui/splash.py` | The start-up splash: Bun and a spinner mid-screen while a cold start loads |
-| `soundboard/ui/livedot.py` | the glowing dot (and green icon) on a tab whose feature is live, e.g. the Voice tab while your voice is being changed |
+| `soundboard/ui/livedot.py` | the glowing dot (and highlight-coloured icon) on a tab whose feature is live, e.g. the Voice tab while your voice is being changed |
 | `soundboard/ui/logowidget.py` | the header logo animated: a breathing glow and sheen, flaring with embers while sounds play |
 | `soundboard/ui/overlay.py` | the in-game overlay: a panel of pads that never takes focus, driven by number keys or clicks, on a chosen monitor and spot (or wherever it was dragged) |
 | `soundboard/ui/voicepanel.py` | the Voice tab: voice changer, text-to-speech, live voice-to-speech, add-ons list |
@@ -174,7 +174,8 @@ the launcher the shortcuts and PyInstaller use. The app is the `soundboard` pack
 | `soundboard/clipedit.py` | the clip editor without the window: `LiveBuffer` (the last minute and its waveform, filled on the capture thread) and `Take` (cut, paste, fades, gain, reverse, with undo capped by memory) |
 | `soundboard/recorder.py` | the Radio tab's clip recorder: a rolling last-15-seconds buffer plus a recording spooled to disk |
 | `soundboard/mapped.py` | long sounds stay on disk: decoded cache files over ~30 s (or past a RAM budget) are memory-mapped, and warmed (first second read, the rest prefetched) before they play |
-| `soundboard/library.py` | decoding (bounded to 15 min), the int16 decoded-audio cache (plus each sound's rendered effects version), loudness levelling, duplicating a sound, imports and clips (FLAC), versioned config with backups |
+| `soundboard/library.py` | decoding (bounded to 15 min), the int16 decoded-audio cache (plus each sound's rendered effects version), loudness levelling, duplicating a sound, imports and clips (FLAC), versioned config with backups, saved on a background thread (`Saver`) so a slow disk never freezes the window |
+| `soundboard/usage.py` | the anonymous usage count (*Count me in*, feature `usage_stats`): a daily "still here" to GoatCounter with the version and a random `stats_id`, a one-off first start (with the installer's *Where did you hear about Onion Board?* answer, tidied by `heard_tag`) and *Update now*; installed copies only, never from source. `--usage-count on/off` is the installer's box |
 | `soundboard/theme.py` | colour themes (tokens → stylesheet, also read by the painted widgets) and the logo |
 | `soundboard/settings.py` | Settings window, global hotkey actions, hotkey capture dialog |
 | `soundboard/wheelguard.py` | mouse wheel scrolls the page instead of changing sliders / dropdowns (installed per widget) |
@@ -183,7 +184,7 @@ the launcher the shortcuts and PyInstaller use. The app is the `soundboard` pack
 | `soundboard/testcheck.py` | analysis for the Record-6s test (finds your voice in the output by cross-correlation) |
 | `soundboard/destination.py` | destination modes (Setup tab / Settings → *Who's listening*), one per voice chat engine: shapes the sounds bus for the listener's voice codec — sub-bass harmonics, a low cut with each sound's level given back, codec ceiling, gentle compressor (custom modes), mono |
 | `soundboard/profiles.py` | the simple sound modes over *Who's listening*: Game, Voice chat, Clean, Advanced. Each is a family of destination modes and picks one from detector `Hint`s (what voicesdk sees); a later per-program list would be one more detector. Stored as `dest["simple"]` beside `dest["mode"]` |
-| `soundboard/voicesdk.py` | which *Who's listening* mode suits: first the program recording the virtual cable's far end (`Listeners`: Discord, TeamSpeak and Mumble by name, a game by its files), else the voice engine of the game in front, from the voice libraries in its install folder (the exe path is read with the least access Windows has; nothing touches the game). A suggestion, switched to by itself only when the picker's box says so |
+| `soundboard/voicesdk.py` | which *Who's listening* mode suits: first the program recording what others hear (`Listeners`: your mic on the mic route, plus the virtual cable's far end; Discord, TeamSpeak and Mumble by name, a game by its files), else the voice engine of the game in front, from the voice libraries in its install folder (the exe path is read with the least access Windows has; nothing touches the game). A suggestion, switched to by itself only when the picker's box says so |
 | `soundboard/ui/deleted.py` | the Recently deleted window (Bring back / Delete for good) |
 | `soundboard/ui/resetguide.py` | the Reset guide (pick → check → reset and restart) and the Restore points window |
 | `soundboard/ui/destpanel.py` | the mode picker and the custom-modes editor |
@@ -195,11 +196,12 @@ the launcher the shortcuts and PyInstaller use. The app is the `soundboard` pack
 | `soundboard/ui/chatguide.py` | the Discord and game voice-chat guides (the settings that keep sounds clean) and the check that runs from them |
 | `soundboard/ui/streamguide.py` | the streamer guide for remote control (Stream Deck keys, channel points, chat commands, with the links to copy) and the prompt that lets an AI assistant set it up |
 | `soundboard/sendfx.py` | the send stage before what others hear (your mic, the cable or another device): phase-aware mono downmix, lookahead peak limiter, ducking under your voice |
+| `soundboard/cableremove.py` | the Setup tab's *Remove the virtual cable* (offered once straight into the mic works): runs VB-Audio's own setup program from Program Files with `-u -h`, as admin; other kinds of cable are left alone |
 | `soundboard/cableformat.py` | reads both ends of the virtual cable's Windows format and sets them to 48 kHz, so the cable passes sound through unconverted |
 | `modules/` | add-ons shipped with the app: `retro-fx` (an effects module, the example to copy), `live-voice` (a service module with its own Python environment) and `translate-zh/es/fr/de/ru` (translation modules: a manifest naming a model that's downloaded only when picked). Remote add-ons such as Onion Pocket are installed into `%APPDATA%\OnionBoard\modules`. `ai-voices` (real-time voice conversion: onnxruntime + a Beatrice 2 model, see its README) lives here too but isn't built into the app: it's downloaded from its own release (`scripts/make_ai_voices_zip.py` packs it) |
 | `build.ps1`, `installer/` | the PyInstaller build and the Inno Setup installer (`installer/OnionBoard.iss`); `installer/install-vbcable.ps1` downloads VB-Cable, checks its signature and installs it (used by the app and the installer) |
 | `assets/onionboard.ico` | the .exe, installer and shortcut icon, generated by `scripts/make_icon.py` |
-| `scripts/` | `install.bat` / `install.ps1` / `run.bat` (run from source: set up `.venv` and shortcuts, then launch), `make_icon.py` (regenerates `assets/onionboard.ico` from the logo in `theme.py`), `make_bunny.py` (renders the installer artwork from `bunny.py`; `--preview` for a sheet of poses), `check_sensitive.py` (secrets / personal-data scan, also the pre-commit hook; your own patterns go in a root `.sensitive-patterns`, see `sensitive-patterns.example`), `make_notices.py` (third-party licences for the build), `prune_build.py` (drops the unused parts of Qt from the PyInstaller output; `--dry-run` lists them), `version_info.py` (writes the .exe's version resource from `soundboard.__version__`, so Windows and its firewall prompt name it "Onion Board"), `codec_bench.py` (what voice chat does to your sounds, in numbers), `discord_roundtrip.py` (the same measured through a real Discord call to a second client), `dest_fit.py` (which *Who's listening* mode suits each game), `game_capture.py` (which mic Windows gives a game, its resampling and ducking), `steam_voice_roundtrip.py` (Steam's own voice codec, measured on one PC), `game_roundtrip.py` (a real game, recorded by a friend in the lobby) `docs.py` (the README and website in one go: the screenshots, the version and VirusTotal line from `docs/release.json`, the sitemap dates; `--tour` re-records the tour), `screenshots.py` (renders `docs/screenshots/` offscreen from made-up demo data; set `ONIONBOARD_ONION_WATCH_ZIP` to an Onion Watch module zip to include the Triggers tab) `promo.py` (renders the Triggers promo clips: a made-up game scene drawn with QPainter, a synthesized trombone, ffmpeg) and `tour.py` (records the feature tour `docs/screenshots/tour.webp` from the real app, driven in a window parked off-screen, with the same made-up data as the screenshots) |
+| `scripts/` | `install.bat` / `install.ps1` / `run.bat` (run from source: set up `.venv` and shortcuts, then launch), `build_directmic.py` (builds the mic effect `obmic.dll` with MinGW-w64's g++; `--testhost` also builds the test host), `fetch_tor.py` (unpacks Tor into the gitignored `vendor\tor` to try Tor mode from source), `prepare_art.py` (turns generated pictures into `assets/art/<key>.png`, see its README), `make_icon.py` (regenerates `assets/onionboard.ico` from the logo in `theme.py`), `make_bunny.py` (renders the installer artwork from `bunny.py`; `--preview` for a sheet of poses), `check_sensitive.py` (secrets / personal-data scan, also the pre-commit hook; your own patterns go in a root `.sensitive-patterns`, see `sensitive-patterns.example`), `make_notices.py` (third-party licences for the build), `prune_build.py` (drops the unused parts of Qt from the PyInstaller output; `--dry-run` lists them), `version_info.py` (writes the .exe's version resource from `soundboard.__version__`, so Windows and its firewall prompt name it "Onion Board"), `codec_bench.py` (what voice chat does to your sounds, in numbers), `discord_roundtrip.py` (the same measured through a real Discord call to a second client), `dest_fit.py` (which *Who's listening* mode suits each game), `game_capture.py` (which mic Windows gives a game, its resampling and ducking), `steam_voice_roundtrip.py` (Steam's own voice codec, measured on one PC), `game_roundtrip.py` (a real game, recorded by a friend in the lobby, whose PC runs `game_listener.py`), `docs.py` (the README and website in one go: the screenshots, the version and VirusTotal line from `docs/release.json`, the sitemap dates; `--tour` re-records the tour), `screenshots.py` (renders `docs/screenshots/` offscreen from made-up demo data; set `ONIONBOARD_ONION_WATCH_ZIP` to an Onion Watch module zip to include the Triggers tab) `promo.py` (renders the Triggers promo clips: a made-up game scene drawn with QPainter, a synthesized trombone, ffmpeg) and `tour.py` (records the feature tour `docs/screenshots/tour.webp` from the real app, driven in a window parked off-screen, with the same made-up data as the screenshots) |
 | `tests/` | pytest suite: ring buffer, engine mixing/guards/watchdog, cache and imports, recorder, hotkey parsing, EQ, levelling, config, test analysis, the main window built on Qt's offscreen platform (no window, no devices, no hotkeys) including shrinking it, the overlay, setup guide, voice panel, speech and effects, per-sound effects (speed and pitch measured by frequency and length, every preset, the effects cache, the Edit dialog) and live speed / pitch, the web search, the Triggers tab and its add-on (a made-up one: loading it and refusing one it can't host, zip installs that stay in their folder, downloads checked against GitHub's SHA-256, updates), and the Radio tab against a local stand-in for the directory and a station (parsing untrusted station data, search, cache and mirror failover, a stream decoded to 48 kHz and measured by frequency, dead stations, the globe page's click bridge with the internet blocked) |
 
 Developing:
@@ -215,15 +217,22 @@ the ruff and pytest settings, and a `soundboard` GUI entry point for `pip instal
 
 ## The installer
 
-`build.ps1` runs PyInstaller and produces `dist\OnionBoard\OnionBoard.exe` (one folder,
-QtWebEngine included), then compiles `installer\OnionBoard.iss` with Inno Setup 6
+`build.ps1` builds the mic effect (`scripts\build_directmic.py`, MinGW-w64), runs
+PyInstaller and produces `dist\OnionBoard\OnionBoard.exe` (one folder, QtWebEngine and
+`directmic\obmic.dll` included), then compiles `installer\OnionBoard.iss` with Inno Setup 6
 (`winget install JRSoftware.InnoSetup`) into **`dist\OnionBoardSetup.exe`**, the one
 file to hand out. It installs per user (no admin), adds the Desktop and Start menu
-shortcuts and opens the app. Its *Pick what you want* page (Inno Setup tasks) covers
-VB-Cable (downloaded and signature-checked by `installer\install-vbcable.ps1`), FFmpeg via winget
-(offered only when ffmpeg is missing and winget exists), the add-ons in `modules\`
-(copied to `{app}\modules`; *live-voice* then runs its `install.bat --quiet` when
-Python is present) and the Desktop shortcut. Before it, the *Your privacy* page
+shortcuts and opens the app, whose setup guide puts the sounds straight into the mic.
+The add-ons in `modules\` (all but `ai-voices`) always come along in `{app}\modules`.
+Its *Pick what you want* page (Inno Setup tasks) covers VB-Cable, unticked, only for
+those who'd rather use the cable (downloaded and signature-checked by
+`installer\install-vbcable.ps1`), FFmpeg via winget (offered only when ffmpeg is
+missing and winget exists), setting up live voice-to-speech (*live-voice* runs its
+`install.bat --quiet` when Python is present), Tor, keeping the network activity
+history, *Count me in* (the usage count; ticked, the last page asks where they heard
+about the app) and the Desktop shortcut. Uninstalling runs `--direct-mic remove`
+first (the mic put back as it was; Windows asks only if the effect is on a mic) and
+offers to remove VB-Cable too. Before the boxes, the *Your privacy* page
 says what the app connects to and has an *Offline mode* box: ticked, the installer
 runs `OnionBoard.exe --set-offline` (Offline mode in `config.json` before the first
 start) and unticks the boxes that download. Silent installs use the defaults or the
@@ -231,14 +240,15 @@ previous install's choices; `/OFFLINE=1` is the Offline mode box, and skips the
 download boxes unless `/TASKS=` or `/MERGETASKS=` names them. The installer artwork is Bun the mascot, drawn in code by
 `soundboard/bunny.py` and rendered by `scripts\make_bunny.py` (`--preview` writes a sheet of
 every pose). Settings live in `%APPDATA%\OnionBoard\` either way.
-Every `config.json` save keeps the last three good copies next to it
-(`config.json.1` … `.3`); a damaged file is set aside as `config.json.broken-<time>` and
+Saving `config.json` keeps the last three good copies next to it
+(`config.json.1` … `.3`, rotated at most once an hour); a damaged file is set aside as `config.json.broken-<time>` and
 the newest backup is used, so the pad list is never silently reset.
 
 ## Audio notes
 
-- Sounds are held in RAM as int16 stereo at 48 kHz (half the size of float32; the
-  engine scales them in the same multiply as the gain). Only the first 15 minutes of a
+- Sounds are held as int16 stereo at 48 kHz (half the size of float32; the
+  engine scales them in the same multiply as the gain): short ones in RAM, long ones
+  memory-mapped from the cache (`mapped.py`). Only the first 15 minutes of a
   file are ever decoded. Video, m4a, aac and wma imports are stored as FLAC of their
   audio rather than a copy of the source, so the library is small and stays playable
   without ffmpeg. Re-importing a file that's already in the library is refused by

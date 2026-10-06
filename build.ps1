@@ -1,7 +1,8 @@
 # Builds a self-contained Onion Board for PCs without Python:
 #   dist\OnionBoard\OnionBoard.exe  (one folder)
-#   dist\OnionBoardSetup.exe          (the one file to give people: installs the app,
-#                                      the virtual cable and the shortcuts)
+#   dist\OnionBoardSetup.exe          (the one file to give people: installs the app
+#                                      and the shortcuts; the virtual cable only if
+#                                      its box is ticked)
 #
 # The installer step needs Inno Setup 6 once:  winget install JRSoftware.InnoSetup
 #

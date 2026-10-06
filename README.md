@@ -27,17 +27,20 @@ Version **1.9.2** · Windows 10 / 11 · free, no account, no ads, anonymous usag
 
 - **Sounds into Discord and games.** By default they go straight into your own mic:
   one click in the app, and Discord and games hear them through the mic they already
-  use, with no virtual cable to install. Or use a free virtual cable, any other output
-  you pick (Voicemeeter, a mixer, a capture card, OBS), or nowhere, so only you hear
-  them. Your voice goes along, or tick it off and send only sounds.
+  use, with no virtual cable to install. Or, as a backup, the free virtual cable; or
+  any other output you pick (Voicemeeter, a mixer, a capture card, OBS); or nowhere,
+  so only you hear them. Your voice goes along, or tick it off and send only sounds.
 - **Hotkeys that work in-game**, MIDI pads, an in-game overlay, Stream Deck support,
   and your pads on your phone with the optional Onion Pocket add-on.
 - **Add sounds from anywhere**: drag in files, or search YouTube and SoundCloud
   inside the app.
 - **Effects on any sound**: trim, speed, pitch, bass boost, reverse. One-click
   *Ear rape*, *Nightcore*, *Slowed + reverb*.
-- **Voice changer, text-to-speech** and live voice-to-speech.
+- **Voice changer, text-to-speech** and live voice-to-speech, plus optional **AI
+  voices** that make you sound like someone else, live on your own PC.
 - **Instant replay**: one key turns the last 30 seconds you heard into a pad.
+- **Share a program's sound** (music, a video) with your friends, and grab the bit you
+  want from it in the **clip editor**.
 - **Screen triggers**, **world radio**, a **clean stream output for OBS**, and 31 themes.
 
 The full list is in [docs/FEATURES.md](docs/FEATURES.md).
@@ -82,9 +85,9 @@ Optional: if you never get it, nothing changes.
      mic** and **Yes** when Windows asks (once). Discord and games keep your normal
      mic, so there's nothing to pick there. In Discord, set *User Settings → Voice &
      Video → Input Profile* to **Studio** so it doesn't filter your sounds out.
-   - **The virtual cable** (the other way): installs the free VB-Cable; in Discord or
-     your game, set your microphone to `CABLE Output` (and Discord's *Input Profile*
-     to **Studio**).
+   - **The virtual cable** (the backup, if your mic won't take it): installs the free
+     VB-Cable; in Discord or your game, set your microphone to `CABLE Output` (and
+     Discord's *Input Profile* to **Studio**).
    - **Another device**: any output but your headphones, such as Voicemeeter, a
      mixer, a capture card or a second sound card. Nothing is installed. In OBS add
      it as an *Audio Output Capture*; in Voicemeeter or a mixer, send that input on
@@ -100,20 +103,25 @@ Optional: if you never get it, nothing changes.
 
 ### Something's not right?
 
-- **Friends hear nothing:** the pill at the top should be green. Straight into your
-  mic, it reads *In your mic — Discord / games hear your sounds*, and Discord or the
+- **Friends hear nothing:** the pill at the top should have a tick (✓), not a warning
+  sign. Straight into your mic, it reads *In your mic — Discord / games hear your sounds*, and Discord or the
   game must be using that same mic. With the cable, it reads *Your mic in Discord /
-  games* and their app's microphone must be `CABLE Output`. With another device, it reads *Sending to:* and whatever sits on the other
-  end (OBS, Voicemeeter, your mixer) must be picking that device up. With *Nowhere*,
-  only you hear sounds, on purpose.
+  games* and their app's microphone must be `CABLE Output`. With another device, it
+  reads *Sending to:* and whatever sits on the other end (OBS, Voicemeeter, your
+  mixer) must be picking that device up. With *Nowhere*, only you hear sounds, on
+  purpose.
 - **They hear sounds but not you:** tick **Others hear it** under *My mic*.
 - **Check it yourself:** *Setup → Record 6s → play back* records what others get (it
   works any way but *Nowhere*).
 - **Switch how sounds go out any time:** *Setup → Devices → Send to others through*.
+- **Have the virtual cable from before?** Once your sounds are in your mic, the
+  *Setup* tab offers to remove it. Keep it if another program uses it.
 - **Still stuck?** [Open an issue](../../issues/new/choose) and attach
   `%APPDATA%\OnionBoard\onionboard.log` (skim it first: it has your device names).
 
 Your sounds and settings live in `%APPDATA%\OnionBoard\` and survive reinstalls.
+
+<a id="license"></a>
 
 ## Free, and it stays free
 

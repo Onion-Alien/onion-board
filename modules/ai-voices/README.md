@@ -4,7 +4,9 @@ Talk, and others hear a different person: your words, timing and tone in another
 voice, live, on your PC's CPU. It isn't part of Onion Board or its installer; the
 Voice tab's *Get AI voices* button downloads it (`AiVoices-module.zip` from this
 project's `ai-voices` release, checked against GitHub's SHA-256) and
-*Remove AI voices* deletes it again.
+*Remove AI voices* deletes it again. Its install (`install.bat` does the same) needs
+Python 3.12+ and makes its own `.venv` with the pinned `onnxruntime` and `numpy`;
+nothing of it runs inside the app.
 
 ## How it works
 
@@ -42,7 +44,7 @@ person. Never add a voice made to sound like a real, identifiable person.
   runtime is our own ONNX export (`tools/stream_model.py`).
 - onnxruntime: MIT licence.
 
-The model in `model/` isn't this project's own work: it's converted from Project
+The model in `model/` (in the released zip; never committed) isn't this project's own work: it's converted from Project
 Beatrice's pretrained models, which their repository releases under the MIT
 licence (code *and* pretrained models). Their licence travels with it:
 [LICENSE-beatrice.txt](LICENSE-beatrice.txt).

@@ -40,7 +40,8 @@ in a later commit.
    (`numpy`); keep it that way. No copyrighted sound effects, music or clips.
 5. **No bundled third-party binaries.** Dependencies come from PyPI via
    `requirements.txt`; VB-Cable is downloaded when someone chooses to install it because its licence
-   forbids redistribution. Don't add `.exe`, `.dll` or driver files.
+   forbids redistribution. Don't add `.exe`, `.dll` or driver files. Native code (the
+   mic effect in `native/directmic/`) is committed as source and built by `build.ps1`.
 6. **Assets must be ours.** Icons and artwork are drawn in code (`theme.py`,
    `icons.py`, `bunny.py`), except pictures made for this project in `assets/art/`
    (see its README); the app works without them. Other images, fonts or sounds need
@@ -51,7 +52,10 @@ in a later commit.
 8. **Loopback stays locked.** Local sockets bind to `127.0.0.1` only and must
    check a secret with `secrets.compare_digest`: a per-launch one, or, for the
    opt-in remote control API, the key shown in Settings. Never log the secret or
-   a URL containing it.
+   a URL containing it. The one server that listens beyond this PC, the opt-in one for
+   remote add-ons such as Onion Pocket, answers local-network addresses only and needs
+   its own key. Treat anything read from the mic effect's shared file as untrusted:
+   any signed-in user can write it.
 
 If you commit something sensitive by accident, **don't just delete it in a new
 commit** — it's still in history. Rotate/revoke it first, then say so in the PR (or

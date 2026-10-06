@@ -17,7 +17,8 @@
 ;         signature-checked by install-vbcable.ps1; Windows asks "Yes" once)
 ;       * FFmpeg for m4a / aac / video files (via winget; hidden when ffmpeg is
 ;         already there or winget isn't)
-;       * the add-on modules in ..\modules (retro voice effect, live voice-to-speech)
+;       * live voice-to-speech's set-up (its module itself always ships, like the
+;         other add-on modules in ..\modules but ai-voices)
 ;       * Tor, unticked: the installer doesn't carry it. A ticked box runs
 ;         OnionBoard.exe --get-tor, which downloads the Tor Project's Expert Bundle
 ;         (soundboard/torget.py: SHA-256 pinned, the saved proxy used) into

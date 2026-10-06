@@ -46,6 +46,7 @@ Lethal Company's occlusion and walkie-talkie filters come from its decompiled
 - **Windows' default mic.** Voice SDKs ask Windows for the *default communication
   device*, which "Set as Default Device" doesn't change; the Setup tab's
   *Game has no microphone setting?* steps (shown on the cable route) now set both.
+  Straight into your mic there's nothing to switch: the game keeps the mic it has.
 
 - **Steam voice, measured** (`scripts/steam_voice_roundtrip.py`): Steamworks reports
   24 kHz as its voice rate, confirming the 12 kHz ceiling. Its capture gates the
@@ -197,7 +198,10 @@ front wins). A browser recording the cable gets the new *Browser voice (WebRTC)*
 the same 80 Hz cut as Epic Online Services, whose cleanup is the same WebRTC code (in
 the sweep above the browser profile measured −1.4 dB at 80 Hz and −1.3 at 90; the
 99-song numbers are below). With *Pick the mode by itself* ticked, the picker uses
-it as soon as it's found; with nothing listening the mode stays as it is.
+it as soon as it's found; with nothing listening the mode stays as it is. Since 1.9
+(sounds straight into your own mic) it looks at the programs recording your mic and,
+if you have one, the cable's far end too. The **Game** and **Voice chat** modes use
+the same answer to pick the exact profile by themselves.
 
 **Browser, Zoom and Teams on all 99 songs** (2026-10; same measure as the table above:
 median dB against the song played straight in, no mode → the Browser mode):

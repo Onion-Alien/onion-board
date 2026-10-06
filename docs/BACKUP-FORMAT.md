@@ -99,11 +99,14 @@ Only `name` and `audio` are needed; everything else falls back to the defaults.
 ## `settings.json`
 
 The app's settings (`Config` in `soundboard/library.py`) minus anything that
-belongs to one PC or that must only be switched on by hand: audio devices, where
-sounds are sent (the cable / another device / nowhere route), the setup-guide state,
-per-program Apps settings, category hotkeys, the remote-control switch, port and
-key, the network settings (connection mode, proxy, Offline mode, Tor) and the
-downloaded-code settings (yt-dlp auto-update, the update check and its state). On
+belongs to one PC or that must only be switched on by hand (`LOCAL_SETTINGS` in
+`soundboard/backup.py`): audio devices, where sounds are sent (straight into the mic,
+the cable, another device or nowhere), the setup-guide state, per-program Apps
+settings, the Triggers tab's screen settings, category hotkeys, the remote-control
+switch, port and key, remote add-ons' settings (Onion Pocket), the network settings
+(connection mode, proxy, per-feature switches, Offline mode, Tor bridges), the data
+& quality settings, the usage count's ID and state, and the downloaded-code settings
+(yt-dlp auto-update, the update check and its state). On
 import only known settings of the right type are used, and only if the user says
 yes.
 
