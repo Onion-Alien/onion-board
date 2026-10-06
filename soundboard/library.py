@@ -159,12 +159,29 @@ SETTING_RANGES = {"sound_vol": (0.0, VOLUME_MAX), "mic_vol": (0.0, VOLUME_MAX),
                   "duck_db": (-24.0, 0.0), "replay_seconds": (5, 120)}
 
 
+def clean_programs(v) -> dict[str, str]:
+    """Config.category_programs as the app can use it: {exe file name, lower case:
+    category}; entries that aren't a plain file name and a category name are dropped."""
+    out: dict[str, str] = {}
+    if not isinstance(v, dict):
+        return out
+    for exe, cat in v.items():
+        if not isinstance(exe, str) or not isinstance(cat, str) or not cat.strip():
+            continue
+        name = exe.strip().lower()
+        if name and name not in (".", "..") and not any(c in name for c in "/\\:"):
+            out[name] = cat.strip()
+    return out
+
+
 def clean_setting(k: str, v):
     """Setting `k` (already of the right type) as the app can use it: brought into the
     range of its control. None if it's unusable, so the default applies instead."""
     if k in SETTING_RANGES:
         lo, hi = SETTING_RANGES[k]
         return min(max(v, lo), hi)
+    if k == "category_programs":   # {exe file name: category}; anything else is dropped
+        return clean_programs(v)
     if k == "net_mode":   # a mode this version doesn't know (a newer one's): fail
         return v if v in NET_MODES else "proxy"   # closed, never quietly direct
     if k in ("net_off", "tabs_off"):   # keys (strings); unknown ones are kept, so a
@@ -379,6 +396,10 @@ class Config:
     scoped_hotkeys: bool = False
     single_click: bool = False        # one click on a pad plays it (not a double-click)
     category_hotkeys: dict = field(default_factory=dict)   # category -> its random-sound key
+    # Switch category when a program is in front (soundboard.catswitch): {"game.exe":
+    # category}, set by the user from a category's menu; and the switch for all of it
+    category_programs: dict = field(default_factory=dict)
+    category_programs_on: bool = True
     # instant replay (soundboard.replay): while this hotkey is set, the last
     # replay_seconds of everything you hear (except Onion Board's own sounds) are kept
     # in memory, and the key saves them as a new pad

@@ -1148,11 +1148,58 @@ class SettingsDialog(QDialog):
         hint.setWordWrap(True)
         cv.addWidget(hint)
         v.addWidget(card)
+        v.addWidget(self._programs_card())
         v.addWidget(self._background_card())
         v.addWidget(self._backup_card())
         v.addWidget(self._reset_card())
         v.addStretch(1)
         return w
+
+    def _programs_card(self):
+        """Switch category when a program is in front: every rule in one place."""
+        card, cv = self._card(
+            "Switch category by program",
+            "Right-click a category tab → Show this when a program is in front… and the "
+            "board shows that category by itself whenever the program is in front.")
+        self.box_programs = self._option(
+            cv, "Switch by itself",
+            "When the program closes, the board goes back to what it showed before.",
+            self.mw.cfg.category_programs_on, self.mw.set_category_programs_on)
+        self.programs_list = QVBoxLayout()
+        self.programs_list.setSpacing(4)
+        cv.addLayout(self.programs_list)
+        self._fill_programs()
+        if hasattr(self.mw, "category_programs_changed"):
+            self.mw.category_programs_changed.connect(self._fill_programs)
+        return card
+
+    def _fill_programs(self):
+        lay = self.programs_list
+        while lay.count():
+            w = lay.takeAt(0).widget()
+            if w is not None:
+                w.deleteLater()
+        rules = self.mw.cfg.category_programs
+        if not rules:
+            none = QLabel("No programs set yet.")
+            none.setObjectName("muted")
+            lay.addWidget(none)
+        for exe, cat in sorted(rules.items()):
+            row = QWidget()
+            h = QHBoxLayout(row)
+            h.setContentsMargins(0, 0, 0, 0)
+            missing = cat not in self.mw.cfg.categories
+            lbl = QLabel(f"{exe}  →  “{cat}”" + ("  (no such category now)" if missing
+                                                   else ""))
+            lbl.setObjectName("muted" if missing else "")
+            h.addWidget(lbl, 1)
+            rm = QPushButton("Remove")
+            rm.setObjectName("small")
+            rm.setToolTip(f"Stop switching to “{cat}” when {exe} is in front")
+            icons.set_icon(rm, "trash", "danger_text", size=12)
+            rm.clicked.connect(lambda _c=False, e=exe: self.mw.remove_category_program(e))
+            h.addWidget(rm)
+            lay.addWidget(row)
 
     # Settings > Tabs: what each tab that can be switched off is for (taboff.KEYS)
     TAB_HINTS = {
