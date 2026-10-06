@@ -5512,7 +5512,8 @@ class MainWindow(QMainWindow):
         f.add(10, "w", r.hide(*self._pad_size))
         f.add(16, "w", r.hide(self._mode_pick[0]))   # the dropdown's tooltip says what it is
         f.add(38, "w", r.hide(self._mode_pick[1]))   # also on the Setup tab
-        f.add(12, "w", r.hide(*self._mixer_send))
+        # the ear button shrinks to its icon first: the level bar is the live part
+        f.add(12, "w", r.icon_only(self.btn_check))
         f.add(14, "w", r.hide(self.np_time))
         f.add(45, "w", r.hide(self.speed_btn))
         f.add(20, "w", self._shorten_pill)
@@ -5522,7 +5523,6 @@ class MainWindow(QMainWindow):
         f.add(22, "w", r.icon_only(self.gear))
         f.add(30, "w", r.hide(self.chk_monitor))
         f.add(28, "w", r.icon_only(self.chk_mic))   # its tooltip still explains it
-        f.add(34, "w", r.icon_only(self.btn_check))
         f.add(55, "w", r.hide(*self._mixer_hp))
         f.add(40, "w", r.hide(*self._transport_vol))
         f.add(50, "w", r.hide(self.np_name))
@@ -5532,7 +5532,7 @@ class MainWindow(QMainWindow):
         f.add(15, "w", r.icon_only(self.btn_folder))
         f.add(33, "w", r.hide(self.btn_folder))   # also in the Backup menu
         f.add(60, "w", self._tab_icons_only)
-        f.add(70, "w", r.hide(self.btn_check, *self._mixer_others))
+        f.add(70, "w", r.hide(self.btn_check, *self._mixer_send, *self._mixer_others))
         f.add(80, "w", r.hide(self.pill))
         f.add(85, "w", self._tabs_tight)   # else the icons alone held it at ~480 px
         self._radio_steps = self.radio.fit_steps()   # swapped with the tab (Privacy)
