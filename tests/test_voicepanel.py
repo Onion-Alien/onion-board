@@ -1058,3 +1058,73 @@ def test_copy_from_a_tile_with_the_window_closed_says_so(panel, monkeypatch):
     assert p.fx.undo_bar.isVisibleTo(p.fx) and p.fx.undo_bar.btn_undo.isHidden()
     p.fx.delete_voice("Mine")                        # a real Undo shows its button again
     assert not p.fx.undo_bar.btn_undo.isHidden()
+
+
+def test_make_it_yours_buttons_are_at_the_top(panel):
+    fx = panel[0].fx
+    tools = fx.btn_random.parentWidget()
+    for b in (fx.btn_save, fx.btn_share, fx.btn_import, fx.btn_bin):
+        assert b.parentWidget() is tools                     # one row of buttons...
+    assert fx.tweak.layout().indexOf(tools) == 0             # ...first in the window
+
+
+def test_effect_cards_fold_and_stay_folded(qapp, monkeypatch):
+    monkeypatch.setattr(tts.SapiTTS, "warm_up", lambda self: [])
+    from soundboard.ui.voicepanel import VoicePanel
+    p = VoicePanel(FakeEngine(), {}, {"folded": ["ai", "fx.echo"]})
+    try:
+        echo, radio = p.fx.rows["echo"], p.fx.rows["radio"]
+        assert echo.is_folded() and echo.desc.isHidden() and not radio.is_folded()
+        saved = []
+        p.speech_changed.connect(saved.append)
+        radio.chk.setChecked(True)
+        assert not radio.body.isHidden()
+        radio.arrow.click()                                  # fold it: just its title line
+        assert radio.body.isHidden() and radio.desc.isHidden() and radio.chk.isChecked()
+        assert saved[-1]["folded"] == ["ai", "fx.echo", "fx.radio"]
+        echo.chk.setChecked(True)                            # switching it on opens it
+        assert not echo.is_folded() and not echo.body.isHidden()
+        assert saved[-1]["folded"] == ["ai", "fx.radio"]
+        p.fx.pick("Robot")                                   # a voice pick leaves folds be
+        assert radio.is_folded() and not p.fx.rows["robot"].is_folded()
+    finally:
+        p.shutdown()
+        p.deleteLater()
+
+
+def test_effect_columns_stack_without_holes(panel, qapp):
+    """Two columns, each card under the shorter one: no hole beside a short card,
+    and the columns end close together, after a voice pick and after folding."""
+    fx = panel[0].fx
+    fx.open_tweak()
+    fx.dlg.resize(800, 700)
+
+    def check():
+        for _ in range(3):
+            qapp.processEvents()
+        assert fx._fx_cols == 2
+        cols = [[col.itemAt(i).widget() for i in range(col.count() - 1)]
+                for col in fx._fx_columns]
+        assert sorted(len(c) for c in cols)[0] >= 3
+        assert not any(lbl.isVisible() for lbl in fx._groups.values())
+        bottoms = []
+        for col in cols:
+            for a, b in zip(col, col[1:]):
+                assert b.y() - (a.y() + a.height()) == 10      # just the spacing
+            bottoms.append(col[-1].y() + col[-1].height())
+        tallest = max(c.height() for col in cols for c in col)
+        assert abs(bottoms[0] - bottoms[1]) <= tallest          # no long empty run
+
+    check()
+    fx.pick("Robot")
+    for t in ("radio", "helmet", "tone"):
+        fx.rows[t].chk.setChecked(True)
+    check()
+    for t in ("compressor", "distortion", "shout", "chorus", "echo"):
+        fx.rows[t].arrow.click()
+    check()
+    fx.dlg.resize(500, 700)                                   # one column: titles back
+    for _ in range(3):
+        qapp.processEvents()
+    assert fx._fx_cols == 1 and fx._groups["Character"].isVisible()
+    fx.dlg.close()

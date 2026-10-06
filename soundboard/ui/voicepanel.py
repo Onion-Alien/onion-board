@@ -30,7 +30,7 @@ from soundboard.speech import customvoices, translation, winvoices
 from soundboard.speech.aivoice import AiVoiceController
 from soundboard.speech.live import SpeechController, clean_settings
 from soundboard.ui import appstate, art, busy, icons
-from soundboard.ui.panel import (UndoBar, VolumeControl, bar, card, hint_label, icon_label,
+from soundboard.ui.panel import (Flow, UndoBar, VolumeControl, bar, card, hint_label, icon_label,
                                  section_label, vsep)
 from soundboard.ui.responsive import FitWidth
 from soundboard.ui.widgets import Meter
@@ -327,8 +327,11 @@ KEEP = frozenset({"cleanup"})
 class EffectRow(QFrame):
     """One effect as a card: icon, name, an on/off switch, what it does, and its
     settings while it's on. `hero` (Pitch, Clean up my mic): the settings always
-    show, and moving one switches the effect on."""
+    show, and moving one switches the effect on. Its arrow folds it down to just
+    its title line (`folded_changed`)."""
     changed = Signal()
+    folded_changed = Signal(bool)
+    reshaped = Signal()   # taller or shorter: switched on or off, folded or opened
 
     def __init__(self, cls: type[voicefx.Effect], cfg: dict, hero: bool = False):
         super().__init__()
@@ -359,6 +362,13 @@ class EffectRow(QFrame):
         self.chk = Switch(f"Turn {cls.name} on or off")
         self.chk.setChecked(bool(cfg.get("on")))
         head.addWidget(self.chk)
+        self.arrow = QPushButton()
+        self.arrow.setObjectName("fold")
+        self.arrow.setFixedSize(24, 24)
+        self.arrow.setCursor(Qt.PointingHandCursor)
+        self.arrow.clicked.connect(lambda: self.set_folded(not self._folded, asked=True))
+        head.addWidget(self.arrow)
+        self._folded = False
         v.addLayout(head)
         self.desc = hint_label(cls.description)
         self.desc.setObjectName("fxdesc")
@@ -383,22 +393,47 @@ class EffectRow(QFrame):
             grid.setColumnStretch(c, 1)
         v.addWidget(self.body)
         self.chk.toggled.connect(self._toggled)
-        self._shown: bool | None = None   # the on/off the card last showed
+        self._shown: tuple | None = None   # the (on, folded) the card last showed
+        self._paint_arrow()
         self._show()
 
     def _show(self):
         on = self.chk.isChecked()
-        if on == self._shown:
+        if (on, self._folded) == self._shown:
             return   # a voice pick loads all 13 cards: only those it switched need showing
-        self._shown = on
-        self.body.setVisible(on or self.hero)
-        self.btn_reset.setVisible(on)
+        self._shown = (on, self._folded)
+        self.desc.setVisible(not self._folded)
+        self.body.setVisible((on or self.hero) and not self._folded)
+        self.btn_reset.setVisible(on and not self._folded)
         if bool(self.property("on")) != on:
             self.setProperty("on", on)
             self.style().unpolish(self)
             self.style().polish(self)
+        self.reshaped.emit()
 
-    def _toggled(self, _on):
+    def is_folded(self) -> bool:
+        return self._folded
+
+    def set_folded(self, folded: bool, asked: bool = False):
+        """Folded: just the icon, name, switch and arrow. `asked`: the arrow (or the
+        switch) did it, so it's remembered."""
+        if folded == self._folded:
+            return
+        self._folded = folded
+        self._paint_arrow()
+        self._show()
+        if asked:
+            self.folded_changed.emit(folded)
+
+    def _paint_arrow(self):
+        icons.set_icon(self.arrow, "fold" if self._folded else "fold_open", "muted", "text",
+                       size=12)
+        self.arrow.setToolTip(f"Show {self.cls.name}" if self._folded
+                              else f"Fold {self.cls.name} away")
+
+    def _toggled(self, on):
+        if on and self._folded:
+            self.set_folded(False, asked=True)   # switched on: show its sliders
         self._show()
         self.changed.emit()
 
@@ -467,6 +502,7 @@ class VoiceFxPanel(QWidget):
     changed = Signal(dict)
     chat_help = Signal()
     tip_dismissed = Signal()
+    folds_changed = Signal(list)   # the effect types whose cards are folded away
 
     COLS = 3
 
@@ -602,19 +638,11 @@ class VoiceFxPanel(QWidget):
         tv = QVBoxLayout(self.tweak)
         tv.setContentsMargins(0, 0, 0, 0)
         tv.setSpacing(10)
-        head = QHBoxLayout()
-        head.setSpacing(8)
-        head.addWidget(QLabel("<b>Make it yours</b>"))
-        head.addStretch(1)
-        self.delay = QLabel()
-        self.delay.setObjectName("pill")
-        head.addWidget(self.delay)
-        tv.addLayout(head)
-        self.hero_box = QVBoxLayout()
-        self.hero_box.setSpacing(10)
-        tv.addLayout(self.hero_box)
-        srow = QHBoxLayout()
-        srow.setSpacing(6)
+        # the window's buttons, all along the top (they wrap when it's narrow); the
+        # title bar already says "Make it yours"
+        tools = QWidget()
+        srow = Flow(tools, gap=6)
+        tv.addWidget(tools)
         self.btn_random = QPushButton("Randomize")
         self.btn_random.setIcon(art.random_icon())
         self.btn_random.setIconSize(QSize(16, 16))
@@ -628,34 +656,31 @@ class VoiceFxPanel(QWidget):
                                  "button under “Pick a voice”.")
         self.btn_save.clicked.connect(self.save_voice)
         srow.addWidget(self.btn_save)
-        srow.addStretch(1)
-        tv.addLayout(srow)
         # saved voices: share one as a line of text, add one a friend sent
-        vrow = QHBoxLayout()
-        vrow.setSpacing(6)
         self.btn_share = QPushButton("Copy share code")
         icons.set_icon(self.btn_share, "copy")
-        self.btn_share.setObjectName("small")
         self.btn_share.setToolTip("Copy the saved voice that's on as a short code to paste to "
                                   "a friend: just its name and settings")
         self.btn_share.clicked.connect(lambda: self.copy_code(self._preset))
-        vrow.addWidget(self.btn_share)
+        srow.addWidget(self.btn_share)
         self.btn_import = QPushButton("Import a code…")
         icons.set_icon(self.btn_import, "plus")
-        self.btn_import.setObjectName("small")
         self.btn_import.setToolTip("Add a voice someone sent you as a code (it starts "
                                    "with “OB1-”)")
         self.btn_import.clicked.connect(lambda: self.import_code())
-        vrow.addWidget(self.btn_import)
+        srow.addWidget(self.btn_import)
         self.btn_bin = QPushButton("Recently deleted")
         icons.set_icon(self.btn_bin, "trash")
-        self.btn_bin.setObjectName("small")
         self.btn_bin.setToolTip("Saved voices you deleted, kept for "
                                 f"{savedvoices.KEEP_DAYS} days so you can bring them back")
         self.btn_bin.clicked.connect(self.show_deleted)
-        vrow.addWidget(self.btn_bin)
-        vrow.addStretch(1)
-        tv.addLayout(vrow)
+        srow.addWidget(self.btn_bin)
+        self.delay = QLabel()
+        self.delay.setObjectName("pill")
+        srow.addWidget(self.delay)
+        self.hero_box = QVBoxLayout()
+        self.hero_box.setSpacing(10)
+        tv.addLayout(self.hero_box)
         pv.addWidget(self.tweak)
 
         # ---- every effect, as cards in groups
@@ -668,17 +693,31 @@ class VoiceFxPanel(QWidget):
                                       "own voice. Changing anything switches to “My own "
                                       "mix”; like it? Save it as a voice and it gets a "
                                       "button of its own."))
-        self._groups: dict[str, tuple[QLabel, QGridLayout]] = {}
+        # two columns that stack their cards tightly, each card going under the shorter
+        # one: a grid (or a row per group) left holes beside the shorter cards. The
+        # group titles show in one column only, where they can't leave a hole.
+        self._groups: dict[str, QLabel] = {}
         for title, _types in (*GROUPS, (ADDON_GROUP, ())):
             lbl = QLabel(title)
             lbl.setObjectName("fxgroup")
-            g = QGridLayout()
-            g.setHorizontalSpacing(10)
-            g.setVerticalSpacing(10)
-            self.box.addWidget(lbl)
-            self.box.addLayout(g)
-            self._groups[title] = (lbl, g)
+            self._groups[title] = lbl
+        self._fx_row = QHBoxLayout()
+        self._fx_row.setSpacing(10)
+        self._fx_columns: list[QVBoxLayout] = []
+        for _ in range(2):
+            col = QVBoxLayout()
+            col.setSpacing(10)
+            col.addStretch(1)
+            self._fx_row.addLayout(col, 1)
+            self._fx_columns.append(col)
+        self.box.addLayout(self._fx_row)
         self._fx_cols = 2
+        self._placed: list | None = None   # what each column holds now
+        self._replace = QTimer(self)       # a voice pick changes many cards: once after
+        self._replace.setSingleShot(True)
+        self._replace.setInterval(0)
+        self._replace.timeout.connect(self._place_cards)
+        self._folded_fx: set[str] = set()
         pv.addWidget(self.more)
         pv.addStretch(1)
         done = QHBoxLayout()
@@ -836,6 +875,8 @@ class VoiceFxPanel(QWidget):
             if cols != self._fx_cols:
                 self._fx_cols = cols
                 self._place_cards()
+            else:
+                self._reshape()   # wider or narrower: the cards' text wraps differently
         return super().eventFilter(obj, e)
 
     # ------------------------------------------------------------------ saved voices
@@ -1153,6 +1194,9 @@ class VoiceFxPanel(QWidget):
                 cfg = {"on": True} if etype in KEEP else {}
             r = EffectRow(cls, cfg, hero=etype in HERO)
             r.changed.connect(lambda t=etype: self._edited(t))
+            r.set_folded(etype in self._folded_fx)
+            r.folded_changed.connect(lambda f, t=etype: self._card_folded(t, f))
+            r.reshaped.connect(self._reshape)
             if etype in HERO:
                 self.hero_box.insertWidget(min(HERO.index(etype), self.hero_box.count()), r)
             self.rows[etype] = r
@@ -1160,22 +1204,66 @@ class VoiceFxPanel(QWidget):
         if added:
             self._place_cards()
 
-    def _place_cards(self):
-        """The effect cards into their groups' grids, `_fx_cols` a row."""
-        cols = self._fx_cols
-        placed = set(HERO)
+    def set_folded(self, types):
+        """Fold these effects' cards (the rest open): what `folds_changed` said last time."""
+        self._folded_fx = {t for t in types if isinstance(t, str)}
+        for t, r in self.rows.items():
+            r.set_folded(t in self._folded_fx)
+
+    def _card_folded(self, etype: str, folded: bool):
+        (self._folded_fx.add if folded else self._folded_fx.discard)(etype)
+        self.folds_changed.emit(sorted(self._folded_fx))
+
+    def _ordered_cards(self) -> list[tuple[str, list[EffectRow]]]:
+        """(group title, its cards) in reading order; add-on effects last."""
+        grouped = set(HERO)
         for _title, types in GROUPS:
-            placed.update(types)
-        for title, (lbl, g) in self._groups.items():
-            types = dict(GROUPS).get(title) or [t for t in self.rows if t not in placed]
-            cards = [self.rows[t] for t in types if t in self.rows]
-            for c in cards:
-                g.removeWidget(c)
-            for i, c in enumerate(cards):
-                g.addWidget(c, i // cols, i % cols, Qt.AlignTop)
-            for c in range(2):
-                g.setColumnStretch(c, 1 if c < cols else 0)
-            lbl.setVisible(bool(cards))
+            grouped.update(types)
+        out = []
+        for title in self._groups:
+            types = dict(GROUPS).get(title) or [t for t in self.rows if t not in grouped]
+            out.append((title, [self.rows[t] for t in types if t in self.rows]))
+        return out
+
+    @staticmethod
+    def _card_height(c: QWidget, width: int) -> int:
+        return c.heightForWidth(width) if c.hasHeightForWidth() else c.sizeHint().height()
+
+    def _place_cards(self):
+        """The effect cards into the columns: one column with the group titles, or two
+        with each card under whichever column is shorter so far (in reading order),
+        so a short card never leaves a hole beside a tall one."""
+        groups = self._ordered_cards()
+        if self._fx_cols == 1:
+            plan = [[w for title, cards in groups if cards
+                     for w in (self._groups[title], *cards)], []]
+        else:
+            width = max(200, (self.more.width() - self._fx_row.spacing()) // 2)
+            plan, heights = [[], []], [0, 0]
+            for _title, cards in groups:
+                for c in cards:
+                    i = 0 if heights[0] <= heights[1] else 1
+                    plan[i].append(c)
+                    heights[i] += self._card_height(c, width) + 10
+        if plan == self._placed:
+            return   # nothing moves (most on/off flips)
+        self._placed = plan
+        for lbl in self._groups.values():
+            lbl.hide()
+        for col in self._fx_columns:
+            while col.count() > 1:           # all but the stretch
+                col.takeAt(0)
+        for col, widgets in zip(self._fx_columns, plan):
+            for w in widgets:
+                col.insertWidget(col.count() - 1, w)   # above the column's stretch
+                if isinstance(w, QLabel):
+                    w.show()                           # a group title
+        self._fx_row.setStretch(1, 1 if self._fx_cols == 2 else 0)
+
+    def _reshape(self):
+        """A card got taller or shorter (on/off, folded): balance the columns again."""
+        if self._fx_cols == 2:
+            self._replace.start()
 
     def _mine(self) -> bool:
         """Is Fine-tune showing your own mix? A nudged preset counts only while you
@@ -2453,6 +2541,9 @@ class VoicePanel(QWidget):
         # left on from last time, it changed your mic the moment the app opened.
         self.fx = VoiceFxPanel({**voicefx.clean_spec(fx_spec), "enabled": False})
         self.fx.changed.connect(self._fx_changed)
+        # Make it yours' folded effect cards: "fx.<type>" in the same list
+        self.fx.set_folded(k[3:] for k in self._folded if k.startswith("fx."))
+        self.fx.folds_changed.connect(self._fx_folds)
         lcol.addWidget(self._fold_card("fx", self.fx))
         lcol.addStretch(1)
 
@@ -2595,6 +2686,12 @@ class VoicePanel(QWidget):
         if folded == (key in self._folded):
             return
         (self._folded.add if folded else self._folded.discard)(key)
+        self.speech.s["folded"] = sorted(self._folded)   # kept with the speech settings
+        self.speech_changed.emit(dict(self.speech.s))
+
+    def _fx_folds(self, types: list):
+        self._folded = {k for k in self._folded if not k.startswith("fx.")} | {
+            f"fx.{t}" for t in types}
         self.speech.s["folded"] = sorted(self._folded)   # kept with the speech settings
         self.speech_changed.emit(dict(self.speech.s))
 
