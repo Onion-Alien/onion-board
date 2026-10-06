@@ -22,6 +22,10 @@ def dropped_cycle():
 
 def test_a_cycle_is_never_collected_on_another_thread(qapp):
     assert not gc.isenabled()                  # the app's UiCollector; conftest for tests
+    # the older generations' counts go up only as younger ones are collected: set them
+    # here, not by whatever the tests before this one happened to collect
+    for gen in (1, 1, 0, 0):
+        gc.collect(gen)
     held = dropped_cycle()
 
     def busy():                                # allocates far past every threshold

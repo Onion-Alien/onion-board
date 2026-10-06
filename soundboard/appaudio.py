@@ -22,6 +22,7 @@ import os
 import sys
 import threading
 import time
+from collections.abc import Callable
 from ctypes import (POINTER, Structure, Union, addressof, byref, c_float, c_int, c_int64,
                     c_long, c_ubyte, c_uint, c_ulong, c_ushort, c_void_p, c_wchar_p, cast, sizeof)
 from dataclasses import dataclass, field
@@ -530,15 +531,19 @@ def endpoint_names(kind: str) -> set[str] | None:
             _ole32.CoUninitialize()
 
 
-def list_apps(strict: bool = False) -> list[App]:
+def list_apps(strict: bool = False, alive: dict[int, str] | None = None,
+              meters: dict | None = None) -> list[App]:
     """Every program with a live audio session on any playback device, this
     process excluded and grouped by process tree. Safe from any thread. A failed
-    listing is [] (or raises ComError with `strict`: [] would read as "nothing plays")."""
+    listing is [] (or raises ComError with `strict`: [] would read as "nothing plays").
+    `alive` is filled with every running process (pid -> exe name, lower case) from
+    the process list the listing was made from, as running() would give, without
+    walking every process a second time. `meters`: as in _list_apps."""
     if not _win:
         return []
     own = _co_init()
     try:
-        return _list_apps()
+        return _list_apps(meters, alive=alive, titles=True)
     except ComError:
         if strict:
             raise
@@ -567,13 +572,17 @@ def recording_apps(device: str) -> list[App]:
 
 
 def _list_apps(meters: dict | None = None, flow: int = E_RENDER,
-               only: str | None = None) -> list[App]:
+               only: str | None = None, alive: dict[int, str] | None = None,
+               titles: bool | None = None) -> list[App]:
     """With `meters`, also keeps each session's IAudioMeterInformation there
-    (root pid -> [Com]) for the caller to read and release; window titles are skipped.
-    `flow` E_CAPTURE lists recording sessions instead, `only` on one device."""
+    (root pid -> [Com]) for the caller to read and release; window titles are then
+    skipped unless `titles`. `flow` E_CAPTURE lists recording sessions instead,
+    `only` on one device. `alive`: see list_apps."""
     me = os.getpid()
     table = _process_table()
     forget_dead_pids(table)
+    if alive is not None:
+        alive.update((pid, exe) for pid, (_, exe) in table.items())
     apps: dict[int, App] = {}
     with _enumerator() as en:
         devices = _render_devices(en, flow)
@@ -606,10 +615,12 @@ def _list_apps(meters: dict | None = None, flow: int = E_RENDER,
     finally:
         for dev in devices:
             dev.release()
-    titles = window_titles() if apps and meters is None else {}
+    if titles is None:
+        titles = meters is None
+    names = window_titles() if apps and titles else {}
     for app in apps.values():
         pids = (app.pid, *sorted(app.session_pids))
-        app.title = next((titles[p] for p in pids if p in titles), "")
+        app.title = next((names[p] for p in pids if p in names), "")
     return sorted(apps.values(), key=lambda a: (not a.active, a.name.lower(), a.pid))
 
 
@@ -656,21 +667,40 @@ def _read_session(c: Com, dname: str, me: int, table, apps: dict[int, App],
             pass
 
 
+Listed = Callable[[list[App] | None, dict[int, str] | None], None]
+
+
 class PeakWatcher:
     """Live levels of every program, from Windows' own session meters, read
     ~20 times a second on a worker thread (`list_apps` is too slow to re-run that
     often: it walks processes and windows). The sessions are re-found every
-    `rescan` seconds. `peak(pid)` takes the root pid, as in `App.pid`."""
+    `rescan` seconds, or sooner when list_for() asks for the whole listing.
+    `peak(pid)` takes the root pid, as in `App.pid`."""
 
     def __init__(self, interval: float = 0.05, rescan: float = 1.5):
         self.interval, self.rescan = interval, rescan
         self._peaks: dict[int, float] = {}
         self._stop = threading.Event()
         self._thread: threading.Thread | None = None
+        self._asks: list[Listed] = []        # list_for() callers waiting for a rescan
+        self._asks_lock = threading.Lock()
 
     def peak(self, pid: int) -> float | None:
         """0..1, or None if the program has no session the watcher knows of yet."""
         return self._peaks.get(pid)
+
+    def list_for(self, done: Listed) -> bool:
+        """The Apps tab's list of programs, made by the watcher's next rescan (within
+        `interval`): done(apps, alive) is called on the watcher's thread with what
+        list_apps(alive=...) gives, apps None if it failed. The tab used to list the
+        programs, walk every process again (running()) and have this watcher find the
+        same sessions on its own: three walks every 1.5 s, now one.
+        False while the watcher isn't running: list them yourself."""
+        with self._asks_lock:
+            if self._thread is None or self._stop.is_set():
+                return False
+            self._asks.append(done)
+        return True
 
     def start(self):
         if not _win or (self._thread and self._thread.is_alive()):
@@ -681,9 +711,18 @@ class PeakWatcher:
         self._thread.start()
 
     def stop(self):
-        self._stop.set()
-        self._thread = None
+        with self._asks_lock:
+            self._stop.set()
+            self._thread = None
         self._peaks = {}
+
+    def _take_asks(self) -> list[Listed]:
+        with self._asks_lock:
+            return self._take_asks_locked()
+
+    def _take_asks_locked(self) -> list[Listed]:
+        asks, self._asks = self._asks, []
+        return asks
 
     def _run(self, stop: threading.Event):
         meters: dict[int, list[Com]] = {}
@@ -692,14 +731,23 @@ class PeakWatcher:
             next_scan = 0.0
             peak = c_float()
             while not stop.is_set():
-                if time.monotonic() >= next_scan:
+                asks = self._take_asks()
+                if asks or time.monotonic() >= next_scan:
                     _release_meters(meters)
                     meters = {}
+                    apps = alive = None
                     try:
-                        _list_apps(meters)
+                        if asks:   # the whole listing, window titles and all
+                            alive = {}
+                            apps = list_apps(strict=True, alive=alive, meters=meters)
+                        else:
+                            _list_apps(meters)
                     except ComError:
                         log.debug("finding session meters failed", exc_info=True)
-                    next_scan = time.monotonic() + self.rescan
+                    finally:
+                        _answer(asks, apps, alive)   # (None on any failure)
+                    # asked every 1.5 s while the Apps tab shows: no rescans of its own
+                    next_scan = time.monotonic() + self.rescan * (2 if asks else 1)
                 old, peaks = self._peaks, {}
                 for pid, ms in meters.items():
                     v = 0.0
@@ -717,8 +765,20 @@ class PeakWatcher:
             log.exception("program level watcher failed")
         finally:
             _release_meters(meters)
+            with self._asks_lock:
+                stop.set()   # this run takes no more asks: list_for says so from now on
+                asks = self._take_asks_locked()
+            _answer(asks, None, None)   # never leave the tab waiting for a list
             if own:
                 _ole32.CoUninitialize()
+
+
+def _answer(asks: list[Listed], apps: list[App] | None, alive: dict[int, str] | None):
+    for done in asks:
+        try:
+            done(apps, alive)
+        except Exception:  # noqa: BLE001 - one caller's bug mustn't stop the levels
+            log.exception("handing over the program list failed")
 
 
 def _release_meters(meters: dict):

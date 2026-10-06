@@ -87,12 +87,14 @@ def saved_volume(v) -> float:
 
 
 class _Lister(QObject):
-    """Reads the audio sessions on a worker thread (COM, ~50 ms) and hands the
-    result to the UI thread."""
+    """Reads the audio sessions off the UI thread (COM, ~50 ms) and hands the result
+    to it: `peaks`' next rescan makes the list while that watcher runs (it was finding
+    the same sessions on its own), else a worker thread of its own does."""
     ready = Signal(object)
 
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, peaks: appaudio.PeakWatcher | None = None):
         super().__init__(parent)
+        self.peaks = peaks
         self._busy = False
         self._stopped = False
 
@@ -100,22 +102,27 @@ class _Lister(QObject):
         if self._busy or self._stopped:
             return
         self._busy = True
+        if self.peaks is not None and self.peaks.list_for(self._listed):
+            return
         threading.Thread(target=self._work, name="applist", daemon=True).start()
 
     def _work(self):
+        alive: dict[int, str] = {}   # every process, from the listing's own process list
+        apps = None
         try:
-            apps = appaudio.list_apps(strict=True)
-            alive = appaudio.running()
+            apps = appaudio.list_apps(strict=True, alive=alive)
         except appaudio.ComError:
-            # skip this round: an empty list would stop every capture and drop the rows
             log.debug("listing programs failed", exc_info=True)
-            return
         except Exception:  # noqa: BLE001
             log.exception("listing programs failed")
-            return
-        finally:
-            self._busy = False
-        if not self._stopped:
+        self._listed(apps, alive)
+
+    def _listed(self, apps: list | None, alive: dict[int, str] | None):
+        """On the worker's or the level watcher's thread. apps None: the listing failed,
+        and this round is skipped (an empty list would stop every capture and drop
+        the rows)."""
+        self._busy = False
+        if apps is not None and not self._stopped:
             self.ready.emit((apps, alive))
 
     def stop(self):
@@ -509,14 +516,14 @@ class AppsTab(QWidget):
                           str(spec.get("to", "both")), key=key, path=key)
         self._label_folders()
 
-        self.lister = _Lister(self)
+        self.peaks = appaudio.PeakWatcher()   # live levels; the list is only re-read every 1.5 s
+        self.lister = _Lister(self, self.peaks)
         self.lister.ready.connect(lambda listed: self._on_apps(*listed))
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.lister.refresh)
         self.meter_timer = QTimer(self)
         self.meter_timer.timeout.connect(self._meters)
         appstate.slow_in_background(self, self.meter_timer, METER_MS)   # behind a game
-        self.peaks = appaudio.PeakWatcher()   # live levels; the list is only re-read every 1.5 s
         # behind a game nobody watches the levels: the meters fall back to the list's
         appstate.pause_in_background(self, self.peaks.start, self.peaks.stop)
         self._started = False

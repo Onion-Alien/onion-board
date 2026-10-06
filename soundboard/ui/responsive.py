@@ -101,7 +101,10 @@ class Fitter:
         # applied step index -> the (width, height) it was applied at, and whether it
         # went for the other axis' sake (the diagonal pass in fit)
         self._at: dict[int, tuple[int, int, bool]] = {}
-        self._layouts: list[QLayout] | None = None   # the root's, while fit() runs
+        # while fit() runs: the root's layouts (found once, not on every measure) and
+        # the last need() (good until a step is applied or undone)
+        self._layouts: list[QLayout] | None = None
+        self._known: QSize | None = None
 
     def add(self, priority: int, axis: str, apply: Callable[[bool], None]):
         self.reset()
@@ -130,41 +133,53 @@ class Fitter:
         changed a text deep in a row (the status pill getting its long words back)
         left a nested layout's cached size behind, so growing 640 -> 900 px wide with
         search results brought back more than fits and the main window fell into the
-        mini player. ~250 layouts: well under a millisecond."""
-        lays = self._layouts
-        for lay in self.root.findChildren(QLayout) if lays is None else lays:
+        mini player. ~250 layouts: well under a millisecond, but fit() used to
+        measure 5-6 times a resize step; inside it, it's measured again only after a
+        step changed something."""
+        if self._known is not None:
+            return QSize(self._known)
+        for lay in (self._layouts if self._layouts is not None
+                    else self.root.findChildren(QLayout)):
             lay.invalidate()
-        return self.root.minimumSizeHint()
+        need = self.root.minimumSizeHint()
+        if self._layouts is not None:
+            self._known = QSize(need)
+        return need
 
     def _over(self, size: QSize, axis: str) -> bool:
         need = self.need()
         return (need.width() > size.width() if axis == "w"
                 else need.height() > size.height())
 
-    def fit(self, size: QSize):
-        """Apply as few steps as it takes for the content to fit `size`."""
+    def _apply(self, i: int, on: bool):
+        self.steps[i][2](on)
+        self._known = None   # measure again
+
+    def fit(self, size: QSize) -> QSize:
+        """Apply as few steps as it takes for the content to fit `size`. Returns
+        need() for what it left."""
         dim = {"w": size.width(), "h": size.height()}
-        self.root.setUpdatesEnabled(False)
         # found once for the whole fit, not on each need(): with a few hundred pads the
         # search through every widget took longer than the measuring (a step only
         # shows, hides or retitles things, so the layouts stay the same meanwhile)
-        self._layouts = self.root.findChildren(QLayout)
+        self._layouts, self._known = self.root.findChildren(QLayout), None
+        self.root.setUpdatesEnabled(False)
         try:
             for axis in ("h", "w"):   # hiding the mixer (height) narrows the window too
-                for i, (_, ax, apply) in enumerate(self.steps):
+                for i, (_, ax, _fn) in enumerate(self.steps):
                     if ax != axis or i in self._at:
                         continue
                     if not self._over(size, axis):
                         break
-                    apply(True)
+                    self._apply(i, True)
                     self._at[i] = (dim["w"], dim["h"], False)
             # still over (a diagonal drag): the other axis' steps can help too (hiding
             # the mixer narrows the window), so try them before anyone calls it too small
-            for i, (_, _ax, apply) in enumerate(self.steps):
+            for i in range(len(self.steps)):
                 if not (self._over(size, "w") or self._over(size, "h")):
                     break
                 if i not in self._at:
-                    apply(True)
+                    self._apply(i, True)
                     self._at[i] = (dim["w"], dim["h"], True)
             for axis in ("w", "h"):   # grown: bring back what fits again, last-hidden first
                 for i in sorted((i for i in self._at if self.steps[i][1] == axis),
@@ -175,15 +190,18 @@ class Fitter:
                         grown = grown or (dim["h"] > h if axis == "w" else dim["w"] > w)
                     if not grown:
                         break   # no bigger than when it had to go
-                    self.steps[i][2](False)
+                    self._apply(i, False)
                     if self._over(size, "w") or self._over(size, "h"):
-                        self.steps[i][2](True)
+                        self._apply(i, True)
                         self._at[i] = (dim["w"], dim["h"], cross)
                         break
                     del self._at[i]
         finally:
-            self._layouts = None
             self.root.setUpdatesEnabled(True)
+        try:
+            return self.need()
+        finally:
+            self._layouts = self._known = None
 
     def compact_count(self) -> int:
         return len(self._at)

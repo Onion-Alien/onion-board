@@ -44,3 +44,21 @@ def test_a_step_that_changes_text_in_a_nested_row_is_measured_fresh(qapp):
     f.fit(QSize(long_w + 10, 400))
     assert pill.text() == LONG
     root.deleteLater()
+
+
+def test_a_fit_measures_again_only_after_a_step_changed_something(qapp):
+    """Each measure finds and invalidates every layout in the window: a resize step
+    measured 5-6 times though nothing changed in between."""
+    root, pill = header(LONG)
+    f = responsive.Fitter(root)
+    f.add(10, "w", lambda short: pill.setText(SHORT if short else LONG))
+    root.show()
+    qapp.processEvents()
+    real, measured = root.minimumSizeHint, []
+    root.minimumSizeHint = lambda: (measured.append(1), real())[1]
+    wide = f.fit(QSize(2000, 400))
+    assert len(measured) == 1 and wide == f.need()   # nothing to do: measured once
+    measured.clear()
+    narrow = f.fit(QSize(10, 400))                   # one step applied: and again after it
+    assert pill.text() == SHORT and len(measured) == 2 and narrow.width() < wide.width()
+    root.deleteLater()
