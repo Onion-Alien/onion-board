@@ -33,8 +33,10 @@ changer never hear its own sounds come back. Each block of clean mic in, the boa
 renders the same stretch of what others hear and writes it out: it runs on the mic's
 clock, so the two never drift apart. In replace mode (the default) that is the whole
 send mix, your processed voice included, and the effect puts it in place of the mic
-(about 20 ms later); add mode adds only the sounds on top of the mic. Whenever the
-board is quiet or late, the effect crossfades back to the plain mic. Nobody recording
+(about 20 ms later); add mode adds only the sounds on top of the mic. The board late
+with a block: the effect fills in with the clean mic from the moment that block was
+to be made from (`set_sync`), so the voice carries on. The board gone: the effect
+crossfades back to the plain mic. Nobody recording
 the mic: the effect doesn't run, and the board keeps time on its own clock.
 
 Installing needs admin once (Windows' prompt): `install()` runs this app again as admin
@@ -68,7 +70,7 @@ FLAG = "--direct-mic"
 CLSID = "{C55E76FE-6667-4828-81FD-05B393FD649E}"   # obmic.cpp CLSID_OnionMic
 DEVICE = "Your mic (no cable)"         # the send "device" for the engine
 DLL_NAME = "obmic.dll"
-EFFECT_VERSION = 2                                  # obmic.cpp EFFECT_VERSION
+EFFECT_VERSION = 3                                  # obmic.cpp EFFECT_VERSION
 
 RATE = 48000
 CAPACITY = 1 << 16          # ~1.4 s at 48 kHz
@@ -89,10 +91,12 @@ OTHER_BOARD_MS = 1000       # another board wrote this recently: it's still runn
 HEAD = np.dtype({
     "names": ["magic", "version", "rate", "capacity", "write_pos", "board_tick", "enabled",
               "mode", "gain", "mic_gain", "mic_capacity", "publisher", "mic_write_pos",
-              "mic_rate", "lead", "mic_tick", "effect_version", "board_pid"],
+              "mic_rate", "lead", "mic_tick", "effect_version", "board_pid", "sync_seq",
+              "sync_wp", "sync_mic"],
     "formats": ["<u4", "<u4", "<u4", "<u4", "<u8", "<u8", "<u4", "<u4", "<f4", "<f4", "<u4",
-                "<i4", "<u8", "<u4", "<u4", "<u8", "<u4", "<u4"],
-    "offsets": [0, 4, 8, 12, 16, 24, 32, 36, 40, 44, 48, 52, 56, 64, 68, 72, 80, 84],
+                "<i4", "<u8", "<u4", "<u4", "<u8", "<u4", "<u4", "<u4", "<u8", "<u8"],
+    "offsets": [0, 4, 8, 12, 16, 24, 32, 36, 40, 44, 48, 52, 56, 64, 68, 72, 80, 84, 88, 96,
+                104],
     "itemsize": SLOT_OFFSET})
 SLOT = np.dtype({
     "names": ["owner", "rate", "channels", "flags", "tick", "read_pos", "lead", "underruns",
@@ -300,6 +304,23 @@ class RingWriter:
     def heartbeat(self):
         self._btick[0] = _tick()
 
+    def set_sync(self, wp: int, mic: int):
+        """Ring frame `wp` is the board's audio for clean-mic frame `mic`: a board late
+        with a block, the effect fills in with the mic from the same moment (no skip or
+        repeat in the voice). Odd sync_seq while it changes: the effect reads it then."""
+        seq = int(self._get("sync_seq"))
+        self._set("sync_seq", (seq + 1) & 0xFFFFFFFF)
+        self._set("sync_wp", wp)
+        self._set("sync_mic", mic)
+        self._set("sync_seq", (seq + 2) & 0xFFFFFFFE)
+
+    def clear_sync(self):
+        seq = int(self._get("sync_seq"))
+        self._set("sync_seq", (seq + 1) & 0xFFFFFFFF)
+        self._set("sync_wp", 0)
+        self._set("sync_mic", 0)
+        self._set("sync_seq", (seq + 2) & 0xFFFFFFFE)
+
     def jump(self, pos: int):
         """Start writing at `pos`."""
         self._wp[0] = pos
@@ -362,9 +383,12 @@ class DirectMicStream:
     samplerate = RATE
 
     def __init__(self, callback, path: Path | None = None, mic_callback=None,
-                 mode: int = MODE_REPLACE, lead_s: float = LEAD_S):
+                 mode: int = MODE_REPLACE, lead_s: float = LEAD_S, voice_delay=None):
         self._callback = callback
         self._mic_callback = mic_callback
+        # () -> frames (at RATE) the voice in what was just rendered is behind the mic
+        # handed over (see Engine._direct_voice_delay); None = none
+        self._voice_delay = voice_delay
         if path is None:
             make_ring()
         self._ring = RingWriter(path)
@@ -449,6 +473,15 @@ class DirectMicStream:
         finally:
             self._lock.release()
 
+    def _delay(self) -> float:
+        if self._voice_delay is None:
+            return 0.0
+        try:
+            return max(0.0, float(self._voice_delay()))
+        except Exception:  # noqa: BLE001 - only the fill-in's timing is off by it
+            log.debug("voice delay", exc_info=True)
+            return 0.0
+
     def _render(self, n: int):
         buf = self._buf
         while n > 0:
@@ -480,10 +513,12 @@ class DirectMicStream:
             k = int(self._acc)
             self._acc -= k
             self._render(k)
+            ring.set_sync(ring.write_pos, max(0, wp - int(round(self._delay() * rate / RATE))))
             self._start, self._made = time.perf_counter(), 0
             return
         if self.mic_live:   # the mic stopped: keep time from here on our own
             self.mic_live = False
+            ring.clear_sync()
             self._start, self._made = time.perf_counter(), 0
         due = int((time.perf_counter() - self._start) * RATE)
         if due - self._made > RATE // 5:   # stalled (sleep, a hang): don't catch up

@@ -196,6 +196,11 @@ class VoiceChain:
         return ((self.enabled and bool(self._effects)) or self.tap is not None or self.replace
                 or self.source is not None)
 
+    @property
+    def changes_voice(self) -> bool:
+        """Others hear another voice than yours (an effect, the AI voice, a replacement)."""
+        return (self.enabled and bool(self._effects)) or self.replace or self.source is not None
+
     def latency(self) -> float:
         """Seconds the effects that are on (and the AI voice) add to your voice right now."""
         total = 0.0
