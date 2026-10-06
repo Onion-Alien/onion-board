@@ -143,6 +143,10 @@ def test_the_route_picker_and_its_settings_mirror(win, opened):
     assert label.isHidden() and send.isHidden()
     route.activated.emit(route.findData("cable"))
     assert win.cfg.route == "cable" and label.text() == "Send into (the cable)"
+    assert not send.isHidden()
+    win.cfg.route = "mic"   # straight into the mic: no device to send to, like the Setup tab
+    d._sync_devices()
+    assert label.isHidden() and send.isHidden()
     d.close()
 
 
