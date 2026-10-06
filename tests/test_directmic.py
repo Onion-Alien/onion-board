@@ -1087,6 +1087,29 @@ def test_nobody_goes_silent_before_the_mic_is_set_up(window, monkeypatch, state)
     assert w._main_name() is None   # no cable either: nothing to send into
 
 
+@pytest.mark.parametrize("state", ["ready", "missing", "wiped"])
+def test_on_the_mic_the_setup_tab_never_talks_about_the_cable(window, monkeypatch, state):  # noqa: F811
+    """Straight into the mic is the way: working or not set up yet, the Setup tab
+    doesn't say the cable is in use, or tell anyone to pick one. The cable comes up
+    only as the "Use the virtual cable instead" fallback button."""
+    w = window
+    _routes(w, monkeypatch, state)
+    monkeypatch.setattr(w, "_direct_not_running", lambda: False)
+
+    class S:
+        def stop(self):
+            pass
+        close = stop
+    w.engine.main_stream, w.engine.tap = S(), S()   # the cable still fed alongside
+    try:
+        w._show_route()
+        w._update_status()
+        for lbl in (w.flow_out, w.step_lbl, w.setup_hint, w.how_title, w.pill):
+            assert "cable" not in lbl.text().lower(), lbl.text()
+    finally:
+        w.engine.main_stream = w.engine.tap = None
+
+
 @pytest.mark.parametrize("state", ["ready", "outdated"])
 def test_on_the_mic_the_cable_gets_the_same(window, monkeypatch, state):  # noqa: F811
     w = window
@@ -1113,7 +1136,7 @@ def test_saying_no_to_windows_keeps_the_mic_on_offer(window, monkeypatch, cables
     monkeypatch.setattr(QMessageBox, "warning", lambda *a: said.append(a[2]))
     w._mic_attached("My mic", "Windows' admin prompt was turned down (or didn't finish).")
     assert w.cfg.route == "mic" and w._main_name() == (cables[0] if cables else None)
-    assert ("virtual cable meanwhile" in said[0]) == bool(cables)
+    assert "cable" not in said[0].lower()   # the mic is the way; the cable just quietly helps
     assert "Try again" in said[0]
     assert "mic" in w.pill.text().lower()
 
