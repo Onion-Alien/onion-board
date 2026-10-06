@@ -1,5 +1,14 @@
 # Changelog
 
+## Unreleased
+
+- **Important fixes get a banner.** When a new Onion Board or Onion Watch fixes
+  something serious, a banner across the top of the window says what it fixes,
+  with an *Update now* button. You can hide it until the next start, but it can't
+  be skipped for good. Normal updates keep the small *Update* button.
+- **Updates show up sooner.** The app now checks for a new version every 6 hours
+  instead of once a day. The setting is now called *Check for updates*.
+
 ## 1.9.5 — 2026-10-06
 
 - **Switch off the tabs you don't use.** New *Settings → Tabs*: untick Radio, Apps,

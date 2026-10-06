@@ -256,6 +256,12 @@ Get-Process OnionBoard -ErrorAction SilentlyContinue      # is it running?
    GitHub's download counts tell updates apart from new downloads. A release with a broken installer reaches
    everyone who clicks *Update now*: install the built one over your own copy
    before publishing.
+   **An urgent fix** (a crash, sounds cutting out, a security problem): add a line
+   `Urgent: <what it fixes, in a few plain words>` to the notes. Copies that check
+   (every 6 hours) then show a banner across the window with that reason and
+   *Update now*, and *Skip this version* isn't offered. The same line works in Onion
+   Watch's release notes. Only the newest release is read, so if a normal release
+   follows soon after, keep the line there too while the fix still matters.
    The notes start with a one-line headline, then a download line, because GitHub
    adds two *Source code* files that people mistake for the app:
    `**[⬇ Download OnionBoardSetup.exe](https://github.com/Onion-Alien/onion-board/releases/download/vX.Y.Z/OnionBoardSetup.exe)**: the one file you need (Windows 10 / 11). Already have Onion Board? The *Update* button at the top of the app offers this version. (The *Source code* files are for developers.)`

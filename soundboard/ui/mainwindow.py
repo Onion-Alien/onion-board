@@ -250,7 +250,7 @@ class MainWindow(QMainWindow):
         self.bridge.update.connect(self._on_update)
         self.bridge.update_progress.connect(self._on_update_progress)
         self.bridge.update_ready.connect(self._on_update_ready)
-        self.bridge.watch_update.connect(lambda offer: self.triggers.offer_update(offer))
+        self.bridge.watch_update.connect(self._on_watch_update)
         self.bridge.counted.connect(self._save_later)   # stats_sent
         self._removed: list[tuple[SoundMeta, int, np.ndarray | None]] = []   # undo-able
         self._render_gen: dict[str, int] = {}   # sid -> newest effects render (_rerender)
@@ -271,7 +271,9 @@ class MainWindow(QMainWindow):
         self.release: updates.Release | None = None   # a newer version, once found
         self._update_file: Path | None = None   # its downloaded, checked installer
         self._downloading = False
-        self._preview_gen = 0             # newest effects preview (older renders are dropped)
+        self.watch_offer: watchaddon.Offer | None = None   # an urgent Onion Watch fix
+        self._urgent_hidden: set[str] = set()   # "board 1.9.6" / "watch 0.8.2", this run
+        self._preview_gen = 0            # newest effects preview (older renders are dropped)
         self._preview_done = None         # its done(ok) callback while it renders
         self._ptt_held: str | None = None   # PTT key we're currently holding
         self._pending_imports = 0
@@ -473,6 +475,31 @@ class MainWindow(QMainWindow):
         self._pulse.setEndValue(1.0)
         self._pulse.setLoopCount(-1)
         rv.addWidget(self.mic_banner)
+
+        # an urgent fix (a release whose notes say "Urgent: …", updates.urgent): a bar
+        # across the window, not only the small Update pill. Hidden only until next start.
+        self.urgent_bar = QFrame()
+        self.urgent_bar.setObjectName("urgentbar")
+        uh = QHBoxLayout(self.urgent_bar)
+        uh.setContentsMargins(12, 6, 6, 6)
+        uh.setSpacing(8)
+        self.urgent_lbl = QLabel()
+        self.urgent_lbl.setTextFormat(Qt.PlainText)   # the reason is release-note text
+        self.urgent_lbl.setWordWrap(True)   # never makes the window wider
+        uh.addWidget(self.urgent_lbl, 1)
+        self.urgent_btn = QPushButton()
+        self.urgent_btn.setObjectName("primary")
+        self.urgent_btn.clicked.connect(self._urgent_clicked)
+        uh.addWidget(self.urgent_btn)
+        hide = QPushButton("✕")
+        hide.setObjectName("urgenthide")
+        hide.setAccessibleName("Hide")
+        hide.setToolTip("Hide until Onion Board starts again")
+        hide.setFixedSize(28, 28)
+        hide.clicked.connect(self._hide_urgent)
+        uh.addWidget(hide)
+        self.urgent_bar.hide()
+        rv.addWidget(self.urgent_bar)
 
         # ---- tabs
         self.tab_info: dict[str, tuple[str, str]] = {}   # page attr -> (title, text) for ⓘ
@@ -4794,13 +4821,13 @@ class MainWindow(QMainWindow):
     # ------------------------------------------------------------------ updates
     def check_updates(self, force: bool = False, why: str = ""):
         """Look for a newer release on a thread (see updates.py). Without `force` only
-        if the box is ticked, and at most once a day. `why`: the click that asked, for
-        Network activity (none: the app's own timer)."""
+        if the box is ticked, and at most every 6 hours. `why`: the click that asked,
+        for Network activity (none: the app's own timer)."""
         if not force and not self.cfg.update_check:
             return
 
         due = force or time.time() - self.cfg.update_checked >= updates.EVERY_S
-        why = why or "Automatic update check (at most once a day)"
+        why = why or "Automatic update check (at most every 6 hours)"
         netlog.cause(updates.FEATURE, why)
         netlog.cause(watchaddon.FEATURE, f"{why}: Onion Watch add-on")
 
@@ -4828,11 +4855,76 @@ class MainWindow(QMainWindow):
             self._set_update_pill(f"Update: {rel.version}",
                                   f"Onion Board {rel.version} is out — click for details")
             if self.tray is not None and not self.isVisible():
-                self.tray.showMessage("Onion Board", f"Version {rel.version} is out.",
-                                      QSystemTrayIcon.Information, 8000)
+                self.tray.showMessage(
+                    "Onion Board", f"Important fix: {rel.urgent}" if rel.urgent
+                    else f"Version {rel.version} is out.",
+                    QSystemTrayIcon.Warning if rel.urgent else QSystemTrayIcon.Information,
+                    8000)
+            self._show_urgent()
         self.update_done.emit(rel, err)   # for the Settings window's "Check now"
         if asked and rel is not None:
             self.show_update()
+
+    def _on_watch_update(self, offer):
+        """A newer Onion Watch (check_updates): its Triggers tab offers it, and an
+        urgent one gets the banner too."""
+        self.triggers.offer_update(offer)
+        if offer.urgent:
+            self.watch_offer = offer
+            self._show_urgent()
+
+    def _urgent_now(self) -> tuple[str, str, str] | None:
+        """The urgent fix to show on the banner: (key, text, button), Onion Board's
+        before Onion Watch's; None when there's none, or it was hidden."""
+        rel = self.release
+        if (rel is not None and rel.urgent and not self._downloading
+                and f"board {rel.version}" not in self._urgent_hidden):
+            button = ("Restart to update" if self._update_file is not None
+                      else "Update now" if updates.can_install() and rel.asset_url
+                      else "Details")
+            return (f"board {rel.version}",
+                    f"Important fix in Onion Board {rel.version}: {rel.urgent}", button)
+        o = self.watch_offer
+        if o is not None and f"watch {o.version}" not in self._urgent_hidden:
+            return (f"watch {o.version}",
+                    f"Important fix in Onion Watch {o.version}: {o.urgent}",
+                    "Update Onion Watch")
+        return None
+
+    def _show_urgent(self):
+        now = self._urgent_now()
+        if now is None:
+            self.urgent_bar.hide()
+            return
+        _key, text, button = now
+        self.urgent_lbl.setText(text)
+        self.urgent_btn.setText(button)
+        self.urgent_bar.show()
+
+    def _hide_urgent(self):
+        now = self._urgent_now()
+        if now is not None:
+            self._urgent_hidden.add(now[0])
+        self._show_urgent()   # the next one, if any
+
+    def _urgent_clicked(self):
+        now = self._urgent_now()
+        if now is None:
+            return
+        if now[0].startswith("board"):
+            if self._update_file is not None:
+                self.install_update()
+            elif updates.can_install() and self.release.asset_url:
+                self.download_update()
+            else:
+                self.show_update()
+            return
+        # Onion Watch: its tab does the updating (and shows how it's going)
+        self.tabs.setCurrentWidget(self.triggers)
+        if self.triggers.offer is not None and not self.triggers._busy:
+            self.triggers.get()
+        self.watch_offer = None
+        self._show_urgent()
 
     def _set_update_pill(self, text: str, tip: str, enabled: bool = True):
         self.btn_update.setText(text)
@@ -4849,10 +4941,13 @@ class MainWindow(QMainWindow):
         if rel is None or self._downloading:
             return
         from soundboard import __version__
-        box = QMessageBox(QMessageBox.Information, "Update available",
+        box = QMessageBox(QMessageBox.Warning if rel.urgent else QMessageBox.Information,
+                          "Important fix available" if rel.urgent else "Update available",
                           f"Onion Board {rel.version} is out (you have {__version__}).",
                           QMessageBox.NoButton, self)
-        info = html.escape(rel.notes).replace("\n", "<br>") if rel.notes else ""
+        info = (f"<p><b>Important fix:</b> {html.escape(rel.urgent)}</p>"
+                if rel.urgent else "")
+        info += html.escape(rel.notes).replace("\n", "<br>") if rel.notes else ""
         installable = updates.can_install() and bool(rel.asset_url)
         if installable:
             info += ("<p>Update now downloads it in the background (about 180 MB); you "
@@ -4865,7 +4960,9 @@ class MainWindow(QMainWindow):
         get = box.addButton("Update now" if installable else "Open the download page",
                             QMessageBox.AcceptRole)
         page = box.addButton("Release page", QMessageBox.HelpRole) if installable else None
-        skip = box.addButton("Skip this version", QMessageBox.DestructiveRole)
+        # an urgent fix can't be skipped for good, only put off
+        skip = (None if rel.urgent
+                else box.addButton("Skip this version", QMessageBox.DestructiveRole))
         box.addButton("Later", QMessageBox.RejectRole)
         box.exec()
         clicked = box.clickedButton()
@@ -4874,7 +4971,7 @@ class MainWindow(QMainWindow):
             self.download_update()
         elif clicked is get or (page is not None and clicked is page):
             QDesktopServices.openUrl(QUrl(rel.url))
-        elif clicked is skip:
+        elif skip is not None and clicked is skip:
             self.set_option("update_skip", rel.version)
             self.release = None
             self.btn_update.hide()
@@ -4892,6 +4989,7 @@ class MainWindow(QMainWindow):
         usage.maybe_send(self.cfg, event=usage.update_event(rel.version))
         self._set_update_pill("Downloading update…",
                               f"Downloading Onion Board {rel.version}", enabled=False)
+        self._show_urgent()   # the pill shows how it's going
         last = [-1]
 
         def progress(done, total):
@@ -4920,6 +5018,7 @@ class MainWindow(QMainWindow):
         rel = self.release
         if rel is None:
             return
+        self._show_urgent()   # back, as "Update now" or "Restart to update"
         if path is None:
             self._set_update_pill(f"Update: {rel.version}",
                                   f"Onion Board {rel.version} is out — click for details")
@@ -4936,6 +5035,7 @@ class MainWindow(QMainWindow):
                 QDesktopServices.openUrl(QUrl(rel.url))
             return
         self._update_file = path
+        self._show_urgent()
         self._set_update_pill("Restart to update",
                               f"Onion Board {rel.version} is downloaded — click to install it")
         if self.tray is not None and not self.isVisible():

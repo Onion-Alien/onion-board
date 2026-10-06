@@ -2431,9 +2431,10 @@ class SettingsDialog(QDialog):
                "This copy runs from source, so it only tells you: update it with git pull.")
         card, cv = self._card("App updates",
                               f"This is Onion Board {__version__}. With the box ticked it asks "
-                              "GitHub once a day whether a newer version is out and tells you. "
+                              "GitHub every few hours whether a newer version is out and tells you "
+                              "(with a banner if it's an important fix). "
                               + how)
-        chk = self._option(cv, "Check once a day",
+        chk = self._option(cv, "Check for updates",
                            "Tell me when a new version is out. Nothing is downloaded "
                            "until I press Update now.", self.mw.cfg.update_check,
                            self._updates_optin)

@@ -1,6 +1,11 @@
 """Is there a newer Onion Board, and installing it. The app asks the project's latest
-GitHub release once a day (Settings → Updates; on unless unticked), plus a "Check now"
-button.
+GitHub release every 6 hours (Settings → Updates; on unless unticked), plus a "Check
+now" button.
+
+A release whose notes have a line starting "Urgent:" ("Urgent: fixes sounds cutting
+out") is an urgent fix: the app shows it as a banner across the window instead of only
+the small Update pill, and "Skip this version" doesn't hide it. Only the newest release
+is looked at, so keep that line in the next release's notes while the fix still matters.
 
 A newer version is only announced. Nothing is downloaded until the user presses
 *Update now*: then the release's OnionBoardSetup.exe is fetched from the project's own
@@ -43,7 +48,7 @@ DOWNLOADS = f"https://github.com/{REPO}/releases/download/"
 OLD_DOWNLOADS = "https://github.com/Onion-Alien/onionboard/releases/download/"
 UPDATES_DIR = APP_DIR / "updates"
 INSTALL_LOG = UPDATES_DIR / "install.log"
-EVERY_S = 24 * 3600
+EVERY_S = 6 * 3600       # so an urgent fix reaches people the same day
 LIMIT = 1 << 20          # the API's answer is a few KB
 MAX_SIZE = 400 << 20     # the installer is ~180 MB
 CHUNK = 1 << 20
@@ -63,6 +68,7 @@ class Release:
     asset_url: str = ""   # its OnionBoardSetup.exe; "" = nothing to install
     sha256: str = ""      # that file's SHA-256 (lowercase hex), as GitHub lists it
     size: int = 0
+    urgent: str = ""      # why it's an urgent fix (its "Urgent: …" line); "" = it isn't
 
 
 def parse_version(text: str) -> tuple[int, ...] | None:
@@ -136,6 +142,22 @@ def find_asset(data: dict, name: str, trusted: tuple[str, ...]) -> tuple[str, st
     return "", "", 0
 
 
+# "Urgent: …" at the start of a line, also as **Urgent:**, "> Urgent -", "- Urgent:"
+URGENT_RE = re.compile(r"^[\s>*_#-]*urgent[*_]*\s*[:\-–—]\s*(.+)$",
+                       re.IGNORECASE | re.MULTILINE)
+
+
+def urgent(body: str) -> str:
+    """The reason in a release's "Urgent: …" line, as plain text (Markdown marks taken
+    out, at most 160 characters), or "" when it has none: not an urgent fix."""
+    m = URGENT_RE.search(body.replace("\r\n", "\n"))
+    if not m:
+        return ""
+    text = re.sub(r"\[([^\]]*)\]\([^)]*\)", r"\1", m.group(1))
+    text = re.sub(r"\*\*|__|`", "", text).strip(" *_")
+    return text if len(text) <= 160 else text[:159].rsplit(" ", 1)[0] + "…"
+
+
 def summary(body: str, limit: int = 420) -> str:
     """The start of a release's notes as plain text for the dialog: Markdown marks
     (**bold**, `code`, [links](…)) taken out, and whole paragraphs only, as many as
@@ -146,7 +168,8 @@ def summary(body: str, limit: int = 420) -> str:
     text = re.sub(r"\*\*|__|`", "", text)
     paras = [" ".join(line.strip() for line in p.splitlines())
              for p in re.split(r"\n\s*\n", text.strip()) if p.strip()]
-    paras = [p for p in paras if not p.startswith("⬇")]
+    paras = [p for p in paras if not p.startswith("⬇")
+             and not URGENT_RE.match(p)]   # the banner says that one
     out: list[str] = []
     for p in paras:
         if out and len("\n\n".join(out + [p])) > limit:
@@ -170,13 +193,15 @@ def latest() -> Release | None:
     url = str(data.get("html_url") or RELEASES)
     if not url.startswith("https://github.com/"):
         url = RELEASES   # only ever open the project's own page
-    notes = summary(str(data.get("body") or ""))
-    return Release(".".join(map(str, ver)), url, notes, *_installer(data))
+    body = str(data.get("body") or "")
+    return Release(".".join(map(str, ver)), url, summary(body), *_installer(data),
+                   urgent=urgent(body))
 
 
 def check(cfg, force: bool = False) -> Release | None:
     """A newer release than this one, or None. Without `force` it only asks if the
-    box is ticked, once a day, and stays quiet about a version they skipped.
+    box is ticked, at most every EVERY_S, and stays quiet about a version they
+    skipped (unless it's an urgent fix).
     Network errors are logged and read as 'nothing new'. Switched off in Settings >
     Privacy & security, the daily check skips itself silently (a forced one raises
     net.FeatureOff). Call off the UI thread."""
@@ -193,7 +218,7 @@ def check(cfg, force: bool = False) -> Release | None:
     cfg.update_checked = time.time()
     if rel is None or not newer(rel.version):
         return None
-    if not force and rel.version == cfg.update_skip:
+    if not force and rel.version == cfg.update_skip and not rel.urgent:
         return None
     log.info("a newer version is out: %s", rel.version)
     return rel
@@ -359,10 +384,13 @@ def finished(pending: str, current: str = __version__) -> bool:
 
 
 def cleanup() -> None:
-    """Remove downloaded installers (and half-downloads). One still running, just
-    after it reopened the app, is locked: it goes next time."""
-    for p in UPDATES_DIR.glob("OnionBoardSetup-*"):
-        try:
-            p.unlink()
-        except OSError:
-            pass
+    """Remove downloaded installers and add-on zips (and half-downloads), so updates
+    never pile up on the disk. An add-on zip is normally deleted once it's installed;
+    this catches one cut off by a crash or a closed app. One still running or still
+    being written is locked: it goes next time. install.log stays."""
+    for pattern in ("OnionBoardSetup-*", "*-module-*.zip", "*-module-*.zip.part"):
+        for p in UPDATES_DIR.glob(pattern):
+            try:
+                p.unlink()
+            except OSError:
+                pass
