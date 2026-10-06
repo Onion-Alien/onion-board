@@ -4906,7 +4906,6 @@ class MainWindow(QMainWindow):
         else:
             self._pulse.stop()
             self._banner_fx.setOpacity(1.0)
-        self.setWindowTitle(f"● MIC LIVE IN HEADPHONES — {self.title}" if on else self.title)
         self.mic_lbl.setStyleSheet(f"color:{theme.status('error')};" if on else "")
         self.mic_meter.hot = on
         if on and not self.cfg.mic_enabled:

@@ -694,8 +694,8 @@ def test_the_window_shows_which_version_is_running(window, monkeypatch):
     from soundboard.ui import mainwindow
     assert window.windowTitle() == f"Onion Board {__version__} from source"
     assert window.tagline.text().endswith(f"v{__version__} from source")
-    window.on_mic_check(True)                           # the warning keeps the version
-    assert window.windowTitle().endswith(f"Onion Board {__version__} from source")
+    window.on_mic_check(True)          # the red banner says it; the title stays the app's name
+    assert window.windowTitle() == f"Onion Board {__version__} from source"
     window.on_mic_check(False)
     assert window.windowTitle() == f"Onion Board {__version__} from source"
     monkeypatch.setattr("sys.frozen", True, raising=False)
