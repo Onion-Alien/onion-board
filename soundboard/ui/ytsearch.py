@@ -36,17 +36,18 @@ from soundboard.ui.panel import CardGrid, HoverCard
 from soundboard.ui.responsive import FitWidth
 from soundboard.ui.widgets import LoadingBar, fmt_time
 from soundboard import errors
+from soundboard.i18n import _
 
 log = logging.getLogger(__name__)
 
 THUMB_W, THUMB_H = 128, 72   # the pictures' shape (16:9); they fill the card's width
 CARD_MIN_W = 210             # results are cards, as many across as fit at this width
-TIPS = {"youtube": "Search YouTube",
-        "ytmusic": "Search YouTube Music: songs, the official versions",
-        "soundcloud": "Search SoundCloud",
-        "tiktok": "Find TikTok sounds (TikTok's own search needs an account, so this "
-                  "looks for them on YouTube, where they get reposted)",
-        "myinstants": "Search Myinstants: short meme sound buttons"}
+TIPS = {"youtube": _("Search YouTube"),
+        "ytmusic": _("Search YouTube Music: songs, the official versions"),
+        "soundcloud": _("Search SoundCloud"),
+        "tiktok": _("Find TikTok sounds (TikTok's own search needs an account, so this "
+                    "looks for them on YouTube, where they get reposted)"),
+        "myinstants": _("Search Myinstants: short meme sound buttons")}
 
 
 def fmt_count(n: int) -> str:
@@ -386,13 +387,13 @@ class ResultRow(HoverCard):
         v.addStretch(1)
         h = QHBoxLayout()
         h.setSpacing(6)
-        self.btn_play = QPushButton("Play")
-        self.btn_play.setToolTip("Download its audio and play it once (it isn't kept)")
+        self.btn_play = QPushButton(_("Play"))
+        self.btn_play.setToolTip(_("Download its audio and play it once (it isn't kept)"))
         icons.set_icon(self.btn_play, "play", size=14)
         self.btn_play.clicked.connect(lambda: self.play.emit(self.result))
-        self.btn_add = QPushButton("Add")
+        self.btn_add = QPushButton(_("Add"))
         self.btn_add.setObjectName("primary")
-        self.btn_add.setToolTip("Download its audio and add it to your Sounds")
+        self.btn_add.setToolTip(_("Download its audio and add it to your Sounds"))
         icons.set_icon(self.btn_add, "plus", "on_accent", size=14)
         self.btn_add.clicked.connect(lambda: self.add.emit(self.result))
         for b in (self.btn_play, self.btn_add):
@@ -404,7 +405,7 @@ class ResultRow(HoverCard):
         self.bar.setObjectName("downloadprogress")
         self.bar.setRange(0, 1000)
         self.bar.setValue(0)
-        self.bar.setAccessibleName("Audio download progress")
+        self.bar.setAccessibleName(_("Audio download progress"))
         self.bar.setTextVisible(False)
         self.bar.setFixedHeight(5)
         pol = self.bar.sizePolicy()
@@ -416,7 +417,7 @@ class ResultRow(HoverCard):
         self._added = False
         self._locked = False
         self.setCursor(Qt.PointingHandCursor)
-        self.setToolTip("Double-click to play")
+        self.setToolTip(_("Double-click to play"))
 
     def hasHeightForWidth(self) -> bool:
         return True
@@ -450,10 +451,11 @@ class ResultRow(HoverCard):
             busy.set_busy(btn, False)
         if not self._release:
             self.bar.setValue(0)
-            self.bar.setToolTip("Preparing audio download · 0%")
-        text = ("Processing…" if self.bar.toolTip() == "Processing audio…" else
-                f"{'Adding' if kind == 'add' else 'Loading'}… {self.bar.value() / 10:.0f}%"
-                if self.bar.value() else "Preparing… 0%")
+            self.bar.setToolTip(_("Preparing audio download · 0%"))
+        text = (_("Processing…") if self.bar.toolTip() == _("Processing audio…") else
+                (_("Adding… {pct:.0f}%", pct=self.bar.value() / 10) if kind == "add" else
+                 _("Loading… {pct:.0f}%", pct=self.bar.value() / 10))
+                if self.bar.value() else _("Preparing… 0%"))
         self._release[kind] = busy.hold(btn, text)
         self.bar.show()
 
@@ -462,13 +464,13 @@ class ResultRow(HoverCard):
         if not self._release:
             return
         if frac < 0:
-            self.bar.setToolTip("Processing audio…")
+            self.bar.setToolTip(_("Processing audio…"))
         else:
             self.bar.setValue(max(self.bar.value(), min(1000, int(frac * 1000))))
-            self.bar.setToolTip(f"Downloading audio · {self.bar.value() / 10:.0f}%")
+            self.bar.setToolTip(_("Downloading audio · {value:.0f}%", value=self.bar.value() / 10))
         for kind in self._release:
-            word = "Adding…" if kind == "add" else "Loading…"
-            self._btn(kind).setText("Processing…" if frac < 0 else
+            word = _("Adding…") if kind == "add" else _("Loading…")
+            self._btn(kind).setText(_("Processing…") if frac < 0 else
                                     f"{word} {self.bar.value() / 10:.0f}%")
 
     def set_done(self, kind: str, ok: bool):
@@ -480,7 +482,7 @@ class ResultRow(HoverCard):
         if kind == "add" and ok:
             release()
             self._added = True
-            self.btn_add.setText("✓ Added")   # added once is enough
+            self.btn_add.setText(_("✓ Added"))   # added once is enough
             busy.set_busy(self.btn_add, True)
         else:
             release(None if ok else ("Didn't add" if kind == "add" else "Didn't play"))
@@ -497,8 +499,8 @@ class ResultRow(HoverCard):
             if kind in self._release or (kind == "add" and self._added):
                 continue
             busy.set_busy(self._btn(kind), on)
-        self.setToolTip("Wait for the other download to finish" if on
-                        else "Double-click to play")
+        self.setToolTip(_("Wait for the other download to finish") if on
+                        else _("Double-click to play"))
 
     def set_thumb(self, pm: QPixmap):
         self.thumb.set_pixmap(pm)
@@ -528,9 +530,9 @@ class SearchResults(QFrame):
         v.setContentsMargins(0, 0, 0, 0)
         v.setSpacing(6)
         head = QHBoxLayout()
-        back = self.btn_back = QPushButton("My sounds")
+        back = self.btn_back = QPushButton(_("My sounds"))
         back.setObjectName("small")
-        back.setToolTip("Close the search results and go back to your sounds")
+        back.setToolTip(_("Close the search results and go back to your sounds"))
         icons.set_icon(back, "back", size=12)
         back.clicked.connect(self.close_results)
         head.addWidget(back)
@@ -557,9 +559,9 @@ class SearchResults(QFrame):
         v.addWidget(self.title)
         # Tor mode, after the site turned Tor away even over new routes: only this click
         # runs the search without Tor (ytdl.TorBlocked)
-        self.direct_btn = QPushButton("Search this without Tor")
-        self.direct_btn.setToolTip("Run just this search straight from the site, not through "
-                                   "Tor: the site will see your own address")
+        self.direct_btn = QPushButton(_("Search this without Tor"))
+        self.direct_btn.setToolTip(_("Run just this search straight from the site, not through "
+                                     "Tor: the site will see your own address"))
         self.direct_btn.clicked.connect(lambda: self.search(self.query, direct=True))
         self.direct_btn.hide()
         row = QHBoxLayout()
@@ -632,7 +634,7 @@ class SearchResults(QFrame):
         where = "TikTok sounds" if self.source == "tiktok" else self.site
         netlog.cause(ytdl.FEATURE, f"You searched {where} for {netlog.quoted(query)}"
                      + (" (without Tor)" if direct else ""))
-        text = f"Searching {where} for <b>{html.escape(query)}</b>…"
+        text = _("Searching {where} for <b>{query}</b>…", where=where, query=html.escape(query))
         self.title.setText(text)
         self._loading(True, text)
         self.show()
@@ -709,12 +711,12 @@ class SearchResults(QFrame):
         q = html.escape(self.query)
         if err:
             red = theme.status("error")
-            self.title.setText(f"<span style='color:{red}'>Couldn't search {self.site}: "
-                               f"{err}</span>")   # rich text from _work
+            self.title.setText(_("<span style='color:{red}'>Couldn't search {site}: {err}</span>",
+                                 red=red, site=self.site, err=err))   # rich text from _work
             self.direct_btn.setVisible(results == "blocked")
             return
         if not results:
-            self.title.setText(f"No {self.site} results for <b>{q}</b>.")
+            self.title.setText(_("No {site} results for <b>{q}</b>.", site=self.site, q=q))
             return
         self.title.hide()   # the cards say it all; the title is for "no results" / errors
         for r in results:
