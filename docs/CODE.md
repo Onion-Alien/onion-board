@@ -113,6 +113,7 @@ the launcher the shortcuts and PyInstaller use. The app is the `soundboard` pack
 | `soundboard/livefx.py` | live effects on every playing sound (the speed & pitch popup): bass, treble, muffle, reverb, echo, distortion and presets; not saved |
 | `soundboard/soundfx.py` | per-sound effects: trim, speed / pitch (phase vocoder + soxr), EQ, boost, reverse and any voice effect, rendered off the audio thread; the presets |
 | `soundboard/i18n.py` | translations: `_()` / `ngettext()` look the English up in the language picked (`assets/lang/<code>.json`) and fall back to it; Windows' language, plural rules, the pseudo-language `xx` and `unwrapped_texts` for layout checks (see [TRANSLATING.md](TRANSLATING.md)); `scripts/i18n_extract.py` lists missing / unused texts |
+| `soundboard/tips.py` | *Did you know?* tips: the list (each with where *Show me* goes), which one is due (after setup, once a day, never during a game), and the fullscreen-in-front check; the main window shows the bar |
 | `soundboard/ui/recordmic.py` | the Sounds tab's *Record a sound* window: a mic take (`Engine.start_mic_take`, spooled by `recorder.MicTake`), raw or through the voice changer, trimmed and added as a pad |
 | `soundboard/catswitch.py` | Switch category when a program is in front: `Switcher.poll()` (one foreground lookup a second, only while a rule exists; back to the old category when the program closes) and the open programs for picking one (`windowed_programs`) |
 | `soundboard/ui/programpick.py` | the program picker for a category's *Show this when a program is in front…* |

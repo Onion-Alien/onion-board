@@ -70,7 +70,8 @@ class AiVoicePanel(QWidget):
         v = QVBoxLayout(self)
         v.setContentsMargins(0, 0, 0, 0)
         v.setSpacing(12)
-        v.addWidget(section_label("AI VOICES"))
+        self.title = section_label("AI VOICES")
+        v.addWidget(self.title)
         v.addWidget(hint_label("Talk, and others hear a different person: your words and "
                                "tone, another voice, live. It runs on this PC (about one CPU "
                                "core while you talk, nothing while you're quiet); what you "

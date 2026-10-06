@@ -162,6 +162,27 @@ def test_source_sends_only_while_talking_with_preroll_and_says_when_you_stop():
     assert quiet == [1]
 
 
+def test_speaking_another_language_sends_the_translated_lines_not_your_mic():
+    """Dub mode: the AI voice gets the translated text-to-speech lines (at the mic's
+    rate), and your loud real voice never reaches the helper."""
+    got = []
+    src = VoiceSource(lambda m, r: got.append(m.copy()), None)
+    src.ready = True
+    src.dub_on = True
+    src.process(np.zeros(BLOCK, np.float32), RATE)          # learns the mic's rate
+    line = np.full(int(0.5 * 24000), 0.3, np.float32)       # a 24 kHz "spoken" line
+    src.dub(line, 24000)
+    loud_mic = np.full(BLOCK, 0.9, np.float32)
+    for _ in range(int(0.6 * RATE / BLOCK)):
+        src.process(loud_mic, RATE)
+    sent = np.concatenate(got)
+    assert len(sent) / RATE >= 0.5                          # the whole line went
+    assert sent.max() < 0.5                                  # the line, not the mic
+    src.dub(line, 24000)
+    src.clear_dub()                                          # Stop: queued lines go
+    assert not src._dub and not len(src._dub_head)
+
+
 def test_source_plays_what_comes_back_after_its_jitter_buffer():
     src, _fed, _q = make_source(backup="mute")
     src.process(np.zeros(BLOCK, np.float32), RATE)      # learns the rate
