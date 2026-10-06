@@ -9,6 +9,10 @@ that language and are spoken with `live_voice`, a voice that speaks it.
 Spoken lines are played like a sound (sid "tts"), so they go to the send device, your
 headphones and auto push-to-talk exactly as a pad would. While live voice is on,
 the chain can also mute your real voice (`replace`), so others only hear the TTS.
+
+With an AI voice on, translated lines go to it instead (`dub`, the AI voice
+controller): the AI voice says them, and the voice changer's effects follow in
+the chain as they do for your mic.
 """
 from __future__ import annotations
 
@@ -67,7 +71,10 @@ class SpeechController:
         self.mute_real_voice = True
         self.voice_fx = True    # the voice changer's effects go on the computer voice too
         self.live_voice: str | None = None   # voice for live lines (None: the chosen one)
+        self.dub = None         # the AI voice controller saying the lines, or None
+        self.fx_always = False  # translating for the voice changer: its effect, always
         self._ready = False     # the module said "ready": an error after that isn't fatal
+        self._replace = False   # live voice mutes your real voice
 
     # ------------------------------------------------------------ text-to-speech
     def say(self, text: str):
@@ -76,9 +83,14 @@ class SpeechController:
     def stop_speaking(self):
         self.speaker.stop()
         self.engine.stop(TTS_SID)
+        if self.dub is not None:
+            self.dub.clear_dub()
 
     def _play(self, stereo: np.ndarray, rate: int):
-        if self.voice_fx and self.chain.enabled:
+        dub = self.dub
+        if dub is not None and dub.dub(stereo[:, 0], rate):
+            return              # the AI voice says it (the chain adds the voice changer)
+        if (self.voice_fx or self.fx_always) and self.chain.enabled:
             stereo = np.repeat(self.chain.render(stereo[:, 0], rate)[:, None], 2, axis=1)
         # "overlap": the Speaker already spaces lines out; this never cuts one short
         if self.engine.play(TTS_SID, stereo, self.gain, mode="overlap", src_rate=rate) is None:
@@ -90,7 +102,9 @@ class SpeechController:
     def live(self) -> bool:
         return self.host is not None
 
-    def start_live(self, module: ModuleInfo, args: list[str] = ()):
+    def start_live(self, module: ModuleInfo, args: list[str] = (),
+                   replace: bool | None = None):
+        """`replace`: mute your real voice (None: the mute_real_voice setting)."""
         self.stop_live()
         from soundboard import netlog
         netlog.cause("voices", f"You started live voice ({module.name}): it may fetch "
@@ -112,7 +126,8 @@ class SpeechController:
             self.host = None
             raise
         self.chain.tap = host.feed
-        self.chain.replace = self.mute_real_voice
+        self._replace = self.mute_real_voice if replace is None else bool(replace)
+        self.chain.replace = self._replace
 
     def stop_live(self):
         h, self.host = self.host, None
@@ -125,8 +140,12 @@ class SpeechController:
 
     def set_mute_real_voice(self, on: bool):
         self.mute_real_voice = on
+
+    def set_replace(self, on: bool):
+        """Mute (or give back) your real voice while live voice runs."""
+        self._replace = bool(on)
         if self.live:
-            self.chain.replace = on
+            self.chain.replace = self._replace
 
     def _event(self, ev: dict, host: ServiceHost | None):
         if host is None or host is not self.host:

@@ -183,20 +183,20 @@ def test_voice_tab_lists_custom_voices_and_bad_files(vdir, qapp, monkeypatch):
 
 def test_custom_voices_are_found_from_the_voice_list_and_from_settings(window):  # noqa: F811
     """Add voices… beside the Voice list, and Settings → Audio's card, both lead to
-    the Custom voices part (folded away under More options)."""
+    the Custom voices box (hidden until asked for, so More options stays short)."""
     from PySide6.QtWidgets import QPushButton
     from soundboard.settings import SettingsDialog
     w = window
     s = w.voice.speech
-    assert not s.btn_opts.isChecked()
+    assert s.custom_box.isHidden()
     s.b_add_voices.click()
-    assert s.btn_opts.isChecked() and not s.opts.isHidden()
-    s.btn_opts.setChecked(False)
+    assert not s.custom_box.isHidden() and not s.btn_opts.isChecked()
+    s.custom_box.hide()
     dlg = SettingsDialog(w, "audio")
     try:
         buttons = {b.text(): b for b in dlg.findChildren(QPushButton)}
         assert {"Add a voice server…", "Open voices folder"} <= set(buttons)
         buttons["Show on the Voice tab"].click()
-        assert w.tabs.currentWidget() is w.voice and s.btn_opts.isChecked()
+        assert w.tabs.currentWidget() is w.voice and not s.custom_box.isHidden()
     finally:
         dlg.deleteLater()

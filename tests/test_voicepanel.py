@@ -97,7 +97,7 @@ def test_live_voice_needs_the_addon_set_up(panel):
     # the repo's live-voice module has no .venv in a test checkout -> install hint
     m = p.speech.module
     if m is None or not m.installed:
-        assert p.speech.live_box.isHidden() and not p.speech.missing.isHidden()
+        assert p.speech.lang_box.isHidden() and not p.speech.missing.isHidden()
 
 
 def test_everything_spoken_lands_in_the_log(panel, monkeypatch):
@@ -916,6 +916,53 @@ def test_every_value_a_slider_shows_fits_its_label(panel):
             for i in range(s.steps + 1):
                 v = s.q.lo + (s.q.hi - s.q.lo) * i / s.steps
                 assert fm.horizontalAdvance(param_text(s.q, v)) <= room, (s.q.key, v)
+
+
+def test_cards_fold_away_and_stay_folded(qapp, monkeypatch):
+    monkeypatch.setattr(tts.SapiTTS, "warm_up", lambda self: [])
+    from soundboard.ui.voicepanel import VoicePanel
+    p = VoicePanel(FakeEngine(), {}, {"folded": ["ai", 7, "later"]})   # 7: junk
+    try:
+        assert p.ai.isHidden() and not p.fx.isHidden() and not p.speech.isHidden()
+        saved = []
+        p.speech_changed.connect(saved.append)
+        p._heads["fx"].arrow.click()                 # fold the voice changer
+        assert p.fx.isHidden() and saved[-1]["folded"] == ["ai", "fx", "later"]
+        p._heads["ai"].arrow.click()                 # and open the AI voices again
+        # "later": a newer version's card, kept for it
+        assert not p.ai.isHidden() and saved[-1]["folded"] == ["fx", "later"]
+        p.fx.pick("Robot")                           # folded, it still says it's on
+        assert p._heads["fx"].pill.text() == "On"
+    finally:
+        p.shutdown()
+        p.deleteLater()
+
+
+def test_the_voice_thats_on_speaks_the_language_picked(panel, monkeypatch):
+    """Speak in belongs to the whole tab: the AI voice gets the translated lines,
+    else the voice changer (real mic muted); text-to-speech's own Start wins."""
+    from types import SimpleNamespace
+    p, _ = panel
+    sp = p.speech
+    asked = []
+    monkeypatch.setattr(sp, "translate_for", asked.append)
+    p._sync_translate()
+    assert asked[-1] == "" and sp.ctl.dub is None             # English: nothing to do
+    de = SimpleNamespace(language="de", language_name="German")
+    monkeypatch.setattr(sp, "translating", lambda: de)
+    p._sync_translate()
+    assert asked[-1] == "" and "Turn on the AI voice" in sp.lbl_bg.text()
+    p.fx.pick("Robot")
+    assert asked[-1] == "fx" and sp.ctl.fx_always and sp.ctl.dub is None
+    assert "German, a few seconds late" in p._heads["fx"].pill.text()
+    monkeypatch.setattr(p.ai, "is_on", lambda: True)
+    p._sync_translate()
+    assert asked[-1] == "ai" and sp.ctl.dub is p.ai_controller and p.ai_controller.dub_on
+    sp.b_live.blockSignals(True)
+    sp.b_live.setChecked(True)
+    sp.b_live.blockSignals(False)
+    p._sync_translate()
+    assert asked[-1] == "" and sp.ctl.dub is None and not p.ai_controller.dub_on
 
 
 # ---------------------------------------------------------------- Make it yours window

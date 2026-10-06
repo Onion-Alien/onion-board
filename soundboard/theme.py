@@ -691,6 +691,7 @@ QPushButton#fxreset, QFrame#card QPushButton#fxreset, QFrame#card[roomy="true"] 
 QPushButton#fxreset:hover, QFrame#card QPushButton#fxreset:hover, QFrame#card[roomy="true"] QPushButton#fxreset:hover { color:$text; background:transparent; }
 QLabel#pill { background:$inset; border:1px solid $border; border-radius:10px; padding:3px 10px; color:$muted; font-size:8.5pt; font-weight:600; }
 QLabel#pill[slow="true"] { color:$warn_text; border-color:$warn_text; }
+QLabel#pill[on="true"] { color:$live_text; border-color:$live_border; }
 QPushButton#fold { background:transparent; border:none; color:$muted; padding:3px 6px; font-size:8.5pt; font-weight:600; }
 QPushButton#fold:hover, QPushButton#fold:checked { color:$text; background:transparent; }
 QFrame#card QPushButton#fold, QFrame#card QPushButton#fold:checked { background:transparent; }
