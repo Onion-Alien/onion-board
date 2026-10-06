@@ -915,6 +915,76 @@ def test_effect_survives_a_fuzzed_ring(ring_file, seed):
     assert abs(y.mean() - 0.1) < 0.02 and y.max() > 0.5, (y.mean(), y.max())
 
 
+@needs_host
+@pytest.mark.parametrize("damage", ["truncated", "tiny", "empty", "capacity", "version"])
+def test_a_damaged_ring_file_leaves_the_mic_exactly_as_it_is(ring_file, damage):
+    """A ring file cut short, emptied or with a layout the effect doesn't know: it never
+    reads past what's there and hands on the mic untouched."""
+    raw = bytearray(ring_file.read_bytes())
+    if damage == "truncated":
+        raw = raw[:len(raw) // 2]   # the header promises more than the file has
+    elif damage == "tiny":
+        raw = raw[:100]
+    elif damage == "empty":
+        raw = bytearray()
+    elif damage == "capacity":
+        raw[12:16] = (3).to_bytes(4, "little")
+    else:
+        raw[4:8] = (99).to_bytes(4, "little")
+    ring_file.write_bytes(bytes(raw))
+    out = ring_file.parent / "out.f32"
+    env = dict(os.environ, ProgramData=str(ring_file.parent.parent.parent))
+    r = subprocess.run([str(HOST), str(DLL), str(out), "48000", "2", "0.3", "0.2"], env=env,
+                       capture_output=True, text=True, timeout=20)
+    assert r.returncode == 0, r.stdout + r.stderr
+    assert np.all(np.fromfile(out, np.float32) == np.float32(0.2))
+
+
+@needs_host
+@realtime
+def test_a_header_gone_bad_puts_the_mic_back_until_it_is_right(ring_file):
+    """The layout changing under a running effect (only junk does that: the board makes a
+    new file instead): the plain mic until it's right again, then the board is back."""
+    def during(s):
+        h = s._ring
+        time.sleep(0.8)
+        h._set("magic", 0)
+        time.sleep(0.8)
+        h._set("magic", dm.MAGIC)
+
+    (x,), _, _ = _run_host(ring_file, 48000, 2, 2.6, mic=0.1, during=during)
+    y = x[:, 0]
+    assert np.abs(y[int(0.4 * 48000):int(0.6 * 48000)] - 0.1).max() > 0.3   # board + mic
+    bad = y[int(1.0 * 48000):int(1.35 * 48000)]
+    assert np.all(bad == np.float32(0.1)), np.abs(bad - 0.1).max()        # the mic alone
+    assert np.abs(y[int(2.0 * 48000):int(2.5 * 48000)] - 0.1).max() > 0.3   # board back
+
+
+FUZZ_HOST = BUILD / "fuzzhost.exe"
+FUZZ_DLL = BUILD / "obmic_fuzz.dll"
+needs_fuzz = pytest.mark.skipif(not (FUZZ_HOST.is_file() and FUZZ_DLL.is_file()),
+                                reason="run scripts/build_directmic.py --fuzz")
+
+
+@needs_fuzz
+def test_a_fault_in_the_effect_puts_the_mic_back(tmp_path):
+    """The guard: a fault while the effect runs (the fuzz build's test switch) hands on
+    the block exactly as it came in, rests a moment, then the board is back."""
+    r = subprocess.run([str(FUZZ_HOST), str(FUZZ_DLL), str(tmp_path), "--selftest"],
+                       capture_output=True, text=True, timeout=60)
+    assert r.returncode == 0 and "SELFTEST OK" in r.stdout, r.stdout + r.stderr
+
+
+@needs_fuzz
+def test_effect_survives_a_short_fuzz(tmp_path):
+    """A few seconds of fuzzhost (hostile, truncated and half-written ring files; the
+    effect with sanitizer traps): no crash, hang, caught fault or sound out of range.
+    scripts/fuzz_directmic.py runs it for longer."""
+    r = subprocess.run([str(FUZZ_HOST), str(FUZZ_DLL), str(tmp_path), "4", "12345"],
+                       capture_output=True, text=True, timeout=60)
+    assert r.returncode == 0 and "0 findings" in r.stdout, r.stdout[-3000:] + r.stderr
+
+
 def test_board_ignores_a_nonsense_mic_rate(ring_file):
     """A ring claiming a 1 Hz mic would make the board render a gigantic stretch for a
     handful of mic frames (a hang): such a rate doesn't count as a live mic."""

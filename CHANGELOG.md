@@ -33,6 +33,9 @@
   take you for a bot.
 - **Instant replay reminds you to ask first.** Setting its key now says that in some
   places recording a call needs everyone's OK.
+- **A broken mic-effect file can't cut out all of Windows' sound.** If the file *Straight
+  into my mic* reads is damaged or tampered with, it just passes your mic through until
+  the file is right again.
 
 ## 1.9.6 — 2026-10-06
 
