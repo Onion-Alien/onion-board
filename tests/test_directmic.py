@@ -448,8 +448,39 @@ def test_direct_fifo_pads_once_then_keeps_up():
     for _ in range(5):
         f.write(np.full((480, 2), 2, np.float32))
         assert (f.read(480) == 2).all()
-    f.write(np.full((4000, 2), 3, np.float32))   # a pile-up: dropped to one read
-    assert len(f.read(480)) == 480 and f.count == 0
+    f.write(np.full((4000, 2), 3, np.float32))   # a stall: nothing reads it...
+    f.write(np.full((480, 2), 4, np.float32))    # ...so the next write drops it
+    assert (f.read(480) == 4).all() and f.count == 0
+
+
+def test_direct_fifo_keeps_a_late_wake_up_whole():
+    """The board's thread woke 100 ms late: it writes all that mic at once and renders
+    it in 10 ms reads. Every frame goes out, in order (dropping all but the last read
+    cut holes in the voice whenever the PC was busy)."""
+    from soundboard.engine import DirectFifo
+    f = DirectFifo()
+    x = np.arange(4800, dtype=np.float32)[:, None].repeat(2, axis=1)
+    f.write(x)
+    got = np.concatenate([f.read(480) for _ in range(10)])
+    assert np.array_equal(got, x) and f.count == 0
+
+
+def test_late_pump_sends_all_the_voice(ring_file):
+    """A late pump in the real engine: the voice sent is the mic it got, with no holes."""
+    from soundboard.engine import Engine
+    e = Engine()
+    e.main_direct = True
+    e.main_stream = object()   # "open": the mic goes to the send mix
+    voice = (0.3 * np.sin(np.arange(4800) / 7)).astype(np.float32)
+    e._mic(np.stack([voice, voice], 1), direct=True)
+    out = np.zeros((480, 2), np.float32)
+    sent = []
+    for _ in range(10):
+        e._cb_main(out, 480, None, None)
+        sent.append(out[:, 0].copy())
+    sent = np.concatenate(sent)
+    rms = np.sqrt((sent.reshape(10, 480) ** 2).mean(axis=1))
+    assert rms.min() > 0.1, rms   # every 10 ms has voice in it
 
 
 # ---------------------------------------------------------------------- the real effect
@@ -634,6 +665,110 @@ def test_replace_mode_sends_the_boards_voice_soon(ring_file, instances):
         lags.append(lag)
     # every app hears it at about the same time (each starts reading on its own block)
     assert max(lags) - min(lags) <= 480 + 48 * 5
+
+
+class Stalling(Echo):
+    """An Echo board that stalls for `stall` s at each of `at` (seconds of its output)."""
+
+    def __init__(self, at, stall, **kw):
+        super().__init__(**kw)
+        self.at, self.stall, self.made = list(at), stall, 0
+
+    def __call__(self, out, frames, t, status):
+        super().__call__(out, frames, t, status)
+        self.made += frames
+        if self.at and self.made >= self.at[0] * dm.RATE:
+            self.at.pop(0)
+            time.sleep(self.stall)
+
+
+@needs_host
+@pytest.mark.parametrize("stall", [0.03, 0.08])
+@realtime
+def test_a_late_board_is_filled_in_with_the_mic_from_then(ring_file, stall):
+    """Replace mode, the board late (a busy PC): the effect fills in with the clean mic
+    from the moment the board's audio was made from, so the voice goes on without a skip
+    or a repeat. (It used to fill in with the mic as it is now, a lead ahead: each
+    hiccup cut a bit out of the voice, then the resync played a bit twice.) Here the
+    board's voice is the clean mic itself: the output is the mic, a fixed time later,
+    sample for sample, hiccups and all."""
+    board = Stalling([0.9, 1.5], stall, gain=1.0)
+    (x,), _, _ = _run_host(ring_file, 48000, 1, 2.5, mic=0.3, mic_hz=-1, callback=board,
+                           mic_callback=board.mic, mode=dm.MODE_REPLACE)
+    lag, exact = _delay(x[:, 0], 48000, start_s=0.6, span_s=1.6)
+    assert lag <= 0.05 * 48000, lag / 48
+    assert exact > 0.98, exact
+
+
+@needs_host
+@realtime
+def test_a_late_board_never_lets_a_muted_mic_out(ring_file):
+    """Replace mode, the mic muted on the board (it sends silence), the board late: the
+    effect's fill-in stays muted. (It used to put the plain mic out for the hiccup.)"""
+    board = Stalling([0.9, 1.4], 0.08, gain=0.0)
+
+    def during(s):
+        s.set_mic_gain(0.0)
+
+    (x,), _, _ = _run_host(ring_file, 48000, 1, 2.0, mic=0.3, mic_hz=-1, callback=board,
+                           mic_callback=board.mic, mode=dm.MODE_REPLACE, during=during)
+    assert np.abs(x[int(0.6 * 48000):, 0]).max() < 0.01
+
+
+def test_board_tells_the_effect_where_its_audio_came_from(ring_file):
+    """Each stretch the board renders on the mic's clock comes with the sync pair: ring
+    frame -> the clean-mic frame it was made from (minus the board's own voice delay)."""
+    w = dm.RingWriter(ring_file)
+    w._set("mic_rate", 48000)
+    w.close()
+    s = dm.DirectMicStream(lambda out, frames, t, st: out.fill(0), ring_file,
+                           voice_delay=lambda: 144.0)
+    try:
+        ring = s._ring
+        s.active = True
+        ring._mtick[0] = dm._tick()
+        ring._mwp[0] = 1000
+        s._pump()                      # starts here
+        ring._mtick[0] = dm._tick()
+        ring._mwp[0] = 1960
+        s._pump()                      # 960 frames of mic -> 960 rendered
+        assert ring.write_pos == 960
+        assert int(ring._get("sync_wp")) == 960 and int(ring._get("sync_mic")) == 1960 - 144
+        assert int(ring._get("sync_seq")) % 2 == 0
+    finally:
+        s.close()
+
+
+def test_engine_voice_delay_is_what_it_adds(ring_file):
+    """Engine._direct_voice_delay matches the delay the send mix really has on the voice
+    (limiter lookahead; a resampler's hold-back at other mic rates)."""
+    from soundboard.engine import Engine
+    for rate in (48000, 44100):
+        e = Engine()
+        e.main_direct = True
+        e.main_stream = object()
+        e.rates["mic"] = rate
+        e._reconfigure_mic_resamplers()
+        rng = np.random.default_rng(1)
+        x = (0.1 * rng.standard_normal(2 * rate)).astype(np.float32)
+        blk = rate // 100
+        out = np.zeros((480, 2), np.float32)
+        sent = []
+        for i in range(200):
+            b = x[i * blk:(i + 1) * blk]
+            e._mic(np.stack([b, b], 1), direct=True)
+            e._cb_main(out, 480, None, None)
+            sent.append(out[:, 0].copy())
+        y = np.concatenate(sent).astype(np.float64)
+        # the newest voice in y is the mic from `d` frames (at 48 kHz) before its end
+        d = e._direct_voice_delay()
+        import soxr
+        ref = x.astype(np.float64) if rate == 48000 else \
+            soxr.resample(x, rate, 48000, quality="VHQ")
+        tail = y[-24000:]   # (it settles over the first moments: the end is what counts)
+        lags = range(0, 4000)
+        k = max(lags, key=lambda lag: float(np.dot(tail, ref[len(y) - 24000 - lag:len(y) - lag])))
+        assert abs(k - d) <= 2, (rate, k, d)
 
 
 @needs_host

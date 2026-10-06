@@ -34,10 +34,15 @@ the route (`Config.route`, `library.ROUTES`):
   (`DirectMicStream`, on the mic's clock: no drift), and in *replace* mode (the
   default) the effect puts that whole send mix, processed voice included, in place of
   the mic about 20 ms later, so every mic feature works as with the cable. Each app
-  recording the mic runs its own instance with its own slot in the file. Whenever the
-  board is late or gone the mic fades back in over what the board had already sent;
-  after such a hiccup the effect reads a little further behind the board, and closes
-  that gap again in a quiet moment once the board keeps time. A mic at another rate
+  recording the mic runs its own instance with its own slot in the file. When the
+  board is late with a block (a busy PC) the effect fills the gap with the clean mic
+  from the moment that block would have been made from (the board publishes a sync
+  pair, ring frame -> mic frame, minus its own voice delay), so the voice goes on
+  without a skip or a repeat, at the board's mic level (muted stays muted; a changed
+  voice goes quiet rather than let the real one out). When it's gone the plain mic
+  fades back in. After a hiccup the effect reads a little further behind the board
+  (stepping back where it's quiet), and closes that gap again in a quiet moment once
+  the board keeps time. A mic at another rate
   than 48 kHz gets the board's mix through a windowed-sinc resampler (no fold-back of
   the highs on 44.1 / 16 kHz mics). Only one board writes the file at a time
   (`board_pid`: a second copy of the app says so instead). Nothing read from the file

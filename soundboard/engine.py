@@ -510,7 +510,14 @@ class DirectFifo:
     Writer and reader run on the same clock (the mic's) one right after the other, so
     unlike Ring there's no cushion: a read takes what's there. Short (a resampler's
     start-up delay), it's padded once with silence at the front; then every read finds
-    what it needs. A pile-up beyond MAX_S (a stall) is dropped down to one read."""
+    what it needs.
+
+    One write can be many reads long: when the board's thread wakes late it takes all
+    the mic that came in meanwhile (40 ms, 100 ms...) and renders the same stretch in
+    10 ms reads. That's all audio still to be sent, never a pile-up; dropping it there
+    cut 20-40 ms holes out of the voice whenever the PC was busy. Only what's left over
+    from earlier writes and never read (a stall) is stale: over MAX_S, it's dropped when
+    the next write comes in."""
 
     MAX_S = 0.03
 
@@ -523,16 +530,17 @@ class DirectFifo:
         self.parts, self.count = [], 0
 
     def write(self, x: np.ndarray):
-        if len(x):
-            self.parts.append(x)
-            self.count += len(x)
+        if not len(x):
+            return
+        if self.count > self.MAX_S * self.rate:   # a stall's leftovers: too late to send
+            self.clear()
+        self.parts.append(x)
+        self.count += len(x)
 
     def read(self, n: int) -> np.ndarray | None:
         if not self.count:
             return None
         buf = self.parts[0] if len(self.parts) == 1 else np.concatenate(self.parts)
-        if len(buf) > n + self.MAX_S * self.rate:
-            buf = buf[-n:]
         if len(buf) >= n:
             out, rest = buf[:n], buf[n:]
         else:
@@ -587,11 +595,22 @@ class StreamResampler:
 
     def __init__(self, src: int, dst: int):
         self.same = src == dst
+        self.src, self.dst = src, dst
         self.rs = None if self.same else soxr.ResampleStream(src, dst, CH, dtype="float32",
                                                               quality="HQ")
+        self.fed = self.made = 0   # frames in (at src) and out (at dst) so far
 
     def __call__(self, x: np.ndarray) -> np.ndarray:
-        return x if self.same else self.rs.resample_chunk(x)
+        if self.same:
+            return x
+        y = self.rs.resample_chunk(x)
+        self.fed += len(x)
+        self.made += len(y)
+        return y
+
+    def held(self) -> float:
+        """Frames (at dst) it has taken in but not given out yet: its delay."""
+        return 0.0 if self.same else max(0.0, self.fed * self.dst / self.src - self.made)
 
 
 def soft_limit(x: np.ndarray, knee: float = 0.89) -> np.ndarray:
@@ -998,7 +1017,8 @@ class Engine:
         """What others hear -> straight into the real mic (soundboard.directmic)."""
         try:
             s = directmic.DirectMicStream(callback, mic_callback=self._mic_direct,
-                                          mode=self.direct_mode, lead_s=self.direct_lead_s)
+                                          mode=self.direct_mode, lead_s=self.direct_lead_s,
+                                          voice_delay=self._direct_voice_delay)
         except FileNotFoundError:
             raise RuntimeError("Onion Board isn't attached to your mic yet") from None
         self.fifo_direct.clear()
@@ -1014,6 +1034,17 @@ class Engine:
         self._resume_voices("main", rate)
         log.info("opened main output: straight into the mic")
         return s
+
+    def _direct_voice_delay(self) -> float:
+        """Frames (at the send rate) the newest frame of the send mix is behind the newest
+        clean mic, in your voice: what the resampler holds back, what waits in the fifo,
+        the limiter's lookahead. (The mic effect fills in for a late block with the mic
+        from the same moment; a voice changer's own delay doesn't count: the effect
+        doesn't fill in with your real voice then, see _direct_mic_gain.)"""
+        d = self._rs_main.held() + self.fifo_direct.count
+        if self.limiter_on:
+            d += self._stage("main", Limiter).la
+        return d
 
     def effect_alive(self) -> bool:
         """The mic effect is running: a program is recording the mic it's on."""
@@ -1983,8 +2014,7 @@ class Engine:
             mic = self.fifo_direct.read(frames)
             mix = self._send_bus("main", finite(mix), mic,
                                  add_mic=self.direct_mode == directmic.MODE_REPLACE)
-            if self.direct_mode == directmic.MODE_ADD:   # the effect keeps the real mic
-                self._direct_mic_gain()
+            self._direct_mic_gain()
         else:
             mix = self._send_bus("main", finite(mix), self.ring_main.read(frames))
         # muted: others get silence (faded, not cut), nothing else changes
@@ -2128,12 +2158,17 @@ class Engine:
         return mix
 
     def _direct_mic_gain(self):
-        """Add mode: the real mic's level, applied by the mic effect (mute, mic volume,
-        the gate while a sound plays, and nothing at all while sending is off)."""
+        """The real mic's level, applied by the mic effect (mute, mic volume, the gate
+        while a sound plays, and nothing at all while sending is off). Add mode: always
+        heard. Replace mode: only when the effect fills in for a block the board was
+        late with; a changed voice then stays quiet rather than let the real one out."""
         d = self.direct_stream()
         if d is None:
             return
         on = self.mic_enabled and not self.mic_muted and self.sending
+        if self.direct_mode == directmic.MODE_REPLACE:
+            chain = self.voice_chain
+            on = on and not (chain is not None and getattr(chain, "changes_voice", True))
         d.set_mic_gain(self.mic_vol * self._gate.get("main", 1.0) if on else 0.0)
 
     def _vol(self, out: str, what, x: np.ndarray, v: float) -> np.ndarray:

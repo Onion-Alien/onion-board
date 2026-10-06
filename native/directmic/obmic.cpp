@@ -13,7 +13,9 @@
 //  - The board writes what others hear (48 kHz mono) into the main ring. MODE_REPLACE:
 //    that is the board's whole send mix, your processed voice included (voice changer,
 //    volume, gate, mute all work), and replaces the mic. MODE_ADD: only the sounds,
-//    added on top of the mic. The board quiet or late: the mic alone, crossfaded.
+//    added on top of the mic. The board late with a block: the clean mic from the
+//    moment that block was made from fills in (the voice goes on, no skip or repeat).
+//    The board gone: the mic alone, crossfaded.
 //  - Every app recording the mic runs its own instance; each has a slot in the file
 //    with its own read position, so they never race.
 //
@@ -178,7 +180,7 @@ static const PROPERTYKEY PKEY_AudioEndpoint_GUID_ =
 static const CLSID CLSID_OnionMic =
     {0xc55e76fe, 0x6667, 0x4828, {0x81, 0xfd, 0x05, 0xb3, 0x93, 0xfd, 0x64, 0x9e}};
 static const wchar_t *STATE_KEY = L"SOFTWARE\\OnionBoard\\MicPlugin\\Endpoints";
-static const uint32_t EFFECT_VERSION = 2;        // directmic.EFFECT_VERSION
+static const uint32_t EFFECT_VERSION = 3;        // directmic.EFFECT_VERSION
 
 // The shared ring file. soundboard/directmic.py writes the same layout and documents it.
 // Anyone signed in can write this file, so nothing read from it is trusted: sizes are
@@ -242,6 +244,12 @@ struct RingHeader {                // offset
     volatile uint64_t mic_tick;    // 72  GetTickCount64 of the last clean-mic block
     volatile uint32_t effect_version;  // 80  EFFECT_VERSION of the running effect
     uint32_t board_pid;            // 84  the board writing (another board backs off)
+    // board: ring frame sync_wp is its audio for clean-mic frame sync_mic (both 0: none).
+    // sync_seq is odd while the board changes them.
+    volatile uint32_t sync_seq;    // 88
+    uint32_t pad1;                 // 92
+    volatile uint64_t sync_wp;     // 96
+    volatile uint64_t sync_mic;    // 104
 };
 #pragma pack(pop)
 
@@ -509,6 +517,8 @@ public:
         m_locked = true;
         m_w = 0.0f;
         m_mg = 1.0f;
+        m_b = 1.0f;
+        m_owe = 0;
         m_okBlocks = 0;
         if (m_ring && m_rate) makeKernel();
         if (m_ring && m_rate) {
@@ -708,6 +718,38 @@ private:
         return pk;
     }
 
+    // The board's sync pair (RingHeader.sync_*), read only while the board isn't changing
+    // it: the last good one is kept meanwhile.
+    void readSync() {
+        RingHeader *h = m_ring;
+        uint32_t a = h->sync_seq;
+        if (a & 1) return;
+        MemoryBarrier();
+        uint64_t wp = h->sync_wp, mic = h->sync_mic;
+        MemoryBarrier();
+        if (h->sync_seq != a) return;
+        m_syncOk = wp != 0 || mic != 0;
+        m_syncWp = wp;
+        m_syncMic = mic;
+    }
+
+    // The clean-mic frame (fractional) the board's audio at ring position `pos` was made
+    // from (the resampler's delay included: sample(pos) plays ring frame pos - m_half).
+    inline double micFrame(double pos) const {
+        return (double)m_syncMic + (pos - (double)m_half - (double)m_syncWp) * m_micStep;
+    }
+
+    // The clean mic (both channels averaged, as the board's mono) at mic frame `m`.
+    inline float micAt(double m) const {
+        double fk = floor(m);
+        uint64_t k = (uint64_t)(int64_t)fk;
+        float f = (float)(m - fk);
+        const float *a = m_mic + (size_t)(k & m_micMask) * 2;
+        const float *b = m_mic + (size_t)((k + 1) & m_micMask) * 2;
+        float x0 = 0.5f * (clean(a[0]) + clean(a[1])), x1 = 0.5f * (clean(b[0]) + clean(b[1]));
+        return x0 + (x1 - x0) * f;
+    }
+
     void openRing() {
         if (m_ring) return;
         initDataDir();
@@ -838,13 +880,24 @@ private:
         bool replaceMode = h->mode == MODE_REPLACE;
         double step = (double)m_boardRate / (double)m_rate;   // ring frames per mic frame
         double cap = (double)(m_mask + 1);
+        m_micStep = 1.0 / step;
         uint32_t want = h->lead;
         if (want >= (uint32_t)(0.002 * m_boardRate) && want <= (uint32_t)(LEAD_MAX_S * m_boardRate)
                 && want != (uint32_t)m_leadBase) {
             m_leadBase = want;            // the board asked for another lead
             m_lead = want;
+            m_owe = 0;
             m_synced = false;
         }
+        // The board late with a block (replace mode): the gap is filled in with the clean
+        // mic from the very moment the board's audio was made from, so the voice carries
+        // on with no skip or repeat, and this keeps its place in the ring meanwhile. (The
+        // plain mic now is a lead ahead of that: each hiccup cut a bit out of the voice,
+        // and the resync after it, a lead further back, played a bit twice.) Needs the
+        // board's sync pair (older boards don't write one) and the clean mic at this
+        // stream's rate (another app's stream, at another rate, may be publishing it).
+        readSync();
+        bool canFill = replaceMode && m_syncOk && h->mic_rate == m_rate;
         // the board only just started (or came back): wait until it's a lead ahead
         if (board && !m_synced && (double)wp < m_lead + frames * step + 2.0) board = false;
         bool fresh = false;
@@ -855,14 +908,26 @@ private:
         if (board && !m_synced && m_played && (double)wp - m_lead < m_pos
                 && m_pos <= (double)wp)
             board = false;
-        if (board && (!m_synced || m_pos > (double)wp ||
+        // (filling in, this runs ahead of the board for as long as it's late)
+        bool past = m_pos > (double)wp &&
+                    !(canFill && m_synced && m_pos - (double)wp < 0.25 * m_boardRate);
+        if (board && (!m_synced || past ||
                       (double)wp - m_pos > m_lead + 0.1 * m_boardRate ||
                       (double)wp - m_pos > cap * 0.5)) {
             m_pos = (double)wp - m_lead;
             if (m_pos < 0) m_pos = 0;
+            m_owe = 0;
             m_synced = true;
             fresh = true;
         }
+        // the clean mic this block would fill in with is all still in its ring
+        bool micOk = canFill && m_synced;
+        if (micOk) {
+            double micWp = (double)h->mic_write_pos;
+            double m0 = micFrame(m_pos), m1 = micFrame(m_pos + frames * step) + 2.0;
+            micOk = m0 >= 0.0 && m1 < micWp && micWp - m0 < (double)m_micMask - 64.0;
+        }
+        bool fill = micOk && board;
         // How much of the board's audio is there ahead of this instance. A block needs
         // (frames - 1) * step + 1 (the last sample interpolates up to the next frame,
         // which only counts when the position isn't whole). The board only stays in while
@@ -874,43 +939,52 @@ private:
         bool ahead = have && avail >= need + frames * step;
         bool late = board && !ahead && !fresh;
         if (late && !m_late) {   // once per hiccup
+            double before = m_lead;
             m_lead += LEAD_STEP_S * m_boardRate;
             if (m_lead > LEAD_MAX_S * m_boardRate) m_lead = LEAD_MAX_S * m_boardRate;
+            if (fill) m_owe += m_lead - before;   // filling in: stepped back where it's quiet
             if (m_slot) m_slot->underruns = m_slot->underruns + 1;
         }
         m_late = late;
         if (late || !board) m_okBlocks = 0;
         else if (m_okBlocks < 0x7fffffff) m_okBlocks++;
-        float wTarget = board && ahead && replaceMode ? 1.0f : 0.0f;
+        float wTarget = board && replaceMode && (ahead || fill) ? 1.0f : 0.0f;
+        float bTarget = ahead || !fill ? 1.0f : 0.0f;   // 1 = the board, 0 = the mic from then
+        // The mic's level while it's heard: the board's (MODE_ADD; and in MODE_REPLACE
+        // while it stands in for a late board: muted stays muted)
         float mgTarget = 1.0f;
-        if (board && !replaceMode) {
+        if (board) {
             float mg = h->mic_gain;
             mgTarget = mg >= 0.0f && mg <= 4.0f ? mg : 1.0f;
         }
+        bool useMic = micOk && (fill || (m_b < 1.0f && m_w > 0.0f));
         float g = h->gain;
         if (!(g >= 0.0f && g < 16.0f)) g = 1.0f;
         float ramp = 1.0f / (float)(FADE_S * m_rate);
-        float w = m_w, mg = m_mg;
+        float w = m_w, mg = m_mg, b = useMic ? m_b : 1.0f;
         float sLast = 1.0f;
         bool any = false;
-        if (have || w > 0.0f || mg != 1.0f || mgTarget != 1.0f) {
+        if (have || useMic || w > 0.0f || mg != 1.0f || mgTarget != 1.0f) {
             if (silent) {   // a silent buffer's contents are undefined: start from zero
                 memset(buf, 0, (size_t)frames * ch * sizeof(float));
             }
             double pos = m_pos;
             for (UINT32 i = 0; i < frames; i++) {
-                float s = 0.0f;
-                if (have) {
-                    s = sample(pos) * g;
-                    pos += step;
+                mg += mg < mgTarget ? ramp : mg > mgTarget ? -ramp : 0.0f;
+                if (fabsf(mg - mgTarget) < ramp) mg = mgTarget;
+                float s = have ? sample(pos) * g : 0.0f;
+                sLast = s;
+                if (useMic) {   // crossfade: the board's audio and the mic from then
+                    b += b < bTarget ? ramp : b > bTarget ? -ramp : 0.0f;
+                    if (b < 0.0f || !have) b = 0.0f;
+                    if (b > 1.0f) b = 1.0f;
+                    s = s * b + micAt(micFrame(pos)) * mg * (1.0f - b);
                 }
+                if (have || useMic) pos += step;
                 w += w < wTarget ? ramp : w > wTarget ? -ramp : 0.0f;
                 if (w < 0.0f) w = 0.0f;
                 if (w > 1.0f) w = 1.0f;
-                mg += mg < mgTarget ? ramp : mg > mgTarget ? -ramp : 0.0f;
-                if (fabsf(mg - mgTarget) < ramp) mg = mgTarget;
                 float keep = (1.0f - w) * mg;
-                sLast = s;
                 if (replaceMode) s *= w;   // crossfade: the board's voice in, the mic out
                 float *p = buf + (size_t)i * ch;
                 for (UINT32 c = 0; c < ch; c++) {
@@ -919,17 +993,27 @@ private:
                 }
                 any = any || s != 0.0f || keep != 1.0f;
             }
-            if (have) {
-                m_pos = pos;
-                m_played = true;
-            }
-            // On time for a while after a hiccup: read closer to the board again (less
-            // delay), skipping a stretch only where it's quiet on both sides of the jump
-            if (have && !late && m_okBlocks > SHRINK_AFTER && m_lead > m_leadBase + 0.5) {
+            if (have || useMic) m_pos = pos;
+            if (have) m_played = true;
+            float quiet = QUIET / (g > 1.0f ? g : 1.0f);
+            if (have && !late && b >= 1.0f && m_owe > 0.5) {
+                // The lead grew after a hiccup that was filled in: step back to it where
+                // the board was quiet, so the stretch heard twice is silence
+                double d = m_owe;
+                if (d > SHRINK_MAX_S * m_boardRate) d = SHRINK_MAX_S * m_boardRate;
+                uint32_t look = (uint32_t)d + 2 * (uint32_t)m_half + 2;
+                if (fabsf(sLast) < QUIET && m_pos - d - m_half - 1 > 0
+                        && peakOf(m_pos - d - m_half - 1, look) < quiet) {
+                    m_pos -= d;
+                    m_owe -= d;
+                }
+            } else if (have && !late && m_owe <= 0.5 && m_okBlocks > SHRINK_AFTER
+                       && m_lead > m_leadBase + 0.5) {
+                // On time for a while after a hiccup: read closer to the board again (less
+                // delay), skipping a stretch only where it's quiet on both sides of the jump
                 double d = m_lead - m_leadBase;
                 if (d > SHRINK_MAX_S * m_boardRate) d = SHRINK_MAX_S * m_boardRate;
                 uint32_t look = (uint32_t)d + 2 * (uint32_t)m_half + 2;
-                float quiet = QUIET / (g > 1.0f ? g : 1.0f);
                 if (fabsf(sLast) < QUIET && peakOf(m_pos - m_half - 1, look) < quiet
                         // (enough for the next block once the board has written it,
                         // as it does right after each mic block: the normal lead)
@@ -942,7 +1026,12 @@ private:
         }
         m_w = w;
         m_mg = mg;
-        if (!have || (late && w <= 0.0f)) m_synced = false;   // (silent now: a jump is fine)
+        m_b = useMic ? b : 1.0f;
+        bool filling = useMic && !have;
+        if (!filling && (!have || (late && w <= 0.0f))) {   // (silent now: a jump is fine)
+            m_synced = false;
+            m_owe = 0;
+        }
         if (any) o->u32BufferFlags = BUFFER_VALID;
         if (m_slot) {
             m_slot->rate = m_rate;
@@ -985,7 +1074,13 @@ private:
     float *m_kernel = NULL;    // the resampler's table (makeKernel); NULL = same rate
     int m_half = 0;            // its half width, in ring frames
     float m_w = 0.0f;    // 0 = the mic, 1 = the board's voice (MODE_REPLACE), crossfaded
-    float m_mg = 1.0f;   // the mic's level (MODE_ADD)
+    float m_mg = 1.0f;   // the mic's level (MODE_ADD; MODE_REPLACE: while it stands in)
+    float m_b = 1.0f;    // filling in: 1 = the board's audio, 0 = the mic from then
+    double m_owe = 0;    // ring frames the lead grew by that still need stepping back
+    double m_micStep = 1.0;   // clean-mic frames per ring frame
+    bool m_syncOk = false;    // the board's sync pair (readSync)
+    uint64_t m_syncWp = 0;
+    uint64_t m_syncMic = 0;
 };
 
 // ------------------------------------------------------------------ COM plumbing
