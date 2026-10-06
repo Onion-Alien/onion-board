@@ -52,7 +52,7 @@ class FakeCapture:
 @pytest.fixture
 def tab(qapp, monkeypatch):
     monkeypatch.setattr(appaudio, "AppCapture", FakeCapture)
-    monkeypatch.setattr(appaudio, "list_apps", lambda strict=False: [])
+    monkeypatch.setattr(appaudio, "list_apps", lambda strict=False, **_: [])
     FakeCapture.made = []
     FakeCapture.fail = FakeCapture.slow = False
     cfg = Config()
@@ -242,7 +242,7 @@ def test_remembered_programs_start_from_the_config_and_auto_send(qapp, monkeypat
 
 def test_a_damaged_remembered_volume_does_not_stop_the_app_starting(qapp, monkeypatch):
     """A hand-edited or damaged config ("loud", NaN, huge) used to crash the window."""
-    monkeypatch.setattr(appaudio, "list_apps", lambda strict=False: [])
+    monkeypatch.setattr(appaudio, "list_apps", lambda strict=False, **_: [])
     cfg = Config()
     cfg.apps = {"a.exe": {"vol": "loud"}, "b.exe": {"vol": float("nan")},
                 "c.exe": {"vol": 1e9}, "d.exe": {"vol": -2}, "e.exe": {"vol": None},
@@ -377,9 +377,12 @@ def test_level_watcher_pauses_behind_a_game(qapp, monkeypatch):
 
         def peak(self, pid):
             return None
+
+        def list_for(self, done):
+            return False
     monkeypatch.setattr(appaudio, "PeakWatcher", Watcher)
     monkeypatch.setattr(appaudio, "AppCapture", FakeCapture)
-    monkeypatch.setattr(appaudio, "list_apps", lambda: [])
+    monkeypatch.setattr(appaudio, "list_apps", lambda **_: [])
     monkeypatch.setattr(appspanel.appstate, "active", lambda: True)
     t = AppsTab(Engine(), Config(), lambda: None, Meter)
     try:
@@ -436,7 +439,7 @@ def test_windows_only_warning(qapp, monkeypatch):
 
 
 def test_lister_hands_results_to_the_ui_thread(qapp, monkeypatch):
-    monkeypatch.setattr(appaudio, "list_apps", lambda strict=False: [music()])
+    monkeypatch.setattr(appaudio, "list_apps", lambda strict=False, **_: [music()])
     got = []
     lister = appspanel._Lister()
     lister.ready.connect(got.append)
@@ -451,8 +454,26 @@ def test_lister_hands_results_to_the_ui_thread(qapp, monkeypatch):
     lister.stop()
 
 
+def test_lister_takes_the_list_from_the_level_watcher_while_it_runs(qapp, monkeypatch):
+    def walked(**_):
+        raise AssertionError("listed again on a thread of its own")
+    monkeypatch.setattr(appaudio, "list_apps", walked)
+
+    class Watcher:
+        def list_for(self, done):
+            done([music()], {100: "music.exe"})   # (on the watcher's thread, really)
+            return True
+    got = []
+    lister = appspanel._Lister(peaks=Watcher())
+    lister.ready.connect(got.append)
+    lister.refresh()
+    qapp.processEvents()
+    assert got == [([music()], {100: "music.exe"})] and not lister._busy
+    lister.stop()
+
+
 def test_a_listing_failure_skips_the_update(qapp, monkeypatch):
-    def boom(strict=False):
+    def boom(strict=False, **_):
         raise appaudio.ComError("COM hiccup")
     monkeypatch.setattr(appaudio, "list_apps", boom)
     got = []
@@ -558,7 +579,7 @@ def test_cards_tighten_when_narrow_and_keep_the_meter(qapp):
 def test_programs_are_cards_several_across(tab, qapp, monkeypatch):
     """A wide window shows the programs side by side, an equal-width card each."""
     apps = [music(), App(200, "game.exe"), App(300, "call.exe")]
-    monkeypatch.setattr(appaudio, "list_apps", lambda strict=False: apps)   # running when shown
+    monkeypatch.setattr(appaudio, "list_apps", lambda **_: apps)   # running when shown
     tab._on_apps(apps)
     tab.resize(1200, 600)
     tab.show()
@@ -582,7 +603,7 @@ def test_cards_settle_instead_of_jumping(tab, qapp, monkeypatch):
     from PySide6.QtCore import QEvent, QObject
 
     apps = [music(), App(200, "game.exe"), App(300, "call.exe")]
-    monkeypatch.setattr(appaudio, "list_apps", lambda strict=False: apps)
+    monkeypatch.setattr(appaudio, "list_apps", lambda strict=False, **_: apps)
     tab._on_apps(apps)
     cards = [tab.rows[k] for k in ("music.exe", "game.exe", "call.exe")]
 

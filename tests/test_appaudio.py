@@ -108,6 +108,77 @@ class _FakeMeter:
 
 
 @pytest.mark.skipif(not WIN, reason="Windows only")
+def test_list_apps_hands_over_the_process_list_it_was_made_from():
+    alive = {}
+    apps = appaudio.list_apps(strict=True, alive=alive)
+    assert isinstance(apps, list)
+    exe = os.path.basename(sys.executable).lower()
+    assert alive.get(os.getpid()) == exe            # what running() says, without a 2nd walk
+    assert set(appaudio.running()) & set(alive)
+
+
+@pytest.mark.skipif(not WIN, reason="Windows only")
+def test_peak_watcher_makes_the_tabs_list_on_its_own_rescan(monkeypatch):
+    """The Apps tab's list comes from the watcher's rescan while it runs: one walk of
+    the sessions and processes every 1.5 s, not three."""
+    import threading
+    scans, listed = [], []
+
+    def fake_list_apps(strict=False, alive=None, meters=None):
+        scans.append("list")
+        alive[7] = "music.exe"
+        meters[7] = [_FakeMeter(0.5)]
+        return ["apps"]
+
+    def fake_scan(meters=None):
+        scans.append("scan")
+        return []
+    monkeypatch.setattr(appaudio, "list_apps", fake_list_apps)
+    monkeypatch.setattr(appaudio, "_list_apps", fake_scan)
+    w = appaudio.PeakWatcher(interval=0.01, rescan=0.2)
+    assert not w.list_for(lambda *a: listed.append(a))   # not running: list it yourself
+    w.start()
+    done = threading.Event()
+    for _ in range(4):                                     # the tab, asking every 0.15 s
+        done.clear()
+        assert w.list_for(lambda apps, alive: (listed.append((apps, alive)), done.set()))
+        assert done.wait(2)
+        time.sleep(0.15)
+    assert listed == [(["apps"], {7: "music.exe"})] * 4
+    assert scans.count("list") == 4 and scans.count("scan") <= 1   # (its first, maybe)
+    assert w.peak(7) == pytest.approx(0.5)                 # and the levels from that listing
+    t = w._thread
+    w.stop()
+    assert not w.list_for(lambda *a: listed.append(a))
+    t.join(2)
+
+
+@pytest.mark.skipif(not WIN, reason="Windows only")
+def test_peak_watcher_never_leaves_an_ask_unanswered(monkeypatch):
+    """An ask the watcher can't serve (a failed listing, or stopped meanwhile) is
+    answered with None: the Apps tab would otherwise wait forever."""
+    def boom(**_):
+        raise appaudio.ComError(-1, "GetSessionEnumerator")
+    monkeypatch.setattr(appaudio, "list_apps", boom)
+    monkeypatch.setattr(appaudio, "_list_apps", lambda meters=None: [])
+    w = appaudio.PeakWatcher(interval=0.01, rescan=60)
+    w.start()
+    got = []
+    assert w.list_for(lambda *a: got.append(a))
+    deadline = time.monotonic() + 2
+    while not got and time.monotonic() < deadline:
+        time.sleep(0.01)
+    assert len(got) == 1 and got[0][0] is None
+    monkeypatch.setattr(appaudio, "list_apps", lambda **_: time.sleep(0.3) or [])
+    t = w._thread
+    assert w.list_for(lambda *a: got.append(a))
+    w._stop.set()             # it stops before (or while) serving that one
+    t.join(2)
+    assert len(got) == 2 and not w.list_for(lambda *a: got.append(a))
+    w.stop()
+
+
+@pytest.mark.skipif(not WIN, reason="Windows only")
 def test_peak_watcher_reads_meters_between_scans_and_releases_them(monkeypatch):
     made = []
 
