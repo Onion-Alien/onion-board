@@ -1701,6 +1701,10 @@ class MainWindow(QMainWindow):
                                     "or pick <b>Nowhere</b>: your sounds already play in "
                                     "your headphones, where OBS's Desktop Audio picks "
                                     "them up.</span>")
+        elif c.route == "mic":
+            self.setup_hint.setText("Your sounds go straight into <b>My real mic</b>, so "
+                                    "Discord and games hear them through the mic they "
+                                    "already use.")
         elif self.virtual_mic:
             hint = (f"A virtual cable is a pipe: audio goes in at <b>{main}</b> "
                     f"and comes out at <b>{self.virtual_mic}</b>, which Discord "
@@ -1772,8 +1776,7 @@ class MainWindow(QMainWindow):
             out = f"Into your mic  <b style='color:{bad}'>✗ needs a quick repair</b>"
             step = (f"<b style='color:{warn}'>One click:</b> Windows took Onion Board off "
                     "your mic (a driver or Windows update does that). Windows asks for "
-                    "permission once, and your sounds are back in your mic."
-                    + self._meanwhile())
+                    "permission once, and your sounds are back in your mic.")
         elif route == "mic" and not directmic.works(direct):
             state = "missing"
             out = (f"Into your mic  <b style='color:{warn}'>one click to go</b>"
@@ -1781,8 +1784,7 @@ class MainWindow(QMainWindow):
                    f"Into your mic  <b style='color:{warn}'>set up on another mic</b>")
             step = (f"<b style='color:{warn}'>One click:</b> put your sounds straight into "
                     "your mic. Windows asks for permission once; after that Discord and "
-                    "games hear them through your normal mic, with nothing to set there."
-                    + self._meanwhile())
+                    "games hear them through your normal mic, with nothing to set there.")
         elif route == "mic" and e.main_stream is not None and self._direct_not_running():
             state = "unrouted"
             out = (f"Into your mic  <b style='color:{bad}'>✗ Windows isn't running "
@@ -1796,9 +1798,7 @@ class MainWindow(QMainWindow):
             apps = e.direct_apps()
             out = (f"<b style='color:{ok}'>{name}</b> — your sounds are in it "
                    f"<b style='color:{ok}'>✓</b>"
-                   + (f"  <b style='color:{ok}'>(live)</b>" if apps else "")
-                   + ("  <span>· also on the virtual cable</span>"
-                      if e.tap is not None else ""))
+                   + (f"  <b style='color:{ok}'>(live)</b>" if apps else ""))
             step = ("<b>Nothing to set.</b> Discord and games keep your normal mic, and "
                     "your sounds are in it. If sounds get chopped up, switch off the "
                     "voice app's noise suppression (Discord: <b>Input Profile → Studio</b>)."
@@ -1961,11 +1961,7 @@ class MainWindow(QMainWindow):
             log.warning("not put on the mic: %s", err)
             # the route stays on the mic: until it's set up, the cable carries the
             # sounds meanwhile (_main_name), and the one-click stays on offer
-            if self.cfg.route == "mic" and eng.virtual_outputs():
-                err += ("\n\nYour sounds go through the virtual cable meanwhile. Try again "
-                        "any time from the Setup tab.")
-            else:
-                err += "\n\nTry again any time from the Setup tab."
+            err += "\n\nTry again any time from the Setup tab."
             QMessageBox.warning(self, "Couldn't put Onion Board on your mic", err)
         else:
             log.info("on the mic now: %s", mic)
@@ -1978,14 +1974,6 @@ class MainWindow(QMainWindow):
                            "headset's USB dongle or the virtual cable.", "warn")
         self._show_route()
         self._update_status()
-
-    def _meanwhile(self) -> str:
-        """While it isn't on the mic yet: do others still hear you through the cable?"""
-        e = self.engine
-        if e.main_stream is not None and e.names["main"] not in (None, directmic.DEVICE):
-            return (" Meanwhile your sounds still go through the virtual cable, so a "
-                    "voice app set to it still hears you.")
-        return ""
 
     @staticmethod
     def _set_primary(btn, on: bool):
