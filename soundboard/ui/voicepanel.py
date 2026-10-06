@@ -1700,14 +1700,14 @@ class SpeechPanel(QWidget):
 
         def work():
             try:
-                self._voice_done.emit(winvoices.install(m.language), "")
+                busy.emit(self._voice_done, winvoices.install(m.language), "")
             except winvoices.Cancelled:
-                self._voice_done.emit("cancelled", "")
+                busy.emit(self._voice_done, "cancelled", "")
             except RuntimeError as e:
-                self._voice_done.emit("", errors.plain(e))
+                busy.emit(self._voice_done, "", errors.plain(e))
             except Exception as e:  # noqa: BLE001 - the button must come back
                 applog.report(where="windows voice install")
-                self._voice_done.emit("", errors.plain(e))
+                busy.emit(self._voice_done, "", errors.plain(e))
 
         threading.Thread(target=work, name="voice-install", daemon=True).start()
 
@@ -1794,15 +1794,16 @@ class SpeechPanel(QWidget):
 
         def work():
             try:
-                translation.download(m, self._dl_progress.emit, lambda: self._dl_cancel)
-                self._dl_done.emit("")
+                translation.download(m, lambda *a: busy.emit(self._dl_progress, *a),
+                                     lambda: self._dl_cancel)
+                busy.emit(self._dl_done, "")
             except translation.Cancelled:
-                self._dl_done.emit("cancelled")
+                busy.emit(self._dl_done, "cancelled")
             except RuntimeError as e:
-                self._dl_done.emit(errors.plain(e))
+                busy.emit(self._dl_done, errors.plain(e))
             except Exception as e:  # noqa: BLE001 - the UI must never stay on "Downloading…"
                 applog.report(where="translation download")
-                self._dl_done.emit(errors.plain(e))
+                busy.emit(self._dl_done, errors.plain(e))
 
         threading.Thread(target=work, name="translation-download", daemon=True).start()
 
@@ -1887,11 +1888,11 @@ class SpeechPanel(QWidget):
 
         def work():
             try:
-                ok = mods.install(m, self._install_line.emit)
-                self._install_done.emit(ok, "")
+                ok = mods.install(m, lambda line: busy.emit(self._install_line, line))
+                busy.emit(self._install_done, ok, "")
             except Exception as e:  # noqa: BLE001 - the buttons must come back
                 applog.report(where="module install")
-                self._install_done.emit(False, errors.plain(e))
+                busy.emit(self._install_done, False, errors.plain(e))
 
         threading.Thread(target=work, name="module-install", daemon=True).start()
 
@@ -2258,7 +2259,10 @@ class VoicePanel(QWidget):
             raise
 
     def shutdown(self):
+        """Closing the app, or the tab switched off in Settings > Tabs. A download or
+        install still running finishes quietly (busy.emit) or, a translation, stops."""
         self._meter_timer.stop()
+        self.speech._dl_cancel = True
         self.ai.shutdown()
         self.controller.shutdown()
         self.engine.voice_chain = None

@@ -167,8 +167,8 @@ def clean_setting(k: str, v):
         return min(max(v, lo), hi)
     if k == "net_mode":   # a mode this version doesn't know (a newer one's): fail
         return v if v in NET_MODES else "proxy"   # closed, never quietly direct
-    if k == "net_off":   # feature keys (strings); unknown ones are kept, so a newer
-        # version's switch stays off after a downgrade and an upgrade
+    if k in ("net_off", "tabs_off"):   # keys (strings); unknown ones are kept, so a
+        # newer version's switch stays off after a downgrade and an upgrade
         return list(dict.fromkeys(x for x in v if isinstance(x, str) and x))
     if k == "route":   # a newer version's route: back to the cable, the safe default
         return v if v in ROUTES else "cable"
@@ -328,6 +328,9 @@ class Config:
     pad_width: int = 150
     app_card_width: int = 300
     tab: int = 0     # 0 = sounds, 1 = radio, 2 = apps, 3 = triggers, 4 = voice, 5 = setup
+    # Settings > Tabs: the tabs switched off ("radio", "apps", "triggers", "voice"), gone
+    # from the window and never built
+    tabs_off: list[str] = field(default_factory=list)
     # fetch newer yt-dlp versions from PyPI by itself: opt-in, since that's code the app
     # runs (named *_optin so configs saved while it defaulted to on start off again)
     ytdlp_auto_optin: bool = False

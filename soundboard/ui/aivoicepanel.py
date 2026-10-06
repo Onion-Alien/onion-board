@@ -354,8 +354,8 @@ class AiVoicePanel(QWidget):
 
         def progress(done: int, total: int):
             if total:
-                self._install_line.emit(f"downloading: {done * 100 // total} % of "
-                                        f"{total / 1e6:.0f} MB")
+                busy.emit(self._install_line, f"downloading: {done * 100 // total} % of "
+                                              f"{total / 1e6:.0f} MB")
 
         def work():
             try:
@@ -363,12 +363,13 @@ class AiVoicePanel(QWidget):
                 if offer is None:
                     raise mods.ModuleError("there's no AI voices add-on to download yet")
                 info = aiaddon.install(aiaddon.fetch(offer, progress))
-                self._install_line.emit("setting up its Python environment (a few minutes)…")
-                self._install_done.emit(mods.install(info, self._install_line.emit), "")
+                busy.emit(self._install_line, "setting up its Python environment (a few minutes)…")
+                ok = mods.install(info, lambda line: busy.emit(self._install_line, line))
+                busy.emit(self._install_done, ok, "")
             except Exception as e:  # noqa: BLE001 - the button must come back
                 if not isinstance(e, (mods.ModuleError, OSError)):   # a bug: report it
                     applog.report(where="AI voices download")
-                self._install_done.emit(False, aiaddon.friendly(e))
+                busy.emit(self._install_done, False, aiaddon.friendly(e))
 
         threading.Thread(target=work, name="ai-voices-get", daemon=True).start()
 
@@ -400,10 +401,11 @@ class AiVoicePanel(QWidget):
 
         def work():
             try:
-                self._install_done.emit(mods.install(m, self._install_line.emit), "")
+                ok = mods.install(m, lambda line: busy.emit(self._install_line, line))
+                busy.emit(self._install_done, ok, "")
             except Exception as e:  # noqa: BLE001 - the buttons must come back
                 applog.report(where="module install")
-                self._install_done.emit(False, errors.plain(e))
+                busy.emit(self._install_done, False, errors.plain(e))
 
         threading.Thread(target=work, name="ai-voices-install", daemon=True).start()
 

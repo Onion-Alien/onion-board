@@ -16,7 +16,8 @@ from pathlib import Path
 import numpy as np
 import sounddevice as sd
 from PySide6.QtCore import (QAbstractAnimation, QEvent, QFileSystemWatcher, QObject,
-                            QPropertyAnimation, QSize, Qt, QTimer, QUrl, Signal)
+                            QPropertyAnimation, QSignalBlocker, QSize, Qt, QTimer, QUrl,
+                            Signal)
 from PySide6.QtGui import QDesktopServices, QIcon, QKeySequence, QShortcut
 from PySide6.QtWidgets import (QApplication, QCheckBox, QComboBox, QDialog, QFileDialog, QFrame,
                                QGraphicsOpacityEffect, QGridLayout, QHBoxLayout, QInputDialog,
@@ -42,7 +43,8 @@ from soundboard.testcheck import analyze as analyze_output
 from soundboard.testcheck import summary_html
 from soundboard.ui.crashdialog import free_dialog
 from soundboard.ui.dialogs import EditDialog
-from soundboard.ui import a11y, alsosend, appstate, busy, clipeditor, icons, responsive, splash
+from soundboard.ui import (a11y, alsosend, appstate, busy, clipeditor, icons, responsive, splash,
+                           taboff)
 from soundboard.ui.speedpitch import SpeedPitchButton
 from soundboard.ui.panel import (EqPanel, Flow, VolumeControl, bar, card, hint_label,
                                  icon_label, vsep)
@@ -84,6 +86,7 @@ TABS = (("Sounds", "Your sound buttons: click one to play it"),
         ("Triggers", "Play a sound when something shows up on your screen (“YOU DIED”…)"),
         ("Voice", "Change your voice, or talk as a computer voice"),
         ("Setup", "Pick where your sounds go (Discord, games, OBS…), test it"))
+TAB_INDEX = {text.lower(): i for i, (text, _tip) in enumerate(TABS)}
 
 
 UNDO_S = 10          # how long "Removed … · Undo" stays up
@@ -204,6 +207,7 @@ class MainWindow(QMainWindow):
     config_saved = Signal(bool)         # the background save finished: ok
     voice_engine = Signal(object)       # the voice engine of the game in front (a mode key|None)
     default_found = Signal(object)      # Windows' default output, asked on a thread (str|None)
+    tab_switched = Signal(str, bool)    # Settings > Tabs: a tab (taboff.KEYS) off / on again
 
     def __init__(self):
         super().__init__()
@@ -484,15 +488,13 @@ class MainWindow(QMainWindow):
         self.radio_page = QStackedWidget()
         self.radio = self._make_radio()
         self.tabs.addTab(self.radio_page, "")
-        self.apps = AppsTab(self.engine, self.cfg, self._save_later, Meter)
-        self.apps.clip_ready.connect(self.on_clip)
+        # the rest are made by _make_tab: each one or, switched off in Settings > Tabs,
+        # a stand-in that loads nothing (ui/taboff.py)
+        self.apps = self._make_tab("apps")
         self.tabs.addTab(self.apps, "")
-        # the Onion Watch add-on, or Hoot and its download button until it's installed
-        self.triggers = TriggersTab(BoardHost(self), defer=True)   # see load_triggers
+        self.triggers = self._make_tab("triggers")
         self.tabs.addTab(self.triggers, "")
-        self.voice = VoicePanel(self.engine, self.cfg.voice_fx, self.cfg.speech)
-        self.voice.fx_changed.connect(lambda spec: self.set_option("voice_fx", spec))
-        self.voice.speech_changed.connect(lambda s: self.set_option("speech", s))
+        self.voice = self._make_tab("voice")
         self.tabs.addTab(self.voice, "")
         self.setup_page = self._build_setup_page()
         self.tabs.addTab(self.setup_page, "")
@@ -500,7 +502,8 @@ class MainWindow(QMainWindow):
             self.tabs.setTabText(i, text)
             self.tabs.setTabToolTip(i, tip)
             icons.set_tab_icon(self.tabs, i, text.lower())
-        self.tab_info["apps"] = self.apps.info
+        for key in taboff.KEYS:
+            self.tabs.setTabVisible(TAB_INDEX[key], self.tab_on(key))
         # one ⓘ at the end of the tab bar: the tab's explanation, instead of a banner
         self.btn_info = QPushButton()
         self.btn_info.setObjectName("tabinfo")
@@ -515,9 +518,9 @@ class MainWindow(QMainWindow):
         self._update_info_btn = lambda *_: self.btn_info.setVisible(
             self._current_tab_info() is not None)
         self.tabs.currentChanged.connect(self._update_info_btn)
-        self.triggers.loaded.connect(self._update_info_btn)   # Onion Watch can arrive late
         self._update_info_btn()
-        self.tabs.setCurrentIndex(self.cfg.tab if 0 <= self.cfg.tab < self.tabs.count() else 0)
+        tab = self.cfg.tab if 0 <= self.cfg.tab < self.tabs.count() else 0
+        self.tabs.setCurrentIndex(tab if self.tabs.isTabVisible(tab) else 0)
         self.tabs.currentChanged.connect(lambda i: self.set_option("tab", i))
         self.tabs.currentChanged.connect(lambda _i: self._update_status())
         self.tabs.currentChanged.connect(self._focus_sounds_page)
@@ -525,30 +528,15 @@ class MainWindow(QMainWindow):
         # its feature is live — the voice changer, a radio station, a program being
         # sent, the screen watched — so it's never left on without you noticing
         set_live_tint(self.tabs, self.cfg.live_tab_green)
-        vi = self.tabs.indexOf(self.voice)
-        self.voice.active_changed.connect(lambda on: set_tab_live(
-            self.tabs, vi, on, "● ON: others hear your changed / computer voice",
-            self.voice.tab_icon()))   # the active voice's picture, when there is one
-        set_tab_live(self.tabs, vi, self.voice.is_active(), icon=self.voice.tab_icon())
-        ti = self.tabs.indexOf(self.triggers)
-        self.triggers.active_changed.connect(lambda on: set_tab_live(
-            self.tabs, ti, on, "● ON: watching your screen", "triggers"))
-        set_tab_live(self.tabs, ti, self.triggers.is_active(), icon="triggers")
+        for key in ("voice", "triggers", "apps"):
+            self._tab_live(key, getattr(self, key).is_active())
         QTimer.singleShot(TRIGGERS_LOAD_MS, self, self.load_triggers)
         self._radio_live(self.radio.is_active())
         self._search_follow_switch()
         net.on_change(self._follow_switches)
-        ai = self.tabs.indexOf(self.apps)
-        self.apps.active_changed.connect(lambda on: set_tab_live(
-            self.tabs, ai, on, self.apps.live_tip(), "apps"))
-        set_tab_live(self.tabs, ai, self.apps.is_active(), icon="apps")
 
         # ---- mixer strip: the things that apply whatever tab you're on
         rv.addWidget(self._build_mixer())
-        self.voice.fx.set_tip_enabled(not self.cfg.voice_discord_tip_shown)
-        self.voice.fx.chat_help.connect(lambda: self.show_chat_guide("discord"))
-        self.voice.fx.tip_dismissed.connect(
-            lambda: self.set_option("voice_discord_tip_shown", True))
 
         self.status = StatusLine()
         self.status.setWordWrap(True)
@@ -2356,8 +2344,9 @@ class MainWindow(QMainWindow):
 
     def _make_radio(self):
         """The Radio tab, or with Radio switched off in Settings > Privacy & security a
-        panel saying so: then no directory, player or web view is made at all."""
-        if net.allowed("radio"):
+        panel saying so: then no directory, player or web view is made at all. (The
+        same panel stands in, hidden, while the tab is switched off in Settings > Tabs.)"""
+        if net.allowed("radio") and self.tab_on("radio"):
             r = RadioTab(self.engine, self.cfg, self._save_later, Meter)
             r.clip_ready.connect(self.on_clip)
         else:
@@ -2371,6 +2360,106 @@ class MainWindow(QMainWindow):
     def _radio_live(self, on: bool):
         set_tab_live(self.tabs, self.tabs.indexOf(self.radio_page), on,
                      self.radio.live_tip(), "radio")
+
+    def tab_on(self, key: str) -> bool:
+        """Whether a tab (taboff.KEYS) is switched on in Settings > Tabs."""
+        return key not in self.cfg.tabs_off
+
+    def _make_tab(self, key: str):
+        """The Apps, Triggers or Voice tab, wired to the window; or, switched off in
+        Settings > Tabs, its stand-in (nothing of the tab is made or loaded)."""
+        if not self.tab_on(key):
+            self.tab_info.pop(key, None)
+            if key != "voice":
+                return taboff.TabOff()
+            # effects add-ons still load: a sound's effects (Edit sound) use them too
+            from soundboard import modules
+            modules.load_effects(modules.discover())
+            return taboff.VoiceOff()
+        if key == "voice":
+            v = VoicePanel(self.engine, self.cfg.voice_fx, self.cfg.speech)
+            v.fx_changed.connect(lambda spec: self.set_option("voice_fx", spec))
+            v.speech_changed.connect(lambda s: self.set_option("speech", s))
+            v.fx.set_tip_enabled(not self.cfg.voice_discord_tip_shown)
+            v.fx.chat_help.connect(lambda: self.show_chat_guide("discord"))
+            v.fx.tip_dismissed.connect(
+                lambda: self.set_option("voice_discord_tip_shown", True))
+        elif key == "apps":
+            v = AppsTab(self.engine, self.cfg, self._save_later, Meter)
+            v.clip_ready.connect(self.on_clip)
+            self.tab_info["apps"] = v.info
+        else:
+            # the Onion Watch add-on, or Hoot and its download button until it's
+            # installed; loaded by load_triggers
+            v = TriggersTab(BoardHost(self), defer=True)
+            v.loaded.connect(lambda: self._update_info_btn())   # Onion Watch can arrive late
+        v.active_changed.connect(lambda on, k=key: self._tab_live(k, on))
+        return v
+
+    def _tab_live(self, key: str, on: bool):
+        """The live badge on the Voice, Triggers or Apps tab."""
+        page = getattr(self, key)
+        if key == "voice":   # the active voice's picture, when there is one
+            set_tab_live(self.tabs, TAB_INDEX[key], on,
+                         "● ON: others hear your changed / computer voice", page.tab_icon())
+        elif key == "triggers":
+            set_tab_live(self.tabs, TAB_INDEX[key], on, "● ON: watching your screen",
+                         "triggers")
+        else:
+            set_tab_live(self.tabs, TAB_INDEX[key], on, page.live_tip(), "apps")
+
+    def set_tab_on(self, key: str, on: bool):
+        """Settings > Tabs: switch a tab off (what it was doing stops, it's shut down
+        and hidden, and it isn't made again, even at the next start) or back on (made
+        afresh and shown)."""
+        if key not in taboff.KEYS or self.tab_on(key) == on:
+            return
+        off = [k for k in self.cfg.tabs_off if k != key]
+        self.set_option("tabs_off", off if on else [*off, key])
+        i = TAB_INDEX[key]
+        if not on and self.tabs.currentIndex() == i:
+            self.tabs.setCurrentIndex(0)
+        if key == "radio":
+            self._radio_follow_switch()
+        else:
+            self._swap_tab(key)
+        self.tabs.setTabVisible(i, on)
+        self._update_info_btn()
+        log.info("tab %s switched %s", key, "on" if on else "off")
+        self.tab_switched.emit(key, on)
+
+    def _swap_tab(self, key: str):
+        """Put a freshly made `key` tab (or its stand-in) in place of the one there."""
+        i, old = TAB_INDEX[key], getattr(self, key)
+        if key == "triggers":
+            old.cancel_pending()   # sounds still waiting out a trigger's wait
+        old.shutdown()   # first: a new Voice tab sets the engine's voice chain
+        steps = self._tab_steps.pop(key, []) if hasattr(self, "_fit") else []
+        if steps:
+            self._fit.remove(steps)
+        new = self._make_tab(key)
+        setattr(self, key, new)
+        bar = self.tabs.tabBar()
+        text, tip, name = self.tabs.tabText(i), self.tabs.tabToolTip(i), bar.accessibleTabName(i)
+        cur = self.tabs.currentIndex()
+        with QSignalBlocker(self.tabs):   # no tab change saved, no status rewritten
+            self.tabs.removeTab(i)
+            self.tabs.insertTab(i, new, text)
+            self.tabs.setTabToolTip(i, tip)
+            bar.setAccessibleTabName(i, name)
+            self.tabs.setCurrentIndex(cur)
+        icons.set_tab_icon(self.tabs, i, key)
+        old.deleteLater()
+        self._tab_live(key, False)
+        if key == "triggers":
+            self.load_triggers()
+        if hasattr(self, "_fit"):
+            if key in ("voice", "triggers"):
+                self._tab_steps[key] = new.fit_steps()
+                self._fit.extend(self._tab_steps[key])
+            if key == "voice":
+                self._stack_cols = (self._stack_cols[0], *new.stack_steps())
+            self._refit()
 
     def _follow_switches(self):
         """Settings > Privacy & security changed: the parts of the window that go
@@ -2392,7 +2481,7 @@ class MainWindow(QMainWindow):
     def _radio_follow_switch(self):
         """Radio switched off: the tab becomes the "off" panel (a playing station
         stops); switched back on, the tab is built again."""
-        if net.allowed("radio") == isinstance(self.radio, RadioTab):
+        if (net.allowed("radio") and self.tab_on("radio")) == isinstance(self.radio, RadioTab):
             return
         old, playing = self.radio, self.radio.is_active()
         old.shutdown()
@@ -2740,9 +2829,10 @@ class MainWindow(QMainWindow):
             on = not self.voice.fx.btn_power.isChecked()
             self._voice_was = None
             self._set_voice(on)
-            self.cue("start" if on else "stop")
+            # the Voice tab switched off: nothing went on, so no "on" beep either
+            self.cue("fail" if not self.tab_on("voice") else "start" if on else "stop")
         elif action == "__voicehold__":
-            if self._voice_was is None:
+            if self._voice_was is None and self.tab_on("voice"):
                 self._voice_was = self.voice.fx.btn_power.isChecked()
             self._set_voice(True)
         elif action == "__replay__":
@@ -2759,6 +2849,10 @@ class MainWindow(QMainWindow):
 
     def _set_voice(self, on: bool):
         """The voice changer's big ON / OFF switch, from a hotkey."""
+        if not self.tab_on("voice"):
+            if on:
+                self.toast("The Voice tab is switched off (Settings > Tabs).")
+            return
         if self.voice.fx.btn_power.isChecked() != on:
             self.voice.fx.btn_power.setChecked(on)   # its toggled handler applies it
 
@@ -2909,12 +3003,17 @@ class MainWindow(QMainWindow):
         def seen(i: int):
             if self.tabs.widget(i) is self.triggers:
                 self.tabs.currentChanged.disconnect(seen)
+                self._nudge_seen = None
                 self.triggers.nudged()
                 icons.set_tab_icon(self.tabs, index, "triggers")
+        if getattr(self, "_nudge_seen", None) is not None:   # the tab made again (Settings
+            self.tabs.currentChanged.disconnect(self._nudge_seen)   # > Tabs): one hook
+            self._nudge_seen = None
         if self.tabs.currentWidget() is self.triggers:
             self.triggers.nudged()
             icons.set_tab_icon(self.tabs, index, "triggers")
         else:
+            self._nudge_seen = seen
             self.tabs.currentChanged.connect(seen)
 
     # ------------------------------------------------------------------ sounds
@@ -4456,7 +4555,15 @@ class MainWindow(QMainWindow):
         threading.Thread(target=run, daemon=True, name="import-pack").start()
 
     def _apply_backup_settings(self, raw: dict):
+        was_off = list(self.cfg.tabs_off)
         changed = backup.apply_settings(self.cfg, raw)
+        if "tabs_off" in changed:   # the tabs follow now: a list saying one thing while
+            # the window shows another left the Voice tab unreachable, and Settings
+            # crashed reaching into a stand-in
+            off, self.cfg.tabs_off = self.cfg.tabs_off, was_off
+            for key in taboff.KEYS:
+                self.set_tab_on(key, key not in off)
+            self.set_option("tabs_off", off)   # with a newer version's keys
         if self.voice.fx.merge_saved(raw.get(backup.SAVED_VOICES)):   # their own file
             changed.append("saved voices")
         if "theme" in changed:
@@ -5330,8 +5437,9 @@ class MainWindow(QMainWindow):
         f.add(85, "w", self._tabs_tight)   # else the icons alone held it at ~480 px
         self._radio_steps = self.radio.fit_steps()   # swapped with the tab (Privacy)
         f.extend(self._radio_steps)
-        f.extend(self.voice.fit_steps())
-        f.extend(self.triggers.fit_steps())
+        self._tab_steps = {k: getattr(self, k).fit_steps() for k in ("voice", "triggers")}
+        for steps in self._tab_steps.values():
+            f.extend(steps)
         # height: the status line, then the whole mixer strip
         f.add(10, "h", self.status.set_room)
         f.add(30, "h", r.hide(*self._deck_titles))
