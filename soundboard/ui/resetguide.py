@@ -12,6 +12,7 @@ from PySide6.QtWidgets import (QAbstractItemView, QCheckBox, QDialog, QFrame, QH
 from soundboard import reset, trash
 from soundboard.ui import fit, icons
 from soundboard.ui.panel import hint_label, icon_label
+from soundboard.i18n import _
 
 # (part, what it does) in the order the guide lists them
 OPTIONS = [
@@ -39,7 +40,7 @@ class ResetGuide(QDialog):
         super().__init__(parent or mw)
         fit.watch(self)
         self.mw = mw
-        self.setWindowTitle("Reset")
+        self.setWindowTitle(_("Reset"))
         self.setMinimumWidth(480)
         lay = QVBoxLayout(self)
         lay.setContentsMargins(20, 18, 20, 16)
@@ -66,9 +67,9 @@ class ResetGuide(QDialog):
         v = QVBoxLayout(w)
         v.setContentsMargins(0, 0, 0, 0)
         v.setSpacing(10)
-        v.addWidget(_heading("What do you want to reset?"))
-        v.addWidget(hint_label("Pick only what's giving you trouble. Everything else stays "
-                               "as it is."))
+        v.addWidget(_heading(_("What do you want to reset?")))
+        v.addWidget(hint_label(_("Pick only what's giving you trouble. Everything else stays as "
+                                 "it is.")))
         self.boxes: dict[str, QCheckBox] = {}
         for part, hint in OPTIONS:
             row = QFrame()
@@ -86,7 +87,7 @@ class ResetGuide(QDialog):
             h.setContentsMargins(24, 0, 0, 0)
             rv.addWidget(h)
             if part == reset.HOTKEYS:
-                self.sound_keys = QCheckBox("Clear sound hotkeys too")
+                self.sound_keys = QCheckBox(_("Clear sound hotkeys too"))
                 self.sound_keys.toggled.connect(self._update)
                 wrap = QHBoxLayout()
                 wrap.setContentsMargins(24, 2, 0, 0)
@@ -97,15 +98,15 @@ class ResetGuide(QDialog):
         safe = QHBoxLayout()
         safe.setSpacing(6)
         safe.addWidget(icon_label("shield"))
-        safe.addWidget(hint_label("A restore point is saved first, so you can undo this."), 1)
+        safe.addWidget(hint_label(_("A restore point is saved first, so you can undo this.")), 1)
         v.addSpacing(4)
         v.addLayout(safe)
         v.addStretch(1)
         row = QHBoxLayout()
         row.addStretch(1)
-        cancel = QPushButton("Cancel")
+        cancel = QPushButton(_("Cancel"))
         cancel.clicked.connect(self.reject)
-        self.btn_next = QPushButton("Next")
+        self.btn_next = QPushButton(_("Next"))
         self.btn_next.setObjectName("primary")
         self.btn_next.setDefault(True)
         self.btn_next.clicked.connect(self._to_check)
@@ -120,7 +121,7 @@ class ResetGuide(QDialog):
             out.append(reset.SOUND_KEYS)
         return [p for p in reset.PARTS if p in out]
 
-    def _update(self, *_):
+    def _update(self, *__):
         hk = self.boxes[reset.HOTKEYS].isChecked()
         self.sound_keys.setVisible(hk)
         self.btn_next.setEnabled(bool(self.parts()))
@@ -131,7 +132,7 @@ class ResetGuide(QDialog):
         v = QVBoxLayout(w)
         v.setContentsMargins(0, 0, 0, 0)
         v.setSpacing(10)
-        v.addWidget(_heading("Ready to reset"))
+        v.addWidget(_heading(_("Ready to reset")))
         self.summary = QLabel()
         self.summary.setWordWrap(True)
         self.summary.setTextFormat(Qt.RichText)
@@ -141,15 +142,15 @@ class ResetGuide(QDialog):
         cv.setContentsMargins(14, 10, 14, 12)
         cv.addWidget(self.summary)
         v.addWidget(card)
-        v.addWidget(hint_label("Onion Board restarts to finish, which takes a few seconds. "
-                               "To undo it, open Settings › General › Restore points."))
+        v.addWidget(hint_label(_("Onion Board restarts to finish, which takes a few seconds. To "
+                                 "undo it, open Settings › General › Restore points.")))
         v.addStretch(1)
         row = QHBoxLayout()
-        back = QPushButton("Back")
+        back = QPushButton(_("Back"))
         back.clicked.connect(lambda: self.show_page(0))
         row.addWidget(back)
         row.addStretch(1)
-        self.btn_go = QPushButton("Reset and restart")
+        self.btn_go = QPushButton(_("Reset and restart"))
         self.btn_go.setObjectName("danger")
         self.btn_go.clicked.connect(self._go)
         row.addWidget(self.btn_go)
@@ -182,15 +183,15 @@ class RestorePoints(QDialog):
         super().__init__(parent or mw)
         fit.watch(self)
         self.mw = mw
-        self.setWindowTitle("Restore points")
+        self.setWindowTitle(_("Restore points"))
         lay = QVBoxLayout(self)
         lay.setContentsMargins(20, 18, 20, 16)
         lay.setSpacing(10)
-        lay.addWidget(_heading("Restore points"))
+        lay.addWidget(_heading(_("Restore points")))
         lay.addWidget(hint_label(
-            f"One is saved every time you reset something (the last {reset.MAX_POINTS} are "
-            "kept). Restoring puts back your settings, hotkeys and sounds as they were. "
-            "Sounds you've added since are kept."))
+            _("One is saved every time you reset something (the last {max_points} are kept). "
+              "Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've "
+              "added since are kept.", max_points=reset.MAX_POINTS)))
         self.list = QListWidget()
         self.list.setSelectionMode(QAbstractItemView.SingleSelection)
         self.list.setMinimumSize(420, 200)
@@ -198,15 +199,15 @@ class RestorePoints(QDialog):
         self.list.itemDoubleClicked.connect(lambda _i: self.restore())
         lay.addWidget(self.list, 1)
         row = QHBoxLayout()
-        self.btn_delete = QPushButton("Delete")
+        self.btn_delete = QPushButton(_("Delete"))
         icons.set_icon(self.btn_delete, "trash", "danger_text")
         self.btn_delete.clicked.connect(self.delete)
         row.addWidget(self.btn_delete)
         row.addStretch(1)
-        close = QPushButton("Close")
+        close = QPushButton(_("Close"))
         close.clicked.connect(self.reject)
         row.addWidget(close)
-        self.btn_restore = QPushButton("Restore")
+        self.btn_restore = QPushButton(_("Restore"))
         self.btn_restore.setObjectName("primary")
         self.btn_restore.clicked.connect(self.restore)
         self.btn_restore.setDefault(True)   # Enter restores (it was Delete, the first button)
@@ -223,8 +224,8 @@ class RestorePoints(QDialog):
         if self.list.count():
             self.list.setCurrentRow(0)
         else:
-            li = QListWidgetItem("No restore points yet. One is saved every time you reset "
-                                 "something.")
+            li = QListWidgetItem(_("No restore points yet. One is saved every time you reset "
+                                   "something."))
             li.setFlags(Qt.NoItemFlags)
             self.list.addItem(li)
         self._update()
@@ -244,10 +245,10 @@ class RestorePoints(QDialog):
         if p is None:
             return
         if QMessageBox.question(
-                self, "Restore",
-                f"Put things back the way they were {trash.ago(p.when)}?\n\n"
-                "Onion Board restarts to do it. A new restore point is saved first, so "
-                "this can be undone too.") != QMessageBox.Yes:
+                self, _("Restore"),
+                _("Put things back the way they were {ago}?\n\nOnion Board restarts to do it. A "
+                  "new restore point is saved first, so this can be undone too.",
+                  ago=trash.ago(p.when))) != QMessageBox.Yes:
             return
         reset.schedule_restore(p.id)
         self.accept()
@@ -258,9 +259,9 @@ class RestorePoints(QDialog):
         if p is None:
             return
         if QMessageBox.question(
-                self, "Delete restore point",
-                "Delete this restore point? You won't be able to go back to it. Sounds "
-                "kept in it go to the Windows Recycle Bin.") != QMessageBox.Yes:
+                self, _("Delete restore point"),
+                _("Delete this restore point? You won't be able to go back to it. Sounds kept in "
+                  "it go to the Windows Recycle Bin.")) != QMessageBox.Yes:
             return
         reset.delete_point(p.id)
         self.fill()

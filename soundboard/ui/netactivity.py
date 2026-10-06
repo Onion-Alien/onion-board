@@ -27,6 +27,7 @@ from PySide6.QtWidgets import (QAbstractItemView, QApplication, QButtonGroup, QC
 from soundboard import netlog, theme
 from soundboard.ui import fit
 from soundboard.ui.panel import Flow
+from soundboard.i18n import _
 
 REFRESH_MS = 1000
 _TOR = ("Tor's own connections to the Tor network aren't listed one by one: with Tor, "
@@ -174,12 +175,11 @@ class NetActivity(QWidget):
         v.addWidget(note)
 
         row = QHBoxLayout()
-        self.simple = QRadioButton("Simple")
-        self.simple.setToolTip("One row per server: what it was for, why, and how often")
-        self.detailed = QRadioButton("Detailed")
-        self.detailed.setToolTip("One row per connection: what you did that made it, "
-                                 "route, result, bytes, and the requests the app could "
-                                 "read")
+        self.simple = QRadioButton(_("Simple"))
+        self.simple.setToolTip(_("One row per server: what it was for, why, and how often"))
+        self.detailed = QRadioButton(_("Detailed"))
+        self.detailed.setToolTip(_("One row per connection: what you did that made it, route, "
+                                   "result, bytes, and the requests the app could read"))
         group = QButtonGroup(self)
         for b in (self.simple, self.detailed):
             group.addButton(b)
@@ -192,12 +192,11 @@ class NetActivity(QWidget):
         self.summary.setObjectName("hint")
         self.summary.setWordWrap(True)
         v.addWidget(self.summary)
-        self.copy = QPushButton("Copy")
-        self.copy.setToolTip("Copy the detailed list as text. It shows the sites you used: "
-                             "read it before sharing it")
-        self.clear = QPushButton("Clear")
-        self.clear.setToolTip("Forget the list so far (and the saved history, if "
-                              "it's kept)")
+        self.copy = QPushButton(_("Copy"))
+        self.copy.setToolTip(_("Copy the detailed list as text. It shows the sites you used: "
+                               "read it before sharing it"))
+        self.clear = QPushButton(_("Clear"))
+        self.clear.setToolTip(_("Forget the list so far (and the saved history, if it's kept)"))
 
         self.servers = _table(["Server", "Why", "Used for", "Connections", "Data",
                                "Last"], 1)
@@ -206,7 +205,7 @@ class NetActivity(QWidget):
         self.info = QPlainTextEdit()
         self.info.setReadOnly(True)
         self.info.setFont(QFontDatabase.systemFont(QFontDatabase.FixedFont))
-        self.info.setPlaceholderText("Pick a connection to see everything about it.")
+        self.info.setPlaceholderText(_("Pick a connection to see everything about it."))
         self.info.setMinimumHeight(120)
         self.info.setMaximumHeight(180)
         detail = QWidget()
@@ -226,10 +225,10 @@ class NetActivity(QWidget):
         # in a small Settings window (Copy and Clear far right beside the summary looked
         # out of line with Totals and Open log)
         row = Flow(gap=8)
-        self.totals = QPushButton("Totals…")
-        self.totals.setToolTip("How much data went to each site, added up over the whole "
-                               "history")
-        self.open_log = QPushButton("Open log")
+        self.totals = QPushButton(_("Totals…"))
+        self.totals.setToolTip(_("How much data went to each site, added up over the whole "
+                                 "history"))
+        self.open_log = QPushButton(_("Open log"))
         for b in (self.copy, self.clear, self.totals, self.open_log):
             row.addWidget(b)
         v.addLayout(row)
@@ -276,12 +275,12 @@ class NetActivity(QWidget):
         if self.note.text() != note:
             self.note.setText(note)
         if not self._entries:
-            self.summary.setText("Nothing has gone online yet." if kept else
-                                 "Nothing has gone online since the app started.")
+            self.summary.setText(_("Nothing has gone online yet.") if kept else
+                                 _("Nothing has gone online since the app started."))
         else:
             self.summary.setText(
-                f"{len(self._entries)} connection(s) to {len(servers)} server(s)"
-                + (f", {blocked} blocked by a switch" if blocked else "") + ".")
+                _("{n} connection(s) to {n2} server(s)", n=len(self._entries), n2=len(servers))
+                + (_(", {blocked} blocked by a switch", blocked=blocked) if blocked else "") + ".")
         self.copy.setEnabled(bool(self._entries))
         self.clear.setEnabled(bool(self._entries))
         self.totals.setEnabled(bool(self._entries))
@@ -289,9 +288,10 @@ class NetActivity(QWidget):
         # without a saved file it shows this run's list in a window instead (nothing
         # written): a greyed-out Open log beside a full list looked broken
         self.open_log.setEnabled(has_file or bool(self._entries))
-        tip = (f"Open {netlog.FILE_NAME}, the saved history (one connection per line)"
-               if has_file else "Show this run's list as text. Nothing is saved: tick "
-               "Keep a history between starts (below) to keep a log on this PC")
+        tip = (_("Open {file_name}, the saved history (one connection per line)",
+                 file_name=netlog.FILE_NAME)
+               if has_file else _("Show this run's list as text. Nothing is saved: tick Keep a "
+                                  "history between starts (below) to keep a log on this PC"))
         if self.open_log.toolTip() != tip:
             self.open_log.setToolTip(tip)
         if self.simple.isChecked():
@@ -335,7 +335,7 @@ class NetActivity(QWidget):
                 del self._conn_ns[r]
         top = self._conn_ns[0] if self._conn_ns else 0
         new = [e.n for e in self._entries if e.n > top]   # newest first, like the list
-        for _ in new:
+        for __ in new:
             t.insertRow(0)
         self._conn_ns[:0] = new
         if t.rowCount() != len(self._entries) or self._conn_ns != [e.n for e in self._entries]:
@@ -387,8 +387,8 @@ class NetActivity(QWidget):
 
     def _copy(self):
         QApplication.clipboard().setText(netlog.as_text(list(reversed(self._entries))))
-        self.copy.setText("✓ Copied")
-        QTimer.singleShot(1500, self.copy, lambda: self.copy.setText("Copy"))
+        self.copy.setText(_("✓ Copied"))
+        QTimer.singleShot(1500, self.copy, lambda: self.copy.setText(_("Copy")))
 
     def _show_totals(self):
         dlg = TotalsDialog(self)
@@ -432,7 +432,7 @@ class LogDialog(QDialog):
     def __init__(self, text: str, parent: QWidget | None = None):
         super().__init__(parent)
         fit.watch(self)   # grows to fit its text (ui/fit.py)
-        self.setWindowTitle("Network activity log (this run, not saved)")
+        self.setWindowTitle(_("Network activity log (this run, not saved)"))
         self.resize(820, 520)
         v = QVBoxLayout(self)
         self.text = QPlainTextEdit(text)
@@ -442,7 +442,7 @@ class LogDialog(QDialog):
         v.addWidget(self.text)
         row = QHBoxLayout()
         row.addStretch(1)
-        close = QPushButton("Close")
+        close = QPushButton(_("Close"))
         close.clicked.connect(self.close)
         row.addWidget(close)
         v.addLayout(row)
@@ -457,15 +457,15 @@ class TotalsDialog(QDialog):
     def __init__(self, parent: QWidget | None = None):
         super().__init__(parent)
         fit.watch(self)   # grows to fit its text (ui/fit.py)
-        self.setWindowTitle("Network activity totals")
+        self.setWindowTitle(_("Network activity totals"))
         self.resize(820, 520)
         v = QVBoxLayout(self)
         self.summary = QLabel()
         self.summary.setObjectName("hint")
         self.summary.setWordWrap(True)
         v.addWidget(self.summary)
-        self.by_site = QCheckBox("Group servers by site (googlevideo.com, not each "
-                                 "r3---sn-abc.googlevideo.com)")
+        self.by_site = QCheckBox(_("Group servers by site (googlevideo.com, not each "
+                                   "r3---sn-abc.googlevideo.com)"))
         self.by_site.setChecked(True)
         v.addWidget(self.by_site)
         t = self.table = QTableWidget(0, len(self.COLUMNS))
@@ -489,10 +489,10 @@ class TotalsDialog(QDialog):
         v.addWidget(t, 1)
         row = QHBoxLayout()
         row.addStretch(1)
-        self.copy = QPushButton("Copy")
-        self.copy.setToolTip("Copy the table (pastes into a spreadsheet). It shows the "
-                             "sites you used: read it before sharing it")
-        close = QPushButton("Close")
+        self.copy = QPushButton(_("Copy"))
+        self.copy.setToolTip(_("Copy the table (pastes into a spreadsheet). It shows the sites "
+                               "you used: read it before sharing it"))
+        close = QPushButton(_("Close"))
         row.addWidget(self.copy)
         row.addWidget(close)
         v.addLayout(row)
@@ -523,7 +523,7 @@ class TotalsDialog(QDialog):
                           f"{netlog.size(sent + received)} in all.")
         self.summary.setText(self._head)
         t = self.table
-        t.horizontalHeaderItem(0).setText("Site" if by_site else "Server")
+        t.horizontalHeaderItem(0).setText(_("Site") if by_site else _("Server"))
         t.setSortingEnabled(False)
         t.setRowCount(len(rows))
         right = Qt.AlignRight | Qt.AlignVCenter
@@ -557,5 +557,5 @@ class TotalsDialog(QDialog):
 
     def _copy(self):
         QApplication.clipboard().setText(netlog.totals_text(self._rows, self._head))
-        self.copy.setText("✓ Copied")
-        QTimer.singleShot(1500, self.copy, lambda: self.copy.setText("Copy"))
+        self.copy.setText(_("✓ Copied"))
+        QTimer.singleShot(1500, self.copy, lambda: self.copy.setText(_("Copy")))

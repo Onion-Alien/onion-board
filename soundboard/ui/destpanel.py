@@ -17,6 +17,7 @@ from soundboard.destination import CEILINGS, LOWCUTS, Dest
 from soundboard.ui import fit
 from soundboard.ui.panel import Flow, UndoBar, hint_label
 from soundboard.wheelguard import no_wheel
+from soundboard.i18n import _
 
 
 def describe(d: Dest) -> str:
@@ -104,11 +105,11 @@ class ModesHelp(QDialog):
     def __init__(self, mw, parent=None):
         super().__init__(parent or mw)
         fit.watch(self)
-        self.setWindowTitle("Sound modes: what each one does")
+        self.setWindowTitle(_("Sound modes: what each one does"))
         self.setMinimumWidth(520)
         v = QVBoxLayout(self)
         v.setSpacing(10)
-        now = QLabel("<b>Right now:</b> " + html.escape(
+        now = QLabel(_("<b>Right now:</b> ") + html.escape(
             profiles.explain(_dest_cfg(mw), getattr(mw, "mode_why", ""))))
         now.setWordWrap(True)
         v.addWidget(now)
@@ -132,7 +133,7 @@ class ModeCombo(QComboBox):
     def __init__(self, mw):
         super().__init__()
         self.mw = mw
-        self.setAccessibleName("Who's listening")
+        self.setAccessibleName(_("Who's listening"))
         self.setSizeAdjustPolicy(QComboBox.AdjustToMinimumContentsLengthWithIcon)
         self.setMinimumContentsLength(10)
         no_wheel(self)
@@ -150,17 +151,17 @@ class ModeCombo(QComboBox):
         for q in profiles.PROFILES:
             label = q.label
             if q is profiles.ADVANCED:
-                label = (f"Advanced: {destination.resolve(d).label}"
-                         if p is q else "Advanced…")
+                label = (_("Advanced: {label}", label=destination.resolve(d).label)
+                         if p is q else _("Advanced…"))
             self.addItem(label, q.key)
             self.setItemData(self.count() - 1, mode_tip(q), Qt.ToolTipRole)
         self.setCurrentIndex(max(0, self.findData(p.key)))
         self.view().setMinimumWidth(self.view().sizeHintForColumn(0) + 32)   # long names whole
         self.blockSignals(False)
         self.setToolTip(
-            f"Who's listening: {html.escape(profiles.explain(d, getattr(self.mw, 'mode_why', '')))}"
-            "<br><br>Hover a mode in the list to see what it does. More in Settings → "
-            "Audio → Who's listening.")
+            _("Who's listening: {explain}<br><br>Hover a mode in the list to see what it does. "
+              "More in Settings → Audio → Who's listening.",
+              explain=html.escape(profiles.explain(d, getattr(self.mw, 'mode_why', '')))))
 
     def showEvent(self, e):
         super().showEvent(e)
@@ -197,7 +198,7 @@ class DestPanel(QWidget):
             b = QPushButton(p.label)
             b.setCheckable(True)
             b.setToolTip(mode_tip(p))
-            b.setAccessibleName(f"{p.label} mode")
+            b.setAccessibleName(_("{label} mode", label=p.label))
             b.setAccessibleDescription(p.summary)
             self.group.addButton(b)
             self.buttons[p.key] = b
@@ -205,9 +206,9 @@ class DestPanel(QWidget):
         v.addLayout(row)
         self.now = hint_label("")
         v.addWidget(self.now)
-        help_btn = QPushButton("What do these do?")
+        help_btn = QPushButton(_("What do these do?"))
         help_btn.setObjectName("small")
-        help_btn.setToolTip("Every mode in plain words, and what it's doing right now")
+        help_btn.setToolTip(_("Every mode in plain words, and what it's doing right now"))
         help_btn.clicked.connect(self.show_help)
         v.addWidget(help_btn, 0, Qt.AlignLeft)
         # a hint that something else is in use: Discord listening while in Game, say,
@@ -218,8 +219,8 @@ class DestPanel(QWidget):
         sr.setSpacing(4)
         self.suggest_text = hint_label("")
         sr.addWidget(self.suggest_text)
-        self.suggest_btn = QPushButton("Use it")
-        self.suggest_btn.setToolTip("Switch to the mode that suits what's listening")
+        self.suggest_btn = QPushButton(_("Use it"))
+        self.suggest_btn.setToolTip(_("Switch to the mode that suits what's listening"))
         self.suggest_btn.setObjectName("small")
         self.suggest_btn.clicked.connect(self._use_suggestion)
         sr.addWidget(self.suggest_btn, 0, Qt.AlignLeft)
@@ -235,43 +236,42 @@ class DestPanel(QWidget):
         self.combo = QComboBox()
         no_wheel(self.combo)
         arow.addWidget(self.combo, 1)
-        custom = QPushButton("Custom modes…")
-        custom.setToolTip("Describe another codec or service by what it does to the sound")
+        custom = QPushButton(_("Custom modes…"))
+        custom.setToolTip(_("Describe another codec or service by what it does to the sound"))
         custom.clicked.connect(self.edit_custom)
         arow.addWidget(custom)
         av.addLayout(arow)
         self.desc = hint_label("")
         av.addWidget(self.desc)
-        self.chk_auto = QCheckBox("Pick the mode by itself")
+        self.chk_auto = QCheckBox(_("Pick the mode by itself"))
         self.chk_auto.setToolTip(
-            "When Discord, TeamSpeak, Mumble or a game with a known voice chat is "
-            "listening to your mic (or the cable), use its mode without asking. With nothing "
-            "listening, the mode stays as it is.")
+            _("When Discord, TeamSpeak, Mumble or a game with a known voice chat is listening to "
+              "your mic (or the cable), use its mode without asking. With nothing listening, the "
+              "mode stays as it is."))
         av.addWidget(self.chk_auto)
         v.addWidget(self.advanced)
         sig = getattr(mw, "voice_engine", None)
         if sig is not None:
             sig.connect(self._on_voice_engine)   # a bound slot: gone with the panel
         # the send stage (soundboard.sendfx), whatever the mode
-        self.chk_mono = QCheckBox("Send in mono (recommended)")
+        self.chk_mono = QCheckBox(_("Send in mono (recommended)"))
         self.chk_mono.setToolTip(
-            "Every voice chat sends one channel. Onion Board makes it, smarter than "
-            "Discord or a game would: wide stereo sounds and phasey bass don't cancel out")
+            _("Every voice chat sends one channel. Onion Board makes it, smarter than Discord or "
+              "a game would: wide stereo sounds and phasey bass don't cancel out"))
         v.addWidget(self.chk_mono)
         duck = QHBoxLayout()
-        duck.addWidget(QLabel("While I talk, lower my sounds:"))
+        duck.addWidget(QLabel(_("While I talk, lower my sounds:")))
         self.cb_duck = QComboBox()
         no_wheel(self.cb_duck)
         for label, db in DUCK_LABELS:
             self.cb_duck.addItem(label, db)
-        self.cb_duck.setToolTip("Turns your sounds down while the mic hears you, so your "
-                                "voice isn't buried under a song")
+        self.cb_duck.setToolTip(_("Turns your sounds down while the mic hears you, so your voice "
+                                  "isn't buried under a song"))
         duck.addWidget(self.cb_duck, 1)
         v.addLayout(duck)
-        self.chk_gate = QCheckBox("Mute my mic while a sound plays")
-        self.chk_gate.setToolTip("Others hear only the sound, clean, and your mic comes "
-                                 "back the moment it ends. Handy with a noisy room or "
-                                 "keyboard.")
+        self.chk_gate = QCheckBox(_("Mute my mic while a sound plays"))
+        self.chk_gate.setToolTip(_("Others hear only the sound, clean, and your mic comes back "
+                                   "the moment it ends. Handy with a noisy room or keyboard."))
         v.addWidget(self.chk_gate)
         self.refresh()
         self.group.buttonClicked.connect(self._simple_clicked)
@@ -292,7 +292,7 @@ class DestPanel(QWidget):
         self.combo.blockSignals(True)
         self.combo.clear()
         for d in destination.all_modes(cfg.get("custom")):
-            self.combo.addItem(d.label + ("  (custom)" if d.custom else ""), d.key)
+            self.combo.addItem(d.label + (_("  (custom)") if d.custom else ""), d.key)
         self.combo.setCurrentIndex(max(0, self.combo.findData(current)))
         self.combo.blockSignals(False)
         c = self.mw.cfg
@@ -366,11 +366,12 @@ class DestPanel(QWidget):
             why = html.escape(getattr(self.mw, "voice_why", "") or (
                 f"The game you have open uses {voicesdk.NAMES.get(key, key)} for voice chat"))
             self.suggest_text.setText(
-                f"{why}: <b>{destination.BUILTIN_BY_KEY[key].label}</b> suits it.")
+                _("{why}: <b>{label}</b> suits it.",
+                  why=why, label=destination.BUILTIN_BY_KEY[key].label))
         elif simple:
             self.suggest_text.setText(
-                f"{html.escape(hint.why)}: <b>{profiles.BY_KEY[simple].label}</b> mode "
-                "suits it.")
+                _("{why}: <b>{label}</b> mode suits it.",
+                  why=html.escape(hint.why), label=profiles.BY_KEY[simple].label))
         self.suggest.setVisible(bool(key or simple))
 
     def _use_suggestion(self):
@@ -394,7 +395,7 @@ class DestPanel(QWidget):
         self.mw._save_later()
         self._show()
 
-    def _send_changed(self, *_):
+    def _send_changed(self, *__):
         c = self.mw.cfg
         c.send_mono = self.chk_mono.isChecked()
         c.duck_db = float(self.cb_duck.currentData())
@@ -417,7 +418,7 @@ class CustomDestDialog(QDialog):
         super().__init__(parent or mw)
         fit.watch(self)
         self.mw = mw
-        self.setWindowTitle("Custom destination modes")
+        self.setWindowTitle(_("Custom destination modes"))
         self.setMinimumSize(640, 420)
         cfg = mw.cfg.dest if isinstance(mw.cfg.dest, dict) else {}
         mw.cfg.dest = cfg
@@ -429,26 +430,26 @@ class CustomDestDialog(QDialog):
 
         lay = QVBoxLayout(self)
         lay.addWidget(hint_label(
-            "A mode describes what the listener's voice codec does to your sounds, so the "
-            "app can pre-shape them: which frequencies it cuts, how much sub-bass to turn "
-            "into harmonics that survive, how much to even out the level, and whether it's "
-            "mono. The built-in modes were measured; to measure another service, run "
-            "scripts/codec_bench.py from the source tree."))
+            _("A mode describes what the listener's voice codec does to your sounds, so the app "
+              "can pre-shape them: which frequencies it cuts, how much sub-bass to turn into "
+              "harmonics that survive, how much to even out the level, and whether it's mono. "
+              "The built-in modes were measured; to measure another service, run "
+              "scripts/codec_bench.py from the source tree.")))
         body = QHBoxLayout()
         left = QVBoxLayout()
         self.list = QListWidget()
         self.list.currentRowChanged.connect(self._select)
         left.addWidget(self.list, 1)
-        self.empty = hint_label("No custom modes yet. Fill in the form to make one, or "
-                                "click Add / Copy built-in….")
+        self.empty = hint_label(_("No custom modes yet. Fill in the form to make one, or click "
+                                  "Add / Copy built-in…."))
         left.addWidget(self.empty)
         btns = QHBoxLayout()
-        self.b_add = QPushButton("Add")
+        self.b_add = QPushButton(_("Add"))
         self.b_add.clicked.connect(self.add)
-        self.b_copy = QPushButton("Copy built-in…")
-        self.b_copy.setToolTip("Start from one of the measured modes")
+        self.b_copy = QPushButton(_("Copy built-in…"))
+        self.b_copy.setToolTip(_("Start from one of the measured modes"))
         self.b_copy.clicked.connect(self.copy_builtin)
-        self.b_del = QPushButton("Remove")
+        self.b_del = QPushButton(_("Remove"))
         self.b_del.clicked.connect(self.remove)
         for b in (self.b_add, self.b_copy, self.b_del):
             b.setObjectName("small")
@@ -475,19 +476,19 @@ class CustomDestDialog(QDialog):
         self.lowcut = QComboBox()
         for hz in LOWCUTS:
             self.lowcut.addItem(lowcut_label(hz), hz)
-        self.lowcut.setToolTip("The chat throws the deepest bass away anyway. Cutting it here "
-                               "stops it pulling the whole sound down in the limiter, and "
-                               "each sound is turned back up by what the cut took from it")
+        self.lowcut.setToolTip(_("The chat throws the deepest bass away anyway. Cutting it here "
+                                 "stops it pulling the whole sound down in the limiter, and each "
+                                 "sound is turned back up by what the cut took from it"))
         self.lowcut.currentIndexChanged.connect(self._edited)
         form.addRow("Deep bass", self.lowcut)
         self.comp, comp_row = self._slider("evens the level out for the service's gate / auto gain")
         form.addRow("Compressor", comp_row)
-        self.mono = QCheckBox("Mono (the service captures a mono mic)")
+        self.mono = QCheckBox(_("Mono (the service captures a mono mic)"))
         self.mono.toggled.connect(self._edited)
         form.addRow("", self.mono)
         self.note = QLineEdit()
         self.note.setMaxLength(200)
-        self.note.setPlaceholderText("e.g. Mumble at 72 kbps, TeamSpeak…")
+        self.note.setPlaceholderText(_("e.g. Mumble at 72 kbps, TeamSpeak…"))
         self.note.textEdited.connect(self._edited)
         form.addRow("Notes", self.note)
         no_wheel(self.ceiling, self.lowcut, self.bass, self.comp)
@@ -566,12 +567,13 @@ class CustomDestDialog(QDialog):
     def copy_builtin(self):
         from PySide6.QtWidgets import QInputDialog
         names = [d.label for d in destination.BUILTIN if d.active]
-        pick, ok = QInputDialog.getItem(self, "Copy a built-in mode", "Start from", names, 0, False)
+        pick, ok = QInputDialog.getItem(self, _("Copy a built-in mode"), _("Start from"), names,
+                                        0, False)
         if not ok:
             return
         src = next(d for d in destination.BUILTIN if d.label == pick)
         raw = src.to_dict()
-        raw.update(key=self._new_key(), label=f"{src.label} (copy)")
+        raw.update(key=self._new_key(), label=_("{label} (copy)", label=src.label))
         self.items.append(raw)
         self._fill(len(self.items) - 1)
         self._commit()
@@ -602,7 +604,7 @@ class CustomDestDialog(QDialog):
         self._commit()
 
     # ------------------------------------------------------------------ edits
-    def _edited(self, *_):
+    def _edited(self, *__):
         if self._loading:
             return
         row = self.list.currentRow()

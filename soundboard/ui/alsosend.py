@@ -11,6 +11,7 @@ from soundboard import engine as eng
 from soundboard.ui import icons
 from soundboard.ui.panel import icon_label
 from soundboard.wheelguard import no_wheel
+from soundboard.i18n import _
 
 LABEL = "Also send to"
 TIP = ("Streaming, or using more than one app? Each device here gets a copy of what "
@@ -24,7 +25,7 @@ class AlsoSendRows:
     def __init__(self, mw, grid: QGridLayout, row: int, icons_col: bool):
         self.mw, self.grid, self.row, self.icons_col = mw, grid, row, icons_col
         self.widgets = []
-        self.add = QPushButton("Add a device")
+        self.add = QPushButton(_("Add a device"))
         icons.set_icon(self.add, "plus")
         self.add.setToolTip(TIP)
         self.add.clicked.connect(self._add)
@@ -76,8 +77,8 @@ class AlsoSendRows:
                 i, box.currentData()))
             minus = QPushButton("−")
             minus.setObjectName("iconbutton")
-            minus.setToolTip(f"Stop sending to {name}")
-            minus.setAccessibleName(f"Remove {name}")
+            minus.setToolTip(_("Stop sending to {name}", name=name))
+            minus.setAccessibleName(_("Remove {name}", name=name))
             minus.clicked.connect(lambda _c=False, i=i: self.mw.set_also_send_at(i, None))
             label = QLabel(LABEL if i == 0 else "")
             label.setBuddy(box)
@@ -108,6 +109,6 @@ def build(mw, grid: QGridLayout, row: int, icons_col: bool) -> AlsoSendRows:
     """Also send to rows in `grid` from `row` on, kept up to date by `mw`."""
     rows = AlsoSendRows(mw, grid, row, icons_col)
     mw.also_views.append(rows)
-    rows.add.destroyed.connect(lambda *_: mw.also_views.remove(rows)
+    rows.add.destroyed.connect(lambda *__: mw.also_views.remove(rows)
                                if rows in mw.also_views else None)
     return rows

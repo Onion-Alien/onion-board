@@ -16,6 +16,7 @@ from soundboard import remote, theme
 from soundboard.ui import busy, fit, icons
 from soundboard.ui.bunnywidget import BunnyWidget
 from soundboard.ui.chatguide import _header, _label
+from soundboard.i18n import _
 
 
 def link(cfg, action: str, query: str = "") -> str:
@@ -44,7 +45,7 @@ class StreamerGuide(QDialog):
         super().__init__(parent)
         fit.watch(self)
         self.mw = mw
-        self.setWindowTitle("Streamer guide — play sounds from your Stream Deck and chat")
+        self.setWindowTitle(_("Streamer guide — play sounds from your Stream Deck and chat"))
         self.setMinimumWidth(660)
         v = QVBoxLayout(self)
         v.setContentsMargins(24, 20, 24, 18)
@@ -115,18 +116,18 @@ class StreamerGuide(QDialog):
         self.state = _label("", "font-size:10pt;")
         self.state.setObjectName("hint")
         row = QHBoxLayout()
-        self.btn_on = QPushButton("Turn it on")
+        self.btn_on = QPushButton(_("Turn it on"))
         self.btn_on.setObjectName("primary")
         self.btn_on.clicked.connect(self.turn_on)
         row.addWidget(self.btn_on)
         self.sound = QComboBox()
-        self.sound.setAccessibleName("Sound to copy a link for")
+        self.sound.setAccessibleName(_("Sound to copy a link for"))
         self.sound.addItems([m.name for m in mw.cfg.sounds])
         self.sound.setMinimumWidth(180)
         row.addWidget(self.sound, 1)
-        self.btn_play = QPushButton("Copy")
+        self.btn_play = QPushButton(_("Copy"))
         icons.set_icon(self.btn_play, "copy")
-        self.btn_play.setToolTip("Copy the link that plays this sound")
+        self.btn_play.setToolTip(_("Copy the link that plays this sound"))
         self.btn_play.clicked.connect(
             lambda: self._copy(self.btn_play, "play",
                                "name=" + quote(self.sound.currentText())))
@@ -140,18 +141,18 @@ class StreamerGuide(QDialog):
                 ("Panic mute", "live", "on=toggle",
                  "Muted / live: while muted nobody hears your sounds or your mic")):
             b = QPushButton(text)
-            b.setToolTip(f"Copy the link: {tip}")
-            b.clicked.connect(lambda _=False, b=b, a=action, q=query: self._copy(b, a, q))
+            b.setToolTip(_("Copy the link: {tip}", tip=tip))
+            b.clicked.connect(lambda __=False, b=b, a=action, q=query: self._copy(b, a, q))
             row.addWidget(b)
             self.link_btns.append(b)
         row.addStretch(1)
-        ai = QPushButton("Copy AI prompt")
-        ai.setToolTip("A message for ChatGPT / Claude that explains Onion Board's links and "
-                      "lists your sounds, so it can set up your tools with you")
+        ai = QPushButton(_("Copy AI prompt"))
+        ai.setToolTip(_("A message for ChatGPT / Claude that explains Onion Board's links and "
+                        "lists your sounds, so it can set up your tools with you"))
         ai.clicked.connect(lambda: (self.state.setText(copy_prompt(mw, False)),
-                                    busy.flash(ai, "✓  Copied")))
+                                    busy.flash(ai, _("✓  Copied"))))
         row.addWidget(ai)
-        done = QPushButton("Done")
+        done = QPushButton(_("Done"))
         done.clicked.connect(self.accept)
         row.addWidget(done)
         v.addLayout(row)
@@ -168,13 +169,13 @@ class StreamerGuide(QDialog):
         if not self.sound.count():
             self.btn_play.setEnabled(False)
         if not cfg.api_enabled:
-            self.state.setText("Remote control is off: turn it on to get your links.")
+            self.state.setText(_("Remote control is off: turn it on to get your links."))
         elif not on:
-            self.state.setText(f"Remote control couldn't start: {self.mw.remote.error}. "
-                               "Try another port in Settings → Remote.")
+            self.state.setText(_("Remote control couldn't start: {error}. Try another port in "
+                                 "Settings → Remote.", error=self.mw.remote.error))
         else:
-            self.state.setText(f"On, at {remote.HOST}:{self.mw.remote.port}. Pick a link "
-                               "to copy.")
+            self.state.setText(_("On, at {host}:{port}. Pick a link to copy.",
+                                 host=remote.HOST, port=self.mw.remote.port))
 
     def turn_on(self):
         self.mw.cfg.api_enabled = True
@@ -184,6 +185,6 @@ class StreamerGuide(QDialog):
 
     def _copy(self, btn, action: str, query: str):
         QApplication.clipboard().setText(link(self.mw.cfg, action, query))
-        busy.flash(btn, "✓  Copied")
-        self.state.setText("Copied. It holds your key: paste it only into your own tools, "
-                           "never into chat.")
+        busy.flash(btn, _("✓  Copied"))
+        self.state.setText(_("Copied. It holds your key: paste it only into your own tools, "
+                             "never into chat."))

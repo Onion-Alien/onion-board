@@ -24,6 +24,7 @@ from soundboard.ui import busy, fit, icons
 from soundboard.ui.bunnywidget import BunnyWidget
 from soundboard.ui.crashdialog import free_dialog
 from soundboard import errors
+from soundboard.i18n import _
 
 log = logging.getLogger(__name__)
 
@@ -278,7 +279,7 @@ class DiscordGuide(QDialog):
         super().__init__(parent)
         fit.watch(self)
         self.mw, self.vm, self.kept = mw, vm, kept
-        self.setWindowTitle("Discord — make your sounds come through clean")
+        self.setWindowTitle(_("Discord — make your sounds come through clean"))
         self.setMinimumWidth(640)
         v = QVBoxLayout(self)
         v.setContentsMargins(24, 20, 24, 18)
@@ -315,28 +316,28 @@ class DiscordGuide(QDialog):
         self.result.hide()
         v.addWidget(self.result)
         row = QHBoxLayout()
-        copy = QPushButton("Copy the mic name")
+        copy = QPushButton(_("Copy the mic name"))
         icons.set_icon(copy, "copy")
         copy.clicked.connect(lambda: (QApplication.clipboard().setText(vm),
-                                      busy.flash(copy, "✓  Copied")))
+                                      busy.flash(copy, _("✓  Copied"))))
         copy.setVisible(not kept)   # straight into the mic: nothing to pick
         row.addWidget(copy)
-        opn = QPushButton("Open Discord")
-        opn.setToolTip("Opens Discord's Voice & Video settings")
+        opn = QPushButton(_("Open Discord"))
+        opn.setToolTip(_("Opens Discord's Voice & Video settings"))
         opn.clicked.connect(lambda: busy.open_url(
             DISCORD_VOICE_URL, opn, self, opened="✓ Opened Discord",
             failed="Couldn't open Discord — is it installed? Open it yourself: ⚙ User "
                    "Settings → Voice & Video. The link was"))
         row.addWidget(opn)
-        ptt = QPushButton("Auto push-to-talk…")
+        ptt = QPushButton(_("Auto push-to-talk…"))
         ptt.clicked.connect(lambda: mw.open_settings("hotkeys"))
         row.addWidget(ptt)
         row.addStretch(1)
-        self.btn_check = QPushButton("Check Discord")
+        self.btn_check = QPushButton(_("Check Discord"))
         self.btn_check.setObjectName("primary")
         self.btn_check.clicked.connect(self.check)
         row.addWidget(self.btn_check)
-        done = QPushButton("Done")
+        done = QPushButton(_("Done"))
         done.clicked.connect(self.accept)
         row.addWidget(done)
         v.addLayout(row)
@@ -348,8 +349,8 @@ class DiscordGuide(QDialog):
         if busy.is_busy(self.btn_check):
             return
         busy.set_busy(self.btn_check, True)   # not setEnabled: that moves the focus away
-        self.btn_check.setText("Checking…")
-        self.result.setText("Starting…")
+        self.btn_check.setText(_("Checking…"))
+        self.result.setText(_("Starting…"))
         self.result.show()
         QTimer.singleShot(0, self, self._start_check)   # paint "Starting…" first
 
@@ -361,12 +362,12 @@ class DiscordGuide(QDialog):
             self._checked({"issues": [], "error": f"The check couldn't start: {errors.plain(e)}"})
 
     def _progress(self, text: str):
-        self.result.setText(f"{text} (about {round(chatcheck.LENGTH_S + TAIL_S)} seconds; "
-                            "stay quiet for a moment)")
+        self.result.setText(_("{text} (about {n} seconds; stay quiet for a moment)",
+                              text=text, n=round(chatcheck.LENGTH_S + TAIL_S)))
 
     def _checked(self, res: dict):
         busy.set_busy(self.btn_check, False)
-        self.btn_check.setText("Check again")
+        self.btn_check.setText(_("Check again"))
         self.result.setText(result_html(res, self.vm, self.kept))
         self.result.show()
 
@@ -382,7 +383,7 @@ class GameGuide(QDialog):
     def __init__(self, parent, mw, vm: str, kept: bool = False):
         super().__init__(parent)
         fit.watch(self)
-        self.setWindowTitle("Game voice chat — make your sounds come through clean")
+        self.setWindowTitle(_("Game voice chat — make your sounds come through clean"))
         self.setMinimumWidth(600)
         v = QVBoxLayout(self)
         v.setContentsMargins(24, 20, 24, 18)
@@ -416,17 +417,17 @@ class GameGuide(QDialog):
             "Online Services</b> (Fortnite) or <b>Low bandwidth</b> (older and console "
             "titles), choose <b>Advanced</b> and pick it.</li></ol>"))
         row = QHBoxLayout()
-        copy = QPushButton("Copy the mic name")
+        copy = QPushButton(_("Copy the mic name"))
         icons.set_icon(copy, "copy")
         copy.clicked.connect(lambda: (QApplication.clipboard().setText(vm),
-                                      busy.flash(copy, "✓  Copied")))
+                                      busy.flash(copy, _("✓  Copied"))))
         copy.setVisible(not kept)   # straight into the mic: nothing to pick
         row.addWidget(copy)
-        ptt = QPushButton("Auto push-to-talk…")
+        ptt = QPushButton(_("Auto push-to-talk…"))
         ptt.clicked.connect(lambda: mw.open_settings("hotkeys"))
         row.addWidget(ptt)
         row.addStretch(1)
-        done = QPushButton("Done")
+        done = QPushButton(_("Done"))
         done.setObjectName("primary")
         done.clicked.connect(self.accept)
         row.addWidget(done)
@@ -440,8 +441,8 @@ class MeetingGuide(QDialog):
     def __init__(self, parent, mw, vm: str, kept: bool = False):
         super().__init__(parent)
         fit.watch(self)
-        self.setWindowTitle("Zoom, Teams and browser calls — make your sounds come through "
-                            "clean")
+        self.setWindowTitle(_("Zoom, Teams and browser calls — make your sounds come through "
+                              "clean"))
         self.setMinimumWidth(600)
         v = QVBoxLayout(self)
         v.setContentsMargins(24, 20, 24, 18)
@@ -470,14 +471,14 @@ class MeetingGuide(QDialog):
             "<li>On the Setup tab, set <b>Who's listening</b> to <b>Voice chat</b>. It "
             "picks the browser shaping by itself once the call is listening.</li></ol>"))
         row = QHBoxLayout()
-        copy = QPushButton("Copy the mic name")
+        copy = QPushButton(_("Copy the mic name"))
         icons.set_icon(copy, "copy")
         copy.clicked.connect(lambda: (QApplication.clipboard().setText(vm),
-                                      busy.flash(copy, "✓  Copied")))
+                                      busy.flash(copy, _("✓  Copied"))))
         copy.setVisible(not kept)   # straight into the mic: nothing to pick
         row.addWidget(copy)
         row.addStretch(1)
-        done = QPushButton("Done")
+        done = QPushButton(_("Done"))
         done.setObjectName("primary")
         done.clicked.connect(self.accept)
         row.addWidget(done)
