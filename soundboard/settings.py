@@ -1057,8 +1057,8 @@ class SettingsDialog(QDialog):
             cb.setCurrentIndex(src.currentIndex())
         label, cb = self.dev_main
         label.setText(self.mw.main_label())
-        for w in (label, cb):
-            w.setVisible(self.mw.cfg.route != "off")
+        for w in (label, cb):   # like the Setup tab: only a device / the cable is picked
+            w.setVisible(self.mw.cfg.route not in ("off", "mic"))
 
     def _pick_device(self, src, attr, i):
         src.setCurrentIndex(i)
