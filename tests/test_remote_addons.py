@@ -235,3 +235,49 @@ def test_the_network_category_never_raises():
     from soundboard import netcategory
     assert netcategory.category("203.0.113.9") is None   # no adapter has it
     assert netcategory.category("not an address") is None
+
+
+def _sig(key, request, ts=None, nonce=None):
+    import base64
+    import hashlib
+    import hmac
+    import secrets
+    import time
+    ts = int(time.time()) if ts is None else ts
+    nonce = nonce or secrets.token_urlsafe(16)
+    mac = hmac.new(key.encode(), f"{ts}.{nonce}.{request}".encode(), hashlib.sha256)
+    return f"{ts}.{nonce}." + base64.urlsafe_b64encode(mac.digest()).decode().rstrip("=")
+
+
+def test_a_signed_request_never_sends_the_key(qapp, loaded):
+    """What someone reading the Wi-Fi sees: a signature good for that one request,
+    once, now. Sent again, for another request, old, or made with another key: no."""
+    import time
+    srv = loaded.server
+    assert loaded.host.signed_requests
+    assert srv.start(0, "add-on-key", "127.0.0.1")
+    good = _sig("add-on-key", "POST /api/sounds")
+    assert call(qapp, srv, "/api/sounds", {"X-Sig": good}, "POST")[0] == 200
+    assert call(qapp, srv, "/api/sounds", {"X-Sig": good}, "POST")[0] == 401    # replayed
+    other = _sig("add-on-key", "POST /api/sounds")
+    assert call(qapp, srv, "/api/play?id=x", {"X-Sig": other}, "POST")[0] == 401
+    srv.succeeded("127.0.0.1")
+    old = _sig("add-on-key", "POST /api/status", ts=int(time.time()) - remote.SIG_WINDOW_S - 5)
+    status, body = call(qapp, srv, "/api/status", {"X-Sig": old}, "POST")
+    assert status == 401 and abs(json.loads(body)["now"] - time.time()) < 5
+    assert call(qapp, srv, "/api/status", {"X-Sig": _sig("guess", "POST /api/status")},
+                "POST")[0] == 401
+    srv.succeeded("127.0.0.1")
+    for junk in ("", "x", "1.2.3", "99999999999999.aaaaaaaaaaaaaaaa.x", ". . ."):
+        assert not srv.signed(junk, "POST /api/status")
+    assert api(qapp, srv, "/api/status", "add-on-key")[0] == 200   # older Pocket pages
+
+
+def test_remembered_nonces_stay_bounded(loaded, monkeypatch):
+    monkeypatch.setattr(remote, "NONCES_MAX", 3)
+    srv = loaded.server
+    srv.token = "k"
+    sigs = [_sig("k", "POST /api/status") for _ in range(4)]
+    assert all(srv.signed(s, "POST /api/status") for s in sigs[:3])
+    assert not srv.signed(sigs[3], "POST /api/status")   # full of fresh ones: refused
+    assert len(srv._nonces) == 3

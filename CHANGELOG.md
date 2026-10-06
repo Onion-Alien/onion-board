@@ -13,6 +13,11 @@
   (a café's or a hotel's Wi-Fi), the phone remote doesn't listen at all, even
   if Windows Firewall would let it through, and it turns itself off if the
   network becomes Public while it runs.
+- **Phone remote: your key stays on your phone.** With Onion Pocket 0.2.2 the
+  phone no longer sends its key over the Wi-Fi with every tap: it signs each tap
+  with the key, and Onion Board takes each signature only once, for that one
+  tap, within five minutes. Someone reading your Wi-Fi's traffic can't copy the
+  key or replay a tap. Older Onion Pocket versions keep working as before.
 - **Clip editor copy and paste do what you'd expect.** A click places the cursor
   (a slight wobble of the mouse no longer picks a sliver), Ctrl+V always says
   what it pasted and where, and pasting right after copying puts a second copy
