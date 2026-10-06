@@ -1,7 +1,18 @@
 # Changelog
 
-## Unreleased
+## 1.9.6 — 2026-10-06
 
+- **New voice: Secret detective.** A disguised TV voice: yours plus a copy a fifth
+  lower, lined up, thin and boxy with a metallic ring. Its knobs are all in *Make
+  it yours*, so you can build it (or your own spin on it) by hand.
+- **New voice knobs.** *Tone* has a *Mid* slider. *Pitch & voice* has *Gap between
+  voices* (the lower copy lined up with you, or trailing like an echo), *Blur on
+  the new voice*, and *Voice size on my voice too* (below 100 % Mix, your own voice
+  underneath gets the new throat size as well, so it doesn't give you away). Your
+  saved voices sound as before.
+- **Every voice has a picture.** The eight voices that showed a "?" now have their
+  own picture.
+- **No blank window flashing up** when you open *Edit sound*.
 - **Important fixes get a banner.** When a new Onion Board or Onion Watch fixes
   something serious, a banner across the top of the window says what it fixes,
   with an *Update now* button. You can hide it until the next start, but it can't

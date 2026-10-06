@@ -345,9 +345,10 @@ class PitchShift(Effect):
     Natural sound and Voice size move the formants on their own (_envelope_shift,
     one more ~20 ms frame): Natural 100% puts them back where your own voice has
     them, so a pitch change sounds like another person rather than a cartoon, and
-    Voice size makes the throat behind the voice bigger or smaller (below 100% Mix
-    it reshapes the blended-in own voice as well, in its own frame). Both at 0 (the
-    default, and what sounds and music use) skip that stage entirely.
+    Voice size makes the throat behind the voice bigger or smaller (below 100% Mix,
+    "Voice size on my voice too" reshapes the blended-in own voice as well, in its own
+    frame; off for saves from before it). Both at 0 (the default, and what sounds and
+    music use) skip that stage entirely.
 
     Autotune snaps the voice to the nearest note: a pitch tracker on the input picks
     the correction, which glides in (slow: natural tuning) or jumps (100%: the hard
@@ -368,7 +369,9 @@ class PitchShift(Effect):
               Param("tune", "Autotune", 0, 1, 0, "", 0, ("off", "robotic")),
               Param("mix", "Mix", 0, 1, 1),
               Param("gap", "Gap between voices", 0, 1, 1, "", 0, ("together", "echo")),
-              Param("blur", "Blur on the new voice", 0, 1, 0, "", 0, ("clear", "blurry")))
+              Param("blur", "Blur on the new voice", 0, 1, 0, "", 0, ("clear", "blurry")),
+              Param("under", "Voice size on my voice too", 0, 1, 0, "", 0,
+                    ("new voice only", "mine too")))
 
     SEQ_MS = 30.0       # one sequence of voice, copied to the output
     SEEK_MS = 10.0      # how far the splice point may move to line up
@@ -609,9 +612,9 @@ class PitchShift(Effect):
                 "peak", self.BLUR_SCOOP_HZ, rate, -self.BLUR_SCOOP_DB, 0.7))
             wet = wet + room * F32(blur)
         if mix < 1:
-            # Voice size reshapes the blended-in voice too, or your own voice stays
-            # recognisable under the effect
-            dry, d = x, 2.0 ** (-p.get("size", 0.0) / 12.0)
+            # "Voice size on my voice too" reshapes the blended-in voice as well, or your
+            # own voice stays recognisable under the effect (no key: old saves, as before)
+            dry, d = x, 2.0 ** (-p.get("size", 0.0) * p.get("under", 0.0) / 12.0)
             if self.dstage is None and abs(np.log2(d)) > 1e-3:
                 self.dstage = _Stft(_stft_size(rate, self.FORMANT_S))
             if self.dstage is not None:
@@ -1169,11 +1172,12 @@ PRESETS: dict[str, dict[str, dict]] = {
     # the voice and a copy 7 st down blended (deep and high at once, no one clear
     # pitch), both with a much smaller throat so it isn't your voice any more, thin
     # on bass and top, strong in the mids, and a metallic ring over it
-    "Secret detective":  {"pitch": {"semitones": -7, "size": -5.5, "mix": 0.475, "gap": 0},
+    "Secret detective":  {"pitch": {"semitones": -7, "size": -6, "mix": 0.45, "gap": 0,
+                                    "under": 1},
                           "compressor": {"threshold": -26, "ratio": 5, "boost": 9},
-                          "tone": {"bass": -9, "mid": 7, "presence": 3, "treble": -11},
-                          "radio": {"low": 150, "high": 6100, "drive": 0, "noise": 0.0},
-                          "helmet": {"size": 1.8, "ring": 0.49, "mix": 0.79}},
+                          "tone": {"bass": -7, "mid": 6, "presence": 3, "treble": -11},
+                          "radio": {"low": 150, "high": 6700, "drive": 0, "noise": 0.0},
+                          "helmet": {"size": 1.8, "ring": 0.49, "mix": 0.84}},
     "Dark lord":         {"pitch": {"semitones": -3, "natural": 1, "size": 3},
                           "compressor": {"threshold": -26, "ratio": 4, "boost": 8},
                           "tone": {"bass": 4, "presence": 1, "treble": -3},

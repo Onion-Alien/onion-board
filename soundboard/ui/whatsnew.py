@@ -27,6 +27,17 @@ class Note:
 
 # newest first; add one per release that has something worth telling
 NOTES = (
+    Note("1.9.6", "A new voice, and faster fixes", (
+        ("voice", "Secret detective",
+         "A disguised TV voice: yours plus a lined-up copy a fifth lower, thin and boxy "
+         "with a metallic ring. Every voice now has its own picture."),
+        ("sliders", "More ways to shape a voice",
+         "Tone has a Mid slider; Pitch & voice has Gap between voices, Blur on the new "
+         "voice and Voice size on my voice too. Your saved voices sound as before."),
+        ("shield", "Important fixes get a banner",
+         "When an update fixes something serious, a banner says what and offers Update "
+         "now. Updates are checked every 6 hours."),
+    )),
     Note("1.9.5", "Only the tabs you use", (
         ("sounds", "Switch off the tabs you don't use",
          "Settings → Tabs: untick Radio, Apps, Triggers or Voice and that tab is gone and "

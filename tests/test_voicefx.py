@@ -377,12 +377,15 @@ def test_tone_mid_lifts_the_middle_only():
 
 
 def test_voice_size_reshapes_the_blended_in_voice_too():
-    """Below 100% Mix your own voice is blended back in: Voice size changes it as
-    well, or the speaker stays recognisable under the effect."""
+    """Below 100% Mix your own voice is blended back in: "Voice size on my voice too"
+    changes it as well, or the speaker stays recognisable under the effect. Saves from
+    before the knob (no key) leave it as it was."""
     x = _vowel()
-    y = _run("pitch", {"size": -4, "mix": 0.01}, x)   # almost all blended-in voice
+    y = _run("pitch", {"size": -4, "mix": 0.01, "under": 1}, x)   # almost all own voice
     assert _f0(y) == pytest.approx(120, rel=0.03)
     assert _centroid(y) > _centroid(x) * 1.05
+    old = _run("pitch", {"size": -4, "mix": 0.01}, x)
+    assert _centroid(old) == pytest.approx(_centroid(x), rel=0.03)
 
 
 def _onset(y, thr=0.05):
