@@ -54,18 +54,31 @@ is ignored for LOCK_S seconds. It never listens on a network Windows calls Publi
 (a café's Wi-Fi), whatever Windows Firewall says (soundboard.netcategory). Either
 server keeps at most MAX_CONNECTIONS open at once (PEER_CONNECTIONS from one address).
 
+On the home network the key needn't travel at all: a request can instead carry
+`X-Sig: <unix time>.<nonce>.<HMAC-SHA256(key, "<time>.<nonce>.<METHOD> <path>")>`
+(base64url, no padding), where <path> is the request target as sent ("/api/play?id=…").
+Someone reading the Wi-Fi's traffic sees only signatures: each is good for one request,
+within SIG_WINDOW_S of this PC's clock, and a nonce is never taken twice. A wrong key's
+401 carries `now`, this PC's clock, so a phone whose clock is off can sign again.
+Onion Pocket signs from the version that sees `RemoteHost.signed_requests`; the plain
+key header still works for older ones.
+
 The HTTP side runs on its own thread; each request is handed to the UI thread
 (`RemoteControl.request`) and answered from there, so it never touches the
 window's state from another thread.
 """
 from __future__ import annotations
 
+import base64
 import difflib
+import hashlib
+import hmac
 import ipaddress
 import json
 import logging
 import math
 import random
+import re
 import secrets
 import threading
 import time
@@ -89,6 +102,8 @@ ANSWER_S = 3.0          # how long a request waits for the UI thread
 IDLE_S = 10.0           # a client that connects and goes quiet is dropped after this
 FAIL_LIMIT = 5          # lan: wrong keys in a row from one address before it's locked out
 LOCK_S = 60.0           # lan: ...for this long
+SIG_WINDOW_S = 300      # lan: a signed request's time may be this far from this PC's
+NONCES_MAX = 20000      # lan: nonces remembered (a phone sends one every 2 s or so)
 MAX_CONNECTIONS = 32    # connections open at once; more are closed straight away
 PEER_CONNECTIONS = 8    # ...and from any one address (a phone uses one or two)
 NETWORK_CHECK_S = 30.0  # lan: how often it checks the network is still not Public
@@ -137,6 +152,7 @@ ENDPOINTS = {
     "help": "this list",
 }
 ACTIONS = tuple(ENDPOINTS)
+_NONCE = re.compile(r"[A-Za-z0-9_-]{16,64}")
 
 
 def new_token() -> str:
@@ -226,6 +242,7 @@ class RemoteControl(QObject):
         self._server: _Server | None = None
         self._fails: dict[str, tuple[int, float]] = {}   # peer -> (wrong keys, locked until)
         self._fails_lock = threading.Lock()
+        self._nonces: dict[str, float] = {}   # lan: nonce -> forget it after (monotonic)
         self.request.connect(self._on_request, Qt.QueuedConnection)
         self._network = QTimer(self)
         self._network.setInterval(int(NETWORK_CHECK_S * 1000))
@@ -241,6 +258,7 @@ class RemoteControl(QObject):
         self.token, self.port, self.error, self.host = token, int(port), "", host
         with self._fails_lock:
             self._fails.clear()
+            self._nonces.clear()
         if not token:
             self.error = "no token"
             return False
@@ -299,7 +317,10 @@ class RemoteControl(QObject):
         job.done.set()
 
     # ------------------------------------------------------------------ requests
-    def authorised(self, headers, query: dict) -> bool:
+    def authorised(self, headers, query: dict, request: str = "") -> bool:
+        """`request`: "<METHOD> <target>", what a signature covers."""
+        if self.lan and headers.get("X-Sig"):
+            return self.signed(headers["X-Sig"], request)
         given = ""
         auth = headers.get("Authorization", "")
         if auth.lower().startswith("bearer "):
@@ -308,6 +329,32 @@ class RemoteControl(QObject):
         if not self.lan:   # the phone page sends a header: on the Wi-Fi a key in the
             given = given or (query.get("token") or [""])[0]   # URL is never taken
         return bool(self.token) and secrets.compare_digest(given.encode(), self.token.encode())
+
+    def signed(self, sig: str, request: str) -> bool:
+        """lan: X-Sig is this key's signature of `request`, fresh, and its nonce new."""
+        if not self.token:
+            return False
+        ts, _, rest = sig.strip().partition(".")
+        nonce, _, mac = rest.partition(".")
+        if not (ts.isdigit() and len(ts) <= 12 and _NONCE.fullmatch(nonce)):
+            return False
+        if abs(time.time() - int(ts)) > SIG_WINDOW_S:
+            return False
+        want = base64.urlsafe_b64encode(hmac.new(
+            self.token.encode(), f"{ts}.{nonce}.{request}".encode(), hashlib.sha256)
+            .digest()).decode().rstrip("=")
+        if not secrets.compare_digest(mac.encode(), want.encode()):
+            return False
+        now = time.monotonic()
+        with self._fails_lock:
+            if self._nonces.get(nonce, 0.0) > now:
+                return False   # a request read off the Wi-Fi and sent again
+            if len(self._nonces) >= NONCES_MAX:
+                self._nonces = {n: t for n, t in self._nonces.items() if t > now}
+                if len(self._nonces) >= NONCES_MAX:   # all still fresh: refuse, don't forget
+                    return False
+            self._nonces[nonce] = now + 2 * SIG_WINDOW_S
+        return True
 
     def host_ok(self, host: str) -> bool:
         if self.host != HOST:
@@ -390,9 +437,12 @@ def _handler_for(ctl: RemoteControl):
                 return self._page()
             if ctl.locked(peer):
                 return self._answer(429, {"error": "too many wrong keys: wait a minute"})
-            if not ctl.authorised(self.headers, query):
+            if not ctl.authorised(self.headers, query, f"{self.command} {self.path}"):
                 ctl.failed(peer)
-                return self._answer(401, {"error": "missing or wrong token"})
+                body = {"error": "missing or wrong token"}
+                if ctl.lan:   # so a phone whose clock is off can sign again
+                    body["now"] = int(time.time())
+                return self._answer(401, body)
             ctl.succeeded(peer)
             action = url.path.strip("/").removeprefix("api/").removeprefix("api")
             if action not in ctl.actions:
