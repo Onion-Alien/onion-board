@@ -154,7 +154,8 @@ def test_saving_the_whole_take_trims_dead_air(tab, qapp):
                                      np.zeros((SR, 2), np.float32)]))
     row.editor.save()
     data = tab.shelf.shelf.clips[0].audio()
-    assert len(data) / SR == pytest.approx(1.1, abs=0.05)
+    # the silence before it was never kept; after it, the pad trim_silence leaves
+    assert len(data) / SR == pytest.approx(1.05, abs=0.02)
 
 
 def test_play_and_send_go_to_the_right_place(tab, qapp):
@@ -384,3 +385,53 @@ def test_big_view_gives_one_card_the_tab(tab, qapp):
     qapp.processEvents()
     assert tab.big is None and rest.isVisible() and not row.editor.btn_big.isChecked()
     assert row.editor.wave.minimumHeight() == clipeditor.WAVE_H
+
+
+def test_click_copy_paste_with_real_keys_does_something(tab, qapp):
+    """What a user does: a click (the hand wobbles a pixel), Ctrl+C, Ctrl+V. The
+    click is a cursor, not a 0.1 s selection; the paste says what it did."""
+    row = opened(tab, qapp)
+    ed = row.editor
+    row.capture.sink(tone(4.0))
+    qapp.processEvents()
+    w = ed.wave
+    y = w.height() // 2
+    ed.peaks()   # sets the live view, as a paint would
+    x = int(w.x_of(ed.view[1] - 2 * SR))   # 2 s back from now
+    QTest.mousePress(w, Qt.LeftButton, Qt.NoModifier, QPoint(x, y))
+    QTest.mouseMove(w, QPoint(x + 1, y))
+    QTest.mouseRelease(w, Qt.LeftButton, Qt.NoModifier, QPoint(x + 1, y))
+    t = ed.take
+    assert not t.has_selection and t.a > 0           # just a cursor
+    n = len(t)
+    QTest.keyClick(w, Qt.Key_C, Qt.ControlModifier)  # nothing picked: copies it all
+    assert "Copied all of it" in ed.info.text()
+    QTest.keyClick(w, Qt.Key_V, Qt.ControlModifier)
+    assert len(ed.take) == 2 * n and "Pasted 0:04.00" in ed.info.text()
+    QTest.keyClick(w, Qt.Key_Z, Qt.ControlModifier)
+    assert len(ed.take) == n
+
+
+def test_paste_over_what_was_just_copied_duplicates_it(tab, qapp):
+    row = opened(tab, qapp)
+    ed = row.editor
+    row.capture.sink(tone(4.0))
+    ed.freeze()
+    ed.take.select(SR, 2 * SR)
+    w = ed.wave
+    w.setFocus()
+    QTest.keyClick(w, Qt.Key_C, Qt.ControlModifier)
+    QTest.keyClick(w, Qt.Key_V, Qt.ControlModifier)
+    t = ed.take
+    assert len(t) == 5 * SR and (t.a, t.b) == (2 * SR, 3 * SR)   # a second copy, after it
+    assert "Pasted 0:01.00 at 0:02.00" in ed.info.text()
+
+
+def test_a_paused_program_doesnt_fill_the_editor_with_silence(tab, qapp):
+    row = opened(tab, qapp)
+    ed = row.editor
+    quiet = np.zeros((40 * SR, 2), np.float32)
+    row.capture.sink(quiet)                          # nothing playing yet
+    assert ed.length() == 0
+    row.capture.sink(np.concatenate([tone(2.0), quiet, tone(1.0), quiet]))
+    assert ed.length() / SR == pytest.approx(2.0 + 0.5 + 1.0 + 0.5, abs=0.02)

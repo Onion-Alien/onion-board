@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+- **Clip editor copy and paste do what you'd expect.** A click places the cursor
+  (a slight wobble of the mouse no longer picks a sliver), Ctrl+V always says
+  what it pasted and where, and pasting right after copying puts a second copy
+  in after it instead of silently swapping it for itself.
+- **No more minutes of silence in the clip editor.** Left open while nothing
+  plays, it keeps only what the program actually played: silence before it
+  isn't kept, and long gaps close up to half a second.
+
 - **Clip editor: saved clips get a list.** Save in an app's clip editor now keeps
   the bit in *Saved clips* at the bottom of the Apps tab: double-click plays it,
   F2 renames it, right-click adds it to your Sounds, sends it, copies it or

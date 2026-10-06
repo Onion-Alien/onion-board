@@ -17,6 +17,8 @@ BIN = 240                # frames per waveform column (5 ms): fine enough to zoo
 UNDO_BYTES = 300 << 20   # undo steps kept, by the memory their audio takes
 FADE_MIN_S = 0.005       # a click-free edge for cuts and pastes
 MAX_FRAMES = int(MAX_SECONDS * SR)   # a take never grows past what a sound may be
+QUIET = 1e-6             # a column this quiet is silence (a paused program sends zeros)
+GAP_S = 0.5              # silence kept between two sounds; longer gaps close up to this
 
 
 def bin_peaks(data: np.ndarray, size: int = BIN) -> np.ndarray:
@@ -38,7 +40,11 @@ def bin_peaks(data: np.ndarray, size: int = BIN) -> np.ndarray:
 class LiveBuffer:
     """The last `seconds` of a program's sound, kept as it plays. push() runs on
     the capture thread; snapshot() / peaks() on the UI thread. Only whole BIN-frame
-    slices are kept, so the audio and its waveform always line up."""
+    slices are kept, so the audio and its waveform always line up.
+
+    Silence isn't kept: none before the first sound, and a gap between two sounds
+    closes up to GAP_S. A paused video left with the editor open doesn't fill the
+    minute with nothing, and `total` (the live view's clock) stands still."""
 
     def __init__(self, seconds: float = LISTEN_S):
         self.cols = max(1, int(seconds * SR) // BIN)
@@ -48,6 +54,8 @@ class LiveBuffer:
         self.filled = 0       # columns holding sound
         self.total = 0        # frames ever kept (the clock the view scrolls by)
         self._part = np.zeros((0, 2), np.float32)   # less than a BIN, waiting for more
+        self._gap_cols = max(1, int(GAP_S * SR) // BIN)
+        self._quiet = self._gap_cols + 1   # silent columns in a row so far (none heard yet)
         self._lock = threading.Lock()
 
     def push(self, x: np.ndarray):
@@ -63,7 +71,9 @@ class LiveBuffer:
             self._part = x[whole:].copy()
             if not whole:
                 return
-            x = x[:whole]
+            x = self._drop_silence(x[:whole])
+            if not len(x):
+                return
             if len(x) > len(self.audio):
                 x = x[-len(self.audio):]
             k = len(x) // BIN
@@ -73,6 +83,20 @@ class LiveBuffer:
             self.col = (self.col + k) % self.cols
             self.filled = min(self.filled + k, self.cols)
             self.total += k * BIN
+
+    def _drop_silence(self, x: np.ndarray) -> np.ndarray:
+        """`x` (whole BINs) without what's past GAP_S of silence in a row."""
+        k = len(x) // BIN
+        silent = np.abs(x).reshape(k, -1).max(axis=1) < QUIET
+        if not silent.any():
+            self._quiet = 0
+            return x
+        idx = np.arange(k)
+        last_loud = np.maximum.accumulate(np.where(silent, -1, idx))
+        run = np.where(last_loud < 0, self._quiet + idx + 1, idx - last_loud)
+        keep = ~silent | (run <= self._gap_cols)
+        self._quiet = int(run[-1]) if silent[-1] else 0
+        return x if keep.all() else x.reshape(k, BIN, 2)[keep].reshape(-1, 2)
 
     def _order(self) -> np.ndarray:
         """Column indices, oldest first."""
@@ -97,6 +121,7 @@ class LiveBuffer:
         with self._lock:
             self.col = self.filled = 0
             self._part = np.zeros((0, 2), np.float32)
+            self._quiet = self._gap_cols + 1
 
 
 def _ramp(n: int, up: bool) -> np.ndarray:
