@@ -56,6 +56,8 @@ PRIVACY_KEYS = ("net_mode", "net_proxy", "net_off", "net_offline", "netlog_keep"
 SIDE_KEYS = PRIVACY_KEYS + ("whats_new_seen",)
 CONFIG_VERSION = 4
 LOAD_TRIES = 12      # ~10 s of retries while config.json is locked
+# a new user's first window: Sounds, Voice and Setup; the rest wait under + More tabs
+BASIC_TABS_OFF = ("radio", "apps", "triggers")
 CONFIG_BACKUPS = 3   # config.json.1 … .3, rotated on a save that changes something...
 ROTATE_EVERY_S = 3600   # ...at most once an hour (the first change of a session always)
 # where install-vbcable.ps1 lives: installer/ in a source checkout, or the frozen
@@ -159,12 +161,29 @@ SETTING_RANGES = {"sound_vol": (0.0, VOLUME_MAX), "mic_vol": (0.0, VOLUME_MAX),
                   "duck_db": (-24.0, 0.0), "replay_seconds": (5, 120)}
 
 
+def clean_programs(v) -> dict[str, str]:
+    """Config.category_programs as the app can use it: {exe file name, lower case:
+    category}; entries that aren't a plain file name and a category name are dropped."""
+    out: dict[str, str] = {}
+    if not isinstance(v, dict):
+        return out
+    for exe, cat in v.items():
+        if not isinstance(exe, str) or not isinstance(cat, str) or not cat.strip():
+            continue
+        name = exe.strip().lower()
+        if name and name not in (".", "..") and not any(c in name for c in "/\\:"):
+            out[name] = cat.strip()
+    return out
+
+
 def clean_setting(k: str, v):
     """Setting `k` (already of the right type) as the app can use it: brought into the
     range of its control. None if it's unusable, so the default applies instead."""
     if k in SETTING_RANGES:
         lo, hi = SETTING_RANGES[k]
         return min(max(v, lo), hi)
+    if k == "category_programs":   # {exe file name: category}; anything else is dropped
+        return clean_programs(v)
     if k == "net_mode":   # a mode this version doesn't know (a newer one's): fail
         return v if v in NET_MODES else "proxy"   # closed, never quietly direct
     if k in ("net_off", "tabs_off"):   # keys (strings); unknown ones are kept, so a
@@ -329,7 +348,7 @@ class Config:
     app_card_width: int = 300
     tab: int = 0     # 0 = sounds, 1 = radio, 2 = apps, 3 = triggers, 4 = voice, 5 = setup
     # Settings > Tabs: the tabs switched off ("radio", "apps", "triggers", "voice"), gone
-    # from the window and never built
+    # from the window and never built (a new user starts with BASIC_TABS_OFF)
     tabs_off: list[str] = field(default_factory=list)
     # fetch newer yt-dlp versions from PyPI by itself: opt-in, since that's code the app
     # runs (named *_optin so configs saved while it defaulted to on start off again)
@@ -379,6 +398,10 @@ class Config:
     scoped_hotkeys: bool = False
     single_click: bool = False        # one click on a pad plays it (not a double-click)
     category_hotkeys: dict = field(default_factory=dict)   # category -> its random-sound key
+    # Switch category when a program is in front (soundboard.catswitch): {"game.exe":
+    # category}, set by the user from a category's menu; and the switch for all of it
+    category_programs: dict = field(default_factory=dict)
+    category_programs_on: bool = True
     # instant replay (soundboard.replay): while this hotkey is set, the last
     # replay_seconds of everything you hear (except Onion Board's own sounds) are kept
     # in memory, and the key saves them as a new pad
@@ -507,6 +530,7 @@ class Config:
         cfg = cls()
         cfg.route = "mic"
         cfg.mic_first = True
+        cfg.tabs_off = list(BASIC_TABS_OFF)   # a plain soundboard first; + More tabs adds them
         return cfg
 
     def _restore_privacy(self):
@@ -1327,13 +1351,21 @@ def save_clip(data: np.ndarray, name: str, color: str) -> tuple[SoundMeta, np.nd
     return meta, store_cached(sid, data)
 
 
-def trim_silence(data: np.ndarray, threshold: float = 0.002, pad_s: float = 0.05) -> np.ndarray:
-    """Cut dead air off both ends of a recording (keeps a tiny pad so it doesn't start abruptly)."""
+def silence_bounds(data: np.ndarray, threshold: float = 0.002,
+                   pad_s: float = 0.05) -> tuple[int, int]:
+    """(start, end) frames of a recording with the dead air at both ends cut off (a
+    tiny pad kept so it doesn't start abruptly); (0, 0) if it's all quiet."""
     loud = np.flatnonzero(np.max(np.abs(data), axis=1) > threshold)
     if not len(loud):
-        return data[:0]
+        return 0, 0
     pad = int(pad_s * SR)
-    return data[max(loud[0] - pad, 0): loud[-1] + pad]
+    return max(int(loud[0]) - pad, 0), min(int(loud[-1]) + pad, len(data))
+
+
+def trim_silence(data: np.ndarray, threshold: float = 0.002, pad_s: float = 0.05) -> np.ndarray:
+    """Cut dead air off both ends of a recording (keeps a tiny pad so it doesn't start abruptly)."""
+    a, b = silence_bounds(data, threshold, pad_s)
+    return data[a:b]
 
 
 def duplicate(meta: SoundMeta, name: str) -> SoundMeta:
