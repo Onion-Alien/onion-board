@@ -212,6 +212,13 @@ def _never_touch_the_real_mic(monkeypatch, tmp_path):
 
 
 @pytest.fixture(autouse=True)
+def _not_a_dev_pc(monkeypatch):
+    """The developer's PCs set ONIONBOARD_NO_STATS (no usage count from them): the
+    tests run as on anyone's PC, so the usage count tests see it sent."""
+    monkeypatch.delenv("ONIONBOARD_NO_STATS", raising=False)
+
+
+@pytest.fixture(autouse=True)
 def _never_touch_real_shortcuts(monkeypatch):
     """The theme re-icons the app's Desktop / Start menu shortcuts: never the
     developer's real ones (offscreen already skips it; this is the second lock)."""
