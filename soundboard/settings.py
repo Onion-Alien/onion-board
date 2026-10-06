@@ -1113,7 +1113,9 @@ class SettingsDialog(QDialog):
 
     def _help(self):
         w, v = self._page()
-        v.addWidget(self._addons_card())
+        card = self._addons_card()
+        self._pocket_addon_row(card.layout())
+        v.addWidget(card)
         v.addWidget(self._feedback_card())
         v.addWidget(self._support_card())
         v.addStretch(1)
@@ -1220,8 +1222,10 @@ class SettingsDialog(QDialog):
         from soundboard import watchaddon
         tab = self.mw.triggers
         card, cv = self._card("Add-ons",
-                              "Onion Watch is the free add-on behind the Triggers tab. "
-                              "Removing it keeps your triggers for when you get it again.")
+                              "Onion Watch is the free add-on behind the Triggers tab, and "
+                              "Onion Pocket puts your pads on your phone. Removing one "
+                              "keeps your triggers and paired phones for when you get it "
+                              "again.")
         self.addon_label = QLabel()
         self.addon_label.setWordWrap(True)
         self.addon_remove = QPushButton("Remove Onion Watch…")
@@ -2225,11 +2229,112 @@ class SettingsDialog(QDialog):
             if card is not None:
                 if info.id == pocketaddon.MODULE_ID:
                     self._pocket_update(card, info)
+                    self._pocket_remove_button(card, info)
+                    self._pocket_slot = card
                 out.append(card)
                 have.add(info.id)
         if pocketaddon.MODULE_ID not in have and pocketaddon.offered():
-            out.append(self._get_pocket_card())
+            self._pocket_slot = self._get_pocket_card()
+            out.append(self._pocket_slot)
         return out
+
+    # ------------------------------------------------------------ Onion Pocket: remove
+    def _pocket_info(self):
+        """The installed Onion Pocket the app knows of (running or not), or None."""
+        from soundboard import pocketaddon
+        return next((i for i, _a in getattr(self.mw, "remote_addons", [])
+                     if i.id == pocketaddon.MODULE_ID), None)
+
+    def _pocket_addon_row(self, cv):
+        """Onion Pocket on the Add-ons card: its version and *Remove Onion Pocket…*,
+        like Onion Watch's above it."""
+        from soundboard import pocketaddon
+        label = QLabel()
+        label.setWordWrap(True)
+        btn = QPushButton("Remove Onion Pocket…")
+        icons.set_icon(btn, "trash", "danger_text")
+
+        def refresh():
+            if not qt_valid(label):
+                return
+            info = self._pocket_info()
+            have = info is not None and pocketaddon.removable(info)
+            label.setText(f"Onion Pocket {info.version} is installed." if have else
+                          "Onion Pocket isn't installed. Get it from Settings → Remote.")
+            btn.setVisible(have)
+
+        btn.clicked.connect(lambda: self._remove_pocket(btn))
+        self._pocket_refresh = refresh
+        row = _button_row()
+        row.addWidget(btn)
+        cv.addWidget(label)
+        cv.addLayout(row)
+        refresh()
+        self.pocket_remove_addons = btn
+
+    def _pocket_remove_button(self, card, info):
+        """*Remove Onion Pocket…* at the foot of its own card on Settings → Remote."""
+        from soundboard import pocketaddon
+        lay = card.layout()
+        if lay is None or not pocketaddon.removable(info):
+            return
+        btn = QPushButton("Remove Onion Pocket…")
+        btn.setToolTip("Takes the add-on out of Onion Board: phones can't play your pads "
+                       "any more. Paired phones are kept for when you get it again.")
+        icons.set_icon(btn, "trash", "danger_text")
+        btn.clicked.connect(lambda: self._remove_pocket(btn))
+        row = _button_row()
+        row.addWidget(btn)
+        lay.addLayout(row)
+        self.pocket_remove = btn
+
+    def _swap_pocket_slot(self, new):
+        """Put `new` (a card, or None) where Onion Pocket's card is on Settings →
+        Remote, if that page is built."""
+        old = getattr(self, "_pocket_slot", None)
+        self._pocket_slot = new
+        if old is None or not qt_valid(old):
+            return
+        lay = old.parentWidget().layout() if old.parentWidget() else None
+        if new is not None and lay is not None:
+            lay.insertWidget(lay.indexOf(old), new)
+        old.hide()
+        old.deleteLater()
+
+    def _pocket_changed(self):
+        refresh = getattr(self, "_pocket_refresh", None)
+        if refresh is not None:
+            refresh()
+
+    def _remove_pocket(self, btn):
+        """Uninstall Onion Pocket, after asking: its server stops, and its card on
+        Settings → Remote turns back into *Get Onion Pocket*."""
+        from PySide6.QtWidgets import QMessageBox
+
+        from soundboard import modules, pocketaddon
+        info = self._pocket_info()
+        if info is None:
+            return
+        if QMessageBox.question(
+                self, "Remove Onion Pocket?",
+                "Remove the Onion Pocket add-on from Onion Board? Phones won't be able to "
+                "play your pads any more. Paired phones are kept for when you get it "
+                "again.\n\nYou can get it again from Settings → Remote any time.",
+                QMessageBox.Yes | QMessageBox.No, QMessageBox.No) != QMessageBox.Yes:
+            return
+        try:
+            self.mw.remove_remote_addon(info)
+        except modules.ModuleError as e:
+            log.warning("Onion Pocket couldn't be removed: %s", e)
+            QMessageBox.warning(self, "Onion Pocket wasn't removed",
+                                f"Onion Pocket wasn't removed: {errors.plain(e)}")
+            return
+        self.mw.pocket_offer = None
+        if getattr(self, "_pocket_slot", None) is not None:
+            self._swap_pocket_slot(self._get_pocket_card() if pocketaddon.offered()
+                                   else None)
+        self._pocket_changed()
+        busy.toast(self, "✓ Onion Pocket removed.", "ok")
 
     def _addon_card(self, info, addon):
         if addon is None:
@@ -2299,9 +2404,10 @@ class SettingsDialog(QDialog):
             box = card.parentWidget().layout() if card.parentWidget() else None
             fresh = self._addon_card(new, addon)
             if fresh is not None and box is not None:
-                box.insertWidget(box.indexOf(card), fresh)
-                card.hide()
-                card.deleteLater()
+                self._pocket_remove_button(fresh, new)
+                self._pocket_slot = card
+                self._swap_pocket_slot(fresh)
+                self._pocket_changed()
             else:
                 state["release"]()
                 btn.hide()
@@ -2361,11 +2467,11 @@ class SettingsDialog(QDialog):
                 return
             addon = self.mw.load_remote_addon(info) if info is not None else None
             new = self._addon_card(info, addon) if addon is not None else None
-            lay = card.parentWidget().layout() if card.parentWidget() else None
-            if new is not None and lay is not None:
-                lay.insertWidget(lay.indexOf(card), new)
-            card.hide()
-            card.deleteLater()
+            if new is not None:
+                self._pocket_remove_button(new, info)
+            self._pocket_slot = card
+            self._swap_pocket_slot(new)
+            self._pocket_changed()
 
         def run():
             busy.hold(get, "Getting Onion Pocket…")

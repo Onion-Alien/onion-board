@@ -281,3 +281,33 @@ def test_remembered_nonces_stay_bounded(loaded, monkeypatch):
     assert all(srv.signed(s, "POST /api/status") for s in sigs[:3])
     assert not srv.signed(sigs[3], "POST /api/status")   # full of fresh ones: refused
     assert len(srv._nonces) == 3
+
+
+def test_onion_pocket_can_be_removed_from_its_card_and_add_ons(qapp, window,  # noqa: F811
+                                                               monkeypatch):
+    """*Remove Onion Pocket…* on its card (Settings → Remote) and on the Add-ons card:
+    asks first, stops it, deletes its folder, keeps its settings, and the card turns
+    back into *Get Onion Pocket*."""
+    from PySide6.QtWidgets import QMessageBox
+
+    from soundboard import library, pocketaddon
+    base = library.APP_DIR / "modules"
+    info = _module(base, pocketaddon.MODULE_ID, "pocket_remove_test_addon", ADDON)
+    monkeypatch.setattr(modules, "discover", lambda dirs=None: [modules._read(info.path)])
+    monkeypatch.setattr(pocketaddon, "offered", lambda: True)
+    window.pocket_checked = 1e18          # no update check over the network
+    window.remote_addons = window._load_remote_addons()
+    (info, addon), = window.remote_addons
+    window.cfg.remote_addons[info.id] = {"token": "kept"}
+    d = SettingsDialog(window, "remote", lazy=False)
+    assert not d.pocket_remove.isHidden() and not d.pocket_remove_addons.isHidden()
+    monkeypatch.setattr(QMessageBox, "question", lambda *a, **k: QMessageBox.No)
+    d.pocket_remove.click()
+    assert info.path.is_dir() and window.remote_addons    # said no: nothing happens
+    monkeypatch.setattr(QMessageBox, "question", lambda *a, **k: QMessageBox.Yes)
+    d.pocket_remove_addons.click()
+    assert not info.path.exists() and window.remote_addons == []
+    assert addon.stopped == 1 and window.cfg.remote_addons[info.id] == {"token": "kept"}
+    assert d.pocket_remove_addons.isHidden()   # Add-ons: not installed
+    assert d.get_pocket.isVisibleTo(d)                     # Remote offers it again
+    d.close()

@@ -4583,6 +4583,35 @@ class MainWindow(QMainWindow):
         self.remote_addons.append((info, addon))
         return addon
 
+    def remove_remote_addon(self, info, base=None):
+        """Uninstall a remote add-on (Settings' *Remove Onion Pocket…*): the running
+        copy is stopped (its server lets go of the port), its folder in `base` (the
+        modules folder in %APPDATA%) deleted and its package forgotten. Its settings
+        in Config.remote_addons stay, for when it's got again. If the folder can't be
+        deleted, it's started again. Raises modules.ModuleError."""
+        from soundboard import modules
+        cur = next(((i, a) for i, a in self.remote_addons if i.id == info.id), None)
+        if cur is not None and cur[1] is not None:
+            try:
+                cur[1].stop()
+            except Exception:  # noqa: BLE001 - it's being removed anyway
+                log.exception("remote add-on %s didn't stop cleanly", info.id)
+        try:
+            modules.uninstall(info.id, base)
+        except modules.ModuleError:
+            if cur is not None and cur[1] is not None:
+                restart = getattr(cur[1], "apply", None)
+                try:
+                    if callable(restart):
+                        restart()
+                except Exception:  # noqa: BLE001
+                    log.exception("remote add-on %s didn't start again", info.id)
+            raise
+        if info.package:
+            modules._forget(info.package)
+        self.remote_addons = [(i, a) for i, a in self.remote_addons if i.id != info.id]
+        log.info("remote add-on %s %s was removed", info.id, info.version)
+
     def _stop_remote_addons(self):
         for info, addon in self.remote_addons:
             if addon is not None:

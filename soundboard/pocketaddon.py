@@ -75,6 +75,17 @@ def installed(dirs: list[Path] | None = None) -> ModuleInfo | None:
     return next((m for m in modules.discover(dirs) if m.id == MODULE_ID), None)
 
 
+def removable(info: ModuleInfo, base: Path | None = None) -> bool:
+    """Whether this copy is the one installed into `base` (the modules folder in
+    %APPDATA%), which MainWindow.remove_remote_addon can take out, rather than one
+    shipped with the app."""
+    base = base if base is not None else modules.search_dirs()[0]
+    try:
+        return info.path.resolve() == (base / MODULE_ID).resolve()
+    except OSError:
+        return False
+
+
 def _zip_version(path: Path) -> str:
     try:
         with zipfile.ZipFile(path) as z:
