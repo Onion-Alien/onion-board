@@ -62,6 +62,9 @@ AppPublisherURL=https://github.com/Onion-Alien/onion-board
 AppSupportURL=https://github.com/Onion-Alien/onion-board/issues
 AppUpdatesURL=https://github.com/Onion-Alien/onion-board/releases
 AppCopyright=Copyright (C) Onion Board contributors
+; Shown in Windows' installed-apps details (Comments / Contact)
+AppComments=A free soundboard: plays sounds through your mic into Discord and games
+AppContact=https://github.com/Onion-Alien/onion-board/issues
 ; Setup's own file details (Properties -> Details): a named, versioned installer rather
 ; than a blank one, which also helps machine-learning virus scanners that distrust those
 VersionInfoVersion={#AppVersion}
