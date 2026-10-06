@@ -1327,13 +1327,21 @@ def save_clip(data: np.ndarray, name: str, color: str) -> tuple[SoundMeta, np.nd
     return meta, store_cached(sid, data)
 
 
-def trim_silence(data: np.ndarray, threshold: float = 0.002, pad_s: float = 0.05) -> np.ndarray:
-    """Cut dead air off both ends of a recording (keeps a tiny pad so it doesn't start abruptly)."""
+def silence_bounds(data: np.ndarray, threshold: float = 0.002,
+                   pad_s: float = 0.05) -> tuple[int, int]:
+    """(start, end) frames of a recording with the dead air at both ends cut off (a
+    tiny pad kept so it doesn't start abruptly); (0, 0) if it's all quiet."""
     loud = np.flatnonzero(np.max(np.abs(data), axis=1) > threshold)
     if not len(loud):
-        return data[:0]
+        return 0, 0
     pad = int(pad_s * SR)
-    return data[max(loud[0] - pad, 0): loud[-1] + pad]
+    return max(int(loud[0]) - pad, 0), min(int(loud[-1]) + pad, len(data))
+
+
+def trim_silence(data: np.ndarray, threshold: float = 0.002, pad_s: float = 0.05) -> np.ndarray:
+    """Cut dead air off both ends of a recording (keeps a tiny pad so it doesn't start abruptly)."""
+    a, b = silence_bounds(data, threshold, pad_s)
+    return data[a:b]
 
 
 def duplicate(meta: SoundMeta, name: str) -> SoundMeta:
