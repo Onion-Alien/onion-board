@@ -1141,6 +1141,12 @@ def relaunch_params(args: list[str]) -> str:
 def _elevated(args: list[str], wait_s: float = 90.0) -> int | None:
     """Run this app's admin copy with `args` (Windows asks first). Its exit code, or
     None if the prompt was turned down or it didn't finish."""
+    return run_elevated(sys.executable, relaunch_params(args), wait_s)
+
+
+def run_elevated(exe: str, params: str, wait_s: float = 90.0) -> int | None:
+    """Run `exe` as admin, hidden (Windows asks first). Its exit code, or None if the
+    prompt was turned down or it didn't finish in `wait_s`."""
     from ctypes import wintypes
 
     class SHELLEXECUTEINFOW(ctypes.Structure):
@@ -1154,8 +1160,7 @@ def _elevated(args: list[str], wait_s: float = 90.0) -> int | None:
                     ("hProcess", wintypes.HANDLE)]
 
     info = SHELLEXECUTEINFOW(cbSize=ctypes.sizeof(SHELLEXECUTEINFOW), fMask=0x40,
-                             lpVerb="runas", lpFile=sys.executable,
-                             lpParameters=relaunch_params(args), nShow=0)
+                             lpVerb="runas", lpFile=exe, lpParameters=params, nShow=0)
     shell32 = ctypes.WinDLL("shell32", use_last_error=True)
     kernel32 = ctypes.WinDLL("kernel32", use_last_error=True)
     shell32.ShellExecuteExW.argtypes = [ctypes.POINTER(SHELLEXECUTEINFOW)]
@@ -1163,7 +1168,8 @@ def _elevated(args: list[str], wait_s: float = 90.0) -> int | None:
     kernel32.GetExitCodeProcess.argtypes = [wintypes.HANDLE, ctypes.POINTER(wintypes.DWORD)]
     kernel32.CloseHandle.argtypes = [wintypes.HANDLE]
     if not shell32.ShellExecuteExW(ctypes.byref(info)) or not info.hProcess:
-        log.info("mic effect %s not run (error %s)", args[:1], ctypes.get_last_error())
+        log.info("%s %s not run (error %s)", Path(exe).name, params[-40:],
+                 ctypes.get_last_error())
         return None
     try:
         if kernel32.WaitForSingleObject(info.hProcess, int(wait_s * 1000)) != 0:
