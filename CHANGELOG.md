@@ -2,6 +2,13 @@
 
 ## 1.9.4 — 2026-10-06
 
+- **Phone remote (Onion Pocket) is harder to knock over.** A device on the same
+  Wi-Fi can no longer stall the app by opening thousands of connections: the
+  remote servers keep at most 32 connections open (8 per device) and close the
+  rest straight away.
+- **Phone remote: the key stays out of web addresses.** The phone key is only
+  accepted in a request header, never in the address, so it can't end up in a
+  browser's history. Stream Deck links on this PC still work as before.
 - **Clip editor copy and paste do what you'd expect.** A click places the cursor
   (a slight wobble of the mouse no longer picks a sliver), Ctrl+V always says
   what it pasted and where, and pasting right after copying puts a second copy
