@@ -77,6 +77,8 @@ def test_mic_check_pulse_runs_only_while_on(window):
     window.on_mic_check(True)
     assert window._pulse.state() == window._pulse.State.Running
     assert window.mic_banner.isVisibleTo(window)
+    window.mic_banner.click()             # only a sign: the mixer's button is the switch
+    assert window.engine.mic_check
     window.on_mic_check(False)
     assert window._pulse.state() == window._pulse.State.Stopped
     assert window._banner_fx.opacity() == 1.0

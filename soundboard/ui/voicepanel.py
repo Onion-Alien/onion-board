@@ -461,14 +461,9 @@ class VoiceFxPanel(QWidget):
     way to hear yourself, and (folded away) the individual effects for fine-tuning.
 
     `changed(spec)` with spec = {"enabled", "preset", "effects": {type: {...}}}.
-    `hear_toggled(bool)` asks the window to switch "Hear what they hear" on or off;
-    `voice_only(bool)` says whether that should be your voice alone (Hear my voice)
-    or everything (switched on from the mixer).
     `chat_help()` asks for the Discord guide; `tip_dismissed()` means "Got it" on the
     Discord notice (the window remembers it)."""
     changed = Signal(dict)
-    hear_toggled = Signal(bool)
-    voice_only = Signal(bool)    # Hear my voice: only the voice, not the sounds
     chat_help = Signal()
     tip_dismissed = Signal()
 
@@ -496,8 +491,8 @@ class VoiceFxPanel(QWidget):
         v.setSpacing(12)
         v.addWidget(section_label("VOICE CHANGER"))
         v.addWidget(hint_label("Change your mic live for whoever you send sounds to (Discord, a "
-                               "game, OBS). Pick a voice to turn it on, then use Hear my "
-                               "voice to try it."))
+                               "game, OBS). Pick a voice to turn it on, then use Hear what "
+                               "they hear at the bottom to try it."))
 
         # ---- the switch
         self.btn_power = QPushButton()
@@ -508,27 +503,16 @@ class VoiceFxPanel(QWidget):
         icons.set_icon(self.btn_power, "mic", checked_color="#ffffff")
         self.btn_power.setChecked(spec["enabled"])
         self.btn_power.toggled.connect(self._on_power)
-        # the switch, your mic level and "Hear my voice" side by side: everything you
-        # need to try a voice is up here, next to the voice tiles
+        # the switch and your mic level side by side, next to the voice tiles (to hear
+        # it: the mixer's "Hear what they hear", the one switch for that on every tab)
         top = QHBoxLayout()
         top.setSpacing(8)
         top.addWidget(self.btn_power)
-        self.btn_hear = QPushButton("Hear my voice")
-        self.btn_hear.setObjectName("miccheck")
-        self.btn_hear.setCheckable(True)
-        self.btn_hear.setMinimumHeight(42)
-        self.btn_hear.setToolTip("Hear my voice (only me): plays your changed voice into your "
-                                 "headphones, without your sounds, so you can tune it. "
-                                 "(The mixer's “Hear what they hear” plays everything.) "
-                                 "Click again to stop.")
-        icons.set_icon(self.btn_hear, "ear", checked_color="#ffffff")
-        self.btn_hear.toggled.connect(self._hear)
         top.addWidget(icon_label("mic", "Your mic level"))
         self.meter = Meter()
         self.meter.setMinimumWidth(60)
         self.meter.setToolTip("Your mic level: it moves when you talk")
         top.addWidget(self.meter, 1)
-        top.addWidget(self.btn_hear)
         v.addLayout(top)
 
         # ---- the Discord catch (shown with the changer on, until "Got it")
@@ -939,19 +923,6 @@ class VoiceFxPanel(QWidget):
         if added:
             self._fill_saved()
         return added
-
-    def set_hearing(self, on: bool):
-        """Mirror the window's "Hear what they hear" state. Switched on over there,
-        you hear everything they hear, not only your voice."""
-        if on and not self.btn_hear.isChecked():
-            self.voice_only.emit(False)
-        self.btn_hear.blockSignals(True)
-        self.btn_hear.setChecked(on)
-        self.btn_hear.blockSignals(False)
-
-    def _hear(self, on: bool):
-        self.voice_only.emit(on)      # first: the window switches the monitor on next
-        self.hear_toggled.emit(on)
 
     def set_device_delay(self, ms: float | None):
         """Your sound devices' own delay (mic in + send device out), from the engine."""
@@ -2129,7 +2100,6 @@ class VoicePanel(QWidget):
         # left on from last time, it changed your mic the moment the app opened.
         self.fx = VoiceFxPanel({**voicefx.clean_spec(fx_spec), "enabled": False})
         self.fx.changed.connect(self._fx_changed)
-        self.fx.voice_only.connect(lambda on: setattr(engine, "mon_voice_only", on))
         fx_card, fv = card(roomy=True)
         fv.addWidget(self.fx)
         lcol.addWidget(fx_card)
@@ -2196,8 +2166,7 @@ class VoicePanel(QWidget):
     def fit_steps(self):
         """What the main window may hide here when it gets small (ui/responsive.py)."""
         from soundboard.ui import responsive as r
-        return [(35, "w", r.icon_only(self.fx.btn_hear)),
-                (40, "w", r.hide(*self.speech.say_vol_group)),
+        return [(40, "w", r.hide(*self.speech.say_vol_group)),
                 (50, "w", r.hide(self.speech.say_stop))]
 
     def stack_steps(self):

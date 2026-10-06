@@ -448,12 +448,12 @@ class MainWindow(QMainWindow):
         rv.addLayout(head)
         self._paint_logo()
 
+        # only a sign: the one switch is "Hear what they hear" in the mixer at the bottom
         self.mic_banner = BannerButton("YOU'RE HEARING YOUR MIC OUTPUT  —  mic + sounds, "
-                                       "exactly what others hear   ·   click to turn off",
-                                       "HEARING YOUR MIC OUTPUT  ·  click to turn off")
+                                       "exactly what others hear",
+                                       "HEARING YOUR MIC OUTPUT")
         self.mic_banner.setObjectName("micbanner")
-        self.mic_banner.setCursor(Qt.PointingHandCursor)
-        self.mic_banner.clicked.connect(lambda: self.btn_check.setChecked(False))
+        self.mic_banner.setFocusPolicy(Qt.NoFocus)
         self.mic_banner.hide()
         icons.set_icon(self.mic_banner, "ear", "#ffffff", size=20)
         # pulse: an opacity animation, not a stylesheet rewrite 30x a second (each
@@ -543,12 +543,6 @@ class MainWindow(QMainWindow):
 
         # ---- mixer strip: the things that apply whatever tab you're on
         rv.addWidget(self._build_mixer())
-        # the Voice tab's "Hear my voice" and the mixer's "Hear what they hear" are one switch
-        self.voice.fx.hear_toggled.connect(self.btn_check.setChecked)
-        self.btn_check.toggled.connect(self.voice.fx.set_hearing)
-        # ... and so is the Setup tab's, in TEST IT
-        self.btn_check.toggled.connect(self.btn_check_test.setChecked)
-        self.btn_check_test.toggled.connect(self.btn_check.setChecked)
         self.voice.fx.set_tip_enabled(not self.cfg.voice_discord_tip_shown)
         self.voice.fx.chat_help.connect(lambda: self.show_chat_guide("discord"))
         self.voice.fx.tip_dismissed.connect(
@@ -1285,18 +1279,8 @@ class MainWindow(QMainWindow):
         icons.set_icon(self.btn_rec, "record", "on_accent")
         self.btn_rec.clicked.connect(self.start_test)
         tv.addWidget(self.btn_rec)
-        # a live check right here, the same switch as the mixer's at the bottom
-        live = QVBoxLayout()
-        live.setSpacing(10)
-        self.btn_check_test = QPushButton("Hear what they hear")
-        self.btn_check_test.setObjectName("miccheck")
-        self.btn_check_test.setCheckable(True)
-        self.btn_check_test.setToolTip("A live check: plays your output (your mic and sounds) "
-                                       "into your headphones. Click again to stop.")
-        icons.set_icon(self.btn_check_test, "ear", checked_color="#ffffff")
-        live.addWidget(self.btn_check_test, 0, Qt.AlignLeft)
-        live.addWidget(hint_label("Live: hear exactly what they hear, in your headphones."), 1)
-        tv.addLayout(live)
+        tv.addWidget(hint_label("To hear it live instead, use Hear what they hear at the "
+                                "bottom."))
         self.test_result = QLabel()
         self.test_result.setWordWrap(True)
         self.test_result.setTextFormat(Qt.RichText)
@@ -4895,7 +4879,6 @@ class MainWindow(QMainWindow):
         self.engine.mic_check = on
         text = "Stop hearing it" if on else "Hear what they hear"
         self.btn_check.setProperty("full_text", text)   # what a compact window restores
-        self.btn_check_test.setText(text)
         if self.btn_check.text():   # blank while the window is too narrow for words
             self.btn_check.setText(text)
         self.mic_banner.setVisible(on)
