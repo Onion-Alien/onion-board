@@ -6,11 +6,33 @@
   tip about one feature at most once a day, with a *Show me* button that takes you
   there. Never while a game is up, and each tip only once. *Show tips* in
   *Settings → General* turns them off.
+- **Switch category when a program is in front.** Right-click a category tab →
+  *Show this when a program is in front…* and pick your game (or any program). When
+  it comes to the front, the board and the overlay show that category by themselves
+  (and its hotkeys, with *hotkeys per category*); when it closes, the board goes back
+  to what it showed before. Pick another category by hand and it stays. All the
+  programs you've set are listed in *Settings → General*, with a switch for all of it.
+- **The search box keeps its room** on the Sounds tab in mid-size windows.
 - **Record a sound with your mic.** New **Record** button next to *Add sounds*:
   record your own voice (or, while the voice changer is on, your changed voice),
   then drag the ends to cut it, listen in your headphones, name it and *Save*. The
   quiet bits at both ends are already cut off. Up to 15 minutes; nobody hears you
   while you record.
+- **A simpler first window.** A new install starts with just Sounds, Voice and Setup.
+  The other tabs wait under **+ More tabs** beside the tabs: click one and it's added
+  and opened. *Choose tabs in Settings…* in the same menu shows them all. Your tabs
+  stay as they are if you already use Onion Board.
+- **Instant replay and the Apps tab work on Windows 10.** They needed a Windows 10
+  build normal PCs never get; any Windows 10 updated to version 2004 or newer works.
+- **Fewer update prompts.** A new version is offered once it's been out a day, so a
+  quick follow-up fix replaces it instead of asking you twice. Fixes for something
+  serious still show up straight away, and *Check now* always finds the newest.
+- **The loudest effect preset is now called *Deep fried*.** Same sound as before.
+- **Search no longer looks up likes and comments** for each YouTube result. Results
+  show their views as before, load with fewer requests, and YouTube is less likely to
+  take you for a bot.
+- **Instant replay reminds you to ask first.** Setting its key now says that in some
+  places recording a call needs everyone's OK.
 
 ## 1.9.6 — 2026-10-06
 

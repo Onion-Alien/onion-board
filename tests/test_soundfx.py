@@ -198,7 +198,7 @@ def test_fx_survive_a_config_round_trip(app_dir, sound):
 def test_duplicate_is_independent_of_the_original(app_dir, sound):
     sound.hotkey, sound.fx = "ctrl+1", {"pitch": 3}
     library.load_sound(sound)
-    copy = library.duplicate(sound, "s (ear rape)")
+    copy = library.duplicate(sound, "s (deep fried)")
     assert copy.id != sound.id and copy.file != sound.file and copy.hotkey == ""
     assert copy.fx == sound.fx and copy.fx is not sound.fx
     copy.fx["pitch"] = 0

@@ -24,6 +24,16 @@ The full list. The [README](../README.md) has the short version and how to get s
   give it a random-sound hotkey, or to *Play them all* (in order or shuffled). With
   *Use hotkeys per category* (Settings → Hotkeys) each category is its own set of
   keys: one key, a different sound per category.
+- **Switch category when a program is in front:** right-click a category →
+  *Show this when a program is in front…* lists the programs open now (with their
+  icons) and *Browse for a program…*. When one of them comes to the front, the board
+  and the overlay switch to that category (with the category beep, if beeps are on);
+  when it closes, the board goes back to the category it showed before. Alt-tabbing
+  away changes nothing; a category you pick by hand while it's in front stays. Rules
+  match the program's file name (`game.exe`), so they survive a reinstall and go
+  into backups. The tab's tooltip lists its programs; *Stop showing this for…* in the
+  same menu, or *Settings → General → Switch category by program* (every rule, a
+  *Remove* each, and *Switch by itself* to turn it all off).
 - **Remove can be undone:** *Removed “…” · Undo* stays up for 10 seconds. After that
   the sound waits in **Recently deleted** (the *Backup* menu, or the bin button that
   shows while it holds sounds) for 30 days, and *Bring back* returns it exactly as it
@@ -49,7 +59,7 @@ The full list. The [README](../README.md) has the short version and how to get s
   type exact times — keep one line out of a 4-minute video), a 7-band EQ, a boost
   up to +36 dB that clips on purpose,
   play backwards, and every voice effect (echo, reverb, distortion, radio, robot,
-  add-on effects too). One-click presets: **Ear rape**, Bass boosted,
+  add-on effects too). One-click presets: **Deep fried**, Bass boosted,
   Slowed + reverb, Nightcore, Chipmunk, Demon, Fast / Slow-mo (same pitch), Old
   radio, Reversed. *Preview* plays it to you only; **Save** changes that pad,
   **Save as new sound** keeps the original and adds the edited version as its own
@@ -103,7 +113,7 @@ The full list. The [README](../README.md) has the short version and how to get s
     plays (a friend in Discord, the game, a video; not Onion Board's own sounds)
     are kept in memory. Press it after something funny and it becomes a pad.
     Nothing is saved or sent anywhere until you press it; clear the key to switch
-    it off. Needs Windows 11 or Windows 10 build 20348+.
+    it off. Needs Windows 11, or Windows 10 version 2004 or newer.
   - Hotkeys can beep in your headphones (only you hear it), so you know they
     worked.
 - **Radio tab:** internet radio from all over the world, from the free

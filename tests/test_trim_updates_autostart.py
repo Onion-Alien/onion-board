@@ -3,6 +3,7 @@ with Windows. No network: GitHub's answers and downloads are faked. No registry:
 is faked."""
 import hashlib
 import io
+import time
 
 import numpy as np
 import pytest
@@ -98,6 +99,40 @@ def test_an_urgent_fix_shows_even_when_skipped(monkeypatch):
         "99.0.0", "https://x", urgent="fixes sounds cutting out"))
     cfg = Config(update_skip="99.0.0")
     assert updates.check(cfg).urgent == "fixes sounds cutting out"
+
+
+def _gh(tag, age_h, **extra):
+    """A GitHub release answer, `age_h` hours old."""
+    return {"tag_name": tag, "html_url": "https://github.com/x", "body": "",
+            "published_at": time.strftime("%Y-%m-%dT%H:%M:%SZ",
+                                          time.gmtime(time.time() - age_h * 3600)), **extra}
+
+
+def test_a_fresh_release_settles_a_day_before_it_is_offered(monkeypatch):
+    answers = {updates.API: _gh("v99.0.2", 3),
+               updates.RECENT: [_gh("v99.0.2", 3), _gh("v99.1.0-beta", 30, prerelease=True),
+                                _gh("v99.0.1", 30), _gh("v99.0.0", 50)]}
+    monkeypatch.setattr(updates, "_get", lambda url, *_f: answers[url])
+    rel = updates.check(Config())
+    assert rel.version == "99.0.1"                           # the newest settled one
+    assert updates.check(Config(), force=True).version == "99.0.2"   # "Check now": newest
+    answers[updates.RECENT] = [_gh("v99.0.2", 3), _gh("v1.0.0", 30)]
+    assert updates.check(Config()) is None                   # nothing settled is newer
+
+
+def test_an_urgent_fix_does_not_wait_to_settle(monkeypatch):
+    monkeypatch.setattr(updates, "_get", lambda url, *_f: _gh(
+        "v99.0.2", 1, body="Urgent: sounds cut out"))
+    assert updates.check(Config()).version == "99.0.2"
+
+
+def test_settled():
+    rel = updates.Release("1.0.0", "https://x", published=1000.0)
+    assert not updates.settled(rel, now=1000.0 + updates.SETTLE_S - 1)
+    assert updates.settled(rel, now=1000.0 + updates.SETTLE_S)
+    assert updates.settled(updates.Release("1.0.0", "https://x"))     # age unknown
+    assert updates._published({"published_at": "2026-10-06T20:39:15Z"}) == 1791319155.0
+    assert updates._published({"published_at": "soon"}) == 0.0
 
 
 @pytest.mark.parametrize("body, want", [

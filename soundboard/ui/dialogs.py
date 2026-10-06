@@ -142,7 +142,7 @@ class EffectsPanel(QWidget):
 
     def _boost_hint(self):
         db = self.boost.value()
-        self.boost_hint.setText("⚠ Very loud: this clips on purpose (ear-rape territory). "
+        self.boost_hint.setText("⚠ Very loud: this clips on purpose (deep-fried territory). "
                                 "Preview it at low volume first." if db > 6 else
                                 "Above 0 dB the sound gets louder until it clips.")
 
