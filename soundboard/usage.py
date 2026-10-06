@@ -11,11 +11,14 @@ site does, and isn't sent it to keep or look up).
 On unless switched off: the installer's "Count me in" box, or Settings > Privacy &
 security > Usage count (soundboard.net, so it also obeys Offline mode, a proxy and
 Tor). Copies from before it existed start with it off: they were installed as an app
-that sent nothing. A copy running from source never sends anything."""
+that sent nothing. A copy running from source never sends anything, and neither does
+one on a PC with ONIONBOARD_NO_STATS set (the developer's own PCs and test VMs:
+GoatCounter's "Ignore IPs" can't catch these sends, as they carry no IP)."""
 from __future__ import annotations
 
 import json
 import logging
+import os
 import re
 import sys
 import threading
@@ -45,8 +48,9 @@ TIMEOUT_S = 15
 
 
 def enabled() -> bool:
-    """Could anything be sent at all: the installed app, with a key."""
-    return bool(TOKEN) and bool(getattr(sys, "frozen", False))
+    """Could anything be sent at all: the installed app, with a key, not on a dev PC."""
+    return (bool(TOKEN) and bool(getattr(sys, "frozen", False))
+            and not os.environ.get("ONIONBOARD_NO_STATS"))
 
 
 def install_id(cfg) -> str:
