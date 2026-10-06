@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+- A damaged or tampered mic-effect file can no longer cut out all of Windows' sound:
+  *Straight into my mic* just passes your mic through until the file is right again.
+
 ## 1.9.6 — 2026-10-06
 
 - **New voice: Secret detective.** A disguised TV voice: yours plus a copy a fifth

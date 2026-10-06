@@ -79,6 +79,9 @@ They're safe to run while someone is using the PC. The mic effect's tests
 the registry; the ones that need the DLL are skipped until
 `scripts\build_directmic.py --testhost` has built it (CI doesn't build it, so run them
 locally after touching `native\directmic\` or the ring in `directmic.py`).
+`scripts\build_directmic.py --fuzz` also builds `fuzzhost.exe`, which throws hostile and
+half-written ring files at the effect (built with sanitizer traps);
+`scripts\fuzz_directmic.py [seconds] [workers]` runs it for longer than the tests do.
 
 To iterate faster, run just the file you touched, e.g.
 `.venv\Scripts\python -m pytest -q tests\test_engine.py`, and the full suite

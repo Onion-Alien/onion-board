@@ -292,7 +292,10 @@ goes online.
   admins and SYSTEM), and none to store apps. The board writes what others hear there, and the effect writes the
   clean mic back, so the board's meter and voice changer hear only you. Every app
   recording that mic runs its own copy of the effect. When the board is closed or
-  late, the effect crossfades back to the plain mic.
+  late, the effect crossfades back to the plain mic. Since others can write the file,
+  the effect trusts nothing in it: a damaged, cut-short or tampered file (even one
+  that makes reading it fault) gets the plain mic passed through, never a crash of
+  Windows' audio engine. `scripts/fuzz_directmic.py` tests this.
 - **Taking it off**: uninstalling Onion Board runs `--direct-mic remove`, which asks
   for admin only if the effect is on a mic, then does what `--direct-mic uninstall`
   (as admin) does: put every mic's values back from the notes, unregister the effect and
