@@ -37,6 +37,12 @@ NOTES = (
         ("shield", "A sturdier phone remote",
          "Onion Pocket's connection can't be flooded by another device on your Wi-Fi, "
          "and its key never goes in a web address."),
+        ("shield", "Phone remote stays off public Wi-Fi",
+         "On a network Windows calls Public (a café, a hotel), the phone remote doesn't "
+         "listen at all, and it switches itself off if the network turns Public."),
+        ("shield", "Your phone's key never crosses the Wi-Fi",
+         "With Onion Pocket 0.2.2 each tap is signed instead of carrying the key, so "
+         "nobody on your Wi-Fi can copy it or replay a tap. Older versions still work."),
     )),
     Note("1.9.3", "Your mic, start to finish", (
         ("check", "No cable box ticked for you",
