@@ -42,7 +42,7 @@ from soundboard.testcheck import analyze as analyze_output
 from soundboard.testcheck import summary_html
 from soundboard.ui.crashdialog import free_dialog
 from soundboard.ui.dialogs import EditDialog
-from soundboard.ui import a11y, appstate, busy, icons, responsive, splash
+from soundboard.ui import a11y, appstate, busy, clipeditor, icons, responsive, splash
 from soundboard.ui.speedpitch import SpeedPitchButton
 from soundboard.ui.panel import (EqPanel, Flow, VolumeControl, bar, card, hint_label,
                                  icon_label, vsep)
@@ -517,6 +517,7 @@ class MainWindow(QMainWindow):
         self.tabs.setCurrentIndex(self.cfg.tab if 0 <= self.cfg.tab < self.tabs.count() else 0)
         self.tabs.currentChanged.connect(lambda i: self.set_option("tab", i))
         self.tabs.currentChanged.connect(lambda _i: self._update_status())
+        self.tabs.currentChanged.connect(self._focus_sounds_page)
         # a badge on a tab's icon (or, by default, a wash) in the theme's live colour while
         # its feature is live — the voice changer, a radio station, a program being
         # sent, the screen watched — so it's never left on without you noticing
@@ -860,8 +861,11 @@ class MainWindow(QMainWindow):
         # ---- "3 selected · Colour · Volume… · Delete": Ctrl / Shift+click picks pads
         self.selection = PadSelection(self, scroll)
         left.addWidget(self.selection.bar)
-        # Ctrl+V with a copied picture: it goes on the selected pad (or the picked ones)
-        paste = QShortcut(QKeySequence.Paste, scroll)
+        # Ctrl+V anywhere on the page (a text box keeps its own): a copied clip from
+        # the Apps tab's editor becomes a sound; a copied picture goes on the selected
+        # pad (or the picked ones)
+        page.setFocusPolicy(Qt.ClickFocus)   # a click on the page's bare parts lands here
+        paste = QShortcut(QKeySequence.Paste, page)
         paste.setContext(Qt.WidgetWithChildrenShortcut)
         paste.activated.connect(self.paste_picture)
 
@@ -3745,9 +3749,22 @@ class MainWindow(QMainWindow):
         self._save_now()
         self.pads[sid].update()
 
+    def _focus_sounds_page(self, _i: int):
+        """Switched to Sounds with the focus left behind on another tab (a hidden clip
+        editor): the page takes it, so its Ctrl+V works straight away."""
+        page = self.sounds_page
+        fw = QApplication.focusWidget()
+        if self.tabs.currentWidget() is page and (fw is None or not page.isAncestorOf(fw)):
+            page.setFocus(Qt.OtherFocusReason)
+
     def paste_picture(self):
-        """Ctrl+V on the pads: the copied picture goes on the picked pads, or else
-        on the selected one."""
+        """Ctrl+V on the Sounds tab: a clip copied in the Apps tab's editor (or its
+        Saved clips) is added as a sound; a copied picture goes on the picked pads,
+        or else on the selected one."""
+        clip = clipeditor.pasted_clip()
+        if clip is not None:
+            self.on_clip(clip.copy(), f"Clip {time.strftime('%H.%M.%S')}")
+            return
         sids = [m.id for m in self.selection.sounds()] or (
             [self.current] if self.current in self.pads else [])
         if not sids:

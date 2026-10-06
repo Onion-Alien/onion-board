@@ -2,6 +2,18 @@
 
 ## Unreleased
 
+- **Clip editor: saved clips get a list.** Save in an app's clip editor now keeps
+  the bit in *Saved clips* at the bottom of the Apps tab: double-click plays it,
+  F2 renames it, right-click adds it to your Sounds, sends it, copies it or
+  deletes it (with Undo). They're kept between runs.
+- **Copy a bit, paste it on the Sounds tab.** Ctrl+C in the clip editor, then
+  Ctrl+V on the Sounds tab adds it as a new sound. The "Copied" message no
+  longer gets cut off.
+- **Big view for the clip editor.** The button at the right of the editor's
+  buttons gives that program the whole tab and a tall waveform. Card size goes
+  much wider too, and opening one card's editor no longer stretches the cards
+  beside it.
+
 - **The Sounds tab is lighter on a big board.** Scrolling draws only the pads that
   come into view instead of every pad on screen, and switching categories, dragging
   a pad to a new place and saving do less work, so they stay smooth with hundreds of

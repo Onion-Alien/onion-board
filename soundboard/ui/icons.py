@@ -91,6 +91,15 @@ def _stop(p, fill):
     fill(path)
 
 
+def _expand(p, fill):
+    """Four corners pointing out: make it big."""
+    for x, y, dx, dy in ((4, 4, 1, 1), (20, 4, -1, 1), (4, 20, 1, -1), (20, 20, -1, -1)):
+        path = QPainterPath(QPointF(x + 6 * dx, y))
+        path.lineTo(x, y)
+        path.lineTo(x, y + 6 * dy)
+        p.drawPath(path)
+
+
 def _record(p, fill):
     path = QPainterPath()
     path.addEllipse(QPointF(12, 12), 6, 6)
@@ -465,6 +474,7 @@ SHAPES = {
     "sliders": _sliders, "wave": _wave,
     "mic": _mic, "headphones": _headphones, "volume": _volume, "ear": _ear,
     "play": _play, "pause": _pause, "stop": _stop, "record": _record, "plus": _plus,
+    "expand": _expand,
     "settings": _gear, "history": _history, "leaf": _leaf, "live": _live,
     "back": _arrow("back"), "forward": _arrow("forward"), "reload": _reload,
     "speech": _speech, "cable": _cable, "check": _check, "warn": _warn, "folder": _folder,

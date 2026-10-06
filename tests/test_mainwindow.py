@@ -708,6 +708,23 @@ def test_ctrl_v_pastes_a_copied_picture_on_the_selected_pad(window):
     assert not library.Path(pic).exists()   # the old picture's file is gone
 
 
+def test_ctrl_v_adds_a_clip_copied_in_the_clip_editor_as_a_sound(window):
+    import numpy as np
+
+    from soundboard.ui import clipeditor
+    n = len(window.cfg.sounds)
+    clipeditor.set_clipboard(np.zeros((int(0.23 * 48000), 2), np.float32))   # even silence
+    try:
+        window.paste_picture()
+        assert len(window.cfg.sounds) == n + 1
+        assert window.cfg.sounds[-1].name.startswith("Clip ")
+        QApplication.clipboard().setText("words")      # copied something since: not again
+        window.paste_picture()
+        assert len(window.cfg.sounds) == n + 1
+    finally:
+        clipeditor.clipboard = None
+
+
 def test_new_pads_never_flash_up_as_windows_of_their_own(qapp):
     """A new pad has no parent until the grid takes it: shown before that, it popped
     up on the desktop for a moment as a little blank window (behind the splash)."""

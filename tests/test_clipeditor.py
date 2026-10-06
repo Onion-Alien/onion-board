@@ -142,10 +142,10 @@ def test_drag_selects_and_save_adds_just_that_bit(tab, qapp):
     assert t.has_selection and (t.b - t.a) / SR == pytest.approx(2.0, abs=0.15)
     assert not ed.timer.isActive()   # frozen and quiet: no redraws
     QTest.keyClick(w, Qt.Key_Return)
-    assert len(tab.clips) == 1
-    data, name = tab.clips[0]
-    assert len(data) == t.b - t.a and name.startswith("Music")
-    assert "Saved" in ed.info.text()
+    assert not tab.clips   # not straight into Sounds: into Saved clips, under the cards
+    (c,) = tab.shelf.shelf.clips
+    assert len(c.audio()) == t.b - t.a and c.name.startswith(c.src) and c.src
+    assert "Saved clips" in ed.info.text() and tab.shelf.isVisible()
 
 
 def test_saving_the_whole_take_trims_dead_air(tab, qapp):
@@ -153,7 +153,7 @@ def test_saving_the_whole_take_trims_dead_air(tab, qapp):
     row.capture.sink(np.concatenate([np.zeros((SR, 2), np.float32), tone(1.0),
                                      np.zeros((SR, 2), np.float32)]))
     row.editor.save()
-    data, _ = tab.clips[0]
+    data = tab.shelf.shelf.clips[0].audio()
     assert len(data) / SR == pytest.approx(1.1, abs=0.05)
 
 
@@ -304,3 +304,83 @@ def test_buttons_wake_up_when_the_first_sound_arrives(tab, qapp):
     row.capture.sink(tone(1.0))
     ed._tick()
     assert ed.btn_play.isEnabled() and ed.btn_save.isEnabled() and ed.btn_send.isEnabled()
+
+
+# ---------------------------------------------------------------------- saved clips
+
+def saved(tab, qapp, seconds=1.0):
+    row = opened(tab, qapp)
+    row.capture.sink(tone(seconds))
+    row.editor.freeze()
+    row.editor.select_all()
+    row.editor.save()
+    return row
+
+
+def test_saved_clips_play_rename_add_and_delete_with_undo(tab, qapp):
+    saved(tab, qapp)
+    sh = tab.shelf
+    assert sh.list.topLevelItemCount() == 1
+    it = sh.list.topLevelItem(0)
+    sh.list.setCurrentItem(it)
+    sh.list.itemDoubleClicked.emit(it, 0)            # double-click: plays in the headphones
+    assert tab.engine.played[-1][2].get("preview") and sh._playing is not None
+    sh.list.itemDoubleClicked.emit(it, 0)            # again: stops
+    assert sh._playing is None
+    it.setText(0, "airhorn bit")                     # renamed in the list
+    assert sh.shelf.clips[0].name == "airhorn bit"
+    it.setText(0, "   ")                             # nothing: back to the old name
+    assert it.text(0) == "airhorn bit" and sh.shelf.clips[0].name == "airhorn bit"
+    sh.add_picked()                                  # right-click → Add to Sounds
+    (data, name), = tab.clips
+    assert name == "airhorn bit" and len(data) == SR
+    sh.delete_picked()
+    assert not sh.shelf.clips and sh.undo_bar.isVisible()
+    sh.undo_bar.undo()
+    assert [c.name for c in sh.shelf.clips] == ["airhorn bit"]
+
+
+def test_saved_clips_are_kept_for_next_time(tab, qapp):
+    from soundboard.clipshelf import Shelf
+    ed = saved(tab, qapp).editor
+    ed.take.select(0, SR // 2)
+    ed.save()                                        # a second clip: half of it
+    gone = tab.shelf.shelf.clips[0]
+    assert gone.seconds == pytest.approx(0.5, abs=0.01)
+    tab.shelf.list.setCurrentItem(tab.shelf._item(gone.id))
+    tab.shelf.delete_picked()
+    again = Shelf()                                  # the next start
+    assert len(again.clips) == 1 and again.clips[0].id != gone.id
+    assert not gone.path.exists()                    # a deleted one's file is tidied up
+
+
+def test_copy_marks_the_clipboard_so_the_sounds_tab_can_paste_it(tab, qapp):
+    from PySide6.QtWidgets import QApplication
+    row = opened(tab, qapp)
+    row.capture.sink(tone(1.0))
+    row.editor.freeze()
+    row.editor.select_all()
+    row.editor.copy()
+    got = clipeditor.pasted_clip()
+    assert got is not None and len(got) == SR
+    assert "Sounds tab" in row.editor.info.text() and row.editor.info.wordWrap()
+    QApplication.clipboard().setText("something else copied since")
+    assert clipeditor.pasted_clip() is None          # the newer copy wins
+
+
+def test_big_view_gives_one_card_the_tab(tab, qapp):
+    other = App(200, "other.exe", r"C:\Programs\other.exe", "Other", True, 0.3, ["Speakers"])
+    run(tab, music(), other)
+    row, rest = tab.rows["music.exe"], tab.rows["other.exe"]
+    row.btn_clip.click()
+    qapp.processEvents()
+    h_rest = rest.height()
+    assert h_rest < row.height()      # an open editor doesn't stretch the card next to it
+    row.editor.btn_big.click()
+    qapp.processEvents()
+    assert tab.big is row and not rest.isVisible() and row.width() > tab.width() * 0.8
+    assert row.editor.wave.minimumHeight() > clipeditor.WAVE_H
+    row.btn_clip.click()              # closing the editor leaves the big view
+    qapp.processEvents()
+    assert tab.big is None and rest.isVisible() and not row.editor.btn_big.isChecked()
+    assert row.editor.wave.minimumHeight() == clipeditor.WAVE_H
