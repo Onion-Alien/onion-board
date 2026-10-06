@@ -943,9 +943,9 @@ class SettingsDialog(QDialog):
             "Streaming? Send what others hear, clean (no voice chat shaping), to a device "
             "of its own, and add it to OBS as its own audio track: your sounds, screen "
             "triggers, live radio and programs, and your voice if you like. In OBS: "
-            "Sources → + → Audio Output Capture → pick the same device. A second virtual "
-            "cable (free: VB-Cable A+B from vb-audio.com) is ideal; then use Audio Input "
-            "Capture → its Output end. Any output you don't listen on works too.")
+            "Sources → + → Audio Output Capture → pick the same device. Any output you don't "
+            "listen on works (with a spare virtual cable, use Audio Input Capture → its "
+            "Output end).")
         cb = QComboBox()
         no_wheel(cb)
         cb.addItem("Off", None)
