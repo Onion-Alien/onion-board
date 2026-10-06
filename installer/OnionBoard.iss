@@ -148,7 +148,8 @@ Filename: "{app}\{#AppExeName}.exe"; Parameters: "--keep-netlog"; \
 Filename: "{app}\{#AppExeName}.exe"; Parameters: "--usage-count off"; \
   StatusMsg: "Switching off the usage count..."; \
   Tasks: not countme; Flags: runhidden waituntilterminated
-Filename: "{app}\{#AppExeName}.exe"; Parameters: "--usage-count on"; \
+; It also passes on the last page's "Where did you hear about Onion Board?".
+Filename: "{app}\{#AppExeName}.exe"; Parameters: "--usage-count on{code:HeardArg}"; \
   StatusMsg: "Switching on the usage count..."; \
   Tasks: countme; Check: not WizardSilent; Flags: runhidden waituntilterminated
 ; The virtual cable is installed from CurStepChanged in [Code], so its exit code can
@@ -207,6 +208,10 @@ var
   ImportBoxes: array of TNewCheckBox;
   ImportKeys: array of String; // soundboard/otherboards.py's key for each box
   ImportTop: Integer;          // where the next box goes
+  HeardPage: TWizardPage;      // "Where did you hear about Onion Board?": new installs
+  HeardRadios: array of TNewRadioButton;
+  HeardKeys: array of String;  // what each one sends (soundboard/usage.py's HEARD)
+  HeardOther: TNewEdit;        // Other's own answer
 
 // "net_offline": true in %APPDATA%\OnionBoard\config.json: the app is in Offline mode
 // already (a reinstall). A plain text search: json.dumps writes it on one line.
@@ -387,21 +392,158 @@ begin
   Later.AdjustHeight;
 end;
 
+procedure HeardOtherTyped(Sender: TObject);
+begin
+  if HeardOther.Text <> '' then
+    HeardRadios[GetArrayLength(HeardRadios) - 2].Checked := True;   // Other
+end;
+
+procedure AddHeardRadio(Key, Caption: String; var Top: Integer);
+var
+  I: Integer;
+  R: TNewRadioButton;
+begin
+  I := GetArrayLength(HeardRadios);
+  SetArrayLength(HeardRadios, I + 1);
+  SetArrayLength(HeardKeys, I + 1);
+  R := TNewRadioButton.Create(HeardPage);
+  R.Parent := HeardPage.Surface;
+  R.Top := Top;
+  R.Width := HeardPage.SurfaceWidth;
+  R.Height := ScaleY(17);
+  R.Caption := Caption;
+  HeardRadios[I] := R;
+  HeardKeys[I] := Key;
+  Top := Top + ScaleY(23);
+end;
+
+// The last page of a new install with Count me in ticked: where they heard about the
+// app, sent once with the first-start count (soundboard/usage.py heard_tag, which
+// drops a typed answer that doesn't look like a name). "Rather not say" is picked.
+procedure CreateHeardPage;
+var
+  Body, Note: TNewStaticText;
+  Top: Integer;
+begin
+  HeardPage := CreateCustomPage(ImportPage.ID, 'One last thing',
+    'Where did you hear about Onion Board?');
+  Body := TNewStaticText.Create(HeardPage);
+  Body.Parent := HeardPage.Surface;
+  Body.AutoSize := False;
+  Body.WordWrap := True;
+  Body.Width := HeardPage.SurfaceWidth;
+  Body.ShowAccelChar := False;
+  Body.Caption := 'It helps us know where people find it. Your pick goes once with the ' +
+    'anonymous Count me in, and nothing else is sent.';
+  Body.AdjustHeight;
+  Top := Body.Top + Body.Height + ScaleY(12);
+  AddHeardRadio('youtube', 'YouTube', Top);
+  AddHeardRadio('reddit', 'Reddit', Top);
+  AddHeardRadio('github', 'GitHub', Top);
+  AddHeardRadio('google', 'Google', Top);
+  AddHeardRadio('friend', 'A friend', Top);
+  AddHeardRadio('other', 'Other:', Top);
+  HeardOther := TNewEdit.Create(HeardPage);
+  HeardOther.Parent := HeardPage.Surface;
+  HeardOther.Left := ScaleX(70);
+  HeardOther.Top := HeardRadios[5].Top - ScaleY(3);
+  HeardOther.Width := ScaleX(200);
+  HeardOther.MaxLength := 40;
+  HeardOther.OnChange := @HeardOtherTyped;
+  HeardRadios[5].Width := HeardOther.Left - ScaleX(4);
+  AddHeardRadio('', 'Rather not say', Top);
+  HeardRadios[6].Checked := True;
+  Note := TNewStaticText.Create(HeardPage);
+  Note.Parent := HeardPage.Surface;
+  Note.AutoSize := False;
+  Note.WordWrap := True;
+  Note.Width := HeardPage.SurfaceWidth;
+  Note.Top := Top + ScaleY(6);
+  Note.ShowAccelChar := False;
+  Note.Caption := 'For Other, just a name like Discord or TikTok. Anything else ' +
+    '(an email address, a link, a number) is left out.';
+  Note.AdjustHeight;
+end;
+
+// A first install: no settings from an earlier one. An update already sent its
+// first-start, so it isn't asked.
+function IsNewInstall: Boolean;
+begin
+  Result := not FileExists(ExpandConstant('{userappdata}\OnionBoard\config.json'));
+end;
+
+function HeardShown: Boolean;
+begin
+#ifdef PREVIEW
+  Result := True;
+#else
+  Result := IsNewInstall and WizardIsTaskSelected('countme') and not WizardSilent;
+#endif
+end;
+
+// " --heard-from <answer>" for the "--usage-count on" entry, or nothing
+function HeardArg(Param: String): String;
+var
+  I: Integer;
+  V: String;
+begin
+  Result := '';
+  if not HeardShown then
+    exit;
+  V := '';
+  for I := 0 to GetArrayLength(HeardRadios) - 1 do
+    if HeardRadios[I].Checked then
+      V := HeardKeys[I];
+  if V = 'other' then
+  begin
+    V := Trim(HeardOther.Text);
+    StringChangeEx(V, '"', '', True);
+  end;
+  if V <> '' then
+    Result := ' --heard-from "' + V + '"';
+end;
+
 function ShouldSkipPage(PageID: Integer): Boolean;
 begin
 #ifdef PREVIEW
-  Result := PageID <> ImportPage.ID;
+  Result := (PageID <> ImportPage.ID) and (PageID <> HeardPage.ID);
 #else
-  Result := (PageID = ImportPage.ID) and (GetArrayLength(ImportBoxes) = 0);
+  Result := ((PageID = ImportPage.ID) and (GetArrayLength(ImportBoxes) = 0)) or
+    ((PageID = HeardPage.ID) and not HeardShown);
 #endif
 end;
 
 #ifdef PREVIEW
 function NextButtonClick(CurPageID: Integer): Boolean;
 begin
-  Result := CurPageID <> ImportPage.ID;   // a look at the page, never an install
+  Result := CurPageID <> HeardPage.ID;   // a look at the pages, never an install
 end;
 #endif
+
+// Next or Install on the pages before installing (there's no Ready page): Install on
+// whichever is last, which can change as Count me in is ticked.
+procedure UpdateInstallCaption;
+var
+  Last: Boolean;
+begin
+  if WizardForm.CurPageID = HeardPage.ID then
+    Last := True
+  else if WizardForm.CurPageID = ImportPage.ID then
+    Last := not HeardShown
+  else if WizardForm.CurPageID = wpSelectTasks then
+    Last := (GetArrayLength(ImportBoxes) = 0) and not HeardShown
+  else
+    exit;
+  if Last then
+    WizardForm.NextButton.Caption := SetupMessage(msgButtonInstall)
+  else
+    WizardForm.NextButton.Caption := SetupMessage(msgButtonNext);
+end;
+
+procedure TasksClicked(Sender: TObject);
+begin
+  UpdateInstallCaption;
+end;
 
 procedure InitializeWizard;
 var
@@ -462,6 +604,8 @@ begin
   BunnyRight := Bunny.Left + Bunny.Width;
   WizardForm.TasksList.ShowHint := True;
   CreateImportPage;
+  CreateHeardPage;
+  WizardForm.TasksList.OnClickCheck := @TasksClicked;
 end;
 
 // Offline mode ticked: untick the boxes that download (once, so ticking one again
@@ -500,9 +644,7 @@ var
 begin
   if (CurPageID <> wpWelcome) and (CurPageID <> wpFinished) then
     LayoutHeader;
-  // the import page is the last before installing (there's no Ready page)
-  if CurPageID = ImportPage.ID then
-    WizardForm.NextButton.Caption := SetupMessage(msgButtonInstall);
+  UpdateInstallCaption;
   if (CurPageID <> wpSelectTasks) or WizardSilent then
     exit;
   // The cable isn't needed (sounds go straight into the mic), so its box is unticked

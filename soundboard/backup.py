@@ -70,7 +70,7 @@ LOCAL_SETTINGS = {"version", "sounds", "categories", "category", "main_device", 
                   "update_pending", "category_hotkeys", "api_enabled", "api_port",
                   "api_token", "remote_addons", "net_mode", "net_proxy",
                   "net_off", "net_offline", "tor_bridges", "data", "stats_id",
-                  "stats_sent"}
+                  "stats_sent", "stats_heard"}
 # per-sound fields that are written to sound.json (the paths are replaced by names)
 SOUND_FIELDS = ("name", "volume", "hotkey", "mode", "loop", "color", "level_gain",
                 "duration", "fingerprint", "fx", "tags", "fade_in", "fade_out", "hold",

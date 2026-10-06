@@ -71,6 +71,31 @@ def test_a_new_install_counts_once_a_day(sent):
     assert [h["path"] for h in _hits(sent[1][0])] == [f"/app/{__version__}"]
 
 
+@pytest.mark.parametrize("answer, path", [
+    ("youtube", "first-start/heard-youtube"),
+    ("  You Tube ", "first-start/heard-youtube"),
+    ("my friends", "first-start/heard-friend"),
+    ("Discord server", "first-start/heard-other-discord-server"),
+    ("twitch.tv", "first-start/heard-other-twitch-tv"),
+    ("", "first-start"),
+    # typed answers that don't read like a name are dropped, not sent
+    ("me@example.com", "first-start"),
+    ("021 555 1234", "first-start"),
+    ("https://example.com/x", "first-start"),
+    ("asdfghjkl", "first-start"),
+    ("<script>", "first-start"),
+    ("one two three four", "first-start"),
+    ("a" * 40, "first-start"),
+])
+def test_first_start_says_where_they_heard(sent, answer, path):
+    cfg = Config(stats_heard=answer)
+    usage.maybe_send(cfg)
+    assert [h["path"] for h in _hits(sent[0][0])] == [f"/app/{__version__}", path]
+    cfg.stats_sent -= usage.EVERY_S   # only ever once
+    usage.maybe_send(cfg)
+    assert [h["path"] for h in _hits(sent[1][0])] == [f"/app/{__version__}"]
+
+
 def test_update_now_is_one_event(sent):
     cfg = Config(stats_sent=1.0)
     usage.maybe_send(cfg, event=usage.update_event("9.9.9"))
@@ -154,6 +179,11 @@ def test_the_installer_box(cli):
     assert app.set_usage_count(False) == 0
     cfg = Config.load()
     assert cfg.net_off == ["radio", "usage_stats"] and cfg.sound_vol == 0.42
+    assert app.set_usage_count(True, "Reddit") == 0   # the "where did you hear" page
+    cfg = Config.load()
+    assert cfg.stats_heard == "Reddit" and cfg.net_off == ["radio"]
+    assert app.set_usage_count(True) == 0   # no answer keeps the last one
+    assert Config.load().stats_heard == "Reddit"
 
 
 def test_update_now_fetches_its_own_copy_of_the_installer():

@@ -401,6 +401,9 @@ class Config:
     # one went. A config without stats_id is from before the count existed.
     stats_id: str = ""
     stats_sent: float = 0.0
+    # the installer's "Where did you hear about Onion Board?", sent once with the
+    # first-start event (usage.heard_tag tidies it, or drops it)
+    stats_heard: str = ""
     sounds: list[SoundMeta] = field(default_factory=list)
 
     # set by load() when the settings weren't read cleanly, for the window to tell the

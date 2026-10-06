@@ -262,12 +262,14 @@ def keep_netlog() -> int:
     return 0
 
 
-def set_usage_count(on: bool) -> int:
-    """`OnionBoard.exe --usage-count on|off`: the installer's "Count me in" box. Off
-    adds the usage count to the switched-off features in config.json before the
-    app's first start, so it never sends one; on takes it out (only a box the user
-    saw: a silent update never passes on). Other settings are kept; nothing
-    connects. No window. Returns 0 once it's saved, 1 if it couldn't be."""
+def set_usage_count(on: bool, heard: str = "") -> int:
+    """`OnionBoard.exe --usage-count on|off [--heard-from <answer>]`: the installer's
+    "Count me in" box. Off adds the usage count to the switched-off features in
+    config.json before the app's first start, so it never sends one; on takes it out
+    (only a box the user saw: a silent update never passes on). `heard` is the
+    installer's "Where did you hear about Onion Board?", kept for the first-start
+    event. Other settings are kept; nothing connects. No window. Returns 0 once it's
+    saved, 1 if it couldn't be."""
     migrate_from_soundboard()
     applog.setup(APP_DIR)
     from soundboard import library
@@ -276,6 +278,8 @@ def set_usage_count(on: bool) -> int:
         print("FAIL: config.json is locked by another program", file=sys.stderr)
         return 1
     cfg.net_off = [k for k in cfg.net_off if k != "usage_stats"] + ([] if on else ["usage_stats"])
+    if heard:
+        cfg.stats_heard = heard[:200]
     if not cfg.save():
         print(f"FAIL: couldn't save {library.CONFIG_PATH}", file=sys.stderr)
         return 1
@@ -359,7 +363,9 @@ def main():
         sys.exit(keep_netlog())
     if "--usage-count" in sys.argv:
         i = sys.argv.index("--usage-count")
-        sys.exit(set_usage_count(sys.argv[i + 1:i + 2] == ["on"]))
+        j = sys.argv.index("--heard-from") if "--heard-from" in sys.argv else -1
+        heard = sys.argv[j + 1] if 0 <= j < len(sys.argv) - 1 else ""
+        sys.exit(set_usage_count(sys.argv[i + 1:i + 2] == ["on"], heard))
     if "--selftest-addon" in sys.argv:
         try:
             sys.exit(selftest_addon(sys.argv[sys.argv.index("--selftest-addon") + 1]))

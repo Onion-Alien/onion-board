@@ -47,7 +47,7 @@ PROGRAM_FIELDS = ("apps", "apps_paths", "apps_hidden")
 # categories, triggers, radio favourites) and the app's own bookkeeping
 KEEP = {"version", "sounds", "categories", "category", "category_hotkeys", "screen",
         "setup_done", "ptt_key", "update_checked", "update_pending", "update_skip",
-        "stats_id", "stats_sent", "mic_first",
+        "stats_id", "stats_sent", "stats_heard", "mic_first",
         *DEVICE_FIELDS, *PROGRAM_FIELDS}
 RADIO_KEEP = ("favorites", "recent")
 
