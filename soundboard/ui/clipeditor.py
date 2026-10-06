@@ -28,6 +28,7 @@ from soundboard.ui import appstate, icons
 
 PAD = 4                 # the waveform's inner margin, px
 EDGE_PX = 6             # how close to a selection edge a press grabs it
+DRAG_PX = 4             # a press that moves less than this is a click: it places the cursor
 TICK_MS = 50            # redraw pace while live or playing (20 a second)
 MIN_VIEW = 256          # frames: the furthest it zooms in
 STEP_DB = 3.0           # Louder / Quieter
@@ -96,11 +97,16 @@ class ClipWave(QWidget):
         self.setFocusPolicy(Qt.StrongFocus)
         self.setCursor(Qt.IBeamCursor)
         self.setAccessibleName("Clip waveform")
-        self.setToolTip("Drag to select. Space plays it, Enter saves it, Ctrl+X / C / V "
-                        "cut, copy and paste, Delete removes it, Ctrl+Z undoes. "
-                        "Ctrl+scroll zooms, Shift+scroll moves.")
+        # no tooltip: it covered the waveform being dragged on (the keys are in the
+        # Edit menu and the line under it)
+        self.setAccessibleDescription("Drag to select. Space plays it, Enter saves it, "
+                                      "Ctrl+X / C / V cut, copy and paste, Delete removes "
+                                      "it, Ctrl+Z undoes. Ctrl+scroll zooms, Shift+scroll "
+                                      "moves.")
         self._anchor: int | None = None
         self._moved = False
+        self._press_x = 0.0
+        self._edge = False   # the press grabbed a selection's edge: it moves at once
 
     # ---------------------------------------------------------- mapping
     def _span(self) -> float:
@@ -126,10 +132,14 @@ class ClipWave(QWidget):
         x = e.position().x()
         f = self.frame_at(x)
         self._moved = False
+        self._press_x = x
+        self._edge = False
         if take.has_selection and abs(x - self.x_of(take.a)) <= EDGE_PX:
             self._anchor = take.b       # drag the start edge
+            self._edge = True
         elif take.has_selection and abs(x - self.x_of(take.b)) <= EDGE_PX:
             self._anchor = take.a       # drag the end edge
+            self._edge = True
         elif e.modifiers() & Qt.ShiftModifier:
             self._anchor = take.a if abs(f - take.a) > abs(f - take.b) else take.b
             take.select(self._anchor, f)
@@ -146,8 +156,11 @@ class ClipWave(QWidget):
                     and min(abs(x - self.x_of(take.a)), abs(x - self.x_of(take.b))) <= EDGE_PX)
             self.setCursor(Qt.SizeHorCursor if near else Qt.IBeamCursor)
             return
+        x = e.position().x()
+        if not self._edge and not self._moved and abs(x - self._press_x) < DRAG_PX:
+            return   # a hand's wobble on a click: still just a cursor
         self._moved = True
-        take.select(self._anchor, self.frame_at(e.position().x()))
+        take.select(self._anchor, self.frame_at(x))
         self.ed.changed_selection()
 
     def mouseReleaseEvent(self, e):
@@ -307,6 +320,7 @@ class ClipEditor(QWidget):
         v = QVBoxLayout(self)
         v.setContentsMargins(0, 0, 0, 0)
         v.setSpacing(6)
+        self._copied_from: tuple[int, int, int] | None = None   # (take data id, a, b)
         self.wave = ClipWave(self)
         v.addWidget(self.wave)
         bar = QHBoxLayout()
@@ -543,8 +557,10 @@ class ClipEditor(QWidget):
         if take is None or not len(take):
             return False
         set_clipboard(take.selected())
-        self.flash(f"Copied {fmt(len(clipboard))}. Ctrl+V pastes it here, in another "
-                   "program's editor, or on the Sounds tab as a new sound.")
+        self._copied_from = (id(take.data), take.a, take.b) if take.has_selection else None
+        what = fmt(len(clipboard)) if take.has_selection else f"all of it ({fmt(len(clipboard))})"
+        self.flash(f"Copied {what}. Ctrl+V pastes it at the cursor, in another program's "
+                   "editor, or on the Sounds tab as a new sound.")
         return True
 
     def cut(self) -> bool:
@@ -559,7 +575,20 @@ class ClipEditor(QWidget):
             self.flash("Nothing copied yet: select a bit and press Ctrl+C.")
             return False
         piece = clipboard
-        return self._edit(lambda t: t.paste(piece))
+        take = self.freeze()
+        if take is None:
+            return False
+        if take.has_selection and self._copied_from == (id(take.data), take.a, take.b):
+            take.select(take.b, take.b)   # pasted over what was just copied: it'd change
+            #                               nothing, so it goes in after it (a copy of it)
+        at = take.a
+        if not self._edit(lambda t: t.paste(piece)):
+            self.flash("Couldn't paste: the clip can't get any longer.", error=True)
+            return False
+        self._copied_from = None
+        self.flash(f"Pasted {fmt(len(piece))} at {fmt(at)}: it's {fmt(len(self.take))} long "
+                   "now. Ctrl+Z undoes it.")
+        return True
 
     def undo(self):
         if self.take is None and self._stash is not None:

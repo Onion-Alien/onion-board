@@ -721,6 +721,17 @@ def test_ctrl_v_adds_a_clip_copied_in_the_clip_editor_as_a_sound(window):
         QApplication.clipboard().setText("words")      # copied something since: not again
         window.paste_picture()
         assert len(window.cfg.sounds) == n + 1
+        # the real key, after switching to the Sounds tab from another one
+        from PySide6.QtTest import QTest
+        clipeditor.set_clipboard(np.zeros((4800, 2), np.float32))
+        window.show()
+        window.activateWindow()
+        window.tabs.setCurrentWidget(window.apps)
+        window.tabs.setCurrentWidget(window.sounds_page)
+        QApplication.processEvents()
+        QTest.keyClick(QApplication.focusWidget() or window.sounds_page, Qt.Key_V,
+                       Qt.ControlModifier)
+        assert len(window.cfg.sounds) == n + 2
     finally:
         clipeditor.clipboard = None
 

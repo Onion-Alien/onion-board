@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.9.4 — 2026-10-06
+
+- **Clip editor copy and paste do what you'd expect.** A click places the cursor
+  (a slight wobble of the mouse no longer picks a sliver), Ctrl+V always says
+  what it pasted and where, and pasting right after copying puts a second copy
+  in after it instead of silently swapping it for itself.
+- **No more minutes of silence in the clip editor.** Left open while nothing
+  plays, it keeps only what the program actually played: silence before it
+  isn't kept, and long gaps close up to half a second.
+
 ## 1.9.3 — 2026-10-06
 
 - **Your mic, start to finish.** The installer no longer ticks the virtual cable,
