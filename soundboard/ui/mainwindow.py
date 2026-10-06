@@ -983,11 +983,17 @@ class MainWindow(QMainWindow):
 
     def _update_chips(self, playing):
         """The row above the pads: what's playing (when it's more than the player shows)
-        and the queue, each with its own ✕."""
+        and the queue, each with its own ✕. A web search / link's Play once counts
+        too: it isn't a pad, but it plays over them and needs its own ■. So does one
+        lone sound the player isn't showing (another pad was picked while it played):
+        its chip is the only way back to it."""
         ids = tuple(s for s in self.pads if s in playing)
+        if LINK_ID in playing:
+            ids += (LINK_ID,)
         queue = tuple(self._queue)
-        if (ids, queue) != self._chip_ids:
-            self._chip_ids = (ids, queue)
+        lone = len(ids) == 1 and self.current not in (None, ids[0])
+        if (ids, queue, lone) != self._chip_ids:
+            self._chip_ids = (ids, queue, lone)
             while self._chips_hl.count():
                 w = self._chips_hl.takeAt(0).widget()
                 if w:
@@ -1007,7 +1013,7 @@ class MainWindow(QMainWindow):
                     more = QLabel(f"+{len(queue) - QUEUE_CHIPS} more")
                     more.setObjectName("muted")
                     self._chips_hl.addWidget(more)
-            if len(ids) >= 2:
+            if len(ids) >= 2 or lone:
                 lbl = QLabel("Now playing")
                 lbl.setObjectName("muted")
                 self._chips_hl.addWidget(lbl)
@@ -1028,7 +1034,7 @@ class MainWindow(QMainWindow):
                     stop.setToolTip("Stop this sound")
                     icons.set_icon(stop, "stop", "danger_text", size=12)
                     stop.setFixedSize(24, 24)
-                    stop.clicked.connect(lambda _=False, s=sid: self.engine.stop(s))
+                    stop.clicked.connect(lambda _=False, s=sid: self._stop_sound(s))
                     ch.addWidget(name)
                     ch.addWidget(stop)
                     self._chips_hl.addWidget(chip)
@@ -1037,7 +1043,7 @@ class MainWindow(QMainWindow):
             # its width); a row that shrank and grew back with every overlapping
             # sound resized and repainted the whole board under it
             self.playing_row.setMinimumHeight(CHIPS_ROW_H)
-            self.playing_row.setVisible(len(ids) >= 2 or bool(queue))
+            self.playing_row.setVisible(len(ids) >= 2 or bool(queue) or lone)
         for sid, chip in self._chips.items():
             sel = "true" if sid == self.current else "false"
             if chip.property("sel") != sel:
@@ -3057,8 +3063,20 @@ class MainWindow(QMainWindow):
 
     def stop_current(self):
         if self.current:
-            self.engine.stop(self.current)
+            self._stop_sound(self.current)
         self.start_frac = 0.0
+
+    def _stop_sound(self, sid: str):
+        """Stop one sound. If it was the player's and others still play, the player
+        moves to the newest of them, so its ⏸ / ■ reach them (stopping the shown pad
+        used to leave a web search's sound playing with no way back to it)."""
+        self.engine.stop(sid)
+        if sid != self.current:
+            return
+        others = [s for s in self.engine.playing()
+                  if s != sid and (s in self._meta or s == LINK_ID)]
+        if others:
+            self.select(others[-1])
 
     def _seek_preview(self, v):
         if self._seeking:
@@ -3787,7 +3805,7 @@ class MainWindow(QMainWindow):
         elif act == a_export:
             self.export_sounds([m], m.name)
         elif act == a_stop:
-            self.engine.stop(sid)
+            self._stop_sound(sid)
         elif act == a_next:
             self.queue_sound(sid)
         elif act == a_edit:

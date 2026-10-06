@@ -134,6 +134,30 @@ def test_overlapping_sounds_each_get_a_stop_chip(window, monkeypatch):
     assert stopped == ["s0"]
 
 
+def test_a_web_search_sound_gets_a_chip_and_the_player_follows_it(window, monkeypatch):
+    """Play a pad, then a web search result (Play once) over it, then stop the pad:
+    the search's sound was in no chip and the player stayed on the stopped pad, so
+    only Stop all could reach it."""
+    import numpy as np
+    from soundboard.ui.linkbar import PLAY_ID
+    live = {"s0": (0.2, False)}
+    monkeypatch.setattr(window.engine, "playing", lambda: dict(live))
+    monkeypatch.setattr(window.engine, "stop", lambda sid: live.pop(sid, None))
+    window.on_link_played("Search hit", np.zeros(4800, np.int16), 1.0)
+    live[PLAY_ID] = (0.1, False)
+    assert window.current == PLAY_ID
+    window._update_chips(live)
+    assert not window.playing_row.isHidden() and set(window._chips) == {"s0", PLAY_ID}
+    window.select("s0")       # back on the board: pick the pad, stop it
+    window.stop_current()
+    assert window.current == PLAY_ID   # the player moved to what's still playing
+    window._update_chips(live)
+    assert window.playing_row.isHidden()   # one sound, and the player shows it
+    window.select("s1")       # another pad picked while it plays: its chip stays
+    window._update_chips(live)
+    assert not window.playing_row.isHidden() and set(window._chips) == {PLAY_ID}
+
+
 def test_mic_check_button_keeps_its_label(window):
     window.btn_check.setChecked(True)
     window.btn_check.setChecked(False)

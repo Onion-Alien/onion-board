@@ -2,6 +2,11 @@
 
 ## 1.9.4 — 2026-10-06
 
+- **A sound from web search can't get lost any more.** Played a pad, then a search
+  result over it, then stopped the pad? The search's sound kept playing with no way
+  to reach it but Stop all. Now it gets its own chip in the *Now playing* row (with
+  its own stop button), and stopping the sound in the player moves the player to
+  whatever is still playing.
 - **Phone remote (Onion Pocket) is harder to knock over.** A device on the same
   Wi-Fi can no longer stall the app by opening thousands of connections: the
   remote servers keep at most 32 connections open (8 per device) and close the
