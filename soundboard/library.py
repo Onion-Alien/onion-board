@@ -20,6 +20,7 @@ import threading
 import time
 import uuid
 from dataclasses import asdict, dataclass, field
+from functools import lru_cache
 from pathlib import Path
 from typing import ClassVar
 
@@ -104,6 +105,17 @@ def _typed(raw: dict, defaults, what: str) -> dict:
             continue
         out[k] = float(v) if isinstance(want, float) else v
     return out
+
+
+@lru_cache(maxsize=4096)
+def _stored_path(path: str, folder: Path, absolute: bool) -> str:
+    """`path` as config.json keeps it: just the name when it's a file in `folder` (only
+    an absolute path, with `absolute`). Remembered: every save (each drag of a pad, each
+    volume change) asked pathlib this for every sound, ~3 ms of it with 200 sounds."""
+    p = Path(path)
+    if (p.is_absolute() or not absolute) and p.parent == folder:
+        return p.name
+    return path
 
 
 # A newer version's settings, kept so this one's save writes them back (an older
@@ -644,12 +656,12 @@ class Config:
         d["version"] = CONFIG_VERSION
         for s, m in zip(d["sounds"], self.sounds):
             _with_raw(s, m)
-        for s in d["sounds"]:   # files inside the library are stored by name only, so the
-            p = Path(s["file"])  # whole %APPDATA%\OnionBoard folder can move or be restored
-            if p.is_absolute() and p.parent == SOUNDS_DIR:
-                s["file"] = p.name
-            if s["image"] and Path(s["image"]).parent == THUMBS_DIR:
-                s["image"] = Path(s["image"]).name
+        # files inside the library are stored by name only, so the whole
+        # %APPDATA%\OnionBoard folder can move or be restored
+        for s in d["sounds"]:
+            s["file"] = _stored_path(s["file"], SOUNDS_DIR, True)
+            if s["image"]:
+                s["image"] = _stored_path(s["image"], THUMBS_DIR, False)
         return d
 
     def save(self) -> bool:

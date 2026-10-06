@@ -3086,7 +3086,7 @@ class MainWindow(QMainWindow):
             p.state = "ready" if m.id in self.audio else p.state
             p.selected = m.id == self.current
             ordered.append(p)
-        self.grid.set_pads(ordered)
+        self.grid.set_pads(ordered, layout=False)   # laid out once, by the filter next
         self.apply_filter(self.search.text())
         self._update_status()
 

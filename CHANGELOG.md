@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- **The Sounds tab is lighter on a big board.** Scrolling draws only the pads that
+  come into view instead of every pad on screen, and switching categories, dragging
+  a pad to a new place and saving do less work, so they stay smooth with hundreds of
+  sounds.
+
 ## 1.9.2 — 2026-10-05
 
 - **Straight into my mic is steadier.** If Onion Board crashes or freezes, your

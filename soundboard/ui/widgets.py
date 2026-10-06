@@ -878,6 +878,7 @@ class PadGrid(QWidget):
         self.grid.setContentsMargins(4, 4, 4, 4)
         self.grid.setAlignment(Qt.AlignTop | Qt.AlignLeft)
         self.setAcceptDrops(True)
+        self.setAttribute(Qt.WA_OpaquePaintEvent)   # see event()
         # no sounds yet: Bun waits (sadly) above the how-to, and cheers up when
         # files are dragged over
         self.empty = QWidget()
@@ -900,6 +901,7 @@ class PadGrid(QWidget):
         self._cols = 0
         self._shape = None       # (columns, pad width) last laid out
         self._placed = None      # (columns, the pads shown) in the grid now
+        self._slots: dict[Pad, tuple[int, int]] = {}   # the pads in the grid: row, column
 
     def minimumSizeHint(self):
         # never wider than the scroll area around it: the pads fit themselves to its
@@ -910,10 +912,15 @@ class PadGrid(QWidget):
     def sizeHint(self):
         return QSize(0, super().sizeHint().height())
 
-    def set_pads(self, pads):
+    def set_pads(self, pads, layout: bool = True):
+        """The pads, in order. `layout`: lay them out now (False: the caller filters
+        them next, and that lays them out)."""
+        keep = set(pads)   # (one gone from the list is taken out of the grid by _place)
+        self._slots = {p: at for p, at in self._slots.items() if p in keep}
         self.pads = pads
         self._shape = self._placed = None
-        self.relayout(force=True)
+        if layout:
+            self.relayout(force=True)
 
     def set_pad_width(self, w: int):
         self.pad_w = w
@@ -979,10 +986,16 @@ class PadGrid(QWidget):
         if shown and placed == self._placed:
             return   # the same pads in the same columns: only their size changed
         self._placed = placed if shown else None
-        while self.grid.count():
-            it = self.grid.takeAt(0)
-            if it.widget() and it.widget() is not self.empty:
-                it.widget().setParent(self)
+        want = {p: (i // cols, i % cols) for i, p in enumerate(shown)}
+        # only the pads that move are taken out and put back, and only the ones whose
+        # filter changed are shown or hidden: a category click redid all of them, even
+        # the hundreds out of sight
+        slots, grid = self._slots, self.grid
+        for i in reversed(range(grid.count())):   # from the end: each take is cheap
+            it = grid.itemAt(i).widget()
+            if it not in want or slots.get(it) != want[it]:   # (Bun's never wanted)
+                grid.takeAt(i)
+                slots.pop(it, None)
         if not shown:
             # every pad filtered out showed nothing at all: Bun says why instead
             for p in self.pads:
@@ -990,23 +1003,41 @@ class PadGrid(QWidget):
             self.empty_text.setText(self.NO_MATCH if self.pads else self.HOW_TO)
             # across the whole width, however wide that is now (a fixed width here kept
             # the grid as wide as the window once was: a shrunk window showed nothing)
-            self.grid.setAlignment(Qt.AlignTop)
-            self.grid.addWidget(self.empty, 0, 0)
+            grid.setAlignment(Qt.AlignTop)
+            grid.addWidget(self.empty, 0, 0)
             self.empty.show()
             return
-        self.grid.setAlignment(Qt.AlignTop | Qt.AlignLeft)
+        grid.setAlignment(Qt.AlignTop | Qt.AlignLeft)
         self.empty.hide()
         self.empty_text.setText(self.HOW_TO)
-        i = 0
+        for p, at in want.items():
+            if p not in slots:
+                # into the grid first: a new pad has no parent yet, and showing it then
+                # flashed it up on the desktop as a little window of its own
+                grid.addWidget(p, *at)
+                slots[p] = at
         for p in self.pads:
-            if p.property("filtered"):
+            if p in want:
+                if p.isHidden():
+                    p.show()
+            elif not p.isHidden():
                 p.hide()
-                continue
-            # into the grid first: a new pad has no parent yet, and showing it then
-            # flashed it up on the desktop as a little window of its own
-            self.grid.addWidget(p, i // cols, i % cols)
-            p.show()
-            i += 1
+
+    def event(self, e):
+        done = super().event(e)
+        if e.type() in (QEvent.Polish, QEvent.StyleChange, QEvent.ParentChange):
+            # opaque: it paints the page colour behind itself (paintEvent), so a scroll
+            # copies what's on screen and only the strip that came into view is drawn.
+            # See-through, every pad in view was painted again on each wheel step. Qt
+            # clears the flag when the scroll area adopts it and on each restyle (a
+            # theme change), so it's set again after those
+            self.setAttribute(Qt.WA_OpaquePaintEvent)
+        return done
+
+    def paintEvent(self, e):
+        # the same colour the page behind it shows; read on each paint, so a theme
+        # change (theme.apply repaints every widget) follows
+        QPainter(self).fillRect(e.rect(), QColor(theme.T["bg"]))
 
     def resizeEvent(self, e):
         super().resizeEvent(e)
