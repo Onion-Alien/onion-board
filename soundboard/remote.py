@@ -92,6 +92,7 @@ from urllib.parse import parse_qs, urlsplit
 from PySide6.QtCore import QObject, Qt, QTimer, Signal
 
 from soundboard import errors, netcategory
+from soundboard.i18n import _
 
 if TYPE_CHECKING:
     from soundboard.ui.mainwindow import MainWindow
@@ -110,9 +111,15 @@ MAX_CONNECTIONS = 32    # connections open at once; more are closed straight awa
 PEER_CONNECTIONS = 8    # ...and from any one address (a phone uses one or two)
 NETWORK_CHECK_S = 30.0  # lan: how often it checks the network is still not Public
 WAKE_S = 30.0           # the server thread's longest sleep (halt() wakes it at once)
-PUBLIC_NETWORK = ("Windows calls this network Public (like a café's or a hotel's Wi-Fi), "
-                  "so phones are turned away. At home, set it to Private in Windows "
-                  "Settings → Network & internet, then turn this off and on again")
+
+
+def public_network() -> str:
+    """Why a lan server won't listen, for the app's window (shown as `error`)."""
+    return _("Windows calls this network Public (like a café's or a hotel's Wi-Fi), "
+             "so phones are turned away. At home, set it to Private in Windows "
+             "Settings → Network & internet, then turn this off and on again")
+
+
 # every endpoint, in the order they're listed (the 404 answer, /api/help, the
 # setup prompt and Settings all read this)
 ENDPOINTS = {
@@ -324,7 +331,7 @@ class RemoteControl(QObject):
             self.error = "no token"
             return False
         if self.lan and netcategory.category(host) == netcategory.PUBLIC:
-            self.error = PUBLIC_NETWORK
+            self.error = public_network()
             log.info("%s not started: the network is Public", self.name)
             return False
         try:
@@ -373,9 +380,9 @@ class RemoteControl(QObject):
         restart is dropped: the restart asked again.)"""
         if public and self.running and server is self._server:
             self.stop()
-            self.error = PUBLIC_NETWORK
+            self.error = public_network()
             log.info("%s stopped: the network is Public now", self.name)
-            self.closed.emit(PUBLIC_NETWORK)
+            self.closed.emit(self.error)
 
     def stop(self):
         self._network.stop()

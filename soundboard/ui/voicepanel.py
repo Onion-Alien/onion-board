@@ -36,15 +36,16 @@ from soundboard.ui.responsive import FitWidth
 from soundboard.ui.widgets import Meter
 from soundboard.wheelguard import no_wheel
 from soundboard import errors
+from soundboard.i18n import _, ngettext
 
 CUSTOM = "Custom"
 TILE_ART = 30     # px: a voice tile's picture (when there is one, see ui/art.py)
 TILE_MAX_W = 210  # px: a voice tile at its widest
 LIVE_MODULE = "live-voice"
-IDLE_HINT = "Press Start, then just talk."
-MODELS = [("Fast (base.en)", "base.en"), ("Fastest (tiny.en)", "tiny.en"),
-          ("Accurate (small.en)", "small.en"), ("Any language (base)", "base"),
-          ("Any language, accurate (small)", "small")]
+IDLE_HINT = _("Press Start, then just talk.")
+MODELS = [(_("Fast (base.en)"), "base.en"), (_("Fastest (tiny.en)"), "tiny.en"),
+          (_("Accurate (small.en)"), "small.en"), (_("Any language (base)"), "base"),
+          (_("Any language, accurate (small)"), "small")]
 
 
 def default_fx_spec() -> dict:
@@ -192,7 +193,7 @@ class ParamSlider(QWidget):
         self.steps = max(1, int(round((q.hi - q.lo) / q.step))) if q.step else 200
         self.slider: QSlider | None = None
         self.switch: Switch | None = None
-        self.name = QLabel(q.label)
+        self.name = QLabel(voicefx.shown(q.label))
         self.name.setObjectName("fxparam")
         # the effect cards' value, a slider's: as wide as its widest value
         self.val = (_ValueLabel(_value_shapes(q.lo, q.hi, q.unit, self.steps))
@@ -219,7 +220,7 @@ class ParamSlider(QWidget):
         if _is_switch(q):
             h = QHBoxLayout(self)
             h.setContentsMargins(0, 2, 0, 2)
-            self.switch = Switch(q.label)
+            self.switch = Switch(voicefx.shown(q.label))
             h.addWidget(self.name)
             h.addStretch(1)
             h.addWidget(self.switch)
@@ -244,7 +245,7 @@ class ParamSlider(QWidget):
         if any(q.ends):
             ends = QHBoxLayout()
             for i, word in enumerate(q.ends):
-                lbl = QLabel(word)
+                lbl = QLabel(voicefx.shown(word))
                 lbl.setObjectName("fxend")
                 ends.addWidget(lbl)
                 if i == 0:
@@ -290,7 +291,7 @@ class ParamSlider(QWidget):
     def _label(self):
         self.val.setText(self.text())
         if self.slider is not None:   # a screen reader said only "slider, 40"
-            self.slider.setAccessibleName(self.q.label)
+            self.slider.setAccessibleName(voicefx.shown(self.q.label))
             self.slider.setAccessibleDescription(self.text())
 
     def _moved(self, _v):
@@ -315,11 +316,11 @@ FX_ICONS = {"cleanup": "shield", "pitch": "mic", "growl": "wave", "robot": "keyb
 # the Voice tab's "Make it yours" window's top and the effect cards' groups;
 # an effect from an add-on goes under Add-ons
 HERO = ("pitch", "cleanup")
-HERO_TITLES = {"pitch": "Pitch & voice"}
-GROUPS = (("Change the voice", ("growl", "robot")),
-          ("Character", ("compressor", "tone", "radio", "distortion", "shout", "helmet")),
-          ("Room", ("chorus", "echo", "reverb")))
-ADDON_GROUP = "Add-ons"
+HERO_TITLES = {"pitch": _("Pitch & voice")}
+GROUPS = ((_("Change the voice"), ("growl", "robot")),
+          (_("Character"), ("compressor", "tone", "radio", "distortion", "shout", "helmet")),
+          (_("Room"), ("chorus", "echo", "reverb")))
+ADDON_GROUP = _("Add-ons")
 # your own setting, not part of a voice: picking or saving a voice leaves it as it is
 KEEP = frozenset({"cleanup"})
 
@@ -349,17 +350,18 @@ class EffectRow(QFrame):
         icons.set_label_icon(icon, FX_ICONS.get(cls.type, "sliders"), "accent_hi", size=16)
         icon.setObjectName("fxicon")
         head.addWidget(icon)
-        title = QLabel(HERO_TITLES.get(cls.type, cls.name))
+        title = QLabel(HERO_TITLES.get(cls.type) or voicefx.shown(cls.name))
         title.setObjectName("fxname")
         head.addWidget(title)
         head.addStretch(1)
-        self.btn_reset = QPushButton("Reset")
+        self.btn_reset = QPushButton(_("Reset"))
         self.btn_reset.setObjectName("fxreset")
         self.btn_reset.setCursor(Qt.PointingHandCursor)
-        self.btn_reset.setToolTip(f"Put {cls.name}'s settings back to how they start")
+        self.btn_reset.setToolTip(_("Put {effect}'s settings back to how they start",
+                                    effect=voicefx.shown(cls.name)))
         self.btn_reset.clicked.connect(self.reset)
         head.addWidget(self.btn_reset)
-        self.chk = Switch(f"Turn {cls.name} on or off")
+        self.chk = Switch(_("Turn {effect} on or off", effect=voicefx.shown(cls.name)))
         self.chk.setChecked(bool(cfg.get("on")))
         head.addWidget(self.chk)
         self.arrow = QPushButton()
@@ -370,7 +372,7 @@ class EffectRow(QFrame):
         head.addWidget(self.arrow)
         self._folded = False
         v.addLayout(head)
-        self.desc = hint_label(cls.description)
+        self.desc = hint_label(voicefx.shown(cls.description))
         self.desc.setObjectName("fxdesc")
         v.addWidget(self.desc)
         self.err = hint_label("")
@@ -428,8 +430,9 @@ class EffectRow(QFrame):
     def _paint_arrow(self):
         icons.set_icon(self.arrow, "fold" if self._folded else "fold_open", "muted", "text",
                        size=12)
-        self.arrow.setToolTip(f"Show {self.cls.name}" if self._folded
-                              else f"Fold {self.cls.name} away")
+        name = voicefx.shown(self.cls.name)
+        self.arrow.setToolTip(_("Show {effect}", effect=name) if self._folded
+                              else _("Fold {effect} away", effect=name))
 
     def _toggled(self, on):
         if on and self._folded:
@@ -470,7 +473,7 @@ class EffectRow(QFrame):
         self._show()
 
     def set_error(self, msg: str):
-        self.err.setText(f"⚠ Turned off after an error: {msg}" if msg else "")
+        self.err.setText(_("⚠ Turned off after an error: {error}", error=msg) if msg else "")
         self.err.setVisible(bool(msg))
 
     def set_fresh(self, on: bool):
@@ -484,8 +487,9 @@ class EffectRow(QFrame):
         return bool(self.property("fresh"))
 
 
-POWER_TEXT = {False: "Voice changer is OFF", True: "Voice changer is ON"}
-POWER_SHORT = {False: "Voice changer is OFF", True: "ON  —  everyone hears it"}   # narrow
+POWER_TEXT = {False: _("Voice changer is OFF"), True: _("Voice changer is ON")}
+POWER_SHORT = {False: _("Voice changer is OFF"),
+               True: _("ON  —  everyone hears it")}   # narrow
 VOICE_ICONS = {"Walkie-talkie": "radio", "Old telephone": "speech",
                "Megaphone": "volume", "Stadium announcer": "volume",
                "Podcast voice": "mic", "Demon": "voice", "Ghost": "voice",
@@ -526,11 +530,11 @@ class VoiceFxPanel(QWidget):
         v = QVBoxLayout(self)
         v.setContentsMargins(0, 0, 0, 0)
         v.setSpacing(12)
-        self.title = section_label("VOICE CHANGER")
+        self.title = section_label(_("VOICE CHANGER"))
         v.addWidget(self.title)
-        v.addWidget(hint_label("Change your mic live for whoever you send sounds to (Discord, a "
-                               "game, OBS). Pick a voice to turn it on, then use Hear what "
-                               "they hear at the bottom to try it."))
+        v.addWidget(hint_label(_("Change your mic live for whoever you send sounds to (Discord, "
+                                 "a game, OBS). Pick a voice to turn it on, then use Hear what "
+                                 "they hear at the bottom to try it.")))
 
         # ---- the switch
         self.btn_power = QPushButton()
@@ -546,10 +550,10 @@ class VoiceFxPanel(QWidget):
         top = QHBoxLayout()
         top.setSpacing(8)
         top.addWidget(self.btn_power)
-        top.addWidget(icon_label("mic", "Your mic level"))
+        top.addWidget(icon_label("mic", _("Your mic level")))
         self.meter = Meter()
         self.meter.setMinimumWidth(60)
-        self.meter.setToolTip("Your mic level: it moves when you talk")
+        self.meter.setToolTip(_("Your mic level: it moves when you talk"))
         top.addWidget(self.meter, 1)
         v.addLayout(top)
 
@@ -562,24 +566,24 @@ class VoiceFxPanel(QWidget):
         tl.setSpacing(8)
         # Straight into my mic, Studio makes Discord skip Onion Board (your real voice
         # goes out): Custom with noise suppression off works on the mic and the cable
-        tip_text = hint_label("⚠ Discord deletes most of a changed voice unless its noise "
-                              "suppression is off: Settings → Voice & Video → <b>Input "
-                              "Profile</b> <b>Custom</b>, <b>Noise Suppression</b> "
-                              "<b>None</b> (not Studio: it skips Onion Board on your mic). "
-                              "Game voice chats' noise suppression does the same.")
+        tip_text = hint_label(_("⚠ Discord deletes most of a changed voice unless its noise "
+                                "suppression is off: Settings → Voice & Video → <b>Input "
+                                "Profile</b> <b>Custom</b>, <b>Noise Suppression</b> "
+                                "<b>None</b> (not Studio: it skips Onion Board on your mic). "
+                                "Game voice chats' noise suppression does the same."))
         theme.set_tone(tip_text, "warn")
         tl.addWidget(tip_text, 1)
-        self.btn_tip_help = QPushButton("Show me how")
+        self.btn_tip_help = QPushButton(_("Show me how"))
         self.btn_tip_help.clicked.connect(self.chat_help)
         tl.addWidget(self.btn_tip_help)
-        self.btn_tip_ok = QPushButton("Got it")
+        self.btn_tip_ok = QPushButton(_("Got it"))
         self.btn_tip_ok.clicked.connect(self._tip_ok)
         tl.addWidget(self.btn_tip_ok)
         self._tip_enabled = True
         v.addWidget(self.tip)
 
         # ---- pick a voice
-        v.addWidget(QLabel("<b>Pick a voice</b>"))
+        v.addWidget(QLabel(_("<b>Pick a voice</b>")))
         grid = self._tile_grid = QGridLayout()
         grid.setSpacing(10)
         self._tile_cols = self.COLS
@@ -591,30 +595,30 @@ class VoiceFxPanel(QWidget):
         self._tile: dict[str, QPushButton] = {}
         self._saved_tiles: list[QPushButton] = []
         for name in list(voicefx.PRESETS) + [CUSTOM]:
-            title = "My own mix" if name == CUSTOM else name
+            title = _("My own mix") if name == CUSTOM else voicefx.shown(name)
             pic = art.icon(art.voice_key(name)) or (art.mystery_icon() if name != CUSTOM
                                                     else None)
             b = self._make_tile(name, title, pic, VOICE_ICONS.get(name, "wave"))
-            b.setToolTip("Your own settings: Make it yours… opens them" if name == CUSTOM
-                         else f"Sound like: {name}. Click to turn the voice changer on "
-                              "with it.")
+            b.setToolTip(_("Your own settings: Make it yours… opens them") if name == CUSTOM
+                         else _("Sound like: {voice}. Click to turn the voice changer on "
+                                "with it.", voice=title))
         for c in range(self.COLS):
             grid.setColumnStretch(c, 1)
         v.addLayout(grid)
-        self.undo_bar = UndoBar("Bring the voice back, as it was")
+        self.undo_bar = UndoBar(_("Bring the voice back, as it was"))
         v.addWidget(self.undo_bar)
         # everything for making your own voice opens in a window of its own (on the
         # card it made the tab scroll forever)
-        self.btn_tweak = QPushButton("Make it yours…")
+        self.btn_tweak = QPushButton(_("Make it yours…"))
         icons.set_icon(self.btn_tweak, "sliders")
-        self.btn_tweak.setToolTip("Pitch, Randomize, every effect, and your saved voices: "
-                                  "build your own voice in a window beside the app")
+        self.btn_tweak.setToolTip(_("Pitch, Randomize, every effect, and your saved voices: "
+                                    "build your own voice in a window beside the app"))
         self.btn_tweak.clicked.connect(self.open_tweak)
         v.addWidget(self.btn_tweak, 0, Qt.AlignLeft)
 
         # ---- the "Make it yours" window: not modal, so the voices stay clickable
         self.dlg = QDialog(self)
-        self.dlg.setWindowTitle("Make it yours")
+        self.dlg.setWindowTitle(_("Make it yours"))
         self.dlg.setModal(False)
         self.dlg.setWindowFlag(Qt.WindowContextHelpButtonHint, False)
         self.dlg.finished.connect(self._tweak_closed)
@@ -647,36 +651,38 @@ class VoiceFxPanel(QWidget):
         tools = QWidget()
         srow = Flow(tools, gap=6)
         tv.addWidget(tools)
-        self.btn_random = QPushButton("Randomize")
+        self.btn_random = QPushButton(_("Randomize"))
         self.btn_random.setIcon(art.random_icon())
         self.btn_random.setIconSize(QSize(16, 16))
-        self.btn_random.setToolTip("A random silly mix of effects, as “My own mix”: what it "
-                                   "changed lights up below. Click again for another.")
+        self.btn_random.setToolTip(_("A random silly mix of effects, as “My own mix”: what "
+                                     "it changed lights up below. Click again for another."))
         self.btn_random.clicked.connect(lambda: self.randomize())
         srow.addWidget(self.btn_random)
-        self.btn_save = QPushButton("Save as a voice…")
+        self.btn_save = QPushButton(_("Save as a voice…"))
         icons.set_icon(self.btn_save, "plus")
-        self.btn_save.setToolTip("Keep these settings as a voice with a name: it gets its own "
-                                 "button under “Pick a voice”.")
+        self.btn_save.setToolTip(_("Keep these settings as a voice with a name: it gets its "
+                                   "own button under “Pick a voice”."))
         self.btn_save.clicked.connect(self.save_voice)
         srow.addWidget(self.btn_save)
         # saved voices: share one as a line of text, add one a friend sent
-        self.btn_share = QPushButton("Copy share code")
+        self.btn_share = QPushButton(_("Copy share code"))
         icons.set_icon(self.btn_share, "copy")
-        self.btn_share.setToolTip("Copy the saved voice that's on as a short code to paste to "
-                                  "a friend: just its name and settings")
+        self.btn_share.setToolTip(_("Copy the saved voice that's on as a short code to paste "
+                                    "to a friend: just its name and settings"))
         self.btn_share.clicked.connect(lambda: self.copy_code(self._preset))
         srow.addWidget(self.btn_share)
-        self.btn_import = QPushButton("Import a code…")
+        self.btn_import = QPushButton(_("Import a code…"))
         icons.set_icon(self.btn_import, "plus")
-        self.btn_import.setToolTip("Add a voice someone sent you as a code (it starts "
-                                   "with “OB1-”)")
+        self.btn_import.setToolTip(_("Add a voice someone sent you as a code (it starts "
+                                     "with “OB1-”)"))
         self.btn_import.clicked.connect(lambda: self.import_code())
         srow.addWidget(self.btn_import)
-        self.btn_bin = QPushButton("Recently deleted")
+        self.btn_bin = QPushButton(_("Recently deleted"))
         icons.set_icon(self.btn_bin, "trash")
-        self.btn_bin.setToolTip("Saved voices you deleted, kept for "
-                                f"{savedvoices.KEEP_DAYS} days so you can bring them back")
+        self.btn_bin.setToolTip(ngettext(
+            "Saved voices you deleted, kept for {n} day so you can bring them back",
+            "Saved voices you deleted, kept for {n} days so you can bring them back",
+            savedvoices.KEEP_DAYS))
         self.btn_bin.clicked.connect(self.show_deleted)
         srow.addWidget(self.btn_bin)
         self.delay = QLabel()
@@ -692,11 +698,11 @@ class VoiceFxPanel(QWidget):
         self.box = QVBoxLayout(self.more)
         self.box.setContentsMargins(0, 6, 0, 0)
         self.box.setSpacing(8)
-        self.box.addWidget(QLabel("<b>All effects</b>"))
-        self.box.addWidget(hint_label("Switch effects on and drag their sliders to build your "
-                                      "own voice. Changing anything switches to “My own "
-                                      "mix”; like it? Save it as a voice and it gets a "
-                                      "button of its own."))
+        self.box.addWidget(QLabel(_("<b>All effects</b>")))
+        self.box.addWidget(hint_label(_("Switch effects on and drag their sliders to build "
+                                        "your own voice. Changing anything switches to “My "
+                                        "own mix”; like it? Save it as a voice and it gets a "
+                                        "button of its own.")))
         # two columns that stack their cards tightly, each card going under the shorter
         # one: a grid (or a row per group) left holes beside the shorter cards. The
         # group titles show in one column only, where they can't leave a hole.
@@ -708,7 +714,7 @@ class VoiceFxPanel(QWidget):
         self._fx_row = QHBoxLayout()
         self._fx_row.setSpacing(10)
         self._fx_columns: list[QVBoxLayout] = []
-        for _ in range(2):
+        for __ in range(2):
             col = QVBoxLayout()
             col.setSpacing(10)
             col.addStretch(1)
@@ -727,7 +733,7 @@ class VoiceFxPanel(QWidget):
         done = QHBoxLayout()
         done.setContentsMargins(16, 0, 16, 0)
         done.addStretch(1)
-        btn_done = QPushButton("Done")
+        btn_done = QPushButton(_("Done"))
         btn_done.setObjectName("primary")
         btn_done.clicked.connect(self.dlg.close)
         done.addWidget(btn_done)
@@ -906,7 +912,7 @@ class VoiceFxPanel(QWidget):
         if shown != title:
             b.setToolTip(title)
         b.setCursor(Qt.PointingHandCursor)
-        b.clicked.connect(lambda _=False, n=name: self.pick(n))
+        b.clicked.connect(lambda __=False, n=name: self.pick(n))
         self.tiles.addButton(b)
         self._tile[name] = b
         return b
@@ -922,8 +928,8 @@ class VoiceFxPanel(QWidget):
         self._saved_tiles = []
         for name in self.store.voices:
             b = self._make_tile(name, name, art.icon(art.voice_key(CUSTOM)), "sliders")
-            b.setToolTip(f"Your saved voice “{name}”. Click to turn the voice changer on "
-                         "with it; right-click to rename or delete it.")
+            b.setToolTip(_("Your saved voice “{name}”. Click to turn the voice changer on "
+                           "with it; right-click to rename or delete it.", name=name))
             b.setContextMenuPolicy(Qt.CustomContextMenu)
             b.customContextMenuRequested.connect(
                 lambda pos, n=name, w=b: self._saved_menu(n, w.mapToGlobal(pos)))
@@ -949,34 +955,34 @@ class VoiceFxPanel(QWidget):
         the voice being renamed, whose own name is fine)."""
         builtin = self._builtin_names()
         while True:
-            name, ok = QInputDialog.getText(self._parent(), title, "Name:", QLineEdit.Normal, text)
+            name, ok = QInputDialog.getText(self._parent(), title, _("Name:"), QLineEdit.Normal,
+                                            text)
             name = savedvoices.clean_name(name) if ok else ""
             if not name:
                 return ""
             if name.casefold() in builtin:
                 QMessageBox.information(self._parent(), title,
-                                        f"“{name}” is a built-in voice's name. "
-                                        "Pick another one.")
+                                        _("“{name}” is a built-in voice's name. "
+                                          "Pick another one.", name=name))
                 text = name
                 continue
             other = self.store.find(name)
             if other is None or other == keep:
                 return name
-            if QMessageBox.question(self._parent(), title, f"You already have a voice called "
-                                    f"“{other}”. Replace it?") == QMessageBox.Yes:
+            if QMessageBox.question(self._parent(), title,
+                                    _("You already have a voice called “{name}”. Replace it?",
+                                      name=other)) == QMessageBox.Yes:
                 return other
             text = name
 
     def save_voice(self):
         """Fine-tune's "Save as a voice": what's in Fine-tune now, under a name, as a
         tile of its own (picked straight away)."""
-        suggestion = self._based_on or self.store.free_name("My voice")
+        suggestion = self._based_on or self.store.free_name(_("My voice"))
         if self.store.full() and self.store.find(suggestion) is None:
-            QMessageBox.information(self._parent(), "Save as a voice",
-                                    f"You have {savedvoices.MAX_VOICES} saved voices, the "
-                                    "most there can be. Delete one (right-click it) first.")
+            QMessageBox.information(self._parent(), _("Save as a voice"), self._full_text())
             return
-        name = self._ask_name("Save as a voice", suggestion)
+        name = self._ask_name(_("Save as a voice"), suggestion)
         if not name:
             return
         effects = {t: r.state() for t, r in self.rows.items()}
@@ -986,15 +992,22 @@ class VoiceFxPanel(QWidget):
         self._preset, self._own, self._based_on = name, False, name
         self._fill_saved()
         self._emit()
-        busy.flash(self.btn_save, "✓ Saved")
+        busy.flash(self.btn_save, _("✓ Saved"))
 
     def _saved_menu(self, name: str, at):
         m = QMenu(self)
-        m.addAction(icons.icon("edit"), "Rename…", lambda: self.rename_voice(name))
-        m.addAction(icons.icon("copy"), "Copy share code", lambda: self.copy_code(name))
-        m.addAction(icons.icon("trash", "danger_text"), "Delete",
+        m.addAction(icons.icon("edit"), _("Rename…"), lambda: self.rename_voice(name))
+        m.addAction(icons.icon("copy"), _("Copy share code"), lambda: self.copy_code(name))
+        m.addAction(icons.icon("trash", "danger_text"), _("Delete"),
                     lambda: self.delete_voice(name))
         m.exec(at)
+
+    @staticmethod
+    def _full_text() -> str:
+        return ngettext("You have {n} saved voice, the most there can be. Delete one "
+                        "(right-click it) first.",
+                        "You have {n} saved voices, the most there can be. Delete one "
+                        "(right-click it) first.", savedvoices.MAX_VOICES)
 
     def _parent(self) -> QWidget:
         """Where a question goes: over Make it yours while it's open."""
@@ -1008,10 +1021,10 @@ class VoiceFxPanel(QWidget):
         code = savedvoices.share_code(name, effects)
         QGuiApplication.clipboard().setText(code)
         if self.dlg.isVisible() and name == self._preset:
-            busy.flash(self.btn_share, "✓ Copied")
+            busy.flash(self.btn_share, _("✓ Copied"))
         else:
             self.undo_bar.finish()
-            self._note(f"Copied “{name}” as a share code")
+            self._note(_("Copied “{name}” as a share code", name=name))
         return code
 
     def _note(self, text: str):
@@ -1022,10 +1035,10 @@ class VoiceFxPanel(QWidget):
     def import_code(self, text: str | None = None) -> str:
         """Add a voice from a share code (asked for if not given) as a new saved voice,
         renamed if the name's taken, and turn it on. Returns its name ("" if not)."""
-        title = "Import a voice code"
+        title = _("Import a voice code")
         if text is None:
             text, ok = QInputDialog.getText(self._parent(), title,
-                                            "Paste the code someone sent you:",
+                                            _("Paste the code someone sent you:"),
                                             QLineEdit.Normal, "")
             if not ok or not text.strip():
                 return ""
@@ -1035,16 +1048,15 @@ class VoiceFxPanel(QWidget):
             QMessageBox.warning(self._parent(), title, str(e))
             return ""
         if self.store.full():
-            QMessageBox.information(self._parent(), title,
-                                    f"You have {savedvoices.MAX_VOICES} saved voices, the "
-                                    "most there can be. Delete one (right-click it) first.")
+            QMessageBox.information(self._parent(), title, self._full_text())
             return ""
         if name.casefold() in self._builtin_names():
             name = f"{name[:savedvoices.MAX_NAME - 9]} (shared)"
         name = self.store.free_name(name)
-        on = [voicefx.REGISTRY[t].name for t in effects]
-        ask = (f"Add the voice “{html.escape(name)}”?<br><br>Effects: "
-               + (html.escape(", ".join(on)) if on else "none (your normal voice)")
+        on = [voicefx.shown(voicefx.REGISTRY[t].name) for t in effects]
+        ask = (_("Add the voice “{name}”?<br><br>Effects: {effects}", name=html.escape(name),
+                 effects=(html.escape(", ".join(on)) if on
+                          else _("none (your normal voice)")))
                + "".join(f"<br><br>{html.escape(n)}" for n in notes))
         if QMessageBox.question(self._parent(), title, ask) != QMessageBox.Yes:
             return ""
@@ -1052,16 +1064,18 @@ class VoiceFxPanel(QWidget):
         self._fill_saved()
         self.pick(name)
         if self.dlg.isVisible():
-            busy.flash(self.btn_import, "✓ Added")
+            busy.flash(self.btn_import, _("✓ Added"))
         return name
 
     @staticmethod
     def _builtin_names() -> set[str]:
-        return {n.casefold() for n in (*voicefx.PRESETS, CUSTOM, "My own mix",
-                                       "Random voice")}
+        # the English names (what's saved) and how they read on the tiles now
+        names = (*voicefx.PRESETS, CUSTOM, "My own mix", "Random voice")
+        return {n.casefold() for n in (*names, *map(voicefx.shown, voicefx.PRESETS),
+                                       _("My own mix"))}
 
     def rename_voice(self, old: str):
-        new = self._ask_name("Rename voice", old, keep=old)
+        new = self._ask_name(_("Rename voice"), old, keep=old)
         if not new or new == old:
             return
         if self.store.find(new) not in (None, old):
@@ -1092,7 +1106,7 @@ class VoiceFxPanel(QWidget):
         self._fill_saved()
         self._emit()
         self.undo_bar.btn_undo.show()   # (a note hides it)
-        self.undo_bar.show_for(f"Deleted the voice “{name}”",
+        self.undo_bar.show_for(_("Deleted the voice “{name}”", name=name),
                                lambda: self._undelete(item.id, was_on))
 
     def _undelete(self, item_id: str, was_on: bool = False) -> str:
@@ -1164,14 +1178,17 @@ class VoiceFxPanel(QWidget):
         fx = self.effects_delay()
         dev = self._device_ms
         total = fx + (dev or 0.0)
-        self.delay.setText(f"{total:.0f} ms delay")
-        parts = [f"{fx:.0f} ms from the effects"]
-        if dev is not None:
-            parts.append(f"{dev:.0f} ms from your sound devices")
-        self.delay.setToolTip("How far behind your real voice the changed one is: "
-                              + " + ".join(parts) + ". Under about 100 ms feels normal "
-                              "to talk over; pitch effects cost the most, the rest "
-                              "almost nothing.")
+        self.delay.setText(_("{ms} ms delay", ms=f"{total:.0f}"))
+        if dev is None:
+            tip = _("How far behind your real voice the changed one is: {effects} ms from the "
+                    "effects. Under about 100 ms feels normal to talk over; pitch effects "
+                    "cost the most, the rest almost nothing.", effects=f"{fx:.0f}")
+        else:
+            tip = _("How far behind your real voice the changed one is: {effects} ms from the "
+                    "effects + {devices} ms from your sound devices. Under about 100 ms feels "
+                    "normal to talk over; pitch effects cost the most, the rest almost "
+                    "nothing.", effects=f"{fx:.0f}", devices=f"{dev:.0f}")
+        self.delay.setToolTip(tip)
         slow = total > 120
         if bool(self.delay.property("slow")) != slow:
             self.delay.setProperty("slow", slow)
@@ -1347,10 +1364,11 @@ class VoiceFxPanel(QWidget):
             b.setChecked(on and name == self._preset)
         self.tiles.setExclusive(True)
         n = self._count_on()
-        self.btn_tweak.setText(f"Make it yours…  ·  {n} on" if n else "Make it yours…")
+        self.btn_tweak.setText(ngettext("Make it yours…  ·  {n} on", "Make it yours…  ·  {n} on",
+                                        n) if n else _("Make it yours…"))
         mine = self._preset in self.store.voices
-        _enable(self.btn_share, mine, "Turn on one of your saved voices to share it "
-                                      "(or right-click its button)")
+        _enable(self.btn_share, mine, _("Turn on one of your saved voices to share it "
+                                        "(or right-click its button)"))
         self._show_delay()
 
     def _edited(self, etype: str = ""):
@@ -1426,28 +1444,29 @@ class SpeechPanel(QWidget):
         v.setSpacing(12)
 
         # ---- live voice to speech
-        self.title = section_label("SPEAK ANOTHER LANGUAGE")
+        self.title = section_label(_("SPEAK ANOTHER LANGUAGE"))
         v.addWidget(self.title)
-        self.lbl_intro = hint_label(
+        self.lbl_intro = hint_label(_(
             "Talk in English and others hear another language. The AI voice or the voice "
             "changer says it when one of them is on; otherwise press Start and a computer "
-            "voice does. Or type a line at the bottom.")
+            "voice does. Or type a line at the bottom."))
         v.addWidget(self.lbl_intro)
         # Speak in belongs to every voice on the tab (VoicePanel._sync_translate).
         # English in, the chosen language out.
         self.bg_for = ""             # translating for the "ai" voice or the "fx" changer
         self._bg_key: tuple = ()     # (who, language) the running helper was started for
         self._bg_failed: tuple = ()  # the key it last stopped with an error for
+        self._bg_warning = False     # lbl_bg shows a ⚠ problem (not a hint)
         self.lang_box = QWidget()
         lv = QVBoxLayout(self.lang_box)
         lv.setContentsMargins(0, 0, 0, 0)
         lv.setSpacing(8)
         trow = QHBoxLayout()
-        self.lbl_lang = QLabel("Speak in")
+        self.lbl_lang = QLabel(_("Speak in"))
         trow.addWidget(self.lbl_lang)
         self.cb_lang = QComboBox()
-        self.cb_lang.setToolTip("Say it in English; whichever voice is on says it in this "
-                                "language. Each language is a one-time download.")
+        self.cb_lang.setToolTip(_("Say it in English; whichever voice is on says it in this "
+                                  "language. Each language is a one-time download."))
         trow.addWidget(self.cb_lang, 1)
         lv.addLayout(trow)
         self.lbl_delay = hint_label("")
@@ -1465,33 +1484,34 @@ class SpeechPanel(QWidget):
         self.lbl_tr = hint_label("")
         tv.addWidget(self.lbl_tr)
         tb = QHBoxLayout()
-        self.b_dl = QPushButton("Download")
+        self.b_dl = QPushButton(_("Download"))
         icons.set_icon(self.b_dl, "plus")
         self.b_dl.clicked.connect(self._download)
-        self.b_dl_cancel = QPushButton("Cancel")
+        self.b_dl_cancel = QPushButton(_("Cancel"))
         self.b_dl_cancel.clicked.connect(self._cancel_download)
-        self.b_voice_install = QPushButton("Install the voice")
+        self.b_voice_install = QPushButton(_("Install the voice"))
         icons.set_icon(self.b_voice_install, "plus")
-        self._voice_install_tip = ("Windows asks for permission once, then downloads its "
-                                   "free voice for this language. It's used as soon as "
-                                   "it's in; no restart.")
+        self._voice_install_tip = _("Windows asks for permission once, then downloads its "
+                                    "free voice for this language. It's used as soon as "
+                                    "it's in; no restart.")
         self.b_voice_install.setToolTip(self._voice_install_tip)
         net.on_change(self._refresh_translation)   # Settings > Privacy's switches
         self.b_voice_install.clicked.connect(self._install_voice)
-        self.b_voices = QPushButton("Windows settings")
+        self.b_voices = QPushButton(_("Windows settings"))
         self.b_voices.setObjectName("small")
-        self.b_voices.setToolTip("Do it by hand: Settings \u2192 Time & language \u2192 Speech "
-                                 "\u2192 Add voices. It's picked up by itself once it's in.")
+        self.b_voices.setToolTip(_("Do it by hand: Settings \u2192 Time & language \u2192 "
+                                   "Speech \u2192 Add voices. It's picked up by itself once "
+                                   "it's in."))
         self.b_voices.clicked.connect(self._get_voice)
-        self.b_voices_check = QPushButton("Reload voices")
+        self.b_voices_check = QPushButton(_("Reload voices"))
         self.b_voices_check.setObjectName("small")
-        self.b_voices_check.setToolTip("Restart the speech engine to pick up new Windows "
-                                       "voices (it also does this by itself)")
+        self.b_voices_check.setToolTip(_("Restart the speech engine to pick up new Windows "
+                                         "voices (it also does this by itself)"))
         self.b_voices_check.clicked.connect(self._recheck_voices_asked)
         self._voices_asked = False   # the button was pressed: say what it found
         self._voices_again = False   # a reload was asked for while one ran
         self._voice_wait = False     # sent to Windows settings for a voice; look on return
-        self.b_dl_remove = QPushButton("Delete download")
+        self.b_dl_remove = QPushButton(_("Delete download"))
         self.b_dl_remove.setObjectName("small")
         self.b_dl_remove.clicked.connect(self._remove_download)
         for b in (self.b_dl, self.b_dl_cancel, self.b_voice_install, self.b_voices,
@@ -1506,24 +1526,24 @@ class SpeechPanel(QWidget):
         grid = QGridLayout()
         grid.setHorizontalSpacing(12)
         grid.setVerticalSpacing(14)
-        grid.addWidget(QLabel("Computer voice"), 0, 0)
+        grid.addWidget(QLabel(_("Computer voice")), 0, 0)
         self.cb_voice = QComboBox()
-        self.cb_voice.setToolTip("Speaks for you when no AI voice or voice changer is on, "
-                                 "and says lines you type")
-        self.cb_voice.addItem("Loading voices…", "")
+        self.cb_voice.setToolTip(_("Speaks for you when no AI voice or voice changer is on, "
+                                   "and says lines you type"))
+        self.cb_voice.addItem(_("Loading voices…"), "")
         self.cb_voice.setEnabled(False)
         # the list shows a stand-in, not the saved voice (still loading, speech failed,
         # or that voice isn't installed now): other settings changes keep the saved one
         self._voice_standin = True
         grid.addWidget(self.cb_voice, 0, 1)
         # custom voices have their own box, opened from next to the list itself
-        self.b_add_voices = QPushButton("Add voices…")
+        self.b_add_voices = QPushButton(_("Add voices…"))
         icons.set_icon(self.b_add_voices, "plus")
-        self.b_add_voices.setToolTip("Your own voices: a TTS server on your PC (Kokoro, "
-                                     "AllTalk…) or Piper voice packs")
+        self.b_add_voices.setToolTip(_("Your own voices: a TTS server on your PC (Kokoro, "
+                                       "AllTalk…) or Piper voice packs"))
         self.b_add_voices.clicked.connect(self.show_custom_voices)
         grid.addWidget(self.b_add_voices, 0, 2)
-        grid.addWidget(QLabel("Speed"), 1, 0)
+        grid.addWidget(QLabel(_("Speed")), 1, 0)
         self.sl_rate = QSlider(Qt.Horizontal)
         self.sl_rate.setMinimumHeight(28)
         self.sl_rate.setRange(-10, 10)
@@ -1536,7 +1556,7 @@ class SpeechPanel(QWidget):
         lv = QVBoxLayout(self.start_box)
         lv.setContentsMargins(0, 0, 0, 0)
         lv.setSpacing(12)
-        self.b_live = QPushButton("Start the computer voice")
+        self.b_live = QPushButton(_("Start the computer voice"))
         icons.set_icon(self.b_live, "mic", "on_accent", "on_accent")
         self.b_live.setCheckable(True)
         self.b_live.setMinimumHeight(40)
@@ -1550,9 +1570,9 @@ class SpeechPanel(QWidget):
         v.addWidget(self.start_box)
         # everything the voice was asked to say, live or typed, newest at the bottom
         lrow = QHBoxLayout()
-        lrow.addWidget(section_label("WHAT THE VOICE SAID"))
+        lrow.addWidget(section_label(_("WHAT THE VOICE SAID")))
         lrow.addStretch(1)
-        b_clear = QPushButton("Clear")
+        b_clear = QPushButton(_("Clear"))
         b_clear.setMinimumHeight(32)
         lrow.addWidget(b_clear)
         v.addLayout(lrow)
@@ -1569,7 +1589,8 @@ class SpeechPanel(QWidget):
             self.said_log.setFixedHeight(lines * fm.lineSpacing() + pad)
         self.said_log.textChanged.connect(fit_log)
         fit_log()
-        self.said_log.setPlaceholderText("Nothing yet. Lines show up here as they're spoken.")
+        self.said_log.setPlaceholderText(_("Nothing yet. Lines show up here as they're "
+                                           "spoken."))
         b_clear.clicked.connect(self.said_log.clear)
         v.addWidget(self.said_log)
 
@@ -1580,12 +1601,12 @@ class SpeechPanel(QWidget):
         self.lbl_missing = hint_label("")
         mv.addWidget(self.lbl_missing)
         mrow = QHBoxLayout()
-        self.b_install = QPushButton("Install speech recognition")
+        self.b_install = QPushButton(_("Install speech recognition"))
         icons.set_icon(self.b_install, "plus")
-        self.b_install.setToolTip("One-time download, about 300 MB. Requires Python 3.12+.")
+        self.b_install.setToolTip(_("One-time download, about 300 MB. Requires Python 3.12+."))
         self.b_install.clicked.connect(self._install)
         mrow.addWidget(self.b_install)
-        b_open = QPushButton("Open folder")
+        b_open = QPushButton(_("Open folder"))
         b_open.clicked.connect(lambda: self._open_folder(self.module, b_open))
         mrow.addWidget(b_open)
         mrow.addStretch(1)
@@ -1596,7 +1617,7 @@ class SpeechPanel(QWidget):
         self.lbl_install.hide()
         v.addWidget(self.lbl_install)
 
-        self.btn_opts = QPushButton("More options")
+        self.btn_opts = QPushButton(_("More options"))
         self.btn_opts.setObjectName("fold")
         icons.set_icon(self.btn_opts, "fold", "muted", "text", size=12)
         self.btn_opts.setCheckable(True)
@@ -1605,33 +1626,34 @@ class SpeechPanel(QWidget):
         ov = QVBoxLayout(self.opts)
         ov.setContentsMargins(0, 0, 0, 0)
         grid = QGridLayout()
-        grid.addWidget(QLabel("Recognition"), 2, 0)
+        grid.addWidget(QLabel(_("Recognition")), 2, 0)
         self.cb_model = QComboBox()
         for label, key in MODELS:
             self.cb_model.addItem(label, key)
         self.cb_model.setCurrentIndex(max(0, self.cb_model.findData(self.s["model"])))
         grid.addWidget(self.cb_model, 2, 1)
-        grid.addWidget(QLabel("Language"), 3, 0)
+        grid.addWidget(QLabel(_("Language")), 3, 0)
         self.ed_lang = QLineEdit(self.s["language"])
-        self.ed_lang.setPlaceholderText("en, es, de… or auto")
-        self.ed_lang.setToolTip("Language you speak (two-letter code). 'auto' guesses; needs "
-                                "an 'Any language' recognition model for anything but English.")
+        self.ed_lang.setPlaceholderText(_("en, es, de… or auto"))
+        self.ed_lang.setToolTip(_("Language you speak (two-letter code). 'auto' guesses; needs "
+                                  "an 'Any language' recognition model for anything but "
+                                  "English."))
         grid.addWidget(self.ed_lang, 3, 1)
         grid.setColumnStretch(1, 1)
         ov.addLayout(grid)
         no_wheel(self.cb_voice, self.sl_rate, self.cb_model)
-        self.chk_mute = QCheckBox("Mute my real mic while the computer voice is on")
-        self.chk_mute.setToolTip("Others hear only the spoken voice, not your real one.")
+        self.chk_mute = QCheckBox(_("Mute my real mic while the computer voice is on"))
+        self.chk_mute.setToolTip(_("Others hear only the spoken voice, not your real one."))
         self.chk_mute.setChecked(self.s["mute_real_voice"])
         ov.addWidget(self.chk_mute)
-        self.chk_fx = QCheckBox("Put the voice changer on the computer voice")
-        self.chk_fx.setToolTip("With a voice picked under Voice changer, the computer voice "
-                               "gets the same effect (a chipmunk robot voice, say).")
+        self.chk_fx = QCheckBox(_("Put the voice changer on the computer voice"))
+        self.chk_fx.setToolTip(_("With a voice picked under Voice changer, the computer voice "
+                                 "gets the same effect (a chipmunk robot voice, say)."))
         self.chk_fx.setChecked(self.s["voice_fx"])
         ov.addWidget(self.chk_fx)
-        self.b_update = QPushButton("Update speech recognition")
-        self.b_update.setToolTip("Runs its install again: picks up what a newer Onion Board "
-                                 "needs (translation, for one). Needs Python 3.12+.")
+        self.b_update = QPushButton(_("Update speech recognition"))
+        self.b_update.setToolTip(_("Runs its install again: picks up what a newer Onion Board "
+                                   "needs (translation, for one). Needs Python 3.12+."))
         self.b_update.clicked.connect(self._install)
         ov.addWidget(self.b_update, 0, Qt.AlignLeft)
         v.addWidget(self.opts)
@@ -1643,24 +1665,25 @@ class SpeechPanel(QWidget):
         ov.setContentsMargins(0, 0, 0, 0)
         ov.setSpacing(8)
         chead = QHBoxLayout()
-        self.custom_head = section_label("CUSTOM VOICES")
+        self.custom_head = section_label(_("CUSTOM VOICES"))
         chead.addWidget(self.custom_head)
         chead.addStretch(1)
-        b_close = QPushButton("Close")
+        b_close = QPushButton(_("Close"))
         b_close.setObjectName("small")
         b_close.clicked.connect(lambda: self.custom_box.hide())
         chead.addWidget(b_close)
         ov.addLayout(chead)
-        ov.addWidget(hint_label("Use a TTS server running on your PC (Kokoro, AllTalk, any "
-                                "OpenAI-style one) or drop voice packs (Piper) into the "
-                                "voices folder. They join the Voice list above."))
+        ov.addWidget(hint_label(_("Use a TTS server running on your PC (Kokoro, AllTalk, any "
+                                  "OpenAI-style one) or drop voice packs (Piper) into the "
+                                  "voices folder. They join the Voice list above.")))
         crow = QHBoxLayout()
-        b_server = QPushButton("Add a voice server…")
+        b_server = QPushButton(_("Add a voice server…"))
         icons.set_icon(b_server, "plus")
         b_server.clicked.connect(self._add_voice_server)
         crow.addWidget(b_server)
-        b_vfolder = QPushButton("Open voices folder")
-        b_vfolder.setToolTip("Voice packs and voice settings go here; README.txt in it says how")
+        b_vfolder = QPushButton(_("Open voices folder"))
+        b_vfolder.setToolTip(_("Voice packs and voice settings go here; README.txt in it "
+                               "says how"))
         b_vfolder.clicked.connect(lambda: busy.open_folder(customvoices.ensure_folder, b_vfolder))
         crow.addWidget(b_vfolder)
         crow.addStretch(1)
@@ -1682,25 +1705,25 @@ class SpeechPanel(QWidget):
         # ---- the tab's bottom bar (placed by VoicePanel, like every tab's bar):
         # typing a line is the extra, then the voice's volume
         self.say_bar, row = bar()
-        row.addWidget(icon_label("speech", "Or type a line and it's spoken in the voice"))
+        row.addWidget(icon_label("speech", _("Or type a line and it's spoken in the voice")))
         self.ed = QLineEdit()
-        self.ed.setPlaceholderText("Or type a line and press Enter…")
+        self.ed.setPlaceholderText(_("Or type a line and press Enter…"))
         self.ed.returnPressed.connect(self._say)
         self.ed.textEdited.connect(self._warm_for_a_line)
         row.addWidget(self.ed, 1)
-        b_say = QPushButton("Say")
+        b_say = QPushButton(_("Say"))
         b_say.clicked.connect(self._say)
-        b_stop = QPushButton("Stop")
+        b_stop = QPushButton(_("Stop"))
         b_stop.clicked.connect(lambda: (controller.stop_speaking(),
-                                        busy.flash(b_stop, "✓ Stopped", 1200)))
+                                        busy.flash(b_stop, _("✓ Stopped"), 1200)))
         row.addWidget(b_say)
         row.addWidget(b_stop)
         sep = vsep()
         row.addWidget(sep)
-        vol_icon = icon_label("volume", "How loud the spoken voice is")
+        vol_icon = icon_label("volume", _("How loud the spoken voice is"))
         row.addWidget(vol_icon)
         self.sl_gain = VolumeControl(self.s["gain"], slider_max=200, typed_max=400,
-                                     tip="How loud the spoken voice is")
+                                     tip=_("How loud the spoken voice is"))
         row.addWidget(self.sl_gain)
         self.say_vol_group = (sep, vol_icon, self.sl_gain)
         self.say_stop = b_stop
@@ -1779,7 +1802,7 @@ class SpeechPanel(QWidget):
     def _fill_voices(self, voices: list, error: str):
         self.cb_voice.blockSignals(True)
         self.cb_voice.clear()
-        self.cb_voice.addItem("Windows default", "")
+        self.cb_voice.addItem(_("Windows default"), "")
         for name in voices:
             self.cb_voice.addItem(customvoices.label(name), name)
         found = self.cb_voice.findData(self.s["voice"])
@@ -1794,15 +1817,15 @@ class SpeechPanel(QWidget):
         if not error:
             self._remember_voices()
         self.b_voices_check.setEnabled(True)
-        self.b_voices_check.setText("Reload voices")
+        self.b_voices_check.setText(_("Reload voices"))
         if self._voices_again:   # asked for while that load ran (e.g. a server was added)
             self._voices_again = False
             QTimer.singleShot(0, self, self._recheck_voices)
         if self._voices_asked:
             self._voices_asked = False
             busy.flash(self.b_voices_check,
-                       f"✓ {len(voices)} voice{'s' if len(voices) != 1 else ''}" if not error
-                       else "Couldn't load them")
+                       ngettext("✓ {n} voice", "✓ {n} voices", len(voices)) if not error
+                       else _("Couldn't load them"))
         m = self._lang()
         voice = self._voice_for(m) if m is not None else ""
         if m is None or voice:
@@ -1812,16 +1835,18 @@ class SpeechPanel(QWidget):
             # talking already: switch to the new voice now, no restart needed
             self.ctl.live_voice = voice
             short = customvoices.label(voice)
-            self.lbl_state.setText(f"✓ {m.language_name} voice found: {short} speaks "
-                                   "from the next line on.")
+            self.lbl_state.setText(_("✓ {language} voice found: {voice} speaks from the "
+                                     "next line on.", language=m.language_name, voice=short))
         self._refresh_translation()
         problems = getattr(self.ctl.tts, "problems", [])
         custom = getattr(self.ctl.tts, "custom", {})
         self.lbl_custom.setText("\n".join(f"⚠ {p}" for p in problems) if problems else
-                                f"{len(custom)} custom voice(s) loaded." if custom else "")
+                                ngettext("{n} custom voice loaded.", "{n} custom voices loaded.",
+                                         len(custom)) if custom else "")
         self.lbl_custom.setVisible(bool(self.lbl_custom.text()))
         if error:
-            self._tts_error(f"Text-to-speech isn't available: {errors.plain(error)}")
+            self._tts_error(_("Text-to-speech isn't available: {error}",
+                              error=errors.plain(error)))
 
     def show_custom_voices(self):
         """Open the Custom voices box and bring it into view."""
@@ -1835,24 +1860,25 @@ class SpeechPanel(QWidget):
     def _add_voice_server(self):
         """A small form for a TTS server's address; saved as a .json in the voices folder."""
         dlg = QDialog(self)
-        dlg.setWindowTitle("Add a voice server")
+        dlg.setWindowTitle(_("Add a voice server"))
         form = QFormLayout(dlg)
-        form.addRow(hint_label("A text-to-speech server running on your PC. Most have an "
-                               "OpenAI-style address ending in /v1/audio/speech; one that takes "
-                               "the text in the address can use {text} in it instead."))
+        form.addRow(hint_label(_("A text-to-speech server running on your PC. Most have an "
+                                 "OpenAI-style address ending in /v1/audio/speech; one that "
+                                 "takes the text in the address can use {text} in it instead.",
+                                 text="{text}")))
         ed_name = QLineEdit()
         ed_name.setPlaceholderText("Kokoro")
         ed_url = QLineEdit()
         ed_url.setPlaceholderText("http://127.0.0.1:8880/v1/audio/speech")
         ed_voice = QLineEdit()
-        ed_voice.setPlaceholderText("the server's voice name, e.g. af_bella (optional)")
+        ed_voice.setPlaceholderText(_("the server's voice name, e.g. af_bella (optional)"))
         ed_model = QLineEdit()
-        ed_model.setPlaceholderText("optional")
+        ed_model.setPlaceholderText(_("optional"))
         ed_key = QLineEdit()
         ed_key.setEchoMode(QLineEdit.Password)
-        ed_key.setPlaceholderText("only if the server asks for one")
-        for lbl, w in (("Name", ed_name), ("Address", ed_url), ("Voice", ed_voice),
-                       ("Model", ed_model), ("API key", ed_key)):
+        ed_key.setPlaceholderText(_("only if the server asks for one"))
+        for lbl, w in ((_("Name"), ed_name), (_("Address"), ed_url), (_("Voice"), ed_voice),
+                       (_("Model"), ed_model), (_("API key"), ed_key)):
             form.addRow(lbl, w)
         err = hint_label("")
         theme.set_tone(err, "error")
@@ -1865,20 +1891,22 @@ class SpeechPanel(QWidget):
         def ok():
             url = ed_url.text().strip()
             if not url.lower().startswith(("http://", "https://")):
-                err.setText("The address starts with http:// or https://")
+                err.setText(_("The address starts with http:// or https://"))
                 err.show()
                 return
             name = ed_name.text().strip() or "Voice server"
             try:
                 if customvoices.server_path(name).exists() and QMessageBox.question(
-                        dlg, "Add a voice server",
-                        f"There's already a voice server called “{name}”. Replace it?"
+                        dlg, _("Add a voice server"),
+                        _("There's already a voice server called “{name}”. Replace it?",
+                          name=name)
                 ) != QMessageBox.Yes:
                     return
                 customvoices.save_server(name, url, ed_voice.text().strip(),
                                          ed_model.text().strip(), ed_key.text().strip())
             except OSError as e:
-                err.setText(f"Couldn't save it in the voices folder: {errors.plain(e)}")
+                err.setText(_("Couldn't save it in the voices folder: {error}",
+                              error=errors.plain(e)))
                 err.show()
                 return
             self.s["voice"] = customvoices.PREFIX + name   # pick it once it's loaded
@@ -1886,8 +1914,9 @@ class SpeechPanel(QWidget):
         btns.accepted.connect(ok)
         if dlg.exec() == QDialog.Accepted:
             self.changed.emit(dict(self.s))
-            busy.toast(self, f"✓ Saved “{html.escape(ed_name.text().strip() or 'Voice server')}”"
-                       " — loading its voices…", "ok")
+            busy.toast(self, _("✓ Saved “{name}” — loading its voices…",
+                               name=html.escape(ed_name.text().strip() or "Voice server")),
+                       "ok")
             self._recheck_voices_asked()
 
     def _tts_error(self, msg: str):
@@ -1934,11 +1963,12 @@ class SpeechPanel(QWidget):
     def _fill_langs(self):
         self.cb_lang.blockSignals(True)
         self.cb_lang.clear()
-        self.cb_lang.addItem("English (as you say it)", "")
+        self.cb_lang.addItem(_("English (as you say it)"), "")
         for m in self.langs:
             name = m.language_name or m.language
             self.cb_lang.addItem(name if m.installed
-                                 else f"{name}  (download {translation.size_mb(m)} MB)",
+                                 else _("{language}  (download {size} MB)", language=name,
+                                        size=translation.size_mb(m)),
                                  m.language)
         self.cb_lang.setIconSize(QSize(20, 20))
         self.cb_lang.setCurrentIndex(max(0, self.cb_lang.findData(self.s["translate"])))
@@ -1966,11 +1996,11 @@ class SpeechPanel(QWidget):
         m = self._lang()
         if m is not None:
             name = m.language_name or m.language
-            self.lbl_delay.setText(
-                f"⏱ Others hear you in {name} a few seconds late: each sentence is "
+            self.lbl_delay.setText(_(
+                "⏱ Others hear you in {language} a few seconds late: each sentence is "
                 "written down, translated, then spoken once you've finished it. It works "
                 "with the AI voice, the voice changer and the computer voice; your real voice "
-                "is muted meanwhile.")
+                "is muted meanwhile.", language=name))
         self.lbl_delay.setVisible(m is not None)
         busy = self._dl_busy is not None
         self.tr_box.setVisible(m is not None or busy)
@@ -1986,46 +2016,50 @@ class SpeechPanel(QWidget):
         name = m.language_name or m.language
         live = self.ctl.live
         if not m.installed:
-            self.lbl_tr.setText(f"{name} needs a one-time download of its translation model "
-                                f"({translation.size_mb(m)} MB). After that, translating "
-                                "happens on this PC; what you say never leaves it.")
-            self.b_dl.setText(f"Download {name}")
+            self.lbl_tr.setText(_("{language} needs a one-time download of its translation "
+                                  "model ({size} MB). After that, translating happens on this "
+                                  "PC; what you say never leaves it.", language=name,
+                                  size=translation.size_mb(m)))
+            self.b_dl.setText(_("Download {language}", language=name))
             self.b_dl.show()
             # downloading voices switched off in Settings > Privacy: greyed, saying why
             self.b_dl.setEnabled(not live and net.allowed("voices"))
             self.b_dl.setToolTip(net.off_message("voices") if not net.allowed("voices") else
-                                 "Stop the voice to download this" if live else "")
+                                 _("Stop the voice to download this") if live else "")
             return
         self.b_dl_remove.setVisible(not live)
         if not self.ctl.tts.voices:        # still loading, or no speech at all
-            self.lbl_tr.setText(f"Say it in English; the voice says it in {name}.")
+            self.lbl_tr.setText(_("Say it in English; the voice says it in {language}.",
+                                  language=name))
             return
         voice = self._voice_for(m)
         if voice:
             short = customvoices.label(voice)
-            self.lbl_tr.setText(f"Say it in English; {short} says it in {name}. "
-                                "Translation is quick but not perfect with slang.")
+            self.lbl_tr.setText(_("Say it in English; {voice} says it in {language}. "
+                                  "Translation is quick but not perfect with slang.",
+                                  voice=short, language=name))
         else:
             self._watch_voices(True)
             for b in (self.b_voice_install, self.b_voices, self.b_voices_check):
                 b.show()
             if self._voice_installing is not None:
-                self.lbl_tr.setText(f"Installing the {name} voice\u2026 Say Yes to Windows' "
-                                    "permission prompt, then it downloads (a minute or two). "
-                                    "It's used by itself as soon as it's in.")
-                self.b_voice_install.setText("Installing\u2026")
+                self.lbl_tr.setText(_("Installing the {language} voice\u2026 Say Yes to "
+                                      "Windows' permission prompt, then it downloads (a minute "
+                                      "or two). It's used by itself as soon as it's in.",
+                                      language=name))
+                self.b_voice_install.setText(_("Installing\u2026"))
                 self.b_voice_install.setEnabled(False)
                 self.b_voices.hide()
                 return
-            self.b_voice_install.setText(f"Install the {name} voice")
+            self.b_voice_install.setText(_("Install the {language} voice", language=name))
             # Windows Update can't go through the app's connection: off means not at all
             self.b_voice_install.setEnabled(net.allowed("voices"))
             self.b_voice_install.setToolTip(
                 self._voice_install_tip if net.allowed("voices") else net.off_message("voices"))
-            self.lbl_tr.setText(self._voice_note or (
-                f"\u26a0 Windows has no {name} voice yet, so {name} can't be spoken "
+            self.lbl_tr.setText(self._voice_note or _(
+                "\u26a0 Windows has no {language} voice yet, so {language} can't be spoken "
                 "properly. Press Install (free, one click); it's picked up by itself "
-                "once it's in, even mid-sentence."))
+                "once it's in, even mid-sentence.", language=name))
 
     # ---- Windows voices
     def _install_voice(self):
@@ -2050,30 +2084,33 @@ class SpeechPanel(QWidget):
 
     def _on_voice_installed(self, result: str, err: str):
         m, self._voice_installing = self._voice_installing, None
-        name = (m.language_name or m.language) if m is not None else "the"
+        m = m or self._lang()
+        name = (m.language_name or m.language) if m is not None else ""
         if err:
-            self._voice_note = (f"\u26a0 Couldn't install the {name} voice: "
-                                f"{errors.plain(err)}. Press "
-                                "Install to try again, or add it in Windows settings.")
+            self._voice_note = _("\u26a0 Couldn't install the {language} voice: {error}. "
+                                 "Press Install to try again, or add it in Windows settings.",
+                                 language=name, error=errors.plain(err))
         elif result == "cancelled":
-            self._voice_note = (f"Windows' permission prompt was closed, so the {name} "
-                                "voice wasn't installed. Press Install to try again.")
+            self._voice_note = _("Windows' permission prompt was closed, so the {language} "
+                                 "voice wasn't installed. Press Install to try again.",
+                                 language=name)
         elif result == "restart":
-            self._voice_note = (f"The {name} voice is installed, but Windows wants the PC "
-                                "restarted to finish. After that it's picked up by itself.")
+            self._voice_note = _("The {language} voice is installed, but Windows wants the "
+                                 "PC restarted to finish. After that it's picked up by "
+                                 "itself.", language=name)
         else:
-            self._voice_note = (f"The {name} voice is installed; loading it\u2026 If it "
-                                "doesn't appear in a minute, press Reload voices or restart "
-                                "the PC.")
+            self._voice_note = _("The {language} voice is installed; loading it\u2026 If it "
+                                 "doesn't appear in a minute, press Reload voices or restart "
+                                 "the PC.", language=name)
         self._refresh_translation()
         if not err and result != "cancelled":
             self._recheck_voices()
 
     def _get_voice(self):
         self._voice_wait = busy.open_url(
-            "ms-settings:speech", self.b_voices, opened="✓ Opened Windows settings",
-            failed="Couldn't open Windows settings. Go to Settings → Time & language → "
-                   "Speech → Add voices yourself")
+            "ms-settings:speech", self.b_voices, opened=_("✓ Opened Windows settings"),
+            failed=_("Couldn't open Windows settings. Go to Settings → Time & language → "
+                     "Speech → Add voices yourself"))
 
     def _app_state(self, state):
         # back from Windows settings: a voice may have just been installed
@@ -2107,7 +2144,7 @@ class SpeechPanel(QWidget):
             return
         self._loading_since = time.monotonic()
         self.b_voices_check.setEnabled(False)
-        self.b_voices_check.setText("Reloading\u2026")
+        self.b_voices_check.setText(_("Reloading\u2026"))
 
         def work():
             self._voice_fp = winvoices.fingerprint()
@@ -2123,10 +2160,11 @@ class SpeechPanel(QWidget):
         if m is None or self._dl_busy is not None:
             return
         self._dl_busy, self._dl_cancel = m, False
-        _enable(self.cb_lang, False, "Waiting for the download to finish")
-        _enable(self.b_live, False, "Waiting for the download to finish")
+        _enable(self.cb_lang, False, _("Waiting for the download to finish"))
+        _enable(self.b_live, False, _("Waiting for the download to finish"))
         self._refresh_translation()
-        self.lbl_tr.setText(f"Downloading {m.language_name}\u2026 0%")
+        self.lbl_tr.setText(_("Downloading {language}\u2026 {percent}%",
+                              language=m.language_name, percent=0))
         netlog.cause("voices", f"You downloaded the {m.language_name} translation model")
 
         def work():
@@ -2148,25 +2186,28 @@ class SpeechPanel(QWidget):
         self._dl_cancel = True
         self.b_dl_cancel.setEnabled(False)
         if self._dl_busy is not None:
-            self.lbl_tr.setText("Cancelling…")
+            self.lbl_tr.setText(_("Cancelling…"))
 
     def _on_dl_progress(self, done: int, total: int):
         m = self._dl_busy
         if m is not None and not self._dl_cancel:
-            pct = f"{done * 100 // total}%" if total else f"{done // 1_000_000} MB"
-            self.lbl_tr.setText(f"Downloading {m.language_name}\u2026 {pct}")
+            self.lbl_tr.setText(
+                _("Downloading {language}\u2026 {percent}%", language=m.language_name,
+                  percent=done * 100 // total) if total else
+                _("Downloading {language}\u2026 {size} MB", language=m.language_name,
+                  size=done // 1_000_000))
 
     def _on_dl_done(self, err: str):
         m, self._dl_busy = self._dl_busy, None
-        _enable(self.cb_lang, not self.ctl.live, "Stop the computer voice to change this")
-        _enable(self.b_live, not self._installing, "Waiting for the install to finish")
+        _enable(self.cb_lang, not self.ctl.live, _("Stop the computer voice to change this"))
+        _enable(self.b_live, not self._installing, _("Waiting for the install to finish"))
         self.b_dl_cancel.setEnabled(True)
         self._fill_langs()
         if err and m is not None:
-            self.lbl_tr.setText("Download cancelled." if err == "cancelled"
-                                else f"\u26a0 {m.language_name}: {errors.plain(err)}. "
-                                     "Check your internet "
-                                     "connection and press Download again.")
+            self.lbl_tr.setText(_("Download cancelled.") if err == "cancelled"
+                                else _("\u26a0 {language}: {error}. Check your internet "
+                                       "connection and press Download again.",
+                                       language=m.language_name, error=errors.plain(err)))
         self.downloaded.emit()
 
     def _remove_download(self):
@@ -2174,9 +2215,9 @@ class SpeechPanel(QWidget):
         if m is None or self.ctl.live:
             return
         if QMessageBox.question(
-                self, "Delete download",
-                f"Delete the downloaded {m.language_name} translation? You can download "
-                "it again any time.") != QMessageBox.Yes:
+                self, _("Delete download"),
+                _("Delete the downloaded {language} translation? You can download it again "
+                  "any time.", language=m.language_name)) != QMessageBox.Yes:
             return
 
         def go():
@@ -2187,11 +2228,12 @@ class SpeechPanel(QWidget):
 
         def said(gone: bool):
             if gone:
-                busy.toast(self, f"✓ Deleted the {html.escape(m.language_name)} download", "ok")
+                busy.toast(self, _("✓ Deleted the {language} download",
+                                   language=html.escape(m.language_name)), "ok")
             else:
-                busy.toast(self, "Couldn't delete all of it (a file is in use). Restart Onion "
-                                 "Board and try again.", "warn")
-        busy.run_busy(self.b_dl_remove, "Deleting…", go, said)
+                busy.toast(self, _("Couldn't delete all of it (a file is in use). Restart "
+                                   "Onion Board and try again."), "warn")
+        busy.run_busy(self.b_dl_remove, _("Deleting…"), go, said)
 
     def _refresh_module(self):
         m = self.module
@@ -2202,14 +2244,13 @@ class SpeechPanel(QWidget):
         self.b_install.setVisible(m is not None and not ok)
         self.b_update.setVisible(m is not None)
         if m is None:
-            self.lbl_missing.setText(
+            self.lbl_missing.setText(_(
                 "The live-voice add-on is missing from this copy of Onion Board. Run the "
-                "installer again (it comes with every install), then press Refresh below.")
+                "installer again (it comes with every install), then press Refresh below."))
         elif not ok:
-            self.lbl_missing.setText("Speaking another language needs speech recognition "
-                                     "installed first (runs on this PC; what you say never "
-                                     "leaves it). "
-                                     "Needs Python 3.12+ from python.org.")
+            self.lbl_missing.setText(_("Speaking another language needs speech recognition "
+                                       "installed first (runs on this PC; what you say never "
+                                       "leaves it). Needs Python 3.12+ from python.org."))
             self.lbl_missing.setToolTip(str(m.path))
 
     def _install(self):
@@ -2219,10 +2260,10 @@ class SpeechPanel(QWidget):
         self._installing = True
         for b in (self.b_install, self.b_update, self.b_live):
             b.setEnabled(False)
-        self.b_install.setText("Installing… (a few minutes)")
-        self.b_update.setText("Updating… (a few minutes)")
+        self.b_install.setText(_("Installing… (a few minutes)"))
+        self.b_update.setText(_("Updating… (a few minutes)"))
         self.lbl_install.show()
-        self.lbl_install.setText("starting…")
+        self.lbl_install.setText(_("starting…"))
 
         def work():
             try:
@@ -2237,18 +2278,19 @@ class SpeechPanel(QWidget):
     def _on_install_done(self, ok: bool, err: str = ""):
         self._installing = False
         self.b_install.setEnabled(True)
-        self.b_install.setText("Install speech recognition")
-        _enable(self.b_update, not self.ctl.live, "Stop the computer voice to change this")
-        self.b_update.setText("Update speech recognition")
-        _enable(self.b_live, self._dl_busy is None, "Waiting for the download to finish")
+        self.b_install.setText(_("Install speech recognition"))
+        _enable(self.b_update, not self.ctl.live, _("Stop the computer voice to change this"))
+        self.b_update.setText(_("Update speech recognition"))
+        _enable(self.b_live, self._dl_busy is None, _("Waiting for the download to finish"))
         if ok:
             self.lbl_install.hide()
             self._refresh_module()
-            self.lbl_state.setText("Installed. Press Start and talk.")
+            self.lbl_state.setText(_("Installed. Press Start and talk."))
         else:
-            self.lbl_install.setText(f"⚠ Install failed: {err or self.lbl_install.text()}. "
-                                     "Press it again to retry; if it keeps failing, run "
-                                     "install.bat in the add-on's folder to see why.")
+            self.lbl_install.setText(_("⚠ Install failed: {error}. Press it again to retry; "
+                                       "if it keeps failing, run install.bat in the add-on's "
+                                       "folder to see why.",
+                                       error=err or self.lbl_install.text()))
 
     def _live_args(self) -> list[str]:
         """The live-voice helper's arguments; sets the voice translated lines use."""
@@ -2270,7 +2312,8 @@ class SpeechPanel(QWidget):
         if on and not self.ctl.live:
             m = self._lang()
             if m is not None and not m.installed:
-                self._set_live_ui(False, f"Download {m.language_name} first (above).")
+                self._set_live_ui(False, _("Download {language} first (above).",
+                                           language=m.language_name))
                 return
             try:
                 self.ctl.start_live(self.module, self._live_args())
@@ -2278,7 +2321,7 @@ class SpeechPanel(QWidget):
                 self._set_live_ui(False, f"⚠ {errors.plain(e)}")
                 return
             self._warm_for_a_line()   # its first line would otherwise wait for speech
-            self._set_live_ui(True, "starting…")
+            self._set_live_ui(True, _("starting…"))
         elif not on and self.ctl.live:
             self.ctl.stop_live()
             self._set_live_ui(False, IDLE_HINT)
@@ -2311,10 +2354,11 @@ class SpeechPanel(QWidget):
         try:
             self.ctl.start_live(self.module, self._live_args(), replace=(who == "fx"))
         except RuntimeError as e:
-            self._bg_note(f"⚠ Couldn't start translating: {errors.plain(e)}")
+            self._bg_note(_("⚠ Couldn't start translating: {error}", error=errors.plain(e)),
+                          warning=True)
             return
         self.bg_for, self._bg_key = who, key
-        self._bg_note("Starting the translation…")
+        self._bg_note(_("Starting the translation…"))
         self._refresh_translation()
 
     def _stop_bg(self):
@@ -2322,21 +2366,22 @@ class SpeechPanel(QWidget):
         self.ctl.stop_live()
         self._bg_note("")
 
-    def _bg_note(self, text: str):
+    def _bg_note(self, text: str, warning: bool = False):
         self.lbl_bg.setText(text)
+        self._bg_warning = warning and bool(text)
         self.lbl_bg.setVisible(bool(text))
 
     def _set_live_ui(self, on: bool, state: str):
         self.b_live.blockSignals(True)
         self.b_live.setChecked(on)
         self.b_live.blockSignals(False)
-        self.b_live.setText("Stop the computer voice" if on else "Start the computer voice")
+        self.b_live.setText(_("Stop the computer voice") if on else _("Start the computer voice"))
         self.live_changed.emit(on)
         for w in (self.cb_model, self.ed_lang, self.cb_lang):
-            _enable(w, not on, "Stop the computer voice to change this")
+            _enable(w, not on, _("Stop the computer voice to change this"))
         _enable(self.b_update, not on and not self._installing,
-                "Stop the computer voice to change this" if on
-                else "Waiting for the install to finish")
+                _("Stop the computer voice to change this") if on
+                else _("Waiting for the install to finish"))
         self.lbl_state.setText(state)
         self._refresh_translation()
 
@@ -2347,41 +2392,46 @@ class SpeechPanel(QWidget):
             self._on_bg_event(t, text, ev)
             return
         if t == "tts_error":
-            self._tts_error(f"Couldn't speak that line: {text}")
+            self._tts_error(_("Couldn't speak that line: {error}", error=text))
         elif t == "status":
             self.lbl_state.setText(text)
         elif t == "ready":
-            self.lbl_state.setText("● listening")
+            self.lbl_state.setText(_("● listening"))
         elif t == "vad":
-            self.lbl_state.setText("● hearing you…" if ev.get("speaking") else "● listening")
+            self.lbl_state.setText(_("● hearing you…") if ev.get("speaking")
+                                   else _("● listening"))
         elif t == "final" and text:
             orig = str(ev.get("original", ""))
-            self._log_said(f"{text}   (you said: {orig})" if orig else text)
+            self._log_said(_("{text}   (you said: {original})", text=text, original=orig)
+                           if orig else text)
         elif t == "error":
             self.lbl_state.setText(f"⚠ {text}")
         elif t == "stopped":
-            self._set_live_ui(False, f"⚠ stopped: {text}" if text else "stopped")
+            self._set_live_ui(False, _("⚠ stopped: {error}", error=text) if text
+                              else _("stopped"))
 
     def _on_bg_event(self, t, text: str, ev: dict):
         name = self._bg_key[1] if self._bg_key else ""
         m = self._lang()
         name = (m.language_name or m.language) if m is not None else name
         if t == "ready" or (t == "vad" and not ev.get("speaking")):
-            self._bg_note(f"● Listening: say it in English, it comes out in {name}.")
+            self._bg_note(_("● Listening: say it in English, it comes out in {language}.",
+                            language=name))
         elif t == "vad":
-            self._bg_note("● Hearing you…")
+            self._bg_note(_("● Hearing you…"))
         elif t == "status":
             self._bg_note(text)
         elif t == "final" and text:
             orig = str(ev.get("original", ""))
-            self._log_said(f"{text}   (you said: {orig})" if orig else text)
+            self._log_said(_("{text}   (you said: {original})", text=text, original=orig)
+                           if orig else text)
         elif t == "error":
-            self._bg_note(f"⚠ {text}")
+            self._bg_note(f"⚠ {text}", warning=True)
         elif t == "stopped":
             self._bg_failed = self._bg_key
             self.bg_for, self._bg_key = "", ()
-            self._bg_note(f"⚠ Translating stopped: {text}" if text
-                          else "Translating stopped.")
+            self._bg_note(_("⚠ Translating stopped: {error}", error=text) if text
+                          else _("Translating stopped."), warning=bool(text))
             self._refresh_translation()
 
     @staticmethod
@@ -2408,15 +2458,15 @@ class ModulesList(QWidget):
         v = QVBoxLayout(self)
         v.setContentsMargins(0, 0, 0, 0)
         v.setSpacing(12)
-        self.title = section_label("ADD-ONS")
+        self.title = section_label(_("ADD-ONS"))
         v.addWidget(self.title)
         self.list = QVBoxLayout()
         self.list.setSpacing(10)
         v.addLayout(self.list)
         row = QHBoxLayout()
-        b = self.b_refresh = QPushButton("Refresh")
+        b = self.b_refresh = QPushButton(_("Refresh"))
         b.clicked.connect(self._refresh)
-        o = QPushButton("Open folder")
+        o = QPushButton(_("Open folder"))
         o.clicked.connect(lambda: SpeechPanel._open_folder(btn=o))
         row.addWidget(b)
         row.addWidget(o)
@@ -2426,7 +2476,7 @@ class ModulesList(QWidget):
     def _refresh(self):
         if busy.is_busy(self.b_refresh):
             return   # already checking: a double click mustn't start it twice
-        busy.hold_until(self.b_refresh, "Checking…", self.shown, lambda: "✓ Up to date")
+        busy.hold_until(self.b_refresh, _("Checking…"), self.shown, lambda: _("✓ Up to date"))
         self.refresh.emit()
 
     def show_modules(self, infos: list[mods.ModuleInfo]):
@@ -2451,25 +2501,27 @@ class ModulesList(QWidget):
             if m.error:
                 state = f"⚠ {m.error}"
             elif m.kind == "service" and not m.installed:
-                state = ("not set up yet: press Install speech recognition above"
-                         if m.id == LIVE_MODULE else "not set up yet")
+                state = (_("not set up yet: press Install speech recognition above")
+                         if m.id == LIVE_MODULE else _("not set up yet"))
             elif m.kind == "effects":
-                state = "on" if m.loaded else "not loaded"
+                state = _("on") if m.loaded else _("not loaded")
             else:
-                state = "ready"
+                state = _("ready")
             row(f"<b>{e(m.name)}</b> {e(m.version)} · {e(state)}",
                 f"{m.description}" + chr(10) + str(m.path))
         if langs:
             have = [m.language_name or m.name for m in langs if m.installed]
             more = [m.language_name or m.name for m in langs if not m.installed]
-            parts = [f"{', '.join(have)} downloaded"] if have else []
+            parts = [_("{languages} downloaded", languages=", ".join(have))] if have else []
             if more:
-                parts.append(f"{', '.join(more)} can be downloaded under Speak in")
-            row(f"<b>Languages</b> · {e('; '.join(parts))}",
-                chr(10).join(f"{m.language_name or m.name}: {translation.size_mb(m)} MB"
-                          for m in langs))
+                parts.append(_("{languages} can be downloaded under Speak in",
+                               languages=", ".join(more)))
+            row(_("<b>Languages</b> · {state}", state=e("; ".join(parts))),
+                chr(10).join(_("{language}: {size} MB", language=m.language_name or m.name,
+                               size=translation.size_mb(m))
+                             for m in langs))
         if not voice:
-            self.list.addWidget(hint_label("No voice add-ons installed."))
+            self.list.addWidget(hint_label(_("No voice add-ons installed.")))
         self.shown.emit()
 
 
@@ -2514,14 +2566,14 @@ class CardHead(QWidget):
         return self._open
 
     def set_state(self, on: bool, note: str = ""):
-        text = " \u00b7 ".join(t for t in ("On" if on else "", note) if t)
+        text = " \u00b7 ".join(t for t in (_("On") if on else "", note) if t)
         self.pill.setText(text)
         self.pill.setVisible(bool(text))
 
     def _paint_arrow(self):
         icons.set_icon(self.arrow, "fold_open" if self._open else "fold", "muted", "text",
                        size=14)
-        self.arrow.setToolTip("Fold this card away" if self._open else "Show this card")
+        self.arrow.setToolTip(_("Fold this card away") if self._open else _("Show this card"))
 
     def _toggled(self, open_: bool):
         self._open = open_
@@ -2709,9 +2761,10 @@ class VoicePanel(QWidget):
         if who and not sp.bg_for:
             sp._bg_note("")               # "turn on a voice": one is on now
         sp.translate_for(who)
-        if m is not None and not fg and not who and not sp.lbl_bg.text().startswith("\u26a0"):
-            sp._bg_note("Turn on the AI voice or the voice changer below, or press Start "
-                        f"for the computer voice, to speak {m.language_name or m.language}.")
+        if m is not None and not fg and not who and not sp._bg_warning:
+            sp._bg_note(_("Turn on the AI voice or the voice changer below, or press Start "
+                          "for the computer voice, to speak {language}.",
+                          language=m.language_name or m.language))
 
     # ---- cards that fold away
     def _fold_card(self, key: str, panel: QWidget) -> QFrame:
@@ -2746,7 +2799,7 @@ class VoicePanel(QWidget):
             return
         m = self.speech.translating()
         lang = (m.language_name or m.language) if m is not None else ""
-        late = f"in {lang}, a few seconds late" if lang else ""
+        late = _("in {language}, a few seconds late", language=lang) if lang else ""
         fx, ai, tts = (self.fx.btn_power.isChecked(), self.ai.is_on(),
                        self.speech.b_live.isChecked())
         self._heads["fx"].set_state(fx, late if fx and not ai and not tts else "")

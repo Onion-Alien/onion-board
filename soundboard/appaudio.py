@@ -30,6 +30,7 @@ from dataclasses import dataclass, field
 import numpy as np
 
 from soundboard import errors
+from soundboard.i18n import _
 
 log = logging.getLogger(__name__)
 
@@ -110,11 +111,12 @@ if _win:
 def supported() -> tuple[bool, str]:
     """(can this machine capture a program's audio, why not)."""
     if not _win:
-        return False, "Capturing a program's audio needs Windows."
+        return False, _("Capturing a program's audio needs Windows.")
     build = sys.getwindowsversion().build
     if build < MIN_BUILD:
-        return False, (f"Capturing a program's audio needs Windows 11, or Windows 10 "
-                       f"updated to version 2004 or newer (this is build {build}).")
+        return False, _("Capturing a program's audio needs Windows 11, or Windows 10 "
+                        "updated to version 2004 or newer (this is build {build}).",
+                        build=build)
     return True, ""
 
 
@@ -1016,7 +1018,7 @@ class AppCapture:
             self.error = supported()[1]
             return False
         if not is_running(self.pid):   # Windows would happily "capture" a pid that's gone
-            self.error = "That program isn't running any more."
+            self.error = _("That program isn't running any more.")
             self.ended = True
             return False
         self._started = process_started(self.pid)
@@ -1024,7 +1026,7 @@ class AppCapture:
         if not wait:
             return True
         if not self._ready.wait(timeout):
-            self.error = "Windows didn't answer in time. Switch Send on to try again."
+            self.error = _("Windows didn't answer in time. Switch Send on to try again.")
             self._stop.set()
             return False
         return self.error is None
@@ -1097,7 +1099,7 @@ class AppCapture:
         try:
             if not handler.done.wait(5.0):
                 handler.abandon()   # it stays alive in _Handler._live for a late callback
-                raise TimeoutError("Windows didn't answer the capture request.")
+                raise TimeoutError(_("Windows didn't answer the capture request."))
         finally:
             Com(op.value).release()
         if handler.hr < 0:
@@ -1154,7 +1156,8 @@ class AppCapture:
             from soundboard import applog
             applog.report(where=f"sending {self.name}'s audio")
             # surfaces on the Apps tab, which stops the capture and shows this
-            self.error = "Sending this program's sound failed. Switch Send on to try again."
+            self.error = _("Sending this program's sound failed. "
+                           "Switch Send on to try again.")
             return False
 
     def _loop(self, cap: Com, fmt: WAVEFORMATEX, is_float: bool, evt):
@@ -1203,17 +1206,18 @@ class AppCapture:
 
 def _explain(e: ComError) -> str:
     if e.hr == AUDCLNT_E_DEVICE_INVALIDATED & 0xFFFFFFFF:
-        return "The program's audio device went away. Switch Send on to try again."
+        return _("The program's audio device went away. Switch Send on to try again.")
     if e.hr == 0x88890008:
-        return ("Windows won't hand this program's audio over in a format we can use. "
-                "Try switching the program to another output device.")
+        return _("Windows won't hand this program's audio over in a format we can use. "
+                 "Try switching the program to another output device.")
     if e.hr == 0x80070057 or e.hr == 0x88890001:   # E_INVALIDARG / NOT_INITIALIZED
-        return ("Windows refused to capture this program. Check it's still running, "
-                "then switch Send on again.")
+        return _("Windows refused to capture this program. Check it's still running, "
+                 "then switch Send on again.")
     if e.hr in (0x80070005, 0x88890010):   # E_ACCESSDENIED / AUDCLNT_E_DEVICE_IN_USE
-        return ("Windows won't let this app capture that program's audio. If the program "
-                "runs as administrator, run this app as administrator too.")
+        return _("Windows won't let this app capture that program's audio. If the program "
+                 "runs as administrator, run this app as administrator too.")
     ok, why = supported()
     if not ok:
         return why
-    return f"Windows couldn't start the capture ({errors.plain(e)}). Switch Send on to try again."
+    return _("Windows couldn't start the capture ({error}). Switch Send on to try again.",
+             error=errors.plain(e))

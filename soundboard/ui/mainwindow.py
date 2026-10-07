@@ -2532,7 +2532,7 @@ class MainWindow(QMainWindow):
             log.info("who's listening: %s mode switched to %s (%s)", p.key, key,
                      self.mode_why)
             self.toast(_("{mode} mode: shaping for {target}. {mode_why}.",
-                         mode=p.label, target=mode.label, mode_why=self.mode_why))
+                         mode=p.name, target=mode.name, mode_why=self.mode_why))
             return
         key = self.voice_suggestion
         if not d.get("auto") or key not in destination.BUILTIN_BY_KEY:
@@ -2544,7 +2544,7 @@ class MainWindow(QMainWindow):
         self._save_later()
         log.info("who's listening: switched to %s (%s)", key, self.voice_why)
         self.toast(_("Who's listening: {label}. {voice_why}.",
-                     label=mode.label, voice_why=self.voice_why))
+                     label=mode.name, voice_why=self.voice_why))
 
     def _save_later(self):
         self._save_timer.start(400)

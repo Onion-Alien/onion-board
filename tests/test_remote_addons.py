@@ -216,7 +216,7 @@ def test_never_on_a_network_windows_calls_public(qapp, window, loaded,  # noqa: 
     srv = loaded.server
     monkeypatch.setattr(netcategory, "category", lambda ip: netcategory.PUBLIC)
     assert not srv.start(0, "add-on-key", "127.0.0.1") and not srv.running
-    assert srv.error == remote.PUBLIC_NETWORK
+    assert srv.error == remote.public_network()
     monkeypatch.setattr(netcategory, "category", lambda ip: None)   # can't tell: on
     assert srv.start(0, "add-on-key", "127.0.0.1")
     asked = []
@@ -231,7 +231,7 @@ def test_never_on_a_network_windows_calls_public(qapp, window, loaded,  # noqa: 
     monkeypatch.setattr(netcategory, "category", lambda ip: netcategory.PUBLIC)
     srv._check_network()
     assert process_events(qapp, lambda: not srv.running, timeout=3)
-    assert srv.error == remote.PUBLIC_NETWORK
+    assert srv.error == remote.public_network()
     assert "Public" in window.status.text()
     loop = remote.RemoteControl(lambda a, p: (200, {}))   # Stream Deck side: 127.0.0.1
     assert loop.start(0, "k") and loop.running

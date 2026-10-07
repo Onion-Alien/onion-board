@@ -18,6 +18,7 @@ from PySide6.QtGui import QColor, QCursor, QFont, QImage, QPainter, QPainterPath
 from PySide6.QtWidgets import QSizePolicy, QWidget
 
 from soundboard import theme
+from soundboard.i18n import _
 from soundboard.ui import appstate
 
 # drawn on a 100 x 120 canvas, scaled to the requested height
@@ -213,9 +214,9 @@ def sparkle(p: QPainter, x: float, y: float, r: float, col: QColor):
 
 
 # ---------------------------------------------------------------------- alive
-WAIT_LINES = ("pleeease?", "just one picture?", "I'll watch anything…", "hoo? hoo…?",
-              "so… bored…", "my turn yet?")
-JOY_LINES = ("yay!! ↓ down there!", "hoo-ray!", "let's watch something!")
+WAIT_LINES = (_("pleeease?"), _("just one picture?"), _("I'll watch anything…"),
+              _("hoo? hoo…?"), _("so… bored…"), _("my turn yet?"))
+JOY_LINES = (_("yay!! ↓ down there!"), _("hoo-ray!"), _("let's watch something!"))
 # the little acts he does while he waits, and how long each lasts (seconds)
 ACTS = {"sigh": 1.8, "plead": 3.0, "tear": 2.6, "peek": 2.2, "doze": 5.0}
 
@@ -257,7 +258,7 @@ class OwlWidget(QWidget):
         # overlaps him a little)
         self.setSizePolicy(QSizePolicy.Maximum, QSizePolicy.Fixed)
         self.setCursor(Qt.PointingHandCursor)
-        self.setToolTip("Hoot is waiting for something to watch")
+        self.setToolTip(_("Hoot is waiting for something to watch"))
         self._rng = random.Random()
         self._t0 = self._last = time.monotonic()
         self.t = 0.0

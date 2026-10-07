@@ -31,7 +31,28 @@ import os
 import sys
 import threading
 import time
+from collections.abc import Callable, Mapping
 from pathlib import Path
+
+from soundboard.i18n import _
+
+
+class _Shown(Mapping):
+    """A table whose names are translated each time it's read: this module is imported
+    before the language is set, so a plain dict would keep the English."""
+
+    def __init__(self, make: Callable[[], dict]):
+        self._make = make
+
+    def __getitem__(self, key):
+        return self._make()[key]
+
+    def __iter__(self):
+        return iter(self._make())
+
+    def __len__(self):
+        return len(self._make())
+
 
 # file name (lower case) -> destination mode key
 SIGNATURES = {
@@ -44,14 +65,14 @@ PREFIXES = {"photonvoice": "unity"}   # PhotonVoice.dll, PhotonVoice.API.dll, â€
 # which wins when a game ships more than one (an Unreal game can carry a Vivox plugin
 # next to Photon's): the one found first in this order
 ORDER = ("game", "unity")
-NAMES = {"game": "Vivox", "unity": "Photon or Dissonance"}   # for the hint
+NAMES = _Shown(lambda: {"game": "Vivox", "unity": _("Photon or Dissonance")})   # for the hint
 # voice chat programs that record the cable, by exe: (mode key, name for the hint).
 # TeamSpeak and Mumble sit with Vivox's mode (Opus mono, a high-pass ~80 Hz: see
 # destination.BUILTIN). A browser recording the cable is a call in a web page (Meet,
 # Discord in a browser): the browser mode, which Zoom and Teams share (on the bench it
 # gets them their level back; their AI noise suppression is what hurts, and no mode
 # fixes that: docs/GAME-VOICE.md).
-VOICE_APPS = {
+_VOICE_APPS = {
     "chrome.exe": ("webrtc", "Your browser"),
     "msedge.exe": ("webrtc", "Your browser"),
     "firefox.exe": ("webrtc", "Your browser"),
@@ -70,6 +91,15 @@ VOICE_APPS = {
     "teamspeak.exe": ("game", "TeamSpeak"),
     "mumble.exe": ("game", "Mumble"),
 }
+
+
+def _app_name(name: str) -> str:
+    """A VOICE_APPS name as shown (the programs' own names stay as they are)."""
+    return _("Your browser") if name == "Your browser" else name
+
+
+VOICE_APPS = _Shown(lambda: {exe: (key, _app_name(name))
+                             for exe, (key, name) in _VOICE_APPS.items()})
 # folders that hold game data, never a voice library: not worth listing on a slow disk
 SKIP_DIRS = {"content", "paks", "movies", "videos", "streamingassets", "localization",
              "logs", "saved", "shadercache", "screenshots", "__pycache__", ".git"}

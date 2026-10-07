@@ -39,6 +39,8 @@ import urllib.parse
 from dataclasses import dataclass, field
 from pathlib import Path
 
+from soundboard.i18n import _
+
 log = logging.getLogger(__name__)
 
 MAX_ENTRIES = 1000
@@ -342,15 +344,15 @@ def _remove(path: Path) -> None:
 # --------------------------------------------------------------------------- for the view
 
 def feature_label(feature: str) -> str:
-    """What a feature key is for, in words."""
+    """What a feature key is for, in words (in the language picked)."""
     from soundboard import net
     if feature == net.TEST:
-        return "Proxy test button"
-    main, _, sub = feature.partition(".")
+        return _("Proxy test button")
+    main, __, sub = feature.partition(".")
     if main not in net.FEATURES:
-        return "(didn't say)"
-    label = net.FEATURES[main]
-    return f"{label} ({net.SITES[sub]})" if sub in net.SITES else label
+        return _("(didn't say)")
+    label = net.feature_name(main)
+    return f"{label} ({net.site_name(sub)})" if sub in net.SITES else label
 
 
 def redact(target: str) -> str:
@@ -392,8 +394,8 @@ def why(e: Entry) -> str:
 
 
 def outcome(e: Entry) -> str:
-    return {CONNECTING: "Connecting…", CONNECTED: "Open", CLOSED: "Done",
-            BLOCKED: "Blocked", FAILED: "Failed"}[e.state]
+    return {CONNECTING: _("Connecting…"), CONNECTED: _("Open"), CLOSED: _("Done"),
+            BLOCKED: _("Blocked"), FAILED: _("Failed")}[e.state]
 
 
 @dataclass

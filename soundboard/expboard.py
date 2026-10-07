@@ -20,6 +20,7 @@ import re
 from pathlib import Path
 
 from soundboard.otherboards import Entry, Source, vk_hotkey
+from soundboard.i18n import _
 
 MAX_BYTES = 20 * 1024 * 1024
 _PREFS_KEY = r"Software\JavaSoft\Prefs\/Expenosa's /Soundboard"
@@ -111,7 +112,7 @@ def read(path: str | Path) -> list[Entry]:
     plain message if it isn't one."""
     path = Path(path)
     if path.stat().st_size > MAX_BYTES:
-        raise ValueError("that file is too big to be an EXP Soundboard board")
+        raise ValueError(_("that file is too big to be an EXP Soundboard board"))
     raw = path.read_bytes()
     try:
         text = raw.decode("utf-8-sig")
@@ -120,10 +121,10 @@ def read(path: str | Path) -> list[Entry]:
     try:
         data = json.loads(text)
     except ValueError as e:
-        raise ValueError("that isn't an EXP Soundboard board (it couldn't be read)") from e
+        raise ValueError(_("that isn't an EXP Soundboard board (it couldn't be read)")) from e
     rows = data.get("soundboardEntries") if isinstance(data, dict) else None
     if not isinstance(rows, list):
-        raise ValueError("that isn't an EXP Soundboard board")
+        raise ValueError(_("that isn't an EXP Soundboard board"))
     out = []
     for r in rows:
         f = r.get("file") if isinstance(r, dict) else None

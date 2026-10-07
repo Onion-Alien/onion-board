@@ -25,6 +25,7 @@ import struct
 from pathlib import Path
 
 from soundboard.otherboards import Entry, Source, vk_hotkey
+from soundboard.i18n import _
 
 PAGE = 8192
 MAGIC = b"** This is a LiteDB file **"
@@ -202,10 +203,10 @@ def read(path: str | Path) -> list[Entry]:
     with a plain message if it isn't one."""
     path = Path(path)
     if path.stat().st_size > MAX_BYTES:
-        raise ValueError("that file is too big to be a Resanance board")
+        raise ValueError(_("that file is too big to be a Resanance board"))
     raw = path.read_bytes()
     if raw[32:32 + len(MAGIC)] != MAGIC:
-        raise ValueError("that isn't a Resanance board")
+        raise ValueError(_("that isn't a Resanance board"))
     pages = _pages(raw)
     log = path.with_name(path.stem + "-log" + path.suffix)
     if log.is_file() and log.stat().st_size <= MAX_BYTES:
