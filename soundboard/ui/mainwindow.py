@@ -4192,7 +4192,9 @@ class MainWindow(QMainWindow):
 
         def closed(_r):
             self._record_dlg = None
-            QTimer.singleShot(0, lambda: free_dialog(d))   # after its own signal returns
+            # after its own signal returns; tied to `d`, so nothing runs if the window
+            # (and the dialog with it) is gone first
+            QTimer.singleShot(0, d, lambda: free_dialog(d))
         d.finished.connect(closed)
         d.setModal(False)
         d.show()
