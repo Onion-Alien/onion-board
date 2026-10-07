@@ -454,7 +454,7 @@ class MainWindow(QMainWindow):
         QApplication.instance().applicationStateChanged.connect(self._set_tick_rate)
         # Space plays / pauses on the Sounds and Radio tabs, wherever the focus is
         self._space = SpaceKey(self, self._space_action)
-        QApplication.instance().installEventFilter(self._space)
+        theme.app_filter(QApplication.instance(), self._space)
         # which voice chat the game you're playing uses: a hint by Who's listening
         self.voice_suggestion: str | None = None
         self.voice_why = ""   # why it's suggested, for the hint ("Discord is listening…")
