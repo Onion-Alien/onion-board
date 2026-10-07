@@ -22,6 +22,7 @@ from soundboard.engine import SR
 from soundboard.library import AUDIO_EXTS, SoundMeta
 from soundboard.settings import pretty_key
 from soundboard.ui.bunnywidget import BunnyWidget
+from soundboard.i18n import _
 
 PAD_MIME = "application/x-soundboard-pad"
 
@@ -33,7 +34,7 @@ class Meter(QWidget):
         self._hot = False
         self._drawn = None        # (bar width in px, colour) as last painted
         self.setFixedHeight(8)
-        self.setAccessibleName("Level meter")
+        self.setAccessibleName(_("Level meter"))
 
     @property
     def hot(self) -> bool:
@@ -86,8 +87,8 @@ class EqCurve(QWidget):
         self.setFixedHeight(70)
         self.gains = [0.0] * 7
         self.on = False
-        self.setToolTip("Double-click to reset")
-        self.setAccessibleName("EQ curve")
+        self.setToolTip(_("Double-click to reset"))
+        self.setAccessibleName(_("EQ curve"))
         self._freqs = np.geomspace(30, 18000, 160)
 
     def set_gains(self, gains, on):
@@ -894,7 +895,7 @@ class PadGrid(QWidget):
                    "just one sound?", "I'm bored…"),
             hope_lines=("yes! drop it!", "ooh, for me?!"),
             joy_lines=("yay!!", "↑ Add sounds!", "hehe!"))
-        self.bun.setToolTip("Bun is waiting for some sounds")
+        self.bun.setToolTip(_("Bun is waiting for some sounds"))
         ev.addWidget(self.bun, 0, Qt.AlignHCenter)
         self.empty_text = QLabel(self.HOW_TO)
         self.empty_text.setAlignment(Qt.AlignCenter)   # short lines: fits the mini player

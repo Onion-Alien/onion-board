@@ -22,6 +22,7 @@ from PySide6.QtWidgets import QApplication, QLabel, QWidget
 
 from soundboard import theme
 from soundboard import errors
+from soundboard.i18n import _
 
 FLASH_MS = 2200
 _IDLE = "_busy_idle_text"
@@ -198,7 +199,7 @@ class _Toast(QLabel):
         self.setTextFormat(Qt.RichText)
         self.setAlignment(Qt.AlignCenter)
         self.setAttribute(Qt.WA_TransparentForMouseEvents)
-        self.setAccessibleName("Notice")
+        self.setAccessibleName(_("Notice"))
         self._timer = QTimer(self, singleShot=True, timeout=self.hide)
         host.installEventFilter(self)
         self.hide()
