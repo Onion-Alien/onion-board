@@ -228,7 +228,9 @@ def test_peak_watcher_reads_meters_between_scans_and_releases_them(monkeypatch):
     assert w.peak(42) == pytest.approx(0.5)
     for m in made:                                  # it keeps reading without rescanning
         m.v = 0.0
-    time.sleep(0.3)
+    deadline = time.monotonic() + 3                 # (falls over a few reads: a busy PC
+    while w.peak(42) >= 0.05 and time.monotonic() < deadline:   # runs fewer of them)
+        time.sleep(0.01)
     assert w.peak(42) < 0.05 and len(made) == 2
     t = w._thread
     w.stop()

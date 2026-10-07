@@ -103,9 +103,13 @@ the run goes on. Wall-clock audio timing tests carry `conftest.real_pc_timing`: 
 shared runners stall a thread as long as the hitch they measure, so they run on a
 real PC only. Something a test makes that a thread of its own (or Qt's) calls back
 into is stopped after the test (`_STOP_AFTER_TEST` in `conftest.py`), as the app
-stops it when its tab goes. `PYTEST_XDIST_AUTO_NUM_WORKERS=N` sets the workers for
-the whole suite; `PYTEST_DEBUG_TEMPROOT` puts the tests' temp folders on another
-drive (worth it when the system drive is slow).
+stops it when its tab goes. A test that needs `time.sleep`, `threading.Thread` and
+the like faked gives only the module under test a fake one (`conftest.own_module`,
+`own_time`): patched on the real module, every leftover thread in the worker spins
+or never starts. A wait on another thread polls until done (with a generous limit)
+instead of sleeping a fixed time. `PYTEST_XDIST_AUTO_NUM_WORKERS=N` sets the workers
+for the whole suite (8 on CI's 4 cores measured no faster than 4: runners differ by
+up to 2x from run to run, so compare runs started at the same time).
 
 ### How heavy is it (the performance suite)
 

@@ -67,6 +67,3 @@ jobs:
       - run: .venv\Scripts\python -m pytest --durations=20
         env:
           QT_QPA_PLATFORM: offscreen
-          # the runner has 4 cores, but most tests spend their time waiting (threads,
-          # child processes, timers): 8 workers take ~135 s where 4 took ~265 s
-          PYTEST_XDIST_AUTO_NUM_WORKERS: "8"
