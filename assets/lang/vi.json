@@ -634,5 +634,6 @@
   ],
   "{n} min ago": "{n} phút trước",
   "✓ Fades set": "✓ Đã đặt tăng / giảm dần",
-  "✓ Volume {pct}%": "✓ Âm lượng {pct}%"
+  "✓ Volume {pct}%": "✓ Âm lượng {pct}%",
+  "Fix Discord": "Sửa Discord"
 }

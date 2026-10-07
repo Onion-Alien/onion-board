@@ -650,5 +650,6 @@
   ],
   "{n} min ago": "il y a {n} min",
   "✓ Fades set": "✓ Fondus réglés",
-  "✓ Volume {pct}%": "✓ Volume {pct}%"
+  "✓ Volume {pct}%": "✓ Volume {pct}%",
+  "Fix Discord": "Réparer Discord"
 }

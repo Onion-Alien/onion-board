@@ -634,5 +634,6 @@
   ],
   "{n} min ago": "{n} นาทีที่แล้ว",
   "✓ Fades set": "✓ ตั้งเฟดแล้ว",
-  "✓ Volume {pct}%": "✓ ระดับเสียง {pct}%"
+  "✓ Volume {pct}%": "✓ ระดับเสียง {pct}%",
+  "Fix Discord": "แก้ Discord"
 }

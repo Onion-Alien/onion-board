@@ -714,5 +714,6 @@
   ],
   "{n} min ago": "قبل {n} دقيقة",
   "✓ Fades set": "✓ ضُبط الظهور والتلاشي",
-  "✓ Volume {pct}%": "✓ مستوى الصوت {pct}%"
+  "✓ Volume {pct}%": "✓ مستوى الصوت {pct}%",
+  "Fix Discord": "إصلاح Discord"
 }

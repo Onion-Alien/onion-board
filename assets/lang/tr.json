@@ -650,5 +650,6 @@
   ],
   "{n} min ago": "{n} dk önce",
   "✓ Fades set": "✓ Geçişler ayarlandı",
-  "✓ Volume {pct}%": "✓ Ses düzeyi %{pct}"
+  "✓ Volume {pct}%": "✓ Ses düzeyi %{pct}",
+  "Fix Discord": "Discord'u düzelt"
 }

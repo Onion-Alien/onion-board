@@ -634,5 +634,6 @@
   ],
   "{n} min ago": "{n} 分前",
   "✓ Fades set": "✓ フェードを設定しました",
-  "✓ Volume {pct}%": "✓ 音量 {pct}%"
+  "✓ Volume {pct}%": "✓ 音量 {pct}%",
+  "Fix Discord": "Discord を修正"
 }

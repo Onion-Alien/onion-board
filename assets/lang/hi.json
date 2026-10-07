@@ -650,5 +650,6 @@
   ],
   "{n} min ago": "{n} मिनट पहले",
   "✓ Fades set": "✓ फ़ेड सेट हो गए",
-  "✓ Volume {pct}%": "✓ वॉल्यूम {pct}%"
+  "✓ Volume {pct}%": "✓ वॉल्यूम {pct}%",
+  "Fix Discord": "Discord ठीक करें"
 }

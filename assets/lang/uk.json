@@ -666,5 +666,6 @@
   ],
   "{n} min ago": "{n} хв тому",
   "✓ Fades set": "✓ Наростання й згасання задано",
-  "✓ Volume {pct}%": "✓ Гучність {pct}%"
+  "✓ Volume {pct}%": "✓ Гучність {pct}%",
+  "Fix Discord": "Виправити Discord"
 }

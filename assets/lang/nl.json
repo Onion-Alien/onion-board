@@ -650,5 +650,6 @@
   ],
   "{n} min ago": "{n} min geleden",
   "✓ Fades set": "✓ Faden ingesteld",
-  "✓ Volume {pct}%": "✓ Volume {pct}%"
+  "✓ Volume {pct}%": "✓ Volume {pct}%",
+  "Fix Discord": "Discord repareren"
 }

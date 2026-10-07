@@ -650,5 +650,6 @@
   ],
   "{n} min ago": "vor {n} Min.",
   "✓ Fades set": "✓ Ein-/Ausblenden gesetzt",
-  "✓ Volume {pct}%": "✓ Lautstärke {pct}%"
+  "✓ Volume {pct}%": "✓ Lautstärke {pct}%",
+  "Fix Discord": "Discord reparieren"
 }

@@ -634,5 +634,6 @@
   ],
   "{n} min ago": "{n}분 전",
   "✓ Fades set": "✓ 페이드 설정됨",
-  "✓ Volume {pct}%": "✓ 볼륨 {pct}%"
+  "✓ Volume {pct}%": "✓ 볼륨 {pct}%",
+  "Fix Discord": "Discord 고치기"
 }

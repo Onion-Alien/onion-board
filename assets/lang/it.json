@@ -650,5 +650,6 @@
   ],
   "{n} min ago": "{n} min fa",
   "✓ Fades set": "✓ Dissolvenze impostate",
-  "✓ Volume {pct}%": "✓ Volume {pct}%"
+  "✓ Volume {pct}%": "✓ Volume {pct}%",
+  "Fix Discord": "Sistema Discord"
 }
