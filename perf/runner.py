@@ -412,8 +412,24 @@ def parse_args(argv=None):
     return args
 
 
+def source_label() -> str:
+    """What was measured: the commit (and branch) of this checkout, for --compare."""
+    try:
+        r = subprocess.run(["git", "log", "-1", "--format=%h %D"], cwd=ROOT,
+                           capture_output=True, text=True, timeout=10)
+        if r.returncode == 0 and r.stdout.strip():
+            return r.stdout.strip()[:80]
+    except (OSError, subprocess.SubprocessError):
+        pass
+    return ROOT.name
+
+
 def main(argv=None) -> int:
     args = parse_args(argv)
+    try:   # report.md has → in it; a cp1252 console can't print that
+        sys.stdout.reconfigure(errors="replace")
+    except (AttributeError, ValueError):
+        pass
     if args.real_window:
         print("perf: the --real-window tier isn't finished and opens real windows; "
               "it stays off until it's been checked with the user (see perf/README.md).")
@@ -428,7 +444,7 @@ def main(argv=None) -> int:
     out.mkdir(parents=True, exist_ok=True)
     t0 = time.perf_counter()
     hz = winproc.cycles_per_second()
-    report = {"tier": args.tier, "started": stamp, "source": str(ROOT.name),
+    report = {"tier": args.tier, "started": stamp, "source": source_label(),
               "machine": {"cpus": os.cpu_count(), "cycles_ghz": round(hz / 1e9, 3),
                           "python": sys.version.split()[0]},
               "env": args.env, "real_window": args.real_window,
