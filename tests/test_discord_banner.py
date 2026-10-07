@@ -17,7 +17,8 @@ def window(main_window):  # noqa: F811
 def found(**over):
     return [dc.parse({"default": dict({"activeInputProfile": "CUSTOM",
                                        "noiseCancellation": False, "echoCancellation": False,
-                                       "automaticGainControl": False}, **over)})]
+                                       "automaticGainControl": False,
+                                       "modeOptions": {"vadUseKrisp": False}}, **over)})]
 
 
 def test_studio_on_the_mic_gets_the_urgent_bar(window, monkeypatch):
