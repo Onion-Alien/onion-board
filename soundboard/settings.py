@@ -25,73 +25,73 @@ from soundboard.ui import overlay as ovl
 from soundboard.wheelguard import no_wheel
 from soundboard.winkeys import Hotkeys
 from soundboard import errors
-from soundboard.i18n import _
+from soundboard.i18n import _, ngettext
 
 log = logging.getLogger(__name__)
 
 # Global hotkey actions: (config attribute, action id, label, what it does).
 # Grouped for the Settings window; the action ids go to MainWindow.on_hotkey.
 HOTKEY_GROUPS = [
-    ("Sounds", [
-        ("stop_hotkey", "__stop__", "Stop everything",
-         "Stops every sound, the radio and every program."),
-        ("pause_hotkey", "__pause__", "Pause / resume sounds",
-         "Pauses everything playing; press again to carry on."),
-        ("random_hotkey", "__random__", "Play a random sound",
-         "From the category showing (All = any sound), never the same one twice in a row. "
-         "A category can have its own: right-click its tab."),
-        ("last_hotkey", "__last__", "Play the last sound again",
-         "Whatever played last, from a pad, a hotkey or the random key."),
-        ("vol_up_hotkey", "__volup__", "Sounds louder",
-         "Turns your sounds up by 10% (what others hear and what you hear)."),
-        ("vol_down_hotkey", "__voldown__", "Sounds quieter",
-         "Turns your sounds down by 10%."),
+    (_("Sounds"), [
+        ("stop_hotkey", "__stop__", _("Stop everything"),
+         _("Stops every sound, the radio and every program.")),
+        ("pause_hotkey", "__pause__", _("Pause / resume sounds"),
+         _("Pauses everything playing; press again to carry on.")),
+        ("random_hotkey", "__random__", _("Play a random sound"),
+         _("From the category showing (All = any sound), never the same one twice in a row. "
+           "A category can have its own: right-click its tab.")),
+        ("last_hotkey", "__last__", _("Play the last sound again"),
+         _("Whatever played last, from a pad, a hotkey or the random key.")),
+        ("vol_up_hotkey", "__volup__", _("Sounds louder"),
+         _("Turns your sounds up by 10% (what others hear and what you hear).")),
+        ("vol_down_hotkey", "__voldown__", _("Sounds quieter"),
+         _("Turns your sounds down by 10%.")),
     ]),
-    ("Categories", [
-        ("next_cat_hotkey", "__nextcat__", "Next category",
-         "Shows the next category's pads. The random-sound key and the overlay follow it, "
-         "so one key plays a random sound from whichever category you switched to."),
-        ("prev_cat_hotkey", "__prevcat__", "Previous category",
-         "Shows the category before it."),
+    (_("Categories"), [
+        ("next_cat_hotkey", "__nextcat__", _("Next category"),
+         _("Shows the next category's pads. The random-sound key and the overlay follow it, "
+           "so one key plays a random sound from whichever category you switched to.")),
+        ("prev_cat_hotkey", "__prevcat__", _("Previous category"),
+         _("Shows the category before it.")),
     ]),
-    ("Mic and voice", [
-        ("mic_hotkey", "__mic__", "Send my mic on / off",
-         "Others hear your voice with the sounds, or only the sounds."),
-        ("voice_hotkey", "__voice__", "Voice changer on / off",
-         "Turns the voice changer on with the voice picked on the Voice tab, or off."),
-        ("voice_hold_hotkey", "__voicehold__", "Change my voice while held",
-         "The voice changer is on only while you hold this key down."),
+    (_("Mic and voice"), [
+        ("mic_hotkey", "__mic__", _("Send my mic on / off"),
+         _("Others hear your voice with the sounds, or only the sounds.")),
+        ("voice_hotkey", "__voice__", _("Voice changer on / off"),
+         _("Turns the voice changer on with the voice picked on the Voice tab, or off.")),
+        ("voice_hold_hotkey", "__voicehold__", _("Change my voice while held"),
+         _("The voice changer is on only while you hold this key down.")),
     ]),
-    ("Turn hotkeys off", [
-        ("hotkeys_off_hotkey", "__hotkeys__", "All hotkeys off / on",
-         "Turns every other hotkey off, so they type normally (in chat, say), and back "
-         "on. Hotkeys are always on when Onion Board opens."),
+    (_("Turn hotkeys off"), [
+        ("hotkeys_off_hotkey", "__hotkeys__", _("All hotkeys off / on"),
+         _("Turns every other hotkey off, so they type normally (in chat, say), and back "
+           "on. Hotkeys are always on when Onion Board opens.")),
     ]),
-    ("Instant replay", [
-        ("replay_hotkey", "__replay__", "Save what you just heard",
-         "Turns instant replay on: the last 30 seconds of everything your PC plays (a "
-         "friend in Discord, the game, a video; not Onion Board's own sounds) are kept "
-         "in memory, and this key adds them to your Sounds as a pad. Nothing is saved "
-         "until you press it. Clear the key to switch it off. Only keep clips of people "
-         "who are fine with it: in some places, recording a call needs everyone's OK."),
+    (_("Instant replay"), [
+        ("replay_hotkey", "__replay__", _("Save what you just heard"),
+         _("Turns instant replay on: the last 30 seconds of everything your PC plays (a "
+           "friend in Discord, the game, a video; not Onion Board's own sounds) are kept "
+           "in memory, and this key adds them to your Sounds as a pad. Nothing is saved "
+           "until you press it. Clear the key to switch it off. Only keep clips of people "
+           "who are fine with it: in some places, recording a call needs everyone's OK.")),
     ]),
-    ("Overlay", [
-        ("overlay_hotkey", "__overlay__", "Open the in-game overlay",
-         "Sound tiles over your game; pick one with the number keys. See the Overlay tab."),
+    (_("Overlay"), [
+        ("overlay_hotkey", "__overlay__", _("Open the in-game overlay"),
+         _("Sound tiles over your game; pick one with the number keys. See the Overlay tab.")),
     ]),
 ]
 HOTKEY_ACTIONS = [a for __, group in HOTKEY_GROUPS for a in group]
 
 # Settings > About. The note is the author's own words, kept casual on purpose.
-NOTE = ("Hey, thanks for actually using this. Onion Board started because every soundboard "
-        "I tried was either ugly, full of ads, or quietly phoning home, so I made my own "
-        "and it kind of snowballed from there. It's just me building it, a lot of late "
-        "nights and a lot of testing, so if something's broken, ugly or confusing, tell "
-        "me. Honestly. I'd way rather hear \"this part is cooked\" than have you quietly "
-        "uninstall it.\n\nIt's free and it's staying free. Have fun with it, don't be a "
-        "menace with it, and go make your friends jump in voice chat.\n\n— OnionAlien")
+NOTE = _("Hey, thanks for actually using this. Onion Board started because every soundboard "
+          "I tried was either ugly, full of ads, or quietly phoning home, so I made my own "
+          "and it kind of snowballed from there. It's just me building it, a lot of late "
+          "nights and a lot of testing, so if something's broken, ugly or confusing, tell "
+          "me. Honestly. I'd way rather hear \"this part is cooked\" than have you quietly "
+          "uninstall it.\n\nIt's free and it's staying free. Have fun with it, don't be a "
+          "menace with it, and go make your friends jump in voice chat.\n\n— OnionAlien")
 # Plain words, not a contract: the LICENSE file is the real terms.
-DISCLAIMER = (
+DISCLAIMER = _(
     "Onion Board is provided as is, with no warranty: use it at your own risk (the "
     "LICENSE file has the full terms). In plain words:"
     "<ul style='margin-left:-24px'>"
@@ -185,13 +185,13 @@ class HotkeyDialog(QDialog):
         free = [d for d in found if d not in busy]
         lines = []
         if free:
-            lines.append("…or hit a pad on " + ", ".join(free) + ".")
+            lines.append(_("…or hit a pad on {devices}.", devices=", ".join(free)))
         if busy:
             warn = theme.status("warn")
-            lines.append(f"<span style='color:{warn}'>" + ", ".join(sorted(busy))
-                         + " is open in another program (a music app?), so its pads can't "
-                         "be used here. Close that program and it's picked up in a few "
-                         "seconds.</span>")
+            lines.append(_("<span style='color:{warn}'>{devices} is open in another program "
+                           "(a music app?), so its pads can't be used here. Close that "
+                           "program and it's picked up in a few seconds.</span>",
+                           warn=warn, devices=", ".join(sorted(busy))))
         self.pads_note.setText("<br>".join(lines))
         self.pads_note.setVisible(bool(lines))
 
@@ -418,19 +418,19 @@ class SettingsDialog(QDialog):
         self.tabs = QTabWidget()
         self.tabs.setDocumentMode(True)
         self.hk_buttons: dict[str, list[QPushButton]] = {}
-        pages = (("privacy", "Privacy && security", "shield", self._privacy),
-                 ("connection", "Connection", "radio", self._connection),
-                 ("data", "Data && quality", "wave", self._data),
-                 ("general", "General", "settings", self._general),
-                 ("tabs", "Tabs", "sounds", self._tabs),
-                 ("appearance", "Appearance", "palette", self._appearance),
-                 ("audio", "Audio", "volume", self._audio),
-                 ("hotkeys", "Hotkeys", "keyboard", self._hotkeys),
-                 ("overlay", "Overlay", "gamepad", self._overlay),
-                 ("updates", "Updates", "reload", self._updates),
-                 ("help", "Add-ons && help", "plus", self._help),
-                 ("remote", "Remote", "cable", self._remote),
-                 ("about", "About", "star", self._about))
+        pages = (("privacy", _("Privacy && security"), "shield", self._privacy),
+                 ("connection", _("Connection"), "radio", self._connection),
+                 ("data", _("Data && quality"), "wave", self._data),
+                 ("general", _("General"), "settings", self._general),
+                 ("tabs", _("Tabs"), "sounds", self._tabs),
+                 ("appearance", _("Appearance"), "palette", self._appearance),
+                 ("audio", _("Audio"), "volume", self._audio),
+                 ("hotkeys", _("Hotkeys"), "keyboard", self._hotkeys),
+                 ("overlay", _("Overlay"), "gamepad", self._overlay),
+                 ("updates", _("Updates"), "reload", self._updates),
+                 ("help", _("Add-ons && help"), "plus", self._help),
+                 ("remote", _("Remote"), "cable", self._remote),
+                 ("about", _("About"), "star", self._about))
         self.categories = QListWidget()
         self.categories.setObjectName("settingscategories")
         self.categories.setAccessibleName(_("Settings categories"))
@@ -576,8 +576,8 @@ class SettingsDialog(QDialog):
         cv.addLayout(row)
         v.addWidget(card)
         v.addWidget(self._highlight_card())
-        hints = {"Classic": "Changes the whole app instantly.",
-                 "Meme": "For when you want your soundboard to be a bit."}
+        hints = {"Classic": _("Changes the whole app instantly."),
+                 "Meme": _("For when you want your soundboard to be a bit.")}
         for group, names in theme.GROUPS:
             card, cv = self._card(group, hints.get(group, ""))
             cards = []
@@ -661,7 +661,7 @@ class SettingsDialog(QDialog):
             hue.blockSignals(False)
             now.setText(_("Now: your own colour, in every theme.")
                         if theme.live_override else
-                        _("Now: {current_name}'s own colour.", current_name=theme.current_name))
+                        _("Now: {theme}'s own colour.", theme=theme.current_name))
             preview()
 
         def use(colour: str, btn=None, done: str = "") -> bool:
@@ -681,15 +681,15 @@ class SettingsDialog(QDialog):
         settle.timeout.connect(lambda: use(own(hue.value())))
 
         def pick():
-            c = QColorDialog.getColor(QColor(theme.T["live"]), self, "Highlight colour")
+            c = QColorDialog.getColor(QColor(theme.T["live"]), self, _("Highlight colour"))
             if c.isValid():
-                use(c.name(), more, "✓ Changed")
+                use(c.name(), more, _("✓ Changed"))
 
         def back():
             if not theme.live_override:
                 busy.flash(reset, _("✓ Already the theme's"))
             else:
-                use("", reset, "✓ Back to the theme's")
+                use("", reset, _("✓ Back to the theme's"))
         more.clicked.connect(pick)
         reset.clicked.connect(back)
         self._sync_highlight = sync
@@ -716,7 +716,8 @@ class SettingsDialog(QDialog):
             card, cv = self._card(group)
             for attr, _action, label, desc in actions:
                 self._hk_row(cv, attr, label, desc)
-            if group == "Categories":   # its keys and the per-category sets go together
+            # the Categories group: its keys and the per-category sets go together
+            if any(a[0] == "next_cat_hotkey" for a in actions):
                 scoped = QCheckBox(_("Use hotkeys per category"))
                 scoped.setToolTip(_("One key can play a different sound in each category: switch "
                                     "category (its tab, or the keys above) and the same keys "
@@ -735,7 +736,7 @@ class SettingsDialog(QDialog):
                               _("Only if you use push-to-talk in a game or Discord: set your "
                                 "push-to-talk key and the app holds it for you while a sound, "
                                 "live radio or a program plays. Leave it Off for open mic."))
-        self._hk_row(cv, "ptt_key", "Hold this key", "")
+        self._hk_row(cv, "ptt_key", _("Hold this key"), "")
         v.addWidget(card)
         card, cv = self._card(_("Hotkey sounds"),
                               _("Short beeps in your headphones (only you hear them) when a "
@@ -791,7 +792,8 @@ class SettingsDialog(QDialog):
         for attr, buttons in self.hk_buttons.items():
             combo = getattr(self.mw.cfg, attr)
             for b in buttons:
-                b.setText(pretty_key(combo) or ("Off" if attr == "ptt_key" else "Click to set…"))
+                b.setText(pretty_key(combo)
+                          or (_("Off") if attr == "ptt_key" else _("Click to set…")))
 
     def _capture(self, attr):
         # auto push-to-talk presses the key itself: that can't be a MIDI pad
@@ -813,7 +815,7 @@ class SettingsDialog(QDialog):
                               _("Press the hotkey in a game and your sounds appear on top of it. "
                                 "The game keeps your keyboard and mouse, and the overlay's keys "
                                 "go back to the game the moment it closes."))
-        self._hk_row(cv, "overlay_hotkey", "Overlay hotkey", "")
+        self._hk_row(cv, "overlay_hotkey", _("Overlay hotkey"), "")
         test = QPushButton(_("Open overlay"))
         test.setToolTip(_("Opens it now, the same as the hotkey: pick a sound with its keys or a "
                           "click. Esc, this button or the hotkey closes it"))
@@ -902,10 +904,11 @@ class SettingsDialog(QDialog):
         sl = QSlider(Qt.Horizontal)
         sl.setRange(lo, hi)
         sl.setValue(value)
-        val = QLabel(f"{value} %")
+        val = QLabel(_("{percent} %", percent=value))
         val.setFixedWidth(48)
         val.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
-        sl.valueChanged.connect(lambda x: (val.setText(f"{x} %"), self._ov_set(key, x)))
+        sl.valueChanged.connect(lambda x: (val.setText(_("{percent} %", percent=x)),
+                                           self._ov_set(key, x)))
         no_wheel(sl)
         row.addWidget(sl, 1)
         row.addWidget(val)
@@ -921,7 +924,8 @@ class SettingsDialog(QDialog):
     def _monitor_choices(self, current: str) -> list[tuple[str, str]]:
         choices = ovl.monitor_choices(QApplication.screens(), QApplication.primaryScreen())
         if current not in dict(choices):   # a monitor that isn't plugged in right now
-            choices.append((current, f"{current.rpartition('@')[0] or current}  (not connected)"))
+            choices.append((current, _("{monitor}  (not connected)",
+                                       monitor=current.rpartition('@')[0] or current)))
         return choices
 
     def _ov_dragged(self):
@@ -986,8 +990,10 @@ class SettingsDialog(QDialog):
         cv.addWidget(lat)
         e = self.mw.engine
         xr = sum(e.xruns.values())
-        stat = QLabel(f"Since start: {xr} drop-out{'s' if xr != 1 else ''}, "
-                      f"{e.stalls} device reconnect{'s' if e.stalls != 1 else ''}.")
+        stat = QLabel(_("Since start: {dropouts}, {reconnects}.",
+                        dropouts=ngettext("{n} drop-out", "{n} drop-outs", xr),
+                        reconnects=ngettext("{n} device reconnect", "{n} device reconnects",
+                                            e.stalls)))
         stat.setObjectName("hint")
         cv.addWidget(stat)
         v.addWidget(card)
@@ -1091,9 +1097,9 @@ class SettingsDialog(QDialog):
         grid.setVerticalSpacing(6)
         self.dev_combos = []
         for r, (text, src, attr) in enumerate((
-                ("Input — my mic", mw.cb_mic, "mic_device"),
-                ("Output — my headphones", mw.cb_mon, "mon_device"),
-                ("Send my sounds to", mw.cb_route, "route"))):
+                (_("Input — my mic"), mw.cb_mic, "mic_device"),
+                (_("Output — my headphones"), mw.cb_mon, "mon_device"),
+                (_("Send my sounds to"), mw.cb_route, "route"))):
             cb = QComboBox()
             cb.setMinimumWidth(120)
             # sized for a short name, the list opens wide enough for whole ones (device
@@ -1194,13 +1200,15 @@ class SettingsDialog(QDialog):
             h = QHBoxLayout(row)
             h.setContentsMargins(0, 0, 0, 0)
             missing = cat not in self.mw.cfg.categories
-            lbl = QLabel(f"{exe}  →  “{cat}”" + (_("  (no such category now)") if missing
-                                                   else ""))
+            lbl = QLabel(_("{program}  →  “{category}”  (no such category now)",
+                           program=exe, category=cat) if missing else
+                         _("{program}  →  “{category}”", program=exe, category=cat))
             lbl.setObjectName("muted" if missing else "")
             h.addWidget(lbl, 1)
             rm = QPushButton(_("Remove"))
             rm.setObjectName("small")
-            rm.setToolTip(_("Stop switching to “{cat}” when {exe} is in front", cat=cat, exe=exe))
+            rm.setToolTip(_("Stop switching to “{category}” when {program} is in front",
+                            category=cat, program=exe))
             icons.set_icon(rm, "trash", "danger_text", size=12)
             rm.clicked.connect(lambda _c=False, e=exe: self.mw.remove_category_program(e))
             h.addWidget(rm)
@@ -1208,11 +1216,11 @@ class SettingsDialog(QDialog):
 
     # Settings > Tabs: what each tab that can be switched off is for (taboff.KEYS)
     TAB_HINTS = {
-        "radio": "Internet radio stations from around the world.",
-        "apps": "Send another program's sound (a music player, a game) to others.",
-        "triggers": "Play a sound when something shows up on your screen (Onion Watch).",
-        "voice": "The voice changer, AI voices and talking as a computer voice. Off: "
-                 "your mic goes out as it is.",
+        "radio": _("Internet radio stations from around the world."),
+        "apps": _("Send another program's sound (a music player, a game) to others."),
+        "triggers": _("Play a sound when something shows up on your screen (Onion Watch)."),
+        "voice": _("The voice changer, AI voices and talking as a computer voice. Off: "
+                   "your mic goes out as it is."),
     }
 
     def _tabs(self):
@@ -1319,8 +1327,8 @@ class SettingsDialog(QDialog):
         if icon:
             icons.set_icon(btn, icon)
         btn.clicked.connect(lambda: busy.open_url(
-            url, btn, opened="✓ Opened in your browser",
-            failed="Couldn't open your browser. The page is"))
+            url, btn, opened=_("✓ Opened in your browser"),
+            failed=_("Couldn't open your browser. The page is")))
         return btn
 
     def _about_card(self):
@@ -1329,7 +1337,7 @@ class SettingsDialog(QDialog):
         from soundboard.ui.mainwindow import version_text
         from soundboard.updates import REPO
         card, cv = self._card("Onion Board")
-        ver = self.about_version = QLabel(_("Version {version_text}", version_text=version_text()))
+        ver = self.about_version = QLabel(_("Version {version}", version=version_text()))
         ver.setTextInteractionFlags(Qt.TextSelectableByMouse)
         cv.addWidget(ver)
         hint = QLabel(_("Free, with no ads and no account. Made by OnionAlien. MIT license with "
@@ -1339,10 +1347,10 @@ class SettingsDialog(QDialog):
         hint.setWordWrap(True)
         cv.addWidget(hint)
         row = _button_row()
-        row.addWidget(self._link_button("Website", "https://onion-alien.github.io/onion-board/",
+        row.addWidget(self._link_button(_("Website"), "https://onion-alien.github.io/onion-board/",
                                         "browser"))
-        row.addWidget(self._link_button("Source code", f"https://github.com/{REPO}"))
-        row.addWidget(self._link_button("Licenses", f"https://github.com/{REPO}#license"))
+        row.addWidget(self._link_button(_("Source code"), f"https://github.com/{REPO}"))
+        row.addWidget(self._link_button(_("Licenses"), f"https://github.com/{REPO}#license"))
         cv.addLayout(row)
         return card
 
@@ -1356,12 +1364,13 @@ class SettingsDialog(QDialog):
                                 "account. Found a security problem? Report it privately on "
                                 "GitHub, not in a public issue."))
         row = _button_row()
-        send = self._link_button("Send feedback", feedback.feedback_url(__version__), "speech")
+        send = self._link_button(_("Send feedback"), feedback.feedback_url(__version__), "speech")
         send.setObjectName("primary")
         row.addWidget(send)
-        row.addWidget(self._link_button("Report a problem", feedback.problem_url(__version__)))
+        row.addWidget(self._link_button(_("Report a problem"),
+                                        feedback.problem_url(__version__)))
         row.addWidget(self._link_button(
-            "Report a security issue", f"https://github.com/{REPO}/security/advisories/new",
+            _("Report a security issue"), f"https://github.com/{REPO}/security/advisories/new",
             "shield"))
         cv.addLayout(row)
         return card
@@ -1419,11 +1428,11 @@ class SettingsDialog(QDialog):
         status.setObjectName("hint")
         status.setWordWrap(True)
         btns = {}
-        for key, text, icon in (("get", f"Get {name}", ""),
-                                ("check", "Check for updates", "reload"),
-                                ("reinstall", "Reinstall", ""),
-                                ("report", "Report a problem", ""),
-                                ("remove", "Remove…", "trash")):
+        for key, text, icon in (("get", _("Get {name}", name=name), ""),
+                                ("check", _("Check for updates"), "reload"),
+                                ("reinstall", _("Reinstall"), ""),
+                                ("report", _("Report a problem"), ""),
+                                ("remove", _("Remove…"), "trash")):
             b = QPushButton(text)
             if icon:
                 icons.set_icon(b, icon, "danger_text" if key == "remove" else None)
@@ -1439,8 +1448,8 @@ class SettingsDialog(QDialog):
     def _addon_report(self, btn, what: str):
         from soundboard import __version__, feedback
         busy.open_url(feedback.problem_url(__version__, what), btn,
-                      opened="✓ Opened in your browser",
-                      failed="Couldn't open your browser. The page is")
+                      opened=_("✓ Opened in your browser"),
+                      failed=_("Couldn't open your browser. The page is"))
 
     def _addon_check(self, btn, feature: str, latest, newer_than: str, on_offer):
         """Check for updates: asks GitHub on a thread (`latest()` -> offer or None);
@@ -1458,19 +1467,20 @@ class SettingsDialog(QDialog):
             if not qt_valid(btn):
                 return
             if error:
-                release("Couldn't check")
+                release(_("Couldn't check"))
                 busy.toast(self, html.escape(error), "warn")
             elif offer is not None and updates.newer(offer.version, newer_than):
                 release()
                 on_offer(offer)
             else:
-                release("✓ Up to date")
+                release(_("✓ Up to date"))
 
         def ask():
             try:
                 offer, error = latest(), ""
             except Exception as e:  # noqa: BLE001 - offline, rate-limited, switched off…
-                offer, error = None, f"Couldn't reach GitHub ({errors.plain(e)})."
+                offer, error = None, _("Couldn't reach GitHub ({error}).",
+                                       error=errors.plain(e))
             try:
                 relay.done.emit(offer, error)
             except RuntimeError:        # Settings was closed meanwhile
@@ -1481,7 +1491,7 @@ class SettingsDialog(QDialog):
     # ---- Onion Watch (the Triggers tab's add-on, soundboard.watchaddon)
     def _watch_block(self, grid):
         from soundboard import watchaddon
-        status, b = self._addon_block(grid, "Onion Watch", "the Triggers tab")
+        status, b = self._addon_block(grid, "Onion Watch", _("the Triggers tab"))
         self.addon_label, self.addon_remove = status, b["remove"]
         self.watch_buttons = b
         state = {}
@@ -1504,8 +1514,8 @@ class SettingsDialog(QDialog):
             b["report"].setVisible(True)   # back on (Settings > Tabs)
             info = t.info
             have = info is not None and watchaddon.removable(info, t._base())
-            status.setText(note or (f"Version {info.version} is installed." if have else
-                                    "Onion Watch isn't installed."))
+            status.setText(note or (_("Version {version} is installed.", version=info.version)
+                                    if have else _("Onion Watch isn't installed.")))
             b["get"].setVisible(not have)
             for k in ("check", "reinstall", "remove"):
                 b[k].setVisible(have)
@@ -1528,11 +1538,12 @@ class SettingsDialog(QDialog):
                 t._finished.disconnect(finished)
                 if not qt_valid(btn):
                     return
-                release("✗ Didn't work" if error else "✓ Done")
+                release(_("✗ Didn't work") if error else _("✓ Done"))
                 state.pop("offer", None)
-                refresh(f"Onion Watch wasn't installed: {errors.plain(error)}" if error
-                        else (f"Version {info.version} is in. Restart Onion Board to "
-                              "start using it." if _update else ""))
+                refresh(_("Onion Watch wasn't installed: {error}", error=errors.plain(error))
+                        if error else
+                        (_("Version {version} is in. Restart Onion Board to start using it.",
+                           version=info.version) if _update else ""))
                 QTimer.singleShot(0, lambda: refresh() if not error and not _update
                                   else None)
             t._finished.connect(finished)
@@ -1540,7 +1551,7 @@ class SettingsDialog(QDialog):
 
         def check():
             if state.get("offer") is not None:      # "Update to X"
-                run_get(state["offer"], b["check"], "Updating…")
+                run_get(state["offer"], b["check"], _("Updating…"))
                 return
             if tab() is None:
                 return
@@ -1559,10 +1570,10 @@ class SettingsDialog(QDialog):
                 tab().remove()              # asks first
             refresh()
 
-        b["get"].clicked.connect(lambda: run_get(None, b["get"], "Getting it…"))
+        b["get"].clicked.connect(lambda: run_get(None, b["get"], _("Getting it…")))
         b["check"].clicked.connect(check)
         b["reinstall"].clicked.connect(lambda: run_get(None, b["reinstall"],
-                                                       "Reinstalling…"))
+                                                       _("Reinstalling…")))
         b["report"].clicked.connect(lambda: self._addon_report(
             b["report"], f"Onion Watch {tab().info.version}"
             if tab() is not None and tab().info else "Onion Watch"))
@@ -1584,7 +1595,7 @@ class SettingsDialog(QDialog):
     # ---- Onion Pocket (the phone remote, soundboard.pocketaddon)
     def _pocket_block(self, grid):
         from soundboard import pocketaddon, updates
-        status, b = self._addon_block(grid, "Onion Pocket", "your pads on your phone")
+        status, b = self._addon_block(grid, "Onion Pocket", _("your pads on your phone"))
         self.pocket_remove_addons = b["remove"]
         self.pocket_buttons = b
         state = {}
@@ -1595,11 +1606,12 @@ class SettingsDialog(QDialog):
             info = self._pocket_info()
             have = info is not None and pocketaddon.removable(info)
             if info is not None and info.error and have:
-                note = note or f"Version {info.version} is installed but didn't start: " \
-                               f"{info.error}. Reinstall it, or report the problem."
-            status.setText(note or (f"Version {info.version} is installed. Its settings "
-                                    "are on the Remote page." if have else
-                                    "Onion Pocket isn't installed."))
+                note = note or _("Version {version} is installed but didn't start: "
+                                 "{error}. Reinstall it, or report the problem.",
+                                 version=info.version, error=info.error)
+            status.setText(note or (_("Version {version} is installed. Its settings are on "
+                                      "the Remote page.", version=info.version) if have else
+                                    _("Onion Pocket isn't installed.")))
             b["get"].setVisible(not have and pocketaddon.offered())
             for k in ("check", "reinstall", "remove"):
                 b[k].setVisible(have)
@@ -1611,7 +1623,7 @@ class SettingsDialog(QDialog):
 
         def check():
             if state.get("offer") is not None:      # "Update to X"
-                self._pocket_install(b["check"], state["offer"], "Updating…")
+                self._pocket_install(b["check"], state["offer"], _("Updating…"))
                 return
             info = self._pocket_info()
 
@@ -1623,10 +1635,10 @@ class SettingsDialog(QDialog):
                               info.version if info else "0", found)
 
         b["get"].clicked.connect(lambda: self._pocket_install(b["get"], None,
-                                                              "Getting it…"))
+                                                              _("Getting it…")))
         b["check"].clicked.connect(check)
         b["reinstall"].clicked.connect(lambda: self._pocket_install(b["reinstall"], None,
-                                                                    "Reinstalling…"))
+                                                                    _("Reinstalling…")))
         b["report"].clicked.connect(lambda: self._addon_report(
             b["report"], f"Onion Pocket {i.version}" if (i := self._pocket_info())
             else "Onion Pocket"))
@@ -1656,19 +1668,20 @@ class SettingsDialog(QDialog):
             if not qt_valid(btn):
                 return
             if addon is None:
-                release("✗ Didn't work")
-                busy.toast(self, "Couldn't get Onion Pocket right now. Check your "
-                                 "internet connection and try again.", "warn")
+                release(_("✗ Didn't work"))
+                busy.toast(self, _("Couldn't get Onion Pocket right now. Check your "
+                                   "internet connection and try again."), "warn")
                 self._pocket_changed()
                 return
-            release("✓ Done")
+            release(_("✓ Done"))
             if getattr(self, "_pocket_slot", None) is not None:
                 fresh = self._addon_card(new, addon)
                 if fresh is not None:
                     self._pocket_remove_button(fresh, new)
                 self._swap_pocket_slot(fresh)
             self._pocket_changed()
-            busy.toast(self, f"✓ Onion Pocket {html.escape(new.version)} is in.", "ok")
+            busy.toast(self, _("✓ Onion Pocket {version} is in.",
+                               version=html.escape(new.version)), "ok")
 
         relay.done.connect(finish)
         threading.Thread(target=lambda: relay.done.emit(pocketaddon.get(offer=offer)),
@@ -1687,14 +1700,14 @@ class SettingsDialog(QDialog):
         send = QPushButton(_("Send feedback"))
         send.setObjectName("primary")
         send.clicked.connect(lambda: busy.open_url(
-            feedback.feedback_url(__version__), send, opened="✓ Opened in your browser",
-            failed="Couldn't open your browser. The page is"))
+            feedback.feedback_url(__version__), send, opened=_("✓ Opened in your browser"),
+            failed=_("Couldn't open your browser. The page is")))
         icons.set_icon(send, "speech")
         bug = QPushButton(_("Report a problem on GitHub"))
         bug.setToolTip(_("For people with a GitHub account: opens a new bug report"))
         bug.clicked.connect(lambda: busy.open_url(
-            feedback.problem_url(__version__), bug, opened="✓ Opened in your browser",
-            failed="Couldn't open your browser. The page is"))
+            feedback.problem_url(__version__), bug, opened=_("✓ Opened in your browser"),
+            failed=_("Couldn't open your browser. The page is")))
         row.addWidget(send)
         row.addWidget(bug)
         cv.addLayout(row)
@@ -1713,8 +1726,8 @@ class SettingsDialog(QDialog):
         btn = QPushButton(_("♥  Support Onion Board"))
         btn.clicked.connect(lambda: busy.open_url(
             f"https://github.com/{REPO}#support-onion-board", btn,
-            opened="✓ Opened in your browser — thank you!",
-            failed="Couldn't open your browser. The page is"))
+            opened=_("✓ Opened in your browser — thank you!"),
+            failed=_("Couldn't open your browser. The page is")))
         row = QHBoxLayout()
         row.addWidget(btn)
         row.addStretch(1)
@@ -1755,8 +1768,8 @@ class SettingsDialog(QDialog):
                 auto.blockSignals(True)
                 auto.setChecked(autostart.is_enabled())
                 auto.blockSignals(False)
-                busy.toast(self, "Couldn't change Windows startup — see the log in "
-                           r"%APPDATA%\OnionBoard.", "warn")
+                busy.toast(self, _("Couldn't change Windows startup — see the log in "
+                                   "{folder}.", folder=r"%APPDATA%\OnionBoard"), "warn")
             sync_hidden()
         auto.toggled.connect(set_auto)
         hidden.toggled.connect(mw.set_autostart_hidden)
@@ -1781,8 +1794,9 @@ class SettingsDialog(QDialog):
             mw = self.mw
             mw.export_board()
             if mw._exporting:   # it started (not cancelled in the save dialog)
-                busy.hold_until(exp, "Exporting…", mw.bridge.exported,
-                                lambda _p, _n, err: "Didn't export" if err else "✓ Exported")
+                busy.hold_until(exp, _("Exporting…"), mw.bridge.exported,
+                                lambda _p, _n, err: _("Didn't export") if err
+                                else _("✓ Exported"))
         exp.clicked.connect(export)
         imp = QPushButton(_("Import…"))
         imp.clicked.connect(self.mw.import_dialog)
@@ -1835,9 +1849,10 @@ class SettingsDialog(QDialog):
         self._data_widgets["save_video"] = self._option(
             cv, _("Also save the video"),
             _("Add as sound keeps a copy of the video too (the pad is still just its sound). "
-              "Videos use a lot more data: about 5 to 25 MB a minute.")
-            + ("" if has_ff else _(" Without ffmpeg installed only lower-quality videos can be "
-                                   "saved (usually 360p).")),
+              "Videos use a lot more data: about 5 to 25 MB a minute.") if has_ff else
+            _("Add as sound keeps a copy of the video too (the pad is still just its sound). "
+              "Videos use a lot more data: about 5 to 25 MB a minute. Without ffmpeg "
+              "installed only lower-quality videos can be saved (usually 360p)."),
             q.save_video, lambda b: self._data_set(save_video=b))
         grid = QGridLayout()
         grid.setHorizontalSpacing(12)
@@ -1845,7 +1860,7 @@ class SettingsDialog(QDialog):
         grid.addWidget(QLabel(_("Video quality")), 0, 0)
         vh = QComboBox()
         for h in quality.VIDEO_HEIGHTS:
-            vh.addItem(_("Up to {h}p", h=h), h)
+            vh.addItem(_("Up to {height}p", height=h), h)
         vh.currentIndexChanged.connect(lambda _i: self._data_set(video_height=vh.currentData()))
         grid.addWidget(vh, 0, 1)
         self._data_widgets["video_height"] = vh
@@ -2007,37 +2022,37 @@ class SettingsDialog(QDialog):
 
     # what each switch contacts, and when (soundboard.net.FEATURES)
     NET_HINTS = {
-        "sounds_web": "Searches and pasted links on the Sounds tab go to that site, and "
-                      "search results show its thumbnails. Off: the search bar only "
-                      "searches your own sounds.",
-        "ytdlp_update": "Fetches a newer yt-dlp from PyPI when you press Update now or "
-                        "Reset downloader (Updates page), or by itself if you ticked "
-                        "Update automatically there.",
-        "radio": "The station directory (Radio Browser) and the stations you play. Off: "
-                 "the Radio tab contacts nobody.",
-        "app_update": "Asks GitHub for the latest release, and downloads its installer "
-                      "when you press Update now.",
-        "addons": "GitHub, for Onion Watch (Triggers tab) and its updates, and the "
-                  "packages an add-on's Install step downloads (pip).",
-        "voices": "Translation models (Voice tab), live voice's speech model (Hugging "
-                  "Face) and Windows' own voices (Windows Update). Off: live voice still "
-                  "works with a model it already has.",
-        "voice_servers": "Voices in your voices folder that are a server on the "
-                         "internet. Ones on this PC (127.0.0.1) always work.",
-        "setup_downloads": "The setup guide's Install button downloads VB-Cable (the "
-                           "virtual cable) from vb-audio.com. Not needed if your sounds go "
-                           "straight into your mic, to another device or nowhere. Off: "
-                           "install it yourself from there.",
-        "tor_download": "Get Tor / Update Tor (Connection page) downloads Tor from the "
-                        "Tor Project (dist.torproject.org). Off: a Tor that's already "
-                        "here still works.",
-        "usage_stats": "Once a day, the installed app sends an anonymous \"still here\" "
-                       "to our counter (goatcounter.com): the version number and a random "
-                       "ID made on this PC, so nobody is counted twice, and which tabs you "
-                       "opened. If it crashed or froze, how many times (a count, never "
-                       "the report), and once when you uninstall. Nothing else: no "
-                       "name, sounds, settings or games. It's how we know if anyone uses "
-                       "Onion Board, and if it's working for them. Off: nothing is sent.",
+        "sounds_web": _("Searches and pasted links on the Sounds tab go to that site, and "
+                        "search results show its thumbnails. Off: the search bar only "
+                        "searches your own sounds."),
+        "ytdlp_update": _("Fetches a newer yt-dlp from PyPI when you press Update now or "
+                          "Reset downloader (Updates page), or by itself if you ticked "
+                          "Update automatically there."),
+        "radio": _("The station directory (Radio Browser) and the stations you play. Off: "
+                   "the Radio tab contacts nobody."),
+        "app_update": _("Asks GitHub for the latest release, and downloads its installer "
+                        "when you press Update now."),
+        "addons": _("GitHub, for Onion Watch (Triggers tab) and its updates, and the "
+                    "packages an add-on's Install step downloads (pip)."),
+        "voices": _("Translation models (Voice tab), live voice's speech model (Hugging "
+                    "Face) and Windows' own voices (Windows Update). Off: live voice still "
+                    "works with a model it already has."),
+        "voice_servers": _("Voices in your voices folder that are a server on the "
+                           "internet. Ones on this PC (127.0.0.1) always work."),
+        "setup_downloads": _("The setup guide's Install button downloads VB-Cable (the "
+                             "virtual cable) from vb-audio.com. Not needed if your sounds go "
+                             "straight into your mic, to another device or nowhere. Off: "
+                             "install it yourself from there."),
+        "tor_download": _("Get Tor / Update Tor (Connection page) downloads Tor from the "
+                          "Tor Project (dist.torproject.org). Off: a Tor that's already "
+                          "here still works."),
+        "usage_stats": _("Once a day, the installed app sends an anonymous \"still here\" "
+                         "to our counter (goatcounter.com): the version number and a random "
+                         "ID made on this PC, so nobody is counted twice, and which tabs you "
+                         "opened. If it crashed or froze, how many times (a count, never "
+                         "the report), and once when you uninstall. Nothing else: no "
+                         "name, sounds, settings or games. It's how we know if anyone uses "
+                         "Onion Board, and if it's working for them. Off: nothing is sent."),
     }
 
     def _switches_card(self):
@@ -2064,17 +2079,19 @@ class SettingsDialog(QDialog):
         self.net_boxes: dict[str, QCheckBox] = {}
         self._net_subs: dict[str, QWidget] = {}
         groups = (
-            ("Sounds and radio", ("sounds_web", "radio")),
-            ("Voices", ("voices", "voice_servers")),
-            ("Updates and add-ons", ("app_update", "ytdlp_update", "addons")),
-            ("Setup downloads", ("setup_downloads", "tor_download")),
-            ("Usage count", ("usage_stats",)),
+            (_("Sounds and radio"), ("sounds_web", "radio")),
+            (_("Voices"), ("voices", "voice_servers")),
+            (_("Updates and add-ons"), ("app_update", "ytdlp_update", "addons")),
+            (_("Setup downloads"), ("setup_downloads", "tor_download")),
+            (_("Usage count"), ("usage_stats",)),
         )
-        labels = {"sounds_web": "Online sounds", "app_update": "App updates",
-                  "ytdlp_update": "Downloader updates", "addons": "Add-on downloads",
-                  "voices": "Voice and model downloads", "voice_servers": "Online voice servers",
-                  "setup_downloads": "Virtual cable download", "tor_download": "Tor download",
-                  "usage_stats": "Count me in"}
+        labels = {"sounds_web": _("Online sounds"), "app_update": _("App updates"),
+                  "ytdlp_update": _("Downloader updates"), "addons": _("Add-on downloads"),
+                  "voices": _("Voice and model downloads"),
+                  "voice_servers": _("Online voice servers"),
+                  "setup_downloads": _("Virtual cable download"),
+                  "tor_download": _("Tor download"),
+                  "usage_stats": _("Count me in")}
         for title, keys in groups:
             section, sv = self._card(title)
             for key in keys:
@@ -2249,8 +2266,9 @@ class SettingsDialog(QDialog):
         get_note.setWordWrap(True)
         row.addWidget(get_note, 1)
         get = QPushButton(_("Get Tor"))
-        get.setProperty("tip", f"Download Tor {torget.VERSION} from the Tor Project "
-                               "(dist.torproject.org), the way the Connection setting says")
+        get.setProperty("tip", _("Download Tor {version} from the Tor Project "
+                                 "(dist.torproject.org), the way the Connection setting says",
+                                 version=torget.VERSION))
         get.setToolTip(get.property("tip"))
         row.addWidget(get)
         cv.addWidget(get_box)
@@ -2267,9 +2285,10 @@ class SettingsDialog(QDialog):
                 get.setText(_("Update Tor") if outdated else _("Get Tor"))
             get_box.setVisible(bool(msg) or busy.is_busy(get) or not have or outdated)
             get_note.setText(msg or (
-                f"A newer Tor ({torget.VERSION}) is ready to download." if outdated else
-                "To use Tor, get it first: about 22 MB from the Tor Project, checked "
-                "before it's used. " + torget.BLOCKED_HINT))
+                _("A newer Tor ({version}) is ready to download.", version=torget.VERSION)
+                if outdated else
+                _("To use Tor, get it first: about 22 MB from the Tor Project, checked "
+                  "before it's used. {blocked_hint}", blocked_hint=torget.BLOCKED_HINT)))
 
         # ---- proxy
         proxy_box = QWidget()
@@ -2313,8 +2332,8 @@ class SettingsDialog(QDialog):
         kind = QComboBox()
         kind.addItem(_("Snowflake"), "snowflake")
         kind.addItem("obfs4", "obfs4")
-        kind.setItemData(0, "Looks like a video call", Qt.ToolTipRole)
-        kind.setItemData(1, "Looks like random noise", Qt.ToolTipRole)
+        kind.setItemData(0, _("Looks like a video call"), Qt.ToolTipRole)
+        kind.setItemData(1, _("Looks like random noise"), Qt.ToolTipRole)
         kind.setCurrentIndex(max(0, kind.findData(cfg.tor_bridges or tor.DEFAULT_BRIDGE)))
         kind.setToolTip(_("If one doesn't connect, try the other"))
         no_wheel(kind)
@@ -2355,9 +2374,10 @@ class SettingsDialog(QDialog):
                 try:
                     net.parse(addr.text())
                 except ValueError as e:
-                    note.setText(_("{e}. Until it's fixed, nothing goes online.", e=e))
+                    note.setText(_("{error}. Until it's fixed, nothing goes online.",
+                                   error=e))
                     return
-            note.setText(_("Now: {describe}.", describe=net.describe()))
+            note.setText(_("Now: {connection}.", connection=net.describe()))
 
         def apply():
             mode = (net.TOR if use_tor.isChecked() else
@@ -2395,7 +2415,8 @@ class SettingsDialog(QDialog):
 
             def finish(msg):
                 relay.deleteLater()
-                release("✓ Changed" if msg.startswith("New identity") else "✗ Failed")
+                ok = msg == tor.NEWNYM_OK
+                release(_("✓ Changed") if ok else _("✗ Failed"))
                 if qt_valid(tor_state):
                     tor_state.setText(msg)
 
@@ -2410,15 +2431,17 @@ class SettingsDialog(QDialog):
 
             def progress(done, total):
                 if qt_valid(get_note):
-                    get_note.setText(_("Downloading Tor… {value:.1f}", value=done / 1e6) + (
-                        _(" of {value:.1f} MB", value=total / 1e6) if total else _(" MB")))
+                    get_note.setText(
+                        _("Downloading Tor… {done:.1f} of {total:.1f} MB",
+                          done=done / 1e6, total=total / 1e6) if total else
+                        _("Downloading Tor… {done:.1f} MB", done=done / 1e6))
 
             def finish(err):
                 relay.deleteLater()
-                release("✗ Failed" if err else "✓ Got Tor")
+                release(_("✗ Failed") if err else _("✓ Got Tor"))
                 if qt_valid(get_note):
-                    show_get(err or f"Tor {torget.VERSION} is ready: pick Tor above to "
-                                    "use it.")
+                    show_get(err or _("Tor {version} is ready: pick Tor above to use it.",
+                                      version=torget.VERSION))
                     show()
                     self._net_sync()
 
@@ -2435,7 +2458,7 @@ class SettingsDialog(QDialog):
                     relay.done.emit(errors.plain(e))
                 except Exception as e:  # noqa: BLE001 - shown, never a stuck button
                     logging.getLogger(__name__).exception("Get Tor failed")
-                    relay.done.emit(f"Couldn't get Tor ({errors.plain(e)}).")
+                    relay.done.emit(_("Couldn't get Tor ({error}).", error=errors.plain(e)))
 
             relay.progress.connect(progress)
             relay.done.connect(finish)
@@ -2446,10 +2469,11 @@ class SettingsDialog(QDialog):
             text = addr.text()
             release = busy.hold(test, _("Testing…"))
             relay = _Relay(self.mw)   # outlives this window if it's closed meanwhile
+            worked = []   # set by the thread before it emits: not read from the message
 
             def finish(msg):
                 relay.deleteLater()
-                release("✓ Works" if msg.startswith("It works") else "✗ Failed")
+                release(_("✓ Works") if worked else _("✗ Failed"))
                 if qt_valid(note):
                     note.setText(msg)
 
@@ -2460,8 +2484,9 @@ class SettingsDialog(QDialog):
                 netlog.cause(net.TEST, "You clicked Test (Settings > Connection)")
                 try:
                     msg = net.test(text)
+                    worked.append(True)
                 except (ValueError, OSError) as e:
-                    msg = _("It didn't work: {e}", e=errors.plain(e))
+                    msg = _("It didn't work: {error}", error=errors.plain(e))
                 relay.done.emit(msg)
             threading.Thread(target=run, daemon=True, name="proxy-test").start()
         test.clicked.connect(run_test)
@@ -2478,16 +2503,17 @@ class SettingsDialog(QDialog):
     # ------------------------------------------------------------------ app updates
     def _updates_card(self):
         from soundboard import __version__, updates
-        how = ("Update now downloads it and checks it's the file GitHub lists; you pick "
-               "when the app restarts to install it. Your sounds and settings are kept."
-               if updates.can_install() else
-               "This copy runs from source, so it only tells you: update it with git pull.")
-        card, cv = self._card(_("App updates"),
-                              _("This is Onion Board {version}. With the box ticked it asks "
-                                "GitHub every few hours whether a newer version is out and tells "
-                                "you (with a banner if it's an important fix). ",
-                                version=__version__)
-                              + how)
+        hint = (_("This is Onion Board {version}. With the box ticked it asks GitHub every "
+                  "few hours whether a newer version is out and tells you (with a banner if "
+                  "it's an important fix). Update now downloads it and checks it's the file "
+                  "GitHub lists; you pick when the app restarts to install it. Your sounds "
+                  "and settings are kept.", version=__version__)
+                if updates.can_install() else
+                _("This is Onion Board {version}. With the box ticked it asks GitHub every "
+                  "few hours whether a newer version is out and tells you (with a banner if "
+                  "it's an important fix). This copy runs from source, so it only tells you: "
+                  "update it with git pull.", version=__version__))
+        card, cv = self._card(_("App updates"), hint)
         chk = self._option(cv, _("Check for updates"),
                            _("Tell me when a new version is out. Nothing is downloaded until I "
                              "press Update now."), self.mw.cfg.update_check,
@@ -2526,7 +2552,7 @@ class SettingsDialog(QDialog):
         self._net_sync()
         asked, self._upd_asked = getattr(self, "_upd_asked", False), False
         if err:
-            self.upd_label.setText(_("Couldn't check: {err}", err=errors.plain(err)))
+            self.upd_label.setText(_("Couldn't check: {error}", error=errors.plain(err)))
         elif rel is None:
             # a check the user didn't ask for may not have asked GitHub at all (done
             # today already, or the newer version was skipped): don't claim anything
@@ -2590,10 +2616,11 @@ class SettingsDialog(QDialog):
         state.setWordWrap(True)
         crow.addWidget(state, 1)
         cv.addLayout(crow)
-        help_ = QLabel(_("Endpoints: ") + " · ".join(f"/api/{a}" for a in remote.ENDPOINTS)
-                       + _(". E.g. /api/play?name=Airhorn, /api/random?category=Memes, "
-                           "/api/live?on=toggle. Send the key as ?token=…, an X-Token header or "
-                           "Authorization: Bearer …. /api/help describes each one."))
+        help_ = QLabel(_("Endpoints: {endpoints}. E.g. /api/play?name=Airhorn, "
+                         "/api/random?category=Memes, /api/live?on=toggle. Send the key as "
+                         "?token=…, an X-Token header or Authorization: Bearer …. /api/help "
+                         "describes each one.",
+                         endpoints=" · ".join(f"/api/{a}" for a in remote.ENDPOINTS)))
         help_.setObjectName("hint")
         help_.setWordWrap(True)
         help_.setTextInteractionFlags(Qt.TextSelectableByMouse)
@@ -2606,7 +2633,7 @@ class SettingsDialog(QDialog):
             if not cfg.api_enabled:
                 state.setText(_("Off."))
             elif err or not mw.remote.running:
-                state.setText(_("Couldn't start: {value}", value=err or mw.remote.error))
+                state.setText(_("Couldn't start: {error}", error=err or mw.remote.error))
             else:
                 state.setText(_("On: listening on {host}:{port}.",
                                 host=remote.HOST, port=mw.remote.port))
@@ -2633,8 +2660,7 @@ class SettingsDialog(QDialog):
 
         def copy_link():
             QApplication.clipboard().setText(
-                _("http://{host}:{api_port}/api/random?token={api_token}",
-                  host=remote.HOST, api_port=cfg.api_port, api_token=cfg.api_token))
+                f"http://{remote.HOST}:{cfg.api_port}/api/random?token={cfg.api_token}")
             state.setText(_("Copied. It holds your key: only paste it into your own tools."))
 
         on.toggled.connect(set_on)
@@ -2727,14 +2753,15 @@ class SettingsDialog(QDialog):
         except modules.ModuleError as e:
             log.warning("Onion Pocket couldn't be removed: %s", e)
             QMessageBox.warning(self, _("Onion Pocket wasn't removed"),
-                                _("Onion Pocket wasn't removed: {e}", e=errors.plain(e)))
+                                _("Onion Pocket wasn't removed: {error}",
+                                  error=errors.plain(e)))
             return
         self.mw.pocket_offer = None
         if getattr(self, "_pocket_slot", None) is not None:
             self._swap_pocket_slot(self._get_pocket_card() if pocketaddon.offered()
                                    else None)
         self._pocket_changed()
-        busy.toast(self, "✓ Onion Pocket removed.", "ok")
+        busy.toast(self, _("✓ Onion Pocket removed."), "ok")
 
     def _addon_card(self, info, addon):
         if addon is None:
@@ -2744,7 +2771,7 @@ class SettingsDialog(QDialog):
             return addon.card(self)
         except Exception as e:  # noqa: BLE001 - an add-on can't break Settings
             log.exception("add-on %s couldn't make its card", info.id)
-            info.error = f"its settings failed: {errors.plain(e)}"
+            info.error = _("its settings failed: {error}", error=errors.plain(e))
             return None
 
     POCKET_CHECK_S = 3600   # how often Settings → Remote asks GitHub for a newer one
@@ -2797,7 +2824,7 @@ class SettingsDialog(QDialog):
             if not qt_valid(btn):
                 return                      # Settings was closed: it's loaded anyway
             if addon is None:
-                state["release"]("Couldn't update it right now")
+                state["release"](_("Couldn't update it right now"))
                 if new is not None:
                     btn.hide()
                 return
@@ -2811,7 +2838,8 @@ class SettingsDialog(QDialog):
             else:
                 state["release"]()
                 btn.hide()
-            busy.toast(self, f"✓ Onion Pocket {html.escape(new.version)} is in.", "ok")
+            busy.toast(self, _("✓ Onion Pocket {version} is in.",
+                               version=html.escape(new.version)), "ok")
 
         def run():
             offer = state.get("offer")
@@ -2954,14 +2982,16 @@ class SettingsDialog(QDialog):
         self.ytdlp_label.setWordWrap(True)
         cv.addWidget(self.ytdlp_label)
         self.ytdlp_btns = []
-        for text, job, tip in (
-                ("Update now", ytdl.update, "Check for a newer yt-dlp and install it"),
-                ("Reset downloader", ytdl.reset,
-                 "Delete the downloaded yt-dlp and its cache, then install a fresh copy")):
+        # (label, the English one for the network log, job, tooltip)
+        for text, logged, job, tip in (
+                (_("Update now"), "Update now", ytdl.update,
+                 _("Check for a newer yt-dlp and install it")),
+                (_("Reset downloader"), "Reset downloader", ytdl.reset,
+                 _("Delete the downloaded yt-dlp and its cache, then install a fresh copy"))):
             b = QPushButton(text)
             b.setToolTip(tip)
             b.setProperty("tip", tip)
-            b.clicked.connect(lambda __=False, j=job, t=text: self._ytdlp_run(j, t))
+            b.clicked.connect(lambda __=False, j=job, t=logged: self._ytdlp_run(j, t))
             row.addWidget(b)
             self.ytdlp_btns.append(b)
         cv.addLayout(row)
@@ -2971,8 +3001,9 @@ class SettingsDialog(QDialog):
 
     def _ytdlp_show(self, msg: str = ""):
         v, downloaded = ytdl.active_version()
-        where = "updated copy" if downloaded else "built in"
-        now = f"In use: yt-dlp {v} ({where})." if v else "yt-dlp isn't installed."
+        now = (_("yt-dlp isn't installed.") if not v else
+               _("In use: yt-dlp {version} (updated copy).", version=v) if downloaded else
+               _("In use: yt-dlp {version} (built in).", version=v))
         self.ytdlp_label.setText(f"{msg} {now}".strip())
 
     def _ytdlp_run(self, job, button: str = ""):
@@ -2998,6 +3029,6 @@ class SettingsDialog(QDialog):
             try:
                 msg = job()
             except Exception as e:  # noqa: BLE001 - offline, PyPI down…
-                msg = _("Couldn't update: {e}.", e=errors.plain(e))
+                msg = _("Couldn't update: {error}.", error=errors.plain(e))
             relay.done.emit(msg)
         threading.Thread(target=run, daemon=True, name="ytdlp-settings").start()

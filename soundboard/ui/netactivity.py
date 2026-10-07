@@ -27,17 +27,17 @@ from PySide6.QtWidgets import (QAbstractItemView, QApplication, QButtonGroup, QC
 from soundboard import netlog, theme
 from soundboard.ui import fit
 from soundboard.ui.panel import Flow
-from soundboard.i18n import _
+from soundboard.i18n import _, ngettext
 
 REFRESH_MS = 1000
-_TOR = ("Tor's own connections to the Tor network aren't listed one by one: with Tor, "
-        "everything here leaves through it.")
-NOTE = ("Every connection the app makes while it's open, and every one a switch "
-        "turned away. Kept in memory only: nothing here is saved, logged or sent, and "
-        "closing the app forgets it. " + _TOR)
-NOTE_KEPT = ("Every connection the app makes while it's open, and every one a switch "
-             "turned away. Kept on this PC between starts (Keep a history, below), "
-             "never logged or sent. " + _TOR)
+_TOR = _("Tor's own connections to the Tor network aren't listed one by one: with Tor, "
+         "everything here leaves through it.")
+NOTE = _("Every connection the app makes while it's open, and every one a switch "
+         "turned away. Kept in memory only: nothing here is saved, logged or sent, and "
+         "closing the app forgets it.") + " " + _TOR
+NOTE_KEPT = _("Every connection the app makes while it's open, and every one a switch "
+              "turned away. Kept on this PC between starts (Keep a history, below), "
+              "never logged or sent.") + " " + _TOR
 
 
 def _when(t: float) -> str:
@@ -46,6 +46,16 @@ def _when(t: float) -> str:
     if lt[:3] == time.localtime()[:3]:
         return time.strftime("%H:%M:%S", lt)
     return time.strftime("%d %b %H:%M", lt)
+
+
+def _count(connections: int, blocked: int, failed: int) -> str:
+    """"12 (3 blocked, 1 failed)": the connections, and how many of them didn't go."""
+    extra = []
+    if blocked:
+        extra.append(ngettext("{n} blocked", "{n} blocked", blocked))
+    if failed:
+        extra.append(ngettext("{n} failed", "{n} failed", failed))
+    return f"{connections} ({', '.join(extra)})" if extra else str(connections)
 
 
 _TONE = Qt.UserRole + 1   # the status colour a cell is drawn in (None: the default)
@@ -198,10 +208,10 @@ class NetActivity(QWidget):
         self.clear = QPushButton(_("Clear"))
         self.clear.setToolTip(_("Forget the list so far (and the saved history, if it's kept)"))
 
-        self.servers = _table(["Server", "Why", "Used for", "Connections", "Data",
-                               "Last"], 1)
-        self.conns = _table(["Time", "Server", "Why", "For", "Route", "Result", "Sent",
-                             "Received"], 2)
+        self.servers = _table([_("Server"), _("Why"), _("Used for"), _("Connections"),
+                               _("Data"), _("Last")], 1)
+        self.conns = _table([_("Time"), _("Server"), _("Why"), _("For"), _("Route"),
+                             _("Result"), _("Sent"), _("Received")], 2)
         self.info = QPlainTextEdit()
         self.info.setReadOnly(True)
         self.info.setFont(QFontDatabase.systemFont(QFontDatabase.FixedFont))
@@ -278,9 +288,15 @@ class NetActivity(QWidget):
             self.summary.setText(_("Nothing has gone online yet.") if kept else
                                  _("Nothing has gone online since the app started."))
         else:
-            self.summary.setText(
-                _("{n} connection(s) to {n2} server(s)", n=len(self._entries), n2=len(servers))
-                + (_(", {blocked} blocked by a switch", blocked=blocked) if blocked else "") + ".")
+            where = ngettext("{n} server", "{n} servers", len(servers))
+            if blocked:
+                text = ngettext("{n} connection to {servers}, {blocked} blocked by a switch.",
+                                "{n} connections to {servers}, {blocked} blocked by a switch.",
+                                len(self._entries), servers=where, blocked=blocked)
+            else:
+                text = ngettext("{n} connection to {servers}.", "{n} connections to {servers}.",
+                                len(self._entries), servers=where)
+            self.summary.setText(text)
         self.copy.setEnabled(bool(self._entries))
         self.clear.setEnabled(bool(self._entries))
         self.totals.setEnabled(bool(self._entries))
@@ -304,21 +320,17 @@ class NetActivity(QWidget):
         t.setRowCount(len(servers))
         right = Qt.AlignRight | Qt.AlignVCenter
         for r, s in enumerate(servers):
-            count = str(s.connections)
-            extra = [f"{k} {what}" for k, what in ((s.blocked, "blocked"),
-                                                   (s.failed, "failed")) if k]
-            if extra:
-                count += f" ({', '.join(extra)})"
+            count = _count(s.connections, s.blocked, s.failed)
             tone = "warn" if s.blocked == s.connections else None
             why = s.causes[0] if s.causes else "—"
             if len(s.causes) > 1:
-                why += f" (+{len(s.causes) - 1} more)"
+                why = _("{reason} (+{n} more)", reason=why, n=len(s.causes) - 1)
             _put(t, r, 0, s.host, tone=tone)
             _put(t, r, 1, why, "\n".join(s.causes), tone=tone)
             _put(t, r, 2, ", ".join(s.features), "\n".join(s.features), tone=tone)
             _put(t, r, 3, count, align=right, tone=tone)
             _put(t, r, 4, f"↑ {netlog.size(s.sent)}  ↓ {netlog.size(s.received)}",
-                 "Sent / received", right, tone)
+                 _("Sent / received"), right, tone)
             _put(t, r, 5, _when(s.last), tone=tone)
 
     def _fill_conns(self, force: bool = False):
@@ -452,7 +464,8 @@ class TotalsDialog(QDialog):
     """Network activity added up: per site (or per server), the connections and the data
     each way, over the whole kept history (or this run's list when none is kept)."""
 
-    COLUMNS = ["Site", "Connections", "Sent", "Received", "Total", "First", "Last"]
+    COLUMNS = [_("Site"), _("Connections"), _("Sent"), _("Received"), _("Total"), _("First"),
+               _("Last")]
 
     def __init__(self, parent: QWidget | None = None):
         super().__init__(parent)
@@ -509,18 +522,23 @@ class TotalsDialog(QDialog):
         self._rows = rows = netlog.totals(items, by_site)
         sent = sum(r.sent for r in rows)
         received = sum(r.received for r in rows)
-        what = "site(s)" if by_site else "server(s)"
         if not items:
-            self._head = "Nothing has gone online yet."
+            self._head = _("Nothing has gone online yet.")
         else:
             since = time.strftime("%d %b %Y %H:%M", time.localtime(items[0].started))
-            scope = ("in the saved history" if netlog.keeping() else
-                     "since the app started (tick Keep a history to add up across "
-                     "starts)")
-            self._head = (f"{len(items)} connection(s) to {len(rows)} {what} {scope}, "
-                          f"from {since}: ↑ {netlog.size(sent)} sent, "
-                          f"↓ {netlog.size(received)} received, "
-                          f"{netlog.size(sent + received)} in all.")
+            where = (ngettext("{n} site", "{n} sites", len(rows)) if by_site else
+                     ngettext("{n} server", "{n} servers", len(rows)))
+            conns = ngettext("{n} connection to {places}", "{n} connections to {places}",
+                             len(items), places=where)
+            kw = dict(connections=conns, since=since, sent=netlog.size(sent),
+                      received=netlog.size(received), total=netlog.size(sent + received))
+            if netlog.keeping():
+                self._head = _("{connections} in the saved history, from {since}: ↑ {sent} "
+                               "sent, ↓ {received} received, {total} in all.", **kw)
+            else:
+                self._head = _("{connections} since the app started (tick Keep a history to "
+                               "add up across starts), from {since}: ↑ {sent} sent, "
+                               "↓ {received} received, {total} in all.", **kw)
         self.summary.setText(self._head)
         t = self.table
         t.horizontalHeaderItem(0).setText(_("Site") if by_site else _("Server"))
@@ -528,18 +546,19 @@ class TotalsDialog(QDialog):
         t.setRowCount(len(rows))
         right = Qt.AlignRight | Qt.AlignVCenter
         for r, row in enumerate(rows):
-            count = str(row.connections)
-            extra = [f"{k} {w}" for k, w in ((row.blocked, "blocked"),
-                                             (row.failed, "failed")) if k]
-            if extra:
-                count += f" ({', '.join(extra)})"
+            count = _count(row.connections, row.blocked, row.failed)
             tone = "warn" if row.blocked == row.connections else None
             cells = [(row.name, None, "\n".join(row.hosts)),
                      (count, row.connections, ""),
-                     (netlog.size(row.sent), row.sent, f"{row.sent:,} bytes sent"),
+                     (netlog.size(row.sent), row.sent,
+                      ngettext("{bytes} byte sent", "{bytes} bytes sent", row.sent,
+                               bytes=f"{row.sent:,}")),
                      (netlog.size(row.received), row.received,
-                      f"{row.received:,} bytes received"),
-                     (netlog.size(row.data), row.data, f"{row.data:,} bytes in all"),
+                      ngettext("{bytes} byte received", "{bytes} bytes received",
+                               row.received, bytes=f"{row.received:,}")),
+                     (netlog.size(row.data), row.data,
+                      ngettext("{bytes} byte in all", "{bytes} bytes in all", row.data,
+                               bytes=f"{row.data:,}")),
                      (_when(row.first), row.first, ""), (_when(row.last), row.last, "")]
             for c, (text, num, tip) in enumerate(cells):
                 it = QTableWidgetItem(text) if num is None else _Num(text)

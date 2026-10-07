@@ -92,7 +92,7 @@ class Waveform(QWidget):
                 p.drawRect(QRectF(x, mid - bh, max(w - 0.5, 0.6), bh * 2))
         else:
             p.setPen(QColor(T["muted"]))
-            p.drawText(r, Qt.AlignCenter, "Waveform shows once the sound has loaded")
+            p.drawText(r, Qt.AlignCenter, _("Waveform shows once the sound has loaded"))
         shade = QColor(0, 0, 0, 90)
         p.setPen(Qt.NoPen)
         p.setBrush(shade)
@@ -126,7 +126,7 @@ class TrimPanel(QWidget):
         self.info = QLabel()   # before the boxes: setting their values updates it
         self.info.setObjectName("muted")
         self.box_start, self.box_end = QDoubleSpinBox(), QDoubleSpinBox()
-        for lbl, box in (("Start", self.box_start), ("End", self.box_end)):
+        for lbl, box in ((_("Start"), self.box_start), (_("End"), self.box_end)):
             box.setDecimals(2)
             box.setSingleStep(0.1)
             box.setSuffix(" s")

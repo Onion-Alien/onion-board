@@ -13,9 +13,9 @@ from soundboard.ui.panel import icon_label
 from soundboard.wheelguard import no_wheel
 from soundboard.i18n import _
 
-LABEL = "Also send to"
-TIP = ("Streaming, or using more than one app? Each device here gets a copy of what "
-       "others hear too: Voicemeeter, a device OBS captures, a second cable, speakers...")
+LABEL = _("Also send to")
+TIP = _("Streaming, or using more than one app? Each device here gets a copy of what "
+        "others hear too: Voicemeeter, a device OBS captures, a second cable, speakers...")
 
 
 class AlsoSendRows:

@@ -16,13 +16,13 @@ from soundboard.i18n import _
 
 # (part, what it does) in the order the guide lists them
 OPTIONS = [
-    (reset.SETTINGS, "Theme, audio, voice, overlay and privacy options."),
-    (reset.HOTKEYS, "The app's hotkeys, back to the defaults."),
-    (reset.SOUNDS, "Clears the board. The sounds are kept in the restore point."),
-    (reset.BIN, "Empties the bin. It's kept in the restore point."),
-    (reset.PROGRAMS, "Forgets Apps tab volumes and hidden programs."),
-    (reset.DEVICES, "Forgets your mic, headphones, where your sounds are sent and the "
-                     "stream output; the quick setup runs again."),
+    (reset.SETTINGS, _("Theme, audio, voice, overlay and privacy options.")),
+    (reset.HOTKEYS, _("The app's hotkeys, back to the defaults.")),
+    (reset.SOUNDS, _("Clears the board. The sounds are kept in the restore point.")),
+    (reset.BIN, _("Empties the bin. It's kept in the restore point.")),
+    (reset.PROGRAMS, _("Forgets Apps tab volumes and hidden programs.")),
+    (reset.DEVICES, _("Forgets your mic, headphones, where your sounds are sent and the "
+                      "stream output; the quick setup runs again.")),
 ]
 
 
@@ -77,7 +77,7 @@ class ResetGuide(QDialog):
             rv = QVBoxLayout(row)
             rv.setContentsMargins(12, 8, 12, 9)
             rv.setSpacing(2)
-            box = QCheckBox(reset.NAMES[part])
+            box = QCheckBox(reset.part_name(part))
             f = QFont(box.font())
             f.setBold(True)
             box.setFont(f)
@@ -158,13 +158,13 @@ class ResetGuide(QDialog):
         return w
 
     def _to_check(self):
-        lines = {reset.SETTINGS: "Settings go back to the defaults",
-                 reset.HOTKEYS: "App hotkeys go back to the defaults",
-                 reset.SOUND_KEYS: "Every sound's hotkey is cleared",
-                 reset.SOUNDS: "Every sound comes off the board",
-                 reset.BIN: "Recently deleted is emptied",
-                 reset.PROGRAMS: "Program volumes are forgotten",
-                 reset.DEVICES: "Devices are forgotten; the quick setup runs again"}
+        lines = {reset.SETTINGS: _("Settings go back to the defaults"),
+                 reset.HOTKEYS: _("App hotkeys go back to the defaults"),
+                 reset.SOUND_KEYS: _("Every sound's hotkey is cleared"),
+                 reset.SOUNDS: _("Every sound comes off the board"),
+                 reset.BIN: _("Recently deleted is emptied"),
+                 reset.PROGRAMS: _("Program volumes are forgotten"),
+                 reset.DEVICES: _("Devices are forgotten; the quick setup runs again")}
         self.summary.setText("".join(f"<p style='margin:4px 0'>•&nbsp; {lines[p]}</p>"
                                      for p in self.parts()))
         self.show_page(1)
@@ -218,7 +218,7 @@ class RestorePoints(QDialog):
     def fill(self):
         self.list.clear()
         for p in reset.points():
-            li = QListWidgetItem(f"{p.label}  ·  {trash.ago(p.when)}\n{p.describe()}")
+            li = QListWidgetItem(f"{p.title}  ·  {trash.ago(p.when)}\n{p.describe()}")
             li.setData(Qt.UserRole, p.id)
             self.list.addItem(li)
         if self.list.count():

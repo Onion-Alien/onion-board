@@ -26,21 +26,21 @@ def describe(d: Dest) -> str:
         return d.note
     parts = []
     if d.mono:
-        parts.append("mono")
+        parts.append(_("mono"))
     if d.bass > 0:
-        parts.append(f"sub-bass harmonics {round(d.bass * 100)}%")
+        parts.append(_("sub-bass harmonics {percent}%", percent=round(d.bass * 100)))
     if d.lowcut:
-        parts.append(f"sub-bass under {d.lowcut} Hz swapped for level")
+        parts.append(_("sub-bass under {hz} Hz swapped for level", hz=d.lowcut))
     if d.comp > 0:
-        parts.append(f"compressor {round(d.comp * 100)}%")
+        parts.append(_("compressor {percent}%", percent=round(d.comp * 100)))
     if d.ceiling:
-        parts.append(f"cut above {d.ceiling // 1000} kHz")
+        parts.append(_("cut above {khz} kHz", khz=d.ceiling // 1000))
     what = " · ".join(parts)
     return f"{d.note}  ({what})" if d.note else what
 
 
-DUCK_LABELS = (("Off", 0.0), ("A little (-6 dB)", -6.0), ("Half (-12 dB)", -12.0),
-               ("A lot (-20 dB)", -20.0))
+DUCK_LABELS = ((_("Off"), 0.0), (_("A little (-6 dB)"), -6.0), (_("Half (-12 dB)"), -12.0),
+               (_("A lot (-20 dB)"), -20.0))
 
 
 def apply_send(cfg, engine):
@@ -51,11 +51,12 @@ def apply_send(cfg, engine):
 
 
 def ceiling_label(hz: int) -> str:
-    return "No cut (full band)" if not hz else f"Cut above {hz // 1000} kHz"
+    return _("No cut (full band)") if not hz else _("Cut above {khz} kHz", khz=hz // 1000)
 
 
 def lowcut_label(hz: int) -> str:
-    return "Keep it (no cut)" if not hz else f"Cut under {hz} Hz, give the level back"
+    return (_("Keep it (no cut)") if not hz
+            else _("Cut under {hz} Hz, give the level back", hz=hz))
 
 
 def _dest_cfg(mw) -> dict:
@@ -109,8 +110,8 @@ class ModesHelp(QDialog):
         self.setMinimumWidth(520)
         v = QVBoxLayout(self)
         v.setSpacing(10)
-        now = QLabel(_("<b>Right now:</b> ") + html.escape(
-            profiles.explain(_dest_cfg(mw), getattr(mw, "mode_why", ""))))
+        now = QLabel(_("<b>Right now:</b> {explain}", explain=html.escape(
+            profiles.explain(_dest_cfg(mw), getattr(mw, "mode_why", "")))))
         now.setWordWrap(True)
         v.addWidget(now)
         for p in profiles.PROFILES:
@@ -292,7 +293,7 @@ class DestPanel(QWidget):
         self.combo.blockSignals(True)
         self.combo.clear()
         for d in destination.all_modes(cfg.get("custom")):
-            self.combo.addItem(d.label + (_("  (custom)") if d.custom else ""), d.key)
+            self.combo.addItem(_("{mode}  (custom)", mode=d.label) if d.custom else d.label, d.key)
         self.combo.setCurrentIndex(max(0, self.combo.findData(current)))
         self.combo.blockSignals(False)
         c = self.mw.cfg
@@ -364,7 +365,8 @@ class DestPanel(QWidget):
         simple, hint = self._better()
         if key:
             why = html.escape(getattr(self.mw, "voice_why", "") or (
-                f"The game you have open uses {voicesdk.NAMES.get(key, key)} for voice chat"))
+                _("The game you have open uses {voice} for voice chat",
+                  voice=voicesdk.NAMES.get(key, key))))
             self.suggest_text.setText(
                 _("{why}: <b>{label}</b> suits it.",
                   why=why, label=destination.BUILTIN_BY_KEY[key].label))
@@ -455,7 +457,7 @@ class CustomDestDialog(QDialog):
             b.setObjectName("small")
             btns.addWidget(b)
         left.addLayout(btns)
-        self.undo_bar = UndoBar("Put the mode back, as it was")
+        self.undo_bar = UndoBar(_("Put the mode back, as it was"))
         left.addWidget(self.undo_bar)
         body.addLayout(left, 1)
 
@@ -465,14 +467,14 @@ class CustomDestDialog(QDialog):
         self.name = QLineEdit()
         self.name.setMaxLength(40)
         self.name.textEdited.connect(self._edited)
-        form.addRow("Name", self.name)
+        form.addRow(_("Name"), self.name)
         self.ceiling = QComboBox()
         for hz in CEILINGS:
             self.ceiling.addItem(ceiling_label(hz), hz)
         self.ceiling.currentIndexChanged.connect(self._edited)
-        form.addRow("Frequencies", self.ceiling)
-        self.bass, bass_row = self._slider("sub-bass turned into harmonics the codec keeps")
-        form.addRow("Sub-bass", bass_row)
+        form.addRow(_("Frequencies"), self.ceiling)
+        self.bass, bass_row = self._slider(_("sub-bass turned into harmonics the codec keeps"))
+        form.addRow(_("Sub-bass"), bass_row)
         self.lowcut = QComboBox()
         for hz in LOWCUTS:
             self.lowcut.addItem(lowcut_label(hz), hz)
@@ -480,9 +482,10 @@ class CustomDestDialog(QDialog):
                                  "stops it pulling the whole sound down in the limiter, and each "
                                  "sound is turned back up by what the cut took from it"))
         self.lowcut.currentIndexChanged.connect(self._edited)
-        form.addRow("Deep bass", self.lowcut)
-        self.comp, comp_row = self._slider("evens the level out for the service's gate / auto gain")
-        form.addRow("Compressor", comp_row)
+        form.addRow(_("Deep bass"), self.lowcut)
+        self.comp, comp_row = self._slider(
+            _("evens the level out for the service's gate / auto gain"))
+        form.addRow(_("Compressor"), comp_row)
         self.mono = QCheckBox(_("Mono (the service captures a mono mic)"))
         self.mono.toggled.connect(self._edited)
         form.addRow("", self.mono)
@@ -490,7 +493,7 @@ class CustomDestDialog(QDialog):
         self.note.setMaxLength(200)
         self.note.setPlaceholderText(_("e.g. Mumble at 72 kbps, TeamSpeak…"))
         self.note.textEdited.connect(self._edited)
-        form.addRow("Notes", self.note)
+        form.addRow(_("Notes"), self.note)
         no_wheel(self.ceiling, self.lowcut, self.bass, self.comp)
         body.addWidget(self.form_box, 2)
         lay.addLayout(body, 1)
@@ -557,8 +560,8 @@ class CustomDestDialog(QDialog):
         return f"custom{n}"
 
     def add(self):
-        self.items.append(Dest(self._new_key(), f"My mode {len(self.items) + 1}", 0, 0.5, 0.4,
-                               True).to_dict())
+        self.items.append(Dest(self._new_key(), _("My mode {n}", n=len(self.items) + 1), 0,
+                               0.5, 0.4, True).to_dict())
         self._fill(len(self.items) - 1)
         self._commit()
         self.name.setFocus()
@@ -566,12 +569,13 @@ class CustomDestDialog(QDialog):
 
     def copy_builtin(self):
         from PySide6.QtWidgets import QInputDialog
-        names = [d.label for d in destination.BUILTIN if d.active]
+        modes = [d for d in destination.BUILTIN if d.active]
+        names = [d.label for d in modes]
         pick, ok = QInputDialog.getItem(self, _("Copy a built-in mode"), _("Start from"), names,
                                         0, False)
-        if not ok:
+        if not ok or pick not in names:
             return
-        src = next(d for d in destination.BUILTIN if d.label == pick)
+        src = modes[names.index(pick)]   # by place: the shown label may be translated
         raw = src.to_dict()
         raw.update(key=self._new_key(), label=_("{label} (copy)", label=src.label))
         self.items.append(raw)
@@ -589,9 +593,11 @@ class CustomDestDialog(QDialog):
             cfg["mode"] = "off"
         self._fill(row)
         self._commit()
-        self.undo_bar.show_for(f"Removed “{gone.get('label') or 'mode'}”"
-                               + (" — Who's listening is Off now" if was_on else ""),
-                               lambda: self._put_back(row, gone, was_on))
+        name = gone.get("label") or _("mode")
+        self.undo_bar.show_for(
+            _("Removed “{name}” — Who's listening is Off now", name=name) if was_on
+            else _("Removed “{name}”", name=name),
+            lambda: self._put_back(row, gone, was_on))
 
     def _put_back(self, row: int, raw: dict, was_on: bool):
         if raw.get("key") in {d.get("key") for d in self.items}:
@@ -618,7 +624,7 @@ class CustomDestDialog(QDialog):
             self.b_del.setEnabled(True)
             self.empty.setVisible(False)
         raw = self.items[row]
-        raw.update(label=self.name.text().strip() or f"My mode {row + 1}",
+        raw.update(label=self.name.text().strip() or _("My mode {n}", n=row + 1),
                    ceiling=int(self.ceiling.currentData() or 0),
                    bass=self.bass.value() / 100, comp=self.comp.value() / 100,
                    lowcut=int(self.lowcut.currentData() or 0),

@@ -122,13 +122,14 @@ class EqCurve(QWidget):
         p.drawPath(path)
         if not self.on:   # on a little plate, so the flat line doesn't strike it through
             fm = p.fontMetrics()
-            plate = QRectF(0, 0, fm.horizontalAdvance("EQ off") + 14, fm.height() + 4)
+            off = _("EQ off")
+            plate = QRectF(0, 0, fm.horizontalAdvance(off) + 14, fm.height() + 4)
             plate.moveCenter(r.center())
             p.setPen(Qt.NoPen)
             p.setBrush(QColor(theme.T["bg"]))
             p.drawRoundedRect(plate, plate.height() / 2, plate.height() / 2)
             p.setPen(QColor(theme.T["muted"]))
-            p.drawText(plate, Qt.AlignCenter, "EQ off")
+            p.drawText(plate, Qt.AlignCenter, off)
 
 
 class SeekSlider(QSlider):
@@ -432,28 +433,28 @@ class Pad(QAbstractButton):
         m = self.meta
         bits = []
         if self.progress is not None:
-            bits.append("paused" if self.paused else "playing")
+            bits.append(_("paused") if self.paused else _("playing"))
         if self.picked:
-            bits.append("selected")
+            bits.append(_("selected"))
         if self.state in ("loading", "rendering"):
-            bits.append("loading")
+            bits.append(_("loading"))
         elif self.state == "error":
-            bits.append("can't load the file")
+            bits.append(_("can't load the file"))
         else:
-            bits.append(f"{m.duration:.1f} seconds")
+            bits.append(_("{s} seconds", s=f"{m.duration:.1f}"))
         if m.hotkey:
-            bits.append(f"hotkey {pretty_key(m.hotkey)}")
+            bits.append(_("hotkey {key}", key=pretty_key(m.hotkey)))
         if m.loop:
-            bits.append("loops")
+            bits.append(_("loops"))
         if m.mode in ("overlap", "toggle", "solo"):
-            bits.append({"overlap": "presses overlap", "toggle": "press again stops",
-                         "solo": "stops the other sounds"}[m.mode])
+            bits.append({"overlap": _("presses overlap"), "toggle": _("press again stops"),
+                         "solo": _("stops the other sounds")}[m.mode])
         if m.hold:
-            bits.append("plays while its hotkey is held")
+            bits.append(_("plays while its hotkey is held"))
         if m.fx:
-            bits.append("effects")
+            bits.append(_("effects"))
         if m.tags:
-            bits.append("in " + ", ".join(m.tags))
+            bits.append(_("in {categories}", categories=", ".join(m.tags)))
         desc = ", ".join(bits)
         if (m.name, desc) != self._described:
             self._described = (m.name, desc)
@@ -535,8 +536,8 @@ class Pad(QAbstractButton):
             f.setPointSizeF(8.5)
             flags = ("FX " if m.fx else "") + ("⟳ " if m.loop else "") + \
                 {"overlap": "⧉ ", "toggle": "⏯ ", "solo": "◉ "}.get(m.mode, "") + \
-                ("hold " if m.hold else "")
-            right = "❚❚ paused" if self.paused else f"{flags}{m.duration:.1f}s"
+                (_("hold") + " " if m.hold else "")
+            right = _("❚❚ paused") if self.paused else f"{flags}{m.duration:.1f}s"
             hk = m.hotkey and (midi.short(m.hotkey) if midi.is_midi(m.hotkey)
                                else pretty_key(m.hotkey))
             badge = None
@@ -738,10 +739,10 @@ class Pad(QAbstractButton):
         if self.state in ("loading", "rendering"):
             p.setPen(muted)
             p.drawText(foot, Qt.AlignLeft | Qt.AlignVCenter,
-                       "applying effects…" if self.state == "rendering" else "loading…")
+                       _("applying effects…") if self.state == "rendering" else _("loading…"))
         elif self.state == "error":
             p.setPen(_ERROR_ON_PIC if on_pic else C["error_text"])   # readable on light
-            p.drawText(foot, Qt.AlignLeft | Qt.AlignVCenter, "can't load file")
+            p.drawText(foot, Qt.AlignLeft | Qt.AlignVCenter, _("can't load file"))
         else:
             p.setPen(muted)
             p.drawText(foot, Qt.AlignRight | Qt.AlignVCenter, right)
@@ -814,9 +815,10 @@ class Pad(QAbstractButton):
         p.setFont(f)
         fm = p.fontMetrics()
         if self.state in ("loading", "rendering"):
-            right, rc = ("applying…" if self.state == "rendering" else "loading…"), T["muted"]
+            right = _("applying…") if self.state == "rendering" else _("loading…")
+            rc = T["muted"]
         elif self.state == "error":
-            right, rc = "can't load", "#ff6b6b"
+            right, rc = _("can't load"), "#ff6b6b"
         else:
             right = "❚❚" if self.paused else f"{self.meta.duration:.1f}s"
             rc = T["muted"]
@@ -867,9 +869,9 @@ class PadGrid(QWidget):
     reorder = Signal(str, int)   # sound id, new index
     files_dropped = Signal(list)
     image_dropped = Signal(str, str)   # sound id, picture file dropped on its pad
-    HOW_TO = ("Drop sound files here\nor click  ＋ Add sounds\n\n"
-              "mp3 · wav · ogg · flac\nm4a · even video files")
-    NO_MATCH = "No sounds match the search\nor this category"
+    HOW_TO = _("Drop sound files here\nor click  ＋ Add sounds\n\n"
+               "mp3 · wav · ogg · flac\nm4a · even video files")
+    NO_MATCH = _("No sounds match the search\nor this category")
 
     def __init__(self):
         super().__init__()
@@ -891,10 +893,10 @@ class PadGrid(QWidget):
         ev.setSpacing(0)
         self.bun = BunnyWidget(
             height=96, pad=16, sad=0.9,
-            lines=("add a sound?", "pleeease?", "it's so quiet…", "drop one on me!",
-                   "just one sound?", "I'm bored…"),
-            hope_lines=("yes! drop it!", "ooh, for me?!"),
-            joy_lines=("yay!!", "↑ Add sounds!", "hehe!"))
+            lines=(_("add a sound?"), _("pleeease?"), _("it's so quiet…"),
+                   _("drop one on me!"), _("just one sound?"), _("I'm bored…")),
+            hope_lines=(_("yes! drop it!"), _("ooh, for me?!")),
+            joy_lines=(_("yay!!"), _("↑ Add sounds!"), _("hehe!")))
         self.bun.setToolTip(_("Bun is waiting for some sounds"))
         ev.addWidget(self.bun, 0, Qt.AlignHCenter)
         self.empty_text = QLabel(self.HOW_TO)

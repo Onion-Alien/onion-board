@@ -32,10 +32,10 @@ def copy_prompt(mw, with_key: bool) -> str:
     token = cfg.api_token if with_key and cfg.api_enabled else ""
     QApplication.clipboard().setText(remote.setup_prompt(cfg, cfg.api_port, token))
     if token:
-        return ("Copied, with your key in it. Paste it into ChatGPT, Claude or any AI "
-                "chat and say which tools you use.")
-    return ("Copied (without your key: the AI will tell you where it goes). Paste it into "
-            "ChatGPT, Claude or any AI chat and say which tools you use.")
+        return _("Copied, with your key in it. Paste it into ChatGPT, Claude or any AI "
+                 "chat and say which tools you use.")
+    return _("Copied (without your key: the AI will tell you where it goes). Paste it into "
+             "ChatGPT, Claude or any AI chat and say which tools you use.")
 
 
 class StreamerGuide(QDialog):
@@ -50,54 +50,55 @@ class StreamerGuide(QDialog):
         v = QVBoxLayout(self)
         v.setContentsMargins(24, 20, 24, 18)
         v.setSpacing(12)
-        v.addLayout(_header("Streamer guide", _label(
+        v.addLayout(_header(_("Streamer guide"), _label(_(
             "Remote control lets your other stream tools press Onion Board's buttons for "
             "you: a <b>Stream Deck</b> key, a <b>channel point</b> reward, a <b>!command</b> "
-            "in chat. Each one is just a link. Everything stays on this PC."),
+            "in chat. Each one is just a link. Everything stays on this PC.")),
             BunnyWidget("star")))
 
         ok = theme.status("ok")
+        li = "<li style='margin-bottom:8px'>{}</li>"
+        items = [
+            _("<b>Turn it on.</b> Click <b>Turn it on</b> below (or tick <i>Enable remote "
+              "control</i> in Settings → Remote). Onion Board has to be open — the tray is "
+              "fine."),
+            _("<b>Test it.</b> Click <b>Random sound</b> below to copy its link, paste it "
+              "into your web browser's address bar and press Enter. You hear a random sound "
+              "and the page shows <span style='color:{ok_colour}'>\"playing\"</span>. It "
+              "works!", ok_colour=ok),
+            _("<b>A Stream Deck key.</b> In the Stream Deck app drag <b>System → Website</b> "
+              "onto a key. Pick a sound below, click <b>Copy</b> and paste the link into the "
+              "URL box. Tick <b>GET request in background</b> so no browser window opens. "
+              "One key per sound."),
+            _("<b>Channel points and chat commands</b> (Twitch, YouTube, Kick). Get the free "
+              "<b>Streamer.bot</b>. Under <b>Actions</b>, add an action, then right-click → "
+              "<b>Core → Network → Fetch URL</b> and paste a link. Under <b>Triggers</b> pick "
+              "what sets it off, e.g. <b>Twitch → Channel Reward → Reward Redemption</b> and "
+              "your reward, or a chat command. Touch Portal, SAMMI and Mix It Up work the "
+              "same way: look for their <i>HTTP / web request</i> action."),
+            _("<b>A panic button.</b> Make a key with the <b>Panic mute</b> link: one press "
+              "and nobody hears anything (your sounds or your mic); press it again to go "
+              "live. <b>Stop all</b> just stops the sounds."),
+            _("<b>Let your stream hear the sounds.</b> Settings → Audio → <b>Stream "
+              "output</b>, pick a device, then add that device in OBS: Sources → + → "
+              "<i>Audio Output Capture</i> (for a virtual cable: an <i>Audio Input "
+              "Capture</i> of its Output end). Your sounds get their own volume slider in "
+              "OBS. No virtual cable, or Voicemeeter / a mixer? Setup → Devices → <b>Send my "
+              "sounds to</b> → that device (OBS can capture that one too) or <i>Nobody</i> "
+              "(only you and the stream output hear them)."),
+        ]
         steps = _label(
             "<ol style='margin-left:-20px'>"
-            "<li style='margin-bottom:8px'><b>Turn it on.</b> Click <b>Turn it on</b> "
-            "below (or tick <i>Enable remote control</i> in Settings → Remote). Onion "
-            "Board has to be open — the tray is fine.</li>"
-            "<li style='margin-bottom:8px'><b>Test it.</b> Click <b>Random sound</b> below "
-            "to copy its link, paste it into your web browser's address bar and press "
-            "Enter. You hear a random sound and the page shows "
-            f"<span style='color:{ok}'>\"playing\"</span>. It works!</li>"
-            "<li style='margin-bottom:8px'><b>A Stream Deck key.</b> In the Stream Deck "
-            "app drag <b>System → Website</b> onto a key. Pick a sound below, click "
-            "<b>Copy</b> and paste the link into the URL box. Tick <b>GET request in "
-            "background</b> so no browser window opens. One key per sound.</li>"
-            "<li style='margin-bottom:8px'><b>Channel points and chat commands</b> "
-            "(Twitch, YouTube, Kick). Get the free <b>Streamer.bot</b>. Under "
-            "<b>Actions</b>, add an action, then right-click → <b>Core → Network → Fetch "
-            "URL</b> and paste a link. Under <b>Triggers</b> pick what sets it off, e.g. "
-            "<b>Twitch → Channel Reward → Reward Redemption</b> and your reward, or a "
-            "chat command. Touch Portal, SAMMI and Mix It Up work the same way: look "
-            "for their <i>HTTP / web request</i> action.</li>"
-            "<li style='margin-bottom:8px'><b>A panic button.</b> Make a key with the "
-            "<b>Panic mute</b> link: one press and nobody hears anything (your sounds "
-            "or your mic); press it again to go live. <b>Stop all</b> just stops the "
-            "sounds.</li>"
-            "<li style='margin-bottom:8px'><b>Let your stream hear the sounds.</b> "
-            "Settings → Audio → <b>Stream output</b>, pick a device, then add that "
-            "device in OBS: Sources → + → <i>Audio Output Capture</i> (for a virtual "
-            "cable: an <i>Audio Input Capture</i> of its Output end). Your sounds get "
-            "their own volume slider in OBS. No virtual cable, or Voicemeeter / a "
-            "mixer? Setup → Devices → <b>Send my sounds to</b> → that device (OBS can "
-            "capture that one too) or <i>Nobody</i> (only you and the stream output "
-            "hear them).</li>"
-            "<li><b>Keep the key secret.</b> Every link holds your key. Don't show it on "
-            "stream or paste it into chat. If it leaks, click <b>New key</b> in Settings → "
-            "Remote — the old links stop working and you paste the new ones.</li>"
-            "</ol>"
-            "<span style='font-size:9.5pt'>Stuck, or want something fancier (a key per "
-            "category, a random sound for every new follower, AutoHotkey)? Click "
-            "<b>Copy AI prompt</b> and paste it into ChatGPT or Claude: it knows how "
-            "Onion Board's links work and which sounds you have, and walks you through "
-            "it.</span>")
+            + "".join(li.format(t) for t in items)
+            + "<li>" + _("<b>Keep the key secret.</b> Every link holds your key. Don't show "
+                         "it on stream or paste it into chat. If it leaks, click <b>New "
+                         "key</b> in Settings → Remote — the old links stop working and you "
+                         "paste the new ones.") + "</li></ol>"
+            "<span style='font-size:9.5pt'>"
+            + _("Stuck, or want something fancier (a key per category, a random sound for "
+                "every new follower, AutoHotkey)? Click <b>Copy AI prompt</b> and paste it "
+                "into ChatGPT or Claude: it knows how Onion Board's links work and which "
+                "sounds you have, and walks you through it.") + "</span>")
         steps.setTextInteractionFlags(Qt.TextSelectableByMouse)
         body = QWidget()
         bl = QVBoxLayout(body)
@@ -136,10 +137,10 @@ class StreamerGuide(QDialog):
         row = QHBoxLayout()
         self.link_btns = [self.btn_play]
         for text, action, query, tip in (
-                ("Random sound", "random", "category=", "Plays any of your sounds"),
-                ("Stop all", "stop", "", "Stops every sound"),
-                ("Panic mute", "live", "on=toggle",
-                 "Muted / live: while muted nobody hears your sounds or your mic")):
+                (_("Random sound"), "random", "category=", _("Plays any of your sounds")),
+                (_("Stop all"), "stop", "", _("Stops every sound")),
+                (_("Panic mute"), "live", "on=toggle",
+                 _("Muted / live: while muted nobody hears your sounds or your mic"))):
             b = QPushButton(text)
             b.setToolTip(_("Copy the link: {tip}", tip=tip))
             b.clicked.connect(lambda __=False, b=b, a=action, q=query: self._copy(b, a, q))

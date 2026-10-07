@@ -36,7 +36,7 @@ from soundboard.ui.panel import CardGrid, HoverCard
 from soundboard.ui.responsive import FitWidth
 from soundboard.ui.widgets import LoadingBar, fmt_time
 from soundboard import errors
-from soundboard.i18n import _
+from soundboard.i18n import _, ngettext
 
 log = logging.getLogger(__name__)
 
@@ -59,15 +59,24 @@ def fmt_count(n: int) -> str:
     return str(n)
 
 
+def _count(kind: str, n: int, shown: str) -> str:
+    """"1.2K views": `n` picks the word's form, `shown` is the number as written."""
+    if kind == "views":
+        return ngettext("{count} view", "{count} views", n, count=shown)
+    if kind == "likes":
+        return ngettext("{count} like", "{count} likes", n, count=shown)
+    return ngettext("{count} comment", "{count} comments", n, count=shown)
+
+
 def stats_text(r: ytdl.Result) -> tuple[str, str]:
     """(the card's line, its tooltip) for a hit's views, likes and comments, as its
     search entry gave them: nothing for what it didn't say. No video page is fetched
     for more (a look-up per hit is scraping, and the kind that gets you bot-checked)."""
     parts, tip = [], []
-    for n, word in ((r.views, "views"), (r.likes, "likes"), (r.comments, "comments")):
+    for n, kind in ((r.views, "views"), (r.likes, "likes"), (r.comments, "comments")):
         if n is not None:
-            parts.append(f"{fmt_count(n)} {word}")
-            tip.append(f"{n:,} {word}")
+            parts.append(_count(kind, n, fmt_count(n)))
+            tip.append(_count(kind, n, f"{n:,}"))
     return " · ".join(parts), ", ".join(tip)
 
 
@@ -485,7 +494,7 @@ class ResultRow(HoverCard):
             self.btn_add.setText(_("✓ Added"))   # added once is enough
             busy.set_busy(self.btn_add, True)
         else:
-            release(None if ok else ("Didn't add" if kind == "add" else "Didn't play"))
+            release(None if ok else (_("Didn't add") if kind == "add" else _("Didn't play")))
             if self._locked:
                 busy.set_busy(self._btn(kind), True)
 
@@ -631,7 +640,7 @@ class SearchResults(QFrame):
         self.query = query
         self._gen += 1
         self._clear()
-        where = "TikTok sounds" if self.source == "tiktok" else self.site
+        where = _("TikTok sounds") if self.source == "tiktok" else self.site
         netlog.cause(ytdl.FEATURE, f"You searched {where} for {netlog.quoted(query)}"
                      + (" (without Tor)" if direct else ""))
         text = _("Searching {where} for <b>{query}</b>…", where=where, query=html.escape(query))

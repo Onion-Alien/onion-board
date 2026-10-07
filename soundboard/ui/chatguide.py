@@ -51,6 +51,12 @@ def _label(text: str, css: str = "font-size:11pt;") -> QLabel:
     return lbl
 
 
+def _steps(*items: str) -> str:
+    """A numbered list of guide steps (each one translated whole)."""
+    lis = [f"<li style='margin-bottom:8px'>{t}</li>" for t in items[:-1]]
+    return f"<ol style='margin-left:-20px'>{''.join(lis)}<li>{items[-1]}</li></ol>"
+
+
 def _header(title: str, body: QLabel, bun: BunnyWidget) -> QHBoxLayout:
     from soundboard.ui.setupwizard import _header as header
     return header(title, body, bun)
@@ -86,32 +92,34 @@ def result_html(res: dict, vm: str, kept: bool = False) -> str:
     if res.get("error"):
         return f"<span style='color:{warn}'>{html.escape(str(res['error']))}</span>"
     if not issues:
-        return (f"<b style='color:{ok}'>✓ Discord passes your sounds through clean.</b> "
-                "Nothing in its settings is changing them.")
+        return _("<b style='color:{color}'>✓ Discord passes your sounds through clean.</b> "
+                 "Nothing in its settings is changing them.", color=ok)
+    device = (_("your normal mic, <b>{mic}</b>", mic=vm) if kept
+              else f"<b>{vm}</b>")
     fixes = {
-        "not_heard": (
+        "not_heard": _(
             "Discord didn't play the test back. In Discord → <b>Voice &amp; Video</b>, set "
-            f"<b>Input Device</b> to {'your normal mic, ' if kept else ''}<b>{vm}</b>, "
-            "click <b>Let's Check</b> (the bar should "
+            "<b>Input Device</b> to {device}, click <b>Let's Check</b> (the bar should "
             "move when you play a sound here), then check again. If that's all set, noise "
             "suppression is removing your sounds completely: set <b>Input Profile</b> to "
-            "<b>Studio</b>."),
-        "suppression": (
+            "<b>Studio</b>.", device=device),
+        "suppression": _(
             "<b>Noise suppression is removing your sounds.</b> Set <b>Input Profile</b> to "
             "<b>Studio</b> (or <b>Noise Suppression</b> to <b>None</b>)."),
-        "gate": (
+        "gate": _(
             "<b>Quiet parts of your sounds are cut off</b> (fades, quiet intros). Switch "
             "<b>Input Mode</b> to <b>Push to Talk</b> and turn on <b>Auto push-to-talk</b> "
             "(Settings → Hotkeys), or turn off <b>Automatically determine input "
             "sensitivity</b> and drag the slider almost all the way left."),
-        "agc": (
+        "agc": _(
             "<b>Automatic gain control is pumping your volume.</b> Set <b>Input Profile</b> "
             "to <b>Studio</b> (or turn off <b>Automatic Gain Control</b>)."),
     }
     items = "".join(f"<li style='margin-bottom:6px'>{fixes[i]}</li>" for i in issues
                     if i in fixes)
-    return (f"<b style='color:{warn}'>Discord is changing your sounds:</b>"
-            f"<ul style='margin-left:-20px'>{items}</ul>Fix it, then check again.")
+    return _("<b style='color:{color}'>Discord is changing your sounds:</b>"
+             "<ul style='margin-left:-20px'>{fixes}</ul>Fix it, then check again.",
+             color=warn, fixes=items)
 
 
 class ChatCheck(QObject):
@@ -150,8 +158,8 @@ class ChatCheck(QObject):
             return
         e = self.engine
         if e.main_stream is None:
-            self.done.emit({"issues": [], "error": "Pick where your sounds go first "
-                                                   "(Setup tab → Step-by-step guide)."})
+            self.done.emit({"issues": [], "error": _("Pick where your sounds go first "
+                                                     "(Setup tab → Step-by-step guide).")})
             return
         from soundboard import appaudio
         can, why = appaudio.supported()
@@ -181,7 +189,7 @@ class ChatCheck(QObject):
         self._sig = sig
         if app is None:
             self.running = False
-            self.done.emit({"issues": [], "error": (
+            self.done.emit({"issues": [], "error": _(
                 "Couldn't find Discord playing anything. Open Discord → ⚙ User Settings → "
                 "Voice & Video, click Let's Check, then check again.")})
             return
@@ -190,7 +198,7 @@ class ChatCheck(QObject):
         cap = appaudio.AppCapture(app.pid, self._heard.append, name=app.name)
         if not cap.start(wait=False):
             self.running = False
-            self.done.emit({"issues": [], "error": cap.error or "Couldn't listen to Discord."})
+            self.done.emit({"issues": [], "error": cap.error or _("Couldn't listen to Discord.")})
             return
         self._cap = cap
         self._deadline = time.monotonic() + CONNECT_S
@@ -206,7 +214,7 @@ class ChatCheck(QObject):
             return
         self._poll.stop()
         if not cap.ready:
-            err = cap.error or "Windows didn't answer in time. Check again to retry."
+            err = cap.error or _("Windows didn't answer in time. Check again to retry.")
             self._stop()
             self.done.emit({"issues": [], "error": err})
             return
@@ -217,11 +225,11 @@ class ChatCheck(QObject):
         except Exception as ex:  # noqa: BLE001 - no capture or tap left running
             log.exception("discord check couldn't start")
             self._stop()
-            self.done.emit({"issues": [], "error": f"The check couldn't start: "
-                                                   f"{errors.plain(ex)}"})
+            self.done.emit({"issues": [], "error": _("The check couldn't start: {error}",
+                                                     error=errors.plain(ex))})
             return
         self._t0 = time.monotonic()
-        self.progress.emit("Listening to Discord…")
+        self.progress.emit(_("Listening to Discord…"))
         self._timer.start(int((chatcheck.LENGTH_S + TAIL_S) * 1000))
 
     def cancel(self):
@@ -260,7 +268,7 @@ class ChatCheck(QObject):
             log.info("discord check: %s", {k: v for k, v in res.items()})
         except Exception as ex:  # noqa: BLE001
             log.exception("discord check failed")
-            res = {"issues": [], "error": f"The check failed: {errors.plain(ex)}"}
+            res = {"issues": [], "error": _("The check failed: {error}", error=errors.plain(ex))}
         self._emit(self._analyzed, res, run)
 
     def _on_analyzed(self, res: dict, run: int):
@@ -284,33 +292,31 @@ class DiscordGuide(QDialog):
         v = QVBoxLayout(self)
         v.setContentsMargins(24, 20, 24, 18)
         v.setSpacing(12)
-        v.addLayout(_header("Discord: sound clean", _label(
+        v.addLayout(_header(_("Discord: sound clean"), _label(_(
             "Discord cleans up your mic for <b>talking</b>. Left on, that cleanup treats "
             "music and sound effects as background noise and chops them up, so your "
-            "sounds reach your friends muffled and cut off. Two minutes, once:"),
+            "sounds reach your friends muffled and cut off. Two minutes, once:")),
             BunnyWidget("headphones")))
-        v.addWidget(_label(
-            "<ol style='margin-left:-20px'>"
-            "<li style='margin-bottom:8px'>In Discord, click the ⚙ gear next to your name "
-            "(<b>User Settings</b>) → <b>Voice &amp; Video</b>.</li>"
-            + (f"<li style='margin-bottom:8px'><b>Input Device</b>: keep your normal mic "
-               f"(<b style='color:{_ok()}'>{html.escape(vm)}</b>). Your sounds are already "
-               "in it.</li>" if kept else
-               "<li style='margin-bottom:8px'><b>Input Device</b>: choose "
-               f"<b style='color:{_ok()}'>{html.escape(vm)}</b>.</li>") +
-            "<li style='margin-bottom:8px'><b>Input Profile</b>: choose <b>Studio</b>. That "
-            "switches off noise suppression, echo cancellation and automatic gain "
-            "control in one go.<br><span style='font-size:9pt'>No Input Profile in your "
-            "Discord? Set <b>Noise Suppression</b> to <b>None</b> and turn off <b>Echo "
-            "Cancellation</b> and <b>Automatic Gain Control</b>.</span></li>"
-            "<li style='margin-bottom:8px'><b>Input Mode</b>: <b>Push to Talk</b> works best "
-            "(set the same key under Settings → Hotkeys → Auto push-to-talk and Onion "
-            "Board holds it for you while a sound plays). On <b>Voice Activity</b>, turn off "
-            "<b>Automatically determine input sensitivity</b> and drag the slider almost "
-            "all the way left, or quiet parts of your sounds get cut.</li>"
-            "<li>Click <b>Let's Check</b> in Discord, then <b>Check Discord</b> below. "
-            "Onion Board plays a short test into your mic and listens to what Discord "
-            "does with it.</li></ol>"))
+        mic = f"<b style='color:{_ok()}'>{html.escape(vm)}</b>"
+        v.addWidget(_label(_steps(
+            _("In Discord, click the ⚙ gear next to your name (<b>User Settings</b>) → "
+              "<b>Voice &amp; Video</b>."),
+            _("<b>Input Device</b>: keep your normal mic ({mic}). Your sounds are already "
+              "in it.", mic=mic) if kept else
+            _("<b>Input Device</b>: choose {mic}.", mic=mic),
+            _("<b>Input Profile</b>: choose <b>Studio</b>. That switches off noise "
+              "suppression, echo cancellation and automatic gain control in one go."
+              "<br><span style='font-size:9pt'>No Input Profile in your Discord? Set "
+              "<b>Noise Suppression</b> to <b>None</b> and turn off <b>Echo "
+              "Cancellation</b> and <b>Automatic Gain Control</b>.</span>"),
+            _("<b>Input Mode</b>: <b>Push to Talk</b> works best (set the same key under "
+              "Settings → Hotkeys → Auto push-to-talk and Onion Board holds it for you "
+              "while a sound plays). On <b>Voice Activity</b>, turn off <b>Automatically "
+              "determine input sensitivity</b> and drag the slider almost all the way "
+              "left, or quiet parts of your sounds get cut."),
+            _("Click <b>Let's Check</b> in Discord, then <b>Check Discord</b> below. Onion "
+              "Board plays a short test into your mic and listens to what Discord does "
+              "with it."))))
         self.result = _label("", "font-size:10.5pt;")
         self.result.setObjectName("resultbox")
         self.result.hide()
@@ -325,9 +331,9 @@ class DiscordGuide(QDialog):
         opn = QPushButton(_("Open Discord"))
         opn.setToolTip(_("Opens Discord's Voice & Video settings"))
         opn.clicked.connect(lambda: busy.open_url(
-            DISCORD_VOICE_URL, opn, self, opened="✓ Opened Discord",
-            failed="Couldn't open Discord — is it installed? Open it yourself: ⚙ User "
-                   "Settings → Voice & Video. The link was"))
+            DISCORD_VOICE_URL, opn, self, opened=_("✓ Opened Discord"),
+            failed=_("Couldn't open Discord — is it installed? Open it yourself: ⚙ User "
+                     "Settings → Voice & Video. The link was")))
         row.addWidget(opn)
         ptt = QPushButton(_("Auto push-to-talk…"))
         ptt.clicked.connect(lambda: mw.open_settings("hotkeys"))
@@ -359,7 +365,8 @@ class DiscordGuide(QDialog):
             self._check.start()
         except Exception as e:  # noqa: BLE001 - never leave the button stuck on "Checking…"
             log.exception("discord check couldn't start")
-            self._checked({"issues": [], "error": f"The check couldn't start: {errors.plain(e)}"})
+            self._checked({"issues": [], "error": _("The check couldn't start: {error}",
+                                                     error=errors.plain(e))})
 
     def _progress(self, text: str):
         self.result.setText(_("{text} (about {n} seconds; stay quiet for a moment)",
@@ -388,34 +395,30 @@ class GameGuide(QDialog):
         v = QVBoxLayout(self)
         v.setContentsMargins(24, 20, 24, 18)
         v.setSpacing(12)
-        v.addLayout(_header("Game voice chat", _label(
+        v.addLayout(_header(_("Game voice chat"), _label(_(
             "Games squeeze voice chat harder than Discord, and many clean up the mic the "
-            "same way. In the game's <b>Audio</b> or <b>Voice chat</b> settings:"),
+            "same way. In the game's <b>Audio</b> or <b>Voice chat</b> settings:")),
             BunnyWidget("headphones")))
-        v.addWidget(_label(
-            "<ol style='margin-left:-20px'>"
-            + (f"<li style='margin-bottom:8px'><b>Microphone / Input device</b>: keep your "
-               f"normal mic (<b style='color:{_ok()}'>{html.escape(vm)}</b>). Your sounds "
-               "are already in it.</li>" if kept else
-               f"<li style='margin-bottom:8px'><b>Microphone / Input device</b>: "
-               f"<b style='color:{_ok()}'>{html.escape(vm)}</b>. No such setting? Use "
-               "<b>Game has no microphone setting?</b> on the Setup tab.</li>") +
-            "<li style='margin-bottom:8px'>Turn <b>off</b> anything called <b>noise "
-            "suppression</b>, <b>noise cancellation</b>, <b>denoiser</b>, <b>background "
-            "sound removal</b>, <b>voice clarity</b> or <b>automatic gain</b>. The AI "
-            "denoisers (VRChat, Minecraft's Simple Voice Chat) wipe out music almost "
-            "completely.</li>"
-            "<li style='margin-bottom:8px'><b>Push to talk</b> instead of open mic or voice "
-            "activation, with the same key under <b>Settings → Hotkeys → Auto "
-            "push-to-talk</b>: voice activation cuts the quiet parts of sounds, and some "
-            "games send only speech on it, never music. Some games' anti-cheat ignores "
-            "keys other programs press: if your mic doesn't open for a sound, "
-            "<b>hold your push-to-talk key yourself</b> while it plays.</li>"
-            "<li>On the Setup tab, set <b>Who's listening</b> to <b>Game</b>. While the "
-            "game is open it recognises Vivox and Unity voice chat and shapes your "
-            "sounds for it by itself. For <b>Steam voice</b> (CS2, Dota 2), <b>Epic "
-            "Online Services</b> (Fortnite) or <b>Low bandwidth</b> (older and console "
-            "titles), choose <b>Advanced</b> and pick it.</li></ol>"))
+        mic = f"<b style='color:{_ok()}'>{html.escape(vm)}</b>"
+        v.addWidget(_label(_steps(
+            _("<b>Microphone / Input device</b>: keep your normal mic ({mic}). Your sounds "
+              "are already in it.", mic=mic) if kept else
+            _("<b>Microphone / Input device</b>: {mic}. No such setting? Use <b>Game has no "
+              "microphone setting?</b> on the Setup tab.", mic=mic),
+            _("Turn <b>off</b> anything called <b>noise suppression</b>, <b>noise "
+              "cancellation</b>, <b>denoiser</b>, <b>background sound removal</b>, <b>voice "
+              "clarity</b> or <b>automatic gain</b>. The AI denoisers (VRChat, Minecraft's "
+              "Simple Voice Chat) wipe out music almost completely."),
+            _("<b>Push to talk</b> instead of open mic or voice activation, with the same key "
+              "under <b>Settings → Hotkeys → Auto push-to-talk</b>: voice activation cuts the "
+              "quiet parts of sounds, and some games send only speech on it, never music. "
+              "Some games' anti-cheat ignores keys other programs press: if your mic doesn't "
+              "open for a sound, <b>hold your push-to-talk key yourself</b> while it plays."),
+            _("On the Setup tab, set <b>Who's listening</b> to <b>Game</b>. While the game is "
+              "open it recognises Vivox and Unity voice chat and shapes your sounds for it by "
+              "itself. For <b>Steam voice</b> (CS2, Dota 2), <b>Epic Online Services</b> "
+              "(Fortnite) or <b>Low bandwidth</b> (older and console titles), choose "
+              "<b>Advanced</b> and pick it."))))
         row = QHBoxLayout()
         copy = QPushButton(_("Copy the mic name"))
         icons.set_icon(copy, "copy")
@@ -447,29 +450,27 @@ class MeetingGuide(QDialog):
         v = QVBoxLayout(self)
         v.setContentsMargins(24, 20, 24, 18)
         v.setSpacing(12)
-        v.addLayout(_header("Zoom, Teams and browser calls", _label(
-            "Meeting apps clean up the mic for speech and treat music as background "
-            "noise. " + ("Your sounds are already in your mic: keep it, and turn that "
-                         "cleanup down:" if kept else
-                         "Pick the mic below and turn that cleanup down:")),
+        v.addLayout(_header(_("Zoom, Teams and browser calls"), _label(
+            _("Meeting apps clean up the mic for speech and treat music as background "
+              "noise. Your sounds are already in your mic: keep it, and turn that cleanup "
+              "down:") if kept else
+            _("Meeting apps clean up the mic for speech and treat music as background "
+              "noise. Pick the mic below and turn that cleanup down:")),
             BunnyWidget("headphones")))
         mic = f"<b style='color:{_ok()}'>{html.escape(vm)}</b>"
-        v.addWidget(_label(
-            "<ol style='margin-left:-20px'>"
-            f"<li style='margin-bottom:8px'><b>Zoom</b>: Settings → Audio → Microphone: "
-            f"{mic}. Untick <b>Automatically adjust microphone volume</b>, set "
-            "<b>Background noise suppression</b> to <b>Low</b>, or pick <b>Original sound "
-            "for musicians</b> (then turn it on in the meeting, top left).</li>"
-            f"<li style='margin-bottom:8px'><b>Microsoft Teams</b>: Settings → Devices → "
-            f"Microphone: {mic}. Set <b>Noise suppression</b> to <b>Off</b> or <b>Low</b>, "
-            "or switch on <b>Music mode</b> / <b>High fidelity music mode</b> if it's "
-            "there.</li>"
-            f"<li style='margin-bottom:8px'><b>In a browser</b> (Google Meet, Discord or "
-            f"Guilded in a web page): the call's own settings → Microphone: {mic}, and "
-            "turn off <b>Noise cancellation</b> / <b>noise suppression</b> where the site "
-            "has it.</li>"
-            "<li>On the Setup tab, set <b>Who's listening</b> to <b>Voice chat</b>. It "
-            "picks the browser shaping by itself once the call is listening.</li></ol>"))
+        v.addWidget(_label(_steps(
+            _("<b>Zoom</b>: Settings → Audio → Microphone: {mic}. Untick <b>Automatically "
+              "adjust microphone volume</b>, set <b>Background noise suppression</b> to "
+              "<b>Low</b>, or pick <b>Original sound for musicians</b> (then turn it on in "
+              "the meeting, top left).", mic=mic),
+            _("<b>Microsoft Teams</b>: Settings → Devices → Microphone: {mic}. Set <b>Noise "
+              "suppression</b> to <b>Off</b> or <b>Low</b>, or switch on <b>Music mode</b> / "
+              "<b>High fidelity music mode</b> if it's there.", mic=mic),
+            _("<b>In a browser</b> (Google Meet, Discord or Guilded in a web page): the "
+              "call's own settings → Microphone: {mic}, and turn off <b>Noise "
+              "cancellation</b> / <b>noise suppression</b> where the site has it.", mic=mic),
+            _("On the Setup tab, set <b>Who's listening</b> to <b>Voice chat</b>. It picks "
+              "the browser shaping by itself once the call is listening."))))
         row = QHBoxLayout()
         copy = QPushButton(_("Copy the mic name"))
         icons.set_icon(copy, "copy")
@@ -490,7 +491,7 @@ def show_guide(which: str, parent, mw, vm: str):
     the mic, the guides name the user's own mic (there's nothing to switch to)."""
     kept = on_mic(mw)
     if kept:
-        vm = mw.cfg.mic_device or "your mic"
+        vm = mw.cfg.mic_device or _("your mic")
     if which == "steam":
         from soundboard.ui.setupwizard import SteamGuide
         g = SteamGuide(parent, vm)
