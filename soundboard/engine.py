@@ -977,6 +977,10 @@ class Engine:
         # thread moves them to disk as they come. Separate from the test's _mic_rec
         self._take: list[np.ndarray] | None = None
         self._take_fx = False        # the take is the mic after the voice changer
+        # Record a sound from what's playing: the sounds bus plus the radio, before your
+        # mic is added, at the main output's rate (start_play_take)
+        self._play_take: list[np.ndarray] | None = None
+        self.play_take_out = "main"   # ...taken from this output ("mon": no send device)
         # a copy of every block sent to the send device while set to a list (the voice chat
         # check compares it with what Discord plays back); None = off
         self.main_tap: list[np.ndarray] | None = None
@@ -1741,6 +1745,24 @@ class Engine:
     def taking(self) -> bool:
         return self._take is not None
 
+    def start_play_take(self) -> list[np.ndarray]:
+        """Record a sound from what's playing: from now on every block of your sounds
+        (web results and the link bar's too) and the radio, as you hear them and
+        without your mic, is appended at the main output's rate (`rates["main"]`) to
+        the list returned, like start_mic_take. With no send device open it's taken from
+        your headphones instead (`play_take_out`, at that rate)."""
+        self.play_take_out = "main" if self.main_stream is not None else "mon"
+        self._play_take = blocks = []
+        return blocks
+
+    def stop_play_take(self) -> list[np.ndarray]:
+        blocks, self._play_take = self._play_take, None
+        return blocks if blocks is not None else []
+
+    @property
+    def play_taking(self) -> bool:
+        return self._play_take is not None
+
     # ----------------------------------------------------------------- callbacks
     def _render(self, out: str, frames: int, previews_only=False,
                 fixed=False, makeup=True) -> np.ndarray:
@@ -2021,10 +2043,16 @@ class Engine:
     def _main(self, outdata, frames):
         mix = self._vol("main", "sounds", self._sounds("main", frames), self.sound_vol)
         play = peak(mix)
+        take = self._play_take   # read once: the UI may end it meanwhile
+        took = mix.copy() if take is not None and self.play_take_out == "main" else None
         r = self.ring_rmain.read(frames)
         if r is not None:
             play = max(play, peak(r) * self.radio_vol)
             mix += self._vol("main", "radio", r, self.radio_vol if self.radio_live else 0.0)
+            if took is not None:   # the radio as you hear it, sent out or not
+                took += r * np.float32(self.radio_vol)
+        if took is not None:
+            take.append(took)
         lowcut = self._lowcut()
         for a in self.aux:
             x = a.ring_main.read(frames)
@@ -2076,11 +2104,17 @@ class Engine:
         m = self.ring_mon.read(frames)
         mix = self._vol("mon", "sounds", mix, self.sound_vol if check else 1.0)
         play = peak(mix)   # the main output sees the rest; this one counts with no send device too
+        take = self._play_take   # no send device: what's playing is recorded from here
+        took = mix.copy() if take is not None and self.play_take_out == "mon" else None
         r = self.ring_rmon.read(frames)
         if r is not None:
             play = max(play, peak(r) * self.radio_vol)
             on = self.radio_monitor or (check and self.radio_live)
             mix += self._vol("mon", "radio", r, self.radio_vol if on else 0.0)
+            if took is not None:
+                took += r * np.float32(self.radio_vol)
+        if took is not None:
+            take.append(took)
         lowcut = self._lowcut()   # the headphones get the mode's shaping too (_dest)
         for a in self.aux:
             x = a.ring_mon.read(frames)

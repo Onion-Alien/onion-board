@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- **Record a bit of what's playing.** The Sounds tab's **Record** window has a new
+  *What's playing* choice: press Record, play a sound, a web search result or the
+  radio (or catch a song already playing), then Stop, cut the ends and save it as a
+  pad, named after what played. Your mic isn't in it. The window no longer blocks
+  the board while it's open.
 - **Space plays and pauses everywhere on Sounds and Radio**, not just on a pad: after
   clicking a web result's *Play*, a slider or a station, Space pauses (it used to
   click the button again and download the song a second time). Typing in a box and

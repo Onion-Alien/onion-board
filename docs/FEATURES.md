@@ -11,8 +11,10 @@ The full list. The [README](../README.md) has the short version and how to get s
   step with the sound (only you see it). **Pick several pads** with Ctrl+click,
   Shift+click or Ctrl+A to change their colour, volume, fades or categories, export
   them or remove them together (one Undo).
-- **Record a sound with your mic:** the **Record** button next to *Add sounds*.
-  Record your own voice, or your voice through the voice changer while it's on;
+- **Record a sound with your mic, or from what's playing:** the **Record** button next
+  to *Add sounds*. Record your own voice, your voice through the voice changer while
+  it's on, or *What's playing*: a bit of a sound, a web search result or the radio as
+  you hear it (the window stays out of the way, so you can play it while it records);
   after *Stop* the quiet ends are already cut off, drag the start and end to cut
   more, *Preview* plays it in your headphones only, then name it and *Save* to add
   the pad (it joins the category showing). Up to 15 minutes, spooled to disk as it

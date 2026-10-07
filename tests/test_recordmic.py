@@ -146,7 +146,7 @@ def record(d, e, quiet_blocks=50, loud_blocks=50):
 def test_record_stop_save_adds_one_trimmed_pad(qapp, app_dir):
     e, saved = mic_engine(), []
     d = make_dialog(e, saved)
-    assert d.source.isHidden()   # voice changer off: no choice to make
+    assert d.opt_fx.isHidden() and not d.source.isHidden()   # voice changer off: mic or playing
     record(d, e)
     assert d.data is not None and len(d.data) == 150 * BLOCK
     assert d.name.text() == "Recording 1"
@@ -164,7 +164,7 @@ def test_through_the_voice_changer_records_the_changed_voice(qapp, app_dir):
     e, saved = mic_engine(), []
     e.voice_chain = Halver()
     d = make_dialog(e, saved, voice=True)
-    assert not d.source.isHidden()
+    assert not d.opt_fx.isHidden()
     d.opt_fx.setChecked(True)
     record(d, e, quiet_blocks=0)
     assert abs(float(d.data.max()) - 0.25) < 1e-6
@@ -249,3 +249,96 @@ def test_cancel_adds_nothing(window, monkeypatch):  # noqa: F811
         d.deleteLater()
     finally:
         e.mic_stream = None
+
+
+# ------------------------------------------------------------------ what's playing
+
+def out_engine(*outs) -> Engine:
+    e = Engine()
+    e.dest, e.limiter_on, e.send_mono = None, False, False   # no shaping, exact samples
+    for o in outs:
+        setattr(e, f"{o}_stream", object())
+        e.names[o] = f"fake {o}"
+    return e
+
+
+def test_play_take_records_the_sounds_and_radio_without_the_mic():
+    e = out_engine("main")
+    e.ring_rmain.prefill = 0
+    e.play("song", np.full((SR, 2), 0.25, np.float32), 1.0, loop=True)
+    e.ring_main.write(np.full((BLOCK * 4, 2), 0.5, np.float32))   # your mic, on its way out
+    out = np.zeros((BLOCK, 2), np.float32)
+    e._main(out, BLOCK)                       # past the sound's fade-in
+    blocks = e.start_play_take()
+    assert e.play_take_out == "main" and e.play_taking
+    e.feed_radio(np.full((BLOCK * 2, 2), 0.1, np.float32))
+    e.radio_live = False                      # the radio not sent out: still recorded
+    e._main(out, BLOCK)
+    assert e.stop_play_take() is blocks and not e.play_taking
+    assert len(blocks) == 1 and np.allclose(blocks[0][-10:], 0.25 + 0.1, atol=1e-3)
+    e._main(out, BLOCK)
+    assert len(blocks) == 1                   # stopped: nothing more lands
+
+
+def test_play_take_comes_from_the_headphones_with_no_send_device():
+    e = out_engine("mon")
+    e.monitor_sounds = True
+    e.play("song", np.full((SR, 2), 0.25, np.float32), 1.0, loop=True)
+    out = np.zeros((BLOCK, 2), np.float32)
+    e._mon(out, BLOCK)
+    blocks = e.start_play_take()
+    assert e.play_take_out == "mon"
+    e._mon(out, BLOCK)
+    e.stop_play_take()
+    assert len(blocks) == 1 and np.allclose(blocks[0][-10:], 0.25, atol=1e-3)
+
+
+def test_the_window_records_whats_playing_and_names_it(app_dir):
+    e = out_engine("main")
+    saved = []
+    d = RecordDialog(e, lambda: False, lambda: ["Boom"],
+                     lambda data, name: saved.append((data, name)) or True, lambda: None,
+                     playing_name=lambda: "Haddaway - What Is Love")
+    d.opt_play.setChecked(True)
+    assert not d.problem.isVisibleTo(d) and d.btn_rec.isEnabled()   # no mic needed
+    assert d.start() and d.take.playing
+    for _ in range(50):
+        e._play_take.append(np.full((BLOCK, 2), 0.3, np.float32))
+    d._tick()
+    d.stop()
+    assert d.data is not None and abs(len(d.data) - 50 * BLOCK) <= 2
+    assert d.name.text() == "Haddaway - What Is Love"
+    assert d.save() and saved[0][1] == "Haddaway - What Is Love"
+    assert RecordDialog.last_source == "play"
+    RecordDialog.last_source = "mic"
+    d.deleteLater()
+
+
+def test_recording_silence_from_whats_playing_says_nothing_played(app_dir):
+    e = out_engine("main")
+    d = RecordDialog(e, lambda: False, lambda: [], lambda *a: True, lambda: None)
+    d.opt_play.setChecked(True)
+    assert d.start()
+    e._play_take.append(np.zeros((BLOCK, 2), np.float32))
+    d.stop()
+    assert d.data is None and "nothing played" in d.status.text()
+    RecordDialog.last_source = "mic"
+    d.deleteLater()
+
+
+def test_whats_playing_needs_an_open_device(app_dir):
+    e = Engine()
+    d = RecordDialog(e, lambda: False, lambda: [], lambda *a: True, lambda: None)
+    d.opt_play.setChecked(True)
+    assert "No audio device" in d.problem_text.text() and not d.start()
+    d.deleteLater()
+
+
+def test_the_record_window_leaves_the_board_usable(window):  # noqa: F811
+    window.record_dialog()
+    d = window._record_dlg
+    assert d is not None and d.isVisible() and not d.isModal()
+    window.record_dialog()                     # a second click brings the same one up
+    assert window._record_dlg is d
+    d.reject()
+    assert window._record_dlg is None
