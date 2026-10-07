@@ -468,6 +468,7 @@ QFrame#card[interactive="true"][hovered="true"] { background:$card_hi; border-co
 QFrame#card[interactive="true"]:focus { background:$card_hi; border-color:$accent; }
 QLabel#section { color:$section; font-size:8pt; font-weight:700; letter-spacing:1px; padding-top:8px;
                  qproperty-indent:0; }  /* padding alone makes Qt indent the text 3 px */
+QLabel#section[head="true"] { padding-top:0; }
 QLabel#hint, QLabel#muted { color:$muted; }
 QLabel#hint { font-size:8.5pt; }
 QLabel[tone="ok"], QLabel#hint[tone="ok"] { color:$ok_text; }

@@ -2440,6 +2440,7 @@ class CardHead(QWidget):
         h.setContentsMargins(0, 0, 0, 0)
         h.setSpacing(8)
         self.label = section_label(title)
+        self.label.setProperty("head", True)   # centred on the arrow, no top padding
         h.addWidget(self.label)
         h.addStretch(1)
         self.pill = QLabel("")

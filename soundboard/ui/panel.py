@@ -234,7 +234,8 @@ def card(title: str = "", hint: str = "", *, roomy: bool = False) -> tuple[QFram
     f.setObjectName("card")
     v = QVBoxLayout(f)
     f.setProperty("roomy", roomy)
-    v.setContentsMargins(*((18, 18, 18, 18) if roomy else (14, 8, 14, 14)))
+    # the title label adds 8 px of its own above, so the top margin is 8 less
+    v.setContentsMargins(*((18, 10, 18, 18) if roomy else (14, 8, 14, 14)))
     v.setSpacing(12 if roomy else 6)
     if title:
         v.addWidget(section_label(title))
