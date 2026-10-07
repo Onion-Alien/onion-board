@@ -32,7 +32,7 @@ def isolate(conf: dict):
     if not Path(settings.APP_DIR).resolve().is_relative_to(Path(conf["profile"]).resolve()):
         link.send("error", text=f"Onion Watch's data folder isn't in the run's profile: "
                                 f"refusing ({settings.APP_DIR})")
-        os._exit(3)
+        link.hard_exit(3)
     stand_in_screen(screenwatch)
 
     from onionwatch import updates, usage
@@ -157,7 +157,7 @@ def main():
         child.phase(name, fn)
     link.send("done", errors=child.errors)
     sys.stderr.flush()
-    os._exit(0)
+    link.hard_exit(0)
 
 
 if __name__ == "__main__":

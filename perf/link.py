@@ -39,7 +39,23 @@ def mark(ev: str, **data) -> None:
     send(ev, wait=True, **data)
     line = sys.stdin.readline()
     if not line:   # the runner went away: nothing left to measure for
-        os._exit(2)
+        hard_exit(2)
+
+
+def hard_exit(code: int):
+    """End the measured process now. os._exit can hang there (DLLs unloading with the
+    app's threads still running); TerminateProcess on ourselves can't."""
+    for f in (sys.stdout, sys.stderr, _out):
+        try:
+            f and f.flush()
+        except (OSError, ValueError):
+            pass
+    if sys.platform == "win32":
+        import ctypes
+        k32 = ctypes.windll.kernel32
+        k32.GetCurrentProcess.restype = ctypes.c_void_p
+        k32.TerminateProcess(ctypes.c_void_p(k32.GetCurrentProcess()), code)
+    os._exit(code)
 
 
 def parse(line: str) -> dict | None:
