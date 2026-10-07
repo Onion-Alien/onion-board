@@ -65,10 +65,11 @@ class PadSelection(QObject):
         self.lbl = QLabel()
         h.addWidget(self.lbl, 1)
         for text, tip, fn in (
-                ("Colour", "Give every picked pad the same colour", self._color_menu),
-                ("Volume…", "Set every picked sound's volume", self.ask_volume),
-                ("Fades…", "Set every picked sound's fade in / fade out", self.ask_fades),
-                ("Categories", "Put the picked sounds in a category, or take them out",
+                (_("Colour"), _("Give every picked pad the same colour"), self._color_menu),
+                (_("Volume…"), _("Set every picked sound's volume"), self.ask_volume),
+                (_("Fades…"), _("Set every picked sound's fade in / fade out"),
+                 self.ask_fades),
+                (_("Categories"), _("Put the picked sounds in a category, or take them out"),
                  self._cats_menu)):
             b = QPushButton(text)
             b.setObjectName("small")

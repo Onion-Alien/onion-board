@@ -28,6 +28,7 @@ from dataclasses import dataclass, field, fields
 from pathlib import Path
 
 from soundboard import library, trash
+from soundboard.i18n import _
 from soundboard.library import Config
 
 log = logging.getLogger(__name__)
@@ -35,11 +36,20 @@ log = logging.getLogger(__name__)
 MAX_POINTS = 5
 SETTINGS, HOTKEYS, SOUND_KEYS, SOUNDS, BIN, PROGRAMS, DEVICES = (
     "settings", "hotkeys", "sound_keys", "sounds", "bin", "programs", "devices")
-# what each part is called (the guide, the restore point list, the toast)
+# what each part is called, in English (shown through part_name(): this module can be
+# imported before the language is picked, so nothing here is translated at import)
 NAMES = {SETTINGS: "Settings", HOTKEYS: "Hotkeys", SOUND_KEYS: "Sound hotkeys",
          SOUNDS: "Sounds", BIN: "Recently deleted", PROGRAMS: "Programs",
          DEVICES: "Audio devices"}
 PARTS = tuple(NAMES)
+
+
+def part_name(part: str) -> str:
+    """What `part` is called in the language showing (the guide, the restore point
+    list, the toast)."""
+    return {SETTINGS: _("Settings"), HOTKEYS: _("Hotkeys"), SOUND_KEYS: _("Sound hotkeys"),
+            SOUNDS: _("Sounds"), BIN: _("Recently deleted"), PROGRAMS: _("Programs"),
+            DEVICES: _("Audio devices")}.get(part, NAMES.get(part, part))
 DEVICE_FIELDS = ("main_device", "mon_device", "mic_device", "obs_device", "also_send",
                  "mon_follows_default", "route")
 PROGRAM_FIELDS = ("apps", "apps_paths", "apps_hidden")
@@ -68,16 +78,23 @@ def _pending_path() -> Path:
 class Point:
     id: str
     when: float
-    label: str                    # "Before reset", "Before restoring"
+    label: str                    # "Before reset", "Before restoring" (kept in English)
     parts: list[str] = field(default_factory=list)
 
     @property
     def path(self) -> Path:
         return folder() / self.id
 
+    @property
+    def title(self) -> str:
+        """The label in the language showing."""
+        return {"Before reset": _("Before reset"),
+                "Before restoring": _("Before restoring")}.get(self.label, self.label)
+
     def describe(self) -> str:
         """"Settings, Hotkeys" / "Everything as it was"."""
-        return ", ".join(NAMES[p] for p in self.parts if p in NAMES) or "Everything as it was"
+        return (", ".join(part_name(p) for p in self.parts if p in NAMES)
+                or _("Everything as it was"))
 
 
 # --------------------------------------------------------------------------- schedule
@@ -116,7 +133,7 @@ def run_pending() -> str:
             return restore(raw["restore"])
     except Exception:  # noqa: BLE001 - start up anyway, on the settings as they are
         log.exception("the reset / restore failed")
-        return "Couldn't finish that: nothing was changed. The log has the details."
+        return _("Couldn't finish that: nothing was changed. The log has the details.")
     return ""
 
 
@@ -127,7 +144,7 @@ def reset(parts: list[str]) -> str:
         return ""
     cfg = Config.load()
     if cfg.read_only:
-        return "Couldn't reset: the settings file was locked. Nothing was changed."
+        return _("Couldn't reset: the settings file was locked. Nothing was changed.")
     point = _new_point("Before reset", parts, cfg)
     if BIN in parts:
         with trash._lock:
@@ -165,10 +182,11 @@ def reset(parts: list[str]) -> str:
             _forget_newer(cfg, name)
         cfg.setup_done = False   # the quick setup guide picks them again
     if not cfg.save():
-        return "Couldn't save the reset settings. Your restore point is in Settings > General."
+        return _("Couldn't save the reset settings. Your restore point is in "
+                 "Settings > General.")
     log.info("reset %s (restore point %s)", parts, point.id)
-    return (f"Reset: {', '.join(NAMES[p] for p in parts)}. Changed your mind? "
-            "Settings > General > Restore points.")
+    return _("Reset: {parts}. Changed your mind? Settings > General > Restore points.",
+             parts=", ".join(part_name(p) for p in parts))
 
 
 def _forget_newer(cfg: Config, name: str) -> None:
@@ -196,10 +214,10 @@ def _keep_sounds(cfg: Config, point: Point) -> None:
 def restore(point_id: str) -> str:
     point = next((p for p in points() if p.id == point_id), None)
     if point is None:
-        return "That restore point is gone."
+        return _("That restore point is gone.")
     now = Config.load()
     if now.read_only:
-        return "Couldn't restore: the settings file was locked. Nothing was changed."
+        return _("Couldn't restore: the settings file was locked. Nothing was changed.")
     old = Config.from_raw(json.loads((point.path / "config.json").read_text(encoding="utf-8")))
     _new_point("Before restoring", [], now, keep=point.id)   # so this can be undone too
     moved: list[tuple[Path, Path]] = []   # (where it was in the point, where it is now)
@@ -226,15 +244,15 @@ def restore(point_id: str) -> str:
     except Exception:
         if not _put_back(moved):
             log.exception("the restore failed partway")
-            return ("Couldn't finish restoring, and some of its sounds couldn't be put "
-                    "back in the restore point: they're in your library's sounds folder. "
-                    "The log has the details.")
+            return _("Couldn't finish restoring, and some of its sounds couldn't be put "
+                     "back in the restore point: they're in your library's sounds folder. "
+                     "The log has the details.")
         raise   # put back as it was: "nothing was changed" is true
     if not saved:
         if not _put_back(moved):
-            return ("Couldn't save the restored settings, and some of its sounds are in "
-                    "your library's sounds folder now. The log has the details.")
-        return "Couldn't save the restored settings. Nothing was changed."
+            return _("Couldn't save the restored settings, and some of its sounds are in "
+                     "your library's sounds folder now. The log has the details.")
+        return _("Couldn't save the restored settings. Nothing was changed.")
     bin_note = ""
     if (point.path / "deleted").is_dir():
         try:   # the settings are restored now: a bin that won't come in stays in the point
@@ -244,14 +262,15 @@ def restore(point_id: str) -> str:
             done = False
         if not done:
             whole = False
-            bin_note = (" Some of Recently deleted couldn't be brought back: it's kept in "
-                        "this restore point.")
+            bin_note = " " + _("Some of Recently deleted couldn't be brought back: it's "
+                               "kept in this restore point.")
     if whole:
         _remove(point.path, recycle=False)
     else:   # kept (and listed): what's left in it isn't lost
         log.warning("restored %s, but kept it: some of it is still only in there", point.id)
     log.info("restored %s", point.id)
-    return f"Restored: {point.describe()} from {trash.ago(point.when)}.{bin_note}"
+    return _("Restored: {parts} from {ago}.", parts=point.describe(),
+             ago=trash.ago(point.when)) + bin_note
 
 
 def _put_back(moved: list[tuple[Path, Path]]) -> bool:
