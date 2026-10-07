@@ -100,8 +100,11 @@ class AiVoicePanel(QWidget):
         grid.setVerticalSpacing(10)
         grid.addWidget(QLabel(_("Voice")), 0, 0)
         vrow = QHBoxLayout()
+        vrow.setSpacing(8)
         self.cb_voice = QComboBox()
         self.cb_voice.setToolTip(_("The character you sound like"))
+        self.cb_voice.setMinimumWidth(180)
+        self.cb_voice.setMaximumWidth(300)   # a name and an emoji, not a bar across the card
         vrow.addWidget(self.cb_voice, 1)
         self.b_all = QPushButton(_("All voices"))
         icons.set_icon(self.b_all, "sounds")
@@ -109,11 +112,13 @@ class AiVoicePanel(QWidget):
                                 "and making your own"))
         self.b_all.clicked.connect(self.open_browser)
         vrow.addWidget(self.b_all)
+        vrow.addStretch(1)
         grid.addLayout(vrow, 0, 1)
         self.lbl_about = hint_label("")
         grid.addWidget(self.lbl_about, 1, 1)
         grid.addWidget(QLabel(_("Pitch")), 2, 0)
         prow = QHBoxLayout()
+        prow.setSpacing(12)
         self.chk_auto = QCheckBox(_("Match the voice"))
         self.chk_auto.setToolTip(_("Moves your pitch to where this voice naturally sits, "
                                    "whoever is talking. Off: your own pitch."))
@@ -123,11 +128,13 @@ class AiVoicePanel(QWidget):
         self.sl_pitch.setRange(-24, 24)            # half semitones
         self.sl_pitch.setValue(int(round(self.s["pitch"] * 2)))
         self.sl_pitch.setMinimumHeight(28)
+        self.sl_pitch.setMaximumWidth(320)
         self.sl_pitch.setToolTip(_("Higher or lower than that, in semitones"))
         prow.addWidget(self.sl_pitch, 1)
         self.lbl_pitch = QLabel("")
         self.lbl_pitch.setMinimumWidth(48)
         prow.addWidget(self.lbl_pitch)
+        prow.addStretch(1)
         grid.addLayout(prow, 2, 1)
         grid.setColumnStretch(1, 1)
         rv.addLayout(grid)
@@ -152,6 +159,7 @@ class AiVoicePanel(QWidget):
         self.lbl_missing = hint_label("")
         mv.addWidget(self.lbl_missing)
         mrow = QHBoxLayout()
+        mrow.setSpacing(8)
         self.b_install = QPushButton(_("Install AI voices"))
         icons.set_icon(self.b_install, "plus")
         self.b_install.setToolTip(_("One-time download, about 90 MB. Needs Python 3.12+."))
@@ -180,6 +188,7 @@ class AiVoicePanel(QWidget):
         ov.setContentsMargins(0, 0, 0, 0)
         ov.setSpacing(10)
         brow = QHBoxLayout()
+        brow.setSpacing(12)
         brow.addWidget(QLabel(_("If the AI voice stops")))
         self.cb_backup = QComboBox()
         for label, key in BACKUP_LABELS:
@@ -188,13 +197,16 @@ class AiVoicePanel(QWidget):
         self.cb_backup.setToolTip(_("What others hear if the AI voice crashes or can't keep "
                                     "up: by default a built-in voice changer preset, so your "
                                     "real voice still isn't heard."))
+        self.cb_backup.setMaximumWidth(360)
         brow.addWidget(self.cb_backup, 1)
+        brow.addStretch(1)
         ov.addLayout(brow)
         self.b_update = QPushButton(_("Update AI voices"))
         self.b_update.setToolTip(_("Runs its install again (and fetches the voice model if "
                                    "it's missing). Needs Python 3.12+."))
         self.b_update.clicked.connect(self._install)
         urow = QHBoxLayout()
+        urow.setSpacing(8)
         urow.addWidget(self.b_update)
         self.b_remove = QPushButton(_("Remove AI voices"))
         self.b_remove.setToolTip(_("Deletes the add-on, its voice model and its Python "

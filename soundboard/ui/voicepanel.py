@@ -30,8 +30,8 @@ from soundboard.speech import customvoices, translation, tts, winvoices
 from soundboard.speech.aivoice import AiVoiceController
 from soundboard.speech.live import SpeechController, clean_settings
 from soundboard.ui import appstate, art, busy, icons
-from soundboard.ui.panel import (Flow, UndoBar, VolumeControl, bar, card, hint_label, icon_label,
-                                 section_label, vsep)
+from soundboard.ui.panel import (Flow, UndoBar, VolumeControl, bar, capped, card, hint_label,
+                                 icon_label, section_label, vsep)
 from soundboard.ui.responsive import FitWidth
 from soundboard.ui.widgets import Meter
 from soundboard.wheelguard import no_wheel
@@ -1554,7 +1554,11 @@ class SpeechPanel(QWidget):
         self.sl_rate.setRange(-10, 10)
         self.sl_rate.setValue(int(self.s["rate"]))
         grid.addWidget(self.sl_rate, 1, 1)
+        for w in (self.cb_voice, self.sl_rate):   # a list and a slider, not bars across
+            w.setMinimumWidth(220)                # the whole card at full screen
+            w.setMaximumWidth(380)
         grid.setColumnStretch(1, 1)
+        grid.setColumnStretch(3, 2)
         v.addLayout(grid)
 
         self.start_box = QWidget()   # Start and its state: shown with live_box
@@ -2621,7 +2625,9 @@ class VoicePanel(QWidget):
         scroll.setFrameShape(QFrame.NoFrame)
         scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         page = FitWidth()   # the voice changer fits itself to the width (_fit_width)
-        pv = QVBoxLayout(page)
+        body = QWidget()
+        capped(body, page)  # not a 900 px wide card at full screen
+        pv = QVBoxLayout(body)
         pv.setContentsMargins(4, 4, 8, 12)
         pv.setSpacing(16)
         self._top = QVBoxLayout()     # Speak in: every voice below uses it

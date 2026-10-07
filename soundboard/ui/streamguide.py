@@ -79,13 +79,14 @@ class StreamerGuide(QDialog):
             _("<b>A panic button.</b> Make a key with the <b>Panic mute</b> link: one press "
               "and nobody hears anything (your sounds or your mic); press it again to go "
               "live. <b>Stop all</b> just stops the sounds."),
-            _("<b>Let your stream hear the sounds.</b> Settings → Audio → <b>Stream "
-              "output</b>, pick a device, then add that device in OBS: Sources → + → "
+            _("<b>Let your stream hear the sounds.</b> Setup → Devices → <b>Also send "
+              "to</b>: add a device set to <b>Clean, for streaming</b>, then add that device "
+              "in OBS: Sources → + → "
               "<i>Audio Output Capture</i> (for a virtual cable: an <i>Audio Input "
               "Capture</i> of its Output end). Your sounds get their own volume slider in "
               "OBS. No virtual cable, or Voicemeeter / a mixer? Setup → Devices → <b>Send my "
               "sounds to</b> → that device (OBS can capture that one too) or <i>Nobody</i> "
-              "(only you and the stream output hear them)."),
+              "(only you and your streaming device hear them)."),
         ]
         steps = _label(
             "<ol style='margin-left:-20px'>"

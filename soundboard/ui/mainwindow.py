@@ -46,8 +46,8 @@ from soundboard.ui.dialogs import EditDialog
 from soundboard.ui import (a11y, alsosend, appstate, busy, clipeditor, icons, responsive, splash,
                            taboff)
 from soundboard.ui.speedpitch import SpeedPitchButton
-from soundboard.ui.panel import (EqPanel, Flow, VolumeControl, bar, card, hint_label,
-                                 icon_label, vsep)
+from soundboard.ui.panel import (EqPanel, Flow, VolumeControl, bar, capped, card,
+                                 hint_label, icon_label, vsep)
 from soundboard.ui.linkbar import PLAY_ID as LINK_ID
 from soundboard.ui.linkbar import LinkBar
 from soundboard.ui.livedot import is_tab_live, set_tab_live
@@ -1275,9 +1275,10 @@ class MainWindow(QMainWindow):
         page = QScrollArea()
         page.setWidgetResizable(True)
         page.setFrameShape(QFrame.NoFrame)
-        inner = QWidget()
-        cols = self._setup_cols = QHBoxLayout(inner)
-        cols.setContentsMargins(4, 12, 8, 12)
+        body = QWidget()
+        inner = capped(body, margins=(4, 12, 8, 12))   # not a 900 px wide card at full screen
+        cols = self._setup_cols = QHBoxLayout(body)
+        cols.setContentsMargins(0, 0, 0, 0)
         cols.setSpacing(16)
         lcol, rcol = QVBoxLayout(), QVBoxLayout()
         for col in (lcol, rcol):
@@ -1320,7 +1321,9 @@ class MainWindow(QMainWindow):
         self.btn_attach.clicked.connect(self.attach_mic)
         icons.set_icon(self.btn_attach, "mic")
         self.btn_attach.hide()
-        cv.addWidget(self.btn_attach)
+        # the ways to set it up, side by side at their own size (wraps when narrow)
+        ways = Flow(gap=8)
+        ways.addWidget(self.btn_attach)
         self.btn_usecable = QPushButton(_("Use the virtual cable instead"))
         self.btn_usecable.setToolTip(_("The other way to reach Discord and games: a free virtual "
                                        "cable you pick as the mic there"))
@@ -1332,8 +1335,9 @@ class MainWindow(QMainWindow):
         self._attach_release = None   # busy.hold on btn_install while it's being set up
         self._settle_until = 0.0      # just set up: Windows is still loading it
         icons.set_icon(self.btn_install, "cable", "on_accent")
-        cv.addWidget(self.btn_install)
-        cv.addWidget(self.btn_usecable)   # (under the mic's own button: the second way)
+        ways.addWidget(self.btn_install)
+        ways.addWidget(self.btn_usecable)   # (after the mic's own button: the second way)
+        cv.addLayout(ways)
         # straight into the mic works: the cable is only a fallback, so offer to remove it
         self.btn_rmcable = QPushButton(_("Remove the virtual cable"))
         self.btn_rmcable.setToolTip(_("Uninstalls VB-Cable. Your sounds go straight into your "
@@ -1353,33 +1357,35 @@ class MainWindow(QMainWindow):
         self.btn_rescan = QPushButton(_("I've installed it — check again"))
         self.btn_rescan.clicked.connect(lambda: self.rescan_with_feedback(self.btn_rescan))
         icons.set_icon(self.btn_rescan, "reload")
-        cv.addWidget(self.btn_rescan)
+        cv.addWidget(self.btn_rescan, 0, Qt.AlignLeft)
         helpcard, hv = card(_("CONNECT YOUR CHAT"),
                             _("Choose your app for the recommended microphone settings."),
                             roomy=True)
+        chat = Flow(gap=8)   # at their own size, wrapping, not five full-width bars
         self.btn_chat = QPushButton(_("Make it sound clean in Discord"))
         self.btn_chat.setToolTip(_("The Discord settings that stop it chopping up your sounds, "
                                    "and a check that listens to what Discord does to them"))
         icons.set_icon(self.btn_chat, "headphones")
         self.btn_chat.clicked.connect(lambda: self.show_chat_guide("discord"))
-        hv.addWidget(self.btn_chat)
+        chat.addWidget(self.btn_chat)
         self.btn_game = QPushButton(_("Set up game voice chat"))
         self.btn_game.clicked.connect(lambda: self.show_chat_guide("game"))
-        hv.addWidget(self.btn_game)
+        chat.addWidget(self.btn_game)
         self.btn_meeting = QPushButton(_("Zoom, Teams or a browser call"))
         self.btn_meeting.setToolTip(_("The settings in Zoom, Microsoft Teams and calls in a web "
                                       "page that stop them treating your sounds as noise"))
         self.btn_meeting.clicked.connect(lambda: self.show_chat_guide("meeting"))
-        hv.addWidget(self.btn_meeting)
+        chat.addWidget(self.btn_meeting)
         self.btn_nomic = QPushButton(_("Game has no microphone setting?"))
         self.btn_nomic.clicked.connect(self.open_windows_mic)
-        hv.addWidget(self.btn_nomic)
+        chat.addWidget(self.btn_nomic)
         guide = QPushButton(_("Step-by-step guide"))
         guide.setToolTip(_("Walks you through mic, headphones, where your sounds go (your mic, "
                            "the cable, another device or nowhere) and Discord"))
         icons.set_icon(guide, "check")
         guide.clicked.connect(self.run_setup)
-        hv.addWidget(guide)
+        chat.addWidget(guide)
+        hv.addLayout(chat)
         lcol.addWidget(howcard)
         lcol.addWidget(helpcard)
 
@@ -1458,7 +1464,7 @@ class MainWindow(QMainWindow):
         self.btn_rec.setObjectName("primary")
         icons.set_icon(self.btn_rec, "record", "on_accent")
         self.btn_rec.clicked.connect(self.start_test)
-        tv.addWidget(self.btn_rec)
+        tv.addWidget(self.btn_rec, 0, Qt.AlignLeft)
         tv.addWidget(hint_label(_("To hear it live instead, use Hear what they hear at the "
                                   "bottom.")))
         self.test_result = QLabel()
@@ -1926,12 +1932,38 @@ class MainWindow(QMainWindow):
         return name
 
     def set_obs_device(self, name: str | None):
-        """Settings -> Audio -> Stream output (OBS): None switches it off."""
+        """The stream output: Setup -> Devices -> Also send to -> a row set to Clean,
+        for streaming. None switches it off."""
         self.cfg.obs_device = name
         self.engine.set_obs_device(self._obs_name(name))
+        copies = self._copy_names()   # (a copy row on it may be free to open again)
+        if list(self.engine.copy_names) != copies:
+            self.engine.set_copy_devices(copies)
+        self._show_route()            # the rows
         self._save_now()
         self._update_status()
         self._prepare_all()
+
+    def set_send_kind(self, name: str, stream: bool):
+        """Also send to: the row on `name` gets the clean stream mix (`stream`; the
+        one that had it before goes back to a copy of the call, in its place) or the
+        same as the call."""
+        c = self.cfg
+        lst = list(c.also_send)
+        if stream:
+            if c.obs_device == name:
+                return
+            i = lst.index(name) if name in lst else len(lst)
+            lst = [n for n in lst if n != name]
+            if c.obs_device and c.route != "off":
+                lst.insert(i, c.obs_device)
+            c.also_send = lst
+            log.info("also send to: %s, clean: %s", lst, name)
+            self.set_obs_device(name)
+        elif c.obs_device == name:
+            c.also_send = list(dict.fromkeys([*lst, name]))
+            log.info("also send to: %s, clean: none", c.also_send)
+            self.set_obs_device(None)
 
     def _prepare_all(self):
         items = list(self.audio.items())
@@ -1952,8 +1984,8 @@ class MainWindow(QMainWindow):
         self.virtual_mic = eng.virtual_mic_for(main)
         if c.route == "off":
             self.setup_hint.setText(_("Sending to others is off: your sounds play in your "
-                                      "headphones and on the stream output (Settings → Audio) "
-                                      "only."))
+                                      "headphones and on a device set to Clean, for streaming "
+                                      "(Also send to) only."))
         elif c.route == "device" and c.main_device and c.main_device == c.mon_device:
             self.setup_hint.setText(_("<span style='color:{status}'>That's your headphones too, "
                                       "so nothing is sent (you'd hear everything twice). Pick "

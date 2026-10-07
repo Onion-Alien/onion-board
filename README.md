@@ -106,7 +106,7 @@ Optional: if you never get it, nothing changes.
      mixer, a capture card or a second sound card. Nothing is installed. In OBS add
      it as an *Audio Output Capture*; in Voicemeeter or a mixer, send that input on
      to wherever it should go.
-   - **Nobody**: only you hear your sounds (and the *Stream output* if you set one).
+   - **Nobody**: only you hear your sounds (and a device set to *Clean, for streaming* under *Also send to*).
      Nothing to change in Discord or your game.
 4. **Drag sounds onto the window** and double-click a pad to play it. Right-click a
    pad for a hotkey or **Effects…**.
