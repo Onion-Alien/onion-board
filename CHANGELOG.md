@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 1.9.7 — 2026-10-07
 
 - **Important fix: Discord wiping out your sounds on Straight into my mic.** Measured
   on a real Discord: its default noise suppression (Krisp / Voice Isolation) lets a
@@ -13,6 +13,8 @@
   *Input Profile* **Custom**, *Noise Suppression* **None**, *Echo Cancellation* off
   (Studio stays the clean choice on the virtual cable). The guide shows each of your
   Discord settings with a ✓ or what to switch, and updates as you change them.
+  It also catches Discord's *Advanced Voice Activity*: in a real call it let only
+  about 2 seconds of a 25-second song through (the Mic Test never shows it).
 - **Record a bit of what's playing.** The Sounds tab's **Record** window has a new
   *What's playing* choice: press Record, play a sound, a web search result or the
   radio (or catch a song already playing), then Stop, cut the ends and save it as a
