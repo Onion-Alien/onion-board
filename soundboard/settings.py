@@ -964,7 +964,6 @@ class SettingsDialog(QDialog):
         send.toggled.connect(self.mw.chk_mic.setChecked)   # the window applies it
         cv.addWidget(send)
         v.addWidget(card)
-        v.addWidget(self._stream_card())
         v.addWidget(self._voices_card())
         card, cv = self._card(_("Who's listening"),
                               _("Voice chat squashes your sounds: mono, no deep bass, and in "
@@ -999,52 +998,6 @@ class SettingsDialog(QDialog):
         v.addWidget(card)
         v.addStretch(1)
         return w
-
-    def _stream_card(self):
-        """The stream output: sounds (and your voice) on a device of their own for OBS."""
-        from soundboard import engine as eng
-        from soundboard.ui.panel import VolumeControl
-        mw = self.mw
-        c = mw.cfg
-        card, cv = self._card(
-            _("Stream output (OBS)"),
-            _("Streaming? Send what others hear, clean (no voice chat shaping), to a device of "
-              "its own, and add it to OBS as its own audio track: your sounds, screen triggers, "
-              "live radio and programs, and your voice if you like. In OBS: Sources → + → Audio "
-              "Output Capture → pick the same device. Any output you don't listen on works (with "
-              "a spare virtual cable, use Audio Input Capture → its Output end)."))
-        cb = QComboBox()
-        no_wheel(cb)
-        cb.addItem(_("Off"), None)
-        main = mw._main_name()   # what others hear (None: sending nowhere frees it)
-        for d in eng.list_devices("output"):
-            if (d["name"] not in (main, c.mon_device)   # those already have a job
-                    and not eng.same_cable(d["name"], main)):
-                cb.addItem(d["name"], d["name"])
-        i = cb.findData(c.obs_device) if c.obs_device else 0
-        cb.setCurrentIndex(max(i, 0))
-        cb.activated.connect(lambda i: mw.set_obs_device(cb.itemData(i)))
-        grid = QGridLayout()
-        grid.setHorizontalSpacing(10)
-        grid.setVerticalSpacing(6)
-        grid.addWidget(QLabel(_("Send to")), 0, 0)
-        grid.addWidget(cb, 0, 1, 1, 2)
-        grid.addWidget(QLabel(_("Volume")), 1, 0)
-        vol = VolumeControl(c.obs_vol, tip=_("How loud the stream output is (only OBS hears it)"))
-        vol.changed.connect(lambda x: mw.set_option("obs_vol", x))
-        grid.addWidget(vol, 1, 1)
-        grid.setColumnStretch(2, 1)   # the slider and its box stay together on the left
-        cv.addLayout(grid)
-        voice = QCheckBox(_("Include my voice"))
-        voice.setToolTip(_("Untick if OBS already records your mic on its own"))
-        voice.setChecked(c.obs_voice)
-        voice.toggled.connect(lambda b: mw.set_option("obs_voice", b))
-        cv.addWidget(voice)
-        note = QLabel(_("Includes the voice changer when it's on. Untick if OBS already records "
-                        "your mic separately."))
-        note.setObjectName("hint")
-        cv.addWidget(note)
-        return card
 
     def _voices_card(self):
         """Custom text-to-speech voices live on the Voice tab (behind Add voices…); this
