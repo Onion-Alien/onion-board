@@ -100,6 +100,7 @@ class AiVoicePanel(QWidget):
         grid.setVerticalSpacing(10)
         grid.addWidget(QLabel(_("Voice")), 0, 0)
         vrow = QHBoxLayout()
+        vrow.setSpacing(8)
         self.cb_voice = QComboBox()
         self.cb_voice.setToolTip(_("The character you sound like"))
         self.cb_voice.setMinimumWidth(180)
@@ -158,6 +159,7 @@ class AiVoicePanel(QWidget):
         self.lbl_missing = hint_label("")
         mv.addWidget(self.lbl_missing)
         mrow = QHBoxLayout()
+        mrow.setSpacing(8)
         self.b_install = QPushButton(_("Install AI voices"))
         icons.set_icon(self.b_install, "plus")
         self.b_install.setToolTip(_("One-time download, about 90 MB. Needs Python 3.12+."))
@@ -186,6 +188,7 @@ class AiVoicePanel(QWidget):
         ov.setContentsMargins(0, 0, 0, 0)
         ov.setSpacing(10)
         brow = QHBoxLayout()
+        brow.setSpacing(12)
         brow.addWidget(QLabel(_("If the AI voice stops")))
         self.cb_backup = QComboBox()
         for label, key in BACKUP_LABELS:
@@ -203,6 +206,7 @@ class AiVoicePanel(QWidget):
                                    "it's missing). Needs Python 3.12+."))
         self.b_update.clicked.connect(self._install)
         urow = QHBoxLayout()
+        urow.setSpacing(8)
         urow.addWidget(self.b_update)
         self.b_remove = QPushButton(_("Remove AI voices"))
         self.b_remove.setToolTip(_("Deletes the add-on, its voice model and its Python "
