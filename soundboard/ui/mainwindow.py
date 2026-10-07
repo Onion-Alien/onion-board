@@ -669,9 +669,8 @@ class MainWindow(QMainWindow):
         self.tabs.addTab(self.voice, "")
         self.setup_page = self._build_setup_page()
         self.tabs.addTab(self.setup_page, "")
-        for i, (text, tip) in enumerate(TABS):
+        for i, (text, _tip) in enumerate(TABS):   # no hover tip: the name says it
             self.tabs.setTabText(i, text)
-            self.tabs.setTabToolTip(i, tip)
             icons.set_tab_icon(self.tabs, i, TAB_KEYS[i])
         for key in taboff.KEYS:
             self.tabs.setTabVisible(TAB_INDEX[key], self.tab_on(key))
@@ -904,7 +903,6 @@ class MainWindow(QMainWindow):
         add.clicked.connect(self.add_dialog)
         icons.set_icon(add, "plus", "on_accent")
         self.btn_record = QPushButton(_("Record"))
-        self.btn_record.setToolTip(_("Record a sound with your mic and add it to your sounds"))
         icons.set_icon(self.btn_record, "record", "#ff4d4f")
         self.btn_record.clicked.connect(self.record_dialog)
         self.search = QLineEdit()
@@ -1147,7 +1145,6 @@ class MainWindow(QMainWindow):
         self.vol_sound.changed.connect(lambda v: self.set_option("sound_vol", v))
         th.addWidget(self.vol_sound)
         self.chk_monitor = QCheckBox(_("Hear it myself"))
-        self.chk_monitor.setToolTip(_("Also play your sounds into your headphones"))
         self.chk_monitor.setChecked(c.monitor_sounds)
         self.chk_monitor.toggled.connect(lambda b: self.set_option("monitor_sounds", b))
         th.addWidget(self.chk_monitor)
@@ -1488,7 +1485,6 @@ class MainWindow(QMainWindow):
         self.chk_level.toggled.connect(self.on_level_toggle)
         uv.addWidget(self.chk_level)
         hk = QPushButton(_("Hotkeys && auto push-to-talk…"))
-        hk.setToolTip(_("Opens Settings → Hotkeys"))
         hk.clicked.connect(lambda: self.open_settings("hotkeys"))
         uv.addWidget(hk, 0, Qt.AlignLeft)
         rcol.addWidget(utilitycard)
@@ -3762,7 +3758,6 @@ class MainWindow(QMainWindow):
         while tb.count():
             tb.removeTab(0)
         tb.addTab(ALL)
-        tb.setTabToolTip(0, _("Every sound"))
         for c in self.cfg.categories:
             n = sum(1 for m in self.cfg.sounds if c in m.tags)
             i = tb.addTab(c.replace("&", "&&"))   # a lone & would be a shortcut key
@@ -6141,16 +6136,20 @@ class MainWindow(QMainWindow):
             self._update_flow()
 
     def _tab_icons_only(self, compact: bool):
-        for i, (text, tip) in enumerate(TABS):
+        for i, (text, _tip) in enumerate(TABS):
             self.tabs.setTabText(i, "" if compact else text)
             self.tabs.tabBar().setAccessibleTabName(i, text)   # icon-only tabs aren't silent
-            base = f"{text}: {tip}" if compact else tip
+            base = text if compact else ""   # only an icon-only tab needs its name on hover
             old = self.tabs.property(f"_tip{i}")   # set_tab_live's copy of the plain tip
             if old is not None:
                 cur = self.tabs.tabToolTip(i)
                 self.tabs.setProperty(f"_tip{i}", base)
-                if is_tab_live(self.tabs, i) and cur.endswith(old):   # keep its "● ON" line
-                    base = cur[:len(cur) - len(old)] + base
+                live = None   # keep its "● ON" line
+                if is_tab_live(self.tabs, i):
+                    live = cur if not old else cur[:-len(old) - 1] if cur.endswith(
+                        "\n" + old) else None
+                if live:
+                    base = f"{live}\n{base}" if base else live
             self.tabs.setTabToolTip(i, base)
 
     def _tabs_tight(self, compact: bool):

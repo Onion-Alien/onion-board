@@ -553,7 +553,6 @@ class VoiceFxPanel(QWidget):
         top.addWidget(icon_label("mic", _("Your mic level")))
         self.meter = Meter()
         self.meter.setMinimumWidth(60)
-        self.meter.setToolTip(_("Your mic level: it moves when you talk"))
         top.addWidget(self.meter, 1)
         v.addLayout(top)
 

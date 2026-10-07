@@ -102,7 +102,6 @@ class AiVoicePanel(QWidget):
         vrow = QHBoxLayout()
         vrow.setSpacing(8)
         self.cb_voice = QComboBox()
-        self.cb_voice.setToolTip(_("The character you sound like"))
         self.cb_voice.setMinimumWidth(180)
         self.cb_voice.setMaximumWidth(300)   # a name and an emoji, not a bar across the card
         vrow.addWidget(self.cb_voice, 1)

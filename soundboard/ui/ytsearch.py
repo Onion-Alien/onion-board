@@ -439,7 +439,6 @@ class ResultRow(HoverCard):
         self.btn_play.clicked.connect(lambda: self.play.emit(self.result))
         self.btn_add = QPushButton(_("Add"))
         self.btn_add.setObjectName("primary")
-        self.btn_add.setToolTip(_("Download its audio and add it to your Sounds"))
         icons.set_icon(self.btn_add, "plus", "on_accent", size=14)
         self.btn_add.clicked.connect(lambda: self.add.emit(self.result))
         for b in (self.btn_play, self.btn_add):
@@ -602,7 +601,6 @@ class SearchResults(QFrame):
         back = self.btn_back = QPushButton(_("Back to my sounds"))
         back.setObjectName("backhome")   # stands out: the way out of the results
         back.setCursor(Qt.PointingHandCursor)
-        back.setToolTip(_("Close the search results and go back to your sounds"))
         icons.set_icon(back, "back", "danger_text", size=18)
         back.clicked.connect(self.close_results)
         head.addWidget(back)
