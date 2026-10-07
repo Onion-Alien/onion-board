@@ -58,7 +58,7 @@ RETRY_S = 5.0   # how often to retry a device that failed to open
 # 22 ms with ~10 ms to spare per block; asking for a number buys real room.
 BUFFER = {"low": "low", "high": 0.04}
 I16_SCALE = np.float32(1 / 32767.0)   # int16 sound data -> float
-CACHE_BUDGET = 512 << 20               # bytes of resampled copies kept for non-48 kHz devices
+CACHE_BUDGET = 192 << 20               # bytes of resampled copies kept for non-48 kHz devices
 # the app's own playback: the test recording, cue beeps, the setup wizard's tune. With
 # previews ("<sid>:preview", "<sid>~fx:preview") they ignore the live speed / pitch
 FIXED_SIDS = frozenset({"__test__", "__cue__", "__setup__", "__check__"})
@@ -1558,8 +1558,13 @@ class Engine:
         long as the copies fit in CACHE_BUDGET. Past it, each new copy would only push
         out an earlier one: a big board on a 44.1 kHz headset resampled every song at
         every start and threw most of them away. Those are made when pressed instead
-        (play reads the source at the device's rate meanwhile)."""
+        (play reads the source at the device's rate meanwhile).
+        Long sounds on disk (mapped) aren't copied here at all: a copy reads the whole
+        file and keeps it in RAM, which undoes mapping it (8 songs cost 242 MB and
+        1.8 s at every start on a 44.1 kHz headset). Their copy is made on first press."""
         self.cut_shares(sid, data)
+        if mapped.is_mapped(data):
+            return
         for o in self.active_outputs():
             rate = self.rates[o]
             if self._cached(sid, data, rate, SR) is None:
