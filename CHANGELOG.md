@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- **No more freezes when a headset drops out.** Unplugging a headset, Bluetooth
+  cutting out or the PC waking from sleep could freeze the window for seconds while
+  the app reopened the device. That now happens in the background.
 - **28 more languages to speak in.** The Voice tab's *Speak in* list grows from 5
   to 33: Italian, Portuguese (Brazil and Portugal), Dutch, Polish, Czech, Slovak,
   Slovenian, Hungarian, Romanian, Bulgarian, Greek, Danish, Swedish, Norwegian,

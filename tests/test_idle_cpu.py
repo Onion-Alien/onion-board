@@ -54,7 +54,13 @@ def test_a_slow_default_output_answer_isnt_asked_twice(window, monkeypatch, qapp
     assert len(asked) == 1
 
 
-def test_an_unplugged_device_is_looked_for_less_often(window, monkeypatch):  # noqa: F811
+def recover(w, qapp):
+    """One device check, and its answer (it asks Windows on the device thread)."""
+    w._recover_devices()
+    process_events(qapp, lambda: not w.engine.devices.busy, timeout=5)
+
+
+def test_an_unplugged_device_is_looked_for_less_often(window, monkeypatch, qapp):  # noqa: F811
     e = window.engine
     monkeypatch.setitem(e.names, "mic", "Microphone (USB Mic)")
     monkeypatch.setitem(e.errors, "mic", "device not found")
@@ -62,10 +68,10 @@ def test_an_unplugged_device_is_looked_for_less_often(window, monkeypatch):  # n
     looks = []
     monkeypatch.setattr(appaudio, "endpoint_names", lambda kind: looks.append(kind) or set())
     for _ in range(10):
-        window._recover_devices()
+        recover(window, qapp)
     assert len(looks) == 4                            # a few quick looks, then it waits
     window._recover_at = 0.0
-    window._recover_devices()
+    recover(window, qapp)
     assert len(looks) == 5
 
 

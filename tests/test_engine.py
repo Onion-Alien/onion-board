@@ -220,7 +220,9 @@ def test_watchdog_reopens_a_stalled_stream():
     e._last_cb["main"] = time.monotonic()
     assert e.check_streams() == []               # fresh: nothing to do
     e._last_cb["main"] = time.monotonic() - 10
-    assert e.check_streams() == ["main"]
+    assert e.check_streams() == []               # reopened on the device thread...
+    assert e.devices.wait(5)
+    assert e.check_streams() == ["main"]         # ...and reported on the next check
     assert s.closed and e.stalls == 1
     assert "main" in e.errors                    # "fake main" can't actually be opened
 
@@ -232,6 +234,7 @@ def test_watchdog_retries_a_failed_device_only_every_few_seconds():
     assert e.check_streams() == []
     e._last_try["main"] = time.monotonic() - eng.RETRY_S - 1
     e.check_streams()
+    assert e.devices.wait(5)
     assert "main" in e.errors and e.main_stream is None
     assert time.monotonic() - e._last_try["main"] < 1
 

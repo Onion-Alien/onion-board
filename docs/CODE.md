@@ -324,7 +324,12 @@ the newest backup is used, so the pad list is never silently reset.
   buffers if a device keeps crackling.
 - A stream whose callback stops (headset unplugged, sample rate changed, PC woke from
   sleep) is reopened automatically after 1.5 s of silence from it; a device that failed to open
-  is retried every few seconds.
+  is retried every few seconds. That reopening, and the re-scan when Windows lists a
+  device PortAudio can't open, runs on the engine's one device thread
+  (`engine.DeviceWorker`), never the UI thread: a driver can take seconds to close or
+  open a stream when a headset is unplugged, Bluetooth drops or the PC wakes. One
+  recovery at a time (`devices.claim()`); `engine.DEVICES` is held while streams open
+  or close, and the device lists answer from their last copy during a re-scan.
 - The audio callbacks never take the engine lock: the voice list is an immutable tuple
   swapped by the UI thread. An exception inside a callback is logged once and that
   block is silent; the stream keeps running.

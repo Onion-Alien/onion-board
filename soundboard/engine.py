@@ -29,7 +29,9 @@ Per-sound effects are baked in ahead of time instead (soundboard.soundfx).
 from __future__ import annotations
 
 import logging
+import queue
 import threading
+import functools
 import time
 import weakref
 from collections import OrderedDict
@@ -72,6 +74,88 @@ def is_fixed(sid: str) -> bool:
 
 # --------------------------------------------------------------------------- devices
 
+# Held while streams are opened or closed and while PortAudio is re-scanned (torn down
+# and started again), which happen on the device thread (DeviceWorker). The device
+# lists below never wait for it: during a re-scan PortAudio's list is being freed, so
+# they answer from the last list they read instead.
+DEVICES = threading.RLock()
+_seen: dict = {}   # the last answers of list_devices / default_device_name
+
+
+class DeviceWorker:
+    """The one thread that does slow device work: closing, opening and re-scanning
+    streams, asking Windows for its devices. A driver can take seconds to answer when
+    a headset is unplugged, Bluetooth drops or the PC wakes from sleep, and on the UI
+    thread that froze the window. Here it only holds up this thread.
+
+    One recovery at a time: claim() first (False: one is running, try again on the
+    next check), then run() its steps; whoever claimed calls release() when the last
+    step is done. A step that hangs keeps the claim, so nothing piles up behind it."""
+
+    IDLE_S = 30.0   # the thread ends after this long without work (a new one starts)
+
+    def __init__(self, name: str = "devices"):
+        self.name = name
+        self._q: queue.SimpleQueue = queue.SimpleQueue()
+        self._lock = threading.Lock()
+        self._thread: threading.Thread | None = None
+        self._idle = threading.Event()
+        self._idle.set()
+
+    @property
+    def busy(self) -> bool:
+        return not self._idle.is_set()
+
+    def claim(self) -> bool:
+        with self._lock:
+            if not self._idle.is_set():
+                return False
+            self._idle.clear()
+            return True
+
+    def release(self):
+        self._idle.set()
+
+    def wait(self, timeout: float | None = None) -> bool:
+        """Until nothing is claimed (tests, and quitting). False: still busy."""
+        return self._idle.wait(timeout)
+
+    def run(self, fn, done=None):
+        """Call fn() on the device thread, then done(its result) there too (None if it
+        raised). The caller holds the claim."""
+        with self._lock:
+            self._q.put((fn, done))
+            if self._thread is None:
+                self._thread = threading.Thread(target=self._loop, daemon=True, name=self.name)
+                self._thread.start()
+
+    def _loop(self):
+        while True:
+            try:
+                fn, done = self._q.get(timeout=self.IDLE_S)
+            except queue.Empty:
+                with self._lock:
+                    if self._q.empty():
+                        self._thread = None
+                        return
+                continue
+            t0 = time.monotonic()
+            result = None
+            try:
+                result = fn()
+            except Exception:  # noqa: BLE001 - the next recovery must still be able to run
+                log.exception("device work failed")
+            took = time.monotonic() - t0
+            if took > 2:
+                log.warning("device work took %.1fs (a slow driver)", took)
+            if done is not None:
+                try:
+                    done(result)
+                except Exception:  # noqa: BLE001
+                    log.exception("device work's hand-back failed")
+                    self.release()
+
+
 def _wasapi_index() -> int | None:
     for i, api in enumerate(sd.query_hostapis()):
         if "WASAPI" in api["name"]:
@@ -84,44 +168,65 @@ def rescan() -> bool:
 
     sounddevice has no public API for this; _terminate/_initialize are what its own
     tests use. If a future version drops them, the app keeps its current device list."""
-    try:
-        sd._terminate()
-        sd._initialize()
-        return True
-    except Exception:  # noqa: BLE001
-        log.exception("device rescan failed")
+    with DEVICES:
         try:
+            sd._terminate()
             sd._initialize()
+            return True
         except Exception:  # noqa: BLE001
-            pass
-        return False
+            log.exception("device rescan failed")
+            try:
+                sd._initialize()
+            except Exception:  # noqa: BLE001
+                pass
+            return False
 
 
 def list_devices(kind: str) -> list[dict]:
     """WASAPI devices of kind 'input' or 'output' as [{index, name}]."""
-    api = _wasapi_index()
-    key = "max_input_channels" if kind == "input" else "max_output_channels"
-    out = []
-    for i, d in enumerate(sd.query_devices()):
-        if (api is None or d["hostapi"] == api) and d[key] > 0:
-            out.append({"index": i, "name": d["name"]})
-    return out
+    if not DEVICES.acquire(blocking=False):   # being re-scanned: the last list
+        return list(_seen.get(kind, ()))
+    try:
+        api = _wasapi_index()
+        key = "max_input_channels" if kind == "input" else "max_output_channels"
+        out = []
+        for i, d in enumerate(sd.query_devices()):
+            if (api is None or d["hostapi"] == api) and d[key] > 0:
+                out.append({"index": i, "name": d["name"]})
+        _seen[kind] = out
+        return out
+    finally:
+        DEVICES.release()
 
 
 def default_device_name(kind: str) -> str | None:
-    api = _wasapi_index()
-    if api is None:
-        return None
-    info = sd.query_hostapis(api)
-    idx = info["default_input_device" if kind == "input" else "default_output_device"]
-    if idx is None or idx < 0:
-        return None
-    return sd.query_devices(idx)["name"]
+    if not DEVICES.acquire(blocking=False):
+        return _seen.get(("default", kind))
+    try:
+        api = _wasapi_index()
+        if api is None:
+            return None
+        info = sd.query_hostapis(api)
+        idx = info["default_input_device" if kind == "input" else "default_output_device"]
+        name = None if idx is None or idx < 0 else sd.query_devices(idx)["name"]
+        _seen[("default", kind)] = name
+        return name
+    finally:
+        DEVICES.release()
 
 
 def list_name(index: int) -> str:
     """A device's name as the device lists show it."""
-    return sd.query_devices(index)["name"]
+    if not DEVICES.acquire(blocking=False):
+        for kind in ("output", "input"):
+            for d in _seen.get(kind, ()):
+                if d["index"] == index:
+                    return d["name"]
+        raise LookupError(index)
+    try:
+        return sd.query_devices(index)["name"]
+    finally:
+        DEVICES.release()
 
 
 def find_device(kind: str, name: str | None) -> int | None:
@@ -859,6 +964,16 @@ class Voice:
 
 # --------------------------------------------------------------------------- engine
 
+def _holding_devices(fn):
+    """Engine methods that open or close streams hold DEVICES: the device thread and
+    the UI thread (a device picked by hand) never do it at the same time."""
+    @functools.wraps(fn)
+    def run(*a, **k):
+        with DEVICES:
+            return fn(*a, **k)
+    return run
+
+
 class Engine:
     def __init__(self):
         # `voices` is an immutable tuple that is *replaced* (never mutated) under
@@ -959,6 +1074,11 @@ class Engine:
         self._tap_try = 0.0
         self.rates = {"main": SR, "mon": SR, "mic": SR, "obs": SR}
         self.errors: dict[str, str] = {}
+        # the watchdog's reopens run here (check_streams), and so do the window's
+        # re-scans: one at a time, never on the UI thread
+        self.devices = DeviceWorker()
+        self._touched: list[str] = []   # keys the device thread's last reopens touched
+        self._touched_lock = threading.Lock()
 
         # the mic's clock is its own device's: drift tracking switches itself on if it
         # turns out to wander from the output's (see Ring.auto_drift)
@@ -1089,6 +1209,7 @@ class Engine:
         s = self.main_stream
         return isinstance(s, directmic.DirectMicStream) and s.effect_alive()
 
+    @_holding_devices
     def set_tap_device(self, name: str | None):
         """Also play what others hear into `name` (the virtual cable) while it goes
         straight into the mic; None = don't."""
@@ -1104,6 +1225,7 @@ class Engine:
             except Exception as e:  # noqa: BLE001 - the mic still works; retried
                 log.warning("can't also send into %s: %s", name, e)
 
+    @_holding_devices
     def set_copy_devices(self, names):
         """Also play what others hear into each of `names` (Setup -> Devices -> Also send
         to: Voicemeeter, OBS, a second cable...). Ones already open stay open; one that
@@ -1134,6 +1256,11 @@ class Engine:
         up = {t.name for t in self.copies}
         return [n for n in self.copy_names if n not in up]
 
+    def _copies_due(self, now: float) -> bool:
+        return (any(now - t.last_cb > STALL_S for t in self.copies)
+                or any(now - self._copy_try.get(n, 0.0) >= RETRY_S for n in self.copies_down()))
+
+    @_holding_devices
     def _check_copies(self, now: float):
         """The "Also send to" copies' watchdog (see check_streams)."""
         for t in self.copies:
@@ -1146,17 +1273,22 @@ class Engine:
             if now - self._copy_try.get(n, 0.0) >= RETRY_S:
                 self._open_copy(n)
 
+    def _tap_due(self, now: float) -> bool:
+        tap = self.tap
+        if not self.tap_name:
+            return False
+        if tap is None:
+            return now - self._tap_try >= RETRY_S
+        return now - tap.last_cb > STALL_S
+
+    @_holding_devices
     def _check_tap(self, now: float):
         """The cable tap's own watchdog (see check_streams)."""
-        name = self.tap_name
-        if not name:
+        if not self._tap_due(now):
             return
-        if self.tap is None:
-            if now - self._tap_try >= RETRY_S:
-                self.set_tap_device(name)
-        elif now - self.tap.last_cb > STALL_S:
-            log.warning("cable tap stalled; reopening %s", name)
-            self.set_tap_device(name)
+        if self.tap is not None:
+            log.warning("cable tap stalled; reopening %s", self.tap_name)
+        self.set_tap_device(self.tap_name)
 
     def direct_apps(self) -> int:
         """Apps whose mic stream carries the board right now (its own one too)."""
@@ -1215,6 +1347,7 @@ class Engine:
         # new stream is logged and reported again (cb_errors stays a running total)
         self._cb_err_base[key] = self.cb_errors[key]
 
+    @_holding_devices
     def set_main_device(self, name: str | None):
         self._close("main_stream")
         self.errors.pop("main", None)
@@ -1228,6 +1361,7 @@ class Engine:
                 log.warning("can't open main output %r: %s", name, e)
                 self.errors["main"] = errors.plain(e)
 
+    @_holding_devices
     def set_mon_device(self, name: str | None):
         self._close("mon_stream")
         self.errors.pop("mon", None)
@@ -1240,6 +1374,7 @@ class Engine:
                 log.warning("can't open headphone output %r: %s", name, e)
                 self.errors["mon"] = errors.plain(e)
 
+    @_holding_devices
     def set_obs_device(self, name: str | None):
         """The stream output: a device OBS captures (None = off)."""
         self._close("obs_stream")
@@ -1253,6 +1388,7 @@ class Engine:
                 log.warning("can't open stream output %r: %s", name, e)
                 self.errors["obs"] = errors.plain(e)
 
+    @_holding_devices
     def set_mic_device(self, name: str | None):
         self._close("mic_stream")
         self.errors.pop("mic", None)
@@ -1289,6 +1425,7 @@ class Engine:
                     self.rates["mic"] = old_rate
                     self._reconfigure_mic_resamplers()
 
+    @_holding_devices
     def reopen_all(self):
         """Close and reopen every stream with the same devices (after a latency change)."""
         self.set_mic_device(self.names["mic"])
@@ -1300,42 +1437,70 @@ class Engine:
         self.set_mon_device(self.names["mon"])
         self.set_obs_device(self.names["obs"])
 
+    KEYS = ("main", "mon", "mic", "obs")
+
+    def _key_due(self, key: str, now: float) -> str | None:
+        """'retry' (didn't open, and RETRY_S is up), 'stall' (its callback stopped) or
+        None, for stream `key`."""
+        if not self.names[key]:
+            return None
+        if getattr(self, f"{key}_stream") is None:
+            return "retry" if now - self._last_try[key] >= RETRY_S else None
+        return "stall" if now - self._last_cb[key] > STALL_S else None
+
     def check_streams(self) -> list[str]:
         """Watchdog (call about once a second from the UI thread).
 
         A stream whose callback has stopped being called (headset unplugged, Windows
         changed its sample rate, PC came back from sleep) is closed and reopened. A
-        device that failed to open is retried every RETRY_S. Returns the keys that
-        were touched (reopened, came back, or whose callback raised since the last
-        check), so the UI can refresh its status from errors_snapshot()."""
+        device that failed to open is retried every RETRY_S. Both happen on the device
+        thread (self.devices: closing a dead device's stream or opening a missing one
+        can take the driver seconds), one check at a time. Returns the keys that were
+        touched (reopened or came back since the last check, or whose callback raised),
+        so the UI can refresh its status from errors_snapshot()."""
         now = time.monotonic()
-        touched = []
-        self._check_tap(now)
-        self._check_copies(now)
-        for key, attr, setter in (("main", "main_stream", self.set_main_device),
-                                  ("mon", "mon_stream", self.set_mon_device),
-                                  ("mic", "mic_stream", self.set_mic_device),
-                                  ("obs", "obs_stream", self.set_obs_device)):
+        with self._touched_lock:
+            touched, self._touched = self._touched, []
+        for key in self.KEYS:
             n_err = self.cb_errors[key]
             if n_err != self._cb_err_seen[key]:
                 self._cb_err_seen[key] = n_err
                 touched.append(key)
-            name = self.names[key]
-            if not name:
+        due = (self._tap_due(now) or self._copies_due(now)
+               or any(self._key_due(k, now) for k in self.KEYS))
+        if due and self.devices.claim():
+            self.devices.run(lambda: self._watch(time.monotonic()), self._watched)
+        return list(dict.fromkeys(touched))
+
+    def _watched(self, keys: list[str] | None):
+        with self._touched_lock:
+            self._touched += keys or []
+        self.devices.release()
+
+    @_holding_devices
+    def _watch(self, now: float) -> list[str]:
+        """check_streams' reopens, on the device thread. Returns the keys touched."""
+        touched = []
+        self._check_tap(now)
+        self._check_copies(now)
+        for key in self.KEYS:
+            why = self._key_due(key, now)
+            if why is None:
                 continue
-            if getattr(self, attr) is None:
-                if now - self._last_try[key] >= RETRY_S:
-                    setter(name)
-                    if key not in self.errors:
-                        log.info("%s device came back: %s", key, name)
-                        touched.append(key)
-            elif now - self._last_cb[key] > STALL_S:
+            name = self.names[key]
+            setter = getattr(self, f"set_{key}_device")
+            if why == "stall":
                 log.warning("%s stream stalled (%.1fs without a callback); reopening %s",
                             key, now - self._last_cb[key], name)
                 self.stalls += 1
                 setter(name)
                 touched.append(key)
-        return list(dict.fromkeys(touched))
+            else:
+                setter(name)
+                if key not in self.errors:
+                    log.info("%s device came back: %s", key, name)
+                    touched.append(key)
+        return touched
 
     def errors_snapshot(self) -> dict[str, str]:
         """A copy of `errors` that is safe to iterate. A failing audio callback adds
@@ -1451,11 +1616,24 @@ class Engine:
             except Exception:  # noqa: BLE001
                 log.debug("closing %s raised", attr, exc_info=True)
 
-    def shutdown(self):
-        for a in ("mic_stream", "main_stream", "mon_stream", "obs_stream"):
-            self._close(a)
-        self.set_tap_device(None)
-        self.set_copy_devices(())
+    def shutdown(self, wait_s: float = 5.0):
+        """Close every stream. Waits up to `wait_s` for the device thread's work
+        (quitting mustn't hang on a driver that never answers)."""
+        held = DEVICES.acquire(timeout=wait_s)
+        if not held:
+            log.warning("the device thread is stuck; closing the streams anyway")
+        try:
+            for a in ("mic_stream", "main_stream", "mon_stream", "obs_stream"):
+                self._close(a)
+            # what set_tap_device(None) and set_copy_devices(()) do, without their wait
+            taps = (self.tap, *self.copies)
+            self.tap, self.tap_name, self.copies, self.copy_names = None, None, (), ()
+            for t in taps:
+                if t is not None:
+                    t.close()
+        finally:
+            if held:
+                DEVICES.release()
 
     def active_outputs(self) -> set:
         outs = set()
