@@ -150,13 +150,16 @@ def isolate(conf: dict):
 
     from perf import fakeaudio
     fakeaudio.install(sd, conf.get("mic_channels", 1))
-    sd._terminate = sd._initialize = lambda: None   # the device rescan: nothing to do
+    # the device rescan: nothing to do. _terminate still clears the count, or
+    # sounddevice's exit handler (`while _initialized: _terminate()`) never ends
+    sd._initialize = lambda: None
+    sd._terminate = lambda: setattr(sd, "_initialized", 0)
 
     from soundboard import library
     if not Path(library.APP_DIR).resolve().is_relative_to(profile):
         link.send("error", text=f"the app's data folder isn't in the run's profile: refusing "
                                 f"({library.APP_DIR})")
-        os._exit(3)
+        link.hard_exit(3)
 
     from soundboard import directmic
     mic_dir = profile / "Mic"
@@ -376,7 +379,10 @@ class Child:
         self.stats(name, wall, extra)
 
     def iteration(self, i: int, **extra):
-        link.mark("iter", i=i, py_objects=len(gc.get_objects()), **extra)
+        from PySide6.QtCore import QObject
+        from PySide6.QtWidgets import QApplication
+        qobjects = len(self.w.findChildren(QObject)) + len(QApplication.topLevelWidgets())
+        link.mark("iter", i=i, py_objects=len(gc.get_objects()), qobjects=qobjects, **extra)
 
     # -- start
     def start_app(self):
@@ -613,9 +619,16 @@ class Child:
         w = self.w
         sids = self._sids()
         n = int(self.conf.get("leak_iterations", 6))
+        # The first few rounds build things once (Settings' pages, the tabs, effect
+        # filters) and grow the heap by ~40 MB; counted, they read as a leak of over
+        # 1 MB a round. After them private memory only steps up now and then as the
+        # heap settles, and Python and Qt object counts stay flat.
+        warm = int(self.conf.get("leak_warmup", 5))
         fx = soundfx.PRESETS.get("Bass boosted")
-        self.iteration(0)
-        for i in range(1, n + 1):
+        for i in range(-warm, n + 1):
+            if i == 0:
+                self.iteration(0)
+                continue
             for sid in sids[i % len(sids):][:3]:
                 w.play(sid, now=True)
             self.run_for(0.3)
@@ -630,8 +643,9 @@ class Child:
             w._rebuild_pads()
             self.run_for(0.2)
             gc.collect()
-            self.iteration(i)
-        return {"iterations": n}
+            if i > 0:
+                self.iteration(i)
+        return {"iterations": n, "warmup": warm}
 
     def sc_soak(self):
         w = self.w
@@ -715,7 +729,7 @@ def main():
     except Exception:  # noqa: BLE001 - the measuring is over; only the exit is left
         pass
     sys.stderr.flush()
-    os._exit(0)
+    link.hard_exit(0)
 
 
 if __name__ == "__main__":

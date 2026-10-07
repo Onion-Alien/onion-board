@@ -128,7 +128,8 @@ class Run:
                                 "iters": [], "profile_mb": self._profile_mb()}
             elif ev == "iter" and self.current is not None:
                 self.current["iters"].append({**s, "i": msg["i"],
-                                              "py_objects": msg.get("py_objects", 0)})
+                                              "py_objects": msg.get("py_objects", 0),
+                                              "qobjects": msg.get("qobjects", 0)})
             elif ev == "end" and self.current is not None:
                 c, self.current = self.current, None
                 m = stats.phase_metrics(c["a"], s, c["during"], self.hz)
@@ -147,7 +148,8 @@ class Run:
     def _slopes(self, m: dict, iters: list[dict], name: str):
         keys = {"private_mb": ("private", winproc.MB), "wset_mb": ("wset", winproc.MB),
                 "handles": ("handles", 1), "gdi": ("gdi", 1), "user": ("user", 1),
-                "threads": ("threads", 1), "py_objects": ("py_objects", 1)}
+                "threads": ("threads", 1), "py_objects": ("py_objects", 1),
+                "qobjects": ("qobjects", 1)}
         if name == "soak":   # per hour, from the runner's clock
             t0 = iters[0]["t"]
             pts = [{**p, "h": (p["t"] - t0) / 3600} for p in iters]
