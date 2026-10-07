@@ -51,6 +51,8 @@
   to what it showed before. Pick another category by hand and it stays. All the
   programs you've set are listed in *Settings → General*, with a switch for all of it.
 - **The search box keeps its room** on the Sounds tab in mid-size windows.
+- **Buttons in the guides aren't cut off any more** ("Copy the mic na…"): a window
+  with a row of buttons grows wide enough to show them all.
 - **Record a sound with your mic.** New **Record** button next to *Add sounds*:
   record your own voice (or, while the voice changer is on, your changed voice),
   then drag the ends to cut it, listen in your headphones, name it and *Save*. The

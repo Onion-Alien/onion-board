@@ -78,7 +78,9 @@ def version_text() -> str:
     """The version, as the title bar and header show it: "1.5.5", or "1.5.5 from
     source" when run with Python rather than the installed app."""
     from soundboard import __version__
-    return __version__ if getattr(sys, "frozen", False) else f"{__version__} from source"
+    if getattr(sys, "frozen", False):
+        return __version__
+    return _("{version} from source", version=__version__)
 
 
 # The tabs, in order: each one is a thing you can play (or, last, the setup). The
@@ -216,22 +218,22 @@ def _listed(name: str, names) -> bool:
 
 # the urgent bar's line for the worst thing in Discord's settings (discordcfg)
 DISCORD_URGENT = {
-    discordcfg.STUDIO: "{name} isn't hearing your sounds: its Input Profile is Studio, "
-                       "which skips Onion Board. Set it to Custom.",
-    discordcfg.BYPASS: "{name} isn't hearing your sounds: \"Bypass System Audio Input "
-                       "Processing\" is on, which skips Onion Board.",
-    discordcfg.VAD: "{name}'s Advanced Voice Activity cuts most of your sounds in calls. "
-                    "Turn it off (Voice & Video → Show Advanced Voice Settings).",
-    discordcfg.ISOLATION: "{name}'s Voice Isolation is wiping out your sounds. Set its "
-                          "Input Profile to Custom and Noise Suppression to None.",
-    discordcfg.KRISP: "{name}'s noise suppression (Krisp) is wiping out your sounds. Set "
-                      "Noise Suppression to None.",
-    discordcfg.SUPPRESSION: "{name}'s noise suppression is eating your sounds. Set Noise "
-                            "Suppression to None.",
-    discordcfg.ECHO: "{name}'s echo cancellation is making your sounds dip and pump. "
-                     "Turn it off.",
-    discordcfg.AGC: "{name}'s automatic gain control is making your sounds' volume jump. "
-                    "Turn it off.",
+    discordcfg.STUDIO: _("{name} isn't hearing your sounds: its Input Profile is Studio, "
+                         "which skips Onion Board. Set it to Custom."),
+    discordcfg.BYPASS: _("{name} isn't hearing your sounds: \"Bypass System Audio Input "
+                         "Processing\" is on, which skips Onion Board."),
+    discordcfg.VAD: _("{name}'s Advanced Voice Activity cuts most of your sounds in calls. "
+                      "Turn it off (Voice & Video → Show Advanced Voice Settings)."),
+    discordcfg.ISOLATION: _("{name}'s Voice Isolation is wiping out your sounds. Set its "
+                            "Input Profile to Custom and Noise Suppression to None."),
+    discordcfg.KRISP: _("{name}'s noise suppression (Krisp) is wiping out your sounds. Set "
+                        "Noise Suppression to None."),
+    discordcfg.SUPPRESSION: _("{name}'s noise suppression is eating your sounds. Set Noise "
+                              "Suppression to None."),
+    discordcfg.ECHO: _("{name}'s echo cancellation is making your sounds dip and pump. "
+                       "Turn it off."),
+    discordcfg.AGC: _("{name}'s automatic gain control is making your sounds' volume jump. "
+                      "Turn it off."),
 }
 
 
@@ -520,9 +522,9 @@ class MainWindow(QMainWindow):
         self._paint_logo()
 
         # only a sign: the one switch is "Hear what they hear" in the mixer at the bottom
-        self.mic_banner = BannerButton("YOU'RE HEARING YOUR MIC OUTPUT  —  mic + sounds, "
-                                       "exactly what others hear",
-                                       "HEARING YOUR MIC OUTPUT")
+        self.mic_banner = BannerButton(_("YOU'RE HEARING YOUR MIC OUTPUT  —  mic + sounds, "
+                                         "exactly what others hear"),
+                                       _("HEARING YOUR MIC OUTPUT"))
         self.mic_banner.setObjectName("micbanner")
         self.mic_banner.setFocusPolicy(Qt.NoFocus)
         self.mic_banner.hide()
@@ -1076,8 +1078,8 @@ class MainWindow(QMainWindow):
         self._video_win = None   # ui/videowindow.VideoWindow, made on first use
         th.addWidget(self.btn_video)
         self.speed_btn = SpeedPitchButton(
-            "sounds", "Changes every sound while it plays. To save a version, "
-                      "right-click a pad → Effects.")
+            "sounds", _("Changes every sound while it plays. To save a version, "
+                        "right-click a pad → Effects."))
         self.speed_btn.changed.connect(self.on_live_speed)
         self.speed_btn.fx_changed.connect(lambda fx: setattr(self.engine, "sound_fx", fx))
         th.addWidget(self.speed_btn)
@@ -1124,9 +1126,9 @@ class MainWindow(QMainWindow):
                 for i, sid in enumerate(queue[:QUEUE_CHIPS]):
                     m = self.meta(sid)
                     self._chips_hl.addWidget(self._chip(
-                        m.name if m else sid, "Waits for the sounds playing to finish",
+                        m.name if m else sid, _("Waits for the sounds playing to finish"),
                         lambda __=False, s=sid: self.select(s),
-                        "Take it out of the queue", lambda __=False, i=i: self._unqueue(i)))
+                        _("Take it out of the queue"), lambda __=False, i=i: self._unqueue(i)))
                 if len(queue) > QUEUE_CHIPS:
                     more = QLabel(_("+{value} more", value=len(queue) - QUEUE_CHIPS))
                     more.setObjectName("muted")
@@ -1229,7 +1231,7 @@ class MainWindow(QMainWindow):
         page.setWidget(inner)
 
         # ---- how it works + the one thing to set in Discord
-        howcard, cv = card("YOUR VIRTUAL MIC", roomy=True)
+        howcard, cv = card(_("YOUR VIRTUAL MIC"), roomy=True)
         self.how_title = cv.itemAt(0).widget()   # renamed when not using the cable
         self.flow_mic = QLabel()
         self.flow_snd = QLabel(_("Your sounds, radio and voice effects"))
@@ -1297,8 +1299,9 @@ class MainWindow(QMainWindow):
         self.btn_rescan.clicked.connect(lambda: self.rescan_with_feedback(self.btn_rescan))
         icons.set_icon(self.btn_rescan, "reload")
         cv.addWidget(self.btn_rescan)
-        helpcard, hv = card("CONNECT YOUR CHAT",
-                            "Choose your app for the recommended microphone settings.", roomy=True)
+        helpcard, hv = card(_("CONNECT YOUR CHAT"),
+                            _("Choose your app for the recommended microphone settings."),
+                            roomy=True)
         self.btn_chat = QPushButton(_("Make it sound clean in Discord"))
         self.btn_chat.setToolTip(_("The Discord settings that stop it chopping up your sounds, "
                                    "and a check that listens to what Discord does to them"))
@@ -1326,8 +1329,8 @@ class MainWindow(QMainWindow):
         lcol.addWidget(helpcard)
 
         # ---- devices
-        devcard, av = card("DEVICES", "Already set up for you — only change these if "
-                                      "something's wrong.", roomy=True)
+        devcard, av = card(_("DEVICES"), _("Already set up for you — only change these if "
+                                           "something's wrong."), roomy=True)
         grid = QGridLayout()
         grid.setHorizontalSpacing(10)
         grid.setVerticalSpacing(12)
@@ -1340,8 +1343,8 @@ class MainWindow(QMainWindow):
                                    "somewhere instead: Voicemeeter, a mixer, a device OBS "
                                    "captures, or a virtual cable."))
         for r, (ic, text, cb) in enumerate((
-                ("headphones", "My headphones", self.cb_mon),
-                ("mic", "My mic", self.cb_mic),
+                ("headphones", _("My headphones"), self.cb_mon),
+                ("mic", _("My mic"), self.cb_mic),
                 ("live", SEND_TO, self.cb_route))):
             row = (icon_label(ic), QLabel(text), cb)
             row[1].setBuddy(cb)   # a screen reader reads the label as the box's name
@@ -1367,8 +1370,8 @@ class MainWindow(QMainWindow):
         self.btn_cablefix.setToolTip(_("Sets the cable's playback and recording side to 48 kHz, "
                                        "so it passes your sound through without converting it"))
         self.btn_cablefix.clicked.connect(lambda: busy.run_busy(
-            self.btn_cablefix, "Switching the cable to 48 kHz…", self.fix_cable_format,
-            lambda ok: "✓ Done" if ok and not self.cable_bad else "Couldn't — see below"))
+            self.btn_cablefix, _("Switching the cable to 48 kHz…"), self.fix_cable_format,
+            lambda ok: _("✓ Done") if ok and not self.cable_bad else _("Couldn't — see below")))
         self.btn_cablefix.hide()
         av.addWidget(self.btn_cablefix, 0, Qt.AlignLeft)
         no_wheel(self.cb_main, self.cb_mon, self.cb_mic, self.cb_route)
@@ -1382,19 +1385,20 @@ class MainWindow(QMainWindow):
         lcol.addWidget(devcard)
 
         # ---- who's listening: shape the sounds for the voice chat on the other end
-        destcard, dv = card("WHO'S LISTENING", "Where people hear you: a game, a voice "
-                                               "chat app, or a stream. Your sounds are "
-                                               "shaped to come through clearly.", roomy=True)
+        destcard, dv = card(_("WHO'S LISTENING"), _("Where people hear you: a game, a voice "
+                                                    "chat app, or a stream. Your sounds are "
+                                                    "shaped to come through clearly."),
+                            roomy=True)
         from soundboard.ui.destpanel import DestPanel
         self.dest_panel = DestPanel(self)
         dv.addWidget(self.dest_panel)
         lcol.addStretch(1)
 
         # ---- test
-        testcard, tv = card("TEST IT", "Talk while a sound plays. Records what goes out to "
-                                       "others (what Discord, the game or OBS receives), plays "
-                                       "it back, and tells you if your voice + sounds are in "
-                                       "it.", roomy=True)
+        testcard, tv = card(_("TEST IT"), _("Talk while a sound plays. Records what goes out "
+                                            "to others (what Discord, the game or OBS "
+                                            "receives), plays it back, and tells you if your "
+                                            "voice + sounds are in it."), roomy=True)
         self.btn_rec = QPushButton(_("Record 6s → play back"))
         self.btn_rec.setObjectName("primary")
         icons.set_icon(self.btn_rec, "record", "on_accent")
@@ -1417,7 +1421,7 @@ class MainWindow(QMainWindow):
         ev.addWidget(self.eq)
         rcol.addWidget(eqcard)
         rcol.addWidget(destcard)
-        utilitycard, uv = card("VOLUME & SHORTCUTS", roomy=True)
+        utilitycard, uv = card(_("VOLUME & SHORTCUTS"), roomy=True)
         self.chk_level = QCheckBox(_("Level volumes (all sounds equally loud)"))
         self.chk_level.setChecked(c.level_volumes)
         self.chk_level.toggled.connect(self.on_level_toggle)
@@ -1455,14 +1459,14 @@ class MainWindow(QMainWindow):
             self.status.setText(_("<span style='color:{status}'>Couldn't re-scan devices — "
                                   "restart the app to pick up new ones.</span>",
                                   status=theme.status('warn')))
-            return "Couldn't re-scan"
+            return _("Couldn't re-scan")
         if self.cfg.route == "cable" and not any(is_virtual_cable(d["name"]) for d in outs):
             self.status.setText(_("<span style='color:{status}'>Still no virtual cable. If you "
                                   "just installed it, restart your PC — Windows often only shows "
                                   "it after a restart.</span>", status=theme.status('warn')))
-            return "No cable found yet"
+            return _("No cable found yet")
         n = len({d["name"] for d in outs} | {d["name"] for d in eng.list_devices("input")})
-        return f"✓ Found {n} device{'s' if n != 1 else ''}"
+        return ngettext("✓ Found {n} device", "✓ Found {n} devices", n)
 
     def rescan_with_feedback(self, btn, after=None):
         """A Re-scan button: "Scanning…" while it runs, then what it found."""
@@ -1471,7 +1475,7 @@ class MainWindow(QMainWindow):
             if after:
                 after()
             return msg
-        busy.run_busy(btn, "Scanning…", go, lambda msg: msg, ms=3000)
+        busy.run_busy(btn, _("Scanning…"), go, lambda msg: msg, ms=3000)
 
     def set_latency(self, mode: str):
         """'low' (default) or 'high' (bigger buffers: more delay, fewer drop-outs)."""
@@ -1650,11 +1654,11 @@ class MainWindow(QMainWindow):
         self.refresh_devices()   # the rates changed: rescan and reopen (re-checks too)
         if not quiet:
             if ok and not self.cable_bad:
-                msg, kind = ("✓ The cable is on 48 kHz both ends now. If Discord goes "
-                             "quiet, rejoin the voice channel."), "ok"
+                msg, kind = _("✓ The cable is on 48 kHz both ends now. If Discord goes "
+                              "quiet, rejoin the voice channel."), "ok"
             else:
-                msg, kind = ("Couldn't change the cable's format. Set it by hand: Sound "
-                             "settings → the cable → Advanced → 48000 Hz."), "warn"
+                msg, kind = _("Couldn't change the cable's format. Set it by hand: Sound "
+                              "settings → the cable → Advanced → 48000 Hz."), "warn"
             self.status.setText(f"<span style='color:{theme.status(kind)}'>{msg}</span>")
             self.toast(msg, kind)
         return ok
@@ -1909,10 +1913,14 @@ class MainWindow(QMainWindow):
                       "at <b>{virtual_mic}</b>, which Discord / the game uses as your mic.",
                       main=main, virtual_mic=self.virtual_mic))
             if self.cable_bad:
-                rates = " and ".join(f"{x.rate / 1000:g} kHz" for x in self.cable_bad)
-                hint += (f"<br><span style='color:{theme.status('warn')}'>One end of the "
-                         f"cable is on {rates}, so it converts your sound on the way "
-                         "through. Fix it for the cleanest sound.</span>")
+                rates = [f"{x.rate / 1000:g} kHz" for x in self.cable_bad]
+                if len(rates) > 1:
+                    rates = [_("{first} and {second}", first=", ".join(rates[:-1]),
+                               second=rates[-1])]
+                hint += _("<br><span style='color:{colour}'>One end of the cable is on "
+                          "{rates}, so it converts your sound on the way through. Fix it for "
+                          "the cleanest sound.</span>", colour=theme.status('warn'),
+                          rates=rates[0])
             self.setup_hint.setText(hint)
         elif main and c.route == "device":
             self.setup_hint.setText(_("Whatever listens to <b>{main}</b> gets your sounds (and "
@@ -1950,22 +1958,24 @@ class MainWindow(QMainWindow):
         if xr:
             tip = ("" if self.cfg.latency == "high" else
                    _(" — try Settings → Audio → Audio buffering: Safer"))
-            text += (f"{'<br>' if text else ''}<span style='color:{theme.status('warn')}'>"
-                     f"{xr} audio drop-out"
-                     f"{'s' if xr != 1 else ''} since start{tip}</span>")
+            text += ("<br>" if text else "") + ngettext(
+                "<span style='color:{colour}'>{n} audio drop-out since start{tip}</span>",
+                "<span style='color:{colour}'>{n} audio drop-outs since start{tip}</span>",
+                xr, colour=theme.status('warn'), tip=tip)
         self.status.setText(text)
 
     def _update_flow(self, talking=False):
         e = self.engine
         ok, bad = theme.status("ok"), theme.status("error")
         if not self.cfg.mic_enabled:
-            mic = f"Your mic  <b style='color:{theme.status('warn')}'>not sent (sounds only)</b>"
+            mic = _("Your mic  <b style='color:{colour}'>not sent (sounds only)</b>",
+                    colour=theme.status('warn'))
         elif e.mic_stream is None:
-            mic = f"Your mic  <b style='color:{bad}'>✗ off</b>"
+            mic = _("Your mic  <b style='color:{colour}'>✗ off</b>", colour=bad)
         elif talking:
-            mic = f"Your mic  <b style='color:{ok}'>✓ hearing you</b>"
+            mic = _("Your mic  <b style='color:{colour}'>✓ hearing you</b>", colour=ok)
         else:
-            mic = f"Your mic  <b style='color:{ok}'>✓</b>"
+            mic = _("Your mic  <b style='color:{colour}'>✓</b>", colour=ok)
         vm = self.virtual_mic
         route = self.cfg.route
         dev = self._main_name()
@@ -1977,118 +1987,130 @@ class MainWindow(QMainWindow):
                     and time.monotonic() < self._settle_until)
         if route == "mic" and self._attaching:
             state = "missing"
-            out = "Into your mic  <b>setting up…</b>"
-            step = ("Click <b>Yes</b> when Windows asks for permission. Your PC's sound "
-                    "drops out for a second while Windows reloads it.")
+            out = _("Into your mic  <b>setting up…</b>")
+            step = _("Click <b>Yes</b> when Windows asks for permission. Your PC's sound "
+                     "drops out for a second while Windows reloads it.")
         elif settling and not (e.main_stream is not None and directmic.works(direct)
                                and e.effect_alive()):
             state = "missing"
-            out = "Into your mic  <b>starting…</b>"
-            step = ("Windows is reloading your sound with Onion Board on your mic. This "
-                    "takes a few seconds.")
+            out = _("Into your mic  <b>starting…</b>")
+            step = _("Windows is reloading your sound with Onion Board on your mic. This "
+                     "takes a few seconds.")
         elif route == "mic" and directmic.needs_repair(direct):
             state = "missing"
-            out = f"Into your mic  <b style='color:{bad}'>✗ needs a quick repair</b>"
-            step = (f"<b style='color:{warn}'>One click:</b> Windows took Onion Board off "
-                    "your mic (a driver or Windows update does that). Windows asks for "
-                    "permission once, and your sounds are back in your mic.")
+            out = _("Into your mic  <b style='color:{colour}'>✗ needs a quick repair</b>",
+                    colour=bad)
+            step = _("<b style='color:{colour}'>One click:</b> Windows took Onion Board off "
+                     "your mic (a driver or Windows update does that). Windows asks for "
+                     "permission once, and your sounds are back in your mic.", colour=warn)
         elif route == "mic" and not directmic.works(direct):
             state = "missing"
-            out = (f"Into your mic  <b style='color:{warn}'>one click to go</b>"
-                   if direct == "missing" else
-                   f"Into your mic  <b style='color:{warn}'>set up on another mic</b>")
-            step = (f"<b style='color:{warn}'>One click:</b> put your sounds straight into "
-                    "your mic. Windows asks for permission once; after that Discord and "
-                    "games hear them through your normal mic, with nothing to set there.")
+            out = (_("Into your mic  <b style='color:{colour}'>one click to go</b>",
+                     colour=warn) if direct == "missing" else
+                   _("Into your mic  <b style='color:{colour}'>set up on another mic</b>",
+                     colour=warn))
+            step = _("<b style='color:{colour}'>One click:</b> put your sounds straight into "
+                     "your mic. Windows asks for permission once; after that Discord and "
+                     "games hear them through your normal mic, with nothing to set there.",
+                     colour=warn)
         elif route == "mic" and e.main_stream is not None and self._direct_not_running():
             state = "unrouted"
-            out = (f"Into your mic  <b style='color:{bad}'>✗ Windows isn't running "
-                   "Onion Board on it</b>")
-            step = ("Another app may have your mic to itself (an <b>exclusive mode</b> "
-                    "setting), or Windows hasn't loaded Onion Board on it. Repair it below, "
-                    "or send through the virtual cable instead.")
+            out = _("Into your mic  <b style='color:{colour}'>✗ Windows isn't running "
+                    "Onion Board on it</b>", colour=bad)
+            step = _("Another app may have your mic to itself (an <b>exclusive mode</b> "
+                     "setting), or Windows hasn't loaded Onion Board on it. Repair it below, "
+                     "or send through the virtual cable instead.")
         elif route == "mic" and e.main_stream is not None:
             state = "ok"
-            name = html.escape(self.cfg.mic_device or "your mic")
+            name = html.escape(self.cfg.mic_device or _("your mic"))
             apps = e.direct_apps()
-            out = (f"<b style='color:{ok}'>{name}</b> — your sounds are in it "
-                   f"<b style='color:{ok}'>✓</b>"
-                   + (f"  <b style='color:{ok}'>(live)</b>" if apps else ""))
-            step = ("<b>Nothing to set.</b> Discord and games keep your normal mic, and "
-                    "your sounds are in it. If sounds get chopped up, switch off the "
-                    "voice app's noise suppression (Discord: <b>Input Profile → Custom</b>, "
-                    "<b>Noise Suppression → None</b>, <b>Echo Cancellation</b> off. Not "
-                    "Studio: it skips Onion Board)."
-                    + ("<br><br><b>Optional:</b> your mic part works, and a newer "
-                       "version is here. It's not needed — update below whenever suits "
-                       "you (Windows asks once, and your sound drops out for a second)."
+            out = (_("<b style='color:{colour}'>{name}</b> — your sounds are in it "
+                     "<b style='color:{colour}'>✓</b>", colour=ok, name=name)
+                   + ("  " + _("<b style='color:{colour}'>(live)</b>", colour=ok)
+                      if apps else ""))
+            step = (_("<b>Nothing to set.</b> Discord and games keep your normal mic, and "
+                      "your sounds are in it. If sounds get chopped up, switch off the "
+                      "voice app's noise suppression (Discord: <b>Input Profile → Custom</b>, "
+                      "<b>Noise Suppression → None</b>, <b>Echo Cancellation</b> off. Not "
+                      "Studio: it skips Onion Board).")
+                    + (_("<br><br><b>Optional:</b> your mic part works, and a newer "
+                         "version is here. It's not needed — update below whenever suits "
+                         "you (Windows asks once, and your sound drops out for a second).")
                        if direct == "outdated" else ""))
         elif route == "mic":
             state = "unrouted"
-            out = f"Into your mic  <b style='color:{bad}'>✗ can't reach it</b>"
+            out = _("Into your mic  <b style='color:{colour}'>✗ can't reach it</b>",
+                    colour=bad)
             err = html.escape(e.errors_snapshot().get("main", ""))
-            step = ((f"{err}. " if err else "Something went wrong sending into your mic. ")
-                    + "Repair it below, or send through the virtual cable instead.")
+            step = (_("{error}. Repair it below, or send through the virtual cable instead.",
+                      error=err) if err else
+                    _("Something went wrong sending into your mic. Repair it below, or send "
+                      "through the virtual cable instead."))
         elif route == "off":
             state = "off"
-            out = "Sent to others  <b>nowhere (your choice)</b>"
-            step = ("<b>Nothing goes out as a mic</b>, so Discord and games don't hear your "
-                    "sounds. They play in your headphones (OBS's <b>Desktop Audio</b> picks "
-                    "them up there) and on the <b>stream output</b> if you set one "
-                    "(Settings → Audio). To send them out, set <b>Send my sounds to</b> "
-                    "back to <b>My mic</b> under Devices.")
+            out = _("Sent to others  <b>nowhere (your choice)</b>")
+            step = _("<b>Nothing goes out as a mic</b>, so Discord and games don't hear your "
+                     "sounds. They play in your headphones (OBS's <b>Desktop Audio</b> picks "
+                     "them up there) and on the <b>stream output</b> if you set one "
+                     "(Settings → Audio). To send them out, set <b>Send my sounds to</b> "
+                     "back to <b>My mic</b> under Devices.")
         elif route == "device" and dev and e.main_stream is not None and not vm:
             state = "ok"
             name = html.escape(dev)
-            out = f"<b style='color:{ok}'>{name}</b> — sending <b style='color:{ok}'>✓</b>"
-            step = (f"<b>Your sounds go to {name}.</b> Whatever listens there gets them. "
-                    "In OBS: Sources → + → <b>Audio Output Capture</b> → "
-                    f"<b>{name}</b>. In Voicemeeter or a mixer, send that input on "
-                    "to wherever it should go. Not going on to a voice chat? Untick "
-                    "<b>Send in mono</b> under Who's listening to keep it stereo.")
+            out = _("<b style='color:{colour}'>{name}</b> — sending "
+                    "<b style='color:{colour}'>✓</b>", colour=ok, name=name)
+            step = _("<b>Your sounds go to {name}.</b> Whatever listens there gets them. "
+                     "In OBS: Sources → + → <b>Audio Output Capture</b> → "
+                     "<b>{name}</b>. In Voicemeeter or a mixer, send that input on "
+                     "to wherever it should go. Not going on to a voice chat? Untick "
+                     "<b>Send in mono</b> under Who's listening to keep it stereo.", name=name)
         elif route == "device" and not (dev and e.main_stream is not None):
             state = "unrouted"
             if self.cfg.main_device and dev is None:
-                out = f"Sending  <b style='color:{bad}'>✗ same device as your headphones</b>"
+                out = _("Sending  <b style='color:{colour}'>✗ same device as your "
+                        "headphones</b>", colour=bad)
             elif dev:
-                out = f"Sending  <b style='color:{bad}'>✗ can't open {html.escape(dev)}</b>"
+                out = _("Sending  <b style='color:{colour}'>✗ can't open {device}</b>",
+                        colour=bad, device=html.escape(dev))
             else:
-                out = f"Sending  <b style='color:{bad}'>✗ no device picked</b>"
-            almost = f"<b style='color:{theme.status('warn')}'>Almost:</b> under <b>Devices</b>, "
-            step = almost + (
-                "set <b>Send my sounds to</b> to another device than your headphones, or "
-                "to <b>My mic</b>." if self.cfg.main_device and dev is None
-                else "set <b>Send my sounds to</b> to the device that should get your "
-                "sounds (and check it's plugged in), or to <b>My mic</b>.")
+                out = _("Sending  <b style='color:{colour}'>✗ no device picked</b>", colour=bad)
+            step = (_("<b style='color:{colour}'>Almost:</b> under <b>Devices</b>, set <b>Send "
+                      "my sounds to</b> to another device than your headphones, or to <b>My "
+                      "mic</b>.", colour=warn)
+                    if self.cfg.main_device and dev is None else
+                    _("<b style='color:{colour}'>Almost:</b> under <b>Devices</b>, set <b>Send "
+                      "my sounds to</b> to the device that should get your sounds (and check "
+                      "it's plugged in), or to <b>My mic</b>.", colour=warn))
         elif route == "device":   # another virtual cable: its other end is the mic
             state = "ok"
-            out = (f"<b style='color:{ok}'>{vm}</b> — your new mic "
-                   f"<b style='color:{ok}'>✓ working</b>")
-            step = (f"<b>The only thing you set:</b> in Discord, your game or OBS, pick "
-                    f"<b style='color:{ok}'>{vm}</b> as the <b>microphone</b> / audio input.")
+            out = _("<b style='color:{colour}'>{device}</b> — your new mic "
+                    "<b style='color:{colour}'>✓ working</b>", colour=ok, device=vm)
+            step = _("<b>The only thing you set:</b> in Discord, your game or OBS, pick "
+                     "<b style='color:{colour}'>{device}</b> as the <b>microphone</b> / audio "
+                     "input.", colour=ok, device=vm)
         elif not any_cable:
             state = "missing"
-            out = f"Virtual mic  <b style='color:{bad}'>✗ not installed yet</b>"
-            step = (f"<b style='color:{theme.status('warn')}'>"
-                    "One-time setup:</b> install the free virtual "
-                    "cable. It's what lets Discord and games hear your sounds — without it, "
-                    "only you can hear them. Easier: set <b>Send my sounds to</b> to "
-                    "<b>My mic</b> (nothing to install). Voicemeeter, a mixer or OBS? Pick "
-                    "that device there.")
+            out = _("Virtual mic  <b style='color:{colour}'>✗ not installed yet</b>",
+                    colour=bad)
+            step = _("<b style='color:{colour}'>One-time setup:</b> install the free virtual "
+                     "cable. It's what lets Discord and games hear your sounds — without it, "
+                     "only you can hear them. Easier: set <b>Send my sounds to</b> to "
+                     "<b>My mic</b> (nothing to install). Voicemeeter, a mixer or OBS? Pick "
+                     "that device there.", colour=warn)
         elif vm and e.main_stream is not None:
             state = "ok"
-            out = (f"<b style='color:{ok}'>{vm}</b> — your new mic "
-                   f"<b style='color:{ok}'>✓ working</b>")
-            step = (f"<b>The only thing you set:</b> in Discord or your game, pick "
-                    f"<b style='color:{ok}'>{vm}</b> as your <b>microphone</b>, and switch "
-                    "off its noise suppression (Discord: <b>Input Profile → Studio</b>), "
-                    "or it chops your sounds up.")
+            out = _("<b style='color:{colour}'>{device}</b> — your new mic "
+                    "<b style='color:{colour}'>✓ working</b>", colour=ok, device=vm)
+            step = _("<b>The only thing you set:</b> in Discord or your game, pick "
+                     "<b style='color:{colour}'>{device}</b> as your <b>microphone</b>, and "
+                     "switch off its noise suppression (Discord: <b>Input Profile → "
+                     "Studio</b>), or it chops your sounds up.", colour=ok, device=vm)
         else:
             state = "unrouted"
-            out = f"Virtual mic  <b style='color:{bad}'>✗ not connected</b>"
-            step = (f"<b style='color:{theme.status('warn')}'>"
-                    "Almost:</b> under <b>Devices</b>, set "
-                    "<b>Send my sounds to</b> to your virtual cable, or to <b>My mic</b>.")
+            out = _("Virtual mic  <b style='color:{colour}'>✗ not connected</b>", colour=bad)
+            step = _("<b style='color:{colour}'>Almost:</b> under <b>Devices</b>, set "
+                     "<b>Send my sounds to</b> to your virtual cable, or to <b>My mic</b>.",
+                     colour=warn)
         self.flow_mic.setText(mic)
         self.flow_out.setText(out)
         self.step_lbl.setText(step)
@@ -2192,11 +2214,11 @@ class MainWindow(QMainWindow):
         if err:
             if self._attach_release is not None:
                 release, self._attach_release = self._attach_release, None
-                release("✗ Didn't work")
+                release(_("✗ Didn't work"))
             log.warning("not put on the mic: %s", err)
             # the route stays on the mic: until it's set up, the cable carries the
             # sounds meanwhile (_main_name), and the one-click stays on offer
-            err += "\n\nTry again any time from the Setup tab."
+            err = _("{error}\n\nTry again any time from the Setup tab.", error=err)
             QMessageBox.warning(self, _("Couldn't put Onion Board on your mic"), err)
         else:
             log.info("on the mic now: %s", mic)
@@ -2289,7 +2311,7 @@ class MainWindow(QMainWindow):
     def _cable_removed(self, err: str):
         if err:
             log.warning("virtual cable not removed: %s", err)
-            self._rmcable_release("✗ Not removed")
+            self._rmcable_release(_("✗ Not removed"))
             self.toast(_("The virtual cable wasn't removed: {err}", err=html.escape(err)), "warn")
             return
         self._rmcable_release()
@@ -2352,7 +2374,7 @@ class MainWindow(QMainWindow):
         self._prepare_all()
 
     def open_windows_mic(self):
-        vm = self.virtual_mic or "your virtual cable"
+        vm = self.virtual_mic or _("your virtual cable")
         try:
             subprocess.Popen(["control", "mmsys.cpl,,1"], creationflags=0x08000000)
         except OSError:
@@ -2418,16 +2440,19 @@ class MainWindow(QMainWindow):
         # for the simple modes, in order: voice chat apps on the cable, the game in
         # front, games on the cable (a per-program list would go first)
         apps = set(voicesdk.VOICE_APPS.values())
-        where = "your mic" if self.cfg.route == "mic" else "the virtual cable"
-        hints = [profiles.Hint(h[0], f"{h[1]} is listening to {where}",
+        def listening(name: str) -> str:
+            return (_("{name} is listening to your mic", name=name)
+                    if self.cfg.route == "mic" else
+                    _("{name} is listening to the virtual cable", name=name))
+        hints = [profiles.Hint(h[0], listening(h[1]),
                                profiles.VOICE.key) for h in heard if h in apps]
         if key:
             hints.append(profiles.Hint(key, why, profiles.GAME.key))
-        hints += [profiles.Hint(h[0], f"{h[1]} is listening to {where}",
+        hints += [profiles.Hint(h[0], listening(h[1]),
                                 profiles.GAME.key) for h in heard if h not in apps]
         if heard:   # the game in front, if it's one of them; else the first
             key, name = next((h for h in heard if h[0] == key), heard[0])
-            why = _("{name} is listening to {where}", name=name, where=where)
+            why = listening(name)
         if (key != self.voice_suggestion or why != self.voice_why
                 or hints != self.voice_hints):
             self.voice_suggestion, self.voice_why, self.voice_hints = key, why, hints
@@ -2554,9 +2579,9 @@ class MainWindow(QMainWindow):
         page = getattr(self, key)
         if key == "voice":   # the active voice's picture, when there is one
             set_tab_live(self.tabs, TAB_INDEX[key], on,
-                         "● ON: others hear your changed / computer voice", page.tab_icon())
+                         _("● ON: others hear your changed / computer voice"), page.tab_icon())
         elif key == "triggers":
-            set_tab_live(self.tabs, TAB_INDEX[key], on, "● ON: watching your screen",
+            set_tab_live(self.tabs, TAB_INDEX[key], on, _("● ON: watching your screen"),
                          "triggers")
         else:
             set_tab_live(self.tabs, TAB_INDEX[key], on, page.live_tip(), "apps")
@@ -2650,20 +2675,20 @@ class MainWindow(QMainWindow):
             self._refit()
         self._radio_live(False)
         if playing:
-            self.toast(html.escape("Radio was switched off, so the station stopped."))
+            self.toast(html.escape(_("Radio was switched off, so the station stopped.")))
 
     def _on_tor(self):
         """Something is waiting for Tor: say so (once), and when it's ready or failed."""
         t = tor.manager()
         if t.state == tor.STARTING and t.waiting:
-            say = ("starting", "Connecting to Tor… what you asked for goes once it's "
-                                "connected (Settings → Privacy & security shows how far "
-                                "it is).", "")
+            say = ("starting", _("Connecting to Tor… what you asked for goes once it's "
+                                  "connected (Settings → Privacy & security shows how far "
+                                  "it is)."), "")
         elif t.state == tor.READY and self._tor_told == "starting":
-            say = ("ready", "✓ Connected to Tor.", "ok")
+            say = ("ready", _("✓ Connected to Tor."), "ok")
         elif t.state == tor.FAILED and self._tor_told in ("starting", "") and t.waiting:
-            say = ("failed", f"Couldn't connect to Tor: {t.message}. Nothing was sent "
-                               "without it.", "error")
+            say = ("failed", _("Couldn't connect to Tor: {error}. Nothing was sent "
+                               "without it.", error=t.message), "error")
         elif t.state == tor.OFF:
             self._tor_told = ""
             return
@@ -2830,12 +2855,13 @@ class MainWindow(QMainWindow):
         data = self.replay.clip()
         if len(data) < int(0.2 * SR):
             self.cue("fail")
-            why = self.replay.error or (
-                f"nothing has played on this PC in the last {self.replay.seconds} seconds")
+            why = self.replay.error or ngettext(
+                "nothing has played on this PC in the last {n} second",
+                "nothing has played on this PC in the last {n} seconds", self.replay.seconds)
             self.status.setText(_("<span style='color:{status}'>Nothing to save: {why}.</span>",
                                   status=theme.status('warn'), why=html.escape(why)))
             return
-        self.on_clip(data, "Replay " + time.strftime("%H.%M.%S"))
+        self.on_clip(data, _("Replay {time}", time=time.strftime("%H.%M.%S")))
         self.cue("saved")
 
     def on_hotkeys_failed(self, failed: list[str]):
@@ -2875,10 +2901,10 @@ class MainWindow(QMainWindow):
         one to set it), then a way into Settings → Hotkeys for the rest."""
         menu.clear()
         labels = {attr: label for attr, _a, label, _d in HOTKEY_ACTIONS}
-        labels["ptt_key"] = "Auto push-to-talk key"
+        labels["ptt_key"] = _("Auto push-to-talk key")
         for attr in (*self.QUICK_HOTKEYS, "ptt_key"):
             combo = getattr(self.cfg, attr)
-            key = pretty_key(combo) or ("Off" if attr == "ptt_key" else "not set")
+            key = pretty_key(combo) or (_("Off") if attr == "ptt_key" else _("not set"))
             menu.addAction(f"{labels[attr]}	{key}",
                            lambda a=attr: self._quick_set_hotkey(a))
         menu.addSeparator()
@@ -4059,8 +4085,8 @@ class MainWindow(QMainWindow):
         exts = " ".join(f"*{e}" for e in sorted(AUDIO_EXTS))
         files, __ = QFileDialog.getOpenFileNames(
             self, _("Add sounds"), str(Path.home()),
-            f"Sounds and zips ({exts} *.zip);;Audio ({exts});;Zip of sounds, backup or "
-            "sound pack (*.zip);;All files (*)")
+            _("Sounds and zips ({exts} *.zip);;Audio ({exts});;Zip of sounds, backup or "
+              "sound pack (*.zip);;All files (*)", exts=exts))
         if files:
             self.import_files(files)
 
@@ -4118,7 +4144,8 @@ class MainWindow(QMainWindow):
                         if f in extras:
                             self.bridge.imported.emit(None, None, "")   # already moved over
                             continue
-                        raise RuntimeError(f"already in your library as “{known[fp]}”")
+                        raise RuntimeError(_("already in your library as “{name}”",
+                                             name=known[fp]))
                     meta, data = import_file(f, PAD_COLORS[(start + i) % len(PAD_COLORS)])
                     if (x := extras.get(f)) is not None:
                         meta.name = x.name or meta.name
@@ -4300,22 +4327,22 @@ class MainWindow(QMainWindow):
             a = parent.addAction(icons.icon(*icon) if icon else QIcon(), text)
             a.setToolTip(tip or text)
             return a
-        a_stop = add(("stop",), "Stop") if self.engine.state(sid) else None
-        a_next = add(("play",), "Play next", "Plays it after the sounds playing now")
+        a_stop = add(("stop",), _("Stop")) if self.engine.state(sid) else None
+        a_next = add(("play",), _("Play next"), _("Plays it after the sounds playing now"))
         menu.addSeparator()
-        a_edit = add(("edit",), "Edit…", "Name, volume, hotkey, what a press does, loop, "
-                     "fades, wait first, cooldown, colour")
-        a_fx = add(("wave",), "Effects…", "Speed, pitch, EQ, boost")
+        a_edit = add(("edit",), _("Edit…"), _("Name, volume, hotkey, what a press does, loop, "
+                                              "fades, wait first, cooldown, colour"))
+        a_fx = add(("wave",), _("Effects…"), _("Speed, pitch, EQ, boost"))
         a_hk_clear = None
         if m.hotkey:
             hk = menu.addMenu(icons.icon("keyboard"), _("Hotkey: {hotkey}",
                                                         hotkey=pretty_key(m.hotkey)))
             hk.setToolTipsVisible(True)
-            a_hk = add(None, "Change…", "Press a new key or combo for it", hk)
-            a_hk_clear = add(None, "Remove hotkey", "", hk)
+            a_hk = add(None, _("Change…"), _("Press a new key or combo for it"), hk)
+            a_hk_clear = add(None, _("Remove hotkey"), "", hk)
         else:
-            a_hk = add(("keyboard",), "Set hotkey…", "A key or combo that plays it, even "
-                       "in-game")
+            a_hk = add(("keyboard",), _("Set hotkey…"), _("A key or combo that plays it, even "
+                                                          "in-game"))
         cats = menu.addMenu(_("Categories"))
         cat_acts = {}
         for c in self.cfg.categories:
@@ -4332,11 +4359,12 @@ class MainWindow(QMainWindow):
             a_pic = pic.addAction(_("Change…"))
             a_nopic = pic.addAction(_("Remove picture"))
         else:
-            a_pic = add(("image",), "Add picture…", "Shown on the pad (you can also drop a "
-                        "picture on it, or copy one, click the pad and press Ctrl+V)")
+            a_pic = add(("image",), _("Add picture…"), _("Shown on the pad (you can also drop "
+                                                         "a picture on it, or copy one, click "
+                                                         "the pad and press Ctrl+V)"))
         menu.addSeparator()
-        a_export = add(("folder",), "Export…", "Save it as a file to share with friends")
-        a_del = add(("trash", "danger_text"), "Remove", "Goes to Recently deleted")
+        a_export = add(("folder",), _("Export…"), _("Save it as a file to share with friends"))
+        a_del = add(("trash", "danger_text"), _("Remove"), _("Goes to Recently deleted"))
         act = menu.exec(pos)
         menu.deleteLater()   # its actions stay valid until this returns
         if act is None:
@@ -4362,7 +4390,8 @@ class MainWindow(QMainWindow):
         elif act == a_pic:
             f, __ = QFileDialog.getOpenFileName(
                 self, _("Pick a picture"), str(Path.home()),
-                "Pictures (" + " ".join(f"*{x}" for x in sorted(thumbs.IMAGE_EXTS)) + ")")
+                _("Pictures ({patterns})",
+                  patterns=" ".join(f"*{x}" for x in sorted(thumbs.IMAGE_EXTS))))
             if f:
                 self.set_picture(sid, f)
         elif act is not None and act == a_nopic:
@@ -4399,7 +4428,7 @@ class MainWindow(QMainWindow):
         or else on the selected one."""
         clip = clipeditor.pasted_clip()
         if clip is not None:
-            self.on_clip(clip.copy(), f"Clip {time.strftime('%H.%M.%S')}")
+            self.on_clip(clip.copy(), _("Clip {time}", time=time.strftime('%H.%M.%S')))
             return
         sids = [m.id for m in self.selection.sounds()] or (
             [self.current] if self.current in self.pads else [])
@@ -4419,19 +4448,26 @@ class MainWindow(QMainWindow):
         m = self.meta(done[0])
         self.status.setText(_("Picture pasted on “{name}”.",
                               name=html.escape(m.name)) if len(done) == 1
-                            else _("Picture pasted on {n} pads.", n=len(done)))
+                            else ngettext("Picture pasted on {n} pad.",
+                                          "Picture pasted on {n} pads.", len(done)))
 
     def ask_remove(self, sids: list[str]) -> bool:
         """Remove from the menu / picked pads: ask first. They go to Recently deleted."""
         gone = [m for m in (self.meta(s) for s in sids) if m]
         if not gone:
             return False
-        what = f"“{gone[0].name}”" if len(gone) == 1 else f"these {len(gone)} sounds"
+        if len(gone) == 1:
+            ask = _("Remove “{name}”?\n\nRemoved sounds go to Recently deleted, where you "
+                    "can bring them back for {keep_days} days.",
+                    name=gone[0].name, keep_days=trash.KEEP_DAYS)
+        else:
+            ask = ngettext("Remove this {n} sound?\n\nRemoved sounds go to Recently deleted, "
+                           "where you can bring them back for {keep_days} days.",
+                           "Remove these {n} sounds?\n\nRemoved sounds go to Recently "
+                           "deleted, where you can bring them back for {keep_days} days.",
+                           len(gone), keep_days=trash.KEEP_DAYS)
         box = QMessageBox(QMessageBox.Question, _("Remove sound") if len(gone) == 1
-                          else _("Remove sounds"),
-                          _("Remove {what}?\n\nRemoved sounds go to Recently deleted, where you "
-                            "can bring them back for {keep_days} days.",
-                            what=what, keep_days=trash.KEEP_DAYS),
+                          else _("Remove sounds"), ask,
                           QMessageBox.Yes | QMessageBox.Cancel, self)
         box.button(QMessageBox.Yes).setText(_("Remove"))
         box.setDefaultButton(QMessageBox.Cancel)
@@ -4462,7 +4498,7 @@ class MainWindow(QMainWindow):
             self.engine.forget(m.id)
             if self.current == m.id:
                 self.current = None
-                self._set_np_name("Pick a sound")
+                self._set_np_name(_("Pick a sound"))
                 self.np_name.setToolTip(_("Select a sound pad to use these playback controls."))
         self._save_now()
         self._rebuild_pads()
@@ -4577,12 +4613,12 @@ class MainWindow(QMainWindow):
             if m.hotkey == getattr(self.cfg, attr):
                 setattr(self.cfg, attr, "")
                 lost.append(label)
-        lost += [f"a random sound from “{c}”" for c, k in self.cfg.category_hotkeys.items()
-                 if k == m.hotkey]
+        lost += [_("a random sound from “{name}”", name=c)
+                 for c, k in self.cfg.category_hotkeys.items() if k == m.hotkey]
         self._clear_category_hotkey(m.hotkey)
         if self.cfg.ptt_key == m.hotkey:   # as everywhere else a key is set
             self.cfg.ptt_key = ""
-            lost.append("auto push-to-talk")
+            lost.append(_("auto push-to-talk"))
         if lost:
             self.status.setText(
                 _("<span style='color:{status}'>{hotkey} plays “{name}” now — it was the key for "
@@ -4635,7 +4671,7 @@ class MainWindow(QMainWindow):
             for attr, *__ in HOTKEY_ACTIONS:
                 if getattr(self.cfg, attr) == combo:
                     setattr(self.cfg, attr, "")
-                    taken_from.append("another action")
+                    taken_from.append(_("another action"))
             for m in self.cfg.sounds:
                 if m.hotkey == combo:
                     taken_from.append(f"“{m.name}”")
@@ -4646,10 +4682,13 @@ class MainWindow(QMainWindow):
             if self.cfg.ptt_key == combo:
                 self.cfg.ptt_key = ""
             self.cfg.category_hotkeys[name] = combo
-            msg = _("✓ {combo} plays a random “{name}” sound",
-                    combo=html.escape(combo), name=html.escape(name))
             if taken_from:
-                msg += " — it was the key for " + html.escape(", ".join(taken_from))
+                msg = _("✓ {combo} plays a random “{name}” sound — it was the key for {lost}",
+                        combo=html.escape(combo), name=html.escape(name),
+                        lost=html.escape(", ".join(taken_from)))
+            else:
+                msg = _("✓ {combo} plays a random “{name}” sound",
+                        combo=html.escape(combo), name=html.escape(name))
             self.toast(msg, "ok")
         else:
             self.cfg.category_hotkeys.pop(name, None)
@@ -4742,7 +4781,7 @@ class MainWindow(QMainWindow):
     def _save_name(self, title: str, name: str) -> str:
         docs = Path.home() / "Documents"
         start = (docs if docs.is_dir() else Path.home()) / name
-        f, __ = QFileDialog.getSaveFileName(self, title, str(start), "Zip file (*.zip)")
+        f, __ = QFileDialog.getSaveFileName(self, title, str(start), _("Zip file (*.zip)"))
         if f and not f.lower().endswith(".zip"):
             f += ".zip"
         return f
@@ -4754,7 +4793,7 @@ class MainWindow(QMainWindow):
                 self, _("Export"), _("There are no sounds yet. Export just your settings?")) \
                 == QMessageBox.Yes:
             return
-        f = self._save_name("Export everything",
+        f = self._save_name(_("Export everything"),
                             f"Onion Board backup {time.strftime('%Y-%m-%d')}.zip")
         if f:
             self._export(f, list(self.cfg.sounds), with_settings=True)
@@ -4768,7 +4807,7 @@ class MainWindow(QMainWindow):
         if not sounds:
             QMessageBox.information(self, _("Export"), _("There are no sounds in it to export."))
             return
-        f = self._save_name("Export sounds", backup._safe(name) + ".zip")
+        f = self._save_name(_("Export sounds"), backup._safe(name) + ".zip")
         if f:
             self._export(f, sounds, with_settings=False)
 
@@ -4812,7 +4851,7 @@ class MainWindow(QMainWindow):
     def import_dialog(self):
         files, __ = QFileDialog.getOpenFileNames(
             self, _("Import a backup, sound pack or zip of sounds"), str(Path.home()),
-            "Zip file (*.zip)")
+            _("Zip file (*.zip)"))
         if files:
             self.import_files(files)   # a plain zip of sounds is imported too
 
@@ -4846,7 +4885,8 @@ class MainWindow(QMainWindow):
         if not path:
             path, __ = QFileDialog.getOpenFileName(
                 self, _("{title}: pick a saved board", title=title), str(Path.home()),
-                f"{src.name} board ({' '.join('*' + x for x in src.suffixes)})")
+                _("{name} board ({patterns})", name=src.name,
+                  patterns=" ".join("*" + x for x in src.suffixes)))
             if not path:
                 return
         try:
@@ -4873,21 +4913,31 @@ class MainWindow(QMainWindow):
         if ask:
             keys = sum(1 for e in ok if e.hotkey)
             cats = {t for e in ok for t in e.tags}
-            lines = [f"Found <b>{len(ok)}</b> sound{'s' if len(ok) != 1 else ''} "
-                     f"in {src.name}"]
-            extra = [f"{len(cats)} categor{'ies' if len(cats) != 1 else 'y'}" if cats else "",
-                     f"{keys} hotkey{'s' if keys != 1 else ''}" if keys else ""]
-            if any(extra):
-                lines[0] += " with " + " and ".join(x for x in extra if x)
-            lines[0] += "."
-            lines.append(f"They're copied into Onion Board; {src.name} keeps its own. Ones "
-                         "already here are skipped, and a hotkey something here already "
-                         "uses is left off.")
+            n_cats = ngettext("{n} category", "{n} categories", len(cats))
+            n_keys = ngettext("{n} hotkey", "{n} hotkeys", keys)
+            if cats and keys:
+                found = ngettext("Found <b>{n}</b> sound in {name} with {categories} and "
+                                 "{hotkeys}.", "Found <b>{n}</b> sounds in {name} with "
+                                 "{categories} and {hotkeys}.", len(ok), name=src.name,
+                                 categories=n_cats, hotkeys=n_keys)
+            elif cats or keys:
+                found = ngettext("Found <b>{n}</b> sound in {name} with {what}.",
+                                 "Found <b>{n}</b> sounds in {name} with {what}.", len(ok),
+                                 name=src.name, what=n_cats if cats else n_keys)
+            else:
+                found = ngettext("Found <b>{n}</b> sound in {name}.",
+                                 "Found <b>{n}</b> sounds in {name}.", len(ok), name=src.name)
+            lines = [found,
+                     _("They're copied into Onion Board; {name} keeps its own. Ones "
+                       "already here are skipped, and a hotkey something here already "
+                       "uses is left off.", name=src.name)]
             if bad:
-                lines.append(f"{len(bad)} more can't be brought over (the file was moved "
-                             "or deleted, or isn't a sound): "
-                             + html.escape(", ".join(e.name for e in bad[:5]))
-                             + ("…" if len(bad) > 5 else ""))
+                lines.append(ngettext(
+                    "{n} more can't be brought over (the file was moved or deleted, or isn't "
+                    "a sound): {names}", "{n} more can't be brought over (the file was moved "
+                    "or deleted, or isn't a sound): {names}", len(bad),
+                    names=html.escape(", ".join(e.name for e in bad[:5]))
+                    + ("…" if len(bad) > 5 else "")))
             if QMessageBox.question(self, title, "<br><br>".join(lines),
                                     QMessageBox.Yes | QMessageBox.No) != QMessageBox.Yes:
                 return
@@ -5004,9 +5054,10 @@ class MainWindow(QMainWindow):
         self._load_all()
         self.register_hotkeys()
         n = len(res.sounds)
-        msg = ngettext("Imported {n} sound", "Imported {n} sounds", n)
-        if res.skipped:
-            msg += f" ({len(res.skipped)} already in your library)"
+        msg = (ngettext("Imported {n} sound ({skipped} already in your library)",
+                        "Imported {n} sounds ({skipped} already in your library)", n,
+                        skipped=len(res.skipped)) if res.skipped else
+               ngettext("Imported {n} sound", "Imported {n} sounds", n))
         self.status.setText(msg + ".")
         self.toast(f"✓ {msg}", "ok" if n else "")
         if res.failed:
@@ -5110,7 +5161,7 @@ class MainWindow(QMainWindow):
         except Exception as e:  # noqa: BLE001 - a bad add-on can't stop the app
             log.exception("remote add-on %s didn't start", info.id)
             info.error = str(e) if isinstance(e, modules.ModuleError) \
-                else f"failed to start: {errors.plain(e)}"
+                else _("failed to start: {error}", error=errors.plain(e))
             return None
 
     def load_remote_addon(self, info):
@@ -5236,12 +5287,13 @@ class MainWindow(QMainWindow):
         busy = self._downloading or self._update_file is not None
         if rel is not None and not busy:
             self.release = rel
-            self._set_update_pill(f"Update: {rel.version}",
-                                  f"Onion Board {rel.version} is out — click for details")
+            self._set_update_pill(_("Update: {version}", version=rel.version),
+                                  _("Onion Board {version} is out — click for details",
+                                    version=rel.version))
             if self.tray is not None and not self.isVisible():
                 self.tray.showMessage(
-                    "Onion Board", f"Important fix: {rel.urgent}" if rel.urgent
-                    else f"Version {rel.version} is out.",
+                    "Onion Board", _("Important fix: {fix}", fix=rel.urgent) if rel.urgent
+                    else _("Version {version} is out.", version=rel.version),
                     QSystemTrayIcon.Warning if rel.urgent else QSystemTrayIcon.Information,
                     8000)
             self._show_urgent()
@@ -5263,16 +5315,18 @@ class MainWindow(QMainWindow):
         rel = self.release
         if (rel is not None and rel.urgent and not self._downloading
                 and f"board {rel.version}" not in self._urgent_hidden):
-            button = ("Restart to update" if self._update_file is not None
-                      else "Update now" if updates.can_install() and rel.asset_url
-                      else "Details")
+            button = (_("Restart to update") if self._update_file is not None
+                      else _("Update now") if updates.can_install() and rel.asset_url
+                      else _("Details"))
             return (f"board {rel.version}",
-                    f"Important fix in Onion Board {rel.version}: {rel.urgent}", button)
+                    _("Important fix in Onion Board {version}: {fix}",
+                      version=rel.version, fix=rel.urgent), button)
         o = self.watch_offer
         if o is not None and f"watch {o.version}" not in self._urgent_hidden:
             return (f"watch {o.version}",
-                    f"Important fix in Onion Watch {o.version}: {o.urgent}",
-                    "Update Onion Watch")
+                    _("Important fix in Onion Watch {version}: {fix}",
+                      version=o.version, fix=o.urgent),
+                    _("Update Onion Watch"))
         probs = self.discord_problems()
         key = "discord " + ",".join(probs)
         if probs and key not in self._urgent_hidden:
@@ -5381,16 +5435,16 @@ class MainWindow(QMainWindow):
                           _("Onion Board {version} is out (you have {current}).",
                             version=rel.version, current=__version__),
                           QMessageBox.NoButton, self)
-        info = (f"<p><b>Important fix:</b> {html.escape(rel.urgent)}</p>"
+        info = (_("<p><b>Important fix:</b> {fix}</p>", fix=html.escape(rel.urgent))
                 if rel.urgent else "")
         info += html.escape(rel.notes).replace("\n", "<br>") if rel.notes else ""
         installable = updates.can_install() and bool(rel.asset_url)
         if installable:
-            info += ("<p>Update now downloads it in the background (about 180 MB); you "
-                     "choose when the app restarts to install it. Your sounds and "
-                     "settings stay as they are.</p>")
+            info += _("<p>Update now downloads it in the background (about 180 MB); you "
+                      "choose when the app restarts to install it. Your sounds and "
+                      "settings stay as they are.</p>")
         elif not updates.can_install():
-            info += "<p>This copy runs from source: update it with <code>git pull</code>.</p>"
+            info += _("<p>This copy runs from source: update it with <code>git pull</code>.</p>")
         if info:
             box.setInformativeText(f"<p>{info}</p>")
         get = box.addButton(_("Update now") if installable else _("Open the download page"),
@@ -5423,8 +5477,9 @@ class MainWindow(QMainWindow):
         self._downloading = True
         netlog.cause(updates.FEATURE, f"You clicked to download Onion Board {rel.version}")
         usage.maybe_send(self.cfg, event=usage.update_event(rel.version))
-        self._set_update_pill("Downloading update…",
-                              f"Downloading Onion Board {rel.version}", enabled=False)
+        self._set_update_pill(_("Downloading update…"),
+                              _("Downloading Onion Board {version}", version=rel.version),
+                              enabled=False)
         self._show_urgent()   # the pill shows how it's going
         last = [-1]
 
@@ -5456,8 +5511,9 @@ class MainWindow(QMainWindow):
             return
         self._show_urgent()   # back, as "Update now" or "Restart to update"
         if path is None:
-            self._set_update_pill(f"Update: {rel.version}",
-                                  f"Onion Board {rel.version} is out — click for details")
+            self._set_update_pill(_("Update: {version}", version=rel.version),
+                                  _("Onion Board {version} is out — click for details",
+                                    version=rel.version))
             box = QMessageBox(QMessageBox.Warning, _("Couldn't update"),
                               _("Onion Board {version} couldn't be downloaded: {rstrip}.",
                                 version=rel.version, rstrip=errors.plain(err).rstrip('.')),
@@ -5472,12 +5528,14 @@ class MainWindow(QMainWindow):
             return
         self._update_file = path
         self._show_urgent()
-        self._set_update_pill("Restart to update",
-                              f"Onion Board {rel.version} is downloaded — click to install it")
+        self._set_update_pill(_("Restart to update"),
+                              _("Onion Board {version} is downloaded — click to install it",
+                                version=rel.version))
         if self.tray is not None and not self.isVisible():
             # hidden in the tray, maybe mid-game: don't pop a question, just say so
-            self.tray.showMessage("Onion Board", f"Version {rel.version} is ready to install: "
-                                  "open Onion Board and click Restart to update.",
+            self.tray.showMessage("Onion Board", _("Version {version} is ready to install: "
+                                                   "open Onion Board and click Restart to "
+                                                   "update.", version=rel.version),
                                   QSystemTrayIcon.Information, 8000)
             return
         self.install_update()
@@ -5778,7 +5836,7 @@ class MainWindow(QMainWindow):
         if live != self._sounds_live:   # the Sounds tab glows while a sound plays
             self._sounds_live = live
             set_tab_live(self.tabs, self.tabs.indexOf(self.sounds_page), live,
-                         "● ON: a sound is playing", "sounds")
+                         _("● ON: a sound is playing"), "sounds")
         self._tick_busy = self._busy(playing)
         pace = self._tick_pace()
         if self.timer.interval() != pace:
@@ -6115,8 +6173,8 @@ class MainWindow(QMainWindow):
             if not self._tray_told:
                 self._tray_told = True
                 self.tray.showMessage(_("Onion Board is still running"),
-                                      "Your hotkeys keep working. Right-click this icon "
-                                      "to quit.", QSystemTrayIcon.Information, 5000)
+                                      _("Your hotkeys keep working. Right-click this icon "
+                                        "to quit."), QSystemTrayIcon.Information, 5000)
             return
         if self.tray is not None:
             self.tray.hide()

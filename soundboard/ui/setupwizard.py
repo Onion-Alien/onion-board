@@ -34,21 +34,22 @@ from soundboard.ui import busy, fit, icons
 from soundboard.ui.bunnywidget import BunnyWidget
 from soundboard.ui.widgets import Meter
 from soundboard import errors
+from soundboard.i18n import _
 
 # step 3's "I don't use the cable" list: this choice sends nowhere (Config.route "off")
-NOWHERE = "Nobody: only I hear them"
+NOWHERE = _("Nobody: only I hear them")
 RESTART_NEEDED = 3010   # install-vbcable.ps1: installed, but Windows must restart first
 TICK_MS = 40            # the mic page's meter
 SLOW_TICK_MS = 250      # the other pages: only the cable installer to keep up with
 
 # install-vbcable.ps1 -StatusFile writes "<step>|<text>"; these are the steps as the
 # guide shows them, in order ("wake" only happens if the cable needs a nudge)
-CABLE_STEPS = (("permission", "Click <b>Yes</b> when Windows asks"),
-               ("download", "Fetching the parts (downloading)"),
-               ("install", "Building your cable (installing)"),
-               ("check", "Checking it works"),
-               ("wake", "Waking it up, so you don't have to restart "
-                        "(your sound may blip for a second)"))
+CABLE_STEPS = (("permission", _("Click <b>Yes</b> when Windows asks")),
+               ("download", _("Fetching the parts (downloading)")),
+               ("install", _("Building your cable (installing)")),
+               ("check", _("Checking it works")),
+               ("wake", _("Waking it up, so you don't have to restart "
+                          "(your sound may blip for a second)")))
 
 
 def cable_restart_pending() -> bool:
@@ -196,7 +197,7 @@ class SetupWizard(QDialog):
         self._resumed = resumed
         fit.watch(self)   # grows to fit its text (ui/fit.py)
         self.win = win
-        self.setWindowTitle("Onion Board — quick setup")
+        self.setWindowTitle(_("Onion Board — quick setup"))
         self.setMinimumSize(620, 520)
         # the cable installer, while it runs (one a closed guide left running included)
         self._proc: subprocess.Popen | None = \
@@ -228,11 +229,11 @@ class SetupWizard(QDialog):
         self._fill_discord()
 
         nav = QHBoxLayout()
-        self.btn_back = QPushButton("←  Back")
+        self.btn_back = QPushButton(_("←  Back"))
         self.btn_back.clicked.connect(self.back_clicked)
         nav.addWidget(self.btn_back)
         nav.addStretch(1)
-        self.btn_next = QPushButton("Next  →")
+        self.btn_next = QPushButton(_("Next  →"))
         self.btn_next.setObjectName("primary")
         self.btn_next.setMinimumWidth(160)
         self.btn_next.setStyleSheet("padding:10px 18px; font-size:11pt;")
@@ -265,9 +266,9 @@ class SetupWizard(QDialog):
             if n == current:
                 rb.setChecked(True)
         if not names:
-            bv.addWidget(_label(f"<span style='color:{_bad()}'>None found. Plug it in, close "
-                                "this, then press <b>Step-by-step guide</b> on the Setup "
-                                "tab.</span>"))
+            bv.addWidget(_label(_("<span style='color:{colour}'>None found. Plug it in, close "
+                                  "this, then press <b>Step-by-step guide</b> on the Setup "
+                                  "tab.</span>", colour=_bad())))
         bv.addStretch(1)
         group.buttonClicked.connect(lambda b: on_pick(b.property("device")))
         scroll = QScrollArea()
@@ -280,10 +281,10 @@ class SetupWizard(QDialog):
         p = QWidget()
         v = QVBoxLayout(p)
         self.bun_mic = BunnyWidget("mic")
-        v.addLayout(_header("Which microphone do you talk into?",
-                            _label("Pick the mic you use for gaming (your headset or desk "
-                                   "mic). <b>Say something</b> — the bar below should move "
-                                   "(and Bun talks along) when you talk."),
+        v.addLayout(_header(_("Which microphone do you talk into?"),
+                            _label(_("Pick the mic you use for gaming (your headset or desk "
+                                     "mic). <b>Say something</b> — the bar below should move "
+                                     "(and Bun talks along) when you talk.")),
                             self.bun_mic))
         mics = [d["name"] for d in eng.list_devices("input") if not eng.is_virtual(d["name"])]
         self._no_mics = not mics
@@ -295,15 +296,15 @@ class SetupWizard(QDialog):
             mics, cur, lambda n: self._pick_mic(n, by_user=True))
         v.addWidget(lst, 1)
         row = QHBoxLayout()
-        row.addWidget(_label("Your voice:"))
+        row.addWidget(_label(_("Your voice:")))
         self.mic_meter = Meter()
         self.mic_meter.setFixedHeight(16)
         row.addWidget(self.mic_meter, 1)
         v.addLayout(row)
         self.mic_heard = _label("")
         v.addWidget(self.mic_heard)
-        self.chk_send = QCheckBox("Send my voice too (untick if you only want your sounds "
-                                  "to go out, not your mic)")
+        self.chk_send = QCheckBox(_("Send my voice too (untick if you only want your sounds to "
+                                    "go out, not your mic)"))
         self.chk_send.setChecked(self.win.cfg.mic_enabled)
         v.addWidget(self.chk_send)
         self._mic_peak_seen = False
@@ -313,24 +314,24 @@ class SetupWizard(QDialog):
         p = QWidget()
         v = QVBoxLayout(p)
         self.bun_phones = BunnyWidget("headphones")
-        v.addLayout(_header("Where do you listen?",
-                            _label("Pick your headphones or speakers, then press <b>Play a "
-                                   "test sound</b>. Only you hear this."),
+        v.addLayout(_header(_("Where do you listen?"),
+                            _label(_("Pick your headphones or speakers, then press <b>Play a "
+                                     "test sound</b>. Only you hear this.")),
                             self.bun_phones))
         outs = [d["name"] for d in eng.list_devices("output") if not eng.is_virtual(d["name"])]
         cur = self.win.cfg.mon_device if self.win.cfg.mon_device in outs else \
             (outs[0] if outs else None)
         if cur and cur != self.win.cfg.mon_device:   # the saved one is missing
             self._pick_headphones(cur)
-        lst, _ = self._choice_list(outs, cur,
+        lst, __ = self._choice_list(outs, cur,
                                    lambda n: self._pick_headphones(n, by_user=True))
         v.addWidget(lst, 1)
-        play = self.btn_test = QPushButton("Play a test sound")
+        play = self.btn_test = QPushButton(_("Play a test sound"))
         icons.set_icon(play, "volume")
         play.setStyleSheet("padding:10px; font-size:11pt;")
         play.clicked.connect(self.test_sound)
         v.addWidget(play)
-        v.addWidget(_label("Didn't hear it? Pick another one and try again.",
+        v.addWidget(_label(_("Didn't hear it? Pick another one and try again."),
                            "font-size:9pt;"))
         return p
 
@@ -338,20 +339,20 @@ class SetupWizard(QDialog):
         p = QWidget()
         v = QVBoxLayout(p)
         self.bun_cable = BunnyWidget("plug")
-        v.addLayout(_header("Where do your sounds go?",
-                            _label("Straight into <b>your mic</b>: one click, and Discord "
-                                   "and games hear your sounds through the mic they already "
-                                   "use. Nothing to install from the internet, nothing to "
-                                   "pick in Discord. (Or use a free <b>virtual cable</b> "
-                                   "instead.)"),
+        v.addLayout(_header(_("Where do your sounds go?"),
+                            _label(_("Straight into <b>your mic</b>: one click, and Discord "
+                                     "and games hear your sounds through the mic they already "
+                                     "use. Nothing to install from the internet, nothing to "
+                                     "pick in Discord. (Or use a free <b>virtual cable</b> "
+                                     "instead.)")),
                             self.bun_cable))
-        self.btn_attach = QPushButton("Put my sounds straight into my mic")
+        self.btn_attach = QPushButton(_("Put my sounds straight into my mic"))
         icons.set_icon(self.btn_attach, "mic", "on_accent")
         self.btn_attach.setObjectName("primary")
         self.btn_attach.setStyleSheet("padding:12px; font-size:12pt;")
         self.btn_attach.clicked.connect(self.attach_mic)
         v.addWidget(self.btn_attach)
-        self.win.mic_attached.connect(lambda *_: self.recheck_cable(rescan=False))
+        self.win.mic_attached.connect(lambda *__: self.recheck_cable(rescan=False))
         self.cable_status = _label("")
         self.cable_status.setStyleSheet("font-size:12pt; padding:12px;")
         v.addWidget(self.cable_status)
@@ -364,27 +365,27 @@ class SetupWizard(QDialog):
         self.cable_steps = _label("")
         self.cable_steps.hide()
         v.addWidget(self.cable_steps)
-        self.btn_cable = QPushButton("⬇  Install it now (free)")
+        self.btn_cable = QPushButton(_("⬇  Install it now (free)"))
         self.btn_cable.setObjectName("primary")
         self.btn_cable.setStyleSheet("padding:12px; font-size:12pt;")
         self.btn_cable.clicked.connect(self.install_cable)
         v.addWidget(self.btn_cable)
-        self.btn_recheck = QPushButton("⟳  Check again")
+        self.btn_recheck = QPushButton(_("⟳  Check again"))
         self.btn_recheck.clicked.connect(lambda: busy.run_busy(
-            self.btn_recheck, "Checking…", self.recheck_cable,
-            lambda _r: None if self.route_ok() else "Still not found — checked just now",
+            self.btn_recheck, _("Checking…"), self.recheck_cable,
+            lambda _r: None if self.route_ok() else _("Still not found — checked just now"),
             ms=3500))
         v.addWidget(self.btn_recheck)
-        self.btn_restart = QPushButton("⟲  Restart my PC now")
+        self.btn_restart = QPushButton(_("⟲  Restart my PC now"))
         self.btn_restart.setObjectName("primary")
         self.btn_restart.setStyleSheet("padding:12px; font-size:12pt;")
         self.btn_restart.clicked.connect(self.restart_pc)
         self.btn_restart.hide()
         v.addWidget(self.btn_restart)
         # streamers and Voicemeeter / mixer users: send somewhere else instead
-        self.btn_other = QPushButton("Send somewhere else (Voicemeeter, OBS, a mixer…)")
-        self.btn_other.setToolTip("Send your sounds to another device instead, or nowhere "
-                                  "(only you, and the stream output)")
+        self.btn_other = QPushButton(_("Send somewhere else (Voicemeeter, OBS, a mixer…)"))
+        self.btn_other.setToolTip(_("Send your sounds to another device instead, or nowhere "
+                                    "(only you, and the stream output)"))
         self.btn_other.clicked.connect(lambda: self._show_other(True))
         v.addWidget(self.btn_other, 0, Qt.AlignLeft)
         self.other_box = QWidget()
@@ -392,7 +393,7 @@ class SetupWizard(QDialog):
         self.other_lay.setContentsMargins(0, 0, 0, 0)
         self.other_box.hide()
         v.addWidget(self.other_box, 1)
-        self.btn_use_cable = QPushButton("Use the virtual cable after all")
+        self.btn_use_cable = QPushButton(_("Use the virtual cable after all"))
         icons.set_icon(self.btn_use_cable, "cable")
         self.btn_use_cable.clicked.connect(lambda: self._pick_route("cable"))
         self.btn_use_cable.hide()
@@ -412,15 +413,15 @@ class SetupWizard(QDialog):
         if not on:
             return
         cfg = self.win.cfg
-        self.other_lay.addWidget(_label(
+        self.other_lay.addWidget(_label(_(
             "Pick where your sounds go instead. Onion Board plays them (and your voice, if "
             "you send it) into that device, and whatever listens to it gets them: OBS "
-            "(<b>Audio Output Capture</b>), Voicemeeter, a mixer or a capture card.",
+            "(<b>Audio Output Capture</b>), Voicemeeter, a mixer or a capture card."),
             "font-size:10pt;"))
         outs = [d["name"] for d in eng.list_devices("output") if d["name"] != cfg.mon_device]
         cur = (NOWHERE if cfg.route == "off" else
                cfg.main_device if cfg.route == "device" else None)
-        lst, _ = self._choice_list(outs + [NOWHERE], cur, self._pick_route)
+        lst, __ = self._choice_list(outs + [NOWHERE], cur, self._pick_route)
         self.other_lay.addWidget(lst, 1)
 
     def _pick_route(self, choice: str):
@@ -439,44 +440,44 @@ class SetupWizard(QDialog):
         p = QWidget()
         v = QVBoxLayout(p)
         self.discord_text = _label("")
-        head = _header("Last step: tell Discord or your game", self.discord_text,
+        head = _header(_("Last step: tell Discord or your game"), self.discord_text,
                        BunnyWidget("star", celebrate=True))
         self.discord_title = head.itemAt(0).layout().itemAt(0).widget()
         v.addLayout(head)
         row = QHBoxLayout()
-        self.btn_copy = QPushButton("Copy the name")
+        self.btn_copy = QPushButton(_("Copy the name"))
         icons.set_icon(self.btn_copy, "copy")
         self.btn_copy.clicked.connect(self.copy_name)
         row.addWidget(self.btn_copy)
-        nomic = self.btn_nomic = QPushButton("Game has no microphone setting?")
+        nomic = self.btn_nomic = QPushButton(_("Game has no microphone setting?"))
         nomic.clicked.connect(self.win.open_windows_mic)
         row.addWidget(nomic)
         row.addStretch(1)
         v.addLayout(row)
-        self.btn_discord = QPushButton("Discord: make my sounds come through clean")
+        self.btn_discord = QPushButton(_("Discord: make my sounds come through clean"))
         icons.set_icon(self.btn_discord, "headphones", "on_accent")
         self.btn_discord.setObjectName("primary")
-        self.btn_discord.setToolTip("The Discord settings that stop it chopping up your "
-                                    "sounds, and a check that listens to what Discord does")
+        self.btn_discord.setToolTip(_("The Discord settings that stop it chopping up your "
+                                      "sounds, and a check that listens to what Discord does"))
         self.btn_discord.clicked.connect(lambda: self.show_guide("discord"))
         v.addWidget(self.btn_discord)
         games = QHBoxLayout()
-        self.btn_steam = QPushButton("Steam games (CS2, Dota 2, Deadlock…)")
+        self.btn_steam = QPushButton(_("Steam games (CS2, Dota 2, Deadlock…)"))
         icons.set_icon(self.btn_steam, "gamepad")
-        self.btn_steam.setToolTip("Games that use Steam voice chat take the mic from "
-                                  "Steam's own settings")
+        self.btn_steam.setToolTip(_("Games that use Steam voice chat take the mic from Steam's "
+                                    "own settings"))
         self.btn_steam.clicked.connect(self.show_steam_guide)
         games.addWidget(self.btn_steam)
-        self.btn_game = QPushButton("Other games")
+        self.btn_game = QPushButton(_("Other games"))
         icons.set_icon(self.btn_game, "gamepad")
-        self.btn_game.setToolTip("Valorant, Fortnite, Apex, Rust… the voice chat settings "
-                                 "that matter")
+        self.btn_game.setToolTip(_("Valorant, Fortnite, Apex, Rust… the voice chat settings that "
+                                   "matter"))
         self.btn_game.clicked.connect(lambda: self.show_guide("game"))
         games.addWidget(self.btn_game)
-        self.btn_meeting = QPushButton("Zoom, Teams, browser")
+        self.btn_meeting = QPushButton(_("Zoom, Teams, browser"))
         icons.set_icon(self.btn_meeting, "headphones")
-        self.btn_meeting.setToolTip("Calls in Zoom, Microsoft Teams or a web page (Google "
-                                    "Meet): the settings that matter")
+        self.btn_meeting.setToolTip(_("Calls in Zoom, Microsoft Teams or a web page (Google "
+                                      "Meet): the settings that matter"))
         self.btn_meeting.clicked.connect(lambda: self.show_guide("meeting"))
         games.addWidget(self.btn_meeting)
         v.addLayout(games)
@@ -484,18 +485,18 @@ class SetupWizard(QDialog):
         # ones whose board is here; nothing is read until they click)
         self.import_buttons = []
         for src in otherboards.found():
-            btn = QPushButton(f"Bring my {src.name} sounds over")
+            btn = QPushButton(_("Bring my {name} sounds over", name=src.name))
             icons.set_icon(btn, "folder")
-            btn.setToolTip(f"Copies the sounds on your {src.name} board into Onion Board, "
-                           f"with their names, categories and hotkeys. {src.name} keeps "
-                           "its own.")
-            btn.clicked.connect(lambda _=False, src=src: self.win.import_other(src))
+            btn.setToolTip(_("Copies the sounds on your {name} board into Onion Board, with "
+                             "their names, categories and hotkeys. {name} keeps its own.",
+                             name=src.name))
+            btn.clicked.connect(lambda __=False, src=src: self.win.import_other(src))
             v.addWidget(btn)
             self.import_buttons.append(btn)
         v.addStretch(1)
-        v.addWidget(_label("That's it. Add sounds by dragging files onto the window, then "
-                           "click one to play it. You can open this guide again any time "
-                           "from the <b>Setup</b> tab (<b>Step-by-step guide</b>).",
+        v.addWidget(_label(_("That's it. Add sounds by dragging files onto the window, then "
+                             "click one to play it. You can open this guide again any time "
+                             "from the <b>Setup</b> tab (<b>Step-by-step guide</b>)."),
                            "font-size:10pt;"))
         return p
 
@@ -503,11 +504,11 @@ class SetupWizard(QDialog):
     def go(self, i: int):
         i = max(0, min(self.PAGES - 1, i))
         self.stack.setCurrentIndex(i)
-        self.progress.setText(f"Step {i + 1} of {self.PAGES}")
+        self.progress.setText(_("Step {step} of {pages}", step=i + 1, pages=self.PAGES))
         self.btn_back.setVisible(i > 0)
         self.timer.setInterval(TICK_MS if i == 0 else SLOW_TICK_MS)
         if i == 2:
-            self.cable_status.setText("Checking…")
+            self.cable_status.setText(_("Checking…"))
             self.cable_status.repaint()   # the check can take a moment (it may reopen devices)
             self.recheck_cable(rescan=False)
         elif i == 3:
@@ -524,11 +525,11 @@ class SetupWizard(QDialog):
         busy.set_busy(self.btn_next, installing)
         busy.set_busy(self.btn_back, installing)
         if i == self.PAGES - 1:
-            self.btn_next.setText("Finish  ✓")
+            self.btn_next.setText(_("Finish  ✓"))
         elif i == 2 and not self.route_ok():
-            self.btn_next.setText("Skip for now  →")
+            self.btn_next.setText(_("Skip for now  →"))
         else:
-            self.btn_next.setText("Next  →")
+            self.btn_next.setText(_("Next  →"))
 
     def back_clicked(self):
         if self._proc is None:
@@ -556,10 +557,10 @@ class SetupWizard(QDialog):
         """Esc / the window's X. Mid-install, check first: the install carries on
         either way, and reopening the guide picks it back up."""
         if self._proc is not None and self._proc.poll() is None and QMessageBox.question(
-                self, "Still installing",
-                "Bun is still installing the virtual cable.\n\nClose the guide anyway? The "
-                "install carries on by itself; open the guide again from the Setup tab "
-                "(Step-by-step guide) to see how it went.") \
+                self, _("Still installing"),
+                _("Bun is still installing the virtual cable.\n\nClose the guide anyway? The "
+                  "install carries on by itself; open the guide again from the Setup tab "
+                  "(Step-by-step guide) to see how it went.")) \
                 != QMessageBox.StandardButton.Yes:
             return
         super().reject()
@@ -590,11 +591,11 @@ class SetupWizard(QDialog):
 
     def test_sound(self):
         if self.win.engine.mon_stream is None:
-            busy.flash(self.btn_test, "No headphones open — pick another above", 3500)
+            busy.flash(self.btn_test, _("No headphones open — pick another above"), 3500)
             return
         self.win.engine.play("__setup__", test_tune(), 1.0, preview=True)
         self.bun_phones.burst()
-        busy.flash(self.btn_test, "Playing… hear it?", 1500)
+        busy.flash(self.btn_test, _("Playing… hear it?"), 1500)
 
     def cable_ok(self) -> bool:
         return bool(eng.virtual_outputs())
@@ -636,29 +637,29 @@ class SetupWizard(QDialog):
         self.btn_attach.setVisible(not busy and not (route == "mic" and self.route_ok()))
         self.btn_attach.setEnabled(not attaching)
         state = directmic.status(self.win.cfg.mic_device)
-        self.btn_attach.setText("Setting up… click Yes when Windows asks" if attaching
-                                else "Repair (one click)" if directmic.needs_repair(state)
-                                else "Put my sounds straight into my mic")
+        self.btn_attach.setText(_("Setting up… click Yes when Windows asks") if attaching
+                                else _("Repair (one click)") if directmic.needs_repair(state)
+                                else _("Put my sounds straight into my mic"))
         if route == "mic" and not busy and not self._cable_tries and not self._needs_restart:
             self.other_box.hide()
             if self.route_ok():
-                self.cable_status.setText(f"<b style='color:{_ok()}'>✓ On your "
-                                          "mic.</b> Discord and games hear your sounds "
-                                          "through it — press Next.")
+                self.cable_status.setText(_("<b style='color:{colour}'>✓ On your mic.</b> "
+                                            "Discord and games hear your sounds through it — "
+                                            "press Next.", colour=_ok()))
             elif directmic.needs_repair(state):
-                self.cable_status.setText("Onion Board was on your mic but needs a quick "
-                                          "repair: <b>one click</b>, and Windows asks for "
-                                          "permission once.")
+                self.cable_status.setText(_("Onion Board was on your mic but needs a quick "
+                                            "repair: <b>one click</b>, and Windows asks for "
+                                            "permission once."))
             else:
-                self.cable_status.setText("Windows asks for permission once, and your "
-                                          "PC's sound drops out for a second.")
-            self.btn_cable.setText("Use the virtual cable instead")
+                self.cable_status.setText(_("Windows asks for permission once, and your PC's "
+                                            "sound drops out for a second."))
+            self.btn_cable.setText(_("Use the virtual cable instead"))
             self.btn_cable.show()
             self.btn_recheck.hide()
             self._update_next()
             return
         if busy:
-            self.cable_status.setText("<b>Bun is setting it up for you…</b>")
+            self.cable_status.setText(_("<b>Bun is setting it up for you…</b>"))
             self.cable_steps.setText(self._steps_html())
             self.btn_cable.hide()
             self.btn_recheck.hide()
@@ -668,18 +669,21 @@ class SetupWizard(QDialog):
                 self._show_other(True)
             dev = self.win._main_name()
             if route == "off":
-                self.cable_status.setText(f"<b style='color:{_ok()}'>✓ Sending nowhere.</b> "
-                                          "Only you hear your sounds (and the stream output, "
-                                          "if you set one in Settings → Audio).")
+                self.cable_status.setText(_("<b style='color:{colour}'>✓ Sending nowhere.</b> "
+                                            "Only you hear your sounds (and the stream output, "
+                                            "if you set one in Settings → Audio).",
+                                            colour=_ok()))
             elif self.route_ok():
-                self.cable_status.setText(f"<b style='color:{_ok()}'>✓ Sending to "
-                                          f"{html.escape(dev)}.</b> Press Next.")
+                self.cable_status.setText(_("<b style='color:{colour}'>✓ Sending to "
+                                            "{device}.</b> Press Next.", colour=_ok(),
+                                            device=html.escape(dev)))
             elif dev:
-                self.cable_status.setText(f"<b style='color:{_bad()}'>Couldn't open "
-                                          f"{html.escape(dev)}.</b> Is it plugged in? Pick "
-                                          "another one, or press Next to carry on.")
+                self.cable_status.setText(_("<b style='color:{colour}'>Couldn't open "
+                                            "{device}.</b> Is it plugged in? Pick another one, "
+                                            "or press Next to carry on.", colour=_bad(),
+                                            device=html.escape(dev)))
             else:
-                self.cable_status.setText("Pick the device your sounds should go to.")
+                self.cable_status.setText(_("Pick the device your sounds should go to."))
             self.btn_cable.hide()
             self.btn_recheck.hide()
         elif self.cable_ok():
@@ -694,11 +698,13 @@ class SetupWizard(QDialog):
             if self._resumed:   # back from the restart, and it worked
                 self._resumed = False
                 self.bun_cable.stop_building(True)
-                self.cable_status.setText(f"<b style='color:{_ok()}'>Welcome back — the cable "
-                                          "works now!</b> Press Next for the last step.")
+                self.cable_status.setText(_("<b style='color:{colour}'>Welcome back — the cable "
+                                            "works now!</b> Press Next for the last step.",
+                                            colour=_ok()))
             else:
-                self.cable_status.setText(f"<b style='color:{_ok()}'>✓ Installed and "
-                                          "connected.</b> Nothing to do here — press Next.")
+                self.cable_status.setText(_("<b style='color:{colour}'>✓ Installed and "
+                                            "connected.</b> Nothing to do here — press Next.",
+                                            colour=_ok()))
             self.btn_cable.hide()
             self.btn_recheck.hide()
         elif self._needs_restart or cable_restart_pending():
@@ -706,33 +712,34 @@ class SetupWizard(QDialog):
             # again before then (VB-Audio says not to); the button below only re-runs
             # the installer's wake-up (restart the cable + audio service), no reinstall.
             resume_after_restart(True)
-            self.cable_status.setText(f"<b style='color:{_ok()}'>✓ Installed.</b> Windows needs "
-                                      "a <b>restart</b> to finish setting it up. Restart "
-                                      "whenever suits you: Onion Board will open by itself "
-                                      "afterwards and pick up right here.")
-            self.btn_cable.setText("Try once more without restarting")
+            self.cable_status.setText(_("<b style='color:{colour}'>✓ Installed.</b> Windows "
+                                        "needs a <b>restart</b> to finish setting it up. Restart "
+                                        "whenever suits you: Onion Board will open by itself "
+                                        "afterwards and pick up right here.", colour=_ok()))
+            self.btn_cable.setText(_("Try once more without restarting"))
             self.btn_cable.setVisible(not self._needs_restart)   # it just tried that
             self.btn_recheck.show()
             self.btn_restart.show()
         elif self._cable_tries:
-            self.cable_status.setText(f"<b style='color:{_bad()}'>That didn't work.</b> If Windows "
-                                      "asked for permission, click <b>Yes</b> this time. If it "
-                                      "still won't install, restarting your PC often helps.")
-            self.btn_cable.setText("⬇  Try installing again")
+            self.cable_status.setText(_("<b style='color:{colour}'>That didn't work.</b> If "
+                                        "Windows asked for permission, click <b>Yes</b> this "
+                                        "time. If it still won't install, restarting your PC "
+                                        "often helps.", colour=_bad()))
+            self.btn_cable.setText(_("⬇  Try installing again"))
             self.btn_cable.show()
             self.btn_recheck.show()
         elif self._resumed:   # back from the restart, and it still isn't there
-            self.cable_status.setText(f"<b style='color:{_bad()}'>It still isn't showing up after "
-                                      "the restart.</b> Install it again below; if Windows "
-                                      "asks for permission, click <b>Yes</b>.")
-            self.btn_cable.setText("⬇  Try installing again")
+            self.cable_status.setText(_("<b style='color:{colour}'>It still isn't showing up after "
+                                        "the restart.</b> Install it again below; if Windows "
+                                        "asks for permission, click <b>Yes</b>.", colour=_bad()))
+            self.btn_cable.setText(_("⬇  Try installing again"))
             self.btn_cable.show()
             self.btn_recheck.show()
         else:
-            self.cable_status.setText(f"<b style='color:{_bad()}'>Not installed yet.</b> "
-                                      "Without it, only you can hear your sounds. Or put "
-                                      "them straight into your mic: nothing to install.")
-            self.btn_cable.setText("⬇  Install it now (free)")
+            self.cable_status.setText(_("<b style='color:{colour}'>Not installed yet.</b> Without "
+                                        "it, only you can hear your sounds. Or put them straight "
+                                        "into your mic: nothing to install.", colour=_bad()))
+            self.btn_cable.setText(_("⬇  Install it now (free)"))
             self.btn_cable.show()
             self.btn_recheck.hide()
         # switched off in Settings > Privacy & security: the installer's download
@@ -757,8 +764,9 @@ class SetupWizard(QDialog):
             self.cable_status.setText(html.escape(net.off_message("setup_downloads")))
             return
         if not script.exists():
-            self.cable_status.setText(f"<span style='color:{_bad()}'>The cable installer is "
-                                      "missing. Get it from vb-audio.com/Cable.</span>")
+            self.cable_status.setText(_("<span style='color:{colour}'>The cable installer is "
+                                        "missing. Get it from vb-audio.com/Cable.</span>",
+                                        colour=_bad()))
             return
         global _installer
         if self._proc is not None:
@@ -773,10 +781,10 @@ class SetupWizard(QDialog):
                  str(script), "-Silent", "-StatusFile", str(status)],
                 creationflags=subprocess.CREATE_NO_WINDOW)
         except OSError as e:
-            self.cable_status.setText(f"<span style='color:{_bad()}'>Couldn't start the cable "
-                                      f"installer ({errors.plain(e)}).</span> Restart your PC "
-                                      "and try again, or install it yourself from "
-                                      "vb-audio.com/Cable.")
+            self.cable_status.setText(_("<span style='color:{colour}'>Couldn't start the cable "
+                                        "installer ({error}).</span> Restart your PC and try "
+                                        "again, or install it yourself from vb-audio.com/Cable.",
+                                        colour=_bad(), error=errors.plain(e)))
             return
         self._cable_tries += 1
         self._needs_restart = False
@@ -821,21 +829,22 @@ class SetupWizard(QDialog):
 
     def restart_pc(self):
         if QMessageBox.question(
-                self, "Restart now?",
-                "Your PC will restart in a few seconds. Save anything you have open first.\n\n"
-                "Onion Board will open by itself after the restart to finish setting up.") \
+                self, _("Restart now?"),
+                _("Your PC will restart in a few seconds. Save anything you have open "
+                  "first.\n\nOnion Board will open by itself after the restart to finish setting "
+                  "up.")) \
                 != QMessageBox.StandardButton.Yes:
             return
         self.win.cfg.save()
         try:
             subprocess.Popen(["shutdown", "/r", "/t", "5"],
                              creationflags=subprocess.CREATE_NO_WINDOW)
-            busy.hold(self.btn_restart, "Restarting in a few seconds…")
+            busy.hold(self.btn_restart, _("Restarting in a few seconds…"))
         except OSError as e:
-            self.cable_status.setText(f"<span style='color:{_bad()}'>Couldn't restart the PC "
-                                      f"({errors.plain(e)}).</span> Restart it from the Start "
-                                      "menu (Power → Restart); Onion Board will pick up here "
-                                      "afterwards.")
+            self.cable_status.setText(_("<span style='color:{colour}'>Couldn't restart the PC "
+                                        "({error}).</span> Restart it from the Start menu (Power → "
+                                        "Restart); Onion Board will pick up here afterwards.",
+                                        colour=_bad(), error=errors.plain(e)))
 
     def _fill_discord(self):
         cfg = self.win.cfg
@@ -849,16 +858,16 @@ class SetupWizard(QDialog):
             self._fill_direct()
             return
         self.discord_title.setText(
-            "Last step: nothing to tell" if cfg.route == "off" else
-            "Last step: pick it up where it arrives" if cfg.route == "device" and dev
-            and not name else "Last step: tell Discord or your game")
+            _("Last step: nothing to tell") if cfg.route == "off" else
+            _("Last step: pick it up where it arrives") if cfg.route == "device" and dev
+            and not name else _("Last step: tell Discord or your game"))
         if cfg.route == "off":
             self.discord_text.setText(
-                "Your sounds play only for you: in your headphones, where OBS's "
-                "<b>Desktop Audio</b> picks them up, and on the <b>stream output</b> if you "
-                "set one (Settings → Audio → Stream output).<br><br>Nothing to change in "
-                "Discord or your game. To send your sounds to them later, go to the Setup "
-                "tab → Devices → <b>Send my sounds to</b> → <b>My mic</b>.")
+                _("Your sounds play only for you: in your headphones, where OBS's <b>Desktop "
+                  "Audio</b> picks them up, and on the <b>stream output</b> if you set one "
+                  "(Settings → Audio → Stream output).<br><br>Nothing to change in Discord or "
+                  "your game. To send your sounds to them later, go to the Setup tab → Devices → "
+                  "<b>Send my sounds to</b> → <b>My mic</b>."))
             self.btn_copy.hide()
             self.btn_discord.hide()
             return
@@ -866,18 +875,18 @@ class SetupWizard(QDialog):
             self.btn_copy.show()
             self.btn_discord.hide()
             self.discord_text.setText(
-                "Onion Board sends your sounds (and your voice, if you send it) to:"
-                f"<p style='font-size:15pt; font-weight:800; color:{_ok()}'>"
-                f"{html.escape(dev)}</p>"
-                "<b>In OBS:</b> Sources → + → <b>Audio Output Capture</b> → pick it. "
-                "<b>In Voicemeeter or a mixer:</b> send that input on to wherever it should "
-                "go (Discord, your stream, a recording).")
+                _("Onion Board sends your sounds (and your voice, if you send it) to:<p "
+                  "style='font-size:15pt; font-weight:800; color:{colour}'>{device}</p><b>In "
+                  "OBS:</b> Sources → + → <b>Audio Output Capture</b> → pick it. <b>In "
+                  "Voicemeeter or a mixer:</b> send that input on to wherever it should go "
+                  "(Discord, your stream, a recording).", colour=_ok(), device=html.escape(dev)))
             return
         if not name:
             self.discord_text.setText(
-                f"<span style='color:{_bad()}'>The virtual cable isn't set up yet, so only you "
-                "will hear your sounds.</span> Go <b>Back</b> to install it (or pick another "
-                "device there), or finish now and this guide will open again next time.")
+                _("<span style='color:{colour}'>The virtual cable isn't set up yet, so only you "
+                  "will hear your sounds.</span> Go <b>Back</b> to install it (or pick another "
+                  "device there), or finish now and this guide will open again next time.",
+                  colour=_bad()))
             self.btn_copy.hide()
             self.btn_discord.hide()
             return
@@ -885,41 +894,41 @@ class SetupWizard(QDialog):
         self.btn_discord.show()
         esc = html.escape(name)
         self.discord_text.setText(
-            "Onion Board now sends your voice and sounds into a new microphone called:"
-            f"<p style='font-size:15pt; font-weight:800; color:{_ok()}'>{esc}</p>"
-            "<b>In Discord:</b> click the ⚙ gear (User Settings) → <b>Voice &amp; Video</b> → "
-            f"<b>Input Device</b> → choose <b>{esc}</b>, and set <b>Input Profile</b> to "
-            "<b>Studio</b>. Left on, Discord's noise suppression treats your sounds as "
-            "background noise and chops them up.<br><br>"
-            f"<b>In a game:</b> open its audio / voice chat settings, set the microphone to "
-            f"<b>{esc}</b> and turn off its noise suppression.")
+            _("Onion Board now sends your voice and sounds into a new microphone called:<p "
+              "style='font-size:15pt; font-weight:800; color:{colour}'>{device}</p><b>In "
+              "Discord:</b> click the ⚙ gear (User Settings) → <b>Voice &amp; Video</b> → "
+              "<b>Input Device</b> → choose <b>{device}</b>, and set <b>Input Profile</b> to "
+              "<b>Studio</b>. Left on, Discord's noise suppression treats your sounds as "
+              "background noise and chops them up.<br><br><b>In a game:</b> open its audio / "
+              "voice chat settings, set the microphone to <b>{device}</b> and turn off its "
+              "noise suppression.", colour=_ok(), device=esc))
 
     def _fill_direct(self):
         """Straight into my mic: Discord and games keep the mic they have."""
         cfg = self.win.cfg
         self.btn_copy.hide()
         if not directmic.works(directmic.status(cfg.mic_device)):
-            self.discord_title.setText("Last step: tell Discord or your game")
+            self.discord_title.setText(_("Last step: tell Discord or your game"))
             self.discord_text.setText(
-                f"<span style='color:{_bad()}'>Onion Board isn't on your mic yet, so only "
-                "you will hear your sounds.</span> Go <b>Back</b> and click <b>Put my "
-                "sounds straight into my mic</b> (or use the virtual cable), or finish now "
-                "and this guide will open again next time.")
+                _("<span style='color:{colour}'>Onion Board isn't on your mic yet, so only "
+                  "you will hear your sounds.</span> Go <b>Back</b> and click <b>Put my sounds "
+                  "straight into my mic</b> (or use the virtual cable), or finish now and this "
+                  "guide will open again next time.", colour=_bad()))
             self.btn_discord.hide()
             return
-        self.discord_title.setText("Last step: nothing to pick")
+        self.discord_title.setText(_("Last step: nothing to pick"))
         self.btn_discord.show()
-        mic = html.escape(cfg.mic_device or "your mic")
+        mic = html.escape(cfg.mic_device or _("your mic"))
         self.discord_text.setText(
-            "Discord and your games keep using the mic they already have:"
-            f"<p style='font-size:15pt; font-weight:800; color:{_ok()}'>{mic}</p>"
-            "Your sounds are in it now, so there's nothing to pick anywhere.<br><br>"
-            "<b>One thing worth doing in Discord:</b> ⚙ User Settings → <b>Voice &amp; "
-            "Video</b> → <b>Input Profile</b> → <b>Custom</b>, <b>Noise Suppression</b> → "
-            "<b>None</b>, and <b>Echo Cancellation</b> off (not Studio: Studio skips "
-            "Onion Board). Left on, its noise suppression treats your sounds as "
-            "background noise and wipes them out. "
-            "<b>In a game:</b> turn off its noise suppression if your sounds cut out.")
+            _("Discord and your games keep using the mic they already have:<p "
+              "style='font-size:15pt; font-weight:800; color:{colour}'>{mic}</p>Your sounds "
+              "are in it now, so there's nothing to pick anywhere.<br><br><b>One thing worth "
+              "doing in Discord:</b> ⚙ User Settings → <b>Voice &amp; Video</b> → <b>Input "
+              "Profile</b> → <b>Custom</b>, <b>Noise Suppression</b> → <b>None</b>, and "
+              "<b>Echo Cancellation</b> off (not Studio: Studio skips Onion Board). Left on, "
+              "its noise suppression treats your sounds as background noise and wipes them "
+              "out. <b>In a game:</b> turn off its noise suppression if your sounds cut out.",
+              colour=_ok(), mic=mic))
 
     def show_steam_guide(self):
         self.show_guide("steam")
@@ -930,7 +939,7 @@ class SetupWizard(QDialog):
 
     def copy_name(self):
         QApplication.clipboard().setText(self._vm)
-        busy.flash(self.btn_copy, "✓  Copied")
+        busy.flash(self.btn_copy, _("✓  Copied"))
 
     def _tick(self):
         if self.stack.currentIndex() == 0:   # the mic page: its meter and Bun
@@ -941,18 +950,19 @@ class SetupWizard(QDialog):
             if lvl > 0.05:
                 self._mic_peak_seen = True
             if e.mic_stream is None and self._no_mics:
-                self.mic_heard.setText(f"<span style='color:{_bad()}'>No microphone was found."
-                                       "</span> Plug one in, then open this guide again "
-                                       "from the Setup tab — or press Next to carry on "
-                                       "without one.")
+                self.mic_heard.setText(_("<span style='color:{colour}'>No microphone was "
+                                         "found.</span> Plug one in, then open this guide again "
+                                         "from the Setup tab — or press Next to carry on without "
+                                         "one.", colour=_bad()))
             elif e.mic_stream is None:
-                self.mic_heard.setText(f"<span style='color:{_bad()}'>Couldn't open that mic — "
-                                       "try another one.</span>")
+                self.mic_heard.setText(_("<span style='color:{colour}'>Couldn't open that "
+                                         "mic — try another one.</span>", colour=_bad()))
             elif self._mic_peak_seen:
-                self.mic_heard.setText(f"<b style='color:{_ok()}'>✓ Hearing you!</b>")
+                self.mic_heard.setText(_("<b style='color:{colour}'>✓ Hearing you!</b>",
+                                         colour=_ok()))
             else:
-                self.mic_heard.setText("Waiting to hear you… if the bar doesn't move, pick "
-                                       "another mic.")
+                self.mic_heard.setText(_("Waiting to hear you… if the bar doesn't move, pick "
+                                         "another mic."))
         if self._proc is not None:
             self._read_cable_step()
             if (rc := self._proc.poll()) is not None:
@@ -973,54 +983,56 @@ class SteamGuide(QDialog):
     def __init__(self, parent, mic_name: str):
         super().__init__(parent)
         fit.watch(self)   # grows to fit its text (ui/fit.py)
-        self.setWindowTitle("Steam games — set your mic")
+        self.setWindowTitle(_("Steam games — set your mic"))
         self.setMinimumWidth(600)
         v = QVBoxLayout(self)
         v.setContentsMargins(24, 20, 24, 18)
         v.setSpacing(12)
-        v.addLayout(_header("Steam games", _label(
+        v.addLayout(_header(_("Steam games"), _label(_(
             "Games that use <b>Steam's voice chat</b> (like <b>Counter-Strike 2</b>, "
             "<b>Dota 2</b> and <b>Deadlock</b>) don't have their own mic setting. "
-            "They use the mic you pick <b>in Steam</b>. Do this once:"),
+            "They use the mic you pick <b>in Steam</b>. Do this once:")),
             BunnyWidget("headphones")))
+        small = "<br><span style='font-size:9pt'>{}</span>"
+        items = [
+            _("Open <b>Steam</b>. Click <b>Steam</b> in the top-left corner, then "
+              "<b>Settings</b>.")
+            + small.format(_("(In a game? Press <b>Shift + Tab</b> and click the ⚙ gear.)")),
+            _("On the left, click <b>Voice</b>."),
+            _("Click the <b>Voice Input Device</b> box and choose <b style='color:{colour}'>"
+              "{mic}</b>.", colour=_ok(), mic=html.escape(mic_name))
+            + small.format(_("Not in the list? Close Steam completely (right-click its icon "
+                             "by the clock → Exit) and open it again.")),
+            _("Under <b>Advanced options</b>, turn <b>OFF</b>: <b>Noise cancellation</b>, "
+              "<b>Echo cancellation</b> and <b>Automatic volume/gain control</b>.")
+            + small.format(_("They think music is background noise and cut your sounds up. "
+                             "Onion Board already cleans up your voice.")),
+            _("Click <b>Start microphone test</b> and play a sound in Onion Board. You should "
+              "hear it back."),
+            _("On the Setup tab, set <b>Who's listening</b> to <b>Advanced</b>, then <b>Steam "
+              "voice</b>."),
+        ]
         v.addWidget(_label(
             "<ol style='margin-left:-20px'>"
-            "<li style='margin-bottom:8px'>Open <b>Steam</b>. Click <b>Steam</b> in the "
-            "top-left corner, then <b>Settings</b>.<br>"
-            "<span style='font-size:9pt'>(In a game? Press <b>Shift + Tab</b> and click "
-            "the ⚙ gear.)</span></li>"
-            "<li style='margin-bottom:8px'>On the left, click <b>Voice</b>.</li>"
-            "<li style='margin-bottom:8px'>Click the <b>Voice Input Device</b> box and "
-            f"choose <b style='color:{_ok()}'>{html.escape(mic_name)}</b>.<br>"
-            "<span style='font-size:9pt'>Not in the list? Close Steam completely "
-            "(right-click its icon by the clock → Exit) and open it again.</span></li>"
-            "<li style='margin-bottom:8px'>Under <b>Advanced options</b>, turn "
-            "<b>OFF</b>: <b>Noise cancellation</b>, <b>Echo cancellation</b> and "
-            "<b>Automatic volume/gain control</b>.<br>"
-            "<span style='font-size:9pt'>They think music is background noise and cut "
-            "your sounds up. Onion Board already cleans up your voice.</span></li>"
-            "<li style='margin-bottom:8px'>Click <b>Start microphone test</b> and play a "
-            "sound in Onion Board. You should hear it back.</li>"
-            "<li style='margin-bottom:8px'>On the Setup tab, set <b>Who's listening</b> "
-            "to <b>Advanced</b>, then <b>Steam voice</b>.</li>"
-            "<li>Restart the game if it was already open.</li>"
-            "</ol>"))
-        v.addWidget(_label(
+            + "".join(f"<li style='margin-bottom:8px'>{t}</li>" for t in items)
+            + "<li>" + _("Restart the game if it was already open.") + "</li></ol>"))
+        v.addWidget(_label(_(
             "<b>Push-to-talk tip:</b> if you use push-to-talk in Steam or the game, set "
-            "the same key in Onion Board (⚙ Settings → <b>Hotkeys</b> → <b>Auto push-to-talk</b>). "
-            "Onion Board will then hold it down for you while a sound plays.",
+            "the same key in Onion Board (⚙ Settings → <b>Hotkeys</b> → <b>Auto "
+            "push-to-talk</b>). Onion Board will then hold it down for you while a sound "
+            "plays."),
             "font-size:10pt;"))
         row = QHBoxLayout()
-        copy = QPushButton("Copy the mic name")
+        copy = QPushButton(_("Copy the mic name"))
         icons.set_icon(copy, "copy")
         copy.clicked.connect(lambda: (QApplication.clipboard().setText(mic_name),
-                                      busy.flash(copy, "✓  Copied")))
+                                      busy.flash(copy, _("✓  Copied"))))
         row.addWidget(copy)
-        open_steam = QPushButton("Open Steam's voice settings")
+        open_steam = QPushButton(_("Open Steam's voice settings"))
         open_steam.clicked.connect(lambda: self.open_steam(open_steam))
         row.addWidget(open_steam)
         row.addStretch(1)
-        ok = QPushButton("Done")
+        ok = QPushButton(_("Done"))
         ok.setObjectName("primary")
         ok.clicked.connect(self.accept)
         row.addWidget(ok)
@@ -1029,6 +1041,6 @@ class SteamGuide(QDialog):
     def open_steam(self, btn=None):
         """steam://settings/voice opens the Voice page when Steam is installed; if it
         isn't, Windows says so and the written steps still apply."""
-        busy.open_url("steam://settings/voice", btn, self, opened="✓ Opened Steam",
-                      failed="Couldn't open Steam — is it installed? Follow the steps "
-                             "above instead. The link was")
+        busy.open_url("steam://settings/voice", btn, self, opened=_("✓ Opened Steam"),
+                      failed=_("Couldn't open Steam — is it installed? Follow the steps "
+                               "above instead. The link was"))
