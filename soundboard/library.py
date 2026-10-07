@@ -50,7 +50,7 @@ CONFIG_PATH = APP_DIR / "config.json"
 # privacy.json beside config.json: a copy of the Privacy & security settings: a version
 # from before them drops them when it saves, and the next newer start takes them back
 PRIVACY_KEYS = ("net_mode", "net_proxy", "net_off", "net_offline", "netlog_keep",
-                "tor_bridges")
+                "tor_bridges", "app_log")
 # ...and which What's new was seen, which those versions drop too (it showed again after
 # going back a version and returning). Versions that read privacy.json take only
 # PRIVACY_KEYS from it, so the extra key is safe for them.
@@ -429,6 +429,8 @@ class Config:
     net_offline: bool = False
     # Network activity's "Keep a history" (soundboard.netlog.keep): off = memory only
     netlog_keep: bool = False
+    # "Keep an app log" (soundboard.applog.keep): off = onionboard.log isn't written
+    app_log: bool = True
     # "Hide that I'm using Tor": "" (off), "snowflake" or "obfs4" bridges
     tor_bridges: str = ""
     # the anonymous usage count (soundboard.usage; its switch is "usage_stats" in

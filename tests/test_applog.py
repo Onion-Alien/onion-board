@@ -280,3 +280,49 @@ def test_open_dialog_lists_at_most_max_extra(fresh):
         # same line, new exception type each time: a new bug each time
         applog.report(_raise(type(f"E{i}", (Exception,), {})(str(i))))
     assert len(first.extra) == applog.MAX_EXTRA
+
+
+@pytest.fixture
+def root_logging(monkeypatch):
+    """setup() replaces the root logger's handlers: put pytest's back afterwards."""
+    import logging
+    root = logging.getLogger()
+    handlers, level = list(root.handlers), root.level
+    monkeypatch.setattr(applog, "_state", dict(applog._state, log_path=None))
+    monkeypatch.setattr(applog.sys, "stderr", None)
+    yield root
+    for h in list(root.handlers):
+        root.removeHandler(h)
+        h.close()
+    for h in handlers:
+        root.addHandler(h)
+    root.setLevel(level)
+
+
+def test_app_log_follows_the_config(tmp_path, root_logging):
+    """Settings' "Keep an app log": on unless config.json says false."""
+    assert applog.wanted(tmp_path)   # no config yet
+    (tmp_path / "config.json").write_text('{"app_log": false}', encoding="utf-8")
+    assert not applog.wanted(tmp_path)
+    path = applog.setup(tmp_path)
+    root_logging.info("a site failed")
+    assert not path.exists() and not applog.keeping()
+    # a crash report still gets this run's last lines, from memory
+    assert "a site failed" in applog._log_tail(path, 10)
+
+
+def test_unticking_the_app_log_deletes_it_and_ticking_starts_it_again(tmp_path,
+                                                                       root_logging):
+    path = applog.setup(tmp_path, keep_log=True)
+    (tmp_path / (applog.LOG_NAME + ".1")).write_text("older\n", encoding="utf-8")
+    root_logging.info("before")
+    assert path.exists() and applog.keeping()
+    applog.keep(False)
+    root_logging.info("while off")
+    assert not path.exists() and not (tmp_path / (applog.LOG_NAME + ".1")).exists()
+    tail = applog._log_tail(path, 10)
+    assert "before" in tail and "while off" in tail
+    applog.keep(True)
+    root_logging.info("back on")
+    text = path.read_text(encoding="utf-8")
+    assert "back on" in text and "while off" not in text

@@ -33,11 +33,10 @@ REFRESH_MS = 1000
 _TOR = _("Tor's own connections to the Tor network aren't listed one by one: with Tor, "
          "everything here leaves through it.")
 NOTE = _("Every connection the app makes while it's open, and every one a switch "
-         "turned away. Kept in memory only: nothing here is saved, logged or sent, and "
-         "closing the app forgets it.") + " " + _TOR
+         "turned away.") + " " + _TOR
 NOTE_KEPT = _("Every connection the app makes while it's open, and every one a switch "
               "turned away. Kept on this PC between starts (Keep a history, below), "
-              "never logged or sent.") + " " + _TOR
+              "never sent.") + " " + _TOR
 
 
 def _when(t: float) -> str:
