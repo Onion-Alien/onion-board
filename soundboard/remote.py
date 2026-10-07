@@ -80,6 +80,8 @@ import math
 import random
 import re
 import secrets
+import selectors
+import socket
 import threading
 import time
 from dataclasses import dataclass, field
@@ -107,6 +109,7 @@ NONCES_MAX = 20000      # lan: nonces remembered (a phone sends one every 2 s or
 MAX_CONNECTIONS = 32    # connections open at once; more are closed straight away
 PEER_CONNECTIONS = 8    # ...and from any one address (a phone uses one or two)
 NETWORK_CHECK_S = 30.0  # lan: how often it checks the network is still not Public
+WAKE_S = 30.0           # the server thread's longest sleep (halt() wakes it at once)
 PUBLIC_NETWORK = ("Windows calls this network Public (like a café's or a hotel's Wi-Fi), "
                   "so phones are turned away. At home, set it to Private in Windows "
                   "Settings → Network & internet, then turn this off and on again")
@@ -184,7 +187,62 @@ class _Server(ThreadingHTTPServer):
     def __init__(self, *args, **kwargs):
         self._open: dict[str, int] = {}   # peer -> connections open now
         self._open_lock = threading.Lock()
-        super().__init__(*args, **kwargs)
+        self._halting = False
+        self._halted = threading.Event()
+        self._halted.set()
+        try:   # halt()'s wake-up call: a byte on a socket pair the thread also waits on
+            self._wake_r, self._wake_w = socket.socketpair()
+        except OSError:
+            self._wake_r = self._wake_w = None
+        try:
+            super().__init__(*args, **kwargs)
+        except BaseException:
+            self._close_wake()
+            raise
+
+    def start_thread(self, name: str):
+        """serve() on a thread of its own."""
+        self._halted.clear()
+        threading.Thread(target=self.serve, daemon=True, name=name).start()
+
+    def serve(self):
+        """socketserver's serve_forever, but asleep until a connection comes or halt()
+        wakes it: serve_forever(poll_interval=0.25) woke 4 times a second all day just
+        to see whether it should stop. Without the socket pair it looks every second."""
+        try:
+            with selectors.DefaultSelector() as sel:
+                sel.register(self, selectors.EVENT_READ)
+                if self._wake_r is not None:
+                    sel.register(self._wake_r, selectors.EVENT_READ)
+                timeout = WAKE_S if self._wake_r is not None else 1.0
+                while not self._halting:
+                    ready = sel.select(timeout)
+                    if self._halting:
+                        break
+                    if any(key.fileobj is self for key, _ in ready):
+                        self._handle_request_noblock()
+                    self.service_actions()
+        finally:
+            self._halted.set()
+
+    def halt(self):
+        """Stop serve() and wait for it to end (instead of shutdown())."""
+        self._halting = True
+        if self._wake_w is not None:
+            try:
+                self._wake_w.send(b"x")
+            except OSError:
+                pass
+        self._halted.wait(5.0)
+
+    def server_close(self):
+        super().server_close()
+        self._close_wake()
+
+    def _close_wake(self):
+        for s in (self._wake_r, self._wake_w):
+            if s is not None:
+                s.close()
 
     def process_request(self, request, client_address):
         peer = client_address[0]
@@ -226,6 +284,7 @@ class RemoteControl(QObject):
     after: `closed` says why when that stops it)."""
     request = Signal(object)
     closed = Signal(str)   # lan: stopped by itself, and why
+    _net_answer = Signal(object, bool)   # (the server asked about, is the network Public)
 
     def __init__(self, dispatch, parent=None, *, actions=ACTIONS, page=None,
                  lan: bool = False, name: str = "control API"):
@@ -247,6 +306,8 @@ class RemoteControl(QObject):
         self._network = QTimer(self)
         self._network.setInterval(int(NETWORK_CHECK_S * 1000))
         self._network.timeout.connect(self._check_network)
+        self._net_asking = False
+        self._net_answer.connect(self._network_checked, Qt.QueuedConnection)
 
     @property
     def running(self) -> bool:
@@ -280,17 +341,37 @@ class RemoteControl(QObject):
             return False
         self._server = srv
         self.port = srv.server_address[1]   # (port 0 = any free one, for the tests)
-        threading.Thread(target=srv.serve_forever, kwargs={"poll_interval": 0.25},
-                         daemon=True, name=self.name.replace(" ", "-")).start()
+        srv.start_thread(self.name.replace(" ", "-"))
         log.info("%s listening on %s:%s", self.name, self.host, self.port)
         if self.lan:
             self._network.start()
         return True
 
     def _check_network(self):
+        """lan, every NETWORK_CHECK_S: is the network still not Public? Asked on a
+        thread (Windows takes ~10 ms to say, which was a stall on the UI thread), the
+        answer handled back on the UI thread (_network_checked)."""
+        if not self.running or self._net_asking:
+            return
+        self._net_asking = True
+        server, host = self._server, self.host
+
+        def ask():
+            try:
+                public = netcategory.category(host) == netcategory.PUBLIC
+            finally:
+                self._net_asking = False
+            try:
+                self._net_answer.emit(server, public)
+            except RuntimeError:   # the window (and this) went away meanwhile
+                pass
+        threading.Thread(target=ask, daemon=True, name="remote-network-check").start()
+
+    def _network_checked(self, server, public: bool):
         """lan: the network turned Public (or the PC moved to a Public one keeping its
-        address) while it listens: stop."""
-        if self.running and netcategory.category(self.host) == netcategory.PUBLIC:
+        address) while it listens: stop. (An answer about a server since replaced by a
+        restart is dropped: the restart asked again.)"""
+        if public and self.running and server is self._server:
             self.stop()
             self.error = PUBLIC_NETWORK
             log.info("%s stopped: the network is Public now", self.name)
@@ -300,7 +381,7 @@ class RemoteControl(QObject):
         self._network.stop()
         srv, self._server = self._server, None
         if srv is not None:
-            srv.shutdown()
+            srv.halt()
             srv.server_close()
             log.info("%s stopped", self.name)
 

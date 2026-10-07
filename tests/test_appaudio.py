@@ -86,6 +86,36 @@ def test_a_shared_helper_is_folded_into_the_program_that_started_it():
 
 
 @pytest.mark.skipif(not WIN, reason="Windows only")
+def test_one_process_at_a_time_gives_what_the_full_snapshot_gives():
+    """Who's listening looks up only the pids its sessions name (PidTable), not a
+    snapshot of every process: the rows, and so the names and trees, are the same."""
+    child = subprocess.Popen([sys.executable, "-c", "import time; time.sleep(30)"])
+    try:
+        full = appaudio._process_table()
+        table = appaudio.PidTable()
+        for pid in (os.getpid(), child.pid, os.getppid()):
+            if pid in full:
+                assert table.get(pid) == full[pid] and pid in table
+        assert table[child.pid][0] == os.getpid()
+        assert appaudio.root_pid(child.pid, table) == appaudio.root_pid(child.pid, full)
+        assert table.snapshots == 0
+    finally:
+        child.kill()
+        child.wait()
+    assert child.pid not in appaudio.PidTable()          # gone, as in a fresh snapshot
+    assert appaudio.PidTable().get(0, (0, "")) == (0, "")
+
+
+def test_a_process_windows_wont_open_falls_back_to_the_full_snapshot(monkeypatch):
+    monkeypatch.setattr(appaudio, "_open_row", lambda pid: appaudio._DENIED)
+    monkeypatch.setattr(appaudio, "_process_table",
+                        lambda: {4: (0, "system"), 600: (4, "audiodg.exe")})
+    table = appaudio.PidTable()
+    assert table.get(600) == (4, "audiodg.exe") and 4 in table and 7 not in table
+    assert table.snapshots == 1                          # once, then it's all known
+
+
+@pytest.mark.skipif(not WIN, reason="Windows only")
 def test_list_apps_runs_and_never_lists_this_process():
     apps = appaudio.list_apps()
     assert isinstance(apps, list)

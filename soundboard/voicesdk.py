@@ -30,6 +30,7 @@ from __future__ import annotations
 import os
 import sys
 import threading
+import time
 from pathlib import Path
 
 # file name (lower case) -> destination mode key
@@ -263,8 +264,13 @@ class Watcher:
 class Listeners:
     """Who records the mic or the cable's far end, as [(mode key, program name)],
     voice chat programs (VOICE_APPS) first, then games by their files. poll() is cheap: the
-    sessions are listed (and a new game's folder scanned, once) on a thread, and it
-    returns what the last look found."""
+    sessions are listed (and a new game's folder scanned, once) on a worker thread, and
+    it returns what the last look found. The worker is one thread kept while polls keep
+    coming (not a new one per poll); it ends after IDLE_EXIT_S without one. Looks are at
+    least MIN_GAP_S apart however often poll() is called."""
+
+    IDLE_EXIT_S = 60.0
+    MIN_GAP_S = 1.0
 
     def __init__(self, lister=None, scanner=None):
         if lister is None:
@@ -273,7 +279,11 @@ class Listeners:
         self._list = lister
         self._scan = scanner or (lambda path: scan(path))
         self._cache: dict[str, str | None] = {}   # exe path -> mode key (games)
-        self._busy = False
+        self._lock = threading.Lock()
+        self._wake = threading.Event()
+        self._want = None                          # the device(s) the next look is for
+        self._thread: threading.Thread | None = None
+        self.looks = 0
         self.found: tuple = ()
 
     def poll(self, device) -> tuple:
@@ -281,10 +291,14 @@ class Listeners:
         mic looks at the mic and the cable's far end both)."""
         if not device:
             self.found = ()
-        elif not self._busy:
-            self._busy = True
-            threading.Thread(target=self._look, args=(device,), daemon=True,
-                             name="voicesdk-listeners").start()
+            return self.found
+        with self._lock:
+            self._want = device
+            if self._thread is None:
+                self._thread = threading.Thread(target=self._run, daemon=True,
+                                                name="voicesdk-listeners")
+                self._thread.start()
+            self._wake.set()
         return self.found
 
     def look(self, device: str) -> tuple:
@@ -303,13 +317,24 @@ class Listeners:
                     games.append((key, app.name))
         return tuple(dict.fromkeys(voice + games))
 
-    def _look(self, device: str):
-        try:
-            self.found = self.look(device)
-        except Exception:  # noqa: BLE001 - only a hint
-            self.found = ()
-        finally:
-            self._busy = False
+    def _run(self):
+        last = 0.0
+        while True:
+            if not self._wake.wait(self.IDLE_EXIT_S):
+                with self._lock:
+                    if not self._wake.is_set():   # (a poll may have come just now)
+                        self._thread = None
+                        return
+            time.sleep(max(0.0, last + self.MIN_GAP_S - time.monotonic()))
+            with self._lock:
+                self._wake.clear()
+                device = self._want
+            last = time.monotonic()
+            try:
+                self.found = self.look(device)
+            except Exception:  # noqa: BLE001 - only a hint
+                self.found = ()
+            self.looks += 1
 
 
 __all__ = ["NAMES", "ORDER", "SIGNATURES", "VOICE_APPS", "Listeners", "Watcher",
