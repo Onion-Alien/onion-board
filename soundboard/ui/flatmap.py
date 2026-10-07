@@ -9,8 +9,8 @@ at any zoom. Tiles not drawn yet (a new zoom, a drag onto new ground) are drawn 
 slice at a time while the last whole view, put together into one picture and
 stretched, stands in for them (tiles stretched one by one showed their seams, a grid
 over the map); a new zoom shows only once all of it is drawn. Under that, the land of
-the whole world, small. The first stations pop in a few at a time (REVEAL_S), and Bun
-waits on the map till they come.
+the whole world, small. The country names show first, then (NAMES_FIRST_S on) the
+first stations pop in a few at a time (REVEAL_S); Bun waits on the map till they come.
 
 Stations arrive as radio.globe_points() dicts (the name is from the 3D globe this map
 replaced).
@@ -52,7 +52,8 @@ TOWN_ZOOM = 2.0                     # city and town names show from this zoom in
 TOWNS_IN_VIEW = 40                  # ...at most this many at once, only those in view
 SPREAD_ZOOM = 4.0                   # stations on the very same spot fan out from here...
 SPREAD_PX = 2.4                     # ...this far apart (a spiral round the spot)
-REVEAL_S = 1.4                      # the first stations pop in over this long...
+NAMES_FIRST_S = 0.35                # the country names alone, before the dots...
+REVEAL_S = 1.4                      # ...then the first stations pop in over this long...
 POP_S = 0.3                         # ...each growing in over this (a little overshoot)
 LOADING_TEXT = "Tuning in to radio stations around the world…"
 
@@ -170,7 +171,10 @@ class FlatMap(QWidget):
         self._stable: tuple | None = None
         self._pics: dict[tuple, tuple] = {}      # (level, slots): (picture, x, y)
         self._placed: dict[float, list] = {}     # country names' places, per scale
-        self._reveal_t0: float | None = None     # when the first stations came (REVEAL_S)
+        self._reveal_t0: float | None = None     # when the first stations pop in (REVEAL_S)
+        self._reveal_wait = False                # ...stations came before the land did
+        self._land_set = False
+        self._names_pic: tuple | None = None     # (view, picture): the names over the pop-in
         self._delay = np.zeros(0)                # ...and each one's turn to pop in
         self._reveal = QTimer(self)
         self._reveal.setInterval(16)
@@ -231,6 +235,9 @@ class FlatMap(QWidget):
             n += len(ring)
         self._land_box = [part.boundingRect() for part in self._land]
         self._land_ver += 1
+        self._land_set = True
+        if self._reveal_wait:   # the stations came first: their pop-in waited for this
+            self._start_reveal()
         self._redraw()
 
     def set_points(self, points: list[dict]):
@@ -255,19 +262,28 @@ class FlatMap(QWidget):
             rank = (n - 1 - np.arange(n)) / max(1, n)
             jitter = np.random.default_rng(7).random(n) * 0.25
             self._delay = (REVEAL_S - POP_S) * np.clip(rank * 0.8 + jitter, 0, 1)
-            self._reveal_t0 = time.monotonic()
-            self._reveal.start()
-        elif self._reveal_t0 is not None:
+            if self._land_set:
+                self._start_reveal()
+            else:   # the land and its names first, then the dots
+                self._reveal_wait = True
+        elif self.revealing():
             self._delay = np.zeros(len(pts))   # changed mid-way: the rest at once
         self._redraw()
 
+    def _start_reveal(self):
+        """The country names show on their own for NAMES_FIRST_S, then the dots pop in."""
+        self._reveal_wait = False
+        self._reveal_t0 = time.monotonic() + NAMES_FIRST_S
+        self._reveal.start()
+
     def revealing(self) -> bool:
-        """The first stations still popping in (REVEAL_S)."""
-        return self._reveal_t0 is not None
+        """The first stations still to pop in, or popping in (REVEAL_S)."""
+        return self._reveal_t0 is not None or self._reveal_wait
 
     def _reveal_step(self):
         if self._reveal_t0 is None or time.monotonic() - self._reveal_t0 >= REVEAL_S:
             self._reveal_t0 = None
+            self._names_pic = None
             self._reveal.stop()
         self.update()
 
@@ -809,6 +825,8 @@ class FlatMap(QWidget):
     def _paint_reveal(self, p: QPainter):
         """The first stations popping in, drawn live over the map (the tiles with
         them on wait till all are in): just the ones in view, each its turn."""
+        if self._reveal_t0 is None:   # waiting on the land: no dots yet
+            return
         t = time.monotonic() - self._reveal_t0
         size = _pop((t - self._delay) / POP_S) if len(self._delay) == len(self._r) else 1.0
         xs, ys = self._screen()
@@ -821,6 +839,43 @@ class FlatMap(QWidget):
         r = self._r * self._grow() * size
         for i in on.tolist():
             p.drawEllipse(QPointF(xs[i], ys[i]), r[i], r[i])
+
+    def _paint_names(self, p: QPainter):
+        """The country names over the pop-in (the stand-in under it is just land), so
+        they're there before the dots: drawn once for the view, then copied."""
+        if not self._labels:
+            return
+        dpr = self.devicePixelRatioF()
+        s = self._scale()
+        view = (round(s, 6), self.cx, self.cy, self.width(), self.height(), dpr,
+                self._ver)
+        if self._names_pic is None or self._names_pic[0] != view:
+            pic = QPixmap(max(1, round(self.width() * dpr)),
+                          max(1, round(self.height() * dpr)))
+            pic.setDevicePixelRatio(dpr)
+            pic.fill(Qt.transparent)
+            q = QPainter(pic)
+            q.setRenderHint(QPainter.Antialiasing)
+            t = theme.T
+            font, colour = self._label_style()
+            fm = QFontMetricsF(font)
+            halo = QPen(_mix(t["bg"], t["text"], 0.14), 3)
+            halo.setJoinStyle(Qt.RoundJoin)
+            rect = QRectF(self.rect())
+            placed = self._place_labels(s)
+            for k in self._copies():
+                corner = self._origin(k, s)
+                for box, name in placed:
+                    box = box.translated(corner)
+                    if not box.adjusted(-3, -3, 3, 3).intersects(rect):
+                        continue
+                    path = QPainterPath()
+                    path.addText(box.left(), box.top() + fm.ascent(), font, name)
+                    q.strokePath(path, halo)
+                    q.fillPath(path, colour)
+            q.end()
+            self._names_pic = (view, pic)
+        p.drawPixmap(0, 0, self._names_pic[1])
 
     def paintEvent(self, _e):
         self._clamp()
@@ -849,6 +904,7 @@ class FlatMap(QWidget):
         p.setRenderHint(QPainter.Antialiasing)
         if revealing:
             self._paint_reveal(p)
+            self._paint_names(p)   # on top, as the tiles have them
         self._paint_towns(p, dpr)
         hover, cur_i = self._hover, self._index.get(self._current, -1)
         if (0 <= hover < len(self._points)) or cur_i >= 0:
