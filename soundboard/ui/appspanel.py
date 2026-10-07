@@ -61,8 +61,8 @@ CARD_MAX_W = 900        # the Card size slider's widest: one big card across mos
 MAX_VOL = 10.0          # 1000 %, the most the volume box takes
 CONNECTING = _("Connecting…")   # a card's status while its capture is starting
 # where a sent program goes (cfg.apps[exe]["to"], cfg.apps_paths[path]["to"]): the
-# choice shows once a stream output is set (Settings → Audio), or while it's set to
-# anything but both
+# choice shows once a stream output is set (Also send to → Clean, for streaming), or
+# while it's set to anything but both
 TO = (("both", _("Call + stream"), _("Others in the call and your stream output both get it")),
       ("call", _("Call only"), _("Only others in the call get it, not your stream output")),
       ("stream", _("Stream only"), _("Only your stream output gets it (music for your "
@@ -1206,7 +1206,7 @@ class AppsTab(QWidget):
         self._report_active()
 
     def _stream_output(self) -> bool:
-        """A stream output is set (Settings → Audio → Stream output)."""
+        """A stream output is set (Also send to → Clean, for streaming)."""
         return bool(self.engine.names.get("obs"))
 
     def _on_hear(self, row: AppRow, on: bool):

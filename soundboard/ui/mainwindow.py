@@ -1932,12 +1932,38 @@ class MainWindow(QMainWindow):
         return name
 
     def set_obs_device(self, name: str | None):
-        """Settings -> Audio -> Stream output (OBS): None switches it off."""
+        """The stream output: Setup -> Devices -> Also send to -> a row set to Clean,
+        for streaming. None switches it off."""
         self.cfg.obs_device = name
         self.engine.set_obs_device(self._obs_name(name))
+        copies = self._copy_names()   # (a copy row on it may be free to open again)
+        if list(self.engine.copy_names) != copies:
+            self.engine.set_copy_devices(copies)
+        self._show_route()            # the rows
         self._save_now()
         self._update_status()
         self._prepare_all()
+
+    def set_send_kind(self, name: str, stream: bool):
+        """Also send to: the row on `name` gets the clean stream mix (`stream`; the
+        one that had it before goes back to a copy of the call, in its place) or the
+        same as the call."""
+        c = self.cfg
+        lst = list(c.also_send)
+        if stream:
+            if c.obs_device == name:
+                return
+            i = lst.index(name) if name in lst else len(lst)
+            lst = [n for n in lst if n != name]
+            if c.obs_device and c.route != "off":
+                lst.insert(i, c.obs_device)
+            c.also_send = lst
+            log.info("also send to: %s, clean: %s", lst, name)
+            self.set_obs_device(name)
+        elif c.obs_device == name:
+            c.also_send = list(dict.fromkeys([*lst, name]))
+            log.info("also send to: %s, clean: none", c.also_send)
+            self.set_obs_device(None)
 
     def _prepare_all(self):
         items = list(self.audio.items())
@@ -1958,8 +1984,8 @@ class MainWindow(QMainWindow):
         self.virtual_mic = eng.virtual_mic_for(main)
         if c.route == "off":
             self.setup_hint.setText(_("Sending to others is off: your sounds play in your "
-                                      "headphones and on the stream output (Settings → Audio) "
-                                      "only."))
+                                      "headphones and on a device set to Clean, for streaming "
+                                      "(Also send to) only."))
         elif c.route == "device" and c.main_device and c.main_device == c.mon_device:
             self.setup_hint.setText(_("<span style='color:{status}'>That's your headphones too, "
                                       "so nothing is sent (you'd hear everything twice). Pick "

@@ -206,8 +206,8 @@ def test_also_send_to_copies_what_others_hear_into_more_devices(win, monkeypatch
     d = SettingsDialog(win, "audio")
     mirror = [v for v in win.also_views if v is not rows]
     assert len(mirror) == 1 and [b.currentData() for b in mirror[0].boxes] == ["Speakers"]
-    win.set_route("off")                 # nobody: nothing goes anywhere
-    assert copies[-1] == [] and rows.boxes == [] and rows.add.isHidden()
+    win.set_route("off")                 # nobody: no copies (+ adds a clean one)
+    assert copies[-1] == [] and rows.boxes == [] and not rows.add.isHidden()
     win.set_route("cable")
     assert copies[-1] == ["Speakers"] and len(rows.boxes) == 1
     win.set_route("device", "Speakers")  # picked as the main one: not twice
@@ -221,6 +221,47 @@ def test_also_send_to_copies_what_others_hear_into_more_devices(win, monkeypatch
     d.close()
     win.set_also_send_at(0, PHONES)      # the headphones: you'd hear it twice
     assert copies[-1] == []
+
+
+def test_also_send_row_can_be_the_clean_stream_mix(win, monkeypatch, devices):  # noqa: F811
+    """The stream output lives in the Also send to rows: a row set to Clean, for
+    streaming is cfg.obs_device (its volume and voice switch under it), one at a time,
+    and back to Same as the call it's a copy again. Sending to nobody, it's the only
+    kind a row can be. No separate card in Settings any more."""
+    from PySide6.QtWidgets import QLabel
+    opened = []
+    monkeypatch.setattr(engine.Engine, "set_obs_device",
+                        lambda self, name: (opened.append(name),
+                                            self.names.__setitem__("obs", name)))
+    win.set_route("cable")
+    rows = win.also_rows
+    rows.add.click()
+    assert win.cfg.also_send == ["Speakers"] and rows.stream_vol is None
+    kind = rows.kinds[0]
+    kind.setCurrentIndex(kind.findData("stream"))
+    kind.activated.emit(kind.currentIndex())
+    assert win.cfg.obs_device == "Speakers" and win.cfg.also_send == []
+    assert opened[-1] == "Speakers"
+    assert [k.currentData() for k in rows.kinds] == ["stream"]
+    assert rows.stream_vol is not None and rows.stream_voice.isChecked()
+    rows.stream_voice.setChecked(False)
+    assert win.cfg.obs_voice is False
+    assert rows.add.isHidden()           # nothing left to add
+    win.set_send_kind("Speakers", False)  # back to a copy of the call
+    assert win.cfg.obs_device is None and win.cfg.also_send == ["Speakers"]
+    assert opened[-1] is None and rows.stream_vol is None
+    win.set_also_send_at(0, None)
+    win.set_route("off")                 # nobody: only the clean one makes sense
+    assert rows.boxes == [] and not rows.add.isHidden()
+    rows.add.click()
+    assert win.cfg.obs_device and win.cfg.also_send == []
+    assert [rows.kinds[0].itemData(i) for i in range(rows.kinds[0].count())] == ["stream"]
+    assert rows.add.isHidden()           # one clean one at a time
+    rows.widgets[rows.widgets.index(rows.kinds[0].parentWidget()) + 1].click()   # −
+    assert win.cfg.obs_device is None and rows.boxes == []
+    d = SettingsDialog(win, "audio")
+    assert not [w for w in d.findChildren(QLabel) if "Stream output (OBS)" in w.text()]
+    d.close()
 
 
 def test_engine_copies_open_close_retry_and_get_the_send_mix(monkeypatch):
