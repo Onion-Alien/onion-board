@@ -218,20 +218,20 @@ def _listed(name: str, names) -> bool:
 
 # the urgent bar's line for the worst thing in Discord's settings (discordcfg)
 DISCORD_URGENT = {
-    discordcfg.STUDIO: "{name} isn't hearing your sounds: its Input Profile is Studio, "
-                       "which skips Onion Board. Set it to Custom.",
-    discordcfg.BYPASS: "{name} isn't hearing your sounds: \"Bypass System Audio Input "
-                       "Processing\" is on, which skips Onion Board.",
-    discordcfg.ISOLATION: "{name}'s Voice Isolation is wiping out your sounds. Set its "
-                          "Input Profile to Custom and Noise Suppression to None.",
-    discordcfg.KRISP: "{name}'s noise suppression (Krisp) is wiping out your sounds. Set "
-                      "Noise Suppression to None.",
-    discordcfg.SUPPRESSION: "{name}'s noise suppression is eating your sounds. Set Noise "
-                            "Suppression to None.",
-    discordcfg.ECHO: "{name}'s echo cancellation is making your sounds dip and pump. "
-                     "Turn it off.",
-    discordcfg.AGC: "{name}'s automatic gain control is making your sounds' volume jump. "
-                    "Turn it off.",
+    discordcfg.STUDIO: _("{name} isn't hearing your sounds: its Input Profile is Studio, "
+                         "which skips Onion Board. Set it to Custom."),
+    discordcfg.BYPASS: _("{name} isn't hearing your sounds: \"Bypass System Audio Input "
+                         "Processing\" is on, which skips Onion Board."),
+    discordcfg.ISOLATION: _("{name}'s Voice Isolation is wiping out your sounds. Set its "
+                            "Input Profile to Custom and Noise Suppression to None."),
+    discordcfg.KRISP: _("{name}'s noise suppression (Krisp) is wiping out your sounds. Set "
+                        "Noise Suppression to None."),
+    discordcfg.SUPPRESSION: _("{name}'s noise suppression is eating your sounds. Set Noise "
+                              "Suppression to None."),
+    discordcfg.ECHO: _("{name}'s echo cancellation is making your sounds dip and pump. "
+                       "Turn it off."),
+    discordcfg.AGC: _("{name}'s automatic gain control is making your sounds' volume jump. "
+                      "Turn it off."),
 }
 
 

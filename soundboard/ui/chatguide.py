@@ -84,37 +84,31 @@ def on_mic(mw) -> bool:
     return cfg.route == "mic" and directmic.works(directmic.status(cfg.mic_device))
 
 
-# Straight into my mic: Discord's Studio profile (and "Bypass System Audio Input
-# Processing") opens the mic around every Windows audio effect, so nothing of the
-# board's reaches Discord. The clean setting there is Custom with the cleanup off.
-CUSTOM_OFF = ("set <b>Input Profile</b> to <b>Custom</b> (not Studio: Studio skips Onion "
-              "Board), <b>Noise Suppression</b> to <b>None</b>, and turn off <b>Echo "
-              "Cancellation</b>")
-
-# each discordcfg problem: (what it does, what to switch)
+# each discordcfg problem: what it does and what to switch, in one sentence. Straight
+# into my mic, Discord's Studio profile (and "Bypass System Audio Input Processing")
+# opens the mic around every Windows audio effect, so nothing of the board's reaches
+# Discord: the clean setting there is Custom with the cleanup off.
 SETTING_FIXES = {
-    discordcfg.STUDIO: (
+    discordcfg.STUDIO: _(
         "Input Profile is <b>Studio</b>: Discord skips Onion Board, so none of your "
-        "sounds get through",
-        "set <b>Input Profile</b> to <b>Custom</b>"),
-    discordcfg.BYPASS: (
-        "<b>Bypass System Audio Input Processing</b> is on: Discord skips Onion Board",
-        "turn it off (Show Advanced Voice Settings)"),
-    discordcfg.ISOLATION: (
-        "Input Profile is <b>Voice Isolation</b>: Krisp wipes out music after a second",
-        "set <b>Input Profile</b> to <b>Custom</b>, then Noise Suppression to <b>None</b>"),
-    discordcfg.KRISP: (
-        "Noise Suppression is <b>Krisp</b>: it wipes out music after a second",
-        "set <b>Noise Suppression</b> to <b>None</b>"),
-    discordcfg.SUPPRESSION: (
-        "Noise Suppression is <b>Standard</b>: it eats steady sounds",
-        "set <b>Noise Suppression</b> to <b>None</b>"),
-    discordcfg.ECHO: (
-        "<b>Echo Cancellation</b> is on: your sounds dip and pump",
-        "turn it off"),
-    discordcfg.AGC: (
-        "<b>Automatic Gain Control</b> is on: the volume jumps around",
-        "turn it off (Show Advanced Voice Settings)"),
+        "sounds get through: set <b>Input Profile</b> to <b>Custom</b>."),
+    discordcfg.BYPASS: _(
+        "<b>Bypass System Audio Input Processing</b> is on: Discord skips Onion Board: "
+        "turn it off (Show Advanced Voice Settings)."),
+    discordcfg.ISOLATION: _(
+        "Input Profile is <b>Voice Isolation</b>: Krisp wipes out music after a second: "
+        "set <b>Input Profile</b> to <b>Custom</b>, then Noise Suppression to <b>None</b>."),
+    discordcfg.KRISP: _(
+        "Noise Suppression is <b>Krisp</b>: it wipes out music after a second: set "
+        "<b>Noise Suppression</b> to <b>None</b>."),
+    discordcfg.SUPPRESSION: _(
+        "Noise Suppression is <b>Standard</b>: it eats steady sounds: set <b>Noise "
+        "Suppression</b> to <b>None</b>."),
+    discordcfg.ECHO: _(
+        "<b>Echo Cancellation</b> is on: your sounds dip and pump: turn it off."),
+    discordcfg.AGC: _(
+        "<b>Automatic Gain Control</b> is on: the volume jumps around: turn it off (Show "
+        "Advanced Voice Settings)."),
 }
 
 
@@ -128,13 +122,14 @@ def settings_html(found: list, kept: bool) -> str:
     name = html.escape(s.client)
     probs = s.problems(kept)
     if not probs:
-        return (f"<b style='color:{ok}'>✓ {name}'s settings are right for your sounds.</b>")
-    items = "".join(f"<li style='margin-bottom:4px'>{SETTING_FIXES[p][0]}: "
-                    f"{SETTING_FIXES[p][1]}.</li>" for p in probs)
-    return (f"<b style='color:{warn}'>{name}'s settings are changing your sounds:</b>"
-            f"<ul style='margin-left:-20px'>{items}</ul>"
-            "<span style='font-size:9pt'>Discord saves a change after a few seconds, up "
-            "to a minute: this updates by itself.</span>")
+        return _("<b style='color:{colour}'>✓ {name}'s settings are right for your "
+                 "sounds.</b>", colour=ok, name=name)
+    items = "".join(f"<li style='margin-bottom:4px'>{SETTING_FIXES[p]}</li>" for p in probs)
+    return (_("<b style='color:{colour}'>{name}'s settings are changing your sounds:</b>",
+              colour=warn, name=name)
+            + f"<ul style='margin-left:-20px'>{items}</ul><span style='font-size:9pt'>"
+            + _("Discord saves a change after a few seconds, up to a minute: this updates "
+                "by itself.") + "</span>")
 
 
 def result_html(res: dict, vm: str, kept: bool = False) -> str:
