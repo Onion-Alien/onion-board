@@ -204,7 +204,7 @@ def fitted(path: str, w: int, h: int, dpr: float,
     pm.setDevicePixelRatio(dpr)
     # the pads are all one size: a new size (Pad size dragged, another screen's
     # scale) makes the old one of this picture and shade useless
-    for old in [k for k in _fitted if k[0] == path and k[3:] == key[3:]]:
+    for old in [k for k in _fitted if k[0] == path and k[4:] == key[4:] and k != key]:
         _fitted_bytes -= _size(_fitted.pop(old))
     _fitted[key] = pm
     _fitted_bytes += _size(pm)

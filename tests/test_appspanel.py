@@ -523,7 +523,7 @@ def test_lister_uses_one_worker_thread_for_every_listing(qapp, monkeypatch):
     lister.ready.connect(got.append)
     for n in range(1, 4):
         lister.refresh()
-        assert _wait(qapp, lambda: len(got) == n and not lister._busy)
+        assert _wait(qapp, lambda n=n: len(got) == n and not lister._busy)
     workers = [t for t in threading.enumerate() if t.name == "applist"]
     assert lister._thread in workers and lister._thread.is_alive()
     first = lister._thread
