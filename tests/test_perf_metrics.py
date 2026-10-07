@@ -69,6 +69,16 @@ def test_markdown_compare_and_problems():
     assert "qt 1.0" in md and "oops" in md and "within its budget" in md
 
 
+def test_make_budgets_rounds_up_and_takes_the_highest():
+    from perf import make_budgets
+    a = {"scenarios": {"tray": {"cpu_pct": 1.2, "private_mb": 613.4, "threads": 39,
+                                "notes": "text is skipped"}}}
+    b = {"scenarios": {"tray": {"cpu_pct": 4.1, "private_mb": 600.0, "threads": 41}}}
+    got = make_budgets.limits([a, b])["tray"]
+    assert got == {"cpu_pct": 5, "private_mb": 620, "threads": 41}
+    assert make_budgets.up(0.2, 0.5, 1) == 1 and make_budgets.up(3.66, 0.5, 0) == 4
+
+
 def test_link_parse():
     assert link.parse('@@perf {"ev": "start", "name": "x"}') == {"ev": "start", "name": "x"}
     assert link.parse("hello") is None
