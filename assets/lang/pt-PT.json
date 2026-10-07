@@ -422,8 +422,6 @@
   "End": "Fim",
   "Endpoints: {endpoints}. E.g. /api/play?name=Airhorn, /api/random?category=Memes, /api/live?on=toggle. Send the key as ?token=…, an X-Token header or Authorization: Bearer …. /api/help describes each one.": "Endpoints: {endpoints}. P. ex. /api/play?name=Airhorn, /api/random?category=Memes, /api/live?on=toggle. Envia a chave como ?token=…, um cabeçalho X-Token ou Authorization: Bearer …. /api/help descreve cada um.",
   "Esc  close": "Esc  fechar",
-  "Every connection the app makes while it's open, and every one a switch turned away. Kept in memory only: nothing here is saved, logged or sent, and closing the app forgets it.": "Todas as ligações que a app faz enquanto está aberta, e todas as que um interruptor bloqueou. Guardado só na memória: nada aqui é guardado, registado ou enviado, e fechar a app esquece tudo.",
-  "Every connection the app makes while it's open, and every one a switch turned away. Kept on this PC between starts (Keep a history, below), never logged or sent.": "Todas as ligações que a app faz enquanto está aberta, e todas as que um interruptor bloqueou. Guardado neste PC entre arranques (Manter um histórico, abaixo), nunca registado nem enviado.",
   "Every mode in plain words, and what it's doing right now": "Cada modo em palavras simples, e o que está a fazer agora",
   "Every sound": "Todos os sons",
   "Every sound comes off the board": "Todos os sons saem do painel",
@@ -2652,5 +2650,10 @@
   "✓ {n} voice": [
     "✓ {n} voz",
     "✓ {n} vozes"
-  ]
+  ],
+  "Every connection the app makes while it's open, and every one a switch turned away.": "Cada ligação que a aplicação faz enquanto está aberta e cada uma delas com um interruptor desligado.",
+  "Every connection the app makes while it's open, and every one a switch turned away. Kept on this PC between starts (Keep a history, below), never sent.": "Cada ligação que a aplicação faz enquanto está aberta e cada uma delas com um interruptor desligado. Mantido neste PC entre arranques (mantenha um histórico abaixo), nunca enviado.",
+  "Keep an app log": "Mantenha um registo do aplicativo",
+  "Listening…": "Escuta…",
+  "The app writes what it does to onionboard.log in its folder (3 MB at most), so a problem can be looked into. It can name a site a download or radio station failed on. Nothing is sent anywhere. Unticking it stops the log and deletes it.": "A aplicação grava o que faz em onionboard. log na sua pasta (3 MB no máximo), para que um problema possa ser investigado. Pode nomear um site em que um download ou estação de rádio falhou. Nada é enviado para lado nenhum. Desmarcá-lo interrompe o registo e elimina-o."
 }

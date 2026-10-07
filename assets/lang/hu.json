@@ -422,8 +422,6 @@
   "End": "Vége",
   "Endpoints: {endpoints}. E.g. /api/play?name=Airhorn, /api/random?category=Memes, /api/live?on=toggle. Send the key as ?token=…, an X-Token header or Authorization: Bearer …. /api/help describes each one.": "Végpontok: {endpoints}. Pl. /api/play?name=Airhorn, /api/random?category=Memes, /api/live?on=toggle. A kulcsot így küldd: ?token=…, X-Token fejléc vagy Authorization: Bearer …. Az /api/help mindegyiket leírja.",
   "Esc  close": "Esc  bezárás",
-  "Every connection the app makes while it's open, and every one a switch turned away. Kept in memory only: nothing here is saved, logged or sent, and closing the app forgets it.": "Minden kapcsolat, amit az app nyitva létekor létesít, és minden, amit egy kapcsoló letiltott. Csak a memóriában: itt semmi nincs mentve, naplózva vagy elküldve, és az app bezárásakor elfelejti.",
-  "Every connection the app makes while it's open, and every one a switch turned away. Kept on this PC between starts (Keep a history, below), never logged or sent.": "Minden kapcsolat, amit az app nyitva létekor létesít, és minden, amit egy kapcsoló letiltott. Indítások között ezen a gépen marad (Előzmények megtartása, lent), soha nincs naplózva vagy elküldve.",
   "Every mode in plain words, and what it's doing right now": "Minden mód közérthetően, és hogy épp mit csinál",
   "Every sound": "Minden hang",
   "Every sound comes off the board": "Minden hang lekerül a boardról",
@@ -2652,5 +2650,10 @@
   "✓ {n} voice": [
     "✓ {n} hang",
     "✓ {n} hang"
-  ]
+  ],
+  "Every connection the app makes while it's open, and every one a switch turned away.": "Minden kapcsolat, amelyet az alkalmazás nyitott állapotban létesít, és mindegyiknél el van kapcsolva egy kapcsoló.",
+  "Every connection the app makes while it's open, and every one a switch turned away. Kept on this PC between starts (Keep a history, below), never sent.": "Minden kapcsolat, amelyet az alkalmazás nyitott állapotban létesít, és mindegyiknél el van kapcsolva egy kapcsoló. Ezen a számítógépen tárolva az indítások között (Előzmények megőrzése lent), soha nem küldték el.",
+  "Keep an app log": "Vezessen alkalmazásnaplót",
+  "Listening…": "Hallgatás…",
+  "The app writes what it does to onionboard.log in its folder (3 MB at most), so a problem can be looked into. It can name a site a download or radio station failed on. Nothing is sent anywhere. Unticking it stops the log and deletes it.": "Az alkalmazás az onionboard.log mappába írja be, hogy mit csinál, a mappájába (maximum 3 MB), így a probléma után lehet nézni. Meg tud nevezni egy webhelyet, ahol a letöltés vagy a rádióállomás sikertelen volt. Semmit nem küldenek sehova. A pipa törlése leállítja a naplót és törli."
 }

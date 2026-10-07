@@ -730,8 +730,8 @@
   "<span style='color:{colour}'>The cable installer is missing. Get it from vb-audio.com/Cable.</span>": "<span style='color:{colour}'>Manca l'installatore del cavo. Ottienilo da vb-audio.com/Cable.</span>",
   "<span style='color:{colour}'>The virtual cable isn't set up yet, so only you will hear your sounds.</span> Go <b>Back</b> to install it (or pick another device there), or finish now and this guide will open again next time.": "<span style='color:{colour}'>Il cavo virtuale non è ancora configurato, quindi solo tu sentirai i tuoi suoni.</span> Torna <b>indietro</b> per installarlo (o scegli un altro dispositivo lì), oppure finisci ora e questa guida si aprirà di nuovo la prossima volta.",
   "<span style='color:{colour}'>{n} audio drop-out since start{tip}</span>": [
-    "",
-    ""
+    "<span style='color:{colour}'>{n} interruzioni dell'audio dall'inizio {tip}</span>",
+    "<span style='color:{colour}'>{n} interruzioni dell'audio dall'inizio {tip}</span>"
   ],
   "<span style='color:{warn}'><b>{key}</b> on its own would stop working for typing everywhere (chat, games, browser). Add Ctrl, Alt or Shift — or press it again to use it anyway.</span>": "<span style='color:{warn}'><b>{key}</b> da solo smetterebbe di funzionare per digitare ovunque (chat, giochi, browser). Aggiungi Ctrl, Alt o Maiusc oppure premilo di nuovo per usarlo comunque.</span>",
   "<span style='color:{warn}'>{devices} is open in another program (a music app?), so its pads can't be used here. Close that program and it's picked up in a few seconds.</span>": "<span style='color:{warn}'>{devices} è aperto in un altro programma (un'app musicale?), quindi i suoi pad non possono essere utilizzati qui. Chiudi quel programma e verrà ripreso in pochi secondi.</span>",
@@ -931,8 +931,6 @@
   "End": "FINE",
   "Endpoints: {endpoints}. E.g. /api/play?name=Airhorn, /api/random?category=Memes, /api/live?on=toggle. Send the key as ?token=…, an X-Token header or Authorization: Bearer …. /api/help describes each one.": "Endpoint: {endpoints} . Ad esempio /api/play?name=Airhorn, /api/random?category=Memes, /api/live?on=toggle. Invia la chiave come ?token=…, un'intestazione X-Token o Authorization: Bearer …. /api/help descrive ciascuno di essi.",
   "Esc  close": "Esci chiudi",
-  "Every connection the app makes while it's open, and every one a switch turned away. Kept in memory only: nothing here is saved, logged or sent, and closing the app forgets it.": "Ogni connessione effettuata dall'app mentre è aperta e ognuna con un interruttore disattivato. Mantenuto solo in memoria: nulla qui viene salvato, registrato o inviato e chiudendo l'app lo si dimentica.",
-  "Every connection the app makes while it's open, and every one a switch turned away. Kept on this PC between starts (Keep a history, below), never logged or sent.": "Ogni connessione effettuata dall'app mentre è aperta e ognuna con un interruttore disattivato. Mantenuto su questo PC tra un avvio e l'altro (Conserva una cronologia, di seguito), mai registrato o inviato.",
   "Every mode in plain words, and what it's doing right now": "Ogni modalità in parole povere e cosa sta facendo in questo momento",
   "Every sound comes off the board": "Ogni suono esce dal tabellone",
   "Every sound's hotkey is cleared": "Il tasto di scelta rapida di ogni suono viene cancellato",
@@ -957,16 +955,16 @@
   "Forgets Apps tab volumes and hidden programs.": "Dimentica i volumi della scheda App e i programmi nascosti.",
   "Forgets your mic, headphones, where your sounds are sent and the stream output; the quick setup runs again.": "Dimentica il microfono, le cuffie, il luogo in cui vengono inviati i suoni e l'uscita del flusso; la configurazione rapida viene eseguita di nuovo.",
   "Found <b>{n}</b> sound in {name} with {categories} and {hotkeys}.": [
-    "",
-    ""
+    "Trovato <b>{n}</b> suono in {name} con {categories} e {hotkeys} .",
+    "Trovato <b>{n}</b> suoni in {name} con {categories} e {hotkeys} ."
   ],
   "Found <b>{n}</b> sound in {name} with {what}.": [
-    "",
-    ""
+    "Trovato <b>{n}</b> suono in {name} con {what} .",
+    "Trovato <b>{n}</b> suoni in {name} con {what} ."
   ],
   "Found <b>{n}</b> sound in {name}.": [
-    "",
-    ""
+    "Trovato <b>{n}</b> suono in {name} .",
+    "Trovato <b>{n}</b> suoni in {name} ."
   ],
   "The Discord is where to chat, ask for help and hear about new versions. Found a bug or missing something? Everything opens in your browser, and nothing is sent unless you submit it there.": "Sul Discord puoi chiacchierare, chiedere aiuto e sapere delle nuove versioni. Hai trovato un bug o ti manca qualcosa? Si apre tutto nel tuo browser, e non viene inviato niente finché non lo invii tu da lì.",
   "Free add-ons from GitHub. Removing or reinstalling one keeps your triggers and paired phones.": "Componenti aggiuntivi gratuiti da GitHub. La rimozione o la reinstallazione di uno mantiene i trigger e i telefoni associati.",
@@ -1016,8 +1014,8 @@
   "Important fix in Onion Watch {version}: {fix}": "Correzione importante in Onion Watch {version} : {fix}",
   "Important fix: {fix}": "Correzione importante: {fix}",
   "Imported {n} sound ({skipped} already in your library)": [
-    "",
-    ""
+    "Suono {n} importato ( {skipped} già presente nella tua libreria)",
+    "{n} suoni importati ( {skipped} già nella tua libreria)"
   ],
   "Import…": "Importare…",
   "In Discord, click the ⚙ gear next to your name (<b>User Settings</b>) → <b>Voice &amp; Video</b>.": "In Discord, click the ⚙ gear next to your name (<b>User Settings</b>) → <b>Voice &amp; Video</b>.",
@@ -1192,8 +1190,8 @@
   "Pick where your sounds go instead. Onion Board plays them (and your voice, if you send it) into that device, and whatever listens to it gets them: OBS (<b>Audio Output Capture</b>), Voicemeeter, a mixer or a capture card.": "Scegli invece dove vanno i tuoi suoni. Onion Board li riproduce (e la tua voce, se la invii) in quel dispositivo, e qualunque cosa ascolti li ottiene: OBS ( <b>Audio Output Capture</b> ), Voicemeeter, un mixer o una scheda di acquisizione.",
   "Pick your headphones or speakers, then press <b>Play a test sound</b>. Only you hear this.": "Scegli le cuffie o gli altoparlanti, quindi premi <b>Riproduci un suono di prova</b> . Solo tu lo senti.",
   "Picture pasted on {n} pad.": [
-    "",
-    ""
+    "Immagine incollata sul pad {n} .",
+    "Immagine incollata su {n} pad."
   ],
   "Pictures ({patterns})": "Immagini ({patterns})",
   "Pink": "Rosa",
@@ -1250,8 +1248,8 @@
   "Remove hotkey": "Rimuovi il tasto di scelta rapida",
   "Remove the Onion Pocket add-on from Onion Board? Phones won't be able to play your pads any more. Paired phones are kept for when you get it again.\n\nYou can get it again from Settings → Remote any time.": "Rimuovere il componente aggiuntivo Onion Pocket da Onion Board? I telefoni non saranno più in grado di riprodurre i tuoi pad. I telefoni accoppiati vengono conservati per quando li riceverai di nuovo. Puoi recuperarlo di nuovo da Impostazioni → Remoto in qualsiasi momento.",
   "Remove this {n} sound?\n\nRemoved sounds go to Recently deleted, where you can bring them back for {keep_days} days.": [
-    "",
-    ""
+    "Rimuovere questo suono {n} ? I suoni rimossi vanno in Eliminati di recente, dove puoi ripristinarli per {keep_days} giorni.",
+    "Rimuovere questi {n} suoni? I suoni rimossi vanno in Eliminati di recente, dove puoi ripristinarli per {keep_days} giorni."
   ],
   "Remove {name}": "Rimuovi {name}",
   "Removed “{name}” — Who's listening is Off now": "Rimosso \"{name}\": chi sta ascoltando è disattivato ora",
@@ -1573,8 +1571,8 @@
   "mono": "mono",
   "not set": "non impostato",
   "nothing has played on this PC in the last {n} second": [
-    "",
-    ""
+    "non è stato riprodotto nulla su questo PC negli ultimi {n} secondi",
+    "non è stato riprodotto nulla su questo PC negli ultimi {n} secondi"
   ],
   "off": "spento",
   "ooh, for me?!": "oh, per me?!",
@@ -1599,30 +1597,30 @@
   "your virtual cable": "il tuo cavo virtuale",
   "yt-dlp isn't installed.": "yt-dlp non è installato.",
   "{bytes} byte in all": [
-    "",
-    ""
+    "{bytes} byte in tutto",
+    "{bytes} byte in tutto"
   ],
   "{bytes} byte received": [
-    "",
-    ""
+    "{bytes} byte ricevuti",
+    "{bytes} byte ricevuti"
   ],
   "{bytes} byte sent": [
-    "",
-    ""
+    "{bytes} byte inviati",
+    "{bytes} byte inviati"
   ],
   "{connections} in the saved history, from {since}: ↑ {sent} sent, ↓ {received} received, {total} in all.": "{connections} nella cronologia salvata, da {since} : ↑ {sent} inviato, ↓ {received} ricevuto, {total} in tutto.",
   "{connections} since the app started (tick Keep a history to add up across starts), from {since}: ↑ {sent} sent, ↓ {received} received, {total} in all.": "{connections} dall'avvio dell'app (selezionare Keep a History to Add Up across Starts), da {since} : ↑ {sent} inviato, ↓ {received} ricevuto, {total} in tutto.",
   "{count} comment": [
-    "",
-    ""
+    "{count} commento",
+    "{count} commenti"
   ],
   "{count} like": [
-    "",
-    ""
+    "{count} piace",
+    "{count} Mi piace"
   ],
   "{count} view": [
-    "",
-    ""
+    "{count} visualizzazione",
+    "{count} visualizzazioni"
   ],
   "{error}\n\nTry again any time from the Setup tab.": "{error} Riprova in qualsiasi momento dalla scheda Configurazione.",
   "{error}. Repair it below, or send through the virtual cable instead.": "{error} . Riparalo di seguito o invialo tramite il cavo virtuale.",
@@ -1646,52 +1644,52 @@
   "{name}'s noise suppression (Krisp) is wiping out your sounds. Set Noise Suppression to None.": "La soppressione del rumore di {name} (Krisp) sta cancellando i tuoi suoni. Impostare Soppressione del rumore su Nessuna.",
   "{name}'s noise suppression is eating your sounds. Set Noise Suppression to None.": "La soppressione del rumore di {name} sta mangiando i tuoi suoni. Impostare Soppressione del rumore su Nessuna.",
   "{n} blocked": [
-    "",
-    ""
+    "{n} bloccato",
+    "{n} bloccato"
   ],
   "{n} category": [
-    "",
-    ""
+    "{n} categoria",
+    "{n} categorie"
   ],
   "{n} connection to {places}": [
-    "",
-    ""
+    "{n} collegamento a {places}",
+    "{n} collegamenti a {places}"
   ],
   "{n} connection to {servers}, {blocked} blocked by a switch.": [
-    "",
-    ""
+    "{n} connessione a {servers} , {blocked} bloccata da un interruttore.",
+    "{n} connessioni a {servers} , {blocked} bloccate da un interruttore."
   ],
   "{n} connection to {servers}.": [
-    "",
-    ""
+    "{n} connessione a {servers} .",
+    "{n} connessioni a {servers} ."
   ],
   "{n} device reconnect": [
-    "",
-    ""
+    "{n} dispositivo si riconnette",
+    "{n} dispositivo si riconnette"
   ],
   "{n} drop-out": [
-    "",
-    ""
+    "{n} abbandono",
+    "{n} abbandoni"
   ],
   "{n} failed": [
-    "",
-    ""
+    "{n} non sono riusciti",
+    "{n} non sono riusciti"
   ],
   "{n} hotkey": [
-    "",
-    ""
+    "{n} tasto di scelta rapida",
+    "{n} tasti di scelta rapida"
   ],
   "{n} more can't be brought over (the file was moved or deleted, or isn't a sound): {names}": [
-    "",
-    ""
+    "Impossibile trasferirne altri {n} (il file è stato spostato o eliminato oppure non viene emesso alcun suono): {names}",
+    "Impossibile trasferirne altri {n} (il file è stato spostato o eliminato oppure non viene emesso alcun suono): {names}"
   ],
   "{n} server": [
-    "",
-    ""
+    "{n} server",
+    "{n} server"
   ],
   "{n} site": [
-    "",
-    ""
+    "{n} sito",
+    "{n} siti"
   ],
   "{percent} %": "{percent} %",
   "{program}    (already set)": "{program} (già impostato)",
@@ -1724,8 +1722,8 @@
   "✓ Done": "✓ Fatto",
   "✓ Exported": "✓ Esportato",
   "✓ Found {n} device": [
-    "",
-    ""
+    "✓ Trovato {n} dispositivo",
+    "✓ Trovati {n} dispositivi"
   ],
   "✓ Got Tor": "✓ Ho Tor",
   "✓ New key made": "✓ Nuova chiave realizzata",
@@ -2653,6 +2651,9 @@
     "✓ {n} voce",
     "✓ {n} voci"
   ],
-  "<b>Input Mode</b>: <b>Push to Talk</b> works best (set the same key under Settings → Hotkeys → Auto push-to-talk and Onion Board holds it for you while a sound plays). On <b>Voice Activity</b>, turn off <b>Automatically determine input sensitivity</b> and drag the slider almost all the way left, or quiet parts of your sounds get cut.": "",
-  "Listening…": "In ascolto…"
+  "Listening…": "In ascolto…",
+  "Every connection the app makes while it's open, and every one a switch turned away.": "Ogni connessione effettuata dall'app mentre è aperta e ognuna con un interruttore disattivato.",
+  "Every connection the app makes while it's open, and every one a switch turned away. Kept on this PC between starts (Keep a history, below), never sent.": "Ogni connessione effettuata dall'app mentre è aperta e ognuna con un interruttore disattivato. Conservato su questo PC tra un avvio e l'altro (Conserva una cronologia, di seguito), mai inviato.",
+  "Keep an app log": "Conserva un registro dell'app",
+  "The app writes what it does to onionboard.log in its folder (3 MB at most), so a problem can be looked into. It can name a site a download or radio station failed on. Nothing is sent anywhere. Unticking it stops the log and deletes it.": "L'app scrive ciò che fa su cipolla.log nella sua cartella (3 MB al massimo), quindi è possibile esaminare un problema. Può nominare un sito su cui il download o la stazione radio non sono riusciti. Niente viene inviato da nessuna parte. Deselezionandolo si interrompe il registro e lo si elimina."
 }

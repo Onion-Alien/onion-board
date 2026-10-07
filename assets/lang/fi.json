@@ -422,8 +422,6 @@
   "End": "Loppu",
   "Endpoints: {endpoints}. E.g. /api/play?name=Airhorn, /api/random?category=Memes, /api/live?on=toggle. Send the key as ?token=…, an X-Token header or Authorization: Bearer …. /api/help describes each one.": "Päätepisteet: {endpoints}. Esim. /api/play?name=Airhorn, /api/random?category=Memes, /api/live?on=toggle. Lähetä avain muodossa ?token=…, X-Token-otsakkeena tai Authorization: Bearer …. /api/help kuvaa jokaisen.",
   "Esc  close": "Esc  sulje",
-  "Every connection the app makes while it's open, and every one a switch turned away. Kept in memory only: nothing here is saved, logged or sent, and closing the app forgets it.": "Jokainen yhteys, jonka sovellus tekee ollessaan auki, ja jokainen, jonka jokin kytkin käänsi pois. Säilytetään vain muistissa: mitään tästä ei tallenneta, kirjata eikä lähetetä, ja sovelluksen sulkeminen unohtaa sen.",
-  "Every connection the app makes while it's open, and every one a switch turned away. Kept on this PC between starts (Keep a history, below), never logged or sent.": "Jokainen yhteys, jonka sovellus tekee ollessaan auki, ja jokainen, jonka jokin kytkin käänsi pois. Säilytetään tällä PC:llä käynnistysten välillä (Säilytä historia, alla), ei koskaan kirjata eikä lähetetä.",
   "Every mode in plain words, and what it's doing right now": "Jokainen tila selkokielellä, ja mitä se tekee juuri nyt",
   "Every sound": "Jokainen ääni",
   "Every sound comes off the board": "Jokainen ääni poistetaan boardilta",
@@ -2652,5 +2650,10 @@
   "✓ {n} voice": [
     "✓ {n} ääni",
     "✓ {n} ääntä"
-  ]
+  ],
+  "Every connection the app makes while it's open, and every one a switch turned away.": "Jokainen yhteys, jonka sovellus tekee, kun se on auki, ja jokainen kytkin on käännetty pois päältä.",
+  "Every connection the app makes while it's open, and every one a switch turned away. Kept on this PC between starts (Keep a history, below), never sent.": "Jokainen yhteys, jonka sovellus tekee, kun se on auki, ja jokainen kytkin on käännetty pois päältä. Säilytetty tällä tietokoneella käynnistysten välillä (Säilytä historia, alla), ei lähetetty.",
+  "Keep an app log": "Pidä sovelluslokia",
+  "Listening…": "Kuuntelee…",
+  "The app writes what it does to onionboard.log in its folder (3 MB at most), so a problem can be looked into. It can name a site a download or radio station failed on. Nothing is sent anywhere. Unticking it stops the log and deletes it.": "Sovellus kirjoittaa mitä se tekee onionboard.log-kansioon (enintään 3 Mt), joten ongelmaa voidaan tutkia. Se voi nimetä sivuston, jonka lataus tai radioasema epäonnistui. Mitään ei lähetetä minnekään. Sen valinnan poistaminen pysäyttää lokin ja poistaa sen."
 }

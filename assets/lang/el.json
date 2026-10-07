@@ -422,8 +422,6 @@
   "End": "Τέλος",
   "Endpoints: {endpoints}. E.g. /api/play?name=Airhorn, /api/random?category=Memes, /api/live?on=toggle. Send the key as ?token=…, an X-Token header or Authorization: Bearer …. /api/help describes each one.": "Endpoints: {endpoints}. Π.χ. /api/play?name=Airhorn, /api/random?category=Memes, /api/live?on=toggle. Στείλε το κλειδί ως ?token=…, header X-Token ή Authorization: Bearer …. Το /api/help περιγράφει το καθένα.",
   "Esc  close": "Esc  κλείσιμο",
-  "Every connection the app makes while it's open, and every one a switch turned away. Kept in memory only: nothing here is saved, logged or sent, and closing the app forgets it.": "Κάθε σύνδεση που κάνει η εφαρμογή όσο είναι ανοιχτή, και κάθε μία που μπλόκαρε ένας διακόπτης. Κρατιούνται μόνο στη μνήμη: τίποτα εδώ δεν αποθηκεύεται, καταγράφεται ή στέλνεται, και το κλείσιμο της εφαρμογής τα ξεχνάει.",
-  "Every connection the app makes while it's open, and every one a switch turned away. Kept on this PC between starts (Keep a history, below), never logged or sent.": "Κάθε σύνδεση που κάνει η εφαρμογή όσο είναι ανοιχτή, και κάθε μία που μπλόκαρε ένας διακόπτης. Κρατιούνται σε αυτό το PC ανάμεσα στις εκκινήσεις (Κράτα ιστορικό, παρακάτω), ποτέ δεν καταγράφονται ή στέλνονται.",
   "Every mode in plain words, and what it's doing right now": "Κάθε λειτουργία με απλά λόγια, και τι κάνει αυτή τη στιγμή",
   "Every sound": "Κάθε ήχος",
   "Every sound comes off the board": "Όλοι οι ήχοι βγαίνουν από τον πίνακα",
@@ -2652,5 +2650,10 @@
   "✓ {n} voice": [
     "✓ {n} φωνή",
     "✓ {n} φωνές"
-  ]
+  ],
+  "Every connection the app makes while it's open, and every one a switch turned away.": "Κάθε σύνδεση που πραγματοποιεί η εφαρμογή ενώ είναι ανοιχτή, και κάθε μια διακόπτης στρέφεται.",
+  "Every connection the app makes while it's open, and every one a switch turned away. Kept on this PC between starts (Keep a history, below), never sent.": "Κάθε σύνδεση που πραγματοποιεί η εφαρμογή ενώ είναι ανοιχτή, και κάθε μια διακόπτης στρέφεται. Διατηρήθηκε σε αυτόν τον υπολογιστή μεταξύ των εκκινήσεων (Κρατήστε ιστορικό, παρακάτω), δεν εστάλη ποτέ.",
+  "Keep an app log": "Διατηρήστε ένα αρχείο καταγραφής εφαρμογής",
+  "Listening…": "Ακούγοντας…",
+  "The app writes what it does to onionboard.log in its folder (3 MB at most), so a problem can be looked into. It can name a site a download or radio station failed on. Nothing is sent anywhere. Unticking it stops the log and deletes it.": "Η εφαρμογή γράφει τι κάνει στο onionboard.log στον φάκελό της (3 MB το πολύ), ώστε να μπορεί να εξεταστεί ένα πρόβλημα. Μπορεί να ονομάσει έναν ιστότοπο στον οποίο η λήψη ή ο ραδιοφωνικός σταθμός απέτυχε. Τίποτα δεν αποστέλλεται πουθενά. Η κατάργησή του διακόπτει το αρχείο καταγραφής και το διαγράφει."
 }

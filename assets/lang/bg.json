@@ -422,8 +422,6 @@
   "End": "Край",
   "Endpoints: {endpoints}. E.g. /api/play?name=Airhorn, /api/random?category=Memes, /api/live?on=toggle. Send the key as ?token=…, an X-Token header or Authorization: Bearer …. /api/help describes each one.": "Адреси: {endpoints}. Напр. /api/play?name=Airhorn, /api/random?category=Memes, /api/live?on=toggle. Прати ключа като ?token=…, заглавка X-Token или Authorization: Bearer …. /api/help описва всеки от тях.",
   "Esc  close": "Esc  затвори",
-  "Every connection the app makes while it's open, and every one a switch turned away. Kept in memory only: nothing here is saved, logged or sent, and closing the app forgets it.": "Всяка връзка, която приложението прави, докато е отворено, и всяка, която някой превключвател е спрял. Пази се само в паметта: нищо оттук не се запазва, записва или праща, а затварянето на приложението го забравя.",
-  "Every connection the app makes while it's open, and every one a switch turned away. Kept on this PC between starts (Keep a history, below), never logged or sent.": "Всяка връзка, която приложението прави, докато е отворено, и всяка, която някой превключвател е спрял. Пази се на този компютър между стартиранията (Пази история, по-долу), никога не се записва в дневник и не се праща.",
   "Every mode in plain words, and what it's doing right now": "Всеки режим с прости думи и какво прави в момента",
   "Every sound": "Всеки звук",
   "Every sound comes off the board": "Всички звуци се махат от борда",
@@ -2652,5 +2650,10 @@
   "✓ {n} voice": [
     "✓ {n} глас",
     "✓ {n} гласа"
-  ]
+  ],
+  "Every connection the app makes while it's open, and every one a switch turned away.": "Всяка връзка, която приложението прави, докато е отворено, и всяка превключена превключвател.",
+  "Every connection the app makes while it's open, and every one a switch turned away. Kept on this PC between starts (Keep a history, below), never sent.": "Всяка връзка, която приложението прави, докато е отворено, и всяка превключена превключвател. Съхранява се на този компютър между стартиранията (Пази се история по-долу), никога не се изпраща.",
+  "Keep an app log": "Съхранявайте дневник на приложението",
+  "Listening…": "Слушам...",
+  "The app writes what it does to onionboard.log in its folder (3 MB at most), so a problem can be looked into. It can name a site a download or radio station failed on. Nothing is sent anywhere. Unticking it stops the log and deletes it.": "Приложението пише какво прави в onionboard.log в своята папка (най-много 3 MB), така че проблемът може да бъде разгледан. Може да посочи сайт, на който изтеглянето или радиостанцията са неуспешни. Нищо не се изпраща никъде. Премахването на отметката спира дневника и го изтрива."
 }

@@ -422,8 +422,6 @@
   "End": "Slutt",
   "Endpoints: {endpoints}. E.g. /api/play?name=Airhorn, /api/random?category=Memes, /api/live?on=toggle. Send the key as ?token=…, an X-Token header or Authorization: Bearer …. /api/help describes each one.": "Endepunkter: {endpoints}. F.eks. /api/play?name=Airhorn, /api/random?category=Memes, /api/live?on=toggle. Send nøkkelen som ?token=…, en X-Token-header eller Authorization: Bearer …. /api/help beskriver hvert av dem.",
   "Esc  close": "Esc  lukk",
-  "Every connection the app makes while it's open, and every one a switch turned away. Kept in memory only: nothing here is saved, logged or sent, and closing the app forgets it.": "Hver tilkobling appen gjør mens den er åpen, og hver en bryter avviste. Holdes bare i minnet: ingenting her lagres, logges eller sendes, og når appen lukkes, glemmes det.",
-  "Every connection the app makes while it's open, and every one a switch turned away. Kept on this PC between starts (Keep a history, below), never logged or sent.": "Hver tilkobling appen gjør mens den er åpen, og hver en bryter avviste. Lagres på denne PC-en mellom oppstarter (Behold historikk, nedenfor), logges eller sendes aldri.",
   "Every mode in plain words, and what it's doing right now": "Hver modus med enkle ord, og hva den gjør akkurat nå",
   "Every sound": "Alle lyder",
   "Every sound comes off the board": "Alle lyder fjernes fra brettet",
@@ -2652,5 +2650,10 @@
   "✓ {n} voice": [
     "✓ {n} stemme",
     "✓ {n} stemmer"
-  ]
+  ],
+  "Every connection the app makes while it's open, and every one a switch turned away.": "Hver tilkobling appen oppretter mens den er åpen, og hver eneste en bryter vendt bort.",
+  "Every connection the app makes while it's open, and every one a switch turned away. Kept on this PC between starts (Keep a history, below), never sent.": "Hver tilkobling appen oppretter mens den er åpen, og hver eneste en bryter vendt bort. Oppbevares på denne PC-en mellom oppstart (Bevar historikk nedenfor), aldri sendt.",
+  "Keep an app log": "Hold en applogg",
+  "Listening…": "Lytter …",
+  "The app writes what it does to onionboard.log in its folder (3 MB at most), so a problem can be looked into. It can name a site a download or radio station failed on. Nothing is sent anywhere. Unticking it stops the log and deletes it.": "Appen skriver hva den gjør til onionboard.log i mappen sin (3 MB på det meste), slik at et problem kan undersøkes. Den kan navngi et nettsted som en nedlasting eller radiostasjon mislyktes på. Ingenting sendes noe sted. Hvis du fjerner merket, stopper loggen og sletter den."
 }

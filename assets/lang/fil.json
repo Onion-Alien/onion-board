@@ -422,8 +422,6 @@
   "End": "Dulo",
   "Endpoints: {endpoints}. E.g. /api/play?name=Airhorn, /api/random?category=Memes, /api/live?on=toggle. Send the key as ?token=…, an X-Token header or Authorization: Bearer …. /api/help describes each one.": "Endpoints: {endpoints}. Hal. /api/play?name=Airhorn, /api/random?category=Memes, /api/live?on=toggle. Ipadala ang key bilang ?token=…, X-Token header o Authorization: Bearer …. Inilalarawan ng /api/help ang bawat isa.",
   "Esc  close": "Esc  isara",
-  "Every connection the app makes while it's open, and every one a switch turned away. Kept in memory only: nothing here is saved, logged or sent, and closing the app forgets it.": "Bawat connection na ginagawa ng app habang bukas ito, at bawat isang tinanggihan ng switch. Sa memory lang nakatago: walang sine-save, nilo-log o ipinapadala dito, at nakakalimutan ito pagsara ng app.",
-  "Every connection the app makes while it's open, and every one a switch turned away. Kept on this PC between starts (Keep a history, below), never logged or sent.": "Bawat connection na ginagawa ng app habang bukas ito, at bawat isang tinanggihan ng switch. Nakatago sa PC na ito sa pagitan ng mga start (Itago ang history, sa ibaba), hindi kailanman nilo-log o ipinapadala.",
   "Every mode in plain words, and what it's doing right now": "Bawat mode sa simpleng salita, at ano ang ginagawa nito ngayon",
   "Every sound": "Bawat sound",
   "Every sound comes off the board": "Aalisin sa board ang bawat sound",
@@ -2652,5 +2650,10 @@
   "✓ {n} voice": [
     "✓ {n} boses",
     "✓ {n} mga boses"
-  ]
+  ],
+  "Every connection the app makes while it's open, and every one a switch turned away.": "Bawat koneksyon na ginagawa ng app habang bukas ito, at bawat isa ay tumalikod.",
+  "Every connection the app makes while it's open, and every one a switch turned away. Kept on this PC between starts (Keep a history, below), never sent.": "Bawat koneksyon na ginagawa ng app habang bukas ito, at bawat isa ay tumalikod. Pinananatili sa PC na ito sa pagitan ng mga pagsisimula (Panatilihin ang isang kasaysayan, sa ibaba), hindi kailanman naipadala.",
+  "Keep an app log": "Panatilihin ang isang log ng app",
+  "Listening…": "Nakikinig...",
+  "The app writes what it does to onionboard.log in its folder (3 MB at most), so a problem can be looked into. It can name a site a download or radio station failed on. Nothing is sent anywhere. Unticking it stops the log and deletes it.": "Isinulat ng app kung ano ang ginagawa nito sa onionboard.log sa folder nito (3 MB sa pinakamaraming), para matingnan ang isang problema. Maaari nitong pangalanan ang isang site kung saan nabigo ang pag-download o istasyon ng radyo. Walang ipinapadala kahit saan. Ang pag-uncheck nito ay huminto sa log at nagtatanggal nito."
 }

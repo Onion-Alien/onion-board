@@ -418,8 +418,6 @@
   "End": "Tamat",
   "Endpoints: {endpoints}. E.g. /api/play?name=Airhorn, /api/random?category=Memes, /api/live?on=toggle. Send the key as ?token=…, an X-Token header or Authorization: Bearer …. /api/help describes each one.": "Titik akhir: {endpoints}. Cth. /api/play?name=Airhorn, /api/random?category=Memes, /api/live?on=toggle. Hantar kunci sebagai ?token=…, pengepala X-Token atau Authorization: Bearer …. /api/help menerangkan setiap satu.",
   "Esc  close": "Esc  tutup",
-  "Every connection the app makes while it's open, and every one a switch turned away. Kept in memory only: nothing here is saved, logged or sent, and closing the app forgets it.": "Setiap sambungan yang dibuat aplikasi semasa ia dibuka, dan setiap satu yang ditolak oleh suis. Disimpan dalam memori sahaja: tiada apa di sini disimpan, dilog atau dihantar, dan menutup aplikasi melupakannya.",
-  "Every connection the app makes while it's open, and every one a switch turned away. Kept on this PC between starts (Keep a history, below), never logged or sent.": "Setiap sambungan yang dibuat aplikasi semasa ia dibuka, dan setiap satu yang ditolak oleh suis. Disimpan di PC ini antara permulaan (Simpan sejarah, di bawah), tidak pernah dilog atau dihantar.",
   "Every mode in plain words, and what it's doing right now": "Setiap mod dalam bahasa mudah, dan apa yang ia sedang lakukan sekarang",
   "Every sound": "Setiap bunyi",
   "Every sound comes off the board": "Setiap bunyi dikeluarkan dari board",
@@ -2598,5 +2596,10 @@
   "✓ {language} voice found: {voice} speaks from the next line on.": "✓ {language} suara ditemui: {voice} bercakap dari baris seterusnya pada.",
   "✓ {n} voice": [
     "✓ {n} suara"
-  ]
+  ],
+  "Every connection the app makes while it's open, and every one a switch turned away.": "Setiap sambungan yang dibuat apl semasa ia dibuka dan setiap sambungan dimatikan.",
+  "Every connection the app makes while it's open, and every one a switch turned away. Kept on this PC between starts (Keep a history, below), never sent.": "Setiap sambungan yang dibuat apl semasa ia dibuka dan setiap sambungan dimatikan. Disimpan pada PC ini antara permulaan (Simpan sejarah, di bawah), tidak pernah dihantar.",
+  "Keep an app log": "Simpan log apl",
+  "Listening…": "Mendengar…",
+  "The app writes what it does to onionboard.log in its folder (3 MB at most), so a problem can be looked into. It can name a site a download or radio station failed on. Nothing is sent anywhere. Unticking it stops the log and deletes it.": "Apl menulis perkara yang dilakukannya pada onionboard.log dalam foldernya (paling banyak 3 MB), jadi masalah boleh dilihat. Ia boleh menamakan tapak yang gagal muat turun atau stesen radio. Tiada apa-apa dihantar ke mana-mana. Menyahtanda ia menghentikan log dan memadamkannya."
 }

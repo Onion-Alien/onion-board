@@ -422,8 +422,6 @@
   "End": "Fin",
   "Endpoints: {endpoints}. E.g. /api/play?name=Airhorn, /api/random?category=Memes, /api/live?on=toggle. Send the key as ?token=…, an X-Token header or Authorization: Bearer …. /api/help describes each one.": "Endpoints: {endpoints}. Por ejemplo /api/play?name=Airhorn, /api/random?category=Memes, /api/live?on=toggle. Envía la clave como ?token=…, un encabezado X-Token o Authorization: Bearer …. /api/help describe cada uno.",
   "Esc  close": "Esc  cerrar",
-  "Every connection the app makes while it's open, and every one a switch turned away. Kept in memory only: nothing here is saved, logged or sent, and closing the app forgets it.": "Cada conexión que hace la app mientras está abierta, y cada una que bloqueó un interruptor. Se guarda solo en memoria: aquí no se guarda, registra ni envía nada, y al cerrar la app se olvida.",
-  "Every connection the app makes while it's open, and every one a switch turned away. Kept on this PC between starts (Keep a history, below), never logged or sent.": "Cada conexión que hace la app mientras está abierta, y cada una que bloqueó un interruptor. Se guarda en esta PC entre inicios (Guardar un historial, abajo), nunca se registra ni se envía.",
   "Every mode in plain words, and what it's doing right now": "Cada modo en palabras simples, y lo que está haciendo ahora mismo",
   "Every sound": "Todos los sonidos",
   "Every sound comes off the board": "Todos los sonidos salen del tablero",
@@ -2652,5 +2650,10 @@
   "✓ {n} voice": [
     "✓ {n} voz",
     "✓ {n} voces"
-  ]
+  ],
+  "Every connection the app makes while it's open, and every one a switch turned away.": "Cada conexión que realiza la aplicación mientras está abierta y cada una de ellas es un interruptor desactivado.",
+  "Every connection the app makes while it's open, and every one a switch turned away. Kept on this PC between starts (Keep a history, below), never sent.": "Cada conexión que realiza la aplicación mientras está abierta y cada una de ellas es un interruptor desactivado. Mantenido en esta PC entre inicios (Mantener un historial, a continuación), nunca enviado.",
+  "Keep an app log": "Mantener un registro de aplicaciones",
+  "Listening…": "Escuchando…",
+  "The app writes what it does to onionboard.log in its folder (3 MB at most), so a problem can be looked into. It can name a site a download or radio station failed on. Nothing is sent anywhere. Unticking it stops the log and deletes it.": "La aplicación escribe lo que hace en cebollaboard.log en su carpeta (3 MB como máximo), por lo que se puede investigar el problema. Puede nombrar un sitio en el que falló una descarga o una estación de radio. No se envía nada a ninguna parte. Al desmarcarlo se detiene el registro y se elimina."
 }

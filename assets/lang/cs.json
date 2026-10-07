@@ -426,8 +426,6 @@
   "End": "Konec",
   "Endpoints: {endpoints}. E.g. /api/play?name=Airhorn, /api/random?category=Memes, /api/live?on=toggle. Send the key as ?token=…, an X-Token header or Authorization: Bearer …. /api/help describes each one.": "Koncové body: {endpoints}. Např. /api/play?name=Airhorn, /api/random?category=Memes, /api/live?on=toggle. Klíč pošli jako ?token=…, hlavičku X-Token nebo Authorization: Bearer …. /api/help popisuje každý z nich.",
   "Esc  close": "Esc  zavřít",
-  "Every connection the app makes while it's open, and every one a switch turned away. Kept in memory only: nothing here is saved, logged or sent, and closing the app forgets it.": "Každé spojení, které aplikace naváže, dokud je otevřená, a každé, které zastavil přepínač. Drží se jen v paměti: nic z toho se neukládá, nezaznamenává ani neposílá a zavřením aplikace se to zapomene.",
-  "Every connection the app makes while it's open, and every one a switch turned away. Kept on this PC between starts (Keep a history, below), never logged or sent.": "Každé spojení, které aplikace naváže, dokud je otevřená, a každé, které zastavil přepínač. Uchovává se na tomto PC mezi spuštěními (Uchovávat historii, níže), nikdy se nezaznamenává ani neposílá.",
   "Every mode in plain words, and what it's doing right now": "Každý režim jednoduše vysvětlený a co právě dělá",
   "Every sound": "Všechny zvuky",
   "Every sound comes off the board": "Všechny zvuky zmizí z boardu",
@@ -2706,5 +2704,10 @@
     "✓ {n} hlas",
     "✓ {n} hlasů",
     "✓ {n} hlasů"
-  ]
+  ],
+  "Every connection the app makes while it's open, and every one a switch turned away.": "Každé připojení, které aplikace vytvoří, když je otevřená, a každé otočení přepínače.",
+  "Every connection the app makes while it's open, and every one a switch turned away. Kept on this PC between starts (Keep a history, below), never sent.": "Každé připojení, které aplikace vytvoří, když je otevřená, a každé otočení přepínače. Ponecháno na tomto počítači mezi spuštěními (Uchovat historii níže), nikdy neodesláno.",
+  "Keep an app log": "Udržujte protokol aplikace",
+  "Listening…": "Naslouchání…",
+  "The app writes what it does to onionboard.log in its folder (3 MB at most), so a problem can be looked into. It can name a site a download or radio station failed on. Nothing is sent anywhere. Unticking it stops the log and deletes it.": "Aplikace zapisuje, co dělá, do onionboard.log ve své složce (maximálně 3 MB), takže je možné hledat problém. Může pojmenovat web, na kterém selhalo stahování nebo rádio. Nikam se nic neposílá. Zrušením zaškrtnutí se záznam zastaví a smaže se."
 }

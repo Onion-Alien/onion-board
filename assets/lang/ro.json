@@ -426,8 +426,6 @@
   "End": "Sfârșit",
   "Endpoints: {endpoints}. E.g. /api/play?name=Airhorn, /api/random?category=Memes, /api/live?on=toggle. Send the key as ?token=…, an X-Token header or Authorization: Bearer …. /api/help describes each one.": "Endpoint-uri: {endpoints}. De ex. /api/play?name=Airhorn, /api/random?category=Memes, /api/live?on=toggle. Trimite cheia ca ?token=…, un header X-Token sau Authorization: Bearer …. /api/help descrie fiecare endpoint.",
   "Esc  close": "Esc  închide",
-  "Every connection the app makes while it's open, and every one a switch turned away. Kept in memory only: nothing here is saved, logged or sent, and closing the app forgets it.": "Fiecare conexiune pe care o face aplicația cât e deschisă, și fiecare oprită de un comutator. Ținute doar în memorie: nimic de aici nu e salvat, jurnalizat sau trimis, iar închiderea aplicației le uită.",
-  "Every connection the app makes while it's open, and every one a switch turned away. Kept on this PC between starts (Keep a history, below), never logged or sent.": "Fiecare conexiune pe care o face aplicația cât e deschisă, și fiecare oprită de un comutator. Păstrate pe PC-ul ăsta între porniri (Păstrează un istoric, mai jos), niciodată jurnalizate sau trimise.",
   "Every mode in plain words, and what it's doing right now": "Fiecare mod în cuvinte simple, și ce face chiar acum",
   "Every sound": "Fiecare sunet",
   "Every sound comes off the board": "Toate sunetele dispar de pe tablă",
@@ -2706,5 +2704,10 @@
     "✓ {n} voce",
     "✓ {n} voci",
     "✓ {n} voci"
-  ]
+  ],
+  "Every connection the app makes while it's open, and every one a switch turned away.": "Fiecare conexiune pe care o face aplicația în timp ce este deschisă și fiecare un comutator a fost oprit.",
+  "Every connection the app makes while it's open, and every one a switch turned away. Kept on this PC between starts (Keep a history, below), never sent.": "Fiecare conexiune pe care o face aplicația în timp ce este deschisă și fiecare un comutator a fost oprit. Păstrat pe acest computer între porniri (Păstrați un istoric, mai jos), niciodată trimis.",
+  "Keep an app log": "Păstrați un jurnal al aplicației",
+  "Listening…": "Ascultare…",
+  "The app writes what it does to onionboard.log in its folder (3 MB at most), so a problem can be looked into. It can name a site a download or radio station failed on. Nothing is sent anywhere. Unticking it stops the log and deletes it.": "Aplicația scrie ceea ce face în onionboard.log în folderul său (cel mult 3 MB), astfel încât o problemă poate fi analizată. Poate denumi un site pe care a eșuat descărcarea sau postul de radio. Nimic nu este trimis nicăieri. Debifarea acestuia oprește jurnalul și îl șterge."
 }
