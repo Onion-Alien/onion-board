@@ -59,9 +59,25 @@ class Limiter:
         self.fhist = np.ones(self.hold - 1, F32)        # the box filter's last outputs
         self.rel = RELEASE_DB_S / rate                 # dB per sample
         self.reduction_db = 0.0                        # deepest gain cut in the last block
+        self._resting = 0   # zeros fed through the gain-1 fast path since anything else
+        self._fast = False  # the last block took that path
+
+    def silence(self, n: int) -> np.ndarray | None:
+        """process() of n silent frames, or None when that is n zeros with nothing
+        changed: the gain is at rest and the delay line holds only silence. With
+        nothing playing that's every block, and costs nothing."""
+        if self._resting >= self.la:
+            return None
+        was = self._resting
+        out = self.process(np.zeros((n, 2), F32))
+        if self._fast:   # gain 1 throughout: the delay line now ends in `was + n` zeros
+            self._resting = was + n
+        return out
 
     def process(self, x: np.ndarray) -> np.ndarray:
         n = len(x)
+        self._resting = 0
+        self._fast = False
         if n == 0:
             return x
         la = self.la
@@ -75,6 +91,7 @@ class Limiter:
             self.delay = buf[n:]
             self.need = np.ones(2 * la, F32)
             self.reduction_db = 0.0
+            self._fast = True
             return buf[:n]
         pk = np.max(np.abs(x), axis=1)
         need = np.minimum(F32(1), self.ceiling / np.maximum(pk, F32(1e-9))).astype(F32)

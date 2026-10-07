@@ -660,6 +660,11 @@ class LivePitch:
             self.shift.p = {"semitones": float(semitones), "mix": 1.0}
         return self.shift.run(x, self.rate)
 
+    def skip_silence(self, n: int):
+        """What n frames of silence at 0 st would have done (only kept as history)."""
+        h = self.shift.hist
+        self.shift._remember(np.zeros((min(n, len(h)), CH), np.float32))
+
 
 # --------------------------------------------------------------------------- voices
 
@@ -902,6 +907,7 @@ class Engine:
         self.limiter_on = True    # hold the send device's peaks at sendfx.CEILING_DB
         self._send: dict[tuple[str, str], object] = {}   # (out, kind) -> its sendfx stage
         self._quiet: dict[str, int] = {}   # out -> frames of silence on its sounds bus
+        self._idle_n: dict[str, int] = {}  # out -> frames its sounds bus skipped (_bus_idle)
         self._glides: dict = {}   # (out, what) -> the volume its last block ended at (_vol)
         self.sound_speed = 1.0        # live playback speed of every sound (0.25..4)
         self.sound_pitch = 0.0        # live pitch of every sound, semitones
@@ -1916,12 +1922,17 @@ class Engine:
             mix += self._render(out, frames, previews_only, fixed=True, makeup=makeup)
         return mix
 
-    def _pitch(self, out: str, x: np.ndarray) -> np.ndarray:
-        """Live pitch on the sounds bus: the user's shift, plus the correction that
-        undoes the speed's pitch change when keep-pitch is on."""
+    def _sound_st(self) -> float:
+        """The live pitch's shift in semitones (see _pitch)."""
         st = float(self.sound_pitch)
         if self.sound_keep_pitch and abs(self.sound_speed - 1.0) >= 1e-4:
             st -= 12.0 * float(np.log2(max(self.sound_speed, 1e-3)))
+        return st
+
+    def _pitch(self, out: str, x: np.ndarray) -> np.ndarray:
+        """Live pitch on the sounds bus: the user's shift, plus the correction that
+        undoes the speed's pitch change when keep-pitch is on."""
+        st = self._sound_st()
         f = self._spitch.get(out)
         if f is None or f.rate != self.rates[out]:   # made at 0 st too: it needs the history
             f = self._spitch[out] = LivePitch(self.rates[out])
@@ -2041,12 +2052,20 @@ class Engine:
             self._guard("mic", e)
 
     def _main(self, outdata, frames):
-        mix = self._vol("main", "sounds", self._sounds("main", frames), self.sound_vol)
-        play = peak(mix)
+        idle = self._bus_idle("main", frames)   # nothing to mix: the sounds bus is silence
+        if idle:
+            mix = np.zeros((frames, CH), np.float32)
+            self._glides[("main", "sounds")] = float(self.sound_vol)
+            play = 0.0
+        else:
+            self._wake_bus("main")
+            mix = self._vol("main", "sounds", self._sounds("main", frames), self.sound_vol)
+            play = peak(mix)
         take = self._play_take   # read once: the UI may end it meanwhile
         took = mix.copy() if take is not None and self.play_take_out == "main" else None
         r = self.ring_rmain.read(frames)
         if r is not None:
+            idle = False
             play = max(play, peak(r) * self.radio_vol)
             mix += self._vol("main", "radio", r, self.radio_vol if self.radio_live else 0.0)
             if took is not None:   # the radio as you hear it, sent out or not
@@ -2057,24 +2076,43 @@ class Engine:
         for a in self.aux:
             x = a.ring_main.read(frames)
             if x is not None:
+                idle = False
                 play = max(play, peak(x) * a.vol)
                 g = a.gain("main", lowcut) if a.live else 0.0
                 mix += self._vol("main", ("aux", a.key), x, g)
         self.level_play = max(play, self.level_play * 0.85)
+        if not idle:
+            finite(mix)
         if self.main_direct:
-            mic = self.fifo_direct.read(frames)
-            mix = self._send_bus("main", finite(mix), mic,
-                                 add_mic=self.direct_mode == directmic.MODE_REPLACE)
+            m = self.fifo_direct.read(frames)
+            add = self.direct_mode == directmic.MODE_REPLACE
+            mix = self._send_bus("main", mix, m, add_mic=add, silent=idle)
             self._direct_mic_gain()
         else:
-            mix = self._send_bus("main", finite(mix), self.ring_main.read(frames))
+            m, add = self.ring_main.read(frames), True
+            mix = self._send_bus("main", mix, m, silent=idle)
+        # still silence unless the mic went in: every stage below would only pass zeros
+        silent = idle and not (add and m is not None and self.mic_enabled and not self.mic_muted)
         # muted: others get silence (faded, not cut), nothing else changes
-        mix = self._vol("main", "send", mix, 1.0 if self.sending else 0.0)
+        if silent:
+            self._glides[("main", "send")] = 1.0 if self.sending else 0.0
+        else:
+            mix = self._vol("main", "send", mix, 1.0 if self.sending else 0.0)
         if self.limiter_on:
-            mix = self._stage("main", Limiter).process(mix)
-        soft_limit(mix)
-        outdata[:] = mix
-        self.level_main = max(peak(mix), self.level_main * 0.85)
+            lim = self._stage("main", Limiter)
+            if not silent:
+                mix = lim.process(mix)
+            else:
+                y = lim.silence(frames)   # None: at rest, zeros out
+                if y is not None:
+                    mix, silent = y, False
+        if silent:
+            outdata.fill(0)
+            self.level_main *= 0.85
+        else:
+            soft_limit(mix)
+            outdata[:] = mix
+            self.level_main = max(peak(mix), self.level_main * 0.85)
         cable = self.tap
         if cable is not None and self.main_direct:
             cable.write(mix)
@@ -2100,14 +2138,24 @@ class Engine:
             return
         # in mic check you hear the real output mix: sounds at their outgoing
         # level plus your mic, so you can judge the balance while a song plays
-        mix = self._sounds("mon", frames, previews_only=not (check or self.monitor_sounds))
+        idle = not check and self._bus_idle("mon", frames)
+        if idle:
+            mix = np.zeros((frames, CH), np.float32)
+            self._glides[("mon", "sounds")] = 1.0
+            play = 0.0
+        else:
+            self._wake_bus("mon")
+            mix = self._sounds("mon", frames, previews_only=not (check or self.monitor_sounds))
         m = self.ring_mon.read(frames)
-        mix = self._vol("mon", "sounds", mix, self.sound_vol if check else 1.0)
-        play = peak(mix)   # the main output sees the rest; this one counts with no send device too
+        if not idle:
+            mix = self._vol("mon", "sounds", mix, self.sound_vol if check else 1.0)
+            # the main output sees the rest; this one counts with no send device too
+            play = peak(mix)
         take = self._play_take   # no send device: what's playing is recorded from here
         took = mix.copy() if take is not None and self.play_take_out == "mon" else None
         r = self.ring_rmon.read(frames)
         if r is not None:
+            idle = False
             play = max(play, peak(r) * self.radio_vol)
             on = self.radio_monitor or (check and self.radio_live)
             mix += self._vol("mon", "radio", r, self.radio_vol if on else 0.0)
@@ -2119,19 +2167,30 @@ class Engine:
         for a in self.aux:
             x = a.ring_mon.read(frames)
             if x is not None:
+                idle = False
                 play = max(play, peak(x) * a.vol)
                 on = a.monitor or (check and a.live)
                 mix += self._vol("mon", ("aux", a.key), x, a.gain("mon", lowcut) if on else 0.0)
         self.level_play = max(play, self.level_play)   # _main decays it; no main: the UI does
-        finite(mix)
-        if check:   # you hear what others get: the same send stage, your mic in it
-            mix = self._send_bus("mon", mix, m)
-            if self.limiter_on:
-                mix = self._stage("mon", Limiter).process(mix)
-        elif not self._bus_quiet("mon", mix):
-            mix = self._dest("mon", self._eq("mon", "sounds", mix))
-        mix = self._vol("mon", "out", mix, self.mon_vol)
-        mix = self._stage("mon", SafetyLimiter).process(mix)
+        if idle:   # silence all the way: only the volume's glide and the limiter to keep
+            self._bus_quiet("mon", mix, silent=True)
+            self._glides[("mon", "out")] = float(self.mon_vol)
+            y = self._stage("mon", SafetyLimiter).silence(frames)
+            if y is None:
+                outdata.fill(0)
+                self.level_mon *= 0.85
+                return
+            mix = y
+        else:
+            finite(mix)
+            if check:   # you hear what others get: the same send stage, your mic in it
+                mix = self._send_bus("mon", mix, m)
+                if self.limiter_on:
+                    mix = self._stage("mon", Limiter).process(mix)
+            elif not self._bus_quiet("mon", mix):
+                mix = self._dest("mon", self._eq("mon", "sounds", mix))
+            mix = self._vol("mon", "out", mix, self.mon_vol)
+            mix = self._stage("mon", SafetyLimiter).process(mix)
         outdata[:] = mix
         self.level_mon = max(peak(mix), self.level_mon * 0.85)
 
@@ -2192,17 +2251,18 @@ class Engine:
         self.level_obs = max(peak(mix), self.level_obs * 0.85)
 
     def _send_bus(self, out: str, mix: np.ndarray, m: np.ndarray | None,
-                  add_mic: bool = True) -> np.ndarray:
+                  add_mic: bool = True, silent: bool = False) -> np.ndarray:
         """The sounds bus shaped for voice chat (EQ, destination mode, ducking under
         your voice, phase-aware mono), with the mic block `m` added on top (unless not
-        `add_mic`: the mic effect's add mode, where Windows keeps the mic itself)."""
+        `add_mic`: the mic effect's add mode, where Windows keeps the mic itself).
+        `silent`: the bus is known to be zeros (_bus_idle), so there's nothing to shape."""
         mic_on = m is not None and self.mic_enabled and not self.mic_muted
-        quiet = self._bus_quiet(out, mix)
+        quiet = self._bus_quiet(out, mix, silent)
         if not quiet:
             mix = self._dest(out, self._eq(out, "sounds", mix))
         if self.duck_db < 0 or (out, "Ducker") in self._send:
             g = self._stage(out, Ducker).process(m if mic_on else None, len(mix), self.duck_db)
-            if not isinstance(g, float):
+            if not isinstance(g, float) and not silent:
                 mix = mix * g
         # a mode that already made the bus mono (every built-in one) needs no second pass
         if self.send_mono and not quiet and not (self.dest is not None and self.dest.mono):
@@ -2243,17 +2303,47 @@ class Engine:
 
     QUIET_S = 0.5   # this long with nothing on a sounds bus: its filters have rung out
 
-    def _bus_quiet(self, out: str, mix: np.ndarray) -> bool:
+    def _bus_quiet(self, out: str, mix: np.ndarray, silent: bool = False) -> bool:
         """True once the sounds bus of `out` has carried only zeros for QUIET_S. Its EQ,
         mode shaping and mono downmix would only be filtering silence then (~1 ms of
         every 10 ms block in a voice chat mode, with nothing playing), so they're
-        skipped; their state has long decayed, and the next sound picks them up."""
-        if mix.any():
+        skipped; their state has long decayed, and the next sound picks them up.
+        `silent`: mix is known to be zeros, so there's no need to look."""
+        if not silent and mix.any():
             self._quiet[out] = 0
             return False
         n = self._quiet.get(out, 0) + len(mix)
         self._quiet[out] = n
         return n > self.QUIET_S * self.rates[out]
+
+    IDLE_FAST = True   # _bus_idle may skip the mixer (False: every block mixes, as before)
+
+    def _bus_idle(self, out: str, frames: int) -> bool:
+        """True when this block of out's sounds bus is sure to be silence that changes
+        nothing: no sound live on it, no live effect or pitch at work, and its filters
+        long rung out (_bus_quiet). The callback then skips the mixer, which with
+        nothing playing was most of the engine's CPU. _wake_bus catches up after."""
+        if not self.IDLE_FAST or self._quiet.get(out, 0) <= self.QUIET_S * self.rates[out]:
+            return False
+        if self.sound_fx or out in self._sfx or abs(self._sound_st()) >= 0.01:
+            return False
+        f = self._spitch.get(out)
+        if f is not None and f.shift.running:   # still fading out
+            return False
+        for v in self.voices:
+            if out in v.data and out not in v.done:
+                return False
+        self._idle_n[out] = self._idle_n.get(out, 0) + frames
+        return True
+
+    def _wake_bus(self, out: str):
+        """Before the mixer runs again after idle blocks: the live pitch gets the
+        silence it would have kept meanwhile, so switching it on starts as before."""
+        n = self._idle_n.pop(out, 0)
+        if n:
+            f = self._spitch.get(out)
+            if f is not None:
+                f.skip_silence(n)
 
     GATE_S = 0.04    # how fast the mic fades out / back in around a sound
 
