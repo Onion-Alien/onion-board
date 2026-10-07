@@ -11,9 +11,10 @@ import tempfile
 from pathlib import Path
 from string import Template
 
-from PySide6.QtCore import QPointF, QRectF, Qt
+from PySide6.QtCore import QObject, QPointF, QRectF, Qt
 from PySide6.QtGui import (QColor, QIcon, QImage, QLinearGradient, QPainter, QPainterPath,
                            QPen, QPixmap, QTransform)
+from shiboken6 import isValid as qt_valid
 
 from soundboard.i18n import _
 
@@ -1048,6 +1049,35 @@ def _recolour_inline(widgets, old: dict[str, str]) -> None:
             pass
 
 
+# App-wide event filters written in Python (Space plays, quiet message boxes) are called
+# for every event of every widget, and restyling sends each widget ~10 (font, palette
+# and style changes: 20,000+ with Settings open) that none of them wants: a third of a
+# theme switch went on them. Installed with app_filter(), they sit out each restyle.
+_app_filters: list[QObject] = []
+
+
+def app_filter(app, f: QObject) -> None:
+    """app.installEventFilter(f), but `f` is left out while apply() restyles."""
+    app.installEventFilter(f)
+    _app_filters.append(f)
+
+
+def _restyle(app, css: str) -> None:
+    live = [f for f in _app_filters if qt_valid(f)]
+    _app_filters[:] = live
+    for f in live:
+        app.removeEventFilter(f)
+    try:
+        # cleared first: Qt swapping one app-wide sheet straight for another re-styles
+        # every widget the slow way (3 s against 0.6 s with ~2000 widgets); empty and
+        # then the new sheet gives the same look. No paint happens in between.
+        app.setStyleSheet("")
+        app.setStyleSheet(css)
+    finally:
+        for f in live:   # oldest first: Qt asks the newest first, as before
+            app.installEventFilter(f)
+
+
 def apply(app, name: str, live: str | None = None) -> str:
     """Switch the whole app to theme `name` (live). `live`: the user's own highlight
     colour ("" = the theme's), None = keep the one set already."""
@@ -1055,11 +1085,7 @@ def apply(app, name: str, live: str | None = None) -> str:
     if live is not None:
         set_live(live)
     name = set_current(name)
-    # cleared first: Qt swapping one app-wide sheet straight for another re-styles every
-    # widget the slow way (0.6-1.3 s with ~1000 widgets); empty and then the new sheet
-    # gives the same look in about a quarter of the time. No paint happens in between.
-    app.setStyleSheet("")
-    app.setStyleSheet(stylesheet(name))
+    _restyle(app, stylesheet(name))
     widgets = app.allWidgets()
     _recolour_inline(widgets, old)
     sheet = live_sheet()
