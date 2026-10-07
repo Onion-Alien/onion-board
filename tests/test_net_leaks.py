@@ -324,7 +324,7 @@ def test_search_thumbnails_through_the_proxy(qapp, sites, socks, monkeypatch):
     from PySide6.QtCore import QBuffer, QByteArray
     from PySide6.QtGui import QImage
 
-    from soundboard import ytdl
+    from soundboard import quality, ytdl
     from soundboard.ui.ytsearch import ResultRow, SearchResults
     shown = []
     monkeypatch.setattr(ResultRow, "set_thumb", lambda row, pm: shown.append(pm.size().toTuple()))
@@ -338,9 +338,16 @@ def test_search_thumbnails_through_the_proxy(qapp, sites, socks, monkeypatch):
     hit = ytdl.Result(id="x", title="T", channel="c", seconds=1, source="soundcloud",
                       art=sites.url("thumbs", "/t.png"))
     monkeypatch.setattr(ytdl, "search", lambda q, count=20, source="youtube": [hit])
+    replies = []   # what each picture's request came back with, for a failure's message
+    real_on_thumb = SearchResults._on_thumb
+    monkeypatch.setattr(SearchResults, "_on_thumb", lambda panel, reply, *a: (
+        replies.append((reply.error(), reply.errorString(), reply.bytesAvailable())),
+        real_on_thumb(panel, reply, *a)))
+    assert quality.current.web_extras and net.allowed("sounds_web")
     panel = SearchResults()
-    panel.search("t")
-    assert process_events(qapp, lambda: shown, timeout=15)
+    assert panel.search("t")
+    assert process_events(qapp, lambda: shown, timeout=15), (
+        replies, sites.hits, socks.hosts_asked(), net.describe())
     assert shown == [(32, 18)]
     assert socks.hosts_asked() == {"thumbs.test"}
 

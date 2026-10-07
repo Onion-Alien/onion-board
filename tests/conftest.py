@@ -168,6 +168,14 @@ def process_events(app, until, timeout=8.0, step=0.02):
     return until()
 
 
+def devices_done(win, timeout=8.0):
+    """Until the window's device changes (picks, Re-scan) ran on the device thread
+    and came back to the UI thread."""
+    from PySide6.QtWidgets import QApplication
+    assert process_events(QApplication.instance(), lambda: not win._dev_waiting
+                          and not win.engine.devices.busy, timeout)
+
+
 @pytest.fixture
 def app_dir(tmp_path, monkeypatch):
     """Point library's config/sounds paths at a temp folder."""
@@ -301,6 +309,15 @@ def _switches_back_on():
     yield
     from soundboard import net
     net.configure_features()
+
+
+@pytest.fixture(autouse=True)
+def _data_quality_back_to_normal():
+    """Settings > Data & quality (soundboard.quality) is process-wide too: Low data
+    mode left on by one test hides the next one's search pictures."""
+    yield
+    from soundboard import quality
+    quality.current = quality.Prefs()
 
 
 class NoMidi:

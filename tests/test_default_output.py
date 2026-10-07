@@ -1,12 +1,14 @@
 """The headphones output follows Windows' default output: switch Windows from the
 headset to the speakers with the app open and the sounds come out of the speakers,
 unless another device was picked for the headphones by hand."""
+import threading
 import time
 
 import pytest
 
 from soundboard import appaudio
 from soundboard import engine as eng
+from conftest import devices_done
 from test_mainwindow import window as main_window  # noqa: F401 - the real window, offscreen
 
 OUTS = ["Headphones  (Gaming Headset)", "Speakers (Realtek Audio)",
@@ -112,4 +114,54 @@ def test_picking_a_bluetooth_hands_free_mic_warns_about_call_quality(window, mon
                "Headset (WH-1000XM4 Hands-Free AG Audio)")
     cb.setCurrentIndex(cb.count() - 1)
     window.on_device(cb, "mic_device")
+    devices_done(window)
     assert "phone-call mic" in window.status.text()
+
+
+def test_a_pick_waits_its_turn_while_a_driver_is_stuck(window, monkeypatch, qapp):
+    """A recovery stuck in a dead driver on the device thread: picking a device by hand
+    doesn't freeze the window waiting for it. The picks run after it, in order."""
+    from conftest import process_events
+    windows_default(monkeypatch, "Speakers (Realtek Audio)")
+    window._fill_combo(window.cb_mon, OUTS, OUTS[2])
+    devices_done(window)
+    e, stuck = window.engine, threading.Event()
+    assert e.devices.claim()
+    e.devices.run(lambda: stuck.wait(10), lambda _r: e.devices.release())
+    for name in (OUTS[1], OUTS[0]):
+        window.cb_mon.setCurrentIndex(window.cb_mon.findData(name))
+        t0 = time.monotonic()
+        window.on_device(window.cb_mon, "mon_device")
+        assert time.monotonic() - t0 < 0.5             # the window didn't wait
+    process_events(qapp, lambda: False, timeout=0.3)
+    assert window.opened[-2:] != [OUTS[1], OUTS[0]]    # still waiting their turn
+    assert window.cfg.mon_device == OUTS[0]            # ...but the pick is taken
+    stuck.set()
+    devices_done(window)
+    assert window.opened[-2:] == [OUTS[1], OUTS[0]]
+
+
+def test_rescan_runs_on_the_device_thread(window, monkeypatch, qapp):
+    from PySide6.QtWidgets import QPushButton
+
+    from conftest import process_events
+    from soundboard.ui import busy
+    devices_done(window)
+    stuck, threads = threading.Event(), []
+
+    def rescan():
+        threads.append(threading.current_thread())
+        stuck.wait(10)
+        return True
+    monkeypatch.setattr(eng, "rescan", rescan)
+    btn = QPushButton("Re-scan devices")
+    window.rescan_with_feedback(btn)
+    assert process_events(qapp, lambda: threads, timeout=5)
+    assert threads[0] is not threading.main_thread()
+    assert btn.text() == "Scanning…" and busy.is_busy(btn)   # the window is free meanwhile
+    window.rescan_with_feedback(btn)                         # a double click: ignored
+    assert not window._dev_waiting
+    stuck.set()
+    devices_done(window)
+    assert len(threads) == 1 and not busy.is_busy(btn)
+    assert btn.text() == "✓ Found 3 devices"
