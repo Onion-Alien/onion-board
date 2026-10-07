@@ -56,8 +56,8 @@ import weakref
 from collections.abc import Callable
 from dataclasses import dataclass
 
-from soundboard import netlog
-from soundboard import errors
+from soundboard import errors, netlog, without_app_blas
+from soundboard.i18n import _
 
 log = logging.getLogger(__name__)
 
@@ -79,7 +79,8 @@ DIRECT_LOGIN = "direct-"   # relay login "direct-<feature>": not through the pro
 NEVER_THIS_PC = frozenset({"radio"})
 
 # Everything that goes online, by the key its requests carry: its switch in Settings >
-# Privacy & security (cfg.net_off lists the ones switched off).
+# Privacy & security (cfg.net_off lists the ones switched off). The names as written
+# (English); feature_name() gives them in the language picked.
 FEATURES = {
     "sounds_web": "Find and download sounds online",
     "ytdlp_update": "Update the downloader (yt-dlp)",
@@ -96,20 +97,56 @@ FEATURES = {
 SITES = {"youtube": "YouTube", "soundcloud": "SoundCloud", "myinstants": "Myinstants",
          "other": "Other pasted links"}
 TEST = "connection_test"   # the Test button: no switch of its own, but not while Offline
-# what's off, in a sentence ("… is switched off in Settings > Privacy & security.")
-_OFF_WHAT = {
-    "sounds_web": "Finding and downloading sounds online is",
-    "ytdlp_update": "Updating the downloader (yt-dlp) is",
-    "radio": "Radio is",
-    "app_update": "Checking for Onion Board updates is",
-    "addons": "Getting and updating add-ons is",
-    "voices": "Downloading voices and speech models is",
-    "voice_servers": "Custom voice servers are",
-    "setup_downloads": "Installing the virtual cable from the app is",
-    "tor_download": "Downloading Tor from the app is",
-    "usage_stats": "The anonymous usage count is",
-}
 WHERE = "Settings > Privacy & security"
+
+
+# Functions, not tables, for the words: this module can be imported before the
+# language is picked (app.main), so they're translated when they're used.
+def feature_name(key: str) -> str:
+    """A FEATURES key's name in the language picked."""
+    return {
+        "sounds_web": _("Find and download sounds online"),
+        "ytdlp_update": _("Update the downloader (yt-dlp)"),
+        "radio": _("Radio"),
+        "app_update": _("Check for and download Onion Board updates"),
+        "addons": _("Get and update add-ons"),
+        "voices": _("Download voices and speech models"),
+        "voice_servers": _("Custom voice servers"),
+        "setup_downloads": _("Install the virtual cable from the app"),
+        "tor_download": _("Download Tor from the app"),
+        "usage_stats": _("Anonymous usage count"),
+    }.get(key, FEATURES.get(key, key))
+
+
+def site_name(key: str) -> str:
+    """A SITES key's name in the language picked (the sites' own names stay)."""
+    return _("Other pasted links") if key == "other" else SITES.get(key, key)
+
+
+def _off_sentence(main: str) -> str:
+    """ "… is switched off in Settings > Privacy & security." for a FEATURES key."""
+    return {
+        "sounds_web": _("Finding and downloading sounds online is switched off in "
+                        "Settings > Privacy & security."),
+        "ytdlp_update": _("Updating the downloader (yt-dlp) is switched off in "
+                          "Settings > Privacy & security."),
+        "radio": _("Radio is switched off in Settings > Privacy & security."),
+        "app_update": _("Checking for Onion Board updates is switched off in "
+                        "Settings > Privacy & security."),
+        "addons": _("Getting and updating add-ons is switched off in "
+                    "Settings > Privacy & security."),
+        "voices": _("Downloading voices and speech models is switched off in "
+                    "Settings > Privacy & security."),
+        "voice_servers": _("Custom voice servers are switched off in "
+                           "Settings > Privacy & security."),
+        "setup_downloads": _("Installing the virtual cable from the app is switched off in "
+                             "Settings > Privacy & security. Install VB-Cable yourself "
+                             "from vb-audio.com."),
+        "tor_download": _("Downloading Tor from the app is switched off in "
+                          "Settings > Privacy & security."),
+        "usage_stats": _("The anonymous usage count is switched off in "
+                         "Settings > Privacy & security."),
+    }[main]
 
 
 class ProxyError(OSError):
@@ -151,21 +188,22 @@ def parse(text: str) -> Proxy:
     user."""
     t = (text or "").strip()
     if not t:
-        raise ValueError("Type the proxy's address, e.g. socks5h://127.0.0.1:9050")
+        raise ValueError(_("Type the proxy's address, e.g. socks5h://127.0.0.1:9050"))
     if "://" not in t:
         t = "socks5h://" + t
     u = urllib.parse.urlsplit(t)
     scheme = u.scheme.lower()
     kinds = {"socks5h": "socks5", "socks5": "socks5", "socks": "socks5", "http": "http"}
     if scheme not in kinds:
-        raise ValueError(f"{u.scheme}:// proxies aren't supported: use socks5h:// or http://")
+        raise ValueError(_("{scheme}:// proxies aren't supported: use socks5h:// or "
+                           "http://", scheme=u.scheme))
     try:
         port = u.port
     except ValueError:
         port = None
     if not u.hostname or not port or (u.path not in ("", "/")) or u.query or u.fragment:
-        raise ValueError("That isn't a proxy address: it should look like "
-                         "socks5h://127.0.0.1:9050 or http://host:8080")
+        raise ValueError(_("That isn't a proxy address: it should look like "
+                           "socks5h://127.0.0.1:9050 or http://host:8080"))
     return Proxy(kinds[scheme], u.hostname, port,
                  urllib.parse.unquote(u.username or ""), urllib.parse.unquote(u.password or ""))
 
@@ -336,17 +374,16 @@ def any_allowed() -> bool:
 def off_message(feature) -> str:
     """Why `feature` isn't allowed, as a sentence for the user."""
     if _offline:
-        return f"Onion Board is in Offline mode ({WHERE}), so nothing goes online."
+        return _("Onion Board is in Offline mode (Settings > Privacy & security), so "
+                 "nothing goes online.")
     if not known(feature):
-        return (f"Not connecting: this request didn't say which setting in {WHERE} "
-                "allows it.")
-    main, _, sub = feature.partition(".")
+        return _("Not connecting: this request didn't say which setting in "
+                 "Settings > Privacy & security allows it.")
+    main, __, sub = feature.partition(".")
     if main not in _off and sub in SITES:
-        return f"Getting sounds from {SITES[sub]} is switched off in {WHERE}."
-    msg = f"{_OFF_WHAT[main]} switched off in {WHERE}."
-    if main == "setup_downloads":
-        msg += " Install VB-Cable yourself from vb-audio.com."
-    return msg
+        return _("Getting sounds from {site} is switched off in "
+                 "Settings > Privacy & security.", site=site_name(sub))
+    return _off_sentence(main)
 
 
 def check(feature) -> None:
@@ -367,8 +404,8 @@ def set_tor_gate(fn: Callable[[float], Proxy] | None) -> None:
 
 def _tor_proxy() -> Proxy:
     if _tor_gate is None:
-        raise _failed("Not connecting: Tor isn't available. Pick another Connection in "
-                      "Settings > Connection.")
+        raise _failed(_("Not connecting: Tor isn't available. Pick another Connection in "
+                        "Settings > Connection."))
     try:
         return _tor_gate(TOR_WAIT_S)
     except ProxyError as e:
@@ -378,12 +415,13 @@ def _tor_proxy() -> Proxy:
 def describe() -> str:
     """For the log and Settings: never includes a password."""
     if _mode == DIRECT:
-        return "direct"
+        return _("direct")
     if _mode == TOR:
-        return "through Tor"
+        return _("through Tor")
     if _proxy is None:
-        return f"{_mode}, but the address isn't usable ({_bad})"
-    return f"{_mode} via {'SOCKS5' if _proxy.kind == 'socks5' else 'HTTP'} {_proxy.where}"
+        return _("{mode}, but the address isn't usable ({error})", mode=_mode, error=_bad)
+    return _("{mode} via {kind} {address}", mode=_mode,
+             kind="SOCKS5" if _proxy.kind == "socks5" else "HTTP", address=_proxy.where)
 
 
 def on_change(fn: Callable[[], None]) -> None:
@@ -483,8 +521,8 @@ def _route(host: str, port: int, timeout: float | None, via: Proxy | None,
             return _via(_tor_proxy(), host, port, timeout, "Tor",
                         handshake=max(timeout or 0, TOR_HANDSHAKE_S)), "Tor"
         if _proxy is None:
-            raise _failed(f"Not connecting: the proxy address in Settings > Connection isn't "
-                          f"usable ({_bad})")
+            raise _failed(_("Not connecting: the proxy address in Settings > Connection "
+                            "isn't usable ({error})", error=_bad))
         via = _proxy
     return _via(via, host, port, timeout), _route_name(via, direct, host)
 
@@ -494,8 +532,10 @@ def _via(via: Proxy, host: str, port: int, timeout: float | None,
     try:
         sock = socket.create_connection((via.host, via.port), handshake or timeout)
     except OSError as e:
-        raise _failed(f"Couldn't reach {name or f'the proxy at {via.where}'} ({_why(e)}). "
-                      "Nothing was sent without it.") from None
+        raise _failed(_("Couldn't reach {name} ({error}). Nothing was sent without it.",
+                        name=name, error=_why(e)) if name else
+                      _("Couldn't reach the proxy at {address} ({error}). Nothing was sent "
+                        "without it.", address=via.where, error=_why(e))) from None
     try:
         if via.kind == "socks5":
             _socks5(sock, via, host, port)
@@ -506,15 +546,17 @@ def _via(via: Proxy, host: str, port: int, timeout: float | None,
         raise _failed(errors.plain(e)) from None
     except OSError as e:
         sock.close()
-        raise _failed(f"{name or f'The proxy at {via.where}'} stopped answering "
-                      f"({_why(e)})") from None
+        raise _failed(_("{name} stopped answering ({error})", name=name, error=_why(e))
+                      if name else
+                      _("The proxy at {address} stopped answering ({error})",
+                        address=via.where, error=_why(e))) from None
     sock.settimeout(timeout)
     return sock
 
 
 def _why(e: OSError) -> str:
     if isinstance(e, TimeoutError | socket.timeout):
-        return "timed out"
+        return _("timed out")
     return e.strerror or str(e) or type(e).__name__
 
 
@@ -523,16 +565,20 @@ def _recv_exact(sock: socket.socket, n: int) -> bytes:
     while len(buf) < n:
         chunk = sock.recv(n - len(buf))
         if not chunk:
-            raise ProxyError("the proxy closed the connection")
+            raise ProxyError(_("the proxy closed the connection"))
         buf += chunk
     return buf
 
 
-SOCKS_REPLIES = {1: "the proxy failed", 2: "the proxy's rules don't allow it",
-                 3: "the network is unreachable from the proxy",
-                 4: "the site is unreachable from the proxy",
-                 5: "the site refused the connection", 6: "it timed out",
-                 7: "the proxy doesn't support that", 8: "the proxy doesn't support that"}
+def _socks_reply(code: int) -> str:
+    """A SOCKS5 reply code in words."""
+    if code in (7, 8):
+        return _("the proxy doesn't support that")
+    return {1: _("the proxy failed"), 2: _("the proxy's rules don't allow it"),
+            3: _("the network is unreachable from the proxy"),
+            4: _("the site is unreachable from the proxy"),
+            5: _("the site refused the connection"), 6: _("it timed out")}.get(
+        code, _("error {code}", code=code))
 
 
 def _socks5(sock: socket.socket, p: Proxy, host: str, port: int):
@@ -542,30 +588,33 @@ def _socks5(sock: socket.socket, p: Proxy, host: str, port: int):
     sock.sendall(b"\x05" + bytes([len(methods)]) + methods)
     ver, method = _recv_exact(sock, 2)
     if ver != 5:
-        raise ProxyError(f"{p.where} isn't a SOCKS5 proxy")
+        raise ProxyError(_("{address} isn't a SOCKS5 proxy", address=p.where))
     if method == 2:
         u, pw = p.user.encode()[:255], p.password.encode()[:255]
         sock.sendall(b"\x01" + bytes([len(u)]) + u + bytes([len(pw)]) + pw)
         if _recv_exact(sock, 2)[1] != 0:
-            raise ProxyError(f"the proxy at {p.where} turned down the user name / password")
+            raise ProxyError(_("the proxy at {address} turned down the user name / "
+                               "password", address=p.where))
     elif method != 0:
-        raise ProxyError(f"the proxy at {p.where} wants a login"
-                         + ("" if p.user else ": add user:password@ to its address"))
+        raise ProxyError(_("the proxy at {address} wants a login", address=p.where)
+                         if p.user else
+                         _("the proxy at {address} wants a login: add user:password@ to "
+                           "its address", address=p.where))
     try:
         ip = ipaddress.ip_address(host)
         addr = (b"\x01" + ip.packed) if ip.version == 4 else (b"\x04" + ip.packed)
     except ValueError:
         name = host.encode("idna")
         if not 0 < len(name) < 256:
-            raise ProxyError(f"{host!r} isn't a host name") from None
+            raise ProxyError(_("{host} isn't a host name", host=repr(host))) from None
         addr = b"\x03" + bytes([len(name)]) + name
     sock.sendall(b"\x05\x01\x00" + addr + struct.pack(">H", port))
     ver, rep, _rsv, atyp = _recv_exact(sock, 4)
     if ver != 5:
-        raise ProxyError(f"{p.where} isn't a SOCKS5 proxy")
+        raise ProxyError(_("{address} isn't a SOCKS5 proxy", address=p.where))
     if rep != 0:
-        raise ProxyError(f"Couldn't reach {host} through the proxy: "
-                         f"{SOCKS_REPLIES.get(rep, f'error {rep}')}")
+        raise ProxyError(_("Couldn't reach {host} through the proxy: {error}",
+                           host=host, error=_socks_reply(rep)))
     if atyp == 1:
         _recv_exact(sock, 4 + 2)
     elif atyp == 4:
@@ -573,7 +622,8 @@ def _socks5(sock: socket.socket, p: Proxy, host: str, port: int):
     elif atyp == 3:
         _recv_exact(sock, _recv_exact(sock, 1)[0] + 2)
     else:
-        raise ProxyError(f"{p.where} sent a SOCKS5 answer that makes no sense")
+        raise ProxyError(_("{address} sent a SOCKS5 answer that makes no sense",
+                           address=p.where))
 
 
 def _http_connect(sock: socket.socket, p: Proxy, host: str, port: int):
@@ -587,19 +637,22 @@ def _http_connect(sock: socket.socket, p: Proxy, host: str, port: int):
     while b"\r\n\r\n" not in reply:
         chunk = sock.recv(4096)
         if not chunk:
-            raise ProxyError(f"the proxy at {p.where} closed the connection")
+            raise ProxyError(_("the proxy at {address} closed the connection",
+                               address=p.where))
         reply += chunk
         if len(reply) > HEAD_LIMIT:
-            raise ProxyError(f"{p.where} isn't an HTTP proxy")
+            raise ProxyError(_("{address} isn't an HTTP proxy", address=p.where))
     status = reply.split(b"\r\n", 1)[0].decode("latin-1", "replace").split(" ", 2)
     if len(status) < 2 or not status[0].startswith("HTTP/"):
-        raise ProxyError(f"{p.where} isn't an HTTP proxy")
+        raise ProxyError(_("{address} isn't an HTTP proxy", address=p.where))
     if status[1] == "407":
-        raise ProxyError(f"the proxy at {p.where} wants a login"
-                         + ("" if p.user else ": add user:password@ to its address"))
+        raise ProxyError(_("the proxy at {address} wants a login", address=p.where)
+                         if p.user else
+                         _("the proxy at {address} wants a login: add user:password@ to "
+                           "its address", address=p.where))
     if not status[1].startswith("2"):
-        raise ProxyError(f"Couldn't reach {host} through the proxy: it said "
-                         f"{' '.join(status[1:]).strip()}")
+        raise ProxyError(_("Couldn't reach {host} through the proxy: it said {answer}",
+                           host=host, answer=" ".join(status[1:]).strip()))
     # a proxy sends nothing after its answer until the client speaks: nothing to keep
 
 
@@ -612,7 +665,8 @@ def test(proxy_url: str, target: tuple[str, int] = TEST_HOST,
     sock, entry = _open(target[0], target[1], timeout, via=p, feature=TEST)
     sock.close()
     entry.closed()
-    return f"It works: the proxy reached {target[0]} in {time.monotonic() - t:.1f} s."
+    return _("It works: the proxy reached {host} in {seconds} s.", host=target[0],
+             seconds=f"{time.monotonic() - t:.1f}")
 
 
 # --------------------------------------------------------------------------- urllib
@@ -718,8 +772,8 @@ class _Logged:
         if not allowed(self.feature):
             return off_message(self.feature)
         if self.gen != _generation:
-            return ("Stopped: the connection setting changed while this was downloading, "
-                    "so it didn't carry on the old way. Try again.")
+            return _("Stopped: the connection setting changed while this was "
+                     "downloading, so it didn't carry on the old way. Try again.")
         return ""
 
     def putrequest(self, method, url, *a, **kw):
@@ -1013,7 +1067,7 @@ class _Relay:
                 return self._refuse(c, 400, "bad request")
             method, target, version = parts
             if method.upper() == "CONNECT":
-                host, _, port = target.rpartition(":")
+                host, __, port = target.rpartition(":")
                 first = b""
             else:
                 u = urllib.parse.urlsplit(target)
@@ -1042,14 +1096,16 @@ class _Relay:
                 # this PC stays reachable, as it was before the relay ran in it, except
                 # for the features in NEVER_THIS_PC.)
                 self.seen.append((feature, host, "local"))
-                why = f"Not connecting to {host}: it's on this PC or your home network"
+                why = _("Not connecting to {host}: it's on this PC or your home network",
+                        host=host)
                 netlog.blocked(feature, host, int(port), why, netlog.RELAY)
                 return self._refuse(c, 403, str(_failed(why)))
             if (_mode == DIRECT or direct) and _name_leads_home(host):
                 # going direct, the name is looked up on this PC anyway: one that leads
                 # into this PC / the home network (a stream redirecting there) is refused
                 self.seen.append((feature, host, "local"))
-                why = f"Not connecting to {host}: it leads to this PC or your home network"
+                why = _("Not connecting to {host}: it leads to this PC or your home "
+                        "network", host=host)
                 netlog.blocked(feature, host, int(port), why, netlog.RELAY)
                 return self._refuse(c, 403, str(_failed(why)))
             try:
@@ -1261,8 +1317,10 @@ def child_env(feature: str, env: dict[str, str] | None = None) -> dict[str, str]
     """The environment for a child process that goes online for `feature` (pip for
     add-ons, the live-voice helper for voices): the relay with that feature's login,
     so the Connection setting and its switch hold. Switched off, the relay refuses it,
-    and HF_HUB_OFFLINE=1 tells Hugging Face downloads (the speech model) not to try."""
+    and HF_HUB_OFFLINE=1 tells Hugging Face downloads (the speech model) not to try.
+    The app's own OPENBLAS_NUM_THREADS is left out (soundboard/__init__.py)."""
     out = _without_proxy_vars(dict(os.environ if env is None else env))
+    without_app_blas(out)    # its own numpy / torch: not the app's thread cap
     url = relay_url(feature)
     out.update(http_proxy=url, https_proxy=url, all_proxy=url,
                no_proxy="localhost,127.0.0.1,::1")

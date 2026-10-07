@@ -2,6 +2,31 @@
 
 ## Unreleased
 
+## 1.9.8 — 2026-10-07
+
+- **Onion Board has a Discord.** Chat, get help and hear about new versions: *Join
+  the Discord* in Settings, the tray icon's menu, *What's new* and the installer's
+  last page (it only opens when you click it).
+- **Discord's automatic input sensitivity is caught too.** In a real call it kept
+  cutting songs out in bursts: up to a third of a high-pitched song went missing,
+  none once it was off. The *Fix Discord* bar and the Discord guide now say when
+  *Automatically determine input sensitivity* is on and how to switch it off.
+- **Lighter on memory.** The Radio tab's HD 3D globe is gone: the flat map (the
+  default since October) is now the only map, and if you had the globe picked you
+  get the map. That takes the whole built-in web browser out of the app, so the
+  download and install get much smaller. Windows no longer get a graphics-card
+  device each (about 30 MB and 16 threads per window, never given back), the maths
+  library stops parking ~30 idle threads and up to 1 GB of reserved memory, the
+  radio's decoder loads only once you open the Radio tab, and unused picture-format
+  plug-ins (PDF and co.) no longer load at start-up.
+
+- **Triggers tab: Onion Watch 0.9.2.** Lighter too (closed trigger cards cost almost
+  nothing, and with watching off it doesn't load its maths libraries), and a green
+  *READY* is no longer mistaken for a red one. The board offers the add-on's
+  update by itself.
+
+## 1.9.7 — 2026-10-07
+
 - **Important fix: Discord wiping out your sounds on Straight into my mic.** Measured
   on a real Discord: its default noise suppression (Krisp / Voice Isolation) lets a
   song through for about a second, then wipes it out, and its **Studio** profile,
@@ -13,6 +38,14 @@
   *Input Profile* **Custom**, *Noise Suppression* **None**, *Echo Cancellation* off
   (Studio stays the clean choice on the virtual cable). The guide shows each of your
   Discord settings with a ✓ or what to switch, and updates as you change them.
+  It also catches Discord's *Advanced Voice Activity*: in a real call it let only
+  about 2 seconds of a 25-second song through (the Mic Test never shows it).
+- **Onion Board starts speaking your language.** When Windows is set to one of 19
+  languages (Deutsch, Español, Français, Italiano, Nederlands, Polski, Português
+  (Brasil), Türkçe, Bahasa Indonesia, Tiếng Việt, Русский, Українська, العربية, हिन्दी,
+  ไทย, 简体中文, 繁體中文, 日本語, 한국어), the main window and the Sounds tab are in
+  it; the rest follows. The same languages and words as Onion Watch's Triggers tab.
+  Arabic is shown right to left. Hong Kong and Macau get Traditional Chinese.
 - **Record a bit of what's playing.** The Sounds tab's **Record** window has a new
   *What's playing* choice: press Record, play a sound, a web search result or the
   radio (or catch a song already playing), then Stop, cut the ends and save it as a
@@ -49,6 +82,8 @@
   to what it showed before. Pick another category by hand and it stays. All the
   programs you've set are listed in *Settings → General*, with a switch for all of it.
 - **The search box keeps its room** on the Sounds tab in mid-size windows.
+- **Buttons in the guides aren't cut off any more** ("Copy the mic na…"): a window
+  with a row of buttons grows wide enough to show them all.
 - **Record a sound with your mic.** New **Record** button next to *Add sounds*:
   record your own voice (or, while the voice changer is on, your changed voice),
   then drag the ends to cut it, listen in your headphones, name it and *Save*. The

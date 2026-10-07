@@ -34,18 +34,53 @@ LANG_DIR = (Path(sys._MEIPASS) / "lang" if hasattr(sys, "_MEIPASS")
 ENGLISH = "en"
 PSEUDO = "xx"
 WINDOWS = ""     # Config.language: follow Windows' display language
+# Until every text is translated and Settings has a Language picker (2.0), the board
+# stays in English unless config.json or ONIONBOARD_LANG names a language: following
+# Windows now would show a half-translated window.
+FOLLOW_WINDOWS = False
 
-# plural rules: n -> index into a catalog entry's list of forms
+# plural rules: n -> index into a catalog entry's list of forms (FORMS: how many)
+def _one_other(n):
+    return 0 if n == 1 else 1
+
+
+def _slavic(n):            # ru, uk: one (1, 21, 31…), few (2-4, 22-24…), many (the rest)
+    return 0 if n % 10 == 1 and n % 100 != 11 \
+        else 1 if 2 <= n % 10 <= 4 and not 12 <= n % 100 <= 14 else 2
+
+
 PLURALS = {
-    "en": lambda n: 0 if n == 1 else 1,
-    "de": lambda n: 0 if n == 1 else 1,
-    "es": lambda n: 0 if n == 1 else 1,
+    "en": _one_other, "de": _one_other, "es": _one_other, "it": _one_other,
+    "nl": _one_other, "tr": _one_other,
     "pt-BR": lambda n: 0 if n in (0, 1) else 1,
     "fr": lambda n: 0 if n in (0, 1) else 1,
-    # one (1, 21, 31…), few (2-4, 22-24…), many (the rest)
-    "ru": lambda n: 0 if n % 10 == 1 and n % 100 != 11
+    "hi": lambda n: 0 if n in (0, 1) else 1,
+    "ru": _slavic, "uk": _slavic,
+    # one (1), few (2-4, 22-24…, not 12-14), many (the rest)
+    "pl": lambda n: 0 if n == 1
     else 1 if 2 <= n % 10 <= 4 and not 12 <= n % 100 <= 14 else 2,
+    # one form for every number
+    "zh-CN": lambda n: 0, "zh-TW": lambda n: 0, "ja": lambda n: 0, "ko": lambda n: 0,
+    "id": lambda n: 0, "vi": lambda n: 0, "th": lambda n: 0,
+    # zero, one, two, few (3-10, 103-110…), many (11-99, 111-199…), other
+    "ar": lambda n: 0 if n == 0 else 1 if n == 1 else 2 if n == 2
+    else 3 if 3 <= n % 100 <= 10 else 4 if 11 <= n % 100 <= 99 else 5,
 }
+FORMS = {"ru": 3, "uk": 3, "pl": 3, "ar": 6,
+         **dict.fromkeys(("zh-CN", "zh-TW", "ja", "ko", "id", "vi", "th"), 1)}
+
+
+def forms(code: str) -> int:
+    """How many plural forms a catalog entry has in language `code`."""
+    return FORMS.get(code, 2)
+
+
+RTL = {"ar"}               # written right to left: the layout is mirrored
+# the font for each script, by language: Windows finds one by itself, but on a Japanese
+# PC it would draw Chinese with Japanese shapes (and the other way round)
+FONTS = {"zh-CN": "Microsoft YaHei UI", "zh-TW": "Microsoft JhengHei UI",
+         "ja": "Yu Gothic UI", "ko": "Malgun Gothic", "th": "Leelawadee UI",
+         "hi": "Nirmala UI"}
 
 _lang = ENGLISH
 _catalog: dict[str, str | list[str]] = {}
@@ -129,11 +164,43 @@ def resolve(setting: str) -> str:
         return PSEUDO
     if want in codes:
         return want
+    chinese = _chinese(want)
+    if chinese:
+        return chinese if chinese in codes else ENGLISH
     base = want.split("-")[0].lower()
     for c in codes:                       # "de-AT" -> "de", "pt-PT" -> "pt-BR"
         if c.split("-")[0].lower() == base:
             return c
     return ENGLISH
+
+
+def _chinese(name: str) -> str | None:
+    """Windows names Chinese by region or script: Hong Kong, Macau and Traditional
+    script read zh-TW, the rest zh-CN (a plain "zh" match would send Hong Kong to
+    Simplified). None for other languages."""
+    parts = [p.lower() for p in name.split("-")]
+    if parts[0] != "zh":
+        return None
+    if "hant" in parts or {"hk", "mo", "tw"} & set(parts[1:]):
+        return "zh-TW"
+    return "zh-CN"
+
+
+def is_rtl(code: str | None = None) -> bool:
+    """Language `code` (default: the current one) is written right to left."""
+    return (_lang if code is None else code) in RTL
+
+
+def use_fonts(families) -> None:
+    """After the QApplication is made: the theme fonts `families` (Segoe UI, Consolas…)
+    fall back to the current language's own font for letters they haven't got."""
+    own = FONTS.get(_lang)
+    if not own:
+        return
+    from PySide6.QtGui import QFont
+    for fam in families:
+        if fam and own not in QFont.substitutes(fam):
+            QFont.insertSubstitution(fam, own)
 
 
 def set_language(code: str) -> str:
@@ -162,9 +229,51 @@ def startup(app_dir: Path) -> str:
         raw = _read(app_dir / "config.json") if (app_dir / "config.json").is_file() else {}
         want = raw.get("language", WINDOWS)
         want = want if isinstance(want, str) else WINDOWS
+    if want == WINDOWS and not FOLLOW_WINDOWS:
+        want = ENGLISH
     code = set_language(resolve(want))
     log.info("language: %s (setting %r)", code, want)
     return code
+
+
+def _qt_button(source: str) -> str | None:
+    """Qt's own words on standard buttons (OK, Cancel… in message boxes and dialogs), in
+    the current language; None for words not here."""
+    key = source.replace("&", "")
+    words = {"OK": _("OK"), "Cancel": _("Cancel"), "Close": _("Close"), "Yes": _("Yes"),
+             "No": _("No"), "Save": _("Save"), "Open": _("Open"), "Apply": _("Apply")}
+    return words.get(key)
+
+
+_translator = None
+
+
+def translate_qt_buttons(app) -> bool:
+    """Put Qt's standard buttons (OK, Cancel, Yes…) in the current language too: Qt's
+    own translations aren't shipped. Skipped for English, and when something else
+    already translates them (an Onion Watch tab that got there first, say). True once
+    it's in place."""
+    global _translator
+    if _lang == ENGLISH or _translator is not None:
+        return _translator is not None
+    from PySide6.QtCore import QCoreApplication, QTranslator
+    if QCoreApplication.translate("QPlatformTheme", "Cancel") != "Cancel":
+        return False
+
+    class ButtonWords(QTranslator):
+        def translate(self, context, source, disambiguation=None, n=-1):
+            if context == "QPlatformTheme" and source:
+                return _qt_button(source) or ""
+            return ""
+
+        def isEmpty(self):
+            return False
+
+    _translator = ButtonWords(app)
+    app.installTranslator(_translator)
+    # out again before Python shuts down: Qt mustn't call into it while it does
+    app.aboutToQuit.connect(lambda: app.removeTranslator(_translator))
+    return True
 
 
 def _read(path: Path) -> dict:

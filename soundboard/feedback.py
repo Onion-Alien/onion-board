@@ -1,6 +1,6 @@
-"""Where "Send feedback" and "Report a problem" go.
+"""Where "Join the Discord", "Send feedback" and "Report a problem" go.
 
-Both only open a page in the user's browser: nothing is sent by the app, and the
+All three only open a page in the user's browser: nothing is sent by the app, and the
 user decides what to type and whether to submit. The feedback form needs no
 account (a GitHub issue does), and gets the app's version in the address so a
 report says which version it's about."""
@@ -10,6 +10,8 @@ from urllib.parse import quote, urlencode
 
 from soundboard.updates import REPO
 
+# the Onion Board Discord server: chat, help, and new versions (a permanent invite)
+DISCORD_URL = "https://discord.gg/FhKGaWCWHM"
 # the no-account feedback form; empty = fall back to GitHub issues
 FORM_URL = "https://tally.so/r/rjxjyM"
 ISSUE_URL = f"https://github.com/{REPO}/issues/new"

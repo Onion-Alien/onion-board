@@ -250,3 +250,23 @@ def test_from_clipboard_takes_a_copied_image_or_a_copied_picture_file(qapp, tmp_
     text = QMimeData()
     text.setText("hello")
     assert thumbs.from_clipboard(text) is None and thumbs.from_clipboard(None) is None
+
+
+def test_fitted_keeps_one_size_per_picture_and_trim_lets_all_go(qapp, app_dir, tmp_path):
+    """Pads draw the picture at their own size: a new size (Pad size dragged) replaces
+    the old one instead of piling up, and to the tray the cache is let go (it's made
+    again from the small files when the window is back)."""
+    thumbs.trim()
+    p = str(make_image(tmp_path / "a.png", 480, 300))
+    a = thumbs.fitted(p, 150, 93, 1.0)
+    assert a is not None and (a.width(), a.height()) == (150, 93)
+    assert thumbs.fitted(p, 150, 93, 1.0) is a                # cached
+    b = thumbs.fitted(p, 200, 124, 1.25)
+    assert (b.width(), b.height()) == (200, 124)
+    assert [k[:4] for k in thumbs._fitted] == [(p, 200, 124, 1.25)]   # the old size went
+    assert thumbs._fitted_bytes == 200 * 124 * 4
+    thumbs.trim()
+    assert not thumbs._fitted and not thumbs._pixmaps
+    assert thumbs._fitted_bytes == thumbs._bytes == 0
+    c = thumbs.fitted(p, 200, 124, 1.25)                      # made again on the next paint
+    assert c is not None and c.toImage() == b.toImage()

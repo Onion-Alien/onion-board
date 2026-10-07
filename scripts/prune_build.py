@@ -1,18 +1,21 @@
 """Trim the PyInstaller output before it's packaged (build.ps1 runs this).
 
 PyInstaller's PySide6 hooks ship the whole Qt: QML and Quick 3D, Charts, the
-Chromium developer tools, 186 translation files, a software OpenGL rasteriser…
+web engine (Chromium), 186 translation files, a software OpenGL rasteriser…
 none of which this app touches. This removes what the app never loads:
 
 - Qt Python modules (`Qt*.pyd`) other than the ones the app imports (KEEP_MODULES)
 - `Qt6*.dll` (and the FFmpeg DLLs) that nothing left behind imports, found by walking
   each kept file's import table with pefile
 - the QML folder, the QML/positioning/touch plugins, spare platform plugins
-- Chromium's developer-tools and `.debug` resources
-- Qt's translations and every WebEngine locale except en-US (the app is English;
-  WebEngine falls back to en-US when the system locale's pack is missing)
-- `opengl32sw.dll`: the software OpenGL fallback. Widgets render through Direct3D
-  (QT_WIDGETS_RHI) and Chromium has its own software renderer, so it never loads.
+- the web engine: its helper exe, resources and locales (the Radio tab's 3D globe
+  used it up to 1.9.7; with them gone Qt6WebEngineCore, Quick and QML go too)
+- image formats the app never opens (PDF, which drags Qt6Pdf in, TIFF, ICNS, TGA,
+  WBMP: every format plugin is loaded at start-up), the virtual keyboard, and the
+  TLS backends besides Windows' own (no OpenSSL ships, so that one can't load anyway)
+- Qt's translations (the app has its own)
+- `opengl32sw.dll`: the software OpenGL fallback. Widgets draw with the CPU, so it
+  never loads.
 
 Usage: python scripts/prune_build.py dist/OnionBoard [--dry-run]
 Exit 1 if a kept file imports a DLL that would be missing afterwards, so a change in
@@ -25,18 +28,23 @@ import sys
 from collections.abc import Callable, Iterable
 from pathlib import Path
 
-# PySide6 modules the app imports (soundboard/ and their PySide6-side dependencies,
-# e.g. QtWebEngineWidgets pulls QtPrintSupport in). Everything else's .pyd goes.
+# PySide6 modules the app imports (soundboard/ and their PySide6-side dependencies).
+# Everything else's .pyd goes.
 KEEP_MODULES = frozenset({
-    "QtCore", "QtGui", "QtWidgets", "QtNetwork", "QtPrintSupport",
-    "QtWebChannel", "QtWebEngineCore", "QtWebEngineWidgets", "QtMultimedia",
-    "QtMultimediaWidgets",
+    "QtCore", "QtGui", "QtWidgets", "QtNetwork", "QtMultimedia", "QtMultimediaWidgets",
 })
-KEEP_LOCALES = frozenset({"en-US.pak"})
 # platform plugins: the real one, and offscreen for `OnionBoard.exe --selftest`
 KEEP_PLATFORMS = frozenset({"qwindows.dll", "qoffscreen.dll"})
-DROP_PLUGIN_DIRS = ("qmltooling", "position", "generic")
-DROP_FILES = ("opengl32sw.dll",)
+DROP_PLUGIN_DIRS = ("qmltooling", "position", "generic", "platforminputcontexts")
+# picture formats: pads and thumbnails are PNG / JPEG / WebP / GIF / BMP (thumbs.py),
+# the icons SVG and ICO; Qt loads every format plugin it finds when it first reads one
+DROP_PLUGINS = ("imageformats/qpdf.dll", "imageformats/qtiff.dll", "imageformats/qicns.dll",
+                "imageformats/qtga.dll", "imageformats/qwbmp.dll",
+                "tls/qopensslbackend.dll", "tls/qcertonlybackend.dll")
+# pyside6qml: the Python side of QML (only QtQml.pyd uses it), which keeps Qt6Qml in
+DROP_FILES = ("opengl32sw.dll", "QtWebEngineProcess.exe", "pyside6qml.abi3.dll")
+# the web engine's data: resources/ holds nothing else
+DROP_DIRS = ("resources", "translations/qtwebengine_locales")
 # the FFmpeg libraries are kept only if the multimedia plugin still imports them
 DLL_CANDIDATES = ("qt6", "av", "sw")
 
@@ -88,20 +96,16 @@ def plan(app_dir: Path, imports_of: Callable[[Path], list[str]] = _imports_pefil
             drop.append(pyd)
 
     # 2. folders and files the app never opens
-    for d in (qt / "qml", *(qt / "plugins" / n for n in DROP_PLUGIN_DIRS)):
+    for d in (qt / "qml", *(qt / "plugins" / n for n in DROP_PLUGIN_DIRS),
+              *(qt / n for n in DROP_DIRS)):
         if d.is_dir():
             drop.append(d)
     drop += [qt / n for n in DROP_FILES if (qt / n).exists()]
+    drop += [qt / "plugins" / n for n in DROP_PLUGINS if (qt / "plugins" / n).exists()]
     for p in (qt / "plugins" / "platforms").glob("*.dll"):
         if p.name not in KEEP_PLATFORMS:
             drop.append(p)
-    for p in (qt / "resources").glob("*"):
-        if ".debug." in p.name or "devtools" in p.name:
-            drop.append(p)
     drop += list((qt / "translations").glob("*.qm"))
-    for p in (qt / "translations" / "qtwebengine_locales").glob("*.pak"):
-        if p.name not in KEEP_LOCALES:
-            drop.append(p)
 
     # 3. DLLs nothing left behind imports
     dropped = {p.resolve() for p in drop}

@@ -14,10 +14,11 @@ IMPORTS = {
     "qtquick.pyd": ["qt6quick.dll"],
     "qt6webenginecore.dll": ["qt6quick.dll", "qt6core.dll"],
     "qt6quick.dll": ["qt6qml.dll"],
-    "qt6widgets.dll": ["qt6core.dll"],
+    "qt6widgets.dll": ["qt6gui.dll", "qt6core.dll"],
     "qtwebengineprocess.exe": ["qt6webenginecore.dll"],
     "ffmpegmediaplugin.dll": ["avcodec-61.dll"],
     "avcodec-61.dll": ["avutil-59.dll"],
+    "qpdf.dll": ["qt6pdf.dll"],
 }
 
 
@@ -29,13 +30,16 @@ def make_tree(tmp_path: Path) -> Path:
     qt = tmp_path / "OnionBoard" / "_internal" / "PySide6"
     files = [
         "QtCore.pyd", "QtWidgets.pyd", "QtWebEngineCore.pyd", "QtQuick.pyd", "QtOpenGL.pyd",
-        "Qt6Core.dll", "Qt6Widgets.dll", "Qt6WebEngineCore.dll", "Qt6Quick.dll", "Qt6Qml.dll",
+        "Qt6Core.dll", "Qt6Gui.dll", "Qt6Widgets.dll", "Qt6WebEngineCore.dll", "Qt6Pdf.dll",
+        "Qt6Quick.dll", "Qt6Qml.dll",
         "Qt6Charts.dll", "Qt63DRender.dll", "avcodec-61.dll", "avutil-59.dll", "swscale-8.dll",
         "opengl32sw.dll", "MSVCP140.dll", "QtWebEngineProcess.exe",
         "plugins/multimedia/ffmpegmediaplugin.dll",
         "plugins/platforms/qwindows.dll", "plugins/platforms/qoffscreen.dll",
         "plugins/platforms/qminimal.dll",
         "plugins/qmltooling/qmldbg_debugger.dll", "plugins/imageformats/qjpeg.dll",
+        "plugins/imageformats/qpdf.dll", "plugins/tls/qschannelbackend.dll",
+        "plugins/tls/qopensslbackend.dll",
         "qml/QtQuick/qmldir",
         "resources/qtwebengine_resources.pak", "resources/qtwebengine_resources.debug.pak",
         "resources/qtwebengine_devtools_resources.pak", "resources/icudtl.dat",
@@ -55,16 +59,18 @@ def test_plan_keeps_what_is_reachable_and_drops_the_rest(tmp_path):
     drop, problems = pb.plan(app, imports_of=fake_imports)
     assert problems == []
     names = {p.name for p in drop}
-    # cut: unused Python modules, unreachable Qt DLLs, QML, dev tools, locales, extras
-    assert {"QtQuick.pyd", "QtOpenGL.pyd", "Qt6Charts.dll", "Qt63DRender.dll",
+    # cut: unused Python modules, unreachable Qt DLLs, QML, the whole web engine (the
+    # Radio tab's 3D globe used it up to 1.9.7), unused picture formats and TLS, extras
+    assert {"QtQuick.pyd", "QtOpenGL.pyd", "QtWebEngineCore.pyd", "Qt6Charts.dll",
+            "Qt63DRender.dll", "Qt6WebEngineCore.dll", "Qt6Quick.dll", "Qt6Qml.dll",
+            "Qt6Pdf.dll", "QtWebEngineProcess.exe", "resources", "qtwebengine_locales",
             "swscale-8.dll", "opengl32sw.dll", "qml", "qmltooling", "qminimal.dll",
-            "qtwebengine_resources.debug.pak", "qtwebengine_devtools_resources.pak",
-            "qt_de.qm", "de.pak"} <= names
-    # kept: everything the app imports, and what those import (Quick via WebEngineCore)
-    for keep in ("QtCore.pyd", "QtWidgets.pyd", "Qt6Quick.dll", "Qt6Qml.dll", "Qt6Core.dll",
-                 "avcodec-61.dll", "avutil-59.dll", "qwindows.dll", "qoffscreen.dll",
-                 "ffmpegmediaplugin.dll", "qjpeg.dll", "qtwebengine_resources.pak",
-                 "icudtl.dat", "en-US.pak", "MSVCP140.dll", "QtWebEngineProcess.exe"):
+            "qpdf.dll", "qopensslbackend.dll", "qt_de.qm"} <= names
+    # kept: everything the app imports, and what those import
+    for keep in ("QtCore.pyd", "QtWidgets.pyd", "Qt6Widgets.dll", "Qt6Gui.dll",
+                 "Qt6Core.dll", "avcodec-61.dll", "avutil-59.dll", "qwindows.dll",
+                 "qoffscreen.dll", "ffmpegmediaplugin.dll", "qjpeg.dll",
+                 "qschannelbackend.dll", "MSVCP140.dll"):
         assert keep not in names, keep
 
 
@@ -84,7 +90,7 @@ def test_main_dry_run_deletes_nothing(tmp_path, monkeypatch, capsys):
     assert "would free" in capsys.readouterr().out
     assert pb.main([str(app)]) == 0
     assert not (app / "_internal" / "PySide6" / "qml").exists()
-    assert (app / "_internal" / "PySide6" / "Qt6Quick.dll").exists()
+    assert (app / "_internal" / "PySide6" / "Qt6Widgets.dll").exists()
 
 
 def test_every_qt_module_the_app_imports_is_kept():

@@ -10,6 +10,8 @@ from __future__ import annotations
 import math
 import weakref
 
+import shiboken6
+
 from PySide6.QtCore import QPointF, QRectF, QSize, Qt
 from PySide6.QtGui import (QColor, QIcon, QIconEngine, QPainter, QPainterPath, QPen, QPixmap,
                            QTransform)
@@ -602,6 +604,13 @@ def icon(name: str, color: str | None = None, checked_color: str | None = None,
 
 # --------------------------------------------------------------------------- live retheme
 
+def _gone(ref: weakref.ref) -> bool:
+    """The widget an entry below is for was deleted (its Python side may still be
+    around, pointing at nothing)."""
+    w = ref()
+    return w is None or not shiboken6.isValid(w)
+
+
 _applied: list[tuple[weakref.ref, str, str | None, str | None]] = []
 _tabs: list[tuple[weakref.ref, int, str, str | None, bool]] = []
 
@@ -626,6 +635,9 @@ def set_label_icon(label, name: str, color: str = "muted", size: int = 18):
     dpr = label.devicePixelRatioF() or 1.0
     pm = icon(name, color).pixmap(QSize(size, size), dpr)
     label.setPixmap(pm)
+    # one entry per label, and none for deleted ones: a dialog's labels went on the
+    # list each time it was opened
+    _labels[:] = [e for e in _labels if not _gone(e[0]) and e[0]() is not label]
     _labels.append((weakref.ref(label), name, color, size))
 
 
@@ -706,7 +718,8 @@ def set_tab_icon(tabs, index: int, name: str, tint: str | None = None, badge: bo
     # time a sound started or stopped); the bar asks for a layout only if it changed
     # size, and widgets.SteadyTabs lets that through
     tabs.tabBar().setTabIcon(index, _tab_icon(name, tint, badge))
-    _tabs[:] = [e for e in _tabs if not (e[0]() is tabs and e[1] == index)]
+    # ...and none for deleted tab widgets: Settings' tabs added 12 each time it opened
+    _tabs[:] = [e for e in _tabs if not _gone(e[0]) and not (e[0]() is tabs and e[1] == index)]
     _tabs.append((weakref.ref(tabs), index, name, tint, badge))
 
 

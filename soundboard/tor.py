@@ -40,6 +40,7 @@ from pathlib import Path
 
 from soundboard import library, net, torget
 from soundboard import errors
+from soundboard.i18n import _
 
 log = logging.getLogger(__name__)
 
@@ -55,8 +56,17 @@ NEWNYM_EVERY_S = 10.0         # tor ignores (delays) NEWNYM more often than this
 STOP_WAIT_S = 3.0
 STILL_MOVING_S = 60.0         # a request keeps waiting past its time while Tor progresses
 LOG_LINES = 40
-UPDATING = ("Not connecting: Tor is being updated. Nothing was sent without it: try "
-            "again in a moment.")
+
+
+# Functions, not constants, for the words: this module can be imported before the
+# language is picked (app.main), so they're translated when they're used.
+def newnym_ok() -> str:
+    return _("New identity: new connections go out through a different route.")
+
+
+def updating() -> str:
+    return _("Not connecting: Tor is being updated. Nothing was sent without it: try "
+             "again in a moment.")
 
 
 def bundle_dirs() -> list[Path]:
@@ -85,10 +95,13 @@ def available() -> bool:
     return tor_exe() is not None
 
 
-NOT_INSTALLED = ("Tor isn't on this PC yet: press Get Tor (Settings > Connection) "
-                 "to download it." + (
-                     "" if hasattr(sys, "_MEIPASS") else
-                     " From source, scripts/fetch_tor.py also works."))
+def not_installed() -> str:
+    """Why Tor can't be used yet."""
+    if hasattr(sys, "_MEIPASS"):
+        return _("Tor isn't on this PC yet: press Get Tor (Settings > Connection) to "
+                 "download it.")
+    return _("Tor isn't on this PC yet: press Get Tor (Settings > Connection) to "
+             "download it. From source, scripts/fetch_tor.py also works.")
 
 
 def data_root() -> Path:
@@ -425,18 +438,20 @@ class Tor:
     def status_text(self) -> str:
         """The status line for Settings, in plain words."""
         if not self.exe:
-            return NOT_INSTALLED
+            return not_installed()
         if self.state == READY:
-            return "Connected to Tor."
+            return _("Connected to Tor.")
         if self.state == STARTING:
-            return f"Connecting to Tor… {self.progress}%" + (
-                f" ({self.message})" if self.message else "")
+            if self.message:
+                return _("Connecting to Tor… {percent}% ({status})", percent=self.progress,
+                         status=self.message)
+            return _("Connecting to Tor… {percent}%", percent=self.progress)
         if self.state == FAILED:
-            return f"Couldn't connect to Tor: {self.message}"
+            return _("Couldn't connect to Tor: {error}", error=self.message)
         if self.enabled and not net.any_allowed():
-            return "Tor doesn't start: nothing is allowed to go online (Offline mode)."
-        return ("Tor starts the next time the app goes online." if self.enabled
-                else "Tor is off.")
+            return _("Tor doesn't start: nothing is allowed to go online (Offline mode).")
+        return (_("Tor starts the next time the app goes online.") if self.enabled
+                else _("Tor is off."))
 
     # ---- control
     def configure(self, enabled: bool, bridges: str = ""):
@@ -519,17 +534,17 @@ class Tor:
         """net's way in: Tor's SOCKS port once it's connected. Starts Tor if needed and
         waits up to `timeout`; raises net.ProxyError (nothing is sent) otherwise."""
         if not self.exe:
-            raise net.ProxyError(f"Not connecting: {NOT_INSTALLED} Or pick another "
-                                 "connection in Settings > Connection.")
+            raise net.ProxyError(_("Not connecting: {why} Or pick another connection in "
+                                   "Settings > Connection.", why=not_installed()))
         with self._cond:
             if not self.enabled:
-                raise net.ProxyError("Not connecting: Tor is switched off")
+                raise net.ProxyError(_("Not connecting: Tor is switched off"))
             if _holds:   # its files are being replaced: it mustn't start from them now
-                raise net.ProxyError(UPDATING)
+                raise net.ProxyError(updating())
             if (self.state == FAILED
                     and time.monotonic() - self._failed_at < RETRY_AFTER_FAIL_S):
-                raise net.ProxyError(f"Couldn't connect to Tor ({self.message}). Nothing "
-                                     "was sent without it.")
+                raise net.ProxyError(_("Couldn't connect to Tor ({error}). Nothing was "
+                                       "sent without it.", error=self.message))
         self.start()
         deadline = time.monotonic() + timeout
         with self._cond:
@@ -553,18 +568,19 @@ class Tor:
                 proc = self._proc
                 if self.state == READY and proc is not None and proc.poll() is not None:
                     # died since it connected; the watcher marks it failed any moment
-                    raise net.ProxyError("Couldn't connect to Tor (tor.exe stopped). "
-                                         "Nothing was sent without it.")
+                    raise net.ProxyError(_("Couldn't connect to Tor (tor.exe stopped). "
+                                           "Nothing was sent without it."))
                 if self.state == READY and self.socks_port:
                     return net.Proxy("socks5", "127.0.0.1", self.socks_port)
                 if self.state == FAILED:
-                    raise net.ProxyError(f"Couldn't connect to Tor ({self.message}). "
-                                         "Nothing was sent without it.")
+                    raise net.ProxyError(_("Couldn't connect to Tor ({error}). Nothing "
+                                           "was sent without it.", error=self.message))
                 if self.state == OFF:
-                    raise net.ProxyError(UPDATING if _holds else
-                                         "Not connecting: Tor was switched off")
-                raise net.ProxyError(f"Tor is still connecting ({self.progress}%). Nothing "
-                                     "was sent without it: try again in a moment.")
+                    raise net.ProxyError(updating() if _holds else
+                                         _("Not connecting: Tor was switched off"))
+                raise net.ProxyError(_("Tor is still connecting ({percent}%). Nothing was "
+                                       "sent without it: try again in a moment.",
+                                       percent=self.progress))
         finally:
             with self._cond:
                 self.waiting -= 1
@@ -577,17 +593,17 @@ class Tor:
         with self._cond:
             ctrl = self._ctrl if self.state == READY else None
         if ctrl is None:
-            return "Tor isn't connected, so there's no identity to change."
+            return _("Tor isn't connected, so there's no identity to change.")
         wait = self._last_newnym + NEWNYM_EVERY_S - time.monotonic()
         if wait > 0:
             time.sleep(wait)
         try:
             ctrl.signal("NEWNYM")
         except OSError as e:
-            return f"Tor didn't take it ({errors.plain(e)})"
+            return _("Tor didn't take it ({error})", error=errors.plain(e))
         self._last_newnym = time.monotonic()
         log.info("tor: new identity")
-        return "New identity: new connections go out through a different route."
+        return newnym_ok()
 
     # ---- the worker
     def _fail(self, run_id: int, why: str):
@@ -614,7 +630,7 @@ class Tor:
     def _launch(self, run_id: int) -> tuple[subprocess.Popen, Path] | None:
         exe = self.exe
         if exe is None:
-            self._fail(run_id, NOT_INSTALLED)
+            self._fail(run_id, not_installed())
             return None
         root = self.root
         try:
@@ -628,7 +644,8 @@ class Tor:
             self._fail(run_id, errors.plain(e))
             return None
         except OSError as e:
-            self._fail(run_id, f"couldn't write its settings ({errors.plain(e)})")
+            self._fail(run_id, _("couldn't write its settings ({error})",
+                                 error=errors.plain(e)))
             return None
         flags = subprocess.CREATE_NO_WINDOW if os.name == "nt" else 0
         try:
@@ -639,8 +656,8 @@ class Tor:
                 cwd=str(self._cwd or exe.parent), stdin=subprocess.DEVNULL,
                 stdout=subprocess.PIPE, stderr=subprocess.STDOUT, creationflags=flags)
         except OSError as e:
-            self._fail(run_id, f"tor.exe wouldn't start ({errors.plain(e)}); an antivirus "
-                               "may have blocked it")
+            self._fail(run_id, _("tor.exe wouldn't start ({error}); an antivirus may "
+                                 "have blocked it", error=errors.plain(e)))
             return None
         try:
             job.assign(proc)
@@ -668,8 +685,8 @@ class Tor:
         time.sleep(0.2)   # let the log reader catch up
         for line in reversed(self._log):
             if "[err]" in line or "[warn]" in line:
-                return f"tor.exe stopped: {line.split('] ', 1)[-1]}"
-        return f"tor.exe stopped (exit code {proc.returncode})"
+                return _("tor.exe stopped: {error}", error=line.split("] ", 1)[-1])
+        return _("tor.exe stopped (exit code {code})", code=proc.returncode)
 
     def _run(self, run_id: int):
         # a Tor stopped a moment ago (a bridge change) may still be exiting: two on the
@@ -688,7 +705,7 @@ class Tor:
             if proc.poll() is not None:
                 return self._fail(run_id, self._why_exited(proc))
             if time.monotonic() > deadline:
-                return self._fail(run_id, "tor.exe didn't open its control port")
+                return self._fail(run_id, _("tor.exe didn't open its control port"))
             if run_id != self._run_id:
                 return
             port = read_control_port(port_file)
@@ -705,10 +722,11 @@ class Tor:
         except OSError as e:
             if ctrl is not None:   # a refused login: don't leave the socket open
                 ctrl.close()
-            return self._fail(run_id, f"couldn't talk to tor.exe ({errors.plain(e)})")
+            return self._fail(run_id, _("couldn't talk to tor.exe ({error})",
+                                        error=errors.plain(e)))
         if socks is None:
             ctrl.close()
-            return self._fail(run_id, "tor.exe didn't open its SOCKS port")
+            return self._fail(run_id, _("tor.exe didn't open its SOCKS port"))
         with self._cond:
             if run_id != self._run_id:
                 ctrl.close()
@@ -726,7 +744,8 @@ class Tor:
             except OSError as e:
                 if run_id != self._run_id:
                     return
-                return self._fail(run_id, f"tor.exe stopped answering ({errors.plain(e)})")
+                return self._fail(run_id, _("tor.exe stopped answering ({error})",
+                                            error=errors.plain(e)))
             now = (phase["progress"], phase["summary"])
             if now != last:
                 last = now
@@ -736,12 +755,13 @@ class Tor:
                 log.info("tor connected (SOCKS on 127.0.0.1:%d)", socks)
                 return self._watch(run_id, proc)
             self._set(run_id, progress=phase["progress"],
-                      message=phase["summary"] or "connecting")
+                      message=phase["summary"] or _("connecting"))
             if time.monotonic() > deadline:
-                why = phase["warning"] or phase["summary"] or "no reason given"
-                hint = ("" if self.bridges else
-                        ". If Tor is blocked where you are, try “Hide that I'm using Tor”")
-                return self._fail(run_id, f"it took too long ({why}){hint}")
+                why = phase["warning"] or phase["summary"] or _("no reason given")
+                return self._fail(run_id, _("it took too long ({why})", why=why)
+                                  if self.bridges else
+                                  _("it took too long ({why}). If Tor is blocked where you "
+                                    "are, try “Hide that I'm using Tor”", why=why))
             time.sleep(POLL_S)
 
     def _watch(self, run_id: int, proc: subprocess.Popen):
@@ -797,7 +817,7 @@ def configure_from(cfg) -> None:
 
 
 def new_identity() -> str:
-    return manager().new_identity() if _tor is not None else "Tor isn't running."
+    return manager().new_identity() if _tor is not None else _("Tor isn't running.")
 
 
 def shutdown() -> None:

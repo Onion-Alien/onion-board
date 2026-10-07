@@ -15,6 +15,8 @@ from PySide6.QtCore import QPointF, QRectF, Qt
 from PySide6.QtGui import (QColor, QIcon, QImage, QLinearGradient, QPainter, QPainterPath,
                            QPen, QPixmap, QTransform)
 
+from soundboard.i18n import _
+
 # Status colours (inline ok / warn / error messages, danger buttons) most themes share:
 # the bright ones read on dark backgrounds, the deep ones on light.
 _DARK_STATUS = dict(
@@ -403,7 +405,22 @@ GROUPS: list[tuple[str, list[str]]] = [
     ("Meme", ["Flashbang", "Barbie", "Swamp", "Deep Fried", "Retro 98", "Comic Sans",
               "Brainrot"]),
 ]
+
+
+def group_name(group: str) -> str:
+    """A GROUPS key as Settings shows it, in the language picked (the keys stay
+    English; a function: this module can be imported before the language is)."""
+    return {"Classic": _("Classic"), "Colourful": _("Colourful"), "Wild": _("Wild"),
+            "Meme": _("Meme")}.get(group, group)
+
+
 FONT = "Segoe UI"   # a theme can swap it with a `font` token
+
+
+def font_families() -> list[str]:
+    """Every font a theme uses."""
+    return sorted({FONT, *(t["font"] for t in THEMES.values() if t.get("font"))})
+
 
 T: dict[str, str] = dict(THEMES[DEFAULT])   # current theme (read at paint time)
 current_name = DEFAULT

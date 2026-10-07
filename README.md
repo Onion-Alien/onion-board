@@ -1,6 +1,4 @@
-<p align="right"><img src="https://hits.sh/github.com/Onion-Alien/onion-board.svg?view=total&label=total%20visits&color=6b8e23" alt="total visits"></p>
-
-# Onion Board
+<h1>Onion Board <img align="right" src="https://hits.sh/github.com/Onion-Alien/onion-board.svg?view=total&label=total%20visits&color=6b8e23" alt="total visits"></h1>
 
 A free soundboard for Windows. Press a pad or a hotkey, even in-game, and **your
 friends in Discord or your game hear the sound**, with your voice or without it.
@@ -9,8 +7,8 @@ Or send it to your stream, or keep it to your own headphones.
 ## ⬇️ [Download Onion Board for Windows](../../releases/latest/download/OnionBoardSetup.exe)
 
 <!-- release -->
-Version **1.9.6** · Windows 10 / 11 · free, no account, no ads, anonymous usage count you can switch off ·
-[VirusTotal: 66 of 66 clean](https://www.virustotal.com/gui/file/800165727a34f556ef256564a4ea95a1526fefa1a7e154d607eb08ab42f4553f) ·
+Version **1.9.8** · Windows 10 / 11 · free, no account, no ads, anonymous usage count you can switch off ·
+[VirusTotal: 69 of 69 clean](https://www.virustotal.com/gui/file/ba3b211263c34e9cfb4952b8c1a06aae5d5a1a5205a58e5f486934befa547151) ·
 [what's new](CHANGELOG.md)
 <!-- /release -->
 

@@ -33,6 +33,7 @@ from pathlib import Path
 
 from soundboard import library, net
 from soundboard import errors
+from soundboard.i18n import _
 
 log = logging.getLogger(__name__)
 
@@ -60,8 +61,13 @@ KEEP = {
 }
 STAMP = "VERSION"
 FEATURE = "tor_download"   # soundboard.net's switch for this download
-BLOCKED_HINT = ("Where Tor is blocked, downloading it often is too: a proxy (Connection "
-                "> Through a proxy) may get through.")
+
+
+def blocked_hint() -> str:
+    """Added to a failed download. A function: this module can be imported before the
+    language is picked (app.main)."""
+    return _("Where Tor is blocked, downloading it often is too: a proxy (Connection "
+             "> Through a proxy) may get through.")
 
 
 class GetError(Exception):
@@ -99,7 +105,8 @@ def download(progress: Callable[[int, int], None] | None = None) -> bytes:
     try:
         return _download(ARCHIVE_URL, progress)
     except _Gone as e:
-        raise GetError(f"archive.torproject.org said {e}. {BLOCKED_HINT}") from None
+        raise GetError(_("archive.torproject.org said {error}.", error=e) + " "
+                       + blocked_hint()) from None
 
 
 class _Gone(Exception):
@@ -115,14 +122,14 @@ def _download(url: str, progress) -> bytes:
         with net.urlopen(req, timeout=TIMEOUT_S, feature=FEATURE) as r:
             total = _length(r.headers.get("Content-Length"))
             if total > MAX_BYTES:
-                raise GetError(f"The download is {total / 1e6:.0f} MB, far bigger than "
-                               "Tor: not taking it.")
+                raise GetError(_("The download is {mb} MB, far bigger than Tor: not "
+                                 "taking it.", mb=f"{total / 1e6:.0f}"))
             while chunk := r.read(CHUNK):
                 h.update(chunk)
                 buf.write(chunk)
                 if buf.tell() > MAX_BYTES:
-                    raise GetError("The download kept going far past Tor's size: "
-                                   "not taking it.")
+                    raise GetError(_("The download kept going far past Tor's size: "
+                                     "not taking it."))
                 if progress:
                     progress(buf.tell(), total)
     except net.ProxyError as e:   # FeatureOff included: switched off, nothing sent
@@ -130,16 +137,18 @@ def _download(url: str, progress) -> bytes:
     except urllib.error.HTTPError as e:
         if e.code in GONE:
             raise _Gone(f"{e.code} {e.reason}") from None
-        raise GetError(f"{host} said {e.code} {e.reason}. {BLOCKED_HINT}") from None
+        raise GetError(_("{host} said {error}.", host=host, error=f"{e.code} {e.reason}")
+                       + " " + blocked_hint()) from None
     except (urllib.error.URLError, OSError) as e:
         why = getattr(e, "reason", None) or e
-        raise GetError(f"Couldn't reach {host} ({why}). {BLOCKED_HINT}") from None
+        raise GetError(_("Couldn't reach {host} ({error}).", host=host, error=why)
+                       + " " + blocked_hint()) from None
     got = h.hexdigest()
     if got != SHA256:
         log.warning("tor download: SHA-256 %s, expected %s", got, SHA256)
-        raise GetError("The download isn't the Tor it should be (its checksum doesn't "
-                       "match), so it wasn't used. Something between you and the Tor "
-                       "Project changed it, or it was cut short: try again later.")
+        raise GetError(_("The download isn't the Tor it should be (its checksum doesn't "
+                         "match), so it wasn't used. Something between you and the Tor "
+                         "Project changed it, or it was cut short: try again later."))
     return buf.getvalue()
 
 
@@ -164,10 +173,12 @@ def unpack(data: bytes, dest: Path | None = None) -> Path:
                 try:
                     member = tar.getmember(name)
                 except KeyError:
-                    raise GetError(f"{name} is missing from {TARBALL}") from None
+                    raise GetError(_("{name} is missing from {file}", name=name,
+                                     file=TARBALL)) from None
                 src = tar.extractfile(member) if member.isfile() else None
                 if src is None:
-                    raise GetError(f"{name} in {TARBALL} isn't a file")
+                    raise GetError(_("{name} in {file} isn't a file", name=name,
+                                     file=TARBALL))
                 out = tmp / rel
                 out.parent.mkdir(parents=True, exist_ok=True)
                 out.write_bytes(src.read())
@@ -188,9 +199,10 @@ def unpack(data: bytes, dest: Path | None = None) -> Path:
         raise
     except (OSError, tarfile.TarError) as e:
         shutil.rmtree(tmp, ignore_errors=True)
-        raise GetError(f"Couldn't unpack Tor into {dest} ({getattr(e, 'strerror', '') or e}). "
-                       "If Tor is running, switch Connection away from Tor and try again; "
-                       "an antivirus may also have blocked tor.exe.") from None
+        raise GetError(_("Couldn't unpack Tor into {folder} ({error}). If Tor is running, "
+                         "switch Connection away from Tor and try again; an antivirus may "
+                         "also have blocked tor.exe.", folder=dest,
+                         error=getattr(e, "strerror", "") or e)) from None
     return dest
 
 
@@ -203,8 +215,8 @@ def get(progress: Callable[[int, int], None] | None = None,
     if not net.allowed(FEATURE):
         raise GetError(net.off_message(FEATURE))
     if net.mode() == net.TOR and not tor.available():
-        raise GetError("Connection is set to Tor, but there's no Tor here yet to carry "
-                       "the download. Pick Direct or Through a proxy, then Get Tor.")
+        raise GetError(_("Connection is set to Tor, but there's no Tor here yet to carry "
+                         "the download. Pick Direct or Through a proxy, then Get Tor."))
     log.info("downloading Tor %s (%s)", VERSION, net.describe())
     data = download(progress)
     with tor.hold():   # nothing restarts tor.exe from the folder while it's swapped
