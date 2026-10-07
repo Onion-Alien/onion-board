@@ -1523,6 +1523,25 @@ def test_on_the_mic_the_setup_tab_never_talks_about_the_cable(window, monkeypatc
         w.engine.main_stream = w.engine.tap = None
 
 
+@pytest.mark.parametrize("state, dead", [("ready", True), ("wiped", True),
+                                         ("missing", False), ("other", False)])
+def test_effect_not_running_check_reads_no_registry(window, monkeypatch, state, dead):  # noqa: F811
+    """Checked every second on the UI thread: it uses the cached status instead of
+    walking the registry's recording devices each time."""
+    w = window
+    w.cfg.mic_device = "My mic"
+    monkeypatch.setattr(dm, "status", lambda name=None: state)
+
+    def registry(*_a):
+        raise AssertionError("walked the registry on the UI thread")
+    monkeypatch.setattr(dm, "endpoint_for", registry)
+    monkeypatch.setattr(dm, "installed_on", registry)
+    monkeypatch.setattr(w.engine, "effect_alive", lambda: False)
+    monkeypatch.setattr(w.engine, "mic_stream", object())
+    w._direct_dead_since = time.monotonic() - w.DIRECT_GRACE_S - 1
+    assert w._direct_not_running() is dead
+
+
 def test_an_older_working_mic_part_offers_the_update_as_optional(window, monkeypatch):  # noqa: F811
     """Sounds in the mic with an older mic part: the tab says it's all set, and the
     update is plainly optional (not a primary button, not a "needs fixing")."""
@@ -1576,6 +1595,55 @@ def test_saying_no_to_windows_keeps_the_mic_on_offer(window, monkeypatch, cables
     assert "cable" not in said[0].lower()   # the mic is the way; the cable just quietly helps
     assert "Try again" in said[0]
     assert "mic" in w.pill.text().lower()
+
+
+def test_a_slow_status_check_never_holds_up_the_window(monkeypatch):
+    """A 1.9.7 freeze: the window asks for the status every second, and re-checking it
+    stat()ed the ring file on the UI thread (6 s on a busy disk). After the first
+    answer the re-check runs on a thread and the last answer comes back meanwhile."""
+    import threading
+    import time
+    gate, calls, answer = threading.Event(), [], ["ready"]
+
+    def slow(name):
+        calls.append(name)
+        if len(calls) > 1:
+            gate.wait(5)   # the disk is busy
+        return answer[0]
+    monkeypatch.setattr(dm, "_status", slow)
+    dm.forget_status()
+    assert dm.status("My mic") == "ready"            # the first answer: worked out now
+    monkeypatch.setattr(dm, "STATUS_S", 0.0)          # ...and stale at once
+    answer[0] = "wiped"
+    start = time.monotonic()
+    for _ in range(5):
+        assert dm.status("My mic") == "ready"        # the last answer, no waiting
+    assert time.monotonic() - start < 0.5
+    assert len(calls) == 2                            # one re-check at a time
+    gate.set()
+    end = time.monotonic() + 5
+    while dm._status_busy and time.monotonic() < end:
+        time.sleep(0.01)
+    monkeypatch.setattr(dm, "STATUS_S", 60.0)
+    assert dm.status("My mic") == "wiped"
+
+
+def test_a_status_check_from_before_forget_status_is_dropped(monkeypatch):
+    import threading
+    import time
+    gate = threading.Event()
+    monkeypatch.setattr(dm, "_status", lambda name: "ready")
+    dm.forget_status()
+    dm.status(None)
+    monkeypatch.setattr(dm, "STATUS_S", 0.0)
+    monkeypatch.setattr(dm, "_status", lambda name: gate.wait(5) and "wiped")
+    dm.status(None)                  # a re-check starts...
+    dm.forget_status()               # ...then the user set it up again
+    gate.set()
+    end = time.monotonic() + 5
+    while dm._status_busy and time.monotonic() < end:
+        time.sleep(0.01)
+    assert None not in dm._status_cache   # the old re-check's answer wasn't kept
 
 
 def test_the_banner_never_sends_mic_users_to_the_cable(window, monkeypatch):  # noqa: F811

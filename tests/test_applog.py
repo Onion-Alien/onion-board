@@ -324,5 +324,74 @@ def test_unticking_the_app_log_deletes_it_and_ticking_starts_it_again(tmp_path,
     assert "before" in tail and "while off" in tail
     applog.keep(True)
     root_logging.info("back on")
+    applog.flush()
     text = path.read_text(encoding="utf-8")
     assert "back on" in text and "while off" not in text
+
+
+def test_a_slow_disk_doesnt_hold_up_a_log_line(tmp_path, root_logging):
+    """A 1.9.7 freeze: a warning on the UI thread waited 5 s for the log file's flush.
+    Lines are written on the log's own thread now."""
+    import time
+    path = applog.setup(tmp_path, keep_log=True)
+    h = next(h for h in root_logging.handlers if isinstance(h, applog._Background))
+    gate, real = threading.Event(), h.file.emit
+
+    def slow(record):   # a disk that's busy (or an antivirus scan of the log)
+        gate.wait(5)
+        real(record)
+    h.file.emit = slow
+    start = time.monotonic()
+    root_logging.warning("can't also send into %s", "a cable")
+    assert time.monotonic() - start < 0.5
+    gate.set()
+    applog.flush()
+    line = path.read_text(encoding="utf-8").strip().splitlines()[-1]
+    assert line.endswith("root: can't also send into a cable") and "WARNING" in line
+
+
+def test_a_traceback_logged_off_the_ui_thread_keeps_its_lines(tmp_path, root_logging):
+    path = applog.setup(tmp_path, keep_log=True)
+    try:
+        raise ValueError("bad thing")
+    except ValueError:
+        root_logging.exception("it failed")
+    applog.flush()
+    text = path.read_text(encoding="utf-8")
+    assert "it failed" in text and "ValueError: bad thing" in text and "Traceback" in text
+
+
+def test_app_commands_under_test_never_log_into_the_real_app_folder():
+    """app.py took its own copy of APP_DIR: a test of --uninstall-count set up the log
+    in the real app folder (%APPDATA%), and every later test's lines went there."""
+    import os
+
+    from soundboard import app, library, updates
+    real = Path(os.environ.get("APPDATA", Path.home())) / "OnionBoard"
+    for d in (app.APP_DIR, updates.APP_DIR, library.APP_DIR):
+        assert not Path(d).is_relative_to(real), d
+
+
+@pytest.mark.parametrize("exc", [
+    OSError(28, "No space left on device"),
+    PermissionError(13, "Permission denied"),
+    MemoryError(),
+    ConnectionResetError(104, "reset"),
+])
+def test_the_pcs_situation_is_said_plainly_not_reported_as_a_crash(fresh, monkeypatch, exc):
+    """A full disk or a file another program holds isn't a bug: no crash dialog, no
+    saved report (it would count as an error/<version> problem), a plain message."""
+    log_path, shown = fresh
+    said = []
+    monkeypatch.setattr(applog, "_show_plain", said.append)
+    assert applog.report(_raise(exc), where="saving a clip") is None
+    assert shown == [] and len(said) == 1
+    assert not (log_path.parent / applog.REPORTS_DIR).exists()
+    applog.report(_raise(exc), where="saving a clip")   # the same again: said once
+    assert len(said) == 1
+
+
+def test_a_missing_file_is_still_a_bug_worth_a_report(fresh):
+    _log_path, shown = fresh
+    assert applog.report(_raise(FileNotFoundError(2, "No such file"))) is not None
+    assert len(shown) == 1

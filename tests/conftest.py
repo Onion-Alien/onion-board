@@ -190,6 +190,31 @@ def _never_touch_real_appdata(monkeypatch, tmp_path):
                  "CONFIG_PATH"):
         if getattr(library, name).is_relative_to(real):
             monkeypatch.setattr(library, name, tmp_path / "guard" / name.lower())
+    # modules that took their own copy of APP_DIR at import: app.py's commands set up
+    # the log there, and a test of one sent every later test's log lines (and crash
+    # reports) into the developer's real onionboard.log
+    for mod in ("soundboard.app", "soundboard.updates"):
+        m = sys.modules.get(mod)
+        if m is not None and Path(m.APP_DIR).is_relative_to(real):
+            monkeypatch.setattr(m, "APP_DIR", tmp_path / "guard" / "app_dir")
+
+
+@pytest.fixture(autouse=True)
+def _keep_the_test_logging():
+    """applog.setup() (an app command under test) swaps the root logger's handlers:
+    put pytest's back afterwards and close the ones it made (the log's writer thread)."""
+    import logging
+    root = logging.getLogger()
+    handlers, level = list(root.handlers), root.level
+    yield
+    for h in list(root.handlers):
+        if h not in handlers:
+            root.removeHandler(h)
+            h.close()
+    for h in handlers:
+        if h not in root.handlers:
+            root.addHandler(h)
+    root.setLevel(level)
 
 
 @pytest.fixture(autouse=True)

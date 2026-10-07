@@ -655,16 +655,19 @@ class RadioDirectory(QObject):
     # -- the flat map's land
     def load_outlines(self):
         """The country outlines, from the copy that ships with the app. Answers [] when
-        it's missing or altered: the map shows just its dots."""
-        try:
-            raw = (ASSET_DIR / COUNTRIES).read_bytes()
-        except OSError:
-            raw = b""
-        rings = outline_rings(raw)
-        if not rings:
-            log.warning("map outlines unavailable: %s missing or altered", COUNTRIES)
-        labels = outline_labels(raw) if rings else []
-        QTimer.singleShot(0, lambda: self.outlines_ready.emit(rings, labels))
+        it's missing or altered: the map shows just its dots. Read and parsed on a
+        thread: on the UI thread a busy disk froze the window for 5 s (1.8.0)."""
+        def work():
+            try:
+                raw = (ASSET_DIR / COUNTRIES).read_bytes()
+            except OSError:
+                raw = b""
+            rings = outline_rings(raw)
+            if not rings:
+                log.warning("map outlines unavailable: %s missing or altered", COUNTRIES)
+            return rings, (outline_labels(raw) if rings else [])
+        self._off_thread(work, lambda r: self.outlines_ready.emit(*r),
+                         lambda: self.outlines_ready.emit([], []))
 
     # -- search
     def search(self, text: str):

@@ -305,6 +305,57 @@ def test_engine_copies_open_close_retry_and_get_the_send_mix(monkeypatch):
     assert e.copies == () and all(t.closed for t in made)
 
 
+def test_a_missing_cable_is_warned_about_once_not_every_retry(monkeypatch, caplog):
+    """A 1.9.7 freeze ended in this warning's write: it was logged every RETRY_S, on
+    the UI thread, for as long as the cable was missing."""
+    import logging
+    fail = {"CABLE"}
+
+    class FakeTap:
+        def __init__(self, name, latency="low"):
+            if name in fail:
+                raise RuntimeError("busy")
+            self.name, self.last_cb = name, engine.time.monotonic()
+
+        def close(self):
+            pass
+    monkeypatch.setattr(engine, "CableTap", FakeTap)
+    e = engine.Engine()
+    try:
+        with caplog.at_level(logging.INFO, logger="soundboard.engine"):
+            for _ in range(5):
+                e.set_tap_device("CABLE")
+                e._open_copy("CABLE")
+            warned = [r for r in caplog.records if r.levelno >= logging.WARNING]
+            assert len(warned) == 1 and "CABLE" in warned[0].getMessage()
+            fail.clear()
+            e.set_tap_device("CABLE")   # back: said once, and a later loss warns again
+            assert any("also sending into CABLE" in r.getMessage() for r in caplog.records)
+            fail.add("CABLE")
+            e.set_tap_device("CABLE")
+            assert len([r for r in caplog.records if r.levelno >= logging.WARNING]) == 2
+    finally:
+        e.shutdown()
+
+
+def test_an_unplugged_output_is_warned_about_once_while_retried(monkeypatch, caplog):
+    import logging
+    e = engine.Engine()
+
+    def gone(*_a, **_k):
+        raise RuntimeError("device not found")
+    monkeypatch.setattr(e, "_open_out", gone)
+    try:
+        with caplog.at_level(logging.INFO, logger="soundboard.engine"):
+            for _ in range(4):
+                e.set_mon_device("Headset")
+            warned = [r for r in caplog.records if r.levelno >= logging.WARNING]
+            assert len(warned) == 1 and "Headset" in warned[0].getMessage()
+            assert e.errors["mon"]   # the window still says it's missing
+    finally:
+        e.shutdown()
+
+
 def test_also_send_is_kept_on_this_pc_and_reset_with_the_devices():
     assert "also_send" in backup.LOCAL_SETTINGS and "also_send" in reset.DEVICE_FIELDS
     assert Config.from_raw({"version": 2, "also_send": ["X"]}).also_send == ["X"]
