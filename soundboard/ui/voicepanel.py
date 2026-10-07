@@ -13,7 +13,7 @@ import re
 import threading
 import time
 
-from PySide6.QtCore import QEvent, QRectF, QSize, Qt, QTimer, Signal
+from PySide6.QtCore import QEvent, QObject, QRectF, QSize, Qt, QTimer, Signal
 from PySide6.QtGui import QColor, QGuiApplication, QPainter
 from PySide6.QtWidgets import (QButtonGroup, QCheckBox, QComboBox, QDialog, QMessageBox,
                                QDialogButtonBox, QFormLayout, QFrame, QGridLayout,
@@ -1390,6 +1390,28 @@ class VoiceFxPanel(QWidget):
 
 # =========================================================================== speech
 
+class _SameWidth(QObject):
+    """Keeps the list `follower` as wide as `source` (two lists in different rows),
+    or wider when its picked item wouldn't fit (a narrow window)."""
+
+    def __init__(self, source: QWidget, follower: QComboBox):
+        super().__init__(source)
+        self._source, self._follower = source, follower
+        source.installEventFilter(self)
+        follower.currentIndexChanged.connect(lambda _i: self.fit())
+
+    def fit(self):
+        f = self._follower
+        need = f.fontMetrics().horizontalAdvance(f.currentText()) + 56   # padding + arrow
+        if self._source.width() > 0:
+            f.setFixedWidth(max(self._source.width(), need))
+
+    def eventFilter(self, obj, e):
+        if e.type() == QEvent.Resize:
+            self.fit()
+        return False
+
+
 class SpeechPanel(QWidget):
     """Text-to-speech box and live voice-to-speech. `changed(settings)` for the config."""
     changed = Signal(dict)
@@ -1467,10 +1489,9 @@ class SpeechPanel(QWidget):
         self.cb_lang = QComboBox()
         self.cb_lang.setToolTip(_("Say it in English; whichever voice is on says it in this "
                                   "language. Each language is a one-time download."))
-        # as wide as its longest language, not the whole card: its list opens as wide
-        # as the box, and 33 short names in a full-width list look lost
-        self.cb_lang.setSizeAdjustPolicy(QComboBox.AdjustToContents)
-        self.cb_lang.setMinimumWidth(140)               # can still shrink in a narrow window
+        # as wide as the voice list below (_SameWidth), not a bar across the card:
+        # its list opens as wide as the box
+        trow.setSpacing(12)                             # the voice grid's spacing
         trow.addWidget(self.cb_lang)
         trow.addStretch(1)
         lv.addLayout(trow)
@@ -1531,7 +1552,11 @@ class SpeechPanel(QWidget):
         grid = QGridLayout()
         grid.setHorizontalSpacing(12)
         grid.setVerticalSpacing(14)
-        grid.addWidget(QLabel(_("Computer voice")), 0, 0)
+        lbl_voice = QLabel(_("Computer voice"))
+        grid.addWidget(lbl_voice, 0, 0)
+        # Speak in's box starts where the voice list does
+        self.lbl_lang.setMinimumWidth(max(self.lbl_lang.sizeHint().width(),
+                                          lbl_voice.sizeHint().width()))
         self.cb_voice = QComboBox()
         self.cb_voice.setToolTip(_("Speaks for you when no AI voice or voice changer is on, "
                                    "and says lines you type"))
@@ -1555,8 +1580,9 @@ class SpeechPanel(QWidget):
         self.sl_rate.setValue(int(self.s["rate"]))
         grid.addWidget(self.sl_rate, 1, 1)
         for w in (self.cb_voice, self.sl_rate):   # a list and a slider, not bars across
-            w.setMinimumWidth(220)                # the whole card at full screen
-            w.setMaximumWidth(380)
+            w.setMinimumWidth(160)                # the whole card at full screen (and
+            w.setMaximumWidth(380)                # Add voices… fits a narrow window)
+        _SameWidth(self.cb_voice, self.cb_lang)
         grid.setColumnStretch(1, 1)
         grid.setColumnStretch(3, 2)
         v.addLayout(grid)
@@ -1980,6 +2006,9 @@ class SpeechPanel(QWidget):
                                         size=translation.size_mb(m)),
                                  m.language)
         self.cb_lang.setIconSize(QSize(20, 20))
+        # the open list shows every name whole, even past the box's own width
+        view = self.cb_lang.view()
+        view.setMinimumWidth(view.sizeHintForColumn(0) + 40)    # + padding, scroll bar
         self.cb_lang.setCurrentIndex(max(0, self.cb_lang.findData(self.s["translate"])))
         self.cb_lang.blockSignals(False)
         self.lang_box.setVisible(self.module is not None and self.module.installed
