@@ -102,6 +102,9 @@ if _win:
     _k32le = ctypes.WinDLL("kernel32", use_last_error=True)
     _k32le.OpenProcess.restype = c_void_p
     _k32le.OpenProcess.argtypes = (c_ulong, c_int, c_ulong)
+    _ntdll = windll.ntdll
+    _ntdll.NtQueryInformationProcess.restype = c_long
+    _ntdll.NtQueryInformationProcess.argtypes = (c_void_p, c_int, c_void_p, c_ulong, c_void_p)
 
 
 def supported() -> tuple[bool, str]:
@@ -405,6 +408,80 @@ def _process_table() -> dict[int, tuple[int, str]]:
     return table
 
 
+class _PBI(Structure):   # PROCESS_BASIC_INFORMATION
+    _fields_ = [("ExitStatus", c_long), ("PebBaseAddress", c_void_p),
+                ("AffinityMask", ctypes.c_size_t), ("BasePriority", c_long),
+                ("UniqueProcessId", ctypes.c_size_t), ("ParentPid", ctypes.c_size_t)]
+
+
+class PidTable:
+    """The _process_table rows a session list needs, (parent pid, exe name), looked up
+    one process at a time as they're asked for. A recording-session list touches a
+    handful of pids (each session's and a few parents), and a full snapshot of every
+    process (~500 on a gaming PC) cost ~20 ms of the ~28 ms the Who's listening poll
+    took every 3 s. A pid that's gone isn't in it, as in a snapshot; one Windows won't
+    let us open (a protected process) makes it take the full snapshot after all, so
+    nothing is ever named differently from before."""
+
+    def __init__(self):
+        self._rows: dict[int, tuple[int, str] | None] = {}
+        self._full: dict[int, tuple[int, str]] | None = None
+        self.snapshots = 0   # full snapshots it had to take (for the tests and benches)
+
+    def _row(self, pid: int) -> tuple[int, str] | None:
+        if self._full is not None:
+            return self._full.get(pid)
+        if pid in self._rows:
+            return self._rows[pid]
+        row = _open_row(pid)
+        if row is _DENIED:
+            self._full = _process_table()
+            self.snapshots += 1
+            return self._full.get(pid)
+        self._rows[pid] = row
+        return row
+
+    def get(self, pid: int, default=None):
+        row = self._row(pid)
+        return default if row is None else row
+
+    def __contains__(self, pid) -> bool:
+        return self._row(pid) is not None
+
+    def __getitem__(self, pid: int) -> tuple[int, str]:
+        row = self._row(pid)
+        if row is None:
+            raise KeyError(pid)
+        return row
+
+
+_DENIED = object()
+
+
+def _open_row(pid: int):
+    """(parent pid, exe name) of one running process, None if there's no such process,
+    _DENIED if Windows won't say."""
+    if pid == 0:
+        return None
+    h = _k32le.OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, False, pid)
+    if not h:
+        return None if ctypes.get_last_error() == 87 else _DENIED   # INVALID_PARAMETER: gone
+    try:
+        code = c_ulong()
+        if _k32.GetExitCodeProcess(h, byref(code)) and code.value != STILL_ACTIVE:
+            return None   # exited, only a handle keeps it (a snapshot wouldn't list it)
+        buf = ctypes.create_unicode_buffer(1024)
+        size = c_ulong(len(buf))
+        pbi, got = _PBI(), c_ulong()
+        if (not _k32.QueryFullProcessImageNameW(h, 0, buf, byref(size))
+                or _ntdll.NtQueryInformationProcess(h, 0, byref(pbi), sizeof(pbi),
+                                                    byref(got)) != 0):
+            return _DENIED
+        return int(pbi.ParentPid), os.path.basename(buf.value).lower()
+    finally:
+        _k32.CloseHandle(h)
+
+
 def running() -> dict[int, str]:
     """pid -> exe name (lower case) of every running process; {} off Windows."""
     return {pid: exe for pid, (_, exe) in _process_table().items()} if _win else {}
@@ -563,7 +640,8 @@ def recording_apps(device: str) -> list[App]:
         return []
     own = _co_init()
     try:
-        return _list_apps(flow=E_CAPTURE, only=device)
+        # one process at a time (PidTable): only the few recording are looked up
+        return _list_apps(flow=E_CAPTURE, only=device, titles=False, table=PidTable())
     except ComError:
         log.debug("listing recording sessions failed", exc_info=True)
         return []
@@ -574,14 +652,16 @@ def recording_apps(device: str) -> list[App]:
 
 def _list_apps(meters: dict | None = None, flow: int = E_RENDER,
                only: str | None = None, alive: dict[int, str] | None = None,
-               titles: bool | None = None) -> list[App]:
+               titles: bool | None = None, table: PidTable | None = None) -> list[App]:
     """With `meters`, also keeps each session's IAudioMeterInformation there
     (root pid -> [Com]) for the caller to read and release; window titles are then
     skipped unless `titles`. `flow` E_CAPTURE lists recording sessions instead,
-    `only` on one device. `alive`: see list_apps."""
+    `only` on one device. `alive`: see list_apps. `table`: a PidTable instead of a
+    snapshot of every process (not with `alive`, which needs them all)."""
     me = os.getpid()
-    table = _process_table()
-    forget_dead_pids(table)
+    if table is None:
+        table = _process_table()
+        forget_dead_pids(table)
     if alive is not None:
         alive.update((pid, exe) for pid, (_, exe) in table.items())
     apps: dict[int, App] = {}

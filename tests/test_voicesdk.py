@@ -1,6 +1,7 @@
 """Voice engine detection (soundboard.voicesdk): made-up install folders, no real
 games or processes."""
 import threading
+import time
 from pathlib import Path
 
 from soundboard import voicesdk
@@ -144,3 +145,40 @@ def test_listeners_name_voice_apps_first_and_scan_each_game_once():
     assert lis.look("CABLE Output") == (("discord", "Discord"), ("game", "Game"))
     assert sorted(scans) == [r"C:\Apps\obs\obs64.exe", r"C:\Games\Thing\game.exe"]
     assert lis.poll(None) == ()                    # no cable: nobody to name
+
+
+def test_listeners_look_on_one_kept_thread_not_one_per_poll(monkeypatch):
+    """Polled every few seconds all day: one worker thread does every look, back to
+    back polls make one look (not a queue of them), and it ends once polls stop."""
+    monkeypatch.setattr(voicesdk.Listeners, "MIN_GAP_S", 0.05)
+    monkeypatch.setattr(voicesdk.Listeners, "IDLE_EXIT_S", 0.3)
+    threads, go, looking = set(), threading.Event(), threading.Event()
+
+    def lister(device):
+        threads.add(threading.current_thread())
+        looking.set()
+        go.wait(5)
+        return []
+    lis = voicesdk.Listeners(lister=lister, scanner=lambda p: None)
+    lis.poll("CABLE Output")
+    assert looking.wait(5)
+    for _ in range(20):                     # while the first look still runs
+        lis.poll("CABLE Output")
+    go.set()
+    _wait(lambda: lis.looks == 2)
+    time.sleep(0.2)
+    assert lis.looks == 2                   # the 20 became one more look
+    for _ in range(3):
+        lis.poll("CABLE Output")
+        _wait(lambda n=lis.looks: lis.looks > n)
+    assert len(threads) == 1 and next(iter(threads)).name == "voicesdk-listeners"
+    _wait(lambda: lis._thread is None)      # nobody polls: the thread ends...
+    lis.poll("CABLE Output")                # ...and the next poll starts one again
+    _wait(lambda: lis.looks == 6)
+
+
+def _wait(cond, timeout=5.0):
+    end = time.monotonic() + timeout
+    while not cond():
+        assert time.monotonic() < end, "timed out"
+        time.sleep(0.01)

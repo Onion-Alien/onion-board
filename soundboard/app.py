@@ -395,6 +395,8 @@ def main():
         except Exception as e:  # noqa: BLE001 - a FAILED line, not the frozen exe's error box
             print(f"FAILED: {type(e).__name__}: {e}", file=sys.stderr)
             sys.exit(1)
+    from soundboard import threadnames
+    threadnames.install()   # first: every thread after this has its name in Windows too
     migrate_from_soundboard()
     log_path = applog.setup(APP_DIR)
     applog.install_hooks(log_path, __version__)

@@ -81,6 +81,27 @@ def test_a_taken_port_is_reported(qapp, ctl):
     assert not other.running
 
 
+def test_the_server_sleeps_until_asked_and_stops_at_once(qapp, monkeypatch):
+    """It used to wake 4 times a second to see whether it should stop; now it waits
+    for a connection, and stopping wakes it straight away, so the same port can be
+    taken again at once (a restart with a new key)."""
+    looks = []
+    real = remote._Server.service_actions
+    monkeypatch.setattr(remote._Server, "service_actions",
+                        lambda self: looks.append(1) or real(self))
+    c = remote.RemoteControl(lambda a, p: (200, {}))
+    assert c.start(0, TOKEN)
+    port = c.port
+    time.sleep(0.6)
+    assert looks == []                                  # nothing came: still asleep
+    assert call(qapp, c, f"/api/status?token={TOKEN}")[0] == 200
+    t0 = time.monotonic()
+    c.stop()
+    assert time.monotonic() - t0 < 0.5 and not c.running
+    assert c.start(port, TOKEN) and c.port == port
+    c.stop()
+
+
 def test_a_client_that_goes_quiet_is_dropped(qapp, monkeypatch):
     monkeypatch.setattr(remote, "IDLE_S", 0.3)
     c = remote.RemoteControl(lambda a, p: (200, {}))
