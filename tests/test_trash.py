@@ -4,7 +4,7 @@ import time
 from pathlib import Path
 
 import pytest
-from conftest import process_events
+from conftest import own_time, process_events
 from test_appspanel import music
 from test_appspanel import tab as apps_tab  # noqa: F401 - the Apps tab with fake captures
 from test_mainwindow import window  # noqa: F401 - the real MainWindow, offscreen
@@ -169,7 +169,7 @@ def test_a_locked_bin_list_is_never_saved_over(app_dir, monkeypatch):
             raise PermissionError(32, "being used by another process")
         return real(self, *a, **k)
 
-    monkeypatch.setattr(trash.time, "sleep", lambda _s: None)
+    own_time(monkeypatch, trash, sleep=lambda _s: None)
     monkeypatch.setattr(Path, "read_text", read_text)
     trash.put_sound(_sound(app_dir, "k3"), 0)
     assert locked["n"] > 1                     # tried again before giving up

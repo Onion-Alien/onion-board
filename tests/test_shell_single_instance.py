@@ -5,6 +5,7 @@ import uuid
 
 import pytest
 
+from conftest import own_time
 from soundboard import singleinstance as si
 
 
@@ -25,7 +26,7 @@ def test_second_launch_waits_for_a_first_one_still_starting(qapp, instance, monk
     def sleep(_s):   # the first copy gets as far as listening while the second waits
         if not servers:
             servers.append(si.listen_for_second_launch(qapp, lambda: None))
-    monkeypatch.setattr(si.time, "sleep", sleep)
+    own_time(monkeypatch, si, sleep=sleep)
     assert not si.claim_single_instance()   # the second copy
     assert instance == []                   # no "already open" message
     from conftest import process_events

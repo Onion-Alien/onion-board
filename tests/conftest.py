@@ -280,6 +280,15 @@ def _switches_back_on():
     net.configure_features()
 
 
+@pytest.fixture(autouse=True)
+def _data_prefs_back_to_default(monkeypatch):
+    """Settings > Data & quality (soundboard.quality.current) is process-wide too: a
+    test that turns on Low data mode doesn't leave the next one without thumbnails."""
+    quality = sys.modules.get("soundboard.quality")
+    if quality is not None:
+        monkeypatch.setattr(quality, "current", quality.Prefs())
+
+
 class NoMidi:
     """soundboard.midi's winmm backend with no devices: tests never open the
     developer's real MIDI controllers (a DAW may be using them)."""
@@ -329,6 +338,20 @@ def _never_touch_real_autostart(monkeypatch):
     that exercise autostart put their own fake winreg in."""
     from soundboard import autostart
     monkeypatch.setattr(autostart, "winreg", None)
+
+
+def own_time(monkeypatch, module, **fakes):
+    """Give `module` a time module of its own with `fakes` in it (sleep=..., monotonic=...).
+    Patching time.sleep itself changes it for every thread in the process: the threads
+    earlier tests left running then spin flat out (a 1 s test took 44 s, and a window's
+    loader beside it missed its 15 s)."""
+    import time
+    import types
+    t = types.ModuleType("time")
+    t.__dict__.update(vars(time))
+    t.__dict__.update(fakes)
+    monkeypatch.setattr(module, "time", t)
+    return t
 
 
 def us_key_char(vk: int) -> str:

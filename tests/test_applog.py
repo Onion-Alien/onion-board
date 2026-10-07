@@ -5,6 +5,7 @@ from pathlib import Path
 
 import pytest
 
+from conftest import own_time
 from soundboard import applog
 
 
@@ -244,7 +245,7 @@ def test_same_bug_again_skips_the_file_and_logs_one_counted_line(fresh, monkeypa
     monkeypatch.setattr(applog, "build_report",
                         lambda *a, **k: built.append(1) or real_build(*a, **k))
     now = [1000.0]
-    monkeypatch.setattr(applog.time, "monotonic", lambda: now[0])
+    own_time(monkeypatch, applog, monotonic=lambda: now[0])
 
     def boom():
         raise KeyError("x")
