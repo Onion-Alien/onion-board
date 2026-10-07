@@ -39,7 +39,7 @@ import numpy as np
 import sounddevice as sd
 import soxr
 
-from soundboard import destination, directmic, livefx, mapped
+from soundboard import destination, directmic, livefx, mapped, sharestore
 from soundboard.dsp import hermite
 from soundboard.eq import EQ
 from soundboard.sendfx import Ducker, Limiter, SafetyLimiter, SmartMono
@@ -1532,7 +1532,10 @@ class Engine:
             return hit[2]
         self._sweep()
         gen = self._forgets.get(key, 0)
-        shares = destination.cut_shares(data, src_rate)
+        shares = sharestore.lookup(data, src_rate)   # a long song's, from the last start
+        if shares is None:
+            shares = destination.cut_shares(data, src_rate)
+            sharestore.remember(data, src_rate, shares)   # (does nothing unless mapped)
         with self._cache_lock:
             if self._forgets.get(key, 0) == gen:   # not forgotten meanwhile
                 self._shares[key] = (self._ref(data), src_rate, shares)
