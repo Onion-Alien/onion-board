@@ -9,7 +9,7 @@ from __future__ import annotations
 
 from collections.abc import Callable
 
-from PySide6.QtCore import QObject, Qt
+from PySide6.QtCore import QEvent, QObject, Qt
 from PySide6.QtGui import QGuiApplication
 from PySide6.QtWidgets import QWidget
 
@@ -25,12 +25,29 @@ class _Pauser(QObject):
     def __init__(self, widget: QWidget, start: Callable[[], None], stop: Callable[[], None]):
         super().__init__(widget)
         self._widget, self._start, self._stop = widget, start, stop
+        self._watching = None   # the minimised window we wait on to be restored
 
     def on_state(self, state):
         if state != Qt.ApplicationActive:
             self._stop()
-        elif self._widget.isVisible() and not self._widget.window().isMinimized():
-            self._start()   # (a minimised window's widgets are still "visible")
+        elif self._widget.isVisible():
+            win = self._widget.window()
+            if not win.isMinimized():
+                self._start()   # (a minimised window's widgets are still "visible")
+            elif self._watching is None:
+                # Restoring from the taskbar makes the app active *before* the window
+                # leaves its minimised state, so start once it actually has.
+                self._watching = win
+                win.installEventFilter(self)
+
+    def eventFilter(self, obj, e):
+        if obj is self._watching and e.type() == QEvent.WindowStateChange \
+                and not obj.isMinimized():
+            obj.removeEventFilter(self)
+            self._watching = None
+            if active() and self._widget.isVisible():
+                self._start()
+        return False
 
 
 def pause_in_background(widget: QWidget, start: Callable[[], None],
