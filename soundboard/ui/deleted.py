@@ -13,7 +13,29 @@ from PySide6.QtWidgets import (QAbstractItemView, QDialog, QDialogButtonBox, QHB
 from soundboard import trash
 from soundboard.ui import fit, icons
 from soundboard.ui.panel import hint_label
-from soundboard.i18n import _
+from soundboard.i18n import _, ngettext
+
+
+def _texts(what: str, keep_days: int) -> tuple[str, str, str]:
+    """(title, hint, empty list) for "sounds", "voices" or "programs": whole sentences,
+    so each language can word them its own way."""
+    if what == "voices":
+        return (_("Recently deleted voices"),
+                ngettext("Voices you delete are kept here for {n} day, so you can bring "
+                         "them back.", "Voices you delete are kept here for {n} days, so "
+                         "you can bring them back.", keep_days),
+                _("Nothing here. Deleted voices show up here."))
+    if what == "programs":
+        return (_("Recently deleted programs"),
+                ngettext("Programs you delete are kept here for {n} day, so you can bring "
+                         "them back.", "Programs you delete are kept here for {n} days, "
+                         "so you can bring them back.", keep_days),
+                _("Nothing here. Deleted programs show up here."))
+    return (_("Recently deleted sounds"),
+            ngettext("Sounds you delete are kept here for {n} day, so you can bring them "
+                     "back.", "Sounds you delete are kept here for {n} days, so you can "
+                     "bring them back.", keep_days),
+            _("Nothing here. Deleted sounds show up here."))
 
 
 class DeletedDialog(QDialog):
@@ -25,11 +47,10 @@ class DeletedDialog(QDialog):
         super().__init__(parent)
         fit.watch(self)
         self.kind, self.what, self.restore, self.source = kind, what, restore, source
-        self.setWindowTitle(_("Recently deleted {what}", what=what))
+        title, hint, self.empty_text = _texts(what, source.KEEP_DAYS)
+        self.setWindowTitle(title)
         lay = QVBoxLayout(self)
-        self.hint = hint_label(_("{what} you delete are kept here for {keep_days} days, so you "
-                                 "can bring them back.",
-                                 what=what.capitalize(), keep_days=source.KEEP_DAYS))
+        self.hint = hint_label(hint)
         lay.addWidget(self.hint)
         self.list = QListWidget()
         self.list.setSelectionMode(QAbstractItemView.ExtendedSelection)
@@ -64,7 +85,7 @@ class DeletedDialog(QDialog):
         if self.list.count():
             self.list.setCurrentRow(0)
         else:
-            li = QListWidgetItem(_("Nothing here. Deleted {what} show up here.", what=self.what))
+            li = QListWidgetItem(self.empty_text)
             li.setFlags(Qt.NoItemFlags)
             self.list.addItem(li)
         self._update()
@@ -97,8 +118,9 @@ class DeletedDialog(QDialog):
         n = len(ids)
         if QMessageBox.question(
                 self, _("Delete for good"),
-                _("Delete {value} for good? This can't be undone.",
-                  value='this' if n == 1 else f'these {n}')) != QMessageBox.Yes:
+                ngettext("Delete {n} item for good? This can't be undone.",
+                         "Delete {n} items for good? This can't be undone.", n)
+            ) != QMessageBox.Yes:
             return
         for iid in ids:
             self.source.forget(iid)

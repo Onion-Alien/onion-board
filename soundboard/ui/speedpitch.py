@@ -23,12 +23,12 @@ from soundboard.ui.panel import hint_label, section_label
 from soundboard.ui.voicepanel import ParamSlider
 from soundboard.i18n import _
 
-SPEED = voicefx.Param("speed", "Speed", 0.25, 2.0, 1.0, "x", 0.05)
-PITCH = voicefx.Param("pitch", "Pitch", -12, 12, 0, " st", 1)
+SPEED = voicefx.Param("speed", _("Speed"), 0.25, 2.0, 1.0, "x", 0.05)
+PITCH = voicefx.Param("pitch", _("Pitch"), -12, 12, 0, " st", 1)
 QUICK = (0.5, 0.75, 1.0, 1.25, 1.5, 2.0)
 REDLINE_AT = 2.0                        # the meter's red zone starts here
 REDLINE_SPEED = (0.1, 10.0)             # sounds
-REDLINE_PITCH = voicefx.Param("pitch", "Pitch", -36, 36, 0, " st", 1)
+REDLINE_PITCH = voicefx.Param("pitch", _("Pitch"), -36, 36, 0, " st", 1)
 REDLINE_QUICK = (3.0, 4.0, 6.0, 8.0, 10.0)
 RED = "#ff4d4f"
 NAME_W, VAL_W, GAP = 48, 52, 10         # popup slider columns: name | track | value
@@ -37,7 +37,7 @@ COL_W = 340                             # each column
 
 
 def redline_speed(lo: float, hi: float) -> voicefx.Param:
-    return voicefx.Param("speed", "Speed", lo, hi, 1.0, "x", 0.05)
+    return voicefx.Param("speed", _("Speed"), lo, hi, 1.0, "x", 0.05)
 
 
 class RevMeter(QWidget):
@@ -112,7 +112,7 @@ class RevMeter(QWidget):
         if hot:
             f.setPointSizeF(7)
             p.setFont(f)
-            p.drawText(QRectF(c.x() - 60, c.y() + 25, 120, 14), Qt.AlignCenter, "REDLINE")
+            p.drawText(QRectF(c.x() - 60, c.y() + 25, 120, 14), Qt.AlignCenter, _("REDLINE"))
         p.end()
 
 
@@ -128,7 +128,7 @@ class SpeedPitchButton(QPushButton):
         super().__init__()
         self.setObjectName("small")
         self.setProperty("speedpitch", True)
-        self.setToolTip(_("Speed, pitch and effects of the {what} playing now", what=what))
+        self.setToolTip(_("Speed, pitch and effects of the sounds playing now"))
         self.setCursor(Qt.PointingHandCursor)
         self._speed_hi = redline_speed(*redline)
         redline = redline[1]
@@ -144,7 +144,7 @@ class SpeedPitchButton(QPushButton):
         head.setSpacing(8)
         title = QLabel(_("Live controls"))
         title.setStyleSheet("font-weight:700; font-size:10.5pt;")
-        sub = QLabel(_("All {what}", what=what))
+        sub = QLabel(_("All sounds"))
         sub.setObjectName("muted")
         reset = QPushButton(_("Reset all"))
         reset.setObjectName("small")
@@ -177,7 +177,7 @@ class SpeedPitchButton(QPushButton):
         outer, v = v, QVBoxLayout(left_w)     # the speed & pitch column
         v.setContentsMargins(0, 0, 0, 0)
         v.setSpacing(8)
-        v.addWidget(section_label("SPEED & PITCH"))
+        v.addWidget(section_label(_("SPEED & PITCH")))
         self.speed = self._slider(SPEED, 1.0)
         self.pitch = self._slider(PITCH, 0.0)
         v.addWidget(self.speed)
@@ -244,7 +244,7 @@ class SpeedPitchButton(QPushButton):
         v = QVBoxLayout(box)
         v.setContentsMargins(0, 0, 0, 0)
         v.setSpacing(8)
-        v.addWidget(section_label("EFFECTS"))
+        v.addWidget(section_label(_("EFFECTS")))
         self.fx = {}
         for q in livefx.PARAMS:
             s = self._slider(q, q.default, FX_NAME_W)
