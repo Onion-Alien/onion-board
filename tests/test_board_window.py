@@ -211,3 +211,27 @@ def test_without_a_tray_close_quits_and_never_starts_hidden(window):
         assert not window.can_hide()
     window.cfg.setup_done = False
     assert not window.can_hide()
+
+
+def test_the_tray_menu_offers_the_discord_and_feedback(window, monkeypatch):
+    """Near the bottom, above Quit; both only open a page in the browser."""
+    from PySide6.QtWidgets import QApplication, QSystemTrayIcon
+
+    from soundboard import __version__, feedback
+    from soundboard.ui import busy
+    opened = []
+    monkeypatch.setattr(busy.QDesktopServices, "openUrl", lambda u: opened.append(u.toString()))
+    monkeypatch.setattr(QSystemTrayIcon, "isSystemTrayAvailable", staticmethod(lambda: True))
+    old, quits = window.tray, QApplication.instance().quitOnLastWindowClosed()
+    try:
+        window._init_tray()
+        acts = [a for a in window.tray.contextMenu().actions()]
+        texts = [a.text() for a in acts if not a.isSeparator()]
+        assert texts[-3:] == ["Join the Discord", "Send feedback", "Quit"]
+        next(a for a in acts if a.text() == "Join the Discord").trigger()
+        next(a for a in acts if a.text() == "Send feedback").trigger()
+        assert opened == [feedback.DISCORD_URL, feedback.feedback_url(__version__)]
+    finally:
+        window.tray.hide()
+        window.tray = old
+        QApplication.instance().setQuitOnLastWindowClosed(quits)

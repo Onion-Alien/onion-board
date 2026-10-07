@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- **Onion Board has a Discord.** Chat, get help and hear about new versions: *Join
+  the Discord* in Settings, the tray icon's menu, *What's new* and the installer's
+  last page (it only opens when you click it).
 - **Discord's automatic input sensitivity is caught too.** In a real call it kept
   cutting songs out in bursts: up to a third of a high-pitched song went missing,
   none once it was off. The *Fix Discord* bar and the Discord guide now say when

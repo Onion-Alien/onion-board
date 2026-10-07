@@ -969,7 +969,7 @@
     "",
     ""
   ],
-  "Found a bug, missing something, or just want to say hi? It opens in your browser, and nothing is sent unless you submit it there.": "",
+  "The Discord is where to chat, ask for help and hear about new versions. Found a bug or missing something? Everything opens in your browser, and nothing is sent unless you submit it there.": "No Discord você pode bater papo, pedir ajuda e ficar sabendo das novas versões. Achou um bug ou sentiu falta de algo? Tudo abre no seu navegador, e nada é enviado a menos que você envie por lá.",
   "Free add-ons from GitHub. Removing or reinstalling one keeps your triggers and paired phones.": "",
   "Free, with no ads and no account. Made by OnionAlien. MIT license with the Commons Clause: use it for anything, share it for free, never sell it.": "",
   "Frequencies": "",
@@ -1011,7 +1011,7 @@
   "How loud the stream output is (only OBS hears it)": "",
   "How much data went to each site, added up over the whole history": "",
   "I'm bored…": "",
-  "Ideas, bugs, or just want to say hi? The feedback form needs no account. Found a security problem? Report it privately on GitHub, not in a public issue.": "",
+  "The Discord is where to chat, ask for help and hear about new versions. The feedback form needs no account. Found a security problem? Report it privately on GitHub, not in a public issue.": "No Discord você pode bater papo, pedir ajuda e ficar sabendo das novas versões. O formulário de feedback não precisa de conta. Achou um problema de segurança? Avise em particular no GitHub, não numa issue pública.",
   "If one doesn't connect, try the other": "",
   "Important fix in Onion Board {version}: {fix}": "",
   "Important fix in Onion Watch {version}: {fix}": "",
@@ -1748,5 +1748,8 @@
   "⟲  Restart my PC now": "",
   "⟳  Check again": "",
   "⬇  Install it now (free)": "",
-  "⬇  Try installing again": ""
+  "⬇  Try installing again": "",
+  "Join the Discord": "Entrar no Discord",
+  "Chat about it on Discord": "Converse sobre isso no Discord",
+  "The Onion Board Discord server, in your browser": "O servidor do Discord do Onion Board, no seu navegador"
 }

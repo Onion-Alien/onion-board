@@ -98,6 +98,15 @@ def _write(raw: dict):
     library.CONFIG_PATH.write_text(json.dumps(raw), encoding="utf-8")
 
 
+def test_a_small_discord_link_sits_under_the_notes(window):
+    from soundboard import feedback
+    dlg = whatsnew.WhatsNewDialog(window, whatsnew.NOTES[:1])
+    link = dlg.discord_link
+    assert f'href="{feedback.DISCORD_URL}"' in link.text()
+    assert "Chat about it on Discord" in link.text() and link.openExternalLinks()
+    dlg.close()
+
+
 def test_privacy_survives_an_older_version_saving_over_it(app_dir):
     cfg = Config(net_mode="tor", net_off=["radio", "sounds_web.youtube"], net_offline=True,
                  netlog_keep=True, tor_bridges="snowflake", net_proxy="socks5h://h:1")
