@@ -118,12 +118,14 @@ def find_screen(screens, key: str):
 
 def monitor_choices(screens, primary) -> list[tuple[str, str]]:
     """(value, label) for the Settings window's monitor list."""
-    out = [(MONITOR_GAME, "The one the game is on"), (MONITOR_PRIMARY, "Main monitor")]
+    out = [(MONITOR_GAME, _("The one the game is on")), (MONITOR_PRIMARY, _("Main monitor"))]
     for i, sc in enumerate(screens, 1):
         g, k = sc.geometry(), sc.devicePixelRatio()
-        main = "  (main)" if sc is primary else ""
-        out.append((screen_key(sc), f"Screen {i}: {sc.name()}  "
-                                    f"{round(g.width() * k)}×{round(g.height() * k)}{main}"))
+        size = f"{round(g.width() * k)}×{round(g.height() * k)}"
+        out.append((screen_key(sc),
+                    _("Screen {n}: {name}  {size}  (main)", n=i, name=sc.name(), size=size)
+                    if sc is primary else
+                    _("Screen {n}: {name}  {size}", n=i, name=sc.name(), size=size)))
     return out
 
 
@@ -822,24 +824,24 @@ class OverlayWindow(QWidget):
         f.setPointSizeF(8.5)
         p.setFont(f)
         p.setPen(QColor(T["muted"]))
-        cat_key = (f"     {key_label(ks['cat'])}  category"
+        cat_key = ("     " + _("{key}  category", key=key_label(ks["cat"]))
                    if ov.host.cfg.categories else "")
         if not ov.sounds():
             p.drawText(foot, Qt.AlignCenter,
-                       f"Nothing in this category{cat_key}" if cat
-                       else "No sounds yet: add some in the Sounds tab")
+                       _("Nothing in this category") + cat_key if cat
+                       else _("No sounds yet: add some in the Sounds tab"))
         else:
             btns, paused, live = self._buttons(), self._all_paused(), bool(self.playing)
             self._button(p, f, "pause", "play" if paused else "pause",
-                         "Resume" if paused else "Pause", key_label(ks["pause"]), live)
-            self._button(p, f, "stop", "stop", "Stop all", key_label(ks["stop"]), live)
+                         _("Resume") if paused else _("Pause"), key_label(ks["pause"]), live)
+            self._button(p, f, "stop", "stop", _("Stop all"), key_label(ks["stop"]), live)
             f.setBold(False)
             f.setPointSizeF(8.5)
             p.setFont(f)
             p.setPen(QColor(T["muted"]))
             left = btns["stop"].right() + 10
             rest = QRectF(left, btns["stop"].top(), W - self.PAD - 2 - left, self.BTN_H)
-            close = "let go to close" if ov.s.mode == "hold" else "Esc  close"
+            close = _("let go to close") if ov.s.mode == "hold" else _("Esc  close")
             p.drawText(rest, Qt.AlignLeft | Qt.AlignVCenter, cat_key.strip())
             p.drawText(rest, Qt.AlignRight | Qt.AlignVCenter, close)
 
@@ -954,7 +956,7 @@ class OverlayWindow(QWidget):
         p.setFont(f)
         p.setPen(QColor(T["text_hi"] if ready else T["muted"]))
         p.drawText(r.adjusted(11, 27, -8, -5), Qt.AlignLeft | Qt.AlignTop | Qt.TextWordWrap,
-                   meta.name if ready else f"{meta.name} (loading)")
+                   meta.name if ready else _("{name} (loading)", name=meta.name))
 
     def _tile_edge(self, p: QPainter, r: QRectF, i: int, meta, flash: bool):
         T = theme.T

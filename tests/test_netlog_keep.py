@@ -223,7 +223,7 @@ def test_the_view_has_totals_and_open_log(qapp, path):
     assert w.open_log.isEnabled() and netlog.kept_file() == path
     d = TotalsDialog()
     assert d.table.rowCount() == 2 and d.table.item(0, 0).text() == "example.com"
-    assert "3 connection(s) to 2 site(s)" in d.summary.text()
+    assert "3 connections to 2 sites" in d.summary.text()
     assert d.table.item(0, 1).text() == "2"
     d.by_site.setChecked(False)
     assert d.table.rowCount() == 3
