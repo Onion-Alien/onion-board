@@ -33,6 +33,7 @@ from PySide6.QtGui import (QColor, QFont, QFontMetrics, QGuiApplication, QPainte
 from PySide6.QtWidgets import QApplication, QWidget
 
 from soundboard import theme, winkeys
+from soundboard.i18n import _, ngettext
 
 log = logging.getLogger(__name__)
 
@@ -45,19 +46,20 @@ KEYSETS = {
     "numpad": dict(slots=[f"num {i}" for i in (7, 8, 9, 4, 5, 6, 1, 2, 3)],
                    prev="subtract", next="add", stop="num 0", pause="num .", cat="multiply"),
 }
-MODES = [("toggle", "Tap to open, tap again to close"),
-         ("hold", "Hold to show, let go to hide")]
-KEY_CHOICES = [("digits", "Number row 1–9  (Q / E flip pages, R category)"),
-               ("numpad", "Numpad  (− / + flip pages, * category)")]
-POSITIONS = [("top-left", "Top left"), ("top", "Top middle"), ("top-right", "Top right"),
-             ("left", "Middle left"), ("center", "Middle"), ("right", "Middle right"),
-             ("bottom-left", "Bottom left"), ("bottom", "Bottom middle"),
-             ("bottom-right", "Bottom right"), ("custom", "Where I dragged it")]
+MODES = [("toggle", _("Tap to open, tap again to close")),
+         ("hold", _("Hold to show, let go to hide"))]
+KEY_CHOICES = [("digits", _("Number row 1–9  (Q / E flip pages, R category)")),
+               ("numpad", _("Numpad  (− / + flip pages, * category)"))]
+POSITIONS = [("top-left", _("Top left")), ("top", _("Top middle")),
+             ("top-right", _("Top right")), ("left", _("Middle left")),
+             ("center", _("Middle")), ("right", _("Middle right")),
+             ("bottom-left", _("Bottom left")), ("bottom", _("Bottom middle")),
+             ("bottom-right", _("Bottom right")), ("custom", _("Where I dragged it"))]
 # which monitor: the one the game is on, the main one, or one screen's screen_key()
 MONITOR_GAME, MONITOR_PRIMARY = "game", "primary"
 DRAG_START_PX = 4       # how far a press has to move before it's a drag
-AUTOHIDE = [(0, "Never"), (3, "3 seconds"), (4, "4 seconds"), (6, "6 seconds"),
-            (10, "10 seconds")]
+AUTOHIDE = [(0, _("Never"))] + [(s, ngettext("{n} second", "{n} seconds", s))
+                                 for s in (3, 4, 6, 10)]
 CLOSE_DELAY_MS = 220    # after a pick, long enough to see the tile light up
 FLASH_S = 0.25
 HOLD_POLL_MS = 30
@@ -395,7 +397,7 @@ class Overlay:
         self.page = (self.page + step) % n
         self.flash = None
         if self.blind and n > 1:     # 1 beep for page 1, 2 for page 2, …
-            self.host.cue(tuple(f for _ in range(min(self.page + 1, 6)) for f in (1175, 0)))
+            self.host.cue(tuple(f for __ in range(min(self.page + 1, 6)) for f in (1175, 0)))
         if self._window is not None:
             self._window.update()
         self._touch()
@@ -519,7 +521,7 @@ class OverlayWindow(QWidget):
         self.ov = ov
         self.setAttribute(Qt.WA_TranslucentBackground)
         self.setAttribute(Qt.WA_ShowWithoutActivating)
-        self.setWindowTitle("Onion Board overlay")
+        self.setWindowTitle(_("Onion Board overlay"))
         self.playing: dict = {}
         self._hover: str | None = None     # "slot:N" / "pause" / "stop" under the mouse
         self.setMouseTracking(True)
@@ -567,7 +569,7 @@ class OverlayWindow(QWidget):
         return None
 
     def _all_paused(self) -> bool:
-        return bool(self.playing) and all(paused for _, paused in self.playing.values())
+        return bool(self.playing) and all(paused for __, paused in self.playing.values())
 
     # ------------------------------------------------------------------ mouse
     def mouseMoveEvent(self, e):
@@ -757,7 +759,7 @@ class OverlayWindow(QWidget):
         p.setRenderHint(QPainter.Antialiasing)
         p.drawPixmap(0, 0, under)
         p.scale(k, k)
-        for _, r, meta in tiles:
+        for __, r, meta in tiles:
             self._tile_bar(p, r, meta)
         p.resetTransform()
         p.drawPixmap(0, 0, over)
@@ -791,7 +793,7 @@ class OverlayWindow(QWidget):
         p.setFont(f)
         p.setPen(QColor(T["text_hi"]))
         cat = ov.host.cfg.category
-        title = f"Page {ov.page + 1} of {n}" if n > 1 else "Sounds"
+        title = _("Page {value} of {n}", value=ov.page + 1, n=n) if n > 1 else _("Sounds")
         if cat:
             title = f"{cat}  ·  {title}" if n > 1 else cat
         hint = f"{key_label(ks['prev'])}  ‹  ›  {key_label(ks['next'])}" if n > 1 else ""

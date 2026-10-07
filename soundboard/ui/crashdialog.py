@@ -17,6 +17,7 @@ import shiboken6
 
 from soundboard.ui import fit
 from soundboard.updates import REPO
+from soundboard.i18n import _
 
 ISSUE_URL = f"https://github.com/{REPO}/issues/new"
 ISSUE_BODY = ("**What were you doing when it happened?**\n\n\n"
@@ -35,13 +36,13 @@ class CrashDialog(QDialog):
         super().__init__(parent)
         fit.watch(self)   # grows to fit its text (ui/fit.py)
         self.rep, self.log_path = rep, log_path
-        self.setWindowTitle("Onion Board hit a problem")
+        self.setWindowTitle(_("Onion Board hit a problem"))
         self.setAttribute(Qt.WidgetAttribute.WA_DeleteOnClose)
         self.setMinimumSize(560, 420)
         v = QVBoxLayout(self)
 
-        head = QLabel("Sorry — something went wrong." if not rep.fatal
-                      else "Sorry — Onion Board couldn't start.")
+        head = QLabel(_("Sorry — something went wrong.") if not rep.fatal
+                      else _("Sorry — Onion Board couldn't start."))
         f = head.font()
         f.setPointSizeF(f.pointSizeF() * 1.3)
         f.setBold(True)
@@ -57,10 +58,10 @@ class CrashDialog(QDialog):
         keep = ("The app will close." if rep.fatal else
                 "The app is still running, but if something looks wrong, restart it.")
         ask = QLabel(
-            f"{keep}<br><br><b>Please send this report to the developer</b> so it can be "
-            "fixed: press <i>Report on GitHub</i> and paste it in (it's copied for you), "
-            "or <i>Copy report</i> and send it however you like. Nothing is sent "
-            "automatically, and your user name and folders are already blanked out.")
+            _("{keep}<br><br><b>Please send this report to the developer</b> so it can be fixed: "
+              "press <i>Report on GitHub</i> and paste it in (it's copied for you), or <i>Copy "
+              "report</i> and send it however you like. Nothing is sent automatically, and your "
+              "user name and folders are already blanked out.", keep=keep))
         ask.setWordWrap(True)
         v.addWidget(ask)
 
@@ -77,17 +78,17 @@ class CrashDialog(QDialog):
         v.addWidget(self.status)
 
         row = QHBoxLayout()
-        self.copy_btn = QPushButton("Copy report")
+        self.copy_btn = QPushButton(_("Copy report"))
         self.copy_btn.clicked.connect(self.copy)
-        self.github_btn = QPushButton("Report on GitHub")
+        self.github_btn = QPushButton(_("Report on GitHub"))
         self.github_btn.setDefault(True)
-        self.github_btn.setToolTip("Copies the report and opens a new issue in your browser")
+        self.github_btn.setToolTip(_("Copies the report and opens a new issue in your browser"))
         self.github_btn.clicked.connect(self.open_issue)
-        self.folder_btn = QPushButton("Open folder")
-        self.folder_btn.setToolTip("The saved report and the app's log")
+        self.folder_btn = QPushButton(_("Open folder"))
+        self.folder_btn.setToolTip(_("The saved report and the app's log"))
         self.folder_btn.clicked.connect(self.open_folder)
         self.folder_btn.setEnabled(self._folder() is not None)
-        close = QPushButton("Quit" if rep.fatal else "Close")
+        close = QPushButton(_("Quit") if rep.fatal else _("Close"))
         close.clicked.connect(self.accept)
         for b in (self.copy_btn, self.github_btn, self.folder_btn):
             row.addWidget(b)
@@ -104,16 +105,16 @@ class CrashDialog(QDialog):
 
     def copy(self):
         QGuiApplication.clipboard().setText(self.report_text())
-        self.status.setText("Report copied — paste it into your message (Ctrl+V).")
+        self.status.setText(_("Report copied — paste it into your message (Ctrl+V)."))
 
     def open_issue(self):
         self.copy()
         if QDesktopServices.openUrl(QUrl(issue_url(self.rep.title))):
-            self.status.setText("Report copied. Paste it into the issue that just opened "
-                                "in your browser (Ctrl+V).")
+            self.status.setText(_("Report copied. Paste it into the issue that just opened in "
+                                  "your browser (Ctrl+V)."))
         else:
-            self.status.setText(f"Report copied, but the browser didn't open. Go to "
-                                f"{ISSUE_URL} and paste it there.")
+            self.status.setText(_("Report copied, but the browser didn't open. Go to {issue_url} "
+                                  "and paste it there.", issue_url=ISSUE_URL))
 
     def _folder(self) -> Path | None:
         if self.rep.path is not None:
@@ -125,9 +126,9 @@ class CrashDialog(QDialog):
         if folder is None:
             return
         if QDesktopServices.openUrl(QUrl.fromLocalFile(str(folder))):
-            self.status.setText("Opened the folder with the log in it.")
+            self.status.setText(_("Opened the folder with the log in it."))
         else:
-            self.status.setText(f"Couldn't open the folder. It's here: {folder}")
+            self.status.setText(_("Couldn't open the folder. It's here: {folder}", folder=folder))
 
 
 def free_dialog(dlg: QDialog):

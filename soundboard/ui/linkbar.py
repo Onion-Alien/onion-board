@@ -24,6 +24,7 @@ from soundboard.library import (SR, decode, fingerprint, import_file, level_gain
 from soundboard.ui import busy, icons
 from soundboard.ui.widgets import fmt_time
 from soundboard import errors
+from soundboard.i18n import _
 
 log = logging.getLogger(__name__)
 
@@ -78,21 +79,21 @@ class LinkBar(QFrame):
         self.info.setWordWrap(True)
         errors.linkify(self.info)   # an error's "Report it" link
         h.addWidget(self.info, 1)
-        self.btn_play = QPushButton("Play once")
-        self.btn_play.setToolTip("Download it and play it once, like a pad (others hear it "
-                                 "too) — it isn't added to your Sounds")
+        self.btn_play = QPushButton(_("Play once"))
+        self.btn_play.setToolTip(_("Download it and play it once, like a pad (others hear it "
+                                   "too) — it isn't added to your Sounds"))
         icons.set_icon(self.btn_play, "play", size=14)
         self.btn_play.clicked.connect(self.play_once)
-        self.btn_add = QPushButton("Add as sound")
+        self.btn_add = QPushButton(_("Add as sound"))
         self.btn_add.setObjectName("primary")
-        self.btn_add.setToolTip("Download its audio and add it to your Sounds (Enter)")
+        self.btn_add.setToolTip(_("Download its audio and add it to your Sounds (Enter)"))
         icons.set_icon(self.btn_add, "plus", "on_accent", size=14)
         self.btn_add.clicked.connect(self.add)
         # Tor mode, after the site turned Tor away even over new routes: only this click
         # makes one download go without Tor (ytdl.TorBlocked)
-        self.btn_direct = QPushButton("Try this one without Tor")
-        self.btn_direct.setToolTip("Download just this one link straight from the site, not "
-                                   "through Tor: the site will see your own address")
+        self.btn_direct = QPushButton(_("Try this one without Tor"))
+        self.btn_direct.setToolTip(_("Download just this one link straight from the site, not "
+                                     "through Tor: the site will see your own address"))
         self.btn_direct.clicked.connect(self._without_tor)
         self.btn_direct.hide()
         self._blocked = ""            # "add" / "play" that Tor couldn't do for this link
@@ -170,8 +171,8 @@ class LinkBar(QFrame):
         ok = bool(self.url) and not self._busy and ytdl.site_allowed(self.url)
         self.btn_add.setEnabled(ok)
         self.btn_play.setEnabled(ok)
-        self.btn_add.setText("Adding…" if self._busy == "add" else "Add as sound")
-        self.btn_play.setText("Loading…" if self._busy == "play" else "Play once")
+        self.btn_add.setText(_("Adding…") if self._busy == "add" else _("Add as sound"))
+        self.btn_play.setText(_("Loading…") if self._busy == "play" else _("Play once"))
 
     def _drop_download(self):
         if self._got is not None:
@@ -310,7 +311,7 @@ class LinkBar(QFrame):
             # a bot check or rate limit is about the user's address, not yt-dlp
             hint = ("" if not isinstance(e, ytdl.FetchError) or auto_update
                     or ytdl.blocked_by_site(f"{e} {getattr(e, 'raw', '')}") else
-                    " A newer yt-dlp may fix this: Settings → Updates → Update now.")
+                    _(" A newer yt-dlp may fix this: Settings → Updates → Update now."))
             doing = "add" if kind == "add" else "play"
             # rich text: the plain words, and a "Report it" link when it's one for us
             self._msg.emit("error", url, errors.html(e, f"Couldn't {doing} it: ",
