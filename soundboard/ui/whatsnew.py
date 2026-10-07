@@ -28,6 +28,17 @@ class Note:
 
 # newest first; add one per release that has something worth telling
 NOTES = (
+    Note("1.9.8", "Lighter, and a Discord to join", (
+        ("check", "Uses less memory",
+         "The 3D globe is gone (the flat map stays), so the app and its download are much "
+         "smaller and it holds far less memory and fewer threads while it sits there."),
+        ("shield", "Discord's automatic sensitivity is caught too",
+         "It kept cutting songs out in bursts in calls. The Fix Discord bar now says when "
+         "it's on and how to switch it off."),
+        ("plus", "Join the Discord",
+         "Chat, get help and hear about new versions: Join the Discord is in Settings and "
+         "the tray menu."),
+    )),
     Note("1.9.7", "Your sounds get through Discord again", (
         ("shield", "Discord no longer wipes out your sounds",
          "Discord's noise suppression, Studio profile and Advanced Voice Activity were "

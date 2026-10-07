@@ -169,6 +169,15 @@ def test_startup_reads_the_setting_or_the_env(langs, tmp_path, monkeypatch):
     assert i18n.startup(tmp_path) == "xx"
 
 
+def test_startup_stays_english_on_another_windows_until_the_picker(langs, tmp_path,
+                                                                   monkeypatch):
+    monkeypatch.delenv("ONIONBOARD_LANG", raising=False)
+    monkeypatch.setattr(i18n, "windows_language", lambda: "de-DE")
+    assert i18n.startup(tmp_path) == "en"
+    monkeypatch.setattr(i18n, "FOLLOW_WINDOWS", True)
+    assert i18n.startup(tmp_path) == "de"
+
+
 def test_any_placeholder_name_works():
     assert _("{text} and {singular}", text="a", singular="b") == "a and b"
     assert ngettext("{n} {text}", "{n} {text}s", 2, text="cat", plural="x") == "2 cats"
