@@ -4135,8 +4135,15 @@ class MainWindow(QMainWindow):
         return meta
 
     def record_dialog(self):
-        """Sounds tab → Record: record a sound with the mic."""
+        """Sounds tab → Record: record a sound with the mic, or a bit of what's playing.
+        The window doesn't block the board: pads, web results, the radio and Space
+        still work while it's open (to play what's being recorded)."""
         from soundboard.ui.recordmic import RecordDialog
+        d = getattr(self, "_record_dlg", None)
+        if d is not None:   # already open: bring it forward
+            d.raise_()
+            d.activateWindow()
+            return
         voice = getattr(self, "voice", None)
 
         def voice_on() -> bool:
@@ -4147,9 +4154,28 @@ class MainWindow(QMainWindow):
             self.tabs.setCurrentWidget(self.setup_page)
 
         d = RecordDialog(self.engine, voice_on, lambda: [m.name for m in self.cfg.sounds],
-                         self.add_recording, open_devices, self)
-        d.exec()
-        free_dialog(d)
+                         self.add_recording, open_devices, self,
+                         playing_name=self._playing_name)
+        self._record_dlg = d
+
+        def closed(_r):
+            self._record_dlg = None
+            QTimer.singleShot(0, lambda: free_dialog(d))   # after its own signal returns
+        d.finished.connect(closed)
+        d.setModal(False)
+        d.show()
+
+    def _playing_name(self) -> str:
+        """What's playing now, for naming a recording of it: the player's sound (a pad
+        or a web result) or the radio station; "" for nothing."""
+        sid = self.current
+        st = self.engine.state(sid) if sid else None
+        if st is not None and not st[1]:
+            m = self.meta(sid)
+            if m is not None:
+                return m.name
+        station = getattr(getattr(self.radio, "player", None), "station", None)
+        return station.name if station is not None else ""
 
     def add_recording(self, data, name) -> bool:
         """A mic recording becomes a pad: selected, scrolled to, and a toast says so."""

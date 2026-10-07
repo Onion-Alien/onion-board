@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- **Record a bit of what's playing.** The Sounds tab's **Record** window has a new
+  *What's playing* choice: press Record, play a sound, a web search result or the
+  radio (or catch a song already playing), then Stop, cut the ends and save it as a
+  pad, named after what played. Your mic isn't in it. The window no longer blocks
+  the board while it's open.
 - **"Did you know?" tips.** Once the setup guide is done, Onion Board shows a short
   tip about one feature at most once a day, with a *Show me* button that takes you
   there. Never while a game is up, and each tip only once. *Show tips* in
