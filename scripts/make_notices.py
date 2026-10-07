@@ -3,7 +3,8 @@
 The PyInstaller build bundles Python, Qt (PySide6, LGPL-3.0), numpy, scipy,
 libsndfile, libsoxr, PortAudio and more; their licences require the notices to
 travel with the binaries. This walks the runtime dependencies installed in the
-current environment and copies every licence file each one ships, then adds the texts PySide6 doesn't include itself.
+current environment and copies every licence file each one ships, then adds the
+texts PySide6 doesn't include itself.
 
     python scripts/make_notices.py [output path]
 """

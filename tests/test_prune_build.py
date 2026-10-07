@@ -30,7 +30,8 @@ def make_tree(tmp_path: Path) -> Path:
     qt = tmp_path / "OnionBoard" / "_internal" / "PySide6"
     files = [
         "QtCore.pyd", "QtWidgets.pyd", "QtWebEngineCore.pyd", "QtQuick.pyd", "QtOpenGL.pyd",
-        "Qt6Core.dll", "Qt6Gui.dll", "Qt6Widgets.dll", "Qt6WebEngineCore.dll", "Qt6Pdf.dll", "Qt6Quick.dll", "Qt6Qml.dll",
+        "Qt6Core.dll", "Qt6Gui.dll", "Qt6Widgets.dll", "Qt6WebEngineCore.dll", "Qt6Pdf.dll",
+        "Qt6Quick.dll", "Qt6Qml.dll",
         "Qt6Charts.dll", "Qt63DRender.dll", "avcodec-61.dll", "avutil-59.dll", "swscale-8.dll",
         "opengl32sw.dll", "MSVCP140.dll", "QtWebEngineProcess.exe",
         "plugins/multimedia/ffmpegmediaplugin.dll",
