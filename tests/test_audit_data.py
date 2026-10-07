@@ -6,6 +6,7 @@ from pathlib import Path
 
 import pytest
 
+from conftest import own_time
 from soundboard import library, reset, resanance, soundux, trash, videos
 from soundboard.library import Config, SoundMeta
 
@@ -19,7 +20,7 @@ def _lock(monkeypatch, name: str):
             raise PermissionError(32, "being used by another process")
         return real(self, *a, **k)
     monkeypatch.setattr(Path, "read_text", read_text)
-    monkeypatch.setattr(trash.time, "sleep", lambda s: None)
+    own_time(monkeypatch, trash, sleep=lambda s: None)
     return real
 
 

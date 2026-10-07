@@ -612,6 +612,31 @@ def test_first_audio_is_sent_once_however_long_the_window_takes(qapp, server):
         p.stop()
 
 
+def test_shutdown_waits_out_a_buffer_being_handed_over(qapp):
+    """Qt's decoding thread mid-way through a buffer when the player shuts down (its tab
+    going): shutdown waits for it, and a buffer after that isn't taken. Freed while
+    that thread still used it, the player crashed."""
+    p = RadioPlayer()
+    inside, release, took = threading.Event(), threading.Event(), []
+
+    def slow(buf):
+        inside.set()
+        release.wait(5)
+        took.append(buf)
+    p._take_buffer = slow
+    t = threading.Thread(target=p._on_buffer, args=("first",))
+    t.start()
+    assert inside.wait(5)
+    threading.Timer(0.2, release.set).start()
+    t0 = time.monotonic()
+    p.shutdown()
+    assert time.monotonic() - t0 > 0.15 and took == ["first"]
+    p._on_buffer("later")
+    t.join(5)
+    assert took == ["first"]
+    p.shutdown()                                  # twice (the window, then the tab): fine
+
+
 def test_player_reports_a_dead_station(qapp, monkeypatch):
     monkeypatch.setattr(radio, "CONNECT_S", 1.5)   # FFmpeg alone can wait for minutes
     p = RadioPlayer()

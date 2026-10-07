@@ -122,6 +122,14 @@ def _refuse_closed_ports_at_once():
 
 _refuse_closed_ports_at_once()
 
+# Hosted CI runners (shared cores, other test workers beside it) stall a thread
+# 10-30 ms on their own, as much as the hitches the wall-clock audio timing tests
+# measure: there they fail on unchanged code. They run on a real PC, where a hitch is
+# the only stall.
+real_pc_timing = pytest.mark.skipif(bool(os.environ.get("CI")),
+                                    reason="wall-clock audio timing: too noisy on CI")
+
+
 def pytest_configure(config):
     config.addinivalue_line("markers", "real_this_pc: the relay refuses radio 127.x "
                             "(net.NEVER_THIS_PC) as in the app")
@@ -130,10 +138,13 @@ def pytest_configure(config):
 def pytest_xdist_auto_num_workers(config):
     """`-n auto` (pyproject's addopts): the whole suite runs on 4 workers, about a
     quarter of the time; a file or two runs in this process, where starting workers
-    would cost more than it saves. `-n 2` / `-n 0` on the command line override it."""
+    would cost more than it saves. `-n 2` / `-n 0` on the command line override it, and
+    so does PYTEST_XDIST_AUTO_NUM_WORKERS (xdist's own setting) for the whole suite."""
     picked = [a for a in config.args if Path(a.split("::")[0]).suffix == ".py"]
     if picked and len(picked) == len(config.args) and len(picked) <= 2:
         return 0
+    if (n := os.environ.get("PYTEST_XDIST_AUTO_NUM_WORKERS", "")).isdigit():
+        return int(n)
     return min(4, os.cpu_count() or 1)
 
 
@@ -312,12 +323,12 @@ def _switches_back_on():
 
 
 @pytest.fixture(autouse=True)
-def _data_quality_back_to_normal():
-    """Settings > Data & quality (soundboard.quality) is process-wide too: Low data
-    mode left on by one test hides the next one's search pictures."""
-    yield
-    from soundboard import quality
-    quality.current = quality.Prefs()
+def _data_prefs_back_to_default(monkeypatch):
+    """Settings > Data & quality (soundboard.quality.current) is process-wide too: a
+    test that turns on Low data mode doesn't leave the next one without thumbnails."""
+    quality = sys.modules.get("soundboard.quality")
+    if quality is not None:
+        monkeypatch.setattr(quality, "current", quality.Prefs())
 
 
 class NoMidi:
@@ -369,6 +380,26 @@ def _never_touch_real_autostart(monkeypatch):
     that exercise autostart put their own fake winreg in."""
     from soundboard import autostart
     monkeypatch.setattr(autostart, "winreg", None)
+
+
+def own_module(monkeypatch, module, name: str, **fakes):
+    """Give `module` its own copy of the module it imported as `name` (time, threading,
+    ...) with `fakes` in it. Patching time.sleep or threading.Thread itself changes it
+    for every thread in the process: the threads earlier tests left running then spun
+    flat out (a 1 s test took 44 s, and a window's loader beside it missed its 15 s),
+    or a thread of something else was never started."""
+    import types
+    real = getattr(module, name)
+    copy = types.ModuleType(real.__name__)
+    copy.__dict__.update(vars(real))
+    copy.__dict__.update(fakes)
+    monkeypatch.setattr(module, name, copy)
+    return copy
+
+
+def own_time(monkeypatch, module, **fakes):
+    """own_module for `time`: sleep=..., monotonic=... for `module` alone."""
+    return own_module(monkeypatch, module, "time", **fakes)
 
 
 def us_key_char(vk: int) -> str:
@@ -460,6 +491,38 @@ def _no_windows_speech(request, monkeypatch):
         return
     from soundboard.speech import tts
     monkeypatch.setattr(tts.SapiTTS, "warm_up", lambda self: [])
+
+
+# What a test made and left running with a thread of Qt's or its own behind it, stopped
+# after the test as the app stops it when the tab goes: freed while that thread was
+# still handing it something, it crashed the test worker a few tests later (access
+# violation / abort, about 1 run in 100). (module, class, method that stops it)
+_STOP_AFTER_TEST = (("soundboard.radio", "RadioPlayer", "shutdown"),
+                    ("soundboard.ui.appspanel", "_Lister", "stop"))
+
+
+@pytest.fixture(autouse=True)
+def _stop_what_tests_left_running(monkeypatch):
+    import weakref
+    made = []
+    for mod_name, cls_name, stop in _STOP_AFTER_TEST:
+        mod = sys.modules.get(mod_name)
+        if mod is None:   # this test's module never imported it: none made here
+            continue
+        cls = getattr(mod, cls_name)
+
+        def tracked(self, *a, _init=cls.__init__, _stop=stop, **k):
+            _init(self, *a, **k)
+            made.append((weakref.ref(self), _stop))
+        monkeypatch.setattr(cls, "__init__", tracked)
+    yield
+    for ref, stop in made:
+        obj = ref()
+        if obj is not None:
+            try:
+                getattr(obj, stop)()
+            except RuntimeError:   # its C++ side is already gone (its tab was freed)
+                pass
 
 
 @pytest.fixture(autouse=True)

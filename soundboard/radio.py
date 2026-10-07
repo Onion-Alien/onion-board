@@ -828,6 +828,10 @@ class RadioPlayer(QObject):
         self._looked_up.connect(self._on_looked_up)
         self._first_audio.connect(self._on_first_audio)
         self._conn = 0               # net.generation() when the stream was opened
+        # held by _on_buffer (decoding thread) while it runs; shutdown() takes it to know
+        # none is running before the player can be freed
+        self._buffer_lock = threading.Lock()
+        self._closed = False
         net.on_change(self._on_connection)
 
     def _make(self):
@@ -949,6 +953,11 @@ class RadioPlayer(QObject):
     def _on_buffer(self, buf):
         """On Qt's decoding thread. The player's own state changes on the UI thread
         (_on_first_audio)."""
+        with self._buffer_lock:
+            if not self._closed:
+                self._take_buffer(buf)
+
+    def _take_buffer(self, buf):
         if self.station is None:
             return
         gen = self._gen
@@ -1039,7 +1048,19 @@ class RadioPlayer(QObject):
             self.now_playing.emit(title)
 
     def shutdown(self):
+        """Stop for good, before the player is freed (its tab going, the app closing):
+        Qt's decoding thread is cut off and any buffer it's still handing over is
+        waited out, so it never calls into a freed player (a crash)."""
+        if self._closed:
+            return
         self.stop()
+        if self._out is not None:
+            try:
+                self._out.audioBufferReceived.disconnect(self._on_buffer)
+            except (RuntimeError, TypeError):   # never connected / already gone
+                pass
+        with self._buffer_lock:
+            self._closed = True
 
 
 def _tor_ready() -> bool:
