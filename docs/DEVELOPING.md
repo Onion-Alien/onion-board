@@ -97,6 +97,18 @@ listening" takes its port from `conftest.closed_port()` (refused at once), and a
 test server on 127.0.0.1 only marks its port with `conftest.ipv4_only()`.
 `--durations=20` shows what's slow.
 
+### How heavy is it (the performance suite)
+
+`.venv\Scripts\python -m perf --tier quick` (~1.5 min) runs the real app in a child
+process on a throwaway profile, offscreen with fake audio devices, steps it through
+idle, tray, imports, plays, previews, tabs, dialogs, the voice changer and a leak
+loop, and writes `report.md`: CPU, RAM, threads, handles, disk writes and audio
+callback lateness per step. `--tier full` is longer, `--watch-src <onion-watch
+checkout>` adds the Triggers add-on and standalone Onion Watch, `--compare
+old\report.json` shows before → after, and over `perf\budgets.json` it exits 1. It
+isn't part of pytest. Tiers, scenarios and how to read it:
+[perf/README.md](../perf/README.md).
+
 ### What voice chat does to the sounds (the bench)
 
 `scripts\codec_bench.py` runs sounds through each voice chat's codec, and with
