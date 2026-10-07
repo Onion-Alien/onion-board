@@ -11,16 +11,16 @@ import threading
 from collections.abc import Callable
 
 from PySide6.QtCore import Qt, Signal
-from PySide6.QtWidgets import (QComboBox, QDialog, QDialogButtonBox, QFrame, QGridLayout,
-                               QHBoxLayout, QLabel, QLineEdit, QPushButton, QScrollArea,
-                               QSlider, QVBoxLayout, QWidget)
+from PySide6.QtWidgets import (QButtonGroup, QComboBox, QDialog, QDialogButtonBox, QFrame,
+                               QGridLayout, QHBoxLayout, QLabel, QLineEdit, QPushButton,
+                               QScrollArea, QSlider, QVBoxLayout, QWidget)
 
 from soundboard import errors
 from soundboard.i18n import _, ngettext
 from soundboard.speech import aipreview
 from soundboard.speech import aivoicelist as avl
 from soundboard.ui import busy, fit, icons
-from soundboard.ui.panel import UndoBar, hint_label
+from soundboard.ui.panel import Flow, UndoBar, hint_label, section_label
 from soundboard.wheelguard import no_wheel
 
 HEAR, MAKING = _("Hear it"), _("Making a sample…")
@@ -151,6 +151,19 @@ class AiVoiceBrowser(QDialog):
         lay.addWidget(hint_label(_(
             "Every voice, who it sounds like and how high it sits. Hear it plays a short "
             "sample in your headphones only. Make your own by blending them.")))
+        # filters: who it sounds like, and how high
+        self._who, self._band = "all", "any"
+        self.who_names = {"men": _("Men"), "women": _("Women"),
+                          "other": _("In between & fun"), "mine": _("Your own")}
+        self.who_buttons: dict[str, QPushButton] = {}
+        self.band_buttons: dict[str, QPushButton] = {}
+        lay.addLayout(self._chips(
+            _("Who"), [("all", _("All"))] + [(k, self.who_names[k]) for k in (*avl.WHO, "mine")],
+            self.who_buttons, self._pick_who))
+        lay.addLayout(self._chips(
+            _("Pitch"), [("any", _("Any")), ("low", _("Low")), ("mid", _("Middle")),
+                         ("high", _("High"))],
+            self.band_buttons, self._pick_band))
         self.status = QLabel("")
         self.status.setObjectName("muted")
         self.status.setWordWrap(True)
@@ -188,26 +201,96 @@ class AiVoiceBrowser(QDialog):
         self.status.setText(text)
         self.status.setVisible(bool(text))
 
+    def _chips(self, label: str, items, buttons: dict, pick) -> QHBoxLayout:
+        """A row of filter chips, the first one picked."""
+        row = QHBoxLayout()
+        row.setSpacing(10)
+        head = QLabel(label)
+        head.setObjectName("muted")
+        head.setMinimumWidth(40)
+        row.addWidget(head, 0, Qt.AlignVCenter)
+        flow = Flow(gap=6)
+        group = QButtonGroup(self)
+        for key, text in items:
+            b = QPushButton(text.replace("&", "&&"))   # a plain &, not a shortcut key
+            b.setObjectName("small")
+            b.setCheckable(True)
+            b.setChecked(key == items[0][0])
+            b.setProperty("label", text.replace("&", "&&"))
+            b.clicked.connect(lambda __=False, key=key: pick(key))
+            group.addButton(b)
+            buttons[key] = b
+            flow.addWidget(b)
+        row.addLayout(flow, 1)
+        return row
+
+    def _pick_who(self, key: str):
+        self._who = key
+        self.fill()
+
+    def _pick_band(self, key: str):
+        self._band = key
+        self.fill()
+
+    def _shown(self, vo: dict) -> bool:
+        w, b = self._who, self._band
+        return ((w == "all" or (avl.is_mine(vo) if w == "mine" else avl.who(vo) == w))
+                and (b == "any" or avl.pitch_band(vo) == b))
+
+    def _sections(self) -> list[tuple[str, list[dict]]]:
+        """The voices to show, lowest first: under a heading per kind when showing
+        everyone (your own last), else one list."""
+        shown = sorted((v for v in self.voices if self._shown(v)),
+                       key=lambda v: v.get("pitch_hz", 0))
+        if self._who != "all":
+            return [("", shown)] if shown else []
+        out = [(self.who_names[k], [v for v in shown if not avl.is_mine(v) and avl.who(v) == k])
+               for k in avl.WHO]
+        out.append((self.who_names["mine"], [v for v in shown if avl.is_mine(v)]))
+        return [(t, vs) for t, vs in out if vs]
+
+    def _count_chips(self):
+        mine = any(avl.is_mine(v) for v in self.voices)
+        self.who_buttons["mine"].setVisible(mine)
+        if self._who == "mine" and not mine:      # deleted the last one
+            self._who = "all"
+            self.who_buttons["all"].setChecked(True)
+        for key, b in self.who_buttons.items():   # how many each one has
+            n = sum(1 for v in self.voices if key == "all" or (
+                avl.is_mine(v) if key == "mine" else avl.who(v) == key))
+            b.setText(f"{b.property('label')}  {n}")
+
     def fill(self):
         self.cards: list[VoiceCard] = []
+        self._count_chips()
         body = QWidget()
         grid = QGridLayout(body)
         grid.setContentsMargins(0, 0, 6, 0)
         grid.setSpacing(10)
         can_hear = self.previewer.available()
-        for i, vo in enumerate(self.voices):
-            c = VoiceCard(vo, vo["id"] == self.current, can_hear)
-            c.b_use.clicked.connect(lambda __=False, vid=vo["id"]: self.use(vid))
-            c.b_hear.clicked.connect(lambda __=False, c=c: self.previewer.hear(
-                c.b_hear, c.voice, self._sampled, self._say))
-            if c.b_edit is not None:
-                c.b_edit.clicked.connect(lambda __=False, vid=vo["id"]: self.edit(vid))
-                c.b_delete.clicked.connect(lambda __=False, vid=vo["id"]: self.delete(vid))
-            grid.addWidget(c, i // 2, i % 2)
-            self.cards.append(c)
+        r = 0
+        sections = self._sections()
+        for title, voices in sections:
+            if title:
+                grid.addWidget(section_label(title.upper()), r, 0, 1, 2)
+                r += 1
+            for i, vo in enumerate(voices):
+                c = VoiceCard(vo, vo["id"] == self.current, can_hear)
+                c.b_use.clicked.connect(lambda __=False, vid=vo["id"]: self.use(vid))
+                c.b_hear.clicked.connect(lambda __=False, c=c: self.previewer.hear(
+                    c.b_hear, c.voice, self._sampled, self._say))
+                if c.b_edit is not None:
+                    c.b_edit.clicked.connect(lambda __=False, vid=vo["id"]: self.edit(vid))
+                    c.b_delete.clicked.connect(lambda __=False, vid=vo["id"]: self.delete(vid))
+                grid.addWidget(c, r + i // 2, i % 2)
+                self.cards.append(c)
+            r += (len(voices) + 1) // 2
+        if not sections:
+            grid.addWidget(hint_label(_("No voices like that. Try another pitch.")), r, 0, 1, 2)
+            r += 1
         grid.setColumnStretch(0, 1)
         grid.setColumnStretch(1, 1)
-        grid.setRowStretch(len(self.voices) // 2 + 1, 1)
+        grid.setRowStretch(r, 1)
         self.scroll.setWidget(body)
         n = len(self.store.deleted)
         self.b_bin.setText(_("Recently deleted ({n})", n=n))
