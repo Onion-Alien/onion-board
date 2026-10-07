@@ -43,6 +43,7 @@ from soundboard.ui.clipeditor import WAVE_H, ClipEditor
 from soundboard.ui.clipshelf import ClipShelf
 from soundboard.ui.panel import CardGrid, HoverCard, UndoBar, VolumeControl, hint_label
 from soundboard.ui.responsive import FitWidth
+from soundboard.ui.speedpitch import SpeedPitchButton
 from soundboard.wheelguard import no_wheel
 
 log = logging.getLogger(__name__)
@@ -506,6 +507,11 @@ class AppsTab(QWidget):
         self.btn_bin.clicked.connect(self.show_forgotten)
         toolbar = QHBoxLayout()
         toolbar.addWidget(self.btn_bin)
+        # Live controls: pitch and effects on every program you send (no speed: live)
+        self.fx_btn = SpeedPitchButton("apps")
+        self.fx_btn.changed.connect(lambda _s, p, _k: setattr(self.engine, "apps_pitch", p))
+        self.fx_btn.fx_changed.connect(lambda fx: setattr(self.engine, "apps_fx", fx))
+        toolbar.addWidget(self.fx_btn)
         toolbar.addStretch(1)
         size_label = QLabel(_("Card size"))
         size_label.setObjectName("muted")

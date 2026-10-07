@@ -30,6 +30,7 @@ from soundboard.radio import RadioDirectory, RadioPlayer, Station
 from soundboard.ui import appstate, busy, icons
 from soundboard.ui.panel import Flow as _Flow
 from soundboard.ui.panel import VolumeControl, bar, icon_label, vsep
+from soundboard.ui.speedpitch import SpeedPitchButton
 from soundboard.ui.widgets import paint_now_playing
 
 log = logging.getLogger(__name__)
@@ -568,6 +569,11 @@ class RadioTab(QWidget):
         icons.set_icon(self.btn_last, "history")
         self.btn_last.clicked.connect(self.clip_last)
         bh.addWidget(self.btn_last)
+        # Live controls: the radio's pitch and effects (no speed: it's a live stream)
+        self.fx_btn = SpeedPitchButton("radio")
+        self.fx_btn.changed.connect(lambda _s, p, _k: setattr(self.engine, "radio_pitch", p))
+        self.fx_btn.fx_changed.connect(lambda fx: setattr(self.engine, "radio_fx", fx))
+        bh.addWidget(self.fx_btn)
         sep2 = vsep()
         bh.addWidget(sep2)
         tip = "Radio volume (for them and for you). The dot shows audio activity."
@@ -1413,6 +1419,7 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
                 (36, "w", r.icon_only(self.btn_last)),
                 (36, "w", play_icon),
                 (40, "w", r.hide(*self._vol_group)),
+                (45, "w", r.hide(self.fx_btn)),
                 (46, "w", r.hide(self.globe_box)),      # narrow: just the list
                 (50, "w", r.hide(*self._clip_group, self.btn_fav, self.btn_refresh)),
                 (54, "w", r.hide(self.now)),

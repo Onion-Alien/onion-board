@@ -124,12 +124,19 @@ class SpeedPitchButton(QPushButton):
 
     def __init__(self, what: str = "sounds", hint: str = "",
                  redline: tuple[float, float] = REDLINE_SPEED):
-        """`redline`: the (slowest, fastest) speed once Redline is unlocked."""
+        """`what`: "sounds", or a live stream, "radio" / "apps" (the Radio and Apps
+        tabs): those have no speed, only the pitch and the effects.
+        `redline`: the (slowest, fastest) speed once Redline is unlocked."""
         super().__init__()
+        self.has_speed = what == "sounds"
         self.setObjectName("small")
         self.setProperty("speedpitch", True)
-        self.setToolTip(_("Speed, pitch and effects of the sounds playing now"))
+        self.setToolTip({"radio": _("Pitch and effects of the radio"),
+                         "apps": _("Pitch and effects of the programs you send")}.get(
+            what, _("Speed, pitch and effects of the sounds playing now")))
         self.setCursor(Qt.PointingHandCursor)
+        if not self.has_speed:   # "Effects" on its own reads as a label: show it's a control
+            icons.set_icon(self, "wave", size=14)
         self._speed_hi = redline_speed(*redline)
         redline = redline[1]
 
@@ -144,11 +151,13 @@ class SpeedPitchButton(QPushButton):
         head.setSpacing(8)
         title = QLabel(_("Live controls"))
         title.setStyleSheet("font-weight:700; font-size:10.5pt;")
-        sub = QLabel(_("All sounds"))
+        sub = QLabel({"radio": _("The radio"), "apps": _("All programs")}.get(
+            what, _("All sounds")))
         sub.setObjectName("muted")
         reset = QPushButton(_("Reset all"))
         reset.setObjectName("small")
-        reset.setToolTip(_("Back to 1x, no pitch change and no effects"))
+        reset.setToolTip(_("Back to 1x, no pitch change and no effects") if self.has_speed
+                         else _("Back to no pitch change and no effects"))
         reset.setCursor(Qt.PointingHandCursor)
         reset.clicked.connect(self.reset)
         head.addWidget(title)
@@ -177,17 +186,23 @@ class SpeedPitchButton(QPushButton):
         outer, v = v, QVBoxLayout(left_w)     # the speed & pitch column
         v.setContentsMargins(0, 0, 0, 0)
         v.setSpacing(8)
-        v.addWidget(section_label(_("SPEED & PITCH")))
+        v.addWidget(section_label(_("SPEED & PITCH") if self.has_speed else _("PITCH")))
         self.speed = self._slider(SPEED, 1.0)
         self.pitch = self._slider(PITCH, 0.0)
         v.addWidget(self.speed)
-        v.addLayout(self._quick_row(QUICK))
+        quick = QWidget()
+        quick.setObjectName("spcol")
+        quick.setLayout(self._quick_row(QUICK))
+        v.addWidget(quick)
         v.addSpacing(2)
         v.addWidget(self.pitch)
         self.keep = QCheckBox(_("Keep pitch when changing speed"))
         self.keep.setChecked(True)
         self.keep.setToolTip(_("Off: slower is also deeper and faster is higher, like a tape"))
         v.addWidget(self.keep)
+        if not self.has_speed:    # a live stream can't be sped up or slowed down
+            for w in (self.speed, quick, self.keep):
+                w.hide()
 
         # --- Redline: its own section, locked until you ask for it
         v.addSpacing(2)
@@ -199,7 +214,8 @@ class SpeedPitchButton(QPushButton):
         red_name = QLabel(_("Redline"))
         red_name.setStyleSheet("font-weight:700;")
         red_sub = QLabel(_("Up to {redline:g}x speed and ±{hi:g} st pitch",
-                           redline=redline, hi=REDLINE_PITCH.hi))
+                           redline=redline, hi=REDLINE_PITCH.hi) if self.has_speed
+                         else _("Up to ±{hi:g} st pitch", hi=REDLINE_PITCH.hi))
         red_sub.setObjectName("hint")
         red_text.addWidget(red_name)
         red_text.addWidget(red_sub)
@@ -211,7 +227,8 @@ class SpeedPitchButton(QPushButton):
         self.redline.setCursor(Qt.PointingHandCursor)
         self.redline.setMinimumWidth(84)
         self.redline.setToolTip(_("Unlock silly speeds (up to {redline:g}x) and pitch (±{hi:g} "
-                                  "st)", redline=redline, hi=REDLINE_PITCH.hi))
+                                  "st)", redline=redline, hi=REDLINE_PITCH.hi) if self.has_speed
+                                else _("Unlock silly pitch (±{hi:g} st)", hi=REDLINE_PITCH.hi))
         self.redline.toggled.connect(self.set_redline)
         red_row.addWidget(self.redline, 0, Qt.AlignVCenter)
         v.addLayout(red_row)
@@ -310,7 +327,7 @@ class SpeedPitchButton(QPushButton):
         self.redline.setText(_("On") if on else _("Unlock"))
         self.speed.set_param(self._speed_hi if on else SPEED)
         self.pitch.set_param(REDLINE_PITCH if on else PITCH)
-        self.red_box.setVisible(on)
+        self.red_box.setVisible(on and self.has_speed)   # the rev meter: speed only
         if self.pop.isVisible():
             self._open()                  # resize / re-place it for the new height
         self._edited()
@@ -374,12 +391,18 @@ class SpeedPitchButton(QPushButton):
 
     def _label(self):
         s, p, _k = self.values()
-        txt = f"{s:g}x"
-        if abs(p) >= 1e-3:
-            txt += f" {p:+g}"
         fx = bool(self.fx_values())
-        if fx:
-            txt += " · FX"
+        if self.has_speed:
+            txt = f"{s:g}x"
+            if abs(p) >= 1e-3:
+                txt += f" {p:+g}"
+            if fx:
+                txt += " · FX"
+        else:   # no speed to show: "Effects" until something's on
+            parts = [f"{p:+g} st"] if abs(p) >= 1e-3 else []
+            if fx:
+                parts.append("FX")
+            txt = " · ".join(parts) or _("Effects")
         self.setText(txt)
         hot = s > REDLINE_AT + 1e-6 or abs(p) > PITCH.hi
         # scoped to this button: unscoped, it would cascade into the popup (a child).
