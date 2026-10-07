@@ -44,8 +44,9 @@ SUPPRESSION = "suppression"  # Noise Suppression: Standard
 ECHO = "echo"                # Echo Cancellation
 AGC = "agc"                  # Automatic Gain Control
 VAD = "vad"                  # Advanced Voice Activity: Krisp decides when you talk
-ORDER = (STUDIO, BYPASS, VAD, ISOLATION, KRISP, SUPPRESSION, ECHO, AGC)
-WIPES = (STUDIO, BYPASS, VAD, ISOLATION, KRISP, SUPPRESSION)   # the ones that remove sounds
+AUTO = "auto"                # "Automatically determine input sensitivity" (Voice Activity)
+ORDER = (STUDIO, BYPASS, VAD, AUTO, ISOLATION, KRISP, SUPPRESSION, ECHO, AGC)
+WIPES = (STUDIO, BYPASS, VAD, AUTO, ISOLATION, KRISP, SUPPRESSION)   # the ones that remove sounds
 
 
 @dataclass(frozen=True)
@@ -60,6 +61,7 @@ class Settings:
     vad: bool                  # Voice Activity mode with Advanced Voice Activity (Krisp)
     input_device: str          # Windows endpoint id, or "default"
     stamp: float               # when the file it came from was written
+    auto: bool = False         # Voice Activity with its sensitivity set automatically
 
     def problems(self, on_mic: bool) -> list[str]:
         """What in these settings changes or removes sounds, ORDER first-worst.
@@ -73,6 +75,8 @@ class Settings:
             out.append(BYPASS)
         if self.vad:   # a real call (not the Mic Test): ~90% of a song cut, measured
             out.append(VAD)
+        elif self.auto:   # a real call: 8-32% of a song cut in bursts, measured
+            out.append(AUTO)
         if p and p not in ("CUSTOM", "STUDIO"):   # Voice Isolation, or a newer preset
             out.append(ISOLATION)
             return out
@@ -249,7 +253,9 @@ def parse(store: dict, client: str = "Discord", stamp: float = 0.0) -> Settings:
                     vad=str(d.get("mode", "VOICE_ACTIVITY")) == "VOICE_ACTIVITY"
                     and (d.get("modeOptions") or {}).get("vadUseKrisp", True) is not False,
                     input_device=str(d.get("inputDeviceId") or "default"),
-                    stamp=stamp)
+                    stamp=stamp,
+                    auto=str(d.get("mode", "VOICE_ACTIVITY")) == "VOICE_ACTIVITY"
+                    and (d.get("modeOptions") or {}).get("autoThreshold", True) is not False)
 
 
 def read_client(client_dir: str, name: str, appdata: Path | None = None) -> Settings | None:

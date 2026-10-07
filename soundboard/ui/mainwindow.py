@@ -15,9 +15,8 @@ from pathlib import Path
 
 import numpy as np
 import sounddevice as sd
-from PySide6.QtCore import (QAbstractAnimation, QEvent, QFileSystemWatcher, QObject,
-                            QPropertyAnimation, QSignalBlocker, QSize, Qt, QTimer, QUrl,
-                            Signal)
+from PySide6.QtCore import (QEvent, QFileSystemWatcher, QObject, QSignalBlocker, QSize, Qt,
+                            QTimer, QUrl, Signal)
 from PySide6.QtGui import QDesktopServices, QIcon, QKeySequence, QShortcut
 from PySide6.QtWidgets import (QApplication, QCheckBox, QComboBox, QDialog, QFileDialog, QFrame,
                                QGraphicsOpacityEffect, QGridLayout, QHBoxLayout, QInputDialog,
@@ -109,8 +108,14 @@ TICK_QUIET_MS = 100  # on screen with nothing moving: no sound, radio, recording
 LEVEL_QUIET = 0.003  # a level below this (-50 dB) shows as nothing on the meters
 TRIGGERS_LOAD_MS = 50   # Onion Watch loads this long after the window is built
 GLOW_STEPS = 4       # how many glow levels the taskbar / tray icon has while sound plays
-ICON_GLOW_MS = 120   # ...and how often at most it changes
-ICON_GLOW_BG_MS = 400   # ...while another program (a game) is in front
+ICON_GLOW_MS = 250   # ...and how often at most it changes
+ICON_GLOW_BG_MS = 1000  # ...while another program (a game) is in front
+# ...and a step is kept until the level is this far (in steps) past the middle between
+# it and the next: a level hovering on a boundary flipped the icon back and forth
+ICON_GLOW_HOLD = 0.25
+PULSE_MS = 1200      # the mic-check banner's throb: bright, dimmer, bright again
+PULSE_LOW = 0.55     # ...down to this opacity
+PULSE_FRAME_MS = 60  # ...a step this often (~16 a second still reads as a smooth pulse)
 DEFAULT_POLL_MS = 1500   # how often Windows' default output is checked
 DISCORD_POLL_MS = 10000  # how often Discord's voice settings are looked at (discordcfg)
 DEFAULT_POLL_IDLE_S = 5  # ...while the window is in the tray or minimised (seconds)
@@ -190,6 +195,57 @@ class BannerButton(QPushButton):
             self.setText(text)
 
 
+class Pulse(QObject):
+    """The mic-check banner's throb: its opacity goes from 1 down to PULSE_LOW and back
+    every PULSE_MS, a step every PULSE_FRAME_MS. Each step draws the whole banner again
+    off-screen, so it runs only while it's on and the window can be seen in front
+    (set_live); otherwise the banner stands still, fully bright. An animation did this
+    at 60 frames a second, behind a game too."""
+
+    def __init__(self, fx: QGraphicsOpacityEffect, parent: QObject):
+        super().__init__(parent)
+        self.fx = fx
+        fx.setOpacity(1.0)     # (Qt's own start is 0.7)
+        fx.setEnabled(False)   # a still banner is drawn straight, not through the effect
+        self.on, self.live = False, True
+        self._t0 = 0.0
+        self.timer = QTimer(self)
+        self.timer.setInterval(PULSE_FRAME_MS)
+        self.timer.timeout.connect(self._step)
+
+    def running(self) -> bool:
+        return self.timer.isActive()
+
+    def set_on(self, on: bool):
+        self.on = on
+        self._apply()
+
+    def set_live(self, live: bool):
+        self.live = live
+        self._apply()
+
+    def _apply(self):
+        run = self.on and self.live
+        if run == self.timer.isActive():
+            return
+        if run:
+            self._t0 = time.monotonic()
+            self.fx.setEnabled(True)
+            self._step()
+            self.timer.start()
+        else:
+            self.timer.stop()
+            self.fx.setOpacity(1.0)
+            self.fx.setEnabled(False)
+
+    def opacity_at(self, ms: float) -> float:
+        t = (ms % PULSE_MS) / PULSE_MS   # 0..1 through one throb
+        return PULSE_LOW + (1.0 - PULSE_LOW) * abs(2.0 * t - 1.0)
+
+    def _step(self):
+        self.fx.setOpacity(self.opacity_at((time.monotonic() - self._t0) * 1000.0))
+
+
 class Bridge(QObject):
     loaded = Signal(str, object, str)          # id, data|None, error
     exported = Signal(str, int, str)           # file, sounds written, error
@@ -224,6 +280,8 @@ DISCORD_URGENT = {
                          "Processing\" is on, which skips Onion Board."),
     discordcfg.VAD: _("{name}'s Advanced Voice Activity cuts most of your sounds in calls. "
                       "Turn it off (Voice & Video → Show Advanced Voice Settings)."),
+    discordcfg.AUTO: _("{name}'s automatic input sensitivity keeps cutting your sounds out "
+                       "in calls. Turn it off (Voice & Video → Input Sensitivity)."),
     discordcfg.ISOLATION: _("{name}'s Voice Isolation is wiping out your sounds. Set its "
                             "Input Profile to Custom and Noise Suppression to None."),
     discordcfg.KRISP: _("{name}'s noise suppression (Krisp) is wiping out your sounds. Set "
@@ -341,6 +399,7 @@ class MainWindow(QMainWindow):
         self._tick_n = 0                  # ticks since start (the watchdog runs ~once a second)
         self._ui_live = True              # the window is on screen (see _set_tick_rate)
         self._tick_busy = True            # something moves with the tick (see _busy)
+        self._pads_lit: set[str] = set()  # pads showing a sound (see _tick_visuals)
         self._sounds_live = False         # the Sounds tab's live dot is shown
         self._icon_step, self._icon_next = -1, 0.0   # the icons' glow step (_glow_icons)
         self._tray_step = -1              # ...and the tray icon's
@@ -533,12 +592,7 @@ class MainWindow(QMainWindow):
         # setStyleSheet re-parses and re-polishes the widget)
         self._banner_fx = QGraphicsOpacityEffect(self.mic_banner)
         self.mic_banner.setGraphicsEffect(self._banner_fx)
-        self._pulse = QPropertyAnimation(self._banner_fx, b"opacity", self)
-        self._pulse.setDuration(1200)
-        self._pulse.setStartValue(1.0)
-        self._pulse.setKeyValueAt(0.5, 0.55)
-        self._pulse.setEndValue(1.0)
-        self._pulse.setLoopCount(-1)
+        self._pulse = Pulse(self._banner_fx, self)
         rv.addWidget(self.mic_banner)
 
         # an urgent fix (a release whose notes say "Urgent: …", updates.urgent): a bar
@@ -3019,8 +3073,13 @@ class MainWindow(QMainWindow):
         """The title bar / taskbar and tray icons glow warm with whatever is playing,
         like the header logo: a few steps of glow, swapped only when the step changes
         (at most every ICON_GLOW_MS, or ICON_GLOW_BG_MS behind a game), back to the plain
-        icon when it goes quiet."""
-        step = min(GLOW_STEPS, round(min(1.0, level * 1.4) * GLOW_STEPS))
+        icon when it goes quiet. Each swap makes Windows redraw the taskbar and tray
+        icons in Explorer, so a step is held until the level clearly leaves it
+        (ICON_GLOW_HOLD): on songs that's 3-10 times fewer swaps for the same glow."""
+        x = min(1.0, level * 1.4) * GLOW_STEPS
+        step = min(GLOW_STEPS, round(x))
+        if self._icon_step >= 0 and abs(x - self._icon_step) < 0.5 + ICON_GLOW_HOLD:
+            step = self._icon_step
         if not self.isVisible() or self.isMinimized():
             # nobody sees it, and each swap makes Windows rebuild the taskbar and tray
             # icons in Explorer, several times a second while a game runs
@@ -5662,13 +5721,10 @@ class MainWindow(QMainWindow):
         if self.btn_check.text():   # blank while the window is too narrow for words
             self.btn_check.setText(text)
         self.mic_banner.setVisible(on)
-        if on:
-            self._pulse.start()   # impossible to miss, and cheap
-            if not self._ui_live:   # turned on from the tray: pulses once it's shown
-                self._pulse.pause()
-        else:
-            self._pulse.stop()
-            self._banner_fx.setOpacity(1.0)
+        # impossible to miss; turned on from the tray or behind a game it pulses once
+        # the window is shown in front (_set_tick_rate)
+        self._pulse.set_live(self._ui_live and appstate.active())
+        self._pulse.set_on(on)
         self.mic_lbl.setStyleSheet(f"color:{theme.status('error')};" if on else "")
         self.mic_meter.hot = on
         if on and not self.cfg.mic_enabled:
@@ -5810,11 +5866,8 @@ class MainWindow(QMainWindow):
     def _set_tick_rate(self, *__):
         live = self.isVisible() and not self.isMinimized()
         was, self._ui_live = self._ui_live, live
-        # the mic-check banner's pulse (~60 frames a second) only while it can be seen
-        if not live and self._pulse.state() == QAbstractAnimation.Running:
-            self._pulse.pause()
-        elif live and self._pulse.state() == QAbstractAnimation.Paused:
-            self._pulse.resume()
+        # the mic-check banner pulses only while it can be seen, in front
+        self._pulse.set_live(live and appstate.active())
         pace = self._tick_pace()
         if live == was and self.timer.interval() == pace:
             return
@@ -5822,6 +5875,8 @@ class MainWindow(QMainWindow):
         if not live:   # a level frozen mid-flight would show as stuck on the next show
             self.out_meter.set_level(0.0)
             self.mic_meter.set_level(0.0)
+            if not self.isVisible():   # to the tray: the pads' pictures are made again
+                thumbs.trim()          # from their small files when it's back
 
     def tick(self):
         e = self.engine
@@ -5896,7 +5951,14 @@ class MainWindow(QMainWindow):
         e = self.engine
         on_board = self.tabs.currentWidget() is self.sounds_page   # no visualiser off-screen
         shown = self.isVisible()
-        for sid, p in self.pads.items():
+        # only the pads playing now and the ones still showing a sound (cleared on the
+        # tick after it stops): going over all of them, 30 times a second, cost more
+        # than the rest of the tick on a big board with nothing playing
+        pads, lit = self.pads, set()
+        for sid in self._pads_lit.union(playing):
+            p = pads.get(sid)
+            if p is None:   # not a pad (a preview, the test recording) or gone
+                continue
             prog, paused = playing.get(sid, (None, False))
             if prog is not None and not paused and on_board and not p.isHidden():
                 # scrolled out of view: skip the FFT (the next tick after it scrolls
@@ -5908,6 +5970,9 @@ class MainWindow(QMainWindow):
             if prog != p.progress or paused != p.paused:
                 p.progress, p.paused = prog, paused
                 p.update()
+            if p.progress is not None or p.bands is not None:
+                lit.add(sid)
+        self._pads_lit = lit
         self._update_transport(playing)
         if not self.ytresults.isHidden():   # the result in the player says so
             prog, paused = playing.get(LINK_ID, (None, False))

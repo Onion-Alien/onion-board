@@ -18,7 +18,9 @@ def found(**over):
     return [dc.parse({"default": dict({"activeInputProfile": "CUSTOM",
                                        "noiseCancellation": False, "echoCancellation": False,
                                        "automaticGainControl": False,
-                                       "modeOptions": {"vadUseKrisp": False}}, **over)})]
+                                       "modeOptions": {"vadUseKrisp": False,
+                                                       "autoThreshold": False}},
+                                      **over)})]
 
 
 def test_studio_on_the_mic_gets_the_urgent_bar(window, monkeypatch):

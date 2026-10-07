@@ -56,8 +56,7 @@ import weakref
 from collections.abc import Callable
 from dataclasses import dataclass
 
-from soundboard import netlog
-from soundboard import errors
+from soundboard import errors, netlog, without_app_blas
 from soundboard.i18n import _
 
 log = logging.getLogger(__name__)
@@ -1318,8 +1317,10 @@ def child_env(feature: str, env: dict[str, str] | None = None) -> dict[str, str]
     """The environment for a child process that goes online for `feature` (pip for
     add-ons, the live-voice helper for voices): the relay with that feature's login,
     so the Connection setting and its switch hold. Switched off, the relay refuses it,
-    and HF_HUB_OFFLINE=1 tells Hugging Face downloads (the speech model) not to try."""
+    and HF_HUB_OFFLINE=1 tells Hugging Face downloads (the speech model) not to try.
+    The app's own OPENBLAS_NUM_THREADS is left out (soundboard/__init__.py)."""
     out = _without_proxy_vars(dict(os.environ if env is None else env))
+    without_app_blas(out)    # its own numpy / torch: not the app's thread cap
     url = relay_url(feature)
     out.update(http_proxy=url, https_proxy=url, all_proxy=url,
                no_proxy="localhost,127.0.0.1,::1")
