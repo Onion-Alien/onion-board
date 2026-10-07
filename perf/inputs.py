@@ -18,7 +18,8 @@ def tone(secs: float, seed: int) -> np.ndarray:
     n = int(SR * secs)
     t = np.arange(n) / SR
     f = 110 * 2 ** (rng.integers(0, 24) / 12)
-    x = sum(0.12 / k * np.sin(2 * np.pi * f * k * t * (1 + 0.002 * np.sin(t))) for k in (1, 2, 3, 5))
+    x = sum(0.12 / k * np.sin(2 * np.pi * f * k * t * (1 + 0.002 * np.sin(t)))
+            for k in (1, 2, 3, 5))
     beat = (np.sin(2 * np.pi * 2 * t) > 0.6) * 0.15 * rng.standard_normal(n)
     x = x + beat + 0.005 * rng.standard_normal(n)
     fade = np.minimum(1, np.minimum(t / 0.01, (secs - t) / 0.05))
@@ -68,7 +69,8 @@ def png(path: Path, rgb: np.ndarray):
         c = struct.pack(">I", len(data)) + kind + data
         return c + struct.pack(">I", zlib.crc32(kind + data) & 0xFFFFFFFF)
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_bytes(b"\x89PNG\r\n\x1a\n" + chunk(b"IHDR", struct.pack(">IIBBBBB", w, h, 8, 2, 0, 0, 0))
+    head = struct.pack(">IIBBBBB", w, h, 8, 2, 0, 0, 0)
+    path.write_bytes(b"\x89PNG\r\n\x1a\n" + chunk(b"IHDR", head)
                      + chunk(b"IDAT", zlib.compress(raw, 6)) + chunk(b"IEND", b""))
 
 

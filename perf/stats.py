@@ -96,7 +96,8 @@ def audio_summary(streams: dict[str, dict]) -> dict:
     if not streams:
         return {}
     worst = lambda k: max((s.get(k) or 0) for s in streams.values())  # noqa: E731
-    return {"late_p99_ms": rnd(worst("late_p99_ms"), 2), "late_max_ms": rnd(worst("late_max_ms"), 2),
+    return {"late_p99_ms": rnd(worst("late_p99_ms"), 2),
+            "late_max_ms": rnd(worst("late_max_ms"), 2),
             "cb_p50_ms": rnd(worst("cb_p50_ms"), 3), "cb_p99_ms": rnd(worst("cb_p99_ms"), 3),
             "late_blocks": sum(s.get("late_blocks", 0) for s in streams.values()),
             "xruns": sum(s.get("xruns", 0) for s in streams.values()),
@@ -222,7 +223,8 @@ def markdown(report: dict, before: dict | None = None) -> str:
     if report.get("frozen"):
         lines += ["## Built app (--selftest only)", "",
                   "| exe | exit code | took s | peak private MB | peak RAM (WS) MB | peak threads "
-                  "| peak handles | children | folder MB |", "|---|---|---|---|---|---|---|---|---|"]
+                  "| peak handles | children | folder MB |",
+                  "|---|---|---|---|---|---|---|---|---|"]
         for name, f in report["frozen"].items():
             lines.append(f"| {name} | {f.get('exit_code')} | {f.get('took_s')} | "
                          f"{f.get('private_mb_peak')} | {f.get('wset_mb_peak')} | "

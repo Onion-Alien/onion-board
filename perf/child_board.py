@@ -28,6 +28,8 @@ import threading
 import time
 from pathlib import Path
 
+import soundboard  # noqa: F401  # first, as in main.py: it sets env (BLAS threads) numpy reads
+
 from perf import link
 
 T_START = time.perf_counter()
@@ -310,7 +312,8 @@ class Child:
     # -- what gets reported
     def thread_names(self) -> dict:
         from perf import fakeaudio
-        names = {t.native_id: f"python: {t.name.split('-')[0] if t.name.startswith('Thread-') else t.name}"
+        names = {t.native_id: "python: " + (t.name.split("-")[0] if t.name.startswith("Thread-")
+                                             else t.name)
                  for t in threading.enumerate() if t.native_id}
         names[threading.main_thread().native_id] = "ui (main thread)"
         names.update(fakeaudio.native_ids())

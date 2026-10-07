@@ -271,8 +271,8 @@ def child_env(profile: Path, instance: str, real_window: bool, extra: dict) -> d
 
 def build_watch_zip(src: Path, out: Path) -> Path:
     out.mkdir(parents=True, exist_ok=True)
-    r = subprocess.run([sys.executable, str(src / "scripts" / "build_module.py"), "--out", str(out)],
-                       cwd=src, capture_output=True, text=True, timeout=180)
+    r = subprocess.run([sys.executable, str(src / "scripts" / "build_module.py"),
+                        "--out", str(out)], cwd=src, capture_output=True, text=True, timeout=180)
     z = out / "OnionWatch-module.zip"
     if r.returncode != 0 or not z.is_file():
         raise RuntimeError(f"building Onion Watch's module failed: {r.stderr[-800:]}")
