@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased
+
+- **Discord's automatic input sensitivity is caught too.** In a real call it kept
+  cutting songs out in bursts: up to a third of a high-pitched song went missing,
+  none once it was off. The *Fix Discord* bar and the Discord guide now say when
+  *Automatically determine input sensitivity* is on and how to switch it off.
+
 ## 1.9.7 — 2026-10-07
 
 - **Important fix: Discord wiping out your sounds on Straight into my mic.** Measured

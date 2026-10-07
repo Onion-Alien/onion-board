@@ -224,6 +224,8 @@ DISCORD_URGENT = {
                          "Processing\" is on, which skips Onion Board."),
     discordcfg.VAD: _("{name}'s Advanced Voice Activity cuts most of your sounds in calls. "
                       "Turn it off (Voice & Video → Show Advanced Voice Settings)."),
+    discordcfg.AUTO: _("{name}'s automatic input sensitivity keeps cutting your sounds out "
+                       "in calls. Turn it off (Voice & Video → Input Sensitivity)."),
     discordcfg.ISOLATION: _("{name}'s Voice Isolation is wiping out your sounds. Set its "
                             "Input Profile to Custom and Noise Suppression to None."),
     discordcfg.KRISP: _("{name}'s noise suppression (Krisp) is wiping out your sounds. Set "
