@@ -47,6 +47,10 @@ def fit(w: QWidget) -> bool:
     max_h = avail.height() - extra_h
     max_w = avail.width() - extra_w
     width = w.width()
+    lay = w.layout()
+    if lay is not None:   # a row of buttons (longer in other languages) is never cut
+        lay.activate()
+        width = min(max(width, lay.totalMinimumSize().width()), max(max_w, width))
     need = needed_height(w, width)
     while need > max_h and width + WIDEN_STEP <= max_w:   # too tall for the screen: widen
         width += WIDEN_STEP

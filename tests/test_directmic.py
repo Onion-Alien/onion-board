@@ -976,6 +976,17 @@ def test_a_fault_in_the_effect_puts_the_mic_back(tmp_path):
 
 
 @needs_fuzz
+def test_lead_grows_just_enough_and_comes_back(tmp_path):
+    """fuzzhost --lead, block by block (no timing luck): a board late by a block once
+    takes the lead one step; late every other block, two steps (the same lag counted
+    again while a step was still owed took it to 50 ms); then back to the normal lead,
+    really read that far behind, with the board's sync pair and without."""
+    r = subprocess.run([str(FUZZ_HOST), str(FUZZ_DLL), str(tmp_path), "--lead"],
+                       capture_output=True, text=True, timeout=60)
+    assert r.returncode == 0 and "LEAD OK" in r.stdout, r.stdout + r.stderr
+
+
+@needs_fuzz
 def test_effect_survives_a_short_fuzz(tmp_path):
     """A few seconds of fuzzhost (hostile, truncated and half-written ring files; the
     effect with sanitizer traps): no crash, hang, caught fault or sound out of range.
@@ -1019,17 +1030,31 @@ def test_delay_shrinks_back_after_a_hiccup(ring_file, stall):
             time.sleep(stall)   # the board stalls (a GIL hog, a page fault storm)
 
     leads = {}
-
-    def during(s):
-        time.sleep(1.5)
-        leads["after"] = int(s._ring.live_slots()["lead"].max())
-        time.sleep(3.5)
-        leads["end"] = int(s._ring.live_slots()["lead"].max())
-        leads["late"] = s.late()
-
-    (x,), _, _ = _run_host(ring_file, 48000, 1, 6.0, callback=bursts, mode=dm.MODE_REPLACE,
-                           during=during)
     base = int(dm.LEAD_S * dm.RATE)
+
+    # "Once the board has kept time": each time it's late again (this Python board, on a
+    # PC busy with the rest of the suite, can be) the effect rightly keeps the bigger
+    # lead and starts counting again. So: back to normal within ~3 s of the last late
+    # block (2 s on time, then a quiet moment per 20 ms step), however long that takes.
+    def during(s):
+        lead = lambda: int(s._ring.live_slots()["lead"].max())  # noqa: E731
+        time.sleep(1.5)
+        leads["after"] = lead()
+        late, since, end = s.late(), time.monotonic(), time.monotonic() + 7.0
+        while time.monotonic() < end and lead() != base:
+            if s.late() != late:
+                late, since = s.late(), time.monotonic()
+            if time.monotonic() - since > 3.2:
+                leads["on time"] = "3.2 s and it didn't come back"
+                break
+            time.sleep(0.05)
+        else:
+            if lead() != base:
+                leads["on time"] = "never 3.2 s on end: the PC was too busy to tell"
+        leads["end"], leads["late"] = lead(), s.late()
+
+    (x,), _, _ = _run_host(ring_file, 48000, 1, 9.5, callback=bursts, mode=dm.MODE_REPLACE,
+                           during=during)
     assert leads["after"] > base, leads             # it rode the hiccup out
     assert leads["end"] == base, leads              # ...and came back
     assert np.all(np.isfinite(x)) and np.abs(x).max() <= 0.41

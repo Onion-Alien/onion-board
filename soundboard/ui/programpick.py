@@ -84,9 +84,9 @@ class ProgramPicker(QDialog):
         text = exe if not title else f"{exe}    ·    {title[:60]}"
         cat = self.taken.get(exe)
         if cat == self.category:
-            text += "    (already set)"
+            text = _("{program}    (already set)", program=text)
         elif cat:
-            text += f"    (now shows “{cat}”)"
+            text = _("{program}    (now shows “{category}”)", program=text, category=cat)
         li = QListWidgetItem(text)
         li.setData(Qt.UserRole, exe)
         li.setToolTip(path or exe)
@@ -100,7 +100,7 @@ class ProgramPicker(QDialog):
 
     def browse(self):
         path, __ = QFileDialog.getOpenFileName(self, _("Pick a program"), "",
-                                              "Programs (*.exe);;All files (*)")
+                                              _("Programs (*.exe);;All files (*)"))
         self.add_path(path)
 
     def add_path(self, path: str):
