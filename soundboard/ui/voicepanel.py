@@ -2558,7 +2558,7 @@ class VoicePanel(QWidget):
         from soundboard.ui.aivoicepanel import AiVoicePanel
         self.ai_controller = AiVoiceController(self.chain, lambda ev: None)
         saved = speech.get("ai") if isinstance(speech, dict) else None   # may be damaged
-        self.ai = AiVoicePanel(self.ai_controller, saved, self.modules)
+        self.ai = AiVoicePanel(self.ai_controller, saved, self.modules, engine)
         self.ai.changed.connect(self._ai_changed)
         self.ai.live_changed.connect(self._ai_live)
         self.ai.modules_changed.connect(self.rescan_modules)
