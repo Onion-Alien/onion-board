@@ -2601,5 +2601,14 @@
   "Every connection the app makes while it's open, and every one a switch turned away.": "Mọi kết nối mà ứng dụng thực hiện khi ứng dụng đang mở và mọi kết nối đều bị tắt.",
   "Every connection the app makes while it's open, and every one a switch turned away. Kept on this PC between starts (Keep a history, below), never sent.": "Mọi kết nối mà ứng dụng thực hiện khi ứng dụng đang mở và mọi kết nối đều bị tắt. Được lưu giữ trên PC này giữa các lần khởi động (Giữ lịch sử ở bên dưới), chưa bao giờ được gửi.",
   "Keep an app log": "Giữ nhật ký ứng dụng",
-  "The app writes what it does to onionboard.log in its folder (3 MB at most), so a problem can be looked into. It can name a site a download or radio station failed on. Nothing is sent anywhere. Unticking it stops the log and deletes it.": "Ứng dụng ghi những gì nó thực hiện vào Onionboard.log trong thư mục của nó (tối đa 3 MB), do đó có thể xem xét vấn đề. Nó có thể đặt tên cho một trang web tải xuống hoặc đài phát thanh không thành công. Không có gì được gửi đi bất cứ đâu. Bỏ chọn nó sẽ dừng nhật ký và xóa nó."
+  "The app writes what it does to onionboard.log in its folder (3 MB at most), so a problem can be looked into. It can name a site a download or radio station failed on. Nothing is sent anywhere. Unticking it stops the log and deletes it.": "Ứng dụng ghi những gì nó thực hiện vào Onionboard.log trong thư mục của nó (tối đa 3 MB), do đó có thể xem xét vấn đề. Nó có thể đặt tên cho một trang web tải xuống hoặc đài phát thanh không thành công. Không có gì được gửi đi bất cứ đâu. Bỏ chọn nó sẽ dừng nhật ký và xóa nó.",
+  "Men": "Nam",
+  "Women": "Nữ",
+  "In between & fun": "Ở giữa & vui nhộn",
+  "Your own": "Của bạn",
+  "Who": "Ai",
+  "Any": "Bất kỳ",
+  "Low": "Trầm",
+  "High": "Cao",
+  "No voices like that. Try another pitch.": "Không có giọng nào như vậy. Thử cao độ khác."
 }

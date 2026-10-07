@@ -2655,5 +2655,14 @@
   "Every connection the app makes while it's open, and every one a switch turned away. Kept on this PC between starts (Keep a history, below), never sent.": "Varje anslutning som appen gör medan den är öppen, och var och en en brytare vriden bort. Förvaras på den här datorn mellan startar (Behåll en historik nedan), har aldrig skickats.",
   "Keep an app log": "Håll en applogg",
   "Listening…": "Lyssnande…",
-  "The app writes what it does to onionboard.log in its folder (3 MB at most), so a problem can be looked into. It can name a site a download or radio station failed on. Nothing is sent anywhere. Unticking it stops the log and deletes it.": "Appen skriver vad den gör med onionboard.log i sin mapp (max 3 MB), så ett problem kan undersökas. Den kan namnge en webbplats som en nedladdning eller radiostation misslyckades på. Inget skickas någonstans. Om du avmarkerar den stoppas loggen och raderas den."
+  "The app writes what it does to onionboard.log in its folder (3 MB at most), so a problem can be looked into. It can name a site a download or radio station failed on. Nothing is sent anywhere. Unticking it stops the log and deletes it.": "Appen skriver vad den gör med onionboard.log i sin mapp (max 3 MB), så ett problem kan undersökas. Den kan namnge en webbplats som en nedladdning eller radiostation misslyckades på. Inget skickas någonstans. Om du avmarkerar den stoppas loggen och raderas den.",
+  "Men": "Män",
+  "Women": "Kvinnor",
+  "In between & fun": "Mittemellan & roliga",
+  "Your own": "Dina egna",
+  "Who": "Vem",
+  "Any": "Alla",
+  "Low": "Låg",
+  "High": "Hög",
+  "No voices like that. Try another pitch.": "Inga röster som det. Prova en annan tonhöjd."
 }

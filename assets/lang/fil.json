@@ -2655,5 +2655,14 @@
   "Every connection the app makes while it's open, and every one a switch turned away. Kept on this PC between starts (Keep a history, below), never sent.": "Bawat koneksyon na ginagawa ng app habang bukas ito, at bawat isa ay tumalikod. Pinananatili sa PC na ito sa pagitan ng mga pagsisimula (Panatilihin ang isang kasaysayan, sa ibaba), hindi kailanman naipadala.",
   "Keep an app log": "Panatilihin ang isang log ng app",
   "Listening…": "Nakikinig...",
-  "The app writes what it does to onionboard.log in its folder (3 MB at most), so a problem can be looked into. It can name a site a download or radio station failed on. Nothing is sent anywhere. Unticking it stops the log and deletes it.": "Isinulat ng app kung ano ang ginagawa nito sa onionboard.log sa folder nito (3 MB sa pinakamaraming), para matingnan ang isang problema. Maaari nitong pangalanan ang isang site kung saan nabigo ang pag-download o istasyon ng radyo. Walang ipinapadala kahit saan. Ang pag-uncheck nito ay huminto sa log at nagtatanggal nito."
+  "The app writes what it does to onionboard.log in its folder (3 MB at most), so a problem can be looked into. It can name a site a download or radio station failed on. Nothing is sent anywhere. Unticking it stops the log and deletes it.": "Isinulat ng app kung ano ang ginagawa nito sa onionboard.log sa folder nito (3 MB sa pinakamaraming), para matingnan ang isang problema. Maaari nitong pangalanan ang isang site kung saan nabigo ang pag-download o istasyon ng radyo. Walang ipinapadala kahit saan. Ang pag-uncheck nito ay huminto sa log at nagtatanggal nito.",
+  "Men": "Lalaki",
+  "Women": "Babae",
+  "In between & fun": "Nasa gitna at nakakatuwa",
+  "Your own": "Sa iyo",
+  "Who": "Sino",
+  "Any": "Kahit ano",
+  "Low": "Mababa",
+  "High": "Mataas",
+  "No voices like that. Try another pitch.": "Walang ganoong boses. Subukan ang ibang tono."
 }

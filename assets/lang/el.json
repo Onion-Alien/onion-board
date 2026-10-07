@@ -2655,5 +2655,14 @@
   "Every connection the app makes while it's open, and every one a switch turned away. Kept on this PC between starts (Keep a history, below), never sent.": "Κάθε σύνδεση που πραγματοποιεί η εφαρμογή ενώ είναι ανοιχτή, και κάθε μια διακόπτης στρέφεται. Διατηρήθηκε σε αυτόν τον υπολογιστή μεταξύ των εκκινήσεων (Κρατήστε ιστορικό, παρακάτω), δεν εστάλη ποτέ.",
   "Keep an app log": "Διατηρήστε ένα αρχείο καταγραφής εφαρμογής",
   "Listening…": "Ακούγοντας…",
-  "The app writes what it does to onionboard.log in its folder (3 MB at most), so a problem can be looked into. It can name a site a download or radio station failed on. Nothing is sent anywhere. Unticking it stops the log and deletes it.": "Η εφαρμογή γράφει τι κάνει στο onionboard.log στον φάκελό της (3 MB το πολύ), ώστε να μπορεί να εξεταστεί ένα πρόβλημα. Μπορεί να ονομάσει έναν ιστότοπο στον οποίο η λήψη ή ο ραδιοφωνικός σταθμός απέτυχε. Τίποτα δεν αποστέλλεται πουθενά. Η κατάργησή του διακόπτει το αρχείο καταγραφής και το διαγράφει."
+  "The app writes what it does to onionboard.log in its folder (3 MB at most), so a problem can be looked into. It can name a site a download or radio station failed on. Nothing is sent anywhere. Unticking it stops the log and deletes it.": "Η εφαρμογή γράφει τι κάνει στο onionboard.log στον φάκελό της (3 MB το πολύ), ώστε να μπορεί να εξεταστεί ένα πρόβλημα. Μπορεί να ονομάσει έναν ιστότοπο στον οποίο η λήψη ή ο ραδιοφωνικός σταθμός απέτυχε. Τίποτα δεν αποστέλλεται πουθενά. Η κατάργησή του διακόπτει το αρχείο καταγραφής και το διαγράφει.",
+  "Men": "Άντρες",
+  "Women": "Γυναίκες",
+  "In between & fun": "Ενδιάμεσες & αστείες",
+  "Your own": "Δικές σου",
+  "Who": "Ποιος",
+  "Any": "Οποιοδήποτε",
+  "Low": "Χαμηλός",
+  "High": "Υψηλός",
+  "No voices like that. Try another pitch.": "Δεν υπάρχουν τέτοιες φωνές. Δοκίμασε άλλον τόνο."
 }

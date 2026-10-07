@@ -2709,5 +2709,14 @@
   "Every connection the app makes while it's open, and every one a switch turned away.": "Każde połączenie, które aplikacja nawiązuje, gdy jest otwarte, i każde połączenie jest wyłączone.",
   "Every connection the app makes while it's open, and every one a switch turned away. Kept on this PC between starts (Keep a history, below), never sent.": "Każde połączenie, które aplikacja nawiązuje, gdy jest otwarte, i każde połączenie jest wyłączone. Przechowywane na tym komputerze pomiędzy uruchomieniami (Zachowaj historię poniżej), nigdy nie wysłane.",
   "Keep an app log": "Prowadź dziennik aplikacji",
-  "The app writes what it does to onionboard.log in its folder (3 MB at most), so a problem can be looked into. It can name a site a download or radio station failed on. Nothing is sent anywhere. Unticking it stops the log and deletes it.": "Aplikacja zapisuje swoje działania w pliku cebulboard.log w swoim folderze (maksymalnie 3 MB), dzięki czemu można sprawdzić problem. Może nazwać witrynę, w której nie udało się pobrać lub stację radiową. Nic nie jest nigdzie wysyłane. Odznaczenie powoduje zatrzymanie dziennika i jego usunięcie."
+  "The app writes what it does to onionboard.log in its folder (3 MB at most), so a problem can be looked into. It can name a site a download or radio station failed on. Nothing is sent anywhere. Unticking it stops the log and deletes it.": "Aplikacja zapisuje swoje działania w pliku cebulboard.log w swoim folderze (maksymalnie 3 MB), dzięki czemu można sprawdzić problem. Może nazwać witrynę, w której nie udało się pobrać lub stację radiową. Nic nie jest nigdzie wysyłane. Odznaczenie powoduje zatrzymanie dziennika i jego usunięcie.",
+  "Men": "Mężczyźni",
+  "Women": "Kobiety",
+  "In between & fun": "Pomiędzy i zabawne",
+  "Your own": "Twoje",
+  "Who": "Kto",
+  "Any": "Dowolna",
+  "Low": "Niska",
+  "High": "Wysoka",
+  "No voices like that. Try another pitch.": "Brak takich głosów. Spróbuj innej wysokości."
 }

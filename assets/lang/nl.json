@@ -2655,5 +2655,14 @@
   "Every connection the app makes while it's open, and every one a switch turned away.": "Elke verbinding die de app maakt terwijl deze open is, en elke keer dat er een schakelaar wordt omgedraaid.",
   "Every connection the app makes while it's open, and every one a switch turned away. Kept on this PC between starts (Keep a history, below), never sent.": "Elke verbinding die de app maakt terwijl deze open is, en elke keer dat er een schakelaar wordt omgedraaid. Tussen het opstarten op deze pc bewaard (Houd een geschiedenis bij, hieronder), nooit verzonden.",
   "Keep an app log": "Houd een app-logboek bij",
-  "The app writes what it does to onionboard.log in its folder (3 MB at most), so a problem can be looked into. It can name a site a download or radio station failed on. Nothing is sent anywhere. Unticking it stops the log and deletes it.": "De app schrijft in zijn map (maximaal 3 MB) wat hij doet met uienbord.log, zodat er naar een probleem kan worden gekeken. Het kan een site een naam geven waarop een download- of radiostation is mislukt. Er wordt niets verzonden. Als u dit uitschakelt, wordt het logboek gestopt en verwijderd."
+  "The app writes what it does to onionboard.log in its folder (3 MB at most), so a problem can be looked into. It can name a site a download or radio station failed on. Nothing is sent anywhere. Unticking it stops the log and deletes it.": "De app schrijft in zijn map (maximaal 3 MB) wat hij doet met uienbord.log, zodat er naar een probleem kan worden gekeken. Het kan een site een naam geven waarop een download- of radiostation is mislukt. Er wordt niets verzonden. Als u dit uitschakelt, wordt het logboek gestopt en verwijderd.",
+  "Men": "Mannen",
+  "Women": "Vrouwen",
+  "In between & fun": "Ertussenin & grappig",
+  "Your own": "Je eigen",
+  "Who": "Wie",
+  "Any": "Elke",
+  "Low": "Laag",
+  "High": "Hoog",
+  "No voices like that. Try another pitch.": "Geen stemmen zoals dat. Probeer een andere toonhoogte."
 }

@@ -110,6 +110,27 @@ def pitch_word(hz) -> str:
     return next(w for top, w in PITCH_WORDS if hz < top)
 
 
+# All voices' filters: who it sounds like (from its tags) and how high (from pitch_hz)
+# (the window has the words for them, in the app's language)
+WHO = ("men", "women", "other")
+PITCH_BANDS = (("low", 130), ("mid", 200), ("high", 10 ** 6))   # up to (Hz)
+
+
+def who(voice: dict) -> str:
+    """'men', 'women' or 'other' (in between, cartoon, monster, untagged)."""
+    tags = {str(t).lower() for t in voice.get("tags", []) if isinstance(t, str)}
+    return "men" if "man" in tags else "women" if "woman" in tags else "other"
+
+
+def pitch_band(voice: dict) -> str:
+    """'low', 'mid' or 'high', from its pitch_hz."""
+    try:
+        hz = float(voice.get("pitch_hz", 0))
+    except (TypeError, ValueError):
+        hz = 0.0
+    return next(key for key, top in PITCH_BANDS if hz < top)
+
+
 def tag_line(voice: dict) -> str:
     """'Man · Low' / 'Woman · Higher' / 'Your voice · Middle'."""
     tags = [str(t) for t in voice.get("tags", []) if isinstance(t, str)][:3]

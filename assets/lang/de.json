@@ -2655,5 +2655,14 @@
   "Every connection the app makes while it's open, and every one a switch turned away.": "Jede Verbindung, die die App herstellt, während sie geöffnet ist, und jede Verbindung, bei der ein Schalter weggedreht ist.",
   "Every connection the app makes while it's open, and every one a switch turned away. Kept on this PC between starts (Keep a history, below), never sent.": "Jede Verbindung, die die App herstellt, während sie geöffnet ist, und jede Verbindung, bei der ein Schalter weggedreht ist. Zwischen den Starts auf diesem PC gespeichert (Verlauf unten speichern), nie gesendet.",
   "Keep an app log": "Führen Sie ein App-Protokoll",
-  "The app writes what it does to onionboard.log in its folder (3 MB at most), so a problem can be looked into. It can name a site a download or radio station failed on. Nothing is sent anywhere. Unticking it stops the log and deletes it.": "Die App schreibt, was sie tut, in onionboard.log in ihren Ordner (höchstens 3 MB), sodass ein Problem untersucht werden kann. Es kann eine Site benennen, auf der ein Download oder ein Radiosender fehlgeschlagen ist. Es wird nichts irgendwo hingeschickt. Wenn Sie das Häkchen entfernen, wird das Protokoll gestoppt und gelöscht."
+  "The app writes what it does to onionboard.log in its folder (3 MB at most), so a problem can be looked into. It can name a site a download or radio station failed on. Nothing is sent anywhere. Unticking it stops the log and deletes it.": "Die App schreibt, was sie tut, in onionboard.log in ihren Ordner (höchstens 3 MB), sodass ein Problem untersucht werden kann. Es kann eine Site benennen, auf der ein Download oder ein Radiosender fehlgeschlagen ist. Es wird nichts irgendwo hingeschickt. Wenn Sie das Häkchen entfernen, wird das Protokoll gestoppt und gelöscht.",
+  "Men": "Männer",
+  "Women": "Frauen",
+  "In between & fun": "Dazwischen & Spaß",
+  "Your own": "Deine eigenen",
+  "Who": "Wer",
+  "Any": "Egal",
+  "Low": "Tief",
+  "High": "Hoch",
+  "No voices like that. Try another pitch.": "Keine solchen Stimmen. Probier eine andere Tonhöhe."
 }

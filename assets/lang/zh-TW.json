@@ -2601,5 +2601,14 @@
   "Every connection the app makes while it's open, and every one a switch turned away.": "應用程式在開啟時建立的每一個連接，以及每個開關都關閉的連接。",
   "Every connection the app makes while it's open, and every one a switch turned away. Kept on this PC between starts (Keep a history, below), never sent.": "應用程式在開啟時建立的每一個連接，以及每個開關都關閉的連接。在啟動之間保留在這台電腦上（保留歷史記錄，如下），從未發送。",
   "Keep an app log": "保留應用程式日誌",
-  "The app writes what it does to onionboard.log in its folder (3 MB at most), so a problem can be looked into. It can name a site a download or radio station failed on. Nothing is sent anywhere. Unticking it stops the log and deletes it.": "該應用程式將其執行的操作寫入其資料夾中的 onionboard.log（最多 3 MB），以便可以調查問題。它可以命名下載失敗的網站或廣播電台。沒有任何東西被送到任何地方。取消勾選它會停止日誌並將其刪除。"
+  "The app writes what it does to onionboard.log in its folder (3 MB at most), so a problem can be looked into. It can name a site a download or radio station failed on. Nothing is sent anywhere. Unticking it stops the log and deletes it.": "該應用程式將其執行的操作寫入其資料夾中的 onionboard.log（最多 3 MB），以便可以調查問題。它可以命名下載失敗的網站或廣播電台。沒有任何東西被送到任何地方。取消勾選它會停止日誌並將其刪除。",
+  "Men": "男聲",
+  "Women": "女聲",
+  "In between & fun": "中性與趣味",
+  "Your own": "你的",
+  "Who": "誰",
+  "Any": "不限",
+  "Low": "低",
+  "High": "高",
+  "No voices like that. Try another pitch.": "沒有這樣的聲音。換個音高試試。"
 }

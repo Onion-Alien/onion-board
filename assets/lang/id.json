@@ -2601,5 +2601,14 @@
   "Every connection the app makes while it's open, and every one a switch turned away.": "Setiap koneksi yang dibuat aplikasi saat aplikasi terbuka, dan setiap koneksi dimatikan.",
   "Every connection the app makes while it's open, and every one a switch turned away. Kept on this PC between starts (Keep a history, below), never sent.": "Setiap koneksi yang dibuat aplikasi saat aplikasi terbuka, dan setiap koneksi dimatikan. Disimpan di PC ini antara permulaan (Simpan riwayat, di bawah), tidak pernah dikirim.",
   "Keep an app log": "Simpan log aplikasi",
-  "The app writes what it does to onionboard.log in its folder (3 MB at most), so a problem can be looked into. It can name a site a download or radio station failed on. Nothing is sent anywhere. Unticking it stops the log and deletes it.": "Aplikasi ini menulis apa yang dilakukannya pada Onionboard.log di foldernya (maksimal 3 MB), sehingga masalahnya dapat diselidiki. Itu dapat memberi nama situs yang gagal diunduh atau stasiun radionya. Tidak ada yang dikirim ke mana pun. Menghapus centang akan menghentikan log dan menghapusnya."
+  "The app writes what it does to onionboard.log in its folder (3 MB at most), so a problem can be looked into. It can name a site a download or radio station failed on. Nothing is sent anywhere. Unticking it stops the log and deletes it.": "Aplikasi ini menulis apa yang dilakukannya pada Onionboard.log di foldernya (maksimal 3 MB), sehingga masalahnya dapat diselidiki. Itu dapat memberi nama situs yang gagal diunduh atau stasiun radionya. Tidak ada yang dikirim ke mana pun. Menghapus centang akan menghentikan log dan menghapusnya.",
+  "Men": "Pria",
+  "Women": "Wanita",
+  "In between & fun": "Di antaranya & lucu",
+  "Your own": "Milikmu",
+  "Who": "Siapa",
+  "Any": "Apa saja",
+  "Low": "Rendah",
+  "High": "Tinggi",
+  "No voices like that. Try another pitch.": "Tidak ada suara seperti itu. Coba nada lain."
 }

@@ -2655,5 +2655,14 @@
   "Every connection the app makes while it's open, and every one a switch turned away. Kept on this PC between starts (Keep a history, below), never sent.": "Всяка връзка, която приложението прави, докато е отворено, и всяка превключена превключвател. Съхранява се на този компютър между стартиранията (Пази се история по-долу), никога не се изпраща.",
   "Keep an app log": "Съхранявайте дневник на приложението",
   "Listening…": "Слушам...",
-  "The app writes what it does to onionboard.log in its folder (3 MB at most), so a problem can be looked into. It can name a site a download or radio station failed on. Nothing is sent anywhere. Unticking it stops the log and deletes it.": "Приложението пише какво прави в onionboard.log в своята папка (най-много 3 MB), така че проблемът може да бъде разгледан. Може да посочи сайт, на който изтеглянето или радиостанцията са неуспешни. Нищо не се изпраща никъде. Премахването на отметката спира дневника и го изтрива."
+  "The app writes what it does to onionboard.log in its folder (3 MB at most), so a problem can be looked into. It can name a site a download or radio station failed on. Nothing is sent anywhere. Unticking it stops the log and deletes it.": "Приложението пише какво прави в onionboard.log в своята папка (най-много 3 MB), така че проблемът може да бъде разгледан. Може да посочи сайт, на който изтеглянето или радиостанцията са неуспешни. Нищо не се изпраща никъде. Премахването на отметката спира дневника и го изтрива.",
+  "Men": "Мъже",
+  "Women": "Жени",
+  "In between & fun": "Междинни и забавни",
+  "Your own": "Твоите",
+  "Who": "Кой",
+  "Any": "Всяка",
+  "Low": "Ниска",
+  "High": "Висока",
+  "No voices like that. Try another pitch.": "Няма такива гласове. Опитай друга височина."
 }

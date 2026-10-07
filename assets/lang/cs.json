@@ -2709,5 +2709,14 @@
   "Every connection the app makes while it's open, and every one a switch turned away. Kept on this PC between starts (Keep a history, below), never sent.": "Každé připojení, které aplikace vytvoří, když je otevřená, a každé otočení přepínače. Ponecháno na tomto počítači mezi spuštěními (Uchovat historii níže), nikdy neodesláno.",
   "Keep an app log": "Udržujte protokol aplikace",
   "Listening…": "Naslouchání…",
-  "The app writes what it does to onionboard.log in its folder (3 MB at most), so a problem can be looked into. It can name a site a download or radio station failed on. Nothing is sent anywhere. Unticking it stops the log and deletes it.": "Aplikace zapisuje, co dělá, do onionboard.log ve své složce (maximálně 3 MB), takže je možné hledat problém. Může pojmenovat web, na kterém selhalo stahování nebo rádio. Nikam se nic neposílá. Zrušením zaškrtnutí se záznam zastaví a smaže se."
+  "The app writes what it does to onionboard.log in its folder (3 MB at most), so a problem can be looked into. It can name a site a download or radio station failed on. Nothing is sent anywhere. Unticking it stops the log and deletes it.": "Aplikace zapisuje, co dělá, do onionboard.log ve své složce (maximálně 3 MB), takže je možné hledat problém. Může pojmenovat web, na kterém selhalo stahování nebo rádio. Nikam se nic neposílá. Zrušením zaškrtnutí se záznam zastaví a smaže se.",
+  "Men": "Muži",
+  "Women": "Ženy",
+  "In between & fun": "Něco mezi a zábavné",
+  "Your own": "Vlastní",
+  "Who": "Kdo",
+  "Any": "Jakákoli",
+  "Low": "Nízká",
+  "High": "Vysoká",
+  "No voices like that. Try another pitch.": "Žádné takové hlasy. Zkus jinou výšku."
 }

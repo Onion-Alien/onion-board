@@ -2709,5 +2709,14 @@
   "Every connection the app makes while it's open, and every one a switch turned away.": "Каждое соединение, которое приложение устанавливает, пока оно открыто, и каждое выключенное переключение.",
   "Every connection the app makes while it's open, and every one a switch turned away. Kept on this PC between starts (Keep a history, below), never sent.": "Каждое соединение, которое приложение устанавливает, пока оно открыто, и каждое выключенное переключение. Хранится на этом компьютере между запусками (Сохранять историю ниже), никогда не отправляется.",
   "Keep an app log": "Ведите журнал приложений",
-  "The app writes what it does to onionboard.log in its folder (3 MB at most), so a problem can be looked into. It can name a site a download or radio station failed on. Nothing is sent anywhere. Unticking it stops the log and deletes it.": "Приложение записывает свои действия в onionboard.log в свою папку (максимум 3 МБ), чтобы можно было разобраться в проблеме. Он может назвать сайт, на котором произошла ошибка при загрузке, или радиостанцию. Никуда ничего не отправляется. Снятие отметки останавливает журнал и удаляет его."
+  "The app writes what it does to onionboard.log in its folder (3 MB at most), so a problem can be looked into. It can name a site a download or radio station failed on. Nothing is sent anywhere. Unticking it stops the log and deletes it.": "Приложение записывает свои действия в onionboard.log в свою папку (максимум 3 МБ), чтобы можно было разобраться в проблеме. Он может назвать сайт, на котором произошла ошибка при загрузке, или радиостанцию. Никуда ничего не отправляется. Снятие отметки останавливает журнал и удаляет его.",
+  "Men": "Мужские",
+  "Women": "Женские",
+  "In between & fun": "Средние и забавные",
+  "Your own": "Ваши",
+  "Who": "Кто",
+  "Any": "Любая",
+  "Low": "Низкая",
+  "High": "Высокая",
+  "No voices like that. Try another pitch.": "Таких голосов нет. Попробуйте другую высоту."
 }

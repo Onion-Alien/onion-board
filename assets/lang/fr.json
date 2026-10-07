@@ -2655,5 +2655,14 @@
   "Every connection the app makes while it's open, and every one a switch turned away.": "Chaque connexion établie par l'application lorsqu'elle est ouverte, et chacune d'elles est désactivée.",
   "Every connection the app makes while it's open, and every one a switch turned away. Kept on this PC between starts (Keep a history, below), never sent.": "Chaque connexion établie par l'application lorsqu'elle est ouverte, et chacune d'elles est désactivée. Conservé sur ce PC entre les démarrages (Conserver un historique, ci-dessous), jamais envoyé.",
   "Keep an app log": "Tenir un journal d'application",
-  "The app writes what it does to onionboard.log in its folder (3 MB at most), so a problem can be looked into. It can name a site a download or radio station failed on. Nothing is sent anywhere. Unticking it stops the log and deletes it.": "L'application écrit ce qu'elle fait dans onionboard.log dans son dossier (3 Mo au maximum), afin qu'un problème puisse être examiné. Il peut nommer un site sur lequel un téléchargement ou une station de radio a échoué. Rien n'est envoyé nulle part. Décocher cette case arrête le journal et le supprime."
+  "The app writes what it does to onionboard.log in its folder (3 MB at most), so a problem can be looked into. It can name a site a download or radio station failed on. Nothing is sent anywhere. Unticking it stops the log and deletes it.": "L'application écrit ce qu'elle fait dans onionboard.log dans son dossier (3 Mo au maximum), afin qu'un problème puisse être examiné. Il peut nommer un site sur lequel un téléchargement ou une station de radio a échoué. Rien n'est envoyé nulle part. Décocher cette case arrête le journal et le supprime.",
+  "Men": "Hommes",
+  "Women": "Femmes",
+  "In between & fun": "Entre les deux & fun",
+  "Your own": "Les vôtres",
+  "Who": "Qui",
+  "Any": "Toutes",
+  "Low": "Grave",
+  "High": "Aiguë",
+  "No voices like that. Try another pitch.": "Aucune voix de ce genre. Essayez une autre hauteur."
 }

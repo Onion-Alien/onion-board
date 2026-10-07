@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+- **Setup and Voice tabs fit a big screen.** Full screen, their cards no longer
+  stretch to half the screen each: the pages stay a readable width in the middle,
+  and buttons, voice lists and sliders keep their own size instead of becoming bars
+  across the whole card.
+- **AI voices: pick by who and how high.** *All voices* sorts them under Men,
+  Women and In between & fun (your own last), lowest first, with chips to show only
+  one kind and only low, middle or high voices.
 - **Live controls on the Radio and Apps tabs.** The Sounds tab's speed / pitch /
   effects popup now has a twin on the Radio bar and the Apps tab: change the pitch
   (Redline up to ±36 st) and add bass, treble, muffle, reverb, echo, distortion or a

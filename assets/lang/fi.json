@@ -2655,5 +2655,14 @@
   "Every connection the app makes while it's open, and every one a switch turned away. Kept on this PC between starts (Keep a history, below), never sent.": "Jokainen yhteys, jonka sovellus tekee, kun se on auki, ja jokainen kytkin on käännetty pois päältä. Säilytetty tällä tietokoneella käynnistysten välillä (Säilytä historia, alla), ei lähetetty.",
   "Keep an app log": "Pidä sovelluslokia",
   "Listening…": "Kuuntelee…",
-  "The app writes what it does to onionboard.log in its folder (3 MB at most), so a problem can be looked into. It can name a site a download or radio station failed on. Nothing is sent anywhere. Unticking it stops the log and deletes it.": "Sovellus kirjoittaa mitä se tekee onionboard.log-kansioon (enintään 3 Mt), joten ongelmaa voidaan tutkia. Se voi nimetä sivuston, jonka lataus tai radioasema epäonnistui. Mitään ei lähetetä minnekään. Sen valinnan poistaminen pysäyttää lokin ja poistaa sen."
+  "The app writes what it does to onionboard.log in its folder (3 MB at most), so a problem can be looked into. It can name a site a download or radio station failed on. Nothing is sent anywhere. Unticking it stops the log and deletes it.": "Sovellus kirjoittaa mitä se tekee onionboard.log-kansioon (enintään 3 Mt), joten ongelmaa voidaan tutkia. Se voi nimetä sivuston, jonka lataus tai radioasema epäonnistui. Mitään ei lähetetä minnekään. Sen valinnan poistaminen pysäyttää lokin ja poistaa sen.",
+  "Men": "Miehet",
+  "Women": "Naiset",
+  "In between & fun": "Siltä väliltä & hauskat",
+  "Your own": "Omat",
+  "Who": "Kuka",
+  "Any": "Mikä tahansa",
+  "Low": "Matala",
+  "High": "Korkea",
+  "No voices like that. Try another pitch.": "Ei sellaisia ääniä. Kokeile toista sävelkorkeutta."
 }

@@ -2709,5 +2709,14 @@
   "Every connection the app makes while it's open, and every one a switch turned away. Kept on this PC between starts (Keep a history, below), never sent.": "Fiecare conexiune pe care o face aplicația în timp ce este deschisă și fiecare un comutator a fost oprit. Păstrat pe acest computer între porniri (Păstrați un istoric, mai jos), niciodată trimis.",
   "Keep an app log": "Păstrați un jurnal al aplicației",
   "Listening…": "Ascultare…",
-  "The app writes what it does to onionboard.log in its folder (3 MB at most), so a problem can be looked into. It can name a site a download or radio station failed on. Nothing is sent anywhere. Unticking it stops the log and deletes it.": "Aplicația scrie ceea ce face în onionboard.log în folderul său (cel mult 3 MB), astfel încât o problemă poate fi analizată. Poate denumi un site pe care a eșuat descărcarea sau postul de radio. Nimic nu este trimis nicăieri. Debifarea acestuia oprește jurnalul și îl șterge."
+  "The app writes what it does to onionboard.log in its folder (3 MB at most), so a problem can be looked into. It can name a site a download or radio station failed on. Nothing is sent anywhere. Unticking it stops the log and deletes it.": "Aplicația scrie ceea ce face în onionboard.log în folderul său (cel mult 3 MB), astfel încât o problemă poate fi analizată. Poate denumi un site pe care a eșuat descărcarea sau postul de radio. Nimic nu este trimis nicăieri. Debifarea acestuia oprește jurnalul și îl șterge.",
+  "Men": "Bărbați",
+  "Women": "Femei",
+  "In between & fun": "Între ele și amuzante",
+  "Your own": "Ale tale",
+  "Who": "Cine",
+  "Any": "Oricare",
+  "Low": "Joasă",
+  "High": "Înaltă",
+  "No voices like that. Try another pitch.": "Nicio voce așa. Încearcă altă înălțime."
 }
