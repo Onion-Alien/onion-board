@@ -2,6 +2,9 @@
 regrid, pictures scaled once per size, the footer worked out once, and typing in the
 search box / dragging Pad size not regridding on every step. Work is counted, not
 timed, so a slow test runner can't make these flaky."""
+import threading
+import time
+
 import pytest
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QColor, QImage
@@ -152,7 +155,7 @@ def test_fitted_picture_is_made_once_per_size_screen_and_shade(qapp, tmp_path, m
     path = make_image(tmp_path / "a.png")
     loads = []
     real = thumbs.pixmap
-    monkeypatch.setattr(thumbs, "pixmap", lambda p: (loads.append(p), real(p))[1])
+    monkeypatch.setattr(thumbs, "pixmap", lambda p, *a: (loads.append(p), real(p, *a))[1])
     a = thumbs.fitted(path, 146, 89, 1.0, widgets.PIC_SHADE)
     assert a is not None and (a.width(), a.height()) == (146, 89)
     assert thumbs.fitted(path, 146, 89, 1.0, widgets.PIC_SHADE) is a and len(loads) == 1
@@ -201,9 +204,9 @@ def test_pad_paints_its_picture_without_scaling_it_again(qapp, tmp_path, monkeyp
     made = []
     real = thumbs.fitted
 
-    def counting(*a):
+    def counting(*a, **k):
         before = set(thumbs._fitted)
-        pm = real(*a)
+        pm = real(*a, **k)
         made.append(set(thumbs._fitted) != before)
         return pm
     monkeypatch.setattr(thumbs, "fitted", counting)
@@ -225,6 +228,46 @@ def test_pad_paints_its_picture_without_scaling_it_again(qapp, tmp_path, monkeyp
     mid = img.pixelColor(img.width() // 2, img.height() // 3)
     assert mid.red() > mid.blue()
     thumbs.forget(m.image)
+
+
+def test_pad_picture_is_read_off_the_ui_thread(qapp, tmp_path, monkeypatch):
+    """Every restore from the tray (thumbs.trim) re-read a screenful of picture files
+    on the UI thread: on a slow or sleeping disk the window froze. The pad paints its
+    plain card at once and its picture when the worker has read it."""
+    monkeypatch.setattr(thumbs, "LOAD_ASYNC", True, raising=False)
+    m = SoundMeta(id="p", name="Boom", file="f", duration=1.0,
+                  image=make_image(tmp_path / "a.png"))
+    pad = Pad(m, 150)
+    pad.state = "ready"
+    gate, real = threading.Event(), thumbs.QImage
+    monkeypatch.setattr(thumbs, "QImage", lambda *a: (gate.wait(3), real(*a))[1])
+    t0 = time.monotonic()
+    img = pad.grab().toImage()
+    assert time.monotonic() - t0 < 0.5
+    mid = img.pixelColor(img.width() // 2, img.height() // 3)
+    assert not mid.blue() > mid.red() + 40          # the plain card for now
+    assert thumbs.loading(m.image)
+    repaints = []
+    monkeypatch.setattr(pad, "update", lambda *a: repaints.append(a))
+    gate.set()
+    assert process_events(qapp, lambda: repaints, 3)    # repainted once it's in
+    assert not thumbs.loading(m.image)
+    img = pad.grab().toImage()
+    mid = img.pixelColor(img.width() // 2, img.height() // 3)
+    assert mid.blue() > mid.red()                   # the picture shows
+    thumbs.forget(m.image)
+
+
+def test_a_picture_forgotten_while_read_is_not_cached(qapp, tmp_path, monkeypatch):
+    monkeypatch.setattr(thumbs, "LOAD_ASYNC", True, raising=False)
+    path = make_image(tmp_path / "a.png")
+    gate, real = threading.Event(), thumbs.QImage
+    monkeypatch.setattr(thumbs, "QImage", lambda *a: (gate.wait(3), real(*a))[1])
+    assert thumbs.pixmap(path) is None and thumbs.loading(path)
+    thumbs.forget(path)                             # replaced while it was being read
+    gate.set()
+    process_events(qapp, lambda: False, 0.3)
+    assert path not in thumbs._pixmaps
 
 
 def test_pad_footer_is_worked_out_only_when_it_changes(qapp, monkeypatch):

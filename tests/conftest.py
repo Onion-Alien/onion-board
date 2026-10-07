@@ -243,6 +243,15 @@ def _never_read_the_real_discord(monkeypatch, tmp_path):
 
 
 @pytest.fixture(autouse=True)
+def _pictures_load_at_once(monkeypatch):
+    """Pad pictures are read on a worker thread in the app (thumbs.LOAD_ASYNC); tests
+    that check pictures and their caches get them at once, so a grab shows them. The
+    tests of the worker itself turn it back on."""
+    from soundboard import thumbs
+    monkeypatch.setattr(thumbs, "LOAD_ASYNC", False, raising=False)
+
+
+@pytest.fixture(autouse=True)
 def _not_a_dev_pc(monkeypatch):
     """The developer's PCs set ONIONBOARD_NO_STATS (no usage count from them): the
     tests run as on anyone's PC, so the usage count tests see it sent."""
