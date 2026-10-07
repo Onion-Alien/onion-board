@@ -353,6 +353,7 @@ class ChatCheck(QObject):
 
 class DiscordGuide(QDialog):
     """The Discord settings that matter for sounds, with the check built in."""
+    _settings_read = Signal(object, object)   # (signature, [Settings] or None = unchanged)
 
     def __init__(self, parent, mw, vm: str, kept: bool = False):
         super().__init__(parent)
@@ -400,6 +401,8 @@ class DiscordGuide(QDialog):
         self.settings.hide()
         v.addWidget(self.settings)
         self._sig = None
+        self._reading = False   # a worker is reading them (files in Discord's folder)
+        self._settings_read.connect(self._settings_in)
         self._watch = QTimer(self)
         self._watch.setInterval(2000)
         self._watch.timeout.connect(self._read_settings)
@@ -440,12 +443,32 @@ class DiscordGuide(QDialog):
         self._check.progress.connect(self._progress)
 
     def _read_settings(self):
-        """Re-read Discord's settings when its files changed (a few ms; ~10 kB)."""
-        sig = discordcfg.signature()
-        if sig == self._sig:
+        """Re-read Discord's settings when its files changed (~10 kB), on a worker: a
+        few ms usually, but the window froze while a slow or waking disk answered."""
+        if self._reading:
+            return
+        self._reading = True
+        threading.Thread(target=self._read_worker, args=(self._sig,), daemon=True,
+                         name="discord-guide-read").start()
+
+    def _read_worker(self, last):
+        try:
+            sig = discordcfg.signature()
+            found = None if sig == last else discordcfg.read()
+        except Exception:  # noqa: BLE001 - never leave _reading stuck
+            log.debug("reading Discord's settings failed", exc_info=True)
+            sig, found = last, None
+        try:
+            self._settings_read.emit(sig, found)
+        except RuntimeError:   # the guide closed meanwhile
+            pass
+
+    def _settings_in(self, sig, found):
+        self._reading = False
+        if found is None:
             return
         self._sig = sig
-        text = settings_html(discordcfg.read(), self.kept)
+        text = settings_html(found, self.kept)
         if text == self.settings.text():
             return
         self.settings.setText(text)

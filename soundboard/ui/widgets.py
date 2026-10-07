@@ -781,13 +781,15 @@ class Pad(QAbstractButton):
         """The pad's picture fitted to `r` in real pixels with its shade drawn on, or
         None. thumbs.fitted caches it by picture, size, screen and shade, so a resize,
         a press, a new picture, another screen or the mouse over it each get their own
-        and nothing is scaled on an ordinary paint."""
+        and nothing is scaled on an ordinary paint. None (the plain card) while the
+        file is still being read."""
         if not self.meta.image:
             return None
         dpr = self.devicePixelRatioF()
         return thumbs.fitted(self.meta.image, math.ceil(r.width() * dpr),
                              math.ceil(r.height() * dpr), dpr,
-                             PIC_SHADE_HOVER if self.hover else PIC_SHADE, PAD_RADIUS)
+                             PIC_SHADE_HOVER if self.hover else PIC_SHADE, PAD_RADIUS,
+                             waiter=self)   # read off the UI thread: repainted when in
 
     def _paint_slim(self):
         """A one-line row: accent dot, name, duration; progress along the bottom."""

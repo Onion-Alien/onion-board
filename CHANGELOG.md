@@ -5,6 +5,11 @@
 - **No more freezes when a headset drops out.** Unplugging a headset, Bluetooth
   cutting out or the PC waking from sleep could freeze the window for seconds while
   the app reopened the device. That now happens in the background.
+- **No more short freezes on a slow or sleeping disk.** Pad pictures, the Discord
+  guide's settings, the *Remove the virtual cable* check and a pad's video are now
+  read in the background, so bringing the window back from the tray or picking a pad
+  no longer waits for the disk. A pad shows its plain card for a moment until its
+  picture is in.
 - **28 more languages to speak in.** The Voice tab's *Speak in* list grows from 5
   to 33: Italian, Portuguese (Brazil and Portugal), Dutch, Polish, Czech, Slovak,
   Slovenian, Hungarian, Romanian, Bulgarian, Greek, Danish, Swedish, Norwegian,

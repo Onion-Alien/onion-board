@@ -1,6 +1,8 @@
 """A frozen UI thread gets its stack logged, once per freeze."""
 import logging
+import threading
 import time
+from pathlib import Path
 
 from PySide6.QtCore import QCoreApplication, QEvent
 
@@ -50,6 +52,52 @@ def test_a_frozen_window_logs_what_it_was_doing_once(qapp, caplog, tmp_path, mon
         assert "frozen_in_a_long_wait" in hw.saved.read_text(encoding="utf-8")
         beat_for(qapp, HANG_S)                     # beating again: no new report
         assert hw.reports == 1
+    finally:
+        hw.stop()
+
+
+def waiting_in_a_worker(go):
+    go.wait()
+
+
+class Dialog:
+    """Stands in for a modal dialog: exec() runs native code with no Python frame."""
+    exec = staticmethod(time.sleep)
+
+
+def test_a_freeze_report_shows_the_other_threads_too(qapp, tmp_path, monkeypatch):
+    from soundboard import applog
+    monkeypatch.setitem(applog._state, "log_path", tmp_path / "onionboard.log")
+    go = threading.Event()
+    worker = threading.Thread(target=waiting_in_a_worker, args=(go,), name="busy-worker",
+                              daemon=True)
+    worker.start()
+    settle(qapp)
+    hw = HangWatch(hang_s=HANG_S)
+    try:
+        frozen_in_a_long_wait(hw, HANG_S * 2)
+        text = hw.saved.read_text(encoding="utf-8")
+        assert text.index("frozen_in_a_long_wait") < text.index("Other threads")
+        assert "busy-worker" in text and "waiting_in_a_worker" in text
+        assert 'Thread "hangwatch"' not in text                        # not itself
+        assert "window's own event loop" not in text
+        assert str(Path.home()).lower() not in text.lower()          # scrubbed throughout
+    finally:
+        hw.stop()
+        go.set()
+        worker.join()
+
+
+def test_a_freeze_inside_a_dialogs_exec_says_so(qapp, tmp_path, monkeypatch):
+    from soundboard import applog
+    monkeypatch.setitem(applog._state, "log_path", tmp_path / "onionboard.log")
+    settle(qapp)
+    hw = HangWatch(hang_s=HANG_S)
+    try:
+        Dialog.exec(HANG_S * 2)
+        frozen_in_a_long_wait(hw, 0)
+        text = hw.saved.read_text(encoding="utf-8")
+        assert "it was inside a window's own event loop" in text
     finally:
         hw.stop()
 
