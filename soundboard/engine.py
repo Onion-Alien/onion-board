@@ -31,6 +31,7 @@ from __future__ import annotations
 import logging
 import threading
 import time
+import weakref
 from collections import OrderedDict
 from dataclasses import dataclass, field
 
@@ -857,14 +858,21 @@ class Engine:
         # audio thread stalls while a lower-priority thread holds the lock).
         self.lock = threading.Lock()
         self.voices: tuple[Voice, ...] = ()
-        # (sid, rate) -> (source array, resampled copy); LRU, bounded by CACHE_BUDGET
-        self._cache: OrderedDict[tuple[str, int], tuple[np.ndarray, np.ndarray]] = OrderedDict()
+        # (sid, rate) -> (weak ref to the source array, resampled copy); LRU, bounded by
+        # CACHE_BUDGET. The source is held weakly, here and in _shares: the library keeps
+        # its sounds alive, while a preview's or a link's audio is only held by its voice
+        # and must be freed when that ends (an effects preview of a song is ~70 MB)
+        self._cache: OrderedDict[tuple[str, int], tuple[weakref.ref, np.ndarray]] = OrderedDict()
         self._cache_bytes = 0
         self._cache_lock = threading.Lock()
         self._resampling: set[tuple[str, int]] = set()   # cache keys being made on a thread
         # sid -> (source array, src rate, destination.cut_shares): worked out once per
         # sound (at load, by prepare), not on every press
-        self._shares: dict[str, tuple[np.ndarray, int, dict]] = {}
+        self._shares: dict[str, tuple[weakref.ref, int, dict]] = {}
+        # a source array died: its entries get dropped on the next _sweep. The weakref
+        # callback only appends here: it can fire on any thread, even one holding
+        # _cache_lock, so it mustn't take a lock itself
+        self._dead: list[None] = []
         # sid -> times forget() was called: a prepare still running when its sound is
         # removed mustn't put the audio back afterwards (it'd hold a mapped cache file
         # open, so the file couldn't be deleted until the app closed)
@@ -1456,8 +1464,9 @@ class Engine:
         # the cache holds a reference to the source array and compares identity with
         # `is`: comparing id() alone could match a *new* array that happens to be
         # allocated at a freed one's address (e.g. successive test recordings)
-        if hit and hit[0] is data:
+        if hit and hit[0]() is data:
             return hit[1]
+        self._sweep()
         gen = self._forgets.get(key[0], 0)
         if data.dtype == np.int16:   # library audio: resample in float, keep the copy compact
             f = data.astype(np.float32)   # in place from here: a song's float copy is
@@ -1481,7 +1490,7 @@ class Engine:
             old = self._cache.pop(key, None)
             if old is not None:
                 self._cache_bytes -= old[1].nbytes
-            self._cache[key] = (data, out)
+            self._cache[key] = (self._ref(data), out)
             self._cache_bytes += out.nbytes
             while self._cache_bytes > CACHE_BUDGET and len(self._cache) > 1:
                 _, (_, dropped) = self._cache.popitem(last=False)
@@ -1494,7 +1503,7 @@ class Engine:
             return data
         with self._cache_lock:
             hit = self._cache.get((sid.split(":")[0], rate))
-        return hit[1] if hit and hit[0] is data else None
+        return hit[1] if hit and hit[0]() is data else None
 
     def _resample_soon(self, sid: str, data: np.ndarray, rate: int, src_rate: int):
         """Make data_for's copy on a thread (once per sound and rate at a time)."""
@@ -1519,14 +1528,30 @@ class Engine:
         """destination.cut_shares of a sound, worked out once (~12 ms for a song)."""
         key = sid.split(":")[0]
         hit = self._shares.get(key)
-        if hit is not None and hit[0] is data and hit[1] == src_rate:
+        if hit is not None and hit[0]() is data and hit[1] == src_rate:
             return hit[2]
+        self._sweep()
         gen = self._forgets.get(key, 0)
         shares = destination.cut_shares(data, src_rate)
         with self._cache_lock:
             if self._forgets.get(key, 0) == gen:   # not forgotten meanwhile
-                self._shares[key] = (data, src_rate, shares)
+                self._shares[key] = (self._ref(data), src_rate, shares)
         return shares
+
+    def _ref(self, data: np.ndarray) -> weakref.ref:
+        dead = self._dead   # not self: the ref mustn't keep the engine alive
+        return weakref.ref(data, lambda _r: dead.append(None))
+
+    def _sweep(self):
+        """Drop the cache and shares entries whose source array is gone."""
+        if not self._dead:
+            return
+        with self._cache_lock:
+            self._dead.clear()
+            for k in [k for k, v in self._shares.items() if v[0]() is None]:
+                del self._shares[k]
+            for k in [k for k, v in self._cache.items() if v[0]() is None]:
+                self._cache_bytes -= self._cache.pop(k)[1].nbytes
 
     def prepare(self, sid: str, data: np.ndarray):
         """Pre-resample for the currently open outputs (call off the UI thread), as
@@ -1545,10 +1570,11 @@ class Engine:
 
     def forget(self, sid: str):
         with self._cache_lock:
-            self._forgets[sid] = self._forgets.get(sid, 0) + 1
-            self._shares.pop(sid, None)
-            for k in [k for k in self._cache if k[0] == sid]:
-                self._cache_bytes -= self._cache.pop(k)[1].nbytes
+            for s in (sid, sid + "~fx"):   # and its effects preview
+                self._forgets[s] = self._forgets.get(s, 0) + 1
+                self._shares.pop(s, None)
+                for k in [k for k in self._cache if k[0] == s]:
+                    self._cache_bytes -= self._cache.pop(k)[1].nbytes
 
     # ----------------------------------------------------------------- playback
     def play(self, sid: str, data: np.ndarray, gain: float, loop=False, mode="restart",
@@ -1675,6 +1701,7 @@ class Engine:
     def playing(self) -> dict[str, tuple[float, bool]]:
         """sid -> (progress 0..1, paused) of the newest voice for that sound."""
         res = {}
+        self._sweep()   # the UI polls this: a finished preview's audio goes here
         with self.lock:
             self.voices = tuple(v for v in self.voices if not v.finished)
             for v in self.voices:
