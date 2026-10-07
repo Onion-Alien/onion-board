@@ -288,6 +288,7 @@ def test_bun_waits_on_the_map_and_the_first_stations_pop_in(qapp):
     m.show()
     qapp.processEvents()
     assert m._loading.isVisible()              # the map is there (it drags) with Bun on it
+    m.set_land([], [])
     m.set_points([{"id": f"s{i}", "la": 0.0, "lo": float(i), "k": i} for i in range(50)])
     assert not m._loading.isVisible() and m.revealing()
     t = time.monotonic() - m._reveal_t0
@@ -304,6 +305,31 @@ def test_bun_waits_on_the_map_and_the_first_stations_pop_in(qapp):
     m.show_message("The station directory can't be reached right now.")
     m.set_loading(True)
     assert not m._loading.isVisible()          # a message says what's wrong instead
+    m.close()
+
+
+def test_the_country_names_show_before_the_dots(qapp):
+    """The dots popped in over a map with no names, and the names came only once
+    they were all in. Now the names come first (even when the stations beat the land
+    in), and the dots after."""
+    from soundboard.ui import flatmap
+    rings, labels = outlines()
+    m = FlatMap()
+    m.resize(600, 400)
+    m.show()
+    m.set_points([{"id": f"s{i}", "la": 0.0, "lo": float(i), "k": i} for i in range(50)])
+    assert m.revealing() and m._reveal_t0 is None   # no dots till the land is in
+    m.set_land(rings, labels)
+    assert m._reveal_t0 > time.monotonic() + flatmap.NAMES_FIRST_S / 2
+    m.grab()
+    assert m._names_pic is not None                 # the names are on the map...
+    t = time.monotonic() - m._reveal_t0
+    assert (flatmap._pop((t - m._delay) / flatmap.POP_S) < 0.05).all()   # ...no dots yet
+    end = time.monotonic() + flatmap.NAMES_FIRST_S + flatmap.REVEAL_S + 2
+    while m.revealing() and time.monotonic() < end:
+        qapp.processEvents()
+        time.sleep(0.005)
+    assert not m.revealing() and m._names_pic is None
     m.close()
 
 
