@@ -1,6 +1,4 @@
-<p align="right"><img src="https://hits.sh/github.com/Onion-Alien/onion-board.svg?view=total&label=total%20visits&color=6b8e23" alt="total visits"></p>
-
-# Onion Board
+<h1>Onion Board <img align="right" src="https://hits.sh/github.com/Onion-Alien/onion-board.svg?view=total&label=total%20visits&color=6b8e23" alt="total visits"></h1>
 
 A free soundboard for Windows. Press a pad or a hotkey, even in-game, and **your
 friends in Discord or your game hear the sound**, with your voice or without it.
