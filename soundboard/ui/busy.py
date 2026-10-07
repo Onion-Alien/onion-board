@@ -180,7 +180,7 @@ def run_busy(btn, text: str, fn: Callable[[], object],
             result = fn()
             msg = done(result) if callable(done) else done
         except Exception:
-            release("Didn't work — try again")
+            release(_("Didn't work — try again"))
             raise
         release(msg, ms)
     QTimer.singleShot(0, go)
@@ -272,11 +272,12 @@ def open_url(url, btn=None, window: QWidget | None = None, opened: str = "",
         ok = False
     if ok:
         if btn is not None:
-            flash(btn, opened or "✓ Opened")
+            flash(btn, opened or _("✓ Opened"))
         return True
     where = q.toLocalFile() if q.isLocalFile() else q.toString()
     toast(window or (btn.window() if btn is not None else None),
-          f"{failed or 'Couldn’t open it'}: <b>{html.escape(where)}</b>", "warn", 8000)
+          _("{message}: <b>{link}</b>", message=failed or _("Couldn’t open it"),
+            link=html.escape(where)), "warn", 8000)
     return False
 
 
@@ -288,7 +289,8 @@ def open_folder(folder, btn=None, window: QWidget | None = None) -> bool:
         path = folder() if callable(folder) else folder
     except OSError as e:
         toast(window or (btn.window() if btn is not None else None),
-              f"Couldn't make the folder: {html.escape(errors.plain(e))}", "warn", 8000)
+              _("Couldn't make the folder: {error}", error=html.escape(errors.plain(e))),
+              "warn", 8000)
         return False
-    return open_url(QUrl.fromLocalFile(str(path)), btn, window, opened="✓ Opened",
-                    failed="Couldn't open the folder")
+    return open_url(QUrl.fromLocalFile(str(path)), btn, window, opened=_("✓ Opened"),
+                    failed=_("Couldn't open the folder"))

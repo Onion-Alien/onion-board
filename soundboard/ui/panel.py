@@ -364,15 +364,16 @@ class EqPanel(QWidget):
         pv = QVBoxLayout(self)
         pv.setContentsMargins(0, 0, 0, 0)
         pv.setSpacing(8)
-        pv.addWidget(section_label("EQUALIZER"))
+        pv.addWidget(section_label(_("EQUALIZER")))
         row = QHBoxLayout()
         self.chk_on = QCheckBox(_("EQ on"))
         self.chk_on.setChecked(enabled)
         row.addWidget(self.chk_on)
-        self.lbl_for = QLabel("for")
+        self.lbl_for = QLabel(_("for"))
         row.addWidget(self.lbl_for)
         self.cb_target = QComboBox()
-        for label, key in (("My voice", "voice"), ("My sounds", "sounds"), ("Both", "all")):
+        for label, key in ((_("My voice"), "voice"), (_("My sounds"), "sounds"),
+                           (_("Both"), "all")):
             self.cb_target.addItem(label, key)
         icons.set_item_icons(self.cb_target, ["mic", "volume", "wave"])
         self.cb_target.setCurrentIndex(max(0, self.cb_target.findData(target)))
@@ -380,8 +381,9 @@ class EqPanel(QWidget):
         pv.addLayout(row)
 
         self.cb_preset = QComboBox()
-        self.cb_preset.addItems(list(EQ_PRESETS))
-        self.cb_preset.addItem(_("Custom"))
+        for name in EQ_PRESETS:   # the item data is the preset's key, "Custom" for none
+            self.cb_preset.addItem(name, name)
+        self.cb_preset.addItem(_("Custom"), "Custom")
         pv.addWidget(self.cb_preset)
         no_wheel(self.cb_target, self.cb_preset)
 
@@ -415,10 +417,11 @@ class EqPanel(QWidget):
                                   "down to cut. Double-click the curve to reset.")))
 
         self._set_sliders(gains)
-        self.cb_preset.setCurrentText(preset if preset in EQ_PRESETS else "Custom")
+        self._show_preset(preset)
         self.chk_on.toggled.connect(lambda _on: self._emit())
         self.cb_target.currentIndexChanged.connect(lambda _i: self._emit())
-        self.cb_preset.currentTextChanged.connect(self._on_preset)
+        self.cb_preset.currentIndexChanged.connect(
+            lambda _i: self._on_preset(self.cb_preset.currentData()))
         self.curve.reset.connect(self._reset)
         self._refresh(emit=False)
 
@@ -430,7 +433,7 @@ class EqPanel(QWidget):
         """Load gains, turning the EQ on unless they're flat. Emits `changed`."""
         self._set_sliders(gains)
         self.cb_preset.blockSignals(True)
-        self.cb_preset.setCurrentText(preset if preset in EQ_PRESETS else "Custom")
+        self._show_preset(preset)
         self.cb_preset.blockSignals(False)
         self.chk_on.blockSignals(True)
         self.chk_on.setChecked(any(abs(g) >= 0.05 for g in self.gains()))
@@ -439,9 +442,14 @@ class EqPanel(QWidget):
 
     def state(self) -> tuple[list[float], bool, str, str]:
         return (self.gains(), self.chk_on.isChecked(), self.cb_target.currentData(),
-                self.cb_preset.currentText())
+                self.cb_preset.currentData())
 
     # ---- internals
+    def _show_preset(self, preset: str):
+        """Select `preset` (a key of EQ_PRESETS) in the box, or Custom."""
+        key = preset if preset in EQ_PRESETS else "Custom"
+        self.cb_preset.setCurrentIndex(max(0, self.cb_preset.findData(key)))
+
     def _set_sliders(self, gains):
         # a damaged config can hand us anything: a band that isn't a finite number, or
         # a list of the wrong length, is flat (0 dB) instead of an error
@@ -462,7 +470,7 @@ class EqPanel(QWidget):
     def _on_slider(self, _v):
         self._refresh_labels()
         self.cb_preset.blockSignals(True)
-        self.cb_preset.setCurrentText("Custom")
+        self._show_preset("Custom")
         self.cb_preset.blockSignals(False)
         if not self.chk_on.isChecked():
             self.chk_on.setChecked(True)   # touching the EQ means you want it on (emits)
@@ -472,7 +480,7 @@ class EqPanel(QWidget):
     def _reset(self):
         """Double-click on the curve: flat and off, even if it already says Flat."""
         self.cb_preset.blockSignals(True)
-        self.cb_preset.setCurrentText("Flat (off)")
+        self._show_preset("Flat (off)")
         self.cb_preset.blockSignals(False)
         self._on_preset("Flat (off)")
 
@@ -508,7 +516,7 @@ class UndoBar(QFrame):
     dismissed, or showing something else calls `done` (if given) instead."""
     SECONDS = 10
 
-    def __init__(self, tip: str = "Put it back, exactly as it was"):
+    def __init__(self, tip: str = ""):
         super().__init__()
         from PySide6.QtCore import QTimer
         from PySide6.QtWidgets import QPushButton
@@ -520,7 +528,7 @@ class UndoBar(QFrame):
         h.addWidget(self.label, 1)
         self.btn_undo = QPushButton(_("Undo"))
         self.btn_undo.setObjectName("primary")
-        self.btn_undo.setToolTip(tip)
+        self.btn_undo.setToolTip(tip or _("Put it back, exactly as it was"))
         self.btn_undo.clicked.connect(self.undo)
         h.addWidget(self.btn_undo)
         dismiss = QPushButton()

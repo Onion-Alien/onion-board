@@ -82,6 +82,8 @@ locally after touching `native\directmic\` or the ring in `directmic.py`).
 `scripts\build_directmic.py --fuzz` also builds `fuzzhost.exe`, which throws hostile and
 half-written ring files at the effect (built with sanitizer traps);
 `scripts\fuzz_directmic.py [seconds] [workers]` runs it for longer than the tests do.
+`fuzzhost --lead` replays a late board block by block (no timing luck) and checks the
+effect's lead grows just enough and comes back; the real-time tests can't pin that down.
 
 To iterate faster, run just the file you touched, e.g.
 `.venv\Scripts\python -m pytest -q tests\test_engine.py`, and the full suite
