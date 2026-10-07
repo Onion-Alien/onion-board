@@ -291,6 +291,7 @@ class MainWindow(QMainWindow):
         self._tick_n = 0                  # ticks since start (the watchdog runs ~once a second)
         self._ui_live = True              # the window is on screen (see _set_tick_rate)
         self._tick_busy = True            # something moves with the tick (see _busy)
+        self._pads_lit: set[str] = set()  # pads showing a sound (see _tick_visuals)
         self._sounds_live = False         # the Sounds tab's live dot is shown
         self._icon_step, self._icon_next = -1, 0.0   # the icons' glow step (_glow_icons)
         self._tray_step = -1              # ...and the tray icon's
@@ -5446,7 +5447,14 @@ class MainWindow(QMainWindow):
         e = self.engine
         on_board = self.tabs.currentWidget() is self.sounds_page   # no visualiser off-screen
         shown = self.isVisible()
-        for sid, p in self.pads.items():
+        # only the pads playing now and the ones still showing a sound (cleared on the
+        # tick after it stops): going over all of them, 30 times a second, cost more
+        # than the rest of the tick on a big board with nothing playing
+        pads, lit = self.pads, set()
+        for sid in self._pads_lit.union(playing):
+            p = pads.get(sid)
+            if p is None:   # not a pad (a preview, the test recording) or gone
+                continue
             prog, paused = playing.get(sid, (None, False))
             if prog is not None and not paused and on_board and not p.isHidden():
                 # scrolled out of view: skip the FFT (the next tick after it scrolls
