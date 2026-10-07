@@ -1360,13 +1360,15 @@ class SettingsDialog(QDialog):
         from soundboard import __version__, feedback
         from soundboard.updates import REPO
         card, cv = self._card(_("Get in touch"),
-                              _("Ideas, bugs, or just want to say hi? The feedback form needs no "
-                                "account. Found a security problem? Report it privately on "
-                                "GitHub, not in a public issue."))
+                              _("The Discord is where to chat, ask for help and hear about new "
+                                "versions. The feedback form needs no account. Found a security "
+                                "problem? Report it privately on GitHub, not in a public issue."))
         row = _button_row()
-        send = self._link_button(_("Send feedback"), feedback.feedback_url(__version__), "speech")
-        send.setObjectName("primary")
-        row.addWidget(send)
+        discord = self._link_button(_("Join the Discord"), feedback.DISCORD_URL, "speech")
+        discord.setObjectName("primary")
+        row.addWidget(discord)
+        row.addWidget(self._link_button(_("Send feedback"), feedback.feedback_url(__version__),
+                                        "edit"))
         row.addWidget(self._link_button(_("Report a problem"),
                                         feedback.problem_url(__version__)))
         row.addWidget(self._link_button(
@@ -1689,29 +1691,35 @@ class SettingsDialog(QDialog):
 
     # ------------------------------------------------------------------ support
     def _feedback_card(self):
-        """Feedback and bug reports: both open a page in the browser, nothing is sent
-        from the app (feedback.py)."""
+        """The Discord, feedback and bug reports: all open a page in the browser,
+        nothing is sent from the app (feedback.py)."""
         from soundboard import __version__, feedback
         card, cv = self._card(_("Feedback and problems"),
-                              _("Found a bug, missing something, or just want to say hi? It "
-                                "opens in your browser, and nothing is sent unless you submit it "
-                                "there."))
+                              _("The Discord is where to chat, ask for help and hear about new "
+                                "versions. Found a bug or missing something? Everything opens in "
+                                "your browser, and nothing is sent unless you submit it there."))
         row = _button_row()
+        discord = QPushButton(_("Join the Discord"))
+        discord.setObjectName("primary")
+        discord.clicked.connect(lambda: busy.open_url(
+            feedback.DISCORD_URL, discord, opened=_("✓ Opened in your browser"),
+            failed=_("Couldn't open your browser. The page is")))
+        icons.set_icon(discord, "speech")
         send = QPushButton(_("Send feedback"))
-        send.setObjectName("primary")
         send.clicked.connect(lambda: busy.open_url(
             feedback.feedback_url(__version__), send, opened=_("✓ Opened in your browser"),
             failed=_("Couldn't open your browser. The page is")))
-        icons.set_icon(send, "speech")
+        icons.set_icon(send, "edit")
         bug = QPushButton(_("Report a problem on GitHub"))
         bug.setToolTip(_("For people with a GitHub account: opens a new bug report"))
         bug.clicked.connect(lambda: busy.open_url(
             feedback.problem_url(__version__), bug, opened=_("✓ Opened in your browser"),
             failed=_("Couldn't open your browser. The page is")))
+        row.addWidget(discord)
         row.addWidget(send)
         row.addWidget(bug)
         cv.addLayout(row)
-        self.feedback_btn, self.problem_btn = send, bug
+        self.discord_btn, self.feedback_btn, self.problem_btn = discord, send, bug
         return card
 
     def _support_card(self):

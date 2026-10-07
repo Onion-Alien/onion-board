@@ -953,7 +953,7 @@
     "",
     ""
   ],
-  "Found a bug, missing something, or just want to say hi? It opens in your browser, and nothing is sent unless you submit it there.": "",
+  "The Discord is where to chat, ask for help and hear about new versions. Found a bug or missing something? Everything opens in your browser, and nothing is sent unless you submit it there.": "在 Discord 可以聊天、求助，還能第一時間知道新版本。發現了 bug 或缺了什麼？一切都在你的瀏覽器裡開啟，除非你在那裡送出，否則什麼都不會傳送。",
   "Free add-ons from GitHub. Removing or reinstalling one keeps your triggers and paired phones.": "",
   "Free, with no ads and no account. Made by OnionAlien. MIT license with the Commons Clause: use it for anything, share it for free, never sell it.": "",
   "Frequencies": "",
@@ -995,7 +995,7 @@
   "How loud the stream output is (only OBS hears it)": "",
   "How much data went to each site, added up over the whole history": "",
   "I'm bored…": "",
-  "Ideas, bugs, or just want to say hi? The feedback form needs no account. Found a security problem? Report it privately on GitHub, not in a public issue.": "",
+  "The Discord is where to chat, ask for help and hear about new versions. The feedback form needs no account. Found a security problem? Report it privately on GitHub, not in a public issue.": "在 Discord 可以聊天、求助，還能第一時間知道新版本。意見表單不需要帳號。發現了安全問題？請在 GitHub 上私下回報，不要發在公開的 issue 裡。",
   "If one doesn't connect, try the other": "",
   "Important fix in Onion Board {version}: {fix}": "",
   "Important fix in Onion Watch {version}: {fix}": "",
@@ -1732,5 +1732,8 @@
   "⟲  Restart my PC now": "",
   "⟳  Check again": "",
   "⬇  Install it now (free)": "",
-  "⬇  Try installing again": ""
+  "⬇  Try installing again": "",
+  "Join the Discord": "加入 Discord",
+  "Chat about it on Discord": "到 Discord 聊聊",
+  "The Onion Board Discord server, in your browser": "Onion Board 的 Discord 伺服器，在你的瀏覽器裡開啟"
 }

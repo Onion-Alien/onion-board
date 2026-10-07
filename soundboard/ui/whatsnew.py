@@ -11,7 +11,7 @@ from PySide6.QtGui import QDesktopServices, QFont
 from PySide6.QtWidgets import (QDialog, QFrame, QHBoxLayout, QLabel, QPushButton, QVBoxLayout,
                                QWidget)
 
-from soundboard import __version__, updates
+from soundboard import __version__, feedback, theme, updates
 from soundboard.ui import fit
 from soundboard.ui.panel import hint_label, icon_label
 from soundboard.i18n import _
@@ -240,6 +240,14 @@ class WhatsNewDialog(QDialog):
             for icon, title, text in note.items:
                 lay.addWidget(self._item(icon, title, text))
         lay.addStretch(1)   # any spare height goes here, not between the rows
+        chat = self.discord_link = QLabel(   # the theme's colour: Qt's own blue is dark
+            f'<a href="{feedback.DISCORD_URL}" style="color: {theme.T["accent"]};">'
+            f'{_("Chat about it on Discord")}</a>')
+        chat.setObjectName("hint")
+        chat.setToolTip(_("The Onion Board Discord server, in your browser"))
+        chat.setTextInteractionFlags(Qt.LinksAccessibleByMouse | Qt.LinksAccessibleByKeyboard)
+        chat.setOpenExternalLinks(True)
+        lay.addWidget(chat)
         buttons = QHBoxLayout()
         notes_btn = QPushButton(_("Full release notes"))
         notes_btn.setToolTip(_("This version's page on GitHub, in your browser"))

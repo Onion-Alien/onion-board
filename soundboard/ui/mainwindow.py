@@ -5140,12 +5140,22 @@ class MainWindow(QMainWindow):
         menu.addAction(_("Open Onion Board"), self.show_from_tray)
         icons.set_icon(menu.addAction(_("Stop all sounds"), self.stop_all), "stop")
         menu.addSeparator()
+        # both only open a page in the browser (feedback.py)
+        from soundboard import __version__, feedback
+        icons.set_icon(menu.addAction(_("Join the Discord"), lambda: self._open_page(
+            feedback.DISCORD_URL)), "speech")
+        icons.set_icon(menu.addAction(_("Send feedback"), lambda: self._open_page(
+            feedback.feedback_url(__version__))), "edit")
+        menu.addSeparator()
         menu.addAction(_("Quit"), self.quit_app)
         t.setContextMenu(menu)
         t.activated.connect(self._on_tray)
         t.messageClicked.connect(self.show_from_tray)
         t.show()
         QApplication.instance().setQuitOnLastWindowClosed(False)
+
+    def _open_page(self, url: str):
+        busy.open_url(url, window=self, failed=_("Couldn't open your browser. The page is"))
 
     def _on_tray(self, reason):
         if reason in (QSystemTrayIcon.Trigger, QSystemTrayIcon.DoubleClick):

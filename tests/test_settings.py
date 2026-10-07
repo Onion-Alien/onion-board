@@ -137,6 +137,28 @@ def test_feedback_and_problem_buttons_only_open_the_browser(window, monkeypatch)
     d.close()
 
 
+def test_join_the_discord_comes_first_and_only_opens_the_browser(window, monkeypatch):  # noqa: F811
+    from soundboard import feedback
+    opened = []
+    monkeypatch.setattr(busy.QDesktopServices, "openUrl", lambda u: opened.append(u.toString()))
+    d = SettingsDialog(window, "help")
+    assert d.discord_btn.objectName() == "primary"
+
+    def rows(lay):   # every layout under the card's, depth first
+        yield lay
+        for i in range(lay.count()):
+            if lay.itemAt(i).layout() is not None:
+                yield from rows(lay.itemAt(i).layout())
+    row = next(r for r in rows(d.discord_btn.parentWidget().layout())
+               if r.indexOf(d.discord_btn) >= 0)
+    assert ([row.indexOf(b) for b in (d.discord_btn, d.feedback_btn, d.problem_btn)]
+            == sorted(row.indexOf(b) for b in (d.discord_btn, d.feedback_btn, d.problem_btn)))
+    d.discord_btn.click()
+    assert opened == [feedback.DISCORD_URL]
+    assert feedback.DISCORD_URL.startswith("https://discord.gg/")
+    d.close()
+
+
 def test_onion_watch_can_be_removed_from_settings(window, monkeypatch):  # noqa: F811
     from types import SimpleNamespace
 

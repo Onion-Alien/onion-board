@@ -125,7 +125,7 @@ the launcher the shortcuts and PyInstaller use. The app is the `soundboard` pack
 | `soundboard/autostart.py` | *Start with Windows*: the per-user `Run` registry value (`--tray` starts it hidden) |
 | `soundboard/shellicon.py` | the app icon in the theme's colours outside its windows: writes `%APPDATA%\OnionBoard\icons\onionboard-<hash>.ico`, puts it on the main window's relaunch properties (taskbar right-click menu, a pin) and on this copy's own *Onion Board* Desktop / Start menu / taskbar-pin shortcuts |
 | `soundboard/updates.py` | "is there a newer version?" (GitHub Releases, every 6 hours; an "Urgent: …" line in the notes gets a banner) and the self-update: downloads the release's installer, checks its SHA-256, runs it silently and reopens the app |
-| `soundboard/feedback.py` | where *Send feedback* and *Report a problem* (Settings → Add-ons & help, and Settings → About) go: a no-account form or a GitHub issue, opened in the browser with the version filled in; the app sends nothing |
+| `soundboard/feedback.py` | where *Join the Discord*, *Send feedback* and *Report a problem* (Settings → Add-ons & help, Settings → About, the tray menu) go: the Discord invite, a no-account form or a GitHub issue, opened in the browser with the version filled in; the app sends nothing |
 | `soundboard/errors.py` | other libraries' errors (yt-dlp, libsndfile, PortAudio, Windows, network) in plain words, minus their "report this to us" lines and command-line tips; the original stays in the log and in the report. Ones the user can't fix get a *Report it* link/button: a pre-filled issue on this repo, opened in the browser |
 | `soundboard/hangwatch.py` | notes down a frozen window: if the UI thread stops answering for 5 s, its stack goes into the log and a report beside the crash reports (nothing shown or sent) |
 | `soundboard/uigc.py` | Python's garbage collection on the UI thread only: a collection on another thread could free a Qt object with a running timer there and crash the app |
@@ -135,7 +135,7 @@ the launcher the shortcuts and PyInstaller use. The app is the `soundboard` pack
 | `soundboard/ui/fit.py` | dialogs grow to fit their wrapped text instead of clipping it (`fit.watch(self)` in every dialog's `__init__`) |
 | `soundboard/ui/setupwizard.py` | the first-run guide with Bun (mic, headphones, where your sounds go: straight into your mic, or the cable or another way out, then Discord) and the Steam help |
 | `soundboard/ui/bunnywidget.py` | Bun animated: bobs, blinks, talks along with your mic and throws music notes |
-| `soundboard/ui/whatsnew.py` | the *What's new* window shown once after an update, with what the release added and a button to the settings it's about (`NOTES`, newest first: add one per release) |
+| `soundboard/ui/whatsnew.py` | the *What's new* window shown once after an update, with what the release added, a button to the settings it's about and a link to the Discord (`NOTES`, newest first: add one per release) |
 | `soundboard/ui/splash.py` | The start-up splash: Bun and a spinner mid-screen while a cold start loads |
 | `soundboard/ui/livedot.py` | the glowing dot (and highlight-coloured icon) on a tab whose feature is live, e.g. the Voice tab while your voice is being changed |
 | `soundboard/ui/logowidget.py` | the header logo animated: a breathing glow and sheen, flaring with embers while sounds play |

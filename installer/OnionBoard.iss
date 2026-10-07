@@ -199,6 +199,7 @@ Type: filesandordirs; Name: "{app}\modules"
 const
   PrivacyURL = 'https://github.com/Onion-Alien/onion-board/blob/main/SECURITY.md#what-the-app-does-on-the-network';
   UninstallFeedbackURL = 'https://tally.so/r/rjxjyM';   // feedback.py's FORM_URL
+  DiscordURL = 'https://discord.gg/FhKGaWCWHM';          // feedback.py's DISCORD_URL
 
 var
   PrivacyPage: TWizardPage;
@@ -217,6 +218,7 @@ var
   HeardRadios: array of TNewRadioButton;
   HeardKeys: array of String;  // what each one sends (soundboard/usage.py's HEARD)
   HeardOther: TNewEdit;        // Other's own answer
+  DiscordLink: TNewStaticText; // the Finished page's "Join the Onion Board Discord"
 
 // "net_offline": true in %APPDATA%\OnionBoard\config.json: the app is in Offline mode
 // already (a reinstall). A plain text search: json.dumps writes it on one line.
@@ -294,6 +296,42 @@ var
   Code: Integer;
 begin
   ShellExecAsOriginalUser('open', PrivacyURL, '', '', SW_SHOWNORMAL, ewNoWait, Code);
+end;
+
+// Only when clicked: the Finished page never opens it by itself
+procedure OpenDiscordLink(Sender: TObject);
+var
+  Code: Integer;
+begin
+  ShellExecAsOriginalUser('open', DiscordURL, '', '', SW_SHOWNORMAL, ewNoWait, Code);
+end;
+
+// The Finished page's link, under whatever is last there (the "Open Onion Board now"
+// box, or the restart choice): placed when the page shows, once those are laid out.
+procedure CreateDiscordLink;
+begin
+  DiscordLink := TNewStaticText.Create(WizardForm.FinishedPage);
+  DiscordLink.Parent := WizardForm.FinishedPage;
+  DiscordLink.Caption := 'Join the Onion Board Discord';
+  DiscordLink.Hint := 'Chat, get help and hear about new versions (opens in your browser)';
+  DiscordLink.ShowHint := True;
+  DiscordLink.Cursor := crHand;
+  DiscordLink.Font.Color := clHotLight;
+  DiscordLink.Font.Style := [fsUnderline];
+  DiscordLink.OnClick := @OpenDiscordLink;
+end;
+
+procedure PlaceDiscordLink;
+var
+  Bottom: Integer;
+begin
+  Bottom := WizardForm.FinishedLabel.Top + WizardForm.FinishedLabel.Height;
+  if WizardForm.RunList.Visible then
+    Bottom := WizardForm.RunList.Top + WizardForm.RunList.Height;
+  if WizardForm.NoRadio.Visible then
+    Bottom := WizardForm.NoRadio.Top + WizardForm.NoRadio.Height;
+  DiscordLink.Left := WizardForm.FinishedLabel.Left;
+  DiscordLink.Top := Bottom + ScaleY(12);
 end;
 
 // "Your privacy": what the app connects to, in plain words, before the boxes (so they
@@ -610,6 +648,7 @@ begin
   WizardForm.TasksList.ShowHint := True;
   CreateImportPage;
   CreateHeardPage;
+  CreateDiscordLink;
   WizardForm.TasksList.OnClickCheck := @TasksClicked;
 end;
 
@@ -649,6 +688,8 @@ var
 begin
   if (CurPageID <> wpWelcome) and (CurPageID <> wpFinished) then
     LayoutHeader;
+  if CurPageID = wpFinished then
+    PlaceDiscordLink;
   UpdateInstallCaption;
   if (CurPageID <> wpSelectTasks) or WizardSilent then
     exit;
