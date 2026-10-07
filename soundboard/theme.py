@@ -556,7 +556,7 @@ QSpinBox#pct, QFrame#card QSpinBox#pct { background:transparent; border-color:tr
     padding:3px 2px; }
 QSpinBox#pct:hover, QFrame#card QSpinBox#pct:hover { background:$bg; border-color:$border_hi; }
 QSpinBox#pct:focus, QFrame#card QSpinBox#pct:focus { background:$bg; border-color:$accent; }
-QDoubleSpinBox, QSpinBox#stepper { padding-right:20px; }
+QDoubleSpinBox, QSpinBox#stepper { padding-right:2px; }
 QDoubleSpinBox::up-button, QDoubleSpinBox::down-button,
 QSpinBox#stepper::up-button, QSpinBox#stepper::down-button {
     subcontrol-origin:border; width:18px; border:none; background:transparent; }
@@ -597,7 +597,7 @@ QLineEdit, QComboBox { background:$card; border:1px solid $border; border-radius
 QLineEdit:hover, QComboBox:hover { border-color:$border_hi; }
 QLineEdit:focus, QComboBox:focus, QComboBox:on { border-color:$accent; }
 QLineEdit { selection-background-color:$accent; selection-color:$on_accent; }
-QComboBox { padding:6px 10px; padding-right:30px; combobox-popup:0; }
+QComboBox { padding:6px 10px; padding-right:6px; combobox-popup:0; }
 QComboBox::drop-down { subcontrol-origin:padding; subcontrol-position:center right;
     width:26px; border:none; background:transparent; }
 QComboBox::down-arrow { image:url("$down"); width:10px; height:10px; }
