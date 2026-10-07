@@ -15,7 +15,7 @@ from pathlib import Path
 import numpy as np
 import pytest
 
-from conftest import real_pc_timing
+from conftest import own_module, real_pc_timing
 from soundboard import directmic as dm
 from test_mainwindow import window  # noqa: F401  (fixture)
 
@@ -1616,7 +1616,7 @@ class _NoThread:
 def _no_threads(monkeypatch, run=False):
     from soundboard.ui import mainwindow as mw
     t = type("T", (_NoThread,), {"started": 0, "run": run})
-    monkeypatch.setattr(mw.threading, "Thread", t)
+    own_module(monkeypatch, mw, "threading", Thread=t)
     return t
 
 

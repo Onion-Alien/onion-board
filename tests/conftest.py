@@ -340,18 +340,24 @@ def _never_touch_real_autostart(monkeypatch):
     monkeypatch.setattr(autostart, "winreg", None)
 
 
-def own_time(monkeypatch, module, **fakes):
-    """Give `module` a time module of its own with `fakes` in it (sleep=..., monotonic=...).
-    Patching time.sleep itself changes it for every thread in the process: the threads
-    earlier tests left running then spin flat out (a 1 s test took 44 s, and a window's
-    loader beside it missed its 15 s)."""
-    import time
+def own_module(monkeypatch, module, name: str, **fakes):
+    """Give `module` its own copy of the module it imported as `name` (time, threading,
+    ...) with `fakes` in it. Patching time.sleep or threading.Thread itself changes it
+    for every thread in the process: the threads earlier tests left running then spun
+    flat out (a 1 s test took 44 s, and a window's loader beside it missed its 15 s),
+    or a thread of something else was never started."""
     import types
-    t = types.ModuleType("time")
-    t.__dict__.update(vars(time))
-    t.__dict__.update(fakes)
-    monkeypatch.setattr(module, "time", t)
-    return t
+    real = getattr(module, name)
+    copy = types.ModuleType(real.__name__)
+    copy.__dict__.update(vars(real))
+    copy.__dict__.update(fakes)
+    monkeypatch.setattr(module, name, copy)
+    return copy
+
+
+def own_time(monkeypatch, module, **fakes):
+    """own_module for `time`: sleep=..., monotonic=... for `module` alone."""
+    return own_module(monkeypatch, module, "time", **fakes)
 
 
 def us_key_char(vk: int) -> str:
