@@ -797,6 +797,78 @@ def test_the_feed_keeps_up_with_a_busy_board_while_mostly_asleep(ring_file):
     assert len(wakes) / (wakes[-1] - wakes[0]) < 300   # was about 450 a second
 
 
+@pytest.mark.parametrize("taker", ["feed", "mic callback"])
+@realtime
+def test_no_underruns_beside_a_busy_ui_thread(ring_file, taker):
+    """A stand-in for the effect publishes a 10 ms block of clean mic in real time for
+    5 s while a UI thread beside the board keeps Python busy. The board takes every
+    block within the 20 ms lead the effect reads behind it (any later and the effect
+    fills in with the clean mic: a gap in the sounds), whether the feed thread takes
+    the mic or the board's mic callback does, and the feed thread still sleeps between
+    blocks (it used to look 500 times a second). With the app's GIL switch interval."""
+    import sys
+
+    from soundboard.app import SWITCH_S
+    block, block_s = dm.BLOCK, dm.BLOCK / dm.RATE
+    seen = {}   # block number -> when the board took it
+
+    def mic(x, rate):
+        now = time.perf_counter()
+        for k in np.unique(np.rint(x[:, 0] * 1e4).astype(int)):
+            seen.setdefault(int(k), now)
+
+    s = dm.DirectMicStream(lambda out, frames, t, status: out.fill(0.25), ring_file,
+                           mic_callback=mic)
+    w = dm.RingWriter(ring_file)
+    stop = threading.Event()
+    wakes = [0]
+    pump = s.pump
+
+    def counted():
+        if threading.current_thread() is s._thread:
+            wakes[0] += 1
+        return pump()
+    s.pump = counted
+
+    def ui():   # 50 ms of pure-Python work at a time: holds the GIL all it can
+        while not stop.is_set():
+            end = time.perf_counter() + 0.05
+            while time.perf_counter() < end:
+                sum(i * i for i in range(500))
+            time.sleep(0.002)
+
+    sent, blocks = {}, int(5.0 / block_s)
+    old = sys.getswitchinterval()
+    sys.setswitchinterval(SWITCH_S)
+    s.start()
+    threading.Thread(target=ui, daemon=True).start()
+    try:
+        t0 = time.perf_counter()
+        for k in range(1, blocks + 1):
+            while (d := t0 + k * block_s - time.perf_counter()) > 0:
+                time.sleep(d)
+            pos = w.mic_write_pos
+            w.mic[np.arange(pos, pos + block) % dm.MIC_CAPACITY] = k * 1e-4   # its number
+            h = w.h[0]
+            h["mic_rate"], h["mic_write_pos"], h["mic_tick"] = 48000, pos + block, dm._tick()
+            sent[k] = time.perf_counter()
+            if taker == "mic callback":
+                s.pump()
+        time.sleep(3 * block_s)
+        seconds = time.perf_counter() - t0
+    finally:
+        stop.set()
+        s.close()
+        w.close()
+        sys.setswitchinterval(old)
+    first = min(seen)   # (the block the stream starts on only sets where it starts)
+    took = {k: seen[k] - sent[k] if k in seen else float("inf") for k in sent if k > 30}
+    late = sorted(k for k, t in took.items() if t >= dm.LEAD_S)
+    assert first <= 3 and not late, (first, late[:5], [round(took[k] * 1e3, 1) for k in late[:5]])
+    rate = wakes[0] / seconds
+    assert rate < (350 if taker == "feed" else 150), rate   # was about 450 a second
+
+
 @needs_host
 @realtime
 def test_a_late_board_never_lets_a_muted_mic_out(ring_file):
