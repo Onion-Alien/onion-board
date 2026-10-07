@@ -15,6 +15,7 @@ from __future__ import annotations
 import numpy as np
 from soundboard.dsp import (SmoothSos, butter, hermite, lfilter, matched_biquad, sosfilt,
                              sosfilt_bank)
+from soundboard.i18n import _
 from soundboard.voicefx import Effect, Param, register
 
 F32 = np.float32
@@ -1221,3 +1222,133 @@ PRESET_ICONS = {"Chipmunk": "🐿️", "Deep voice": "🐻", "Female voice": "�
                 "Hothead": "😡", "Alien": "👽", "Ghost": "👻", "Walkie-talkie": "📻",
                 "Old telephone": "☎️", "Megaphone": "📢", "Stadium announcer": "🏟️",
                 "Cave": "🦇", "Podcast voice": "🎙️"}
+
+
+# --------------------------------------------------------------------------- shown text
+
+def shown_texts() -> dict[str, str]:
+    """The built-in effects' names, descriptions, settings and slider-end words, and
+    the built-in voices' names: English (what the code and saved settings use) -> the
+    app's language. Built when asked, not at import: this module loads before the
+    language is set."""
+    return {
+        # effects
+        "Clean up my mic": _("Clean up my mic"),
+        "Removes hum, hiss and room noise before the other effects.":
+            _("Removes hum, hiss and room noise before the other effects."),
+        "Pitch": _("Pitch"),
+        "Higher or lower; a cartoon or a real-sounding person; a bigger or smaller throat; "
+        "autotune.": _("Higher or lower; a cartoon or a real-sounding person; a bigger or "
+                       "smaller throat; autotune."),
+        "Monster growl": _("Monster growl"),
+        "Adds a rough voice an octave below yours.":
+            _("Adds a rough voice an octave below yours."),
+        "Robot": _("Robot"),
+        "Your words spoken by a buzzing synthesizer (vocoder).":
+            _("Your words spoken by a buzzing synthesizer (vocoder)."),
+        "Compressor": _("Compressor"),
+        "Evens out your volume: quiet words louder, shouting tamed.":
+            _("Evens out your volume: quiet words louder, shouting tamed."),
+        "Tone": _("Tone"),
+        "Bass, mid, presence and treble, like the EQ on a mixer.":
+            _("Bass, mid, presence and treble, like the EQ on a mixer."),
+        "Radio": _("Radio"),
+        "Walkie-talkie, telephone or megaphone band-limiting.":
+            _("Walkie-talkie, telephone or megaphone band-limiting."),
+        "Distortion": _("Distortion"),
+        "Overdriven, crunchy voice.": _("Overdriven, crunchy voice."),
+        "Shout blowout": _("Shout blowout"),
+        "Shout and your voice blows out like a megaphone.":
+            _("Shout and your voice blows out like a megaphone."),
+        "Helmet": _("Helmet"),
+        "Talking inside a helmet, mask or metal box.":
+            _("Talking inside a helmet, mask or metal box."),
+        "Chorus": _("Chorus"),
+        "Doubled, wobbling voice: subtle shimmer to full alien warble.":
+            _("Doubled, wobbling voice: subtle shimmer to full alien warble."),
+        "Echo": _("Echo"),
+        "Repeating echo, from slapback to canyon.":
+            _("Repeating echo, from slapback to canyon."),
+        "Reverb": _("Reverb"),
+        "Room, hall or cave.": _("Room, hall or cave."),
+        # settings
+        "Noise gate": _("Noise gate"),
+        "Hiss removal": _("Hiss removal"),
+        "Natural sound": _("Natural sound"),
+        "Voice size": _("Voice size"),
+        "Autotune": _("Autotune"),
+        "Mix": _("Mix"),
+        "Gap between voices": _("Gap between voices"),
+        "Blur on the new voice": _("Blur on the new voice"),
+        "Voice size on my voice too": _("Voice size on my voice too"),
+        "Growl": _("Growl"),
+        "Buzz pitch": _("Buzz pitch"),
+        "Follow my pitch": _("Follow my pitch"),
+        "Breath": _("Breath"),
+        "Kicks in at": _("Kicks in at"),
+        "Squash": _("Squash"),
+        "Boost": _("Boost"),
+        "Bass": _("Bass"),
+        "Mid": _("Mid"),
+        "Presence": _("Presence"),
+        "Treble": _("Treble"),
+        "Low cut": _("Low cut"),
+        "High cut": _("High cut"),
+        "Crunch": _("Crunch"),
+        "Static": _("Static"),
+        "Click when I talk": _("Click when I talk"),
+        "Drive": _("Drive"),
+        "Volume": _("Volume"),
+        "Helmet size": _("Helmet size"),
+        "Metal ring": _("Metal ring"),
+        "Speed": _("Speed"),
+        "Depth": _("Depth"),
+        "Delay": _("Delay"),
+        "Repeats": _("Repeats"),
+        "Size": _("Size"),
+        "Brightness": _("Brightness"),
+        # the words under a slider's two ends
+        "off": _("off"),
+        "strong": _("strong"),
+        "lower": _("lower"),
+        "higher": _("higher"),
+        "cartoon": _("cartoon"),
+        "real person": _("real person"),
+        "smaller": _("smaller"),
+        "bigger": _("bigger"),
+        "robotic": _("robotic"),
+        "together": _("together"),
+        "echo": _("echo"),
+        "clear": _("clear"),
+        "blurry": _("blurry"),
+        "new voice only": _("new voice only"),
+        "mine too": _("mine too"),
+        "subtle": _("subtle"),
+        "monster": _("monster"),
+        "dark": _("dark"),
+        "raspy": _("raspy"),
+        "whisper": _("whisper"),
+        "yell": _("yell"),
+        "tin can": _("tin can"),
+        "big helmet": _("big helmet"),
+        # voices (PRESETS: their English names are what settings and share codes keep)
+        "Chipmunk": _("Chipmunk"),
+        "Deep voice": _("Deep voice"),
+        "Female voice": _("Female voice"),
+        "Male voice": _("Male voice"),
+        "Demon": _("Demon"),
+        "Talkbox": _("Talkbox"),
+        "Masked caller": _("Masked caller"),
+        "Anonymous": _("Anonymous"),
+        "Secret detective": _("Secret detective"),
+        "Dark lord": _("Dark lord"),
+        "Hothead": _("Hothead"),
+        "Alien": _("Alien"),
+        "Ghost": _("Ghost"),
+        "Walkie-talkie": _("Walkie-talkie"),
+        "Old telephone": _("Old telephone"),
+        "Megaphone": _("Megaphone"),
+        "Stadium announcer": _("Stadium announcer"),
+        "Cave": _("Cave"),
+        "Podcast voice": _("Podcast voice"),
+    }

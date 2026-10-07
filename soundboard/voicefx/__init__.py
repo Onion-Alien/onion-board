@@ -327,5 +327,20 @@ class VoiceChain:
 from soundboard.voicefx import builtin  # noqa: E402,F401  (registers the built-ins)
 from soundboard.voicefx.builtin import PRESET_ICONS, PRESETS  # noqa: E402
 
+_shown: tuple[str, dict[str, str]] = ("", {})   # (language, shown_texts()) last built
+
+
+def shown(text: str) -> str:
+    """How an effect's name, description, setting or slider-end word, or a built-in
+    voice's name, reads in the app's language. `text` is the English the code and the
+    saved settings use (it stays the key); an add-on's own text comes back as it is."""
+    global _shown
+    from soundboard import i18n
+    lang = i18n.current()
+    if _shown[0] != lang or not _shown[1]:
+        _shown = (lang, builtin.shown_texts())
+    return _shown[1].get(text, text)
+
+
 __all__ = ["Param", "Effect", "REGISTRY", "register", "defaults", "clean_spec", "VoiceChain",
-           "PRESETS", "PRESET_ICONS"]
+           "PRESETS", "PRESET_ICONS", "shown"]
