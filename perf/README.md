@@ -17,7 +17,7 @@ From the repo folder:
 ```powershell
 .venv\Scripts\python -m perf --tier quick                 # ~1.5 min
 .venv\Scripts\python -m perf --tier quick --watch-src ..\onion-watch   # + Triggers, Onion Watch
-.venv\Scripts\python -m perf --tier full                  # ~5 min
+.venv\Scripts\python -m perf --tier full                  # ~3.5 min
 .venv\Scripts\python -m perf --tier soak --minutes 30     # tray idle, for leaks
 .venv\Scripts\python -m perf --tier frozen --app-dir ..\App --watch-exe <path>\OnionWatch.exe
 ```
@@ -56,7 +56,7 @@ on it or runs it.
 | tier | takes | what |
 |---|---|---|
 | quick | ~1.5 min (+ ~1 min with `--watch-src`) | 20 sounds, every scenario below once, 4 s each |
-| full | ~5 min (+ ~2 min with `--watch-src`) | 100 sounds, 8 s each, longer leak loop, stereo mic, heavy voice presets; Triggers with 0, 10 and 50 triggers |
+| full | ~3.5 min (+ ~3 min with `--watch-src`) | 100 sounds, 8 s each, longer leak loop, stereo mic, heavy voice presets; Triggers with 0, 10 and 50 triggers |
 | soak | `--minutes` + ~30 s | hidden in the tray, a sample every 10 s; reports growth per hour |
 | frozen | ~30 s | built `OnionBoard.exe` / `OnionWatch.exe --selftest`: peak RAM, threads, handles, time to exit, install folder size and its 20 biggest files |
 
