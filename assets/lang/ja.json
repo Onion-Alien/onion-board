@@ -1182,7 +1182,7 @@
   ],
   "Pictures ({patterns})": "",
   "Pink": "",
-  "Pitch": "",
+  "Pitch": "高さ",
   "Play a random sound": "",
   "Play a sound when something shows up on your screen (Onion Watch).": "",
   "Play a test sound": "",
@@ -1735,5 +1735,14 @@
   "⬇  Try installing again": "",
   "Join the Discord": "Discord に参加",
   "Chat about it on Discord": "Discord で話そう",
-  "The Onion Board Discord server, in your browser": "Onion Board の Discord サーバー（ブラウザーで開きます）"
+  "The Onion Board Discord server, in your browser": "Onion Board の Discord サーバー（ブラウザーで開きます）",
+  "Men": "男性",
+  "Women": "女性",
+  "In between & fun": "中間・おもしろ",
+  "Your own": "自分の声",
+  "Who": "誰",
+  "Any": "指定なし",
+  "Low": "低い",
+  "High": "高い",
+  "No voices like that. Try another pitch.": "該当する声はありません。別の高さを試してください。"
 }

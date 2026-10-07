@@ -1214,7 +1214,7 @@
   ],
   "Pictures ({patterns})": "",
   "Pink": "",
-  "Pitch": "",
+  "Pitch": "Высота",
   "Play a random sound": "",
   "Play a sound when something shows up on your screen (Onion Watch).": "",
   "Play a test sound": "",
@@ -1767,5 +1767,14 @@
   "⬇  Try installing again": "",
   "Join the Discord": "Зайти в Discord",
   "Chat about it on Discord": "Обсудить в Discord",
-  "The Onion Board Discord server, in your browser": "Discord-сервер Onion Board, в твоём браузере"
+  "The Onion Board Discord server, in your browser": "Discord-сервер Onion Board, в твоём браузере",
+  "Men": "Мужские",
+  "Women": "Женские",
+  "In between & fun": "Средние и забавные",
+  "Your own": "Ваши",
+  "Who": "Кто",
+  "Any": "Любая",
+  "Low": "Низкая",
+  "High": "Высокая",
+  "No voices like that. Try another pitch.": "Таких голосов нет. Попробуйте другую высоту."
 }

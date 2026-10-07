@@ -1182,7 +1182,7 @@
   ],
   "Pictures ({patterns})": "",
   "Pink": "",
-  "Pitch": "",
+  "Pitch": "음높이",
   "Play a random sound": "",
   "Play a sound when something shows up on your screen (Onion Watch).": "",
   "Play a test sound": "",
@@ -1735,5 +1735,14 @@
   "⬇  Try installing again": "",
   "Join the Discord": "Discord 참여하기",
   "Chat about it on Discord": "Discord에서 이야기해요",
-  "The Onion Board Discord server, in your browser": "Onion Board Discord 서버 (브라우저에서 열려요)"
+  "The Onion Board Discord server, in your browser": "Onion Board Discord 서버 (브라우저에서 열려요)",
+  "Men": "남성",
+  "Women": "여성",
+  "In between & fun": "중간 & 재미",
+  "Your own": "내 목소리",
+  "Who": "누구",
+  "Any": "모두",
+  "Low": "낮음",
+  "High": "높음",
+  "No voices like that. Try another pitch.": "해당하는 목소리가 없습니다. 다른 음높이를 골라 보세요."
 }

@@ -229,6 +229,25 @@ class HoverCard(QFrame):
         super().leaveEvent(event)
 
 
+# the widest the Setup and Voice pages' cards get: on a full-screen window they
+# spread to half the screen each, every button and list a bar ~900 px long
+PAGE_MAX_W = 1180
+
+
+def capped(body: QWidget, outer: QWidget | None = None, *,
+           margins: tuple[int, int, int, int] = (0, 0, 0, 0)) -> QWidget:
+    """`body` no wider than PAGE_MAX_W, centred in `outer` (a new QWidget if None)."""
+    outer = outer if outer is not None else QWidget()
+    body.setMaximumWidth(PAGE_MAX_W)
+    h = QHBoxLayout(outer)
+    h.setContentsMargins(*margins)
+    h.setSpacing(0)
+    h.addStretch(1)
+    h.addWidget(body, 1000)   # takes everything up to its cap, the sides the rest
+    h.addStretch(1)
+    return outer
+
+
 def card(title: str = "", hint: str = "", *, roomy: bool = False) -> tuple[QFrame, QVBoxLayout]:
     """A titled card, the building block of the Voice and Setup pages."""
     f = QFrame()

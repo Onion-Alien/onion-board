@@ -1182,7 +1182,7 @@
   ],
   "Pictures ({patterns})": "",
   "Pink": "",
-  "Pitch": "",
+  "Pitch": "Nada",
   "Play a random sound": "",
   "Play a sound when something shows up on your screen (Onion Watch).": "",
   "Play a test sound": "",
@@ -1735,5 +1735,14 @@
   "⬇  Try installing again": "",
   "Join the Discord": "Gabung ke Discord",
   "Chat about it on Discord": "Ngobrol soal ini di Discord",
-  "The Onion Board Discord server, in your browser": "Server Discord Onion Board, di browser-mu"
+  "The Onion Board Discord server, in your browser": "Server Discord Onion Board, di browser-mu",
+  "Men": "Pria",
+  "Women": "Wanita",
+  "In between & fun": "Di antaranya & lucu",
+  "Your own": "Milikmu",
+  "Who": "Siapa",
+  "Any": "Apa saja",
+  "Low": "Rendah",
+  "High": "Tinggi",
+  "No voices like that. Try another pitch.": "Tidak ada suara seperti itu. Coba nada lain."
 }

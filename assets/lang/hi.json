@@ -1198,7 +1198,7 @@
   ],
   "Pictures ({patterns})": "",
   "Pink": "",
-  "Pitch": "",
+  "Pitch": "पिच",
   "Play a random sound": "",
   "Play a sound when something shows up on your screen (Onion Watch).": "",
   "Play a test sound": "",
@@ -1751,5 +1751,14 @@
   "⬇  Try installing again": "",
   "Join the Discord": "Discord से जुड़ें",
   "Chat about it on Discord": "Discord पर इसके बारे में बात करें",
-  "The Onion Board Discord server, in your browser": "Onion Board का Discord सर्वर, आपके ब्राउज़र में"
+  "The Onion Board Discord server, in your browser": "Onion Board का Discord सर्वर, आपके ब्राउज़र में",
+  "Men": "पुरुष",
+  "Women": "महिलाएँ",
+  "In between & fun": "बीच की और मज़ेदार",
+  "Your own": "आपकी अपनी",
+  "Who": "कौन",
+  "Any": "कोई भी",
+  "Low": "नीची",
+  "High": "ऊँची",
+  "No voices like that. Try another pitch.": "ऐसी कोई आवाज़ नहीं। कोई और पिच आज़माएँ।"
 }

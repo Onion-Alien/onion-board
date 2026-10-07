@@ -1182,7 +1182,7 @@
   ],
   "Pictures ({patterns})": "",
   "Pink": "",
-  "Pitch": "",
+  "Pitch": "ระดับเสียง",
   "Play a random sound": "",
   "Play a sound when something shows up on your screen (Onion Watch).": "",
   "Play a test sound": "",
@@ -1735,5 +1735,14 @@
   "⬇  Try installing again": "",
   "Join the Discord": "เข้าร่วม Discord",
   "Chat about it on Discord": "คุยเรื่องนี้กันใน Discord",
-  "The Onion Board Discord server, in your browser": "เซิร์ฟเวอร์ Discord ของ Onion Board ในเบราว์เซอร์ของคุณ"
+  "The Onion Board Discord server, in your browser": "เซิร์ฟเวอร์ Discord ของ Onion Board ในเบราว์เซอร์ของคุณ",
+  "Men": "ผู้ชาย",
+  "Women": "ผู้หญิง",
+  "In between & fun": "กลางๆ และสนุก",
+  "Your own": "ของคุณเอง",
+  "Who": "ใคร",
+  "Any": "ใดก็ได้",
+  "Low": "ต่ำ",
+  "High": "สูง",
+  "No voices like that. Try another pitch.": "ไม่มีเสียงแบบนั้น ลองระดับเสียงอื่น"
 }

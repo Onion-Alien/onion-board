@@ -1198,7 +1198,7 @@
   ],
   "Pictures ({patterns})": "",
   "Pink": "",
-  "Pitch": "",
+  "Pitch": "Toonhoogte",
   "Play a random sound": "",
   "Play a sound when something shows up on your screen (Onion Watch).": "",
   "Play a test sound": "",
@@ -1751,5 +1751,14 @@
   "⬇  Try installing again": "",
   "Join the Discord": "Kom op de Discord",
   "Chat about it on Discord": "Praat erover op Discord",
-  "The Onion Board Discord server, in your browser": "De Discord-server van Onion Board, in je browser"
+  "The Onion Board Discord server, in your browser": "De Discord-server van Onion Board, in je browser",
+  "Men": "Mannen",
+  "Women": "Vrouwen",
+  "In between & fun": "Ertussenin & grappig",
+  "Your own": "Je eigen",
+  "Who": "Wie",
+  "Any": "Elke",
+  "Low": "Laag",
+  "High": "Hoog",
+  "No voices like that. Try another pitch.": "Geen stemmen zoals dat. Probeer een andere toonhoogte."
 }

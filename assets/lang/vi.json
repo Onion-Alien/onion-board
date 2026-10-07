@@ -1182,7 +1182,7 @@
   ],
   "Pictures ({patterns})": "",
   "Pink": "",
-  "Pitch": "",
+  "Pitch": "Cao độ",
   "Play a random sound": "",
   "Play a sound when something shows up on your screen (Onion Watch).": "",
   "Play a test sound": "",
@@ -1735,5 +1735,14 @@
   "⬇  Try installing again": "",
   "Join the Discord": "Tham gia Discord",
   "Chat about it on Discord": "Trò chuyện về nó trên Discord",
-  "The Onion Board Discord server, in your browser": "Máy chủ Discord của Onion Board, trong trình duyệt của bạn"
+  "The Onion Board Discord server, in your browser": "Máy chủ Discord của Onion Board, trong trình duyệt của bạn",
+  "Men": "Nam",
+  "Women": "Nữ",
+  "In between & fun": "Ở giữa & vui nhộn",
+  "Your own": "Của bạn",
+  "Who": "Ai",
+  "Any": "Bất kỳ",
+  "Low": "Trầm",
+  "High": "Cao",
+  "No voices like that. Try another pitch.": "Không có giọng nào như vậy. Thử cao độ khác."
 }

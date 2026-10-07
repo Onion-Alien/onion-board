@@ -1182,7 +1182,7 @@
   ],
   "Pictures ({patterns})": "",
   "Pink": "",
-  "Pitch": "",
+  "Pitch": "音高",
   "Play a random sound": "",
   "Play a sound when something shows up on your screen (Onion Watch).": "",
   "Play a test sound": "",
@@ -1735,5 +1735,14 @@
   "⬇  Try installing again": "",
   "Join the Discord": "加入 Discord",
   "Chat about it on Discord": "到 Discord 聊聊",
-  "The Onion Board Discord server, in your browser": "Onion Board 的 Discord 伺服器，在你的瀏覽器裡開啟"
+  "The Onion Board Discord server, in your browser": "Onion Board 的 Discord 伺服器，在你的瀏覽器裡開啟",
+  "Men": "男聲",
+  "Women": "女聲",
+  "In between & fun": "中性與趣味",
+  "Your own": "你的",
+  "Who": "誰",
+  "Any": "不限",
+  "Low": "低",
+  "High": "高",
+  "No voices like that. Try another pitch.": "沒有這樣的聲音。換個音高試試。"
 }

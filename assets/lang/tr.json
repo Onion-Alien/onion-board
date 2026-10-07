@@ -1198,7 +1198,7 @@
   ],
   "Pictures ({patterns})": "",
   "Pink": "",
-  "Pitch": "",
+  "Pitch": "Perde",
   "Play a random sound": "",
   "Play a sound when something shows up on your screen (Onion Watch).": "",
   "Play a test sound": "",
@@ -1751,5 +1751,14 @@
   "⬇  Try installing again": "",
   "Join the Discord": "Discord'a katıl",
   "Chat about it on Discord": "Discord'da konuş",
-  "The Onion Board Discord server, in your browser": "Onion Board Discord sunucusu, tarayıcında"
+  "The Onion Board Discord server, in your browser": "Onion Board Discord sunucusu, tarayıcında",
+  "Men": "Erkekler",
+  "Women": "Kadınlar",
+  "In between & fun": "Arada ve eğlenceli",
+  "Your own": "Seninkiler",
+  "Who": "Kim",
+  "Any": "Herhangi",
+  "Low": "Kalın",
+  "High": "İnce",
+  "No voices like that. Try another pitch.": "Böyle bir ses yok. Başka bir perde dene."
 }

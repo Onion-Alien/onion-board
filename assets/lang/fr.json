@@ -1198,7 +1198,7 @@
   ],
   "Pictures ({patterns})": "",
   "Pink": "",
-  "Pitch": "",
+  "Pitch": "Hauteur",
   "Play a random sound": "",
   "Play a sound when something shows up on your screen (Onion Watch).": "",
   "Play a test sound": "",
@@ -1751,5 +1751,14 @@
   "⬇  Try installing again": "",
   "Join the Discord": "Rejoindre le Discord",
   "Chat about it on Discord": "En parler sur Discord",
-  "The Onion Board Discord server, in your browser": "Le serveur Discord d’Onion Board, dans ton navigateur"
+  "The Onion Board Discord server, in your browser": "Le serveur Discord d’Onion Board, dans ton navigateur",
+  "Men": "Hommes",
+  "Women": "Femmes",
+  "In between & fun": "Entre les deux & fun",
+  "Your own": "Les vôtres",
+  "Who": "Qui",
+  "Any": "Toutes",
+  "Low": "Grave",
+  "High": "Aiguë",
+  "No voices like that. Try another pitch.": "Aucune voix de ce genre. Essayez une autre hauteur."
 }

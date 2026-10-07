@@ -1262,7 +1262,7 @@
   ],
   "Pictures ({patterns})": "",
   "Pink": "",
-  "Pitch": "",
+  "Pitch": "طبقة الصوت",
   "Play a random sound": "",
   "Play a sound when something shows up on your screen (Onion Watch).": "",
   "Play a test sound": "",
@@ -1815,5 +1815,14 @@
   "⬇  Try installing again": "",
   "Join the Discord": "انضم إلى Discord",
   "Chat about it on Discord": "تحدّث عنه على Discord",
-  "The Onion Board Discord server, in your browser": "خادم Onion Board على Discord، في متصفحك"
+  "The Onion Board Discord server, in your browser": "خادم Onion Board على Discord، في متصفحك",
+  "Men": "رجال",
+  "Women": "نساء",
+  "In between & fun": "بين الاثنين ومرح",
+  "Your own": "أصواتك",
+  "Who": "من",
+  "Any": "أي",
+  "Low": "منخفضة",
+  "High": "عالية",
+  "No voices like that. Try another pitch.": "لا توجد أصوات كهذه. جرّب طبقة أخرى."
 }
