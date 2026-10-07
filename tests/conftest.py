@@ -67,10 +67,6 @@ class _SilentOutputStream:
 if os.environ.get("ONIONBOARD_TEST_REAL_AUDIO") != "1":
     import sounddevice
     sounddevice.OutputStream = _SilentOutputStream
-    # Chromium (the Radio tab's globe) must never reach the default device either.
-    flags = os.environ.get("QTWEBENGINE_CHROMIUM_FLAGS", "")
-    if "--mute-audio" not in flags:
-        os.environ["QTWEBENGINE_CHROMIUM_FLAGS"] = f"{flags} --mute-audio".strip()
 
 
 

@@ -180,9 +180,9 @@ the launcher the shortcuts and PyInstaller use. The app is the `soundboard` pack
 | `soundboard/tor.py` | the app's own Tor (Connection → *Tor*): starts `tor.exe` only when needed, writes its torrc in `%APPDATA%\OnionBoard\tor`, ties it to the app with a job object, speaks its control port (cookie auth, bootstrap progress, `NEWNYM`) and hands `net.py` its SOCKS port once connected; optional Snowflake / obfs4 bridges |
 | `soundboard/torget.py` | *Get Tor* (Settings, and the installer's Tor box via `OnionBoard.exe --get-tor`): downloads the Tor Expert Bundle through `net.urlopen`, checks its pinned SHA-256 and unpacks only tor.exe, lyrebird, pt_config.json and the licences into `%APPDATA%\OnionBoard\tor\bin` (the app doesn't ship Tor) |
 | `soundboard/quality.py` | Settings > Data & quality: download size, keeping the video, the radio's bitrate cap and patience, and web search extras (low data mode) |
-| `soundboard/radio.py` | Radio tab back end: the Radio Browser directory client (stations, search, a day's cache), the stream player (Qt Multimedia decodes, a `QAudioBufferOutput` hands 48 kHz PCM to the engine) the globe page (globe.gl, pinned with SRI) and the flat map's land outlines (SHA-384-checked) |
+| `soundboard/radio.py` | Radio tab back end: the Radio Browser directory client (stations, search, a day's cache), the stream player (Qt Multimedia decodes, a `QAudioBufferOutput` hands 48 kHz PCM to the engine; the decoder's DLLs preload on a thread when the tab first opens) and the map's land outlines (SHA-384-checked) |
 | `soundboard/ui/radiopanel.py` | the Radio tab: search bar, the map (click a dot to play), station list, favourites, Send / record / last 15 s, the now-playing strip |
-| `soundboard/ui/flatmap.py` | the Radio tab's flat world map (the default view, painted by Qt, no web engine); the 3D globe is its HD option |
+| `soundboard/ui/flatmap.py` | the Radio tab's world map, painted by Qt (no web engine) |
 | `soundboard/ui/appstate.py` | stops decorative animations (logo, mascots, live dot) while another program is in front |
 | `soundboard/ui/clipeditor.py` | the Apps tab's clip editor, folded away under each card until opened: the live waveform of the program's last minute, drag to select, play in your headphones / save as a sound / send out, the Edit menu and its keys |
 | `soundboard/ui/clipshelf.py` | the Apps tab's *Saved clips* list under the cards: what the clip editor's Save keeps; double-click plays, F2 renames, right-click adds to Sounds / sends / copies / deletes (Undo bar) |
@@ -234,7 +234,7 @@ the ruff and pytest settings, and a `soundboard` GUI entry point for `pip instal
 ## The installer
 
 `build.ps1` builds the mic effect (`scripts\build_directmic.py`, MinGW-w64), runs
-PyInstaller and produces `dist\OnionBoard\OnionBoard.exe` (one folder, QtWebEngine and
+PyInstaller and produces `dist\OnionBoard\OnionBoard.exe` (one folder,
 `directmic\obmic.dll` included), then compiles `installer\OnionBoard.iss` with Inno Setup 6
 (`winget install JRSoftware.InnoSetup`) into **`dist\OnionBoardSetup.exe`**, the one
 file to hand out. It installs per user (no admin), adds the Desktop and Start menu
@@ -311,9 +311,14 @@ the newest backup is used, so the pad list is never silently reset.
 - Auto push-to-talk can't press keys in a game that runs as administrator unless
   Onion Board also runs as administrator (Windows blocks it). Keys are injected with
   `SendInput`, modifiers and key in one call.
-- The window is GPU-composited from the start (`QT_WIDGETS_RHI=1`) so the Radio
-  tab's globe can appear without rebuilding it. On a machine whose GPU driver or remote-desktop
-  session can't do that, set `QT_WIDGETS_RHI=0` before launching.
+- Windows draw the ordinary way (no `QT_WIDGETS_RHI`). Forcing GPU drawing, as up to
+  1.9.6 for the Radio tab's 3D globe, gave every window its own Direct3D device (16
+  driver threads and ~30 MB each, never freed).
+- `OPENBLAS_NUM_THREADS` is set to 2 when the `soundboard` package is first imported,
+  before numpy loads (a value you set yourself wins). numpy's and scipy's OpenBLAS
+  otherwise start a pool of one thread per CPU each and reserve ~32 MB per thread: about
+  1 GB of commit and 30 idle threads. Add-on helper processes (`net.child_env`) get the
+  variable removed again, so their own maths isn't capped by the app's choice.
 - Drop-outs reported by the audio driver are counted and shown in the status line.
   **⚙ Settings → Audio → Audio buffering: Safer** trades a little delay for bigger
   buffers if a device keeps crackling.
