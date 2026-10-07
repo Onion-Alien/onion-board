@@ -704,7 +704,9 @@ class SearchResults(QFrame):
         where = _("TikTok sounds") if self.source == "tiktok" else self.site
         netlog.cause(ytdl.FEATURE, f"You searched {where} for {netlog.quoted(query)}"
                      + (" (without Tor)" if direct else ""))
-        text = _("Searching {where} for <b>{query}</b>…", where=where, query=html.escape(query))
+        text = (_("Searching TikTok sounds for <b>{query}</b>…", query=html.escape(query))
+                if self.source == "tiktok" else
+                _("Searching {where} for <b>{query}</b>…", where=where, query=html.escape(query)))
         self.title.setText(text)
         self._loading(True, text)
         self.show()
