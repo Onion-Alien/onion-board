@@ -34,6 +34,10 @@ LANG_DIR = (Path(sys._MEIPASS) / "lang" if hasattr(sys, "_MEIPASS")
 ENGLISH = "en"
 PSEUDO = "xx"
 WINDOWS = ""     # Config.language: follow Windows' display language
+# Until every text is translated and Settings has a Language picker (2.0), the board
+# stays in English unless config.json or ONIONBOARD_LANG names a language: following
+# Windows now would show a half-translated window.
+FOLLOW_WINDOWS = False
 
 # plural rules: n -> index into a catalog entry's list of forms (FORMS: how many)
 def _one_other(n):
@@ -225,6 +229,8 @@ def startup(app_dir: Path) -> str:
         raw = _read(app_dir / "config.json") if (app_dir / "config.json").is_file() else {}
         want = raw.get("language", WINDOWS)
         want = want if isinstance(want, str) else WINDOWS
+    if want == WINDOWS and not FOLLOW_WINDOWS:
+        want = ENGLISH
     code = set_language(resolve(want))
     log.info("language: %s (setting %r)", code, want)
     return code

@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 1.9.8 — 2026-10-07
+
 - **Onion Board has a Discord.** Chat, get help and hear about new versions: *Join
   the Discord* in Settings, the tray icon's menu, *What's new* and the installer's
   last page (it only opens when you click it).
@@ -17,6 +19,11 @@
   library stops parking ~30 idle threads and up to 1 GB of reserved memory, the
   radio's decoder loads only once you open the Radio tab, and unused picture-format
   plug-ins (PDF and co.) no longer load at start-up.
+
+- **Triggers tab: Onion Watch 0.9.2.** Lighter too (closed trigger cards cost almost
+  nothing, and with watching off it doesn't load its maths libraries), and a green
+  *READY* is no longer mistaken for a red one. The board offers the add-on's
+  update by itself.
 
 ## 1.9.7 — 2026-10-07
 
