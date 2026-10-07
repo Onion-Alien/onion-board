@@ -47,7 +47,9 @@ def _slavic(n):            # ru, uk: one (1, 21, 31…), few (2-4, 22-24…), ma
 
 PLURALS = {
     "en": _one_other, "de": _one_other, "es": _one_other, "it": _one_other,
-    "nl": _one_other, "tr": _one_other,
+    "nl": _one_other, "tr": _one_other, "es-419": _one_other, "pt-PT": _one_other,
+    "el": _one_other, "sv": _one_other, "da": _one_other, "nb": _one_other,
+    "fi": _one_other, "bg": _one_other, "hu": _one_other,
     "pt-BR": lambda n: 0 if n in (0, 1) else 1,
     "fr": lambda n: 0 if n in (0, 1) else 1,
     "hi": lambda n: 0 if n in (0, 1) else 1,
@@ -55,15 +57,21 @@ PLURALS = {
     # one (1), few (2-4, 22-24…, not 12-14), many (the rest)
     "pl": lambda n: 0 if n == 1
     else 1 if 2 <= n % 10 <= 4 and not 12 <= n % 100 <= 14 else 2,
+    # one (1), few (2-4), other
+    "cs": lambda n: 0 if n == 1 else 1 if 2 <= n <= 4 else 2,
+    # one (1), few (0, 2-19, 101-119…), other (20-100, 120…)
+    "ro": lambda n: 0 if n == 1 else 1 if n == 0 or 1 <= n % 100 <= 19 else 2,
+    # one (1, 2, 3, and anything not ending in 4, 6 or 9), other
+    "fil": lambda n: 0 if n in (1, 2, 3) or n % 10 not in (4, 6, 9) else 1,
     # one form for every number
     "zh-CN": lambda n: 0, "zh-TW": lambda n: 0, "ja": lambda n: 0, "ko": lambda n: 0,
-    "id": lambda n: 0, "vi": lambda n: 0, "th": lambda n: 0,
+    "id": lambda n: 0, "vi": lambda n: 0, "th": lambda n: 0, "ms": lambda n: 0,
     # zero, one, two, few (3-10, 103-110…), many (11-99, 111-199…), other
     "ar": lambda n: 0 if n == 0 else 1 if n == 1 else 2 if n == 2
     else 3 if 3 <= n % 100 <= 10 else 4 if 11 <= n % 100 <= 99 else 5,
 }
-FORMS = {"ru": 3, "uk": 3, "pl": 3, "ar": 6,
-         **dict.fromkeys(("zh-CN", "zh-TW", "ja", "ko", "id", "vi", "th"), 1)}
+FORMS = {"ru": 3, "uk": 3, "pl": 3, "cs": 3, "ro": 3, "ar": 6,
+         **dict.fromkeys(("zh-CN", "zh-TW", "ja", "ko", "id", "vi", "th", "ms"), 1)}
 
 
 def forms(code: str) -> int:
@@ -163,6 +171,9 @@ def resolve(setting: str) -> str:
     chinese = _chinese(want)
     if chinese:
         return chinese if chinese in codes else ENGLISH
+    regional = _regional(want)
+    if regional in codes:
+        return regional
     base = want.split("-")[0].lower()
     for c in codes:                       # "de-AT" -> "de", "pt-PT" -> "pt-BR"
         if c.split("-")[0].lower() == base:
@@ -180,6 +191,22 @@ def _chinese(name: str) -> str | None:
     if "hant" in parts or {"hk", "mo", "tw"} & set(parts[1:]):
         return "zh-TW"
     return "zh-CN"
+
+
+def _regional(name: str) -> str | None:
+    """The catalog for a region a plain base-language match would get wrong: Spain's
+    Spanish (es) or Latin America's (es-419, every other es-XX); Brazil's Portuguese
+    (pt-BR, also a plain "pt") or Portugal's (pt-PT, the other pt-XX); Norwegian
+    (nb, nn, no) is nb. None: no rule."""
+    parts = [p.lower() for p in name.split("-")]
+    lang, region = parts[0], parts[-1] if len(parts) > 1 else ""
+    if lang == "es" and region:
+        return "es" if region == "es" else "es-419"
+    if lang == "pt":
+        return "pt-BR" if region in ("", "br") else "pt-PT"
+    if lang in ("nb", "nn", "no"):
+        return "nb"
+    return None
 
 
 def is_rtl(code: str | None = None) -> bool:
