@@ -34,7 +34,7 @@ from soundboard.ui.owl import W as OWL_W
 from soundboard.ui.owl import OwlWidget
 from soundboard.ui.panel import CardGrid, HoverCard
 from soundboard.ui.responsive import FitWidth
-from soundboard.ui.widgets import LoadingBar, fmt_time
+from soundboard.ui.widgets import LoadingBar, fmt_time, paint_now_playing
 from soundboard import errors
 
 log = logging.getLogger(__name__)
@@ -199,6 +199,7 @@ class Thumb(QWidget):
         super().__init__()
         self._pm: QPixmap | None = None
         self._scaled: QPixmap | None = None   # _pm at this size: not scaled per paint
+        self.now = ""   # "playing" / "paused" while it's the one in the player
         self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
         policy = self.sizePolicy()
         policy.setHeightForWidth(True)
@@ -249,7 +250,42 @@ class Thumb(QWidget):
                 pm.setDevicePixelRatio(dpr)
             size = pm.deviceIndependentSize()
             p.drawPixmap(QPointF((w - size.width()) / 2, (h - size.height()) / 2), pm)
+        if self.now:
+            self._paint_now(p, w, h)
         p.end()
+
+    def _paint_now(self, p: QPainter, w: int, h: int):
+        """The one in the player: the picture dims and a big equalizer (bouncing, or
+        still while paused) with "Playing" / "Paused" sits on it."""
+        p.fillRect(QRectF(0, 0, w, h), QColor(0, 0, 0, 120))
+        paused = self.now == "paused"
+        eq = min(44.0, h * 0.42)
+        box = QRectF((w - eq) / 2, h / 2 - eq * 0.75, eq, eq)
+        if paused:   # a pause sign: still bars read as dots
+            p.setPen(Qt.NoPen)
+            p.setBrush(QColor("#ffffff"))
+            bw = eq * 0.24
+            for x in (box.center().x() - bw * 1.4, box.center().x() + bw * 0.4):
+                p.drawRoundedRect(QRectF(x, box.top() + eq * 0.1, bw, eq * 0.8), 3, 3)
+        else:
+            paint_now_playing(p, box, QColor("#ffffff"))
+        f = p.font()
+        f.setBold(True)
+        f.setPointSizeF(9)
+        p.setFont(f)
+        word = "Paused" if paused else "Playing"
+        pill_w = p.fontMetrics().horizontalAdvance(word) + 18
+        pill = QRectF((w - pill_w) / 2, h / 2 + eq * 0.35, pill_w, 20)
+        p.setPen(Qt.NoPen)
+        p.setBrush(QColor(theme.T["accent"]))
+        p.drawRoundedRect(pill, 10, 10)
+        p.setPen(QColor(theme.T["on_accent"]))
+        p.drawText(pill, Qt.AlignCenter, word)
+
+    def set_now(self, now: str):
+        changed, self.now = now != self.now, now
+        if changed or now == "playing":
+            self.update()   # bouncing bars: every tick while it plays
 
 
 class ClampLabel(QLabel):
@@ -365,6 +401,7 @@ class ResultRow(HoverCard):
         super().__init__()
         self.result = r
         self.setFocusPolicy(Qt.StrongFocus)
+        self.setProperty("own_space", True)   # Space plays / pauses this one (spacekey.py)
         self.setAccessibleName(r.title)
         v = QVBoxLayout(self)
         v.setContentsMargins(8, 8, 8, 8)
@@ -415,6 +452,8 @@ class ResultRow(HoverCard):
         self._release = {}      # "play" / "add" -> busy.hold's release while it's fetched
         self._added = False
         self._locked = False
+        self.now = ""           # "playing" / "paused": it's the one in the player
+        self.setProperty("playing", False)
         self.setCursor(Qt.PointingHandCursor)
         self.setToolTip("Double-click to play")
 
@@ -439,6 +478,23 @@ class ResultRow(HoverCard):
 
     def _btn(self, kind: str) -> QPushButton:
         return self.btn_add if kind == "add" else self.btn_play
+
+    def set_now(self, now: str):
+        """"playing" / "paused" while it's the one in the player, "" when it isn't:
+        the picture shows it, the card is outlined and Play becomes Pause / Resume."""
+        self.thumb.set_now(now)
+        if now == self.now:
+            return
+        self.now = now
+        self.setProperty("playing", bool(now))
+        self.style().unpolish(self)
+        self.style().polish(self)
+        if "play" not in self._release:   # not while its button shows the download
+            self.btn_play.setText({"playing": "Pause", "paused": "Resume"}.get(now, "Play"))
+            icons.set_icon(self.btn_play, "pause" if now == "playing" else "play", size=14)
+        self.btn_play.setToolTip("Pause it" if now == "playing" else "Carry on playing it"
+                                 if now == "paused" else
+                                 "Download its audio and play it once (it isn't kept)")
 
     def set_busy(self, kind: str):
         """Its audio is being fetched: that button greys out until set_done, and the
@@ -486,6 +542,9 @@ class ResultRow(HoverCard):
             release(None if ok else ("Didn't add" if kind == "add" else "Didn't play"))
             if self._locked:
                 busy.set_busy(self._btn(kind), True)
+            if kind == "play" and self.now:   # it started before the button let go
+                now, self.now = self.now, ""
+                self.set_now(now)
 
     def set_locked(self, on: bool):
         """Another card's download is running: this one's buttons wait for it (one at a
@@ -528,10 +587,11 @@ class SearchResults(QFrame):
         v.setContentsMargins(0, 0, 0, 0)
         v.setSpacing(6)
         head = QHBoxLayout()
-        back = self.btn_back = QPushButton("My sounds")
-        back.setObjectName("small")
+        back = self.btn_back = QPushButton("Back to my sounds")
+        back.setObjectName("backhome")   # stands out: the way out of the results
+        back.setCursor(Qt.PointingHandCursor)
         back.setToolTip("Close the search results and go back to your sounds")
-        icons.set_icon(back, "back", size=12)
+        icons.set_icon(back, "back", "danger_text", size=18)
         back.clicked.connect(self.close_results)
         head.addWidget(back)
         head.addSpacing(8)
@@ -674,6 +734,12 @@ class SearchResults(QFrame):
                 else:
                     r.set_done(kind, ok)
         self._lock_rows()
+
+    def show_now(self, url: str, now: str):
+        """The player has `url` loaded ("playing" / "paused"), or nothing from here
+        (url ""): its card says so."""
+        for r in self._rows:
+            r.set_now(now if url and r.result.url == url else "")
 
     def progress(self, url: str, frac: float):
         """The link bar's download of `url`: 0..1, or below 0 while it's converted."""

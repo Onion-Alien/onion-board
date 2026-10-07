@@ -2,6 +2,18 @@
 
 ## Unreleased
 
+- **Space plays and pauses everywhere on Sounds and Radio**, not just on a pad: after
+  clicking a web result's *Play*, a slider or a station, Space pauses (it used to
+  click the button again and download the song a second time). Typing in a box and
+  buttons reached with Tab keep their own Space.
+- **You can see what's playing.** The web result in the player shows bouncing bars
+  (or a pause sign) on its picture, gets an outline, and its *Play* becomes
+  *Pause* / *Resume*. The Radio's bottom bar shows the station and song with moving
+  bars; click it to find the station in the list.
+- **One click plays a radio station** (clicking the one playing doesn't restart it).
+- **The Radio's *Only me / LIVE* button is now *Send / Sending***, the same as a
+  program's on the Apps tab.
+- **Back to my sounds** stands out after a web search: a bigger red button.
 - **"Did you know?" tips.** Once the setup guide is done, Onion Board shows a short
   tip about one feature at most once a day, with a *Show me* button that takes you
   there. Never while a game is up, and each tip only once. *Show tips* in
