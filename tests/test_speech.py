@@ -22,7 +22,9 @@ ROOT = Path(__file__).resolve().parent.parent
 LIVE = ROOT / "modules" / "live-voice"
 
 
-def wait_for(cond, timeout=10.0):
+def wait_for(cond, timeout=30.0):
+    # (generous: most of these wait on a helper process, which a PC busy with the
+    # rest of the suite can hold up for seconds; a passing wait ends at once)
     end = time.monotonic() + timeout
     while not cond() and time.monotonic() < end:
         time.sleep(0.02)

@@ -1,7 +1,6 @@
 """The Radio tab mustn't hold up the audio threads: Qt keeps Python's lock through
 each call into it, so one long call (drawing the whole map, loading the decoder) is
 a sound skipping on the cable."""
-import os
 import threading
 import time
 from pathlib import Path
@@ -9,6 +8,7 @@ from pathlib import Path
 import numpy as np
 import pytest
 
+from conftest import real_pc_timing
 from soundboard import radio
 from soundboard.ui import flatmap
 from soundboard.ui.flatmap import LAND_PART, FlatMap
@@ -17,13 +17,6 @@ from soundboard.ui.flatmap import LAND_PART, FlatMap
 def outlines():
     raw = (radio.ASSET_DIR / radio.COUNTRIES).read_bytes()
     return radio.outline_rings(raw), radio.outline_labels(raw)
-
-
-# Hosted CI runners (2 shared cores, other test workers beside it) stall a thread
-# 10-15 ms on their own, as much as the hitch these measure: the timing tests there
-# fail on unchanged code. They run on a real PC, where a hitch is the only stall.
-real_pc_timing = pytest.mark.skipif(bool(os.environ.get("CI")),
-                                    reason="wall-clock audio timing: too noisy on CI")
 
 
 def quietest(measure, limit, tries=5):
@@ -339,7 +332,6 @@ def test_the_decoder_is_loaded_off_the_ui_thread_once(qapp, monkeypatch):
     import ctypes
     import sys
 
-    import pytest
     if sys.platform != "win32":
         pytest.skip("Windows only")
     loaded = []

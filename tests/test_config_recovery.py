@@ -2,6 +2,7 @@
 is told when their settings came from a backup or the defaults."""
 import json
 
+from conftest import own_time
 from soundboard import library
 from soundboard.library import Config
 
@@ -160,7 +161,7 @@ def test_locked_config_isnt_set_aside_or_saved_over(app_dir, monkeypatch):
         return real(self, *a, **k)
     with monkeypatch.context() as m:
         m.setattr(type(library.CONFIG_PATH), "read_text", locked)
-        m.setattr(library.time, "sleep", lambda s: None)
+        own_time(m, library, sleep=lambda s: None)
         cfg = Config.load()
     assert cfg.stop_hotkey == "f7" and "locked" in cfg.load_note
     assert not list(app_dir.glob("config.json.broken-*"))
