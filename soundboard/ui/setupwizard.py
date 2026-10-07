@@ -915,8 +915,10 @@ class SetupWizard(QDialog):
             f"<p style='font-size:15pt; font-weight:800; color:{_ok()}'>{mic}</p>"
             "Your sounds are in it now, so there's nothing to pick anywhere.<br><br>"
             "<b>One thing worth doing in Discord:</b> ⚙ User Settings → <b>Voice &amp; "
-            "Video</b> → <b>Input Profile</b> → <b>Studio</b>. Left on, its noise "
-            "suppression treats your sounds as background noise and chops them up. "
+            "Video</b> → <b>Input Profile</b> → <b>Custom</b>, <b>Noise Suppression</b> → "
+            "<b>None</b>, and <b>Echo Cancellation</b> off (not Studio: Studio skips "
+            "Onion Board). Left on, its noise suppression treats your sounds as "
+            "background noise and wipes them out. "
             "<b>In a game:</b> turn off its noise suppression if your sounds cut out.")
 
     def show_steam_guide(self):

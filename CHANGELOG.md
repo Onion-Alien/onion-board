@@ -2,6 +2,17 @@
 
 ## Unreleased
 
+- **Important fix: Discord wiping out your sounds on Straight into my mic.** Measured
+  on a real Discord: its default noise suppression (Krisp / Voice Isolation) lets a
+  song through for about a second, then wipes it out, and its **Studio** profile,
+  which Onion Board used to tell you to pick, makes Discord skip Onion Board
+  entirely, so none of your sounds got through. Onion Board now reads Discord's own
+  voice settings while it runs and shows a bar across the window when one of them is
+  in the way (*Fix Discord* opens the steps). The Discord guide, the setup guide, the
+  Setup tab and the voice changer's warning now say the right thing for your mic:
+  *Input Profile* **Custom**, *Noise Suppression* **None**, *Echo Cancellation* off
+  (Studio stays the clean choice on the virtual cable). The guide shows each of your
+  Discord settings with a ✓ or what to switch, and updates as you change them.
 - **Record a bit of what's playing.** The Sounds tab's **Record** window has a new
   *What's playing* choice: press Record, play a sound, a web search result or the
   radio (or catch a song already playing), then Stop, cut the ends and save it as a
