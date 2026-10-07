@@ -13,6 +13,7 @@ from conftest import process_events
 from soundboard import updates, watchaddon
 from soundboard.library import SoundMeta
 from soundboard.ui import triggershost
+from soundboard.ui.livedot import is_tab_live
 from soundboard.ui.triggershost import BoardHost
 from soundboard.ui.triggerstab import TriggersTab
 from test_triggers_module import make_module, zip_of
@@ -166,6 +167,150 @@ def test_the_window_loads_onion_watch_after_it_is_built(qapp, app_dir, monkeypat
         w.close()
         w.deleteLater()
         qapp.sendPostedEvents(None, QEvent.DeferredDelete)
+
+
+def watch_window(qapp, app_dir, monkeypatch, pkg, screen):
+    """The real MainWindow with a made-up Onion Watch installed and `screen` saved."""
+    from soundboard import engine, winkeys
+    from soundboard.library import Config
+    from soundboard.ui import mainwindow as main
+    for name in ("set_main_device", "set_mon_device", "set_mic_device"):
+        monkeypatch.setattr(engine.Engine, name, lambda self, n: None)
+    monkeypatch.setattr(winkeys.Hotkeys, "register", lambda self, m: None)
+    make_module(app_dir / "modules" / "onion-watch", package=pkg, board=PANEL)
+    Config(screen=screen, mic_first=True).save()
+    w = main.MainWindow()
+    w._load_thread.join(15)
+    return w
+
+
+def close_window(qapp, w):
+    from PySide6.QtCore import QEvent
+    w.close()
+    w._load_thread.join(15)
+    w.deleteLater()
+    qapp.sendPostedEvents(None, QEvent.DeferredDelete)
+
+
+def test_not_watching_the_window_leaves_onion_watch_until_the_tab_is_shown(
+        qapp, app_dir, monkeypatch, pkg):
+    """Watching off: loading the add-on (~0.5 s, 40+ MB, a dozen threads) waits for
+    the Triggers tab; showing it switches at once, then loads it."""
+    from soundboard.ui import mainwindow as main
+    w = watch_window(qapp, app_dir, monkeypatch, pkg, two_triggers(on=False))
+    try:
+        w.show()
+        process_events(qapp, lambda: False, timeout=0.5)   # well past its start timer
+        assert w.triggers.pending and w.triggers.panel is None
+        assert w.triggers.info is not None                 # Settings > Add-ons knows it
+        assert w.triggers.stack.currentWidget() is w.triggers.wait_page
+        assert not is_tab_live(w.tabs, main.TAB_INDEX["triggers"])
+        w.tabs.setCurrentWidget(w.triggers)
+        assert w.tabs.currentWidget() is w.triggers and w.triggers.panel is None
+        assert process_events(qapp, lambda: w.triggers.panel is not None, timeout=5)
+        assert w.triggers.stack.currentWidget() is w.triggers.board_page
+        assert w.triggers.panel.host.screen is w.cfg.screen
+    finally:
+        close_window(qapp, w)
+
+
+def test_watching_on_loads_onion_watch_at_the_start(qapp, app_dir, monkeypatch, pkg):
+    w = watch_window(qapp, app_dir, monkeypatch, pkg, two_triggers(on=True))
+    try:
+        assert w.triggers.pending                          # not while it's built...
+        assert process_events(qapp, lambda: w.triggers.panel is not None, timeout=5)
+        assert w.tabs.currentWidget() is not w.triggers    # ...without the tab shown
+    finally:
+        close_window(qapp, w)
+
+
+def test_watching_on_with_no_triggers_still_waits(qapp, app_dir, monkeypatch, pkg):
+    """Onion Watch only starts watching again when there's a trigger to watch."""
+    w = watch_window(qapp, app_dir, monkeypatch, pkg, {"on": True, "triggers": []})
+    try:
+        process_events(qapp, lambda: False, timeout=0.3)
+        assert w.triggers.pending and w.triggers.panel is None
+        w.load_triggers()                                  # asked for: loads now
+        assert w.triggers.panel is not None and not w.triggers.pending
+    finally:
+        close_window(qapp, w)
+
+
+def test_a_waiting_tab_loads_when_first_shown(qapp, tmp_path, pkg):
+    make_module(tmp_path / "modules" / "onion-watch", package=pkg, board=PANEL)
+    tab = TriggersTab(FakeHost(two_triggers(on=False)), [tmp_path / "modules"], defer=True)
+    assert not tab.needed_now() and tab.info is not None and tab.pending
+    tab.resize(600, 400)
+    tab.show()
+    assert tab.panel is None                               # its first paint comes first
+    assert process_events(qapp, lambda: tab.panel is not None, timeout=5)
+    assert not tab.pending
+    tab.hide()
+    tab.show()                                             # once: never loaded twice
+    process_events(qapp, lambda: False, timeout=0.2)
+    tab.shutdown()
+
+
+def test_a_waiting_tab_hidden_again_before_it_loads_waits_on(qapp, tmp_path, pkg):
+    make_module(tmp_path / "modules" / "onion-watch", package=pkg, board=PANEL)
+    tab = TriggersTab(FakeHost(), [tmp_path / "modules"], defer=True)
+    tab.needed_now()
+    tab.show()
+    tab.hide()                                             # clicked straight past it
+    process_events(qapp, lambda: False, timeout=0.3)
+    assert tab.pending and tab.panel is None
+    tab.show()
+    assert process_events(qapp, lambda: tab.panel is not None, timeout=5)
+    tab.shutdown()
+
+
+def test_with_none_installed_the_start_loads_hoot_at_once(qapp, tmp_path):
+    tab = TriggersTab(FakeHost(two_triggers(on=False)), [tmp_path / "modules"], defer=True)
+    assert tab.needed_now()                                # nothing to wait for
+    tab.load()
+    assert tab.stack.currentWidget() is tab.get_page
+
+
+def test_an_update_found_before_it_loads_is_on_the_tab_once_it_does(qapp, tmp_path, pkg):
+    make_module(tmp_path / "modules" / "onion-watch", package=pkg, board=PANEL)
+    tab = TriggersTab(FakeHost(), [tmp_path / "modules"], defer=True)
+    tab.needed_now()
+    tab.offer_update(watchaddon.Offer("9.0.0", notes="Faster."))
+    assert tab.offer is not None and tab.panel is None    # kept, not dropped
+    tab.load()
+    assert tab.update_text.text() == "Onion Watch 9.0.0 is out. Faster."
+    assert not tab.update_bar.isHidden()
+    tab.shutdown()
+
+
+def test_getting_it_while_it_waits_loads_it_first_and_updates_for_the_next_start(
+        qapp, tmp_path, addon_zip, monkeypatch):
+    """Settings > Add-ons' Update / Reinstall, or the urgent banner, before the tab
+    was ever shown: it works as it always did on a loaded tab."""
+    watchaddon.install(addon_zip("0.2.0", "old"), tmp_path / "modules")
+    tab = TriggersTab(FakeHost(), [tmp_path / "modules"], defer=True)
+    tab.needed_now()
+    tab.offer = watchaddon.Offer("0.3.0", local=addon_zip("0.3.0", "new"))
+    tab.get()
+    assert tab.panel is not None                           # the installed one, loaded
+    assert process_events(qapp, lambda: "Restart Onion Board" in tab.update_text.text())
+    assert watchaddon.installed([tmp_path / "modules"]).version == "0.3.0"
+    tab.shutdown()
+
+
+def test_removing_it_while_it_waits(qapp, tmp_path, addon_zip, monkeypatch):
+    watchaddon.install(addon_zip(), tmp_path / "modules")
+    tab = TriggersTab(FakeHost(two_triggers(on=False)), [tmp_path / "modules"], defer=True)
+    tab.needed_now()
+    monkeypatch.setattr(tab, "confirm_remove", lambda: True)
+    tab.remove()
+    assert watchaddon.installed([tmp_path / "modules"]) is None
+    assert not tab.pending and tab.panel is None
+    assert tab.stack.currentWidget() is tab.get_page
+    tab.show()                                             # nothing left to load
+    process_events(qapp, lambda: False, timeout=0.2)
+    assert tab.panel is None and tab.stack.currentWidget() is tab.get_page
+    tab.hide()
 
 
 def test_triggers_past_the_50th_are_counted_too(qapp, tmp_path):
