@@ -9,6 +9,7 @@
 //   fuzzhost <obmic_fuzz.dll> <workdir> <seconds> <seed>      fuzz; exit 0 = clean
 //   fuzzhost <obmic_fuzz.dll> <workdir> --selftest            the guard puts the mic back
 //   fuzzhost <obmic_fuzz.dll> <workdir> --replay <case seed>  one case, verbose
+//   fuzzhost <obmic_fuzz.dll> <workdir> --lead                the lead comes back after hiccups
 //
 // Nothing touches the PC's audio: the effect only ever sees the ring file
 // <workdir>\OnionBoard\MicPlugin\ring2.bin and buffers this program hands it.
@@ -624,9 +625,104 @@ static int selftest() {
     return 0;
 }
 
+// --lead: the lead the effect reads behind the board, through a board late by a block
+// once, then late every other block for a while (a busy PC), then on time. It should
+// grow just enough to ride each out, really read that far behind (not just count it),
+// and once the board keeps time, come back to the normal lead. Run with the board's
+// sync pair (late blocks filled in with the mic from then) and without (an older
+// board). Block by block, so it's the same every run.
+static int leadcase(bool sync) {
+    const uint32_t F = 480, BASE = 960, STEP = 240;   // 10 ms blocks; LEAD_DEFAULT_S, LEAD_STEP_S
+    Layout L = {1u << 16, 1u << 16, 48000, true, 0};
+    L.size = HEADER + (uint64_t)L.cap * 4 + (uint64_t)L.mcap * 8;
+    Mapped m;
+    if (!writeRing(L, m)) { printf("can't write the ring\n"); return 1; }
+    memset(m.p + HEADER, 0, (size_t)(L.size - HEADER));
+    wr<uint32_t>(m.p, 36, 1);   // MODE_REPLACE
+    float *s = (float *)(m.p + HEADER);
+    Instance x;
+    if (!create(x, 48000, 1, F)) { printf("can't start the effect\n"); return 1; }
+    uint64_t wp = 0;
+    uint32_t seq = 0;
+    auto write = [&](uint32_t n) {   // 100 ms of tone, 100 ms of silence
+        for (uint32_t i = 0; i < n; i++) {
+            uint64_t k = wp + i;
+            s[k & (L.cap - 1)] = (k / 4800) % 2 ? 0.0f
+                : 0.4f * (float)sin(2 * 3.141592653589793 * 440 * (double)k / 48000);
+        }
+        wp += n;
+        wr<uint64_t>(m.p, 16, wp);
+        wr<uint64_t>(m.p, 24, GetTickCount64());
+        wr<uint32_t>(m.p, 32, 1);
+        if (sync) {   // made from the clean mic up to now
+            wr<uint32_t>(m.p, 88, ++seq);
+            wr<uint64_t>(m.p, 96, wp);
+            wr<uint64_t>(m.p, 104, rd<uint64_t>(m.p, 56));
+            wr<uint32_t>(m.p, 88, ++seq);
+        }
+    };
+    auto block = [&]() {
+        for (uint32_t i = 0; i < F; i++) x.in[i] = 0.001f;
+        APO_CONNECTION_PROPERTY in = {(UINT_PTR)x.in, F, BUFFER_VALID, 0};
+        APO_CONNECTION_PROPERTY o = {(UINT_PTR)x.out, 0, BUFFER_INVALID, 0};
+        APO_CONNECTION_PROPERTY *pi = &in, *po = &o;
+        x.rt->APOProcess(1, &pi, 1, &po);
+    };
+    auto slot = [&](uint32_t off) -> uint64_t {   // this instance's slot
+        for (uint32_t k = 0; SLOT_OFFSET + (k + 1) * 64 <= HEADER; k++) {
+            const uint8_t *p = m.p + SLOT_OFFSET + k * 64;
+            if (rd<LONG>(p, 0)) return off == 24 ? rd<uint64_t>(p, off) : rd<uint32_t>(p, off);
+        }
+        return 0;
+    };
+    write(3 * F);
+    // The board writes right after each mic block. At block 100 it's a block late (then
+    // writes both); from 600 to 640, late every other block.
+    uint32_t owed = 0, most1 = 0, most2 = 0;
+    int fails = 0;
+    for (int k = 0; k < 1600; k++) {
+        block();
+        uint32_t n = F + owed;
+        owed = 0;
+        if (k == 100 || (k >= 600 && k < 640 && k % 2 == 0)) { owed = n; n = 0; }
+        if (n) write(n);
+        uint32_t lead = (uint32_t)slot(32);
+        if (k < 600) most1 = lead > most1 ? lead : most1;
+        else most2 = lead > most2 ? lead : most2;
+        if (k == 590 && (lead != BASE || wp - slot(24) != BASE)) {
+            printf("  after the first hiccup: lead %u, reads %llu behind\n", lead,
+                   (unsigned long long)(wp - slot(24)));
+            fails++;
+        }
+    }
+    uint64_t lead = slot(32), behind = wp - slot(24);
+    printf("%s: one hiccup: lead up to %u; late every other block: up to %u; at the end %llu,"
+           " reads %llu behind the board, late %llu times\n", sync ? "sync pair" : "no sync pair",
+           most1, most2, (unsigned long long)lead, (unsigned long long)behind,
+           (unsigned long long)slot(36));
+    destroy(x);
+    m.close();
+    // one hiccup a block long: one step. Late every other block: a block more than the
+    // normal lead covers it (two steps); the same lag, counted again before the step it
+    // already took was taken, piled steps on top of that.
+    if (most1 != BASE + STEP) { printf("  one hiccup should take one step\n"); fails++; }
+    if (most2 > BASE + 2 * STEP) { printf("  a lag of one block grew it more than it needed\n"); fails++; }
+    // (the board just wrote: it reads exactly the lead behind it)
+    if (lead != BASE || behind != BASE) { printf("  the lead didn't come back to %u\n", BASE); fails++; }
+    return fails;
+}
+
+static int leadtest() {
+    g_rng = 7;
+    g_caseSeed = 0;
+    int fails = leadcase(true) + leadcase(false);
+    printf(fails ? "LEAD FAILED\n" : "LEAD OK\n");
+    return fails ? 1 : 0;
+}
+
 int main(int argc, char **argv) {
     if (argc < 4) {
-        fprintf(stderr, "usage: fuzzhost dll workdir seconds seed | --selftest | --replay seed\n");
+        fprintf(stderr, "usage: fuzzhost dll workdir seconds seed | --selftest | --lead | --replay seed\n");
         return 2;
     }
     setvbuf(stdout, NULL, _IONBF, 0);   // (Windows' _IOLBF is full buffering: logs stay empty)
@@ -654,6 +750,7 @@ int main(int argc, char **argv) {
     }
     if (!g_faultsFn) printf("(not the fuzz build: faults the guard catches go uncounted)\n");
     if (!strcmp(argv[3], "--selftest")) return selftest();
+    if (!strcmp(argv[3], "--lead")) return leadtest();
     if (!strcmp(argv[3], "--replay")) {
         uint64_t seed = argc > 4 ? strtoull(argv[4], NULL, 10) : 0;
         bool ok = runCase(seed, true);
