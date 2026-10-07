@@ -14,6 +14,7 @@ from PySide6.QtWidgets import (QDialog, QFrame, QHBoxLayout, QLabel, QPushButton
 from soundboard import __version__, updates
 from soundboard.ui import fit
 from soundboard.ui.panel import hint_label, icon_label
+from soundboard.i18n import _
 
 
 @dataclass(frozen=True)
@@ -211,7 +212,7 @@ class WhatsNewDialog(QDialog):
         fit.watch(self)
         self.mw = mw
         self.page = ""   # set when they pressed the settings button
-        self.setWindowTitle("What's new")
+        self.setWindowTitle(_("What's new"))
         self.setMinimumWidth(520)
         lay = QVBoxLayout(self)
         lay.setContentsMargins(20, 18, 20, 16)
@@ -219,20 +220,22 @@ class WhatsNewDialog(QDialog):
         top = notes[0]
         lay.addWidget(_heading(top.headline))
         lay.addWidget(hint_label(
-            f"{'Updated to' if updated else 'New in'} Onion Board {__version__}. "
-            "Nothing changes until you want it to: everything works as before."))
+            _("Updated to Onion Board {version}. Nothing changes until you want it to: "
+              "everything works as before.", version=__version__) if updated else
+            _("New in Onion Board {version}. Nothing changes until you want it to: everything "
+              "works as before.", version=__version__)))
         for note in notes:
             for icon, title, text in note.items:
                 lay.addWidget(self._item(icon, title, text))
         lay.addStretch(1)   # any spare height goes here, not between the rows
         buttons = QHBoxLayout()
-        notes_btn = QPushButton("Full release notes")
-        notes_btn.setToolTip("This version's page on GitHub, in your browser")
+        notes_btn = QPushButton(_("Full release notes"))
+        notes_btn.setToolTip(_("This version's page on GitHub, in your browser"))
         notes_btn.clicked.connect(lambda: QDesktopServices.openUrl(QUrl(
             f"https://github.com/{updates.REPO}/releases/tag/v{__version__}")))
         buttons.addWidget(notes_btn)
         buttons.addStretch(1)
-        close = QPushButton("Close")
+        close = QPushButton(_("Close"))
         close.clicked.connect(self.reject)
         buttons.addWidget(close)
         page = next((n for n in notes if n.page), None)

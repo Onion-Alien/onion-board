@@ -466,8 +466,10 @@ QFrame#card QWidget { background:transparent; }
 QFrame#card[interactive="true"] { border:1px solid transparent; }
 QFrame#card[interactive="true"][hovered="true"] { background:$card_hi; border-color:$border_hi; }
 QFrame#card[interactive="true"]:focus { background:$card_hi; border-color:$accent; }
+QFrame#card[interactive="true"][playing="true"] { background:$card_hi; border:2px solid $accent; }
 QLabel#section { color:$section; font-size:8pt; font-weight:700; letter-spacing:1px; padding-top:8px;
                  qproperty-indent:0; }  /* padding alone makes Qt indent the text 3 px */
+QLabel#section[head="true"] { padding-top:0; }
 QLabel#hint, QLabel#muted { color:$muted; }
 QLabel#hint { font-size:8.5pt; }
 QLabel[tone="ok"], QLabel#hint[tone="ok"] { color:$ok_text; }
@@ -493,10 +495,17 @@ QPushButton#primary:focus { border:1px solid $text_hi; }
 QPushButton#danger { background:$danger_bg; border:1px solid $danger_border; color:$danger_text; font-weight:600; }
 QPushButton#danger:hover { background:$danger_hover; }
 QPushButton#small { padding:2px 8px; font-size:8pt; }
+QPushButton#backhome { background:$danger_bg; border:1px solid $danger_border; color:$danger_text;
+    font-weight:700; font-size:10pt; padding:6px 14px; border-radius:8px; }
+QPushButton#backhome:hover { background:$danger_hover; border-color:$danger_text; }
 QPushButton#tabinfo { padding:0; border-radius:8px; background:transparent; border:1px solid transparent; }
 QPushButton#tabinfo:hover { background:$btn_hover; border-color:$border_hi; }
 QPushButton#tabinfo:pressed { background:$btn_press; border-color:$accent; }
 QPushButton#tabinfo:focus { border-color:$accent; }
+QPushButton#moretabs { padding:3px 10px; border-radius:8px; background:transparent; border:1px dashed $border_hi; }
+QPushButton#moretabs:hover { background:$btn_hover; border-color:$accent; }
+QPushButton#moretabs:pressed, QPushButton#moretabs:focus { border-color:$accent; }
+QPushButton#moretabs::menu-indicator { image:none; width:0; }
 QPushButton#settings { padding:6px 14px; font-weight:600; }
 QFrame#transport, QFrame#deck { background:$panel; border-radius:12px; }
 QFrame#mixer { background:transparent; }
@@ -551,6 +560,11 @@ QSlider::handle:vertical { background:white; border:1px solid $border_hi; width:
 QPushButton#micbanner { background:#d32f2f; color:white; font-weight:700; font-size:11pt;
     border:none; border-radius:10px; padding:10px; }
 QFrame#urgentbar { background:$warn_bg; border:1px solid $warn_text; border-radius:10px; }
+QFrame#tipbar { background:$panel; border:1px solid $border_hi; border-radius:10px; }
+QFrame#tipbar QLabel { background:transparent; color:$text; }
+QFrame#tipbar QPushButton#urgenthide { background:transparent; color:$muted; border:none;
+                                       border-radius:6px; font-weight:700; font-size:12pt; }
+QFrame#tipbar QPushButton#urgenthide:hover { background:$btn_hover; }
 QFrame#urgentbar QLabel { background:transparent; color:$warn_text; font-weight:600; }
 QFrame#urgentbar QPushButton#urgenthide { background:transparent; color:$warn_text; border:none;
     border-radius:14px; padding:0; font-size:12pt; }
@@ -687,6 +701,7 @@ QPushButton#fxreset, QFrame#card QPushButton#fxreset, QFrame#card[roomy="true"] 
 QPushButton#fxreset:hover, QFrame#card QPushButton#fxreset:hover, QFrame#card[roomy="true"] QPushButton#fxreset:hover { color:$text; background:transparent; }
 QLabel#pill { background:$inset; border:1px solid $border; border-radius:10px; padding:3px 10px; color:$muted; font-size:8.5pt; font-weight:600; }
 QLabel#pill[slow="true"] { color:$warn_text; border-color:$warn_text; }
+QLabel#pill[on="true"] { color:$live_text; border-color:$live_border; }
 QPushButton#fold { background:transparent; border:none; color:$muted; padding:3px 6px; font-size:8.5pt; font-weight:600; }
 QPushButton#fold:hover, QPushButton#fold:checked { color:$text; background:transparent; }
 QFrame#card QPushButton#fold, QFrame#card QPushButton#fold:checked { background:transparent; }

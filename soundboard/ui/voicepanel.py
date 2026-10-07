@@ -30,7 +30,7 @@ from soundboard.speech import customvoices, translation, winvoices
 from soundboard.speech.aivoice import AiVoiceController
 from soundboard.speech.live import SpeechController, clean_settings
 from soundboard.ui import appstate, art, busy, icons
-from soundboard.ui.panel import (UndoBar, VolumeControl, bar, card, hint_label, icon_label,
+from soundboard.ui.panel import (Flow, UndoBar, VolumeControl, bar, card, hint_label, icon_label,
                                  section_label, vsep)
 from soundboard.ui.responsive import FitWidth
 from soundboard.ui.widgets import Meter
@@ -327,8 +327,11 @@ KEEP = frozenset({"cleanup"})
 class EffectRow(QFrame):
     """One effect as a card: icon, name, an on/off switch, what it does, and its
     settings while it's on. `hero` (Pitch, Clean up my mic): the settings always
-    show, and moving one switches the effect on."""
+    show, and moving one switches the effect on. Its arrow folds it down to just
+    its title line (`folded_changed`)."""
     changed = Signal()
+    folded_changed = Signal(bool)
+    reshaped = Signal()   # taller or shorter: switched on or off, folded or opened
 
     def __init__(self, cls: type[voicefx.Effect], cfg: dict, hero: bool = False):
         super().__init__()
@@ -359,6 +362,13 @@ class EffectRow(QFrame):
         self.chk = Switch(f"Turn {cls.name} on or off")
         self.chk.setChecked(bool(cfg.get("on")))
         head.addWidget(self.chk)
+        self.arrow = QPushButton()
+        self.arrow.setObjectName("fold")
+        self.arrow.setFixedSize(24, 24)
+        self.arrow.setCursor(Qt.PointingHandCursor)
+        self.arrow.clicked.connect(lambda: self.set_folded(not self._folded, asked=True))
+        head.addWidget(self.arrow)
+        self._folded = False
         v.addLayout(head)
         self.desc = hint_label(cls.description)
         self.desc.setObjectName("fxdesc")
@@ -383,22 +393,47 @@ class EffectRow(QFrame):
             grid.setColumnStretch(c, 1)
         v.addWidget(self.body)
         self.chk.toggled.connect(self._toggled)
-        self._shown: bool | None = None   # the on/off the card last showed
+        self._shown: tuple | None = None   # the (on, folded) the card last showed
+        self._paint_arrow()
         self._show()
 
     def _show(self):
         on = self.chk.isChecked()
-        if on == self._shown:
+        if (on, self._folded) == self._shown:
             return   # a voice pick loads all 13 cards: only those it switched need showing
-        self._shown = on
-        self.body.setVisible(on or self.hero)
-        self.btn_reset.setVisible(on)
+        self._shown = (on, self._folded)
+        self.desc.setVisible(not self._folded)
+        self.body.setVisible((on or self.hero) and not self._folded)
+        self.btn_reset.setVisible(on and not self._folded)
         if bool(self.property("on")) != on:
             self.setProperty("on", on)
             self.style().unpolish(self)
             self.style().polish(self)
+        self.reshaped.emit()
 
-    def _toggled(self, _on):
+    def is_folded(self) -> bool:
+        return self._folded
+
+    def set_folded(self, folded: bool, asked: bool = False):
+        """Folded: just the icon, name, switch and arrow. `asked`: the arrow (or the
+        switch) did it, so it's remembered."""
+        if folded == self._folded:
+            return
+        self._folded = folded
+        self._paint_arrow()
+        self._show()
+        if asked:
+            self.folded_changed.emit(folded)
+
+    def _paint_arrow(self):
+        icons.set_icon(self.arrow, "fold" if self._folded else "fold_open", "muted", "text",
+                       size=12)
+        self.arrow.setToolTip(f"Show {self.cls.name}" if self._folded
+                              else f"Fold {self.cls.name} away")
+
+    def _toggled(self, on):
+        if on and self._folded:
+            self.set_folded(False, asked=True)   # switched on: show its sliders
         self._show()
         self.changed.emit()
 
@@ -467,6 +502,7 @@ class VoiceFxPanel(QWidget):
     changed = Signal(dict)
     chat_help = Signal()
     tip_dismissed = Signal()
+    folds_changed = Signal(list)   # the effect types whose cards are folded away
 
     COLS = 3
 
@@ -490,7 +526,8 @@ class VoiceFxPanel(QWidget):
         v = QVBoxLayout(self)
         v.setContentsMargins(0, 0, 0, 0)
         v.setSpacing(12)
-        v.addWidget(section_label("VOICE CHANGER"))
+        self.title = section_label("VOICE CHANGER")
+        v.addWidget(self.title)
         v.addWidget(hint_label("Change your mic live for whoever you send sounds to (Discord, a "
                                "game, OBS). Pick a voice to turn it on, then use Hear what "
                                "they hear at the bottom to try it."))
@@ -601,19 +638,11 @@ class VoiceFxPanel(QWidget):
         tv = QVBoxLayout(self.tweak)
         tv.setContentsMargins(0, 0, 0, 0)
         tv.setSpacing(10)
-        head = QHBoxLayout()
-        head.setSpacing(8)
-        head.addWidget(QLabel("<b>Make it yours</b>"))
-        head.addStretch(1)
-        self.delay = QLabel()
-        self.delay.setObjectName("pill")
-        head.addWidget(self.delay)
-        tv.addLayout(head)
-        self.hero_box = QVBoxLayout()
-        self.hero_box.setSpacing(10)
-        tv.addLayout(self.hero_box)
-        srow = QHBoxLayout()
-        srow.setSpacing(6)
+        # the window's buttons, all along the top (they wrap when it's narrow); the
+        # title bar already says "Make it yours"
+        tools = QWidget()
+        srow = Flow(tools, gap=6)
+        tv.addWidget(tools)
         self.btn_random = QPushButton("Randomize")
         self.btn_random.setIcon(art.random_icon())
         self.btn_random.setIconSize(QSize(16, 16))
@@ -627,34 +656,31 @@ class VoiceFxPanel(QWidget):
                                  "button under “Pick a voice”.")
         self.btn_save.clicked.connect(self.save_voice)
         srow.addWidget(self.btn_save)
-        srow.addStretch(1)
-        tv.addLayout(srow)
         # saved voices: share one as a line of text, add one a friend sent
-        vrow = QHBoxLayout()
-        vrow.setSpacing(6)
         self.btn_share = QPushButton("Copy share code")
         icons.set_icon(self.btn_share, "copy")
-        self.btn_share.setObjectName("small")
         self.btn_share.setToolTip("Copy the saved voice that's on as a short code to paste to "
                                   "a friend: just its name and settings")
         self.btn_share.clicked.connect(lambda: self.copy_code(self._preset))
-        vrow.addWidget(self.btn_share)
+        srow.addWidget(self.btn_share)
         self.btn_import = QPushButton("Import a code…")
         icons.set_icon(self.btn_import, "plus")
-        self.btn_import.setObjectName("small")
         self.btn_import.setToolTip("Add a voice someone sent you as a code (it starts "
                                    "with “OB1-”)")
         self.btn_import.clicked.connect(lambda: self.import_code())
-        vrow.addWidget(self.btn_import)
+        srow.addWidget(self.btn_import)
         self.btn_bin = QPushButton("Recently deleted")
         icons.set_icon(self.btn_bin, "trash")
-        self.btn_bin.setObjectName("small")
         self.btn_bin.setToolTip("Saved voices you deleted, kept for "
                                 f"{savedvoices.KEEP_DAYS} days so you can bring them back")
         self.btn_bin.clicked.connect(self.show_deleted)
-        vrow.addWidget(self.btn_bin)
-        vrow.addStretch(1)
-        tv.addLayout(vrow)
+        srow.addWidget(self.btn_bin)
+        self.delay = QLabel()
+        self.delay.setObjectName("pill")
+        srow.addWidget(self.delay)
+        self.hero_box = QVBoxLayout()
+        self.hero_box.setSpacing(10)
+        tv.addLayout(self.hero_box)
         pv.addWidget(self.tweak)
 
         # ---- every effect, as cards in groups
@@ -667,17 +693,31 @@ class VoiceFxPanel(QWidget):
                                       "own voice. Changing anything switches to “My own "
                                       "mix”; like it? Save it as a voice and it gets a "
                                       "button of its own."))
-        self._groups: dict[str, tuple[QLabel, QGridLayout]] = {}
+        # two columns that stack their cards tightly, each card going under the shorter
+        # one: a grid (or a row per group) left holes beside the shorter cards. The
+        # group titles show in one column only, where they can't leave a hole.
+        self._groups: dict[str, QLabel] = {}
         for title, _types in (*GROUPS, (ADDON_GROUP, ())):
             lbl = QLabel(title)
             lbl.setObjectName("fxgroup")
-            g = QGridLayout()
-            g.setHorizontalSpacing(10)
-            g.setVerticalSpacing(10)
-            self.box.addWidget(lbl)
-            self.box.addLayout(g)
-            self._groups[title] = (lbl, g)
+            self._groups[title] = lbl
+        self._fx_row = QHBoxLayout()
+        self._fx_row.setSpacing(10)
+        self._fx_columns: list[QVBoxLayout] = []
+        for _ in range(2):
+            col = QVBoxLayout()
+            col.setSpacing(10)
+            col.addStretch(1)
+            self._fx_row.addLayout(col, 1)
+            self._fx_columns.append(col)
+        self.box.addLayout(self._fx_row)
         self._fx_cols = 2
+        self._placed: list | None = None   # what each column holds now
+        self._replace = QTimer(self)       # a voice pick changes many cards: once after
+        self._replace.setSingleShot(True)
+        self._replace.setInterval(0)
+        self._replace.timeout.connect(self._place_cards)
+        self._folded_fx: set[str] = set()
         pv.addWidget(self.more)
         pv.addStretch(1)
         done = QHBoxLayout()
@@ -835,6 +875,8 @@ class VoiceFxPanel(QWidget):
             if cols != self._fx_cols:
                 self._fx_cols = cols
                 self._place_cards()
+            else:
+                self._reshape()   # wider or narrower: the cards' text wraps differently
         return super().eventFilter(obj, e)
 
     # ------------------------------------------------------------------ saved voices
@@ -1152,6 +1194,9 @@ class VoiceFxPanel(QWidget):
                 cfg = {"on": True} if etype in KEEP else {}
             r = EffectRow(cls, cfg, hero=etype in HERO)
             r.changed.connect(lambda t=etype: self._edited(t))
+            r.set_folded(etype in self._folded_fx)
+            r.folded_changed.connect(lambda f, t=etype: self._card_folded(t, f))
+            r.reshaped.connect(self._reshape)
             if etype in HERO:
                 self.hero_box.insertWidget(min(HERO.index(etype), self.hero_box.count()), r)
             self.rows[etype] = r
@@ -1159,22 +1204,66 @@ class VoiceFxPanel(QWidget):
         if added:
             self._place_cards()
 
-    def _place_cards(self):
-        """The effect cards into their groups' grids, `_fx_cols` a row."""
-        cols = self._fx_cols
-        placed = set(HERO)
+    def set_folded(self, types):
+        """Fold these effects' cards (the rest open): what `folds_changed` said last time."""
+        self._folded_fx = {t for t in types if isinstance(t, str)}
+        for t, r in self.rows.items():
+            r.set_folded(t in self._folded_fx)
+
+    def _card_folded(self, etype: str, folded: bool):
+        (self._folded_fx.add if folded else self._folded_fx.discard)(etype)
+        self.folds_changed.emit(sorted(self._folded_fx))
+
+    def _ordered_cards(self) -> list[tuple[str, list[EffectRow]]]:
+        """(group title, its cards) in reading order; add-on effects last."""
+        grouped = set(HERO)
         for _title, types in GROUPS:
-            placed.update(types)
-        for title, (lbl, g) in self._groups.items():
-            types = dict(GROUPS).get(title) or [t for t in self.rows if t not in placed]
-            cards = [self.rows[t] for t in types if t in self.rows]
-            for c in cards:
-                g.removeWidget(c)
-            for i, c in enumerate(cards):
-                g.addWidget(c, i // cols, i % cols, Qt.AlignTop)
-            for c in range(2):
-                g.setColumnStretch(c, 1 if c < cols else 0)
-            lbl.setVisible(bool(cards))
+            grouped.update(types)
+        out = []
+        for title in self._groups:
+            types = dict(GROUPS).get(title) or [t for t in self.rows if t not in grouped]
+            out.append((title, [self.rows[t] for t in types if t in self.rows]))
+        return out
+
+    @staticmethod
+    def _card_height(c: QWidget, width: int) -> int:
+        return c.heightForWidth(width) if c.hasHeightForWidth() else c.sizeHint().height()
+
+    def _place_cards(self):
+        """The effect cards into the columns: one column with the group titles, or two
+        with each card under whichever column is shorter so far (in reading order),
+        so a short card never leaves a hole beside a tall one."""
+        groups = self._ordered_cards()
+        if self._fx_cols == 1:
+            plan = [[w for title, cards in groups if cards
+                     for w in (self._groups[title], *cards)], []]
+        else:
+            width = max(200, (self.more.width() - self._fx_row.spacing()) // 2)
+            plan, heights = [[], []], [0, 0]
+            for _title, cards in groups:
+                for c in cards:
+                    i = 0 if heights[0] <= heights[1] else 1
+                    plan[i].append(c)
+                    heights[i] += self._card_height(c, width) + 10
+        if plan == self._placed:
+            return   # nothing moves (most on/off flips)
+        self._placed = plan
+        for lbl in self._groups.values():
+            lbl.hide()
+        for col in self._fx_columns:
+            while col.count() > 1:           # all but the stretch
+                col.takeAt(0)
+        for col, widgets in zip(self._fx_columns, plan):
+            for w in widgets:
+                col.insertWidget(col.count() - 1, w)   # above the column's stretch
+                if isinstance(w, QLabel):
+                    w.show()                           # a group title
+        self._fx_row.setStretch(1, 1 if self._fx_cols == 2 else 0)
+
+    def _reshape(self):
+        """A card got taller or shorter (on/off, folded): balance the columns again."""
+        if self._fx_cols == 2:
+            self._replace.start()
 
     def _mine(self) -> bool:
         """Is Fine-tune showing your own mix? A nudged preset counts only while you
@@ -1291,6 +1380,7 @@ class SpeechPanel(QWidget):
     _voice_done = Signal(str, str)  # a Windows voice install: result, what went wrong
     downloaded = Signal()           # a translation was downloaded or removed
     live_changed = Signal(bool)     # "talk as a computer voice" started / stopped
+    lang_changed = Signal()         # Speak in: another language picked (VoicePanel)
 
     def __init__(self, controller: SpeechController, settings: dict,
                  module_list: list[mods.ModuleInfo]):
@@ -1330,23 +1420,39 @@ class SpeechPanel(QWidget):
         v.setContentsMargins(0, 0, 0, 0)
         v.setSpacing(12)
 
-        # ---- live voice to speech: the main event
-        v.addWidget(section_label("TALK AS A COMPUTER VOICE"))
-        v.addWidget(hint_label("Pick a voice and press Start. Your speech is transcribed on "
-                               "this PC, then read aloud in that voice after a short delay."))
-        self.live_box = QWidget()
-        lv = QVBoxLayout(self.live_box)
+        # ---- live voice to speech
+        self.title = section_label("SPEAK ANOTHER LANGUAGE")
+        v.addWidget(self.title)
+        self.lbl_intro = hint_label(
+            "Talk in English and others hear another language. The AI voice or the voice "
+            "changer says it when one of them is on; otherwise press Start and a computer "
+            "voice does. Or type a line at the bottom.")
+        v.addWidget(self.lbl_intro)
+        # Speak in belongs to every voice on the tab (VoicePanel._sync_translate).
+        # English in, the chosen language out.
+        self.bg_for = ""             # translating for the "ai" voice or the "fx" changer
+        self._bg_key: tuple = ()     # (who, language) the running helper was started for
+        self._bg_failed: tuple = ()  # the key it last stopped with an error for
+        self.lang_box = QWidget()
+        lv = QVBoxLayout(self.lang_box)
         lv.setContentsMargins(0, 0, 0, 0)
-        lv.setSpacing(12)
-        # speak in another language: English in, the chosen language out
+        lv.setSpacing(8)
         trow = QHBoxLayout()
         self.lbl_lang = QLabel("Speak in")
         trow.addWidget(self.lbl_lang)
         self.cb_lang = QComboBox()
-        self.cb_lang.setToolTip("Say it in English; the computer voice says it in this "
+        self.cb_lang.setToolTip("Say it in English; whichever voice is on says it in this "
                                 "language. Each language is a one-time download.")
         trow.addWidget(self.cb_lang, 1)
         lv.addLayout(trow)
+        self.lbl_delay = hint_label("")
+        theme.set_tone(self.lbl_delay, "warn")
+        self.lbl_delay.hide()
+        lv.addWidget(self.lbl_delay)
+        self.lbl_bg = hint_label("")
+        self.lbl_bg.setTextFormat(Qt.PlainText)     # shows the helper's error text
+        self.lbl_bg.hide()
+        lv.addWidget(self.lbl_bg)
         self.tr_box = QWidget()
         tv = QVBoxLayout(self.tr_box)
         tv.setContentsMargins(0, 0, 0, 0)
@@ -1389,21 +1495,23 @@ class SpeechPanel(QWidget):
         tb.addStretch(1)
         tv.addLayout(tb)
         lv.addWidget(self.tr_box)
-        v.addWidget(self.live_box)
+        v.addWidget(self.lang_box)
 
         # ---- the voice (shared by live and typed speech): set before you press Start
         grid = QGridLayout()
         grid.setHorizontalSpacing(12)
         grid.setVerticalSpacing(14)
-        grid.addWidget(QLabel("Voice"), 0, 0)
+        grid.addWidget(QLabel("Computer voice"), 0, 0)
         self.cb_voice = QComboBox()
+        self.cb_voice.setToolTip("Speaks for you when no AI voice or voice changer is on, "
+                                 "and says lines you type")
         self.cb_voice.addItem("Loading voices…", "")
         self.cb_voice.setEnabled(False)
         # the list shows a stand-in, not the saved voice (still loading, speech failed,
         # or that voice isn't installed now): other settings changes keep the saved one
         self._voice_standin = True
         grid.addWidget(self.cb_voice, 0, 1)
-        # custom voices sit under More options: this gets you there from the list itself
+        # custom voices have their own box, opened from next to the list itself
         self.b_add_voices = QPushButton("Add voices…")
         icons.set_icon(self.b_add_voices, "plus")
         self.b_add_voices.setToolTip("Your own voices: a TTS server on your PC (Kokoro, "
@@ -1423,7 +1531,7 @@ class SpeechPanel(QWidget):
         lv = QVBoxLayout(self.start_box)
         lv.setContentsMargins(0, 0, 0, 0)
         lv.setSpacing(12)
-        self.b_live = QPushButton("Start talking as the voice")
+        self.b_live = QPushButton("Start the computer voice")
         icons.set_icon(self.b_live, "mic", "on_accent", "on_accent")
         self.b_live.setCheckable(True)
         self.b_live.setMinimumHeight(40)
@@ -1477,7 +1585,7 @@ class SpeechPanel(QWidget):
         mrow.addWidget(b_open)
         mrow.addStretch(1)
         mv.addLayout(mrow)
-        v.addWidget(self.missing)
+        v.insertWidget(v.indexOf(self.lang_box) + 1, self.missing)   # first thing to do
         # install / update progress: outside `missing`, which is hidden for an update
         self.lbl_install = hint_label("")
         self.lbl_install.hide()
@@ -1513,7 +1621,7 @@ class SpeechPanel(QWidget):
         ov.addWidget(self.chk_mute)
         self.chk_fx = QCheckBox("Put the voice changer on the computer voice")
         self.chk_fx.setToolTip("With a voice picked under Voice changer, the computer voice "
-                               "gets the same effect (a chipmunk computer voice, say).")
+                               "gets the same effect (a chipmunk robot voice, say).")
         self.chk_fx.setChecked(self.s["voice_fx"])
         ov.addWidget(self.chk_fx)
         self.b_update = QPushButton("Update speech recognition")
@@ -1521,9 +1629,23 @@ class SpeechPanel(QWidget):
                                  "needs (translation, for one). Needs Python 3.12+.")
         self.b_update.clicked.connect(self._install)
         ov.addWidget(self.b_update, 0, Qt.AlignLeft)
-        # ---- custom voices: a TTS server on this PC, a TTS program, Piper voice packs
+        v.addWidget(self.opts)
+        self.opts.hide()
+        # ---- custom voices: a TTS server on this PC, a TTS program, Piper voice packs.
+        # Their own box, opened by "Add voices…" (it made More options a long list)
+        self.custom_box = QWidget()
+        ov = QVBoxLayout(self.custom_box)
+        ov.setContentsMargins(0, 0, 0, 0)
+        ov.setSpacing(8)
+        chead = QHBoxLayout()
         self.custom_head = section_label("CUSTOM VOICES")
-        ov.addWidget(self.custom_head)
+        chead.addWidget(self.custom_head)
+        chead.addStretch(1)
+        b_close = QPushButton("Close")
+        b_close.setObjectName("small")
+        b_close.clicked.connect(lambda: self.custom_box.hide())
+        chead.addWidget(b_close)
+        ov.addLayout(chead)
         ov.addWidget(hint_label("Use a TTS server running on your PC (Kokoro, AllTalk, any "
                                 "OpenAI-style one) or drop voice packs (Piper) into the "
                                 "voices folder. They join the Voice list above."))
@@ -1542,8 +1664,8 @@ class SpeechPanel(QWidget):
         self.lbl_custom.setTextFormat(Qt.PlainText)    # shows file names and errors
         self.lbl_custom.hide()
         ov.addWidget(self.lbl_custom)
-        v.addWidget(self.opts)
-        self.opts.hide()
+        v.addWidget(self.custom_box)
+        self.custom_box.hide()
         self.btn_opts.toggled.connect(lambda on: (
             self.opts.setVisible(on),
             icons.set_icon(self.btn_opts, "fold_open" if on else "fold", "muted", "text",
@@ -1658,8 +1780,8 @@ class SpeechPanel(QWidget):
             self._tts_error(f"Text-to-speech isn't available: {errors.plain(error)}")
 
     def show_custom_voices(self):
-        """Open More options and bring its Custom voices part into view."""
-        self.btn_opts.setChecked(True)
+        """Open the Custom voices box and bring it into view."""
+        self.custom_box.show()
         w = self.parentWidget()
         while w is not None and not isinstance(w, QScrollArea):
             w = w.parentWidget()
@@ -1745,6 +1867,8 @@ class SpeechPanel(QWidget):
         self.ctl.speaker.rate = self.s["rate"]
         self.ctl.gain = self.s["gain"]
         self.ctl.set_mute_real_voice(self.s["mute_real_voice"])
+        if self.ctl.live and not self.bg_for:
+            self.ctl.set_replace(self.s["mute_real_voice"])
         self.ctl.voice_fx = self.s["voice_fx"]
         self.changed.emit(dict(self.s))
 
@@ -1775,13 +1899,20 @@ class SpeechPanel(QWidget):
         self.cb_lang.setIconSize(QSize(20, 20))
         self.cb_lang.setCurrentIndex(max(0, self.cb_lang.findData(self.s["translate"])))
         self.cb_lang.blockSignals(False)
-        self.lbl_lang.setVisible(bool(self.langs))
-        self.cb_lang.setVisible(bool(self.langs))
+        self.lang_box.setVisible(self.module is not None and self.module.installed
+                                 and bool(self.langs))
         self._refresh_translation()
 
     def _lang_picked(self, *_):
         self._settings_edited()
         self._refresh_translation()
+        self.lang_changed.emit()
+
+    def translating(self) -> mods.ModuleInfo | None:
+        """The language picked under Speak in, when it's downloaded and ready."""
+        m = self._lang()
+        ok = self.module is not None and self.module.installed
+        return m if ok and m is not None and m.installed else None
 
     def _voice_for(self, m: mods.ModuleInfo) -> str:
         return self.ctl.tts.voice_for(m.language, self.s["voice"])
@@ -1789,6 +1920,14 @@ class SpeechPanel(QWidget):
     def _refresh_translation(self):
         """The box under "Speak in": download it, get its Windows voice, or all set."""
         m = self._lang()
+        if m is not None:
+            name = m.language_name or m.language
+            self.lbl_delay.setText(
+                f"⏱ Others hear you in {name} a few seconds late: each sentence is "
+                "written down, translated, then spoken once you've finished it. It works "
+                "with the AI voice, the voice changer and the computer voice; your real voice "
+                "is muted meanwhile.")
+        self.lbl_delay.setVisible(m is not None)
         busy = self._dl_busy is not None
         self.tr_box.setVisible(m is not None or busy)
         for b in (self.b_dl, self.b_dl_cancel, self.b_voice_install, self.b_voices,
@@ -1811,7 +1950,7 @@ class SpeechPanel(QWidget):
             # downloading voices switched off in Settings > Privacy: greyed, saying why
             self.b_dl.setEnabled(not live and net.allowed("voices"))
             self.b_dl.setToolTip(net.off_message("voices") if not net.allowed("voices") else
-                                 "Stop the computer voice to download this" if live else "")
+                                 "Stop the voice to download this" if live else "")
             return
         self.b_dl_remove.setVisible(not live)
         if not self.ctl.tts.voices:        # still loading, or no speech at all
@@ -2013,7 +2152,7 @@ class SpeechPanel(QWidget):
     def _refresh_module(self):
         m = self.module
         ok = m is not None and m.installed
-        self.live_box.setVisible(ok)
+        self.lang_box.setVisible(ok and bool(self.langs))
         self.start_box.setVisible(ok)
         self.missing.setVisible(not ok)
         self.b_install.setVisible(m is not None and not ok)
@@ -2023,8 +2162,9 @@ class SpeechPanel(QWidget):
                 "The live-voice add-on is missing from this copy of Onion Board. Run the "
                 "installer again (it comes with every install), then press Refresh below.")
         elif not ok:
-            self.lbl_missing.setText("Live voice needs its speech recognition installed first "
-                                     "(runs on this PC; what you say never leaves it). "
+            self.lbl_missing.setText("Speaking another language needs speech recognition "
+                                     "installed first (runs on this PC; what you say never "
+                                     "leaves it). "
                                      "Needs Python 3.12+ from python.org.")
             self.lbl_missing.setToolTip(str(m.path))
 
@@ -2066,23 +2206,30 @@ class SpeechPanel(QWidget):
                                      "Press it again to retry; if it keeps failing, run "
                                      "install.bat in the add-on's folder to see why.")
 
+    def _live_args(self) -> list[str]:
+        """The live-voice helper's arguments; sets the voice translated lines use."""
+        # only our own models: any other name makes the helper download that repo
+        model = self.s["model"] if self.s["model"] in {d for _n, d in MODELS} else MODELS[0][1]
+        lang = str(self.s["language"]).strip().lower()
+        lang = lang if re.fullmatch(r"auto|[a-z]{2,3}", lang) else "en"
+        args = ["--model", model, "--language", lang]
+        m = self._lang()
+        self.ctl.live_voice = None
+        if m is not None and m.installed:
+            args += ["--translate", str(translation.model_dir(m))]
+            self.ctl.live_voice = self._voice_for(m) or None
+        return args
+
     def _toggle_live(self, on: bool):
+        if on and self.bg_for:           # Start takes over from translating for a voice
+            self._stop_bg()
         if on and not self.ctl.live:
-            # only our own models: any other name makes the helper download that repo
-            model = self.s["model"] if self.s["model"] in {d for _n, d in MODELS} else MODELS[0][1]
-            lang = str(self.s["language"]).strip().lower()
-            lang = lang if re.fullmatch(r"auto|[a-z]{2,3}", lang) else "en"
-            args = ["--model", model, "--language", lang]
             m = self._lang()
-            self.ctl.live_voice = None
-            if m is not None:
-                if not m.installed:
-                    self._set_live_ui(False, f"Download {m.language_name} first (above).")
-                    return
-                args += ["--translate", str(translation.model_dir(m))]
-                self.ctl.live_voice = self._voice_for(m) or None
+            if m is not None and not m.installed:
+                self._set_live_ui(False, f"Download {m.language_name} first (above).")
+                return
             try:
-                self.ctl.start_live(self.module, args)
+                self.ctl.start_live(self.module, self._live_args())
             except RuntimeError as e:
                 self._set_live_ui(False, f"⚠ {errors.plain(e)}")
                 return
@@ -2091,11 +2238,54 @@ class SpeechPanel(QWidget):
             self.ctl.stop_live()
             self._set_live_ui(False, IDLE_HINT)
 
+    # ---- translating for the AI voice or the voice changer (VoicePanel decides)
+    def translate_for(self, who: str):
+        """Run speech recognition + translation in the background so the voice that's
+        on ("ai" or "fx") speaks the language picked under Speak in; "" stops it.
+        Text-to-speech's own Start, when on, already does this and wins."""
+        if self.b_live.isChecked():
+            who = ""
+        m = self.translating() if who else None
+        key = (who, m.language) if m is not None else ()
+        if not key:
+            self._bg_failed = ()      # switched off: the next switch-on tries again
+        if key == self._bg_key and (not key or self.ctl.live):
+            return
+        if key and key == self._bg_failed:
+            return        # it stopped with an error: not again on every slider step
+        if key and self.bg_for and self.ctl.live and key[1] == self._bg_key[1]:
+            # the other voice took over: same helper, only the real-mic mute changes
+            self.bg_for, self._bg_key = who, key
+            self.ctl.set_replace(who == "fx")
+            return
+        if self.bg_for:
+            self._stop_bg()
+        if not key:
+            self._refresh_translation()
+            return
+        try:
+            self.ctl.start_live(self.module, self._live_args(), replace=(who == "fx"))
+        except RuntimeError as e:
+            self._bg_note(f"⚠ Couldn't start translating: {errors.plain(e)}")
+            return
+        self.bg_for, self._bg_key = who, key
+        self._bg_note("Starting the translation…")
+        self._refresh_translation()
+
+    def _stop_bg(self):
+        self.bg_for, self._bg_key, self._bg_failed = "", (), ()
+        self.ctl.stop_live()
+        self._bg_note("")
+
+    def _bg_note(self, text: str):
+        self.lbl_bg.setText(text)
+        self.lbl_bg.setVisible(bool(text))
+
     def _set_live_ui(self, on: bool, state: str):
         self.b_live.blockSignals(True)
         self.b_live.setChecked(on)
         self.b_live.blockSignals(False)
-        self.b_live.setText("Stop the computer voice" if on else "Start talking as the voice")
+        self.b_live.setText("Stop the computer voice" if on else "Start the computer voice")
         self.live_changed.emit(on)
         for w in (self.cb_model, self.ed_lang, self.cb_lang):
             _enable(w, not on, "Stop the computer voice to change this")
@@ -2108,6 +2298,9 @@ class SpeechPanel(QWidget):
     def _on_event(self, ev: dict):
         t = ev.get("type")
         text = str(ev.get("text", ""))
+        if self.bg_for and t != "tts_error":
+            self._on_bg_event(t, text, ev)
+            return
         if t == "tts_error":
             self._tts_error(f"Couldn't speak that line: {text}")
         elif t == "status":
@@ -2123,6 +2316,28 @@ class SpeechPanel(QWidget):
             self.lbl_state.setText(f"⚠ {text}")
         elif t == "stopped":
             self._set_live_ui(False, f"⚠ stopped: {text}" if text else "stopped")
+
+    def _on_bg_event(self, t, text: str, ev: dict):
+        name = self._bg_key[1] if self._bg_key else ""
+        m = self._lang()
+        name = (m.language_name or m.language) if m is not None else name
+        if t == "ready" or (t == "vad" and not ev.get("speaking")):
+            self._bg_note(f"● Listening: say it in English, it comes out in {name}.")
+        elif t == "vad":
+            self._bg_note("● Hearing you…")
+        elif t == "status":
+            self._bg_note(text)
+        elif t == "final" and text:
+            orig = str(ev.get("original", ""))
+            self._log_said(f"{text}   (you said: {orig})" if orig else text)
+        elif t == "error":
+            self._bg_note(f"⚠ {text}")
+        elif t == "stopped":
+            self._bg_failed = self._bg_key
+            self.bg_for, self._bg_key = "", ()
+            self._bg_note(f"⚠ Translating stopped: {text}" if text
+                          else "Translating stopped.")
+            self._refresh_translation()
 
     @staticmethod
     def _open_folder(module: mods.ModuleInfo | None = None, btn=None):
@@ -2148,7 +2363,8 @@ class ModulesList(QWidget):
         v = QVBoxLayout(self)
         v.setContentsMargins(0, 0, 0, 0)
         v.setSpacing(12)
-        v.addWidget(section_label("ADD-ONS"))
+        self.title = section_label("ADD-ONS")
+        v.addWidget(self.title)
         self.list = QVBoxLayout()
         self.list.setSpacing(10)
         v.addLayout(self.list)
@@ -2212,6 +2428,67 @@ class ModulesList(QWidget):
         self.shown.emit()
 
 
+class CardHead(QWidget):
+    """A card's title with an arrow: click anywhere on it to fold the card away. A
+    folded card still says when it's on (and when it speaks another language)."""
+    toggled = Signal(bool)   # open
+
+    def __init__(self, title: str):
+        super().__init__()
+        self.setCursor(Qt.PointingHandCursor)
+        h = QHBoxLayout(self)
+        h.setContentsMargins(0, 0, 0, 0)
+        h.setSpacing(8)
+        self.label = section_label(title)
+        self.label.setProperty("head", True)   # centred on the arrow, no top padding
+        h.addWidget(self.label)
+        h.addStretch(1)
+        self.pill = QLabel("")
+        self.pill.setObjectName("pill")
+        self.pill.setProperty("on", True)
+        self.pill.hide()
+        h.addWidget(self.pill)
+        self.arrow = QPushButton()
+        self.arrow.setObjectName("fold")
+        self.arrow.setCheckable(True)
+        self.arrow.setChecked(True)
+        self.arrow.setFixedSize(28, 28)
+        self.arrow.toggled.connect(self._toggled)
+        h.addWidget(self.arrow)
+        self._open = True
+        self._paint_arrow()
+
+    def set_open(self, open_: bool):
+        self.arrow.blockSignals(True)
+        self.arrow.setChecked(open_)
+        self.arrow.blockSignals(False)
+        self._open = open_
+        self._paint_arrow()
+
+    def is_open(self) -> bool:
+        return self._open
+
+    def set_state(self, on: bool, note: str = ""):
+        text = " \u00b7 ".join(t for t in ("On" if on else "", note) if t)
+        self.pill.setText(text)
+        self.pill.setVisible(bool(text))
+
+    def _paint_arrow(self):
+        icons.set_icon(self.arrow, "fold_open" if self._open else "fold", "muted", "text",
+                       size=14)
+        self.arrow.setToolTip("Fold this card away" if self._open else "Show this card")
+
+    def _toggled(self, open_: bool):
+        self._open = open_
+        self._paint_arrow()
+        self.toggled.emit(open_)
+
+    def mouseReleaseEvent(self, e):
+        if e.button() == Qt.LeftButton and self.rect().contains(e.position().toPoint()):
+            self.arrow.toggle()
+        super().mouseReleaseEvent(e)
+
+
 class VoicePanel(QWidget):
     """The Voice tab, shaped like the others: cards (live voice first, then the
     voice changer and add-ons) and the tab's bottom bar. Owns the chain wiring for
@@ -2241,9 +2518,19 @@ class VoicePanel(QWidget):
         scroll.setFrameShape(QFrame.NoFrame)
         scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         page = FitWidth()   # the voice changer fits itself to the width (_fit_width)
-        cols = self._cols = QHBoxLayout(page)
-        cols.setContentsMargins(4, 4, 8, 12)
+        pv = QVBoxLayout(page)
+        pv.setContentsMargins(4, 4, 8, 12)
+        pv.setSpacing(16)
+        self._top = QVBoxLayout()     # Speak in: every voice below uses it
+        pv.addLayout(self._top)
+        cols = self._cols = QHBoxLayout()
+        cols.setContentsMargins(0, 0, 0, 0)
         cols.setSpacing(16)
+        pv.addLayout(cols, 1)
+        folded = speech.get("folded") if isinstance(speech, dict) else None
+        self._folded = {k for k in folded if isinstance(k, str)} \
+            if isinstance(folded, list) else set()
+        self._heads: dict[str, CardHead] = {}
         lcol, rcol = QVBoxLayout(), QVBoxLayout()
         for col in (lcol, rcol):
             col.setSpacing(16)
@@ -2255,45 +2542,42 @@ class VoicePanel(QWidget):
         # left on from last time, it changed your mic the moment the app opened.
         self.fx = VoiceFxPanel({**voicefx.clean_spec(fx_spec), "enabled": False})
         self.fx.changed.connect(self._fx_changed)
-        fx_card, fv = card(roomy=True)
-        fv.addWidget(self.fx)
-        lcol.addWidget(fx_card)
+        # Make it yours' folded effect cards: "fx.<type>" in the same list
+        self.fx.set_folded(k[3:] for k in self._folded if k.startswith("fx."))
+        self.fx.folds_changed.connect(self._fx_folds)
+        lcol.addWidget(self._fold_card("fx", self.fx))
         lcol.addStretch(1)
 
-        # Right: computer voice and its add-ons.
+        # Top: Speak another language (and the computer voice); right: AI voices, add-ons.
         self.controller = SpeechController(engine, self.chain, lambda ev: None)
         self.speech = SpeechPanel(self.controller, speech or {}, self.modules)
         self.speech.changed.connect(self.speech_changed)
         self.speech.changed.connect(lambda _s: self._emit_active())   # the tab's picture
         self.speech.downloaded.connect(lambda: self.addons.show_modules(self.modules))
         self.speech.live_changed.connect(lambda _on: self._emit_active())
-        # AI voices first: the live voice changer; then the computer voice
+        # AI voices: the live voice changer
         from soundboard.ui.aivoicepanel import AiVoicePanel
         self.ai_controller = AiVoiceController(self.chain, lambda ev: None)
         saved = speech.get("ai") if isinstance(speech, dict) else None   # may be damaged
-        self.ai = AiVoicePanel(self.ai_controller, saved, self.modules)
+        self.ai = AiVoicePanel(self.ai_controller, saved, self.modules, engine)
         self.ai.changed.connect(self._ai_changed)
         self.ai.live_changed.connect(self._ai_live)
         self.ai.modules_changed.connect(self.rescan_modules)
-        ai_card, aiv = card(roomy=True)
-        aiv.addWidget(self.ai)
-        rcol.addWidget(ai_card)
+        rcol.addWidget(self._fold_card("ai", self.ai))
         self.speech.live_changed.connect(self._speech_live)
-        live_card, lv = card(roomy=True)
-        lv.addWidget(self.speech)
-        rcol.addWidget(live_card)
+        self.speech.lang_changed.connect(self._emit_active)
+        self._top.addWidget(self._fold_card("speak", self.speech))
         self.addons = ModulesList()
         self.addons.refresh.connect(self._rescan_in_background)
         self._scanned.connect(self._apply_scan)
         self._scanning = False
         self.addons.show_modules(self.modules)
-        add_card, av = card(roomy=True)
-        av.addWidget(self.addons)
-        rcol.addWidget(add_card)
+        rcol.addWidget(self._fold_card("addons", self.addons))
         rcol.addStretch(1)
 
         outer.addWidget(self.speech.say_bar)
         self.chain.configure(self.fx.spec())
+        self._emit_active()
 
         # the voice changer's mic meter (only while the tab is showing)
         self._meter_timer = QTimer(self)
@@ -2355,11 +2639,75 @@ class VoicePanel(QWidget):
                 or self.ai.is_on())
 
     def _emit_active(self):
+        self._sync_translate()
+        self._update_heads()
         # only when it flips: every slider step lands here, and each send redraws the tab
         on = self.is_active()
         if on != self._active:
             self._active = on
             self.active_changed.emit(on)
+
+    # ---- Speak in: the voice that's on says the translated lines
+    def _sync_translate(self):
+        sp = self.speech
+        m = sp.translating()
+        fg = sp.b_live.isChecked()     # text-to-speech's own Start translates by itself
+        who = ""
+        if m is not None and not fg:
+            if self.ai.is_on():
+                who = "ai"
+            elif self.fx.btn_power.isChecked():
+                who = "fx"
+        self.ai_controller.set_dub(who == "ai")
+        sp.ctl.dub = self.ai_controller if who == "ai" else None
+        sp.ctl.fx_always = who == "fx"
+        if who and not sp.bg_for:
+            sp._bg_note("")               # "turn on a voice": one is on now
+        sp.translate_for(who)
+        if m is not None and not fg and not who and not sp.lbl_bg.text().startswith("\u26a0"):
+            sp._bg_note("Turn on the AI voice or the voice changer below, or press Start "
+                        f"for the computer voice, to speak {m.language_name or m.language}.")
+
+    # ---- cards that fold away
+    def _fold_card(self, key: str, panel: QWidget) -> QFrame:
+        f, v = card(roomy=True)
+        head = CardHead(panel.title.text())
+        panel.title.hide()                      # the head shows it, with the arrow
+        head.toggled.connect(lambda open_, k=key, p=panel: self._fold(k, p, not open_))
+        v.addWidget(head)
+        v.addWidget(panel)
+        self._heads[key] = head
+        head.set_open(key not in self._folded)
+        panel.setVisible(key not in self._folded)
+        return f
+
+    def _fold(self, key: str, panel: QWidget, folded: bool):
+        panel.setVisible(not folded)
+        self._update_heads()
+        if folded == (key in self._folded):
+            return
+        (self._folded.add if folded else self._folded.discard)(key)
+        self.speech.s["folded"] = sorted(self._folded)   # kept with the speech settings
+        self.speech_changed.emit(dict(self.speech.s))
+
+    def _fx_folds(self, types: list):
+        self._folded = {k for k in self._folded if not k.startswith("fx.")} | {
+            f"fx.{t}" for t in types}
+        self.speech.s["folded"] = sorted(self._folded)   # kept with the speech settings
+        self.speech_changed.emit(dict(self.speech.s))
+
+    def _update_heads(self):
+        if not self._heads:
+            return
+        m = self.speech.translating()
+        lang = (m.language_name or m.language) if m is not None else ""
+        late = f"in {lang}, a few seconds late" if lang else ""
+        fx, ai, tts = (self.fx.btn_power.isChecked(), self.ai.is_on(),
+                       self.speech.b_live.isChecked())
+        self._heads["fx"].set_state(fx, late if fx and not ai and not tts else "")
+        self._heads["ai"].set_state(ai, late if ai and not tts else "")
+        sh = self._heads["speak"]   # open, the list says the language
+        sh.set_state(tts, lang if not sh.is_open() or tts else "")
 
     def tab_icon(self) -> str:
         """A consistent line icon; the live dot indicates whether voice is active."""

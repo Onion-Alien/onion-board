@@ -14,10 +14,8 @@ from __future__ import annotations
 import html
 import logging
 import math
-import queue
 import random
 import threading
-import time
 
 from PySide6.QtCore import QEvent, QPointF, QRect, QRectF, QSize, QUrl, Qt, Signal
 from PySide6.QtGui import (QColor, QPainter, QPainterPath, QPixmap,
@@ -36,21 +34,20 @@ from soundboard.ui.owl import W as OWL_W
 from soundboard.ui.owl import OwlWidget
 from soundboard.ui.panel import CardGrid, HoverCard
 from soundboard.ui.responsive import FitWidth
-from soundboard.ui.widgets import LoadingBar, fmt_time
+from soundboard.ui.widgets import LoadingBar, fmt_time, paint_now_playing
 from soundboard import errors
+from soundboard.i18n import _
 
 log = logging.getLogger(__name__)
 
 THUMB_W, THUMB_H = 128, 72   # the pictures' shape (16:9); they fill the card's width
 CARD_MIN_W = 210             # results are cards, as many across as fit at this width
-STATS_WORKERS = 1            # likes / comments looked up this many at a time
-STATS_GAP = 1.0              # ...and this many seconds apart: a burst looks like a bot
-TIPS = {"youtube": "Search YouTube",
-        "ytmusic": "Search YouTube Music: songs, the official versions",
-        "soundcloud": "Search SoundCloud",
-        "tiktok": "Find TikTok sounds (TikTok's own search needs an account, so this "
-                  "looks for them on YouTube, where they get reposted)",
-        "myinstants": "Search Myinstants: short meme sound buttons"}
+TIPS = {"youtube": _("Search YouTube"),
+        "ytmusic": _("Search YouTube Music: songs, the official versions"),
+        "soundcloud": _("Search SoundCloud"),
+        "tiktok": _("Find TikTok sounds (TikTok's own search needs an account, so this "
+                    "looks for them on YouTube, where they get reposted)"),
+        "myinstants": _("Search Myinstants: short meme sound buttons")}
 
 
 def fmt_count(n: int) -> str:
@@ -62,16 +59,15 @@ def fmt_count(n: int) -> str:
     return str(n)
 
 
-def stats_text(r: ytdl.Result, waiting: bool = False) -> tuple[str, str]:
-    """(the card's line, its tooltip) for a hit's views, likes and comments: nothing
-    for what the site didn't say, "…" for likes / comments still being looked up."""
+def stats_text(r: ytdl.Result) -> tuple[str, str]:
+    """(the card's line, its tooltip) for a hit's views, likes and comments, as its
+    search entry gave them: nothing for what it didn't say. No video page is fetched
+    for more (a look-up per hit is scraping, and the kind that gets you bot-checked)."""
     parts, tip = [], []
     for n, word in ((r.views, "views"), (r.likes, "likes"), (r.comments, "comments")):
         if n is not None:
             parts.append(f"{fmt_count(n)} {word}")
             tip.append(f"{n:,} {word}")
-        elif waiting and word != "views":
-            parts.append(f"… {word}")
     return " · ".join(parts), ", ".join(tip)
 
 
@@ -204,6 +200,7 @@ class Thumb(QWidget):
         super().__init__()
         self._pm: QPixmap | None = None
         self._scaled: QPixmap | None = None   # _pm at this size: not scaled per paint
+        self.now = ""   # "playing" / "paused" while it's the one in the player
         self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
         policy = self.sizePolicy()
         policy.setHeightForWidth(True)
@@ -254,7 +251,42 @@ class Thumb(QWidget):
                 pm.setDevicePixelRatio(dpr)
             size = pm.deviceIndependentSize()
             p.drawPixmap(QPointF((w - size.width()) / 2, (h - size.height()) / 2), pm)
+        if self.now:
+            self._paint_now(p, w, h)
         p.end()
+
+    def _paint_now(self, p: QPainter, w: int, h: int):
+        """The one in the player: the picture dims and a big equalizer (bouncing, or
+        still while paused) with "Playing" / "Paused" sits on it."""
+        p.fillRect(QRectF(0, 0, w, h), QColor(0, 0, 0, 120))
+        paused = self.now == "paused"
+        eq = min(44.0, h * 0.42)
+        box = QRectF((w - eq) / 2, h / 2 - eq * 0.75, eq, eq)
+        if paused:   # a pause sign: still bars read as dots
+            p.setPen(Qt.NoPen)
+            p.setBrush(QColor("#ffffff"))
+            bw = eq * 0.24
+            for x in (box.center().x() - bw * 1.4, box.center().x() + bw * 0.4):
+                p.drawRoundedRect(QRectF(x, box.top() + eq * 0.1, bw, eq * 0.8), 3, 3)
+        else:
+            paint_now_playing(p, box, QColor("#ffffff"))
+        f = p.font()
+        f.setBold(True)
+        f.setPointSizeF(9)
+        p.setFont(f)
+        word = _("Paused") if paused else _("Playing")
+        pill_w = p.fontMetrics().horizontalAdvance(word) + 18
+        pill = QRectF((w - pill_w) / 2, h / 2 + eq * 0.35, pill_w, 20)
+        p.setPen(Qt.NoPen)
+        p.setBrush(QColor(theme.T["accent"]))
+        p.drawRoundedRect(pill, 10, 10)
+        p.setPen(QColor(theme.T["on_accent"]))
+        p.drawText(pill, Qt.AlignCenter, word)
+
+    def set_now(self, now: str):
+        changed, self.now = now != self.now, now
+        if changed or now == "playing":
+            self.update()   # bouncing bars: every tick while it plays
 
 
 class ClampLabel(QLabel):
@@ -332,12 +364,12 @@ class StatsLabel(ClampLabel):
         super().__init__("", lines=1, bold=False)
         self.fields = []
 
-    def set_stats(self, result, waiting):
-        self.fields = [(icon, fmt_count(n) if n is not None else "…")
+    def set_stats(self, result):
+        self.fields = [(icon, fmt_count(n))
                        for n, icon in ((result.views, "triggers"), (result.likes, "like"),
                                        (result.comments, "speech"))
-                       if n is not None or (waiting and icon != "triggers")]
-        text, tip = stats_text(result, waiting)
+                       if n is not None]
+        text, tip = stats_text(result)
         self.set_full(text, tip)
         self.setAccessibleName(text)
         self.setVisible(bool(text))
@@ -370,6 +402,7 @@ class ResultRow(HoverCard):
         super().__init__()
         self.result = r
         self.setFocusPolicy(Qt.StrongFocus)
+        self.setProperty("own_space", True)   # Space plays / pauses this one (spacekey.py)
         self.setAccessibleName(r.title)
         v = QVBoxLayout(self)
         v.setContentsMargins(8, 8, 8, 8)
@@ -387,18 +420,17 @@ class ResultRow(HoverCard):
         self.stats = StatsLabel()
         self.stats.setObjectName("muted")
         v.addWidget(self.stats)
-        self.waiting = ytdl.needs_stats(r)   # likes / comments still to look up
-        self.show_stats()
+        self.stats.set_stats(r)
         v.addStretch(1)
         h = QHBoxLayout()
         h.setSpacing(6)
-        self.btn_play = QPushButton("Play")
-        self.btn_play.setToolTip("Download its audio and play it once (it isn't kept)")
+        self.btn_play = QPushButton(_("Play"))
+        self.btn_play.setToolTip(_("Download its audio and play it once (it isn't kept)"))
         icons.set_icon(self.btn_play, "play", size=14)
         self.btn_play.clicked.connect(lambda: self.play.emit(self.result))
-        self.btn_add = QPushButton("Add")
+        self.btn_add = QPushButton(_("Add"))
         self.btn_add.setObjectName("primary")
-        self.btn_add.setToolTip("Download its audio and add it to your Sounds")
+        self.btn_add.setToolTip(_("Download its audio and add it to your Sounds"))
         icons.set_icon(self.btn_add, "plus", "on_accent", size=14)
         self.btn_add.clicked.connect(lambda: self.add.emit(self.result))
         for b in (self.btn_play, self.btn_add):
@@ -410,7 +442,7 @@ class ResultRow(HoverCard):
         self.bar.setObjectName("downloadprogress")
         self.bar.setRange(0, 1000)
         self.bar.setValue(0)
-        self.bar.setAccessibleName("Audio download progress")
+        self.bar.setAccessibleName(_("Audio download progress"))
         self.bar.setTextVisible(False)
         self.bar.setFixedHeight(5)
         pol = self.bar.sizePolicy()
@@ -421,8 +453,10 @@ class ResultRow(HoverCard):
         self._release = {}      # "play" / "add" -> busy.hold's release while it's fetched
         self._added = False
         self._locked = False
+        self.now = ""           # "playing" / "paused": it's the one in the player
+        self.setProperty("playing", False)
         self.setCursor(Qt.PointingHandCursor)
-        self.setToolTip("Double-click to play")
+        self.setToolTip(_("Double-click to play"))
 
     def hasHeightForWidth(self) -> bool:
         return True
@@ -443,11 +477,26 @@ class ResultRow(HoverCard):
             return
         super().keyPressEvent(e)
 
-    def show_stats(self):
-        self.stats.set_stats(self.result, self.waiting)
-
     def _btn(self, kind: str) -> QPushButton:
         return self.btn_add if kind == "add" else self.btn_play
+
+    def set_now(self, now: str):
+        """"playing" / "paused" while it's the one in the player, "" when it isn't:
+        the picture shows it, the card is outlined and Play becomes Pause / Resume."""
+        self.thumb.set_now(now)
+        if now == self.now:
+            return
+        self.now = now
+        self.setProperty("playing", bool(now))
+        self.style().unpolish(self)
+        self.style().polish(self)
+        if "play" not in self._release:   # not while its button shows the download
+            self.btn_play.setText({"playing": _("Pause"), "paused": _("Resume")}.get(
+                now, _("Play")))
+            icons.set_icon(self.btn_play, "pause" if now == "playing" else "play", size=14)
+        self.btn_play.setToolTip(_("Pause it") if now == "playing" else
+                                 _("Carry on playing it") if now == "paused" else
+                                 _("Download its audio and play it once (it isn't kept)"))
 
     def set_busy(self, kind: str):
         """Its audio is being fetched: that button greys out until set_done, and the
@@ -459,10 +508,11 @@ class ResultRow(HoverCard):
             busy.set_busy(btn, False)
         if not self._release:
             self.bar.setValue(0)
-            self.bar.setToolTip("Preparing audio download · 0%")
-        text = ("Processing…" if self.bar.toolTip() == "Processing audio…" else
-                f"{'Adding' if kind == 'add' else 'Loading'}… {self.bar.value() / 10:.0f}%"
-                if self.bar.value() else "Preparing… 0%")
+            self.bar.setToolTip(_("Preparing audio download · 0%"))
+        text = (_("Processing…") if self.bar.toolTip() == _("Processing audio…") else
+                (_("Adding… {pct:.0f}%", pct=self.bar.value() / 10) if kind == "add" else
+                 _("Loading… {pct:.0f}%", pct=self.bar.value() / 10))
+                if self.bar.value() else _("Preparing… 0%"))
         self._release[kind] = busy.hold(btn, text)
         self.bar.show()
 
@@ -471,13 +521,13 @@ class ResultRow(HoverCard):
         if not self._release:
             return
         if frac < 0:
-            self.bar.setToolTip("Processing audio…")
+            self.bar.setToolTip(_("Processing audio…"))
         else:
             self.bar.setValue(max(self.bar.value(), min(1000, int(frac * 1000))))
-            self.bar.setToolTip(f"Downloading audio · {self.bar.value() / 10:.0f}%")
+            self.bar.setToolTip(_("Downloading audio · {value:.0f}%", value=self.bar.value() / 10))
         for kind in self._release:
-            word = "Adding…" if kind == "add" else "Loading…"
-            self._btn(kind).setText("Processing…" if frac < 0 else
+            word = _("Adding…") if kind == "add" else _("Loading…")
+            self._btn(kind).setText(_("Processing…") if frac < 0 else
                                     f"{word} {self.bar.value() / 10:.0f}%")
 
     def set_done(self, kind: str, ok: bool):
@@ -489,12 +539,15 @@ class ResultRow(HoverCard):
         if kind == "add" and ok:
             release()
             self._added = True
-            self.btn_add.setText("✓ Added")   # added once is enough
+            self.btn_add.setText(_("✓ Added"))   # added once is enough
             busy.set_busy(self.btn_add, True)
         else:
             release(None if ok else ("Didn't add" if kind == "add" else "Didn't play"))
             if self._locked:
                 busy.set_busy(self._btn(kind), True)
+            if kind == "play" and self.now:   # it started before the button let go
+                now, self.now = self.now, ""
+                self.set_now(now)
 
     def set_locked(self, on: bool):
         """Another card's download is running: this one's buttons wait for it (one at a
@@ -506,8 +559,8 @@ class ResultRow(HoverCard):
             if kind in self._release or (kind == "add" and self._added):
                 continue
             busy.set_busy(self._btn(kind), on)
-        self.setToolTip("Wait for the other download to finish" if on
-                        else "Double-click to play")
+        self.setToolTip(_("Wait for the other download to finish") if on
+                        else _("Double-click to play"))
 
     def set_thumb(self, pm: QPixmap):
         self.thumb.set_pixmap(pm)
@@ -521,7 +574,6 @@ class SearchResults(QFrame):
     add = Signal(object)
     closed = Signal()
     _done = Signal(int, object, str)   # worker -> UI: (search number, results, error)
-    _stats = Signal(int, object, object)   # worker -> UI: (search number, Result, counts)
 
     def __init__(self):
         super().__init__()
@@ -530,11 +582,6 @@ class SearchResults(QFrame):
         self._gen = 0
         self._rows: list[ResultRow] = []
         self._fetching: dict[str, set[str]] = {}   # url -> {"play", "add"} downloading
-        self._todo: queue.Queue = queue.Queue()     # (search number, Result) for stats
-        self._workers: list[threading.Thread] = []
-        self._quiet = threading.Event()   # set while nothing downloads: stats may run
-        self._quiet.set()
-        self._stats.connect(self._on_stats)
         self.net = QNetworkAccessManager(self)
         net.apply_qt(self.net, "sounds_web")   # thumbnails: Settings > Privacy & security
         self._done.connect(self._on_done)
@@ -543,10 +590,11 @@ class SearchResults(QFrame):
         v.setContentsMargins(0, 0, 0, 0)
         v.setSpacing(6)
         head = QHBoxLayout()
-        back = self.btn_back = QPushButton("My sounds")
-        back.setObjectName("small")
-        back.setToolTip("Close the search results and go back to your sounds")
-        icons.set_icon(back, "back", size=12)
+        back = self.btn_back = QPushButton(_("Back to my sounds"))
+        back.setObjectName("backhome")   # stands out: the way out of the results
+        back.setCursor(Qt.PointingHandCursor)
+        back.setToolTip(_("Close the search results and go back to your sounds"))
+        icons.set_icon(back, "back", "danger_text", size=18)
         back.clicked.connect(self.close_results)
         head.addWidget(back)
         head.addSpacing(8)
@@ -572,9 +620,9 @@ class SearchResults(QFrame):
         v.addWidget(self.title)
         # Tor mode, after the site turned Tor away even over new routes: only this click
         # runs the search without Tor (ytdl.TorBlocked)
-        self.direct_btn = QPushButton("Search this without Tor")
-        self.direct_btn.setToolTip("Run just this search straight from the site, not through "
-                                   "Tor: the site will see your own address")
+        self.direct_btn = QPushButton(_("Search this without Tor"))
+        self.direct_btn.setToolTip(_("Run just this search straight from the site, not through "
+                                     "Tor: the site will see your own address"))
         self.direct_btn.clicked.connect(lambda: self.search(self.query, direct=True))
         self.direct_btn.hide()
         row = QHBoxLayout()
@@ -647,7 +695,7 @@ class SearchResults(QFrame):
         where = "TikTok sounds" if self.source == "tiktok" else self.site
         netlog.cause(ytdl.FEATURE, f"You searched {where} for {netlog.quoted(query)}"
                      + (" (without Tor)" if direct else ""))
-        text = f"Searching {where} for <b>{html.escape(query)}</b>…"
+        text = _("Searching {where} for <b>{query}</b>…", where=where, query=html.escape(query))
         self.title.setText(text)
         self._loading(True, text)
         self.show()
@@ -690,6 +738,12 @@ class SearchResults(QFrame):
                     r.set_done(kind, ok)
         self._lock_rows()
 
+    def show_now(self, url: str, now: str):
+        """The player has `url` loaded ("playing" / "paused"), or nothing from here
+        (url ""): its card says so."""
+        for r in self._rows:
+            r.set_now(now if url and r.result.url == url else "")
+
     def progress(self, url: str, frac: float):
         """The link bar's download of `url`: 0..1, or below 0 while it's converted."""
         for r in self._rows:
@@ -699,10 +753,6 @@ class SearchResults(QFrame):
     def _lock_rows(self):
         for r in self._rows:
             r.set_locked(bool(self._fetching) and r.result.url not in self._fetching)
-        if self._fetching:   # downloads first: the like counts wait
-            self._quiet.clear()
-        else:
-            self._quiet.set()
 
     def _clear(self):
         for r in self._rows:
@@ -728,12 +778,12 @@ class SearchResults(QFrame):
         q = html.escape(self.query)
         if err:
             red = theme.status("error")
-            self.title.setText(f"<span style='color:{red}'>Couldn't search {self.site}: "
-                               f"{err}</span>")   # rich text from _work
+            self.title.setText(_("<span style='color:{red}'>Couldn't search {site}: {err}</span>",
+                                 red=red, site=self.site, err=err))   # rich text from _work
             self.direct_btn.setVisible(results == "blocked")
             return
         if not results:
-            self.title.setText(f"No {self.site} results for <b>{q}</b>.")
+            self.title.setText(_("No {site} results for <b>{q}</b>.", site=self.site, q=q))
             return
         self.title.hide()   # the cards say it all; the title is for "no results" / errors
         for r in results:
@@ -742,60 +792,12 @@ class SearchResults(QFrame):
             row.add.connect(self.add)
             self.rows.addWidget(row)
             self._rows.append(row)
-            if not quality.current.web_extras:   # Settings > Data & quality
-                row.waiting = False
-                row.show_stats()
-                continue
-            if not r.thumb:
+            if not quality.current.web_extras or not r.thumb:   # Settings > Data & quality
                 continue
             reply = self.net.get(QNetworkRequest(QUrl(r.thumb)))
             reply.finished.connect(lambda reply=reply, row=row, g=gen: self._on_thumb(
                 reply, row, g))
         self._lock_rows()
-        for row in self._rows:
-            if row.waiting:
-                self._todo.put((gen, row.result))
-        while len(self._workers) < STATS_WORKERS and not self._todo.empty():
-            t = threading.Thread(target=self._stats_work, daemon=True,
-                                 name=f"web-stats-{len(self._workers)}")
-            self._workers.append(t)
-            t.start()
-
-    def _stats_work(self):
-        """Likes and comments for the hits that came without them, one at a time and
-        STATS_GAP apart, never while a Play / Add downloads, and not at all while the
-        site is pushing back (ytdl.stats_paused). A newer search drops the rest."""
-        while True:
-            gen, r = self._todo.get()
-            self._quiet.wait()
-            if gen != self._gen:
-                continue
-            if ytdl.stats_paused():   # the card keeps its views, without "…"
-                self._stats.emit(gen, r, (None, None, None))
-                continue
-            time.sleep(STATS_GAP)
-            self._quiet.wait()        # a Play / Add clicked meanwhile goes first
-            if gen != self._gen:
-                continue
-            try:
-                netlog.cause(ytdl.FEATURE, "Likes and comments for your search "
-                                           f"{netlog.quoted(self.query)}")
-                counts = ytdl.stats(r)
-            except Exception as e:  # noqa: BLE001 - the card just keeps its views
-                log.info("no stats for %s: %s", r.url, e)
-                counts = (None, None, None)
-            self._stats.emit(gen, r, counts)
-
-    def _on_stats(self, gen: int, r, counts):
-        if gen != self._gen:
-            return
-        views, likes, comments = counts
-        r.views = r.views if views is None else views
-        r.likes, r.comments = likes, comments
-        for row in self._rows:
-            if row.result is r:
-                row.waiting = False
-                row.show_stats()
 
     def _on_thumb(self, reply, row: ResultRow, gen: int):
         data = reply.readAll()

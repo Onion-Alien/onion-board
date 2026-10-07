@@ -287,6 +287,9 @@ def _never_look_at_the_real_foreground():
     from soundboard import appaudio, voicesdk
     with pytest.MonkeyPatch.context() as mp:
         mp.setattr(voicesdk, "foreground_process", lambda: (0, ""))
+        # ...nor whether it fills the screen (no tip during a game, soundboard.tips)
+        from soundboard import tips
+        mp.setattr(tips, "fullscreen_in_front", lambda: False)
         # ...nor which output Windows has as its default (the headphones follow it)
         mp.setattr(appaudio, "default_output_name", lambda: None)
         # ...nor which devices it has (a failing device is re-scanned when it's listed)
@@ -428,16 +431,3 @@ def _free_test_windows():
             except RuntimeError:   # already gone on the C++ side
                 pass
     app.sendPostedEvents(None, QEvent.DeferredDelete)
-
-
-@pytest.fixture(autouse=True)
-def _no_result_stats_lookups(monkeypatch):
-    """Web search cards look up each YouTube hit's likes and comments on a thread
-    (ytsearch.SearchResults): never the real site from a test."""
-    from soundboard import ytdl
-
-    def offline(r):
-        raise ytdl.FetchError("offline in tests")
-    monkeypatch.setattr(ytdl, "stats", offline)
-    monkeypatch.setattr(ytdl, "_stats_paused_until", 0.0)   # a test's bot check stays in it
-    monkeypatch.setattr("soundboard.ui.ytsearch.STATS_GAP", 0)

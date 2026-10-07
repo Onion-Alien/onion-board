@@ -18,6 +18,7 @@ from soundboard.ui.trim import TrimPanel
 from soundboard.ui.voicepanel import EffectRow, ParamSlider
 from soundboard.wheelguard import no_wheel
 from soundboard.winkeys import Hotkeys
+from soundboard.i18n import _
 
 CUSTOM = "Custom"
 # what the pad colour swatches are called (tooltip and screen reader)
@@ -42,14 +43,14 @@ class EffectsPanel(QWidget):
         v.setSpacing(8)
 
         prow = QHBoxLayout()
-        prow.addWidget(QLabel("Preset"))
+        prow.addWidget(QLabel(_("Preset")))
         self.preset = QComboBox()
         self.preset.addItems(list(soundfx.PRESETS) + [CUSTOM])
         no_wheel(self.preset)
         prow.addWidget(self.preset, 1)
-        reset = QPushButton("Reset")
+        reset = QPushButton(_("Reset"))
         reset.setObjectName("small")
-        reset.setToolTip("Back to the original sound (the trim stays)")
+        reset.setToolTip(_("Back to the original sound (the trim stays)"))
         reset.clicked.connect(lambda: self.preset.setCurrentText(next(iter(soundfx.PRESETS))))
         prow.addWidget(reset)
         v.addLayout(prow)
@@ -60,14 +61,14 @@ class EffectsPanel(QWidget):
         v.addWidget(self.trim)              # in the layout first: shown with no parent,
         self.trim.setVisible(length > 0)    # it flashed up as a window of its own
         if length <= 0:
-            v.addWidget(hint_label("Trimming works once the sound has loaded."))
+            v.addWidget(hint_label(_("Trimming works once the sound has loaded.")))
 
         v.addWidget(section_label("SPEED & PITCH"))
         self.speed = ParamSlider(SPEED, 1.0)
         self.pitch = ParamSlider(PITCH, 0.0)
-        self.tape = QCheckBox("Tape mode: speed changes the pitch too (nightcore / slowed)")
-        self.tape.setToolTip("Off: speed and pitch are independent. On: like a record player, "
-                             "faster is also higher; Pitch adds on top.")
+        self.tape = QCheckBox(_("Tape mode: speed changes the pitch too (nightcore / slowed)"))
+        self.tape.setToolTip(_("Off: speed and pitch are independent. On: like a record player, "
+                               "faster is also higher; Pitch adds on top."))
         for w in (self.speed, self.pitch, self.tape):
             v.addWidget(w)
 
@@ -76,7 +77,7 @@ class EffectsPanel(QWidget):
         v.addWidget(self.boost)
         self.boost_hint = hint_label("")
         v.addWidget(self.boost_hint)
-        self.reverse = QCheckBox("Play backwards")
+        self.reverse = QCheckBox(_("Play backwards"))
         v.addWidget(self.reverse)
 
         self.eq = EqPanel(False, "sounds", "Flat (off)", [0.0] * 7)
@@ -95,7 +96,7 @@ class EffectsPanel(QWidget):
             row.changed.connect(self._edited)
             self.rows[etype] = row
             v.addWidget(row)
-        v.addWidget(hint_label("Effects from add-on modules show up here too."))
+        v.addWidget(hint_label(_("Effects from add-on modules show up here too.")))
         v.addStretch(1)
 
         self.load(fx or {})
@@ -104,7 +105,7 @@ class EffectsPanel(QWidget):
         self.tape.toggled.connect(self._edited)
         self.reverse.toggled.connect(self._edited)
         self.trim.changed.connect(self._edited)
-        self.eq.changed.connect(lambda *_: self._edited())
+        self.eq.changed.connect(lambda *__: self._edited())
         self.preset.currentTextChanged.connect(self._on_preset)
         self._matching_preset()
 
@@ -142,9 +143,9 @@ class EffectsPanel(QWidget):
 
     def _boost_hint(self):
         db = self.boost.value()
-        self.boost_hint.setText("⚠ Very loud: this clips on purpose (ear-rape territory). "
-                                "Preview it at low volume first." if db > 6 else
-                                "Above 0 dB the sound gets louder until it clips.")
+        self.boost_hint.setText(_("⚠ Very loud: this clips on purpose (deep-fried territory). "
+                                  "Preview it at low volume first.") if db > 6 else
+                                _("Above 0 dB the sound gets louder until it clips."))
 
     def _edited(self):
         self._boost_hint()
@@ -184,7 +185,7 @@ class EditDialog(QDialog):
                  tab: str = "sound"):
         super().__init__(parent)
         fit.watch(self)   # grows to fit its text (ui/fit.py)
-        self.setWindowTitle("Edit sound")
+        self.setWindowTitle(_("Edit sound"))
         self.meta = meta
         self.hotkeys = hotkeys
         self.hotkey = meta.hotkey
@@ -217,7 +218,7 @@ class EditDialog(QDialog):
         hrow = QHBoxLayout()
         self.hk_btn = QPushButton()
         self.hk_btn.clicked.connect(self._capture)
-        clr = QPushButton("Clear")
+        clr = QPushButton(_("Clear"))
         clr.clicked.connect(lambda: self._set_hk(""))
         hrow.addWidget(self.hk_btn, 1)
         hrow.addWidget(clr)
@@ -225,28 +226,28 @@ class EditDialog(QDialog):
         self._set_hk(self.hotkey)
 
         self.mode = QComboBox()
-        self.mode.addItem("Restart — press again restarts it", "restart")
-        self.mode.addItem("Overlap — every press plays a new copy", "overlap")
-        self.mode.addItem("Toggle — press again stops it", "toggle")
-        self.mode.addItem("Solo — stops every other sound first", "solo")
-        self.mode.addItem("Queue — waits for the sounds playing to finish", "queue")
+        self.mode.addItem(_("Restart — press again restarts it"), "restart")
+        self.mode.addItem(_("Overlap — every press plays a new copy"), "overlap")
+        self.mode.addItem(_("Toggle — press again stops it"), "toggle")
+        self.mode.addItem(_("Solo — stops every other sound first"), "solo")
+        self.mode.addItem(_("Queue — waits for the sounds playing to finish"), "queue")
         self.mode.setCurrentIndex(max(0, self.mode.findData(meta.mode)))
         no_wheel(self.mode)
         form.addRow("On press", self.mode)
 
-        self.loop = QCheckBox("Loop until stopped")
+        self.loop = QCheckBox(_("Loop until stopped"))
         self.loop.setChecked(meta.loop)
         form.addRow("", self.loop)
 
-        self.hold = QCheckBox("Hold to play — stops when you let go of its hotkey")
-        self.hold.setToolTip("Plays only while its hotkey or MIDI pad is held down, like "
-                             "an air horn. Clicking the pad still plays it through.")
+        self.hold = QCheckBox(_("Hold to play — stops when you let go of its hotkey"))
+        self.hold.setToolTip(_("Plays only while its hotkey or MIDI pad is held down, like an "
+                               "air horn. Clicking the pad still plays it through."))
         self.hold.setChecked(meta.hold)
         form.addRow("", self.hold)
 
-        self.only_them = QCheckBox("Only others hear it — not played in my headphones")
-        self.only_them.setToolTip("It still goes out to others (Discord, the game, OBS…); you just "
-                                  "don't hear it yourself (Preview still plays it to you)")
+        self.only_them = QCheckBox(_("Only others hear it — not played in my headphones"))
+        self.only_them.setToolTip(_("It still goes out to others (Discord, the game, OBS…); you "
+                                    "just don't hear it yourself (Preview still plays it to you)"))
         self.only_them.setChecked(meta.only_them)
         form.addRow("", self.only_them)
 
@@ -274,31 +275,31 @@ class EditDialog(QDialog):
             b.setCheckable(True)
             name = COLOUR_NAMES.get(c, c)
             b.setToolTip(name)
-            b.setAccessibleName(f"{name} colour")
-            b.clicked.connect(lambda _=False, c=c: self._set_color(c))
+            b.setAccessibleName(_("{name} colour", name=name))
+            b.clicked.connect(lambda __=False, c=c: self._set_color(c))
             self.swatch_group.addButton(b)
             self.swatches.append((b, c))
             crow.addWidget(b)
         crow.addStretch()
         form.addRow("Colour", crow)
         self._set_color(self.color)
-        self.tabs.addTab(basics, "Sound")
+        self.tabs.addTab(basics, _("Sound"))
 
         self.effects = EffectsPanel(meta.fx, meta)
         scroll = QScrollArea()
         scroll.setWidgetResizable(True)
         scroll.setWidget(self.effects)
         scroll.setFrameShape(QScrollArea.NoFrame)
-        self.tabs.addTab(scroll, "Effects")
+        self.tabs.addTab(scroll, _("Effects"))
         if tab == "effects":
             self.tabs.setCurrentIndex(1)
 
         prow = QHBoxLayout()
-        prev = QPushButton("Preview (only you hear it)")
+        prev = QPushButton(_("Preview (only you hear it)"))
         icons.set_icon(prev, "headphones")
 
         def play_preview():
-            release = busy.hold(prev, "Rendering the effects…")
+            release = busy.hold(prev, _("Rendering the effects…"))
             got = preview_cb(self.meta.id, self.vol.value() / 100, self.effects.fx(),
                              self.fades(), lambda ok: release(
                                  "▶  Playing" if ok else "Couldn't render it"))
@@ -315,8 +316,8 @@ class EditDialog(QDialog):
         self._fx_note()
 
         bb = QDialogButtonBox(QDialogButtonBox.Save | QDialogButtonBox.Cancel)
-        copy = bb.addButton("Save as new sound", QDialogButtonBox.AcceptRole)
-        copy.setToolTip("Keep this sound as it is and add the edited version as a new pad")
+        copy = bb.addButton(_("Save as new sound"), QDialogButtonBox.AcceptRole)
+        copy.setToolTip(_("Keep this sound as it is and add the edited version as a new pad"))
         copy.clicked.connect(lambda: setattr(self, "as_copy", True))
         bb.accepted.connect(self.accept)
         bb.rejected.connect(self.reject)
@@ -353,7 +354,7 @@ class EditDialog(QDialog):
 
     def _fx_note(self):
         s = soundfx.summary(self.effects.fx())
-        self.fx_note.setText(f"Effects: {s}" if s else "")
+        self.fx_note.setText(_("Effects: {s}", s=s) if s else "")
 
     def _set_color(self, c):
         self.color = c

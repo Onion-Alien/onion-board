@@ -1,6 +1,6 @@
 """The Radio tab: internet radio from all over the world, picked on a world map or
 by searching, played through the engine so it can go out to others like your
-sounds do (LIVE). The directory, player and globe page are in radio.py; the
+sounds do (Send). The directory, player and globe page are in radio.py; the
 flat map (the default view) is ui/flatmap.py, the 3D globe its HD option.
 
 Nothing touches the network until the tab is first opened.
@@ -33,6 +33,7 @@ from soundboard.radio import RadioDirectory, RadioPlayer, Station
 from soundboard.ui import appstate, busy, icons
 from soundboard.ui.panel import Flow as _Flow
 from soundboard.ui.panel import VolumeControl, bar, icon_label, vsep
+from soundboard.ui.widgets import paint_now_playing
 
 log = logging.getLogger(__name__)
 
@@ -214,9 +215,10 @@ class _StationDelegate(QStyledItemDelegate):
             p.setPen(Qt.NoPen)
             p.setBrush(QColor(t["on_accent"]))
             c = QRectF(avatar).center()
-            if playing:          # a little equalizer
-                for i, h in enumerate((10, 16, 7)):
-                    p.drawRoundedRect(QRectF(c.x() - 8 + i * 6, c.y() + 8 - h, 4, h), 1, 1)
+            if playing:          # a little equalizer, bouncing (still while tuning in)
+                paint_now_playing(p, QRectF(c.x() - 9, c.y() - 9, 18, 18),
+                                  QColor(t["on_accent"]), n=3,
+                                  paused=self.tab.player.status == "connecting")
             else:                # ▶
                 tri = QPainterPath()
                 tri.moveTo(c.x() - 5, c.y() - 8)
@@ -289,6 +291,8 @@ class _StationDelegate(QStyledItemDelegate):
             if avatar.contains(pos):
                 QTimer.singleShot(0, lambda: self.tab._play_or_stop(uuid))
                 return True
+            if ev.type() == QEvent.MouseButtonRelease and opt.rect.contains(pos):
+                QTimer.singleShot(0, lambda: self.tab.play_uuid(uuid))   # a click plays it
         return super().editorEvent(ev, model, opt, idx)
 
 
@@ -360,6 +364,80 @@ class _FilterRow(QWidget):
     def resizeEvent(self, e):
         super().resizeEvent(e)
         self._arrange(self.rows_for(self.width()))
+
+
+class NowPlaying(QWidget):
+    """The control bar's "what's on": bouncing bars and the station's name (and the
+    song, when the station says) while one plays, so it's plain at a glance even with
+    the station scrolled out of the list. Click it to find the station in the list."""
+    clicked = Signal()
+
+    def __init__(self):
+        super().__init__()
+        self.name = ""
+        self.title = ""
+        self.tuning = False
+        self.setMinimumWidth(80)
+        self.setFixedHeight(34)
+        self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+        self.setAccessibleName("Now playing")
+        self.setAccessibleDescription("Nothing playing")
+
+    def set_station(self, name: str, title: str = "", tuning: bool = False):
+        if (name, title, tuning) != (self.name, self.title, self.tuning):
+            self.name, self.title, self.tuning = name, title, tuning
+            self.setCursor(Qt.PointingHandCursor if name else Qt.ArrowCursor)
+            self.setToolTip("Show it in the list" if name else "")
+            what = (f"Tuning in to {name}" if tuning else
+                    f"Playing {name}" + (f": {title}" if title else ""))
+            self.setAccessibleDescription(what if name else "Nothing playing")
+        self.update()   # the bars move on every tick while it plays
+
+    def mouseReleaseEvent(self, e):
+        if self.name and e.button() == Qt.LeftButton and self.rect().contains(
+                e.position().toPoint()):
+            self.clicked.emit()
+        super().mouseReleaseEvent(e)
+
+    def paintEvent(self, _e):
+        t = theme.T
+        p = QPainter(self)
+        p.setRenderHint(QPainter.Antialiasing)
+        r = QRectF(self.rect()).adjusted(0.5, 0.5, -0.5, -0.5)
+        f = QFont(self.font())
+        if not self.name:
+            p.setPen(QColor(t["muted"]))
+            p.setFont(f)
+            p.drawText(r.adjusted(10, 0, -4, 0), Qt.AlignLeft | Qt.AlignVCenter,
+                       p.fontMetrics().elidedText("Nothing playing — click a station",
+                                                  Qt.ElideRight, int(r.width()) - 14))
+            p.end()
+            return
+        bg = QColor(t["accent"])
+        bg.setAlpha(40)
+        p.setPen(QColor(t["accent"]))
+        p.setBrush(bg)
+        p.drawRoundedRect(r, r.height() / 2, r.height() / 2)
+        paint_now_playing(p, QRectF(r.left() + 12, r.top() + 9, 16, r.height() - 18),
+                          QColor(t["accent_hi"]), paused=self.tuning)
+        x = r.left() + 36
+        room = int(r.right() - 12 - x)
+        f.setBold(True)
+        p.setFont(f)
+        p.setPen(QColor(t["text_hi"]))
+        head = f"Tuning in to {self.name}…" if self.tuning else self.name
+        head = p.fontMetrics().elidedText(head, Qt.ElideRight, room)
+        p.drawText(QRectF(x, r.top(), room, r.height()), Qt.AlignLeft | Qt.AlignVCenter, head)
+        used = p.fontMetrics().horizontalAdvance(head)
+        if self.title and not self.tuning and used + 40 < room:
+            f.setBold(False)
+            p.setFont(f)
+            p.setPen(QColor(t["muted"]))
+            rest = p.fontMetrics().elidedText(f"— {self.title}", Qt.ElideRight,
+                                              room - used - 8)
+            p.drawText(QRectF(x + used + 8, r.top(), room - used - 8, r.height()),
+                       Qt.AlignLeft | Qt.AlignVCenter, rest)
+        p.end()
 
 
 class RadioTab(QWidget):
@@ -478,7 +556,7 @@ class RadioTab(QWidget):
         self.btn_play = QPushButton("Play")
         self.btn_play.setToolTip("Play the selected station / stop the radio")
         icons.set_icon(self.btn_play, "play")
-        self.btn_play.clicked.connect(self._toggle_play)
+        self.btn_play.clicked.connect(self.toggle_play)
         bh.addWidget(self.btn_play)
         self.btn_random = QPushButton()
         self.btn_random.setObjectName("iconbutton")
@@ -496,13 +574,15 @@ class RadioTab(QWidget):
         self.btn_fav.clicked.connect(lambda: self._toggle_fav())
         bh.addWidget(self.btn_fav)
         bh.addWidget(vsep())
-        self.btn_live = QPushButton()
+        self.btn_live = QPushButton()   # Send, like a program's on the Apps tab
         self.btn_live.setObjectName("live")
         self.btn_live.setCheckable(True)
         icons.set_icon(self.btn_live, "live", checked_color="#ffffff")
         self.btn_live.toggled.connect(self._on_live)
         bh.addWidget(self.btn_live)
-        bh.addStretch(1)
+        self.now = NowPlaying()
+        self.now.clicked.connect(self._show_playing)
+        bh.addWidget(self.now, 1)
         self.btn_rec = QPushButton("Record")
         self.btn_rec.setObjectName("rec")
         self.btn_rec.setCheckable(True)
@@ -536,7 +616,7 @@ class RadioTab(QWidget):
         bh.addWidget(self.chk_hear)
         v.addWidget(bar_)
 
-        # LIVE always starts off
+        # Send always starts off
         self._on_live(False)
         self._on_vol(self.vol.value())
         hear = bool(cfg.radio.get("monitor", True))
@@ -1301,9 +1381,21 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
         self._update_buttons()
 
     def _on_activated(self, it):
-        s = self._stations.get(it.data(Qt.UserRole))
-        if s is not None:
+        self.play_uuid(it.data(Qt.UserRole))
+
+    def play_uuid(self, uuid: str):
+        """Play the station unless it's already the one playing (a click, a
+        double-click, Enter): clicking it again doesn't restart it."""
+        s = self._stations.get(uuid)
+        on = self.player.station
+        if s is not None and (on is None or on.uuid != uuid):
             self.play(s)
+
+    def _show_playing(self):
+        """The now-playing strip was clicked: the station's row in the list."""
+        if self.player.station is not None:
+            self._highlight(self.player.station.uuid)
+            self._select_on_globe(fly=True)
 
     # ------------------------------------------------------------------ playing
     def play_random(self):
@@ -1333,7 +1425,7 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
         self._report_active()
 
     def is_active(self) -> bool:
-        """A station is playing (to you, or to everyone with LIVE on)."""
+        """A station is playing (to you, or to everyone with Send on)."""
         return self.player.station is not None
 
     def live_tip(self) -> str:
@@ -1361,7 +1453,8 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
             self._restate_rows()
         self._report_active()
 
-    def _toggle_play(self):
+    def toggle_play(self):
+        """The Play / Stop button, and Space on this tab (ui/spacekey.py)."""
         if self.player.station is not None:
             self.stop()
             return
@@ -1393,9 +1486,16 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
         if st is not None and title.strip().lower() != st.name.strip().lower():
             self._title = title
             self._refresh_info()
+            self._update_now()
+
+    def _update_now(self):
+        st = self.player.station
+        self.now.set_station(st.name if st else "", self._title if st else "",
+                             st is not None and self.player.status == "connecting")
 
     def _update_buttons(self):
         on = self.player.station is not None
+        self._update_now()
         self.btn_play.setText("" if self._play_short else "Stop" if on else "Play")
         icons.set_icon(self.btn_play, "stop" if on else "play")
         self.btn_play.setEnabled(on or self.selected() is not None
@@ -1423,7 +1523,7 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
         if st is None:
             n = len(self._globe_list)
             text = (f"{n:,} popular stations — click a dot on the map, or search. "
-                    "Click a station's badge (or double-click it) to play it." if n else
+                    "Click a station to play it." if n else
                     self._no_stations_text())
             if not n and self._globe_error:
                 red = theme.status("error")
@@ -1441,8 +1541,8 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
             if self.engine.radio_live:
                 text += f"  <span style='color:{theme.status('ok')}'>· others hear it</span>"
             else:
-                text += ("  · only you hear the radio: press “Only me” below to send it "
-                         "to others too")
+                text += ("  · only you hear the radio: press “Send” below so others "
+                         "hear it too")
         self.info.setText(text)
 
     # ------------------------------------------------------------------ favourites
@@ -1474,10 +1574,10 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
 
     def _label_live(self):
         on = self.btn_live.isChecked()
-        self.btn_live.setText("LIVE" if on else "Only me")
+        self.btn_live.setText("Sending" if on else "Send")
         self.btn_live.setToolTip("Others hear the radio. Click so only you do." if on else
-                                 "Only you hear the radio. Click to go live: others hear "
-                                 "it too.")
+                                 "Send the radio out to others, the way your sounds go "
+                                 "(Setup tab). Off: only you hear it.")
 
     def fit_steps(self):
         """What the main window may hide here when it gets small (ui/responsive.py)."""
@@ -1501,6 +1601,7 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
                 (40, "w", r.hide(*self._vol_group)),
                 (46, "w", r.hide(self.globe_box)),      # narrow: just the list
                 (50, "w", r.hide(*self._clip_group, self.btn_fav, self.btn_refresh)),
+                (54, "w", r.hide(self.now)),
                 (20, "h", r.hide(self.info))]
 
     def _on_vol(self, gain: float):
@@ -1554,6 +1655,14 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
             return
         self.meter.set_level(e.level_radio)
         e.level_radio *= 0.8
+        st = self.player.station
+        if st is not None:   # the bouncing bars: the strip and the playing row's badge
+            self.now.update()
+            for i in range(self.list.count()):
+                it = self.list.item(i)
+                if it.data(Qt.UserRole) == st.uuid:
+                    self.list.viewport().update(self.list.visualItemRect(it))
+                    break
         if self.recorder.recording:
             secs = self.recorder.rec_frames / SR
             self.btn_rec.setText(f"Stop  {int(secs // 60)}:{int(secs % 60):02d}")

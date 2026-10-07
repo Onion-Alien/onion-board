@@ -2,9 +2,9 @@
 game, a call in another app) and push it into the engine so it goes out through
 the send device like a sound, without touching what any other program plays.
 
-Windows 10 build 20348+ and Windows 11 have this built into WASAPI ("process
-loopback", what Discord's and OBS's application-audio capture use). It is a *copy*
-of the program's audio: the program keeps playing on your speakers as before.
+Windows 11 and Windows 10 version 2004+ (build 19041) have this built into WASAPI
+("process loopback", what Discord's and OBS's application-audio capture use). It is a
+*copy* of the program's audio: the program keeps playing on your speakers as before.
 
 Everything here is ctypes over COM (no extra packages). Nothing in it works
 outside Windows; `supported()` says whether this machine can do it, and a failed
@@ -34,7 +34,8 @@ from soundboard import errors
 log = logging.getLogger(__name__)
 
 SR = 48000            # what the sink gets (the engine's storage rate)
-MIN_BUILD = 20348     # first Windows build with process loopback
+MIN_BUILD = 19041     # Windows 10 2004: process loopback works there (OBS relies on it),
+                      # though Microsoft only documents it from 20348, a Server build
 GAP_S = 0.03          # no packets from the program this long: it's quiet, send silence
 
 S_OK = 0
@@ -109,8 +110,8 @@ def supported() -> tuple[bool, str]:
         return False, "Capturing a program's audio needs Windows."
     build = sys.getwindowsversion().build
     if build < MIN_BUILD:
-        return False, (f"Capturing a program's audio needs Windows 11 or Windows 10 build "
-                       f"{MIN_BUILD} or newer (this is build {build}).")
+        return False, (f"Capturing a program's audio needs Windows 11, or Windows 10 "
+                       f"updated to version 2004 or newer (this is build {build}).")
     return True, ""
 
 

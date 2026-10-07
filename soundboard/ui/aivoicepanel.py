@@ -17,6 +17,7 @@ from PySide6.QtWidgets import (QCheckBox, QComboBox, QGridLayout, QHBoxLayout, Q
 from soundboard import aiaddon, applog, errors
 from soundboard import modules as mods
 from soundboard.speech import aivoice
+from soundboard.speech import aivoicelist as avl
 from soundboard.ui import busy, icons
 from soundboard.ui.panel import hint_label, section_label
 from soundboard.wheelguard import no_wheel
@@ -26,11 +27,18 @@ BACKUP_LABELS = [("A built-in voice (still hides yours)", "voice"),
                  ("My real voice", "mic"), ("Silence", "mute")]
 
 
-def read_voices(module: mods.ModuleInfo | None) -> list[dict]:
-    """The add-on's voices.json "voices" (id, name, description, emoji…); [] if unreadable."""
+def read_voices(module: mods.ModuleInfo | None,
+                mine: list[dict] | None = None) -> list[dict]:
+    """The add-on's voices.json "voices" (id, name, description, emoji…), first brought
+    up to date with the app's built-in voices and your own (`mine`, else read from
+    your file) when it's the installed copy (aivoicelist.sync); [] if unreadable."""
     if module is None:
         return []
     try:
+        voices = avl.sync(module.path, avl.Store().voices if mine is None else mine,
+                          aiaddon.removable(module))
+        if voices:
+            return voices
         data = json.loads((module.path / "voices.json").read_text(encoding="utf-8"))
         return [v for v in data.get("voices", [])
                 if isinstance(v, dict) and isinstance(v.get("id"), str) and v.get("name")]
@@ -53,9 +61,11 @@ class AiVoicePanel(QWidget):
     _install_done = Signal(bool, str)
 
     def __init__(self, controller: aivoice.AiVoiceController, settings: dict,
-                 module_list: list[mods.ModuleInfo]):
+                 module_list: list[mods.ModuleInfo], engine=None):
         super().__init__()
         self.ctl = controller
+        self.engine = engine           # for Hear it (None: no samples)
+        self.store = avl.Store()       # your own voices
         self.s = aivoice.clean_settings(settings)
         controller.on_event = self._event.emit
         controller.set_backup(self.s["backup"])
@@ -70,7 +80,8 @@ class AiVoicePanel(QWidget):
         v = QVBoxLayout(self)
         v.setContentsMargins(0, 0, 0, 0)
         v.setSpacing(12)
-        v.addWidget(section_label("AI VOICES"))
+        self.title = section_label("AI VOICES")
+        v.addWidget(self.title)
         v.addWidget(hint_label("Talk, and others hear a different person: your words and "
                                "tone, another voice, live. It runs on this PC (about one CPU "
                                "core while you talk, nothing while you're quiet); what you "
@@ -84,9 +95,17 @@ class AiVoicePanel(QWidget):
         grid.setHorizontalSpacing(12)
         grid.setVerticalSpacing(10)
         grid.addWidget(QLabel("Voice"), 0, 0)
+        vrow = QHBoxLayout()
         self.cb_voice = QComboBox()
         self.cb_voice.setToolTip("The character you sound like")
-        grid.addWidget(self.cb_voice, 0, 1)
+        vrow.addWidget(self.cb_voice, 1)
+        self.b_all = QPushButton("All voices")
+        icons.set_icon(self.b_all, "sounds")
+        self.b_all.setToolTip("Every voice with what it sounds like, a sample to hear, "
+                              "and making your own")
+        self.b_all.clicked.connect(self.open_browser)
+        vrow.addWidget(self.b_all)
+        grid.addLayout(vrow, 0, 1)
         self.lbl_about = hint_label("")
         grid.addWidget(self.lbl_about, 1, 1)
         grid.addWidget(QLabel("Pitch"), 2, 0)
@@ -246,7 +265,41 @@ class AiVoicePanel(QWidget):
         return next((vo for vo in self.voices if vo["id"] == vid), {})
 
     def _show_about(self):
-        self.lbl_about.setText(str(self._voice().get("description", "")))
+        vo = self._voice()
+        tags = avl.tag_line(vo) if vo else ""
+        text = str(vo.get("about") or vo.get("description") or "")
+        self.lbl_about.setText(f"{tags}. {text}" if tags and text else tags or text)
+
+    # ------------------------------------------------------------ all voices
+    def _resync(self) -> list[dict]:
+        """Your own voices changed: write them into the add-on and list them again."""
+        self.voices = read_voices(self.module, self.store.voices)
+        old = self.s["voice"]
+        self.cb_voice.blockSignals(True)
+        self.cb_voice.clear()
+        for vo in self.voices:
+            self.cb_voice.addItem(f"{vo.get('emoji', '')} {vo['name']}".strip(), vo["id"])
+        self.cb_voice.setCurrentIndex(max(0, self.cb_voice.findData(old)))
+        self.cb_voice.blockSignals(False)
+        if (self.cb_voice.currentData() or "") != old:    # it was deleted
+            self._voice_picked()
+        self._show_about()
+        return self.voices
+
+    def _play_sample(self, data):
+        self.engine.play("__ai_voice_sample", data, 1.0, preview=True)
+
+    def open_browser(self):
+        from soundboard.ui.aivoicebrowser import AiVoiceBrowser, Previewer
+        ready = self.module is not None and self.module.installed
+        prev = Previewer(self, lambda: self.module if ready else None,
+                         self._play_sample if self.engine is not None else None)
+        can_make = self.module is not None and aiaddon.removable(self.module)
+        d = AiVoiceBrowser(self.voices, self.cb_voice.currentData() or "", self.store, prev,
+                           can_make, self, refresh=self._resync)
+        d.picked.connect(lambda vid: self.cb_voice.setCurrentIndex(
+            max(0, self.cb_voice.findData(vid))))
+        d.exec()
 
     def _voice_picked(self, *_):
         self.s["voice"] = self.cb_voice.currentData() or ""

@@ -18,6 +18,7 @@ from soundboard.eq import PRESETS as EQ_PRESETS
 from soundboard.ui import icons
 from soundboard.ui.widgets import EqCurve, Meter
 from soundboard.wheelguard import no_wheel
+from soundboard.i18n import _
 
 
 def section_label(text: str) -> QLabel:
@@ -234,7 +235,8 @@ def card(title: str = "", hint: str = "", *, roomy: bool = False) -> tuple[QFram
     f.setObjectName("card")
     v = QVBoxLayout(f)
     f.setProperty("roomy", roomy)
-    v.setContentsMargins(*((18, 18, 18, 18) if roomy else (14, 8, 14, 14)))
+    # the title label adds 8 px of its own above, so the top margin is 8 less
+    v.setContentsMargins(*((18, 10, 18, 18) if roomy else (14, 8, 14, 14)))
     v.setSpacing(12 if roomy else 6)
     if title:
         v.addWidget(section_label(title))
@@ -258,8 +260,8 @@ class _LevelDot(Meter):
     def __init__(self):
         super().__init__()
         self.setFixedSize(6, 6)
-        self.setAccessibleName("Audio activity")
-        self.setToolTip("Audio activity: green is signal, amber is loud, red is near clipping")
+        self.setAccessibleName(_("Audio activity"))
+        self.setToolTip(_("Audio activity: green is signal, amber is loud, red is near clipping"))
 
     def paintEvent(self, e):
         frac, color = self._bar()
@@ -314,7 +316,7 @@ class VolumeControl(QWidget):
         self.spin.setSuffix(" %")
         self.spin.setFixedWidth(58)   # until it's styled (_Pct)
         self.spin.setAlignment(Qt.AlignRight)
-        self.spin.setToolTip(f"Type an exact volume (0–{typed_max}%)")
+        self.spin.setToolTip(_("Type an exact volume (0–{typed_max}%)", typed_max=typed_max))
         if tip:
             self.slider.setToolTip(tip)
         h.addWidget(self.slider, 1)
@@ -364,7 +366,7 @@ class EqPanel(QWidget):
         pv.setSpacing(8)
         pv.addWidget(section_label("EQUALIZER"))
         row = QHBoxLayout()
-        self.chk_on = QCheckBox("EQ on")
+        self.chk_on = QCheckBox(_("EQ on"))
         self.chk_on.setChecked(enabled)
         row.addWidget(self.chk_on)
         self.lbl_for = QLabel("for")
@@ -379,7 +381,7 @@ class EqPanel(QWidget):
 
         self.cb_preset = QComboBox()
         self.cb_preset.addItems(list(EQ_PRESETS))
-        self.cb_preset.addItem("Custom")
+        self.cb_preset.addItem(_("Custom"))
         pv.addWidget(self.cb_preset)
         no_wheel(self.cb_target, self.cb_preset)
 
@@ -397,7 +399,7 @@ class EqPanel(QWidget):
             s = QSlider(Qt.Vertical)
             s.setRange(-EQ_MAX_DB * 2, EQ_MAX_DB * 2)   # half-dB steps
             s.setFixedHeight(96)
-            s.setToolTip(f"{lab} Hz")
+            s.setToolTip(_("{lab} Hz", lab=lab))
             f = QLabel(lab)
             f.setAlignment(Qt.AlignCenter)
             f.setObjectName("eqlabel")
@@ -409,8 +411,8 @@ class EqPanel(QWidget):
             self.vals.append(val)
         no_wheel(*self.sliders)
         pv.addLayout(grid)
-        pv.addWidget(hint_label("Low = bass (left) · high = treble (right). Drag up to boost, "
-                                "down to cut. Double-click the curve to reset."))
+        pv.addWidget(hint_label(_("Low = bass (left) · high = treble (right). Drag up to boost, "
+                                  "down to cut. Double-click the curve to reset.")))
 
         self._set_sliders(gains)
         self.cb_preset.setCurrentText(preset if preset in EQ_PRESETS else "Custom")
@@ -516,14 +518,14 @@ class UndoBar(QFrame):
         self.label = QLabel()
         self.label.setTextFormat(Qt.PlainText)   # names are user / web text
         h.addWidget(self.label, 1)
-        self.btn_undo = QPushButton("Undo")
+        self.btn_undo = QPushButton(_("Undo"))
         self.btn_undo.setObjectName("primary")
         self.btn_undo.setToolTip(tip)
         self.btn_undo.clicked.connect(self.undo)
         h.addWidget(self.btn_undo)
         dismiss = QPushButton()
         dismiss.setObjectName("chipstop")
-        dismiss.setToolTip("Dismiss")
+        dismiss.setToolTip(_("Dismiss"))
         dismiss.setFixedSize(24, 24)
         icons.set_icon(dismiss, "stop", size=10)
         dismiss.clicked.connect(self.finish)

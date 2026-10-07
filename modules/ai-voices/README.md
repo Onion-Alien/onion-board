@@ -34,6 +34,12 @@ app: voice chain <- jitter buffer <- 24 kHz  <───  b"B" frames, 20 ms each
 200-speaker model, plus a formant and pitch setting, so no voice is any one real
 person. Never add a voice made to sound like a real, identifiable person.
 
+The app carries the same list (`soundboard/speech/aivoicelist.py`, a test keeps them
+equal) and writes it into the installed copy's `voices.json`, with the user's own
+voices, so a new blend of speakers the model already has reaches old downloads
+without a new release. A voice needing a speaker the model lacks is left out.
+`about` and `tags` are for the app's *All voices* window.
+
 ## Licences
 
 - Model design, training code and pretrained weights: [beatrice-trainer]

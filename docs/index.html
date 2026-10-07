@@ -51,8 +51,8 @@
   .shots { grid-template-columns: repeat(auto-fit, minmax(380px, 1fr)); gap: 18px; }
   .shots figure { margin: 0; }
   .shots figcaption { color: var(--muted); font-size: 15px; margin-top: 6px; }
-  ol.steps { max-width: 640px; margin: 0 auto; padding-left: 22px; }
-  ol.steps li { margin: 6px 0; }
+  .steps { max-width: 640px; margin: 0 auto; padding-left: 22px; }
+  .steps li { margin: 6px 0; }
   .note { max-width: 640px; margin: 16px auto 0; color: var(--muted); font-size: 14px; }
   footer { text-align: center; color: var(--muted); font-size: 14px; padding: 48px 0 40px; }
   @media (max-width: 440px) { .shots { grid-template-columns: 1fr; } }
@@ -77,15 +77,13 @@
 
   <h2>What it does</h2>
   <div class="grid">
-    <div class="card"><b>🎤 Sounds through your mic</b><span>Into Discord or any game, with your voice or without it.</span></div>
-    <div class="card"><b>⌨️ Hotkeys that work in-game</b><span>Plus an overlay, MIDI pads and Stream Deck.</span></div>
-    <div class="card"><b>🔎 Sounds from anywhere</b><span>Drag in files, or search YouTube and SoundCloud in the app.</span></div>
-    <div class="card"><b>🎛️ Effects on any sound</b><span>Trim, speed, pitch, bass boost. One-click Ear rape and Nightcore.</span></div>
-    <div class="card"><b>🤖 Voice changer and TTS</b><span>Change your voice live, or sound like someone else with the optional AI voices. Or type and a computer voice says it.</span></div>
-    <div class="card"><b>💀 Screen triggers</b><span>A sound the moment "YOU DIED" shows up, via the free <a href="https://onion-alien.github.io/onion-watch/">Onion Watch</a> add-on.</span></div>
-    <div class="card"><b>📱 Your pads on your phone</b><span>Scan a code, tap a pad, it plays on your PC. Run the radio and the speed, pitch and effects from it too. Nothing to install on the phone, via the free <a href="https://github.com/Onion-Alien/onion-pocket">Onion Pocket</a> add-on.</span></div>
-    <div class="card"><b>⏪ Instant replay</b><span>One key turns the last 30 seconds you heard into a pad.</span></div>
-    <div class="card"><b>📻 And more</b><span>World radio, app audio, a clean OBS output, 31 themes. <a href="https://github.com/Onion-Alien/onion-board/blob/main/docs/FEATURES.md">Full list</a></span></div>
+    <div class="card"><b>🎤 No virtual cable</b><span>Sounds go straight into the mic you already use in Discord and games, with your voice or without it.</span></div>
+    <div class="card"><b>🔎 One-click sounds</b><span>Search YouTube, SoundCloud and Myinstants in the app and add a sound in one click. Or drag in files.</span></div>
+    <div class="card"><b>⌨️ Hotkeys that work in-game</b><span>Plus an in-game overlay, MIDI pads and Stream Deck.</span></div>
+    <div class="card"><b>📦 Bring your board over</b><span>Coming from Soundpad, Resanance, Soundux or EXP Soundboard? Your sounds and hotkeys come with you in one click.</span></div>
+    <div class="card"><b>🎛️ Effects on any sound</b><span>Trim, speed, pitch, bass boost. One-click Deep fried and Nightcore.</span></div>
+    <div class="card"><b>🤖 Voice changer and TTS</b><span>Change your voice live, or type and a computer voice says it.</span></div>
+    <div class="card"><b>📻 And more</b><span>Instant replay, screen triggers, your pads on your phone, world radio, a clean OBS output. <a href="https://github.com/Onion-Alien/onion-board/blob/main/docs/FEATURES.md">Full list</a></span></div>
   </div>
 
   <h2>A closer look</h2>
@@ -106,9 +104,22 @@
       Already use Voicemeeter, a mixer or OBS? Pick it under
       <b>Send my sounds to</b> instead.</li>
   </ol>
-  <p class="note">Windows may warn you about the download. That's normal for a free app that isn't
-    code-signed: click <b>More info → Run anyway</b> (or <b>⋯ → Keep</b> in Edge / Chrome). The full
-    source is <a href="https://github.com/Onion-Alien/onion-board">on GitHub</a>.</p>
+  <h2>Is it safe?</h2>
+  <ul class="steps">
+    <li><b>Why Windows warns you:</b> the app isn't code-signed yet (a certificate costs money
+      every year), so Windows doesn't know it. Click <b>More info → Run anyway</b> (or <b>⋯ → Keep</b>
+      in Edge / Chrome). Every release is scanned on VirusTotal (the link is above).</li>
+    <li><b>What needs admin, and why:</b> only the one-click "straight into my mic" step. It adds a
+      small audio effect to your mic in Windows' audio engine, backs up your mic's settings first, and
+      puts them back when you switch it off or uninstall.</li>
+    <li><b>What goes online:</b> only what you ask for (searches, downloads, the radio), an update
+      check, and an anonymous daily count you can switch off. Every request is listed in
+      <a href="https://github.com/Onion-Alien/onion-board/blob/main/SECURITY.md#what-the-app-does-on-the-network">SECURITY.md</a>,
+      and the app shows them live under Settings → Connection → Network activity.</li>
+    <li><b>Getting rid of it:</b> uninstall it like any app in Windows' Settings. Your mic goes back
+      the way it was. Your own sounds stay in <code>%APPDATA%\OnionBoard</code> until you delete them.</li>
+    <li>The full source is <a href="https://github.com/Onion-Alien/onion-board">on GitHub</a>.</li>
+  </ul>
   <p class="note">Use winget? <code>winget install OnionAlien.OnionBoard</code> installs it from a
     terminal with no clicks.</p>
 

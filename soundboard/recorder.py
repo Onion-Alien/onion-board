@@ -212,9 +212,18 @@ class MicTake:
     as it comes, so a long one doesn't sit in RAM; at the mic's own rate, capped at
     MAX_SECONDS. stop() gives it back as (n, 2) float32 at SR."""
 
-    def __init__(self, engine, processed: bool = False, spool_path=None):
+    def __init__(self, engine, processed: bool = False, spool_path=None,
+                 playing: bool = False):
+        """`playing`: record what's playing (Engine.start_play_take) instead of the mic."""
         self.engine = engine
-        self.rate = int(engine.rates["mic"])
+        self.playing = playing
+        self.out = "mic"   # whose rate the blocks come at (what's playing: set below)
+        # first: it says which output (and rate) what's playing comes from
+        self._blocks = (engine.start_play_take() if playing
+                        else engine.start_mic_take(processed))
+        if playing:
+            self.out = engine.play_take_out
+        self.rate = int(engine.rates[self.out])
         self.frames = 0
         self.rate_changed = False   # the mic switched rate mid-take: it ends there
         self.spool_path = spool_path or library.APP_DIR / "mictake.tmp.wav"
@@ -227,7 +236,6 @@ class MicTake:
             log.warning("can't open the mic take's spool %s; keeping it in memory",
                         self.spool_path, exc_info=True)
             self._spool, self._mem = None, []
-        self._blocks = engine.start_mic_take(processed)
 
     @property
     def seconds(self) -> float:
@@ -243,7 +251,7 @@ class MicTake:
         n = len(blocks)
         if not n or self.full:
             return 0
-        if self.engine.rates["mic"] != self.rate:
+        if self.engine.rates[self.out] != self.rate:
             self.rate_changed = True
             return 0
         chunk = blocks[:n]
@@ -252,6 +260,15 @@ class MicTake:
         self._write(x)
         self.frames += len(x)
         return len(x)
+
+    def _end(self):
+        """The engine stops adding to this take (and only this one)."""
+        e = self.engine
+        if self.playing:
+            if e._play_take is self._blocks:
+                e.stop_play_take()
+        elif e._take is self._blocks:
+            e.stop_mic_take()
 
     def _write(self, x: np.ndarray):
         if self._spool is not None:
@@ -283,7 +300,7 @@ class MicTake:
 
     def stop(self) -> np.ndarray:
         """End it: (n, 2) float32 at SR (empty if the mic sent nothing)."""
-        self.engine.stop_mic_take()
+        self._end()
         self.pump()
         if self._spool is not None:
             data = self._read_back()
@@ -294,8 +311,7 @@ class MicTake:
 
     def cancel(self):
         """Throw it away."""
-        if self.engine.taking and self.engine._take is self._blocks:
-            self.engine.stop_mic_take()
+        self._end()
         self._blocks = []
         if self._spool is not None:
             try:

@@ -11,8 +11,9 @@ from PySide6.QtCore import (QEvent, QMimeData, QObject, QPoint, QPointF, QRectF,
                             QTimer, QVariantAnimation, Signal)
 from PySide6.QtGui import (QColor, QDrag, QFont, QFontMetrics, QLinearGradient, QPainter,
                            QPainterPath, QPen)
-from PySide6.QtWidgets import (QAbstractButton, QGridLayout, QLabel, QScrollArea, QSlider,
-                               QStackedWidget, QStyle, QTabWidget, QVBoxLayout, QWidget)
+from PySide6.QtWidgets import (QAbstractButton, QGridLayout, QHBoxLayout, QLabel, QScrollArea,
+                               QSlider, QStackedWidget, QStyle, QTabWidget, QVBoxLayout,
+                               QWidget)
 
 from soundboard import midi, theme, thumbs
 from soundboard.eq import MAX_DB as EQ_MAX_DB
@@ -21,6 +22,7 @@ from soundboard.engine import SR
 from soundboard.library import AUDIO_EXTS, SoundMeta
 from soundboard.settings import pretty_key
 from soundboard.ui.bunnywidget import BunnyWidget
+from soundboard.i18n import _
 
 PAD_MIME = "application/x-soundboard-pad"
 
@@ -32,7 +34,7 @@ class Meter(QWidget):
         self._hot = False
         self._drawn = None        # (bar width in px, colour) as last painted
         self.setFixedHeight(8)
-        self.setAccessibleName("Level meter")
+        self.setAccessibleName(_("Level meter"))
 
     @property
     def hot(self) -> bool:
@@ -85,8 +87,8 @@ class EqCurve(QWidget):
         self.setFixedHeight(70)
         self.gains = [0.0] * 7
         self.on = False
-        self.setToolTip("Double-click to reset")
-        self.setAccessibleName("EQ curve")
+        self.setToolTip(_("Double-click to reset"))
+        self.setAccessibleName(_("EQ curve"))
         self._freqs = np.geomspace(30, 18000, 160)
 
     def set_gains(self, gains, on):
@@ -241,6 +243,27 @@ class LoadingBar(QWidget):
         p.end()
 
 
+def paint_now_playing(p: QPainter, rect: QRectF, color: QColor, paused: bool = False,
+                      n: int = 4, t: float | None = None):
+    """A small "now playing" equalizer in `rect`: `n` bars bouncing with the clock (`t`,
+    seconds; now if None), or low and still while paused. Used wherever something
+    playing has to stand out at a glance: a web result's picture, the playing radio
+    station."""
+    t = time.monotonic() if t is None else t
+    gap = rect.width() / (n * 3 - 1)   # a bar is two gaps wide
+    bw = gap * 2
+    p.save()
+    p.setRenderHint(QPainter.Antialiasing)
+    p.setPen(Qt.NoPen)
+    p.setBrush(color)
+    for i in range(n):
+        f = 0.3 if paused else 0.25 + 0.75 * abs(math.sin(t * (2.3 + i * 0.9) + i * 1.7))
+        h = max(bw, rect.height() * f)
+        p.drawRoundedRect(QRectF(rect.left() + i * (bw + gap), rect.bottom() - h, bw, h),
+                          bw / 2, bw / 2)
+    p.restore()
+
+
 def fmt_time(s: float) -> str:
     s = max(0, int(s))
     return f"{s // 60}:{s % 60:02d}"
@@ -258,14 +281,16 @@ _FREQS = np.fft.rfftfreq(FFT_N, 1 / SR)
 
 
 class TabInfoCorner(QWidget):
-    """Give Qt's corner the tab row's height so its button is vertically centered."""
+    """Give Qt's corner the tab row's height so its buttons are vertically centered."""
 
-    def __init__(self, tabs, button):
+    def __init__(self, tabs, *buttons):
         super().__init__()
         self.tabs = tabs
-        layout = QVBoxLayout(self)
+        layout = QHBoxLayout(self)
         layout.setContentsMargins(0, 0, 0, 0)
-        layout.addWidget(button, 0, Qt.AlignVCenter)
+        layout.setSpacing(4)
+        for button in buttons:
+            layout.addWidget(button, 0, Qt.AlignVCenter)
 
     def sizeHint(self):
         size = super().sizeHint()
@@ -388,6 +413,7 @@ class Pad(QAbstractButton):
 
     def __init__(self, meta: SoundMeta, width: int):
         super().__init__()
+        self.setProperty("own_space", True)   # Space pauses / plays this pad (ui/spacekey.py)
         self.meta = meta
         self.progress = None     # None = not playing
         self.paused = False
@@ -891,7 +917,7 @@ class PadGrid(QWidget):
                    "just one sound?", "I'm bored…"),
             hope_lines=("yes! drop it!", "ooh, for me?!"),
             joy_lines=("yay!!", "↑ Add sounds!", "hehe!"))
-        self.bun.setToolTip("Bun is waiting for some sounds")
+        self.bun.setToolTip(_("Bun is waiting for some sounds"))
         ev.addWidget(self.bun, 0, Qt.AlignHCenter)
         self.empty_text = QLabel(self.HOW_TO)
         self.empty_text.setAlignment(Qt.AlignCenter)   # short lines: fits the mini player

@@ -70,7 +70,7 @@ FLAG = "--direct-mic"
 CLSID = "{C55E76FE-6667-4828-81FD-05B393FD649E}"   # obmic.cpp CLSID_OnionMic
 DEVICE = "Your mic (no cable)"         # the send "device" for the engine
 DLL_NAME = "obmic.dll"
-EFFECT_VERSION = 3                                  # obmic.cpp EFFECT_VERSION
+EFFECT_VERSION = 4                                  # obmic.cpp EFFECT_VERSION
 
 RATE = 48000
 CAPACITY = 1 << 16          # ~1.4 s at 48 kHz

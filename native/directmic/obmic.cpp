@@ -25,7 +25,10 @@
 //
 // Rules for this file: it runs inside audiodg.exe, so a crash here silences every
 // sound on the PC. APOProcess runs on a real-time thread: no locks, no allocation,
-// no file or registry access there.
+// no file or registry access there. Everything that touches the shared file runs
+// through guarded() (a fault there, say a disk error paging the file in, puts the mic
+// back as it was and rests the effect for a moment instead of taking audiodg down).
+// native/directmic/fuzzhost.cpp hammers it with hostile files (scripts/fuzz_directmic.py).
 
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
@@ -180,7 +183,7 @@ static const PROPERTYKEY PKEY_AudioEndpoint_GUID_ =
 static const CLSID CLSID_OnionMic =
     {0xc55e76fe, 0x6667, 0x4828, {0x81, 0xfd, 0x05, 0xb3, 0x93, 0xfd, 0x64, 0x9e}};
 static const wchar_t *STATE_KEY = L"SOFTWARE\\OnionBoard\\MicPlugin\\Endpoints";
-static const uint32_t EFFECT_VERSION = 3;        // directmic.EFFECT_VERSION
+static const uint32_t EFFECT_VERSION = 4;        // directmic.EFFECT_VERSION
 
 // The shared ring file. soundboard/directmic.py writes the same layout and documents it.
 // Anyone signed in can write this file, so nothing read from it is trusted: sizes are
@@ -200,6 +203,8 @@ static const double FADE_S = 0.01;               // crossfade between the mic an
 static const uint32_t SHRINK_AFTER = 200;        // blocks on time before the lead shrinks back
 static const double SHRINK_MAX_S = 0.02;         // the most one quiet skip takes back
 static const float QUIET = 0.004f;               // (-48 dBFS) a skip this quiet can't be heard
+static const uint64_t POS_MAX = 1ull << 52;      // positions past this are junk (see process)
+static const uint64_t FAULT_REST_MS = 1000;      // after a fault: the plain mic this long
 // The board's 48 kHz into a mic at another rate: a windowed-sinc (Kaiser) low-pass and
 // resampler, from a table made in LockForProcess. Linear interpolation folded the
 // board's highs back down as noise on 44.1 / 16 kHz mics.
@@ -359,6 +364,71 @@ static inline float clean(float x) {   // NaN / inf / out of range from the ring
     return x > 1.0f ? 1.0f : x < -1.0f ? -1.0f : x;
 }
 
+// ------------------------------------------------------------------ the guard
+// guarded(fn, ctx) runs fn(ctx) and returns false, instead of crashing audiodg, if it
+// faults: a __try / __except, which g++ hasn't got, built the way the compiler would.
+// The SEH scope table names the call's range and obmicGuardFilter as its filter; the
+// system's __C_specific_handler unwinds to .l_obguard_end on a fault, right after the
+// call, the same as a return from it (the guarded range holds nothing else). Only
+// faults the shared file can cause are caught; anything else stays fatal, as before.
+
+static volatile LONG g_faults;              // faults caught (all instances)
+static volatile DWORD g_faultCode;          // the last one's exception code
+static void *volatile g_faultAddr;          // and where
+
+extern "C" __attribute__((used)) LONG obmicGuardFilter(EXCEPTION_POINTERS *ep, void *) {
+    DWORD code = ep && ep->ExceptionRecord ? ep->ExceptionRecord->ExceptionCode : 0;
+    switch (code) {
+    case EXCEPTION_ACCESS_VIOLATION:
+    case EXCEPTION_IN_PAGE_ERROR:           // the file couldn't be paged in (disk full...)
+    case EXCEPTION_ARRAY_BOUNDS_EXCEEDED:
+    case EXCEPTION_DATATYPE_MISALIGNMENT:
+    case EXCEPTION_ILLEGAL_INSTRUCTION:     // (the fuzz build's sanitizer traps)
+    case EXCEPTION_INT_DIVIDE_BY_ZERO:
+    case EXCEPTION_INT_OVERFLOW:
+    case EXCEPTION_FLT_DENORMAL_OPERAND:
+    case EXCEPTION_FLT_DIVIDE_BY_ZERO:
+    case EXCEPTION_FLT_INEXACT_RESULT:
+    case EXCEPTION_FLT_INVALID_OPERATION:
+    case EXCEPTION_FLT_OVERFLOW:
+    case EXCEPTION_FLT_STACK_CHECK:
+    case EXCEPTION_FLT_UNDERFLOW:
+        g_faultCode = code;
+        g_faultAddr = ep->ExceptionRecord->ExceptionAddress;
+        InterlockedIncrement(&g_faults);
+        return EXCEPTION_EXECUTE_HANDLER;
+    default:
+        return EXCEPTION_CONTINUE_SEARCH;
+    }
+}
+
+#if defined(__x86_64__) && defined(__SEH__)
+__attribute__((noinline)) static bool guarded(void (*fn)(void *), void *ctx) {
+    volatile int ok = 0;
+    __asm__ __volatile__(".l_obguard_start:\n"
+                         "\t.seh_handler __C_specific_handler, @except\n"
+                         "\t.seh_handlerdata\n"
+                         "\t.long 1\n"
+                         "\t.rva .l_obguard_start, .l_obguard_end, obmicGuardFilter, .l_obguard_end\n"
+                         "\t.text\n" ::: "memory");
+    fn(ctx);
+    ok = 1;
+    __asm__ __volatile__("\tnop\n.l_obguard_end:\n\tnop\n" ::: "memory");
+    return ok;
+}
+#else
+#error "obmic needs x86-64 SEH (MinGW-w64 x86_64 g++)"
+#endif
+
+#ifdef OBMIC_FUZZ
+// fuzz build only (scripts/fuzz_directmic.py): how many faults the guard caught
+extern "C" __declspec(dllexport) LONG ObmicFuzzFaults(DWORD *code, void **addr) {
+    if (code) *code = g_faultCode;
+    if (addr) *addr = g_faultAddr;
+    return g_faults;
+}
+#endif
+
 static double besselI0(double x) {
     double sum = 1.0, term = 1.0;
     for (int k = 1; k < 64; k++) {
@@ -477,7 +547,11 @@ public:
         }
         logf("initialize: endpoint %ls, %u bytes, discovery %d, child %s", endpoint, cb,
              (int)discovery, m_child ? "yes" : "no");
-        if (!discovery) openRing();
+        if (!discovery && !m_ring && !guarded([](void *p) { ((OnionMicAPO *)p)->openRing(); }, this)) {
+            problemf("the ring file faulted while opening (0x%08lx): the mic as it is",
+                     (unsigned long)g_faultCode);
+            m_ring = NULL;
+        }
         return S_OK;
     }
     HRESULT STDMETHODCALLTYPE IsInputFormatSupported(IAudioMediaType *opp, IAudioMediaType *req,
@@ -520,12 +594,31 @@ public:
         m_b = 1.0f;
         m_owe = 0;
         m_okBlocks = 0;
+        m_restUntil = 0;
+        if (m_snap) HeapFree(GetProcessHeap(), 0, m_snap);
+        m_snap = NULL;
+        m_snapFrames = 0;
+        if (m_ring && m_rate && m_channels && m_channels <= 64) {
+            // a copy of each block as it came in, to put back if processing faults
+            UINT32 maxFrames = out[0]->u32MaxFrameCount;
+            m_snap = (float *)HeapAlloc(GetProcessHeap(), 0,
+                                        (size_t)maxFrames * m_channels * sizeof(float));
+            if (m_snap) m_snapFrames = maxFrames;
+        }
         if (m_ring && m_rate) makeKernel();
         if (m_ring && m_rate) {
-            double lead = LEAD_DEFAULT_S * m_ring->rate;
+            double lead = LEAD_DEFAULT_S * m_boardRate;
             m_leadBase = lead;
             m_lead = lead;
-            claimSlot();
+            if (!guarded([](void *p) { ((OnionMicAPO *)p)->claimSlot(); }, this)) {
+                problemf("the ring file faulted (0x%08lx): no slot", (unsigned long)g_faultCode);
+                m_slot = NULL;
+            }
+        }
+        if (m_faults) {
+            problemf("%ld faults reading the ring file were caught (last 0x%08lx at %p)",
+                     (long)m_faults, (unsigned long)g_faultCode, g_faultAddr);
+            m_faults = 0;
         }
         logf("lock: %u Hz, %u ch, float %d, max %u frames, ring %s, slot %d, resampler %d taps",
              m_rate, m_channels, (int)m_float, out[0]->u32MaxFrameCount,
@@ -534,7 +627,11 @@ public:
     }
     HRESULT STDMETHODCALLTYPE UnlockForProcess() override {
         m_locked = false;
-        releaseSlot();
+        releaseSlotGuarded();
+        if (m_faults)
+            problemf("%ld faults reading the ring file were caught (last 0x%08lx at %p)",
+                     (long)m_faults, (unsigned long)g_faultCode, g_faultAddr);
+        m_faults = 0;
         logf("unlock");
         return m_childConfig ? m_childConfig->UnlockForProcess() : S_OK;
     }
@@ -553,7 +650,7 @@ public:
             o->u32BufferFlags = i->u32BufferFlags;
         }
         if (nOut >= 1 && m_float && m_ring && m_channels && m_rate)
-            process(out[0]);
+            processGuarded(out[0]);
     }
     UINT32 STDMETHODCALLTYPE CalcInputFrames(UINT32 n) override {
         return m_childRT ? m_childRT->CalcInputFrames(n) : n;
@@ -564,12 +661,13 @@ public:
 
 private:
     virtual ~OnionMicAPO() {
-        releaseSlot();
+        releaseSlotGuarded();
         if (m_childConfig) m_childConfig->Release();
         if (m_childRT) m_childRT->Release();
         if (m_child) m_child->Release();
         if (m_kernel) HeapFree(GetProcessHeap(), 0, m_kernel);
-        if (m_ring) UnmapViewOfFile(m_ring);
+        if (m_snap) HeapFree(GetProcessHeap(), 0, m_snap);
+        if (m_view) UnmapViewOfFile(m_view);
         if (m_map) CloseHandle(m_map);
         if (m_file != INVALID_HANDLE_VALUE) CloseHandle(m_file);
         InterlockedDecrement(&g_objects);
@@ -728,7 +826,8 @@ private:
         uint64_t wp = h->sync_wp, mic = h->sync_mic;
         MemoryBarrier();
         if (h->sync_seq != a) return;
-        m_syncOk = wp != 0 || mic != 0;
+        // (past POS_MAX it's junk: the doubles below would stop counting)
+        m_syncOk = (wp != 0 || mic != 0) && wp <= POS_MAX && mic <= POS_MAX;
         m_syncWp = wp;
         m_syncMic = mic;
     }
@@ -778,15 +877,29 @@ private:
             problemf("can't view the ring: error %lu", GetLastError());
             return;
         }
-        // sizes are read once, here: what's in the file later can't move them
-        uint32_t cap = h->capacity, mcap = h->mic_capacity, rate = h->rate;
+        m_view = h;   // (unmapped by the destructor, also if reading it faults below)
+        // How much is really mapped: the file can change size between GetFileSizeEx and
+        // CreateFileMapping (anyone signed in can write it), and the view is what counts.
+        MEMORY_BASIC_INFORMATION mbi;
+        uint64_t mapped = 0;
+        if (VirtualQuery(h, &mbi, sizeof mbi) == sizeof mbi && mbi.BaseAddress == (void *)h)
+            mapped = mbi.RegionSize;
+        if ((uint64_t)size.QuadPart < mapped) mapped = (uint64_t)size.QuadPart;
+        if (mapped < HEADER_BYTES) {
+            problemf("ring file too small once mapped");
+            return;
+        }
+        // Sizes are read once, here (volatile: the compiler can't fetch them again after
+        // the checks): what's in the file later can't move them.
+        const volatile RingHeader *vh = h;
+        uint32_t magic = vh->magic, version = vh->version;
+        uint32_t cap = vh->capacity, mcap = vh->mic_capacity, rate = vh->rate;
         uint64_t need = HEADER_BYTES + (uint64_t)cap * sizeof(float) +
                         (uint64_t)mcap * 2 * sizeof(float);
-        if (h->magic != RING_MAGIC || h->version != RING_VERSION || !cap || (cap & (cap - 1)) ||
+        if (magic != RING_MAGIC || version != RING_VERSION || !cap || (cap & (cap - 1)) ||
                 !mcap || (mcap & (mcap - 1)) || cap > (1u << 22) || mcap > (1u << 22) ||
-                (uint64_t)size.QuadPart < need || rate < 8000 || rate > 384000) {
-            problemf("ring file has the wrong layout (version %u)", h->version);
-            UnmapViewOfFile(h);
+                mapped < need || rate < 8000 || rate > 384000) {
+            problemf("ring file has the wrong layout (version %u)", version);
             return;
         }
         m_ring = h;
@@ -836,6 +949,60 @@ private:
         m_slot = NULL;
     }
 
+    void releaseSlotGuarded() {
+        if (m_slot && !guarded([](void *p) { ((OnionMicAPO *)p)->releaseSlot(); }, this))
+            m_slot = NULL;
+    }
+
+    // The header still as it was opened: the board only ever replaces the file with a
+    // new one (this keeps the old one mapped), so a changed layout here is junk.
+    bool headerOk() const {
+        const volatile RingHeader *h = m_ring;
+        return h->magic == RING_MAGIC && h->version == RING_VERSION &&
+               h->capacity == m_mask + 1 && h->mic_capacity == m_micMask + 1 &&
+               h->rate == m_boardRate;
+    }
+
+    // Back to the plain mic with nothing half done: the next good block starts afresh.
+    void standDown() {
+        m_synced = false;
+        m_played = false;
+        m_late = false;
+        m_w = 0.0f;
+        m_mg = 1.0f;
+        m_b = 1.0f;
+        m_owe = 0;
+        m_okBlocks = 0;
+        m_lead = m_leadBase;
+    }
+
+    struct ProcessCall { OnionMicAPO *self; APO_CONNECTION_PROPERTY *o; };
+
+    // process() under the guard: if it faults, the block goes back to what came in (the
+    // mic as it is) and the effect rests FAULT_REST_MS before it trusts the file again.
+    void processGuarded(APO_CONNECTION_PROPERTY *o) {
+        uint64_t now = GetTickCount64();
+        if (m_restUntil && now < m_restUntil) return;   // resting: the mic as it is
+        m_restUntil = 0;
+        UINT32 frames = o->u32ValidFrameCount;
+        if (!m_snap || frames > m_snapFrames || !o->pBuffer) return;   // can't undo it
+        APO_BUFFER_FLAGS flags = o->u32BufferFlags;
+        size_t bytes = (size_t)frames * m_channels * sizeof(float);
+        memcpy(m_snap, (const void *)o->pBuffer, bytes);
+        ProcessCall call = {this, o};
+        if (guarded([](void *p) {
+                ProcessCall *c = (ProcessCall *)p;
+                c->self->process(c->o);
+            }, &call))
+            return;
+        memcpy((void *)o->pBuffer, m_snap, bytes);
+        o->u32ValidFrameCount = frames;
+        o->u32BufferFlags = flags;
+        standDown();
+        m_faults++;
+        m_restUntil = now + FAULT_REST_MS;
+    }
+
     // The clean mic (after the mic's own effect, before the board): the board takes its
     // mic from here, so it never hears its own sounds coming back. One instance at a
     // time writes it; another takes over when that one stops.
@@ -865,6 +1032,16 @@ private:
 
     void process(APO_CONNECTION_PROPERTY *o) {
         RingHeader *h = m_ring;
+        if (!headerOk()) {   // junk in the header: the mic as it is until it's right again
+            standDown();
+            return;
+        }
+#ifdef OBMIC_FUZZ
+        if (*(volatile uint32_t *)&h->pad1 == 0x0BADF00Du) {   // the guard's self-test
+            volatile int *volatile nowhere = NULL;
+            *nowhere = 1;
+        }
+#endif
         uint64_t now = GetTickCount64();
         if (!m_slot && m_locked) claimSlot(true);
         bool publishing = publish(o, now);
@@ -876,7 +1053,7 @@ private:
         bool board = h->enabled && now - h->board_tick <= BOARD_STALE_MS;
         // positions are tracked in doubles: past 2^52 frames (thousands of years at
         // 48 kHz, so only junk) they'd stop counting. The board starts over from 0.
-        if (wp > (1ull << 52)) board = false;
+        if (wp > POS_MAX) board = false;
         bool replaceMode = h->mode == MODE_REPLACE;
         double step = (double)m_boardRate / (double)m_rate;   // ring frames per mic frame
         double cap = (double)(m_mask + 1);
@@ -923,9 +1100,11 @@ private:
         // the clean mic this block would fill in with is all still in its ring
         bool micOk = canFill && m_synced;
         if (micOk) {
-            double micWp = (double)h->mic_write_pos;
+            uint64_t mwp = h->mic_write_pos;
+            double micWp = (double)mwp;
             double m0 = micFrame(m_pos), m1 = micFrame(m_pos + frames * step) + 2.0;
-            micOk = m0 >= 0.0 && m1 < micWp && micWp - m0 < (double)m_micMask - 64.0;
+            micOk = mwp <= POS_MAX && m0 >= 0.0 && m1 < micWp &&
+                    micWp - m0 < (double)m_micMask - 64.0;
         }
         bool fill = micOk && board;
         // How much of the board's audio is there ahead of this instance. A block needs
@@ -1053,8 +1232,13 @@ private:
     IAudioProcessingObjectConfiguration *m_childConfig = NULL;
     HANDLE m_file = INVALID_HANDLE_VALUE;
     HANDLE m_map = NULL;
+    void *m_view = NULL;       // the file's view (m_ring once its layout checked out)
     RingHeader *m_ring = NULL;
     Slot *m_slot = NULL;
+    float *m_snap = NULL;      // the block as it came in (processGuarded)
+    UINT32 m_snapFrames = 0;
+    uint64_t m_restUntil = 0;  // after a fault: the plain mic until this tick
+    LONG m_faults = 0;         // faults this instance caught since it last logged them
     const float *m_data = NULL;
     float *m_mic = NULL;
     uint32_t m_mask = 0;

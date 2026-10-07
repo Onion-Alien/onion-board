@@ -1,5 +1,5 @@
 {
-  "_about": "The AI voices. Each is a blend of speakers from the pretrained Beatrice 2 model (LibriTTS-R readers, CC BY 4.0), mixed and moved so it isn't any one real person. mix: [[speaker, weight]]; formant: -2..2 semitones; pitch_hz: where auto pitch puts your voice. model: the voice model download (only used if the add-on came without it).",
+  "_about": "The AI voices. Each is a blend of speakers from the pretrained Beatrice 2 model (LibriTTS-R readers, CC BY 4.0), mixed and moved so it isn't any one real person. mix: [[speaker, weight]]; formant: -2..2 semitones; pitch_hz: where auto pitch puts your voice; description: one line; about: a few lines for the voice list; tags: who it sounds like. model: the voice model download (only used if the add-on came without it).",
   "model": {
     "url": "",
     "sha256": "",
@@ -11,86 +11,86 @@
       "name": "Bear",
       "emoji": "🐻",
       "description": "A big, deep voice.",
-      "mix": [
-        [
-          171,
-          0.5
-        ],
-        [
-          60,
-          0.25
-        ],
-        [
-          85,
-          0.25
-        ]
-      ],
+      "about": "A big man with a deep, heavy voice. Good for a tough guy, a boss or a gentle giant.",
+      "tags": ["Man"],
+      "mix": [[171, 0.5], [60, 0.25], [85, 0.25]],
       "formant": -1.0,
       "pitch_hz": 88
     },
     {
-      "id": "max",
-      "name": "Max",
-      "emoji": "🧢",
-      "description": "An everyday guy.",
-      "mix": [
-        [
-          188,
-          0.5
-        ],
-        [
-          80,
-          0.25
-        ],
-        [
-          5,
-          0.25
-        ]
-      ],
-      "formant": 0.0,
-      "pitch_hz": 118
+      "id": "duke",
+      "name": "Duke",
+      "emoji": "🎩",
+      "description": "Older and gravelly.",
+      "about": "An older man with a low, gravelly voice. Good for a grandad, a wizard or a grumpy shopkeeper.",
+      "tags": ["Man"],
+      "mix": [[151, 0.5], [85, 0.25], [80, 0.25]],
+      "formant": -1.5,
+      "pitch_hz": 96
     },
     {
       "id": "brick",
       "name": "Brick",
       "emoji": "🧱",
       "description": "Gruff and grounded.",
-      "mix": [
-        [
-          156,
-          0.5
-        ],
-        [
-          80,
-          0.25
-        ],
-        [
-          151,
-          0.25
-        ]
-      ],
+      "about": "A rough, hard-edged man's voice with some grit in it. Good for soldiers, bouncers and grumpy characters.",
+      "tags": ["Man"],
+      "mix": [[156, 0.5], [80, 0.25], [151, 0.25]],
       "formant": -0.5,
       "pitch_hz": 100
+    },
+    {
+      "id": "max",
+      "name": "Max",
+      "emoji": "🧢",
+      "description": "An everyday guy.",
+      "about": "An ordinary grown man. The safest pick if you just want to sound like somebody else.",
+      "tags": ["Man"],
+      "mix": [[188, 0.5], [80, 0.25], [5, 0.25]],
+      "formant": 0.0,
+      "pitch_hz": 118
+    },
+    {
+      "id": "riley",
+      "name": "Riley",
+      "emoji": "🎮",
+      "description": "A young guy.",
+      "about": "A lighter, younger man's voice, like someone in their late teens or early twenties.",
+      "tags": ["Man"],
+      "mix": [[5, 0.5], [80, 0.25], [188, 0.25]],
+      "formant": 0.5,
+      "pitch_hz": 140
+    },
+    {
+      "id": "river",
+      "name": "River",
+      "emoji": "🌊",
+      "description": "Somewhere in between.",
+      "about": "Sits between a man's and a woman's voice, so it's hard to tell which. Good if you'd rather not be either.",
+      "tags": ["Either"],
+      "mix": [[80, 0.5], [29, 0.5]],
+      "formant": 0.5,
+      "pitch_hz": 160
+    },
+    {
+      "id": "ivy",
+      "name": "Ivy",
+      "emoji": "🍂",
+      "description": "A husky woman's voice.",
+      "about": "A woman with a low, slightly husky voice. Sounds older and cooler than Sage.",
+      "tags": ["Woman"],
+      "mix": [[108, 0.5], [141, 0.25], [27, 0.25]],
+      "formant": -0.5,
+      "pitch_hz": 160
     },
     {
       "id": "sage",
       "name": "Sage",
       "emoji": "🌿",
       "description": "A calm, low woman's voice.",
-      "mix": [
-        [
-          127,
-          0.5
-        ],
-        [
-          29,
-          0.25
-        ],
-        [
-          108,
-          0.25
-        ]
-      ],
+      "about": "A grown woman with a calm, steady, low voice. Sounds relaxed and sure of herself.",
+      "tags": ["Woman"],
+      "mix": [[127, 0.5], [29, 0.25], [108, 0.25]],
       "formant": 0.0,
       "pitch_hz": 180
     },
@@ -98,21 +98,10 @@
       "id": "nova",
       "name": "Nova",
       "emoji": "✨",
-      "description": "A clear, bright woman's voice.",
-      "mix": [
-        [
-          27,
-          0.5
-        ],
-        [
-          136,
-          0.25
-        ],
-        [
-          53,
-          0.25
-        ]
-      ],
+      "description": "A clear, soft woman's voice.",
+      "about": "A woman with a clear, soft voice. The everyday pick if you want to sound like a woman.",
+      "tags": ["Woman"],
+      "mix": [[27, 0.5], [136, 0.25], [53, 0.25]],
       "formant": 0.0,
       "pitch_hz": 215
     },
@@ -121,22 +110,33 @@
       "name": "Pixie",
       "emoji": "🧚",
       "description": "Light and young-sounding.",
-      "mix": [
-        [
-          18,
-          0.5
-        ],
-        [
-          110,
-          0.25
-        ],
-        [
-          141,
-          0.25
-        ]
-      ],
+      "about": "A light, high, young-sounding voice. Good for cheerful or cartoon-like characters.",
+      "tags": ["Woman"],
+      "mix": [[18, 0.5], [110, 0.25], [141, 0.25]],
       "formant": 1.0,
       "pitch_hz": 265
+    },
+    {
+      "id": "squeak",
+      "name": "Squeak",
+      "emoji": "🐿️",
+      "description": "A tiny cartoon voice.",
+      "about": "Very high and squeaky, like a chipmunk or a cartoon sidekick. Just for fun: nobody will think it's real.",
+      "tags": ["Cartoon"],
+      "mix": [[18, 0.5], [110, 0.5]],
+      "formant": 2.0,
+      "pitch_hz": 360
+    },
+    {
+      "id": "titan",
+      "name": "Titan",
+      "emoji": "🗿",
+      "description": "A huge, rumbling voice.",
+      "about": "Deeper than anyone really talks: a giant, an ogre or a monster. Best for laughs and villains, not for passing as a real person.",
+      "tags": ["Monster"],
+      "mix": [[60, 0.5], [85, 0.25], [171, 0.25]],
+      "formant": -2.0,
+      "pitch_hz": 72
     }
   ]
 }

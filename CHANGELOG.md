@@ -2,11 +2,65 @@
 
 ## Unreleased
 
+- **Record a bit of what's playing.** The Sounds tab's **Record** window has a new
+  *What's playing* choice: press Record, play a sound, a web search result or the
+  radio (or catch a song already playing), then Stop, cut the ends and save it as a
+  pad, named after what played. Your mic isn't in it. The window no longer blocks
+  the board while it's open.
+- **Space plays and pauses everywhere on Sounds and Radio**, not just on a pad: after
+  clicking a web result's *Play*, a slider or a station, Space pauses (it used to
+  click the button again and download the song a second time). Typing in a box and
+  buttons reached with Tab keep their own Space.
+- **You can see what's playing.** The web result in the player shows bouncing bars
+  (or a pause sign) on its picture, gets an outline, and its *Play* becomes
+  *Pause* / *Resume*. The Radio's bottom bar shows the station and song with moving
+  bars; click it to find the station in the list.
+- **One click plays a radio station** (clicking the one playing doesn't restart it).
+- **The Radio's *Only me / LIVE* button is now *Send / Sending***, the same as a
+  program's on the Apps tab.
+- **Back to my sounds** stands out after a web search: a bigger red button.
+- **More AI voices, and a way to tell them apart.** Six new voices: Duke (an older,
+  gravelly man), Riley (a young guy), River (somewhere between a man and a woman),
+  Ivy (a husky woman), Squeak (a tiny cartoon voice) and Titan (a giant). Under the
+  voice list it now says who each one sounds like and how high it is. The new
+  **All voices** button opens every voice as a card with a few lines about it and
+  **Hear it**, a short sample in your headphones only. **Make your own voice** blends
+  two voices and sets how deep and how high it is. No new download: AI voices you
+  already have get the new voices too.
+- **"Did you know?" tips.** Once the setup guide is done, Onion Board shows a short
+  tip about one feature at most once a day, with a *Show me* button that takes you
+  there. Never while a game is up, and each tip only once. *Show tips* in
+  *Settings → General* turns them off.
+- **Switch category when a program is in front.** Right-click a category tab →
+  *Show this when a program is in front…* and pick your game (or any program). When
+  it comes to the front, the board and the overlay show that category by themselves
+  (and its hotkeys, with *hotkeys per category*); when it closes, the board goes back
+  to what it showed before. Pick another category by hand and it stays. All the
+  programs you've set are listed in *Settings → General*, with a switch for all of it.
+- **The search box keeps its room** on the Sounds tab in mid-size windows.
 - **Record a sound with your mic.** New **Record** button next to *Add sounds*:
   record your own voice (or, while the voice changer is on, your changed voice),
   then drag the ends to cut it, listen in your headphones, name it and *Save*. The
   quiet bits at both ends are already cut off. Up to 15 minutes; nobody hears you
   while you record.
+- **A simpler first window.** A new install starts with just Sounds, Voice and Setup.
+  The other tabs wait under **+ More tabs** beside the tabs: click one and it's added
+  and opened. *Choose tabs in Settings…* in the same menu shows them all. Your tabs
+  stay as they are if you already use Onion Board.
+- **Instant replay and the Apps tab work on Windows 10.** They needed a Windows 10
+  build normal PCs never get; any Windows 10 updated to version 2004 or newer works.
+- **Fewer update prompts.** A new version is offered once it's been out a day, so a
+  quick follow-up fix replaces it instead of asking you twice. Fixes for something
+  serious still show up straight away, and *Check now* always finds the newest.
+- **The loudest effect preset is now called *Deep fried*.** Same sound as before.
+- **Search no longer looks up likes and comments** for each YouTube result. Results
+  show their views as before, load with fewer requests, and YouTube is less likely to
+  take you for a bot.
+- **Instant replay reminds you to ask first.** Setting its key now says that in some
+  places recording a call needs everyone's OK.
+- **A broken mic-effect file can't cut out all of Windows' sound.** If the file *Straight
+  into my mic* reads is damaged or tampered with, it just passes your mic through until
+  the file is right again.
 
 ## 1.9.6 — 2026-10-06
 

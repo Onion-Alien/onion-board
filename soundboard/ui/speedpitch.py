@@ -21,6 +21,7 @@ from soundboard import livefx, theme, voicefx
 from soundboard.ui import icons
 from soundboard.ui.panel import hint_label, section_label
 from soundboard.ui.voicepanel import ParamSlider
+from soundboard.i18n import _
 
 SPEED = voicefx.Param("speed", "Speed", 0.25, 2.0, 1.0, "x", 0.05)
 PITCH = voicefx.Param("pitch", "Pitch", -12, 12, 0, " st", 1)
@@ -127,7 +128,7 @@ class SpeedPitchButton(QPushButton):
         super().__init__()
         self.setObjectName("small")
         self.setProperty("speedpitch", True)
-        self.setToolTip(f"Speed, pitch and effects of the {what} playing now")
+        self.setToolTip(_("Speed, pitch and effects of the {what} playing now", what=what))
         self.setCursor(Qt.PointingHandCursor)
         self._speed_hi = redline_speed(*redline)
         redline = redline[1]
@@ -141,13 +142,13 @@ class SpeedPitchButton(QPushButton):
         # header: title on the left, Reset where it's easy to find
         head = QHBoxLayout()
         head.setSpacing(8)
-        title = QLabel("Live controls")
+        title = QLabel(_("Live controls"))
         title.setStyleSheet("font-weight:700; font-size:10.5pt;")
-        sub = QLabel(f"All {what}")
+        sub = QLabel(_("All {what}", what=what))
         sub.setObjectName("muted")
-        reset = QPushButton("Reset all")
+        reset = QPushButton(_("Reset all"))
         reset.setObjectName("small")
-        reset.setToolTip("Back to 1x, no pitch change and no effects")
+        reset.setToolTip(_("Back to 1x, no pitch change and no effects"))
         reset.setCursor(Qt.PointingHandCursor)
         reset.clicked.connect(self.reset)
         head.addWidget(title)
@@ -183,9 +184,9 @@ class SpeedPitchButton(QPushButton):
         v.addLayout(self._quick_row(QUICK))
         v.addSpacing(2)
         v.addWidget(self.pitch)
-        self.keep = QCheckBox("Keep pitch when changing speed")
+        self.keep = QCheckBox(_("Keep pitch when changing speed"))
         self.keep.setChecked(True)
-        self.keep.setToolTip("Off: slower is also deeper and faster is higher, like a tape")
+        self.keep.setToolTip(_("Off: slower is also deeper and faster is higher, like a tape"))
         v.addWidget(self.keep)
 
         # --- Redline: its own section, locked until you ask for it
@@ -195,21 +196,22 @@ class SpeedPitchButton(QPushButton):
         red_row.setSpacing(8)
         red_text = QVBoxLayout()
         red_text.setSpacing(0)
-        red_name = QLabel("Redline")
+        red_name = QLabel(_("Redline"))
         red_name.setStyleSheet("font-weight:700;")
-        red_sub = QLabel(f"Up to {redline:g}x speed and ±{REDLINE_PITCH.hi:g} st pitch")
+        red_sub = QLabel(_("Up to {redline:g}x speed and ±{hi:g} st pitch",
+                           redline=redline, hi=REDLINE_PITCH.hi))
         red_sub.setObjectName("hint")
         red_text.addWidget(red_name)
         red_text.addWidget(red_sub)
         red_row.addLayout(red_text, 1)
-        self.redline = QPushButton("Unlock")
+        self.redline = QPushButton(_("Unlock"))
         icons.set_icon(self.redline, "shield", size=14)
         self.redline.setObjectName("small")
         self.redline.setCheckable(True)
         self.redline.setCursor(Qt.PointingHandCursor)
         self.redline.setMinimumWidth(84)
-        self.redline.setToolTip(f"Unlock silly speeds (up to {redline:g}x) and pitch "
-                                f"(±{REDLINE_PITCH.hi:g} st)")
+        self.redline.setToolTip(_("Unlock silly speeds (up to {redline:g}x) and pitch (±{hi:g} "
+                                  "st)", redline=redline, hi=REDLINE_PITCH.hi))
         self.redline.toggled.connect(self.set_redline)
         red_row.addWidget(self.redline, 0, Qt.AlignVCenter)
         v.addLayout(red_row)
@@ -259,7 +261,7 @@ class SpeedPitchButton(QPushButton):
             b.setObjectName("small")
             b.setCheckable(True)
             b.setCursor(Qt.PointingHandCursor)
-            b.setToolTip("Click again to turn it off")
+            b.setToolTip(_("Click again to turn it off"))
             b.clicked.connect(lambda on, a=amounts: self.set_fx(a if on else {}))
             self.fx_presets[name] = b
             grid.addWidget(b, i // 3, i % 3)
@@ -294,8 +296,8 @@ class SpeedPitchButton(QPushButton):
             b = QPushButton(f"{s:g}x")
             b.setObjectName("small")
             b.setCursor(Qt.PointingHandCursor)
-            b.setToolTip(f"Play at {s:g}x speed")
-            b.clicked.connect(lambda _=False, s=s: self.speed.set_value(s) or self._edited())
+            b.setToolTip(_("Play at {s:g}x speed", s=s))
+            b.clicked.connect(lambda __=False, s=s: self.speed.set_value(s) or self._edited())
             q.addWidget(b)
         return q
 
@@ -305,7 +307,7 @@ class SpeedPitchButton(QPushButton):
             self.redline.setChecked(on)   # comes back here through toggled
             return
         icons.set_icon(self.redline, "wave" if on else "shield", size=14)
-        self.redline.setText("On" if on else "Unlock")
+        self.redline.setText(_("On") if on else _("Unlock"))
         self.speed.set_param(self._speed_hi if on else SPEED)
         self.pitch.set_param(REDLINE_PITCH if on else PITCH)
         self.red_box.setVisible(on)

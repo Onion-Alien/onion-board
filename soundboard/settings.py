@@ -1041,7 +1041,7 @@ class SettingsDialog(QDialog):
         return card
 
     def _voices_card(self):
-        """Custom text-to-speech voices live on the Voice tab (under More options); this
+        """Custom text-to-speech voices live on the Voice tab (behind Add voices…); this
         card is where people look for them first. Hidden while the tab is switched off
         (Settings > Tabs), and its buttons reach the Voice tab there now: switched off
         and on again while Settings is open, that's a new one."""
@@ -1049,7 +1049,7 @@ class SettingsDialog(QDialog):
         mw = self.mw
         card, cv = self._card(
             "Custom voices (text-to-speech)",
-            "Your own voices for typed lines and Talk as a computer voice: a TTS server "
+            "Your own voices for typed lines and the text-to-speech voice: a TTS server "
             "running on your PC (Kokoro, AllTalk, any OpenAI-style one), a TTS program, or "
             "Piper voice packs dropped into the voices folder. They join the Voice list on "
             "the Voice tab.")
@@ -1147,12 +1147,63 @@ class SettingsDialog(QDialog):
         hint.setObjectName("hint")
         hint.setWordWrap(True)
         cv.addWidget(hint)
+        if hasattr(self.mw, "set_tips_on"):
+            self.box_tips = self._option(
+                cv, "Show tips", "A short “Did you know?” about a feature, at most once "
+                "a day, never while a game is up.", self.mw.cfg.tips_on, self.mw.set_tips_on)
         v.addWidget(card)
+        v.addWidget(self._programs_card())
         v.addWidget(self._background_card())
         v.addWidget(self._backup_card())
         v.addWidget(self._reset_card())
         v.addStretch(1)
         return w
+
+    def _programs_card(self):
+        """Switch category when a program is in front: every rule in one place."""
+        card, cv = self._card(
+            "Switch category by program",
+            "Right-click a category tab → Show this when a program is in front… and the "
+            "board shows that category by itself whenever the program is in front.")
+        self.box_programs = self._option(
+            cv, "Switch by itself",
+            "When the program closes, the board goes back to what it showed before.",
+            self.mw.cfg.category_programs_on, self.mw.set_category_programs_on)
+        self.programs_list = QVBoxLayout()
+        self.programs_list.setSpacing(4)
+        cv.addLayout(self.programs_list)
+        self._fill_programs()
+        if hasattr(self.mw, "category_programs_changed"):
+            self.mw.category_programs_changed.connect(self._fill_programs)
+        return card
+
+    def _fill_programs(self):
+        lay = self.programs_list
+        while lay.count():
+            w = lay.takeAt(0).widget()
+            if w is not None:
+                w.deleteLater()
+        rules = self.mw.cfg.category_programs
+        if not rules:
+            none = QLabel("No programs set yet.")
+            none.setObjectName("muted")
+            lay.addWidget(none)
+        for exe, cat in sorted(rules.items()):
+            row = QWidget()
+            h = QHBoxLayout(row)
+            h.setContentsMargins(0, 0, 0, 0)
+            missing = cat not in self.mw.cfg.categories
+            lbl = QLabel(f"{exe}  →  “{cat}”" + ("  (no such category now)" if missing
+                                                   else ""))
+            lbl.setObjectName("muted" if missing else "")
+            h.addWidget(lbl, 1)
+            rm = QPushButton("Remove")
+            rm.setObjectName("small")
+            rm.setToolTip(f"Stop switching to “{cat}” when {exe} is in front")
+            icons.set_icon(rm, "trash", "danger_text", size=12)
+            rm.clicked.connect(lambda _c=False, e=exe: self.mw.remove_category_program(e))
+            h.addWidget(rm)
+            lay.addWidget(row)
 
     # Settings > Tabs: what each tab that can be switched off is for (taboff.KEYS)
     TAB_HINTS = {
@@ -1169,11 +1220,10 @@ class SettingsDialog(QDialog):
             "Tabs",
             "Switch off the tabs you don't use. A switched-off tab is gone from the "
             "window and doesn't load at all, so nothing of it runs in the background. "
-            "Switch it back on any time.")
-        from soundboard.ui.mainwindow import TABS
+            "Switch it back on any time, here or with + More tabs beside the tabs.")
+        from soundboard.ui.mainwindow import TAB_KEYS, TABS
         self.tab_boxes: dict[str, QCheckBox] = {}
-        for text, _tip in TABS:
-            key = text.lower()
+        for key, (text, _tip) in zip(TAB_KEYS, TABS):
             if key in self.TAB_HINTS:
                 self.tab_boxes[key] = self._option(
                     cv, text, self.TAB_HINTS[key], self.mw.tab_on(key),
@@ -1756,7 +1806,7 @@ class SettingsDialog(QDialog):
         card, cv = self._card("Low data mode",
                               "For a phone hotspot, capped plan or slow internet: smaller "
                               "downloads, lower-bitrate radio, more patience with stations "
-                              "that cut out, and no pictures or like counts in web search "
+                              "that cut out, and no pictures in web search "
                               "results. Or pick each one below.")
         self.data_low = QCheckBox("Use less data")
         self.data_low.toggled.connect(
@@ -1853,9 +1903,9 @@ class SettingsDialog(QDialog):
 
         card, cv = self._card("Sounds from the web")
         self._data_widgets["web_extras"] = self._option(
-            cv, "Show pictures and like counts",
-            "Search results load each video's thumbnail and look up its likes and "
-            "comments. Off: just the titles, a lot less data per search.",
+            cv, "Show pictures",
+            "Search results load each video's thumbnail. Off: just the titles, "
+            "a lot less data per search.",
             q.web_extras, lambda b: self._data_set(web_extras=b))
         v.addWidget(card)
         v.addStretch(1)
