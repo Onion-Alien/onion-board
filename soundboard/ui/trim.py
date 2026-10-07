@@ -12,6 +12,7 @@ from PySide6.QtWidgets import (QDoubleSpinBox, QHBoxLayout, QLabel, QPushButton,
 
 from soundboard import soundfx, theme
 from soundboard.wheelguard import no_wheel
+from soundboard.i18n import _
 
 HANDLE_PX = 8   # how close to a handle a press grabs it
 
@@ -29,8 +30,8 @@ class Waveform(QWidget):
         self._drag: str | None = None
         self.setMinimumHeight(70)
         self.setCursor(Qt.SizeHorCursor)
-        self.setToolTip("Drag the handles to cut off the start and end. Only the part "
-                        "between them plays.")
+        self.setToolTip(_("Drag the handles to cut off the start and end. Only the part between "
+                          "them plays."))
 
     def set_range(self, start: float, end: float):
         self.start, self.end = start, end
@@ -137,9 +138,9 @@ class TrimPanel(QWidget):
             row.addWidget(box)
         self.box_end.setValue(self.length)
         row.addWidget(self.info, 1)
-        reset = QPushButton("Keep all")
+        reset = QPushButton(_("Keep all"))
         reset.setObjectName("small")
-        reset.setToolTip("Undo the trim: play the whole sound")
+        reset.setToolTip(_("Undo the trim: play the whole sound"))
         reset.clicked.connect(lambda: self.set_values(0.0, 0.0, emit=True))
         row.addWidget(reset)
         v.addLayout(row)
@@ -166,7 +167,8 @@ class TrimPanel(QWidget):
 
     def _show_info(self):
         kept = self.wave.end - self.wave.start
-        self.info.setText(f"plays {soundfx.fmt_s(kept)} of {soundfx.fmt_s(self.length)}")
+        self.info.setText(_("plays {kept} of {length}",
+                            kept=soundfx.fmt_s(kept), length=soundfx.fmt_s(self.length)))
 
     def _from_wave(self, _s, _e):
         self._sync_boxes()

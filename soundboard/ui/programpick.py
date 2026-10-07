@@ -13,6 +13,7 @@ from PySide6.QtWidgets import (QAbstractItemView, QDialog, QFileDialog, QFileIco
 from soundboard import catswitch
 from soundboard.ui import fit, icons
 from soundboard.ui.panel import hint_label
+from soundboard.i18n import _
 
 
 class ProgramPicker(QDialog):
@@ -26,11 +27,12 @@ class ProgramPicker(QDialog):
         self.category, self.taken = category, taken
         self.picked: list[str] = []
         self._lister = lister or catswitch.windowed_programs
-        self.setWindowTitle(f"Show “{category}” when a program is in front")
+        self.setWindowTitle(_("Show “{category}” when a program is in front", category=category))
         lay = QVBoxLayout(self)
         lay.addWidget(hint_label(
-            f"When one of these programs comes to the front, the board shows “{category}”"
-            " by itself. When it closes, the board goes back to what it showed before."))
+            _("When one of these programs comes to the front, the board shows “{category}” by "
+              "itself. When it closes, the board goes back to what it showed before.",
+              category=category)))
         self.list = QListWidget()
         self.list.setSelectionMode(QAbstractItemView.ExtendedSelection)
         self.list.setIconSize(QSize(20, 20))
@@ -39,22 +41,22 @@ class ProgramPicker(QDialog):
         self.list.itemDoubleClicked.connect(lambda _i: self._ok())
         lay.addWidget(self.list, 1)
         row = QHBoxLayout()
-        browse = QPushButton("Browse for a program…")
+        browse = QPushButton(_("Browse for a program…"))
         icons.set_icon(browse, "folder")
         browse.clicked.connect(self.browse)
         row.addWidget(browse)
         row.addStretch(1)
-        self.btn_ok = QPushButton("Add")
+        self.btn_ok = QPushButton(_("Add"))
         self.btn_ok.setObjectName("primary")
         icons.set_icon(self.btn_ok, "plus", "on_accent")
         self.btn_ok.clicked.connect(self._ok)
         row.addWidget(self.btn_ok)
-        cancel = QPushButton("Cancel")
+        cancel = QPushButton(_("Cancel"))
         cancel.clicked.connect(self.reject)
         row.addWidget(cancel)
         lay.addLayout(row)
         self._icons = QFileIconProvider()
-        self._wait = QListWidgetItem("Looking for open programs…")
+        self._wait = QListWidgetItem(_("Looking for open programs…"))
         self._wait.setFlags(Qt.NoItemFlags)
         self.list.addItem(self._wait)
         self._listed.connect(self.fill)
@@ -73,7 +75,7 @@ class ProgramPicker(QDialog):
         for exe, path, title in programs:
             self._add(exe, path, title)
         if not self.list.count():
-            li = QListWidgetItem("No open programs found. Use Browse for a program….")
+            li = QListWidgetItem(_("No open programs found. Use Browse for a program…."))
             li.setFlags(Qt.NoItemFlags)
             self.list.addItem(li)
         self._update()
@@ -97,7 +99,7 @@ class ProgramPicker(QDialog):
         return li
 
     def browse(self):
-        path, _ = QFileDialog.getOpenFileName(self, "Pick a program", "",
+        path, __ = QFileDialog.getOpenFileName(self, _("Pick a program"), "",
                                               "Programs (*.exe);;All files (*)")
         self.add_path(path)
 

@@ -14,6 +14,7 @@ from PySide6.QtCore import Qt, QUrl, Signal
 from PySide6.QtMultimedia import QMediaPlayer
 from PySide6.QtMultimediaWidgets import QVideoWidget
 from PySide6.QtWidgets import QLabel, QVBoxLayout, QWidget
+from soundboard.i18n import _
 
 log = logging.getLogger(__name__)
 
@@ -52,7 +53,7 @@ class VideoWindow(QWidget):
             self.note.hide()
             self.player.setSource(QUrl.fromLocalFile(str(path)))
             self.player.pause()   # shows the first frame until the sound plays
-        self.setWindowTitle(f"{name} — video")
+        self.setWindowTitle(_("{name} — video", name=name))
         if not self.isVisible():
             self.show()
         self.raise_()
@@ -86,8 +87,8 @@ class VideoWindow(QWidget):
 
     def _on_error(self, _err, text: str):
         log.info("can't show the video %s: %s", self.path, text)
-        self.note.setText(f"This video can't be shown ({text or 'unknown format'}). "
-                          "The sound plays as normal.")
+        self.note.setText(_("This video can't be shown ({value}). The sound plays as normal.",
+                            value=text or 'unknown format'))
         self.note.show()
 
     def closeEvent(self, e):

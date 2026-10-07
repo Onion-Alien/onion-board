@@ -12,6 +12,8 @@ import os
 import sys
 from dataclasses import dataclass
 
+from soundboard.i18n import _
+
 log = logging.getLogger(__name__)
 
 
@@ -24,50 +26,50 @@ class Tip:
 
 
 TIPS: tuple[Tip, ...] = (
-    Tip("effects", "Right-click any pad → Effects… for bass boost, nightcore, slowed + "
-        "reverb, trim and more. The original file is never changed.", "tab:sounds"),
-    Tip("record", "Record a sound with your mic: the Record button next to Add sounds.",
+    Tip("effects", _("Right-click any pad → Effects… for bass boost, nightcore, slowed + "
+        "reverb, trim and more. The original file is never changed."), "tab:sounds"),
+    Tip("record", _("Record a sound with your mic: the Record button next to Add sounds."),
         "record"),
-    Tip("search", "Type in the search box and press Enter to find sounds on YouTube, "
-        "SoundCloud and Myinstants, then add one with a click.", "search"),
-    Tip("link", "Paste a YouTube or TikTok link into the search box to add its sound "
-        "as a pad.", "search"),
-    Tip("replay", "Instant replay: one hotkey turns the last 30 seconds you heard into "
-        "a pad. Set its key in Settings → Hotkeys.", "settings:hotkeys"),
-    Tip("overlay", "The in-game overlay shows your pads over the game, played with the "
-        "number keys. Set it up in Settings → Overlay.", "settings:overlay"),
-    Tip("hold", "Hold to play: a sound plays only while you hold its key down, like an "
-        "air horn. Right-click a pad → Edit… to switch it on.", "tab:sounds"),
-    Tip("categories", "Make categories with the + above your pads, then right-click "
-        "one to give it a random-sound hotkey.", "tab:sounds"),
-    Tip("scoped", "Hotkeys per category: one key plays a different sound in each "
-        "category. Switch it on in Settings → Hotkeys.", "settings:hotkeys"),
-    Tip("programs", "Right-click a category → Show this when a program is in front, and "
-        "the board switches to it by itself when you open your game.", "tab:sounds"),
-    Tip("tabs", "Don't use the Radio or Triggers tabs? Switch them off in Settings → "
-        "Tabs and they don't load at all.", "settings:tabs"),
-    Tip("phone", "Play your pads from your phone with Onion Pocket: Settings → Remote.",
+    Tip("search", _("Type in the search box and press Enter to find sounds on YouTube, "
+        "SoundCloud and Myinstants, then add one with a click."), "search"),
+    Tip("link", _("Paste a YouTube or TikTok link into the search box to add its sound "
+        "as a pad."), "search"),
+    Tip("replay", _("Instant replay: one hotkey turns the last 30 seconds you heard into "
+        "a pad. Set its key in Settings → Hotkeys."), "settings:hotkeys"),
+    Tip("overlay", _("The in-game overlay shows your pads over the game, played with the "
+        "number keys. Set it up in Settings → Overlay."), "settings:overlay"),
+    Tip("hold", _("Hold to play: a sound plays only while you hold its key down, like an "
+        "air horn. Right-click a pad → Edit… to switch it on."), "tab:sounds"),
+    Tip("categories", _("Make categories with the + above your pads, then right-click "
+        "one to give it a random-sound hotkey."), "tab:sounds"),
+    Tip("scoped", _("Hotkeys per category: one key plays a different sound in each "
+        "category. Switch it on in Settings → Hotkeys."), "settings:hotkeys"),
+    Tip("programs", _("Right-click a category → Show this when a program is in front, and "
+        "the board switches to it by itself when you open your game."), "tab:sounds"),
+    Tip("tabs", _("Don't use the Radio or Triggers tabs? Switch them off in Settings → "
+        "Tabs and they don't load at all."), "settings:tabs"),
+    Tip("phone", _("Play your pads from your phone with Onion Pocket: Settings → Remote."),
         "settings:remote"),
-    Tip("triggers", "Triggers play a sound when something shows up on your screen, "
-        "like a victory banner.", "tab:triggers", "triggers"),
-    Tip("voice", "The Voice tab changes your voice live, or talks for you with a "
-        "computer voice.", "tab:voice", "voice"),
-    Tip("apps", "The Apps tab sends another program's sound (a music player, a video) "
-        "to your friends, and can record it.", "tab:apps", "apps"),
-    Tip("radio", "The Radio tab plays stations from around the world, and can save the "
-        "last 15 seconds as a pad.", "tab:radio", "radio"),
-    Tip("queue", "Right-click a pad → Play next to queue it after the sound that's "
-        "playing.", "tab:sounds"),
-    Tip("deleted", "Removed a sound by mistake? It waits in Recently deleted for 30 "
-        "days.", "deleted"),
-    Tip("backup", "Back up every sound and setting to one file, or share a category as "
-        "a sound pack: the Backup button.", "settings:general"),
-    Tip("themes", "Onion Board has over 30 themes: Settings → Appearance.",
+    Tip("triggers", _("Triggers play a sound when something shows up on your screen, "
+        "like a victory banner."), "tab:triggers", "triggers"),
+    Tip("voice", _("The Voice tab changes your voice live, or talks for you with a "
+        "computer voice."), "tab:voice", "voice"),
+    Tip("apps", _("The Apps tab sends another program's sound (a music player, a video) "
+        "to your friends, and can record it."), "tab:apps", "apps"),
+    Tip("radio", _("The Radio tab plays stations from around the world, and can save the "
+        "last 15 seconds as a pad."), "tab:radio", "radio"),
+    Tip("queue", _("Right-click a pad → Play next to queue it after the sound that's "
+        "playing."), "tab:sounds"),
+    Tip("deleted", _("Removed a sound by mistake? It waits in Recently deleted for 30 "
+        "days."), "deleted"),
+    Tip("backup", _("Back up every sound and setting to one file, or share a category as "
+        "a sound pack: the Backup button."), "settings:general"),
+    Tip("themes", _("Onion Board has over 30 themes: Settings → Appearance."),
         "settings:appearance"),
-    Tip("stream", "Streaming? The stream output gives OBS your sounds on their own "
-        "track: Settings → Audio.", "settings:audio"),
-    Tip("hotkeys_off", "One key can switch every other hotkey off while you type in "
-        "chat. Set it in Settings → Hotkeys.", "settings:hotkeys"),
+    Tip("stream", _("Streaming? The stream output gives OBS your sounds on their own "
+        "track: Settings → Audio."), "settings:audio"),
+    Tip("hotkeys_off", _("One key can switch every other hotkey off while you type in "
+        "chat. Set it in Settings → Hotkeys."), "settings:hotkeys"),
 )
 BY_KEY = {t.key: t for t in TIPS}
 

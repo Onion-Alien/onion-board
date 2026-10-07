@@ -126,7 +126,7 @@ The full list. The [README](../README.md) has the short version and how to get s
   map's **HD** button swaps it for a 3D globe you can spin (heavier: it runs a web
   engine); **2D** on the globe goes back. Star stations for
   *★ Favorites*; *Popular* and *Recent* list the most played and the ones you had on. It plays in your headphones, goes out through
-  your mic when you press **LIVE**, and can *Record* or save the *Last 15s* as a pad.
+  your mic when you press **Send**, and can *Record* or save the *Last 15s* as a pad.
 - **Apps tab:** send one program's sound (a music player, a browser, a video, a
   call in another app) to whoever's listening, without touching any other program.
   Each program is a card with its level, a **Send** switch, its own volume, *Hear it

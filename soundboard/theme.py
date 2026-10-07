@@ -466,6 +466,7 @@ QFrame#card QWidget { background:transparent; }
 QFrame#card[interactive="true"] { border:1px solid transparent; }
 QFrame#card[interactive="true"][hovered="true"] { background:$card_hi; border-color:$border_hi; }
 QFrame#card[interactive="true"]:focus { background:$card_hi; border-color:$accent; }
+QFrame#card[interactive="true"][playing="true"] { background:$card_hi; border:2px solid $accent; }
 QLabel#section { color:$section; font-size:8pt; font-weight:700; letter-spacing:1px; padding-top:8px;
                  qproperty-indent:0; }  /* padding alone makes Qt indent the text 3 px */
 QLabel#section[head="true"] { padding-top:0; }
@@ -494,6 +495,9 @@ QPushButton#primary:focus { border:1px solid $text_hi; }
 QPushButton#danger { background:$danger_bg; border:1px solid $danger_border; color:$danger_text; font-weight:600; }
 QPushButton#danger:hover { background:$danger_hover; }
 QPushButton#small { padding:2px 8px; font-size:8pt; }
+QPushButton#backhome { background:$danger_bg; border:1px solid $danger_border; color:$danger_text;
+    font-weight:700; font-size:10pt; padding:6px 14px; border-radius:8px; }
+QPushButton#backhome:hover { background:$danger_hover; border-color:$danger_text; }
 QPushButton#tabinfo { padding:0; border-radius:8px; background:transparent; border:1px solid transparent; }
 QPushButton#tabinfo:hover { background:$btn_hover; border-color:$border_hi; }
 QPushButton#tabinfo:pressed { background:$btn_press; border-color:$accent; }
