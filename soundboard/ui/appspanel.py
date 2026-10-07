@@ -48,6 +48,10 @@ log = logging.getLogger(__name__)
 
 REFRESH_MS = 1500       # how often the list of programs is re-read while the tab is shown
 REFRESH_HIDDEN_MS = 5000   # ...and while it isn't (a remembered program still gets picked up)
+# while hidden, a 5 s check only walks the process list (~4 ms, not the ~20 ms of a whole
+# listing) and lists the programs when one of the tab's started or closed, one not yet
+# picked up runs, or this long has gone by
+HIDDEN_FULL_S = 30.0
 METER_MS = 60
 MAX_REMEMBERED = 30
 CARD_MIN_W = 300        # programs are cards, as many across as fit at this width
@@ -92,7 +96,8 @@ def saved_volume(v) -> float:
 class _Lister(QObject):
     """Reads the audio sessions off the UI thread (COM, ~50 ms) and hands the result
     to it: `peaks`' next rescan makes the list while that watcher runs (it was finding
-    the same sessions on its own), else a worker thread of its own does."""
+    the same sessions on its own), else one worker thread of the lister's own does
+    (it started a new thread for every listing, 720 an hour in the tray)."""
     ready = Signal(object)
 
     def __init__(self, parent=None, peaks: appaudio.PeakWatcher | None = None):
@@ -100,14 +105,53 @@ class _Lister(QObject):
         self.peaks = peaks
         self._busy = False
         self._stopped = False
+        self._job: tuple[frozenset, frozenset] | None = None
+        self._wake = threading.Event()
+        self._thread: threading.Thread | None = None
+        # the worker's own: what refresh(watch=...) saw last time, and when it last listed
+        self._seen: frozenset | None = None
+        self._listed_at = -math.inf
 
-    def refresh(self):
+    def refresh(self, watch: frozenset[str] | None = None,
+                waiting: frozenset[str] = frozenset()):
+        """List the programs. With `watch` (.exe names, lower case: the tab is hidden),
+        only walk the processes first, and list them only if one of those started or
+        closed since the last walk, one in `waiting` (not picked up yet) runs, or
+        HIDDEN_FULL_S has gone by since the last listing."""
         if self._busy or self._stopped:
             return
         self._busy = True
-        if self.peaks is not None and self.peaks.list_for(self._listed):
+        if watch is None and self.peaks is not None and self.peaks.list_for(self._listed):
             return
-        threading.Thread(target=self._work, name="applist", daemon=True).start()
+        self._job = None if watch is None else (watch, waiting)
+        if self._thread is None or not self._thread.is_alive():
+            self._thread = threading.Thread(target=self._run, name="applist", daemon=True)
+            self._thread.start()
+        self._wake.set()
+
+    def _run(self):
+        while True:
+            self._wake.wait()
+            self._wake.clear()
+            if self._stopped:
+                return
+            job = self._job
+            try:
+                due = job is None or self._due(*job)
+            except Exception:  # noqa: BLE001
+                log.debug("walking the processes failed", exc_info=True)
+                due = True
+            if due:
+                self._work()
+            else:
+                self._busy = False
+
+    def _due(self, watch: frozenset[str], waiting: frozenset[str]) -> bool:
+        alive = appaudio.running()
+        seen = frozenset((pid, exe) for pid, exe in alive.items() if exe in watch)
+        changed, self._seen = seen != self._seen, seen
+        return (changed or any(exe in waiting for _pid, exe in seen)
+                or time.monotonic() - self._listed_at >= HIDDEN_FULL_S)
 
     def _work(self):
         alive: dict[int, str] = {}   # every process, from the listing's own process list
@@ -124,12 +168,14 @@ class _Lister(QObject):
         """On the worker's or the level watcher's thread. apps None: the listing failed,
         and this round is skipped (an empty list would stop every capture and drop
         the rows)."""
+        self._listed_at = time.monotonic()
         self._busy = False
         if apps is not None and not self._stopped:
             self.ready.emit((apps, alive))
 
     def stop(self):
         self._stopped = True
+        self._wake.set()   # the worker sees it and ends
 
 
 class ElidedLabel(QLabel):
@@ -531,7 +577,7 @@ class AppsTab(QWidget):
         self.lister = _Lister(None, self.peaks)
         self.lister.ready.connect(self._on_listed)
         self.timer = QTimer(self)
-        self.timer.timeout.connect(self.lister.refresh)
+        self.timer.timeout.connect(self._refresh)
         self.meter_timer = QTimer(self)
         self.meter_timer.timeout.connect(self._meters)
         appstate.slow_in_background(self, self.meter_timer, METER_MS)   # behind a game
@@ -573,6 +619,19 @@ class AppsTab(QWidget):
         # the meters run while shown / recording; the list is re-read slowly until then
         self._pace_list()
         self.lister.refresh()
+
+    def _refresh(self):
+        """The list timer: the whole listing while the tab shows (or a capture needs
+        starting again), else the lister's cheap check first."""
+        if self.isVisible() or any(
+                row.capture is not None and (row.capture.ended or row.capture.error)
+                for row in self.rows.values()):
+            self.lister.refresh()
+            return
+        watch = frozenset(row.exe.lower() for row in self.rows.values())
+        waiting = frozenset(row.exe.lower() for key, row in self.rows.items()
+                            if row.app is None and self._spec(key) is not None)
+        self.lister.refresh(watch, waiting)
 
     def _watching(self) -> bool:
         """Something to keep an eye on while the tab is hidden: a remembered program

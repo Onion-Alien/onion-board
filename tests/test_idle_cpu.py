@@ -3,7 +3,6 @@ skipped or slowed down, and animations stop while nobody can see them."""
 import threading
 import time
 
-from PySide6.QtCore import QAbstractAnimation
 from PySide6.QtWidgets import QApplication
 
 from conftest import process_events
@@ -99,16 +98,89 @@ def test_icon_glow_sets_only_the_windows_own_icon(window, monkeypatch):  # noqa:
     assert len(app_wide) == 1
 
 
-def test_mic_check_pulse_pauses_while_hidden(window):  # noqa: F811
-    window._pulse.start()
+def test_mic_check_pulse_runs_only_while_shown_in_front(window, monkeypatch, qapp):  # noqa: F811
+    """The banner's throb draws the whole banner again on each step: not in the tray,
+    minimised or behind a game (there it stands still, fully bright)."""
+    from PySide6.QtCore import Qt
+    from soundboard.ui import mainwindow as main
+    monkeypatch.setattr(main.appstate, "active", lambda: True)
     window._ui_live = True
+    window.on_mic_check(True)
     window._set_tick_rate()                           # not shown (offscreen): not live
-    assert window._pulse.state() == QAbstractAnimation.Paused
+    assert not window._pulse.running()
+    assert window._banner_fx.opacity() == 1.0 and not window._banner_fx.isEnabled()
     window.show()
-    assert window._pulse.state() == QAbstractAnimation.Running
+    assert window._pulse.running() and window._banner_fx.isEnabled()
+    monkeypatch.setattr(main.appstate, "active", lambda: False)
+    qapp.applicationStateChanged.emit(Qt.ApplicationInactive)    # a game in front
+    assert not window._pulse.running() and window._banner_fx.opacity() == 1.0
+    monkeypatch.setattr(main.appstate, "active", lambda: True)
+    qapp.applicationStateChanged.emit(Qt.ApplicationActive)      # back in front
+    assert window._pulse.running()
     window.hide()
-    assert window._pulse.state() == QAbstractAnimation.Paused
-    window._pulse.stop()
+    assert not window._pulse.running()
+    window.on_mic_check(False)
+    window.show()
+    assert not window._pulse.running()                # off: shown again, still off
+    window.hide()
+
+
+def test_mic_check_pulse_steps_about_16_times_a_second_along_the_same_curve(window):  # noqa: F811
+    from soundboard.ui import mainwindow as main
+    pulse = window._pulse
+    assert 1000 / pulse.timer.interval() <= 20        # the animation ran at 60
+    assert pulse.opacity_at(0) == 1.0
+    assert abs(pulse.opacity_at(main.PULSE_MS / 2) - main.PULSE_LOW) < 1e-9
+    assert abs(pulse.opacity_at(main.PULSE_MS / 4) - (1 + main.PULSE_LOW) / 2) < 1e-9
+    assert pulse.opacity_at(main.PULSE_MS) == 1.0     # and round again
+
+
+def test_icon_glow_holds_a_step_while_the_level_hovers_on_a_boundary(window, monkeypatch):  # noqa: F811
+    """Each swap makes Explorer redraw the taskbar and tray icons: a level wobbling
+    across the line between two steps flipped the icon back and forth."""
+    from soundboard.ui import mainwindow as main
+    monkeypatch.setattr(window, "isVisible", lambda: True)
+    swaps = []
+    real = type(window).setWindowIcon
+    monkeypatch.setattr(window, "setWindowIcon", lambda ic: (swaps.append(1), real(window, ic)))
+    now = time.monotonic() + 100
+    edge = 1.5 / main.GLOW_STEPS / 1.4                # the level between step 1 and 2
+    window._glow_icons(edge * 0.98, now)
+    assert window._icon_step == 1
+    for i in range(1, 20):                            # wobbling on the line
+        window._glow_icons(edge * (1.03 if i % 2 else 0.97), now + i)
+    assert window._icon_step == 1 and len(swaps) == 1
+    window._glow_icons(1.0, now + 30)                 # clearly louder: follows at once
+    assert window._icon_step == main.GLOW_STEPS
+    window._glow_icons(0.0, now + 31)                 # quiet: the plain icon
+    assert window._icon_step == 0 and len(swaps) == 3
+
+
+def test_ui_tick_goes_over_only_the_pads_showing_a_sound(window, monkeypatch):  # noqa: F811
+    """Nothing playing: no pad is looked at (all of them, 30 times a second, cost more
+    than the rest of the tick on a big board). One that stops is cleared on the next
+    tick, then left alone."""
+    looked = []
+
+    class Pads(dict):
+        def get(self, sid, default=None):
+            looked.append(sid)
+            return super().get(sid, default)
+    monkeypatch.setattr(window, "pads", Pads(window.pads))
+    pad = window.pads["s0"]
+    now = time.monotonic()
+    window._tick_visuals({}, now)
+    assert looked == []
+    window._tick_visuals({"s0": (0.25, False)}, now)
+    assert pad.progress == 0.25 and looked == ["s0"]
+    window._tick_visuals({"s0": (0.5, True)}, now)    # paused: still shown
+    assert pad.progress == 0.5 and pad.paused
+    looked.clear()
+    window._tick_visuals({}, now)                     # it stopped
+    assert looked == ["s0"] and pad.progress is None and pad.bands is None
+    looked.clear()
+    window._tick_visuals({}, now)
+    assert looked == []
 
 
 def test_the_ui_tick_slows_down_while_nothing_moves(window, monkeypatch, qapp):  # noqa: F811
