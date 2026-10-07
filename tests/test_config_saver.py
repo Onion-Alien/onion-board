@@ -45,6 +45,30 @@ def test_a_slow_disk_doesnt_hold_up_the_caller(app_dir, monkeypatch):
     assert _on_disk()["theme"] == "Light"
 
 
+def test_saving_again_while_the_disk_is_busy_doesnt_freeze(app_dir, monkeypatch):
+    """A 1.7.2 freeze: the second save waited for the first to finish on the disk,
+    on the UI thread, just to copy the settings."""
+    writing, gate = threading.Event(), threading.Event()
+    real = library._write_privacy
+
+    def slow(text):
+        writing.set()
+        gate.wait(5)
+        real(text)
+    monkeypatch.setattr(library, "_write_privacy", slow)
+    cfg = Config()
+    s = library.Saver(cfg)
+    s.save()
+    assert writing.wait(5)   # the writer is on the disk now, holding the write lock
+    start = time.monotonic()
+    cfg.theme = "Light"
+    s.save()
+    assert time.monotonic() - start < 0.5
+    gate.set()
+    assert s.flush(10)
+    assert _on_disk()["theme"] == "Light"
+
+
 def test_an_older_snapshot_never_overwrites_a_newer_save(app_dir):
     cfg = Config()
     cfg.theme = "Light"

@@ -480,7 +480,8 @@ class AiVoicePanel(QWidget):
                 ok = mods.install(m, lambda line: busy.emit(self._install_line, line))
                 busy.emit(self._install_done, ok, "")
             except Exception as e:  # noqa: BLE001 - the buttons must come back
-                applog.report(where="module install")
+                if not isinstance(e, (mods.ModuleError, OSError)):   # a bug: report it
+                    applog.report(where="module install")
                 busy.emit(self._install_done, False, errors.plain(e))
 
         threading.Thread(target=work, name="ai-voices-install", daemon=True).start()

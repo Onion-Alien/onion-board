@@ -98,6 +98,7 @@ def end_process(code: int):
     watcher, the speech worker, an FFT pool) PySide6's crashed in them, so a clean
     quit ended in an access violation and a Windows "stopped working" report.
     TerminateProcess skips all of that; the settings are already saved."""
+    applog.flush()   # the log is written on a thread: its last lines first
     try:
         sys.stdout and sys.stdout.flush()
         sys.stderr and sys.stderr.flush()

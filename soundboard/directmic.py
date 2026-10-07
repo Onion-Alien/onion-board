@@ -671,11 +671,16 @@ def installed_on() -> list[str]:
 
 
 _status_cache: dict = {}
+_status_gen = [0]          # forget_status() bumps it: a refresh started before is dropped
+_status_busy: set = set()  # mic names being re-checked on a thread
+_status_lock = threading.Lock()
 STATUS_S = 2.0
 
 
 def forget_status():
-    _status_cache.clear()
+    with _status_lock:
+        _status_cache.clear()
+        _status_gen[0] += 1
 
 
 def status(mic_name: str | None = None) -> str:
@@ -685,15 +690,44 @@ def status(mic_name: str | None = None) -> str:
       'wiped'     attached, but Windows (a driver or Windows update) took the effect off
       'outdated'  attached, but with another version of the effect than this app's
       'ready'     attached and working
-    'wiped' and 'outdated' need the one-click repair (attaching again). Cached for
-    STATUS_S."""
-    hit = _status_cache.get(mic_name)
-    now = time.monotonic()
-    if hit and now - hit[0] < STATUS_S:
-        return hit[1]
+    'wiped' and 'outdated' need the one-click repair (attaching again).
+
+    The first answer is worked out at once; after that it's re-checked every STATUS_S
+    on a thread, and the last answer comes back meanwhile. The check reads the
+    registry and the ring file, and the window asks every second: on a busy disk the
+    stat alone froze it for 6 s (1.9.7)."""
+    with _status_lock:
+        hit = _status_cache.get(mic_name)
+        now = time.monotonic()
+        if hit and now - hit[0] < STATUS_S:
+            return hit[1]
+        if hit:
+            if mic_name not in _status_busy:
+                _status_busy.add(mic_name)
+                threading.Thread(target=_refresh_status, args=(mic_name, _status_gen[0]),
+                                 daemon=True, name="mic-effect-status").start()
+            return hit[1]
+        gen = _status_gen[0]
     result = _status(mic_name)
-    _status_cache[mic_name] = (now, result)
+    with _status_lock:
+        if gen == _status_gen[0]:
+            _status_cache[mic_name] = (time.monotonic(), result)
     return result
+
+
+def _refresh_status(mic_name: str | None, gen: int):
+    try:
+        result = _status(mic_name)
+    except Exception:  # noqa: BLE001 - keep the last answer; tried again later
+        log.warning("couldn't check the mic effect", exc_info=True)
+        result = None
+    with _status_lock:
+        _status_busy.discard(mic_name)
+        if gen != _status_gen[0]:
+            return
+        hit = _status_cache.get(mic_name)
+        _status_cache[mic_name] = (time.monotonic(),
+                                   result if result is not None else hit[1] if hit else "missing")
 
 
 def needs_repair(state: str) -> bool:
