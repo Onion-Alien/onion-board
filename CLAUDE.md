@@ -31,6 +31,28 @@ published. Before writing or committing anything:
 Run `python scripts/check_sensitive.py` before proposing a commit and fix anything it
 reports. Don't add `# sensitive-scan: allow` to silence it without telling the user why.
 
+## Text the app shows: every language, in the same change
+
+Onion Board ships in every language in `assets/lang/` (the same set as Onion Watch). So any change
+that adds or edits text a user can see (labels, buttons, tooltips, dialogs, toasts,
+errors) does all of this **before committing**, not "later":
+
+1. Wrap it: `_("…")` / `ngettext("…", "…", n)` from `soundboard.i18n`. Whole sentences with
+   `{placeholders}`: never an f-string, `+`, or an English word passed into a
+   placeholder ("{what}" = "sounds" can't be translated).
+2. `python scripts/i18n_extract.py --update`: adds the new texts (empty) to every
+   catalog and drops the unused ones.
+3. Translate every text you added or changed into **every** catalog: plain, short,
+   friendly words for gamers, the same words the catalog already uses (and Onion Watch
+   uses, for shared things), every `{placeholder}`, `<b>…</b>`, `&amp;` and line break
+   kept, and the language's number of plural forms (`i18n.FORMS`). Lots of text: one
+   subagent per language.
+4. `ruff`, the i18n tests, and check that `i18n_extract.py` lists none of your texts as
+   missing.
+
+Never wrap log messages, settings keys, file names, the control API's JSON or the changelog. A new language goes into
+both apps at once. Details: [docs/TRANSLATING.md](docs/TRANSLATING.md).
+
 ## Working in the code
 
 **[docs/DEVELOPING.md](docs/DEVELOPING.md) is the full loop**: setup → change →

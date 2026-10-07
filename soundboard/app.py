@@ -395,6 +395,12 @@ def main():
     except Exception:  # noqa: BLE001
         log.debug("SetCurrentProcessExplicitAppUserModelID failed", exc_info=True)
     app = QApplication(sys.argv)
+    if i18n.is_rtl():   # Arabic: the whole app mirrored, add-on tabs included
+        from PySide6.QtCore import Qt as _Qt
+        app.setLayoutDirection(_Qt.RightToLeft)
+    from soundboard import theme as _theme
+    i18n.use_fonts(_theme.font_families())
+    i18n.translate_qt_buttons(app)   # OK, Cancel, Yes… in Qt's own dialogs
     from soundboard.ui import quietbox
     quietbox.install(app)   # no Windows ding from tips and warnings
     applog.ui_ready()
