@@ -8,7 +8,8 @@ and handed one line per sentence. It writes a WAV file and answers "OK", and
 `SapiTTS.synth` reads that file back. Starting PowerShell takes about a second, so
 it is started once, on first use (or ahead of time with `warm_up`), and kept while
 it's used: after IDLE_CLOSE_S without a line it is closed (it holds ~85 MB), and the
-next line starts it again.
+next line starts it again. The voice list it gives is remembered in the settings
+(remember_voices), so a launch with the same Windows voices needn't start it at all.
 
 `Speaker` queues sentences and plays them one after another through a callback,
 so a second line never talks over the first.
@@ -127,6 +128,34 @@ def parse_voices(listing: str) -> tuple[list[str], dict[str, str]]:
     return names, langs
 
 
+VOICE_CACHE = "win_voices"   # the speech settings' key for remember_voices' entry
+
+
+def remember_voices(names: list[str], langs: dict[str, str], fp) -> dict:
+    """The helper's voice list, to keep in the speech settings under VOICE_CACHE, for
+    the Windows voices fingerprint `fp` (winvoices.fingerprint) it was listed with."""
+    return {"fp": sorted(fp), "voices": [[n, langs.get(n, "")] for n in names]}
+
+
+def remembered_voices(entry, fp) -> tuple[list[str], dict[str, str]] | None:
+    """(names, {name: language}) from a remember_voices entry, if it was listed with
+    these same Windows voices (`fp`); None if it wasn't, or the entry is bad. Listing
+    them meant starting the helper (~2 s and 85 MB, kept for 5 min) at every launch."""
+    if not fp or not isinstance(entry, dict) or entry.get("fp") != sorted(fp):
+        return None
+    rows = entry.get("voices")
+    if not isinstance(rows, list) or not all(
+            isinstance(r, list) and len(r) == 2 and all(isinstance(x, str) for x in r)
+            for r in rows):
+        return None
+    names, langs = [], {}
+    for name, lang in rows:
+        if name and name not in langs:
+            names.append(name)
+            langs[name] = lang
+    return names, langs
+
+
 def _b64(s: str) -> str:
     return base64.b64encode(s.encode("utf-8")).decode("ascii")
 
@@ -138,6 +167,7 @@ class SapiTTS:
         self._lock = threading.Lock()
         self.voices: list[str] = []
         self.voice_langs: dict[str, str] = {}   # voice name -> its language, like "de-DE"
+        self.listed: tuple[list[str], dict[str, str]] | None = None   # the helper's own last list
         self.error = ""
         self._clock = time.monotonic
         self._used = 0.0                    # when the helper last started or spoke
@@ -163,6 +193,7 @@ class SapiTTS:
             self.close()
             raise RuntimeError(f"Windows speech didn't start: {line or 'no answer'}")
         self.voices, self.voice_langs = parse_voices(line[5:])
+        self.listed = (list(self.voices), dict(self.voice_langs))
         log.info("Windows speech ready: %s", ", ".join(self.voices) or "no voices")
         self._used = self._clock()
         if self._idle_thread is None:   # (the lock is held: see close_if_idle)
@@ -198,6 +229,21 @@ class SapiTTS:
         if prefer and speaks(prefer):
             return prefer
         return next((v for v in self.voices if speaks(v)), "")
+
+    @property
+    def running(self) -> bool:
+        """The helper is up (a line now won't wait for it to start)."""
+        p = self._proc
+        return p is not None and p.poll() is None
+
+    def use_listing(self, names: list[str], langs: dict[str, str]) -> list[str]:
+        """Take the voice list remembered from an earlier run (remembered_voices)
+        instead of starting the helper to list them: it starts on the first line."""
+        with self._lock:
+            if self._proc is None:
+                self.voices, self.voice_langs = list(names), dict(langs)
+                self.error = ""
+            return self.voices
 
     def warm_up(self) -> list[str]:
         with self._lock:

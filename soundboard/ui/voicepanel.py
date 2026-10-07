@@ -26,7 +26,7 @@ from soundboard import applog
 from soundboard import modules as mods
 from soundboard import voicefx
 from soundboard import library, net, netlog, savedvoices, theme
-from soundboard.speech import customvoices, translation, winvoices
+from soundboard.speech import customvoices, translation, tts, winvoices
 from soundboard.speech.aivoice import AiVoiceController
 from soundboard.speech.live import SpeechController, clean_settings
 from soundboard.ui import appstate, art, busy, icons
@@ -1431,6 +1431,7 @@ class SpeechPanel(QWidget):
         self._voice_installing: mods.ModuleInfo | None = None
         self._voice_note = ""        # how the last voice install went, until it's found
         self._voice_fp: frozenset[str] | None = None   # voice tokens when last loaded
+        self._warming = False         # _warm_for_a_line's start is under way
         self._loading_since = time.monotonic()   # a voice (re)load is in flight; 0 when not
         # a voice installed any way at all (here, in Settings, by a script) is noticed
         # by its registry token appearing, and the speech engine reloads to use it
@@ -1708,6 +1709,7 @@ class SpeechPanel(QWidget):
         self.ed = QLineEdit()
         self.ed.setPlaceholderText(_("Or type a line and press Enter…"))
         self.ed.returnPressed.connect(self._say)
+        self.ed.textEdited.connect(self._warm_for_a_line)
         row.addWidget(self.ed, 1)
         b_say = QPushButton(_("Say"))
         b_say.clicked.connect(self._say)
@@ -1740,8 +1742,13 @@ class SpeechPanel(QWidget):
         if app is not None:
             app.applicationStateChanged.connect(self._app_state)
         def warm_up():
-            self._voice_fp = winvoices.fingerprint()
-            voices, err = controller.tts.warm_up(), controller.tts.error
+            # the voice list from the last run, if Windows' voices are the same: no
+            # speech helper is started for it (it starts when there's a line to say)
+            fp = self._voice_fp = winvoices.fingerprint()
+            known = tts.remembered_voices(self.s.get(tts.VOICE_CACHE), fp)
+            voices = (controller.tts.use_listing(*known) if known
+                      else controller.tts.warm_up())
+            err = controller.tts.error
             try:
                 self._voices.emit(voices, err)
             except RuntimeError:   # the panel was closed while the voices loaded
@@ -1749,6 +1756,37 @@ class SpeechPanel(QWidget):
         threading.Thread(target=warm_up, name="tts-warmup", daemon=True).start()
 
     # ---- text to speech
+    def _warm_for_a_line(self, *_):
+        """A line is being typed (or the live voice starts): start Windows speech now,
+        not when the line is said. With the voice list remembered from the last run it
+        isn't running yet, and starting it takes ~2 s."""
+        t = self.ctl.tts
+        if (self._warming or getattr(t, "running", True)
+                or self.ctl.speaker.voice.startswith(customvoices.PREFIX)):
+            return
+        self._warming = True
+
+        def work():
+            try:
+                voices = t.warm_up()
+                self._voices.emit(voices, t.error)
+            except RuntimeError:   # the panel was closed meanwhile
+                pass
+            finally:
+                self._warming = False
+        threading.Thread(target=work, name="tts-warmup", daemon=True).start()
+
+    def _remember_voices(self):
+        """Keep the list the speech helper gave (with the Windows voices it was for) in
+        the settings, so the next launch needn't start the helper to list them."""
+        listed = getattr(self.ctl.tts, "listed", None)
+        if not listed or not self._voice_fp:
+            return
+        entry = tts.remember_voices(*listed, self._voice_fp)
+        if self.s.get(tts.VOICE_CACHE) != entry:
+            self.s[tts.VOICE_CACHE] = entry
+            self.changed.emit(dict(self.s))
+
     def _say(self):
         text = self.ed.text().strip()
         if text:
@@ -1776,6 +1814,8 @@ class SpeechPanel(QWidget):
         # shows as "Windows default", and asking for it would fail every line
         self.ctl.speaker.voice = self.cb_voice.currentData() or ""
         self._loading_since = 0.0
+        if not error:
+            self._remember_voices()
         self.b_voices_check.setEnabled(True)
         self.b_voices_check.setText(_("Reload voices"))
         if self._voices_again:   # asked for while that load ran (e.g. a server was added)
@@ -2280,6 +2320,7 @@ class SpeechPanel(QWidget):
             except RuntimeError as e:
                 self._set_live_ui(False, f"⚠ {errors.plain(e)}")
                 return
+            self._warm_for_a_line()   # its first line would otherwise wait for speech
             self._set_live_ui(True, _("starting…"))
         elif not on and self.ctl.live:
             self.ctl.stop_live()
