@@ -7,13 +7,13 @@ from soundboard import discordcfg as dc
 DEFAULTS = {"mode": "VOICE_ACTIVITY", "echoCancellation": True, "noiseSuppression": False,
             "automaticGainControl": True, "noiseCancellation": True,
             "bypassSystemInputProcessing": False, "activeInputProfile": "VOICE_ISOLATION",
-            "inputDeviceId": "default"}
+            "inputDeviceId": "default", "modeOptions": {"vadUseKrisp": False}}
 
 
 def store(**over) -> bytes:
     d = dict(DEFAULTS, **over)
     return (b"\x01_https://discord.com\x00\x01MediaEngineStore\xcd*\x01"
-            + json.dumps({"default": d, "stream": {}}).encode())
+            + json.dumps({"default": d, "stream": {}}, separators=(",", ":")).encode())
 
 
 def folder(client="discord"):
@@ -72,7 +72,7 @@ def test_discords_defaults_are_all_problems():
     s = dc.parse({"default": dict(DEFAULTS, activeInputProfile="CUSTOM")})
     assert s.problems(True) == [dc.KRISP, dc.ECHO, dc.AGC]
     s = dc.parse({"default": {}})   # an older Discord that wrote none of the keys
-    assert s.profile == "" and s.problems(True) == [dc.KRISP, dc.ECHO, dc.AGC]
+    assert s.profile == "" and s.problems(True) == [dc.VAD, dc.KRISP, dc.ECHO, dc.AGC]
     s = dc.parse({"default": dict(DEFAULTS, activeInputProfile="CUSTOM",
                                   noiseCancellation=False, noiseSuppression=True)})
     assert s.problems(True) == [dc.SUPPRESSION, dc.ECHO, dc.AGC]
@@ -94,3 +94,20 @@ def test_several_clients_most_recently_changed_first():
     got = dc.read()
     assert [s.client for s in got] == ["Discord Canary", "Discord"]
     assert len(dc.signature()) == 2
+
+
+def test_advanced_voice_activity_cuts_sounds_in_calls():
+    s = dc.parse({"default": dict(DEFAULTS, activeInputProfile="CUSTOM", noiseCancellation=False,
+                                  echoCancellation=False, automaticGainControl=False,
+                                  modeOptions={"vadUseKrisp": True})})
+    assert s.problems(True) == [dc.VAD] and s.problems(False) == [dc.VAD]
+    s = dc.parse({"default": dict(DEFAULTS, mode="PUSH_TO_TALK", activeInputProfile="CUSTOM",
+                                  noiseCancellation=False, echoCancellation=False,
+                                  automaticGainControl=False, modeOptions={"vadUseKrisp": True})})
+    assert s.problems(True) == []
+
+
+def test_snappy_round_trip():
+    # literal "abcd" then a copy of 8 bytes at offset 4 (overlapping): "abcdabcdabcd"
+    packed = bytes([12, 3 << 2]) + b"abcd" + bytes([((8 - 4) << 2) | 1, 4])
+    assert dc.unsnappy(packed) == b"abcdabcdabcd"
