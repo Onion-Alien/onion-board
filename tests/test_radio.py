@@ -729,7 +729,8 @@ def test_the_map_is_the_only_view_and_the_3d_globe_setting_moves_to_it(
     if old.get("map") == "globe":
         assert cfg.radio["map"] == "flat" and saved   # moved over, and saved at once
     else:
-        assert cfg.radio.get("map") is None and not saved   # nothing to move: left alone
+        # nothing to move: left alone (other settings may still save)
+        assert cfg.radio.get("map") is None and not any("map" in s for s in saved)
     t.start()
     assert process_events(qapp, lambda: t.flat is not None and t._globe_list)
     assert isinstance(t.flat, FlatMap) and not hasattr(t, "view")

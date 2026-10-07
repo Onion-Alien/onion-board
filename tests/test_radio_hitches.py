@@ -320,14 +320,13 @@ def test_the_decoder_is_loaded_off_the_ui_thread_once(qapp, monkeypatch):
     monkeypatch.setattr(ctypes, "WinDLL",
                         lambda path: loaded.append((path, threading.current_thread().name)))
     monkeypatch.setattr(radio, "_preloaded", False)
-    p1, p2 = radio.RadioPlayer(), radio.RadioPlayer()
+    radio.preload_decoder()   # the Radio tab's first show calls it
+    radio.preload_decoder()   # and again: a no-op
     end = time.monotonic() + 5
     while not any("ffmpeg" in f.lower() for f, _ in loaded) and time.monotonic() < end:
         time.sleep(0.01)
     names = [Path(f).name.lower() for f, _ in loaded]
     assert names[0].startswith("avutil") and names[-1].startswith("ffmpeg")
     assert any(n.startswith("avcodec") for n in names)
-    assert len(names) == len(set(names))                       # once, for both players
+    assert len(names) == len(set(names))                       # once, for both calls
     assert all(t == "radio-preload" for _, t in loaded)        # never the UI thread
-    p1.deleteLater()
-    p2.deleteLater()
