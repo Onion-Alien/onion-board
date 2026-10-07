@@ -24,7 +24,7 @@ from soundboard.ui import busy, fit, icons
 from soundboard.ui import overlay as ovl
 from soundboard.wheelguard import no_wheel
 from soundboard.winkeys import Hotkeys
-from soundboard import errors
+from soundboard import errors, i18n
 from soundboard.i18n import _, ngettext
 
 log = logging.getLogger(__name__)
@@ -555,7 +555,8 @@ class SettingsDialog(QDialog):
     def _appearance(self):
         w, v = self._page()
         self.theme_cards = []
-        # first, above the themes (it sat under every theme card, out of sight)
+        v.addWidget(self._language_card())
+        # above the themes (it sat under every theme card, out of sight)
         card, cv = self._card(_("Live tabs"),
                               _("A tab whose feature is on right now (a sound playing, the voice "
                                 "changer, the radio…) is marked, so nothing is left on without "
@@ -591,6 +592,70 @@ class SettingsDialog(QDialog):
             v.addWidget(card)
         v.addStretch(1)
         return w
+
+    def _language_card(self) -> QFrame:
+        """The app's language: a button showing the one picked, opening a window of
+        language tiles with a search (ui.langpick). The title is in Windows' language
+        too, so someone who can't read this page still finds it; what it says about
+        restarting is in the language picked."""
+        title = _("Language")
+        other = i18n.offer()
+        if other:
+            word = i18n.in_language(other, lambda: _("Language"))
+            title = title if word == title else f"{title} · {word}"
+        card, cv = self._card(title)
+        pick = QPushButton()
+        icons.set_icon(pick, "browser")
+        pick.setAccessibleName(_("Language"))
+        pick.setToolTip(_("Pick the language Onion Board is shown in"))
+        restart = QPushButton()
+        restart.clicked.connect(self.mw.restart_app)
+        row = QHBoxLayout()
+        row.setSpacing(10)
+        row.addWidget(pick)
+        row.addWidget(restart)
+        row.addStretch(1)   # buttons as wide as their text, not the card
+        cv.addLayout(row)
+        note = QLabel()
+        note.setObjectName("hint")
+        note.setWordWrap(True)
+        cv.addWidget(note)
+        langs = dict(i18n.available())
+
+        def chosen() -> str:
+            c = self.mw.cfg.language
+            return c if c in langs else i18n.current()
+
+        def show():
+            code = chosen()
+            pick.setText(f"{langs.get(code, code)}  ▾")
+            later = code != i18n.current()
+            if later:
+                text, button = i18n.in_language(code, lambda: (
+                    _("Onion Board shows {name} after a restart.", name=i18n.name_of(code)),
+                    _("Restart now")))
+                note.setText("‏" + text if i18n.is_rtl(code) else text)   # (RLM: see
+                # MainWindow._offer_language)
+                restart.setText(button)
+                note.setLayoutDirection(Qt.RightToLeft if i18n.is_rtl(code)
+                                        else Qt.LeftToRight)
+            note.setVisible(later)
+            restart.setVisible(later)
+
+        def open_picker():
+            from soundboard.ui.langpick import LanguageDialog
+            dlg = LanguageDialog(self, chosen())
+            self.lang_dialog = dlg   # (tests reach it while it's open)
+            dlg.chosen.connect(lambda code: (
+                self.mw.switch_language(code, restart=False), show()))
+            dlg.exec()
+            self.lang_dialog = None
+            dlg.deleteLater()
+        pick.clicked.connect(open_picker)
+        show()
+        self.lang_button, self.lang_note, self.lang_restart = pick, note, restart
+        self.lang_dialog = None
+        return card
 
     def _highlight_card(self) -> QFrame:
         """Your own colour for what's on right now (the voice changer, Live, a live tab),

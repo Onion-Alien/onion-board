@@ -53,6 +53,20 @@ errors) does all of this **before committing**, not "later":
 Never wrap log messages, settings keys, file names, the control API's JSON or the changelog. A new language goes into
 both apps at once. Details: [docs/TRANSLATING.md](docs/TRANSLATING.md).
 
+## New UI: narrow by default
+
+The author has had to shrink nearly every new control, card and window by hand. New UI
+is **as narrow as its content**, never stretched to fill the space:
+
+- Buttons, drop-downs and boxes are as wide as their text (`QSizePolicy.Maximum` /
+  `AdjustToContents`, a `addStretch(1)` after them in the row). No stretch factor on a
+  control unless it really holds long text (a search box, a slider, a path).
+- Dialogs and pop-ups get a fixed or capped width that fits their content (about
+  ≤ 620 px), not the parent's width or the screen's. Grids: few columns of fixed-size
+  tiles, scroll down instead of spreading out.
+- Long text wraps (`setWordWrap`) or goes on two lines; don't widen the layout for it.
+- Before sending pictures, look at them for empty horizontal space and fix it first.
+
 ## Working in the code
 
 **[docs/DEVELOPING.md](docs/DEVELOPING.md) is the full loop**: setup → change →

@@ -1,5 +1,12 @@
 # Translating Onion Board
 
+People pick the language in **Settings → Appearance → Language**: a window of tiles
+(`ui/langpick.py`), each language in its own name with a search on top; the card's title
+is in Windows' language too. It's saved as config.json's
+`language` and takes effect after a restart. The board doesn't follow Windows by itself
+yet (`i18n.FOLLOW_WINDOWS`, for 2.0): until a language is picked, a bar in Windows'
+language offers to switch, once, if a catalog for it is shipped.
+
 The app's text is English in the code, wrapped for translation:
 
 ```python
