@@ -40,6 +40,18 @@ HOOT_PX = 130
 HOOT_BEGS = ("pleeease?", "install me?", "one click!", "hoo? hoo…?", "I'd watch for you…",
              "so… bored…")
 HOOT_JOY = ("yay!!", "hoo-ray!", "↓ that button!")
+SHOW_LOAD_MS = 50   # first shown, the add-on loads after the tab's first paint, or this
+
+
+class _WaitPage(QWidget):
+    """The blank page while the add-on isn't loaded yet; tells the tab it was painted."""
+    def __init__(self, painted):
+        super().__init__()
+        self._painted = painted
+
+    def paintEvent(self, event):
+        super().paintEvent(event)
+        self._painted()
 
 
 def plural(n: int, word: str) -> str:
@@ -56,7 +68,8 @@ class TriggersTab(QWidget):
     def __init__(self, host, dirs=None, defer: bool = False):
         """`host` is the BoardHost; `dirs` where to look for the add-on (tests).
         `defer`: don't load the add-on yet, the window calls load() once it's up
-        (loading it takes up to a second, and the window used to wait for it)."""
+        (loading it takes up to a second, and the window used to wait for it), or
+        only when the tab is first shown, when nothing has to run (needed_now)."""
         super().__init__()
         self.host = host
         self._dirs = dirs
@@ -90,8 +103,9 @@ class TriggersTab(QWidget):
         self.btn_remove = self._remove_button()
         self.foot.addWidget(self.btn_remove)
         self.stack.addWidget(self.board_page)
+        self._load_queued = False           # a load after the first paint is on its way
         if defer:   # blank meanwhile, not Hoot asking to be installed
-            self.wait_page = QWidget()
+            self.wait_page = _WaitPage(self._painted)
             self.stack.addWidget(self.wait_page)
             self.stack.setCurrentWidget(self.wait_page)
         else:
@@ -249,6 +263,42 @@ class TriggersTab(QWidget):
             self.btn_update.setToolTip(why)
 
     # ------------------------------------------------------------------ loading
+    def needed_now(self) -> bool:
+        """At the window's start (or the tab switched back on in Settings > Tabs):
+        whether to load the add-on straight away. Only when it has to run (watching
+        was on with triggers to watch: it picks up again by itself) or there's none
+        installed (Hoot's page costs nothing, and the board may point at the tab).
+        Otherwise it waits until the tab is first shown: loading it costs ~0.5 s,
+        40+ MB and a dozen threads that a board not watching never needs."""
+        self.info = watchaddon.installed(self._dirs)   # Settings > Add-ons shows it
+        if self.info is None:
+            return True
+        return bool(self.host.screen.get("on")) and self._trigger_count() > 0
+
+    def ensure_loaded(self):
+        """Load the add-on now if it's still waiting to be (something needs it)."""
+        if self.pending:
+            self.load()
+
+    def showEvent(self, event):
+        super().showEvent(event)
+        if self.pending and not self._load_queued:
+            # the tab changes at once (its first paint), then it loads; a timer as
+            # well, in case that paint never comes
+            self._load_queued = True
+            QTimer.singleShot(SHOW_LOAD_MS, self, self._load_on_show)
+
+    def _painted(self):
+        if self._load_queued:
+            QTimer.singleShot(0, self, self._load_on_show)
+
+    def _load_on_show(self):
+        if not self._load_queued:
+            return
+        self._load_queued = False
+        if self.pending and not self._busy and self.isVisible():
+            self.load()
+
     def load(self, error: str = "") -> bool:
         """Put the installed add-on's tab in, if it's there and loads. False (Hoot
         stays, saying why) otherwise."""
@@ -301,6 +351,7 @@ class TriggersTab(QWidget):
         on a thread; the tab loads it when it's in."""
         if self._busy:
             return
+        self.ensure_loaded()   # not shown yet: what's installed now is what's updated
         self._busy, self._cancel = True, False
         update = self.panel is not None
         offer = self.offer
@@ -445,6 +496,7 @@ class TriggersTab(QWidget):
             return
         log.info("Onion Watch %s was removed", info.version)
         self.info = None
+        self.pending = False                # nothing left to load
         self._label_get()
         self.stack.setCurrentWidget(self.get_page)
         n = self._trigger_count()
@@ -452,8 +504,10 @@ class TriggersTab(QWidget):
                    "ok")
 
     def offer_update(self, offer: watchaddon.Offer):
-        """A newer Onion Watch is out (the daily update check): say so on the tab."""
-        if self.panel is None or self._busy:
+        """A newer Onion Watch is out (the daily update check): say so on the tab
+        (not loaded yet, but installed: the bar is there once it is)."""
+        waiting = self.pending and self.info is not None
+        if (self.panel is None and not waiting) or self._busy:
             return
         self.offer = offer
         self.update_text.setText(f"Onion Watch {offer.version} is out."

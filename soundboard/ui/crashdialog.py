@@ -55,8 +55,8 @@ class CrashDialog(QDialog):
         what.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
         v.addWidget(what)
 
-        keep = ("The app will close." if rep.fatal else
-                "The app is still running, but if something looks wrong, restart it.")
+        keep = (_("The app will close.") if rep.fatal else
+                _("The app is still running, but if something looks wrong, restart it."))
         ask = QLabel(
             _("{keep}<br><br><b>Please send this report to the developer</b> so it can be fixed: "
               "press <i>Report on GitHub</i> and paste it in (it's copied for you), or <i>Copy "

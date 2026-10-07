@@ -130,7 +130,7 @@ class LinkBar(QFrame):
                       theme.status("warn"))
             self._buttons()
             return
-        self._say(f"Looking up <b>{html.escape(self._host())}</b>…")
+        self._say(_("Looking up <b>{host}</b>…", host=html.escape(self._host())))
         self._buttons()
         self._probe_timer.start()
 
@@ -213,7 +213,8 @@ class LinkBar(QFrame):
             return False
         self._queued = kind
         name = html.escape(self.title or self._host())
-        self._say(f"<b>{name}</b> is next: waiting for the download before it to finish…")
+        self._say(_("<b>{name}</b> is next: waiting for the download before it to finish…",
+                    name=name))
         return True
 
     def _without_tor(self):
@@ -249,12 +250,12 @@ class LinkBar(QFrame):
         gain = gain if self.cfg.level_volumes else 1.0
         v = self.engine.play(PLAY_ID, data, gain, mode="restart")
         if v is None:
-            self._say("No audio device is open — pick one in Setup.", theme.status("warn"))
+            self._say(_("No audio device is open — pick one in Setup."), theme.status("warn"))
         else:
-            self.played.emit(self.title or "Link", data, gain)
-            name = html.escape(self.title or "it")
-            self._say(f"▶ Playing <b>{name}</b> ({fmt_time(len(data) / SR)}) — "
-                      "<i>Add as sound</i> keeps it.")
+            self.played.emit(self.title or _("Link"), data, gain)
+            name = html.escape(self.title or _("it"))
+            self._say(_("▶ Playing <b>{name}</b> ({time}) — <i>Add as sound</i> keeps it.",
+                        name=name, time=fmt_time(len(data) / SR)))
 
     # ------------------------------------------------------------------ workers
     def _probe(self, url: str):
@@ -285,7 +286,8 @@ class LinkBar(QFrame):
                 return
             fp = fingerprint(str(path))
             if fp and fp in known:
-                raise ytdl.DownloadError(f"It's already in your Sounds as “{known[fp]}”.")
+                raise ytdl.DownloadError(_("It's already in your Sounds as “{name}”.",
+                                           name=known[fp]))
             meta, data = import_file(str(path), color)
             if (pic := thumbs.find_in(Path(path).parent)) is not None:
                 meta.image = thumbs.store(pic, meta.id)   # the video's thumbnail
@@ -296,16 +298,18 @@ class LinkBar(QFrame):
                     kept = ytdl.save_video(path, title or meta.name)
                     if kept:
                         videos.link(meta.id, kept)   # the player's Video button shows it
-                    saved = (f"Video saved in {kept.parent}." if kept else
-                             "No video was saved: this site only gave the sound.")
+                    saved = (_("Video saved in {folder}.", folder=kept.parent) if kept else
+                             _("No video was saved: this site only gave the sound."))
                 except OSError as e:
                     log.warning("couldn't keep the video of %s: %s", url, e)
-                    saved = f"The video couldn't be saved ({errors.plain(e)})."
+                    saved = _("The video couldn't be saved ({error}).",
+                              error=errors.plain(e))
             self._msg.emit("added", url, (meta, data, title, saved))
         except ytdl.TorBlocked as e:   # the bar offers to try it without Tor
             log.warning("link %s turned away over Tor for %s", kind, url)
             self._msg.emit("blocked", url, (kind, html.escape(
-                f"Couldn't {'add' if kind == 'add' else 'play'} it: {e}")))
+                _("Couldn't add it: {error}", error=e) if kind == "add" else
+                _("Couldn't play it: {error}", error=e))))
         except Exception as e:  # noqa: BLE001 - shown in the bar, logged
             log.warning("link %s failed for %s: %s", kind, url, e)
             # a bot check or rate limit is about the user's address, not yt-dlp
@@ -314,7 +318,8 @@ class LinkBar(QFrame):
                     _(" A newer yt-dlp may fix this: Settings → Updates → Update now."))
             doing = "add" if kind == "add" else "play"
             # rich text: the plain words, and a "Report it" link when it's one for us
-            self._msg.emit("error", url, errors.html(e, f"Couldn't {doing} it: ",
+            before = _("Couldn't add it: ") if kind == "add" else _("Couldn't play it: ")
+            self._msg.emit("error", url, errors.html(e, before,
                                                      where=f"Couldn't {doing} a link")
                            + html.escape(hint))
         finally:
@@ -333,7 +338,8 @@ class LinkBar(QFrame):
             return
         if kind == "probe-error":
             if current and not self._busy:
-                self._say(html.escape(f"Can't use this link: {payload}"), theme.status("error"))
+                self._say(html.escape(_("Can't use this link: {error}", error=payload)),
+                          theme.status("error"))
             return
         if kind == "title":
             if current:
@@ -342,7 +348,7 @@ class LinkBar(QFrame):
         if kind == "progress":
             self.progress.emit(url, payload)
             if current:
-                t = ("Adding…" if self._busy == "add" else "Loading…")
+                t = (_("Adding…") if self._busy == "add" else _("Loading…"))
                 t = t if payload < 0 else f"{t} {payload:.0%}"
                 (self.btn_add if self._busy == "add" else self.btn_play).setText(t)
             return
@@ -363,11 +369,12 @@ class LinkBar(QFrame):
             meta.name = (title or (current and self.title) or meta.name)[:40]
             self.sound_ready.emit(meta, data)
             if current:
-                self._say(f"✓ Added <b>{html.escape(meta.name)}</b> to your Sounds."
+                self._say(_("✓ Added <b>{name}</b> to your Sounds.",
+                            name=html.escape(meta.name))
                           + (f" {html.escape(saved)}" if saved else ""), theme.status("ok"))
             else:   # another link is showing now: still say this one made it
-                busy.toast(self.window(), f"✓ Added <b>{html.escape(meta.name)}</b> to your "
-                                          "Sounds.", "ok")
+                busy.toast(self.window(), _("✓ Added <b>{name}</b> to your Sounds.",
+                                            name=html.escape(meta.name)), "ok")
             self.done.emit(url, "add", True)
         elif kind == "play":
             path, data, gain = payload

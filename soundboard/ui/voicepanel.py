@@ -560,9 +560,13 @@ class VoiceFxPanel(QWidget):
         tl = QHBoxLayout(self.tip)
         tl.setContentsMargins(0, 0, 0, 0)
         tl.setSpacing(8)
-        tip_text = hint_label("⚠ Discord deletes most of a changed voice unless its "
-                              "<b>Input Profile</b> is <b>Studio</b> (Settings → Voice & "
-                              "Video). Game voice chats' noise suppression does the same.")
+        # Straight into my mic, Studio makes Discord skip Onion Board (your real voice
+        # goes out): Custom with noise suppression off works on the mic and the cable
+        tip_text = hint_label("⚠ Discord deletes most of a changed voice unless its noise "
+                              "suppression is off: Settings → Voice & Video → <b>Input "
+                              "Profile</b> <b>Custom</b>, <b>Noise Suppression</b> "
+                              "<b>None</b> (not Studio: it skips Onion Board on your mic). "
+                              "Game voice chats' noise suppression does the same.")
         theme.set_tone(tip_text, "warn")
         tl.addWidget(tip_text, 1)
         self.btn_tip_help = QPushButton("Show me how")
