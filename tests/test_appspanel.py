@@ -505,6 +505,92 @@ def test_a_listing_failure_skips_the_update(qapp, monkeypatch):
     lister.stop()
 
 
+def _wait(qapp, until, timeout=3.0):
+    import time
+    end = time.monotonic() + timeout
+    while not until() and time.monotonic() < end:
+        qapp.processEvents()
+        time.sleep(0.01)
+    return until()
+
+
+def test_lister_uses_one_worker_thread_for_every_listing(qapp, monkeypatch):
+    """It started a new thread for each listing: 720 an hour in the tray."""
+    import threading
+    monkeypatch.setattr(appaudio, "list_apps", lambda strict=False, **_: [music()])
+    got = []
+    lister = appspanel._Lister()
+    lister.ready.connect(got.append)
+    for n in range(1, 4):
+        lister.refresh()
+        assert _wait(qapp, lambda n=n: len(got) == n and not lister._busy)
+    workers = [t for t in threading.enumerate() if t.name == "applist"]
+    assert lister._thread in workers and lister._thread.is_alive()
+    first = lister._thread
+    lister.refresh()
+    assert _wait(qapp, lambda: len(got) == 4)
+    assert lister._thread is first
+    lister.stop()
+    first.join(2)
+    assert not first.is_alive()                  # stop() ends it
+
+
+def test_hidden_tab_lists_programs_only_when_one_it_watches_starts_or_closes(qapp, monkeypatch):
+    """Hidden, a 5 s check walks only the processes (~4 ms) and lists the programs
+    (~20 ms) when one of the tab's started or closed, one not picked up yet runs, or
+    HIDDEN_FULL_S went by."""
+    import time
+    procs = {1: "explorer.exe", 100: "music.exe"}
+    monkeypatch.setattr(appaudio, "running", lambda: dict(procs))
+    lister = appspanel._Lister()
+    watch = frozenset({"music.exe", "chat.exe"})
+    assert lister._due(watch, frozenset())         # the first look: listed
+    lister._listed_at = time.monotonic()
+    assert not lister._due(watch, frozenset())     # nothing changed: only the walk
+    procs[7] = "game.exe"
+    assert not lister._due(watch, frozenset())     # not one of the tab's programs
+    procs[200] = "chat.exe"
+    assert lister._due(watch, frozenset())         # a watched one started
+    assert not lister._due(watch, frozenset())
+    assert lister._due(watch, frozenset({"chat.exe"}))   # remembered, not picked up yet
+    del procs[100]
+    assert lister._due(watch, frozenset())         # one closed
+    assert not lister._due(watch, frozenset())
+    lister._listed_at = time.monotonic() - appspanel.HIDDEN_FULL_S
+    assert lister._due(watch, frozenset())         # now and then anyway
+    lister.stop()
+
+
+def test_hidden_tab_picks_up_a_remembered_program_on_the_next_check(tab, qapp, monkeypatch):
+    """The feature the hidden re-read is for: a remembered program that starts is
+    sent again within one check, with the cheap process walk in between."""
+    procs = {1: "explorer.exe"}
+    listed = []
+    monkeypatch.setattr(appaudio, "running", lambda: dict(procs))
+    monkeypatch.setattr(appaudio, "list_apps",
+                        lambda strict=False, **_: (listed.append(1),
+                                                   [music()] if 100 in procs else [])[1])
+    tab.peaks.stop()
+    tab._on_apps([music()])
+    tab.rows["music.exe"].btn_send.setChecked(True)
+    tab._on_apps([])                               # it closed: still remembered
+    assert tab.rows["music.exe"].app is None
+    tab.hide()
+
+    def check():
+        n = len(listed)
+        tab._refresh()
+        _wait(qapp, lambda: not tab.lister._busy)
+        qapp.processEvents()
+        return len(listed) - n
+    check()                                        # the first look lists them
+    assert check() == 0                            # nothing new: no listing
+    procs[100] = "music.exe"                       # it starts again
+    assert check() == 1
+    assert tab.rows["music.exe"].sending and tab.rows["music.exe"].app is not None
+    assert check() == 0                            # picked up: back to the walk only
+
+
 def test_record_waits_for_sound_then_adds_a_clip_without_sending(tab, monkeypatch, tmp_path):
     monkeypatch.setattr(appspanel.library, "APP_DIR", tmp_path)
     clips = []

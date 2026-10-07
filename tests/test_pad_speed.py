@@ -169,14 +169,25 @@ def test_fitted_picture_is_made_once_per_size_screen_and_shade(qapp, tmp_path, m
 
 
 def test_fitted_pictures_are_capped_by_size(qapp, tmp_path, monkeypatch):
-    path = make_image(tmp_path / "a.png")
+    paths = [make_image(tmp_path / f"{i}.png") for i in range(6)]
     cap = 3 * 106 * 60 * 4    # three of the biggest below
     monkeypatch.setattr(thumbs, "MAX_FITTED_BYTES", cap)
-    for w in range(100, 106):
+    for w, path in zip(range(100, 106), paths):
         thumbs.fitted(path, w, 60, 1.0)
     assert thumbs._fitted_bytes <= cap
-    assert len([k for k in thumbs._fitted if k[0] == path]) == 3   # the newest kept
-    assert (path, 105, 60, 1.0, (), 0) in thumbs._fitted
+    assert len([k for k in thumbs._fitted if k[0] in paths]) == 3   # the newest kept
+    assert (paths[-1], 105, 60, 1.0, (), 0) in thumbs._fitted
+    for path in paths:
+        thumbs.forget(path)
+
+
+def test_a_new_size_of_a_picture_replaces_the_old_one(qapp, tmp_path):
+    """Pads are all one size: dragging Pad size left a copy at every size it passed."""
+    path = make_image(tmp_path / "a.png")
+    for w in range(100, 106):
+        thumbs.fitted(path, w, 60, 1.0)
+    thumbs.fitted(path, 105, 60, 1.0, ((0, 9),))     # another shade (hover) is its own
+    assert sorted(k[1] for k in thumbs._fitted if k[0] == path) == [105, 105]
     thumbs.forget(path)
 
 
@@ -191,9 +202,9 @@ def test_pad_paints_its_picture_without_scaling_it_again(qapp, tmp_path, monkeyp
     real = thumbs.fitted
 
     def counting(*a):
-        before = len(thumbs._fitted)
+        before = set(thumbs._fitted)
         pm = real(*a)
-        made.append(len(thumbs._fitted) > before)
+        made.append(set(thumbs._fitted) != before)
         return pm
     monkeypatch.setattr(thumbs, "fitted", counting)
     for _ in range(3):
