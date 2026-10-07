@@ -128,7 +128,7 @@ class SpeedPitchButton(QPushButton):
         super().__init__()
         self.setObjectName("small")
         self.setProperty("speedpitch", True)
-        self.setToolTip(_("Speed, pitch and effects of the {what} playing now", what=what))
+        self.setToolTip(_("Speed, pitch and effects of the sounds playing now"))
         self.setCursor(Qt.PointingHandCursor)
         self._speed_hi = redline_speed(*redline)
         redline = redline[1]
@@ -144,7 +144,7 @@ class SpeedPitchButton(QPushButton):
         head.setSpacing(8)
         title = QLabel(_("Live controls"))
         title.setStyleSheet("font-weight:700; font-size:10.5pt;")
-        sub = QLabel(_("All {what}", what=what))
+        sub = QLabel(_("All sounds"))
         sub.setObjectName("muted")
         reset = QPushButton(_("Reset all"))
         reset.setObjectName("small")

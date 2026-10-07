@@ -1042,8 +1042,8 @@ class MainWindow(QMainWindow):
         self._video_win = None   # ui/videowindow.VideoWindow, made on first use
         th.addWidget(self.btn_video)
         self.speed_btn = SpeedPitchButton(
-            "sounds", "Changes every sound while it plays. To save a version, "
-                      "right-click a pad → Effects.")
+            "sounds", _("Changes every sound while it plays. To save a version, "
+                        "right-click a pad → Effects."))
         self.speed_btn.changed.connect(self.on_live_speed)
         self.speed_btn.fx_changed.connect(lambda fx: setattr(self.engine, "sound_fx", fx))
         th.addWidget(self.speed_btn)
@@ -2391,7 +2391,8 @@ class MainWindow(QMainWindow):
                                 profiles.GAME.key) for h in heard if h not in apps]
         if heard:   # the game in front, if it's one of them; else the first
             key, name = next((h for h in heard if h[0] == key), heard[0])
-            why = _("{name} is listening to {where}", name=name, where=where)
+            why = (_("{name} is listening to your mic", name=name) if self.cfg.route == "mic"
+                   else _("{name} is listening to the virtual cable", name=name))
         if (key != self.voice_suggestion or why != self.voice_why
                 or hints != self.voice_hints):
             self.voice_suggestion, self.voice_why, self.voice_hints = key, why, hints
@@ -4390,12 +4391,14 @@ class MainWindow(QMainWindow):
         gone = [m for m in (self.meta(s) for s in sids) if m]
         if not gone:
             return False
-        what = f"“{gone[0].name}”" if len(gone) == 1 else f"these {len(gone)} sounds"
+        days = trash.KEEP_DAYS
+        ask = (_("Remove “{name}”?\n\nRemoved sounds go to Recently deleted, where you can "
+                 "bring them back for {keep_days} days.", name=gone[0].name, keep_days=days)
+               if len(gone) == 1 else
+               _("Remove these {n} sounds?\n\nRemoved sounds go to Recently deleted, where "
+                 "you can bring them back for {keep_days} days.", n=len(gone), keep_days=days))
         box = QMessageBox(QMessageBox.Question, _("Remove sound") if len(gone) == 1
-                          else _("Remove sounds"),
-                          _("Remove {what}?\n\nRemoved sounds go to Recently deleted, where you "
-                            "can bring them back for {keep_days} days.",
-                            what=what, keep_days=trash.KEEP_DAYS),
+                          else _("Remove sounds"), ask,
                           QMessageBox.Yes | QMessageBox.Cancel, self)
         box.button(QMessageBox.Yes).setText(_("Remove"))
         box.setDefaultButton(QMessageBox.Cancel)

@@ -172,3 +172,72 @@ def test_startup_reads_the_setting_or_the_env(langs, tmp_path, monkeypatch):
 def test_any_placeholder_name_works():
     assert _("{text} and {singular}", text="a", singular="b") == "a and b"
     assert ngettext("{n} {text}", "{n} {text}s", 2, text="cat", plural="x") == "2 cats"
+
+
+def test_plural_rules_pick_the_right_form():
+    pl, ar, ja = i18n.PLURALS["pl"], i18n.PLURALS["ar"], i18n.PLURALS["ja"]
+    assert [pl(n) for n in (1, 2, 5, 12, 22, 25)] == [0, 1, 2, 2, 1, 2]
+    assert [ar(n) for n in (0, 1, 2, 3, 11, 100)] == [0, 1, 2, 3, 4, 5]
+    assert {ja(n) for n in (0, 1, 2, 5, 100)} == {0}
+    # every rule stays inside its language's number of forms
+    assert set(i18n.FORMS) <= set(i18n.PLURALS)
+    for code, rule in i18n.PLURALS.items():
+        assert {rule(n) for n in range(250)} == set(range(i18n.forms(code))), code
+
+
+def test_chinese_follows_the_region_not_just_the_language(langs, monkeypatch):
+    for code in ("zh-CN", "zh-TW"):
+        (langs / f"{code}.json").write_text(json.dumps({"_meta": {"name": code}}),
+                                            encoding="utf-8")
+    for name in ("zh-TW", "zh-HK", "zh-MO", "zh-Hant", "zh-Hant-HK", "zh-Hant-TW"):
+        assert i18n.resolve(name) == "zh-TW", name
+    for name in ("zh-CN", "zh-SG", "zh", "zh-Hans", "zh-Hans-SG"):
+        assert i18n.resolve(name) == "zh-CN", name
+    monkeypatch.setattr(i18n, "windows_language", lambda: "zh-HK")
+    assert i18n.resolve(i18n.WINDOWS) == "zh-TW"
+    (langs / "zh-TW.json").unlink()      # no Traditional catalog: English, not Simplified
+    assert i18n.resolve("zh-HK") == "en"
+    assert i18n.resolve("de-AT") == "de"
+
+
+def test_arabic_is_right_to_left(langs):
+    assert i18n.is_rtl("ar") and not i18n.is_rtl("de") and not i18n.is_rtl()
+    (langs / "ar.json").write_text(json.dumps({"_meta": {"name": "العربية"}},
+                                              ensure_ascii=False), encoding="utf-8")
+    i18n.set_language("ar")
+    assert i18n.is_rtl()
+
+
+def extract_script():
+    import importlib.util
+    from pathlib import Path
+    spec = importlib.util.spec_from_file_location(
+        "i18n_extract", Path(__file__).resolve().parent.parent / "scripts" / "i18n_extract.py")
+    ex = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(ex)
+    return ex
+
+
+def test_every_shipped_catalog_is_complete_and_keeps_the_placeholders():
+    """Each language in assets/lang translates every wrapped text, with the same
+    {placeholders} and markup, and the right number of plural forms. The same languages
+    as Onion Watch, so the Triggers tab reads like the rest of the board."""
+    import re
+    ex = extract_script()
+    texts, plural, _problems = ex.scan()
+    cats = ex.catalogs()
+    assert set(cats) == {"de", "es", "fr", "pt-BR", "ru", "zh-CN", "zh-TW", "ja", "ko",
+                         "hi", "id", "vi", "th", "tr", "it", "pl", "uk", "nl", "ar"}
+    ph = re.compile(r"\{[^{}]*\}|<[^<>]*>|&[a-z]+;")
+    for code, (_path, cat) in cats.items():
+        missing, unused = ex.compare(texts, cat)
+        assert (missing, unused) == ([], []), code
+        assert isinstance(cat["_meta"].get("name"), str), code
+        for key, value in cat.items():
+            if key.startswith("_"):
+                continue
+            assert isinstance(value, list) == plural[key], (code, key)
+            for v in value if isinstance(value, list) else [value]:
+                assert set(ph.findall(v)) == set(ph.findall(key)), (code, key, v)
+            if plural[key]:
+                assert len(value) == i18n.forms(code), (code, key)

@@ -16,7 +16,7 @@ from PySide6.QtWidgets import (QFrame, QHBoxLayout, QInputDialog, QLabel, QMenu,
 
 from soundboard.library import MAX_FADE_S, PAD_COLORS, SoundMeta
 from soundboard.ui import icons
-from soundboard.i18n import _
+from soundboard.i18n import _, ngettext
 
 if TYPE_CHECKING:
     from soundboard.ui.mainwindow import MainWindow
@@ -36,7 +36,7 @@ def swatch(color: str, size: int = 14) -> QIcon:
 
 def count(n: int) -> str:
     """"1 sound" / "3 sounds"."""
-    return f"{n} sound{'s' if n != 1 else ''}"
+    return ngettext("{n} sound", "{n} sounds", n)
 
 
 class PadSelection(QObject):
@@ -211,7 +211,7 @@ class PadSelection(QObject):
             m.volume = volume
             self.mw.engine.set_gain(m.id, self.mw.gain_for(m))
         self._changed()
-        self._said(f"✓ Volume {round(volume * 100)}%")
+        self._said(_("✓ Volume {pct}%", pct=round(volume * 100)))
 
     def ask_volume(self, *__):
         sounds = self.sounds()
@@ -232,14 +232,14 @@ class PadSelection(QObject):
             if fade_out is not None:
                 m.fade_out = min(max(fade_out, 0.0), MAX_FADE_S)
         self._changed()
-        self._said("✓ Fades set")
+        self._said(_("✓ Fades set"))
 
     def ask_fades(self, *__):
         sounds = self.sounds()
         if not sounds:
             return
         got = []
-        for label, attr in (("Fade in", "fade_in"), ("Fade out", "fade_out")):
+        for label, attr in ((_("Fade in"), "fade_in"), (_("Fade out"), "fade_out")):
             vals = {getattr(m, attr) for m in sounds}
             v, ok = QInputDialog.getDouble(
                 self.mw, label, _("{label} for {count} (seconds, 0 = off):",

@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+- **Onion Board starts speaking your language.** When Windows is set to one of 19
+  languages (Deutsch, Español, Français, Italiano, Nederlands, Polski, Português
+  (Brasil), Türkçe, Bahasa Indonesia, Tiếng Việt, Русский, Українська, العربية, हिन्दी,
+  ไทย, 简体中文, 繁體中文, 日本語, 한국어), the main window and the Sounds tab are in
+  it; the rest follows. The same languages and words as Onion Watch's Triggers tab.
+  Arabic is shown right to left. Hong Kong and Macau get Traditional Chinese.
 - **Record a bit of what's playing.** The Sounds tab's **Record** window has a new
   *What's playing* choice: press Record, play a sound, a web search result or the
   radio (or catch a song already playing), then Stop, cut the ends and save it as a
