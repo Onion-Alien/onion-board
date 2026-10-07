@@ -64,6 +64,8 @@ from pathlib import Path
 
 import numpy as np
 
+from soundboard.i18n import _
+
 log = logging.getLogger(__name__)
 
 FLAG = "--direct-mic"
@@ -284,8 +286,8 @@ class RingWriter:
         pid, me = int(self._get("board_pid")), os.getpid()
         if pid and pid != me and self._get("enabled") \
                 and _tick() - int(self._btick[0]) < OTHER_BOARD_MS and _pid_alive(pid):
-            raise RuntimeError("Another Onion Board is already sending into your mic. "
-                               "Close it, and this one takes over.")
+            raise RuntimeError(_("Another Onion Board is already sending into your mic. "
+                                 "Close it, and this one takes over."))
         self._set("board_pid", me)
 
     def set_enabled(self, on: bool):
@@ -1221,19 +1223,20 @@ def install(mic_name: str | None) -> str | None:
     done, else what went wrong, in plain words."""
     guid = endpoint_for(mic_name)
     if guid is None:
-        return "That mic isn't plugged in (or Windows doesn't list it)."
+        return _("That mic isn't plugged in (or Windows doesn't list it).")
     if not bundled_dll().is_file():
-        return "This copy of Onion Board has no mic effect in it."
+        return _("This copy of Onion Board has no mic effect in it.")
     code = _elevated(["install", guid])
     if code is None:
-        return "Windows' admin prompt was turned down (or didn't finish)."
+        return _("Windows' admin prompt was turned down (or didn't finish).")
     if code:
-        return f"Installing failed (code {code}). The log is in {data_dir().parent}."
+        return _("Installing failed (code {code}). The log is in {folder}.",
+                 code=code, folder=data_dir().parent)
     return None
 
 
 def uninstall() -> str | None:
     code = _elevated(["uninstall"])
     if code is None:
-        return "Windows' admin prompt was turned down (or didn't finish)."
-    return f"Removing failed (code {code})." if code else None
+        return _("Windows' admin prompt was turned down (or didn't finish).")
+    return _("Removing failed (code {code}).", code=code) if code else None

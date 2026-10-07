@@ -10,20 +10,41 @@ as `Config.data` (a plain dict, like `radio` and `overlay`).
 """
 from __future__ import annotations
 
+from collections.abc import Callable, Mapping
 from dataclasses import asdict, dataclass, fields
 from pathlib import Path
 
+from soundboard.i18n import _
+
+
+class _Shown(Mapping):
+    """A table whose labels are translated each time it's read: this module is imported
+    before the language is set, so a plain dict would keep the English."""
+
+    def __init__(self, make: Callable[[], dict]):
+        self._make = make
+
+    def __getitem__(self, key):
+        return self._make()[key]
+
+    def __iter__(self):
+        return iter(self._make())
+
+    def __len__(self):
+        return len(self._make())
+
+
 # "Add as sound" / Play: key -> (label, yt-dlp audio format)
-DOWNLOADS = {
-    "best": ("Best quality", "bestaudio/best"),
+DOWNLOADS = _Shown(lambda: {
+    "best": (_("Best quality"), "bestaudio/best"),
     # YouTube's ~50-70 kbps Opus / 48 kbps AAC: about a third of "best", fine for a pad
-    "small": ("Smaller files", "bestaudio[abr<=80]/worstaudio/bestaudio/best"),
-}
+    "small": (_("Smaller files"), "bestaudio[abr<=80]/worstaudio/bestaudio/best"),
+})
 VIDEO_HEIGHTS = (1080, 720, 480, 360)
 # Radio: the highest station bitrate shown (0 = any). Radio Browser lists most
 # stations at 128 kbps; 64 and under are the "mobile" streams.
-RADIO_KBPS = {0: "Any quality", 128: "Up to 128 kbps", 64: "Up to 64 kbps",
-              32: "Up to 32 kbps"}
+RADIO_KBPS = _Shown(lambda: {0: _("Any quality"), 128: _("Up to 128 kbps"),
+                             64: _("Up to 64 kbps"), 32: _("Up to 32 kbps")})
 LOW_RADIO_KBPS = 64
 GLOBE_LOW = 1000              # stations the map fetches in low data mode (else radio's 3000)
 

@@ -353,7 +353,7 @@ def test_missing_tor_exe(tmp_path, monkeypatch):
     t.configure(True)
     with pytest.raises(net.ProxyError, match="fetch_tor"):
         t.gate(1)
-    assert t.status_text() == tor.NOT_INSTALLED
+    assert t.status_text() == tor.not_installed()
 
 
 # ---------------------------------------------------------------- job object

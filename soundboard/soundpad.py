@@ -21,6 +21,7 @@ import xml.etree.ElementTree as ET
 from pathlib import Path
 
 from soundboard.otherboards import Entry, Source, vk_hotkey
+from soundboard.i18n import _
 
 LIST_NAME = "soundlist.spl"
 MAX_BYTES = 50 * 1024 * 1024   # a list of tens of thousands of sounds is ~10 MB
@@ -55,12 +56,12 @@ def read(path: str | Path) -> list[Entry]:
     path = Path(path)
     try:
         if path.stat().st_size > MAX_BYTES:
-            raise ValueError("that file is too big to be a Soundpad sound list")
+            raise ValueError(_("that file is too big to be a Soundpad sound list"))
         root = ET.fromstring(path.read_bytes())
     except ET.ParseError as e:
-        raise ValueError("that isn't a Soundpad sound list (it couldn't be read)") from e
+        raise ValueError(_("that isn't a Soundpad sound list (it couldn't be read)")) from e
     if root.tag != "Soundlist":
-        raise ValueError("that isn't a Soundpad sound list")
+        raise ValueError(_("that isn't a Soundpad sound list"))
     base = Path(root.get("rel") or path.parent)
     entries: list[Entry] = []
     for s in root.findall("Sound"):

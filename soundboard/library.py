@@ -32,6 +32,7 @@ from soundboard import __version__, mapped
 from soundboard.engine import SR
 from soundboard.eq import BANDS as EQ_BANDS
 from soundboard.eq import MAX_DB as EQ_MAX_DB
+from soundboard.i18n import _
 
 log = logging.getLogger(__name__)
 
@@ -495,21 +496,20 @@ class Config:
                 except (TypeError, ValueError, KeyError, AttributeError):
                     continue
                 cfg.read_only = True
-                cfg.load_note = (f"Your settings file was locked by another program, so the "
-                                 f"last copy ({name}) was loaded instead. Changes won't be "
-                                 "saved until you restart Onion Board.")
+                cfg.load_note = _("Your settings file was locked by another program, so "
+                                  "the last copy ({name}) was loaded instead. Changes won't "
+                                  "be saved until you restart Onion Board.", name=name)
                 return cfg
             cfg = cls()
             cfg.read_only = True
-            cfg.load_note = ("Your settings file was locked by another program, so Onion "
-                             "Board started with default settings. Changes won't be saved "
-                             "until you restart it.")
+            cfg.load_note = _("Your settings file was locked by another program, so "
+                              "Onion Board started with default settings. Changes won't be "
+                              "saved until you restart it.")
             return cfg
         log.error("config %s is unreadable: %r", CONFIG_PATH, err)
         broken = "" if missing else cls._set_aside()
-        kept = ("" if missing else
-                f" The damaged file was kept as {broken or 'config.json'}.")
-        what = "missing" if missing else "damaged"
+        kept = ("" if missing else " " + _("The damaged file was kept as {file}.",
+                                           file=broken or "config.json"))
         for name, raw in cls._backups():
             try:
                 cfg = cls.from_raw(raw)
@@ -517,13 +517,18 @@ class Config:
                 log.warning("backup %s doesn't load either", name, exc_info=True)
                 continue
             log.warning("recovered settings from backup %s", name)
-            cfg.load_note = (f"Your settings file was {what}, so the last good copy "
-                             f"({name}) was loaded instead.{kept}")
+            cfg.load_note = (_("Your settings file was missing, so the last good copy "
+                               "({name}) was loaded instead.", name=name) if missing else
+                             _("Your settings file was damaged, so the last good copy "
+                               "({name}) was loaded instead.", name=name)) + kept
             return cfg
         cfg = cls()
-        cfg.load_note = (f"Your settings file was {what} and no backup could be read, so "
-                         "Onion Board started with default settings. Your sound files are "
-                         f"still in {SOUNDS_DIR}.{kept}")
+        cfg.load_note = (_("Your settings file was missing and no backup could be read, "
+                           "so Onion Board started with default settings. Your sound files "
+                           "are still in {folder}.", folder=SOUNDS_DIR) if missing else
+                         _("Your settings file was damaged and no backup could be read, "
+                           "so Onion Board started with default settings. Your sound files "
+                           "are still in {folder}.", folder=SOUNDS_DIR)) + kept
         return cfg
 
     @classmethod
@@ -986,16 +991,18 @@ def _decode(path: str) -> tuple[np.ndarray, bool]:
         log.debug("libsndfile can't read %s (%s); trying ffmpeg", path, e)
         ff = _ffmpeg()
         if not ff:
-            raise RuntimeError("Can't decode this format (install ffmpeg for m4a/aac/video)") from e
+            raise RuntimeError(_("Can't decode this format (install ffmpeg for "
+                                 "m4a/aac/video)")) from e
         try:
             p = subprocess.run([ff, "-v", "error", "-i", path, "-vn", "-t", str(MAX_SECONDS),
                                 "-f", "f32le", "-ac", "2", "-ar", str(SR), "-"],
                                capture_output=True, timeout=FFMPEG_TIMEOUT,
                                creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0))
         except subprocess.TimeoutExpired:
-            raise RuntimeError(f"ffmpeg took longer than {FFMPEG_TIMEOUT}s") from None
+            raise RuntimeError(_("ffmpeg took longer than {seconds}s",
+                                 seconds=FFMPEG_TIMEOUT)) from None
         if p.returncode != 0 or not p.stdout:
-            msg = p.stderr.decode(errors="ignore").strip() or "ffmpeg failed"
+            msg = p.stderr.decode(errors="ignore").strip() or _("ffmpeg failed")
             raise RuntimeError(msg) from None
         data = np.frombuffer(p.stdout, np.float32).reshape(-1, 2).copy()
         sr = SR
@@ -1313,7 +1320,7 @@ def import_file(src: str, color: str) -> tuple[SoundMeta, np.ndarray]:
     those come back in from a backup (soundboard.backup)."""
     data, via_ffmpeg = _decode(src)
     if not len(data):
-        raise ValueError("this file has no audio in it")
+        raise ValueError(_("this file has no audio in it"))
     SOUNDS_DIR.mkdir(parents=True, exist_ok=True)
     sid = uuid.uuid4().hex[:10]
     srcp = Path(src)
@@ -1338,8 +1345,8 @@ def import_file(src: str, color: str) -> tuple[SoundMeta, np.ndarray]:
         log.warning("couldn't copy %s into the library", src, exc_info=True)
         dest.unlink(missing_ok=True)
         if isinstance(e, OSError):
-            raise OSError(f"couldn't save it into your Sounds folder ({e.strerror or e}). "
-                          "Check the disk isn't full and try again.") from e
+            raise OSError(_("couldn't save it into your Sounds folder ({error}). Check "
+                            "the disk isn't full and try again.", error=e.strerror or e)) from e
         raise
 
 

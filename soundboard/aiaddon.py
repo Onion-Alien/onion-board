@@ -27,6 +27,7 @@ from pathlib import Path
 from soundboard import modules, net, updates
 from soundboard.modules import ModuleInfo
 from soundboard import errors
+from soundboard.i18n import _
 
 log = logging.getLogger(__name__)
 
@@ -108,7 +109,7 @@ def fetch(offer: Offer, progress: Callable[[int, int], None] | None = None,
             raise updates.UpdateError(f"{offer.local} isn't there ({LOCAL_ENV})")
         return offer.local
     dest = updates.UPDATES_DIR / f"AiVoices-module-{offer.version}.zip"
-    return updates.fetch(offer.url, offer.sha256, dest, (DOWNLOADS,), MAX_SIZE, "an add-on",
+    return updates.fetch(offer.url, offer.sha256, dest, (DOWNLOADS,), MAX_SIZE, "add-on",
                          offer.size, progress, cancelled, FEATURE)
 
 
@@ -144,11 +145,12 @@ def friendly(e: Exception) -> str:
     if isinstance(e, net.FeatureOff):
         return text
     if getattr(e, "code", None) in (502, 503, 504):
-        return ("GitHub's download check is temporarily unavailable (gateway error). "
-                "Try Get AI voices again in a moment.")
+        return _("GitHub's download check is temporarily unavailable (gateway error). "
+                 "Try Get AI voices again in a moment.")
     if "404" in text:
-        return ("AI voices aren't available to download yet (GitHub says it can't find "
-                "it). Try again later.")
+        return _("AI voices aren't available to download yet (GitHub says it can't find "
+                 "it). Try again later.")
     if isinstance(e, OSError):          # urllib's errors: offline, DNS, timeouts
-        return f"Couldn't reach GitHub ({text}). Check your internet connection."
+        return _("Couldn't reach GitHub ({error}). Check your internet connection.",
+                 error=text)
     return text[:1].upper() + text[1:]
