@@ -328,7 +328,9 @@ def test_every_shipped_catalog_keeps_the_placeholders():
     texts, plural, _problems = ex.scan()
     cats = ex.catalogs()
     assert set(cats) == {"de", "es", "fr", "pt-BR", "ru", "zh-CN", "zh-TW", "ja", "ko",
-                         "hi", "id", "vi", "th", "tr", "it", "pl", "uk", "nl", "ar"}
+                         "hi", "id", "vi", "th", "tr", "it", "pl", "uk", "nl", "ar",
+                         "es-419", "pt-PT", "fil", "ms", "cs", "hu", "ro", "el", "bg",
+                         "sv", "da", "nb", "fi"}
     ph = re.compile(r"\{[^{}]*\}|<[^<>]*>|&[a-z]+;")
     for code, (_path, cat) in cats.items():
         assert isinstance(cat["_meta"].get("name"), str), code
@@ -355,3 +357,22 @@ def test_qt_standard_buttons_follow_the_language(qapp, langs):
         assert box.buttons()[0].text() == "Cancel"
     finally:
         i18n.set_language(i18n.ENGLISH)
+
+
+def test_more_plural_rules_and_regions(langs, monkeypatch):
+    cs, ro, fil = i18n.PLURALS["cs"], i18n.PLURALS["ro"], i18n.PLURALS["fil"]
+    assert [cs(n) for n in (1, 2, 4, 5, 0)] == [0, 1, 1, 2, 2]
+    assert [ro(n) for n in (1, 0, 2, 19, 20, 101, 120)] == [0, 1, 1, 1, 2, 1, 2]
+    assert [fil(n) for n in (1, 2, 3, 4, 5, 6, 10, 14)] == [0, 0, 0, 1, 0, 1, 0, 1]
+    for code in ("es-419", "pt-PT", "nb"):
+        (langs / f"{code}.json").write_text(json.dumps({"_meta": {"name": code}}),
+                                            encoding="utf-8")
+    (langs / "es.json").write_text(json.dumps({"_meta": {"name": "es"}}), encoding="utf-8")
+    assert i18n.resolve("es-ES") == "es" and i18n.resolve("es") == "es"
+    for name in ("es-MX", "es-AR", "es-CO", "es-US", "es-419"):
+        assert i18n.resolve(name) == "es-419", name
+    assert i18n.resolve("pt-BR") == "pt-BR" and i18n.resolve("pt") == "pt-BR"
+    assert i18n.resolve("pt-PT") == "pt-PT" and i18n.resolve("pt-AO") == "pt-PT"
+    assert i18n.resolve("nn-NO") == "nb" and i18n.resolve("nb-NO") == "nb"
+    (langs / "es-419.json").unlink()      # no Latin American catalog: Spain's, not English
+    assert i18n.resolve("es-MX") == "es"
