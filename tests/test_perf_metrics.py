@@ -100,8 +100,13 @@ def test_thread_groups():
 @pytest.mark.skipif(sys.platform != "win32", reason="reads Windows processes")
 def test_reads_this_process():
     with winproc.Proc(os.getpid()) as p:
-        s = p.sample([])
-        t = p.sample([], winproc.processes())
+        # both ways count the same threads; one a thread of an earlier test started or
+        # ended between the two reads differs by it, so read again (a real gap stays)
+        for _ in range(10):
+            s = p.sample([])
+            t = p.sample([], winproc.processes())
+            if t.threads == s.threads:
+                break
         assert p.alive()
     assert t.threads == s.threads
     assert s.private > 10 * stats.MB and s.wset > 0
