@@ -304,6 +304,7 @@ class MainWindow(QMainWindow):
     config_saved = Signal(bool)         # the background save finished: ok
     voice_engine = Signal(object)       # the voice engine of the game in front (a mode key|None)
     default_found = Signal(object)      # Windows' default output, asked on a thread (str|None)
+    device_step = Signal(object)        # the device thread's next step for the UI (_off_ui)
     tab_switched = Signal(str, bool)    # Settings > Tabs: a tab (taboff.KEYS) off / on again
     category_programs_changed = Signal()   # a program -> category rule added / removed
 
@@ -487,6 +488,7 @@ class MainWindow(QMainWindow):
         self._default_at = 0.0   # when Windows' default was last looked at (_default_tick)
         self._default_asking = False   # ...and a thread is asking it now
         self.default_found.connect(self._on_default_found)
+        self.device_step.connect(lambda step: step())
         self._recover_n, self._recover_at = 0, 0.0   # see _recover_devices
         self._gone_n = 0   # checks in a row that found the failing device unplugged
         if sys.platform == "win32":
@@ -1515,12 +1517,55 @@ class MainWindow(QMainWindow):
     # ------------------------------------------------------------------ devices
     def refresh_devices(self) -> str:
         """Re-scan the sound devices and reopen the streams. Returns a short result
-        for the button that asked ("✓ Found 7 devices", "No cable yet", …)."""
-        e = self.engine
-        e.shutdown()
+        for the button that asked ("✓ Found 7 devices", "No cable yet", …).
+        Runs on the UI thread: the app's own recoveries use _refresh_off_ui."""
+        self.engine.shutdown()
         rescanned = eng.rescan()
         self._vb_setup = None     # installed or removed since: look again
         self._init_devices()
+        return self._rescanned(rescanned)
+
+    def _off_ui(self, work, then):
+        """work() on the engine's device thread, then then(its result) back on the UI
+        thread. The caller holds the device thread's claim (engine.devices.claim())."""
+        def done(result):
+            def step():
+                try:
+                    then(result)
+                except Exception:
+                    self.engine.devices.release()   # the next recovery can still run
+                    raise
+            try:
+                self.device_step.emit(step)
+            except RuntimeError:   # the window is gone (quitting)
+                self.engine.devices.release()
+        self.engine.devices.run(work, done)
+
+    def _refresh_off_ui(self, then=None):
+        """refresh_devices without the slow part on the UI thread: closing every
+        stream, the re-scan, opening them again and the cable's format (asked of
+        Windows) run on the device thread. The caller holds its claim; it's released
+        when this is done, then then() runs."""
+        e = self.engine
+
+        def scanned(rescanned):
+            if rescanned is None:   # it raised (logged): leave the streams to the watchdog
+                rescanned = False
+            self._pick_devices()
+            plan = self._device_plan()
+            self._off_ui(lambda: self._open_devices(plan), lambda ends: opened(ends, rescanned))
+
+        def opened(ends, rescanned):
+            self._devices_opened(ends or [])
+            self._rescanned(rescanned)
+            e.devices.release()
+            if then is not None:
+                then()
+
+        self._off_ui(lambda: (e.shutdown(), eng.rescan())[1], scanned)
+
+    def _rescanned(self, rescanned: bool) -> str:
+        """After a re-scan: the sounds are prepared for the new rates, and the result."""
         self._prepare_all()
         outs = eng.list_devices("output")
         if not rescanned:   # after _init_devices, whose status update would hide it
@@ -1556,6 +1601,11 @@ class MainWindow(QMainWindow):
         self._update_status()
 
     def _init_devices(self):
+        self._pick_devices()
+        self._devices_opened(self._open_devices(self._device_plan()))
+
+    def _pick_devices(self):
+        """_init_devices' quick part (UI thread): the devices to use, from the lists."""
         outs = [d["name"] for d in eng.list_devices("output")]
         # a virtual cable as the *mic* would record our own output and feed it back
         # into itself (a loud feedback screech), so cables never appear here
@@ -1587,13 +1637,34 @@ class MainWindow(QMainWindow):
         e.sound_vol, e.mic_vol, e.mon_vol = c.sound_vol, c.mic_vol, c.mon_vol
         e.mic_enabled, e.monitor_sounds = c.mic_enabled, c.monitor_sounds
         e.obs_vol, e.obs_voice = c.obs_vol, c.obs_voice
-        e.set_mic_device(c.mic_device)
-        e.set_main_device(self._main_name())
-        e.set_tap_device(self._tap_name())
-        e.set_mon_device(c.mon_device)
-        e.set_obs_device(self._obs_name(c.obs_device))
-        e.set_copy_devices(self._copy_names())
-        self._check_cable_format()
+
+    def _device_plan(self) -> dict:
+        """What _open_devices opens, worked out on the UI thread (it reads the config)."""
+        c = self.cfg
+        main = self._main_name()
+        return {"mic": c.mic_device, "main": main, "tap": self._tap_name(),
+                "mon": c.mon_device, "obs": self._obs_name(c.obs_device),
+                "copies": self._copy_names(), "vm": eng.virtual_mic_for(main)}
+
+    def _open_devices(self, plan: dict) -> list:
+        """_init_devices' slow part (any thread; the app's recoveries run it on the
+        device thread): open the streams and ask Windows for the cable's format.
+        Returns the ends of the cable in use (cableformat.CableEnd)."""
+        e = self.engine
+        with eng.DEVICES:   # all of them, or none if the app quit meanwhile
+            if getattr(self, "_shut_down", False):   # (not set yet while starting)
+                return []
+            e.set_mic_device(plan["mic"])
+            e.set_main_device(plan["main"])
+            e.set_tap_device(plan["tap"])
+            e.set_mon_device(plan["mon"])
+            e.set_obs_device(plan["obs"])
+            e.set_copy_devices(plan["copies"])
+        return self._cable_ends(plan["main"], plan["vm"])
+
+    def _devices_opened(self, ends: list):
+        """_init_devices' last part (UI thread): what the cable check found, the status."""
+        self._set_cable_bad(ends)
         self._update_status()
 
     def _default_output(self) -> str | None:
@@ -1615,29 +1686,39 @@ class MainWindow(QMainWindow):
         if not failing:
             self._recover_n = self._gone_n = 0
             return
+        if time.monotonic() < self._recover_at or not e.devices.claim():
+            return   # waiting, or the device thread is busy: the next check looks again
+
+        def ask():   # Windows' device lists (COM): on the device thread
+            listed: dict[str, set[str] | None] = {}
+            for key, name in failing:
+                kind = "input" if key == "mic" else "output"
+                if kind not in listed:
+                    listed[kind] = appaudio.endpoint_names(kind)
+                if _listed(name, listed[kind] or ()):
+                    return key, name
+            return None
+
+        self._off_ui(ask, self._recover_found)
+
+    def _recover_found(self, found: tuple[str, str] | None):
+        """_recover_devices' answer from Windows (UI thread, holding the device thread)."""
         now = time.monotonic()
-        if now < self._recover_at:
-            return
-        listed: dict[str, set[str] | None] = {}
-        for key, name in failing:
-            kind = "input" if key == "mic" else "output"
-            if kind not in listed:
-                listed[kind] = appaudio.endpoint_names(kind)
-            if _listed(name, listed[kind] or ()):
-                break
-        else:
+        if found is None:
             # really gone (unplugged): the engine's retries pick it up again. Asking
             # Windows for its device list every check while it stays unplugged is
             # wasted work, so after a few checks look less often
             self._gone_n += 1
             if self._gone_n >= GONE_CHECKS:
                 self._recover_at = now + GONE_WAIT_S
+            self.engine.devices.release()
             return
+        key, name = found
         self._gone_n = 0
         self._recover_at = now + RECOVER_WAIT_S[min(self._recover_n, len(RECOVER_WAIT_S) - 1)]
         self._recover_n += 1
         log.info("%s device %r is listed by Windows but won't open: re-scanning", key, name)
-        self.refresh_devices()
+        self._refresh_off_ui()
 
     def _default_tick(self):
         """The timer's look at Windows' default output (a COM call): only while the
@@ -1677,15 +1758,25 @@ class MainWindow(QMainWindow):
         now = found[0] if found else appaudio.default_output_name()
         if not now or now == self._default_out:
             return
-        self._default_out = now
+        was, self._default_out = self._default_out, now
         c = self.cfg
         if not c.mon_follows_default:
             return
         name = self._default_output()
         if name is None and not is_virtual_cable(now):
-            self.refresh_devices()   # plugged in since the app started: not listed yet
-            name = self._default_output()
-        if name is None or name == c.mon_device:
+            # plugged in since the app started: not listed yet. Re-scanned on the device
+            # thread; if it's busy, the next poll sees the change again
+            if not self.engine.devices.claim():
+                self._default_out = was
+                return
+            self._refresh_off_ui(lambda: self._use_default_output(self._default_output()))
+            return
+        self._use_default_output(name)
+
+    def _use_default_output(self, name: str | None):
+        """The headphones move to Windows' default output, `name` (as listed)."""
+        c = self.cfg
+        if name is None or name == c.mon_device or not c.mon_follows_default:
             return
         log.info("Windows' default output changed: headphones %r -> %r", c.mon_device, name)
         c.mon_device = name
@@ -1699,14 +1790,20 @@ class MainWindow(QMainWindow):
 
     def _check_cable_format(self):
         """Note which ends of the cable in use aren't at 48 kHz (shown on the Setup tab)."""
-        from soundboard import cableformat
         main = self._main_name()
-        vm = eng.virtual_mic_for(main)
+        self._set_cable_bad(self._cable_ends(main, eng.virtual_mic_for(main)))
+
+    @staticmethod
+    def _cable_ends(main: str | None, vm: str | None) -> list:
+        """The ends of the cable `main` -> `vm` with their formats (a COM call: any thread)."""
+        from soundboard import cableformat
         try:
-            ends = cableformat.pair(cableformat.cable_ends(), main, vm) if vm else []
+            return cableformat.pair(cableformat.cable_ends(), main, vm) if vm else []
         except Exception:  # noqa: BLE001 - only a hint
             log.debug("cable format check failed", exc_info=True)
-            ends = []
+            return []
+
+    def _set_cable_bad(self, ends: list):
         self.cable_bad = [x for x in ends if not x.ok]
         if self.cable_bad:
             log.info("cable not at 48 kHz: %s",

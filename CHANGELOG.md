@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- **No more freezes when a headset drops out.** Unplugging a headset, Bluetooth
+  cutting out or the PC waking from sleep could freeze the window for seconds while
+  the app reopened the device. That now happens in the background.
 - **No more short freezes on a slow or sleeping disk.** Pad pictures, the Discord
   guide's settings, the *Remove the virtual cable* check and a pad's video are now
   read in the background, so bringing the window back from the tray or picking a pad
