@@ -98,6 +98,7 @@ def end_process(code: int):
     watcher, the speech worker, an FFT pool) PySide6's crashed in them, so a clean
     quit ended in an access violation and a Windows "stopped working" report.
     TerminateProcess skips all of that; the settings are already saved."""
+    applog.flush()   # the log is written on a thread: its last lines first
     try:
         sys.stdout and sys.stdout.flush()
         sys.stderr and sys.stderr.flush()
@@ -146,6 +147,15 @@ def clean_temp_leftovers(now: float | None = None) -> int:
     if gone:
         log.info("removed %d old temp folder(s)", gone)
     return gone
+
+
+def modules_prune():
+    """Leftover add-on copies (modules.prune_leftovers), off the UI thread."""
+    from soundboard import modules
+    try:
+        modules.prune_leftovers()
+    except Exception:  # noqa: BLE001 - tidying up must never hurt the running app
+        log.debug("couldn't tidy old add-on copies", exc_info=True)
 
 
 def start_ytdlp_check(cfg):
@@ -465,6 +475,9 @@ def main():
         QTimer.singleShot(900, lambda: w.toast(reset_note, "warn" if "Couldn't" in reset_note
                                                else "ok"))
     QTimer.singleShot(30_000, lambda: start_ytdlp_check(w.cfg))
+    # old add-on copies: once the add-ons are loaded (so the ones in use are known)
+    QTimer.singleShot(20_000, lambda: threading.Thread(
+        target=modules_prune, daemon=True, name="addon-leftovers").start())
     QTimer.singleShot(500, w.import_queued)   # the installer's "from Soundpad" box
     QTimer.singleShot(600, w.after_update)   # "Updated to …" after an update restarted it
     # new versions (updates.py): unless unticked, at most every 6 hours, also for an app

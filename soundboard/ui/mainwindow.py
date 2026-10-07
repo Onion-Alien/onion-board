@@ -2509,7 +2509,10 @@ class MainWindow(QMainWindow):
         if e.mic_stream is None or e.effect_alive():
             self._direct_dead_since = None
             return False
-        if directmic.endpoint_for(self.cfg.mic_device) not in directmic.installed_on():
+        # the cached status, not endpoint_for / installed_on: those walk the registry,
+        # and this runs every second on the UI thread
+        if not self.cfg.mic_device or directmic.status(self.cfg.mic_device) in ("missing",
+                                                                                "other"):
             return False
         now = time.monotonic()
         since = getattr(self, "_direct_dead_since", None) or now

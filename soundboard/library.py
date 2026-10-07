@@ -727,7 +727,9 @@ class Config:
         so another thread can write it. The number orders snapshots: an older one is
         never written over a newer one."""
         global _snap_seq
-        with _write_lock:
+        # not _write_lock: the writer holds that while it's on the disk, and a slow
+        # disk would freeze the window that's only copying the settings
+        with _seq_lock:
             _snap_seq += 1
             seq = _snap_seq
         return (seq, self.to_raw(),
@@ -735,6 +737,7 @@ class Config:
 
 
 _write_lock = threading.Lock()   # one writer at a time: Saver's thread or a direct save()
+_seq_lock = threading.Lock()     # numbering snapshots (never held across disk I/O)
 _snap_seq = 0       # the last snapshot's number (Config.snapshot)
 _written_seq = 0    # ...and the newest one written
 

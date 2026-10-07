@@ -1072,6 +1072,10 @@ class Engine:
         self._copy_try: dict[str, float] = {}
         self.tap_name: str | None = None
         self._tap_try = 0.0
+        # cable / copy devices already logged as failing to open: retried every RETRY_S,
+        # but warned about once until they open again (a log line every 5 s, on the UI
+        # thread, for hours while a cable is missing)
+        self._open_warned: set[str] = set()
         self.rates = {"main": SR, "mon": SR, "mic": SR, "obs": SR}
         self.errors: dict[str, str] = {}
         # the watchdog's reopens run here (check_streams), and so do the window's
@@ -1221,9 +1225,10 @@ class Engine:
         if name:
             try:
                 self.tap = CableTap(name, BUFFER.get(self.latency, "low"))
-                log.info("also sending into %s", name)
             except Exception as e:  # noqa: BLE001 - the mic still works; retried
-                log.warning("can't also send into %s: %s", name, e)
+                self._open_failed(name, e)
+            else:
+                self._opened(name)
 
     @_holding_devices
     def set_copy_devices(self, names):
@@ -1246,10 +1251,26 @@ class Engine:
         try:
             t = CableTap(name, BUFFER.get(self.latency, "low"))
         except Exception as e:  # noqa: BLE001 - the rest still works; retried
-            log.warning("can't also send into %s: %s", name, e)
+            self._open_failed(name, e)
             return
-        log.info("also sending into %s", name)
+        self._opened(name)
         self.copies = (*self.copies, t)
+
+    def _open_failed(self, name: str, e: Exception):
+        self._warn_open(f"copy:{name}", "can't also send into %s: %s", name, e)
+
+    def _opened(self, name: str):
+        self._open_warned.discard(f"copy:{name}")
+        log.info("also sending into %s", name)
+
+    def _warn_open(self, tag: str, msg: str, *args):
+        """A device that won't open: a warning the first time, then debug lines while
+        it's retried every RETRY_S, until it opens (the setter discards `tag`)."""
+        if tag in self._open_warned:
+            log.debug("still: " + msg, *args)
+        else:
+            self._open_warned.add(tag)
+            log.warning(msg + " (trying again every %.0f s)", *args, RETRY_S)
 
     def copies_down(self) -> list[str]:
         """The "Also send to" devices that aren't open (unplugged, or busy)."""
@@ -1358,8 +1379,10 @@ class Engine:
             try:
                 self.main_stream = self._open_out("main", name, self._cb_main)
             except Exception as e:  # noqa: BLE001
-                log.warning("can't open main output %r: %s", name, e)
+                self._warn_open(f"main:{name}", "can't open main output %r: %s", name, e)
                 self.errors["main"] = errors.plain(e)
+            else:
+                self._open_warned.discard(f"main:{name}")
 
     @_holding_devices
     def set_mon_device(self, name: str | None):
@@ -1371,8 +1394,10 @@ class Engine:
             try:
                 self.mon_stream = self._open_out("mon", name, self._cb_mon)
             except Exception as e:  # noqa: BLE001
-                log.warning("can't open headphone output %r: %s", name, e)
+                self._warn_open(f"mon:{name}", "can't open headphone output %r: %s", name, e)
                 self.errors["mon"] = errors.plain(e)
+            else:
+                self._open_warned.discard(f"mon:{name}")
 
     @_holding_devices
     def set_obs_device(self, name: str | None):
@@ -1385,8 +1410,10 @@ class Engine:
             try:
                 self.obs_stream = self._open_out("obs", name, self._cb_obs)
             except Exception as e:  # noqa: BLE001
-                log.warning("can't open stream output %r: %s", name, e)
+                self._warn_open(f"obs:{name}", "can't open stream output %r: %s", name, e)
                 self.errors["obs"] = errors.plain(e)
+            else:
+                self._open_warned.discard(f"obs:{name}")
 
     @_holding_devices
     def set_mic_device(self, name: str | None):
@@ -1415,9 +1442,10 @@ class Engine:
                 s.start()
                 self._stream_opened("mic")
                 self.mic_stream = s
+                self._open_warned.discard(f"mic:{name}")
                 log.info("opened mic: %s @ %d Hz, %d ch", name, rate, chans)
             except Exception as e:  # noqa: BLE001
-                log.warning("can't open mic %r: %s", name, e)
+                self._warn_open(f"mic:{name}", "can't open mic %r: %s", name, e)
                 self.errors["mic"] = errors.plain(e)
                 if s is not None:
                     self._close_quietly(s, "mic")

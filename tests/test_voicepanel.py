@@ -322,7 +322,8 @@ def test_update_shows_progress_and_blocks_a_second_install(panel, qapp, monkeypa
         raise OSError("disk full")
 
     monkeypatch.setattr(mods, "install", boom)
-    monkeypatch.setattr(applog, "report", lambda **k: None)
+    reported = []
+    monkeypatch.setattr(applog, "report", lambda **k: reported.append(k))
     s._install()
     assert not s.b_update.isEnabled() and not s.b_install.isEnabled()
     s._install()                                   # a double-click: still one pip
@@ -330,6 +331,7 @@ def test_update_shows_progress_and_blocks_a_second_install(panel, qapp, monkeypa
     assert len(started) == 1 and not s.lbl_install.isHidden()
     assert "disk full" in s.lbl_install.text() and "again" in s.lbl_install.text()
     assert s.b_update.text() == "Update speech recognition"
+    assert reported == []   # a full disk is said on the card, not shown as a crash
 
 
 def test_no_update_button_without_the_addon(panel):

@@ -233,6 +233,22 @@ def test_flat_map_outlines_come_from_the_app(qapp):
     assert len(rings) > 200 and any(n == "Japan" for n, *_ in labels)
 
 
+def test_reading_the_map_outlines_never_holds_up_the_window(qapp, monkeypatch):
+    """A 1.8.0 freeze: the outlines were read on the UI thread (5 s on a busy disk)."""
+    import threading
+    import time
+    gate, real = threading.Event(), radio.outline_rings
+    monkeypatch.setattr(radio, "outline_rings", lambda raw: gate.wait(5) and real(raw))
+    d = RadioDirectory(cache_dir=None)
+    got = []
+    d.outlines_ready.connect(lambda rings, labels: got.append(rings))
+    start = time.monotonic()
+    d.load_outlines()
+    assert time.monotonic() - start < 0.5 and not got
+    gate.set()
+    assert process_events(qapp, lambda: got) and len(got[0]) > 200
+
+
 def test_map_names_islands_the_outlines_leave_out():
     names = [p[0] for p in radio.PLACES]
     assert len(names) == len(set(names))
