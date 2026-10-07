@@ -99,6 +99,10 @@ SETTING_FIXES = {
         "<b>Advanced Voice Activity</b> is on: in a call it only sends your voice, and "
         "cuts most of a song: turn it off (Show Advanced Voice Settings), or use Push "
         "to Talk."),
+    discordcfg.AUTO: _(
+        "<b>Automatically determine input sensitivity</b> is on: in a call it keeps "
+        "taking your sounds for silence and cuts them out: turn it off (Input "
+        "Sensitivity) and leave the slider low, or use Push to Talk."),
     discordcfg.ISOLATION: _(
         "Input Profile is <b>Voice Isolation</b>: Krisp wipes out music after a second: "
         "set <b>Input Profile</b> to <b>Custom</b>, then Noise Suppression to <b>None</b>."),
@@ -386,7 +390,7 @@ class DiscordGuide(QDialog):
               "Settings → Hotkeys → Auto push-to-talk and Onion Board holds it for you "
               "while a sound plays). On <b>Voice Activity</b>, turn off <b>Automatically "
               "determine input sensitivity</b> and drag the slider almost all the way "
-              "left, or quiet parts of your sounds get cut."),
+              "left, or Discord keeps cutting your sounds out, loud ones too."),
             _("Click <b>Let's Check</b> in Discord, then <b>Check Discord</b> below. Onion "
               "Board plays a short test into your mic and listens to what Discord does "
               "with it."))))

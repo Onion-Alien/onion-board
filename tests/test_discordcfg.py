@@ -7,7 +7,8 @@ from soundboard import discordcfg as dc
 DEFAULTS = {"mode": "VOICE_ACTIVITY", "echoCancellation": True, "noiseSuppression": False,
             "automaticGainControl": True, "noiseCancellation": True,
             "bypassSystemInputProcessing": False, "activeInputProfile": "VOICE_ISOLATION",
-            "inputDeviceId": "default", "modeOptions": {"vadUseKrisp": False}}
+            "inputDeviceId": "default",
+            "modeOptions": {"vadUseKrisp": False, "autoThreshold": False}}
 
 
 def store(**over) -> bytes:
@@ -105,6 +106,23 @@ def test_advanced_voice_activity_cuts_sounds_in_calls():
                                   noiseCancellation=False, echoCancellation=False,
                                   automaticGainControl=False, modeOptions={"vadUseKrisp": True})})
     assert s.problems(True) == []
+
+
+def test_automatic_sensitivity_cuts_sounds_in_calls():
+    """Measured in a real call: 32 % of a high song cut with it on, 0 % with it off."""
+    clean = dict(DEFAULTS, activeInputProfile="CUSTOM", noiseCancellation=False,
+                 echoCancellation=False, automaticGainControl=False)
+    s = dc.parse({"default": dict(clean, modeOptions={"vadUseKrisp": False,
+                                                      "autoThreshold": True})})
+    assert s.problems(True) == [dc.AUTO] and s.problems(False) == [dc.AUTO]
+    s = dc.parse({"default": dict(clean, modeOptions={"vadUseKrisp": False})})
+    assert s.problems(True) == [dc.AUTO]     # Discord's default is on
+    s = dc.parse({"default": dict(clean, mode="PUSH_TO_TALK",
+                                  modeOptions={"vadUseKrisp": False, "autoThreshold": True})})
+    assert s.problems(True) == []
+    s = dc.parse({"default": dict(clean, modeOptions={"vadUseKrisp": True,
+                                                      "autoThreshold": True})})
+    assert s.problems(True) == [dc.VAD]     # one fix at a time: Advanced first
 
 
 def test_snappy_round_trip():
