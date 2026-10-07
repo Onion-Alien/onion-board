@@ -416,6 +416,7 @@ def main():
         app.setLayoutDirection(_Qt.RightToLeft)
     from soundboard import theme as _theme
     i18n.use_fonts(_theme.font_families())
+    i18n.translate_qt_buttons(app)   # OK, Cancel, Yes… in Qt's own dialogs
     from soundboard.ui import quietbox
     quietbox.install(app)   # no Windows ding from tips and warnings
     applog.ui_ready()

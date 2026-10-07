@@ -667,5 +667,10 @@
   "{n} min ago": "{n} min temu",
   "✓ Fades set": "✓ Ustawiono narastanie i wygasanie",
   "✓ Volume {pct}%": "✓ Głośność {pct}%",
-  "Fix Discord": "Napraw Discord"
+  "Fix Discord": "Napraw Discord",
+  "Apply": "Zastosuj",
+  "No": "Nie",
+  "OK": "OK",
+  "Open": "Otwórz",
+  "Yes": "Tak"
 }

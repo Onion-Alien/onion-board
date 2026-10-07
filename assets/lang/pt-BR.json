@@ -651,5 +651,10 @@
   "{n} min ago": "há {n} min",
   "✓ Fades set": "✓ Fades definidos",
   "✓ Volume {pct}%": "✓ Volume {pct}%",
-  "Fix Discord": "Corrigir Discord"
+  "Fix Discord": "Corrigir Discord",
+  "Apply": "Aplicar",
+  "No": "Não",
+  "OK": "OK",
+  "Open": "Abrir",
+  "Yes": "Sim"
 }

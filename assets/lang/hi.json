@@ -651,5 +651,10 @@
   "{n} min ago": "{n} मिनट पहले",
   "✓ Fades set": "✓ फ़ेड सेट हो गए",
   "✓ Volume {pct}%": "✓ वॉल्यूम {pct}%",
-  "Fix Discord": "Discord ठीक करें"
+  "Fix Discord": "Discord ठीक करें",
+  "Apply": "लागू करें",
+  "No": "नहीं",
+  "OK": "ठीक है",
+  "Open": "खोलें",
+  "Yes": "हाँ"
 }

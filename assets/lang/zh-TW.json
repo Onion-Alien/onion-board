@@ -635,5 +635,10 @@
   "{n} min ago": "{n} 分鐘前",
   "✓ Fades set": "✓ 已設定淡入淡出",
   "✓ Volume {pct}%": "✓ 音量 {pct}%",
-  "Fix Discord": "修正 Discord"
+  "Fix Discord": "修正 Discord",
+  "Apply": "套用",
+  "No": "否",
+  "OK": "確定",
+  "Open": "開啟",
+  "Yes": "是"
 }

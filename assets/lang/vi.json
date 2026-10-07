@@ -635,5 +635,10 @@
   "{n} min ago": "{n} phút trước",
   "✓ Fades set": "✓ Đã đặt tăng / giảm dần",
   "✓ Volume {pct}%": "✓ Âm lượng {pct}%",
-  "Fix Discord": "Sửa Discord"
+  "Fix Discord": "Sửa Discord",
+  "Apply": "Áp dụng",
+  "No": "Không",
+  "OK": "OK",
+  "Open": "Mở",
+  "Yes": "Có"
 }

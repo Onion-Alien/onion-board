@@ -230,6 +230,46 @@ def startup(app_dir: Path) -> str:
     return code
 
 
+def _qt_button(source: str) -> str | None:
+    """Qt's own words on standard buttons (OK, Cancel… in message boxes and dialogs), in
+    the current language; None for words not here."""
+    key = source.replace("&", "")
+    words = {"OK": _("OK"), "Cancel": _("Cancel"), "Close": _("Close"), "Yes": _("Yes"),
+             "No": _("No"), "Save": _("Save"), "Open": _("Open"), "Apply": _("Apply")}
+    return words.get(key)
+
+
+_translator = None
+
+
+def translate_qt_buttons(app) -> bool:
+    """Put Qt's standard buttons (OK, Cancel, Yes…) in the current language too: Qt's
+    own translations aren't shipped. Skipped for English, and when something else
+    already translates them (an Onion Watch tab that got there first, say). True once
+    it's in place."""
+    global _translator
+    if _lang == ENGLISH or _translator is not None:
+        return _translator is not None
+    from PySide6.QtCore import QCoreApplication, QTranslator
+    if QCoreApplication.translate("QPlatformTheme", "Cancel") != "Cancel":
+        return False
+
+    class ButtonWords(QTranslator):
+        def translate(self, context, source, disambiguation=None, n=-1):
+            if context == "QPlatformTheme" and source:
+                return _qt_button(source) or ""
+            return ""
+
+        def isEmpty(self):
+            return False
+
+    _translator = ButtonWords(app)
+    app.installTranslator(_translator)
+    # out again before Python shuts down: Qt mustn't call into it while it does
+    app.aboutToQuit.connect(lambda: app.removeTranslator(_translator))
+    return True
+
+
 def _read(path: Path) -> dict:
     try:
         data = json.loads(path.read_text(encoding="utf-8"))

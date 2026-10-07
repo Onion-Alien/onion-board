@@ -651,5 +651,10 @@
   "{n} min ago": "{n} min fa",
   "✓ Fades set": "✓ Dissolvenze impostate",
   "✓ Volume {pct}%": "✓ Volume {pct}%",
-  "Fix Discord": "Sistema Discord"
+  "Fix Discord": "Sistema Discord",
+  "Apply": "Applica",
+  "No": "No",
+  "OK": "OK",
+  "Open": "Apri",
+  "Yes": "Sì"
 }

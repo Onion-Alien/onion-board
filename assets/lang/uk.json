@@ -667,5 +667,10 @@
   "{n} min ago": "{n} хв тому",
   "✓ Fades set": "✓ Наростання й згасання задано",
   "✓ Volume {pct}%": "✓ Гучність {pct}%",
-  "Fix Discord": "Виправити Discord"
+  "Fix Discord": "Виправити Discord",
+  "Apply": "Застосувати",
+  "No": "Ні",
+  "OK": "OK",
+  "Open": "Відкрити",
+  "Yes": "Так"
 }

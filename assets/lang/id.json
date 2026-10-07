@@ -635,5 +635,10 @@
   "{n} min ago": "{n} mnt lalu",
   "✓ Fades set": "✓ Fade diatur",
   "✓ Volume {pct}%": "✓ Volume {pct}%",
-  "Fix Discord": "Perbaiki Discord"
+  "Fix Discord": "Perbaiki Discord",
+  "Apply": "Terapkan",
+  "No": "Tidak",
+  "OK": "OK",
+  "Open": "Buka",
+  "Yes": "Ya"
 }

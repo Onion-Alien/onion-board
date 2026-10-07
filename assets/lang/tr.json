@@ -651,5 +651,10 @@
   "{n} min ago": "{n} dk önce",
   "✓ Fades set": "✓ Geçişler ayarlandı",
   "✓ Volume {pct}%": "✓ Ses düzeyi %{pct}",
-  "Fix Discord": "Discord'u düzelt"
+  "Fix Discord": "Discord'u düzelt",
+  "Apply": "Uygula",
+  "No": "Hayır",
+  "OK": "Tamam",
+  "Open": "Aç",
+  "Yes": "Evet"
 }

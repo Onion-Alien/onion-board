@@ -635,5 +635,10 @@
   "{n} min ago": "{n} นาทีที่แล้ว",
   "✓ Fades set": "✓ ตั้งเฟดแล้ว",
   "✓ Volume {pct}%": "✓ ระดับเสียง {pct}%",
-  "Fix Discord": "แก้ Discord"
+  "Fix Discord": "แก้ Discord",
+  "Apply": "ใช้",
+  "No": "ไม่",
+  "OK": "ตกลง",
+  "Open": "เปิด",
+  "Yes": "ใช่"
 }
