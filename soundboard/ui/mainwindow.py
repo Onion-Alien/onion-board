@@ -661,7 +661,8 @@ class MainWindow(QMainWindow):
         set_live_tint(self.tabs, self.cfg.live_tab_green)
         for key in ("voice", "triggers", "apps"):
             self._tab_live(key, getattr(self, key).is_active())
-        QTimer.singleShot(TRIGGERS_LOAD_MS, self, self.load_triggers)
+        # only if watching has to pick up again; else when the tab is first shown
+        QTimer.singleShot(TRIGGERS_LOAD_MS, self, lambda: self.load_triggers(now=False))
         self._radio_live(self.radio.is_active())
         self._search_follow_switch()
         net.on_change(self._follow_switches)
@@ -2631,7 +2632,7 @@ class MainWindow(QMainWindow):
         old.deleteLater()
         self._tab_live(key, False)
         if key == "triggers":
-            self.load_triggers()
+            self.load_triggers(now=False)   # (or once it's shown)
         if hasattr(self, "_fit"):
             if key in ("voice", "triggers"):
                 self._tab_steps[key] = new.fit_steps()
@@ -3222,11 +3223,15 @@ class MainWindow(QMainWindow):
         self.apps.stop_all()
         self.triggers.cancel_pending()
 
-    def load_triggers(self):
+    def load_triggers(self, now: bool = True):
         """Put the Onion Watch add-on into the Triggers tab. It took 0.4-1 s on the UI
         thread, so it waits until the window is up: a 0 ms timer would still run before
-        Windows' first paint message, a TRIGGERS_LOAD_MS one runs after it. Runs once."""
+        Windows' first paint message, a TRIGGERS_LOAD_MS one runs after it. Runs once.
+        `now` False (the window's start, the tab switched back on): only if it has to
+        run now (watching was on); otherwise the tab loads it when first shown."""
         if not self.triggers.pending or self._shut_down:
+            return
+        if not now and not self.triggers.needed_now():
             return
         self.triggers.load()
         if self.triggers.needs_nudge():

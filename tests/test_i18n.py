@@ -262,3 +262,87 @@ def test_import_time_finder_sees_module_level_class_and_default_calls(tmp_path):
                  "    return _('fine')\n"
                  "g = lambda: _('fine')\n", encoding="utf-8")
     assert _import_time_translations(f) == [2, 4, 5]
+
+
+def test_plural_rules_pick_the_right_form():
+    pl, ar, ja = i18n.PLURALS["pl"], i18n.PLURALS["ar"], i18n.PLURALS["ja"]
+    assert [pl(n) for n in (1, 2, 5, 12, 22, 25)] == [0, 1, 2, 2, 1, 2]
+    assert [ar(n) for n in (0, 1, 2, 3, 11, 100)] == [0, 1, 2, 3, 4, 5]
+    assert {ja(n) for n in (0, 1, 2, 5, 100)} == {0}
+    # every rule stays inside its language's number of forms
+    assert set(i18n.FORMS) <= set(i18n.PLURALS)
+    for code, rule in i18n.PLURALS.items():
+        assert {rule(n) for n in range(250)} == set(range(i18n.forms(code))), code
+
+
+def test_chinese_follows_the_region_not_just_the_language(langs, monkeypatch):
+    for code in ("zh-CN", "zh-TW"):
+        (langs / f"{code}.json").write_text(json.dumps({"_meta": {"name": code}}),
+                                            encoding="utf-8")
+    for name in ("zh-TW", "zh-HK", "zh-MO", "zh-Hant", "zh-Hant-HK", "zh-Hant-TW"):
+        assert i18n.resolve(name) == "zh-TW", name
+    for name in ("zh-CN", "zh-SG", "zh", "zh-Hans", "zh-Hans-SG"):
+        assert i18n.resolve(name) == "zh-CN", name
+    monkeypatch.setattr(i18n, "windows_language", lambda: "zh-HK")
+    assert i18n.resolve(i18n.WINDOWS) == "zh-TW"
+    (langs / "zh-TW.json").unlink()      # no Traditional catalog: English, not Simplified
+    assert i18n.resolve("zh-HK") == "en"
+    assert i18n.resolve("de-AT") == "de"
+
+
+def test_arabic_is_right_to_left(langs):
+    assert i18n.is_rtl("ar") and not i18n.is_rtl("de") and not i18n.is_rtl()
+    (langs / "ar.json").write_text(json.dumps({"_meta": {"name": "العربية"}},
+                                              ensure_ascii=False), encoding="utf-8")
+    i18n.set_language("ar")
+    assert i18n.is_rtl()
+
+
+def extract_script():
+    import importlib.util
+    from pathlib import Path
+    spec = importlib.util.spec_from_file_location(
+        "i18n_extract", Path(__file__).resolve().parent.parent / "scripts" / "i18n_extract.py")
+    ex = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(ex)
+    return ex
+
+
+def test_every_shipped_catalog_keeps_the_placeholders():
+    """Each language in assets/lang: every translation it has keeps the English's
+    {placeholders} and markup and has the right number of plural forms. A text not
+    translated yet (newly wrapped: `i18n_extract.py --update` adds it empty) shows the
+    English, so wrapping more text never waits on 19 translations. The same languages
+    as Onion Watch, so the Triggers tab reads like the rest of the board."""
+    import re
+    ex = extract_script()
+    texts, plural, _problems = ex.scan()
+    cats = ex.catalogs()
+    assert set(cats) == {"de", "es", "fr", "pt-BR", "ru", "zh-CN", "zh-TW", "ja", "ko",
+                         "hi", "id", "vi", "th", "tr", "it", "pl", "uk", "nl", "ar"}
+    ph = re.compile(r"\{[^{}]*\}|<[^<>]*>|&[a-z]+;")
+    for code, (_path, cat) in cats.items():
+        assert isinstance(cat["_meta"].get("name"), str), code
+        for key, value in cat.items():
+            if key.startswith("_") or key not in texts or not value:
+                continue
+            assert isinstance(value, list) == plural[key], (code, key)
+            for v in value if isinstance(value, list) else [value]:
+                if v:
+                    assert set(ph.findall(v)) == set(ph.findall(key)), (code, key, v)
+            if plural[key] and all(value):
+                assert len(value) == i18n.forms(code), (code, key)
+
+
+def test_qt_standard_buttons_follow_the_language(qapp, langs):
+    from PySide6.QtWidgets import QDialogButtonBox
+    i18n.set_language(i18n.PSEUDO)
+    try:
+        assert i18n.translate_qt_buttons(qapp)
+        box = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
+        assert all(i18n.is_pseudo(b.text()) for b in box.buttons())
+        i18n.set_language(i18n.ENGLISH)          # back in English: Qt's own words again
+        box = QDialogButtonBox(QDialogButtonBox.Cancel)
+        assert box.buttons()[0].text() == "Cancel"
+    finally:
+        i18n.set_language(i18n.ENGLISH)

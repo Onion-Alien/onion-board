@@ -22,8 +22,8 @@ from dataclasses import asdict, dataclass, field
 from pathlib import Path
 
 from soundboard import library
-from soundboard.library import SoundMeta
 from soundboard.i18n import _, ngettext
+from soundboard.library import SoundMeta
 
 log = logging.getLogger(__name__)
 
@@ -359,7 +359,7 @@ def ago(when: float, now: float | None = None) -> str:
     if s < 60:
         return _("just now")
     if s < 3600:
-        return ngettext("{n} min ago", "{n} min ago", int(s // 60))
+        return _("{n} min ago", n=int(s // 60))
     if s < 86400:
         return ngettext("{n} hour ago", "{n} hours ago", int(s // 3600))
     return ngettext("{n} day ago", "{n} days ago", int(s // 86400))

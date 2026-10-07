@@ -416,6 +416,12 @@ def group_name(group: str) -> str:
 
 FONT = "Segoe UI"   # a theme can swap it with a `font` token
 
+
+def font_families() -> list[str]:
+    """Every font a theme uses."""
+    return sorted({FONT, *(t["font"] for t in THEMES.values() if t.get("font"))})
+
+
 T: dict[str, str] = dict(THEMES[DEFAULT])   # current theme (read at paint time)
 current_name = DEFAULT
 live_override = ""   # the user's own highlight colour ("" = each theme's own)
