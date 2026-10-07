@@ -45,6 +45,18 @@ def limits(reports: list[dict]) -> dict:
     return out
 
 
+def dumps(budgets: dict) -> str:
+    """JSON with one line per scenario, so a diff shows which limits moved."""
+    parts = []
+    for k, v in budgets.items():
+        if isinstance(v, dict):
+            rows = ",\n".join(f"  {json.dumps(s)}: {json.dumps(m)}" for s, m in v.items())
+            parts.append(f" {json.dumps(k)}: {{\n{rows}\n }}")
+        else:
+            parts.append(f" {json.dumps(k)}: {json.dumps(v)}")
+    return "{\n" + ",\n".join(parts) + "\n}\n"
+
+
 def main(argv: list[str]) -> int:
     by_tier: dict[str, list[dict]] = {}
     for a in argv:
@@ -62,8 +74,7 @@ def main(argv: list[str]) -> int:
     for tier, reps in by_tier.items():
         new[tier] = limits(reps)
     with open(path, "w", encoding="utf-8", newline="\n") as f:
-        json.dump(new, f, indent=1)
-        f.write("\n")
+        f.write(dumps(new))
     print(f"wrote {path}: " + ", ".join(f"{t} ({len(new[t])} scenarios)" for t in by_tier))
     return 0
 
