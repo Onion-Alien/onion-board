@@ -1,7 +1,20 @@
 # Changelog
 
-## Unreleased
+## 1.9.7 — 2026-10-07
 
+- **Important fix: Discord wiping out your sounds on Straight into my mic.** Measured
+  on a real Discord: its default noise suppression (Krisp / Voice Isolation) lets a
+  song through for about a second, then wipes it out, and its **Studio** profile,
+  which Onion Board used to tell you to pick, makes Discord skip Onion Board
+  entirely, so none of your sounds got through. Onion Board now reads Discord's own
+  voice settings while it runs and shows a bar across the window when one of them is
+  in the way (*Fix Discord* opens the steps). The Discord guide, the setup guide, the
+  Setup tab and the voice changer's warning now say the right thing for your mic:
+  *Input Profile* **Custom**, *Noise Suppression* **None**, *Echo Cancellation* off
+  (Studio stays the clean choice on the virtual cable). The guide shows each of your
+  Discord settings with a ✓ or what to switch, and updates as you change them.
+  It also catches Discord's *Advanced Voice Activity*: in a real call it let only
+  about 2 seconds of a 25-second song through (the Mic Test never shows it).
 - **Record a bit of what's playing.** The Sounds tab's **Record** window has a new
   *What's playing* choice: press Record, play a sound, a web search result or the
   radio (or catch a song already playing), then Stop, cut the ends and save it as a
@@ -38,6 +51,8 @@
   to what it showed before. Pick another category by hand and it stays. All the
   programs you've set are listed in *Settings → General*, with a switch for all of it.
 - **The search box keeps its room** on the Sounds tab in mid-size windows.
+- **Buttons in the guides aren't cut off any more** ("Copy the mic na…"): a window
+  with a row of buttons grows wide enough to show them all.
 - **Record a sound with your mic.** New **Record** button next to *Add sounds*:
   record your own voice (or, while the voice changer is on, your changed voice),
   then drag the ends to cut it, listen in your headphones, name it and *Save*. The

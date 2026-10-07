@@ -20,15 +20,15 @@ from soundboard.wheelguard import no_wheel
 from soundboard.winkeys import Hotkeys
 from soundboard.i18n import _
 
-CUSTOM = "Custom"
+CUSTOM = "Custom"   # the preset box's item data when no preset matches
 # what the pad colour swatches are called (tooltip and screen reader)
-COLOUR_NAMES = {"#7c5cff": "Purple", "#ff5c8a": "Pink", "#1fb6ff": "Blue",
-                "#13ce66": "Green", "#ffb020": "Yellow", "#ff7849": "Orange",
-                "#00c2b2": "Teal", "#e056fd": "Magenta", "#5c7cfa": "Indigo",
-                "#94a3b8": "Grey"}
-SPEED = voicefx.Param("speed", "Speed", *soundfx.SPEED_RANGE, 1.0, "x", 0.05)
-PITCH = voicefx.Param("pitch", "Pitch", *soundfx.PITCH_RANGE, 0.0, " st", 1)
-BOOST = voicefx.Param("gain_db", "Boost", *soundfx.GAIN_RANGE, 0.0, " dB", 1)
+COLOUR_NAMES = {"#7c5cff": _("Purple"), "#ff5c8a": _("Pink"), "#1fb6ff": _("Blue"),
+                "#13ce66": _("Green"), "#ffb020": _("Yellow"), "#ff7849": _("Orange"),
+                "#00c2b2": _("Teal"), "#e056fd": _("Magenta"), "#5c7cfa": _("Indigo"),
+                "#94a3b8": _("Grey")}
+SPEED = voicefx.Param("speed", _("Speed"), *soundfx.SPEED_RANGE, 1.0, "x", 0.05)
+PITCH = voicefx.Param("pitch", _("Pitch"), *soundfx.PITCH_RANGE, 0.0, " st", 1)
+BOOST = voicefx.Param("gain_db", _("Boost"), *soundfx.GAIN_RANGE, 0.0, " dB", 1)
 
 
 class EffectsPanel(QWidget):
@@ -45,17 +45,19 @@ class EffectsPanel(QWidget):
         prow = QHBoxLayout()
         prow.addWidget(QLabel(_("Preset")))
         self.preset = QComboBox()
-        self.preset.addItems(list(soundfx.PRESETS) + [CUSTOM])
+        for name in soundfx.PRESETS:
+            self.preset.addItem(name, name)
+        self.preset.addItem(_("Custom"), CUSTOM)
         no_wheel(self.preset)
         prow.addWidget(self.preset, 1)
         reset = QPushButton(_("Reset"))
         reset.setObjectName("small")
         reset.setToolTip(_("Back to the original sound (the trim stays)"))
-        reset.clicked.connect(lambda: self.preset.setCurrentText(next(iter(soundfx.PRESETS))))
+        reset.clicked.connect(lambda: self.preset.setCurrentIndex(0))   # the first preset
         prow.addWidget(reset)
         v.addLayout(prow)
 
-        v.addWidget(section_label("TRIM"))
+        v.addWidget(section_label(_("TRIM")))
         peaks, length = original_peaks(meta) if meta is not None else ([], 0.0)
         self.trim = TrimPanel(peaks, length)
         v.addWidget(self.trim)              # in the layout first: shown with no parent,
@@ -63,7 +65,7 @@ class EffectsPanel(QWidget):
         if length <= 0:
             v.addWidget(hint_label(_("Trimming works once the sound has loaded.")))
 
-        v.addWidget(section_label("SPEED & PITCH"))
+        v.addWidget(section_label(_("SPEED & PITCH")))
         self.speed = ParamSlider(SPEED, 1.0)
         self.pitch = ParamSlider(PITCH, 0.0)
         self.tape = QCheckBox(_("Tape mode: speed changes the pitch too (nightcore / slowed)"))
@@ -72,7 +74,7 @@ class EffectsPanel(QWidget):
         for w in (self.speed, self.pitch, self.tape):
             v.addWidget(w)
 
-        v.addWidget(section_label("LOUDNESS"))
+        v.addWidget(section_label(_("LOUDNESS")))
         self.boost = ParamSlider(BOOST, 0.0)
         v.addWidget(self.boost)
         self.boost_hint = hint_label("")
@@ -85,7 +87,7 @@ class EffectsPanel(QWidget):
         self.eq.cb_target.hide()
         v.addWidget(self.eq)
 
-        v.addWidget(section_label("EFFECTS"))
+        v.addWidget(section_label(_("EFFECTS")))
         self.rows: dict[str, EffectRow] = {}
         for etype, cls in voicefx.REGISTRY.items():
             if etype == "pitch":   # the Pitch slider above does this, better
@@ -106,7 +108,8 @@ class EffectsPanel(QWidget):
         self.reverse.toggled.connect(self._edited)
         self.trim.changed.connect(self._edited)
         self.eq.changed.connect(lambda *__: self._edited())
-        self.preset.currentTextChanged.connect(self._on_preset)
+        self.preset.currentIndexChanged.connect(
+            lambda __: self._on_preset(self.preset.currentData()))
         self._matching_preset()
 
     def load(self, fx: dict):
@@ -161,7 +164,7 @@ class EffectsPanel(QWidget):
         cur = soundfx.key(self._untrimmed())   # a preset never changes the trim
         name = next((n for n, p in soundfx.PRESETS.items() if soundfx.key(p) == cur), CUSTOM)
         self.preset.blockSignals(True)
-        self.preset.setCurrentText(name)
+        self.preset.setCurrentIndex(max(0, self.preset.findData(name)))
         self.preset.blockSignals(False)
 
     def _on_preset(self, name: str):
@@ -199,7 +202,7 @@ class EditDialog(QDialog):
         form = QFormLayout(basics)
         form.setLabelAlignment(Qt.AlignRight)
         self.name = QLineEdit(meta.name)
-        form.addRow("Name", self.name)
+        form.addRow(_("Name"), self.name)
 
         vrow = QHBoxLayout()
         self.vol = QSlider(Qt.Horizontal)
@@ -212,7 +215,7 @@ class EditDialog(QDialog):
         self.vol_lbl.setFixedWidth(42)
         vrow.addWidget(self.vol)
         vrow.addWidget(self.vol_lbl)
-        form.addRow("Volume", vrow)
+        form.addRow(_("Volume"), vrow)
 
         # the hotkey is what most people open this for: near the top, not under the timings
         hrow = QHBoxLayout()
@@ -222,7 +225,7 @@ class EditDialog(QDialog):
         clr.clicked.connect(lambda: self._set_hk(""))
         hrow.addWidget(self.hk_btn, 1)
         hrow.addWidget(clr)
-        form.addRow("Hotkey", hrow)
+        form.addRow(_("Hotkey"), hrow)
         self._set_hk(self.hotkey)
 
         self.mode = QComboBox()
@@ -233,7 +236,7 @@ class EditDialog(QDialog):
         self.mode.addItem(_("Queue — waits for the sounds playing to finish"), "queue")
         self.mode.setCurrentIndex(max(0, self.mode.findData(meta.mode)))
         no_wheel(self.mode)
-        form.addRow("On press", self.mode)
+        form.addRow(_("On press"), self.mode)
 
         self.loop = QCheckBox(_("Loop until stopped"))
         self.loop.setChecked(meta.loop)
@@ -251,19 +254,20 @@ class EditDialog(QDialog):
         self.only_them.setChecked(meta.only_them)
         form.addRow("", self.only_them)
 
-        self.fade_in = self._fade_row(form, "Fade in", meta.fade_in,
-                                      "Starts silent and rises to full volume over this long")
-        self.fade_out = self._fade_row(form, "Fade out", meta.fade_out,
-                                       "Stopping it fades it out over this long instead of "
-                                       "cutting it; a sound that isn't looping also fades "
-                                       "over its last seconds. Stop everything still cuts "
-                                       "straight away.")
-        self.delay = self._fade_row(form, "Wait first", meta.delay,
-                                    "Waits this long after the press before it plays, say for "
-                                    "a punchline. Stop everything cancels it.", MAX_DELAY_S)
-        self.cooldown = self._fade_row(form, "Cooldown", meta.cooldown,
-                                       "After it starts, presses are ignored for this long, so "
-                                       "nobody can spam it", MAX_COOLDOWN_S)
+        self.fade_in = self._fade_row(form, _("Fade in"), meta.fade_in,
+                                      _("Starts silent and rises to full volume over this long"))
+        self.fade_out = self._fade_row(form, _("Fade out"), meta.fade_out,
+                                       _("Stopping it fades it out over this long instead of "
+                                         "cutting it; a sound that isn't looping also fades "
+                                         "over its last seconds. Stop everything still cuts "
+                                         "straight away."))
+        self.delay = self._fade_row(form, _("Wait first"), meta.delay,
+                                    _("Waits this long after the press before it plays, say "
+                                      "for a punchline. Stop everything cancels it."),
+                                    MAX_DELAY_S)
+        self.cooldown = self._fade_row(form, _("Cooldown"), meta.cooldown,
+                                       _("After it starts, presses are ignored for this long, "
+                                         "so nobody can spam it"), MAX_COOLDOWN_S)
 
         crow = QHBoxLayout()
         crow.setSpacing(6)
@@ -281,7 +285,7 @@ class EditDialog(QDialog):
             self.swatches.append((b, c))
             crow.addWidget(b)
         crow.addStretch()
-        form.addRow("Colour", crow)
+        form.addRow(_("Colour"), crow)
         self._set_color(self.color)
         self.tabs.addTab(basics, _("Sound"))
 
@@ -302,10 +306,10 @@ class EditDialog(QDialog):
             release = busy.hold(prev, _("Rendering the effects…"))
             got = preview_cb(self.meta.id, self.vol.value() / 100, self.effects.fx(),
                              self.fades(), lambda ok: release(
-                                 "▶  Playing" if ok else "Couldn't render it"))
+                                 _("▶  Playing") if ok else _("Couldn't render it")))
             if got != "rendering":
-                release("Not loaded yet — try again in a moment" if got == "missing"
-                        else "▶  Playing", 1200)
+                release(_("Not loaded yet — try again in a moment") if got == "missing"
+                        else _("▶  Playing"), 1200)
         prev.clicked.connect(play_preview)
         prow.addWidget(prev)
         self.fx_note = QLabel()
@@ -340,7 +344,7 @@ class EditDialog(QDialog):
         lbl.setFixedWidth(42)
 
         def show(v):
-            lbl.setText(f"{v / 10:.1f} s" if v else "off")
+            lbl.setText(_("{s} s", s=f"{v / 10:.1f}") if v else _("off"))
             sl.setAccessibleDescription(lbl.text())
         sl.valueChanged.connect(show)
         show(sl.value())
@@ -372,7 +376,7 @@ class EditDialog(QDialog):
 
     def _set_hk(self, combo):
         self.hotkey = combo
-        self.hk_btn.setText(pretty_key(combo) or "Click to set…")
+        self.hk_btn.setText(pretty_key(combo) or _("Click to set…"))
 
     def _capture(self):
         d = HotkeyDialog(self.hotkeys, self)

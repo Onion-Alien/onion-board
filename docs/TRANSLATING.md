@@ -14,7 +14,10 @@ ngettext("{n} sound", "{n} sounds", n)
   `{placeholders}` and pass them as keyword arguments, so a translation can move them.
 - `ngettext(singular, plural, n)` for text with a number in it; `{n}` is filled in.
 - Don't wrap log messages, settings keys, the control API's JSON or file names. The
-  changelog stays in English.
+  changelog stays in English, and so do the older What's new notes
+  (`ui/whatsnew.py`); notes for 2.0 and later are wrapped.
+- Menus, pop-ups and text set later (status lines, toasts) don't show up in a
+  screenshot sweep: check them in the code too.
 - Don't use `_` as a throwaway name (`path, _ = …`) in a function that calls `_()`:
   write `path, __ = …`. `scripts/i18n_extract.py` and the tests catch it.
 
