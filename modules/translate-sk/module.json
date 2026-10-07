@@ -1,0 +1,15 @@
+{
+  "id": "translate-sk",
+  "name": "Translate to Slovak",
+  "version": "1.0.0",
+  "kind": "translation",
+  "description": "The computer voice speaks what you say in Slovak. Needs live voice-to-speech. Downloads a 71 MB translation model once, when you ask for it; translating then happens on this PC.",
+  "language": "sk",
+  "language_name": "Slovak",
+  "download": {
+    "url": "https://argos-net.com/v1/translate-en_sk-1_9.argosmodel",
+    "sha256": "937a73ea56435772a60623959b4f3873dbe65c3de7446f3462919a32c62fd788",
+    "bytes": 71114489
+  },
+  "credits": "English to Slovak model from the Argos Translate package index: OPUS-MT (Tiedemann & Thottingal, 2020), CC BY 4.0."
+}

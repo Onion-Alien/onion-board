@@ -1,0 +1,15 @@
+{
+  "id": "translate-ms",
+  "name": "Translate to Malay",
+  "version": "1.0.0",
+  "kind": "translation",
+  "description": "The computer voice speaks what you say in Malay. Needs live voice-to-speech. Downloads a 69 MB translation model once, when you ask for it; translating then happens on this PC.",
+  "language": "ms",
+  "language_name": "Malay",
+  "download": {
+    "url": "https://argos-net.com/v1/translate-en_ms-1_9.argosmodel",
+    "sha256": "c09e2aa67cb1067ca52f71665f38e16a4b4566154a7fe11b18bf77d9dc6d1c7d",
+    "bytes": 69068181
+  },
+  "credits": "English to Malay model from the Argos Translate package index: OPUS-MT (Tiedemann & Thottingal, 2020), CC BY 4.0."
+}

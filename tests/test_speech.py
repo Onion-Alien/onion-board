@@ -7,6 +7,7 @@ import sys
 import threading
 import time
 from pathlib import Path
+from types import SimpleNamespace
 
 import numpy as np
 import pytest
@@ -759,10 +760,12 @@ def test_helper_refuses_to_run_without_the_app():
 
 # ---------------------------------------------------------------- translation add-ons
 
-LANGS = {"zh", "es", "fr", "de", "ru"}
+LANGS = {"zh", "es", "fr", "de", "ru", "it", "pt-PT", "pt-BR", "nl", "pl", "cs", "sk", "sl",
+         "hu", "ro", "bg", "el", "da", "sv", "nb", "fi", "ca", "ja", "ko", "zh-TW", "th",
+         "vi", "id", "ms", "hi", "ar", "he", "tr"}
 
 
-def test_repo_ships_the_five_translation_addons_not_downloaded():
+def test_repo_ships_the_translation_addons_not_downloaded():
     infos = [m for m in modules.discover([ROOT / "modules"]) if m.kind == "translation"]
     assert {m.language for m in infos} == LANGS
     for m in infos:
@@ -772,17 +775,38 @@ def test_repo_ships_the_five_translation_addons_not_downloaded():
     assert not list((ROOT / "modules").glob("translate-*/model"))
 
 
+def test_every_speak_language_has_a_name_in_every_app_language():
+    """langnames_data.py is current: rerun scripts/make_langnames.py when this fails."""
+    from soundboard import i18n, langnames
+    from soundboard.langnames_data import NAMES
+    apps = {"en"} | {p.stem for p in (ROOT / "assets" / "lang").glob("*.json")}
+    assert set(NAMES) == apps
+    assert all(set(names) == LANGS and all(names.values()) for names in NAMES.values())
+    try:
+        i18n.set_language("de")
+        assert langnames.name("ja") == "Japanisch"
+        assert langnames.name("pt-BR") == "Portugiesisch (Brasilien)"
+        dk, de = (SimpleNamespace(language=c, language_name="") for c in ("da", "de"))
+        assert langnames.sort_key(dk) < langnames.sort_key(de)    # Dänisch, Deutsch
+        assert langnames.name("xq", "Klingon") == "Klingon"     # not in the table yet
+    finally:
+        i18n.set_language("en")
+    assert langnames.name("zh-TW") == "Traditional Chinese"
+
+
 def test_translation_manifest_needs_https_and_a_checksum(tmp_path):
     good = {"url": "https://example.com/m.zip", "sha256": "a" * 64, "bytes": 5}
     write_module(tmp_path / "ok", id="ok", kind="translation", language="de", download=good)
+    write_module(tmp_path / "tw", id="tw", kind="translation", language="zh-TW", download=good)
+    write_module(tmp_path / "bad", id="bad", kind="translation", language="zh_tw", download=good)
     write_module(tmp_path / "http", id="http", kind="translation", language="de",
                  download={**good, "url": "http://example.com/m.zip"})
     write_module(tmp_path / "nosum", id="nosum", kind="translation", language="de",
                  download={"url": good["url"]})
     write_module(tmp_path / "nolang", id="nolang", kind="translation", download=good)
     got = {m.id: m for m in modules.discover([tmp_path])}
-    assert got["ok"].error == ""
-    assert all(got[k].error for k in ("http", "nosum", "nolang"))
+    assert got["ok"].error == "" and got["tw"].error == ""
+    assert all(got[k].error for k in ("http", "nosum", "nolang", "bad"))
 
 
 def model_package(path: Path, top="translate-en_xx-1_0") -> tuple[str, int]:
@@ -884,3 +908,10 @@ def test_voice_listing_and_picking_a_voice_for_a_language():
     assert t.voice_for("de", prefer="Microsoft Zira Desktop") == "Microsoft Katja"
     assert t.voice_for("zh") == "Microsoft Huihui"
     assert t.voice_for("ru") == ""
+    # a country: that country's voice first, else any voice of the language
+    t.voices = names + ["Microsoft Hanhan"]
+    t.voice_langs = {**langs, "Microsoft Hanhan": "zh-TW"}
+    assert t.voice_for("zh-TW") == "Microsoft Hanhan"
+    assert t.voice_for("zh-TW", prefer="Microsoft Huihui") == "Microsoft Hanhan"
+    assert t.voice_for("zh") == "Microsoft Huihui"
+    assert t.voice_for("de-AT") == "Microsoft Katja"

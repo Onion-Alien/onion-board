@@ -26,7 +26,7 @@ language, both under **More options** on the Voice tab. It runs on the CPU.
 
 ## Speaking another language
 
-The `translate-*` add-ons (Chinese, Spanish, French, German, Russian) let the
+The `translate-*` add-ons (33 languages; `scripts/make_langnames.py` names them in every app language) let the
 voice say what you said in that language. Pick one under **Speak in** in the
 Voice tab and press **Download** (65–196 MB, once). The app then starts this
 helper with `--translate <folder>`: each English sentence is translated on your

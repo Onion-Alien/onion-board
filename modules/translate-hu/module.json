@@ -1,0 +1,15 @@
+{
+  "id": "translate-hu",
+  "name": "Translate to Hungarian",
+  "version": "1.0.0",
+  "kind": "translation",
+  "description": "The computer voice speaks what you say in Hungarian. Needs live voice-to-speech. Downloads a 68 MB translation model once, when you ask for it; translating then happens on this PC.",
+  "language": "hu",
+  "language_name": "Hungarian",
+  "download": {
+    "url": "https://argos-net.com/v1/translate-en_hu-1_9.argosmodel",
+    "sha256": "63cd48e94fce5041fb0b3ef6394900a5f4ea014f90f9509e57bf10d79d8bbb10",
+    "bytes": 67859271
+  },
+  "credits": "English to Hungarian model from the Argos Translate package index: OPUS-MT (Tiedemann & Thottingal, 2020), CC BY 4.0."
+}

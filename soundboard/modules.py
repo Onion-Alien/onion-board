@@ -187,7 +187,7 @@ def _read(folder: Path) -> ModuleInfo | None:
     elif info.kind == "service" and not info.command:
         info.error = "no command"
     elif info.kind == "translation" and not (
-            re.fullmatch(r"[a-z]{2,3}", info.language)
+            re.fullmatch(r"[a-z]{2,3}(-[A-Z]{2})?", info.language)
             and str(info.download.get("url", "")).startswith("https://")
             and re.fullmatch(r"[0-9a-f]{64}", str(info.download.get("sha256", "")))):
         info.error = "needs a language code and an https download with its sha256"

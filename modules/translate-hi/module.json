@@ -1,0 +1,15 @@
+{
+  "id": "translate-hi",
+  "name": "Translate to Hindi",
+  "version": "1.0.0",
+  "kind": "translation",
+  "description": "The computer voice speaks what you say in Hindi. Needs live voice-to-speech. Downloads a 107 MB translation model once, when you ask for it; translating then happens on this PC.",
+  "language": "hi",
+  "language_name": "Hindi",
+  "download": {
+    "url": "https://argos-net.com/v1/translate-en_hi-1_1.argosmodel",
+    "sha256": "60470a003a9c7339db8c060ed8eafc7cf999ba90dfa5dceebd8d0a4f75f1d3f0",
+    "bytes": 106752178
+  },
+  "credits": "English to Hindi model from the Argos Translate package index: Argos Translate, trained on OPUS data."
+}

@@ -13,7 +13,7 @@ import re
 import threading
 import time
 
-from PySide6.QtCore import QEvent, QRectF, QSize, Qt, QTimer, Signal
+from PySide6.QtCore import QEvent, QObject, QRectF, QSize, Qt, QTimer, Signal
 from PySide6.QtGui import QColor, QGuiApplication, QPainter
 from PySide6.QtWidgets import (QButtonGroup, QCheckBox, QComboBox, QDialog, QMessageBox,
                                QDialogButtonBox, QFormLayout, QFrame, QGridLayout,
@@ -25,7 +25,7 @@ from shiboken6 import isValid as qt_valid
 from soundboard import applog
 from soundboard import modules as mods
 from soundboard import voicefx
-from soundboard import library, net, netlog, savedvoices, theme
+from soundboard import langnames, library, net, netlog, savedvoices, theme
 from soundboard.speech import customvoices, translation, tts, winvoices
 from soundboard.speech.aivoice import AiVoiceController
 from soundboard.speech.live import SpeechController, clean_settings
@@ -60,7 +60,7 @@ def default_speech_settings() -> dict:
 def translations(module_list: list[mods.ModuleInfo]) -> list[mods.ModuleInfo]:
     """The languages the live voice can speak in (translation add-ons), A to Z."""
     return sorted((m for m in module_list if m.kind == "translation" and not m.error),
-                  key=lambda m: m.language_name or m.language)
+                  key=langnames.sort_key)
 
 
 # =========================================================================== voice changer
@@ -1389,6 +1389,28 @@ class VoiceFxPanel(QWidget):
 
 # =========================================================================== speech
 
+class _SameWidth(QObject):
+    """Keeps the list `follower` as wide as `source` (two lists in different rows),
+    or wider when its picked item wouldn't fit (a narrow window)."""
+
+    def __init__(self, source: QWidget, follower: QComboBox):
+        super().__init__(source)
+        self._source, self._follower = source, follower
+        source.installEventFilter(self)
+        follower.currentIndexChanged.connect(lambda _i: self.fit())
+
+    def fit(self):
+        f = self._follower
+        need = f.fontMetrics().horizontalAdvance(f.currentText()) + 56   # padding + arrow
+        if self._source.width() > 0:
+            f.setFixedWidth(max(self._source.width(), need))
+
+    def eventFilter(self, obj, e):
+        if e.type() == QEvent.Resize:
+            self.fit()
+        return False
+
+
 class SpeechPanel(QWidget):
     """Text-to-speech box and live voice-to-speech. `changed(settings)` for the config."""
     changed = Signal(dict)
@@ -1466,7 +1488,11 @@ class SpeechPanel(QWidget):
         self.cb_lang = QComboBox()
         self.cb_lang.setToolTip(_("Say it in English; whichever voice is on says it in this "
                                   "language. Each language is a one-time download."))
-        trow.addWidget(self.cb_lang, 1)
+        # as wide as the voice list below (_SameWidth), not a bar across the card:
+        # its list opens as wide as the box
+        trow.setSpacing(12)                             # the voice grid's spacing
+        trow.addWidget(self.cb_lang)
+        trow.addStretch(1)
         lv.addLayout(trow)
         self.lbl_delay = hint_label("")
         theme.set_tone(self.lbl_delay, "warn")
@@ -1525,7 +1551,11 @@ class SpeechPanel(QWidget):
         grid = QGridLayout()
         grid.setHorizontalSpacing(12)
         grid.setVerticalSpacing(14)
-        grid.addWidget(QLabel(_("Computer voice")), 0, 0)
+        lbl_voice = QLabel(_("Computer voice"))
+        grid.addWidget(lbl_voice, 0, 0)
+        # Speak in's box starts where the voice list does
+        self.lbl_lang.setMinimumWidth(max(self.lbl_lang.sizeHint().width(),
+                                          lbl_voice.sizeHint().width()))
         self.cb_voice = QComboBox()
         self.cb_voice.setToolTip(_("Speaks for you when no AI voice or voice changer is on, "
                                    "and says lines you type"))
@@ -1549,8 +1579,9 @@ class SpeechPanel(QWidget):
         self.sl_rate.setValue(int(self.s["rate"]))
         grid.addWidget(self.sl_rate, 1, 1)
         for w in (self.cb_voice, self.sl_rate):   # a list and a slider, not bars across
-            w.setMinimumWidth(220)                # the whole card at full screen
-            w.setMaximumWidth(380)
+            w.setMinimumWidth(160)                # the whole card at full screen (and
+            w.setMaximumWidth(380)                # Add voices… fits a narrow window)
+        _SameWidth(self.cb_voice, self.cb_lang)
         grid.setColumnStretch(1, 1)
         grid.setColumnStretch(3, 2)
         v.addLayout(grid)
@@ -1839,7 +1870,7 @@ class SpeechPanel(QWidget):
             self.ctl.live_voice = voice
             short = customvoices.label(voice)
             self.lbl_state.setText(_("✓ {language} voice found: {voice} speaks from the "
-                                     "next line on.", language=m.language_name, voice=short))
+                                     "next line on.", language=langnames.of(m), voice=short))
         self._refresh_translation()
         problems = getattr(self.ctl.tts, "problems", [])
         custom = getattr(self.ctl.tts, "custom", {})
@@ -1968,12 +1999,15 @@ class SpeechPanel(QWidget):
         self.cb_lang.clear()
         self.cb_lang.addItem(_("English (as you say it)"), "")
         for m in self.langs:
-            name = m.language_name or m.language
+            name = langnames.of(m)
             self.cb_lang.addItem(name if m.installed
                                  else _("{language}  (download {size} MB)", language=name,
                                         size=translation.size_mb(m)),
                                  m.language)
         self.cb_lang.setIconSize(QSize(20, 20))
+        # the open list shows every name whole, even past the box's own width
+        view = self.cb_lang.view()
+        view.setMinimumWidth(view.sizeHintForColumn(0) + 40)    # + padding, scroll bar
         self.cb_lang.setCurrentIndex(max(0, self.cb_lang.findData(self.s["translate"])))
         self.cb_lang.blockSignals(False)
         self.lang_box.setVisible(self.module is not None and self.module.installed
@@ -1998,7 +2032,7 @@ class SpeechPanel(QWidget):
         """The box under "Speak in": download it, get its Windows voice, or all set."""
         m = self._lang()
         if m is not None:
-            name = m.language_name or m.language
+            name = langnames.of(m)
             self.lbl_delay.setText(_(
                 "⏱ Others hear you in {language} a few seconds late: each sentence is "
                 "written down, translated, then spoken once you've finished it. It works "
@@ -2016,7 +2050,7 @@ class SpeechPanel(QWidget):
             return
         if m is None:
             return
-        name = m.language_name or m.language
+        name = langnames.of(m)
         live = self.ctl.live
         if not m.installed:
             self.lbl_tr.setText(_("{language} needs a one-time download of its translation "
@@ -2088,7 +2122,7 @@ class SpeechPanel(QWidget):
     def _on_voice_installed(self, result: str, err: str):
         m, self._voice_installing = self._voice_installing, None
         m = m or self._lang()
-        name = (m.language_name or m.language) if m is not None else ""
+        name = langnames.of(m) if m is not None else ""
         if err:
             self._voice_note = _("\u26a0 Couldn't install the {language} voice: {error}. "
                                  "Press Install to try again, or add it in Windows settings.",
@@ -2167,8 +2201,9 @@ class SpeechPanel(QWidget):
         _enable(self.b_live, False, _("Waiting for the download to finish"))
         self._refresh_translation()
         self.lbl_tr.setText(_("Downloading {language}\u2026 {percent}%",
-                              language=m.language_name, percent=0))
-        netlog.cause("voices", f"You downloaded the {m.language_name} translation model")
+                              language=langnames.of(m), percent=0))
+        netlog.cause("voices",
+                     f"You downloaded the {m.language_name or m.language} translation model")
 
         def work():
             try:
@@ -2195,9 +2230,9 @@ class SpeechPanel(QWidget):
         m = self._dl_busy
         if m is not None and not self._dl_cancel:
             self.lbl_tr.setText(
-                _("Downloading {language}\u2026 {percent}%", language=m.language_name,
+                _("Downloading {language}\u2026 {percent}%", language=langnames.of(m),
                   percent=done * 100 // total) if total else
-                _("Downloading {language}\u2026 {size} MB", language=m.language_name,
+                _("Downloading {language}\u2026 {size} MB", language=langnames.of(m),
                   size=done // 1_000_000))
 
     def _on_dl_done(self, err: str):
@@ -2210,7 +2245,7 @@ class SpeechPanel(QWidget):
             self.lbl_tr.setText(_("Download cancelled.") if err == "cancelled"
                                 else _("\u26a0 {language}: {error}. Check your internet "
                                        "connection and press Download again.",
-                                       language=m.language_name, error=errors.plain(err)))
+                                       language=langnames.of(m), error=errors.plain(err)))
         self.downloaded.emit()
 
     def _remove_download(self):
@@ -2220,7 +2255,7 @@ class SpeechPanel(QWidget):
         if QMessageBox.question(
                 self, _("Delete download"),
                 _("Delete the downloaded {language} translation? You can download it again "
-                  "any time.", language=m.language_name)) != QMessageBox.Yes:
+                  "any time.", language=langnames.of(m))) != QMessageBox.Yes:
             return
 
         def go():
@@ -2232,7 +2267,7 @@ class SpeechPanel(QWidget):
         def said(gone: bool):
             if gone:
                 busy.toast(self, _("✓ Deleted the {language} download",
-                                   language=html.escape(m.language_name)), "ok")
+                                   language=html.escape(langnames.of(m))), "ok")
             else:
                 busy.toast(self, _("Couldn't delete all of it (a file is in use). Restart "
                                    "Onion Board and try again."), "warn")
@@ -2316,7 +2351,7 @@ class SpeechPanel(QWidget):
             m = self._lang()
             if m is not None and not m.installed:
                 self._set_live_ui(False, _("Download {language} first (above).",
-                                           language=m.language_name))
+                                           language=langnames.of(m)))
                 return
             try:
                 self.ctl.start_live(self.module, self._live_args())
@@ -2416,7 +2451,7 @@ class SpeechPanel(QWidget):
     def _on_bg_event(self, t, text: str, ev: dict):
         name = self._bg_key[1] if self._bg_key else ""
         m = self._lang()
-        name = (m.language_name or m.language) if m is not None else name
+        name = langnames.of(m) if m is not None else name
         if t == "ready" or (t == "vad" and not ev.get("speaking")):
             self._bg_note(_("● Listening: say it in English, it comes out in {language}.",
                             language=name))
@@ -2513,14 +2548,14 @@ class ModulesList(QWidget):
             row(f"<b>{e(m.name)}</b> {e(m.version)} · {e(state)}",
                 f"{m.description}" + chr(10) + str(m.path))
         if langs:
-            have = [m.language_name or m.name for m in langs if m.installed]
-            more = [m.language_name or m.name for m in langs if not m.installed]
+            have = [langnames.of(m) for m in langs if m.installed]
+            more = [langnames.of(m) for m in langs if not m.installed]
             parts = [_("{languages} downloaded", languages=", ".join(have))] if have else []
             if more:
                 parts.append(_("{languages} can be downloaded under Speak in",
                                languages=", ".join(more)))
             row(_("<b>Languages</b> · {state}", state=e("; ".join(parts))),
-                chr(10).join(_("{language}: {size} MB", language=m.language_name or m.name,
+                chr(10).join(_("{language}: {size} MB", language=langnames.of(m),
                                size=translation.size_mb(m))
                              for m in langs))
         if not voice:
@@ -2769,7 +2804,7 @@ class VoicePanel(QWidget):
         if m is not None and not fg and not who and not sp._bg_warning:
             sp._bg_note(_("Turn on the AI voice or the voice changer below, or press Start "
                           "for the computer voice, to speak {language}.",
-                          language=m.language_name or m.language))
+                          language=langnames.of(m)))
 
     # ---- cards that fold away
     def _fold_card(self, key: str, panel: QWidget) -> QFrame:
@@ -2803,7 +2838,7 @@ class VoicePanel(QWidget):
         if not self._heads:
             return
         m = self.speech.translating()
-        lang = (m.language_name or m.language) if m is not None else ""
+        lang = langnames.of(m) if m is not None else ""
         late = _("in {language}, a few seconds late", language=lang) if lang else ""
         fx, ai, tts = (self.fx.btn_power.isChecked(), self.ai.is_on(),
                        self.speech.b_live.isChecked())

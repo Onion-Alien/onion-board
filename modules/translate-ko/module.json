@@ -1,0 +1,15 @@
+{
+  "id": "translate-ko",
+  "name": "Translate to Korean",
+  "version": "1.0.0",
+  "kind": "translation",
+  "description": "The computer voice speaks what you say in Korean. Needs live voice-to-speech. Downloads a 121 MB translation model once, when you ask for it; translating then happens on this PC.",
+  "language": "ko",
+  "language_name": "Korean",
+  "download": {
+    "url": "https://argos-net.com/v1/translate-en_ko-1_1.argosmodel",
+    "sha256": "e03d8e65e6d44525ec5808c3409fcf8728c76c2c76925372b6d3dc3278de17fc",
+    "bytes": 120789009
+  },
+  "credits": "English to Korean model from the Argos Translate package index: Argos Translate, trained on OPUS data."
+}

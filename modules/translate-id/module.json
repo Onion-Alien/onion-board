@@ -1,0 +1,15 @@
+{
+  "id": "translate-id",
+  "name": "Translate to Indonesian",
+  "version": "1.0.0",
+  "kind": "translation",
+  "description": "The computer voice speaks what you say in Indonesian. Needs live voice-to-speech. Downloads a 68 MB translation model once, when you ask for it; translating then happens on this PC.",
+  "language": "id",
+  "language_name": "Indonesian",
+  "download": {
+    "url": "https://argos-net.com/v1/translate-en_id-1_9.argosmodel",
+    "sha256": "fe5773201222806cfc802a094c5758ada6c25e10dbdd306d0c46bf200aac25fd",
+    "bytes": 68010209
+  },
+  "credits": "English to Indonesian model from the Argos Translate package index: OPUS-MT (Tiedemann & Thottingal, 2020), CC BY 4.0."
+}

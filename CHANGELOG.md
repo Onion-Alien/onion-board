@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+- **28 more languages to speak in.** The Voice tab's *Speak in* list grows from 5
+  to 33: Italian, Portuguese (Brazil and Portugal), Dutch, Polish, Czech, Slovak,
+  Slovenian, Hungarian, Romanian, Bulgarian, Greek, Danish, Swedish, Norwegian,
+  Finnish, Catalan, Japanese, Korean, Traditional Chinese, Thai, Vietnamese,
+  Indonesian, Malay, Hindi, Arabic, Hebrew and Turkish. Each is a one-time download
+  (66–125 MB) and uses Windows' free voice for it. Language names now show in the
+  app's own language.
 - **Setup and Voice tabs fit a big screen.** Full screen, their cards no longer
   stretch to half the screen each: the pages stay a readable width in the middle,
   and buttons, voice lists and sliders keep their own size instead of becoming bars

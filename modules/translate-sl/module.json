@@ -1,0 +1,15 @@
+{
+  "id": "translate-sl",
+  "name": "Translate to Slovenian",
+  "version": "1.0.0",
+  "kind": "translation",
+  "description": "The computer voice speaks what you say in Slovenian. Needs live voice-to-speech. Downloads a 70 MB translation model once, when you ask for it; translating then happens on this PC.",
+  "language": "sl",
+  "language_name": "Slovenian",
+  "download": {
+    "url": "https://argos-net.com/v1/translate-en_sl-1_9.argosmodel",
+    "sha256": "19bd9c6188f5a36722aac4ed1601b4824b10081efa25fff39de50f1879c37f57",
+    "bytes": 69632517
+  },
+  "credits": "English to Slovenian model from the Argos Translate package index: OPUS-MT (Tiedemann & Thottingal, 2020), CC BY 4.0."
+}
