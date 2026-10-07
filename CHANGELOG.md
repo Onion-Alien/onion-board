@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- **Live controls on the Radio and Apps tabs.** The Sounds tab's speed / pitch /
+  effects popup now has a twin on the Radio bar and the Apps tab: change the pitch
+  (Redline up to ±36 st) and add bass, treble, muffle, reverb, echo, distortion or a
+  preset to the radio, or to every program you send. No speed there: a live stream
+  can't be played faster than it arrives.
 - **You can switch the app log off.** *Keep an app log* (Settings → Connection,
   under Network activity) stops `onionboard.log` being written and deletes it. The
   log can name a site a download or radio station failed on, so Network activity no

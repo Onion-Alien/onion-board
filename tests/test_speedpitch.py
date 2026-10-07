@@ -34,3 +34,23 @@ def test_volume_control_restyles_only_when_its_colour_changes(qapp):
     vc.slider.setValue(150)                    # over 100 %: warning colour
     vc.slider.setValue(160)
     assert len(calls) == 1
+
+
+def test_live_stream_button_has_no_speed(qapp):
+    """The Radio and Apps tabs' button: pitch and effects only, a live stream can't
+    be sped up."""
+    from soundboard.ui.speedpitch import SpeedPitchButton
+    b = SpeedPitchButton("radio")
+    got = []
+    b.changed.connect(lambda s, p, k: got.append((s, p)))
+    assert not b.has_speed and b.speed.isHidden() and b.keep.isHidden()
+    assert b.text() == "Effects"
+    b.pitch.set_value(3)
+    b._edited()
+    assert got[-1] == (1.0, 3) and b.text() == "+3 st"
+    b.set_fx({"reverb": 0.5})
+    assert b.text() == "+3 st · FX"
+    b.set_redline(True)
+    assert b.red_box.isHidden()            # the rev meter is for speed
+    b.reset()
+    assert b.text() == "Effects"
