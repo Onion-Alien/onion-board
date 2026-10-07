@@ -31,8 +31,8 @@ from soundboard.engine import SR, Engine
 from soundboard.engine import is_virtual as is_virtual_cable
 from soundboard import (appaudio, autostart, backup, catswitch, destination, library, midi,
                         remote, otherboards, soundfx, thumbs, trash, updates, videos, voicesdk)
-from soundboard import (directmic, net, netlog, profiles, quality, shellicon, tips, tor, usage,
-                        watchaddon)
+from soundboard import (directmic, discordcfg, net, netlog, profiles, quality, shellicon, tips,
+                        tor, usage, watchaddon)
 from soundboard.replay import InstantReplay
 from soundboard.library import (AUDIO_EXTS, PAD_COLORS, RESOURCE_DIR, Config, SoundMeta,
                                 cache_keep, clean_tags, duplicate, fingerprint,
@@ -110,6 +110,7 @@ GLOW_STEPS = 4       # how many glow levels the taskbar / tray icon has while so
 ICON_GLOW_MS = 120   # ...and how often at most it changes
 ICON_GLOW_BG_MS = 400   # ...while another program (a game) is in front
 DEFAULT_POLL_MS = 1500   # how often Windows' default output is checked
+DISCORD_POLL_MS = 10000  # how often Discord's voice settings are looked at (discordcfg)
 DEFAULT_POLL_IDLE_S = 5  # ...while the window is in the tray or minimised (seconds)
 # a device that won't open while Windows lists it: re-scan, then wait this long
 # (seconds) before the next re-scan, so one that really won't open isn't re-scanned
@@ -195,6 +196,7 @@ class Bridge(QObject):
     update_progress = Signal(int)              # percent of the new version downloaded
     update_ready = Signal(object, str)         # its installer's Path|None, error
     watch_update = Signal(object)              # a newer Onion Watch: watchaddon.Offer
+    discord = Signal(object)                   # [discordcfg.Settings] read in the background
     counted = Signal()                         # the daily usage count was sent (usage.py)
     imported = Signal(object, object, str)     # meta|None, data|None, error/filename
     preview = Signal(str, object, float, int)  # id, audio with unsaved effects|None, gain, gen
@@ -210,6 +212,25 @@ def _listed(name: str, names) -> bool:
     """`name` (as the app saved it) is one of `names` (Windows' own), spacing aside."""
     squash = " ".join(name.split()).lower()
     return any(" ".join(n.split()).lower() == squash for n in names)
+
+
+# the urgent bar's line for the worst thing in Discord's settings (discordcfg)
+DISCORD_URGENT = {
+    discordcfg.STUDIO: "{name} isn't hearing your sounds: its Input Profile is Studio, "
+                       "which skips Onion Board. Set it to Custom.",
+    discordcfg.BYPASS: "{name} isn't hearing your sounds: \"Bypass System Audio Input "
+                       "Processing\" is on, which skips Onion Board.",
+    discordcfg.ISOLATION: "{name}'s Voice Isolation is wiping out your sounds. Set its "
+                          "Input Profile to Custom and Noise Suppression to None.",
+    discordcfg.KRISP: "{name}'s noise suppression (Krisp) is wiping out your sounds. Set "
+                      "Noise Suppression to None.",
+    discordcfg.SUPPRESSION: "{name}'s noise suppression is eating your sounds. Set Noise "
+                            "Suppression to None.",
+    discordcfg.ECHO: "{name}'s echo cancellation is making your sounds dip and pump. "
+                     "Turn it off.",
+    discordcfg.AGC: "{name}'s automatic gain control is making your sounds' volume jump. "
+                    "Turn it off.",
+}
 
 
 class MainWindow(QMainWindow):
@@ -264,6 +285,7 @@ class MainWindow(QMainWindow):
         self.bridge.update_progress.connect(self._on_update_progress)
         self.bridge.update_ready.connect(self._on_update_ready)
         self.bridge.watch_update.connect(self._on_watch_update)
+        self.bridge.discord.connect(self._on_discord)
         self.bridge.counted.connect(self._save_later)   # stats_sent
         self._removed: list[tuple[SoundMeta, int, np.ndarray | None]] = []   # undo-able
         self._render_gen: dict[str, int] = {}   # sid -> newest effects render (_rerender)
@@ -286,6 +308,16 @@ class MainWindow(QMainWindow):
         self._downloading = False
         self.watch_offer: watchaddon.Offer | None = None   # an urgent Onion Watch fix
         self._urgent_hidden: set[str] = set()   # "board 1.9.6" / "watch 0.8.2", this run
+        # Discord's own voice settings (discordcfg), read while it runs: the ones that
+        # wipe out sounds get the urgent bar
+        self.discord_found: list = []
+        self._discord_sig = None
+        self._discord_reading = False
+        self._discord_timer = QTimer(self, interval=DISCORD_POLL_MS)
+        self._discord_timer.timeout.connect(self._discord_tick)
+        if sys.platform == "win32":
+            self._discord_timer.start()
+            QTimer.singleShot(3000, self._discord_tick)
         self._preview_gen = 0            # newest effects preview (older renders are dropped)
         self._preview_done = None         # its done(ok) callback while it renders
         self._ptt_held: str | None = None   # PTT key we're currently holding
@@ -1982,7 +2014,9 @@ class MainWindow(QMainWindow):
                    + (f"  <b style='color:{ok}'>(live)</b>" if apps else ""))
             step = ("<b>Nothing to set.</b> Discord and games keep your normal mic, and "
                     "your sounds are in it. If sounds get chopped up, switch off the "
-                    "voice app's noise suppression (Discord: <b>Input Profile → Studio</b>)."
+                    "voice app's noise suppression (Discord: <b>Input Profile → Custom</b>, "
+                    "<b>Noise Suppression → None</b>, <b>Echo Cancellation</b> off. Not "
+                    "Studio: it skips Onion Board)."
                     + ("<br><br><b>Optional:</b> your mic part works, and a newer "
                        "version is here. It's not needed — update below whenever suits "
                        "you (Windows asks once, and your sound drops out for a second)."
@@ -5209,7 +5243,54 @@ class MainWindow(QMainWindow):
             return (f"watch {o.version}",
                     f"Important fix in Onion Watch {o.version}: {o.urgent}",
                     "Update Onion Watch")
+        probs = self.discord_problems()
+        key = "discord " + ",".join(probs)
+        if probs and key not in self._urgent_hidden:
+            return key, DISCORD_URGENT[probs[0]].format(
+                name=self.discord_found[0].client), _("Fix Discord")
         return None
+
+    def discord_problems(self) -> list[str]:
+        """What in the running Discord's own settings hurts your sounds (discordcfg),
+        worst first; [] when it's fine, not running, or couldn't be read."""
+        if not self.discord_found:
+            return []
+        from soundboard.ui.chatguide import on_mic
+        return self.discord_found[0].problems(on_mic(self))
+
+    def _discord_tick(self):
+        """Every DISCORD_POLL_MS: while Discord runs, re-read its settings when its
+        files changed. On a worker: the process list and the files take a few ms."""
+        if self._discord_reading:
+            return
+        self._discord_reading = True
+        last = self._discord_sig
+
+        def run():
+            found, sig = [], None
+            try:
+                from soundboard.ui.chatguide import DISCORD_EXES
+                names = {n for _p, n in appaudio._process_table().values()}
+                if names & set(DISCORD_EXES):
+                    sig = discordcfg.signature()
+                    found = None if sig == last else discordcfg.read()
+            except Exception:  # noqa: BLE001 - a check that can't run shows nothing
+                log.debug("reading Discord's settings failed", exc_info=True)
+            self.bridge.discord.emit((found, sig))
+        threading.Thread(target=run, daemon=True, name="discord-settings").start()
+
+    def _on_discord(self, res):
+        found, sig = res
+        self._discord_reading = False
+        self._discord_sig = sig
+        if found is None:   # unchanged
+            return
+        before = self.discord_problems()
+        self.discord_found = found
+        now = self.discord_problems()
+        if now != before:
+            log.info("Discord settings: %s", now or "fine")
+            self._show_urgent()
 
     def _show_urgent(self):
         now = self._urgent_now()
@@ -5230,6 +5311,10 @@ class MainWindow(QMainWindow):
     def _urgent_clicked(self):
         now = self._urgent_now()
         if now is None:
+            return
+        if now[0].startswith("discord"):
+            self.show_chat_guide("discord")
+            self._show_urgent()   # fixed meanwhile, or still to do
             return
         if now[0].startswith("board"):
             if self._update_file is not None:
