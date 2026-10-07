@@ -40,7 +40,8 @@ def test_off_hides_the_tab_and_on_builds_it_again(window):
         assert isinstance(getattr(w, key), cls) and w.tabs.isTabVisible(i)
         page = w.radio_page if key == "radio" else getattr(w, key)
         assert w.tabs.widget(i) is page
-        assert w.tabs.tabToolTip(i).endswith(main.TABS[i][1])
+        # no description on hover: just the name, and only while the tab is icon-only
+        assert w.tabs.tabToolTip(i) in ("", main.TABS[i][0])
     assert w.cfg.tabs_off == []
     assert w.engine.voice_chain is w.voice.chain
 

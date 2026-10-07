@@ -527,7 +527,6 @@ class RadioTab(QWidget):
         # ---- control bar: play, random, star | live ... record, last 15 s | volume | hear
         bar_, bh = bar()
         self.btn_play = QPushButton("Play")
-        self.btn_play.setToolTip("Play the selected station / stop the radio")
         icons.set_icon(self.btn_play, "play")
         self.btn_play.clicked.connect(self.toggle_play)
         bh.addWidget(self.btn_play)
@@ -589,7 +588,6 @@ class RadioTab(QWidget):
         self._vol_group = (sep2, vol_icon, self.vol)
         self._play_short = False
         self.chk_hear = QCheckBox("Hear it myself")
-        self.chk_hear.setToolTip("Also play the radio into your headphones")
         self.chk_hear.toggled.connect(self._on_hear)
         bh.addWidget(self.chk_hear)
         v.addWidget(bar_)
@@ -661,9 +659,6 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
             self._mode.addButton(b)
             sh.addWidget(b, 1)
         self.btn_popular.setChecked(True)
-        self.btn_popular.setToolTip("The most listened-to stations right now")
-        self.btn_favs.setToolTip("Stations you starred")
-        self.btn_recent.setToolTip("Stations you played lately")
         self._mode.buttonClicked.connect(lambda _b: self._show_list())
         self.seg_box = seg
         v.addWidget(seg)
@@ -692,7 +687,6 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
         fv.setContentsMargins(0, 0, 0, 0)
         fv.setSpacing(8)
         self.cmb_country = QComboBox()
-        self.cmb_country.setToolTip("Only stations from this country")
         self.cmb_country.setSizeAdjustPolicy(QComboBox.AdjustToMinimumContentsLengthWithIcon)
         self.cmb_country.setMinimumContentsLength(8)
         self.cmb_country.addItem("All countries", "")
@@ -704,7 +698,6 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
             self.cmb_quality.addItem(label, kbps)
         self.cmb_quality.activated.connect(lambda _i: self._on_filter())
         self.cmb_sort = QComboBox()
-        self.cmb_sort.setToolTip("Sort the list")
         for label, _key in SORTS:
             self.cmb_sort.addItem(label)
         self.cmb_sort.activated.connect(lambda _i: self._show_list())

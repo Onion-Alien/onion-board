@@ -54,7 +54,6 @@ class ClipShelf(QWidget):
         self.btn_add = QPushButton(_("Add to Sounds"))
         self.btn_add.setObjectName("small")
         icons.set_icon(self.btn_add, "sounds", size=13)
-        self.btn_add.setToolTip(_("Make the picked clips sounds on the Sounds tab"))
         self.btn_add.clicked.connect(self.add_picked)
         head.addWidget(self.btn_add)
         v.addLayout(head)

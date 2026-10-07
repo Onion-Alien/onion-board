@@ -268,7 +268,6 @@ class AppRow(HoverCard):
         v.addLayout(top)
         self.meter = meter_cls()
         self.meter.setMinimumWidth(60)
-        self.meter.setToolTip(_("What the program is playing"))
         v.addWidget(self.meter)
         buttons = QHBoxLayout()
         buttons.setSpacing(6)

@@ -313,7 +313,6 @@ class SpeedPitchButton(QPushButton):
             b = QPushButton(f"{s:g}x")
             b.setObjectName("small")
             b.setCursor(Qt.PointingHandCursor)
-            b.setToolTip(_("Play at {s:g}x speed", s=s))
             b.clicked.connect(lambda __=False, s=s: self.speed.set_value(s) or self._edited())
             q.addWidget(b)
         return q

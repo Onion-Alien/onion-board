@@ -398,10 +398,11 @@ def test_speed_popup_shrinks_back_when_redline_locks(window, qapp):
 def test_every_tab_has_its_own_label(window):
     texts = [window.tabs.tabText(i) for i in range(window.tabs.count())]
     assert texts == [t for t, _ in main.TABS] and len(set(texts)) == len(texts)
+    assert window.tabs.tabToolTip(2) == ""   # the name says it: no hover tip
     window._tab_icons_only(True)
-    assert window.tabs.tabText(1) == "" and window.tabs.tabToolTip(1).startswith("Radio")
+    assert window.tabs.tabText(1) == "" and window.tabs.tabToolTip(1) == "Radio"
     window._tab_icons_only(False)
-    assert window.tabs.tabText(2) == "Apps"
+    assert window.tabs.tabText(2) == "Apps" and window.tabs.tabToolTip(2) == ""
 
 
 def test_sounds_tab_lights_up_while_a_sound_plays(window, monkeypatch):

@@ -103,7 +103,7 @@ def set_tab_live(tabs: QTabWidget, index: int, on: bool, tip: str = "",
     if base is None:
         base = tabs.tabToolTip(index)
         tabs.setProperty(f"_tip{index}", base)
-    tabs.setTabToolTip(index, f"{tip}\n{base}" if on and tip else base)
+    tabs.setTabToolTip(index, "\n".join(filter(None, (tip, base))) if on and tip else base)
     _sync_tint(tabs)
 
 

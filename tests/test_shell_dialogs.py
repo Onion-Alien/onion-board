@@ -58,7 +58,7 @@ def test_live_tab_warning_survives_the_icons_only_tab_bar(qapp, win):
         win._tab_icons_only(compact)
         tip = win.tabs.tabToolTip(vi)
         assert tip.startswith("● ON"), tip
-        assert ("Voice:" in tip) == compact
+        assert tip.endswith("\nVoice") == compact
     set_tab_live(win.tabs, vi, False)
     assert not win.tabs.tabToolTip(vi).startswith("●")   # the right plain tip is back
     other = win.tabs.indexOf(win.setup_page)
