@@ -328,6 +328,7 @@ def test_off_on_cycles_leave_nothing_behind(window, qapp, fake_watch):
     for key in taboff.KEYS:   # once round, so every count below is a settled one
         w.set_tab_on(key, False)
         w.set_tab_on(key, True)
+    w.load_triggers()         # (not watching, it would wait to be shown)
 
     def counts():
         _flush_deletes(qapp)
@@ -355,6 +356,9 @@ def test_off_on_cycles_leave_nothing_behind(window, qapp, fake_watch):
             assert w.engine.voice_chain is (None if key == "voice" else w.voice.chain)
             w.set_tab_on(key, True)
             assert isinstance(getattr(w, key), REAL[key])
+            if key == "triggers":   # not watching: it waits to be shown, or asked for
+                assert w.triggers.pending and w.triggers.panel is None
+                w.load_triggers()
         assert w.engine.voice_chain is w.voice.chain
         assert w.triggers.panel is not None
         assert counts() == before
@@ -397,7 +401,9 @@ def test_off_from_the_start_then_on_and_off_again(qapp, app_dir, monkeypatch, fa
                 assert isinstance(getattr(w, key), cls)
                 assert w.tabs.isTabVisible(main.TAB_INDEX[key])
             assert w.engine.voice_chain is w.voice.chain
-            assert w.triggers.panel is not None   # Onion Watch loaded on the way back
+            assert w.triggers.pending   # not watching: Onion Watch waits to be shown
+            w.load_triggers()
+            assert w.triggers.panel is not None   # ...and loads on the way back
             for key in REAL:
                 w.set_tab_on(key, False)
             assert w.engine.voice_chain is None
