@@ -44,6 +44,7 @@ from pathlib import Path
 from soundboard import library, net, quality
 from soundboard.library import MAX_SECONDS
 from soundboard import errors
+from soundboard.i18n import _
 
 log = logging.getLogger(__name__)
 
@@ -191,10 +192,11 @@ def _over_tor(fn, target: str):
                 raise SwitchedOff(net.off_message(site_feature(target))) from None
             if attempt == TOR_TRIES:
                 site = _site_name(target)
-                raise TorBlocked(
-                    f"{site} turned Tor away ({site} often blocks Tor's addresses), and "
-                    f"so did {TOR_TRIES} other Tor routes. You can try this one without "
-                    f"Tor: {site} would then see your own address.") from e
+                raise TorBlocked(_(
+                    "{site} turned Tor away ({site} often blocks Tor's addresses), and "
+                    "so did {tries} other Tor routes. You can try this one without "
+                    "Tor: {site} would then see your own address.",
+                    site=site, tries=TOR_TRIES)) from e
             log.info("site turned Tor away (%s); new identity, try %d of %d",
                      str(e)[:120], attempt + 1, TOR_TRIES)
             tor.new_identity()
@@ -316,7 +318,7 @@ def _get(url: str, limit: int) -> bytes:
     with net.urlopen(req, timeout=30, feature=UPDATE_FEATURE) as r:
         data = r.read(limit + 1)
     if len(data) > limit:
-        raise DownloadError(f"{url} is unexpectedly large")
+        raise DownloadError(_("{url} is unexpectedly large", url=url))
     return data
 
 
@@ -325,12 +327,14 @@ def _wheel(meta: dict) -> bytes:
     for f in meta.get("urls", ()):
         if f.get("packagetype") == "bdist_wheel" and f["filename"].endswith("-py3-none-any.whl"):
             if not f["url"].startswith(WHEEL_HOST):
-                raise DownloadError(f"unexpected download location for {f['filename']}")
+                raise DownloadError(_("unexpected download location for {file}",
+                                      file=f["filename"]))
             data = _get(f["url"], WHEEL_MAX)
             if hashlib.sha256(data).hexdigest() != f["digests"]["sha256"]:
-                raise DownloadError(f"{f['filename']} failed its checksum")
+                raise DownloadError(_("{file} failed its checksum", file=f["filename"]))
             return data
-    raise DownloadError(f"no wheel for {meta.get('info', {}).get('name')}")
+    raise DownloadError(_("no wheel for {package}",
+                          package=meta.get("info", {}).get("name")))
 
 
 def update(force: bool = False) -> str:
@@ -343,11 +347,11 @@ def update(force: bool = False) -> str:
         meta = json.loads(_get(PYPI.format("yt-dlp"), 5 * 1024 * 1024))
         latest = str(meta["info"]["version"])
     except (ValueError, KeyError, TypeError) as e:
-        raise DownloadError("PyPI sent an answer that couldn't be read") from e
-    current, _ = active_version()
+        raise DownloadError(_("PyPI sent an answer that couldn't be read")) from e
+    current, __ = active_version()
     _save_state(checked=time.time())
     if not force and current and vtuple(latest) <= vtuple(current):
-        return f"yt-dlp {current} is up to date."
+        return _("yt-dlp {version} is up to date.", version=current)
     wheels = [_wheel(meta)]
     pin = next((m.group(1) for r in meta["info"].get("requires_dist") or ()
                 if (m := re.match(r"yt-dlp-ejs\s*==\s*([\w.]+)", r))), None)
@@ -361,7 +365,7 @@ def update(force: bool = False) -> str:
             with zipfile.ZipFile(io.BytesIO(data)) as z:
                 z.extractall(new, [n for n in z.namelist() if n.split("/")[0] in PACKAGES])
         if not (new / "yt_dlp" / "__init__.py").is_file():
-            raise DownloadError("the yt-dlp wheel didn't contain yt_dlp")
+            raise DownloadError(_("the yt-dlp wheel didn't contain yt_dlp"))
         with _lock.exclusive():   # not while a download is using the old copy
             old = root() / f"old-{time.time_ns()}"
             if _pkg_dir().exists():
@@ -371,14 +375,15 @@ def update(force: bool = False) -> str:
             except OSError as e:   # put the copy in use back, or downloads break
                 if old.exists():
                     old.rename(_pkg_dir())
-                raise DownloadError(f"couldn't swap in the new yt-dlp ({errors.plain(e)})") from e
+                raise DownloadError(_("couldn't swap in the new yt-dlp ({error})",
+                                      error=errors.plain(e))) from e
             shutil.rmtree(old, ignore_errors=True)
             _save_state(version=latest)
             _purge()
     finally:
         shutil.rmtree(new, ignore_errors=True)
     log.info("yt-dlp updated to %s", latest)
-    return f"Updated yt-dlp to {latest}."
+    return _("Updated yt-dlp to {version}.", version=latest)
 
 
 def reset() -> str:
@@ -393,12 +398,15 @@ def reset() -> str:
         _purge()
     try:
         update(force=True)
-        return f"Reinstalled yt-dlp {override_version()}."
+        return _("Reinstalled yt-dlp {version}.", version=override_version())
     except Exception as e:  # noqa: BLE001
         log.warning("yt-dlp reinstall failed: %s", e)
         v = bundled_version()
-        return (f"Cleared, but couldn't download a fresh copy ({errors.plain(e)}). "
-                + (f"Using the built-in yt-dlp {v}." if v else "Try again when you're online."))
+        if v:
+            return _("Cleared, but couldn't download a fresh copy ({error}). "
+                     "Using the built-in yt-dlp {version}.", error=errors.plain(e), version=v)
+        return _("Cleared, but couldn't download a fresh copy ({error}). "
+                 "Try again when you're online.", error=errors.plain(e))
 
 
 def due(every: float = CHECK_EVERY) -> bool:
@@ -480,12 +488,13 @@ def download_audio(url: str, dest: Path | None = None,
         if (isinstance(e, TorBlocked) or not auto_update or not due(RETRY_CHECK_AFTER)
                 or not net.allowed(UPDATE_FEATURE)):
             raise
+        before = override_version()
         try:
             msg = update()
         except Exception as ue:  # noqa: BLE001
             log.info("yt-dlp update after a failed download didn't work: %s", ue)
             raise e from None
-        if msg.startswith("Updated"):
+        if override_version() != before:   # a newer copy came in (not "up to date")
             log.info("%s Retrying %s", msg, url)
             return fetch()
         raise
@@ -508,7 +517,7 @@ def probe(url: str, direct: bool = False) -> tuple[str, float]:
             except Exception as e:  # noqa: BLE001 - yt-dlp raises many kinds; show its message
                 raise _readable(e) from e
     info = look() if direct else _over_tor(look, url)
-    return clean_title(info.get("title") or "") or "Sound", float(info.get("duration") or 0)
+    return clean_title(info.get("title") or "") or _("Sound"), float(info.get("duration") or 0)
 
 
 # The sites search() can look things up on: key -> (button name, what it searches).
@@ -609,12 +618,13 @@ def _myinstants(query: str, count: int, direct: bool = False) -> list[Result]:
     except net.FeatureOff as e:
         raise SwitchedOff(str(e)) from None
     except Exception as e:  # noqa: BLE001 - offline, blocked…: show why
-        raise FetchError(f"Myinstants didn't answer ({errors.plain(e)})") from e
+        raise FetchError(_("Myinstants didn't answer ({error})",
+                           error=errors.plain(e))) from e
     out = []
     for m in re.finditer(r"onclick=\"play\('(/media/sounds/[^']+?\.mp3)'.*?"
                          r'class="instant-link[^"]*">([^<]+)</a>', page, re.S):
         path, title = m.group(1), html.unescape(m.group(2)).strip()
-        out.append(Result(path.rsplit("/", 1)[-1], title or "Sound", "Myinstants", 0,
+        out.append(Result(path.rsplit("/", 1)[-1], title or _("Sound"), "Myinstants", 0,
                           "myinstants", MYINSTANTS + path))
         if len(out) >= count:
             break
@@ -638,7 +648,7 @@ def _soundcloud_hit(e: dict) -> Result | None:
     art = next((str(t.get("url")) for t in reversed(e.get("thumbnails") or ())
                 if t.get("url")), "")
     art = re.sub(r"-(mini|tiny|small|badge|t\d+x\d+|large)\.(jpg|png)$", r"-t300x300.\2", art)
-    return Result(str(e.get("id") or link), str(e.get("title") or "Track"),
+    return Result(str(e.get("id") or link), str(e.get("title") or _("Track")),
                   str(e.get("uploader") or ""), float(e.get("duration") or 0),
                   "soundcloud", link, art, _count(e.get("view_count")),
                   _count(e.get("like_count")), _count(e.get("comment_count")))
@@ -659,8 +669,8 @@ def _ydl():
         try:
             import yt_dlp
         except ImportError as e:
-            raise FetchError("The downloader (yt-dlp) isn't installed — "
-                             "Settings → Updates → Reset downloader.") from e
+            raise FetchError(_("The downloader (yt-dlp) isn't installed — "
+                               "Settings → Updates → Reset downloader.")) from e
         yield yt_dlp
 
 
@@ -688,7 +698,7 @@ def _direct_leaf(url: str) -> str:
 
 def _direct_title(url: str) -> str:
     stem = _direct_leaf(url).rsplit(".", 1)[0]
-    return re.sub(r"[-_]+", " ", stem).strip().capitalize() or "Sound"
+    return re.sub(r"[-_]+", " ", stem).strip().capitalize() or _("Sound")
 
 
 def _download_direct(url, dest, progress, direct: bool = False) -> tuple[Path, str]:
@@ -699,13 +709,13 @@ def _download_direct(url, dest, progress, direct: bool = False) -> tuple[Path, s
     # out of our folder (Windows resolves `\..` inside the name)
     if (parts.netloc != urllib.parse.urlsplit(MYINSTANTS).netloc or parts.query
             or parts.fragment or not leaf.lower().endswith(".mp3")):
-        raise DownloadError("That isn't a Myinstants sound link.")
+        raise DownloadError(_("That isn't a Myinstants sound link."))
     tmp = Path(dest) if dest else Path(tempfile.mkdtemp(prefix="sb-ytdl-"))
     path = tmp / leaf
     if path.resolve().parent != tmp.resolve():
         if not dest:
             shutil.rmtree(tmp, ignore_errors=True)
-        raise DownloadError("That isn't a Myinstants sound link.")
+        raise DownloadError(_("That isn't a Myinstants sound link."))
     try:
         req = urllib.request.Request(url, headers=BROWSER_HEADERS)
         with (net.urlopen(req, timeout=30, feature=f"{FEATURE}.myinstants",
@@ -715,7 +725,7 @@ def _download_direct(url, dest, progress, direct: bool = False) -> tuple[Path, s
             while chunk := r.read(64 * 1024):
                 got += len(chunk)
                 if got > MAX_BYTES:
-                    raise DownloadError(f"It's over {MAX_BYTES // 2**20} MB.")
+                    raise DownloadError(_("It's over {mb} MB.", mb=MAX_BYTES // 2**20))
                 f.write(chunk)
                 if progress and total:
                     progress(min(got / total, 1.0))
@@ -730,16 +740,16 @@ def _download_direct(url, dest, progress, direct: bool = False) -> tuple[Path, s
     except Exception as e:  # noqa: BLE001 - network: show why
         if not dest:
             shutil.rmtree(tmp, ignore_errors=True)
-        raise DownloadError(f"Download failed ({errors.plain(e)})") from e
+        raise DownloadError(_("Download failed ({error})", error=errors.plain(e))) from e
     return path, _direct_title(url)
 
 
 def _check(info: dict) -> dict:
     """Refuse what isn't one sound."""
     if info.get("_type") == "playlist":
-        raise DownloadError("That's a playlist — open one video and try again.")
+        raise DownloadError(_("That's a playlist — open one video and try again."))
     if info.get("is_live"):
-        raise DownloadError("Can't add a live stream — use Record instead.")
+        raise DownloadError(_("Can't add a live stream — use Record instead."))
     return info
 
 
@@ -835,7 +845,7 @@ def _run(yt_dlp, url: str, dest: Path, progress, feature: str = FEATURE,
         found = [p for p in dest.iterdir() if p.is_file() and not p.name.endswith(".part")
                  and p.suffix.lower() not in IMAGE_EXTS]
         if not found:
-            raise DownloadError("Nothing was downloaded (the file may be over "
-                                f"{MAX_BYTES // 2**20} MB).")
+            raise DownloadError(_("Nothing was downloaded (the file may be over {mb} MB).",
+                                  mb=MAX_BYTES // 2**20))
         path = found[0]
     return path, clean_title(info.get("title") or path.stem)

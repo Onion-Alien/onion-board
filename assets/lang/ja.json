@@ -951,7 +951,7 @@
     "",
     ""
   ],
-  "Found a bug, missing something, or just want to say hi? It opens in your browser, and nothing is sent unless you submit it there.": "",
+  "The Discord is where to chat, ask for help and hear about new versions. Found a bug or missing something? Everything opens in your browser, and nothing is sent unless you submit it there.": "Discord では雑談したり、助けを求めたり、新しいバージョンの情報を受け取れます。バグを見つけた、または何か足りない？すべてブラウザーで開き、そこで送信しない限り何も送られません。",
   "Free add-ons from GitHub. Removing or reinstalling one keeps your triggers and paired phones.": "",
   "Free, with no ads and no account. Made by OnionAlien. MIT license with the Commons Clause: use it for anything, share it for free, never sell it.": "",
   "Frequencies": "",
@@ -993,7 +993,7 @@
   "How loud the stream output is (only OBS hears it)": "",
   "How much data went to each site, added up over the whole history": "",
   "I'm bored…": "",
-  "Ideas, bugs, or just want to say hi? The feedback form needs no account. Found a security problem? Report it privately on GitHub, not in a public issue.": "",
+  "The Discord is where to chat, ask for help and hear about new versions. The feedback form needs no account. Found a security problem? Report it privately on GitHub, not in a public issue.": "Discord では雑談したり、助けを求めたり、新しいバージョンの情報を受け取れます。フィードバックフォームにアカウントは不要です。セキュリティの問題を見つけたら、公開の issue ではなく GitHub で非公開で報告してください。",
   "If one doesn't connect, try the other": "",
   "Important fix in Onion Board {version}: {fix}": "",
   "Important fix in Onion Watch {version}: {fix}": "",
@@ -1730,5 +1730,8 @@
   "⟲  Restart my PC now": "",
   "⟳  Check again": "",
   "⬇  Install it now (free)": "",
-  "⬇  Try installing again": ""
+  "⬇  Try installing again": "",
+  "Join the Discord": "Discord に参加",
+  "Chat about it on Discord": "Discord で話そう",
+  "The Onion Board Discord server, in your browser": "Onion Board の Discord サーバー（ブラウザーで開きます）"
 }

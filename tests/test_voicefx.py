@@ -486,3 +486,25 @@ def test_every_preset_runs_and_reports_its_delay():
             assert np.all(np.isfinite(y))
         assert not ch.errors, name
         assert 0 <= ch.latency() < 0.1, name
+
+
+def test_every_built_in_text_can_be_translated():
+    """The built-in effects' names, descriptions, settings and slider ends and the voices'
+    names all have a line in voicefx.builtin.shown_texts(): the Voice tab translates
+    through it, while the English stays what settings and share codes keep."""
+    from soundboard import i18n
+    from soundboard.voicefx import builtin
+    table = builtin.shown_texts()
+    builtins = [c for c in REGISTRY.values() if c.__module__ == builtin.__name__]
+    texts = {t for c in builtins for t in (c.name, c.description)}
+    texts |= {t for c in builtins for q in c.params for t in (q.label, *q.ends) if t}
+    texts |= set(voicefx.PRESETS)
+    assert texts <= set(table), sorted(texts - set(table))
+    assert all(k == v for k, v in table.items())      # English: as written
+    try:
+        i18n.set_language(i18n.PSEUDO)
+        assert i18n.is_pseudo(voicefx.shown("Chipmunk"))
+        assert voicefx.shown("an add-on's own text") == "an add-on's own text"
+    finally:
+        i18n.set_language(i18n.ENGLISH)
+    assert voicefx.shown("Chipmunk") == "Chipmunk"

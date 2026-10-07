@@ -16,15 +16,19 @@ from PySide6.QtWidgets import (QCheckBox, QComboBox, QGridLayout, QHBoxLayout, Q
 
 from soundboard import aiaddon, applog, errors
 from soundboard import modules as mods
+from soundboard.i18n import _
 from soundboard.speech import aivoice
 from soundboard.speech import aivoicelist as avl
 from soundboard.ui import busy, icons
 from soundboard.ui.panel import hint_label, section_label
 from soundboard.wheelguard import no_wheel
 
-IDLE = "Pick a voice, press Start, then just talk."
-BACKUP_LABELS = [("A built-in voice (still hides yours)", "voice"),
-                 ("My real voice", "mic"), ("Silence", "mute")]
+IDLE = _("Pick a voice, press Start, then just talk.")
+BACKUP_LABELS = [(_("A built-in voice (still hides yours)"), "voice"),
+                 (_("My real voice"), "mic"), (_("Silence"), "mute")]
+# what others hear once the AI voice has stopped, by backup key ("Others now hear …")
+BACKUP_HEARD = {"voice": _("a built-in voice (still hides yours)"),
+                "mic": _("my real voice"), "mute": _("silence")}
 
 
 def read_voices(module: mods.ModuleInfo | None,
@@ -80,12 +84,12 @@ class AiVoicePanel(QWidget):
         v = QVBoxLayout(self)
         v.setContentsMargins(0, 0, 0, 0)
         v.setSpacing(12)
-        self.title = section_label("AI VOICES")
+        self.title = section_label(_("AI VOICES"))
         v.addWidget(self.title)
-        v.addWidget(hint_label("Talk, and others hear a different person: your words and "
-                               "tone, another voice, live. It runs on this PC (about one CPU "
-                               "core while you talk, nothing while you're quiet); what you "
-                               "say never leaves it."))
+        v.addWidget(hint_label(_("Talk, and others hear a different person: your words and "
+                                 "tone, another voice, live. It runs on this PC (about one "
+                                 "CPU core while you talk, nothing while you're quiet); what "
+                                 "you say never leaves it.")))
 
         self.ready_box = QWidget()
         rv = QVBoxLayout(self.ready_box)
@@ -94,32 +98,32 @@ class AiVoicePanel(QWidget):
         grid = QGridLayout()
         grid.setHorizontalSpacing(12)
         grid.setVerticalSpacing(10)
-        grid.addWidget(QLabel("Voice"), 0, 0)
+        grid.addWidget(QLabel(_("Voice")), 0, 0)
         vrow = QHBoxLayout()
         self.cb_voice = QComboBox()
-        self.cb_voice.setToolTip("The character you sound like")
+        self.cb_voice.setToolTip(_("The character you sound like"))
         vrow.addWidget(self.cb_voice, 1)
-        self.b_all = QPushButton("All voices")
+        self.b_all = QPushButton(_("All voices"))
         icons.set_icon(self.b_all, "sounds")
-        self.b_all.setToolTip("Every voice with what it sounds like, a sample to hear, "
-                              "and making your own")
+        self.b_all.setToolTip(_("Every voice with what it sounds like, a sample to hear, "
+                                "and making your own"))
         self.b_all.clicked.connect(self.open_browser)
         vrow.addWidget(self.b_all)
         grid.addLayout(vrow, 0, 1)
         self.lbl_about = hint_label("")
         grid.addWidget(self.lbl_about, 1, 1)
-        grid.addWidget(QLabel("Pitch"), 2, 0)
+        grid.addWidget(QLabel(_("Pitch")), 2, 0)
         prow = QHBoxLayout()
-        self.chk_auto = QCheckBox("Match the voice")
-        self.chk_auto.setToolTip("Moves your pitch to where this voice naturally sits, "
-                                 "whoever is talking. Off: your own pitch.")
+        self.chk_auto = QCheckBox(_("Match the voice"))
+        self.chk_auto.setToolTip(_("Moves your pitch to where this voice naturally sits, "
+                                   "whoever is talking. Off: your own pitch."))
         self.chk_auto.setChecked(self.s["auto_pitch"])
         prow.addWidget(self.chk_auto)
         self.sl_pitch = QSlider(Qt.Horizontal)
         self.sl_pitch.setRange(-24, 24)            # half semitones
         self.sl_pitch.setValue(int(round(self.s["pitch"] * 2)))
         self.sl_pitch.setMinimumHeight(28)
-        self.sl_pitch.setToolTip("Higher or lower than that, in semitones")
+        self.sl_pitch.setToolTip(_("Higher or lower than that, in semitones"))
         prow.addWidget(self.sl_pitch, 1)
         self.lbl_pitch = QLabel("")
         self.lbl_pitch.setMinimumWidth(48)
@@ -127,7 +131,7 @@ class AiVoicePanel(QWidget):
         grid.addLayout(prow, 2, 1)
         grid.setColumnStretch(1, 1)
         rv.addLayout(grid)
-        self.b_start = QPushButton("Start the AI voice")
+        self.b_start = QPushButton(_("Start the AI voice"))
         icons.set_icon(self.b_start, "mic", "on_accent", "on_accent")
         self.b_start.setCheckable(True)
         self.b_start.setMinimumHeight(40)
@@ -148,15 +152,15 @@ class AiVoicePanel(QWidget):
         self.lbl_missing = hint_label("")
         mv.addWidget(self.lbl_missing)
         mrow = QHBoxLayout()
-        self.b_install = QPushButton("Install AI voices")
+        self.b_install = QPushButton(_("Install AI voices"))
         icons.set_icon(self.b_install, "plus")
-        self.b_install.setToolTip("One-time download, about 90 MB. Needs Python 3.12+.")
+        self.b_install.setToolTip(_("One-time download, about 90 MB. Needs Python 3.12+."))
         self.b_install.clicked.connect(self._install)
         mrow.addWidget(self.b_install)
-        self.b_get = QPushButton("Get AI voices")
+        self.b_get = QPushButton(_("Get AI voices"))
         icons.set_icon(self.b_get, "plus")
-        self.b_get.setToolTip("An optional add-on: about 55 MB, from this project's GitHub "
-                              "page. Needs Python 3.12+ from python.org.")
+        self.b_get.setToolTip(_("An optional add-on: about 55 MB, from this project's GitHub "
+                                "page. Needs Python 3.12+ from python.org."))
         self.b_get.clicked.connect(self._get)
         mrow.addWidget(self.b_get)
         mrow.addStretch(1)
@@ -166,7 +170,7 @@ class AiVoicePanel(QWidget):
         self.lbl_install.hide()
         v.addWidget(self.lbl_install)
 
-        self.btn_opts = QPushButton("More options")
+        self.btn_opts = QPushButton(_("More options"))
         self.btn_opts.setObjectName("fold")
         icons.set_icon(self.btn_opts, "fold", "muted", "text", size=12)
         self.btn_opts.setCheckable(True)
@@ -176,25 +180,25 @@ class AiVoicePanel(QWidget):
         ov.setContentsMargins(0, 0, 0, 0)
         ov.setSpacing(10)
         brow = QHBoxLayout()
-        brow.addWidget(QLabel("If the AI voice stops"))
+        brow.addWidget(QLabel(_("If the AI voice stops")))
         self.cb_backup = QComboBox()
         for label, key in BACKUP_LABELS:
             self.cb_backup.addItem(label, key)
         self.cb_backup.setCurrentIndex(max(0, self.cb_backup.findData(self.s["backup"])))
-        self.cb_backup.setToolTip("What others hear if the AI voice crashes or can't keep "
-                                  "up: by default a built-in voice changer preset, so your "
-                                  "real voice still isn't heard.")
+        self.cb_backup.setToolTip(_("What others hear if the AI voice crashes or can't keep "
+                                    "up: by default a built-in voice changer preset, so your "
+                                    "real voice still isn't heard."))
         brow.addWidget(self.cb_backup, 1)
         ov.addLayout(brow)
-        self.b_update = QPushButton("Update AI voices")
-        self.b_update.setToolTip("Runs its install again (and fetches the voice model if "
-                                 "it's missing). Needs Python 3.12+.")
+        self.b_update = QPushButton(_("Update AI voices"))
+        self.b_update.setToolTip(_("Runs its install again (and fetches the voice model if "
+                                   "it's missing). Needs Python 3.12+."))
         self.b_update.clicked.connect(self._install)
         urow = QHBoxLayout()
         urow.addWidget(self.b_update)
-        self.b_remove = QPushButton("Remove AI voices")
-        self.b_remove.setToolTip("Deletes the add-on, its voice model and its Python "
-                                 "environment from this PC. Get it again any time.")
+        self.b_remove = QPushButton(_("Remove AI voices"))
+        self.b_remove.setToolTip(_("Deletes the add-on, its voice model and its Python "
+                                   "environment from this PC. Get it again any time."))
         self.b_remove.clicked.connect(self._remove)
         urow.addWidget(self.b_remove)
         urow.addStretch(1)
@@ -247,13 +251,13 @@ class AiVoicePanel(QWidget):
         if m is None:
             self.opts.hide()
             self.btn_opts.setChecked(False)
-            self.lbl_missing.setText(
+            self.lbl_missing.setText(_(
                 "AI voices are an optional add-on (about 55 MB, the voice model and its "
-                "runtime). Nothing is downloaded until you press Get AI voices.")
+                "runtime). Nothing is downloaded until you press Get AI voices."))
         elif not ok:
-            self.lbl_missing.setText("AI voices need a one-time install first: about 90 MB "
-                                     "(the voice model and its runtime). Needs Python 3.12+ "
-                                     "from python.org.")
+            self.lbl_missing.setText(_("AI voices need a one-time install first: about 90 MB "
+                                       "(the voice model and its runtime). Needs Python 3.12+ "
+                                       "from python.org."))
             self.lbl_missing.setToolTip(str(m.path))
 
     # ------------------------------------------------------------ settings
@@ -301,13 +305,13 @@ class AiVoicePanel(QWidget):
             max(0, self.cb_voice.findData(vid))))
         d.exec()
 
-    def _voice_picked(self, *_):
+    def _voice_picked(self, *__):
         self.s["voice"] = self.cb_voice.currentData() or ""
         self._show_about()
         if self.ctl.running:
             self.ctl.set_voice(self.s["voice"], self.s["pitch"])
             self._voice_name = self._voice().get("name", "")
-            self.lbl_state.setText(f"● switching to {self._voice_name}…")
+            self.lbl_state.setText(_("● switching to {voice}…", voice=self._voice_name))
         self._emit()
 
     def _auto_toggled(self, on: bool):
@@ -357,7 +361,7 @@ class AiVoicePanel(QWidget):
                 self._set_ui(False, f"⚠ {errors.plain(e)}")
                 return
             self._voice_name = self._voice().get("name", "")
-            self._set_ui(True, "starting… (a built-in voice covers you until it's ready)")
+            self._set_ui(True, _("starting… (a built-in voice covers you until it's ready)"))
         elif not on and self.ctl.running:
             self.ctl.stop()
             self._set_ui(False, IDLE)
@@ -366,7 +370,7 @@ class AiVoicePanel(QWidget):
         self.b_start.blockSignals(True)
         self.b_start.setChecked(on)
         self.b_start.blockSignals(False)
-        self.b_start.setText("Stop the AI voice" if on else "Start the AI voice")
+        self.b_start.setText(_("Stop the AI voice") if on else _("Start the AI voice"))
         self.b_update.setEnabled(not on and not self._installing)
         self.lbl_state.setText(state)
         self.live_changed.emit(on)
@@ -377,23 +381,29 @@ class AiVoicePanel(QWidget):
         if t == "status":
             self.lbl_state.setText(text)
         elif t == "ready":
-            msg = f"● you sound like {self._voice_name or 'the voice'}"
+            msg = (_("● you sound like {voice}", voice=self._voice_name) if self._voice_name
+                   else _("● you sound like the voice"))
             if ev.get("slow"):
-                msg += (" ⚠ This PC is slow for AI voices: games may stutter. A voice "
-                        "changer preset (left) is much lighter.")
+                msg += " " + _("⚠ This PC is slow for AI voices: games may stutter. A voice "
+                               "changer preset (left) is much lighter.")
             self.lbl_state.setText(msg)
         elif t == "stats":
+            cpu, ms = f"{float(ev.get('cpu', 0)):.0f}", f"{aivoice.LATENCY_S * 1000:.0f}"
             self.lbl_state.setText(
-                f"● you sound like {self._voice_name or 'the voice'} · CPU "
-                f"{float(ev.get('cpu', 0)):.0f}% · about "
-                f"{aivoice.LATENCY_S * 1000:.0f} ms behind you")
+                _("● you sound like {voice} · CPU {cpu}% · about {ms} ms behind you",
+                  voice=self._voice_name, cpu=cpu, ms=ms) if self._voice_name else
+                _("● you sound like the voice · CPU {cpu}% · about {ms} ms behind you",
+                  cpu=cpu, ms=ms))
         elif t == "error":
             self.lbl_state.setText(f"⚠ {text}")
         elif t == "stopped" and self.ctl.running:
-            backup = self.cb_backup.currentText().lower()
-            self.lbl_state.setText(f"⚠ The AI voice stopped{': ' + text if text else ''}. "
-                                   f"Others now hear {backup}. Press Stop, then Start to "
-                                   "try again.")
+            backup = BACKUP_HEARD.get(self.cb_backup.currentData() or "voice",
+                                      BACKUP_HEARD["voice"])
+            self.lbl_state.setText(
+                _("⚠ The AI voice stopped: {error}. Others now hear {backup}. Press Stop, "
+                  "then Start to try again.", error=text, backup=backup) if text else
+                _("⚠ The AI voice stopped. Others now hear {backup}. Press Stop, then Start "
+                  "to try again.", backup=backup))
 
     # ------------------------------------------------------------ get / remove
     def _get(self):
@@ -401,22 +411,24 @@ class AiVoicePanel(QWidget):
             return
         self._installing = True
         self.b_get.setEnabled(False)
-        self.b_get.setText("Getting AI voices…")
+        self.b_get.setText(_("Getting AI voices…"))
         self.lbl_install.show()
-        self.lbl_install.setText("asking GitHub for the add-on…")
+        self.lbl_install.setText(_("asking GitHub for the add-on…"))
 
         def progress(done: int, total: int):
             if total:
-                busy.emit(self._install_line, f"downloading: {done * 100 // total} % of "
-                                              f"{total / 1e6:.0f} MB")
+                busy.emit(self._install_line, _("downloading: {percent} % of {size} MB",
+                                                percent=done * 100 // total,
+                                                size=f"{total / 1e6:.0f}"))
 
         def work():
             try:
                 offer = aiaddon.latest()
                 if offer is None:
-                    raise mods.ModuleError("there's no AI voices add-on to download yet")
+                    raise mods.ModuleError(_("there's no AI voices add-on to download yet"))
                 info = aiaddon.install(aiaddon.fetch(offer, progress))
-                busy.emit(self._install_line, "setting up its Python environment (a few minutes)…")
+                busy.emit(self._install_line,
+                          _("setting up its Python environment (a few minutes)…"))
                 ok = mods.install(info, lambda line: busy.emit(self._install_line, line))
                 busy.emit(self._install_done, ok, "")
             except Exception as e:  # noqa: BLE001 - the button must come back
@@ -436,9 +448,9 @@ class AiVoicePanel(QWidget):
 
         def done(_r=None):
             self.modules_changed.emit()
-            busy.toast(self, "AI voices are removed.", "ok")
+            busy.toast(self, _("AI voices are removed."), "ok")
 
-        busy.run_busy(self.b_remove, "Removing…", go, done)
+        busy.run_busy(self.b_remove, _("Removing…"), go, done)
 
     # ------------------------------------------------------------ install
     def _install(self):
@@ -448,9 +460,9 @@ class AiVoicePanel(QWidget):
         self._installing = True
         for b in (self.b_install, self.b_update, self.b_start):
             b.setEnabled(False)
-        self.b_install.setText("Installing… (a few minutes)")
+        self.b_install.setText(_("Installing… (a few minutes)"))
         self.lbl_install.show()
-        self.lbl_install.setText("starting…")
+        self.lbl_install.setText(_("starting…"))
 
         def work():
             try:
@@ -466,17 +478,18 @@ class AiVoicePanel(QWidget):
         self._installing = False
         for b in (self.b_install, self.b_update, self.b_start, self.b_get):
             b.setEnabled(True)
-        self.b_install.setText("Install AI voices")
-        self.b_get.setText("Get AI voices")
+        self.b_install.setText(_("Install AI voices"))
+        self.b_get.setText(_("Get AI voices"))
         if ok:
             self.lbl_install.hide()
             self.modules_changed.emit()     # a fresh download is a new module folder
             self._refresh()
-            busy.toast(self, "AI voices are installed. Pick a voice and press Start.", "ok")
+            busy.toast(self, _("AI voices are installed. Pick a voice and press Start."), "ok")
         else:
-            self.lbl_install.setText(f"⚠ Install failed: {err or self.lbl_install.text()}. "
-                                     "Press it again to retry; if it keeps failing, run "
-                                     "install.bat in the add-on's folder to see why.")
+            self.lbl_install.setText(_("⚠ Install failed: {error}. Press it again to retry; "
+                                       "if it keeps failing, run install.bat in the add-on's "
+                                       "folder to see why.",
+                                       error=err or self.lbl_install.text()))
 
     def shutdown(self):
         self.ctl.shutdown()

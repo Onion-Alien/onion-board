@@ -969,7 +969,7 @@
     "",
     ""
   ],
-  "Found a bug, missing something, or just want to say hi? It opens in your browser, and nothing is sent unless you submit it there.": "",
+  "The Discord is where to chat, ask for help and hear about new versions. Found a bug or missing something? Everything opens in your browser, and nothing is sent unless you submit it there.": "Discord पर आप बातें कर सकते हैं, मदद माँग सकते हैं और नए वर्ज़न की खबर पा सकते हैं। कोई बग मिला या कुछ कमी लगी? सब कुछ आपके ब्राउज़र में खुलता है, और जब तक आप वहाँ भेजें नहीं, कुछ नहीं भेजा जाता।",
   "Free add-ons from GitHub. Removing or reinstalling one keeps your triggers and paired phones.": "",
   "Free, with no ads and no account. Made by OnionAlien. MIT license with the Commons Clause: use it for anything, share it for free, never sell it.": "",
   "Frequencies": "",
@@ -1011,7 +1011,7 @@
   "How loud the stream output is (only OBS hears it)": "",
   "How much data went to each site, added up over the whole history": "",
   "I'm bored…": "",
-  "Ideas, bugs, or just want to say hi? The feedback form needs no account. Found a security problem? Report it privately on GitHub, not in a public issue.": "",
+  "The Discord is where to chat, ask for help and hear about new versions. The feedback form needs no account. Found a security problem? Report it privately on GitHub, not in a public issue.": "Discord पर आप बातें कर सकते हैं, मदद माँग सकते हैं और नए वर्ज़न की खबर पा सकते हैं। फ़ीडबैक फ़ॉर्म के लिए अकाउंट की ज़रूरत नहीं। सुरक्षा से जुड़ी कोई दिक्कत मिली? उसे GitHub पर निजी तौर पर बताएँ, किसी सार्वजनिक issue में नहीं।",
   "If one doesn't connect, try the other": "",
   "Important fix in Onion Board {version}: {fix}": "",
   "Important fix in Onion Watch {version}: {fix}": "",
@@ -1748,5 +1748,8 @@
   "⟲  Restart my PC now": "",
   "⟳  Check again": "",
   "⬇  Install it now (free)": "",
-  "⬇  Try installing again": ""
+  "⬇  Try installing again": "",
+  "Join the Discord": "Discord से जुड़ें",
+  "Chat about it on Discord": "Discord पर इसके बारे में बात करें",
+  "The Onion Board Discord server, in your browser": "Onion Board का Discord सर्वर, आपके ब्राउज़र में"
 }

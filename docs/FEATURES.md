@@ -122,9 +122,7 @@ The full list. The [README](../README.md) has the short version and how to get s
   [Radio Browser](https://www.radio-browser.info) directory. Click a dot on the
   world map to tune in (hover one for its country, genres, quality and how popular
   it is; drag to move, scroll to zoom: zoomed in, the cities and towns with stations
-  are named), or search by name, genre, country or city. The
-  map's **HD** button swaps it for a 3D globe you can spin (heavier: it runs a web
-  engine); **2D** on the globe goes back. Star stations for
+  are named), or search by name, genre, country or city. Star stations for
   *★ Favorites*; *Popular* and *Recent* list the most played and the ones you had on. It plays in your headphones, goes out through
   your mic when you press **Send**, and can *Record* or save the *Last 15s* as a pad.
 - **Apps tab:** send one program's sound (a music player, a browser, a video, a

@@ -67,6 +67,7 @@ from pathlib import Path, PurePosixPath
 from soundboard import voicefx
 from soundboard import library, net
 from soundboard import errors
+from soundboard.i18n import _, ngettext
 
 log = logging.getLogger(__name__)
 
@@ -205,9 +206,9 @@ def _package_error(info: ModuleInfo) -> str:
         return f"entry {entry!r} isn't a module of {pkg!r}"
     low, high = PACKAGE_KINDS[info.kind]
     if info.api_version > high:
-        return "it needs a newer Onion Board: update Onion Board first"
+        return _("it needs a newer Onion Board: update Onion Board first")
     if info.api_version < low:
-        return "it's too old for this Onion Board: get its update"
+        return _("it's too old for this Onion Board: get its update")
     return ""
 
 
@@ -264,7 +265,7 @@ def load_effects(infos: list[ModuleInfo]) -> None:
             _LOADED[info.path] = api.effects
             log.info("loaded module %s %s: %s", info.id, info.version, ", ".join(api.effects))
         except Exception as e:  # noqa: BLE001
-            info.error = f"failed to load: {errors.plain(e)}"
+            info.error = _("failed to load: {error}", error=errors.plain(e))
             log.exception("module %s failed to load", info.id)
 
 
@@ -306,19 +307,21 @@ def load_package(info: ModuleInfo):
     from the same folder, at the same version, is reused; a different one needs a
     restart (Python can't swap a package it's running). Raises ModuleError."""
     if info.kind not in PACKAGE_KINDS:
-        raise ModuleError(f"{info.name} isn't an add-on that loads into the app")
+        raise ModuleError(_("{name} isn't an add-on that loads into the app", name=info.name))
     if info.error:
         raise ModuleError(info.error)
     missing = [m for m in info.imports if not _importable(m)]
     if missing:
-        raise ModuleError(f"it needs {', '.join(missing)}, which this Onion Board doesn't have: "
-                          f"update {info.name} or Onion Board")
+        raise ModuleError(_("it needs {modules}, which this Onion Board doesn't have: "
+                            "update {name} or Onion Board",
+                            modules=", ".join(missing), name=info.name))
     pkg_dir = info.path / info.package
     have = sys.modules.get(info.package)
     if have is not None:
         where = Path(getattr(have, "__file__", "") or ".").resolve().parent
         if where != pkg_dir.resolve() or getattr(have, "__version__", None) != info.version:
-            raise ModuleError(f"restart Onion Board to use {info.name} {info.version}")
+            raise ModuleError(_("restart Onion Board to use {name} {version}",
+                                name=info.name, version=info.version))
     else:
         spec = importlib.util.spec_from_file_location(
             info.package, pkg_dir / "__init__.py", submodule_search_locations=[str(pkg_dir)])
@@ -329,13 +332,13 @@ def load_package(info: ModuleInfo):
         except Exception as e:  # noqa: BLE001 - a bad add-on can't stop the app
             _forget(info.package)
             log.exception("module %s failed to load", info.id)
-            raise ModuleError(f"failed to load: {errors.plain(e)}") from e
+            raise ModuleError(_("failed to load: {error}", error=errors.plain(e))) from e
     try:
         entry = importlib.import_module(info.entry)
     except Exception as e:  # noqa: BLE001
         _forget(info.package)
         log.exception("module %s failed to load", info.id)
-        raise ModuleError(f"failed to load: {errors.plain(e)}") from e
+        raise ModuleError(_("failed to load: {error}", error=errors.plain(e))) from e
     if not callable(getattr(entry, "create", None)):
         raise ModuleError(f"{info.entry} has no create()")
     _load_all(info.package, pkg_dir)
@@ -349,19 +352,19 @@ def _check_zip(z: zipfile.ZipFile, module_id: str) -> None:
     links, or is far too big once unpacked."""
     items = z.infolist()
     if not items or len(items) > MAX_ZIP_FILES:
-        raise ModuleError("it isn't an add-on (empty, or far too many files)")
+        raise ModuleError(_("it isn't an add-on (empty, or far too many files)"))
     total = 0
     for i in items:
         n = i.filename
         parts = PurePosixPath(n).parts
         if (not parts or parts[0] != module_id or n.startswith("/") or "\\" in n or ":" in n
                 or ".." in parts):
-            raise ModuleError(f"it holds a file outside its own folder ({n})")
+            raise ModuleError(_("it holds a file outside its own folder ({file})", file=n))
         if stat.S_ISLNK(i.external_attr >> 16):
-            raise ModuleError(f"it holds a link ({n})")
+            raise ModuleError(_("it holds a link ({file})", file=n))
         total += i.file_size
     if total > MAX_ZIP_UNPACKED:
-        raise ModuleError("it would unpack to far more than an add-on")
+        raise ModuleError(_("it would unpack to far more than an add-on"))
 
 
 def install_zip(path: Path, module_id: str, kind: str,
@@ -374,7 +377,8 @@ def install_zip(path: Path, module_id: str, kind: str,
     try:
         z = zipfile.ZipFile(path)
     except (OSError, zipfile.BadZipFile) as e:
-        raise ModuleError(f"it isn't a zip file that can be opened ({errors.plain(e)})") from e
+        raise ModuleError(_("it isn't a zip file that can be opened ({error})",
+                            error=errors.plain(e))) from e
     staging = base.parent / f"modules-new-{uuid.uuid4().hex[:8]}"
     try:
         with z:
@@ -382,16 +386,17 @@ def install_zip(path: Path, module_id: str, kind: str,
             try:
                 d = json.loads(z.read(f"{module_id}/module.json").decode("utf-8-sig"))
             except KeyError as e:
-                raise ModuleError("it has no module.json") from e
+                raise ModuleError(_("it has no module.json")) from e
             except ValueError as e:
-                raise ModuleError(f"its module.json can't be read ({errors.plain(e)})") from e
+                raise ModuleError(_("its module.json can't be read ({error})",
+                                    error=errors.plain(e))) from e
             if not isinstance(d, dict) or d.get("id") != module_id or d.get("kind") != kind:
-                raise ModuleError(f"it isn't the {module_id} add-on")
+                raise ModuleError(_("it isn't the {module} add-on", module=module_id))
             staging.mkdir(parents=True)
             z.extractall(staging)
         info = _read(staging / module_id)
         if info is None or info.error:
-            raise ModuleError(info.error if info is not None else "it has no module.json")
+            raise ModuleError(info.error if info is not None else _("it has no module.json"))
         base.mkdir(parents=True, exist_ok=True)
         dest, old = base / module_id, staging / f"{module_id}.old"
         if dest.exists():
@@ -403,7 +408,7 @@ def install_zip(path: Path, module_id: str, kind: str,
                 os.rename(old, dest)           # put the working copy back
             raise
     except OSError as e:
-        raise ModuleError(f"it couldn't be installed ({errors.plain(e)})") from e
+        raise ModuleError(_("it couldn't be installed ({error})", error=errors.plain(e))) from e
     finally:
         shutil.rmtree(staging, ignore_errors=True)
     info = _read(dest)
@@ -423,7 +428,7 @@ def uninstall(module_id: str, base: Path | None = None) -> None:
     try:
         os.rename(dest, gone)
     except OSError as e:
-        raise ModuleError(f"it couldn't be removed ({errors.plain(e)})") from e
+        raise ModuleError(_("it couldn't be removed ({error})", error=errors.plain(e))) from e
     shutil.rmtree(gone, ignore_errors=True)
     log.info("removed module %s from %s", module_id, dest)
 
@@ -480,7 +485,7 @@ def install(info: ModuleInfo, on_line: Callable[[str], None]) -> bool:
     """Run the module's "install" steps (module.json), streaming their output to
     `on_line`. Blocking: call from a worker thread. Returns True on success."""
     if not info.install_steps:
-        on_line("This add-on has no install steps.")
+        on_line(_("This add-on has no install steps."))
         return False
     if not net.allowed("addons"):
         on_line(net.off_message("addons"))
@@ -490,8 +495,8 @@ def install(info: ModuleInfo, on_line: Callable[[str], None]) -> bool:
                            "add-on")
     py = base_python()
     if py is None:
-        on_line("Python isn't installed. Get it from python.org (tick \"Add python.exe to "
-                "PATH\"), then press Install again.")
+        on_line(_("Python isn't installed. Get it from python.org (tick \"Add python.exe to "
+                  "PATH\"), then press Install again."))
         return False
     for step in info.install_steps:
         argv = [info._fill(a, py) for a in step]
@@ -505,7 +510,7 @@ def install(info: ModuleInfo, on_line: Callable[[str], None]) -> bool:
                                  text=True, encoding="utf-8", errors="replace",
                                  creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0))
         except OSError as e:
-            on_line(f"couldn't run it: {errors.plain(e)}")
+            on_line(_("couldn't run it: {error}", error=errors.plain(e)))
             return False
         # a step that hangs (a stuck download, a prompt nobody sees) is killed, with
         # everything it started: a grandchild still holding the output pipe would
@@ -533,12 +538,15 @@ def install(info: ModuleInfo, on_line: Callable[[str], None]) -> bool:
             if job is not None:
                 job.close()
         if timed_out.is_set():
-            on_line(f"stopped: it took over {INSTALL_STEP_TIMEOUT_S // 60:.0f} minutes. Check "
-                    "your internet connection and press it again.")
+            on_line(ngettext("stopped: it took over {n} minute. Check "
+                             "your internet connection and press it again.",
+                             "stopped: it took over {n} minutes. Check "
+                             "your internet connection and press it again.",
+                             INSTALL_STEP_TIMEOUT_S // 60))
             log.warning("install of %s timed out at: %s", info.id, argv)
             return False
         if p.returncode != 0:
-            on_line(f"failed (exit code {p.returncode})")
+            on_line(_("failed (exit code {code})", code=p.returncode))
             log.warning("install of %s failed at: %s", info.id, argv)
             return False
     log.info("installed module %s", info.id)

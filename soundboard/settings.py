@@ -579,7 +579,7 @@ class SettingsDialog(QDialog):
         hints = {"Classic": _("Changes the whole app instantly."),
                  "Meme": _("For when you want your soundboard to be a bit.")}
         for group, names in theme.GROUPS:
-            card, cv = self._card(group, hints.get(group, ""))
+            card, cv = self._card(theme.group_name(group), hints.get(group, ""))
             cards = []
             for name in names:
                 c = ThemeCard(name)
@@ -1360,13 +1360,15 @@ class SettingsDialog(QDialog):
         from soundboard import __version__, feedback
         from soundboard.updates import REPO
         card, cv = self._card(_("Get in touch"),
-                              _("Ideas, bugs, or just want to say hi? The feedback form needs no "
-                                "account. Found a security problem? Report it privately on "
-                                "GitHub, not in a public issue."))
+                              _("The Discord is where to chat, ask for help and hear about new "
+                                "versions. The feedback form needs no account. Found a security "
+                                "problem? Report it privately on GitHub, not in a public issue."))
         row = _button_row()
-        send = self._link_button(_("Send feedback"), feedback.feedback_url(__version__), "speech")
-        send.setObjectName("primary")
-        row.addWidget(send)
+        discord = self._link_button(_("Join the Discord"), feedback.DISCORD_URL, "speech")
+        discord.setObjectName("primary")
+        row.addWidget(discord)
+        row.addWidget(self._link_button(_("Send feedback"), feedback.feedback_url(__version__),
+                                        "edit"))
         row.addWidget(self._link_button(_("Report a problem"),
                                         feedback.problem_url(__version__)))
         row.addWidget(self._link_button(
@@ -1689,29 +1691,35 @@ class SettingsDialog(QDialog):
 
     # ------------------------------------------------------------------ support
     def _feedback_card(self):
-        """Feedback and bug reports: both open a page in the browser, nothing is sent
-        from the app (feedback.py)."""
+        """The Discord, feedback and bug reports: all open a page in the browser,
+        nothing is sent from the app (feedback.py)."""
         from soundboard import __version__, feedback
         card, cv = self._card(_("Feedback and problems"),
-                              _("Found a bug, missing something, or just want to say hi? It "
-                                "opens in your browser, and nothing is sent unless you submit it "
-                                "there."))
+                              _("The Discord is where to chat, ask for help and hear about new "
+                                "versions. Found a bug or missing something? Everything opens in "
+                                "your browser, and nothing is sent unless you submit it there."))
         row = _button_row()
+        discord = QPushButton(_("Join the Discord"))
+        discord.setObjectName("primary")
+        discord.clicked.connect(lambda: busy.open_url(
+            feedback.DISCORD_URL, discord, opened=_("✓ Opened in your browser"),
+            failed=_("Couldn't open your browser. The page is")))
+        icons.set_icon(discord, "speech")
         send = QPushButton(_("Send feedback"))
-        send.setObjectName("primary")
         send.clicked.connect(lambda: busy.open_url(
             feedback.feedback_url(__version__), send, opened=_("✓ Opened in your browser"),
             failed=_("Couldn't open your browser. The page is")))
-        icons.set_icon(send, "speech")
+        icons.set_icon(send, "edit")
         bug = QPushButton(_("Report a problem on GitHub"))
         bug.setToolTip(_("For people with a GitHub account: opens a new bug report"))
         bug.clicked.connect(lambda: busy.open_url(
             feedback.problem_url(__version__), bug, opened=_("✓ Opened in your browser"),
             failed=_("Couldn't open your browser. The page is")))
+        row.addWidget(discord)
         row.addWidget(send)
         row.addWidget(bug)
         cv.addLayout(row)
-        self.feedback_btn, self.problem_btn = send, bug
+        self.discord_btn, self.feedback_btn, self.problem_btn = discord, send, bug
         return card
 
     def _support_card(self):
@@ -2096,7 +2104,7 @@ class SettingsDialog(QDialog):
             section, sv = self._card(title)
             for key in keys:
                 self.net_boxes[key] = self._option(
-                    sv, labels.get(key, net.FEATURES[key]), self.NET_HINTS[key],
+                    sv, labels.get(key) or net.feature_name(key), self.NET_HINTS[key],
                     key not in cfg.net_off, lambda on, k=key: self._set_feature(k, on))
                 sub = QWidget()
                 sl = QVBoxLayout(sub)
@@ -2280,7 +2288,7 @@ class SettingsDialog(QDialog):
             use_tor.setEnabled(have)
             use_tor.setToolTip(
                 _("The app's own Tor: sites and radio stations don't see your address")
-                if have else tor.NOT_INSTALLED)
+                if have else tor.not_installed())
             if not busy.is_busy(get):
                 get.setText(_("Update Tor") if outdated else _("Get Tor"))
             get_box.setVisible(bool(msg) or busy.is_busy(get) or not have or outdated)
@@ -2288,7 +2296,7 @@ class SettingsDialog(QDialog):
                 _("A newer Tor ({version}) is ready to download.", version=torget.VERSION)
                 if outdated else
                 _("To use Tor, get it first: about 22 MB from the Tor Project, checked "
-                  "before it's used. {blocked_hint}", blocked_hint=torget.BLOCKED_HINT)))
+                  "before it's used. {blocked_hint}", blocked_hint=torget.blocked_hint())))
 
         # ---- proxy
         proxy_box = QWidget()
@@ -2415,7 +2423,7 @@ class SettingsDialog(QDialog):
 
             def finish(msg):
                 relay.deleteLater()
-                ok = msg == tor.NEWNYM_OK
+                ok = msg == tor.newnym_ok()
                 release(_("✓ Changed") if ok else _("✗ Failed"))
                 if qt_valid(tor_state):
                     tor_state.setText(msg)

@@ -122,12 +122,13 @@ def clear(meta: SoundMeta):
     meta.image = ""
 
 
-# the most recently drawn pictures, as loaded (up to ~0.6 MB each): enough for a
-# screen of pads, so a new pad size rescales them without reading the files again.
-# The oldest give way, so a long session doesn't keep every picture it ever showed.
-# Pads draw fitted() copies, so these are only read to make one.
+# the most recently drawn pictures, as loaded (up to ~0.6 MB each): pads draw fitted()
+# copies, so these are only read to make one (a new pad size, the mouse over a pad).
+# A couple of screens' worth, so dragging Pad size doesn't read every file again
+# (~1 ms each); the oldest give way. 48 MB of them sat there for a session that had
+# long since drawn every pad (a 300-sound board, half with pictures).
 MAX_CACHED = 128
-MAX_BYTES = 48 << 20
+MAX_BYTES = 12 << 20
 _pixmaps: OrderedDict[str, QPixmap | None] = OrderedDict()
 _bytes = 0
 
@@ -135,8 +136,8 @@ _bytes = 0
 # drawn on: a pad paints one with a plain copy, where scaling the picture on every paint
 # made scrolling a board of pictures stutter (77 ms a step). A few screens' worth even
 # of the biggest (a 240 px pad on a 200 % screen is ~0.6 MB, a 150 px one at 100 %
-# 50 KB); the oldest give way.
-MAX_FITTED_BYTES = 64 << 20
+# 50 KB); the oldest give way, and a new size of a picture replaces the old size.
+MAX_FITTED_BYTES = 24 << 20
 _fitted: OrderedDict[tuple, QPixmap] = OrderedDict()
 _fitted_bytes = 0
 
@@ -153,7 +154,8 @@ def pixmap(path: str) -> QPixmap | None:
     if path in _pixmaps:
         _pixmaps.move_to_end(path)
         return _pixmaps[path]
-    pm = QPixmap(path)
+    # by way of a QImage: QPixmap(path) also keeps a copy in Qt's own pixmap cache
+    pm = QPixmap.fromImage(QImage(path))
     pm = None if pm.isNull() else pm
     _pixmaps[path] = pm
     _bytes += _size(pm)
@@ -200,6 +202,10 @@ def fitted(path: str, w: int, h: int, dpr: float,
         p.fillPath(corners.subtracted(rounded), Qt.black)
     p.end()
     pm.setDevicePixelRatio(dpr)
+    # the pads are all one size: a new size (Pad size dragged, another screen's
+    # scale) makes the old one of this picture and shade useless
+    for old in [k for k in _fitted if k[0] == path and k[4:] == key[4:] and k != key]:
+        _fitted_bytes -= _size(_fitted.pop(old))
     _fitted[key] = pm
     _fitted_bytes += _size(pm)
     while len(_fitted) > 1 and _fitted_bytes > MAX_FITTED_BYTES:
@@ -213,6 +219,16 @@ def forget(path: str):
     _bytes -= _size(_pixmaps.pop(path, None))
     for key in [k for k in _fitted if k[0] == path]:
         _fitted_bytes -= _size(_fitted.pop(key))
+
+
+def trim():
+    """Let every cached picture go (the window went to the tray: nothing is drawn
+    until it's back, and then a screen of them is made again from the small files in
+    a few ms). UI thread only."""
+    global _bytes, _fitted_bytes
+    _pixmaps.clear()
+    _fitted.clear()
+    _bytes = _fitted_bytes = 0
 
 
 def prune(keep: set[str]):

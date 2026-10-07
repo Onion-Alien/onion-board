@@ -314,6 +314,12 @@ class VoiceSet(SapiTTS):
         self._merge()
         return self.voices
 
+    def use_listing(self, names: list[str], langs: dict[str, str]) -> list[str]:
+        self._load_custom()
+        self.voices = list(super().use_listing(names, langs))
+        self._merge()
+        return self.voices
+
     def refresh(self) -> list[str]:
         self._load_custom()
         self.voices = list(super().refresh())

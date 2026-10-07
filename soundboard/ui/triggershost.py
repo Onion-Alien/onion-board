@@ -24,6 +24,7 @@ from collections.abc import Callable
 from pathlib import Path
 
 from soundboard import library, theme
+from soundboard.i18n import _
 from soundboard.modules import TRIGGERS_API
 
 log = logging.getLogger(__name__)
@@ -68,8 +69,12 @@ class BoardHost:
         """Optional detail for newer trigger cards; keeps the existing host API."""
         meta = self.win.meta(sid)
         if meta is None:
-            return "Sound unavailable"
-        return f"{meta.name}: {meta.volume:.0%} · Hotkey: {meta.hotkey or 'none'}"
+            return _("Sound unavailable")
+        volume = f"{meta.volume:.0%}"
+        if meta.hotkey:
+            return _("{name}: {volume} · Hotkey: {hotkey}", name=meta.name, volume=volume,
+                     hotkey=meta.hotkey)
+        return _("{name}: {volume} · Hotkey: none", name=meta.name, volume=volume)
 
     def sounds(self) -> list[tuple[str, str]]:
         return [(m.id, m.name) for m in self.win.cfg.sounds]

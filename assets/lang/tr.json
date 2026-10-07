@@ -969,7 +969,7 @@
     "",
     ""
   ],
-  "Found a bug, missing something, or just want to say hi? It opens in your browser, and nothing is sent unless you submit it there.": "",
+  "The Discord is where to chat, ask for help and hear about new versions. Found a bug or missing something? Everything opens in your browser, and nothing is sent unless you submit it there.": "Discord'da sohbet edebilir, yardım isteyebilir ve yeni sürümlerden haberdar olabilirsin. Bir hata mı buldun ya da bir şey mi eksik? Her şey tarayıcında açılır ve orada göndermedikçe hiçbir şey gönderilmez.",
   "Free add-ons from GitHub. Removing or reinstalling one keeps your triggers and paired phones.": "",
   "Free, with no ads and no account. Made by OnionAlien. MIT license with the Commons Clause: use it for anything, share it for free, never sell it.": "",
   "Frequencies": "",
@@ -1011,7 +1011,7 @@
   "How loud the stream output is (only OBS hears it)": "",
   "How much data went to each site, added up over the whole history": "",
   "I'm bored…": "",
-  "Ideas, bugs, or just want to say hi? The feedback form needs no account. Found a security problem? Report it privately on GitHub, not in a public issue.": "",
+  "The Discord is where to chat, ask for help and hear about new versions. The feedback form needs no account. Found a security problem? Report it privately on GitHub, not in a public issue.": "Discord'da sohbet edebilir, yardım isteyebilir ve yeni sürümlerden haberdar olabilirsin. Geri bildirim formu için hesap gerekmez. Bir güvenlik sorunu mu buldun? GitHub'da gizli olarak bildir, herkese açık bir issue'da değil.",
   "If one doesn't connect, try the other": "",
   "Important fix in Onion Board {version}: {fix}": "",
   "Important fix in Onion Watch {version}: {fix}": "",
@@ -1748,5 +1748,8 @@
   "⟲  Restart my PC now": "",
   "⟳  Check again": "",
   "⬇  Install it now (free)": "",
-  "⬇  Try installing again": ""
+  "⬇  Try installing again": "",
+  "Join the Discord": "Discord'a katıl",
+  "Chat about it on Discord": "Discord'da konuş",
+  "The Onion Board Discord server, in your browser": "Onion Board Discord sunucusu, tarayıcında"
 }

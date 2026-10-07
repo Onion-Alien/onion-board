@@ -1732,5 +1732,10 @@
   "⟲  Restart my PC now": "",
   "⟳  Check again": "",
   "⬇  Install it now (free)": "",
-  "⬇  Try installing again": ""
+  "⬇  Try installing again": "",
+  "The Discord is where to chat, ask for help and hear about new versions. Found a bug or missing something? Everything opens in your browser, and nothing is sent unless you submit it there.": "Di Discord kamu bisa ngobrol, minta bantuan, dan dapat kabar versi baru. Menemukan bug atau ada yang kurang? Semuanya terbuka di browser-mu, dan tidak ada yang dikirim kecuali kamu mengirimnya di sana.",
+  "The Discord is where to chat, ask for help and hear about new versions. The feedback form needs no account. Found a security problem? Report it privately on GitHub, not in a public issue.": "Di Discord kamu bisa ngobrol, minta bantuan, dan dapat kabar versi baru. Formulir masukan tidak perlu akun. Menemukan masalah keamanan? Laporkan secara pribadi di GitHub, jangan di issue publik.",
+  "Join the Discord": "Gabung ke Discord",
+  "Chat about it on Discord": "Ngobrol soal ini di Discord",
+  "The Onion Board Discord server, in your browser": "Server Discord Onion Board, di browser-mu"
 }

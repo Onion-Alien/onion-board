@@ -20,6 +20,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 
 from soundboard import destination
+from soundboard.i18n import _
 
 
 @dataclass(frozen=True)
@@ -30,6 +31,46 @@ class Profile:
     details: str               # what it does, in plain words (the "What do these do?" box)
     engines: tuple[str, ...]   # destination modes it picks from; () = any (Advanced)
     fallback: str = "off"      # when nothing is detected and the current mode isn't one
+
+    # label / summary / details are the English as stored (the control API sends them);
+    # name / blurb / about are what the UI shows, in the language picked
+    @property
+    def name(self) -> str:
+        return _words().get(self.key, (self.label,))[0]
+
+    @property
+    def blurb(self) -> str:
+        return _words().get(self.key, (None, self.summary))[1]
+
+    @property
+    def about(self) -> str:
+        return _words().get(self.key, (None, None, self.details))[2]
+
+
+def _words() -> dict[str, tuple[str, str, str]]:
+    """{key: (name, summary, details)} in the language picked. A function, not a
+    table: this module can be imported before the language is (app.main)."""
+    return {
+        "game": (_("Game"), _("Voice chat inside a game."), _(
+            "Shapes your sounds for voice chat inside games: mono, the deep bass the chat "
+            "throws away turned into harmonics that get through, and each sound's level "
+            "given back. When it recognises the game's voice chat (Vivox, or Unity's "
+            "Photon and Dissonance) it switches to that by itself; otherwise it keeps the "
+            "last one it used (Vivox at first, the most common). Steam voice, Epic and "
+            "older 8 kHz games: pick them in Advanced.")),
+        "voice": (_("Voice chat"), _("Discord, calls in a browser, Zoom, Teams, TeamSpeak."), _(
+            "Shapes your sounds for a voice chat app: Discord, or a call in a browser, Zoom "
+            "or Teams, picked by which one is listening to you. Mono, the deep bass turned "
+            "into harmonics that get through, each sound's level given back. If it can't "
+            "tell, it keeps the last one it used (Discord at first).")),
+        "clean": (_("Clean"), _("Streaming, recording, Voicemeeter or a mixer."), _(
+            "No shaping at all: your sounds go out exactly as mixed, full range. For OBS, "
+            "recording, Voicemeeter, a mixer, or anything that isn't a voice chat.")),
+        "advanced": (_("Advanced"), _("Pick the exact voice chat yourself, or make your own."), _(
+            "Every built-in mode by name, your custom modes, and the option to let the app "
+            "switch between all of them by itself. Nothing is picked for you unless you tick "
+            "that.")),
+    }
 
 
 GAME = Profile(
@@ -67,9 +108,11 @@ ADVANCED = Profile(
 PROFILES: tuple[Profile, ...] = (GAME, VOICE, CLEAN, ADVANCED)
 BY_KEY = {p.key: p for p in PROFILES}
 
-# the shared settings no mode changes, for the "What do these do?" box
-SHARED = ("Send in mono, lowering your sounds while you talk and muting your mic "
-          "during sounds are your own settings: changing mode leaves them as they are.")
+
+def shared() -> str:
+    """The shared settings no mode changes, for the "What do these do?" box."""
+    return _("Send in mono, lowering your sounds while you talk and muting your mic "
+             "during sounds are your own settings: changing mode leaves them as they are.")
 
 
 @dataclass(frozen=True)
@@ -145,11 +188,11 @@ def explain(cfg_dest: dict | None, why: str = "") -> str:
     p = current(d)
     m = destination.resolve(d)
     if p is CLEAN:
-        return "Clean: your sounds go out exactly as mixed."
-    using = "Off (no shaping)" if m is destination.OFF else m.label
-    line = f"{p.label}: shaping for {using}."
+        return _("Clean: your sounds go out exactly as mixed.")
+    using = _("Off (no shaping)") if m is destination.OFF else m.name
     if why:
-        line += f" {why}."
-    elif auto_picks(p):
-        line += " Nothing detected yet, so it keeps the last one used."
-    return line
+        return _("{mode}: shaping for {target}. {why}.", mode=p.name, target=using, why=why)
+    if auto_picks(p):
+        return _("{mode}: shaping for {target}. Nothing detected yet, so it keeps the last "
+                 "one used.", mode=p.name, target=using)
+    return _("{mode}: shaping for {target}.", mode=p.name, target=using)

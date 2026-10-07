@@ -11,7 +11,7 @@ from PySide6.QtGui import QDesktopServices, QFont
 from PySide6.QtWidgets import (QDialog, QFrame, QHBoxLayout, QLabel, QPushButton, QVBoxLayout,
                                QWidget)
 
-from soundboard import __version__, updates
+from soundboard import __version__, feedback, theme, updates
 from soundboard.ui import fit
 from soundboard.ui.panel import hint_label, icon_label
 from soundboard.i18n import _
@@ -28,6 +28,17 @@ class Note:
 
 # newest first; add one per release that has something worth telling
 NOTES = (
+    Note("1.9.8", "Lighter, and a Discord to join", (
+        ("check", "Uses less memory",
+         "The 3D globe is gone (the flat map stays), so the app and its download are much "
+         "smaller and it holds far less memory and fewer threads while it sits there."),
+        ("shield", "Discord's automatic sensitivity is caught too",
+         "It kept cutting songs out in bursts in calls. The Fix Discord bar now says when "
+         "it's on and how to switch it off."),
+        ("plus", "Join the Discord",
+         "Chat, get help and hear about new versions: Join the Discord is in Settings and "
+         "the tray menu."),
+    )),
     Note("1.9.7", "Your sounds get through Discord again", (
         ("shield", "Discord no longer wipes out your sounds",
          "Discord's noise suppression, Studio profile and Advanced Voice Activity were "
@@ -240,6 +251,14 @@ class WhatsNewDialog(QDialog):
             for icon, title, text in note.items:
                 lay.addWidget(self._item(icon, title, text))
         lay.addStretch(1)   # any spare height goes here, not between the rows
+        chat = self.discord_link = QLabel(   # the theme's colour: Qt's own blue is dark
+            f'<a href="{feedback.DISCORD_URL}" style="color: {theme.T["accent"]};">'
+            f'{_("Chat about it on Discord")}</a>')
+        chat.setObjectName("hint")
+        chat.setToolTip(_("The Onion Board Discord server, in your browser"))
+        chat.setTextInteractionFlags(Qt.LinksAccessibleByMouse | Qt.LinksAccessibleByKeyboard)
+        chat.setOpenExternalLinks(True)
+        lay.addWidget(chat)
         buttons = QHBoxLayout()
         notes_btn = QPushButton(_("Full release notes"))
         notes_btn.setToolTip(_("This version's page on GitHub, in your browser"))

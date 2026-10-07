@@ -9,6 +9,7 @@ import os
 from pathlib import Path
 
 from soundboard import directmic
+from soundboard.i18n import _
 
 log = logging.getLogger(__name__)
 
@@ -30,9 +31,10 @@ def remove() -> str | None:
     plain words."""
     exe = setup_exe()
     if exe is None:
-        return "VB-Cable's own setup program isn't on this PC, so it can't be removed here."
+        return _("VB-Cable's own setup program isn't on this PC, "
+                 "so it can't be removed here.")
     code = directmic.run_elevated(str(exe), "-u -h", wait_s=120.0)
     if code is None:
-        return "Windows' admin prompt was turned down (or didn't finish)."
+        return _("Windows' admin prompt was turned down (or didn't finish).")
     log.info("VB-Cable removed (setup exit code %s)", code)   # (its codes aren't documented)
     return None

@@ -27,7 +27,6 @@ os.environ["ONIONBOARD_INSTANCE"] = "screenshots"
 os.environ.setdefault("QT_QPA_FONTDIR", str(Path(os.environ.get("WINDIR", r"C:\Windows"))
                                             / "Fonts"))   # offscreen has no fonts otherwise
 os.environ.setdefault("QT_SCALE_FACTOR", "1.5")           # crisper pictures
-os.environ["QTWEBENGINE_CHROMIUM_FLAGS"] = "--mute-audio"
 
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))

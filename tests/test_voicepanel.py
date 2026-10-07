@@ -1128,3 +1128,88 @@ def test_effect_columns_stack_without_holes(panel, qapp):
         qapp.processEvents()
     assert fx._fx_cols == 1 and fx._groups["Character"].isVisible()
     fx.dlg.close()
+
+
+def _remembered(names_langs, fp):
+    names = [n for n, _ in names_langs]
+    return tts.remember_voices(names, dict(names_langs), fp)
+
+
+def test_a_launch_with_the_same_windows_voices_starts_no_speech_helper(qapp, monkeypatch):
+    """The voice list is remembered with the Windows voices it was listed for: the
+    next launch shows it without starting PowerShell (~2 s, 85 MB) just to list them."""
+    from soundboard.speech import winvoices
+    from soundboard.ui.voicepanel import VoicePanel
+    fp = frozenset({"TTS_MS_EN-US_ZIRA_11.0", "TTS_MS_DE-DE_HEDDA_11.0"})
+    monkeypatch.setattr(winvoices, "fingerprint", lambda: fp)
+    started = []
+
+    class Helper:   # stands in for the PowerShell process
+        stdin = None
+
+        def poll(self):
+            return None
+
+        def kill(self):
+            pass
+
+    def warm_up(self):
+        started.append(1)
+        self._proc = Helper()
+        return self.voices
+    monkeypatch.setattr(tts.SapiTTS, "warm_up", warm_up)
+    known = _remembered([("Microsoft Zira Desktop", "en-US"),
+                         ("Microsoft Hedda Desktop", "de-DE")], fp)
+    p = VoicePanel(FakeEngine(), {}, {"voice": "Microsoft Hedda Desktop",
+                                      tts.VOICE_CACHE: known})
+    sp = p.speech
+    try:
+        assert process_events(qapp, lambda: sp.cb_voice.count() == 3, timeout=5)
+        assert not started and not sp.ctl.tts.running
+        assert sp.cb_voice.currentData() == "Microsoft Hedda Desktop"
+        assert sp.ctl.tts.voice_for("de") == "Microsoft Hedda Desktop"
+        sp.ctl.speaker.voice = "Microsoft Hedda Desktop"
+        sp.ed.textEdited.emit("Hel")                 # typing a line: start it now
+        assert process_events(qapp, lambda: started and not sp._warming, timeout=5)
+        sp.ed.textEdited.emit("Hell")
+        process_events(qapp, lambda: False, timeout=0.2)
+        assert len(started) == 1                     # ...once, not per key
+    finally:
+        p.shutdown()
+        p.deleteLater()
+
+
+def test_other_windows_voices_list_them_again_and_remember_that(qapp, monkeypatch):
+    from soundboard.speech import winvoices
+    from soundboard.ui.voicepanel import VoicePanel
+    fp = frozenset({"TTS_MS_EN-US_ZIRA_11.0", "TTS_MS_FR-FR_JULIE_11.0"})
+    monkeypatch.setattr(winvoices, "fingerprint", lambda: fp)
+
+    def listed(self):   # what the helper's READY line gives
+        self.voices, self.voice_langs = ["Zira", "Julie"], {"Zira": "en-US", "Julie": "fr-FR"}
+        self.listed = (list(self.voices), dict(self.voice_langs))
+        return self.voices
+    monkeypatch.setattr(tts.SapiTTS, "warm_up", listed)
+    old = _remembered([("Zira", "en-US")], {"TTS_MS_EN-US_ZIRA_11.0"})   # before Julie
+    p = VoicePanel(FakeEngine(), {}, {tts.VOICE_CACHE: old})
+    saved = []
+    p.speech_changed.connect(saved.append)
+    try:
+        assert process_events(qapp, lambda: saved, timeout=5)
+        assert tts.remembered_voices(saved[-1][tts.VOICE_CACHE], fp) == (
+            ["Zira", "Julie"], {"Zira": "en-US", "Julie": "fr-FR"})
+    finally:
+        p.shutdown()
+        p.deleteLater()
+
+
+def test_remembered_voices_only_count_for_the_same_voices_and_a_sound_entry():
+    fp = frozenset({"A", "B"})
+    entry = tts.remember_voices(["Zira", "Hedda"], {"Zira": "en-US", "Hedda": "de-DE"}, fp)
+    assert tts.remembered_voices(entry, frozenset({"B", "A"})) == (
+        ["Zira", "Hedda"], {"Zira": "en-US", "Hedda": "de-DE"})
+    assert tts.remembered_voices(entry, frozenset({"A"})) is None      # one removed
+    assert tts.remembered_voices(entry, frozenset()) is None           # can't tell
+    for bad in (None, "x", {"fp": ["A", "B"]}, {"fp": ["A", "B"], "voices": [["Zira"]]},
+                {"fp": ["A", "B"], "voices": [[1, "en"]]}, {"fp": "AB", "voices": []}):
+        assert tts.remembered_voices(bad, fp) is None

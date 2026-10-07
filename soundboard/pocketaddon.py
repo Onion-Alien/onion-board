@@ -124,7 +124,7 @@ def fetch(offer: Offer, progress: Callable[[int, int], None] | None = None,
             raise updates.UpdateError(f"{offer.local} isn't there ({LOCAL_ENV})")
         return offer.local
     dest = updates.UPDATES_DIR / f"OnionPocket-module-{offer.version}.zip"
-    return updates.fetch(offer.url, offer.sha256, dest, (DOWNLOADS,), MAX_SIZE, "an add-on",
+    return updates.fetch(offer.url, offer.sha256, dest, (DOWNLOADS,), MAX_SIZE, "add-on",
                          offer.size, progress, cancelled, FEATURE)
 
 

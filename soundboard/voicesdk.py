@@ -30,7 +30,29 @@ from __future__ import annotations
 import os
 import sys
 import threading
+import time
+from collections.abc import Callable, Mapping
 from pathlib import Path
+
+from soundboard.i18n import _
+
+
+class _Shown(Mapping):
+    """A table whose names are translated each time it's read: this module is imported
+    before the language is set, so a plain dict would keep the English."""
+
+    def __init__(self, make: Callable[[], dict]):
+        self._make = make
+
+    def __getitem__(self, key):
+        return self._make()[key]
+
+    def __iter__(self):
+        return iter(self._make())
+
+    def __len__(self):
+        return len(self._make())
+
 
 # file name (lower case) -> destination mode key
 SIGNATURES = {
@@ -43,14 +65,14 @@ PREFIXES = {"photonvoice": "unity"}   # PhotonVoice.dll, PhotonVoice.API.dll, â€
 # which wins when a game ships more than one (an Unreal game can carry a Vivox plugin
 # next to Photon's): the one found first in this order
 ORDER = ("game", "unity")
-NAMES = {"game": "Vivox", "unity": "Photon or Dissonance"}   # for the hint
+NAMES = _Shown(lambda: {"game": "Vivox", "unity": _("Photon or Dissonance")})   # for the hint
 # voice chat programs that record the cable, by exe: (mode key, name for the hint).
 # TeamSpeak and Mumble sit with Vivox's mode (Opus mono, a high-pass ~80 Hz: see
 # destination.BUILTIN). A browser recording the cable is a call in a web page (Meet,
 # Discord in a browser): the browser mode, which Zoom and Teams share (on the bench it
 # gets them their level back; their AI noise suppression is what hurts, and no mode
 # fixes that: docs/GAME-VOICE.md).
-VOICE_APPS = {
+_VOICE_APPS = {
     "chrome.exe": ("webrtc", "Your browser"),
     "msedge.exe": ("webrtc", "Your browser"),
     "firefox.exe": ("webrtc", "Your browser"),
@@ -69,6 +91,15 @@ VOICE_APPS = {
     "teamspeak.exe": ("game", "TeamSpeak"),
     "mumble.exe": ("game", "Mumble"),
 }
+
+
+def _app_name(name: str) -> str:
+    """A VOICE_APPS name as shown (the programs' own names stay as they are)."""
+    return _("Your browser") if name == "Your browser" else name
+
+
+VOICE_APPS = _Shown(lambda: {exe: (key, _app_name(name))
+                             for exe, (key, name) in _VOICE_APPS.items()})
 # folders that hold game data, never a voice library: not worth listing on a slow disk
 SKIP_DIRS = {"content", "paks", "movies", "videos", "streamingassets", "localization",
              "logs", "saved", "shadercache", "screenshots", "__pycache__", ".git"}
@@ -263,8 +294,13 @@ class Watcher:
 class Listeners:
     """Who records the mic or the cable's far end, as [(mode key, program name)],
     voice chat programs (VOICE_APPS) first, then games by their files. poll() is cheap: the
-    sessions are listed (and a new game's folder scanned, once) on a thread, and it
-    returns what the last look found."""
+    sessions are listed (and a new game's folder scanned, once) on a worker thread, and
+    it returns what the last look found. The worker is one thread kept while polls keep
+    coming (not a new one per poll); it ends after IDLE_EXIT_S without one. Looks are at
+    least MIN_GAP_S apart however often poll() is called."""
+
+    IDLE_EXIT_S = 60.0
+    MIN_GAP_S = 1.0
 
     def __init__(self, lister=None, scanner=None):
         if lister is None:
@@ -273,7 +309,11 @@ class Listeners:
         self._list = lister
         self._scan = scanner or (lambda path: scan(path))
         self._cache: dict[str, str | None] = {}   # exe path -> mode key (games)
-        self._busy = False
+        self._lock = threading.Lock()
+        self._wake = threading.Event()
+        self._want = None                          # the device(s) the next look is for
+        self._thread: threading.Thread | None = None
+        self.looks = 0
         self.found: tuple = ()
 
     def poll(self, device) -> tuple:
@@ -281,10 +321,14 @@ class Listeners:
         mic looks at the mic and the cable's far end both)."""
         if not device:
             self.found = ()
-        elif not self._busy:
-            self._busy = True
-            threading.Thread(target=self._look, args=(device,), daemon=True,
-                             name="voicesdk-listeners").start()
+            return self.found
+        with self._lock:
+            self._want = device
+            if self._thread is None:
+                self._thread = threading.Thread(target=self._run, daemon=True,
+                                                name="voicesdk-listeners")
+                self._thread.start()
+            self._wake.set()
         return self.found
 
     def look(self, device: str) -> tuple:
@@ -303,13 +347,24 @@ class Listeners:
                     games.append((key, app.name))
         return tuple(dict.fromkeys(voice + games))
 
-    def _look(self, device: str):
-        try:
-            self.found = self.look(device)
-        except Exception:  # noqa: BLE001 - only a hint
-            self.found = ()
-        finally:
-            self._busy = False
+    def _run(self):
+        last = 0.0
+        while True:
+            if not self._wake.wait(self.IDLE_EXIT_S):
+                with self._lock:
+                    if not self._wake.is_set():   # (a poll may have come just now)
+                        self._thread = None
+                        return
+            time.sleep(max(0.0, last + self.MIN_GAP_S - time.monotonic()))
+            with self._lock:
+                self._wake.clear()
+                device = self._want
+            last = time.monotonic()
+            try:
+                self.found = self.look(device)
+            except Exception:  # noqa: BLE001 - only a hint
+                self.found = ()
+            self.looks += 1
 
 
 __all__ = ["NAMES", "ORDER", "SIGNATURES", "VOICE_APPS", "Listeners", "Watcher",
