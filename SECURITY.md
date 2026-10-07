@@ -19,8 +19,7 @@ Only the latest release gets security fixes.
 
 In scope, for example:
 
-- The Radio tab's globe page navigating anywhere, running script other than the
-  pinned `globe.gl`, or showing a station's name / country as HTML (it's
+- The Radio tab showing a station's name / country as rich text (it's
   community-edited data).
 - Another local process or web page connecting to the app's loopback sockets
   (module link) without the per-launch secret.
@@ -60,8 +59,8 @@ Out of scope:
   `piper.exe` there): they're programs you chose to run.
 - Games' anti-cheat reacting to global hotkeys or `SendInput` (auto push-to-talk);
   see [Anti-cheat](#anti-cheat) for what the app does and doesn't touch.
-- Chromium bugs in Qt WebEngine that are already fixed upstream. Tell us if
-  the pinned PySide6 is behind on security releases, though — that's in scope.
+- Bugs in Qt that are already fixed upstream. Tell us if the pinned PySide6 is
+  behind on security releases, though — that's in scope.
 
 ## What the app does on the network
 
@@ -75,7 +74,7 @@ So you know what normal looks like when auditing it:
 | Unless you untick *Check for updates* (Settings → Updates): 45 s after start, then at most every 6 hours; or when you click *Check now* | `api.github.com` | asks for this project's latest release (version number, release page, the first lines of its notes, and its installer's download link and SHA-256). If that release came out less than a day ago (and isn't an urgent fix), the automatic check also asks for the last 10 releases, to offer the newest one that's been out a day instead. A newer version is only announced; nothing is downloaded until you click *Update now* | `app_update` |
 | You click *Update now* on a newer version (installed app only; a copy running from source only opens the release page) | `github.com` → GitHub's release download server (`release-assets.githubusercontent.com`) | downloads that release's `OnionBoardSetup.exe` (only from this project's own `github.com/…/releases/download/` link, HTTPS only) into `%APPDATA%\OnionBoard\updates\` and checks it against the SHA-256 GitHub lists for it; a file that doesn't match is deleted. When you click *Restart now* the app closes and runs it silently over the installed copy (never the virtual cable, FFmpeg or live-voice extras), then the installer opens the app again. Downloaded installers are removed on the next start | `app_update` |
 | Unless you untick *Count me in* (the installer, or Settings → Privacy & security; on for new installs, off for copies installed before it existed): once a day, 60 s after start (and checked every 6 hours, for an app left running); also once when you click *Update now* (installed app only; a copy running from source never sends it) | `onionalien.goatcounter.com` (GoatCounter, a privacy-friendly counter; the website counts its visits there too) | one HTTPS POST to its `/api/v0/count`: the path `/app/<version>`, a random ID made on this PC (`stats_id` in `config.json`) so one person counts once, and on the very first send a `first-start` event (`first-start/heard-<where>` if you picked where you heard about the app on the installer's last page: YouTube, Reddit, GitHub, Google, a friend, or a short name you typed under Other; a typed answer that looks like an email address, a link or a number is dropped, not sent); *Update now* sends an `update-now/<from>-to-<to>` event instead. The daily one also says which tabs you opened since the last one (`tab/sounds`, `tab/radio`… names only, nothing about what you did there). Soon after a start, how many problems there were since the last send, as counts only: `crash/<version>`, `error/<version>` or `freeze/<version>` for each crash or freeze report saved in `crash-reports\` (its kind and version are all that's read from it; the report itself never leaves your PC unless you post it), and `unclean-exit/<version>` when the last run ended without the app closing itself (a hard crash, ended in Task Manager, a power cut). Uninstalling sends one `uninstall/<version>` (the uninstaller runs `OnionBoard.exe --uninstall-count`; not in Tor mode, and it gives up after 15 s). Nothing else: no user name, PC name, sounds, settings, devices, games or crash details, and the app doesn't send its IP address in the message (GoatCounter sees the connection's address like any site, and isn't asked to look it up or keep it). The key in `soundboard/usage.py` can only add counts, not read them | `usage_stats` |
-| You open the Radio tab (or start the app with Radio as the last tab you used: the app reopens it), or a phone remote / the control API asks for the popular stations or searches them | `*.api.radio-browser.info` | the station directory: the ~3000 most-listened stations with a location (cached for a day), your searches, and — only if you tick *Share play counts* (Settings → Privacy & security, off by default) — a "click" when you start a station (Radio Browser's own popularity count). Nothing else about you is sent. The maps (country outlines, the 3D globe's `globe.gl`, its Earth pictures) ship with the app and load from its own folder: no CDN is contacted | `radio` |
+| You open the Radio tab (or start the app with Radio as the last tab you used: the app reopens it), or a phone remote / the control API asks for the popular stations or searches them | `*.api.radio-browser.info` | the station directory: the ~3000 most-listened stations with a location (cached for a day), your searches, and — only if you tick *Share play counts* (Settings → Privacy & security, off by default) — a "click" when you start a station (Radio Browser's own popularity count). Nothing else about you is sent. The map's country outlines ship with the app and load from its own folder: no CDN is contacted | `radio` |
 | You play a radio station | that station's stream server (the address listed for it in the directory; its `https` address when the directory lists one, so the network in between can't see which station) | the stream itself, decoded by Qt Multimedia (FFmpeg) and played through the app's audio engine | `radio` |
 | You speak a line with a custom voice server you added (Voice tab → More options → *Custom voices*; a `.json` with a `"url"` in `%APPDATA%\OnionBoard\voices\`) | the address you gave it (normally a TTS server on your own PC, e.g. `127.0.0.1`) | sends the line's text (and the voice / model / API key you entered) and gets the spoken audio back. Nothing is sent until you add one | `voice_servers` |
 | You tick *Play M4A, AAC and video files* in the installer | `winget` (Microsoft's package source, then the FFmpeg build it points to) | installs `Gyan.FFmpeg.Essentials` | — (the installer) |
@@ -198,8 +197,6 @@ this PC reachable through the relay, as it was before the relay ran there.)
 - **Switching** applies at once: Qt's network managers are switched and their kept
   connections dropped, open relayed connections are closed, and a playing radio
   station reconnects.
-- **The radio globe page** loads only the app's own files, and its web profile
-  refuses any `http`/`https`/`ws` request.
 - **Not covered**, because the app doesn't make these requests itself: pages it
   opens in your web browser (*Support*, the feedback and report buttons, *Report on GitHub*, a release page), the
   installer's downloads (VB-Cable, `winget`), Windows Update (*Install the … voice*)

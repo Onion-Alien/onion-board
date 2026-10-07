@@ -33,9 +33,6 @@ import screenshots  # noqa: E402  (sets the offscreen platform: undone just belo
 
 os.environ["QT_QPA_PLATFORM"] = "windows"
 os.environ["ONIONBOARD_INSTANCE"] = "tour"
-os.environ["QTWEBENGINE_CHROMIUM_FLAGS"] = (
-    "--mute-audio --disable-backgrounding-occluded-windows --disable-renderer-backgrounding "
-    "--disable-features=CalculateNativeWinOcclusion")
 
 from PySide6.QtCore import QEventLoop, QPointF, QRectF, Qt  # noqa: E402
 from PySide6.QtGui import QColor, QFont, QImage, QPainter  # noqa: E402
