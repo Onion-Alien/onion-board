@@ -730,8 +730,8 @@
   "<span style='color:{colour}'>The cable installer is missing. Get it from vb-audio.com/Cable.</span>": "<span style='color:{colour}'>Der Kabel-Installer fehlt. Hol ihn dir von vb-audio.com/Cable.</span>",
   "<span style='color:{colour}'>The virtual cable isn't set up yet, so only you will hear your sounds.</span> Go <b>Back</b> to install it (or pick another device there), or finish now and this guide will open again next time.": "<span style='color:{colour}'>Das virtuelle Kabel ist noch nicht eingerichtet, also hörst nur du deine Sounds.</span> Geh <b>Zurück</b>, um es zu installieren (oder wähl dort ein anderes Gerät), oder beende jetzt, dann öffnet sich diese Anleitung beim nächsten Mal wieder.",
   "<span style='color:{colour}'>{n} audio drop-out since start{tip}</span>": [
-    "<span style='color:{colour}'>{n} Audio-Aussetzer seit Beginn {tip}</span>",
-    "<span style='color:{colour}'>{n} Audioaussetzer seit Beginn {tip}</span>"
+    "",
+    ""
   ],
   "<span style='color:{warn}'><b>{key}</b> on its own would stop working for typing everywhere (chat, games, browser). Add Ctrl, Alt or Shift — or press it again to use it anyway.</span>": "<span style='color:{warn}'><b>{key}</b> allein würde beim Tippen überall nicht mehr gehen (Chat, Spiele, Browser). Nimm Ctrl, Alt oder Shift dazu – oder drück die Taste nochmal, um sie trotzdem zu nutzen.</span>",
   "<span style='color:{warn}'>{devices} is open in another program (a music app?), so its pads can't be used here. Close that program and it's picked up in a few seconds.</span>": "<span style='color:{warn}'>{devices} ist in einem anderen Programm offen (einer Musik-App?), also lassen sich seine Pads hier nicht nutzen. Schließ das Programm, dann wird es in ein paar Sekunden übernommen.</span>",
@@ -957,16 +957,16 @@
   "Forgets Apps tab volumes and hidden programs.": "Vergisst Lautstärken im Apps-Tab und ausgeblendete Programme.",
   "Forgets your mic, headphones, where your sounds are sent and the stream output; the quick setup runs again.": "Vergisst dein Mikro, deine Kopfhörer, wohin deine Sounds gesendet werden und den Stream-Ausgang; die Schnelleinrichtung läuft nochmal.",
   "Found <b>{n}</b> sound in {name} with {categories} and {hotkeys}.": [
-    "<b>{n}</b> Sound in {name} mit {categories} und {hotkeys} gefunden.",
-    "<b>{n}</b> Sounds in {name} mit {categories} und {hotkeys} gefunden."
+    "",
+    ""
   ],
   "Found <b>{n}</b> sound in {name} with {what}.": [
-    "<b>{n}</b> Sound in {name} mit {what} gefunden.",
-    "<b>{n}</b> Sounds in {name} mit {what} gefunden."
+    "",
+    ""
   ],
   "Found <b>{n}</b> sound in {name}.": [
-    "<b>{n}</b> Sound in {name} gefunden.",
-    "<b>{n}</b> Sounds in {name} gefunden."
+    "",
+    ""
   ],
   "Free add-ons from GitHub. Removing or reinstalling one keeps your triggers and paired phones.": "Kostenlose Add-ons von GitHub. Beim Entfernen oder Neuinstallieren bleiben deine Trigger und gekoppelten Handys erhalten.",
   "Free, with no ads and no account. Made by OnionAlien. MIT license with the Commons Clause: use it for anything, share it for free, never sell it.": "Kostenlos, ohne Werbung und ohne Konto. Gemacht von OnionAlien. MIT-Lizenz mit Commons Clause: Nutz es für alles, teil es kostenlos, verkauf es nie.",
@@ -1014,8 +1014,8 @@
   "Important fix in Onion Watch {version}: {fix}": "Wichtige Korrektur in Onion Watch {version}: {fix}",
   "Important fix: {fix}": "Wichtige Korrektur: {fix}",
   "Imported {n} sound ({skipped} already in your library)": [
-    "{n} Sound importiert ({skipped} bereits in Ihrer Bibliothek)",
-    "{n} Sounds importiert ({skipped} bereits in Ihrer Bibliothek)"
+    "",
+    ""
   ],
   "Import…": "Importieren…",
   "In Discord, click the ⚙ gear next to your name (<b>User Settings</b>) → <b>Voice &amp; Video</b>.": "Klick in Discord auf das ⚙ Zahnrad neben deinem Namen (<b>Benutzereinstellungen</b>) → <b>Sprache &amp; Video</b>.",
@@ -1190,8 +1190,8 @@
   "Pick where your sounds go instead. Onion Board plays them (and your voice, if you send it) into that device, and whatever listens to it gets them: OBS (<b>Audio Output Capture</b>), Voicemeeter, a mixer or a capture card.": "Wähl, wohin deine Sounds stattdessen gehen. Onion Board spielt sie (und deine Stimme, wenn du sie sendest) in dieses Gerät, und was dort zuhört, bekommt sie: OBS (<b>Audioausgabeaufnahme</b>), Voicemeeter, ein Mischpult oder eine Capture-Karte.",
   "Pick your headphones or speakers, then press <b>Play a test sound</b>. Only you hear this.": "Wähl deine Kopfhörer oder Lautsprecher und drück dann <b>Testsound abspielen</b>. Nur du hörst das.",
   "Picture pasted on {n} pad.": [
-    "Bild auf {n} Pad eingefügt.",
-    "Bild auf {n} Pads eingefügt."
+    "",
+    ""
   ],
   "Pictures ({patterns})": "Bilder ({patterns})",
   "Pink": "Pink",
@@ -1248,8 +1248,8 @@
   "Remove hotkey": "Hotkey entfernen",
   "Remove the Onion Pocket add-on from Onion Board? Phones won't be able to play your pads any more. Paired phones are kept for when you get it again.\n\nYou can get it again from Settings → Remote any time.": "Das Onion Pocket-Add-on aus Onion Board entfernen? Handys können deine Pads dann nicht mehr abspielen. Gekoppelte Handys bleiben gespeichert, falls du es wieder holst.\n\nDu kannst es jederzeit unter Einstellungen → Fernsteuerung wieder holen.",
   "Remove this {n} sound?\n\nRemoved sounds go to Recently deleted, where you can bring them back for {keep_days} days.": [
-    "Diesen {n} -Sound entfernen? Entfernte Sounds gehen zu „Zuletzt gelöscht“, wo Sie sie {keep_days} Tage lang wiederherstellen können.",
-    "Diese {n} Sounds entfernen? Entfernte Sounds gehen zu „Zuletzt gelöscht“, wo Sie sie {keep_days} Tage lang wiederherstellen können."
+    "",
+    ""
   ],
   "Remove {name}": "{name} entfernen",
   "Removed “{name}” — Who's listening is Off now": "„{name}“ entfernt – Wer zuhört ist jetzt Aus",
@@ -1571,8 +1571,8 @@
   "mono": "Mono",
   "not set": "nicht festgelegt",
   "nothing has played on this PC in the last {n} second": [
-    "Auf diesem PC wurde in der letzten {n} Sekunde nichts abgespielt",
-    "In den letzten {n} Sekunden wurde auf diesem PC nichts abgespielt"
+    "",
+    ""
   ],
   "off": "aus",
   "ooh, for me?!": "ooh, für mich?!",
@@ -1597,30 +1597,30 @@
   "your virtual cable": "dein virtuelles Kabel",
   "yt-dlp isn't installed.": "yt-dlp ist nicht installiert.",
   "{bytes} byte in all": [
-    "Insgesamt {bytes} Byte",
-    "Insgesamt {bytes} Bytes"
+    "",
+    ""
   ],
   "{bytes} byte received": [
-    "{bytes} Byte empfangen",
-    "{bytes} Bytes empfangen"
+    "",
+    ""
   ],
   "{bytes} byte sent": [
-    "{bytes} Byte gesendet",
-    "{bytes} Bytes gesendet"
+    "",
+    ""
   ],
   "{connections} in the saved history, from {since}: ↑ {sent} sent, ↓ {received} received, {total} in all.": "{connections} im gespeicherten Verlauf, seit {since}: ↑ {sent} gesendet, ↓ {received} empfangen, {total} insgesamt.",
   "{connections} since the app started (tick Keep a history to add up across starts), from {since}: ↑ {sent} sent, ↓ {received} received, {total} in all.": "{connections} seit dem Start der App (hak „Verlauf behalten“ an, um über mehrere Starts zusammenzuzählen), seit {since}: ↑ {sent} gesendet, ↓ {received} empfangen, {total} insgesamt.",
   "{count} comment": [
-    "{count} Kommentar",
-    "{count} Kommentare"
+    "",
+    ""
   ],
   "{count} like": [
-    "{count} gefällt mir",
-    "{count} Likes"
+    "",
+    ""
   ],
   "{count} view": [
-    "{count} Ansicht",
-    "{count} Aufrufe"
+    "",
+    ""
   ],
   "{error}\n\nTry again any time from the Setup tab.": "{error}\n\nVersuch es jederzeit nochmal im Setup-Tab.",
   "{error}. Repair it below, or send through the virtual cable instead.": "{error}. Repariere es unten oder sende stattdessen über das virtuelle Kabel.",
@@ -1644,52 +1644,52 @@
   "{name}'s noise suppression (Krisp) is wiping out your sounds. Set Noise Suppression to None.": "Die Rauschunterdrückung (Krisp) von {name} löscht deine Sounds. Stell die Rauschunterdrückung auf Keine.",
   "{name}'s noise suppression is eating your sounds. Set Noise Suppression to None.": "Die Rauschunterdrückung von {name} frisst deine Sounds. Stell die Rauschunterdrückung auf Keine.",
   "{n} blocked": [
-    "{n} blockiert",
-    "{n} blockiert"
+    "",
+    ""
   ],
   "{n} category": [
-    "{n} Kategorie",
-    "{n} Kategorien"
+    "",
+    ""
   ],
   "{n} connection to {places}": [
-    "{n} Verbindung zu {places}",
-    "{n} Verbindungen zu {places}"
+    "",
+    ""
   ],
   "{n} connection to {servers}, {blocked} blocked by a switch.": [
-    "{n} Verbindung zu {servers} , {blocked} durch einen Switch blockiert.",
-    "{n} Verbindungen zu {servers} , {blocked} durch einen Switch blockiert."
+    "",
+    ""
   ],
   "{n} connection to {servers}.": [
-    "{n} Verbindung zu {servers} .",
-    "{n} Verbindungen zu {servers} ."
+    "",
+    ""
   ],
   "{n} device reconnect": [
-    "{n} Gerät erneut verbinden",
-    "{n} Gerät verbindet sich erneut"
+    "",
+    ""
   ],
   "{n} drop-out": [
-    "{n} Aussteiger",
-    "{n} Aussteiger"
+    "",
+    ""
   ],
   "{n} failed": [
-    "{n} ist fehlgeschlagen",
-    "{n} ist fehlgeschlagen"
+    "",
+    ""
   ],
   "{n} hotkey": [
-    "{n} Hotkey",
-    "{n} Hotkeys"
+    "",
+    ""
   ],
   "{n} more can't be brought over (the file was moved or deleted, or isn't a sound): {names}": [
-    "{n} weitere können nicht übertragen werden (die Datei wurde verschoben oder gelöscht oder es ist kein Ton): {names}",
-    "{n} weitere können nicht übertragen werden (die Datei wurde verschoben oder gelöscht oder es ist kein Ton): {names}"
+    "",
+    ""
   ],
   "{n} server": [
-    "{n} Server",
-    "{n} Server"
+    "",
+    ""
   ],
   "{n} site": [
-    "{n} Website",
-    "{n} Websites"
+    "",
+    ""
   ],
   "{percent} %": "{percent} %",
   "{program}    (already set)": "{program}    (schon festgelegt)",
@@ -1722,8 +1722,8 @@
   "✓ Done": "✓ Fertig",
   "✓ Exported": "✓ Exportiert",
   "✓ Found {n} device": [
-    "✓ {n} Gerät gefunden",
-    "✓ {n} Geräte gefunden"
+    "",
+    ""
   ],
   "✓ Got Tor": "✓ Tor ist da",
   "✓ New key made": "✓ Neuer Schlüssel erstellt",
@@ -2652,5 +2652,7 @@
   "✓ {n} voice": [
     "✓ {n} Stimme",
     "✓ {n} Stimmen"
-  ]
+  ],
+  "<b>Input Mode</b>: <b>Push to Talk</b> works best (set the same key under Settings → Hotkeys → Auto push-to-talk and Onion Board holds it for you while a sound plays). On <b>Voice Activity</b>, turn off <b>Automatically determine input sensitivity</b> and drag the slider almost all the way left, or quiet parts of your sounds get cut.": "",
+  "Listening…": "Hört zu…"
 }

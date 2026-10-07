@@ -714,7 +714,8 @@
   "<span style='color:{colour}'>The cable installer is missing. Get it from vb-audio.com/Cable.</span>": "<span style='color:{colour}'>Trình cài đặt cáp bị thiếu. Lấy nó từ vb-audio.com/Cable.</span>",
   "<span style='color:{colour}'>The virtual cable isn't set up yet, so only you will hear your sounds.</span> Go <b>Back</b> to install it (or pick another device there), or finish now and this guide will open again next time.": "<span style='color:{colour}'>Cáp ảo chưa được thiết lập nên chỉ bạn mới nghe thấy âm thanh của mình.</span> Quay <b>lại</b> để cài đặt (hoặc chọn thiết bị khác ở đó) hoặc hoàn tất ngay bây giờ và hướng dẫn này sẽ mở lại vào lần sau.",
   "<span style='color:{colour}'>{n} audio drop-out since start{tip}</span>": [
-    "<span style='color:{colour}'>{n} âm thanh bị mất kể từ khi bắt đầu {tip}</span>"
+    "",
+    ""
   ],
   "<span style='color:{warn}'><b>{key}</b> on its own would stop working for typing everywhere (chat, games, browser). Add Ctrl, Alt or Shift — or press it again to use it anyway.</span>": "<span style='color:{warn}'><b>{key}</b> tự nó sẽ ngừng hoạt động để gõ ở mọi nơi (trò chuyện, trò chơi, trình duyệt). Thêm Ctrl, Alt hoặc Shift — hoặc nhấn lại để sử dụng.</span>",
   "<span style='color:{warn}'>{devices} is open in another program (a music app?), so its pads can't be used here. Close that program and it's picked up in a few seconds.</span>": "<span style='color:{warn}'>{devices} đang mở trong một chương trình khác (ứng dụng âm nhạc?), vì vậy không thể sử dụng các miếng đệm của nó ở đây. Đóng chương trình đó và nó sẽ được chọn sau vài giây.</span>",
@@ -940,13 +941,16 @@
   "Forgets Apps tab volumes and hidden programs.": "Quên khối lượng tab Ứng dụng và các chương trình ẩn.",
   "Forgets your mic, headphones, where your sounds are sent and the stream output; the quick setup runs again.": "Quên mic, tai nghe, nơi gửi âm thanh và đầu ra luồng; thiết lập nhanh sẽ chạy lại.",
   "Found <b>{n}</b> sound in {name} with {categories} and {hotkeys}.": [
-    "Đã tìm thấy âm thanh <b>{n}</b> trong {name} với {categories} và {hotkeys} ."
+    "",
+    ""
   ],
   "Found <b>{n}</b> sound in {name} with {what}.": [
-    "Đã tìm thấy âm thanh <b>{n}</b> trong {name} với {what} ."
+    "",
+    ""
   ],
   "Found <b>{n}</b> sound in {name}.": [
-    "Đã tìm thấy âm thanh <b>{n}</b> trong {name} ."
+    "",
+    ""
   ],
   "The Discord is where to chat, ask for help and hear about new versions. Found a bug or missing something? Everything opens in your browser, and nothing is sent unless you submit it there.": "Discord là nơi để trò chuyện, nhờ giúp đỡ và nghe tin về phiên bản mới. Tìm thấy lỗi hoặc thiếu gì đó? Mọi thứ mở trong trình duyệt của bạn, và không có gì được gửi trừ khi bạn tự gửi ở đó.",
   "Free add-ons from GitHub. Removing or reinstalling one keeps your triggers and paired phones.": "Tiện ích bổ sung miễn phí từ GitHub. Việc gỡ bỏ hoặc cài đặt lại một cái sẽ giữ lại trình kích hoạt và điện thoại được ghép nối của bạn.",
@@ -996,7 +1000,8 @@
   "Important fix in Onion Watch {version}: {fix}": "Bản sửa lỗi quan trọng trong Onion Watch {version} : {fix}",
   "Important fix: {fix}": "Sửa chữa quan trọng: {fix}",
   "Imported {n} sound ({skipped} already in your library)": [
-    "Đã nhập âm thanh {n} ({skipped} đã có trong thư viện của bạn)"
+    "",
+    ""
   ],
   "Import…": "Nhập khẩu…",
   "In Discord, click the ⚙ gear next to your name (<b>User Settings</b>) → <b>Voice &amp; Video</b>.": "In Discord, click the ⚙ gear next to your name (<b>User Settings</b>) → <b>Voice &amp; Video</b>.",
@@ -1171,7 +1176,8 @@
   "Pick where your sounds go instead. Onion Board plays them (and your voice, if you send it) into that device, and whatever listens to it gets them: OBS (<b>Audio Output Capture</b>), Voicemeeter, a mixer or a capture card.": "Thay vào đó, hãy chọn nơi âm thanh của bạn sẽ đến. Onion Board phát chúng (và giọng nói của bạn, nếu bạn gửi nó) vào thiết bị đó và bất cứ thứ gì nghe được sẽ nhận được chúng: OBS ( <b>Audio Output Capture</b> ), Voicemeeter, bộ trộn hoặc thẻ ghi.",
   "Pick your headphones or speakers, then press <b>Play a test sound</b>. Only you hear this.": "Chọn tai nghe hoặc loa của bạn, sau đó nhấn <b>Phát thử âm thanh</b> . Chỉ có bạn nghe thấy điều này.",
   "Picture pasted on {n} pad.": [
-    "Hình ảnh được dán trên {n} miếng đệm."
+    "",
+    ""
   ],
   "Pictures ({patterns})": "Hình ảnh ({patterns})",
   "Pink": "Hồng",
@@ -1228,7 +1234,8 @@
   "Remove hotkey": "Xóa phím nóng",
   "Remove the Onion Pocket add-on from Onion Board? Phones won't be able to play your pads any more. Paired phones are kept for when you get it again.\n\nYou can get it again from Settings → Remote any time.": "Xóa tiện ích bổ sung Onion Pocket khỏi Onion Board? Điện thoại sẽ không thể phát miếng đệm của bạn nữa. Điện thoại đã ghép nối sẽ được giữ lại khi bạn lấy lại. Bạn có thể lấy lại nó từ Cài đặt → Điều khiển từ xa bất kỳ lúc nào.",
   "Remove this {n} sound?\n\nRemoved sounds go to Recently deleted, where you can bring them back for {keep_days} days.": [
-    "Xóa những âm thanh {n} này? Âm thanh đã xóa sẽ chuyển đến Đã xóa gần đây, nơi bạn có thể mang chúng trở lại trong {keep_days} ngày."
+    "",
+    ""
   ],
   "Remove {name}": "Xóa {name}",
   "Removed “{name}” — Who's listening is Off now": "Đã xóa “{name}” — Ai đang nghe hiện đang Tắt",
@@ -1550,7 +1557,8 @@
   "mono": "bệnh tăng bạch cầu đơn nhân",
   "not set": "chưa được đặt",
   "nothing has played on this PC in the last {n} second": [
-    "không có gì phát trên PC này trong {n} giây qua"
+    "",
+    ""
   ],
   "off": "tắt",
   "ooh, for me?!": "ôi, cho tôi?!",
@@ -1575,24 +1583,30 @@
   "your virtual cable": "cáp ảo của bạn",
   "yt-dlp isn't installed.": "yt-dlp chưa được cài đặt.",
   "{bytes} byte in all": [
-    "tổng cộng là {bytes} byte"
+    "",
+    ""
   ],
   "{bytes} byte received": [
-    "đã nhận được {bytes} byte"
+    "",
+    ""
   ],
   "{bytes} byte sent": [
-    "{bytes} byte đã được gửi"
+    "",
+    ""
   ],
   "{connections} in the saved history, from {since}: ↑ {sent} sent, ↓ {received} received, {total} in all.": "{connections} trong lịch sử đã lưu, từ {since} : ↑ {sent} đã gửi, ↓ {received} đã nhận, tổng cộng là {total} .",
   "{connections} since the app started (tick Keep a history to add up across starts), from {since}: ↑ {sent} sent, ↓ {received} received, {total} in all.": "{connections} kể từ khi ứng dụng bắt đầu (đánh dấu vào phần Giữ lịch sử để cập nhật qua các lần bắt đầu), từ {since} : ↑ {sent} đã gửi, ↓ {received} đã nhận, tổng cộng là {total} .",
   "{count} comment": [
-    "{count} nhận xét"
+    "",
+    ""
   ],
   "{count} like": [
-    "{count} lượt thích"
+    "",
+    ""
   ],
   "{count} view": [
-    "{count} lượt xem"
+    "",
+    ""
   ],
   "{error}\n\nTry again any time from the Setup tab.": "{error} Hãy thử lại bất kỳ lúc nào từ tab Thiết lập.",
   "{error}. Repair it below, or send through the virtual cable instead.": "{error} . Hãy sửa chữa nó bên dưới hoặc gửi qua cáp ảo thay thế.",
@@ -1616,40 +1630,52 @@
   "{name}'s noise suppression (Krisp) is wiping out your sounds. Set Noise Suppression to None.": "Tính năng khử tiếng ồn của {name} (Krisp) đang xóa sạch âm thanh của bạn. Đặt Giảm tiếng ồn thành Không.",
   "{name}'s noise suppression is eating your sounds. Set Noise Suppression to None.": "Tính năng khử tiếng ồn của {name} đang ăn mòn âm thanh của bạn. Đặt Giảm tiếng ồn thành Không.",
   "{n} blocked": [
-    "{n} bị chặn"
+    "",
+    ""
   ],
   "{n} category": [
-    "{n} danh mục"
+    "",
+    ""
   ],
   "{n} connection to {places}": [
-    "{n} kết nối tới {places}"
+    "",
+    ""
   ],
   "{n} connection to {servers}, {blocked} blocked by a switch.": [
-    "{n} kết nối tới {servers} , {blocked} bị chặn bởi một công tắc."
+    "",
+    ""
   ],
   "{n} connection to {servers}.": [
-    "{n} kết nối tới {servers} ."
+    "",
+    ""
   ],
   "{n} device reconnect": [
-    "{n} thiết bị kết nối lại"
+    "",
+    ""
   ],
   "{n} drop-out": [
-    "{n} bỏ học"
+    "",
+    ""
   ],
   "{n} failed": [
-    "{n} thất bại"
+    "",
+    ""
   ],
   "{n} hotkey": [
-    "{n} phím nóng"
+    "",
+    ""
   ],
   "{n} more can't be brought over (the file was moved or deleted, or isn't a sound): {names}": [
-    "Không thể mang thêm {n} nội dung khác (tệp đã bị di chuyển hoặc bị xóa hoặc không có âm thanh): {names}"
+    "",
+    ""
   ],
   "{n} server": [
-    "{n} máy chủ"
+    "",
+    ""
   ],
   "{n} site": [
-    "{n} trang web"
+    "",
+    ""
   ],
   "{percent} %": "{percent} %",
   "{program}    (already set)": "{program} (đã được đặt)",
@@ -1682,7 +1708,8 @@
   "✓ Done": "✓ Xong",
   "✓ Exported": "✓ Đã xuất khẩu",
   "✓ Found {n} device": [
-    "✓ Đã tìm thấy {n} thiết bị"
+    "",
+    ""
   ],
   "✓ Got Tor": "✓ Có Tor",
   "✓ New key made": "✓ Làm chìa khóa mới",
@@ -2598,5 +2625,7 @@
   "✓ {language} voice found: {voice} speaks from the next line on.": "✓ Đã tìm thấy giọng nói {language} : {voice} nói từ dòng tiếp theo trở đi.",
   "✓ {n} voice": [
     "✓ {n} giọng nói"
-  ]
+  ],
+  "<b>Input Mode</b>: <b>Push to Talk</b> works best (set the same key under Settings → Hotkeys → Auto push-to-talk and Onion Board holds it for you while a sound plays). On <b>Voice Activity</b>, turn off <b>Automatically determine input sensitivity</b> and drag the slider almost all the way left, or quiet parts of your sounds get cut.": "",
+  "Listening…": "Đang nghe…"
 }

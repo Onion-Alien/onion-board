@@ -746,9 +746,8 @@
   "<span style='color:{colour}'>The cable installer is missing. Get it from vb-audio.com/Cable.</span>": "<span style='color:{colour}'>Нет установщика кабеля. Скачай его с vb-audio.com/Cable.</span>",
   "<span style='color:{colour}'>The virtual cable isn't set up yet, so only you will hear your sounds.</span> Go <b>Back</b> to install it (or pick another device there), or finish now and this guide will open again next time.": "<span style='color:{colour}'>Виртуальный кабель ещё не настроен, поэтому твои звуки услышишь только ты.</span> Вернись <b>Назад</b>, чтобы установить его (или выбрать там другое устройство), или закончи сейчас — тогда эта инструкция откроется в следующий раз.",
   "<span style='color:{colour}'>{n} audio drop-out since start{tip}</span>": [
-    "<span style='color:{colour}'>Пропадание звука {n} с момента запуска {tip}</span>",
-    "<span style='color:{colour}'>Пропадания звука: {n} с момента запуска {tip}</span>",
-    "<span style='color:{colour}'>Пропадания звука: {n} с момента запуска {tip}</span>"
+    "",
+    ""
   ],
   "<span style='color:{warn}'><b>{key}</b> on its own would stop working for typing everywhere (chat, games, browser). Add Ctrl, Alt or Shift — or press it again to use it anyway.</span>": "<span style='color:{warn}'><b>{key}</b> без модификаторов перестанет печататься везде (чат, игры, браузер). Добавь Ctrl, Alt или Shift — или нажми её ещё раз, чтобы всё равно её использовать.</span>",
   "<span style='color:{warn}'>{devices} is open in another program (a music app?), so its pads can't be used here. Close that program and it's picked up in a few seconds.</span>": "<span style='color:{warn}'>{devices} занято другой программой (музыкальным плеером?), поэтому его кнопки здесь не работают. Закрой ту программу, и через пару секунд оно подхватится.</span>",
@@ -974,19 +973,16 @@
   "Forgets Apps tab volumes and hidden programs.": "Забывает громкость на вкладке «Программы» и скрытые программы.",
   "Forgets your mic, headphones, where your sounds are sent and the stream output; the quick setup runs again.": "Забывает микрофон, наушники, то, куда отправляются звуки, и выход для стрима; быстрая настройка запустится снова.",
   "Found <b>{n}</b> sound in {name} with {categories} and {hotkeys}.": [
-    "Найден звук <b>{n}</b> в {name} с помощью {categories} и {hotkeys} .",
-    "Найдено <b>{n}</b> звуков в {name} с помощью {categories} и {hotkeys} .",
-    "Найдено <b>{n}</b> звуков в {name} с помощью {categories} и {hotkeys} ."
+    "",
+    ""
   ],
   "Found <b>{n}</b> sound in {name} with {what}.": [
-    "Найден звук <b>{n}</b> в {name} с помощью {what} .",
-    "Найдено <b>{n}</b> звуков в {name} с помощью {what} .",
-    "Найдено <b>{n}</b> звуков в {name} с помощью {what} ."
+    "",
+    ""
   ],
   "Found <b>{n}</b> sound in {name}.": [
-    "Найден звук <b>{n}</b> в {name} .",
-    "Найдено <b>{n}</b> звуков в {name} .",
-    "Найдено <b>{n}</b> звуков в {name} ."
+    "",
+    ""
   ],
   "Free add-ons from GitHub. Removing or reinstalling one keeps your triggers and paired phones.": "Бесплатные дополнения с GitHub. Удаление или переустановка дополнения сохраняет твои триггеры и привязанные телефоны.",
   "Free, with no ads and no account. Made by OnionAlien. MIT license with the Commons Clause: use it for anything, share it for free, never sell it.": "Бесплатно, без рекламы и без аккаунта. Сделал OnionAlien. Лицензия MIT с Commons Clause: используй как хочешь, делись бесплатно, никогда не продавай.",
@@ -1034,9 +1030,8 @@
   "Important fix in Onion Watch {version}: {fix}": "Важное исправление в Onion Watch {version}: {fix}",
   "Important fix: {fix}": "Важное исправление: {fix}",
   "Imported {n} sound ({skipped} already in your library)": [
-    "Импортирован звук {n} ({skipped} уже в вашей библиотеке)",
-    "Импортировано {n} звуков ({skipped} уже в вашей библиотеке)",
-    "Импортировано {n} звуков ({skipped} уже в вашей библиотеке)"
+    "",
+    ""
   ],
   "Import…": "Импорт…",
   "In Discord, click the ⚙ gear next to your name (<b>User Settings</b>) → <b>Voice &amp; Video</b>.": "В Discord нажми на шестерёнку ⚙ рядом со своим именем (<b>Настройки пользователя</b>) → <b>Голос и видео (Voice &amp; Video)</b>.",
@@ -1211,9 +1206,8 @@
   "Pick where your sounds go instead. Onion Board plays them (and your voice, if you send it) into that device, and whatever listens to it gets them: OBS (<b>Audio Output Capture</b>), Voicemeeter, a mixer or a capture card.": "Выбери, куда вместо этого идут твои звуки. Onion Board играет их (и твой голос, если ты его отправляешь) в это устройство, и всё, что его слушает, их получает: OBS (<b>Захват выходного аудиопотока</b>), Voicemeeter, микшер или карта захвата.",
   "Pick your headphones or speakers, then press <b>Play a test sound</b>. Only you hear this.": "Выбери наушники или колонки, затем нажми <b>Сыграть тестовый звук</b>. Его слышишь только ты.",
   "Picture pasted on {n} pad.": [
-    "Изображение вставлено на панель {n} .",
-    "Изображение вставлено на {n} контактных площадок.",
-    "Изображение вставлено на {n} контактных площадок."
+    "",
+    ""
   ],
   "Pictures ({patterns})": "Картинки ({patterns})",
   "Pink": "Розовый",
@@ -1270,9 +1264,8 @@
   "Remove hotkey": "Убрать горячую клавишу",
   "Remove the Onion Pocket add-on from Onion Board? Phones won't be able to play your pads any more. Paired phones are kept for when you get it again.\n\nYou can get it again from Settings → Remote any time.": "Удалить дополнение Onion Pocket из Onion Board? Телефоны больше не смогут играть твои кнопки. Привязанные телефоны сохранятся на случай, если установишь его снова.\n\nСнова получить его можно в любой момент в Настройки → Пульт.",
   "Remove this {n} sound?\n\nRemoved sounds go to Recently deleted, where you can bring them back for {keep_days} days.": [
-    "Удалить этот звук {n} ? Удаленные звуки попадают в раздел «Недавно удаленные», где их можно вернуть на {keep_days} дн.",
-    "Удалить эти звуки {n} ? Удаленные звуки попадают в раздел «Недавно удаленные», где их можно вернуть на {keep_days} дн.",
-    "Удалить эти звуки {n} ? Удаленные звуки попадают в раздел «Недавно удаленные», где их можно вернуть на {keep_days} дн."
+    "",
+    ""
   ],
   "Remove {name}": "Убрать {name}",
   "Removed “{name}” — Who's listening is Off now": "«{name}» удалён — «Кто слушает» теперь выключено",
@@ -1594,9 +1587,8 @@
   "mono": "моно",
   "not set": "не задано",
   "nothing has played on this PC in the last {n} second": [
-    "на этом компьютере ничего не воспроизводилось за последнюю {n} секунду",
-    "на этом компьютере ничего не воспроизводилось за последние {n} секунд",
-    "на этом компьютере ничего не воспроизводилось за последние {n} секунд"
+    "",
+    ""
   ],
   "off": "выкл.",
   "ooh, for me?!": "ой, это мне?!",
@@ -1621,36 +1613,30 @@
   "your virtual cable": "твой виртуальный кабель",
   "yt-dlp isn't installed.": "yt-dlp не установлен.",
   "{bytes} byte in all": [
-    "Всего {bytes} байт",
-    "Всего {bytes} байт",
-    "Всего {bytes} байт"
+    "",
+    ""
   ],
   "{bytes} byte received": [
-    "Получено {bytes} байт",
-    "Получено {bytes} байт",
-    "Получено {bytes} байт"
+    "",
+    ""
   ],
   "{bytes} byte sent": [
-    "{bytes} байт отправлено",
-    "{bytes} байт отправлено",
-    "{bytes} байт отправлено"
+    "",
+    ""
   ],
   "{connections} in the saved history, from {since}: ↑ {sent} sent, ↓ {received} received, {total} in all.": "{connections} в сохранённой истории, с {since}: ↑ отправлено {sent}, ↓ получено {received}, всего {total}.",
   "{connections} since the app started (tick Keep a history to add up across starts), from {since}: ↑ {sent} sent, ↓ {received} received, {total} in all.": "{connections} с запуска приложения (отметь «Хранить историю», чтобы считать между запусками), с {since}: ↑ отправлено {sent}, ↓ получено {received}, всего {total}.",
   "{count} comment": [
-    "{count} комментарий",
-    "{count} комментариев",
-    "{count} комментариев"
+    "",
+    ""
   ],
   "{count} like": [
-    "{count} лайк",
-    "{count} лайков",
-    "{count} лайков"
+    "",
+    ""
   ],
   "{count} view": [
-    "{count} просмотр",
-    "{count} просмотров",
-    "{count} просмотров"
+    "",
+    ""
   ],
   "{error}\n\nTry again any time from the Setup tab.": "{error}\n\nПопробуй снова в любой момент на вкладке «Подключение».",
   "{error}. Repair it below, or send through the virtual cable instead.": "{error}. Почини это ниже или отправляй через виртуальный кабель.",
@@ -1674,64 +1660,52 @@
   "{name}'s noise suppression (Krisp) is wiping out your sounds. Set Noise Suppression to None.": "Шумоподавление (Krisp) в {name} стирает твои звуки. Поставь шумоподавление на «Нет».",
   "{name}'s noise suppression is eating your sounds. Set Noise Suppression to None.": "Шумоподавление в {name} съедает твои звуки. Поставь шумоподавление на «Нет».",
   "{n} blocked": [
-    "{n} заблокировано",
-    "{n} заблокировано",
-    "{n} заблокировано"
+    "",
+    ""
   ],
   "{n} category": [
-    "{n} категория",
-    "{n} категорий",
-    "{n} категорий"
+    "",
+    ""
   ],
   "{n} connection to {places}": [
-    "{n} соединение с {places}",
-    "{n} соединений с {places}",
-    "{n} соединений с {places}"
+    "",
+    ""
   ],
   "{n} connection to {servers}, {blocked} blocked by a switch.": [
-    "Соединение {n} с {servers} , {blocked} заблокировано коммутатором.",
-    "{n} подключений к {servers} , {blocked} заблокировано коммутатором.",
-    "{n} подключений к {servers} , {blocked} заблокировано коммутатором."
+    "",
+    ""
   ],
   "{n} connection to {servers}.": [
-    "Соединение {n} с {servers} .",
-    "{n} подключений к {servers} .",
-    "{n} подключений к {servers} ."
+    "",
+    ""
   ],
   "{n} device reconnect": [
-    "{n} устройство переподключается",
-    "{n} устройство повторно подключается",
-    "{n} устройство повторно подключается"
+    "",
+    ""
   ],
   "{n} drop-out": [
-    "{n} выпадение",
-    "{n} выбывших",
-    "{n} выбывших"
+    "",
+    ""
   ],
   "{n} failed": [
-    "{n} не удалось",
-    "{n} не удалось",
-    "{n} не удалось"
+    "",
+    ""
   ],
   "{n} hotkey": [
-    "{n} горячая клавиша",
-    "{n} горячих клавиш",
-    "{n} горячих клавиш"
+    "",
+    ""
   ],
   "{n} more can't be brought over (the file was moved or deleted, or isn't a sound): {names}": [
-    "Больше {n} невозможно перенести (файл был перемещен или удален, или не является звуком): {names}",
-    "Больше {n} невозможно перенести (файл был перемещен или удален, или не является звуком): {names}",
-    "Больше {n} невозможно перенести (файл был перемещен или удален, или не является звуком): {names}"
+    "",
+    ""
   ],
   "{n} server": [
-    "{n} сервер",
-    "{n} серверов",
-    "{n} серверов"
+    "",
+    ""
   ],
   "{n} site": [
-    "{n} сайт",
-    "{n} сайтов",
-    "{n} сайтов"
+    "",
+    ""
   ],
   "{percent} %": "{percent} %",
   "{program}    (already set)": "{program}    (уже задано)",
@@ -1764,9 +1738,8 @@
   "✓ Done": "✓ Готово",
   "✓ Exported": "✓ Экспортировано",
   "✓ Found {n} device": [
-    "✓ Найдено {n} устройство",
-    "✓ Найдено {n} устройств",
-    "✓ Найдено {n} устройств"
+    "",
+    ""
   ],
   "✓ Got Tor": "✓ Tor получен",
   "✓ New key made": "✓ Новый ключ создан",
@@ -2706,5 +2679,7 @@
     "✓ {n} голос",
     "✓ {n} голосов",
     "✓ {n} голосов"
-  ]
+  ],
+  "<b>Input Mode</b>: <b>Push to Talk</b> works best (set the same key under Settings → Hotkeys → Auto push-to-talk and Onion Board holds it for you while a sound plays). On <b>Voice Activity</b>, turn off <b>Automatically determine input sensitivity</b> and drag the slider almost all the way left, or quiet parts of your sounds get cut.": "",
+  "Listening…": "Слушает…"
 }

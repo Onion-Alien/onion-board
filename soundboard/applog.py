@@ -2,7 +2,9 @@
 
 The app runs under pythonw.exe, so there is no console: without this, every
 traceback, Qt warning and swallowed error simply vanishes. Everything goes to a
-small rotating log in the app folder.
+small rotating log in the app folder, unless "Keep an app log" is off (Settings >
+Connection, config app_log): then the lines are kept in memory only, for a crash
+report's log excerpt, and gone when the app closes (see keep()).
 
 Any unhandled exception — on the UI thread, in a worker thread, or reported by
 code that caught something it didn't expect (`report()`) — is logged, saved as a
@@ -15,6 +17,8 @@ Set ONIONBOARD_DEBUG=1 to log at DEBUG level.
 """
 from __future__ import annotations
 
+import collections
+import json
 import logging
 import logging.handlers
 import os
@@ -35,6 +39,7 @@ LOG_TAIL_LINES = 60
 MAX_DIALOGS = 3   # per run: a bug that fires every frame mustn't bury the user in popups
 MAX_EXTRA = 20    # later errors listed on an open (or held-back) report
 REPEAT_LOG_S = 60.0   # the same bug again: one short log line a minute at most
+FORMAT = "%(asctime)s %(levelname)-7s %(threadName)s %(name)s: %(message)s"
 
 log = logging.getLogger("crash")
 
@@ -51,8 +56,35 @@ class Report:
     extra: list[str] = field(default_factory=list)   # later errors while it was open
 
 
-def setup(app_dir: Path) -> Path:
-    """Send all logging to app_dir/onionboard.log (3 x 1 MB). Returns the log path."""
+class _Memory(logging.Handler):
+    """The last LOG_TAIL_LINES lines, in memory only: the log while "Keep an app log"
+    is off, so a crash report still says what led up to it."""
+
+    def __init__(self):
+        super().__init__()
+        self.lines: collections.deque[str] = collections.deque(maxlen=LOG_TAIL_LINES)
+
+    def emit(self, record):
+        try:
+            self.lines.append(self.format(record))
+        except Exception:  # noqa: BLE001 - logging must never raise
+            self.handleError(record)
+
+
+def wanted(app_dir: Path) -> bool:
+    """Is "Keep an app log" on in app_dir's config.json? (On unless it says false:
+    setup() runs before the config is loaded, and for the installer's helper runs.)"""
+    try:
+        cfg = json.loads((app_dir / "config.json").read_text(encoding="utf-8"))
+        return cfg.get("app_log", True) is not False
+    except (OSError, ValueError, AttributeError):
+        return True
+
+
+def setup(app_dir: Path, keep_log: bool | None = None) -> Path:
+    """Send all logging to app_dir/onionboard.log (3 x 1 MB), or to memory only while
+    "Keep an app log" is off (keep_log; None: as config.json says). Returns the log
+    path, written or not."""
     app_dir.mkdir(parents=True, exist_ok=True)
     path = app_dir / LOG_NAME
     level = logging.DEBUG if os.environ.get("ONIONBOARD_DEBUG") else logging.INFO
@@ -60,14 +92,49 @@ def setup(app_dir: Path) -> Path:
     root.setLevel(level)
     for h in list(root.handlers):
         root.removeHandler(h)
-    h = logging.handlers.RotatingFileHandler(path, maxBytes=1_000_000, backupCount=2,
-                                             encoding="utf-8")
-    h.setFormatter(logging.Formatter("%(asctime)s %(levelname)-7s %(threadName)s "
-                                     "%(name)s: %(message)s"))
-    root.addHandler(h)
+        h.close()
+    _state["log_path"] = path
+    root.addHandler(_handler(path, wanted(app_dir) if keep_log is None else keep_log))
     if sys.stderr is not None:   # a console is attached (python.exe): mirror there too
         root.addHandler(logging.StreamHandler(sys.stderr))
     return path
+
+
+def _handler(path: Path, keep_log: bool) -> logging.Handler:
+    h = (logging.handlers.RotatingFileHandler(path, maxBytes=1_000_000, backupCount=2,
+                                              encoding="utf-8")
+         if keep_log else _Memory())
+    h.setFormatter(logging.Formatter(FORMAT))
+    return h
+
+
+def keeping() -> bool:
+    return not any(isinstance(h, _Memory) for h in logging.getLogger().handlers)
+
+
+def keep(on: bool) -> None:
+    """Settings' "Keep an app log": switch between onionboard.log and memory only.
+    Switching off deletes the log and its older copies; this run's lines so far stay
+    in memory, for a crash report."""
+    path = _state["log_path"]
+    if path is None or on == keeping():
+        return
+    root = logging.getLogger()
+    old = next(h for h in root.handlers
+               if isinstance(h, (_Memory, logging.handlers.RotatingFileHandler)))
+    new = _handler(Path(path), on)
+    if not on:
+        new.lines.extend(_log_tail(path, LOG_TAIL_LINES).splitlines())
+    root.addHandler(new)
+    root.removeHandler(old)
+    old.close()
+    if not on:
+        for f in (Path(path), *Path(path).parent.glob(LOG_NAME + ".*")):
+            try:
+                f.unlink(missing_ok=True)
+            except OSError:
+                log.warning("couldn't delete %s", f.name)
+    log.info("app log %s", "kept in onionboard.log" if on else "in memory only")
 
 
 def install_hooks(log_path: Path, version: str):
@@ -285,6 +352,9 @@ def _add_extra(rep: Report, title: str):
 
 
 def _log_tail(path: Path | None, n: int) -> str:
+    for h in logging.getLogger().handlers:
+        if isinstance(h, _Memory):   # "Keep an app log" is off
+            return "\n".join(list(h.lines)[-n:])
     if path is None:
         return ""
     try:

@@ -714,7 +714,8 @@
   "<span style='color:{colour}'>The cable installer is missing. Get it from vb-audio.com/Cable.</span>": "<span style='color:{colour}'>找不到音频线安装程序。请从 vb-audio.com/Cable 获取。</span>",
   "<span style='color:{colour}'>The virtual cable isn't set up yet, so only you will hear your sounds.</span> Go <b>Back</b> to install it (or pick another device there), or finish now and this guide will open again next time.": "<span style='color:{colour}'>虚拟音频线还没设置好，所以只有你能听到自己的音效。</span>点 <b>返回</b> 去安装（或在那里选另一个设备），也可以现在完成，下次会再打开这个指南。",
   "<span style='color:{colour}'>{n} audio drop-out since start{tip}</span>": [
-    "<span style='color:{colour}'>自开始以来有{n}音频中断{tip}</span>"
+    "",
+    ""
   ],
   "<span style='color:{warn}'><b>{key}</b> on its own would stop working for typing everywhere (chat, games, browser). Add Ctrl, Alt or Shift — or press it again to use it anyway.</span>": "<span style='color:{warn}'>单独的 <b>{key}</b> 会让这个键在所有地方都没法打字（聊天、游戏、浏览器）。加上 Ctrl、Alt 或 Shift — 或者再按一次，仍然使用它。</span>",
   "<span style='color:{warn}'>{devices} is open in another program (a music app?), so its pads can't be used here. Close that program and it's picked up in a few seconds.</span>": "<span style='color:{warn}'>{devices} 正被其他程序（音乐软件？）占用，所以这里不能用它的按钮。关闭那个程序，几秒后就会重新接上。</span>",
@@ -940,13 +941,16 @@
   "Forgets Apps tab volumes and hidden programs.": "忘记“应用”标签页的音量和隐藏的程序。",
   "Forgets your mic, headphones, where your sounds are sent and the stream output; the quick setup runs again.": "忘记你的麦克风、耳机、音效发送到哪里以及直播输出；重新运行快速设置。",
   "Found <b>{n}</b> sound in {name} with {categories} and {hotkeys}.": [
-    "在{name}中使用{categories}和{hotkeys}找到了<b>{n}</b>个声音。"
+    "",
+    ""
   ],
   "Found <b>{n}</b> sound in {name} with {what}.": [
-    "在{name}中使用{what}找到了<b>{n}</b>个声音。"
+    "",
+    ""
   ],
   "Found <b>{n}</b> sound in {name}.": [
-    "在{name}中找到<b>{n}</b>个声音。"
+    "",
+    ""
   ],
   "Free add-ons from GitHub. Removing or reinstalling one keeps your triggers and paired phones.": "来自 GitHub 的免费插件。移除或重装插件会保留你的触发器和已配对的手机。",
   "Free, with no ads and no account. Made by OnionAlien. MIT license with the Commons Clause: use it for anything, share it for free, never sell it.": "免费，无广告，无需账号。由 OnionAlien 制作。MIT 许可证附加 Commons Clause：可用于任何用途，可免费分享，但绝不能出售。",
@@ -994,7 +998,8 @@
   "Important fix in Onion Watch {version}: {fix}": "Onion Watch {version} 的重要修复：{fix}",
   "Important fix: {fix}": "重要修复：{fix}",
   "Imported {n} sound ({skipped} already in your library)": [
-    "导入的{n}声音（ {skipped}已在您的库中）"
+    "",
+    ""
   ],
   "Import…": "导入…",
   "In Discord, click the ⚙ gear next to your name (<b>User Settings</b>) → <b>Voice &amp; Video</b>.": "在 Discord 里，点你名字旁边的 ⚙ 齿轮（<b>用户设置</b>）→ <b>语音 &amp; 视频</b>。",
@@ -1169,7 +1174,8 @@
   "Pick where your sounds go instead. Onion Board plays them (and your voice, if you send it) into that device, and whatever listens to it gets them: OBS (<b>Audio Output Capture</b>), Voicemeeter, a mixer or a capture card.": "改为选择音效要去的地方。Onion Board 会把它们（以及你的声音，如果你发送的话）播放到那个设备，任何收听它的程序都会收到：OBS（<b>音频输出采集</b>）、Voicemeeter、调音台或采集卡。",
   "Pick your headphones or speakers, then press <b>Play a test sound</b>. Only you hear this.": "选择你的耳机或扬声器，然后按 <b>播放测试音</b>。只有你能听到。",
   "Picture pasted on {n} pad.": [
-    "图片已粘贴到{n}垫上。"
+    "",
+    ""
   ],
   "Pictures ({patterns})": "图片（{patterns}）",
   "Pink": "粉色",
@@ -1226,7 +1232,8 @@
   "Remove hotkey": "移除快捷键",
   "Remove the Onion Pocket add-on from Onion Board? Phones won't be able to play your pads any more. Paired phones are kept for when you get it again.\n\nYou can get it again from Settings → Remote any time.": "从 Onion Board 移除 Onion Pocket 插件？手机将无法再播放你的按钮。已配对的手机会保留，等你再次获取时使用。\n\n你随时可以在 设置 → 远程 里重新获取。",
   "Remove this {n} sound?\n\nRemoved sounds go to Recently deleted, where you can bring them back for {keep_days} days.": [
-    "删除这{n}声音？删除的声音会转到“最近删除”，您可以在其中将它们恢复{keep_days}天。"
+    "",
+    ""
   ],
   "Remove {name}": "移除 {name}",
   "Removed “{name}” — Who's listening is Off now": "已移除“{name}” — 收听者现在为“关”",
@@ -1548,7 +1555,8 @@
   "mono": "单声道",
   "not set": "未设置",
   "nothing has played on this PC in the last {n} second": [
-    "过去{n}秒内该电脑上没有播放过任何内容"
+    "",
+    ""
   ],
   "off": "关",
   "ooh, for me?!": "哇，给我的？！",
@@ -1573,24 +1581,30 @@
   "your virtual cable": "你的虚拟音频线",
   "yt-dlp isn't installed.": "yt-dlp 没有安装。",
   "{bytes} byte in all": [
-    "总共{bytes}个字节"
+    "",
+    ""
   ],
   "{bytes} byte received": [
-    "收到{bytes}字节"
+    "",
+    ""
   ],
   "{bytes} byte sent": [
-    "已发送{bytes}字节"
+    "",
+    ""
   ],
   "{connections} in the saved history, from {since}: ↑ {sent} sent, ↓ {received} received, {total} in all.": "保存的历史中有 {connections}，自 {since} 起：↑ 已发送 {sent}，↓ 已接收 {received}，共 {total}。",
   "{connections} since the app started (tick Keep a history to add up across starts), from {since}: ↑ {sent} sent, ↓ {received} received, {total} in all.": "应用启动以来有 {connections}（勾选“保留历史”可以跨启动累计），自 {since} 起：↑ 已发送 {sent}，↓ 已接收 {received}，共 {total}。",
   "{count} comment": [
-    "{count}条评论"
+    "",
+    ""
   ],
   "{count} like": [
-    "{count}个赞"
+    "",
+    ""
   ],
   "{count} view": [
-    "{count}次观看"
+    "",
+    ""
   ],
   "{error}\n\nTry again any time from the Setup tab.": "{error}\n\n随时可以在向导标签页里重试。",
   "{error}. Repair it below, or send through the virtual cable instead.": "{error}。在下面修复，或改用虚拟音频线发送。",
@@ -1614,40 +1628,52 @@
   "{name}'s noise suppression (Krisp) is wiping out your sounds. Set Noise Suppression to None.": "{name} 的噪音抑制（Krisp）正在清掉你的音效。把噪音抑制设为无。",
   "{name}'s noise suppression is eating your sounds. Set Noise Suppression to None.": "{name} 的噪音抑制正在吃掉你的音效。把噪音抑制设为无。",
   "{n} blocked": [
-    "{n}被阻止"
+    "",
+    ""
   ],
   "{n} category": [
-    "{n}个类别"
+    "",
+    ""
   ],
   "{n} connection to {places}": [
-    "与{places}的{n}连接"
+    "",
+    ""
   ],
   "{n} connection to {servers}, {blocked} blocked by a switch.": [
-    "与{servers}的{n}个连接， {blocked}被开关阻止。"
+    "",
+    ""
   ],
   "{n} connection to {servers}.": [
-    "与{servers}的{n}连接。"
+    "",
+    ""
   ],
   "{n} device reconnect": [
-    "{n}个设备重新连接"
+    "",
+    ""
   ],
   "{n} drop-out": [
-    "{n}次退学"
+    "",
+    ""
   ],
   "{n} failed": [
-    "{n}失败"
+    "",
+    ""
   ],
   "{n} hotkey": [
-    "{n}热键"
+    "",
+    ""
   ],
   "{n} more can't be brought over (the file was moved or deleted, or isn't a sound): {names}": [
-    "还有{n}个无法带过来（文件已移动或删除，或者不是声音）： {names}"
+    "",
+    ""
   ],
   "{n} server": [
-    "{n}服务器"
+    "",
+    ""
   ],
   "{n} site": [
-    "{n}个站点"
+    "",
+    ""
   ],
   "{percent} %": "{percent} %",
   "{program}    (already set)": "{program}    （已设置）",
@@ -1680,7 +1706,8 @@
   "✓ Done": "✓ 完成",
   "✓ Exported": "✓ 已导出",
   "✓ Found {n} device": [
-    "✓ 找到{n}个设备"
+    "",
+    ""
   ],
   "✓ Got Tor": "✓ 已获取 Tor",
   "✓ New key made": "✓ 已生成新密钥",
@@ -2598,5 +2625,7 @@
   "✓ {language} voice found: {voice} speaks from the next line on.": "✓ 找到{language}语音： {voice}从下一行开始讲话。",
   "✓ {n} voice": [
     "✓ {n}声音"
-  ]
+  ],
+  "<b>Input Mode</b>: <b>Push to Talk</b> works best (set the same key under Settings → Hotkeys → Auto push-to-talk and Onion Board holds it for you while a sound plays). On <b>Voice Activity</b>, turn off <b>Automatically determine input sensitivity</b> and drag the slider almost all the way left, or quiet parts of your sounds get cut.": "",
+  "Listening…": "正在收听…"
 }

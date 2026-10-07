@@ -714,7 +714,8 @@
   "<span style='color:{colour}'>The cable installer is missing. Get it from vb-audio.com/Cable.</span>": "<span style='color:{colour}'>找不到音源線安裝程式。請到 vb-audio.com/Cable 下載。</span>",
   "<span style='color:{colour}'>The virtual cable isn't set up yet, so only you will hear your sounds.</span> Go <b>Back</b> to install it (or pick another device there), or finish now and this guide will open again next time.": "<span style='color:{colour}'>虛擬音源線還沒設定好，所以只有你聽得到音效。</span>按<b>上一步</b>去安裝它（或在那裡選其他裝置），或者現在完成，下次這份教學會再開啟。",
   "<span style='color:{colour}'>{n} audio drop-out since start{tip}</span>": [
-    "<span style='color:{colour}'>自開始以來有{n}音訊中斷{tip}</span>"
+    "",
+    ""
   ],
   "<span style='color:{warn}'><b>{key}</b> on its own would stop working for typing everywhere (chat, games, browser). Add Ctrl, Alt or Shift — or press it again to use it anyway.</span>": "<span style='color:{warn}'>單獨使用 <b>{key}</b> 會讓它在任何地方都無法打字（聊天、遊戲、瀏覽器）。加上 Ctrl、Alt 或 Shift——或再按一次照樣使用。</span>",
   "<span style='color:{warn}'>{devices} is open in another program (a music app?), so its pads can't be used here. Close that program and it's picked up in a few seconds.</span>": "<span style='color:{warn}'>{devices} 正被其他程式使用中（音樂播放器？），所以它的按鈕在這裡無法使用。關掉那個程式，幾秒內就會接上。</span>",
@@ -940,13 +941,16 @@
   "Forgets Apps tab volumes and hidden programs.": "忘掉「應用程式」分頁的音量和隱藏的程式。",
   "Forgets your mic, headphones, where your sounds are sent and the stream output; the quick setup runs again.": "忘掉你的麥克風、耳機、音效傳送到哪裡以及直播輸出；快速設置會重新執行。",
   "Found <b>{n}</b> sound in {name} with {categories} and {hotkeys}.": [
-    "在{name}中使用{categories}和{hotkeys}找到了<b>{n}</b>個音。"
+    "",
+    ""
   ],
   "Found <b>{n}</b> sound in {name} with {what}.": [
-    "在{name}中使用{what}找到了<b>{n}</b>個聲音。"
+    "",
+    ""
   ],
   "Found <b>{n}</b> sound in {name}.": [
-    "在{name}中找出<b>{n}</b>個音。"
+    "",
+    ""
   ],
   "Free add-ons from GitHub. Removing or reinstalling one keeps your triggers and paired phones.": "來自 GitHub 的免費附加元件。移除或重新安裝附加元件時，你的觸發器和配對的手機都會保留。",
   "Free, with no ads and no account. Made by OnionAlien. MIT license with the Commons Clause: use it for anything, share it for free, never sell it.": "免費、沒有廣告、不用帳號。由 OnionAlien 製作。MIT 授權加上 Commons Clause：可以用在任何地方、免費分享，但絕對不能販售。",
@@ -994,7 +998,8 @@
   "Important fix in Onion Watch {version}: {fix}": "Onion Watch {version} 的重要修正：{fix}",
   "Important fix: {fix}": "重要修正：{fix}",
   "Imported {n} sound ({skipped} already in your library)": [
-    "導入的{n}聲音（ {skipped}已在您的庫中）"
+    "",
+    ""
   ],
   "Import…": "匯入…",
   "In Discord, click the ⚙ gear next to your name (<b>User Settings</b>) → <b>Voice &amp; Video</b>.": "在 Discord 裡，按你名字旁邊的 ⚙ 齒輪（<b>使用者設定</b>）→ <b>語音 &amp; 視訊</b>。",
@@ -1169,7 +1174,8 @@
   "Pick where your sounds go instead. Onion Board plays them (and your voice, if you send it) into that device, and whatever listens to it gets them: OBS (<b>Audio Output Capture</b>), Voicemeeter, a mixer or a capture card.": "改選音效要送到哪裡。Onion Board 會把它們（以及你的聲音，如果有傳送的話）播放到那個裝置，在那裡收聽的東西都會收到：OBS（<b>音訊輸出擷取</b>）、Voicemeeter、混音器或擷取卡。",
   "Pick your headphones or speakers, then press <b>Play a test sound</b>. Only you hear this.": "選擇你的耳機或喇叭，然後按<b>播放測試音效</b>。只有你聽得到。",
   "Picture pasted on {n} pad.": [
-    "圖片已貼到{n}墊上。"
+    "",
+    ""
   ],
   "Pictures ({patterns})": "圖片（{patterns}）",
   "Pink": "粉紅色",
@@ -1226,7 +1232,8 @@
   "Remove hotkey": "移除快速鍵",
   "Remove the Onion Pocket add-on from Onion Board? Phones won't be able to play your pads any more. Paired phones are kept for when you get it again.\n\nYou can get it again from Settings → Remote any time.": "要從 Onion Board 移除 Onion Pocket 附加元件嗎？手機將無法再播放你的按鈕。配對的手機會保留，等你再次取得時使用。\n\n你隨時可以從 設定 → 遠端 再次取得它。",
   "Remove this {n} sound?\n\nRemoved sounds go to Recently deleted, where you can bring them back for {keep_days} days.": [
-    "刪除這{n}聲音？刪除的聲音會轉到“最近刪除”，您可以在其中將它們恢復{keep_days}天。"
+    "",
+    ""
   ],
   "Remove {name}": "移除 {name}",
   "Removed “{name}” — Who's listening is Off now": "已移除「{name}」——「誰在聽」現在是關閉",
@@ -1548,7 +1555,8 @@
   "mono": "單聲道",
   "not set": "未設定",
   "nothing has played on this PC in the last {n} second": [
-    "過去{n}秒內該電腦上沒有播放過任何內容"
+    "",
+    ""
   ],
   "off": "關閉",
   "ooh, for me?!": "哇，給我的嗎？！",
@@ -1573,24 +1581,30 @@
   "your virtual cable": "你的虛擬音源線",
   "yt-dlp isn't installed.": "沒有安裝 yt-dlp。",
   "{bytes} byte in all": [
-    "總共{bytes}個位元組"
+    "",
+    ""
   ],
   "{bytes} byte received": [
-    "收到{bytes}位元組"
+    "",
+    ""
   ],
   "{bytes} byte sent": [
-    "已傳送{bytes}位元組"
+    "",
+    ""
   ],
   "{connections} in the saved history, from {since}: ↑ {sent} sent, ↓ {received} received, {total} in all.": "已儲存的歷史記錄中有 {connections}，從 {since} 開始：↑ 已傳送 {sent}，↓ 已接收 {received}，總共 {total}。",
   "{connections} since the app started (tick Keep a history to add up across starts), from {since}: ↑ {sent} sent, ↓ {received} received, {total} in all.": "程式啟動以來有 {connections}（勾選「保留歷史記錄」可跨次啟動加總），從 {since} 開始：↑ 已傳送 {sent}，↓ 已接收 {received}，總共 {total}。",
   "{count} comment": [
-    "{count}條評論"
+    "",
+    ""
   ],
   "{count} like": [
-    "{count}個贊"
+    "",
+    ""
   ],
   "{count} view": [
-    "{count}次觀看"
+    "",
+    ""
   ],
   "{error}\n\nTry again any time from the Setup tab.": "{error}\n\n隨時可以從設置分頁再試一次。",
   "{error}. Repair it below, or send through the virtual cable instead.": "{error}。請在下方修復，或改用虛擬音源線傳送。",
@@ -1614,40 +1628,52 @@
   "{name}'s noise suppression (Krisp) is wiping out your sounds. Set Noise Suppression to None.": "{name} 的噪音抑制（Krisp）正在把你的音效消掉。請把噪音抑制設為「無」。",
   "{name}'s noise suppression is eating your sounds. Set Noise Suppression to None.": "{name} 的噪音抑制正在吃掉你的音效。請把噪音抑制設為「無」。",
   "{n} blocked": [
-    "{n}被阻止"
+    "",
+    ""
   ],
   "{n} category": [
-    "{n}個類別"
+    "",
+    ""
   ],
   "{n} connection to {places}": [
-    "與{places}的{n}連接"
+    "",
+    ""
   ],
   "{n} connection to {servers}, {blocked} blocked by a switch.": [
-    "與{servers}的{n}個連接， {blocked}被開關阻止。"
+    "",
+    ""
   ],
   "{n} connection to {servers}.": [
-    "與{servers}的{n}連線。"
+    "",
+    ""
   ],
   "{n} device reconnect": [
-    "{n}個裝置重新連接"
+    "",
+    ""
   ],
   "{n} drop-out": [
-    "{n}次退學"
+    "",
+    ""
   ],
   "{n} failed": [
-    "{n}失敗"
+    "",
+    ""
   ],
   "{n} hotkey": [
-    "{n}熱鍵"
+    "",
+    ""
   ],
   "{n} more can't be brought over (the file was moved or deleted, or isn't a sound): {names}": [
-    "還有{n}個無法帶過來（檔案已移動或刪除，或不是聲音）： {names}"
+    "",
+    ""
   ],
   "{n} server": [
-    "{n}伺服器"
+    "",
+    ""
   ],
   "{n} site": [
-    "{n}個站點"
+    "",
+    ""
   ],
   "{percent} %": "{percent} %",
   "{program}    (already set)": "{program}    （已設定）",
@@ -1680,7 +1706,8 @@
   "✓ Done": "✓ 完成",
   "✓ Exported": "✓ 已匯出",
   "✓ Found {n} device": [
-    "✓ 找到{n}個設備"
+    "",
+    ""
   ],
   "✓ Got Tor": "✓ 已取得 Tor",
   "✓ New key made": "✓ 已產生新金鑰",
@@ -2598,5 +2625,7 @@
   "✓ {language} voice found: {voice} speaks from the next line on.": "✓ 找到{language}語音： {voice}從下一行開始說話。",
   "✓ {n} voice": [
     "✓ {n}聲音"
-  ]
+  ],
+  "<b>Input Mode</b>: <b>Push to Talk</b> works best (set the same key under Settings → Hotkeys → Auto push-to-talk and Onion Board holds it for you while a sound plays). On <b>Voice Activity</b>, turn off <b>Automatically determine input sensitivity</b> and drag the slider almost all the way left, or quiet parts of your sounds get cut.": "",
+  "Listening…": "正在收聽…"
 }

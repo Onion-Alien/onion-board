@@ -714,7 +714,8 @@
   "<span style='color:{colour}'>The cable installer is missing. Get it from vb-audio.com/Cable.</span>": "<span style='color:{colour}'>케이블 설치 프로그램이 없습니다. vb-audio.com/Cable에서 다운로드하세요.</span>",
   "<span style='color:{colour}'>The virtual cable isn't set up yet, so only you will hear your sounds.</span> Go <b>Back</b> to install it (or pick another device there), or finish now and this guide will open again next time.": "<span style='color:{colour}'>가상 케이블이 아직 설정되지 않았으므로 나만의 소리를 들을 수 있습니다.</span> <b>돌아가서</b> 설치하거나(또는 그곳에서 다른 장치를 선택) 지금 완료하면 다음에 이 가이드가 다시 열립니다.",
   "<span style='color:{colour}'>{n} audio drop-out since start{tip}</span>": [
-    "<span style='color:{colour}'>시작 이후 {n} 개의 오디오 끊김 현상이 발생했습니다. {tip}</span>"
+    "",
+    ""
   ],
   "<span style='color:{warn}'><b>{key}</b> on its own would stop working for typing everywhere (chat, games, browser). Add Ctrl, Alt or Shift — or press it again to use it anyway.</span>": "<span style='color:{warn}'><b>{key}</b> 자체는 모든 곳(채팅, 게임, 브라우저)에서 입력하는 작동을 중지합니다. Ctrl, Alt 또는 Shift를 추가하거나 다시 눌러 사용하세요.</span>",
   "<span style='color:{warn}'>{devices} is open in another program (a music app?), so its pads can't be used here. Close that program and it's picked up in a few seconds.</span>": "<span style='color:{warn}'>{devices} 이(가) 다른 프로그램(음악 앱?)에 열려 있으므로 여기서 패드를 사용할 수 없습니다. 해당 프로그램을 닫으면 몇 초 안에 선택됩니다.</span>",
@@ -940,13 +941,16 @@
   "Forgets Apps tab volumes and hidden programs.": "앱 탭 볼륨과 숨겨진 프로그램을 잊어버립니다.",
   "Forgets your mic, headphones, where your sounds are sent and the stream output; the quick setup runs again.": "사운드가 전송되는 마이크, 헤드폰 및 스트림 출력을 잊어버리세요. 빠른 설정이 다시 실행됩니다.",
   "Found <b>{n}</b> sound in {name} with {categories} and {hotkeys}.": [
-    "{categories} 및 {hotkeys} 를 사용하여 {name} 에서 <b>{n}</b> 개의 사운드를 찾았습니다."
+    "",
+    ""
   ],
   "Found <b>{n}</b> sound in {name} with {what}.": [
-    "{name} 에서 {what} 을(를) 사용하여 <b>{n}</b> 개의 소리를 찾았습니다."
+    "",
+    ""
   ],
   "Found <b>{n}</b> sound in {name}.": [
-    "{name} 에서 <b>{n}</b> 개의 소리를 찾았습니다."
+    "",
+    ""
   ],
   "The Discord is where to chat, ask for help and hear about new versions. Found a bug or missing something? Everything opens in your browser, and nothing is sent unless you submit it there.": "Discord에서는 수다를 떨고, 도움을 청하고, 새 버전 소식을 들을 수 있어요. 버그를 찾았거나 뭔가 아쉬운가요? 모든 건 브라우저에서 열리고, 거기서 직접 보내기 전엔 아무것도 전송되지 않아요.",
   "Free add-ons from GitHub. Removing or reinstalling one keeps your triggers and paired phones.": "GitHub의 무료 추가 기능. 제거하거나 다시 설치하면 트리거와 페어링된 휴대폰이 유지됩니다.",
@@ -996,7 +1000,8 @@
   "Important fix in Onion Watch {version}: {fix}": "Onion Watch {version} 의 중요한 수정 사항: {fix}",
   "Important fix: {fix}": "중요한 수정: {fix}",
   "Imported {n} sound ({skipped} already in your library)": [
-    "가져온 {n} 사운드({skipped} 이(가) 이미 라이브러리에 있음)"
+    "",
+    ""
   ],
   "Import…": "수입…",
   "In Discord, click the ⚙ gear next to your name (<b>User Settings</b>) → <b>Voice &amp; Video</b>.": "In Discord, click the ⚙ gear next to your name (<b>User Settings</b>) → <b>Voice &amp; Video</b>.",
@@ -1171,7 +1176,8 @@
   "Pick where your sounds go instead. Onion Board plays them (and your voice, if you send it) into that device, and whatever listens to it gets them: OBS (<b>Audio Output Capture</b>), Voicemeeter, a mixer or a capture card.": "대신 소리가 어디로 갈지 선택하세요. Onion Board는 해당 장치에서 해당 장치로 해당 장치(및 전송하는 경우 음성)를 재생하며 OBS( <b>오디오 출력 캡처</b> ), Voicemeeter, 믹서 또는 캡처 카드 등 무엇을 듣든 해당 장치를 가져옵니다.",
   "Pick your headphones or speakers, then press <b>Play a test sound</b>. Only you hear this.": "헤드폰이나 스피커를 선택한 다음 <b>테스트 사운드 재생을</b> 누릅니다. 당신만이 이 말을 듣습니다.",
   "Picture pasted on {n} pad.": [
-    "{n} 패드에 그림을 붙여넣었습니다."
+    "",
+    ""
   ],
   "Pictures ({patterns})": "그림({patterns})",
   "Pink": "분홍색",
@@ -1228,7 +1234,8 @@
   "Remove hotkey": "단축키 제거",
   "Remove the Onion Pocket add-on from Onion Board? Phones won't be able to play your pads any more. Paired phones are kept for when you get it again.\n\nYou can get it again from Settings → Remote any time.": "Onion Board에서 Onion Pocket 추가 기능을 제거하시겠습니까? 휴대폰에서는 더 이상 패드를 재생할 수 없습니다. 페어링된 휴대폰은 다시 구입했을 때를 대비해 보관됩니다. 언제든지 설정 → 원격에서 다시 받으실 수 있습니다.",
   "Remove this {n} sound?\n\nRemoved sounds go to Recently deleted, where you can bring them back for {keep_days} days.": [
-    "이 {n} 소리를 제거하시겠습니까? 제거된 사운드는 최근 삭제됨으로 이동하여 {keep_days} 일 동안 다시 가져올 수 있습니다."
+    "",
+    ""
   ],
   "Remove {name}": "{name} 삭제",
   "Removed “{name}” — Who's listening is Off now": "\"{name}\" 제거됨 — 지금 듣고 있는 사람이 꺼져 있습니다.",
@@ -1550,7 +1557,8 @@
   "mono": "단핵증",
   "not set": "설정되지 않음",
   "nothing has played on this PC in the last {n} second": [
-    "지난 {n} 초 동안 이 PC에서 아무것도 재생되지 않았습니다"
+    "",
+    ""
   ],
   "off": "끄다",
   "ooh, for me?!": "아, 나를 위해서?!",
@@ -1575,24 +1583,30 @@
   "your virtual cable": "가상 케이블",
   "yt-dlp isn't installed.": "yt-dlp가 설치되지 않았습니다.",
   "{bytes} byte in all": [
-    "총 {bytes} 바이트"
+    "",
+    ""
   ],
   "{bytes} byte received": [
-    "{bytes} 바이트 수신됨"
+    "",
+    ""
   ],
   "{bytes} byte sent": [
-    "{bytes} 바이트를 보냈습니다."
+    "",
+    ""
   ],
   "{connections} in the saved history, from {since}: ↑ {sent} sent, ↓ {received} received, {total} in all.": "저장된 기록의 {connections} , {since} 부터: ↑ {sent} 개 전송됨, ↓ {received} 개 수신됨, {total} 개.",
   "{connections} since the app started (tick Keep a history to add up across starts), from {since}: ↑ {sent} sent, ↓ {received} received, {total} in all.": "앱이 시작된 이후 {connections} (시작 시 합산 기록 유지 선택), from {since} : ↑ {sent} 전송, ↓ {received} 수신, {total} .",
   "{count} comment": [
-    "댓글 {count} 개"
+    "",
+    ""
   ],
   "{count} like": [
-    "좋아요 {count} 개"
+    "",
+    ""
   ],
   "{count} view": [
-    "조회수 {count} 회"
+    "",
+    ""
   ],
   "{error}\n\nTry again any time from the Setup tab.": "{error} 언제든지 설정 탭에서 다시 시도하세요.",
   "{error}. Repair it below, or send through the virtual cable instead.": "{error} . 아래에서 수리하거나 대신 가상 케이블을 통해 보내세요.",
@@ -1616,40 +1630,52 @@
   "{name}'s noise suppression (Krisp) is wiping out your sounds. Set Noise Suppression to None.": "{name} 의 소음 억제(Krisp)가 귀하의 소리를 없애고 있습니다. 소음 억제를 없음으로 설정합니다.",
   "{name}'s noise suppression is eating your sounds. Set Noise Suppression to None.": "{name} 의 소음 억제 기능이 귀하의 소리를 먹어치우고 있습니다. 소음 억제를 없음으로 설정합니다.",
   "{n} blocked": [
-    "{n} 이 차단되었습니다"
+    "",
+    ""
   ],
   "{n} category": [
-    "{n} 카테고리"
+    "",
+    ""
   ],
   "{n} connection to {places}": [
-    "{places} 에 대한 {n} 연결"
+    "",
+    ""
   ],
   "{n} connection to {servers}, {blocked} blocked by a switch.": [
-    "{servers} 에 대한 {n} 연결, 스위치에 의해 {blocked} 차단되었습니다."
+    "",
+    ""
   ],
   "{n} connection to {servers}.": [
-    "{servers} 에 대한 {n} 연결."
+    "",
+    ""
   ],
   "{n} device reconnect": [
-    "{n} 장치가 다시 연결됩니다"
+    "",
+    ""
   ],
   "{n} drop-out": [
-    "{n} 탈락자"
+    "",
+    ""
   ],
   "{n} failed": [
-    "{n} 실패"
+    "",
+    ""
   ],
   "{n} hotkey": [
-    "{n} 단축키"
+    "",
+    ""
   ],
   "{n} more can't be brought over (the file was moved or deleted, or isn't a sound): {names}": [
-    "{n} 개를 더 가져올 수 없습니다(파일이 이동 또는 삭제되었거나 소리가 나지 않음): {names}"
+    "",
+    ""
   ],
   "{n} server": [
-    "{n} 서버"
+    "",
+    ""
   ],
   "{n} site": [
-    "{n} 개 사이트"
+    "",
+    ""
   ],
   "{percent} %": "{percent} %",
   "{program}    (already set)": "{program} (이미 설정됨)",
@@ -1682,7 +1708,8 @@
   "✓ Done": "✓ 완료",
   "✓ Exported": "✓ 수출됨",
   "✓ Found {n} device": [
-    "✓ {n} 개의 기기를 찾았습니다."
+    "",
+    ""
   ],
   "✓ Got Tor": "✓ 토르를 얻었다",
   "✓ New key made": "✓ 새로운 키가 만들어졌습니다.",
@@ -2598,5 +2625,7 @@
   "✓ {language} voice found: {voice} speaks from the next line on.": "✓ {language} 음성 발견: {voice} 은 다음 줄에서 말합니다.",
   "✓ {n} voice": [
     "✓ {n} 목소리"
-  ]
+  ],
+  "<b>Input Mode</b>: <b>Push to Talk</b> works best (set the same key under Settings → Hotkeys → Auto push-to-talk and Onion Board holds it for you while a sound plays). On <b>Voice Activity</b>, turn off <b>Automatically determine input sensitivity</b> and drag the slider almost all the way left, or quiet parts of your sounds get cut.": "",
+  "Listening…": "듣는 중…"
 }

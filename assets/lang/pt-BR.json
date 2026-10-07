@@ -730,8 +730,8 @@
   "<span style='color:{colour}'>The cable installer is missing. Get it from vb-audio.com/Cable.</span>": "<span style='color:{colour}'>O instalador do cabo não foi encontrado. Pegue em vb-audio.com/Cable.</span>",
   "<span style='color:{colour}'>The virtual cable isn't set up yet, so only you will hear your sounds.</span> Go <b>Back</b> to install it (or pick another device there), or finish now and this guide will open again next time.": "<span style='color:{colour}'>O cabo virtual ainda não está configurado, então só você vai ouvir seus sons.</span> Vá em <b>Voltar</b> para instalá-lo (ou escolha outro dispositivo lá), ou termine agora e este guia abre de novo na próxima vez.",
   "<span style='color:{colour}'>{n} audio drop-out since start{tip}</span>": [
-    "<span style='color:{colour}'>{n} interrupção do áudio desde o início {tip}</span>",
-    "<span style='color:{colour}'>{n} interrupções de áudio desde o início {tip}</span>"
+    "",
+    ""
   ],
   "<span style='color:{warn}'><b>{key}</b> on its own would stop working for typing everywhere (chat, games, browser). Add Ctrl, Alt or Shift — or press it again to use it anyway.</span>": "<span style='color:{warn}'><b>{key}</b> sozinha pararia de funcionar para digitar em todo lugar (chat, jogos, navegador). Adicione Ctrl, Alt ou Shift — ou aperte de novo para usar mesmo assim.</span>",
   "<span style='color:{warn}'>{devices} is open in another program (a music app?), so its pads can't be used here. Close that program and it's picked up in a few seconds.</span>": "<span style='color:{warn}'>{devices} está aberto em outro programa (um app de música?), então os botões dele não podem ser usados aqui. Feche esse programa e ele é detectado em poucos segundos.</span>",
@@ -957,16 +957,16 @@
   "Forgets Apps tab volumes and hidden programs.": "Esquece os volumes da aba Apps e os programas ocultos.",
   "Forgets your mic, headphones, where your sounds are sent and the stream output; the quick setup runs again.": "Esquece seu microfone, fones de ouvido, para onde seus sons são enviados e a saída de stream; a configuração rápida roda de novo.",
   "Found <b>{n}</b> sound in {name} with {categories} and {hotkeys}.": [
-    "Encontrado <b>{n}</b> som em {name} com {categories} e {hotkeys} .",
-    "Foram encontrados <b>{n}</b> sons em {name} com {categories} e {hotkeys} ."
+    "",
+    ""
   ],
   "Found <b>{n}</b> sound in {name} with {what}.": [
-    "Encontrou <b>{n}</b> som em {name} com {what} .",
-    "Foram encontrados <b>{n}</b> sons em {name} com {what} ."
+    "",
+    ""
   ],
   "Found <b>{n}</b> sound in {name}.": [
-    "Encontrado <b>{n}</b> som em {name} .",
-    "Foram encontrados <b>{n}</b> sons em {name} ."
+    "",
+    ""
   ],
   "Free add-ons from GitHub. Removing or reinstalling one keeps your triggers and paired phones.": "Complementos grátis do GitHub. Remover ou reinstalar um mantém seus gatilhos e celulares pareados.",
   "Free, with no ads and no account. Made by OnionAlien. MIT license with the Commons Clause: use it for anything, share it for free, never sell it.": "Grátis, sem anúncios e sem conta. Feito por OnionAlien. Licença MIT com a Commons Clause: use para o que quiser, compartilhe de graça, nunca venda.",
@@ -1014,8 +1014,8 @@
   "Important fix in Onion Watch {version}: {fix}": "Correção importante no Onion Watch {version}: {fix}",
   "Important fix: {fix}": "Correção importante: {fix}",
   "Imported {n} sound ({skipped} already in your library)": [
-    "Som {n} importado ({skipped} já está na sua biblioteca)",
-    "{n} sons importados ({skipped} já está na sua biblioteca)"
+    "",
+    ""
   ],
   "Import…": "Importar…",
   "In Discord, click the ⚙ gear next to your name (<b>User Settings</b>) → <b>Voice &amp; Video</b>.": "No Discord, clique na engrenagem ⚙ ao lado do seu nome (<b>Configurações de usuário</b>) → <b>Voz &amp; vídeo</b>.",
@@ -1190,8 +1190,8 @@
   "Pick where your sounds go instead. Onion Board plays them (and your voice, if you send it) into that device, and whatever listens to it gets them: OBS (<b>Audio Output Capture</b>), Voicemeeter, a mixer or a capture card.": "Escolha para onde seus sons vão. O Onion Board toca eles (e sua voz, se você enviar) nesse dispositivo, e o que estiver ouvindo ele recebe os sons: OBS (<b>Captura de saída de áudio</b>), Voicemeeter, um mixer ou uma placa de captura.",
   "Pick your headphones or speakers, then press <b>Play a test sound</b>. Only you hear this.": "Escolha seus fones de ouvido ou alto-falantes, depois aperte <b>Tocar um som de teste</b>. Só você ouve isto.",
   "Picture pasted on {n} pad.": [
-    "Imagem colada em {n} bloco.",
-    "Imagem colada em {n} blocos."
+    "",
+    ""
   ],
   "Pictures ({patterns})": "Imagens ({patterns})",
   "Pink": "Rosa",
@@ -1248,8 +1248,8 @@
   "Remove hotkey": "Remover atalho",
   "Remove the Onion Pocket add-on from Onion Board? Phones won't be able to play your pads any more. Paired phones are kept for when you get it again.\n\nYou can get it again from Settings → Remote any time.": "Remover o complemento Onion Pocket do Onion Board? Os celulares não vão mais poder tocar seus botões. Os celulares pareados ficam guardados para quando você pegá-lo de novo.\n\nVocê pode pegá-lo de novo em Configurações → Controle remoto quando quiser.",
   "Remove this {n} sound?\n\nRemoved sounds go to Recently deleted, where you can bring them back for {keep_days} days.": [
-    "Remover este som {n} ? Os sons removidos vão para Excluídos recentemente, onde você pode recuperá-los por {keep_days} dias.",
-    "Remover esses {n} sons? Os sons removidos vão para Excluídos recentemente, onde você pode recuperá-los por {keep_days} dias."
+    "",
+    ""
   ],
   "Remove {name}": "Remover {name}",
   "Removed “{name}” — Who's listening is Off now": "“{name}” removido — Quem está ouvindo agora está Desligado",
@@ -1571,8 +1571,8 @@
   "mono": "mono",
   "not set": "não definido",
   "nothing has played on this PC in the last {n} second": [
-    "nada foi reproduzido neste PC nos últimos {n} segundos",
-    "nada foi reproduzido neste PC nos últimos {n} segundos"
+    "",
+    ""
   ],
   "off": "desligado",
   "ooh, for me?!": "ooh, pra mim?!",
@@ -1597,30 +1597,30 @@
   "your virtual cable": "seu cabo virtual",
   "yt-dlp isn't installed.": "O yt-dlp não está instalado.",
   "{bytes} byte in all": [
-    "{bytes} byte ao todo",
-    "{bytes} bytes ao todo"
+    "",
+    ""
   ],
   "{bytes} byte received": [
-    "{bytes} bytes recebidos",
-    "{bytes} bytes recebidos"
+    "",
+    ""
   ],
   "{bytes} byte sent": [
-    "{bytes} byte enviado",
-    "{bytes} bytes enviados"
+    "",
+    ""
   ],
   "{connections} in the saved history, from {since}: ↑ {sent} sent, ↓ {received} received, {total} in all.": "{connections} no histórico salvo, desde {since}: ↑ {sent} enviados, ↓ {received} recebidos, {total} no total.",
   "{connections} since the app started (tick Keep a history to add up across starts), from {since}: ↑ {sent} sent, ↓ {received} received, {total} in all.": "{connections} desde que o app abriu (marque Manter um histórico para somar entre aberturas), desde {since}: ↑ {sent} enviados, ↓ {received} recebidos, {total} no total.",
   "{count} comment": [
-    "{count} comentários",
-    "{count} comentários"
+    "",
+    ""
   ],
   "{count} like": [
-    "{count} curtidas",
-    "{count} curtidas"
+    "",
+    ""
   ],
   "{count} view": [
-    "{count} visualizações",
-    "{count} visualizações"
+    "",
+    ""
   ],
   "{error}\n\nTry again any time from the Setup tab.": "{error}\n\nTente de novo quando quiser pela aba Configurar.",
   "{error}. Repair it below, or send through the virtual cable instead.": "{error}. Conserte abaixo, ou envie pelo cabo virtual.",
@@ -1644,52 +1644,52 @@
   "{name}'s noise suppression (Krisp) is wiping out your sounds. Set Noise Suppression to None.": "A supressão de ruído (Krisp) do {name} está apagando seus sons. Ponha Supressão de ruído em Nenhuma.",
   "{name}'s noise suppression is eating your sounds. Set Noise Suppression to None.": "A supressão de ruído do {name} está comendo seus sons. Ponha Supressão de ruído em Nenhuma.",
   "{n} blocked": [
-    "{n} bloqueado",
-    "{n} bloqueado"
+    "",
+    ""
   ],
   "{n} category": [
-    "{n} categoria",
-    "{n} categorias"
+    "",
+    ""
   ],
   "{n} connection to {places}": [
-    "{n} conexão com {places}",
-    "{n} conexões com {places}"
+    "",
+    ""
   ],
   "{n} connection to {servers}, {blocked} blocked by a switch.": [
-    "{n} conexão com {servers} , {blocked} bloqueada por um switch.",
-    "{n} conexões com {servers} , {blocked} bloqueadas por um switch."
+    "",
+    ""
   ],
   "{n} connection to {servers}.": [
-    "{n} conexão com {servers} .",
-    "{n} conexões com {servers} ."
+    "",
+    ""
   ],
   "{n} device reconnect": [
-    "{n} reconexão do dispositivo",
-    "{n} dispositivo reconecta"
+    "",
+    ""
   ],
   "{n} drop-out": [
-    "{n} abandono",
-    "{n} desistências"
+    "",
+    ""
   ],
   "{n} failed": [
-    "{n} falhou",
-    "{n} falhou"
+    "",
+    ""
   ],
   "{n} hotkey": [
-    "{n} tecla de atalho",
-    "{n} teclas de atalho"
+    "",
+    ""
   ],
   "{n} more can't be brought over (the file was moved or deleted, or isn't a sound): {names}": [
-    "{n} mais não podem ser transferidos (o arquivo foi movido ou excluído ou não há som): {names}",
-    "{n} mais não podem ser transferidos (o arquivo foi movido ou excluído ou não há som): {names}"
+    "",
+    ""
   ],
   "{n} server": [
-    "{n} servidor",
-    "{n} servidores"
+    "",
+    ""
   ],
   "{n} site": [
-    "{n} site",
-    "{n} sites"
+    "",
+    ""
   ],
   "{percent} %": "{percent} %",
   "{program}    (already set)": "{program}    (já definido)",
@@ -1722,8 +1722,8 @@
   "✓ Done": "✓ Pronto",
   "✓ Exported": "✓ Exportado",
   "✓ Found {n} device": [
-    "✓ Encontrado {n} dispositivo",
-    "✓ Encontrados {n} dispositivos"
+    "",
+    ""
   ],
   "✓ Got Tor": "✓ Tor baixado",
   "✓ New key made": "✓ Nova chave criada",
@@ -2652,5 +2652,7 @@
   "✓ {n} voice": [
     "✓ {n} voz",
     "✓ {n} vozes"
-  ]
+  ],
+  "<b>Input Mode</b>: <b>Push to Talk</b> works best (set the same key under Settings → Hotkeys → Auto push-to-talk and Onion Board holds it for you while a sound plays). On <b>Voice Activity</b>, turn off <b>Automatically determine input sensitivity</b> and drag the slider almost all the way left, or quiet parts of your sounds get cut.": "",
+  "Listening…": "Ouvindo…"
 }

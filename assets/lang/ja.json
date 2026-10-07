@@ -714,7 +714,8 @@
   "<span style='color:{colour}'>The cable installer is missing. Get it from vb-audio.com/Cable.</span>": "<span style='color:{colour}'>ケーブルのインストーラーがありません。vb-audio.com/Cable から入手してください。</span>",
   "<span style='color:{colour}'>The virtual cable isn't set up yet, so only you will hear your sounds.</span> Go <b>Back</b> to install it (or pick another device there), or finish now and this guide will open again next time.": "<span style='color:{colour}'>仮想ケーブルがまだセットアップされていないので、サウンドは自分にしか聞こえません。</span> <b>戻る</b>でインストールするか（またはそこで別のデバイスを選ぶ）、今は終了すれば次回またこのガイドが開きます。",
   "<span style='color:{colour}'>{n} audio drop-out since start{tip}</span>": [
-    "<span style='color:{colour}'>起動してから音の途切れが {n} 回{tip}</span>"
+    "",
+    ""
   ],
   "<span style='color:{warn}'><b>{key}</b> on its own would stop working for typing everywhere (chat, games, browser). Add Ctrl, Alt or Shift — or press it again to use it anyway.</span>": "<span style='color:{warn}'><b>{key}</b> 単独だと、どこでも（チャット、ゲーム、ブラウザ）入力に使えなくなります。Ctrl、Alt、Shift を足してください — それでも使う場合はもう一度押してください。</span>",
   "<span style='color:{warn}'>{devices} is open in another program (a music app?), so its pads can't be used here. Close that program and it's picked up in a few seconds.</span>": "<span style='color:{warn}'>{devices} はほかのプログラム（音楽アプリ？）が使用中のため、そのパッドはここでは使えません。そのプログラムを閉じれば数秒で使えるようになります。</span>",
@@ -940,13 +941,16 @@
   "Forgets Apps tab volumes and hidden programs.": "アプリタブの音量と非表示にしたプログラムを忘れます。",
   "Forgets your mic, headphones, where your sounds are sent and the stream output; the quick setup runs again.": "マイク、ヘッドホン、サウンドの送信先、配信出力を忘れます。クイックセットアップがまた始まります。",
   "Found <b>{n}</b> sound in {name} with {categories} and {hotkeys}.": [
-    "{name} に <b>{n}</b> 個のサウンドが見つかりました（{categories}、{hotkeys}）。"
+    "",
+    ""
   ],
   "Found <b>{n}</b> sound in {name} with {what}.": [
-    "{name}で{what}の<b>{n}</b>個の音が見つかりました。"
+    "",
+    ""
   ],
   "Found <b>{n}</b> sound in {name}.": [
-    "{name}で<b>{n}</b>個の音が見つかりました。"
+    "",
+    ""
   ],
   "The Discord is where to chat, ask for help and hear about new versions. Found a bug or missing something? Everything opens in your browser, and nothing is sent unless you submit it there.": "Discord では雑談したり、助けを求めたり、新しいバージョンの情報を受け取れます。バグを見つけた、または何か足りない？すべてブラウザーで開き、そこで送信しない限り何も送られません。",
   "Free add-ons from GitHub. Removing or reinstalling one keeps your triggers and paired phones.": "GitHub からの無料のアドオン。削除または再インストールしても、トリガーとペアリングされた電話は保持されます。",
@@ -996,7 +1000,8 @@
   "Important fix in Onion Watch {version}: {fix}": "Onion Watch {version}の重要な修正: {fix}",
   "Important fix: {fix}": "重要な修正: {fix}",
   "Imported {n} sound ({skipped} already in your library)": [
-    "{n}個のサウンドをインポートしました ({skipped}がすでにライブラリにあります)"
+    "",
+    ""
   ],
   "Import…": "輸入…",
   "In Discord, click the ⚙ gear next to your name (<b>User Settings</b>) → <b>Voice &amp; Video</b>.": "In Discord, click the ⚙ gear next to your name (<b>User Settings</b>) → <b>Voice &amp; Video</b>.",
@@ -1171,7 +1176,8 @@
   "Pick where your sounds go instead. Onion Board plays them (and your voice, if you send it) into that device, and whatever listens to it gets them: OBS (<b>Audio Output Capture</b>), Voicemeeter, a mixer or a capture card.": "代わりにサウンドの行き先を選択してください。 Onion Board はそれらの音声 (送信する場合はあなたの声も) をそのデバイスに再生し、OBS (<b>オーディオ アウトプット キャプチャ</b>)、Voicemeeter、ミキサー、キャプチャ カードなど、何を聞いても音声を取得します。",
   "Pick your headphones or speakers, then press <b>Play a test sound</b>. Only you hear this.": "ヘッドフォンまたはスピーカーを選択し、 <b>「テストサウンドを再生する」</b>を押します。これを聞くのはあなただけです。",
   "Picture pasted on {n} pad.": [
-    "画像は{n}個のパッドに貼り付けられました。"
+    "",
+    ""
   ],
   "Pictures ({patterns})": "写真 ({patterns})",
   "Pink": "ピンク",
@@ -1228,7 +1234,8 @@
   "Remove hotkey": "ホットキーを削除する",
   "Remove the Onion Pocket add-on from Onion Board? Phones won't be able to play your pads any more. Paired phones are kept for when you get it again.\n\nYou can get it again from Settings → Remote any time.": "Onion Board から Onion Pocket アドオンを削除しますか?携帯電話ではパッドを再生できなくなります。ペアリングされた携帯電話は、再度入手したときのために保持されます。 「設定」→「リモート」からいつでも再度取得できます。",
   "Remove this {n} sound?\n\nRemoved sounds go to Recently deleted, where you can bring them back for {keep_days} days.": [
-    "これらの{n}音を削除しますか?削除されたサウンドは [最近削除された] に移動され、 {keep_days}日間は戻すことができます。"
+    "",
+    ""
   ],
   "Remove {name}": "{name}を削除",
   "Removed “{name}” — Who's listening is Off now": "「{name}」を削除しました — 誰が聞いているかは現在オフです",
@@ -1550,7 +1557,8 @@
   "mono": "単核症",
   "not set": "設定されていません",
   "nothing has played on this PC in the last {n} second": [
-    "過去{n}秒間、この PC では何も再生されていません"
+    "",
+    ""
   ],
   "off": "オフ",
   "ooh, for me?!": "ああ、私に?!",
@@ -1575,24 +1583,30 @@
   "your virtual cable": "仮想ケーブル",
   "yt-dlp isn't installed.": "yt-dlp がインストールされていません。",
   "{bytes} byte in all": [
-    "{bytes}バイト"
+    "",
+    ""
   ],
   "{bytes} byte received": [
-    "{bytes}バイトを受信しました"
+    "",
+    ""
   ],
   "{bytes} byte sent": [
-    "{bytes}バイトが送信されました"
+    "",
+    ""
   ],
   "{connections} in the saved history, from {since}: ↑ {sent} sent, ↓ {received} received, {total} in all.": "保存された履歴の{connections} 、 {since}から: ↑ {sent}送信、↓ {received}受信、合計{total}件。",
   "{connections} since the app started (tick Keep a history to add up across starts), from {since}: ↑ {sent} sent, ↓ {received} received, {total} in all.": "アプリの起動以降の{connections} (開始後も合計する履歴を保持するにチェックを入れる)、 {since}から: ↑ {sent}が送信、↓ {received}が受信、合計で{total} 。",
   "{count} comment": [
-    "{count}件のコメント"
+    "",
+    ""
   ],
   "{count} like": [
-    "{count}個のいいね！"
+    "",
+    ""
   ],
   "{count} view": [
-    "{count}回のビュー"
+    "",
+    ""
   ],
   "{error}\n\nTry again any time from the Setup tab.": "{error} [設定] タブからいつでも再試行してください。",
   "{error}. Repair it below, or send through the virtual cable instead.": "{error} 。以下で修復するか、代わりに仮想ケーブル経由で送信してください。",
@@ -1616,40 +1630,52 @@
   "{name}'s noise suppression (Krisp) is wiping out your sounds. Set Noise Suppression to None.": "{name}のノイズ抑制 (Krisp) があなたの音を消し去っています。ノイズ抑制を「なし」に設定します。",
   "{name}'s noise suppression is eating your sounds. Set Noise Suppression to None.": "{name}のノイズ抑制がサウンドを蝕んでいます。ノイズ抑制を「なし」に設定します。",
   "{n} blocked": [
-    "{n}ブロックされました"
+    "",
+    ""
   ],
   "{n} category": [
-    "{n}カテゴリ"
+    "",
+    ""
   ],
   "{n} connection to {places}": [
-    "{places}への{n}の接続"
+    "",
+    ""
   ],
   "{n} connection to {servers}, {blocked} blocked by a switch.": [
-    "{servers}への{n}個の接続、 {blocked}がスイッチによってブロックされました。"
+    "",
+    ""
   ],
   "{n} connection to {servers}.": [
-    "{servers}への{n}個の接続。"
+    "",
+    ""
   ],
   "{n} device reconnect": [
-    "{n}台のデバイスが再接続します"
+    "",
+    ""
   ],
   "{n} drop-out": [
-    "{n}の退学者"
+    "",
+    ""
   ],
   "{n} failed": [
-    "{n}が失敗しました"
+    "",
+    ""
   ],
   "{n} hotkey": [
-    "{n}のホットキー"
+    "",
+    ""
   ],
   "{n} more can't be brought over (the file was moved or deleted, or isn't a sound): {names}": [
-    "あと{n}個は引き継げません (ファイルが移動または削除されたか、サウンドではありません): {names}"
+    "",
+    ""
   ],
   "{n} server": [
-    "{n}台のサーバー"
+    "",
+    ""
   ],
   "{n} site": [
-    "{n}サイト"
+    "",
+    ""
   ],
   "{percent} %": "{percent} %",
   "{program}    (already set)": "{program} (設定済み)",
@@ -1682,7 +1708,8 @@
   "✓ Done": "✓ 完了",
   "✓ Exported": "✓ 輸出済み",
   "✓ Found {n} device": [
-    "✓ {n}台のデバイスが見つかりました"
+    "",
+    ""
   ],
   "✓ Got Tor": "✓ トーを理解しました",
   "✓ New key made": "✓ 新しいキーが作成されました",
@@ -2598,5 +2625,7 @@
   "✓ {language} voice found: {voice} speaks from the next line on.": "✓ {language}音声が見つかりました: {voice}は次の行から話します。",
   "✓ {n} voice": [
     "✓ {n}個の声"
-  ]
+  ],
+  "<b>Input Mode</b>: <b>Push to Talk</b> works best (set the same key under Settings → Hotkeys → Auto push-to-talk and Onion Board holds it for you while a sound plays). On <b>Voice Activity</b>, turn off <b>Automatically determine input sensitivity</b> and drag the slider almost all the way left, or quiet parts of your sounds get cut.": "",
+  "Listening…": "聞いています…"
 }
