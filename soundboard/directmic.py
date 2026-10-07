@@ -85,7 +85,10 @@ LEAD_S = 0.02               # how far behind the board the effect reads (its add
 BLOCK = 480                 # frames rendered per engine call (10 ms)
 ALIVE_MS = 250              # effect heard from this recently: it's running
 MIC_LIVE_MS = 150           # the clean mic arrived this recently: the board runs on it
-POLL_S = 0.002
+POLL_S = 0.002              # how often the feed looks while a block is due (or overdue)
+EARLY_S = 0.002             # the feed itself takes the mic: it looks again this long before
+                            # the next block is due (blocks come a bit early now and then)
+BLOCK_S = BLOCK / RATE
 OTHER_BOARD_MS = 1000       # another board wrote this recently: it's still running
 
 HEAD = np.dtype({
@@ -375,10 +378,13 @@ class DirectMicStream:
     effect. Each stretch of clean mic the effect publishes is handed to `mic_callback`
     (frames x 2, rate) and the same stretch of the board's output is rendered with
     `callback` (the engine's) and written into the ring, downmixed to mono (voice chat
-    is mono anyway). That's a thread polling every POLL_S, plus `pump()` from the
-    board's own mic callback, which fires right after the effect ran on its block.
-    Without the effect (nobody records the mic) the thread keeps time itself, so
-    sounds still play at the right speed."""
+    is mono anyway). That's a thread, plus `pump()` from the board's own mic callback,
+    which fires right after the effect ran on its block. The thread sleeps until the
+    next block is due (it used to look every POLL_S, 500 times a second): when it
+    takes the mic itself, it looks every POLL_S from just before then; when the mic
+    callback takes it, the thread only steps in if that's late. Without the effect
+    (nobody records the mic) the thread keeps time itself, a whole block at a time,
+    so sounds still play at the right speed."""
 
     samplerate = RATE
 
@@ -412,6 +418,13 @@ class DirectMicStream:
         self._start = time.perf_counter()
         self._made = 0
         self._buf = np.zeros((BLOCK, 2), np.float32)
+        # when the thread looks next (see _wait): the last clean mic taken (perf_counter),
+        # how long a block of it lasts, and whether the thread took it (or the mic
+        # callback did); on its own clock, when the next whole block is due
+        self._fed_at: float | None = None
+        self._fed_period = BLOCK_S
+        self._fed_here = True
+        self._due_at: float | None = None
 
     def start(self):
         self._ring.set_enabled(True)
@@ -507,6 +520,10 @@ class DirectMicStream:
                 return
             x = ring.read_mic(self._mic_pos, gap)
             self._mic_pos = wp
+            # (never counted as more than a block: after a hiccup two can come at once,
+            # and the next one is still only a block away)
+            self._fed_at, self._fed_period = time.perf_counter(), min(gap / rate, BLOCK_S)
+            self._fed_here = threading.current_thread() is self._thread
             if self._mic_callback is not None:
                 self._mic_callback(x, rate)
             self._acc += gap * RATE / rate
@@ -518,23 +535,47 @@ class DirectMicStream:
             return
         if self.mic_live:   # the mic stopped: keep time from here on our own
             self.mic_live = False
+            self._fed_at = None
             ring.clear_sync()
             self._start, self._made = time.perf_counter(), 0
         due = int((time.perf_counter() - self._start) * RATE)
         if due - self._made > RATE // 5:   # stalled (sleep, a hang): don't catch up
             self._made = due - BLOCK
         need = due - self._made
+        if ring.effect_alive(now):
+            # the effect reads the ring on its own clock (no clean mic from it): keep
+            # the ring as full as it can be, in small steps
+            self._due_at = None
+        else:
+            # nobody listens: render whole blocks as they come due, and sleep between
+            need -= need % BLOCK
+            self._due_at = self._start + (self._made + need + BLOCK) / RATE
         if need > 0:
             self._made += need
             self._render(need)
         else:
             ring.heartbeat()
 
+    def _wait(self) -> float:
+        """How long the thread sleeps before it looks again."""
+        now = time.perf_counter()
+        if self.mic_live:
+            if self._fed_at is None:
+                return POLL_S
+            # the thread takes the mic: look from just before the next block is due.
+            # The mic callback does: step in only if it's late with the next one.
+            nxt = self._fed_at + self._fed_period + (-EARLY_S if self._fed_here else POLL_S)
+        elif self._due_at is not None:
+            nxt = self._due_at
+        else:
+            return POLL_S
+        return min(max(nxt - now, POLL_S if self.mic_live else 0.0005), BLOCK_S + POLL_S)
+
     def _run(self):
         try:
             while not self._stop.is_set():
                 self.pump()
-                time.sleep(POLL_S)
+                time.sleep(self._wait())
         except Exception:  # noqa: BLE001 - the engine's watchdog reopens a stalled stream
             log.exception("mic effect feed stopped")
 

@@ -390,7 +390,68 @@ def test_stream_keeps_time_without_the_effect(ring_file):
         s.close()
     made = sum(calls)
     assert 0.35 * dm.RATE < made < 0.65 * dm.RATE
-    assert max(calls) <= dm.BLOCK
+    assert set(calls) == {dm.BLOCK}   # whole blocks, as a sound card's would come
+
+
+def test_stream_sleeps_between_blocks_when_nobody_listens(ring_file):
+    """Nobody records the mic: the thread wakes about once a block (10 ms), not every
+    2 ms (that was 500 wakeups a second, a third of the board's CPU while idle)."""
+    s = dm.DirectMicStream(lambda out, frames, t, status: out.fill(0), ring_file)
+    wakes = []
+    pump = s.pump
+    s.pump = lambda: (wakes.append(1), pump())[1]
+    s.start()
+    try:
+        time.sleep(1.0)
+    finally:
+        s.close()
+    assert 50 <= len(wakes) <= 150, len(wakes)
+
+
+def test_feed_looks_again_just_in_time(ring_file):
+    """When the thread looks again: just before the next mic block when it takes the
+    mic itself, just after it when the mic callback does (the thread is only the
+    stand-in then), every 2 ms once a block is due, and never more than a block away."""
+    s = dm.DirectMicStream(lambda out, frames, t, status: out.fill(0), ring_file)
+    try:
+        s.mic_live = True
+        now = time.perf_counter()
+        s._fed_at, s._fed_period, s._fed_here = now, dm.BLOCK_S, True
+        assert dm.BLOCK_S - dm.EARLY_S - 0.002 < s._wait() <= dm.BLOCK_S - dm.EARLY_S
+        s._fed_here = False   # the mic callback took it
+        assert dm.BLOCK_S < s._wait() <= dm.BLOCK_S + dm.POLL_S
+        s._fed_period = 0.003   # a mic with short blocks
+        assert s._wait() <= 0.003 + dm.POLL_S
+        s._fed_at = now - 1.0   # overdue: look every POLL_S
+        assert s._wait() == dm.POLL_S
+        s._fed_at = None        # mic just (re)started
+        assert s._wait() == dm.POLL_S
+        s.mic_live, s._due_at = False, time.perf_counter() + 0.007   # on its own clock
+        assert 0.005 < s._wait() <= 0.007
+        s._due_at = time.perf_counter() + 5.0
+        assert s._wait() == dm.BLOCK_S + dm.POLL_S
+        s._due_at = None        # the effect reads on its own clock: keep it topped up
+        assert s._wait() == dm.POLL_S
+    finally:
+        s.close()
+
+
+def test_two_blocks_at_once_still_wait_for_only_one(ring_file):
+    """After a hiccup two blocks of mic can come at once: the thread still looks again a
+    block later, not two (that would make the board late with the next one)."""
+    s = dm.DirectMicStream(lambda out, frames, t, status: out.fill(0), ring_file)
+    w = dm.RingWriter(ring_file)
+    try:
+        s.active = True
+        _publish(w, np.zeros((480, 2), np.float32))
+        s.pump()
+        _publish(w, np.zeros((960, 2), np.float32))
+        s.pump()
+        assert s._fed_period == dm.BLOCK_S
+        assert s._wait() <= dm.BLOCK_S + dm.POLL_S   # (pumped here: the mic callback's timing)
+    finally:
+        w.close()
+        s.close()
 
 
 def _publish(w: dm.RingWriter, x: np.ndarray, rate: int = 48000):
@@ -698,6 +759,42 @@ def test_a_late_board_is_filled_in_with_the_mic_from_then(ring_file, stall):
     lag, exact = _delay(x[:, 0], 48000, start_s=0.6, span_s=1.6)
     assert lag <= 0.05 * 48000, lag / 48
     assert exact > 0.98, exact
+
+
+@needs_host
+@realtime
+def test_the_feed_keeps_up_with_a_busy_board_while_mostly_asleep(ring_file):
+    """Replace mode with a busy thread beside the board (a UI at work): every block of
+    its voice is in time, sample for sample the mic a lead later, while the thread
+    wakes a couple of times a block instead of every 2 ms."""
+    board = Echo(gain=1.0)
+    stop = threading.Event()
+    wakes = []
+
+    def busy():
+        while not stop.is_set():
+            sum(i * i for i in range(20000))
+            time.sleep(0.001)
+
+    def during(s):
+        pump = s.pump
+
+        def counted():
+            if threading.current_thread().name == "direct-mic":
+                wakes.append(time.perf_counter())
+            return pump()
+        s.pump = counted
+        threading.Thread(target=busy, daemon=True).start()
+
+    try:
+        (x,), _, _ = _run_host(ring_file, 48000, 1, 4.0, mic=0.3, mic_hz=-1, callback=board,
+                               mic_callback=board.mic, mode=dm.MODE_REPLACE, during=during)
+    finally:
+        stop.set()
+    lag, exact = _delay(x[:, 0], 48000, start_s=0.6, span_s=3.0)
+    assert lag <= 0.05 * 48000, lag / 48
+    assert exact > 0.98, exact
+    assert len(wakes) / (wakes[-1] - wakes[0]) < 300   # was about 450 a second
 
 
 @needs_host
