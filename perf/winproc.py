@@ -238,14 +238,17 @@ class Proc:
                 out.append((mi.lpBaseOfDll or 0, mi.SizeOfImage, os.path.basename(buf.value)))
         return sorted(out)
 
-    def sample(self, kids: list[int] | None = None) -> Sample:
+    def sample(self, kids: list[int] | None = None, table: list | None = None) -> Sample:
+        """Its counters now; `kids` are child pids to add up, `table` a processes()
+        list taken just before (its thread counts save a system-wide thread walk)."""
         s = Sample(t=time.perf_counter())
         for k, v in {**self.memory(), **self.io(), **self.gui()}.items():
             setattr(s, k, v)
         s.cpu_user, s.cpu_kernel, _ = self.times()
         s.cycles = self.cycles()
         s.handles = self.handles()
-        s.threads = len(threads_of(self.pid))
+        row = next((r for r in table if r[0] == self.pid), None) if table else None
+        s.threads = row[3] if row else len(threads_of(self.pid))
         if kids:
             s.children = len(kids)
             for pid in kids:
@@ -273,8 +276,8 @@ def kill(pid: int) -> bool:
 
 # ------------------------------------------------------------------ processes, threads
 
-def processes() -> list[tuple[int, int, str]]:
-    """Every process: (pid, parent pid, exe name)."""
+def processes() -> list[tuple[int, int, str, int]]:
+    """Every process: (pid, parent pid, exe name, threads)."""
     snap = k32.CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0)
     if not snap or snap == INVALID_HANDLE:
         return []
@@ -284,18 +287,18 @@ def processes() -> list[tuple[int, int, str]]:
         e.dwSize = ctypes.sizeof(e)
         ok = k32.Process32FirstW(snap, ctypes.byref(e))
         while ok:
-            out.append((e.th32ProcessID, e.th32ParentProcessID, e.szExeFile))
+            out.append((e.th32ProcessID, e.th32ParentProcessID, e.szExeFile, e.cntThreads))
             ok = k32.Process32NextW(snap, ctypes.byref(e))
     finally:
         k32.CloseHandle(snap)
     return out
 
 
-def descendants(pid: int, table: list[tuple[int, int, str]] | None = None) -> list[int]:
+def descendants(pid: int, table: list[tuple[int, int, str, int]] | None = None) -> list[int]:
     """Processes started by `pid`, and by those, and so on."""
     table = processes() if table is None else table
     kids: dict[int, list[int]] = {}
-    for p, parent, _name in table:
+    for p, parent, *_ in table:
         if p != parent:
             kids.setdefault(parent, []).append(p)
     out, todo = [], list(kids.get(pid, []))

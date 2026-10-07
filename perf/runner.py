@@ -59,8 +59,8 @@ class Run:
     # -- measuring
     def snapshot(self) -> dict:
         p = self.proc
-        kids = winproc.descendants(p.pid)
-        s = p.sample(kids).as_dict()
+        table = winproc.processes()
+        s = p.sample(winproc.descendants(p.pid, table), table).as_dict()
         self._n += 1
         return s
 
@@ -356,8 +356,8 @@ def frozen(exe: Path, out: Path, timeout_s: float = 150) -> dict:
                 winproc.kill(p.pid)
                 break
             try:
-                kids = winproc.descendants(p.pid)
-                s = proc.sample(kids)
+                table = winproc.processes()
+                s = proc.sample(winproc.descendants(p.pid, table), table)
             except OSError:
                 break
             row = {"t": round(s.t - t0, 2), "private_mb": round(s.private / winproc.MB),

@@ -91,7 +91,9 @@ def test_thread_groups():
 def test_reads_this_process():
     with winproc.Proc(os.getpid()) as p:
         s = p.sample([])
+        t = p.sample([], winproc.processes())
         assert p.alive()
+    assert t.threads == s.threads
     assert s.private > 10 * stats.MB and s.wset > 0
     assert s.threads >= 1 and s.handles > 10
     assert s.cycles > 0
