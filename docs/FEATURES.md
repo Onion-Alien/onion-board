@@ -11,8 +11,10 @@ The full list. The [README](../README.md) has the short version and how to get s
   step with the sound (only you see it). **Pick several pads** with Ctrl+click,
   Shift+click or Ctrl+A to change their colour, volume, fades or categories, export
   them or remove them together (one Undo).
-- **Record a sound with your mic:** the **Record** button next to *Add sounds*.
-  Record your own voice, or your voice through the voice changer while it's on;
+- **Record a sound with your mic, or from what's playing:** the **Record** button next
+  to *Add sounds*. Record your own voice, your voice through the voice changer while
+  it's on, or *What's playing*: a bit of a sound, a web search result or the radio as
+  you hear it (the window stays out of the way, so you can play it while it records);
   after *Stop* the quiet ends are already cut off, drag the start and end to cut
   more, *Preview* plays it in your headphones only, then name it and *Save* to add
   the pad (it joins the category showing). Up to 15 minutes, spooled to disk as it
@@ -124,7 +126,7 @@ The full list. The [README](../README.md) has the short version and how to get s
   map's **HD** button swaps it for a 3D globe you can spin (heavier: it runs a web
   engine); **2D** on the globe goes back. Star stations for
   *★ Favorites*; *Popular* and *Recent* list the most played and the ones you had on. It plays in your headphones, goes out through
-  your mic when you press **LIVE**, and can *Record* or save the *Last 15s* as a pad.
+  your mic when you press **Send**, and can *Record* or save the *Last 15s* as a pad.
 - **Apps tab:** send one program's sound (a music player, a browser, a video, a
   call in another app) to whoever's listening, without touching any other program.
   Each program is a card with its level, a **Send** switch, its own volume, *Hear it

@@ -19,7 +19,7 @@ from PySide6.QtCore import QObject, Qt, QTimer, Signal
 from PySide6.QtWidgets import (QApplication, QDialog, QHBoxLayout, QLabel, QPushButton,
                                QVBoxLayout)
 
-from soundboard import chatcheck, directmic, theme
+from soundboard import chatcheck, directmic, discordcfg, theme
 from soundboard.ui import busy, fit, icons
 from soundboard.ui.bunnywidget import BunnyWidget
 from soundboard.ui.crashdialog import free_dialog
@@ -84,6 +84,59 @@ def on_mic(mw) -> bool:
     return cfg.route == "mic" and directmic.works(directmic.status(cfg.mic_device))
 
 
+# Straight into my mic: Discord's Studio profile (and "Bypass System Audio Input
+# Processing") opens the mic around every Windows audio effect, so nothing of the
+# board's reaches Discord. The clean setting there is Custom with the cleanup off.
+CUSTOM_OFF = ("set <b>Input Profile</b> to <b>Custom</b> (not Studio: Studio skips Onion "
+              "Board), <b>Noise Suppression</b> to <b>None</b>, and turn off <b>Echo "
+              "Cancellation</b>")
+
+# each discordcfg problem: (what it does, what to switch)
+SETTING_FIXES = {
+    discordcfg.STUDIO: (
+        "Input Profile is <b>Studio</b>: Discord skips Onion Board, so none of your "
+        "sounds get through",
+        "set <b>Input Profile</b> to <b>Custom</b>"),
+    discordcfg.BYPASS: (
+        "<b>Bypass System Audio Input Processing</b> is on: Discord skips Onion Board",
+        "turn it off (Show Advanced Voice Settings)"),
+    discordcfg.ISOLATION: (
+        "Input Profile is <b>Voice Isolation</b>: Krisp wipes out music after a second",
+        "set <b>Input Profile</b> to <b>Custom</b>, then Noise Suppression to <b>None</b>"),
+    discordcfg.KRISP: (
+        "Noise Suppression is <b>Krisp</b>: it wipes out music after a second",
+        "set <b>Noise Suppression</b> to <b>None</b>"),
+    discordcfg.SUPPRESSION: (
+        "Noise Suppression is <b>Standard</b>: it eats steady sounds",
+        "set <b>Noise Suppression</b> to <b>None</b>"),
+    discordcfg.ECHO: (
+        "<b>Echo Cancellation</b> is on: your sounds dip and pump",
+        "turn it off"),
+    discordcfg.AGC: (
+        "<b>Automatic Gain Control</b> is on: the volume jumps around",
+        "turn it off (Show Advanced Voice Settings)"),
+}
+
+
+def settings_html(found: list, kept: bool) -> str:
+    """Discord's own settings as read from its files (soundboard.discordcfg): a ✓, or
+    each one that's hurting your sounds and what to switch. '' when none was found."""
+    if not found:
+        return ""
+    ok, warn = _ok(), _warn()
+    s = found[0]   # the client changed most recently
+    name = html.escape(s.client)
+    probs = s.problems(kept)
+    if not probs:
+        return (f"<b style='color:{ok}'>✓ {name}'s settings are right for your sounds.</b>")
+    items = "".join(f"<li style='margin-bottom:4px'>{SETTING_FIXES[p][0]}: "
+                    f"{SETTING_FIXES[p][1]}.</li>" for p in probs)
+    return (f"<b style='color:{warn}'>{name}'s settings are changing your sounds:</b>"
+            f"<ul style='margin-left:-20px'>{items}</ul>"
+            "<span style='font-size:9pt'>Discord saves a change after a few seconds, up "
+            "to a minute: this updates by itself.</span>")
+
+
 def result_html(res: dict, vm: str, kept: bool = False) -> str:
     """What the check found, and what to switch in Discord for each finding."""
     ok, warn = _ok(), _warn()
@@ -100,10 +153,22 @@ def result_html(res: dict, vm: str, kept: bool = False) -> str:
         "not_heard": _(
             "Discord didn't play the test back. In Discord → <b>Voice &amp; Video</b>, set "
             "<b>Input Device</b> to {device}, click <b>Let's Check</b> (the bar should "
+            "move when you play a sound here), then check again. If that's all set, Discord "
+            "is skipping Onion Board or wiping your sounds out: set <b>Input Profile</b> to "
+            "<b>Custom</b> (not Studio: Studio skips Onion Board), <b>Noise Suppression</b> "
+            "to <b>None</b>, turn off <b>Echo Cancellation</b>, and turn off <b>Bypass "
+            "System Audio Input Processing</b> (Show Advanced Voice Settings).",
+            device=device) if kept else _(
+            "Discord didn't play the test back. In Discord → <b>Voice &amp; Video</b>, set "
+            "<b>Input Device</b> to {device}, click <b>Let's Check</b> (the bar should "
             "move when you play a sound here), then check again. If that's all set, noise "
             "suppression is removing your sounds completely: set <b>Input Profile</b> to "
             "<b>Studio</b>.", device=device),
         "suppression": _(
+            "<b>Noise suppression is removing your sounds.</b> In Discord, set <b>Input "
+            "Profile</b> to <b>Custom</b> (not Studio: Studio skips Onion Board), <b>Noise "
+            "Suppression</b> to <b>None</b>, and turn off <b>Echo Cancellation</b>.")
+        if kept else _(
             "<b>Noise suppression is removing your sounds.</b> Set <b>Input Profile</b> to "
             "<b>Studio</b> (or <b>Noise Suppression</b> to <b>None</b>)."),
         "gate": _(
@@ -112,6 +177,9 @@ def result_html(res: dict, vm: str, kept: bool = False) -> str:
             "(Settings → Hotkeys), or turn off <b>Automatically determine input "
             "sensitivity</b> and drag the slider almost all the way left."),
         "agc": _(
+            "<b>Automatic gain control is pumping your volume.</b> Turn off <b>Automatic "
+            "Gain Control</b> and <b>Echo Cancellation</b> (Input Profile <b>Custom</b>, not "
+            "Studio).") if kept else _(
             "<b>Automatic gain control is pumping your volume.</b> Set <b>Input Profile</b> "
             "to <b>Studio</b> (or turn off <b>Automatic Gain Control</b>)."),
     }
@@ -304,6 +372,12 @@ class DiscordGuide(QDialog):
             _("<b>Input Device</b>: keep your normal mic ({mic}). Your sounds are already "
               "in it.", mic=mic) if kept else
             _("<b>Input Device</b>: choose {mic}.", mic=mic),
+            _("<b>Input Profile</b>: choose <b>Custom</b>. <b>Not Studio</b>: Studio makes "
+              "Discord skip Onion Board, and none of your sounds get through. Then set "
+              "<b>Noise Suppression</b> to <b>None</b> and turn off <b>Echo "
+              "Cancellation</b>. Under <b>Show Advanced Voice Settings</b>, turn off "
+              "<b>Automatic Gain Control</b> and keep <b>Bypass System Audio Input "
+              "Processing</b> off.") if kept else
             _("<b>Input Profile</b>: choose <b>Studio</b>. That switches off noise "
               "suppression, echo cancellation and automatic gain control in one go."
               "<br><span style='font-size:9pt'>No Input Profile in your Discord? Set "
@@ -317,6 +391,17 @@ class DiscordGuide(QDialog):
             _("Click <b>Let's Check</b> in Discord, then <b>Check Discord</b> below. Onion "
               "Board plays a short test into your mic and listens to what Discord does "
               "with it."))))
+        # Discord's settings as its files have them, kept up to date while open
+        self.settings = _label("", "font-size:10.5pt;")
+        self.settings.setObjectName("resultbox")
+        self.settings.hide()
+        v.addWidget(self.settings)
+        self._sig = None
+        self._watch = QTimer(self)
+        self._watch.setInterval(2000)
+        self._watch.timeout.connect(self._read_settings)
+        self._watch.start()
+        self._read_settings()
         self.result = _label("", "font-size:10.5pt;")
         self.result.setObjectName("resultbox")
         self.result.hide()
@@ -350,6 +435,20 @@ class DiscordGuide(QDialog):
         self._check = ChatCheck(mw.engine, self)
         self._check.done.connect(self._checked)
         self._check.progress.connect(self._progress)
+
+    def _read_settings(self):
+        """Re-read Discord's settings when its files changed (a few ms; ~10 kB)."""
+        sig = discordcfg.signature()
+        if sig == self._sig:
+            return
+        self._sig = sig
+        text = settings_html(discordcfg.read(), self.kept)
+        if text == self.settings.text():
+            return
+        self.settings.setText(text)
+        self.settings.setVisible(bool(text))
+        if self.isVisible():   # a shorter list: shrink, not a gap under the header
+            QTimer.singleShot(0, self, self.adjustSize)
 
     def check(self):
         if busy.is_busy(self.btn_check):

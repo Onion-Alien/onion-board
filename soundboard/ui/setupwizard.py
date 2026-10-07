@@ -921,12 +921,14 @@ class SetupWizard(QDialog):
         mic = html.escape(cfg.mic_device or _("your mic"))
         self.discord_text.setText(
             _("Discord and your games keep using the mic they already have:<p "
-              "style='font-size:15pt; font-weight:800; color:{colour}'>{mic}</p>Your sounds are in "
-              "it now, so there's nothing to pick anywhere.<br><br><b>One thing worth doing in "
-              "Discord:</b> ⚙ User Settings → <b>Voice &amp; Video</b> → <b>Input Profile</b> → "
-              "<b>Studio</b>. Left on, its noise suppression treats your sounds as background "
-              "noise and chops them up. <b>In a game:</b> turn off its noise suppression if your "
-              "sounds cut out.", colour=_ok(), mic=mic))
+              "style='font-size:15pt; font-weight:800; color:{colour}'>{mic}</p>Your sounds "
+              "are in it now, so there's nothing to pick anywhere.<br><br><b>One thing worth "
+              "doing in Discord:</b> ⚙ User Settings → <b>Voice &amp; Video</b> → <b>Input "
+              "Profile</b> → <b>Custom</b>, <b>Noise Suppression</b> → <b>None</b>, and "
+              "<b>Echo Cancellation</b> off (not Studio: Studio skips Onion Board). Left on, "
+              "its noise suppression treats your sounds as background noise and wipes them "
+              "out. <b>In a game:</b> turn off its noise suppression if your sounds cut out.",
+              colour=_ok(), mic=mic))
 
     def show_steam_guide(self):
         self.show_guide("steam")

@@ -212,6 +212,16 @@ def _never_touch_the_real_mic(monkeypatch, tmp_path):
 
 
 @pytest.fixture(autouse=True)
+def _never_read_the_real_discord(monkeypatch, tmp_path):
+    """Discord's voice settings (soundboard.discordcfg) come from an empty folder: the
+    developer's own Discord must not put a banner in a test or a screenshot. Tests
+    write a fake store under discordcfg._appdata() when they need one."""
+    from soundboard import discordcfg
+    root = tmp_path / "guard" / "discord-appdata"
+    monkeypatch.setattr(discordcfg, "_appdata", lambda: root)
+
+
+@pytest.fixture(autouse=True)
 def _not_a_dev_pc(monkeypatch):
     """The developer's PCs set ONIONBOARD_NO_STATS (no usage count from them): the
     tests run as on anyone's PC, so the usage count tests see it sent."""

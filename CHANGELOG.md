@@ -2,6 +2,42 @@
 
 ## Unreleased
 
+- **Important fix: Discord wiping out your sounds on Straight into my mic.** Measured
+  on a real Discord: its default noise suppression (Krisp / Voice Isolation) lets a
+  song through for about a second, then wipes it out, and its **Studio** profile,
+  which Onion Board used to tell you to pick, makes Discord skip Onion Board
+  entirely, so none of your sounds got through. Onion Board now reads Discord's own
+  voice settings while it runs and shows a bar across the window when one of them is
+  in the way (*Fix Discord* opens the steps). The Discord guide, the setup guide, the
+  Setup tab and the voice changer's warning now say the right thing for your mic:
+  *Input Profile* **Custom**, *Noise Suppression* **None**, *Echo Cancellation* off
+  (Studio stays the clean choice on the virtual cable). The guide shows each of your
+  Discord settings with a ✓ or what to switch, and updates as you change them.
+- **Record a bit of what's playing.** The Sounds tab's **Record** window has a new
+  *What's playing* choice: press Record, play a sound, a web search result or the
+  radio (or catch a song already playing), then Stop, cut the ends and save it as a
+  pad, named after what played. Your mic isn't in it. The window no longer blocks
+  the board while it's open.
+- **Space plays and pauses everywhere on Sounds and Radio**, not just on a pad: after
+  clicking a web result's *Play*, a slider or a station, Space pauses (it used to
+  click the button again and download the song a second time). Typing in a box and
+  buttons reached with Tab keep their own Space.
+- **You can see what's playing.** The web result in the player shows bouncing bars
+  (or a pause sign) on its picture, gets an outline, and its *Play* becomes
+  *Pause* / *Resume*. The Radio's bottom bar shows the station and song with moving
+  bars; click it to find the station in the list.
+- **One click plays a radio station** (clicking the one playing doesn't restart it).
+- **The Radio's *Only me / LIVE* button is now *Send / Sending***, the same as a
+  program's on the Apps tab.
+- **Back to my sounds** stands out after a web search: a bigger red button.
+- **More AI voices, and a way to tell them apart.** Six new voices: Duke (an older,
+  gravelly man), Riley (a young guy), River (somewhere between a man and a woman),
+  Ivy (a husky woman), Squeak (a tiny cartoon voice) and Titan (a giant). Under the
+  voice list it now says who each one sounds like and how high it is. The new
+  **All voices** button opens every voice as a card with a few lines about it and
+  **Hear it**, a short sample in your headphones only. **Make your own voice** blends
+  two voices and sets how deep and how high it is. No new download: AI voices you
+  already have get the new voices too.
 - **"Did you know?" tips.** Once the setup guide is done, Onion Board shows a short
   tip about one feature at most once a day, with a *Show me* button that takes you
   there. Never while a game is up, and each tip only once. *Show tips* in

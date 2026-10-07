@@ -1354,3 +1354,26 @@ def test_the_flat_map_keeps_its_picture_while_tabs_flick_and_lets_it_go_later(qa
     _drawn(qapp, m)
     assert m._tiles                                    # drawn again when it shows
     m.close()
+
+
+def test_a_click_on_a_station_plays_it_and_the_bar_shows_what_plays(qapp, tab, server):
+    from PySide6.QtCore import Qt
+    from PySide6.QtTest import QTest
+    for s in tab._stations.values():
+        s.url = server.base + "/stream.wav"
+    assert tab.now.name == "" and tab.btn_live.text() == "Send"
+    tab.list.resize(400, 400)
+    it = tab.list.item(1)
+    at = tab.list.visualItemRect(it).center()     # the row's name, not its badge
+    QTest.mouseClick(tab.list.viewport(), Qt.LeftButton, pos=at)
+    uuid = it.data(Qt.UserRole)
+    assert process_events(qapp, lambda: tab.player.station is not None)
+    assert tab.player.station.uuid == uuid and tab.now.name == tab.player.station.name
+    playing = tab.player
+    QTest.mouseClick(tab.list.viewport(), Qt.LeftButton, pos=at)
+    process_events(qapp, lambda: False, timeout=0.1)
+    assert tab.player is playing and tab.player.station.uuid == uuid   # not restarted
+    tab.btn_live.click()
+    assert tab.btn_live.text() == "Sending" and tab.engine.radio_live
+    tab.toggle_play()                                # Space / the Stop button
+    assert tab.player.station is None and tab.now.name == ""
