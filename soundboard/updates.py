@@ -38,6 +38,7 @@ from pathlib import Path
 from soundboard import __version__, net
 from soundboard.library import APP_DIR
 from soundboard import errors
+from soundboard.i18n import _
 
 log = logging.getLogger(__name__)
 
@@ -114,7 +115,7 @@ def _get(url: str, feature: str = FEATURE,
             if attempt or e.code not in (502, 503, 504):
                 raise
             if cancelled is not None and cancelled():
-                raise UpdateError("cancelled") from e
+                raise UpdateError(_("cancelled")) from e
     raise AssertionError("release lookup exhausted without a result")
 
 
@@ -294,10 +295,10 @@ def download(rel: Release, progress: Callable[[int, int], None] | None = None,
     lists (SHA-256); its path. `progress(done, total)` is called as it arrives. Raises
     UpdateError with a message for the user. Call off the UI thread."""
     if not rel.asset_url.startswith((DOWNLOADS, OLD_DOWNLOADS)) or not SHA_RE.fullmatch(rel.sha256):
-        raise UpdateError("this release has no installer the app can check, "
-                          "so it can only be downloaded from its page")
+        raise UpdateError(_("this release has no installer the app can check, "
+                            "so it can only be downloaded from its page"))
     dest = fetch(rel.asset_url, rel.sha256, installer_path(rel), (DOWNLOADS, OLD_DOWNLOADS),
-                 MAX_SIZE, "an installer", rel.size, progress, cancelled)
+                 MAX_SIZE, "installer", rel.size, progress, cancelled)
     log.info("downloaded update %s (SHA-256 checked)", rel.version)
     return dest
 
@@ -316,12 +317,22 @@ def fetch(url: str, sha256: str, dest: Path, trusted: tuple[str, ...], max_size:
     """Download a release file to `dest` (via dest + ".part", so a failed download
     never leaves a half file under its name) and prove it's the one GitHub lists
     (`sha256`); returns `dest`. Only from a link under `trusted`, only over HTTPS,
-    and never more than `max_size` bytes (`what` it is, for the message). A file
+    and never more than `max_size` bytes (`what` it is, for the message: "installer",
+    "add-on", or anything else for a plain file). A file
     already there with the right checksum isn't fetched again. `feature` is whose
     download it is (soundboard.net). Raises UpdateError with a message for the user.
     Call off the UI thread."""
+    if what == "installer":
+        no_file = _("there's no installer here the app can check")
+        too_big = _("the download is far bigger than an installer")
+    elif what == "add-on":
+        no_file = _("there's no add-on here the app can check")
+        too_big = _("the download is far bigger than an add-on")
+    else:
+        no_file = _("there's no file here the app can check")
+        too_big = _("the download is far bigger than it should be")
     if not url.startswith(trusted) or not SHA_RE.fullmatch(sha256):
-        raise UpdateError(f"there's no {what.split(' ', 1)[-1]} here the app can check")
+        raise UpdateError(no_file)
     if dest.is_file() and _sha256(dest) == sha256:
         return dest   # downloaded earlier, never used
     dest.parent.mkdir(parents=True, exist_ok=True)
@@ -331,26 +342,26 @@ def fetch(url: str, sha256: str, dest: Path, trusted: tuple[str, ...], max_size:
     try:
         with _open(url, feature) as r, open(part, "wb") as f:
             if not r.geturl().startswith("https://"):
-                raise UpdateError("the download was redirected off HTTPS")
+                raise UpdateError(_("the download was redirected off HTTPS"))
             total = _length(r.headers.get("Content-Length")) or size or 0
             if total > max_size:
-                raise UpdateError(f"the download is far bigger than {what}")
+                raise UpdateError(too_big)
             while chunk := r.read(CHUNK):
                 if cancelled is not None and cancelled():
-                    raise UpdateError("cancelled")
+                    raise UpdateError(_("cancelled"))
                 if not net.allowed(feature):   # switched off (or Offline) meanwhile
                     raise UpdateError(net.off_message(feature))
                 done += len(chunk)
                 if done > max_size:
-                    raise UpdateError(f"the download is far bigger than {what}")
+                    raise UpdateError(too_big)
                 h.update(chunk)
                 f.write(chunk)
                 if progress is not None:
                     progress(done, total)
         if h.hexdigest() != sha256:
             log.warning("%s: SHA-256 %s, expected %s", dest.name, h.hexdigest(), sha256)
-            raise UpdateError("the downloaded file isn't the one GitHub lists "
-                              "(its checksum doesn't match), so it wasn't kept")
+            raise UpdateError(_("the downloaded file isn't the one GitHub lists "
+                                "(its checksum doesn't match), so it wasn't kept"))
         os.replace(part, dest)
     except UpdateError:
         part.unlink(missing_ok=True)
@@ -360,7 +371,7 @@ def fetch(url: str, sha256: str, dest: Path, trusted: tuple[str, ...], max_size:
         raise UpdateError(str(e)) from e
     except OSError as e:   # offline, disk full, connection dropped…
         part.unlink(missing_ok=True)
-        raise UpdateError(f"the download failed ({errors.plain(e)})") from e
+        raise UpdateError(_("the download failed ({error})", error=errors.plain(e))) from e
     log.info("downloaded %s (%d bytes, SHA-256 checked)", dest.name, done)
     return dest
 

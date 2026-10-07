@@ -23,7 +23,7 @@ from soundboard.i18n import _
 def describe(d: Dest) -> str:
     """One line of what a mode does, for the label under the picker."""
     if not d.active:
-        return d.note
+        return d.about
     parts = []
     if d.mono:
         parts.append(_("mono"))
@@ -36,7 +36,7 @@ def describe(d: Dest) -> str:
     if d.ceiling:
         parts.append(_("cut above {khz} kHz", khz=d.ceiling // 1000))
     what = " · ".join(parts)
-    return f"{d.note}  ({what})" if d.note else what
+    return f"{d.about}  ({what})" if d.about else what
 
 
 DUCK_LABELS = ((_("Off"), 0.0), (_("A little (-6 dB)"), -6.0), (_("Half (-12 dB)"), -12.0),
@@ -68,7 +68,7 @@ def _dest_cfg(mw) -> dict:
 
 def mode_tip(p: profiles.Profile) -> str:
     """A simple mode's tooltip: who it's for, then what it does."""
-    return f"<b>{p.label}</b>: {html.escape(p.summary)}<br><br>{html.escape(p.details)}"
+    return f"<b>{p.name}</b>: {html.escape(p.blurb)}<br><br>{html.escape(p.about)}"
 
 
 def set_simple(mw, key: str) -> profiles.Profile:
@@ -115,12 +115,12 @@ class ModesHelp(QDialog):
         now.setWordWrap(True)
         v.addWidget(now)
         for p in profiles.PROFILES:
-            lbl = QLabel(f"<b>{p.label}</b> &nbsp;<i>{html.escape(p.summary)}</i><br>"
-                         f"{html.escape(p.details)}")
+            lbl = QLabel(f"<b>{p.name}</b> &nbsp;<i>{html.escape(p.blurb)}</i><br>"
+                         f"{html.escape(p.about)}")
             lbl.setWordWrap(True)
             lbl.setTextFormat(Qt.RichText)
             v.addWidget(lbl)
-        v.addWidget(hint_label(profiles.SHARED))
+        v.addWidget(hint_label(profiles.shared()))
         bb = QDialogButtonBox(QDialogButtonBox.Close)
         bb.rejected.connect(self.accept)
         v.addWidget(bb)
@@ -150,9 +150,9 @@ class ModeCombo(QComboBox):
         self.blockSignals(True)
         self.clear()
         for q in profiles.PROFILES:
-            label = q.label
+            label = q.name
             if q is profiles.ADVANCED:
-                label = (_("Advanced: {label}", label=destination.resolve(d).label)
+                label = (_("Advanced: {label}", label=destination.resolve(d).name)
                          if p is q else _("Advanced…"))
             self.addItem(label, q.key)
             self.setItemData(self.count() - 1, mode_tip(q), Qt.ToolTipRole)
@@ -196,11 +196,11 @@ class DestPanel(QWidget):
         self.group.setExclusive(True)
         self.buttons: dict[str, QPushButton] = {}
         for p in profiles.PROFILES:
-            b = QPushButton(p.label)
+            b = QPushButton(p.name)
             b.setCheckable(True)
             b.setToolTip(mode_tip(p))
-            b.setAccessibleName(_("{label} mode", label=p.label))
-            b.setAccessibleDescription(p.summary)
+            b.setAccessibleName(_("{label} mode", label=p.name))
+            b.setAccessibleDescription(p.blurb)
             self.group.addButton(b)
             self.buttons[p.key] = b
             row.addWidget(b)
@@ -293,7 +293,7 @@ class DestPanel(QWidget):
         self.combo.blockSignals(True)
         self.combo.clear()
         for d in destination.all_modes(cfg.get("custom")):
-            self.combo.addItem(_("{mode}  (custom)", mode=d.label) if d.custom else d.label, d.key)
+            self.combo.addItem(_("{mode}  (custom)", mode=d.name) if d.custom else d.name, d.key)
         self.combo.setCurrentIndex(max(0, self.combo.findData(current)))
         self.combo.blockSignals(False)
         c = self.mw.cfg
@@ -369,11 +369,11 @@ class DestPanel(QWidget):
                   voice=voicesdk.NAMES.get(key, key))))
             self.suggest_text.setText(
                 _("{why}: <b>{label}</b> suits it.",
-                  why=why, label=destination.BUILTIN_BY_KEY[key].label))
+                  why=why, label=destination.BUILTIN_BY_KEY[key].name))
         elif simple:
             self.suggest_text.setText(
                 _("{why}: <b>{label}</b> mode suits it.",
-                  why=html.escape(hint.why), label=profiles.BY_KEY[simple].label))
+                  why=html.escape(hint.why), label=profiles.BY_KEY[simple].name))
         self.suggest.setVisible(bool(key or simple))
 
     def _use_suggestion(self):

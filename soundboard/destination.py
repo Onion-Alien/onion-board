@@ -44,6 +44,7 @@ from functools import lru_cache
 import numpy as np
 
 from soundboard.dsp import butter, lfilter, sos_response, sosfilt
+from soundboard.i18n import _
 
 F32 = np.float32
 CEILINGS = (0, 16000, 12000, 8000, 6000, 4000)   # 0 = none; the rest are codec bandwidths
@@ -63,6 +64,20 @@ class Dest:
     note: str = ""
     custom: bool = False
     lowcut: int = 0           # Hz high-pass (one of LOWCUTS); 0 = none
+
+    # label / note are stored as written (English for the built-in modes; saved with a
+    # custom one, sent by the control API); name / about are what the UI shows
+    @property
+    def name(self) -> str:
+        if self.custom:
+            return self.label
+        return _builtin_words().get(self.key, (self.label,))[0]
+
+    @property
+    def about(self) -> str:
+        if self.custom:
+            return self.note
+        return _builtin_words().get(self.key, (None, self.note))[1]
 
     @property
     def active(self) -> bool:
@@ -133,6 +148,37 @@ BUILTIN: tuple[Dest, ...] = (
               "low-CPU codec. Nothing above 8 kHz."),
 )
 BUILTIN_BY_KEY = {d.key: d for d in BUILTIN}
+
+
+def _builtin_words() -> dict[str, tuple[str, str]]:
+    """{key: (name, note)} of the built-in modes in the language picked. A function,
+    not a table: this module is imported before the language is (app.main)."""
+    return {
+        "off": (_("Off (send as is)"), _("No shaping. Your sounds go out exactly as mixed.")),
+        "discord": ("Discord", _(
+            "Discord calls and servers. Opus 64 kbps mono, keeps 100 Hz-20 kHz "
+            "(measured in a real call).")),
+        "game": ("Vivox", _(
+            "Valorant, League of Legends, Rainbow Six Siege, Overwatch 2 and other "
+            "games on Vivox. Opus 32 kbps mono, full band, nothing under ~80 Hz "
+            "(measured in a real game). Also suits TeamSpeak and Mumble.")),
+        "eos": ("Epic Online Services", _(
+            "Fortnite and other games on Epic's voice chat. Opus mono with "
+            "WebRTC-style noise suppression: turn that off in the game if it lets you.")),
+        "webrtc": (_("Browser, Zoom, Teams"), _(
+            "Calls in a web browser (Google Meet, Discord or Guilded in a browser, "
+            "web games), Zoom and Microsoft Teams. Mono, with the app's own "
+            "noise suppression and gain control: turn the noise suppression down.")),
+        "steam": (_("Steam voice"), _(
+            "CS2, Dota 2, TF2 and other games on Steam's voice chat. Opus fed "
+            "24 kHz mono: nothing above 12 kHz gets through.")),
+        "unity": (_("Unity voice (Photon / Dissonance)"), _(
+            "Phasmophobia, Lethal Company and other Unity games with Photon Voice or "
+            "Dissonance: Opus at 17-30 kbps, 12 kHz at most, voice activation.")),
+        "game_lo": (_("Low bandwidth (8 kHz)"), _(
+            "Older and console titles: Unreal's built-in voice chat, Vivox's "
+            "low-CPU codec. Nothing above 8 kHz.")),
+    }
 
 
 def all_modes(custom: list[dict] | None) -> list[Dest]:

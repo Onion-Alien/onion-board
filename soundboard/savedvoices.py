@@ -24,6 +24,7 @@ import zlib
 from pathlib import Path
 
 from soundboard import library, trash, voicefx
+from soundboard.i18n import _
 
 log = logging.getLogger(__name__)
 
@@ -103,7 +104,7 @@ def share_code(name: str, effects: dict) -> str:
                 if v != q.default:
                     d[q.key] = round(v, 4)
         out[etype] = d
-    raw = json.dumps({"n": clean_name(name) or "My voice", "e": out},
+    raw = json.dumps({"n": clean_name(name) or _("My voice"), "e": out},
                      separators=(",", ":"), ensure_ascii=False).encode("utf-8")
     body = base64.urlsafe_b64encode(zlib.compress(raw, 9)).rstrip(b"=").decode("ascii")
     return f"{CODE_PREFIX}{CODE_VERSION}-{body}"
@@ -115,35 +116,35 @@ def read_code(text) -> tuple[str, dict, list[str]]:
     named in `notes`."""
     code = "".join(str(text or "").split())   # pasted over two lines, spaces around
     if not code:
-        raise CodeError("There's no code there.")
+        raise CodeError(_("There's no code there."))
     if len(code) > MAX_CODE:
-        raise CodeError("That's far too long to be a voice code.")
+        raise CodeError(_("That's far too long to be a voice code."))
     head, dash, body = code.partition("-")
     version = head[len(CODE_PREFIX):]
     if not dash or not head.upper().startswith(CODE_PREFIX) \
             or not (version.isascii() and version.isdecimal()):
-        raise CodeError("That isn't a voice code (they start with “OB1-”).")
+        raise CodeError(_("That isn't a voice code (they start with “OB1-”)."))
     if int(version) > CODE_VERSION:
-        raise CodeError("That code was made by a newer version of the app. Update to "
-                        "use it.")
+        raise CodeError(_("That code was made by a newer version of the app. Update to "
+                          "use it."))
     try:
         packed = base64.urlsafe_b64decode(body + "=" * (-len(body) % 4))
         unzip = zlib.decompressobj()
         raw = unzip.decompress(packed, MAX_JSON)
         if unzip.unconsumed_tail:
-            raise CodeError("That code unpacks to far too much to be a voice.")
+            raise CodeError(_("That code unpacks to far too much to be a voice."))
         if not unzip.eof:
             raise ValueError("cut short")
         data = json.loads(raw.decode("utf-8"))
     except CodeError:
         raise
     except (ValueError, zlib.error, RecursionError):
-        raise CodeError("That code is damaged or cut short. Copy the whole thing "
-                        "and try again.") from None
+        raise CodeError(_("That code is damaged or cut short. Copy the whole thing "
+                          "and try again.")) from None
     if not isinstance(data, dict) or not isinstance(data.get("n"), str) \
             or not isinstance(data.get("e"), dict):
-        raise CodeError("That code is damaged: it doesn't hold a voice.")
-    name = clean_name(data["n"]) or "Shared voice"
+        raise CodeError(_("That code is damaged: it doesn't hold a voice."))
+    name = clean_name(data["n"]) or _("Shared voice")
     effects, unknown = {}, []
     for etype, cfg in data["e"].items():
         cls = voicefx.REGISTRY.get(etype) if isinstance(etype, str) else None
@@ -153,7 +154,7 @@ def read_code(text) -> tuple[str, dict, list[str]]:
         if etype in NOT_SHARED:
             continue
         if not isinstance(cfg, dict):
-            raise CodeError("That code is damaged: an effect's settings are missing.")
+            raise CodeError(_("That code is damaged: an effect's settings are missing."))
         d = {"on": True}
         for q in cls.params:
             v = cfg.get(q.key)
@@ -167,9 +168,9 @@ def read_code(text) -> tuple[str, dict, list[str]]:
         effects[etype] = d
     notes = []
     if unknown:
-        notes.append("Left out effects this version doesn't have: "
-                     + ", ".join(unknown[:5]) + ("…" if len(unknown) > 5 else "")
-                     + ". Updating the app may add them.")
+        names = ", ".join(unknown[:5]) + ("…" if len(unknown) > 5 else "")
+        notes.append(_("Left out effects this version doesn't have: {effects}. "
+                       "Updating the app may add them.", effects=names))
     return name, effects, notes
 
 
@@ -209,7 +210,7 @@ class Store:
         self.voices = dict(clean_list(raw.get("voices")))
         for d in raw.get("deleted", []) if isinstance(raw.get("deleted"), list) else ():
             try:
-                name = clean_name(d["name"]) or "Voice"
+                name = clean_name(d["name"]) or _("Voice")
                 self.deleted.append(trash.Item(str(d["id"]), VOICE, name,
                                                float(d.get("when", 0)),
                                                {"effects": clean_effects(d.get("effects"))}))
@@ -252,7 +253,7 @@ class Store:
 
     def free_name(self, name: str) -> str:
         """`name`, or "name (2)", "name (3)"... if that's taken."""
-        name = clean_name(name) or "My voice"
+        name = clean_name(name) or _("My voice")
         if self.find(name) is None:
             return name
         n = 2

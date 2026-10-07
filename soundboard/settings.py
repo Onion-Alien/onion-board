@@ -579,7 +579,7 @@ class SettingsDialog(QDialog):
         hints = {"Classic": _("Changes the whole app instantly."),
                  "Meme": _("For when you want your soundboard to be a bit.")}
         for group, names in theme.GROUPS:
-            card, cv = self._card(group, hints.get(group, ""))
+            card, cv = self._card(theme.group_name(group), hints.get(group, ""))
             cards = []
             for name in names:
                 c = ThemeCard(name)
@@ -2096,7 +2096,7 @@ class SettingsDialog(QDialog):
             section, sv = self._card(title)
             for key in keys:
                 self.net_boxes[key] = self._option(
-                    sv, labels.get(key, net.FEATURES[key]), self.NET_HINTS[key],
+                    sv, labels.get(key) or net.feature_name(key), self.NET_HINTS[key],
                     key not in cfg.net_off, lambda on, k=key: self._set_feature(k, on))
                 sub = QWidget()
                 sl = QVBoxLayout(sub)
@@ -2280,7 +2280,7 @@ class SettingsDialog(QDialog):
             use_tor.setEnabled(have)
             use_tor.setToolTip(
                 _("The app's own Tor: sites and radio stations don't see your address")
-                if have else tor.NOT_INSTALLED)
+                if have else tor.not_installed())
             if not busy.is_busy(get):
                 get.setText(_("Update Tor") if outdated else _("Get Tor"))
             get_box.setVisible(bool(msg) or busy.is_busy(get) or not have or outdated)
@@ -2288,7 +2288,7 @@ class SettingsDialog(QDialog):
                 _("A newer Tor ({version}) is ready to download.", version=torget.VERSION)
                 if outdated else
                 _("To use Tor, get it first: about 22 MB from the Tor Project, checked "
-                  "before it's used. {blocked_hint}", blocked_hint=torget.BLOCKED_HINT)))
+                  "before it's used. {blocked_hint}", blocked_hint=torget.blocked_hint())))
 
         # ---- proxy
         proxy_box = QWidget()
@@ -2415,7 +2415,7 @@ class SettingsDialog(QDialog):
 
             def finish(msg):
                 relay.deleteLater()
-                ok = msg == tor.NEWNYM_OK
+                ok = msg == tor.newnym_ok()
                 release(_("✓ Changed") if ok else _("✗ Failed"))
                 if qt_valid(tor_state):
                     tor_state.setText(msg)

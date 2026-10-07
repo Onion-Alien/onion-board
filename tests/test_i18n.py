@@ -172,3 +172,93 @@ def test_startup_reads_the_setting_or_the_env(langs, tmp_path, monkeypatch):
 def test_any_placeholder_name_works():
     assert _("{text} and {singular}", text="a", singular="b") == "a and b"
     assert ngettext("{n} {text}", "{n} {text}s", 2, text="cat", plural="x") == "2 cats"
+
+
+def _import_time_translations(path) -> list[int]:
+    """Lines of `path` where _() / ngettext() runs when the module is imported: calls
+    outside any function or lambda body (module level, class bodies, default argument
+    values and decorators all run at import)."""
+    import ast
+    found: list[int] = []
+
+    def visit(node):
+        if isinstance(node, ast.Call) and isinstance(node.func, ast.Name) \
+                and node.func.id in ("_", "ngettext"):
+            found.append(node.lineno)
+        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+            for n in node.decorator_list + node.args.defaults + node.args.kw_defaults:
+                if n is not None:
+                    visit(n)
+            return   # the body runs later
+        if isinstance(node, ast.Lambda):
+            for n in node.args.defaults + node.args.kw_defaults:
+                if n is not None:
+                    visit(n)
+            return
+        for child in ast.iter_child_nodes(node):
+            visit(child)
+
+    visit(ast.parse(path.read_text(encoding="utf-8")))
+    return found
+
+
+def test_modules_imported_before_the_language_is_picked_translate_on_use():
+    """app.main imports some modules before i18n.startup(): text they translate at
+    import time would stay English for good. Finds them (app.py's own imports and
+    main's above the startup call, then everything those pull in) and checks none
+    calls _() / ngettext() at import time."""
+    import ast
+    import os
+    import subprocess
+    import sys
+    from pathlib import Path
+    root = Path(__file__).resolve().parent.parent
+    tree = ast.parse((root / "soundboard" / "app.py").read_text(encoding="utf-8"))
+    main = next(n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name == "main")
+    startup = next(n.lineno for n in ast.walk(main) if isinstance(n, ast.Call)
+                   and isinstance(n.func, ast.Attribute) and n.func.attr == "startup")
+    early = [n for n in tree.body if isinstance(n, (ast.Import, ast.ImportFrom))]
+    early += [n for n in ast.walk(main) if isinstance(n, (ast.Import, ast.ImportFrom))
+              and n.lineno < startup]
+    wanted = {"soundboard.app"}
+    for n in early:
+        if isinstance(n, ast.Import):
+            wanted.update(a.name for a in n.names)
+        elif n.module and n.module.split(".")[0] == "soundboard":
+            wanted.add(n.module)
+            wanted.update(f"{n.module}.{a.name}" for a in n.names)   # maybe submodules
+    code = ("import importlib, sys\n"
+            f"for m in {sorted(wanted)!r}:\n"
+            "    try:\n"
+            "        importlib.import_module(m)\n"
+            "    except ImportError:\n"
+            "        pass   # a name imported from a module, not a submodule\n"
+            "print(' '.join(sorted(n for n, m in sys.modules.items()\n"
+            "    if n.split('.')[0] == 'soundboard' and getattr(m, '__file__', None))))\n")
+    env = dict(os.environ, PYTHONPATH=str(root), QT_QPA_PLATFORM="offscreen")
+    out = subprocess.run([sys.executable, "-c", code], capture_output=True, text=True,
+                         cwd=root, env=env, timeout=120)
+    assert out.returncode == 0, out.stderr
+    mods = out.stdout.split()
+    assert "soundboard.library" in mods and "soundboard.errors" in mods   # it found them
+    bad = {}
+    for name in mods:
+        path = root / Path(*name.split("."))
+        path = path / "__init__.py" if path.is_dir() else path.with_suffix(".py")
+        if path.is_file() and (lines := _import_time_translations(path)):
+            bad[name] = lines
+    assert not bad, f"_() / ngettext() at import time, before i18n.startup(): {bad}"
+
+
+def test_import_time_finder_sees_module_level_class_and_default_calls(tmp_path):
+    f = tmp_path / "m.py"
+    f.write_text("from soundboard.i18n import _\n"
+                 "A = _('a')\n"
+                 "class C:\n"
+                 "    b = _('b')\n"
+                 "    def m(self, x=_('c')):\n"
+                 "        return _('fine')\n"
+                 "def f():\n"
+                 "    return _('fine')\n"
+                 "g = lambda: _('fine')\n", encoding="utf-8")
+    assert _import_time_translations(f) == [2, 4, 5]

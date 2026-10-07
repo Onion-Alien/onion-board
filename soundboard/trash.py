@@ -23,6 +23,7 @@ from pathlib import Path
 
 from soundboard import library
 from soundboard.library import SoundMeta
+from soundboard.i18n import _, ngettext
 
 log = logging.getLogger(__name__)
 
@@ -356,11 +357,9 @@ def ago(when: float, now: float | None = None) -> str:
     """"just now", "5 min ago", "3 hours ago", "2 days ago"."""
     s = max(0, (now or time.time()) - when)
     if s < 60:
-        return "just now"
+        return _("just now")
     if s < 3600:
-        return f"{int(s // 60)} min ago"
+        return ngettext("{n} min ago", "{n} min ago", int(s // 60))
     if s < 86400:
-        h = int(s // 3600)
-        return f"{h} hour{'s' if h != 1 else ''} ago"
-    d = int(s // 86400)
-    return f"{d} day{'s' if d != 1 else ''} ago"
+        return ngettext("{n} hour ago", "{n} hours ago", int(s // 3600))
+    return ngettext("{n} day ago", "{n} days ago", int(s // 86400))

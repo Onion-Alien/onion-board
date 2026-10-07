@@ -44,6 +44,7 @@ from soundboard.eq import EQ
 from soundboard.sendfx import Ducker, Limiter, SafetyLimiter, SmartMono
 from soundboard.voicefx.builtin import PitchShift
 from soundboard import errors
+from soundboard.i18n import _
 
 log = logging.getLogger(__name__)
 
@@ -561,7 +562,7 @@ class CableTap:
     def __init__(self, name: str, latency="low"):
         idx = find_device("output", name)
         if idx is None:
-            raise RuntimeError(f"device not found: {name}")
+            raise RuntimeError(_("device not found: {device}", device=name))
         self.name = name
         self.rate = int(sd.query_devices(idx)["default_samplerate"])
         self.ring = Ring(self.rate, prefill_s=0.03, max_s=0.2, auto_drift=True)
@@ -995,11 +996,11 @@ class Engine:
             return self._open_direct(callback)
         idx = find_device("output", name)
         if idx is None:
-            raise RuntimeError(f"device not found: {name}")
+            raise RuntimeError(_("device not found: {device}", device=name))
         rate = self._native_rate(idx)
         chans = min(CH, sd.query_devices(idx)["max_output_channels"])
         if chans < CH:
-            raise RuntimeError("mono output devices aren't supported")
+            raise RuntimeError(_("mono output devices aren't supported"))
         s = sd.OutputStream(device=idx, samplerate=rate, channels=CH, dtype="float32",
                             latency=BUFFER.get(self.latency, "low"), callback=callback)
         self._last_cb[key] = time.monotonic()
@@ -1028,7 +1029,7 @@ class Engine:
                                           mode=self.direct_mode, lead_s=self.direct_lead_s,
                                           voice_delay=self._direct_voice_delay)
         except FileNotFoundError:
-            raise RuntimeError("Onion Board isn't attached to your mic yet") from None
+            raise RuntimeError(_("Onion Board isn't attached to your mic yet")) from None
         self.fifo_direct.clear()
         self._last_cb["main"] = time.monotonic()
         s.start()
@@ -1234,7 +1235,7 @@ class Engine:
             s = None
             try:
                 if idx is None:
-                    raise RuntimeError(f"device not found: {name}")
+                    raise RuntimeError(_("device not found: {device}", device=name))
                 rate = self._native_rate(idx)
                 chans = min(2, sd.query_devices(idx)["max_input_channels"])
                 s = sd.InputStream(device=idx, samplerate=rate, channels=chans, dtype="float32",
