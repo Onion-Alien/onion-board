@@ -645,6 +645,14 @@ def is_xrun(status) -> bool:
                 or status.input_underflow or status.input_overflow)
 
 
+def _add(acc: np.ndarray | None, x: np.ndarray) -> np.ndarray:
+    """acc + x, starting a new sum (a copy: x may be a ring's buffer) when acc is None."""
+    if acc is None:
+        return np.array(x, dtype=np.float32)
+    acc += x
+    return acc
+
+
 class LivePitch:
     """Stereo real-time pitch shifter (a voicefx PitchShift on both channels at once,
     spliced at the same places: see its `channels`). Keeps its recent input while
@@ -923,7 +931,14 @@ class Engine:
         self.sound_keep_pitch = True  # speed changes leave the pitch alone
         self.sound_fx: dict = {}      # live effects on every sound (livefx), {} = none
         self._spitch: dict[str, LivePitch] = {}
-        self._sfx: dict[str, livefx.LiveFx] = {}
+        self._sfx: dict = {}          # out or (out, bus) -> livefx.LiveFx
+        # the same live pitch / effects on the radio and on the Apps tab's programs
+        # (one setting for all of them): no speed, they're live streams
+        self.radio_pitch = 0.0
+        self.radio_fx: dict = {}
+        self.apps_pitch = 0.0
+        self.apps_fx: dict = {}
+        self._lpitch: dict[tuple[str, str], LivePitch] = {}
 
         self.main_stream = self.mon_stream = self.mic_stream = self.obs_stream = None
         # "straight into my mic" (soundboard.directmic): what others hear goes into the
@@ -1974,19 +1989,39 @@ class Engine:
             f = self._spitch[out] = LivePitch(self.rates[out])
         return f.process(x, st)   # at 0 st it only keeps its history fresh
 
-    def _fx(self, out: str, x: np.ndarray) -> np.ndarray:
-        """Live effects on the sounds bus (livefx). Made when a knob comes off 0 and
-        dropped once they're all back at 0 and the last change has faded out."""
-        fx = self.sound_fx
-        f = self._sfx.get(out)
+    def _fx(self, out: str, x: np.ndarray, fx: dict | None = None, key=None) -> np.ndarray:
+        """Live effects on the sounds bus (livefx), or on another bus with its own
+        `fx` and `key`. Made when a knob comes off 0 and dropped once they're all back
+        at 0 and the last change has faded out."""
+        if fx is None:
+            fx = self.sound_fx
+        key = out if key is None else key
+        f = self._sfx.get(key)
         if f is None or f.rate != self.rates[out]:
             if not fx:
                 return x
-            f = self._sfx[out] = livefx.LiveFx(self.rates[out])
+            f = self._sfx[key] = livefx.LiveFx(self.rates[out])
         y = f.process(x, fx)
         if not fx and f.idle:
-            self._sfx.pop(out, None)
+            self._sfx.pop(key, None)
         return y
+
+    def _live(self, out: str, bus: str, x: np.ndarray) -> np.ndarray:
+        """The radio's ('radio') or the programs' ('apps') live pitch and effects.
+        The pitch shifter is made the first time it's off 0 and kept from then on
+        (at 0 st it only keeps its history fresh), so going back to 0 doesn't click."""
+        st, fx = ((self.radio_pitch, self.radio_fx) if bus == "radio"
+                  else (self.apps_pitch, self.apps_fx))
+        key = (out, bus)
+        f = self._lpitch.get(key)
+        if f is None or f.rate != self.rates[out]:
+            if not st:
+                f = None
+            else:
+                f = self._lpitch[key] = LivePitch(self.rates[out])
+        if f is not None:
+            x = f.process(x, float(st))
+        return self._fx(out, x, fx, key)
 
     def _eq(self, out: str, part: str, x: np.ndarray) -> np.ndarray:
         """Run x through the EQ if it's on and aimed at `part` ('sounds' / 'voice')."""
@@ -2101,6 +2136,7 @@ class Engine:
         took = mix.copy() if take is not None and self.play_take_out == "main" else None
         r = self.ring_rmain.read(frames)
         if r is not None:
+            r = self._live("main", "radio", r)
             idle = False
             play = max(play, peak(r) * self.radio_vol)
             mix += self._vol("main", "radio", r, self.radio_vol if self.radio_live else 0.0)
@@ -2109,13 +2145,16 @@ class Engine:
         if took is not None:
             take.append(took)
         lowcut = self._lowcut()
+        apps = None
         for a in self.aux:
             x = a.ring_main.read(frames)
             if x is not None:
                 idle = False
                 play = max(play, peak(x) * a.vol)
                 g = a.gain("main", lowcut) if a.live else 0.0
-                mix += self._vol("main", ("aux", a.key), x, g)
+                apps = _add(apps, self._vol("main", ("aux", a.key), x, g))
+        if apps is not None:
+            mix += self._live("main", "apps", apps)
         self.level_play = max(play, self.level_play * 0.85)
         if not idle:
             finite(mix)
@@ -2191,6 +2230,7 @@ class Engine:
         took = mix.copy() if take is not None and self.play_take_out == "mon" else None
         r = self.ring_rmon.read(frames)
         if r is not None:
+            r = self._live("mon", "radio", r)
             idle = False
             play = max(play, peak(r) * self.radio_vol)
             on = self.radio_monitor or (check and self.radio_live)
@@ -2200,13 +2240,17 @@ class Engine:
         if took is not None:
             take.append(took)
         lowcut = self._lowcut()   # the headphones get the mode's shaping too (_dest)
+        apps = None
         for a in self.aux:
             x = a.ring_mon.read(frames)
             if x is not None:
                 idle = False
                 play = max(play, peak(x) * a.vol)
                 on = a.monitor or (check and a.live)
-                mix += self._vol("mon", ("aux", a.key), x, a.gain("mon", lowcut) if on else 0.0)
+                apps = _add(apps, self._vol("mon", ("aux", a.key), x,
+                                            a.gain("mon", lowcut) if on else 0.0))
+        if apps is not None:
+            mix += self._live("mon", "apps", apps)
         self.level_play = max(play, self.level_play)   # _main decays it; no main: the UI does
         if idle:   # silence all the way: only the volume's glide and the limiter to keep
             self._bus_quiet("mon", mix, silent=True)
@@ -2264,11 +2308,16 @@ class Engine:
         mix = self._vol("obs", "sounds", mix, self.sound_vol)
         r = self.ring_robs.read(frames)
         if r is not None:
+            r = self._live("obs", "radio", r)
             mix += self._vol("obs", "radio", r, self.radio_vol if self.radio_live else 0.0)
+        apps = None
         for a in self.aux:
             x = a.ring_obs.read(frames)
             if x is not None:
-                mix += self._vol("obs", ("aux", a.key), x, a.vol if a.stream else 0.0)
+                apps = _add(apps, self._vol("obs", ("aux", a.key), x,
+                                            a.vol if a.stream else 0.0))
+        if apps is not None:
+            mix += self._live("obs", "apps", apps)
         mix = self._eq("obs", "sounds", finite(mix))
         m = self.ring_obs.read(frames)
         if m is None:
