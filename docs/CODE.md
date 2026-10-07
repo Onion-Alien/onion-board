@@ -312,7 +312,7 @@ the newest backup is used, so the pad list is never silently reset.
   Onion Board also runs as administrator (Windows blocks it). Keys are injected with
   `SendInput`, modifiers and key in one call.
 - Windows draw the ordinary way (no `QT_WIDGETS_RHI`). Forcing GPU drawing, as up to
-  1.9.6 for the Radio tab's 3D globe, gave every window its own Direct3D device (16
+  1.9.7 for the Radio tab's 3D globe, gave every window its own Direct3D device (16
   driver threads and ~30 MB each, never freed).
 - `OPENBLAS_NUM_THREADS` is set to 2 when the `soundboard` package is first imported,
   before numpy loads (a value you set yourself wins). numpy's and scipy's OpenBLAS

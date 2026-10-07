@@ -52,6 +52,7 @@ BRIDGE_BOOTSTRAP_TIMEOUT_S = 360.0   # Snowflake can take minutes
 POLL_S = 0.5
 RETRY_AFTER_FAIL_S = 10.0     # a request right after a failure gets that failure
 NEWNYM_EVERY_S = 10.0         # tor ignores (delays) NEWNYM more often than this
+NEWNYM_OK = "New identity: new connections go out through a different route."
 STOP_WAIT_S = 3.0
 STILL_MOVING_S = 60.0         # a request keeps waiting past its time while Tor progresses
 LOG_LINES = 40
@@ -587,7 +588,7 @@ class Tor:
             return f"Tor didn't take it ({errors.plain(e)})"
         self._last_newnym = time.monotonic()
         log.info("tor: new identity")
-        return "New identity: new connections go out through a different route."
+        return NEWNYM_OK
 
     # ---- the worker
     def _fail(self, run_id: int, why: str):

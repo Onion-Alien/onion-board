@@ -60,7 +60,7 @@ def test_plan_keeps_what_is_reachable_and_drops_the_rest(tmp_path):
     assert problems == []
     names = {p.name for p in drop}
     # cut: unused Python modules, unreachable Qt DLLs, QML, the whole web engine (the
-    # Radio tab's 3D globe used it up to 1.9.6), unused picture formats and TLS, extras
+    # Radio tab's 3D globe used it up to 1.9.7), unused picture formats and TLS, extras
     assert {"QtQuick.pyd", "QtOpenGL.pyd", "QtWebEngineCore.pyd", "Qt6Charts.dll",
             "Qt63DRender.dll", "Qt6WebEngineCore.dll", "Qt6Quick.dll", "Qt6Qml.dll",
             "Qt6Pdf.dll", "QtWebEngineProcess.exe", "resources", "qtwebengine_locales",

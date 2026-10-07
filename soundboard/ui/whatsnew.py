@@ -28,6 +28,18 @@ class Note:
 
 # newest first; add one per release that has something worth telling
 NOTES = (
+    Note("1.9.7", "Your sounds get through Discord again", (
+        ("shield", "Discord no longer wipes out your sounds",
+         "Discord's noise suppression, Studio profile and Advanced Voice Activity were "
+         "cutting your sounds on Straight into my mic. A bar now says when one is on, "
+         "and Fix Discord shows what to switch."),
+        ("voice", "Six new AI voices",
+         "All voices shows every voice as a card with a sample, and Make your own voice "
+         "blends two of them."),
+        ("mic", "Record a sound",
+         "The new Record button records your mic or whatever is playing; cut the ends "
+         "and save it as a pad."),
+    )),
     Note("1.9.6", "A new voice, and faster fixes", (
         ("voice", "Secret detective",
          "A disguised TV voice: yours plus a lined-up copy a fifth lower, thin and boxy "

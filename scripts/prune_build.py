@@ -9,7 +9,7 @@ none of which this app touches. This removes what the app never loads:
   each kept file's import table with pefile
 - the QML folder, the QML/positioning/touch plugins, spare platform plugins
 - the web engine: its helper exe, resources and locales (the Radio tab's 3D globe
-  used it up to 1.9.6; with them gone Qt6WebEngineCore, Quick and QML go too)
+  used it up to 1.9.7; with them gone Qt6WebEngineCore, Quick and QML go too)
 - image formats the app never opens (PDF, which drags Qt6Pdf in, TIFF, ICNS, TGA,
   WBMP: every format plugin is loaded at start-up), the virtual keyboard, and the
   TLS backends besides Windows' own (no OpenSSL ships, so that one can't load anyway)

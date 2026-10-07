@@ -436,7 +436,7 @@ class RadioTab(QWidget):
 
         self._want_globe = globe   # a map at all (tests run without one)
         self.flat = None           # the map, made on first show
-        # The 3D globe (an "HD" button on the map until 1.9.6) is gone: whoever had it
+        # The 3D globe (an "HD" button on the map until 1.9.7) is gone: whoever had it
         # on gets the map. "flat" is a value every older version reads.
         if cfg.radio.get("map") not in (None, "flat"):
             cfg.radio["map"] = "flat"

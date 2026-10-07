@@ -35,10 +35,12 @@ PEAKS = 400
 
 
 def next_name(names) -> str:
-    """"Recording N", one past the highest number already used."""
-    used = [int(m.group(1)) for n in names
-            if (m := re.fullmatch(r"Recording (\d+)", n.strip()))]
-    return f"Recording {max(used, default=0) + 1}"
+    """"Recording N", one past the highest number already used (in English or the
+    language showing: names made before a language change count too)."""
+    mine = re.escape(_("Recording {n}")).replace(re.escape("{n}"), r"(\d+)")
+    used = [int(m.group(1)) for n in names for pat in {r"Recording (\d+)", mine}
+            if (m := re.fullmatch(pat, n.strip()))]
+    return _("Recording {n}", n=max(used, default=0) + 1)
 
 
 def _clock(s: float) -> str:
@@ -209,11 +211,11 @@ class RecordDialog(QDialog):
             return ("" if e.active_outputs() else
                     _("No audio device is open. Pick one in Setup → Devices."))
         if not e.names.get("mic"):
-            return "No mic is picked. Pick one in Setup → Devices."
+            return _("No mic is picked. Pick one in Setup → Devices.")
         if e.mic_stream is None:
             err = e.errors_snapshot().get("mic")
-            return f"Your mic can't open: {err}" if err else \
-                "Your mic can't open right now. Check it in Setup → Devices."
+            return _("Your mic can't open: {error}", error=err) if err else \
+                _("Your mic can't open right now. Check it in Setup → Devices.")
         return ""
 
     def _show_state(self):

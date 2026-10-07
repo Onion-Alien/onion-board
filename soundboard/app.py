@@ -8,7 +8,7 @@ import os
 import subprocess
 import sys
 
-# (Up to 1.9.6 QT_WIDGETS_RHI=1 was set here so the Radio tab's 3D globe could show
+# (Up to 1.9.7 QT_WIDGETS_RHI=1 was set here so the Radio tab's 3D globe could show
 # without rebuilding the window. It gave every window its own Direct3D device, 16
 # driver threads and ~30 MB each, never freed; the globe is gone and windows draw
 # the ordinary way again.)
