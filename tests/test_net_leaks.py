@@ -20,7 +20,7 @@ from conftest import closed_port, process_events
 from fakeproxy import Socks5, no_leaks
 from soundboard import net, updates
 from soundboard.engine import SR
-from test_radio import FakeEngine, FakeMeter, wav_bytes
+from test_radio import wav_bytes
 
 
 class Sites:
@@ -421,23 +421,3 @@ def test_a_playing_station_follows_a_change_of_proxy(qapp, sites, socks):
     finally:
         p.stop()
         other.close()
-
-
-def test_the_globe_page_cant_reach_the_network(qapp, app_dir, sites):
-    from soundboard.radio import RadioDirectory
-    from soundboard.ui.radiopanel import RadioTab
-    from soundboard.library import Config
-    from test_radio import api_station
-    sites.routes["/json/stations/search"] = (json.dumps([api_station(1)]).encode(),
-                                             "application/json")
-    d = RadioDirectory(app_dir / "radio", bases=(f"http://127.0.0.1:{sites.port}",))
-    cfg = Config()
-    cfg.radio = {"map": "globe"}
-    t = RadioTab(FakeEngine(), cfg, lambda: None, FakeMeter, directory=d, globe=True)
-    t.start()
-    assert process_events(qapp, lambda: t._globe_loaded, timeout=20)
-    leak = f"http://127.0.0.1:{sites.port}/leak"
-    t.view.page().runJavaScript(f"fetch('{leak}').catch(()=>0); new Image().src='{leak}2'")
-    process_events(qapp, lambda: False, timeout=1.5)
-    assert not any(p.startswith("/leak") for p in sites.paths())
-    t.shutdown()

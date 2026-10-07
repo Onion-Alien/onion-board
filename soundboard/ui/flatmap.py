@@ -1,4 +1,4 @@
-"""The Radio tab's flat world map: the default view, painted by Qt itself.
+"""The Radio tab's world map, painted by Qt itself.
 
 A plain map (land outlines, country names, a dot per station and, zoomed in, the
 names of the cities and towns in view that have stations) costs nothing while
@@ -10,11 +10,10 @@ slice at a time while the last whole view, put together into one picture and
 stretched, stands in for them (tiles stretched one by one showed their seams, a grid
 over the map); a new zoom shows only once all of it is drawn. Under that, the land of
 the whole world, small. The first stations pop in a few at a time (REVEAL_S), and Bun
-waits on the map till they come. The 3D globe (radio.globe_html) is the HD view, one
-click away on the map's HD button.
+waits on the map till they come.
 
-Stations arrive as radio.globe_points() dicts, like the globe's, so the tab can
-feed either view the same way.
+Stations arrive as radio.globe_points() dicts (the name is from the 3D globe this map
+replaced).
 """
 from __future__ import annotations
 
@@ -137,7 +136,6 @@ def _fan_out(lon: np.ndarray, lat: np.ndarray) -> np.ndarray:
 
 class FlatMap(QWidget):
     clicked = Signal(str)       # a station's uuid
-    hd_requested = Signal()     # the HD (3D globe) button
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -198,9 +196,7 @@ class FlatMap(QWidget):
         box.addStretch(1)
         self._buttons = []
         for text, tip, slot in (("+", "Zoom in", lambda: self._zoom_by(1.5)),
-                                ("−", "Zoom out", lambda: self._zoom_by(1 / 1.5)),
-                                ("HD", "Show the 3D globe (uses more memory and graphics "
-                                       "power than this map)", self.hd_requested.emit)):
+                                ("−", "Zoom out", lambda: self._zoom_by(1 / 1.5))):
             b = QPushButton(text)
             b.setObjectName("mapbtn")
             b.setToolTip(tip)
@@ -391,9 +387,9 @@ class FlatMap(QWidget):
         self.update()
 
     def hideEvent(self, e):
-        """Off screen (another tab, the Radio tab's globe instead): after FORGET_MS let
-        the tiles go (tens of MB zoomed in). Not at once: flicking between tabs would
-        draw them all again on every return, a freeze each time."""
+        """Off screen (another tab): after FORGET_MS let the tiles go (tens of MB
+        zoomed in). Not at once: flicking between tabs would draw them all again on
+        every return, a freeze each time."""
         self._stop_build()
         self._forget.start()
         super().hideEvent(e)

@@ -6,6 +6,14 @@
   cutting songs out in bursts: up to a third of a high-pitched song went missing,
   none once it was off. The *Fix Discord* bar and the Discord guide now say when
   *Automatically determine input sensitivity* is on and how to switch it off.
+- **Lighter on memory.** The Radio tab's HD 3D globe is gone: the flat map (the
+  default since October) is now the only map, and if you had the globe picked you
+  get the map. That takes the whole built-in web browser out of the app, so the
+  download and install get much smaller. Windows no longer get a graphics-card
+  device each (about 30 MB and 16 threads per window, never given back), the maths
+  library stops parking ~30 idle threads and up to 1 GB of reserved memory, the
+  radio's decoder loads only once you open the Radio tab, and unused picture-format
+  plug-ins (PDF and co.) no longer load at start-up.
 
 ## 1.9.7 — 2026-10-07
 

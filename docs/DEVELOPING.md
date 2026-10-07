@@ -71,9 +71,8 @@ platform and a separate single-instance name, and never touches the real
 `%APPDATA%\OnionBoard`. No window appears and no global hotkey is registered.
 `sounddevice.OutputStream` is swapped for a silent stand-in that runs the
 callback at the device's pace but plays nothing, so no test is ever heard on
-the speakers or headphones, and the web engine (the Radio tab's globe) runs with
-`--mute-audio` (set `ONIONBOARD_TEST_REAL_AUDIO=1` to
-opt out of both).
+the speakers or headphones (set `ONIONBOARD_TEST_REAL_AUDIO=1` to
+opt out).
 They're safe to run while someone is using the PC. The mic effect's tests
 (`tests\test_directmic.py`) run the real DLL in `testhost.exe`, never on a real mic or
 the registry; the ones that need the DLL are skipped until
@@ -158,9 +157,9 @@ if g++ is missing), PyInstaller (bundles `installer\install-vbcable.ps1` and
 `assets\onionboard.ico` as data, both at the root of `_internal\`, and `obmic.dll` in
 `_internal\directmic\`),
 `scripts\prune_build.py` (removes the parts of Qt the app never loads — QML, 3D,
-charts, Chromium's dev tools, translations — by walking the DLL import tables; the
+charts, the web engine, unused image formats, translations — by walking the DLL import tables; the
 build fails if a kept file would lose an import), `OnionBoard.exe --selftest` (the
-trimmed app loads Qt, WebEngine, Multimedia and the audio stack headless, no window
+trimmed app loads Qt, Multimedia and the audio stack headless, no window
 or device), licence files,
 the add-ons in `modules\` copied into `dist\OnionBoard\modules\` (all but
 `ai-voices`, which has its own release), `scripts\make_bunny.py` (renders the installer artwork
