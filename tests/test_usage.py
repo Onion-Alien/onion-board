@@ -252,6 +252,45 @@ def test_new_crash_and_freeze_reports_are_counted_once_never_sent(sent, app_dir)
     assert len(sent) == 1
 
 
+def _real_report(where_from: str) -> str:
+    """A report as applog writes it, for an error raised in a soundboard file."""
+    try:
+        exec(compile("def f():\n    raise KeyError('D:/private/secret.wav')\nf()",
+                     where_from, "exec"), {})
+    except KeyError:
+        import sys
+        rep = applog.build_report(sys.exc_info(), where="tick")
+    return rep.text.replace(f"Version:  {applog._state['version']}", "Version:  1.9.8")
+
+
+def test_problem_events_say_where_in_our_code_never_the_message(tmp_path):
+    f = tmp_path / "crash-x.txt"
+    src = "D:\\private\\code\\soundboard\\engine.py"
+    f.write_text(_real_report(src) + "\n\nLast 60 log lines\n------\n"
+                 '  File "C:\\soundboard\\ui\\other.py", line 7, in g\nOSError: x\n',
+                 encoding="utf-8")
+    assert usage._report_event(f) == "error/1.9.8/KeyError@soundboard/engine.py:2"
+    # the freeze from a real 1.9.7 report: its deepest line of our own code
+    f.write_text("Onion Board froze for 6 s\nVersion:  1.9.7\nTime:  x\n\n"
+                 "What it was doing\n-----------------\n"
+                 '  File "main.py", line 22, in <module>\n'
+                 '  File "soundboard\\ui\\mainwindow.py", line 5898, in tick\n'
+                 '  File "soundboard\\directmic.py", line 184, in make_ring\n'
+                 '  File "pathlib\\_local.py", line 515, in stat\n', encoding="utf-8")
+    assert usage._report_event(f) == "freeze/1.9.7@soundboard/directmic.py:184"
+
+
+def test_problem_events_keep_paths_outside_our_package_out(tmp_path):
+    f = tmp_path / "crash-x.txt"
+    # an odd install folder named soundboard: deeper than our package, so not sent
+    f.write_text(_real_report("D:\\soundboard\\Python\\Lib\\json\\decoder.py"),
+                 encoding="utf-8")
+    assert usage._report_event(f) == "error/1.9.8/KeyError"
+    f.write_text("Onion Board crash report\nVersion:  1.9.8\n\nError\n-----\nboom\n",
+                 encoding="utf-8")
+    assert usage._report_event(f) == "error/1.9.8"
+
+
 def test_reports_from_before_counting_existed_arent_sent(sent, app_dir):
     cfg = Config(stats_sent=1e18)   # stats_problems_seen 0: an update to this version
     _report(app_dir, "crash-a.txt", "Onion Board crash report\nVersion:  1.9.5\n", 2000)

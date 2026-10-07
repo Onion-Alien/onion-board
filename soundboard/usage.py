@@ -7,7 +7,10 @@ heard about the app, if they picked it on the installer's last page), and "updat
 *Update now* installs a new version. With the daily one: which tabs were opened since the
 last one (their names only). Soon after a start: how many problems there were since the
 last send, as counts, never the report itself: a crash report or a freeze saved
-(`crash/<version>`, `error/<version>`, `freeze/<version>`), or the last run ending
+(`crash/<version>`, `error/<version>`, `freeze/<version>`, with the error's type and
+the file and line of this app's own code it happened in, e.g. `error/1.9.8/KeyError@
+soundboard/engine.py:1090`: never its message or anything else from the report), or
+the last run ending
 without the app closing itself (`unclean-exit/<version>`: a hard crash, ended in Task
 Manager, a power cut). And `uninstall/<version>` when the uninstaller removes it.
 Nothing else: no name, sounds, settings, devices, games or IP address in the message
@@ -131,18 +134,60 @@ def tab_opened(cfg, key: str) -> None:
         cfg.stats_tabs = [*tabs, key]
 
 
+# a stack line in a report: `File "...\soundboard\engine.py", line 1090, in ...`; only
+# our own files count, named from the package folder down (never the folder above it)
+_OUR_FRAME = re.compile(r'^\s*File "(?:[^"]*[\\/])?(soundboard(?:[\\/][a-z0-9_]+)?'
+                        r'[\\/][a-z0-9_]+\.py)", line (\d+)', re.M)
+_ANY_FRAME = re.compile(r'^\s*File ".*", line \d+', re.M)
+_ERROR_TYPE = re.compile(r"([A-Za-z_][\w.]*)(?::|$)")
+
+
+def _where(stack: str) -> str:
+    """`soundboard/engine.py:1090`: the deepest of our own lines in a report's stack
+    (the same file and line anyone can look up in the public source), or ""."""
+    frames = _OUR_FRAME.findall(stack)
+    if not frames:
+        return ""
+    file, line = frames[-1]
+    return f"{file.replace(chr(92), '/')}:{line}"
+
+
+def _error_type(stack: str) -> str:
+    """`KeyError` from the traceback's last line: the type only, never its message
+    (a message can hold a path, a device or a user name)."""
+    frames = list(_ANY_FRAME.finditer(stack))
+    if not frames:
+        return ""
+    for line in stack[frames[-1].end():].splitlines()[1:]:
+        if line.strip() and not line[:1].isspace():   # past the frame's code lines
+            m = _ERROR_TYPE.match(line)
+            name = m.group(1).rsplit(".", 1)[-1] if m else ""
+            return name if len(name) <= 40 else ""
+    return ""
+
+
 def _report_event(path: Path) -> str:
-    """`crash/1.9.6`, `error/1.9.6` or `freeze/1.9.6` for a saved report (applog.py)."""
+    """`crash/1.9.6`, `error/1.9.6` or `freeze/1.9.6` for a saved report (applog.py),
+    then where it happened when the stack shows it: `error/1.9.6/KeyError@
+    soundboard/engine.py:1090`, `freeze/1.9.6@soundboard/directmic.py:184`."""
     try:
         with open(path, encoding="utf-8", errors="replace") as f:
-            head = f.read(600)
+            text = f.read(64_000)
     except OSError:
         return ""
+    head = text[:600]
     m = re.search(rf"^Version:\s*({VERSION_RE})\s*$", head, re.M)
     ver = m.group(1) if m else __version__
+    # the stack only: never the log lines saved below it
+    stack = re.split(r"^Last \d+ log lines\s*$", text, maxsplit=1, flags=re.M)[0]
+    stack = stack.split("\n\n", 1)[-1]
+    where = _where(stack)
     if "froze for" in head.split("\n", 1)[0]:
-        return f"freeze/{ver}"
-    return f"{'crash' if re.search(r'^Fatal:', head, re.M) else 'error'}/{ver}"
+        return f"freeze/{ver}" + (f"@{where}" if where else "")
+    kind = "crash" if re.search(r"^Fatal:", head, re.M) else "error"
+    etype = _error_type(stack)
+    tag = "@".join(p for p in (etype, where) if p)
+    return f"{kind}/{ver}" + (f"/{tag}" if tag else "")
 
 
 def problems(app_dir: Path, since: float) -> tuple[list[str], float]:
