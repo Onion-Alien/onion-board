@@ -243,6 +243,27 @@ class LoadingBar(QWidget):
         p.end()
 
 
+def paint_now_playing(p: QPainter, rect: QRectF, color: QColor, paused: bool = False,
+                      n: int = 4, t: float | None = None):
+    """A small "now playing" equalizer in `rect`: `n` bars bouncing with the clock (`t`,
+    seconds; now if None), or low and still while paused. Used wherever something
+    playing has to stand out at a glance: a web result's picture, the playing radio
+    station."""
+    t = time.monotonic() if t is None else t
+    gap = rect.width() / (n * 3 - 1)   # a bar is two gaps wide
+    bw = gap * 2
+    p.save()
+    p.setRenderHint(QPainter.Antialiasing)
+    p.setPen(Qt.NoPen)
+    p.setBrush(color)
+    for i in range(n):
+        f = 0.3 if paused else 0.25 + 0.75 * abs(math.sin(t * (2.3 + i * 0.9) + i * 1.7))
+        h = max(bw, rect.height() * f)
+        p.drawRoundedRect(QRectF(rect.left() + i * (bw + gap), rect.bottom() - h, bw, h),
+                          bw / 2, bw / 2)
+    p.restore()
+
+
 def fmt_time(s: float) -> str:
     s = max(0, int(s))
     return f"{s // 60}:{s % 60:02d}"
@@ -392,6 +413,7 @@ class Pad(QAbstractButton):
 
     def __init__(self, meta: SoundMeta, width: int):
         super().__init__()
+        self.setProperty("own_space", True)   # Space pauses / plays this pad (ui/spacekey.py)
         self.meta = meta
         self.progress = None     # None = not playing
         self.paused = False

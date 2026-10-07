@@ -55,6 +55,7 @@ from soundboard.ui.livedot import is_tab_live, set_tab_live
 from soundboard.ui.livedot import set_tint as set_live_tint
 from soundboard.ui.logowidget import LogoWidget, glow_icon
 from soundboard.ui.ytsearch import SearchResults
+from soundboard.ui.spacekey import SpaceKey
 from soundboard.ui.padbatch import PadSelection
 from soundboard.ui.overlay import Overlay
 from soundboard.ui.appspanel import AppsTab, ElidedLabel
@@ -298,6 +299,7 @@ class MainWindow(QMainWindow):
         self._rec_playing = False
         self.current: str | None = None   # sound shown in the transport bar
         self._link_meta: SoundMeta | None = None   # the link bar's Play once
+        self._link_url = ""                        # ...and the page it came from
         self.start_frac = 0.0             # where ▶ starts if it isn't playing
         self._seeking = False
         self._tick_n = 0                  # ticks since start (the watchdog runs ~once a second)
@@ -353,6 +355,9 @@ class MainWindow(QMainWindow):
         self.timer.timeout.connect(self.tick)
         self.timer.start(TICK_MS)
         QApplication.instance().applicationStateChanged.connect(self._set_tick_rate)
+        # Space plays / pauses on the Sounds and Radio tabs, wherever the focus is
+        self._space = SpaceKey(self, self._space_action)
+        QApplication.instance().installEventFilter(self._space)
         # which voice chat the game you're playing uses: a hint by Who's listening
         self.voice_suggestion: str | None = None
         self.voice_why = ""   # why it's suggested, for the hint ("Discord is listening…")
@@ -3205,6 +3210,7 @@ class MainWindow(QMainWindow):
         can be paused, stopped and seeked. It isn't a sound in the library."""
         self._link_meta = SoundMeta(id=LINK_ID, name=title, file="", level_gain=gain,
                                     duration=len(data) / SR)
+        self._link_url = self.linkbar.url
         self.audio[LINK_ID] = data
         if self.current == LINK_ID:
             self.current = None   # a new link: refresh the name
@@ -3234,6 +3240,10 @@ class MainWindow(QMainWindow):
             self.search_youtube()
 
     def _from_youtube(self, r, play: bool):
+        if play and r.url == self._link_url and self.audio.get(LINK_ID) is not None:
+            self.select(LINK_ID)   # already in the player: Play / Space pause and resume it
+            self.toggle_play_pause()
+            return
         kind = "play" if play else "add"
         self.linkbar.open(r.url, r.title, r.seconds)
         self.ytresults.mark(r.url, kind)   # its button greys out until the link bar's done
@@ -3383,6 +3393,16 @@ class MainWindow(QMainWindow):
             self.engine.play(sid, data, self.gain_for(m), loop=m.loop, mode="restart", start=frac,
                              fade_in=m.fade_in if frac == 0 else 0.0, fade_out=m.fade_out)
             self._wake()
+
+    def _space_action(self):
+        """What Space does on the tab showing (ui/spacekey.py): play / pause the
+        player's sound on Sounds, play / stop the radio on Radio; None elsewhere."""
+        page = self.tabs.currentWidget()
+        if page is self.sounds_page:
+            return self.toggle_play_pause if self.current else None
+        if page is self.radio_page:
+            return getattr(self.radio, "toggle_play", None)
+        return None
 
     def space_pad(self, sid: str):
         """Space on a pad: pause or resume it while it's playing (or paused), like a
@@ -5711,6 +5731,10 @@ class MainWindow(QMainWindow):
                 p.progress, p.paused = prog, paused
                 p.update()
         self._update_transport(playing)
+        if not self.ytresults.isHidden():   # the result in the player says so
+            prog, paused = playing.get(LINK_ID, (None, False))
+            self.ytresults.show_now(self._link_url, "" if prog is None else
+                                    "paused" if paused else "playing")
         self._update_chips(playing)
         self.out_meter.set_level(e.level_main)
         self.logo.set_level(e.level_play)   # anything playing, not your voice
