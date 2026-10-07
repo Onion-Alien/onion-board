@@ -398,8 +398,8 @@ def parse_args(argv=None):
                     "(OnionBoard.exe in it)")
     ap.add_argument("--watch-exe", type=Path, help="frozen: a built OnionWatch.exe")
     ap.add_argument("--real-window", action="store_true",
-                    help="real Windows windows parked off every monitor (catches GPU / driver "
-                    "costs). Opens real windows: only with the user's OK")
+                    help="not finished: real windows parked off every monitor (to catch GPU / "
+                    "driver costs). It opens real windows, so it stays off for now")
     ap.add_argument("--no-event-counts", action="store_true",
                     help="leave out the paint / timer counter (it costs a little CPU itself)")
     ap.add_argument("--only", default="", help="comma-separated runs to do: board, triggers, "
@@ -413,6 +413,10 @@ def parse_args(argv=None):
 
 def main(argv=None) -> int:
     args = parse_args(argv)
+    if args.real_window:
+        print("perf: the --real-window tier isn't finished and opens real windows; "
+              "it stays off until it's been checked with the user (see perf/README.md).")
+        return 2
     if not winproc.supported():
         print("perf: the performance suite measures Windows processes; skipped on "
               f"{sys.platform}.")
