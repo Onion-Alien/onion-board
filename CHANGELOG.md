@@ -9,6 +9,11 @@
 - **AI voices: pick by who and how high.** *All voices* sorts them under Men,
   Women and In between & fun (your own last), lowest first, with chips to show only
   one kind and only low, middle or high voices.
+- **You can switch the app log off.** *Keep an app log* (Settings → Connection,
+  under Network activity) stops `onionboard.log` being written and deletes it. The
+  log can name a site a download or radio station failed on, so Network activity no
+  longer says "nothing here is logged". With the log off, a crash report still gets
+  the run's last lines, from memory.
 
 ## 1.9.8 — 2026-10-07
 

@@ -335,6 +335,7 @@ gameplay in a way that helps you play.
 
 `%APPDATA%\OnionBoard\onionboard.log` contains file paths that include your
 Windows user name. Skim it and replace anything personal before attaching it to a
-public issue. Crash reports (the crash window, and
+public issue. It can also name a site a download or radio station failed on.
+*Keep an app log* (Settings → Connection) switches it off and deletes it. Crash reports (the crash window, and
 `%APPDATA%\OnionBoard\crash-reports\`) already have your home folder, user name
 and computer name replaced — still skim them before posting.

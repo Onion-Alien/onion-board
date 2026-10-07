@@ -2006,7 +2006,19 @@ class SettingsDialog(QDialog):
               "it again next time (the last 1000; Totals adds up all of it). Nothing is sent "
               "anywhere. Unticking it deletes the saved file; Clear empties it."),
             self.mw.cfg.netlog_keep, self._set_netlog_keep)
+        self.app_log_box = self._option(
+            cv, _("Keep an app log"),
+            _("The app writes what it does to onionboard.log in its folder (3 MB at most), "
+              "so a problem can be looked into. It can name a site a download or radio "
+              "station failed on. Nothing is sent anywhere. Unticking it stops the log and "
+              "deletes it."),
+            self.mw.cfg.app_log, self._set_app_log)
         return card
+
+    def _set_app_log(self, on: bool):
+        from soundboard import applog
+        self.mw.set_option("app_log", on)
+        applog.keep(on)
 
     def _set_netlog_keep(self, on: bool):
         from soundboard import library, netlog

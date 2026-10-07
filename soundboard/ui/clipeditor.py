@@ -259,9 +259,12 @@ class ClipWave(QWidget):
                              for x, v in zip(xs[pick].tolist(), h[pick].tolist())])
         else:
             p.setPen(QColor(T["muted"]))
-            p.drawText(r, Qt.AlignCenter,
-                       _("Listening… the waveform shows once it plays something")
-                       if ed.take is None else _("Empty"))
+            text = _("Listening… the waveform shows once it plays something")
+            if ed.take is not None:
+                text = _("Empty")
+            elif p.fontMetrics().horizontalAdvance(text) > r.width() - 2 * PAD - 8:
+                text = _("Listening…")   # a small card: the long line ran off both sides
+            p.drawText(r, Qt.AlignCenter, text)
         if take is not None and not take.has_selection:   # the cursor: where a paste goes
             x = self.x_of(take.a)
             p.setPen(QPen(QColor(T["text_hi"]), 1, Qt.DashLine))
