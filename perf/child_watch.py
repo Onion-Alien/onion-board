@@ -18,7 +18,7 @@ import time
 from pathlib import Path
 
 from perf import link
-from perf.child_board import Counts, _loopback_only, stand_in_screen
+from perf.child_board import Counts, _loopback_only, stand_in_screen, watcher_stats
 
 
 def isolate(conf: dict):
@@ -48,7 +48,9 @@ def isolate(conf: dict):
         setattr(QMessageBox, name, staticmethod(lambda *a, **k: QMessageBox.Ok))
 
     cfg = settings.Config(screen=conf["triggers"], usage_count=False, update_check=False,
-                          notify=False)
+                          notify=False,   # a trigger without a sound it can play isn't watched
+                          sounds=[{"id": s["id"], "name": s["name"], "path": s["file"]}
+                                  for s in conf.get("sounds", [])])
     cfg.save()
 
 
@@ -121,11 +123,7 @@ class WatchChild:
         self.stats(name, wall, extra)
 
     def _watcher(self) -> dict:
-        wt = getattr(self.w.triggers, "watcher", None)
-        if wt is None:
-            return {}
-        return {"check_ms": round(float(getattr(wt, "check_ms", 0) or 0), 1),
-                "gap_s": round(float(getattr(wt, "gap", 0) or 0), 3)}
+        return watcher_stats(getattr(self.w.triggers, "watcher", None))
 
     # -- scenarios
     def sc_ow_shown(self):

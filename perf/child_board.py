@@ -130,6 +130,19 @@ def stand_in_screen(sw, width=1920, height=1080):
     return StandIn
 
 
+def watcher_stats(wt) -> dict:
+    """An Onion Watch screenwatch.Watcher's last check: how long it took, the gap to
+    the next, and why it isn't checking if it isn't."""
+    if wt is None:
+        return {}
+    out = {"check_ms": round(float(getattr(wt, "check_ms", 0) or 0), 1),
+           "gap_s": round(float(getattr(wt, "gap", 0) or 0), 3)}
+    for k in ("error", "failed"):
+        if getattr(wt, k, None):
+            out[f"watch_{k}"] = str(getattr(wt, k))[:300]
+    return out
+
+
 def isolate(conf: dict):
     profile = Path(conf["profile"]).resolve()
     _loopback_only()
@@ -403,7 +416,7 @@ class Child:
         app.collector = UiCollector(parent=app)
         self.foreground(True)
         loaded = self.run_until(lambda: not w._load_thread.is_alive(), 60)
-        if self.conf.get("watch_zip"):
+        if self.conf.get("watch_zip") and w.triggers.needed_now():
             self.run_until(lambda: not w.triggers.pending, 30)
         self.run_for(0.3)
         link.mark("ready", loaded=loaded, sounds=len(w.cfg.sounds),
@@ -641,25 +654,25 @@ class Child:
         return getattr(p, "panel", None)
 
     def sc_trig_idle_off(self):
+        """Installed, watching off, tab never opened: the add-on isn't even loaded."""
         self.w.tabs.setCurrentIndex(0)
         self.run_for(self.secs)
-        tp = self._panel()
-        return {"rows": len(getattr(tp, "rows", {}) or {}) if tp is not None else None}
+        return {"loaded": self._panel() is not None}
 
     def sc_trig_watch_hidden(self):
+        """Watching on, the tab never opened: loaded the way a start with watching on
+        loads it."""
+        t0 = time.perf_counter()
+        self.w.load_triggers()
+        load_s = round(time.perf_counter() - t0, 2)
         tp = self._panel()
         if tp is not None:
             tp.set_watching(True)
         self.run_for(self.secs * 1.5)
-        return self._watcher()
+        return {"load_s": load_s, **self._watcher()}
 
     def _watcher(self):
-        tp = self._panel()
-        wt = getattr(tp, "watcher", None)
-        if wt is None:
-            return {}
-        return {"check_ms": round(float(getattr(wt, "check_ms", 0) or 0), 1),
-                "gap_s": round(float(getattr(wt, "gap", 0) or 0), 3)}
+        return watcher_stats(getattr(self._panel(), "watcher", None))
 
     def sc_trig_tab_shown(self):
         from PySide6.QtWidgets import QApplication

@@ -315,6 +315,7 @@ def watch_run(name: str, out: Path, args, tier: dict, hz: float, src: Path) -> t
     profile = out / "profiles" / name
     conf = {"profile": str(profile), "scenarios": WATCH, "secs": tier["secs"],
             "triggers": inputs.triggers(out / "inputs" / "triggers", 10),
+            "sounds": inputs.board_sounds(out / "inputs" / "board", 10),   # the triggers' s0-s9
             "event_counts": not args.no_event_counts}
     profile.mkdir(parents=True, exist_ok=True)
     conf_path = out / f"{name}.child.json"
