@@ -1131,7 +1131,7 @@ class VoiceFxPanel(QWidget):
             self._fill_saved()
             self._emit()
             return True
-        DeletedDialog(savedvoices.VOICE, _("voices"), back, self, source=self.store).exec()
+        DeletedDialog(savedvoices.VOICE, "voices", back, self, source=self.store).exec()
         self._fill_saved()
 
     def merge_saved(self, raw) -> int:

@@ -264,7 +264,7 @@ class AiVoiceBrowser(QDialog):
 
         def back(item) -> bool:
             return self.store.restore(item) is not None
-        DeletedDialog(avl.KIND, _("voices"), back, self, source=self.store).exec()
+        DeletedDialog(avl.KIND, "voices", back, self, source=self.store).exec()
         self._changed()
 
 
