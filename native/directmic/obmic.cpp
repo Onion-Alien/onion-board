@@ -183,7 +183,7 @@ static const PROPERTYKEY PKEY_AudioEndpoint_GUID_ =
 static const CLSID CLSID_OnionMic =
     {0xc55e76fe, 0x6667, 0x4828, {0x81, 0xfd, 0x05, 0xb3, 0x93, 0xfd, 0x64, 0x9e}};
 static const wchar_t *STATE_KEY = L"SOFTWARE\\OnionBoard\\MicPlugin\\Endpoints";
-static const uint32_t EFFECT_VERSION = 4;        // directmic.EFFECT_VERSION
+static const uint32_t EFFECT_VERSION = 5;        // directmic.EFFECT_VERSION
 
 // The shared ring file. soundboard/directmic.py writes the same layout and documents it.
 // Anyone signed in can write this file, so nothing read from it is trusted: sizes are
@@ -1118,10 +1118,16 @@ private:
         bool ahead = have && avail >= need + frames * step;
         bool late = board && !ahead && !fresh;
         if (late && !m_late) {   // once per hiccup
-            double before = m_lead;
-            m_lead += LEAD_STEP_S * m_boardRate;
-            if (m_lead > LEAD_MAX_S * m_boardRate) m_lead = LEAD_MAX_S * m_boardRate;
-            if (fill) m_owe += m_lead - before;   // filling in: stepped back where it's quiet
+            // Not while the last step is still owed (filling in, it's only taken where
+            // it's quiet): this is the same lag again, not a new one. Counting it again
+            // piled step on step (a board a block behind every other block took the
+            // lead to 50 ms, not the 30 that cover it).
+            if (m_owe <= 0.5) {
+                double before = m_lead;
+                m_lead += LEAD_STEP_S * m_boardRate;
+                if (m_lead > LEAD_MAX_S * m_boardRate) m_lead = LEAD_MAX_S * m_boardRate;
+                if (fill) m_owe += m_lead - before;   // filling in: stepped back where it's quiet
+            }
             if (m_slot) m_slot->underruns = m_slot->underruns + 1;
         }
         m_late = late;
