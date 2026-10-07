@@ -1436,11 +1436,12 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
         if not self.isVisible():
             self.timer.stop()
         self.btn_rec.setText("Record")
-        self._emit_clip(self.recorder.stop(), "Nothing was playing while you recorded.")
+        self._emit_clip(self.recorder.stop(),
+                        "Nothing was playing on the radio while you recorded.")
 
     def clip_last(self) -> bool:
         return self._emit_clip(self.recorder.last(),
-                               f"Nothing has played in the last {CLIP_S} seconds.")
+                               f"Nothing on the radio has played in the last {CLIP_S} seconds.")
 
     def _emit_clip(self, data: np.ndarray, empty_msg: str) -> bool:
         data = trim_silence(data)
