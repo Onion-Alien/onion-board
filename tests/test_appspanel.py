@@ -474,6 +474,31 @@ def test_a_listing_that_finishes_after_the_panel_is_gone_is_dropped(qapp, monkey
     lister.stop()
 
 
+def test_stop_waits_out_a_listing_being_handed_over(qapp):
+    """The worker mid-way through handing a listing over when the tab goes: stop()
+    waits for it, and nothing is handed over after (the object may be freed next)."""
+    import threading
+    import time
+    lister = appspanel._Lister()
+    inside, release, sent = threading.Event(), threading.Event(), []
+
+    def slow_emit(x):
+        inside.set()
+        release.wait(5)
+        sent.append(x)
+    lister.ready = type("Ready", (), {"emit": staticmethod(slow_emit)})()
+    t = threading.Thread(target=lister._listed, args=([music()], {}))
+    t.start()
+    assert inside.wait(5)
+    threading.Timer(0.2, release.set).start()
+    t0 = time.monotonic()
+    lister.stop()
+    assert time.monotonic() - t0 > 0.15 and len(sent) == 1
+    lister._listed([music()], {})
+    t.join(5)
+    assert len(sent) == 1
+
+
 def test_lister_takes_the_list_from_the_level_watcher_while_it_runs(qapp, monkeypatch):
     def walked(**_):
         raise AssertionError("listed again on a thread of its own")

@@ -15,6 +15,7 @@ from pathlib import Path
 import numpy as np
 import pytest
 
+from conftest import real_pc_timing
 from soundboard import directmic as dm
 from test_mainwindow import window  # noqa: F401  (fixture)
 
@@ -869,6 +870,7 @@ def _feed_beside_busy_ui(ring_file, taker, seconds, poll_every=None):
 
 
 @pytest.mark.parametrize("taker", ["feed", "mic callback"])
+@real_pc_timing
 @realtime
 def test_no_underruns_beside_a_busy_ui_thread(ring_file, taker):
     """5 s of clean mic beside a busy UI thread: the board takes every block in time, as

@@ -107,6 +107,9 @@ class _Lister(QObject):
         self.peaks = peaks
         self._busy = False
         self._stopped = False
+        # held while a result is handed over (worker thread); stop() takes it, so none
+        # is mid-way once the tab is going and could be freed under it (a crash)
+        self._hand_over = threading.Lock()
         self._job: tuple[frozenset, frozenset] | None = None
         self._wake = threading.Event()
         self._thread: threading.Thread | None = None
@@ -172,11 +175,13 @@ class _Lister(QObject):
         the rows)."""
         self._listed_at = time.monotonic()
         self._busy = False
-        if apps is not None and not self._stopped:
-            self.ready.emit((apps, alive))
+        with self._hand_over:
+            if apps is not None and not self._stopped:
+                self.ready.emit((apps, alive))
 
     def stop(self):
-        self._stopped = True
+        with self._hand_over:
+            self._stopped = True
         self._wake.set()   # the worker sees it and ends
 
 

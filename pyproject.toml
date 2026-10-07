@@ -72,3 +72,9 @@ ignore = [
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 addopts = "-q -rfE -n auto"   # -rfE: failures and errors listed at the end; -n: see conftest
+# A test still running after 2 minutes is hung (the slowest take ~10 s, ~50 s on a PC
+# busy with something else): every thread's stack is printed and its worker stopped,
+# so the run goes on and says where it hung, instead of sitting there until CI's
+# 20-minute limit.
+faulthandler_timeout = 120
+faulthandler_exit_on_timeout = true

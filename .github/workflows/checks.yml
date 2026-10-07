@@ -62,6 +62,8 @@ jobs:
           python -m venv .venv
           .venv\Scripts\python -m pip install -r requirements.txt -r requirements-dev.txt
       - run: .venv\Scripts\ruff check .
-      - run: .venv\Scripts\python -m pytest
+      # --durations: the slowest tests are listed at the end of every run, so one that
+      # got slow (or hangs: pyproject's faulthandler_timeout stops it) shows up there
+      - run: .venv\Scripts\python -m pytest --durations=20
         env:
           QT_QPA_PLATFORM: offscreen

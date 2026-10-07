@@ -95,7 +95,17 @@ Keeping it fast: Windows takes ~2 s to refuse a connection to a closed port, eve
 on 127.0.0.1, and `localhost` tries `::1` first. A test that needs "nothing is
 listening" takes its port from `conftest.closed_port()` (refused at once), and a
 test server on 127.0.0.1 only marks its port with `conftest.ipv4_only()`.
-`--durations=20` shows what's slow.
+`--durations=20` shows what's slow (CI lists them on every run).
+
+Hangs and flakes: a test still running after 2 minutes is hung; every thread's stack
+is printed and its worker stopped (`faulthandler_timeout` in `pyproject.toml`), and
+the run goes on. Wall-clock audio timing tests carry `conftest.real_pc_timing`: CI's
+shared runners stall a thread as long as the hitch they measure, so they run on a
+real PC only. Something a test makes that a thread of its own (or Qt's) calls back
+into is stopped after the test (`_STOP_AFTER_TEST` in `conftest.py`), as the app
+stops it when its tab goes. `PYTEST_XDIST_AUTO_NUM_WORKERS=N` sets the workers for
+the whole suite; `PYTEST_DEBUG_TEMPROOT` puts the tests' temp folders on another
+drive (worth it when the system drive is slow).
 
 ### How heavy is it (the performance suite)
 

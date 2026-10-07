@@ -122,6 +122,14 @@ def _refuse_closed_ports_at_once():
 
 _refuse_closed_ports_at_once()
 
+# Hosted CI runners (shared cores, other test workers beside it) stall a thread
+# 10-30 ms on their own, as much as the hitches the wall-clock audio timing tests
+# measure: there they fail on unchanged code. They run on a real PC, where a hitch is
+# the only stall.
+real_pc_timing = pytest.mark.skipif(bool(os.environ.get("CI")),
+                                    reason="wall-clock audio timing: too noisy on CI")
+
+
 def pytest_configure(config):
     config.addinivalue_line("markers", "real_this_pc: the relay refuses radio 127.x "
                             "(net.NEVER_THIS_PC) as in the app")
@@ -130,10 +138,13 @@ def pytest_configure(config):
 def pytest_xdist_auto_num_workers(config):
     """`-n auto` (pyproject's addopts): the whole suite runs on 4 workers, about a
     quarter of the time; a file or two runs in this process, where starting workers
-    would cost more than it saves. `-n 2` / `-n 0` on the command line override it."""
+    would cost more than it saves. `-n 2` / `-n 0` on the command line override it, and
+    so does PYTEST_XDIST_AUTO_NUM_WORKERS (xdist's own setting) for the whole suite."""
     picked = [a for a in config.args if Path(a.split("::")[0]).suffix == ".py"]
     if picked and len(picked) == len(config.args) and len(picked) <= 2:
         return 0
+    if (n := os.environ.get("PYTEST_XDIST_AUTO_NUM_WORKERS", "")).isdigit():
+        return int(n)
     return min(4, os.cpu_count() or 1)
 
 
@@ -409,6 +420,38 @@ def _no_windows_speech(request, monkeypatch):
         return
     from soundboard.speech import tts
     monkeypatch.setattr(tts.SapiTTS, "warm_up", lambda self: [])
+
+
+# What a test made and left running with a thread of Qt's or its own behind it, stopped
+# after the test as the app stops it when the tab goes: freed while that thread was
+# still handing it something, it crashed the test worker a few tests later (access
+# violation / abort, about 1 run in 100). (module, class, method that stops it)
+_STOP_AFTER_TEST = (("soundboard.radio", "RadioPlayer", "shutdown"),
+                    ("soundboard.ui.appspanel", "_Lister", "stop"))
+
+
+@pytest.fixture(autouse=True)
+def _stop_what_tests_left_running(monkeypatch):
+    import weakref
+    made = []
+    for mod_name, cls_name, stop in _STOP_AFTER_TEST:
+        mod = sys.modules.get(mod_name)
+        if mod is None:   # this test's module never imported it: none made here
+            continue
+        cls = getattr(mod, cls_name)
+
+        def tracked(self, *a, _init=cls.__init__, _stop=stop, **k):
+            _init(self, *a, **k)
+            made.append((weakref.ref(self), _stop))
+        monkeypatch.setattr(cls, "__init__", tracked)
+    yield
+    for ref, stop in made:
+        obj = ref()
+        if obj is not None:
+            try:
+                getattr(obj, stop)()
+            except RuntimeError:   # its C++ side is already gone (its tab was freed)
+                pass
 
 
 @pytest.fixture(autouse=True)
