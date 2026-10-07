@@ -34,9 +34,10 @@ LANG_DIR = (Path(sys._MEIPASS) / "lang" if hasattr(sys, "_MEIPASS")
 ENGLISH = "en"
 PSEUDO = "xx"
 WINDOWS = ""     # Config.language: follow Windows' display language
-# Until every text is translated and Settings has a Language picker (2.0), the board
-# stays in English unless config.json or ONIONBOARD_LANG names a language: following
-# Windows now would show a half-translated window.
+# The board doesn't switch to Windows' language by itself yet (that's for 2.0): until a
+# language is picked (Settings → Appearance → Language, saved as config.json's
+# `language`) it stays in English and offers Windows' language in a bar, in that
+# language (MainWindow._offer_language). ONIONBOARD_LANG overrides both.
 FOLLOW_WINDOWS = False
 
 # plural rules: n -> index into a catalog entry's list of forms (FORMS: how many)
@@ -132,20 +133,38 @@ def current() -> str:
     return _lang
 
 
+def _files() -> list[Path]:
+    try:
+        return [f for f in sorted(LANG_DIR.glob("*.json")) if f.stem not in (ENGLISH, PSEUDO)]
+    except OSError:
+        return []
+
+
+def codes() -> list[str]:
+    """The code of every catalog shipped, English first (no catalog is read)."""
+    return [ENGLISH, *(f.stem for f in _files())]
+
+
+_META_NAME = re.compile(r'^\{\s*"_meta"\s*:\s*\{\s*"name"\s*:\s*("(?:[^"\\]|\\.)*")')
+
+
+def _own_name(f: Path) -> str:
+    """Catalog `f`'s `_meta.name`, from its first lines when it's at the top (a whole
+    catalog is ~300 KB: reading all of them took 0.1 s), else from the whole file."""
+    try:
+        with f.open(encoding="utf-8") as fh:
+            m = _META_NAME.match(fh.read(512))
+        if m:
+            return json.loads(m.group(1)) or f.stem
+    except (OSError, ValueError):
+        pass
+    meta = _read(f).get("_meta", {})
+    return meta.get("name", f.stem) if isinstance(meta, dict) else f.stem
+
+
 def available() -> list[tuple[str, str]]:
     """(code, the language's own name) for every catalog shipped, English first."""
-    out = [(ENGLISH, "English")]
-    try:
-        files = sorted(LANG_DIR.glob("*.json"))
-    except OSError:
-        files = []
-    for f in files:
-        code = f.stem
-        if code in (ENGLISH, PSEUDO):
-            continue
-        meta = _read(f).get("_meta", {})
-        out.append((code, meta.get("name", code) if isinstance(meta, dict) else code))
-    return out
+    return [(ENGLISH, "English"), *((f.stem, _own_name(f)) for f in _files())]
 
 
 def windows_language() -> str:
@@ -166,20 +185,20 @@ def windows_language() -> str:
 
 def resolve(setting: str) -> str:
     """The catalog to use for Config.language (`WINDOWS`: Windows' own, if shipped)."""
-    codes = [c for c, _n in available()]
+    codes_ = codes()
     want = setting if setting and setting != WINDOWS else windows_language()
     if want == PSEUDO:
         return PSEUDO
-    if want in codes:
+    if want in codes_:
         return want
     chinese = _chinese(want)
     if chinese:
-        return chinese if chinese in codes else ENGLISH
+        return chinese if chinese in codes_ else ENGLISH
     regional = _regional(want)
-    if regional in codes:
+    if regional in codes_:
         return regional
     base = want.split("-")[0].lower()
-    for c in codes:                       # "de-AT" -> "de", "pt-PT" -> "pt-BR"
+    for c in codes_:                       # "de-AT" -> "de", "pt-PT" -> "pt-BR"
         if c.split("-")[0].lower() == base:
             return c
     return ENGLISH
@@ -244,6 +263,33 @@ def set_language(code: str) -> str:
     _lang = code
     _catalog = {k: v for k, v in data.items() if not k.startswith("_")}
     return code
+
+
+def in_language(code: str, make):
+    """What `make()` returns with language `code` on for the call (the Language picker
+    and the offer bar speak the language they offer before the app has switched)."""
+    global _lang, _catalog
+    old = _lang, _catalog
+    set_language(code)
+    try:
+        return make()
+    finally:
+        _lang, _catalog = old
+
+
+def offer() -> str | None:
+    """Windows' display language, if a catalog for it is shipped and it isn't the one
+    showing (the board doesn't follow Windows by itself yet: it offers to)."""
+    code = resolve(windows_language())
+    return code if code not in (ENGLISH, PSEUDO, _lang) else None
+
+
+def name_of(code: str) -> str:
+    """Language `code`'s own name ("Deutsch"), or the code."""
+    if code == ENGLISH:
+        return "English"
+    f = LANG_DIR / f"{code}.json"
+    return _own_name(f) if f.is_file() else code
 
 
 def startup(app_dir: Path) -> str:

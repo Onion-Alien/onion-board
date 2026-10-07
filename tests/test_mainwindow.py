@@ -843,3 +843,39 @@ def test_clamp_label_wraps_once_per_text_width_and_font(qapp):
     lbl.set_full("Short")
     assert lbl._wrapped() is not wide and [t for t, _ in lbl._wrapped()] == ["Short"]
     lbl.deleteLater()
+
+
+def test_windows_language_is_offered_in_that_language(window, monkeypatch):
+    from soundboard import i18n
+    monkeypatch.setattr(i18n, "windows_language", lambda: "de-DE")
+    restarts = []
+    monkeypatch.setattr(window, "restart_app", lambda: restarts.append(1))
+    window._offer_language()
+    assert window.lang_bar.isVisibleTo(window)
+    assert window.lang_lbl.text() == ("Onion Board gibt es auch auf Deutsch. Du kannst die "
+                                      "Sprache jederzeit unter Einstellungen → Aussehen → "
+                                      "Sprache ändern.")
+    assert window.lang_btn.text() == "Zu Deutsch wechseln"
+    window.lang_btn.click()
+    assert window.cfg.language == "de" and restarts == [1]
+    assert not window.lang_bar.isVisibleTo(window)
+    window._offer_language()                     # picked: never offered again
+    assert not window.lang_bar.isVisibleTo(window)
+
+
+def test_turning_down_the_language_offer_is_remembered(window, monkeypatch):
+    from soundboard import i18n
+    monkeypatch.setattr(i18n, "windows_language", lambda: "ja-JP")
+    window._offer_language()
+    assert window.lang_bar.isVisibleTo(window) and window.lang_btn.text() == "日本語に切り替えます"
+    window.lang_hide.click()
+    assert not window.lang_bar.isVisibleTo(window) and window.cfg.language == ""
+    window._offer_language()
+    assert not window.lang_bar.isVisibleTo(window)
+
+
+def test_no_language_offer_on_an_english_windows(window, monkeypatch):
+    from soundboard import i18n
+    monkeypatch.setattr(i18n, "windows_language", lambda: "en-GB")
+    window._offer_language()
+    assert not window.lang_bar.isVisibleTo(window)

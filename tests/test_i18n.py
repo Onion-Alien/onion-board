@@ -376,3 +376,31 @@ def test_more_plural_rules_and_regions(langs, monkeypatch):
     assert i18n.resolve("nn-NO") == "nb" and i18n.resolve("nb-NO") == "nb"
     (langs / "es-419.json").unlink()      # no Latin American catalog: Spain's, not English
     assert i18n.resolve("es-MX") == "es"
+
+
+def test_in_language_speaks_another_language_for_one_call(langs):
+    assert i18n.in_language("de", lambda: _("Add sounds")) == "Sounds hinzufügen"
+    assert i18n.current() == "en" and _("Add sounds") == "Add sounds"   # back as it was
+    i18n.set_language("ru")
+    assert i18n.in_language("de", lambda: _("Add sounds")) == "Sounds hinzufügen"
+    assert i18n.current() == "ru"
+
+
+def test_offer_is_windows_language_when_shipped_and_not_showing(langs, monkeypatch):
+    monkeypatch.setattr(i18n, "windows_language", lambda: "de-AT")
+    assert i18n.offer() == "de" and i18n.name_of("de") == "Deutsch"
+    i18n.set_language("de")
+    assert i18n.offer() is None                          # already showing it
+    i18n.set_language("en")
+    monkeypatch.setattr(i18n, "windows_language", lambda: "en-NZ")
+    assert i18n.offer() is None
+    monkeypatch.setattr(i18n, "windows_language", lambda: "sw-KE")   # not shipped
+    assert i18n.offer() is None
+
+
+def test_the_picked_language_is_saved_where_startup_reads_it(langs, app_dir, monkeypatch):
+    from soundboard.library import Config
+    monkeypatch.delenv("ONIONBOARD_LANG", raising=False)
+    Config(language="de").save()
+    assert i18n.startup(app_dir) == "de"
+    assert Config.load().language == "de"

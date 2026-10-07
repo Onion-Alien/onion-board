@@ -68,6 +68,7 @@ from soundboard.ui.widgets import (Meter, NameAndSeek, Pad, PadGrid, SeekSlider,
 from soundboard.wheelguard import no_wheel
 from soundboard.winkeys import Hotkeys
 from soundboard import errors
+from soundboard import i18n
 from soundboard.i18n import _, ngettext
 
 log = logging.getLogger(__name__)
@@ -137,6 +138,7 @@ RANDOM = "__random__:"   # hotkey action prefix: a random sound from the categor
 ALL = _("All")       # the category tab that shows every sound
 TIP_DELAY_MS = 8000    # the first tip waits this long after the start
 TIP_RETRY_MS = 60_000  # ...and is tried again this often while it can't show
+LANG_OFFER_SEEN = "language-offer"   # in Config.tips_seen: the language bar was turned down
 SEARCH_MIN_W = 220    # the Sounds tab's search box, until the window gets narrow
 VOICE_POLL_MS = 3000  # how often the game in front is looked at (soundboard.voicesdk)
 VOICE_POLL_IDLE_S = 15   # ...while nobody sees the hint and nothing switches by itself
@@ -475,6 +477,7 @@ class MainWindow(QMainWindow):
         self._tip_timer = QTimer(self, interval=TIP_RETRY_MS)
         self._tip_timer.timeout.connect(self._maybe_tip)
         QTimer.singleShot(TIP_DELAY_MS, self, self._start_tips)
+        self._offer_language()
         # Switch category when a program is in front: a cheap look at the window in
         # front each second, only while a rule exists (and runs while the board is hidden)
         self.cat_switch = catswitch.Switcher()
@@ -650,6 +653,31 @@ class MainWindow(QMainWindow):
         self.tip_bar.hide()
         self.tip: tips.Tip | None = None
         rv.addWidget(self.tip_bar)
+
+        # Windows is in a language the board has but isn't showing: offered in that
+        # language, so someone who can't read English finds it (_offer_language)
+        self.lang_bar = QFrame()
+        self.lang_bar.setObjectName("tipbar")
+        lh = QHBoxLayout(self.lang_bar)
+        lh.setContentsMargins(12, 6, 6, 6)
+        lh.setSpacing(8)
+        self.lang_lbl = QLabel()
+        self.lang_lbl.setTextFormat(Qt.PlainText)
+        self.lang_lbl.setWordWrap(True)
+        lh.addWidget(self.lang_lbl, 1)
+        self.lang_btn = QPushButton()
+        self.lang_btn.setObjectName("small")
+        self.lang_btn.clicked.connect(lambda: self.switch_language(self._lang_offered))
+        lh.addWidget(self.lang_btn)
+        hide = QPushButton("✕")
+        hide.setObjectName("urgenthide")
+        hide.setFixedSize(28, 28)
+        hide.clicked.connect(self._no_language)
+        lh.addWidget(hide)
+        self.lang_hide = hide
+        self.lang_bar.hide()
+        self._lang_offered = ""
+        rv.addWidget(self.lang_bar)
 
         # ---- tabs
         self.tab_info: dict[str, tuple[str, str]] = {}   # page attr -> (title, text) for ⓘ
@@ -3241,6 +3269,47 @@ class MainWindow(QMainWindow):
         info = self._current_tab_info()
         if info:
             QMessageBox.information(self, info[0], info[1])
+
+    # ------------------------------------------------------------------ language
+    def _offer_language(self):
+        """Windows speaks a language the board has, and no language was ever picked:
+        a bar, in that language, offering to switch (until switched or dismissed)."""
+        code = i18n.offer()
+        if not code or self.cfg.language or LANG_OFFER_SEEN in self.cfg.tips_seen:
+            return
+        name = i18n.name_of(code)
+        self._lang_offered = code
+        text, button, hide = i18n.in_language(code, lambda: (
+            # the way there in the catalog's own words for the gear, the page and the box
+            _("Onion Board is also in {name}. You can change it any time in {where}.",
+              name=name, where=" → ".join((_("Settings"), _("Appearance"), _("Language")))),
+            _("Switch to {name}", name=name), _("No thanks")))
+        # a right-to-left line that starts with "Onion Board" still reads right to left
+        self.lang_lbl.setText("‏" + text if i18n.is_rtl(code) else text)
+        self.lang_btn.setText(button)
+        self.lang_hide.setAccessibleName(hide)
+        self.lang_hide.setToolTip(hide)
+        for w in (self.lang_lbl, self.lang_btn):   # its own direction (Arabic offered
+            w.setLayoutDirection(Qt.RightToLeft if i18n.is_rtl(code) else Qt.LeftToRight)
+        self.lang_bar.show()
+
+    def _no_language(self):
+        self.lang_bar.hide()
+        if LANG_OFFER_SEEN not in self.cfg.tips_seen:
+            self.cfg.tips_seen.append(LANG_OFFER_SEEN)
+        self._save_later()
+
+    def switch_language(self, code: str, restart: bool = True):
+        """Show the app in language `code` from the next start (now, with `restart`:
+        text already on screen can't change language)."""
+        if not code:
+            return
+        self.cfg.language = code
+        self.lang_bar.hide()
+        self._save_later()
+        log.info("language picked: %s", code)
+        if restart and code != i18n.current():
+            self.restart_app()
 
     # ------------------------------------------------------------------ tips
     def _start_tips(self):

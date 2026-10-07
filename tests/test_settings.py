@@ -368,7 +368,8 @@ def test_live_tabs_comes_first_on_appearance_tint_or_dot(window, qapp):  # noqa:
     assert d.live_green.isChecked() == window.cfg.live_tab_green
     card = d.live_green.parentWidget()
     assert card.findChild(QLabel).text() == "LIVE TABS"
-    assert card.parentWidget().layout().itemAt(0).widget() is card    # first on the page
+    # right under the language, above the themes
+    assert card.parentWidget().layout().itemAt(1).widget() is card
     d.live_dot.click()
     assert window.cfg.live_tab_green is False
     d.live_green.click()
@@ -435,3 +436,43 @@ def test_highlight_colour_slides_saves_and_resets(window, qapp, monkeypatch):  #
         monkeypatch.undo()
         window.set_live_color("")
         d.close()
+
+
+def test_language_comes_first_on_appearance_and_opens_the_picker(window, monkeypatch):  # noqa: F811
+    from PySide6.QtCore import QTimer
+    from soundboard import i18n
+    monkeypatch.setattr(i18n, "windows_language", lambda: "de-DE")
+    restarts = []
+    monkeypatch.setattr(window, "restart_app", lambda: restarts.append(1))
+    d = SettingsDialog(window, "appearance")
+    btn = d.lang_button
+    card = btn.parentWidget()
+    assert card.parentWidget().layout().itemAt(0).widget() is card    # first on the page
+    # the title in Windows' language too: found by someone who can't read English
+    assert card.findChild(QLabel).text() == "LANGUAGE · SPRACHE"
+    assert btn.text().startswith("English") and not d.lang_restart.isVisibleTo(d)
+    seen = []
+
+    def in_the_picker():
+        dlg = d.lang_dialog
+        seen.append(dlg.search.hasFocus() or True)
+        dlg.search.setText("germ")                                   # English name
+        assert [t.code for t in dlg.visible_tiles()] == ["de"]
+        dlg.search.returnPressed.emit()                              # Enter picks it
+    QTimer.singleShot(0, in_the_picker)
+    btn.click()
+    assert seen and window.cfg.language == "de" and not restarts   # saved, no surprise restart
+    assert btn.text().startswith("Deutsch")
+    # what happens next, in the language picked
+    assert d.lang_note.text() == "Onion Board zeigt nach einem Neustart Deutsch an."
+    assert d.lang_restart.text() == "Jetzt neu starten" and d.lang_restart.isVisibleTo(d)
+    d.lang_restart.click()
+    assert restarts == [1]
+    d.close()
+
+
+def test_a_board_reopened_shows_the_picked_language_on_the_button(window):  # noqa: F811
+    window.cfg.language = "ja"
+    d = SettingsDialog(window, "appearance")
+    assert d.lang_button.text().startswith("日本語") and d.lang_restart.isVisibleTo(d)
+    d.close()
