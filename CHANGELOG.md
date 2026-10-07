@@ -14,6 +14,14 @@
 - **The Radio's *Only me / LIVE* button is now *Send / Sending***, the same as a
   program's on the Apps tab.
 - **Back to my sounds** stands out after a web search: a bigger red button.
+- **More AI voices, and a way to tell them apart.** Six new voices: Duke (an older,
+  gravelly man), Riley (a young guy), River (somewhere between a man and a woman),
+  Ivy (a husky woman), Squeak (a tiny cartoon voice) and Titan (a giant). Under the
+  voice list it now says who each one sounds like and how high it is. The new
+  **All voices** button opens every voice as a card with a few lines about it and
+  **Hear it**, a short sample in your headphones only. **Make your own voice** blends
+  two voices and sets how deep and how high it is. No new download: AI voices you
+  already have get the new voices too.
 - **"Did you know?" tips.** Once the setup guide is done, Onion Board shows a short
   tip about one feature at most once a day, with a *Show me* button that takes you
   there. Never while a game is up, and each tip only once. *Show tips* in
