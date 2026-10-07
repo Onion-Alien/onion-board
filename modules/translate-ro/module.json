@@ -1,0 +1,15 @@
+{
+  "id": "translate-ro",
+  "name": "Translate to Romanian",
+  "version": "1.0.0",
+  "kind": "translation",
+  "description": "The computer voice speaks what you say in Romanian. Needs live voice-to-speech. Downloads a 71 MB translation model once, when you ask for it; translating then happens on this PC.",
+  "language": "ro",
+  "language_name": "Romanian",
+  "download": {
+    "url": "https://argos-net.com/v1/translate-en_ro-1_9.argosmodel",
+    "sha256": "bf8909d2b1e734f73ef4e892fd53c68fa4a96853b5b786b16da596a5ed258003",
+    "bytes": 71049078
+  },
+  "credits": "English to Romanian model from the Argos Translate package index: OPUS-MT (Tiedemann & Thottingal, 2020), CC BY 4.0."
+}

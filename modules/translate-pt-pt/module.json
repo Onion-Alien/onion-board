@@ -1,0 +1,15 @@
+{
+  "id": "translate-pt-pt",
+  "name": "Translate to Portuguese (Portugal)",
+  "version": "1.0.0",
+  "kind": "translation",
+  "description": "The computer voice speaks what you say in Portuguese (Portugal). Needs live voice-to-speech. Downloads a 66 MB translation model once, when you ask for it; translating then happens on this PC.",
+  "language": "pt-PT",
+  "language_name": "Portuguese (Portugal)",
+  "download": {
+    "url": "https://argos-net.com/v1/translate-en_pt-1_9.argosmodel",
+    "sha256": "0c5350a2fa5b923de1346edc0d42e08e38bab2e33cede3a0b9a48eb4281ad8a9",
+    "bytes": 66179184
+  },
+  "credits": "English to Portuguese (Portugal) model from the Argos Translate package index: OPUS-MT (Tiedemann & Thottingal, 2020), CC BY 4.0."
+}

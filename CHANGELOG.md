@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+- **28 more languages to speak in.** The Voice tab's *Speak in* list grows from 5
+  to 33: Italian, Portuguese (Brazil and Portugal), Dutch, Polish, Czech, Slovak,
+  Slovenian, Hungarian, Romanian, Bulgarian, Greek, Danish, Swedish, Norwegian,
+  Finnish, Catalan, Japanese, Korean, Traditional Chinese, Thai, Vietnamese,
+  Indonesian, Malay, Hindi, Arabic, Hebrew and Turkish. Each is a one-time download
+  (66–125 MB) and uses Windows' free voice for it. Language names now show in the
+  app's own language.
 - **Live controls on the Radio and Apps tabs.** The Sounds tab's speed / pitch /
   effects popup now has a twin on the Radio bar and the Apps tab: change the pitch
   (Redline up to ±36 st) and add bass, treble, muffle, reverb, echo, distortion or a

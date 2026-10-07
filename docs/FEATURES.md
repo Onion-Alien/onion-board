@@ -157,9 +157,9 @@ The full list. The [README](../README.md) has the short version and how to get s
   press *Start talking as the voice* and each sentence you say is spoken by a
   computer voice instead of yours. Speech recognition runs on your PC (the first time, the Voice tab's *Install speech
   recognition* button downloads it, about 300 MB; needs Python 3.12+).
-  *Speak in* makes the voice say it in Chinese, Spanish, French, German or
-  Russian: talk in English and it's translated on your PC. Each language is an
-  add-on you download only if you pick it (65–195 MB), and it needs that
+  *Speak in* makes the voice say it in one of 33 languages (Chinese, Spanish,
+  French, German, Japanese, Portuguese…): talk in English and it's translated on
+  your PC. Each language is an add-on you download only if you pick it (65–196 MB), and it needs that
   language's Windows voice (Settings → Speech → Add voices, free).
 - **Triggers tab:** plays a sound when a picture shows up in your game: a
   game's "YOU DIED", a rare spawn, a queue popping. It's the

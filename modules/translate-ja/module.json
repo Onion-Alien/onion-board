@@ -1,0 +1,15 @@
+{
+  "id": "translate-ja",
+  "name": "Translate to Japanese",
+  "version": "1.0.0",
+  "kind": "translation",
+  "description": "The computer voice speaks what you say in Japanese. Needs live voice-to-speech. Downloads a 120 MB translation model once, when you ask for it; translating then happens on this PC.",
+  "language": "ja",
+  "language_name": "Japanese",
+  "download": {
+    "url": "https://argos-net.com/v1/translate-en_ja-1_1.argosmodel",
+    "sha256": "16300cc4eaa85320520cabcf433b63d01be40ef6966251de72043a083408f716",
+    "bytes": 120470284
+  },
+  "credits": "English to Japanese model from the Argos Translate package index: Argos Translate, trained on OPUS data."
+}

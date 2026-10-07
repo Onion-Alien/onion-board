@@ -1,0 +1,15 @@
+{
+  "id": "translate-el",
+  "name": "Translate to Greek",
+  "version": "1.0.0",
+  "kind": "translation",
+  "description": "The computer voice speaks what you say in Greek. Needs live voice-to-speech. Downloads a 70 MB translation model once, when you ask for it; translating then happens on this PC.",
+  "language": "el",
+  "language_name": "Greek",
+  "download": {
+    "url": "https://argos-net.com/v1/translate-en_el-1_9.argosmodel",
+    "sha256": "ac5a359363b14490a2c6614e6c5ae4a58a8bbbc739b17a4cb3616fe46f2c329b",
+    "bytes": 69660890
+  },
+  "credits": "English to Greek model from the Argos Translate package index: OPUS-MT (Tiedemann & Thottingal, 2020), CC BY 4.0."
+}

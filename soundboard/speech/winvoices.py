@@ -26,12 +26,13 @@ ERROR_CANCELLED = 1223           # the UAC prompt was answered No
 
 # the locale Settings picks for a language when there are several
 LOCALES = {
-    "ar": "ar-SA", "cs": "cs-CZ", "da": "da-DK", "de": "de-DE", "el": "el-GR",
-    "en": "en-US", "es": "es-ES", "fi": "fi-FI", "fr": "fr-FR", "he": "he-IL",
-    "hi": "hi-IN", "hu": "hu-HU", "id": "id-ID", "it": "it-IT", "ja": "ja-JP",
-    "ko": "ko-KR", "nb": "nb-NO", "nl": "nl-NL", "pl": "pl-PL", "pt": "pt-BR",
-    "ro": "ro-RO", "ru": "ru-RU", "sk": "sk-SK", "sv": "sv-SE", "th": "th-TH",
-    "tr": "tr-TR", "uk": "uk-UA", "vi": "vi-VN", "zh": "zh-CN",
+    "ar": "ar-SA", "bg": "bg-BG", "ca": "ca-ES", "cs": "cs-CZ", "da": "da-DK",
+    "de": "de-DE", "el": "el-GR", "en": "en-US", "es": "es-ES", "fi": "fi-FI",
+    "fr": "fr-FR", "he": "he-IL", "hi": "hi-IN", "hu": "hu-HU", "id": "id-ID",
+    "it": "it-IT", "ja": "ja-JP", "ko": "ko-KR", "ms": "ms-MY", "nb": "nb-NO",
+    "nl": "nl-NL", "pl": "pl-PL", "pt": "pt-BR", "ro": "ro-RO", "ru": "ru-RU",
+    "sk": "sk-SK", "sl": "sl-SI", "sv": "sv-SE", "th": "th-TH", "tr": "tr-TR",
+    "uk": "uk-UA", "vi": "vi-VN", "zh": "zh-CN"
 }
 
 _TOKEN_KEYS = (r"SOFTWARE\Microsoft\Speech_OneCore\Voices\Tokens",
@@ -115,8 +116,10 @@ def fingerprint() -> frozenset[str]:
 
 
 def has_language(tokens: frozenset[str], lang: str) -> bool:
-    """Whether a token looks like a `lang` voice: MSTTS_V110_zhCN_HuihuiM, TTS_MS_ZH-CN_…"""
-    pat = re.compile(rf"_{re.escape(lang.upper())}[A-Z]{{2}}_")
+    """Whether a token looks like a `lang` voice: MSTTS_V110_zhCN_HuihuiM, TTS_MS_ZH-CN_…
+    ("zh-TW" wants that country's voice; "zh" any)."""
+    code = lang.upper().replace("-", "")
+    pat = re.compile(rf"_{re.escape(code)}{'' if len(code) > 3 else '[A-Z]{2}'}_")
     return any(pat.search(t.upper().replace("-", "")) for t in tokens)
 
 

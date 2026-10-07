@@ -1,0 +1,15 @@
+{
+  "id": "translate-pt-br",
+  "name": "Translate to Portuguese (Brazil)",
+  "version": "1.0.0",
+  "kind": "translation",
+  "description": "The computer voice speaks what you say in Portuguese (Brazil). Needs live voice-to-speech. Downloads a 66 MB translation model once, when you ask for it; translating then happens on this PC.",
+  "language": "pt-BR",
+  "language_name": "Portuguese (Brazil)",
+  "download": {
+    "url": "https://argos-net.com/v1/translate-en_pb-1_9.argosmodel",
+    "sha256": "1d1cd5e9540c6b38c258bed002a42d3b311b8a189acb74feaa311ef30d175c5b",
+    "bytes": 66179201
+  },
+  "credits": "English to Portuguese (Brazil) model from the Argos Translate package index: OPUS-MT (Tiedemann & Thottingal, 2020), CC BY 4.0."
+}

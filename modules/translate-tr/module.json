@@ -1,0 +1,15 @@
+{
+  "id": "translate-tr",
+  "name": "Translate to Turkish",
+  "version": "1.0.0",
+  "kind": "translation",
+  "description": "The computer voice speaks what you say in Turkish. Needs live voice-to-speech. Downloads a 125 MB translation model once, when you ask for it; translating then happens on this PC.",
+  "language": "tr",
+  "language_name": "Turkish",
+  "download": {
+    "url": "https://argos-net.com/v1/translate-en_tr-1_5.argosmodel",
+    "sha256": "2d553a00880a0c21dea5b1c375535659e6bf18c9bf2ce9847c2a2fd2ff50316a",
+    "bytes": 124742526
+  },
+  "credits": "English to Turkish model from the Argos Translate package index: Argos Translate, trained on OPUS data."
+}

@@ -1,0 +1,15 @@
+{
+  "id": "translate-sv",
+  "name": "Translate to Swedish",
+  "version": "1.0.0",
+  "kind": "translation",
+  "description": "The computer voice speaks what you say in Swedish. Needs live voice-to-speech. Downloads a 108 MB translation model once, when you ask for it; translating then happens on this PC.",
+  "language": "sv",
+  "language_name": "Swedish",
+  "download": {
+    "url": "https://argos-net.com/v1/translate-en_sv-1_5.argosmodel",
+    "sha256": "d697224b443d212a04d24eb2ea0b615cb663eb24d4d21b70979673507b4d1e49",
+    "bytes": 107585048
+  },
+  "credits": "English to Swedish model from the Argos Translate package index: Argos Translate, trained on OPUS data."
+}

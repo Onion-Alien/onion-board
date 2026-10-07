@@ -222,13 +222,27 @@ class SapiTTS:
             return False
 
     def voice_for(self, lang: str, prefer: str = "") -> str:
-        """A voice that speaks `lang` ("de", "zh"…): `prefer` if it does, else the
-        first one installed; "" when Windows has none."""
+        """A voice that speaks `lang` ("de", "zh", "pt-BR"…): `prefer` if it does,
+        else the first one installed; "" when Windows has none. For a language with
+        a country, a voice from that country comes first, then any of the language
+        (a zh-CN voice reads Traditional Chinese too)."""
+        want = lang.lower()
+        base = want.split("-")[0]
+
+        def tag(name: str) -> str:
+            return self.voice_langs.get(name, "").lower()
+
+        def exact(name: str) -> bool:
+            return "-" in want and tag(name) == want
+
         def speaks(name: str) -> bool:
-            return self.voice_langs.get(name, "").lower().split("-")[0] == lang.lower()
-        if prefer and speaks(prefer):
-            return prefer
-        return next((v for v in self.voices if speaks(v)), "")
+            return tag(name).split("-")[0] == base
+        for ok in (exact, speaks):
+            if prefer and ok(prefer):
+                return prefer
+            if v := next((v for v in self.voices if ok(v)), ""):
+                return v
+        return ""
 
     @property
     def running(self) -> bool:

@@ -1,0 +1,15 @@
+{
+  "id": "translate-ar",
+  "name": "Translate to Arabic",
+  "version": "1.0.0",
+  "kind": "translation",
+  "description": "The computer voice speaks what you say in Arabic. Needs live voice-to-speech. Downloads a 89 MB translation model once, when you ask for it; translating then happens on this PC.",
+  "language": "ar",
+  "language_name": "Arabic",
+  "download": {
+    "url": "https://argos-net.com/v1/translate-en_ar-1_0.argosmodel",
+    "sha256": "e2a6e84337f7ebbb55f9dc61dcba3a861c0d786ae5a46fa198fd8d6473f5c775",
+    "bytes": 88502631
+  },
+  "credits": "English to Arabic model from the Argos Translate package index: Argos Translate, trained on OPUS data."
+}
