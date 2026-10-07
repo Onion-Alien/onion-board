@@ -58,6 +58,7 @@ import stat
 import subprocess
 import sys
 import threading
+import time
 import uuid
 import zipfile
 from collections.abc import Callable
@@ -431,6 +432,75 @@ def uninstall(module_id: str, base: Path | None = None) -> None:
         raise ModuleError(_("it couldn't be removed ({error})", error=errors.plain(e))) from e
     shutil.rmtree(gone, ignore_errors=True)
     log.info("removed module %s from %s", module_id, dest)
+
+
+# Add-on copies left in %APPDATA%\OnionBoard (and its modules\): install_zip's and
+# uninstall's own temp folders when deleting them failed (a file still open), and old
+# or half-swapped copies of an add-on beside the real one ("onion-watch-old3",
+# "onion-pocket-old-20261005111322", "onion-watch-staged-069"). Only names like these,
+# and only folders holding that add-on's module.json, are ever touched.
+_TEMP_COPY = re.compile(r"modules-(?:new|old)-[0-9a-f]{8}")
+_OLD_COPY = re.compile(r"(?P<id>[a-z0-9][a-z0-9-]*?)-(?:old|staged)(?:-?\d+)?")
+LEFTOVER_MIN_AGE_S = 3600   # newer ones may be an install going on right now
+
+
+def prune_leftovers(app_dir: Path | None = None, loaded=None,
+                    now: float | None = None) -> int:
+    """Delete leftover add-on copies (see _TEMP_COPY / _OLD_COPY) from `app_dir`
+    (%APPDATA%\\OnionBoard) and its modules\\, keeping the newest old copy of each
+    add-on (outside modules\\ if there is one). Never a folder an add-on is found in
+    (`discover`) or one holding a file in `loaded` (default: every module imported in
+    this process), nor one touched in the last hour. Returns how many went. Run off the
+    UI thread."""
+    app_dir = app_dir if app_dir is not None else library.APP_DIR
+    now = time.time() if now is None else now
+    if loaded is None:
+        loaded = [f for m in list(sys.modules.values())
+                  if isinstance(f := getattr(m, "__file__", None), str)]
+    in_use = {info.path.resolve() for info in discover([app_dir / "modules",
+                                                        app_root() / "modules"])}
+    loaded = [Path(f).resolve() for f in loaded]
+
+    def protected(d: Path) -> bool:
+        r = d.resolve()
+        return (r in in_use or any(r in p.parents for p in in_use)
+                or any(r in f.parents for f in loaded))
+
+    temps, copies = [], {}
+    for base in (app_dir, app_dir / "modules"):
+        try:
+            subs = [p for p in base.iterdir() if p.is_dir()]
+        except OSError:
+            continue
+        for d in subs:
+            try:
+                if (d.is_symlink() or getattr(d, "is_junction", lambda: False)()
+                        or now - d.stat().st_mtime < LEFTOVER_MIN_AGE_S or protected(d)):
+                    continue
+                if base == app_dir and _TEMP_COPY.fullmatch(d.name):
+                    temps.append(d)
+                elif (m := _OLD_COPY.fullmatch(d.name)):
+                    info = _read(d)
+                    if info is not None and info.id == m["id"]:
+                        # one outside modules\ is kept first: no start-up ever scans it
+                        copies.setdefault(info.id, []).append(
+                            (base == app_dir, d.stat().st_mtime, d))
+            except OSError:
+                continue
+    doomed = list(temps)
+    for found in copies.values():
+        found.sort()
+        doomed += [d for *_, d in found[:-1]]   # the newest one stays, for going back
+    gone = 0
+    for d in doomed:
+        shutil.rmtree(d, ignore_errors=True)
+        if d.exists():
+            log.info("couldn't remove the old add-on copy %s yet", d.name)
+        else:
+            gone += 1
+    if gone:
+        log.info("removed %d old add-on cop%s", gone, "y" if gone == 1 else "ies")
+    return gone
 
 
 def base_python() -> str | None:

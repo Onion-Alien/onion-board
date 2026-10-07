@@ -149,6 +149,15 @@ def clean_temp_leftovers(now: float | None = None) -> int:
     return gone
 
 
+def modules_prune():
+    """Leftover add-on copies (modules.prune_leftovers), off the UI thread."""
+    from soundboard import modules
+    try:
+        modules.prune_leftovers()
+    except Exception:  # noqa: BLE001 - tidying up must never hurt the running app
+        log.debug("couldn't tidy old add-on copies", exc_info=True)
+
+
 def start_ytdlp_check(cfg):
     """The daily "is there a newer yt-dlp?" check, off the UI thread (see ytdl.py)."""
     import threading
@@ -466,6 +475,9 @@ def main():
         QTimer.singleShot(900, lambda: w.toast(reset_note, "warn" if "Couldn't" in reset_note
                                                else "ok"))
     QTimer.singleShot(30_000, lambda: start_ytdlp_check(w.cfg))
+    # old add-on copies: once the add-ons are loaded (so the ones in use are known)
+    QTimer.singleShot(20_000, lambda: threading.Thread(
+        target=modules_prune, daemon=True, name="addon-leftovers").start())
     QTimer.singleShot(500, w.import_queued)   # the installer's "from Soundpad" box
     QTimer.singleShot(600, w.after_update)   # "Updated to …" after an update restarted it
     # new versions (updates.py): unless unticked, at most every 6 hours, also for an app
