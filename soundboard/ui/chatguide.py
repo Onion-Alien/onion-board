@@ -95,6 +95,10 @@ SETTING_FIXES = {
     discordcfg.BYPASS: _(
         "<b>Bypass System Audio Input Processing</b> is on: Discord skips Onion Board: "
         "turn it off (Show Advanced Voice Settings)."),
+    discordcfg.VAD: _(
+        "<b>Advanced Voice Activity</b> is on: in a call it only sends your voice, and "
+        "cuts most of a song: turn it off (Show Advanced Voice Settings), or use Push "
+        "to Talk."),
     discordcfg.ISOLATION: _(
         "Input Profile is <b>Voice Isolation</b>: Krisp wipes out music after a second: "
         "set <b>Input Profile</b> to <b>Custom</b>, then Noise Suppression to <b>None</b>."),

@@ -222,6 +222,8 @@ DISCORD_URGENT = {
                          "which skips Onion Board. Set it to Custom."),
     discordcfg.BYPASS: _("{name} isn't hearing your sounds: \"Bypass System Audio Input "
                          "Processing\" is on, which skips Onion Board."),
+    discordcfg.VAD: _("{name}'s Advanced Voice Activity cuts most of your sounds in calls. "
+                      "Turn it off (Voice & Video → Show Advanced Voice Settings)."),
     discordcfg.ISOLATION: _("{name}'s Voice Isolation is wiping out your sounds. Set its "
                             "Input Profile to Custom and Noise Suppression to None."),
     discordcfg.KRISP: _("{name}'s noise suppression (Krisp) is wiping out your sounds. Set "
