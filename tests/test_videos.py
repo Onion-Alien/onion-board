@@ -161,13 +161,21 @@ def window(qapp, app_dir, monkeypatch):
     _close(qapp, w)
 
 
+def _transport(w):
+    """_update_transport, once the thread looking up the sound's video is back."""
+    from PySide6.QtWidgets import QApplication
+    w._update_transport({})
+    assert process_events(QApplication.instance(), lambda: w._video_asking is None, 3)
+    w._update_transport({})
+
+
 def test_the_video_button_shows_only_for_a_video_pad(window, monkeypatch):
     w = window
     w.select("plain")
-    w._update_transport({})
+    _transport(w)
     assert w.btn_video.isHidden()
     w.select("vid")
-    w._update_transport({})
+    _transport(w)
     assert not w.btn_video.isHidden()
     shown, played = [], []
     monkeypatch.setattr(VideoWindow, "show_for", lambda self, sid, name, path: shown.append(sid))
@@ -179,7 +187,7 @@ def test_the_video_button_shows_only_for_a_video_pad(window, monkeypatch):
 def test_a_moved_video_takes_the_button_away(window, app_dir):
     w = window
     w.select("vid")
-    w._update_transport({})
+    _transport(w)
     (app_dir / "clips" / "vid.mp4").unlink()
     w.btn_video.click()
     assert w.btn_video.isHidden() and w._video_win is None
@@ -197,6 +205,34 @@ def test_a_build_without_qt_video_still_starts_and_just_hides_the_button(window,
     monkeypatch.setattr(builtins, "__import__", no_video)
     w = window
     w.select("vid")
-    w._update_transport({})
+    _transport(w)
     w.btn_video.click()
     assert w.btn_video.isHidden() and w._video_win is None
+
+
+def test_picking_a_pad_never_reads_videos_json_on_the_ui_thread(window, monkeypatch, qapp):
+    """Each new pick read videos.json and checked the video file on the UI thread,
+    maybe on a sleeping drive: the window froze. It's looked up on a thread and the
+    Video button appears once it's known; a pick made meanwhile gets its own answer."""
+    import threading
+    import time
+    w = window
+    gate, real, asked = threading.Event(), videos.get, []
+    monkeypatch.setattr(videos, "get", lambda sid: (asked.append(sid), gate.wait(3),
+                                                    real(sid))[2])
+    gate.set()
+    w.select("plain")
+    _transport(w)            # known: no video
+    gate.clear()             # from here each lookup waits for the gate
+    t0 = time.monotonic()
+    w.select("vid")
+    w._update_transport({})
+    w.select("plain")        # picked again before the answer for "vid" came
+    w._update_transport({})
+    w.select("vid")
+    w._update_transport({})
+    assert time.monotonic() - t0 < 0.5
+    assert w.btn_video.isHidden()
+    gate.set()
+    assert process_events(qapp, lambda: not w.btn_video.isHidden(), 3)
+    assert w._video_asking is None and asked[-1] == "vid"

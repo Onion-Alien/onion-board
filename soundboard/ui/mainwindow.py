@@ -299,6 +299,8 @@ class MainWindow(QMainWindow):
     update_done = Signal(object, str)   # an update check finished: Release|None, error
     mic_attached = Signal(str, str)     # attach_mic finished: the mic, error ("" = done)
     cable_removed = Signal(str)         # remove_cable finished: error ("" = done)
+    cable_setup_found = Signal(bool)    # VB-Cable's setup program is on this PC (asked on a thread)
+    video_found = Signal(str, object)   # a sound's video (Path|None), looked up on a thread
     config_saved = Signal(bool)         # the background save finished: ok
     voice_engine = Signal(object)       # the voice engine of the game in front (a mode key|None)
     default_found = Signal(object)      # Windows' default output, asked on a thread (str|None)
@@ -1128,6 +1130,8 @@ class MainWindow(QMainWindow):
         self.btn_video.clicked.connect(self.show_video)
         self.btn_video.hide()
         self._video_for: tuple[str | None, Path | None] = ("", None)   # (sid, its video)
+        self._video_asking: str | None = None   # the sound whose video a thread looks up
+        self.video_found.connect(self._video_found)
         self._video_win = None   # ui/videowindow.VideoWindow, made on first use
         th.addWidget(self.btn_video)
         self.speed_btn = SpeedPitchButton(
@@ -1344,6 +1348,12 @@ class MainWindow(QMainWindow):
         self.btn_rmcable.hide()
         self.cable_removed.connect(self._cable_removed)
         self._cable_gone = False   # removed this session (Windows lists it till a restart)
+        # is VB-Cable's setup program there to remove it with: looked up on a thread (a
+        # file check in Program Files, on every redraw, could stall on a slow disk) and
+        # asked again when the devices are re-scanned. None = not known yet
+        self._vb_setup: bool | None = None
+        self._vb_setup_asking = False
+        self.cable_setup_found.connect(self._cable_setup_found)
         self.rmcable_note = hint_label(
             _("<b>You don't need the virtual cable any more</b> — it was only the backup. Remove "
               "it, or keep it if another program uses it (Voicemeeter, another soundboard)."))
@@ -1509,6 +1519,7 @@ class MainWindow(QMainWindow):
         e = self.engine
         e.shutdown()
         rescanned = eng.rescan()
+        self._vb_setup = None     # installed or removed since: look again
         self._init_devices()
         self._prepare_all()
         outs = eng.list_devices("output")
@@ -2377,8 +2388,24 @@ class MainWindow(QMainWindow):
         now, so the Setup tab offers to remove it."""
         if self._cable_gone or not eng.virtual_outputs():
             return False
+        if self._vb_setup is None:      # shown once it's known (_cable_setup_found)
+            self._ask_cable_setup()
+            return False
+        return self._vb_setup
+
+    def _ask_cable_setup(self):
+        if self._vb_setup_asking:
+            return
         from soundboard import cableremove
-        return cableremove.setup_exe() is not None
+        self._vb_setup_asking = True
+        threading.Thread(target=lambda: self.cable_setup_found.emit(
+            cableremove.setup_exe() is not None), daemon=True, name="cable-setup").start()
+
+    def _cable_setup_found(self, found: bool):
+        self._vb_setup_asking = False
+        if found != self._vb_setup:
+            self._vb_setup = found
+            self._update_flow()
 
     def remove_cable(self):
         """Setup tab → Remove the virtual cable: VB-Audio's uninstaller, as admin (it
@@ -6050,10 +6077,42 @@ class MainWindow(QMainWindow):
             self.mini_time.setText(self.np_time.text())
 
     def _video_of(self, sid: str | None) -> Path | None:
-        """The current sound's video, looked up once per selection."""
+        """The current sound's video, looked up once per selection, on a thread (it
+        reads videos.json and checks the video is there, maybe on a sleeping drive):
+        None until it's known."""
         if self._video_for[0] != sid:
-            self._video_for = (sid, videos.get(sid) if sid else None)
+            self._video_for = (sid, None)
+            if sid:
+                self._ask_video(sid)
         return self._video_for[1]
+
+    def _ask_video(self, sid: str):
+        if self._video_asking is not None:   # one at a time: its answer asks for the next
+            return
+        self._video_asking = sid
+
+        def look():
+            try:
+                found = videos.get(sid)
+            except Exception:  # noqa: BLE001 - never leave _video_asking stuck
+                log.debug("video lookup failed", exc_info=True)
+                found = None
+            try:
+                self.video_found.emit(sid, found)
+            except RuntimeError:   # the window closed meanwhile
+                pass
+        threading.Thread(target=look, daemon=True, name="video-lookup").start()
+
+    def _video_found(self, sid: str, path):
+        self._video_asking = None
+        now = self._video_for[0]
+        if now != sid:             # another sound was picked meanwhile
+            if now:
+                self._ask_video(now)
+            return
+        self._video_for = (sid, path)
+        if self.btn_video.isHidden() == (path is not None):
+            self.btn_video.setVisible(path is not None)
 
     def _update_video(self, sid, m, playing):
         path = self._video_of(sid) if m else None

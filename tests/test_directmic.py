@@ -1666,6 +1666,17 @@ def _working_on_the_mic(w, monkeypatch, cables=(CABLE_IN,), vbcable=True):
     monkeypatch.setattr(w, "_direct_not_running", lambda: False)
     monkeypatch.setattr(cableremove, "setup_exe",
                         lambda: Path("VBCABLE_Setup_x64.exe") if vbcable else None)
+    w._vb_setup = None            # looked up again (on a thread)
+
+
+def _flow_settled(w):
+    """_update_flow, then again once the thread looking for VB-Cable's setup is back."""
+    from PySide6.QtWidgets import QApplication
+
+    from conftest import process_events
+    w._update_flow()
+    assert process_events(QApplication.instance(), lambda: not w._vb_setup_asking, 3)
+    w._update_flow()
 
 
 def test_a_working_mic_offers_to_remove_the_cable(window, monkeypatch):  # noqa: F811
@@ -1673,15 +1684,47 @@ def test_a_working_mic_offers_to_remove_the_cable(window, monkeypatch):  # noqa:
     removal (and no "also on the virtual cable" on the mic's line)."""
     w = window
     _working_on_the_mic(w, monkeypatch)
-    w._update_flow()
+    _flow_settled(w)
     assert "virtual cable" not in w.flow_out.text()
     assert "don't need the virtual cable" in w.rmcable_note.text()
     assert not w.rmcable_note.isHidden() and "cable" not in w.step_lbl.text().lower()
     assert not w.btn_rmcable.isHidden()
     for cables, vbcable in (((), True), ((CABLE_IN,), False)):   # none, or not VB-Cable's
         _working_on_the_mic(w, monkeypatch, cables, vbcable)
-        w._update_flow()
+        _flow_settled(w)
         assert w.btn_rmcable.isHidden() and w.rmcable_note.isHidden()
+
+
+def test_redraws_never_look_for_the_cable_setup_on_the_ui_thread(window, monkeypatch):  # noqa: F811
+    """_update_flow runs on every status redraw (and each time you start / stop
+    talking): it checked Program Files for VB-Cable's setup every time, which stalls
+    on a slow disk. It's looked up once, on a thread, and again after a re-scan."""
+    from PySide6.QtWidgets import QApplication
+
+    from conftest import process_events
+    from soundboard import cableremove
+    w = window
+    _working_on_the_mic(w, monkeypatch)
+    gate, asked = threading.Event(), []
+    monkeypatch.setattr(cableremove, "setup_exe",
+                        lambda: (asked.append(1), gate.wait(3), Path("VBCABLE_Setup_x64.exe"))[2])
+    t0 = time.monotonic()
+    for _ in range(5):
+        w._update_flow()
+    assert time.monotonic() - t0 < 0.5
+    assert w.btn_rmcable.isHidden()          # not known yet: not offered
+    gate.set()
+    app = QApplication.instance()
+    assert process_events(app, lambda: not w.btn_rmcable.isHidden(), 3)   # shown when known
+    for _ in range(5):
+        w._update_flow()
+    assert len(asked) == 1                   # asked once, not on every redraw
+    monkeypatch.setattr(w.engine, "shutdown", lambda: None)
+    monkeypatch.setattr(w, "_init_devices", lambda: None)
+    monkeypatch.setattr(w, "_prepare_all", lambda: None)
+    w.refresh_devices()                      # devices re-scanned: looked up again
+    w._update_flow()
+    assert process_events(app, lambda: len(asked) == 2 and not w._vb_setup_asking, 3)
 
 
 def test_removing_the_cable(window, monkeypatch):  # noqa: F811
