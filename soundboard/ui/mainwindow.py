@@ -489,6 +489,8 @@ class MainWindow(QMainWindow):
         self._default_asking = False   # ...and a thread is asking it now
         self.default_found.connect(self._on_default_found)
         self.device_step.connect(lambda step: step())
+        self._dev_waiting: list = []   # device changes waiting their turn (_when_devices_free)
+        self._dev_retry = QTimer(self, singleShot=True, interval=100, timeout=self._dev_pump)
         self._recover_n, self._recover_at = 0, 0.0   # see _recover_devices
         self._gone_n = 0   # checks in a row that found the failing device unplugged
         if sys.platform == "win32":
@@ -1557,12 +1559,57 @@ class MainWindow(QMainWindow):
 
         def opened(ends, rescanned):
             self._devices_opened(ends or [])
-            self._rescanned(rescanned)
+            msg = self._rescanned(rescanned)
             e.devices.release()
             if then is not None:
-                then()
+                then(msg)
 
         self._off_ui(lambda: (e.shutdown(), eng.rescan())[1], scanned)
+
+    def _when_devices_free(self, start):
+        """start() on the UI thread once it holds the device thread's claim: a
+        recovery (or an earlier click) still running there finishes first, and clicks
+        take their turns in order. start() hands the claim on to its _off_ui steps,
+        and the last of them releases it."""
+        self._dev_waiting.append(start)
+        self._dev_pump()
+
+    def _dev_pump(self):
+        if not self._dev_waiting or getattr(self, "_shut_down", False):
+            return
+        if not self.engine.devices.claim():
+            self._dev_retry.start()   # busy: look again in a moment
+            return
+        start = self._dev_waiting.pop(0)
+        try:
+            start()
+        except Exception:
+            self.engine.devices.release()
+            raise
+        finally:
+            if self._dev_waiting:
+                self._dev_retry.start()
+
+    def _device_job(self, plan, then=None):
+        """A device change asked for by hand, without the UI thread waiting on a slow
+        driver (one stuck after a headset was pulled can take seconds, or hang): once
+        the device thread is free, plan() on the UI thread returns the work, work() opens
+        and closes streams on the device thread, then then(its result) back here."""
+        e = self.engine
+
+        def start():
+            work = plan()
+
+            def guarded():
+                with eng.DEVICES:   # not after the app quit meanwhile
+                    return None if getattr(self, "_shut_down", False) else work()
+
+            def finish(result):
+                e.devices.release()
+                if then is not None and not getattr(self, "_shut_down", False):
+                    then(result)
+            self._off_ui(guarded, finish)
+        self._when_devices_free(start)
 
     def _rescanned(self, rescanned: bool) -> str:
         """After a re-scan: the sounds are prepared for the new rates, and the result."""
@@ -1582,13 +1629,20 @@ class MainWindow(QMainWindow):
         return ngettext("✓ Found {n} device", "✓ Found {n} devices", n)
 
     def rescan_with_feedback(self, btn, after=None):
-        """A Re-scan button: "Scanning…" while it runs, then what it found."""
-        def go():
-            msg = self.refresh_devices()
+        """A Re-scan button: "Scanning…" while it runs (on the device thread: the
+        window stays usable even if a driver is stuck), then what it found."""
+        if busy.is_busy(btn):
+            return   # already scanning: a double click mustn't queue a second one
+        release = busy.hold(btn, _("Scanning…"))
+
+        def done(msg):
             if after:
-                after()
-            return msg
-        busy.run_busy(btn, _("Scanning…"), go, lambda msg: msg, ms=3000)
+                try:
+                    after()
+                except RuntimeError:   # its dialog was closed while it scanned
+                    pass
+            release(msg, 3000)
+        self._when_devices_free(lambda: self._refresh_off_ui(done))
 
     def set_latency(self, mode: str):
         """'low' (default) or 'high' (bigger buffers: more delay, fewer drop-outs)."""
@@ -1769,7 +1823,7 @@ class MainWindow(QMainWindow):
             if not self.engine.devices.claim():
                 self._default_out = was
                 return
-            self._refresh_off_ui(lambda: self._use_default_output(self._default_output()))
+            self._refresh_off_ui(lambda _msg: self._use_default_output(self._default_output()))
             return
         self._use_default_output(name)
 
@@ -1849,40 +1903,55 @@ class MainWindow(QMainWindow):
             if name and name.startswith(ROUTE_DEVICE):   # a device by name
                 dev = name[len(ROUTE_DEVICE):] or None
                 self.set_route("cable" if dev is None or is_virtual_cable(dev) else "device",
-                               dev)
+                               dev, by_hand=True)
             else:
-                self.set_route(name)
+                self.set_route(name, by_hand=True)
             return
         setattr(self.cfg, attr, name)
         if attr == "mon_device":
-            self.engine.set_mon_device(name)
             # picking Windows' default keeps following it; anything else stays put
             if not self.cfg.mon_follows_default:   # not looked at while not following
                 self._default_out = appaudio.default_output_name() or self._default_out
             self.cfg.mon_follows_default = name is not None and name == self._default_output()
-        elif attr == "mic_device":
-            self.engine.set_mic_device(name)
-            if self.cfg.route == "mic" and directmic.status(name) == "other":
-                self.attach_mic()   # it follows you to the new mic
-        self._apply_send_outputs(force_main=attr == "main_device")
         self._save_now()
         if attr == "mon_device":
             self._show_route()   # the headphones aren't offered as where sounds go
-        self._update_status()
-        if attr == "mic_device" and is_hands_free(name):   # after: it'd be overwritten
-            self.status.setText(
-                _("<span style='color:{status}'>That's a Bluetooth headset's phone-call mic: "
-                  "while it's open, Windows switches the headset to call quality, so everything "
-                  "you hear sounds muffled. A wired mic, or the headset's own USB dongle, sounds "
-                  "much better.</span>", status=theme.status('warn')))
-        self._prepare_all()
+        e = self.engine
 
-    def set_route(self, route: str, device: str | None = None):
+        def plan():   # the streams are opened on the device thread (_device_job)
+            send = self._send_plan(force_main=attr == "main_device")
+
+            def work():
+                if attr == "mon_device":
+                    e.set_mon_device(name)
+                elif attr == "mic_device":
+                    e.set_mic_device(name)
+                return self._open_send(send)
+            return work
+
+        def opened(ends):
+            if ends is not None:
+                self._set_cable_bad(ends)
+            if attr == "mic_device" and self.cfg.route == "mic" \
+                    and directmic.status(name) == "other":
+                self.attach_mic()   # it follows you to the new mic
+            self._update_status()
+            if attr == "mic_device" and is_hands_free(name):   # after: it'd be overwritten
+                self.status.setText(
+                    _("<span style='color:{status}'>That's a Bluetooth headset's phone-call "
+                      "mic: while it's open, Windows switches the headset to call quality, so "
+                      "everything you hear sounds muffled. A wired mic, or the headset's own "
+                      "USB dongle, sounds much better.</span>", status=theme.status('warn')))
+            self._prepare_all()
+        self._device_job(plan, opened)
+
+    def set_route(self, route: str, device: str | None = None, by_hand: bool = False):
         """Setup -> Devices -> Send my sounds to: your mic, the virtual cable, another
         device (Voicemeeter, a mixer, a device OBS captures) or nobody (only you, and the
         stream output). `device`: send into that one too (the picker and the setup guide
         pick both at once). Otherwise the picked device is kept, so switching back
-        restores it."""
+        restores it. `by_hand`: picked in the box, so the streams open on the device
+        thread (_device_job) and the window never waits on a slow driver."""
         c = self.cfg
         if route not in library.ROUTES or (route == c.route and device is None):
             self._show_route()
@@ -1901,8 +1970,20 @@ class MainWindow(QMainWindow):
         self._fill_combo(self.cb_main, [d["name"] for d in eng.list_devices("output")],
                          c.main_device)
         self._show_route()
-        self._apply_send_outputs(force_main=True)
         self._save_now()
+        if by_hand:
+            def opened(ends):
+                if ends is not None:
+                    self._set_cable_bad(ends)
+                self._update_status()
+                self._prepare_all()
+
+            def plan():   # worked out when its turn comes
+                send = self._send_plan(force_main=True)
+                return lambda: self._open_send(send)
+            self._device_job(plan, opened)
+            return
+        self._apply_send_outputs(force_main=True)
         self._update_status()
         self._prepare_all()
 
@@ -1961,20 +2042,42 @@ class MainWindow(QMainWindow):
     def _apply_send_outputs(self, force_main: bool = False):
         """(Re)open what others hear and the stream output for the current devices and
         route. Each is reopened only if its device changed (or `force_main`)."""
+        ends = self._open_send(self._send_plan(force_main))
+        if ends is not None:
+            self._set_cable_bad(ends)
+
+    def _send_plan(self, force_main: bool = False) -> dict:
+        """What _apply_send_outputs reopens, worked out on the UI thread (it reads the
+        config): only what changed."""
         e = self.engine
+        plan = {}
         main = self._main_name()
         if force_main or e.names["main"] != main:
-            e.set_main_device(main)
-            self._check_cable_format()
+            plan["main"], plan["vm"] = main, eng.virtual_mic_for(main)
         tap = self._tap_name()
         if e.tap_name != tap:
-            e.set_tap_device(tap)
+            plan["tap"] = tap
         obs = self._obs_name(self.cfg.obs_device)   # never the cable or headphones too
         if e.names["obs"] != obs:
-            e.set_obs_device(obs)
+            plan["obs"] = obs
         copies = self._copy_names()
         if list(e.copy_names) != copies:
-            e.set_copy_devices(copies)
+            plan["copies"] = copies
+        return plan
+
+    def _open_send(self, plan: dict) -> list | None:
+        """_apply_send_outputs' slow part (any thread): open what `plan` says. Returns
+        the cable's ends if what others hear was reopened (see _cable_ends), else None."""
+        e = self.engine
+        if "main" in plan:
+            e.set_main_device(plan["main"])
+        if "tap" in plan:
+            e.set_tap_device(plan["tap"])
+        if "obs" in plan:
+            e.set_obs_device(plan["obs"])
+        if "copies" in plan:
+            e.set_copy_devices(plan["copies"])
+        return self._cable_ends(plan["main"], plan["vm"]) if "main" in plan else None
 
     def _copy_names(self) -> list[str]:
         """Setup -> Devices -> Also send to: the devices that get a copy of what others

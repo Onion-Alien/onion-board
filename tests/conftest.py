@@ -179,6 +179,14 @@ def process_events(app, until, timeout=8.0, step=0.02):
     return until()
 
 
+def devices_done(win, timeout=8.0):
+    """Until the window's device changes (picks, Re-scan) ran on the device thread
+    and came back to the UI thread."""
+    from PySide6.QtWidgets import QApplication
+    assert process_events(QApplication.instance(), lambda: not win._dev_waiting
+                          and not win.engine.devices.busy, timeout)
+
+
 @pytest.fixture
 def app_dir(tmp_path, monkeypatch):
     """Point library's config/sounds paths at a temp folder."""

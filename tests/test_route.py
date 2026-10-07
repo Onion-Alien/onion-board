@@ -9,6 +9,7 @@ from soundboard.library import Config
 from soundboard.settings import SettingsDialog
 from soundboard.ui import mainwindow as main
 from soundboard.ui import setupwizard
+from conftest import devices_done
 from test_setupwizard import devices, resume, wizard  # noqa: F401  (fake devices)
 
 CABLE = "CABLE Input (VB-Audio Virtual Cable)"
@@ -139,13 +140,16 @@ def test_the_route_picker_and_its_settings_mirror(win, opened):
     assert not any("cable" in t.lower() and t != CABLE for t in texts)
     cb.setCurrentIndex(cb.findData(main.ROUTE_DEVICE + "Speakers"))
     win.on_device(cb, "route")
+    devices_done(win)
     assert win.cfg.route == "device" and opened["main"][-1] == "Speakers"
     d = SettingsDialog(win, "audio")
     route = next(c for c, src in d.dev_combos if src is win.cb_route)
     assert route.currentText() == "Speakers"
     route.activated.emit(route.findData("off"))
+    devices_done(win)
     assert win.cfg.route == "off" and opened["main"][-1] is None
     route.activated.emit(route.findData(main.ROUTE_DEVICE + CABLE))
+    devices_done(win)
     assert win.cfg.route == "cable" and opened["main"][-1] == CABLE   # a cable is a cable
     assert route.currentText() == CABLE
     d.close()
