@@ -396,3 +396,17 @@ def test_a_missing_file_is_still_a_bug_worth_a_report(fresh):
     _log_path, shown = fresh
     assert applog.report(_raise(FileNotFoundError(2, "No such file"))) is not None
     assert len(shown) == 1
+
+
+def test_a_late_callback_to_a_closed_window_is_saved_but_not_shown(fresh):
+    # a timer / signal reaching a freed widget: still counted, but the user lost nothing
+    _, shown = fresh
+    rep = applog.report(_raise(RuntimeError(
+        "Internal C++ object (QPushButton) already deleted.")))
+    assert rep is not None and rep.path is not None and rep.path.exists()
+    assert shown == []
+    try:   # another line, so not "the same bug again"
+        raise RuntimeError("something else")
+    except RuntimeError as e:
+        assert applog.report(e)
+    assert len(shown) == 1
