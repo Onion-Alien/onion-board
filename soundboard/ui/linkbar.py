@@ -366,7 +366,7 @@ class LinkBar(QFrame):
             meta, data, title, saved = payload
             if current:   # one for a link no longer showing would never be played
                 self._kept = (url, data, meta.level_gain)
-            meta.name = (title or (current and self.title) or meta.name)[:40]
+            meta.name = (title or (current and self.title) or meta.name)[:40].strip()
             self.sound_ready.emit(meta, data)
             if current:
                 self._say(_("✓ Added <b>{name}</b> to your Sounds.",

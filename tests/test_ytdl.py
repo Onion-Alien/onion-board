@@ -44,6 +44,14 @@ def test_clean_title_drops_video_noise():
     assert ytdl.clean_title("Just a title") == "Just a title"
 
 
+def test_ytdlp_can_impersonate_a_browser():
+    """TikTok answers only a real browser: without curl_cffi (or with a version this
+    yt-dlp refuses) every pasted TikTok link fails with "Unexpected response"."""
+    from yt_dlp import YoutubeDL
+    with YoutubeDL({"quiet": True}) as ydl:
+        assert ydl._get_available_impersonate_targets()
+
+
 def fake_yt_dlp(monkeypatch, info, write=b"audio", fail=None):
     """Install a stand-in `yt_dlp` module; returns the options it was given."""
     seen = {}

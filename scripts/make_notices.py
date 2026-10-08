@@ -18,7 +18,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 ROOTS = ["PySide6", "numpy", "scipy", "sounddevice", "soundfile", "soxr",
-         "yt-dlp", "yt-dlp-ejs"]
+         "yt-dlp", "yt-dlp-ejs", "curl_cffi"]
 LICENSE_FILE = re.compile(r"(?i)^(licen[cs]e|copying|notice|authors)|licen[cs]e")
 SKIP_FILE = re.compile(r"(?i)commercial")  # Qt's commercial terms don't apply to us
 RULE = "=" * 78
@@ -45,6 +45,14 @@ FFmpeg (through Qt Multimedia)  --  LGPL-2.1-or-later
 The Radio tab decodes streams with Qt Multimedia's FFmpeg backend. The FFmpeg
 libraries (avcodec, avformat, avutil, swresample, swscale) ship with PySide6 as
 separate, replaceable DLLs. Source code and licence: https://ffmpeg.org/legal.html
+
+{RULE}
+curl-impersonate (through curl_cffi)  --  MIT and curl licence
+{RULE}
+Pasted TikTok links (and some other sites) are fetched with curl_cffi's build of
+curl-impersonate: libcurl with BoringSSL, nghttp2, brotli and zstd, shipped as
+libcurl-impersonate*.dll. Licences: https://github.com/lexiforest/curl-impersonate
+and https://curl.se/docs/copyright.html
 
 {RULE}
 Country outlines

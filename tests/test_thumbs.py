@@ -101,6 +101,12 @@ def test_find_in_picks_the_thumbnail_next_to_a_download(tmp_path):
     assert thumbs.find_in(tmp_path).name == "abc.webp"
 
 
+def test_find_in_takes_tiktoks_untyped_thumbnail(tmp_path):
+    (tmp_path / "123.mp4").write_bytes(b"x")
+    (tmp_path / "123.image").write_bytes(b"x")
+    assert thumbs.find_in(tmp_path).name == "123.image"
+
+
 def test_spectrum_puts_a_tone_in_the_right_band():
     t = np.arange(SR) / SR
     for freq in (100, 1000, 8000):

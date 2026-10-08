@@ -51,6 +51,7 @@ if ($LASTEXITCODE -ne 0) { throw "build_directmic.py failed (is MinGW-w64's g++ 
     --add-data "assets\lang;lang" `
     --add-binary "build\directmic\obmic.dll;directmic" `
     --copy-metadata yt-dlp --collect-all yt_dlp_ejs `
+    --collect-all curl_cffi --hidden-import yt_dlp.networking._curlcffi `
     --hidden-import scipy.fft --hidden-import scipy.ndimage `
     --exclude-module scipy.signal `
     --exclude-module scipy.stats --exclude-module scipy.optimize `
