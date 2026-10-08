@@ -18,6 +18,14 @@ def test_yt_dlp_known_errors_are_plain_and_not_for_reporting():
     assert not p.reportable
 
 
+def test_youtube_this_video_is_unavailable_is_plain():
+    """YouTube's wording for a deleted video: it was shown as "The downloader ran into
+    a problem" with a Report it link."""
+    p = errors.describe(DownloadError("ERROR: [youtube] aaaaaaaaaaa: This video is unavailable"))
+    assert p.text == "That video isn't available any more."
+    assert not p.reportable
+
+
 def test_yt_dlp_report_upstream_text_becomes_a_report_to_us():
     e = DownloadError("ERROR: [youtube] dQw4w9WgXcQ: Unable to extract initial player "
                       "response" + bug_reports_message())
