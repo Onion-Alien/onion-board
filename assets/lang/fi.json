@@ -2771,5 +2771,11 @@
   ],
   "Tuning in to radio stations around the world…": "Viritä radioasemia ympäri maailmaa…",
   "{hotkey} is {what} now — it was the key for {lost}": "{hotkey} on nyt {what} – se oli avain kohteelle {lost}",
-  "Rename sound": "Nimeä ääni uudelleen"
+  "Rename sound": "Nimeä ääni uudelleen",
+  "A second pad with the same sound, to give its own effects or hotkey": "Toinen tyyny, jolla on sama ääni, antaa omat tehostensa tai pikanäppäimen",
+  "Duplicate": "Monista",
+  "Just the name (F2 on the pad does it too)": "Pelkkä nimi (myös näppäimistön F2 tekee sen)",
+  "Show the file in its folder": "Näytä tiedosto sen kansiossa",
+  "The file for “{name}” isn't there any more": "Tiedostoa \" {name} \" ei ole enää olemassa",
+  "{name} (copy)": "{name} (kopio)"
 }

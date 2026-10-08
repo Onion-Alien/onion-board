@@ -3011,5 +3011,11 @@
   ],
   "Tuning in to radio stations around the world…": "الاستماع إلى محطات الراديو في جميع أنحاء العالم ...",
   "{hotkey} is {what} now — it was the key for {lost}": "{hotkey} هو {what} الآن - لقد كان مفتاح {lost}",
-  "Rename sound": "إعادة تسمية الصوت"
+  "Rename sound": "إعادة تسمية الصوت",
+  "A second pad with the same sound, to give its own effects or hotkey": "لوحة ثانية بنفس الصوت، لإعطاء تأثيراتها الخاصة أو مفتاح التشغيل السريع",
+  "Duplicate": "ينسخ",
+  "Just the name (F2 on the pad does it too)": "فقط الاسم (F2 الموجود على اللوحة يفعل ذلك أيضًا)",
+  "Show the file in its folder": "إظهار الملف في المجلد الخاص به",
+  "The file for “{name}” isn't there any more": "الملف الخاص بـ \" {name} \" لم يعد موجودًا",
+  "{name} (copy)": "{name} (نسخة)"
 }

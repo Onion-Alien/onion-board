@@ -2711,5 +2711,11 @@
   ],
   "Tuning in to radio stations around the world…": "전 세계 라디오 방송국을 청취하세요…",
   "{hotkey} is {what} now — it was the key for {lost}": "{hotkey} 는 현재 {what} 입니다 — {lost} 의 키였습니다",
-  "Rename sound": "소리 이름 바꾸기"
+  "Rename sound": "소리 이름 바꾸기",
+  "A second pad with the same sound, to give its own effects or hotkey": "자체 효과나 단축키를 제공하기 위한 동일한 사운드의 두 번째 패드",
+  "Duplicate": "복제하다",
+  "Just the name (F2 on the pad does it too)": "이름만(패드의 F2도 마찬가지)",
+  "Show the file in its folder": "해당 폴더에 파일 표시",
+  "The file for “{name}” isn't there any more": "\" {name} \"에 대한 파일이 더 이상 없습니다.",
+  "{name} (copy)": "{name} (사본)"
 }

@@ -2711,5 +2711,11 @@
   ],
   "Tuning in to radio stations around the world…": "收听世界各地的广播电台...",
   "{hotkey} is {what} now — it was the key for {lost}": "{hotkey}现在是{what} — 它是{lost}的钥匙",
-  "Rename sound": "重命名声音"
+  "Rename sound": "重命名声音",
+  "A second pad with the same sound, to give its own effects or hotkey": "具有相同声音的第二个打击垫，可提供其自己的效果或热键",
+  "Duplicate": "复制",
+  "Just the name (F2 on the pad does it too)": "只是名称（键盘上的 F2 也可以）",
+  "Show the file in its folder": "显示其文件夹中的文件",
+  "The file for “{name}” isn't there any more": "“ {name} ”的文件不再存在",
+  "{name} (copy)": "{name} （副本）"
 }

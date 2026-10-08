@@ -2831,5 +2831,11 @@
   ],
   "Tuning in to radio stations around the world…": "Настраиваемся на радиостанции по всему миру…",
   "{hotkey} is {what} now — it was the key for {lost}": "{hotkey} сейчас — это {what} — это был ключ для {lost}",
-  "Rename sound": "Переименование звука"
+  "Rename sound": "Переименование звука",
+  "A second pad with the same sound, to give its own effects or hotkey": "Второй пэд с тем же звуком для создания собственных эффектов или горячей клавиши.",
+  "Duplicate": "Дублировать",
+  "Just the name (F2 on the pad does it too)": "Просто имя (F2 на панели тоже делает это)",
+  "Show the file in its folder": "Показать файл в его папке",
+  "The file for “{name}” isn't there any more": "Файла « {name} » больше нет.",
+  "{name} (copy)": "{name} (копия)"
 }

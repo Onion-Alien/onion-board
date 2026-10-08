@@ -4787,6 +4787,7 @@ class MainWindow(QMainWindow):
         menu.addSeparator()
         a_edit = add(("edit",), _("Edit…"), _("Name, volume, hotkey, what a press does, loop, "
                                               "fades, wait first, cooldown, colour"))
+        a_ren = add(None, _("Rename…"), _("Just the name (F2 on the pad does it too)"))
         a_fx = add(("wave",), _("Effects…"), _("Speed, pitch, EQ, boost"))
         a_hk_clear = None
         if m.hotkey:
@@ -4818,7 +4819,10 @@ class MainWindow(QMainWindow):
                                                          "a picture on it, or copy one, click "
                                                          "the pad and press Ctrl+V)"))
         menu.addSeparator()
+        a_dup = add(("plus",), _("Duplicate"), _("A second pad with the same sound, to give "
+                                                 "its own effects or hotkey"))
         a_export = add(("folder",), _("Export…"), _("Save it as a file to share with friends"))
+        a_show = add(None, _("Show the file in its folder"))
         a_del = add(("trash", "danger_text"), _("Remove"), _("Goes to Recently deleted"))
         act = menu.exec(pos)
         menu.deleteLater()   # its actions stay valid until this returns
@@ -4836,6 +4840,12 @@ class MainWindow(QMainWindow):
             self.queue_sound(sid)
         elif act == a_edit:
             self.edit(sid)
+        elif act == a_ren:
+            self.rename_sound(sid)
+        elif act == a_dup:
+            self.duplicate_sound(sid)
+        elif act == a_show:
+            self.show_sound_file(sid)
         elif act == a_fx:
             self.edit(sid, tab="effects")
         elif act == a_hk:
@@ -5175,6 +5185,43 @@ class MainWindow(QMainWindow):
         finally:
             free_dialog(d)
         self.register_hotkeys()
+
+    def duplicate_sound(self, sid: str) -> SoundMeta | None:
+        """The pad menu's Duplicate: a copy right after the original, with its own
+        file, so each can get its own effects, hotkey or category."""
+        m = self.meta(sid)
+        if m is None:
+            return None
+        try:
+            new = duplicate(m, _("{name} (copy)", name=m.name)[:40])
+        except OSError as e:
+            errors.warn(self, _("Couldn't copy the sound"), e)
+            return None
+        videos.copy_link(m.id, new.id)
+        self._tag_new(new)   # stays in sight in the category showing
+        self.cfg.sounds.insert(self.cfg.sounds.index(m) + 1, new)
+        self._index()
+        self._save_now()
+        self._rebuild_pads()
+        self._rerender(new)
+        self.toast(_("✓ Added “{name}”", name=html.escape(new.name)), "ok")
+        return new
+
+    def show_sound_file(self, sid: str):
+        """The pad menu's Show the file in its folder: Explorer with the file picked
+        (elsewhere, the folder it's in)."""
+        m = self.meta(sid)
+        if m is None:
+            return
+        path = Path(m.file)
+        if not path.is_file():
+            self.toast(_("The file for “{name}” isn't there any more", name=html.escape(m.name)),
+                       "warn")
+            return
+        if sys.platform == "win32":
+            subprocess.Popen(["explorer", "/select,", str(path)])
+        else:
+            QDesktopServices.openUrl(QUrl.fromLocalFile(str(path.parent)))
 
     def _save_copy(self, m: SoundMeta, d: EditDialog):
         """'Save as new sound': the edits go onto a copy placed after the original."""

@@ -391,3 +391,29 @@ def test_pad_keys_rename_edit_delete_and_find(window, monkeypatch, qapp):
     assert asked == [["s0"]]
     QTest.keyClick(pad, Qt.Key_F, Qt.ControlModifier)
     assert qapp.focusWidget() is w.search
+
+
+def test_duplicate_and_show_file(window, monkeypatch):
+    """Duplicate adds a copy right after the original, with its own file and no
+    hotkey; Show the file opens Explorer on it (and says so if the file is gone)."""
+    import subprocess
+    from pathlib import Path
+    w = window
+    w.meta("s0").hotkey = "f1"
+    new = w.duplicate_sound("s0")
+    assert new is not None and new.id in w.pads
+    assert [m.id for m in w.cfg.sounds][:2] == ["s0", new.id]
+    assert new.name == "Boom (copy)" and new.hotkey == "" and new.file != w.meta("s0").file
+    assert Path(new.file).is_file()
+    runs = []
+    monkeypatch.setattr(subprocess, "Popen", lambda args, **k: runs.append(args))
+    from soundboard.ui import mainwindow as mwmod
+    monkeypatch.setattr(mwmod.sys, "platform", "win32")
+    w.show_sound_file("s0")
+    assert runs and runs[-1][0] == "explorer" and runs[-1][-1] == w.meta("s0").file
+    toasts = []
+    from soundboard.ui import busy
+    monkeypatch.setattr(busy, "toast", lambda win, text, kind="", ms=0: toasts.append(kind))
+    w.meta("s0").file = str(Path(w.meta("s0").file).with_name("gone.wav"))
+    w.show_sound_file("s0")
+    assert toasts[-1] == "warn" and len(runs) == 1

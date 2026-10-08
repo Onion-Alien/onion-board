@@ -13,6 +13,8 @@ The full list. The [README](../README.md) has the short version and how to get s
   them or remove them together (one Undo). **From the keyboard:** arrows move
   between pads, Enter or Space plays, F2 renames, Alt+Enter opens Edit, Delete
   removes (the picked pads, or the one you're on) and Ctrl+F jumps to the search box.
+  Right-click a pad for *Rename…*, *Duplicate* (a second pad with its own file, for
+  its own effects or hotkey) and *Show the file in its folder*.
 - **Record a sound with your mic, or from what's playing:** the **Record** button next
   to *Add sounds*. Record your own voice, your voice through the voice changer while
   it's on, or *What's playing*: a bit of a sound, a web search result or the radio as

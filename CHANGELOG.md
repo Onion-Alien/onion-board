@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- **More in a pad's right-click menu:** *Rename…* (just the name), *Duplicate* (a
+  second pad with the same sound and its own file, for its own effects or hotkey) and
+  *Show the file in its folder*.
 - **Pads work from the keyboard.** On a pad, F2 renames it, Alt+Enter opens Edit
   and Delete removes it (it already removed the picked ones); Ctrl+F anywhere on
   the Sounds tab jumps to the search box. Arrows, Enter and Space worked already.

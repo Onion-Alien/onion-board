@@ -2771,5 +2771,11 @@
   ],
   "Tuning in to radio stations around the world…": "Stiller inn på radiostasjoner over hele verden ...",
   "{hotkey} is {what} now — it was the key for {lost}": "{hotkey} er {what} nå — det var nøkkelen til {lost}",
-  "Rename sound": "Gi nytt navn til lyd"
+  "Rename sound": "Gi nytt navn til lyd",
+  "A second pad with the same sound, to give its own effects or hotkey": "En andre pute med samme lyd, for å gi sine egne effekter eller hurtigtast",
+  "Duplicate": "Dupliser",
+  "Just the name (F2 on the pad does it too)": "Bare navnet (F2 på puten gjør det også)",
+  "Show the file in its folder": "Vis filen i mappen",
+  "The file for “{name}” isn't there any more": "Filen for \" {name} \" er ikke der lenger",
+  "{name} (copy)": "{name} (kopi)"
 }

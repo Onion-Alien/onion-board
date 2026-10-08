@@ -2711,5 +2711,11 @@
   ],
   "Tuning in to radio stations around the world…": "Menala ke stesen radio di seluruh dunia…",
   "{hotkey} is {what} now — it was the key for {lost}": "{hotkey} ialah {what} sekarang — ia adalah kunci untuk {lost}",
-  "Rename sound": "Namakan semula bunyi"
+  "Rename sound": "Namakan semula bunyi",
+  "A second pad with the same sound, to give its own effects or hotkey": "Pad kedua dengan bunyi yang sama, untuk memberikan kesan atau hotkey tersendiri",
+  "Duplicate": "Pendua",
+  "Just the name (F2 on the pad does it too)": "Hanya nama (F2 pada pad juga melakukannya)",
+  "Show the file in its folder": "Tunjukkan fail dalam foldernya",
+  "The file for “{name}” isn't there any more": "Fail untuk “ {name} ” tiada lagi",
+  "{name} (copy)": "{name} (salinan)"
 }
