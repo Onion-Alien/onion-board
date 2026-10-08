@@ -277,6 +277,11 @@ class VoiceChain:
     # ------------------------------------------------------------ audio thread
     def process(self, x: np.ndarray, rate: int) -> np.ndarray:
         """(n, 2) float32 mic block -> (n, 2) float32. Called by the mic callback."""
+        if not len(x):
+            # an empty block (a device can hand one over): many effects measure the
+            # block's level or last sample and would fail on it, which bypasses them
+            # for good (a changed voice would turn back into yours mid-call)
+            return np.zeros((0, 2), np.float32)
         if rate != self._rate:          # first block, or the mic changed rate
             self._rate = rate
             self._rebuild(rate)
