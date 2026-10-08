@@ -1371,7 +1371,6 @@
   "Videos can't be shown in this copy of Onion Board": "V této kopii Onion Board nejde zobrazovat videa",
   "Virtual cable download": "Stažení virtuálního kabelu",
   "Virtual mic  <b style='color:{colour}'>✗ not connected</b>": "Virtuální mikrofon  <b style='color:{colour}'>✗ nepřipojený</b>",
-  "Virtual mic  <b style='color:{colour}'>✗ not installed yet</b>": "Virtuální mikrofon  <b style='color:{colour}'>✗ zatím nenainstalovaný</b>",
   "Voice": "Hlas",
   "Voice and model downloads": "Stahování hlasů a modelů",
   "Voice changer on / off": "Měnič hlasu zap. / vyp.",
@@ -2838,5 +2837,7 @@
   "Show the file in its folder": "Zobrazit soubor v jeho složce",
   "The file for “{name}” isn't there any more": "Soubor pro „ {name} “ již neexistuje",
   "{name} (copy)": "{name} (kopie)",
-  "Search settings": "Nastavení vyhledávání"
+  "Search settings": "Nastavení vyhledávání",
+  "Virtual mic  <b style='color:{colour}'>not installed yet</b>": "Virtuální mikrofon <b style='color:{colour}'>zatím není nainstalován</b>",
+  "Your mic  <b style='color:{colour}'>after the setup below</b>": "Váš mikrofon <b style='color:{colour}'>po nastavení níže</b>"
 }

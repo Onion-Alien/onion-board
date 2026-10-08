@@ -1459,7 +1459,6 @@
   "Video saved in {folder}.": "वीडियो {folder} में सहेजा गया।",
   "Virtual cable download": "वर्चुअल केबल डाउनलोड",
   "Virtual mic  <b style='color:{colour}'>✗ not connected</b>": "वर्चुअल माइक <b style='color:{colour}'>✗ कनेक्ट नहीं है</b>",
-  "Virtual mic  <b style='color:{colour}'>✗ not installed yet</b>": "वर्चुअल माइक <b style='color:{colour}'>✗ अभी तक इंस्टॉल नहीं हुआ है</b>",
   "Voice and model downloads": "आवाज और मॉडल डाउनलोड",
   "Voice changer on / off": "वॉयस चेंजर चालू/बंद",
   "Voice chat squashes your sounds: mono, no deep bass, and in some games nothing above 8-12 kHz. Pick where people hear you and they're shaped to get through it. Game and Voice chat work out the exact voice chat by themselves; Clean sends them exactly as mixed; Advanced lets you pick it yourself.": "वॉइस चैट आपकी आवाज़ को ख़त्म कर देती है: मोनो, कोई डीप बास नहीं, और कुछ गेम में 8-12 किलोहर्ट्ज़ से ऊपर कुछ भी नहीं। वह स्थान चुनें जहां लोग आपकी बात सुनते हैं और वे उस पर अमल करने के लिए तैयार हो जाते हैं। गेम और वॉयस चैट अपने आप सटीक वॉयस चैट तैयार करते हैं; क्लीन उन्हें बिल्कुल मिश्रित रूप में भेजता है; उन्नत आपको इसे स्वयं चुनने की सुविधा देता है।",
@@ -2778,5 +2777,7 @@
   "Show the file in its folder": "फ़ाइल को उसके फ़ोल्डर में दिखाएँ",
   "The file for “{name}” isn't there any more": "\" {name} \" के लिए फ़ाइल अब मौजूद नहीं है",
   "{name} (copy)": "{name} (कॉपी)",
-  "Search settings": "सेटिंग खोजें"
+  "Search settings": "सेटिंग खोजें",
+  "Virtual mic  <b style='color:{colour}'>not installed yet</b>": "वर्चुअल माइक <b style='color:{colour}'>अभी तक इंस्टॉल नहीं हुआ है</b>",
+  "Your mic  <b style='color:{colour}'>after the setup below</b>": "<b style='color:{colour}'>नीचे दिए गए सेटअप के बाद</b> आपका माइक"
 }

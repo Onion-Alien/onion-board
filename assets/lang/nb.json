@@ -1355,7 +1355,6 @@
   "Videos can't be shown in this copy of Onion Board": "Videoer kan ikke vises i denne kopien av Onion Board",
   "Virtual cable download": "Nedlasting av virtuell kabel",
   "Virtual mic  <b style='color:{colour}'>✗ not connected</b>": "Virtuell mikrofon  <b style='color:{colour}'>✗ ikke tilkoblet</b>",
-  "Virtual mic  <b style='color:{colour}'>✗ not installed yet</b>": "Virtuell mikrofon  <b style='color:{colour}'>✗ ikke installert ennå</b>",
   "Voice": "Stemme",
   "Voice and model downloads": "Nedlasting av stemmer og modeller",
   "Voice changer on / off": "Stemmeforvrenger på / av",
@@ -2778,5 +2777,7 @@
   "Show the file in its folder": "Vis filen i mappen",
   "The file for “{name}” isn't there any more": "Filen for \" {name} \" er ikke der lenger",
   "{name} (copy)": "{name} (kopi)",
-  "Search settings": "Søkeinnstillinger"
+  "Search settings": "Søkeinnstillinger",
+  "Virtual mic  <b style='color:{colour}'>not installed yet</b>": "Virtuell mikrofon <b style='color:{colour}'>er ikke installert ennå</b>",
+  "Your mic  <b style='color:{colour}'>after the setup below</b>": "Mikrofonen din <b style='color:{colour}'>etter oppsettet nedenfor</b>"
 }

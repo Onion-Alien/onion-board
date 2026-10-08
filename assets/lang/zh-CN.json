@@ -1434,7 +1434,6 @@
   "Video saved in {folder}.": "视频已保存在 {folder}。",
   "Virtual cable download": "虚拟音频线下载",
   "Virtual mic  <b style='color:{colour}'>✗ not connected</b>": "虚拟麦克风  <b style='color:{colour}'>✗ 未连接</b>",
-  "Virtual mic  <b style='color:{colour}'>✗ not installed yet</b>": "虚拟麦克风  <b style='color:{colour}'>✗ 尚未安装</b>",
   "Voice and model downloads": "语音和模型下载",
   "Voice changer on / off": "变声器 开 / 关",
   "Voice chat squashes your sounds: mono, no deep bass, and in some games nothing above 8-12 kHz. Pick where people hear you and they're shaped to get through it. Game and Voice chat work out the exact voice chat by themselves; Clean sends them exactly as mixed; Advanced lets you pick it yourself.": "语音聊天会压扁你的音效：单声道、没有深沉低音，有些游戏里 8-12 kHz 以上全没了。选择大家在哪里听你，音效就会被处理成能顺利传过去的样子。“游戏”和“语音聊天”会自动识别具体的语音聊天；“纯净”按混音原样发送；“高级”让你自己选。",
@@ -2718,5 +2717,7 @@
   "Show the file in its folder": "显示其文件夹中的文件",
   "The file for “{name}” isn't there any more": "“ {name} ”的文件不再存在",
   "{name} (copy)": "{name} （副本）",
-  "Search settings": "搜索设置"
+  "Search settings": "搜索设置",
+  "Virtual mic  <b style='color:{colour}'>not installed yet</b>": "虚拟麦克风<b style='color:{colour}'>尚未安装</b>",
+  "Your mic  <b style='color:{colour}'>after the setup below</b>": "<b style='color:{colour}'>经过以下设置后</b>您的麦克风"
 }

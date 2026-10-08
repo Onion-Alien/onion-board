@@ -1355,7 +1355,6 @@
   "Videos can't be shown in this copy of Onion Board": "Видеата не могат да се показват в това копие на Onion Board",
   "Virtual cable download": "Изтегляне на виртуалния кабел",
   "Virtual mic  <b style='color:{colour}'>✗ not connected</b>": "Виртуален микрофон  <b style='color:{colour}'>✗ не е свързан</b>",
-  "Virtual mic  <b style='color:{colour}'>✗ not installed yet</b>": "Виртуален микрофон  <b style='color:{colour}'>✗ още не е инсталиран</b>",
   "Voice": "Глас",
   "Voice and model downloads": "Изтегляне на гласове и модели",
   "Voice changer on / off": "Гласов модулатор вкл. / изкл.",
@@ -2778,5 +2777,7 @@
   "Show the file in its folder": "Покажете файла в неговата папка",
   "The file for “{name}” isn't there any more": "Файлът за „ {name} ” вече не е там",
   "{name} (copy)": "{name} (копие)",
-  "Search settings": "Настройки за търсене"
+  "Search settings": "Настройки за търсене",
+  "Virtual mic  <b style='color:{colour}'>not installed yet</b>": "Виртуалният микрофон <b style='color:{colour}'>все още не е инсталиран</b>",
+  "Your mic  <b style='color:{colour}'>after the setup below</b>": "Вашият микрофон <b style='color:{colour}'>след настройката по-долу</b>"
 }

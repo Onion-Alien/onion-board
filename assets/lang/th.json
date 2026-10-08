@@ -1436,7 +1436,6 @@
   "Video saved in {folder}.": "วิดีโอที่บันทึกไว้ใน {folder}",
   "Virtual cable download": "ดาวน์โหลดสายเคเบิลเสมือน",
   "Virtual mic  <b style='color:{colour}'>✗ not connected</b>": "<b style='color:{colour}'>ไม่ได้เชื่อมต่อไมโครโฟนเสมือน ✗</b>",
-  "Virtual mic  <b style='color:{colour}'>✗ not installed yet</b>": "ไมโครโฟนเสมือน <b style='color:{colour}'>✗ ยังไม่ได้ติดตั้ง</b>",
   "Voice and model downloads": "ดาวน์โหลดเสียงและโมเดล",
   "Voice changer on / off": "เปิด/ปิดโปรแกรมเปลี่ยนเสียง",
   "Voice chat squashes your sounds: mono, no deep bass, and in some games nothing above 8-12 kHz. Pick where people hear you and they're shaped to get through it. Game and Voice chat work out the exact voice chat by themselves; Clean sends them exactly as mixed; Advanced lets you pick it yourself.": "การแชทด้วยเสียงจะกรองเสียงของคุณ: โมโน ไม่มีเสียงเบสที่ลึก และในบางเกมจะมีความถี่ไม่เกิน 8-12 kHz เลือกสถานที่ที่คนอื่นได้ยินคุณ และพวกเขาก็พร้อมจะผ่านมันไปได้ เกมและการแชทด้วยเสียงทำหน้าที่แชทด้วยเสียงด้วยตัวเอง Clean ส่งพวกมันออกมาแบบผสมกันทุกประการ ขั้นสูงให้คุณเลือกได้เอง",
@@ -2718,5 +2717,7 @@
   "Show the file in its folder": "แสดงไฟล์ในโฟลเดอร์",
   "The file for “{name}” isn't there any more": "ไฟล์สำหรับ “ {name} ” ไม่มีอีกต่อไป",
   "{name} (copy)": "{name} (สำเนา)",
-  "Search settings": "การตั้งค่าการค้นหา"
+  "Search settings": "การตั้งค่าการค้นหา",
+  "Virtual mic  <b style='color:{colour}'>not installed yet</b>": "<b style='color:{colour}'>ยังไม่ได้ติดตั้ง</b> ไมโครโฟนเสมือน",
+  "Your mic  <b style='color:{colour}'>after the setup below</b>": "ไมโครโฟนของคุณ <b style='color:{colour}'>หลังจากการตั้งค่าด้านล่าง</b>"
 }

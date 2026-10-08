@@ -1355,7 +1355,6 @@
   "Videos can't be shown in this copy of Onion Board": "Hindi maipakita ang mga video sa kopyang ito ng Onion Board",
   "Virtual cable download": "Download ng virtual cable",
   "Virtual mic  <b style='color:{colour}'>✗ not connected</b>": "Virtual mic  <b style='color:{colour}'>✗ hindi nakakonekta</b>",
-  "Virtual mic  <b style='color:{colour}'>✗ not installed yet</b>": "Virtual mic  <b style='color:{colour}'>✗ hindi pa naka-install</b>",
   "Voice": "Voice",
   "Voice and model downloads": "Mga download ng voice at model",
   "Voice changer on / off": "Voice changer on / off",
@@ -2778,5 +2777,7 @@
   "Show the file in its folder": "Ipakita ang file sa folder nito",
   "The file for “{name}” isn't there any more": "Ang file para sa “ {name} ” ay wala na",
   "{name} (copy)": "{name} (kopya)",
-  "Search settings": "Mga setting ng paghahanap"
+  "Search settings": "Mga setting ng paghahanap",
+  "Virtual mic  <b style='color:{colour}'>not installed yet</b>": "<b style='color:{colour}'>Hindi pa naka-install</b> ang virtual mic",
+  "Your mic  <b style='color:{colour}'>after the setup below</b>": "Ang iyong mikropono <b style='color:{colour}'>pagkatapos ng setup sa ibaba</b>"
 }
