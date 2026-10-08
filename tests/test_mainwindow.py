@@ -47,6 +47,37 @@ def window(qapp, app_dir, monkeypatch):
     qapp.sendPostedEvents(None, QEvent.DeferredDelete)
 
 
+def test_triggers_timer_during_start_up(qapp, app_dir, monkeypatch):
+    """The splash pumps events while the window is built: the load_triggers timer can
+    run before __init__ ends, and threw AttributeError (_shut_down) when it did."""
+    import sys
+    import time
+    for name in ("set_main_device", "set_mon_device", "set_mic_device"):
+        monkeypatch.setattr(engine.Engine, name, lambda self, n, _k=name: None)
+    monkeypatch.setattr(winkeys.Hotkeys, "register", lambda self, m: None)
+    errors = []
+    monkeypatch.setattr(sys, "excepthook", lambda t, v, tb: errors.append(v))
+    calls = []
+    real = main.MainWindow.load_triggers
+    monkeypatch.setattr(main.MainWindow, "load_triggers",
+                        lambda self, now=True: (calls.append(now), real(self, now)))
+
+    def slow_pump():   # a slow start with the splash up
+        time.sleep(main.TRIGGERS_LOAD_MS / 1000 + 0.03)
+        qapp.processEvents()
+    monkeypatch.setattr(main.splash, "pump", slow_pump)
+    Config(sounds=[]).save()
+    w = main.MainWindow()
+    try:
+        assert calls and not errors
+    finally:
+        w._load_thread.join(15)
+        w.close()
+        from PySide6.QtCore import QEvent
+        w.deleteLater()
+        qapp.sendPostedEvents(None, QEvent.DeferredDelete)
+
+
 def test_window_builds_with_pads_and_index(window):
     assert set(window.pads) == {"s0", "s1"}
     assert window.meta("s1").name == "Airhorn" and window.meta("zz") is None
