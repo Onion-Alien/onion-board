@@ -235,3 +235,32 @@ def test_the_tray_menu_offers_the_discord_and_feedback(window, monkeypatch):
         window.tray.hide()
         window.tray = old
         QApplication.instance().setQuitOnLastWindowClosed(quits)
+
+
+def test_a_sound_on_the_undo_bar_isnt_taken_back_in_as_a_loose_file(window, qapp):
+    """Its file is still in the sounds folder while Undo is up: the folder scan
+    (set off by anything changing that folder, e.g. Recently deleted bringing one
+    back) imported it again as a new sound, without its hotkey, and the bin's entry
+    for it then pointed at a file that was gone."""
+    import numpy as np
+    import soundfile as sf
+
+    from soundboard import library
+    from soundboard.library import SR
+    _loaded(window, qapp)
+    m = window.meta("s1")
+    library.SOUNDS_DIR.mkdir(parents=True, exist_ok=True)
+    plain = library.SOUNDS_DIR / "Airhorn.wav"   # a plain name: an older or hand-put one
+    t = np.arange(SR // 10) / SR   # its own sound: not a twin of Boom's
+    sf.write(plain, np.stack([np.sin(2 * np.pi * 660 * t)] * 2, 1) * 0.3, SR)
+    m.file, m.hotkey = str(plain), "ctrl+alt+2"
+    window.remove_sound("s1")
+    for _ in range(3):   # two looks at the same size = "done copying in"
+        window._loose_timer.stop()
+        window._take_loose()
+    # an import runs on a thread: give one the time to land
+    assert not process_events(qapp, lambda: len(window.cfg.sounds) > 1, timeout=3)
+    assert [s.name for s in window.cfg.sounds] == ["Boom"]
+    window.undo_remove()
+    assert [(s.name, s.hotkey) for s in window.cfg.sounds] == [("Boom", ""),
+                                                               ("Airhorn", "ctrl+alt+2")]
