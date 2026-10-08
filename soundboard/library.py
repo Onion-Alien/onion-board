@@ -377,6 +377,9 @@ class Config:
     tips_seen: list = field(default_factory=list)
     tip_day: str = ""
     voice_discord_tip_shown: bool = False   # "Got it" on the voice changer's Studio notice
+    # set up for the app you're using (soundboard.appsetup): ask, apps {exe: simple mode},
+    # never [exe]. Older versions keep it untouched
+    app_setup: dict = field(default_factory=dict)
     voice_fx: dict = field(default_factory=dict)   # voice changer (see ui.voicepanel)
     speech: dict = field(default_factory=dict)     # text-to-speech / live voice settings
     overlay: dict = field(default_factory=dict)    # in-game overlay (ui.overlay.OverlaySettings)

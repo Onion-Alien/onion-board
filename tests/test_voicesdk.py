@@ -88,16 +88,16 @@ def test_watcher_suggests_the_game_you_just_left_while_it_runs():
     w, fg, poll = _watcher({"C:/Games/V/v.exe": "game", "C:/Apps/browser.exe": None}, alive)
     assert poll() is None
     fg.now = (10, "C:/Games/V/v.exe")
-    assert poll() == "game"
+    assert poll() == "game" and w.path == "C:/Games/V/v.exe"
     fg.now = (0, "")                     # this app in front (or nothing)
     assert poll() == "game"
     fg.now = (20, "C:/Apps/browser.exe")  # another program: no longer that game
-    assert poll() is None
+    assert poll() is None and w.path == ""
     fg.now = (10, "C:/Games/V/v.exe")
     assert poll() == "game"
     alive.discard(10)                    # the game closed
     fg.now = (0, "")
-    assert poll() is None
+    assert poll() is None and w.path == ""
 
 
 def test_watcher_scans_each_exe_once():
@@ -144,7 +144,9 @@ def test_listeners_name_voice_apps_first_and_scan_each_game_once():
     assert lis.look("CABLE Output") == (("discord", "Discord"), ("game", "Game"))
     assert lis.look("CABLE Output") == (("discord", "Discord"), ("game", "Game"))
     assert sorted(scans) == [r"C:\Apps\obs\obs64.exe", r"C:\Games\Thing\game.exe"]
-    assert lis.poll(None) == ()                    # no cable: nobody to name
+    # by exe too, for "Set up for Discord?" (appsetup)
+    assert lis.apps == (("game.exe", "game", "Game"), ("discord.exe", "discord", "Discord"))
+    assert lis.poll(None) == () and lis.apps == ()   # no cable: nobody to name
 
 
 def test_listeners_look_on_one_kept_thread_not_one_per_poll(monkeypatch):

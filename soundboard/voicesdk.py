@@ -264,6 +264,7 @@ class Watcher:
         self._lock = threading.Lock()
         self._pid = 0
         self.suggestion: str | None = None
+        self.path = ""   # the exe of the program suggested for
 
     def _scan_bg(self, path: str):
         key = self._scan(path)
@@ -286,8 +287,9 @@ class Watcher:
                                  name="voicesdk-scan").start()
             elif known:
                 self._pid, self.suggestion = (pid, key) if key else (0, None)
+                self.path = path if key else ""
         if self.suggestion and self._pid and not self._alive(self._pid):
-            self._pid, self.suggestion = 0, None
+            self._pid, self.suggestion, self.path = 0, None, ""
         return self.suggestion
 
 
@@ -315,12 +317,13 @@ class Listeners:
         self._thread: threading.Thread | None = None
         self.looks = 0
         self.found: tuple = ()
+        self.apps: tuple = ()   # the same programs as (exe in lower case, mode key, name)
 
     def poll(self, device) -> tuple:
         """`device`: a recording device's name, or several (a tuple: straight into my
         mic looks at the mic and the cable's far end both)."""
         if not device:
-            self.found = ()
+            self.found = self.apps = ()
             return self.found
         with self._lock:
             self._want = device
@@ -333,18 +336,21 @@ class Listeners:
 
     def look(self, device: str) -> tuple:
         """One look, on the calling thread (poll runs it on its own)."""
-        voice, games = [], []
+        voice, games, apps = [], [], []
         devices = device if isinstance(device, tuple) else (device,)
         for app in [a for d in devices if d for a in self._list(d)]:
             hit = VOICE_APPS.get(app.exe.lower())
             if hit:
                 voice.append(hit)
+                apps.append((app.exe.lower(), *hit))
             elif app.path:
                 if app.path not in self._cache:
                     self._cache[app.path] = self._scan(app.path)
                 key = self._cache[app.path]
                 if key:
                     games.append((key, app.name))
+                    apps.append((app.exe.lower(), key, app.name))
+        self.apps = tuple(dict.fromkeys(apps))
         return tuple(dict.fromkeys(voice + games))
 
     def _run(self):
@@ -363,7 +369,7 @@ class Listeners:
             try:
                 self.found = self.look(device)
             except Exception:  # noqa: BLE001 - only a hint
-                self.found = ()
+                self.found = self.apps = ()
             self.looks += 1
 
 

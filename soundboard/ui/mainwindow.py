@@ -33,8 +33,8 @@ from soundboard.engine import is_virtual as is_virtual_cable
 from soundboard import exitwatch
 from soundboard import (appaudio, autostart, backup, catswitch, destination, library, midi,
                         remote, otherboards, soundfx, thumbs, trash, updates, videos, voicesdk)
-from soundboard import (directmic, discordcfg, net, netlog, profiles, quality, rawmic, shellicon,
-                        tips, tor, usage, watchaddon)
+from soundboard import (appsetup, directmic, discordcfg, net, netlog, profiles, quality, rawmic,
+                        shellicon, tips, tor, usage, watchaddon)
 from soundboard.replay import InstantReplay
 from soundboard.library import (AUDIO_EXTS, PAD_COLORS, RESOURCE_DIR, Config, SoundMeta,
                                 cache_keep, clean_tags, duplicate, fingerprint,
@@ -121,6 +121,8 @@ PULSE_MS = 1200      # the mic-check banner's throb: bright, dimmer, bright agai
 PULSE_LOW = 0.55     # ...down to this opacity
 PULSE_FRAME_MS = 60  # ...a step this often (~16 a second still reads as a smooth pulse)
 DEFAULT_POLL_MS = 1500   # how often Windows' default output is checked
+SETUP_SWITCHED_MS = 8000   # how long "Voice chat mode for Discord. Undo" stays
+SETUP_DONE_MS = 15000      # the set-up card with nothing left to do
 DISCORD_POLL_MS = 10000  # how often Discord's voice settings are looked at (discordcfg)
 RAW_POLL_MS = 2000       # how often the apps recording the mic are counted (rawmic)
 DEFAULT_POLL_IDLE_S = 5  # ...while the window is in the tray or minimised (seconds)
@@ -315,6 +317,7 @@ class MainWindow(QMainWindow):
     device_step = Signal(object)        # the device thread's next step for the UI (_off_ui)
     tab_switched = Signal(str, bool)    # Settings > Tabs: a tab (taboff.KEYS) off / on again
     category_programs_changed = Signal()   # a program -> category rule added / removed
+    app_setup_changed = Signal()   # an app remembered / forgotten (appsetup)
 
     def __init__(self):
         super().__init__()
@@ -490,6 +493,14 @@ class MainWindow(QMainWindow):
         # who's still set to the cable while sounds go straight into the mic (_cable_tip)
         self._cable_watch = voicesdk.Listeners() if sys.platform == "win32" else None
         self.voice_watch = voicesdk.Watcher() if sys.platform == "win32" else None
+        # set up for the app you're using (appsetup): the bar's app and what it shows
+        self._setup_tracker = appsetup.Tracker()
+        self._setup_app: appsetup.Seen | None = None
+        self._setup_state = ""        # "offer", "done", "switched" or "" (hidden)
+        self._setup_skipped: set[str] = set()   # answered Not now, this run
+        self._setup_undo: dict | None = None    # the dest settings before a switch
+        self._setup_hide = QTimer(self, singleShot=True)
+        self._setup_hide.timeout.connect(self._hide_setup)
         self._voice_timer = QTimer(self)
         self._voice_timer.timeout.connect(self._voice_tick)
         self._voice_at = 0.0   # when _poll_voice last ran (see _voice_tick)
@@ -697,6 +708,33 @@ class MainWindow(QMainWindow):
         self.tip_bar.hide()
         self.tip: tips.Tip | None = None
         rv.addWidget(self.tip_bar)
+
+        # "Looks like you're using Discord. Set up for it?" (appsetup, _app_setup): one
+        # slim bar, never a window, so it's safe while a game is up
+        self.setup_bar = QFrame()
+        self.setup_bar.setObjectName("tipbar")
+        sh = QHBoxLayout(self.setup_bar)
+        sh.setContentsMargins(12, 6, 6, 6)
+        sh.setSpacing(8)
+        self.setup_lbl = QLabel()
+        self.setup_lbl.setTextFormat(Qt.RichText)
+        self.setup_lbl.setWordWrap(True)
+        sh.addWidget(self.setup_lbl, 1)
+        self.setup_yes = QPushButton()
+        self.setup_yes.setObjectName("primary")
+        self.setup_yes.clicked.connect(self._setup_yes_clicked)
+        sh.addWidget(self.setup_yes)
+        self.setup_no = QPushButton(_("Not now"))
+        self.setup_no.setObjectName("small")
+        self.setup_no.clicked.connect(self._setup_not_now)
+        sh.addWidget(self.setup_no)
+        self.setup_x = QPushButton("✕")
+        self.setup_x.setObjectName("urgenthide")
+        self.setup_x.setFixedSize(28, 28)
+        self.setup_x.clicked.connect(self._setup_x_clicked)
+        sh.addWidget(self.setup_x)
+        self.setup_bar.hide()
+        rv.addWidget(self.setup_bar)
 
         # Windows is in a language the board has but isn't showing: offered in that
         # language, so someone who can't read English finds it (_offer_language)
@@ -2855,6 +2893,7 @@ class MainWindow(QMainWindow):
         now = time.monotonic()
         if (not self._ui_live and not d.get("auto")
                 and not profiles.auto_picks(profiles.current(d))
+                and not appsetup.settings(self.cfg)["apps"]   # a remembered app switches
                 and now - self._voice_at < VOICE_POLL_IDLE_S):
             return
         self._voice_at = now
@@ -2903,6 +2942,146 @@ class MainWindow(QMainWindow):
             self.voice_suggestion, self.voice_why, self.voice_hints = key, why, hints
             self._auto_dest()
             self.voice_engine.emit(key)
+        self._app_setup(self._apps_seen())
+
+    def _apps_seen(self) -> list[appsetup.Seen]:
+        """The apps using your sounds now, ranked as _poll_voice ranks its hints: voice
+        chat apps listening, the game in front, games listening."""
+        heard = getattr(self.listeners, "apps", ())   # (a stand-in may not have them)
+        voice = [appsetup.Seen(exe, name, profiles.VOICE.key) for exe, _k, name in heard
+                 if exe in voicesdk.VOICE_APPS]
+        games = [appsetup.Seen(exe, name, profiles.GAME.key) for exe, _k, name in heard
+                 if exe not in voicesdk.VOICE_APPS]
+        w = self.voice_watch
+        path = getattr(w, "path", "")
+        if path and getattr(w, "suggestion", None):
+            base = os.path.basename(path)
+            games.insert(0, appsetup.Seen(base.lower(), os.path.splitext(base)[0],
+                                          profiles.GAME.key))
+        out: dict[str, appsetup.Seen] = {}
+        for app in voice + games:
+            out.setdefault(app.exe, app)
+        return list(out.values())
+
+    def _app_setup(self, seen, now: float | None = None):
+        """An app that just started using your sounds: switch to its remembered mode,
+        or offer to set up for it (appsetup.decide). Nothing before the setup guide is
+        done: that one picks the mode."""
+        now = time.monotonic() if now is None else now
+        new = self._setup_tracker.update(seen, now)
+        app = self._setup_app
+        if (self._setup_state == "offer" and app is not None
+                and not self._setup_tracker.here(app.exe, now)):
+            self._hide_setup()   # it closed: nothing to set up any more
+        if not new or not self.cfg.setup_done:
+            return
+        d = self.cfg.dest if isinstance(self.cfg.dest, dict) else {}
+        act = appsetup.decide(self.cfg, new, profiles.current(d).key, self._setup_skipped)
+        if act is None:
+            return
+        what, app = act
+        if what == "switch":
+            from soundboard.ui.destpanel import set_simple
+            self._setup_undo = copy.deepcopy(d)
+            set_simple(self, app.simple)
+            log.info("app setup: %s -> %s mode (remembered)", app.exe, app.simple)
+        self._show_setup("switched" if what == "switch" else "offer", app)
+
+    def _show_setup(self, state: str, app: appsetup.Seen):
+        self._setup_app, self._setup_state = app, state
+        self._setup_hide.stop()
+        name = html.escape(app.name)
+        mode = profiles.BY_KEY[app.simple].name
+        self.setup_x.setToolTip(_("Hide"))
+        self.setup_x.setAccessibleName(_("Hide"))
+        self.setup_no.setVisible(state == "offer")
+        if state == "offer":
+            self.setup_lbl.setText(_("Looks like you're using <b>{name}</b>. Set up for it?",
+                                     name=name))
+            self.setup_yes.setText(_("Set up"))
+            self.setup_x.setToolTip(_("Don't ask about {name} again", name=app.name))
+            self.setup_x.setAccessibleName(self.setup_x.toolTip())
+        elif state == "switched":
+            self.setup_lbl.setText(_("{mode} mode for <b>{name}</b>.", mode=mode, name=name))
+            self.setup_yes.setText(_("Undo"))
+            self._setup_hide.start(SETUP_SWITCHED_MS)
+        else:
+            lines, button = self._setup_checks(app)
+            self.setup_lbl.setText("<br>".join(lines))
+            self.setup_yes.setText(button)
+            if not button:
+                self._setup_hide.start(SETUP_DONE_MS)
+        self.setup_yes.setVisible(bool(self.setup_yes.text()))
+        self.setup_bar.show()
+
+    def _setup_checks(self, app: appsetup.Seen) -> tuple[list[str], str]:
+        """The "done" card: what was set, what the app's own settings say, and the
+        button for what's left ("" for none). Discord's problems already have the
+        urgent bar, so they aren't said twice here."""
+        ok = "<span style='color:#3fb950'>✓</span>"
+        warn = "<span style='color:#d29922'>⚠</span>"
+        mode = profiles.BY_KEY[app.simple].name
+        lines = [_("{ok} {mode} mode on for <b>{name}</b>. Next time it switches by itself.",
+                   ok=ok, mode=mode, name=html.escape(app.name))]
+        guide = app.guide
+        if guide == "discord":
+            if self.discord_problems():
+                return lines, ""   # the urgent bar above says which, with Fix Discord
+            if self.discord_found:
+                lines.append(_("{ok} Discord's voice settings let your sounds through.",
+                               ok=ok))
+                return lines, ""
+            return lines, _("Check Discord")
+        if guide == "meeting":
+            lines.append(_("{warn} Its noise removal can wipe out music: set it to keep "
+                           "the original sound.", warn=warn))
+            return lines, _("Show me how")
+        return lines, ""
+
+    def _setup_yes_clicked(self):
+        app, state = self._setup_app, self._setup_state
+        if app is None:
+            return
+        if state == "offer":
+            from soundboard.ui.destpanel import set_simple
+            appsetup.remember(self.cfg, app.exe, app.simple)
+            set_simple(self, app.simple)
+            log.info("app setup: %s -> %s mode (set up)", app.exe, app.simple)
+            self._show_setup("done", app)
+            self.app_setup_changed.emit()
+        elif state == "switched":
+            if self._setup_undo is not None:
+                from soundboard.ui.destpanel import _refresh_views
+                self.cfg.dest = self._setup_undo
+                self._setup_undo = None
+                self.mode_why = ""
+                destination.apply(self.cfg, self.engine)
+                self._save_later()
+                _refresh_views(self)
+            self._hide_setup()
+        elif app.guide:
+            self.show_chat_guide(app.guide)
+            if self._setup_state == "done":
+                self._show_setup("done", app)   # the ticks, as they are now
+
+    def _setup_not_now(self):
+        if self._setup_app is not None:
+            self._setup_skipped.add(self._setup_app.exe)
+        self._hide_setup()
+
+    def _setup_x_clicked(self):
+        if self._setup_state == "offer" and self._setup_app is not None:
+            appsetup.never(self.cfg, self._setup_app.exe)
+            self._save_later()
+            self.app_setup_changed.emit()
+            self.toast(_("Won't ask about {name} again. Settings → General can change that.",
+                         name=html.escape(self._setup_app.name)))
+        self._hide_setup()
+
+    def _hide_setup(self):
+        self._setup_hide.stop()
+        self._setup_state = ""
+        self.setup_bar.hide()
 
     def _auto_dest(self):
         """Game and Voice chat: the shaping that suits what's seen, as soon as it's
@@ -6213,6 +6392,9 @@ class MainWindow(QMainWindow):
         if now != before:
             log.info("Discord settings: %s", now or "fine")
             self._show_urgent()
+        app = self._setup_app
+        if self._setup_state == "done" and app is not None and app.guide == "discord":
+            self._show_setup("done", app)   # its ticks, live
 
     def _show_urgent(self):
         now = self._urgent_now()

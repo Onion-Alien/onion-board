@@ -580,6 +580,7 @@ QPushButton#micbanner { background:#d32f2f; color:white; font-weight:700; font-s
 QFrame#urgentbar { background:$warn_bg; border:1px solid $warn_text; border-radius:10px; }
 QFrame#tipbar { background:$panel; border:1px solid $border_hi; border-radius:10px; }
 QFrame#tipbar QLabel { background:transparent; color:$text; }
+QFrame#tipbar QPushButton#primary { padding:2px 8px; font-size:8pt; }   /* as small as Not now */
 QFrame#tipbar QPushButton#urgenthide { background:transparent; color:$muted; border:none;
                                        border-radius:6px; font-weight:700; font-size:12pt; }
 QFrame#tipbar QPushButton#urgenthide:hover { background:$btn_hover; }
