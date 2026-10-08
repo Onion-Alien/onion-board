@@ -4850,8 +4850,11 @@ class MainWindow(QMainWindow):
         """Import the sounds folder's loose files once they're done copying in (the
         same size on two looks in a row)."""
         seen, ready, empty = {}, [], {}
+        # a sound on the Undo bar is off the board but its file is still here: not a
+        # new one (it came back as a copy, without its hotkey, and its bin entry broke)
+        undoable = {os.path.normcase(m.file) for m, *_rest in self._removed}
         for p in loose_sounds(self.cfg):
-            if p in self._loose_taken:
+            if p in self._loose_taken or os.path.normcase(str(p)) in undoable:
                 continue
             try:
                 st = p.stat()
