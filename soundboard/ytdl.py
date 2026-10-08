@@ -753,6 +753,17 @@ def _check(info: dict) -> dict:
     return info
 
 
+def _went_nowhere(url: str, msg: str) -> bool:
+    """yt-dlp's "Unsupported URL" for a page `url` only redirected to: a share link
+    (tiktok.com/t/…, vm.tiktok.com/…) of a deleted or private video lands on the site's
+    home page. The site is fine; the video is gone."""
+    m = re.search(r"Unsupported URL: (\S+)", msg)
+    if not m:
+        return False
+    to = urllib.parse.urlsplit(m.group(1))
+    return m.group(1).rstrip("/") != url.rstrip("/") and to.path.strip("/") == ""
+
+
 def _readable(e: Exception) -> FetchError:
     """yt-dlp's error in plain words (errors.describe): no "[youtube] id:" prefix,
     command-line tips or "report this on yt-dlp's GitHub"; one we can't explain is
@@ -829,8 +840,12 @@ def save_video(path: Path, title: str) -> Path | None:
 def _run(yt_dlp, url: str, dest: Path, progress, feature: str = FEATURE,
          direct: bool = False, video: bool = False) -> tuple[Path, str]:
     try:
-        with yt_dlp.YoutubeDL(_opts(dest, progress, thumbnail=True, feature=feature,
-                                    direct=direct, video=video)) as ydl:
+        opts = _opts(dest, progress, thumbnail=True, feature=feature, direct=direct,
+                     video=video)
+        # a playlist's entries left unresolved: one private or deleted video in it
+        # must not hide that it's a playlist (_check says so). A video isn't affected.
+        opts["extract_flat"] = "in_playlist"
+        with yt_dlp.YoutubeDL(opts) as ydl:
             info = _check(ydl.extract_info(url, download=False))
             dur = info.get("duration") or 0
             if dur > MAX_SECONDS:
@@ -840,6 +855,8 @@ def _run(yt_dlp, url: str, dest: Path, progress, feature: str = FEATURE,
     except DownloadError:
         raise
     except Exception as e:  # noqa: BLE001 - yt-dlp raises many kinds; show its message
+        if _went_nowhere(url, str(e)):
+            raise FetchError(_("That video isn't available any more.")) from e
         raise _readable(e) from e
     if not path.is_file():   # skipped (too big) or the extension changed
         found = [p for p in dest.iterdir() if p.is_file() and not p.name.endswith(".part")

@@ -1025,6 +1025,18 @@ def _ffmpeg() -> str | None:
     return None
 
 
+def _ffmpeg_words(stderr: str) -> str:
+    """ffmpeg's error as words for people ("[out#0/f32le @ 0000…] Output file does not
+    contain any stream" was shown as is); the original goes to the log."""
+    s = stderr.lower()
+    if (not s or "does not contain any stream" in s or "matches no streams" in s
+            or "output file is empty" in s):
+        return _("this file has no audio in it")
+    if "invalid data found" in s or "could not find codec" in s or "unknown format" in s:
+        return _("It isn't a sound file that can be read, or it's damaged.")
+    return stderr
+
+
 def _decode(path: str) -> tuple[np.ndarray, bool]:
     """(audio as (n, 2) float32 at SR, decoded-by-ffmpeg?).
 
@@ -1051,8 +1063,9 @@ def _decode(path: str) -> tuple[np.ndarray, bool]:
             raise RuntimeError(_("ffmpeg took longer than {seconds}s",
                                  seconds=FFMPEG_TIMEOUT)) from None
         if p.returncode != 0 or not p.stdout:
-            msg = p.stderr.decode(errors="ignore").strip() or _("ffmpeg failed")
-            raise RuntimeError(msg) from None
+            msg = p.stderr.decode(errors="ignore").strip()
+            log.info("ffmpeg couldn't decode %s: %s", path, msg)
+            raise RuntimeError(_ffmpeg_words(msg)) from None
         data = np.frombuffer(p.stdout, np.float32).reshape(-1, 2).copy()
         sr = SR
         via_ffmpeg = True

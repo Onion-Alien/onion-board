@@ -103,7 +103,7 @@ def _downloader() -> list[tuple[str, str]]:
         (r"copyright", _("That video was taken down over a copyright claim.")),
         (r"not available in your country|geo.?restrict|in your (?:country|region|location)",
          _("That video is blocked in your country.")),
-        (r"video unavailable|not available|has been removed|no longer available|"
+        (r"video (?:is )?unavailable|not available|has been removed|no longer available|"
          r"account .* terminated|does not exist", _("That video isn't available any more.")),
         (r"requested format is not available|no video formats|no formats found",
          _("There's no sound to download at that link.")),

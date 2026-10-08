@@ -114,6 +114,40 @@ def test_download_audio_errors_are_readable(monkeypatch, tmp_path):
     assert isinstance(e.value, ytdl.FetchError)   # yt-dlp's fault: an update may help
 
 
+def test_a_playlist_with_a_private_video_first_is_still_a_playlist(monkeypatch, tmp_path):
+    """Its entries were resolved before _check: the first one's "Private video" was
+    shown for a playlist link."""
+    seen = fake_yt_dlp(monkeypatch, {"_type": "playlist", "title": "x"})
+    real = ytdl.sys.modules["yt_dlp"].YoutubeDL.extract_info
+
+    def extract_info(self, url, download=True):
+        if seen.get("extract_flat") != "in_playlist":
+            raise Exception("ERROR: [youtube] abc: Private video")
+        return real(self, url, download)
+    monkeypatch.setattr(ytdl.sys.modules["yt_dlp"].YoutubeDL, "extract_info", extract_info)
+    with pytest.raises(ytdl.DownloadError, match="playlist"):
+        ytdl.download_audio("https://www.youtube.com/playlist?list=PLx", tmp_path,
+                            auto_update=False)
+
+
+@pytest.mark.parametrize("url, to, words", [
+    # a share link of a deleted video lands on the home page: the video is gone
+    ("https://www.tiktok.com/t/ZTabc/", "https://www.tiktok.com/?_r=1",
+     "That video isn't available any more."),
+    ("https://vm.tiktok.com/ZMabc/", "https://www.tiktok.com/",
+     "That video isn't available any more."),
+    # a page yt-dlp really can't read
+    ("https://example.com/some/page", "https://example.com/some/page",
+     "That link isn't from a site sounds can be added from."),
+])
+def test_a_link_that_went_nowhere_says_the_video_is_gone(monkeypatch, tmp_path, url, to,
+                                                         words):
+    fake_yt_dlp(monkeypatch, {}, fail=f"ERROR: Unsupported URL: {to}")
+    with pytest.raises(ytdl.DownloadError) as e:
+        ytdl.download_audio(url, tmp_path, auto_update=False)
+    assert str(e.value) == words
+
+
 def test_a_failed_download_leaves_no_temp_folder(monkeypatch, tmp_path):
     fake_yt_dlp(monkeypatch, {}, fail="ERROR: Video unavailable")
     monkeypatch.setattr(ytdl.tempfile, "tempdir", str(tmp_path))
