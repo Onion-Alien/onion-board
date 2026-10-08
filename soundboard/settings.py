@@ -532,7 +532,8 @@ class SettingsDialog(QDialog):
             self.categories.item(i).setHidden(bool(words) and not hits)
             if hits and first is None:
                 first = i
-        if words and first is not None and self.categories.item(self.tabs.currentIndex()).isHidden():
+        on_hidden = self.categories.item(self.tabs.currentIndex()).isHidden()
+        if words and first is not None and on_hidden:
             self.tabs.setCurrentIndex(first)
 
     def _category_icons(self):
