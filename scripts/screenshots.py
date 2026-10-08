@@ -104,7 +104,7 @@ def fake_machine(tmp: Path):
     engine.Engine.effect_alive = lambda self: True
     engine.Engine.direct_apps = lambda self: 2
     engine.Engine.set_tap_device = lambda self, n: setattr(self, "tap_name", n)
-    appaudio.list_apps = lambda: [
+    appaudio.list_apps = lambda *a, **k: [
         appaudio.App(pid=1000 + i, exe=exe, title=title, active=on, peak=0.4 if on else 0.0,
                      devices=[OUTS[1]], session_pids={1000 + i})
         for i, (exe, title, on) in enumerate(PROGRAMS)]
@@ -256,6 +256,7 @@ def main():
         spin()
         save(w, name)
     if watch:
+        w.triggers.ensure_loaded()        # the add-on loads when its tab is first shown
         tr = w.triggers.panel.panel       # the add-on's triggers page
         tr.set_watching(True)             # Watcher.start is a no-op (install_onion_watch)
         tr.poll.stop()                    # show made-up live matches instead
