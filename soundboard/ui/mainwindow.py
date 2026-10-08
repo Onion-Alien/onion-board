@@ -30,6 +30,7 @@ from soundboard import engine as eng
 from soundboard import theme, winkeys, ytdl
 from soundboard.engine import SR, Engine
 from soundboard.engine import is_virtual as is_virtual_cable
+from soundboard import exitwatch
 from soundboard import (appaudio, autostart, backup, catswitch, destination, library, midi,
                         remote, otherboards, soundfx, thumbs, trash, updates, videos, voicesdk)
 from soundboard import (directmic, discordcfg, net, netlog, profiles, quality, rawmic, shellicon,
@@ -1107,6 +1108,10 @@ class MainWindow(QMainWindow):
         paste = QShortcut(QKeySequence.Paste, page)
         paste.setContext(Qt.WidgetWithChildrenShortcut)
         paste.activated.connect(self.paste_picture)
+        # Ctrl+F anywhere on the page: into the search box
+        find = QShortcut(QKeySequence.Find, page)
+        find.setContext(Qt.WidgetWithChildrenShortcut)
+        find.activated.connect(self.focus_search)
 
         # ---- "now playing" chips: shown while 2+ sounds overlap, so every one of
         # them can be stopped (■) or taken into the player (name) without clicking
@@ -2449,8 +2454,9 @@ class MainWindow(QMainWindow):
                      "input.", colour=ok, device=vm)
         elif not any_cable:
             state = "missing"
-            out = _("Virtual mic  <b style='color:{colour}'>✗ not installed yet</b>",
-                    colour=bad)
+            # not wrong, just not done yet: orange like the step below, not a red cross
+            out = _("Virtual mic  <b style='color:{colour}'>not installed yet</b>",
+                    colour=warn)
             step = _("<b style='color:{colour}'>One-time setup:</b> install the free virtual "
                      "cable. It's what lets Discord and games hear your sounds — without it, "
                      "only you can hear them. Easier: set <b>Send my sounds to</b> to "
@@ -2470,6 +2476,12 @@ class MainWindow(QMainWindow):
             step = _("<b style='color:{colour}'>Almost:</b> under <b>Devices</b>, set "
                      "<b>Send my sounds to</b> to your virtual cable, or to <b>My mic</b>.",
                      colour=warn)
+        if state == "missing" and self.cfg.mic_enabled and e.mic_stream is None:
+            # nothing is set up yet: the mic being closed is part of that, not a second
+            # fault (the card showed two red crosses and the header a warning over
+            # one thing to do)
+            mic = _("Your mic  <b style='color:{colour}'>after the setup below</b>",
+                    colour=warn)
         self.flow_mic.setText(mic)
         self.flow_out.setText(out)
         self.step_lbl.setText(step)
@@ -4040,6 +4052,8 @@ class MainWindow(QMainWindow):
                 p.step.connect(self.grid.focus_step)
                 p.menu.connect(self.pad_menu)
                 p.nudge.connect(self.nudge_volume)
+                p.rename.connect(self.rename_sound)
+                p.edit.connect(self.edit)
                 self.pads[m.id] = p
             p.state = "ready" if m.id in self.audio else p.state
             p.selected = m.id == self.current
@@ -4266,6 +4280,31 @@ class MainWindow(QMainWindow):
         self._fill_categories()
         self.apply_filter(self.search.text())
         self.toast(msg)
+
+    def focus_search(self):
+        """Ctrl+F: the cursor into Search sounds, with what's there selected."""
+        self.search.setFocus(Qt.ShortcutFocusReason)
+        self.search.selectAll()
+
+    def rename_sound(self, sid: str, new: str | None = None):
+        """F2 on a pad (and the pad menu's Rename…): just the name, without the Edit
+        window."""
+        m = self.meta(sid)
+        if m is None:
+            return
+        if new is None:
+            new, ok = QInputDialog.getText(self, _("Rename sound"), _("New name:"), text=m.name)
+            new = new if ok else ""
+        new = new.strip()
+        if not new or new == m.name:
+            return
+        m.name = new
+        if sid in self.pads:
+            self.pads[sid].update()
+        if self.current == sid:
+            self._set_np_name(new)
+        self._save_now()
+        self.toast(_("✓ Renamed to “{new}”", new=html.escape(new)), "ok")
 
     def rename_category(self, old: str, new: str | None = None):
         if new is None:
@@ -4931,6 +4970,7 @@ class MainWindow(QMainWindow):
         menu.addSeparator()
         a_edit = add(("edit",), _("Edit…"), _("Name, volume, hotkey, what a press does, loop, "
                                               "fades, wait first, cooldown, colour"))
+        a_ren = add(None, _("Rename…"), _("Just the name (F2 on the pad does it too)"))
         a_fx = add(("wave",), _("Effects…"), _("Speed, pitch, EQ, boost"))
         vol_before = m.volume
         menu.addAction(self._volume_action(menu, m))
@@ -4964,7 +5004,10 @@ class MainWindow(QMainWindow):
                                                          "a picture on it, or copy one, click "
                                                          "the pad and press Ctrl+V)"))
         menu.addSeparator()
+        a_dup = add(("plus",), _("Duplicate"), _("A second pad with the same sound, to give "
+                                                 "its own effects or hotkey"))
         a_export = add(("folder",), _("Export…"), _("Save it as a file to share with friends"))
+        a_show = add(None, _("Show the file in its folder"))
         a_del = add(("trash", "danger_text"), _("Remove"), _("Goes to Recently deleted"))
         act = menu.exec(pos)
         menu.deleteLater()   # its actions stay valid until this returns
@@ -4984,6 +5027,12 @@ class MainWindow(QMainWindow):
             self.queue_sound(sid)
         elif act == a_edit:
             self.edit(sid)
+        elif act == a_ren:
+            self.rename_sound(sid)
+        elif act == a_dup:
+            self.duplicate_sound(sid)
+        elif act == a_show:
+            self.show_sound_file(sid)
         elif act == a_fx:
             self.edit(sid, tab="effects")
         elif act == a_hk:
@@ -5323,6 +5372,43 @@ class MainWindow(QMainWindow):
         finally:
             free_dialog(d)
         self.register_hotkeys()
+
+    def duplicate_sound(self, sid: str) -> SoundMeta | None:
+        """The pad menu's Duplicate: a copy right after the original, with its own
+        file, so each can get its own effects, hotkey or category."""
+        m = self.meta(sid)
+        if m is None:
+            return None
+        try:
+            new = duplicate(m, _("{name} (copy)", name=m.name)[:40])
+        except OSError as e:
+            errors.warn(self, _("Couldn't copy the sound"), e)
+            return None
+        videos.copy_link(m.id, new.id)
+        self._tag_new(new)   # stays in sight in the category showing
+        self.cfg.sounds.insert(self.cfg.sounds.index(m) + 1, new)
+        self._index()
+        self._save_now()
+        self._rebuild_pads()
+        self._rerender(new)
+        self.toast(_("✓ Added “{name}”", name=html.escape(new.name)), "ok")
+        return new
+
+    def show_sound_file(self, sid: str):
+        """The pad menu's Show the file in its folder: Explorer with the file picked
+        (elsewhere, the folder it's in)."""
+        m = self.meta(sid)
+        if m is None:
+            return
+        path = Path(m.file)
+        if not path.is_file():
+            self.toast(_("The file for “{name}” isn't there any more", name=html.escape(m.name)),
+                       "warn")
+            return
+        if sys.platform == "win32":
+            subprocess.Popen(["explorer", "/select,", str(path)])
+        else:
+            QDesktopServices.openUrl(QUrl.fromLocalFile(str(path.parent)))
 
     def _save_copy(self, m: SoundMeta, d: EditDialog):
         """'Save as new sound': the edits go onto a copy placed after the original."""
@@ -5890,6 +5976,7 @@ class MainWindow(QMainWindow):
 
     def _mark_stopped(self):
         usage.mark_stopped(library.APP_DIR)
+        exitwatch.stopped()
 
     def _count_tab(self, i: int):
         if 0 <= i < len(TABS):
@@ -6720,8 +6807,9 @@ class MainWindow(QMainWindow):
         f.add(10, "w", r.hide(self.tagline))
         f.add(10, "w", r.hide(*self._pad_size))
         f.add(18, "w", r.icon_only(self.btn_view))   # its tooltip says what it is
-        f.add(16, "w", r.hide(self._mode_pick[0]))   # the dropdown's tooltip says what it is
-        f.add(38, "w", r.hide(self._mode_pick[1]))   # also on the Setup tab
+        # the label and the dropdown go together: a lone "Clean" said nothing (the full
+        # picker is on the Setup tab)
+        f.add(38, "w", r.hide(*self._mode_pick))
         # the ear button shrinks to its icon first: the level bar is the live part
         f.add(12, "w", r.icon_only(self.btn_check))
         f.add(14, "w", r.hide(self.np_time))
@@ -6738,7 +6826,9 @@ class MainWindow(QMainWindow):
         f.add(50, "w", r.hide(self.np_name))
         f.add(60, "w", r.hide(self.wordmark))
         f.add(60, "w", r.icon_only(self.btn_add))
-        f.add(13, "w", r.icon_only(self.btn_record))
+        # a bare red dot read as a warning light, so Record keeps its word until the
+        # folder, Backup and the Listening dropdown have gone
+        f.add(39, "w", r.icon_only(self.btn_record))
         # the search box keeps room to type in until the buttons beside it have shrunk
         f.add(62, "w", lambda tight: (self.search.setMinimumWidth(0 if tight else SEARCH_MIN_W),
                                       r.touch(self.search)))
@@ -6907,6 +6997,7 @@ class MainWindow(QMainWindow):
         if self._shut_down:
             return
         self._shut_down = True
+        exitwatch.quitting()   # a run that dies from here on died closing (exitwatch.py)
         for step in (self._finish_removals, self.timer.stop, self._voice_timer.stop,
                      self._release_ptt,
                      self._stop_capture, self.cfg.save, self.overlay.shutdown,

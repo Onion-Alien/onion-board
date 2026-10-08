@@ -1459,7 +1459,6 @@
   "Video saved in {folder}.": "Video {folder} klasörüne kaydedildi.",
   "Virtual cable download": "Sanal kablo indirme",
   "Virtual mic  <b style='color:{colour}'>✗ not connected</b>": "Sanal mikrofon <b style='color:{colour}'>✗ bağlı değil</b>",
-  "Virtual mic  <b style='color:{colour}'>✗ not installed yet</b>": "Sanal mikrofon <b style='color:{colour}'>✗ henüz kurulmadı</b>",
   "Voice and model downloads": "Ses ve model indirmeleri",
   "Voice changer on / off": "Ses değiştiriciyi açma/kapama",
   "Voice chat squashes your sounds: mono, no deep bass, and in some games nothing above 8-12 kHz. Pick where people hear you and they're shaped to get through it. Game and Voice chat work out the exact voice chat by themselves; Clean sends them exactly as mixed; Advanced lets you pick it yourself.": "Sesli sohbet seslerinizi bastırır: mono, derin bas yoktur ve bazı oyunlarda 8-12 kHz'in üzerinde hiçbir ses yoktur. İnsanların sizi nerede duyacağını ve bunun üstesinden gelebilecek şekilde şekillendiklerini seçin. Oyun ve Sesli sohbet, tam sesli sohbeti kendi başlarına çözer; Temiz onları tam olarak karıştırılmış olarak gönderir; Gelişmiş, kendinizin seçmenizi sağlar.",
@@ -2770,5 +2769,15 @@
     "{n} istasyon (en üstte {shown} gösteriliyor)"
   ],
   "Tuning in to radio stations around the world…": "Dünya çapındaki radyo istasyonlarını ayarlıyoruz…",
-  "{hotkey} is {what} now — it was the key for {lost}": "{hotkey} artık {what} oldu — {lost} 'un anahtarıydı"
+  "{hotkey} is {what} now — it was the key for {lost}": "{hotkey} artık {what} oldu — {lost} 'un anahtarıydı",
+  "Rename sound": "Sesi yeniden adlandır",
+  "A second pad with the same sound, to give its own effects or hotkey": "Kendi efektlerini veya kısayol tuşunu vermek için aynı sese sahip ikinci bir ped",
+  "Duplicate": "Çoğalt",
+  "Just the name (F2 on the pad does it too)": "Sadece isim (pad üzerindeki F2 de bunu yapıyor)",
+  "Show the file in its folder": "Dosyayı kendi klasöründe göster",
+  "The file for “{name}” isn't there any more": "“ {name} ” dosyası artık yok",
+  "{name} (copy)": "{name} (kopya)",
+  "Search settings": "Arama ayarları",
+  "Virtual mic  <b style='color:{colour}'>not installed yet</b>": "Sanal mikrofon <b style='color:{colour}'>henüz kurulmadı</b>",
+  "Your mic  <b style='color:{colour}'>after the setup below</b>": "<b style='color:{colour}'>Aşağıdaki kurulumdan sonra</b> mikrofonunuz"
 }

@@ -1355,7 +1355,6 @@
   "Videos can't be shown in this copy of Onion Board": "Videor kan inte visas i den här kopian av Onion Board",
   "Virtual cable download": "Nedladdning av virtuell kabel",
   "Virtual mic  <b style='color:{colour}'>✗ not connected</b>": "Virtuell mikrofon  <b style='color:{colour}'>✗ inte ansluten</b>",
-  "Virtual mic  <b style='color:{colour}'>✗ not installed yet</b>": "Virtuell mikrofon  <b style='color:{colour}'>✗ inte installerad än</b>",
   "Voice": "Röst",
   "Voice and model downloads": "Nedladdning av röster och modeller",
   "Voice changer on / off": "Röstförvrängare på / av",
@@ -2770,5 +2769,15 @@
     "{n} stationer (överst {shown} visas)"
   ],
   "Tuning in to radio stations around the world…": "Lyssnar på radiostationer runt om i världen...",
-  "{hotkey} is {what} now — it was the key for {lost}": "{hotkey} är {what} nu — det var nyckeln till {lost}"
+  "{hotkey} is {what} now — it was the key for {lost}": "{hotkey} är {what} nu — det var nyckeln till {lost}",
+  "Rename sound": "Byt namn på ljud",
+  "A second pad with the same sound, to give its own effects or hotkey": "En andra pad med samma ljud, för att ge sina egna effekter eller snabbtangent",
+  "Duplicate": "Duplicera",
+  "Just the name (F2 on the pad does it too)": "Bara namnet (F2 på plattan gör det också)",
+  "Show the file in its folder": "Visa filen i dess mapp",
+  "The file for “{name}” isn't there any more": "Filen för \" {name} \" finns inte längre",
+  "{name} (copy)": "{name} (kopia)",
+  "Search settings": "Sökinställningar",
+  "Virtual mic  <b style='color:{colour}'>not installed yet</b>": "Virtuell mikrofon <b style='color:{colour}'>inte installerad ännu</b>",
+  "Your mic  <b style='color:{colour}'>after the setup below</b>": "Din mikrofon <b style='color:{colour}'>efter installationen nedan</b>"
 }

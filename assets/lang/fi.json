@@ -1355,7 +1355,6 @@
   "Videos can't be shown in this copy of Onion Board": "Videoita ei voi näyttää tässä Onion Boardin kopiossa",
   "Virtual cable download": "Virtuaalikaapelin lataus",
   "Virtual mic  <b style='color:{colour}'>✗ not connected</b>": "Virtuaalimikki  <b style='color:{colour}'>✗ ei yhdistetty</b>",
-  "Virtual mic  <b style='color:{colour}'>✗ not installed yet</b>": "Virtuaalimikki  <b style='color:{colour}'>✗ ei vielä asennettu</b>",
   "Voice": "Puhe",
   "Voice and model downloads": "Puheäänten ja mallien lataukset",
   "Voice changer on / off": "Äänenmuunnin päälle / pois",
@@ -2770,5 +2769,15 @@
     "{n} asemaa (ylhäällä {shown})"
   ],
   "Tuning in to radio stations around the world…": "Viritä radioasemia ympäri maailmaa…",
-  "{hotkey} is {what} now — it was the key for {lost}": "{hotkey} on nyt {what} – se oli avain kohteelle {lost}"
+  "{hotkey} is {what} now — it was the key for {lost}": "{hotkey} on nyt {what} – se oli avain kohteelle {lost}",
+  "Rename sound": "Nimeä ääni uudelleen",
+  "A second pad with the same sound, to give its own effects or hotkey": "Toinen tyyny, jolla on sama ääni, antaa omat tehostensa tai pikanäppäimen",
+  "Duplicate": "Monista",
+  "Just the name (F2 on the pad does it too)": "Pelkkä nimi (myös näppäimistön F2 tekee sen)",
+  "Show the file in its folder": "Näytä tiedosto sen kansiossa",
+  "The file for “{name}” isn't there any more": "Tiedostoa \" {name} \" ei ole enää olemassa",
+  "{name} (copy)": "{name} (kopio)",
+  "Search settings": "Hakuasetukset",
+  "Virtual mic  <b style='color:{colour}'>not installed yet</b>": "Virtuaalista mikrofonia <b style='color:{colour}'>ei ole vielä asennettu</b>",
+  "Your mic  <b style='color:{colour}'>after the setup below</b>": "Mikrofonisi <b style='color:{colour}'>alla olevien asetusten jälkeen</b>"
 }

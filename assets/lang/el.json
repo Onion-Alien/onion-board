@@ -1355,7 +1355,6 @@
   "Videos can't be shown in this copy of Onion Board": "Τα βίντεο δεν μπορούν να εμφανιστούν σε αυτό το αντίγραφο του Onion Board",
   "Virtual cable download": "Λήψη εικονικού καλωδίου",
   "Virtual mic  <b style='color:{colour}'>✗ not connected</b>": "Εικονικό μικρόφωνο  <b style='color:{colour}'>✗ δεν συνδέθηκε</b>",
-  "Virtual mic  <b style='color:{colour}'>✗ not installed yet</b>": "Εικονικό μικρόφωνο  <b style='color:{colour}'>✗ δεν έχει εγκατασταθεί ακόμα</b>",
   "Voice": "Φωνή",
   "Voice and model downloads": "Λήψεις φωνών και μοντέλων",
   "Voice changer on / off": "Αλλαγή φωνής ναι / όχι",
@@ -2770,5 +2769,15 @@
     "{n} σταθμοί (εμφανίζονται στην κορυφή {shown})"
   ],
   "Tuning in to radio stations around the world…": "Συντονισμός σε ραδιοφωνικούς σταθμούς σε όλο τον κόσμο…",
-  "{hotkey} is {what} now — it was the key for {lost}": "{hotkey} είναι {what} τώρα — ήταν το κλειδί για {lost}"
+  "{hotkey} is {what} now — it was the key for {lost}": "{hotkey} είναι {what} τώρα — ήταν το κλειδί για {lost}",
+  "Rename sound": "Μετονομασία ήχου",
+  "A second pad with the same sound, to give its own effects or hotkey": "Ένα δεύτερο pad με τον ίδιο ήχο, για να δώσει τα δικά του εφέ ή πλήκτρο πρόσβασης",
+  "Duplicate": "Αντίγραφο",
+  "Just the name (F2 on the pad does it too)": "Μόνο το όνομα (το F2 στο pad το κάνει επίσης)",
+  "Show the file in its folder": "Εμφάνιση του αρχείου στον φάκελό του",
+  "The file for “{name}” isn't there any more": "Το αρχείο για το \" {name} \" δεν υπάρχει πλέον",
+  "{name} (copy)": "{name} (αντίγραφο)",
+  "Search settings": "Ρυθμίσεις αναζήτησης",
+  "Virtual mic  <b style='color:{colour}'>not installed yet</b>": "Το εικονικό μικρόφωνο <b style='color:{colour}'>δεν έχει εγκατασταθεί ακόμα</b>",
+  "Your mic  <b style='color:{colour}'>after the setup below</b>": "Το μικρόφωνό σας <b style='color:{colour}'>μετά την παρακάτω ρύθμιση</b>"
 }

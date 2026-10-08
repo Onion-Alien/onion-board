@@ -1436,7 +1436,6 @@
   "Video saved in {folder}.": "ビデオは{folder}に保存されました。",
   "Virtual cable download": "仮想ケーブルのダウンロード",
   "Virtual mic  <b style='color:{colour}'>✗ not connected</b>": "仮想マイク<b style='color:{colour}'>✗が接続されていません</b>",
-  "Virtual mic  <b style='color:{colour}'>✗ not installed yet</b>": "仮想マイク<b style='color:{colour}'>✗はまだインストールされていません</b>",
   "Voice and model downloads": "音声とモデルのダウンロード",
   "Voice changer on / off": "ボイスチェンジャーのオン/オフ",
   "Voice chat squashes your sounds: mono, no deep bass, and in some games nothing above 8-12 kHz. Pick where people hear you and they're shaped to get through it. Game and Voice chat work out the exact voice chat by themselves; Clean sends them exactly as mixed; Advanced lets you pick it yourself.": "ボイスチャットではサウンドが潰れてしまいます。モノラルで重低音がなく、一部のゲームでは 8 ～ 12 kHz を超えません。人々があなたの声を聞く場所を選択すれば、人々はそれを乗り越えることができます。ゲーム チャットとボイス チャットは、それ自体で正確なボイス チャットを実行します。 Clean はそれらを混合したまま正確に送信します。 Advanced では自分で選択できます。",
@@ -2710,5 +2709,15 @@
     "{n}駅 (上位{shown}を表示)"
   ],
   "Tuning in to radio stations around the world…": "世界中のラジオ局にチャンネルを合わせて…",
-  "{hotkey} is {what} now — it was the key for {lost}": "{hotkey}は現在{what}です — それは{lost}のキーでした"
+  "{hotkey} is {what} now — it was the key for {lost}": "{hotkey}は現在{what}です — それは{lost}のキーでした",
+  "Rename sound": "サウンドの名前を変更する",
+  "A second pad with the same sound, to give its own effects or hotkey": "独自のエフェクトやホットキーを与えるための同じサウンドの 2 番目のパッド",
+  "Duplicate": "重複",
+  "Just the name (F2 on the pad does it too)": "名前だけ (パッドの F2 キーでも実行できます)",
+  "Show the file in its folder": "フォルダー内のファイルを表示する",
+  "The file for “{name}” isn't there any more": "「 {name} 」のファイルはもうありません",
+  "{name} (copy)": "{name} (コピー)",
+  "Search settings": "検索設定",
+  "Virtual mic  <b style='color:{colour}'>not installed yet</b>": "仮想マイク<b style='color:{colour}'>がまだインストールされていません</b>",
+  "Your mic  <b style='color:{colour}'>after the setup below</b>": "<b style='color:{colour}'>以下のセットアップ後の</b>マイク"
 }

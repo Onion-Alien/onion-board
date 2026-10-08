@@ -1480,7 +1480,6 @@
   "Video saved in {folder}.": "Видео сохранено в {folder}.",
   "Virtual cable download": "Загрузка виртуального кабеля",
   "Virtual mic  <b style='color:{colour}'>✗ not connected</b>": "Виртуальный микрофон  <b style='color:{colour}'>✗ не подключён</b>",
-  "Virtual mic  <b style='color:{colour}'>✗ not installed yet</b>": "Виртуальный микрофон  <b style='color:{colour}'>✗ ещё не установлен</b>",
   "Voice and model downloads": "Загрузки голосов и моделей",
   "Voice changer on / off": "Изменитель голоса вкл. / выкл.",
   "Voice chat squashes your sounds: mono, no deep bass, and in some games nothing above 8-12 kHz. Pick where people hear you and they're shaped to get through it. Game and Voice chat work out the exact voice chat by themselves; Clean sends them exactly as mixed; Advanced lets you pick it yourself.": "Голосовой чат сжимает твои звуки: моно, без глубокого баса, а в некоторых играх ничего выше 8–12 кГц. Выбери, где тебя слышат, и звуки подстроятся, чтобы пройти. Game и Voice chat сами определяют точный голосовой чат; Clean отправляет звуки ровно как смикшированы; Advanced даёт выбрать самому.",
@@ -2830,5 +2829,15 @@
     "{n} станций (показаны верхние {shown})"
   ],
   "Tuning in to radio stations around the world…": "Настраиваемся на радиостанции по всему миру…",
-  "{hotkey} is {what} now — it was the key for {lost}": "{hotkey} сейчас — это {what} — это был ключ для {lost}"
+  "{hotkey} is {what} now — it was the key for {lost}": "{hotkey} сейчас — это {what} — это был ключ для {lost}",
+  "Rename sound": "Переименование звука",
+  "A second pad with the same sound, to give its own effects or hotkey": "Второй пэд с тем же звуком для создания собственных эффектов или горячей клавиши.",
+  "Duplicate": "Дублировать",
+  "Just the name (F2 on the pad does it too)": "Просто имя (F2 на панели тоже делает это)",
+  "Show the file in its folder": "Показать файл в его папке",
+  "The file for “{name}” isn't there any more": "Файла « {name} » больше нет.",
+  "{name} (copy)": "{name} (копия)",
+  "Search settings": "Настройки поиска",
+  "Virtual mic  <b style='color:{colour}'>not installed yet</b>": "Виртуальный микрофон <b style='color:{colour}'>еще не установлен</b>",
+  "Your mic  <b style='color:{colour}'>after the setup below</b>": "Ваш микрофон <b style='color:{colour}'>после настройки ниже</b>"
 }

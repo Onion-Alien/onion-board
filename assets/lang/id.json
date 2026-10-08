@@ -1434,7 +1434,6 @@
   "Video saved in {folder}.": "Video disimpan di {folder} .",
   "Virtual cable download": "Pengunduhan kabel virtual",
   "Virtual mic  <b style='color:{colour}'>✗ not connected</b>": "Mikrofon virtual <b style='color:{colour}'>✗ tidak tersambung</b>",
-  "Virtual mic  <b style='color:{colour}'>✗ not installed yet</b>": "Mikrofon virtual <b style='color:{colour}'>✗ belum dipasang</b>",
   "Voice and model downloads": "Unduhan suara dan model",
   "Voice changer on / off": "Pengubah suara hidup/mati",
   "Voice chat squashes your sounds: mono, no deep bass, and in some games nothing above 8-12 kHz. Pick where people hear you and they're shaped to get through it. Game and Voice chat work out the exact voice chat by themselves; Clean sends them exactly as mixed; Advanced lets you pick it yourself.": "Voice chat merusak suaramu: mono, tanpa bass dalam, dan di beberapa game tidak ada yang di atas 8-12 kHz. Pilih tempat orang mendengarmu dan suaranya dibentuk supaya tetap tembus. Game dan Voice chat mencari voice chat yang tepat sendiri; Bersih mengirimnya persis seperti hasil mix; Lanjutan membiarkanmu memilih sendiri.",
@@ -2710,5 +2709,15 @@
     "{n} stasiun ({shown} teratas ditampilkan)"
   ],
   "Tuning in to radio stations around the world…": "Mendengarkan stasiun radio di seluruh dunia…",
-  "{hotkey} is {what} now — it was the key for {lost}": "{hotkey} adalah {what} sekarang — itu adalah kunci untuk {lost}"
+  "{hotkey} is {what} now — it was the key for {lost}": "{hotkey} adalah {what} sekarang — itu adalah kunci untuk {lost}",
+  "Rename sound": "Ganti nama suara",
+  "A second pad with the same sound, to give its own effects or hotkey": "Pad kedua dengan suara yang sama, untuk memberikan efek atau hotkey tersendiri",
+  "Duplicate": "Duplikat",
+  "Just the name (F2 on the pad does it too)": "Hanya namanya saja (F2 di pad juga bisa melakukannya)",
+  "Show the file in its folder": "Tampilkan file di foldernya",
+  "The file for “{name}” isn't there any more": "File untuk “ {name} ” sudah tidak ada lagi",
+  "{name} (copy)": "{name} (salinan)",
+  "Search settings": "Pengaturan pencarian",
+  "Virtual mic  <b style='color:{colour}'>not installed yet</b>": "Mikrofon virtual <b style='color:{colour}'>belum dipasang</b>",
+  "Your mic  <b style='color:{colour}'>after the setup below</b>": "Mikrofon Anda <b style='color:{colour}'>setelah pengaturan di bawah</b>"
 }

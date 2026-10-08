@@ -1436,7 +1436,6 @@
   "Video saved in {folder}.": "Đã lưu video vào {folder} .",
   "Virtual cable download": "Tải xuống cáp ảo",
   "Virtual mic  <b style='color:{colour}'>✗ not connected</b>": "Mic ảo <b style='color:{colour}'>✗ chưa được kết nối</b>",
-  "Virtual mic  <b style='color:{colour}'>✗ not installed yet</b>": "Mic ảo <b style='color:{colour}'>✗ chưa được cài đặt</b>",
   "Voice and model downloads": "Tải xuống giọng nói và mô hình",
   "Voice changer on / off": "Bật/tắt bộ thay đổi giọng nói",
   "Voice chat squashes your sounds: mono, no deep bass, and in some games nothing above 8-12 kHz. Pick where people hear you and they're shaped to get through it. Game and Voice chat work out the exact voice chat by themselves; Clean sends them exactly as mixed; Advanced lets you pick it yourself.": "Trò chuyện thoại sẽ loại bỏ âm thanh của bạn: đơn âm, không có âm trầm sâu và trong một số trò chơi, không có âm thanh nào vượt quá 8-12 kHz. Chọn nơi mọi người nghe thấy bạn và họ được định hình để vượt qua điều đó. Trò chơi và Trò chuyện thoại tự thực hiện trò chuyện thoại chính xác; Clean gửi chúng chính xác như đã trộn; Nâng cao cho phép bạn tự chọn nó.",
@@ -2710,5 +2709,15 @@
     "{n} đài ({shown} trên cùng))"
   ],
   "Tuning in to radio stations around the world…": "Bắt sóng các đài phát thanh trên khắp thế giới…",
-  "{hotkey} is {what} now — it was the key for {lost}": "{hotkey} bây giờ là {what} — đó là chìa khóa cho {lost}"
+  "{hotkey} is {what} now — it was the key for {lost}": "{hotkey} bây giờ là {what} — đó là chìa khóa cho {lost}",
+  "Rename sound": "Đổi tên âm thanh",
+  "A second pad with the same sound, to give its own effects or hotkey": "Bàn phím thứ hai có cùng âm thanh, để tạo hiệu ứng hoặc phím nóng riêng",
+  "Duplicate": "Nhân bản",
+  "Just the name (F2 on the pad does it too)": "Chỉ cần tên (F2 trên pad cũng vậy)",
+  "Show the file in its folder": "Hiển thị tập tin trong thư mục của nó",
+  "The file for “{name}” isn't there any more": "Tệp cho “ {name} ” không còn nữa",
+  "{name} (copy)": "{name} (bản sao)",
+  "Search settings": "Cài đặt tìm kiếm",
+  "Virtual mic  <b style='color:{colour}'>not installed yet</b>": "Mic ảo <b style='color:{colour}'>chưa được cài đặt</b>",
+  "Your mic  <b style='color:{colour}'>after the setup below</b>": "Mic của bạn <b style='color:{colour}'>sau khi thiết lập bên dưới</b>"
 }

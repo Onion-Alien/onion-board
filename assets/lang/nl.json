@@ -1459,7 +1459,6 @@
   "Video saved in {folder}.": "Video opgeslagen in {folder} .",
   "Virtual cable download": "Virtuele kabel downloaden",
   "Virtual mic  <b style='color:{colour}'>✗ not connected</b>": "Virtuele microfoon <b style='color:{colour}'>✗ niet aangesloten</b>",
-  "Virtual mic  <b style='color:{colour}'>✗ not installed yet</b>": "Virtuele microfoon <b style='color:{colour}'>✗ nog niet geïnstalleerd</b>",
   "Voice and model downloads": "Stem- en modeldownloads",
   "Voice changer on / off": "Stemwisselaar aan/uit",
   "Voice chat squashes your sounds: mono, no deep bass, and in some games nothing above 8-12 kHz. Pick where people hear you and they're shaped to get through it. Game and Voice chat work out the exact voice chat by themselves; Clean sends them exactly as mixed; Advanced lets you pick it yourself.": "Voicechat verplettert je geluiden: mono, geen diepe bas en in sommige games niets boven de 8-12 kHz. Kies waar mensen je horen en ze zijn gevormd om er doorheen te komen. Game- en voicechat bepalen zelf de exacte voicechat; Clean verzendt ze precies zoals gemengd; Met Geavanceerd kun je het zelf kiezen.",
@@ -2770,5 +2769,15 @@
     "{n} stations (top {shown} getoond)"
   ],
   "Tuning in to radio stations around the world…": "Afstemmen op radiostations over de hele wereld...",
-  "{hotkey} is {what} now — it was the key for {lost}": "{hotkey} is nu {what} — het was de sleutel voor {lost}"
+  "{hotkey} is {what} now — it was the key for {lost}": "{hotkey} is nu {what} — het was de sleutel voor {lost}",
+  "Rename sound": "Hernoem geluid",
+  "A second pad with the same sound, to give its own effects or hotkey": "Een tweede pad met hetzelfde geluid, om zijn eigen effecten of sneltoets te geven",
+  "Duplicate": "Dupliceren",
+  "Just the name (F2 on the pad does it too)": "Alleen de naam (F2 op het pad doet het ook)",
+  "Show the file in its folder": "Toon het bestand in de map",
+  "The file for “{name}” isn't there any more": "Het bestand voor “ {name} ” is er niet meer",
+  "{name} (copy)": "{name} (kopie)",
+  "Search settings": "Zoekinstellingen",
+  "Virtual mic  <b style='color:{colour}'>not installed yet</b>": "Virtuele microfoon <b style='color:{colour}'>nog niet geïnstalleerd</b>",
+  "Your mic  <b style='color:{colour}'>after the setup below</b>": "Je microfoon <b style='color:{colour}'>na de onderstaande installatie</b>"
 }

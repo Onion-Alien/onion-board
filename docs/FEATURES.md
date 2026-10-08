@@ -10,7 +10,11 @@ The full list. The [README](../README.md) has the short version and how to get s
   used by itself. **Pads from videos** have a *Video* button that shows the video in
   step with the sound (only you see it). **Pick several pads** with Ctrl+click,
   Shift+click or Ctrl+A to change their colour, volume, fades or categories, export
-  them or remove them together (one Undo).
+  them or remove them together (one Undo). **From the keyboard:** arrows move
+  between pads, Enter or Space plays, F2 renames, Alt+Enter opens Edit, Delete
+  removes (the picked pads, or the one you're on) and Ctrl+F jumps to the search box.
+  Right-click a pad for *Rename…*, *Duplicate* (a second pad with its own file, for
+  its own effects or hotkey) and *Show the file in its folder*.
 - **Record a sound with your mic, or from what's playing:** the **Record** button next
   to *Add sounds*. Record your own voice, your voice through the voice changer while
   it's on, or *What's playing*: a bit of a sound, a web search result or the radio as
@@ -245,7 +249,8 @@ The full list. The [README](../README.md) has the short version and how to get s
   bitrate limit, *Slow or patchy connection* (waits longer before giving up), *Also
   save the video* for links, and *Show pictures and like counts* in search results.
 - **Screen readers:** buttons that only show an icon are read out by name.
-- **⚙ Settings:** 31 themes in four groups — Classic (Dark, Light, true-black
+- **⚙ Settings** (with a search box above the categories: type a word and only the
+  cards with it stay)**:** 31 themes in four groups — Classic (Dark, Light, true-black
   Midnight, High Contrast…), Colourful, Wild (Synthwave, Hacker, Amber Terminal…)
   and Meme (Flashbang, Deep Fried, Retro 98, Comic Sans…); they switch live —
   your own highlight colour, how live tabs show (a tint or a dot, in the highlight colour), plus hotkeys, overlay, window and audio options. A category sidebar keeps every

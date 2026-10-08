@@ -284,5 +284,11 @@ class PadSelection(QObject):
         self._refresh()
 
     def _delete_key(self):
+        """Delete: the picked pads, or else the pad the keyboard is on."""
         if self.picked:
             self.delete()
+            return
+        from soundboard.ui.widgets import Pad
+        f = self.mw.focusWidget()   # the window's, so it works before the window is active
+        if isinstance(f, Pad):
+            self.mw.ask_remove([f.meta.id])

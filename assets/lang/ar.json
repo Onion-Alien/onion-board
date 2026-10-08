@@ -1551,7 +1551,6 @@
   "Video saved in {folder}.": "تم حفظ الفيديو في {folder} .",
   "Virtual cable download": "تحميل الكابل الظاهري",
   "Virtual mic  <b style='color:{colour}'>✗ not connected</b>": "الميكروفون الافتراضي <b style='color:{colour}'>✗ غير متصل</b>",
-  "Virtual mic  <b style='color:{colour}'>✗ not installed yet</b>": "الميكروفون الظاهري <b style='color:{colour}'>✗ لم يتم تثبيته بعد</b>",
   "Voice and model downloads": "تنزيلات الصوت والنماذج",
   "Voice changer on / off": "تشغيل/إيقاف مغير الصوت",
   "Voice chat squashes your sounds: mono, no deep bass, and in some games nothing above 8-12 kHz. Pick where people hear you and they're shaped to get through it. Game and Voice chat work out the exact voice chat by themselves; Clean sends them exactly as mixed; Advanced lets you pick it yourself.": "تعمل الدردشة الصوتية على سحق أصواتك: أحادية، بدون صوت جهير عميق، وفي بعض الألعاب لا يزيد الصوت عن 8-12 كيلو هرتز. اختر المكان الذي يسمعك فيه الناس ويكونون على استعداد لتجاوزه. تعمل اللعبة والدردشة الصوتية على إجراء الدردشة الصوتية الدقيقة بنفسها؛ يرسلهم نظيفًا تمامًا كما هو مختلط؛ متقدم يتيح لك اختياره بنفسك.",
@@ -3010,5 +3009,15 @@
     "{n} محطة (أعلى {shown} معروض)"
   ],
   "Tuning in to radio stations around the world…": "الاستماع إلى محطات الراديو في جميع أنحاء العالم ...",
-  "{hotkey} is {what} now — it was the key for {lost}": "{hotkey} هو {what} الآن - لقد كان مفتاح {lost}"
+  "{hotkey} is {what} now — it was the key for {lost}": "{hotkey} هو {what} الآن - لقد كان مفتاح {lost}",
+  "Rename sound": "إعادة تسمية الصوت",
+  "A second pad with the same sound, to give its own effects or hotkey": "لوحة ثانية بنفس الصوت، لإعطاء تأثيراتها الخاصة أو مفتاح التشغيل السريع",
+  "Duplicate": "ينسخ",
+  "Just the name (F2 on the pad does it too)": "فقط الاسم (F2 الموجود على اللوحة يفعل ذلك أيضًا)",
+  "Show the file in its folder": "إظهار الملف في المجلد الخاص به",
+  "The file for “{name}” isn't there any more": "الملف الخاص بـ \" {name} \" لم يعد موجودًا",
+  "{name} (copy)": "{name} (نسخة)",
+  "Search settings": "إعدادات البحث",
+  "Virtual mic  <b style='color:{colour}'>not installed yet</b>": "<b style='color:{colour}'>لم يتم تثبيت الميكروفون الظاهري بعد</b>",
+  "Your mic  <b style='color:{colour}'>after the setup below</b>": "الميكروفون الخاص بك <b style='color:{colour}'>بعد الإعداد أدناه</b>"
 }

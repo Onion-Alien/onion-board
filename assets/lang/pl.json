@@ -1482,7 +1482,6 @@
   "Video saved in {folder}.": "Film zapisany w {folder} .",
   "Virtual cable download": "Pobieranie wirtualnego kabla",
   "Virtual mic  <b style='color:{colour}'>✗ not connected</b>": "Wirtualny mikrofon <b style='color:{colour}'>✗ nie jest podłączony</b>",
-  "Virtual mic  <b style='color:{colour}'>✗ not installed yet</b>": "Wirtualny mikrofon <b style='color:{colour}'>✗ jeszcze nie zainstalowany</b>",
   "Voice and model downloads": "Pobieranie głosów i modeli",
   "Voice changer on / off": "Włączanie/wyłączanie zmiany głosu",
   "Voice chat squashes your sounds: mono, no deep bass, and in some games nothing above 8-12 kHz. Pick where people hear you and they're shaped to get through it. Game and Voice chat work out the exact voice chat by themselves; Clean sends them exactly as mixed; Advanced lets you pick it yourself.": "Czat głosowy tłumi Twoje dźwięki: mono, bez głębokiego basu, a w niektórych grach nic powyżej 8-12 kHz. Wybierz miejsce, w którym ludzie Cię usłyszą i będą przygotowani, aby przez to przejść. Gra i czat głosowy samodzielnie opracowują dokładny czat głosowy; Clean wysyła je dokładnie tak samo zmieszane; Zaawansowane pozwalają wybrać samodzielnie.",
@@ -2830,5 +2829,15 @@
     "{n} stacji (pokazano górne {shown})"
   ],
   "Tuning in to radio stations around the world…": "Dostrajanie stacji radiowych z całego świata…",
-  "{hotkey} is {what} now — it was the key for {lost}": "{hotkey} jest teraz {what} — to był klucz do {lost}"
+  "{hotkey} is {what} now — it was the key for {lost}": "{hotkey} jest teraz {what} — to był klucz do {lost}",
+  "Rename sound": "Zmień nazwę dźwięku",
+  "A second pad with the same sound, to give its own effects or hotkey": "Drugi pad z tym samym dźwiękiem, dający własne efekty lub klawisz skrótu",
+  "Duplicate": "Duplikuj",
+  "Just the name (F2 on the pad does it too)": "Tylko nazwa (F2 na padzie też to robi)",
+  "Show the file in its folder": "Pokaż plik w jego folderze",
+  "The file for “{name}” isn't there any more": "Pliku „ {name} ” już nie ma",
+  "{name} (copy)": "{name} (kopia)",
+  "Search settings": "Ustawienia wyszukiwania",
+  "Virtual mic  <b style='color:{colour}'>not installed yet</b>": "Wirtualny mikrofon <b style='color:{colour}'>nie jest jeszcze zainstalowany</b>",
+  "Your mic  <b style='color:{colour}'>after the setup below</b>": "Twój mikrofon <b style='color:{colour}'>po poniższej konfiguracji</b>"
 }

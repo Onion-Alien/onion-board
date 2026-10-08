@@ -1434,7 +1434,6 @@
   "Video saved in {folder}.": "影片已儲存在 {folder}。",
   "Virtual cable download": "虛擬音源線下載",
   "Virtual mic  <b style='color:{colour}'>✗ not connected</b>": "虛擬麥克風  <b style='color:{colour}'>✗ 未連線</b>",
-  "Virtual mic  <b style='color:{colour}'>✗ not installed yet</b>": "虛擬麥克風  <b style='color:{colour}'>✗ 還沒安裝</b>",
   "Voice and model downloads": "語音和模型下載",
   "Voice changer on / off": "變聲器 開啟／關閉",
   "Voice chat squashes your sounds: mono, no deep bass, and in some games nothing above 8-12 kHz. Pick where people hear you and they're shaped to get through it. Game and Voice chat work out the exact voice chat by themselves; Clean sends them exactly as mixed; Advanced lets you pick it yourself.": "語音聊天會壓扁你的音效：單聲道、沒有深沉低音，有些遊戲甚至沒有 8-12 kHz 以上的聲音。選擇別人在哪裡聽到你，音效就會被調整成能順利傳過去。「遊戲」和「語音聊天」會自己找出確切的語音聊天；「乾淨」會照混音原樣送出；「進階」讓你自己選。",
@@ -2710,5 +2709,15 @@
     "{n}電台（ {shown} ）"
   ],
   "Tuning in to radio stations around the world…": "收聽世界各地的廣播電台...",
-  "{hotkey} is {what} now — it was the key for {lost}": "{hotkey}現在是{what} — 它是{lost}的鑰匙"
+  "{hotkey} is {what} now — it was the key for {lost}": "{hotkey}現在是{what} — 它是{lost}的鑰匙",
+  "Rename sound": "重新命名聲音",
+  "A second pad with the same sound, to give its own effects or hotkey": "具有相同聲音的第二個打擊墊，可提供其自己的效果或熱鍵",
+  "Duplicate": "複製",
+  "Just the name (F2 on the pad does it too)": "只是名稱（鍵盤上的 F2 也可以）",
+  "Show the file in its folder": "顯示其資料夾中的文件",
+  "The file for “{name}” isn't there any more": "「 {name} 」的檔案不再存在",
+  "{name} (copy)": "{name} （副本）",
+  "Search settings": "搜尋設定",
+  "Virtual mic  <b style='color:{colour}'>not installed yet</b>": "虛擬麥克風<b style='color:{colour}'>尚未安裝</b>",
+  "Your mic  <b style='color:{colour}'>after the setup below</b>": "<b style='color:{colour}'>經過以下設定後</b>您的麥克風"
 }

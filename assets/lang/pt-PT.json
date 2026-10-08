@@ -1355,7 +1355,6 @@
   "Videos can't be shown in this copy of Onion Board": "Não é possível mostrar vídeos nesta cópia do Onion Board",
   "Virtual cable download": "Transferência do cabo virtual",
   "Virtual mic  <b style='color:{colour}'>✗ not connected</b>": "Microfone virtual  <b style='color:{colour}'>✗ não ligado</b>",
-  "Virtual mic  <b style='color:{colour}'>✗ not installed yet</b>": "Microfone virtual  <b style='color:{colour}'>✗ ainda não instalado</b>",
   "Voice": "Voz",
   "Voice and model downloads": "Transferências de vozes e modelos",
   "Voice changer on / off": "Ligar / desligar o modificador de voz",
@@ -2770,5 +2769,15 @@
     "{n} estações (topo {shown} apresentado)"
   ],
   "Tuning in to radio stations around the world…": "Sintonizando estações de rádio em todo o mundo…",
-  "{hotkey} is {what} now — it was the key for {lost}": "{hotkey} é {what} agora - foi a chave para {lost}"
+  "{hotkey} is {what} now — it was the key for {lost}": "{hotkey} é {what} agora - foi a chave para {lost}",
+  "Rename sound": "Renomear som",
+  "A second pad with the same sound, to give its own effects or hotkey": "Um segundo pad com o mesmo som, para dar os seus próprios efeitos ou teclas de atalho",
+  "Duplicate": "Duplicar",
+  "Just the name (F2 on the pad does it too)": "Apenas o nome (F2 no pad também serve)",
+  "Show the file in its folder": "Mostrar o ficheiro na sua pasta",
+  "The file for “{name}” isn't there any more": "O ficheiro para “ {name} ” já não existe",
+  "{name} (copy)": "{name} (cópia)",
+  "Search settings": "Configurações de pesquisa",
+  "Virtual mic  <b style='color:{colour}'>not installed yet</b>": "Microfone virtual <b style='color:{colour}'>ainda não instalado</b>",
+  "Your mic  <b style='color:{colour}'>after the setup below</b>": "O seu microfone <b style='color:{colour}'>após a configuração abaixo</b>"
 }

@@ -1355,7 +1355,6 @@
   "Videos can't be shown in this copy of Onion Board": "Videoer kan ikke vises i denne kopi af Onion Board",
   "Virtual cable download": "Download af virtuelt kabel",
   "Virtual mic  <b style='color:{colour}'>✗ not connected</b>": "Virtuel mikrofon  <b style='color:{colour}'>✗ ikke forbundet</b>",
-  "Virtual mic  <b style='color:{colour}'>✗ not installed yet</b>": "Virtuel mikrofon  <b style='color:{colour}'>✗ ikke installeret endnu</b>",
   "Voice": "Stemme",
   "Voice and model downloads": "Downloads af stemmer og modeller",
   "Voice changer on / off": "Stemmeskifter til / fra",
@@ -2770,5 +2769,15 @@
     "{n} stationer (øverst {shown} vist)"
   ],
   "Tuning in to radio stations around the world…": "Stiller ind på radiostationer rundt om i verden...",
-  "{hotkey} is {what} now — it was the key for {lost}": "{hotkey} er {what} nu — det var nøglen til {lost}"
+  "{hotkey} is {what} now — it was the key for {lost}": "{hotkey} er {what} nu — det var nøglen til {lost}",
+  "Rename sound": "Omdøb lyd",
+  "A second pad with the same sound, to give its own effects or hotkey": "En anden pad med samme lyd, for at give sine egne effekter eller genvejstast",
+  "Duplicate": "Dupliker",
+  "Just the name (F2 on the pad does it too)": "Bare navnet (F2 på puden gør det også)",
+  "Show the file in its folder": "Vis filen i dens mappe",
+  "The file for “{name}” isn't there any more": "Filen for \" {name} \" er der ikke længere",
+  "{name} (copy)": "{name} (kopi)",
+  "Search settings": "Søgeindstillinger",
+  "Virtual mic  <b style='color:{colour}'>not installed yet</b>": "Virtuel mikrofon <b style='color:{colour}'>ikke installeret endnu</b>",
+  "Your mic  <b style='color:{colour}'>after the setup below</b>": "Din mikrofon <b style='color:{colour}'>efter opsætningen nedenfor</b>"
 }

@@ -910,3 +910,17 @@ def test_no_language_offer_on_an_english_windows(window, monkeypatch):
     monkeypatch.setattr(i18n, "windows_language", lambda: "en-GB")
     window._offer_language()
     assert not window.lang_bar.isVisibleTo(window)
+
+
+def test_setup_not_done_yet_is_one_orange_step_not_red_crosses(window):
+    """Cable route, no cable, mic closed: the card's two lines say what's still to
+    do in the warn colour; the red cross is for things that are wrong."""
+    from soundboard import theme
+    w = window
+    w.cfg.route = "cable"
+    w._update_flow()
+    assert w.setup_state == "missing"
+    text = w.flow_mic.text() + w.flow_out.text()
+    assert "✗" not in text and theme.status("error") not in text
+    assert "after the setup below" in w.flow_mic.text()
+    assert "not installed yet" in w.flow_out.text()

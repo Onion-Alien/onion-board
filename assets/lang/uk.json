@@ -1482,7 +1482,6 @@
   "Video saved in {folder}.": "Відео збережено в {folder} .",
   "Virtual cable download": "Завантаження віртуального кабелю",
   "Virtual mic  <b style='color:{colour}'>✗ not connected</b>": "Віртуальний мікрофон <b style='color:{colour}'>✗ не підключено</b>",
-  "Virtual mic  <b style='color:{colour}'>✗ not installed yet</b>": "Віртуальний мікрофон <b style='color:{colour}'>✗ ще не встановлено</b>",
   "Voice and model downloads": "Завантаження голосу та моделі",
   "Voice changer on / off": "Увімкнення/вимкнення зміни голосу",
   "Voice chat squashes your sounds: mono, no deep bass, and in some games nothing above 8-12 kHz. Pick where people hear you and they're shaped to get through it. Game and Voice chat work out the exact voice chat by themselves; Clean sends them exactly as mixed; Advanced lets you pick it yourself.": "Голосовий чат пригнічує ваші звуки: моно, без глибоких басів, а в деяких іграх нічого вище 8-12 кГц. Вибирайте, де люди вас чують, і вони готові пройти через це. Ігровий і голосовий чат самостійно розробляють точний голосовий чат; Clean надсилає їх точно так само, як змішані; Advanced дозволяє вибрати його самостійно.",
@@ -2830,5 +2829,15 @@
     "{n} станцій (верхні {shown} показано)"
   ],
   "Tuning in to radio stations around the world…": "Налаштування на радіостанції по всьому світу…",
-  "{hotkey} is {what} now — it was the key for {lost}": "{hotkey} це {what} зараз — це була клавіша для {lost}"
+  "{hotkey} is {what} now — it was the key for {lost}": "{hotkey} це {what} зараз — це була клавіша для {lost}",
+  "Rename sound": "Перейменувати звук",
+  "A second pad with the same sound, to give its own effects or hotkey": "Другий джойстик із таким же звуком, щоб надати власні ефекти або гарячу клавішу",
+  "Duplicate": "Дублювати",
+  "Just the name (F2 on the pad does it too)": "Лише назва (клавіша F2 на панелі також робить це)",
+  "Show the file in its folder": "Показати файл у його папці",
+  "The file for “{name}” isn't there any more": "Файл для “ {name} ” більше не існує",
+  "{name} (copy)": "{name} (копія)",
+  "Search settings": "Налаштування пошуку",
+  "Virtual mic  <b style='color:{colour}'>not installed yet</b>": "Віртуальний мікрофон <b style='color:{colour}'>ще не встановлено</b>",
+  "Your mic  <b style='color:{colour}'>after the setup below</b>": "Ваш мікрофон <b style='color:{colour}'>після налаштування нижче</b>"
 }

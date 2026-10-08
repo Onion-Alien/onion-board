@@ -1371,7 +1371,6 @@
   "Videos can't be shown in this copy of Onion Board": "V této kopii Onion Board nejde zobrazovat videa",
   "Virtual cable download": "Stažení virtuálního kabelu",
   "Virtual mic  <b style='color:{colour}'>✗ not connected</b>": "Virtuální mikrofon  <b style='color:{colour}'>✗ nepřipojený</b>",
-  "Virtual mic  <b style='color:{colour}'>✗ not installed yet</b>": "Virtuální mikrofon  <b style='color:{colour}'>✗ zatím nenainstalovaný</b>",
   "Voice": "Hlas",
   "Voice and model downloads": "Stahování hlasů a modelů",
   "Voice changer on / off": "Měnič hlasu zap. / vyp.",
@@ -2830,5 +2829,15 @@
     "{n} stanic (zobrazeno nahoře {shown})"
   ],
   "Tuning in to radio stations around the world…": "Ladění rozhlasových stanic po celém světě…",
-  "{hotkey} is {what} now — it was the key for {lost}": "{hotkey} je nyní {what} — byl to klíč pro {lost}"
+  "{hotkey} is {what} now — it was the key for {lost}": "{hotkey} je nyní {what} — byl to klíč pro {lost}",
+  "Rename sound": "Přejmenovat zvuk",
+  "A second pad with the same sound, to give its own effects or hotkey": "Druhý pad se stejným zvukem pro vlastní efekty nebo klávesovou zkratku",
+  "Duplicate": "Duplikovat",
+  "Just the name (F2 on the pad does it too)": "Jen jméno (F2 na podložce to dělá taky)",
+  "Show the file in its folder": "Zobrazit soubor v jeho složce",
+  "The file for “{name}” isn't there any more": "Soubor pro „ {name} “ již neexistuje",
+  "{name} (copy)": "{name} (kopie)",
+  "Search settings": "Nastavení vyhledávání",
+  "Virtual mic  <b style='color:{colour}'>not installed yet</b>": "Virtuální mikrofon <b style='color:{colour}'>zatím není nainstalován</b>",
+  "Your mic  <b style='color:{colour}'>after the setup below</b>": "Váš mikrofon <b style='color:{colour}'>po nastavení níže</b>"
 }
