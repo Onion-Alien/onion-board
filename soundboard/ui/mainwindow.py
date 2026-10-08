@@ -6849,7 +6849,8 @@ class MainWindow(QMainWindow):
         if self._queue and not any(sid in self._meta for sid in playing):
             self._next_in_queue()
             playing = e.playing()
-        live = any(sid in self._meta and not paused for sid, (_p, paused) in playing.items())
+        live = any((sid in self._meta or sid == LINK_ID) and not paused   # a web search's
+                   for sid, (_p, paused) in playing.items())                # Play too
         if live != self._sounds_live:   # the Sounds tab glows while a sound plays
             self._sounds_live = live
             set_tab_live(self.tabs, self.tabs.indexOf(self.sounds_page), live,
