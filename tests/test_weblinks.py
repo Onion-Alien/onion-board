@@ -32,6 +32,14 @@ def test_links_open_without_the_relay_proxy(qapp, monkeypatch):
     assert not any(k.lower().endswith("_proxy") for k in env)
 
 
+def test_windows_links_never_go_to_explorer(monkeypatch):
+    """explorer.exe opens Documents for a link with a query string."""
+    monkeypatch.setattr(weblinks.sys, "platform", "win32")
+    cmd = weblinks.opener("https://tally.so/r/x?version=1.9.23")
+    assert "explorer" not in cmd[0].lower()
+    assert cmd[-1] == "https://tally.so/r/x?version=1.9.23"
+
+
 def test_the_users_own_proxy_is_kept(monkeypatch):
     monkeypatch.setenv("https_proxy", net.relay_url("radio"))
     monkeypatch.setattr(net, "_env_saved", {"https_proxy": "http://corp.example.com:8080"})

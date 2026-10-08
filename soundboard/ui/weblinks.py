@@ -27,7 +27,9 @@ SCHEMES = ("http", "https", "mailto")
 def opener(url: str) -> list[str]:
     """The command that hands `url` to the default browser / mail program."""
     if sys.platform == "win32":
-        return ["explorer.exe", url]
+        # not explorer.exe: it can't take a link with ?/& in it and opens the
+        # Documents folder instead (Send feedback, Report a problem)
+        return ["rundll32.exe", "url.dll,FileProtocolHandler", url]
     if sys.platform == "darwin":
         return ["open", url]
     return ["xdg-open", url]
