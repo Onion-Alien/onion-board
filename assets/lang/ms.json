@@ -1339,7 +1339,6 @@
   "Videos can't be shown in this copy of Onion Board": "Video tidak boleh ditunjukkan dalam salinan Onion Board ini",
   "Virtual cable download": "Muat turun kabel maya",
   "Virtual mic  <b style='color:{colour}'>✗ not connected</b>": "Mikrofon maya  <b style='color:{colour}'>✗ tidak bersambung</b>",
-  "Virtual mic  <b style='color:{colour}'>✗ not installed yet</b>": "Mikrofon maya  <b style='color:{colour}'>✗ belum dipasang</b>",
   "Voice": "Suara",
   "Voice and model downloads": "Muat turun suara dan model",
   "Voice changer on / off": "Pengubah suara hidup / mati",
@@ -2718,5 +2717,7 @@
   "Show the file in its folder": "Tunjukkan fail dalam foldernya",
   "The file for “{name}” isn't there any more": "Fail untuk “ {name} ” tiada lagi",
   "{name} (copy)": "{name} (salinan)",
-  "Search settings": "Tetapan carian"
+  "Search settings": "Tetapan carian",
+  "Virtual mic  <b style='color:{colour}'>not installed yet</b>": "Mikrofon maya <b style='color:{colour}'>belum dipasang lagi</b>",
+  "Your mic  <b style='color:{colour}'>after the setup below</b>": "Mikrofon anda <b style='color:{colour}'>selepas persediaan di bawah</b>"
 }

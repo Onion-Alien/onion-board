@@ -1457,7 +1457,6 @@
   "Video saved in {folder}.": "Vídeo salvo em {folder}.",
   "Virtual cable download": "Download do cabo virtual",
   "Virtual mic  <b style='color:{colour}'>✗ not connected</b>": "Microfone virtual  <b style='color:{colour}'>✗ não conectado</b>",
-  "Virtual mic  <b style='color:{colour}'>✗ not installed yet</b>": "Microfone virtual  <b style='color:{colour}'>✗ ainda não instalado</b>",
   "Voice and model downloads": "Downloads de vozes e modelos",
   "Voice changer on / off": "Ligar / desligar o modificador de voz",
   "Voice chat squashes your sounds: mono, no deep bass, and in some games nothing above 8-12 kHz. Pick where people hear you and they're shaped to get through it. Game and Voice chat work out the exact voice chat by themselves; Clean sends them exactly as mixed; Advanced lets you pick it yourself.": "O chat de voz espreme seus sons: mono, sem grave profundo, e em alguns jogos nada acima de 8-12 kHz. Escolha onde as pessoas ouvem você e os sons são ajustados para passar. Game e Voice chat descobrem o chat de voz exato sozinhos; Clean envia exatamente como foi mixado; Advanced deixa você escolher.",
@@ -2778,5 +2777,7 @@
   "Show the file in its folder": "Mostrar o arquivo em sua pasta",
   "The file for “{name}” isn't there any more": "O arquivo para “ {name} ” não existe mais",
   "{name} (copy)": "{name} (cópia)",
-  "Search settings": "Configurações de pesquisa"
+  "Search settings": "Configurações de pesquisa",
+  "Virtual mic  <b style='color:{colour}'>not installed yet</b>": "Microfone virtual <b style='color:{colour}'>ainda não instalado</b>",
+  "Your mic  <b style='color:{colour}'>after the setup below</b>": "Seu microfone <b style='color:{colour}'>após a configuração abaixo</b>"
 }

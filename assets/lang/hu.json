@@ -1355,7 +1355,6 @@
   "Videos can't be shown in this copy of Onion Board": "Az Onion Board ezen példánya nem tud videót megjeleníteni",
   "Virtual cable download": "Virtuális kábel letöltése",
   "Virtual mic  <b style='color:{colour}'>✗ not connected</b>": "Virtuális mikrofon  <b style='color:{colour}'>✗ nincs csatlakozva</b>",
-  "Virtual mic  <b style='color:{colour}'>✗ not installed yet</b>": "Virtuális mikrofon  <b style='color:{colour}'>✗ még nincs telepítve</b>",
   "Voice": "Beszéd",
   "Voice and model downloads": "Hang- és modell-letöltések",
   "Voice changer on / off": "Hangtorzító be / ki",
@@ -2778,5 +2777,7 @@
   "Show the file in its folder": "Mutassa meg a fájlt a mappájában",
   "The file for “{name}” isn't there any more": "A(z) „ {name} ” fájl már nincs meg",
   "{name} (copy)": "{name} (másolat)",
-  "Search settings": "Keresési beállítások"
+  "Search settings": "Keresési beállítások",
+  "Virtual mic  <b style='color:{colour}'>not installed yet</b>": "A virtuális mikrofon <b style='color:{colour}'>még nincs telepítve</b>",
+  "Your mic  <b style='color:{colour}'>after the setup below</b>": "A mikrofon <b style='color:{colour}'>az alábbi beállítás után</b>"
 }

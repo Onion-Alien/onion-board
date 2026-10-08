@@ -1436,7 +1436,6 @@
   "Video saved in {folder}.": "{folder} 에 동영상이 저장되었습니다.",
   "Virtual cable download": "가상 케이블 다운로드",
   "Virtual mic  <b style='color:{colour}'>✗ not connected</b>": "가상 마이크 <b style='color:{colour}'>✗ 연결되지 않음</b>",
-  "Virtual mic  <b style='color:{colour}'>✗ not installed yet</b>": "가상 마이크 <b style='color:{colour}'>✗ 아직 설치되지 않음</b>",
   "Voice and model downloads": "음성 및 모델 다운로드",
   "Voice changer on / off": "보이스 체인저 켜기 / 끄기",
   "Voice chat squashes your sounds: mono, no deep bass, and in some games nothing above 8-12 kHz. Pick where people hear you and they're shaped to get through it. Game and Voice chat work out the exact voice chat by themselves; Clean sends them exactly as mixed; Advanced lets you pick it yourself.": "음성 채팅은 모노, 깊은 저음, 일부 게임에서는 8~12kHz를 넘지 않는 등 사운드를 압도합니다. 사람들이 당신의 말을 들을 수 있는 위치를 선택하면 이를 통과할 수 있도록 구성됩니다. 게임 및 음성 채팅은 정확한 음성 채팅을 자체적으로 수행합니다. Clean은 정확하게 혼합된 상태로 보냅니다. Advanced에서는 직접 선택할 수 있습니다.",
@@ -2718,5 +2717,7 @@
   "Show the file in its folder": "해당 폴더에 파일 표시",
   "The file for “{name}” isn't there any more": "\" {name} \"에 대한 파일이 더 이상 없습니다.",
   "{name} (copy)": "{name} (사본)",
-  "Search settings": "검색 설정"
+  "Search settings": "검색 설정",
+  "Virtual mic  <b style='color:{colour}'>not installed yet</b>": "가상 마이크가 <b style='color:{colour}'>아직 설치되지 않았습니다.</b>",
+  "Your mic  <b style='color:{colour}'>after the setup below</b>": "<b style='color:{colour}'>아래 설정 후</b> 마이크"
 }

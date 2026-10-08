@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- **The Setup tab says the one-time setup once.** Before it's done, the card no
+  longer shows two red crosses ("Your mic ✗ off", "Virtual mic ✗ not installed
+  yet") over the orange step that explains it; nothing is wrong yet.
 - **Search in Settings.** A box above the categories: type a word and only the
   cards with it stay, on the pages that have one (Ctrl+F gets you there).
 - **More in a pad's right-click menu:** *Rename…* (just the name), *Duplicate* (a

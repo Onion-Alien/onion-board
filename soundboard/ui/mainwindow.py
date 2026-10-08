@@ -2436,8 +2436,9 @@ class MainWindow(QMainWindow):
                      "input.", colour=ok, device=vm)
         elif not any_cable:
             state = "missing"
-            out = _("Virtual mic  <b style='color:{colour}'>✗ not installed yet</b>",
-                    colour=bad)
+            # not wrong, just not done yet: orange like the step below, not a red cross
+            out = _("Virtual mic  <b style='color:{colour}'>not installed yet</b>",
+                    colour=warn)
             step = _("<b style='color:{colour}'>One-time setup:</b> install the free virtual "
                      "cable. It's what lets Discord and games hear your sounds — without it, "
                      "only you can hear them. Easier: set <b>Send my sounds to</b> to "
@@ -2457,6 +2458,12 @@ class MainWindow(QMainWindow):
             step = _("<b style='color:{colour}'>Almost:</b> under <b>Devices</b>, set "
                      "<b>Send my sounds to</b> to your virtual cable, or to <b>My mic</b>.",
                      colour=warn)
+        if state == "missing" and self.cfg.mic_enabled and e.mic_stream is None:
+            # nothing is set up yet: the mic being closed is part of that, not a second
+            # fault (the card showed two red crosses and the header a warning over
+            # one thing to do)
+            mic = _("Your mic  <b style='color:{colour}'>after the setup below</b>",
+                    colour=warn)
         self.flow_mic.setText(mic)
         self.flow_out.setText(out)
         self.step_lbl.setText(step)

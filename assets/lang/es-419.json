@@ -1355,7 +1355,6 @@
   "Videos can't be shown in this copy of Onion Board": "Los videos no se pueden mostrar en esta copia de Onion Board",
   "Virtual cable download": "Descarga del cable virtual",
   "Virtual mic  <b style='color:{colour}'>✗ not connected</b>": "Micrófono virtual  <b style='color:{colour}'>✗ sin conectar</b>",
-  "Virtual mic  <b style='color:{colour}'>✗ not installed yet</b>": "Micrófono virtual  <b style='color:{colour}'>✗ aún sin instalar</b>",
   "Voice": "Voz",
   "Voice and model downloads": "Descargas de voces y modelos",
   "Voice changer on / off": "Activar / desactivar el cambiador de voz",
@@ -2778,5 +2777,7 @@
   "Show the file in its folder": "Mostrar el archivo en su carpeta",
   "The file for “{name}” isn't there any more": "El archivo de \" {name} \" ya no existe",
   "{name} (copy)": "{name} (copia)",
-  "Search settings": "Configuración de búsqueda"
+  "Search settings": "Configuración de búsqueda",
+  "Virtual mic  <b style='color:{colour}'>not installed yet</b>": "Micrófono virtual <b style='color:{colour}'>aún no instalado</b>",
+  "Your mic  <b style='color:{colour}'>after the setup below</b>": "Su micrófono <b style='color:{colour}'>después de la configuración a continuación</b>"
 }
