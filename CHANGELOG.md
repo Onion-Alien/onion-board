@@ -7,6 +7,15 @@
   step instead of several, and the mono downmix for voice chat does its sums in bulk:
   playing a few sounds costs about a sixth less of a core, the live effects about a
   fifth less. Nothing sounds different.
+
+## 1.9.10 — 2026-10-08
+
+- **Links no longer break your browser.** Clicking a link in the app (the Discord
+  invite, release notes, Report a bug…) while your browser was closed started the
+  browser with the app's own network settings, so every site in it asked for a
+  password ("The proxy 127.0.0.1 is requesting a username and password"). Links now
+  open the browser exactly as if you'd opened it yourself. If it happened to you,
+  closing the browser and opening it again fixes it.
 - **A hotkey taken off a sound says so.** Giving an app hotkey (Stop everything, the
   overlay, push-to-talk…) a key a pad or category already had takes it off that one,
   as before, but now a message names what lost it, like setting a pad's key already did.
