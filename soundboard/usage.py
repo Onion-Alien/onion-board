@@ -10,9 +10,9 @@ last send, as counts, never the report itself: a crash report or a freeze saved
 (`crash/<version>`, `error/<version>`, `freeze/<version>`, with the error's type and
 the file and line of this app's own code it happened in, e.g. `error/1.9.8/KeyError@
 soundboard/engine.py:1090`: never its message or anything else from the report), or
-the last run ending
-without the app closing itself (`unclean-exit/<version>`: a hard crash, ended in Task
-Manager, a power cut). And `uninstall/<version>` when the uninstaller removes it.
+the last run ending without the app closing itself (`unclean-exit/<version>/<why>`:
+a hard crash, ended in Task Manager, a power cut; exitwatch.py works out which, on
+this PC). And `uninstall/<version>` when the uninstaller removes it.
 Nothing else: no name, sounds, settings, devices, games or IP address in the message
 (GoatCounter sees the connection's address like any site does, and isn't sent it to
 keep or look up).
@@ -176,6 +176,8 @@ def _report_event(path: Path) -> str:
     except OSError:
         return ""
     head = text[:600]
+    if head.startswith("Onion Board ended without closing"):   # exitwatch.py: counted
+        return ""                                          # as unclean-exit/ already
     m = re.search(rf"^Version:\s*({VERSION_RE})\s*$", head, re.M)
     ver = m.group(1) if m else __version__
     # the stack only: never the log lines saved below it
