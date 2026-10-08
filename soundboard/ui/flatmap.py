@@ -29,6 +29,7 @@ from PySide6.QtWidgets import (QFrame, QHBoxLayout, QLabel, QPushButton, QToolTi
                                QVBoxLayout, QWidget)
 
 from soundboard import theme
+from soundboard.i18n import _, ngettext
 
 LAT_TOP, LAT_BOTTOM = 84.0, -58.0   # the inhabited world: no polar wastes
 ZOOM_MAX = 250.0                    # about street level: a city's stations come apart
@@ -55,7 +56,7 @@ SPREAD_PX = 2.4                     # ...this far apart (a spiral round the spot
 NAMES_FIRST_S = 0.35                # the country names alone, before the dots...
 REVEAL_S = 1.4                      # ...then the first stations pop in over this long...
 POP_S = 0.3                         # ...each growing in over this (a little overshoot)
-LOADING_TEXT = "Tuning in to radio stations around the world…"
+LOADING_TEXT = _("Tuning in to radio stations around the world…")
 
 
 def _fill(p: QPainter, rect: QRectF, colour: QColor):
@@ -99,8 +100,13 @@ class _Loading(QFrame):
         box.setSpacing(4)
         self.bun = BunnyWidget("headphones", height=64, pad=14)
         box.addWidget(self.bun)
-        self.label = QLabel(LOADING_TEXT.replace(" around", "\naround"))
+        text = LOADING_TEXT
+        self.label = QLabel(text)
         self.label.setObjectName("maploadertext")
+        # two lines in any language: wrap at about half the text's width
+        self.label.setWordWrap(True)
+        self.label.setFixedWidth(max(150, self.label.fontMetrics().horizontalAdvance(text)
+                                     * 55 // 100))
         box.addWidget(self.label)
         self._notes = QTimer(self)
         self._notes.setInterval(700)
@@ -199,8 +205,8 @@ class FlatMap(QWidget):
         box.setContentsMargins(0, 0, 10, 10)
         box.addStretch(1)
         self._buttons = []
-        for text, tip, slot in (("+", "Zoom in", lambda: self._zoom_by(1.5)),
-                                ("−", "Zoom out", lambda: self._zoom_by(1 / 1.5))):
+        for text, tip, slot in (("+", _("Zoom in"), lambda: self._zoom_by(1.5)),
+                                ("−", _("Zoom out"), lambda: self._zoom_by(1 / 1.5))):
             b = QPushButton(text)
             b.setObjectName("mapbtn")
             b.setToolTip(tip)
@@ -676,7 +682,7 @@ class FlatMap(QWidget):
 
     def _tile_now(self, key: tuple):
         pm, steps = self._tile_steps(*key)
-        for _ in steps:
+        for _step in steps:
             pass
         self._tiles[key] = pm
 
@@ -1026,7 +1032,9 @@ class FlatMap(QWidget):
         if audio:
             lines.append(audio)
         if d.get("k"):
-            lines.append(f"{int(d['k']):,} plays today")
-        lines.append("▶ Playing now" if d.get("id") == self._current else "Click to play")
+            lines.append(ngettext("{n} play today", "{n} plays today", int(d["k"]),
+                                  n=f"{int(d['k']):,}"))
+        lines.append("▶ " + _("Playing now") if d.get("id") == self._current
+                     else _("Click to play"))
         return "<br>".join(lines)
 
