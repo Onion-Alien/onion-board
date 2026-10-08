@@ -1834,11 +1834,15 @@ class SpeechPanel(QWidget):
     def _say(self):
         text = self.ed.text().strip()
         if text:
-            usage.used("text-to-speech")   # the name only (usage.py)
-            self.ctl.say(text)
-            self._log_said(text)
-            self._last_said = text
+            self.say_line(text)
             self.ed.clear()
+
+    def say_line(self, text: str):
+        """Speak `text` (the Say button, or the control API's /api/say)."""
+        usage.used("text-to-speech")   # the name only (usage.py)
+        self.ctl.say(text)
+        self._log_said(text)
+        self._last_said = text
 
     def _save_line(self):
         """Save as sound: the typed line (else the last one said) spoken into a pad."""

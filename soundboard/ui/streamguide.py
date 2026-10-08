@@ -30,7 +30,8 @@ def copy_prompt(mw, with_key: bool) -> str:
     """Put the AI setup prompt on the clipboard; returns what to say about it."""
     cfg = mw.cfg
     token = cfg.api_token if with_key and cfg.api_enabled else ""
-    QApplication.clipboard().setText(remote.setup_prompt(cfg, cfg.api_port, token))
+    voices = remote.voice_names(mw) if mw.tab_on("voice") else None
+    QApplication.clipboard().setText(remote.setup_prompt(cfg, cfg.api_port, token, voices))
     if token:
         return _("Copied, with your key in it. Paste it into ChatGPT, Claude or any AI "
                  "chat and say which tools you use.")
@@ -79,6 +80,11 @@ class StreamerGuide(QDialog):
             _("<b>A panic button.</b> Make a key with the <b>Panic mute</b> link: one press "
               "and nobody hears anything (your sounds or your mic); press it again to go "
               "live. <b>Stop all</b> just stops the sounds."),
+            _("<b>More than sounds.</b> A link can also switch your voice changer straight "
+              "to a voice, say a typed line in the computer voice (a channel point reward "
+              "that reads out what the viewer wrote), play a whole category in a row, "
+              "make every sound fast or echoey, pick a sound mode or play the radio. "
+              "<b>Copy AI prompt</b> has the whole list."),
             _("<b>Let your stream hear the sounds.</b> Setup → Devices → <b>Also send "
               "to</b>: add a device set to <b>Clean, for streaming</b>, then add that device "
               "in OBS: Sources → + → "

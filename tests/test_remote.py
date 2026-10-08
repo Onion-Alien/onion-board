@@ -219,8 +219,8 @@ def test_window_streamer_endpoints(qapp, window):
     assert d("live", on="maybe")[0] == 400
     d("live", on="1")
 
-    assert d("voice", on="on") == (200, {"voice": True})
-    assert d("voice", on="off") == (200, {"voice": False})
+    assert d("voice", on="on")[1]["voice"] is True
+    assert d("voice", on="off")[1]["voice"] is False
     mic = bool(w.cfg.mic_enabled)
     assert d("mic", on="toggle") == (200, {"mic": not mic})
     d("mic", on="1" if mic else "0")
@@ -359,3 +359,55 @@ def test_mode_lists_and_switches_whos_listening(qapp, window):
     assert w.mode_combo.currentData() == "game"
     assert d("mode", simple="nope")[0] == 404
     assert "radio" in s and "available" in s["radio"]
+
+
+def test_voices_say_queue_and_hear(qapp, window):
+    """The Voice tab, the play queue and Hear what they hear, from a button."""
+    from soundboard import voicefx
+    w = window
+    d = lambda action, **p: remote.dispatch(w, action, p)   # noqa: E731
+    st, body = d("voices")
+    names = [v["name"] for v in body["voices"]]
+    assert st == 200 and names[:len(voicefx.PRESETS)] == list(voicefx.PRESETS)
+    assert "Custom" not in names            # My own mix opens a window: not from a button
+    st, body = d("voice", name="chipmunk")
+    assert st == 200 and body == {"voice": True, "voice_name": "Chipmunk"}
+    assert w.voice.fx.btn_power.isChecked() and d("status")[1]["voice_name"] == "Chipmunk"
+    st, body = d("voice", name="chipmonk")
+    assert st == 404 and body["did_you_mean"] == ["Chipmunk"]
+    assert d("voice", on="0")[1]["voice"] is False
+
+    said, stopped = [], []
+    w.voice.speech.ctl.say = said.append
+    w.voice.speech.ctl.stop_speaking = lambda: stopped.append(True)
+    assert d("say", text="  hello   chat ") == (200, {"saying": "hello chat"})
+    assert said == ["hello chat"] and "hello chat" in w.voice.speech.said_log.toPlainText()
+    assert d("say")[0] == 400 and d("say", text="x" * 501)[0] == 400
+    assert d("say", stop="1") == (200, {"stopped": True}) and stopped
+
+    for sid in ("s0", "s1"):
+        w.audio[sid] = np.zeros((48000, 2), np.float32)
+    assert d("queue") == (200, {"queue": []})
+    w.new_category(name="Memes")
+    assert d("queue", category="memes")[0] == 404     # nothing in it yet
+    for sid in ("s0", "s1"):
+        w.toggle_tag(sid, "Memes")
+    played = []
+    w.play = lambda sid, now=False: played.append(sid)
+    w._pads_playing = lambda: bool(played)
+    st, body = d("queue", category="Memes")
+    assert st == 200 and played == ["s0"] and body["queue"] == [{"id": "s1", "name": "Airhorn"}]
+    st, body = d("queue", name="boom")
+    assert st == 200 and [q["id"] for q in body["queue"]] == ["s1", "s0"]
+    assert [q["name"] for q in d("status")[1]["queue"]] == ["Airhorn", "Boom"]
+    assert d("queue", name="nope")[0] == 404 and d("queue", category="Nope")[0] == 404
+    assert d("queue", clear="1") == (200, {"queue": []})
+
+    assert d("hear", on="1") == (200, {"hear": True}) and w.engine.mic_check
+    assert w.btn_check.isChecked() and d("status")[1]["hear"] is True
+    assert d("hear") == (200, {"hear": False}) and not w.engine.mic_check
+    assert d("hear", on="maybe")[0] == 400
+
+    w.set_tab_on("voice", False)
+    assert d("voices")[0] == 409 and d("say", text="hi")[0] == 409
+    assert d("voice", name="Chipmunk")[0] == 409 and "voice_name" in d("status")[1]
