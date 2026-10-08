@@ -361,18 +361,74 @@ def test_admin_step_brings_the_audio_back_whatever_happens(fake_reg, monkeypatch
     monkeypatch.setattr(dm, "bundled_dll", lambda: dll)
     monkeypatch.setattr(dm, "install_dir", lambda: tmp_path / "pf")
     monkeypatch.setattr(dm, "_enable_privileges", lambda *a: None)
-    monkeypatch.setattr(dm, "_audio_comes_back", lambda: calls.append("helper"))
-    monkeypatch.setattr(dm, "_audio_service", lambda start: calls.append(start))
+    monkeypatch.setattr(dm, "_running_dependents", lambda: ["midisrv"])
+    monkeypatch.setattr(dm, "_audio_comes_back", lambda deps: calls.append(("helper", deps)))
+    monkeypatch.setattr(dm, "_audio_service", lambda start, deps=(): calls.append((start, deps)))
     monkeypatch.setattr(dm, "_register_com", lambda path: calls.append("com"))
     monkeypatch.setattr(dm, "_make_ring", lambda: None)
     _mic(fake_reg, MICS["a stream effect"])
     assert dm.admin_install(GUID) == 0
-    assert calls == ["helper", False, "com", True]
+    # the services that ran on the audio (Windows' MIDI one...) come back with it
+    assert calls == [("helper", ["midisrv"]), (False, ()), "com", (True, ["midisrv"])]
+    assert list((tmp_path / "pf").iterdir()) and not list((tmp_path / "pf").glob("*.new"))
     calls.clear()
     fake_reg.kill_at = fake_reg.writes + 1
     with pytest.raises(Killed):
         dm.admin_install(GUID)
-    assert calls[:2] == ["helper", False] and calls[-1] is True
+    assert calls[:2] == [("helper", ["midisrv"]), (False, ())]
+    assert calls[-1] == (True, ["midisrv"])
+
+
+def test_a_failed_set_up_puts_the_mic_back(fake_reg, monkeypatch, tmp_path):
+    """An error half-way through putting it on the mic (not the process dying): the
+    mic goes back as it was before the admin step says it failed."""
+    dll = tmp_path / "obmic.dll"
+    dll.write_bytes(b"dll")
+    monkeypatch.setattr(dm, "bundled_dll", lambda: dll)
+    monkeypatch.setattr(dm, "install_dir", lambda: tmp_path / "pf")
+    for name in ("_enable_privileges", "_register_com", "_make_ring"):
+        monkeypatch.setattr(dm, name, lambda *a: None)
+    monkeypatch.setattr(dm, "_running_dependents", lambda: [])
+    monkeypatch.setattr(dm, "_audio_comes_back", lambda deps: None)
+    monkeypatch.setattr(dm, "_audio_service", lambda start, deps=(): None)
+    _mic(fake_reg, MICS["a G733 (EFX + old LFX)"])
+    before = fake_reg.mics()
+    real = dm._install_endpoint
+
+    def broken(guid, slot):
+        real(guid, slot)
+        raise OSError("disk went away")
+    monkeypatch.setattr(dm, "_install_endpoint", broken)
+    with pytest.raises(OSError):
+        dm.admin_install(GUID)
+    assert fake_reg.mics() == before and not fake_reg.installed_on()
+
+
+def test_audio_restart_brings_back_what_depended_on_it(monkeypatch):
+    ran = []
+    monkeypatch.setattr(dm, "_run", lambda cmd, timeout=60.0: ran.append(cmd) or 0)
+    dm._audio_service(True, ["midisrv", "AarSvc_1a2b", "bad name; rm"])
+    assert ran == [["net", "start", "AudioEndpointBuilder"], ["net", "start", "audiosrv"],
+                   ["net", "start", "midisrv"], ["net", "start", "AarSvc_1a2b"]]
+
+
+def test_which_services_depend_on_the_audio(monkeypatch):
+    out = "midisrv\nAarSvc_1a2b\nAudiosrv\n\nmidisrv\nodd name\n"
+    monkeypatch.setattr(dm.subprocess, "run",
+                        lambda *a, **k: subprocess.CompletedProcess(a, 0, out, ""))
+    assert dm._running_dependents() == ["midisrv", "AarSvc_1a2b"]
+
+    def hang(*a, **k):
+        raise subprocess.TimeoutExpired(a, 30)
+    monkeypatch.setattr(dm.subprocess, "run", hang)
+    assert dm._running_dependents() == []
+
+
+def test_a_hung_command_is_stopped(monkeypatch):
+    def hang(*a, **k):
+        raise subprocess.TimeoutExpired(a, k.get("timeout"))
+    monkeypatch.setattr(dm.subprocess, "run", hang)
+    assert dm._run(["net", "stop", "audiosrv", "/y"], timeout=1) == -1
 
 
 # ---------------------------------------------------------------------- the stream
@@ -1480,6 +1536,147 @@ def test_cli_refuses_odd_arguments():
     assert dm.cli(["install", "not-a-guid"]) == 2
     assert dm.cli(["install", "{00000000-0000-0000-0000-000000000000}", "efx"]) == 2
     assert dm.cli(["frobnicate"]) == 2
+
+
+def test_one_admin_step_at_a_time(monkeypatch):
+    monkeypatch.setattr(dm, "_LOCK_NAME", "Local\\OnionBoardMicEffectTest")
+    held = dm._admin_lock()
+    assert held is not None
+    other = []
+    t = threading.Thread(target=lambda: other.append(dm._admin_lock()))
+    t.start()
+    t.join()
+    assert other == [None]   # another copy is at it
+    dm._release(held)
+    t = threading.Thread(target=lambda: other.append(dm._admin_lock()))
+    t.start()
+    t.join()
+    assert other[-1] is not None
+    dm._release(other[-1])
+    monkeypatch.setattr(dm, "_admin_lock", lambda: None)
+    assert dm.cli(["uninstall"]) == 4
+
+
+def test_a_data_folder_that_cant_be_made_safe_stops_the_admin_step(monkeypatch):
+    ran = []
+    monkeypatch.setattr(dm, "_admin_lock", lambda: "lock")
+    monkeypatch.setattr(dm, "_release", lambda h: ran.append("released"))
+    monkeypatch.setattr(dm, "_enable_privileges", lambda *a: None)
+
+    def unsafe():
+        raise PermissionError("not a plain folder")
+    monkeypatch.setattr(dm, "secure_data_dirs", unsafe)
+    monkeypatch.setattr(dm, "admin_uninstall", lambda: ran.append("uninstall") or 0)
+    assert dm.cli(["uninstall"]) == 5 and ran == ["released"]
+
+
+def test_a_cut_short_name_two_mics_share_picks_neither(monkeypatch):
+    mics = [{"guid": "{a}", "name": "Microphone (USB Audio Device)", "active": True},
+            {"guid": "{b}", "name": "Microphone (USB Audio Device 2)", "active": True},
+            {"guid": "{c}", "name": "Headset Microphone (G733)", "active": True}]
+    monkeypatch.setattr(dm, "capture_endpoints", lambda: mics)
+    assert dm.endpoint_for("Microphone (USB Audio Device)") == "{a}"   # exact wins
+    assert dm.endpoint_for("Microphone (USB Audio") is None             # which one?
+    assert dm.endpoint_for("Headset Microphone (G7") == "{c}"
+
+
+# ---------------------------------------------------------------------- the data folder
+# The admin step writes into %ProgramData%, where anyone signed in can make folders:
+# it must never be steered through a link someone planted there.
+
+def _junction(link, target):
+    import _winapi
+    _winapi.CreateJunction(str(target), str(link))
+
+
+def _dacl(path) -> str:
+    """The folder's access list as stored (GetFileSecurityW: the raw descriptor, not
+    GetNamedSecurityInfo's version, which re-works it against the parent folder)."""
+    import ctypes
+    from ctypes import wintypes
+    advapi = ctypes.WinDLL("advapi32")
+    kernel = ctypes.WinDLL("kernel32")
+    advapi.GetFileSecurityW.argtypes = [wintypes.LPCWSTR, wintypes.DWORD, ctypes.c_void_p,
+                                        wintypes.DWORD, ctypes.POINTER(wintypes.DWORD)]
+    advapi.ConvertSecurityDescriptorToStringSecurityDescriptorW.argtypes = [
+        ctypes.c_void_p, wintypes.DWORD, wintypes.DWORD, ctypes.POINTER(ctypes.c_wchar_p),
+        ctypes.c_void_p]
+    kernel.LocalFree.argtypes = [ctypes.c_void_p]
+    buf = ctypes.create_string_buffer(8192)
+    need = wintypes.DWORD()
+    assert advapi.GetFileSecurityW(str(path), 4, buf, len(buf), ctypes.byref(need))
+    text = ctypes.c_wchar_p()
+    assert advapi.ConvertSecurityDescriptorToStringSecurityDescriptorW(buf, 1, 4,
+                                                                       ctypes.byref(text), None)
+    value = text.value
+    kernel.LocalFree(text)
+    return value
+
+
+_TEST_SDDL = "D:P(A;OICI;FA;;;SY)(A;OICI;FA;;;BA)(A;OICI;FA;;;AU)"   # no owner: not admin
+
+
+def test_a_planted_link_is_replaced_not_followed(tmp_path):
+    victim = tmp_path / "Windows"
+    victim.mkdir()
+    (victim / "system.ini").write_text("keep")
+    before = _dacl(victim)
+    link = tmp_path / "MicPlugin"
+    _junction(link, victim)
+    dm._secure_dir(link, _TEST_SDDL)
+    assert not dm._is_link(link) and link.is_dir() and not list(link.iterdir())
+    assert (victim / "system.ini").read_text() == "keep" and _dacl(victim) == before
+
+
+def test_the_folder_gets_exactly_its_access_and_nothing_inside_changes(tmp_path):
+    d = tmp_path / "MicPlugin"
+    (d / "inside").mkdir(parents=True)
+    inside = _dacl(d / "inside")
+    dm._secure_dir(d, _TEST_SDDL)
+    assert _dacl(d) == _TEST_SDDL
+    assert _dacl(d / "inside") == inside   # no walk through what's in it
+
+
+def test_the_mic_folder_lets_users_write_files_but_not_swap_it():
+    """MicPlugin: signed-in users and the audio engine make and change files, but can't
+    delete or rename the folder itself, or make folders in it."""
+    sddl = dm._MIC_SDDL
+    for sid in ("AU", "LS", "WR"):
+        assert f"(A;;{dm._FOLDER_WRITE};;;{sid})" in sddl
+        assert f"(A;OICIIO;{dm._MODIFY};;;{sid})" in sddl
+    rights = int(dm._FOLDER_WRITE, 16)
+    assert rights & 0x2 and not rights & 0x4                  # files yes, subfolders no
+    assert not rights & 0x10000 and not rights & 0x40         # no DELETE, no DELETE_CHILD
+    assert dm._BASE_SDDL.startswith("O:BAD:P") and "AU" not in dm._BASE_SDDL
+
+
+def test_the_admin_log_folder_drops_what_others_left(tmp_path, monkeypatch):
+    base = tmp_path / "OnionBoard"
+    (base / "MicPlugin").mkdir(parents=True)
+    outside = tmp_path / "hosts"
+    outside.write_text("keep")
+    os.link(outside, base / "directmic-admin.log")        # a hard link to a system file
+    _junction(base / "planted", tmp_path)
+    (base / "mine.log").write_text("x")
+    owners = {"mine.log": "S-1-5-32-544"}
+    monkeypatch.setattr(dm, "_owner", lambda p: owners.get(p.name, "S-1-5-21-1-2-3-1001"))
+    dm._clean_base(base)
+    assert sorted(p.name for p in base.iterdir()) == ["MicPlugin", "mine.log"]
+    assert outside.read_text() == "keep" and (tmp_path / "hosts").exists()
+
+
+def test_the_admin_ring_never_writes_through_a_link(tmp_path, monkeypatch):
+    d = tmp_path / "MicPlugin"
+    d.mkdir()
+    monkeypatch.setattr(dm, "data_dir", lambda: d)
+    monkeypatch.setattr(dm, "ring_path", lambda: d / "ring2.bin")
+    outside = tmp_path / "outside.bin"
+    outside.write_bytes(b"keep")
+    os.link(outside, d / "ring2.bin")
+    dm._make_ring()
+    assert dm.make_ring_ok(d / "ring2.bin")
+    assert outside.read_bytes() == b"keep"
+    assert not list(d.glob("*.tmp"))
 
 
 def test_who_is_listening_looks_at_the_mic_itself(window, monkeypatch):  # noqa: F811

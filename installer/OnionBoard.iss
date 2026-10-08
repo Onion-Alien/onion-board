@@ -850,6 +850,15 @@ begin
   Result := CableNeedsRestart;
 end;
 
+// Straight into my mic's effect still on a mic (soundboard/directmic.py's notes)
+function MicEffectLeft: Boolean;
+var
+  Root: Integer;
+begin
+  if IsWin64 then Root := HKLM64 else Root := HKLM;
+  Result := RegKeyExists(Root, 'SOFTWARE\OnionBoard\MicPlugin\Endpoints');
+end;
+
 // Uninstall: offer to remove the cable too. The default answer is Yes only when this
 // installer put it there (other apps, e.g. Voicemeeter, may use one that was already
 // installed). Silent uninstalls leave it alone.
@@ -862,6 +871,14 @@ begin
   // the page (soundboard/feedback.py's form); nothing is sent unless they submit it.
   if (CurUninstallStep = usPostUninstall) and not UninstallSilent then
   begin
+    // "--direct-mic remove" above couldn't take it off the mic (Windows' prompt was
+    // turned down): say so, rather than leave it there without a word
+    if MicEffectLeft then
+      MsgBox('Onion Board''s mic effect is still on your microphone (Windows'' permission ' +
+        'prompt was turned down).' + #13#10#13#10 + 'Your mic works normally: without ' +
+        'Onion Board the effect passes your voice straight through. To remove it, install ' +
+        'Onion Board again and uninstall it, saying Yes to Windows'' prompt.',
+        mbInformation, MB_OK);
     if MsgBox('Onion Board has been removed.' + #13#10#13#10 +
         'Would you tell us why? It opens a short form in your browser (no account, ' +
         'one question). Choose No to skip.', mbConfirmation, MB_YESNO) = IDYES then
