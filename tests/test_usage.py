@@ -36,6 +36,7 @@ def sent(app_dir, monkeypatch):
     monkeypatch.setattr(sys, "frozen", True, raising=False)
     monkeypatch.delenv("ONIONBOARD_NO_STATS", raising=False)
     monkeypatch.setattr(usage, "threading", SimpleNamespace(Thread=_Inline))
+    monkeypatch.setattr(usage, "_used", set())
     net.configure_features()
     yield out
     net.configure_features()
@@ -49,8 +50,13 @@ class _Inline:
         self.target()
 
 
-def _hits(req) -> list[dict]:
-    return json.loads(req.data.decode("utf-8"))["hits"]
+ABOUT = ("age/", "route/", "sounds/", "played/", "lang/", "used/")
+
+
+def _hits(req, about=False) -> list[dict]:
+    """The hits sent; without the daily picture of how it's used unless `about`."""
+    hits = json.loads(req.data.decode("utf-8"))["hits"]
+    return [h for h in hits if about or not h["path"].startswith(ABOUT)]
 
 
 def test_a_new_install_counts_once_a_day(sent):
@@ -357,3 +363,92 @@ def test_uninstall_count_never_fails_the_uninstall(sent, app_dir, monkeypatch):
     cfg.save()
     monkeypatch.setattr(usage, "send", lambda p: 1 / 0)
     assert app.uninstall_count() == 0
+
+
+# ---- how it's used: buckets and fixed names only ----------------------------------
+
+def _sound(i: int, plays: int = 0, hotkey: str = "") -> library.SoundMeta:
+    return library.SoundMeta(id=f"s{i}", name=f"Secret name {i}", file=f"C:/x/{i}.wav",
+                             plays=plays, hotkey=hotkey)
+
+
+def _paths(req) -> list[str]:
+    return [h["path"] for h in _hits(req, about=True)]
+
+
+def test_the_daily_count_says_roughly_how_its_used(sent):
+    cfg = Config(route="mic", language="de", sounds=[_sound(i, plays=2) for i in range(12)])
+    cfg.sounds[0].hotkey = "f1"
+    usage.used("voice-changer")
+    usage.used("not-a-feature")   # never sent: only FEATURES
+    usage.maybe_send(cfg)
+    paths = _paths(sent[0][0])
+    # 24 plays already: not a new install, so it's aged from its folder
+    assert [p for p in paths if p.startswith(("route/", "sounds/", "played/", "lang/"))] == [
+        "route/mic", "sounds/11-50", "played/0", "lang/de"]
+    assert {p for p in paths if p.startswith("used/")} == {"used/voice-changer", "used/hotkeys"}
+    assert sum(p.startswith("age/") for p in paths) == 1
+    body = sent[0][0].data.decode("utf-8")
+    assert "Secret name" not in body and "f1" not in body and "x/0.wav" not in body
+    # the plays and features since then, a day later
+    cfg.sounds[1].plays += 5
+    cfg.stats_sent -= usage.EVERY_S
+    usage.maybe_send(cfg)
+    paths = _paths(sent[1][0])
+    assert "played/1-10" in paths and "used/voice-changer" not in paths
+    assert "used/hotkeys" in paths   # still set up
+
+
+@pytest.mark.parametrize("n, b", [(0, "0"), (1, "1-10"), (10, "1-10"), (11, "11-50"),
+                                  (50, "11-50"), (51, "51-plus"), (-3, "0")])
+def test_counts_are_rough_buckets(n, b):
+    assert usage.bucket(n) == b
+
+
+@pytest.mark.parametrize("days, b", [(0, "day-1"), (0.9, "day-1"), (1, "days-2-7"),
+                                     (6.9, "days-2-7"), (7, "days-8-30"),
+                                     (30, "days-31-plus"), (400, "days-31-plus")])
+def test_age_is_a_rough_bucket(days, b):
+    assert usage.age_bucket(days) == b
+
+
+def test_an_odd_language_or_route_isnt_sent_as_typed(sent):
+    cfg = Config(route="somewhere-new", language="<script>")
+    usage.maybe_send(cfg)
+    paths = _paths(sent[0][0])
+    assert "lang/auto" in paths and not any(p.startswith("route/") for p in paths)
+
+
+def test_a_new_install_sends_its_first_steps_once_each(sent):
+    cfg = Config()
+    usage.step(cfg, "added-sound")
+    usage.step(cfg, "added-sound")
+    usage.step(cfg, "played-sound")
+    usage.step(cfg, "not-a-step")
+    assert [p for (req, _f) in sent for p in _paths(req)] == [
+        "step/added-sound", "step/played-sound"]
+    usage.maybe_send(cfg)   # its first daily count: a day-old install
+    assert "age/day-1" in _paths(sent[-1][0])
+
+
+def test_a_copy_counted_before_never_sends_first_steps(sent):
+    cfg = Config(stats_sent=1.0)
+    usage.step(cfg, "played-sound")
+    assert sent == [] and set(cfg.stats_steps) == set(usage.STEPS) and cfg.stats_started
+
+
+def test_first_steps_obey_the_switch(sent):
+    net.configure_features(off=[usage.FEATURE])
+    cfg = Config()
+    usage.step(cfg, "played-sound")
+    assert sent == [] and cfg.stats_steps == []
+
+
+def test_features_used_survive_a_quit(app_dir):
+    cfg = Config()
+    usage._used.clear()
+    usage.used("youtube")
+    usage.remember(cfg)
+    cfg.save()
+    assert Config.load().stats_used == ["youtube"]
+

@@ -465,6 +465,12 @@ class Config:
     # already counted (its file time)
     stats_tabs: list[str] = field(default_factory=list)
     stats_problems_seen: float = 0.0
+    # when this install started (usage.settle), its first steps already counted, the
+    # features used since the last daily count, and the plays counted by then
+    stats_started: float = 0.0
+    stats_steps: list[str] = field(default_factory=list)
+    stats_used: list[str] = field(default_factory=list)
+    stats_plays: int = 0
     sounds: list[SoundMeta] = field(default_factory=list)
 
     # set by load() when the settings weren't read cleanly, for the window to tell the

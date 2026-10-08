@@ -2980,7 +2980,7 @@ class MainWindow(QMainWindow):
             return taboff.VoiceOff()
         if key == "voice":
             v = VoicePanel(self.engine, self.cfg.voice_fx, self.cfg.speech)
-            v.fx_changed.connect(lambda spec: self.set_option("voice_fx", spec))
+            v.fx_changed.connect(self._voice_fx_changed)
             v.speech_changed.connect(lambda s: self.set_option("speech", s))
             v.clip_ready.connect(self.on_clip)
             v.fx.set_tip_enabled(not self.cfg.voice_discord_tip_shown)
@@ -3874,6 +3874,10 @@ class MainWindow(QMainWindow):
                              fade_in=m.fade_in, fade_out=m.fade_out,
                              only=("main", "obs") if m.only_them else None)
         self._wake()
+        if v is not None:   # a new install's first steps (usage.py; once each, if counted)
+            usage.step(self.cfg, "played-sound")
+            if self.cfg.route != "off":
+                usage.step(self.cfg, "sent-to-others")
         if v is None and not self.engine.active_outputs():
             self.status.setText(_("<span style='color:{status}'>No audio device is open — pick "
                                   "one in Setup.</span>", status=theme.status('warn')))
@@ -4772,6 +4776,8 @@ class MainWindow(QMainWindow):
             self._index()
             self.audio[meta.id] = data
             self._imported_ok += 1
+            usage.used("add-files")
+            usage.step(self.cfg, "added-sound")
         elif err:
             self._import_errors.append(err)
         if self._pending_imports <= 0:
@@ -4811,6 +4817,8 @@ class MainWindow(QMainWindow):
         self.cfg.sounds.append(meta)
         self._index()
         self.audio[meta.id] = data
+        usage.used("clip")
+        usage.step(self.cfg, "added-sound")
         threading.Thread(target=self.engine.prepare, args=(meta.id, data), daemon=True).start()
         self._save_now()
         self._rebuild_pads()
@@ -4869,6 +4877,7 @@ class MainWindow(QMainWindow):
         meta = self.on_clip(data, name)
         if meta is None:
             return False
+        usage.used("record")
         self.select(meta.id)
 
         def reveal():   # once the grid has laid the new pad out
@@ -4886,6 +4895,8 @@ class MainWindow(QMainWindow):
         self.cfg.sounds.append(meta)
         self._index()
         self.audio[meta.id] = data
+        usage.used("youtube")
+        usage.step(self.cfg, "added-sound")
         self._save_now()
         self._rebuild_pads()
         self.status.setText(_("Added “{name}” ({duration:.1f}s) to Sounds — right-click it there "
@@ -5618,6 +5629,7 @@ class MainWindow(QMainWindow):
         """Bring another soundboard's board over: its sound files (copied, it keeps its
         own), names, categories and the hotkeys nothing here uses yet. `ask`: False
         when they already said yes (the installer's box): no questions or pop-ups."""
+        usage.used("import-board")
         title = _("Import from {name}", name=src.name)
         if not path:
             try:
@@ -6028,6 +6040,14 @@ class MainWindow(QMainWindow):
     def send_usage(self):
         """The anonymous daily usage count, if it's due and switched on (usage.py)."""
         usage.maybe_send(self.cfg, self.bridge.counted.emit, app_dir=library.APP_DIR)
+
+    def _voice_fx_changed(self, spec: dict):
+        if spec.get("enabled"):
+            usage.used("voice-changer")
+        self.set_option("voice_fx", spec)
+
+    def _remember_usage(self):   # features used this run, for the next daily count
+        usage.remember(self.cfg)
 
     def _mark_stopped(self):
         usage.mark_stopped(library.APP_DIR)
@@ -7058,7 +7078,7 @@ class MainWindow(QMainWindow):
         exitwatch.quitting()   # a run that dies from here on died closing (exitwatch.py)
         for step in (self._finish_removals, self.timer.stop, self._voice_timer.stop,
                      self._release_ptt,
-                     self._stop_capture, self.cfg.save, self.overlay.shutdown,
+                     self._stop_capture, self._remember_usage, self.cfg.save, self.overlay.shutdown,
                      self.hotkeys.stop, self.replay.stop, self.remote.stop,
                      self._stop_remote_addons,
                      self.radio.shutdown, tor.shutdown, self.apps.shutdown,

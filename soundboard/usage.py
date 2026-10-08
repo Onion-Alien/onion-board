@@ -13,6 +13,14 @@ soundboard/engine.py:1090`: never its message or anything else from the report),
 the last run ending without the app closing itself (`unclean-exit/<version>/<why>`:
 a hard crash, ended in Task Manager, a power cut; exitwatch.py works out which, on
 this PC). And `uninstall/<version>` when the uninstaller removes it.
+With the daily one, a rough picture of how it's used, each as a bucket or a name from a
+fixed list: how long ago it was installed (`age/days-2-7`), where sounds go
+(`route/mic`), how many sounds the board has and how many were played since the last
+one (`sounds/11-50`, `played/1-10`), the app's language (`lang/de`), and which features
+were used since then (`used/voice-changer`: the names in FEATURES only). And once each,
+the first steps of a new install (`step/added-sound`, `step/played-sound`,
+`step/sent-to-others`), to see where new people get stuck; never for a copy that was
+counted before these existed.
 Nothing else: no name, sounds, settings, devices, games or IP address in the message
 (GoatCounter sees the connection's address like any site does, and isn't sent it to
 keep or look up).
@@ -60,6 +68,13 @@ TABS = ("sounds", "radio", "apps", "triggers", "voice", "setup")
 RUNNING = "running.txt"     # in the app folder while the app runs (mark_running)
 MAX_PROBLEMS = 10           # problem events per send: a bug in a loop isn't 1000 hits
 VERSION_RE = r"[0-9][0-9A-Za-z.\-]{0,20}"
+# what else is counted, only ever these names (see the docstring)
+FEATURES = ("add-files", "youtube", "record", "clip", "clip-editor", "import-board",
+            "voice-changer", "text-to-speech", "hotkeys", "phone-remote", "also-send")
+STEPS = ("added-sound", "played-sound", "sent-to-others")
+ROUTES = ("cable", "device", "off", "mic")   # library.ROUTES
+LANG_RE = r"[a-z]{2,3}(?:-[A-Za-z0-9]{2,4})?"
+DAY_S = 24 * 3600
 
 
 def enabled() -> bool:
@@ -124,6 +139,89 @@ def hits(cfg, now: float, event: str = "", extra=()) -> list[dict]:
         heard = heard_tag(cfg.stats_heard)
         out.append(_event(f"first-start/heard-{heard}" if heard else "first-start", sid))
     out += [_event(f"tab/{t}", sid) for t in cfg.stats_tabs if t in TABS]
+    out += [_event(e, sid) for e in about(cfg, now)]
+    return out
+
+
+def bucket(n: int) -> str:
+    """A count as a rough bucket: 0, 1-10, 11-50, 51-plus."""
+    return "0" if n <= 0 else "1-10" if n <= 10 else "11-50" if n <= 50 else "51-plus"
+
+
+def age_bucket(days: float) -> str:
+    """How long ago it was installed, roughly."""
+    return ("day-1" if days < 1 else "days-2-7" if days < 7 else "days-8-30" if days < 30
+            else "days-31-plus")
+
+
+def total_plays(cfg) -> int:
+    return sum(max(0, int(getattr(m, "plays", 0) or 0)) for m in cfg.sounds)
+
+
+def settle(cfg, now: float) -> None:
+    """Once: when this install started, for age/. A copy counted before this existed
+    (or with sounds already played) isn't a new install: its age comes from the app
+    folder, and its first steps are long done, so they're never sent."""
+    if cfg.stats_started:
+        return
+    if cfg.stats_sent or total_plays(cfg):
+        born = cfg.stats_sent or now
+        try:
+            from soundboard.library import APP_DIR
+            born = min(born, APP_DIR.stat().st_ctime)   # created, on Windows
+        except (OSError, ImportError):
+            pass
+        cfg.stats_started = born
+        cfg.stats_steps = list(STEPS)
+        cfg.stats_plays = total_plays(cfg)
+    else:
+        cfg.stats_started = now
+
+
+_used: set[str] = set()   # features used this run, kept in cfg by remember()
+
+
+def used(key: str) -> None:
+    """Feature `key` (one of FEATURES) was used, for the next daily count."""
+    if key in FEATURES:
+        _used.add(key)
+
+
+def remember(cfg) -> None:
+    """Keep this run's used() features in cfg (so they survive a quit before the
+    next daily count)."""
+    have = cfg.stats_used if isinstance(cfg.stats_used, list) else []
+    new = [k for k in FEATURES if k in _used and k not in have]
+    _used.clear()
+    if new:
+        cfg.stats_used = [*have, *new]
+
+
+def features_now(cfg) -> list[str]:
+    """Features that are set up, counted as used every day they are."""
+    out = []
+    if any(getattr(m, "hotkey", "") for m in cfg.sounds) or cfg.category_hotkeys:
+        out.append("hotkeys")
+    if cfg.remote_addons or cfg.api_enabled:
+        out.append("phone-remote")
+    if cfg.also_send:
+        out.append("also-send")
+    return out
+
+
+def about(cfg, now: float) -> list[str]:
+    """The daily count's picture of how it's used (see the docstring): buckets and
+    names from fixed lists only."""
+    out = [f"age/{age_bucket((now - (cfg.stats_started or now)) / DAY_S)}"]
+    if cfg.route in ROUTES:
+        out.append(f"route/{cfg.route}")
+    out.append(f"sounds/{bucket(len(cfg.sounds))}")
+    out.append(f"played/{bucket(total_plays(cfg) - cfg.stats_plays)}")
+    lang = cfg.language if re.fullmatch(LANG_RE, cfg.language or "") else "auto"
+    out.append(f"lang/{lang}")
+    have = (set(cfg.stats_used if isinstance(cfg.stats_used, list) else [])
+            | set(features_now(cfg)))
+    out += [f"used/{k}" for k in FEATURES if k in have]
     return out
 
 
@@ -278,6 +376,8 @@ def maybe_send(cfg, saved=None, event: str = "", app_dir: Path | None = None) ->
     if not enabled() or not net.allowed(FEATURE):
         return
     now = time.time()
+    settle(cfg, now)
+    remember(cfg)
     extra, taken, newest = [], 0, 0.0
     if not cfg.stats_problems_seen:   # first run with this: older reports aren't news
         cfg.stats_problems_seen = now
@@ -293,6 +393,8 @@ def maybe_send(cfg, saved=None, event: str = "", app_dir: Path | None = None) ->
         return
     daily = not event and not payload[0].get("event")
     tabs = [h["path"][4:] for h in payload if h["path"].startswith("tab/")]
+    feats = [h["path"][5:] for h in payload if h["path"].startswith("used/")]
+    plays = total_plays(cfg)
     netlog.cause(FEATURE, "Anonymous usage count" + (f" ({event})" if event
                                                      else " (once a day)" if daily
                                                      else " (problems)"))
@@ -303,11 +405,25 @@ def maybe_send(cfg, saved=None, event: str = "", app_dir: Path | None = None) ->
         if daily:
             cfg.stats_sent = now
             cfg.stats_tabs = [t for t in cfg.stats_tabs if t not in tabs]
+            cfg.stats_used = [k for k in cfg.stats_used if k not in feats]
+            cfg.stats_plays = plays
         del _pending[:taken]
         cfg.stats_problems_seen = max(cfg.stats_problems_seen, newest)
         if saved is not None:
             saved()
     threading.Thread(target=run, daemon=True, name="usage-count").start()
+
+
+def step(cfg, name: str, saved=None) -> None:
+    """A new install's first time doing `name` (one of STEPS): sent right away, once.
+    A copy counted before these existed never sends them (settle)."""
+    if name not in STEPS or not enabled() or not net.allowed(FEATURE):
+        return
+    settle(cfg, time.time())
+    if name in cfg.stats_steps:
+        return
+    cfg.stats_steps = [*cfg.stats_steps, name]
+    maybe_send(cfg, saved, event=f"step/{name}")
 
 
 def send_now(cfg, event: str) -> bool:

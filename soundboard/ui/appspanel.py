@@ -31,7 +31,7 @@ from PySide6.QtWidgets import (QCheckBox, QComboBox, QFileIconProvider, QFrame, 
                                QLayout, QPushButton, QScrollArea, QSizePolicy, QSlider,
                                QVBoxLayout, QWidget)
 
-from soundboard import appaudio, errors, library, theme, trash
+from soundboard import appaudio, errors, library, theme, trash, usage
 from soundboard.clipedit import LiveBuffer
 from soundboard.engine import SR
 from soundboard.i18n import _
@@ -1078,6 +1078,7 @@ class AppsTab(QWidget):
         if row.app is None and not self._has_take(row):
             row.set_clip_open(False)
             return
+        usage.used("clip-editor")   # the name only (usage.py)
         if row.editor is None:
             row.editor = ClipEditor(self.engine, self.cfg, row)
             row.editor.save_clip.connect(lambda data, whole, r=row: self._save_edit(r, data, whole))

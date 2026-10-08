@@ -25,7 +25,7 @@ from shiboken6 import isValid as qt_valid
 from soundboard import applog
 from soundboard import modules as mods
 from soundboard import voicefx
-from soundboard import langnames, library, net, netlog, savedvoices, theme
+from soundboard import langnames, library, net, netlog, savedvoices, theme, usage
 from soundboard.speech import customvoices, translation, tts, winvoices
 from soundboard.speech.aivoice import AiVoiceController
 from soundboard.speech.live import SpeechController, clean_settings
@@ -1834,6 +1834,7 @@ class SpeechPanel(QWidget):
     def _say(self):
         text = self.ed.text().strip()
         if text:
+            usage.used("text-to-speech")   # the name only (usage.py)
             self.ctl.say(text)
             self._log_said(text)
             self._last_said = text
