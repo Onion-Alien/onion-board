@@ -452,6 +452,11 @@ def test_sounds_tab_lights_up_while_a_sound_plays(window, monkeypatch):
     playing["__test__"] = (0.1, False)           # the mic test's playback isn't a sound
     window.tick()
     assert not is_tab_live(tabs, i) and not tabs.tabToolTip(i).startswith("●")
+    from soundboard.ui.linkbar import PLAY_ID   # a web search's Play lights it too
+    playing.clear()
+    playing[PLAY_ID] = (0.1, False)
+    window.tick()
+    assert is_tab_live(tabs, i)
 
 
 def test_radio_and_apps_light_their_tabs_while_they_send_sound(window):
