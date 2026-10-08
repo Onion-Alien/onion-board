@@ -495,3 +495,24 @@ def test_cable_instead_doesnt_reinstall_a_cable_that_is_there(mic_wizard, monkey
     wiz.go(2)
     wiz.install_cable()
     assert w.cfg.route == "cable" and wiz._proc is None
+
+
+def test_a_mic_set_up_finishing_after_the_guide_closed_is_ignored(qapp, app_dir, devices,
+                                                                 monkeypatch):
+    # The set-up runs on a thread; when it finished after the guide was closed and freed,
+    # the guide's handler still ran and touched its deleted buttons (RuntimeError).
+    from PySide6.QtCore import QEvent
+    w = main.MainWindow()
+    wiz = setupwizard.SetupWizard(w)
+    wiz.done(0)
+    wiz.deleteLater()
+    qapp.sendPostedEvents(None, QEvent.DeferredDelete)
+    calls = []
+    monkeypatch.setattr(setupwizard.SetupWizard, "recheck_cable",
+                        lambda self, rescan=True: calls.append(rescan))
+    w.mic_attached.emit("My mic", "")
+    assert calls == []
+    w._load_thread.join(15)
+    w.close()
+    w.deleteLater()
+    qapp.sendPostedEvents(None, QEvent.DeferredDelete)
