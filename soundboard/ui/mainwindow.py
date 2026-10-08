@@ -28,6 +28,7 @@ from soundboard import engine as eng
 from soundboard import theme, winkeys, ytdl
 from soundboard.engine import SR, Engine
 from soundboard.engine import is_virtual as is_virtual_cable
+from soundboard import exitwatch
 from soundboard import (appaudio, autostart, backup, catswitch, destination, library, midi,
                         remote, otherboards, soundfx, thumbs, trash, updates, videos, voicesdk)
 from soundboard import (directmic, discordcfg, net, netlog, profiles, quality, rawmic, shellicon,
@@ -5697,6 +5698,7 @@ class MainWindow(QMainWindow):
 
     def _mark_stopped(self):
         usage.mark_stopped(library.APP_DIR)
+        exitwatch.stopped()
 
     def _count_tab(self, i: int):
         if 0 <= i < len(TABS):
@@ -6713,6 +6715,7 @@ class MainWindow(QMainWindow):
         if self._shut_down:
             return
         self._shut_down = True
+        exitwatch.quitting()   # a run that dies from here on died closing (exitwatch.py)
         for step in (self._finish_removals, self.timer.stop, self._voice_timer.stop,
                      self._release_ptt,
                      self._stop_capture, self.cfg.save, self.overlay.shutdown,

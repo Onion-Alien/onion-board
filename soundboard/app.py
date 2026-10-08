@@ -461,7 +461,21 @@ def main():
     # calls closeEvent: still let go of push-to-talk and save the settings
     app.aboutToQuit.connect(w.shutdown)
     from soundboard import usage
-    usage.note(usage.mark_running(APP_DIR))   # the last run ended without closing itself?
+    from soundboard import exitwatch
+    last_run = exitwatch.read_last(APP_DIR)   # before this run's black box replaces it
+    unclean = usage.mark_running(APP_DIR)   # the last run ended without closing itself?
+    if unclean:   # work out why (Windows' log, the native-crash stacks) off this thread
+        def why(unclean=unclean):
+            try:
+                event, _path = exitwatch.check_last(APP_DIR, *last_run, unclean)
+            except Exception:  # noqa: BLE001 - still count it, without the why
+                log.warning("couldn't tell why the last run ended", exc_info=True)
+                event = unclean
+            usage.note(event)
+        threading.Thread(target=why, daemon=True, name="last-exit").start()
+    import time
+    exitwatch.start(APP_DIR, lambda: time.monotonic() - getattr(  # for the next start
+        getattr(app, "hangwatch", None), "beat", time.monotonic()))
     if (not (TRAY_ARG in sys.argv and w.can_hide())   # started with Windows: tray only
             or app.instance_server.show_requested):    # ...unless launched again since
         w.show()
