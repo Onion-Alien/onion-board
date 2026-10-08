@@ -29,8 +29,11 @@ chunk's starting state as plain matrix products:
 Those matrices are worked out once per filter design (cached), so filtering is a
 handful of BLAS matrix multiplies over all chunks at once. The only part left that
 goes chunk by chunk is the short state vector, and even that is done without a
-loop over chunks: the states form a linear recurrence, which is solved with a
-parallel prefix scan (log2(chunks) steps, each one matrix product over every chunk).
+loop over chunks: the states form a linear recurrence. For an audio block (a few
+chunks) every chunk's starting state is one more product with a matrix made once
+per block size (_Plan.scan: the recurrence unrolled); a long signal (an effect being
+baked into a sound) uses a parallel prefix scan instead (log2(chunks) steps, each
+one matrix product over every chunk).
 
 The state is kept in scipy's own layout (transposed direct form II per biquad), so
 `zi` arrays carry over unchanged and blocks join without a seam.
@@ -111,7 +114,7 @@ class _Plan:
     biquads is badly conditioned (a 60 Hz shelf's poles sit at radius 0.996), and
     rounding A^L to float32 alone would make the filter drift by ~1e-3."""
 
-    __slots__ = ("L", "S", "D", "TT", "OT", "KT", "ApowT", "_squares")
+    __slots__ = ("L", "S", "D", "TT", "OT", "KT", "ApowT", "_squares", "_scans")
 
     def __init__(self, systems, dtype):
         s = len(systems[0][1])
@@ -128,6 +131,7 @@ class _Plan:
         self.KT = np.ascontiguousarray(np.stack(k), dtype)                     # (F, L, S)
         self.ApowT = np.ascontiguousarray(np.stack(apow).transpose(0, 1, 3, 2))
         self._squares: dict[int, list[np.ndarray]] = {}
+        self._scans: dict[tuple[int, int], tuple] = {}
 
     @staticmethod
     def _blocks(ss, L):
@@ -159,6 +163,47 @@ class _Plan:
             self._squares[r] = sq
         return sq[i]
 
+    # Audio blocks (a few chunks) take the one-product path below; past this many
+    # chunks (a whole song being rendered) the prefix scan is better: its log2(chunks)
+    # steps are each one big product, while the block matrix grows with chunks².
+    SCAN_MAX = 32
+
+    def scan(self, r: int, full: int) -> tuple:
+        """The matrices for a block of `full` chunks of r samples, built on first use:
+        (K, T, O, G, H) with, writing P = (A^r)^T and u_i = chunk i's input through K,
+            [start of chunk 0 | ... | start of chunk full-1 | state after the block]
+              = [u_0 | ... | u_{full-1}] @ G  +  s_0 @ H
+        (G's block (i, j) is P^(j-1-i) for i < j; H's block j is P^j). So every
+        chunk's starting state comes from one matrix product instead of a prefix scan
+        over the chunks: three batched products and a copy, each a few microseconds
+        of numpy on the audio thread for a few hundred flops. K, T and O are this
+        block size's contiguous slices of KT, TT and OT, so BLAS never copies them.
+        For a plan of one filter they're 2-D (a plain BLAS call, no batch loop).
+        Thread-safe: built aside and swapped in whole (the main output and the send
+        device run the same plan on two audio threads)."""
+        got = self._scans.get((r, full))
+        if got is not None:
+            return got
+        S, L, F = self.S, self.L, len(self.D)
+        p = self.ApowT[:, r]                                     # (F, S, S)
+        pw = [np.broadcast_to(np.eye(S), (F, S, S))]
+        for _ in range(full):
+            pw.append(pw[-1] @ p)
+        g = np.zeros((F, full * S, (full + 1) * S))
+        h = np.empty((F, S, (full + 1) * S))
+        for j in range(full + 1):
+            h[:, :, j * S:(j + 1) * S] = pw[j]
+            for i in range(j):
+                g[:, i * S:(i + 1) * S, j * S:(j + 1) * S] = pw[j - 1 - i]
+        mats = (self.KT[:, L - r:], self.TT[:, :r, :r], self.OT[:, :, :r], g, h)
+        if F == 1:
+            mats = tuple(a[0] for a in mats)
+        got = tuple(np.ascontiguousarray(a) for a in mats)
+        if len(self._scans) > 64:   # block sizes change with the device: a bounded cache
+            self._scans = {}
+        self._scans[(r, full)] = got
+        return got
+
     def run(self, x: np.ndarray, s: np.ndarray):
         """x (M, n) contiguous in this plan's dtype, the input of every filter in the
         bank; state s (F, M, S) float64 -> (y (F, M, n), new state)."""
@@ -173,21 +218,37 @@ class _Plan:
         full = n // r
         y = np.empty((F, m, n), x.dtype)
         xc = x[:, :full * r].reshape(m * full, r)           # one row per chunk
-        u = (xc @ self.KT[:, L - r:]).astype(np.float64).reshape(F, m, full, S)
-        u[:, :, 0] += s @ self.ApowT[:, r]
-        # prefix scan: u[j] <- sum_{i<=j} (A^r)^(j-i) u[i] = the state after chunk j
-        k, i = 1, 0
-        while k < full:
-            u[:, :, k:] += u[:, :, :-k] @ self.square(r, i)[:, None]
-            k *= 2
-            i += 1
-        starts = np.empty_like(u)
-        starts[:, :, 0] = s
-        starts[:, :, 1:] = u[:, :, :-1]
-        yc = xc @ self.TT[:, :r, :r]                        # (F, chunks, r)
-        yc += starts.reshape(F, m * full, S) @ self.OT[:, :, :r]
+        if full <= self.SCAN_MAX:   # an audio block: every chunk's start in one product
+            kt, tt, ot, g, h = self.scan(r, full)
+            u = (xc @ kt).astype(np.float64, copy=False)     # (F,) m * full, S
+            if F == 1:
+                states = u.reshape(m, full * S) @ g + s[0] @ h   # (m, (full + 1) * S)
+                starts = states[:, :full * S].reshape(m * full, S)
+                yc = xc @ tt                                 # (m * full, r)
+                yc += starts @ ot
+                s = states[:, full * S:].reshape(1, m, S)
+            else:
+                states = u.reshape(F, m, full * S) @ g + s @ h   # (F, m, (full + 1) * S)
+                starts = states[:, :, :full * S].reshape(F, m * full, S)
+                yc = xc @ tt                                 # (F, m * full, r)
+                yc += starts @ ot
+                s = states[:, :, full * S:]
+        else:   # a long signal (an effect being baked into a sound)
+            u = (xc @ self.KT[:, L - r:]).astype(np.float64).reshape(F, m, full, S)
+            u[:, :, 0] += s @ self.ApowT[:, r]
+            # prefix scan: u[j] <- sum_{i<=j} (A^r)^(j-i) u[i] = the state after chunk j
+            k, i = 1, 0
+            while k < full:
+                u[:, :, k:] += u[:, :, :-k] @ self.square(r, i)[:, None]
+                k *= 2
+                i += 1
+            starts = np.empty_like(u)
+            starts[:, :, 0] = s
+            starts[:, :, 1:] = u[:, :, :-1]
+            yc = xc @ self.TT[:, :r, :r]                    # (F, chunks, r)
+            yc += starts.reshape(F, m * full, S) @ self.OT[:, :, :r]
+            s = u[:, :, -1]
         y[:, :, :full * r] = yc.reshape(F, m, full * r)
-        s = u[:, :, -1]
         rem = n - full * r
         if rem:
             xr = x[:, full * r:]

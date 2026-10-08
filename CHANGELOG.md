@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- **Lighter on the CPU while sounds play.** The filters behind every voice chat mode,
+  the EQ, the live effects and the voice changer do their per-block bookkeeping in one
+  step instead of several, and the mono downmix for voice chat does its sums in bulk:
+  playing a few sounds costs about a sixth less of a core, the live effects about a
+  fifth less. Nothing sounds different.
 - **A hotkey taken off a sound says so.** Giving an app hotkey (Stop everything, the
   overlay, push-to-talk…) a key a pad or category already had takes it off that one,
   as before, but now a message names what lost it, like setting a pad's key already did.
