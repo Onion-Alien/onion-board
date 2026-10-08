@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- **Small tidy-ups:** the ⓘ beside the tabs is on every tab now (a line on what the
+  tab is for), the Apps tab's *Effects* and *Card size* controls wait until a
+  program shows up, and the transport bar's time is blank until a sound is picked.
 - **The Setup tab says the one-time setup once.** Before it's done, the card no
   longer shows two red crosses ("Your mic ✗ off", "Virtual mic ✗ not installed
   yet") over the orange step that explains it; nothing is wrong yet.

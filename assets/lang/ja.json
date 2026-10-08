@@ -2719,5 +2719,11 @@
   "{name} (copy)": "{name} (コピー)",
   "Search settings": "検索設定",
   "Virtual mic  <b style='color:{colour}'>not installed yet</b>": "仮想マイク<b style='color:{colour}'>がまだインストールされていません</b>",
-  "Your mic  <b style='color:{colour}'>after the setup below</b>": "<b style='color:{colour}'>以下のセットアップ後の</b>マイク"
+  "Your mic  <b style='color:{colour}'>after the setup below</b>": "<b style='color:{colour}'>以下のセットアップ後の</b>マイク",
+  "Change your voice live for whoever you send sounds to (pick a voice to turn it on), turn it into someone else's with AI voices, or type a line and a computer voice says it. Hear what they hear at the bottom tries it.": "サウンドを送信する相手に合わせて自分の声をライブで変更したり (声を選択してオンにします)、AI の声で他の人の声に変えたり、セリフを入力するとコンピューターの音声がそれを読み上げたりすることができます。一番下に聞こえるものを聞いて試してみてください。",
+  "Internet radio stations from all over the world. Click a dot on the map or search by name, genre, country or city; it plays in your headphones, and Send puts it out to whoever's listening. Record keeps a bit as a pad.": "世界中のインターネット ラジオ局。地図上の点をクリックするか、名前、ジャンル、国、都市で検索します。それはヘッドフォンで再生され、Send はそれを聞いている人に出力します。記録はパッドとして少しだけ残ります。",
+  "Plays a sound when a picture shows up in your game: a \"YOU DIED\", a rare spawn, a queue popping. It's the Onion Watch add-on; everything happens on your PC and the screen is never saved or sent anywhere.": "ゲーム内に画像が表示されると、「YOU DIED」、レアなスポーン、キューのポップなどのサウンドが再生されます。これは Onion Watch アドオンです。すべてが PC 上で行われ、画面が保存されたり、どこにも送信されたりすることはありません。",
+  "Where your sounds go (straight into your mic, the virtual cable, another device or nobody), your devices, who's listening, the equalizer, and a test that records what goes out and plays it back.": "サウンドがどこに送信されるか (マイク、仮想ケーブル、別のデバイス、または誰もに直接入力されるか)、デバイス、聞いている人、イコライザー、そして出力される内容を記録して再生するテスト。",
+  "Your pads. Add sounds with the button, by dropping files or folders here, or from a web search; double-click (or Enter) plays one, right-click it for its hotkey, effects, categories and picture. The transport bar plays what's picked, and the bottom strip is your mic, what others hear and your headphones.": "あなたのパッド。ボタンを使用してサウンドを追加するか、ここにファイルやフォルダーをドロップするか、Web 検索からサウンドを追加します。ダブルクリック (または Enter) すると再生され、右クリックするとホットキー、効果、カテゴリ、画像が表示されます。トランスポート バーは選択された音を再生し、一番下のストリップはマイク、他の人が聞く音、ヘッドフォンです。",
+  "Your sounds": "あなたのサウンド"
 }

@@ -30,5 +30,9 @@ def test_information_is_centered_on_tabs_and_scoped(window, qapp):  # noqa: F811
     window.tabs.setCurrentWidget(window.triggers)
     qapp.processEvents()
     assert button.isVisible()
-    window.tabs.setCurrentWidget(window.sounds_page)
+    window.tabs.setCurrentWidget(window.sounds_page)   # every tab has a line now
+    qapp.processEvents()
+    assert button.isVisible()
+    del window.tab_info["sounds_page"]
+    window._update_info_btn()
     assert not button.isVisible()
