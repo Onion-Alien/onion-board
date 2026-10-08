@@ -177,7 +177,10 @@ def selftest() -> int:
     os.environ["QT_QPA_PLATFORM"] = "offscreen"
     # scipy.fft: the app itself doesn't use scipy, but Onion Watch's matcher does, and
     # build.ps1 ships only that part of it
-    for mod in ("numpy", "scipy.fft", "sounddevice", "soundfile", "soxr", "yt_dlp"):
+    for mod in ("numpy", "scipy.fft", "sounddevice", "soundfile", "soxr", "yt_dlp",
+                # yt-dlp's browser impersonation (TikTok links): its libcurl DLL loads,
+                # and this yt-dlp accepts that curl_cffi version
+                "curl_cffi.curl", "yt_dlp.networking._curlcffi"):
         __import__(mod)
     from PySide6.QtMultimedia import QMediaPlayer
     _app = QApplication(sys.argv)   # kept until the checks below have run

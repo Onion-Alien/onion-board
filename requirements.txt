@@ -6,3 +6,6 @@ soxr==1.1.0
 scipy==1.18.1
 yt-dlp==2026.8.19
 yt-dlp-ejs==0.8.0
+# TikTok (and some other sites) only answer a real browser: yt-dlp
+# impersonates one with this. Without it TikTok links fail. yt-dlp's tested pin.
+curl_cffi==0.16.0

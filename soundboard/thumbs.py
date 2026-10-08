@@ -41,10 +41,11 @@ def is_image(path: str | Path) -> bool:
 
 
 def find_in(folder: Path) -> Path | None:
-    """The thumbnail yt-dlp wrote into a download folder, if any."""
+    """The thumbnail yt-dlp wrote into a download folder, if any. TikTok's comes as
+    `<id>.image` (its server names no type): Qt reads the JPEG inside all the same."""
     try:
-        return next((p for p in sorted(folder.iterdir()) if p.is_file() and is_image(p)),
-                    None)
+        return next((p for p in sorted(folder.iterdir()) if p.is_file()
+                     and (is_image(p) or p.suffix.lower() == ".image")), None)
     except OSError:
         return None
 
