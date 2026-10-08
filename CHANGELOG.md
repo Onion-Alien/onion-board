@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 1.9.20 — 2026-10-08
 
 - **Sort your pads.** The new button by the search box sorts them *A–Z*, *Newest* or
   *Most played*, or keeps *My order* (the one you drag). Each sound now keeps a play
