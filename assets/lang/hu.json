@@ -2667,5 +2667,7 @@
   "No language matches “{text}”": "Egyetlen nyelv sem felel meg a következőnek: „{text}”",
   "Pick the language Onion Board is shown in": "Válassza ki azt a nyelvet, amelyen a Hagymatábla megjelenik",
   "Search languages": "Nyelvek keresése",
-  "Search languages…": "Nyelvek keresése…"
+  "Search languages…": "Nyelvek keresése…",
+  "One of these apps is using your mic without Onion Board, so it won't hear your sounds: {names}. Look for a \"raw\", \"bypass processing\" or \"studio\" option in its voice settings and turn it off.": "Az egyik ilyen alkalmazás az Onion Board nélkül használja a mikrofont, így nem hallja a hangokat: {names} . Keresse meg a „nyers”, „bypass processing” vagy „studio” opciót a hangbeállításai között, és kapcsolja ki.",
+  "{name} is using your mic without Onion Board, so it won't hear your sounds. Look for a \"raw\", \"bypass processing\" or \"studio\" option in its voice settings and turn it off.": "{name} az Ön mikrofonját Onion Board nélkül használja, így nem fogja hallani a hangjait. Keresse meg a „nyers”, „bypass processing” vagy „studio” opciót a hangbeállításai között, és kapcsolja ki."
 }

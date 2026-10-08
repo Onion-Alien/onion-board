@@ -2721,5 +2721,7 @@
   "No language matches “{text}”": "Ни один язык не соответствует «{text}»",
   "Pick the language Onion Board is shown in": "Выберите язык, на котором отображается Onion Board.",
   "Search languages": "Поиск языков",
-  "Search languages…": "Поиск языков…"
+  "Search languages…": "Поиск языков…",
+  "One of these apps is using your mic without Onion Board, so it won't hear your sounds: {names}. Look for a \"raw\", \"bypass processing\" or \"studio\" option in its voice settings and turn it off.": "Одно из этих приложений использует ваш микрофон без Onion Board, поэтому оно не слышит ваши звуки: {names} . Найдите опцию «сырой», «обход обработки» или «студию» в настройках голоса и отключите ее.",
+  "{name} is using your mic without Onion Board, so it won't hear your sounds. Look for a \"raw\", \"bypass processing\" or \"studio\" option in its voice settings and turn it off.": "{name} использует ваш микрофон без Onion Board, поэтому он не слышит ваши звуки. Найдите опцию «сырой», «обход обработки» или «студию» в настройках голоса и отключите ее."
 }

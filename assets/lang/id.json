@@ -2613,5 +2613,7 @@
   "No language matches “{text}”": "Tidak ada bahasa yang cocok dengan “{text}”",
   "Pick the language Onion Board is shown in": "Pilih bahasa yang digunakan dalam Onion Board",
   "Search languages": "Cari bahasa",
-  "Search languages…": "Cari bahasa…"
+  "Search languages…": "Cari bahasa…",
+  "One of these apps is using your mic without Onion Board, so it won't hear your sounds: {names}. Look for a \"raw\", \"bypass processing\" or \"studio\" option in its voice settings and turn it off.": "Salah satu aplikasi ini menggunakan mikrofon Anda tanpa Onion Board, sehingga tidak akan mendengar suara Anda: {names} . Cari opsi \"mentah\", \"bypass pemrosesan\" atau \"studio\" di pengaturan suaranya dan matikan.",
+  "{name} is using your mic without Onion Board, so it won't hear your sounds. Look for a \"raw\", \"bypass processing\" or \"studio\" option in its voice settings and turn it off.": "{name} menggunakan mikrofon Anda tanpa Onion Board, sehingga tidak akan mendengar suara Anda. Cari opsi \"mentah\", \"bypass pemrosesan\" atau \"studio\" di pengaturan suaranya dan matikan."
 }

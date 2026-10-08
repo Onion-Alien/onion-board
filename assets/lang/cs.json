@@ -2721,5 +2721,7 @@
   "No language matches “{text}”": "Žádný jazyk neodpovídá „{text}“",
   "Pick the language Onion Board is shown in": "Vyberte jazyk, ve kterém je zobrazena Onion Board",
   "Search languages": "Hledat jazyky",
-  "Search languages…": "Hledat jazyky…"
+  "Search languages…": "Hledat jazyky…",
+  "One of these apps is using your mic without Onion Board, so it won't hear your sounds: {names}. Look for a \"raw\", \"bypass processing\" or \"studio\" option in its voice settings and turn it off.": "Jedna z těchto aplikací používá váš mikrofon bez Onion Board, takže neuslyší vaše zvuky: {names} . V nastavení hlasu vyhledejte možnost „raw“, „bypass processing“ nebo „studio“ a vypněte ji.",
+  "{name} is using your mic without Onion Board, so it won't hear your sounds. Look for a \"raw\", \"bypass processing\" or \"studio\" option in its voice settings and turn it off.": "{name} používá váš mikrofon bez Onion Board, takže neslyší vaše zvuky. V nastavení hlasu vyhledejte možnost „raw“, „bypass processing“ nebo „studio“ a vypněte ji."
 }

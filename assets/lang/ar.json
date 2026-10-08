@@ -2883,5 +2883,7 @@
   "No language matches “{text}”": "لا توجد لغة تطابق \"{text}\"",
   "Pick the language Onion Board is shown in": "اختر اللغة التي تظهر بها Onion Board",
   "Search languages": "لغات البحث",
-  "Search languages…": "بحث في اللغات..."
+  "Search languages…": "بحث في اللغات...",
+  "One of these apps is using your mic without Onion Board, so it won't hear your sounds: {names}. Look for a \"raw\", \"bypass processing\" or \"studio\" option in its voice settings and turn it off.": "أحد هذه التطبيقات يستخدم الميكروفون الخاص بك بدون Onion Board، لذلك لن يسمع أصواتك: {names} . ابحث عن خيار \"الخام\" أو \"تجاوز المعالجة\" أو \"الاستوديو\" في إعدادات الصوت الخاصة به وقم بإيقاف تشغيله.",
+  "{name} is using your mic without Onion Board, so it won't hear your sounds. Look for a \"raw\", \"bypass processing\" or \"studio\" option in its voice settings and turn it off.": "يستخدم {name} الميكروفون بدون Onion Board، لذا لن يسمع أصواتك. ابحث عن خيار \"الخام\" أو \"تجاوز المعالجة\" أو \"الاستوديو\" في إعدادات الصوت الخاصة به وقم بإيقاف تشغيله."
 }

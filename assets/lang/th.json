@@ -2613,5 +2613,7 @@
   "No language matches “{text}”": "ไม่มีภาษาที่ตรงกับ “{text}”",
   "Pick the language Onion Board is shown in": "เลือกภาษาที่ Onion Board จะแสดงขึ้นมา",
   "Search languages": "ค้นหาภาษา",
-  "Search languages…": "ค้นหาภาษา..."
+  "Search languages…": "ค้นหาภาษา...",
+  "One of these apps is using your mic without Onion Board, so it won't hear your sounds: {names}. Look for a \"raw\", \"bypass processing\" or \"studio\" option in its voice settings and turn it off.": "แอปหนึ่งใช้ไมโครโฟนของคุณโดยไม่มี Onion Board ดังนั้นแอปจะไม่ได้ยินเสียงของคุณ: {names} มองหาตัวเลือก \"ดิบ\", \"บายพาสการประมวลผล\" หรือ \"สตูดิโอ\" ในการตั้งค่าเสียงแล้วปิด",
+  "{name} is using your mic without Onion Board, so it won't hear your sounds. Look for a \"raw\", \"bypass processing\" or \"studio\" option in its voice settings and turn it off.": "{name} กำลังใช้ไมโครโฟนของคุณโดยไม่มี Onion Board ดังนั้นมันจะไม่ได้ยินเสียงของคุณ มองหาตัวเลือก \"ดิบ\", \"บายพาสการประมวลผล\" หรือ \"สตูดิโอ\" ในการตั้งค่าเสียงแล้วปิด"
 }

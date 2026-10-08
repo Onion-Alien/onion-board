@@ -2667,5 +2667,7 @@
   "No language matches “{text}”": "Καμία γλώσσα δεν ταιριάζει με το \"{text}\"",
   "Pick the language Onion Board is shown in": "Επιλέξτε τη γλώσσα στην οποία εμφανίζεται το Onion Board",
   "Search languages": "Αναζήτηση γλωσσών",
-  "Search languages…": "Αναζήτηση γλωσσών…"
+  "Search languages…": "Αναζήτηση γλωσσών…",
+  "One of these apps is using your mic without Onion Board, so it won't hear your sounds: {names}. Look for a \"raw\", \"bypass processing\" or \"studio\" option in its voice settings and turn it off.": "Μία από αυτές τις εφαρμογές χρησιμοποιεί το μικρόφωνό σας χωρίς Onion Board, επομένως δεν θα ακούει τους ήχους σας: {names} . Αναζητήστε μια επιλογή \"ακατέργαστη\", \"παράκαμψη επεξεργασίας\" ή \"στούντιο\" στις ρυθμίσεις φωνής και απενεργοποιήστε την.",
+  "{name} is using your mic without Onion Board, so it won't hear your sounds. Look for a \"raw\", \"bypass processing\" or \"studio\" option in its voice settings and turn it off.": "{name} χρησιμοποιεί το μικρόφωνό σας χωρίς Onion Board, επομένως δεν θα ακούει τους ήχους σας. Αναζητήστε μια επιλογή \"ακατέργαστη\", \"παράκαμψη επεξεργασίας\" ή \"στούντιο\" στις ρυθμίσεις φωνής και απενεργοποιήστε την."
 }

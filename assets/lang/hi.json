@@ -2667,5 +2667,7 @@
   "No language matches “{text}”": "कोई भी भाषा \"{text}\" से मेल नहीं खाती",
   "Pick the language Onion Board is shown in": "वह भाषा चुनें जिसमें ओनियन बोर्ड दिखाया गया है",
   "Search languages": "भाषाएँ खोजें",
-  "Search languages…": "भाषाएँ खोजें..."
+  "Search languages…": "भाषाएँ खोजें...",
+  "One of these apps is using your mic without Onion Board, so it won't hear your sounds: {names}. Look for a \"raw\", \"bypass processing\" or \"studio\" option in its voice settings and turn it off.": "इनमें से एक ऐप बिना ओनियन बोर्ड के आपके माइक का उपयोग कर रहा है, इसलिए यह आपकी आवाज़ नहीं सुनेगा: {names} । इसकी वॉयस सेटिंग में \"रॉ\", \"बायपास प्रोसेसिंग\" या \"स्टूडियो\" विकल्प देखें और इसे बंद कर दें।",
+  "{name} is using your mic without Onion Board, so it won't hear your sounds. Look for a \"raw\", \"bypass processing\" or \"studio\" option in its voice settings and turn it off.": "{name} आपके माइक का उपयोग बिना ओनियन बोर्ड के कर रहा है, इसलिए यह आपकी आवाज़ नहीं सुनेगा। इसकी वॉयस सेटिंग में \"रॉ\", \"बायपास प्रोसेसिंग\" या \"स्टूडियो\" विकल्प देखें और इसे बंद कर दें।"
 }

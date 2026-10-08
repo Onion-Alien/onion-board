@@ -2613,5 +2613,7 @@
   "No language matches “{text}”": "「{text}」に一致する言語はありません",
   "Pick the language Onion Board is shown in": "Onion Board が表示される言語を選択してください",
   "Search languages": "検索言語",
-  "Search languages…": "言語を検索…"
+  "Search languages…": "言語を検索…",
+  "One of these apps is using your mic without Onion Board, so it won't hear your sounds: {names}. Look for a \"raw\", \"bypass processing\" or \"studio\" option in its voice settings and turn it off.": "これらのアプリの 1 つは、Onion Board なしでマイクを使用しているため、音声が聞こえません: {names} 。音声設定で「raw」、「バイパス処理」、または「スタジオ」オプションを探してオフにします。",
+  "{name} is using your mic without Onion Board, so it won't hear your sounds. Look for a \"raw\", \"bypass processing\" or \"studio\" option in its voice settings and turn it off.": "{name}は Onion Board なしであなたのマイクを使用しているため、あなたの音は聞こえません。音声設定で「raw」、「バイパス処理」、または「スタジオ」オプションを探してオフにします。"
 }

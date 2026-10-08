@@ -2667,5 +2667,7 @@
   "No language matches “{text}”": "Walang tugmang wika sa “{text}”",
   "Pick the language Onion Board is shown in": "Piliin ang wika kung saan ipinapakita ang Onion Board",
   "Search languages": "Maghanap ng mga wika",
-  "Search languages…": "Maghanap ng mga wika..."
+  "Search languages…": "Maghanap ng mga wika...",
+  "One of these apps is using your mic without Onion Board, so it won't hear your sounds: {names}. Look for a \"raw\", \"bypass processing\" or \"studio\" option in its voice settings and turn it off.": "Ginagamit ng isa sa mga app na ito ang iyong mikropono nang walang Onion Board, kaya hindi nito maririnig ang iyong mga tunog: {names} . Maghanap ng opsyong \"raw\", \"bypass processing\" o \"studio\" sa mga setting ng boses nito at i-off ito.",
+  "{name} is using your mic without Onion Board, so it won't hear your sounds. Look for a \"raw\", \"bypass processing\" or \"studio\" option in its voice settings and turn it off.": "Ginagamit ni {name} ang iyong mikropono nang walang Onion Board, kaya hindi nito maririnig ang iyong mga tunog. Maghanap ng opsyong \"raw\", \"bypass processing\" o \"studio\" sa mga setting ng boses nito at i-off ito."
 }

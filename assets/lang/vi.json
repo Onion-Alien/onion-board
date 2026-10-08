@@ -2613,5 +2613,7 @@
   "No language matches “{text}”": "Không có ngôn ngữ nào khớp với “{text}”",
   "Pick the language Onion Board is shown in": "Chọn ngôn ngữ Onion Board được hiển thị trong",
   "Search languages": "Tìm kiếm ngôn ngữ",
-  "Search languages…": "Tìm kiếm ngôn ngữ…"
+  "Search languages…": "Tìm kiếm ngôn ngữ…",
+  "One of these apps is using your mic without Onion Board, so it won't hear your sounds: {names}. Look for a \"raw\", \"bypass processing\" or \"studio\" option in its voice settings and turn it off.": "Một trong những ứng dụng này đang sử dụng micrô của bạn mà không có Onion Board, vì vậy ứng dụng này sẽ không nghe thấy âm thanh của bạn: {names} . Tìm tùy chọn \"thô\", \"xử lý bỏ qua\" hoặc \"studio\" trong cài đặt giọng nói của nó và tắt nó đi.",
+  "{name} is using your mic without Onion Board, so it won't hear your sounds. Look for a \"raw\", \"bypass processing\" or \"studio\" option in its voice settings and turn it off.": "{name} đang sử dụng micrô của bạn mà không có Onion Board nên micrô sẽ không nghe thấy âm thanh của bạn. Tìm tùy chọn \"thô\", \"xử lý bỏ qua\" hoặc \"studio\" trong cài đặt giọng nói của nó và tắt nó đi."
 }

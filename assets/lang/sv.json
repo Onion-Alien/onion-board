@@ -2667,5 +2667,7 @@
   "No language matches “{text}”": "Inget språk matchar \"{text}\"",
   "Pick the language Onion Board is shown in": "Välj språket Onion Board visas på",
   "Search languages": "Sök efter språk",
-  "Search languages…": "Sök efter språk..."
+  "Search languages…": "Sök efter språk...",
+  "One of these apps is using your mic without Onion Board, so it won't hear your sounds: {names}. Look for a \"raw\", \"bypass processing\" or \"studio\" option in its voice settings and turn it off.": "En av dessa appar använder din mikrofon utan Onion Board, så den hör inte dina ljud: {names} . Leta efter ett \"rå\", \"bypass processing\" eller \"studio\" alternativ i röstinställningarna och stäng av det.",
+  "{name} is using your mic without Onion Board, so it won't hear your sounds. Look for a \"raw\", \"bypass processing\" or \"studio\" option in its voice settings and turn it off.": "{name} använder din mikrofon utan Onion Board, så den hör inte dina ljud. Leta efter ett \"rå\", \"bypass processing\" eller \"studio\" alternativ i röstinställningarna och stäng av det."
 }
