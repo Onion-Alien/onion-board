@@ -5,7 +5,7 @@ import pytest
 
 from PySide6.QtCore import QEvent, QObject
 from PySide6.QtGui import QColor
-from PySide6.QtWidgets import QApplication, QLabel, QPushButton, QScrollArea
+from PySide6.QtWidgets import QApplication, QFrame, QLabel, QPushButton, QScrollArea
 
 from conftest import process_events
 from soundboard import net
@@ -476,3 +476,28 @@ def test_a_board_reopened_shows_the_picked_language_on_the_button(window):  # no
     d = SettingsDialog(window, "appearance")
     assert d.lang_button.text().startswith("日本語") and d.lang_restart.isVisibleTo(d)
     d.close()
+
+
+def test_search_hides_cards_and_pages_without_the_word(window, qapp):  # noqa: F811
+    """Typing in the search box keeps only the cards with the word, hides the pages
+    with none left, lands on the first page with one, and clearing brings it all back."""
+    d = SettingsDialog(window, "privacy", lazy=True)
+    try:
+        d.search_box.setText("tray")
+        d._apply_search("tray")
+        shown = [d.categories.item(i).text() for i in range(d.categories.count())
+                 if not d.categories.item(i).isHidden()]
+        assert "General" in shown and "Hotkeys" not in shown
+        assert d._page_keys[d.tabs.currentIndex()] == "general"
+        page = d.tabs.currentWidget().widget()
+        cards = page.findChildren(QFrame, "setcard")
+        visible = [c for c in cards if not c.isHidden()]
+        assert visible and len(visible) < len(cards)
+        assert all("tray" in d._words_of(c) for c in visible)
+        d._apply_search("")
+        assert all(not c.isHidden() for c in cards)
+        assert all(not d.categories.item(i).isHidden() for i in range(d.categories.count()))
+        d._apply_search("no such words here")
+        assert all(d.categories.item(i).isHidden() for i in range(d.categories.count()))
+    finally:
+        d.close()

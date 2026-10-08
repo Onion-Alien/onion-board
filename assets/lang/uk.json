@@ -2837,5 +2837,6 @@
   "Just the name (F2 on the pad does it too)": "Лише назва (клавіша F2 на панелі також робить це)",
   "Show the file in its folder": "Показати файл у його папці",
   "The file for “{name}” isn't there any more": "Файл для “ {name} ” більше не існує",
-  "{name} (copy)": "{name} (копія)"
+  "{name} (copy)": "{name} (копія)",
+  "Search settings": "Налаштування пошуку"
 }

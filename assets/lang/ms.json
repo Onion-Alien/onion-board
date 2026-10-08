@@ -2717,5 +2717,6 @@
   "Just the name (F2 on the pad does it too)": "Hanya nama (F2 pada pad juga melakukannya)",
   "Show the file in its folder": "Tunjukkan fail dalam foldernya",
   "The file for “{name}” isn't there any more": "Fail untuk “ {name} ” tiada lagi",
-  "{name} (copy)": "{name} (salinan)"
+  "{name} (copy)": "{name} (salinan)",
+  "Search settings": "Tetapan carian"
 }

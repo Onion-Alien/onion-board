@@ -2837,5 +2837,6 @@
   "Just the name (F2 on the pad does it too)": "Tylko nazwa (F2 na padzie też to robi)",
   "Show the file in its folder": "Pokaż plik w jego folderze",
   "The file for “{name}” isn't there any more": "Pliku „ {name} ” już nie ma",
-  "{name} (copy)": "{name} (kopia)"
+  "{name} (copy)": "{name} (kopia)",
+  "Search settings": "Ustawienia wyszukiwania"
 }

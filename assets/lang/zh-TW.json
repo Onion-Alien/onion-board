@@ -2717,5 +2717,6 @@
   "Just the name (F2 on the pad does it too)": "只是名稱（鍵盤上的 F2 也可以）",
   "Show the file in its folder": "顯示其資料夾中的文件",
   "The file for “{name}” isn't there any more": "「 {name} 」的檔案不再存在",
-  "{name} (copy)": "{name} （副本）"
+  "{name} (copy)": "{name} （副本）",
+  "Search settings": "搜尋設定"
 }
