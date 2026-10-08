@@ -1,7 +1,31 @@
 # Changelog
 
-## Unreleased
+## 1.9.9 — 2026-10-08
 
+- **Pick your language.** *Settings → Appearance → Language* opens a window of
+  languages, each in its own name, with a search. Every text in the app now comes in
+  all 32 languages (machine-translated where no one has yet, so expect a few odd
+  words). Windows set to one of them gets a one-time offer to switch; the app doesn't
+  switch by itself.
+- **Says when an app skips your sounds.** With *Straight into my mic*, an app that
+  opens the mic in "raw" mode (bypassing Windows' sound effects) gets none of your
+  sounds. The warning bar now names the app, so you know which one to fix.
+- **Stream output is a row under *Also send to*.** Pick *Clean, for streaming* on a
+  row to get the old Stream output (OBS) mix, with its volume and *Include my voice*
+  under it. Your stream setting carries over.
+- **Faster theme switch.** Switching theme in Settings no longer freezes the window
+  for seconds.
+- Setting up *Straight into my mic* no longer flashes an "Audio device problem — mon"
+  error while Windows' audio restarts on purpose.
+- **Triggers tab: Onion Watch 0.9.3.** A trigger's *Test* now shows in *Playing now*
+  with its own stop, and its button says *Stop* while it plays. The Triggers tab is
+  in your language too.
+- Fewer hover tips that only repeated a button's name; dropdowns lose the empty gap
+  before their arrow.
+- Small fixes: the header logo restarts after restoring a minimised window, the Radio
+  map shows country names before the station dots, the clip editor's "Listening…"
+  fits small cards, and the radio's empty-clip messages say "on the radio".
+- Old add-on copies left over from updates are cleaned up at start-up.
 - **No more freezes when a headset drops out.** Unplugging a headset, Bluetooth
   cutting out or the PC waking from sleep could freeze the window for seconds while
   the app reopened the device. That now happens in the background, and so do
