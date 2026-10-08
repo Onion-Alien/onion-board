@@ -445,53 +445,58 @@ class FlatMap(QWidget):
         # grid laid over the map
         yield from _fill(p, world.intersected(rect), _mix(t["bg"], t["accent"], 0.06))
         p.save()
-        p.setClipRect(world.intersected(rect))
-        if self._land:
-            seen = tr.inverted()[0].mapRect(rect.adjusted(-2, -2, 2, 2))   # in degrees
-            p.save()
-            p.setTransform(tr, True)
-            p.setPen(QPen(_mix(t["bg"], t["text"], 0.3), 0.8 / s))
-            p.setBrush(_mix(t["bg"], t["text"], 0.14))
-            for part, box in zip(self._land, self._land_box):
-                if box.intersects(seen):   # a tile: just the land on it
-                    p.drawPath(part)
-                    yield
+        # try/finally: a tile dropped half-drawn (_drop_build closes this generator at a
+        # yield) must leave its painter balanced, or ending it warns about saved states
+        try:
+            p.setClipRect(world.intersected(rect))
+            if self._land:
+                seen = tr.inverted()[0].mapRect(rect.adjusted(-2, -2, 2, 2))   # in degrees
+                p.save()
+                try:
+                    p.setTransform(tr, True)
+                    p.setPen(QPen(_mix(t["bg"], t["text"], 0.3), 0.8 / s))
+                    p.setBrush(_mix(t["bg"], t["text"], 0.14))
+                    for part, box in zip(self._land, self._land_box):
+                        if box.intersects(seen):   # a tile: just the land on it
+                            p.drawPath(part)
+                            yield
+                finally:
+                    p.restore()
+            if land_only:
+                return
+            if len(self._points):
+                o = tr.map(QPointF(0, 0))
+                dx, dy = self._spread()
+                xs, ys = o.x() + self._lon * s + dx, o.y() - self._lat * s + dy
+                on = ((xs > rect.left() - 8) & (xs < rect.right() + 8)
+                      & (ys > rect.top() - 8) & (ys < rect.bottom() + 8))
+                accent = QColor(t["accent"])
+                accent.setAlphaF(0.85)
+                p.setPen(Qt.NoPen)
+                p.setBrush(accent)
+                grow = self._grow()
+                for k, i in enumerate(np.flatnonzero(on), 1):
+                    r = self._r[i] * grow
+                    p.drawEllipse(QPointF(xs[i], ys[i]), r, r)
+                    if k % 200 == 0:
+                        yield
+            # country names last, outlined in the land's colour, so the dots don't hide them
+            font, colour = self._label_style()
+            fm = QFontMetricsF(font)
+            halo = QPen(_mix(t["bg"], t["text"], 0.14), 3)
+            halo.setJoinStyle(Qt.RoundJoin)
+            corner = tr.map(QPointF(-180, -LAT_TOP))
+            for box, name in self._place_labels(s):
+                box = box.translated(corner)
+                if not box.adjusted(-3, -3, 3, 3).intersects(rect):
+                    continue
+                path = QPainterPath()
+                path.addText(box.left(), box.top() + fm.ascent(), font, name)
+                p.strokePath(path, halo)
+                p.fillPath(path, colour)
+                yield
+        finally:
             p.restore()
-        if land_only:
-            p.restore()
-            return
-        if len(self._points):
-            o = tr.map(QPointF(0, 0))
-            dx, dy = self._spread()
-            xs, ys = o.x() + self._lon * s + dx, o.y() - self._lat * s + dy
-            on = ((xs > rect.left() - 8) & (xs < rect.right() + 8)
-                  & (ys > rect.top() - 8) & (ys < rect.bottom() + 8))
-            accent = QColor(t["accent"])
-            accent.setAlphaF(0.85)
-            p.setPen(Qt.NoPen)
-            p.setBrush(accent)
-            grow = self._grow()
-            for k, i in enumerate(np.flatnonzero(on), 1):
-                r = self._r[i] * grow
-                p.drawEllipse(QPointF(xs[i], ys[i]), r, r)
-                if k % 200 == 0:
-                    yield
-        # country names last, outlined in the land's colour, so the dots don't hide them
-        font, colour = self._label_style()
-        fm = QFontMetricsF(font)
-        halo = QPen(_mix(t["bg"], t["text"], 0.14), 3)
-        halo.setJoinStyle(Qt.RoundJoin)
-        corner = tr.map(QPointF(-180, -LAT_TOP))
-        for box, name in self._place_labels(s):
-            box = box.translated(corner)
-            if not box.adjusted(-3, -3, 3, 3).intersects(rect):
-                continue
-            path = QPainterPath()
-            path.addText(box.left(), box.top() + fm.ascent(), font, name)
-            p.strokePath(path, halo)
-            p.fillPath(path, colour)
-            yield
-        p.restore()
 
     def _label_style(self) -> tuple[QFont, QColor]:
         font = QFont(self.font())

@@ -137,6 +137,30 @@ def test_flat_map_fills_its_area_and_wraps_round_the_world(qapp):
     assert m.cx == -170.0
 
 
+def test_a_tile_dropped_half_drawn_leaves_its_painter_balanced(qapp):
+    """Switching stations / zooming drops a tile mid-draw (_drop_build closes its steps
+    at a yield): the painter was ended with its save()s still open, and Qt warned
+    "QPainter::end: Painter ended with 2 saved states"."""
+    from PySide6.QtCore import qInstallMessageHandler
+    from soundboard.ui.flatmap import FlatMap
+    m = FlatMap()
+    m.resize(800, 600)
+    m.set_land([[(x, 0), (x + 5, 0), (x + 5, 5)] for x in range(-170, 170, 10)])
+    warned = []
+    old = qInstallMessageHandler(lambda _kind, _ctx, msg: warned.append(msg))
+    try:
+        total = sum(1 for _ in m._tile_steps(m._level(), 0, 0)[1])
+        assert total >= 2
+        for steps_in in range(1, total + 1):   # dropped at every step it can stop at
+            _pm, steps = m._tile_steps(m._level(), 0, 0)
+            for _ in range(steps_in):
+                next(steps, None)
+            steps.close()
+    finally:
+        qInstallMessageHandler(old)
+    assert not [w for w in warned if "saved states" in w], warned
+
+
 def test_flat_map_hovers_clicks_and_follows_the_playing_station(qapp):
     from PySide6.QtCore import QPointF, Qt
     from PySide6.QtGui import QMouseEvent
