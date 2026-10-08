@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- **Mid-size windows keep the words that matter.** The *Listening* dropdown no longer
+  stands alone as a bare “Clean” (its label goes with it), and *Record* keeps its word
+  instead of becoming a lone red dot, until the window is really small.
 - **A hotkey taken off a sound says so.** Giving an app hotkey (Stop everything, the
   overlay, push-to-talk…) a key a pad or category already had takes it off that one,
   as before, but now a message names what lost it, like setting a pad's key already did.
