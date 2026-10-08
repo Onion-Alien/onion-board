@@ -181,18 +181,27 @@ def new_ring_bytes() -> bytes:
     return head.tobytes() + bytes(FILE_BYTES - HEAD.itemsize)
 
 
+def make_ring_ok(path: Path) -> bool:
+    """The ring file at `path` is there and this version's layout."""
+    try:
+        if not (path.is_file() and path.stat().st_size == FILE_BYTES):
+            return False
+        with open(path, "rb") as f:
+            head = np.frombuffer(f.read(HEAD.itemsize), HEAD)[0]
+    except (OSError, ValueError):
+        return False
+    return bool(head["magic"] == MAGIC and head["version"] == VERSION
+                and head["capacity"] == CAPACITY and head["mic_capacity"] == MIC_CAPACITY)
+
+
 def make_ring(path: Path | None = None) -> bool:
     """Create the ring file if it isn't there (or is another version's). The folder
     lets signed-in users write, so the board can do this without admin. True if it's
     usable now."""
     path = Path(path or ring_path())
     try:
-        if path.is_file() and path.stat().st_size == FILE_BYTES:
-            with open(path, "rb") as f:
-                head = np.frombuffer(f.read(HEAD.itemsize), HEAD)[0]
-            if head["magic"] == MAGIC and head["version"] == VERSION \
-                    and head["capacity"] == CAPACITY and head["mic_capacity"] == MIC_CAPACITY:
-                return True
+        if make_ring_ok(path):
+            return True
         tmp = path.with_suffix(".new")
         tmp.write_bytes(new_ring_bytes())
         os.replace(tmp, path)   # a effect still mapping the old one keeps its own copy
@@ -645,10 +654,9 @@ def endpoint_for(name: str | None) -> str | None:
     for e in active:
         if e["name"] == name:
             return e["guid"]
-    for e in active:
-        if e["name"].startswith(name) or name.startswith(e["name"]):
-            return e["guid"]
-    return None
+    near = [e for e in active if e["name"].startswith(name) or name.startswith(e["name"])]
+    # one mic only: two that start the same (a cut-short name) could be the wrong one
+    return near[0]["guid"] if len(near) == 1 else None
 
 
 def _value(key, name):
@@ -938,19 +946,49 @@ class _StateKey(_BackupKey):
         self.created = False
 
 
-def _run(cmd: list[str]) -> int:
-    r = subprocess.run(cmd, capture_output=True, text=True, creationflags=_CREATE_NO_WINDOW)
+def _run(cmd: list[str], timeout: float = 60.0) -> int:
+    """Run a command, hidden. Its exit code; -1 if it hung (it's stopped after `timeout`)."""
+    try:
+        r = subprocess.run(cmd, capture_output=True, text=True, timeout=timeout,
+                           creationflags=_CREATE_NO_WINDOW)
+    except subprocess.TimeoutExpired:
+        log.warning("%s: no answer in %.0f s, stopped", " ".join(cmd), timeout)
+        return -1
     if r.returncode:
         log.warning("%s -> %s %s", " ".join(cmd), r.returncode, (r.stdout + r.stderr).strip())
     return r.returncode
 
 
-def _audio_comes_back():
+AUDIO_SERVICES = ("AudioEndpointBuilder", "Audiosrv")
+_SERVICE_NAME = re.compile(r"[A-Za-z0-9_.-]{1,80}")
+
+
+def _running_dependents() -> list[str]:
+    """The services running now that depend on Windows' audio ("Windows MIDI Service",
+    "Agent Activation Runtime", some sound-card vendors' own): stopping the audio stops
+    them too, and Windows doesn't start them again with it, so they're started by hand."""
+    script = (f"Get-Service -Name {','.join(AUDIO_SERVICES)} -DependentServices "
+              "-ErrorAction SilentlyContinue | Where-Object Status -eq Running | "
+              "ForEach-Object Name")
+    try:
+        r = subprocess.run(["powershell", "-NoProfile", "-NonInteractive", "-Command", script],
+                           capture_output=True, text=True, timeout=30,
+                           creationflags=_CREATE_NO_WINDOW)
+    except (OSError, subprocess.TimeoutExpired):
+        log.warning("couldn't list the services that depend on the audio")
+        return []
+    names = [n.strip() for n in r.stdout.splitlines()]
+    return [n for n in dict.fromkeys(names) if _SERVICE_NAME.fullmatch(n)
+            and n.lower() not in {s.lower() for s in AUDIO_SERVICES}]
+
+
+def _audio_comes_back(dependents: list[str] = ()):
     """A small helper that starts Windows' audio again once this process ends, however
     it ends: killed half-way or crashed, the PC must never be left without sound.
     (Starting a service that's already running does nothing.)"""
+    names = [*AUDIO_SERVICES, *(n for n in dependents if _SERVICE_NAME.fullmatch(n))]
     script = (f"Wait-Process -Id {os.getpid()} -ErrorAction SilentlyContinue; "
-              "Start-Service AudioEndpointBuilder; Start-Service Audiosrv")
+              + "; ".join(f"Start-Service '{n}' -ErrorAction SilentlyContinue" for n in names))
     cmd = ["powershell", "-NoProfile", "-NonInteractive", "-Command", script]
     for flags in (_CREATE_NO_WINDOW | 0x01000000, _CREATE_NO_WINDOW):   # out of our job
         try:
@@ -962,12 +1000,16 @@ def _audio_comes_back():
     log.warning("no helper to bring the audio back if this stops half-way")
 
 
-def _audio_service(start: bool):
+def _audio_service(start: bool, dependents: list[str] = ()):
     """Stop / start Windows' audio. The endpoint builder reads the mics' effect settings
-    when it starts, so it goes too (the audio service depends on it)."""
+    when it starts, so it goes too (the audio service depends on it). `dependents`: the
+    services that were running on it (_running_dependents), started again after it."""
     if start:
         _run(["net", "start", "AudioEndpointBuilder"])
         _run(["net", "start", "audiosrv"])
+        for name in dependents:
+            if _SERVICE_NAME.fullmatch(name):
+                _run(["net", "start", name], timeout=30.0)
     else:
         _run(["net", "stop", "audiosrv", "/y"])
         _run(["net", "stop", "AudioEndpointBuilder", "/y"])
@@ -1144,18 +1186,185 @@ def _delete_if_empty(path: str):
         advapi.RegDeleteKeyW(winreg.HKEY_LOCAL_MACHINE, path)
 
 
-def _make_ring():
-    d = data_dir()
-    d.mkdir(parents=True, exist_ok=True)
-    # The audio engine runs as LOCAL SERVICE with a write-restricted token (so writing
-    # needs WRITE RESTRICTED too); the board runs as the signed-in user. Nothing else:
-    # not store apps (ALL APPLICATION PACKAGES, which a test build once added by hand).
-    _run(["icacls", str(d), "/remove:g", "*S-1-15-2-1", "*S-1-15-2-2", "/T"])
-    _run(["icacls", str(d), "/grant", "*S-1-5-19:(OI)(CI)M", "*S-1-5-33:(OI)(CI)M",
-          "*S-1-5-11:(OI)(CI)M", "/T"])
-    make_ring()
+# Who may do what in the data folders. %ProgramData%\OnionBoard: admins only (its logs
+# are the admin step's). MicPlugin: the audio engine (LOCAL SERVICE with a write-
+# restricted token, so WRITE RESTRICTED too) and signed-in users make and change files
+# in it, but can't delete, rename or swap the folder itself, nor make folders in it.
+# Nothing for store apps. Owner: Administrators.
+_READ = "0x1200a9"          # read & run
+_FOLDER_WRITE = "0x1201bb"  # read, make files, write attributes: no delete, no subfolders
+_MODIFY = "0x1301bf"
+_BASE_SDDL = f"O:BAD:P(A;OICI;FA;;;SY)(A;OICI;FA;;;BA)(A;OICI;{_READ};;;BU)"
+_MIC_SDDL = _BASE_SDDL + "".join(f"(A;;{_FOLDER_WRITE};;;{s})(A;OICIIO;{_MODIFY};;;{s})"
+                                 for s in ("AU", "LS", "WR"))
+_ADMIN_SIDS = ("S-1-5-32-544", "S-1-5-18")   # Administrators, SYSTEM
+_REPARSE = 0x400                             # FILE_ATTRIBUTE_REPARSE_POINT
+
+
+def _is_link(path: Path) -> bool:
+    """A symlink, junction or other reparse point (never followed by the admin step)."""
     try:
-        (d / "ring.bin").unlink()   # the first test build's
+        return bool(getattr(os.lstat(path), "st_file_attributes", 0) & _REPARSE)
+    except OSError:
+        return False
+
+
+def _remove_entry(path: Path):
+    """Remove one folder entry itself, never what a link points at."""
+    if _is_link(path):
+        try:
+            os.rmdir(path)    # a junction / folder link
+        except OSError:
+            os.unlink(path)   # a file link
+    elif path.is_dir():
+        shutil.rmtree(path)   # (doesn't follow links inside)
+    else:
+        path.unlink()
+
+
+def _secure_dir(path: Path, sddl: str) -> str | None:
+    """Make `path` a real folder owned by Administrators with exactly `sddl`'s access, set
+    on an open handle to the folder itself: never through a link, and without touching
+    anything inside (no inheritance walk a planted link could steer). Its owner SID
+    before (None if it was made just now)."""
+    from ctypes import wintypes
+    if _is_link(path) or (path.exists() and not path.is_dir()):
+        log.warning("%s wasn't a plain folder: replaced", path)
+        _remove_entry(path)
+    made = not path.exists()
+    if made:
+        path.mkdir()
+    advapi = ctypes.WinDLL("advapi32", use_last_error=True)
+    kernel = ctypes.WinDLL("kernel32", use_last_error=True)
+    kernel.CreateFileW.restype = wintypes.HANDLE
+    kernel.CreateFileW.argtypes = [wintypes.LPCWSTR, wintypes.DWORD, wintypes.DWORD,
+                                   ctypes.c_void_p, wintypes.DWORD, wintypes.DWORD,
+                                   wintypes.HANDLE]
+    kernel.GetFileInformationByHandle.argtypes = [wintypes.HANDLE, ctypes.c_void_p]
+    kernel.CloseHandle.argtypes = [wintypes.HANDLE]
+    kernel.LocalFree.argtypes = [ctypes.c_void_p]
+    advapi.ConvertStringSecurityDescriptorToSecurityDescriptorW.argtypes = [
+        wintypes.LPCWSTR, wintypes.DWORD, ctypes.POINTER(ctypes.c_void_p), ctypes.c_void_p]
+    advapi.SetKernelObjectSecurity.argtypes = [wintypes.HANDLE, wintypes.DWORD, ctypes.c_void_p]
+    advapi.GetSecurityInfo.argtypes = [wintypes.HANDLE, ctypes.c_int, wintypes.DWORD,
+                                       ctypes.POINTER(ctypes.c_void_p), ctypes.c_void_p,
+                                       ctypes.c_void_p, ctypes.c_void_p,
+                                       ctypes.POINTER(ctypes.c_void_p)]
+    advapi.ConvertSidToStringSidW.argtypes = [ctypes.c_void_p, ctypes.POINTER(ctypes.c_wchar_p)]
+    # READ_CONTROL | WRITE_DAC | WRITE_OWNER; FILE_FLAG_BACKUP_SEMANTICS | OPEN_REPARSE_POINT
+    h = kernel.CreateFileW(str(path), 0x000E0000, 7, None, 3, 0x02200000, None)
+    if h in (None, wintypes.HANDLE(-1).value):
+        raise ctypes.WinError(ctypes.get_last_error())
+    try:
+        info = (ctypes.c_ulong * 13)()   # BY_HANDLE_FILE_INFORMATION
+        if not kernel.GetFileInformationByHandle(wintypes.HANDLE(h), info):
+            raise ctypes.WinError(ctypes.get_last_error())
+        if info[0] & _REPARSE or not info[0] & 0x10:   # swapped for a link since the check
+            raise PermissionError(f"{path} isn't a plain folder")
+        owner = None
+        if not made:
+            sid, sd = ctypes.c_void_p(), ctypes.c_void_p()
+            # SE_FILE_OBJECT, OWNER_SECURITY_INFORMATION
+            if not advapi.GetSecurityInfo(h, 1, 1, ctypes.byref(sid), None, None, None,
+                                          ctypes.byref(sd)):
+                text = ctypes.c_wchar_p()
+                if advapi.ConvertSidToStringSidW(sid, ctypes.byref(text)):
+                    owner = text.value
+                    kernel.LocalFree(text)
+                kernel.LocalFree(sd)
+        sd = ctypes.c_void_p()
+        if not advapi.ConvertStringSecurityDescriptorToSecurityDescriptorW(
+                sddl, 1, ctypes.byref(sd), None):
+            raise ctypes.WinError(ctypes.get_last_error())
+        try:
+            # (OWNER |) DACL | PROTECTED_DACL: the folder's own security only, no walk
+            what = 0x80000004 | (1 if sddl.startswith("O:") else 0)
+            if not advapi.SetKernelObjectSecurity(h, what, sd):
+                raise ctypes.WinError(ctypes.get_last_error())
+        finally:
+            kernel.LocalFree(sd)
+    finally:
+        kernel.CloseHandle(h)
+    return owner
+
+
+def _owner(path: Path) -> str | None:
+    """The owner SID of one entry itself (links are never asked: they're removed first)."""
+    from ctypes import wintypes
+    advapi = ctypes.WinDLL("advapi32", use_last_error=True)
+    kernel = ctypes.WinDLL("kernel32", use_last_error=True)
+    advapi.GetNamedSecurityInfoW.argtypes = [wintypes.LPCWSTR, ctypes.c_int, wintypes.DWORD,
+                                             ctypes.POINTER(ctypes.c_void_p), ctypes.c_void_p,
+                                             ctypes.c_void_p, ctypes.c_void_p,
+                                             ctypes.POINTER(ctypes.c_void_p)]
+    advapi.ConvertSidToStringSidW.argtypes = [ctypes.c_void_p, ctypes.POINTER(ctypes.c_wchar_p)]
+    kernel.LocalFree.argtypes = [ctypes.c_void_p]
+    sid, sd = ctypes.c_void_p(), ctypes.c_void_p()
+    if advapi.GetNamedSecurityInfoW(str(path), 1, 1, ctypes.byref(sid), None, None, None,
+                                    ctypes.byref(sd)):
+        return None
+    try:
+        text = ctypes.c_wchar_p()
+        if not advapi.ConvertSidToStringSidW(sid, ctypes.byref(text)):
+            return None
+        value = text.value
+        kernel.LocalFree(text)
+        return value
+    finally:
+        kernel.LocalFree(sd)
+
+
+def _clean_base(base: Path):
+    """Once the base folder is admins-only (nobody else can add to it), drop what someone
+    else could have put there before: links, hard links, anything not admin-owned. The
+    admin step writes its log there, and must never write through a planted link."""
+    for entry in list(base.iterdir()):
+        if entry.name == "MicPlugin":
+            continue
+        try:
+            st = os.lstat(entry)
+            if getattr(st, "st_file_attributes", 0) & _REPARSE or st.st_nlink > 1 \
+                    or _owner(entry) not in _ADMIN_SIDS:
+                log.warning("removed %s from the data folder (not the admin step's)", entry.name)
+                _remove_entry(entry)
+        except OSError:
+            log.warning("couldn't check %s", entry, exc_info=True)
+
+
+def secure_data_dirs():
+    """Admin step, first thing: %ProgramData%\\OnionBoard and its MicPlugin folder made
+    safe before anything is written there (anyone signed in can make folders in
+    %ProgramData%, so either could be someone else's, or a link to a system folder)."""
+    base = data_dir().parent
+    base.parent.mkdir(parents=True, exist_ok=True)
+    owner = _secure_dir(base, _BASE_SDDL)
+    if owner is not None and owner not in _ADMIN_SIDS:
+        log.warning("%s belonged to %s: taken over", base, owner)
+    _clean_base(base)
+    _secure_dir(data_dir(), _MIC_SDDL)
+
+
+def _make_ring():
+    """A fresh ring file for the effect to find when the audio starts, made without
+    ever writing through a link someone else put in the (user-writable) folder: a new
+    file of our own, then swapped in by name."""
+    path = ring_path()
+    if make_ring_ok(path):
+        return
+    tmp = path.parent / f"ring2.{os.getpid()}-{int(time.monotonic() * 1000)}.tmp"
+    fd = os.open(tmp, os.O_WRONLY | os.O_CREAT | os.O_EXCL | getattr(os, "O_BINARY", 0))
+    try:
+        with os.fdopen(fd, "wb") as f:
+            f.write(new_ring_bytes())
+        os.replace(tmp, path)   # replaces the entry itself, never a link's target
+    except BaseException:
+        try:
+            os.unlink(tmp)
+        except OSError:
+            pass
+        raise
+    try:
+        (path.parent / "ring.bin").unlink()   # the first test build's (unlink: the entry itself)
     except OSError:
         pass
 
@@ -1166,14 +1375,17 @@ def admin_install(guid: str, slot: str | None = None) -> int:
         log.error("no effect DLL at %s", dll)
         return 3
     _enable_privileges("SeBackupPrivilege", "SeRestorePrivilege")
-    _audio_comes_back()
+    dependents = _running_dependents()
+    _audio_comes_back(dependents)
     _audio_service(False)
     try:
         # a name of its own per version: a copy Windows still holds can't block it
         digest = hashlib.sha256(dll.read_bytes()).hexdigest()[:12]
         target = install_dir() / f"obmic-{digest}.dll"
         target.parent.mkdir(parents=True, exist_ok=True)
-        shutil.copy2(dll, target)
+        tmp = target.with_suffix(".new")
+        shutil.copyfile(dll, tmp)   # whole, then in place: never a half-copied effect
+        os.replace(tmp, target)
         _register_com(target)
         for old in [*install_dir().glob("obmic*.dll"), *_old_install_dirs()]:
             if old != target:
@@ -1181,15 +1393,24 @@ def admin_install(guid: str, slot: str | None = None) -> int:
         _make_ring()
         for other in installed_on():   # one mic at a time; this one is done afresh
             _uninstall_endpoint(other)
-        _install_endpoint(guid, slot)
+        try:
+            _install_endpoint(guid, slot)
+        except BaseException:
+            # cut off half-way: the mic goes back as it was rather than half set up
+            try:
+                _uninstall_endpoint(guid)
+            except Exception:  # noqa: BLE001 - the notes stay; a later uninstall finishes
+                log.exception("couldn't put %s back after a failed set-up", guid)
+            raise
     finally:
-        _audio_service(True)
+        _audio_service(True, dependents)
     return 0
 
 
 def admin_uninstall() -> int:
     _enable_privileges("SeBackupPrivilege", "SeRestorePrivilege")
-    _audio_comes_back()
+    dependents = _running_dependents()
+    _audio_comes_back(dependents)
     _audio_service(False)
     try:
         for guid in installed_on():
@@ -1203,7 +1424,7 @@ def admin_uninstall() -> int:
         except OSError:
             pass
     finally:
-        _audio_service(True)
+        _audio_service(True, dependents)
     return 0
 
 
@@ -1237,33 +1458,65 @@ def cli(args: list[str]) -> int:
         if not anything_installed():
             return 0
         if not _is_admin():
-            code = _elevated(["uninstall"], wait_s=120.0)
+            code = _elevated(["uninstall"])
             return 1 if code is None else code
         args = ["uninstall"]
-    logging.basicConfig(filename=str(data_dir().parent / "directmic-admin.log"),
-                        level=logging.INFO, format="%(asctime)s %(message)s") \
-        if data_dir().parent.exists() or _mkdir(data_dir().parent) else None
-    try:
-        if args[:1] == ["install"] and len(args) in (2, 3) and _GUID.fullmatch(args[1]) \
-                and (len(args) == 2 or args[2] in SLOTS_FX):
-            guid = args[1].lower()
-            if guid not in {e["guid"] for e in capture_endpoints()}:
-                return 2
-            return admin_install(guid, args[2] if len(args) == 3 else None)
-        if args == ["uninstall"]:
-            return admin_uninstall()
+    if args[:1] == ["install"] and len(args) in (2, 3) and _GUID.fullmatch(args[1]) \
+            and (len(args) == 2 or args[2] in SLOTS_FX):
+        guid = args[1].lower()
+        if guid not in {e["guid"] for e in capture_endpoints()}:
+            return 2
+        step = lambda: admin_install(guid, args[2] if len(args) == 3 else None)  # noqa: E731
+    elif args == ["uninstall"]:
+        step = admin_uninstall
+    else:
         return 2
-    except Exception:  # noqa: BLE001
-        log.exception("mic effect %s failed", args[:1])
-        return 1
-
-
-def _mkdir(p: Path) -> bool:
+    lock = _admin_lock()
+    if lock is None:
+        return 4   # another copy is at it (a set-up the board stopped waiting for)
     try:
-        p.mkdir(parents=True, exist_ok=True)
-        return True
-    except OSError:
-        return False
+        try:
+            _enable_privileges("SeBackupPrivilege", "SeRestorePrivilege")
+            secure_data_dirs()   # before the log or anything else is written there
+        except Exception:  # noqa: BLE001 - nowhere safe to log to: just say it failed
+            return 5
+        logging.basicConfig(filename=str(data_dir().parent / "directmic-admin.log"),
+                            level=logging.INFO, format="%(asctime)s %(message)s")
+        try:
+            return step()
+        except Exception:  # noqa: BLE001
+            log.exception("mic effect %s failed", args[:1])
+            return 1
+    finally:
+        _release(lock)
+
+
+_LOCK_NAME = "Global\\OnionBoardMicEffect"
+
+
+def _admin_lock():
+    """One admin step at a time, machine-wide: a handle to hold, or None if another copy
+    holds it (two at once would each stop the audio and rewrite the same mic)."""
+    kernel = ctypes.WinDLL("kernel32", use_last_error=True)
+    kernel.CreateMutexW.restype = ctypes.c_void_p
+    kernel.CreateMutexW.argtypes = [ctypes.c_void_p, ctypes.c_int, ctypes.c_wchar_p]
+    kernel.WaitForSingleObject.argtypes = [ctypes.c_void_p, ctypes.c_ulong]
+    kernel.CloseHandle.argtypes = [ctypes.c_void_p]
+    h = kernel.CreateMutexW(None, False, _LOCK_NAME)
+    if not h:
+        return None
+    if kernel.WaitForSingleObject(h, 0) not in (0, 0x80):   # got it / its owner died
+        kernel.CloseHandle(h)
+        return None
+    return h
+
+
+def _release(h):
+    kernel = ctypes.WinDLL("kernel32", use_last_error=True)
+    kernel.ReleaseMutex.argtypes = [ctypes.c_void_p]
+    kernel.CloseHandle.argtypes = [ctypes.c_void_p]
+    kernel.ReleaseMutex(h)
+    kernel.CloseHandle(h)
 
 
 # ---------------------------------------------------------------------- the app's side
@@ -1275,7 +1528,7 @@ def relaunch_params(args: list[str]) -> str:
     return " ".join(parts + [FLAG] + args)
 
 
-def _elevated(args: list[str], wait_s: float = 90.0) -> int | None:
+def _elevated(args: list[str], wait_s: float = 180.0) -> int | None:
     """Run this app's admin copy with `args` (Windows asks first). Its exit code, or
     None if the prompt was turned down or it didn't finish."""
     return run_elevated(sys.executable, relaunch_params(args), wait_s)

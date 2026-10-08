@@ -284,10 +284,19 @@ goes online.
   had there is kept and run first, inside ours. Every value is noted under
   `HKLM\SOFTWARE\OnionBoard\MicPlugin` before it changes. Windows' audio stops for a
   few seconds while this happens; a helper started first brings it back however the
-  admin step ends. It logs to `%ProgramData%\OnionBoard\directmic-admin.log`.
-- **The shared file**: `%ProgramData%\OnionBoard\MicPlugin\` gives write access to
-  LOCAL SERVICE (the audio engine), WRITE RESTRICTED and signed-in users (besides
-  admins and SYSTEM), and none to store apps. The board writes what others hear there, and the effect writes the
+  admin step ends, along with the services that run on it (Windows' MIDI service...).
+  One admin step runs at a time, every command it runs has a time limit, and a set-up
+  that fails half-way puts the mic back as it was. It logs to
+  `%ProgramData%\OnionBoard\directmic-admin.log`.
+- **The data folders**: anyone signed in can make folders in `%ProgramData%`, so before
+  writing anything there the admin step makes `%ProgramData%\OnionBoard` a real folder
+  owned by Administrators that only admins can change (a link someone put there is
+  removed, never followed; so is anything inside not made by an admin), and sets
+  `MicPlugin`'s own access on the folder itself, without walking what's inside.
+- **The shared file**: `%ProgramData%\OnionBoard\MicPlugin\` lets LOCAL SERVICE (the
+  audio engine), WRITE RESTRICTED and signed-in users make and change files in it, but
+  not delete, rename or swap the folder itself, nor make folders in it (admins and SYSTEM
+  have full access; store apps none). The board writes what others hear there, and the effect writes the
   clean mic back, so the board's meter and voice changer hear only you. Every app
   recording that mic runs its own copy of the effect. When the board is closed or
   late, the effect crossfades back to the plain mic. Since others can write the file,
