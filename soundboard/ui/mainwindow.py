@@ -2699,6 +2699,9 @@ class MainWindow(QMainWindow):
                 release, self._attach_release = self._attach_release, None
                 release(_("✗ Didn't work"))
             log.warning("not put on the mic: %s", err)
+            # an older mic part can still be working (the optional update failed): the
+            # status then reads fine, but this attempt didn't work, so Bun mustn't cheer
+            self.setup_show.finish(False)
             # the route stays on the mic: until it's set up, the cable carries the
             # sounds meanwhile (_main_name), and the one-click stays on offer
             err = _("{error}\n\nTry again any time from the Setup tab.", error=err)
