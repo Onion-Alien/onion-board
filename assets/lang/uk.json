@@ -2830,5 +2830,6 @@
     "{n} станцій (верхні {shown} показано)"
   ],
   "Tuning in to radio stations around the world…": "Налаштування на радіостанції по всьому світу…",
-  "{hotkey} is {what} now — it was the key for {lost}": "{hotkey} це {what} зараз — це була клавіша для {lost}"
+  "{hotkey} is {what} now — it was the key for {lost}": "{hotkey} це {what} зараз — це була клавіша для {lost}",
+  "Rename sound": "Перейменувати звук"
 }

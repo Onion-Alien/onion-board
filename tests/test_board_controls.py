@@ -364,3 +364,30 @@ def test_a_global_hotkey_taken_off_a_sound_is_said_out_loud(window, monkeypatch)
     toasts.clear()
     w.set_global_hotkey("pause_hotkey", "f2")   # nothing had F2: no warning
     assert not [t for t in toasts if t[1] == "warn"]
+
+
+def test_pad_keys_rename_edit_delete_and_find(window, monkeypatch, qapp):
+    """F2 renames the pad the keyboard is on, Alt+Enter opens Edit, Delete removes it
+    (nothing picked), Ctrl+F lands in the search box."""
+    from PySide6.QtCore import Qt
+    from PySide6.QtTest import QTest
+    from PySide6.QtWidgets import QInputDialog
+    w = window
+    w.show()
+    w.tabs.setCurrentWidget(w.sounds_page)
+    pad = w.pads["s0"]
+    pad.setFocus()
+    qapp.processEvents()   # the tab shown: a shortcut on a hidden widget doesn't fire
+    monkeypatch.setattr(QInputDialog, "getText", staticmethod(lambda *a, **k: ("Big boom", True)))
+    QTest.keyClick(pad, Qt.Key_F2)
+    assert w.meta("s0").name == "Big boom" and pad.meta.name == "Big boom"
+    edited = []
+    monkeypatch.setattr(w, "edit", lambda sid, tab="sound": edited.append(sid))
+    QTest.keyClick(pad, Qt.Key_Return, Qt.AltModifier)
+    assert edited == ["s0"]
+    asked = []
+    monkeypatch.setattr(w, "ask_remove", lambda sids: asked.append(list(sids)) or False)
+    QTest.keyClick(pad, Qt.Key_Delete)
+    assert asked == [["s0"]]
+    QTest.keyClick(pad, Qt.Key_F, Qt.ControlModifier)
+    assert qapp.focusWidget() is w.search

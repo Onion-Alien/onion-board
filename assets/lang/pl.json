@@ -2830,5 +2830,6 @@
     "{n} stacji (pokazano górne {shown})"
   ],
   "Tuning in to radio stations around the world…": "Dostrajanie stacji radiowych z całego świata…",
-  "{hotkey} is {what} now — it was the key for {lost}": "{hotkey} jest teraz {what} — to był klucz do {lost}"
+  "{hotkey} is {what} now — it was the key for {lost}": "{hotkey} jest teraz {what} — to był klucz do {lost}",
+  "Rename sound": "Zmień nazwę dźwięku"
 }

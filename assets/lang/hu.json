@@ -2770,5 +2770,6 @@
     "{n} állomás (a felső {shown} látható)"
   ],
   "Tuning in to radio stations around the world…": "Ráhangolódás a világ rádióállomásaira…",
-  "{hotkey} is {what} now — it was the key for {lost}": "A {hotkey} most {what} – ez volt a kulcsa {lost} számára"
+  "{hotkey} is {what} now — it was the key for {lost}": "A {hotkey} most {what} – ez volt a kulcsa {lost} számára",
+  "Rename sound": "Hang átnevezése"
 }

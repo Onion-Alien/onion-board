@@ -2770,5 +2770,6 @@
     "{n} stasjoner (øverst {shown} vist)"
   ],
   "Tuning in to radio stations around the world…": "Stiller inn på radiostasjoner over hele verden ...",
-  "{hotkey} is {what} now — it was the key for {lost}": "{hotkey} er {what} nå — det var nøkkelen til {lost}"
+  "{hotkey} is {what} now — it was the key for {lost}": "{hotkey} er {what} nå — det var nøkkelen til {lost}",
+  "Rename sound": "Gi nytt navn til lyd"
 }
