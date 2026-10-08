@@ -25,6 +25,7 @@ from PySide6.QtWidgets import (QApplication, QCheckBox, QComboBox, QDialog, QFil
                                QPushButton, QScrollArea, QSizePolicy, QSlider, QStackedWidget,
                                QSystemTrayIcon, QTabBar, QTabWidget, QToolTip, QVBoxLayout,
                                QWidget, QWidgetAction)
+from shiboken6 import isValid as qt_valid
 
 from soundboard import engine as eng
 from soundboard import theme, winkeys, ytdl
@@ -2677,8 +2678,18 @@ class MainWindow(QMainWindow):
         self.setup_show.start()
         self._update_flow()
         log.info("attaching the mic effect to %s", mic)
-        threading.Thread(target=lambda: self.mic_attached.emit(mic, directmic.install(mic) or ""),
+        threading.Thread(target=self._attach_mic_work, args=(mic,),
                          daemon=True, name="mic-attach").start()
+
+    def _attach_mic_work(self, mic: str):
+        err = directmic.install(mic) or ""
+        # the admin prompt can outlast the window (closed and freed meanwhile): then
+        # there's nobody to tell, and emitting on the freed window raises TypeError
+        if qt_valid(self):
+            try:
+                self.mic_attached.emit(mic, err)
+            except (RuntimeError, TypeError):   # freed between the check and the emit
+                pass
 
     def _mic_attached(self, mic: str, err: str):
         self._attaching = False
