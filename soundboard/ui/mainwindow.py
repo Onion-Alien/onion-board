@@ -314,6 +314,10 @@ class MainWindow(QMainWindow):
 
     def __init__(self):
         super().__init__()
+        # shutdown() ran (app.py also calls it on aboutToQuit). Set first: the splash
+        # pumps events while the window is built, so its timers (load_triggers) can run
+        # before the end of __init__
+        self._shut_down = False
         self.title = _("Onion Board {version_text}", version_text=version_text())
         self.setWindowTitle(self.title)
         self.setAcceptDrops(True)   # files dropped outside the pad grid: see dropEvent
@@ -516,7 +520,6 @@ class MainWindow(QMainWindow):
         self._init_tray()
         if autostart.available():
             autostart.refresh(self.cfg.autostart_hidden)   # the app may have moved
-        self._shut_down = False   # shutdown() ran (app.py also calls it on aboutToQuit)
         self._pending_note: str | None = None
         if self.cfg.load_note:   # settings came from a backup or the defaults: say so
             QTimer.singleShot(1200, self._show_load_note)
