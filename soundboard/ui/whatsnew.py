@@ -28,6 +28,17 @@ class Note:
 
 # newest first; add one per release that has something worth telling
 NOTES = (
+    Note("1.9.9", "Your language, and fewer freezes", (
+        ("plus", "Pick your language",
+         "Settings → Appearance → Language: 32 languages, each in its own name, with a "
+         "search."),
+        ("check", "Fewer freezes",
+         "A headset dropping out, a slow disk or a theme switch no longer freezes the "
+         "window."),
+        ("shield", "Says which app skips your sounds",
+         "With Straight into my mic, the warning bar names an app that records the mic "
+         "raw and so hears none of your sounds."),
+    ), page="appearance", page_label="Pick a language"),
     Note("1.9.8", "Lighter, and a Discord to join", (
         ("check", "Uses less memory",
          "The 3D globe is gone (the flat map stays), so the app and its download are much "
