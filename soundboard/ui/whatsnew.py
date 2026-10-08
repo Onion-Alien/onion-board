@@ -28,6 +28,16 @@ class Note:
 
 # newest first; add one per release that has something worth telling
 NOTES = (
+    Note("1.9.20", "Sort your pads, and a list view", (
+        ("plus", "Sort and list your pads",
+         "The button by the search box sorts A–Z, Newest or Most played, or shows the "
+         "pads as one-line rows with their hotkeys."),
+        ("plus", "Quick volume and more on a pad",
+         "Ctrl + mouse wheel over a pad sets its volume; right-click now has Rename, "
+         "Duplicate and Show the file."),
+        ("check", "Search in Settings",
+         "A box above the categories finds a setting by any word (Ctrl+F)."),
+    )),
     Note("1.9.9", "Your language, and fewer freezes", (
         ("plus", "Pick your language",
          "Settings → Appearance → Language: 32 languages, each in its own name, with a "
