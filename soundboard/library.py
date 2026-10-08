@@ -405,6 +405,9 @@ class Config:
     # the newest version whose What's new (ui/whatsnew.py) was shown; a first start has
     # nothing to catch up on, a config without it is from an older version
     whats_new_seen: str = __version__
+    # the version that last moved an older mic part on by itself (ui: _auto_mic_update),
+    # so a "No" at Windows' prompt isn't asked again until the next version
+    mic_update_tried: str = ""
     random_hotkey: str = ""           # plays a random sound from the category showing
     last_hotkey: str = ""             # plays the last sound played again
     next_cat_hotkey: str = ""         # shows the next category (random key + overlay follow)

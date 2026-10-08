@@ -140,6 +140,7 @@ SEARCH_WAIT_MS = 100     # typing in the search box filters the pads once it pau
 PAD_SIZE_WAIT_MS = 50    # dragging Pad size re-lays the pads at most this often
 RANDOM = "__random__:"   # hotkey action prefix: a random sound from the category after it
 ALL = _("All")       # the category tab that shows every sound
+AUTO_MIC_UPDATE_MS = 4000   # an older mic part moves on by itself this long after the start
 TIP_DELAY_MS = 8000    # the first tip waits this long after the start
 TIP_RETRY_MS = 60_000  # ...and is tried again this often while it can't show
 LANG_OFFER_SEEN = "language-offer"   # in Config.tips_seen: the language bar was turned down
@@ -530,6 +531,28 @@ class MainWindow(QMainWindow):
         self._pending_note: str | None = None
         if self.cfg.load_note:   # settings came from a backup or the defaults: say so
             QTimer.singleShot(1200, self._show_load_note)
+        QTimer.singleShot(AUTO_MIC_UPDATE_MS, self, self._auto_mic_update)
+
+    def _auto_mic_update(self):
+        """An older mic part (1.9.20 and before sat where raw streams skip it: Discord's
+        Studio, Chrome, Edge) is moved on the first start of a new version, not left to
+        a button nobody looks for. Windows asks once; a No waits for the next version.
+        Only with the window open: a prompt at sign-in, in the tray, would be a surprise."""
+        from soundboard import __version__
+        cfg = self.cfg
+        if cfg.route != "mic" or not cfg.mic_device or cfg.mic_update_tried == __version__:
+            return
+        if not self.isVisible():
+            QTimer.singleShot(AUTO_MIC_UPDATE_MS, self, self._auto_mic_update)
+            return
+        if directmic.status(cfg.mic_device) != "outdated" or self._attaching:
+            return
+        cfg.mic_update_tried = __version__
+        cfg.save()
+        log.info("moving the older mic part on by itself")
+        self.toast(_("Updating Onion Board's part of your mic so every app hears your "
+                     "sounds: click Yes when Windows asks."))
+        self.attach_mic()
 
     def _show_load_note(self):
         """Started hidden in the tray (--tray at sign-in)? Then the box waits for the
