@@ -1,7 +1,7 @@
 """Onion Board — gaming soundboard with virtual-mic output, mic passthrough and test mode."""
 import os as _os
 
-__version__ = "1.9.20"
+__version__ = "1.9.21"
 
 # numpy and scipy each bring an OpenBLAS that starts one thread per CPU when it loads
 # and reserves ~32 MB for each: about 1 GB and 30 threads doing nothing. Two threads

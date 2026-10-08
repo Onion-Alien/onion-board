@@ -117,11 +117,17 @@ CAPTURE_KEY = r"SOFTWARE\Microsoft\Windows\CurrentVersion\MMDevices\Audio\Captur
 FX = "{d04e05a6-594b-4fb6-a80d-01af5eed7d1d},%d"   # PKEY_FX_* / PKEY_CompositeFX_*
 # On a recording device Windows runs the effects in front of each app's stream: SFX (or
 # LFX on drivers that only know the old kind), after the device's own EFX if it has one.
+# An app asking for a raw stream (Chrome and Edge whenever the mic offers raw, Discord's
+# Studio profile) skips SFX/MFX but not EFX, the endpoint's always-on effect: one copy
+# for every app recording the mic. So the effect goes in EFX.
 LFX, GFX, SFX, MFX, EFX = 1, 2, 5, 6, 7
-SLOTS_FX = {"sfx": SFX, "lfx": LFX}                 # where the effect goes on a mic
+SLOTS_FX = {"sfx": SFX, "lfx": LFX, "efx": EFX}     # where the effect goes on a mic
 MODERN = (SFX, MFX, EFX)
 LEGACY = (LFX, GFX)
 COMPOSITE_SFX = 13                                  # PKEY_CompositeFX_StreamEffectClsid
+COMPOSITE_EFX = 15                                  # PKEY_CompositeFX_EndpointEffectClsid
+ENDPOINT_SLOTS = (EFX, COMPOSITE_EFX)               # raw streams get these too
+OUR_SLOTS = (SFX, LFX, COMPOSITE_SFX, EFX, COMPOSITE_EFX)
 DISABLE_SYSFX = "{1da5d803-d492-4edd-8c23-e0c0ffee7f0e},5"   # "Audio enhancements: off"
 MODES_KEY = "{d3993a3f-99c2-4402-b5ec-a92a0367664b},%d"     # PKEY_*_ProcessingModes_...
 MODE_DEFAULT = "{C18E2F7E-933D-4965-B7D1-1EEF228D2AF3}"     # AUDIO_SIGNALPROCESSINGMODE_DEFAULT
@@ -750,9 +756,25 @@ def _status(mic_name: str | None) -> str:
         return "other"
     if not effect_in_place(guid) or not make_ring():
         return "wiped"
-    if not same_dll(registered_dll(), bundled_dll()):
+    if not same_dll(registered_dll(), bundled_dll()) \
+            or installed_slot(guid) in (SFX, COMPOSITE_SFX):   # raw streams skip it
         return "outdated"
     return "ready"
+
+
+def installed_slot(guid: str) -> int | None:
+    """The effect slot the effect was put in on this mic (None: not on it)."""
+    try:
+        with winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, rf"{ENDPOINTS_KEY}\{guid}") as k:
+            return int(winreg.QueryValueEx(k, "Slot")[0])
+    except (OSError, ValueError):
+        return None
+
+
+def endpoint_wide() -> bool:
+    """The effect sits in the mic's endpoint effect: every app recording the mic gets it,
+    raw streams too, through one shared copy (so its stream count isn't per app)."""
+    return any(installed_slot(g) in ENDPOINT_SLOTS for g in installed_on())
 
 
 def effect_in_place(guid: str) -> bool:
@@ -761,7 +783,7 @@ def effect_in_place(guid: str) -> bool:
     try:
         with winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE,
                             rf"{CAPTURE_KEY}\{guid}\FxProperties") as k:
-            return any(_is_ours(_value(k, FX % pid)) for pid in (SFX, LFX, COMPOSITE_SFX))
+            return any(_is_ours(_value(k, FX % pid)) for pid in OUR_SLOTS)
     except OSError:
         return False
 
@@ -984,22 +1006,23 @@ def _unregister_com():
 
 def pick_slot(values: dict[int, object]) -> tuple[str, int]:
     """Which effect slot the effect takes on a mic whose FxProperties hold `values`
-    ({pid: value}), the way Equalizer APO picks: ('composite', 13) joins the stream
-    effect list Windows chains by itself; ('wrap', LFX) on a driver with only the old
-    kind of effects; otherwise ('wrap', SFX). 'wrap' replaces that slot's effect, and
-    the effect runs the one it replaced first."""
-    if values.get(COMPOSITE_SFX):
-        return "composite", COMPOSITE_SFX
-    if any(values.get(p) for p in LEGACY) and not any(values.get(p) for p in MODERN):
+    ({pid: value}): ('wrap', LFX) on a driver with only the old kind of effects;
+    ('composite', 15) joins an endpoint effect list Windows chains by itself; otherwise
+    ('wrap', EFX), the endpoint effect raw streams get too. 'wrap' replaces that slot's
+    effect, and the effect runs the one it replaced first."""
+    if any(values.get(p) for p in LEGACY) and not any(values.get(p) for p in MODERN) \
+            and not values.get(COMPOSITE_SFX):
         return "wrap", LFX
-    return "wrap", SFX
+    if values.get(COMPOSITE_EFX):
+        return "composite", COMPOSITE_EFX
+    return "wrap", EFX
 
 
 def _original(values: dict[int, object], pid: int) -> str:
     """The effect the effect runs first in slot `pid`: the slot's own, or (a mic whose
-    driver has no stream effect) its old-style LFX, which taking SFX switches off."""
+    driver has no endpoint effect) its old-style LFX, which a modern slot switches off."""
     old = values.get(pid)
-    if not old and pid == SFX and not values.get(EFX):
+    if not old and pid in (SFX, EFX) and not values.get(EFX):
         old = values.get(LFX)
     return old if isinstance(old, str) and not _is_ours(old) else ""
 
@@ -1010,25 +1033,27 @@ def _install_endpoint(guid: str, slot: str | None):
     base = rf"{CAPTURE_KEY}\{guid}"
     with _BackupKey(base + r"\FxProperties") as fx, \
             _StateKey(rf"{ENDPOINTS_KEY}\{guid}") as state:
-        values = {p: (fx.get(FX % p) or (None,))[0] for p in (*MODERN, *LEGACY, COMPOSITE_SFX)}
+        values = {p: (fx.get(FX % p) or (None,))[0]
+                  for p in (*MODERN, *LEGACY, COMPOSITE_SFX, COMPOSITE_EFX)}
         kind, pid = pick_slot(values) if not slot else ("wrap", SLOTS_FX[slot])
+        modes = SFX if pid in (SFX, COMPOSITE_SFX) else EFX if pid in ENDPOINT_SLOTS else None
         state.set("FxCreated", winreg.REG_DWORD, 1 if fx.created else 0)
         state.set("Slot", winreg.REG_DWORD, pid)
         # every value this touches, as it was, to put back later (written before anything
         # changes, so a step cut off half-way can still be undone)
-        names = (FX % pid, MODES_KEY % SFX, FX % LFX, FX % GFX, DISABLE_SYSFX)
+        names = (FX % pid, MODES_KEY % SFX, MODES_KEY % EFX, FX % LFX, FX % GFX, DISABLE_SYSFX)
         state.set("Before", winreg.REG_MULTI_SZ, [_note(n, fx.get(n)) for n in names])
         if kind == "composite":
-            cur = list(values[COMPOSITE_SFX] or [])
+            cur = list(values[pid] or [])
             fx.set(FX % pid, winreg.REG_MULTI_SZ,
                    [CLSID] + [c for c in cur if c.upper() != CLSID])
             state.set("Original", winreg.REG_SZ, "")
         else:
             state.set("Original", winreg.REG_SZ, _original(values, pid))
             fx.set(FX % pid, winreg.REG_SZ, CLSID)
-        if pid in (SFX, COMPOSITE_SFX):
-            if not fx.get(MODES_KEY % SFX):
-                fx.set(MODES_KEY % SFX, winreg.REG_MULTI_SZ, [MODE_DEFAULT])
+        if modes is not None:
+            if not fx.get(MODES_KEY % modes):
+                fx.set(MODES_KEY % modes, winreg.REG_MULTI_SZ, [MODE_DEFAULT])
             # a modern effect on the mic switches the old-style ones off anyway
             fx.delete(FX % LFX)
             fx.delete(FX % GFX)
@@ -1097,7 +1122,7 @@ def _uninstall_endpoint(guid: str):
     try:
         with _BackupKey(base + r"\FxProperties", create=False) as fx:
             ours = any(_is_ours((fx.get(FX % p) or (None,))[0])
-                       for p in (SFX, LFX, COMPOSITE_SFX))
+                       for p in OUR_SLOTS)
             if ours:
                 for item in before:
                     _put_back(fx, item)
@@ -1205,7 +1230,7 @@ def _is_admin() -> bool:
 
 
 def cli(args: list[str]) -> int:
-    """`--direct-mic install <endpoint guid> [sfx|lfx]` / `--direct-mic uninstall`: the
+    """`--direct-mic install <endpoint guid> [sfx|lfx|efx]` /`--direct-mic uninstall`: the
     admin copy. `--direct-mic remove`: the uninstaller's, not admin: runs the admin
     `uninstall` (Windows asks first) if Onion Board is on a mic at all. 0 when done."""
     if args == ["remove"]:
