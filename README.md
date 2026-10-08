@@ -7,8 +7,8 @@ Or send it to your stream, or keep it to your own headphones.
 ## ⬇️ [Download Onion Board for Windows](../../releases/latest/download/OnionBoardSetup.exe)
 
 <!-- release -->
-Version **1.9.24** · Windows 10 / 11 · free, no account, no ads, anonymous usage count you can switch off ·
-[VirusTotal: 67 of 67 clean](https://www.virustotal.com/gui/file/6185b79d365a3fb6a84c3d8528de940f28858406cbda0aeeacb4ca08553160fc) ·
+Version **1.9.25** · Windows 10 / 11 · free, no account, no ads, anonymous usage count you can switch off ·
+[VirusTotal: 68 of 68 clean](https://www.virustotal.com/gui/file/e0f806fb020904d460b892cd02ae114f446b044642ac96557e04cea38af9fbd9) ·
 [what's new](CHANGELOG.md)
 <!-- /release -->
 
