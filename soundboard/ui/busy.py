@@ -216,8 +216,11 @@ class _Toast(QLabel):
         host = self.parentWidget()
         w = min(560, max(200, host.width() - 32))
         self.setFixedWidth(w)
-        self.adjustSize()
-        self.move((host.width() - w) // 2, host.height() - self.height() - 18)
+        self.ensurePolished()   # its padding (the style sheet) counts before it's shown
+        # the height for this width: adjustSize() kept the old one when the window
+        # shrank under a toast (into the mini player), cutting its last lines off
+        self.resize(w, self.heightForWidth(w))
+        self.move((host.width() - w) // 2, max(0, host.height() - self.height() - 18))
 
     def eventFilter(self, obj: QObject, ev: QEvent) -> bool:
         if ev.type() == QEvent.Resize and self.isVisible():
