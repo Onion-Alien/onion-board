@@ -23,7 +23,7 @@ from PySide6.QtWidgets import (QAbstractButton, QApplication, QButtonGroup, QChe
 
 from shiboken6 import isValid as qt_valid
 
-from soundboard import autostart, midi, theme, winkeys, ytdl
+from soundboard import appsetup, autostart, midi, profiles, theme, winkeys, ytdl
 from soundboard.ui import busy, fit, icons
 from soundboard.ui import overlay as ovl
 from soundboard.wheelguard import no_wheel
@@ -1241,12 +1241,95 @@ class SettingsDialog(QDialog):
                 _("A short “Did you know?” about a feature, at most once a day, never while a "
                   "game is up."), self.mw.cfg.tips_on, self.mw.set_tips_on)
         v.addWidget(card)
+        v.addWidget(self._app_setup_card())
         v.addWidget(self._programs_card())
         v.addWidget(self._background_card())
         v.addWidget(self._backup_card())
         v.addWidget(self._reset_card())
         v.addStretch(1)
         return w
+
+    def _app_setup_card(self):
+        """Set up for the app you're using (soundboard.appsetup): ask or not, and the
+        apps remembered or never asked about."""
+        card, cv = self._card(
+            _("Set up for the app you're using"),
+            _("When a voice chat app or a game starts listening to you, a small bar offers "
+              "to set the board up for it. Apps you set up switch the mode by themselves "
+              "next time."))
+        self.box_app_setup = self._option(
+            cv, _("Offer to set up for new apps"),
+            _("Off: nothing asks. Apps already set up still switch."),
+            appsetup.settings(self.mw.cfg)["ask"], self._app_setup_ask)
+        self.app_setup_list = QVBoxLayout()
+        self.app_setup_list.setSpacing(4)
+        cv.addLayout(self.app_setup_list)
+        self._fill_app_setup()
+        if hasattr(self.mw, "app_setup_changed"):
+            self.mw.app_setup_changed.connect(self._fill_app_setup)
+        return card
+
+    def _app_setup_ask(self, on: bool):
+        appsetup.settings(self.mw.cfg)["ask"] = bool(on)
+        self.mw._save_later()
+
+    def _fill_app_setup(self):
+        lay = self.app_setup_list
+        while lay.count():
+            w = lay.takeAt(0).widget()
+            if w is not None:
+                w.deleteLater()
+        s = appsetup.settings(self.mw.cfg)
+        if not s["apps"] and not s["never"]:
+            none = QLabel(_("No apps set up yet."))
+            none.setObjectName("muted")
+            lay.addWidget(none)
+        names = {k: profiles.BY_KEY[k].name for k in appsetup.MODES}
+        for exe, mode in sorted(s["apps"].items()):
+            row = QWidget()
+            h = QHBoxLayout(row)
+            h.setContentsMargins(0, 0, 0, 0)
+            h.addWidget(QLabel(exe), 1)
+            if mode in names:
+                cb = QComboBox()
+                for k, n in names.items():
+                    cb.addItem(n, k)
+                cb.setCurrentIndex(cb.findData(mode))
+                cb.setAccessibleName(_("Mode for {program}", program=exe))
+                no_wheel(cb)
+                cb.currentIndexChanged.connect(
+                    lambda _i, e=exe, c=cb: self._app_setup_mode(e, c.currentData()))
+                h.addWidget(cb)
+            rm = QPushButton(_("Remove"))
+            rm.setObjectName("small")
+            rm.setToolTip(_("Forget {program}: it asks again next time", program=exe))
+            icons.set_icon(rm, "trash", "danger_text", size=12)
+            rm.clicked.connect(lambda _c=False, e=exe: self._app_setup_forget(e))
+            h.addWidget(rm)
+            lay.addWidget(row)
+        for exe in sorted(s["never"]):
+            if exe in s["apps"]:
+                continue
+            row = QWidget()
+            h = QHBoxLayout(row)
+            h.setContentsMargins(0, 0, 0, 0)
+            lbl = QLabel(_("{program}  (never asks)", program=exe))
+            lbl.setObjectName("muted")
+            h.addWidget(lbl, 1)
+            again = QPushButton(_("Ask again"))
+            again.setObjectName("small")
+            again.clicked.connect(lambda _c=False, e=exe: self._app_setup_forget(e))
+            h.addWidget(again)
+            lay.addWidget(row)
+
+    def _app_setup_mode(self, exe: str, mode: str):
+        appsetup.remember(self.mw.cfg, exe, mode)
+        self.mw._save_later()
+
+    def _app_setup_forget(self, exe: str):
+        appsetup.forget(self.mw.cfg, exe)
+        self.mw._save_later()
+        self._fill_app_setup()
 
     def _programs_card(self):
         """Switch category when a program is in front: every rule in one place."""
