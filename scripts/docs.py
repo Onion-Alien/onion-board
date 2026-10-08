@@ -67,8 +67,7 @@ def stamp(path: Path, block: str):
 
 
 PAGES = [ROOT / "README.md", ROOT / "docs" / "index.html",
-         ROOT / "docs" / "discord-soundboard" / "index.html",
-         ROOT / "docs" / "free-soundpad-alternative" / "index.html"]
+         *sorted((ROOT / "docs").glob("*/index.html"))]   # the guide pages
 
 
 def bust_caches():
