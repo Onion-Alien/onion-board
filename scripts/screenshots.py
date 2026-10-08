@@ -250,6 +250,14 @@ def main():
     w.show()
     w._update_status()
     spin(1.5)
+    # wide enough that nothing folds away (the tagline with the version, the buttons'
+    # words): the top row grows as features are added, and 1180 stopped being enough
+    w._fit.reset()
+    need = w._fit.need().width()
+    if need > w.width():
+        w.resize(need, round(need * 720 / 1180))
+        spin(1.5)
+    print("window", w.width(), "x", w.height(), "- needs", need)
     for page, name in ((w.sounds_page, "sounds"), (w.apps, "apps"), (w.voice, "voice"),
                        (w.setup_page, "setup")):
         w.tabs.setCurrentWidget(page)
