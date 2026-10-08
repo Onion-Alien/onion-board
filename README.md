@@ -29,20 +29,31 @@ Version **1.9.8** · Windows 10 / 11 · free, no account, no ads, anonymous usag
   any other output you pick (Voicemeeter, a mixer, a capture card, OBS); or nowhere,
   so only you hear them. Your voice goes along, or tick it off and send only sounds.
 - **One-click sounds**: search YouTube, SoundCloud and Myinstants inside the app and
-  add a sound in one click, drag in files, or record one with your mic.
+  add a sound in one click, drag in files, or record one with your mic or from
+  whatever is playing.
 - **Hotkeys that work in-game**, an in-game overlay, MIDI pads, Stream Deck support,
   and your pads on your phone with the optional Onion Pocket add-on. Open your game
   and the board switches to that game's sounds by itself.
+- **Checks Discord for you.** Onion Board reads Discord's voice settings and shows a
+  bar when one of them would cut your sounds out, with the steps to fix it.
 - **Bring your board over** from Soundpad, Resanance, Soundux or EXP Soundboard:
   sounds, names, categories and hotkeys, in one click.
 - **Effects on any sound**: trim, speed, pitch, bass boost, reverse. One-click
   *Deep fried*, *Nightcore*, *Slowed + reverb*.
-- **Voice changer, text-to-speech** and live voice-to-speech, plus optional **AI
-  voices** that make you sound like someone else, live on your own PC.
+- **Voice changer, text-to-speech** (in 33 languages) and live voice-to-speech, plus
+  optional **AI voices** that make you sound like someone else, live on your own PC:
+  12 characters, or blend two into your own.
 - **Instant replay**: one key turns the last 30 seconds you heard into a pad.
 - **Share a program's sound** (music, a video) with your friends, and grab the bit you
   want from it in the **clip editor**.
-- **Screen triggers**, **world radio**, a **clean stream output for OBS**, and 31 themes.
+- **Live speed, pitch and effects** on what's playing: your pads, the radio, or a
+  program you're sending.
+- **Screen triggers**, **world radio**, a **clean stream output for OBS**, 31 themes
+  and your own highlight colour.
+- **In your language**: the whole app comes in 32 languages (Settings → Appearance →
+  Language).
+- **Starts simple**: Sounds, Voice and Setup. The other tabs wait under *+ More
+  tabs*, and any tab you don't use can be switched off so it doesn't load at all.
 
 The full list is in [docs/FEATURES.md](docs/FEATURES.md).
 
@@ -132,7 +143,8 @@ Optional: if you never get it, nothing changes.
   + Add a device*, once per extra output that should get a copy (− takes one off).
 - **Have the virtual cable from before?** Once your sounds are in your mic, the
   *Setup* tab offers to remove it. Keep it if another program uses it.
-- **Still stuck?** [Open an issue](../../issues/new/choose) and attach
+- **Still stuck?** Ask in the [Onion Board Discord](https://discord.gg/FhKGaWCWHM), or
+  [open an issue](../../issues/new/choose) and attach
   `%APPDATA%\OnionBoard\onionboard.log` (skim it first: it has your device names).
 
 Your sounds and settings live in `%APPDATA%\OnionBoard\` and survive reinstalls.
