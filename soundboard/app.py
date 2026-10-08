@@ -415,6 +415,8 @@ def main():
     i18n.translate_qt_buttons(app)   # OK, Cancel, Yes… in Qt's own dialogs
     from soundboard.ui import quietbox
     quietbox.install(app)   # no Windows ding from tips and warnings
+    from soundboard.ui import weblinks
+    weblinks.install()   # links open the browser without the relay's proxy settings
     applog.ui_ready()
     if "--restart-after" in sys.argv:   # restarted by the app (Settings > Reset)
         wait_for_exit(sys.argv[sys.argv.index("--restart-after") + 1:][:1])
