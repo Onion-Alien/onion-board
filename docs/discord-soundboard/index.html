@@ -44,8 +44,12 @@
     <li>Onion Board opens with a short guide. Pick the mic you talk into and the headphones you listen on,
       then click <b>Put my sounds straight into my mic</b> and <b>Yes</b> when Windows asks.</li>
     <li>In Discord, open <b>User Settings → Voice &amp; Video</b>. Keep <b>Input Device</b> on your normal mic.</li>
-    <li>In the same place, set <b>Input Profile</b> to <b>Studio</b>. Otherwise Discord's noise
-      suppression treats music and sound effects as background noise and cuts them out.</li>
+    <li>In the same place, set <b>Input Profile</b> to <b>Custom</b>, <b>Noise Suppression</b> to
+      <b>None</b>, and turn <b>Echo Cancellation</b> off. Otherwise Discord treats music and sound
+      effects as background noise and cuts them out. Don't pick <b>Studio</b>: on your mic it makes
+      Discord skip Onion Board, so none of your sounds get through (on the virtual cable, Studio is fine).
+      Also switch off <b>Automatically determine input sensitivity</b> and <b>Advanced Voice Activity</b>,
+      or use push-to-talk. Onion Board reads these settings and shows a bar when one is in the way.</li>
     <li>Drag sound files onto the Onion Board window and double-click a pad. Everyone in the call hears it.</li>
   </ol>
   <img src="../screenshots/sounds.png?v=5d4d4efc" alt="Onion Board's sound pads" loading="lazy" width="1100" height="736">
@@ -70,8 +74,8 @@
       Input Device is the same mic you picked in Onion Board. (On the virtual cable it must be
       <code>CABLE Output</code>; with another device, the mic that device feeds. <b>Nobody</b>
       sends nothing to others.)</li>
-    <li><b>Sounds cut in and out:</b> set Input Profile to <b>Studio</b>, or turn off noise suppression.
-      Onion Board's Setup tab has a check that tells you which Discord setting is chopping your sounds.</li>
+    <li><b>Sounds cut in and out:</b> set Noise Suppression to <b>None</b> and switch off automatic input
+      sensitivity. Onion Board's <b>Fix Discord</b> bar and its Setup tab say which Discord setting is chopping your sounds.</li>
     <li><b>They hear sounds but not your voice:</b> tick <b>Others hear it</b> in the <i>My mic</i> section at the bottom of the window.</li>
     <li><b>Only want the sounds, not your voice?</b> Untick that same box.</li>
   </ul>
@@ -81,7 +85,7 @@
     <a href="https://github.com/Onion-Alien/onion-board">on GitHub</a>.</div>
 
   <h2>Also in Onion Board</h2>
-  <p>A live voice changer, text-to-speech, instant replay of the last 30 seconds of a call,
+  <p>A live voice changer, text-to-speech in 33 languages, optional AI voices, instant replay of the last 30 seconds of a call,
     MIDI pad support, and screen triggers that play a sound when something shows up in your game.
     <a href="../">See everything it does →</a></p>
 
