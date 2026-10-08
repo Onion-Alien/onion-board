@@ -2015,3 +2015,30 @@ def test_window_starts_on_the_mic_with_the_cable_copy(qapp, app_dir, monkeypatch
     finally:
         w._load_thread.join(15)
         w.close()
+
+
+def test_an_older_mic_part_moves_on_by_itself_once_per_version(window, monkeypatch):  # noqa: F811
+    """1.9.20 and before sat where raw streams skip it: the first start of a new
+    version moves it (Windows asks once) instead of waiting for a button nobody
+    looks for; a No isn't asked again until the next version, and never from the tray."""
+    from soundboard import __version__
+    w = window
+    w.cfg.route, w.cfg.mic_device, w.cfg.mic_update_tried = "mic", "My mic", ""
+    monkeypatch.setattr(dm, "status", lambda name=None: "outdated")
+    monkeypatch.setattr(w.cfg, "save", lambda: True)
+    tried = []
+    monkeypatch.setattr(w, "attach_mic", lambda: tried.append(1))
+    monkeypatch.setattr(w, "isVisible", lambda: False)   # in the tray: not yet
+    w._auto_mic_update()
+    assert not tried and w.cfg.mic_update_tried == ""
+    monkeypatch.setattr(w, "isVisible", lambda: True)
+    w._auto_mic_update()
+    assert tried == [1] and w.cfg.mic_update_tried == __version__
+    w._auto_mic_update()   # said No, or started again: not asked again this version
+    assert tried == [1]
+    w.cfg.mic_update_tried = ""
+    for route, state in (("cable", "outdated"), ("mic", "ready")):
+        w.cfg.route = route
+        monkeypatch.setattr(dm, "status", lambda name=None, s=state: s)
+        w._auto_mic_update()
+    assert tried == [1]

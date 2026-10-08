@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.9.22 — 2026-10-08
+
+- **The mic update from 1.9.21 happens by itself.** If you set up *Straight into my
+  mic* before 1.9.21, the first start of this version moves Onion Board's part of
+  your mic for you: click *Yes* when Windows asks (once). No button to find.
+
 ## 1.9.21 — 2026-10-08
 
 - **Your sounds reach every app that uses your mic.** Some apps open the mic in a way
