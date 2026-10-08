@@ -1,5 +1,17 @@
 # Changelog
 
+## 1.9.26 — 2026-10-08
+
+- **Bun sets up your mic.** While *Straight into my mic* is being set up, Bun
+  rolls in and hammers a speaker together instead of a greyed-out button. If it
+  works, the speaker plays and he cheers; if not, it pops and he shuffles off.
+- **Pasted TikTok links work again.** They all failed with "Unexpected response";
+  TikTok pads now get their picture too.
+- **Smoother voice changer.** A changed voice could turn back into your own
+  mid-call; dragging sliders while talking no longer clicks or drops out.
+- **Fewer pointless error pop-ups.** A window closed a moment too early no longer
+  shows an error report (it's still counted so it gets fixed).
+
 ## 1.9.25 — 2026-10-08
 
 - **Fix:** an error report could pop up if the mic set-up finished after the
