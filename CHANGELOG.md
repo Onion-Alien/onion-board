@@ -2,6 +2,17 @@
 
 ## Unreleased
 
+- **Sort your pads.** The new button by the search box sorts them *A–Z*, *Newest* or
+  *Most played*, or keeps *My order* (the one you drag). Each sound now keeps a play
+  count, starting from this version.
+- **List view.** The same button shows the pads as one-line rows, several columns of
+  them, with each sound's hotkey: hundreds of sounds on one screen.
+- **Quick volume on a pad.** Hold Ctrl and turn the mouse wheel over a pad, or use
+  the volume slider in its right-click menu, instead of opening *Edit* every time.
+- **Save a typed line as a sound.** *Save as sound* beside *Say* on the Voice tab
+  keeps the line, in the voice you picked, as a pad on the Sounds tab.
+- **A colour per category.** Right-click a category → *Colour*: a dot on its tab and
+  on the in-game overlay shows which one is up.
 - **Small tidy-ups:** the ⓘ beside the tabs is on every tab now (a line on what the
   tab is for), the Apps tab's *Effects* and *Card size* controls wait until a
   program shows up, and the transport bar's time is blank until a sound is picked.

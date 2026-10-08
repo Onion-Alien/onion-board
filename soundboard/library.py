@@ -155,7 +155,10 @@ TOR_BRIDGES = ("", "snowflake", "obfs4")   # soundboard.tor.BRIDGES
 ROUTES = ("cable", "device", "off", "mic")
 # settings whose unknown value (a newer version's choice) clean_setting replaces with
 # a safe one: the value as it was is still written back (see _with_raw)
-NEWER_CHOICES = ("route", "net_mode", "tor_bridges")
+NEWER_CHOICES = ("route", "net_mode", "tor_bridges", "pad_sort", "pad_view")
+# the Sounds tab's orders: as dragged, A-Z, the newest first, the most played first
+PAD_SORTS = ("custom", "name", "newest", "plays")
+PAD_VIEWS = ("grid", "list")
 SETTING_RANGES = {"sound_vol": (0.0, VOLUME_MAX), "mic_vol": (0.0, VOLUME_MAX),
                   "mon_vol": (0.0, VOLUME_MAX), "obs_vol": (0.0, VOLUME_MAX),
                   "pad_width": PAD_WIDTH_RANGE, "app_card_width": (240, 480),
@@ -192,6 +195,13 @@ def clean_setting(k: str, v):
         return list(dict.fromkeys(x for x in v if isinstance(x, str) and x))
     if k == "route":   # a newer version's route: back to the cable, the safe default
         return v if v in ROUTES else "cable"
+    if k == "pad_sort":
+        return v if v in PAD_SORTS else "custom"
+    if k == "pad_view":
+        return v if v in PAD_VIEWS else "grid"
+    if k == "category_colors":   # {category: "#rrggbb"}; anything else is dropped
+        return {c: col for c, col in v.items() if isinstance(c, str) and isinstance(col, str)
+                and re.fullmatch(r"#[0-9a-fA-F]{6}", col)}
     if k == "tor_bridges":   # an unknown kind: still hide Tor, with the default bridge
         return v if v in TOR_BRIDGES else "snowflake"
     if k == "eq_gains":   # one finite gain per band, within the EQ's sliders
@@ -293,6 +303,8 @@ class SoundMeta:
     only_them: bool = False   # goes out to others but not into your own headphones
     delay: float = 0.0        # seconds between the press and the sound starting
     cooldown: float = 0.0     # seconds after it starts during which presses are ignored
+    plays: int = 0            # times it was played (the Sounds tab's Most played order)
+    added: float = 0.0        # time.time() it joined the board; 0 = before this was kept
 
 
 @dataclass
@@ -348,6 +360,8 @@ class Config:
     # never picked by anyone) doesn't keep it off; older versions just ignore it
     live_tab_green: bool = True
     pad_width: int = 150
+    pad_sort: str = "custom"   # the Sounds tab's order: PAD_SORTS
+    pad_view: str = "grid"     # "grid" (cards) or "list" (one-line rows)
     app_card_width: int = 300
     tab: int = 0     # 0 = sounds, 1 = radio, 2 = apps, 3 = triggers, 4 = voice, 5 = setup
     # Settings > Tabs: the tabs switched off ("radio", "apps", "triggers", "voice"), gone
@@ -379,6 +393,7 @@ class Config:
     screen: dict = field(default_factory=dict)
     categories: list[str] = field(default_factory=list)   # pad categories, in tab order
     category: str = ""                # the category the Sounds tab shows; "" = all
+    category_colors: dict = field(default_factory=dict)   # category -> "#rrggbb" on its tab
     tray: bool = True                 # closing the window keeps the app in the tray
     autostart_hidden: bool = True     # started with Windows: straight to the tray
     # look at GitHub Releases for a newer version, at most every 6 hours (soundboard.updates).
@@ -653,7 +668,8 @@ class Config:
                     s[k] = clean_wait(s[k], k)
             if s.get("mode") not in MODES:
                 s["mode"] = "restart"
-            for k, lo, hi in (("volume", 0.0, 2.0), ("level_gain", 0.1, 6.0)):
+            for k, lo, hi in (("volume", 0.0, 2.0), ("level_gain", 0.1, 6.0),
+                              ("plays", 0, 10**9), ("added", 0.0, 1e11)):
                 if k in s:   # the Edit dialog's slider can't take any number
                     s[k] = min(max(s[k], lo), hi)
             m = SoundMeta(**s)
@@ -865,6 +881,20 @@ MAX_FADE_S = 10.0
 MAX_DELAY_S = 10.0      # a sound's "wait before playing"
 MAX_COOLDOWN_S = 60.0   # a sound's "ignore presses for"
 MODES = ("restart", "overlap", "toggle", "solo", "queue")   # SoundMeta.mode
+
+
+def sorted_sounds(sounds: list[SoundMeta], how: str) -> list[SoundMeta]:
+    """The sounds in the Sounds tab's order `how` (PAD_SORTS). Ties keep the board's
+    own order; sounds from before `added` was kept count as older than any since, and
+    among themselves the later in the board the newer (new sounds are added at the end)."""
+    if how == "name":
+        return sorted(sounds, key=lambda m: m.name.casefold())
+    if how == "plays":
+        return sorted(sounds, key=lambda m: -m.plays)
+    if how == "newest":
+        order = {id(m): i for i, m in enumerate(sounds)}
+        return sorted(sounds, key=lambda m: (-m.added, -order[id(m)]))
+    return list(sounds)
 
 
 def clean_fade(v) -> float:
@@ -1344,7 +1374,8 @@ def import_file(src: str, color: str) -> tuple[SoundMeta, np.ndarray]:
             sf.write(dest, data, SR, subtype="PCM_16")
         else:
             shutil.copy2(srcp, dest)
-        meta = SoundMeta(id=sid, name=srcp.stem.replace("_", " ").strip()[:40] or "Sound",
+        meta = SoundMeta(id=sid, added=time.time(),
+                         name=srcp.stem.replace("_", " ").strip()[:40] or "Sound",
                          file=str(dest), color=color, level_gain=level_gain(data),
                          duration=len(data) / SR, fingerprint=fingerprint(src))
         return meta, store_cached(sid, data)
@@ -1363,7 +1394,7 @@ def save_clip(data: np.ndarray, name: str, color: str) -> tuple[SoundMeta, np.nd
     sid = uuid.uuid4().hex[:10]
     dest = SOUNDS_DIR / f"{sid}_{_safe_name(name)}.flac"
     sf.write(dest, data, SR, subtype="PCM_16")
-    meta = SoundMeta(id=sid, name=name[:40], file=str(dest), color=color,
+    meta = SoundMeta(id=sid, name=name[:40], file=str(dest), color=color, added=time.time(),
                      level_gain=level_gain(data), duration=len(data) / SR,
                      fingerprint=fingerprint(str(dest)))
     return meta, store_cached(sid, data)
@@ -1410,7 +1441,8 @@ def duplicate(meta: SoundMeta, name: str) -> SoundMeta:
         except OSError:
             log.debug("couldn't copy the picture of %s", meta.id, exc_info=True)
             image = ""
-    return SoundMeta(id=sid, name=name[:40], file=str(dest), volume=meta.volume,
+    return SoundMeta(id=sid, name=name[:40], file=str(dest), added=time.time(),
+                     volume=meta.volume,
                      mode=meta.mode, loop=meta.loop, color=meta.color,
                      level_gain=meta.level_gain, duration=meta.duration,
                      fingerprint="", fx=dict(meta.fx), image=image, tags=list(meta.tags),

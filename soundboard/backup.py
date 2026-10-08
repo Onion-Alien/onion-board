@@ -503,7 +503,7 @@ def _install_one(src: _Source, ps: PackedSound, name: str, color: str | None,
 def _fill_meta(src: _Source, ps: PackedSound, sid: str, name: str, color: str | None,
                dest: Path, budget: _Budget | None = None) -> SoundMeta:
     from soundboard import thumbs
-    meta = SoundMeta(id=sid, name=name, file=str(dest))
+    meta = SoundMeta(id=sid, name=name, file=str(dest), added=time.time())
     defaults = {f.name: getattr(meta, f.name) for f in fields(SoundMeta)}
     for k in SOUND_FIELDS:
         v = ps.entry.get(k)

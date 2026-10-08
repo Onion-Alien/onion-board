@@ -461,6 +461,20 @@ def _like(p, fill):
     p.drawPath(path)
 
 
+def _sort(p, fill):
+    """Lines getting shorter, an arrow pointing down beside them."""
+    for y, w in ((6, 10), (12, 7), (18, 4)):
+        p.drawLine(QPointF(3, y), QPointF(3 + w, y))
+    p.drawLine(QPointF(18, 4), QPointF(18, 20))
+    p.drawPolyline([QPointF(14.5, 16.5), QPointF(18, 20), QPointF(21.5, 16.5)])
+
+
+def _list(p, fill):
+    for y in (6, 12, 18):
+        fill(QPainterPath(), lambda pp, y=y: pp.addEllipse(QPointF(4.5, y), 1.6, 1.6))
+        p.drawLine(QPointF(9, y), QPointF(21, y))
+
+
 def _copy(p, fill):
     p.drawRoundedRect(QRectF(8, 8, 12, 13), 2, 2)
     path = QPainterPath(QPointF(5, 16))
@@ -472,6 +486,7 @@ def _copy(p, fill):
 SHAPES = {
     "shuffle": _shuffle, "star": _star,
     "star_filled": lambda p, fill: _star(p, fill, True), "like": _like, "copy": _copy,
+    "sort": _sort, "list": _list,
     "sounds": _grid, "browser": _globe, "voice": _mask, "setup": _sliders,
     "sliders": _sliders, "wave": _wave,
     "mic": _mic, "headphones": _headphones, "volume": _volume, "ear": _ear,
