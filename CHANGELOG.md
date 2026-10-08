@@ -1,5 +1,21 @@
 # Changelog
 
+## 1.9.24 — 2026-10-08
+
+- **Set up for the app you're using.** When Discord, Zoom, Teams, a browser call,
+  TeamSpeak, Mumble or a game with a known voice chat starts listening, a slim bar
+  asks "Looks like you're using Discord. Set up for it?". *Set up* picks the right
+  sound mode and shows what's left to check; next time that app starts, the mode
+  switches by itself (with Undo). Settings → General lists the apps it remembers.
+- **More for your Stream Deck and chat.** Remote control can now switch the voice
+  changer straight to a voice, say a typed line in the computer voice (a channel
+  point reward that reads out what the viewer wrote), queue a sound or play a whole
+  category in a row, and turn *Hear what they hear* on or off. The Streamer guide's
+  *Copy AI prompt* knows all of it, and lists your voices too.
+- **Fixes:** *Send feedback* and *Report a problem* opened the Documents folder
+  instead of the browser; the Sounds tab now lights up for a song played from the
+  web search, like the Radio tab does.
+
 ## 1.9.23 — 2026-10-08
 
 - **Safer mic set-up.** The one-time *Straight into my mic* set-up locks down its own
