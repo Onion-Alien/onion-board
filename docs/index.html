@@ -10,6 +10,10 @@
 <meta property="og:image" content="https://onion-alien.github.io/onion-board/screenshots/sounds.png?v=5d4d4efc">
 <meta property="og:type" content="website">
 <meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="favicon.ico" sizes="16x16 32x32 48x48">
+<link rel="icon" type="image/png" href="favicon.png" sizes="192x192">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="theme-color" content="#0f1016">
 <link rel="canonical" href="https://onion-alien.github.io/onion-board/">
 <script type="application/ld+json">
 {"@context": "https://schema.org", "@type": "SoftwareApplication",
@@ -54,6 +58,8 @@
   .steps { max-width: 640px; margin: 0 auto; padding-left: 22px; }
   .steps li { margin: 6px 0; }
   .note { max-width: 640px; margin: 16px auto 0; color: var(--muted); font-size: 14px; }
+  h1 .logo { display: inline-block; width: 1.15em; height: 1.15em; border: 0; border-radius: 0;
+            vertical-align: -0.2em; margin-right: 0.25em; }
   footer { text-align: center; color: var(--muted); font-size: 14px; padding: 48px 0 40px; }
   @media (max-width: 440px) { .shots { grid-template-columns: 1fr; } }
 </style>
@@ -63,7 +69,7 @@
 <body>
 <div class="wrap">
   <header>
-    <h1><span>Onion Board</span></h1>
+    <h1><img class="logo" src="favicon.png" alt="" width="60" height="60"><span>Onion Board</span></h1>
     <p class="tag">A free soundboard for Windows. Press a pad or a hotkey, even in-game, and
       your friends in Discord or your game hear it through your mic.</p>
     <a class="dl" href="https://github.com/Onion-Alien/onion-board/releases/latest/download/OnionBoardSetup.exe" data-goatcounter-click="download-home-top">⬇ Download for Windows</a>
@@ -139,5 +145,6 @@
     The app sends only an anonymous daily count (its version and a random ID), and you can switch it off. This site counts visits with GoatCounter: no cookies, nothing personal.
   </footer>
 </div>
+<script src="zoom.js" defer></script>
 </body>
 </html>
