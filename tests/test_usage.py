@@ -378,7 +378,7 @@ def _paths(req) -> list[str]:
 
 def test_the_daily_count_says_roughly_how_its_used(sent):
     cfg = Config(route="mic", language="de", sounds=[_sound(i, plays=2) for i in range(12)])
-    cfg.sounds[0].hotkey = "f1"
+    cfg.sounds[0].hotkey = "ctrl+f1"
     usage.used("voice-changer")
     usage.used("not-a-feature")   # never sent: only FEATURES
     usage.maybe_send(cfg)
@@ -389,7 +389,7 @@ def test_the_daily_count_says_roughly_how_its_used(sent):
     assert {p for p in paths if p.startswith("used/")} == {"used/voice-changer", "used/hotkeys"}
     assert sum(p.startswith("age/") for p in paths) == 1
     body = sent[0][0].data.decode("utf-8")
-    assert "Secret name" not in body and "f1" not in body and "x/0.wav" not in body
+    assert "Secret name" not in body and "ctrl+f1" not in body and "x/0.wav" not in body
     # the plays and features since then, a day later
     cfg.sounds[1].plays += 5
     cfg.stats_sent -= usage.EVERY_S
