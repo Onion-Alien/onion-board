@@ -1937,8 +1937,14 @@ class MainWindow(QMainWindow):
                     status=theme.status('warn'), devices=devices))
         self.set_sending(self.btn_air.isChecked())   # its label follows the route
         self._update_flow()
-        errs = [f"{_('stream output') if k == 'obs' else k}: {v}"
-                for k, v in e.errors_snapshot().items()]
+        where = {"main": _("sending"), "mon": _("headphones"), "mic": _("mic"),
+                 "obs": _("stream output")}
+        errs = [f"{where.get(k, k)}: {v}" for k, v in e.errors_snapshot().items()]
+        if errs and (self._attaching or time.monotonic() < self._settle_until):
+            # setting up straight into my mic restarts Windows' audio on purpose: every
+            # device drops for a few seconds and comes back by itself, so that's no error
+            # (still failing once the wait is over, it shows: _mic_attached redraws then)
+            errs = []
         if errs:
             self.status.setText(_("<span style='color:{status}'>Audio device problem — "
                                   "{problems}</span>", status=theme.status('error'),
@@ -2203,7 +2209,7 @@ class MainWindow(QMainWindow):
             # Windows takes a few seconds to load it: "starting…" meanwhile, then a
             # redraw when the wait is over (it works by then, or Repair comes back)
             self._settle_until = time.monotonic() + self.SETTLE_S
-            QTimer.singleShot(int(self.SETTLE_S * 1000) + 200, self._update_flow)
+            QTimer.singleShot(int(self.SETTLE_S * 1000) + 200, self._update_status)
             self.cfg.route = "cable"   # so set_route() applies "mic" in full
             self.set_route("mic")
             self.toast(_("Done — Discord and games hear your sounds through your mic now."))
