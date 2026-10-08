@@ -147,6 +147,8 @@ codec, one PC, one account), `discord_roundtrip.py` and `game_roundtrip.py` (a
 friend records the game on their end). The stacks, their sources and what the
 bench found: [GAME-VOICE.md](GAME-VOICE.md).
 
+**After any change to the sending path** (the mic effect, `directmic.py`, routes, send volume or the *Who's listening* modes), run the maintainer's silent voice check (`voicecheck.py`, kept outside the repo because it needs Vivox and Epic developer keys; ~3 min) and paste its table into the PR: it shows what Discord, Vivox and Epic voice do to 3 songs, and whether apps opening the mic each way still get our sounds.
+
 **Launching the real app is not headless.** It opens a window, grabs global
 hotkeys and opens audio devices. Agents: ask the user before running
 `scripts\run.bat`, `python -m soundboard`, `OnionBoard.exe` or the installer.
