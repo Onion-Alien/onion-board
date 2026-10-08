@@ -352,7 +352,9 @@ class SetupWizard(QDialog):
         self.btn_attach.setStyleSheet("padding:12px; font-size:12pt;")
         self.btn_attach.clicked.connect(self.attach_mic)
         v.addWidget(self.btn_attach)
-        self.win.mic_attached.connect(lambda *__: self.recheck_cable(rescan=False))
+        # a bound method, not a lambda: Qt drops the link when the guide is freed, so a
+        # set-up finishing after it closed can't poke its deleted buttons
+        self.win.mic_attached.connect(self._mic_attached)
         self.cable_status = _label("")
         self.cable_status.setStyleSheet("font-size:12pt; padding:12px;")
         v.addWidget(self.cable_status)
@@ -612,6 +614,9 @@ class SetupWizard(QDialog):
             return (self.win._main_name() is not None
                     and "main" not in self.win.engine.errors_snapshot())
         return self.cable_ok()
+
+    def _mic_attached(self, mic: str, err: str):
+        self.recheck_cable(rescan=False)
 
     def recheck_cable(self, rescan: bool = True):
         if rescan:
