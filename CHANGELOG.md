@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- **Pads work from the keyboard.** On a pad, F2 renames it, Alt+Enter opens Edit
+  and Delete removes it (it already removed the picked ones); Ctrl+F anywhere on
+  the Sounds tab jumps to the search box. Arrows, Enter and Space worked already.
 - **Mid-size windows keep the words that matter.** The *Listening* dropdown no longer
   stands alone as a bare “Clean” (its label goes with it), and *Record* keeps its word
   instead of becoming a lone red dot, until the window is really small.

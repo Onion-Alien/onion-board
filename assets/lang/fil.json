@@ -2770,5 +2770,6 @@
     "{n} istasyon ({shown})"
   ],
   "Tuning in to radio stations around the world…": "Nag-tune in sa mga istasyon ng radyo sa buong mundo…",
-  "{hotkey} is {what} now — it was the key for {lost}": "{hotkey} ay {what} ngayon — ito ang susi para sa {lost}"
+  "{hotkey} is {what} now — it was the key for {lost}": "{hotkey} ay {what} ngayon — ito ang susi para sa {lost}",
+  "Rename sound": "Palitan ang pangalan ng tunog"
 }

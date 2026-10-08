@@ -1090,6 +1090,10 @@ class MainWindow(QMainWindow):
         paste = QShortcut(QKeySequence.Paste, page)
         paste.setContext(Qt.WidgetWithChildrenShortcut)
         paste.activated.connect(self.paste_picture)
+        # Ctrl+F anywhere on the page: into the search box
+        find = QShortcut(QKeySequence.Find, page)
+        find.setContext(Qt.WidgetWithChildrenShortcut)
+        find.activated.connect(self.focus_search)
 
         # ---- "now playing" chips: shown while 2+ sounds overlap, so every one of
         # them can be stopped (■) or taken into the player (name) without clicking
@@ -4017,6 +4021,8 @@ class MainWindow(QMainWindow):
                 p.pick.connect(self.selection.on_pick)
                 p.step.connect(self.grid.focus_step)
                 p.menu.connect(self.pad_menu)
+                p.rename.connect(self.rename_sound)
+                p.edit.connect(self.edit)
                 self.pads[m.id] = p
             p.state = "ready" if m.id in self.audio else p.state
             p.selected = m.id == self.current
@@ -4215,6 +4221,31 @@ class MainWindow(QMainWindow):
         self._fill_categories()
         self.apply_filter(self.search.text())
         self.toast(msg)
+
+    def focus_search(self):
+        """Ctrl+F: the cursor into Search sounds, with what's there selected."""
+        self.search.setFocus(Qt.ShortcutFocusReason)
+        self.search.selectAll()
+
+    def rename_sound(self, sid: str, new: str | None = None):
+        """F2 on a pad (and the pad menu's Rename…): just the name, without the Edit
+        window."""
+        m = self.meta(sid)
+        if m is None:
+            return
+        if new is None:
+            new, ok = QInputDialog.getText(self, _("Rename sound"), _("New name:"), text=m.name)
+            new = new if ok else ""
+        new = new.strip()
+        if not new or new == m.name:
+            return
+        m.name = new
+        if sid in self.pads:
+            self.pads[sid].update()
+        if self.current == sid:
+            self._set_np_name(new)
+        self._save_now()
+        self.toast(_("✓ Renamed to “{new}”", new=html.escape(new)), "ok")
 
     def rename_category(self, old: str, new: str | None = None):
         if new is None:

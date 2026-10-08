@@ -2770,5 +2770,6 @@
     "{n} asemaa (ylhäällä {shown})"
   ],
   "Tuning in to radio stations around the world…": "Viritä radioasemia ympäri maailmaa…",
-  "{hotkey} is {what} now — it was the key for {lost}": "{hotkey} on nyt {what} – se oli avain kohteelle {lost}"
+  "{hotkey} is {what} now — it was the key for {lost}": "{hotkey} on nyt {what} – se oli avain kohteelle {lost}",
+  "Rename sound": "Nimeä ääni uudelleen"
 }

@@ -2770,5 +2770,6 @@
     "{n} estações (topo {shown} apresentado)"
   ],
   "Tuning in to radio stations around the world…": "Sintonizando estações de rádio em todo o mundo…",
-  "{hotkey} is {what} now — it was the key for {lost}": "{hotkey} é {what} agora - foi a chave para {lost}"
+  "{hotkey} is {what} now — it was the key for {lost}": "{hotkey} é {what} agora - foi a chave para {lost}",
+  "Rename sound": "Renomear som"
 }

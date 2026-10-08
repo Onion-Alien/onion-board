@@ -403,8 +403,11 @@ def pad_colours() -> dict[str, QColor]:
 class Pad(QAbstractButton):
     """One sound's button, painted by hand. It's a QAbstractButton so screen readers
     see a button with the sound's name, and it works from the keyboard: Tab / arrows
-    to move, Enter or Space to play, Ctrl+Space to pick, the Menu key for its menu."""
+    to move, Enter or Space to play, Ctrl+Space to pick, the Menu key for its menu,
+    F2 to rename it, Alt+Enter to edit it (Delete removes it: ui/padbatch.py)."""
     activated = Signal(str)     # play it (a double-click, Enter, a screen reader's press)
+    rename = Signal(str)        # F2: ask for a new name
+    edit = Signal(str)          # Alt+Enter: the Edit window
     chosen = Signal(str)        # a single click: select it (transport bar) without playing
     pick = Signal(str, bool)    # Ctrl+click / Ctrl+Space (False) or Shift+click (True)
     space = Signal(str)         # Space: pause / resume it if it's playing, else play it
@@ -502,8 +505,12 @@ class Pad(QAbstractButton):
         elif k == Qt.Key_Space and not mods:
             if not e.isAutoRepeat():
                 self.space.emit(self.meta.id)
+        elif k in (Qt.Key_Return, Qt.Key_Enter) and mods & Qt.AltModifier:
+            self.edit.emit(self.meta.id)
         elif k in (Qt.Key_Return, Qt.Key_Enter):
             self.activated.emit(self.meta.id)
+        elif k == Qt.Key_F2 and not mods:
+            self.rename.emit(self.meta.id)
         elif k == Qt.Key_Menu or (k == Qt.Key_F10 and mods & Qt.ShiftModifier):
             self.menu.emit(self.meta.id, self.mapToGlobal(self.rect().center()))
         elif k in arrows and not mods & (Qt.ControlModifier | Qt.AltModifier):

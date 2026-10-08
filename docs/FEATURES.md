@@ -10,7 +10,9 @@ The full list. The [README](../README.md) has the short version and how to get s
   used by itself. **Pads from videos** have a *Video* button that shows the video in
   step with the sound (only you see it). **Pick several pads** with Ctrl+click,
   Shift+click or Ctrl+A to change their colour, volume, fades or categories, export
-  them or remove them together (one Undo).
+  them or remove them together (one Undo). **From the keyboard:** arrows move
+  between pads, Enter or Space plays, F2 renames, Alt+Enter opens Edit, Delete
+  removes (the picked pads, or the one you're on) and Ctrl+F jumps to the search box.
 - **Record a sound with your mic, or from what's playing:** the **Record** button next
   to *Add sounds*. Record your own voice, your voice through the voice changer while
   it's on, or *What's playing*: a bit of a sound, a web search result or the radio as

@@ -2710,5 +2710,6 @@
     "{n} สถานี (ด้านบน {shown} แสดง)"
   ],
   "Tuning in to radio stations around the world…": "ปรับสถานีวิทยุทั่วโลก...",
-  "{hotkey} is {what} now — it was the key for {lost}": "{hotkey} คือ {what} ตอนนี้ — มันเป็นกุญแจสำหรับ {lost}"
+  "{hotkey} is {what} now — it was the key for {lost}": "{hotkey} คือ {what} ตอนนี้ — มันเป็นกุญแจสำหรับ {lost}",
+  "Rename sound": "เปลี่ยนชื่อเสียง"
 }

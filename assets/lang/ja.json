@@ -2710,5 +2710,6 @@
     "{n}駅 (上位{shown}を表示)"
   ],
   "Tuning in to radio stations around the world…": "世界中のラジオ局にチャンネルを合わせて…",
-  "{hotkey} is {what} now — it was the key for {lost}": "{hotkey}は現在{what}です — それは{lost}のキーでした"
+  "{hotkey} is {what} now — it was the key for {lost}": "{hotkey}は現在{what}です — それは{lost}のキーでした",
+  "Rename sound": "サウンドの名前を変更する"
 }
