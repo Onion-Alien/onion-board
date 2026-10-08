@@ -2771,5 +2771,11 @@
   ],
   "Tuning in to radio stations around the world…": "Dünya çapındaki radyo istasyonlarını ayarlıyoruz…",
   "{hotkey} is {what} now — it was the key for {lost}": "{hotkey} artık {what} oldu — {lost} 'un anahtarıydı",
-  "Rename sound": "Sesi yeniden adlandır"
+  "Rename sound": "Sesi yeniden adlandır",
+  "A second pad with the same sound, to give its own effects or hotkey": "Kendi efektlerini veya kısayol tuşunu vermek için aynı sese sahip ikinci bir ped",
+  "Duplicate": "Çoğalt",
+  "Just the name (F2 on the pad does it too)": "Sadece isim (pad üzerindeki F2 de bunu yapıyor)",
+  "Show the file in its folder": "Dosyayı kendi klasöründe göster",
+  "The file for “{name}” isn't there any more": "“ {name} ” dosyası artık yok",
+  "{name} (copy)": "{name} (kopya)"
 }

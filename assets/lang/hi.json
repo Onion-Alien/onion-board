@@ -2771,5 +2771,11 @@
   ],
   "Tuning in to radio stations around the world…": "दुनिया भर के रेडियो स्टेशनों से जुड़ना...",
   "{hotkey} is {what} now — it was the key for {lost}": "{hotkey} अब {what} है - यह {lost} की कुंजी थी",
-  "Rename sound": "ध्वनि का नाम बदलें"
+  "Rename sound": "ध्वनि का नाम बदलें",
+  "A second pad with the same sound, to give its own effects or hotkey": "अपना स्वयं का प्रभाव या हॉटकी देने के लिए समान ध्वनि वाला दूसरा पैड",
+  "Duplicate": "डुप्लिकेट",
+  "Just the name (F2 on the pad does it too)": "बस नाम (पैड पर F2 भी ऐसा करता है)",
+  "Show the file in its folder": "फ़ाइल को उसके फ़ोल्डर में दिखाएँ",
+  "The file for “{name}” isn't there any more": "\" {name} \" के लिए फ़ाइल अब मौजूद नहीं है",
+  "{name} (copy)": "{name} (कॉपी)"
 }

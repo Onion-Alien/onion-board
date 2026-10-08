@@ -2771,5 +2771,11 @@
   ],
   "Tuning in to radio stations around the world…": "Écouter les stations de radio du monde entier…",
   "{hotkey} is {what} now — it was the key for {lost}": "{hotkey} est {what} maintenant – c'était la clé de {lost}",
-  "Rename sound": "Renommer le son"
+  "Rename sound": "Renommer le son",
+  "A second pad with the same sound, to give its own effects or hotkey": "Un deuxième pad avec le même son, pour donner ses propres effets ou raccourci clavier",
+  "Duplicate": "Dupliquer",
+  "Just the name (F2 on the pad does it too)": "Juste le nom (F2 sur le pad le fait aussi)",
+  "Show the file in its folder": "Afficher le fichier dans son dossier",
+  "The file for “{name}” isn't there any more": "Le fichier « {name} » n'existe plus",
+  "{name} (copy)": "{name} (copie)"
 }

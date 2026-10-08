@@ -2771,5 +2771,11 @@
   ],
   "Tuning in to radio stations around the world…": "Ráhangolódás a világ rádióállomásaira…",
   "{hotkey} is {what} now — it was the key for {lost}": "A {hotkey} most {what} – ez volt a kulcsa {lost} számára",
-  "Rename sound": "Hang átnevezése"
+  "Rename sound": "Hang átnevezése",
+  "A second pad with the same sound, to give its own effects or hotkey": "Egy második pad ugyanazzal a hanggal, hogy saját effektusokat vagy gyorsbillentyűket adjon",
+  "Duplicate": "Duplikálás",
+  "Just the name (F2 on the pad does it too)": "Csak a név (a padon az F2 is ezt teszi)",
+  "Show the file in its folder": "Mutassa meg a fájlt a mappájában",
+  "The file for “{name}” isn't there any more": "A(z) „ {name} ” fájl már nincs meg",
+  "{name} (copy)": "{name} (másolat)"
 }

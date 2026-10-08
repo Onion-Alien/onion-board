@@ -2831,5 +2831,11 @@
   ],
   "Tuning in to radio stations around the world…": "Vă acordați posturile de radio din întreaga lume...",
   "{hotkey} is {what} now — it was the key for {lost}": "{hotkey} este {what} acum - a fost cheia pentru {lost}",
-  "Rename sound": "Redenumiți sunetul"
+  "Rename sound": "Redenumiți sunetul",
+  "A second pad with the same sound, to give its own effects or hotkey": "Un al doilea pad cu același sunet, pentru a oferi propriile efecte sau taste rapide",
+  "Duplicate": "Duplică",
+  "Just the name (F2 on the pad does it too)": "Doar numele (F2 de pe pad o face și el)",
+  "Show the file in its folder": "Afișați fișierul în folderul său",
+  "The file for “{name}” isn't there any more": "Fișierul pentru „ {name} ” nu mai există",
+  "{name} (copy)": "{name} (copie)"
 }

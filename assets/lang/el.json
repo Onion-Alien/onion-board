@@ -2771,5 +2771,11 @@
   ],
   "Tuning in to radio stations around the world…": "Συντονισμός σε ραδιοφωνικούς σταθμούς σε όλο τον κόσμο…",
   "{hotkey} is {what} now — it was the key for {lost}": "{hotkey} είναι {what} τώρα — ήταν το κλειδί για {lost}",
-  "Rename sound": "Μετονομασία ήχου"
+  "Rename sound": "Μετονομασία ήχου",
+  "A second pad with the same sound, to give its own effects or hotkey": "Ένα δεύτερο pad με τον ίδιο ήχο, για να δώσει τα δικά του εφέ ή πλήκτρο πρόσβασης",
+  "Duplicate": "Αντίγραφο",
+  "Just the name (F2 on the pad does it too)": "Μόνο το όνομα (το F2 στο pad το κάνει επίσης)",
+  "Show the file in its folder": "Εμφάνιση του αρχείου στον φάκελό του",
+  "The file for “{name}” isn't there any more": "Το αρχείο για το \" {name} \" δεν υπάρχει πλέον",
+  "{name} (copy)": "{name} (αντίγραφο)"
 }
