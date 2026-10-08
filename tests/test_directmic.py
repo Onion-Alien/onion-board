@@ -1937,8 +1937,9 @@ def test_setting_up_the_mic_shows_it_and_takes_one_click(window, monkeypatch):  
     threads = _no_threads(monkeypatch)
     w.attach_mic()
     assert busy.is_busy(w.btn_install) and w.btn_install.text() == "Setting up…"
-    assert not w.btn_install.isHidden() and w.btn_usecable.isHidden()
+    assert w.btn_install.isHidden() and w.btn_usecable.isHidden()
     assert "setting up" in w.pill.text().lower()
+    assert w.setup_show.on   # Bun's building it, in the button's place
     w.attach_mic()
     w.btn_install.click()   # spam-clicked: still the one admin prompt
     assert threads.started == 1
@@ -1948,9 +1949,11 @@ def test_setting_up_the_mic_shows_it_and_takes_one_click(window, monkeypatch):  
     w._mic_attached("My mic", "")
     assert "starting" in w.flow_out.text() and busy.is_busy(w.btn_install)
     assert "Repair" not in w.btn_install.text() and w.btn_usecable.isHidden()
+    assert w.setup_show.on   # still at it while Windows loads it
     w._settle_until = 0.0   # the wait is over: the button is a button again
     w._update_flow()
     assert not busy.is_busy(w.btn_install) and w._attach_release is None
+    assert not w.setup_show.on   # (off screen here, so no ending to watch)
 
 
 def test_setting_up_the_mic_shows_no_device_error_for_the_audio_restart(window, monkeypatch):  # noqa: F811

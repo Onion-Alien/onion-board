@@ -57,6 +57,7 @@ from soundboard.ui.livedot import is_tab_live, set_tab_live
 from soundboard.ui.livedot import set_tint as set_live_tint
 from soundboard.ui.logowidget import LogoWidget, glow_icon
 from soundboard.ui.ytsearch import SearchResults
+from soundboard.ui.setupshow import SetupShow
 from soundboard.ui.spacekey import SpaceKey
 from soundboard.ui.padbatch import PadSelection
 from soundboard.ui.overlay import Overlay
@@ -1473,6 +1474,9 @@ class MainWindow(QMainWindow):
         self.step_lbl.setTextFormat(Qt.RichText)
         self.step_lbl.setObjectName("stepbox")
         cv.addWidget(self.step_lbl)
+        self.setup_show = SetupShow(height=96)   # Bun builds your mic (instead of the button)
+        self.setup_show.done.connect(self._update_flow)   # (the button's back, if needed)
+        cv.addWidget(self.setup_show)
         self.btn_install = QPushButton(_("Install the free virtual cable"))
         self.btn_install.setObjectName("primary")
         self.btn_install.clicked.connect(
@@ -2585,8 +2589,11 @@ class MainWindow(QMainWindow):
         if self._attach_release is not None and not mic_busy:
             release, self._attach_release = self._attach_release, None
             release()
-        self.btn_install.setVisible(state == "missing" or update
-                                    or (route == "mic" and state != "ok"))
+        if self.setup_show.on and not mic_busy:
+            self.setup_show.finish(route == "mic" and state == "ok")
+        self.btn_install.setVisible((state == "missing" or update
+                                     or (route == "mic" and state != "ok"))
+                                    and not self.setup_show.on)   # Bun's show instead
         if not busy.is_busy(self.btn_install):
             self.btn_install.setText(
                 _("Install the free virtual cable") if route != "mic" else
@@ -2667,6 +2674,7 @@ class MainWindow(QMainWindow):
         self._attaching = True
         if self._attach_release is None:   # released by _update_flow once it works
             self._attach_release = busy.hold(self.btn_install, _("Setting up…"))
+        self.setup_show.start()
         self._update_flow()
         log.info("attaching the mic effect to %s", mic)
         threading.Thread(target=lambda: self.mic_attached.emit(mic, directmic.install(mic) or ""),
