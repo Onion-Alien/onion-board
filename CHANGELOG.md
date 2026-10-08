@@ -36,6 +36,11 @@
   log can name a site a download or radio station failed on, so Network activity no
   longer says "nothing here is logged". With the log off, a crash report still gets
   the run's last lines, from memory.
+- **The Radio tab speaks your language.** Its buttons, genres, filters, messages and
+  the map's tips were still English in every language; now they follow the app's.
+- **Triggers come back on at start-up.** With watching on, Onion Watch could miss
+  starting with the window (an error while the window was still being built) and
+  only picked up once the Triggers tab was opened.
 
 ## 1.9.8 — 2026-10-07
 

@@ -24,6 +24,7 @@ from PySide6.QtWidgets import (QButtonGroup, QCheckBox, QComboBox, QFrame, QHBox
                                QWidget)
 
 from soundboard import library, radio, theme
+from soundboard.i18n import _, ngettext
 from soundboard.engine import SR
 from soundboard.library import MAX_SECONDS, trim_silence
 from soundboard.radio import RadioDirectory, RadioPlayer, Station
@@ -62,15 +63,21 @@ GENRES: tuple[tuple[str, tuple[str, ...]], ...] = (
     ("News & Talk", ("news", "talk", "sport", "information", "public radio", "politics")),
 )
 _GENRE_WORDS = dict(GENRES)
+GENRE_LABELS = {"Pop": _("Pop"), "Rock": _("Rock"), "Dance": _("Dance"),
+                "Hip-hop": _("Hip-hop"), "Jazz & Soul": _("Jazz & Soul"),
+                "Classical": _("Classical"), "Chill": _("Chill"), "Oldies": _("Oldies"),
+                "Country & Folk": _("Country & Folk"), "Latin": _("Latin"),
+                "Reggae": _("Reggae"), "News & Talk": _("News & Talk")}
 
 # (label, key) — None keeps the list's own order (most listened / starred / most recent)
-SORTS = (("Default order", None),
-         ("Most listened", lambda s: -s.clicks),
-         ("Trending", lambda s: -s.trend),
-         ("Most voted", lambda s: -s.votes),
-         ("Name A–Z", lambda s: s.name.lower()),
-         ("Best quality", lambda s: -s.bitrate))
-QUALITIES = (("Any quality", 0), ("128 kbps +", 128), ("192 kbps +", 192), ("256 kbps +", 256))
+SORTS = ((_("Default order"), None),
+         (_("Most listened"), lambda s: -s.clicks),
+         (_("Trending"), lambda s: -s.trend),
+         (_("Most voted"), lambda s: -s.votes),
+         (_("Name A–Z"), lambda s: s.name.lower()),
+         (_("Best quality"), lambda s: -s.bitrate))
+QUALITIES = ((_("Any quality"), 0), (_("{kbps} kbps +", kbps=128), 128),
+             (_("{kbps} kbps +", kbps=192), 192), (_("{kbps} kbps +", kbps=256), 256))
 
 
 def in_genre(s: Station, genre: str) -> bool:
@@ -282,7 +289,7 @@ class _FilterRow(QWidget):
         v.setContentsMargins(0, 0, 0, 0)
         v.setSpacing(self.GAP)
         self._lines = []
-        for _ in combos:
+        for _combo in combos:
             h = QHBoxLayout()
             h.setSpacing(self.GAP)
             v.addLayout(h)
@@ -351,17 +358,18 @@ class NowPlaying(QWidget):
         self.setMinimumWidth(80)
         self.setFixedHeight(34)
         self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
-        self.setAccessibleName("Now playing")
-        self.setAccessibleDescription("Nothing playing")
+        self.setAccessibleName(_("Now playing"))
+        self.setAccessibleDescription(_("Nothing playing"))
 
     def set_station(self, name: str, title: str = "", tuning: bool = False):
         if (name, title, tuning) != (self.name, self.title, self.tuning):
             self.name, self.title, self.tuning = name, title, tuning
             self.setCursor(Qt.PointingHandCursor if name else Qt.ArrowCursor)
-            self.setToolTip("Show it in the list" if name else "")
-            what = (f"Tuning in to {name}" if tuning else
-                    f"Playing {name}" + (f": {title}" if title else ""))
-            self.setAccessibleDescription(what if name else "Nothing playing")
+            self.setToolTip(_("Show it in the list") if name else "")
+            what = (_("Tuning in to {name}", name=name) if tuning else
+                    _("Playing {name}: {title}", name=name, title=title) if title else
+                    _("Playing {name}", name=name))
+            self.setAccessibleDescription(what if name else _("Nothing playing"))
         self.update()   # the bars move on every tick while it plays
 
     def mouseReleaseEvent(self, e):
@@ -380,7 +388,7 @@ class NowPlaying(QWidget):
             p.setPen(QColor(t["muted"]))
             p.setFont(f)
             p.drawText(r.adjusted(10, 0, -4, 0), Qt.AlignLeft | Qt.AlignVCenter,
-                       p.fontMetrics().elidedText("Nothing playing — click a station",
+                       p.fontMetrics().elidedText(_("Nothing playing — click a station"),
                                                   Qt.ElideRight, int(r.width()) - 14))
             p.end()
             return
@@ -396,7 +404,7 @@ class NowPlaying(QWidget):
         f.setBold(True)
         p.setFont(f)
         p.setPen(QColor(t["text_hi"]))
-        head = f"Tuning in to {self.name}…" if self.tuning else self.name
+        head = _("Tuning in to {name}…", name=self.name) if self.tuning else self.name
         head = p.fontMetrics().elidedText(head, Qt.ElideRight, room)
         p.drawText(QRectF(x, r.top(), room, r.height()), Qt.AlignLeft | Qt.AlignVCenter, head)
         used = p.fontMetrics().horizontalAdvance(head)
@@ -490,14 +498,14 @@ class RadioTab(QWidget):
         top = QHBoxLayout()
         top.setSpacing(8)
         self.search = QLineEdit()
-        self.search.setPlaceholderText("Search radio stations, genres, countries or cities…  "
-                                       "(or click a dot on the map)")
+        self.search.setPlaceholderText(_("Search radio stations, genres, countries or "
+                                         "cities…  (or click a dot on the map)"))
         self.search.setClearButtonEnabled(True)
         self.search.textChanged.connect(self._on_text)
         self.search.returnPressed.connect(self._search_now)
         top.addWidget(self.search, 1)
         self.btn_refresh = QPushButton()
-        self.btn_refresh.setToolTip("Fetch the station list again")
+        self.btn_refresh.setToolTip(_("Fetch the station list again"))
         icons.set_icon(self.btn_refresh, "reload")
         self.btn_refresh.clicked.connect(self._reload)
         top.addWidget(self.btn_refresh)
@@ -526,22 +534,22 @@ class RadioTab(QWidget):
 
         # ---- control bar: play, random, star | live ... record, last 15 s | volume | hear
         bar_, bh = bar()
-        self.btn_play = QPushButton("Play")
+        self.btn_play = QPushButton(_("Play"))
         icons.set_icon(self.btn_play, "play")
         self.btn_play.clicked.connect(self.toggle_play)
         bh.addWidget(self.btn_play)
         self.btn_random = QPushButton()
         self.btn_random.setObjectName("iconbutton")
-        self.btn_random.setAccessibleName("Play a random station")
+        self.btn_random.setAccessibleName(_("Play a random station"))
         icons.set_icon(self.btn_random, "shuffle")
-        self.btn_random.setToolTip("Play a random station from the list showing (pick a "
-                                   "genre or country first to narrow it)")
+        self.btn_random.setToolTip(_("Play a random station from the list showing (pick a "
+                                     "genre or country first to narrow it)"))
         self.btn_random.clicked.connect(self.play_random)
         bh.addWidget(self.btn_random)
         self.btn_fav = QPushButton()
         self.btn_fav.setObjectName("iconbutton")
-        self.btn_fav.setAccessibleName("Favorite station")
-        self.btn_fav.setToolTip("Add the selected station to Favorites")
+        self.btn_fav.setAccessibleName(_("Favorite station"))
+        self.btn_fav.setToolTip(_("Add the selected station to Favorites"))
         icons.set_icon(self.btn_fav, "star")
         self.btn_fav.clicked.connect(lambda: self._toggle_fav())
         bh.addWidget(self.btn_fav)
@@ -555,16 +563,17 @@ class RadioTab(QWidget):
         self.now = NowPlaying()
         self.now.clicked.connect(self._show_playing)
         bh.addWidget(self.now, 1)
-        self.btn_rec = QPushButton("Record")
+        self.btn_rec = QPushButton(_("Record"))
         self.btn_rec.setObjectName("rec")
         self.btn_rec.setCheckable(True)
-        self.btn_rec.setToolTip("Record the radio. Click again to stop — the clip is added "
-                                "to your Sounds.")
+        self.btn_rec.setToolTip(_("Record the radio. Click again to stop — the clip is "
+                                  "added to your Sounds."))
         icons.set_icon(self.btn_rec, "record", "#ff4d4f", "#ffffff", size=14)
         self.btn_rec.toggled.connect(self._on_rec)
         bh.addWidget(self.btn_rec)
-        self.btn_last = QPushButton(f"Last {CLIP_S}s")
-        self.btn_last.setToolTip(f"Save the last {CLIP_S} seconds of the radio as a sound")
+        self.btn_last = QPushButton(_("Last {n}s", n=CLIP_S))
+        self.btn_last.setToolTip(_("Save the last {n} seconds of the radio as a sound",
+                                   n=CLIP_S))
         icons.set_icon(self.btn_last, "history")
         self.btn_last.clicked.connect(self.clip_last)
         bh.addWidget(self.btn_last)
@@ -575,7 +584,7 @@ class RadioTab(QWidget):
         bh.addWidget(self.fx_btn)
         sep2 = vsep()
         bh.addWidget(sep2)
-        tip = "Radio volume (for them and for you). The dot shows audio activity."
+        tip = _("Radio volume (for them and for you). The dot shows audio activity.")
         vol_icon = icon_label("volume", tip)
         bh.addWidget(vol_icon)
         vol = cfg.radio.get("vol", 1.0)
@@ -587,7 +596,7 @@ class RadioTab(QWidget):
         self._clip_group = (self.btn_rec, self.btn_last)
         self._vol_group = (sep2, vol_icon, self.vol)
         self._play_short = False
-        self.chk_hear = QCheckBox("Hear it myself")
+        self.chk_hear = QCheckBox(_("Hear it myself"))
         self.chk_hear.toggled.connect(self._on_hear)
         bh.addWidget(self.chk_hear)
         v.addWidget(bar_)
@@ -647,10 +656,10 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
         sh = QHBoxLayout(seg)
         sh.setContentsMargins(3, 3, 3, 3)
         sh.setSpacing(2)
-        self.btn_popular = QPushButton("Popular")
-        self.btn_favs = QPushButton("Favorites")
+        self.btn_popular = QPushButton(_("Popular"))
+        self.btn_favs = QPushButton(_("Favorites"))
         icons.set_icon(self.btn_favs, "star", "muted")
-        self.btn_recent = QPushButton("Recent")
+        self.btn_recent = QPushButton(_("Recent"))
         self._mode = QButtonGroup(self)
         for b in (self.btn_popular, self.btn_favs, self.btn_recent):
             b.setObjectName("seg")
@@ -669,8 +678,8 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
         flow = _Flow(self.genre_box, gap=5)
         self._genres = QButtonGroup(self)
         self._genre_btns: dict[str, QPushButton] = {}
-        for g in ("", *(name for name, _ in GENRES)):
-            b = QPushButton((g or "All").replace("&", "&&"))
+        for g in ("", *(name for name, _words in GENRES)):
+            b = QPushButton((GENRE_LABELS.get(g, g) if g else _("All")).replace("&", "&&"))
             b.setObjectName("genre")
             b.setCheckable(True)
             b.setCursor(Qt.PointingHandCursor)
@@ -689,11 +698,11 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
         self.cmb_country = QComboBox()
         self.cmb_country.setSizeAdjustPolicy(QComboBox.AdjustToMinimumContentsLengthWithIcon)
         self.cmb_country.setMinimumContentsLength(8)
-        self.cmb_country.addItem("All countries", "")
+        self.cmb_country.addItem(_("All countries"), "")
         self.cmb_country.activated.connect(
             lambda _i: self.set_country(self.cmb_country.currentData() or ""))
         self.cmb_quality = QComboBox()
-        self.cmb_quality.setToolTip("Only stations streaming at least this bitrate")
+        self.cmb_quality.setToolTip(_("Only stations streaming at least this bitrate"))
         for label, kbps in QUALITIES:
             self.cmb_quality.addItem(label, kbps)
         self.cmb_quality.activated.connect(lambda _i: self._on_filter())
@@ -708,7 +717,7 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
         self.count_label = QLabel()
         self.count_label.setObjectName("count")
         row.addWidget(self.count_label, 1)
-        self.btn_clear = QPushButton("Clear filters")
+        self.btn_clear = QPushButton(_("Clear filters"))
         self.btn_clear.setObjectName("clear")
         self.btn_clear.setCursor(Qt.PointingHandCursor)
         self.btn_clear.clicked.connect(self.clear_filters)
@@ -827,7 +836,7 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
         if rows != self._countries_shown:   # the same counts: the menu is already right
             self._countries_shown = rows
             cmb.clear()
-            cmb.addItem("All countries", "")
+            cmb.addItem(_("All countries"), "")
             for c, n in rows:
                 cmb.addItem(f"{c}  ({n:,})", c)
         cmb.setCurrentIndex(max(0, cmb.findData(self._country)))
@@ -938,7 +947,7 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
         busy.set_busy(self.btn_refresh, True)   # back when the list (or an error) is in
         self.dir.load_globe(force=True)
         if self._globe_list:
-            self._refresh_info("Refreshing the station list…")
+            self._refresh_info(_("Refreshing the station list…"))
         if not self._globe_list:
             self._show_list()
             self._refresh_info()
@@ -955,10 +964,13 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
             busy.set_busy(self.btn_refresh, False)
             stale = getattr(self.dir, "globe_stale", "")
             self._refresh_info(
-                f"<span style='color:{theme.status('warn')}'>Couldn't reach the station "
-                "directory — showing the saved list.</span>" if stale else
-                f"<span style='color:{theme.status('ok')}'>✓ Station list updated: "
-                f"{len(stations)} stations.</span>")
+                f"<span style='color:{theme.status('warn')}'>"
+                + _("Couldn't reach the station directory — showing the saved list.")
+                + "</span>" if stale else
+                f"<span style='color:{theme.status('ok')}'>✓ "
+                + ngettext("Station list updated: {n} station.",
+                           "Station list updated: {n} stations.", len(stations))
+                + "</span>")
         else:
             self._refresh_info()
 
@@ -966,19 +978,20 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
         if kind == "globe":
             self._reloading = False
             busy.set_busy(self.btn_refresh, False)
-            self._map("show_message", "The station directory can't be reached right now. "
-                      "Check your connection and press ↻.")
+            self._map("show_message", _("The station directory can't be reached right "
+                                        "now. Check your connection and press ↻."))
             # stays up (list and info line) until a reload gets through
-            self._globe_error = msg or "no answer"
+            self._globe_error = msg or _("no answer")
             self._flash_until = 0.0
             self._show_list()
             self._refresh_info()
         elif self._query:
             self._results, self._search_failed = [], True
             self._show_list()
-            self._refresh_info(f"<span style='color:{theme.status('error')}'>Search failed "
-                               f"({html.escape(msg)}). Check your connection and press "
-                               f"Enter to try again.</span>")
+            self._refresh_info(
+                f"<span style='color:{theme.status('error')}'>"
+                + _("Search failed ({error}). Check your connection and press Enter to try "
+                    "again.", error=html.escape(msg)) + "</span>")
 
     def _on_text(self, text: str):
         self._query = " ".join(text.split())
@@ -1007,7 +1020,7 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
                 self._results, self._search_failed = None, False
                 self._show_list()
             self.dir.search(self._query)
-            self._refresh_info("Searching…")
+            self._refresh_info(_("Searching…"))
 
     def _on_results(self, query: str, stations: list):
         if query != radio.search_text(self._query):   # long queries are cut short
@@ -1095,9 +1108,15 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
                              if self._country else others)
         stations = every[:LIST_MAX]
         n, total = len(every), len(source)
-        self.count_label.setText(
-            f"{n:,} of {total:,} stations" if n != total else
-            f"{n:,} station{'' if n == 1 else 's'}" + (" (top 300 shown)" if n > LIST_MAX else ""))
+        if n != total:
+            count = ngettext("{n} of {total} station", "{n} of {total} stations", total,
+                             n=f"{n:,}", total=f"{total:,}")
+        elif n > LIST_MAX:
+            count = ngettext("{n} station (top {shown} shown)", "{n} stations (top {shown} shown)",
+                             n, n=f"{n:,}", shown=LIST_MAX)
+        else:
+            count = ngettext("{n} station", "{n} stations", n, n=f"{n:,}")
+        self.count_label.setText(count)
         self.btn_clear.setVisible(self.filters_on())
         cur = self.list.currentItem()
         keep = cur.data(Qt.UserRole) if cur is not None else None
@@ -1122,15 +1141,16 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
         self.list.blockSignals(False)
         if not stations:
             if self._query:
-                empty = ("Searching…" if self._results is None else
-                         "Search failed — press Enter to try again." if self._search_failed
-                         else "No stations found.")
+                empty = (_("Searching…") if self._results is None else
+                         _("Search failed — press Enter to try again.") if self._search_failed
+                         else _("No stations found."))
             elif source and self.filters_on():
-                empty = "No stations match these filters.\nTry another genre or country."
+                empty = _("No stations match these filters.\nTry another genre or country.")
             elif self.btn_favs.isChecked():
-                empty = "No favorites yet.\nHover a station and click its ☆ to keep it here."
+                empty = _("No favorites yet.\nHover a station and click its ☆ to keep it "
+                          "here.")
             elif self.btn_recent.isChecked():
-                empty = "Nothing played yet.\nStations you listen to show up here."
+                empty = _("Nothing played yet.\nStations you listen to show up here.")
             else:
                 empty = self._no_stations_text()
             if empty:
@@ -1290,8 +1310,9 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
     def _on_error(self, msg: str):
         self._restate_rows()
         red = theme.status("error")
-        self._refresh_info(f"<span style='color:{red}'>That station isn't working "
-                           f"({html.escape(msg)}). Try another one.</span>")
+        self._refresh_info(f"<span style='color:{red}'>"
+                           + _("That station isn't working ({error}). Try another one.",
+                               error=html.escape(msg)) + "</span>")
         self._select_on_globe(fly=False)
 
     def _on_now_playing(self, title: str):
@@ -1309,7 +1330,7 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
     def _update_buttons(self):
         on = self.player.station is not None
         self._update_now()
-        self.btn_play.setText("" if self._play_short else "Stop" if on else "Play")
+        self.btn_play.setText("" if self._play_short else _("Stop") if on else _("Play"))
         icons.set_icon(self.btn_play, "stop" if on else "play")
         self.btn_play.setEnabled(on or self.selected() is not None
                                  or bool(self.cfg.radio.get("last")))
@@ -1317,13 +1338,13 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
         fav = s is not None and s.uuid in self._fav_ids
         icons.set_icon(self.btn_fav, "star_filled" if fav else "star",
                        "accent" if fav else "text")
-        self.btn_fav.setToolTip("Remove from Favorites" if fav else "Add to Favorites")
+        self.btn_fav.setToolTip(_("Remove from Favorites") if fav else _("Add to Favorites"))
         self.btn_fav.setEnabled(s is not None)
 
     def _no_stations_text(self) -> str:
         if self._globe_error:
-            return "Can't reach the station directory — press ↻ to try again."
-        return "Finding stations…" if self._started else ""
+            return _("Can't reach the station directory — press ↻ to try again.")
+        return _("Finding stations…") if self._started else ""
 
     def _refresh_info(self, msg: str = ""):
         if msg:
@@ -1335,27 +1356,31 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
         st, state = self.player.station, self.player.status
         if st is None:
             n = len(self._globe_list)
-            text = (f"{n:,} popular stations — click a dot on the map, or search. "
-                    "Click a station to play it." if n else
+            text = (ngettext("{n} popular station — click a dot on the map, or search. "
+                             "Click a station to play it.",
+                             "{n} popular stations — click a dot on the map, or search. "
+                             "Click a station to play it.", n, n=f"{n:,}") if n else
                     self._no_stations_text())
             if not n and self._globe_error:
                 red = theme.status("error")
-                text = (f"<span style='color:{red}'>Can't reach the station directory "
-                        f"({html.escape(self._globe_error)}) — press ↻ to try again.</span>")
+                text = (f"<span style='color:{red}'>"
+                        + _("Can't reach the station directory ({error}) — press ↻ to try "
+                            "again.", error=html.escape(self._globe_error)) + "</span>")
         else:
             name = html.escape(st.name)
             where = html.escape(st.country) if st.country else ""
             if state == "connecting":
-                text = f"Tuning in to <b>{name}</b>…"
+                text = _("Tuning in to {name}…", name=f"<b>{name}</b>")
             else:
                 text = f"▶ <b>{name}</b>" + (f" · {where}" if where else "")
                 if self._title:
                     text += f" — <i>{html.escape(self._title)}</i>"
             if self.engine.radio_live:
-                text += f"  <span style='color:{theme.status('ok')}'>· others hear it</span>"
+                text += (f"  <span style='color:{theme.status('ok')}'>· "
+                         + _("others hear it") + "</span>")
             else:
-                text += ("  · only you hear the radio: press “Send” below so others "
-                         "hear it too")
+                text += "  · " + _("only you hear the radio: press “Send” below so others "
+                                   "hear it too")
         self.info.setText(text)
 
     # ------------------------------------------------------------------ favourites
@@ -1387,16 +1412,16 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
 
     def _label_live(self):
         on = self.btn_live.isChecked()
-        self.btn_live.setText("Sending" if on else "Send")
-        self.btn_live.setToolTip("Others hear the radio. Click so only you do." if on else
-                                 "Send the radio out to others, the way your sounds go "
-                                 "(Setup tab). Off: only you hear it.")
+        self.btn_live.setText(_("Sending") if on else _("Send"))
+        self.btn_live.setToolTip(_("Others hear the radio. Click so only you do.") if on else
+                                 _("Send the radio out to others, the way your sounds go "
+                                   "(Setup tab). Off: only you hear it."))
 
     def fit_steps(self):
         """What the main window may hide here when it gets small (ui/responsive.py)."""
         from soundboard.ui import responsive as r
         def star_only(compact):
-            self.btn_favs.setText("" if compact else "Favorites")
+            self.btn_favs.setText("" if compact else _("Favorites"))
             r.touch(self.btn_favs)
 
         def play_icon(compact):
@@ -1435,13 +1460,14 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
             return
         if not self.isVisible():
             self.timer.stop()
-        self.btn_rec.setText("Record")
+        self.btn_rec.setText(_("Record"))
         self._emit_clip(self.recorder.stop(),
-                        "Nothing was playing on the radio while you recorded.")
+                        _("Nothing was playing on the radio while you recorded."))
 
     def clip_last(self) -> bool:
         return self._emit_clip(self.recorder.last(),
-                               f"Nothing on the radio has played in the last {CLIP_S} seconds.")
+                               _("Nothing on the radio has played in the last {n} seconds.",
+                                 n=CLIP_S))
 
     def _emit_clip(self, data: np.ndarray, empty_msg: str) -> bool:
         data = trim_silence(data)
@@ -1449,16 +1475,18 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
             self._refresh_info(f"<span style='color:{theme.status('warn')}'>{empty_msg}</span>")
             return False
         st = self.player.station or self._fed_by or self.selected()
-        name = (st.name[:30] if st else "Radio") + " " + time.strftime("%H.%M.%S")
+        name = (st.name[:30] if st else _("Radio")) + " " + time.strftime("%H.%M.%S")
         self.clip_error = ""
         self.clip_ready.emit(data, name)   # the window saves it (and sets clip_error if not)
         if self.clip_error:
-            self._refresh_info(f"<span style='color:{theme.status('error')}'>Couldn't save "
-                               f"the clip: {html.escape(self.clip_error)}</span>")
+            self._refresh_info(f"<span style='color:{theme.status('error')}'>"
+                               + _("Couldn't save the clip: {error}",
+                                   error=html.escape(self.clip_error)) + "</span>")
             return False
         green = theme.status("ok")
-        self._refresh_info(f"<span style='color:{green}'>✓ Saved a {len(data) / SR:.1f}s clip "
-                           "to your Sounds.</span>")
+        self._refresh_info(f"<span style='color:{green}'>✓ "
+                           + _("Saved a {secs}s clip to your Sounds.",
+                               secs=f"{len(data) / SR:.1f}") + "</span>")
         return True
 
     def _tick(self):
@@ -1480,7 +1508,7 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
                     break
         if self.recorder.recording:
             secs = self.recorder.rec_frames / SR
-            self.btn_rec.setText(f"Stop  {int(secs // 60)}:{int(secs % 60):02d}")
+            self.btn_rec.setText(_("Stop") + f"  {int(secs // 60)}:{int(secs % 60):02d}")
         elif self._flash_until and time.monotonic() >= self._flash_until:
             self._flash_until = 0.0
             self._refresh_info()
@@ -1514,17 +1542,17 @@ class RadioOff(QWidget):
         super().__init__()
         v = QVBoxLayout(self)
         v.addStretch(1)
-        title = QLabel("Radio is off")
+        title = QLabel(_("Radio is off"))
         title.setObjectName("section")
         title.setAlignment(Qt.AlignCenter)
         v.addWidget(title)
-        note = QLabel("It's switched off in Settings > Privacy & security, so the radio "
-                      "contacts nobody: no station directory, no stations.")
+        note = QLabel(_("It's switched off in Settings > Privacy & security, so the radio "
+                        "contacts nobody: no station directory, no stations."))
         note.setObjectName("hint")
         note.setWordWrap(True)
         note.setAlignment(Qt.AlignCenter)
         v.addWidget(note)
-        go = QPushButton("Privacy & security settings")
+        go = QPushButton(_("Privacy && security settings"))
         go.clicked.connect(self.open_settings)
         row = QHBoxLayout()
         row.addStretch(1)
