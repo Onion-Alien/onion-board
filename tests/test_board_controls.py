@@ -418,3 +418,11 @@ def test_duplicate_and_show_file(window, monkeypatch):
     w.meta("s0").file = str(Path(w.meta("s0").file).with_name("gone.wav"))
     w.show_sound_file("s0")
     assert toasts[-1] == "warn" and len(runs) == 1
+
+
+def test_transport_time_is_blank_until_a_sound_is_picked(window):
+    w = window
+    assert w.np_time.text() == "" and w.mini_time.text() == ""
+    w.select("s0")
+    w.remove_sound("s0")   # back to "Pick a sound"
+    assert w.np_time.text() == ""

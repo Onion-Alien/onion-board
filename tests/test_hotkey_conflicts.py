@@ -142,4 +142,6 @@ def test_tab_explanations_sit_behind_one_info_button(window, monkeypatch):  # no
     window.btn_info.click()
     assert shown == ["Send a program's sound"]
     window.tabs.setCurrentWidget(window.sounds_page)
-    assert window.btn_info.isHidden()
+    assert not window.btn_info.isHidden()   # every tab has a line now
+    window.btn_info.click()
+    assert shown[-1] == "Your sounds"

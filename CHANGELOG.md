@@ -13,6 +13,9 @@
   keeps the line, in the voice you picked, as a pad on the Sounds tab.
 - **A colour per category.** Right-click a category → *Colour*: a dot on its tab and
   on the in-game overlay shows which one is up.
+- **Small tidy-ups:** the ⓘ beside the tabs is on every tab now (a line on what the
+  tab is for), the Apps tab's *Effects* and *Card size* controls wait until a
+  program shows up, and the transport bar's time is blank until a sound is picked.
 - **The Setup tab says the one-time setup once.** Before it's done, the card no
   longer shows two red crosses ("Your mic ✗ off", "Virtual mic ✗ not installed
   yet") over the orange step that explains it; nothing is wrong yet.

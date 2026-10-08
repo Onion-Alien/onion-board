@@ -860,3 +860,9 @@ def test_card_buttons_say_which_program_they_are_for(qapp):
     assert row.btn_rec.accessibleName() == f"Record {name}"
     assert row.btn_forget.accessibleName() == f"Forget {name}"
     assert row.btn_clip.accessibleName() == f"Clip editor for {name}"
+
+
+def test_effects_and_card_size_wait_for_a_program(tab, qapp):
+    """Over the empty page the effects button and the card-size slider are hidden:
+    nothing to apply them to."""
+    assert tab.fx_btn.isHidden() and tab.card_size.isHidden() and tab.size_label.isHidden()
