@@ -344,3 +344,23 @@ def test_a_key_taken_from_another_sound_or_action_says_so(window):
     w.status.setText("")
     w.set_sound_hotkey("s1", "f9")         # a free key: nothing to say
     assert w.status.text() == ""
+
+
+def test_a_global_hotkey_taken_off_a_sound_is_said_out_loud(window, monkeypatch):
+    """Settings → Hotkeys: giving Stop everything a key a pad had takes it off the
+    pad (a combo does one thing) and a warn toast names what lost it."""
+    from soundboard.ui import busy
+    toasts = []
+    monkeypatch.setattr(busy, "toast", lambda win, text, kind="", ms=0: toasts.append((text, kind)))
+    w = window
+    w.meta("s0").hotkey = "f1"
+    w.cfg.category_hotkeys["All"] = "f1"
+    w.set_global_hotkey("stop_hotkey", "f1")
+    assert w.meta("s0").hotkey == ""
+    assert "All" not in w.cfg.category_hotkeys
+    assert w.cfg.stop_hotkey == "f1"
+    text, kind = toasts[-1]
+    assert kind == "warn" and "Boom" in text and "Stop everything" in text and "All" in text
+    toasts.clear()
+    w.set_global_hotkey("pause_hotkey", "f2")   # nothing had F2: no warning
+    assert not [t for t in toasts if t[1] == "warn"]

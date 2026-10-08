@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- **A hotkey taken off a sound says so.** Giving an app hotkey (Stop everything, the
+  overlay, push-to-talk…) a key a pad or category already had takes it off that one,
+  as before, but now a message names what lost it, like setting a pad's key already did.
 - **The Voice tab starts with the voice changer.** *Speak another language* moved
   under the voice changer and AI voices, so the voices are on screen the moment
   the tab opens.

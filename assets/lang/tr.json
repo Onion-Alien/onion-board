@@ -2769,5 +2769,6 @@
     "{n} istasyon (en üstte {shown} gösteriliyor)",
     "{n} istasyon (en üstte {shown} gösteriliyor)"
   ],
-  "Tuning in to radio stations around the world…": "Dünya çapındaki radyo istasyonlarını ayarlıyoruz…"
+  "Tuning in to radio stations around the world…": "Dünya çapındaki radyo istasyonlarını ayarlıyoruz…",
+  "{hotkey} is {what} now — it was the key for {lost}": "{hotkey} artık {what} oldu — {lost} 'un anahtarıydı"
 }

@@ -2709,5 +2709,6 @@
   "{n} station (top {shown} shown)": [
     "{n} 개 역(상위 {shown} 표시됨)"
   ],
-  "Tuning in to radio stations around the world…": "전 세계 라디오 방송국을 청취하세요…"
+  "Tuning in to radio stations around the world…": "전 세계 라디오 방송국을 청취하세요…",
+  "{hotkey} is {what} now — it was the key for {lost}": "{hotkey} 는 현재 {what} 입니다 — {lost} 의 키였습니다"
 }

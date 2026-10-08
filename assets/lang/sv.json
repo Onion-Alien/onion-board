@@ -2769,5 +2769,6 @@
     "{n} station (överst {shown} visas)",
     "{n} stationer (överst {shown} visas)"
   ],
-  "Tuning in to radio stations around the world…": "Lyssnar på radiostationer runt om i världen..."
+  "Tuning in to radio stations around the world…": "Lyssnar på radiostationer runt om i världen...",
+  "{hotkey} is {what} now — it was the key for {lost}": "{hotkey} är {what} nu — det var nyckeln till {lost}"
 }

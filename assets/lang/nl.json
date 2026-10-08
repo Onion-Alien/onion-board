@@ -2769,5 +2769,6 @@
     "{n} station (bovenste {shown} getoond)",
     "{n} stations (top {shown} getoond)"
   ],
-  "Tuning in to radio stations around the world…": "Afstemmen op radiostations over de hele wereld..."
+  "Tuning in to radio stations around the world…": "Afstemmen op radiostations over de hele wereld...",
+  "{hotkey} is {what} now — it was the key for {lost}": "{hotkey} is nu {what} — het was de sleutel voor {lost}"
 }

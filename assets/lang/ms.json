@@ -2709,5 +2709,6 @@
   "{n} station (top {shown} shown)": [
     "{n} stesen (atas {shown} ditunjukkan)"
   ],
-  "Tuning in to radio stations around the world…": "Menala ke stesen radio di seluruh dunia…"
+  "Tuning in to radio stations around the world…": "Menala ke stesen radio di seluruh dunia…",
+  "{hotkey} is {what} now — it was the key for {lost}": "{hotkey} ialah {what} sekarang — ia adalah kunci untuk {lost}"
 }

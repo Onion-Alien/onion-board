@@ -3235,24 +3235,38 @@ class MainWindow(QMainWindow):
 
     def set_global_hotkey(self, attr: str, combo: str):
         """Set one of the app-wide hotkeys (or ptt_key). A combo can only do one thing,
-        so it's taken off any other action or sound that had it."""
+        so it's taken off any other action or sound that had it, and a toast says what
+        lost it: a key quietly going off a pad was a surprise the next time it was
+        pressed in a game."""
+        lost = []
         if combo:
-            for other, *__ in HOTKEY_ACTIONS:
+            for other, _action, label, _desc in HOTKEY_ACTIONS:
                 if other != attr and getattr(self.cfg, other) == combo:
                     setattr(self.cfg, other, "")
+                    lost.append(label)
             for m in self.cfg.sounds:
                 if m.hotkey == combo:
                     m.hotkey = ""
+                    lost.append(f"“{m.name}”")
                     if m.id in self.pads:
                         self.pads[m.id].update()
+            lost += [_("a random sound from “{name}”", name=c)
+                     for c, k in self.cfg.category_hotkeys.items() if k == combo]
             self._clear_category_hotkey(combo)
             if attr != "ptt_key" and self.cfg.ptt_key == combo:
                 self.cfg.ptt_key = ""
+                lost.append(_("auto push-to-talk"))
         if attr == "replay_hotkey" and combo and not self.cfg.replay_hotkey:
             self.toast(REPLAY_NOTE)   # instant replay just went on
         setattr(self.cfg, attr, combo)
         self._save_now()
         self.register_hotkeys()
+        if lost:
+            what = (_("auto push-to-talk") if attr == "ptt_key"
+                    else next((label for a, _ac, label, _d in HOTKEY_ACTIONS if a == attr), attr))
+            self.toast(_("{hotkey} is {what} now — it was the key for {lost}",
+                         hotkey=html.escape(pretty_key(combo)), what=html.escape(what),
+                         lost=html.escape(_(" and ").join(lost))), "warn")
 
     QUICK_HOTKEYS = ("stop_hotkey", "pause_hotkey", "random_hotkey", "last_hotkey",
                      "mic_hotkey", "hotkeys_off_hotkey", "overlay_hotkey")

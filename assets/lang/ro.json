@@ -2829,5 +2829,6 @@
     "{n} stații (sus {shown} afișat)",
     "{n} stații (sus {shown} afișat)"
   ],
-  "Tuning in to radio stations around the world…": "Vă acordați posturile de radio din întreaga lume..."
+  "Tuning in to radio stations around the world…": "Vă acordați posturile de radio din întreaga lume...",
+  "{hotkey} is {what} now — it was the key for {lost}": "{hotkey} este {what} acum - a fost cheia pentru {lost}"
 }

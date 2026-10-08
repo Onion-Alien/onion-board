@@ -2769,5 +2769,6 @@
     "{n} Station (oben {shown} angezeigt)",
     "{n} Stationen (oben {shown} angezeigt)"
   ],
-  "Tuning in to radio stations around the world…": "Radiosender auf der ganzen Welt hören …"
+  "Tuning in to radio stations around the world…": "Radiosender auf der ganzen Welt hören …",
+  "{hotkey} is {what} now — it was the key for {lost}": "{hotkey} ist jetzt {what} – es war der Schlüssel für {lost}"
 }

@@ -3009,5 +3009,6 @@
     "{n} محطة (أعلى {shown} معروض)",
     "{n} محطة (أعلى {shown} معروض)"
   ],
-  "Tuning in to radio stations around the world…": "الاستماع إلى محطات الراديو في جميع أنحاء العالم ..."
+  "Tuning in to radio stations around the world…": "الاستماع إلى محطات الراديو في جميع أنحاء العالم ...",
+  "{hotkey} is {what} now — it was the key for {lost}": "{hotkey} هو {what} الآن - لقد كان مفتاح {lost}"
 }
