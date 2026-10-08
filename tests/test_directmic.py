@@ -1715,6 +1715,27 @@ def test_setting_up_the_mic_shows_it_and_takes_one_click(window, monkeypatch):  
     assert not busy.is_busy(w.btn_install) and w._attach_release is None
 
 
+def test_setting_up_the_mic_shows_no_device_error_for_the_audio_restart(window, monkeypatch):  # noqa: F811
+    """Setting it up restarts Windows' audio, so the headphones drop for a moment and
+    come back by themselves: no "Audio device problem" meanwhile. Still failing once
+    the wait is over, it shows, in plain words."""
+    w = window
+    _routes(w, monkeypatch, "missing")
+    w.cfg.mic_device = "My mic"
+    _no_threads(monkeypatch)
+    w.attach_mic()
+    w.engine.errors["mon"] = "Device unavailable"
+    w._update_status()
+    assert "problem" not in w.status.text()
+    monkeypatch.setattr(dm, "status", lambda name=None: "ready")
+    w._mic_attached("My mic", "")
+    assert "problem" not in w.status.text()
+    w._settle_until = 0.0
+    w._update_status()
+    assert "headphones: Device unavailable" in w.status.text()
+    assert "mon:" not in w.status.text()
+
+
 def test_turning_windows_down_lets_go_of_the_button(window, monkeypatch):  # noqa: F811
     from PySide6.QtWidgets import QMessageBox
     from soundboard.ui import busy
