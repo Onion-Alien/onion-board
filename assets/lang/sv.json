@@ -2777,5 +2777,6 @@
   "Just the name (F2 on the pad does it too)": "Bara namnet (F2 på plattan gör det också)",
   "Show the file in its folder": "Visa filen i dess mapp",
   "The file for “{name}” isn't there any more": "Filen för \" {name} \" finns inte längre",
-  "{name} (copy)": "{name} (kopia)"
+  "{name} (copy)": "{name} (kopia)",
+  "Search settings": "Sökinställningar"
 }

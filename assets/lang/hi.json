@@ -2777,5 +2777,6 @@
   "Just the name (F2 on the pad does it too)": "बस नाम (पैड पर F2 भी ऐसा करता है)",
   "Show the file in its folder": "फ़ाइल को उसके फ़ोल्डर में दिखाएँ",
   "The file for “{name}” isn't there any more": "\" {name} \" के लिए फ़ाइल अब मौजूद नहीं है",
-  "{name} (copy)": "{name} (कॉपी)"
+  "{name} (copy)": "{name} (कॉपी)",
+  "Search settings": "सेटिंग खोजें"
 }

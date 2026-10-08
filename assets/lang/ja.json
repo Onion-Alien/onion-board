@@ -2717,5 +2717,6 @@
   "Just the name (F2 on the pad does it too)": "名前だけ (パッドの F2 キーでも実行できます)",
   "Show the file in its folder": "フォルダー内のファイルを表示する",
   "The file for “{name}” isn't there any more": "「 {name} 」のファイルはもうありません",
-  "{name} (copy)": "{name} (コピー)"
+  "{name} (copy)": "{name} (コピー)",
+  "Search settings": "検索設定"
 }

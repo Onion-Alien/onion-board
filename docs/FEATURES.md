@@ -249,7 +249,8 @@ The full list. The [README](../README.md) has the short version and how to get s
   bitrate limit, *Slow or patchy connection* (waits longer before giving up), *Also
   save the video* for links, and *Show pictures and like counts* in search results.
 - **Screen readers:** buttons that only show an icon are read out by name.
-- **⚙ Settings:** 31 themes in four groups — Classic (Dark, Light, true-black
+- **⚙ Settings** (with a search box above the categories: type a word and only the
+  cards with it stay)**:** 31 themes in four groups — Classic (Dark, Light, true-black
   Midnight, High Contrast…), Colourful, Wild (Synthwave, Hacker, Amber Terminal…)
   and Meme (Flashbang, Deep Fried, Retro 98, Comic Sans…); they switch live —
   your own highlight colour, how live tabs show (a tint or a dot, in the highlight colour), plus hotkeys, overlay, window and audio options. A category sidebar keeps every

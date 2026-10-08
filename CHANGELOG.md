@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- **Search in Settings.** A box above the categories: type a word and only the
+  cards with it stay, on the pages that have one (Ctrl+F gets you there).
 - **More in a pad's right-click menu:** *Rename…* (just the name), *Duplicate* (a
   second pad with the same sound and its own file, for its own effects or hotkey) and
   *Show the file in its folder*.

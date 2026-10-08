@@ -3017,5 +3017,6 @@
   "Just the name (F2 on the pad does it too)": "فقط الاسم (F2 الموجود على اللوحة يفعل ذلك أيضًا)",
   "Show the file in its folder": "إظهار الملف في المجلد الخاص به",
   "The file for “{name}” isn't there any more": "الملف الخاص بـ \" {name} \" لم يعد موجودًا",
-  "{name} (copy)": "{name} (نسخة)"
+  "{name} (copy)": "{name} (نسخة)",
+  "Search settings": "إعدادات البحث"
 }

@@ -2717,5 +2717,6 @@
   "Just the name (F2 on the pad does it too)": "Chỉ cần tên (F2 trên pad cũng vậy)",
   "Show the file in its folder": "Hiển thị tập tin trong thư mục của nó",
   "The file for “{name}” isn't there any more": "Tệp cho “ {name} ” không còn nữa",
-  "{name} (copy)": "{name} (bản sao)"
+  "{name} (copy)": "{name} (bản sao)",
+  "Search settings": "Cài đặt tìm kiếm"
 }

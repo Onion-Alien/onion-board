@@ -2717,5 +2717,6 @@
   "Just the name (F2 on the pad does it too)": "แค่ชื่อ (F2 บนแพดก็ทำเหมือนกัน)",
   "Show the file in its folder": "แสดงไฟล์ในโฟลเดอร์",
   "The file for “{name}” isn't there any more": "ไฟล์สำหรับ “ {name} ” ไม่มีอีกต่อไป",
-  "{name} (copy)": "{name} (สำเนา)"
+  "{name} (copy)": "{name} (สำเนา)",
+  "Search settings": "การตั้งค่าการค้นหา"
 }

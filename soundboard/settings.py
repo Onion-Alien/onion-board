@@ -4,16 +4,20 @@ from __future__ import annotations
 
 import html
 import logging
+import re
 import threading
 import time
 
 from PySide6.QtCore import QObject, QRectF, QSignalBlocker, QSize, Qt, QTimer, Signal
-from PySide6.QtGui import (QBrush, QColor, QFont, QPainter, QPainterPath,
+from PySide6.QtGui import (QBrush, QColor, QFont, QKeySequence, QPainter, QPainterPath,
+                           QShortcut,
                            QPixmap)
-from PySide6.QtWidgets import (QApplication, QButtonGroup, QCheckBox, QColorDialog, QComboBox,
+from PySide6.QtWidgets import (QAbstractButton, QApplication, QButtonGroup, QCheckBox,
+                               QColorDialog, QComboBox,
                                QDialog, QFrame,
                                QGridLayout,
-                               QHBoxLayout, QLabel, QLayout, QListWidget, QListWidgetItem,
+                               QHBoxLayout, QLabel, QLayout, QLineEdit, QListWidget,
+                               QListWidgetItem,
                                QPushButton, QRadioButton, QScrollArea, QSlider, QTabWidget,
                                QVBoxLayout, QWidget)
 
@@ -458,9 +462,26 @@ class SettingsDialog(QDialog):
         self.categories.setCurrentRow(keys.index(page) if page in keys else 0)
         self.tabs.setCurrentIndex(keys.index(page) if page in keys else 0)
         self._build_page(self.tabs.currentIndex())   # an unknown page: the first one
+        # a search box over the categories: 13 pages are a lot to look through for one
+        # switch. Typing hides every card without the word and every page without a card.
+        self.search_box = QLineEdit()
+        self.search_box.setPlaceholderText(_("Search settings"))
+        self.search_box.setClearButtonEnabled(True)
+        self.search_box.setAccessibleName(_("Search settings"))
+        self.search_box.setFixedWidth(196)
+        self._search_wait = QTimer(self, singleShot=True, interval=150)
+        self._search_wait.timeout.connect(lambda: self._apply_search(self.search_box.text()))
+        self.search_box.textChanged.connect(lambda _t: self._search_wait.start())
+        find = QShortcut(QKeySequence.Find, self)
+        find.activated.connect(lambda: (self.search_box.setFocus(Qt.ShortcutFocusReason),
+                                        self.search_box.selectAll()))
+        side = QVBoxLayout()
+        side.setSpacing(8)
+        side.addWidget(self.search_box)
+        side.addWidget(self.categories, 1)
         content = QHBoxLayout()
         content.setSpacing(16)
-        content.addWidget(self.categories)
+        content.addLayout(side)
         content.addWidget(self.tabs, 1)
         lay.addLayout(content, 1)
         close = QPushButton(_("Done"))
@@ -471,6 +492,49 @@ class SettingsDialog(QDialog):
         row.addWidget(close)
         lay.addLayout(row)
         self._initial_size()
+
+    # ------------------------------------------------------------------ search
+    @staticmethod
+    def _words_of(card: QWidget) -> str:
+        """Every word a card shows, lower-cased: its labels, buttons, boxes and
+        dropdown items (tags stripped: some labels are rich text)."""
+        bits = []
+        for w in card.findChildren(QWidget):
+            if isinstance(w, (QLabel, QAbstractButton)):
+                bits.append(w.text())
+            elif isinstance(w, QComboBox):
+                bits += [w.itemText(i) for i in range(w.count())]
+            elif isinstance(w, QLineEdit):
+                bits.append(w.placeholderText())
+        return html.unescape(re.sub(r"<[^>]+>", " ", " ".join(bits))).lower()
+
+    def _apply_search(self, text: str):
+        """Hide every card without the words, and every page without a card left;
+        land on the first page that has one. Empty: everything back."""
+        words = text.lower().split()
+        if words:
+            for i in list(self._unbuilt):   # a page not built yet can't be searched
+                self._build_page(i)
+        first = None
+        for i in range(self.tabs.count()):
+            page = self.tabs.widget(i).widget()
+            title = self.categories.item(i).text().lower()
+            hits = 0
+            for card in page.findChildren(QFrame, "setcard"):
+                match = not words or all(w in title or w in self._words_of(card) for w in words)
+                if not match and not card.isHidden():
+                    card.hide()
+                    card.setProperty("search_hid", True)
+                elif match and card.property("search_hid"):
+                    card.show()
+                    card.setProperty("search_hid", False)
+                hits += match
+            self.categories.item(i).setHidden(bool(words) and not hits)
+            if hits and first is None:
+                first = i
+        on_hidden = self.categories.item(self.tabs.currentIndex()).isHidden()
+        if words and first is not None and on_hidden:
+            self.tabs.setCurrentIndex(first)
 
     def _category_icons(self):
         for i in range(self.categories.count()):
