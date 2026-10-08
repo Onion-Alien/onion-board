@@ -70,6 +70,23 @@ Lethal Company's occlusion and walkie-talkie filters come from its decompiled
   cable recordings it matches what the second PC heard within 0.7 dB in every band. On *Automatic* Valorant sends only speech: test tones, noise, sweeps
   and speech-shaped noise were never transmitted. Its anti-cheat ignores injected key
   presses, so the app's *Auto push-to-talk* can't hold the key: hold it yourself.
+- **Fortnite, measured in a real party** (2026-10-08, main menu, open mic, Straight into
+  my mic; four 15 s songs per run, the second PC's Fortnite recorded with voice volume
+  at 100 %). Fortnite records the mic through the effect. Nothing was cut out in any
+  mode, the level arrived within 3 dB, and the bottom band (60 Hz) lost 1.5-5.5 dB. Its
+  automatic gain dips loud, steady songs by 8 dB or more some of the time, and no send
+  mode changed that:
+
+  | 8 dB+ dips | no mode | Epic Online Services | Vivox |
+  |---|---|---|---|
+  | high (monk vocals) | 16 % | 17 % | 9 % |
+  | low (bass-heavy) | 11 % | 15 % | 17 % |
+  | two others | 1 % | 1 % | 1 % |
+
+  At the second PC's default 28 % voice volume the same run arrived 10-13 dB quieter:
+  that is the listener's slider, not the chat. The real EOS SDK on one PC (two users in
+  a lobby voice room, manual audio) shows the same no-cut-outs and bass loss but only
+  ~3 % dips on the low song: Fortnite's own voice settings pump more than EOS defaults.
 - **A bass-heavy song in Valorant**: sent raw it arrived 7 dB quieter, most of that the
   lost sub-bass (the bottom band 8.5 dB down on the rest). Through the old *Game*
   destination mode (today's *Vivox*) the bass harmonics halved that loss (4 dB), but the mode's
