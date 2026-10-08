@@ -96,8 +96,10 @@ class SetupShow(BunnyWidget):
         self._wake()
 
     def finish(self, ok: bool):
-        """How it went: the ending plays once the speaker is far enough along."""
-        if not self.on or self._end_at >= 0:
+        """How it went: the ending plays once the speaker is far enough along. The first
+        answer stands: a failed attempt isn't turned into a cheer by a later status
+        redraw that finds an older, still working mic part."""
+        if not self.on or self._end_at >= 0 or self._result is not None:
             return
         if not self.isVisible():   # nobody's watching: no show to finish
             self._stop()

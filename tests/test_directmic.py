@@ -1956,6 +1956,25 @@ def test_setting_up_the_mic_shows_it_and_takes_one_click(window, monkeypatch):  
     assert not w.setup_show.on   # (off screen here, so no ending to watch)
 
 
+def test_a_failed_mic_update_never_cheers(window, monkeypatch):  # noqa: F811
+    """The optional update fails (No to Windows' prompt) while the older mic part still
+    works: the status reads fine, but Bun's speaker must blow up, not play."""
+    from soundboard.ui import mainwindow as mw
+    w = window
+    _routes(w, monkeypatch, "outdated")
+    monkeypatch.setattr(w.engine, "main_stream", object())   # the old part's running
+    monkeypatch.setattr(w, "_direct_not_running", lambda: False)
+    monkeypatch.setattr(type(w.engine), "effect_alive", lambda self: True)
+    w.cfg.mic_device = "My mic"
+    _no_threads(monkeypatch)
+    monkeypatch.setattr(type(w.setup_show), "isVisible", lambda self: True)   # watched
+    monkeypatch.setattr(mw.QMessageBox, "warning", lambda *a, **k: None)
+    w.attach_mic()
+    assert w.setup_show.on
+    w._mic_attached("My mic", "Windows said no")
+    assert w.setup_show._result is False
+
+
 def test_setting_up_the_mic_shows_no_device_error_for_the_audio_restart(window, monkeypatch):  # noqa: F811
     """Setting it up restarts Windows' audio, so the headphones drop for a moment and
     come back by themselves: no "Audio device problem" meanwhile. Still failing once
