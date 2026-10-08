@@ -2613,5 +2613,7 @@
   "No language matches “{text}”": "“{text}”와 일치하는 언어가 없습니다.",
   "Pick the language Onion Board is shown in": "Onion Board가 표시되는 언어를 선택하세요.",
   "Search languages": "언어 검색",
-  "Search languages…": "언어 검색…"
+  "Search languages…": "언어 검색…",
+  "One of these apps is using your mic without Onion Board, so it won't hear your sounds: {names}. Look for a \"raw\", \"bypass processing\" or \"studio\" option in its voice settings and turn it off.": "다음 앱 중 하나가 Onion Board 없이 마이크를 사용하므로 {names} 소리가 들리지 않습니다. 음성 설정에서 \"원시\", \"바이패스 처리\" 또는 \"스튜디오\" 옵션을 찾아 끄십시오.",
+  "{name} is using your mic without Onion Board, so it won't hear your sounds. Look for a \"raw\", \"bypass processing\" or \"studio\" option in its voice settings and turn it off.": "{name} 님은 Onion Board 없이 귀하의 마이크를 사용하고 있으므로 귀하의 소리가 들리지 않습니다. 음성 설정에서 \"원시\", \"바이패스 처리\" 또는 \"스튜디오\" 옵션을 찾아 끄십시오."
 }

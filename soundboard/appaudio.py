@@ -634,16 +634,17 @@ def list_apps(strict: bool = False, alive: dict[int, str] | None = None,
             _ole32.CoUninitialize()
 
 
-def recording_apps(device: str) -> list[App]:
+def recording_apps(device: str, mine: bool = False) -> list[App]:
     """The programs recording from the recording device named `device` (who listens
-    to the virtual cable's far end: Discord, a game, OBS), this process excluded.
-    Safe from any thread."""
+    to the virtual cable's far end: Discord, a game, OBS), this process excluded
+    unless `mine`. Safe from any thread."""
     if not _win or not device:
         return []
     own = _co_init()
     try:
         # one process at a time (PidTable): only the few recording are looked up
-        return _list_apps(flow=E_CAPTURE, only=device, titles=False, table=PidTable())
+        return _list_apps(flow=E_CAPTURE, only=device, titles=False, table=PidTable(),
+                          mine=mine)
     except ComError:
         log.debug("listing recording sessions failed", exc_info=True)
         return []
@@ -654,13 +655,15 @@ def recording_apps(device: str) -> list[App]:
 
 def _list_apps(meters: dict | None = None, flow: int = E_RENDER,
                only: str | None = None, alive: dict[int, str] | None = None,
-               titles: bool | None = None, table: PidTable | None = None) -> list[App]:
+               titles: bool | None = None, table: PidTable | None = None,
+               mine: bool = False) -> list[App]:
     """With `meters`, also keeps each session's IAudioMeterInformation there
     (root pid -> [Com]) for the caller to read and release; window titles are then
     skipped unless `titles`. `flow` E_CAPTURE lists recording sessions instead,
     `only` on one device. `alive`: see list_apps. `table`: a PidTable instead of a
-    snapshot of every process (not with `alive`, which needs them all)."""
-    me = os.getpid()
+    snapshot of every process (not with `alive`, which needs them all). `mine`: this
+    process's own sessions too."""
+    me = 0 if mine else os.getpid()
     if table is None:
         table = _process_table()
         forget_dead_pids(table)

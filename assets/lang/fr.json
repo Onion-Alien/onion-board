@@ -2667,5 +2667,7 @@
   "No language matches “{text}”": "Aucune langue ne correspond à «{text}»",
   "Pick the language Onion Board is shown in": "Choisissez la langue dans laquelle Onion Board est affiché",
   "Search languages": "Langues de recherche",
-  "Search languages…": "Rechercher des langues…"
+  "Search languages…": "Rechercher des langues…",
+  "One of these apps is using your mic without Onion Board, so it won't hear your sounds: {names}. Look for a \"raw\", \"bypass processing\" or \"studio\" option in its voice settings and turn it off.": "L'une de ces applications utilise votre micro sans Onion Board, elle n'entendra donc pas vos sons : {names} . Recherchez une option « brut », « contourner le traitement » ou « studio » dans ses paramètres vocaux et désactivez-la.",
+  "{name} is using your mic without Onion Board, so it won't hear your sounds. Look for a \"raw\", \"bypass processing\" or \"studio\" option in its voice settings and turn it off.": "{name} utilise votre micro sans Onion Board, il n'entendra donc pas vos sons. Recherchez une option « brut », « contourner le traitement » ou « studio » dans ses paramètres vocaux et désactivez-la."
 }

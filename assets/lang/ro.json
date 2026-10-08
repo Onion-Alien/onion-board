@@ -2721,5 +2721,7 @@
   "No language matches “{text}”": "Nicio limbă nu se potrivește cu „{text}”",
   "Pick the language Onion Board is shown in": "Alegeți limba în care este afișată placa de ceapă",
   "Search languages": "Căutați limbi",
-  "Search languages…": "Căutați limbi..."
+  "Search languages…": "Căutați limbi...",
+  "One of these apps is using your mic without Onion Board, so it won't hear your sounds: {names}. Look for a \"raw\", \"bypass processing\" or \"studio\" option in its voice settings and turn it off.": "Una dintre aceste aplicații folosește microfonul fără Onion Board, așa că nu vă va auzi sunetele: {names} . Căutați o opțiune „raw”, „bypass processing” sau „studio” în setările sale de voce și dezactivați-o.",
+  "{name} is using your mic without Onion Board, so it won't hear your sounds. Look for a \"raw\", \"bypass processing\" or \"studio\" option in its voice settings and turn it off.": "{name} vă folosește microfonul fără Onion Board, așa că nu vă va auzi sunetele. Căutați o opțiune „raw”, „bypass processing” sau „studio” în setările sale de voce și dezactivați-o."
 }

@@ -30,8 +30,8 @@ from soundboard.engine import SR, Engine
 from soundboard.engine import is_virtual as is_virtual_cable
 from soundboard import (appaudio, autostart, backup, catswitch, destination, library, midi,
                         remote, otherboards, soundfx, thumbs, trash, updates, videos, voicesdk)
-from soundboard import (directmic, discordcfg, net, netlog, profiles, quality, shellicon, tips,
-                        tor, usage, watchaddon)
+from soundboard import (directmic, discordcfg, net, netlog, profiles, quality, rawmic, shellicon,
+                        tips, tor, usage, watchaddon)
 from soundboard.replay import InstantReplay
 from soundboard.library import (AUDIO_EXTS, PAD_COLORS, RESOURCE_DIR, Config, SoundMeta,
                                 cache_keep, clean_tags, duplicate, fingerprint,
@@ -119,6 +119,7 @@ PULSE_LOW = 0.55     # ...down to this opacity
 PULSE_FRAME_MS = 60  # ...a step this often (~16 a second still reads as a smooth pulse)
 DEFAULT_POLL_MS = 1500   # how often Windows' default output is checked
 DISCORD_POLL_MS = 10000  # how often Discord's voice settings are looked at (discordcfg)
+RAW_POLL_MS = 2000       # how often the apps recording the mic are counted (rawmic)
 DEFAULT_POLL_IDLE_S = 5  # ...while the window is in the tray or minimised (seconds)
 # a device that won't open while Windows lists it: re-scan, then wait this long
 # (seconds) before the next re-scan, so one that really won't open isn't re-scanned
@@ -257,6 +258,7 @@ class Bridge(QObject):
     update_ready = Signal(object, str)         # its installer's Path|None, error
     watch_update = Signal(object)              # a newer Onion Watch: watchaddon.Offer
     discord = Signal(object)                   # [discordcfg.Settings] read in the background
+    mic_users = Signal(object)                 # [appaudio.App] recording the mic (rawmic)
     counted = Signal()                         # the daily usage count was sent (usage.py)
     imported = Signal(object, object, str)     # meta|None, data|None, error/filename
     preview = Signal(str, object, float, int)  # id, audio with unsaved effects|None, gain, gen
@@ -353,6 +355,7 @@ class MainWindow(QMainWindow):
         self.bridge.update_ready.connect(self._on_update_ready)
         self.bridge.watch_update.connect(self._on_watch_update)
         self.bridge.discord.connect(self._on_discord)
+        self.bridge.mic_users.connect(self._on_mic_users)
         self.bridge.counted.connect(self._save_later)   # stats_sent
         self._removed: list[tuple[SoundMeta, int, np.ndarray | None]] = []   # undo-able
         self._render_gen: dict[str, int] = {}   # sid -> newest effects render (_rerender)
@@ -385,6 +388,14 @@ class MainWindow(QMainWindow):
         if sys.platform == "win32":
             self._discord_timer.start()
             QTimer.singleShot(3000, self._discord_tick)
+        # straight into my mic: an app recording the mic in raw mode skips Onion Board
+        # and hears none of the sounds (rawmic)
+        self.raw_watch = rawmic.BypassWatch()
+        self._raw_looking = False
+        self._raw_timer = QTimer(self, interval=RAW_POLL_MS)
+        self._raw_timer.timeout.connect(self._raw_tick)
+        if sys.platform == "win32":
+            self._raw_timer.start()
         self._preview_gen = 0            # newest effects preview (older renders are dropped)
         self._preview_done = None         # its done(ok) callback while it renders
         self._ptt_held: str | None = None   # PTT key we're currently holding
@@ -5732,7 +5743,67 @@ class MainWindow(QMainWindow):
         if probs and key not in self._urgent_hidden:
             return key, DISCORD_URGENT[probs[0]].format(
                 name=self.discord_found[0].client), _("Fix Discord")
+        raw = self._raw_culprits()
+        key = "rawmic " + ",".join(a.exe.lower() for a in raw)
+        if raw and key not in self._urgent_hidden:
+            if len(raw) == 1:
+                text = _("{name} is using your mic without Onion Board, so it won't hear "
+                         "your sounds. Look for a \"raw\", \"bypass processing\" or "
+                         "\"studio\" option in its voice settings and turn it off.",
+                         name=raw[0].name)
+            else:
+                text = _("One of these apps is using your mic without Onion Board, so it "
+                         "won't hear your sounds: {names}. Look for a \"raw\", \"bypass "
+                         "processing\" or \"studio\" option in its voice settings and turn "
+                         "it off.", names=", ".join(a.name for a in raw))
+            return key, text, ""
         return None
+
+    def _raw_culprits(self) -> list:
+        """The apps recording the mic in raw mode (rawmic), but not a Discord whose own
+        settings already have their line (Studio, Bypass)."""
+        raw = self.raw_watch.culprits
+        if raw and self.discord_problems():
+            from soundboard.ui.chatguide import DISCORD_EXES
+            raw = [a for a in raw if a.exe.lower() not in DISCORD_EXES]
+        return raw
+
+    def _raw_tick(self):
+        """Every RAW_POLL_MS while sending straight into the mic: who records it, on a
+        worker (Windows' session list); compared with the effect's streams after."""
+        e = self.engine
+        mic = self.cfg.mic_device
+        if (self.cfg.route != "mic" or e.direct_stream() is None or not mic
+                or self._direct_not_running()):
+            shown = bool(self.raw_watch.culprits)
+            self.raw_watch.reset()
+            if shown:
+                self._show_urgent()
+            return
+        if self._raw_looking:
+            return
+        self._raw_looking = True
+
+        def run():
+            apps = None
+            try:
+                apps = appaudio.recording_apps(mic, mine=True)
+            except Exception:  # noqa: BLE001 - a check that can't run shows nothing
+                log.debug("listing who records the mic failed", exc_info=True)
+            self.bridge.mic_users.emit(apps)
+        threading.Thread(target=run, daemon=True, name="raw-mic").start()
+
+    def _on_mic_users(self, apps, now: float | None = None):
+        self._raw_looking = False
+        if apps is None or self.engine.direct_stream() is None:
+            return
+        before = [a.exe for a in self.raw_watch.culprits]
+        now = self.raw_watch.update(apps, self.engine.direct_apps(),
+                                   time.monotonic() if now is None else now)
+        if [a.exe for a in now] != before:
+            log.info("recording the mic without Onion Board: %s",
+                     [a.exe for a in now] or "nobody")
+            self._show_urgent()
 
     def discord_problems(self) -> list[str]:
         """What in the running Discord's own settings hurts your sounds (discordcfg),
@@ -5784,6 +5855,7 @@ class MainWindow(QMainWindow):
         _key, text, button = now
         self.urgent_lbl.setText(text)
         self.urgent_btn.setText(button)
+        self.urgent_btn.setVisible(bool(button))   # a warning with nothing to click
         self.urgent_bar.show()
 
     def _hide_urgent(self):

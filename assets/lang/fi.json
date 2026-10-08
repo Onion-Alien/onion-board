@@ -2667,5 +2667,7 @@
   "No language matches “{text}”": "Mikään kieli ei vastaa \"{text}\"",
   "Pick the language Onion Board is shown in": "Valitse kieli, jolla Sipulilauta näytetään",
   "Search languages": "Hae kieliä",
-  "Search languages…": "Hae kieliä…"
+  "Search languages…": "Hae kieliä…",
+  "One of these apps is using your mic without Onion Board, so it won't hear your sounds: {names}. Look for a \"raw\", \"bypass processing\" or \"studio\" option in its voice settings and turn it off.": "Yksi näistä sovelluksista käyttää mikrofoniasi ilman Onion Boardia, joten se ei kuule ääniäsi: {names} . Etsi puheasetuksista \"raw\", \"bypass processing\" tai \"studio\" ja sammuta se.",
+  "{name} is using your mic without Onion Board, so it won't hear your sounds. Look for a \"raw\", \"bypass processing\" or \"studio\" option in its voice settings and turn it off.": "{name} käyttää mikrofoniasi ilman Onion Boardia, joten se ei kuule ääniäsi. Etsi puheasetuksista \"raw\", \"bypass processing\" tai \"studio\" ja sammuta se."
 }

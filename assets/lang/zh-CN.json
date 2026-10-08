@@ -2613,5 +2613,7 @@
   "No language matches “{text}”": "没有语言匹配“{text}”",
   "Pick the language Onion Board is shown in": "选择 Onion Board 显示的语言",
   "Search languages": "搜索语言",
-  "Search languages…": "搜索语言..."
+  "Search languages…": "搜索语言...",
+  "One of these apps is using your mic without Onion Board, so it won't hear your sounds: {names}. Look for a \"raw\", \"bypass processing\" or \"studio\" option in its voice settings and turn it off.": "其中一个应用程序在没有 Onion Board 的情况下使用您的麦克风，因此它不会听到您的声音： {names} 。在其语音设置中查找“原始”、“旁路处理”或“工作室”选项并将其关闭。",
+  "{name} is using your mic without Onion Board, so it won't hear your sounds. Look for a \"raw\", \"bypass processing\" or \"studio\" option in its voice settings and turn it off.": "{name}使用的麦克风没有安装 Onion Board，因此它听不到您的声音。在其语音设置中查找“原始”、“旁路处理”或“工作室”选项并将其关闭。"
 }
