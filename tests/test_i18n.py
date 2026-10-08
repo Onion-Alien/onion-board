@@ -355,6 +355,17 @@ def test_qt_standard_buttons_follow_the_language(qapp, langs):
         i18n.set_language(i18n.ENGLISH)          # back in English: Qt's own words again
         box = QDialogButtonBox(QDialogButtonBox.Cancel)
         assert box.buttons()[0].text() == "Cancel"
+        # and nothing else Qt translates is touched: a PNG still loads from memory
+        # (an empty answer from the translator made every one fail)
+        from PySide6.QtCore import QBuffer, QByteArray
+        from PySide6.QtGui import QImage
+        img = QImage(20, 10, QImage.Format_RGB32)
+        img.fill(0xff3366)
+        data = QByteArray()
+        buf = QBuffer(data)
+        buf.open(QBuffer.WriteOnly)
+        assert img.save(buf, "PNG")
+        assert QImage.fromData(bytes(data)).size() == img.size()
     finally:
         i18n.set_language(i18n.ENGLISH)
 
