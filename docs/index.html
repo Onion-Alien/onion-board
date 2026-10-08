@@ -99,11 +99,10 @@
                transform: skewX(-20deg); animation: shine 6s ease-in-out infinite; }
   @keyframes shine { 0%, 75% { left: -60%; } 100% { left: 130%; } }
 
-  .stage3d { perspective: 1400px; margin: 28px auto 0; position: relative; }
+  .stage3d { margin: 28px auto 0; position: relative; }
   .stage3d::before { content: ""; position: absolute; inset: 10% 8% 0; border-radius: 30px;
                      background: linear-gradient(90deg, var(--accent), var(--accent2));
                      filter: blur(70px); opacity: .22; z-index: -1; }
-  .tilt { transform: rotateX(var(--rx, 12deg)) scale(var(--sc, .95)); transform-origin: 50% 0; }
   .stage3d .hero { margin: 0; box-shadow: 0 30px 80px rgba(0,0,0,.5); }
 
   .card { position: relative; transition: transform .2s, border-color .2s; }
@@ -119,7 +118,6 @@
   /* Asked for less motion: keep the small loops, drop the big movement. */
   @media (prefers-reduced-motion: reduce) {
     .aurora i { animation: none; }
-    .tilt { transform: none; }
     .js .reveal { opacity: 1; transform: none; transition: none; }
   }
 </style>
@@ -140,7 +138,7 @@
       <a href="https://www.virustotal.com/gui/file/8093c89458b7ecfcccd5a4122b1ae0ce53488394f59aa388e06b69c371783b1a">VirusTotal: 69 of 69 clean</a> ·
       <a href="https://github.com/Onion-Alien/onion-board/releases/latest">what's new</a></p>
     <!-- /release -->
-    <div class="stage3d"><div class="tilt"><img class="hero" src="screenshots/sounds.png?v=5d4d4efc" width="1770" height="1080" alt="Onion Board's sound pads"></div></div>
+    <div class="stage3d"><img class="hero" src="screenshots/sounds.png?v=5d4d4efc" width="1770" height="1080" alt="Onion Board's sound pads"></div>
   </header>
 
   <h2>What it does</h2>
@@ -239,18 +237,6 @@
     }, { threshold: 0.1 });
     els.forEach(function (el) { io.observe(el); });
   } else { els.forEach(function (el) { el.classList.add("in"); }); }
-  // The big screenshot starts tilted back and lies flat as you scroll.
-  var tilt = document.querySelector(".tilt");
-  if (still || !tilt) return;
-  var ticking = false;
-  function upd() {
-    var t = Math.min(1, window.scrollY / (window.innerHeight * 0.4));
-    tilt.style.setProperty("--rx", (12 * (1 - t)).toFixed(2) + "deg");
-    tilt.style.setProperty("--sc", (0.95 + 0.05 * t).toFixed(3));
-    ticking = false;
-  }
-  addEventListener("scroll", function () { if (!ticking) { ticking = true; requestAnimationFrame(upd); } }, { passive: true });
-  upd();
 })();
 </script>
 </body>
