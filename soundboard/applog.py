@@ -267,7 +267,8 @@ def report(exc_info=None, where: str = "", fatal: bool = False) -> Report | None
         log.critical("Unhandled exception%s", f" in {where}" if where else "", exc_info=exc_info)
         rep = build_report(exc_info, where, fatal)
         rep.path = _save(rep)
-        _offer(rep, sig)
+        if fatal or not _late_callback(v):
+            _offer(rep, sig)
         return rep
     except Exception:  # noqa: BLE001 - the crash reporter must never crash
         try:
@@ -275,6 +276,13 @@ def report(exc_info=None, where: str = "", fatal: bool = False) -> Report | None
         except Exception:  # noqa: BLE001
             pass
         return None
+
+
+def _late_callback(v) -> bool:
+    """A timer or signal reached a window that was already closed and freed ("Internal
+    C++ object (...) already deleted"). Still a bug, so it's saved and counted like any
+    other, but the window is gone and the user lost nothing: no dialog for it."""
+    return isinstance(v, RuntimeError) and "already deleted" in str(v)
 
 
 # Windows errors that are the PC's state, not a bug: in use (32, 33), access denied (5),
