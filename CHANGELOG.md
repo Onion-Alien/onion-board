@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.9.25 — 2026-10-08
+
+- **Fix:** an error report could pop up if the mic set-up finished after the
+  quick-setup guide had already been closed.
+
 ## 1.9.24 — 2026-10-08
 
 - **Set up for the app you're using.** When Discord, Zoom, Teams, a browser call,
