@@ -332,9 +332,20 @@ def test_off_on_cycles_leave_nothing_behind(window, qapp, fake_watch):
     w.load_triggers()         # (not watching, it would wait to be shown)
 
     def counts():
-        _flush_deletes(qapp)
-        gc.collect()
-        _flush_deletes(qapp)
+        # a tab that's just gone can take a few collections to really let go
+        # (how many depends on the machine), so look again until the numbers stop
+        last = None
+        for _ in range(10):
+            _flush_deletes(qapp)
+            gc.collect()
+            _flush_deletes(qapp)
+            now = snapshot()
+            if now == last:
+                break
+            last = now
+        return now
+
+    def snapshot():
         alive = sum(ref() is not None for ref in net._listeners)
         objs = gc.get_objects()
         return {"net listeners": alive, "fit steps": len(w._fit.steps),
