@@ -80,6 +80,19 @@ class SpeechController:
     def say(self, text: str):
         self.speaker.say(text)
 
+    def render_line(self, text: str) -> np.ndarray:
+        """`text` spoken as a sound to keep: (n, 2) float32 at library.SR, in the voice
+        and with the voice changer that Say uses (not an AI voice). Blocks: call it off
+        the UI thread. Raises when the voice can't say it."""
+        mono, rate = self.tts.synth(text, self.speaker.voice, self.speaker.rate)
+        if not len(mono):
+            raise RuntimeError("this voice can't read that text")
+        if (self.voice_fx or self.fx_always) and self.chain.enabled:
+            mono = self.chain.render(mono, rate)
+        from soundboard.engine import resample
+        mono = resample(np.asarray(mono, np.float32), rate, library.SR)
+        return np.ascontiguousarray(np.repeat(mono[:, None], 2, axis=1), np.float32)
+
     def stop_speaking(self):
         self.speaker.stop()
         self.engine.stop(TTS_SID)

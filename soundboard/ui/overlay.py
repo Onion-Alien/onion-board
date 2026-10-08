@@ -724,7 +724,8 @@ class OverlayWindow(QWidget):
         cfg, T = ov.host.cfg, theme.T
         return (self.width(), self.height(), self.devicePixelRatioF(), self.font().key(),
                 ov.s.scale, ov.s.opacity, ov.s.mode, ov.s.keys, ov.page, ov.pages(),
-                cfg.category, bool(cfg.categories), bool(ov.sounds()),
+                cfg.category, cfg.category_colors.get(cfg.category), bool(cfg.categories),
+                bool(ov.sounds()),
                 tuple(T.get(t) for t in self.THEMED),
                 tuple((m.id, m.name, m.color, m.id in ov.host.audio)
                       for m in ov.page_sounds()),
@@ -804,6 +805,15 @@ class OverlayWindow(QWidget):
         small.setPointSizeF(8.5)
         # a long category name ran into the page keys: it's cut with "…" before them
         room = head.width() - (QFontMetrics(small).horizontalAdvance(hint) + 12 if hint else 0)
+        col = ov.host.cfg.category_colors.get(cat) if cat else None
+        if col:   # the category's colour, as on its tab
+            p.save()
+            p.setPen(Qt.NoPen)
+            p.setBrush(QColor(col))
+            p.drawEllipse(QRectF(head.left(), head.center().y() - 5, 10, 10))
+            p.restore()
+            head = head.adjusted(16, 0, 0, 0)
+            room -= 16
         p.drawText(head, Qt.AlignLeft | Qt.AlignVCenter,
                    p.fontMetrics().elidedText(title, Qt.ElideRight, max(0, int(room))))
         f.setBold(False)

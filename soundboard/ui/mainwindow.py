@@ -17,12 +17,14 @@ import numpy as np
 import sounddevice as sd
 from PySide6.QtCore import (QEvent, QFileSystemWatcher, QObject, QSignalBlocker, QSize, Qt,
                             QTimer, QUrl, Signal)
-from PySide6.QtGui import QDesktopServices, QIcon, QKeySequence, QShortcut
+from PySide6.QtGui import (QActionGroup, QColor, QCursor, QDesktopServices, QFontMetricsF, QIcon,
+                           QKeySequence, QPainter, QPixmap, QShortcut)
 from PySide6.QtWidgets import (QApplication, QCheckBox, QComboBox, QDialog, QFileDialog, QFrame,
                                QGraphicsOpacityEffect, QGridLayout, QHBoxLayout, QInputDialog,
                                QLabel, QLineEdit, QMainWindow, QMenu, QMessageBox,
                                QPushButton, QScrollArea, QSizePolicy, QSlider, QStackedWidget,
-                               QSystemTrayIcon, QTabBar, QTabWidget, QVBoxLayout, QWidget)
+                               QSystemTrayIcon, QTabBar, QTabWidget, QToolTip, QVBoxLayout,
+                               QWidget, QWidgetAction)
 
 from soundboard import engine as eng
 from soundboard import theme, winkeys, ytdl
@@ -42,7 +44,7 @@ from soundboard.shuffle import ShuffleBag
 from soundboard.testcheck import analyze as analyze_output
 from soundboard.testcheck import summary_html
 from soundboard.ui.crashdialog import free_dialog
-from soundboard.ui.dialogs import EditDialog
+from soundboard.ui.dialogs import COLOUR_NAMES, EditDialog
 from soundboard.ui import (a11y, alsosend, appstate, busy, clipeditor, icons, responsive, splash,
                            taboff)
 from soundboard.ui.speedpitch import SpeedPitchButton
@@ -437,6 +439,10 @@ class MainWindow(QMainWindow):
         self._save_timer = QTimer(self)
         self._save_timer.setSingleShot(True)
         self._save_timer.timeout.connect(self._save_now)
+        # play counts and Ctrl+wheel volumes: saved within a few seconds, not on each press
+        # (a spammed hotkey wrote the whole config every time); closing saves the rest
+        self._count_save = QTimer(self, singleShot=True, interval=5000)
+        self._count_save.timeout.connect(self._save_now)
         # written on a background thread: a slow disk froze the window for seconds
         self._saver = library.Saver(self.cfg, done=self.config_saved.emit)
         self.config_saved.connect(self._on_saved)
@@ -1021,6 +1027,15 @@ class MainWindow(QMainWindow):
         tb.addWidget(self.btn_keys)
         tb.addWidget(self.search, 1)
         tb.addWidget(self.btn_yt)
+        # the pads' order (as dragged, A-Z, newest, most played) and cards or a list
+        self.btn_view = QPushButton()
+        self.btn_view.setAccessibleName(_("Order and view"))
+        vm = QMenu(self.btn_view)
+        vm.setToolTipsVisible(True)
+        vm.aboutToShow.connect(lambda: self._fill_view_menu(vm))
+        self.btn_view.setMenu(vm)
+        self._label_view()
+        tb.addWidget(self.btn_view)
         size = QSlider(Qt.Horizontal)
         size.setRange(110, 240)
         c.pad_width = min(max(c.pad_width, 110), 240)   # the pads are built with it next
@@ -1064,6 +1079,8 @@ class MainWindow(QMainWindow):
 
         self.grid = PadGrid()
         self.grid.pad_w = c.pad_width
+        self.grid.listed = c.pad_view == "list"
+        self.grid._spacing()
         self.grid.reorder.connect(self.on_reorder)
         # queued: the import (and any question it asks) runs after the drop returns,
         # so Explorer isn't frozen until a dialog is answered
@@ -2898,6 +2915,7 @@ class MainWindow(QMainWindow):
             v = VoicePanel(self.engine, self.cfg.voice_fx, self.cfg.speech)
             v.fx_changed.connect(lambda spec: self.set_option("voice_fx", spec))
             v.speech_changed.connect(lambda s: self.set_option("speech", s))
+            v.clip_ready.connect(self.on_clip)
             v.fx.set_tip_enabled(not self.cfg.voice_discord_tip_shown)
             v.fx.chat_help.connect(lambda: self.show_chat_guide("discord"))
             v.fx.tip_dismissed.connect(
@@ -3780,6 +3798,10 @@ class MainWindow(QMainWindow):
             return
         self.select(sid)
         self._last_sid = sid
+        if sid != LINK_ID:
+            m.plays += 1   # Most played
+            if not self._count_save.isActive():
+                self._count_save.start()
         v = self.engine.play(sid, data, self.gain_for(m), loop=m.loop,
                              mode="restart" if m.mode == "queue" else m.mode,
                              fade_in=m.fade_in, fade_out=m.fade_out,
@@ -4007,7 +4029,7 @@ class MainWindow(QMainWindow):
             p.setParent(None)
             p.deleteLater()
         ordered = []
-        for m in self.cfg.sounds:
+        for m in library.sorted_sounds(self.cfg.sounds, self.cfg.pad_sort):
             p = self.pads.get(m.id)
             if p is None:
                 p = Pad(m, self.cfg.pad_width)
@@ -4017,6 +4039,7 @@ class MainWindow(QMainWindow):
                 p.pick.connect(self.selection.on_pick)
                 p.step.connect(self.grid.focus_step)
                 p.menu.connect(self.pad_menu)
+                p.nudge.connect(self.nudge_volume)
                 self.pads[m.id] = p
             p.state = "ready" if m.id in self.audio else p.state
             p.selected = m.id == self.current
@@ -4121,6 +4144,8 @@ class MainWindow(QMainWindow):
             n = sum(1 for m in self.cfg.sounds if c in m.tags)
             i = tb.addTab(c.replace("&", "&&"))   # a lone & would be a shortcut key
             tb.setTabData(i, c)                   # the real name; All's data stays None
+            col = self.cfg.category_colors.get(c)
+            tb.setTabIcon(i, self._dot_icon(col) if col else QIcon())
             hk = self.cfg.category_hotkeys.get(c)
             progs = catswitch.programs_for(self.cfg.category_programs, c)
             tb.setTabToolTip(i, ngettext("{n} sound", "{n} sounds", n)
@@ -4134,6 +4159,32 @@ class MainWindow(QMainWindow):
         tb.setCurrentIndex(self.cfg.categories.index(cat) + 1 if cat in self.cfg.categories
                            else 0)
         tb.blockSignals(False)
+
+    @staticmethod
+    def _dot_icon(color: str) -> QIcon:
+        """A category's colour on its tab: a round dot."""
+        dpr = QApplication.instance().devicePixelRatio() if QApplication.instance() else 1.0
+        pm = QPixmap(round(12 * dpr), round(12 * dpr))
+        pm.setDevicePixelRatio(dpr)
+        pm.fill(Qt.transparent)
+        p = QPainter(pm)
+        p.setRenderHint(QPainter.Antialiasing)
+        p.setPen(Qt.NoPen)
+        p.setBrush(QColor(color))
+        p.drawEllipse(1, 1, 10, 10)
+        p.end()
+        return QIcon(pm)
+
+    def set_category_color(self, name: str, color: str):
+        """A category's colour on its tab and the overlay ("" takes it off)."""
+        if color:
+            self.cfg.category_colors[name] = color
+        else:
+            self.cfg.category_colors.pop(name, None)
+        self._save_now()
+        self._fill_categories()
+        if getattr(self, "overlay", None) is not None:
+            self.overlay.sounds_changed()
 
     def _on_category_tab(self, i: int):
         self.set_category(self.cfg.categories[i - 1] if 1 <= i <= len(self.cfg.categories)
@@ -4233,6 +4284,8 @@ class MainWindow(QMainWindow):
         self.cfg.categories[self.cfg.categories.index(old)] = new
         if old in self.cfg.category_hotkeys:
             self.cfg.category_hotkeys[new] = self.cfg.category_hotkeys.pop(old)
+        if old in self.cfg.category_colors:
+            self.cfg.category_colors[new] = self.cfg.category_colors.pop(old)
         for exe, cat in self.cfg.category_programs.items():   # its programs come along
             if cat == old:
                 self.cfg.category_programs[exe] = new
@@ -4265,6 +4318,7 @@ class MainWindow(QMainWindow):
             return
         self.cfg.categories.remove(name)
         self.cfg.category_hotkeys.pop(name, None)
+        self.cfg.category_colors.pop(name, None)
         self.cfg.category_programs = {exe: cat for exe, cat
                                       in self.cfg.category_programs.items() if cat != name}
         self._update_cat_timer()
@@ -4295,6 +4349,22 @@ class MainWindow(QMainWindow):
         a_all = menu.addAction(icons.icon("next"), _("Play them all, in order"))
         a_shuf = menu.addAction(icons.icon("next"), _("Play them all, shuffled"))
         a_exp = menu.addAction(icons.icon("folder"), _("Export as a sound pack…"))
+        cm = menu.addMenu(icons.icon("palette"), _("Colour"))
+        now = self.cfg.category_colors.get(name, "")
+        a_cols = {}
+        for col in PAD_COLORS:
+            picked = col.lower() == now.lower()
+            # the dot sits where a tick would: the one it has now is bold, with a ✓
+            a = cm.addAction(self._dot_icon(col), COLOUR_NAMES.get(col, col)
+                             + ("  ✓" if picked else ""))
+            if picked:
+                bold = a.font()
+                bold.setBold(True)
+                a.setFont(bold)
+            a_cols[a] = col
+        if now:
+            cm.addSeparator()
+            a_cols[cm.addAction(_("No colour"))] = ""
         menu.addSeparator()
         a_prog = menu.addAction(icons.icon("apps"), _("Show this when a program is in front…"))
         a_unprog = {menu.addAction(_("Stop showing this for {exe}", exe=exe)): exe
@@ -4318,6 +4388,8 @@ class MainWindow(QMainWindow):
             self.queue_category(name, shuffled=act == a_shuf)
         elif act == a_exp:
             self.export_sounds([m for m in self.cfg.sounds if name in m.tags], name)
+        elif act in a_cols:
+            self.set_category_color(name, a_cols[act])
         elif act == a_del:
             self.delete_category(name)
         elif act == a_prog:
@@ -4730,10 +4802,113 @@ class MainWindow(QMainWindow):
         m = self.meta(sid)
         if not m:
             return
+        if self.cfg.pad_sort != "custom":   # the drop index is into the sorted pads
+            self.toast(_("The pads are sorted {how}: pick “My order” (the ⇣ button by the "
+                         "search box) to drag them into place.",
+                         how=self._sort_names()[self.cfg.pad_sort]))
+            return
         self.cfg.sounds.remove(m)
         self.cfg.sounds.insert(min(target, len(self.cfg.sounds)), m)
         self._save_now()
         self._rebuild_pads()
+
+    # ------------------------------------------------------------------ order and view
+    @staticmethod
+    def _sort_names() -> dict[str, str]:
+        return {"custom": _("My order"), "name": _("A–Z"), "newest": _("Newest"),
+                "plays": _("Most played")}
+
+    def _label_view(self):
+        """The order button by the search box: the order it shows, and the list icon in
+        the list view."""
+        b, c = self.btn_view, self.cfg
+        b.setText(self._sort_names().get(c.pad_sort, ""))
+        icons.set_icon(b, "list" if c.pad_view == "list" else "sort")
+        b.setToolTip(_("Sort the pads (my order, A–Z, newest, most played) and show them as "
+                       "cards or a list"))
+
+    def _fill_view_menu(self, menu: QMenu):
+        menu.clear()
+        tips = {"custom": _("As you dragged them"), "name": _("By name"),
+                "newest": _("The sounds added last first"),
+                "plays": _("The sounds you play most first (counted from now on)")}
+        group = QActionGroup(menu)
+        for key, name in self._sort_names().items():
+            a = menu.addAction(name, lambda k=key: self.set_pad_sort(k))
+            a.setCheckable(True)
+            a.setChecked(self.cfg.pad_sort == key)
+            a.setToolTip(tips[key])
+            group.addAction(a)
+        menu.addSeparator()
+        views = QActionGroup(menu)
+        for key, name, icon, tip in (
+                ("grid", _("Pads"), "sounds", _("Cards, with pictures")),
+                ("list", _("List"), "list", _("One line each: many more sounds on the screen"))):
+            a = menu.addAction(icons.icon(icon), name, lambda k=key: self.set_pad_view(k))
+            a.setCheckable(True)
+            a.setChecked(self.cfg.pad_view == key)
+            a.setToolTip(tip)
+            views.addAction(a)
+
+    def set_pad_sort(self, how: str):
+        if how not in library.PAD_SORTS or how == self.cfg.pad_sort:
+            return
+        self.cfg.pad_sort = how
+        self._label_view()
+        self._save_now()
+        self._rebuild_pads()
+
+    def set_pad_view(self, view: str):
+        if view not in library.PAD_VIEWS or view == self.cfg.pad_view:
+            return
+        self.cfg.pad_view = view
+        self._label_view()
+        self._save_now()
+        self.grid.set_listed(view == "list")
+        self.selection.sync()
+
+    def _volume_action(self, menu: QMenu, m: SoundMeta) -> QWidgetAction:
+        """A pad menu's volume slider: changes it as it's dragged (a playing sound too)."""
+        w = QWidget()
+        h = QHBoxLayout(w)
+        h.setContentsMargins(10, 4, 10, 4)
+        h.setSpacing(8)
+        h.addWidget(icon_label("volume", _("This sound's volume (Ctrl+wheel on the pad "
+                                            "changes it too)")))
+        sl = QSlider(Qt.Horizontal)
+        sl.setRange(0, 200)
+        sl.setSingleStep(5)
+        sl.setPageStep(10)
+        sl.setValue(round(m.volume * 100))
+        sl.setFixedWidth(120)
+        sl.setAccessibleName(_("Volume"))
+        val = QLabel(f"{sl.value()} %")
+        val.setObjectName("muted")
+        val.setMinimumWidth(QFontMetricsF(val.font()).horizontalAdvance("200 %") + 2)
+
+        def moved(v: int):
+            val.setText(f"{v} %")
+            m.volume = v / 100
+            self.engine.set_gain(m.id, self.gain_for(m))
+        sl.valueChanged.connect(moved)
+        h.addWidget(sl)
+        h.addWidget(val)
+        a = QWidgetAction(menu)
+        a.setText(_("Volume"))   # what a screen reader says for the row
+        a.setDefaultWidget(w)
+        return a
+
+    def nudge_volume(self, sid: str, steps: int):
+        """Ctrl+wheel on a pad: its volume in 5 % steps (0-200 %, as in Edit)."""
+        m = self.meta(sid)
+        if m is None:
+            return
+        m.volume = round(min(2.0, max(0.0, m.volume + 0.05 * steps)), 2)
+        self.engine.set_gain(sid, self.gain_for(m))
+        QToolTip.showText(QCursor.pos(), _("{name}: {pct} %", name=m.name,
+                                           pct=round(m.volume * 100)), self.pads.get(sid))
+        if not self._count_save.isActive():
+            self._count_save.start()
 
     def pad_menu(self, sid, pos):
         m = self.meta(sid)
@@ -4757,6 +4932,8 @@ class MainWindow(QMainWindow):
         a_edit = add(("edit",), _("Edit…"), _("Name, volume, hotkey, what a press does, loop, "
                                               "fades, wait first, cooldown, colour"))
         a_fx = add(("wave",), _("Effects…"), _("Speed, pitch, EQ, boost"))
+        vol_before = m.volume
+        menu.addAction(self._volume_action(menu, m))
         a_hk_clear = None
         if m.hotkey:
             hk = menu.addMenu(icons.icon("keyboard"), _("Hotkey: {hotkey}",
@@ -4791,6 +4968,8 @@ class MainWindow(QMainWindow):
         a_del = add(("trash", "danger_text"), _("Remove"), _("Goes to Recently deleted"))
         act = menu.exec(pos)
         menu.deleteLater()   # its actions stay valid until this returns
+        if m.volume != vol_before:
+            self._save_now()
         if act is None:
             return
         if act in cat_acts:
@@ -6540,6 +6719,7 @@ class MainWindow(QMainWindow):
         f = self._fit = r.Fitter(self._full)
         f.add(10, "w", r.hide(self.tagline))
         f.add(10, "w", r.hide(*self._pad_size))
+        f.add(18, "w", r.icon_only(self.btn_view))   # its tooltip says what it is
         f.add(16, "w", r.hide(self._mode_pick[0]))   # the dropdown's tooltip says what it is
         f.add(38, "w", r.hide(self._mode_pick[1]))   # also on the Setup tab
         # the ear button shrinks to its icon first: the level bar is the live part

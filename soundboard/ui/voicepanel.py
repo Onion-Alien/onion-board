@@ -1424,6 +1424,8 @@ class SpeechPanel(QWidget):
     downloaded = Signal()           # a translation was downloaded or removed
     live_changed = Signal(bool)     # "talk as a computer voice" started / stopped
     lang_changed = Signal()         # Speak in: another language picked (VoicePanel)
+    clip_ready = Signal(object, str)   # Save as sound: the line's audio, its name
+    _line_saved = Signal(object, str, str)   # its worker: audio (or None), name, error
 
     def __init__(self, controller: SpeechController, settings: dict,
                  module_list: list[mods.ModuleInfo]):
@@ -1436,6 +1438,7 @@ class SpeechPanel(QWidget):
         self._dl_cancel = False
         self._dl_busy: mods.ModuleInfo | None = None
         self._installing = False
+        self._last_said = ""   # Save as sound with the box empty keeps this line
         controller.gain = self.s["gain"]
         controller.speaker.voice = self.s["voice"]
         controller.speaker.rate = int(self.s["rate"])
@@ -1750,7 +1753,14 @@ class SpeechPanel(QWidget):
         b_stop = QPushButton(_("Stop"))
         b_stop.clicked.connect(lambda: (controller.stop_speaking(),
                                         busy.flash(b_stop, _("✓ Stopped"), 1200)))
+        b_keep = self.b_keep = QPushButton(_("Save as sound"))
+        b_keep.setToolTip(_("Keep the line typed here as a pad on the Sounds tab, in this "
+                            "voice (with the voice changer, if it's on for the computer voice)"))
+        icons.set_icon(b_keep, "plus", size=12)
+        b_keep.clicked.connect(self._save_line)
+        self._line_saved.connect(self._line_done)
         row.addWidget(b_say)
+        row.addWidget(b_keep)
         row.addWidget(b_stop)
         sep = vsep()
         row.addWidget(sep)
@@ -1826,7 +1836,36 @@ class SpeechPanel(QWidget):
         if text:
             self.ctl.say(text)
             self._log_said(text)
+            self._last_said = text
             self.ed.clear()
+
+    def _save_line(self):
+        """Save as sound: the typed line (else the last one said) spoken into a pad."""
+        text = self.ed.text().strip() or self._last_said
+        if not text:
+            busy.flash(self.b_keep, _("Type a line first"), 1600)
+            return
+        busy.set_busy(self.b_keep, True)
+        name = " ".join(text.split())[:40]
+
+        def work():
+            try:
+                data, err = self.ctl.render_line(text), ""
+            except Exception as e:  # noqa: BLE001 - said under the bar
+                data, err = None, errors.plain(e)
+            try:
+                self._line_saved.emit(data, name, err)
+            except RuntimeError:   # the panel was closed meanwhile
+                pass
+        threading.Thread(target=work, name="tts-save", daemon=True).start()
+
+    def _line_done(self, data, name: str, err: str):
+        busy.set_busy(self.b_keep, False)
+        if data is None:
+            self._tts_error(_("Couldn't save that line: {error}", error=err))
+            return
+        self.clip_ready.emit(data, name)
+        busy.flash(self.b_keep, _("✓ Added to Sounds"), 1800)
 
     def _log_said(self, text: str):
         self.said_log.appendPlainText(f"{time.strftime('%H:%M:%S')}  {text}")
@@ -2635,6 +2674,7 @@ class VoicePanel(QWidget):
     fx_changed = Signal(dict)
     speech_changed = Signal(dict)
     active_changed = Signal(bool)   # the voice changer or the computer voice is on / off
+    clip_ready = Signal(object, str)   # a typed line saved as a sound (SpeechPanel)
     _scanned = Signal(object, object)   # the Refresh button's worker: (modules, AI voices)
 
     def __init__(self, engine, fx_spec: dict | None = None, speech: dict | None = None):
@@ -2695,6 +2735,7 @@ class VoicePanel(QWidget):
         self.speech.changed.connect(self.speech_changed)
         self.speech.changed.connect(lambda _s: self._emit_active())   # the tab's picture
         self.speech.downloaded.connect(lambda: self.addons.show_modules(self.modules))
+        self.speech.clip_ready.connect(self.clip_ready)
         self.speech.live_changed.connect(lambda _on: self._emit_active())
         # AI voices: the live voice changer
         from soundboard.ui.aivoicepanel import AiVoicePanel

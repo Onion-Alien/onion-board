@@ -370,6 +370,7 @@ MINI_PAD_MIN_W = 96   # the mini player's two-a-row pads get no smaller than thi
 
 
 SLIM_PAD_H = 30      # a pad as a one-line row: the mini player when it's too small for cards
+LIST_ROW_W = 260     # the Sounds tab's list view: rows at least this wide, as many a line as fit
 
 
 def pad_height(width: int) -> int:
@@ -410,6 +411,7 @@ class Pad(QAbstractButton):
     space = Signal(str)         # Space: pause / resume it if it's playing, else play it
     menu = Signal(str, QPoint)
     step = Signal(object, int, int)   # arrow key: this pad, columns, rows to move focus
+    nudge = Signal(str, int)    # Ctrl+wheel: its volume this many steps up (+) or down (-)
     single_click = False        # Settings: a click plays it (activated) instead of selecting
 
     def __init__(self, meta: SoundMeta, width: int):
@@ -438,6 +440,7 @@ class Pad(QAbstractButton):
         self._font_key = self.font().key()
         self._accent = (None, None)   # (meta.color, its QColor)
         self._foot = (None, None)     # (what the footer shows, its font, text and badge)
+        self._wheel = 0               # Ctrl+wheel turned less than a notch (touchpads)
         self.setFixedSize(width, pad_height(width))
         self.setCursor(Qt.PointingHandCursor)
         self.setAttribute(Qt.WA_Hover)
@@ -649,6 +652,18 @@ class Pad(QAbstractButton):
             else:
                 self.chosen.emit(self.meta.id)
 
+    def wheelEvent(self, e):
+        """Ctrl+wheel: the sound's volume. A plain wheel still scrolls the pads."""
+        if not e.modifiers() & Qt.ControlModifier:
+            e.ignore()
+            return
+        self._wheel += e.angleDelta().y()
+        steps = int(self._wheel / 120)
+        if steps:
+            self._wheel -= steps * 120
+            self.nudge.emit(self.meta.id, steps)
+        e.accept()
+
     def mouseDoubleClickEvent(self, e):
         if Pad.single_click:   # a quick second click is just another click
             self.mousePressEvent(e)
@@ -844,11 +859,26 @@ class Pad(QAbstractButton):
         elif self.state == "error":
             right, rc = _("can't load"), "#ff6b6b"
         else:
-            right = "❚❚" if self.paused else f"{self.meta.duration:.1f}s"
+            m = self.meta
+            flags = ("⟳ " if m.loop else "") + \
+                {"overlap": "⧉ ", "toggle": "⏯ ", "solo": "◉ "}.get(m.mode, "")
+            right = "❚❚" if self.paused else f"{flags}{m.duration:.1f}s"
             rc = T["muted"]
         rw = fm.horizontalAdvance(right) + 4
         p.setPen(QColor(rc))
         p.drawText(r.adjusted(0, 0, -9, 0), Qt.AlignRight | Qt.AlignVCenter, right)
+        hk = self.meta.hotkey and (midi.short(self.meta.hotkey) if midi.is_midi(self.meta.hotkey)
+                                   else pretty_key(self.meta.hotkey))
+        if hk and r.width() >= 200:   # the key as a badge left of the length, room allowing
+            bw = fm.horizontalAdvance(hk) + 10
+            if bw <= r.width() * 0.4:
+                box = QRectF(r.right() - 9 - rw - 4 - bw, r.center().y() - 9, bw, 18)
+                p.setPen(Qt.NoPen)
+                p.setBrush(pad_colours()["badge"])
+                p.drawRoundedRect(box, 5, 5)
+                p.setPen(pad_colours()["badge_text"])
+                p.drawText(box, Qt.AlignCenter, hk)
+                rw += bw + 8
         f.setBold(True)
         p.setFont(f)
         text_r = r.adjusted(24, 0, -14 - rw, 0)
@@ -903,6 +933,7 @@ class PadGrid(QWidget):
         self.pad_w = 150         # the size picked (Pad size); narrower only when it won't fit
         self.two_up = False      # the mini player: two smaller pads a row rather than one
         self.slim = False        # a tiny mini player: one-line rows instead of cards
+        self.listed = False      # the list view (Sounds tab): one-line rows in columns
         self.grid = QGridLayout(self)
         self.grid.setSpacing(10)
         self.grid.setContentsMargins(4, 4, 4, 4)
@@ -964,11 +995,24 @@ class PadGrid(QWidget):
     def set_slim(self, on: bool):
         if on != self.slim:
             self.slim = on
-            self.grid.setSpacing(4 if on else 10)
+            self._spacing()
             self.relayout(force=True)
 
+    def set_listed(self, on: bool):
+        if on != self.listed:
+            self.listed = on
+            self._spacing()
+            self.relayout(force=True)
+
+    def _spacing(self):
+        self.grid.setSpacing(4 if self.slim else 6 if self.listed else 10)
+
+    def rows(self) -> bool:
+        """Pads drawn as one-line rows: the list view, or a tiny mini player."""
+        return self.slim or self.listed
+
     def pad_h(self, w: int) -> int:
-        return SLIM_PAD_H if self.slim else pad_height(w)
+        return SLIM_PAD_H if self.rows() else pad_height(w)
 
     def fit_width(self, room: int, slim: bool | None = None) -> tuple[int, int]:
         """(columns, pad width) for `room` pixels: the picked size, but never wider than
@@ -976,6 +1020,12 @@ class PadGrid(QWidget):
         Slim rows take the whole width, one a row."""
         if self.slim if slim is None else slim:
             return 1, max(1, room)
+        if self.listed and slim is None:   # the mini player's rows take the whole width
+            if self.two_up:
+                return 1, max(1, room)
+            sp = 6
+            cols = max(1, (room + sp) // (LIST_ROW_W + sp))
+            return cols, max(1, (room - sp * (cols - 1)) // cols)
         sp = 10
         w = max(1, min(self.pad_w, room))
         if self.two_up and (room + sp) // (w + sp) < 2 and room - sp >= 2 * MINI_PAD_MIN_W:
