@@ -143,12 +143,14 @@ def test_make_ring_replaces_an_old_layout(tmp_path):
 
 
 @pytest.mark.parametrize("values, expected", [
-    ({}, ("wrap", 5)),                                    # nothing: a stream effect (SFX)
-    ({5: "{S}"}, ("wrap", 5)),                            # wrap the driver's SFX
-    ({7: "{E}", 1: "{E}"}, ("wrap", 5)),                  # modern driver (a G733): SFX
-    ({1: "{L}"}, ("wrap", 1)),                            # only old-style effects: LFX
+    ({}, ("wrap", 7)),                       # nothing: the endpoint effect (raw gets it)
+    ({5: "{S}"}, ("wrap", 7)),               # the driver's SFX stays where it is
+    ({7: "{E}", 1: "{E}"}, ("wrap", 7)),     # modern driver (a G733): wrap its EFX
+    ({1: "{L}"}, ("wrap", 1)),               # only old-style effects: LFX
     ({1: "{L}", 2: "{G}"}, ("wrap", 1)),
-    ({13: ["{X}"], 5: "{S}"}, ("composite", 13)),         # a list: join it
+    ({13: ["{X}"], 5: "{S}"}, ("wrap", 7)),  # a stream effect list: left alone
+    ({13: ["{X}"], 1: "{L}"}, ("wrap", 7)),
+    ({15: ["{X}"], 7: "{E}"}, ("composite", 15)),   # an endpoint effect list: join it
 ])
 def test_pick_slot(values, expected):
     assert dm.pick_slot(values) == expected
@@ -158,6 +160,8 @@ def test_pick_slot(values, expected):
     ({5: "{S}"}, 5, "{S}"),
     ({1: "{L}"}, 5, "{L}"),             # SFX switches the old LFX off: run it inside
     ({1: "{L}", 7: "{E}"}, 5, ""),      # ...unless an EFX still runs it before us
+    ({7: "{E}", 1: "{E}"}, 7, "{E}"),   # EFX: the driver's own endpoint effect first
+    ({1: "{L}", 5: "{S}"}, 7, "{L}"),   # no EFX: the LFX it switches off, inside
     ({1: "{L}"}, 1, "{L}"),
     ({}, 5, ""),
 ])
@@ -314,16 +318,16 @@ def test_a_set_up_cut_off_anywhere_can_be_undone(fake_reg, mic):
 def test_repair_after_windows_reset_keeps_the_new_driver_effects(fake_reg):
     """A driver update / "Reset sound settings" rewrote the mic's effects: repairing and
     later taking it off leave the driver's new ones, not the stale ones from before."""
-    _mic(fake_reg, MICS["a stream effect"])
+    _mic(fake_reg, MICS["a G733 (EFX + old LFX)"])
     dm._install_endpoint(GUID, None)
-    fake_reg.keys[FXKEY.lower()] = {dm.FX % 5: ("{NEW}", SZ)}   # Windows reset it
+    fake_reg.keys[FXKEY.lower()] = {dm.FX % 7: ("{NEW}", SZ)}   # Windows reset it
     for guid in fake_reg.installed_on():   # what admin_install does: repair
         dm._uninstall_endpoint(guid)
-    assert fake_reg.mics()[FXKEY.lower()] == {dm.FX % 5: ("{NEW}", SZ)}
+    assert fake_reg.mics()[FXKEY.lower()] == {dm.FX % 7: ("{NEW}", SZ)}
     dm._install_endpoint(GUID, None)
     assert fake_reg.keys[dm.ENDPOINTS_KEY.lower() + "\\" + GUID.lower()]["Original"][0] == "{NEW}"
     dm._uninstall_endpoint(GUID)
-    assert fake_reg.mics()[FXKEY.lower()] == {dm.FX % 5: ("{NEW}", SZ)}
+    assert fake_reg.mics()[FXKEY.lower()] == {dm.FX % 7: ("{NEW}", SZ)}
 
 
 def test_lost_notes_never_leave_the_effect_behind(fake_reg):
@@ -1397,7 +1401,9 @@ def test_new_users_go_straight_into_their_mic_old_settings_keep_the_cable(app_di
     (["{a}"], True, True, False, "outdated"),    # an older copy (still works)
     (["{a}"], True, True, True, "ready"),
 ])
-def test_status(monkeypatch, tmp_path, on, here, in_place, same, expected):
+@pytest.mark.parametrize("slot", [None, 7])
+def test_status(monkeypatch, tmp_path, on, here, in_place, same, expected, slot):
+    monkeypatch.setattr(dm, "installed_slot", lambda guid: slot)
     monkeypatch.setattr(dm, "installed_on", lambda: on)
     monkeypatch.setattr(dm, "endpoint_for", lambda name: "{a}")
     monkeypatch.setattr(dm, "effect_in_place", lambda guid: in_place)
@@ -1408,6 +1414,41 @@ def test_status(monkeypatch, tmp_path, on, here, in_place, same, expected):
     assert dm.status("My mic") == expected
     assert dm.needs_repair(expected) == (expected == "wiped")
     assert dm.works(expected) == (expected in ("ready", "outdated"))
+
+
+@pytest.mark.parametrize("slot, expected", [(5, "outdated"), (13, "outdated"), (1, "ready"),
+                                            (7, "ready"), (15, "ready")])
+def test_status_offers_the_move_out_of_the_stream_effect(monkeypatch, slot, expected):
+    """On in the stream effect (before the endpoint one), raw streams (Chrome, Edge,
+    Discord Studio) skip it: the update that moves it is offered."""
+    monkeypatch.setattr(dm, "installed_on", lambda: ["{a}"])
+    monkeypatch.setattr(dm, "endpoint_for", lambda name: "{a}")
+    monkeypatch.setattr(dm, "effect_in_place", lambda guid: True)
+    monkeypatch.setattr(dm, "same_dll", lambda a, b: True)
+    monkeypatch.setattr(dm, "registered_dll", lambda: None)
+    monkeypatch.setattr(dm, "make_ring", lambda path=None: True)
+    monkeypatch.setattr(dm, "installed_slot", lambda guid: slot)
+    dm.forget_status()
+    assert dm.status("My mic") == expected
+    assert dm.endpoint_wide() == (slot in (7, 15))
+
+
+def test_a_g733_gets_it_in_the_endpoint_effect(fake_reg):
+    _mic(fake_reg, MICS["a G733 (EFX + old LFX)"])
+    dm._install_endpoint(GUID, None)
+    fx = fake_reg.keys[FXKEY.lower()]
+    state = fake_reg.keys[dm.ENDPOINTS_KEY.lower() + "\\" + GUID.lower()]
+    assert fx[dm.FX % 7][0] == dm.CLSID and dm.FX % 1 not in fx
+    assert state["Original"][0] == "{E}" and state["Slot"][0] == 7
+
+
+def test_a_mic_without_effects_gets_the_endpoint_modes(fake_reg):
+    dm._install_endpoint(GUID, None)
+    fx = fake_reg.keys[FXKEY.lower()]
+    assert fx[dm.FX % 7][0] == dm.CLSID
+    assert fx[dm.MODES_KEY % 7][0] == [dm.MODE_DEFAULT]
+    dm._uninstall_endpoint(GUID)
+    assert not fake_reg.mics()
 
 
 def test_same_dll(tmp_path):

@@ -84,6 +84,12 @@ def on_mic(mw) -> bool:
     return cfg.route == "mic" and directmic.works(directmic.status(cfg.mic_device))
 
 
+def raw_skips(mw) -> bool:
+    """On the mic, and an app opening it raw (Discord's Studio or Bypass) skips Onion
+    Board: an older copy in the stream effect. In the endpoint effect raw gets it too."""
+    return on_mic(mw) and not directmic.endpoint_wide()
+
+
 # each discordcfg problem: what it does and what to switch, in one sentence. Straight
 # into my mic, Discord's Studio profile (and "Bypass System Audio Input Processing")
 # opens the mic around every Windows audio effect, so nothing of the board's reaches
@@ -128,7 +134,7 @@ def settings_html(found: list, kept: bool) -> str:
     ok, warn = _ok(), _warn()
     s = found[0]   # the client changed most recently
     name = html.escape(s.client)
-    probs = s.problems(kept)
+    probs = s.problems(kept and not directmic.endpoint_wide())
     if not probs:
         return _("<b style='color:{colour}'>✓ {name}'s settings are right for your "
                  "sounds.</b>", colour=ok, name=name)

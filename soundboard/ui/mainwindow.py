@@ -6108,7 +6108,10 @@ class MainWindow(QMainWindow):
         def run():
             apps = None
             try:
-                apps = appaudio.recording_apps(mic, mine=True)
+                # in the endpoint effect nobody can skip it, and one copy serves every
+                # app (its stream count isn't per app): nobody to name
+                apps = [] if directmic.endpoint_wide() else \
+                    appaudio.recording_apps(mic, mine=True)
             except Exception:  # noqa: BLE001 - a check that can't run shows nothing
                 log.debug("listing who records the mic failed", exc_info=True)
             self.bridge.mic_users.emit(apps)
@@ -6131,8 +6134,8 @@ class MainWindow(QMainWindow):
         worst first; [] when it's fine, not running, or couldn't be read."""
         if not self.discord_found:
             return []
-        from soundboard.ui.chatguide import on_mic
-        return self.discord_found[0].problems(on_mic(self))
+        from soundboard.ui.chatguide import raw_skips
+        return self.discord_found[0].problems(raw_skips(self))
 
     def _discord_tick(self):
         """Every DISCORD_POLL_MS: while Discord runs, re-read its settings when its

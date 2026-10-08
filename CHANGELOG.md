@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.9.21 — 2026-10-08
+
+- **Your sounds reach every app that uses your mic.** Some apps open the mic in a way
+  that went around Onion Board (Discord's *Studio* profile is one), so they heard your
+  voice but not your sounds. Onion Board now sits in the part of the mic those apps
+  can't skip. If you set up *Straight into my mic* before this version, the Setup tab
+  offers the update (Windows asks once, and your sound drops out for a second).
+
 ## 1.9.20 — 2026-10-08
 
 - **Sort your pads.** The new button by the search box sorts them *A–Z*, *Newest* or

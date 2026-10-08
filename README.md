@@ -106,10 +106,8 @@ Optional: if you never get it, nothing changes.
      mic** and **Yes** when Windows asks (once). Discord and games keep your normal
      mic, so there's nothing to pick there. In Discord, set *User Settings → Voice &
      Video → Input Profile* to **Custom**, *Noise Suppression* to **None** and turn
-     *Echo Cancellation* off so it doesn't filter your sounds out. **Not Studio**: on
-     your mic, Studio makes Discord skip Onion Board, and none of your sounds get
-     through. Onion Board reads Discord's settings and warns you when one of them is
-     in the way.
+     *Echo Cancellation* off so it doesn't filter your sounds out. Onion Board reads
+     Discord's settings and warns you when one of them is in the way.
    - **A virtual cable** (the backup, if your mic won't take it; pick it by name): installs the free
      VB-Cable; in Discord or your game, set your microphone to `CABLE Output` (and
      Discord's *Input Profile* to **Studio**).
