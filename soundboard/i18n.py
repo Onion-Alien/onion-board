@@ -335,9 +335,12 @@ def translate_qt_buttons(app) -> bool:
 
     class ButtonWords(QTranslator):
         def translate(self, context, source, disambiguation=None, n=-1):
+            # None, not "": Qt takes "" as a translation (an empty one) and stops there,
+            # which broke more than buttons: QImage.loadFromData() failed on every PNG
+            # once a language other than English was on
             if context == "QPlatformTheme" and source:
-                return _qt_button(source) or ""
-            return ""
+                return _qt_button(source)
+            return None
 
         def isEmpty(self):
             return False
