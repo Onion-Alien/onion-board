@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+- **The Voice tab starts with the voice changer.** *Speak another language* moved
+  under the voice changer and AI voices, so the voices are on screen the moment
+  the tab opens.
+
 ## 1.9.9 — 2026-10-08
 
 - **Pick your language.** *Settings → Appearance → Language* opens a window of

@@ -2659,12 +2659,15 @@ class VoicePanel(QWidget):
         pv = QVBoxLayout(body)
         pv.setContentsMargins(4, 4, 8, 12)
         pv.setSpacing(16)
-        self._top = QVBoxLayout()     # Speak in: every voice below uses it
-        pv.addLayout(self._top)
         cols = self._cols = QHBoxLayout()
         cols.setContentsMargins(0, 0, 0, 0)
         cols.setSpacing(16)
         pv.addLayout(cols, 1)
+        # Speak another language goes under the columns, the full width: the voice
+        # changer and AI voices are what most people come for, so they're first and
+        # fully on screen at 1280x760; the speak card is nearest the bottom bar it uses.
+        self._bottom = QVBoxLayout()
+        pv.addLayout(self._bottom)
         folded = speech.get("folded") if isinstance(speech, dict) else None
         self._folded = {k for k in folded if isinstance(k, str)} \
             if isinstance(folded, list) else set()
@@ -2686,7 +2689,7 @@ class VoicePanel(QWidget):
         lcol.addWidget(self._fold_card("fx", self.fx))
         lcol.addStretch(1)
 
-        # Top: Speak another language (and the computer voice); right: AI voices, add-ons.
+        # Bottom: Speak another language (and the computer voice); right: AI voices, add-ons.
         self.controller = SpeechController(engine, self.chain, lambda ev: None)
         self.speech = SpeechPanel(self.controller, speech or {}, self.modules)
         self.speech.changed.connect(self.speech_changed)
@@ -2704,7 +2707,7 @@ class VoicePanel(QWidget):
         rcol.addWidget(self._fold_card("ai", self.ai))
         self.speech.live_changed.connect(self._speech_live)
         self.speech.lang_changed.connect(self._emit_active)
-        self._top.addWidget(self._fold_card("speak", self.speech))
+        self._bottom.addWidget(self._fold_card("speak", self.speech))
         self.addons = ModulesList()
         self.addons.refresh.connect(self._rescan_in_background)
         self._scanned.connect(self._apply_scan)
