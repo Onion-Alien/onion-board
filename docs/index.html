@@ -58,18 +58,78 @@
   .steps { max-width: 640px; margin: 0 auto; padding-left: 22px; }
   .steps li { margin: 6px 0; }
   .note { max-width: 640px; margin: 16px auto 0; color: var(--muted); font-size: 14px; }
-  h1 .logo { display: inline-block; width: 1.15em; height: 1.15em; border: 0; border-radius: 0;
-            vertical-align: -0.2em; margin-right: 0.25em; }
+  h1 .logo { display: block; border: 0; border-radius: 0; }
   footer { text-align: center; color: var(--muted); font-size: 14px; padding: 48px 0 40px; }
   @media (max-width: 440px) { .shots { grid-template-columns: 1fr; } }
+
+  /* ---- motion and glow (all off for people who ask Windows for less motion) ---- */
+  body { overflow-x: hidden; }
+  .aurora { position: fixed; inset: 0; z-index: -1; pointer-events: none; overflow: hidden; }
+  .aurora i { position: absolute; width: 60vmax; height: 60vmax; border-radius: 50%;
+              filter: blur(100px); opacity: .16; animation: drift 30s ease-in-out infinite alternate; }
+  .aurora i:nth-child(1) { background: var(--accent); top: -30vmax; left: -20vmax; }
+  .aurora i:nth-child(2) { background: var(--accent2); top: -28vmax; right: -30vmax; opacity: .10;
+                           animation-duration: 36s; animation-delay: -10s; }
+  @keyframes drift { to { transform: translate(10vw, 8vh) scale(1.1); } }
+
+  .bun { position: relative; display: inline-block; width: 1.15em; height: 1.15em;
+         vertical-align: -0.2em; margin-right: 0.25em; cursor: pointer; }
+  .bun .logo { position: relative; z-index: 1; width: 100%; height: 100%;
+               animation: bob 3.6s ease-in-out infinite; transform-origin: 50% 90%;
+               filter: drop-shadow(0 6px 14px rgba(124, 92, 255, .45)); }
+  .bun:hover .logo, .bun.boing .logo { animation: boing .6s cubic-bezier(.3, 1.6, .5, 1); }
+  .bun b { position: absolute; inset: 10%; border-radius: 50%; border: 2px solid var(--accent);
+           opacity: 0; animation: ring 3.6s ease-out infinite; }
+  .bun b + b { animation-delay: 1.8s; border-color: var(--accent2); }
+  @keyframes bob { 0%, 100% { transform: translateY(0) rotate(-3deg); }
+                   50% { transform: translateY(-6%) rotate(3deg); } }
+  @keyframes boing { 0% { transform: scale(1); } 30% { transform: scale(1.2, .85); }
+                     55% { transform: scale(.9, 1.15) translateY(-10%); } 100% { transform: scale(1); } }
+  @keyframes ring { 0% { transform: scale(.75); opacity: .5; } 100% { transform: scale(1.8); opacity: 0; } }
+
+  h1 span:not(.bun) { background: linear-gradient(90deg, var(--accent), var(--accent2), var(--accent));
+            background-size: 200% 100%; -webkit-background-clip: text; background-clip: text;
+            animation: shimmer 10s linear infinite; }
+  @keyframes shimmer { to { background-position: 200% 0; } }
+
+  .dl { position: relative; overflow: hidden; transition: transform .2s, box-shadow .2s, background .2s; }
+  .dl:hover { transform: translateY(-2px); box-shadow: 0 12px 40px rgba(124, 92, 255, .5); }
+  .dl::after { content: ""; position: absolute; top: 0; left: -60%; width: 35%; height: 100%;
+               background: linear-gradient(100deg, transparent, rgba(255,255,255,.3), transparent);
+               transform: skewX(-20deg); animation: shine 6s ease-in-out infinite; }
+  @keyframes shine { 0%, 75% { left: -60%; } 100% { left: 130%; } }
+
+  .stage3d { margin: 28px auto 0; position: relative; }
+  .stage3d::before { content: ""; position: absolute; inset: 10% 8% 0; border-radius: 30px;
+                     background: linear-gradient(90deg, var(--accent), var(--accent2));
+                     filter: blur(70px); opacity: .22; z-index: -1; }
+  .stage3d .hero { margin: 0; box-shadow: 0 30px 80px rgba(0,0,0,.5); }
+
+  .card { position: relative; transition: transform .2s, border-color .2s; }
+  .card::before { content: ""; position: absolute; inset: -1px; border-radius: inherit; pointer-events: none;
+                  opacity: 0; transition: opacity .25s;
+                  background: radial-gradient(240px circle at var(--mx, 50%) var(--my, 50%), rgba(124, 92, 255, .16), transparent 70%); }
+  .card:hover { transform: translateY(-2px); border-color: rgba(124, 92, 255, .45); }
+  .card:hover::before { opacity: 1; }
+
+  .js .reveal { opacity: 0; transform: translateY(20px); transition: opacity .6s ease, transform .6s ease; }
+  .js .reveal.in { opacity: 1; transform: none; }
+
+  /* Asked for less motion: keep the small loops, drop the big movement. */
+  @media (prefers-reduced-motion: reduce) {
+    .aurora i { animation: none; }
+    .js .reveal { opacity: 1; transform: none; transition: none; }
+  }
 </style>
+<script>document.documentElement.className += " js";</script>
 <script data-goatcounter="https://onionalien.goatcounter.com/count"
         async src="https://gc.zgo.at/count.js"></script>
 </head>
 <body>
+<div class="aurora" aria-hidden="true"><i></i><i></i></div>
 <div class="wrap">
   <header>
-    <h1><img class="logo" src="favicon.png" alt="" width="60" height="60"><span>Onion Board</span></h1>
+    <h1><span class="bun"><b></b><b></b><img class="logo" src="favicon.png" alt="" width="60" height="60"></span><span>Onion Board</span></h1>
     <p class="tag">A free soundboard for Windows. Press a pad or a hotkey, even in-game, and
       your friends in Discord or your game hear it through your mic.</p>
     <a class="dl" href="https://github.com/Onion-Alien/onion-board/releases/latest/download/OnionBoardSetup.exe" data-goatcounter-click="download-home-top">⬇ Download for Windows</a>
@@ -78,11 +138,11 @@
       <a href="https://www.virustotal.com/gui/file/8093c89458b7ecfcccd5a4122b1ae0ce53488394f59aa388e06b69c371783b1a">VirusTotal: 69 of 69 clean</a> ·
       <a href="https://github.com/Onion-Alien/onion-board/releases/latest">what's new</a></p>
     <!-- /release -->
-    <img class="hero" src="screenshots/sounds.png?v=5d4d4efc" width="1770" height="1080" alt="Onion Board's sound pads">
+    <div class="stage3d"><img class="hero" src="screenshots/sounds.png?v=5d4d4efc" width="1770" height="1080" alt="Onion Board's sound pads"></div>
   </header>
 
   <h2>What it does</h2>
-  <div class="grid">
+  <div class="grid reveal">
     <div class="card"><b>🎤 No virtual cable</b><span>Sounds go straight into the mic you already use in Discord and games, with your voice or without it.</span></div>
     <div class="card"><b>🔎 One-click sounds</b><span>Search YouTube, SoundCloud and Myinstants in the app and add a sound in one click. Or drag in files.</span></div>
     <div class="card"><b>⌨️ Hotkeys that work in-game</b><span>Plus an in-game overlay, MIDI pads and Stream Deck. Open your game and the board switches to its sounds.</span></div>
@@ -96,7 +156,7 @@
   </div>
 
   <h2>A closer look</h2>
-  <div class="grid shots">
+  <div class="grid shots reveal">
     <figure><img src="screenshots/voice.png?v=c7aa5887" alt="The Voice tab" loading="lazy"><figcaption>Voice changer and text-to-speech</figcaption></figure>
     <figure><img src="screenshots/triggers.png?v=74911d4a" alt="The Triggers tab" loading="lazy"><figcaption>Triggers: a sound when something shows up in your game</figcaption></figure>
     <figure><img src="screenshots/apps.png?v=8fc8871d" alt="The Apps tab" loading="lazy"><figcaption>Send one program's sound to your friends</figcaption></figure>
@@ -104,7 +164,7 @@
   </div>
 
   <h2>Get started</h2>
-  <ol class="steps">
+  <ol class="steps reveal">
     <li><a href="https://github.com/Onion-Alien/onion-board/releases/latest/download/OnionBoardSetup.exe" data-goatcounter-click="download-home-steps">Download <code>OnionBoardSetup.exe</code></a> and run it.</li>
     <li>Bun the bunny asks which mic and headphones you use and sets the rest up.</li>
     <li>Click <b>Put my sounds straight into my mic</b> (Windows asks once). Discord and games keep
@@ -116,7 +176,7 @@
       <b>Send my sounds to</b> instead, or add it under <b>Also send to</b>.</li>
   </ol>
   <h2>Is it safe?</h2>
-  <ul class="steps">
+  <ul class="steps reveal">
     <li><b>Why Windows warns you:</b> the app isn't code-signed yet (a certificate costs money
       every year), so Windows doesn't know it. Click <b>More info → Run anyway</b> (or <b>⋯ → Keep</b>
       in Edge / Chrome). Every release is scanned on VirusTotal (the link is above).</li>
@@ -153,5 +213,31 @@
   </footer>
 </div>
 <script src="zoom.js" defer></script>
+<script>
+(function () {
+  var still = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  // Bun goes boing on tap too, not just hover.
+  var bun = document.querySelector(".bun");
+  bun.addEventListener("click", function () {
+    bun.classList.remove("boing"); void bun.offsetWidth; bun.classList.add("boing");
+  });
+  // Cards: a soft light follows the mouse.
+  document.querySelectorAll(".card").forEach(function (c) {
+    c.addEventListener("pointermove", function (e) {
+      var r = c.getBoundingClientRect();
+      c.style.setProperty("--mx", (e.clientX - r.left) + "px");
+      c.style.setProperty("--my", (e.clientY - r.top) + "px");
+    });
+  });
+  // Sections fade up as they scroll into view.
+  var els = document.querySelectorAll(".reveal");
+  if ("IntersectionObserver" in window && !still) {
+    var io = new IntersectionObserver(function (es) {
+      es.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); } });
+    }, { threshold: 0.1 });
+    els.forEach(function (el) { io.observe(el); });
+  } else { els.forEach(function (el) { el.classList.add("in"); }); }
+})();
+</script>
 </body>
 </html>
