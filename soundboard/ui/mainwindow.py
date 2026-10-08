@@ -6540,8 +6540,9 @@ class MainWindow(QMainWindow):
         f = self._fit = r.Fitter(self._full)
         f.add(10, "w", r.hide(self.tagline))
         f.add(10, "w", r.hide(*self._pad_size))
-        f.add(16, "w", r.hide(self._mode_pick[0]))   # the dropdown's tooltip says what it is
-        f.add(38, "w", r.hide(self._mode_pick[1]))   # also on the Setup tab
+        # the label and the dropdown go together: a lone "Clean" said nothing (the full
+        # picker is on the Setup tab)
+        f.add(38, "w", r.hide(*self._mode_pick))
         # the ear button shrinks to its icon first: the level bar is the live part
         f.add(12, "w", r.icon_only(self.btn_check))
         f.add(14, "w", r.hide(self.np_time))
@@ -6558,7 +6559,9 @@ class MainWindow(QMainWindow):
         f.add(50, "w", r.hide(self.np_name))
         f.add(60, "w", r.hide(self.wordmark))
         f.add(60, "w", r.icon_only(self.btn_add))
-        f.add(13, "w", r.icon_only(self.btn_record))
+        # a bare red dot read as a warning light, so Record keeps its word until the
+        # folder, Backup and the Listening dropdown have gone
+        f.add(39, "w", r.icon_only(self.btn_record))
         # the search box keeps room to type in until the buttons beside it have shrunk
         f.add(62, "w", lambda tight: (self.search.setMinimumWidth(0 if tight else SEARCH_MIN_W),
                                       r.touch(self.search)))

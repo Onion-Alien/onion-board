@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- **Mid-size windows keep the words that matter.** The *Listening* dropdown no longer
+  stands alone as a bare “Clean” (its label goes with it), and *Record* keeps its word
+  instead of becoming a lone red dot, until the window is really small.
 - **Lighter on the CPU while sounds play.** The filters behind every voice chat mode,
   the EQ, the live effects and the voice changer do their per-block bookkeeping in one
   step instead of several, and the mono downmix for voice chat does its sums in bulk:
