@@ -2829,5 +2829,6 @@
     "{n} stanic (zobrazeno nahoře {shown})",
     "{n} stanic (zobrazeno nahoře {shown})"
   ],
-  "Tuning in to radio stations around the world…": "Ladění rozhlasových stanic po celém světě…"
+  "Tuning in to radio stations around the world…": "Ladění rozhlasových stanic po celém světě…",
+  "{hotkey} is {what} now — it was the key for {lost}": "{hotkey} je nyní {what} — byl to klíč pro {lost}"
 }

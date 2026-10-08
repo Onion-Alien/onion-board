@@ -2709,5 +2709,6 @@
   "{n} station (top {shown} shown)": [
     "{n} đài ({shown} trên cùng))"
   ],
-  "Tuning in to radio stations around the world…": "Bắt sóng các đài phát thanh trên khắp thế giới…"
+  "Tuning in to radio stations around the world…": "Bắt sóng các đài phát thanh trên khắp thế giới…",
+  "{hotkey} is {what} now — it was the key for {lost}": "{hotkey} bây giờ là {what} — đó là chìa khóa cho {lost}"
 }

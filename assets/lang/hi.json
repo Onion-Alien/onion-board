@@ -2769,5 +2769,6 @@
     "{n} स्टेशन (शीर्ष {shown} दिखाया गया है)",
     "{n} स्टेशन (शीर्ष {shown} दिखाया गया है)"
   ],
-  "Tuning in to radio stations around the world…": "दुनिया भर के रेडियो स्टेशनों से जुड़ना..."
+  "Tuning in to radio stations around the world…": "दुनिया भर के रेडियो स्टेशनों से जुड़ना...",
+  "{hotkey} is {what} now — it was the key for {lost}": "{hotkey} अब {what} है - यह {lost} की कुंजी थी"
 }

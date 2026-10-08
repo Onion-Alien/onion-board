@@ -2769,5 +2769,6 @@
     "{n} σταθμός (εμφανίζεται στην κορυφή {shown})",
     "{n} σταθμοί (εμφανίζονται στην κορυφή {shown})"
   ],
-  "Tuning in to radio stations around the world…": "Συντονισμός σε ραδιοφωνικούς σταθμούς σε όλο τον κόσμο…"
+  "Tuning in to radio stations around the world…": "Συντονισμός σε ραδιοφωνικούς σταθμούς σε όλο τον κόσμο…",
+  "{hotkey} is {what} now — it was the key for {lost}": "{hotkey} είναι {what} τώρα — ήταν το κλειδί για {lost}"
 }

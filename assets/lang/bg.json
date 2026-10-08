@@ -2769,5 +2769,6 @@
     "{n} станция (горните {shown} показани)",
     "{n} станции (топ {shown} показани)"
   ],
-  "Tuning in to radio stations around the world…": "Настройване на радиостанции по целия свят..."
+  "Tuning in to radio stations around the world…": "Настройване на радиостанции по целия свят...",
+  "{hotkey} is {what} now — it was the key for {lost}": "{hotkey} е {what} сега — това беше ключът за {lost}"
 }
