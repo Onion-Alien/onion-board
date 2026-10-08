@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Soundboard without a virtual cable: play sounds through your mic on Windows</title>
+<meta name="description" content="Play sounds through your mic on Windows without installing VB-Cable or Voicemeeter. Onion Board is a free soundboard that puts sounds straight into the mic Discord and games already use.">
+<meta property="og:title" content="A soundboard that needs no virtual cable">
+<meta property="og:description" content="Free Windows soundboard: sounds go straight into the mic you already use. No VB-Cable, no Voicemeeter, nothing to pick in Discord.">
+<meta property="og:image" content="https://onion-alien.github.io/onion-board/screenshots/setup.png?v=b52be90b">
+<meta property="og:type" content="article">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="../favicon.ico" sizes="16x16 32x32 48x48">
+<link rel="icon" type="image/png" href="../favicon.png" sizes="192x192">
+<link rel="apple-touch-icon" href="../apple-touch-icon.png">
+<meta name="theme-color" content="#0f1016">
+<link rel="canonical" href="https://onion-alien.github.io/onion-board/soundboard-without-virtual-cable/">
+<link rel="stylesheet" href="../guide.css">
+<script data-goatcounter="https://onionalien.goatcounter.com/count"
+        async src="https://gc.zgo.at/count.js"></script>
+</head>
+<body>
+<div class="wrap">
+  <nav><a href="../">← Onion Board</a></nav>
+
+  <h1>A soundboard that needs no virtual cable</h1>
+  <p class="lead">Most soundboards tell you to install VB-Cable or Voicemeeter, switch Discord's
+    mic to <code>CABLE Output</code>, and then route your real mic back through it. Onion Board
+    skips all of that: your sounds go straight into the mic you already use, so Discord and your
+    games hear your voice and your sounds together.</p>
+
+  <a class="dl" href="https://github.com/Onion-Alien/onion-board/releases/latest/download/OnionBoardSetup.exe" data-goatcounter-click="download-no-cable-top">⬇ Download Onion Board (free)</a>
+  <p class="small">Windows 10 and 11 · no account, no ads, anonymous usage count you can switch off</p>
+
+  <h2>Why the virtual cable is a pain</h2>
+  <ul>
+    <li>It's a driver install, and it adds fake devices to every app's mic list.</li>
+    <li>Every app has to be switched to the cable: Discord, each game, OBS.</li>
+    <li>Your real voice then needs a second trick ("listen to this device" or Voicemeeter) to
+      reach the cable too, which adds delay and echo when it goes wrong.</li>
+    <li>When something breaks, nobody can hear you, and it's hard to tell which step failed.</li>
+  </ul>
+
+  <h2>How Onion Board does it instead</h2>
+  <p>One click, <b>Put my sounds straight into my mic</b>, adds a small audio effect to your mic in
+    Windows' own audio engine (Windows asks for permission once). From then on, anything that listens
+    to your mic hears your sounds mixed in. Nothing to pick in Discord, nothing to change in your games.</p>
+  <img src="../screenshots/setup.png?v=b52be90b" alt="Onion Board's Setup tab showing the sounds going into the mic" loading="lazy" width="1100" height="736">
+  <p>It backs up your mic's settings first, and puts them back when you switch it off or uninstall.</p>
+
+  <h2>Setup, step by step</h2>
+  <ol>
+    <li><a href="https://github.com/Onion-Alien/onion-board/releases/latest/download/OnionBoardSetup.exe" data-goatcounter-click="download-no-cable-steps">Download <code>OnionBoardSetup.exe</code></a> and run it.</li>
+    <li>The short guide asks for your mic and headphones. Click <b>Put my sounds straight into my mic</b>
+      and <b>Yes</b> when Windows asks.</li>
+    <li>In Discord (<b>User Settings → Voice &amp; Video</b>), keep your normal mic. Set
+      <b>Input Profile</b> to <b>Custom</b>, <b>Noise Suppression</b> to <b>None</b> and turn
+      <b>Echo Cancellation</b> off, so Discord doesn't filter your sounds out. Don't pick
+      <b>Studio</b>: on your real mic it makes Discord skip Windows' audio effects, Onion Board included.
+      Onion Board reads these settings and tells you if one is in the way.</li>
+    <li>Drag sound files onto the window, give pads hotkeys, and play. Everyone in the call hears them.</li>
+  </ol>
+
+  <h2>Still want a cable or a mixer?</h2>
+  <p>That works too. On the Setup tab, <b>Use the virtual cable instead</b> installs and sets up
+    VB-Cable for you. Already use Voicemeeter, a mixer, OBS or a capture card? Pick it under
+    <b>Send my sounds to</b>, or add it under <b>Also send to</b>.</p>
+
+  <h2>Questions</h2>
+  <ul>
+    <li><b>Does it work in games, not just Discord?</b> Yes. Any game with voice chat listens to your mic,
+      so it hears your sounds too. Push-to-talk works: <b>Auto push-to-talk</b> can hold your key while a
+      sound plays.</li>
+    <li><b>Can I send only the sounds, not my voice?</b> Yes, untick <b>Others hear it</b> under <i>My mic</i>.</li>
+    <li><b>Is it safe?</b> The only step that needs admin is that one-click mic effect, and it's fully undone
+      on uninstall. Every release is scanned on VirusTotal and the source is
+      <a href="https://github.com/Onion-Alien/onion-board">on GitHub</a>.</li>
+    <li><b>Coming from Soundpad, Resanance, Soundux or EXP?</b> It offers to bring your sounds and hotkeys over
+      in one click. See the <a href="../free-soundpad-alternative/">Soundpad alternative page</a>.</li>
+  </ul>
+
+  <div class="note">Windows may warn about the download because the installer isn't code-signed
+    (that costs hundreds a year). Click <b>More info → Run anyway</b>.</div>
+
+  <footer>
+    <a href="../">Onion Board</a> ·
+    <a href="../discord-soundboard/">Discord soundboard setup</a> ·
+    <a href="../free-soundpad-alternative/">Free Soundpad alternative</a> ·
+    <a href="https://github.com/Onion-Alien/onion-board">Source code</a> ·
+    <a href="https://discord.gg/FhKGaWCWHM">Join the Discord</a> ·
+    <a href="https://tally.so/r/rjxjyM">Send feedback</a><br>
+    The app sends only an anonymous daily count (its version and a random ID), and you can switch it off. This site counts visits with GoatCounter: no cookies, nothing personal.
+  </footer>
+</div>
+<script src="../zoom.js" defer></script>
+</body>
+</html>
