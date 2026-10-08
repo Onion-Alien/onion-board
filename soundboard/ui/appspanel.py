@@ -517,7 +517,7 @@ class AppsTab(QWidget):
         self.fx_btn.fx_changed.connect(lambda fx: setattr(self.engine, "apps_fx", fx))
         toolbar.addWidget(self.fx_btn)
         toolbar.addStretch(1)
-        size_label = QLabel(_("Card size"))
+        size_label = self.size_label = QLabel(_("Card size"))
         size_label.setObjectName("muted")
         toolbar.addWidget(size_label)
         self.card_size = QSlider(Qt.Horizontal)
@@ -556,6 +556,7 @@ class AppsTab(QWidget):
         self.empty_text.setAlignment(Qt.AlignCenter)
         ev.addWidget(self.empty_text)
         self.list_layout.addWidget(self.empty)
+        self._tools_for_rows()
         self.list_layout.addLayout(self.grid)
         self.list_layout.addStretch(1)
         self.scroll.setWidget(self.list)
@@ -728,7 +729,14 @@ class AppsTab(QWidget):
             if self.big is not None:
                 row.hide()   # another card has the big view
             self.empty.setVisible(False)
+            self._tools_for_rows()
         return row
+
+    def _tools_for_rows(self):
+        """The effects button and the card-size slider only mean something with a
+        card to apply them to: hidden over the empty page."""
+        for w in (self.fx_btn, self.size_label, self.card_size):
+            w.setVisible(bool(self.rows))
 
     def _drop_row(self, row: AppRow):
         self._stop_capture(row)
@@ -741,6 +749,7 @@ class AppsTab(QWidget):
         self.grid.removeWidget(row)
         row.deleteLater()
         self.empty.setVisible(not self.rows)
+        self._tools_for_rows()
         self._report_active()
 
     def _hidden(self) -> set[str]:
@@ -870,6 +879,7 @@ class AppsTab(QWidget):
                 row.set_status("")
         self._label_folders()
         self.empty.setVisible(not self.rows)
+        self._tools_for_rows()
         self._report_active()
         if not self.isVisible():
             self._pace_list()   # the last captured program closed: stop re-reading

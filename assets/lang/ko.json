@@ -2719,5 +2719,11 @@
   "{name} (copy)": "{name} (사본)",
   "Search settings": "검색 설정",
   "Virtual mic  <b style='color:{colour}'>not installed yet</b>": "가상 마이크가 <b style='color:{colour}'>아직 설치되지 않았습니다.</b>",
-  "Your mic  <b style='color:{colour}'>after the setup below</b>": "<b style='color:{colour}'>아래 설정 후</b> 마이크"
+  "Your mic  <b style='color:{colour}'>after the setup below</b>": "<b style='color:{colour}'>아래 설정 후</b> 마이크",
+  "Change your voice live for whoever you send sounds to (pick a voice to turn it on), turn it into someone else's with AI voices, or type a line and a computer voice says it. Hear what they hear at the bottom tries it.": "소리를 보내는 사람에게 실시간으로 음성을 변경하거나(켜려면 음성 선택), AI 음성으로 다른 사람의 음성으로 바꾸거나, 대사를 입력하면 컴퓨터 음성으로 말해줍니다. 그들이 바닥에서 듣는 것을 들어보십시오.",
+  "Internet radio stations from all over the world. Click a dot on the map or search by name, genre, country or city; it plays in your headphones, and Send puts it out to whoever's listening. Record keeps a bit as a pad.": "전 세계의 인터넷 라디오 방송국. 지도에서 점을 클릭하거나 이름, 장르, 국가 또는 도시로 검색하세요. 헤드폰에서 재생되고 Send는 듣는 사람에게 전달됩니다. 레코드는 약간의 패드로 유지됩니다.",
+  "Plays a sound when a picture shows up in your game: a \"YOU DIED\", a rare spawn, a queue popping. It's the Onion Watch add-on; everything happens on your PC and the screen is never saved or sent anywhere.": "게임에 그림이 나타날 때 소리를 재생합니다. \"YOU DIED\", 희귀한 스폰, 대기열 팝업. Onion Watch 애드온입니다. 모든 일은 PC에서 발생하며 화면은 어디에도 저장되거나 전송되지 않습니다.",
+  "Where your sounds go (straight into your mic, the virtual cable, another device or nobody), your devices, who's listening, the equalizer, and a test that records what goes out and plays it back.": "소리가 전달되는 곳(마이크, 가상 케이블, 다른 장치 또는 누구에게도 연결되지 않음), 장치, 듣는 사람, 이퀄라이저 및 나가는 내용을 기록하고 재생하는 테스트입니다.",
+  "Your pads. Add sounds with the button, by dropping files or folders here, or from a web search; double-click (or Enter) plays one, right-click it for its hotkey, effects, categories and picture. The transport bar plays what's picked, and the bottom strip is your mic, what others hear and your headphones.": "당신의 패드. 여기에 파일이나 폴더를 놓거나 웹 검색을 통해 버튼을 사용하여 사운드를 추가하세요. 두 번 클릭(또는 Enter)하면 하나가 재생되고 해당 단축키, 효과, 범주 및 사진을 마우스 오른쪽 버튼으로 클릭합니다. 전송 막대는 선택한 내용을 재생하고 하단 스트립은 마이크, 다른 사람이 듣는 내용 및 헤드폰입니다.",
+  "Your sounds": "당신의 소리"
 }

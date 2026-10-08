@@ -2719,5 +2719,11 @@
   "{name} (copy)": "{name} （副本）",
   "Search settings": "搜尋設定",
   "Virtual mic  <b style='color:{colour}'>not installed yet</b>": "虛擬麥克風<b style='color:{colour}'>尚未安裝</b>",
-  "Your mic  <b style='color:{colour}'>after the setup below</b>": "<b style='color:{colour}'>經過以下設定後</b>您的麥克風"
+  "Your mic  <b style='color:{colour}'>after the setup below</b>": "<b style='color:{colour}'>經過以下設定後</b>您的麥克風",
+  "Change your voice live for whoever you send sounds to (pick a voice to turn it on), turn it into someone else's with AI voices, or type a line and a computer voice says it. Hear what they hear at the bottom tries it.": "無論您向誰發送聲音，都可以即時更改您的聲音（選擇一個聲音將其打開），使用人工智慧聲音將其變成其他人的聲音，或者輸入一行並由電腦聲音說出。聽聽他們在底部聽到了什麼，試試看。",
+  "Internet radio stations from all over the world. Click a dot on the map or search by name, genre, country or city; it plays in your headphones, and Send puts it out to whoever's listening. Record keeps a bit as a pad.": "來自世界各地的網路廣播電台。點擊地圖上的一個點或按名稱、類型、國家或城市進行搜尋；它會在您的耳機中播放，然後「發送」會將其發送給正在收聽的人。記錄保留一點作為墊子。",
+  "Plays a sound when a picture shows up in your game: a \"YOU DIED\", a rare spawn, a queue popping. It's the Onion Watch add-on; everything happens on your PC and the screen is never saved or sent anywhere.": "當遊戲中出現圖片時播放聲音：「你死了」、罕見的重生、隊列彈出。這是 Onion Watch 附加元件；一切都發生在您的電腦上，螢幕永遠不會儲存或傳送到任何地方。",
+  "Where your sounds go (straight into your mic, the virtual cable, another device or nobody), your devices, who's listening, the equalizer, and a test that records what goes out and plays it back.": "你的聲音去往何處（直接進入你的麥克風、虛擬電纜、其他設備或無人）、你的設備、誰在聽、均衡器以及記錄發出的內容並回放的測試。",
+  "Your pads. Add sounds with the button, by dropping files or folders here, or from a web search; double-click (or Enter) plays one, right-click it for its hotkey, effects, categories and picture. The transport bar plays what's picked, and the bottom strip is your mic, what others hear and your headphones.": "你的護墊。使用按鈕新增聲音，透過將檔案或資料夾拖放到此處或透過網路搜尋來新增聲音；雙擊（或 Enter）播放一個，右鍵單擊它以查看其熱鍵、效果、類別和圖片。走帶條播放所選內容，底部條帶是您的麥克風、其他人聽到的內容以及您的耳機。",
+  "Your sounds": "你的聲音"
 }

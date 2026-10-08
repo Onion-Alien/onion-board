@@ -746,6 +746,35 @@ class MainWindow(QMainWindow):
         self._update_more_tabs()
         info_corner = TabInfoCorner(self.tabs, self.btn_more_tabs, self.btn_info)
         self.tabs.setCornerWidget(info_corner, Qt.TopRightCorner)
+        # every tab has a line for the ⓘ (the Apps tab brings its own): one tab with
+        # the button and the rest without looked like a slip
+        self.tab_info.setdefault("sounds_page", (
+            _("Your sounds"),
+            _("Your pads. Add sounds with the button, by dropping files or folders here, "
+              "or from a web search; double-click (or Enter) plays one, right-click it "
+              "for its hotkey, effects, categories and picture. The transport bar "
+              "plays what's picked, and the bottom strip is your mic, what others hear "
+              "and your headphones.")))
+        self.tab_info.setdefault("radio_page", (
+            _("Radio"),
+            _("Internet radio stations from all over the world. Click a dot on the map or "
+              "search by name, genre, country or city; it plays in your headphones, and "
+              "Send puts it out to whoever's listening. Record keeps a bit as a pad.")))
+        self.tab_info.setdefault("triggers", (
+            _("Triggers"),
+            _("Plays a sound when a picture shows up in your game: a \"YOU DIED\", a rare "
+              "spawn, a queue popping. It's the Onion Watch add-on; everything happens on "
+              "your PC and the screen is never saved or sent anywhere.")))
+        self.tab_info.setdefault("voice", (
+            _("Voice"),
+            _("Change your voice live for whoever you send sounds to (pick a voice to "
+              "turn it on), turn it into someone else's with AI voices, or type a line "
+              "and a computer voice says it. Hear what they hear at the bottom tries it.")))
+        self.tab_info.setdefault("setup_page", (
+            _("Setup"),
+            _("Where your sounds go (straight into your mic, the virtual cable, another "
+              "device or nobody), your devices, who's listening, the equalizer, and a "
+              "test that records what goes out and plays it back.")))
         self._update_info_btn = lambda *__: self.btn_info.setVisible(
             self._current_tab_info() is not None)
         self.tabs.currentChanged.connect(self._update_info_btn)
@@ -853,6 +882,9 @@ class MainWindow(QMainWindow):
         self.np_name.setToolTip(text)
         self._name_seek.relayout()
         self.mini_name.setText(text)   # hides itself when it has no room
+        if text == _("Pick a sound"):   # nothing picked: no time either
+            self.np_time.setText("")
+            self.mini_time.setText("")
 
     def _build_mixer(self) -> QFrame:
         """The levels strip along the bottom, the same on every tab: three labelled
@@ -1161,7 +1193,7 @@ class MainWindow(QMainWindow):
         self.seek.sliderReleased.connect(self.do_seek)
         self.seek.valueChanged.connect(self._seek_preview)
         no_wheel(self.seek)
-        self.np_time = QLabel("0:00 / 0:00")
+        self.np_time = QLabel("")   # blank until a sound is picked: "0:00 / 0:00" said nothing
         # room for a long sound's "75:12 / 112:40" in this font (84 px cut it, and
         # "12:34 / 45:67" too in the Consolas themes)
         self.np_time.setFixedWidth(
