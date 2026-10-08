@@ -279,7 +279,9 @@ The full list. The [README](../README.md) has the short version and how to get s
   (Bitfocus Companion, Touch Portal, its website buttons), AutoHotkey or a script.
   It only listens on this PC and needs the key shown there (*Copy an example link* gives a
   ready-made "play a random sound" link). Besides playing and stopping sounds it can
-  mute you (a panic button), switch the voice changer and mic, change the volume and
+  mute you (a panic button), switch the voice changer on or straight to a voice,
+  say a typed line in the computer voice, queue sounds or play a whole category in
+  a row, turn the mic and *Hear what they hear* on or off, change the volume and
   category, save the instant replay, change the live speed, pitch and effects,
   switch who's listening and run the radio; `/api/help` lists it all. New to it? The
   **Streamer guide** there walks through Stream Deck keys, channel points and chat
