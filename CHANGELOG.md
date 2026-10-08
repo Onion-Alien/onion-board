@@ -1,5 +1,17 @@
 # Changelog
 
+## 1.9.23 — 2026-10-08
+
+- **Safer mic set-up.** The one-time *Straight into my mic* set-up locks down its own
+  data folder, brings back the Windows audio services it restarts, and puts your mic
+  back as it was if anything goes wrong half-way.
+- **The anonymous usage count says a little more** (only if *Count me in* is on; it
+  still never sends names, sounds or files). Along with the daily count: rough
+  buckets for how long ago it was installed, how many sounds your board has and how
+  many you played, where your sounds go, the app's language, and which features you
+  used. A new install also counts its first steps (added a sound, played one, one
+  reached others) once each. The full list is in SECURITY.md.
+
 ## 1.9.22 — 2026-10-08
 
 - **The mic update from 1.9.21 happens by itself.** If you set up *Straight into my
