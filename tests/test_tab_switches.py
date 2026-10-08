@@ -326,6 +326,18 @@ def test_off_on_cycles_leave_nothing_behind(window, qapp, fake_watch):
     from soundboard.ui.voicepanel import SpeechPanel
     from soundboard.voicefx import VoiceChain
     w = window
+    counted = (*REAL.values(), BoardHost, VoiceChain, SpeechPanel, AiVoicePanel,
+               taboff.TabOff, RadioOff)
+    # Only what this test makes is counted. An earlier test's window can still be
+    # around, held by something outside Python's view (a pending timer's lambda keeps
+    # one until it fires), and let go in the middle of this test: its tabs and
+    # listeners going then changed the numbers. So whatever is already here is held
+    # until the end, and left out.
+    gc.collect()
+    already = [o for o in gc.get_objects() if isinstance(o, counted)]
+    already_ids = {id(o) for o in already}
+    old_listeners = list(net._listeners)
+    old_listener_ids = {id(ref) for ref in old_listeners}
     for key in taboff.KEYS:   # once round, so every count below is a settled one
         w.set_tab_on(key, False)
         w.set_tab_on(key, True)
@@ -346,17 +358,16 @@ def test_off_on_cycles_leave_nothing_behind(window, qapp, fake_watch):
         return now
 
     def snapshot():
-        alive = sum(ref() is not None for ref in net._listeners)
-        objs = gc.get_objects()
+        alive = sum(ref() is not None for ref in net._listeners
+                    if id(ref) not in old_listener_ids)
+        objs = [o for o in gc.get_objects() if id(o) not in already_ids]
         return {"net listeners": alive, "fit steps": len(w._fit.steps),
                 "stack": len(w._stack_cols), "tabs": w.tabs.count(),
                 "radio pages": w.radio_page.count(),
                 "watch panels": sum(type(x).__name__ == "Panel"
                                     for x in QApplication.allWidgets()),
                 # nothing still holds an old tab (a hook, a closure, the host)
-                **{cls.__name__: sum(isinstance(o, cls) for o in objs)
-                   for cls in (*REAL.values(), BoardHost, VoiceChain, SpeechPanel,
-                               AiVoicePanel, taboff.TabOff, RadioOff)}}
+                **{cls.__name__: sum(isinstance(o, cls) for o in objs) for cls in counted}}
     before = counts()
     assert before["watch panels"] == 1
     calls = []   # each Onion Watch panel's log (not the panel: that would keep it)
