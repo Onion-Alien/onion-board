@@ -198,7 +198,9 @@ def test_a_filter_bank_equals_one_sosfilt_per_filter_block_by_block():
 
 def test_a_plan_shared_by_two_audio_threads_stays_right():
     """The main output and the cable run the same plan on their own threads: both
-    building a square at once used to leave [P, P², P², …] for good."""
+    building a square at once used to leave [P, P², P², …] for good. The block
+    matrices (scan) are built on first use the same way: whoever builds them, every
+    thread gets the same ones."""
     import sys
     import threading
     old = sys.getswitchinterval()
@@ -208,9 +210,10 @@ def test_a_plan_shared_by_two_audio_threads_stays_right():
             p = dsp._Plan([dsp._sections_ss(dsp.butter(8, 0.01 + k * 1e-6))],
                           np.dtype(np.float64))
             go = threading.Barrier(4)
-            threads = [threading.Thread(target=lambda go=go, p=p: (go.wait(),
-                                                                   p.square(64, 5)))
-                       for _ in range(4)]
+            got = []
+            threads = [threading.Thread(target=lambda go=go, p=p, got=got: (
+                go.wait(), p.square(64, 5), got.append(p.scan(60, 8))))
+                for _ in range(4)]
             for t in threads:
                 t.start()
             for t in threads:
@@ -218,5 +221,39 @@ def test_a_plan_shared_by_two_audio_threads_stays_right():
             sq = p._squares[64]
             assert len(sq) == 6
             assert np.allclose(sq[2], sq[1] @ sq[1])
+            fresh = dsp._Plan([dsp._sections_ss(dsp.butter(8, 0.01 + k * 1e-6))],
+                              np.dtype(np.float64)).scan(60, 8)
+            assert len(got) == 4
+            for mats in got:
+                assert all(np.array_equal(a, b) for a, b in zip(mats, fresh))
     finally:
         sys.setswitchinterval(old)
+
+
+def test_long_signals_take_the_prefix_scan_and_blocks_the_one_product_path():
+    """Both paths must agree exactly: a song baked in one go, then played back in
+    10 ms blocks, is the same filter."""
+    rng = np.random.default_rng(5)
+    sos = np.vstack([dsp.butter(4, (0.01, 0.2), "band"), dsp.butter(2, 0.4)])
+    x = rng.standard_normal((2, 64 * 40 + 17))   # past SCAN_MAX chunks: the scan path
+    whole = dsp.sosfilt(sos, x)
+    zi = np.zeros((len(sos), 2, 2))
+    parts = []
+    for i in range(0, x.shape[1], 480):          # under it: the one-product path
+        y, zi = dsp.sosfilt(sos, x[:, i:i + 480], zi=zi)
+        parts.append(y)
+    assert np.allclose(np.concatenate(parts, axis=1), whole, atol=1e-10)
+
+
+def test_blocks_with_a_remainder_chunk_match_the_recursion():
+    """500 samples at L = 64 is 7 chunks of 63 and 59 left over: the remainder path."""
+    rng = np.random.default_rng(3)
+    sos = dsp.butter(4, (0.02, 0.3), "band")
+    x = rng.standard_normal((3, 500))
+    zi = np.zeros((len(sos), 3, 2))
+    y, zf = dsp.sosfilt(sos, x, zi=zi)
+    assert np.allclose(y, np.stack([_direct_sos(sos, row) for row in x]), atol=1e-10)
+    y2, zf2 = dsp.sosfilt(sos, x[:, :250], zi=zi)
+    y3, zf3 = dsp.sosfilt(sos, x[:, 250:], zi=zf2)
+    assert np.allclose(np.concatenate([y2, y3], axis=1), y, atol=1e-10)
+    assert np.allclose(zf3, zf, atol=1e-10)

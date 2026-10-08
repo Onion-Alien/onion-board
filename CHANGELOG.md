@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+- **Lighter on the CPU while sounds play.** The filters behind every voice chat mode,
+  the EQ, the live effects and the voice changer do their per-block bookkeeping in one
+  step instead of several, and the mono downmix for voice chat does its sums in bulk:
+  playing a few sounds costs about a sixth less of a core, the live effects about a
+  fifth less. Nothing sounds different.
+
 ## 1.9.10 — 2026-10-08
 
 - **Links no longer break your browser.** Clicking a link in the app (the Discord
