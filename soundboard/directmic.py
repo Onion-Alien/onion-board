@@ -1348,7 +1348,6 @@ def _make_ring():
     """A fresh ring file for the effect to find when the audio starts, made without
     ever writing through a link someone else put in the (user-writable) folder: a new
     file of our own, then swapped in by name."""
-    d = data_dir()
     path = ring_path()
     if make_ring_ok(path):
         return
