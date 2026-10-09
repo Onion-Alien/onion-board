@@ -13,6 +13,7 @@ from soundboard.ui import icons
 
 CARD_W = 400
 ICON = 40
+GAP = 8   # px between the + More tabs button and its dropdown
 
 # what each tab is good for, said to sell it (the tab's own tooltip is the plain one)
 PITCH = {
@@ -25,6 +26,17 @@ PITCH = {
     "voice": _("Change your voice live: robots, monsters, other languages, or let it "
                "speak what you type."),
 }
+
+
+class Menu(QMenu):
+    """The dropdown, opened a little clear of its button instead of touching it."""
+
+    def showEvent(self, ev):
+        super().showEvent(ev)
+        btn = self.parentWidget()
+        if btn is not None:   # below the button: down a bit; above it (no room): up
+            below = self.y() >= btn.mapToGlobal(btn.rect().center()).y()
+            self.move(self.x(), self.y() + (GAP if below else -GAP))
 
 
 class TabCard(QFrame):

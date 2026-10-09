@@ -509,3 +509,20 @@ def test_more_tabs_counts_opened_added_and_closed(window, qapp, monkeypatch):
     w.hide_tab("voice")
     assert seen[-1] == "tab-hidden-voice"
     assert all(k in usage.FEATURES for k in seen)
+
+
+def test_more_tabs_menu_opens_clear_of_its_button(window, qapp):
+    """+ More tabs' dropdown sits a few px below the button, not stuck to it."""
+    from soundboard.ui import moretabs
+    w = window
+    w.show()
+    w.set_tab_on("radio", False)
+    btn, menu = w.btn_more_tabs, w.btn_more_tabs.menu()
+    assert isinstance(menu, moretabs.Menu)
+    bottom = btn.mapToGlobal(btn.rect().bottomLeft()).y()
+    menu.popup(btn.mapToGlobal(btn.rect().bottomLeft()))
+    process_events(qapp, menu.isVisible)
+    try:
+        assert menu.y() - bottom >= moretabs.GAP
+    finally:
+        menu.close()
