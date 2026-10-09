@@ -68,8 +68,8 @@ from soundboard.ui.triggerstab import TriggersTab
 from soundboard.ui.radiopanel import RadioOff, RadioTab
 from soundboard.ui.voicepanel import VoicePanel
 from soundboard.ui.widgets import (Meter, NameAndSeek, Pad, PadGrid, SeekSlider, SteadyTabs,
-                                   TabEndCorner, expand_dropped, fmt_pos, pad_height, spectrum,
-                                   SLIM_PAD_H)
+                                   TabEndCorner, expand_dropped, fmt_pos, loudness, pad_height,
+                                   spectrum, SLIM_PAD_H)
 from soundboard.wheelguard import no_wheel
 from soundboard.winkeys import Hotkeys
 from soundboard import errors
@@ -7220,9 +7220,12 @@ class MainWindow(QMainWindow):
                 # scrolled out of view: skip the FFT (the next tick after it scrolls
                 # back in catches up)
                 if not (shown and p.visibleRegion().isEmpty()):
-                    p.set_levels(spectrum(self.audio.get(sid), prog, p.n_bands))
+                    data = self.audio.get(sid)
+                    p.set_levels(spectrum(data, prog, p.n_bands))
+                    p.set_meter(loudness(data, prog, self.gain_for(p.meta)))
             elif prog is None and p.bands is not None:
                 p.set_levels(None)
+                p.set_meter(None)
             if prog != p.progress or paused != p.paused:
                 p.progress, p.paused = prog, paused
                 p.update()
