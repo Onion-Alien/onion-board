@@ -90,7 +90,7 @@ class FeedbackDialog(QDialog):
         note.setSpacing(6)
         shield = QLabel()
         icons.set_label_icon(shield, "shield", size=14)
-        self.anon_note = QLabel(_("Anonymous: not linked to you, your account or this PC."))
+        self.anon_note = QLabel(_("Anonymous: not linked to you or this PC."))
         self.anon_note.setObjectName("hint")
         self.anon_note.setWordWrap(True)
         note.addWidget(shield, 0, Qt.AlignmentFlag.AlignTop)
