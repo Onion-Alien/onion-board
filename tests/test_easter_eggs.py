@@ -7,6 +7,7 @@ from PySide6.QtCore import Qt
 from PySide6.QtTest import QTest
 from PySide6.QtWidgets import QHBoxLayout, QWidget
 
+from soundboard import usage
 from soundboard.ui import bunnywidget as bw
 from soundboard.ui import logowidget as lw
 from soundboard.ui.bunnywidget import BunnyWidget
@@ -34,15 +35,18 @@ def test_a_few_clicks_only_wobble(qapp):
     win.close()
 
 
-def test_enough_quick_clicks_make_it_cry_tears_that_land(qapp):
+def test_enough_quick_clicks_make_it_cry_tears_that_land(qapp, monkeypatch):
+    monkeypatch.setattr(usage, "_used", set())
     win, logo = _logo()
     for i in range(lw.CRY_CLICKS - 1):
         QTest.mouseClick(logo, Qt.LeftButton)
         if i + 1 >= lw.WELL_UP_AT:
             assert logo.welling > 0   # eyes welling up on the way
     assert not logo.crying
+    assert "egg-onion-cried" not in usage._used
     QTest.mouseClick(logo, Qt.LeftButton)
     assert logo.crying
+    assert usage._used == {"egg-onion-cried"}   # counted (by name only)
     _run(logo, 1.0)
     assert logo.tears and logo._layer is not None and logo._layer.isVisible()
     assert any(t[5] >= 0 for t in logo.tears)    # some have splashed down
@@ -106,12 +110,20 @@ def test_bun_naps_in_the_small_hours_only(qapp, monkeypatch):
 
 
 def test_a_click_wakes_him_grumpy_then_he_dozes_off(qapp, monkeypatch):
+    monkeypatch.setattr(usage, "_used", set())
     b = BunnyWidget(joy_lines=("hehe!",), pong=True, naps=True)
     monkeypatch.setattr(bw, "local_hour", lambda: 3)
     assert b.asleep
     QTest.mouseClick(b, Qt.LeftButton)
     assert not b.asleep and b.say and not b._pokes   # woken, not a poke towards Pong
+    assert usage._used == {"egg-bun-woken"}
     _frames(b, 10)
     assert b.pose()["angry"] > 0.3
     b._woken_until = time.monotonic() - 1           # 30 s later
     assert b.asleep
+
+
+def test_the_eggs_are_counted_by_name_only():
+    for key in ("egg-pong-opened", "egg-pong-quit", "egg-pong-won", "egg-pong-lost",
+                "egg-onion-cried", "egg-bun-woken"):
+        assert key in usage.FEATURES

@@ -40,7 +40,7 @@ from PySide6.QtCore import QPointF, QRectF, QSize, Qt, QTimer, Signal
 from PySide6.QtGui import QColor, QFont, QPainter, QPainterPath, QPen
 from PySide6.QtWidgets import QSizePolicy, QWidget
 
-from soundboard import theme
+from soundboard import theme, usage
 from soundboard.bunny import H, INK, W, WOOD, draw_bunny, music_note, sparkle
 from soundboard.i18n import _
 from soundboard.ui import appstate
@@ -217,6 +217,7 @@ class BunnyWidget(QWidget):
     def wake(self):
         """A click while he naps: up he gets, grumpy, for WOKEN_S seconds."""
         now = time.monotonic()
+        usage.used("egg-bun-woken")   # the name only (usage.py)
         self._woken_until = now + WOKEN_S
         self._cross_until = now + 1.6
         self.zzz.clear()

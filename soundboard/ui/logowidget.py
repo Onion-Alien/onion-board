@@ -27,7 +27,7 @@ from PySide6.QtGui import (QColor, QIcon, QLinearGradient, QPainter, QPainterPat
                            QPixmap, QRadialGradient)
 from PySide6.QtWidgets import QWidget
 
-from soundboard import theme
+from soundboard import theme, usage
 from soundboard.ui import appstate
 
 FLAME = QColor("#ff8a2b")
@@ -205,6 +205,7 @@ class LogoWidget(QWidget):
         self._clicks = [t for t in self._clicks if now - t < CRY_WINDOW] + [now]
         n = len(self._clicks)
         if n >= CRY_CLICKS:
+            usage.used("egg-onion-cried")   # the name only (usage.py)
             self._clicks.clear()
             self.cry_until = now + CRY_S
             self.welling = 1.0
