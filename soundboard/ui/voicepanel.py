@@ -13,7 +13,7 @@ import re
 import threading
 import time
 
-from PySide6.QtCore import QEvent, QObject, QRectF, QSize, Qt, QTimer, Signal
+from PySide6.QtCore import QEvent, QObject, QPoint, QRectF, QSize, Qt, QTimer, Signal
 from PySide6.QtGui import QColor, QGuiApplication, QPainter
 from PySide6.QtWidgets import (QButtonGroup, QCheckBox, QComboBox, QDialog, QMessageBox,
                                QDialogButtonBox, QFormLayout, QFrame, QGridLayout,
@@ -33,7 +33,7 @@ from soundboard.ui import appstate, art, busy, icons
 from soundboard.ui.panel import (Flow, UndoBar, VolumeControl, bar, capped, card, hint_label,
                                  icon_label, section_label, vsep)
 from soundboard.ui.responsive import FitWidth
-from soundboard.ui.widgets import Meter
+from soundboard.ui.voicestatus import VoiceStatusBar
 from soundboard.wheelguard import no_wheel
 from soundboard import errors
 from soundboard.i18n import _, ngettext
@@ -547,16 +547,9 @@ class VoiceFxPanel(QWidget):
         icons.set_icon(self.btn_power, "mic", checked_color="#ffffff")
         self.btn_power.setChecked(spec["enabled"])
         self.btn_power.toggled.connect(self._on_power)
-        # the switch and your mic level side by side, next to the voice tiles (to hear
-        # it: the mixer's "Hear what they hear", the one switch for that on every tab)
-        top = QHBoxLayout()
-        top.setSpacing(8)
-        top.addWidget(self.btn_power)
-        top.addWidget(icon_label("mic", _("Your mic level")))
-        self.meter = Meter()
-        self.meter.setMinimumWidth(60)
-        top.addWidget(self.meter, 1)
-        v.addLayout(top)
+        # your mic level is in the tab's status bar (ui/voicestatus.py), over every card
+        # (to hear it: the mixer's "Hear what they hear", the one switch on every tab)
+        v.addWidget(self.btn_power, 0, Qt.AlignLeft)
 
         # ---- the Discord catch (shown with the changer on, until "Got it")
         # Measured in a real call: with Discord's default Input Profile (Voice
@@ -1195,9 +1188,6 @@ class VoiceFxPanel(QWidget):
             self.delay.setProperty("slow", slow)
             self.delay.style().unpolish(self.delay)
             self.delay.style().polish(self.delay)
-
-    def set_level(self, level: float):
-        self.meter.set_level(level)
 
     def set_tip_enabled(self, on: bool):
         """Whether the Discord notice may show (False once it's been dismissed)."""
@@ -2711,13 +2701,22 @@ class VoicePanel(QWidget):
         outer = QVBoxLayout(self)
         outer.setContentsMargins(0, 8, 0, 0)
         outer.setSpacing(8)
-        scroll = QScrollArea()
+        # what's on and your mic level, whatever's folded or scrolled away
+        self.bar = VoiceStatusBar()
+        self.bar.open_card.connect(self._open_card)
+        bar_row = self._bar_row = QHBoxLayout()   # lined up with the cards (_line_up)
+        bar_row.setContentsMargins(4, 0, 8, 0)
+        bar_row.addWidget(self.bar)
+        outer.addLayout(bar_row)
+        scroll = self._scroll = QScrollArea()
         scroll.setWidgetResizable(True)
         scroll.setFrameShape(QFrame.NoFrame)
         scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         page = FitWidth()   # the voice changer fits itself to the width (_fit_width)
         body = QWidget()
         capped(body, page)  # not a 900 px wide card at full screen
+        self._body = body
+        body.installEventFilter(self)       # the status bar lines up with it (_line_up)
         pv = QVBoxLayout(body)
         pv.setContentsMargins(4, 4, 8, 12)
         pv.setSpacing(16)
@@ -2771,6 +2770,7 @@ class VoicePanel(QWidget):
         self.ai.changed.connect(self._ai_changed)
         self.ai.live_changed.connect(self._ai_live)
         self.ai.modules_changed.connect(self.rescan_modules)
+        self.ai._event.connect(lambda _ev: self._update_bar())   # starting -> on / failed
         self._ai_card = self._fold_card("ai", self.ai)
         net.on_change(self._ai_net_changed)
         self._ai_follow_offline()
@@ -2808,7 +2808,7 @@ class VoicePanel(QWidget):
     def _meter(self):
         if self.isVisible():
             e = self.engine
-            self.fx.set_level(e.level_mic if e.mic_stream is not None else 0.0)
+            self.bar.set_level(e.level_mic if e.mic_stream is not None else None)
             self._ticks = getattr(self, "_ticks", 0) + 1
             if self._ticks % 20 == 1:       # the devices' delay: once a second is plenty
                 delay = getattr(e, "device_delay", None)
@@ -2832,9 +2832,25 @@ class VoicePanel(QWidget):
         return [apply]
 
     def eventFilter(self, obj, e):
+        if obj is getattr(self, "_body", None) and e.type() in (QEvent.Resize, QEvent.Move,
+                                                                 QEvent.Show):
+            QTimer.singleShot(0, self, self._line_up)
         if e.type() in (QEvent.Resize, QEvent.Show, QEvent.Hide) and obj in self._cards:
             self._arranger.start(0)   # a card grew, shrank or came and went: re-stack
         return super().eventFilter(obj, e)
+
+    def _line_up(self):
+        """The status bar exactly as wide as the cards, whatever the scroll bar and the
+        width cap do (the cards sit 4 px in from the body's left, 8 from its right)."""
+        b = self._body
+        try:
+            left = b.mapTo(self, QPoint(4, 0)).x()
+            right = max(0, self.width() - (left + b.width() - 12))
+            m = self._bar_row.contentsMargins()
+            if (m.left(), m.right()) != (left, right):
+                self._bar_row.setContentsMargins(left, 0, right, 0)
+        except RuntimeError:     # the tab was closed meanwhile (a queued call)
+            pass
 
     def _arrange(self):
         """The voice changer heads the left column and AI voices the right; every other
@@ -2957,7 +2973,63 @@ class VoicePanel(QWidget):
         self.speech.s["folded"] = sorted(self._folded)   # kept with the speech settings
         self.speech_changed.emit(dict(self.speech.s))
 
+    def _update_bar(self):
+        """The status bar's chips: each thing changing what others hear, in the order
+        the sound goes through them."""
+        if not hasattr(self, "bar"):
+            return
+        # short: a picture and a name; the full words are the chip's tip
+        items = []
+        if self.fx.btn_power.isChecked():
+            name = self.fx.preset
+            shown = _("My own mix") if name == CUSTOM else voicefx.shown(name)
+            pic = art.icon(art.voice_key(name)) if name != CUSTOM else None
+            items.append(("fx", shown, "on", "voice" if pic is None else "", pic,
+                          _("Voice changer: {voice}. Click to open it.", voice=shown)))
+        if self.ai.is_on():
+            st, title = self.ai.status(), self.ai.voice_title()
+            if st == "failed":
+                items.append(("ai", _("AI voice off"), "warn", "warn", None,
+                              _("The AI voice stopped: a built-in voice covers you. Click "
+                                "to open AI voices.")))
+            else:
+                items.append(("ai", title + ("…" if st == "starting" else ""), "on", "wave",
+                              None, (_("AI voice: {voice}, starting.", voice=title)
+                                     if st == "starting" else
+                                     _("AI voice: {voice}.", voice=title)) + " "
+                              + _("Click to open AI voices.")))
+        if self.speech.b_live.isChecked():
+            # which voice: a custom one may be a voice server on this PC (a web address)
+            cb = self.speech.cb_voice
+            who = cb.currentText() if cb.currentData() else _("Computer voice")
+            items.append(("speak", who, "on", "speech", None,
+                          _("The computer voice ({voice}) speaks for you. Click to open it.",
+                            voice=who)))
+        m = self.speech.translating()
+        if m is not None:
+            lang = langnames.of(m)
+            items.append(("lang", lang, "on", "browser", None,
+                          _("What you say is said in {language}. Click to open it.",
+                            language=lang)))
+        if not items:
+            items.append(("none", _("Your real voice"), "off", "mic", None,
+                          _("Nothing changes your voice. Click to pick a voice.")))
+        self.bar.set_items(items)
+
+    def _open_card(self, key: str):
+        """A status bar chip: unfold its card and scroll to it."""
+        key = {"none": "fx", "lang": "speak"}.get(key, key)
+        head = self._heads.get(key)
+        if head is None:
+            return
+        if not head.is_open():
+            head.arrow.toggle()
+        card_ = head.parentWidget()
+        # tied to this tab: closed meanwhile, it never runs
+        QTimer.singleShot(0, self._scroll, lambda: self._scroll.ensureWidgetVisible(card_, 0, 0))
+
     def _update_heads(self):
+        self._update_bar()
         if not self._heads:
             return
         m = self.speech.translating()
