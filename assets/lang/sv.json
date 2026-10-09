@@ -2859,8 +2859,8 @@
   "{language} needs a one-time download of its translation model ({size} MB). Offline mode is on, so it can't be downloaded now.": "{language} behöver en engångsnedladdning av sin översättningsmodell ( {size} MB). Offlineläget är på, så det kan inte laddas ner nu.",
   "{n} MB": "{n} MB",
   "⚠ Windows has no {language} voice yet, so {language} can't be spoken properly. Offline mode is on, so it can't be installed now.": "⚠ Windows har ingen {language} -röst än, så {language} kan inte talas ordentligt. Offlineläget är på, så det kan inte installeras nu.",
-  "A bar at the edge of the tabs and a coloured icon, in the highlight colour: easy to spot from across the room": "En stapel i kanten av flikarna och en färgad ikon, i höjdpunktsfärgen: lätt att se från andra sidan rummet",
-  "A bar beside the tab": "En bar bredvid fliken",
+  "A bar at the edge of the tabs and a coloured icon, in the highlight colour: easy to spot from across the room": "Ett streck i kanten av flikarna och en färgad ikon, i markeringsfärgen: lätt att se från andra sidan rummet",
+  "A bar beside the tab": "Ett streck bredvid fliken",
   "Show tab names": "Visa fliknamn",
   "Hide tab names": "Dölj fliknamn",
   "Show only the icons": "Visa endast ikonerna"

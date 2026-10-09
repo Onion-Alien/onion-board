@@ -2800,7 +2800,7 @@
   "{n} MB": "{n} MB",
   "⚠ Windows has no {language} voice yet, so {language} can't be spoken properly. Offline mode is on, so it can't be installed now.": "⚠ Windows에는 아직 {language} 음성이 없으므로 {language} 제대로 말할 수 없습니다. 오프라인 모드가 켜져 있으므로 지금은 설치할 수 없습니다.",
   "A bar at the edge of the tabs and a coloured icon, in the highlight colour: easy to spot from across the room": "탭 가장자리의 막대와 하이라이트 색상의 컬러 아이콘: 방 전체에서 쉽게 알아볼 수 있습니다.",
-  "A bar beside the tab": "탭 옆의 바",
+  "A bar beside the tab": "탭 옆의 막대",
   "Show tab names": "탭 이름 표시",
   "Hide tab names": "탭 이름 숨기기",
   "Show only the icons": "아이콘만 표시"

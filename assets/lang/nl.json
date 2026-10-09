@@ -2861,7 +2861,7 @@
   "⚠ Windows has no {language} voice yet, so {language} can't be spoken properly. Offline mode is on, so it can't be installed now.": "⚠ Windows heeft nog geen {language} -stem, dus {language} kan niet correct worden uitgesproken. De offlinemodus staat aan, dus deze kan nu niet worden geïnstalleerd.",
   "A bar at the edge of the tabs and a coloured icon, in the highlight colour: easy to spot from across the room": "Een balk aan de rand van de tabbladen en een gekleurd pictogram in de accentkleur: gemakkelijk te herkennen vanaf de andere kant van de kamer",
   "A bar beside the tab": "Een balk naast het tabblad",
-  "Show tab names": "Toon tabbladnamen",
-  "Hide tab names": "Tabnamen verbergen",
-  "Show only the icons": "Toon alleen de pictogrammen"
+  "Show tab names": "Tabbladnamen tonen",
+  "Hide tab names": "Tabbladnamen verbergen",
+  "Show only the icons": "Alleen de pictogrammen tonen"
 }

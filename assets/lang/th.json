@@ -2799,7 +2799,7 @@
   "{language} needs a one-time download of its translation model ({size} MB). Offline mode is on, so it can't be downloaded now.": "{language} ต้องการดาวน์โหลดโมเดลการแปลเพียงครั้งเดียว ( {size} MB) โหมดออฟไลน์เปิดอยู่ จึงไม่สามารถดาวน์โหลดได้ในขณะนี้",
   "{n} MB": "{n} เมกะไบต์",
   "⚠ Windows has no {language} voice yet, so {language} can't be spoken properly. Offline mode is on, so it can't be installed now.": "⚠ Windows ยังไม่มีเสียง {language} ดังนั้นจึงไม่สามารถพูด {language} ได้อย่างถูกต้อง โหมดออฟไลน์เปิดอยู่ จึงไม่สามารถติดตั้งได้ในขณะนี้",
-  "A bar at the edge of the tabs and a coloured icon, in the highlight colour: easy to spot from across the room": "แถบที่ขอบแถบและไอคอนสีเป็นสีไฮไลต์ มองเห็นได้ง่ายจากอีกฟากหนึ่งของห้อง",
+  "A bar at the edge of the tabs and a coloured icon, in the highlight colour: easy to spot from across the room": "แถบที่ขอบแท็บและไอคอนในสีไฮไลต์: มองเห็นได้ง่ายจากอีกฟากของห้อง",
   "A bar beside the tab": "แถบข้างแท็บ",
   "Show tab names": "แสดงชื่อแท็บ",
   "Hide tab names": "ซ่อนชื่อแท็บ",

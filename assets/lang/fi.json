@@ -2860,7 +2860,7 @@
   "{n} MB": "{n} Mt",
   "⚠ Windows has no {language} voice yet, so {language} can't be spoken properly. Offline mode is on, so it can't be installed now.": "⚠ Windowsilla ei ole vielä ääntä {language} , joten {language} ei voi puhua oikein. Offline-tila on käytössä, joten sitä ei voi asentaa nyt.",
   "A bar at the edge of the tabs and a coloured icon, in the highlight colour: easy to spot from across the room": "Palkki välilehtien reunassa ja värillinen kuvake korostusvärissä: helppo havaita huoneen toiselta puolelta",
-  "A bar beside the tab": "Baari välilehden vieressä",
+  "A bar beside the tab": "Palkki välilehden vieressä",
   "Show tab names": "Näytä välilehtien nimet",
   "Hide tab names": "Piilota välilehtien nimet",
   "Show only the icons": "Näytä vain kuvakkeet"

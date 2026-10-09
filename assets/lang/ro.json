@@ -2920,8 +2920,8 @@
   "{n} MB": "{n} MB",
   "⚠ Windows has no {language} voice yet, so {language} can't be spoken properly. Offline mode is on, so it can't be installed now.": "⚠ Windows nu are încă voce {language} , așa că {language} nu poate fi rostit corect. Modul offline este activat, deci nu poate fi instalat acum.",
   "A bar at the edge of the tabs and a coloured icon, in the highlight colour: easy to spot from across the room": "O bară la marginea filelor și o pictogramă colorată, în culoarea evidențiată: ușor de observat din întreaga cameră",
-  "A bar beside the tab": "Un bar lângă filă",
-  "Show tab names": "Afișați numele filelor",
+  "A bar beside the tab": "O bară lângă filă",
+  "Show tab names": "Arată numele filelor",
   "Hide tab names": "Ascunde numele filelor",
-  "Show only the icons": "Afișați doar pictogramele"
+  "Show only the icons": "Arată doar pictogramele"
 }

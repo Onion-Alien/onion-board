@@ -2859,8 +2859,8 @@
   "{language} needs a one-time download of its translation model ({size} MB). Offline mode is on, so it can't be downloaded now.": "{language} trenger en engangsnedlasting av sin oversettelsesmodell ( {size} MB). Frakoblet modus er på, så den kan ikke lastes ned nå.",
   "{n} MB": "{n} MB",
   "⚠ Windows has no {language} voice yet, so {language} can't be spoken properly. Offline mode is on, so it can't be installed now.": "⚠ Windows har ingen {language} -stemme ennå, så {language} kan ikke snakkes ordentlig. Frakoblet modus er på, så den kan ikke installeres nå.",
-  "A bar at the edge of the tabs and a coloured icon, in the highlight colour: easy to spot from across the room": "En stolpe i kanten av fanene og et farget ikon, i høylysfargen: lett å se fra andre siden av rommet",
-  "A bar beside the tab": "En bar ved siden av fanen",
+  "A bar at the edge of the tabs and a coloured icon, in the highlight colour: easy to spot from across the room": "En strek i kanten av fanene og et farget ikon, i uthevingsfargen: lett å se fra andre siden av rommet",
+  "A bar beside the tab": "En strek ved siden av fanen",
   "Show tab names": "Vis fanenavn",
   "Hide tab names": "Skjul fanenavn",
   "Show only the icons": "Vis bare ikonene"

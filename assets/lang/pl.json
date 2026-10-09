@@ -2919,9 +2919,9 @@
   "{language} needs a one-time download of its translation model ({size} MB). Offline mode is on, so it can't be downloaded now.": "{language} wymaga jednorazowego pobrania swojego modelu tłumaczenia ( {size} MB). Tryb offline jest włączony, więc nie można go teraz pobrać.",
   "{n} MB": "{n} MB",
   "⚠ Windows has no {language} voice yet, so {language} can't be spoken properly. Offline mode is on, so it can't be installed now.": "⚠ System Windows nie obsługuje jeszcze języka {language} , więc nie można mówić poprawnie w języku {language} . Tryb offline jest włączony, więc nie można go teraz zainstalować.",
-  "A bar at the edge of the tabs and a coloured icon, in the highlight colour: easy to spot from across the room": "Pasek na krawędzi zakładek i kolorowa ikona w podświetlonym kolorze: łatwe do zauważenia z drugiego końca pokoju",
-  "A bar beside the tab": "Pasek obok zakładki",
-  "Show tab names": "Pokaż nazwy zakładek",
-  "Hide tab names": "Ukryj nazwy zakładek",
+  "A bar at the edge of the tabs and a coloured icon, in the highlight colour: easy to spot from across the room": "Pasek na krawędzi kart i kolorowa ikona w kolorze wyróżnienia: łatwo go zauważyć z drugiego końca pokoju",
+  "A bar beside the tab": "Pasek obok karty",
+  "Show tab names": "Pokaż nazwy kart",
+  "Hide tab names": "Ukryj nazwy kart",
   "Show only the icons": "Pokaż tylko ikony"
 }

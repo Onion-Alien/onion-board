@@ -2859,8 +2859,8 @@
   "{language} needs a one-time download of its translation model ({size} MB). Offline mode is on, so it can't be downloaded now.": "{language} benötigt einen einmaligen Download seines Übersetzungsmodells ( {size} MB). Der Offline-Modus ist aktiviert und kann daher derzeit nicht heruntergeladen werden.",
   "{n} MB": "{n} MB",
   "⚠ Windows has no {language} voice yet, so {language} can't be spoken properly. Offline mode is on, so it can't be installed now.": "⚠ Windows hat noch keine {language} -Stimme, daher kann {language} nicht richtig gesprochen werden. Der Offline-Modus ist aktiviert und kann daher derzeit nicht installiert werden.",
-  "A bar at the edge of the tabs and a coloured icon, in the highlight colour: easy to spot from across the room": "Eine Leiste am Rand der Registerkarten und ein farbiges Symbol in der Hervorhebungsfarbe: von der anderen Seite des Raums aus leicht zu erkennen",
-  "A bar beside the tab": "Eine Leiste neben der Registerkarte",
+  "A bar at the edge of the tabs and a coloured icon, in the highlight colour: easy to spot from across the room": "Ein Balken am Rand der Tabs und ein farbiges Symbol in der Hervorhebungsfarbe: auch von der anderen Zimmerseite gut zu sehen",
+  "A bar beside the tab": "Ein Balken neben dem Tab",
   "Show tab names": "Tab-Namen anzeigen",
   "Hide tab names": "Tab-Namen ausblenden",
   "Show only the icons": "Nur die Symbole anzeigen"
