@@ -749,7 +749,7 @@
   "On the left, click <b>Voice</b>.": "Vlevo klikni na <b>Hlas</b>.",
   "On, at {host}:{port}. Pick a link to copy.": "Zapnuto, na {host}:{port}. Vyber odkaz ke zkopírování.",
   "On: listening on {host}:{port}.": "Zapnuto: naslouchá na {host}:{port}.",
-  "Once a day, sends an anonymous count to goatcounter.com: the version, tabs opened, crash counts and a random ID that follows how the app is used over time. Only used to fix errors and see which features need work. Never your name, sounds or settings. Off: nothing is sent.": "Jednou denně pošle anonymní počet na goatcounter.com: verzi, otevřené karty, počet pádů a náhodné ID, které sleduje, jak se aplikace v čase používá. Slouží jen k opravě chyb a k tomu, abychom viděli, které funkce potřebují práci. Nikdy tvoje jméno, zvuky ani nastavení. Vypnuto: nic se neposílá.",
+  "Once a day, sends an anonymous count to goatcounter.com: the version, tabs opened, crash counts and a random ID that follows how the app is used over time. Only used to fix errors and see which features need work. Never your name, sounds or settings. Switching it off sends one last anonymous count (no ID), then nothing.": "Jednou denně pošle anonymní počet na goatcounter.com: verzi, otevřené karty, počet pádů a náhodné ID, které sleduje, jak se aplikace v čase používá. Slouží jen k opravě chyb a k tomu, abychom viděli, které funkce potřebují práci. Nikdy tvoje jméno, zvuky ani nastavení. Vypnutí pošle jeden poslední anonymní počet (bez ID), pak už nic.",
   "One click": "Jedno kliknutí",
   "One click needed: repair your mic": "Potřeba jedno kliknutí: oprav svůj mikrofon",
   "One click: put your sounds straight into your mic": "Jedno kliknutí: dej svoje zvuky rovnou do mikrofonu",

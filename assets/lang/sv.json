@@ -737,7 +737,7 @@
   "On the left, click <b>Voice</b>.": "Till vänster, klicka <b>Voice</b>.",
   "On, at {host}:{port}. Pick a link to copy.": "På, på {host}:{port}. Välj en länk att kopiera.",
   "On: listening on {host}:{port}.": "På: lyssnar på {host}:{port}.",
-  "Once a day, sends an anonymous count to goatcounter.com: the version, tabs opened, crash counts and a random ID that follows how the app is used over time. Only used to fix errors and see which features need work. Never your name, sounds or settings. Off: nothing is sent.": "En gång om dagen skickas en anonym räkning till goatcounter.com: versionen, öppnade flikar, antal krascher och ett slumpmässigt ID som följer hur appen används över tid. Används bara för att rätta fel och se vilka funktioner som behöver jobbas på. Aldrig ditt namn, dina ljud eller inställningar. Av: inget skickas.",
+  "Once a day, sends an anonymous count to goatcounter.com: the version, tabs opened, crash counts and a random ID that follows how the app is used over time. Only used to fix errors and see which features need work. Never your name, sounds or settings. Switching it off sends one last anonymous count (no ID), then nothing.": "En gång om dagen skickas en anonym räkning till goatcounter.com: versionen, öppnade flikar, antal krascher och ett slumpmässigt ID som följer hur appen används över tid. Används bara för att rätta fel och se vilka funktioner som behöver jobbas på. Aldrig ditt namn, dina ljud eller inställningar. Stänger du av det skickas en sista anonym räkning (utan ID), sedan inget.",
   "One click": "Ett klick",
   "One click needed: repair your mic": "Ett klick behövs: reparera din mikrofon",
   "One click: put your sounds straight into your mic": "Ett klick: lägg dina ljud direkt i din mikrofon",
