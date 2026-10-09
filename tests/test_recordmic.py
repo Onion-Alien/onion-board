@@ -235,6 +235,49 @@ def test_the_window_adds_a_recording_as_a_selected_pad(window, monkeypatch):  # 
         e.mic_stream = None
 
 
+def test_a_recording_of_a_playing_pad_gets_its_picture(window, tmp_path):  # noqa: F811
+    from PySide6.QtGui import QColor, QImage
+
+    from soundboard import thumbs
+    img = QImage(64, 64, QImage.Format_RGB32)
+    img.fill(QColor("#00ff00"))
+    src = window.meta("s0")
+    assert thumbs.set_image(src, img)
+    e = out_engine("main")
+    saved = []
+    d = RecordDialog(e, lambda: False, lambda: [],
+                     lambda *a: saved.append(a) or window.add_recording(*a), lambda: None,
+                     playing_name=lambda: "Airhorn", playing_picture=lambda: src.image)
+    d.opt_play.setChecked(True)
+    assert d.start()
+    for _ in range(50):
+        e._play_take.append(np.full((BLOCK, 2), 0.3, np.float32))
+    d._tick()
+    d.stop()
+    assert d.save() and saved[0][2] == src.image
+    m = window.cfg.sounds[-1]
+    assert m.name == "Airhorn" and m.image and m.image != src.image   # its own copy
+    assert library.Path(m.image).is_file()
+    thumbs.clear(src)   # the old pad's picture going doesn't take the copy with it
+    assert library.Path(m.image).is_file()
+    RecordDialog.last_source = "mic"
+    d.deleteLater()
+
+
+def test_the_main_window_names_the_playing_pads_picture(window, monkeypatch):  # noqa: F811
+    from PySide6.QtGui import QColor, QImage
+
+    from soundboard import thumbs
+    img = QImage(8, 8, QImage.Format_RGB32)
+    img.fill(QColor("#0000ff"))
+    assert thumbs.set_image(window.meta("s0"), img)
+    window.current = "s0"
+    monkeypatch.setattr(window.engine, "state", lambda sid: (0.1, False))
+    assert window._playing_picture() == window.meta("s0").image
+    monkeypatch.setattr(window.engine, "state", lambda sid: None)   # stopped: nothing
+    assert window._playing_picture() == ""
+
+
 def test_cancel_adds_nothing(window, monkeypatch):  # noqa: F811
     e = window.engine
     e.names["mic"], e.mic_stream = "Test mic", object()

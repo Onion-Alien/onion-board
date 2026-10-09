@@ -487,6 +487,26 @@ def _sort(p, fill):
     p.drawPolyline([QPointF(14.5, 16.5), QPointF(18, 20), QPointF(21.5, 16.5)])
 
 
+def _rename(p, fill):
+    """A text box with a typing cursor in it."""
+    p.drawRoundedRect(QRectF(2.5, 7, 19, 10), 2, 2)
+    p.drawLine(QPointF(12, 4), QPointF(12, 20))
+    p.drawLine(QPointF(10, 4), QPointF(14, 4))
+    p.drawLine(QPointF(10, 20), QPointF(14, 20))
+
+
+def _tag(p, fill):
+    """A label tag with its hole."""
+    path = QPainterPath(QPointF(3.5, 5.5))
+    for pt in ((3.5, 11.5), (12.5, 20.5), (20.5, 12.5), (11.5, 3.5), (5.5, 3.5)):
+        path.lineTo(*pt)
+    path.closeSubpath()
+    p.drawPath(path)
+    hole = QPainterPath()
+    hole.addEllipse(QPointF(8, 8), 1.5, 1.5)
+    fill(hole)
+
+
 def _list(p, fill):
     for y in (6, 12, 18):
         fill(QPainterPath(), lambda pp, y=y: pp.addEllipse(QPointF(4.5, y), 1.6, 1.6))
@@ -504,7 +524,7 @@ def _copy(p, fill):
 SHAPES = {
     "shuffle": _shuffle, "star": _star,
     "star_filled": lambda p, fill: _star(p, fill, True), "like": _like, "copy": _copy,
-    "sort": _sort, "list": _list, "search": _search,
+    "sort": _sort, "list": _list, "rename": _rename, "tag": _tag, "search": _search,
     "sounds": _grid, "browser": _globe, "offline": _offline, "voice": _mask, "setup": _sliders,
     "sliders": _sliders, "wave": _wave,
     "mic": _mic, "headphones": _headphones, "volume": _volume, "ear": _ear,
