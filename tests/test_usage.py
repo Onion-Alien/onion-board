@@ -286,6 +286,27 @@ def test_problem_events_say_where_in_our_code_never_the_message(tmp_path):
     assert usage._report_event(f) == "freeze/1.9.7@soundboard/directmic.py:184"
 
 
+def test_a_freeze_says_where_the_window_was_never_another_thread(tmp_path):
+    """hangwatch.py lists every other thread after the window's own stack; the
+    place sent is the window's, and a thread start is blamed on its caller, not on
+    threadnames.py's wrapper around Thread.start."""
+    f = tmp_path / "freeze-x.txt"
+    f.write_text("Onion Board froze for 6 s\nVersion:  1.9.20\nTime:  x\n\n"
+                 "What it was doing\n-----------------\n"
+                 '  File "main.py", line 22, in <module>\n'
+                 '  File "soundboard\\ui\\mainwindow.py", line 5898, in tick\n'
+                 '  File "soundboard\\threadnames.py", line 70, in named_start\n'
+                 '  File "threading.py", line 999, in start\n'
+                 "\nOther threads\n-------------\n"
+                 'Thread "audio" (12):\n'
+                 '  File "soundboard\\threadnames.py", line 68, in named_run\n'
+                 '  File "soundboard\\engine.py", line 400, in _loop\n'
+                 'Thread "x" (13):\n'
+                 '  File "soundboard\\threadnames.py", line 70, in named_start\n',
+                 encoding="utf-8")
+    assert usage._report_event(f) == "freeze/1.9.20@soundboard/ui/mainwindow.py:5898"
+
+
 def test_problem_events_keep_paths_outside_our_package_out(tmp_path):
     f = tmp_path / "crash-x.txt"
     # an odd install folder named soundboard: deeper than our package, so not sent

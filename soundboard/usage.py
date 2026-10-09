@@ -253,12 +253,15 @@ _ERROR_TYPE = re.compile(r"([A-Za-z_][\w.]*)(?::|$)")
 
 def _where(stack: str) -> str:
     """`soundboard/engine.py:1090`: the deepest of our own lines in a report's stack
-    (the same file and line anyone can look up in the public source), or ""."""
-    frames = _OUR_FRAME.findall(stack)
+    (the same file and line anyone can look up in the public source), or "".
+    threadnames.py only wraps Thread.start / run, so its lines name their caller."""
+    frames = [(file.replace(chr(92), "/"), line)
+              for file, line in _OUR_FRAME.findall(stack)]
+    frames = [f for f in frames if f[0] != "soundboard/threadnames.py"] or frames
     if not frames:
         return ""
     file, line = frames[-1]
-    return f"{file.replace(chr(92), '/')}:{line}"
+    return f"{file}:{line}"
 
 
 def _error_type(stack: str) -> str:
@@ -292,6 +295,8 @@ def _report_event(path: Path) -> str:
     # the stack only: never the log lines saved below it
     stack = re.split(r"^Last \d+ log lines\s*$", text, maxsplit=1, flags=re.M)[0]
     stack = stack.split("\n\n", 1)[-1]
+    # a freeze: the window's own stack, never the other threads hangwatch.py adds
+    stack = re.split(r"^Other threads\s*$", stack, maxsplit=1, flags=re.M)[0]
     where = _where(stack)
     if "froze for" in head.split("\n", 1)[0]:
         return f"freeze/{ver}" + (f"@{where}" if where else "")
