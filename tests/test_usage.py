@@ -37,6 +37,7 @@ def sent(app_dir, monkeypatch):
     monkeypatch.delenv("ONIONBOARD_NO_STATS", raising=False)
     monkeypatch.setattr(usage, "threading", SimpleNamespace(Thread=_Inline))
     monkeypatch.setattr(usage, "_used", set())
+    monkeypatch.setattr(usage, "_open_mark", None)
     net.configure_features()
     yield out
     net.configure_features()
@@ -50,7 +51,7 @@ class _Inline:
         self.target()
 
 
-ABOUT = ("age/", "route/", "sounds/", "played/", "lang/", "used/")
+ABOUT = ("age/", "route/", "sounds/", "played/", "open/", "lang/", "used/")
 
 
 def _hits(req, about=False) -> list[dict]:
@@ -524,3 +525,38 @@ def test_features_used_survive_a_quit(app_dir):
     cfg.save()
     assert Config.load().stats_used == ["youtube"]
 
+
+
+# ---- how long it was open ------------------------------------------------------------
+
+def test_open_time_adds_up_ticks_and_skips_sleep(sent):
+    cfg = Config()
+    usage.open_tick(cfg, now=1000)        # the start: nothing yet
+    usage.open_tick(cfg, now=1300)        # 5 min
+    usage.open_tick(cfg, now=1600)        # 5 min
+    usage.open_tick(cfg, now=1600 + 3600)   # an hour's gap: the PC slept, not counted
+    usage.open_tick(cfg, now=5200 + 300)  # 5 min
+    assert cfg.stats_open_s == 900
+
+
+def test_open_time_doesnt_pile_up_while_the_count_is_off(sent):
+    cfg = Config(net_off=["usage_stats"])
+    net.configure_features(cfg.net_off)
+    usage.open_tick(cfg, now=0)
+    usage.open_tick(cfg, now=300)
+    assert cfg.stats_open_s == 0
+
+
+def test_the_daily_count_says_roughly_how_long_it_was_open(sent):
+    cfg = Config(stats_open_s=2 * 3600)
+    usage.maybe_send(cfg)
+    paths = [p for p in _paths(sent[0][0]) if p.startswith("open/")]
+    assert paths == ["open/1-3h"]
+    assert cfg.stats_open_s < 60    # counted: starts again from about nothing
+
+
+@pytest.mark.parametrize("seconds, b", [(0, "under-15m"), (899, "under-15m"),
+                                        (900, "15m-1h"), (3600, "1-3h"),
+                                        (3 * 3600, "3-8h"), (8 * 3600, "8h-plus")])
+def test_open_time_is_a_rough_bucket(seconds, b):
+    assert usage.open_bucket(seconds) == b
