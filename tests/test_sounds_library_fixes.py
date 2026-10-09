@@ -79,11 +79,11 @@ def test_sound_volume_in_a_hand_edited_config_is_brought_into_range(app_dir):
 
 @pytest.mark.parametrize("ext,fmt", [(".au", "AU"), (".caf", "CAF"), (".w64", "W64"),
                                      (".aifc", "AIFF")])
-def test_a_file_outside_the_audio_types_is_kept_as_flac_and_round_trips(
+def test_a_file_outside_the_audio_types_is_kept_as_mp3_and_round_trips(
         app_dir, tmp_path, ext, fmt):
     src = _tone(tmp_path / f"Beep{ext}", fmt=fmt)
     meta, _ = library.import_file(str(src), "#7c5cff")
-    assert meta.file.endswith("Beep.flac") and meta.name == "Beep"
+    assert meta.file.endswith("Beep.mp3") and meta.name == "Beep"
     out = tmp_path / "backup.zip"
     assert backup.export(out, [meta]) == 1
     pkg = backup.read(out)

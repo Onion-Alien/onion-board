@@ -321,7 +321,7 @@ class NetActivity(QWidget):
         for r, s in enumerate(servers):
             count = _count(s.connections, s.blocked, s.failed)
             tone = "warn" if s.blocked == s.connections else None
-            why = s.causes[0] if s.causes else "—"
+            why = s.causes[0] if s.causes else ""
             if len(s.causes) > 1:
                 why = _("{reason} (+{n} more)", reason=why, n=len(s.causes) - 1)
             _put(t, r, 0, s.host, tone=tone)
@@ -371,9 +371,9 @@ class NetActivity(QWidget):
             color = tone.get(e.state)
             _put(t, r, 0, _when(e.started), tone=color).setData(Qt.UserRole, e.n)
             _put(t, r, 1, netlog.where(e), tone=color)
-            _put(t, r, 2, e.cause or "—", e.cause, tone=color)
+            _put(t, r, 2, e.cause or "", e.cause, tone=color)
             _put(t, r, 3, label, label, tone=color)
-            _put(t, r, 4, e.route or "—", tone=color)
+            _put(t, r, 4, e.route or "", tone=color)
             _put(t, r, 5, netlog.outcome(e), e.reason, tone=color)
             _put(t, r, 6, netlog.size(e.sent), align=right, tone=color)
             _put(t, r, 7, netlog.size(e.received), align=right, tone=color)

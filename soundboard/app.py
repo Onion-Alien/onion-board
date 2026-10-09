@@ -417,6 +417,11 @@ def main():
         app.setLayoutDirection(_Qt.RightToLeft)
     from soundboard import theme as _theme
     i18n.use_fonts(_theme.font_families())
+    # same-width digits everywhere, so a number that changes doesn't make its text jump
+    from PySide6.QtGui import QFont as _QFont
+    _font = app.font()
+    _font.setFeature(_QFont.Tag("tnum"), 1)
+    app.setFont(_font)
     i18n.translate_qt_buttons(app)   # OK, Cancel, Yes… in Qt's own dialogs
     from soundboard.ui import quietbox
     quietbox.install(app)   # no Windows ding from tips and warnings

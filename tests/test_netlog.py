@@ -204,7 +204,7 @@ def test_the_view_shows_simple_and_detailed(qapp):
     w.detailed.setChecked(True)
     assert w.stack.currentIndex() == 1 and w.conns.rowCount() == 2
     assert w.conns.item(1, 2).text() == "You clicked Check now"
-    assert w.conns.item(0, 2).text() == "—"
+    assert w.conns.item(0, 2).text() == ""
     w.conns.selectRow(1)
     text = w.info.toPlainText()
     assert "api.example.com:443" in text and "Route: Tor" in text

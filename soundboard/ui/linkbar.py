@@ -23,7 +23,8 @@ from PySide6.QtCore import Qt, Signal
 from PySide6.QtWidgets import QFrame, QHBoxLayout, QLabel, QPushButton
 
 from soundboard import net, netlog, quality, theme, thumbs, videos, ytdl
-from soundboard.library import (SR, decode, fingerprint, import_file, level_gain, to_int16)
+from soundboard.library import (SR, decode, fingerprint, import_file, level_gain,
+                                site_folder, to_int16)
 from soundboard.ui import busy
 from soundboard.ui.widgets import fmt_time
 from soundboard import errors
@@ -203,7 +204,7 @@ class LinkBar(QFrame):
             _drop_temp(got[1])
             got = None
         args = (kind, self.url, got, self._color_for(), self._known_for(),
-                bool(self.cfg.ytdlp_auto_optin), direct, video)
+                bool(self.cfg.ytdlp_auto_optin), direct, video, self.title)
         what = netlog.quoted(self.title) if self.title else "a link"
         netlog.cause(ytdl.FEATURE, (f"You clicked Play on {what}" if kind == "play" else
                                     f"You added {what} as a sound")
@@ -219,16 +220,18 @@ class LinkBar(QFrame):
         gain = gain if self.cfg.level_volumes else 1.0
         v = self.engine.play(PLAY_ID, data, gain, mode="restart")
         if v is None:
-            self._say(_("No audio device is open — pick one in Setup."), theme.status("warn"))
+            self._say(_("No audio device is open, pick one in Setup."), theme.status("warn"))
         else:
             self.played.emit(self.title or _("Link"), data, gain)
             name = html.escape(self.title or _("it"))
-            self._say(_("▶ Playing <b>{name}</b> ({time}) — <i>Add as sound</i> keeps it.",
+            self._say(_("▶ Playing <b>{name}</b> ({time}): <i>Add as sound</i> keeps it.",
                         name=name, time=fmt_time(len(data) / SR)))
 
     # ------------------------------------------------------------------ workers
-    def _work(self, kind, url, got, color, known, auto_update, direct=False, video=False):
-        """Download (unless `got` already holds it), then import or decode."""
+    def _work(self, kind, url, got, color, known, auto_update, direct=False, video=False,
+              shown=""):
+        """Download (unless `got` already holds it), then import or decode. `shown`:
+        the link's title as the bar has it (the file's name when `got` is used)."""
         path = got[1] if got else None
         title = ""
         keep = False
@@ -250,7 +253,9 @@ class LinkBar(QFrame):
             if fp and fp in known:
                 raise ytdl.DownloadError(_("It's already in your Sounds as “{name}”.",
                                            name=known[fp]))
-            meta, data = import_file(str(path), color)
+            # named after the video, in a folder for the site: YouTube/<title>.flac
+            meta, data = import_file(str(path), color, name=title or shown,
+                                     folder=site_folder(url))
             if (pic := thumbs.find_in(Path(path).parent)) is not None:
                 meta.image = thumbs.store(pic, meta.id)   # the video's thumbnail
             self.engine.prepare(meta.id, data)

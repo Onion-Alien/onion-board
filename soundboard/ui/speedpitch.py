@@ -112,7 +112,7 @@ class RevMeter(QWidget):
         if hot:
             f.setPointSizeF(7)
             p.setFont(f)
-            p.drawText(QRectF(c.x() - 60, c.y() + 25, 120, 14), Qt.AlignCenter, _("REDLINE"))
+            p.drawText(QRectF(c.x() - 60, c.y() + 25, 120, 14), Qt.AlignCenter, _("Redline"))
         p.end()
 
 

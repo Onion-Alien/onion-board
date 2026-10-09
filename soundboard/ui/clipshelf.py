@@ -221,7 +221,7 @@ class ClipShelf(QWidget):
         data = self._audio(picked[0])
         if data is not None:
             clipeditor.set_clipboard(data)
-            self.title.setText(_("Saved clips ({n}) · copied “{name}” — Ctrl+V pastes it in "
+            self.title.setText(_("Saved clips ({n}) · copied “{name}”: Ctrl+V pastes it in "
                                  "an editor or on the Sounds tab",
                                  n=len(self.shelf.clips), name=picked[0].name))
 
