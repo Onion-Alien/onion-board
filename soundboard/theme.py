@@ -12,8 +12,8 @@ from pathlib import Path
 from string import Template
 
 from PySide6.QtCore import QObject, QPointF, QRectF, Qt
-from PySide6.QtGui import (QColor, QIcon, QImage, QLinearGradient, QPainter, QPainterPath,
-                           QPen, QPixmap, QTransform)
+from PySide6.QtGui import (QBrush, QColor, QIcon, QImage, QLinearGradient, QPainter,
+                           QPainterPath, QPen, QPixmap, QRadialGradient, QTransform)
 from shiboken6 import isValid as qt_valid
 
 from soundboard.i18n import _
@@ -816,7 +816,8 @@ QFrame#setcard QPushButton#primary[busy="true"]:hover { background:$inset; color
 LIVE_NAMES = ("power", "onair", "pill")
 LIVE_STYLE = Template("""
 QPushButton#power:checked, QPushButton#onair:checked {
-    background:$live; border:1px solid $live_hi; color:$on_live; }
+    background:qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 $live_top, stop:1 $live);
+    border:1px solid $live_hi; color:$on_live; }
 QPushButton#onair:checked { border-color:transparent; }
 QPushButton#power:checked:hover, QPushButton#onair:checked:hover { background:$live_hi; }
 QPushButton#pill[state="ok"] { color:$live_text; background:transparent; }
@@ -826,7 +827,123 @@ QPushButton#pill[state="ok"] { color:$live_text; background:transparent; }
 def live_sheet() -> str:
     """The live rules in the current colours, as a widget's own stylesheet (it wins
     over the app's, so it also beats the cards' generic `:checked` rules)."""
-    return LIVE_STYLE.substitute(T)
+    return LIVE_STYLE.substitute(T, live_top=_mix(T["live"], "#ffffff", 0.16))
+
+
+# Depth on top of the flat theme colours: the window fades from a faint glow of the
+# accent behind the logo to a darker foot, cards and buttons catch a little light on
+# their top edge, the bars float a touch see-through, and a fine grain keeps big
+# empty areas from looking like flat plastic. All of it is worked out from each
+# theme's own colours, so every theme gets it. High Contrast stays flat.
+POLISH_STYLE = Template("""
+QWidget#root { background:qradialgradient(cx:0.08, cy:0, radius:1.15, fx:0.08, fy:0,
+    stop:0 $bg_glow, stop:0.45 $bg, stop:1 $bg_foot); }
+QWidget#root[grain="true"] { background-image:url("$grain"); }
+QWidget#root QTabWidget, QWidget#root QTabBar, QWidget#root QStackedWidget,
+QWidget#root QStackedWidget > QWidget, QWidget#root .QWidget { background:transparent; }
+QLabel { background:transparent; }   /* over the gradient: no flat box behind text */
+QToolTip { background:$card; }
+QFrame#card, QFrame#setcard, QFrame#fxcard {
+    background:qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 $card_top, stop:1 $card_base);
+    border-top:1px solid $edge; border-bottom:1px solid $shade; }
+QFrame#card[interactive="true"] { border-left:1px solid transparent; border-right:1px solid transparent; }
+QFrame#card[interactive="true"][hovered="true"] { background:$card_hi; border-color:$border_hi; }
+QFrame#transport, QFrame#deck { background:$glass; border-top:1px solid $edge; }
+QPushButton#primary, QFrame#card QPushButton#primary, QFrame#setcard QPushButton#primary {
+    background:qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 $accent_top, stop:1 $accent); }
+QPushButton#primary:hover, QFrame#card QPushButton#primary:hover,
+QFrame#setcard QPushButton#primary:hover {
+    background:qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 $accent_top_hi, stop:1 $accent_hover); }
+QPushButton#onair:checked, QPushButton#power:checked, QFrame#card QPushButton#power:checked,
+QFrame#setcard QPushButton#power:checked {
+    background:qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 $live_top, stop:1 $live); }
+""")
+
+
+def _rgba(colour: str, alpha: float) -> str:
+    c = QColor(colour)
+    return f"rgba({c.red()}, {c.green()}, {c.blue()}, {round(alpha * 255)})"
+
+
+def polish_tokens(tk: dict[str, str], light: bool) -> dict[str, str]:
+    """The extra shades POLISH_STYLE paints with, from theme tokens `tk`."""
+    black, white = "#000000", "#ffffff"
+    panel = tk["panel"]
+    return dict(
+        tk,
+        bg_glow=_mix(tk["bg"], tk["accent"], 0.05 if light else 0.09),
+        bg_foot=_mix(tk["bg"], black, 0.04 if light else 0.28),
+        card_top=_mix(panel, white, 0.5) if light else _mix(panel, tk["text_hi"], 0.04),
+        card_base=panel,
+        edge=white if light else _mix(panel, tk["text_hi"], 0.11),
+        shade=_mix(panel, black, 0.08 if light else 0.35),
+        glass=_rgba(panel, 0.86),
+        accent_top=_mix(tk["accent"], white, 0.16),
+        accent_top_hi=_mix(tk["accent_hover"], white, 0.16),
+        live_top=_mix(tk["live"], white, 0.16),
+        grain=_grain_url(light),
+    )
+
+
+def polished(name: str | None = None) -> bool:
+    """Whether theme `name` (default: the current one) gets POLISH_STYLE's depth."""
+    return (name or current_name) not in OUTLINED
+
+
+_grain_pixmaps: dict[bool, QPixmap] = {}
+
+
+def paint_window_bg(p: QPainter, rect, origin: QPointF, width: float, height: float) -> None:
+    """Paint `rect` the way the window's own background looks (POLISH_STYLE's glow,
+    foot and grain), for a widget that paints its own background to stay opaque. The
+    window's top left is at `origin` in the painter's coordinates and it is
+    `width` x `height`: the same gradient QWidget#root gets from the stylesheet."""
+    if not polished():
+        p.fillRect(rect, QColor(T["bg"]))
+        return
+    light = is_light()
+    pt = polish_tokens(T, light)
+    g = QRadialGradient(QPointF(0.08, 0), 1.15)
+    for at, key in ((0, "bg_glow"), (0.45, "bg"), (1, "bg_foot")):
+        g.setColorAt(at, QColor(pt[key]))
+    brush = QBrush(g)
+    brush.setTransform(QTransform().translate(origin.x(), origin.y()).scale(width, height))
+    p.fillRect(rect, brush)
+    grain = _grain_pixmaps.get(light)
+    if grain is None:
+        grain = _grain_pixmaps[light] = QPixmap.fromImage(_grain_image(light))
+    tile = QBrush(grain)
+    tile.setTransform(QTransform().translate(origin.x(), origin.y()))
+    p.fillRect(rect, tile)
+
+
+def _grain_image(light: bool, size: int = 96) -> QImage:
+    """A tile of fine film grain: specks of white and black at a few percent opacity,
+    the same every time (a fixed seed), so it tiles without a visible seam."""
+    import random
+    rng = random.Random(7)
+    img = QImage(size, size, QImage.Format_ARGB32)
+    img.fill(Qt.transparent)
+    peak = 7 if light else 10
+    for y in range(size):
+        for x in range(size):
+            a = rng.randint(0, peak)
+            if a > 2:
+                v = 255 if rng.random() < 0.5 else 0
+                img.setPixelColor(x, y, QColor(v, v, v, a))
+    return img
+
+
+def _grain_url(light: bool) -> str:
+    folder = Path(tempfile.gettempdir()) / "onionboard-ui"
+    path = folder / f"grain-{'light' if light else 'dark'}.png"
+    try:
+        folder.mkdir(exist_ok=True)
+        if not path.exists():
+            _grain_image(light).save(str(path))
+    except OSError:
+        return ""
+    return path.as_posix()
 
 
 def _check_image(colour: str, size: int) -> QImage:
@@ -1043,6 +1160,8 @@ def stylesheet(name: str | None = None) -> str:
     css = STYLE.substitute(tk)
     if outlined:
         css += OUTLINE_STYLE.substitute(tk)
+    else:
+        css += POLISH_STYLE.substitute(polish_tokens(tk, is_light(name)))
     if tk.get("texture") and (url := _texture_url(tk["texture"], tk["panel"])):
         css += ("QFrame#card, QFrame#transport, QFrame#deck, QFrame#setcard "
                 f'{{ background-image:url("{url}"); }}\n')
