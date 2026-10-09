@@ -63,6 +63,10 @@ dialog and button from it. The rules people trip over most:
   dialogs ≤ ~620 px; tiles in fixed-size grids that scroll down.
 - **Buttons on the left, the main one first** (`[Send] [Cancel]`), one filled
   `#primary` button per card or dialog at most.
+- **Icons and pop-ups over long buttons**: a button is one to three words; anything
+  a picture says is an icon with a tooltip; how-to text goes behind an ⓘ pop-up.
+- **Cards look designed, not like a form**: heading icon, status pill, choice tiles,
+  pictures, an inner area; never a heading over stacked plain rows.
 - Theme tokens only, never a hex colour; ticks and on-states stay the accent colour.
 - Sentence case, no long dashes, `23%`, every string through `_()`.
 - Before sending pictures of a change, look at every state yourself for empty space,
