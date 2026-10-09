@@ -1,7 +1,7 @@
 # Free sound packs
 
-Ready-made boards anyone can add to Onion Board in one click: **Sounds tab → Free packs**
-(or the *Or get a free sound pack* button on an empty board). The list the app shows is
+Ready-made boards anyone can add to Onion Board in one click: **Sounds tab → Backup →
+Free sound packs…**. The list the app shows is
 [catalog.json](catalog.json).
 
 ## Share your own pack
@@ -10,10 +10,10 @@ Ready-made boards anyone can add to Onion Board in one click: **Sounds tab → F
    pictures and hotkeys if you like.
 2. **Backup → Export this category…** saves it as a zip.
 3. Open the [Share a sound pack](https://github.com/Onion-Alien/onion-board/issues/new?template=sound-pack.yml)
-   form (Free packs → *Share a pack* opens it too), drag the zip in, and say where each
-   sound comes from.
+   form (*Share a pack* in the Free sound packs window opens it too), drag the zip
+   in, and say where each sound comes from.
 
-Once it's checked, it shows up in everyone's Free packs window. No app update needed.
+Once it's checked, it shows up in everyone's Free sound packs window. No app update needed.
 
 ## The rules
 

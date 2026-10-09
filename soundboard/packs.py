@@ -1,5 +1,5 @@
 """Free sound packs: ready-made boards (a GM's tavern and battle sounds…) anyone can add
-in one click from the Sounds tab's *Free packs* button.
+in one click from the Sounds tab's Backup menu (*Free sound packs…*).
 
 The list is packs/catalog.json in the project's repository, read fresh each time the
 window opens (a copy of the packs known when this version was built, BUILT_IN, stands

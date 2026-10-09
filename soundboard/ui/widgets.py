@@ -11,8 +11,7 @@ from PySide6.QtCore import (QEvent, QMimeData, QObject, QPoint, QPointF, QRectF,
                             QTimer, QVariantAnimation, Signal)
 from PySide6.QtGui import (QColor, QDrag, QFont, QFontMetrics, QLinearGradient, QPainter,
                            QPainterPath, QPen)
-from PySide6.QtWidgets import (QAbstractButton, QGridLayout, QHBoxLayout, QLabel,
-                               QPushButton, QScrollArea,
+from PySide6.QtWidgets import (QAbstractButton, QGridLayout, QHBoxLayout, QLabel, QScrollArea,
                                QSlider, QStackedWidget, QStyle, QTabWidget, QVBoxLayout,
                                QWidget)
 
@@ -956,7 +955,6 @@ class PadGrid(QWidget):
     reorder = Signal(str, int)   # sound id, new index
     files_dropped = Signal(list)
     image_dropped = Signal(str, str)   # sound id, picture file dropped on its pad
-    packs_wanted = Signal()   # the empty board's "Get a free sound pack"
     HOW_TO = _("Drop sound files here\nor click  ＋ Add sounds\n\n"
                "mp3 · wav · ogg · flac\nm4a · even video files")
     NO_MATCH = _("No sounds match the search\nor this category")
@@ -993,13 +991,6 @@ class PadGrid(QWidget):
         self.empty_text.setWordWrap(True)   # and wraps rather than losing both ends
         self.empty_text.setObjectName("empty")
         ev.addWidget(self.empty_text)
-        # a whole board in one click, for someone who has no sounds to drop yet
-        self.empty_packs = QPushButton(_("Or get a free sound pack"))
-        self.empty_packs.setToolTip(_("Ready-made boards (a tabletop GM's sounds and "
-                                      "more), free to use anywhere"))
-        self.empty_packs.clicked.connect(self.packs_wanted)
-        ev.addSpacing(10)
-        ev.addWidget(self.empty_packs, 0, Qt.AlignHCenter)
         self._cols = 0
         self._shape = None       # (columns, pad width) last laid out
         self._placed = None      # (columns, the pads shown) in the grid now
@@ -1122,7 +1113,6 @@ class PadGrid(QWidget):
             for p in self.pads:
                 p.hide()
             self.empty_text.setText(self.NO_MATCH if self.pads else self.HOW_TO)
-            self.empty_packs.setVisible(not self.pads)
             # across the whole width, however wide that is now (a fixed width here kept
             # the grid as wide as the window once was: a shrunk window showed nothing)
             grid.setAlignment(Qt.AlignTop)

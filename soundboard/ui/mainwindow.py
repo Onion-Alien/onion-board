@@ -1115,7 +1115,6 @@ class MainWindow(QMainWindow):
         mm = QMenu(more)
         icons.set_icon(mm.addAction(_("Import a backup or sound pack…"), self.import_dialog),
                        "folder")
-        # here too, for when the window's too narrow for its button
         icons.set_icon(mm.addAction(_("Free sound packs…"), self.show_packs), "download")
         om = mm.addMenu(_("Import from another soundboard"))
         for src in otherboards.sources():
@@ -1129,11 +1128,6 @@ class MainWindow(QMainWindow):
                        "folder")   # here too, for when the window's too narrow for its button
         mm.aboutToShow.connect(lambda: self._act_export_cat.setEnabled(bool(self.cfg.category)))
         more.setMenu(mm)
-        self.btn_packs = QPushButton(_("Free packs"))
-        self.btn_packs.setToolTip(_("Ready-made boards of free sounds (a tabletop GM's "
-                                    "and more): add one in a click, or share your own"))
-        icons.set_icon(self.btn_packs, "download")
-        self.btn_packs.clicked.connect(self.show_packs)
         self.btn_bin = QPushButton()
         self.btn_bin.setToolTip(_("Sounds you removed: bring them back, exactly as they were"))
         icons.set_icon(self.btn_bin, "trash")
@@ -1145,7 +1139,6 @@ class MainWindow(QMainWindow):
         self.btn_folder.clicked.connect(self.open_sounds_folder)
         tb.addWidget(add)
         tb.addWidget(self.btn_record)
-        tb.addWidget(self.btn_packs)
         tb.addWidget(self.btn_folder)
         tb.addWidget(more)
         tb.addWidget(self.btn_bin)
@@ -1216,7 +1209,6 @@ class MainWindow(QMainWindow):
         left.addWidget(self.ytresults, 1)
 
         self.grid = PadGrid()
-        self.grid.packs_wanted.connect(self.show_packs)
         self.grid.pad_w = c.pad_width
         self.grid.listed = c.pad_view == "list"
         self.grid._spacing()
@@ -7307,8 +7299,6 @@ class MainWindow(QMainWindow):
         f.add(35, "w", r.hide(self.btn_more))   # also in Settings → General
         f.add(15, "w", r.icon_only(self.btn_folder))
         f.add(33, "w", r.hide(self.btn_folder))   # also in the Backup menu
-        f.add(36, "w", r.icon_only(self.btn_packs))
-        f.add(72, "w", r.hide(self.btn_packs))   # also in the Backup menu and on an empty board
         f.add(60, "w", self._tab_icons_only)
         f.add(70, "w", r.hide(self.btn_check, *self._mixer_send, *self._mixer_others))
         f.add(80, "w", r.hide(self.pill))

@@ -1,5 +1,5 @@
-"""The Sounds tab's *Free packs* window: ready-made boards anyone can add in one click
-(soundboard.packs), and where to share one of your own."""
+"""The *Free sound packs* window (Sounds tab → Backup): ready-made boards anyone can
+add in one click (soundboard.packs), and where to share one of your own."""
 from __future__ import annotations
 
 import logging

@@ -191,12 +191,3 @@ def test_free_packs_hands_a_download_to_the_windows_import(window, monkeypatch, 
     monkeypatch.setattr(net, "allowed", lambda f: False)   # no list fetch
     window.show_packs()
     assert got == [[str(tmp_path / "horror.zip")]]
-
-
-def test_an_empty_board_offers_a_pack(window, qapp):
-    grid = window.grid
-    assert not grid.empty_packs.isVisibleTo(grid)   # it has sounds
-    for sid in ("s0", "s1"):
-        window.remove_sound(sid)
-    window._finish_removals()
-    assert process_events(qapp, lambda: grid.empty_packs.isVisibleTo(grid), 5)

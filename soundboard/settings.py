@@ -2267,7 +2267,7 @@ class SettingsDialog(QDialog):
         "sounds_web": _("Searches and pasted links on the Sounds tab go to that site, and "
                         "search results show its thumbnails. Off: the search bar only "
                         "searches your own sounds."),
-        "sound_packs": _("The Sounds tab's Free packs button reads the list of packs "
+        "sound_packs": _("Free sound packs (Sounds tab → Backup) reads the list of packs "
                          "from GitHub, and downloads one from there when you press Add."),
         "ytdlp_update": _("Fetches a newer yt-dlp from PyPI when you press Update now or "
                           "Reset downloader (Updates page), or by itself if you ticked "

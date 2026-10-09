@@ -2,9 +2,9 @@
 
 ## Unreleased
 
-- **Free sound packs.** A new *Free packs* button on the Sounds tab (and on an
-  empty board) adds a whole ready-made board in one click, starting with the
-  67-sound GM pack for tabletop games. Made your own? *Share a pack* sends it in;
+- **Free sound packs.** *Backup → Free sound packs…* on the Sounds tab adds a
+  whole ready-made board in one click, starting with the 67-sound GM pack for
+  tabletop games. Made your own? *Share a pack* sends it in;
   once its sounds are checked as CC0 it shows up for everyone. It has its own
   switch in Settings → Privacy & security.
 
