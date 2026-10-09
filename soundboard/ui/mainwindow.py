@@ -5470,13 +5470,13 @@ class MainWindow(QMainWindow):
             return a
         a_stop = add(("stop",), _("Stop")) if self.engine.state(sid) else None
         a_next = add(("play",), _("Play next"), _("Plays it after the sounds playing now"))
+        vol_before = m.volume
+        menu.addAction(self._volume_action(menu, m))
         menu.addSeparator()
         a_edit = add(("edit",), _("Edit…"), _("Name, volume, hotkey, what a press does, loop, "
                                               "fades, wait first, cooldown, colour"))
         a_ren = add(("rename",), _("Rename…"), _("Just the name (F2 on the pad does it too)"))
         a_fx = add(("wave",), _("Effects…"), _("Speed, pitch, EQ, boost"))
-        vol_before = m.volume
-        menu.addAction(self._volume_action(menu, m))
         a_hk_clear = None
         if m.hotkey:
             hk = menu.addMenu(icons.icon("keyboard"), _("Hotkey: {hotkey}",

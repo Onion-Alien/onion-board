@@ -400,7 +400,7 @@ def test_pad_menu_is_short_grouped_and_shows_the_hotkey(window, monkeypatch):
     monkeypatch.setattr(mainwindow.HotkeyDialog, "exec",
                         lambda self: setattr(self, "result_combo", "ctrl+alt+7") or True)
     w.pad_menu("s0", None)
-    assert shown == ["Play next", "---", "Edit…", "Rename…", "Effects…", "Volume",
+    assert shown == ["Play next", "Volume", "---", "Edit…", "Rename…", "Effects…",
                      "Set hotkey…", "Categories", "Add picture", "---", "Duplicate",
                      "Export…", "Show the file in its folder", "Remove"]
     assert w.meta("s0").hotkey == "ctrl+alt+7"
