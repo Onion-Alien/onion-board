@@ -558,6 +558,17 @@ class MainWindow(QMainWindow):
             QTimer.singleShot(1200, self._show_load_note)
         QTimer.singleShot(AUTO_MIC_UPDATE_MS, self, self._auto_mic_update)
         QTimer.singleShot(TLS_WARM_MS, self, self._warm_tls)
+        QTimer.singleShot(TLS_WARM_MS, self, self._precompile_addons)
+
+    def _precompile_addons(self):
+        """The add-ons' compiled files (modules.precompile), written on a thread while
+        nothing plays, so opening the Triggers tab doesn't skip a sound. Once per
+        add-on version: after that it only checks they're there."""
+        from soundboard import modules
+        engine = self.engine
+        threading.Thread(target=lambda: modules.precompile(modules.discover(),
+                                                           engine.any_playing),
+                         daemon=True, name="addon-precompile").start()
 
     def _warm_tls(self, tries: int = 0):
         """Qt sets up its TLS (reads Windows' certificates) on the first https request,

@@ -118,12 +118,14 @@ def test_a_module_zip_installs_and_replaces_the_old_copy(tmp_path):
     src = make_module(tmp_path / "src1" / "onion-watch", package="fake", version="1.0")
     info = modules.install_zip(zip_of(src, tmp_path / "v1.zip"), "onion-watch", "triggers", base)
     assert info.version == "1.0" and info.path == base / "onion-watch" and not info.error
-    (base / "onion-watch" / "fake" / "__pycache__").mkdir()   # left by running it
+    cache = base / "onion-watch" / "fake" / "__pycache__"
+    (cache / "old.cpython-313.pyc").write_bytes(b"stale")   # left by the old copy
     src2 = make_module(tmp_path / "src2" / "onion-watch", package="fake", version="2.0")
     info = modules.install_zip(zip_of(src2, tmp_path / "v2.zip"), "onion-watch", "triggers",
                                base)
     assert info.version == "2.0"
-    assert not (base / "onion-watch" / "fake" / "__pycache__").exists()   # a clean copy
+    assert not (cache / "old.cpython-313.pyc").exists()   # a clean copy, compiled afresh
+    assert list(cache.glob("board.*.pyc"))
     assert sorted(p.name for p in base.parent.iterdir()) == ["modules"]   # no staging left
     assert [m.version for m in modules.discover([base])] == ["2.0"]
 
@@ -223,3 +225,40 @@ def test_the_build_ships_what_every_released_onion_watch_imports():
                 f"build.ps1 excludes {name}, which Onion Watch {version} needs")
             if name.startswith("scipy."):   # scipy parts ship only when named
                 assert name in hidden, f"build.ps1 doesn't ship {name} (Onion Watch {version})"
+
+
+def test_an_add_on_gets_its_compiled_files_once_and_only_while_nothing_plays(tmp_path, pkgname):
+    """The packaged app never writes __pycache__ itself: without them the Triggers
+    tab's first open compiled Onion Watch on the UI thread and a sound skipped."""
+    import importlib.util
+    make_module(tmp_path / "onion-watch", package=pkgname)
+    (m,) = modules.discover([tmp_path])
+    src = tmp_path / "onion-watch" / pkgname / "board.py"
+    pyc = importlib.util.cache_from_source(str(src))
+    playing = iter([True, False])   # a sound plays at first: the file waits for it
+    waits = []
+
+    def wait():
+        waits.append(1)
+        return next(playing, False)
+    import soundboard.modules as mod
+    sleep, mod.time.sleep = mod.time.sleep, lambda s: None
+    try:
+        assert modules.precompile([m], wait) == 2   # __init__ and board
+    finally:
+        mod.time.sleep = sleep
+    assert len(waits) == 3   # first file: playing, then free; second: free
+    assert __import__("os").path.exists(pyc)
+    assert modules.precompile([m], lambda: True) == 0   # up to date: nothing to do
+    assert modules.load_package(m).create("host")[2] == "1.0"
+
+
+def test_an_installed_add_on_comes_compiled(tmp_path):
+    src = make_module(tmp_path / "src" / "onion-watch", package="fakewatch_inst")
+    z = tmp_path / "w.zip"
+    with zipfile.ZipFile(z, "w") as zf:
+        for p in src.rglob("*"):
+            zf.write(p, p.relative_to(src.parent).as_posix())
+    modules.install_zip(z, "onion-watch", "triggers", tmp_path / "modules")
+    assert list((tmp_path / "modules" / "onion-watch" / "fakewatch_inst").glob(
+        "__pycache__/board.*.pyc"))

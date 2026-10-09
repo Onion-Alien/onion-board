@@ -302,6 +302,37 @@ def _load_all(package: str, pkg_dir: Path):
             log.warning("module file %s didn't load", name, exc_info=True)
 
 
+def precompile(infos: list[ModuleInfo], wait: Callable[[], bool] = lambda: False) -> int:
+    """Write the compiled copy (__pycache__) of each loaded-into-the-app add-on's files
+    that hasn't one yet, or an old one. The packaged app never writes them by itself
+    (PyInstaller turns that off), so the first open of the Triggers tab compiled all
+    of Onion Watch on the UI thread, every run: ~0.6 s holding Python's lock, and a
+    sound playing skipped. With them it loads in ~0.4 s and nothing skips. Runs off
+    the UI thread; a file is only compiled while `wait()` is False (nothing plays),
+    as compiling one still holds the lock for a few tens of ms. Returns how many."""
+    import py_compile
+    done = 0
+    for info in infos:
+        if info.kind not in PACKAGE_KINDS or not info.package:
+            continue
+        for src in sorted((info.path / info.package).rglob("*.py")):
+            try:
+                pyc = Path(importlib.util.cache_from_source(str(src)))
+                if pyc.exists() and pyc.stat().st_mtime >= src.stat().st_mtime:
+                    continue
+                for _try in range(600):   # up to ~10 min of sounds playing, then anyway
+                    if not wait():
+                        break
+                    time.sleep(1)
+                py_compile.compile(str(src), cfile=str(pyc), doraise=True)
+                done += 1
+            except Exception:  # noqa: BLE001 - it loads from source as before
+                log.debug("couldn't precompile %s", src, exc_info=True)
+    if done:
+        log.info("precompiled %d add-on files", done)
+    return done
+
+
 def load_package(info: ModuleInfo):
     """Load a "triggers" or "remote" module's package from its folder and return its
     `entry` module (which has create(host)). Loaded once per run: a copy already loaded
@@ -414,6 +445,7 @@ def install_zip(path: Path, module_id: str, kind: str,
         shutil.rmtree(staging, ignore_errors=True)
     info = _read(dest)
     log.info("installed module %s %s into %s", module_id, info.version, dest)
+    precompile([info])   # (on the download's thread) it's loaded straight after
     return info
 
 
