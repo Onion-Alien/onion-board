@@ -957,7 +957,7 @@ class PadGrid(QWidget):
             lines=(_("add a sound?"), _("pleeease?"), _("it's so quiet…"),
                    _("drop one on me!"), _("just one sound?"), _("I'm bored…")),
             hope_lines=(_("yes! drop it!"), _("ooh, for me?!")),
-            joy_lines=(_("yay!!"), _("↑ Add sounds!"), _("hehe!")))
+            joy_lines=(_("yay!!"), _("↑ Add sounds!"), _("hehe!")), pong=True)
         self.bun.setToolTip(_("Bun is waiting for some sounds"))
         ev.addWidget(self.bun, 0, Qt.AlignHCenter)
         self.empty_text = QLabel(self.HOW_TO)

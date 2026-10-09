@@ -16,6 +16,11 @@ him hop for joy (`joy_lines`) and emits `clicked`.
 he went, and he comes back with a hammer and a plank and hammers away until
 `stop_building(ok)`, which ends in a celebration (ok) or back to how he was.
 
+`pong=True` hides an Easter egg: poke him a few times quickly and he gets cross, and
+poke him `ANNOY_CLICKS` times and he storms off the same way, comes back with a
+baseball bat and challenges you to Pong (ui/bunpong.py) over the page.
+Closing the game calls `calm_down()`, and he's back to how he was.
+
 The widget is bigger than Bun himself so there's room around him for the notes,
 which also gives him even breathing room in a layout. The timer only runs while
 he's on screen, always at the same 30 fps (a slower idle pace made the bob judder
@@ -32,6 +37,7 @@ from PySide6.QtGui import QColor, QFont, QPainter, QPainterPath, QPen
 from PySide6.QtWidgets import QSizePolicy, QWidget
 
 from soundboard.bunny import H, INK, W, WOOD, draw_bunny, music_note, sparkle
+from soundboard.i18n import _
 from soundboard.ui import appstate
 
 NOTE_COLORS = ("#7c5cff", "#a48bff", "#1fb6ff", "#ff8fae", "#13ce66")
@@ -56,6 +62,10 @@ FPS = 30
 FAST_MS = 1000 // FPS
 BUBBLE = QColor("#fffaf0")
 BEG = 2.8          # how long a begging line stays up, seconds
+# the Pong Easter egg: this many clicks inside ANNOY_WINDOW seconds and he fetches
+# his bat; from GRUMPY_AT on he's already getting cross
+ANNOY_CLICKS, ANNOY_WINDOW, GRUMPY_AT = 7, 3.0, 4
+TAUNT = 1.5        # how long he taps the bat before the game opens, seconds
 
 
 class _Note:
@@ -83,11 +93,18 @@ class _Puff:
 
 class BunnyWidget(QWidget):
     clicked = Signal()
+    challenge = Signal()   # (pong=True) back with his bat: open the game
 
     def __init__(self, prop: str | None = None, height: int = 110, pad: int = 26,
                  celebrate: bool = False, parent=None, *, sad: float = 0.0,
-                 lines=(), hope_lines=(), joy_lines=()):
+                 lines=(), hope_lines=(), joy_lines=(), pong: bool = False):
         super().__init__(parent)
+        self.pong = pong
+        self._pokes: list[float] = []   # recent click times (the Pong Easter egg)
+        self._angry = 0.0               # how cross he looks right now (smoothed)
+        self._cross_until = 0.0         # ... and stays cross until then
+        self._act_kind = "build"        # which act is running: "build" or "bat"
+        self._dared = False             # the bat act has sent `challenge`
         self.lines, self.hope_lines, self.joy_lines = (tuple(lines), tuple(hope_lines),
                                                        tuple(joy_lines))
         # room either side for the speech bubble (both, so he stays centred)
@@ -129,6 +146,8 @@ class BunnyWidget(QWidget):
         self._timer = QTimer(self)
         self._timer.setInterval(FAST_MS)
         self._timer.timeout.connect(self._step)
+        if pong:
+            self.challenge.connect(self._open_game)
         appstate.pause_in_background(self, self._resume, self._timer.stop)
 
     def sizeHint(self) -> QSize:
@@ -146,7 +165,7 @@ class BunnyWidget(QWidget):
 
     def burst(self, n: int = 6):
         """Throw a handful of notes out at once."""
-        for _ in range(n):
+        for _i in range(n):
             self._spawn(1.3)
 
     def hope(self, on: bool):
@@ -166,9 +185,53 @@ class BunnyWidget(QWidget):
 
     def mousePressEvent(self, ev):
         if ev.button() == Qt.LeftButton and self.joy_lines:
-            self.cheer()
+            if not self.poke():
+                self.cheer()
             self.clicked.emit()
         super().mousePressEvent(ev)
+
+    def poke(self) -> bool:
+        """A click, for the Pong Easter egg: True if it made him cross (rather than
+        happy). The ANNOY_CLICKS-th quick one sends him off for his bat."""
+        if not self.pong:
+            return False
+        if self.building:
+            return True   # mid-act: more clicks do nothing
+        now = time.monotonic()
+        self._pokes = [t for t in self._pokes if now - t < ANNOY_WINDOW] + [now]
+        n = len(self._pokes)
+        if n < GRUMPY_AT:
+            return False
+        self._cross_until = now + ANNOY_WINDOW
+        if n >= ANNOY_CLICKS:
+            self.fetch_bat()
+        else:
+            grumpy = (_("hey!"), _("quit it!"), _("stop poking!"), _("okay, that's it…"))
+            self.say = grumpy[min(n - GRUMPY_AT, len(grumpy) - 1)]
+            self._say_until = now + 1.2
+            self._joy_at = -1.0
+        return True
+
+    def fetch_bat(self):
+        """He storms off and comes back with a baseball bat, then sends `challenge`."""
+        self._pokes.clear()
+        self._act_kind, self._dared = "bat", False
+        self._act_t, self._blows = 0.0, 0
+        self.celebrate = False
+        self.say = ""
+
+    def calm_down(self):
+        """Back to how he was before the game (it closed)."""
+        self._pokes.clear()
+        self._act_t, self._act_kind, self._dared = -1.0, "build", False
+        self._cross_until = 0.0
+        self.prop, self.celebrate = self._home_prop, self._home_celebrate
+        self.say = ""
+
+    def _open_game(self):
+        from soundboard.ui import bunpong   # only ever needed once someone finds it
+        self.say = ""   # (his taunt would poke out from under the game)
+        bunpong.open_for(self)
 
     def _say(self, lines, secs: float):
         if lines:
@@ -183,24 +246,26 @@ class BunnyWidget(QWidget):
         """Start the building act (see the module docstring). Harmless if running."""
         if self.building:
             return
+        self._act_kind = "build"
         self._act_t, self._blows = 0.0, 0
         self.celebrate = False
 
     def stop_building(self, ok: bool):
         """End the act: celebrate if `ok`, otherwise go back to the usual pose."""
-        self._act_t = -1.0
+        self._act_t, self._act_kind = -1.0, "build"
         self.prop = "star" if ok else self._home_prop
         self.celebrate = ok or self._home_celebrate
         if ok:
             self.burst(8)
 
     def act_phase(self) -> str | None:
-        """'dash' (running off), 'cloud' (off screen), 'back', 'hammer', or None."""
+        """'dash' (running off), 'cloud' (off screen), 'back', then 'hammer' (building)
+        or 'bat' (the Pong dare), or None."""
         t = self._act_t
         if t < 0:
             return None
         return ("dash" if t < DASH_END else "cloud" if t < CLOUD_END else
-                "back" if t < BACK_END else "hammer")
+                "back" if t < BACK_END else "hammer" if self._act_kind == "build" else "bat")
 
     def _swing(self) -> float:
         """Hammer position, 0 (raised) .. 1 (on the plank): slow lift, fast strike."""
@@ -219,6 +284,8 @@ class BunnyWidget(QWidget):
 
     def hideEvent(self, ev):
         self._timer.stop()
+        if self._act_kind == "bat" and self.building:   # left the page mid-dare
+            self.calm_down()
         self._level = 0.0
         super().hideEvent(ev)
 
@@ -256,14 +323,21 @@ class BunnyWidget(QWidget):
                 self._puff(r.center().x() + self._rng.uniform(-18, 18),
                            r.center().y() + self._rng.uniform(-10, 18), 40, 9, 0.6)
         elif phase == "back" and before < CLOUD_END:
-            self.prop = "hammer"
+            self.prop = "hammer" if self._act_kind == "build" else "bat"
+        elif phase == "bat":
+            if before < BACK_END:
+                self.say = _("you want some?")
+                self._say_until = time.monotonic() + TAUNT + 0.6
+            elif not self._dared and self._act_t >= BACK_END + TAUNT:
+                self._dared = True
+                self.challenge.emit()
         elif phase == "hammer":
             blows = int((self._act_t - BACK_END) / SWING + 0.3)   # strikes at k = 0.7
             if blows > self._blows:   # just hit the plank: a puff of sawdust, a tink
                 self._blows = blows
                 x = r.left() + r.width() * 1.04    # where the hammer lands
                 y = r.top() + r.height() * 0.9
-                for _ in range(3):
+                for _i in range(3):
                     self._puff(x, y, 26, 4, 0.5)
                 if blows % 2 == 0:
                     n = _Note(x, y - 6, self._rng, 0.6)
@@ -318,7 +392,9 @@ class BunnyWidget(QWidget):
             self._flick_at = now
             self._next_flick = now + self._rng.uniform(4, 9)
         cheering = self._joy_at >= 0 and now - self._joy_at < 1.4
-        target = 0.0 if self._hopeful or cheering else self.sad
+        cross = now < self._cross_until or (self._act_kind == "bat" and self.building)
+        self._angry += (float(cross) - self._angry) * min(1.0, dt * (10 if cross else 2))
+        target = 0.0 if self._hopeful or cheering or cross else self.sad
         self._sad += (target - self._sad) * min(1.0, dt * (8 if target < self._sad else 1.5))
         if self._sad > 0.3 and now >= self._next_sigh:
             self._sigh_at = now
@@ -379,8 +455,14 @@ class BunnyWidget(QWidget):
             swing = self._swing()
             dy += 1.5 * swing    # leans into each blow
             ears += 6 * swing
+        elif phase == "bat":     # taps the bat on his paw, glaring
+            swing = 0.18 * abs(math.sin((self._act_t - BACK_END) * 5))
+            ears -= 8
+        if self._angry > 0.05 and phase in (None, "bat"):   # a cross little shake
+            dx += 1.6 * self._angry * math.sin(t * 40)
         return {"blink": blink, "mouth": self._mouth, "ears": ears, "dy": dy,
-                "dx": dx, "swing": swing, "shown": shown, "sad": self._sad}
+                "dx": dx, "swing": swing, "shown": shown, "sad": self._sad,
+                "angry": self._angry}
 
     # ------------------------------------------------------------------ paint
     def paintEvent(self, ev):
@@ -409,7 +491,7 @@ class BunnyWidget(QWidget):
         if pose["shown"]:
             draw_bunny(p, r.translated(pose["dx"], pose["dy"]), self.prop,
                        blink=pose["blink"], mouth=pose["mouth"], ears=pose["ears"],
-                       swing=pose["swing"], sad=pose["sad"])
+                       swing=pose["swing"], sad=pose["sad"], angry=pose["angry"])
         else:
             self._paint_scuffle(p)
         if self.say and pose["shown"]:
