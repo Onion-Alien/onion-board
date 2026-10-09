@@ -167,7 +167,7 @@ THEMES: dict[str, dict[str, str]] = {
         bg="#1c1714", panel="#251e1a", card="#2d2520", card_hi="#362c26",
         btn="#312822", btn_hover="#3b302a", btn_press="#473a32",
         border="#45382f", border_hi="#6e5a4b", groove="#413429", inset="#171210",
-        text="#efe4da", text_hi="#fbf3ec", muted="#a8927f", faint="#7d6a5b", section="#d0a77f",
+        text="#efe4da", text_hi="#fbf3ec", muted="#a8927f", faint="#7d6a5b", section="#b9b0a8",
         accent="#d4915a", accent_hi="#e0a36e", accent2="#a86a4a", on_accent="#1c120a",
         off="#5a4a3f", badge="#3b302a", badge_text="#e8dccf", **_DARK_STATUS,
     ),
@@ -510,7 +510,7 @@ QPushButton:hover { background:$btn_hover; }
 QPushButton:focus { border-color:$accent; }
 QPushButton#iconbutton { padding:7px 10px; min-width:18px; }
 QPushButton:pressed { background:$btn_press; }
-QPushButton:checked { background:$accent; border-color:$accent; color:$on_accent; }
+QPushButton:checked { background:$btn_press; border-color:$border_hi; color:$text_hi; }
 QPushButton:disabled { color:$muted; }
 QPushButton[busy="true"], QPushButton#primary[busy="true"] { color:$muted; }
 QPushButton#primary { background:$accent; border:none; color:$on_accent; font-weight:600; }
@@ -527,7 +527,7 @@ QPushButton#backhome { background:$danger_bg; border:1px solid $danger_border; c
 QPushButton#backhome:hover { background:$danger_hover; border-color:$danger_text; }
 QPushButton#tabinfo { padding:0; border-radius:8px; background:transparent; border:1px solid transparent; }
 QPushButton#tabinfo:hover { background:$btn_hover; border-color:$border_hi; }
-QPushButton#tabinfo:pressed { background:$btn_press; border-color:$accent; }
+QPushButton#tabinfo:pressed { background:$btn_press; border-color:$border_hi; }
 QPushButton#tabinfo:focus { border-color:$accent; }
 QPushButton#moretabs { padding:4px 10px; border-radius:8px; background:transparent; border:1px solid transparent; color:$muted; }
 QPushButton#moretabs:hover { background:$btn_hover; border-color:$border_hi; color:$text_hi; }
@@ -543,7 +543,7 @@ QFrame#vsep { background:$border; border:none; }
 QLabel#toast { background:$panel; border:1px solid $border_hi;
                border-radius:12px; padding:8px 14px; }
 QFrame#chip { background:$panel; border:1px solid transparent; border-radius:14px; }
-QFrame#chip[sel="true"] { border-color:$accent; }
+QFrame#chip[sel="true"] { border-color:$text_hi; }
 QFrame#chip QPushButton { background:transparent; border:none; padding:2px 6px; }
 QFrame#chip QPushButton#chipname { font-weight:600; }
 QFrame#chip QPushButton#chipstop { border-radius:12px; padding:0; }
@@ -561,12 +561,12 @@ QLabel#statusnote { background:$card_hi; color:$text; border-radius:8px; padding
 QPushButton#pill[state="warn"] { background:$warn_bg; color:$warn_text; }
 QAbstractSpinBox { background:$bg; border:1px solid transparent; border-radius:6px; padding:3px 6px; }
 QAbstractSpinBox:hover { border-color:$border_hi; }
-QAbstractSpinBox:focus { border-color:$accent; }
+QAbstractSpinBox:focus { border-color:$border_hi; }
 QSpinBox::up-button, QSpinBox::down-button { width:0; }
 QSpinBox#pct, QFrame#card QSpinBox#pct { background:transparent; border-color:transparent;
     padding:3px 2px; }
 QSpinBox#pct:hover, QFrame#card QSpinBox#pct:hover { background:$bg; border-color:$border_hi; }
-QSpinBox#pct:focus, QFrame#card QSpinBox#pct:focus { background:$bg; border-color:$accent; }
+QSpinBox#pct:focus, QFrame#card QSpinBox#pct:focus { background:$bg; border-color:$border_hi; }
 QDoubleSpinBox, QSpinBox#stepper { padding-right:2px; }
 QDoubleSpinBox::up-button, QDoubleSpinBox::down-button,
 QSpinBox#stepper::up-button, QSpinBox#stepper::down-button {
@@ -607,8 +607,8 @@ QSlider#seek::groove:horizontal { height:6px; border-radius:3px; }
 QSlider#seek::sub-page:horizontal { border-radius:3px; }
 QLineEdit, QComboBox { background:$card; border:1px solid transparent; border-radius:8px; padding:6px 8px; }
 QLineEdit:hover, QComboBox:hover { background:$card_hi; }
-QLineEdit:focus, QComboBox:focus, QComboBox:on { border-color:$accent; }
-QLineEdit { selection-background-color:$accent; selection-color:$on_accent; }
+QLineEdit:focus, QComboBox:focus, QComboBox:on { border-color:$border_hi; }
+QLineEdit { selection-background-color:$btn_press; selection-color:$text_hi; }
 QComboBox { padding:6px 10px; padding-right:6px; combobox-popup:0; }
 QComboBox::drop-down { subcontrol-origin:padding; subcontrol-position:center right;
     width:26px; border:none; background:transparent; }
@@ -622,13 +622,13 @@ QFrame#card QPushButton#primary:hover { background:$accent_hover; }
 QFrame#card QPushButton:focus { border-color:$accent; }
 QFrame#card QComboBox:disabled, QFrame#card QLineEdit:disabled { background:$inset; }
 QFrame#card QAbstractSpinBox { background:$bg; }
-QFrame#card QPushButton:checked { background:$accent; }
+QFrame#card QPushButton:checked { background:$btn_press; }
 QFrame#card QPushButton#miccheck:checked { background:#d32f2f; }
 QComboBox QAbstractItemView { background:$card; color:$text; border:1px solid $border_hi;
-    padding:4px; outline:0; selection-background-color:$accent; selection-color:$on_accent; }
+    padding:4px; outline:0; selection-background-color:$btn_press; selection-color:$text_hi; }
 QComboBox QAbstractItemView::item { min-height:28px; padding:0 10px; border-radius:6px; }
 QComboBox QAbstractItemView::item:hover { background:$btn_hover; color:$text_hi; }
-QComboBox QAbstractItemView::item:selected { background:$accent; color:$on_accent; }
+QComboBox QAbstractItemView::item:selected { background:$btn_hover; color:$text_hi; }
 QComboBox QAbstractItemView::item:disabled { color:$faint; }
 QPushButton::menu-indicator { image:url("$down"); width:9px; height:9px;
     subcontrol-origin:padding; subcontrol-position:center right; right:2px; }
@@ -641,16 +641,16 @@ QSlider::handle:horizontal { background:$text_hi; border:1px solid transparent; 
    and bottom off flat */
 QSlider:horizontal { min-height:20px; }
 QSlider:vertical { min-width:20px; }
-QSlider::handle:hover, QSlider::handle:pressed { border-color:$accent; }
+QSlider::handle:hover, QSlider::handle:pressed { border-color:$border_hi; }
 QSlider::handle:disabled { background:$inset; }
 QSlider::sub-page:horizontal:disabled, QSlider::add-page:vertical:disabled { background:$off; }
 /* dim="true": a control that's live but does nothing right now (the EQ while it's off) */
 QSlider[dim="true"]::sub-page:horizontal, QSlider[dim="true"]::add-page:vertical { background:$off; }
 QComboBox[dim="true"] { color:$muted; }
 QCheckBox::indicator { width:16px; height:16px; border-radius:4px; border:1px solid $off; background:$card; }
-QCheckBox::indicator:checked { background:$accent; border-color:$accent; image:url("$check"); }
+QCheckBox::indicator:checked { background:$text_hi; border-color:$text_hi; image:url("$check"); }
 QCheckBox::indicator:hover { border-color:$border_hi; }
-QCheckBox::indicator:checked:hover { background:$accent_hover; border-color:$accent_hover; }
+QCheckBox::indicator:checked:hover { background:$text; border-color:$text; }
 QCheckBox::indicator:disabled { background:$inset; border-color:$border; }
 QCheckBox::indicator:checked:disabled { image:url("$check_off"); }
 /* radio circles are whole pictures: a stylesheet border-radius:8px on a 16px box
@@ -676,12 +676,12 @@ QScrollBar::add-line, QScrollBar::sub-line { height:0; width:0; }
 QScrollBar::add-page, QScrollBar::sub-page { background:transparent; }
 QMenu { background:$card; border:1px solid $border_hi; padding:5px; }
 QMenu::item { padding:7px 22px 7px 12px; border-radius:6px; margin:1px 0; }
-QMenu::item:selected { background:$accent; color:$on_accent; }
+QMenu::item:selected { background:$btn_hover; color:$text_hi; }
 QMenu::item:disabled { color:$faint; }
 QMenu::icon { padding-left:10px; }
 QMenu::separator { height:1px; background:$border; margin:5px 8px; }
 QFrame#tabcard { background:$card_hi; border:1px solid transparent; border-radius:10px; margin:3px 4px; }
-QFrame#tabcard:hover { border-color:$accent; background:$btn_hover; }
+QFrame#tabcard:hover { border-color:$border_hi; background:$btn_hover; }
 QLabel#tabcardpic { background:$inset; border-radius:12px; }
 QLabel#tabcardtitle { font-size:11pt; font-weight:700; color:$text_hi; background:transparent; }
 QLabel#tabcardblurb { color:$muted; background:transparent; }
@@ -705,7 +705,7 @@ QTabBar QToolButton::right-arrow:disabled { image:url("$right_off"); }
 QTabBar::tear { width:0; border:none; }
 QPushButton#live { font-weight:700; }
 QPushButton#voicetile { text-align:left; padding:9px 10px; border-radius:10px; }
-QPushButton#voicetile:checked { background:$accent; color:$on_accent; border:1px solid $accent_hi; font-weight:700; }
+QPushButton#voicetile:checked { background:$btn_press; color:$text_hi; border:1px solid $text_hi; font-weight:700; }
 QPushButton#voicetile[art="true"] { padding:5px 10px 5px 6px; }
 QPushButton#voicetile:hover:!checked { border-color:$border_hi; }
 /* Spacious controls only in Voice and Setup cards. */
@@ -725,14 +725,14 @@ QPlainTextEdit#speechlog { background:$bg; border:1px solid transparent; border-
 
 QFrame#fxcard { background:$card; border:1px solid transparent; border-radius:12px; }
 QFrame#fxcard:hover { border-color:$border_hi; }
-QFrame#fxcard[on="true"] { border-color:$accent; }
+QFrame#fxcard[on="true"] { border-color:$border_hi; }
 QFrame#fxcard[hero="true"] { background:$card; }
-QFrame#fxcard[fresh="true"] { background:$card_hi; border:2px solid $accent_hi; }
+QFrame#fxcard[fresh="true"] { background:$card_hi; border:2px solid $text_hi; }
 QFrame#fxcard QLabel, QFrame#fxcard QCheckBox { background:transparent; }
 QLabel#fxname { font-weight:700; font-size:10pt; color:$text_hi; }
 QLabel#fxdesc { color:$muted; font-size:8.5pt; }
 QLabel#fxparam { color:$text; font-size:9pt; }
-QLabel#fxvalue { color:$accent_hi; font-size:9pt; font-weight:700; }
+QLabel#fxvalue { color:$text_hi; font-size:9pt; font-weight:700; }
 QLabel#fxend { color:$muted; font-size:7.5pt; }   /* faint was 2.6:1 on some */
 QLabel#fxgroup { color:$text; font-size:9pt; font-weight:600; padding-top:6px; }
 QPushButton#fxreset, QFrame#card QPushButton#fxreset, QFrame#card[roomy="true"] QPushButton#fxreset { background:transparent; border:none; color:$muted; padding:2px 6px; min-height:0; font-size:8pt; }
@@ -752,33 +752,33 @@ QFrame#setcard { background:$panel; border-radius:12px; }
 QFrame#setcard QWidget { background:transparent; }
 QFrame#setcard QPushButton { background:$btn; }
 QFrame#setcard QPushButton:hover { background:$btn_hover; }
-QFrame#setcard QPushButton:checked { background:$accent; color:$on_accent; }
+QFrame#setcard QPushButton:checked { background:$btn_press; color:$text_hi; }
 QFrame#setcard QPushButton#primary { background:$accent; color:$on_accent; border:none; }
 QFrame#setcard QPushButton#power:checked { background:$live; border:1px solid $live_hi; color:$on_live; }
 QFrame#setcard QPushButton#primary:hover { background:$accent_hover; }
 QTableView, QFrame#setcard QTableView { background:$card; alternate-background-color:$card_hi;
     color:$text; border:1px solid transparent; border-radius:6px;
-    selection-background-color:$accent; selection-color:$on_accent; }
+    selection-background-color:$btn_press; selection-color:$text_hi; }
 QTableView::item { padding:5px 8px; border:none; }
 QTableView::item:hover { background:$btn_hover; }
-QTableView::item:selected { background:$accent; color:$on_accent; }
+QTableView::item:selected { background:$btn_press; color:$text_hi; }
 QHeaderView, QFrame#setcard QHeaderView { background:$btn; color:$text; }
 QHeaderView::section, QFrame#setcard QHeaderView::section { background:$btn; color:$text;
     padding:8px; border:none; border-bottom:1px solid $border; font-weight:600; }
 QTableCornerButton::section { background:$btn; border:none; }
 QFrame#setcard QPlainTextEdit { background:$card; color:$text;
     border:1px solid transparent; border-radius:6px; padding:8px;
-    selection-background-color:$accent; selection-color:$on_accent; }
+    selection-background-color:$btn_press; selection-color:$text_hi; }
 QProgressBar#downloadprogress, QFrame#card QProgressBar#downloadprogress {
     background:$groove; border:none; border-radius:2px; }
-QProgressBar#downloadprogress::chunk { background:$accent; border-radius:2px; }
+QProgressBar#downloadprogress::chunk { background:$text_hi; border-radius:2px; }
 QPushButton#hkbtn { min-width:150px; font-weight:600; }
 QPushButton#themecard { background:$panel; border:2px solid $border; border-radius:12px; padding:0; }
 QPushButton#themecard:hover { border-color:$border_hi; }
-QPushButton#themecard:checked { background:$panel; border:2px solid $accent; }
+QPushButton#themecard:checked { background:$panel; border:2px solid $text_hi; }
 QFrame#card QFrame#chip { background:$btn; border:1px solid transparent; border-radius:11px; }
 QFrame#card QFrame#chip:hover { background:$btn_hover; }
-QFrame#card QFrame#chip[sel="true"] { border-color:$accent; }
+QFrame#card QFrame#chip[sel="true"] { border-color:$text_hi; }
 QFrame#card QFrame#chip QPushButton { background:transparent; border:none; }
 QFrame#card QFrame#chip QPushButton#chipname:hover { color:$text_hi; }
 QFrame#card QFrame#chip QPushButton#chipstop { border-radius:11px; color:$muted; }
@@ -1025,12 +1025,12 @@ def stylesheet(name: str | None = None) -> str:
     outlined = (name or current_name) in OUTLINED
     # card titles in the text colour; High Contrast keeps its yellow to scan by
     tk["heading"] = tk["section"] if outlined else tk["text_hi"]
-    tk["check"] = _check_url(tk["on_accent"])
+    tk["check"] = _check_url(tk["bg"])
     tk["check_off"] = _check_url(tk["muted"])   # ticked but greyed out: on $inset
     tk["radio"] = _radio_url(tk["off"], tk["card"])
     tk["radio_hover"] = _radio_url(tk["border_hi"], tk["card"])
-    tk["radio_on"] = _radio_url(tk["accent"], tk["accent"], tk["on_accent"])
-    tk["radio_on_hover"] = _radio_url(tk["accent_hi"], tk["accent_hi"], tk["on_accent"])
+    tk["radio_on"] = _radio_url(tk["text_hi"], tk["text_hi"], tk["bg"])
+    tk["radio_on_hover"] = _radio_url(tk["text"], tk["text"], tk["bg"])
     tk["radio_off"] = _radio_url(tk["border"], tk["inset"])
     tk["radio_on_off"] = _radio_url(tk["border"], tk["inset"], tk["muted"])
     for key, colour in (("", tk["muted"]), ("_off", tk["off"])):

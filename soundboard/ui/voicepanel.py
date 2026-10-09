@@ -85,7 +85,7 @@ class Switch(QCheckBox):
         p.setRenderHint(QPainter.Antialiasing)
         on = self.isChecked()
         r = QRectF(self.rect()).adjusted(1, 3, -1, -3)
-        track = QColor(theme.T["accent"] if on else theme.T["groove"])
+        track = QColor(theme.T["text_hi"] if on else theme.T["groove"])
         if not self.isEnabled():
             track.setAlpha(110)
         p.setPen(Qt.NoPen)
@@ -93,7 +93,7 @@ class Switch(QCheckBox):
         p.drawRoundedRect(r, r.height() / 2, r.height() / 2)
         d = r.height() - 4
         x = r.right() - d - 2 if on else r.left() + 2
-        p.setBrush(QColor(theme.T["on_accent"] if on else theme.T["text"]))
+        p.setBrush(QColor(theme.T["bg"] if on else theme.T["text"]))
         p.drawEllipse(QRectF(x, r.top() + 2, d, d))
         if self.hasFocus():
             p.setBrush(Qt.NoBrush)

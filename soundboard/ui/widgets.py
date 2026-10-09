@@ -116,7 +116,7 @@ class EqCurve(QWidget):
             x = r.left() + 6 + (r.width() - 12) * i / (n - 1)
             y = mid - float(np.clip(d, -EQ_MAX_DB - 3, EQ_MAX_DB + 3)) * scale
             path.moveTo(x, y) if i == 0 else path.lineTo(x, y)
-        col = QColor(theme.T["accent"] if self.on else theme.T["off"])
+        col = QColor(theme.T["text_hi"] if self.on else theme.T["off"])
         p.setPen(QPen(col, 2.2))
         p.setBrush(Qt.NoBrush)
         p.drawPath(path)
