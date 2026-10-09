@@ -146,6 +146,7 @@ PAD_SIZE_WAIT_MS = 50    # dragging Pad size re-lays the pads at most this often
 RANDOM = "__random__:"   # hotkey action prefix: a random sound from the category after it
 ALL = _("All")       # the category tab that shows every sound
 AUTO_MIC_UPDATE_MS = 4000   # an older mic part moves on by itself this long after the start
+TLS_WARM_MS = 2500     # Qt's TLS is set up this long after the start (_warm_tls)
 TIP_DELAY_MS = 8000    # the first tip waits this long after the start
 TIP_RETRY_MS = 60_000  # ...and is tried again this often while it can't show
 LANG_OFFER_SEEN = "language-offer"   # in Config.tips_seen: the language bar was turned down
@@ -556,6 +557,23 @@ class MainWindow(QMainWindow):
         if self.cfg.load_note:   # settings came from a backup or the defaults: say so
             QTimer.singleShot(1200, self._show_load_note)
         QTimer.singleShot(AUTO_MIC_UPDATE_MS, self, self._auto_mic_update)
+        QTimer.singleShot(TLS_WARM_MS, self, self._warm_tls)
+
+    def _warm_tls(self, tries: int = 0):
+        """Qt sets up its TLS (reads Windows' certificates) on the first https request,
+        on the UI thread and holding Python's lock: ~17 ms, long enough to skip a sound
+        playing as the Radio tab or a web search's pictures first load. Done here, soon
+        after the start and while nothing plays (no network: nothing is sent)."""
+        if self._shut_down:
+            return
+        if self.engine.any_playing() and tries < 20:
+            QTimer.singleShot(TLS_WARM_MS, self, lambda: self._warm_tls(tries + 1))
+            return
+        try:
+            from PySide6.QtNetwork import QSslConfiguration
+            QSslConfiguration.defaultConfiguration()
+        except Exception:  # noqa: BLE001 - a later request sets it up as before
+            log.debug("warming up TLS failed", exc_info=True)
 
     def _auto_mic_update(self):
         """An older mic part (1.9.20 and before sat where raw streams skip it: Discord's
@@ -895,6 +913,11 @@ class MainWindow(QMainWindow):
         self._radio_live(self.radio.is_active())
         self._search_follow_switch()
         net.on_change(self._follow_switches)
+
+        # the Sounds tab's player; right under the page, where it sat inside it
+        rv.addWidget(self.transport)
+        self.tabs.currentChanged.connect(lambda _i: self._show_transport())
+        self._show_transport()
 
         # ---- mixer strip: the things that apply whatever tab you're on
         rv.addWidget(self._build_mixer())
@@ -1350,7 +1373,9 @@ class MainWindow(QMainWindow):
         self.chk_monitor.toggled.connect(lambda b: self.set_option("monitor_sounds", b))
         th.addWidget(self.chk_monitor)
         self._transport_vol = (sep, vol_icon, self.vol_sound)
-        left.addWidget(f)
+        # under the tabs, not in this page: the other tabs show it too while a sound
+        # plays, so it can be paused or stopped from anywhere (_show_transport)
+        self.transport = f
         self._set_pp_icon("play")
         return page
 
@@ -7126,6 +7151,7 @@ class MainWindow(QMainWindow):
                 lit.add(sid)
         self._pads_lit = lit
         self._update_transport(playing)
+        self._show_transport(playing)
         if not self.ytresults.isHidden():   # the result in the player says so
             prog, paused = playing.get(LINK_ID, (None, False))
             self.ytresults.show_now(self._link_url, "" if prog is None else
@@ -7141,6 +7167,19 @@ class MainWindow(QMainWindow):
         if talking != self._talk_shown:
             self._talk_shown = talking
             self._update_flow(talking)
+
+    def _show_transport(self, playing=None):
+        """The player bar: always on the Sounds tab; on the others only while a sound
+        plays or is paused, so it can be stopped without going back to the pads (and
+        doesn't take the room the rest of the time)."""
+        if self.tabs.currentWidget() is self.sounds_page:
+            want = True
+        else:
+            if playing is None:
+                playing = self.engine.playing()
+            want = any(sid in self._meta or sid == LINK_ID for sid in playing)
+        if self.transport.isHidden() == want:
+            self.transport.setVisible(want)
 
     def _update_transport(self, playing):
         sid = self.current

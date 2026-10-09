@@ -866,3 +866,47 @@ def test_effects_and_card_size_wait_for_a_program(tab, qapp):
     """Over the empty page the effects button and the card-size slider are hidden:
     nothing to apply them to."""
     assert tab.fx_btn.isHidden() and tab.card_size.isHidden() and tab.size_label.isHidden()
+
+
+def test_a_listing_makes_its_cards_one_go_at_a_time(tab, qapp):
+    """Making every card at once on the first look at the tab held up the audio long
+    enough to skip a sound: a listing makes NEW_CARDS, the rest follow just after; a
+    newer listing takes over from one still going."""
+    import time
+    apps = [App(100 + i, f"player{i}.exe") for i in range(4)]
+    tab._on_listed((apps, None))
+    assert len(tab.rows) == appspanel.NEW_CARDS < len(apps)
+    end = time.monotonic() + 2
+    while len(tab.rows) < len(apps) and time.monotonic() < end:
+        qapp.processEvents()
+    assert set(tab.rows) == {f"player{i}.exe" for i in range(4)}
+    more = apps[:1] + [App(200 + i, f"other{i}.exe") for i in range(3)]
+    tab._on_listed((more, None))
+    tab._on_listed((apps[:1], None))   # the others closed before their cards were made
+    end = time.monotonic() + 0.3
+    while time.monotonic() < end:
+        qapp.processEvents()
+    assert set(tab.rows) == {"player0.exe"}
+
+
+def test_program_icons_are_read_off_the_ui_thread(tab, monkeypatch):
+    """The shell's icon lookup held the GIL on the UI thread (10-70 ms a program): the
+    listing's thread reads them now, and a card only shows what was read."""
+    from PySide6.QtGui import QImage
+
+    from soundboard import exeicon
+    read = []
+
+    def load(paths):
+        for p in paths:
+            read.append(p)
+            img = QImage(32, 32, QImage.Format_ARGB32)
+            img.fill(0xFF00FF00)
+            exeicon._cache[p] = img
+    monkeypatch.setattr(exeicon, "load", load)
+    monkeypatch.setattr(exeicon, "_cache", {})
+    tab.lister._listed([music()], None)
+    assert read == [r"C:\Programs\music.exe"]
+    tab._on_apps([music()])
+    pm = tab.rows["music.exe"].icon.pixmap()
+    assert not pm.isNull() and pm.toImage().pixelColor(12, 12).green() == 255
