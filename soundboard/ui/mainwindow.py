@@ -3252,6 +3252,8 @@ class MainWindow(QMainWindow):
         self._update_info_btn()
         self._update_more_tabs()
         log.info("tab %s switched %s", key, "on" if on else "off")
+        if on:   # once per install, sent now (usage.py: a daily count could be a day off)
+            usage.step(self.cfg, f"added-{key}-tab")
         self.tab_switched.emit(key, on)
 
     def _swap_tab(self, key: str):

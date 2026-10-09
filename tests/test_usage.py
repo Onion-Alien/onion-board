@@ -431,6 +431,16 @@ def test_a_new_install_sends_its_first_steps_once_each(sent):
     assert "age/day-1" in _paths(sent[-1][0])
 
 
+def test_adding_a_tab_is_sent_at_once_not_a_day_later(sent):
+    """+ More tabs is used minutes in, after the first daily count went: waiting for
+    the next one lost it for everyone who only tried the app once."""
+    cfg = Config(stats_sent=1.0, stats_started=1.0, stats_steps=["added-sound"])
+    usage.step(cfg, "added-radio-tab")
+    usage.step(cfg, "added-radio-tab")
+    usage.step(cfg, "added-voice-tab")   # every user starts with it: not a step
+    assert [p for (req, _f) in sent for p in _paths(req)] == ["step/added-radio-tab"]
+
+
 def test_a_copy_counted_before_never_sends_first_steps(sent):
     cfg = Config(stats_sent=1.0)
     usage.step(cfg, "played-sound")
