@@ -18,7 +18,8 @@ this PC). And `uninstall/<version>` when the uninstaller removes it.
 With the daily one, a rough picture of how it's used, each as a bucket or a name from a
 fixed list: how long ago it was installed (`age/days-2-7`), where sounds go
 (`route/mic`), how many sounds the board has and how many were played since the last
-one (`sounds/11-50`, `played/1-10`), the app's language (`lang/de`), and which features
+one (`sounds/11-50`, `played/1-10`), how long the app was open since then
+(`open/1-3h`), the app's language (`lang/de`), and which features
 were used since then (`used/voice-changer`, `used/more-tabs-added-radio`: the names
 in FEATURES only). And once each,
 the first steps of a new install (`step/added-sound`, `step/played-sound`,
@@ -185,6 +186,31 @@ def age_bucket(days: float) -> str:
             else "days-31-plus")
 
 
+# how long the app was open: added up every OPEN_TICK_S (open_tick); a longer gap than
+# OPEN_GAP_S (the PC slept or hibernated) counts as nothing
+OPEN_TICK_S = 300
+OPEN_GAP_S = 600
+_open_mark: float | None = None
+
+
+def open_tick(cfg, now: float | None = None) -> None:
+    """Add the time since the last tick to cfg.stats_open_s (for the next daily count's
+    `open/`). Called at start, every OPEN_TICK_S, before a send and at quit."""
+    global _open_mark
+    now = time.monotonic() if now is None else now
+    counting = enabled() and net.allowed(FEATURE)   # off: nothing piles up for later
+    if counting and _open_mark is not None and 0 < now - _open_mark <= OPEN_GAP_S:
+        cfg.stats_open_s = max(0.0, float(cfg.stats_open_s or 0)) + (now - _open_mark)
+    _open_mark = now
+
+
+def open_bucket(seconds: float) -> str:
+    """How long it was open, roughly."""
+    h = seconds / 3600
+    return ("under-15m" if h < 0.25 else "15m-1h" if h < 1 else "1-3h" if h < 3
+            else "3-8h" if h < 8 else "8h-plus")
+
+
 def total_plays(cfg) -> int:
     return sum(max(0, int(getattr(m, "plays", 0) or 0)) for m in cfg.sounds)
 
@@ -248,6 +274,7 @@ def about(cfg, now: float) -> list[str]:
         out.append(f"route/{cfg.route}")
     out.append(f"sounds/{bucket(len(cfg.sounds))}")
     out.append(f"played/{bucket(total_plays(cfg) - cfg.stats_plays)}")
+    out.append(f"open/{open_bucket(cfg.stats_open_s or 0)}")
     lang = cfg.language if re.fullmatch(LANG_RE, cfg.language or "") else "auto"
     out.append(f"lang/{lang}")
     have = (set(cfg.stats_used if isinstance(cfg.stats_used, list) else [])
@@ -443,6 +470,7 @@ def maybe_send(cfg, saved=None, event: str = "", app_dir: Path | None = None) ->
             found, newest = problems(app_dir, cfg.stats_problems_seen)
             extra += found
         extra = extra[:MAX_PROBLEMS]
+    open_tick(cfg)
     payload = hits(cfg, now, event, extra)
     if not payload:
         return
@@ -450,6 +478,7 @@ def maybe_send(cfg, saved=None, event: str = "", app_dir: Path | None = None) ->
     tabs = [h["path"][4:] for h in payload if h["path"].startswith("tab/")]
     feats = [h["path"][5:] for h in payload if h["path"].startswith("used/")]
     plays = total_plays(cfg)
+    opened = cfg.stats_open_s or 0
     netlog.cause(FEATURE, "Anonymous usage count" + (f" ({event})" if event
                                                      else " (once a day)" if daily
                                                      else " (problems)"))
@@ -462,6 +491,7 @@ def maybe_send(cfg, saved=None, event: str = "", app_dir: Path | None = None) ->
             cfg.stats_tabs = [t for t in cfg.stats_tabs if t not in tabs]
             cfg.stats_used = [k for k in cfg.stats_used if k not in feats]
             cfg.stats_plays = plays
+            cfg.stats_open_s = max(0.0, (cfg.stats_open_s or 0) - opened)   # since then
         del _pending[:taken]
         cfg.stats_problems_seen = max(cfg.stats_problems_seen, newest)
         if saved is not None:

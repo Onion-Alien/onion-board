@@ -477,6 +477,8 @@ class Config:
     stats_steps: list[str] = field(default_factory=list)
     stats_used: list[str] = field(default_factory=list)
     stats_plays: int = 0
+    # seconds the app was open since the last daily count (usage.open_tick)
+    stats_open_s: float = 0.0
     sounds: list[SoundMeta] = field(default_factory=list)
 
     # set by load() when the settings weren't read cleanly, for the window to tell the
