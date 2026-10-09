@@ -1,5 +1,13 @@
 # Changelog
 
+## Unreleased
+
+- **Free sound packs.** *Backup → Free sound packs…* on the Sounds tab adds a
+  whole ready-made board in one click, starting with the 67-sound GM pack for
+  tabletop games. Made your own? *Share a pack* sends it in;
+  once its sounds are checked as CC0 it shows up for everyone. It has its own
+  switch in Settings → Privacy & security.
+
 ## 1.9.26 — 2026-10-08
 
 - **Bun sets up your mic.** While *Straight into my mic* is being set up, Bun

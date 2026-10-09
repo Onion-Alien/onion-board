@@ -2267,6 +2267,8 @@ class SettingsDialog(QDialog):
         "sounds_web": _("Searches and pasted links on the Sounds tab go to that site, and "
                         "search results show its thumbnails. Off: the search bar only "
                         "searches your own sounds."),
+        "sound_packs": _("Free sound packs (Sounds tab → Backup) reads the list of packs "
+                         "from GitHub, and downloads one from there when you press Add."),
         "ytdlp_update": _("Fetches a newer yt-dlp from PyPI when you press Update now or "
                           "Reset downloader (Updates page), or by itself if you ticked "
                           "Update automatically there."),
@@ -2323,13 +2325,14 @@ class SettingsDialog(QDialog):
         self.net_boxes: dict[str, QCheckBox] = {}
         self._net_subs: dict[str, QWidget] = {}
         groups = (
-            (_("Sounds and radio"), ("sounds_web", "radio")),
+            (_("Sounds and radio"), ("sounds_web", "sound_packs", "radio")),
             (_("Voices"), ("voices", "voice_servers")),
             (_("Updates and add-ons"), ("app_update", "ytdlp_update", "addons")),
             (_("Setup downloads"), ("setup_downloads", "tor_download")),
             (_("Usage count"), ("usage_stats",)),
         )
-        labels = {"sounds_web": _("Online sounds"), "app_update": _("App updates"),
+        labels = {"sounds_web": _("Online sounds"), "sound_packs": _("Free sound packs"),
+                  "app_update": _("App updates"),
                   "ytdlp_update": _("Downloader updates"), "addons": _("Add-on downloads"),
                   "voices": _("Voice and model downloads"),
                   "voice_servers": _("Online voice servers"),

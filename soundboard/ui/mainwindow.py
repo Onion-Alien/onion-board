@@ -1142,6 +1142,7 @@ class MainWindow(QMainWindow):
         mm = QMenu(more)
         icons.set_icon(mm.addAction(_("Import a backup or sound pack…"), self.import_dialog),
                        "folder")
+        icons.set_icon(mm.addAction(_("Free sound packs…"), self.show_packs), "download")
         om = mm.addMenu(_("Import from another soundboard"))
         for src in otherboards.sources():
             om.addAction(f"{src.name}…", lambda src=src: self.import_other(src))
@@ -6011,6 +6012,14 @@ class MainWindow(QMainWindow):
                         n, name=html.escape(Path(path).name)))
         self.status.setText(msg)
         self.toast("✓ " + msg, "ok")
+
+    def show_packs(self):
+        """The Free packs window (soundboard.packs): a pack it downloads is imported the
+        way dropping its zip on the window is."""
+        from soundboard.ui.packsdialog import PacksDialog
+        dlg = PacksDialog(lambda path: self.import_files([str(path)]), self)
+        dlg.exec()
+        free_dialog(dlg)
 
     def import_dialog(self):
         files, __ = QFileDialog.getOpenFileNames(

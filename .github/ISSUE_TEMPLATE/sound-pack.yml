@@ -1,0 +1,60 @@
+name: Share a sound pack
+description: Offer a pack of CC0 sounds for everyone's Free packs window in Onion Board.
+title: "Sound pack: "
+labels: ["sound pack"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for sharing! Packs show up in Onion Board's **Free packs** window for everyone,
+        once they've been checked. The rules are in [packs/README.md](https://github.com/Onion-Alien/onion-board/blob/main/packs/README.md).
+
+        The easy way to make a pack: put the sounds in their own category in Onion Board, set
+        names, hotkeys and pictures, then **Backup → Export this category…**. Attach the zip
+        below (drag it into the box), or paste a link to it.
+  - type: input
+    id: name
+    attributes:
+      label: Pack name
+      placeholder: "Horror night"
+    validations:
+      required: true
+  - type: textarea
+    id: about
+    attributes:
+      label: What's in it
+      description: One or two sentences for the Free packs window.
+      placeholder: "Creaks, screams and heartbeats for a scary game night."
+    validations:
+      required: true
+  - type: textarea
+    id: zip
+    attributes:
+      label: The pack
+      description: Drag the zip in here (up to 25 MB), or paste a link to download it.
+    validations:
+      required: true
+  - type: textarea
+    id: sources
+    attributes:
+      label: Where the sounds come from
+      description: For each sound you didn't make yourself, a link to where it's published as CC0 (Freesound, OpenGameArt, Wikimedia Commons…).
+      placeholder: |
+        Door creak: https://freesound.org/s/12345/ (CC0)
+        Heartbeat: I recorded it
+    validations:
+      required: true
+  - type: input
+    id: author
+    attributes:
+      label: Name to show as the pack's maker
+      description: Optional. Leave empty to stay anonymous.
+  - type: checkboxes
+    id: licence
+    attributes:
+      label: Licence
+      options:
+        - label: Every sound (and picture) in the pack is CC0, so anyone can use it anywhere without credit. I made them myself and release them as CC0, or they're published as CC0 by whoever made them.
+          required: true
+        - label: Nothing in it is ripped from a game, film, show, song or meme video.
+          required: true

@@ -83,6 +83,7 @@ NEVER_THIS_PC = frozenset({"radio"})
 # (English); feature_name() gives them in the language picked.
 FEATURES = {
     "sounds_web": "Find and download sounds online",
+    "sound_packs": "Download free sound packs",
     "ytdlp_update": "Update the downloader (yt-dlp)",
     "radio": "Radio",
     "app_update": "Check for and download Onion Board updates",
@@ -106,6 +107,7 @@ def feature_name(key: str) -> str:
     """A FEATURES key's name in the language picked."""
     return {
         "sounds_web": _("Find and download sounds online"),
+        "sound_packs": _("Download free sound packs"),
         "ytdlp_update": _("Update the downloader (yt-dlp)"),
         "radio": _("Radio"),
         "app_update": _("Check for and download Onion Board updates"),
@@ -128,6 +130,8 @@ def _off_sentence(main: str) -> str:
     return {
         "sounds_web": _("Finding and downloading sounds online is switched off in "
                         "Settings > Privacy & security."),
+        "sound_packs": _("Downloading free sound packs is switched off in "
+                         "Settings > Privacy & security."),
         "ytdlp_update": _("Updating the downloader (yt-dlp) is switched off in "
                           "Settings > Privacy & security."),
         "radio": _("Radio is switched off in Settings > Privacy & security."),
