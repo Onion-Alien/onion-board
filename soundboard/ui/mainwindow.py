@@ -1358,21 +1358,18 @@ class MainWindow(QMainWindow):
         return page
 
     def _update_chips(self, playing):
-        """The row above the pads: what's playing (when it's more than the player shows)
-        and the queue, each with its own ✕. A web search / link's Play once counts
-        too: it isn't a pad, but it plays over them and needs its own ■. So does one
-        lone sound the player isn't showing (another pad was picked while it played):
-        its chip is the only way back to it. Once up, the row stays while one of its
-        sounds still plays: stopping one of two used to hide the row, so the other
-        sound's chip went too and it looked like ■ had stopped both."""
+        """The row above the pads: every sound playing, each with its own ■, and the
+        queue, each with its own ✕. A web search / link's Play once counts too: it
+        isn't a pad, but it plays over them and needs its own ■. One rule, whatever
+        played before: a sound has a chip while it plays. (The row used to show only
+        for two or more, so stopping one of two hid the other's chip too and it looked
+        like ■ had stopped both.)"""
         ids = tuple(s for s in self.pads if s in playing)
         if LINK_ID in playing:
             ids += (LINK_ID,)
         queue = tuple(self._queue)
-        was_up = bool(self._chip_ids) and (len(self._chip_ids[0]) >= 2 or self._chip_ids[2])
-        lone = len(ids) == 1 and (self.current not in (None, ids[0]) or was_up)
-        if (ids, queue, lone) != self._chip_ids:
-            self._chip_ids = (ids, queue, lone)
+        if (ids, queue) != self._chip_ids:
+            self._chip_ids = (ids, queue)
             while self._chips_hl.count():
                 w = self._chips_hl.takeAt(0).widget()
                 if w:
@@ -1393,7 +1390,7 @@ class MainWindow(QMainWindow):
                     more = QLabel(_("+{value} more", value=len(queue) - QUEUE_CHIPS))
                     more.setObjectName("muted")
                     self._chips_hl.addWidget(more)
-            if len(ids) >= 2 or lone:
+            if ids:
                 lbl = QLabel(_("Now playing"))
                 lbl.setObjectName("muted")
                 self._chips_hl.addWidget(lbl)
@@ -1423,7 +1420,7 @@ class MainWindow(QMainWindow):
             # its width); a row that shrank and grew back with every overlapping
             # sound resized and repainted the whole board under it
             self.playing_row.setMinimumHeight(CHIPS_ROW_H)
-            self.playing_row.setVisible(len(ids) >= 2 or bool(queue) or lone)
+            self.playing_row.setVisible(bool(ids) or bool(queue))
         for sid, chip in self._chips.items():
             sel = "true" if sid == self.current else "false"
             if chip.property("sel") != sel:

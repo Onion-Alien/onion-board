@@ -254,7 +254,7 @@ def test_the_queue_shows_above_the_pads_and_can_be_trimmed(window, monkeypatch, 
     w._update_chips({"s0": (0.5, False)})
     assert not w.playing_row.isHidden()
     w._unqueue(0)
-    w._update_chips({"s0": (0.5, False)})
+    w._update_chips({})
     assert w._queue == [] and w.playing_row.isHidden()
 
 
@@ -314,9 +314,9 @@ def test_stopping_one_of_two_keeps_the_others_chip(window):
     w._stopped_at = (0.0, "s1")       # well after the first press
     chip_stop(w, "s0")                # the last one stops: the row goes
     assert not w.engine.playing() and w.playing_row.isHidden()
-    w.play("s1")                      # one sound on its own: no row
+    w.play("s1")                      # one sound on its own: its chip, same as always
     w._update_chips(w.engine.playing())
-    assert w.playing_row.isHidden()
+    assert list(w._chips) == ["s1"] and not w.playing_row.isHidden()
 
 
 def test_a_double_click_on_a_now_playing_chips_stop_stops_only_that_one(window):
