@@ -29,14 +29,18 @@ if ! gh pr checks "$n" --required >/dev/null 2>&1; then
     exit 1
 fi
 
+tmp=""
+cleanup() {
+    [ -z "$tmp" ] || { git worktree remove --force "$tmp" 2>/dev/null || true; rm -rf "$tmp"; }
+    git update-ref -d "refs/remotes/origin/pr/$n" 2>/dev/null || true
+}
+trap cleanup EXIT
 git fetch -q origin main "+refs/pull/$n/head:refs/remotes/origin/pr/$n"
 head=$(git rev-parse "origin/pr/$n")
 [ "$head" = "$head_oid" ] || { echo "PR #$n changed while checking it; run this again." >&2; exit 1; }
 sh scripts/check_utc.sh "origin/main..$head"
 
 tmp=$(mktemp -d "${TMPDIR:-/tmp}/merge_pr_$n.XXXXXX")
-cleanup() { git worktree remove --force "$tmp" 2>/dev/null || true; rm -rf "$tmp"; }
-trap cleanup EXIT
 git worktree add -q --detach "$tmp" origin/main
 now="$(date +%s) +0000"
 if ! (cd "$tmp" && GIT_AUTHOR_DATE="$now" GIT_COMMITTER_DATE="$now" \
@@ -46,6 +50,10 @@ if ! (cd "$tmp" && GIT_AUTHOR_DATE="$now" GIT_COMMITTER_DATE="$now" \
     exit 1
 fi
 (cd "$tmp" && sh "$root/scripts/check_utc.sh" -1 HEAD)
+if [ -n "$MERGE_PR_DRY_RUN" ]; then   # everything but the push
+    (cd "$tmp" && git log -1 --format="Would push %h (%ad | %cd): %s" --date=raw)
+    exit 0
+fi
 (cd "$tmp" && git push -q origin HEAD:main)
 echo "Merged PR #$n into main as $(cd "$tmp" && git rev-parse --short HEAD) (UTC)."
 if [ "$del" = --delete-branch ]; then
