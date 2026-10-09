@@ -38,3 +38,4 @@ def no_wheel(*widgets):
         _guard = _Guard()
     for w in widgets:
         w.installEventFilter(_guard)
+        w.setProperty("noWheel", True)   # lets a test find any control left unguarded

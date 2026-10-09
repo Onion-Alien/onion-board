@@ -2072,6 +2072,7 @@ class SettingsDialog(QDialog):
             dl.addItem(label, key)
         dl.currentIndexChanged.connect(lambda _i: self._data_set(download=dl.currentData()))
         grid.addWidget(dl, 0, 1)
+        no_wheel(dl)
         grid.setColumnStretch(1, 1)
         cv.addLayout(grid)
         self._data_widgets["download"] = dl
@@ -2093,6 +2094,7 @@ class SettingsDialog(QDialog):
             vh.addItem(_("Up to {height}p", height=h), h)
         vh.currentIndexChanged.connect(lambda _i: self._data_set(video_height=vh.currentData()))
         grid.addWidget(vh, 0, 1)
+        no_wheel(vh)
         self._data_widgets["video_height"] = vh
         grid.addWidget(QLabel(_("Save videos in")), 1, 0)
         self.data_folder = QLabel()
@@ -2138,6 +2140,7 @@ class SettingsDialog(QDialog):
             kb.addItem(label, kbps)
         kb.currentIndexChanged.connect(lambda _i: self._data_radio(kb.currentData()))
         grid.addWidget(kb, 0, 1)
+        no_wheel(kb)
         grid.setColumnStretch(1, 1)
         cv.addLayout(grid)
         self._data_widgets["radio_kbps"] = kb

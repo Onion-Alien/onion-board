@@ -1682,7 +1682,7 @@ class SpeechPanel(QWidget):
         grid.addWidget(self.ed_lang, 3, 1)
         grid.setColumnStretch(1, 1)
         ov.addLayout(grid)
-        no_wheel(self.cb_voice, self.sl_rate, self.cb_model)
+        no_wheel(self.cb_lang, self.cb_voice, self.sl_rate, self.cb_model)
         self.chk_mute = QCheckBox(_("Mute my real mic while the computer voice is on"))
         self.chk_mute.setToolTip(_("Others hear only the spoken voice, not your real one."))
         self.chk_mute.setChecked(self.s["mute_real_voice"])
