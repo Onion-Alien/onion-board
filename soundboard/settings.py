@@ -2069,6 +2069,9 @@ class SettingsDialog(QDialog):
                               _("Sounds added from YouTube, SoundCloud and other links. Smaller "
                                 "files are about a third of the size (around 0.5 MB a minute "
                                 "instead of 1.5 MB) and still sound fine on a pad."))
+        save_hint = _("Downloads and recordings are saved as this in your Sounds folder. "
+                      "MP3 opens anywhere; FLAC is about 7 times bigger and loses nothing. "
+                      "Files you add from your PC stay as they are.")
         grid = QGridLayout()
         grid.setHorizontalSpacing(12)
         grid.addWidget(QLabel(_("Quality")), 0, 0)
@@ -2078,9 +2081,22 @@ class SettingsDialog(QDialog):
         dl.currentIndexChanged.connect(lambda _i: self._data_set(download=dl.currentData()))
         grid.addWidget(dl, 0, 1)
         no_wheel(dl)
+        grid.addWidget(QLabel(_("Save sounds as")), 1, 0)
+        fmt = QComboBox()
+        for key, label in quality.SAVE_FORMATS.items():
+            fmt.addItem(label, key)
+        fmt.setToolTip(save_hint)
+        fmt.currentIndexChanged.connect(lambda _i: self._data_set(save_format=fmt.currentData()))
+        grid.addWidget(fmt, 1, 1)
+        no_wheel(fmt)
         grid.setColumnStretch(1, 1)
         cv.addLayout(grid)
+        hint = QLabel(save_hint)
+        hint.setObjectName("hint")
+        hint.setWordWrap(True)
+        cv.addWidget(hint)
         self._data_widgets["download"] = dl
+        self._data_widgets["save_format"] = fmt
         has_ff = library._ffmpeg() is not None
         self._data_widgets["save_video"] = self._option(
             cv, _("Also save the video"),

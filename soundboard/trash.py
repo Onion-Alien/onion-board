@@ -143,8 +143,9 @@ def put_sound(meta: SoundMeta, index: int) -> None:
     d = library._with_raw(asdict(meta), meta)   # a newer version's fields too
     try:
         p = Path(meta.file)
-        if p.parent == library.SOUNDS_DIR and p.exists():
-            d["file"] = _move(p, folder()).name
+        if library.owns(p) and p.exists():   # kept in the bin in its library folder
+            sub = p.parent.relative_to(library.SOUNDS_DIR)   # ("YouTube/Song.flac")
+            d["file"] = _move(p, folder() / sub).relative_to(folder()).as_posix()
     except OSError:
         log.warning("couldn't move %s to the bin; removing it instead", meta.file,
                     exc_info=True)
@@ -192,7 +193,14 @@ def _in_bin(name: str) -> Path | None:
     if not name:
         return None
     p = Path(name)
+    if ".." in p.parts:   # never a file outside the bin by way of its list
+        return None
     return p if p.is_absolute() else folder() / p
+
+
+def _ours(p: Path) -> bool:
+    """A file the bin keeps itself (in it, or in a library folder's copy in it)."""
+    return p != folder() and p.is_relative_to(folder())
 
 
 def take(item_id: str) -> Item | None:
@@ -208,11 +216,11 @@ def take(item_id: str) -> Item | None:
             f = _in_bin(d.get("file", ""))
             moved = None
             try:
-                if f is not None and f.parent == folder():
+                if f is not None and _ours(f):
                     if not f.exists():
                         log.warning("the bin lost %s", f)
-                        return None
-                    moved = _move(f, library.SOUNDS_DIR)
+                        return None   # back into its library folder
+                    moved = _move(f, library.SOUNDS_DIR / f.parent.relative_to(folder()))
                     d["file"] = str(moved)
                 img = _in_bin(d.get("image", ""))
                 if img is not None and img.parent == folder():
@@ -259,7 +267,8 @@ def adopt(src: Path) -> bool:
                 for k in ("file", "image"):
                     name = it.data.get(k, "")
                     if name and not Path(name).is_absolute() and (src / name).exists():
-                        it.data[k] = _move(src / name, folder()).name
+                        to = folder() / Path(name).parent
+                        it.data[k] = _move(src / name, to).relative_to(folder()).as_posix()
             except OSError:
                 log.warning("couldn't bring %s back into the bin", it.name, exc_info=True)
                 whole = False
@@ -271,7 +280,7 @@ def adopt(src: Path) -> bool:
         all_.sort(key=lambda i: i.when)
         _save(_prune(all_))
     try:   # anything still in src (a file no entry names) mustn't be deleted with it
-        left = [p for p in src.iterdir() if p.name != "deleted.json"]
+        left = [p for p in src.rglob("*") if p.is_file() and p.name != "deleted.json"]
     except OSError:
         return False
     return whole and not left
@@ -344,7 +353,7 @@ def _destroy(item: Item) -> None:
     f = _in_bin(item.data.get("file", ""))
     img = _in_bin(item.data.get("image", ""))
     try:
-        if f is not None and f.parent == folder() and f.exists() \
+        if f is not None and _ours(f) and f.exists() \
                 and not (library.USE_RECYCLE_BIN and library.recycle(f)):
             f.unlink(missing_ok=True)
         if img is not None and img.parent == folder():
