@@ -262,7 +262,7 @@ with your settings; delete that folder to remove it.
   ticked.
 
 No telemetry, analytics or crash upload beyond the anonymous usage count above (crash counts, never crash reports)
-(*Count me in*). The update check only reads the public
+(*Count me in*). Its random ID does link your counts together over time, only to fix errors and see which features need work; untick *Count me in* and nothing is sent. The update check only reads the public
 release list, and nothing is installed unless you click *Update now*. *Export* only writes a zip where you save it; nothing is uploaded. Logs and
 settings stay in
 `%APPDATA%\OnionBoard\`.
