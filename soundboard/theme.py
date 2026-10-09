@@ -648,9 +648,9 @@ QSlider::sub-page:horizontal:disabled, QSlider::add-page:vertical:disabled { bac
 QSlider[dim="true"]::sub-page:horizontal, QSlider[dim="true"]::add-page:vertical { background:$off; }
 QComboBox[dim="true"] { color:$muted; }
 QCheckBox::indicator { width:16px; height:16px; border-radius:4px; border:1px solid $off; background:$card; }
-QCheckBox::indicator:checked { background:$text_hi; border-color:$text_hi; image:url("$check"); }
+QCheckBox::indicator:checked { background:$accent; border-color:$accent; image:url("$check"); }
 QCheckBox::indicator:hover { border-color:$border_hi; }
-QCheckBox::indicator:checked:hover { background:$text; border-color:$text; }
+QCheckBox::indicator:checked:hover { background:$accent_hover; border-color:$accent_hover; }
 QCheckBox::indicator:disabled { background:$inset; border-color:$border; }
 QCheckBox::indicator:checked:disabled { image:url("$check_off"); }
 /* radio circles are whole pictures: a stylesheet border-radius:8px on a 16px box
@@ -1142,12 +1142,12 @@ def stylesheet(name: str | None = None) -> str:
     outlined = (name or current_name) in OUTLINED
     # card titles in the text colour; High Contrast keeps its yellow to scan by
     tk["heading"] = tk["section"] if outlined else tk["text_hi"]
-    tk["check"] = _check_url(tk["bg"])
+    tk["check"] = _check_url(tk["on_accent"])
     tk["check_off"] = _check_url(tk["muted"])   # ticked but greyed out: on $inset
     tk["radio"] = _radio_url(tk["off"], tk["card"])
     tk["radio_hover"] = _radio_url(tk["border_hi"], tk["card"])
-    tk["radio_on"] = _radio_url(tk["text_hi"], tk["text_hi"], tk["bg"])
-    tk["radio_on_hover"] = _radio_url(tk["text"], tk["text"], tk["bg"])
+    tk["radio_on"] = _radio_url(tk["accent"], tk["accent"], tk["on_accent"])
+    tk["radio_on_hover"] = _radio_url(tk["accent_hi"], tk["accent_hi"], tk["on_accent"])
     tk["radio_off"] = _radio_url(tk["border"], tk["inset"])
     tk["radio_on_off"] = _radio_url(tk["border"], tk["inset"], tk["muted"])
     for key, colour in (("", tk["muted"]), ("_off", tk["off"])):
