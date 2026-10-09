@@ -101,6 +101,11 @@ def register(cls: type[Effect]) -> type[Effect]:
     return cls
 
 
+# built-in voices that were renamed: old saved name -> new name (an older version
+# reading the new name shows Custom with the same effects, so nothing is lost)
+RENAMED = {"Female voice": "High voice"}
+
+
 def _number(v) -> bool:
     return isinstance(v, (int, float)) and not isinstance(v, bool) and math.isfinite(v)
 
@@ -116,7 +121,7 @@ def clean_spec(raw) -> dict:
     if isinstance(raw.get("enabled"), bool):
         out["enabled"] = raw["enabled"]
     if isinstance(raw.get("preset"), str):
-        out["preset"] = raw["preset"]
+        out["preset"] = RENAMED.get(raw["preset"], raw["preset"])
     def effects(v):
         return {t: {k: x for k, x in cfg.items()
                     if isinstance(k, str) and (isinstance(x, bool) if k == "on" else _number(x))}

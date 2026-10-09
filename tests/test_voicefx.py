@@ -596,3 +596,36 @@ def test_pitch_dragged_up_while_running_never_waits():
         e.set_values({"semitones": min(-12 + k * 0.5, 12), "size": 4})
         e.run(x[i:i + 480], RATE)
     assert e.pads == 0 and e.slows > 0
+
+
+def test_walkie_talkie_clicks_stay_in_the_radio_band():
+    # raw white noise on top of the band-limited voice sounded like a hi-hat
+    x = np.concatenate([np.zeros(SR // 2), _vowel(secs=0.5), np.zeros(SR)]).astype(np.float32)
+    y = _run("radio", {"squelch": 1, "noise": 0, "low": 450, "high": 2700}, x)
+    for seg in (y[SR // 2:SR // 2 + 1500], y[SR + int(SR * 0.3):SR + int(SR * 0.6)]):
+        sp = np.abs(np.fft.rfft(seg)) ** 2
+        f = np.fft.rfftfreq(len(seg), 1 / SR)
+        assert sp[f > 5000].sum() < 0.1 * sp.sum()
+
+
+@pytest.mark.parametrize("mic_db", [-36, -12])
+def test_hothead_blows_out_on_shouting_at_any_mic_level(mic_db):
+    # a fixed level alone never went off on a quiet mic: it learns how loud you talk
+    rng = np.random.default_rng(1)
+    words = np.repeat(rng.uniform(0.5, 1.0, 24), SR // 4) * np.tile(
+        np.r_[np.ones(SR // 5), np.zeros(SR // 20)], 24)[:SR * 6]
+    x = (_vowel(secs=6.0) / 0.55 * words * 10 ** (mic_db / 20)).astype(np.float32)
+    x[SR * 4:SR * 5] *= 10 ** (12 / 20)                # one second of shouting
+    e = voicefx.REGISTRY["shout"](SR, {"threshold": -14, "drive": 16})
+    amt = []
+    for i in range(0, len(x), 480):
+        e.run(x[i:i + 480], SR)
+        amt.append(e.amt)
+    amt = np.array(amt)
+    assert amt[200:400].max() < 0.3                   # talking normally: clean
+    assert amt[420:500].max() > 0.9                    # shouting: blown out
+
+
+def test_renamed_voice_keeps_its_pick():
+    assert voicefx.clean_spec({"preset": "Female voice"})["preset"] == "High voice"
+    assert "High voice" in voicefx.PRESETS

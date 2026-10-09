@@ -12,6 +12,8 @@ space. The presets at the bottom are built from these building blocks.
 """
 from __future__ import annotations
 
+import collections
+
 import numpy as np
 from soundboard.dsp import (SmoothSos, butter, hermite, lfilter, matched_biquad, sosfilt,
                              sosfilt_bank)
@@ -931,6 +933,7 @@ class Radio(Effect):
         super().__init__(rate, values)
         self.bp = _Filter()
         self.bp_noise = _Filter()
+        self.bp_click = _Filter()
         self.rng = np.random.default_rng()
         self.talking = False
         self.quiet = 0.0
@@ -941,9 +944,10 @@ class Radio(Effect):
         n = int(rate * secs)
         t = np.arange(n) / rate
         env = np.exp(-t / (secs * (0.15 if click else 0.35)))
+        env *= np.minimum(t / 0.003, 1.0)   # a 3 ms fade-in: no full-band snap
         z = self.rng.standard_normal(n) * env * level
-        if click:   # the key: a sharp tick with a little tone in it
-            z += np.sin(2 * np.pi * 1800 * t) * env * level * 1.5
+        if click:   # the key: a short tick with a little tone in it
+            z += np.sin(2 * np.pi * 1200 * t) * env * level * 1.5
         return z.astype(F32)
 
     def _squelch(self, x, rate) -> np.ndarray:
@@ -954,13 +958,13 @@ class Radio(Effect):
         if level > -42:
             if not self.talking:
                 self.talking = True
-                self.pending = self._burst(rate, 0.03, 0.25, click=True)
+                self.pending = self._burst(rate, 0.03, 0.3, click=True)
             self.quiet = 0.0
         elif self.talking:
             self.quiet += n / rate
             if self.quiet > self.HOLD_S:
                 self.talking = False
-                self.pending = self._burst(rate, 0.18, 0.12)
+                self.pending = self._burst(rate, 0.18, 0.3)
         add = np.zeros(n, F32)
         k = min(n, len(self.pending))
         add[:k] = self.pending[:k]
@@ -982,7 +986,9 @@ class Radio(Effect):
             hiss = self.rng.standard_normal(len(y)).astype(F32) * F32(self.p["noise"] * 3)
             y += self.bp_noise.run(hiss, (lo, hi), design)
         if self.p.get("squelch", 0) >= 0.5:
-            y = y + self._squelch(x, rate)
+            # the clicks go through the radio's band too: raw white noise on top of
+            # a band-limited voice sounded like a hi-hat
+            y = y + np.tanh(self.bp_click.run(self._squelch(x, rate), (lo, hi), design))
         return y
 
 
@@ -1013,7 +1019,8 @@ class Distortion(Effect):
 class Shout(Effect):
     """Reacts to how loud you are: talk normally and nothing happens, shout and the
     voice blows out like a megaphone (band-limited and overdriven), fading back as
-    you calm down."""
+    you calm down. It learns how loud you normally talk, so it works on a quiet mic
+    too: a fixed level alone never went off on most mics."""
 
     type = "shout"
     name = "Shout blowout"
@@ -1021,19 +1028,32 @@ class Shout(Effect):
     params = (Param("threshold", "Kicks in at", -40, -3, -16, " dB", 1, ("whisper", "yell")),
               Param("drive", "Crunch", 0, 30, 14, " dB", 1))
 
+    SPEECH_DB = -55     # louder than this counts as talking
+    OVER_DB = 5         # this far over your normal talking level = shouting
+
     def __init__(self, rate, values=None):
         super().__init__(rate, values)
         self.bp = _Filter()
         self.env = -90.0
         self.amt = 0.0
         self.g = None       # the crunch's gain last block
+        self.heard = collections.deque(maxlen=2000)   # your level while talking
+        self.normal = None  # how loud you normally talk (their median)
 
     def run(self, x, rate):
         n = len(x)
         level = 20 * np.log10(float(np.max(np.abs(x))) + 1e-9)
         tau = 0.01 if level > self.env else 0.25
         self.env = level + (self.env - level) * float(np.exp(-n / (rate * tau)))
-        target = min(max((self.env - self.p["threshold"]) / 6.0, 0.0), 1.0)
+        if self.env > self.SPEECH_DB and self.amt < 0.5:   # shouting isn't "normal"
+            self.heard.append(self.env)
+            if len(self.heard) % 25 == 0:
+                self.normal = float(np.median(self.heard))
+        kick = self.p["threshold"]
+        if self.normal is not None and len(self.heard) >= 100:
+            # this much over your normal also counts; the slider moves it as well
+            kick = min(kick, self.normal + self.OVER_DB + (kick + 16) / 3)
+        target = min(max((self.env - kick) / 4.0, 0.0), 1.0)
         a = np.linspace(self.amt, target, n + 1, dtype=F32)[1:]
         self.amt = target
         # the top edge stays under Nyquist (an 8 kHz mic can't take a 4 kHz edge)
@@ -1269,7 +1289,7 @@ PRESETS: dict[str, dict[str, dict]] = {
     "Deep voice":        {"pitch": {"semitones": -4, "natural": 1, "size": 2},
                           "compressor": {"threshold": -22, "ratio": 3, "boost": 6},
                           "tone": {"bass": 3, "presence": 2, "treble": -1}},
-    "Female voice":      {"pitch": {"semitones": 5, "natural": 1, "size": -2.5},
+    "High voice":        {"pitch": {"semitones": 5, "natural": 1, "size": -2.5},
                           "compressor": {"threshold": -24, "ratio": 2.5, "boost": 5},
                           "tone": {"bass": -3, "presence": 2, "treble": 2}},
     "Male voice":        {"pitch": {"semitones": -5, "natural": 1, "size": 2.5},
@@ -1322,8 +1342,7 @@ PRESETS: dict[str, dict[str, dict]] = {
                           "echo": {"delay": 300, "feedback": 0.45, "mix": 0.3, "tone": 2500},
                           "reverb": {"size": 0.9, "tone": 2500, "mix": 0.4}},
     "Walkie-talkie":     {"compressor": {"threshold": -30, "ratio": 8, "boost": 16},
-                          "radio": {"low": 450, "high": 2700, "drive": 10, "noise": 0.01,
-                                    "squelch": 1}},
+                          "radio": {"low": 450, "high": 2700, "drive": 10, "noise": 0.01}},
     "Old telephone":     {"compressor": {"threshold": -25, "ratio": 4, "boost": 10},
                           "radio": {"low": 300, "high": 3400, "drive": 4, "noise": 0.002}},
     "Megaphone":         {"compressor": {"threshold": -28, "ratio": 6, "boost": 8},
@@ -1342,7 +1361,7 @@ PRESETS: dict[str, dict[str, dict]] = {
                           "tone": {"bass": 3, "presence": 3, "treble": 1}},
 }
 
-PRESET_ICONS = {"Chipmunk": "🐿️", "Deep voice": "🐻", "Female voice": "👩", "Male voice": "👨",
+PRESET_ICONS = {"Chipmunk": "🐿️", "Deep voice": "🐻", "High voice": "🎵", "Male voice": "👨",
                 "Demon": "👹", "Robot": "🤖", "Talkbox": "🎹", "Autotune": "🎤",
                 "Masked caller": "🔪", "Anonymous": "🕶️", "Secret detective": "🕵️",
                 "Dark lord": "⛑️",
@@ -1461,7 +1480,7 @@ def shown_texts() -> dict[str, str]:
         # voices (PRESETS: their English names are what settings and share codes keep)
         "Chipmunk": _("Chipmunk"),
         "Deep voice": _("Deep voice"),
-        "Female voice": _("Female voice"),
+        "High voice": _("High voice"),
         "Male voice": _("Male voice"),
         "Demon": _("Demon"),
         "Talkbox": _("Talkbox"),
