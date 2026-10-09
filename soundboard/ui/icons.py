@@ -36,6 +36,12 @@ def _globe(p, fill):
     p.drawLine(QPointF(3, 12), QPointF(21, 12))
 
 
+def _offline(p, fill):
+    """Offline mode: the globe, struck through."""
+    _globe(p, fill)
+    p.drawLine(QPointF(3.5, 3.5), QPointF(20.5, 20.5))
+
+
 def _wave(p, fill):
     for x, h in ((4, 4), (8, 10), (12, 16), (16, 10), (20, 4)):
         p.drawLine(QPointF(x, 12 - h / 2), QPointF(x, 12 + h / 2))
@@ -487,7 +493,7 @@ SHAPES = {
     "shuffle": _shuffle, "star": _star,
     "star_filled": lambda p, fill: _star(p, fill, True), "like": _like, "copy": _copy,
     "sort": _sort, "list": _list,
-    "sounds": _grid, "browser": _globe, "voice": _mask, "setup": _sliders,
+    "sounds": _grid, "browser": _globe, "offline": _offline, "voice": _mask, "setup": _sliders,
     "sliders": _sliders, "wave": _wave,
     "mic": _mic, "headphones": _headphones, "volume": _volume, "ear": _ear,
     "play": _play, "pause": _pause, "stop": _stop, "record": _record, "plus": _plus,

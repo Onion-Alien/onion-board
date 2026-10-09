@@ -867,6 +867,12 @@ class SetupWizard(QDialog):
         self.btn_cable.setToolTip("" if allowed else net.off_message("setup_downloads"))
         if not allowed and not self.btn_cable.isHidden():
             self.btn_recheck.show()   # for after installing it by hand
+            if net.offline():   # Offline mode: no dead button, and the way that works
+                self.btn_cable.hide()
+                self.cable_status.setText(_(
+                    "<b style='color:{colour}'>Not installed.</b> Offline mode is on, so it "
+                    "can't be downloaded here. Put your sounds straight into your mic "
+                    "instead: nothing to install.", colour=_bad()))
         self._update_next()
 
     def attach_mic(self):

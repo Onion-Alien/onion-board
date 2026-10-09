@@ -466,9 +466,12 @@ class SettingsDialog(QDialog):
         self.tabs.currentChanged.connect(self._build_page)
         self.tabs.currentChanged.connect(self.categories.setCurrentRow)
         keys = self._page_keys = [p[0] for p in pages]
+        if page in self._offline_pages():   # hidden in Offline mode: its switch instead
+            page = "privacy"
         self.categories.setCurrentRow(keys.index(page) if page in keys else 0)
         self.tabs.setCurrentIndex(keys.index(page) if page in keys else 0)
         self._build_page(self.tabs.currentIndex())   # an unknown page: the first one
+        self._offline_sync()
         # a search box over the categories: 13 pages are a lot to look through for one
         # switch. Typing hides every card without the word and every page without a card.
         self.search_box = QLineEdit()
@@ -520,14 +523,23 @@ class SettingsDialog(QDialog):
         land on the first page that has one. Empty: everything back."""
         words = text.lower().split()
         if words:
-            for i in list(self._unbuilt):   # a page not built yet can't be searched
-                self._build_page(i)
+            self._searching = True
+            try:
+                for i in list(self._unbuilt):   # a page not built yet can't be searched
+                    self._build_page(i)
+            finally:
+                self._searching = False
         first = None
         for i in range(self.tabs.count()):
             page = self.tabs.widget(i).widget()
             title = self.categories.item(i).text().lower()
+            if self._page_keys[i] in self._offline_pages():   # hidden in Offline mode
+                self.categories.item(i).setHidden(True)
+                continue
             hits = 0
             for card in page.findChildren(QFrame, "setcard"):
+                if card.property("offline_hid"):   # (_offline_hide) as if it weren't there
+                    continue
                 match = not words or all(w in title or w in self._words_of(card) for w in words)
                 if not match and not card.isHidden():
                     card.hide()
@@ -1412,7 +1424,14 @@ class SettingsDialog(QDialog):
             else:   # Sounds and Setup: the board itself, and where it sends
                 box = self._option(cv, text, _("Always on."), True, lambda _on: None)
                 box.setEnabled(False)
+        self.tabs_offline_note = QLabel(_("Offline mode is on, so the tabs that need the "
+                                          "internet are hidden and greyed out here. Switch it "
+                                          "off in Privacy & security to use them."))
+        self.tabs_offline_note.setObjectName("hint")
+        self.tabs_offline_note.setWordWrap(True)
+        cv.addWidget(self.tabs_offline_note)
         v.addWidget(card)
+        self._offline_sync()
         v.addStretch(1)
         return w
 
@@ -1587,6 +1606,8 @@ class SettingsDialog(QDialog):
         cv.addWidget(grid)      # in the card first: a button shown without a parent
         self._watch_block(grid)  # is a window of its own
         self._pocket_block(grid)
+        self._addons_card_w = card
+        self._watch_refresh()   # (_addon_offline: the card, now it's known)
         return card
 
     # the button columns, in order; "get" stands in for "check" while it isn't in
@@ -1617,7 +1638,34 @@ class SettingsDialog(QDialog):
         btns["report"].setToolTip(_("Opens a bug report on GitHub in your browser, with the "
                                     "versions filled in"))
         grid.add(title, status, [[btns[k] for k in keys] for keys in self.ADDON_COLUMNS])
+        if not hasattr(self, "_addon_titles"):
+            self._addon_titles = {}
+        self._addon_titles[status] = title
         return status, btns
+
+    def _addon_offline(self, status, b, have: bool, can_get: bool):
+        """Offline mode on an add-on's row (after its refresh): Check for updates and
+        Reinstall go; not installed, with nothing on this PC to install it from, the
+        whole row goes. The Add-ons card goes when no row is left."""
+        from soundboard import net
+        if not net.offline():
+            row = True
+        else:
+            row = have or can_get
+            for k in ("check", "reinstall"):
+                b[k].hide()
+            if not row:
+                for btn in b.values():
+                    btn.hide()
+        b["report"].setVisible(row)
+        title = self._addon_titles.get(status)
+        for w in (title, status):
+            if w is not None:
+                w.setVisible(row)
+        card = getattr(self, "_addons_card_w", None)
+        if card is not None and qt_valid(card):
+            self._offline_card(card, lambda: not any(
+                s.isVisibleTo(card) for s in self._addon_titles if qt_valid(s)))
 
     def _addon_report(self, btn, what: str):
         from soundboard import __version__, feedback
@@ -1696,6 +1744,7 @@ class SettingsDialog(QDialog):
             if not have:
                 state.pop("offer", None)
             self._label_update(b["check"], state.get("offer"))
+            self._addon_offline(status, b, have, watchaddon.local_zip() is not None)
 
         def run_get(offer, btn, text):
             """tab.get() does the work (and shows it on the Triggers tab too)."""
@@ -1794,6 +1843,7 @@ class SettingsDialog(QDialog):
                             and not updates.newer(offer.version, info.version)):
                 state.pop("offer", None)
             self._label_update(b["check"], state.get("offer"))
+            self._addon_offline(status, b, have, pocketaddon.local_zip() is not None)
 
         def check():
             if state.get("offer") is not None:      # "Update to X"
@@ -2161,7 +2211,7 @@ class SettingsDialog(QDialog):
 
     def _connection(self):
         w, v = self._page()
-        v.addWidget(self._connection_card())
+        v.addWidget(self._offline_card(self._connection_card()))   # Offline: no use
         v.addWidget(self._activity_card())
         v.addStretch(1)
         return w
@@ -2261,7 +2311,9 @@ class SettingsDialog(QDialog):
               "Connection setting."))
         self.offline_box = self._option(
             cv, _("Offline mode"),
-            _("Nothing goes online at all: every switch below is off until you untick this."),
+            _("Nothing goes online at all, and everything that needs the internet is hidden "
+              "(the Radio tab, web search, downloads, updates…). Untick it to pick what may go "
+              "online."),
             cfg.net_offline, self._set_offline)
         body = QWidget()
         bl = QVBoxLayout(body)
@@ -2367,7 +2419,7 @@ class SettingsDialog(QDialog):
         if body is not None:
             if not qt_valid(body):
                 return
-            body.setEnabled(not net.offline())
+            body.setVisible(not net.offline())   # Offline mode: only its own box
             for key, sub in self._net_subs.items():
                 sub.setEnabled(key not in self.mw.cfg.net_off)
         for keys, attr in ((("app_update",), "upd_btn"), (("app_update",), "upd_chk"),
@@ -2386,6 +2438,72 @@ class SettingsDialog(QDialog):
             b.setEnabled(net.allowed(torget.FEATURE))
             b.setToolTip(b.property("tip") if b.isEnabled()
                          else net.off_message(torget.FEATURE))
+        self._offline_sync()
+
+    # ---- Offline mode: what only works online is hidden, not left greyed out
+    OFFLINE_PAGES = ("data", "updates")   # whole pages about downloads and updates
+
+    @classmethod
+    def _offline_pages(cls) -> tuple[str, ...]:
+        from soundboard import net
+        return cls.OFFLINE_PAGES if net.offline() else ()
+
+    def _offline_card(self, card: QFrame, online_only=None) -> QFrame:
+        """Hide `card` in Offline mode (and show it again after), or, with
+        `online_only()`, only while that says it's no use offline."""
+        if not hasattr(self, "_offline_cards"):
+            self._offline_cards = {}
+        cards = self._offline_cards
+        cards[card] = online_only or (lambda: True)
+        self._offline_hide(card, self._offline_says(cards[card]))
+        return card
+
+    @staticmethod
+    def _offline_says(online_only) -> bool:
+        from soundboard import net
+        return net.offline() and online_only()
+
+    @staticmethod
+    def _offline_hide(card: QFrame, hide: bool):
+        """A card hidden for Offline mode: the search leaves it be (_apply_search)."""
+        if bool(card.property("offline_hid")) == hide:
+            return
+        card.setProperty("offline_hid", hide)
+        card.setProperty("search_hid", False)
+        card.setVisible(not hide)
+
+    def _offline_sync(self):
+        """Offline mode on or off: its pages, cards and tab boxes follow."""
+        from soundboard import net
+        offline = net.offline()
+        for card, online_only in list(getattr(self, "_offline_cards", {}).items()):
+            if qt_valid(card):
+                self._offline_hide(card, self._offline_says(online_only))
+        needs = getattr(self.mw, "needs_online", None)
+        for key, box in getattr(self, "tab_boxes", {}).items():
+            if qt_valid(box) and needs is not None:
+                box.setEnabled(not needs(key))
+                box.setToolTip(_("Needs the internet: Offline mode is on (Privacy & security)")
+                               if needs(key) else "")
+        note = getattr(self, "tabs_offline_note", None)
+        if note is not None and qt_valid(note):
+            note.setVisible(needs is not None and any(needs(k) for k in getattr(
+                self, "tab_boxes", {})))
+        for refresh in ("_watch_refresh", "_pocket_refresh"):
+            if hasattr(self, refresh):
+                getattr(self, refresh)()
+        keys = getattr(self, "_page_keys", None)   # None while the dialog is being made
+        cats = getattr(self, "categories", None)
+        if keys is None or cats is None or not qt_valid(cats):
+            return
+        for i, key in enumerate(keys):
+            cats.item(i).setHidden(offline and key in self.OFFLINE_PAGES)
+        if cats.item(self.tabs.currentIndex()).isHidden():
+            self.tabs.setCurrentIndex(keys.index("privacy"))
+        search = getattr(self, "search_box", None)
+        if (search is not None and search.text().strip()   # it hides what doesn't match
+                and not getattr(self, "_searching", False)):   # (a page built by it)
+            self._apply_search(search.text())
 
     def _online_card(self):
         """What goes online only when you do something, and the app's local doors."""
@@ -3102,7 +3220,8 @@ class SettingsDialog(QDialog):
         relay.done.connect(finish)
         get.clicked.connect(run)
         self.get_pocket = get
-        return card
+        # Offline mode: gone, unless there's a zip on this PC to install it from
+        return self._offline_card(card, lambda: pocketaddon.local_zip() is None)
 
     def _remote_easy_card(self):
         """The easy way in: the streamer guide, and a prompt for an AI assistant."""
