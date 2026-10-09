@@ -19,16 +19,12 @@ GOATCOUNTER_PRIVACY = "https://www.goatcounter.com/help/privacy"
 def rows() -> list[tuple[str, str, str]]:
     """(what, an example of what's sent, why), in the table's order."""
     return [
-        (_("App version"), "1.9.27", _("Know which versions people still use")),
-        (_("Tabs and features used"), "voice-changer", _("See what to improve")),
-        (_("First steps"), "played-sound", _("See where new people get stuck")),
-        (_("How it's set up"), "route/mic, lang/de", _("Test the setups people really use")),
-        (_("Rough numbers"), "sounds/11-50", _("Know how big boards get")),
+        (_("Version and updates"), "1.9.27", _("Know which versions need fixes")),
+        (_("How the app is used"), _("voice changer, Radio tab"), _("See what to improve")),
         (_("Crashes and freezes"), "crash/1.9.27", _("Find and fix bugs")),
-        (_("Updates and uninstalls"), "update-now", _("Check that updates work")),
-        (_("Where you heard of it"), "youtube", _("Know where people find the app")),
-        (_("Feedback picks"), "improve/looks", _("Know what to work on")),
-        (_("A random ID"), "3f9a1c…", _("Count each person once")),
+        (_("Your answers, if you give them"), _("heard of it on YouTube"),
+         _("Know where people find the app")),
+        (_("A random ID"), "3f9a1c…", _("See if people come back")),
     ]
 
 
