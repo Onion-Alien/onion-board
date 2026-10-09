@@ -6309,12 +6309,11 @@ class MainWindow(QMainWindow):
         menu.addAction(_("Open Onion Board"), self.show_from_tray)
         icons.set_icon(menu.addAction(_("Stop all sounds"), self.stop_all), "stop")
         menu.addSeparator()
-        # both only open a page in the browser (feedback.py)
-        from soundboard import __version__, feedback
+        # the Discord opens in the browser (feedback.py); Send feedback asks first
+        from soundboard import feedback
         icons.set_icon(menu.addAction(_("Join the Discord"), lambda: self._open_page(
             feedback.DISCORD_URL)), "speech")
-        icons.set_icon(menu.addAction(_("Send feedback"), lambda: self._open_page(
-            feedback.feedback_url(__version__))), "edit")
+        icons.set_icon(menu.addAction(_("Send feedback"), self.ask_feedback), "edit")
         menu.addSeparator()
         menu.addAction(_("Quit"), self.quit_app)
         t.setContextMenu(menu)
@@ -6322,6 +6321,12 @@ class MainWindow(QMainWindow):
         t.messageClicked.connect(self.show_from_tray)
         t.show()
         QApplication.instance().setQuitOnLastWindowClosed(False)
+
+    def ask_feedback(self):
+        """*Send feedback*: "What would you improve?" (ui/feedbackdialog.py)."""
+        from soundboard.ui import feedbackdialog
+        self.show_from_tray()
+        self.feedback_box = feedbackdialog.ask(self.cfg, self)
 
     def _open_page(self, url: str):
         busy.open_url(url, window=self, failed=_("Couldn't open your browser. The page is"))

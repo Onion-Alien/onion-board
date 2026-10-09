@@ -126,14 +126,17 @@ def test_feedback_and_problem_buttons_only_open_the_browser(window, monkeypatch)
     monkeypatch.setattr(busy.QDesktopServices, "openUrl", lambda u: opened.append(u.toString()))
     d = SettingsDialog(window, "help")
     monkeypatch.setattr(feedback, "FORM_URL", "https://forms.example.com/r/x")
-    d.feedback_btn.click()
+    d.feedback_btn.click()      # asks "What would you improve?" first (test_feedbackdialog)
+    assert d.feedback_box.isVisible() and not opened
+    d.feedback_box.boxes["looks"].setChecked(True)
+    d.feedback_box.send()
+    d.feedback_box.form_btn.click()
     d.problem_btn.click()
-    assert opened[0] == f"https://forms.example.com/r/x?version={__version__}"
+    assert opened[0] == f"https://forms.example.com/r/x?version={__version__}&improve=looks"
     assert opened[1].startswith("https://github.com/Onion-Alien/onion-board/issues/new?labels=bug")
     assert __version__ in opened[1]
     monkeypatch.setattr(feedback, "FORM_URL", "")       # no form: feedback goes to GitHub too
-    d.feedback_btn.click()
-    assert opened[2] == opened[1]
+    assert feedback.feedback_url(__version__) == feedback.problem_url(__version__)
     d.close()
 
 

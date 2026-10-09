@@ -1522,6 +1522,11 @@ class SettingsDialog(QDialog):
             failed=_("Couldn't open your browser. The page is")))
         return btn
 
+    def _ask_feedback(self):
+        """*Send feedback*: "What would you improve?" (ui/feedbackdialog.py)."""
+        from soundboard.ui import feedbackdialog
+        self.feedback_box = feedbackdialog.ask(self.mw.cfg, self)
+
     def _about_card(self):
         """The version (as the title bar shows it), and where the app and its licences
         live."""
@@ -1558,8 +1563,10 @@ class SettingsDialog(QDialog):
         discord = self._link_button(_("Join the Discord"), feedback.DISCORD_URL, "speech")
         discord.setObjectName("primary")
         row.addWidget(discord)
-        row.addWidget(self._link_button(_("Send feedback"), feedback.feedback_url(__version__),
-                                        "edit"))
+        send = QPushButton(_("Send feedback"))
+        icons.set_icon(send, "edit")
+        send.clicked.connect(self._ask_feedback)
+        row.addWidget(send)
         row.addWidget(self._link_button(_("Report a problem"),
                                         feedback.problem_url(__version__)))
         row.addWidget(self._link_button(
@@ -1928,9 +1935,7 @@ class SettingsDialog(QDialog):
             failed=_("Couldn't open your browser. The page is")))
         icons.set_icon(discord, "speech")
         send = QPushButton(_("Send feedback"))
-        send.clicked.connect(lambda: busy.open_url(
-            feedback.feedback_url(__version__), send, opened=_("✓ Opened in your browser"),
-            failed=_("Couldn't open your browser. The page is")))
+        send.clicked.connect(self._ask_feedback)
         icons.set_icon(send, "edit")
         bug = QPushButton(_("Report a problem on GitHub"))
         bug.setToolTip(_("For people with a GitHub account: opens a new bug report"))
