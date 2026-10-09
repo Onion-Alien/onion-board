@@ -24,14 +24,12 @@ def test_sound_flares_and_throws_embers_then_settles(qapp):
     assert not w.embers
 
 
-def test_idle_slows_the_timer_and_a_sound_speeds_it_up(qapp, monkeypatch):
+def test_idle_breathing_keeps_the_full_frame_rate(qapp):
     from soundboard.ui import logowidget
     w = LogoWidget()
     w._timer.start(logowidget.FAST_MS)
     w._t0 = logowidget.time.monotonic() - logowidget.SHEEN_TIME - 0.5   # between sheens
     w._step()
-    assert w._timer.interval() == logowidget.IDLE_MS
-    w.set_level(0.8)
     assert w._timer.interval() == logowidget.FAST_MS
     w._timer.stop()
 
