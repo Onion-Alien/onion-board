@@ -5,6 +5,8 @@ all work as before); only its bar is hidden, and the rail mirrors it: each tab's
 icon (live badge, voice picture, warning tint), name, tip and whether it's shown."""
 from __future__ import annotations
 
+import html
+
 from PySide6.QtCore import QEvent, QObject, QRectF, QSize, Qt, Signal
 from PySide6.QtGui import QColor, QPainter
 from PySide6.QtWidgets import (QBoxLayout, QFrame, QHBoxLayout, QLabel, QPushButton,
@@ -20,7 +22,7 @@ SHUT_W = 43        # the rail's width, shut: its 1 px edge, 4, a 34 px button, 4
 OPEN_W = 168       # ...and opened out
 LOGO = 24          # the onion: with its 5 px glow room, a tab button's width (BUTTON_W)
 BUTTON_W = 34      # a button on the shut rail; open, its icon stays in this column
-COMPACT_H = 30     # every button's height in a short window (else as tall as a tab's)
+COMPACT_H = 28     # every button's height in a short window (else as tall as a tab's)
 SIDE_SHUT = 4      # the rail's own side margins, shut (a 34 px button)...
 SIDE_OPEN = 10     # ...and open
 LIVE_BAR_W = 3     # a live tab's bar on the rail's outer edge (Settings > Live tabs: tint)
@@ -281,7 +283,10 @@ class SideRail(QFrame):
         full, tip = w.property("railfull") or "", w.property("railtip") or ""
         w.setText("")
         w.setAccessibleName(full)
-        w.setToolTip("\n".join(filter(None, (full, tip if tip != full else ""))))
+        if "<br>" in tip:   # rich text (Who's listening's tip)
+            w.setToolTip(f"{html.escape(full)}<br>{tip}")
+        else:
+            w.setToolTip("\n".join(filter(None, (full, tip if tip != full else ""))))
 
     # ---- open / shut
     def is_open(self) -> bool:
@@ -363,5 +368,10 @@ class SideRail(QFrame):
             w.setMaximumHeight(16777215)
         h = COMPACT_H if self._compact else max(w.sizeHint().height() for w in everything)
         self._lay.setSpacing(1 if self._compact else 4)
+        if self.property("compact") != self._compact:   # less padding: the icons stay whole
+            self.setProperty("compact", self._compact)
+            for w in everything:
+                w.style().unpolish(w)
+                w.style().polish(w)
         for w in everything:
             w.setFixedHeight(h)

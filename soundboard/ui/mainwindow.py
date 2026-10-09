@@ -711,6 +711,9 @@ class MainWindow(QMainWindow):
         self.btn_air.toggled.connect(self.set_sending)
         icons.set_icon(self.btn_air, "live", "danger_text", "#ffffff", size=sidebar.ICON)
         self.set_sending(True)
+        # Who's listening, beside Live on the rail (the full picker is on the Setup tab)
+        from soundboard.ui.destpanel import ModeButton
+        self.mode_btn = ModeButton(self)
         self.stop_btn = QPushButton()
         self.stop_btn.setObjectName("danger")
         self.stop_btn.setProperty("quiet", True)   # red text, no box: Live is the loud one
@@ -903,7 +906,8 @@ class MainWindow(QMainWindow):
             self._rail_opened,
             # Live and Stop all first, so they never move; the pills only when needed
             # (at the rail's foot, as icons)
-            [self.btn_air, self.stop_btn, self.pill, self.btn_offline, self.btn_update])
+            [self.btn_air, self.mode_btn, self.stop_btn, self.pill, self.btn_offline,
+             self.btn_update])
         self._full_row.insertWidget(0, self.rail)
         # Tab goes header, rail, page (as it did with the top tabs), not page, rail
         prev = self.tabs.previousInFocusChain()
@@ -1260,14 +1264,6 @@ class MainWindow(QMainWindow):
         size.valueChanged.connect(lambda _v: self._pad_size_wait.isActive()
                                   or self._pad_size_wait.start())
         no_wheel(size)
-        # Who's listening, one click away (the full picker is on the Setup tab)
-        from soundboard.ui.destpanel import ModeCombo
-        mode_lbl = QLabel(_("Listening:"))
-        mode_lbl.setObjectName("muted")
-        self.mode_combo = ModeCombo(self)
-        tb.addWidget(mode_lbl)
-        tb.addWidget(self.mode_combo)
-        self._mode_pick = (mode_lbl, self.mode_combo)
         size_lbl = QLabel(_("Pad size"))
         size_lbl.setObjectName("muted")
         tb.addWidget(size_lbl)
@@ -7409,7 +7405,6 @@ class MainWindow(QMainWindow):
         f.add(18, "w", r.icon_only(self.btn_view))   # its tooltip says what it is
         # the label and the dropdown go together: a lone "Clean" said nothing (the full
         # picker is on the Setup tab)
-        f.add(38, "w", r.hide(*self._mode_pick))
         # the ear button shrinks to its icon first: the level bar is the live part
         f.add(12, "w", r.icon_only(self.btn_check))
         f.add(14, "w", r.hide(self.np_time))
