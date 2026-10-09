@@ -10,11 +10,31 @@ measurable idle cost.
 """
 from __future__ import annotations
 
-from PySide6.QtCore import QEvent, QObject
+from PySide6.QtCore import QEvent, QObject, Qt
 from PySide6.QtWidgets import (QAbstractScrollArea, QAbstractSlider, QAbstractSpinBox,
-                               QApplication, QComboBox, QScrollBar)
+                               QApplication, QComboBox, QProxyStyle,
+                               QScrollBar, QStyle)
 
 _guard: _Guard | None = None
+
+
+class AppStyle(QProxyStyle):
+    """Fusion, with two app-wide changes that reach every window, the add-ons'
+    included (Onion Watch's Triggers / Log strip), at no per-event cost:
+
+    - the wheel never changes a dropdown or flips a tab strip. Rolling past the
+      Radio filters changed them; rolling over Triggers / Log switched pages. An
+      open dropdown's list still scrolls (that's its own view).
+    - a click anywhere on a slider's bar moves it there, not a page step towards it.
+    """
+
+    def styleHint(self, hint, opt=None, widget=None, ret=None):
+        if hint in (QStyle.SH_ComboBox_AllowWheelScrolling,
+                    QStyle.SH_TabBar_AllowWheelScrolling):
+            return 0
+        if hint == QStyle.SH_Slider_AbsoluteSetButtons:
+            return Qt.LeftButton.value
+        return super().styleHint(hint, opt, widget, ret)
 
 
 class _Guard(QObject):
