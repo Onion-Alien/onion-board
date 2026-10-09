@@ -902,16 +902,22 @@ class MainWindow(QMainWindow):
         self.btn_more_tabs.setToolTip(_("Add a tab: radio, sending a program's sound, screen "
                                         "triggers…"))
         from soundboard.ui import moretabs
-        mt = moretabs.Menu(self.btn_more_tabs)
+        mt = self.more_menu = moretabs.Menu(self.btn_more_tabs)
         mt.aboutToShow.connect(lambda: self._fill_more_tabs(mt))
         mt.aboutToHide.connect(self._more_tabs_hidden)
-        self.btn_more_tabs.setMenu(mt)
+        self.btn_more_tabs.clicked.connect(mt.pop)
         self._update_more_tabs()
         self.rail = sidebar.SideRail(
             self.tabs, self.logo, self.wordmark, self.tagline,
             [self.btn_more_tabs, self.btn_info], self.cfg.sidebar_open, [self.gear],
             self._rail_opened)
         self._full_row.insertWidget(0, self.rail)
+        # Tab goes header, rail, page (as it did with the top tabs), not page, rail
+        prev = self.tabs.previousInFocusChain()
+        for w in (*self.rail.buttons, self.btn_more_tabs, self.btn_info, self.gear,
+                  self.rail.toggle, self.tabs):
+            QWidget.setTabOrder(prev, w)
+            prev = w
         # right-click a tab: hide it (+ More tabs or Settings > Tabs bring it back)
         for b in self.rail.buttons:
             b.customContextMenuRequested.connect(

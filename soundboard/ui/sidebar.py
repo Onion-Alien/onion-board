@@ -133,6 +133,8 @@ class SideRail(QFrame):
             lay.addWidget(b)
             self.buttons.append(b)
         self.extras = [*extras, *foot]
+        for w in self.extras:   # the keyboard's ring, not one left by a click
+            w.setFocusPolicy(Qt.TabFocus)
         lay.addSpacing(10)   # More tabs and ⓘ aren't tabs
         for w in extras:
             lay.addWidget(w)
@@ -258,7 +260,7 @@ class SideRail(QFrame):
         # the arrow points the way the rail will go: mirrored (Arabic), it opens leftwards
         icons.set_icon(self.toggle, "back" if shown != self.isRightToLeft() else "forward",
                        size=ICON)
-        self._label(self.toggle, _("Hide tab names"),
-                    _("Show only the icons") if shown else _("Show tab names"), shown)
-        self.toggle.setAccessibleName(self.toggle.toolTip())
+        # its name is what it does now (a screen reader read out both before)
+        self._label(self.toggle, _("Hide tab names") if shown else _("Show tab names"),
+                    _("Show only the icons") if shown else "", shown)
         self.sync()

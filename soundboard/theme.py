@@ -548,6 +548,8 @@ QFrame#sidebar QPushButton#railtoggle { padding:7px 6px; text-align:left; color:
 QFrame#sidebar QPushButton#moretabs:hover, QFrame#sidebar QPushButton#tabinfo:hover,
 QFrame#sidebar QPushButton#settings:hover,
 QFrame#sidebar QPushButton#railtoggle:hover { background:$btn_hover; color:$text_hi; }
+QFrame#sidebar QPushButton#moretabs:focus, QFrame#sidebar QPushButton#tabinfo:focus,
+QFrame#sidebar QPushButton#settings:focus,
 QFrame#sidebar QPushButton#railtoggle:focus { border-color:$accent; }
 QFrame#sidebar QLabel#tagline { font-size:8pt; }
 QPushButton#settings { padding:6px 14px; font-weight:600; }
