@@ -705,7 +705,6 @@
   "A restore point is saved first, so you can undo this.": "先に復元ポイントを保存するので、元に戻せます。",
   "A short “Did you know?” about a feature, at most once a day, never while a game is up.": "機能についての短い「知ってた？」。1日に最大1回、ゲーム中は出ません。",
   "A small dot on its icon": "アイコンに小さな点",
-  "A soft wash and a coloured icon in the theme's colour, easy to spot from across the room": "テーマの色でやわらかい背景と色付きアイコン。離れていても目立ちます",
   "A soundboard is most useful left running: your hotkeys and the overlay work while the window is closed. The tray icon (by the clock) opens it again; right-click it to quit.": "サウンドボードは起動したままが一番便利です: ウィンドウを閉じてもホットキーとオーバーレイは動きます。トレイアイコン（時計の横）でまた開けます。終了するには右クリックしてください。",
   "A tab whose feature is on right now (a sound playing, the voice changer, the radio…) is marked, so nothing is left on without you noticing.": "機能が今オンになっているタブ（サウンド再生中、ボイスチェンジャー、ラジオ…）には印が付くので、知らないうちにオンのままになることはありません。",
   "About": "情報",
@@ -1353,7 +1352,6 @@
   "Through a proxy or Tor, everything the app fetches (searches, downloads, radio, updates) goes through it, and site names are looked up there, not on this PC. If it can't be reached, nothing is fetched: the app never quietly goes direct. This PC's own addresses (127.0.0.1) stay direct.": "プロキシまたは Tor を介して、アプリが取得するもの (検索、ダウンロード、ラジオ、アップデート) はすべてプロキシまたは Tor を経由し、サイト名はこの PC ではなくそこで検索されます。アクセスできない場合は何も取得されません。アプリは静かにダイレクトに移行することはありません。この PC 自体のアドレス (127.0.0.1) はそのまま残ります。",
   "TikTok sounds": "TikTokサウンド",
   "Time": "時間",
-  "Tint the tab": "タブに色を付ける",
   "To use Tor, get it first: about 22 MB from the Tor Project, checked before it's used. {blocked_hint}": "Tor を使用するには、まず Tor を入手します。Tor プロジェクトから約 22 MB を入手し、使用する前にチェックします。 {blocked_hint}",
   "Tor download": "Torのダウンロード",
   "Tor sends everything through three volunteer computers around the world, so the sites you search and download from and the radio stations you play see a Tor address, not yours. It's slower, and YouTube often turns Tor away: the app then tries other Tor routes, and only goes without Tor if you click to.": "Tor は世界中の 3 台のボランティア コンピュータを介してすべてを送信するため、検索してダウンロードするサイトや再生するラジオ局には、あなたのアドレスではなく Tor のアドレスが表示されます。速度が遅く、YouTube は Tor を無効にすることがよくあります。その後、アプリは他の Tor ルートを試行し、クリックした場合にのみ Tor を使用せずに進みます。",
@@ -2799,5 +2797,10 @@
   "by {name}": "{name}著",
   "{language} needs a one-time download of its translation model ({size} MB). Offline mode is on, so it can't be downloaded now.": "{language}では、翻訳モデルを 1 回限りダウンロードする必要があります ( {size} MB)。オフラインモードがオンになっているため、現在ダウンロードできません。",
   "{n} MB": "{n} MB",
-  "⚠ Windows has no {language} voice yet, so {language} can't be spoken properly. Offline mode is on, so it can't be installed now.": "⚠ Windows にはまだ{language}音声がないため、 {language}を適切に話すことができません。オフライン モードがオンになっているため、現在インストールできません。"
+  "⚠ Windows has no {language} voice yet, so {language} can't be spoken properly. Offline mode is on, so it can't be installed now.": "⚠ Windows にはまだ{language}音声がないため、 {language}を適切に話すことができません。オフライン モードがオンになっているため、現在インストールできません。",
+  "A bar at the edge of the tabs and a coloured icon, in the highlight colour: easy to spot from across the room": "タブの端にあるバーとハイライトカラーの色付きアイコン: 部屋のどこからでも見つけやすい",
+  "A bar beside the tab": "タブの横のバー",
+  "Show tab names": "タブ名を表示する",
+  "Hide tab names": "タブ名を非表示にする",
+  "Show only the icons": "アイコンのみを表示する"
 }

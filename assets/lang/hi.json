@@ -722,7 +722,6 @@
   "A restore point is saved first, so you can undo this.": "पहले एक रिस्टोर पॉइंट सेव होता है, ताकि आप इसे पलट सकें।",
   "A short “Did you know?” about a feature, at most once a day, never while a game is up.": "किसी फ़ीचर के बारे में एक छोटा “क्या आप जानते हैं?”, दिन में ज़्यादा से ज़्यादा एक बार, गेम चलते समय कभी नहीं।",
   "A small dot on its icon": "इसके आइकन पर एक छोटा डॉट",
-  "A soft wash and a coloured icon in the theme's colour, easy to spot from across the room": "थीम के रंग में हल्की चमक और रंगीन आइकन, कमरे के उस पार से भी आसानी से दिखे",
   "A soundboard is most useful left running: your hotkeys and the overlay work while the window is closed. The tray icon (by the clock) opens it again; right-click it to quit.": "साउंडबोर्ड चालू छोड़ने पर सबसे काम का है: विंडो बंद होने पर भी आपकी हॉटकी और ओवरले काम करते हैं। ट्रे आइकन (घड़ी के पास) इसे फिर खोलता है; बंद करने के लिए उस पर राइट-क्लिक करें।",
   "A tab whose feature is on right now (a sound playing, the voice changer, the radio…) is marked, so nothing is left on without you noticing.": "जिस टैब का फ़ीचर अभी चालू है (कोई साउंड चल रहा है, वॉइस चेंजर, रेडियो…) उस पर निशान लगता है, ताकि आपकी जानकारी के बिना कुछ चालू न रह जाए।",
   "About": "बारे में",
@@ -1376,7 +1375,6 @@
   "Through a proxy or Tor, everything the app fetches (searches, downloads, radio, updates) goes through it, and site names are looked up there, not on this PC. If it can't be reached, nothing is fetched: the app never quietly goes direct. This PC's own addresses (127.0.0.1) stay direct.": "प्रॉक्सी या टोर के माध्यम से, ऐप जो कुछ भी प्राप्त करता है (खोज, डाउनलोड, रेडियो, अपडेट) इसके माध्यम से जाता है, और साइट के नाम वहां देखे जाते हैं, इस पीसी पर नहीं। यदि उस तक नहीं पहुंचा जा सकता है, तो कुछ भी प्राप्त नहीं होता है: ऐप कभी भी चुपचाप सीधे नहीं जाता है। इस पीसी के अपने पते (127.0.0.1) प्रत्यक्ष रहते हैं।",
   "TikTok sounds": "टिकटोक लगता है",
   "Time": "समय",
-  "Tint the tab": "टैब को रंगें",
   "To use Tor, get it first: about 22 MB from the Tor Project, checked before it's used. {blocked_hint}": "टोर का उपयोग करने के लिए, पहले इसे प्राप्त करें: टोर प्रोजेक्ट से लगभग 22 एमबी, उपयोग करने से पहले इसकी जांच कर ली गई है। {blocked_hint}",
   "Tor download": "टोर डाउनलोड",
   "Tor sends everything through three volunteer computers around the world, so the sites you search and download from and the radio stations you play see a Tor address, not yours. It's slower, and YouTube often turns Tor away: the app then tries other Tor routes, and only goes without Tor if you click to.": "टोर दुनिया भर में तीन स्वयंसेवी कंप्यूटरों के माध्यम से सब कुछ भेजता है, इसलिए जिन साइटों पर आप खोजते हैं और डाउनलोड करते हैं और जिन रेडियो स्टेशनों पर आप खेलते हैं उन्हें टोर पता दिखाई देता है, आपका नहीं। यह धीमा है, और यूट्यूब अक्सर टोर को दूर कर देता है: ऐप फिर अन्य टोर मार्गों की कोशिश करता है, और केवल तभी टोर के बिना जाता है जब आप क्लिक करते हैं।",
@@ -2859,5 +2857,10 @@
   "by {name}": "{name} द्वारा",
   "{language} needs a one-time download of its translation model ({size} MB). Offline mode is on, so it can't be downloaded now.": "{language} को अपने अनुवाद मॉडल ( {size} एमबी) को एक बार डाउनलोड करने की आवश्यकता है। ऑफ़लाइन मोड चालू है, इसलिए इसे अभी डाउनलोड नहीं किया जा सकता.",
   "{n} MB": "{n} एमबी",
-  "⚠ Windows has no {language} voice yet, so {language} can't be spoken properly. Offline mode is on, so it can't be installed now.": "⚠ विंडोज़ में अभी तक कोई {language} आवाज नहीं है, इसलिए {language} ठीक से नहीं बोली जा सकती। ऑफ़लाइन मोड चालू है, इसलिए इसे अभी इंस्टॉल नहीं किया जा सकता."
+  "⚠ Windows has no {language} voice yet, so {language} can't be spoken properly. Offline mode is on, so it can't be installed now.": "⚠ विंडोज़ में अभी तक कोई {language} आवाज नहीं है, इसलिए {language} ठीक से नहीं बोली जा सकती। ऑफ़लाइन मोड चालू है, इसलिए इसे अभी इंस्टॉल नहीं किया जा सकता.",
+  "A bar at the edge of the tabs and a coloured icon, in the highlight colour: easy to spot from across the room": "टैब के किनारे पर एक पट्टी और हाइलाइट रंग में एक रंगीन आइकन: कमरे के दूसरी ओर से भी आसानी से दिखता है",
+  "A bar beside the tab": "टैब के बगल में एक पट्टी",
+  "Show tab names": "टैब नाम दिखाएँ",
+  "Hide tab names": "टैब नाम छिपाएँ",
+  "Show only the icons": "केवल चिह्न दिखाएँ"
 }

@@ -125,7 +125,6 @@
   "A restore point is saved first, so you can undo this.": "Palautuspiste tallennetaan ensin, joten voit kumota tämän.",
   "A short “Did you know?” about a feature, at most once a day, never while a game is up.": "Lyhyt “Tiesitkö?” jostain ominaisuudesta, korkeintaan kerran päivässä, ei koskaan pelin ollessa auki.",
   "A small dot on its icon": "Pieni piste sen kuvakkeessa",
-  "A soft wash and a coloured icon in the theme's colour, easy to spot from across the room": "Pehmeä sävy ja värillinen kuvake teeman värissä, helppo huomata huoneen toiselta puolelta",
   "A soundboard is most useful left running: your hotkeys and the overlay work while the window is closed. The tray icon (by the clock) opens it again; right-click it to quit.": "Soundboard on hyödyllisin, kun se jätetään päälle: pikanäppäimet ja overlay toimivat, vaikka ikkuna on suljettu. Ilmoitusalueen kuvake (kellon vieressä) avaa sen taas; klikkaa sitä oikealla lopettaaksesi.",
   "A tab whose feature is on right now (a sound playing, the voice changer, the radio…) is marked, so nothing is left on without you noticing.": "Välilehti, jonka ominaisuus on juuri nyt päällä (ääni soi, äänenmuunnin, radio…), merkitään, jotta mitään ei jää päälle huomaamattasi.",
   "A virtual cable (not installed yet)": "Virtuaalikaapeli (ei vielä asennettu)",
@@ -1245,7 +1244,6 @@
   "Throw this recording away?": "Heitetäänkö tämä nauhoitus pois?",
   "TikTok sounds": "TikTok-äänet",
   "Time": "Aika",
-  "Tint the tab": "Sävytä välilehti",
   "To hear it live instead, use Hear what they hear at the bottom.": "Kuullaksesi sen sen sijaan livenä käytä alhaalla olevaa Kuule mitä he kuulevat.",
   "To use Tor, get it first: about 22 MB from the Tor Project, checked before it's used. {blocked_hint}": "Käyttääksesi Toria hae se ensin: noin 22 Mt Tor Projectilta, tarkistetaan ennen käyttöä. {blocked_hint}",
   "Toggle: press again stops it": "Vaihto: uusi painallus pysäyttää sen",
@@ -2859,5 +2857,10 @@
   "by {name}": "tekijä: {name}",
   "{language} needs a one-time download of its translation model ({size} MB). Offline mode is on, so it can't be downloaded now.": "{language} tarvitsee käännösmallinsa kertalatauksen ( {size} Mt). Offline-tila on käytössä, joten sitä ei voi ladata nyt.",
   "{n} MB": "{n} Mt",
-  "⚠ Windows has no {language} voice yet, so {language} can't be spoken properly. Offline mode is on, so it can't be installed now.": "⚠ Windowsilla ei ole vielä ääntä {language} , joten {language} ei voi puhua oikein. Offline-tila on käytössä, joten sitä ei voi asentaa nyt."
+  "⚠ Windows has no {language} voice yet, so {language} can't be spoken properly. Offline mode is on, so it can't be installed now.": "⚠ Windowsilla ei ole vielä ääntä {language} , joten {language} ei voi puhua oikein. Offline-tila on käytössä, joten sitä ei voi asentaa nyt.",
+  "A bar at the edge of the tabs and a coloured icon, in the highlight colour: easy to spot from across the room": "Palkki välilehtien reunassa ja värillinen kuvake korostusvärissä: helppo havaita huoneen toiselta puolelta",
+  "A bar beside the tab": "Palkki välilehden vieressä",
+  "Show tab names": "Näytä välilehtien nimet",
+  "Hide tab names": "Piilota välilehtien nimet",
+  "Show only the icons": "Näytä vain kuvakkeet"
 }

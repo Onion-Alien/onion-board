@@ -125,7 +125,6 @@
   "A restore point is saved first, so you can undo this.": "Πρώτα αποθηκεύεται σημείο επαναφοράς, για να μπορείς να το αναιρέσεις.",
   "A short “Did you know?” about a feature, at most once a day, never while a game is up.": "Ένα σύντομο «Το ήξερες;» για μια λειτουργία, το πολύ μία φορά τη μέρα, ποτέ όσο τρέχει παιχνίδι.",
   "A small dot on its icon": "Μια μικρή τελεία στο εικονίδιό της",
-  "A soft wash and a coloured icon in the theme's colour, easy to spot from across the room": "Ένα απαλό χρώμα και χρωματιστό εικονίδιο στο χρώμα του θέματος, που φαίνεται από την άλλη άκρη του δωματίου",
   "A soundboard is most useful left running: your hotkeys and the overlay work while the window is closed. The tray icon (by the clock) opens it again; right-click it to quit.": "Ένα soundboard είναι πιο χρήσιμο όταν μένει ανοιχτό: οι συντομεύσεις και η επικάλυψη δουλεύουν όσο το παράθυρο είναι κλειστό. Το εικονίδιο στο tray (δίπλα στο ρολόι) το ξανανοίγει· δεξί κλικ πάνω του για έξοδο.",
   "A tab whose feature is on right now (a sound playing, the voice changer, the radio…) is marked, so nothing is left on without you noticing.": "Μια καρτέλα της οποίας η λειτουργία είναι ενεργή αυτή τη στιγμή (ένας ήχος που παίζει, η αλλαγή φωνής, το ραδιόφωνο…) σημαδεύεται, ώστε να μη μένει τίποτα ανοιχτό χωρίς να το καταλάβεις.",
   "A virtual cable (not installed yet)": "Ένα εικονικό καλώδιο (δεν έχει εγκατασταθεί ακόμα)",
@@ -1245,7 +1244,6 @@
   "Throw this recording away?": "Να πεταχτεί αυτή η ηχογράφηση;",
   "TikTok sounds": "Ήχοι TikTok",
   "Time": "Ώρα",
-  "Tint the tab": "Χρωμάτισε την καρτέλα",
   "To hear it live instead, use Hear what they hear at the bottom.": "Για να το ακούς ζωντανά, χρησιμοποίησε το Άκου ό,τι ακούν στο κάτω μέρος.",
   "To use Tor, get it first: about 22 MB from the Tor Project, checked before it's used. {blocked_hint}": "Για να χρησιμοποιήσεις Tor, πάρ' το πρώτα: περίπου 22 MB από το Tor Project, ελέγχεται πριν χρησιμοποιηθεί. {blocked_hint}",
   "Toggle: press again stops it": "Εναλλαγή: ξαναπατημένο το σταματάει",
@@ -2859,5 +2857,10 @@
   "by {name}": "από {name}",
   "{language} needs a one-time download of its translation model ({size} MB). Offline mode is on, so it can't be downloaded now.": "{language} χρειάζεται μια λήψη του μοντέλου μετάφρασης του ( {size} MB). Η λειτουργία εκτός σύνδεσης είναι ενεργοποιημένη, επομένως δεν είναι δυνατή η λήψη της τώρα.",
   "{n} MB": "{n} MB",
-  "⚠ Windows has no {language} voice yet, so {language} can't be spoken properly. Offline mode is on, so it can't be installed now.": "⚠ Τα Windows δεν έχουν ακόμη φωνή {language} , επομένως {language} δεν μπορεί να εκφωνηθεί σωστά. Η λειτουργία εκτός σύνδεσης είναι ενεργοποιημένη, επομένως δεν μπορεί να εγκατασταθεί τώρα."
+  "⚠ Windows has no {language} voice yet, so {language} can't be spoken properly. Offline mode is on, so it can't be installed now.": "⚠ Τα Windows δεν έχουν ακόμη φωνή {language} , επομένως {language} δεν μπορεί να εκφωνηθεί σωστά. Η λειτουργία εκτός σύνδεσης είναι ενεργοποιημένη, επομένως δεν μπορεί να εγκατασταθεί τώρα.",
+  "A bar at the edge of the tabs and a coloured icon, in the highlight colour: easy to spot from across the room": "Μια μπάρα στην άκρη των καρτελών και ένα έγχρωμο εικονίδιο, στο χρώμα επισήμανσης: εύκολο να εντοπιστεί από όλο το δωμάτιο",
+  "A bar beside the tab": "Μια μπάρα δίπλα στην καρτέλα",
+  "Show tab names": "Εμφάνιση ονομάτων καρτελών",
+  "Hide tab names": "Απόκρυψη ονομάτων καρτελών",
+  "Show only the icons": "Εμφάνιση μόνο των εικονιδίων"
 }

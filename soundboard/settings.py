@@ -645,9 +645,9 @@ class SettingsDialog(QDialog):
                                 "changer, the radio…) is marked, so nothing is left on without "
                                 "you noticing."))
         row = QVBoxLayout()   # one under the other: side by side made the page too wide
-        green = QRadioButton(_("Tint the tab"))
-        green.setToolTip(_("A soft wash and a coloured icon in the theme's colour, easy to spot "
-                           "from across the room"))
+        green = QRadioButton(_("A bar beside the tab"))
+        green.setToolTip(_("A bar at the edge of the tabs and a coloured icon, in the highlight "
+                           "colour: easy to spot from across the room"))
         dot = QRadioButton(_("A small dot on its icon"))
         dot.setToolTip(_("Quieter: only a dot on the tab's icon"))
         modes = QButtonGroup(card)
@@ -1213,7 +1213,7 @@ class SettingsDialog(QDialog):
             grid.addWidget(label, r, 0)
             grid.addWidget(cb, r, 1)
             self.dev_combos.append((cb, src))
-        grid.setColumnStretch(1, 1)
+        grid.setColumnStretch(2, 1)   # the room past the boxes, not the boxes' column
         cv.addLayout(grid)
         from soundboard.ui import alsosend   # (its panel import imports this module)
         # once the grid is in the card: a row added before would be its own window

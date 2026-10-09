@@ -144,4 +144,5 @@ def test_the_tick_lists_on_a_worker(window, monkeypatch, qapp):
     window.cfg.route, window.cfg.mic_device = "mic", "Microphone (Test)"
     window._raw_tick()
     assert process_events(qapp, lambda: not window._raw_looking)
-    assert seen == [("Microphone (Test)", True)]
+    # the board's own tick timer can fire a second look on a slow runner: same question
+    assert seen and set(seen) == {("Microphone (Test)", True)}

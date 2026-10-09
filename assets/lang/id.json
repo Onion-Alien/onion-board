@@ -705,7 +705,6 @@
   "A restore point is saved first, so you can undo this.": "Titik pemulihan disimpan terlebih dahulu, sehingga Anda dapat membatalkannya.",
   "A short “Did you know?” about a feature, at most once a day, never while a game is up.": "Kalimat singkat “Tahukah Anda?” tentang suatu fitur, paling banyak sekali sehari, tidak pernah saat game sedang berjalan.",
   "A small dot on its icon": "Titik kecil di ikonnya",
-  "A soft wash and a coloured icon in the theme's colour, easy to spot from across the room": "Latar lembut dan ikon berwarna sesuai warna tema, gampang terlihat dari seberang ruangan",
   "A soundboard is most useful left running: your hotkeys and the overlay work while the window is closed. The tray icon (by the clock) opens it again; right-click it to quit.": "Soundboard paling berguna kalau dibiarkan jalan: hotkey dan overlay tetap berfungsi saat jendelanya ditutup. Ikon tray (di dekat jam) membukanya lagi; klik kanan untuk keluar.",
   "A tab whose feature is on right now (a sound playing, the voice changer, the radio…) is marked, so nothing is left on without you noticing.": "Tab yang fiturnya sedang menyala (suara sedang diputar, pengubah suara, radio…) diberi tanda, jadi tidak ada yang tetap menyala tanpa kamu sadari.",
   "About": "Tentang",
@@ -1351,7 +1350,6 @@
   "Through a proxy or Tor, everything the app fetches (searches, downloads, radio, updates) goes through it, and site names are looked up there, not on this PC. If it can't be reached, nothing is fetched: the app never quietly goes direct. This PC's own addresses (127.0.0.1) stay direct.": "Melalui proxy atau Tor, semua yang diambil aplikasi (pencarian, unduhan, radio, pembaruan) melewatinya, dan nama situs dicari di sana, bukan di PC ini. Jika tidak dapat dijangkau, tidak ada yang diambil: aplikasi tidak pernah langsung berjalan secara diam-diam. Alamat PC ini (127.0.0.1) tetap langsung.",
   "TikTok sounds": "Suara TikTok",
   "Time": "Waktu",
-  "Tint the tab": "Warnai tab-nya",
   "To use Tor, get it first: about 22 MB from the Tor Project, checked before it's used. {blocked_hint}": "Untuk menggunakan Tor, dapatkan terlebih dahulu: sekitar 22 MB dari Proyek Tor, diperiksa sebelum digunakan. {blocked_hint}",
   "Tor download": "Unduhan Tor",
   "Tor sends everything through three volunteer computers around the world, so the sites you search and download from and the radio stations you play see a Tor address, not yours. It's slower, and YouTube often turns Tor away: the app then tries other Tor routes, and only goes without Tor if you click to.": "Tor mengirimkan semuanya melalui tiga komputer sukarelawan di seluruh dunia, sehingga situs yang Anda cari dan unduh serta stasiun radio yang Anda putar akan melihat alamat Tor, bukan alamat Anda. Ini lebih lambat, dan YouTube sering kali menolak Tor: aplikasi kemudian mencoba rute Tor lainnya, dan hanya berjalan tanpa Tor jika Anda mengekliknya.",
@@ -2799,5 +2797,10 @@
   "by {name}": "oleh {name}",
   "{language} needs a one-time download of its translation model ({size} MB). Offline mode is on, so it can't be downloaded now.": "{language} memerlukan pengunduhan satu kali model terjemahannya ( {size} MB). Mode offline aktif, jadi tidak dapat diunduh sekarang.",
   "{n} MB": "{n} MB",
-  "⚠ Windows has no {language} voice yet, so {language} can't be spoken properly. Offline mode is on, so it can't be installed now.": "⚠ Windows belum memiliki suara {language} , jadi {language} tidak dapat diucapkan dengan benar. Mode offline aktif, jadi tidak dapat diinstal sekarang."
+  "⚠ Windows has no {language} voice yet, so {language} can't be spoken properly. Offline mode is on, so it can't be installed now.": "⚠ Windows belum memiliki suara {language} , jadi {language} tidak dapat diucapkan dengan benar. Mode offline aktif, jadi tidak dapat diinstal sekarang.",
+  "A bar at the edge of the tabs and a coloured icon, in the highlight colour: easy to spot from across the room": "Bilah di tepi tab dan ikon berwarna, dalam warna highlight: mudah dikenali dari seberang ruangan",
+  "A bar beside the tab": "Bilah di samping tab",
+  "Show tab names": "Tampilkan nama tab",
+  "Hide tab names": "Sembunyikan nama tab",
+  "Show only the icons": "Tampilkan hanya ikonnya"
 }
