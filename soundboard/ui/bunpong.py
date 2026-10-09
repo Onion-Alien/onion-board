@@ -14,7 +14,8 @@ import random
 import time
 
 from PySide6.QtCore import QPointF, QRectF, Qt, QTimer
-from PySide6.QtGui import QColor, QFont, QPainter, QPainterPath, QPen
+from PySide6.QtGui import (QBrush, QColor, QFont, QImage, QLinearGradient, QPainter,
+                           QPainterPath, QPen, QPixmap, QRadialGradient)
 from PySide6.QtWidgets import (QDialog, QFrame, QHBoxLayout, QLabel, QPushButton, QVBoxLayout,
                                QWidget)
 
@@ -35,7 +36,54 @@ SPEEDUP, SPEED_MAX = 1.07, 1.35
 BUN_SPEED = 0.95      # how fast Bun can move, court heights a second
 MAX_ANGLE = 55        # degrees off straight, hitting the very end of a paddle
 BALL = QColor("#d8f25e")
+BUN_PINK = QColor("#ff8fae")   # his end of the court
+CONFETTI = ("#ffcf40", "#ff8fae", "#1fb6ff", "#13ce66", "#a48bff")
+RALLY_SHOWN = 3   # from this many hits in a row the rally counter shows
 BUBBLE = QColor("#fffaf0")
+
+
+def _mix(a: QColor, b: QColor, t: float, alpha: float = 1.0) -> QColor:
+    """`a` moved fraction `t` of the way to `b`, at `alpha`."""
+    c = QColor(round(a.red() + (b.red() - a.red()) * t),
+               round(a.green() + (b.green() - a.green()) * t),
+               round(a.blue() + (b.blue() - a.blue()) * t))
+    c.setAlphaF(alpha)
+    return c
+
+
+def _alpha(c: QColor | str, a: float) -> QColor:
+    c = QColor(c)
+    c.setAlphaF(max(0.0, min(1.0, a)))
+    return c
+
+
+_grain: dict[bool, QPixmap] = {}
+
+
+def _grain_tile(light: bool) -> QPixmap:
+    """A tile of fine grain laid over the court: it breaks up the banding soft colour
+    fades get on 8-bit screens (the same idea as the themes' window grain)."""
+    if light not in _grain:
+        rnd = random.Random(7)
+        img = QImage(96, 96, QImage.Format_ARGB32_Premultiplied)
+        img.fill(Qt.transparent)
+        base = (0, 0, 0) if light else (255, 255, 255)
+        for y in range(96):
+            for x in range(96):
+                a = rnd.randint(0, 9 if light else 11)
+                if a:
+                    img.setPixelColor(x, y, QColor(*base, a))
+        _grain[light] = QPixmap.fromImage(img)
+    return _grain[light]
+
+
+class _Spark:
+    """A bit of something flying: a spark off a hit, or confetti."""
+    __slots__ = ("x", "y", "vx", "vy", "age", "life", "col", "size", "spin")
+
+    def __init__(self, x, y, vx, vy, life, col, size, spin=0.0):
+        self.x, self.y, self.vx, self.vy = x, y, vx, vy
+        self.age, self.life, self.col, self.size, self.spin = 0.0, life, QColor(col), size, spin
 
 
 def _bubble(p: QPainter, text: str, x: float, y: float, px: int):
@@ -66,6 +114,7 @@ class Court(QWidget):
     def __init__(self, rng: random.Random | None = None, parent=None):
         super().__init__(parent)
         self.rng = rng or random.Random()
+        self.fx = random.Random()   # sparks and shakes: never moves the game's own dice
         self.setMouseTracking(True)
         self.setMinimumSize(320, 220)
         self.setFocusPolicy(Qt.StrongFocus)
@@ -88,6 +137,11 @@ class Court(QWidget):
         self.err = 0.0             # how far off Bun's guess is this rally
         self.say, self.say_until = "", 0.0
         self.server = "you"
+        self.sparks: list[_Spark] = []     # hit sparks and confetti, px
+        self.rally = 0                     # hits in a row this point
+        self.goal_flash: list | None = None   # [side "bun" / "you", age]: a goal let in
+        self.pop = {"you": 9.0, "bun": 9.0}   # seconds since each side scored
+        self.shake = 0.0                   # seconds of court shake left
 
     def _speed(self) -> float:
         return math.hypot(self.vx * self.width(), self.vy * self.height()) / max(1, self.width())
@@ -128,6 +182,8 @@ class Court(QWidget):
         return {"w": w, "h": h, "bh": bh, "s": s, "r": max(5.0, h * 0.028),
                 "bun_x": 86 * s + 6,        # his bat, px from the left
                 "bun_half": half,
+                # how far up and down he can go and still be all on the court
+                "bun_min": (72 * s + 6) / h, "bun_max": 1 - (bh - 72 * s + 6) / h,
                 "you_x": w - 22, "you_half": 0.1, "pad_w": 9}
 
     def bun_rect(self, g: dict) -> QRectF:
@@ -148,14 +204,29 @@ class Court(QWidget):
             target = self._predict(g["bun_x"] / g["w"]) + self.err * g["bun_half"]
         else:
             target = 0.5
-        top, bottom = g["bun_half"], 1 - g["bun_half"]
-        target = min(bottom, max(top, target))
+        target = min(g["bun_max"], max(g["bun_min"], target))
         move = BUN_SPEED * dt
         self.bun_y += max(-move, min(move, target - self.bun_y))
         self.swing = max(0.0, self.swing - dt * 2.5)
         for f in self.flash:
             f[2] += dt
         self.flash = [f for f in self.flash if f[2] < 0.35]
+        for sp in self.sparks:
+            sp.age += dt
+            sp.x += sp.vx * dt
+            sp.y += sp.vy * dt
+            sp.vy += 260 * dt if sp.spin else 0.0   # confetti falls, sparks just fly
+            sp.vx *= 1 - dt * 2.5
+            if not sp.spin:
+                sp.vy *= 1 - dt * 2.5
+        self.sparks = [sp for sp in self.sparks if sp.age < sp.life]
+        if self.goal_flash is not None:
+            self.goal_flash[1] += dt
+            if self.goal_flash[1] > 0.7:
+                self.goal_flash = None
+        for k in self.pop:
+            self.pop[k] += dt
+        self.shake = max(0.0, self.shake - dt)
         if self.state == "point" and self.st >= SERVE_PAUSE:
             self.serve(self.server)
         if self.state != "play":
@@ -191,7 +262,10 @@ class Court(QWidget):
         bx = g["bun_x"] + 3
         if self.vx < 0 and bx - 6 <= x - r <= bx:
             off = (self.by - self.bun_y) / g["bun_half"]
-            if abs(off) <= 1 + ry / g["bun_half"]:
+            # as high or low as he can go, he reaches the rest of the way with the bat
+            top = 0.0 if self.bun_y <= g["bun_min"] + 1e-3 else self.bun_y - g["bun_half"]
+            bottom = 1.0 if self.bun_y >= g["bun_max"] - 1e-3 else self.bun_y + g["bun_half"]
+            if top - ry <= self.by <= bottom + ry:
                 self._hit(off, 1, (bx + r) / w)
                 self.swing = 0.45
                 return False
@@ -220,22 +294,48 @@ class Court(QWidget):
         self.vy = speed * math.sin(a) * aspect
         self.bx = x
         self.flash.append([self.bx, self.by, 0.0])
+        self.rally += 1
+        # sparks off the hit, in the hitter's colour, flying back into the court
+        col = BUN_PINK if sign > 0 else QColor(theme.T["accent"])
+        px, py = self.bx * self.width(), self.by * self.height()
+        for _i in range(9 + min(9, self.rally)):
+            a = math.radians(self.fx.uniform(-70, 70))
+            v = self.fx.uniform(80, 220) * (1 + speed - SPEED0)
+            self.sparks.append(_Spark(px, py, sign * math.cos(a) * v, math.sin(a) * v,
+                                      self.fx.uniform(0.25, 0.5),
+                                      col if self.fx.random() < 0.6 else BALL,
+                                      self.fx.uniform(1.4, 2.6)))
 
     def _point(self, who: str):
         self.score[who] += 1
         self.server = "bun" if who == "you" else "you"   # served toward who lost it
         self.trail.clear()
+        self.rally = 0
+        self.pop[who] = 0.0
+        self.goal_flash = ["bun" if who == "you" else "you", 0.0]
+        self.shake = 0.28
         if self.score[who] >= WIN_AT:
+            if who == "you":
+                self._confetti()
             self._go("over")
             self._say(_("aww…") if who == "you" else _("who's the champ!"), 1e9)
             if self.on_over:
                 self.on_over()
             return
         if who == "you":
-            self._say(self.rng.choice((_("no way!"), _("lucky!"), _("hey!"))))
+            self._say(self.fx.choice((_("no way!"), _("lucky!"), _("hey!"))))
         else:
-            self._say(self.rng.choice((_("ha!"), _("too slow!"), _("bonk!"))))
+            self._say(self.fx.choice((_("ha!"), _("too slow!"), _("bonk!"))))
         self._go("point")
+
+    def _confetti(self):
+        w = max(1, self.width())
+        for _i in range(70):
+            self.sparks.append(_Spark(self.fx.uniform(0, w), self.fx.uniform(-60, -4),
+                                      self.fx.uniform(-40, 40), self.fx.uniform(20, 120),
+                                      self.fx.uniform(1.6, 2.6),
+                                      self.fx.choice(CONFETTI), self.fx.uniform(3, 5),
+                                      spin=self.fx.uniform(4, 10)))
 
     @property
     def winner(self) -> str | None:
@@ -280,27 +380,27 @@ class Court(QWidget):
         g = self.geo()
         w, h, r = g["w"], g["h"], g["r"]
         t = time.monotonic()
-        line = QColor(theme.T["border"])
-        dash = QPen(line, 2, Qt.CustomDashLine, Qt.RoundCap)
-        dash.setDashPattern([2.5, 4])
-        p.setPen(dash)
-        if self.state != "over":
-            p.drawLine(QPointF(w / 2, 14), QPointF(w / 2, h - 14))
+        over = self.state == "over"
+        if self.shake > 0:   # a little jolt when a point goes in
+            k = self.shake / 0.28
+            p.translate(self.fx.uniform(-3, 3) * k, self.fx.uniform(-2, 2) * k)
+        self._paint_arena(p, w, h, over)
 
-        # the score: big and faint behind the play
+        # the score: big and faint behind the play, popping when it goes up
         f = QFont(self.font())
-        f.setPixelSize(round(h * 0.24))
-        f.setBold(True)
-        p.setFont(f)
-        faint = QColor(theme.T["text_hi"])
-        faint.setAlphaF(0.12)
-        p.setPen(faint)
-        if self.state != "over":
+        if not over:
             nw = w * 0.16   # each side's number, just off the net
             top = QRectF(w / 2 - nw - w * 0.03, h * 0.06, nw, h * 0.28)
-            p.drawText(top, Qt.AlignCenter, str(self.score["bun"]))
-            p.drawText(top.translated(nw + w * 0.06, 0), Qt.AlignCenter,
-                       str(self.score["you"]))
+            for side, box in (("bun", top), ("you", top.translated(nw + w * 0.06, 0))):
+                k = self.pop[side]
+                bump = 1 + 0.35 * max(0.0, 1 - k / 0.35) ** 2
+                col = QColor(theme.T["text_hi"])
+                col.setAlphaF(0.12 + 0.5 * max(0.0, 1 - k / 0.6))
+                f.setPixelSize(round(h * 0.24 * bump))
+                f.setBold(True)
+                p.setFont(f)
+                p.setPen(col)
+                p.drawText(box.adjusted(-30, -30, 30, 30), Qt.AlignCenter, str(self.score[side]))
             f.setPixelSize(max(10, round(h * 0.045)))
             f.setBold(False)
             p.setFont(f)
@@ -308,9 +408,10 @@ class Court(QWidget):
             under = QRectF(top.left(), top.bottom() - 4, nw, h * 0.07)
             p.drawText(under, Qt.AlignCenter, _("Bun"))
             p.drawText(under.translated(nw + w * 0.06, 0), Qt.AlignCenter, _("You"))
+            if self.rally >= RALLY_SHOWN and self.state == "play":
+                self._paint_rally(p, w, h)
 
         # Bun with his bat up as a paddle (or not, at the end)
-        over = self.state == "over"
         lost = over and self.winner == "you"
         won = over and self.winner == "bun"
         br = self.bun_rect(g)
@@ -333,13 +434,17 @@ class Court(QWidget):
         px = g["you_x"] - g["pad_w"] / 2
         ph = g["you_half"] * 2 * h
         py = self.you_y * h - ph / 2
-        glow = QColor(acc)
-        glow.setAlphaF(0.22 if not over else 0.0)
-        p.setPen(Qt.NoPen)
-        p.setBrush(glow)
-        p.drawRoundedRect(QRectF(px - 4, py - 4, g["pad_w"] + 8, ph + 8), 8, 8)
-        p.setBrush(acc)
-        p.drawRoundedRect(QRectF(px, py, g["pad_w"], ph), g["pad_w"] / 2, g["pad_w"] / 2)
+        if not over:
+            p.setPen(Qt.NoPen)
+            for i, a in ((10, 0.06), (6, 0.12), (3, 0.2)):   # a soft glow round it
+                p.setBrush(_alpha(acc, a))
+                p.drawRoundedRect(QRectF(px - i, py - i, g["pad_w"] + 2 * i, ph + 2 * i),
+                                  g["pad_w"] / 2 + i, g["pad_w"] / 2 + i)
+            body = QLinearGradient(px, 0, px + g["pad_w"], 0)
+            body.setColorAt(0, _mix(acc, QColor("white"), 0.35))
+            body.setColorAt(1, acc)
+            p.setBrush(body)
+            p.drawRoundedRect(QRectF(px, py, g["pad_w"], ph), g["pad_w"] / 2, g["pad_w"] / 2)
 
         # hit rings, the ball's trail, the ball
         for fx, fy, age in self.flash:
@@ -350,14 +455,34 @@ class Court(QWidget):
             p.setBrush(Qt.NoBrush)
             rr = r * (1.2 + 2.2 * k)
             p.drawEllipse(QPointF(fx * w, fy * h), rr, rr)
+        for sp in self.sparks:
+            k = sp.age / sp.life
+            p.setPen(Qt.NoPen)
+            p.setBrush(_alpha(sp.col, 1 - k * k))
+            if sp.spin:   # confetti: little turning paper strips
+                p.save()
+                p.translate(sp.x, sp.y)
+                p.rotate(sp.age * sp.spin * 60)
+                p.scale(1, abs(math.cos(sp.age * sp.spin)) + 0.15)
+                p.drawRect(QRectF(-sp.size / 2, -sp.size, sp.size, sp.size * 2))
+                p.restore()
+            else:
+                p.drawEllipse(QPointF(sp.x, sp.y), sp.size * (1 - 0.5 * k), sp.size * (1 - 0.5 * k))
         if self.state in ("play", "ready"):
+            heat = max(0.0, min(1.0, (self._speed() - SPEED0) / (SPEED_MAX - SPEED0)))
+            hot = _mix(BALL, QColor(theme.T["accent"]), heat)
             p.setPen(Qt.NoPen)
             for i, (tx, ty) in enumerate(self.trail[:-1]):
-                c = QColor(BALL)
-                c.setAlphaF(0.05 + 0.25 * i / len(self.trail))
-                p.setBrush(c)
-                rr = r * (0.5 + 0.5 * i / len(self.trail))
+                k = i / len(self.trail)
+                p.setBrush(_alpha(hot, 0.06 + (0.25 + 0.2 * heat) * k))
+                rr = r * (0.45 + 0.55 * k)
                 p.drawEllipse(QPointF(tx * w, ty * h), rr, rr)
+            glow = QRadialGradient(QPointF(self.bx * w, self.by * h), r * (2.6 + 1.6 * heat))
+            glow.setColorAt(0, _alpha(hot, 0.35 + 0.25 * heat))
+            glow.setColorAt(1, _alpha(hot, 0.0))
+            p.setBrush(glow)
+            p.drawEllipse(QPointF(self.bx * w, self.by * h), r * (2.6 + 1.6 * heat),
+                          r * (2.6 + 1.6 * heat))
             self._paint_ball(p, self.bx * w, self.by * h, r)
 
         if self.state == "ready":
@@ -371,6 +496,85 @@ class Court(QWidget):
             _bubble(p, self.say, br.center().x() + br.width() * 0.15,
                     br.top() + br.height() * 0.1, max(10, round(g["bh"] * 0.12)))
         p.end()
+
+    def _paint_arena(self, p: QPainter, w: float, h: float, over: bool):
+        """The court bed: sunk into the card, lit from the middle with the theme colour,
+        each end tinted for its player, with lines and a glowing net. All from the
+        theme's own colours, so it fits every theme."""
+        light = theme.is_light()
+        acc = QColor(theme.T["accent"])
+        hi = QColor(theme.T["text_hi"])
+        bed = QColor(theme.T.get("inset", theme.T["bg"]))
+        dark = QColor("white" if light else "black")
+        court = QRectF(0, 0, w, h)
+        path = QPainterPath()
+        path.addRoundedRect(court, 12, 12)
+        p.save()
+        p.setClipPath(path)
+        g = QLinearGradient(0, 0, 0, h)   # a sunken bed: shaded under the top lip
+        g.setColorAt(0, _mix(bed, dark, 0.25 if not light else 0.0))
+        g.setColorAt(0.12, bed)
+        g.setColorAt(1, _mix(bed, hi, 0.03))
+        p.fillRect(court, g)
+        glow = QRadialGradient(QPointF(w / 2, h / 2), max(w, h) * 0.55)
+        glow.setColorAt(0, _alpha(acc, 0.14 if not light else 0.08))
+        glow.setColorAt(1, _alpha(acc, 0.0))
+        p.fillRect(court, glow)
+        for x0, x1, col in ((0, w * 0.22, BUN_PINK), (w, w * 0.78, acc)):   # the ends
+            end = QLinearGradient(x0, 0, x1, 0)
+            end.setColorAt(0, _alpha(col, 0.13))
+            end.setColorAt(1, _alpha(col, 0.0))
+            p.fillRect(court, end)
+        if self.goal_flash is not None:   # a goal just went in at this end
+            side, age = self.goal_flash
+            k = max(0.0, 1 - age / 0.7)
+            col = BUN_PINK if side == "you" else acc   # the scorer's colour
+            x0, x1 = (w, w * 0.6) if side == "you" else (0, w * 0.4)
+            fl = QLinearGradient(x0, 0, x1, 0)
+            fl.setColorAt(0, _alpha(col, 0.45 * k))
+            fl.setColorAt(1, _alpha(col, 0.0))
+            p.fillRect(court, fl)
+        p.fillRect(court, QBrush(_grain_tile(light)))
+        if not over:
+            line = _alpha(hi, 0.10)
+            p.setBrush(Qt.NoBrush)
+            p.setPen(QPen(line, 1.5))
+            p.drawRoundedRect(court.adjusted(12, 12, -12, -12), 6, 6)
+            rr = h * 0.17
+            p.drawEllipse(QPointF(w / 2, h / 2), rr, rr)
+            p.setPen(QPen(_alpha(acc, 0.10), 7, Qt.SolidLine, Qt.RoundCap))
+            p.drawLine(QPointF(w / 2, 12), QPointF(w / 2, h - 12))   # the net's glow
+            dash = QPen(_alpha(hi, 0.35), 2, Qt.CustomDashLine, Qt.RoundCap)
+            dash.setDashPattern([2.5, 4])
+            p.setPen(dash)
+            p.drawLine(QPointF(w / 2, 12), QPointF(w / 2, h - 12))
+        p.restore()
+        # the lip: shade along the top edge, a catch of light along the bottom
+        p.setBrush(Qt.NoBrush)
+        p.setPen(QPen(_alpha(hi, 0.08 if not light else 0.0), 1))
+        p.drawRoundedRect(court.adjusted(0.5, 0.5, -0.5, -0.5), 12, 12)
+
+    def _paint_rally(self, p: QPainter, w: float, h: float):
+        """A pill at the bottom of the court counting the rally, like a combo meter."""
+        f = QFont(self.font())
+        f.setPixelSize(max(10, round(h * 0.042)))
+        f.setBold(True)
+        p.setFont(f)
+        text = _("Rally {n}", n=self.rally)
+        fm = p.fontMetrics()
+        bw, bh = fm.horizontalAdvance(text) + 22, fm.height() + 8
+        box = QRectF((w - bw) / 2, h - bh - 18, bw, bh)
+        acc = QColor(theme.T["accent"])
+        g = QLinearGradient(0, box.top(), 0, box.bottom())
+        g.setColorAt(0, _mix(acc, QColor("white"), 0.16))
+        g.setColorAt(1, acc)
+        p.setPen(Qt.NoPen)
+        p.setBrush(_alpha(acc, 0.25))
+        p.drawRoundedRect(box.adjusted(-3, -3, 3, 3), bh / 2 + 3, bh / 2 + 3)
+        p.setBrush(g)
+        p.drawRoundedRect(box, bh / 2, bh / 2)
+        p.setPen(QColor(theme.T.get("on_accent", "#ffffff")))
+        p.drawText(box, Qt.AlignCenter, text)
 
     @staticmethod
     def _paint_ball(p: QPainter, x: float, y: float, r: float):

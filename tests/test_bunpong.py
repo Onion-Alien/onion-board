@@ -197,3 +197,21 @@ def test_arrow_keys_move_and_serve(qapp):
     assert c.state == "play" and c.aim_y > 0.5
     game.finish()
     stack.close()
+
+
+def test_bun_stays_whole_on_the_court_and_still_reaches_the_edges(qapp):
+    stack, game = _game(seed=6)
+    c = game.court
+    g = c.geo()
+    for y in (0.02, 0.98):
+        c.serve("bun")
+        c.bx, c.by, c.vy = 0.5, y, 0.0
+        for _ in range(240):
+            game.step(1 / 60)
+            r = c.bun_rect(g)
+            assert r.top() >= 0 and r.bottom() <= c.height()
+            if c.vx > 0 or c.state != "play":
+                break
+        assert c.vx > 0 and c.score == {"you": 0, "bun": 0}   # he got it, bat stretched
+    game.finish()
+    stack.close()
