@@ -3,7 +3,8 @@ you with the feedback form for anyone who wants to say more or get a reply.
 
 The picks go out with the anonymous usage count (usage.improve: names from a fixed
 list, and Other's words with anything personal taken out), so they're counted only
-when that's on. The form only opens in the browser, like before (feedback.py)."""
+when that's on. They go with a one-off random session, never this PC's ID, and the box
+says so. The form only opens in the browser, like before (feedback.py)."""
 from __future__ import annotations
 
 from PySide6.QtCore import Qt
@@ -12,7 +13,7 @@ from PySide6.QtWidgets import (QCheckBox, QDialog, QHBoxLayout, QLabel, QLineEdi
 
 from soundboard import __version__, feedback, usage
 from soundboard.i18n import _
-from soundboard.ui import busy, fit
+from soundboard.ui import busy, fit, icons
 
 
 def picks() -> list[tuple[str, str]]:
@@ -84,6 +85,18 @@ class FeedbackDialog(QDialog):
         row.addStretch(1)
         v.addSpacing(6)
         v.addLayout(row)
+        # what Send does with the picks (usage.improve): said where people decide
+        note = QHBoxLayout()
+        note.setSpacing(6)
+        shield = QLabel()
+        icons.set_label_icon(shield, "shield", size=14)
+        self.anon_note = QLabel(_("Anonymous: not linked to you or this PC."))
+        self.anon_note.setObjectName("hint")
+        self.anon_note.setWordWrap(True)
+        note.addWidget(shield, 0, Qt.AlignmentFlag.AlignTop)
+        note.addWidget(self.anon_note, 1)
+        v.addSpacing(2)
+        v.addLayout(note)
         self._changed()
         return w
 

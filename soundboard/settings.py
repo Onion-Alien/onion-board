@@ -2272,13 +2272,22 @@ class SettingsDialog(QDialog):
         netlog.keep(library.APP_DIR / netlog.FILE_NAME if on else None)
         self.net_activity.refresh(force=True)
 
-    def _option(self, cv, text: str, hint: str, on: bool, changed):
+    def _option(self, cv, text: str, hint: str, on: bool, changed, extra=None):
         """A checkbox with a short label and its explanation underneath (a long label
-        can't wrap, and would make the whole page wider than the window)."""
+        can't wrap, and would make the whole page wider than the window). `extra` (an
+        icon button) sits right after the box's text."""
         box = QCheckBox(text)
         box.setChecked(on)
         box.toggled.connect(changed)
-        cv.addWidget(box)
+        if extra is None:
+            cv.addWidget(box)
+        else:
+            row = QHBoxLayout()
+            row.setSpacing(4)
+            row.addWidget(box)
+            row.addWidget(extra)
+            row.addStretch(1)
+            cv.addLayout(row)
         h = QLabel(hint)
         h.setObjectName("hint")
         h.setWordWrap(True)
@@ -2314,13 +2323,25 @@ class SettingsDialog(QDialog):
         "tor_download": _("Get Tor / Update Tor (Connection page) downloads Tor from the "
                           "Tor Project (dist.torproject.org). Off: a Tor that's already "
                           "here still works."),
-        "usage_stats": _("Once a day, sends an anonymous count to goatcounter.com: the "
-                         "version, tabs opened, crash counts and a random ID that follows "
-                         "how the app is used over time. Only used to fix errors and see "
-                         "which features need work. Never your name, sounds or settings. "
-                         "Switching it off sends one last anonymous count (no ID), then "
-                         "nothing."),
+        "usage_stats": _("Anonymous usage stats once a day, to see what to improve. "
+                         "Never your name, IP address or device info."),
     }
+
+    def _count_eye(self) -> QPushButton:
+        """Count me in's eye: opens the table of what it sends (ui/countdialog.py)."""
+        eye = QPushButton()
+        eye.setObjectName("iconbutton")
+        eye.setProperty("quiet", True)
+        icons.set_icon(eye, "eye")
+        eye.setToolTip(_("See what's sent"))
+        eye.setAccessibleName(_("See what's sent"))
+
+        def show():
+            from soundboard.ui import countdialog
+            self.count_dialog = countdialog.show(self)
+        eye.clicked.connect(show)
+        self.count_eye = eye
+        return eye
 
     def _switches_card(self):
         """Every feature that goes online, each with its own switch (soundboard.net
@@ -2367,7 +2388,8 @@ class SettingsDialog(QDialog):
             for key in keys:
                 self.net_boxes[key] = self._option(
                     sv, labels.get(key) or net.feature_name(key), self.NET_HINTS[key],
-                    key not in cfg.net_off, lambda on, k=key: self._set_feature(k, on))
+                    key not in cfg.net_off, lambda on, k=key: self._set_feature(k, on),
+                    extra=self._count_eye() if key == "usage_stats" else None)
                 sub = QWidget()
                 sl = QVBoxLayout(sub)
                 sl.setContentsMargins(26, 0, 0, 0)

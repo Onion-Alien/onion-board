@@ -509,6 +509,10 @@ def main():
     # left running for days
     QTimer.singleShot(45_000, w.check_updates)
     QTimer.singleShot(60_000, w.send_usage)   # the anonymous daily count (usage.py)
+    w.tick_usage()   # how long it's open, for the daily count: from now
+    open_timer = QTimer(w)
+    open_timer.timeout.connect(w.tick_usage)
+    open_timer.start(usage.OPEN_TICK_S * 1000)
     recheck = QTimer(w)
     recheck.timeout.connect(w.check_updates)
     recheck.timeout.connect(w.send_usage)
