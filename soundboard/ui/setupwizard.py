@@ -19,7 +19,8 @@ import subprocess
 import time
 
 import numpy as np
-from PySide6.QtCore import Qt, QTimer
+from PySide6.QtCore import QRectF, Qt, QTimer
+from PySide6.QtGui import QColor, QPainter, QPen
 from PySide6.QtWidgets import (QApplication, QButtonGroup, QCheckBox, QDialog, QFrame,
                                QHBoxLayout, QLabel, QMessageBox, QProgressBar, QPushButton,
                                QRadioButton, QScrollArea, QStackedWidget, QVBoxLayout, QWidget)
@@ -31,7 +32,7 @@ from soundboard.engine import SR
 from soundboard import library, net, otherboards
 from soundboard.library import RESOURCE_DIR
 from soundboard.ui import busy, fit, icons
-from soundboard.ui.bunnywidget import BunnyWidget
+from soundboard.ui.bunnywidget import TALK, BunnyWidget
 from soundboard.ui.widgets import Meter
 from soundboard import errors
 from soundboard.i18n import _
@@ -162,6 +163,37 @@ def _bad() -> str:
     return theme.status("warn")
 
 
+def _cable_text(text: str) -> str:
+    """A cable button's words without their ⬇ (the button has the cable picture)."""
+    return text.replace("⬇", "").strip()
+
+
+def _test_title() -> str:
+    return _("Play a test sound")
+
+
+def _choice_icon(name: str, kind: str) -> str:
+    """A device's picture in the pick lists: a mic, headphones or a speaker."""
+    if kind == "input":
+        return "mic"
+    low = name.lower()
+    return "headphones" if any(w in low for w in ("headphone", "headset", "earbud",
+                                                 "airpods", "buds")) else "volume"
+
+
+def _card(margins: int = 16, spacing: int = 12,
+          roomy: bool = True) -> tuple[QFrame, QVBoxLayout]:
+    """A rounded panel (the theme's card) to group a page's buttons; `roomy` gives
+    them the theme's bigger padding."""
+    card = QFrame()
+    card.setObjectName("card")
+    card.setProperty("roomy", roomy)
+    lay = QVBoxLayout(card)
+    lay.setContentsMargins(margins, margins, margins, margins)
+    lay.setSpacing(spacing)
+    return card, lay
+
+
 def _label(text: str, css: str = BODY_CSS) -> QLabel:
     lbl = QLabel(text)
     lbl.setWordWrap(True)
@@ -185,6 +217,32 @@ def _header(title: str, body: QLabel, bun: BunnyWidget) -> QHBoxLayout:
     row.addLayout(col, 1)
     row.addWidget(bun, 0, Qt.AlignTop)
     return row
+
+
+class _RoundButton(QPushButton):
+    """A round accent button showing just its icon (the test sound's speaker). Painted
+    by hand: the theme's button rules square off a style-sheet circle."""
+
+    def __init__(self, size: int):
+        super().__init__()
+        self.setFixedSize(size, size)
+        self.setCursor(Qt.PointingHandCursor)
+
+    def paintEvent(self, ev):
+        p = QPainter(self)
+        p.setRenderHint(QPainter.Antialiasing)
+        t = theme.T
+        col = QColor(t["accent_hover"] if self.underMouse() or self.isDown() else t["accent"])
+        if self.isDown():
+            col = col.darker(115)
+        r = QRectF(self.rect()).adjusted(1, 1, -1, -1)
+        p.setPen(QPen(QColor(t["text"]), 2) if self.hasFocus() else Qt.NoPen)
+        p.setBrush(col)
+        p.drawEllipse(r)
+        s = self.iconSize()
+        pm = self.icon().pixmap(s, self.devicePixelRatioF())
+        p.drawPixmap(round((self.width() - s.width()) / 2),
+                     round((self.height() - s.height()) / 2), pm)
 
 
 class SetupWizard(QDialog):
@@ -251,15 +309,25 @@ class SetupWizard(QDialog):
 
     # ------------------------------------------------------------------ pages
     def _choice_list(self, names: list[str], current: str | None,
-                     on_pick) -> tuple[QWidget, QButtonGroup]:
+                     on_pick, kind: str = "output") -> tuple[QWidget, QButtonGroup]:
+        """The devices as big tiles, each with its picture; the picked one is outlined."""
         box = QWidget()
+        t = theme.T
+        box.setStyleSheet(
+            f"QRadioButton#choice {{ font-size:12pt; padding:11px 14px; spacing:12px; "
+            f"background:{t['panel']}; border:1px solid transparent; border-radius:10px; }}"
+            f"QRadioButton#choice:hover {{ background:{t['card_hi']}; "
+            f"border-color:{t['border_hi']}; }}"
+            f"QRadioButton#choice:checked {{ background:{t['card_hi']}; "
+            f"border:2px solid {t['accent']}; padding:10px 13px; }}")
         bv = QVBoxLayout(box)
         bv.setContentsMargins(0, 0, 0, 0)
-        bv.setSpacing(6)
+        bv.setSpacing(8)
         group = QButtonGroup(box)
         for n in names:
             rb = QRadioButton(n.replace("&", "&&"))   # a lone & is a shortcut marker
-            rb.setStyleSheet("font-size:11pt; padding:6px;")
+            rb.setObjectName("choice")
+            icons.set_icon(rb, "stop" if n == NOWHERE else _choice_icon(n, kind), size=20)
             rb.setProperty("device", n)
             group.addButton(rb)
             bv.addWidget(rb)
@@ -293,20 +361,26 @@ class SetupWizard(QDialog):
         if cur and cur != self.win.cfg.mic_device:   # the saved one is missing
             self._pick_mic(cur)
         lst, self.mic_group = self._choice_list(
-            mics, cur, lambda n: self._pick_mic(n, by_user=True))
-        v.addWidget(lst, 1)
+            mics, cur, lambda n: self._pick_mic(n, by_user=True), "input")
+        v.addSpacing(6)
+        v.addWidget(lst)
+        v.addSpacing(10)
+        card, cl = _card(16, 10, roomy=False)
         row = QHBoxLayout()
+        row.setSpacing(12)
         row.addWidget(_label(_("Your voice:")))
         self.mic_meter = Meter()
         self.mic_meter.setFixedHeight(16)
         row.addWidget(self.mic_meter, 1)
-        v.addLayout(row)
+        cl.addLayout(row)
         self.mic_heard = _label("")
-        v.addWidget(self.mic_heard)
+        cl.addWidget(self.mic_heard)
         self.chk_send = QCheckBox(_("Send my voice too (untick if you only want your sounds to "
                                     "go out, not your mic)"))
         self.chk_send.setChecked(self.win.cfg.mic_enabled)
-        v.addWidget(self.chk_send)
+        cl.addWidget(self.chk_send)
+        v.addWidget(card)
+        v.addStretch(1)
         self._mic_peak_seen = False
         return p
 
@@ -315,8 +389,8 @@ class SetupWizard(QDialog):
         v = QVBoxLayout(p)
         self.bun_phones = BunnyWidget("headphones")
         v.addLayout(_header(_("Where do you listen?"),
-                            _label(_("Pick your headphones or speakers, then press <b>Play a "
-                                     "test sound</b>. Only you hear this.")),
+                            _label(_("Pick your headphones or speakers, then press the "
+                                     "<b>speaker button</b>. Only you hear this.")),
                             self.bun_phones))
         outs = [d["name"] for d in eng.list_devices("output") if not eng.is_virtual(d["name"])]
         cur = self.win.cfg.mon_device if self.win.cfg.mon_device in outs else \
@@ -325,14 +399,33 @@ class SetupWizard(QDialog):
             self._pick_headphones(cur)
         lst, __ = self._choice_list(outs, cur,
                                    lambda n: self._pick_headphones(n, by_user=True))
-        v.addWidget(lst, 1)
-        play = self.btn_test = QPushButton(_("Play a test sound"))
-        icons.set_icon(play, "volume")
-        play.setStyleSheet("padding:10px; font-size:11pt;")
+        v.addSpacing(6)
+        v.addWidget(lst)
+        v.addSpacing(10)
+        # a round speaker button in a card, with what to do next to it
+        card, cl = _card(14, roomy=False)
+        row = QHBoxLayout()
+        row.setSpacing(16)
+        play = self.btn_test = _RoundButton(56)
+        icons.set_icon(play, "volume", "on_accent", size=26)
+        play.setToolTip(_test_title())
+        play.setAccessibleName(_test_title())
         play.clicked.connect(self.test_sound)
-        v.addWidget(play)
-        v.addWidget(_label(_("Didn't hear it? Pick another one and try again."),
-                           "font-size:9pt;"))
+        row.addWidget(play)
+        words = QVBoxLayout()
+        words.setSpacing(2)
+        words.addStretch(1)
+        self.test_hint = _label(f"<b>{_test_title()}</b>", "font-size:12pt;")
+        words.addWidget(self.test_hint)
+        hint = _label(_("Only you hear it. Didn't hear it? Pick another one and try again."),
+                      "font-size:10pt;")
+        hint.setObjectName("muted")
+        words.addWidget(hint)
+        words.addStretch(1)
+        row.addLayout(words, 1)
+        cl.addLayout(row)
+        v.addWidget(card)
+        v.addStretch(1)
         return p
 
     def _page_cable(self) -> QWidget:
@@ -349,14 +442,14 @@ class SetupWizard(QDialog):
         self.btn_attach = QPushButton(_("Put my sounds straight into my mic"))
         icons.set_icon(self.btn_attach, "mic", "on_accent")
         self.btn_attach.setObjectName("primary")
-        self.btn_attach.setStyleSheet("padding:12px; font-size:12pt;")
+        self.btn_attach.setStyleSheet("padding:12px 22px; font-size:12pt;")
         self.btn_attach.clicked.connect(self.attach_mic)
-        v.addWidget(self.btn_attach)
+        v.addWidget(self.btn_attach, 0, Qt.AlignLeft)
         # a bound method, not a lambda: Qt drops the link when the guide is freed, so a
         # set-up finishing after it closed can't poke its deleted buttons
         self.win.mic_attached.connect(self._mic_attached)
         self.cable_status = _label("")
-        self.cable_status.setStyleSheet("font-size:12pt; padding:12px;")
+        self.cable_status.setStyleSheet("font-size:12pt; padding:4px 0;")
         v.addWidget(self.cable_status)
         self.cable_bar = QProgressBar()
         self.cable_bar.setRange(0, 0)   # busy: we can't know how long Windows takes
@@ -367,29 +460,35 @@ class SetupWizard(QDialog):
         self.cable_steps = _label("")
         self.cable_steps.hide()
         v.addWidget(self.cable_steps)
-        self.btn_cable = QPushButton(_("⬇  Install it now (free)"))
-        self.btn_cable.setObjectName("primary")
-        self.btn_cable.setStyleSheet("padding:12px; font-size:12pt;")
+        # the cable is only the backup: a plain button, never the big main one
+        self.btn_cable = QPushButton(_cable_text(_("⬇  Install it now (free)")))
+        icons.set_icon(self.btn_cable, "cable")
         self.btn_cable.clicked.connect(self.install_cable)
-        v.addWidget(self.btn_cable)
+        buttons = QHBoxLayout()   # each button only as wide as its words
+        buttons.setSpacing(10)
+        buttons.addWidget(self.btn_cable)
         self.btn_recheck = QPushButton(_("⟳  Check again"))
         self.btn_recheck.clicked.connect(lambda: busy.run_busy(
             self.btn_recheck, _("Checking…"), self.recheck_cable,
             lambda _r: None if self.route_ok() else _("Still not found — checked just now"),
             ms=3500))
-        v.addWidget(self.btn_recheck)
+        buttons.addWidget(self.btn_recheck)
         self.btn_restart = QPushButton(_("⟲  Restart my PC now"))
         self.btn_restart.setObjectName("primary")
         self.btn_restart.setStyleSheet("padding:12px; font-size:12pt;")
         self.btn_restart.clicked.connect(self.restart_pc)
         self.btn_restart.hide()
-        v.addWidget(self.btn_restart)
+        v.addWidget(self.btn_restart, 0, Qt.AlignLeft)
         # streamers and Voicemeeter / mixer users: send somewhere else instead
-        self.btn_other = QPushButton(_("Send somewhere else (Voicemeeter, OBS, a mixer…)"))
-        self.btn_other.setToolTip(_("Send your sounds to another device instead, or nowhere "
-                                    "(only you, and the stream output)"))
+        self.btn_other = QPushButton(_("Other device"))
+        icons.set_icon(self.btn_other, "sliders")
+        self.btn_other.setToolTip(_("Send your sounds to another device instead (Voicemeeter, "
+                                    "OBS, a mixer…), or nowhere (only you, and the stream "
+                                    "output)"))
         self.btn_other.clicked.connect(lambda: self._show_other(True))
-        v.addWidget(self.btn_other, 0, Qt.AlignLeft)
+        buttons.addWidget(self.btn_other)
+        buttons.addStretch(1)
+        v.addLayout(buttons)
         self.other_box = QWidget()
         self.other_lay = QVBoxLayout(self.other_box)
         self.other_lay.setContentsMargins(0, 0, 0, 0)
@@ -447,42 +546,15 @@ class SetupWizard(QDialog):
         self.discord_title = head.itemAt(0).layout().itemAt(0).widget()
         v.addLayout(head)
         row = QHBoxLayout()
+        row.setSpacing(10)
         self.btn_copy = QPushButton(_("Copy the name"))
         icons.set_icon(self.btn_copy, "copy")
         self.btn_copy.clicked.connect(self.copy_name)
         row.addWidget(self.btn_copy)
         nomic = self.btn_nomic = QPushButton(_("Game has no microphone setting?"))
+        icons.set_icon(nomic, "mic")
         nomic.clicked.connect(self.win.open_windows_mic)
         row.addWidget(nomic)
-        row.addStretch(1)
-        v.addLayout(row)
-        self.btn_discord = QPushButton(_("Discord: make my sounds come through clean"))
-        icons.set_icon(self.btn_discord, "headphones", "on_accent")
-        self.btn_discord.setObjectName("primary")
-        self.btn_discord.setToolTip(_("The Discord settings that stop it chopping up your "
-                                      "sounds, and a check that listens to what Discord does"))
-        self.btn_discord.clicked.connect(lambda: self.show_guide("discord"))
-        v.addWidget(self.btn_discord)
-        games = QHBoxLayout()
-        self.btn_steam = QPushButton(_("Steam games (CS2, Dota 2, Deadlock…)"))
-        icons.set_icon(self.btn_steam, "gamepad")
-        self.btn_steam.setToolTip(_("Games that use Steam voice chat take the mic from Steam's "
-                                    "own settings"))
-        self.btn_steam.clicked.connect(self.show_steam_guide)
-        games.addWidget(self.btn_steam)
-        self.btn_game = QPushButton(_("Other games"))
-        icons.set_icon(self.btn_game, "gamepad")
-        self.btn_game.setToolTip(_("Valorant, Fortnite, Apex, Rust… the voice chat settings that "
-                                   "matter"))
-        self.btn_game.clicked.connect(lambda: self.show_guide("game"))
-        games.addWidget(self.btn_game)
-        self.btn_meeting = QPushButton(_("Zoom, Teams, browser"))
-        icons.set_icon(self.btn_meeting, "headphones")
-        self.btn_meeting.setToolTip(_("Calls in Zoom, Microsoft Teams or a web page (Google "
-                                      "Meet): the settings that matter"))
-        self.btn_meeting.clicked.connect(lambda: self.show_guide("meeting"))
-        games.addWidget(self.btn_meeting)
-        v.addLayout(games)
         # coming from another soundboard: their board in one click (only offered for
         # ones whose board is here; nothing is read until they click)
         self.import_buttons = []
@@ -493,8 +565,47 @@ class SetupWizard(QDialog):
                              "their names, categories and hotkeys. {name} keeps its own.",
                              name=src.name))
             btn.clicked.connect(lambda __=False, src=src: self.win.import_other(src))
-            v.addWidget(btn)
+            row.addWidget(btn)
             self.import_buttons.append(btn)
+        row.addStretch(1)
+        v.addLayout(row)
+        # the helpers, grouped in one card: Discord first, then games and calls
+        self.help_card, cl = _card(14, 10)
+        self.discord_tip = _label("", "font-size:10.5pt;")
+        cl.addWidget(self.discord_tip)
+        self.btn_discord = QPushButton(_("Discord: make my sounds come through clean"))
+        icons.set_icon(self.btn_discord, "speech", "on_accent")
+        self.btn_discord.setObjectName("primary")
+        self.btn_discord.setToolTip(_("The Discord settings that stop it chopping up your "
+                                      "sounds, and a check that listens to what Discord does"))
+        self.btn_discord.clicked.connect(lambda: self.show_guide("discord"))
+        cl.addWidget(self.btn_discord, 0, Qt.AlignLeft)
+        self.games_label = _label(_("Playing a game or on a call?"), "font-size:10pt;")
+        self.games_label.setObjectName("muted")
+        cl.addWidget(self.games_label)
+        games = QHBoxLayout()
+        games.setSpacing(10)
+        self.btn_steam = QPushButton(_("Steam games"))
+        icons.set_icon(self.btn_steam, "gamepad")
+        self.btn_steam.setToolTip(_("CS2, Dota 2, Deadlock… games that use Steam voice chat "
+                                    "take the mic from Steam's own settings"))
+        self.btn_steam.clicked.connect(self.show_steam_guide)
+        games.addWidget(self.btn_steam)
+        self.btn_game = QPushButton(_("Other games"))
+        icons.set_icon(self.btn_game, "gamepad")
+        self.btn_game.setToolTip(_("Valorant, Fortnite, Apex, Rust… the voice chat settings that "
+                                   "matter"))
+        self.btn_game.clicked.connect(lambda: self.show_guide("game"))
+        games.addWidget(self.btn_game)
+        self.btn_meeting = QPushButton(_("Zoom, Teams, browser"))
+        icons.set_icon(self.btn_meeting, "browser")
+        self.btn_meeting.setToolTip(_("Calls in Zoom, Microsoft Teams or a web page (Google "
+                                      "Meet): the settings that matter"))
+        self.btn_meeting.clicked.connect(lambda: self.show_guide("meeting"))
+        games.addWidget(self.btn_meeting)
+        games.addStretch(1)
+        cl.addLayout(games)
+        v.addWidget(self.help_card)
         v.addStretch(1)
         v.addWidget(_label(_("That's it. Add sounds by dragging files onto the window, then "
                              "click one to play it. You can open this guide again any time "
@@ -591,13 +702,20 @@ class SetupWizard(QDialog):
         self.win.cfg.mon_device = name
         self.win.engine.set_mon_device(name)
 
+    def _flash_hint(self, text: str, ms: int):
+        self.test_hint.setText(text)
+        self._hint_serial = getattr(self, "_hint_serial", 0) + 1
+        serial = self._hint_serial
+        QTimer.singleShot(ms, lambda: serial == self._hint_serial
+                          and self.test_hint.setText(f"<b>{_test_title()}</b>"))
+
     def test_sound(self):
         if self.win.engine.mon_stream is None:
-            busy.flash(self.btn_test, _("No headphones open — pick another above"), 3500)
+            self._flash_hint(_("<b>No headphones open</b> — pick another above."), 3500)
             return
         self.win.engine.play("__setup__", test_tune(), 1.0, preview=True)
         self.bun_phones.burst()
-        busy.flash(self.btn_test, _("Playing… hear it?"), 1500)
+        self._flash_hint(_("<b>Playing… hear it?</b>"), 1500)
 
     def cable_ok(self) -> bool:
         return bool(eng.virtual_outputs())
@@ -630,13 +748,8 @@ class SetupWizard(QDialog):
         route = self.win.cfg.route
         # (straight into the mic has its own "...instead" button, below)
         self.btn_use_cable.setVisible(not busy and route not in ("cable", "mic"))
-        primary = "" if route == "mic" else "primary"   # one main button: the mic's
-        if self.btn_cable.objectName() != primary:
-            self.btn_cable.setObjectName(primary)
-            self.btn_cable.setStyleSheet("padding:8px;" if route == "mic"
-                                         else "padding:12px; font-size:12pt;")
-            self.btn_cable.style().unpolish(self.btn_cable)
-            self.btn_cable.style().polish(self.btn_cable)
+        self.btn_cable.setToolTip(_("Use a free virtual cable instead: you pick it as the mic "
+                                    "in Discord and games") if route == "mic" else "")
         self.btn_other.setVisible(not busy and self.other_box.isHidden())
         attaching = self.win._attaching
         self.btn_attach.setVisible(not busy and not (route == "mic" and self.route_ok()))
@@ -658,7 +771,7 @@ class SetupWizard(QDialog):
             else:
                 self.cable_status.setText(_("Windows asks for permission once, and your PC's "
                                             "sound drops out for a second."))
-            self.btn_cable.setText(_("Use the virtual cable instead"))
+            self.btn_cable.setText(_("Virtual cable instead"))
             self.btn_cable.show()
             self.btn_recheck.hide()
             self._update_next()
@@ -730,21 +843,21 @@ class SetupWizard(QDialog):
                                         "Windows asked for permission, click <b>Yes</b> this "
                                         "time. If it still won't install, restarting your PC "
                                         "often helps.", colour=_bad()))
-            self.btn_cable.setText(_("⬇  Try installing again"))
+            self.btn_cable.setText(_cable_text(_("⬇  Try installing again")))
             self.btn_cable.show()
             self.btn_recheck.show()
         elif self._resumed:   # back from the restart, and it still isn't there
             self.cable_status.setText(_("<b style='color:{colour}'>It still isn't showing up after "
                                         "the restart.</b> Install it again below; if Windows "
                                         "asks for permission, click <b>Yes</b>.", colour=_bad()))
-            self.btn_cable.setText(_("⬇  Try installing again"))
+            self.btn_cable.setText(_cable_text(_("⬇  Try installing again")))
             self.btn_cable.show()
             self.btn_recheck.show()
         else:
             self.cable_status.setText(_("<b style='color:{colour}'>Not installed yet.</b> Without "
                                         "it, only you can hear your sounds. Or put them straight "
                                         "into your mic: nothing to install.", colour=_bad()))
-            self.btn_cable.setText(_("⬇  Install it now (free)"))
+            self.btn_cable.setText(_cable_text(_("⬇  Install it now (free)")))
             self.btn_cable.show()
             self.btn_recheck.hide()
         # switched off in Settings > Privacy & security: the installer's download
@@ -852,6 +965,14 @@ class SetupWizard(QDialog):
                                         colour=_bad(), error=errors.plain(e)))
 
     def _fill_discord(self):
+        self.discord_tip.setText("")
+        self._fill_discord_text()
+        self.discord_tip.setVisible(bool(self.discord_tip.text()))
+        games = not self.btn_steam.isHidden()
+        self.games_label.setVisible(games)
+        self.help_card.setVisible(games or not self.btn_discord.isHidden())
+
+    def _fill_discord_text(self):
         cfg = self.win.cfg
         dev = self.win._main_name()
         name = eng.virtual_mic_for(dev)
@@ -934,6 +1055,11 @@ class SetupWizard(QDialog):
               "its noise suppression treats your sounds as background noise and wipes them "
               "out. <b>In a game:</b> turn off its noise suppression if your sounds cut out.",
               colour=_ok(), mic=mic))
+        # the Discord part sits in the card with its button (split after translating)
+        intro, sep, tip = self.discord_text.text().partition("<br><br>")
+        if sep:
+            self.discord_text.setText(intro)
+            self.discord_tip.setText(tip)
 
     def show_steam_guide(self):
         self.show_guide("steam")
@@ -952,7 +1078,7 @@ class SetupWizard(QDialog):
             lvl = e.level_mic if e.mic_stream is not None else 0.0
             self.mic_meter.set_level(lvl)
             self.bun_mic.set_level(lvl)
-            if lvl > 0.05:
+            if lvl > TALK:
                 self._mic_peak_seen = True
             if e.mic_stream is None and self._no_mics:
                 self.mic_heard.setText(_("<span style='color:{colour}'>No microphone was "
