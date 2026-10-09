@@ -1834,7 +1834,7 @@ def test_saying_no_to_windows_keeps_the_mic_on_offer(window, monkeypatch, cables
     assert w.cfg.route == "mic" and w._main_name() == (cables[0] if cables else None)
     assert "cable" not in said[0].lower()   # the mic is the way; the cable just quietly helps
     assert "Try again" in said[0]
-    assert "mic" in w.pill.text().lower()
+    assert "mic" in w.pill.accessibleName().lower()
 
 
 def test_a_slow_status_check_never_holds_up_the_window(monkeypatch):
@@ -1888,19 +1888,18 @@ def test_a_status_check_from_before_forget_status_is_dropped(monkeypatch):
 
 def test_the_banner_never_sends_mic_users_to_the_cable(window, monkeypatch):  # noqa: F811
     w = window
-    w._pill_short = False
     for state in ("missing", "wiped", "other"):
         _routes(w, monkeypatch, state)
         dm.forget_status()
         w._update_flow()
-        assert "virtual cable" not in w.pill.text(), (state, w.pill.text())
-        assert "mic" in w.pill.text()
+        assert "virtual cable" not in w.pill.accessibleName(), (state, w.pill.accessibleName())
+        assert "mic" in w.pill.accessibleName()
         assert "straight into my mic" in w.btn_install.text() or "Repair" in w.btn_install.text()
         assert not w.btn_install.isHidden() and w.btn_install.objectName() == "primary"
     w.cfg.route = "cable"   # on the cable route, and no cable: the fix offers the mic first
     monkeypatch.setattr(w, "virtual_mic", None)
     w._update_flow()
-    assert "virtual cable" not in w.pill.text()
+    assert "virtual cable" not in w.pill.accessibleName()
     assert w.btn_attach.objectName() == "primary" and w.btn_install.objectName() != "primary"
 
 
@@ -1931,14 +1930,13 @@ def test_setting_up_the_mic_shows_it_and_takes_one_click(window, monkeypatch):  
     until Windows has it running, instead of offering Repair again straight away."""
     from soundboard.ui import busy
     w = window
-    w._pill_short = False
     _routes(w, monkeypatch, "missing")
     w.cfg.mic_device = "My mic"
     threads = _no_threads(monkeypatch)
     w.attach_mic()
     assert busy.is_busy(w.btn_install) and w.btn_install.text() == "Setting up…"
     assert w.btn_install.isHidden() and w.btn_usecable.isHidden()
-    assert "setting up" in w.pill.text().lower()
+    assert "setting up" in w.pill.accessibleName().lower()
     assert w.setup_show.on   # Bun's building it, in the button's place
     w.attach_mic()
     w.btn_install.click()   # spam-clicked: still the one admin prompt
@@ -2228,9 +2226,8 @@ def test_window_starts_on_the_mic_with_the_cable_copy(qapp, app_dir, monkeypatch
     try:
         assert w.cfg.route == "mic" and w.cfg.mic_first
         assert w.engine.names["main"] == dm.DEVICE and opened and opened[-1] == CABLE_IN
-        w._pill_short = False
         w._update_flow()
-        assert "virtual cable" not in w.pill.text()
+        assert "virtual cable" not in w.pill.accessibleName()
     finally:
         w._load_thread.join(15)
         w.close()

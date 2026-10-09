@@ -552,6 +552,10 @@ QFrame#sidebar QPushButton#moretabs:focus, QFrame#sidebar QPushButton#tabinfo:fo
 QFrame#sidebar QPushButton#settings:focus,
 QFrame#sidebar QPushButton#railtoggle:focus { border-color:$accent; }
 QFrame#sidebar QLabel#tagline { font-size:8pt; }
+QFrame#sidebar QPushButton#pill, QFrame#sidebar QPushButton#onair,
+QFrame#sidebar QPushButton#danger { padding:7px 6px; border-radius:8px; text-align:left; }
+QFrame#sidebar QLabel#wordmark { font-size:11pt; }
+QFrame#sidebar QWidget#railslot { background:transparent; }
 QPushButton#settings { padding:6px 14px; font-weight:600; }
 QFrame#transport, QFrame#deck { background:$panel; border-radius:12px; }
 QFrame#mixer { background:transparent; }
