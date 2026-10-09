@@ -385,7 +385,14 @@ class ThemeGrid(QWidget):
 
     def resizeEvent(self, event):
         super().resizeEvent(event)
-        self._reflow(max(1, min(len(self.cards), (self.width() + 12) // 162)))
+        columns = max(1, min(len(self.cards), (self.width() + 12) // 162))
+        self._reflow(columns)
+        # the width left over is shared out as equal gaps, first card on the left edge
+        # and last on the right (all of it sat on the right, a big empty strip)
+        gap = 12
+        if columns > 1:
+            gap = max(12, (self.width() - columns * 150) // (columns - 1))
+        self.grid.setHorizontalSpacing(gap)
 
     def _reflow(self, columns):
         if columns == self.columns:
