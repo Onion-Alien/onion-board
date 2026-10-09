@@ -724,7 +724,7 @@ def test_card_titles_and_the_typed_percent_fit_the_themes_font(qapp, theme_name)
         qapp.processEvents()
         assert title.height() == 2 * title.fontMetrics().lineSpacing() + 2
         spin = vol.spin
-        assert spin.width() >= spin.fontMetrics().horizontalAdvance("1000 %") + 10
+        assert spin.width() >= spin.fontMetrics().horizontalAdvance("1000%") + 10
         assert not spin.keyboardTracking()   # typing "150" isn't 1 %, 15 %, 150 %
         host.deleteLater()
     finally:

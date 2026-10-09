@@ -332,7 +332,7 @@ class VolumeControl(QWidget):
         self.spin = _Pct()
         self.spin.setObjectName("pct")   # reads as plain text until hovered / typed in
         self.spin.setRange(0, typed_max)
-        self.spin.setSuffix(" %")
+        self.spin.setSuffix("%")
         self.spin.setFixedWidth(58)   # until it's styled (_Pct)
         self.spin.setAlignment(Qt.AlignRight)
         self.spin.setToolTip(_("Type an exact volume (0–{typed_max}%)", typed_max=typed_max))
