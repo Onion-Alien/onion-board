@@ -510,7 +510,7 @@ QPushButton:hover { background:$btn_hover; }
 QPushButton:focus { border-color:$accent; }
 QPushButton#iconbutton { padding:7px 10px; min-width:18px; }
 QPushButton:pressed { background:$btn_press; }
-QPushButton:checked { background:$btn_press; border-color:$border_hi; color:$text_hi; }
+QPushButton:checked { background:$accent; border-color:$accent; color:$on_accent; }
 QPushButton:disabled { color:$muted; }
 QPushButton[busy="true"], QPushButton#primary[busy="true"] { color:$muted; }
 QPushButton#primary { background:$accent; border:none; color:$on_accent; font-weight:600; }
@@ -543,7 +543,7 @@ QFrame#vsep { background:$border; border:none; }
 QLabel#toast { background:$panel; border:1px solid $border_hi;
                border-radius:12px; padding:8px 14px; }
 QFrame#chip { background:$panel; border:1px solid transparent; border-radius:14px; }
-QFrame#chip[sel="true"] { border-color:$text_hi; }
+QFrame#chip[sel="true"] { border-color:$accent; }
 QFrame#chip QPushButton { background:transparent; border:none; padding:2px 6px; }
 QFrame#chip QPushButton#chipname { font-weight:600; }
 QFrame#chip QPushButton#chipstop { border-radius:12px; padding:0; }
@@ -622,7 +622,7 @@ QFrame#card QPushButton#primary:hover { background:$accent_hover; }
 QFrame#card QPushButton:focus { border-color:$accent; }
 QFrame#card QComboBox:disabled, QFrame#card QLineEdit:disabled { background:$inset; }
 QFrame#card QAbstractSpinBox { background:$bg; }
-QFrame#card QPushButton:checked { background:$btn_press; }
+QFrame#card QPushButton:checked { background:$accent; }
 QFrame#card QPushButton#miccheck:checked { background:#d32f2f; }
 QComboBox QAbstractItemView { background:$card; color:$text; border:1px solid $border_hi;
     padding:4px; outline:0; selection-background-color:$btn_press; selection-color:$text_hi; }
@@ -705,7 +705,7 @@ QTabBar QToolButton::right-arrow:disabled { image:url("$right_off"); }
 QTabBar::tear { width:0; border:none; }
 QPushButton#live { font-weight:700; }
 QPushButton#voicetile { text-align:left; padding:9px 10px; border-radius:10px; }
-QPushButton#voicetile:checked { background:$btn_press; color:$text_hi; border:1px solid $text_hi; font-weight:700; }
+QPushButton#voicetile:checked { background:$accent; color:$on_accent; border:1px solid $accent_hi; font-weight:700; }
 QPushButton#voicetile[art="true"] { padding:5px 10px 5px 6px; }
 QPushButton#voicetile:hover:!checked { border-color:$border_hi; }
 /* Spacious controls only in Voice and Setup cards. */
@@ -725,14 +725,14 @@ QPlainTextEdit#speechlog { background:$bg; border:1px solid transparent; border-
 
 QFrame#fxcard { background:$card; border:1px solid transparent; border-radius:12px; }
 QFrame#fxcard:hover { border-color:$border_hi; }
-QFrame#fxcard[on="true"] { border-color:$border_hi; }
+QFrame#fxcard[on="true"] { border-color:$accent; }
 QFrame#fxcard[hero="true"] { background:$card; }
-QFrame#fxcard[fresh="true"] { background:$card_hi; border:2px solid $text_hi; }
+QFrame#fxcard[fresh="true"] { background:$card_hi; border:2px solid $accent_hi; }
 QFrame#fxcard QLabel, QFrame#fxcard QCheckBox { background:transparent; }
 QLabel#fxname { font-weight:700; font-size:10pt; color:$text_hi; }
 QLabel#fxdesc { color:$muted; font-size:8.5pt; }
 QLabel#fxparam { color:$text; font-size:9pt; }
-QLabel#fxvalue { color:$text_hi; font-size:9pt; font-weight:700; }
+QLabel#fxvalue { color:$accent_hi; font-size:9pt; font-weight:700; }
 QLabel#fxend { color:$muted; font-size:7.5pt; }   /* faint was 2.6:1 on some */
 QLabel#fxgroup { color:$text; font-size:9pt; font-weight:600; padding-top:6px; }
 QPushButton#fxreset, QFrame#card QPushButton#fxreset, QFrame#card[roomy="true"] QPushButton#fxreset { background:transparent; border:none; color:$muted; padding:2px 6px; min-height:0; font-size:8pt; }
@@ -752,7 +752,7 @@ QFrame#setcard { background:$panel; border-radius:12px; }
 QFrame#setcard QWidget { background:transparent; }
 QFrame#setcard QPushButton { background:$btn; }
 QFrame#setcard QPushButton:hover { background:$btn_hover; }
-QFrame#setcard QPushButton:checked { background:$btn_press; color:$text_hi; }
+QFrame#setcard QPushButton:checked { background:$accent; color:$on_accent; }
 QFrame#setcard QPushButton#primary { background:$accent; color:$on_accent; border:none; }
 QFrame#setcard QPushButton#power:checked { background:$live; border:1px solid $live_hi; color:$on_live; }
 QFrame#setcard QPushButton#primary:hover { background:$accent_hover; }
@@ -771,14 +771,14 @@ QFrame#setcard QPlainTextEdit { background:$card; color:$text;
     selection-background-color:$btn_press; selection-color:$text_hi; }
 QProgressBar#downloadprogress, QFrame#card QProgressBar#downloadprogress {
     background:$groove; border:none; border-radius:2px; }
-QProgressBar#downloadprogress::chunk { background:$text_hi; border-radius:2px; }
+QProgressBar#downloadprogress::chunk { background:$accent; border-radius:2px; }
 QPushButton#hkbtn { min-width:150px; font-weight:600; }
 QPushButton#themecard { background:$panel; border:2px solid $border; border-radius:12px; padding:0; }
 QPushButton#themecard:hover { border-color:$border_hi; }
-QPushButton#themecard:checked { background:$panel; border:2px solid $text_hi; }
+QPushButton#themecard:checked { background:$panel; border:2px solid $accent; }
 QFrame#card QFrame#chip { background:$btn; border:1px solid transparent; border-radius:11px; }
 QFrame#card QFrame#chip:hover { background:$btn_hover; }
-QFrame#card QFrame#chip[sel="true"] { border-color:$text_hi; }
+QFrame#card QFrame#chip[sel="true"] { border-color:$accent; }
 QFrame#card QFrame#chip QPushButton { background:transparent; border:none; }
 QFrame#card QFrame#chip QPushButton#chipname:hover { color:$text_hi; }
 QFrame#card QFrame#chip QPushButton#chipstop { border-radius:11px; color:$muted; }
