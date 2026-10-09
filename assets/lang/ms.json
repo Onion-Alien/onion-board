@@ -1185,7 +1185,6 @@
   "Support Onion Board": "Sokong Onion Board",
   "Switch by itself": "Tukar sendiri",
   "Switch category by program": "Tukar kategori mengikut program",
-  "Switch off the tabs you don't use. A switched-off tab is gone from the window and doesn't load at all, so nothing of it runs in the background. Switch it back on any time, here or with + More tabs beside the tabs.": "Matikan tab yang anda tidak guna. Tab yang dimatikan hilang dari tetingkap dan tidak dimuatkan langsung, jadi tiada bahagiannya berjalan di latar belakang. Hidupkan semula bila-bila masa, di sini atau dengan + Lagi tab di sebelah tab.",
   "Switch to the mode that suits what's listening": "Tukar ke mod yang sesuai dengan apa yang mendengar",
   "Switched to “{shown}” ({exe} is in front)": "Ditukar ke “{shown}” ({exe} di hadapan)",
   "Switching the cable to 48 kHz…": "Menukar kabel ke 48 kHz…",
@@ -2365,7 +2364,6 @@
   "error {code}": "ralat {code}",
   "failed (exit code {code})": "gagal (kod keluar {code})",
   "failed to load: {error}": "gagal dimuatkan: {error}",
-  "ffmpeg failed": "ffmpeg gagal",
   "ffmpeg took longer than {seconds}s": "ffmpeg mengambil masa lebih lama daripada {seconds} s",
   "higher": "lebih tinggi",
   "hoo-ray!": "hoo-ray!",
@@ -2768,5 +2766,9 @@
   "{ok} {mode} mode on for <b>{name}</b>. Next time it switches by itself.": "{ok} {mode} dihidupkan untuk <b>{name}</b> . Lain kali ia bertukar dengan sendirinya.",
   "{program}  (never asks)": "{program} (tidak pernah bertanya)",
   "{warn} Its noise removal can wipe out music: set it to keep the original sound.": "{warn} Penyingkiran hingarnya boleh memadamkan muzik: tetapkannya untuk mengekalkan bunyi asal.",
-  "✓ Added to Sounds": "✓ Ditambah pada Bunyi"
+  "✓ Added to Sounds": "✓ Ditambah pada Bunyi",
+  "Hide this tab": "Sembunyikan tab ini",
+  "Switch off the tabs you don't use. A switched-off tab is gone from the window and doesn't load at all, so nothing of it runs in the background. Switch it back on any time, here or with + More tabs left of the tabs. Right-click a tab to hide it.": "Matikan tab yang anda tidak gunakan. Tab yang dimatikan hilang dari tetingkap dan tidak dimuatkan sama sekali, jadi tiada apa-apa daripadanya berjalan di latar belakang. Hidupkan semula pada bila-bila masa, di sini atau dengan + Lagi tab yang ditinggalkan pada tab. Klik kanan tab untuk menyembunyikannya.",
+  "This tab is always shown": "Tab ini sentiasa ditunjukkan",
+  "{tab} hidden. Bring it back with + More tabs or Settings > Tabs.": "{tab} tersembunyi. Bawa kembali dengan + Lagi tab atau Tetapan > Tab."
 }

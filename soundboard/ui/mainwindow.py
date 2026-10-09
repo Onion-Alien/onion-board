@@ -802,19 +802,25 @@ class MainWindow(QMainWindow):
         self.btn_info.setToolTip(_("What's this tab for?"))
         self.btn_info.clicked.connect(self._show_tab_info)
         # + More tabs: the tabs switched off (a new user starts with the basic ones), one
-        # click to add one; only there while one is off
+        # click to add one; only there while one is off. At the left, before the tabs
         self.btn_more_tabs = QPushButton(_("More tabs"))
         self.btn_more_tabs.setObjectName("moretabs")
         icons.set_icon(self.btn_more_tabs, "plus")
         self.btn_more_tabs.setCursor(Qt.PointingHandCursor)
+        self.btn_more_tabs.setFocusPolicy(Qt.TabFocus)   # a click left an accent ring on it
         self.btn_more_tabs.setToolTip(_("Add a tab: radio, sending a program's sound, screen "
                                         "triggers…"))
         mt = QMenu(self.btn_more_tabs)
         mt.aboutToShow.connect(lambda: self._fill_more_tabs(mt))
         self.btn_more_tabs.setMenu(mt)
         self._update_more_tabs()
-        info_corner = TabInfoCorner(self.tabs, self.btn_more_tabs, self.btn_info)
-        self.tabs.setCornerWidget(info_corner, Qt.TopRightCorner)
+        self.tabs.setCornerWidget(TabInfoCorner(self.tabs, self.btn_more_tabs),
+                                  Qt.TopLeftCorner)
+        self.tabs.setCornerWidget(TabInfoCorner(self.tabs, self.btn_info), Qt.TopRightCorner)
+        # right-click a tab: hide it (+ More tabs or Settings > Tabs bring it back)
+        bar = self.tabs.tabBar()
+        bar.setContextMenuPolicy(Qt.CustomContextMenu)
+        bar.customContextMenuRequested.connect(self._tab_menu)
         # every tab has a line for the ⓘ (the Apps tab brings its own): one tab with
         # the button and the rest without looked like a slip
         self.tab_info.setdefault("sounds_page", (
@@ -3216,6 +3222,34 @@ class MainWindow(QMainWindow):
         menu.addSeparator()
         act = menu.addAction(icons.icon("settings"), _("Choose tabs in Settings…"))
         act.triggered.connect(lambda: self.open_settings("tabs"))
+
+    def _tab_menu(self, pos):
+        """Right-click on a tab: Hide this tab (not Sounds or Setup)."""
+        bar = self.tabs.tabBar()
+        i = bar.tabAt(pos)
+        if i >= 0:
+            self.tab_menu(i).exec(bar.mapToGlobal(pos))
+
+    def tab_menu(self, i: int) -> QMenu:
+        key = TAB_KEYS[i]
+        menu = QMenu(self)
+        menu.setAttribute(Qt.WA_DeleteOnClose)
+        if key in taboff.KEYS:
+            act = menu.addAction(_("Hide this tab"))
+            act.triggered.connect(lambda: self.hide_tab(key))
+        else:
+            act = menu.addAction(_("This tab is always shown"))
+            act.setEnabled(False)
+        menu.addSeparator()
+        menu.addAction(icons.icon("settings"), _("Choose tabs in Settings…"),
+                       lambda: self.open_settings("tabs"))
+        return menu
+
+    def hide_tab(self, key: str):
+        """Hide a tab from its right-click menu, saying where to get it back."""
+        self.set_tab_on(key, False)
+        self.toast(_("{tab} hidden. Bring it back with + More tabs or Settings > Tabs.",
+                     tab=TABS[TAB_INDEX[key]][0]))
 
     def _add_tab(self, key: str):
         self.set_tab_on(key, True)

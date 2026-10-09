@@ -1388,7 +1388,6 @@
   "Support Onion Board": "Підтримка Onion Board",
   "Switch by itself": "Перемикач сам по собі",
   "Switch category by program": "Перемикайте категорії за програмою",
-  "Switch off the tabs you don't use. A switched-off tab is gone from the window and doesn't load at all, so nothing of it runs in the background. Switch it back on any time, here or with + More tabs beside the tabs.": "Вимкніть вкладки, якими ви не користуєтеся. Вимкнена вкладка зникла з вікна та взагалі не завантажується, тому нічого з неї не працює у фоновому режимі. Увімкніть його знову будь-коли, тут або за допомогою вкладок + Інші поруч із вкладками.",
   "Switch to the mode that suits what's listening": "Переключіться на режим, який підходить тому, що слухає",
   "Switching the cable to 48 kHz…": "Переключення кабелю на 48 кГц…",
   "TEST IT": "ТЕСТ",
@@ -2465,7 +2464,6 @@
   "error {code}": "помилка {code}",
   "failed (exit code {code})": "не вдалося (код виходу {code})",
   "failed to load: {error}": "не вдалося завантажити: {error}",
-  "ffmpeg failed": "ffmpeg не вдалося",
   "ffmpeg took longer than {seconds}s": "ffmpeg займає більше часу, ніж {seconds} с",
   "higher": "вище",
   "hoo-ray!": "ура-рай!",
@@ -2888,5 +2886,9 @@
   "{ok} {mode} mode on for <b>{name}</b>. Next time it switches by itself.": "{ok} Режим {mode} увімкнено для <b>{name}</b> . Наступного разу він перемикається сам.",
   "{program}  (never asks)": "{program} (ніколи не запитує)",
   "{warn} Its noise removal can wipe out music: set it to keep the original sound.": "{warn} Його видалення шуму може знищити музику: налаштуйте його, щоб зберегти оригінальний звук.",
-  "✓ Added to Sounds": "✓ Додано до Звуків"
+  "✓ Added to Sounds": "✓ Додано до Звуків",
+  "Hide this tab": "Сховати цю вкладку",
+  "Switch off the tabs you don't use. A switched-off tab is gone from the window and doesn't load at all, so nothing of it runs in the background. Switch it back on any time, here or with + More tabs left of the tabs. Right-click a tab to hide it.": "Вимкніть вкладки, якими ви не користуєтеся. Вимкнена вкладка зникла з вікна та взагалі не завантажується, тому нічого з неї не працює у фоновому режимі. Увімкніть його знову будь-коли, тут або за допомогою кнопки + Інші вкладки ліворуч від вкладок. Клацніть вкладку правою кнопкою миші, щоб приховати її.",
+  "This tab is always shown": "Ця вкладка завжди відображається",
+  "{tab} hidden. Bring it back with + More tabs or Settings > Tabs.": "{tab} приховано. Поверніть його за допомогою + Інші вкладки або Налаштування > Вкладки."
 }

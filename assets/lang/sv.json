@@ -1201,7 +1201,6 @@
   "Support Onion Board": "Stöd Onion Board",
   "Switch by itself": "Byt av sig självt",
   "Switch category by program": "Byt kategori efter program",
-  "Switch off the tabs you don't use. A switched-off tab is gone from the window and doesn't load at all, so nothing of it runs in the background. Switch it back on any time, here or with + More tabs beside the tabs.": "Stäng av flikarna du inte använder. En avstängd flik försvinner från fönstret och laddas inte alls, så inget av den körs i bakgrunden. Slå på den igen när som helst, här eller med + Fler flikar bredvid flikarna.",
   "Switch to the mode that suits what's listening": "Byt till läget som passar det som lyssnar",
   "Switched to “{shown}” ({exe} is in front)": "Bytte till ”{shown}” ({exe} ligger överst)",
   "Switching the cable to 48 kHz…": "Byter kabeln till 48 kHz…",
@@ -2415,7 +2414,6 @@
   "error {code}": "fel {code}",
   "failed (exit code {code})": "misslyckades (utgångskod {code})",
   "failed to load: {error}": "kunde inte laddas: {error}",
-  "ffmpeg failed": "ffmpeg misslyckades",
   "ffmpeg took longer than {seconds}s": "ffmpeg tog längre tid än {seconds} s",
   "higher": "högre",
   "hoo-ray!": "hoo-ray!",
@@ -2828,5 +2826,9 @@
   "{ok} {mode} mode on for <b>{name}</b>. Next time it switches by itself.": "{ok} {mode} läge på för <b>{name}</b> . Nästa gång byter den av sig själv.",
   "{program}  (never asks)": "{program} (frågar aldrig)",
   "{warn} Its noise removal can wipe out music: set it to keep the original sound.": "{warn} Dess brusborttagning kan utplåna musik: ställ in den för att behålla originalljudet.",
-  "✓ Added to Sounds": "✓ Tillagd till ljud"
+  "✓ Added to Sounds": "✓ Tillagd till ljud",
+  "Hide this tab": "Dölj den här fliken",
+  "Switch off the tabs you don't use. A switched-off tab is gone from the window and doesn't load at all, so nothing of it runs in the background. Switch it back on any time, here or with + More tabs left of the tabs. Right-click a tab to hide it.": "Stäng av flikarna du inte använder. En avstängd flik är borta från fönstret och laddas inte alls, så inget av den körs i bakgrunden. Slå på den igen när som helst, här eller med + Fler flikar till vänster om flikarna. Högerklicka på en flik för att dölja den.",
+  "This tab is always shown": "Denna flik visas alltid",
+  "{tab} hidden. Bring it back with + More tabs or Settings > Tabs.": "{tab} dold. Ta tillbaka det med + Fler flikar eller Inställningar > Flikar."
 }

@@ -1340,7 +1340,6 @@
   "Support Onion Board": "支持 Onion Board",
   "Switch by itself": "自动切换",
   "Switch category by program": "按程序切换分类",
-  "Switch off the tabs you don't use. A switched-off tab is gone from the window and doesn't load at all, so nothing of it runs in the background. Switch it back on any time, here or with + More tabs beside the tabs.": "关掉你不用的标签页。关掉的标签页会从窗口里消失，完全不会加载，所以它不会在后台运行任何东西。随时可以重新打开，在这里，或用标签页旁边的“+ 更多标签页”。",
   "Switch to the mode that suits what's listening": "切换到适合收听方的模式",
   "Switching the cable to 48 kHz…": "正在把音频线切换到 48 kHz…",
   "TEST IT": "测试一下",
@@ -2365,7 +2364,6 @@
   "error {code}": "错误{code}",
   "failed (exit code {code})": "失败（退出代码{code} ）",
   "failed to load: {error}": "加载失败： {error}",
-  "ffmpeg failed": "ffmpeg 失败",
   "ffmpeg took longer than {seconds}s": "ffmpeg 花费的时间超过{seconds}秒",
   "higher": "更高",
   "hoo-ray!": "呼啦！",
@@ -2768,5 +2766,9 @@
   "{ok} {mode} mode on for <b>{name}</b>. Next time it switches by itself.": "{ok} { <b>{name}</b> {mode}模式。下次它会自动切换。",
   "{program}  (never asks)": "{program} （从不询问）",
   "{warn} Its noise removal can wipe out music: set it to keep the original sound.": "{warn}它的噪音消除功能会消除音乐：将其设置为保留原始声音。",
-  "✓ Added to Sounds": "✓ 添加到声音"
+  "✓ Added to Sounds": "✓ 添加到声音",
+  "Hide this tab": "隐藏此选项卡",
+  "Switch off the tabs you don't use. A switched-off tab is gone from the window and doesn't load at all, so nothing of it runs in the background. Switch it back on any time, here or with + More tabs left of the tabs. Right-click a tab to hide it.": "关闭不使用的选项卡。关闭的选项卡将从窗口中消失并且根本不会加载，因此它不会在后台运行。可以随时在此处或使用选项卡左侧的“更多”选项卡将其重新打开。右键单击选项卡可将其隐藏。",
+  "This tab is always shown": "该选项卡始终显示",
+  "{tab} hidden. Bring it back with + More tabs or Settings > Tabs.": "{tab}已隐藏。使用“+ 更多”选项卡或“设置”>“选项卡”将其恢复。"
 }

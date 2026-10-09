@@ -1363,7 +1363,6 @@
   "Support Onion Board": "Apoya Onion Board",
   "Switch by itself": "Cambiar solo",
   "Switch category by program": "Cambiar de categoría según el programa",
-  "Switch off the tabs you don't use. A switched-off tab is gone from the window and doesn't load at all, so nothing of it runs in the background. Switch it back on any time, here or with + More tabs beside the tabs.": "Desactiva las pestañas que no usas. Una pestaña desactivada desaparece de la ventana y no se carga en absoluto, así que nada de ella funciona en segundo plano. Vuelve a activarla cuando quieras, aquí o con + Más pestañas junto a las pestañas.",
   "Switch to the mode that suits what's listening": "Cambiar al modo que mejor va con lo que está escuchando",
   "Switching the cable to 48 kHz…": "Poniendo el cable a 48 kHz…",
   "TEST IT": "PRUÉBALO",
@@ -2415,7 +2414,6 @@
   "error {code}": "error {code}",
   "failed (exit code {code})": "falló (código de salida {code})",
   "failed to load: {error}": "no se pudo cargar: {error}",
-  "ffmpeg failed": "ffmpeg falló",
   "ffmpeg took longer than {seconds}s": "ffmpeg tardó más de {seconds} s",
   "higher": "más alto",
   "hoo-ray!": "¡Hurra!",
@@ -2828,5 +2826,9 @@
   "{ok} {mode} mode on for <b>{name}</b>. Next time it switches by itself.": "{ok} {mode} modo activado para <b>{name}</b> . La próxima vez cambia solo.",
   "{program}  (never asks)": "{program} (nunca pregunta)",
   "{warn} Its noise removal can wipe out music: set it to keep the original sound.": "{warn} Su eliminación de ruido puede borrar la música: configúrelo para mantener el sonido original.",
-  "✓ Added to Sounds": "✓ Agregado a Sonidos"
+  "✓ Added to Sounds": "✓ Agregado a Sonidos",
+  "Hide this tab": "Ocultar esta pestaña",
+  "Switch off the tabs you don't use. A switched-off tab is gone from the window and doesn't load at all, so nothing of it runs in the background. Switch it back on any time, here or with + More tabs left of the tabs. Right-click a tab to hide it.": "Apaga las pestañas que no utilices. Una pestaña apagada desaparece de la ventana y no se carga en absoluto, por lo que nada se ejecuta en segundo plano. Vuelva a activarlo en cualquier momento, aquí o con + Más pestañas a la izquierda de las pestañas. Haga clic derecho en una pestaña para ocultarla.",
+  "This tab is always shown": "Esta pestaña siempre se muestra",
+  "{tab} hidden. Bring it back with + More tabs or Settings > Tabs.": "{tab} oculta. Recupérelo con + Más pestañas o Configuración > Pestañas."
 }

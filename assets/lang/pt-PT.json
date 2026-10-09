@@ -1201,7 +1201,6 @@
   "Support Onion Board": "Apoiar o Onion Board",
   "Switch by itself": "Mudar sozinho",
   "Switch category by program": "Mudar de categoria consoante o programa",
-  "Switch off the tabs you don't use. A switched-off tab is gone from the window and doesn't load at all, so nothing of it runs in the background. Switch it back on any time, here or with + More tabs beside the tabs.": "Desliga os separadores que não usas. Um separador desligado desaparece da janela e nem sequer carrega, por isso nada dele corre em segundo plano. Volta a ligá-lo quando quiseres, aqui ou com + Mais separadores ao lado dos separadores.",
   "Switch to the mode that suits what's listening": "Mudar para o modo que se adequa a quem está a ouvir",
   "Switched to “{shown}” ({exe} is in front)": "Mudou para “{shown}” ({exe} está à frente)",
   "Switching the cable to 48 kHz…": "A mudar o cabo para 48 kHz…",
@@ -2415,7 +2414,6 @@
   "error {code}": "erro {code}",
   "failed (exit code {code})": "falhou (código de saída {code})",
   "failed to load: {error}": "falha ao carregar: {error}",
-  "ffmpeg failed": "ffmpeg falhou",
   "ffmpeg took longer than {seconds}s": "ffmpeg demorou mais de {seconds} s",
   "higher": "mais alto",
   "hoo-ray!": "hoo-ray!",
@@ -2828,5 +2826,9 @@
   "{ok} {mode} mode on for <b>{name}</b>. Next time it switches by itself.": "{ok} modo {mode} ativado para <b>{name}</b> . Da próxima vez muda sozinho.",
   "{program}  (never asks)": "{program} (nunca pergunta)",
   "{warn} Its noise removal can wipe out music: set it to keep the original sound.": "{warn} A sua remoção de ruído pode acabar com a música: configure-a para manter o som original.",
-  "✓ Added to Sounds": "✓ Adicionado aos sons"
+  "✓ Added to Sounds": "✓ Adicionado aos sons",
+  "Hide this tab": "Ocultar esta guia",
+  "Switch off the tabs you don't use. A switched-off tab is gone from the window and doesn't load at all, so nothing of it runs in the background. Switch it back on any time, here or with + More tabs left of the tabs. Right-click a tab to hide it.": "Desligue as guias que não utiliza. Um separador desligado desaparece da janela e não carrega, pelo que nada é executado em segundo plano. Ligue-o novamente a qualquer momento, aqui ou com + Mais separadores à esquerda dos separadores. Clique com o botão direito do rato numa guia para ocultá-la.",
+  "This tab is always shown": "Esta aba é sempre mostrada",
+  "{tab} hidden. Bring it back with + More tabs or Settings > Tabs.": "{tab} oculto. Traga-o de volta com + Mais separadores ou Definições > Separadores."
 }

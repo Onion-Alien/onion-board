@@ -1201,7 +1201,6 @@
   "Support Onion Board": "Στήριξε το Onion Board",
   "Switch by itself": "Αυτόματη αλλαγή",
   "Switch category by program": "Αλλαγή κατηγορίας ανά πρόγραμμα",
-  "Switch off the tabs you don't use. A switched-off tab is gone from the window and doesn't load at all, so nothing of it runs in the background. Switch it back on any time, here or with + More tabs beside the tabs.": "Κλείσε τις καρτέλες που δεν χρησιμοποιείς. Μια κλειστή καρτέλα φεύγει από το παράθυρο και δεν φορτώνει καθόλου, οπότε τίποτα από αυτή δεν τρέχει στο παρασκήνιο. Άνοιξέ τη ξανά όποτε θες, εδώ ή με το + Περισσότερες καρτέλες δίπλα στις καρτέλες.",
   "Switch to the mode that suits what's listening": "Γύρνα στη λειτουργία που ταιριάζει σε αυτό που ακούει",
   "Switched to “{shown}” ({exe} is in front)": "Άλλαξε σε «{shown}» (το {exe} είναι μπροστά)",
   "Switching the cable to 48 kHz…": "Γυρίζω το καλώδιο στα 48 kHz…",
@@ -2415,7 +2414,6 @@
   "error {code}": "σφάλμα {code}",
   "failed (exit code {code})": "απέτυχε (κωδικός εξόδου {code})",
   "failed to load: {error}": "απέτυχε η φόρτωση: {error}",
-  "ffmpeg failed": "Το ffmpeg απέτυχε",
   "ffmpeg took longer than {seconds}s": "Το ffmpeg χρειάστηκε περισσότερο από {seconds} δευτ",
   "higher": "υψηλότερα",
   "hoo-ray!": "Ζήτω!",
@@ -2828,5 +2826,9 @@
   "{ok} {mode} mode on for <b>{name}</b>. Next time it switches by itself.": "Η λειτουργία {ok} {mode} είναι ενεργοποιημένη για <b>{name}</b> . Την επόμενη φορά αλλάζει μόνο του.",
   "{program}  (never asks)": "{program} (ποτέ δεν ρωτά)",
   "{warn} Its noise removal can wipe out music: set it to keep the original sound.": "{warn} Η αφαίρεση του θορύβου μπορεί να εξαφανίσει τη μουσική: ρυθμίστε την ώστε να διατηρεί τον αρχικό ήχο.",
-  "✓ Added to Sounds": "✓ Προστέθηκε στο Sounds"
+  "✓ Added to Sounds": "✓ Προστέθηκε στο Sounds",
+  "Hide this tab": "Απόκρυψη αυτής της καρτέλας",
+  "Switch off the tabs you don't use. A switched-off tab is gone from the window and doesn't load at all, so nothing of it runs in the background. Switch it back on any time, here or with + More tabs left of the tabs. Right-click a tab to hide it.": "Απενεργοποιήστε τις καρτέλες που δεν χρησιμοποιείτε. Μια απενεργοποιημένη καρτέλα έχει φύγει από το παράθυρο και δεν φορτώνεται καθόλου, επομένως τίποτα από αυτήν δεν εκτελείται στο παρασκήνιο. Ενεργοποιήστε το ξανά οποιαδήποτε στιγμή, εδώ ή με + Περισσότερες καρτέλες αριστερά από τις καρτέλες. Κάντε δεξί κλικ σε μια καρτέλα για να την αποκρύψετε.",
+  "This tab is always shown": "Αυτή η καρτέλα εμφανίζεται πάντα",
+  "{tab} hidden. Bring it back with + More tabs or Settings > Tabs.": "{tab} κρυφό. Επαναφέρετε με + Περισσότερες καρτέλες ή Ρυθμίσεις > Καρτέλες."
 }

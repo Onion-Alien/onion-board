@@ -1342,7 +1342,6 @@
   "Support Onion Board": "オニオンボードをサポート",
   "Switch by itself": "勝手に切り替わる",
   "Switch category by program": "番組ごとにカテゴリーを切り替える",
-  "Switch off the tabs you don't use. A switched-off tab is gone from the window and doesn't load at all, so nothing of it runs in the background. Switch it back on any time, here or with + More tabs beside the tabs.": "使用しないタブはオフにします。オフにされたタブはウィンドウから消え、まったく読み込まれないため、バックグラウンドでは何も実行されません。ここで、またはタブの横にある [+ その他] タブを使用して、いつでもオンに戻します。",
   "Switch to the mode that suits what's listening": "聞いているものに合わせたモードに切り替える",
   "Switching the cable to 48 kHz…": "ケーブルを48kHzに切り替えると…",
   "TEST IT": "テストしてみよう",
@@ -2365,7 +2364,6 @@
   "error {code}": "エラー{code}",
   "failed (exit code {code})": "失敗しました (終了コード{code})",
   "failed to load: {error}": "ロードに失敗しました: {error}",
-  "ffmpeg failed": "ffmpegが失敗しました",
   "ffmpeg took longer than {seconds}s": "ffmpeg に{seconds}秒以上かかりました",
   "higher": "より高い",
   "hoo-ray!": "やあ！",
@@ -2768,5 +2766,9 @@
   "{ok} {mode} mode on for <b>{name}</b>. Next time it switches by itself.": "{ok} { <b>{name}</b>の { {mode}モードがオンです。次回からは自動的に切り替わります。",
   "{program}  (never asks)": "{program} (決して尋ねないでください)",
   "{warn} Its noise removal can wipe out music: set it to keep the original sound.": "{warn}ノイズ除去により音楽が消去される可能性があります。元のサウンドを維持するように設定してください。",
-  "✓ Added to Sounds": "✓ サウンドに追加"
+  "✓ Added to Sounds": "✓ サウンドに追加",
+  "Hide this tab": "このタブを非表示にする",
+  "Switch off the tabs you don't use. A switched-off tab is gone from the window and doesn't load at all, so nothing of it runs in the background. Switch it back on any time, here or with + More tabs left of the tabs. Right-click a tab to hide it.": "使用しないタブはオフにします。オフにされたタブはウィンドウから消え、まったく読み込まれないため、バックグラウンドでは何も実行されません。ここで、またはタブの左側にある [+ その他] タブを使用して、いつでもオンに戻します。タブを右クリックして非表示にします。",
+  "This tab is always shown": "このタブは常に表示されます",
+  "{tab} hidden. Bring it back with + More tabs or Settings > Tabs.": "{tab}を非表示にしました。 [+ その他] タブまたは [設定] > [タブ] を使用して元に戻します。"
 }

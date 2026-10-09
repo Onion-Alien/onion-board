@@ -520,9 +520,10 @@ QPushButton#tabinfo { padding:0; border-radius:8px; background:transparent; bord
 QPushButton#tabinfo:hover { background:$btn_hover; border-color:$border_hi; }
 QPushButton#tabinfo:pressed { background:$btn_press; border-color:$accent; }
 QPushButton#tabinfo:focus { border-color:$accent; }
-QPushButton#moretabs { padding:3px 10px; border-radius:8px; background:transparent; border:1px dashed $border_hi; }
-QPushButton#moretabs:hover { background:$btn_hover; border-color:$accent; }
-QPushButton#moretabs:pressed, QPushButton#moretabs:focus { border-color:$accent; }
+QPushButton#moretabs { padding:4px 10px; border-radius:8px; background:transparent; border:1px solid transparent; color:$muted; }
+QPushButton#moretabs:hover { background:$btn_hover; border-color:$border_hi; color:$text_hi; }
+QPushButton#moretabs:pressed { background:$btn_press; }
+QPushButton#moretabs:focus { border-color:$accent; }
 QPushButton#moretabs::menu-indicator { image:none; width:0; }
 QPushButton#settings { padding:6px 14px; font-weight:600; }
 QFrame#transport, QFrame#deck { background:$panel; border-radius:12px; }

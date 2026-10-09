@@ -1,6 +1,7 @@
 """Settings > Tabs: switching the Radio, Apps, Triggers and Voice tabs off and on
 (Config.tabs_off, ui/taboff.py). A switched-off tab is hidden and never built."""
 import pytest
+from PySide6.QtCore import Qt
 
 from conftest import process_events
 
@@ -465,3 +466,19 @@ def test_more_tabs_lists_the_switched_off_ones_and_adds_one(window, monkeypatch)
     assert w.tab_on("triggers") and w.tabs.currentIndex() == main.TAB_INDEX["triggers"]
     w.set_tab_on("radio", True)
     assert w.btn_more_tabs.isHidden()
+
+
+def test_right_click_hides_a_tab_and_more_tabs_brings_it_back(window, monkeypatch):
+    w = window
+    shown = []
+    monkeypatch.setattr(w, "toast", lambda text, kind="": shown.append(text))
+    w.tabs.setCurrentIndex(main.TAB_INDEX["radio"])
+    w.hide_tab("radio")
+    assert not w.tab_on("radio") and w.tabs.currentIndex() == 0
+    assert "More tabs" in shown[0]
+    assert w.tabs.cornerWidget(Qt.TopLeftCorner).isAncestorOf(w.btn_more_tabs)
+    assert not w.btn_more_tabs.isHidden()
+    menu = w.btn_more_tabs.menu()
+    menu.aboutToShow.emit()
+    menu.actions()[0].trigger()
+    assert w.tab_on("radio")

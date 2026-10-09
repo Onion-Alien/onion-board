@@ -1365,7 +1365,6 @@
   "Support Onion Board": "Steun het uienbord",
   "Switch by itself": "Schakelt vanzelf",
   "Switch category by program": "Wissel van categorie per programma",
-  "Switch off the tabs you don't use. A switched-off tab is gone from the window and doesn't load at all, so nothing of it runs in the background. Switch it back on any time, here or with + More tabs beside the tabs.": "Schakel de tabbladen uit die u niet gebruikt. Een uitgeschakeld tabblad is uit het venster verdwenen en wordt helemaal niet geladen, zodat er niets op de achtergrond draait. Schakel het op elk gewenst moment weer in, hier of met + Meer tabbladen naast de tabbladen.",
   "Switch to the mode that suits what's listening": "Schakel over naar de modus die past bij wat u luistert",
   "Switching the cable to 48 kHz…": "De kabel omschakelen naar 48 kHz…",
   "TEST IT": "TEST HET",
@@ -2415,7 +2414,6 @@
   "error {code}": "fout {code}",
   "failed (exit code {code})": "mislukt (afsluitcode {code})",
   "failed to load: {error}": "Kan niet laden: {error}",
-  "ffmpeg failed": "ffmpeg is mislukt",
   "ffmpeg took longer than {seconds}s": "ffmpeg duurde langer dan {seconds} s",
   "higher": "hoger",
   "hoo-ray!": "hoera!",
@@ -2828,5 +2826,9 @@
   "{ok} {mode} mode on for <b>{name}</b>. Next time it switches by itself.": "{ok} {mode} modus aan voor <b>{name}</b> . De volgende keer schakelt hij vanzelf over.",
   "{program}  (never asks)": "{program} (vraagt ​​nooit)",
   "{warn} Its noise removal can wipe out music: set it to keep the original sound.": "{warn} De ruisverwijdering kan muziek wegvagen: stel deze zo in dat het originele geluid behouden blijft.",
-  "✓ Added to Sounds": "✓ Toegevoegd aan geluiden"
+  "✓ Added to Sounds": "✓ Toegevoegd aan geluiden",
+  "Hide this tab": "Verberg dit tabblad",
+  "Switch off the tabs you don't use. A switched-off tab is gone from the window and doesn't load at all, so nothing of it runs in the background. Switch it back on any time, here or with + More tabs left of the tabs. Right-click a tab to hide it.": "Schakel de tabbladen uit die u niet gebruikt. Een uitgeschakeld tabblad is uit het venster verdwenen en wordt helemaal niet geladen, zodat er niets op de achtergrond draait. Schakel het op elk gewenst moment weer in, hier of met + Meer tabbladen links van de tabbladen. Klik met de rechtermuisknop op een tabblad om het te verbergen.",
+  "This tab is always shown": "Dit tabblad wordt altijd weergegeven",
+  "{tab} hidden. Bring it back with + More tabs or Settings > Tabs.": "{tab} verborgen. Breng het terug met + Meer tabbladen of Instellingen > Tabbladen."
 }
