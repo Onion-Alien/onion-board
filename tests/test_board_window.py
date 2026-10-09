@@ -44,6 +44,8 @@ def test_web_results_put_a_back_button_in_place_of_the_category_tabs(window, mon
     window.show()
     assert window.btn_cat_add.text() == "" and window.btn_cat_add.toolTip()
     assert window.btn_cat_add.x() < window.cat_tabs.geometry().right() + 40
+    last = window.cat_tabs.tabRect(window.cat_tabs.count() - 1)
+    assert window.btn_cat_add.x() - (window.cat_tabs.x() + last.right()) < 16   # no gap
     monkeypatch.setattr(window.ytresults, "available", lambda: True)
     monkeypatch.setattr(window.ytresults, "search", lambda q: window.ytresults.show() or True)
     window.search.setText("test tone")
