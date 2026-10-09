@@ -164,7 +164,8 @@ class SideRail(QFrame):
         self.toggle.setCursor(Qt.PointingHandCursor)
         self.toggle.setFocusPolicy(Qt.TabFocus)
         self.toggle.clicked.connect(lambda: self.set_open(not self._open))
-        lay.addWidget(self.toggle)
+        self.toggle.setFixedWidth(SHUT_W - 2 * SIDE_SHUT - 1)   # a tab button's, open too
+        lay.addWidget(self.toggle, 0, Qt.AlignLeft)   # (mirrored: the right)
         tabs.changed.connect(self.sync)
         tabs.currentChanged.connect(self.sync)
         self._apply()
@@ -278,9 +279,10 @@ class SideRail(QFrame):
         # the arrow points the way the rail will go: mirrored (Arabic), it opens leftwards
         icons.set_icon(self.toggle, "back" if shown != self.isRightToLeft() else "forward",
                        size=ICON)
-        # its name is what it does now (a screen reader read out both before)
-        self._label(self.toggle, _("Hide tab names") if shown else _("Show tab names"),
-                    _("Show only the icons") if shown else "", shown)
+        # only the arrow, open or shut ("Hide tab names" was cut short in most
+        # languages); its name is what it does now, on hover and for a screen reader
+        self._label(self.toggle, _("Hide tab names") if shown else _("Show tab names"), "",
+                    False)
         self.sync()
         # one height for everything on the rail: the buttons under the tabs came out
         # 3 px shorter, so their focus ring and hover box didn't match the tabs'
