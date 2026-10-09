@@ -125,7 +125,6 @@
   "A restore point is saved first, so you can undo this.": "Der gemmes først et gendannelsespunkt, så du kan fortryde det.",
   "A short “Did you know?” about a feature, at most once a day, never while a game is up.": "En kort “Vidste du det?” om en funktion, højst én gang om dagen, aldrig mens et spil kører.",
   "A small dot on its icon": "En lille prik på dens ikon",
-  "A soft wash and a coloured icon in the theme's colour, easy to spot from across the room": "Et blødt skær og et farvet ikon i temaets farve, nemt at få øje på fra den anden ende af rummet",
   "A soundboard is most useful left running: your hotkeys and the overlay work while the window is closed. The tray icon (by the clock) opens it again; right-click it to quit.": "En soundboard er mest nyttig, når den kører i baggrunden: dine genvejstaster og overlayet virker, mens vinduet er lukket. Ikonet i systembakken (ved uret) åbner den igen; højreklik på det for at afslutte.",
   "A tab whose feature is on right now (a sound playing, the voice changer, the radio…) is marked, so nothing is left on without you noticing.": "En fane, hvis funktion er i gang lige nu (en lyd, der spiller, stemmeskifteren, radioen…), bliver markeret, så intet står tændt, uden at du opdager det.",
   "A virtual cable (not installed yet)": "Et virtuelt kabel (ikke installeret endnu)",
@@ -1246,7 +1245,6 @@
   "Throw this recording away?": "Smid denne optagelse væk?",
   "TikTok sounds": "TikTok-lyde",
   "Time": "Tid",
-  "Tint the tab": "Farv fanen",
   "To hear it live instead, use Hear what they hear at the bottom.": "For at høre det live i stedet skal du bruge Hør, hvad de hører, nederst.",
   "To use Tor, get it first: about 22 MB from the Tor Project, checked before it's used. {blocked_hint}": "For at bruge Tor skal du først hente den: ca. 22 MB fra Tor Project, tjekket før den bruges. {blocked_hint}",
   "Toggle — press again stops it": "Til/fra — et nyt tryk stopper den",
@@ -2860,5 +2858,10 @@
   "by {name}": "af {name}",
   "{language} needs a one-time download of its translation model ({size} MB). Offline mode is on, so it can't be downloaded now.": "{language} har brug for en engangsdownload af sin oversættelsesmodel ( {size} MB). Offlinetilstand er aktiveret, så den kan ikke downloades nu.",
   "{n} MB": "{n} MB",
-  "⚠ Windows has no {language} voice yet, so {language} can't be spoken properly. Offline mode is on, so it can't be installed now.": "⚠ Windows har endnu ingen {language} -stemme, så {language} kan ikke læses korrekt. Offlinetilstand er aktiveret, så den kan ikke installeres nu."
+  "⚠ Windows has no {language} voice yet, so {language} can't be spoken properly. Offline mode is on, so it can't be installed now.": "⚠ Windows har endnu ingen {language} -stemme, så {language} kan ikke læses korrekt. Offlinetilstand er aktiveret, så den kan ikke installeres nu.",
+  "A bar at the edge of the tabs and a coloured icon, in the highlight colour: easy to spot from across the room": "En streg i kanten af fanerne og et farvet ikon i fremhævningsfarven: let at se fra den anden side af rummet",
+  "A bar beside the tab": "En streg ved siden af fanen",
+  "Show tab names": "Vis fanenavne",
+  "Hide tab names": "Skjul fanenavne",
+  "Show only the icons": "Vis kun ikonerne"
 }

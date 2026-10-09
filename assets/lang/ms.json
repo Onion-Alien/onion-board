@@ -124,7 +124,6 @@
   "A restore point is saved first, so you can undo this.": "Titik pemulihan disimpan dahulu, jadi anda boleh membuat asal ini.",
   "A short “Did you know?” about a feature, at most once a day, never while a game is up.": "“Tahukah anda?” yang ringkas tentang sesuatu ciri, paling banyak sekali sehari, tidak pernah semasa permainan dibuka.",
   "A small dot on its icon": "Titik kecil pada ikonnya",
-  "A soft wash and a coloured icon in the theme's colour, easy to spot from across the room": "Warna lembut dan ikon berwarna dalam warna tema, mudah dilihat dari hujung bilik",
   "A soundboard is most useful left running: your hotkeys and the overlay work while the window is closed. The tray icon (by the clock) opens it again; right-click it to quit.": "Soundboard paling berguna jika dibiarkan berjalan: hotkey dan overlay anda berfungsi semasa tetingkap ditutup. Ikon dulang (di sebelah jam) membukanya semula; klik kanan untuk keluar.",
   "A tab whose feature is on right now (a sound playing, the voice changer, the radio…) is marked, so nothing is left on without you noticing.": "Tab yang ciri-cirinya sedang hidup (bunyi sedang dimainkan, pengubah suara, radio…) ditandakan, supaya tiada yang dibiarkan hidup tanpa anda sedari.",
   "A virtual cable (not installed yet)": "Kabel maya (belum dipasang)",
@@ -1230,7 +1229,6 @@
   "Throw this recording away?": "Buang rakaman ini?",
   "TikTok sounds": "Bunyi TikTok",
   "Time": "Masa",
-  "Tint the tab": "Warnakan tab",
   "To hear it live instead, use Hear what they hear at the bottom.": "Untuk mendengarnya secara langsung, guna Dengar apa yang mereka dengar di bawah.",
   "To use Tor, get it first: about 22 MB from the Tor Project, checked before it's used. {blocked_hint}": "Untuk guna Tor, dapatkannya dahulu: kira-kira 22 MB dari Tor Project, disemak sebelum digunakan. {blocked_hint}",
   "Toggle — press again stops it": "Togol — tekan lagi menghentikannya",
@@ -2800,5 +2798,10 @@
   "by {name}": "oleh {name}",
   "{language} needs a one-time download of its translation model ({size} MB). Offline mode is on, so it can't be downloaded now.": "{language} memerlukan muat turun sekali sahaja bagi model terjemahannya ( {size} MB). Mod luar talian dihidupkan, jadi ia tidak boleh dimuat turun sekarang.",
   "{n} MB": "{n} MB",
-  "⚠ Windows has no {language} voice yet, so {language} can't be spoken properly. Offline mode is on, so it can't be installed now.": "⚠ Windows belum mempunyai suara {language} , jadi {language} tidak dapat dituturkan dengan betul. Mod luar talian dihidupkan, jadi ia tidak boleh dipasang sekarang."
+  "⚠ Windows has no {language} voice yet, so {language} can't be spoken properly. Offline mode is on, so it can't be installed now.": "⚠ Windows belum mempunyai suara {language} , jadi {language} tidak dapat dituturkan dengan betul. Mod luar talian dihidupkan, jadi ia tidak boleh dipasang sekarang.",
+  "A bar at the edge of the tabs and a coloured icon, in the highlight colour: easy to spot from across the room": "Bar di tepi tab dan ikon berwarna, dalam warna serlahan: mudah dikesan dari seberang bilik",
+  "A bar beside the tab": "Bar di sebelah tab",
+  "Show tab names": "Tunjukkan nama tab",
+  "Hide tab names": "Sembunyikan nama tab",
+  "Show only the icons": "Tunjukkan hanya ikon"
 }

@@ -722,7 +722,6 @@
   "A restore point is saved first, so you can undo this.": "Un punto di ripristino viene salvato per primo, quindi puoi annullarlo.",
   "A short “Did you know?” about a feature, at most once a day, never while a game is up.": "Un breve \"Lo sapevi?\" su una funzionalità, al massimo una volta al giorno, mai mentre il gioco è finito.",
   "A small dot on its icon": "Un piccolo punto sulla sua icona",
-  "A soft wash and a coloured icon in the theme's colour, easy to spot from across the room": "Una sfumatura delicata e un'icona colorata nel colore del tema, facile da individuare dall'altra parte della stanza",
   "A soundboard is most useful left running: your hotkeys and the overlay work while the window is closed. The tray icon (by the clock) opens it again; right-click it to quit.": "Una tavola armonica è molto utile lasciata in esecuzione: i tasti di scelta rapida e l'overlay funzionano mentre la finestra è chiusa. L'icona della barra delle applicazioni (vicino all'orologio) la riapre; fare clic con il pulsante destro del mouse per uscire.",
   "A tab whose feature is on right now (a sound playing, the voice changer, the radio…) is marked, so nothing is left on without you noticing.": "Una scheda la cui funzione è attiva in questo momento (un suono in riproduzione, il cambio di voce, la radio...) è contrassegnata, quindi non viene lasciato nulla senza che tu te ne accorga.",
   "About": "Di",
@@ -1377,7 +1376,6 @@
   "Through a proxy or Tor, everything the app fetches (searches, downloads, radio, updates) goes through it, and site names are looked up there, not on this PC. If it can't be reached, nothing is fetched: the app never quietly goes direct. This PC's own addresses (127.0.0.1) stay direct.": "Attraverso un proxy o Tor, tutto ciò che l'app recupera (ricerche, download, radio, aggiornamenti) passa attraverso di essa e i nomi dei siti vengono cercati lì, non su questo PC. Se non è raggiungibile, non viene recuperato nulla: l'app non va mai tranquillamente in diretta. Gli indirizzi di questo PC (127.0.0.1) rimangono diretti.",
   "TikTok sounds": "Suoni di TikTok",
   "Time": "Tempo",
-  "Tint the tab": "Colora la linguetta",
   "To use Tor, get it first: about 22 MB from the Tor Project, checked before it's used. {blocked_hint}": "Per utilizzare Tor, scaricalo prima: circa 22 MB dal progetto Tor, controllati prima di utilizzarlo. {blocked_hint}",
   "Tor download": "Scarica Tor",
   "Tor sends everything through three volunteer computers around the world, so the sites you search and download from and the radio stations you play see a Tor address, not yours. It's slower, and YouTube often turns Tor away: the app then tries other Tor routes, and only goes without Tor if you click to.": "Tor invia tutto tramite tre computer volontari in tutto il mondo, quindi i siti da cui cerchi e scarichi e le stazioni radio che ascolti vedono un indirizzo Tor, non il tuo. È più lento e YouTube spesso allontana Tor: l'app prova quindi altri percorsi Tor e rinuncia a Tor solo se fai clic su.",
@@ -2860,5 +2858,10 @@
   "by {name}": "di {name}",
   "{language} needs a one-time download of its translation model ({size} MB). Offline mode is on, so it can't be downloaded now.": "{language} necessita di un download una tantum del suo modello di traduzione ( {size} MB). La modalità offline è attiva, quindi non può essere scaricata adesso.",
   "{n} MB": "{n} MB",
-  "⚠ Windows has no {language} voice yet, so {language} can't be spoken properly. Offline mode is on, so it can't be installed now.": "⚠ Windows non ha ancora la voce {language} , quindi {language} non può essere pronunciata correttamente. La modalità offline è attiva, quindi non può essere installata ora."
+  "⚠ Windows has no {language} voice yet, so {language} can't be spoken properly. Offline mode is on, so it can't be installed now.": "⚠ Windows non ha ancora la voce {language} , quindi {language} non può essere pronunciata correttamente. La modalità offline è attiva, quindi non può essere installata ora.",
+  "A bar at the edge of the tabs and a coloured icon, in the highlight colour: easy to spot from across the room": "Una barra al bordo delle schede e un'icona colorata, nel colore evidenziato: facile da individuare dall'altra parte della stanza",
+  "A bar beside the tab": "Una barra accanto alla scheda",
+  "Show tab names": "Mostra i nomi delle schede",
+  "Hide tab names": "Nascondi i nomi delle schede",
+  "Show only the icons": "Mostra solo le icone"
 }

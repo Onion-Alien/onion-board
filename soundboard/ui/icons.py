@@ -755,6 +755,9 @@ def set_tab_icon(tabs, index: int, name: str, tint: str | None = None, badge: bo
     # ...and none for deleted tab widgets: Settings' tabs added 12 each time it opened
     _tabs[:] = [e for e in _tabs if not _gone(e[0]) and not (e[0]() is tabs and e[1] == index)]
     _tabs.append((weakref.ref(tabs), index, name, tint, badge))
+    changed = getattr(tabs, "changed", None)   # a tab widget shown elsewhere (ui/sidebar.py)
+    if changed is not None:
+        changed.emit()
 
 
 def tab_icon_name(tabs, index: int) -> str | None:

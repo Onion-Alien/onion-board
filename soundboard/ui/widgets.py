@@ -11,7 +11,7 @@ from PySide6.QtCore import (QEvent, QMimeData, QObject, QPoint, QPointF, QRectF,
                             QTimer, QVariantAnimation, Signal)
 from PySide6.QtGui import (QColor, QDrag, QFont, QFontMetrics, QLinearGradient, QPainter,
                            QPainterPath, QPen)
-from PySide6.QtWidgets import (QAbstractButton, QGridLayout, QHBoxLayout, QLabel, QScrollArea,
+from PySide6.QtWidgets import (QAbstractButton, QGridLayout, QLabel, QScrollArea,
                                QSlider, QStackedWidget, QStyle, QTabWidget, QVBoxLayout,
                                QWidget)
 
@@ -279,45 +279,6 @@ def fmt_pos(pos: float, total: float) -> str:
 FFT_N = 2048
 _HANN = np.hanning(FFT_N).astype(np.float32)
 _FREQS = np.fft.rfftfreq(FFT_N, 1 / SR)
-
-
-class TabInfoCorner(QWidget):
-    """Give Qt's corner the tab row's height so its buttons are vertically centered."""
-
-    def __init__(self, tabs, *buttons):
-        super().__init__()
-        self.tabs = tabs
-        layout = QHBoxLayout(self)
-        layout.setContentsMargins(0, 0, 0, 0)
-        layout.setSpacing(4)
-        for button in buttons:
-            layout.addWidget(button, 0, Qt.AlignVCenter)
-
-    def sizeHint(self):
-        size = super().sizeHint()
-        size.setHeight(max(size.height(), self.tabs.tabBar().sizeHint().height()))
-        return size
-
-
-class TabEndCorner(TabInfoCorner):
-    """The tab row's right corner stretched back to the last tab: `lead` sits right
-    after the tabs (like a browser's + tab) and `trail` at the far right. Qt gives a
-    corner widget its size hint's width, so the hint is the room the tabs leave; its
-    minimum stays the buttons', so a narrow window still shrinks the tabs first."""
-
-    def __init__(self, tabs, lead, trail):
-        super().__init__(tabs, lead)
-        self.layout().addStretch(1)
-        self.layout().addWidget(trail, 0, Qt.AlignVCenter)
-
-    def sizeHint(self):
-        size = super().sizeHint()
-        room = self.tabs.width() - self.tabs.tabBar().sizeHint().width() - 6
-        size.setWidth(max(size.width(), room))
-        return size
-
-    def minimumSizeHint(self):
-        return super().sizeHint()
 
 
 class SteadyTabs(QObject):

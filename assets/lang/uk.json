@@ -739,7 +739,6 @@
   "A restore point is saved first, so you can undo this.": "Спочатку зберігається точка відновлення, тому ви можете скасувати це.",
   "A short “Did you know?” about a feature, at most once a day, never while a game is up.": "Коротке «Чи знаєте ви?» про функцію, щонайбільше раз на день, ніколи під час гри.",
   "A small dot on its icon": "Маленька крапка на його значку",
-  "A soft wash and a coloured icon in the theme's colour, easy to spot from across the room": "М’яке прання та кольоровий значок у колір теми, який легко помітити з іншого боку кімнати",
   "A soundboard is most useful left running: your hotkeys and the overlay work while the window is closed. The tray icon (by the clock) opens it again; right-click it to quit.": "Дека найкорисніша, коли вона працює: гарячі клавіші та оверлей працюють, коли вікно закрите. Піктограма в треї (біля годинника) знову відкриває його; клацніть його правою кнопкою миші, щоб вийти.",
   "A tab whose feature is on right now (a sound playing, the voice changer, the radio…) is marked, so nothing is left on without you noticing.": "Вкладка, функція якої зараз увімкнена (відтворення звуку, програма зміни голосу, радіо…), позначена, тому нічого не залишається ввімкненим, непомітно для вас.",
   "About": "про",
@@ -1400,7 +1399,6 @@
   "Through a proxy or Tor, everything the app fetches (searches, downloads, radio, updates) goes through it, and site names are looked up there, not on this PC. If it can't be reached, nothing is fetched: the app never quietly goes direct. This PC's own addresses (127.0.0.1) stay direct.": "Через проксі-сервер або Tor все, що отримує програма (пошук, завантаження, радіо, оновлення), проходить через нього, і назви сайтів шукаються там, а не на цьому ПК. Якщо його неможливо отримати, нічого не буде отримано: програма ніколи не переходить тихо безпосередньо. Власні адреси цього ПК (127.0.0.1) залишаються прямими.",
   "TikTok sounds": "Звуки TikTok",
   "Time": "час",
-  "Tint the tab": "Тонувати вкладку",
   "To use Tor, get it first: about 22 MB from the Tor Project, checked before it's used. {blocked_hint}": "Щоб використовувати Tor, спочатку отримайте його: приблизно 22 МБ із проекту Tor, перевірено перед використанням. {blocked_hint}",
   "Tor download": "Завантажити Tor",
   "Tor sends everything through three volunteer computers around the world, so the sites you search and download from and the radio stations you play see a Tor address, not yours. It's slower, and YouTube often turns Tor away: the app then tries other Tor routes, and only goes without Tor if you click to.": "Tor надсилає все через три комп’ютери добровольців по всьому світу, тому сайти, з яких ви шукаєте та завантажуєте, і радіостанції, які ви слухаєте, бачать адресу Tor, а не вашу. Це повільніше, і YouTube часто відмовляє Tor: програма потім пробує інші маршрути Tor, і обходиться без Tor, лише якщо ви натискаєте.",
@@ -2920,5 +2918,10 @@
   "by {name}": "від {name}",
   "{language} needs a one-time download of its translation model ({size} MB). Offline mode is on, so it can't be downloaded now.": "{language} потребує одноразового завантаження моделі перекладу ( {size} MB). Офлайн-режим увімкнено, тому його зараз неможливо завантажити.",
   "{n} MB": "{n} МБ",
-  "⚠ Windows has no {language} voice yet, so {language} can't be spoken properly. Offline mode is on, so it can't be installed now.": "⚠ У Windows ще немає голосу {language} , тому {language} не можна вимовити належним чином. Режим офлайн увімкнено, тому його неможливо встановити зараз."
+  "⚠ Windows has no {language} voice yet, so {language} can't be spoken properly. Offline mode is on, so it can't be installed now.": "⚠ У Windows ще немає голосу {language} , тому {language} не можна вимовити належним чином. Режим офлайн увімкнено, тому його неможливо встановити зараз.",
+  "A bar at the edge of the tabs and a coloured icon, in the highlight colour: easy to spot from across the room": "Смуга на краю вкладок і кольорова піктограма кольором підсвічування: легко помітити з іншого боку кімнати",
+  "A bar beside the tab": "Смужка біля вкладки",
+  "Show tab names": "Показати назви вкладок",
+  "Hide tab names": "Приховати назви вкладок",
+  "Show only the icons": "Показувати лише значки"
 }

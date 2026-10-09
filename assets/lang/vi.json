@@ -705,7 +705,6 @@
   "A restore point is saved first, so you can undo this.": "Điểm khôi phục được lưu trước tiên nên bạn có thể hoàn tác việc này.",
   "A short “Did you know?” about a feature, at most once a day, never while a game is up.": "Một câu ngắn gọn “Bạn có biết không?” về một tính năng, nhiều nhất là một lần một ngày, không bao giờ khi trò chơi kết thúc.",
   "A small dot on its icon": "Một dấu chấm nhỏ trên biểu tượng của nó",
-  "A soft wash and a coloured icon in the theme's colour, easy to spot from across the room": "Nước giặt mềm và biểu tượng có màu cùng màu với chủ đề, dễ dàng nhận biết từ khắp phòng",
   "A soundboard is most useful left running: your hotkeys and the overlay work while the window is closed. The tray icon (by the clock) opens it again; right-click it to quit.": "Bảng âm thanh hữu ích nhất khi chạy: các phím nóng và lớp phủ của bạn hoạt động khi cửa sổ đóng. Biểu tượng khay (theo đồng hồ) sẽ mở lại; nhấp chuột phải vào nó để thoát.",
   "A tab whose feature is on right now (a sound playing, the voice changer, the radio…) is marked, so nothing is left on without you noticing.": "Một tab có tính năng hiện đang được bật (phát âm thanh, bộ thay đổi giọng nói, radio…) sẽ được đánh dấu, do đó, không có gì được bật mà bạn không nhận thấy.",
   "About": "Về",
@@ -1354,7 +1353,6 @@
   "Through a proxy or Tor, everything the app fetches (searches, downloads, radio, updates) goes through it, and site names are looked up there, not on this PC. If it can't be reached, nothing is fetched: the app never quietly goes direct. This PC's own addresses (127.0.0.1) stay direct.": "Thông qua proxy hoặc Tor, mọi thứ mà ứng dụng tìm nạp (tìm kiếm, tải xuống, radio, cập nhật) đều đi qua nó và tên trang web được tra cứu ở đó chứ không phải trên PC này. Nếu không thể truy cập được thì sẽ không có gì được tìm nạp: ứng dụng không bao giờ hoạt động trực tiếp một cách lặng lẽ. Địa chỉ riêng của PC này (127.0.0.1) luôn được giữ nguyên.",
   "TikTok sounds": "Âm thanh TikTok",
   "Time": "Thời gian",
-  "Tint the tab": "Tô màu tab",
   "To use Tor, get it first: about 22 MB from the Tor Project, checked before it's used. {blocked_hint}": "Để sử dụng Tor, trước tiên hãy lấy nó: khoảng 22 MB từ Tor Project, được kiểm tra trước khi sử dụng. {blocked_hint}",
   "Tor download": "Tải xuống Tor",
   "Tor sends everything through three volunteer computers around the world, so the sites you search and download from and the radio stations you play see a Tor address, not yours. It's slower, and YouTube often turns Tor away: the app then tries other Tor routes, and only goes without Tor if you click to.": "Tor gửi mọi thứ thông qua ba máy tính tình nguyện trên khắp thế giới, do đó, các trang web bạn tìm kiếm và tải xuống cũng như các đài phát thanh bạn phát sẽ thấy địa chỉ Tor chứ không phải địa chỉ của bạn. Nó chậm hơn và YouTube thường loại bỏ Tor: sau đó ứng dụng sẽ thử các tuyến Tor khác và chỉ hoạt động mà không có Tor nếu bạn nhấp vào.",
@@ -2800,5 +2798,10 @@
   "by {name}": "bởi {name}",
   "{language} needs a one-time download of its translation model ({size} MB). Offline mode is on, so it can't be downloaded now.": "{language} cần tải xuống một lần mô hình dịch của nó ( {size} MB). Chế độ ngoại tuyến đang bật nên không thể tải xuống ngay bây giờ.",
   "{n} MB": "{n} MB",
-  "⚠ Windows has no {language} voice yet, so {language} can't be spoken properly. Offline mode is on, so it can't be installed now.": "⚠ Windows chưa có giọng nói {language} nên không thể nói chính xác {language} . Chế độ ngoại tuyến đang bật nên không thể cài đặt ngay bây giờ."
+  "⚠ Windows has no {language} voice yet, so {language} can't be spoken properly. Offline mode is on, so it can't be installed now.": "⚠ Windows chưa có giọng nói {language} nên không thể nói chính xác {language} . Chế độ ngoại tuyến đang bật nên không thể cài đặt ngay bây giờ.",
+  "A bar at the edge of the tabs and a coloured icon, in the highlight colour: easy to spot from across the room": "Một thanh ở cạnh các thẻ và một biểu tượng có màu nổi bật: dễ nhận ra từ khắp phòng",
+  "A bar beside the tab": "Một thanh bên cạnh thẻ",
+  "Show tab names": "Hiện tên thẻ",
+  "Hide tab names": "Ẩn tên thẻ",
+  "Show only the icons": "Chỉ hiển thị các biểu tượng"
 }
