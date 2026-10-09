@@ -318,7 +318,7 @@ class Court(QWidget):
             br.translate(0, -6 * abs(math.sin(t * 3.4)))
             for i, col in enumerate(("#ffcf40", "#ff8fae", "#1fb6ff", "#a48bff")):
                 a = t * 0.9 + i * math.pi / 2
-                sparkle(p, br.center().x() + math.cos(a) * br.width() * 0.7,
+                sparkle(p, br.center().x() + math.cos(a) * br.width() * 0.52,
                         br.center().y() + math.sin(a) * br.height() * 0.45,
                         3 + 3 * abs(math.sin(t * 4 + i)), QColor(col))
         blink = 1.0 if (t % 3.7) < 0.12 else 0.0
