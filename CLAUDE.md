@@ -96,6 +96,23 @@ or installing anything. The short version:
   mangles UTF-8 (this codebase uses symbols like ⚙ ⏺ 🐰 in strings).
 - Audio callbacks never block or take the engine lock ([docs/CODE.md](docs/CODE.md) → *Audio notes*).
 - Code layout is the table in [docs/CODE.md](docs/CODE.md); keep it current when adding modules.
+- **Commit times: UTC only.** Every commit's author and committer time must be
+  `+0000`: a local time zone in a public repo says where the author lives. The
+  enforcement:
+  - `git config core.hooksPath .githooks` (required) turns on the hooks:
+    `post-commit` and `post-merge` re-stamp new commits in UTC, and `pre-push` refuses
+    anything that isn't.
+  - CI's *Commit times in UTC* step fails a PR (and main) that has any.
+  - **Never merge a PR with `gh pr merge`, GitHub's Merge button or GitHub's
+    *Update branch*.** GitHub writes those commits in your local time zone, and no
+    hook can touch them. Merge with `sh scripts/merge_pr.sh N [--delete-branch]`: it
+    checks CI is green, makes the merge commit here in UTC and pushes it to main.
+  - Bring main into a branch with a local `git merge origin/main` (the hook stamps
+    it).
+  - A branch whose commits aren't UTC: `sh scripts/utc_fix.sh`, then
+    `git push --force-with-lease`.
+  - The same goes for anything else that records where you are: never write your time
+    zone, locale, city or machine names into commits, PR text or files.
 - Never rewrite history already pushed to `main` (no filter-repo, rebase or force-push):
   commits get new IDs, so every fork or branch that merges `main` sees them all as new
   and conflicts. To clean up old commits, add a new commit instead.
