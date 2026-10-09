@@ -14,7 +14,7 @@ from PySide6.QtCore import Qt, Signal
 from PySide6.QtWidgets import (QCheckBox, QComboBox, QGridLayout, QHBoxLayout, QLabel,
                                QPushButton, QSlider, QVBoxLayout, QWidget)
 
-from soundboard import aiaddon, applog, errors
+from soundboard import aiaddon, applog, errors, net
 from soundboard import modules as mods
 from soundboard.i18n import _
 from soundboard.speech import aivoice
@@ -249,6 +249,11 @@ class AiVoicePanel(QWidget):
         self.lbl_credits.setText(self.module.credits if self.module else "")
         self._refresh()
 
+    def ready(self) -> bool:
+        """Installed, its model downloaded and its voices there: it works offline."""
+        m = self.module
+        return m is not None and m.installed and model_downloaded(m) and bool(self.voices)
+
     def _refresh(self):
         m = self.module
         ok = m is not None and m.installed and model_downloaded(m) and bool(self.voices)
@@ -259,6 +264,9 @@ class AiVoicePanel(QWidget):
         self.b_update.setVisible(m is not None)
         self.b_remove.setVisible(m is not None and aiaddon.removable(m))
         self.btn_opts.setVisible(m is not None)
+        if net.offline():   # Offline mode: nothing here can be fetched (the card goes
+            for b in (self.b_get, self.b_install, self.b_update):   # when not ready)
+                b.hide()
         if m is None:
             self.opts.hide()
             self.btn_opts.setChecked(False)

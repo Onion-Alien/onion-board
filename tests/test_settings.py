@@ -286,7 +286,7 @@ def test_theme_previews_reflow_when_settings_is_resized(window, qapp):  # noqa: 
 def test_each_switch_writes_its_setting_and_applies_at_once(window, monkeypatch):  # noqa: F811
     """Settings > Privacy & security: one switch per feature (and per sound site),
     saved in net_off and applied to soundboard.net straight away; sub-options grey out
-    under a switch that's off, and Offline mode greys out everything under it."""
+    under a switch that's off, and Offline mode hides everything under it."""
     monkeypatch.setattr(window, "_save_later", lambda: None)
     monkeypatch.setattr(window, "check_updates", lambda *a, **k: None)
     d = SettingsDialog(window)
@@ -306,9 +306,9 @@ def test_each_switch_writes_its_setting_and_applies_at_once(window, monkeypatch)
         assert not any(b.isEnabled() for b in d.ytdlp_btns)
         d.offline_box.setChecked(True)
         assert window.cfg.net_offline and not net.any_allowed()
-        assert not d._net_body.isEnabled()
+        assert d._net_body.isHidden()   # Offline mode: hidden, not left greyed out
         d.offline_box.setChecked(False)
-        assert d._net_body.isEnabled() and net.allowed("voices") and not net.allowed("radio")
+        assert not d._net_body.isHidden() and net.allowed("voices") and not net.allowed("radio")
     finally:
         d.close()
         window.cfg.net_off, window.cfg.net_offline = [], False

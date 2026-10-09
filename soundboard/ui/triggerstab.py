@@ -268,6 +268,13 @@ class TriggersTab(QWidget):
             self.btn_update.setToolTip(why)
 
     # ------------------------------------------------------------------ loading
+    def has_addon(self) -> bool:
+        """Whether Onion Watch is installed, or a local zip is there to install it from
+        (Offline mode hides the tab when it's neither: it's only the Get button)."""
+        if self.info is None:
+            self.info = watchaddon.installed(self._dirs)
+        return self.info is not None or watchaddon.local_zip() is not None
+
     def needed_now(self) -> bool:
         """At the window's start (or the tab switched back on in Settings > Tabs):
         whether to load the add-on straight away. Only when it has to run (watching

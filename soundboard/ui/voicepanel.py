@@ -1524,6 +1524,7 @@ class SpeechPanel(QWidget):
                                     "it's in; no restart.")
         self.b_voice_install.setToolTip(self._voice_install_tip)
         net.on_change(self._refresh_translation)   # Settings > Privacy's switches
+        net.on_change(self._net_changed)
         self.b_voice_install.clicked.connect(self._install_voice)
         self.b_voices = QPushButton(_("Windows settings"))
         self.b_voices.setObjectName("small")
@@ -2102,7 +2103,12 @@ class SpeechPanel(QWidget):
                                   "PC; what you say never leaves it.", language=name,
                                   size=translation.size_mb(m)))
             self.b_dl.setText(_("Download {language}", language=name))
-            self.b_dl.show()
+            self.b_dl.setVisible(not net.offline())   # Offline mode: no dead button
+            if net.offline():
+                self.lbl_tr.setText(_("{language} needs a one-time download of its "
+                                      "translation model ({size} MB). Offline mode is on, so "
+                                      "it can't be downloaded now.", language=name,
+                                      size=translation.size_mb(m)))
             # downloading voices switched off in Settings > Privacy: greyed, saying why
             self.b_dl.setEnabled(not live and net.allowed("voices"))
             self.b_dl.setToolTip(net.off_message("voices") if not net.allowed("voices") else
@@ -2133,14 +2139,18 @@ class SpeechPanel(QWidget):
                 self.b_voices.hide()
                 return
             self.b_voice_install.setText(_("Install the {language} voice", language=name))
+            self.b_voice_install.setVisible(not net.offline())   # Windows Update: online
             # Windows Update can't go through the app's connection: off means not at all
             self.b_voice_install.setEnabled(net.allowed("voices"))
             self.b_voice_install.setToolTip(
                 self._voice_install_tip if net.allowed("voices") else net.off_message("voices"))
-            self.lbl_tr.setText(self._voice_note or _(
+            self.lbl_tr.setText(self._voice_note or (_(
+                "\u26a0 Windows has no {language} voice yet, so {language} can't be spoken "
+                "properly. Offline mode is on, so it can't be installed now.", language=name)
+                if net.offline() else _(
                 "\u26a0 Windows has no {language} voice yet, so {language} can't be spoken "
                 "properly. Press Install (free, one click); it's picked up by itself "
-                "once it's in, even mid-sentence.", language=name))
+                "once it's in, even mid-sentence.", language=name)))
 
     # ---- Windows voices
     def _install_voice(self):
@@ -2317,15 +2327,24 @@ class SpeechPanel(QWidget):
                                    "Onion Board and try again."), "warn")
         busy.run_busy(self.b_dl_remove, _("Deleting…"), go, said)
 
+    def _net_changed(self):
+        """Offline mode on or off: the install buttons follow (not mid-install)."""
+        if not self._installing:
+            self._refresh_module()
+
     def _refresh_module(self):
         m = self.module
         ok = m is not None and m.installed
         self.lang_box.setVisible(ok and bool(self.langs))
         self.start_box.setVisible(ok)
         self.missing.setVisible(not ok)
-        self.b_install.setVisible(m is not None and not ok)
-        self.b_update.setVisible(m is not None)
-        if m is None:
+        self.b_install.setVisible(m is not None and not ok and not net.offline())
+        self.b_update.setVisible(m is not None and not net.offline())   # pip: online
+        if m is not None and not ok and net.offline():
+            self.lbl_missing.setText(_("Speaking another language needs speech recognition "
+                                       "installed first, which is a download. Offline mode "
+                                       "is on, so it can't be installed now."))
+        elif m is None:
             self.lbl_missing.setText(_(
                 "The live-voice add-on is missing from this copy of Onion Board. Run the "
                 "installer again (it comes with every install), then press Refresh below."))
@@ -2585,7 +2604,7 @@ class ModulesList(QWidget):
                 state = f"⚠ {m.error}"
             elif m.kind == "service" and not m.installed:
                 state = (_("not set up yet: press Install speech recognition above")
-                         if m.id == LIVE_MODULE else _("not set up yet"))
+                         if m.id == LIVE_MODULE and not net.offline() else _("not set up yet"))
             elif m.kind == "effects":
                 state = _("on") if m.loaded else _("not loaded")
             else:
@@ -2596,7 +2615,7 @@ class ModulesList(QWidget):
             have = [langnames.of(m) for m in langs if m.installed]
             more = [langnames.of(m) for m in langs if not m.installed]
             parts = [_("{languages} downloaded", languages=", ".join(have))] if have else []
-            if more:
+            if more and not net.offline():   # Offline mode: nothing can be downloaded
                 parts.append(_("{languages} can be downloaded under Speak in",
                                languages=", ".join(more)))
             row(_("<b>Languages</b> · {state}", state=e("; ".join(parts))),
@@ -2750,7 +2769,10 @@ class VoicePanel(QWidget):
         self.ai.changed.connect(self._ai_changed)
         self.ai.live_changed.connect(self._ai_live)
         self.ai.modules_changed.connect(self.rescan_modules)
-        rcol.addWidget(self._fold_card("ai", self.ai))
+        self._ai_card = self._fold_card("ai", self.ai)
+        rcol.addWidget(self._ai_card)
+        net.on_change(self._ai_net_changed)
+        self._ai_follow_offline()
         self.speech.live_changed.connect(self._speech_live)
         self.speech.lang_changed.connect(self._emit_active)
         self._bottom.addWidget(self._fold_card("speak", self.speech))
@@ -2915,6 +2937,7 @@ class VoicePanel(QWidget):
         self.chain.configure(self.fx.spec())
         self.speech.set_modules(self.modules)
         self.ai.set_modules(self.modules, ai_voices)
+        self._ai_follow_offline()
         self.addons.show_modules(self.modules)
 
     def _rescan_in_background(self):
@@ -2939,6 +2962,17 @@ class VoicePanel(QWidget):
             except RuntimeError:   # the tab was closed meanwhile
                 pass
         threading.Thread(target=work, daemon=True, name="addon-scan").start()
+
+    def _ai_follow_offline(self):
+        """Offline mode: the AI voices card only while they're ready to use (getting
+        or installing them goes online)."""
+        self._ai_card.setVisible(not net.offline() or self.ai.ready())
+
+    def _ai_net_changed(self):
+        if not self.ai._installing:   # (its buttons come back when that's done)
+            self.ai._refresh()
+        self._ai_follow_offline()
+        self.addons.show_modules(self.modules)   # its lines name downloads
 
     def _apply_scan(self, found, voices):
         self._scanning = False

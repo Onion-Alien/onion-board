@@ -623,6 +623,17 @@ class MainWindow(QMainWindow):
         self.pill.setToolTip(_("Where your sounds go — click for setup and testing"))
         self.pill.clicked.connect(lambda: self.tabs.setCurrentWidget(self.setup_page))
         head.addWidget(self.pill)
+        # Offline mode: what only works online is out of the way, and this says why
+        # (one click to the switch)
+        self.btn_offline = QPushButton(_("Offline"))
+        self.btn_offline.setObjectName("pill")
+        self.btn_offline.setCursor(Qt.PointingHandCursor)
+        self.btn_offline.setToolTip(_("Offline mode is on: nothing goes online, and what needs "
+                                      "the internet is hidden. Click to change it."))
+        self.btn_offline.clicked.connect(lambda: self.open_settings("privacy"))
+        icons.set_icon(self.btn_offline, "offline")
+        self.btn_offline.setVisible(net.offline())
+        head.addWidget(self.btn_offline)
         self.btn_update = QPushButton()
         self.btn_update.setObjectName("pill")
         self.btn_update.setProperty("state", "ok")
@@ -802,7 +813,7 @@ class MainWindow(QMainWindow):
             self.tabs.setTabText(i, text)
             icons.set_tab_icon(self.tabs, i, TAB_KEYS[i])
         for key in taboff.KEYS:
-            self.tabs.setTabVisible(TAB_INDEX[key], self.tab_on(key))
+            self.tabs.setTabVisible(TAB_INDEX[key], self.tab_shown(key))
         # one ⓘ at the end of the tab bar: the tab's explanation, instead of a banner
         self.btn_info = QPushButton()
         self.btn_info.setObjectName("tabinfo")
@@ -1076,9 +1087,10 @@ class MainWindow(QMainWindow):
         # short, so it isn't cut to "Search sounds… …" at normal widths; the tooltip
         # has the rest
         self.search.setPlaceholderText(_("Search sounds or paste a link"))
-        self.search.setToolTip(_("Type to filter your sounds; Enter searches the web (YouTube, "
-                                 "TikTok, Myinstants…). Or paste a link (YouTube, SoundCloud, "
-                                 "TikTok, most media sites) to see it, then play or add it"))
+        self._search_tip = _("Type to filter your sounds; Enter searches the web (YouTube, "
+                             "TikTok, Myinstants…). Or paste a link (YouTube, SoundCloud, "
+                             "TikTok, most media sites) to see it, then play or add it")
+        self.search.setToolTip(self._search_tip)
         self.search.setClearButtonEnabled(True)
         self.search.setMinimumWidth(SEARCH_MIN_W)   # until the window gets narrow (_init_fit)
         # typing regrids only when the pads shown change (35 ms a key with 600 pads),
@@ -2584,11 +2596,16 @@ class MainWindow(QMainWindow):
             # not wrong, just not done yet: orange like the step below, not a red cross
             out = _("Virtual mic  <b style='color:{colour}'>not installed yet</b>",
                     colour=warn)
-            step = _("<b style='color:{colour}'>One-time setup:</b> install the free virtual "
-                     "cable. It's what lets Discord and games hear your sounds — without it, "
-                     "only you can hear them. Easier: set <b>Send my sounds to</b> to "
-                     "<b>My mic</b> (nothing to install). Voicemeeter, a mixer or OBS? Pick "
-                     "that device there.", colour=warn)
+            step = (_("<b style='color:{colour}'>One-time setup:</b> put your sounds straight "
+                      "into your mic, so Discord and games hear them (nothing to install). The "
+                      "virtual cable is a download, and Offline mode is on. Voicemeeter, a "
+                      "mixer or OBS? Pick that device under <b>Send my sounds to</b>.",
+                      colour=warn) if net.offline() else
+                    _("<b style='color:{colour}'>One-time setup:</b> install the free virtual "
+                      "cable. It's what lets Discord and games hear your sounds — without it, "
+                      "only you can hear them. Easier: set <b>Send my sounds to</b> to "
+                      "<b>My mic</b> (nothing to install). Voicemeeter, a mixer or OBS? Pick "
+                      "that device there.", colour=warn))
         elif vm and e.main_stream is not None:
             state = "ok"
             out = _("<b style='color:{colour}'>{device}</b> — your new mic "
@@ -3197,6 +3214,26 @@ class MainWindow(QMainWindow):
         """Whether a tab (taboff.KEYS) is switched on in Settings > Tabs."""
         return key not in self.cfg.tabs_off
 
+    def needs_online(self, key: str) -> bool:
+        """In Offline mode, whether a tab is of no use at all: Radio, and Triggers
+        until Onion Watch is installed (its page is only the Get button). Those are
+        hidden, and + More tabs doesn't offer them."""
+        if not net.offline():
+            return False
+        if key == "radio":
+            return True
+        if key == "triggers":
+            has = getattr(self.triggers, "has_addon", None)   # (switched off: a stand-in)
+            if has is not None:
+                return not has()
+            from soundboard import watchaddon
+            return watchaddon.installed() is None and watchaddon.local_zip() is None
+        return False
+
+    def tab_shown(self, key: str) -> bool:
+        """Whether a tab is in the tab bar: switched on, and of use (needs_online)."""
+        return self.tab_on(key) and not self.needs_online(key)
+
     def _make_tab(self, key: str):
         """The Apps, Triggers or Voice tab, wired to the window; or, switched off in
         Settings > Tabs, its stand-in (nothing of the tab is made or loaded)."""
@@ -3229,14 +3266,18 @@ class MainWindow(QMainWindow):
         v.active_changed.connect(lambda on, k=key: self._tab_live(k, on))
         return v
 
+    def _more_tab_keys(self) -> list[str]:
+        """The tabs + More tabs offers: switched off, and of use (not Radio offline)."""
+        return [k for k in taboff.KEYS if not self.tab_on(k) and not self.needs_online(k)]
+
     def _update_more_tabs(self):
-        self.btn_more_tabs.setVisible(any(not self.tab_on(k) for k in taboff.KEYS))
+        self.btn_more_tabs.setVisible(bool(self._more_tab_keys()))
 
     def _fill_more_tabs(self, menu: QMenu):
         """+ More tabs: a card for each tab that's switched off, with what it's good
         for (click: it's added and opened), then Settings > Tabs to pick them all."""
         from soundboard.ui import moretabs
-        off = [(k, *TABS[TAB_INDEX[k]]) for k in taboff.KEYS if not self.tab_on(k)]
+        off = [(k, *TABS[TAB_INDEX[k]]) for k in self._more_tab_keys()]
         self._more_added = False
         usage.used("more-tabs-opened")
         moretabs.fill(menu, off, self._add_from_more, lambda: self.open_settings("tabs"))
@@ -3315,7 +3356,7 @@ class MainWindow(QMainWindow):
             self._radio_follow_switch()
         else:
             self._swap_tab(key)
-        self.tabs.setTabVisible(i, on)
+        self.tabs.setTabVisible(i, self.tab_shown(key))
         self._update_info_btn()
         self._update_more_tabs()
         log.info("tab %s switched %s", key, "on" if on else "off")
@@ -3360,16 +3401,44 @@ class MainWindow(QMainWindow):
         """Settings > Privacy & security changed: the parts of the window that go
         online follow their switches."""
         self._radio_follow_switch()
-        self._cable_follow_switch()
+        self._update_flow()   # the cable's install button (_cable_follow_switch)
         self._search_follow_switch()
+        self._offline_follow()
+        if hasattr(self, "_fit"):   # buttons came or went: what fits is measured again
+            self._refit()
+
+    def _offline_follow(self):
+        """Offline mode: the Offline pill in the header, and the tabs that only work
+        online (needs_online) out of the tab bar and + More tabs; back when it's off."""
+        self.btn_offline.setVisible(net.offline())
+        for key in ("radio", "triggers"):
+            i = TAB_INDEX[key]
+            shown = self.tab_shown(key)
+            if not shown and self.tabs.currentIndex() == i:
+                self.tabs.setCurrentIndex(0)
+            self.tabs.setTabVisible(i, shown)
+        self._update_info_btn()
+        self._update_more_tabs()
 
     def _search_follow_switch(self):
         """Finding sounds online switched off: no Search button, and the search box
-        only filters your own sounds."""
-        self.btn_yt.setVisible(self.ytresults.available())
+        only filters your own sounds (and says so)."""
+        online = self.ytresults.available()
+        self.btn_yt.setVisible(online)
+        self.search.setPlaceholderText(_("Search sounds or paste a link") if online else
+                                       _("Search your sounds"))
+        self.search.setToolTip(self._search_tip if online else _("Type to filter your sounds"))
 
     def _cable_follow_switch(self):
-        allowed = net.allowed("setup_downloads")
+        """The cable's install button downloads it (from vb-audio.com): gone in Offline
+        mode, greyed with its switch off. On the mic route the same button sets up the
+        mic, which goes nowhere online."""
+        if busy.is_busy(self.btn_install):
+            return
+        cable = self.cfg.route != "mic"
+        allowed = not cable or net.allowed("setup_downloads")
+        if cable and net.offline():
+            self.btn_install.hide()
         self.btn_install.setEnabled(allowed)
         self.btn_install.setToolTip("" if allowed else net.off_message("setup_downloads"))
 
