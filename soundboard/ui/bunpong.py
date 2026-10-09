@@ -1,12 +1,11 @@
 """The Easter egg: poke Bun enough times (bunnywidget.py, `pong=True`) and he comes back
-with a baseball bat and challenges you to Pong, in a card over the page he lives on.
+with a baseball bat and challenges you to Pong, in a dialog like the app's guides.
 
 He holds his bat up as his paddle on the left; yours is on the right and follows the
 mouse (or the arrow keys). First to WIN_AT. Every hit speeds the ball up a little, and
 Bun only moves so fast, so a long rally is how you beat him.
 
-Nothing is kept: Esc, the close button or leaving the page (a tab switch hides it)
-ends the game and Bun calms down again.
+Nothing is kept: Esc or Close ends the game and Bun calms down again.
 """
 from __future__ import annotations
 
@@ -14,15 +13,19 @@ import math
 import random
 import time
 
-from PySide6.QtCore import QEvent, QObject, QPointF, QRectF, Qt, QTimer
-from PySide6.QtGui import QColor, QFont, QKeySequence, QPainter, QPainterPath, QPen, QShortcut
-from PySide6.QtWidgets import (QFrame, QHBoxLayout, QLabel, QPushButton, QStackedWidget,
-                               QVBoxLayout, QWidget)
+from PySide6.QtCore import QPointF, QRectF, Qt, QTimer
+from PySide6.QtGui import QColor, QFont, QPainter, QPainterPath, QPen
+from PySide6.QtWidgets import (QDialog, QFrame, QHBoxLayout, QLabel, QPushButton, QVBoxLayout,
+                               QWidget)
 
 from soundboard import theme
 from soundboard.bunny import INK, H, W, draw_bunny, sparkle
 from soundboard.i18n import _
-from soundboard.ui import appstate
+from soundboard.ui import appstate, fit
+from soundboard.ui.panel import hint_label
+
+TITLE_CSS = "font-size:17pt; font-weight:800;"   # as the guides' titles (setupwizard.py)
+BODY_CSS = "font-size:11pt;"
 
 WIN_AT = 5
 FPS = 60
@@ -65,8 +68,9 @@ class Court(QWidget):
         self.rng = rng or random.Random()
         self.setMouseTracking(True)
         self.setMinimumSize(320, 220)
-        self.setCursor(Qt.BlankCursor)
+        self.setFocusPolicy(Qt.StrongFocus)
         self.on_over = None   # called when someone reaches WIN_AT
+        self.end_bun_left = 0.0   # where Bun stands at the end (the dialog centres him)
         self.reset()
 
     # ------------------------------------------------------------------ state
@@ -101,6 +105,8 @@ class Court(QWidget):
 
     def _go(self, state: str):
         self.state, self.st = state, 0.0
+        # the pointer hides while you play (your paddle is the pointer)
+        self.setCursor(Qt.BlankCursor if state in ("play", "point") else Qt.ArrowCursor)
 
     def _say(self, text: str, secs: float = 1.2):
         self.say, self.say_until = text, time.monotonic() + secs
@@ -126,6 +132,8 @@ class Court(QWidget):
 
     def bun_rect(self, g: dict) -> QRectF:
         s = g["s"]
+        if self.state == "over":   # beside the result, both centred on the court
+            return QRectF(self.end_bun_left, (g["h"] - g["bh"]) / 2, W * s, g["bh"])
         return QRectF(g["bun_x"] - 86 * s, self.bun_y * g["h"] - 72 * s, W * s, g["bh"])
 
     # ------------------------------------------------------------------ simulation
@@ -243,6 +251,22 @@ class Court(QWidget):
         if ev.button() == Qt.LeftButton and self.state == "ready":
             self.serve("bun")
 
+    def key(self, k) -> bool:
+        """The keys: arrows / W S move your paddle, Space or Enter serves. True if used."""
+        if k in (Qt.Key_Up, Qt.Key_W):
+            self.nudge(-0.08)
+        elif k in (Qt.Key_Down, Qt.Key_S):
+            self.nudge(0.08)
+        elif k in (Qt.Key_Space, Qt.Key_Return, Qt.Key_Enter) and self.state == "ready":
+            self.serve("bun")
+        else:
+            return False
+        return True
+
+    def keyPressEvent(self, ev):
+        if not self.key(ev.key()):
+            super().keyPressEvent(ev)
+
     def nudge(self, d: float):
         """The arrow keys: move your paddle by `d` of the court height."""
         self.aim_y = min(1.0, max(0.0, self.you_y + d))
@@ -256,16 +280,12 @@ class Court(QWidget):
         g = self.geo()
         w, h, r = g["w"], g["h"], g["r"]
         t = time.monotonic()
-        court = QRectF(0.5, 0.5, w - 1, h - 1)
-        p.setPen(QPen(QColor(theme.T["border"]), 1))
-        p.setBrush(QColor(theme.T.get("inset", theme.T["bg"])))
-        p.drawRoundedRect(court, 10, 10)
         line = QColor(theme.T["border"])
         dash = QPen(line, 2, Qt.CustomDashLine, Qt.RoundCap)
         dash.setDashPattern([2.5, 4])
         p.setPen(dash)
         if self.state != "over":
-            p.drawLine(QPointF(w / 2, 10), QPointF(w / 2, h - 10))
+            p.drawLine(QPointF(w / 2, 14), QPointF(w / 2, h - 14))
 
         # the score: big and faint behind the play
         f = QFont(self.font())
@@ -367,122 +387,85 @@ class Court(QWidget):
         p.drawArc(QRectF(x + r * 0.2, y - r * 0.8, r * 1.4, r * 1.6), 120 * 16, 120 * 16)
 
 
-class _EndCard(QWidget):
-    """The end-of-game panel over the court: a raised card with a soft shadow."""
-
-    def paintEvent(self, ev):
-        p = QPainter(self)
-        p.setRenderHint(QPainter.Antialiasing)
-        r = QRectF(self.rect()).adjusted(6, 4, -6, -8)
-        p.setPen(Qt.NoPen)
-        for i in range(4):
-            p.setBrush(QColor(0, 0, 0, 22))
-            p.drawRoundedRect(r.adjusted(-i, -i + 3, i, i + 3), 12 + i, 12 + i)
-        p.setPen(QPen(QColor(theme.T["border"]), 1))
-        p.setBrush(QColor(theme.T["card"]))
-        p.drawRoundedRect(r, 12, 12)
-        p.end()
-
-
-def _host_page(w: QWidget) -> QWidget:
-    """The page `w` sits on: the child of the nearest stacked widget (a tab's page),
-    else its window."""
-    while w.parentWidget() is not None:
-        if isinstance(w.parentWidget(), QStackedWidget):
-            return w
-        w = w.parentWidget()
-    return w
-
-
 def open_for(bun) -> BunPong:
-    """Open the game over the page Bun is on (one at a time per page)."""
-    page = _host_page(bun)
-    for old in page.findChildren(BunPong):
+    """Open the game for Bun, over his window (one game at a time)."""
+    win = bun.window()
+    for old in win.findChildren(BunPong):
         old.finish()
-    game = BunPong(page, bun)
-    game.show()
-    game.raise_()
-    game.setFocus(Qt.OtherFocusReason)
-    return game
+    dlg = BunPong(win, bun)
+    dlg.open()
+    dlg.court.setFocus(Qt.OtherFocusReason)
+    return dlg
 
 
-class BunPong(QWidget):
-    """The page dimmed, and on it a card with the game: a heading, the court, and (at
-    the end) who won with a Play again button. Real widgets for everything but the
-    court, so it looks like the rest of the app."""
+class BunPong(QDialog):
+    """The game in a dialog built like the app's guides: a big title and a line on how
+    to play, the court on the theme's card, and Close at the bottom. At the end Bun and
+    who won sit side by side, centred together on the court, with Play again."""
 
-    def __init__(self, page: QWidget, bun=None, rng: random.Random | None = None):
-        super().__init__(page)
-        self.page, self.bun = page, bun
-        self.setFocusPolicy(Qt.StrongFocus)
-        self.setGeometry(page.rect())
-        page.installEventFilter(self)
-        QShortcut(QKeySequence(Qt.Key_Escape), self, self.finish,
-                  context=Qt.WidgetWithChildrenShortcut)
+    def __init__(self, parent: QWidget, bun=None, rng: random.Random | None = None):
+        super().__init__(parent)
+        fit.watch(self)
+        self.bun = bun
         self._done = False
-        self._fade = 0.0
-
-        self.card = QFrame(self)
-        self.card.setObjectName("card")
-        lay = QVBoxLayout(self.card)
-        lay.setContentsMargins(18, 14, 14, 16)
-        lay.setSpacing(10)
-        head = QHBoxLayout()
-        head.setSpacing(8)
-        words = QVBoxLayout()
-        words.setSpacing(2)
+        self.setWindowTitle(_("Pong with Bun"))
+        self.setMinimumWidth(640)
+        v = QVBoxLayout(self)
+        v.setContentsMargins(24, 20, 24, 18)
+        v.setSpacing(12)
         title = QLabel(_("Pong with Bun"))
-        title.setObjectName("section")
-        title.setProperty("head", True)
-        hint = QLabel(_("First to {n}. Move with the mouse or the arrow keys.", n=WIN_AT))
-        hint.setObjectName("hint")
-        words.addWidget(title)
-        words.addWidget(hint)
-        head.addLayout(words, 1)
-        self.close_btn = QPushButton("✕")
-        self.close_btn.setObjectName("iconbutton")
-        self.close_btn.setToolTip(_("Close (Esc)"))
-        self.close_btn.setFocusPolicy(Qt.NoFocus)
-        self.close_btn.clicked.connect(self.finish)
-        head.addWidget(self.close_btn, 0, Qt.AlignTop)
-        lay.addLayout(head)
-        self.court = Court(rng, self.card)
-        self.court.on_over = self._show_end
-        lay.addWidget(self.court, 1)
+        title.setStyleSheet(TITLE_CSS)
+        body = QLabel(_("First to {n} wins. Move your paddle with the mouse or the arrow "
+                        "keys.", n=WIN_AT))
+        body.setWordWrap(True)
+        body.setStyleSheet(BODY_CSS)
+        v.addWidget(title)
+        v.addWidget(body)
 
-        # the end: who won, and Play again (over the right of the court)
-        self.end = _EndCard(self.court)
+        self.card = QFrame()
+        self.card.setObjectName("card")
+        cl = QVBoxLayout(self.card)
+        cl.setContentsMargins(0, 0, 0, 0)
+        self.court = Court(rng)
+        self.court.setMinimumHeight(320)
+        self.court.on_over = self._show_end
+        cl.addWidget(self.court)
+        v.addWidget(self.card, 1)
+
+        # the end: who won and Play again, beside Bun (placed in _place_end)
+        self.end = QWidget(self.court)
         el = QVBoxLayout(self.end)
-        el.setContentsMargins(28, 22, 28, 20)
-        el.setSpacing(4)
+        el.setContentsMargins(0, 0, 0, 0)
+        el.setSpacing(6)
         self.end_title = QLabel()
-        self.end_title.setStyleSheet("font-size:17pt; font-weight:700;")
-        self.end_title.setAlignment(Qt.AlignCenter)
+        self.end_title.setStyleSheet(TITLE_CSS)
         self.end_score = QLabel()
-        self.end_score.setObjectName("hint")
-        self.end_score.setAlignment(Qt.AlignCenter)
+        self.end_score.setStyleSheet(BODY_CSS)
         self.again = QPushButton(_("Play again"))
         self.again.setObjectName("primary")
-        self.again.setCursor(Qt.PointingHandCursor)
+        self.again.setAutoDefault(False)
         self.again.clicked.connect(self.play_again)
-        leave = QLabel(_("Esc to leave"))
-        leave.setObjectName("hint")
-        leave.setAlignment(Qt.AlignCenter)
         el.addWidget(self.end_title)
         el.addWidget(self.end_score)
-        el.addSpacing(12)
-        el.addWidget(self.again, 0, Qt.AlignHCenter)
-        el.addSpacing(2)
-        el.addWidget(leave)
+        el.addSpacing(8)
+        el.addWidget(self.again, 0, Qt.AlignLeft)
         self.end.setCursor(Qt.ArrowCursor)
         self.end.hide()
 
-        self._t0 = self._last = time.monotonic()
+        row = QHBoxLayout()
+        row.addWidget(hint_label(_("Closing it ends the game. Nothing is kept.")), 1)
+        close = QPushButton(_("Close"))
+        close.setAutoDefault(False)
+        close.clicked.connect(self.reject)
+        row.addWidget(close)
+        v.addLayout(row)
+        self.finished.connect(lambda _r: self.finish())
+
+        self._last = time.monotonic()
         self._timer = QTimer(self)
         self._timer.setInterval(1000 // FPS)
         self._timer.timeout.connect(self._tick)
         appstate.pause_in_background(self, self._resume, self._timer.stop)
-        self._place()
 
     # ------------------------------------------------------------------ flow
     def _show_end(self):
@@ -499,10 +482,22 @@ class BunPong(QWidget):
         self.end.show()
         self.again.setFocus()
 
+    def _place_end(self):
+        """Bun and the result side by side, the pair centred on the court."""
+        c = self.court
+        g = c.geo()
+        sz = self.end.sizeHint()
+        gap = 28
+        bun_w = g["bh"] * W / H
+        left = (c.width() - (bun_w + gap + sz.width())) / 2
+        c.end_bun_left = left
+        self.end.setGeometry(round(left + bun_w + gap), round((c.height() - sz.height()) / 2),
+                             sz.width(), sz.height())
+
     def play_again(self):
         self.end.hide()
         self.court.reset()
-        self.setFocus()
+        self.court.setFocus()
 
     def finish(self):
         """End the game: nothing is kept, and Bun calms down."""
@@ -510,18 +505,17 @@ class BunPong(QWidget):
             return
         self._done = True
         self._timer.stop()
-        self.page.removeEventFilter(self)
         if self.bun is not None:
             try:
                 self.bun.calm_down()
             except RuntimeError:   # Bun's widget is already gone
                 pass
-        self.hide()
+        if self.isVisible():
+            self.reject()
         self.deleteLater()
 
     def step(self, dt: float):
-        """Move everything on by `dt` seconds (the timer's tick; tests call it too)."""
-        self._fade = min(1.0, self._fade + dt / 0.18)
+        """Move the game on by `dt` seconds (the timer's tick; tests call it too)."""
         self.court.step(dt)
 
     # ------------------------------------------------------------------ timing
@@ -530,7 +524,6 @@ class BunPong(QWidget):
         dt = min(0.05, now - self._last)
         self._last = now
         self.step(dt)
-        self.update()
         self.court.update()
 
     def showEvent(self, ev):
@@ -547,57 +540,11 @@ class BunPong(QWidget):
         self._timer.stop()
         super().hideEvent(ev)
 
-    # ------------------------------------------------------------------ layout
-    def _place(self):
-        w, h = self.width(), self.height()
-        cw, ch = min(600, w - 32), min(420, h - 32)
-        self.card.setGeometry(round((w - cw) / 2), round((h - ch) / 2), cw, ch)
-        self._place_end()
-
-    def _place_end(self):
-        c = self.court
-        sz = self.end.sizeHint()
-        sz.setWidth(max(sz.width(), 220))
-        self.end.setGeometry(round(c.width() * 0.66 - sz.width() / 2),
-                             round((c.height() - sz.height()) / 2), sz.width(), sz.height())
-
     def resizeEvent(self, ev):
-        self._place()
         super().resizeEvent(ev)
-
-    def eventFilter(self, obj: QObject, ev: QEvent) -> bool:
-        if obj is self.page:
-            if ev.type() == QEvent.Resize:
-                self.setGeometry(self.page.rect())
-            elif ev.type() == QEvent.Hide:   # left the tab: the game's over
-                self.finish()
-        return False
+        if self.end.isVisible():
+            self._place_end()
 
     def keyPressEvent(self, ev):
-        k = ev.key()
-        if k == Qt.Key_Escape:
-            self.finish()
-        elif k in (Qt.Key_Up, Qt.Key_W):
-            self.court.nudge(-0.08)
-        elif k in (Qt.Key_Down, Qt.Key_S):
-            self.court.nudge(0.08)
-        elif k in (Qt.Key_Space, Qt.Key_Return) and self.court.state == "ready":
-            self.court.serve("bun")
-        else:
-            super().keyPressEvent(ev)
-
-    def mousePressEvent(self, ev):
-        self.setFocus()   # (a click on the dimmed page outside the card: nothing else)
-
-    def paintEvent(self, ev):
-        p = QPainter(self)
-        p.fillRect(self.rect(), QColor(8, 6, 16, round(150 * self._fade)))
-        # a soft shadow under the card
-        r = QRectF(self.card.geometry())
-        p.setRenderHint(QPainter.Antialiasing)
-        p.setPen(Qt.NoPen)
-        for i in range(6):
-            p.setBrush(QColor(0, 0, 0, round(14 * self._fade)))
-            p.drawRoundedRect(r.adjusted(-i * 2, -i * 2 + 4, i * 2, i * 2 + 4), 12 + i * 2,
-                              12 + i * 2)
-        p.end()
+        if not self.court.key(ev.key()):
+            super().keyPressEvent(ev)   # Esc closes, as in every dialog

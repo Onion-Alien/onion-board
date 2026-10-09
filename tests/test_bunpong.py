@@ -1,5 +1,5 @@
-"""The Pong Easter egg: poke Bun enough and he fetches a bat and opens Pong over his
-page; points and the end work; Esc or leaving the page ends it and calms him."""
+"""The Pong Easter egg: poke Bun enough and he fetches a bat and opens Pong in a
+dialog; points and the end work; Esc or Close ends it and calms him."""
 
 import random
 import time
@@ -34,7 +34,7 @@ def _page_with_bun():
 def _game(seed=1):
     stack, page, other, bun = _page_with_bun()
     stack.show()
-    game = BunPong(page, bun, rng=random.Random(seed))
+    game = BunPong(stack, bun, rng=random.Random(seed))
     game._timer.stop()
     game.show()
     return stack, game
@@ -76,15 +76,14 @@ def test_enough_pokes_fetch_the_bat_and_open_the_game(qapp):
     for _ in range(150):
         _frames(bun, 1)
         seen.add(bun.act_phase())
-        if page.findChildren(BunPong):
+        if stack.findChildren(BunPong):
             break
     assert {"dash", "cloud", "back", "bat"} <= seen
     assert bun.prop == "bat"
-    game = page.findChildren(BunPong)[0]
-    assert game.isVisible() and game.geometry() == page.rect()
-    assert game.card.geometry().width() <= 600
-    # leaving the page (a tab switch) ends it, and Bun calms down
-    stack.setCurrentWidget(other)
+    game = stack.findChildren(BunPong)[0]
+    assert game.isVisible() and game.isModal()
+    # closing it ends the game, and Bun calms down
+    game.reject()
     assert game._done
     assert not bun.building and bun.prop is None
     stack.close()
@@ -95,7 +94,7 @@ def test_esc_ends_the_game(qapp):
     stack.show()
     bun.fetch_bat()
     game = bunpong.open_for(bun)
-    QTest.keyClick(game, Qt.Key_Escape)
+    QTest.keyClick(game.court, Qt.Key_Escape)
     assert game._done and not game.isVisible()
     assert not bun.building
     stack.close()
@@ -160,6 +159,11 @@ def test_first_to_win_ends_with_play_again(qapp):
         c._point("you")
     assert c.state == "over" and c.winner == "you"
     assert not game.end.isHidden()
+    # Bun and the result are centred together on the court
+    bun = c.bun_rect(c.geo())
+    left, right = bun.left(), game.end.geometry().right()
+    assert abs(left - (c.width() - right)) <= 2
+    assert abs(bun.center().y() - c.height() / 2) <= 1
     assert "win" in game.end_title.text().lower()
     assert not game.grab().isNull()
     game.again.click()
@@ -182,5 +186,14 @@ def test_long_play_never_sticks_and_paints(qapp):
         if c.state == "over":
             break
     assert sum(c.score.values()) >= 1   # Bun misses now and then
+    game.finish()
+    stack.close()
+
+
+def test_arrow_keys_move_and_serve(qapp):
+    stack, game = _game()
+    c = game.court
+    QTest.keyClick(c, Qt.Key_Down)
+    assert c.state == "play" and c.aim_y > 0.5
     game.finish()
     stack.close()
