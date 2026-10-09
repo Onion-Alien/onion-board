@@ -296,7 +296,7 @@ class AppRow(HoverCard):
         icons.set_icon(self.btn_rec, "record", "#ff4d4f", "#ffffff", size=14)
         self.btn_rec.toggled.connect(lambda on: self.rec_toggled.emit(self, on))
         for b in (self.btn_send, self.btn_rec):
-            b.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+            b.setSizePolicy(QSizePolicy.Maximum, QSizePolicy.Fixed)   # as wide as their words
             buttons.addWidget(b)
         self.cb_to = QComboBox(self)   # hidden/shown before its row is laid out: no flash
         for i, (key, label, tip) in enumerate(TO):
@@ -308,6 +308,7 @@ class AppRow(HoverCard):
         no_wheel(self.cb_to)
         self.cb_to.setVisible(self.to != "both")
         buttons.addWidget(self.cb_to)
+        buttons.addStretch(1)
         v.addLayout(buttons)
         mix = QHBoxLayout()
         mix.setSpacing(8)

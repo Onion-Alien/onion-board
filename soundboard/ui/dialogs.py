@@ -49,12 +49,13 @@ class EffectsPanel(QWidget):
             self.preset.addItem(name, name)
         self.preset.addItem(_("Custom"), CUSTOM)
         no_wheel(self.preset)
-        prow.addWidget(self.preset, 1)
+        prow.addWidget(self.preset)
         reset = QPushButton(_("Reset"))
         reset.setObjectName("small")
         reset.setToolTip(_("Back to the original sound (the trim stays)"))
         reset.clicked.connect(lambda: self.preset.setCurrentIndex(0))   # the first preset
         prow.addWidget(reset)
+        prow.addStretch(1)
         v.addLayout(prow)
 
         v.addWidget(section_label(_("Trim")))
@@ -225,8 +226,10 @@ class EditDialog(QDialog):
         self.hk_btn.clicked.connect(self._capture)
         clr = QPushButton(_("Clear"))
         clr.clicked.connect(lambda: self._set_hk(""))
-        hrow.addWidget(self.hk_btn, 1)
+        self.hk_btn.setMinimumWidth(140)   # room for "Ctrl+Shift+F12", not the whole row
+        hrow.addWidget(self.hk_btn)
         hrow.addWidget(clr)
+        hrow.addStretch(1)
         form.addRow(_("Hotkey"), hrow)
         self._set_hk(self.hotkey)
 

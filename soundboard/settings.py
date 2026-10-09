@@ -1213,7 +1213,7 @@ class SettingsDialog(QDialog):
             grid.addWidget(label, r, 0)
             grid.addWidget(cb, r, 1)
             self.dev_combos.append((cb, src))
-        grid.setColumnStretch(1, 1)
+        grid.setColumnStretch(2, 1)   # the room past the boxes, not the boxes' column
         cv.addLayout(grid)
         from soundboard.ui import alsosend   # (its panel import imports this module)
         # once the grid is in the card: a row added before would be its own window
