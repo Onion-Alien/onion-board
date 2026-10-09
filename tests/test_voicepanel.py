@@ -922,15 +922,21 @@ def test_every_value_a_slider_shows_fits_its_label(panel):
                 assert fm.horizontalAdvance(param_text(s.q, v)) <= room, (s.q.key, v)
 
 
-def test_cards_fold_away_and_stay_folded(qapp, monkeypatch):
+def test_cards_start_folded_and_unfold(qapp, monkeypatch):
+    """The tab opens with every card folded (it all fits on one screen); what's
+    folded is still saved for older versions."""
     monkeypatch.setattr(tts.SapiTTS, "warm_up", lambda self: [])
     from soundboard.ui.voicepanel import VoicePanel
     p = VoicePanel(FakeEngine(), {}, {"folded": ["ai", 7, "later"]})   # 7: junk
     try:
-        assert p.ai.isHidden() and not p.fx.isHidden() and not p.speech.isHidden()
+        assert all(not h.is_open() for h in p._heads.values())
+        assert p.ai.isHidden() and p.fx.isHidden() and p.speech.isHidden()
+        assert p.addons.isHidden() and p.speech.custom_box.isHidden()
         saved = []
         p.speech_changed.connect(saved.append)
-        p._heads["fx"].arrow.click()                 # fold the voice changer
+        p._heads["fx"].arrow.click()                 # open the voice changer
+        assert not p.fx.isHidden() and not saved     # it was open last time too
+        p._heads["fx"].arrow.click()                 # fold it again
         assert p.fx.isHidden() and saved[-1]["folded"] == ["ai", "fx", "later"]
         p._heads["ai"].arrow.click()                 # and open the AI voices again
         # "later": a newer version's card, kept for it
