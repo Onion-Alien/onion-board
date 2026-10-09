@@ -508,3 +508,26 @@ def test_search_hides_cards_and_pages_without_the_word(window, qapp):  # noqa: F
         assert all(d.categories.item(i).isHidden() for i in range(d.categories.count()))
     finally:
         d.close()
+
+
+def test_switching_count_me_in_off_sends_one_opt_out_first(window, qapp, monkeypatch):  # noqa: F811
+    """Count me in on -> off: the anonymous opt-out goes while the count is still
+    allowed, and the switch takes hold right after; other switches never send it."""
+    from soundboard import usage
+    calls = []
+    monkeypatch.setattr(usage, "opt_out",
+                        lambda where: calls.append((where, net.allowed("usage_stats"))))
+    monkeypatch.setattr(window, "_save_later", lambda: None)
+    window.cfg.net_off = []
+    net.configure_features()
+    d = SettingsDialog(window)
+    try:
+        box = d.net_boxes["usage_stats"]
+        box.setChecked(False)
+        assert process_events(qapp, lambda: not net.allowed("usage_stats"))
+        assert calls == [("settings", True)] and "usage_stats" in window.cfg.net_off
+        d.net_boxes["radio"].setChecked(False)   # other switches never send it
+        assert calls == [("settings", True)]
+    finally:
+        d.close()
+        net.configure_features()

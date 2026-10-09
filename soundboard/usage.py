@@ -2,7 +2,9 @@
 
 Once a day the installed app sends one "still here" to the project's GoatCounter
 (a privacy-friendly counter): the version number and a random ID made on this PC, so
-the same person isn't counted twice. Also a one-off "first start" (with where they
+the same person isn't counted twice and we can follow how people use the app over time
+(which tabs, which versions, whether they come back) to see what to improve.
+Also a one-off "first start" (with where they
 heard about the app, if they picked it on the installer's last page), and "updated" when
 *Update now* installs a new version. With the daily one: which tabs were opened since the
 last one (their names only). Soon after a start: how many problems there were since the
@@ -42,6 +44,7 @@ one on a PC with ONIONBOARD_NO_STATS set (the developer's own PCs and test VMs:
 GoatCounter's "Ignore IPs" can't catch these sends, as they carry no IP)."""
 from __future__ import annotations
 
+import hashlib
 import json
 import logging
 import os
@@ -110,6 +113,14 @@ def install_id(cfg) -> str:
     return cfg.stats_id
 
 
+def user_tag(sid: str) -> str:
+    """A short tag made from the random ID, sent as each count's "ref". GoatCounter
+    swaps "session" for its own number that starts over after 8 hours, so the daily
+    counts of one person only link up across days through this (Onion Stats' User
+    paths). A hash, so the ID itself isn't what's kept there."""
+    return "u-" + hashlib.sha256(sid.encode()).hexdigest()[:12]
+
+
 def _wordlike(w: str) -> bool:
     """A word, a short name ("tv") or a number: not keyboard mashing ("asdfgh")."""
     return w.isdigit() or ((len(w) <= 3 or bool(re.search(r"[aeiouy]", w)))
@@ -140,7 +151,7 @@ def heard_tag(text: str) -> str:
 
 
 def _event(name: str, sid: str) -> dict:
-    return {"path": name, "title": name, "event": True, "session": sid}
+    return {"path": name, "title": name, "event": True, "session": sid, "ref": user_tag(sid)}
 
 
 def hits(cfg, now: float, event: str = "", extra=()) -> list[dict]:
@@ -154,7 +165,7 @@ def hits(cfg, now: float, event: str = "", extra=()) -> list[dict]:
     if now - cfg.stats_sent < EVERY_S:
         return out
     out.insert(0, {"path": f"/app/{__version__}", "title": f"Onion Board {__version__}",
-                   "session": sid})
+                   "session": sid, "ref": user_tag(sid)})
     if not cfg.stats_sent:
         heard = heard_tag(cfg.stats_heard)
         out.append(_event(f"first-start/heard-{heard}" if heard else "first-start", sid))
@@ -375,19 +386,38 @@ def uninstall_event() -> str:
     return f"uninstall/{__version__}"
 
 
+OPT_OUT_WHERE = ("installer", "settings")
+OPT_OUT_TIMEOUT_S = 5   # the installer waits on it: never long
+
+
+def opt_out(where: str) -> bool:
+    """Count me in switched from on to off (`where`: the installer's box or Settings):
+    one last "opt-out/<where>" so we know how many people aren't counted, then nothing
+    ever again. No random ID, no tag, no session: it can't be tied to anything they
+    sent before. Only while the count is still allowed (call it before switching it
+    off). Waits for the answer: call it off the UI thread."""
+    if where not in OPT_OUT_WHERE or not enabled() or not net.allowed(FEATURE):
+        return False
+    name = f"opt-out/{where}"
+    netlog.cause(FEATURE, f"Anonymous usage count ({name}, the last one)")
+    return send([{"path": name, "title": name, "event": True}],
+                timeout=OPT_OUT_TIMEOUT_S, no_sessions=True)
+
+
 def update_event(to: str) -> str:
     """The event for *Update now* from this version to `to`."""
     return f"update-now/{__version__}-to-{to}"
 
 
-def send(payload: list[dict]) -> bool:
+def send(payload: list[dict], timeout: float = TIMEOUT_S, no_sessions: bool = False) -> bool:
     """POST them to the counter. True if it took them. Call off the UI thread."""
-    body = json.dumps({"hits": payload}).encode("utf-8")
+    body = json.dumps({"hits": payload, "no_sessions": True} if no_sessions
+                      else {"hits": payload}).encode("utf-8")
     req = urllib.request.Request(ENDPOINT, data=body, method="POST", headers={
         "Authorization": f"Bearer {TOKEN}", "Content-Type": "application/json",
         "User-Agent": "OnionBoard"})
     try:
-        with net.urlopen(req, timeout=TIMEOUT_S, feature=FEATURE) as r:
+        with net.urlopen(req, timeout=timeout, feature=FEATURE) as r:
             return 200 <= r.status < 300
     except Exception as e:  # noqa: BLE001 - offline, switched off meanwhile, counter down
         log.info("usage count not sent: %s", e)

@@ -3,63 +3,22 @@ while the voice changer is changing your mic, Radio while a station plays, Apps
 while a program's sound is sent, Triggers while the screen is watched), so it
 can't be left on by accident without you noticing from another tab.
 
-Two ways to mark it (Settings → Appearance): a tint, the default (a soft wash over
-the tab and a coloured icon), or a small dot drawn into the tab's icon. Both use the
-theme's "live" colour (its accent).
-Either way a tab never changes size when it goes live (a dot beside the name used to
-widen it and shove the tabs after it along)."""
+Two ways to mark it (Settings → Appearance): a tint, the default (a bar beside the
+tab on the rail, ui/sidebar.py, and a coloured icon), or a small dot drawn into the
+tab's icon. Both use the theme's "live" colour (its accent)."""
 from __future__ import annotations
 
-from PySide6.QtCore import QEvent, QObject, Qt
-from PySide6.QtGui import QColor, QPainter
-from PySide6.QtWidgets import QTabBar, QTabWidget, QWidget
+from PySide6.QtWidgets import QTabBar, QTabWidget
 
 from soundboard import theme
 from soundboard.ui import icons
 
 TINT_ICON = "live_text"   # a tinted live tab's icon: the theme's live colour
-TAB_MARGIN_RIGHT = 4    # theme.py's QTabBar::tab margin-right: tabRect includes it,
-                        # the selected tab's underline doesn't
 
 
 def live_color() -> str:
     """The theme's live colour, as it reads on the background."""
     return theme.T["live_text"]
-
-
-class LiveTint(QWidget):
-    """The wash over a bar's live tabs: a see-through child laid over the whole
-    bar, so it takes no room and clicks go straight through to the tabs."""
-
-    ALPHA = 0.14
-
-    def __init__(self, bar: QTabBar):
-        super().__init__(bar)
-        self.setAttribute(Qt.WA_TransparentForMouseEvents)
-        self.setAttribute(Qt.WA_NoSystemBackground)
-        self.setGeometry(bar.rect())
-        bar.installEventFilter(self)
-
-    def eventFilter(self, obj: QObject, e: QEvent) -> bool:
-        if obj is self.parentWidget() and e.type() == QEvent.Resize:
-            self.setGeometry(obj.rect())
-        return False
-
-    def paintEvent(self, _e):
-        bar = self.parentWidget()
-        color = QColor(live_color())
-        color.setAlphaF(self.ALPHA)
-        p = QPainter(self)
-        p.setRenderHint(QPainter.Antialiasing)
-        p.setPen(Qt.NoPen)
-        p.setBrush(color)
-        for i in range(bar.count()):
-            if _live(bar, i):
-                # the tab's own box, the margin left out, so its edges line up with the
-                # selected tab's underline; rounded on top only (the bottom runs past
-                # the bar and is cut off flat, along the underline)
-                r = bar.tabRect(i).adjusted(0, 2, -TAB_MARGIN_RIGHT, 8)
-                p.drawRoundedRect(r, 6, 6)
 
 
 def _live(bar: QTabBar, index: int) -> bool:
@@ -81,18 +40,6 @@ def _show(tabs: QTabWidget, index: int, icon: str | None):
                            badge=on and not tint)
 
 
-def _sync_tint(tabs: QTabWidget):
-    bar = tabs.tabBar()
-    wash = bar.findChild(LiveTint)
-    want = _tinted(tabs) and any(_live(bar, i) for i in range(bar.count()))
-    if want and wash is None:
-        wash = LiveTint(bar)
-    if wash is not None:
-        wash.setVisible(want)
-        wash.raise_()
-        wash.update()
-
-
 def set_tab_live(tabs: QTabWidget, index: int, on: bool, tip: str = "",
                  icon: str | None = None):
     """Mark (or unmark) a tab as live and put `tip` in front of its tooltip while it
@@ -104,17 +51,15 @@ def set_tab_live(tabs: QTabWidget, index: int, on: bool, tip: str = "",
         base = tabs.tabToolTip(index)
         tabs.setProperty(f"_tip{index}", base)
     tabs.setTabToolTip(index, "\n".join(filter(None, (tip, base))) if on and tip else base)
-    _sync_tint(tabs)
 
 
 def set_tint(tabs: QTabWidget, on: bool):
-    """Mark live tabs with a green tint (True, the default) or the dot (Settings →
-    Appearance)."""
+    """Mark live tabs with the bar and a coloured icon (True, the default) or the dot
+    (Settings → Appearance)."""
     tabs.setProperty("_live_tint", bool(on))
     for i in range(tabs.count()):
         if _live(tabs.tabBar(), i):
             _show(tabs, i, None)
-    _sync_tint(tabs)
 
 
 def is_tab_live(tabs: QTabWidget, index: int) -> bool:

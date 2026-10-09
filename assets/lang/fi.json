@@ -125,7 +125,6 @@
   "A restore point is saved first, so you can undo this.": "Palautuspiste tallennetaan ensin, joten voit kumota tämän.",
   "A short “Did you know?” about a feature, at most once a day, never while a game is up.": "Lyhyt “Tiesitkö?” jostain ominaisuudesta, korkeintaan kerran päivässä, ei koskaan pelin ollessa auki.",
   "A small dot on its icon": "Pieni piste sen kuvakkeessa",
-  "A soft wash and a coloured icon in the theme's colour, easy to spot from across the room": "Pehmeä sävy ja värillinen kuvake teeman värissä, helppo huomata huoneen toiselta puolelta",
   "A soundboard is most useful left running: your hotkeys and the overlay work while the window is closed. The tray icon (by the clock) opens it again; right-click it to quit.": "Soundboard on hyödyllisin, kun se jätetään päälle: pikanäppäimet ja overlay toimivat, vaikka ikkuna on suljettu. Ilmoitusalueen kuvake (kellon vieressä) avaa sen taas; klikkaa sitä oikealla lopettaaksesi.",
   "A tab whose feature is on right now (a sound playing, the voice changer, the radio…) is marked, so nothing is left on without you noticing.": "Välilehti, jonka ominaisuus on juuri nyt päällä (ääni soi, äänenmuunnin, radio…), merkitään, jotta mitään ei jää päälle huomaamattasi.",
   "A virtual cable (not installed yet)": "Virtuaalikaapeli (ei vielä asennettu)",
@@ -738,7 +737,7 @@
   "On the left, click <b>Voice</b>.": "Klikkaa vasemmalta <b>Puhe</b>.",
   "On, at {host}:{port}. Pick a link to copy.": "Päällä, osoitteessa {host}:{port}. Valitse kopioitava linkki.",
   "On: listening on {host}:{port}.": "Päällä: kuuntelee osoitteessa {host}:{port}.",
-  "Once a day, the installed app sends an anonymous \"still here\" to our counter (goatcounter.com): the version number and a random ID made on this PC, so nobody is counted twice, and which tabs you opened. If it crashed or froze, how many times (a count, never the report), and once when you uninstall. Nothing else: no name, sounds, settings or games. It's how we know if anyone uses Onion Board, and if it's working for them. Off: nothing is sent.": "Kerran päivässä asennettu sovellus lähettää nimettömän \"vielä täällä\" -viestin laskuriimme (goatcounter.com): versionumeron ja tällä PC:llä tehdyn satunnaisen tunnisteen, jottei ketään lasketa kahdesti, sekä mitkä välilehdet avasit. Jos se kaatui tai jumittui, kuinka monta kertaa (määrä, ei koskaan raporttia), ja kerran, kun poistat sen. Ei mitään muuta: ei nimeä, ääniä, asetuksia eikä pelejä. Näin tiedämme, käyttääkö kukaan Onion Boardia ja toimiiko se heillä. Pois: mitään ei lähetetä.",
+  "Once a day, sends an anonymous count to goatcounter.com: the version, tabs opened, crash counts and a random ID that follows how the app is used over time. Only used to fix errors and see which features need work. Never your name, sounds or settings. Switching it off sends one last anonymous count (no ID), then nothing.": "Kerran päivässä lähettää nimettömän laskennan goatcounter.com-palveluun: version, avatut välilehdet, kaatumisten määrän ja satunnaisen tunnisteen, joka näyttää, miten sovellusta käytetään ajan mittaan. Käytetään vain virheiden korjaamiseen ja sen näkemiseen, mitkä ominaisuudet kaipaavat työtä. Ei koskaan nimeäsi, ääniäsi tai asetuksiasi. Pois kytkeminen lähettää yhden viimeisen nimettömän laskennan (ilman tunnistetta), sitten ei mitään.",
   "One click": "Yksi klikkaus",
   "One click needed: repair your mic": "Yksi klikkaus tarvitaan: korjaa mikkisi",
   "One click: put your sounds straight into your mic": "Yksi klikkaus: laita äänesi suoraan mikkiisi",
@@ -1245,7 +1244,6 @@
   "Throw this recording away?": "Heitetäänkö tämä nauhoitus pois?",
   "TikTok sounds": "TikTok-äänet",
   "Time": "Aika",
-  "Tint the tab": "Sävytä välilehti",
   "To hear it live instead, use Hear what they hear at the bottom.": "Kuullaksesi sen sen sijaan livenä käytä alhaalla olevaa Kuule mitä he kuulevat.",
   "To use Tor, get it first: about 22 MB from the Tor Project, checked before it's used. {blocked_hint}": "Käyttääksesi Toria hae se ensin: noin 22 Mt Tor Projectilta, tarkistetaan ennen käyttöä. {blocked_hint}",
   "Toggle: press again stops it": "Vaihto: uusi painallus pysäyttää sen",
@@ -2859,5 +2857,10 @@
   "by {name}": "tekijä: {name}",
   "{language} needs a one-time download of its translation model ({size} MB). Offline mode is on, so it can't be downloaded now.": "{language} tarvitsee käännösmallinsa kertalatauksen ( {size} Mt). Offline-tila on käytössä, joten sitä ei voi ladata nyt.",
   "{n} MB": "{n} Mt",
-  "⚠ Windows has no {language} voice yet, so {language} can't be spoken properly. Offline mode is on, so it can't be installed now.": "⚠ Windowsilla ei ole vielä ääntä {language} , joten {language} ei voi puhua oikein. Offline-tila on käytössä, joten sitä ei voi asentaa nyt."
+  "⚠ Windows has no {language} voice yet, so {language} can't be spoken properly. Offline mode is on, so it can't be installed now.": "⚠ Windowsilla ei ole vielä ääntä {language} , joten {language} ei voi puhua oikein. Offline-tila on käytössä, joten sitä ei voi asentaa nyt.",
+  "A bar at the edge of the tabs and a coloured icon, in the highlight colour: easy to spot from across the room": "Palkki välilehtien reunassa ja värillinen kuvake korostusvärissä: helppo havaita huoneen toiselta puolelta",
+  "A bar beside the tab": "Palkki välilehden vieressä",
+  "Show tab names": "Näytä välilehtien nimet",
+  "Hide tab names": "Piilota välilehtien nimet",
+  "Show only the icons": "Näytä vain kuvakkeet"
 }

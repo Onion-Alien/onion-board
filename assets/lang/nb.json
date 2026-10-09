@@ -125,7 +125,6 @@
   "A restore point is saved first, so you can undo this.": "Et gjenopprettingspunkt lagres først, så du kan angre dette.",
   "A short “Did you know?” about a feature, at most once a day, never while a game is up.": "Et kort «Visste du at?» om en funksjon, maks én gang om dagen, aldri mens et spill kjører.",
   "A small dot on its icon": "En liten prikk på ikonet",
-  "A soft wash and a coloured icon in the theme's colour, easy to spot from across the room": "Et mykt skjær og et farget ikon i temaets farge, lett å se fra andre siden av rommet",
   "A soundboard is most useful left running: your hotkeys and the overlay work while the window is closed. The tray icon (by the clock) opens it again; right-click it to quit.": "Et soundboard er mest nyttig når det får kjøre: hurtigtastene og overlayet virker mens vinduet er lukket. Ikonet i systemstatusfeltet (ved klokken) åpner det igjen; høyreklikk det for å avslutte.",
   "A tab whose feature is on right now (a sound playing, the voice changer, the radio…) is marked, so nothing is left on without you noticing.": "En fane der funksjonen er på akkurat nå (en lyd som spilles, stemmeforvrengeren, radioen…) blir merket, så ingenting står på uten at du merker det.",
   "A virtual cable (not installed yet)": "En virtuell kabel (ikke installert ennå)",
@@ -738,7 +737,7 @@
   "On the left, click <b>Voice</b>.": "Til venstre, klikk <b>Tale</b>.",
   "On, at {host}:{port}. Pick a link to copy.": "På, på {host}:{port}. Velg en lenke å kopiere.",
   "On: listening on {host}:{port}.": "På: lytter på {host}:{port}.",
-  "Once a day, the installed app sends an anonymous \"still here\" to our counter (goatcounter.com): the version number and a random ID made on this PC, so nobody is counted twice, and which tabs you opened. If it crashed or froze, how many times (a count, never the report), and once when you uninstall. Nothing else: no name, sounds, settings or games. It's how we know if anyone uses Onion Board, and if it's working for them. Off: nothing is sent.": "Én gang om dagen sender den installerte appen et anonymt \"fortsatt her\" til telleren vår (goatcounter.com): versjonsnummeret og en tilfeldig ID lagd på denne PC-en, så ingen telles to ganger, og hvilke faner du åpnet. Hvis den krasjet eller frøs, hvor mange ganger (et tall, aldri rapporten), og én gang når du avinstallerer. Ikke noe annet: ikke navn, lyder, innstillinger eller spill. Det er slik vi vet om noen bruker Onion Board, og om det virker for dem. Av: ingenting sendes.",
+  "Once a day, sends an anonymous count to goatcounter.com: the version, tabs opened, crash counts and a random ID that follows how the app is used over time. Only used to fix errors and see which features need work. Never your name, sounds or settings. Switching it off sends one last anonymous count (no ID), then nothing.": "Én gang om dagen sendes en anonym telling til goatcounter.com: versjonen, åpnede faner, antall krasj og en tilfeldig ID som følger hvordan appen brukes over tid. Brukes bare til å fikse feil og se hvilke funksjoner som trenger arbeid. Aldri navnet ditt, lydene eller innstillingene dine. Slår du det av, sendes én siste anonym telling (uten ID), så ingenting.",
   "One click": "Ett klikk",
   "One click needed: repair your mic": "Ett klikk trengs: reparer mikrofonen din",
   "One click: put your sounds straight into your mic": "Ett klikk: legg lydene dine rett inn i mikrofonen",
@@ -1245,7 +1244,6 @@
   "Throw this recording away?": "Kaste dette opptaket?",
   "TikTok sounds": "TikTok-lyder",
   "Time": "Tid",
-  "Tint the tab": "Farg fanen",
   "To hear it live instead, use Hear what they hear at the bottom.": "For å høre det live i stedet, bruk Hør det de hører nederst.",
   "To use Tor, get it first: about 22 MB from the Tor Project, checked before it's used. {blocked_hint}": "For å bruke Tor må du hente den først: ca. 22 MB fra Tor Project, sjekket før den brukes. {blocked_hint}",
   "Toggle: press again stops it": "Av/på: et nytt trykk stopper den",
@@ -2859,5 +2857,10 @@
   "by {name}": "av {name}",
   "{language} needs a one-time download of its translation model ({size} MB). Offline mode is on, so it can't be downloaded now.": "{language} trenger en engangsnedlasting av sin oversettelsesmodell ( {size} MB). Frakoblet modus er på, så den kan ikke lastes ned nå.",
   "{n} MB": "{n} MB",
-  "⚠ Windows has no {language} voice yet, so {language} can't be spoken properly. Offline mode is on, so it can't be installed now.": "⚠ Windows har ingen {language} -stemme ennå, så {language} kan ikke snakkes ordentlig. Frakoblet modus er på, så den kan ikke installeres nå."
+  "⚠ Windows has no {language} voice yet, so {language} can't be spoken properly. Offline mode is on, so it can't be installed now.": "⚠ Windows har ingen {language} -stemme ennå, så {language} kan ikke snakkes ordentlig. Frakoblet modus er på, så den kan ikke installeres nå.",
+  "A bar at the edge of the tabs and a coloured icon, in the highlight colour: easy to spot from across the room": "En strek i kanten av fanene og et farget ikon, i uthevingsfargen: lett å se fra andre siden av rommet",
+  "A bar beside the tab": "En strek ved siden av fanen",
+  "Show tab names": "Vis fanenavn",
+  "Hide tab names": "Skjul fanenavn",
+  "Show only the icons": "Vis bare ikonene"
 }

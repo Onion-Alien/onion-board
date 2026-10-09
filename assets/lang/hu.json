@@ -125,7 +125,6 @@
   "A restore point is saved first, so you can undo this.": "Előbb visszaállítási pont készül, így visszavonhatod.",
   "A short “Did you know?” about a feature, at most once a day, never while a game is up.": "Egy rövid „Tudtad?” egy funkcióról, legfeljebb naponta egyszer, soha nem játék közben.",
   "A small dot on its icon": "Egy kis pötty az ikonján",
-  "A soft wash and a coloured icon in the theme's colour, easy to spot from across the room": "Halvány kiemelés és színes ikon a téma színében, a szoba túloldaláról is látszik",
   "A soundboard is most useful left running: your hotkeys and the overlay work while the window is closed. The tray icon (by the clock) opens it again; right-click it to quit.": "Egy soundboard akkor a leghasznosabb, ha fut: a gyorsbillentyűid és az overlay akkor is működnek, ha az ablak zárva van. A tálcaikon (az óra mellett) újra megnyitja; jobb klikk rajta a kilépéshez.",
   "A tab whose feature is on right now (a sound playing, the voice changer, the radio…) is marked, so nothing is left on without you noticing.": "Az a lap, amelynek funkciója éppen be van kapcsolva (szól egy hang, a hangtorzító, a rádió…), jelölést kap, így semmi nem marad bekapcsolva észrevétlenül.",
   "A virtual cable (not installed yet)": "Virtuális kábel (még nincs telepítve)",
@@ -738,7 +737,7 @@
   "On the left, click <b>Voice</b>.": "Bal oldalt kattints erre: <b>Voice</b>.",
   "On, at {host}:{port}. Pick a link to copy.": "Be, itt: {host}:{port}. Válassz egy linket a másoláshoz.",
   "On: listening on {host}:{port}.": "Be: figyel itt: {host}:{port}.",
-  "Once a day, the installed app sends an anonymous \"still here\" to our counter (goatcounter.com): the version number and a random ID made on this PC, so nobody is counted twice, and which tabs you opened. If it crashed or froze, how many times (a count, never the report), and once when you uninstall. Nothing else: no name, sounds, settings or games. It's how we know if anyone uses Onion Board, and if it's working for them. Off: nothing is sent.": "Naponta egyszer a telepített app egy névtelen „még itt vagyok” jelet küld a számlálónknak (goatcounter.com): a verziószámot és egy ezen a gépen készült véletlen azonosítót, hogy senkit ne számoljunk kétszer, és hogy mely lapokat nyitottad meg. Ha összeomlott vagy lefagyott, hányszor (egy szám, soha a jelentés), és egyszer, amikor eltávolítod. Semmi mást: se nevet, se hangokat, se beállításokat, se játékokat. Ebből tudjuk, használja-e valaki az Onion Boardot, és működik-e nekik. Ki: semmi nem megy el.",
+  "Once a day, sends an anonymous count to goatcounter.com: the version, tabs opened, crash counts and a random ID that follows how the app is used over time. Only used to fix errors and see which features need work. Never your name, sounds or settings. Switching it off sends one last anonymous count (no ID), then nothing.": "Naponta egyszer névtelen számlálást küld a goatcounter.com-nak: a verziót, a megnyitott lapokat, az összeomlások számát és egy véletlen azonosítót, ami mutatja, hogyan használják az appot idővel. Csak hibák javítására és arra, hogy lássuk, mely funkciókon kell dolgozni. Soha nem a neved, a hangjaid vagy a beállításaid. Kikapcsoláskor még egy utolsó névtelen számlálás megy el (azonosító nélkül), utána semmi.",
   "One click": "Egy kattintás",
   "One click needed: repair your mic": "Egy kattintás kell: javítsd meg a mikrofonodat",
   "One click: put your sounds straight into your mic": "Egy kattintás: tedd a hangjaidat egyenesen a mikrofonodba",
@@ -1245,7 +1244,6 @@
   "Throw this recording away?": "Eldobod ezt a felvételt?",
   "TikTok sounds": "TikTok-hangok",
   "Time": "Idő",
-  "Tint the tab": "A lap színezése",
   "To hear it live instead, use Hear what they hear at the bottom.": "Ha inkább élőben akarod hallani, használd lent a Halld, amit ők hallanak gombot.",
   "To use Tor, get it first: about 22 MB from the Tor Project, checked before it's used. {blocked_hint}": "A Tor használatához előbb szerezd be: kb. 22 MB a Tor Projecttől, használat előtt ellenőrizve. {blocked_hint}",
   "Toggle: press again stops it": "Kapcsoló: újabb nyomás leállítja",
@@ -2859,5 +2857,10 @@
   "by {name}": "{name}",
   "{language} needs a one-time download of its translation model ({size} MB). Offline mode is on, so it can't be downloaded now.": "{language} nyelvnek egyszeri letöltésre van szüksége a fordítási modelljéhez ( {size} MB). Az offline mód be van kapcsolva, ezért most nem lehet letölteni.",
   "{n} MB": "{n} MB",
-  "⚠ Windows has no {language} voice yet, so {language} can't be spoken properly. Offline mode is on, so it can't be installed now.": "⚠ A Windowsnak még nincs {language} hangja, így {language} nyelvet nem lehet megfelelően kimondani. Az offline mód be van kapcsolva, ezért most nem telepíthető."
+  "⚠ Windows has no {language} voice yet, so {language} can't be spoken properly. Offline mode is on, so it can't be installed now.": "⚠ A Windowsnak még nincs {language} hangja, így {language} nyelvet nem lehet megfelelően kimondani. Az offline mód be van kapcsolva, ezért most nem telepíthető.",
+  "A bar at the edge of the tabs and a coloured icon, in the highlight colour: easy to spot from across the room": "Egy sáv a lapok szélén és egy színes ikon a kiemelőszínben: a szoba túloldaláról is könnyen észrevehető",
+  "A bar beside the tab": "Egy sáv a lap mellett",
+  "Show tab names": "Lapnevek megjelenítése",
+  "Hide tab names": "Lapnevek elrejtése",
+  "Show only the icons": "Csak az ikonok megjelenítése"
 }

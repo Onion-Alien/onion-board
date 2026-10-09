@@ -147,7 +147,7 @@ Filename: "{app}\{#AppExeName}.exe"; Parameters: "--keep-netlog"; \
   StatusMsg: "Switching on the network activity history..."; \
   Tasks: keepnetlog; Flags: runhidden waituntilterminated
 ; "Count me in" (soundboard/usage.py): unticked, it's switched off before the first
-; start, so nothing is ever sent. Ticked on a page the user saw, it's switched on (an
+; start; the only thing ever sent is one anonymous "opt-out/installer" (no ID). Ticked on a page the user saw, it's switched on (an
 ; old install had it off); a silent update never switches it on.
 Filename: "{app}\{#AppExeName}.exe"; Parameters: "--usage-count off"; \
   StatusMsg: "Switching off the usage count..."; \

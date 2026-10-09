@@ -411,7 +411,8 @@ class EqPanel(QWidget):
             self.cb_target.addItem(label, key)
         icons.set_item_icons(self.cb_target, ["mic", "volume", "wave"])
         self.cb_target.setCurrentIndex(max(0, self.cb_target.findData(target)))
-        row.addWidget(self.cb_target, 1)
+        row.addWidget(self.cb_target)
+        row.addStretch(1)
         pv.addLayout(row)
 
         self.cb_preset = QComboBox()

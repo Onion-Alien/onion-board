@@ -705,7 +705,6 @@
   "A restore point is saved first, so you can undo this.": "Titik pemulihan disimpan terlebih dahulu, sehingga Anda dapat membatalkannya.",
   "A short “Did you know?” about a feature, at most once a day, never while a game is up.": "Kalimat singkat “Tahukah Anda?” tentang suatu fitur, paling banyak sekali sehari, tidak pernah saat game sedang berjalan.",
   "A small dot on its icon": "Titik kecil di ikonnya",
-  "A soft wash and a coloured icon in the theme's colour, easy to spot from across the room": "Latar lembut dan ikon berwarna sesuai warna tema, gampang terlihat dari seberang ruangan",
   "A soundboard is most useful left running: your hotkeys and the overlay work while the window is closed. The tray icon (by the clock) opens it again; right-click it to quit.": "Soundboard paling berguna kalau dibiarkan jalan: hotkey dan overlay tetap berfungsi saat jendelanya ditutup. Ikon tray (di dekat jam) membukanya lagi; klik kanan untuk keluar.",
   "A tab whose feature is on right now (a sound playing, the voice changer, the radio…) is marked, so nothing is left on without you noticing.": "Tab yang fiturnya sedang menyala (suara sedang diputar, pengubah suara, radio…) diberi tanda, jadi tidak ada yang tetap menyala tanpa kamu sadari.",
   "About": "Tentang",
@@ -1068,7 +1067,7 @@
   "On the left, click <b>Voice</b>.": "Di sebelah kiri, klik <b>Suara</b> .",
   "On, at {host}:{port}. Pick a link to copy.": "Aktif, di {host} : {port} . Pilih tautan untuk disalin.",
   "On: listening on {host}:{port}.": "Aktif: mendengarkan di {host} : {port} .",
-  "Once a day, the installed app sends an anonymous \"still here\" to our counter (goatcounter.com): the version number and a random ID made on this PC, so nobody is counted twice, and which tabs you opened. If it crashed or froze, how many times (a count, never the report), and once when you uninstall. Nothing else: no name, sounds, settings or games. It's how we know if anyone uses Onion Board, and if it's working for them. Off: nothing is sent.": "Sekali sehari, aplikasi yang terinstal mengirim \"masih di sini\" anonim ke penghitung kami (goatcounter.com): nomor versi dan ID acak yang dibuat di PC ini, supaya tidak ada yang terhitung dua kali, dan tab mana saja yang kamu buka. Kalau aplikasinya crash atau macet, berapa kali (cuma jumlahnya, bukan laporannya), dan sekali saat kamu uninstall. Tidak ada yang lain: tanpa nama, suara, pengaturan, atau game. Dari situ kami tahu apakah ada yang memakai Onion Board, dan apakah berjalan baik. Mati: tidak ada yang dikirim.",
+  "Once a day, sends an anonymous count to goatcounter.com: the version, tabs opened, crash counts and a random ID that follows how the app is used over time. Only used to fix errors and see which features need work. Never your name, sounds or settings. Switching it off sends one last anonymous count (no ID), then nothing.": "Sekali sehari, mengirim hitungan anonim ke goatcounter.com: versi, tab yang dibuka, jumlah crash, dan ID acak yang mengikuti cara aplikasi dipakai dari waktu ke waktu. Hanya dipakai untuk memperbaiki error dan melihat fitur mana yang perlu dibenahi. Tidak pernah namamu, suaramu, atau pengaturanmu. Mematikannya mengirim satu hitungan anonim terakhir (tanpa ID), lalu tidak ada lagi.",
   "One is saved every time you reset something (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "Satu disimpan setiap kali Anda menyetel ulang sesuatu ({max_points} terakhir disimpan). Memulihkan akan mengembalikan pengaturan, tombol pintas, dan suara Anda seperti semula. Suara yang Anda tambahkan sejak itu disimpan.",
   "One key can play a different sound in each category: switch category (its tab, or the keys above) and the same keys play that category's sounds. Sounds in no category always keep their keys.": "Satu tombol dapat memainkan suara berbeda di setiap kategori: beralih kategori (tabnya, atau tombol di atas) dan tombol yang sama memutar suara kategori tersebut. Suara dalam kategori apa pun selalu menyimpan kuncinya.",
   "One row per connection: what you did that made it, route, result, bytes, and the requests the app could read": "Satu baris per koneksi: apa yang Anda lakukan, rute, hasil, byte, dan permintaan yang dapat dibaca aplikasi",
@@ -1351,7 +1350,6 @@
   "Through a proxy or Tor, everything the app fetches (searches, downloads, radio, updates) goes through it, and site names are looked up there, not on this PC. If it can't be reached, nothing is fetched: the app never quietly goes direct. This PC's own addresses (127.0.0.1) stay direct.": "Melalui proxy atau Tor, semua yang diambil aplikasi (pencarian, unduhan, radio, pembaruan) melewatinya, dan nama situs dicari di sana, bukan di PC ini. Jika tidak dapat dijangkau, tidak ada yang diambil: aplikasi tidak pernah langsung berjalan secara diam-diam. Alamat PC ini (127.0.0.1) tetap langsung.",
   "TikTok sounds": "Suara TikTok",
   "Time": "Waktu",
-  "Tint the tab": "Warnai tab-nya",
   "To use Tor, get it first: about 22 MB from the Tor Project, checked before it's used. {blocked_hint}": "Untuk menggunakan Tor, dapatkan terlebih dahulu: sekitar 22 MB dari Proyek Tor, diperiksa sebelum digunakan. {blocked_hint}",
   "Tor download": "Unduhan Tor",
   "Tor sends everything through three volunteer computers around the world, so the sites you search and download from and the radio stations you play see a Tor address, not yours. It's slower, and YouTube often turns Tor away: the app then tries other Tor routes, and only goes without Tor if you click to.": "Tor mengirimkan semuanya melalui tiga komputer sukarelawan di seluruh dunia, sehingga situs yang Anda cari dan unduh serta stasiun radio yang Anda putar akan melihat alamat Tor, bukan alamat Anda. Ini lebih lambat, dan YouTube sering kali menolak Tor: aplikasi kemudian mencoba rute Tor lainnya, dan hanya berjalan tanpa Tor jika Anda mengekliknya.",
@@ -2799,5 +2797,10 @@
   "by {name}": "oleh {name}",
   "{language} needs a one-time download of its translation model ({size} MB). Offline mode is on, so it can't be downloaded now.": "{language} memerlukan pengunduhan satu kali model terjemahannya ( {size} MB). Mode offline aktif, jadi tidak dapat diunduh sekarang.",
   "{n} MB": "{n} MB",
-  "⚠ Windows has no {language} voice yet, so {language} can't be spoken properly. Offline mode is on, so it can't be installed now.": "⚠ Windows belum memiliki suara {language} , jadi {language} tidak dapat diucapkan dengan benar. Mode offline aktif, jadi tidak dapat diinstal sekarang."
+  "⚠ Windows has no {language} voice yet, so {language} can't be spoken properly. Offline mode is on, so it can't be installed now.": "⚠ Windows belum memiliki suara {language} , jadi {language} tidak dapat diucapkan dengan benar. Mode offline aktif, jadi tidak dapat diinstal sekarang.",
+  "A bar at the edge of the tabs and a coloured icon, in the highlight colour: easy to spot from across the room": "Bilah di tepi tab dan ikon berwarna, dalam warna highlight: mudah dikenali dari seberang ruangan",
+  "A bar beside the tab": "Bilah di samping tab",
+  "Show tab names": "Tampilkan nama tab",
+  "Hide tab names": "Sembunyikan nama tab",
+  "Show only the icons": "Tampilkan hanya ikonnya"
 }
