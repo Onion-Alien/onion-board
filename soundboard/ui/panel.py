@@ -7,7 +7,7 @@ from __future__ import annotations
 import math
 
 from PySide6.QtCore import QEvent, QPoint, QRect, QSize, Qt, Signal
-from PySide6.QtGui import QColor, QPainter
+from PySide6.QtGui import QColor, QFont, QPainter
 from PySide6.QtWidgets import (QCheckBox, QComboBox, QFrame, QGridLayout, QHBoxLayout, QLabel,
                                QLayout, QSlider, QSpinBox, QVBoxLayout, QWidget)
 
@@ -24,6 +24,21 @@ from soundboard.i18n import _
 def section_label(text: str) -> QLabel:
     lbl = QLabel(text)
     lbl.setObjectName("section")
+    return lbl
+
+
+def steady_number(lbl: QLabel, widest: str) -> QLabel:
+    """A number that changes in place (9% → 100%) keeps its width: same-width digits,
+    room for the widest value, right-aligned, so nothing beside it moves."""
+    lbl.ensurePolished()
+    f = lbl.font()
+    f.setFeature(QFont.Tag("tnum"), 1)
+    lbl.setFont(f)
+    text = lbl.text()
+    lbl.setText(widest)                 # its size hint counts the stylesheet's padding too
+    lbl.setMinimumWidth(lbl.sizeHint().width() + 2)
+    lbl.setText(text)
+    lbl.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
     return lbl
 
 
@@ -400,8 +415,10 @@ class EqPanel(QWidget):
         pv.addLayout(row)
 
         self.cb_preset = QComboBox()
-        for name in EQ_PRESETS:   # the item data is the preset's key, "Custom" for none
-            self.cb_preset.addItem(name, name)
+        # the item data is the preset's key, "Custom" for none; the keys are saved in
+        # config, so they keep their old dash and only the shown name drops it
+        for name in EQ_PRESETS:
+            self.cb_preset.addItem(name.replace(" — ", ": "), name)
         self.cb_preset.addItem(_("Custom"), "Custom")
         pv.addWidget(self.cb_preset)
         no_wheel(self.cb_target, self.cb_preset)
