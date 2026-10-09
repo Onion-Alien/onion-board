@@ -42,3 +42,23 @@ def test_settings_controls_ignore_the_wheel(window):  # noqa: F811
         d.close()
         d.deleteLater()   # every page was built: don't leave them alive for later tests
         QApplication.sendPostedEvents(None, QEvent.DeferredDelete)
+
+
+def test_wheel_never_changes_a_dropdown_or_tab_anywhere(window):  # noqa: F811
+    """Off a scrolling page too (the Radio filters), and on tab strips (Onion Watch's
+    Triggers / Log flipped as the wheel rolled past): the app style (wheelguard.AppStyle,
+    set by conftest as by app.main) says no to both."""
+    from PySide6.QtCore import QPoint, QPointF, Qt
+    from PySide6.QtGui import QWheelEvent
+    from PySide6.QtWidgets import QTabBar
+
+    combos = [c for c in window.findChildren(QComboBox) if c.count() > 1]
+    bars = [b for b in window.findChildren(QTabBar) if b.count() > 1]
+    assert combos and bars
+    for w in combos + bars:
+        w.setCurrentIndex(0)
+        for dy in (-120, 120):
+            QApplication.sendEvent(w, QWheelEvent(
+                QPointF(5, 5), QPointF(w.mapToGlobal(QPoint(5, 5))), QPoint(), QPoint(0, dy),
+                Qt.NoButton, Qt.NoModifier, Qt.NoScrollPhase, False))
+        assert w.currentIndex() == 0, f"{type(w).__name__} {w.objectName()} moved"
