@@ -224,8 +224,9 @@ class LogoWidget(QWidget):
     def _peel(self):
         top = self._to_window(QPointF(self.width() / 2, self.pad + self.mark * 0.42))
         side = random.choice((-1, 1))
-        self.peels.append([top.x(), top.y(), side * random.uniform(40, 90),
-                           -random.uniform(120, 190), random.uniform(0, 360), 1.6])
+        # flung out sideways (there's no room above: the logo sits at the top)
+        self.peels.append([top.x(), top.y(), side * random.uniform(70, 130),
+                           -random.uniform(40, 80), random.uniform(0, 360), 1.6])
         self._tear_debt += 3   # a burst of tears with it
 
     def _cry_step(self, dt: float):
