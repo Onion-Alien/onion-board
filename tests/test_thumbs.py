@@ -224,6 +224,8 @@ def test_link_add_uses_the_video_thumbnail(qapp, window, monkeypatch, tmp_path):
     m = window.cfg.sounds[-1]
     assert m.image and thumbs.Path(m.image).parent == library.THUMBS_DIR
     assert thumbs.pixmap(m.image) is not None
+    # named after the video in its site's folder, not after the temp file ("vid")
+    assert m.file == str(library.SOUNDS_DIR / "YouTube" / "A Tone.wav")
 
 
 def test_image_dropped_on_a_pad_becomes_its_picture(qapp, window, tmp_path):  # noqa: F811

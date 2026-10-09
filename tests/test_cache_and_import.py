@@ -92,7 +92,8 @@ def test_import_copies_plain_audio_and_caches_it(app_dir):
     meta, data = import_file(str(src), "#123456")
     assert data.dtype == np.int16 and len(data) == SR
     assert meta.name == "boom sound" and meta.duration == pytest.approx(1.0)
-    assert (library.SOUNDS_DIR / f"{meta.id}_boom_sound.wav").exists()
+    assert meta.file == str(library.SOUNDS_DIR / "My sounds" / "boom sound.wav")
+    assert os.path.exists(meta.file)
     assert cache_path(meta.id).exists()
     assert meta.fingerprint == fingerprint(str(src))
 
