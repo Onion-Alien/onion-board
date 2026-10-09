@@ -6631,8 +6631,12 @@ class MainWindow(QMainWindow):
             usage.used("voice-changer")
         self.set_option("voice_fx", spec)
 
-    def _remember_usage(self):   # features used this run, for the next daily count
+    def _remember_usage(self):   # features used and time open, for the next daily count
+        usage.open_tick(self.cfg)
         usage.remember(self.cfg)
+
+    def tick_usage(self):   # every usage.OPEN_TICK_S: how long the app has been open
+        usage.open_tick(self.cfg)
 
     def _mark_stopped(self):
         usage.mark_stopped(library.APP_DIR)
