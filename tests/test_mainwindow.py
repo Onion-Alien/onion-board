@@ -437,7 +437,7 @@ def test_every_tab_has_its_own_label(window):
 
 
 def test_the_tabs_are_a_rail_down_the_left(window, qapp):
-    """Icons only, names on hover; the button at the bottom opens it out to the names
+    """Icons only (no hover tips); the button at the bottom opens it out to the names
     and the onion (saved); a narrow window shuts it again."""
     window.show()
     window.resize(1200, 760)
@@ -446,7 +446,7 @@ def test_the_tabs_are_a_rail_down_the_left(window, qapp):
     assert window.tabs.tabBar().isHidden()   # the rail shows the tabs, not the bar
     assert not rail.is_open() and rail.width() == main.sidebar.SHUT_W
     b = rail.buttons[1]
-    assert b.text() == "" and b.toolTip() == "Radio" and b.accessibleName() == "Radio"
+    assert b.text() == "" and b.toolTip() == "" and b.accessibleName() == "Radio"
     assert not rail.buttons[0].icon().isNull()
     assert rail.buttons[0].isChecked() == (window.tabs.currentIndex() == 0)
     assert window.wordmark.isHidden()
@@ -532,12 +532,12 @@ def test_mute_switch_silences_what_others_hear(window, monkeypatch):
     e = window.engine
     assert window.btn_air.isChecked() and e.sending
     window.btn_air.click()
-    assert not e.sending and "Muted" in window.btn_air.text()
+    assert not e.sending and "Muted" in window.btn_air.accessibleName()
     out = np.ones((64, 2), np.float32)
     e._main(out, 64)
     assert not out.any()
     window.set_sending(True)
-    assert e.sending and window.btn_air.isChecked() and "Live" in window.btn_air.text()
+    assert e.sending and window.btn_air.isChecked() and "Live" in window.btn_air.accessibleName()
 
 
 def test_closing_the_window_ends_its_computer_voice_thread(window):

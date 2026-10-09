@@ -71,7 +71,7 @@ def test_another_device_is_sent_to_and_the_cable_never_takes_its_place(win, open
     win.set_route("device", "Speakers")
     assert opened["main"][-1] == "Speakers"
     assert win.setup_state == "ok"
-    assert "Speakers" in win.pill.text()
+    assert "Speakers" in win.pill.accessibleName()
     assert "Audio Output Capture" in win.step_lbl.text()
     assert win.btn_install.isHidden() and win.btn_chat.isHidden()   # no cable, no Discord mic
     assert win.cb_route.currentText() == "Speakers"   # picked by name
@@ -97,7 +97,7 @@ def test_the_headphones_are_never_what_others_hear(win, opened):
     assert win.setup_state == "unrouted"
     assert "headphones" in win.setup_hint.text()
     assert "My mic" in win.step_lbl.text() and "plugged in" not in win.step_lbl.text()
-    assert "Not sending" in win.pill.text()
+    assert "Not sending" in win.pill.accessibleName()
 
 
 def test_nowhere_closes_the_send_and_frees_the_cable_for_the_stream_output(win, opened):
@@ -106,7 +106,7 @@ def test_nowhere_closes_the_send_and_frees_the_cable_for_the_stream_output(win, 
     win.set_route("off")
     assert opened["main"][-1] is None and opened["obs"][-1] == CABLE
     assert win.setup_state == "ok"       # picked on purpose: the Setup tab doesn't nag
-    assert "Not sending" in win.pill.text()
+    assert "Not sending" in win.pill.accessibleName()
     assert win.cb_route.currentData() == "off"
     assert win.cfg.main_device == CABLE  # kept for switching back
     win.set_route("cable")
@@ -118,8 +118,7 @@ def test_the_live_switch_never_says_others_hear_you_while_nothing_is_sent(win):
     # one word on the button; the whole sentence is its accessible name and tooltip
     def said():
         assert win.btn_air.toolTip().startswith(win.btn_air.accessibleName())
-        return win.btn_air.text(), win.btn_air.accessibleName()
-    win._air_size = 0
+        return win.btn_air.property("railtext"), win.btn_air.accessibleName()
     win.set_sending(True)
     assert said() == ("Live", "Live: others hear you")
     win.set_route("device", PHONES)      # the headphones: nothing is sent

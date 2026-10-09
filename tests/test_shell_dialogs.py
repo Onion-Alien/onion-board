@@ -56,15 +56,15 @@ def test_live_tab_warning_shows_on_the_rail(qapp, win):
     b = win.rail.buttons[vi]
     plain = b.icon().cacheKey()
     set_tab_live(win.tabs, vi, True, "● ON: others hear your changed voice", "voice")
-    for is_open in (False, True):
+    for is_open in (False, True):   # no hover tips on the tabs: it's for a screen reader
         win.rail.set_open(is_open)
-        assert b.toolTip().startswith("● ON"), b.toolTip()
-        assert b.toolTip().endswith("\nVoice") == (not is_open)
+        assert b.toolTip() == "" and b.accessibleDescription().startswith("● ON")
     assert b.icon().cacheKey() != plain   # the live icon came across
     set_tab_live(win.tabs, vi, False)
-    assert not b.toolTip().startswith("●")   # the right plain tip is back
+    assert not b.accessibleDescription().startswith("●")
     win.rail.set_open(False)
-    assert not win.rail.buttons[win.tabs.indexOf(win.setup_page)].toolTip().startswith("●")
+    setup = win.rail.buttons[win.tabs.indexOf(win.setup_page)]
+    assert not setup.accessibleDescription().startswith("●")
 
 
 def test_the_rail_keeps_up_with_the_tabs(qapp, win, monkeypatch):
