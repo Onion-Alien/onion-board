@@ -366,6 +366,8 @@ class EffectRow(QFrame):
         head.addWidget(self.chk)
         self.arrow = QPushButton()
         self.arrow.setObjectName("fold")
+        self.arrow.setProperty("icononly", True)   # centred, no text padding
+        self.arrow.setFocusPolicy(Qt.TabFocus)     # a click leaves no focus box on it
         self.arrow.setFixedSize(24, 24)
         self.arrow.setCursor(Qt.PointingHandCursor)
         self.arrow.clicked.connect(lambda: self.set_folded(not self._folded, asked=True))
@@ -2642,6 +2644,8 @@ class CardHead(QWidget):
         h.addWidget(self.pill)
         self.arrow = QPushButton()
         self.arrow.setObjectName("fold")
+        self.arrow.setProperty("icononly", True)   # centred, no text padding
+        self.arrow.setFocusPolicy(Qt.TabFocus)     # a click leaves no focus box on it
         self.arrow.setCheckable(True)
         self.arrow.setChecked(True)
         self.arrow.setFixedSize(28, 28)
@@ -2720,22 +2724,24 @@ class VoicePanel(QWidget):
         cols.setContentsMargins(0, 0, 0, 0)
         cols.setSpacing(16)
         pv.addLayout(cols)
-        # Speak another language and the add-ons go under the columns, the full width:
-        # the voice changer and AI voices are what most people come for, so they're
-        # first, side by side; the speak card is nearest the bottom bar it uses. Only two
-        # cards share a row, so a tall one never leaves a hole beside a short one.
-        self._bottom = QVBoxLayout()
-        self._bottom.setSpacing(16)
-        pv.addLayout(self._bottom)
+        # The voice changer and AI voices are what most people come for, so they head
+        # the two columns; the other cards stack under whichever column is shorter
+        # (_arrange), so an open card never leaves a hole beside a short one.
         pv.addStretch(1)                 # spare height goes under the cards, not between
         folded = speech.get("folded") if isinstance(speech, dict) else None
         self._folded = {k for k in folded if isinstance(k, str)} \
             if isinstance(folded, list) else set()
         self._heads: dict[str, CardHead] = {}
-        lcol, rcol = QVBoxLayout(), QVBoxLayout()
+        lcol, rcol = self._lcol, self._rcol = QVBoxLayout(), QVBoxLayout()
         for col in (lcol, rcol):
             col.setSpacing(16)
             cols.addLayout(col, 1)
+            col.addStretch(1)
+        self._cards: list[QFrame] = []   # in reading order: _arrange places them
+        self._stacked = False
+        self._arranger = QTimer(self)
+        self._arranger.setSingleShot(True)
+        self._arranger.timeout.connect(self._arrange)
         scroll.setWidget(page)
         outer.addWidget(scroll, 1)
 
@@ -2746,8 +2752,7 @@ class VoicePanel(QWidget):
         # Make it yours' folded effect cards: "fx.<type>" in the same list
         self.fx.set_folded(k[3:] for k in self._folded if k.startswith("fx."))
         self.fx.folds_changed.connect(self._fx_folds)
-        lcol.addWidget(self._fold_card("fx", self.fx))
-        lcol.addStretch(1)
+        self._fold_card("fx", self.fx)
 
         # Bottom: Speak another language (and the computer voice); right: AI voices, add-ons.
         self.controller = SpeechController(engine, self.chain, lambda ev: None)
@@ -2766,13 +2771,12 @@ class VoicePanel(QWidget):
         self.ai.live_changed.connect(self._ai_live)
         self.ai.modules_changed.connect(self.rescan_modules)
         self._ai_card = self._fold_card("ai", self.ai)
-        rcol.addWidget(self._ai_card)
         net.on_change(self._ai_net_changed)
         self._ai_follow_offline()
         self.speech.live_changed.connect(self._speech_live)
         self.speech.lang_changed.connect(self._emit_active)
-        self._bottom.addWidget(self._fold_card("speak", self.speech))
-        self._bottom.addWidget(self._fold_card("custom", self.speech.custom_box))
+        self._fold_card("speak", self.speech)
+        self._fold_card("custom", self.speech.custom_box)
         self.speech.custom_wanted.connect(
             lambda: self._heads["custom"].is_open() or self._heads["custom"].arrow.toggle())
         self.addons = ModulesList()
@@ -2780,8 +2784,8 @@ class VoicePanel(QWidget):
         self._scanned.connect(self._apply_scan)
         self._scanning = False
         self.addons.show_modules(self.modules)
-        self._bottom.addWidget(self._fold_card("addons", self.addons))
-        rcol.addStretch(1)
+        self._fold_card("addons", self.addons)
+        self._arrange()
 
         outer.addWidget(self.speech.say_bar)
         self.chain.configure(self.fx.spec())
@@ -2818,7 +2822,51 @@ class VoicePanel(QWidget):
 
     def stack_steps(self):
         from soundboard.ui import responsive as r
-        return [r.stack(self._cols)]
+        stack = r.stack(self._cols)
+
+        def apply(compact: bool):
+            stack(compact)
+            self._stacked = compact
+            self._arrange()
+        return [apply]
+
+    def eventFilter(self, obj, e):
+        if e.type() in (QEvent.Resize, QEvent.Show, QEvent.Hide) and obj in self._cards:
+            self._arranger.start(0)   # a card grew, shrank or came and went: re-stack
+        return super().eventFilter(obj, e)
+
+    def _arrange(self):
+        """The voice changer heads the left column and AI voices the right; every other
+        card goes under whichever column is shorter just then, so the two columns stay
+        about level whatever is open or folded. One column (a narrow window): all in
+        reading order."""
+        gap = self._lcol.spacing()
+        heights, place = [0, 0], {}
+        for i, f in enumerate(self._cards):
+            if f.isHidden():
+                col = 0
+            elif self._stacked:
+                col = 0
+            elif i < 2:
+                col = i                  # voice changer left, AI voices right
+            else:
+                col = 0 if heights[0] <= heights[1] else 1
+            place[f] = col
+            if not f.isHidden():
+                heights[col] += f.sizeHint().height() if f.height() <= 1 else f.height()
+                heights[col] += gap
+        cols = (self._lcol, self._rcol)
+        for col in cols:                 # already where they belong, in order: no-op
+            if [col.itemAt(j).widget() for j in range(col.count() - 1)] != [
+                    f for f in self._cards if place[f] == cols.index(col)]:
+                break
+        else:
+            return
+        for f in self._cards:
+            cols[place[f] ^ 1].removeWidget(f)
+            col = cols[place[f]]
+            col.removeWidget(f)
+            col.insertWidget(col.count() - 1, f)   # above the column's stretch
 
     def _fx_changed(self, spec: dict):
         if self.chain.errors:              # give a bypassed effect another go after an edit
@@ -2886,6 +2934,9 @@ class VoicePanel(QWidget):
         v.addWidget(head)
         v.addWidget(panel)
         self._heads[key] = head
+        self._cards.append(f)
+        f.installEventFilter(self)              # its size decides its column (_arrange)
+        self._lcol.insertWidget(self._lcol.count() - 1, f)
         head.set_open(False)                    # the tab opens with every card folded
         panel.setVisible(False)                 # (what's folded is still saved, for
         return f                                # older versions)
