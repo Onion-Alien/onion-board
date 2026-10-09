@@ -1,12 +1,34 @@
 # Changelog
 
-## Unreleased
+## 1.9.27 — 2026-10-09
 
 - **Free sound packs.** *Backup → Free sound packs…* on the Sounds tab adds a
   whole ready-made board in one click, starting with the 67-sound GM pack for
   tabletop games. Made your own? *Share a pack* sends it in;
   once its sounds are checked as CC0 it shows up for everyone. It has its own
   switch in Settings → Privacy & security.
+- **No more skips while you click around.** A sound playing no longer stutters
+  when a tab opens for the first time (Apps, Radio, Triggers), during a web
+  search, or while a link is looked up.
+- **The player follows you.** Play, pause, stop and seek sit under the tabs, so a
+  sound can be stopped from any tab. Every sound playing gets its own chip, and
+  stopping one of two no longer looks like it stopped both.
+- **Pasted links show a card** with the video to Play or Add; nothing downloads
+  until you pick. Dead, playlist and soundless links say so in plain words.
+- **Offline mode hides what only works online** instead of greying it out, and
+  an *Offline* chip in the header says it's on.
+- **Tabs:** *+ More tabs* sits right after the last tab and shows what each tab
+  does; right-click a tab to hide it.
+- **Voice tab** opens tidy with every card folded; *Custom voices* has its own
+  card. Hothead now works on any mic, Walkie-talkie's clicks are off, and
+  *Female voice* is now *High voice*.
+- **Setup guide:** Bun reacts at normal talking volume (and doesn't cheer when
+  the mic set-up fails), with bigger device tiles and tidier buttons.
+- Bun, the owl and the logo move smoothly at a steady 30 fps.
+- **Fixes:** 43 texts that were English in every language are translated; a
+  sound on the Undo bar no longer gets added back as a dropped-in file; queue
+  double-clicks no longer remove or stop the next sound; toasts keep all their
+  lines in a small window.
 
 ## 1.9.26 — 2026-10-08
 
