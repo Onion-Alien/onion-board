@@ -13,7 +13,7 @@ from soundboard.library import (MAX_COOLDOWN_S, MAX_DELAY_S, MAX_FADE_S, PAD_COL
                                 SoundMeta, original_peaks)
 from soundboard.settings import HotkeyDialog, pretty_key
 from soundboard.ui import busy, fit, icons
-from soundboard.ui.panel import EqPanel, hint_label, section_label
+from soundboard.ui.panel import EqPanel, hint_label, section_label, steady_number
 from soundboard.ui.trim import TrimPanel
 from soundboard.ui.voicepanel import EffectRow, ParamSlider
 from soundboard.wheelguard import no_wheel
@@ -214,7 +214,7 @@ class EditDialog(QDialog):
         self.vol_lbl = QLabel()
         self.vol.valueChanged.connect(lambda v: self.vol_lbl.setText(f"{v}%"))
         self.vol_lbl.setText(f"{self.vol.value()}%")
-        self.vol_lbl.setFixedWidth(42)
+        steady_number(self.vol_lbl, "200%")
         vrow.addWidget(self.vol)
         vrow.addWidget(self.vol_lbl)
         form.addRow(_("Volume"), vrow)
@@ -231,11 +231,11 @@ class EditDialog(QDialog):
         self._set_hk(self.hotkey)
 
         self.mode = QComboBox()
-        self.mode.addItem(_("Restart — press again restarts it"), "restart")
-        self.mode.addItem(_("Overlap — every press plays a new copy"), "overlap")
-        self.mode.addItem(_("Toggle — press again stops it"), "toggle")
-        self.mode.addItem(_("Solo — stops every other sound first"), "solo")
-        self.mode.addItem(_("Queue — waits for the sounds playing to finish"), "queue")
+        self.mode.addItem(_("Restart: press again restarts it"), "restart")
+        self.mode.addItem(_("Overlap: every press plays a new copy"), "overlap")
+        self.mode.addItem(_("Toggle: press again stops it"), "toggle")
+        self.mode.addItem(_("Solo: stops every other sound first"), "solo")
+        self.mode.addItem(_("Queue: waits for the sounds playing to finish"), "queue")
         self.mode.setCurrentIndex(max(0, self.mode.findData(meta.mode)))
         no_wheel(self.mode)
         form.addRow(_("On press"), self.mode)
@@ -244,13 +244,13 @@ class EditDialog(QDialog):
         self.loop.setChecked(meta.loop)
         form.addRow("", self.loop)
 
-        self.hold = QCheckBox(_("Hold to play — stops when you let go of its hotkey"))
+        self.hold = QCheckBox(_("Hold to play: stops when you let go of its hotkey"))
         self.hold.setToolTip(_("Plays only while its hotkey or MIDI pad is held down, like an "
                                "air horn. Clicking the pad still plays it through."))
         self.hold.setChecked(meta.hold)
         form.addRow("", self.hold)
 
-        self.only_them = QCheckBox(_("Only others hear it — not played in my headphones"))
+        self.only_them = QCheckBox(_("Only others hear it, not played in my headphones"))
         self.only_them.setToolTip(_("It still goes out to others (Discord, the game, OBS…); you "
                                     "just don't hear it yourself (Preview still plays it to you)"))
         self.only_them.setChecked(meta.only_them)
@@ -328,7 +328,7 @@ class EditDialog(QDialog):
                              self.fades(), done)
             if got != "rendering":
                 busy.set_busy(prev, False)
-                self._say(_("Not loaded yet — try again in a moment") if got == "missing"
+                self._say(_("Not loaded yet: try again in a moment") if got == "missing"
                           else _("▶  Playing"), 1500)
         prev.clicked.connect(play_preview)
 
@@ -359,8 +359,7 @@ class EditDialog(QDialog):
         sl.setToolTip(tip)
         sl.setAccessibleName(label)
         no_wheel(sl)
-        lbl = QLabel()
-        lbl.setFixedWidth(42)
+        lbl = steady_number(QLabel(), _("{s} s", s=f"{top:.1f}"))
 
         def show(v):
             lbl.setText(_("{s} s", s=f"{v / 10:.1f}") if v else _("off"))

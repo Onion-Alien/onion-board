@@ -111,7 +111,7 @@ def test_audio_page_picks_input_and_output_through_the_window(window, monkeypatc
                         lambda cb, attr: picked.append((attr, cb.currentData())))
     d = SettingsDialog(window, "audio")
     mic, mon = d.dev_combos[0][0], d.dev_combos[1][0]
-    assert [mic.itemText(i) for i in range(mic.count())] == ["— none —", "Mic A", "Headset Mic"]
+    assert [mic.itemText(i) for i in range(mic.count())] == ["(none)", "Mic A", "Headset Mic"]
     assert mon.currentText() == "Speakers"
     mic.activated.emit(2)
     mon.activated.emit(2)
