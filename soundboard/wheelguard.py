@@ -10,10 +10,12 @@ measurable idle cost.
 """
 from __future__ import annotations
 
-from PySide6.QtCore import QEvent, QObject, Qt
+from PySide6.QtCore import QEvent, QObject, Qt, QTimer
 from PySide6.QtWidgets import (QAbstractScrollArea, QAbstractSlider, QAbstractSpinBox,
                                QApplication, QComboBox, QProxyStyle,
-                               QScrollBar, QStyle)
+                               QScrollBar, QSizePolicy, QStyle)
+
+QWIDGETSIZE_MAX = (1 << 24) - 1
 
 _guard: _Guard | None = None
 
@@ -26,7 +28,17 @@ class AppStyle(QProxyStyle):
       Radio filters changed them; rolling over Triggers / Log switched pages. An
       open dropdown's list still scrolls (that's its own view).
     - a click anywhere on a slider's bar moves it there, not a page step towards it.
+    - a dropdown is as wide as its longest choice, capped at COMBO_CAP, and never
+      stretches to fill its card (Settings' device boxes were 720 px for a 30-letter
+      name). One that set its own size policy, width cap or sizing rule keeps it.
     """
+
+    COMBO_CAP = 360
+
+    def polish(self, arg):
+        super().polish(arg)
+        if isinstance(arg, QComboBox):
+            snug_combo(arg, self.COMBO_CAP)
 
     def styleHint(self, hint, opt=None, widget=None, ret=None):
         if hint in (QStyle.SH_ComboBox_AllowWheelScrolling,
@@ -35,6 +47,42 @@ class AppStyle(QProxyStyle):
         if hint == QStyle.SH_Slider_AbsoluteSetButtons:
             return Qt.LeftButton.value
         return super().styleHint(hint, opt, widget, ret)
+
+
+def snug_combo(cb: QComboBox, cap: int = AppStyle.COMBO_CAP):
+    """Size a dropdown to its longest choice (up to the cap) instead of the row.
+
+    Many use a short minimum so a long device name can't make a page scroll sideways
+    in a narrow window: that minimum stays as a floor, the box just *prefers* its
+    words now and never grows past them. One the code gave its own width limit or a
+    non-default size policy is left alone. Redone whenever its choices change."""
+    managed = cb.property("snug")
+    if managed is None:
+        if (cb.sizePolicy().horizontalPolicy() != QSizePolicy.Preferred
+                or cb.maximumWidth() < QWIDGETSIZE_MAX):
+            cb.setProperty("snug", False)
+            return
+        cb.setProperty("snug", True)
+        short = cb.sizeAdjustPolicy() != QComboBox.AdjustToContentsOnFirstShow
+        if short and not cb.minimumWidth():
+            cb.setMinimumWidth(cb.minimumSizeHint().width())   # keep the short floor
+        cb.setSizeAdjustPolicy(QComboBox.AdjustToContents)
+        m = cb.model()
+        refit = lambda *_a: _refit(cb, cap)  # noqa: E731
+        for sig in (m.rowsInserted, m.rowsRemoved, m.modelReset, m.dataChanged):
+            sig.connect(refit)
+    elif not managed:
+        return
+    _refit(cb, cap)
+    # again once the theme's stylesheet has polished it too (its padding counts)
+    QTimer.singleShot(0, cb, lambda: _refit(cb, cap))
+
+
+def _refit(cb: QComboBox, cap: int):
+    try:
+        cb.setMaximumWidth(max(cb.minimumWidth(), min(cap, cb.sizeHint().width())))
+    except RuntimeError:   # the model outlived its dropdown
+        pass
 
 
 class _Guard(QObject):

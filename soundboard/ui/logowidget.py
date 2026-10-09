@@ -87,6 +87,13 @@ class LogoWidget(QWidget):
         self._timer.timeout.connect(self._step)
         appstate.pause_in_background(self, self._resume, self._timer.stop)
 
+    def set_mark(self, mark: int):
+        """A new size for the onion (the tab rail's, shut or open)."""
+        if mark != self.mark:
+            self.mark = mark
+            self.setFixedSize(QSize(mark + 2 * self.pad, mark + 2 * self.pad))
+            self.update()
+
     # ---- feeding
     def set_level(self, v: float):
         self._target = max(0.0, min(1.0, float(v)))

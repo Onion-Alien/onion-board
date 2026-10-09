@@ -202,9 +202,10 @@ def _keep_sounds(cfg: Config, point: Point) -> None:
         for attr, home, sub in (("file", library.SOUNDS_DIR, "sounds"),
                                 ("image", library.THUMBS_DIR, "thumbs")):
             p = Path(getattr(m, attr) or "")
-            if getattr(m, attr) and p.parent == home and p.exists():
-                try:
-                    trash._move(p, point.path / sub)
+            ours = library.owns(p) if attr == "file" else p.parent == home
+            if getattr(m, attr) and ours and p.exists():
+                try:   # in the point as in the library: sounds/YouTube/Song.flac
+                    trash._move(p, point.path / sub / p.parent.relative_to(home))
                 except OSError:
                     log.warning("couldn't keep %s in the restore point", p, exc_info=True)
         library.unlink_cache(m.id)
@@ -227,13 +228,15 @@ def restore(point_id: str) -> str:
             src = point.path / sub
             if src.is_dir():
                 home.mkdir(parents=True, exist_ok=True)
-                for f in src.iterdir():
-                    if (home / f.name).exists():   # left in the point, not lost with it
+                for f in sorted(x for x in src.rglob("*") if x.is_file()):
+                    to = home / f.relative_to(src)   # back into its library folder
+                    if to.exists():   # left in the point, not lost with it
                         log.warning("%s is in the library already; kept in the point", f.name)
                         whole = False
                         continue
-                    shutil.move(str(f), home / f.name)
-                    moved.append((f, home / f.name))
+                    to.parent.mkdir(parents=True, exist_ok=True)
+                    shutil.move(str(f), to)
+                    moved.append((f, to))
         # the pad list as it was, minus sounds whose audio has gone since (deleted after
         # the point was saved: they're in Recently deleted), plus sounds added since
         ids = {m.id for m in old.sounds}
@@ -330,7 +333,7 @@ def _remove(path: Path, recycle: bool = True) -> None:
     """Delete a restore point: audio still in it goes to the Windows Recycle Bin."""
     if recycle and library.USE_RECYCLE_BIN:
         for sub in ("sounds", "deleted"):
-            for f in (path / sub).glob("*"):
+            for f in (path / sub).rglob("*"):   # its library folders too
                 if f.is_file() and f.suffix.lower() in library.AUDIO_EXTS:
                     library.recycle(f)
     shutil.rmtree(path, ignore_errors=True)

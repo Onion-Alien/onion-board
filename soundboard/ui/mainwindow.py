@@ -23,7 +23,7 @@ from PySide6.QtWidgets import (QApplication, QCheckBox, QComboBox, QDialog, QFil
                                QGraphicsOpacityEffect, QGridLayout, QHBoxLayout, QInputDialog,
                                QLabel, QLineEdit, QMainWindow, QMenu, QMessageBox,
                                QPushButton, QScrollArea, QSizePolicy, QSlider, QStackedWidget,
-                               QSystemTrayIcon, QTabBar, QTabWidget, QToolTip, QVBoxLayout,
+                               QSystemTrayIcon, QTabBar, QToolTip, QVBoxLayout,
                                QWidget, QWidgetAction)
 from shiboken6 import isValid as qt_valid
 
@@ -54,9 +54,11 @@ from soundboard.ui.panel import (EqPanel, Flow, VolumeControl, bar, capped, card
                                  hint_label, icon_label, steady_number, vsep)
 from soundboard.ui.linkbar import PLAY_ID as LINK_ID
 from soundboard.ui.linkbar import LinkBar
-from soundboard.ui.livedot import is_tab_live, set_tab_live
+from soundboard.ui.livedot import set_tab_live
 from soundboard.ui.livedot import set_tint as set_live_tint
 from soundboard.ui.logowidget import LogoWidget, glow_icon
+from soundboard.ui import sidebar
+from soundboard.ui.sidebar import SideTabs
 from soundboard.ui.ytsearch import SearchResults
 from soundboard.ui.setupshow import SetupShow
 from soundboard.ui.spacekey import SpaceKey
@@ -68,7 +70,7 @@ from soundboard.ui.triggerstab import TriggersTab
 from soundboard.ui.radiopanel import RadioOff, RadioTab
 from soundboard.ui.voicepanel import VoicePanel
 from soundboard.ui.widgets import (Meter, NameAndSeek, Pad, PadGrid, SeekSlider, SteadyTabs,
-                                   TabEndCorner, expand_dropped, fmt_pos, loudness, pad_height,
+                                   expand_dropped, fmt_pos, loudness, pad_height,
                                    spectrum, SLIM_PAD_H)
 from soundboard.wheelguard import no_wheel
 from soundboard.winkeys import Hotkeys
@@ -137,6 +139,8 @@ RECOVER_WAIT_S = (20, 40, 80, 160, 300)
 GONE_CHECKS, GONE_WAIT_S = 4, 6
 LOOSE_WAIT_MS = 1500   # a file dragged into the sounds folder is looked at again (ms)
 LOOSE_EMPTY_LOOKS = 20   # an empty file that long (~30 s) waits for the folder to change
+BODY_SIDE = 14         # the gap around the window's content (beside the tab rail too)...
+BODY_SIDE_TIGHT = 8    # ...and beside the rail in a narrow window
 MINI_SIZE = QSize(440, 380)   # below this the window becomes the mini player...
 MINI_PAD_ROWS = 1             # ...which has the pads above it when this many rows fit
 QUEUE_CHIPS = 5          # queued sounds shown by name above the pads (then "+n more")
@@ -355,6 +359,7 @@ class MainWindow(QMainWindow):
     config_saved = Signal(bool)         # the background save finished: ok
     voice_engine = Signal(object)       # the voice engine of the game in front (a mode key|None)
     default_found = Signal(object)      # Windows' default output, asked on a thread (str|None)
+    picture_fetched = Signal(str, object, str)   # picture from a link: sid, QImage|None, error
     device_step = Signal(object)        # the device thread's next step for the UI (_off_ui)
     tab_switched = Signal(str, bool)    # Settings > Tabs: a tab (taboff.KEYS) off / on again
     category_programs_changed = Signal()   # a program -> category rule added / removed
@@ -508,6 +513,8 @@ class MainWindow(QMainWindow):
             self.tabs.blockSignals(True)
             self.tabs.setCurrentWidget(self.setup_page)
             self.tabs.blockSignals(False)
+            self.rail.sync()   # (it heard nothing)
+        library.tidy_files(self.cfg)   # files from before library folders move in
         self._rebuild_pads()
         splash.pump()
         self._load_all()
@@ -569,6 +576,7 @@ class MainWindow(QMainWindow):
         self._default_at = 0.0   # when Windows' default was last looked at (_default_tick)
         self._default_asking = False   # ...and a thread is asking it now
         self.default_found.connect(self._on_default_found)
+        self.picture_fetched.connect(self._on_picture_fetched)
         self.device_step.connect(lambda step: step())
         self._dev_waiting: list = []   # device changes waiting their turn (_when_devices_free)
         self._dev_retry = QTimer(self, singleShot=True, interval=100, timeout=self._dev_pump)
@@ -658,26 +666,28 @@ class MainWindow(QMainWindow):
         root.setObjectName("root")   # the theme's window gradient
         root.setProperty("grain", True)
         self._pages.addWidget(root)
-        rv = QVBoxLayout(root)
-        rv.setContentsMargins(14, 10, 14, 10)
+        self._full_row = QHBoxLayout(root)   # the tab rail (ui/sidebar.py), then the rest
+        self._full_row.setContentsMargins(0, 0, 0, 0)
+        self._full_row.setSpacing(0)
+        body = QWidget()
+        self._full_row.addWidget(body, 1)
+        rv = QVBoxLayout(body)
+        self._body_lay = rv
+        rv.setContentsMargins(BODY_SIDE, 10, BODY_SIDE, 10)
         rv.setSpacing(8)
 
-        # ---- header: logo + name, then setup status, Stop all, Settings
+        # ---- header: setup status, Stop all, Settings (the logo and name are on top of
+        # the tab rail, made here for _paint_logo)
         head = QHBoxLayout()
         head.setSpacing(10)
         self.logo = LogoWidget()
-        head.addWidget(self.logo)
-        names = QVBoxLayout()
-        names.setSpacing(0)
         self.wordmark = QLabel("Onion Board")
         self.wordmark.setObjectName("wordmark")
         self.tagline = QLabel(_("an app by Onion Alien · v{version_text}",
                                 version_text=version_text()))
         self.tagline.setObjectName("tagline")
-        names.addWidget(self.wordmark)
-        names.addWidget(self.tagline)
-        head.addLayout(names)
-        head.addStretch(1)
+        # on the rail, the name and the version each on a line of their own
+        self.tagline.setText(self.tagline.text().replace(" · ", "\n", 1))
         self.pill = QPushButton()
         self.pill.setObjectName("pill")
         self.pill.setCursor(Qt.PointingHandCursor)
@@ -726,8 +736,9 @@ class MainWindow(QMainWindow):
         self.gear.setProperty("quiet", True)
         self.gear.setToolTip(_("Themes, hotkeys and more"))
         self.gear.clicked.connect(lambda: self.open_settings())
-        icons.set_icon(self.gear, "settings")
-        head.addWidget(self.gear)
+        icons.set_icon(self.gear, "settings", size=sidebar.ICON)
+        self.gear.setProperty("railtext", _("Settings"))   # at the foot of the tab rail
+        head.addStretch(1)
         rv.addLayout(head)
         self._paint_logo()
 
@@ -850,10 +861,9 @@ class MainWindow(QMainWindow):
 
         # ---- tabs
         self.tab_info: dict[str, tuple[str, str]] = {}   # page attr -> (title, text) for ⓘ
-        self.tabs = QTabWidget()
+        self.tabs = SideTabs()   # its bar hidden: the rail down the left shows the tabs
         self.tabs.setDocumentMode(True)
-        self.tabs.setIconSize(QSize(18, 18))
-        self.tabs.tabBar().setUsesScrollButtons(False)   # small windows drop the tab text
+        self.tabs.setIconSize(QSize(sidebar.ICON, sidebar.ICON))
         SteadyTabs(self.tabs)   # a change inside a page doesn't repaint the whole board
         rv.addWidget(self.tabs, 1)
         self.sounds_page = self._build_sounds_page()
@@ -880,9 +890,9 @@ class MainWindow(QMainWindow):
         # one ⓘ at the end of the tab bar: the tab's explanation, instead of a banner
         self.btn_info = QPushButton()
         self.btn_info.setObjectName("tabinfo")
-        self.btn_info.setFixedSize(32, 32)
+        self.btn_info.setProperty("railtext", _("About this tab"))
         self.btn_info.setAccessibleName(_("About this tab"))
-        icons.set_icon(self.btn_info, "info", size=20)
+        icons.set_icon(self.btn_info, "info", size=sidebar.ICON)
         self.btn_info.setCursor(Qt.PointingHandCursor)
         self.btn_info.setToolTip(_("What's this tab for?"))
         self.btn_info.clicked.connect(self._show_tab_info)
@@ -890,23 +900,33 @@ class MainWindow(QMainWindow):
         # click to add one; only there while one is off. Right after the last tab
         self.btn_more_tabs = QPushButton(_("More tabs"))
         self.btn_more_tabs.setObjectName("moretabs")
-        icons.set_icon(self.btn_more_tabs, "plus")
+        icons.set_icon(self.btn_more_tabs, "plus", size=sidebar.ICON)
+        self.btn_more_tabs.setProperty("railtext", _("More tabs"))
         self.btn_more_tabs.setCursor(Qt.PointingHandCursor)
         self.btn_more_tabs.setFocusPolicy(Qt.TabFocus)   # a click left an accent ring on it
         self.btn_more_tabs.setToolTip(_("Add a tab: radio, sending a program's sound, screen "
                                         "triggers…"))
         from soundboard.ui import moretabs
-        mt = moretabs.Menu(self.btn_more_tabs)
+        mt = self.more_menu = moretabs.Menu(self.btn_more_tabs)
         mt.aboutToShow.connect(lambda: self._fill_more_tabs(mt))
         mt.aboutToHide.connect(self._more_tabs_hidden)
-        self.btn_more_tabs.setMenu(mt)
+        self.btn_more_tabs.clicked.connect(mt.pop)
         self._update_more_tabs()
-        self.tabs.setCornerWidget(TabEndCorner(self.tabs, self.btn_more_tabs, self.btn_info),
-                                  Qt.TopRightCorner)
+        self.rail = sidebar.SideRail(
+            self.tabs, self.logo, self.wordmark, self.tagline,
+            [self.btn_more_tabs, self.btn_info], self.cfg.sidebar_open, [self.gear],
+            self._rail_opened)
+        self._full_row.insertWidget(0, self.rail)
+        # Tab goes header, rail, page (as it did with the top tabs), not page, rail
+        prev = self.tabs.previousInFocusChain()
+        for w in (*self.rail.buttons, self.btn_more_tabs, self.btn_info, self.gear,
+                  self.rail.toggle, self.tabs):
+            QWidget.setTabOrder(prev, w)
+            prev = w
         # right-click a tab: hide it (+ More tabs or Settings > Tabs bring it back)
-        bar = self.tabs.tabBar()
-        bar.setContextMenuPolicy(Qt.CustomContextMenu)
-        bar.customContextMenuRequested.connect(self._tab_menu)
+        for b in self.rail.buttons:
+            b.customContextMenuRequested.connect(
+                lambda pos, b=b: self.tab_menu(b.index).exec(b.mapToGlobal(pos)))
         # every tab has a line for the ⓘ (the Apps tab brings its own): one tab with
         # the button and the rest without looked like a slip
         self.tab_info.setdefault("sounds_page", (
@@ -1711,7 +1731,7 @@ class MainWindow(QMainWindow):
             # opens wide enough for whole names
             cb.setSizeAdjustPolicy(QComboBox.AdjustToMinimumContentsLengthWithIcon)
             cb.setMinimumContentsLength(16)
-        grid.setColumnStretch(2, 1)
+        grid.setColumnStretch(3, 1)   # the room past the boxes, not the boxes' column
         av.addLayout(grid)
         self.cb_main.setParent(devcard)   # never a window of its own
         self.cb_main.hide()
@@ -3385,12 +3405,22 @@ class MainWindow(QMainWindow):
         self.set_tab_on(key, True)
         self.tabs.setCurrentIndex(TAB_INDEX[key])
 
-    def _tab_menu(self, pos):
-        """Right-click on a tab: Hide this tab (not Sounds or Setup)."""
-        bar = self.tabs.tabBar()
-        i = bar.tabAt(pos)
-        if i >= 0:
-            self.tab_menu(i).exec(bar.mapToGlobal(pos))
+    def _squeeze_rail(self, tight: bool):
+        """A narrow window: the rail shut (opened out, it shuts again) and the gap
+        beside it narrower, so the pages keep their room before the mini player."""
+        self.rail.squeeze(tight)
+        side = (BODY_SIDE_TIGHT if tight else BODY_SIDE, BODY_SIDE)
+        if self.isRightToLeft():   # mirrored (Arabic): the rail is on the right
+            side = side[::-1]
+        self._body_lay.setContentsMargins(side[0], 10, side[1], 10)
+
+    def _rail_opened(self, on: bool):
+        """The rail opened out or shut: save it, and fit the window to its new width
+        (shut, what had given way for it comes back)."""
+        self.set_option("sidebar_open", on)
+        if hasattr(self, "_fit"):
+            self._fit.reset()
+            self._refit()
 
     def tab_menu(self, i: int) -> QMenu:
         key = TAB_KEYS[i]
@@ -3469,6 +3499,7 @@ class MainWindow(QMainWindow):
             self.tabs.setTabToolTip(i, tip)
             bar.setAccessibleTabName(i, name)
             self.tabs.setCurrentIndex(cur)
+        self.rail.sync()
         icons.set_tab_icon(self.tabs, i, key)
         old.deleteLater()
         self._tab_live(key, False)
@@ -5209,8 +5240,10 @@ class MainWindow(QMainWindow):
                             continue
                         raise RuntimeError(_("already in your library as “{name}”",
                                              name=known[fp]))
-                    meta, data = import_file(f, PAD_COLORS[(start + i) % len(PAD_COLORS)])
-                    if (x := extras.get(f)) is not None:
+                    x = extras.get(f)   # from another soundboard: named as it was there
+                    meta, data = import_file(f, PAD_COLORS[(start + i) % len(PAD_COLORS)],
+                                             name=x.name if x is not None else "")
+                    if x is not None:
                         meta.name = x.name or meta.name
                         meta.tags = clean_tags(x.tags)
                         if x.hotkey:
@@ -5317,7 +5350,8 @@ class MainWindow(QMainWindow):
 
         d = RecordDialog(self.engine, voice_on, lambda: [m.name for m in self.cfg.sounds],
                          self.add_recording, open_devices, self,
-                         playing_name=self._playing_name)
+                         playing_name=self._playing_name,
+                         playing_picture=self._playing_picture)
         self._record_dlg = d
 
         def closed(_r):
@@ -5341,11 +5375,24 @@ class MainWindow(QMainWindow):
         station = getattr(getattr(self.radio, "player", None), "station", None)
         return station.name if station is not None else ""
 
-    def add_recording(self, data, name) -> bool:
-        """A mic recording becomes a pad: selected, scrolled to, and a toast says so."""
+    def _playing_picture(self) -> str:
+        """The picture of the pad playing now ("" for none, or not a pad), for a
+        recording of it."""
+        sid = self.current
+        st = self.engine.state(sid) if sid else None
+        m = self.meta(sid) if st is not None and not st[1] else None
+        return m.image if m is not None and m.image and Path(m.image).is_file() else ""
+
+    def add_recording(self, data, name, picture: str = "") -> bool:
+        """A mic recording becomes a pad: selected, scrolled to, and a toast says so.
+        `picture`: the picture of the pad it was recorded from (copied onto it)."""
         meta = self.on_clip(data, name)
         if meta is None:
             return False
+        if picture and thumbs.set_image(meta, picture):
+            self._save_now()
+            if meta.id in self.pads:
+                self.pads[meta.id].update()
         usage.used("record")
         self.select(meta.id)
 
@@ -5502,13 +5549,13 @@ class MainWindow(QMainWindow):
             return a
         a_stop = add(("stop",), _("Stop")) if self.engine.state(sid) else None
         a_next = add(("play",), _("Play next"), _("Plays it after the sounds playing now"))
+        vol_before = m.volume
+        menu.addAction(self._volume_action(menu, m))
         menu.addSeparator()
         a_edit = add(("edit",), _("Edit…"), _("Name, volume, hotkey, what a press does, loop, "
                                               "fades, wait first, cooldown, colour"))
-        a_ren = add(None, _("Rename…"), _("Just the name (F2 on the pad does it too)"))
+        a_ren = add(("rename",), _("Rename…"), _("Just the name (F2 on the pad does it too)"))
         a_fx = add(("wave",), _("Effects…"), _("Speed, pitch, EQ, boost"))
-        vol_before = m.volume
-        menu.addAction(self._volume_action(menu, m))
         a_hk_clear = None
         if m.hotkey:
             hk = menu.addMenu(icons.icon("keyboard"), _("Hotkey: {hotkey}",
@@ -5519,7 +5566,7 @@ class MainWindow(QMainWindow):
         else:
             a_hk = add(("keyboard",), _("Set hotkey…"), _("A key or combo that plays it, even "
                                                           "in-game"))
-        cats = menu.addMenu(_("Categories"))
+        cats = menu.addMenu(icons.icon("tag"), _("Categories"))
         cat_acts = {}
         for c in self.cfg.categories:
             a = cats.addAction(c.replace("&", "&&"))
@@ -5530,19 +5577,21 @@ class MainWindow(QMainWindow):
             cats.addSeparator()
         a_newcat = cats.addAction(icons.icon("plus"), _("New category…"))
         a_nopic = None
+        pic = menu.addMenu(icons.icon("image"), _("Picture") if m.image else _("Add picture"))
+        pic.setToolTipsVisible(True)
+        a_pic = pic.addAction(_("From a file…"))
+        a_pic.setToolTip(_("Shown on the pad (you can also drop a picture on it, or copy one, "
+                           "click the pad and press Ctrl+V)"))
+        a_piclink = pic.addAction(_("From a link…"))
+        a_piclink.setToolTip(_("Paste a picture's address, or a link to a YouTube video or a "
+                               "web page to use its picture"))
         if m.image:
-            pic = menu.addMenu(icons.icon("image"), _("Picture"))
-            a_pic = pic.addAction(_("Change…"))
             a_nopic = pic.addAction(_("Remove picture"))
-        else:
-            a_pic = add(("image",), _("Add picture…"), _("Shown on the pad (you can also drop "
-                                                         "a picture on it, or copy one, click "
-                                                         "the pad and press Ctrl+V)"))
         menu.addSeparator()
-        a_dup = add(("plus",), _("Duplicate"), _("A second pad with the same sound, to give "
+        a_dup = add(("copy",), _("Duplicate"), _("A second pad with the same sound, to give "
                                                  "its own effects or hotkey"))
-        a_export = add(("folder",), _("Export…"), _("Save it as a file to share with friends"))
-        a_show = add(None, _("Show the file in its folder"))
+        a_export = add(("download",), _("Export…"), _("Save it as a file to share with friends"))
+        a_show = add(("folder",), _("Show the file in its folder"))
         a_del = add(("trash", "danger_text"), _("Remove"), _("Goes to Recently deleted"))
         act = menu.exec(pos)
         menu.deleteLater()   # its actions stay valid until this returns
@@ -5581,6 +5630,8 @@ class MainWindow(QMainWindow):
                   patterns=" ".join(f"*{x}" for x in sorted(thumbs.IMAGE_EXTS))))
             if f:
                 self.set_picture(sid, f)
+        elif act == a_piclink:
+            self.picture_from_link(sid)
         elif act is not None and act == a_nopic:
             thumbs.clear(m)
             self._save_now()
@@ -5601,11 +5652,63 @@ class MainWindow(QMainWindow):
         self._save_now()
         self.pads[sid].update()
 
+    def picture_from_link(self, sid: str, url: str | None = None):
+        """Pad menu → Picture → From a link: ask for the link (a copied one is filled
+        in), then fetch the picture on a thread."""
+        m = self.meta(sid)
+        if m is None:
+            return
+        if url is None:
+            copied = QApplication.clipboard().text().strip()
+            copied = copied if "://" in copied and len(copied) < 2000 and \
+                not any(c.isspace() for c in copied) else ""
+            url, ok = QInputDialog.getText(
+                self, _("Picture from a link"),
+                _("The picture's address (right-click it → Copy image address),\nor a link "
+                  "to a YouTube video or a web page:"), text=copied)
+            if not ok:
+                return
+        url = url.strip()
+        if not url:
+            return
+        self.status.setText(_("Getting the picture for “{name}”…", name=html.escape(m.name)))
+
+        def work():
+            try:
+                img, err = thumbs.fetch(url), ""
+            except (thumbs.LinkError, net.FeatureOff) as e:
+                img, err = None, str(e)
+            except Exception as e:  # noqa: BLE001 - never leave the status hanging
+                log.exception("picture from a link")
+                img, err = None, errors.plain(e)
+            try:
+                self.picture_fetched.emit(sid, img, err)
+            except RuntimeError:   # the window closed meanwhile
+                pass
+        threading.Thread(target=work, daemon=True, name="picture-link").start()
+
+    def _on_picture_fetched(self, sid: str, img, err: str):
+        m = self.meta(sid)
+        if m is None:   # removed while it downloaded
+            return
+        if img is None or not thumbs.set_image(m, img):
+            self.status.setText("")
+            QMessageBox.warning(self, _("Couldn't use that picture"),
+                                err or _("There's no picture at that link."))
+            return
+        self._save_now()
+        if sid in self.pads:
+            self.pads[sid].update()
+        self.status.setText(_("Picture added to “{name}”.", name=html.escape(m.name)))
+
     def _focus_sounds_page(self, _i: int):
         """Switched to Sounds with the focus left behind on another tab (a hidden clip
-        editor): the page takes it, so its Ctrl+V works straight away."""
+        editor): the page takes it, so its Ctrl+V works straight away. Not from the tab
+        rail: going down it with the arrow keys, the focus stays there."""
         page = self.sounds_page
         fw = QApplication.focusWidget()
+        if (own := self.focusWidget()) is not None and self.rail.isAncestorOf(own):
+            return
         if self.tabs.currentWidget() is page and (fw is None or not page.isAncestorOf(fw)):
             page.setFocus(Qt.OtherFocusReason)
 
@@ -7385,7 +7488,9 @@ class MainWindow(QMainWindow):
         numbers go first; width and height are handled separately."""
         r = responsive
         f = self._fit = r.Fitter(self._full)
-        f.add(10, "w", r.hide(self.tagline))
+        # last: opened out, the rail stays open until nothing else can give (it shut
+        # again at once when opened in a mid-sized window)
+        f.add(90, "w", self._squeeze_rail)
         f.add(10, "w", r.hide(*self._pad_size))
         f.add(18, "w", r.icon_only(self.btn_view))   # its tooltip says what it is
         # the label and the dropdown go together: a lone "Clean" said nothing (the full
@@ -7399,13 +7504,11 @@ class MainWindow(QMainWindow):
         f.add(58, "w", r.icon_only(self.stop_btn))
         f.add(24, "w", self._shorten_air(1))
         f.add(65, "w", self._shorten_air(2))
-        f.add(22, "w", r.icon_only(self.gear))
         f.add(30, "w", r.hide(self.chk_monitor))
         f.add(28, "w", r.icon_only(self.chk_mic))   # its tooltip still explains it
         f.add(55, "w", r.hide(*self._mixer_hp))
         f.add(40, "w", r.hide(*self._transport_vol))
         f.add(50, "w", r.hide(self.np_name))
-        f.add(60, "w", r.hide(self.wordmark))
         f.add(60, "w", r.icon_only(self.btn_add))
         # a bare red dot read as a warning light, so Record keeps its word until the
         # folder, Backup and the Listening dropdown have gone
@@ -7416,10 +7519,8 @@ class MainWindow(QMainWindow):
         f.add(35, "w", r.hide(self.btn_more))   # also in Settings → General
         f.add(15, "w", r.icon_only(self.btn_folder))
         f.add(33, "w", r.hide(self.btn_folder))   # also in the Backup menu
-        f.add(60, "w", self._tab_icons_only)
         f.add(70, "w", r.hide(self.btn_check, *self._mixer_send, *self._mixer_others))
         f.add(80, "w", self._show_pill)
-        f.add(85, "w", self._tabs_tight)   # else the icons alone held it at ~480 px
         self._radio_steps = self.radio.fit_steps()   # swapped with the tab (Privacy)
         f.extend(self._radio_steps)
         self._tab_steps = {k: getattr(self, k).fit_steps() for k in ("voice", "triggers")}
@@ -7444,31 +7545,6 @@ class MainWindow(QMainWindow):
         if short != self._pill_short:
             self._pill_short = short
             self._update_flow()
-
-    def _tab_icons_only(self, compact: bool):
-        for i, (text, _tip) in enumerate(TABS):
-            self.tabs.setTabText(i, "" if compact else text)
-            self.tabs.tabBar().setAccessibleTabName(i, text)   # icon-only tabs aren't silent
-            base = text if compact else ""   # only an icon-only tab needs its name on hover
-            old = self.tabs.property(f"_tip{i}")   # set_tab_live's copy of the plain tip
-            if old is not None:
-                cur = self.tabs.tabToolTip(i)
-                self.tabs.setProperty(f"_tip{i}", base)
-                live = None   # keep its "● ON" line
-                if is_tab_live(self.tabs, i):
-                    live = cur if not old else cur[:-len(old) - 1] if cur.endswith(
-                        "\n" + old) else None
-                if live:
-                    base = f"{live}\n{base}" if base else live
-            self.tabs.setTabToolTip(i, base)
-
-    def _tabs_tight(self, compact: bool):
-        """Icon-only tabs packed close: their padding was the widest thing left, so a
-        window the rest fits turned into the mini player."""
-        bar = self.tabs.tabBar()
-        bar.setStyleSheet("QTabBar::tab { padding:8px 6px; margin-right:0px; }"
-                          if compact else "")
-        responsive.touch(bar)
 
     def _refit(self):
         size = self._pages.size()

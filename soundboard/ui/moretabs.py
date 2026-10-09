@@ -3,7 +3,7 @@ what it's good for and an Add button), so the extras read as things worth having
 rather than a list of lines."""
 from __future__ import annotations
 
-from PySide6.QtCore import Qt, Signal
+from PySide6.QtCore import QPoint, Qt, Signal
 from PySide6.QtWidgets import (QFrame, QHBoxLayout, QLabel, QMenu, QPushButton,
                                QVBoxLayout, QWidget, QWidgetAction)
 
@@ -13,7 +13,7 @@ from soundboard.ui import icons
 
 CARD_W = 400
 ICON = 40
-GAP = 8   # px between the + More tabs button and its dropdown
+GAP = 8   # px between the + More tabs button and its menu, beside it
 
 # what each tab is good for, said to sell it (the tab's own tooltip is the plain one)
 PITCH = {
@@ -29,14 +29,23 @@ PITCH = {
 
 
 class Menu(QMenu):
-    """The dropdown, opened a little clear of its button instead of touching it."""
+    """The dropdown, opened beside its button on the tab rail (not down over the tabs
+    under it), a little clear of it. The button opens it with `pop` on a click: given
+    as its menu, Qt kept room for a drop-down arrow and the + sat off centre."""
+
+    def pop(self):
+        self.popup(self.parentWidget().mapToGlobal(QPoint(0, 0)))   # (placed on show)
 
     def showEvent(self, ev):
         super().showEvent(ev)
         btn = self.parentWidget()
-        if btn is not None:   # below the button: down a bit; above it (no room): up
-            below = self.y() >= btn.mapToGlobal(btn.rect().center()).y()
-            self.move(self.x(), self.y() + (GAP if below else -GAP))
+        if btn is None:
+            return
+        at = btn.mapToGlobal(QPoint(0, 0))   # its outer side: the right, or mirrored the left
+        x = at.x() - GAP - self.width() if btn.isRightToLeft() else at.x() + btn.width() + GAP
+        room = btn.screen().availableGeometry()
+        self.move(max(room.left(), min(x, room.right() + 1 - self.width())),
+                  max(room.top(), min(at.y(), room.bottom() + 1 - self.height())))
 
 
 class TabCard(QFrame):
