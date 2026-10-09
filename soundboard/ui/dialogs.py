@@ -39,7 +39,7 @@ class EffectsPanel(QWidget):
     def __init__(self, fx: dict | None, meta: SoundMeta | None = None):
         super().__init__()
         v = QVBoxLayout(self)
-        v.setContentsMargins(0, 0, 8, 0)
+        v.setContentsMargins(0, 14, 8, 0)   # room under the dialog's tab bar
         v.setSpacing(8)
 
         prow = QHBoxLayout()
@@ -200,6 +200,8 @@ class EditDialog(QDialog):
 
         basics = QWidget()
         form = QFormLayout(basics)
+        m = form.contentsMargins()
+        form.setContentsMargins(m.left(), 14, m.right(), m.bottom())   # room under the tabs
         form.setLabelAlignment(Qt.AlignRight)
         self.name = QLineEdit(meta.name)
         form.addRow(_("Name"), self.name)
