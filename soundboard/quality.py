@@ -40,6 +40,9 @@ DOWNLOADS = _Shown(lambda: {
     # YouTube's ~50-70 kbps Opus / 48 kbps AAC: about a third of "best", fine for a pad
     "small": (_("Smaller files"), "bestaudio[abr<=80]/worstaudio/bestaudio/best"),
 })
+# how sounds the app makes itself (a download, a recording) are saved: key -> label
+# (library.stored_ext; files added from the PC are copied as they are)
+SAVE_FORMATS = _Shown(lambda: {"mp3": _("MP3 (smaller)"), "flac": _("FLAC (lossless)")})
 VIDEO_HEIGHTS = (1080, 720, 480, 360)
 # Radio: the highest station bitrate shown (0 = any). Radio Browser lists most
 # stations at 128 kbps; 64 and under are the "mobile" streams.
@@ -56,6 +59,7 @@ def default_video_dir() -> Path:
 @dataclass
 class Prefs:
     download: str = "best"        # a DOWNLOADS key
+    save_format: str = "mp3"      # a SAVE_FORMATS key
     save_video: bool = False      # "Add as sound" also keeps the video (needs ffmpeg)
     video_height: int = 720
     video_dir: str = ""           # "" = default_video_dir()
@@ -97,6 +101,8 @@ def from_raw(raw) -> Prefs:
             setattr(p, f.name, v)
     if p.download not in DOWNLOADS:
         p.download = "best"
+    if p.save_format not in SAVE_FORMATS:
+        p.save_format = "mp3"
     if p.radio_kbps not in RADIO_KBPS:
         p.radio_kbps = 0
     if p.video_height not in VIDEO_HEIGHTS:
@@ -109,11 +115,15 @@ LOW = dict(download="small", save_video=False, radio_kbps=LOW_RADIO_KBPS, patien
 NORMAL = dict(download="best", radio_kbps=0, patient=False, web_extras=True)
 
 current = Prefs()
+# keys of Config.data a newer version wrote, kept so a change here writes them back
+_extra: dict = {}
 
 
 def load(raw) -> Prefs:
-    global current
+    global current, _extra
     current = from_raw(raw)
+    names = {f.name for f in fields(Prefs)}
+    _extra = {k: v for k, v in raw.items() if k not in names} if isinstance(raw, dict) else {}
     return current
 
 
@@ -121,7 +131,7 @@ def change(**kw) -> dict:
     """Change some prefs; returns the dict to save as Config.data."""
     global current
     current = from_raw({**current.to_raw(), **kw})
-    return current.to_raw()
+    return {**_extra, **current.to_raw()}
 
 
 def radio_fits(bitrate: int) -> bool:

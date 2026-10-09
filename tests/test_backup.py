@@ -80,7 +80,7 @@ def test_board_round_trips_into_a_fresh_library(board, tmp_path, app_dir, monkey
     assert a.hotkey == "f1" and a.volume == 1.5 and a.fx["speed"] == 1.5
     assert a.tags == ["Memes"] and b.tags == ["Memes", "Game"] and b.color == "#13ce66"
     for m in res.sounds:
-        assert library.Path(m.file).parent == library.SOUNDS_DIR
+        assert library.Path(m.file).parent == library.SOUNDS_DIR / library.MY_SOUNDS
         assert library.Path(m.file).is_file()
     assert b.image and library.Path(b.image).parent == library.THUMBS_DIR
     # the audio is the same, and plays
@@ -141,7 +141,7 @@ def test_crafted_archive_is_contained(app_dir, tmp_path):
     assert [s.folder for s in pkg.sounds] == ["a"]    # only the well-formed one
     assert pkg.sounds[0].picture == ""
     (m,) = backup.install(pkg, set()).sounds
-    assert library.Path(m.file).parent == library.SOUNDS_DIR
+    assert library.Path(m.file).parent == library.SOUNDS_DIR / library.MY_SOUNDS
     assert m.volume == 2.0 and m.mode == "restart" and m.color.startswith("#")
     assert m.hotkey == ""                                   # wrong type: default
     assert not (tmp_path.parent / "escape.wav").exists()
@@ -290,8 +290,8 @@ def test_writing_more_than_the_archive_declared_stops(app_dir, tmp_path, monkeyp
     monkeypatch.setattr(backup, "_check_room", lambda src, pkg: 1500)   # as if it lied
     res = backup.install(backup.read(zp), set())
     assert len(res.sounds) == 1 and "holds more than it says" in res.failed[0]
-    assert sorted(p.name for p in library.SOUNDS_DIR.glob("*")) == \
-        [library.Path(res.sounds[0].file).name]            # no partial file left
+    assert [p for p in library.SOUNDS_DIR.rglob("*") if p.is_file()] == \
+        [library.Path(res.sounds[0].file)]                 # no partial file left
 
 
 def test_apply_settings_drops_unknown_speech_models_and_languages():

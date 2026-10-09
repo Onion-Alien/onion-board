@@ -514,6 +514,7 @@ class MainWindow(QMainWindow):
             self.tabs.setCurrentWidget(self.setup_page)
             self.tabs.blockSignals(False)
             self.rail.sync()   # (it heard nothing)
+        library.tidy_files(self.cfg)   # files from before library folders move in
         self._rebuild_pads()
         splash.pump()
         self._load_all()
@@ -5239,8 +5240,10 @@ class MainWindow(QMainWindow):
                             continue
                         raise RuntimeError(_("already in your library as “{name}”",
                                              name=known[fp]))
-                    meta, data = import_file(f, PAD_COLORS[(start + i) % len(PAD_COLORS)])
-                    if (x := extras.get(f)) is not None:
+                    x = extras.get(f)   # from another soundboard: named as it was there
+                    meta, data = import_file(f, PAD_COLORS[(start + i) % len(PAD_COLORS)],
+                                             name=x.name if x is not None else "")
+                    if x is not None:
                         meta.name = x.name or meta.name
                         meta.tags = clean_tags(x.tags)
                         if x.hotkey:
