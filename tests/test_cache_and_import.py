@@ -98,22 +98,25 @@ def test_import_copies_plain_audio_and_caches_it(app_dir):
     assert meta.fingerprint == fingerprint(str(src))
 
 
-def test_import_of_ffmpeg_decoded_file_stores_flac_not_the_source(app_dir, monkeypatch):
+def test_import_of_ffmpeg_decoded_file_stores_mp3_not_the_source(app_dir, monkeypatch):
     src = wav(app_dir / "video.wav").rename(app_dir / "video.mp4")   # pretend it's a video
     real = library._decode
     monkeypatch.setattr(library, "_decode", lambda p: (real(p)[0], True))
     meta, _ = import_file(str(src), "#123456")
-    assert meta.file.endswith(".flac")
-    assert sf.info(meta.file).subtype == "PCM_16"
-    assert not any(p.suffix == ".mp4" for p in library.SOUNDS_DIR.iterdir())
+    assert meta.file.endswith(".mp3") and sf.info(meta.file).format == "MP3"
+    assert not any(p.suffix == ".mp4" for p in library.SOUNDS_DIR.rglob("*"))
 
 
-def test_save_clip_writes_flac_and_returns_int16(app_dir):
-    x = (np.random.default_rng(2).standard_normal((SR // 2, 2)) * 0.1).astype(np.float32)
+def test_save_clip_writes_mp3_on_time_and_returns_int16(app_dir):
+    t = np.arange(SR // 2) / SR
+    x = np.stack([0.3 * np.sin(2 * np.pi * 440 * t), 0.2 * np.sin(2 * np.pi * 1000 * t)],
+                 1).astype(np.float32)
     meta, data = save_clip(x, "My clip 12.00.00", "#abcdef")
-    assert meta.file.endswith(".flac") and data.dtype == np.int16
+    assert meta.file.endswith(".mp3") and data.dtype == np.int16
     back, rate = sf.read(meta.file, dtype="float32")
-    assert rate == SR and np.max(np.abs(back - x)) < 1 / 32767 * 2
+    # the same length, no gap at the start (a pad's hit stays on time), close to it
+    assert rate == SR and back.shape == x.shape
+    assert np.sqrt(np.mean((back - x) ** 2)) < 0.01
 
 
 def test_delete_removes_library_file_and_cache(app_dir):

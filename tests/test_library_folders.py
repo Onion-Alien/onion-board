@@ -60,7 +60,7 @@ def test_files_and_clips_and_copies_have_their_folders(app_dir, tmp_path):
     assert m.file == str(library.SOUNDS_DIR / "My sounds" / "air horn.wav")
     clip, _ = library.save_clip(np.zeros((SR // 10, 2), np.float32), "Replay 12.30.00",
                                 "#123456")
-    assert clip.file == str(library.SOUNDS_DIR / "Recordings" / "Replay 12.30.00.flac")
+    assert clip.file == str(library.SOUNDS_DIR / "Recordings" / "Replay 12.30.00.mp3")
     yt, _ = library.import_file(str(_wav(tmp_path / "id.wav")), "#1", name="Song",
                                 folder="YouTube")
     copy = library.duplicate(yt, "Song copy")

@@ -1458,31 +1458,56 @@ def discard(p: Path) -> None:
             pass
 
 
+# Audio the library makes itself (a download, a recording) is kept as Settings > Data
+# & quality says (quality.SAVE_FORMATS). MP3 by default: it plays in anything, and is
+# ~a quarter of a FLAC that holds no more than the compressed download did. ~V2 VBR
+# (~190 kbps on music). libsndfile's MP3 starts on time and keeps the length (no
+# encoder gap before a pad's hit). FLAC where it can't write MP3 (an old system
+# libsndfile). Only the saved file: a sound plays from its cache, made at import from
+# the audio as it came.
+_CAN_MP3 = "MP3" in sf.available_formats()
+MP3_QUALITY = 0.2   # libsndfile's compression_level: 0 best .. 1 smallest
+
+
+def stored_ext() -> str:
+    from soundboard import quality
+    return ".mp3" if quality.current.save_format == "mp3" and _CAN_MP3 else ".flac"
+
+
+def write_stored(dest: Path, data: np.ndarray) -> None:
+    """Write library audio ((n, 2) at SR) to `dest`, as its extension says."""
+    if dest.suffix.lower() == ".mp3":
+        sf.write(dest, data, SR, format="MP3", compression_level=MP3_QUALITY)
+    else:
+        sf.write(dest, data, SR, subtype="PCM_16")
+
+
 def import_file(src: str, color: str, name: str = "",
                 folder: str = MY_SOUNDS) -> tuple[SoundMeta, np.ndarray]:
     """Decode, bring into the library folder, and return metadata + int16 audio.
     The copy is SOUNDS_DIR/`folder`/`name`.ext (`name`: the sound's name, else the
     file's own; a download passes its title, its temp file is named by video id).
 
-    Plain audio files are copied as they are. Anything that needed ffmpeg (video,
-    m4a, aac, wma) is stored as a FLAC of its *audio* instead: a 300 MB video used
-    to be copied whole, and the library stays playable if ffmpeg goes away. So is a
-    file libsndfile reads under a name outside AUDIO_EXTS (.au, .caf, .w64…): only
-    those come back in from a backup (soundboard.backup)."""
+    Plain audio files are copied as they are. Anything that needed ffmpeg (a
+    download, video, m4a, aac, wma) is stored as an MP3 of its *audio* instead
+    (stored_ext()): a 300 MB video used to be copied whole, and the library stays
+    playable if ffmpeg goes away. So is a file libsndfile reads under a name outside
+    AUDIO_EXTS (.au, .caf, .w64…): only those come back in from a backup
+    (soundboard.backup)."""
     data, via_ffmpeg = _decode(src)
     if not len(data):
         raise ValueError(_("this file has no audio in it"))
     sid = uuid.uuid4().hex[:10]
     srcp = Path(src)
-    as_flac = via_ffmpeg or srcp.suffix.lower() not in AUDIO_EXTS
+    convert = via_ffmpeg or srcp.suffix.lower() not in AUDIO_EXTS
     name = name.strip() or srcp.stem.replace("_", " ").strip()
     # Never fall back to using `src` in place: a download's temp folder is deleted
     # right after this. A failed copy leaves nothing behind and says what to do.
     dest = None
     try:
-        dest = new_file(name, ".flac" if as_flac else srcp.suffix, folder)
-        if as_flac:
-            sf.write(dest, data, SR, subtype="PCM_16")
+        dest = new_file(name, stored_ext() if convert else srcp.suffix, folder)
+        if convert:
+            write_stored(dest, data)
         else:
             shutil.copy2(srcp, dest)
         meta = SoundMeta(id=sid, added=time.time(), name=name[:40].strip() or "Sound",
@@ -1500,11 +1525,12 @@ def import_file(src: str, color: str, name: str = "",
 
 
 def save_clip(data: np.ndarray, name: str, color: str) -> tuple[SoundMeta, np.ndarray]:
-    """Store recorded audio ((n, 2) float32 at SR) as a FLAC; return metadata + int16 audio."""
+    """Store recorded audio ((n, 2) float32 at SR) as stored_ext() says; return
+    metadata + int16 audio."""
     sid = uuid.uuid4().hex[:10]
-    dest = new_file(name, ".flac", RECORDINGS)
+    dest = new_file(name, stored_ext(), RECORDINGS)
     try:
-        sf.write(dest, data, SR, subtype="PCM_16")
+        write_stored(dest, data)
     except BaseException:
         discard(dest)
         raise
