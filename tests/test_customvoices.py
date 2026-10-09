@@ -182,16 +182,21 @@ def test_voice_tab_lists_custom_voices_and_bad_files(vdir, qapp, monkeypatch):
 
 
 def test_custom_voices_are_found_from_the_voice_list_and_from_settings(window):  # noqa: F811
-    """Add voices… beside the Voice list, and Settings → Audio's card, both lead to
-    the Custom voices box (hidden until asked for, so More options stays short)."""
+    """Custom voices are their own card on the Voice tab, under Speak another language.
+    Add voices… beside the Voice list, and Settings → Audio's card, both open it (even
+    when it was folded away)."""
     from PySide6.QtWidgets import QPushButton
     from soundboard.settings import SettingsDialog
     w = window
     s = w.voice.speech
+    head = w.voice._heads["custom"]
+    assert head.is_open() and not s.custom_box.isHidden()
+    assert not s.isAncestorOf(s.custom_box)          # its own card, not inside Speak
+    head.arrow.toggle()                              # folded away
     assert s.custom_box.isHidden()
     s.b_add_voices.click()
-    assert not s.custom_box.isHidden() and not s.btn_opts.isChecked()
-    s.custom_box.hide()
+    assert not s.custom_box.isHidden() and not s.btn_opts.isChecked() and head.is_open()
+    head.arrow.toggle()
     dlg = SettingsDialog(w, "audio")
     try:
         buttons = {b.text(): b for b in dlg.findChildren(QPushButton)}

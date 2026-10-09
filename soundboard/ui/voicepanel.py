@@ -1424,6 +1424,7 @@ class SpeechPanel(QWidget):
     downloaded = Signal()           # a translation was downloaded or removed
     live_changed = Signal(bool)     # "talk as a computer voice" started / stopped
     lang_changed = Signal()         # Speak in: another language picked (VoicePanel)
+    custom_wanted = Signal()        # Add voices…: VoicePanel unfolds the Custom voices card
     clip_ready = Signal(object, str)   # Save as sound: the line's audio, its name
     _line_saved = Signal(object, str, str)   # its worker: audio (or None), name, error
 
@@ -1697,20 +1698,13 @@ class SpeechPanel(QWidget):
         v.addWidget(self.opts)
         self.opts.hide()
         # ---- custom voices: a TTS server on this PC, a TTS program, Piper voice packs.
-        # Their own box, opened by "Add voices…" (it made More options a long list)
+        # Their own card under this one (VoicePanel puts it there), so they're easy to
+        # find; "Add voices…" opens it and scrolls to it
         self.custom_box = QWidget()
         ov = QVBoxLayout(self.custom_box)
         ov.setContentsMargins(0, 0, 0, 0)
         ov.setSpacing(8)
-        chead = QHBoxLayout()
-        self.custom_head = section_label(_("CUSTOM VOICES"))
-        chead.addWidget(self.custom_head)
-        chead.addStretch(1)
-        b_close = QPushButton(_("Close"))
-        b_close.setObjectName("small")
-        b_close.clicked.connect(lambda: self.custom_box.hide())
-        chead.addWidget(b_close)
-        ov.addLayout(chead)
+        self.custom_box.title = section_label(_("CUSTOM VOICES"))   # the card's head
         ov.addWidget(hint_label(_("Use a TTS server running on your PC (Kokoro, AllTalk, any "
                                   "OpenAI-style one) or drop voice packs (Piper) into the "
                                   "voices folder. They join the Voice list above.")))
@@ -1730,8 +1724,6 @@ class SpeechPanel(QWidget):
         self.lbl_custom.setTextFormat(Qt.PlainText)    # shows file names and errors
         self.lbl_custom.hide()
         ov.addWidget(self.lbl_custom)
-        v.addWidget(self.custom_box)
-        self.custom_box.hide()
         self.btn_opts.toggled.connect(lambda on: (
             self.opts.setVisible(on),
             icons.set_icon(self.btn_opts, "fold_open" if on else "fold", "muted", "text",
@@ -1928,13 +1920,14 @@ class SpeechPanel(QWidget):
                               error=errors.plain(error)))
 
     def show_custom_voices(self):
-        """Open the Custom voices box and bring it into view."""
-        self.custom_box.show()
-        w = self.parentWidget()
+        """Open the Custom voices card (VoicePanel unfolds it) and bring it into view."""
+        self.custom_wanted.emit()
+        w = self.custom_box.parentWidget()
         while w is not None and not isinstance(w, QScrollArea):
             w = w.parentWidget()
         if w is not None:
-            QTimer.singleShot(0, self, lambda a=w: a.ensureWidgetVisible(self.custom_head, 0, 40))
+            QTimer.singleShot(0, self, lambda a=w: a.ensureWidgetVisible(
+                self.custom_box.parentWidget() or self.custom_box, 0, 40))
 
     def _add_voice_server(self):
         """A small form for a TTS server's address; saved as a .json in the voices folder."""
@@ -2776,6 +2769,9 @@ class VoicePanel(QWidget):
         self.speech.live_changed.connect(self._speech_live)
         self.speech.lang_changed.connect(self._emit_active)
         self._bottom.addWidget(self._fold_card("speak", self.speech))
+        self._bottom.addWidget(self._fold_card("custom", self.speech.custom_box))
+        self.speech.custom_wanted.connect(
+            lambda: self._heads["custom"].is_open() or self._heads["custom"].arrow.toggle())
         self.addons = ModulesList()
         self.addons.refresh.connect(self._rescan_in_background)
         self._scanned.connect(self._apply_scan)
