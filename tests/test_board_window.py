@@ -232,7 +232,14 @@ def test_the_tray_menu_offers_the_discord_and_feedback(window, monkeypatch):
         assert texts[-3:] == ["Join the Discord", "Send feedback", "Quit"]
         next(a for a in acts if a.text() == "Join the Discord").trigger()
         next(a for a in acts if a.text() == "Send feedback").trigger()
-        assert opened == [feedback.DISCORD_URL, feedback.feedback_url(__version__)]
+        # Send feedback asks "What would you improve?" first; its form opens from there
+        box = window.feedback_box
+        assert box.isVisible() and opened == [feedback.DISCORD_URL]
+        box.boxes["sounds"].setChecked(True)
+        box.send()
+        box.form_btn.click()
+        assert opened == [feedback.DISCORD_URL,
+                          feedback.feedback_url(__version__, improve=["sounds"])]
     finally:
         window.tray.hide()
         window.tray = old
