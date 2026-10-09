@@ -1068,7 +1068,7 @@
   "On the left, click <b>Voice</b>.": "在左邊按<b>語音</b>。",
   "On, at {host}:{port}. Pick a link to copy.": "已開啟，位於 {host}:{port}。選一個連結來複製。",
   "On: listening on {host}:{port}.": "已開啟：在 {host}:{port} 上收聽。",
-  "Once a day, sends an anonymous count to goatcounter.com: the version, tabs opened, crash counts and a random ID that follows how the app is used over time. Only used to fix errors and see which features need work. Never your name, sounds or settings. Switching it off sends one last anonymous count (no ID), then nothing.": "每天一次向 goatcounter.com 傳送匿名計數：版本、開啟過的分頁、當機次數，以及一個隨機 ID，用來了解程式隨時間的使用情況。只用於修正錯誤和找出哪些功能需要改進。絕不傳送你的名稱、音效或設定。關閉時會傳送最後一次匿名計數（不含 ID），之後不再傳送任何東西。",
+  "Once a day: the version, which features you use and crash counts, with a random ID so we can see what to improve. We never get your name, IP address or device info. Off: one last count with no ID, then nothing.": "每天一次：版本、你用了哪些功能以及當機次數，附帶一個隨機 ID，讓我們知道該改進什麼。我們絕不會取得你的名字、IP 位址或裝置資訊。關閉：送出最後一次不含 ID 的計數，之後不再傳送任何內容。",
   "One is saved every time you reset something (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "每次重設東西時都會儲存一個（保留最近 {max_points} 個）。還原會把你的設定、快速鍵和音效恢復成當時的樣子。之後加入的音效會保留。",
   "One key can play a different sound in each category: switch category (its tab, or the keys above) and the same keys play that category's sounds. Sounds in no category always keep their keys.": "一個按鍵可以在每個分類播放不同的音效：切換分類（它的分頁，或上面的按鍵），同樣的按鍵就會播放那個分類的音效。不屬於任何分類的音效永遠保留它們的按鍵。",
   "One row per connection: what you did that made it, route, result, bytes, and the requests the app could read": "每個連線一列：是你做了什麼產生的、路線、結果、位元組，以及程式能讀到的請求",
@@ -2799,5 +2799,7 @@
   "by {name}": "透過{name}",
   "{language} needs a one-time download of its translation model ({size} MB). Offline mode is on, so it can't be downloaded now.": "{language}需要一次下載其翻譯模型 ( {size} MB)。離線模式已開啟，因此現在無法下載。",
   "{n} MB": "{n} MB",
-  "⚠ Windows has no {language} voice yet, so {language} can't be spoken properly. Offline mode is on, so it can't be installed now.": "⚠ Windows 還沒有{language}語音，因此無法正常說出{language} 。離線模式已開啟，因此現在無法安裝。"
+  "⚠ Windows has no {language} voice yet, so {language} can't be spoken properly. Offline mode is on, so it can't be installed now.": "⚠ Windows 還沒有{language}語音，因此無法正常說出{language} 。離線模式已開啟，因此現在無法安裝。",
+  "Everything it sends": "傳送的所有內容",
+  "GoatCounter's privacy policy": "GoatCounter 隱私權政策"
 }

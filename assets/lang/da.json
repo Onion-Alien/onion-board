@@ -738,7 +738,7 @@
   "On the left, click <b>Voice</b>.": "Klik på <b>Stemme</b> til venstre.",
   "On, at {host}:{port}. Pick a link to copy.": "Til, på {host}:{port}. Vælg et link at kopiere.",
   "On: listening on {host}:{port}.": "Til: lytter på {host}:{port}.",
-  "Once a day, sends an anonymous count to goatcounter.com: the version, tabs opened, crash counts and a random ID that follows how the app is used over time. Only used to fix errors and see which features need work. Never your name, sounds or settings. Switching it off sends one last anonymous count (no ID), then nothing.": "Én gang om dagen sendes en anonym optælling til goatcounter.com: versionen, åbnede faner, antal nedbrud og et tilfældigt ID, der følger, hvordan appen bruges over tid. Bruges kun til at rette fejl og se, hvilke funktioner der skal forbedres. Aldrig dit navn, dine lyde eller indstillinger. Slår du det fra, sendes én sidste anonym optælling (uden ID), derefter intet.",
+  "Once a day: the version, which features you use and crash counts, with a random ID so we can see what to improve. We never get your name, IP address or device info. Off: one last count with no ID, then nothing.": "Én gang om dagen: versionen, hvilke funktioner du bruger og antal nedbrud, med et tilfældigt ID, så vi kan se, hvad der skal forbedres. Vi får aldrig dit navn, din IP-adresse eller info om din enhed. Fra: én sidste optælling uden ID, derefter intet.",
   "One click": "Ét klik",
   "One click needed: repair your mic": "Ét klik nødvendigt: reparér din mikrofon",
   "One click: put your sounds straight into your mic": "Ét klik: læg dine lyde direkte i din mikrofon",
@@ -2859,5 +2859,7 @@
   "by {name}": "af {name}",
   "{language} needs a one-time download of its translation model ({size} MB). Offline mode is on, so it can't be downloaded now.": "{language} har brug for en engangsdownload af sin oversættelsesmodel ( {size} MB). Offlinetilstand er aktiveret, så den kan ikke downloades nu.",
   "{n} MB": "{n} MB",
-  "⚠ Windows has no {language} voice yet, so {language} can't be spoken properly. Offline mode is on, so it can't be installed now.": "⚠ Windows har endnu ingen {language} -stemme, så {language} kan ikke læses korrekt. Offlinetilstand er aktiveret, så den kan ikke installeres nu."
+  "⚠ Windows has no {language} voice yet, so {language} can't be spoken properly. Offline mode is on, so it can't be installed now.": "⚠ Windows har endnu ingen {language} -stemme, så {language} kan ikke læses korrekt. Offlinetilstand er aktiveret, så den kan ikke installeres nu.",
+  "Everything it sends": "Alt, hvad den sender",
+  "GoatCounter's privacy policy": "GoatCounters privatlivspolitik"
 }

@@ -1110,7 +1110,7 @@
   "On the left, click <b>Voice</b>.": "Слева нажми <b>Голос</b>.",
   "On, at {host}:{port}. Pick a link to copy.": "Включено, на {host}:{port}. Выбери ссылку, чтобы скопировать.",
   "On: listening on {host}:{port}.": "Вкл.: слушаю на {host}:{port}.",
-  "Once a day, sends an anonymous count to goatcounter.com: the version, tabs opened, crash counts and a random ID that follows how the app is used over time. Only used to fix errors and see which features need work. Never your name, sounds or settings. Switching it off sends one last anonymous count (no ID), then nothing.": "Раз в день отправляет анонимный счёт на goatcounter.com: версию, открытые вкладки, число сбоев и случайный ID, по которому видно, как приложением пользуются со временем. Нужно только чтобы исправлять ошибки и понимать, какие функции надо доработать. Никогда не твоё имя, звуки или настройки. При выключении уходит последний анонимный счёт (без ID), потом ничего.",
+  "Once a day: the version, which features you use and crash counts, with a random ID so we can see what to improve. We never get your name, IP address or device info. Off: one last count with no ID, then nothing.": "Раз в день: версия, какими функциями ты пользуешься и число сбоев, со случайным ID, чтобы понять, что улучшить. Мы никогда не получаем твоё имя, IP-адрес или данные устройства. Выключено: один последний подсчёт без ID, потом ничего.",
   "One is saved every time you reset something (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "Она сохраняется при каждом сбросе (хранятся последние {max_points}). Восстановление возвращает настройки, горячие клавиши и звуки как были. Звуки, добавленные после, остаются.",
   "One key can play a different sound in each category: switch category (its tab, or the keys above) and the same keys play that category's sounds. Sounds in no category always keep their keys.": "Одна клавиша может играть разный звук в каждой категории: переключи категорию (её вкладкой или клавишами выше), и те же клавиши играют звуки этой категории. Звуки без категории всегда сохраняют свои клавиши.",
   "One row per connection: what you did that made it, route, result, bytes, and the requests the app could read": "По строке на соединение: что ты сделал, чтобы оно появилось, маршрут, результат, байты и запросы, которые приложение смогло прочитать",
@@ -2920,5 +2920,7 @@
   "by {name}": "по {name}",
   "{language} needs a one-time download of its translation model ({size} MB). Offline mode is on, so it can't be downloaded now.": "Для {language} требуется единоразовая загрузка модели перевода ( {size} МБ). Офлайн-режим включен, поэтому загрузить его сейчас невозможно.",
   "{n} MB": "{n} МБ",
-  "⚠ Windows has no {language} voice yet, so {language} can't be spoken properly. Offline mode is on, so it can't be installed now.": "⚠ В Windows пока нет голоса {language} , поэтому на {language} невозможно произнести правильно. Оффлайн-режим включен, поэтому сейчас его невозможно установить."
+  "⚠ Windows has no {language} voice yet, so {language} can't be spoken properly. Offline mode is on, so it can't be installed now.": "⚠ В Windows пока нет голоса {language} , поэтому на {language} невозможно произнести правильно. Оффлайн-режим включен, поэтому сейчас его невозможно установить.",
+  "Everything it sends": "Всё, что отправляется",
+  "GoatCounter's privacy policy": "Политика конфиденциальности GoatCounter"
 }

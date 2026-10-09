@@ -1089,7 +1089,7 @@
   "On the left, click <b>Voice</b>.": "À esquerda, clique em <b>Voz</b>.",
   "On, at {host}:{port}. Pick a link to copy.": "Ligado, em {host}:{port}. Escolha um link para copiar.",
   "On: listening on {host}:{port}.": "Ligado: ouvindo em {host}:{port}.",
-  "Once a day, sends an anonymous count to goatcounter.com: the version, tabs opened, crash counts and a random ID that follows how the app is used over time. Only used to fix errors and see which features need work. Never your name, sounds or settings. Switching it off sends one last anonymous count (no ID), then nothing.": "Uma vez por dia, manda uma contagem anônima para o goatcounter.com: a versão, as abas abertas, quantos travamentos houve e um ID aleatório que acompanha como o app é usado ao longo do tempo. Só serve para corrigir erros e ver quais recursos precisam melhorar. Nunca seu nome, seus sons ou suas configurações. Ao desligar, vai uma última contagem anônima (sem ID) e depois nada.",
+  "Once a day: the version, which features you use and crash counts, with a random ID so we can see what to improve. We never get your name, IP address or device info. Off: one last count with no ID, then nothing.": "Uma vez por dia: a versão, quais recursos você usa e o número de travamentos, com um ID aleatório para sabermos o que melhorar. Nunca recebemos seu nome, endereço IP ou dados do dispositivo. Desligado: uma última contagem sem ID, depois nada.",
   "One is saved every time you reset something (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "Um é salvo toda vez que você redefine algo (os últimos {max_points} ficam guardados). Restaurar devolve suas configurações, atalhos e sons como estavam. Sons que você adicionou depois são mantidos.",
   "One key can play a different sound in each category: switch category (its tab, or the keys above) and the same keys play that category's sounds. Sounds in no category always keep their keys.": "Uma tecla pode tocar um som diferente em cada categoria: troque de categoria (pela aba dela, ou pelas teclas acima) e as mesmas teclas tocam os sons dessa categoria. Sons sem categoria sempre mantêm suas teclas.",
   "One row per connection: what you did that made it, route, result, bytes, and the requests the app could read": "Uma linha por conexão: o que você fez que a criou, rota, resultado, bytes, e as requisições que o app conseguiu ler",
@@ -2859,5 +2859,7 @@
   "by {name}": "por {name}",
   "{language} needs a one-time download of its translation model ({size} MB). Offline mode is on, so it can't be downloaded now.": "{language} precisa de um download único do modelo de tradução ( {size} MB). O modo offline está ativado, por isso não pode ser baixado agora.",
   "{n} MB": "{n} MB",
-  "⚠ Windows has no {language} voice yet, so {language} can't be spoken properly. Offline mode is on, so it can't be installed now.": "⚠ O Windows ainda não tem voz em {language} , então {language} não pode ser falado corretamente. O modo offline está ativado, portanto não pode ser instalado agora."
+  "⚠ Windows has no {language} voice yet, so {language} can't be spoken properly. Offline mode is on, so it can't be installed now.": "⚠ O Windows ainda não tem voz em {language} , então {language} não pode ser falado corretamente. O modo offline está ativado, portanto não pode ser instalado agora.",
+  "Everything it sends": "Tudo o que é enviado",
+  "GoatCounter's privacy policy": "Política de privacidade do GoatCounter"
 }

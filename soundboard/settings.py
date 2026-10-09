@@ -2267,8 +2267,14 @@ class SettingsDialog(QDialog):
         h.setObjectName("hint")
         h.setWordWrap(True)
         h.setContentsMargins(26, 0, 0, 4)   # under the box's text, not its tick
+        h.linkActivated.connect(lambda url: busy.open_url(url, window=self))
         cv.addWidget(h)
         return box
+
+    # Count me in's links: the full list of what it sends, and the counter's own policy
+    PRIVACY_URL = ("https://github.com/Onion-Alien/onion-board/blob/main/SECURITY.md"
+                   "#what-the-app-does-on-the-network")
+    GOATCOUNTER_PRIVACY = "https://www.goatcounter.com/help/privacy"
 
     # what each switch contacts, and when (soundboard.net.FEATURES)
     NET_HINTS = {
@@ -2298,13 +2304,19 @@ class SettingsDialog(QDialog):
         "tor_download": _("Get Tor / Update Tor (Connection page) downloads Tor from the "
                           "Tor Project (dist.torproject.org). Off: a Tor that's already "
                           "here still works."),
-        "usage_stats": _("Once a day, sends an anonymous count to goatcounter.com: the "
-                         "version, tabs opened, crash counts and a random ID that follows "
-                         "how the app is used over time. Only used to fix errors and see "
-                         "which features need work. Never your name, sounds or settings. "
-                         "Switching it off sends one last anonymous count (no ID), then "
-                         "nothing."),
+        "usage_stats": _("Once a day: the version, which features you use and crash "
+                         "counts, with a random ID so we can see what to improve. We never "
+                         "get your name, IP address or device info. Off: one last count "
+                         "with no ID, then nothing."),
     }
+
+    def _count_links(self) -> str:
+        """Count me in's two links, in the theme's accent (Qt's default blue is unreadable
+        on the dark themes)."""
+        style = f'style="color: {theme.T["accent"]};"'
+        full, policy = _("Everything it sends"), _("GoatCounter's privacy policy")
+        return (f' <a href="{self.PRIVACY_URL}" {style}>{full}</a> · '
+                f'<a href="{self.GOATCOUNTER_PRIVACY}" {style}>{policy}</a>')
 
     def _switches_card(self):
         """Every feature that goes online, each with its own switch (soundboard.net
@@ -2350,7 +2362,8 @@ class SettingsDialog(QDialog):
             section, sv = self._card(title)
             for key in keys:
                 self.net_boxes[key] = self._option(
-                    sv, labels.get(key) or net.feature_name(key), self.NET_HINTS[key],
+                    sv, labels.get(key) or net.feature_name(key),
+                    self.NET_HINTS[key] + (self._count_links() if key == "usage_stats" else ""),
                     key not in cfg.net_off, lambda on, k=key: self._set_feature(k, on))
                 sub = QWidget()
                 sl = QVBoxLayout(sub)

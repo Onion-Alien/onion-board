@@ -1070,7 +1070,7 @@
   "On the left, click <b>Voice</b>.": "Ở bên trái, nhấp vào <b>Giọng nói</b> .",
   "On, at {host}:{port}. Pick a link to copy.": "Bật, tại {host} : {port} . Chọn một liên kết để sao chép.",
   "On: listening on {host}:{port}.": "Bật: đang nghe trên {host} : {port} .",
-  "Once a day, sends an anonymous count to goatcounter.com: the version, tabs opened, crash counts and a random ID that follows how the app is used over time. Only used to fix errors and see which features need work. Never your name, sounds or settings. Switching it off sends one last anonymous count (no ID), then nothing.": "Mỗi ngày một lần, gửi một lượt đếm ẩn danh tới goatcounter.com: phiên bản, các tab đã mở, số lần lỗi và một ID ngẫu nhiên theo dõi cách ứng dụng được dùng theo thời gian. Chỉ dùng để sửa lỗi và xem tính năng nào cần cải thiện. Không bao giờ gửi tên, âm thanh hay cài đặt của bạn. Khi tắt sẽ gửi một lượt đếm ẩn danh cuối cùng (không có ID), rồi không gửi gì nữa.",
+  "Once a day: the version, which features you use and crash counts, with a random ID so we can see what to improve. We never get your name, IP address or device info. Off: one last count with no ID, then nothing.": "Mỗi ngày một lần: phiên bản, những tính năng bạn dùng và số lần lỗi, kèm một ID ngẫu nhiên để chúng tôi biết cần cải thiện gì. Chúng tôi không bao giờ nhận tên, địa chỉ IP hay thông tin thiết bị của bạn. Tắt: một lần đếm cuối không có ID, rồi không gửi gì nữa.",
   "One is saved every time you reset something (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "Một điểm sẽ được lưu mỗi khi bạn đặt lại thứ gì đó ({max_points} cuối cùng được giữ lại). Việc khôi phục sẽ đưa các cài đặt, phím nóng và âm thanh của bạn trở lại như cũ. Âm thanh bạn đã thêm vào sẽ được giữ lại.",
   "One key can play a different sound in each category: switch category (its tab, or the keys above) and the same keys play that category's sounds. Sounds in no category always keep their keys.": "Một phím có thể phát âm thanh khác nhau trong mỗi danh mục: chuyển đổi danh mục (tab của nó hoặc các phím ở trên) và các phím giống nhau sẽ phát âm thanh của danh mục đó. Âm thanh không thuộc danh mục nào luôn giữ chìa khóa của chúng.",
   "One row per connection: what you did that made it, route, result, bytes, and the requests the app could read": "Một hàng cho mỗi kết nối: những gì bạn đã làm để tạo ra kết nối đó, định tuyến, kết quả, byte và các yêu cầu mà ứng dụng có thể đọc",
@@ -2799,5 +2799,7 @@
   "by {name}": "bởi {name}",
   "{language} needs a one-time download of its translation model ({size} MB). Offline mode is on, so it can't be downloaded now.": "{language} cần tải xuống một lần mô hình dịch của nó ( {size} MB). Chế độ ngoại tuyến đang bật nên không thể tải xuống ngay bây giờ.",
   "{n} MB": "{n} MB",
-  "⚠ Windows has no {language} voice yet, so {language} can't be spoken properly. Offline mode is on, so it can't be installed now.": "⚠ Windows chưa có giọng nói {language} nên không thể nói chính xác {language} . Chế độ ngoại tuyến đang bật nên không thể cài đặt ngay bây giờ."
+  "⚠ Windows has no {language} voice yet, so {language} can't be spoken properly. Offline mode is on, so it can't be installed now.": "⚠ Windows chưa có giọng nói {language} nên không thể nói chính xác {language} . Chế độ ngoại tuyến đang bật nên không thể cài đặt ngay bây giờ.",
+  "Everything it sends": "Mọi thứ được gửi đi",
+  "GoatCounter's privacy policy": "Chính sách quyền riêng tư của GoatCounter"
 }

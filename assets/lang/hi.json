@@ -1091,7 +1091,7 @@
   "On the left, click <b>Voice</b>.": "बाईं ओर, <b>वॉयस</b> पर क्लिक करें।",
   "On, at {host}:{port}. Pick a link to copy.": "चालू, {host} पर: {port} । कॉपी करने के लिए एक लिंक चुनें.",
   "On: listening on {host}:{port}.": "चालू: {host} : {port} पर सुन रहा हूँ।",
-  "Once a day, sends an anonymous count to goatcounter.com: the version, tabs opened, crash counts and a random ID that follows how the app is used over time. Only used to fix errors and see which features need work. Never your name, sounds or settings. Switching it off sends one last anonymous count (no ID), then nothing.": "दिन में एक बार goatcounter.com पर एक गुमनाम गिनती भेजता है: वर्शन, खोले गए टैब, क्रैश की संख्या और एक रैंडम आईडी जो दिखाती है कि समय के साथ ऐप कैसे इस्तेमाल होता है। सिर्फ़ गड़बड़ियाँ ठीक करने और यह देखने के लिए कि किन फ़ीचर्स पर काम चाहिए। आपका नाम, साउंड या सेटिंग्स कभी नहीं। बंद करने पर एक आख़िरी गुमनाम गिनती (बिना आईडी) जाती है, फिर कुछ नहीं।",
+  "Once a day: the version, which features you use and crash counts, with a random ID so we can see what to improve. We never get your name, IP address or device info. Off: one last count with no ID, then nothing.": "दिन में एक बार: वर्शन, आप कौन-से फ़ीचर इस्तेमाल करते हैं और क्रैश की गिनती, एक रैंडम ID के साथ ताकि हम देख सकें कि क्या बेहतर करना है। हमें आपका नाम, IP पता या डिवाइस की जानकारी कभी नहीं मिलती। बंद: बिना ID के एक आख़िरी गिनती, फिर कुछ नहीं।",
   "One is saved every time you reset something (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "हर बार जब आप कुछ रीसेट करते हैं तो एक सहेजा जाता है (अंतिम {max_points} रखे जाते हैं)। पुनर्स्थापित करने से आपकी सेटिंग्स, हॉटकीज़ और ध्वनियाँ वैसी ही वापस आ जाती हैं जैसी वे थीं। आपके द्वारा जोड़ी गई ध्वनियाँ रखी गई हैं।",
   "One key can play a different sound in each category: switch category (its tab, or the keys above) and the same keys play that category's sounds. Sounds in no category always keep their keys.": "एक कुंजी प्रत्येक श्रेणी में एक अलग ध्वनि बजा सकती है: श्रेणी स्विच करें (उसका टैब, या ऊपर की कुंजियाँ) और वही कुंजियाँ उस श्रेणी की ध्वनियाँ बजाती हैं। किसी भी श्रेणी की ध्वनियाँ हमेशा अपनी कुंजी नहीं रखतीं।",
   "One row per connection: what you did that made it, route, result, bytes, and the requests the app could read": "प्रति कनेक्शन एक पंक्ति: आपने क्या किया जिससे यह बना, रूट, परिणाम, बाइट्स और वे अनुरोध जिन्हें ऐप पढ़ सकता है",
@@ -2859,5 +2859,7 @@
   "by {name}": "{name} द्वारा",
   "{language} needs a one-time download of its translation model ({size} MB). Offline mode is on, so it can't be downloaded now.": "{language} को अपने अनुवाद मॉडल ( {size} एमबी) को एक बार डाउनलोड करने की आवश्यकता है। ऑफ़लाइन मोड चालू है, इसलिए इसे अभी डाउनलोड नहीं किया जा सकता.",
   "{n} MB": "{n} एमबी",
-  "⚠ Windows has no {language} voice yet, so {language} can't be spoken properly. Offline mode is on, so it can't be installed now.": "⚠ विंडोज़ में अभी तक कोई {language} आवाज नहीं है, इसलिए {language} ठीक से नहीं बोली जा सकती। ऑफ़लाइन मोड चालू है, इसलिए इसे अभी इंस्टॉल नहीं किया जा सकता."
+  "⚠ Windows has no {language} voice yet, so {language} can't be spoken properly. Offline mode is on, so it can't be installed now.": "⚠ विंडोज़ में अभी तक कोई {language} आवाज नहीं है, इसलिए {language} ठीक से नहीं बोली जा सकती। ऑफ़लाइन मोड चालू है, इसलिए इसे अभी इंस्टॉल नहीं किया जा सकता.",
+  "Everything it sends": "यह जो कुछ भेजता है",
+  "GoatCounter's privacy policy": "GoatCounter की प्राइवेसी पॉलिसी"
 }

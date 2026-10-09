@@ -738,7 +738,7 @@
   "On the left, click <b>Voice</b>.": "Bal oldalt kattints erre: <b>Voice</b>.",
   "On, at {host}:{port}. Pick a link to copy.": "Be, itt: {host}:{port}. Válassz egy linket a másoláshoz.",
   "On: listening on {host}:{port}.": "Be: figyel itt: {host}:{port}.",
-  "Once a day, sends an anonymous count to goatcounter.com: the version, tabs opened, crash counts and a random ID that follows how the app is used over time. Only used to fix errors and see which features need work. Never your name, sounds or settings. Switching it off sends one last anonymous count (no ID), then nothing.": "Naponta egyszer névtelen számlálást küld a goatcounter.com-nak: a verziót, a megnyitott lapokat, az összeomlások számát és egy véletlen azonosítót, ami mutatja, hogyan használják az appot idővel. Csak hibák javítására és arra, hogy lássuk, mely funkciókon kell dolgozni. Soha nem a neved, a hangjaid vagy a beállításaid. Kikapcsoláskor még egy utolsó névtelen számlálás megy el (azonosító nélkül), utána semmi.",
+  "Once a day: the version, which features you use and crash counts, with a random ID so we can see what to improve. We never get your name, IP address or device info. Off: one last count with no ID, then nothing.": "Naponta egyszer: a verzió, mely funkciókat használod és az összeomlások száma, egy véletlen azonosítóval, hogy lássuk, min javítsunk. Soha nem kapjuk meg a neved, az IP-címed vagy az eszközöd adatait. Kikapcsolva: egy utolsó számlálás azonosító nélkül, aztán semmi.",
   "One click": "Egy kattintás",
   "One click needed: repair your mic": "Egy kattintás kell: javítsd meg a mikrofonodat",
   "One click: put your sounds straight into your mic": "Egy kattintás: tedd a hangjaidat egyenesen a mikrofonodba",
@@ -2859,5 +2859,7 @@
   "by {name}": "{name}",
   "{language} needs a one-time download of its translation model ({size} MB). Offline mode is on, so it can't be downloaded now.": "{language} nyelvnek egyszeri letöltésre van szüksége a fordítási modelljéhez ( {size} MB). Az offline mód be van kapcsolva, ezért most nem lehet letölteni.",
   "{n} MB": "{n} MB",
-  "⚠ Windows has no {language} voice yet, so {language} can't be spoken properly. Offline mode is on, so it can't be installed now.": "⚠ A Windowsnak még nincs {language} hangja, így {language} nyelvet nem lehet megfelelően kimondani. Az offline mód be van kapcsolva, ezért most nem telepíthető."
+  "⚠ Windows has no {language} voice yet, so {language} can't be spoken properly. Offline mode is on, so it can't be installed now.": "⚠ A Windowsnak még nincs {language} hangja, így {language} nyelvet nem lehet megfelelően kimondani. Az offline mód be van kapcsolva, ezért most nem telepíthető.",
+  "Everything it sends": "Minden, amit küld",
+  "GoatCounter's privacy policy": "A GoatCounter adatvédelmi irányelvei"
 }

@@ -1070,7 +1070,7 @@
   "On the left, click <b>Voice</b>.": "左側にある<b>[音声]</b>をクリックします。",
   "On, at {host}:{port}. Pick a link to copy.": "オン、 {host} : {port} 。コピーするリンクを選択します。",
   "On: listening on {host}:{port}.": "オン: {host} : {port}をリッスンします。",
-  "Once a day, sends an anonymous count to goatcounter.com: the version, tabs opened, crash counts and a random ID that follows how the app is used over time. Only used to fix errors and see which features need work. Never your name, sounds or settings. Switching it off sends one last anonymous count (no ID), then nothing.": "1 日に 1 回、goatcounter.com に匿名のカウントを送ります。内容はバージョン、開いたタブ、クラッシュ回数、そしてアプリが時間とともにどう使われているかを追うランダム ID です。エラーの修正と、どの機能を改善すべきかを知るためだけに使います。名前、サウンド、設定は送りません。オフにすると最後に 1 回だけ匿名のカウント (ID なし) を送り、その後は何も送りません。",
+  "Once a day: the version, which features you use and crash counts, with a random ID so we can see what to improve. We never get your name, IP address or device info. Off: one last count with no ID, then nothing.": "1日1回：バージョン、使った機能、クラッシュ回数を、改善点を知るためのランダムなIDと一緒に送ります。名前、IPアドレス、端末の情報は一切受け取りません。オフ：IDなしの最後のカウントを1回送り、その後は何も送りません。",
   "One is saved every time you reset something (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "何かをリセットするたびに 1 つ保存されます (最後の{max_points}が保持されます)。復元すると、設定、ホットキー、サウンドが元の状態に戻ります。それ以降に追加したサウンドは保持されます。",
   "One key can play a different sound in each category: switch category (its tab, or the keys above) and the same keys play that category's sounds. Sounds in no category always keep their keys.": "1 つのキーで各カテゴリの異なるサウンドを再生できます。カテゴリ (そのタブまたは上のキー) を切り替えると、同じキーでそのカテゴリのサウンドが再生されます。どのカテゴリーのサウンドも常にキーを保持します。",
   "One row per connection: what you did that made it, route, result, bytes, and the requests the app could read": "接続ごとに 1 行: 接続を確立するために行った操作、ルート、結果、バイト数、アプリが読み取ることができたリクエスト",
@@ -2799,5 +2799,7 @@
   "by {name}": "{name}著",
   "{language} needs a one-time download of its translation model ({size} MB). Offline mode is on, so it can't be downloaded now.": "{language}では、翻訳モデルを 1 回限りダウンロードする必要があります ( {size} MB)。オフラインモードがオンになっているため、現在ダウンロードできません。",
   "{n} MB": "{n} MB",
-  "⚠ Windows has no {language} voice yet, so {language} can't be spoken properly. Offline mode is on, so it can't be installed now.": "⚠ Windows にはまだ{language}音声がないため、 {language}を適切に話すことができません。オフライン モードがオンになっているため、現在インストールできません。"
+  "⚠ Windows has no {language} voice yet, so {language} can't be spoken properly. Offline mode is on, so it can't be installed now.": "⚠ Windows にはまだ{language}音声がないため、 {language}を適切に話すことができません。オフライン モードがオンになっているため、現在インストールできません。",
+  "Everything it sends": "送信する内容の一覧",
+  "GoatCounter's privacy policy": "GoatCounter のプライバシーポリシー"
 }

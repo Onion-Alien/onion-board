@@ -1091,7 +1091,7 @@
   "On the left, click <b>Voice</b>.": "Solda <b>Ses'i</b> tıklayın.",
   "On, at {host}:{port}. Pick a link to copy.": "Açık, {host} konumunda: {port} . Kopyalanacak bir bağlantı seçin.",
   "On: listening on {host}:{port}.": "Açık: {host} : {port} üzerinde dinleme.",
-  "Once a day, sends an anonymous count to goatcounter.com: the version, tabs opened, crash counts and a random ID that follows how the app is used over time. Only used to fix errors and see which features need work. Never your name, sounds or settings. Switching it off sends one last anonymous count (no ID), then nothing.": "Günde bir kez goatcounter.com'a isimsiz bir sayım gönderir: sürüm, açılan sekmeler, çökme sayısı ve uygulamanın zamanla nasıl kullanıldığını izleyen rastgele bir kimlik. Yalnızca hataları düzeltmek ve hangi özelliklerin geliştirilmesi gerektiğini görmek için kullanılır. Asla adın, seslerin veya ayarların değil. Kapatınca son bir isimsiz sayım (kimliksiz) gider, sonra hiçbir şey.",
+  "Once a day: the version, which features you use and crash counts, with a random ID so we can see what to improve. We never get your name, IP address or device info. Off: one last count with no ID, then nothing.": "Günde bir kez: sürüm, hangi özellikleri kullandığın ve çökme sayısı, neyi iyileştireceğimizi görmek için rastgele bir kimlikle. Adını, IP adresini veya cihaz bilgini asla almayız. Kapalı: kimliksiz son bir sayım, sonra hiçbir şey.",
   "One is saved every time you reset something (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "Bir şeyi her sıfırladığınızda bir tanesi kaydedilir (son {max_points} saklanır). Geri yükleme, ayarlarınızı, kısayol tuşlarınızı ve seslerinizi olduğu gibi geri yükler. O zamandan beri eklediğiniz sesler tutulur.",
   "One key can play a different sound in each category: switch category (its tab, or the keys above) and the same keys play that category's sounds. Sounds in no category always keep their keys.": "Bir tuş her kategoride farklı bir ses çalabilir: kategoriyi değiştirin (kendi sekmesi veya yukarıdaki tuşlar) ve aynı tuşlar o kategorinin seslerini çalar. Hiçbir kategorideki sesler her zaman anahtarlarını saklamaz.",
   "One row per connection: what you did that made it, route, result, bytes, and the requests the app could read": "Bağlantı başına bir satır: bunu yapan şey, rota, sonuç, bayt ve uygulamanın okuyabildiği istekler",
@@ -2859,5 +2859,7 @@
   "by {name}": "{name} tarafından",
   "{language} needs a one-time download of its translation model ({size} MB). Offline mode is on, so it can't be downloaded now.": "{language} çeviri modelinin ( {size} MB) tek seferlik indirilmesine ihtiyaç duyuyor. Çevrimdışı mod açık olduğundan şu anda indirilemez.",
   "{n} MB": "{n} MB",
-  "⚠ Windows has no {language} voice yet, so {language} can't be spoken properly. Offline mode is on, so it can't be installed now.": "⚠ Windows'un henüz {language} sesi yok, dolayısıyla {language} düzgün şekilde konuşulamıyor. Çevrimdışı mod açık olduğundan şu anda yüklenemiyor."
+  "⚠ Windows has no {language} voice yet, so {language} can't be spoken properly. Offline mode is on, so it can't be installed now.": "⚠ Windows'un henüz {language} sesi yok, dolayısıyla {language} düzgün şekilde konuşulamıyor. Çevrimdışı mod açık olduğundan şu anda yüklenemiyor.",
+  "Everything it sends": "Gönderdiği her şey",
+  "GoatCounter's privacy policy": "GoatCounter gizlilik politikası"
 }

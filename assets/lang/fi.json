@@ -738,7 +738,7 @@
   "On the left, click <b>Voice</b>.": "Klikkaa vasemmalta <b>Puhe</b>.",
   "On, at {host}:{port}. Pick a link to copy.": "Päällä, osoitteessa {host}:{port}. Valitse kopioitava linkki.",
   "On: listening on {host}:{port}.": "Päällä: kuuntelee osoitteessa {host}:{port}.",
-  "Once a day, sends an anonymous count to goatcounter.com: the version, tabs opened, crash counts and a random ID that follows how the app is used over time. Only used to fix errors and see which features need work. Never your name, sounds or settings. Switching it off sends one last anonymous count (no ID), then nothing.": "Kerran päivässä lähettää nimettömän laskennan goatcounter.com-palveluun: version, avatut välilehdet, kaatumisten määrän ja satunnaisen tunnisteen, joka näyttää, miten sovellusta käytetään ajan mittaan. Käytetään vain virheiden korjaamiseen ja sen näkemiseen, mitkä ominaisuudet kaipaavat työtä. Ei koskaan nimeäsi, ääniäsi tai asetuksiasi. Pois kytkeminen lähettää yhden viimeisen nimettömän laskennan (ilman tunnistetta), sitten ei mitään.",
+  "Once a day: the version, which features you use and crash counts, with a random ID so we can see what to improve. We never get your name, IP address or device info. Off: one last count with no ID, then nothing.": "Kerran päivässä: versio, mitä ominaisuuksia käytät ja kaatumisten määrä, satunnaisella tunnisteella, jotta näemme mitä parantaa. Emme koskaan saa nimeäsi, IP-osoitettasi tai laitetietojasi. Pois: yksi viimeinen laskenta ilman tunnistetta, sitten ei mitään.",
   "One click": "Yksi klikkaus",
   "One click needed: repair your mic": "Yksi klikkaus tarvitaan: korjaa mikkisi",
   "One click: put your sounds straight into your mic": "Yksi klikkaus: laita äänesi suoraan mikkiisi",
@@ -2859,5 +2859,7 @@
   "by {name}": "tekijä: {name}",
   "{language} needs a one-time download of its translation model ({size} MB). Offline mode is on, so it can't be downloaded now.": "{language} tarvitsee käännösmallinsa kertalatauksen ( {size} Mt). Offline-tila on käytössä, joten sitä ei voi ladata nyt.",
   "{n} MB": "{n} Mt",
-  "⚠ Windows has no {language} voice yet, so {language} can't be spoken properly. Offline mode is on, so it can't be installed now.": "⚠ Windowsilla ei ole vielä ääntä {language} , joten {language} ei voi puhua oikein. Offline-tila on käytössä, joten sitä ei voi asentaa nyt."
+  "⚠ Windows has no {language} voice yet, so {language} can't be spoken properly. Offline mode is on, so it can't be installed now.": "⚠ Windowsilla ei ole vielä ääntä {language} , joten {language} ei voi puhua oikein. Offline-tila on käytössä, joten sitä ei voi asentaa nyt.",
+  "Everything it sends": "Kaikki mitä se lähettää",
+  "GoatCounter's privacy policy": "GoatCounterin tietosuojakäytäntö"
 }
