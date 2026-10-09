@@ -118,6 +118,8 @@ def _stored_path(path: str, folder: Path, absolute: bool) -> str:
     p = Path(path)
     if (p.is_absolute() or not absolute) and p.parent == folder:
         return p.name
+    if absolute and p.is_absolute() and p.is_relative_to(folder):   # a sound in one of
+        return p.relative_to(folder).as_posix()   # its folders: "YouTube/Song.flac"
     return path
 
 
@@ -1372,41 +1374,150 @@ def _safe_name(name: str) -> str:
     return "".join(c if c.isalnum() or c in " -_" else "_" for c in name).strip()[:40] or "clip"
 
 
-def import_file(src: str, color: str) -> tuple[SoundMeta, np.ndarray]:
-    """Decode, bring into the library folder, and return metadata + int16 audio.
+# Where a new sound's file goes, inside SOUNDS_DIR. Plain folders and the sound's own
+# name, so the folder reads like a music library in Explorer (and still does if Onion
+# Board is uninstalled and the sounds are kept). Files from before this were all in
+# SOUNDS_DIR itself as "<id>_<name>": tidy_files() moves them in. English on purpose:
+# a folder on disk mustn't change with the language picked (or the pseudo one).
+RECORDINGS = "Recordings"   # recorded clips, Replay, voice lines saved as sounds
+MY_SOUNDS = "My sounds"     # files added from the PC, other soundboards, old sounds
+DOWNLOADS = "Downloads"     # a link from a site not named in _SITES
+_SITES = {"youtube.com": "YouTube", "youtu.be": "YouTube", "tiktok.com": "TikTok",
+          "soundcloud.com": "SoundCloud", "instagram.com": "Instagram",
+          "twitter.com": "X", "x.com": "X", "reddit.com": "Reddit", "redd.it": "Reddit",
+          "twitch.tv": "Twitch", "facebook.com": "Facebook", "fb.watch": "Facebook",
+          "vimeo.com": "Vimeo", "bandcamp.com": "Bandcamp", "kick.com": "Kick",
+          "dailymotion.com": "Dailymotion", "bilibili.com": "Bilibili",
+          "myinstants.com": "Myinstants", "streamable.com": "Streamable"}
+_RESERVED = {"con", "prn", "aux", "nul", *(f"com{i}" for i in range(1, 10)),
+             *(f"lpt{i}" for i in range(1, 10))}
+_claim_lock = threading.Lock()
 
-    Plain audio files are copied as they are. Anything that needed ffmpeg (video,
-    m4a, aac, wma) is stored as a FLAC of its *audio* instead: a 300 MB video used
-    to be copied whole, and the library stays playable if ffmpeg goes away. So is a
-    file libsndfile reads under a name outside AUDIO_EXTS (.au, .caf, .w64…): only
-    those come back in from a backup (soundboard.backup)."""
+
+def site_folder(url: str) -> str:
+    """The folder a sound downloaded from `url` goes in: the site's name."""
+    from urllib.parse import urlsplit
+    try:
+        host = (urlsplit(url.strip()).hostname or "").lower()
+    except ValueError:
+        host = ""
+    for site, folder in _SITES.items():
+        if host == site or host.endswith("." + site):
+            return folder
+    return DOWNLOADS
+
+
+def file_stem(name: str) -> str:
+    """`name` as a file name Windows takes: no <>:"/|?* (or backslash) or control characters, no
+    trailing dot or space, not a device name (CON, NUL...), not too long."""
+    s = re.sub(r'[<>:"/\\|?*\x00-\x1f]', "_", name)
+    s = " ".join(s.split()).strip(" .")[:80].strip(" .")
+    if s.split(".")[0].lower() in _RESERVED:
+        s = f"_{s}"
+    return s or "Sound"
+
+
+def owns(path: str | Path) -> bool:
+    """A file the library keeps itself: anywhere in SOUNDS_DIR (its own folders too)."""
+    p = Path(path)
+    return p.is_absolute() and p != SOUNDS_DIR and p.is_relative_to(SOUNDS_DIR)
+
+
+def _folder_of(p: Path) -> str:
+    """The library folder a file of ours is in ("YouTube"), "" for SOUNDS_DIR itself
+    or a file from elsewhere."""
+    if not owns(p) or p.parent == SOUNDS_DIR:
+        return ""
+    return p.parent.relative_to(SOUNDS_DIR).as_posix()
+
+
+def new_file(name: str, ext: str, folder: str) -> Path:
+    """A free path for a new sound file named after the sound ("Name (2)" when that's
+    taken), made empty at once so two sounds saved together never get the same one."""
+    where = SOUNDS_DIR / folder
+    where.mkdir(parents=True, exist_ok=True)
+    stem, ext = file_stem(name), ext.lower()
+    with _claim_lock:
+        for n in range(1, 10000):
+            p = where / (f"{stem}{ext}" if n == 1 else f"{stem} ({n}){ext}")
+            try:
+                with open(p, "xb"):
+                    return p
+            except FileExistsError:
+                continue
+    raise OSError(f"no free file name for {stem}{ext} in {where}")
+
+
+def discard(p: Path) -> None:
+    """Undo new_file() after a failed save: the file, and its folder if that's empty now."""
+    p.unlink(missing_ok=True)
+    if p.parent != SOUNDS_DIR:
+        try:
+            p.parent.rmdir()   # only goes when empty
+        except OSError:
+            pass
+
+
+# Audio the library makes itself (a download, a recording) is kept as Settings > Data
+# & quality says (quality.SAVE_FORMATS). MP3 by default: it plays in anything, and is
+# ~a quarter of a FLAC that holds no more than the compressed download did. ~V2 VBR
+# (~190 kbps on music). libsndfile's MP3 starts on time and keeps the length (no
+# encoder gap before a pad's hit). FLAC where it can't write MP3 (an old system
+# libsndfile). Only the saved file: a sound plays from its cache, made at import from
+# the audio as it came.
+_CAN_MP3 = "MP3" in sf.available_formats()
+MP3_QUALITY = 0.2   # libsndfile's compression_level: 0 best .. 1 smallest
+
+
+def stored_ext() -> str:
+    from soundboard import quality
+    return ".mp3" if quality.current.save_format == "mp3" and _CAN_MP3 else ".flac"
+
+
+def write_stored(dest: Path, data: np.ndarray) -> None:
+    """Write library audio ((n, 2) at SR) to `dest`, as its extension says."""
+    if dest.suffix.lower() == ".mp3":
+        sf.write(dest, data, SR, format="MP3", compression_level=MP3_QUALITY)
+    else:
+        sf.write(dest, data, SR, subtype="PCM_16")
+
+
+def import_file(src: str, color: str, name: str = "",
+                folder: str = MY_SOUNDS) -> tuple[SoundMeta, np.ndarray]:
+    """Decode, bring into the library folder, and return metadata + int16 audio.
+    The copy is SOUNDS_DIR/`folder`/`name`.ext (`name`: the sound's name, else the
+    file's own; a download passes its title, its temp file is named by video id).
+
+    Plain audio files are copied as they are. Anything that needed ffmpeg (a
+    download, video, m4a, aac, wma) is stored as an MP3 of its *audio* instead
+    (stored_ext()): a 300 MB video used to be copied whole, and the library stays
+    playable if ffmpeg goes away. So is a file libsndfile reads under a name outside
+    AUDIO_EXTS (.au, .caf, .w64…): only those come back in from a backup
+    (soundboard.backup)."""
     data, via_ffmpeg = _decode(src)
     if not len(data):
         raise ValueError(_("this file has no audio in it"))
-    SOUNDS_DIR.mkdir(parents=True, exist_ok=True)
     sid = uuid.uuid4().hex[:10]
     srcp = Path(src)
-    as_flac = via_ffmpeg or srcp.suffix.lower() not in AUDIO_EXTS
-    if as_flac:
-        dest = SOUNDS_DIR / f"{sid}_{_safe_name(srcp.stem)}.flac"
-    else:
-        # capped: a long source name plus the id would pass Windows' 255-character limit
-        dest = SOUNDS_DIR / f"{sid}_{srcp.stem[:80].strip() or 'sound'}{srcp.suffix.lower()}"
+    convert = via_ffmpeg or srcp.suffix.lower() not in AUDIO_EXTS
+    name = name.strip() or srcp.stem.replace("_", " ").strip()
     # Never fall back to using `src` in place: a download's temp folder is deleted
     # right after this. A failed copy leaves nothing behind and says what to do.
+    dest = None
     try:
-        if as_flac:
-            sf.write(dest, data, SR, subtype="PCM_16")
+        dest = new_file(name, stored_ext() if convert else srcp.suffix, folder)
+        if convert:
+            write_stored(dest, data)
         else:
             shutil.copy2(srcp, dest)
-        meta = SoundMeta(id=sid, added=time.time(),
-                         name=srcp.stem.replace("_", " ").strip()[:40] or "Sound",
+        meta = SoundMeta(id=sid, added=time.time(), name=name[:40].strip() or "Sound",
                          file=str(dest), color=color, level_gain=level_gain(data),
                          duration=len(data) / SR, fingerprint=fingerprint(src))
         return meta, store_cached(sid, data)
     except Exception as e:
         log.warning("couldn't copy %s into the library", src, exc_info=True)
-        dest.unlink(missing_ok=True)
+        if dest is not None:
+            discard(dest)
         if isinstance(e, OSError):
             raise OSError(_("couldn't save it into your Sounds folder ({error}). Check "
                             "the disk isn't full and try again.", error=e.strerror or e)) from e
@@ -1414,11 +1525,15 @@ def import_file(src: str, color: str) -> tuple[SoundMeta, np.ndarray]:
 
 
 def save_clip(data: np.ndarray, name: str, color: str) -> tuple[SoundMeta, np.ndarray]:
-    """Store recorded audio ((n, 2) float32 at SR) as a FLAC; return metadata + int16 audio."""
-    SOUNDS_DIR.mkdir(parents=True, exist_ok=True)
+    """Store recorded audio ((n, 2) float32 at SR) as stored_ext() says; return
+    metadata + int16 audio."""
     sid = uuid.uuid4().hex[:10]
-    dest = SOUNDS_DIR / f"{sid}_{_safe_name(name)}.flac"
-    sf.write(dest, data, SR, subtype="PCM_16")
+    dest = new_file(name, stored_ext(), RECORDINGS)
+    try:
+        write_stored(dest, data)
+    except BaseException:
+        discard(dest)
+        raise
     meta = SoundMeta(id=sid, name=name[:40], file=str(dest), color=color, added=time.time(),
                      level_gain=level_gain(data), duration=len(data) / SR,
                      fingerprint=fingerprint(str(dest)))
@@ -1448,10 +1563,13 @@ def duplicate(meta: SoundMeta, name: str) -> SoundMeta:
     sid = uuid.uuid4().hex[:10]
     src = Path(meta.file)
     dest = src
-    if src.is_file():
-        SOUNDS_DIR.mkdir(parents=True, exist_ok=True)
-        dest = SOUNDS_DIR / f"{sid}_{_safe_name(name)}{src.suffix}"
-        shutil.copy2(src, dest)
+    if src.is_file():   # next to the original (one from outside: in My sounds)
+        dest = new_file(name, src.suffix, _folder_of(src) or MY_SOUNDS)
+        try:
+            shutil.copy2(src, dest)
+        except BaseException:
+            discard(dest)
+            raise
     try:
         if cache_path(meta.id).exists():
             CACHE_DIR.mkdir(parents=True, exist_ok=True)
@@ -1505,7 +1623,8 @@ USE_RECYCLE_BIN = True
 
 def loose_sounds(cfg: Config) -> list[Path]:
     """Audio files put in the sounds folder by hand (dragged there in Explorer): not
-    one of the library's own files ("<id>_name"), and no sound's file."""
+    one of the library's own files (in its folders, or "<id>_name" from before), and
+    no sound's file."""
     try:
         files = list(SOUNDS_DIR.iterdir())
     except OSError:
@@ -1521,10 +1640,70 @@ def delete_file(meta: SoundMeta):
     that can't be made again), its picture and decoded cache are deleted."""
     p = Path(meta.file)
     try:
-        if p.parent == SOUNDS_DIR and not (USE_RECYCLE_BIN and recycle(p)):
+        if owns(p) and not (USE_RECYCLE_BIN and recycle(p)):
             p.unlink(missing_ok=True)
         if meta.image and Path(meta.image).parent == THUMBS_DIR:
             Path(meta.image).unlink(missing_ok=True)
     except OSError:
         log.warning("couldn't delete %s", p, exc_info=True)
     unlink_cache(meta.id)
+
+
+_VIDEO_ID = re.compile(r"(?=.*[0-9A-Z])[A-Za-z0-9_-]{11}")   # a YouTube video's
+
+
+def _old_folder(rest: str) -> str:
+    """The folder for a file from before library folders, by the "<name>" of its
+    "<id>_<name>": downloads were named by their video id."""
+    if _VIDEO_ID.fullmatch(rest):
+        return "YouTube"
+    if rest.isdigit() and len(rest) >= 8:   # TikTok, X...: a long number
+        return DOWNLOADS
+    return MY_SOUNDS
+
+
+def tidy_files(cfg: Config) -> int:
+    """Move the sound files from before library folders ("<id>_<name>" in SOUNDS_DIR
+    itself) into them, under the sound's own name: "YouTube/Never Gonna Give You
+    Up.flac". At the start, before anything reads them. A file that can't move (open
+    in another program) stays as it is, for the next start. The settings are saved
+    at once: if they can't be, the files go back. Returns how many moved."""
+    if cfg.read_only:
+        return 0
+    moved: dict[Path, Path] = {}
+    changed: list[tuple[SoundMeta, str]] = []
+    for m in cfg.sounds:
+        p = Path(m.file)
+        if p.parent != SOUNDS_DIR or not _OUR_SOUND_FILE.match(p.name):
+            continue
+        if p not in moved:   # two sounds on one file: both follow it
+            if not p.is_file():
+                continue
+            rest = Path(p.name[11:]).stem
+            dest = None
+            try:
+                dest = new_file(m.name or rest, p.suffix, _old_folder(rest))
+                os.replace(p, dest)
+            except OSError:
+                log.warning("couldn't move %s into a library folder", p.name, exc_info=True)
+                if dest is not None:
+                    dest.unlink(missing_ok=True)
+                continue
+            moved[p] = dest
+        changed.append((m, m.file))
+        m.file = str(moved[p])
+    if moved and not cfg.save():
+        log.warning("couldn't save the settings: the sound files go back where they were")
+        for was, now in moved.items():
+            try:
+                os.replace(now, was)
+            except OSError:   # then the sounds keep the new place (saved next time)
+                log.warning("couldn't move %s back", now, exc_info=True)
+                continue
+            for m, old in changed:
+                if Path(old) == was:
+                    m.file = old
+        return 0
+    if moved:
+        log.info("moved %d sound files into library folders", len(moved))
+    return len(moved)
