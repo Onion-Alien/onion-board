@@ -163,26 +163,54 @@ ROUTE_DEVICE = "device:"
 
 
 class StatusLine(QLabel):
-    """The status message under the mixer. Hidden while there's nothing to say, so
-    the window doesn't keep an empty row at the bottom, and while the window is too
-    short for it (set_room)."""
+    """The status message: a small note floating at the bottom left, just above the
+    player and mixer. Not in any layout, so it never adds a row to the window (a row
+    under the mixer pushed the whole board up for one sentence). Hidden while
+    there's nothing to say, while the window is too short for it (set_room), and
+    when clicked."""
 
     room = True
+    GAP = 6
 
-    def __init__(self, *a):
-        super().__init__(*a)
+    def __init__(self, parent: QWidget, above: Callable[[], int]):
+        super().__init__(parent)
+        self._above = above   # the y it sits above (the top of the player / mixer)
         # always rich text: callers pass html.escape()d text, which auto-detection
         # showed as "&#x27;" when it had no tags in it
         self.setTextFormat(Qt.RichText)
+        self.setWordWrap(True)
+        self.setToolTip(_("Click to hide"))
+        parent.installEventFilter(self)
 
     def setText(self, text: str):
         super().setText(text)
         self.setVisible(self.room and bool(text))
+        self.place()
 
     def set_room(self, compact: bool):
         self.room = not compact
         self.setVisible(self.room and bool(self.text()))
-        responsive.touch(self)
+        self.place()
+
+    def place(self):
+        if not self.isVisible():
+            return
+        room = max(80, self.parentWidget().width() - 28)
+        # one line when it fits (a wrapping label's size hint is a narrow column)
+        self.setWordWrap(False)
+        w = min(room, self.sizeHint().width())
+        self.setWordWrap(True)
+        h = self.heightForWidth(w)
+        self.setGeometry(14, self._above() - h - self.GAP, w, h)
+        self.raise_()
+
+    def eventFilter(self, obj, e):
+        if e.type() in (QEvent.Resize, QEvent.LayoutRequest):
+            QTimer.singleShot(0, self, self.place)   # after the layout has moved things
+        return False
+
+    def mousePressEvent(self, e):
+        self.hide()
 
 
 class SnugTabBar(QTabBar):
@@ -468,6 +496,8 @@ class MainWindow(QMainWindow):
 
         self.setup_state = ""
         self._pill_short = False          # the header pill's short text (narrow window)
+        self._pill_good = False           # set up: the pill hides (_show_pill)
+        self._pill_tight = False          # too narrow for the pill at all
         self.cable_bad = []               # cable ends not at 48 kHz (_check_cable_format)
         self._default_out = appaudio.default_output_name()   # see _follow_default_output
         self._build_ui()
@@ -637,7 +667,7 @@ class MainWindow(QMainWindow):
         head.addWidget(self.logo)
         names = QVBoxLayout()
         names.setSpacing(0)
-        self.wordmark = QLabel("ONION BOARD")
+        self.wordmark = QLabel("Onion Board")
         self.wordmark.setObjectName("wordmark")
         self.tagline = QLabel(_("an app by Onion Alien · v{version_text}",
                                 version_text=version_text()))
@@ -683,6 +713,7 @@ class MainWindow(QMainWindow):
         self.set_sending(True)
         self.stop_btn = QPushButton(_("Stop all"))
         self.stop_btn.setObjectName("danger")
+        self.stop_btn.setProperty("quiet", True)   # red text, no box: Live is the loud one
         self.stop_btn.setToolTip(_("Stops every sound, the radio and every program"))
         self.stop_btn.clicked.connect(lambda: (self.stop_all(),
                                                busy.flash(self.stop_btn, _("✓ Stopped"), 1200)))
@@ -690,6 +721,7 @@ class MainWindow(QMainWindow):
         head.addWidget(self.stop_btn)
         self.gear = QPushButton(_("Settings"))
         self.gear.setObjectName("settings")
+        self.gear.setProperty("quiet", True)
         self.gear.setToolTip(_("Themes, hotkeys and more"))
         self.gear.clicked.connect(lambda: self.open_settings())
         icons.set_icon(self.gear, "settings")
@@ -933,11 +965,12 @@ class MainWindow(QMainWindow):
         # ---- mixer strip: the things that apply whatever tab you're on
         rv.addWidget(self._build_mixer())
 
-        self.status = StatusLine()
-        self.status.setWordWrap(True)
-        self.status.setObjectName("muted")
+        # floats above the player (or the mixer when the player's hidden), in no layout
+        self.status = StatusLine(root, lambda: next(
+            (w.geometry().top() for w in (self.transport, self.mixer) if w.isVisible()),
+            root.height() - 10))
+        self.status.setObjectName("statusnote")
         self.status.hide()
-        rv.addWidget(self.status)
         self._pages.addWidget(self._build_mini())
 
     def _build_mini(self) -> QWidget:
@@ -1027,42 +1060,37 @@ class MainWindow(QMainWindow):
         boxes, left to right the way the sound flows — your mic, what others hear,
         your own headphones. (Each tab's own volume sits in that tab's bar.)"""
         c = self.cfg
+        # one slim bar: three groups side by side with a thin line between, each
+        # labelled inline (a title row over each box made the strip twice as tall)
         f = QFrame()
-        f.setObjectName("mixer")
+        f.setObjectName("deck")
         h = QHBoxLayout(f)
-        h.setContentsMargins(0, 0, 0, 0)
-        h.setSpacing(8)
+        h.setContentsMargins(12, 6, 12, 6)
+        h.setSpacing(14)
         self.mixer = f
         self._deck_titles: list[QWidget] = []
-        self._decks: list[QFrame] = []
+        self._decks: list[QWidget] = []   # each group, with the line before it
 
         def group(icon: str, title: str, tip: str) -> tuple[QLabel, QHBoxLayout]:
-            deck = QFrame()
-            deck.setObjectName("deck")
-            self._decks.append(deck)
-            box = QVBoxLayout(deck)
-            box.setContentsMargins(12, 4, 12, 8)
-            box.setSpacing(2)
-            top = QWidget()
-            top.setObjectName("decktop")
-            th = QHBoxLayout(top)
-            th.setContentsMargins(0, 0, 0, 0)
-            th.setSpacing(6)
-            th.addWidget(icon_label(icon, tip))
+            sep = vsep() if self._decks else None
+            if sep is not None:
+                h.addWidget(sep)
+            deck = QWidget()
+            deck.setObjectName("decktop")
+            row = QHBoxLayout(deck)
+            row.setContentsMargins(0, 0, 0, 0)
+            row.setSpacing(8)
+            row.addWidget(icon_label(icon, tip))
             lbl = QLabel(title)
             lbl.setObjectName("decktitle")
             lbl.setToolTip(tip)
-            th.addWidget(lbl)
-            th.addStretch(1)
-            box.addWidget(top)
-            self._deck_titles.append(top)
-            row = QHBoxLayout()
-            row.setSpacing(8)
-            box.addLayout(row)
+            row.addWidget(lbl)
+            self._deck_titles.append(lbl)
+            self._decks.append((deck,) if sep is None else (sep, deck))
             h.addWidget(deck)
             return lbl, row
 
-        self.mic_lbl, row = group("mic", _("MY MIC"),
+        self.mic_lbl, row = group("mic", _("My mic"),
                                   _("Your real microphone, and how loud your voice is for others"))
         self.chk_mic = QCheckBox(_("Others hear it"))
         self.chk_mic.setToolTip(_("Send your voice to others along with the sounds.\nUntick for "
@@ -1076,7 +1104,7 @@ class MainWindow(QMainWindow):
         self.mic_meter = self.vol_mic.meter
         row.addWidget(self.vol_mic)
 
-        send_lbl, row = group("live", _("WHAT OTHERS HEAR"),
+        send_lbl, row = group("live", _("What others hear"),
                               _("Everything going out to others right now (Discord, a game, "
                                 "OBS…): your mic plus whatever is live"))
         self.out_meter = Meter()
@@ -1091,16 +1119,16 @@ class MainWindow(QMainWindow):
         self.btn_check.toggled.connect(self.on_mic_check)
         icons.set_icon(self.btn_check, "ear", checked_color="#ffffff")
         row.addWidget(self.btn_check)
-        h.setStretch(1, 1)   # the "what others hear" box takes the room
+        h.setStretchFactor(self._decks[1][-1], 1)   # the "what others hear" group takes the room
 
-        self.hp_lbl, row = group("headphones", _("MY HEADPHONES  ·  ONLY YOU"),
+        self.hp_lbl, row = group("headphones", _("My headphones"),
                                  _("Only what YOU hear. Doesn't change anything for others."))
         self.vol_mon = VolumeControl(c.mon_vol, tip=_("Only what YOU hear — doesn't change "
                                                       "anything for others"))
         row.addWidget(self.vol_mon)
-        self._mixer_hp = (self._decks[2],)
+        self._mixer_hp = self._decks[2]
         self._mixer_send = (self.out_meter,)
-        self._mixer_others = (self._decks[1],)
+        self._mixer_others = self._decks[1]
 
         for box, key in ((self.vol_mic, "mic_vol"), (self.vol_mon, "mon_vol")):
             box.changed.connect(lambda v, key=key: self.set_option(key, v))
@@ -1141,10 +1169,14 @@ class MainWindow(QMainWindow):
         self.search.textEdited.connect(self._on_search_edited)
         self.search.textChanged.connect(self._on_search_text)
         self.search.returnPressed.connect(self.on_search_enter)
-        self.btn_yt = QPushButton(_("Search"))
+        icons.set_icon(self.search.addAction(QIcon(), QLineEdit.LeadingPosition), "search",
+                       "muted")
+        # the web search: Enter does it too, so a small globe, not a second "Search" box
+        self.btn_yt = QPushButton()
+        self.btn_yt.setAccessibleName(_("Search"))
         self.btn_yt.setToolTip(_("Search YouTube, SoundCloud, TikTok sounds, Myinstants… for "
                                  "what's typed (or press Enter) — play or add the audio"))
-        icons.set_icon(self.btn_yt, "play", size=14)
+        icons.set_icon(self.btn_yt, "browser")
         self.btn_yt.clicked.connect(self.search_youtube)
         more = self.btn_more = QPushButton(_("Backup"))
         more.setToolTip(_("Export your sounds and settings to a file, or import a backup or "
@@ -1201,6 +1233,10 @@ class MainWindow(QMainWindow):
         self.btn_view.setMenu(vm)
         self._label_view()
         tb.addWidget(self.btn_view)
+        # Add sounds is the one filled button; the rest are plain until hovered
+        for b in (self.btn_record, self.btn_folder, more, self.btn_bin, self.btn_keys,
+                  self.btn_yt, self.btn_view):
+            b.setProperty("quiet", True)
         size = QSlider(Qt.Horizontal)
         size.setRange(110, 240)
         c.pad_width = min(max(c.pad_width, 110), 240)   # the pads are built with it next
@@ -2741,8 +2777,12 @@ class MainWindow(QMainWindow):
         else:   # (the Setup tab offers straight into the mic first)
             pill = (_("Not connected") if short
                     else _("Not connected — click to fix"))
+        good = state in ("ok", "off")
+        if good != self._pill_good:
+            # all set: Live says it, so the pill only shows when something needs a click
+            self._pill_good = good
+            self._show_pill()
         if self.pill.text() != pill:
-            good = state in ("ok", "off")
             self.pill.setText(pill)
             self.pill.setIcon(icons.icon("headphones", "live_text") if state == "off" else
                               icons.icon("check", "live_text") if good else
@@ -2750,6 +2790,7 @@ class MainWindow(QMainWindow):
             self.pill.setProperty("state", "ok" if good else "warn")
             self.pill.style().unpolish(self.pill)
             self.pill.style().polish(self.pill)
+            self.set_sending(self.btn_air.isChecked())   # its tooltip carries the pill's text
 
     def attach_mic(self):
         """Put the mic effect on the mic in use (Windows asks for admin once), then send
@@ -4073,7 +4114,10 @@ class MainWindow(QMainWindow):
             text = (_("Live — stream output only"), _("Live"), "")
         else:
             text = (_("Only you hear sounds"), _("Only you"), "")
-        self.btn_air.setText(text[self._air_size])
+        # one word ("Live"); the whole sentence leads its tooltip and is what a screen
+        # reader says
+        self.btn_air.setText(text[max(self._air_size, 1)])
+        self.btn_air.setAccessibleName(text[0])
         if not on:
             tip = _("Click to go live again: others hear you and your sounds")
         elif others:
@@ -4085,7 +4129,9 @@ class MainWindow(QMainWindow):
         else:
             tip = (_("Nothing goes out to others: pick where to send on the Setup tab (Send my "
                      "sounds to)"))
-        self.btn_air.setToolTip(tip)
+        if self._pill_good and self.pill.text():   # the hidden pill's "In your mic…"
+            tip = f"{self.pill.text()}\n{tip}"
+        self.btn_air.setToolTip(f"{text[0]}\n{tip}")
         if hasattr(self, "mini_air"):
             self.mini_air.setChecked(on)
             self.mini_air.setToolTip(self.btn_air.toolTip())
@@ -7362,7 +7408,7 @@ class MainWindow(QMainWindow):
         f.add(33, "w", r.hide(self.btn_folder))   # also in the Backup menu
         f.add(60, "w", self._tab_icons_only)
         f.add(70, "w", r.hide(self.btn_check, *self._mixer_send, *self._mixer_others))
-        f.add(80, "w", r.hide(self.pill))
+        f.add(80, "w", self._show_pill)
         f.add(85, "w", self._tabs_tight)   # else the icons alone held it at ~480 px
         self._radio_steps = self.radio.fit_steps()   # swapped with the tab (Privacy)
         f.extend(self._radio_steps)
@@ -7376,6 +7422,13 @@ class MainWindow(QMainWindow):
         f.add(50, "h", r.hide(self.cat_bar))   # the overlay's category key still works
         self._stack_cols = (r.stack(self._setup_cols), *self.voice.stack_steps())
         self.setMinimumSize(responsive.MIN_SIZE)
+
+    def _show_pill(self, tight: bool | None = None):
+        """The setup pill: only while something needs fixing, and not in a narrow window."""
+        if tight is not None:
+            self._pill_tight = tight
+        self.pill.setVisible(not self._pill_tight and not self._pill_good)
+        responsive.touch(self.pill)
 
     def _shorten_pill(self, short: bool):
         if short != self._pill_short:

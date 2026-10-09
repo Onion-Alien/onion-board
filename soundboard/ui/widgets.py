@@ -713,11 +713,16 @@ class Pad(QAbstractButton):
         p = QPainter(self)
         p.setRenderHint(QPainter.Antialiasing)
         r = QRectF(self.rect()).adjusted(2, 2, -2, -2)
-        if self._down:
-            r.adjust(1.5, 1.5, -1.5, -1.5)
         accent = self._accent_colour()
         C = pad_colours()
         lo, hi, k = C["card"], C["card_hi"], self._hover_k
+        if self._down:
+            r.adjust(1.5, 1.5, -1.5, -1.5)
+        elif k > 0.0:   # the mouse over it: it lifts a little off its shadow
+            shadow = QPainterPath()
+            shadow.addRoundedRect(r.translated(0, 1.5), PAD_RADIUS, PAD_RADIUS)
+            p.fillPath(shadow, QColor(0, 0, 0, int(70 * k)))
+            r.translate(0, -1.5 * k)
         if k <= 0.0:
             base = lo
         elif k >= 1.0:
@@ -740,9 +745,20 @@ class Pad(QAbstractButton):
             self._play_t = now
         if pic is not None:   # already the pad's size, shade and corners: a plain copy
             p.drawPixmap(r.topLeft(), pic)
+        else:   # its colour as a soft wash from the top, not a stripe
+            tint = QLinearGradient(0, r.top(), 0, r.bottom())
+            top, clear = QColor(accent), QColor(accent)
+            top.setAlpha(32)
+            clear.setAlpha(0)
+            tint.setColorAt(0.0, top)
+            tint.setColorAt(0.75, clear)
+            p.fillPath(path, tint)
         if playing:
             p.save()
             p.setClipPath(path)
+            done = QColor(accent)   # how far it's got: the card fills from the left
+            done.setAlpha(34)
+            p.fillRect(QRectF(r.left(), r.top(), r.width() * self.progress, r.height()), done)
             flash = 1 - (now - self._play_t) / 0.35
             if flash > 0:   # a quick wash of its colour as it starts
                 wash = QColor(accent)
@@ -766,8 +782,8 @@ class Pad(QAbstractButton):
             p.setPen(QPen(C["accent"], 2.4))
         elif self.selected:
             p.setPen(QPen(C["border_hi"], 1.6))
-        else:
-            p.setPen(QPen(C["border"], 1.2))
+        else:   # at rest: no outline, the card's own shade is enough
+            p.setPen(Qt.NoPen)
         p.drawPath(path)
         if self.picked:   # a tick in the corner, so it reads as picked while playing too
             c = QRectF(r.right() - 24, r.top() + 6, 18, 18)
@@ -784,13 +800,9 @@ class Pad(QAbstractButton):
         if self.hasFocus() and self._kbd_focus:
             p.setPen(QPen(C["text_hi"], 1.4, Qt.DashLine))
             p.drawRoundedRect(r.adjusted(3, 3, -3, -3), 10, 10)
-        # accent bar
-        p.setPen(Qt.NoPen)
-        p.setBrush(accent)
-        p.drawRoundedRect(QRectF(r.left() + 10, r.top() + 10, 22, 4), 2, 2)
         on_pic = pic is not None
         # name
-        text_r = r.adjusted(10, 20, -10, -24)
+        text_r = r.adjusted(10, 12, -10, -24)
         f, flags, name = self._fit_name(text_r)
         p.setFont(f)
         if on_pic:   # a soft shadow keeps it readable on any picture
@@ -872,7 +884,7 @@ class Pad(QAbstractButton):
         elif self.selected:
             pen = QPen(QColor(T["border_hi"]), 1.4)
         else:
-            pen = QPen(QColor(T["border"]), 1)
+            pen = Qt.NoPen
         p.setPen(pen)
         p.drawPath(path)
         if self.hasFocus() and self._kbd_focus:
@@ -925,12 +937,12 @@ class Pad(QAbstractButton):
         if bands is None or not len(bands):
             return
         n = len(bands)
-        area = r.adjusted(8, r.height() * 0.28, -8, -5)
+        area = r.adjusted(8, r.height() * 0.58, -8, -5)   # under the name, not through it
         gap = 2.0 if area.width() / n > 6 else 1.0
         bw = (area.width() - gap * (n - 1)) / n
         top, bottom = QColor(accent).lighter(135), QColor(accent)
-        top.setAlpha(120 if self.paused else 235)
-        bottom.setAlpha(25 if self.paused else 60)
+        top.setAlpha(70 if self.paused else 150)
+        bottom.setAlpha(15 if self.paused else 40)
         grad = QLinearGradient(0, area.top(), 0, area.bottom())
         grad.setColorAt(0.0, top)
         grad.setColorAt(1.0, bottom)
@@ -943,7 +955,7 @@ class Pad(QAbstractButton):
             p.drawRoundedRect(QRectF(x, area.bottom() - h, bw, h), rad, rad)
         if self.peaks is not None:
             cap = QColor(accent).lighter(160)
-            cap.setAlpha(110 if self.paused else 230)
+            cap.setAlpha(70 if self.paused else 160)
             p.setBrush(cap)
             for i, pk in enumerate(self.peaks):
                 x = area.left() + i * (bw + gap)
@@ -958,6 +970,7 @@ class PadGrid(QWidget):
     HOW_TO = _("Drop sound files here\nor click  ＋ Add sounds\n\n"
                "mp3 · wav · ogg · flac\nm4a · even video files")
     NO_MATCH = _("No sounds match the search\nor this category")
+    DROP_HINT = _("Drop sound files here")
 
     def __init__(self):
         super().__init__()
@@ -992,6 +1005,7 @@ class PadGrid(QWidget):
         self.empty_text.setObjectName("empty")
         ev.addWidget(self.empty_text)
         self._cols = 0
+        self._n_shown = 0        # pads in the grid now (drop_area)
         self._shape = None       # (columns, pad width) last laid out
         self._placed = None      # (columns, the pads shown) in the grid now
         self._slots: dict[Pad, tuple[int, int]] = {}   # the pads in the grid: row, column
@@ -1094,6 +1108,7 @@ class PadGrid(QWidget):
             if p.width() != w or p.height() != h:
                 p.setFixedSize(w, h)
         shown = [p for p in self.pads if not p.property("filtered")]
+        self._n_shown = len(shown)
         placed = (cols, tuple(map(id, shown)))
         if shown and placed == self._placed:
             return   # the same pads in the same columns: only their size changed
@@ -1149,7 +1164,31 @@ class PadGrid(QWidget):
     def paintEvent(self, e):
         # the same colour the page behind it shows; read on each paint, so a theme
         # change (theme.apply repaints every widget) follows
-        QPainter(self).fillRect(e.rect(), QColor(theme.T["bg"]))
+        p = QPainter(self)
+        p.fillRect(e.rect(), QColor(theme.T["bg"]))
+        drop = self.drop_area()
+        if drop is not None and drop.intersects(QRectF(e.rect())):
+            # the empty room under the pads says what it's for, faintly
+            p.setRenderHint(QPainter.Antialiasing)
+            pen = QPen(QColor(theme.T["border"]), 1.4, Qt.DashLine)
+            p.setPen(pen)
+            p.drawRoundedRect(drop, PAD_RADIUS, PAD_RADIUS)
+            p.setPen(QColor(theme.T["faint"]))
+            p.drawText(drop, Qt.AlignCenter, self.DROP_HINT)
+
+    def drop_area(self) -> QRectF | None:
+        """Where the faint "drop sound files here" box goes: the room under the last
+        row of pads, when there's enough of it (and they're cards, not a list)."""
+        if not self._n_shown or self._shape is None or self.rows():
+            return None
+        cols, w = self._shape
+        m, sp = self.grid.contentsMargins(), self.grid.spacing()
+        rows = -(-self._n_shown // cols)
+        top = m.top() + rows * (self.pad_h(w) + sp) + 2
+        room = self.height() - top - m.bottom() - 4
+        if room < 90:
+            return None
+        return QRectF(m.left() + 2, top, cols * (w + sp) - sp - 4, min(room, 110))
 
     def resizeEvent(self, e):
         super().resizeEvent(e)
