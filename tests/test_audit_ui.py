@@ -210,14 +210,14 @@ def test_flat_preset_and_curve_reset_turn_the_eq_off(qapp):
     other = next(n for n in EQ_PRESETS if n != "Flat (off)")
     seen = []
     eq.changed.connect(lambda *a: seen.append(a[1]))
-    eq.cb_preset.setCurrentText(other)
+    eq.cb_preset.setCurrentIndex(eq.cb_preset.findData(other))   # shown without the dash
     assert eq.chk_on.isChecked() and not eq.sliders[0].property("dim")
     eq.cb_preset.setCurrentText("Flat (off)")
     assert not eq.chk_on.isChecked() and seen[-1] is False
     assert eq.sliders[0].property("dim") and eq.cb_target.property("dim")
     eq.chk_on.setChecked(True)                   # on, still flat: double-click resets
     eq.curve.reset.emit()
-    assert not eq.chk_on.isChecked() and eq.cb_preset.currentText() == "Flat (off)"
+    assert not eq.chk_on.isChecked() and eq.cb_preset.currentData() == "Flat (off)"
     eq.deleteLater()
 
 

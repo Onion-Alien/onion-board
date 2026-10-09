@@ -6,7 +6,7 @@ import threading
 import time
 
 import pytest
-from PySide6.QtCore import Qt
+from PySide6.QtCore import QPointF, Qt
 from PySide6.QtGui import QColor, QImage
 from PySide6.QtTest import QTest
 
@@ -147,6 +147,32 @@ def test_the_grid_is_opaque_in_the_page_colour(qapp):
             assert img.pixelColor(4 + 100 + 5, 30) == QColor(theme.T["bg"])
     finally:
         theme.apply(qapp, old)
+
+
+def test_window_background_is_solid_and_near_the_page_colour(qapp):
+    """The glow, foot and grain the grid paints behind the pads (the window's own
+    background, so it lines up): fully opaque, so a scroll can still copy the screen,
+    and never far from the theme's page colour."""
+    from PySide6.QtCore import QRect
+    from PySide6.QtGui import QPainter
+    from soundboard import theme
+    old = theme.current_name
+    try:
+        for name in ("Light", "Dark", "Mocha", "High Contrast"):
+            theme.set_current(name)
+            img = QImage(200, 300, QImage.Format_ARGB32)
+            img.fill(Qt.transparent)
+            p = QPainter(img)
+            theme.paint_window_bg(p, QRect(0, 0, 200, 300), QPointF(-50, -100), 1400, 900)
+            p.end()
+            bg = QColor(theme.T["bg"])
+            for x, y in ((0, 0), (199, 150), (100, 299)):
+                c = img.pixelColor(x, y)
+                assert c.alpha() == 255
+                assert max(abs(c.red() - bg.red()), abs(c.green() - bg.green()),
+                           abs(c.blue() - bg.blue())) < 32
+    finally:
+        theme.set_current(old)
 
 
 # ---------------------------------------------------------------------- pictures

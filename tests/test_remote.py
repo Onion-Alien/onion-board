@@ -411,3 +411,26 @@ def test_voices_say_queue_and_hear(qapp, window):
     w.set_tab_on("voice", False)
     assert d("voices")[0] == 409 and d("say", text="hi")[0] == 409
     assert d("voice", name="Chipmunk")[0] == 409 and "voice_name" in d("status")[1]
+
+
+def test_settings_key_show_says_hide_and_turning_off_hides_it(qapp, window):
+    from PySide6.QtWidgets import QLineEdit, QPushButton
+
+    from soundboard.settings import SettingsDialog
+    w = window
+    w.cfg.api_port = 0
+    d = SettingsDialog(w, "remote")
+    try:
+        d.remote_on.setChecked(True)
+        key = next(e for e in d.findChildren(QLineEdit) if e.accessibleName() == "Key")
+        show = next(b for b in d.findChildren(QPushButton) if b.text() == "Show")
+        assert key.echoMode() == QLineEdit.Password
+        show.click()
+        assert key.echoMode() == QLineEdit.Normal and show.text() == "Hide"
+        d.remote_on.setChecked(False)                 # off: the key is hidden again
+        assert key.echoMode() == QLineEdit.Password and show.text() == "Show"
+        assert not show.isChecked()
+    finally:
+        d.close()
+        w.cfg.api_enabled = False
+        w.apply_remote()

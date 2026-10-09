@@ -53,7 +53,7 @@ class VideoWindow(QWidget):
             self.note.hide()
             self.player.setSource(QUrl.fromLocalFile(str(path)))
             self.player.pause()   # shows the first frame until the sound plays
-        self.setWindowTitle(_("{name} — video", name=name))
+        self.setWindowTitle(_("{name}: video", name=name))
         if not self.isVisible():
             self.show()
         self.raise_()

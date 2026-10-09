@@ -41,8 +41,8 @@ class CrashDialog(QDialog):
         self.setMinimumSize(560, 420)
         v = QVBoxLayout(self)
 
-        head = QLabel(_("Sorry — something went wrong.") if not rep.fatal
-                      else _("Sorry — Onion Board couldn't start."))
+        head = QLabel(_("Sorry, something went wrong.") if not rep.fatal
+                      else _("Sorry, Onion Board couldn't start."))
         f = head.font()
         f.setPointSizeF(f.pointSizeF() * 1.3)
         f.setBold(True)
@@ -105,7 +105,7 @@ class CrashDialog(QDialog):
 
     def copy(self):
         QGuiApplication.clipboard().setText(self.report_text())
-        self.status.setText(_("Report copied — paste it into your message (Ctrl+V)."))
+        self.status.setText(_("Report copied: paste it into your message (Ctrl+V)."))
 
     def open_issue(self):
         self.copy()

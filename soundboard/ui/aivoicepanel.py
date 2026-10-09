@@ -8,6 +8,7 @@ settings under "ai".
 from __future__ import annotations
 
 import json
+import logging
 import threading
 
 from PySide6.QtCore import Qt, Signal
@@ -22,6 +23,8 @@ from soundboard.speech import aivoicelist as avl
 from soundboard.ui import busy, icons
 from soundboard.ui.panel import hint_label, section_label
 from soundboard.wheelguard import no_wheel
+
+log = logging.getLogger(__name__)
 
 IDLE = _("Pick a voice, press Start, then just talk.")
 BACKUP_LABELS = [(_("A built-in voice (still hides yours)"), "voice"),
@@ -78,13 +81,15 @@ class AiVoicePanel(QWidget):
         self._install_done.connect(self._on_install_done)
         self._installing = False
         self._voice_name = ""
+        self._connected = self._retried = False   # this start's helper (_start_helper)
+        self._status = "off"
         self.module: mods.ModuleInfo | None = None
         self.voices: list[dict] = []
 
         v = QVBoxLayout(self)
         v.setContentsMargins(0, 0, 0, 0)
         v.setSpacing(12)
-        self.title = section_label(_("AI VOICES"))
+        self.title = section_label(_("AI voices"))
         v.addWidget(self.title)
         v.addWidget(hint_label(_("Talk, and others hear a different person: your words and "
                                  "tone, another voice, live. It runs on this PC (about one "
@@ -373,11 +378,8 @@ class AiVoicePanel(QWidget):
             if self.module is None:
                 self._set_ui(False, IDLE)
                 return
-            try:
-                self.ctl.start(self.module, self.s["voice"] or self.cb_voice.currentData() or "",
-                               self.s["auto_pitch"], self.s["pitch"])
-            except RuntimeError as e:
-                self._set_ui(False, f"⚠ {errors.plain(e)}")
+            self._retried = False
+            if not self._start_helper():
                 return
             self._voice_name = self._voice().get("name", "")
             self._set_ui(True, _("starting… (a built-in voice covers you until it's ready)"))
@@ -385,7 +387,27 @@ class AiVoicePanel(QWidget):
             self.ctl.stop()
             self._set_ui(False, IDLE)
 
+    def _start_helper(self) -> bool:
+        self._connected = False      # the helper said hello (it can still fail to load)
+        try:
+            self.ctl.start(self.module, self.s["voice"] or self.cb_voice.currentData() or "",
+                           self.s["auto_pitch"], self.s["pitch"])
+        except RuntimeError as e:
+            self._set_ui(False, f"⚠ {errors.plain(e)}")
+            return False
+        return True
+
+    def status(self) -> str:
+        """"off", "starting", "on" (others hear the AI voice) or "failed" (the backup
+        covers you): for the Voice tab's status bar."""
+        return self._status if self.is_on() else "off"
+
+    def voice_title(self) -> str:
+        """The running voice's name (the status bar's chip)."""
+        return self._voice_name or self._voice().get("name", "") or self.cb_voice.currentText()
+
     def _set_ui(self, on: bool, state: str):
+        self._status = "starting" if on else "off"
         self.b_start.blockSignals(True)
         self.b_start.setChecked(on)
         self.b_start.blockSignals(False)
@@ -397,9 +419,12 @@ class AiVoicePanel(QWidget):
     def _on_event(self, ev: dict):
         t = ev.get("type")
         text = str(ev.get("text", ""))
-        if t == "status":
+        if t == "hello":
+            self._connected = True
+        elif t == "status":
             self.lbl_state.setText(text)
         elif t == "ready":
+            self._status = "on"
             msg = (_("● you sound like {voice}", voice=self._voice_name) if self._voice_name
                    else _("● you sound like the voice"))
             if ev.get("slow"):
@@ -414,8 +439,19 @@ class AiVoicePanel(QWidget):
                 _("● you sound like the voice · CPU {cpu}% · about {ms} ms behind you",
                   cpu=cpu, ms=ms))
         elif t == "error":
+            self._status = "failed"
             self.lbl_state.setText(f"⚠ {text}")
+        elif (t == "stopped" and self.ctl.running and not self._connected
+              and not self._retried and self.module is not None):
+            # the helper never called back (once it sat silent for 30 s, then started
+            # fine the next time): one more go by itself before asking you to
+            self._retried = True
+            log.warning("AI voice helper didn't connect (%s); trying once more", text)
+            if self._start_helper():
+                self.lbl_state.setText(_("starting again… (a built-in voice covers you "
+                                         "until it's ready)"))
         elif t == "stopped" and self.ctl.running:
+            self._status = "failed"
             backup = BACKUP_HEARD.get(self.cb_backup.currentData() or "voice",
                                       BACKUP_HEARD["voice"])
             self.lbl_state.setText(
@@ -436,7 +472,7 @@ class AiVoicePanel(QWidget):
 
         def progress(done: int, total: int):
             if total:
-                busy.emit(self._install_line, _("downloading: {percent} % of {size} MB",
+                busy.emit(self._install_line, _("downloading: {percent}% of {size} MB",
                                                 percent=done * 100 // total,
                                                 size=f"{total / 1e6:.0f}"))
 

@@ -411,7 +411,7 @@ class AppRow(HoverCard):
             self.name.setText((self.exe.rsplit(".", 1)[0].capitalize() if self.exe else "?")
                               + self.folder)
             self.set_status("")
-            self.sub.setText(_("Not running — it'll be picked up when it starts"))
+            self.sub.setText(_("Not running: it'll be picked up when it starts"))
         self.btn_send.setEnabled(running)
         self.btn_rec.setEnabled(running)
         self.btn_clip.setEnabled(running or self.btn_clip.isChecked())
@@ -496,8 +496,8 @@ class AppsTab(QWidget):
         v.setSpacing(8)
         # the explanation is behind the ⓘ at the end of the tab bar (MainWindow)
         self.info = (_("Send a program's sound"),
-                     _("Pick a program that's playing — a music player, a browser, a game, "
-                       "even a call in another app — and it goes out to whoever's listening, "
+                     _("Pick a program that's playing (a music player, a browser, a game, "
+                       "even a call in another app) and it goes out to whoever's listening, "
                        "on its own volume, the same way your sounds do (your mic, the "
                        "cable or the device you picked on the Setup tab, and the stream "
                        "output). Sending to Nobody: only the stream output gets it. Only "
@@ -553,7 +553,7 @@ class AppsTab(QWidget):
         self.bun = BunnyWidget(height=72, pad=18, sad=0.6,
                                lines=(_("play something?"), _("so quiet…"),
                                       _("music, please?")),
-                               joy_lines=(_("hehe!"), _("yay!")))
+                               joy_lines=(_("hehe!"), _("yay!")), pong=True)
         ev.addWidget(self.bun, 0, Qt.AlignHCenter)
         self.empty_text = hint_label(_("Nothing is playing sound right now. Start some music, "
                                        "a video or a call and it'll show up here."))

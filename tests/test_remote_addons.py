@@ -103,7 +103,7 @@ def test_a_remote_add_on_for_a_newer_app_is_refused(tmp_path):
 def test_it_loads_and_gets_its_card_on_settings(qapp, window, loaded):  # noqa: F811
     d = SettingsDialog(window, "remote")
     texts = [lb.text() for lb in d.tabs.currentWidget().widget().findChildren(QLabel)]
-    assert "TEST ADD-ON" in texts and "the test card" in texts
+    assert "Test add-on" in texts and "the test card" in texts
     d.close()
     window._stop_remote_addons()
     assert loaded.stopped == 1

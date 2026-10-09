@@ -7,8 +7,8 @@ from functools import lru_cache
 from pathlib import Path
 
 import numpy as np
-from PySide6.QtCore import (QEvent, QMimeData, QObject, QPoint, QPointF, QRectF, QSize, Qt,
-                            QTimer, QVariantAnimation, Signal)
+from PySide6.QtCore import (QEasingCurve, QEvent, QMimeData, QObject, QPoint, QPointF, QRectF,
+                            QSize, Qt, QTimer, QVariantAnimation, Signal)
 from PySide6.QtGui import (QColor, QDrag, QFont, QFontMetrics, QLinearGradient, QPainter,
                            QPainterPath, QPen)
 from PySide6.QtWidgets import (QAbstractButton, QGridLayout, QHBoxLayout, QLabel, QScrollArea,
@@ -380,6 +380,23 @@ def spectrum(data: np.ndarray, frac: float, n: int) -> np.ndarray:
     return np.clip((db + 62) / 52, 0.0, 1.0).astype(np.float32)
 
 
+def loudness(data: np.ndarray, frac: float, gain: float = 1.0) -> float:
+    """How loud (0..1) the stretch just played around `frac` is: its RMS times `gain`,
+    -48 dBFS..0 dBFS. What a playing pad's level meter shows; the same window as
+    spectrum() (what's ahead of a long sound may not be read in yet)."""
+    if data is None or not len(data):
+        return 0.0
+    pos = max(0, int(min(max(frac, 0.0), 1.0) * len(data)) - FFT_N)
+    seg = data[pos:pos + FFT_N]
+    if not len(seg):
+        return 0.0
+    mono = seg.mean(axis=1, dtype=np.float32)
+    if data.dtype == np.int16:
+        mono /= 32768.0
+    rms = float(np.sqrt(np.mean(mono * mono))) * max(gain, 0.0)
+    return min(max((20 * math.log10(rms + 1e-9) + 48) / 48, 0.0), 1.0)
+
+
 @lru_cache(maxsize=16)
 def _band_plan(n: int):
     """Where spectrum()'s `n` log-spaced bands start in the FFT, how many bins each
@@ -405,6 +422,8 @@ def pad_height(width: int) -> int:
 # a picture on a pad is darkened towards the bottom so the text reads on it:
 # (where 0..1, black's alpha), lighter while the mouse is over it
 PAD_RADIUS = 12      # a pad card's rounded corners
+HOVER_LIFT = 2.0     # how far a card rises under the mouse (it has 2 px spare above)
+HOVER_MS = 120       # ...and how quickly: short, so moving across the board feels light
 PIC_SHADE = ((0.0, 100), (0.55, 150), (1.0, 205))
 PIC_SHADE_HOVER = ((0.0, 70), (0.55, 120), (1.0, 205))
 
@@ -412,6 +431,7 @@ _PAD_COLOURS = ("card", "card_hi", "border", "border_hi", "accent", "on_accent",
                 "muted", "error_text", "badge", "badge_text")
 _pad_palette: list = [None, {}]   # (the theme's values, QColor for each) - see pad_colours
 _SHADOW, _WHITE = QColor(0, 0, 0, 200), QColor("#ffffff")   # text on a picture
+_METER_WARM, _METER_HOT = QColor("#ffb84d"), QColor("#ff5a4f")   # a level meter near full scale
 _WHITE_DIM, _WHITE_MUTED = QColor(255, 255, 255, 170), QColor(255, 255, 255, 200)
 _ERROR_ON_PIC = QColor("#ff6b6b")
 
@@ -450,6 +470,8 @@ class Pad(QAbstractButton):
         self.paused = False
         self.bands = None        # visualizer levels (0..1) while playing
         self.peaks = None        # the little caps that fall slowly
+        self.meter = None        # how loud it is right now (0..1) while playing
+        self.meter_peak = 0.0    # the meter's peak mark, falling slowly
         self.selected = False    # the sound in the transport bar
         self.picked = False      # one of several picked for a batch change (ui.padbatch)
         self.state = "loading"   # loading | ready | error
@@ -457,7 +479,8 @@ class Pad(QAbstractButton):
         self.hover = False
         self._hover_k = 0.0      # 0..1, eased in and out (the card lights up smoothly)
         self._hover_anim = QVariantAnimation(self)
-        self._hover_anim.setDuration(140)
+        self._hover_anim.setDuration(HOVER_MS)
+        self._hover_anim.setEasingCurve(QEasingCurve.OutCubic)   # quick up, soft landing
         self._hover_anim.valueChanged.connect(self._on_hover_k)
         self._down = False       # pressed: the card sinks a little
         self._play_t = None      # when it started playing (the flash on start)
@@ -621,6 +644,16 @@ class Pad(QAbstractButton):
         self.bands = np.maximum(levels, self.bands * 0.78)
         self.peaks = np.maximum(self.bands, self.peaks - 0.025)
 
+    def set_meter(self, v):
+        """The level meter's new reading (None clears): up at once, down smoothly, so
+        it reads as loudness rather than flicker; the peak mark falls slower still."""
+        if v is None:
+            self.meter, self.meter_peak = None, 0.0
+            return
+        v = min(max(float(v), 0.0), 1.0)
+        self.meter = v if self.meter is None else max(v, self.meter * 0.86)
+        self.meter_peak = max(self.meter, self.meter_peak - 0.012)
+
     def _on_hover_k(self, v):
         self._hover_k = float(v)
         self.update()
@@ -713,11 +746,19 @@ class Pad(QAbstractButton):
         p = QPainter(self)
         p.setRenderHint(QPainter.Antialiasing)
         r = QRectF(self.rect()).adjusted(2, 2, -2, -2)
-        if self._down:
-            r.adjust(1.5, 1.5, -1.5, -1.5)
         accent = self._accent_colour()
         C = pad_colours()
         lo, hi, k = C["card"], C["card_hi"], self._hover_k
+        if self._down:
+            r.adjust(1.5, 1.5, -1.5, -1.5)
+        elif k > 0.0:   # the mouse over it: it lifts off a soft shadow
+            p.setPen(Qt.NoPen)
+            for grow, alpha in ((0.0, 60), (1.0, 30), (2.0, 14)):   # a blur, cheaply
+                p.setBrush(QColor(0, 0, 0, int(alpha * k)))
+                p.drawRoundedRect(r.adjusted(-grow, HOVER_LIFT - grow + 0.5,
+                                             grow, HOVER_LIFT + grow),
+                                  PAD_RADIUS + grow, PAD_RADIUS + grow)
+            r.translate(0, -HOVER_LIFT * k)
         if k <= 0.0:
             base = lo
         elif k >= 1.0:
@@ -740,15 +781,27 @@ class Pad(QAbstractButton):
             self._play_t = now
         if pic is not None:   # already the pad's size, shade and corners: a plain copy
             p.drawPixmap(r.topLeft(), pic)
+        else:   # its colour as a soft wash from the top, not a stripe
+            tint = QLinearGradient(0, r.top(), 0, r.bottom())
+            top, clear = QColor(accent), QColor(accent)
+            top.setAlpha(32)
+            clear.setAlpha(0)
+            tint.setColorAt(0.0, top)
+            tint.setColorAt(0.75, clear)
+            p.fillPath(path, tint)
         if playing:
             p.save()
             p.setClipPath(path)
+            done = QColor(accent)   # how far it's got: the card fills from the left
+            done.setAlpha(34)
+            p.fillRect(QRectF(r.left(), r.top(), r.width() * self.progress, r.height()), done)
             flash = 1 - (now - self._play_t) / 0.35
             if flash > 0:   # a quick wash of its colour as it starts
                 wash = QColor(accent)
                 wash.setAlpha(int(90 * flash))
                 p.fillPath(path, wash)
             self._paint_visualizer(p, r, accent)
+            self._paint_meter(p, r, accent)
             # progress: a thin accent line along the bottom edge
             p.fillRect(QRectF(r.left(), r.bottom() - 3, r.width() * self.progress, 3), accent)
             p.restore()
@@ -766,8 +819,8 @@ class Pad(QAbstractButton):
             p.setPen(QPen(C["accent"], 2.4))
         elif self.selected:
             p.setPen(QPen(C["border_hi"], 1.6))
-        else:
-            p.setPen(QPen(C["border"], 1.2))
+        else:   # at rest: no outline, the card's own shade is enough
+            p.setPen(Qt.NoPen)
         p.drawPath(path)
         if self.picked:   # a tick in the corner, so it reads as picked while playing too
             c = QRectF(r.right() - 24, r.top() + 6, 18, 18)
@@ -784,13 +837,9 @@ class Pad(QAbstractButton):
         if self.hasFocus() and self._kbd_focus:
             p.setPen(QPen(C["text_hi"], 1.4, Qt.DashLine))
             p.drawRoundedRect(r.adjusted(3, 3, -3, -3), 10, 10)
-        # accent bar
-        p.setPen(Qt.NoPen)
-        p.setBrush(accent)
-        p.drawRoundedRect(QRectF(r.left() + 10, r.top() + 10, 22, 4), 2, 2)
         on_pic = pic is not None
         # name
-        text_r = r.adjusted(10, 20, -10, -24)
+        text_r = r.adjusted(10, 12, -10, -24)
         f, flags, name = self._fit_name(text_r)
         p.setFont(f)
         if on_pic:   # a soft shadow keeps it readable on any picture
@@ -872,15 +921,22 @@ class Pad(QAbstractButton):
         elif self.selected:
             pen = QPen(QColor(T["border_hi"]), 1.4)
         else:
-            pen = QPen(QColor(T["border"]), 1)
+            pen = Qt.NoPen
         p.setPen(pen)
         p.drawPath(path)
         if self.hasFocus() and self._kbd_focus:
             p.setPen(QPen(QColor(T["text_hi"]), 1.2, Qt.DashLine))
             p.drawRoundedRect(r.adjusted(2, 2, -2, -2), 5, 5)
         p.setPen(Qt.NoPen)
+        dot = QRectF(r.left() + 9, r.center().y() - 4, 8, 8)
+        if self.meter:   # the row's level meter: a halo round the dot, as loud as it is
+            halo = QColor(accent)
+            halo.setAlpha(60 if self.paused else 140)
+            p.setBrush(halo)
+            grow = 1 + 5 * self.meter
+            p.drawEllipse(dot.adjusted(-grow, -grow, grow, grow))
         p.setBrush(QColor(T["accent"]) if self.picked else accent)
-        p.drawEllipse(QRectF(r.left() + 9, r.center().y() - 4, 8, 8))
+        p.drawEllipse(dot)
         f = QFont(self.font())
         f.setPointSizeF(8.5)
         p.setFont(f)
@@ -919,18 +975,47 @@ class Pad(QAbstractButton):
                    p.fontMetrics().elidedText(self.meta.name, Qt.ElideRight,
                                               int(text_r.width())))
 
+    def _paint_meter(self, p: QPainter, r: QRectF, accent: QColor):
+        """A slim level meter up the card's left edge: how loud it is right now, with a
+        peak mark. Its own colour, warming to amber then red near full scale."""
+        if self.meter is None:
+            return
+        # from under the top corner to just above the footer (the hotkey badge)
+        track = QRectF(r.left() + 4, r.top() + PAD_RADIUS, 3, r.height() - PAD_RADIUS - 28)
+        p.setPen(Qt.NoPen)
+        dim = QColor(accent)
+        dim.setAlpha(40)
+        p.setBrush(dim)
+        p.drawRoundedRect(track, 1.5, 1.5)
+        h = track.height() * self.meter
+        if h >= 1.0:
+            grad = QLinearGradient(0, track.bottom(), 0, track.top())
+            grad.setColorAt(0.0, QColor(accent).lighter(115))
+            grad.setColorAt(0.72, QColor(accent).lighter(130))
+            grad.setColorAt(0.86, _METER_WARM)
+            grad.setColorAt(1.0, _METER_HOT)
+            if self.paused:
+                p.setOpacity(0.45)
+            p.setBrush(grad)
+            p.drawRoundedRect(QRectF(track.left(), track.bottom() - h, track.width(), h),
+                              1.5, 1.5)
+            if self.meter_peak > self.meter + 0.02:
+                y = track.bottom() - track.height() * self.meter_peak
+                p.drawRect(QRectF(track.left(), y, track.width(), 1.5))
+            p.setOpacity(1.0)
+
     def _paint_visualizer(self, p: QPainter, r: QRectF, accent: QColor):
         """Spectrum bars rising from the bottom, behind the text."""
         bands = self.bands
         if bands is None or not len(bands):
             return
         n = len(bands)
-        area = r.adjusted(8, r.height() * 0.28, -8, -5)
+        area = r.adjusted(8, r.height() * 0.58, -8, -5)   # under the name, not through it
         gap = 2.0 if area.width() / n > 6 else 1.0
         bw = (area.width() - gap * (n - 1)) / n
         top, bottom = QColor(accent).lighter(135), QColor(accent)
-        top.setAlpha(120 if self.paused else 235)
-        bottom.setAlpha(25 if self.paused else 60)
+        top.setAlpha(70 if self.paused else 150)
+        bottom.setAlpha(15 if self.paused else 40)
         grad = QLinearGradient(0, area.top(), 0, area.bottom())
         grad.setColorAt(0.0, top)
         grad.setColorAt(1.0, bottom)
@@ -943,7 +1028,7 @@ class Pad(QAbstractButton):
             p.drawRoundedRect(QRectF(x, area.bottom() - h, bw, h), rad, rad)
         if self.peaks is not None:
             cap = QColor(accent).lighter(160)
-            cap.setAlpha(110 if self.paused else 230)
+            cap.setAlpha(70 if self.paused else 160)
             p.setBrush(cap)
             for i, pk in enumerate(self.peaks):
                 x = area.left() + i * (bw + gap)
@@ -958,6 +1043,7 @@ class PadGrid(QWidget):
     HOW_TO = _("Drop sound files here\nor click  ＋ Add sounds\n\n"
                "mp3 · wav · ogg · flac\nm4a · even video files")
     NO_MATCH = _("No sounds match the search\nor this category")
+    DROP_HINT = _("Drop sound files here")
 
     def __init__(self):
         super().__init__()
@@ -983,7 +1069,7 @@ class PadGrid(QWidget):
             lines=(_("add a sound?"), _("pleeease?"), _("it's so quiet…"),
                    _("drop one on me!"), _("just one sound?"), _("I'm bored…")),
             hope_lines=(_("yes! drop it!"), _("ooh, for me?!")),
-            joy_lines=(_("yay!!"), _("↑ Add sounds!"), _("hehe!")))
+            joy_lines=(_("yay!!"), _("↑ Add sounds!"), _("hehe!")), pong=True)
         self.bun.setToolTip(_("Bun is waiting for some sounds"))
         ev.addWidget(self.bun, 0, Qt.AlignHCenter)
         self.empty_text = QLabel(self.HOW_TO)
@@ -992,6 +1078,7 @@ class PadGrid(QWidget):
         self.empty_text.setObjectName("empty")
         ev.addWidget(self.empty_text)
         self._cols = 0
+        self._n_shown = 0        # pads in the grid now (drop_area)
         self._shape = None       # (columns, pad width) last laid out
         self._placed = None      # (columns, the pads shown) in the grid now
         self._slots: dict[Pad, tuple[int, int]] = {}   # the pads in the grid: row, column
@@ -1094,6 +1181,7 @@ class PadGrid(QWidget):
             if p.width() != w or p.height() != h:
                 p.setFixedSize(w, h)
         shown = [p for p in self.pads if not p.property("filtered")]
+        self._n_shown = len(shown)
         placed = (cols, tuple(map(id, shown)))
         if shown and placed == self._placed:
             return   # the same pads in the same columns: only their size changed
@@ -1149,7 +1237,40 @@ class PadGrid(QWidget):
     def paintEvent(self, e):
         # the same colour the page behind it shows; read on each paint, so a theme
         # change (theme.apply repaints every widget) follows
-        QPainter(self).fillRect(e.rect(), QColor(theme.T["bg"]))
+        p = QPainter(self)
+        # the window's glow and grain, fixed to the pads (so a scroll can still copy
+        # what's on screen): it lines up with the window at the top of the board
+        win, view = self.window(), self.parentWidget()
+        root = win.centralWidget() if hasattr(win, "centralWidget") else None
+        if root is not None and view is not None:
+            at = view.mapTo(root, QPoint(0, 0))
+            theme.paint_window_bg(p, e.rect(), QPointF(-at.x(), -at.y()),
+                                  root.width(), root.height())
+        else:
+            p.fillRect(e.rect(), QColor(theme.T["bg"]))
+        drop = self.drop_area()
+        if drop is not None and drop.intersects(QRectF(e.rect())):
+            # the empty room under the pads says what it's for, faintly
+            p.setRenderHint(QPainter.Antialiasing)
+            pen = QPen(QColor(theme.T["border"]), 1.4, Qt.DashLine)
+            p.setPen(pen)
+            p.drawRoundedRect(drop, PAD_RADIUS, PAD_RADIUS)
+            p.setPen(QColor(theme.T["faint"]))
+            p.drawText(drop, Qt.AlignCenter, self.DROP_HINT)
+
+    def drop_area(self) -> QRectF | None:
+        """Where the faint "drop sound files here" box goes: the room under the last
+        row of pads, when there's enough of it (and they're cards, not a list)."""
+        if not self._n_shown or self._shape is None or self.rows():
+            return None
+        cols, w = self._shape
+        m, sp = self.grid.contentsMargins(), self.grid.spacing()
+        rows = -(-self._n_shown // cols)
+        top = m.top() + rows * (self.pad_h(w) + sp) + 2
+        room = self.height() - top - m.bottom() - 4
+        if room < 90:
+            return None
+        return QRectF(m.left() + 2, top, cols * (w + sp) - sp - 4, min(room, 110))
 
     def resizeEvent(self, e):
         super().resizeEvent(e)

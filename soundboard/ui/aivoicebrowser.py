@@ -20,7 +20,7 @@ from soundboard.i18n import _, ngettext
 from soundboard.speech import aipreview
 from soundboard.speech import aivoicelist as avl
 from soundboard.ui import busy, fit, icons
-from soundboard.ui.panel import Flow, UndoBar, hint_label, section_label
+from soundboard.ui.panel import Flow, UndoBar, hint_label, section_label, steady_number
 from soundboard.wheelguard import no_wheel
 
 HEAR, MAKING = _("Hear it"), _("Making a sample…")
@@ -272,7 +272,7 @@ class AiVoiceBrowser(QDialog):
         sections = self._sections()
         for title, voices in sections:
             if title:
-                grid.addWidget(section_label(title.upper()), r, 0, 1, 2)
+                grid.addWidget(section_label(title), r, 0, 1, 2)
                 r += 1
             for i, vo in enumerate(voices):
                 c = VoiceCard(vo, vo["id"] == self.current, can_hear)
@@ -415,8 +415,7 @@ class AiVoiceEditor(QDialog):
         self.sl_amount.setValue(int(round(float(recipe.get("amount", 0.3)) * 100)))
         self.sl_amount.setToolTip(_("How much of it: up to half"))
         mrow.addWidget(self.sl_amount, 1)
-        self.lbl_amount = QLabel("")
-        self.lbl_amount.setMinimumWidth(40)
+        self.lbl_amount = steady_number(QLabel(""), "100%")
         mrow.addWidget(self.lbl_amount)
         g.addLayout(mrow, r, 1)
         r += 1
@@ -458,6 +457,7 @@ class AiVoiceEditor(QDialog):
         hrow.addWidget(self.status, 1)
         lay.addLayout(hrow)
         self.box = QDialogButtonBox(QDialogButtonBox.Save | QDialogButtonBox.Cancel)
+        self.box.button(QDialogButtonBox.Save).setObjectName("primary")
         self.box.accepted.connect(self.accept)
         self.box.rejected.connect(self.reject)
         lay.addWidget(self.box)
@@ -493,7 +493,7 @@ class AiVoiceEditor(QDialog):
     def _show(self, *__):
         other = self._other() is not None
         self.sl_amount.setEnabled(other)
-        self.lbl_amount.setText(_("{percent} %", percent=self.sl_amount.value()) if other
+        self.lbl_amount.setText(_("{percent}%", percent=self.sl_amount.value()) if other
                                 else "")
         f = self.sl_formant.value() / 2
         self.lbl_formant.setText(_("as it is") if f == 0 else
@@ -508,7 +508,7 @@ class AiVoiceEditor(QDialog):
         tags = [t for t in base.get("tags", []) if not other or t in other.get("tags", [])]
         about = " ".join(self.ed_about.text().split())
         # (the name and description are yours: written in the app's language)
-        made = (_("Made from {voice} with {percent} % {other}.", voice=base["name"],
+        made = (_("Made from {voice} with {percent}% {other}.", voice=base["name"],
                   percent=int(amount * 100), other=other["name"]) if other and amount
                 else _("Made from {voice}.", voice=base["name"]))
         return {"id": self.vid, "name": avl.clean_name(self.ed_name.text()) or _("My voice"),

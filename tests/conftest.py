@@ -152,7 +152,8 @@ def pytest_xdist_auto_num_workers(config):
 def qapp():
     from PySide6.QtWidgets import QApplication
     app = QApplication.instance() or QApplication([])
-    app.setStyle("Fusion")
+    from soundboard.wheelguard import AppStyle
+    app.setStyle(AppStyle("Fusion"))   # as the app sets it (app.main)
     if not hasattr(app, "_collector"):   # collects while a test spins the event loop
         from soundboard.uigc import UiCollector
         app._collector = UiCollector(parent=app)
