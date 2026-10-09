@@ -119,6 +119,13 @@ def _plus(p, fill):
     p.drawLine(QPointF(5, 12), QPointF(19, 12))
 
 
+def _download(p, fill):
+    """An arrow down into an open tray."""
+    p.drawLine(QPointF(12, 3.5), QPointF(12, 14.5))
+    p.drawPolyline([QPointF(7.5, 10.5), QPointF(12, 15), QPointF(16.5, 10.5)])
+    p.drawPolyline([QPointF(4, 15), QPointF(4, 20), QPointF(20, 20), QPointF(20, 15)])
+
+
 def _gear(p, fill):
     """Six chunky rounded teeth on a ring: reads as a gear even at 16 px."""
     body = QPainterPath()
@@ -497,6 +504,7 @@ SHAPES = {
     "sliders": _sliders, "wave": _wave,
     "mic": _mic, "headphones": _headphones, "volume": _volume, "ear": _ear,
     "play": _play, "pause": _pause, "stop": _stop, "record": _record, "plus": _plus,
+    "download": _download,
     "expand": _expand,
     "settings": _gear, "history": _history, "leaf": _leaf, "live": _live,
     "back": _arrow("back"), "forward": _arrow("forward"), "reload": _reload,
