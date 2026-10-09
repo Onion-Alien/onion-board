@@ -32,7 +32,7 @@ from soundboard.voicefx import VoiceChain
 log = logging.getLogger(__name__)
 
 TTS_SID = "tts"
-NO_OUTPUT = "No audio device is open — pick one in Setup"
+NO_OUTPUT = "No audio device is open, pick one in Setup"
 MAX_GAIN = 4.0          # the voice volume box goes to 400 %
 
 

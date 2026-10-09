@@ -6,7 +6,7 @@ from PySide6.QtGui import QColor, QImage
 
 from soundboard import library, thumbs
 from soundboard.library import SR, Config, SoundMeta
-from soundboard.ui.widgets import Pad, spectrum
+from soundboard.ui.widgets import Pad, loudness, spectrum
 
 
 def make_image(path, w=800, h=450, color="#ff0000"):
@@ -171,6 +171,30 @@ def test_pad_bars_jump_up_and_fall_back(qapp):
     assert pad.bands is None
 
 
+def test_loudness_follows_the_sound_and_its_volume():
+    t = np.arange(SR) / SR
+    loud = (np.sin(2 * np.pi * 440 * t) * 0.7 * 32767).astype(np.int16)
+    quiet_then_loud = np.stack([np.r_[np.zeros(SR, np.int16), loud]] * 2, axis=1)
+    assert loudness(quiet_then_loud, 0.4) == 0.0          # silence
+    full = loudness(quiet_then_loud, 0.8)
+    assert 0.85 < full < 0.95                             # ~-6 dBFS RMS
+    half = loudness(quiet_then_loud, 0.8, gain=0.5)       # -6 dB more: 1/8 lower
+    assert abs((full - half) - 6 / 48) < 0.01
+    assert loudness(quiet_then_loud, 0.8, gain=4.0) == 1.0
+    assert loudness(None, 0.5) == 0.0
+
+
+def test_pad_meter_jumps_up_and_falls_back(qapp):
+    pad = Pad(SoundMeta(id="p", name="n", file="f"), 150)
+    pad.set_meter(0.9)
+    pad.set_meter(0.0)
+    assert 0.6 < pad.meter < 0.9 and pad.meter_peak > pad.meter
+    pad.set_meter(1.0)
+    assert pad.meter == pad.meter_peak == 1.0
+    pad.set_meter(None)
+    assert pad.meter is None
+
+
 def test_pad_paints_picture_and_visualizer(qapp, app_dir, tmp_path):
     m = SoundMeta(id="p", name="A very long sound name that wraps", file="f", duration=3.0)
     thumbs.set_image(m, make_image(tmp_path / "a.png", color="#2040ff"))
@@ -178,6 +202,7 @@ def test_pad_paints_picture_and_visualizer(qapp, app_dir, tmp_path):
     pad.state = "ready"
     pad.progress = 0.5
     pad.set_levels(np.linspace(0, 1, pad.n_bands))
+    pad.set_meter(1.0)
     img = pad.grab().toImage()
     assert not img.isNull()
     mid = img.pixelColor(img.width() // 2, img.height() // 3)

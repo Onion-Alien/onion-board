@@ -180,7 +180,7 @@ def run_busy(btn, text: str, fn: Callable[[], object],
             result = fn()
             msg = done(result) if callable(done) else done
         except Exception:
-            release(_("Didn't work — try again"))
+            release(_("Didn't work, try again"))
             raise
         release(msg, ms)
     QTimer.singleShot(0, go)
