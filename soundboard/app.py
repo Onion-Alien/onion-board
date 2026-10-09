@@ -401,6 +401,8 @@ def main():
     for msg in MIGRATION_ERRORS:
         log.error("%s", msg)
     tune_runtime_for_audio()
+    from soundboard import ytworker
+    ytworker.enabled = True   # web searches and downloads off the audio's GIL
     from soundboard import i18n
     i18n.startup(APP_DIR)   # before any window or module-level text is made
     import threading

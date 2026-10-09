@@ -354,6 +354,9 @@ def _mix(a: str, b: str, t: float) -> str:
         (ca.red(), cb.red()), (ca.green(), cb.green()), (ca.blue(), cb.blue())))).name()
 
 
+mix = _mix   # for widgets that tint with the theme's colours
+
+
 def _add_live_tokens(t: dict[str, str], colour: str = "") -> None:
     """The "it's on" highlight (voice changer on, live on air, the mic pill when it's
     connected, a live tab's tint): the theme's own accent, not one green for every

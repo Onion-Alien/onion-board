@@ -7,6 +7,7 @@ import pytest
 import numpy as np
 from PySide6.QtCore import QPointF, Qt
 from PySide6.QtGui import QMouseEvent
+from PySide6.QtWidgets import QPushButton
 
 from soundboard import backup
 from soundboard.library import Config, SoundMeta
@@ -255,6 +256,33 @@ def test_the_queue_shows_above_the_pads_and_can_be_trimmed(window, monkeypatch, 
     w._unqueue(0)
     w._update_chips({"s0": (0.5, False)})
     assert w._queue == [] and w.playing_row.isHidden()
+
+
+def test_a_double_click_on_a_queue_chips_x_takes_out_only_that_one(window, monkeypatch, calls):
+    w = window
+    w._ui_live = True
+    playing(monkeypatch, w, ["s0"])
+    w.queue_sound("s1")
+    w.queue_sound("s0")
+    w._update_chips({"s0": (0.5, False)})
+    first_x = [b for b in w.playing_row.findChildren(QPushButton) if b.text() == "✕"][0]
+    first_x.click()
+    first_x.click()                   # the same ✕ again before the row is remade
+    assert w._queue == ["s0"]
+
+
+def test_a_double_click_on_stop_doesnt_stop_the_next_queued_sound(window, monkeypatch, calls):
+    w = window
+    stopped = []
+    monkeypatch.setattr(w.engine, "stop", stopped.append)
+    w.select("s0")
+    w.stop_current()
+    w.select("s1")                    # the queue's next sound took the player
+    w.stop_current()                  # the double click's second press
+    assert stopped == ["s0"]
+    w._stopped_at = (0.0, "s0")       # a press well after: stops it
+    w.stop_current()
+    assert stopped == ["s0", "s1"]
 
 
 def test_the_queue_status_goes_once_the_queue_is_empty(window, monkeypatch, calls):

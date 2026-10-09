@@ -1,8 +1,11 @@
-"""The Sounds tab's link bar: paste a web link into "Search sounds" and this row
-appears under it. It looks the link up with yt-dlp (YouTube, SoundCloud, TikTok,
-Twitter/X, Reddit, most video sites, and plain links to audio / video files), then
-offers **Add as sound** (downloaded, imported like a dropped file) or **Play once**
-(downloaded and played through the pads' path, nothing kept in the library).
+"""The Sounds tab's link downloads: a web link pasted into "Search sounds" shows as a
+result card (ytsearch.SearchResults.show_link) whose **Add** and **Play** come here,
+as do a web search's. yt-dlp fetches it (YouTube, SoundCloud, TikTok, Twitter/X,
+Reddit, most video sites, and plain links to audio / video files): **Add** imports it
+like a dropped file, **Play** plays it through the pads' path, nothing kept in the
+library. The bar itself is a line under the search box that only shows when something
+went wrong (and "Try this one without Tor" when Tor was turned away); the card shows
+the rest.
 
 One download serves both: after Play once, Add as sound reuses the file instead of
 fetching it again. The temp folder is deleted when the link changes or the app closes.
@@ -16,12 +19,12 @@ import tempfile
 import threading
 from pathlib import Path
 
-from PySide6.QtCore import Qt, QTimer, Signal
+from PySide6.QtCore import Qt, Signal
 from PySide6.QtWidgets import QFrame, QHBoxLayout, QLabel, QPushButton
 
 from soundboard import net, netlog, quality, theme, thumbs, videos, ytdl
 from soundboard.library import (SR, decode, fingerprint, import_file, level_gain, to_int16)
-from soundboard.ui import busy, icons
+from soundboard.ui import busy
 from soundboard.ui.widgets import fmt_time
 from soundboard import errors
 from soundboard.i18n import _
@@ -29,7 +32,6 @@ from soundboard.i18n import _
 log = logging.getLogger(__name__)
 
 PLAY_ID = "__link__"   # the engine voice of Play once
-PROBE_DELAY_MS = 400
 
 
 def _drop_temp(path) -> None:
@@ -48,6 +50,7 @@ class LinkBar(QFrame):
     _msg = Signal(str, str, object)   # worker -> UI: (kind, url, payload)
     done = Signal(str, str, bool)     # (url, "add" | "play", it worked): a search row's busy end
     progress = Signal(str, float)     # (url, 0..1 downloaded, or -1 while it's converted)
+    link_changed = Signal(str)        # the search box's link ("" when it has none now)
 
     def __init__(self, engine, cfg, color_for, known_for):
         """`color_for()` gives the next pad colour, `known_for()` {fingerprint: name}
@@ -65,10 +68,7 @@ class LinkBar(QFrame):
         self._kept = None
         self._queued = ""             # "add" / "play" asked for while another download ran
         self._msg.connect(self._on_msg)
-        # a link typed by hand is a new "link" at every keystroke: look up only the
-        # one the typing stops at
-        self._probe_timer = QTimer(self, singleShot=True, interval=PROBE_DELAY_MS)
-        self._probe_timer.timeout.connect(self._probe_now)
+        self._shown = False           # the line says something wrong (_say)
 
         self.setObjectName("card")
         h = QHBoxLayout(self)
@@ -79,16 +79,6 @@ class LinkBar(QFrame):
         self.info.setWordWrap(True)
         errors.linkify(self.info)   # an error's "Report it" link
         h.addWidget(self.info, 1)
-        self.btn_play = QPushButton(_("Play once"))
-        self.btn_play.setToolTip(_("Download it and play it once, like a pad (others hear it "
-                                   "too) — it isn't added to your Sounds"))
-        icons.set_icon(self.btn_play, "play", size=14)
-        self.btn_play.clicked.connect(self.play_once)
-        self.btn_add = QPushButton(_("Add as sound"))
-        self.btn_add.setObjectName("primary")
-        self.btn_add.setToolTip(_("Download its audio and add it to your Sounds (Enter)"))
-        icons.set_icon(self.btn_add, "plus", "on_accent", size=14)
-        self.btn_add.clicked.connect(self.add)
         # Tor mode, after the site turned Tor away even over new routes: only this click
         # makes one download go without Tor (ytdl.TorBlocked)
         self.btn_direct = QPushButton(_("Try this one without Tor"))
@@ -98,15 +88,14 @@ class LinkBar(QFrame):
         self.btn_direct.hide()
         self._blocked = ""            # "add" / "play" that Tor couldn't do for this link
         h.addWidget(self.btn_direct)
-        h.addWidget(self.btn_play)
-        h.addWidget(self.btn_add)
         self.hide()
 
     # ------------------------------------------------------------------ state
     def set_text(self, text: str):
-        """Whatever is in the search box: a link shows the bar, anything else hides it.
-        Only a change counts: the board re-filters with the same text after every add,
-        which mustn't drop a web-search pick that's downloading or waiting its turn."""
+        """Whatever is in the search box: a link becomes the one Play / Add fetch
+        (link_changed tells the window to show its card). Only a change counts: the
+        board re-filters with the same text after every add, which mustn't drop a
+        web-search pick that's downloading or waiting its turn."""
         if text == self._text:
             return
         self._text = text
@@ -120,26 +109,11 @@ class LinkBar(QFrame):
         self._queued = ""
         self._blocked = ""
         self._drop_download()
-        self.setVisible(bool(url))
-        if not url:
-            self._probe_timer.stop()
-            return
-        if not ytdl.site_allowed(url):   # switched off in Settings > Privacy: no look-up
-            self._probe_timer.stop()
+        self._say("")
+        if url and not ytdl.site_allowed(url):   # switched off in Settings > Privacy
             self._say(html.escape(net.off_message(ytdl.site_feature(url))),
                       theme.status("warn"))
-            self._buttons()
-            return
-        self._say(_("Looking up <b>{host}</b>…", host=html.escape(self._host())))
-        self._buttons()
-        self._probe_timer.start()
-
-    def _probe_now(self):
-        if self.url:
-            netlog.cause(ytdl.FEATURE, "You pasted a link: looking up its name and "
-                                       "length")
-            threading.Thread(target=self._probe, args=(self.url,), daemon=True,
-                             name="link-probe").start()
+        self.link_changed.emit(url)
 
     def open(self, url: str, title: str, secs: float = 0.0):
         """A video picked from the YouTube search: already looked up, so no probe."""
@@ -149,30 +123,25 @@ class LinkBar(QFrame):
             self.url = url
             self._queued = ""
             self._blocked = ""
-            self._probe_timer.stop()
             self._drop_download()
         self.title = title
-        self.show()
         dur = f" · {fmt_time(secs)}" if secs else ""
-        self._say(f"<b>{html.escape(title)}</b>{dur} "
+        self._say(f"<b>{html.escape(title)}</b>{dur} "   # kept for reading, not shown
                   f"<span style='color:{theme.T['muted']}'>· {html.escape(self._host())}</span>")
-        self._buttons()
 
     def _host(self) -> str:
         return self.url.split("/")[2].removeprefix("www.") if self.url else ""
 
     def _say(self, text: str, color: str = ""):
+        """The bar's line. Only a problem shows it (the card shows the rest: busy,
+        playing, added); the text is kept either way."""
         self.info.setText(f"<span style='color:{color}'>{text}</span>" if color else text)
+        self._shown = bool(text) and color in (theme.status("error"), theme.status("warn"))
+        self._buttons()
 
     def _buttons(self):
         self.btn_direct.setVisible(bool(self._blocked) and not self._busy)
-        # already added: no second "Add as sound" next to "✓ Added …"
-        self.btn_add.setVisible(not self.url or self.url != getattr(self, "_added", ""))
-        ok = bool(self.url) and not self._busy and ytdl.site_allowed(self.url)
-        self.btn_add.setEnabled(ok)
-        self.btn_play.setEnabled(ok)
-        self.btn_add.setText(_("Adding…") if self._busy == "add" else _("Add as sound"))
-        self.btn_play.setText(_("Loading…") if self._busy == "play" else _("Play once"))
+        self.setVisible(bool(self.url) and (self._shown or not self.btn_direct.isHidden()))
 
     def _drop_download(self):
         if self._got is not None:
@@ -258,13 +227,6 @@ class LinkBar(QFrame):
                         name=name, time=fmt_time(len(data) / SR)))
 
     # ------------------------------------------------------------------ workers
-    def _probe(self, url: str):
-        try:
-            self._msg.emit("found", url, ytdl.probe(url))
-        except Exception as e:  # noqa: BLE001 - shown in the bar
-            log.info("link lookup failed for %s: %s", url, e)
-            self._msg.emit("probe-error", url, errors.plain(e))
-
     def _work(self, kind, url, got, color, known, auto_update, direct=False, video=False):
         """Download (unless `got` already holds it), then import or decode."""
         path = got[1] if got else None
@@ -328,29 +290,12 @@ class LinkBar(QFrame):
 
     def _on_msg(self, kind: str, url: str, payload):
         current = url == self.url
-        if kind == "found":
-            if current:
-                self.title, secs = payload
-                dur = f" · {fmt_time(secs)}" if secs else ""
-                self._say(f"<b>{html.escape(self.title)}</b>{dur} "
-                          f"<span style='color:{theme.T['muted']}'>"
-                          f"· {html.escape(self._host())}</span>")
-            return
-        if kind == "probe-error":
-            if current and not self._busy:
-                self._say(html.escape(_("Can't use this link: {error}", error=payload)),
-                          theme.status("error"))
-            return
         if kind == "title":
             if current:
                 self.title = self.title or payload
             return
         if kind == "progress":
-            self.progress.emit(url, payload)
-            if current:
-                t = (_("Adding…") if self._busy == "add" else _("Loading…"))
-                t = t if payload < 0 else f"{t} {payload:.0%}"
-                (self.btn_add if self._busy == "add" else self.btn_play).setText(t)
+            self.progress.emit(url, payload)   # the card's bar and button show it
             return
         # the download finished one way or another
         was, self._busy = self._busy, ""

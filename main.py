@@ -16,6 +16,11 @@ if __name__ == "__main__" and sys.argv[1:2] == ["--direct-mic"]:
     from soundboard.directmic import cli as direct_mic_cli
     sys.exit(direct_mic_cli(sys.argv[2:]))
 
+if __name__ == "__main__" and sys.argv[1:2] == ["--ytdl-worker"]:
+    # the app's helper that runs yt-dlp's searches and downloads (soundboard.ytworker)
+    from soundboard.ytworker import child_main
+    sys.exit(child_main())
+
 from soundboard.app import main  # noqa: E402
 
 if __name__ == "__main__":

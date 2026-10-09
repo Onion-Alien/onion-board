@@ -28,7 +28,7 @@ from PySide6.QtWidgets import (QApplication, QCheckBox, QComboBox, QDialog, QFil
 from shiboken6 import isValid as qt_valid
 
 from soundboard import engine as eng
-from soundboard import theme, winkeys, ytdl
+from soundboard import theme, winkeys, ytdl, ytworker
 from soundboard.engine import SR, Engine
 from soundboard.engine import is_virtual as is_virtual_cable
 from soundboard import exitwatch
@@ -141,6 +141,7 @@ MINI_SIZE = QSize(440, 380)   # below this the window becomes the mini player...
 MINI_PAD_ROWS = 1             # ...which has the pads above it when this many rows fit
 QUEUE_CHIPS = 5          # queued sounds shown by name above the pads (then "+n more")
 SEARCH_WAIT_MS = 100     # typing in the search box filters the pads once it pauses this long
+LINK_WAIT_MS = 400       # a link in the search box is looked up once it stays this long
 PAD_SIZE_WAIT_MS = 50    # dragging Pad size re-lays the pads at most this often
 RANDOM = "__random__:"   # hotkey action prefix: a random sound from the category after it
 ALL = _("All")       # the category tab that shows every sound
@@ -375,6 +376,7 @@ class MainWindow(QMainWindow):
         self.shuffle = ShuffleBag()       # the random-sound hotkeys
         self._last_sid: str | None = None   # the last sound played (its replay hotkey)
         self._queue: list[str] = []       # sounds waiting for the ones playing to finish
+        self._stopped_at = (0.0, "")       # (when, which) the player's ■ last stopped
         self._cool: dict[str, float] = {}   # sid -> time.monotonic() its cooldown ends
         self._waiting: dict[str, list[QTimer]] = {}   # sid -> its delayed starts
         self._hotkeys_off = False         # "All hotkeys off": only that key still works
@@ -1061,7 +1063,7 @@ class MainWindow(QMainWindow):
         self.search.setPlaceholderText(_("Search sounds or paste a link"))
         self.search.setToolTip(_("Type to filter your sounds; Enter searches the web (YouTube, "
                                  "TikTok, Myinstants…). Or paste a link (YouTube, SoundCloud, "
-                                 "TikTok, most media sites) to add or play it"))
+                                 "TikTok, most media sites) to see it, then play or add it"))
         self.search.setClearButtonEnabled(True)
         self.search.setMinimumWidth(SEARCH_MIN_W)   # until the window gets narrow (_init_fit)
         # typing regrids only when the pads shown change (35 ms a key with 600 pads),
@@ -1165,6 +1167,10 @@ class MainWindow(QMainWindow):
             lambda: {m.fingerprint: m.name for m in self.cfg.sounds if m.fingerprint})
         self.linkbar.sound_ready.connect(self.on_downloaded)
         self.linkbar.played.connect(self.on_link_played)
+        # a link in the search box shows as a result card (nothing downloads until Play / Add)
+        self._link_wait = QTimer(self, singleShot=True, interval=LINK_WAIT_MS)
+        self._link_wait.timeout.connect(self._show_link)
+        self.linkbar.link_changed.connect(self._on_link_changed)
         left.addWidget(self.linkbar)
         self.ytresults = SearchResults()
         self.ytresults.play.connect(lambda r: self._from_youtube(r, play=True))
@@ -1347,7 +1353,8 @@ class MainWindow(QMainWindow):
                     self._chips_hl.addWidget(self._chip(
                         m.name if m else sid, _("Waits for the sounds playing to finish"),
                         lambda __=False, s=sid: self.select(s),
-                        _("Take it out of the queue"), lambda __=False, i=i: self._unqueue(i)))
+                        _("Take it out of the queue"),
+                        lambda __=False, i=i, q=queue: self._unqueue(i, q)))
                 if len(queue) > QUEUE_CHIPS:
                     more = QLabel(_("+{value} more", value=len(queue) - QUEUE_CHIPS))
                     more.setObjectName("muted")
@@ -1411,10 +1418,17 @@ class MainWindow(QMainWindow):
         ch.addWidget(x)
         return chip
 
-    def _unqueue(self, i: int):
+    def _unqueue(self, i: int, shown: tuple[str, ...] | None = None):
+        """The ✕ on the queue's chip `i`, of the queue as its row `shown` it. A row
+        that's out of date does nothing: the chips are remade on the next tick, so a
+        double click (or a bouncy mouse) hit the same ✕ twice, and the second took out
+        the sound that had moved into that place. The row is remade at once."""
+        if shown is not None and tuple(self._queue) != shown:
+            return
         if 0 <= i < len(self._queue):
             del self._queue[i]
             self._say_queue()
+            self._update_chips(self.engine.playing())
 
     def drop_pending(self, sid: str):
         """`sid` won't start later after all: off the queue, and not when its wait
@@ -3995,7 +4009,10 @@ class MainWindow(QMainWindow):
         link bar's instead)."""
         self.flush_search()
         text = self.search.text()
-        if ytdl.as_link(text) or not self.ytresults.available():
+        if ytdl.as_link(text):
+            self._show_link()
+            return
+        if not self.ytresults.available():
             return
         if not self.ytresults.search(text):
             if not text.strip():
@@ -4008,9 +4025,28 @@ class MainWindow(QMainWindow):
     def on_search_enter(self):
         self.flush_search()   # a link pasted a moment ago: the link bar has it now
         if ytdl.as_link(self.search.text()):
-            self.linkbar.add()
+            self._show_link()   # its card, at once: nothing downloads until Play / Add
         else:
             self.search_youtube()
+
+    def _on_link_changed(self, url: str):
+        """The search box's link changed: show its card once it stays (a link typed by
+        hand is a new one at every key); no link any more: its card goes."""
+        if url:
+            self._link_wait.start()
+            return
+        self._link_wait.stop()
+        if self.ytresults.link and not self.ytresults.isHidden():
+            self.ytresults.close_results()
+
+    def _show_link(self):
+        """The search box's link as a result card: looked up, not downloaded."""
+        self._link_wait.stop()
+        url = self.linkbar.url
+        if not url or self.is_mini() or not self.ytresults.show_link(url):
+            return
+        self._pads_scroll.hide()
+        self._cat_row.hide()
 
     def _from_youtube(self, r, play: bool):
         if play and r.url == self._link_url and self.audio.get(LINK_ID) is not None:
@@ -4196,7 +4232,15 @@ class MainWindow(QMainWindow):
             self.play(sid)
 
     def stop_current(self):
+        """The player's ■. A second press within a double-click of the first that
+        would stop a different sound is a double click (or a bouncy mouse): the queue's
+        next sound had already taken the player, and it went too."""
+        now, (at, was) = time.monotonic(), self._stopped_at
+        if (self.current and was and self.current != was
+                and now - at < QApplication.doubleClickInterval() / 1000):
+            return
         if self.current:
+            self._stopped_at = (now, self.current)
             self._stop_sound(self.current)
         self.start_frac = 0.0
 
@@ -7291,7 +7335,7 @@ class MainWindow(QMainWindow):
                      self._stop_remote_addons,
                      self.radio.shutdown, tor.shutdown, self.apps.shutdown,
                      self.triggers.shutdown,
-                     self.linkbar.shutdown,
+                     self.linkbar.shutdown, ytworker.drop_all,
                      self.voice.shutdown, self.engine.shutdown, shellicon.detach,
                      netlog.flush,   # what's still open, once the rest closed
                      self._mark_stopped):   # last: this run ended cleanly (usage.py)

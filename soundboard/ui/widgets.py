@@ -339,7 +339,11 @@ def spectrum(data: np.ndarray, frac: float, n: int) -> np.ndarray:
     `frac` (0..1): what a pad's visualizer shows. Cheap: one 2048-point FFT."""
     if data is None or not len(data) or n <= 0:
         return np.zeros(max(n, 0), np.float32)
-    pos = int(min(max(frac, 0.0), 1.0) * len(data))
+    # the stretch just played, not the one coming: a long sound is read from disk
+    # (mapped.py) and what's ahead may not be in yet, while the rest of the file is
+    # being read in behind it. On a slow drive each frame waited its turn: the pad's
+    # equalizer ran at 2 a second until that finished. What was just played is in.
+    pos = max(0, int(min(max(frac, 0.0), 1.0) * len(data)) - FFT_N)
     seg = data[pos:pos + FFT_N]
     if len(seg) < FFT_N:
         seg = np.concatenate([seg, np.zeros((FFT_N - len(seg), 2), seg.dtype)])
