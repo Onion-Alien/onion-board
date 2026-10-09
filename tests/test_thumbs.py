@@ -118,17 +118,21 @@ def test_spectrum_puts_a_tone_in_the_right_band():
         assert bands.max() > 0.6
 
 
-def test_spectrum_of_silence_and_the_very_end_is_flat():
+def test_spectrum_of_silence_is_flat_and_it_shows_what_was_just_played():
     assert spectrum(np.zeros((SR, 2), np.int16), 0.5, 12).max() == 0.0
     noise = (np.random.default_rng(1).standard_normal((SR, 2)) * 3000).astype(np.int16)
-    assert spectrum(noise, 1.0, 12).max() == 0.0          # past the end: nothing left
+    quiet_then_loud = np.concatenate([np.zeros((SR, 2), np.int16), noise])
+    # half way: the stretch just played (silence), never the one ahead, which a long
+    # sound may still be reading from disk (mapped.py): a frame waited for it
+    assert spectrum(quiet_then_loud, 0.5, 12).max() == 0.0
+    assert spectrum(quiet_then_loud, 0.6, 12).max() > 0.3
     assert len(spectrum(None, 0.5, 10)) == 10
 
 
 def _spectrum_one_band_at_a_time(data, frac, n):
     """The plain version of spectrum(): a loop over the bands (what it used to be)."""
     from soundboard.ui.widgets import _FREQS, _HANN, FFT_N
-    pos = int(min(max(frac, 0.0), 1.0) * len(data))
+    pos = max(0, int(min(max(frac, 0.0), 1.0) * len(data)) - FFT_N)
     seg = data[pos:pos + FFT_N]
     if len(seg) < FFT_N:
         seg = np.concatenate([seg, np.zeros((FFT_N - len(seg), 2), seg.dtype)])
@@ -213,7 +217,9 @@ def test_link_add_uses_the_video_thumbnail(qapp, window, monkeypatch, tmp_path):
         return path, title
     monkeypatch.setattr(ytdl, "download_audio", with_thumb)
     window.search.setText("https://youtu.be/abc")
-    window.search.returnPressed.emit()
+    window.search.returnPressed.emit()                   # its card; then its Add
+    assert process_events(qapp, lambda: window.ytresults._rows, 5)
+    window.ytresults._rows[0].btn_add.click()
     assert process_events(qapp, lambda: len(window.cfg.sounds) == 3, 5)
     m = window.cfg.sounds[-1]
     assert m.image and thumbs.Path(m.image).parent == library.THUMBS_DIR

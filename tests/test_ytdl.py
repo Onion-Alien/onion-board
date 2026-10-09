@@ -397,29 +397,42 @@ def fake_link_download(monkeypatch, tmp_path):
 
     monkeypatch.setattr(ytdl, "download_audio", download)
     monkeypatch.setattr(ytdl, "probe", lambda url: ("A Tone", 1.0))
+    monkeypatch.setattr(ytdl, "lookup", lambda url, direct=False: ytdl.Result(
+        "abc", "A Tone", "Tone Channel", 1.0, source="link", link=url))
     monkeypatch.setattr(tempfile, "gettempdir", lambda: str(tmp_path))
     return calls
 
 
-def test_link_in_search_shows_the_bar_and_filters_nothing(qapp, window, monkeypatch,  # noqa: F811
-                                                          tmp_path):
-    fake_link_download(monkeypatch, tmp_path)
+def test_link_in_search_shows_its_card_and_filters_nothing(qapp, window, monkeypatch,  # noqa: F811
+                                                           tmp_path):
+    calls = fake_link_download(monkeypatch, tmp_path)
     window.search.setText("Boom")
     assert window.linkbar.isHidden()
     assert window.pads["s1"].property("filtered")
     window.search.setText("https://youtu.be/abc")
-    assert not window.linkbar.isHidden() and window.linkbar.url == "https://youtu.be/abc"
+    assert window.linkbar.url == "https://youtu.be/abc"
+    assert window.linkbar.isHidden()                  # no bar of buttons: the card is it
     assert not any(p.property("filtered") for p in window.pads.values())
-    assert process_events(qapp, lambda: "A Tone" in window.linkbar.info.text(), 3)
+    assert process_events(qapp, lambda: window.ytresults._rows, 3)
+    rows = window.ytresults._rows
+    assert rows[0].result.title == "A Tone" and rows[0].result.url == "https://youtu.be/abc"
+    assert window._pads_scroll.isHidden()
+    assert calls == []                                # looked up, nothing downloaded
     window.search.clear()
-    assert window.linkbar.isHidden() and window.linkbar.url == ""
+    assert window.ytresults.isHidden() and window.linkbar.url == ""
+    assert not window._pads_scroll.isHidden()
 
 
 def test_link_add_as_sound(qapp, window, monkeypatch, tmp_path):  # noqa: F811
     calls = fake_link_download(monkeypatch, tmp_path)
     window.search.setText("https://youtu.be/abc")
-    window.search.returnPressed.emit()                       # Enter = Add as sound
+    window.search.returnPressed.emit()                       # Enter: its card, at once
+    rows = window.ytresults._rows
+    assert process_events(qapp, lambda: rows, 3)
+    assert calls == [] and len(window.cfg.sounds) == 2       # nothing downloaded yet
+    rows[0].btn_add.click()
     assert process_events(qapp, lambda: len(window.cfg.sounds) == 3, 5)
+    assert rows[0].btn_add.text() == "✓ Added"
     m = window.cfg.sounds[-1]
     assert m.name == "A Tone" and m.id in window.pads and m.id in window.audio
     assert calls == ["https://youtu.be/abc"]
@@ -772,22 +785,22 @@ def test_a_download_locks_the_other_cards_and_shows_its_progress(qapp, monkeypat
     panel._on_done(0, hits, "")
     a, b, c = panel._rows
     panel.mark(hits[0].url, "add")                   # Add on the first card
-    assert a.bar.maximum() == 1000 and a.bar.value() == 0
+    assert a.fill == 0.0
     assert "0%" in a.btn_add.text()
     assert busy.is_busy(a.btn_add) and not busy.is_busy(a.btn_play)   # Play after it: fine
     assert all(busy.is_busy(x) for r in (b, c) for x in (r.btn_play, r.btn_add))
     panel.progress(hits[0].url, 0.42)
-    assert a.bar.isVisibleTo(a) and a.bar.value() == 420 and "42%" in a.btn_add.text()
+    assert a.fill == 0.42 and "42%" in a.btn_add.text()
     panel.mark(hits[0].url, "play")                  # ...and Play on it too
-    assert a.bar.value() == 420                      # no reset for a shared download
+    assert a.fill == 0.42                     # no reset for a shared download
     panel.progress(hits[0].url, -1)                  # conversion is a separate phase
-    assert a.bar.maximum() == 1000 and a.bar.value() == 420
+    assert a.fill == 1.0   # converting: full
     assert "Processing" in a.btn_play.text()
     panel.mark(hits[0].url, "add", True)
-    assert a.btn_add.text() == "✓ Added" and a.bar.isVisibleTo(a)   # still playing
+    assert a.btn_add.text() == "✓ Added" and a.fill >= 0   # still playing
     assert busy.is_busy(b.btn_play)
     panel.mark(hits[0].url, "play", True)
-    assert not a.bar.isVisibleTo(a) and busy.is_busy(a.btn_add)       # added stays added
+    assert a.fill < 0 and busy.is_busy(a.btn_add)       # added stays added
     assert not any(busy.is_busy(x) for r in (b, c) for x in (r.btn_play, r.btn_add))
 
 
@@ -809,3 +822,19 @@ def test_download_progress_is_reported_at_most_ten_times_a_second():
     for k in range(1, 1001):            # a fast download: a thousand blocks at once
         hook({"status": "downloading", "downloaded_bytes": k, "total_bytes": 1000})
     assert seen[0] == 0.001 and seen[-1] == 1.0 and len(seen) <= 3
+
+
+def test_a_pasted_link_shows_only_its_own_card(qapp, window, monkeypatch, tmp_path):  # noqa: F811
+    from soundboard.ui.ytsearch import ResultRow
+    fake_link_download(monkeypatch, tmp_path)
+    hits = [ytdl.Result(f"id{i}", f"Hit {i}", "Chan", 3) for i in range(3)]
+    monkeypatch.setattr(ytdl, "search", lambda q, **kw: hits)
+    window.search.setText("vine boom")
+    window.search_youtube()
+    assert process_events(qapp, lambda: len(window.ytresults._rows) == 3, 3)
+    window.search.setText("https://youtu.be/abc")
+    window.search.returnPressed.emit()
+    assert process_events(qapp, lambda: len(window.ytresults._rows) == 1, 3)
+    shown = window.ytresults.list.findChildren(ResultRow)
+    assert [w.result.title for w in shown if not w.isHidden()] == ["A Tone"]
+    assert shown and all(w.wide for w in shown if not w.isHidden())   # its own big card

@@ -41,7 +41,7 @@ from collections.abc import Callable
 from dataclasses import dataclass
 from pathlib import Path
 
-from soundboard import library, net, quality
+from soundboard import library, net, quality, ytworker
 from soundboard.library import MAX_SECONDS
 from soundboard import errors
 from soundboard.i18n import _
@@ -311,6 +311,7 @@ def _purge():
     for name in [n for n in sys.modules if n.partition(".")[0] in PACKAGES]:
         del sys.modules[name]
     importlib.invalidate_caches()
+    ytworker.drop_all()   # the helper process holds the old copy too
 
 
 def _get(url: str, limit: int) -> bytes:
@@ -503,21 +504,31 @@ def download_audio(url: str, dest: Path | None = None,
 def probe(url: str, direct: bool = False) -> tuple[str, float]:
     """Look `url` up without downloading anything: (clean title, seconds or 0).
     Raises DownloadError like download_audio (but never updates yt-dlp)."""
+    r = lookup(url, direct)
+    return r.title, r.seconds
+
+
+def lookup(url: str, direct: bool = False) -> Result:
+    """A pasted link as a search hit: its title, channel, length, picture and counts,
+    nothing downloaded (the search box shows it as a card to play or add). Raises
+    DownloadError like probe."""
     feature = _gate(url)
     if url.startswith(MYINSTANTS + "/media/sounds/"):
-        return _direct_title(url), 0.0
+        return Result(_direct_leaf(url), _direct_title(url), "Myinstants", 0.0,
+                      source="link", link=url)
 
     def look():
-        with _ydl() as yt_dlp:
-            try:
-                with yt_dlp.YoutubeDL(_opts(feature=feature, direct=direct)) as ydl:
-                    return _check(ydl.extract_info(url, download=False))
-            except DownloadError:
-                raise
-            except Exception as e:  # noqa: BLE001 - yt-dlp raises many kinds; show its message
-                raise _readable(e) from e
+        return _check(_extract(url, _opts(feature=feature, direct=direct)))
     info = look() if direct else _over_tor(look, url)
-    return clean_title(info.get("title") or "") or _("Sound"), float(info.get("duration") or 0)
+
+    def count(key):
+        v = info.get(key)
+        return int(v) if isinstance(v, (int, float)) else None
+    return Result(str(info.get("id") or url), clean_title(info.get("title") or "") or _("Sound"),
+                  str(info.get("uploader") or info.get("channel") or info.get("creator") or ""),
+                  float(info.get("duration") or 0), source="link", link=url,
+                  art=str(info.get("thumbnail") or ""), views=count("view_count"),
+                  likes=count("like_count"), comments=count("comment_count"))
 
 
 # The sites search() can look things up on: key -> (button name, what it searches).
@@ -589,12 +600,7 @@ def search(query: str, count: int = 20, source: str = "youtube",
     opts.update(extract_flat="in_playlist", noplaylist=False, playlistend=count)
 
     def look():
-        with _ydl() as yt_dlp:
-            try:
-                with yt_dlp.YoutubeDL(opts) as ydl:
-                    return ydl.extract_info(target, download=False)
-            except Exception as e:  # noqa: BLE001 - yt-dlp raises many kinds; show its message
-                raise _readable(e) from e
+        return _extract(target, opts)
     site = "https://soundcloud.com" if source == "soundcloud" else "https://www.youtube.com"
     info = look() if direct else _over_tor(look, site)
     out = []
@@ -744,6 +750,39 @@ def _download_direct(url, dest, progress, direct: bool = False) -> tuple[Path, s
     return path, _direct_title(url)
 
 
+def _sendable(opts: dict) -> dict:
+    """yt-dlp's options for the helper process: its own hooks and logger go there."""
+    return {k: v for k, v in opts.items() if k not in ("progress_hooks", "logger")}
+
+
+def _remote(e: ytworker.RemoteError) -> Exception:
+    """yt-dlp's error from the helper as one of its own class name, for _readable."""
+    module, _dot, name = e.kind.rpartition(".")
+    return type(name or "Error", (Exception,), {"__module__": module or "yt_dlp"})(str(e))
+
+
+def _extract(target: str, opts: dict) -> dict:
+    """yt-dlp's look-up of `target` (nothing downloaded), in the helper process when
+    the app has one (ytworker: it never holds up the sound), else here."""
+    if ytworker.enabled:
+        try:
+            return ytworker.run("lookup", target, _sendable(opts))
+        except ytworker.RemoteError as e:
+            raise _readable(_remote(e)) from None
+        except TimeoutError as e:
+            raise FetchError(_("The site took too long to answer. Try again.")) from e
+        except ytworker.Unavailable as e:
+            log.info("%s; looking it up here", e)
+    with _ydl() as yt_dlp:
+        try:
+            with yt_dlp.YoutubeDL(opts) as ydl:
+                return ydl.extract_info(target, download=False)
+        except DownloadError:
+            raise
+        except Exception as e:  # noqa: BLE001 - yt-dlp raises many kinds; show its message
+            raise _readable(e) from e
+
+
 def _check(info: dict) -> dict:
     """Refuse what isn't one sound."""
     if info.get("_type") == "playlist":
@@ -845,6 +884,10 @@ def _run(yt_dlp, url: str, dest: Path, progress, feature: str = FEATURE,
         # a playlist's entries left unresolved: one private or deleted video in it
         # must not hide that it's a playlist (_check says so). A video isn't affected.
         opts["extract_flat"] = "in_playlist"
+        done = _run_helper(url, opts, progress) if ytworker.enabled else None
+        if done is not None:
+            info, path = done
+            return _found(url, dest, path, info)
         with yt_dlp.YoutubeDL(opts) as ydl:
             info = _check(ydl.extract_info(url, download=False))
             dur = info.get("duration") or 0
@@ -858,6 +901,35 @@ def _run(yt_dlp, url: str, dest: Path, progress, feature: str = FEATURE,
         if _went_nowhere(url, str(e)):
             raise FetchError(_("That video isn't available any more.")) from e
         raise _readable(e) from e
+    return _found(url, dest, path, info)
+
+
+DOWNLOAD_QUIET_S = 300   # a helper download that says nothing for this long is stuck
+
+
+def _run_helper(url: str, opts: dict, progress) -> tuple[dict, Path] | None:
+    """_run's yt-dlp part in the helper process (ytworker); None: do it here."""
+    try:
+        info, name = ytworker.run("download", url, _sendable(opts), MAX_SECONDS,
+                                  timeout=DOWNLOAD_QUIET_S, progress=progress)
+    except ytworker.RemoteError as e:
+        if _went_nowhere(url, str(e)):
+            raise FetchError(_("That video isn't available any more.")) from None
+        raise _readable(_remote(e)) from None
+    except TimeoutError as e:
+        raise FetchError(_("The download stopped moving. Try again.")) from e
+    except ytworker.Unavailable as e:
+        log.info("%s; downloading here", e)
+        return None
+    info = _check(info)
+    if (info.get("duration") or 0) > MAX_SECONDS:
+        log.info("%s is %ds; only the first %ds will be kept", url, info["duration"],
+                 MAX_SECONDS)
+    return info, Path(name)
+
+
+def _found(url: str, dest: Path, path: Path, info: dict) -> tuple[Path, str]:
+    """The file a download made, and its title."""
     if not path.is_file():   # skipped (too big) or the extension changed
         found = [p for p in dest.iterdir() if p.is_file() and not p.name.endswith(".part")
                  and p.suffix.lower() not in IMAGE_EXTS]

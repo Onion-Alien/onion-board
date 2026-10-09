@@ -24,7 +24,6 @@ def _bar():
     eng = Eng()
     bar = LinkBar(engine=eng, cfg=Config(), color_for=lambda: "#fff", known_for=dict)
     bar.set_text(URL)
-    bar._probe_timer.stop()
     return bar, eng
 
 
