@@ -531,3 +531,22 @@ def test_switching_count_me_in_off_sends_one_opt_out_first(window, qapp, monkeyp
     finally:
         d.close()
         net.configure_features()
+
+
+def test_count_me_in_eye_opens_the_table(window):  # noqa: F811
+    """Count me in's hint stays short; its eye opens the table of what's sent, with
+    an example and a reason on every row, and it never touches the switch."""
+    from soundboard.ui import countdialog
+    d = SettingsDialog(window)
+    try:
+        box = d.net_boxes["usage_stats"]
+        was = box.isChecked()
+        assert len(d.NET_HINTS["usage_stats"]) < 120
+        d.count_eye.click()
+        dlg = d.count_dialog
+        assert isinstance(dlg, countdialog.CountDialog) and dlg.isVisible()
+        assert all(what and example and why for what, example, why in countdialog.rows())
+        assert box.isChecked() == was
+        dlg.close()
+    finally:
+        d.close()

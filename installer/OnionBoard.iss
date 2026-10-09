@@ -105,7 +105,7 @@ WelcomeLabel2=This puts Onion Board on your PC. Your sounds go straight into you
 WizardSelectTasks=Pick what you want
 SelectTasksDesc=Tick what you'd like. If you're not sure, leave the boxes as they are.
 FinishedHeadingLabel=All done!
-FinishedLabel=Onion Board is installed. It will open now and ask you a few easy questions (which mic you use, where you listen), then put your sounds straight into that mic.%n%nYou can find it later on your Desktop or in the Start menu.%n%nPrivacy: no account or ads. The only thing counted is the anonymous "still here" if you left Count me in ticked. Settings > Privacy & security shows everything the app does online, lets you switch those things off, and can send all of it through a proxy or Tor.
+FinishedLabel=Onion Board is installed. It will open now and ask you a few easy questions (which mic you use, where you listen), then put your sounds straight into that mic.%n%nYou can find it later on your Desktop or in the Start menu.%n%nPrivacy: no account or ads. If you left Count me in ticked, it sends anonymous usage stats once a day (never your name, IP address or device info). Settings > Privacy & security shows everything the app does online, lets you switch those things off, and can send all of it through a proxy or Tor.
 FinishedRestartLabel=Onion Board is installed. To finish setting up the virtual cable, Windows needs to restart your PC.%n%nAfter the restart, open Onion Board from the Start menu and it will pick up where it left off.
 
 [Tasks]
@@ -114,7 +114,7 @@ Name: "ffmpeg"; Description: "Play M4A, AAC and video files (the free FFmpeg, ab
 Name: "livevoice"; Description: "Set up live voice-to-speech now (needs Python, about 300 MB)"; GroupDescription: "Extra features (optional)"; Flags: unchecked
 Name: "tor"; Description: "Private connection (Tor): hides your internet address (about 22 MB)"; GroupDescription: "Privacy (optional)"; Flags: unchecked
 Name: "keepnetlog"; Description: "Keep a history of what Onion Board connects to (on this PC only)"; GroupDescription: "Privacy (optional)"; Flags: unchecked
-Name: "countme"; Description: "Count me in: an anonymous ""still here"" once a day, and crash counts"; GroupDescription: "Privacy (optional)"
+Name: "countme"; Description: "Count me in: anonymous usage stats (features used, crash counts)"; GroupDescription: "Privacy (optional)"
 Name: "desktopicon"; Description: "Put an Onion Board shortcut on my Desktop"; GroupDescription: "Shortcuts"
 
 [InstallDelete]
@@ -477,7 +477,7 @@ begin
   Body.Width := HeardPage.SurfaceWidth;
   Body.ShowAccelChar := False;
   Body.Caption := 'It helps us know where people find it. Your pick goes once with the ' +
-    'anonymous Count me in, and nothing else is sent.';
+    'anonymous Count me in.';
   Body.AdjustHeight;
   Top := Body.Top + Body.Height + ScaleY(12);
   AddHeardRadio('youtube', 'YouTube', Top);
@@ -608,7 +608,7 @@ begin
   Body.ShowAccelChar := False;
   Body.Caption :=
     'No account, no ads. On its own, Onion Board only goes online once a day: to ' +
-    'check for updates, and to send an anonymous "still here" if Count me in is ' +
+    'check for updates, and to send anonymous usage stats if Count me in is ' +
     'ticked. Nothing downloads until you click Update, and you can switch both off.' + #13#10#13#10 +
     'Everything else happens only when you use it:' + #13#10 +
     Bullet + 'Sounds: searching and downloading go to YouTube, SoundCloud or Myinstants.' + #13#10 +
