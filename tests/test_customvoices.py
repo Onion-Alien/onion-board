@@ -190,10 +190,8 @@ def test_custom_voices_are_found_from_the_voice_list_and_from_settings(window): 
     w = window
     s = w.voice.speech
     head = w.voice._heads["custom"]
-    assert head.is_open() and not s.custom_box.isHidden()
+    assert not head.is_open() and s.custom_box.isHidden()   # the tab opens folded
     assert not s.isAncestorOf(s.custom_box)          # its own card, not inside Speak
-    head.arrow.toggle()                              # folded away
-    assert s.custom_box.isHidden()
     s.b_add_voices.click()
     assert not s.custom_box.isHidden() and not s.btn_opts.isChecked() and head.is_open()
     head.arrow.toggle()

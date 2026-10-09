@@ -2719,12 +2719,15 @@ class VoicePanel(QWidget):
         cols = self._cols = QHBoxLayout()
         cols.setContentsMargins(0, 0, 0, 0)
         cols.setSpacing(16)
-        pv.addLayout(cols, 1)
-        # Speak another language goes under the columns, the full width: the voice
-        # changer and AI voices are what most people come for, so they're first and
-        # fully on screen at 1280x760; the speak card is nearest the bottom bar it uses.
+        pv.addLayout(cols)
+        # Speak another language and the add-ons go under the columns, the full width:
+        # the voice changer and AI voices are what most people come for, so they're
+        # first, side by side; the speak card is nearest the bottom bar it uses. Only two
+        # cards share a row, so a tall one never leaves a hole beside a short one.
         self._bottom = QVBoxLayout()
+        self._bottom.setSpacing(16)
         pv.addLayout(self._bottom)
+        pv.addStretch(1)                 # spare height goes under the cards, not between
         folded = speech.get("folded") if isinstance(speech, dict) else None
         self._folded = {k for k in folded if isinstance(k, str)} \
             if isinstance(folded, list) else set()
@@ -2777,7 +2780,7 @@ class VoicePanel(QWidget):
         self._scanned.connect(self._apply_scan)
         self._scanning = False
         self.addons.show_modules(self.modules)
-        rcol.addWidget(self._fold_card("addons", self.addons))
+        self._bottom.addWidget(self._fold_card("addons", self.addons))
         rcol.addStretch(1)
 
         outer.addWidget(self.speech.say_bar)
@@ -2883,9 +2886,9 @@ class VoicePanel(QWidget):
         v.addWidget(head)
         v.addWidget(panel)
         self._heads[key] = head
-        head.set_open(key not in self._folded)
-        panel.setVisible(key not in self._folded)
-        return f
+        head.set_open(False)                    # the tab opens with every card folded
+        panel.setVisible(False)                 # (what's folded is still saved, for
+        return f                                # older versions)
 
     def _fold(self, key: str, panel: QWidget, folded: bool):
         panel.setVisible(not folded)
