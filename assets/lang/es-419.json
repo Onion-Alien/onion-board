@@ -125,7 +125,6 @@
   "A restore point is saved first, so you can undo this.": "Primero se guarda un punto de restauración, así que puedes deshacer esto.",
   "A short “Did you know?” about a feature, at most once a day, never while a game is up.": "Un breve “¿Sabías que…?” sobre una función, como mucho una vez al día, nunca mientras haya un juego abierto.",
   "A small dot on its icon": "Un puntito en su ícono",
-  "A soft wash and a coloured icon in the theme's colour, easy to spot from across the room": "Un fondo suave y un ícono en el color del tema, fácil de ver desde el otro lado del cuarto",
   "A soundboard is most useful left running: your hotkeys and the overlay work while the window is closed. The tray icon (by the clock) opens it again; right-click it to quit.": "Una soundboard es más útil si la dejas abierta: tus atajos y la superposición funcionan con la ventana cerrada. El ícono de la bandeja (junto al reloj) la vuelve a abrir; haz clic derecho en él para salir.",
   "A tab whose feature is on right now (a sound playing, the voice changer, the radio…) is marked, so nothing is left on without you noticing.": "Una pestaña cuya función está activa ahora mismo (un sonido sonando, el cambiador de voz, la radio…) se marca, para que nada se quede encendido sin que te des cuenta.",
   "A virtual cable (not installed yet)": "Un cable virtual (aún sin instalar)",
@@ -738,7 +737,7 @@
   "On the left, click <b>Voice</b>.": "A la izquierda, haz clic en <b>Voz</b>.",
   "On, at {host}:{port}. Pick a link to copy.": "Activado, en {host}:{port}. Elige un enlace para copiarlo.",
   "On: listening on {host}:{port}.": "Activado: escuchando en {host}:{port}.",
-  "Once a day, the installed app sends an anonymous \"still here\" to our counter (goatcounter.com): the version number and a random ID made on this PC, so nobody is counted twice, and which tabs you opened. If it crashed or froze, how many times (a count, never the report), and once when you uninstall. Nothing else: no name, sounds, settings or games. It's how we know if anyone uses Onion Board, and if it's working for them. Off: nothing is sent.": "Una vez al día, la app instalada envía un \"sigo aquí\" anónimo a nuestro contador (goatcounter.com): el número de versión y un ID al azar creado en esta PC, para que nadie se cuente dos veces, y qué pestañas abriste. Si se cerró de golpe o se congeló, cuántas veces (un número, nunca el informe), y una vez cuando desinstalas. Nada más: ni nombre, ni sonidos, ni configuración, ni juegos. Así sabemos si alguien usa Onion Board y si le funciona. Desactivado: no se envía nada.",
+  "Once a day, sends an anonymous count to goatcounter.com: the version, tabs opened, crash counts and a random ID that follows how the app is used over time. Only used to fix errors and see which features need work. Never your name, sounds or settings. Switching it off sends one last anonymous count (no ID), then nothing.": "Una vez al día envía un conteo anónimo a goatcounter.com: la versión, las pestañas abiertas, cuántos fallos hubo y un ID al azar que muestra cómo se usa la app con el tiempo. Solo sirve para corregir errores y ver qué funciones hay que mejorar. Nunca tu nombre, tus sonidos ni tu configuración. Al apagarlo se envía un último conteo anónimo (sin ID) y luego nada.",
   "One click": "Un clic",
   "One click needed: repair your mic": "Falta un clic: repara tu micrófono",
   "One click: put your sounds straight into your mic": "Un clic: pon tus sonidos directo en tu micrófono",
@@ -1245,7 +1244,6 @@
   "Throw this recording away?": "¿Descartar esta grabación?",
   "TikTok sounds": "Sonidos de TikTok",
   "Time": "Hora",
-  "Tint the tab": "Teñir la pestaña",
   "To hear it live instead, use Hear what they hear at the bottom.": "Para oírlo en vivo, usa Oír lo que oyen, abajo.",
   "To use Tor, get it first: about 22 MB from the Tor Project, checked before it's used. {blocked_hint}": "Para usar Tor, primero descárgalo: unos 22 MB del Tor Project, verificados antes de usarlos. {blocked_hint}",
   "Toggle: press again stops it": "Alternar: presionarlo otra vez lo detiene",
@@ -2859,5 +2857,10 @@
   "by {name}": "por {name}",
   "{language} needs a one-time download of its translation model ({size} MB). Offline mode is on, so it can't be downloaded now.": "{language} necesita una descarga única de su modelo de traducción ( {size} MB). El modo sin conexión está activado, por lo que no se puede descargar ahora.",
   "{n} MB": "{n} megabytes",
-  "⚠ Windows has no {language} voice yet, so {language} can't be spoken properly. Offline mode is on, so it can't be installed now.": "⚠ Windows aún no tiene voz en {language} , por lo que no se puede hablar {language} correctamente. El modo sin conexión está activado, por lo que no se puede instalar ahora."
+  "⚠ Windows has no {language} voice yet, so {language} can't be spoken properly. Offline mode is on, so it can't be installed now.": "⚠ Windows aún no tiene voz en {language} , por lo que no se puede hablar {language} correctamente. El modo sin conexión está activado, por lo que no se puede instalar ahora.",
+  "A bar at the edge of the tabs and a coloured icon, in the highlight colour: easy to spot from across the room": "Una barra en el borde de las pestañas y un ícono de color, en el color resaltado: fácil de detectar desde el otro lado de la habitación.",
+  "A bar beside the tab": "Una barra al lado de la pestaña",
+  "Show tab names": "Mostrar nombres de pestañas",
+  "Hide tab names": "Ocultar nombres de pestañas",
+  "Show only the icons": "Mostrar solo los iconos"
 }

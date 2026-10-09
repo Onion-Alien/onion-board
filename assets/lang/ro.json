@@ -126,7 +126,6 @@
   "A restore point is saved first, so you can undo this.": "Mai întâi se salvează un punct de restaurare, ca să poți anula asta.",
   "A short “Did you know?” about a feature, at most once a day, never while a game is up.": "Un scurt „Știai că?” despre o funcție, cel mult o dată pe zi, niciodată cât rulează un joc.",
   "A small dot on its icon": "Un punct mic pe pictograma ei",
-  "A soft wash and a coloured icon in the theme's colour, easy to spot from across the room": "O nuanță ușoară și o pictogramă colorată în culoarea temei, ușor de văzut din celălalt capăt al camerei",
   "A soundboard is most useful left running: your hotkeys and the overlay work while the window is closed. The tray icon (by the clock) opens it again; right-click it to quit.": "Un soundboard e cel mai util lăsat pornit: tastele rapide și overlay-ul merg cât fereastra e închisă. Pictograma din tray (lângă ceas) o redeschide; clic dreapta pe ea ca să ieși.",
   "A tab whose feature is on right now (a sound playing, the voice changer, the radio…) is marked, so nothing is left on without you noticing.": "O filă a cărei funcție e pornită acum (un sunet care se redă, schimbătorul de voce, radioul…) e marcată, ca nimic să nu rămână pornit fără să observi.",
   "A virtual cable (not installed yet)": "Un cablu virtual (încă neinstalat)",
@@ -750,7 +749,7 @@
   "On the left, click <b>Voice</b>.": "În stânga, dă clic pe <b>Voce</b>.",
   "On, at {host}:{port}. Pick a link to copy.": "Pornit, la {host}:{port}. Alege un link de copiat.",
   "On: listening on {host}:{port}.": "Pornit: ascultă pe {host}:{port}.",
-  "Once a day, the installed app sends an anonymous \"still here\" to our counter (goatcounter.com): the version number and a random ID made on this PC, so nobody is counted twice, and which tabs you opened. If it crashed or froze, how many times (a count, never the report), and once when you uninstall. Nothing else: no name, sounds, settings or games. It's how we know if anyone uses Onion Board, and if it's working for them. Off: nothing is sent.": "O dată pe zi, aplicația instalată trimite un „încă aici” anonim la contorul nostru (goatcounter.com): numărul versiunii și un ID aleatoriu făcut pe PC-ul ăsta, ca nimeni să nu fie numărat de două ori, și ce file ai deschis. Dacă s-a blocat sau a crăpat, de câte ori (un număr, niciodată raportul), și o dată când o dezinstalezi. Nimic altceva: niciun nume, sunete, setări sau jocuri. Așa știm dacă folosește cineva Onion Board și dacă le merge. Oprit: nu se trimite nimic.",
+  "Once a day, sends an anonymous count to goatcounter.com: the version, tabs opened, crash counts and a random ID that follows how the app is used over time. Only used to fix errors and see which features need work. Never your name, sounds or settings. Switching it off sends one last anonymous count (no ID), then nothing.": "O dată pe zi trimite o numărătoare anonimă la goatcounter.com: versiunea, filele deschise, numărul de blocări și un ID aleatoriu care urmărește cum e folosită aplicația în timp. Folosit doar ca să reparăm erori și să vedem ce funcții trebuie îmbunătățite. Niciodată numele tău, sunetele sau setările. Oprirea trimite o ultimă numărătoare anonimă (fără ID), apoi nimic.",
   "One click": "Un clic",
   "One click needed: repair your mic": "E nevoie de un clic: repară-ți microfonul",
   "One click: put your sounds straight into your mic": "Un clic: pune-ți sunetele direct în microfon",
@@ -1261,7 +1260,6 @@
   "Throw this recording away?": "Arunci înregistrarea asta?",
   "TikTok sounds": "Sunete TikTok",
   "Time": "Ora",
-  "Tint the tab": "Colorează fila",
   "To hear it live instead, use Hear what they hear at the bottom.": "Ca să-l auzi live în schimb, folosește Auzi ce aud ei din partea de jos.",
   "To use Tor, get it first: about 22 MB from the Tor Project, checked before it's used. {blocked_hint}": "Ca să folosești Tor, ia-l întâi: cam 22 MB de la Tor Project, verificat înainte să fie folosit. {blocked_hint}",
   "Toggle: press again stops it": "Comutare: o nouă apăsare îl oprește",
@@ -2919,5 +2917,10 @@
   "by {name}": "de {name}",
   "{language} needs a one-time download of its translation model ({size} MB). Offline mode is on, so it can't be downloaded now.": "{language} are nevoie de o descărcare unică a modelului său de traducere ( {size} MB). Modul offline este activat, deci nu poate fi descărcat acum.",
   "{n} MB": "{n} MB",
-  "⚠ Windows has no {language} voice yet, so {language} can't be spoken properly. Offline mode is on, so it can't be installed now.": "⚠ Windows nu are încă voce {language} , așa că {language} nu poate fi rostit corect. Modul offline este activat, deci nu poate fi instalat acum."
+  "⚠ Windows has no {language} voice yet, so {language} can't be spoken properly. Offline mode is on, so it can't be installed now.": "⚠ Windows nu are încă voce {language} , așa că {language} nu poate fi rostit corect. Modul offline este activat, deci nu poate fi instalat acum.",
+  "A bar at the edge of the tabs and a coloured icon, in the highlight colour: easy to spot from across the room": "O bară la marginea filelor și o pictogramă colorată, în culoarea evidențiată: ușor de observat din întreaga cameră",
+  "A bar beside the tab": "O bară lângă filă",
+  "Show tab names": "Arată numele filelor",
+  "Hide tab names": "Ascunde numele filelor",
+  "Show only the icons": "Arată doar pictogramele"
 }

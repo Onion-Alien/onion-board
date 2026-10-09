@@ -139,7 +139,8 @@ the launcher the shortcuts and PyInstaller use. The app is the `soundboard` pack
 | `soundboard/ui/whatsnew.py` | the *What's new* window shown once after an update, with what the release added, a button to the settings it's about and a link to the Discord (`NOTES`, newest first: add one per release) |
 | `soundboard/ui/splash.py` | The start-up splash: Bun and a spinner mid-screen while a cold start loads |
 | `soundboard/ui/langpick.py` | the language picker (Settings → Appearance → Language): a window of language tiles, each in its own name, with a search |
-| `soundboard/ui/livedot.py` | the glowing dot (and highlight-coloured icon) on a tab whose feature is live, e.g. the Voice tab while your voice is being changed |
+| `soundboard/ui/sidebar.py` | the tab rail down the main window's left: one icon per tab, opened out to show their names (the tab widget's own bar is hidden) |
+| `soundboard/ui/livedot.py` | marks a tab whose feature is live (a highlight-coloured icon, with the rail's bar beside it, or a small dot), e.g. the Voice tab while your voice is being changed |
 | `soundboard/ui/logowidget.py` | the header logo animated: a breathing glow and sheen, flaring with embers while sounds play |
 | `soundboard/ui/overlay.py` | the in-game overlay: a panel of pads that never takes focus, driven by number keys or clicks, on a chosen monitor and spot (or wherever it was dragged) |
 | `soundboard/ui/voicepanel.py` | the Voice tab: voice changer, text-to-speech, live voice-to-speech, add-ons list |

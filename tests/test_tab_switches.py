@@ -1,7 +1,7 @@
 """Settings > Tabs: switching the Radio, Apps, Triggers and Voice tabs off and on
 (Config.tabs_off, ui/taboff.py). A switched-off tab is hidden and never built."""
 import pytest
-from PySide6.QtCore import Qt
+from PySide6.QtCore import QPoint, Qt
 
 from conftest import process_events
 
@@ -288,7 +288,6 @@ def test_apps_switched_off_right_after_it_is_built(window, qapp):
 
 
 def test_keyboard_never_lands_on_a_hidden_tab(window, qapp):
-    from PySide6.QtCore import Qt
     from PySide6.QtTest import QTest
     for key in taboff.KEYS:
         window.set_tab_on(key, False)
@@ -455,7 +454,7 @@ def test_more_tabs_lists_the_switched_off_ones_and_adds_one(window, monkeypatch)
     w.set_tab_on("radio", False)
     w.set_tab_on("triggers", False)
     assert not w.btn_more_tabs.isHidden()
-    menu = w.btn_more_tabs.menu()
+    menu = w.more_menu
     menu.aboutToShow.emit()
     texts = [a.text() for a in menu.actions() if not a.isSeparator() and a.text()]
     assert texts[0].startswith("Radio: ") and texts[1].startswith("Triggers: ")
@@ -479,9 +478,9 @@ def test_right_click_hides_a_tab_and_more_tabs_brings_it_back(window, monkeypatc
     w.hide_tab("radio")
     assert not w.tab_on("radio") and w.tabs.currentIndex() == 0
     assert "More tabs" in shown[0]
-    assert w.tabs.cornerWidget(Qt.TopRightCorner).isAncestorOf(w.btn_more_tabs)
+    assert w.rail.isAncestorOf(w.btn_more_tabs)   # under the tabs on the rail
     assert not w.btn_more_tabs.isHidden()
-    menu = w.btn_more_tabs.menu()
+    menu = w.more_menu
     menu.aboutToShow.emit()
     [a for a in menu.actions() if a.text().startswith("Radio")][0].trigger()
     assert w.tab_on("radio")
@@ -494,7 +493,7 @@ def test_more_tabs_counts_opened_added_and_closed(window, qapp, monkeypatch):
     monkeypatch.setattr(usage, "used", seen.append)
     w.set_tab_on("radio", False)
     w.set_tab_on("voice", False)
-    menu = w.btn_more_tabs.menu()
+    menu = w.more_menu
     menu.aboutToShow.emit()                  # looked, closed, added nothing
     menu.aboutToHide.emit()
     process_events(qapp, lambda: "more-tabs-closed" in seen)
@@ -512,17 +511,19 @@ def test_more_tabs_counts_opened_added_and_closed(window, qapp, monkeypatch):
 
 
 def test_more_tabs_menu_opens_clear_of_its_button(window, qapp):
-    """+ More tabs' dropdown sits a few px below the button, not stuck to it."""
+    """+ More tabs' menu opens beside the button on the rail, a few px clear of it, not
+    down over the tabs (and with no menu arrow's room, the + is centred like the rest)."""
     from soundboard.ui import moretabs
     w = window
     w.show()
     w.set_tab_on("radio", False)
-    btn, menu = w.btn_more_tabs, w.btn_more_tabs.menu()
+    btn, menu = w.btn_more_tabs, w.more_menu
     assert isinstance(menu, moretabs.Menu)
-    bottom = btn.mapToGlobal(btn.rect().bottomLeft()).y()
-    menu.popup(btn.mapToGlobal(btn.rect().bottomLeft()))
+    assert btn.menu() is None
+    btn.click()
     process_events(qapp, menu.isVisible)
     try:
-        assert menu.y() - bottom >= moretabs.GAP
+        at = btn.mapToGlobal(QPoint(0, 0))
+        assert menu.x() == at.x() + btn.width() + moretabs.GAP and menu.y() == at.y()
     finally:
         menu.close()

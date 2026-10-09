@@ -705,7 +705,6 @@
   "A restore point is saved first, so you can undo this.": "복원 지점이 먼저 저장되므로 이 작업을 취소할 수 있습니다.",
   "A short “Did you know?” about a feature, at most once a day, never while a game is up.": "짧은 \"알고 계셨나요?\" 기능에 대해 최대 하루에 한 번, 게임이 진행되는 동안에는 절대 안 됩니다.",
   "A small dot on its icon": "아이콘의 작은 점",
-  "A soft wash and a coloured icon in the theme's colour, easy to spot from across the room": "부드러운 워시와 테마 색상의 컬러 아이콘으로 방 전체에서 쉽게 알아볼 수 있습니다.",
   "A soundboard is most useful left running: your hotkeys and the overlay work while the window is closed. The tray icon (by the clock) opens it again; right-click it to quit.": "사운드보드는 실행 중인 상태에서 가장 유용합니다. 단축키와 오버레이는 창이 닫혀 있는 동안에도 작동합니다. 트레이 아이콘(시계 옆)을 누르면 다시 열립니다. 종료하려면 마우스 오른쪽 버튼을 클릭하세요.",
   "A tab whose feature is on right now (a sound playing, the voice changer, the radio…) is marked, so nothing is left on without you noticing.": "지금 기능이 켜져 있는 탭(소리 재생, 보이스 체인저, 라디오…)이 표시되어 있어 눈치채지 못한 채 아무것도 남지 않습니다.",
   "About": "에 대한",
@@ -1070,7 +1069,7 @@
   "On the left, click <b>Voice</b>.": "왼쪽에서 <b>음성 을</b> 클릭합니다.",
   "On, at {host}:{port}. Pick a link to copy.": "켜짐, {host} : {port} . 복사할 링크를 선택하세요.",
   "On: listening on {host}:{port}.": "켜짐: {host} : {port} 에서 수신 중입니다.",
-  "Once a day, the installed app sends an anonymous \"still here\" to our counter (goatcounter.com): the version number and a random ID made on this PC, so nobody is counted twice, and which tabs you opened. If it crashed or froze, how many times (a count, never the report), and once when you uninstall. Nothing else: no name, sounds, settings or games. It's how we know if anyone uses Onion Board, and if it's working for them. Off: nothing is sent.": "하루에 한 번, 설치된 앱은 익명의 \"아직 여기에 있음\"을 카운터(goatcounter.com)로 보냅니다. 버전 번호와 이 PC에서 생성된 임의의 ID가 포함되어 있어 누구도 두 번 계산되지 않으며 어떤 탭을 열었는지가 포함됩니다. 충돌하거나 멈춘 경우 횟수(개수, 보고서는 아님) 및 제거할 때 한 번. 다른 것은 없습니다: 이름, 소리, 설정 또는 게임이 없습니다. 누군가가 Onion Board를 사용하는지, 그리고 그것이 그들에게 효과가 있는지를 우리가 아는 방법입니다. 꺼짐: 아무것도 전송되지 않습니다.",
+  "Once a day, sends an anonymous count to goatcounter.com: the version, tabs opened, crash counts and a random ID that follows how the app is used over time. Only used to fix errors and see which features need work. Never your name, sounds or settings. Switching it off sends one last anonymous count (no ID), then nothing.": "하루에 한 번 goatcounter.com에 익명 카운트를 보냅니다: 버전, 연 탭, 충돌 횟수, 그리고 시간이 지나며 앱이 어떻게 쓰이는지 따라가는 임의의 ID. 오류를 고치고 어떤 기능을 개선해야 할지 보는 데만 씁니다. 이름, 사운드, 설정은 절대 보내지 않습니다. 끄면 마지막 익명 카운트 하나(ID 없음)를 보내고 그 뒤로는 아무것도 보내지 않습니다.",
   "One is saved every time you reset something (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "무언가를 재설정할 때마다 하나가 저장됩니다(마지막 {max_points} 개는 유지됩니다). 복원하면 설정, 단축키 및 사운드가 원래대로 돌아갑니다. 이후 추가한 사운드는 유지됩니다.",
   "One key can play a different sound in each category: switch category (its tab, or the keys above) and the same keys play that category's sounds. Sounds in no category always keep their keys.": "하나의 키는 각 카테고리에서 다른 사운드를 재생할 수 있습니다. 카테고리(해당 탭 또는 위의 키)를 전환하고 동일한 키가 해당 카테고리의 사운드를 재생합니다. 카테고리가 없는 사운드는 항상 키를 유지합니다.",
   "One row per connection: what you did that made it, route, result, bytes, and the requests the app could read": "연결당 한 행: 이를 수행한 작업, 경로, 결과, 바이트 및 앱이 읽을 수 있는 요청",
@@ -1353,7 +1352,6 @@
   "Through a proxy or Tor, everything the app fetches (searches, downloads, radio, updates) goes through it, and site names are looked up there, not on this PC. If it can't be reached, nothing is fetched: the app never quietly goes direct. This PC's own addresses (127.0.0.1) stay direct.": "프록시나 Tor를 통해 앱이 가져오는 모든 것(검색, 다운로드, 라디오, 업데이트)이 이를 통과하며 사이트 이름은 이 PC가 아닌 그곳에서 조회됩니다. 도달할 수 없는 경우 아무것도 가져오지 않습니다. 앱은 조용히 직접 이동하지 않습니다. 이 PC의 자체 주소(127.0.0.1)는 그대로 유지됩니다.",
   "TikTok sounds": "틱톡 소리",
   "Time": "시간",
-  "Tint the tab": "탭에 색조 지정",
   "To use Tor, get it first: about 22 MB from the Tor Project, checked before it's used. {blocked_hint}": "Tor를 사용하려면 먼저 Tor 프로젝트에서 약 22MB를 가져와 사용하기 전에 확인하세요. {blocked_hint}",
   "Tor download": "토르 다운로드",
   "Tor sends everything through three volunteer computers around the world, so the sites you search and download from and the radio stations you play see a Tor address, not yours. It's slower, and YouTube often turns Tor away: the app then tries other Tor routes, and only goes without Tor if you click to.": "Tor는 전 세계 세 대의 자원 봉사 컴퓨터를 통해 모든 것을 전송하므로 귀하가 검색하고 다운로드하는 사이트와 재생하는 라디오 방송국에는 귀하의 주소가 아닌 Tor 주소가 표시됩니다. 속도가 더 느리고 YouTube는 종종 Tor를 외면합니다. 그런 다음 앱은 다른 Tor 경로를 시도하고 클릭하는 경우에만 Tor 없이 이동합니다.",
@@ -2799,5 +2797,10 @@
   "by {name}": "작성자: {name}",
   "{language} needs a one-time download of its translation model ({size} MB). Offline mode is on, so it can't be downloaded now.": "{language} 에는 번역 모델( {size} MB)을 한 번만 다운로드해야 합니다. 오프라인 모드가 켜져 있으므로 지금은 다운로드할 수 없습니다.",
   "{n} MB": "{n} MB",
-  "⚠ Windows has no {language} voice yet, so {language} can't be spoken properly. Offline mode is on, so it can't be installed now.": "⚠ Windows에는 아직 {language} 음성이 없으므로 {language} 제대로 말할 수 없습니다. 오프라인 모드가 켜져 있으므로 지금은 설치할 수 없습니다."
+  "⚠ Windows has no {language} voice yet, so {language} can't be spoken properly. Offline mode is on, so it can't be installed now.": "⚠ Windows에는 아직 {language} 음성이 없으므로 {language} 제대로 말할 수 없습니다. 오프라인 모드가 켜져 있으므로 지금은 설치할 수 없습니다.",
+  "A bar at the edge of the tabs and a coloured icon, in the highlight colour: easy to spot from across the room": "탭 가장자리의 막대와 하이라이트 색상의 컬러 아이콘: 방 전체에서 쉽게 알아볼 수 있습니다.",
+  "A bar beside the tab": "탭 옆의 막대",
+  "Show tab names": "탭 이름 표시",
+  "Hide tab names": "탭 이름 숨기기",
+  "Show only the icons": "아이콘만 표시"
 }

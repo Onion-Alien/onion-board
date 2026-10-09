@@ -434,10 +434,37 @@ def test_every_tab_has_its_own_label(window):
     texts = [window.tabs.tabText(i) for i in range(window.tabs.count())]
     assert texts == [t for t, _ in main.TABS] and len(set(texts)) == len(texts)
     assert window.tabs.tabToolTip(2) == ""   # the name says it: no hover tip
-    window._tab_icons_only(True)
-    assert window.tabs.tabText(1) == "" and window.tabs.tabToolTip(1) == "Radio"
-    window._tab_icons_only(False)
-    assert window.tabs.tabText(2) == "Apps" and window.tabs.tabToolTip(2) == ""
+
+
+def test_the_tabs_are_a_rail_down_the_left(window, qapp):
+    """Icons only, names on hover; the button at the bottom opens it out to the names
+    and the onion (saved); a narrow window shuts it again."""
+    window.show()
+    window.resize(1200, 760)
+    window._refit()
+    rail = window.rail
+    assert window.tabs.tabBar().isHidden()   # the rail shows the tabs, not the bar
+    assert not rail.is_open() and rail.width() == main.sidebar.SHUT_W
+    b = rail.buttons[1]
+    assert b.text() == "" and b.toolTip() == "Radio" and b.accessibleName() == "Radio"
+    assert not rail.buttons[0].icon().isNull()
+    assert rail.buttons[0].isChecked() == (window.tabs.currentIndex() == 0)
+    assert window.wordmark.isHidden()
+    rail.toggle.click()
+    assert rail.is_open() and window.cfg.sidebar_open
+    assert b.text() == "Radio" and b.toolTip() == ""
+    assert not window.wordmark.isHidden() and not window.tagline.isHidden()
+    rail.buttons[5].click()
+    assert window.tabs.currentIndex() == 5 and rail.buttons[5].isChecked()
+    window.tabs.setTabVisible(2, False)
+    assert rail.buttons[2].isHidden()
+    window.tabs.setTabVisible(2, True)
+    rail.squeeze(True)   # a narrow window
+    assert not rail.is_open() and rail.width() == main.sidebar.SHUT_W
+    rail.squeeze(False)
+    assert rail.is_open()
+    rail.toggle.click()
+    assert not window.cfg.sidebar_open
 
 
 def test_sounds_tab_lights_up_while_a_sound_plays(window, monkeypatch):

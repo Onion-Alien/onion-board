@@ -534,6 +534,24 @@ QPushButton#moretabs:hover { background:$btn_hover; border-color:$border_hi; col
 QPushButton#moretabs:pressed { background:$btn_press; }
 QPushButton#moretabs:focus { border-color:$accent; }
 QPushButton#moretabs::menu-indicator { image:none; width:0; }
+QFrame#sidebar { background:$panel; border:none; border-right:1px solid $border; }
+QFrame#sidebar[rtl="true"] { border-right:none; border-left:1px solid $border; }   /* mirrored */
+QToolButton#railtab { background:transparent; color:$muted; border:1px solid transparent;
+    border-radius:8px; padding:7px 6px; font-weight:600; text-align:left; }
+QToolButton#railtab:hover { background:$btn_hover; color:$text; }
+QToolButton#railtab:checked { background:transparent; color:$text_hi; }   /* + the rail's fill */
+QToolButton#railtab:focus { border-color:$accent; }
+QFrame#sidebar QPushButton#moretabs, QFrame#sidebar QPushButton#tabinfo,
+QFrame#sidebar QPushButton#settings,
+QFrame#sidebar QPushButton#railtoggle { padding:7px 6px; text-align:left; color:$muted;
+    background:transparent; border:1px solid transparent; border-radius:8px; }
+QFrame#sidebar QPushButton#moretabs:hover, QFrame#sidebar QPushButton#tabinfo:hover,
+QFrame#sidebar QPushButton#settings:hover,
+QFrame#sidebar QPushButton#railtoggle:hover { background:$btn_hover; color:$text_hi; }
+QFrame#sidebar QPushButton#moretabs:focus, QFrame#sidebar QPushButton#tabinfo:focus,
+QFrame#sidebar QPushButton#settings:focus,
+QFrame#sidebar QPushButton#railtoggle:focus { border-color:$accent; }
+QFrame#sidebar QLabel#tagline { font-size:8pt; }
 QPushButton#settings { padding:6px 14px; font-weight:600; }
 QFrame#transport, QFrame#deck { background:$panel; border-radius:12px; }
 QFrame#mixer { background:transparent; }
@@ -763,6 +781,8 @@ QFrame#setcard QPushButton:checked { background:$accent; color:$on_accent; }
 QFrame#setcard QPushButton#primary { background:$accent; color:$on_accent; border:none; }
 QFrame#setcard QPushButton#power:checked { background:$live; border:1px solid $live_hi; color:$on_live; }
 QFrame#setcard QPushButton#primary:hover { background:$accent_hover; }
+QFrame#setcard QLineEdit, QFrame#setcard QComboBox { background:$bg; }
+QFrame#setcard QLineEdit:hover, QFrame#setcard QComboBox:hover { background:$card; }
 QTableView, QFrame#setcard QTableView { background:$card; alternate-background-color:$card_hi;
     color:$text; border:1px solid transparent; border-radius:6px;
     selection-background-color:$btn_press; selection-color:$text_hi; }

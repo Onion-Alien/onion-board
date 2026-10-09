@@ -645,9 +645,9 @@ class SettingsDialog(QDialog):
                                 "changer, the radio…) is marked, so nothing is left on without "
                                 "you noticing."))
         row = QVBoxLayout()   # one under the other: side by side made the page too wide
-        green = QRadioButton(_("Tint the tab"))
-        green.setToolTip(_("A soft wash and a coloured icon in the theme's colour, easy to spot "
-                           "from across the room"))
+        green = QRadioButton(_("A bar beside the tab"))
+        green.setToolTip(_("A bar at the edge of the tabs and a coloured icon, in the highlight "
+                           "colour: easy to spot from across the room"))
         dot = QRadioButton(_("A small dot on its icon"))
         dot.setToolTip(_("Quieter: only a dot on the tab's icon"))
         modes = QButtonGroup(card)
@@ -1213,7 +1213,7 @@ class SettingsDialog(QDialog):
             grid.addWidget(label, r, 0)
             grid.addWidget(cb, r, 1)
             self.dev_combos.append((cb, src))
-        grid.setColumnStretch(1, 1)
+        grid.setColumnStretch(2, 1)   # the room past the boxes, not the boxes' column
         cv.addLayout(grid)
         from soundboard.ui import alsosend   # (its panel import imports this module)
         # once the grid is in the card: a row added before would be its own window
@@ -2314,13 +2314,12 @@ class SettingsDialog(QDialog):
         "tor_download": _("Get Tor / Update Tor (Connection page) downloads Tor from the "
                           "Tor Project (dist.torproject.org). Off: a Tor that's already "
                           "here still works."),
-        "usage_stats": _("Once a day, the installed app sends an anonymous \"still here\" "
-                         "to our counter (goatcounter.com): the version number and a random "
-                         "ID made on this PC, so nobody is counted twice, and which tabs you "
-                         "opened. If it crashed or froze, how many times (a count, never "
-                         "the report), and once when you uninstall. Nothing else: no "
-                         "name, sounds, settings or games. It's how we know if anyone uses "
-                         "Onion Board, and if it's working for them. Off: nothing is sent."),
+        "usage_stats": _("Once a day, sends an anonymous count to goatcounter.com: the "
+                         "version, tabs opened, crash counts and a random ID that follows "
+                         "how the app is used over time. Only used to fix errors and see "
+                         "which features need work. Never your name, sounds or settings. "
+                         "Switching it off sends one last anonymous count (no ID), then "
+                         "nothing."),
     }
 
     def _switches_card(self):
@@ -2424,11 +2423,29 @@ class SettingsDialog(QDialog):
             sl.addWidget(go, 0, Qt.AlignLeft)
 
     def _set_feature(self, key: str, on: bool):
-        from soundboard import net
+        from soundboard import net, usage
         cfg = self.mw.cfg
+        was_on = key not in cfg.net_off
         off = [k for k in cfg.net_off if k != key] + ([] if on else [key])
         self.mw.set_option("net_off", off)   # saves
+        if key == usage.FEATURE and was_on and not on and net.allowed(key):
+            # Count me in switched off: one anonymous "opt-out/settings" goes first
+            # (usage.opt_out), and the switch takes hold the moment it's done
+            t = threading.Thread(target=usage.opt_out, args=("settings",), daemon=True,
+                                 name="usage-opt-out")
+            t.start()
+            self._opt_out_wait(t)
+            return
         net.configure_features(cfg.net_off, cfg.net_offline)   # applies at once
+        self._net_sync()
+
+    def _opt_out_wait(self, t):
+        from soundboard import net
+        if t.is_alive():
+            QTimer.singleShot(100, lambda: self._opt_out_wait(t))
+            return
+        cfg = self.mw.cfg
+        net.configure_features(cfg.net_off, cfg.net_offline)
         self._net_sync()
 
     def _set_offline(self, on: bool):

@@ -705,7 +705,6 @@
   "A restore point is saved first, so you can undo this.": "จุดคืนค่าจะถูกบันทึกก่อน ดังนั้นคุณจึงสามารถยกเลิกการดำเนินการนี้ได้",
   "A short “Did you know?” about a feature, at most once a day, never while a game is up.": "สั้น ๆ “คุณรู้หรือไม่” เกี่ยวกับฟีเจอร์ต่างๆ มากที่สุดวันละครั้ง ไม่เคยในขณะที่เกมกำลังดำเนินอยู่",
   "A small dot on its icon": "จุดเล็กๆ บนไอคอน",
-  "A soft wash and a coloured icon in the theme's colour, easy to spot from across the room": "ผ้านุ่มและไอคอนสีตามสีของธีม มองเห็นได้ง่ายจากอีกฟากหนึ่งของห้อง",
   "A soundboard is most useful left running: your hotkeys and the overlay work while the window is closed. The tray icon (by the clock) opens it again; right-click it to quit.": "ซาวด์บอร์ดมีประโยชน์มากที่สุดเมื่อเปิดทิ้งไว้: ปุ่มลัดและโอเวอร์เลย์ของคุณจะทำงานในขณะที่หน้าต่างปิดอยู่ ไอคอนถาด (ข้างนาฬิกา) จะเปิดขึ้นอีกครั้ง คลิกขวาเพื่อออก",
   "A tab whose feature is on right now (a sound playing, the voice changer, the radio…) is marked, so nothing is left on without you noticing.": "แท็บที่ฟีเจอร์เปิดอยู่ในขณะนี้ (เสียงที่กำลังเล่น โปรแกรมเปลี่ยนเสียง วิทยุ…) ถูกทำเครื่องหมายไว้ ดังนั้นจึงไม่มีอะไรเหลืออยู่โดยที่คุณไม่ทันสังเกต",
   "About": "เกี่ยวกับ",
@@ -1070,7 +1069,7 @@
   "On the left, click <b>Voice</b>.": "ทางด้านซ้าย ให้คลิก <b>เสียง</b>",
   "On, at {host}:{port}. Pick a link to copy.": "เปิดที่ {host} : {port} เลือกลิงก์ที่จะคัดลอก",
   "On: listening on {host}:{port}.": "เปิด: กำลังฟังบน {host} : {port}",
-  "Once a day, the installed app sends an anonymous \"still here\" to our counter (goatcounter.com): the version number and a random ID made on this PC, so nobody is counted twice, and which tabs you opened. If it crashed or froze, how many times (a count, never the report), and once when you uninstall. Nothing else: no name, sounds, settings or games. It's how we know if anyone uses Onion Board, and if it's working for them. Off: nothing is sent.": "วันละครั้ง แอปที่ติดตั้งจะส่งข้อความที่ไม่ระบุชื่อ \"ยังอยู่ที่นี่\" ไปยังเคาน์เตอร์ของเรา (goatcounter.com) โดยระบุหมายเลขเวอร์ชันและ ID แบบสุ่มที่สร้างบนพีซีเครื่องนี้ ดังนั้นจึงไม่มีใครถูกนับสองครั้ง และแท็บใดที่คุณเปิด หากเกิดข้อขัดข้องหรือค้าง กี่ครั้ง (นับครั้งไม่นับรายงาน) และหนึ่งครั้งเมื่อคุณถอนการติดตั้ง ไม่มีอะไรอื่น: ไม่มีชื่อ เสียง การตั้งค่า หรือเกม วิธีนี้จะช่วยให้เราทราบได้ว่ามีใครใช้ Onion Board หรือไม่ และได้ผลหรือไม่ ปิด: ไม่มีการส่งอะไรเลย",
+  "Once a day, sends an anonymous count to goatcounter.com: the version, tabs opened, crash counts and a random ID that follows how the app is used over time. Only used to fix errors and see which features need work. Never your name, sounds or settings. Switching it off sends one last anonymous count (no ID), then nothing.": "วันละครั้ง ส่งการนับแบบไม่ระบุตัวตนไปที่ goatcounter.com: เวอร์ชัน แท็บที่เปิด จำนวนครั้งที่แครช และ ID แบบสุ่มที่ติดตามว่าแอปถูกใช้อย่างไรเมื่อเวลาผ่านไป ใช้เพื่อแก้ข้อผิดพลาดและดูว่าฟีเจอร์ไหนต้องปรับปรุงเท่านั้น ไม่ส่งชื่อ เสียง หรือการตั้งค่าของคุณ เมื่อปิด จะส่งการนับแบบไม่ระบุตัวตนครั้งสุดท้าย (ไม่มี ID) แล้วไม่ส่งอะไรอีก",
   "One is saved every time you reset something (the last {max_points} are kept). Restoring puts back your settings, hotkeys and sounds as they were. Sounds you've added since are kept.": "หนึ่งรายการจะถูกบันทึกไว้ทุกครั้งที่คุณรีเซ็ตบางสิ่งบางอย่าง (คะแนนสูงสุด {max_points} สุดท้ายจะถูกเก็บไว้) การคืนค่าจะทำให้การตั้งค่า ปุ่มลัด และเสียงของคุณกลับมาเหมือนเดิม เสียงที่คุณเพิ่มตั้งแต่นั้นจะถูกเก็บไว้",
   "One key can play a different sound in each category: switch category (its tab, or the keys above) and the same keys play that category's sounds. Sounds in no category always keep their keys.": "คีย์หนึ่งสามารถเล่นเสียงที่แตกต่างกันในแต่ละหมวดหมู่ ได้แก่ สลับหมวดหมู่ (แท็บหรือคีย์ด้านบน) และคีย์เดียวกันจะเล่นเสียงของหมวดหมู่นั้น เสียงที่ไม่มีหมวดหมู่จะเก็บคีย์ไว้เสมอ",
   "One row per connection: what you did that made it, route, result, bytes, and the requests the app could read": "หนึ่งแถวต่อการเชื่อมต่อ: สิ่งที่คุณทำ เส้นทาง ผลลัพธ์ ไบต์ และคำขอที่แอปสามารถอ่านได้",
@@ -1353,7 +1352,6 @@
   "Through a proxy or Tor, everything the app fetches (searches, downloads, radio, updates) goes through it, and site names are looked up there, not on this PC. If it can't be reached, nothing is fetched: the app never quietly goes direct. This PC's own addresses (127.0.0.1) stay direct.": "ผ่านพร็อกซีหรือ Tor ทุกสิ่งที่แอปดึงมา (การค้นหา ดาวน์โหลด วิทยุ อัปเดต) จะต้องผ่านมัน และชื่อไซต์จะถูกค้นหาที่นั่น ไม่ใช่บนพีซีเครื่องนี้ หากไม่สามารถเข้าถึงได้ จะไม่มีการดึงข้อมูลใดๆ แอปจะไม่ส่งตรงไปอย่างเงียบๆ ที่อยู่ของพีซีเครื่องนี้ (127.0.0.1) จะยังคงอยู่โดยตรง",
   "TikTok sounds": "เสียงติ๊กต๊อก",
   "Time": "เวลา",
-  "Tint the tab": "แต้มสีแท็บ",
   "To use Tor, get it first: about 22 MB from the Tor Project, checked before it's used. {blocked_hint}": "หากต้องการใช้ Tor ให้ดาวน์โหลดก่อน: ประมาณ 22 MB จากโครงการ Tor ตรวจสอบก่อนใช้งาน {blocked_hint}",
   "Tor download": "ดาวน์โหลดทอร์",
   "Tor sends everything through three volunteer computers around the world, so the sites you search and download from and the radio stations you play see a Tor address, not yours. It's slower, and YouTube often turns Tor away: the app then tries other Tor routes, and only goes without Tor if you click to.": "ทอร์ส่งทุกอย่างผ่านคอมพิวเตอร์อาสาสมัครสามเครื่องทั่วโลก ดังนั้นเว็บไซต์ที่คุณค้นหาและดาวน์โหลดจากและสถานีวิทยุที่คุณเล่นจึงเห็นที่อยู่ของทอร์ ไม่ใช่ของคุณ มันช้ากว่า และ YouTube มักจะเปลี่ยน Tor ออกไป จากนั้นแอปจะลองเส้นทาง Tor อื่น ๆ และจะไปโดยไม่มี Tor เท่านั้นหากคุณคลิกไป",
@@ -2799,5 +2797,10 @@
   "by {name}": "โดย {name}",
   "{language} needs a one-time download of its translation model ({size} MB). Offline mode is on, so it can't be downloaded now.": "{language} ต้องการดาวน์โหลดโมเดลการแปลเพียงครั้งเดียว ( {size} MB) โหมดออฟไลน์เปิดอยู่ จึงไม่สามารถดาวน์โหลดได้ในขณะนี้",
   "{n} MB": "{n} เมกะไบต์",
-  "⚠ Windows has no {language} voice yet, so {language} can't be spoken properly. Offline mode is on, so it can't be installed now.": "⚠ Windows ยังไม่มีเสียง {language} ดังนั้นจึงไม่สามารถพูด {language} ได้อย่างถูกต้อง โหมดออฟไลน์เปิดอยู่ จึงไม่สามารถติดตั้งได้ในขณะนี้"
+  "⚠ Windows has no {language} voice yet, so {language} can't be spoken properly. Offline mode is on, so it can't be installed now.": "⚠ Windows ยังไม่มีเสียง {language} ดังนั้นจึงไม่สามารถพูด {language} ได้อย่างถูกต้อง โหมดออฟไลน์เปิดอยู่ จึงไม่สามารถติดตั้งได้ในขณะนี้",
+  "A bar at the edge of the tabs and a coloured icon, in the highlight colour: easy to spot from across the room": "แถบที่ขอบแท็บและไอคอนในสีไฮไลต์: มองเห็นได้ง่ายจากอีกฟากของห้อง",
+  "A bar beside the tab": "แถบข้างแท็บ",
+  "Show tab names": "แสดงชื่อแท็บ",
+  "Hide tab names": "ซ่อนชื่อแท็บ",
+  "Show only the icons": "แสดงเฉพาะไอคอนเท่านั้น"
 }

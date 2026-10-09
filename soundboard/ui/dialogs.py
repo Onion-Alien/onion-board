@@ -3,9 +3,11 @@
 from __future__ import annotations
 
 from PySide6.QtCore import Qt, QTimer, Signal
+from PySide6.QtGui import QFont
 from PySide6.QtWidgets import (QButtonGroup, QCheckBox, QComboBox, QDialog, QDialogButtonBox,
-                               QFormLayout, QHBoxLayout, QLabel, QLineEdit, QPushButton,
-                               QScrollArea, QSlider, QTabWidget, QVBoxLayout, QWidget)
+                               QFrame, QGridLayout, QHBoxLayout, QLabel,
+                               QLineEdit, QPushButton, QScrollArea, QSlider, QTabWidget,
+                               QVBoxLayout, QWidget)
 
 from soundboard import soundfx, theme, voicefx
 from soundboard.eq import PRESETS as EQ_PRESETS
@@ -49,12 +51,13 @@ class EffectsPanel(QWidget):
             self.preset.addItem(name, name)
         self.preset.addItem(_("Custom"), CUSTOM)
         no_wheel(self.preset)
-        prow.addWidget(self.preset, 1)
+        prow.addWidget(self.preset)
         reset = QPushButton(_("Reset"))
         reset.setObjectName("small")
         reset.setToolTip(_("Back to the original sound (the trim stays)"))
         reset.clicked.connect(lambda: self.preset.setCurrentIndex(0))   # the first preset
         prow.addWidget(reset)
+        prow.addStretch(1)
         v.addLayout(prow)
 
         v.addWidget(section_label(_("Trim")))
@@ -198,36 +201,101 @@ class EditDialog(QDialog):
         self.tabs = QTabWidget()
         lay.addWidget(self.tabs, 1)
 
+        # three cards: the sound itself, its hotkey, its timings. Labels share one
+        # column width across the cards so the fields line up down the page.
         basics = QWidget()
-        form = QFormLayout(basics)
-        m = form.contentsMargins()
-        form.setContentsMargins(m.left(), 14, m.right(), m.bottom())   # room under the tabs
-        form.setLabelAlignment(Qt.AlignRight)
+        page = QVBoxLayout(basics)
+        page.setContentsMargins(2, 14, 2, 2)   # room under the tabs
+        page.setSpacing(10)
+        labels = [_("Name"), _("Volume"), _("Colour"), _("Hotkey"), _("On press")]
+        label_w = max(self.fontMetrics().horizontalAdvance(t) for t in labels) + 12
+
+        def card():
+            c = QFrame()
+            c.setObjectName("setcard")   # (its buttons and boxes keep their fill)
+            g = QGridLayout(c)
+            g.setContentsMargins(14, 12, 14, 12)
+            g.setHorizontalSpacing(12)
+            g.setVerticalSpacing(10)
+            g.setColumnMinimumWidth(0, label_w)
+            g.setColumnStretch(1, 1)
+            page.addWidget(c)
+            return g
+
+        def row(g, text, field):
+            r = g.rowCount()
+            lbl = QLabel(text)
+            lbl.setObjectName("muted")
+            g.addWidget(lbl, r, 0, Qt.AlignLeft | Qt.AlignVCenter)
+            if isinstance(field, QWidget):
+                g.addWidget(field, r, 1)
+                lbl.setBuddy(field)
+            else:
+                g.addLayout(field, r, 1)
+
+        g = card()
         self.name = QLineEdit(meta.name)
-        form.addRow(_("Name"), self.name)
+        f = self.name.font()
+        f.setPointSizeF(f.pointSizeF() + 1.5)
+        f.setWeight(QFont.DemiBold)
+        self.name.setFont(f)
+        row(g, _("Name"), self.name)
 
         vrow = QHBoxLayout()
+        vrow.setSpacing(10)
         self.vol = QSlider(Qt.Horizontal)
         self.vol.setRange(0, 200)
         self.vol.setValue(round(meta.volume * 100))   # int() made 0.29 read as 28 %
+        self.vol.setAccessibleName(_("Volume"))
         no_wheel(self.vol)
         self.vol_lbl = QLabel()
+        self.vol_lbl.setObjectName("muted")
         self.vol.valueChanged.connect(lambda v: self.vol_lbl.setText(f"{v}%"))
         self.vol_lbl.setText(f"{self.vol.value()}%")
         steady_number(self.vol_lbl, "200%")
-        vrow.addWidget(self.vol)
+        vrow.addWidget(self.vol, 1)
         vrow.addWidget(self.vol_lbl)
-        form.addRow(_("Volume"), vrow)
+        row(g, _("Volume"), vrow)
+
+        crow = QHBoxLayout()
+        crow.setSpacing(8)
+        self.swatches = []
+        self.swatch_group = QButtonGroup(self)   # exclusive: one colour is checked
+        for c in PAD_COLORS:
+            b = QPushButton()
+            b.setFixedSize(22, 22)
+            b.setCheckable(True)
+            name = COLOUR_NAMES.get(c, c)
+            b.setToolTip(name)
+            b.setAccessibleName(_("{name} colour", name=name))
+            b.clicked.connect(lambda __=False, c=c: self._set_color(c))
+            self.swatch_group.addButton(b)
+            self.swatches.append((b, c))
+            crow.addWidget(b)
+        crow.addStretch()
+        row(g, _("Colour"), crow)
+
+        self.only_them = QCheckBox(_("Only others hear it, not played in my headphones"))
+        self.only_them.setToolTip(_("It still goes out to others (Discord, the game, OBS…); you "
+                                    "just don't hear it yourself (Preview still plays it to you)"))
+        self.only_them.setChecked(meta.only_them)
+        g.addWidget(self.only_them, g.rowCount(), 1)
 
         # the hotkey is what most people open this for: near the top, not under the timings
+        g = card()
         hrow = QHBoxLayout()
+        hrow.setSpacing(8)
         self.hk_btn = QPushButton()
         self.hk_btn.clicked.connect(self._capture)
+        self.hk_btn.setAccessibleName(_("Hotkey"))
+        icons.set_icon(self.hk_btn, "keyboard")
         clr = QPushButton(_("Clear"))
         clr.clicked.connect(lambda: self._set_hk(""))
-        hrow.addWidget(self.hk_btn, 1)
+        self.hk_btn.setMinimumWidth(140)   # room for "Ctrl+Shift+F12", not the whole row
+        hrow.addWidget(self.hk_btn)
         hrow.addWidget(clr)
-        form.addRow(_("Hotkey"), hrow)
+        hrow.addStretch(1)
+        row(g, _("Hotkey"), hrow)
         self._set_hk(self.hotkey)
 
         self.mode = QComboBox()
@@ -238,56 +306,41 @@ class EditDialog(QDialog):
         self.mode.addItem(_("Queue: waits for the sounds playing to finish"), "queue")
         self.mode.setCurrentIndex(max(0, self.mode.findData(meta.mode)))
         no_wheel(self.mode)
-        form.addRow(_("On press"), self.mode)
+        row(g, _("On press"), self.mode)
 
         self.loop = QCheckBox(_("Loop until stopped"))
         self.loop.setChecked(meta.loop)
-        form.addRow("", self.loop)
+        g.addWidget(self.loop, g.rowCount(), 1)
 
         self.hold = QCheckBox(_("Hold to play: stops when you let go of its hotkey"))
         self.hold.setToolTip(_("Plays only while its hotkey or MIDI pad is held down, like an "
                                "air horn. Clicking the pad still plays it through."))
         self.hold.setChecked(meta.hold)
-        form.addRow("", self.hold)
+        g.addWidget(self.hold, g.rowCount(), 1)
 
-        self.only_them = QCheckBox(_("Only others hear it, not played in my headphones"))
-        self.only_them.setToolTip(_("It still goes out to others (Discord, the game, OBS…); you "
-                                    "just don't hear it yourself (Preview still plays it to you)"))
-        self.only_them.setChecked(meta.only_them)
-        form.addRow("", self.only_them)
-
-        self.fade_in = self._fade_row(form, _("Fade in"), meta.fade_in,
-                                      _("Starts silent and rises to full volume over this long"))
-        self.fade_out = self._fade_row(form, _("Fade out"), meta.fade_out,
-                                       _("Stopping it fades it out over this long instead of "
-                                         "cutting it; a sound that isn't looping also fades "
-                                         "over its last seconds. Stop everything still cuts "
-                                         "straight away."))
-        self.delay = self._fade_row(form, _("Wait first"), meta.delay,
-                                    _("Waits this long after the press before it plays, say "
-                                      "for a punchline. Stop everything cancels it."),
-                                    MAX_DELAY_S)
-        self.cooldown = self._fade_row(form, _("Cooldown"), meta.cooldown,
-                                       _("After it starts, presses are ignored for this long, "
-                                         "so nobody can spam it"), MAX_COOLDOWN_S)
-
-        crow = QHBoxLayout()
-        crow.setSpacing(6)
-        self.swatches = []
-        self.swatch_group = QButtonGroup(self)   # exclusive: one colour is checked
-        for c in PAD_COLORS:
-            b = QPushButton()
-            b.setFixedSize(24, 24)
-            b.setCheckable(True)
-            name = COLOUR_NAMES.get(c, c)
-            b.setToolTip(name)
-            b.setAccessibleName(_("{name} colour", name=name))
-            b.clicked.connect(lambda __=False, c=c: self._set_color(c))
-            self.swatch_group.addButton(b)
-            self.swatches.append((b, c))
-            crow.addWidget(b)
-        crow.addStretch()
-        form.addRow(_("Colour"), crow)
+        # timings two by two, each its name and value over its slider
+        c = QFrame()
+        c.setObjectName("setcard")
+        tg = QGridLayout(c)
+        tg.setContentsMargins(14, 12, 14, 14)
+        tg.setHorizontalSpacing(24)
+        tg.setVerticalSpacing(12)
+        page.addWidget(c)
+        self.fade_in = self._fade_cell(tg, 0, 0, _("Fade in"), meta.fade_in,
+                                       _("Starts silent and rises to full volume over this long"))
+        self.fade_out = self._fade_cell(tg, 0, 1, _("Fade out"), meta.fade_out,
+                                        _("Stopping it fades it out over this long instead of "
+                                          "cutting it; a sound that isn't looping also fades "
+                                          "over its last seconds. Stop everything still cuts "
+                                          "straight away."))
+        self.delay = self._fade_cell(tg, 1, 0, _("Wait first"), meta.delay,
+                                     _("Waits this long after the press before it plays, say "
+                                       "for a punchline. Stop everything cancels it."),
+                                     MAX_DELAY_S)
+        self.cooldown = self._fade_cell(tg, 1, 1, _("Cooldown"), meta.cooldown,
+                                        _("After it starts, presses are ignored for this long, "
+                                          "so nobody can spam it"), MAX_COOLDOWN_S)
+        page.addStretch(1)
         self._set_color(self.color)
         self.tabs.addTab(basics, _("Sound"))
 
@@ -349,26 +402,35 @@ class EditDialog(QDialog):
         self.resize(540, 640)
 
     @staticmethod
-    def _fade_row(form: QFormLayout, label: str, value: float, tip: str,
-                  top: float = MAX_FADE_S) -> QSlider:
-        """A 0..top slider in tenths of a second, with its value beside it."""
-        row = QHBoxLayout()
+    def _fade_cell(grid: QGridLayout, r: int, col: int, label: str, value: float, tip: str,
+                   top: float = MAX_FADE_S) -> QSlider:
+        """A 0..top slider in tenths of a second, its name and value above it."""
+        v = QVBoxLayout()
+        v.setSpacing(4)
+        head = QHBoxLayout()
+        name = QLabel(label)
+        name.setToolTip(tip)
+        lbl = QLabel()
+        lbl.setObjectName("muted")
+        steady_number(lbl, _("{s} s", s=f"{top:.1f}"))
+        head.addWidget(name)
+        head.addStretch(1)
+        head.addWidget(lbl)
         sl = QSlider(Qt.Horizontal)
         sl.setRange(0, int(top * 10))
         sl.setValue(int(round(min(max(value, 0.0), top) * 10)))
         sl.setToolTip(tip)
         sl.setAccessibleName(label)
         no_wheel(sl)
-        lbl = steady_number(QLabel(), _("{s} s", s=f"{top:.1f}"))
 
         def show(v):
             lbl.setText(_("{s} s", s=f"{v / 10:.1f}") if v else _("off"))
             sl.setAccessibleDescription(lbl.text())
         sl.valueChanged.connect(show)
         show(sl.value())
-        row.addWidget(sl)
-        row.addWidget(lbl)
-        form.addRow(label, row)
+        v.addLayout(head)
+        v.addWidget(sl)
+        grid.addLayout(v, r, col)
         return sl
 
     def fades(self) -> tuple[float, float]:
@@ -406,7 +468,7 @@ class EditDialog(QDialog):
             # an accent ring, thick when it's also the chosen colour
             b.setStyleSheet(
                 f"QPushButton {{ background:{col}; border:1px solid {t['border']};"
-                f" border-radius:12px; }}"
+                f" border-radius:11px; }}"
                 f"QPushButton:checked {{ border:3px solid {t['text']}; }}"
                 f"QPushButton:focus {{ border:2px solid {t['accent']}; }}"
                 f"QPushButton:checked:focus {{ border:3px solid {t['accent']}; }}")

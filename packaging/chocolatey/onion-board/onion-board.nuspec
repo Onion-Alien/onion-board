@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2015/06/nuspec.xsd">
+  <metadata>
+    <id>onion-board</id>
+    <version>1.9.27</version>
+    <packageSourceUrl>https://github.com/Onion-Alien/onion-board/tree/main/packaging/chocolatey/onion-board</packageSourceUrl>
+    <owners>OnionAlien</owners>
+    <title>Onion Board</title>
+    <authors>Onion Alien</authors>
+    <projectUrl>https://onion-alien.github.io/onion-board/</projectUrl>
+    <iconUrl>https://cdn.jsdelivr.net/gh/Onion-Alien/onion-board@main/packaging/chocolatey/icon.png</iconUrl>
+    <copyright>2026 OnionAlien</copyright>
+    <licenseUrl>https://github.com/Onion-Alien/onion-board/blob/main/LICENSE</licenseUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <projectSourceUrl>https://github.com/Onion-Alien/onion-board</projectSourceUrl>
+    <docsUrl>https://github.com/Onion-Alien/onion-board#readme</docsUrl>
+    <bugTrackerUrl>https://github.com/Onion-Alien/onion-board/issues</bugTrackerUrl>
+    <tags>onion-board soundboard discord gaming streaming voice-changer text-to-speech tts hotkeys overlay freeware</tags>
+    <summary>Free soundboard for Discord and games, with a voice changer, text-to-speech and screen triggers.</summary>
+    <description><![CDATA[Onion Board plays sounds through your mic into Discord and games. Global hotkeys and an in-game overlay work while you play.
+
+It includes a live voice changer, text-to-speech, per-sound effects, YouTube / SoundCloud search to add sounds, internet radio, and sending another program's audio.
+Screen triggers play a sound automatically when a picture shows up on screen, such as a game's death screen.
+
+## Your mic, no cable
+
+Sounds go straight into the mic you already use, so Discord and games hear them with nothing to change there. Onion Board's first-run guide sets that up in one click (Windows asks for permission once).
+
+A free virtual cable (VB-Cable by VB-Audio) is still supported as another way, if you'd rather use one. It is a kernel-mode audio driver, so **this package never installs it**: the installer's VB-Cable option is switched off. Get it from the app's Setup tab or with `choco install vb-cable`.
+
+The other optional downloads in the installer (FFmpeg, the live voice-to-speech add-on) are switched off too.
+
+## Package parameters
+
+* `/NoDesktopIcon` - don't put a shortcut on the Desktop (the Start menu shortcut is always made).
+* `/Offline` - start the app in Offline mode: it never connects to the internet until you switch Offline mode off in Settings > Connection.
+
+Example: `choco install onion-board --params "'/NoDesktopIcon /Offline'"`
+
+## Notes
+
+* Onion Board installs **per user**, into `%LOCALAPPDATA%\Programs\OnionBoard` of the account that runs the install, and needs no admin rights. Install it from your own account (an elevated prompt of your own account is fine), not as SYSTEM or another admin account.
+* The app can update itself (Settings > Updates). Updates it installs land in the same folder; `choco upgrade onion-board` works either way.
+* Uninstalling keeps your sounds and settings in `%APPDATA%\OnionBoard`, and leaves VB-Cable installed.
+* License: MIT with the Commons Clause (free to use, share and change; selling it is not allowed). The source is on GitHub.
+]]></description>
+    <releaseNotes>https://github.com/Onion-Alien/onion-board/releases/tag/v1.9.27</releaseNotes>
+  </metadata>
+  <files>
+    <file src="tools\**" target="tools" />
+  </files>
+</package>
