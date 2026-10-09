@@ -2868,7 +2868,6 @@
   "Crashes and freezes": "Si blocca e si blocca",
   "Find and fix bugs": "Trova e correggi i bug",
   "Know where people find the app": "Scopri dove le persone trovano l'app",
-  "A random ID": "Un ID casuale",
   "What Count me in sends": "Cosa invia «Conta su di me»",
   "Once a day, anonymous. Never your name, IP address or device info. Where you heard of it and feedback picks only if you give them. Switching it off sends one last count with no ID, then nothing.": "Una volta al giorno, in forma anonima. Mai il tuo nome, il tuo indirizzo IP o i dati del dispositivo. Dove hai conosciuto l'app e le scelte del feedback solo se li indichi. Disattivato: un ultimo conteggio senza ID, poi niente.",
   "What": "Che cosa",
@@ -2880,6 +2879,5 @@
   "How the app is used": "Come viene utilizzata l'app",
   "voice changer, Radio tab": "cambia voce, scheda Radio",
   "Your answers, if you give them": "Le tue risposte, se le dai",
-  "heard of it on YouTube": "ne ho sentito parlare su YouTube",
-  "See if people come back": "Vedi se le persone tornano"
+  "heard of it on YouTube": "ne ho sentito parlare su YouTube"
 }

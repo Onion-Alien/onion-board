@@ -2868,7 +2868,6 @@
   "Crashes and freezes": "Nedstyrter og fryser",
   "Find and fix bugs": "Find og ret fejl",
   "Know where people find the app": "Ved, hvor folk finder appen",
-  "A random ID": "Et tilfældigt ID",
   "What Count me in sends": "Hvad „Jeg er med“ sender",
   "Once a day, anonymous. Never your name, IP address or device info. Where you heard of it and feedback picks only if you give them. Switching it off sends one last count with no ID, then nothing.": "Én gang om dagen, anonymt. Aldrig dit navn, din IP-adresse eller info om din enhed. Hvor du hørte om appen og valg i feedback kun hvis du giver dem. Slået fra: én sidste optælling uden ID, derefter intet.",
   "What": "Hvad",
@@ -2880,6 +2879,5 @@
   "How the app is used": "Hvordan app'en bruges",
   "voice changer, Radio tab": "stemmeskifter, fanen Radio",
   "Your answers, if you give them": "Dine svar, hvis du giver dem",
-  "heard of it on YouTube": "hørt om det på YouTube",
-  "See if people come back": "Se om folk kommer tilbage"
+  "heard of it on YouTube": "hørt om det på YouTube"
 }

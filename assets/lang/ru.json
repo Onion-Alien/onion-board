@@ -2930,7 +2930,6 @@
   "Crashes and freezes": "Вылетает и зависает",
   "Find and fix bugs": "Найдите и исправьте ошибки",
   "Know where people find the app": "Знайте, где люди находят приложение",
-  "A random ID": "Случайный идентификатор",
   "What Count me in sends": "Что отправляет «Я в деле»",
   "Once a day, anonymous. Never your name, IP address or device info. Where you heard of it and feedback picks only if you give them. Switching it off sends one last count with no ID, then nothing.": "Раз в день, анонимно. Никогда твоё имя, IP-адрес или данные устройства. Откуда ты узнал о приложении и выбор в отзыве, только если ты их укажешь. При выключении: один последний подсчёт без ID, потом ничего.",
   "What": "Что",
@@ -2942,6 +2941,5 @@
   "How the app is used": "Как используется приложение",
   "voice changer, Radio tab": "смена голоса, вкладка Радио",
   "Your answers, if you give them": "Ваши ответы, если вы их дадите",
-  "heard of it on YouTube": "слышал об этом на YouTube",
-  "See if people come back": "Посмотрите, вернутся ли люди"
+  "heard of it on YouTube": "слышал об этом на YouTube"
 }

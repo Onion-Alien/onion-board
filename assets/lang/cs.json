@@ -2928,7 +2928,6 @@
   "Crashes and freezes": "Spadne a zamrzne",
   "Find and fix bugs": "Najděte a opravte chyby",
   "Know where people find the app": "Zjistěte, kde lidé aplikaci najdou",
-  "A random ID": "Náhodné ID",
   "What Count me in sends": "Co odesílá „Počítejte se mnou“",
   "Once a day, anonymous. Never your name, IP address or device info. Where you heard of it and feedback picks only if you give them. Switching it off sends one last count with no ID, then nothing.": "Jednou denně, anonymně. Nikdy tvoje jméno, IP adresa ani údaje o zařízení. Odkud ses o aplikaci dozvěděl a volby ze zpětné vazby jen pokud je zadáš. Po vypnutí: jedno poslední počítání bez ID, pak nic.",
   "What": "Co",
@@ -2940,6 +2939,5 @@
   "How the app is used": "Jak se aplikace používá",
   "voice changer, Radio tab": "měnič hlasu, karta Rádio",
   "Your answers, if you give them": "Vaše odpovědi, pokud je dáte",
-  "heard of it on YouTube": "slyšeli o tom na YouTube",
-  "See if people come back": "Uvidíme, jestli se lidé vrátí"
+  "heard of it on YouTube": "slyšeli o tom na YouTube"
 }

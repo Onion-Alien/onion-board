@@ -2868,7 +2868,6 @@
   "Crashes and freezes": "Kraschar och fryser",
   "Find and fix bugs": "Hitta och fixa buggar",
   "Know where people find the app": "Ta reda på var folk hittar appen",
-  "A random ID": "Ett slumpmässigt ID",
   "What Count me in sends": "Vad ”Jag är med” skickar",
   "Once a day, anonymous. Never your name, IP address or device info. Where you heard of it and feedback picks only if you give them. Switching it off sends one last count with no ID, then nothing.": "En gång om dagen, anonymt. Aldrig ditt namn, din IP-adress eller info om enheten. Var du hörde om appen och val i feedback bara om du anger dem. Avstängt: en sista räkning utan ID, sedan ingenting.",
   "What": "Vad",
@@ -2880,6 +2879,5 @@
   "How the app is used": "Hur appen används",
   "voice changer, Radio tab": "röstväxlare, Radiofliken",
   "Your answers, if you give them": "Dina svar, om du ger dem",
-  "heard of it on YouTube": "hört talas om det på YouTube",
-  "See if people come back": "Se om folk kommer tillbaka"
+  "heard of it on YouTube": "hört talas om det på YouTube"
 }

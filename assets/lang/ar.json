@@ -3108,7 +3108,6 @@
   "Crashes and freezes": "تعطل وتجمد",
   "Find and fix bugs": "البحث عن الأخطاء وإصلاحها",
   "Know where people find the app": "معرفة أين يجد الناس التطبيق",
-  "A random ID": "معرف عشوائي",
   "What Count me in sends": "ما يرسله «عد لي في»",
   "Once a day, anonymous. Never your name, IP address or device info. Where you heard of it and feedback picks only if you give them. Switching it off sends one last count with no ID, then nothing.": "مرة في اليوم، بلا هوية. لا اسمك ولا عنوان IP ولا معلومات جهازك أبدًا. من أين سمعت بالتطبيق وخيارات الملاحظات فقط إن أعطيتها. عند الإيقاف: عدّ أخير بلا معرّف، ثم لا شيء.",
   "What": "ماذا",
@@ -3120,6 +3119,5 @@
   "How the app is used": "كيف يتم استخدام التطبيق",
   "voice changer, Radio tab": "مغير الصوت، علامة تبويب الراديو",
   "Your answers, if you give them": "إجاباتك، إذا أعطيتهم",
-  "heard of it on YouTube": "سمعت عنه على موقع يوتيوب",
-  "See if people come back": "معرفة ما إذا كان الناس يعودون"
+  "heard of it on YouTube": "سمعت عنه على موقع يوتيوب"
 }

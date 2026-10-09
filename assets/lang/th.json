@@ -2808,7 +2808,6 @@
   "Crashes and freezes": "ขัดข้องและค้าง",
   "Find and fix bugs": "ค้นหาและแก้ไขข้อบกพร่อง",
   "Know where people find the app": "รู้ว่าผู้คนพบแอปนี้จากที่ใด",
-  "A random ID": "รหัสสุ่ม",
   "What Count me in sends": "สิ่งที่ \"นับฉันเข้าด้วย\" ส่งไป",
   "Once a day, anonymous. Never your name, IP address or device info. Where you heard of it and feedback picks only if you give them. Switching it off sends one last count with no ID, then nothing.": "วันละครั้ง ไม่ระบุตัวตน ไม่มีชื่อ ที่อยู่ IP หรือข้อมูลอุปกรณ์ของคุณเลย ส่งที่มาที่คุณรู้จักแอปและตัวเลือกในความคิดเห็นเฉพาะเมื่อคุณให้มา เมื่อปิด: นับครั้งสุดท้ายแบบไม่มี ID แล้วไม่ส่งอะไรอีก",
   "What": "อะไร",
@@ -2820,6 +2819,5 @@
   "How the app is used": "วิธีการใช้งานแอป",
   "voice changer, Radio tab": "โปรแกรมเปลี่ยนเสียง, แท็บวิทยุ",
   "Your answers, if you give them": "คำตอบของคุณถ้าคุณให้พวกเขา",
-  "heard of it on YouTube": "ได้ยินเรื่องนี้ใน YouTube",
-  "See if people come back": "ดูสิว่าจะมีคนกลับมาไหม"
+  "heard of it on YouTube": "ได้ยินเรื่องนี้ใน YouTube"
 }

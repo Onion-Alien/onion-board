@@ -2868,7 +2868,6 @@
   "Crashes and freezes": "Çökmeler ve donmalar",
   "Find and fix bugs": "Hataları bulun ve düzeltin",
   "Know where people find the app": "İnsanların uygulamayı nerede bulduğunu bilin",
-  "A random ID": "Rastgele bir kimlik",
   "What Count me in sends": "\"Beni de dahil et\" ne gönderir",
   "Once a day, anonymous. Never your name, IP address or device info. Where you heard of it and feedback picks only if you give them. Switching it off sends one last count with no ID, then nothing.": "Günde bir kez, anonim. Asla adın, IP adresin veya cihaz bilgin değil. Uygulamayı nereden duyduğun ve geri bildirim seçimlerin yalnızca verirsen. Kapatınca: kimliksiz son bir sayım, sonra hiçbir şey.",
   "What": "Ne",
@@ -2880,6 +2879,5 @@
   "How the app is used": "Uygulama nasıl kullanılır?",
   "voice changer, Radio tab": "ses değiştirici, Radyo sekmesi",
   "Your answers, if you give them": "Cevaplarınız, eğer verirseniz",
-  "heard of it on YouTube": "YouTube'da duydum",
-  "See if people come back": "Bakalım insanlar geri gelecek mi?"
+  "heard of it on YouTube": "YouTube'da duydum"
 }

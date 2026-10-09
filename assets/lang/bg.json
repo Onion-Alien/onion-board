@@ -2869,7 +2869,6 @@
   "Crashes and freezes": "Срива и замръзва",
   "Find and fix bugs": "Намерете и коригирайте грешки",
   "Know where people find the app": "Знайте къде хората намират приложението",
-  "A random ID": "Произволен идентификатор",
   "What Count me in sends": "Какво изпраща „Включи ме“",
   "Once a day, anonymous. Never your name, IP address or device info. Where you heard of it and feedback picks only if you give them. Switching it off sends one last count with no ID, then nothing.": "Веднъж на ден, анонимно. Никога името ти, IP адресът или данни за устройството. Откъде си чул за приложението и изборите от обратната връзка само ако ги дадеш. При изключване: едно последно броене без ID, после нищо.",
   "What": "какво",
@@ -2881,6 +2880,5 @@
   "How the app is used": "Как се използва приложението",
   "voice changer, Radio tab": "смяна на глас, раздел Радио",
   "Your answers, if you give them": "Вашите отговори, ако ги дадете",
-  "heard of it on YouTube": "чух за него в YouTube",
-  "See if people come back": "Вижте дали хората се връщат"
+  "heard of it on YouTube": "чух за него в YouTube"
 }

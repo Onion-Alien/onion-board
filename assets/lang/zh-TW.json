@@ -2808,7 +2808,6 @@
   "Crashes and freezes": "崩潰和凍結",
   "Find and fix bugs": "尋找並修復錯誤",
   "Know where people find the app": "了解人們在哪裡找到該應用程式",
-  "A random ID": "隨機ID",
   "What Count me in sends": "「算我一份」傳送的內容",
   "Once a day, anonymous. Never your name, IP address or device info. Where you heard of it and feedback picks only if you give them. Switching it off sends one last count with no ID, then nothing.": "每天一次，匿名。絕不包含你的名字、IP 位址或裝置資訊。你從哪裡得知本應用程式以及意見回饋中的選擇，只有在你填寫時才會傳送。關閉後：送出最後一次不含 ID 的計數，之後不再傳送任何內容。",
   "What": "什麼",
@@ -2820,6 +2819,5 @@
   "How the app is used": "如何使用該應用程式",
   "voice changer, Radio tab": "變聲器，收音機選項卡",
   "Your answers, if you give them": "你的答案，如果你給的話",
-  "heard of it on YouTube": "在 YouTube 上聽過",
-  "See if people come back": "看看人們是否回來"
+  "heard of it on YouTube": "在 YouTube 上聽過"
 }
