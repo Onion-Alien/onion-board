@@ -2799,9 +2799,9 @@
   "{language} needs a one-time download of its translation model ({size} MB). Offline mode is on, so it can't be downloaded now.": "{language}需要一次下載其翻譯模型 ( {size} MB)。離線模式已開啟，因此現在無法下載。",
   "{n} MB": "{n} MB",
   "⚠ Windows has no {language} voice yet, so {language} can't be spoken properly. Offline mode is on, so it can't be installed now.": "⚠ Windows 還沒有{language}語音，因此無法正常說出{language} 。離線模式已開啟，因此現在無法安裝。",
-  "A bar at the edge of the tabs and a coloured icon, in the highlight colour: easy to spot from across the room": "選項卡邊緣的欄和突出顯示顏色的彩色圖示：從房間的另一邊很容易發現",
-  "A bar beside the tab": "選項卡旁邊的欄",
-  "Show tab names": "顯示選項卡名稱",
-  "Hide tab names": "隱藏選項卡名稱",
+  "A bar at the edge of the tabs and a coloured icon, in the highlight colour: easy to spot from across the room": "分頁邊上的直條和醒目顏色的圖示：在房間另一頭也能一眼看到",
+  "A bar beside the tab": "分頁旁的直條",
+  "Show tab names": "顯示分頁名稱",
+  "Hide tab names": "隱藏分頁名稱",
   "Show only the icons": "僅顯示圖示"
 }

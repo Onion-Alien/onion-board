@@ -2799,9 +2799,9 @@
   "{language} needs a one-time download of its translation model ({size} MB). Offline mode is on, so it can't be downloaded now.": "{language} cần tải xuống một lần mô hình dịch của nó ( {size} MB). Chế độ ngoại tuyến đang bật nên không thể tải xuống ngay bây giờ.",
   "{n} MB": "{n} MB",
   "⚠ Windows has no {language} voice yet, so {language} can't be spoken properly. Offline mode is on, so it can't be installed now.": "⚠ Windows chưa có giọng nói {language} nên không thể nói chính xác {language} . Chế độ ngoại tuyến đang bật nên không thể cài đặt ngay bây giờ.",
-  "A bar at the edge of the tabs and a coloured icon, in the highlight colour: easy to spot from across the room": "Một thanh ở cạnh các tab và một biểu tượng màu, có màu nổi bật: dễ dàng nhận biết từ khắp phòng",
-  "A bar beside the tab": "Một thanh bên cạnh tab",
-  "Show tab names": "Hiển thị tên tab",
-  "Hide tab names": "Ẩn tên tab",
+  "A bar at the edge of the tabs and a coloured icon, in the highlight colour: easy to spot from across the room": "Một thanh ở cạnh các thẻ và một biểu tượng có màu nổi bật: dễ nhận ra từ khắp phòng",
+  "A bar beside the tab": "Một thanh bên cạnh thẻ",
+  "Show tab names": "Hiện tên thẻ",
+  "Hide tab names": "Ẩn tên thẻ",
   "Show only the icons": "Chỉ hiển thị các biểu tượng"
 }

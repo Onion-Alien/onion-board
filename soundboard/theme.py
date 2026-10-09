@@ -535,20 +535,29 @@ QPushButton#moretabs:pressed { background:$btn_press; }
 QPushButton#moretabs:focus { border-color:$accent; }
 QPushButton#moretabs::menu-indicator { image:none; width:0; }
 QFrame#sidebar { background:$panel; border:none; border-right:1px solid $border; }
+QFrame#sidebar[rtl="true"] { border-right:none; border-left:1px solid $border; }   /* mirrored */
 QToolButton#railtab { background:transparent; color:$muted; border:1px solid transparent;
     border-radius:8px; padding:7px 6px; font-weight:600; text-align:left; }
 QToolButton#railtab:hover { background:$btn_hover; color:$text; }
 QToolButton#railtab:checked { background:transparent; color:$text_hi; }   /* + the rail's fill */
 QToolButton#railtab:focus { border-color:$accent; }
 QFrame#sidebar QPushButton#moretabs, QFrame#sidebar QPushButton#tabinfo,
-QFrame#sidebar QPushButton#settings,
+QFrame#sidebar QPushButton#settings, QFrame#sidebar QPushButton#modebtn,
 QFrame#sidebar QPushButton#railtoggle { padding:7px 6px; text-align:left; color:$muted;
     background:transparent; border:1px solid transparent; border-radius:8px; }
 QFrame#sidebar QPushButton#moretabs:hover, QFrame#sidebar QPushButton#tabinfo:hover,
-QFrame#sidebar QPushButton#settings:hover,
+QFrame#sidebar QPushButton#settings:hover, QFrame#sidebar QPushButton#modebtn:hover,
 QFrame#sidebar QPushButton#railtoggle:hover { background:$btn_hover; color:$text_hi; }
+QFrame#sidebar QPushButton#moretabs:focus, QFrame#sidebar QPushButton#tabinfo:focus,
+QFrame#sidebar QPushButton#settings:focus, QFrame#sidebar QPushButton#modebtn:focus,
 QFrame#sidebar QPushButton#railtoggle:focus { border-color:$accent; }
 QFrame#sidebar QLabel#tagline { font-size:8pt; }
+QFrame#sidebar QPushButton#pill, QFrame#sidebar QPushButton#onair,
+QFrame#sidebar QPushButton#danger { padding:7px 6px; border-radius:8px; text-align:left; }
+QFrame#sidebar QLabel#wordmark { font-size:11pt; }
+QFrame#sidebar QWidget#railslot { background:transparent; }
+QFrame#sidebar[compact="true"] QToolButton#railtab,
+QFrame#sidebar[compact="true"] QPushButton { padding-top:2px; padding-bottom:2px; }
 QPushButton#settings { padding:6px 14px; font-weight:600; }
 QFrame#transport, QFrame#deck { background:$panel; border-radius:12px; }
 QFrame#mixer { background:transparent; }

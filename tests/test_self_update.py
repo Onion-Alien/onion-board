@@ -63,7 +63,7 @@ def test_update_now_downloads_then_restarts_into_the_installer(window, boxes, qa
     assert boxes.shown[0][0] == "Update available" and "Release page" in boxes.shown[0][1]
     assert process_events(qapp, lambda: started)
     assert started == [setup] and quit_ == [1]
-    assert window.btn_update.text() == "Restart to update"
+    assert window.btn_update.accessibleName() == "Restart to update"
     assert window.cfg.update_pending == "99.0.0"
 
 
@@ -93,7 +93,7 @@ def test_a_failed_download_puts_the_pill_back(window, boxes, qapp, monkeypatch):
     window._on_update(_rel(), "", True)
     assert process_events(qapp, lambda: not window._downloading)
     assert boxes.shown[-1][0] == "Couldn't update"
-    assert window.btn_update.text() == "Update: 99.0.0" and window.btn_update.isEnabled()
+    assert window.btn_update.accessibleName() == "Update: 99.0.0" and window.btn_update.isEnabled()
     assert window._update_file is None
 
 

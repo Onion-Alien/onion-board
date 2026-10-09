@@ -2859,9 +2859,9 @@
   "{language} needs a one-time download of its translation model ({size} MB). Offline mode is on, so it can't be downloaded now.": "{language} precisa de um download único do modelo de tradução ( {size} MB). O modo offline está ativado, por isso não pode ser baixado agora.",
   "{n} MB": "{n} MB",
   "⚠ Windows has no {language} voice yet, so {language} can't be spoken properly. Offline mode is on, so it can't be installed now.": "⚠ O Windows ainda não tem voz em {language} , então {language} não pode ser falado corretamente. O modo offline está ativado, portanto não pode ser instalado agora.",
-  "A bar at the edge of the tabs and a coloured icon, in the highlight colour: easy to spot from across the room": "Uma barra na borda das guias e um ícone colorido, na cor de destaque: fácil de localizar do outro lado da sala",
-  "A bar beside the tab": "Uma barra ao lado da guia",
-  "Show tab names": "Mostrar nomes de guias",
-  "Hide tab names": "Ocultar nomes de guias",
+  "A bar at the edge of the tabs and a coloured icon, in the highlight colour: easy to spot from across the room": "Uma barra na borda das abas e um ícone colorido, na cor de destaque: fácil de ver do outro lado da sala",
+  "A bar beside the tab": "Uma barra ao lado da aba",
+  "Show tab names": "Mostrar nomes das abas",
+  "Hide tab names": "Ocultar nomes das abas",
   "Show only the icons": "Mostrar apenas os ícones"
 }

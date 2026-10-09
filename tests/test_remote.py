@@ -346,7 +346,7 @@ def test_mode_lists_and_switches_whos_listening(qapp, window):
     assert {"off", "discord", "steam"} <= {m["key"] for m in body["modes"]}
     assert d("mode", set="Discord")[1]["mode"] == "discord"
     assert w.cfg.dest["mode"] == "discord" and w.engine.dest.key == "discord"
-    assert w.mode_combo.currentData() == "advanced"      # one exact mode: Advanced
+    assert w.mode_btn.currentData() == "advanced"      # one exact mode: Advanced
     assert d("mode", set="steam voice")[1]["mode"] == "steam"         # by its label too
     assert d("mode", set="nope")[0] == 404 and w.cfg.dest["mode"] == "steam"
     s = d("status")[1]
@@ -356,7 +356,7 @@ def test_mode_lists_and_switches_whos_listening(qapp, window):
     assert st == 200 and body["simple"] == "clean" and body["mode"] == "off"
     assert {q["key"] for q in body["simples"]} == {"game", "voice", "clean", "advanced"}
     assert d("mode", simple="game")[1]["simple"] == "game" and w.engine.dest.key == "game"
-    assert w.mode_combo.currentData() == "game"
+    assert w.mode_btn.currentData() == "game"
     assert d("mode", simple="nope")[0] == 404
     assert "radio" in s and "available" in s["radio"]
 

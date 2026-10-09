@@ -2859,8 +2859,8 @@
   "{language} needs a one-time download of its translation model ({size} MB). Offline mode is on, so it can't be downloaded now.": "{language} को अपने अनुवाद मॉडल ( {size} एमबी) को एक बार डाउनलोड करने की आवश्यकता है। ऑफ़लाइन मोड चालू है, इसलिए इसे अभी डाउनलोड नहीं किया जा सकता.",
   "{n} MB": "{n} एमबी",
   "⚠ Windows has no {language} voice yet, so {language} can't be spoken properly. Offline mode is on, so it can't be installed now.": "⚠ विंडोज़ में अभी तक कोई {language} आवाज नहीं है, इसलिए {language} ठीक से नहीं बोली जा सकती। ऑफ़लाइन मोड चालू है, इसलिए इसे अभी इंस्टॉल नहीं किया जा सकता.",
-  "A bar at the edge of the tabs and a coloured icon, in the highlight colour: easy to spot from across the room": "टैब के किनारे पर एक बार और हाइलाइट रंग में एक रंगीन आइकन: पूरे कमरे से पहचानना आसान है",
-  "A bar beside the tab": "टैब के बगल में एक बार",
+  "A bar at the edge of the tabs and a coloured icon, in the highlight colour: easy to spot from across the room": "टैब के किनारे पर एक पट्टी और हाइलाइट रंग में एक रंगीन आइकन: कमरे के दूसरी ओर से भी आसानी से दिखता है",
+  "A bar beside the tab": "टैब के बगल में एक पट्टी",
   "Show tab names": "टैब नाम दिखाएँ",
   "Hide tab names": "टैब नाम छिपाएँ",
   "Show only the icons": "केवल चिह्न दिखाएँ"

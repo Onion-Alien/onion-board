@@ -1,5 +1,5 @@
-"""The "live" mark on a tab (a badge on its icon, optionally a wash in the theme's live
-colour), and the Voice panel driving it."""
+"""The "live" mark on a tab (a badge on its icon, or a coloured icon and the rail's bar
+in the theme's live colour), and the Voice panel driving it."""
 import pytest
 from PySide6.QtGui import QColor
 from PySide6.QtWidgets import QPushButton, QTabWidget, QWidget
@@ -7,8 +7,7 @@ from PySide6.QtWidgets import QPushButton, QTabWidget, QWidget
 from soundboard import theme
 from soundboard.speech import tts
 from soundboard.ui import icons
-from soundboard.ui.livedot import (TAB_MARGIN_RIGHT, LiveTint, is_tab_live, live_color,
-                                   set_tab_live, set_tint)
+from soundboard.ui.livedot import is_tab_live, live_color, set_tab_live, set_tint
 
 
 def entries(tabs):
@@ -56,8 +55,8 @@ def test_going_live_never_changes_a_tabs_size(qapp):
 
 
 def washed(before, after, rect) -> int:
-    """Pixels inside `rect` the wash moved towards the live colour: it's the theme's
-    own colour, so "green-ish" (as it was when it was always green) doesn't say it."""
+    """Pixels inside `rect` moved towards the live colour: it's the theme's own colour,
+    so "green-ish" (as it was when it was always green) doesn't say it."""
     live = QColor(live_color())
     n = 0
     for y in range(rect.top(), rect.bottom() + 1):
@@ -69,7 +68,9 @@ def washed(before, after, rect) -> int:
     return n
 
 
-def test_live_tab_has_a_badge_and_the_optional_wash(qapp):
+def test_live_tab_has_a_badge_or_a_coloured_icon(qapp):
+    """Either-or: the dot in the icon, or (tint, the default in the app) the icon in
+    the live colour with no dot; the rail draws the bar beside it."""
     theme.apply(qapp, "Dark")
     tabs = QTabWidget()
     for name in ("Radio", "Apps"):
@@ -86,19 +87,8 @@ def test_live_tab_has_a_badge_and_the_optional_wash(qapp):
         plain = bar.grab().toImage()
         assert washed(idle, plain, bar.tabRect(1)) > 0                    # the badge
         assert washed(idle, plain, bar.tabRect(0)) == 0
-        assert bar.findChild(LiveTint) is None                            # no wash by default
         set_tint(tabs, True)
-        qapp.processEvents()
         assert entries(tabs)[1] == ("live_text", False)   # coloured icon, no dot: either-or
-        tinted = bar.grab().toImage()
-        assert washed(plain, tinted, bar.tabRect(1).adjusted(4, 4, -4, -4)) > 200
-        assert washed(plain, tinted, bar.tabRect(0)) == 0
-        # the wash lines up with the tab's own box (the selected tab's underline),
-        # not its margin: nothing tinted past its right edge
-        r = bar.tabRect(1)
-        edge = r.right() - TAB_MARGIN_RIGHT + 2
-        assert all(plain.pixel(edge, y) == tinted.pixel(edge, y)
-                   for y in range(r.top() + 8, r.bottom() - 2))
         set_tint(tabs, False)
         qapp.processEvents()
         assert entries(tabs)[1] == (None, True)
