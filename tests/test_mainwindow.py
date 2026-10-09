@@ -459,6 +459,31 @@ def test_sounds_tab_lights_up_while_a_sound_plays(window, monkeypatch):
     assert is_tab_live(tabs, i)
 
 
+def test_player_bar_follows_to_other_tabs_while_a_sound_plays(window, monkeypatch):
+    """Off the Sounds tab the player is there only while a sound plays (or is paused),
+    so it can be stopped from anywhere."""
+    playing = {}
+    monkeypatch.setattr(window.engine, "playing", lambda: dict(playing))
+    bar = window.transport
+    assert bar.parent() is not window.sounds_page   # under the tabs, not in the page
+    window.tabs.setCurrentWidget(window.sounds_page)
+    assert not bar.isHidden()                        # always on the Sounds tab
+    window.tabs.setCurrentWidget(window.setup_page)
+    assert bar.isHidden()                            # nothing playing: out of the way
+    playing["s0"] = (0.3, False)
+    window._show_transport(window.engine.playing())
+    assert not bar.isHidden()
+    playing["s0"] = (0.3, True)                      # paused: still there to resume
+    window._show_transport(window.engine.playing())
+    assert not bar.isHidden()
+    playing.clear()
+    playing["__test__"] = (0.1, False)               # the mic test's playback isn't a sound
+    window._show_transport(window.engine.playing())
+    assert bar.isHidden()
+    window.tabs.setCurrentWidget(window.sounds_page)
+    assert not bar.isHidden()
+
+
 def test_radio_and_apps_light_their_tabs_while_they_send_sound(window):
     tabs = window.tabs
     for panel in (window.radio, window.apps):

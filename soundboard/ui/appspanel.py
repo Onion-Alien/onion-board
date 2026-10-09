@@ -25,13 +25,13 @@ import threading
 import time
 import zlib
 
-from PySide6.QtCore import QFileInfo, QObject, QSize, Qt, QTimer, Signal
-from PySide6.QtGui import QFont, QPainter
-from PySide6.QtWidgets import (QCheckBox, QComboBox, QFileIconProvider, QFrame, QHBoxLayout, QLabel,
+from PySide6.QtCore import QObject, QSize, Qt, QTimer, Signal
+from PySide6.QtGui import QFont, QPainter, QPixmap
+from PySide6.QtWidgets import (QCheckBox, QComboBox, QFrame, QHBoxLayout, QLabel,
                                QLayout, QPushButton, QScrollArea, QSizePolicy, QSlider,
                                QVBoxLayout, QWidget)
 
-from soundboard import appaudio, errors, library, theme, trash, usage
+from soundboard import appaudio, errors, exeicon, library, theme, trash, usage
 from soundboard.clipedit import LiveBuffer
 from soundboard.engine import SR
 from soundboard.i18n import _
@@ -59,6 +59,8 @@ MAX_REMEMBERED = 30
 CARD_MIN_W = 300        # programs are cards, as many across as fit at this width
 CARD_MAX_W = 900        # the Card size slider's widest: one big card across most windows
 MAX_VOL = 10.0          # 1000 %, the most the volume box takes
+NEW_CARDS = 1           # program cards made per go (see AppsTab._apply_listing)
+CARDS_GAP_MS = 6        # ...and the break between goes, for the audio thread
 CONNECTING = _("Connecting…")   # a card's status while its capture is starting
 # where a sent program goes (cfg.apps[exe]["to"], cfg.apps_paths[path]["to"]): the
 # choice shows once a stream output is set (Also send to → Clean, for streaming), or
@@ -173,6 +175,8 @@ class _Lister(QObject):
         """On the worker's or the level watcher's thread. apps None: the listing failed,
         and this round is skipped (an empty list would stop every capture and drop
         the rows)."""
+        if apps:
+            exeicon.load(app.path for app in apps)   # here, not on the UI thread
         self._listed_at = time.monotonic()
         self._busy = False
         with self._hand_over:
@@ -452,22 +456,22 @@ class AppRow(HoverCard):
         if not on:
             self.btn_rec.setText("" if "rec" in self._TIGHTEN[:self._tight] else _("Record"))
 
-    _icons = QFileIconProvider()
-
     def _set_icon(self, path: str, force: bool = False):
-        # set_app runs on every refresh (each 1.5 s, 5 s while hidden): the shell's
-        # icon lookup is only worth doing when the program changed
+        # set_app runs on every refresh (each 1.5 s, 5 s while hidden): only when the
+        # program changed. The icon itself was read by the listing's thread (exeicon):
+        # asking the shell here held up the audio
         if not force and path == getattr(self, "_icon_path", None):
             return
         self._icon_path = path
-        pm = None
-        if path:
-            try:
-                pm = self._icons.icon(QFileInfo(path)).pixmap(QSize(24, 24))
-            except Exception:  # noqa: BLE001
-                pm = None
-        if pm is None or pm.isNull():
+        img = exeicon.get(path) if path else None
+        if img is None:
             pm = icons.icon("apps", "muted").pixmap(QSize(22, 22))
+        else:
+            dpr = self.icon.devicePixelRatioF()
+            side = round(24 * dpr)
+            pm = QPixmap.fromImage(img.scaled(side, side, Qt.KeepAspectRatio,
+                                              Qt.SmoothTransformation))
+            pm.setDevicePixelRatio(dpr)
         self.icon.setPixmap(pm)
 
 
@@ -588,6 +592,7 @@ class AppsTab(QWidget):
         # quitting) must not emit from a deleted object; the thread keeps it alive,
         # and the bound slot drops the result once the panel is gone
         self.lister = _Lister(None, self.peaks)
+        self._listing = 0   # listings come in numbered: a newer one replaces a half-done one
         self.lister.ready.connect(self._on_listed)
         self.timer = QTimer(self)
         self.timer.timeout.connect(self._refresh)
@@ -813,7 +818,30 @@ class AppsTab(QWidget):
                 row.set_app(row.app)
 
     def _on_listed(self, listed):
-        self._on_apps(*listed)
+        self._listing += 1
+        self._apply_listing(self._listing, *listed)
+
+    def _apply_listing(self, n: int, apps: list, alive: dict[int, str] | None):
+        """A listing, NEW_CARDS at a time: making a card is ~10 ms of Qt calls, and
+        the first look at the tab with eight programs running made them all at once,
+        long enough to skip a sound playing. The rest follow a moment later (unless a
+        newer listing came in meanwhile, which picks them up itself)."""
+        if n != self._listing:
+            return
+        hidden = self._hidden()
+        new = [key for key in dict.fromkeys(self._keys_for(apps))
+               if key not in self.rows and key not in hidden]
+        if len(new) > NEW_CARDS:
+            now = set(new[:NEW_CARDS])
+            # every copy of a kept program's .exe stays in: which copy gets the .exe's
+            # own card is worked out among them
+            keep = {app.exe.lower() for app, key in zip(apps, self._keys_for(apps))
+                    if key in self.rows or key in now}
+            self._on_apps([app for app in apps if app.exe.lower() in keep], alive)
+            QTimer.singleShot(CARDS_GAP_MS, self,
+                              lambda: self._apply_listing(n, apps, alive))
+            return
+        self._on_apps(apps, alive)
 
     def _on_apps(self, apps: list, alive: dict[int, str] | None = None):
         """`apps` the programs with an audio session; `alive` every running process
