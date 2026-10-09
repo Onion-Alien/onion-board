@@ -264,3 +264,12 @@ class SideRail(QFrame):
         self._label(self.toggle, _("Hide tab names") if shown else _("Show tab names"),
                     _("Show only the icons") if shown else "", shown)
         self.sync()
+        # one height for everything on the rail: the buttons under the tabs came out
+        # 3 px shorter, so their focus ring and hover box didn't match the tabs'
+        everything = [*self.buttons, *self.extras, self.toggle]
+        for w in everything:
+            w.setMinimumHeight(0)
+            w.setMaximumHeight(16777215)
+        h = max(w.sizeHint().height() for w in everything)
+        for w in everything:
+            w.setFixedHeight(h)
