@@ -1165,7 +1165,16 @@ class PadGrid(QWidget):
         # the same colour the page behind it shows; read on each paint, so a theme
         # change (theme.apply repaints every widget) follows
         p = QPainter(self)
-        p.fillRect(e.rect(), QColor(theme.T["bg"]))
+        # the window's glow and grain, fixed to the pads (so a scroll can still copy
+        # what's on screen): it lines up with the window at the top of the board
+        win, view = self.window(), self.parentWidget()
+        root = win.centralWidget() if hasattr(win, "centralWidget") else None
+        if root is not None and view is not None:
+            at = view.mapTo(root, QPoint(0, 0))
+            theme.paint_window_bg(p, e.rect(), QPointF(-at.x(), -at.y()),
+                                  root.width(), root.height())
+        else:
+            p.fillRect(e.rect(), QColor(theme.T["bg"]))
         drop = self.drop_area()
         if drop is not None and drop.intersects(QRectF(e.rect())):
             # the empty room under the pads says what it's for, faintly

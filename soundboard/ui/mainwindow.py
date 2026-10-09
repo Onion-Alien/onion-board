@@ -655,6 +655,8 @@ class MainWindow(QMainWindow):
         self._pages = QStackedWidget()
         self.setCentralWidget(self._pages)
         root = self._full = QWidget()
+        root.setObjectName("root")   # the theme's window gradient
+        root.setProperty("grain", True)
         self._pages.addWidget(root)
         rv = QVBoxLayout(root)
         rv.setContentsMargins(14, 10, 14, 10)
