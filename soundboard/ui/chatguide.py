@@ -365,7 +365,7 @@ class DiscordGuide(QDialog):
         super().__init__(parent)
         fit.watch(self)
         self.mw, self.vm, self.kept = mw, vm, kept
-        self.setWindowTitle(_("Discord — make your sounds come through clean"))
+        self.setWindowTitle(_("Discord: make your sounds come through clean"))
         self.setMinimumWidth(640)
         v = QVBoxLayout(self)
         v.setContentsMargins(24, 20, 24, 18)
@@ -429,7 +429,7 @@ class DiscordGuide(QDialog):
         opn.setToolTip(_("Opens Discord's Voice & Video settings"))
         opn.clicked.connect(lambda: busy.open_url(
             DISCORD_VOICE_URL, opn, self, opened=_("✓ Opened Discord"),
-            failed=_("Couldn't open Discord — is it installed? Open it yourself: ⚙ User "
+            failed=_("Couldn't open Discord: is it installed? Open it yourself: ⚙ User "
                      "Settings → Voice & Video. The link was")))
         row.addWidget(opn)
         ptt = QPushButton(_("Auto push-to-talk…"))
@@ -521,7 +521,7 @@ class GameGuide(QDialog):
     def __init__(self, parent, mw, vm: str, kept: bool = False):
         super().__init__(parent)
         fit.watch(self)
-        self.setWindowTitle(_("Game voice chat — make your sounds come through clean"))
+        self.setWindowTitle(_("Game voice chat: make your sounds come through clean"))
         self.setMinimumWidth(600)
         v = QVBoxLayout(self)
         v.setContentsMargins(24, 20, 24, 18)
@@ -575,7 +575,7 @@ class MeetingGuide(QDialog):
     def __init__(self, parent, mw, vm: str, kept: bool = False):
         super().__init__(parent)
         fit.watch(self)
-        self.setWindowTitle(_("Zoom, Teams and browser calls — make your sounds come through "
+        self.setWindowTitle(_("Zoom, Teams and browser calls: make your sounds come through "
                               "clean"))
         self.setMinimumWidth(600)
         v = QVBoxLayout(self)

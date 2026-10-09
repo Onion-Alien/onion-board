@@ -364,6 +364,44 @@ def test_card_lists_the_voices_once_installed(qapp, tmp_path):
         p.deleteLater()
 
 
+def test_card_tries_once_more_when_the_helper_never_calls_back(qapp, tmp_path, monkeypatch):
+    """A helper that sat silent (no hello) gets one silent retry; a second silence,
+    or one that connected and then failed, is shown."""
+    from soundboard.ui.aivoicepanel import AiVoicePanel
+    folder = tmp_path / "ai-voices"
+    folder.mkdir()
+    for f in ("module.json", "voices.json"):
+        (folder / f).write_bytes((ADDON / f).read_bytes())
+    (folder / ".venv" / "Scripts").mkdir(parents=True)
+    (folder / ".venv" / "Scripts" / "python.exe").write_bytes(b"")
+    (info,) = modules.discover([tmp_path])
+    ctl = AiVoiceController(VoiceChain(), lambda e: None)
+    starts = []
+
+    def fake_start(module, voice, auto_pitch=True, pitch=0.0, args=()):
+        starts.append(voice)
+        ctl.host = object()          # running
+    monkeypatch.setattr(ctl, "start", fake_start)
+    monkeypatch.setattr(ctl, "stop", lambda: setattr(ctl, "host", None))
+    p = AiVoicePanel(ctl, {"voice": "pixie"}, [info])
+    try:
+        p.b_start.setChecked(True)
+        assert len(starts) == 1
+        p._on_event({"type": "stopped", "text": "ai-voices didn't connect"})
+        assert len(starts) == 2 and "again" in p.lbl_state.text() and p.is_on()
+        p._on_event({"type": "stopped", "text": "ai-voices didn't connect"})
+        assert len(starts) == 2 and "didn't connect" in p.lbl_state.text()
+        # a fresh Start gets its own retry; one that said hello first doesn't
+        p.b_start.setChecked(False)
+        p.b_start.setChecked(True)
+        p._on_event({"type": "hello"})
+        p._on_event({"type": "stopped", "text": "broke"})
+        assert len(starts) == 3 and "broke" in p.lbl_state.text()
+    finally:
+        p.shutdown()
+        p.deleteLater()
+
+
 def test_ai_voice_and_the_computer_voice_take_turns(qapp, monkeypatch, app_dir):
     from soundboard.speech import tts
     from soundboard.ui.voicepanel import VoicePanel

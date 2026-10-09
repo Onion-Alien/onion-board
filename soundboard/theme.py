@@ -755,6 +755,13 @@ QLabel#fxend { color:$muted; font-size:7.5pt; }   /* faint was 2.6:1 on some */
 QLabel#fxgroup { color:$text; font-size:9pt; font-weight:600; padding-top:6px; }
 QPushButton#fxreset, QFrame#card QPushButton#fxreset, QFrame#card[roomy="true"] QPushButton#fxreset { background:transparent; border:none; color:$muted; padding:2px 6px; min-height:0; font-size:8pt; }
 QPushButton#fxreset:hover, QFrame#card QPushButton#fxreset:hover, QFrame#card[roomy="true"] QPushButton#fxreset:hover { color:$text; background:transparent; }
+QFrame#voicebar { background:$panel; border-radius:12px; }
+QWidget#voicebarpart, QFrame#voicebar QLabel { background:transparent; }
+QLabel#voicebarlabel { color:$muted; font-size:9pt; font-weight:600; }
+QPushButton#vchip { background:$inset; border:1px solid transparent; border-radius:13px; padding:4px 11px; color:$muted; font-size:9pt; font-weight:600; min-height:0; }
+QPushButton#vchip:hover { color:$text; }
+QPushButton#vchip[state="on"] { color:$live_text; border-color:$live_border; }
+QPushButton#vchip[state="warn"] { color:$warn_text; border-color:$warn_text; background:$warn_bg; }
 QLabel#pill { background:$inset; border:1px solid transparent; border-radius:10px; padding:3px 10px; color:$muted; font-size:8.5pt; font-weight:600; }
 QLabel#pill[slow="true"] { color:$warn_text; border-color:$warn_text; }
 QLabel#pill[on="true"] { color:$live_text; border-color:$live_border; }
@@ -1145,8 +1152,8 @@ def _texture_url(kind: str, base: str) -> str:
 OUTLINED = {"High Contrast"}
 OUTLINE_STYLE = Template("""
 QPushButton, QPushButton#danger, QLineEdit, QComboBox, QAbstractSpinBox,
-QFrame#chip, QFrame#card QFrame#chip, QFrame#fxcard, QLabel#pill { border:1px solid $border; }
-QFrame#card, QFrame#setcard { border:1px solid $border; }
+QFrame#chip, QFrame#card QFrame#chip, QFrame#fxcard, QLabel#pill, QPushButton#vchip { border:1px solid $border; }
+QFrame#card, QFrame#setcard, QFrame#voicebar { border:1px solid $border; }
 """)
 
 

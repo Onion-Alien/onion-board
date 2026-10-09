@@ -62,19 +62,24 @@ class RecordDialog(QDialog):
     """`voice_on()`: the voice changer is changing the mic right now. `names()`: the
     sounds' names (for "Recording N"). `save(data, name)` adds the pad and returns
     whether it could. `open_devices()` shows Setup → Devices. `playing_name()`: the
-    name of what's playing now ("" for nothing), for a recording of it."""
+    name of what's playing now ("" for nothing), for a recording of it, and
+    `playing_picture()` its pad's picture file ("" for none): a recording of a pad
+    gets its picture, passed as save()'s third argument."""
     last_source = "mic"   # what the window offers first: the last one used
 
     def __init__(self, engine, voice_on: Callable[[], bool], names: Callable[[], list],
                  save: Callable[[np.ndarray, str], bool], open_devices: Callable[[], None],
-                 parent=None, playing_name: Callable[[], str] | None = None):
+                 parent=None, playing_name: Callable[[], str] | None = None,
+                 playing_picture: Callable[[], str] | None = None):
         super().__init__(parent)
         fit.watch(self)
         self.engine = engine
         self._voice_on, self._names, self._save, self._open_devices = \
             voice_on, names, save, open_devices
         self._playing_name = playing_name or (lambda: "")
+        self._playing_picture = playing_picture or (lambda: "")
         self._taken_name = ""   # what was playing while it recorded
+        self._taken_pic = ""    # ...and its pad's picture
         self.take: MicTake | None = None
         self.data: np.ndarray | None = None   # the finished take, (n, 2) float32 at SR
         self.saved = 0                        # pads added from this window
@@ -254,6 +259,7 @@ class RecordDialog(QDialog):
         self.take = MicTake(self.engine, processed=processed, playing=playing)
         self._quiet_s = 0.0
         self._taken_name = self._playing_name() if playing else ""
+        self._taken_pic = self._playing_picture() if playing else ""
         self.status.setText(_("Recording what's playing… play a sound, a search result or "
                               "the radio now, then click Stop.") if playing else
                             _("Recording… click Stop when you're done."))
@@ -304,6 +310,7 @@ class RecordDialog(QDialog):
             return
         if take.playing and not self._taken_name:
             self._taken_name = self._playing_name()   # started after Record was pressed
+            self._taken_pic = self._playing_picture()
         got = take.pump()
         s = take.seconds
         left = MAX_SECONDS - s
@@ -351,7 +358,8 @@ class RecordDialog(QDialog):
             return False
         name = self.name.text().strip() or next_name(self._names())
         self.engine.stop(PREVIEW)
-        if not self._save(data, name):
+        if not (self._save(data, name, self._taken_pic) if self._taken_pic
+                else self._save(data, name)):
             return False
         self.saved += 1
         self.accept_take()

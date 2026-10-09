@@ -1,7 +1,7 @@
 # Contributing
 
-Thanks for helping. Setup is in [docs/DEVELOPING.md](docs/DEVELOPING.md) and code layout in [docs/CODE.md](docs/CODE.md);
-this file is the rules.
+Thanks for helping. Setup is in [docs/DEVELOPING.md](docs/DEVELOPING.md), code layout in [docs/CODE.md](docs/CODE.md)
+and how the UI should look in [docs/DESIGN.md](docs/DESIGN.md); this file is the rules.
 
 ## Before you open a PR
 

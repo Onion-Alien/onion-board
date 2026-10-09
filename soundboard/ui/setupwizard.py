@@ -255,7 +255,7 @@ class SetupWizard(QDialog):
         self._resumed = resumed
         fit.watch(self)   # grows to fit its text (ui/fit.py)
         self.win = win
-        self.setWindowTitle(_("Onion Board — quick setup"))
+        self.setWindowTitle(_("Onion Board: quick setup"))
         self.setMinimumSize(620, 520)
         # the cable installer, while it runs (one a closed guide left running included)
         self._proc: subprocess.Popen | None = \
@@ -351,7 +351,7 @@ class SetupWizard(QDialog):
         self.bun_mic = BunnyWidget("mic")
         v.addLayout(_header(_("Which microphone do you talk into?"),
                             _label(_("Pick the mic you use for gaming (your headset or desk "
-                                     "mic). <b>Say something</b> — the bar below should move "
+                                     "mic). <b>Say something</b>, the bar below should move "
                                      "(and Bun talks along) when you talk.")),
                             self.bun_mic))
         mics = [d["name"] for d in eng.list_devices("input") if not eng.is_virtual(d["name"])]
@@ -470,7 +470,7 @@ class SetupWizard(QDialog):
         self.btn_recheck = QPushButton(_("⟳  Check again"))
         self.btn_recheck.clicked.connect(lambda: busy.run_busy(
             self.btn_recheck, _("Checking…"), self.recheck_cable,
-            lambda _r: None if self.route_ok() else _("Still not found — checked just now"),
+            lambda _r: None if self.route_ok() else _("Still not found: checked just now"),
             ms=3500))
         buttons.addWidget(self.btn_recheck)
         self.btn_restart = QPushButton(_("⟲  Restart my PC now"))
@@ -711,7 +711,7 @@ class SetupWizard(QDialog):
 
     def test_sound(self):
         if self.win.engine.mon_stream is None:
-            self._flash_hint(_("<b>No headphones open</b> — pick another above."), 3500)
+            self._flash_hint(_("<b>No headphones open</b>, pick another above."), 3500)
             return
         self.win.engine.play("__setup__", test_tune(), 1.0, preview=True)
         self.bun_phones.burst()
@@ -762,7 +762,7 @@ class SetupWizard(QDialog):
             self.other_box.hide()
             if self.route_ok():
                 self.cable_status.setText(_("<b style='color:{colour}'>✓ On your mic.</b> "
-                                            "Discord and games hear your sounds through it — "
+                                            "Discord and games hear your sounds through it, "
                                             "press Next.", colour=_ok()))
             elif directmic.needs_repair(state):
                 self.cable_status.setText(_("Onion Board was on your mic but needs a quick "
@@ -816,12 +816,12 @@ class SetupWizard(QDialog):
             if self._resumed:   # back from the restart, and it worked
                 self._resumed = False
                 self.bun_cable.stop_building(True)
-                self.cable_status.setText(_("<b style='color:{colour}'>Welcome back — the cable "
+                self.cable_status.setText(_("<b style='color:{colour}'>Welcome back, the cable "
                                             "works now!</b> Press Next for the last step.",
                                             colour=_ok()))
             else:
                 self.cable_status.setText(_("<b style='color:{colour}'>✓ Installed and "
-                                            "connected.</b> Nothing to do here — press Next.",
+                                            "connected.</b> Nothing to do here, press Next.",
                                             colour=_ok()))
             self.btn_cable.hide()
             self.btn_recheck.hide()
@@ -1089,11 +1089,11 @@ class SetupWizard(QDialog):
             if e.mic_stream is None and self._no_mics:
                 self.mic_heard.setText(_("<span style='color:{colour}'>No microphone was "
                                          "found.</span> Plug one in, then open this guide again "
-                                         "from the Setup tab — or press Next to carry on without "
+                                         "from the Setup tab, or press Next to carry on without "
                                          "one.", colour=_bad()))
             elif e.mic_stream is None:
                 self.mic_heard.setText(_("<span style='color:{colour}'>Couldn't open that "
-                                         "mic — try another one.</span>", colour=_bad()))
+                                         "mic, try another one.</span>", colour=_bad()))
             elif self._mic_peak_seen:
                 self.mic_heard.setText(_("<b style='color:{colour}'>✓ Hearing you!</b>",
                                          colour=_ok()))
@@ -1120,7 +1120,7 @@ class SteamGuide(QDialog):
     def __init__(self, parent, mic_name: str):
         super().__init__(parent)
         fit.watch(self)   # grows to fit its text (ui/fit.py)
-        self.setWindowTitle(_("Steam games — set your mic"))
+        self.setWindowTitle(_("Steam games: set your mic"))
         self.setMinimumWidth(600)
         v = QVBoxLayout(self)
         v.setContentsMargins(24, 20, 24, 18)
@@ -1179,5 +1179,5 @@ class SteamGuide(QDialog):
         """steam://settings/voice opens the Voice page when Steam is installed; if it
         isn't, Windows says so and the written steps still apply."""
         busy.open_url("steam://settings/voice", btn, self, opened=_("✓ Opened Steam"),
-                      failed=_("Couldn't open Steam — is it installed? Follow the steps "
+                      failed=_("Couldn't open Steam: is it installed? Follow the steps "
                                "above instead. The link was"))

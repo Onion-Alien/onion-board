@@ -25,6 +25,10 @@ counted before these existed. Also once each, switching on a tab a new user star
 without (`step/added-radio-tab`, `-apps-`, `-triggers-`): sent when it happens, since
 a tab opened after the first daily count waits a day, and most people trying the app
 never send that one.
+And when someone answers *Send feedback*'s "What would you improve?", their picks
+(`improve/sounds`: names from IMPROVE only), and what they typed under Other as dashed
+words (`improve/other/more-anime-sounds`), with email addresses, links and long numbers
+taken out first.
 Nothing else: no name, sounds, settings, devices, games or IP address in the message
 (GoatCounter sees the connection's address like any site does, and isn't sent it to
 keep or look up).
@@ -84,6 +88,10 @@ STEPS = ("added-sound", "played-sound", "sent-to-others",
          # a tab a new user starts without (+ More tabs, Settings > Tabs)
          "added-radio-tab", "added-apps-tab", "added-triggers-tab")
 ROUTES = ("cable", "device", "off", "mic")   # library.ROUTES
+# the feedback box's "What would you improve?" picks (ui/feedbackdialog.py)
+IMPROVE = ("sounds", "setup", "voice-chat", "voice-changer", "speed", "looks", "bugs",
+           "other")
+OTHER_MAX = 100   # characters of what was typed under Other, as dashed words
 LANG_RE = r"[a-z]{2,3}(?:-[A-Za-z0-9]{2,4})?"
 DAY_S = 24 * 3600
 
@@ -440,6 +448,42 @@ def step(cfg, name: str, saved=None) -> None:
         return
     cfg.stats_steps = [*cfg.stats_steps, name]
     maybe_send(cfg, saved, event=f"step/{name}")
+
+
+def other_tag(text: str) -> str:
+    """What was typed under Other as dashed words ("more-anime-sounds"), any language.
+    Anything that could say who someone is is dropped first: an email address, a link,
+    a long number (a phone), an @name. At most OTHER_MAX characters, cut at a word."""
+    words = []
+    for w in str(text or "").lower().split():
+        if ("@" in w or "/" in w or "www." in w or re.search(r"\.[a-z]{2,4}$", w)
+                or re.search(r"\d{4,}", w)):
+            continue
+        words += [p for p in re.split(r"[\W_]+", w) if p]
+    out = ""
+    for w in words:
+        if len(out) + len(w) + 1 > OTHER_MAX:
+            break
+        out = f"{out}-{w}" if out else w
+    return out
+
+
+def improve(cfg, picks, other: str = "") -> bool:
+    """The feedback box's "What would you improve?" picks, sent now as `improve/<name>`
+    (names from IMPROVE only), and what was typed under Other as `improve/other/<words>`
+    (other_tag). False when nothing can be sent (usage count off, offline, running from
+    source)."""
+    events = [f"improve/{k}" for k in IMPROVE if k in picks]
+    tag = other_tag(other) if "other" in picks else ""
+    if tag:
+        events = [e if e != "improve/other" else f"improve/other/{tag}" for e in events]
+    if not events or not enabled() or not net.allowed(FEATURE):
+        return False
+    sid = install_id(cfg)
+    netlog.cause(FEATURE, "Anonymous usage count (feedback picks)")
+    threading.Thread(target=send, args=([_event(e, sid) for e in events],), daemon=True,
+                     name="usage-count").start()
+    return True
 
 
 def send_now(cfg, event: str) -> bool:

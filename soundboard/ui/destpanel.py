@@ -597,7 +597,7 @@ class CustomDestDialog(QDialog):
         self._commit()
         name = gone.get("label") or _("mode")
         self.undo_bar.show_for(
-            _("Removed “{name}” — Who's listening is Off now", name=name) if was_on
+            _("Removed “{name}”: Who's listening is Off now", name=name) if was_on
             else _("Removed “{name}”", name=name),
             lambda: self._put_back(row, gone, was_on))
 
