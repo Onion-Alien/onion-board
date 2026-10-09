@@ -198,6 +198,31 @@ def test_the_installer_box(cli):
     assert Config.load().stats_heard == "Reddit"
 
 
+def _body(req) -> dict:
+    return json.loads(req.data.decode("utf-8"))
+
+
+def test_unticking_sends_one_anonymous_opt_out(sent, app_dir, monkeypatch):
+    """Count me in going from on to off says so once, with nothing that ties it to the
+    person (no ID, tag or session), then nothing more."""
+    monkeypatch.setattr(app, "APP_DIR", app_dir)
+    monkeypatch.setattr(applog, "setup", lambda d: d / "log")
+    assert app.set_usage_count(False) == 0          # unticked on a first install
+    ((req, feature),) = sent
+    assert feature == usage.FEATURE and _body(req)["no_sessions"] is True
+    assert _body(req)["hits"] == [{"path": "opt-out/installer", "title": "opt-out/installer",
+                                   "event": True}]
+    assert Config.load().net_off == ["usage_stats"] and not Config.load().stats_id
+    net.configure_features()
+    assert app.set_usage_count(False) == 0          # unticked again on an update: already off
+    assert len(sent) == 1
+    Config(net_offline=True).save()                 # Offline mode: never
+    assert app.set_usage_count(False) == 0 and len(sent) == 1
+    net.configure_features()
+    assert not usage.opt_out("somewhere-else") and len(sent) == 1
+    assert usage.opt_out("settings") and _body(sent[-1][0])["hits"][0]["path"] == "opt-out/settings"
+
+
 def test_update_now_fetches_its_own_copy_of_the_installer():
     from soundboard import updates
 

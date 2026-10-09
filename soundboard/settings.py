@@ -2302,7 +2302,8 @@ class SettingsDialog(QDialog):
                          "version, tabs opened, crash counts and a random ID that follows "
                          "how the app is used over time. Only used to fix errors and see "
                          "which features need work. Never your name, sounds or settings. "
-                         "Off: nothing is sent."),
+                         "Switching it off sends one last anonymous count (no ID), then "
+                         "nothing."),
     }
 
     def _switches_card(self):
