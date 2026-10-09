@@ -786,6 +786,12 @@ QFrame#card QMenu, QFrame#setcard QMenu { background:$card; }
 QFrame#card QPushButton#primary:focus, QFrame#setcard QPushButton#primary:focus,
 QPushButton:checked:focus, QFrame#card QPushButton:checked:focus,
 QFrame#setcard QPushButton:checked:focus { border:1px solid $text_hi; }
+/* a card's fold arrow: just the arrow, centred in its square (the roomy cards' text
+   padding pushed it off to one side), and a plain accent box for keyboard focus */
+QPushButton#fold[icononly="true"], QFrame#card[roomy="true"] QPushButton#fold[icononly="true"] {
+    padding:0; min-height:0; text-align:center; border:1px solid transparent; border-radius:6px; }
+QPushButton#fold[icononly="true"]:focus, QFrame#card QPushButton#fold[icononly="true"]:focus,
+QFrame#card QPushButton#fold[icononly="true"]:checked:focus { border:1px solid $accent; }
 QCheckBox::indicator:focus { border-color:$accent; }
 QCheckBox::indicator:checked:focus { border-color:$text_hi; }
 QSlider::handle:horizontal:focus, QSlider::handle:vertical:focus { border:2px solid $accent; }
