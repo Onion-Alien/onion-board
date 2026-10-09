@@ -86,14 +86,13 @@ class SetupShow(BunnyWidget):
         """Start the show (harmless while it's on)."""
         if self.on:
             return
-        self._t, self._act_t = 0.0, 0.0   # (_act_t: the base class counts us as busy)
+        self._t, self._act_t = 0.0, 0.0   # (_act_t: the base class sees us as mid-act)
         self._result, self._end_at, self._ok = None, -1.0, False
         self._parts, self._part_at = 0, [-1.0] * PARTS
         self._bits, self._booms = [], 0
         self.notes, self.puffs = [], []
         self.prop, self.sad, self._sad, self.celebrate = None, 0.0, 0.0, False
         self.show()
-        self._wake()
 
     def finish(self, ok: bool):
         """How it went: the ending plays once the speaker is far enough along. The first

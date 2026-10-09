@@ -7,8 +7,8 @@ towards flame orange, and embers drift up off the onion while sounds play.
 
 It always paints in the current theme's accent colours, so theme switches recolour
 it on the next frame. The widget is a little bigger than the mark to leave room for
-the glow. The timer only runs while it's on screen, and slows to a few frames a
-second at rest (only the breathing moves then).
+the glow. The timer only runs while it's on screen, always at the same pace (a slower
+idle pace made the breathing judder next to the smooth sheen).
 """
 from __future__ import annotations
 
@@ -29,8 +29,7 @@ FLAME = QColor("#ff8a2b")
 EMBER_COLORS = ("#ffcf40", "#ff8a2b", "#ff5a36")
 SHEEN_PERIOD = 4.5   # seconds between sheen sweeps
 SHEEN_TIME = 0.9     # how long one sweep takes
-FAST_MS = 33         # frame interval with sound, embers or the sheen sweeping
-IDLE_MS = 125        # at rest only the slow breathing moves: a few frames a second do
+FAST_MS = 33         # frame interval, ~30 fps
 
 
 def _mix(a: QColor, b: QColor, t: float) -> QColor:
@@ -91,9 +90,6 @@ class LogoWidget(QWidget):
     # ---- feeding
     def set_level(self, v: float):
         self._target = max(0.0, min(1.0, float(v)))
-        if self._target >= 0.01 and self._timer.isActive() \
-                and self._timer.interval() != FAST_MS:
-            self._timer.start(FAST_MS)   # a sound started: back to full speed at once
 
     # ---- lifecycle
     def showEvent(self, e):
@@ -115,17 +111,6 @@ class LogoWidget(QWidget):
         self._last = now
         self.advance(dt)
         self.update()
-        want = FAST_MS if self.busy() else IDLE_MS
-        if self._timer.interval() != want:
-            self._timer.setInterval(want)
-
-    def busy(self) -> bool:
-        """Anything moving faster than the slow idle breathing: sound, embers, or
-        the sheen mid-sweep (or about to start one)."""
-        if self.level >= 0.01 or self._target >= 0.01 or self.embers:
-            return True
-        ph = ((time.monotonic() - self._t0) % SHEEN_PERIOD) / SHEEN_TIME
-        return ph < 1.0 or ph > (SHEEN_PERIOD - IDLE_MS / 1000) / SHEEN_TIME
 
     def advance(self, dt: float):
         """Move the animation on by dt seconds (separate from the timer for tests)."""

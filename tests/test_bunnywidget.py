@@ -114,30 +114,18 @@ def test_sad_bun_begs_in_a_bubble_and_cheers_when_clicked(qapp):
     _run(qapp, b, 15)
     assert b.pose()["sad"] < 0.3             # happy while cheering
 
-def test_idles_at_a_few_frames_a_second_and_wakes_for_talking(qapp):
+def test_idle_bob_runs_at_the_same_frame_rate_as_the_twitches(qapp):
     from soundboard.ui import bunnywidget
     b = BunnyWidget("plug")
     b._timer.start(bunnywidget.FAST_MS)   # as if on screen
     far = time.monotonic() + 60
     b._next_blink = b._next_flick = b._next_sigh = far
-    _run(qapp, b, 2)
-    assert not b.busy()
-    assert b._timer.interval() == bunnywidget.IDLE_MS
-    b.set_level(0.4)                      # talking: full speed at once
-    assert b._timer.interval() == bunnywidget.FAST_MS
-    _run(qapp, b, 5, level=0.4)
-    assert b._timer.interval() == bunnywidget.FAST_MS
-    b._next_blink = time.monotonic()      # a blink due: fast frames so it shows
-    b._level = 0.0
-    assert b.busy()
-    b.notes.clear()
-    b._timer.setInterval(bunnywidget.IDLE_MS)
-    b.burst(2)
+    _run(qapp, b, 5)                      # nothing but the bob going on
     assert b._timer.interval() == bunnywidget.FAST_MS
     b._timer.stop()
 
 
-def test_headphones_trickle_lets_him_idle(qapp):
+def test_headphones_trickle_calm_notes(qapp):
     b = BunnyWidget("headphones")
     b.resize(b.sizeHint())
     for _ in range(90):                 # ~3 s of silence: a note from his headphones
@@ -145,9 +133,3 @@ def test_headphones_trickle_lets_him_idle(qapp):
         if b.notes:
             break
     assert b.notes and all(n.calm for n in b.notes)
-    now = time.monotonic()
-    b._next_blink = b._next_flick = now + 60
-    b._blink_at = b._flick_at = -1
-    assert not b.busy(now)              # so the slow frame rate, not 30 fps forever
-    b.burst(2)
-    assert b.busy(now)
