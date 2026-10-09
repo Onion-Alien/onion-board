@@ -26,10 +26,13 @@ def test_improve_sends_only_known_names_and_the_tidied_other(monkeypatch):
     cfg = SimpleNamespace(stats_id="abc")
     assert usage.improve(cfg, ["looks", "nonsense", "other"], "Dark mode me@example.com")
     assert [h["path"] for h in sent[0]] == ["improve/looks", "improve/other/dark-mode"]
-    assert all(h["event"] and h["session"] == "abc" for h in sent[0])
+    # anonymous: a one-off session per send, never this PC's ID
+    sessions = {h["session"] for h in sent[0]}
+    assert all(h["event"] for h in sent[0]) and len(sessions) == 1 and "abc" not in sessions
     sent.clear()
     usage.improve(cfg, ["sounds"], "typed but Other not ticked")
     assert [h["path"] for h in sent[0]] == ["improve/sounds"]
+    assert sent[0][0]["session"] not in sessions | {"abc"}
 
 
 def test_improve_sends_nothing_when_the_count_is_off(monkeypatch):
@@ -60,6 +63,7 @@ def test_the_box_asks_then_thanks_and_opens_the_form(qapp, monkeypatch):
     assert calls == [(["speed", "other"], "a dark theme")]
     assert dlg.pages.currentIndex() == 1
     assert dlg.not_sent.isVisible()          # the count is off here: say so
+    assert "Anonymous" in dlg.anon_note.text()
     dlg.form_btn.click()
     assert opened == [feedback.feedback_url(__version__, improve=["speed", "other"])]
     assert "improve=speed%2Cother" in opened[0]
