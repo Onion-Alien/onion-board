@@ -183,6 +183,15 @@ class StatusLine(QLabel):
         responsive.touch(self)
 
 
+class SnugTabBar(QTabBar):
+    """A tab bar no wider than its tabs. Qt's minimum keeps room for the scroll
+    arrows even with one short tab, which left a wide gap before the "+" after it."""
+
+    def minimumSizeHint(self) -> QSize:
+        m = super().minimumSizeHint()
+        return QSize(min(m.width(), self.sizeHint().width()), m.height())
+
+
 class BannerButton(QPushButton):
     """A one-line button that never makes the window wider: in less room it shows
     `short`, and in less than that its text is cut with "…". A banner as wide as its
@@ -4386,7 +4395,7 @@ class MainWindow(QMainWindow):
         h = QHBoxLayout(w)
         h.setContentsMargins(0, 0, 0, 0)
         h.setSpacing(4)
-        self.cat_tabs = QTabBar()
+        self.cat_tabs = SnugTabBar()
         self.cat_tabs.setDrawBase(False)
         self.cat_tabs.setExpanding(False)
         self.cat_tabs.setUsesScrollButtons(True)
