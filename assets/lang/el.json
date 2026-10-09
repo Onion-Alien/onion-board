@@ -2830,5 +2830,11 @@
   "Hide this tab": "Απόκρυψη αυτής της καρτέλας",
   "This tab is always shown": "Αυτή η καρτέλα εμφανίζεται πάντα",
   "{tab} hidden. Bring it back with + More tabs or Settings > Tabs.": "{tab} κρυφό. Επαναφέρετε με + Περισσότερες καρτέλες ή Ρυθμίσεις > Καρτέλες.",
-  "Switch off the tabs you don't use. A switched-off tab is gone from the window and doesn't load at all, so nothing of it runs in the background. Switch it back on any time, here or with + More tabs after the tabs. Right-click a tab to hide it.": "Απενεργοποιήστε τις καρτέλες που δεν χρησιμοποιείτε. Μια απενεργοποιημένη καρτέλα έχει φύγει από το παράθυρο και δεν φορτώνεται καθόλου, επομένως τίποτα από αυτήν δεν εκτελείται στο παρασκήνιο. Ενεργοποιήστε το ξανά ανά πάσα στιγμή, εδώ ή με + Περισσότερα καρτέλες μετά τις καρτέλες. Κάντε δεξί κλικ σε μια καρτέλα για να την αποκρύψετε."
+  "Switch off the tabs you don't use. A switched-off tab is gone from the window and doesn't load at all, so nothing of it runs in the background. Switch it back on any time, here or with + More tabs after the tabs. Right-click a tab to hide it.": "Απενεργοποιήστε τις καρτέλες που δεν χρησιμοποιείτε. Μια απενεργοποιημένη καρτέλα έχει φύγει από το παράθυρο και δεν φορτώνεται καθόλου, επομένως τίποτα από αυτήν δεν εκτελείται στο παρασκήνιο. Ενεργοποιήστε το ξανά ανά πάσα στιγμή, εδώ ή με + Περισσότερα καρτέλες μετά τις καρτέλες. Κάντε δεξί κλικ σε μια καρτέλα για να την αποκρύψετε.",
+  "Add more to Onion Board": "Προσθέστε περισσότερα στο Onion Board",
+  "Change your voice live: robots, monsters, other languages, or let it speak what you type.": "Αλλάξτε τη φωνή σας ζωντανά: ρομπότ, τέρατα, άλλες γλώσσες ή αφήστε τη να μιλάει ό,τι πληκτρολογείτε.",
+  "Free, and each one only loads once you add it.": "Δωρεάν και το καθένα φορτώνεται μόνο αφού το προσθέσετε.",
+  "Plays a sound by itself when something shows up in your game: a YOU DIED, a kill, a queue popping.": "Παίζει έναν ήχο από μόνος του όταν εμφανίζεται κάτι στο παιχνίδι σας: a YOU DIED, ένα kill, μια ουρά που σκάει.",
+  "Share Spotify, a video or a game's sound with your friends, kept apart from your own.": "Μοιραστείτε το Spotify, ένα βίντεο ή έναν ήχο παιχνιδιού με τους φίλους σας, χωριστά από τον δικό σας.",
+  "Thousands of live stations from all over the world. Listen yourself, or send one into the call for everyone.": "Χιλιάδες ζωντανοί σταθμοί από όλο τον κόσμο. Ακούστε τον εαυτό σας ή στείλτε έναν στην κλήση για όλους."
 }

@@ -2890,5 +2890,11 @@
   "Hide this tab": "Ukryj tę zakładkę",
   "This tab is always shown": "Ta zakładka jest zawsze widoczna",
   "{tab} hidden. Bring it back with + More tabs or Settings > Tabs.": "{tab} ukryta. Przywróć go za pomocą kart + Więcej lub Ustawienia > Karty.",
-  "Switch off the tabs you don't use. A switched-off tab is gone from the window and doesn't load at all, so nothing of it runs in the background. Switch it back on any time, here or with + More tabs after the tabs. Right-click a tab to hide it.": "Wyłącz karty, których nie używasz. Wyłączona karta zniknęła z okna i w ogóle się nie ładuje, więc nic nie działa w tle. Włącz go ponownie w dowolnym momencie, tutaj lub za pomocą zakładek + Więcej po zakładkach. Kliknij kartę prawym przyciskiem myszy, aby ją ukryć."
+  "Switch off the tabs you don't use. A switched-off tab is gone from the window and doesn't load at all, so nothing of it runs in the background. Switch it back on any time, here or with + More tabs after the tabs. Right-click a tab to hide it.": "Wyłącz karty, których nie używasz. Wyłączona karta zniknęła z okna i w ogóle się nie ładuje, więc nic nie działa w tle. Włącz go ponownie w dowolnym momencie, tutaj lub za pomocą zakładek + Więcej po zakładkach. Kliknij kartę prawym przyciskiem myszy, aby ją ukryć.",
+  "Add more to Onion Board": "Dodaj więcej do Deski Cebulowej",
+  "Change your voice live: robots, monsters, other languages, or let it speak what you type.": "Zmień swój głos na żywo: roboty, potwory, inne języki lub pozwól mu mówić, co piszesz.",
+  "Free, and each one only loads once you add it.": "Bezpłatnie, a każdy ładuje się dopiero po dodaniu.",
+  "Plays a sound by itself when something shows up in your game: a YOU DIED, a kill, a queue popping.": "Odtwarza własny dźwięk, gdy coś pojawi się w grze: UMIERASZ, zabójstwo, wyskakująca kolejka.",
+  "Share Spotify, a video or a game's sound with your friends, kept apart from your own.": "Udostępniaj Spotify, wideo lub dźwięk z gry znajomym, z dala od swoich.",
+  "Thousands of live stations from all over the world. Listen yourself, or send one into the call for everyone.": "Tysiące stacji na żywo z całego świata. Posłuchaj siebie lub wyślij jednego na wezwanie dla wszystkich."
 }

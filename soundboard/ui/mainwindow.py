@@ -812,6 +812,7 @@ class MainWindow(QMainWindow):
                                         "triggers…"))
         mt = QMenu(self.btn_more_tabs)
         mt.aboutToShow.connect(lambda: self._fill_more_tabs(mt))
+        mt.aboutToHide.connect(self._more_tabs_hidden)
         self.btn_more_tabs.setMenu(mt)
         self._update_more_tabs()
         self.tabs.setCornerWidget(TabEndCorner(self.tabs, self.btn_more_tabs, self.btn_info),
@@ -3209,18 +3210,31 @@ class MainWindow(QMainWindow):
         self.btn_more_tabs.setVisible(any(not self.tab_on(k) for k in taboff.KEYS))
 
     def _fill_more_tabs(self, menu: QMenu):
-        """+ More tabs: each tab that's switched off, with what it's for (click: it's
-        added and opened), then Settings > Tabs to pick them all."""
-        menu.clear()
-        for key in taboff.KEYS:
-            if self.tab_on(key):
-                continue
-            text, tip = TABS[TAB_INDEX[key]]
-            act = menu.addAction(icons.icon(key), _("{tab}: {tip}", tab=text, tip=tip))
-            act.triggered.connect(lambda _c=False, k=key: self._add_tab(k))
-        menu.addSeparator()
-        act = menu.addAction(icons.icon("settings"), _("Choose tabs in Settings…"))
-        act.triggered.connect(lambda: self.open_settings("tabs"))
+        """+ More tabs: a card for each tab that's switched off, with what it's good
+        for (click: it's added and opened), then Settings > Tabs to pick them all."""
+        from soundboard.ui import moretabs
+        off = [(k, *TABS[TAB_INDEX[k]]) for k in taboff.KEYS if not self.tab_on(k)]
+        self._more_added = False
+        usage.used("more-tabs-opened")
+        moretabs.fill(menu, off, self._add_from_more, lambda: self.open_settings("tabs"))
+
+    def _more_tabs_hidden(self):
+        """+ More tabs closed: counted when nothing was added (a pick's triggered
+        signal comes after the menu hides, so this looks once that's through)."""
+        def check():
+            if not getattr(self, "_more_added", True):
+                usage.used("more-tabs-closed")
+            self._more_added = True
+        QTimer.singleShot(0, check)
+
+    def _add_from_more(self, key: str):
+        self._more_added = True
+        usage.used(f"more-tabs-added-{key}")
+        self._add_tab(key)
+
+    def _add_tab(self, key: str):
+        self.set_tab_on(key, True)
+        self.tabs.setCurrentIndex(TAB_INDEX[key])
 
     def _tab_menu(self, pos):
         """Right-click on a tab: Hide this tab (not Sounds or Setup)."""
@@ -3247,12 +3261,9 @@ class MainWindow(QMainWindow):
     def hide_tab(self, key: str):
         """Hide a tab from its right-click menu, saying where to get it back."""
         self.set_tab_on(key, False)
+        usage.used(f"tab-hidden-{key}")
         self.toast(_("{tab} hidden. Bring it back with + More tabs or Settings > Tabs.",
                      tab=TABS[TAB_INDEX[key]][0]))
-
-    def _add_tab(self, key: str):
-        self.set_tab_on(key, True)
-        self.tabs.setCurrentIndex(TAB_INDEX[key])
 
     def _tab_live(self, key: str, on: bool):
         """The live badge on the Voice, Triggers or Apps tab."""

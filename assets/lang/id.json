@@ -2770,5 +2770,11 @@
   "Hide this tab": "Sembunyikan tab ini",
   "This tab is always shown": "Tab ini selalu ditampilkan",
   "{tab} hidden. Bring it back with + More tabs or Settings > Tabs.": "{tab} disembunyikan. Kembalikan dengan + Tab lainnya atau Pengaturan > Tab.",
-  "Switch off the tabs you don't use. A switched-off tab is gone from the window and doesn't load at all, so nothing of it runs in the background. Switch it back on any time, here or with + More tabs after the tabs. Right-click a tab to hide it.": "Matikan tab yang tidak Anda gunakan. Tab yang dimatikan hilang dari jendela dan tidak dimuat sama sekali, jadi tidak ada yang berjalan di latar belakang. Aktifkan kembali kapan saja, di sini atau dengan + Tab lainnya setelah tab. Klik kanan tab untuk menyembunyikannya."
+  "Switch off the tabs you don't use. A switched-off tab is gone from the window and doesn't load at all, so nothing of it runs in the background. Switch it back on any time, here or with + More tabs after the tabs. Right-click a tab to hide it.": "Matikan tab yang tidak Anda gunakan. Tab yang dimatikan hilang dari jendela dan tidak dimuat sama sekali, jadi tidak ada yang berjalan di latar belakang. Aktifkan kembali kapan saja, di sini atau dengan + Tab lainnya setelah tab. Klik kanan tab untuk menyembunyikannya.",
+  "Add more to Onion Board": "Tambahkan lebih banyak ke Onion Board",
+  "Change your voice live: robots, monsters, other languages, or let it speak what you type.": "Ubah suara Anda secara langsung: robot, monster, bahasa lain, atau biarkan suara Anda mengucapkan apa yang Anda ketik.",
+  "Free, and each one only loads once you add it.": "Gratis, dan masing-masing hanya dimuat setelah Anda menambahkannya.",
+  "Plays a sound by itself when something shows up in your game: a YOU DIED, a kill, a queue popping.": "Memainkan suara dengan sendirinya ketika sesuatu muncul di game Anda: ANDA MATI, pembunuhan, antrian muncul.",
+  "Share Spotify, a video or a game's sound with your friends, kept apart from your own.": "Bagikan Spotify, video, atau suara game dengan teman-teman Anda, secara terpisah dari teman Anda.",
+  "Thousands of live stations from all over the world. Listen yourself, or send one into the call for everyone.": "Ribuan stasiun langsung dari seluruh dunia. Dengarkan diri Anda sendiri, atau kirimkan satu ke panggilan untuk semua orang."
 }

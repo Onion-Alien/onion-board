@@ -2830,5 +2830,11 @@
   "Hide this tab": "Verberg dit tabblad",
   "This tab is always shown": "Dit tabblad wordt altijd weergegeven",
   "{tab} hidden. Bring it back with + More tabs or Settings > Tabs.": "{tab} verborgen. Breng het terug met + Meer tabbladen of Instellingen > Tabbladen.",
-  "Switch off the tabs you don't use. A switched-off tab is gone from the window and doesn't load at all, so nothing of it runs in the background. Switch it back on any time, here or with + More tabs after the tabs. Right-click a tab to hide it.": "Schakel de tabbladen uit die u niet gebruikt. Een uitgeschakeld tabblad is uit het venster verdwenen en wordt helemaal niet geladen, zodat er niets op de achtergrond draait. Schakel het op elk gewenst moment weer in, hier of met + Meer tabbladen achter de tabbladen. Klik met de rechtermuisknop op een tabblad om het te verbergen."
+  "Switch off the tabs you don't use. A switched-off tab is gone from the window and doesn't load at all, so nothing of it runs in the background. Switch it back on any time, here or with + More tabs after the tabs. Right-click a tab to hide it.": "Schakel de tabbladen uit die u niet gebruikt. Een uitgeschakeld tabblad is uit het venster verdwenen en wordt helemaal niet geladen, zodat er niets op de achtergrond draait. Schakel het op elk gewenst moment weer in, hier of met + Meer tabbladen achter de tabbladen. Klik met de rechtermuisknop op een tabblad om het te verbergen.",
+  "Add more to Onion Board": "Voeg meer toe aan het uienbord",
+  "Change your voice live: robots, monsters, other languages, or let it speak what you type.": "Verander je stem live: robots, monsters, andere talen, of laat hem uitspreken wat je typt.",
+  "Free, and each one only loads once you add it.": "Gratis, en ze worden allemaal pas geladen zodra je ze toevoegt.",
+  "Plays a sound by itself when something shows up in your game: a YOU DIED, a kill, a queue popping.": "Speelt vanzelf een geluid af als er iets in je spel opduikt: een YOU DIED, een kill, een wachtrij die verschijnt.",
+  "Share Spotify, a video or a game's sound with your friends, kept apart from your own.": "Deel Spotify, een video of het geluid van een game met je vrienden, apart van die van jezelf.",
+  "Thousands of live stations from all over the world. Listen yourself, or send one into the call for everyone.": "Duizenden livestations van over de hele wereld. Luister zelf, of stuur er een in de oproep voor iedereen."
 }

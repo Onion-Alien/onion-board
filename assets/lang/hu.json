@@ -2830,5 +2830,11 @@
   "Hide this tab": "A lap elrejtése",
   "This tab is always shown": "Ez a lap mindig látható",
   "{tab} hidden. Bring it back with + More tabs or Settings > Tabs.": "{tab} elrejtve. Hozza vissza a + További lapok vagy a Beállítások > Lapok lehetőséggel.",
-  "Switch off the tabs you don't use. A switched-off tab is gone from the window and doesn't load at all, so nothing of it runs in the background. Switch it back on any time, here or with + More tabs after the tabs. Right-click a tab to hide it.": "Kapcsolja ki a nem használt füleket. Egy kikapcsolt fül eltűnt az ablakból, és egyáltalán nem töltődik be, így a háttérben nem fut belőle semmi. Bármikor visszakapcsolhatja, itt vagy a + További lapokkal a fülek után. Kattintson a jobb gombbal egy lapra az elrejtéséhez."
+  "Switch off the tabs you don't use. A switched-off tab is gone from the window and doesn't load at all, so nothing of it runs in the background. Switch it back on any time, here or with + More tabs after the tabs. Right-click a tab to hide it.": "Kapcsolja ki a nem használt füleket. Egy kikapcsolt fül eltűnt az ablakból, és egyáltalán nem töltődik be, így a háttérben nem fut belőle semmi. Bármikor visszakapcsolhatja, itt vagy a + További lapokkal a fülek után. Kattintson a jobb gombbal egy lapra az elrejtéséhez.",
+  "Add more to Onion Board": "Adjon hozzá többet az Onion Boardhoz",
+  "Change your voice live: robots, monsters, other languages, or let it speak what you type.": "Változtassa meg a hangját élőben: robotok, szörnyek, más nyelvek, vagy hagyja, hogy beszéljen, amit gépel.",
+  "Free, and each one only loads once you add it.": "Ingyenes, és mindegyik csak a hozzáadása után töltődik be.",
+  "Plays a sound by itself when something shows up in your game: a YOU DIED, a kill, a queue popping.": "Önmagában lejátszik egy hangot, ha valami megjelenik a játékban: MEGHALT, gyilkosság, felugró sor.",
+  "Share Spotify, a video or a game's sound with your friends, kept apart from your own.": "Oszd meg barátaiddal a Spotify-t, egy videót vagy egy játék hangját, külön a sajátodtól.",
+  "Thousands of live stations from all over the world. Listen yourself, or send one into the call for everyone.": "Több ezer élő állomás a világ minden tájáról. Hallgassa meg magát, vagy küldjön egyet a hívásba mindenkinek."
 }

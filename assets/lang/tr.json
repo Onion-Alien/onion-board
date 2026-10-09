@@ -2830,5 +2830,11 @@
   "Hide this tab": "Bu sekmeyi gizle",
   "This tab is always shown": "Bu sekme her zaman gösterilir",
   "{tab} hidden. Bring it back with + More tabs or Settings > Tabs.": "{tab} gizlendi. + Diğer sekmeler veya Ayarlar > Sekmeler ile onu geri getirin.",
-  "Switch off the tabs you don't use. A switched-off tab is gone from the window and doesn't load at all, so nothing of it runs in the background. Switch it back on any time, here or with + More tabs after the tabs. Right-click a tab to hide it.": "Kullanmadığınız sekmeleri kapatın. Kapatılan bir sekme pencereden silinir ve hiç yüklenmez, dolayısıyla arka planda hiçbir şey çalışmaz. İstediğiniz zaman buradan veya sekmelerden sonraki + Diğer sekmeleri kullanarak tekrar etkinleştirebilirsiniz. Bir sekmeyi gizlemek için sağ tıklayın."
+  "Switch off the tabs you don't use. A switched-off tab is gone from the window and doesn't load at all, so nothing of it runs in the background. Switch it back on any time, here or with + More tabs after the tabs. Right-click a tab to hide it.": "Kullanmadığınız sekmeleri kapatın. Kapatılan bir sekme pencereden silinir ve hiç yüklenmez, dolayısıyla arka planda hiçbir şey çalışmaz. İstediğiniz zaman buradan veya sekmelerden sonraki + Diğer sekmeleri kullanarak tekrar etkinleştirebilirsiniz. Bir sekmeyi gizlemek için sağ tıklayın.",
+  "Add more to Onion Board": "Soğan Kuruluna daha fazlasını ekleyin",
+  "Change your voice live: robots, monsters, other languages, or let it speak what you type.": "Sesinizi canlı olarak değiştirin: robotlar, canavarlar, diğer diller veya bırakın yazdıklarınızı konuşsun.",
+  "Free, and each one only loads once you add it.": "Ücretsizdir ve her biri yalnızca siz ekledikten sonra yüklenir.",
+  "Plays a sound by itself when something shows up in your game: a YOU DIED, a kill, a queue popping.": "Oyununuzda bir şey göründüğünde kendi kendine bir ses çıkarır: SİZ ÖLDÜNÜZ, bir öldürme, bir sıranın açılması.",
+  "Share Spotify, a video or a game's sound with your friends, kept apart from your own.": "Spotify'ı, bir videoyu veya oyunun sesini kendinizden ayrı olarak arkadaşlarınızla paylaşın.",
+  "Thousands of live stations from all over the world. Listen yourself, or send one into the call for everyone.": "Dünyanın her yerinden binlerce canlı istasyon. Kendinizi dinleyin veya herkes için aramaya bir tane gönderin."
 }

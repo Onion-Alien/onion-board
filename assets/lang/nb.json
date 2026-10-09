@@ -2830,5 +2830,11 @@
   "Hide this tab": "Skjul denne fanen",
   "This tab is always shown": "Denne fanen vises alltid",
   "{tab} hidden. Bring it back with + More tabs or Settings > Tabs.": "{tab} skjult. Ta den tilbake med + Flere faner eller Innstillinger > Faner.",
-  "Switch off the tabs you don't use. A switched-off tab is gone from the window and doesn't load at all, so nothing of it runs in the background. Switch it back on any time, here or with + More tabs after the tabs. Right-click a tab to hide it.": "Slå av fanene du ikke bruker. En avslått fane er borte fra vinduet og laster ikke i det hele tatt, så ingenting av den kjører i bakgrunnen. Slå den på igjen når som helst, her eller med + Flere faner etter fanene. Høyreklikk en fane for å skjule den."
+  "Switch off the tabs you don't use. A switched-off tab is gone from the window and doesn't load at all, so nothing of it runs in the background. Switch it back on any time, here or with + More tabs after the tabs. Right-click a tab to hide it.": "Slå av fanene du ikke bruker. En avslått fane er borte fra vinduet og laster ikke i det hele tatt, så ingenting av den kjører i bakgrunnen. Slå den på igjen når som helst, her eller med + Flere faner etter fanene. Høyreklikk en fane for å skjule den.",
+  "Add more to Onion Board": "Legg til mer til Onion Board",
+  "Change your voice live: robots, monsters, other languages, or let it speak what you type.": "Endre stemmen din live: roboter, monstre, andre språk, eller la den snakke hva du skriver.",
+  "Free, and each one only loads once you add it.": "Gratis, og hver enkelt lastes bare når du legger den til.",
+  "Plays a sound by itself when something shows up in your game: a YOU DIED, a kill, a queue popping.": "Spiller en lyd av seg selv når noe dukker opp i spillet ditt: en DU DØDE, et drap, en kø som dukker.",
+  "Share Spotify, a video or a game's sound with your friends, kept apart from your own.": "Del Spotify, en video eller et spills lyd med vennene dine, holdt adskilt fra dine egne.",
+  "Thousands of live stations from all over the world. Listen yourself, or send one into the call for everyone.": "Tusenvis av live-stasjoner fra hele verden. Lytt selv, eller send en inn i samtalen for alle."
 }

@@ -2770,5 +2770,11 @@
   "Hide this tab": "このタブを非表示にする",
   "This tab is always shown": "このタブは常に表示されます",
   "{tab} hidden. Bring it back with + More tabs or Settings > Tabs.": "{tab}を非表示にしました。 [+ その他] タブまたは [設定] > [タブ] を使用して元に戻します。",
-  "Switch off the tabs you don't use. A switched-off tab is gone from the window and doesn't load at all, so nothing of it runs in the background. Switch it back on any time, here or with + More tabs after the tabs. Right-click a tab to hide it.": "使用しないタブはオフにします。オフにされたタブはウィンドウから消え、まったく読み込まれないため、バックグラウンドでは何も実行されません。ここで、またはタブの後の [+ その他] タブを使用して、いつでもオンに戻します。タブを右クリックして非表示にします。"
+  "Switch off the tabs you don't use. A switched-off tab is gone from the window and doesn't load at all, so nothing of it runs in the background. Switch it back on any time, here or with + More tabs after the tabs. Right-click a tab to hide it.": "使用しないタブはオフにします。オフにされたタブはウィンドウから消え、まったく読み込まれないため、バックグラウンドでは何も実行されません。ここで、またはタブの後の [+ その他] タブを使用して、いつでもオンに戻します。タブを右クリックして非表示にします。",
+  "Add more to Onion Board": "オニオンボードにさらに追加",
+  "Change your voice live: robots, monsters, other languages, or let it speak what you type.": "ロボット、モンスター、その他の言語など、音声をライブで変更したり、入力した内容を読み上げたりできます。",
+  "Free, and each one only loads once you add it.": "無料で、それぞれは追加したときにのみ読み込まれます。",
+  "Plays a sound by itself when something shows up in your game: a YOU DIED, a kill, a queue popping.": "ゲーム内に何かが現れると、サウンドが自動的に再生されます: 死亡、キル、キューのポップなど。",
+  "Share Spotify, a video or a game's sound with your friends, kept apart from your own.": "Spotify、ビデオ、ゲームのサウンドを自分のものとは別にして、友達と共有します。",
+  "Thousands of live stations from all over the world. Listen yourself, or send one into the call for everyone.": "世界中からの何千ものライブステーション。自分自身で聞くことも、全員の通話にメッセージを送信することもできます。"
 }

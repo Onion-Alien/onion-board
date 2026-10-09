@@ -2770,5 +2770,11 @@
   "Hide this tab": "Ẩn tab này",
   "This tab is always shown": "Tab này luôn được hiển thị",
   "{tab} hidden. Bring it back with + More tabs or Settings > Tabs.": "{tab} bị ẩn. Đưa nó trở lại bằng + Tab khác hoặc Cài đặt > Tab.",
-  "Switch off the tabs you don't use. A switched-off tab is gone from the window and doesn't load at all, so nothing of it runs in the background. Switch it back on any time, here or with + More tabs after the tabs. Right-click a tab to hide it.": "Tắt các tab bạn không sử dụng. Một tab đã tắt sẽ biến mất khỏi cửa sổ và hoàn toàn không tải nên không có tab nào chạy trong nền. Bật lại bất kỳ lúc nào, tại đây hoặc bằng + Tab khác sau các tab. Nhấp chuột phải vào một tab để ẩn nó."
+  "Switch off the tabs you don't use. A switched-off tab is gone from the window and doesn't load at all, so nothing of it runs in the background. Switch it back on any time, here or with + More tabs after the tabs. Right-click a tab to hide it.": "Tắt các tab bạn không sử dụng. Một tab đã tắt sẽ biến mất khỏi cửa sổ và hoàn toàn không tải nên không có tab nào chạy trong nền. Bật lại bất kỳ lúc nào, tại đây hoặc bằng + Tab khác sau các tab. Nhấp chuột phải vào một tab để ẩn nó.",
+  "Add more to Onion Board": "Thêm nhiều hơn vào Onion Board",
+  "Change your voice live: robots, monsters, other languages, or let it speak what you type.": "Thay đổi giọng nói của bạn trực tiếp: robot, quái vật, các ngôn ngữ khác hoặc để nó nói những gì bạn nhập.",
+  "Free, and each one only loads once you add it.": "Miễn phí và mỗi cái chỉ tải khi bạn thêm nó.",
+  "Plays a sound by itself when something shows up in your game: a YOU DIED, a kill, a queue popping.": "Tự phát ra âm thanh khi có thứ gì đó xuất hiện trong trò chơi của bạn: BẠN CHẾT, tiêu diệt, hàng đợi xuất hiện.",
+  "Share Spotify, a video or a game's sound with your friends, kept apart from your own.": "Chia sẻ Spotify, video hoặc âm thanh của trò chơi với bạn bè của bạn, tách biệt với bạn bè.",
+  "Thousands of live stations from all over the world. Listen yourself, or send one into the call for everyone.": "Hàng ngàn đài trực tiếp từ khắp nơi trên thế giới. Hãy tự lắng nghe hoặc gửi một cuộc gọi cho mọi người."
 }

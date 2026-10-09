@@ -17,7 +17,8 @@ With the daily one, a rough picture of how it's used, each as a bucket or a name
 fixed list: how long ago it was installed (`age/days-2-7`), where sounds go
 (`route/mic`), how many sounds the board has and how many were played since the last
 one (`sounds/11-50`, `played/1-10`), the app's language (`lang/de`), and which features
-were used since then (`used/voice-changer`: the names in FEATURES only). And once each,
+were used since then (`used/voice-changer`, `used/more-tabs-added-radio`: the names
+in FEATURES only). And once each,
 the first steps of a new install (`step/added-sound`, `step/played-sound`,
 `step/sent-to-others`), to see where new people get stuck; never for a copy that was
 counted before these existed.
@@ -70,7 +71,12 @@ MAX_PROBLEMS = 10           # problem events per send: a bug in a loop isn't 100
 VERSION_RE = r"[0-9][0-9A-Za-z.\-]{0,20}"
 # what else is counted, only ever these names (see the docstring)
 FEATURES = ("add-files", "youtube", "record", "clip", "clip-editor", "import-board",
-            "voice-changer", "text-to-speech", "hotkeys", "phone-remote", "also-send")
+            "voice-changer", "text-to-speech", "hotkeys", "phone-remote", "also-send",
+            # + More tabs: opened it, added a tab from it, or closed it adding none; and
+            # a tab hidden from its right-click menu
+            "more-tabs-opened", "more-tabs-closed",
+            *(f"more-tabs-added-{k}" for k in ("radio", "apps", "triggers", "voice")),
+            *(f"tab-hidden-{k}" for k in ("radio", "apps", "triggers", "voice")))
 STEPS = ("added-sound", "played-sound", "sent-to-others")
 ROUTES = ("cable", "device", "off", "mic")   # library.ROUTES
 LANG_RE = r"[a-z]{2,3}(?:-[A-Za-z0-9]{2,4})?"

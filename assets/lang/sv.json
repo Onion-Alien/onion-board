@@ -2830,5 +2830,11 @@
   "Hide this tab": "Dölj den här fliken",
   "This tab is always shown": "Denna flik visas alltid",
   "{tab} hidden. Bring it back with + More tabs or Settings > Tabs.": "{tab} dold. Ta tillbaka det med + Fler flikar eller Inställningar > Flikar.",
-  "Switch off the tabs you don't use. A switched-off tab is gone from the window and doesn't load at all, so nothing of it runs in the background. Switch it back on any time, here or with + More tabs after the tabs. Right-click a tab to hide it.": "Stäng av flikarna du inte använder. En avstängd flik är borta från fönstret och laddas inte alls, så inget av den körs i bakgrunden. Slå på den igen när som helst, här eller med + Fler flikar efter flikarna. Högerklicka på en flik för att dölja den."
+  "Switch off the tabs you don't use. A switched-off tab is gone from the window and doesn't load at all, so nothing of it runs in the background. Switch it back on any time, here or with + More tabs after the tabs. Right-click a tab to hide it.": "Stäng av flikarna du inte använder. En avstängd flik är borta från fönstret och laddas inte alls, så inget av den körs i bakgrunden. Slå på den igen när som helst, här eller med + Fler flikar efter flikarna. Högerklicka på en flik för att dölja den.",
+  "Add more to Onion Board": "Lägg till mer till Onion Board",
+  "Change your voice live: robots, monsters, other languages, or let it speak what you type.": "Ändra din röst live: robotar, monster, andra språk, eller låt den tala vad du skriver.",
+  "Free, and each one only loads once you add it.": "Gratis, och var och en laddas bara när du har lagt till den.",
+  "Plays a sound by itself when something shows up in your game: a YOU DIED, a kill, a queue popping.": "Spelar ett ljud av sig självt när något dyker upp i ditt spel: en YOU DOD, en kill, en kö som poppar.",
+  "Share Spotify, a video or a game's sound with your friends, kept apart from your own.": "Dela Spotify, en video eller ett spels ljud med dina vänner, hålls åtskilda från dina egna.",
+  "Thousands of live stations from all over the world. Listen yourself, or send one into the call for everyone.": "Tusentals livestationer från hela världen. Lyssna själv, eller skicka en till samtalet för alla."
 }

@@ -2770,5 +2770,11 @@
   "Hide this tab": "隱藏此選項卡",
   "This tab is always shown": "該選項卡始終顯示",
   "{tab} hidden. Bring it back with + More tabs or Settings > Tabs.": "{tab}已隱藏。使用“+ 更多”選項卡或“設定”>“選項卡”將其恢復。",
-  "Switch off the tabs you don't use. A switched-off tab is gone from the window and doesn't load at all, so nothing of it runs in the background. Switch it back on any time, here or with + More tabs after the tabs. Right-click a tab to hide it.": "關閉不使用的選項卡。關閉的選項卡將從視窗中消失並且根本不會加載，因此它不會在後台運行。可以隨時在此處或使用選項卡後的“+ 更多”選項卡將其重新開啟。右鍵單擊選項卡可將其隱藏。"
+  "Switch off the tabs you don't use. A switched-off tab is gone from the window and doesn't load at all, so nothing of it runs in the background. Switch it back on any time, here or with + More tabs after the tabs. Right-click a tab to hide it.": "關閉不使用的選項卡。關閉的選項卡將從視窗中消失並且根本不會加載，因此它不會在後台運行。可以隨時在此處或使用選項卡後的“+ 更多”選項卡將其重新開啟。右鍵單擊選項卡可將其隱藏。",
+  "Add more to Onion Board": "在洋蔥板中添加更多內容",
+  "Change your voice live: robots, monsters, other languages, or let it speak what you type.": "即時改變你的聲音：機器人、怪物、其他語言，或讓它說出你輸入的內容。",
+  "Free, and each one only loads once you add it.": "免費，並且每一個只有在添加後才會加載。",
+  "Plays a sound by itself when something shows up in your game: a YOU DIED, a kill, a queue popping.": "當遊戲中出現某些內容時，它會自行播放聲音：「你死了」、「殺戮」、隊列彈出。",
+  "Share Spotify, a video or a game's sound with your friends, kept apart from your own.": "與您的朋友分享 Spotify、影片或遊戲聲音，與您自己的朋友分開。",
+  "Thousands of live stations from all over the world. Listen yourself, or send one into the call for everyone.": "來自世界各地的數千個直播電台。您自己聽一下，或為所有人發送一個電話。"
 }
