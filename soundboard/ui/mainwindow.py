@@ -5629,9 +5629,12 @@ class MainWindow(QMainWindow):
 
     def _focus_sounds_page(self, _i: int):
         """Switched to Sounds with the focus left behind on another tab (a hidden clip
-        editor): the page takes it, so its Ctrl+V works straight away."""
+        editor): the page takes it, so its Ctrl+V works straight away. Not from the tab
+        rail: going down it with the arrow keys, the focus stays there."""
         page = self.sounds_page
         fw = QApplication.focusWidget()
+        if (own := self.focusWidget()) is not None and self.rail.isAncestorOf(own):
+            return
         if self.tabs.currentWidget() is page and (fw is None or not page.isAncestorOf(fw)):
             page.setFocus(Qt.OtherFocusReason)
 

@@ -52,6 +52,10 @@ class SideTabs(QTabWidget):
         super().setTabToolTip(i, tip)
         self.changed.emit()
 
+    def setTabIcon(self, i, icon):   # a theme or highlight colour change (icons.retheme)
+        super().setTabIcon(i, icon)
+        self.changed.emit()
+
     def setTabVisible(self, i, on):
         super().setTabVisible(i, on)
         self.changed.emit()
@@ -85,6 +89,20 @@ class RailTab(QToolButton):
         if self.isChecked():   # the current tab: a soft accent fill under the icon
             self._fill(r, theme.T["accent"], TINT_ALPHA)
         super().paintEvent(e)
+
+    def keyPressEvent(self, e):
+        """Up / down: the tab before / after it, as the arrows did on the old top bar
+        (left / right too; mirrored, left is the next one)."""
+        step = {Qt.Key_Up: -1, Qt.Key_Down: 1, Qt.Key_Left: -1, Qt.Key_Right: 1}.get(e.key())
+        if step is None or e.modifiers() & ~Qt.KeypadModifier:
+            return super().keyPressEvent(e)
+        if self.isRightToLeft() and e.key() in (Qt.Key_Left, Qt.Key_Right):
+            step = -step
+        shown = [b for b in self.rail.buttons if b.isVisible()]
+        if self in shown:
+            b = shown[(shown.index(self) + step) % len(shown)]
+            b.setFocus(Qt.TabFocusReason)
+            b.click()
 
     def is_live(self) -> bool:
         return bool(self.rail.tabs.tabBar().property(f"_live{self.index}"))

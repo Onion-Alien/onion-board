@@ -67,6 +67,72 @@ def test_live_tab_warning_shows_on_the_rail(qapp, win):
     assert not win.rail.buttons[win.tabs.indexOf(win.setup_page)].toolTip().startswith("●")
 
 
+def test_the_rail_keeps_up_with_the_tabs(qapp, win, monkeypatch):
+    """Everything that changed a tab on the old top bar shows on the rail: a theme or
+    highlight colour change, a tab switched off / on / swapped, offline mode, Ctrl+Tab."""
+    from PySide6.QtTest import QTest
+    from soundboard import net
+    tabs, rail = win.tabs, win.rail
+    win.show()
+
+    def same(why):
+        for b in rail.buttons:
+            i = b.index
+            assert b.isVisibleTo(rail) == tabs.isTabVisible(i), (why, i)
+            assert b.icon().cacheKey() == tabs.tabBar().tabIcon(i).cacheKey(), (why, i)
+            assert b.isChecked() == (i == tabs.currentIndex()), (why, i)
+            assert b.accessibleName() == tabs.tabText(i).replace("&&", "&"), (why, i)
+
+    vi = tabs.indexOf(win.voice)
+    win.set_tab_on("voice", True)
+    set_tab_live(tabs, vi, True, "● ON", "voice")
+    same("start")
+    try:
+        win.apply_theme("Light")
+        same("theme")
+        win.set_live_color("#3399ff")
+        same("highlight colour")
+        set_tab_live(tabs, vi, False)
+        win.set_tab_on("radio", True)
+        tabs.setCurrentIndex(main.TAB_INDEX["radio"])
+        win.set_tab_on("radio", False)
+        same("current tab switched off")
+        win.set_tab_on("radio", True)
+        win.set_tab_on("voice", False)
+        win.set_tab_on("voice", True)
+        same("tab swapped")
+        monkeypatch.setattr(net, "offline", lambda: True)
+        win._offline_follow()
+        same("offline")
+        monkeypatch.setattr(net, "offline", lambda: False)
+        win._offline_follow()
+        tabs.setCurrentIndex(0)
+        QTest.keyClick(tabs, Qt.Key_Tab, Qt.ControlModifier)
+        assert tabs.currentIndex() != 0
+        same("Ctrl+Tab")
+        shown = [b for b in rail.buttons if b.isVisible()]
+        shown[0].click()
+        QTest.keyClick(shown[0], Qt.Key_Down)   # the arrows, as on the old bar
+        assert tabs.currentIndex() == shown[1].index and win.focusWidget() is shown[1]
+        QTest.keyClick(shown[1], Qt.Key_Up)     # onto Sounds: the focus stays on the rail
+        assert win.focusWidget() is shown[0]
+        QTest.keyClick(shown[0], Qt.Key_Up)     # round to the last one
+        assert tabs.currentIndex() == shown[-1].index
+        same("arrows")
+        asked = []   # right-click: that tab's own menu (Hide this tab), as on the old bar
+
+        class Menu:
+            def exec(self, _pos):
+                pass
+        monkeypatch.setattr(win, "tab_menu", lambda i: asked.append(i) or Menu())
+        for b in shown:
+            b.customContextMenuRequested.emit(QPoint(5, 5))
+        assert asked == [b.index for b in shown]
+    finally:
+        win.set_live_color("")
+        win.apply_theme("Dark")
+
+
 def test_the_rail_mirrors_right_to_left(qapp, win):
     """Arabic: the rail on the right, its live bar and border on its outer / inner edge,
     and the narrow window's tight gap beside it."""
