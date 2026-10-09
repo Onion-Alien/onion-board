@@ -21,7 +21,7 @@ LOGO_SHUT = 24     # the onion, shut: with its 5 px glow room, a tab button's wi
 LOGO_OPEN = 32
 SIDE_SHUT = 4      # the rail's own side margins, shut (a 34 px button)...
 SIDE_OPEN = 10     # ...and open
-LIVE_BAR_W = 3     # a live tab's bar on the rail's left edge (Settings > Live tabs: tint)
+LIVE_BAR_W = 3     # a live tab's bar on the rail's outer edge (Settings > Live tabs: tint)
 TEXT_W = OPEN_W - 2 * SIDE_OPEN - ICON - 24   # a name's room on the open rail (icon,
                                               # padding, border, the gap after the icon)
 TINT_ALPHA = 0.16  # the current tab's soft accent fill (an outlined box looked heavy)
@@ -149,6 +149,11 @@ class SideRail(QFrame):
         tabs.currentChanged.connect(self.sync)
         self._apply()
 
+    def changeEvent(self, e):
+        super().changeEvent(e)
+        if e.type() == QEvent.LayoutDirectionChange and hasattr(self, "toggle"):
+            self._apply()
+
     def paintEvent(self, e):
         """A live tab's mark (Settings > Live tabs, "tint"): a bar on the rail's edge
         beside it, in the highlight colour, with its icon in that colour too. A wash
@@ -164,8 +169,10 @@ class SideRail(QFrame):
             if b.isVisible() and b.is_live():
                 g = b.geometry()
                 h = g.height() * 0.6
-                r = QRectF(-LIVE_BAR_W, g.center().y() - h / 2, 2 * LIVE_BAR_W, h)
-                p.drawRoundedRect(r, LIVE_BAR_W, LIVE_BAR_W)   # (its left half off the edge)
+                # on the window's edge: the right one when mirrored (Arabic)
+                x = self.width() - LIVE_BAR_W if self.isRightToLeft() else -LIVE_BAR_W
+                r = QRectF(x, g.center().y() - h / 2, 2 * LIVE_BAR_W, h)
+                p.drawRoundedRect(r, LIVE_BAR_W, LIVE_BAR_W)   # (half of it off the edge)
 
     # ---- the tab widget's state, on the rail
     def sync(self, *_a):
@@ -225,6 +232,10 @@ class SideRail(QFrame):
 
     def _apply(self):
         shown = self.is_open()
+        if self.property("rtl") != self.isRightToLeft():   # its border on the inner edge
+            self.setProperty("rtl", self.isRightToLeft())
+            self.style().unpolish(self)
+            self.style().polish(self)
         self.setFixedWidth(OPEN_W if shown else SHUT_W)
         side = SIDE_OPEN if shown else SIDE_SHUT
         self._lay.setContentsMargins(side, 10, side, 10)
@@ -244,7 +255,9 @@ class SideRail(QFrame):
             w.style().unpolish(w)
             w.style().polish(w)
         self.toggle.setVisible(not self._squeezed)
-        icons.set_icon(self.toggle, "back" if shown else "forward", size=ICON)
+        # the arrow points the way the rail will go: mirrored (Arabic), it opens leftwards
+        icons.set_icon(self.toggle, "back" if shown != self.isRightToLeft() else "forward",
+                       size=ICON)
         self._label(self.toggle, _("Hide tab names"),
                     _("Show only the icons") if shown else _("Show tab names"), shown)
         self.toggle.setAccessibleName(self.toggle.toolTip())

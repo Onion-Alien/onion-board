@@ -535,6 +535,7 @@ QPushButton#moretabs:pressed { background:$btn_press; }
 QPushButton#moretabs:focus { border-color:$accent; }
 QPushButton#moretabs::menu-indicator { image:none; width:0; }
 QFrame#sidebar { background:$panel; border:none; border-right:1px solid $border; }
+QFrame#sidebar[rtl="true"] { border-right:none; border-left:1px solid $border; }   /* mirrored */
 QToolButton#railtab { background:transparent; color:$muted; border:1px solid transparent;
     border-radius:8px; padding:7px 6px; font-weight:600; text-align:left; }
 QToolButton#railtab:hover { background:$btn_hover; color:$text; }

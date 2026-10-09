@@ -3398,8 +3398,10 @@ class MainWindow(QMainWindow):
         """A narrow window: the rail shut (opened out, it shuts again) and the gap
         beside it narrower, so the pages keep their room before the mini player."""
         self.rail.squeeze(tight)
-        self._body_lay.setContentsMargins(BODY_SIDE_TIGHT if tight else BODY_SIDE, 10,
-                                          BODY_SIDE, 10)
+        side = (BODY_SIDE_TIGHT if tight else BODY_SIDE, BODY_SIDE)
+        if self.isRightToLeft():   # mirrored (Arabic): the rail is on the right
+            side = side[::-1]
+        self._body_lay.setContentsMargins(side[0], 10, side[1], 10)
 
     def _rail_opened(self, on: bool):
         """The rail opened out or shut: save it, and fit the window to its new width
