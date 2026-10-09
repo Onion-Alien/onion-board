@@ -327,6 +327,7 @@ class MainWindow(QMainWindow):
     config_saved = Signal(bool)         # the background save finished: ok
     voice_engine = Signal(object)       # the voice engine of the game in front (a mode key|None)
     default_found = Signal(object)      # Windows' default output, asked on a thread (str|None)
+    picture_fetched = Signal(str, object, str)   # picture from a link: sid, QImage|None, error
     device_step = Signal(object)        # the device thread's next step for the UI (_off_ui)
     tab_switched = Signal(str, bool)    # Settings > Tabs: a tab (taboff.KEYS) off / on again
     category_programs_changed = Signal()   # a program -> category rule added / removed
@@ -539,6 +540,7 @@ class MainWindow(QMainWindow):
         self._default_at = 0.0   # when Windows' default was last looked at (_default_tick)
         self._default_asking = False   # ...and a thread is asking it now
         self.default_found.connect(self._on_default_found)
+        self.picture_fetched.connect(self._on_picture_fetched)
         self.device_step.connect(lambda step: step())
         self._dev_waiting: list = []   # device changes waiting their turn (_when_devices_free)
         self._dev_retry = QTimer(self, singleShot=True, interval=100, timeout=self._dev_pump)
@@ -5269,7 +5271,8 @@ class MainWindow(QMainWindow):
 
         d = RecordDialog(self.engine, voice_on, lambda: [m.name for m in self.cfg.sounds],
                          self.add_recording, open_devices, self,
-                         playing_name=self._playing_name)
+                         playing_name=self._playing_name,
+                         playing_picture=self._playing_picture)
         self._record_dlg = d
 
         def closed(_r):
@@ -5293,11 +5296,24 @@ class MainWindow(QMainWindow):
         station = getattr(getattr(self.radio, "player", None), "station", None)
         return station.name if station is not None else ""
 
-    def add_recording(self, data, name) -> bool:
-        """A mic recording becomes a pad: selected, scrolled to, and a toast says so."""
+    def _playing_picture(self) -> str:
+        """The picture of the pad playing now ("" for none, or not a pad), for a
+        recording of it."""
+        sid = self.current
+        st = self.engine.state(sid) if sid else None
+        m = self.meta(sid) if st is not None and not st[1] else None
+        return m.image if m is not None and m.image and Path(m.image).is_file() else ""
+
+    def add_recording(self, data, name, picture: str = "") -> bool:
+        """A mic recording becomes a pad: selected, scrolled to, and a toast says so.
+        `picture`: the picture of the pad it was recorded from (copied onto it)."""
         meta = self.on_clip(data, name)
         if meta is None:
             return False
+        if picture and thumbs.set_image(meta, picture):
+            self._save_now()
+            if meta.id in self.pads:
+                self.pads[meta.id].update()
         usage.used("record")
         self.select(meta.id)
 
@@ -5457,7 +5473,7 @@ class MainWindow(QMainWindow):
         menu.addSeparator()
         a_edit = add(("edit",), _("Edit…"), _("Name, volume, hotkey, what a press does, loop, "
                                               "fades, wait first, cooldown, colour"))
-        a_ren = add(None, _("Rename…"), _("Just the name (F2 on the pad does it too)"))
+        a_ren = add(("rename",), _("Rename…"), _("Just the name (F2 on the pad does it too)"))
         a_fx = add(("wave",), _("Effects…"), _("Speed, pitch, EQ, boost"))
         vol_before = m.volume
         menu.addAction(self._volume_action(menu, m))
@@ -5471,7 +5487,7 @@ class MainWindow(QMainWindow):
         else:
             a_hk = add(("keyboard",), _("Set hotkey…"), _("A key or combo that plays it, even "
                                                           "in-game"))
-        cats = menu.addMenu(_("Categories"))
+        cats = menu.addMenu(icons.icon("tag"), _("Categories"))
         cat_acts = {}
         for c in self.cfg.categories:
             a = cats.addAction(c.replace("&", "&&"))
@@ -5482,19 +5498,21 @@ class MainWindow(QMainWindow):
             cats.addSeparator()
         a_newcat = cats.addAction(icons.icon("plus"), _("New category…"))
         a_nopic = None
+        pic = menu.addMenu(icons.icon("image"), _("Picture") if m.image else _("Add picture"))
+        pic.setToolTipsVisible(True)
+        a_pic = pic.addAction(_("From a file…"))
+        a_pic.setToolTip(_("Shown on the pad (you can also drop a picture on it, or copy one, "
+                           "click the pad and press Ctrl+V)"))
+        a_piclink = pic.addAction(_("From a link…"))
+        a_piclink.setToolTip(_("Paste a picture's address, or a link to a YouTube video or a "
+                               "web page to use its picture"))
         if m.image:
-            pic = menu.addMenu(icons.icon("image"), _("Picture"))
-            a_pic = pic.addAction(_("Change…"))
             a_nopic = pic.addAction(_("Remove picture"))
-        else:
-            a_pic = add(("image",), _("Add picture…"), _("Shown on the pad (you can also drop "
-                                                         "a picture on it, or copy one, click "
-                                                         "the pad and press Ctrl+V)"))
         menu.addSeparator()
-        a_dup = add(("plus",), _("Duplicate"), _("A second pad with the same sound, to give "
+        a_dup = add(("copy",), _("Duplicate"), _("A second pad with the same sound, to give "
                                                  "its own effects or hotkey"))
-        a_export = add(("folder",), _("Export…"), _("Save it as a file to share with friends"))
-        a_show = add(None, _("Show the file in its folder"))
+        a_export = add(("download",), _("Export…"), _("Save it as a file to share with friends"))
+        a_show = add(("folder",), _("Show the file in its folder"))
         a_del = add(("trash", "danger_text"), _("Remove"), _("Goes to Recently deleted"))
         act = menu.exec(pos)
         menu.deleteLater()   # its actions stay valid until this returns
@@ -5533,6 +5551,8 @@ class MainWindow(QMainWindow):
                   patterns=" ".join(f"*{x}" for x in sorted(thumbs.IMAGE_EXTS))))
             if f:
                 self.set_picture(sid, f)
+        elif act == a_piclink:
+            self.picture_from_link(sid)
         elif act is not None and act == a_nopic:
             thumbs.clear(m)
             self._save_now()
@@ -5552,6 +5572,55 @@ class MainWindow(QMainWindow):
             return
         self._save_now()
         self.pads[sid].update()
+
+    def picture_from_link(self, sid: str, url: str | None = None):
+        """Pad menu → Picture → From a link: ask for the link (a copied one is filled
+        in), then fetch the picture on a thread."""
+        m = self.meta(sid)
+        if m is None:
+            return
+        if url is None:
+            copied = QApplication.clipboard().text().strip()
+            copied = copied if "://" in copied and len(copied) < 2000 and \
+                not any(c.isspace() for c in copied) else ""
+            url, ok = QInputDialog.getText(
+                self, _("Picture from a link"),
+                _("The picture's address (right-click it → Copy image address),\nor a link "
+                  "to a YouTube video or a web page:"), text=copied)
+            if not ok:
+                return
+        url = url.strip()
+        if not url:
+            return
+        self.status.setText(_("Getting the picture for “{name}”…", name=html.escape(m.name)))
+
+        def work():
+            try:
+                img, err = thumbs.fetch(url), ""
+            except (thumbs.LinkError, net.FeatureOff) as e:
+                img, err = None, str(e)
+            except Exception as e:  # noqa: BLE001 - never leave the status hanging
+                log.exception("picture from a link")
+                img, err = None, errors.plain(e)
+            try:
+                self.picture_fetched.emit(sid, img, err)
+            except RuntimeError:   # the window closed meanwhile
+                pass
+        threading.Thread(target=work, daemon=True, name="picture-link").start()
+
+    def _on_picture_fetched(self, sid: str, img, err: str):
+        m = self.meta(sid)
+        if m is None:   # removed while it downloaded
+            return
+        if img is None or not thumbs.set_image(m, img):
+            self.status.setText("")
+            QMessageBox.warning(self, _("Couldn't use that picture"),
+                                err or _("There's no picture at that link."))
+            return
+        self._save_now()
+        if sid in self.pads:
+            self.pads[sid].update()
+        self.status.setText(_("Picture added to “{name}”.", name=html.escape(m.name)))
 
     def _focus_sounds_page(self, _i: int):
         """Switched to Sounds with the focus left behind on another tab (a hidden clip
