@@ -275,6 +275,10 @@ def test_theme_previews_reflow_when_settings_is_resized(window, qapp):  # noqa: 
             assert grid.columns == expected
             assert all(c.geometry().right() < grid.width() for c in grid.cards)
             assert len({id(c) for c in grid.cards}) == grid.grid.count()
+            # spread out evenly: the last card in a full row ends at the right edge
+            last = grid.cards[expected - 1].geometry()
+            assert grid.width() - 1 - last.right() < expected
+            assert grid.cards[0].geometry().left() == 0
     finally:
         d.close()
 
