@@ -2768,7 +2768,7 @@
   "{warn} Its noise removal can wipe out music: set it to keep the original sound.": "{warn} 소음 제거로 인해 음악이 지워질 수 있습니다. 원래 사운드를 유지하도록 설정하세요.",
   "✓ Added to Sounds": "✓ 소리에 추가됨",
   "Hide this tab": "이 탭 숨기기",
-  "Switch off the tabs you don't use. A switched-off tab is gone from the window and doesn't load at all, so nothing of it runs in the background. Switch it back on any time, here or with + More tabs left of the tabs. Right-click a tab to hide it.": "사용하지 않는 탭을 끄세요. 꺼진 탭은 창에서 사라지고 전혀 로드되지 않으므로 백그라운드에서 아무것도 실행되지 않습니다. 여기에서 또는 탭 왼쪽에 있는 + 더보기 탭을 사용하여 언제든지 다시 전환할 수 있습니다. 탭을 숨기려면 마우스 오른쪽 버튼을 클릭하세요.",
   "This tab is always shown": "이 탭은 항상 표시됩니다.",
-  "{tab} hidden. Bring it back with + More tabs or Settings > Tabs.": "{tab} 이 숨겨져 있습니다. + 탭 더보기 또는 설정 > 탭을 사용하여 다시 가져오세요."
+  "{tab} hidden. Bring it back with + More tabs or Settings > Tabs.": "{tab} 이 숨겨져 있습니다. + 탭 더보기 또는 설정 > 탭을 사용하여 다시 가져오세요.",
+  "Switch off the tabs you don't use. A switched-off tab is gone from the window and doesn't load at all, so nothing of it runs in the background. Switch it back on any time, here or with + More tabs after the tabs. Right-click a tab to hide it.": "사용하지 않는 탭을 끄세요. 꺼진 탭은 창에서 사라지고 전혀 로드되지 않으므로 백그라운드에서 아무것도 실행되지 않습니다. 언제든지 여기에서 또는 탭 뒤의 + 더보기 탭을 사용하여 다시 전환할 수 있습니다. 탭을 숨기려면 마우스 오른쪽 버튼을 클릭하세요."
 }

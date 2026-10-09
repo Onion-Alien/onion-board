@@ -2828,7 +2828,7 @@
   "{warn} Its noise removal can wipe out music: set it to keep the original sound.": "{warn} La rimozione del rumore può cancellare la musica: impostala per mantenere il suono originale.",
   "✓ Added to Sounds": "✓ Aggiunto ai suoni",
   "Hide this tab": "Nascondi questa scheda",
-  "Switch off the tabs you don't use. A switched-off tab is gone from the window and doesn't load at all, so nothing of it runs in the background. Switch it back on any time, here or with + More tabs left of the tabs. Right-click a tab to hide it.": "Disattiva le schede che non usi. Una scheda disattivata scompare dalla finestra e non si carica affatto, quindi nulla viene eseguito in background. Riattivalo in qualsiasi momento, qui o con + Altre schede a sinistra delle schede. Fare clic con il pulsante destro del mouse su una scheda per nasconderla.",
   "This tab is always shown": "Questa scheda è sempre visualizzata",
-  "{tab} hidden. Bring it back with + More tabs or Settings > Tabs.": "{tab} nascosto. Ripristinalo con + Altre schede o Impostazioni > Schede."
+  "{tab} hidden. Bring it back with + More tabs or Settings > Tabs.": "{tab} nascosto. Ripristinalo con + Altre schede o Impostazioni > Schede.",
+  "Switch off the tabs you don't use. A switched-off tab is gone from the window and doesn't load at all, so nothing of it runs in the background. Switch it back on any time, here or with + More tabs after the tabs. Right-click a tab to hide it.": "Disattiva le schede che non usi. Una scheda disattivata scompare dalla finestra e non si carica affatto, quindi nulla viene eseguito in background. Riattivalo in qualsiasi momento, qui o con + Altre schede dopo le schede. Fare clic con il pulsante destro del mouse su una scheda per nasconderla."
 }

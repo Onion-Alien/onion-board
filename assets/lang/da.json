@@ -2828,7 +2828,7 @@
   "{warn} Its noise removal can wipe out music: set it to keep the original sound.": "{warn} Dens støjfjernelse kan udslette musik: Indstil den til at beholde den originale lyd.",
   "✓ Added to Sounds": "✓ Tilføjet til lyde",
   "Hide this tab": "Skjul denne fane",
-  "Switch off the tabs you don't use. A switched-off tab is gone from the window and doesn't load at all, so nothing of it runs in the background. Switch it back on any time, here or with + More tabs left of the tabs. Right-click a tab to hide it.": "Sluk de faner, du ikke bruger. En slukket fane er væk fra vinduet og indlæses slet ikke, så intet af den kører i baggrunden. Tænd det igen når som helst, her eller med + Flere faner til venstre for fanerne. Højreklik på en fane for at skjule den.",
   "This tab is always shown": "Denne fane vises altid",
-  "{tab} hidden. Bring it back with + More tabs or Settings > Tabs.": "{tab} skjult. Få det tilbage med + Flere faner eller Indstillinger > Faner."
+  "{tab} hidden. Bring it back with + More tabs or Settings > Tabs.": "{tab} skjult. Få det tilbage med + Flere faner eller Indstillinger > Faner.",
+  "Switch off the tabs you don't use. A switched-off tab is gone from the window and doesn't load at all, so nothing of it runs in the background. Switch it back on any time, here or with + More tabs after the tabs. Right-click a tab to hide it.": "Sluk de faner, du ikke bruger. En slukket fane er væk fra vinduet og indlæses slet ikke, så intet af den kører i baggrunden. Tænd det igen når som helst, her eller med + Flere faner efter fanerne. Højreklik på en fane for at skjule den."
 }

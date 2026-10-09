@@ -2828,7 +2828,7 @@
   "{warn} Its noise removal can wipe out music: set it to keep the original sound.": "{warn} Sua remoção de ruído pode acabar com a música: configure-a para manter o som original.",
   "✓ Added to Sounds": "✓ Adicionado aos sons",
   "Hide this tab": "Ocultar esta guia",
-  "Switch off the tabs you don't use. A switched-off tab is gone from the window and doesn't load at all, so nothing of it runs in the background. Switch it back on any time, here or with + More tabs left of the tabs. Right-click a tab to hide it.": "Desligue as guias que você não usa. Uma guia desligada desaparece da janela e não carrega, então nada é executado em segundo plano. Ligue-o novamente a qualquer momento, aqui ou com + Mais guias à esquerda das guias. Clique com o botão direito em uma guia para ocultá-la.",
   "This tab is always shown": "Esta aba é sempre mostrada",
-  "{tab} hidden. Bring it back with + More tabs or Settings > Tabs.": "{tab} oculto. Traga-o de volta com + Mais guias ou Configurações > Guias."
+  "{tab} hidden. Bring it back with + More tabs or Settings > Tabs.": "{tab} oculto. Traga-o de volta com + Mais guias ou Configurações > Guias.",
+  "Switch off the tabs you don't use. A switched-off tab is gone from the window and doesn't load at all, so nothing of it runs in the background. Switch it back on any time, here or with + More tabs after the tabs. Right-click a tab to hide it.": "Desligue as guias que você não usa. Uma guia desligada desaparece da janela e não carrega, então nada é executado em segundo plano. Ligue-o novamente a qualquer momento, aqui ou com + Mais guias após as guias. Clique com o botão direito em uma guia para ocultá-la."
 }

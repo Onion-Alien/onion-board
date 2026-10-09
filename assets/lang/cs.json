@@ -2888,7 +2888,7 @@
   "{warn} Its noise removal can wipe out music: set it to keep the original sound.": "{warn} Jeho odstranění šumu může zničit hudbu: nastavte jej tak, aby zachoval původní zvuk.",
   "✓ Added to Sounds": "✓ Přidáno do Zvuků",
   "Hide this tab": "Skrýt tuto kartu",
-  "Switch off the tabs you don't use. A switched-off tab is gone from the window and doesn't load at all, so nothing of it runs in the background. Switch it back on any time, here or with + More tabs left of the tabs. Right-click a tab to hide it.": "Vypněte karty, které nepoužíváte. Vypnutá karta je z okna pryč a vůbec se nenačte, takže nic z toho neběží na pozadí. Kdykoli jej znovu zapněte, zde nebo pomocí + Další karty vlevo od karet. Kliknutím pravým tlačítkem na kartu ji skryjete.",
   "This tab is always shown": "Tato karta je vždy zobrazena",
-  "{tab} hidden. Bring it back with + More tabs or Settings > Tabs.": "{tab} skryto. Vraťte jej zpět pomocí karet + Další nebo Nastavení > Karty."
+  "{tab} hidden. Bring it back with + More tabs or Settings > Tabs.": "{tab} skryto. Vraťte jej zpět pomocí karet + Další nebo Nastavení > Karty.",
+  "Switch off the tabs you don't use. A switched-off tab is gone from the window and doesn't load at all, so nothing of it runs in the background. Switch it back on any time, here or with + More tabs after the tabs. Right-click a tab to hide it.": "Vypněte karty, které nepoužíváte. Vypnutá karta je z okna pryč a vůbec se nenačte, takže nic z toho neběží na pozadí. Kdykoli jej znovu zapněte, zde nebo pomocí karet + Další po kartách. Kliknutím pravým tlačítkem na kartu ji skryjete."
 }

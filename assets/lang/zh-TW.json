@@ -2768,7 +2768,7 @@
   "{warn} Its noise removal can wipe out music: set it to keep the original sound.": "{warn}它的噪音消除功能會消除音樂：將其設定為保留原始聲音。",
   "✓ Added to Sounds": "✓ 加入聲音",
   "Hide this tab": "隱藏此選項卡",
-  "Switch off the tabs you don't use. A switched-off tab is gone from the window and doesn't load at all, so nothing of it runs in the background. Switch it back on any time, here or with + More tabs left of the tabs. Right-click a tab to hide it.": "關閉不使用的選項卡。關閉的選項卡將從視窗中消失並且根本不會加載，因此它不會在後台運行。可以隨時在此處或使用選項卡左側的“更多”選項卡將其重新打開。右鍵單擊選項卡可將其隱藏。",
   "This tab is always shown": "該選項卡始終顯示",
-  "{tab} hidden. Bring it back with + More tabs or Settings > Tabs.": "{tab}已隱藏。使用“+ 更多”選項卡或“設定”>“選項卡”將其恢復。"
+  "{tab} hidden. Bring it back with + More tabs or Settings > Tabs.": "{tab}已隱藏。使用“+ 更多”選項卡或“設定”>“選項卡”將其恢復。",
+  "Switch off the tabs you don't use. A switched-off tab is gone from the window and doesn't load at all, so nothing of it runs in the background. Switch it back on any time, here or with + More tabs after the tabs. Right-click a tab to hide it.": "關閉不使用的選項卡。關閉的選項卡將從視窗中消失並且根本不會加載，因此它不會在後台運行。可以隨時在此處或使用選項卡後的“+ 更多”選項卡將其重新開啟。右鍵單擊選項卡可將其隱藏。"
 }

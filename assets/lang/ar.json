@@ -3068,7 +3068,7 @@
   "{warn} Its noise removal can wipe out music: set it to keep the original sound.": "{warn} يمكن أن تؤدي إزالة الضوضاء إلى مسح الموسيقى: اضبطها للاحتفاظ بالصوت الأصلي.",
   "✓ Added to Sounds": "✓ أضيفت إلى الأصوات",
   "Hide this tab": "إخفاء علامة التبويب هذه",
-  "Switch off the tabs you don't use. A switched-off tab is gone from the window and doesn't load at all, so nothing of it runs in the background. Switch it back on any time, here or with + More tabs left of the tabs. Right-click a tab to hide it.": "قم بإيقاف تشغيل علامات التبويب التي لا تستخدمها. تختفي علامة التبويب المغلقة من النافذة ولا يتم تحميلها على الإطلاق، لذا لا يعمل أي شيء منها في الخلفية. قم بتشغيله مرة أخرى في أي وقت، هنا أو باستخدام + المزيد من علامات التبويب المتبقية من علامات التبويب. انقر بزر الماوس الأيمن فوق علامة التبويب لإخفائها.",
   "This tab is always shown": "يتم عرض علامة التبويب هذه دائمًا",
-  "{tab} hidden. Bring it back with + More tabs or Settings > Tabs.": "{tab} مخفية. يمكنك استعادتها باستخدام + المزيد من علامات التبويب أو الإعدادات > علامات التبويب."
+  "{tab} hidden. Bring it back with + More tabs or Settings > Tabs.": "{tab} مخفية. يمكنك استعادتها باستخدام + المزيد من علامات التبويب أو الإعدادات > علامات التبويب.",
+  "Switch off the tabs you don't use. A switched-off tab is gone from the window and doesn't load at all, so nothing of it runs in the background. Switch it back on any time, here or with + More tabs after the tabs. Right-click a tab to hide it.": "قم بإيقاف تشغيل علامات التبويب التي لا تستخدمها. تختفي علامة التبويب المغلقة من النافذة ولا يتم تحميلها على الإطلاق، لذا لا يعمل أي شيء منها في الخلفية. قم بتشغيله مرة أخرى في أي وقت، هنا أو باستخدام + المزيد من علامات التبويب بعد علامات التبويب. انقر بزر الماوس الأيمن فوق علامة التبويب لإخفائها."
 }

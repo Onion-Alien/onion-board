@@ -2888,7 +2888,7 @@
   "{warn} Its noise removal can wipe out music: set it to keep the original sound.": "{warn} Функция удаления шума может уничтожить музыку: установите исходный звук.",
   "✓ Added to Sounds": "✓ Добавлено в звуки",
   "Hide this tab": "Скрыть эту вкладку",
-  "Switch off the tabs you don't use. A switched-off tab is gone from the window and doesn't load at all, so nothing of it runs in the background. Switch it back on any time, here or with + More tabs left of the tabs. Right-click a tab to hide it.": "Отключите вкладки, которые вы не используете. Отключенная вкладка исчезла из окна и вообще не загружается, поэтому в фоновом режиме ничего не запускается. Включите его снова в любое время здесь или с помощью + Дополнительные вкладки слева от вкладок. Щелкните вкладку правой кнопкой мыши, чтобы скрыть ее.",
   "This tab is always shown": "Эта вкладка всегда отображается",
-  "{tab} hidden. Bring it back with + More tabs or Settings > Tabs.": "{tab} скрыта. Верните его, выбрав + Дополнительные вкладки или Настройки > Вкладки."
+  "{tab} hidden. Bring it back with + More tabs or Settings > Tabs.": "{tab} скрыта. Верните его, выбрав + Дополнительные вкладки или Настройки > Вкладки.",
+  "Switch off the tabs you don't use. A switched-off tab is gone from the window and doesn't load at all, so nothing of it runs in the background. Switch it back on any time, here or with + More tabs after the tabs. Right-click a tab to hide it.": "Отключите вкладки, которые вы не используете. Отключенная вкладка исчезла из окна и вообще не загружается, поэтому в фоновом режиме ничего не запускается. Включите его снова в любое время здесь или с помощью + Дополнительные вкладки после вкладок. Щелкните вкладку правой кнопкой мыши, чтобы скрыть ее."
 }

@@ -2828,7 +2828,7 @@
   "{warn} Its noise removal can wipe out music: set it to keep the original sound.": "{warn} Su eliminación de ruido puede borrar la música: configúrelo para mantener el sonido original.",
   "✓ Added to Sounds": "✓ Agregado a Sonidos",
   "Hide this tab": "Ocultar esta pestaña",
-  "Switch off the tabs you don't use. A switched-off tab is gone from the window and doesn't load at all, so nothing of it runs in the background. Switch it back on any time, here or with + More tabs left of the tabs. Right-click a tab to hide it.": "Apaga las pestañas que no utilices. Una pestaña apagada desaparece de la ventana y no se carga en absoluto, por lo que nada se ejecuta en segundo plano. Vuelva a activarlo en cualquier momento, aquí o con + Más pestañas a la izquierda de las pestañas. Haga clic derecho en una pestaña para ocultarla.",
   "This tab is always shown": "Esta pestaña siempre se muestra",
-  "{tab} hidden. Bring it back with + More tabs or Settings > Tabs.": "{tab} oculta. Recupérelo con + Más pestañas o Configuración > Pestañas."
+  "{tab} hidden. Bring it back with + More tabs or Settings > Tabs.": "{tab} oculta. Recupérelo con + Más pestañas o Configuración > Pestañas.",
+  "Switch off the tabs you don't use. A switched-off tab is gone from the window and doesn't load at all, so nothing of it runs in the background. Switch it back on any time, here or with + More tabs after the tabs. Right-click a tab to hide it.": "Apaga las pestañas que no utilices. Una pestaña apagada desaparece de la ventana y no se carga en absoluto, por lo que nada se ejecuta en segundo plano. Vuelva a activarlo en cualquier momento, aquí o con + Más pestañas después de las pestañas. Haga clic derecho en una pestaña para ocultarla."
 }

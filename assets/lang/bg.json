@@ -2828,7 +2828,7 @@
   "{warn} Its noise removal can wipe out music: set it to keep the original sound.": "{warn} Неговото премахване на шума може да заличи музиката: настройте го да запази оригиналния звук.",
   "✓ Added to Sounds": "✓ Добавено към Звуци",
   "Hide this tab": "Скрийте този раздел",
-  "Switch off the tabs you don't use. A switched-off tab is gone from the window and doesn't load at all, so nothing of it runs in the background. Switch it back on any time, here or with + More tabs left of the tabs. Right-click a tab to hide it.": "Изключете разделите, които не използвате. Изключен раздел е изчезнал от прозореца и изобщо не се зарежда, така че нищо от него не работи във фонов режим. Включете го отново по всяко време, тук или с + Още раздели вляво от разделите. Щракнете с десния бутон върху раздел, за да го скриете.",
   "This tab is always shown": "Този раздел винаги се показва",
-  "{tab} hidden. Bring it back with + More tabs or Settings > Tabs.": "{tab} скрит. Върнете го с + Още раздели или Настройки > Раздели."
+  "{tab} hidden. Bring it back with + More tabs or Settings > Tabs.": "{tab} скрит. Върнете го с + Още раздели или Настройки > Раздели.",
+  "Switch off the tabs you don't use. A switched-off tab is gone from the window and doesn't load at all, so nothing of it runs in the background. Switch it back on any time, here or with + More tabs after the tabs. Right-click a tab to hide it.": "Изключете разделите, които не използвате. Изключен раздел е изчезнал от прозореца и изобщо не се зарежда, така че нищо от него не работи във фонов режим. Включете го отново по всяко време, тук или с + Още раздели след разделите. Щракнете с десния бутон върху раздел, за да го скриете."
 }

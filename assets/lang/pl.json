@@ -2888,7 +2888,7 @@
   "{warn} Its noise removal can wipe out music: set it to keep the original sound.": "{warn} Funkcja usuwania szumów może wymazać muzykę: ustaw ją tak, aby zachowywała oryginalny dźwięk.",
   "✓ Added to Sounds": "✓ Dodano do dźwięków",
   "Hide this tab": "Ukryj tę zakładkę",
-  "Switch off the tabs you don't use. A switched-off tab is gone from the window and doesn't load at all, so nothing of it runs in the background. Switch it back on any time, here or with + More tabs left of the tabs. Right-click a tab to hide it.": "Wyłącz karty, których nie używasz. Wyłączona karta zniknęła z okna i w ogóle się nie ładuje, więc nic nie działa w tle. Włącz go ponownie w dowolnym momencie, tutaj lub za pomocą zakładek + Więcej po lewej stronie zakładek. Kliknij kartę prawym przyciskiem myszy, aby ją ukryć.",
   "This tab is always shown": "Ta zakładka jest zawsze widoczna",
-  "{tab} hidden. Bring it back with + More tabs or Settings > Tabs.": "{tab} ukryta. Przywróć go za pomocą kart + Więcej lub Ustawienia > Karty."
+  "{tab} hidden. Bring it back with + More tabs or Settings > Tabs.": "{tab} ukryta. Przywróć go za pomocą kart + Więcej lub Ustawienia > Karty.",
+  "Switch off the tabs you don't use. A switched-off tab is gone from the window and doesn't load at all, so nothing of it runs in the background. Switch it back on any time, here or with + More tabs after the tabs. Right-click a tab to hide it.": "Wyłącz karty, których nie używasz. Wyłączona karta zniknęła z okna i w ogóle się nie ładuje, więc nic nie działa w tle. Włącz go ponownie w dowolnym momencie, tutaj lub za pomocą zakładek + Więcej po zakładkach. Kliknij kartę prawym przyciskiem myszy, aby ją ukryć."
 }

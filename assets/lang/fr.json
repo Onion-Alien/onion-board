@@ -2828,7 +2828,7 @@
   "{warn} Its noise removal can wipe out music: set it to keep the original sound.": "{warn} Sa suppression du bruit peut effacer la musique : configurez-la pour conserver le son d'origine.",
   "✓ Added to Sounds": "✓ Ajouté aux sons",
   "Hide this tab": "Masquer cet onglet",
-  "Switch off the tabs you don't use. A switched-off tab is gone from the window and doesn't load at all, so nothing of it runs in the background. Switch it back on any time, here or with + More tabs left of the tabs. Right-click a tab to hide it.": "Désactivez les onglets que vous n'utilisez pas. Un onglet désactivé a disparu de la fenêtre et ne se charge pas du tout, donc rien ne s'exécute en arrière-plan. Réactivez-le à tout moment, ici ou avec + Plus d'onglets à gauche des onglets. Cliquez avec le bouton droit sur un onglet pour le masquer.",
   "This tab is always shown": "Cet onglet est toujours affiché",
-  "{tab} hidden. Bring it back with + More tabs or Settings > Tabs.": "{tab} masqué. Ramenez-le avec + Plus d'onglets ou Paramètres > Onglets."
+  "{tab} hidden. Bring it back with + More tabs or Settings > Tabs.": "{tab} masqué. Ramenez-le avec + Plus d'onglets ou Paramètres > Onglets.",
+  "Switch off the tabs you don't use. A switched-off tab is gone from the window and doesn't load at all, so nothing of it runs in the background. Switch it back on any time, here or with + More tabs after the tabs. Right-click a tab to hide it.": "Désactivez les onglets que vous n'utilisez pas. Un onglet désactivé a disparu de la fenêtre et ne se charge pas du tout, donc rien ne s'exécute en arrière-plan. Réactivez-le à tout moment, ici ou avec + Plus d'onglets après les onglets. Cliquez avec le bouton droit sur un onglet pour le masquer."
 }

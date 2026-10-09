@@ -2768,7 +2768,7 @@
   "{warn} Its noise removal can wipe out music: set it to keep the original sound.": "{warn} การลบเสียงรบกวนอาจทำให้เพลงหายไป: ตั้งค่าให้คงเสียงต้นฉบับไว้",
   "✓ Added to Sounds": "✓ เพิ่มไปยังเสียง",
   "Hide this tab": "ซ่อนแท็บนี้",
-  "Switch off the tabs you don't use. A switched-off tab is gone from the window and doesn't load at all, so nothing of it runs in the background. Switch it back on any time, here or with + More tabs left of the tabs. Right-click a tab to hide it.": "ปิดแท็บที่คุณไม่ได้ใช้ แท็บที่ปิดอยู่หายไปจากหน้าต่างและไม่โหลดเลย ดังนั้นจึงไม่มีอะไรทำงานในพื้นหลัง เปลี่ยนกลับมาได้ทุกเมื่อ ที่นี่ หรือด้วยแท็บ + เพิ่มเติม ทางด้านซ้ายของแท็บ คลิกขวาที่แท็บเพื่อซ่อน",
   "This tab is always shown": "แท็บนี้จะแสดงอยู่เสมอ",
-  "{tab} hidden. Bring it back with + More tabs or Settings > Tabs.": "{tab} ซ่อนอยู่ นำกลับมาด้วย + แท็บเพิ่มเติม หรือ การตั้งค่า > แท็บ"
+  "{tab} hidden. Bring it back with + More tabs or Settings > Tabs.": "{tab} ซ่อนอยู่ นำกลับมาด้วย + แท็บเพิ่มเติม หรือ การตั้งค่า > แท็บ",
+  "Switch off the tabs you don't use. A switched-off tab is gone from the window and doesn't load at all, so nothing of it runs in the background. Switch it back on any time, here or with + More tabs after the tabs. Right-click a tab to hide it.": "ปิดแท็บที่คุณไม่ได้ใช้ แท็บที่ปิดอยู่หายไปจากหน้าต่างและไม่โหลดเลย ดังนั้นจึงไม่มีอะไรทำงานในพื้นหลัง เปลี่ยนกลับมาได้ทุกเมื่อ ที่นี่ หรือใช้แท็บ + เพิ่มเติมหลังแท็บ คลิกขวาที่แท็บเพื่อซ่อน"
 }

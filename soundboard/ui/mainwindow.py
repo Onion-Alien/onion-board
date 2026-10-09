@@ -68,7 +68,7 @@ from soundboard.ui.triggerstab import TriggersTab
 from soundboard.ui.radiopanel import RadioOff, RadioTab
 from soundboard.ui.voicepanel import VoicePanel
 from soundboard.ui.widgets import (Meter, NameAndSeek, Pad, PadGrid, SeekSlider, SteadyTabs,
-                                   TabInfoCorner, expand_dropped, fmt_pos, pad_height, spectrum,
+                                   TabEndCorner, expand_dropped, fmt_pos, pad_height, spectrum,
                                    SLIM_PAD_H)
 from soundboard.wheelguard import no_wheel
 from soundboard.winkeys import Hotkeys
@@ -802,7 +802,7 @@ class MainWindow(QMainWindow):
         self.btn_info.setToolTip(_("What's this tab for?"))
         self.btn_info.clicked.connect(self._show_tab_info)
         # + More tabs: the tabs switched off (a new user starts with the basic ones), one
-        # click to add one; only there while one is off. At the left, before the tabs
+        # click to add one; only there while one is off. Right after the last tab
         self.btn_more_tabs = QPushButton(_("More tabs"))
         self.btn_more_tabs.setObjectName("moretabs")
         icons.set_icon(self.btn_more_tabs, "plus")
@@ -814,9 +814,8 @@ class MainWindow(QMainWindow):
         mt.aboutToShow.connect(lambda: self._fill_more_tabs(mt))
         self.btn_more_tabs.setMenu(mt)
         self._update_more_tabs()
-        self.tabs.setCornerWidget(TabInfoCorner(self.tabs, self.btn_more_tabs),
-                                  Qt.TopLeftCorner)
-        self.tabs.setCornerWidget(TabInfoCorner(self.tabs, self.btn_info), Qt.TopRightCorner)
+        self.tabs.setCornerWidget(TabEndCorner(self.tabs, self.btn_more_tabs, self.btn_info),
+                                  Qt.TopRightCorner)
         # right-click a tab: hide it (+ More tabs or Settings > Tabs bring it back)
         bar = self.tabs.tabBar()
         bar.setContextMenuPolicy(Qt.CustomContextMenu)

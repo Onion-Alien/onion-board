@@ -2828,7 +2828,7 @@
   "{warn} Its noise removal can wipe out music: set it to keep the original sound.": "{warn} इसका शोर हटाने से संगीत ख़त्म हो सकता है: इसे मूल ध्वनि बनाए रखने के लिए सेट करें।",
   "✓ Added to Sounds": "✓ ध्वनि में जोड़ा गया",
   "Hide this tab": "इस टैब को छिपाएँ",
-  "Switch off the tabs you don't use. A switched-off tab is gone from the window and doesn't load at all, so nothing of it runs in the background. Switch it back on any time, here or with + More tabs left of the tabs. Right-click a tab to hide it.": "उन टैब को बंद कर दें जिनका आप उपयोग नहीं करते हैं। एक स्विच-ऑफ टैब विंडो से चला गया है और बिल्कुल भी लोड नहीं होता है, इसलिए इसका कुछ भी पृष्ठभूमि में नहीं चलता है। इसे किसी भी समय, यहां या टैब के शेष + अधिक टैब के साथ वापस चालू करें। किसी टैब को छिपाने के लिए उस पर राइट-क्लिक करें।",
   "This tab is always shown": "यह टैब हमेशा दिखाया जाता है",
-  "{tab} hidden. Bring it back with + More tabs or Settings > Tabs.": "{tab} छिपा हुआ. इसे + अधिक टैब या सेटिंग्स > टैब के साथ वापस लाएं।"
+  "{tab} hidden. Bring it back with + More tabs or Settings > Tabs.": "{tab} छिपा हुआ. इसे + अधिक टैब या सेटिंग्स > टैब के साथ वापस लाएं।",
+  "Switch off the tabs you don't use. A switched-off tab is gone from the window and doesn't load at all, so nothing of it runs in the background. Switch it back on any time, here or with + More tabs after the tabs. Right-click a tab to hide it.": "उन टैब को बंद कर दें जिनका आप उपयोग नहीं करते हैं। एक स्विच-ऑफ टैब विंडो से चला गया है और बिल्कुल भी लोड नहीं होता है, इसलिए इसका कुछ भी पृष्ठभूमि में नहीं चलता है। इसे किसी भी समय, यहां या टैब के बाद + अधिक टैब के साथ वापस चालू करें। किसी टैब को छिपाने के लिए उस पर राइट-क्लिक करें।"
 }

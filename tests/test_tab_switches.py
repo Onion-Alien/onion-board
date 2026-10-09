@@ -476,7 +476,7 @@ def test_right_click_hides_a_tab_and_more_tabs_brings_it_back(window, monkeypatc
     w.hide_tab("radio")
     assert not w.tab_on("radio") and w.tabs.currentIndex() == 0
     assert "More tabs" in shown[0]
-    assert w.tabs.cornerWidget(Qt.TopLeftCorner).isAncestorOf(w.btn_more_tabs)
+    assert w.tabs.cornerWidget(Qt.TopRightCorner).isAncestorOf(w.btn_more_tabs)
     assert not w.btn_more_tabs.isHidden()
     menu = w.btn_more_tabs.menu()
     menu.aboutToShow.emit()

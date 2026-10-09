@@ -2768,7 +2768,7 @@
   "{warn} Its noise removal can wipe out music: set it to keep the original sound.": "{warn}ノイズ除去により音楽が消去される可能性があります。元のサウンドを維持するように設定してください。",
   "✓ Added to Sounds": "✓ サウンドに追加",
   "Hide this tab": "このタブを非表示にする",
-  "Switch off the tabs you don't use. A switched-off tab is gone from the window and doesn't load at all, so nothing of it runs in the background. Switch it back on any time, here or with + More tabs left of the tabs. Right-click a tab to hide it.": "使用しないタブはオフにします。オフにされたタブはウィンドウから消え、まったく読み込まれないため、バックグラウンドでは何も実行されません。ここで、またはタブの左側にある [+ その他] タブを使用して、いつでもオンに戻します。タブを右クリックして非表示にします。",
   "This tab is always shown": "このタブは常に表示されます",
-  "{tab} hidden. Bring it back with + More tabs or Settings > Tabs.": "{tab}を非表示にしました。 [+ その他] タブまたは [設定] > [タブ] を使用して元に戻します。"
+  "{tab} hidden. Bring it back with + More tabs or Settings > Tabs.": "{tab}を非表示にしました。 [+ その他] タブまたは [設定] > [タブ] を使用して元に戻します。",
+  "Switch off the tabs you don't use. A switched-off tab is gone from the window and doesn't load at all, so nothing of it runs in the background. Switch it back on any time, here or with + More tabs after the tabs. Right-click a tab to hide it.": "使用しないタブはオフにします。オフにされたタブはウィンドウから消え、まったく読み込まれないため、バックグラウンドでは何も実行されません。ここで、またはタブの後の [+ その他] タブを使用して、いつでもオンに戻します。タブを右クリックして非表示にします。"
 }

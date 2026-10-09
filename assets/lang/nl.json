@@ -2828,7 +2828,7 @@
   "{warn} Its noise removal can wipe out music: set it to keep the original sound.": "{warn} De ruisverwijdering kan muziek wegvagen: stel deze zo in dat het originele geluid behouden blijft.",
   "✓ Added to Sounds": "✓ Toegevoegd aan geluiden",
   "Hide this tab": "Verberg dit tabblad",
-  "Switch off the tabs you don't use. A switched-off tab is gone from the window and doesn't load at all, so nothing of it runs in the background. Switch it back on any time, here or with + More tabs left of the tabs. Right-click a tab to hide it.": "Schakel de tabbladen uit die u niet gebruikt. Een uitgeschakeld tabblad is uit het venster verdwenen en wordt helemaal niet geladen, zodat er niets op de achtergrond draait. Schakel het op elk gewenst moment weer in, hier of met + Meer tabbladen links van de tabbladen. Klik met de rechtermuisknop op een tabblad om het te verbergen.",
   "This tab is always shown": "Dit tabblad wordt altijd weergegeven",
-  "{tab} hidden. Bring it back with + More tabs or Settings > Tabs.": "{tab} verborgen. Breng het terug met + Meer tabbladen of Instellingen > Tabbladen."
+  "{tab} hidden. Bring it back with + More tabs or Settings > Tabs.": "{tab} verborgen. Breng het terug met + Meer tabbladen of Instellingen > Tabbladen.",
+  "Switch off the tabs you don't use. A switched-off tab is gone from the window and doesn't load at all, so nothing of it runs in the background. Switch it back on any time, here or with + More tabs after the tabs. Right-click a tab to hide it.": "Schakel de tabbladen uit die u niet gebruikt. Een uitgeschakeld tabblad is uit het venster verdwenen en wordt helemaal niet geladen, zodat er niets op de achtergrond draait. Schakel het op elk gewenst moment weer in, hier of met + Meer tabbladen achter de tabbladen. Klik met de rechtermuisknop op een tabblad om het te verbergen."
 }

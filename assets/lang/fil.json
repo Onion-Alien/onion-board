@@ -2828,7 +2828,7 @@
   "{warn} Its noise removal can wipe out music: set it to keep the original sound.": "{warn} Ang pag-aalis ng ingay nito ay maaaring mag-wipe out ng musika: itakda ito upang panatilihin ang orihinal na tunog.",
   "✓ Added to Sounds": "✓ Idinagdag sa Mga Tunog",
   "Hide this tab": "Itago ang tab na ito",
-  "Switch off the tabs you don't use. A switched-off tab is gone from the window and doesn't load at all, so nothing of it runs in the background. Switch it back on any time, here or with + More tabs left of the tabs. Right-click a tab to hide it.": "I-off ang mga tab na hindi mo ginagamit. Ang isang naka-switch-off na tab ay nawala mula sa window at hindi naglo-load, kaya wala nito ang tumatakbo sa background. I-on muli ito anumang oras, dito o sa + Higit pang mga tab na natitira sa mga tab. I-right-click ang isang tab upang itago ito.",
   "This tab is always shown": "Palaging ipinapakita ang tab na ito",
-  "{tab} hidden. Bring it back with + More tabs or Settings > Tabs.": "Nakatago {tab} . Ibalik ito gamit ang + Higit pang mga tab o Mga Setting > Mga Tab."
+  "{tab} hidden. Bring it back with + More tabs or Settings > Tabs.": "Nakatago {tab} . Ibalik ito gamit ang + Higit pang mga tab o Mga Setting > Mga Tab.",
+  "Switch off the tabs you don't use. A switched-off tab is gone from the window and doesn't load at all, so nothing of it runs in the background. Switch it back on any time, here or with + More tabs after the tabs. Right-click a tab to hide it.": "I-off ang mga tab na hindi mo ginagamit. Ang isang naka-switch-off na tab ay nawala mula sa window at hindi naglo-load, kaya wala nito ang tumatakbo sa background. I-on muli ito anumang oras, dito o gamit ang + Higit pang mga tab pagkatapos ng mga tab. I-right-click ang isang tab upang itago ito."
 }

@@ -2888,7 +2888,7 @@
   "{warn} Its noise removal can wipe out music: set it to keep the original sound.": "{warn} Eliminarea zgomotului poate șterge muzica: setați-o să păstreze sunetul original.",
   "✓ Added to Sounds": "✓ Adăugat la Sunete",
   "Hide this tab": "Ascunde această filă",
-  "Switch off the tabs you don't use. A switched-off tab is gone from the window and doesn't load at all, so nothing of it runs in the background. Switch it back on any time, here or with + More tabs left of the tabs. Right-click a tab to hide it.": "Opriți filele pe care nu le utilizați. O filă dezactivată a dispărut din fereastră și nu se încarcă deloc, așa că nimic din ea nu rulează în fundal. Porniți-l din nou oricând, aici sau cu + Mai multe file în stânga filelor. Faceți clic dreapta pe o filă pentru a o ascunde.",
   "This tab is always shown": "Această filă este întotdeauna afișată",
-  "{tab} hidden. Bring it back with + More tabs or Settings > Tabs.": "{tab} ascuns. Aduceți-l înapoi cu + Mai multe file sau Setări > File."
+  "{tab} hidden. Bring it back with + More tabs or Settings > Tabs.": "{tab} ascuns. Aduceți-l înapoi cu + Mai multe file sau Setări > File.",
+  "Switch off the tabs you don't use. A switched-off tab is gone from the window and doesn't load at all, so nothing of it runs in the background. Switch it back on any time, here or with + More tabs after the tabs. Right-click a tab to hide it.": "Opriți filele pe care nu le utilizați. O filă dezactivată a dispărut din fereastră și nu se încarcă deloc, așa că nimic din ea nu rulează în fundal. Porniți-l din nou oricând, aici sau cu + Mai multe file după file. Faceți clic dreapta pe o filă pentru a o ascunde."
 }
