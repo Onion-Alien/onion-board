@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- **Clearer privacy text for *Count me in*.** It now says plainly that the random ID sent with the anonymous count links your counts together, so we can see how people use the app over time (which tabs, which versions, whether they come back) and what to improve. Nothing new is sent; untick *Count me in* and nothing is sent at all.
+
 ## 1.9.27 — 2026-10-09
 
 - **Free sound packs.** *Backup → Free sound packs…* on the Sounds tab adds a

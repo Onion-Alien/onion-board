@@ -2,7 +2,9 @@
 
 Once a day the installed app sends one "still here" to the project's GoatCounter
 (a privacy-friendly counter): the version number and a random ID made on this PC, so
-the same person isn't counted twice. Also a one-off "first start" (with where they
+the same person isn't counted twice and we can follow how people use the app over time
+(which tabs, which versions, whether they come back) to see what to improve.
+Also a one-off "first start" (with where they
 heard about the app, if they picked it on the installer's last page), and "updated" when
 *Update now* installs a new version. With the daily one: which tabs were opened since the
 last one (their names only). Soon after a start: how many problems there were since the

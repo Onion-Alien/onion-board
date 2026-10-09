@@ -2294,11 +2294,12 @@ class SettingsDialog(QDialog):
                           "Tor Project (dist.torproject.org). Off: a Tor that's already "
                           "here still works."),
         "usage_stats": _("Once a day, the installed app sends an anonymous \"still here\" "
-                         "to our counter (goatcounter.com): the version number and a random "
-                         "ID made on this PC, so nobody is counted twice, and which tabs you "
-                         "opened. If it crashed or froze, how many times (a count, never "
-                         "the report), and once when you uninstall. Nothing else: no "
-                         "name, sounds, settings or games. It's how we know if anyone uses "
+                         "to our counter (goatcounter.com): the version number, which tabs "
+                         "you opened, and a random ID made on this PC so we can see how "
+                         "people use the app over time and what to improve. If it crashed or "
+                         "froze, how many times (a count, never the report), and once "
+                         "when you uninstall. Nothing else: no name, sounds, settings or "
+                         "games. It's how we know if anyone uses "
                          "Onion Board, and if it's working for them. Off: nothing is sent."),
     }
 
