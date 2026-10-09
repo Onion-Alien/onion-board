@@ -832,7 +832,8 @@ class MainWindow(QMainWindow):
         self.btn_more_tabs.setFocusPolicy(Qt.TabFocus)   # a click left an accent ring on it
         self.btn_more_tabs.setToolTip(_("Add a tab: radio, sending a program's sound, screen "
                                         "triggers…"))
-        mt = QMenu(self.btn_more_tabs)
+        from soundboard.ui import moretabs
+        mt = moretabs.Menu(self.btn_more_tabs)
         mt.aboutToShow.connect(lambda: self._fill_more_tabs(mt))
         mt.aboutToHide.connect(self._more_tabs_hidden)
         self.btn_more_tabs.setMenu(mt)
