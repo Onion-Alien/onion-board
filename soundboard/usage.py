@@ -20,7 +20,10 @@ one (`sounds/11-50`, `played/1-10`), the app's language (`lang/de`), and which f
 were used since then (`used/voice-changer`: the names in FEATURES only). And once each,
 the first steps of a new install (`step/added-sound`, `step/played-sound`,
 `step/sent-to-others`), to see where new people get stuck; never for a copy that was
-counted before these existed.
+counted before these existed. Also once each, switching on a tab a new user starts
+without (`step/added-radio-tab`, `-apps-`, `-triggers-`): sent when it happens, since
+a tab opened after the first daily count waits a day, and most people trying the app
+never send that one.
 Nothing else: no name, sounds, settings, devices, games or IP address in the message
 (GoatCounter sees the connection's address like any site does, and isn't sent it to
 keep or look up).
@@ -71,7 +74,9 @@ VERSION_RE = r"[0-9][0-9A-Za-z.\-]{0,20}"
 # what else is counted, only ever these names (see the docstring)
 FEATURES = ("add-files", "youtube", "record", "clip", "clip-editor", "import-board",
             "voice-changer", "text-to-speech", "hotkeys", "phone-remote", "also-send")
-STEPS = ("added-sound", "played-sound", "sent-to-others")
+STEPS = ("added-sound", "played-sound", "sent-to-others",
+         # a tab a new user starts without (+ More tabs, Settings > Tabs)
+         "added-radio-tab", "added-apps-tab", "added-triggers-tab")
 ROUTES = ("cable", "device", "off", "mic")   # library.ROUTES
 LANG_RE = r"[a-z]{2,3}(?:-[A-Za-z0-9]{2,4})?"
 DAY_S = 24 * 3600

@@ -448,6 +448,8 @@ def test_a_new_user_starts_with_the_basic_tabs():
 
 def test_more_tabs_lists_the_switched_off_ones_and_adds_one(window, monkeypatch):
     w = window
+    steps = []
+    monkeypatch.setattr(main.usage, "step", lambda cfg, name, saved=None: steps.append(name))
     assert w.btn_more_tabs.isHidden()                      # every tab on: nothing to add
     w.set_tab_on("radio", False)
     w.set_tab_on("triggers", False)
@@ -463,5 +465,6 @@ def test_more_tabs_lists_the_switched_off_ones_and_adds_one(window, monkeypatch)
     assert opened == ["tabs"]
     menu.actions()[1].trigger()                            # Triggers
     assert w.tab_on("triggers") and w.tabs.currentIndex() == main.TAB_INDEX["triggers"]
+    assert steps == ["added-triggers-tab"]   # counted now, not with tomorrow's count
     w.set_tab_on("radio", True)
     assert w.btn_more_tabs.isHidden()
