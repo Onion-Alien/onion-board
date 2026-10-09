@@ -262,11 +262,12 @@ class DestPanel(QWidget):
         arow = QHBoxLayout()
         self.combo = QComboBox()
         no_wheel(self.combo)
-        arow.addWidget(self.combo, 1)
+        arow.addWidget(self.combo)
         custom = QPushButton(_("Custom modes…"))
         custom.setToolTip(_("Describe another codec or service by what it does to the sound"))
         custom.clicked.connect(self.edit_custom)
         arow.addWidget(custom)
+        arow.addStretch(1)
         av.addLayout(arow)
         self.desc = hint_label("")
         av.addWidget(self.desc)
@@ -294,7 +295,8 @@ class DestPanel(QWidget):
             self.cb_duck.addItem(label, db)
         self.cb_duck.setToolTip(_("Turns your sounds down while the mic hears you, so your voice "
                                   "isn't buried under a song"))
-        duck.addWidget(self.cb_duck, 1)
+        duck.addWidget(self.cb_duck)
+        duck.addStretch(1)
         v.addLayout(duck)
         self.chk_gate = QCheckBox(_("Mute my mic while a sound plays"))
         self.chk_gate.setToolTip(_("Others hear only the sound, clean, and your mic comes back "

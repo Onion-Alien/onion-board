@@ -2,7 +2,9 @@
 
 Once a day the installed app sends one "still here" to the project's GoatCounter
 (a privacy-friendly counter): the version number and a random ID made on this PC, so
-the same person isn't counted twice. Also a one-off "first start" (with where they
+the same person isn't counted twice and we can follow how people use the app over time
+(which tabs, which versions, whether they come back) to see what to improve.
+Also a one-off "first start" (with where they
 heard about the app, if they picked it on the installer's last page), and "updated" when
 *Update now* installs a new version. With the daily one: which tabs were opened since the
 last one (their names only). Soon after a start: how many problems there were since the
@@ -41,6 +43,7 @@ one on a PC with ONIONBOARD_NO_STATS set (the developer's own PCs and test VMs:
 GoatCounter's "Ignore IPs" can't catch these sends, as they carry no IP)."""
 from __future__ import annotations
 
+import hashlib
 import json
 import logging
 import os
@@ -109,6 +112,14 @@ def install_id(cfg) -> str:
     return cfg.stats_id
 
 
+def user_tag(sid: str) -> str:
+    """A short tag made from the random ID, sent as each count's "ref". GoatCounter
+    swaps "session" for its own number that starts over after 8 hours, so the daily
+    counts of one person only link up across days through this (Onion Stats' User
+    paths). A hash, so the ID itself isn't what's kept there."""
+    return "u-" + hashlib.sha256(sid.encode()).hexdigest()[:12]
+
+
 def _wordlike(w: str) -> bool:
     """A word, a short name ("tv") or a number: not keyboard mashing ("asdfgh")."""
     return w.isdigit() or ((len(w) <= 3 or bool(re.search(r"[aeiouy]", w)))
@@ -139,7 +150,7 @@ def heard_tag(text: str) -> str:
 
 
 def _event(name: str, sid: str) -> dict:
-    return {"path": name, "title": name, "event": True, "session": sid}
+    return {"path": name, "title": name, "event": True, "session": sid, "ref": user_tag(sid)}
 
 
 def hits(cfg, now: float, event: str = "", extra=()) -> list[dict]:
@@ -153,7 +164,7 @@ def hits(cfg, now: float, event: str = "", extra=()) -> list[dict]:
     if now - cfg.stats_sent < EVERY_S:
         return out
     out.insert(0, {"path": f"/app/{__version__}", "title": f"Onion Board {__version__}",
-                   "session": sid})
+                   "session": sid, "ref": user_tag(sid)})
     if not cfg.stats_sent:
         heard = heard_tag(cfg.stats_heard)
         out.append(_event(f"first-start/heard-{heard}" if heard else "first-start", sid))

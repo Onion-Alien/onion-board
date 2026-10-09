@@ -132,7 +132,7 @@ class StreamerGuide(QDialog):
         self.sound.setAccessibleName(_("Sound to copy a link for"))
         self.sound.addItems([m.name for m in mw.cfg.sounds])
         self.sound.setMinimumWidth(180)
-        row.addWidget(self.sound, 1)
+        row.addWidget(self.sound)
         self.btn_play = QPushButton(_("Copy"))
         icons.set_icon(self.btn_play, "copy")
         self.btn_play.setToolTip(_("Copy the link that plays this sound"))
@@ -140,6 +140,7 @@ class StreamerGuide(QDialog):
             lambda: self._copy(self.btn_play, "play",
                                "name=" + quote(self.sound.currentText())))
         row.addWidget(self.btn_play)
+        row.addStretch(1)
         v.addLayout(row)
         row = QHBoxLayout()
         self.link_btns = [self.btn_play]

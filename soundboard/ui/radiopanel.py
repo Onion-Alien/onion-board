@@ -284,6 +284,8 @@ class _FilterRow(QWidget):
     def __init__(self, combos: list[QComboBox]):
         super().__init__()
         self.combos = combos
+        for c in combos:
+            c.setProperty("snug", False)   # sized here, by what their words need
         self.rows = 0
         v = QVBoxLayout(self)
         v.setContentsMargins(0, 0, 0, 0)
@@ -333,11 +335,14 @@ class _FilterRow(QWidget):
             for i, c in enumerate(self.combos):
                 line = 0 if rows == 1 else (min(i, 1) if rows == 2 else i)
                 self._lines[line].addWidget(c)
+            for h in self._lines:
+                h.addStretch(1)   # boxes as wide as their words, the rest left empty
             self.updateGeometry()
         for c in self.combos:   # a box's share of its row: what its words need
             for h in self._lines:
                 if h.indexOf(c) >= 0:
                     h.setStretch(h.indexOf(c), self.needs(c))
+            c.setMaximumWidth(self.needs(c))   # and no wider: the row's rest stays empty
 
     def resizeEvent(self, e):
         super().resizeEvent(e)
@@ -666,10 +671,11 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
             b.setCheckable(True)
             b.setCursor(Qt.PointingHandCursor)
             self._mode.addButton(b)
-            sh.addWidget(b, 1)
+            sh.addWidget(b)
         self.btn_popular.setChecked(True)
         self._mode.buttonClicked.connect(lambda _b: self._show_list())
         self.seg_box = seg
+        seg.setSizePolicy(QSizePolicy.Maximum, QSizePolicy.Fixed)   # as wide as its words
         v.addWidget(seg)
 
         # genre chips

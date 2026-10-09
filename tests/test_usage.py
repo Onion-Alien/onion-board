@@ -69,8 +69,11 @@ def test_a_new_install_counts_once_a_day(sent):
     hits = _hits(req)
     assert [h["path"] for h in hits] == [f"/app/{__version__}", "first-start"]
     assert {h["session"] for h in hits} == {cfg.stats_id} and len(cfg.stats_id) == 32
+    # the same short tag on every count, so one person's days link up (not the ID itself)
+    assert {h["ref"] for h in hits} == {usage.user_tag(cfg.stats_id)}
+    assert usage.user_tag(cfg.stats_id) != cfg.stats_id and len(usage.user_tag("x")) == 14
     # nothing but these fields leaves the PC
-    assert all(set(h) <= {"path", "title", "event", "session"} for h in hits)
+    assert all(set(h) <= {"path", "title", "event", "session", "ref"} for h in hits)
     usage.maybe_send(cfg)   # the same day: nothing
     assert len(sent) == 1
     cfg.stats_sent -= usage.EVERY_S   # a day later: only the daily one

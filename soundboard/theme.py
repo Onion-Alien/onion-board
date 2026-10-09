@@ -787,6 +787,8 @@ QFrame#setcard QPushButton:checked { background:$accent; color:$on_accent; }
 QFrame#setcard QPushButton#primary { background:$accent; color:$on_accent; border:none; }
 QFrame#setcard QPushButton#power:checked { background:$live; border:1px solid $live_hi; color:$on_live; }
 QFrame#setcard QPushButton#primary:hover { background:$accent_hover; }
+QFrame#setcard QLineEdit, QFrame#setcard QComboBox { background:$bg; }
+QFrame#setcard QLineEdit:hover, QFrame#setcard QComboBox:hover { background:$card; }
 QTableView, QFrame#setcard QTableView { background:$card; alternate-background-color:$card_hi;
     color:$text; border:1px solid transparent; border-radius:6px;
     selection-background-color:$btn_press; selection-color:$text_hi; }

@@ -227,7 +227,7 @@ def test_usage_count_through_the_proxy(sites, socks, guard, counter):
     ((path, body),) = sites.posts
     hits = json.loads(body)["hits"]
     # only what SECURITY.md says: the version, first start, and the random ID
-    assert all(set(h) <= {"path", "title", "event", "session"} for h in hits)
+    assert all(set(h) <= {"path", "title", "event", "session", "ref"} for h in hits)
     assert {h["session"] for h in hits} == {cfg.stats_id}
 
 

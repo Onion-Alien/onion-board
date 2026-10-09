@@ -1721,7 +1721,7 @@ class MainWindow(QMainWindow):
             # opens wide enough for whole names
             cb.setSizeAdjustPolicy(QComboBox.AdjustToMinimumContentsLengthWithIcon)
             cb.setMinimumContentsLength(16)
-        grid.setColumnStretch(2, 1)
+        grid.setColumnStretch(3, 1)   # the room past the boxes, not the boxes' column
         av.addLayout(grid)
         self.cb_main.setParent(devcard)   # never a window of its own
         self.cb_main.hide()
