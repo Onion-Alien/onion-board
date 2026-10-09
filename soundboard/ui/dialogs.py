@@ -57,7 +57,7 @@ class EffectsPanel(QWidget):
         prow.addWidget(reset)
         v.addLayout(prow)
 
-        v.addWidget(section_label(_("TRIM")))
+        v.addWidget(section_label(_("Trim")))
         peaks, length = original_peaks(meta) if meta is not None else ([], 0.0)
         self.trim = TrimPanel(peaks, length)
         v.addWidget(self.trim)              # in the layout first: shown with no parent,
@@ -65,7 +65,7 @@ class EffectsPanel(QWidget):
         if length <= 0:
             v.addWidget(hint_label(_("Trimming works once the sound has loaded.")))
 
-        v.addWidget(section_label(_("SPEED & PITCH")))
+        v.addWidget(section_label(_("Speed & pitch")))
         self.speed = ParamSlider(SPEED, 1.0)
         self.pitch = ParamSlider(PITCH, 0.0)
         self.tape = QCheckBox(_("Tape mode: speed changes the pitch too (nightcore / slowed)"))
@@ -74,7 +74,7 @@ class EffectsPanel(QWidget):
         for w in (self.speed, self.pitch, self.tape):
             v.addWidget(w)
 
-        v.addWidget(section_label(_("LOUDNESS")))
+        v.addWidget(section_label(_("Loudness")))
         self.boost = ParamSlider(BOOST, 0.0)
         v.addWidget(self.boost)
         self.boost_hint = hint_label("")
@@ -87,7 +87,7 @@ class EffectsPanel(QWidget):
         self.eq.cb_target.hide()
         v.addWidget(self.eq)
 
-        v.addWidget(section_label(_("EFFECTS")))
+        v.addWidget(section_label(_("Effects")))
         self.rows: dict[str, EffectRow] = {}
         for etype, cls in voicefx.REGISTRY.items():
             if etype == "pitch":   # the Pitch slider above does this, better
@@ -320,6 +320,7 @@ class EditDialog(QDialog):
         self._fx_note()
 
         bb = QDialogButtonBox(QDialogButtonBox.Save | QDialogButtonBox.Cancel)
+        bb.button(QDialogButtonBox.Save).setObjectName("primary")   # the one filled button
         copy = bb.addButton(_("Save as new sound"), QDialogButtonBox.AcceptRole)
         copy.setToolTip(_("Keep this sound as it is and add the edited version as a new pad"))
         copy.clicked.connect(lambda: setattr(self, "as_copy", True))
