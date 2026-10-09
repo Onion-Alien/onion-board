@@ -2314,13 +2314,11 @@ class SettingsDialog(QDialog):
         "tor_download": _("Get Tor / Update Tor (Connection page) downloads Tor from the "
                           "Tor Project (dist.torproject.org). Off: a Tor that's already "
                           "here still works."),
-        "usage_stats": _("Once a day, the installed app sends an anonymous \"still here\" "
-                         "to our counter (goatcounter.com): the version number and a random "
-                         "ID made on this PC, so nobody is counted twice, and which tabs you "
-                         "opened. If it crashed or froze, how many times (a count, never "
-                         "the report), and once when you uninstall. Nothing else: no "
-                         "name, sounds, settings or games. It's how we know if anyone uses "
-                         "Onion Board, and if it's working for them. Off: nothing is sent."),
+        "usage_stats": _("Once a day, sends an anonymous count to goatcounter.com: the "
+                         "version, tabs opened, crash counts and a random ID that follows "
+                         "how the app is used over time. Only used to fix errors and see "
+                         "which features need work. Never your name, sounds or settings. "
+                         "Off: nothing is sent."),
     }
 
     def _switches_card(self):
