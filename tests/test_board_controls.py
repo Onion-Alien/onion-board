@@ -254,7 +254,7 @@ def test_the_queue_shows_above_the_pads_and_can_be_trimmed(window, monkeypatch, 
     w._update_chips({"s0": (0.5, False)})
     assert not w.playing_row.isHidden()
     w._unqueue(0)
-    w._update_chips({"s0": (0.5, False)})
+    w._update_chips({})
     assert w._queue == [] and w.playing_row.isHidden()
 
 
@@ -283,6 +283,54 @@ def test_a_double_click_on_stop_doesnt_stop_the_next_queued_sound(window, monkey
     w._stopped_at = (0.0, "s0")       # a press well after: stops it
     w.stop_current()
     assert stopped == ["s0", "s1"]
+
+
+def two_playing(w):
+    """s0 then s1 really playing (a stand-in headphone output), their chips up."""
+    w._ui_live = True
+    w.engine.mon_stream = object()
+    w.engine.rates["mon"] = 48000
+    for sid in ("s0", "s1"):
+        w.audio[sid] = np.full((48000 * 20, 2), 0.01, np.float32)
+    w.play("s0")
+    w.play("s1")
+    w._update_chips(w.engine.playing())
+    assert list(w._chips) == ["s0", "s1"]
+
+
+def chip_stop(w, sid):
+    w._chips[sid].findChildren(QPushButton)[-1].click()
+    w._update_chips(w.engine.playing())
+
+
+def test_stopping_one_of_two_keeps_the_others_chip(window):
+    """Two playing, ■ on the right one: the row used to hide with one sound left, so
+    the left one's chip went too and it looked like both had stopped."""
+    w = window
+    two_playing(w)
+    chip_stop(w, "s1")
+    assert list(w.engine.playing()) == ["s0"]
+    assert list(w._chips) == ["s0"] and not w.playing_row.isHidden()
+    w._stopped_at = (0.0, "s1")       # well after the first press
+    chip_stop(w, "s0")                # the last one stops: the row goes
+    assert not w.engine.playing() and w.playing_row.isHidden()
+    w.play("s1")                      # one sound on its own: its chip, same as always
+    w._update_chips(w.engine.playing())
+    assert list(w._chips) == ["s1"] and not w.playing_row.isHidden()
+
+
+def test_a_double_click_on_a_now_playing_chips_stop_stops_only_that_one(window):
+    """The row is remade after a ■ and another sound's ■ can slide in under the mouse:
+    the double click's second press used to stop that one too."""
+    w = window
+    two_playing(w)
+    chip_stop(w, "s1")
+    chip_stop(w, "s0")                # the second press, on the ■ now under the mouse
+    assert list(w.engine.playing()) == ["s0"]
+
+
+def test_the_mini_players_stop_all_says_all(window):
+    assert window.mini_stop.text() == "All" and window.mini_st.text() == ""
 
 
 def test_the_queue_status_goes_once_the_queue_is_empty(window, monkeypatch, calls):

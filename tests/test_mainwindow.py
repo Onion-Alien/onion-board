@@ -154,9 +154,11 @@ def test_window_uses_only_the_temp_config(window, app_dir):
 
 def test_overlapping_sounds_each_get_a_stop_chip(window, monkeypatch):
     stopped = []
+    window._update_chips({})
+    assert window.playing_row.isHidden() and not window._chips   # nothing playing
     monkeypatch.setattr(window.engine, "stop", stopped.append)
     window._update_chips({"s0": (0.2, False)})
-    assert window.playing_row.isHidden() and not window._chips   # one sound: no chips
+    assert not window.playing_row.isHidden() and set(window._chips) == {"s0"}  # one: a chip
     window.select("s1")
     window._update_chips({"s0": (0.2, False), "s1": (0.1, False)})
     assert not window.playing_row.isHidden() and set(window._chips) == {"s0", "s1"}
@@ -185,7 +187,9 @@ def test_a_web_search_sound_gets_a_chip_and_the_player_follows_it(window, monkey
     window.stop_current()
     assert window.current == PLAY_ID   # the player moved to what's still playing
     window._update_chips(live)
-    assert window.playing_row.isHidden()   # one sound, and the player shows it
+    # one sound left, the player shows it: its chip stays (the row going made it
+    # look like ■ had stopped both)
+    assert not window.playing_row.isHidden() and set(window._chips) == {PLAY_ID}
     window.select("s1")       # another pad picked while it plays: its chip stays
     window._update_chips(live)
     assert not window.playing_row.isHidden() and set(window._chips) == {PLAY_ID}

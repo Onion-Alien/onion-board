@@ -386,7 +386,7 @@ class MainWindow(QMainWindow):
         self.shuffle = ShuffleBag()       # the random-sound hotkeys
         self._last_sid: str | None = None   # the last sound played (its replay hotkey)
         self._queue: list[str] = []       # sounds waiting for the ones playing to finish
-        self._stopped_at = (0.0, "")       # (when, which) the player's ■ last stopped
+        self._stopped_at = (0.0, "")       # (when, which) a ■ for one sound last stopped
         self._cool: dict[str, float] = {}   # sid -> time.monotonic() its cooldown ends
         self._waiting: dict[str, list[QTimer]] = {}   # sid -> its delayed starts
         self._hotkeys_off = False         # "All hotkeys off": only that key still works
@@ -970,13 +970,17 @@ class MainWindow(QMainWindow):
         self.mini_air.setToolTip(self.btn_air.toolTip())
         self.mini_air.toggled.connect(self.set_sending)
         icons.set_icon(self.mini_air, "live", "danger_text", "#ffffff")
-        self.mini_stop = QPushButton()
+        # "All" in words: an icon-only ■ here looked just like the one-sound ■ on
+        # the left, and stopped everything
+        self.mini_stop = QPushButton(_("All"))
         self.mini_stop.setObjectName("danger")
         self.mini_stop.setToolTip(self.stop_btn.toolTip())
         self.mini_stop.clicked.connect(self.stop_all)
         icons.set_icon(self.mini_stop, "stop", "danger_text", size=14)
+        self.mini_air.setFixedSize(38, 30)
+        self.mini_stop.setFixedHeight(30)
+        self.mini_stop.setMinimumWidth(38)
         for b in (self.mini_air, self.mini_stop):
-            b.setFixedSize(38, 30)
             top.addWidget(b)
         cv.addLayout(top)
         bottom = QHBoxLayout()
@@ -1380,18 +1384,18 @@ class MainWindow(QMainWindow):
         return page
 
     def _update_chips(self, playing):
-        """The row above the pads: what's playing (when it's more than the player shows)
-        and the queue, each with its own ✕. A web search / link's Play once counts
-        too: it isn't a pad, but it plays over them and needs its own ■. So does one
-        lone sound the player isn't showing (another pad was picked while it played):
-        its chip is the only way back to it."""
+        """The row above the pads: every sound playing, each with its own ■, and the
+        queue, each with its own ✕. A web search / link's Play once counts too: it
+        isn't a pad, but it plays over them and needs its own ■. One rule, whatever
+        played before: a sound has a chip while it plays. (The row used to show only
+        for two or more, so stopping one of two hid the other's chip too and it looked
+        like ■ had stopped both.)"""
         ids = tuple(s for s in self.pads if s in playing)
         if LINK_ID in playing:
             ids += (LINK_ID,)
         queue = tuple(self._queue)
-        lone = len(ids) == 1 and self.current not in (None, ids[0])
-        if (ids, queue, lone) != self._chip_ids:
-            self._chip_ids = (ids, queue, lone)
+        if (ids, queue) != self._chip_ids:
+            self._chip_ids = (ids, queue)
             while self._chips_hl.count():
                 w = self._chips_hl.takeAt(0).widget()
                 if w:
@@ -1412,7 +1416,7 @@ class MainWindow(QMainWindow):
                     more = QLabel(_("+{value} more", value=len(queue) - QUEUE_CHIPS))
                     more.setObjectName("muted")
                     self._chips_hl.addWidget(more)
-            if len(ids) >= 2 or lone:
+            if ids:
                 lbl = QLabel(_("Now playing"))
                 lbl.setObjectName("muted")
                 self._chips_hl.addWidget(lbl)
@@ -1433,7 +1437,7 @@ class MainWindow(QMainWindow):
                     stop.setToolTip(_("Stop this sound"))
                     icons.set_icon(stop, "stop", "danger_text", size=12)
                     stop.setFixedSize(24, 24)
-                    stop.clicked.connect(lambda __=False, s=sid: self._stop_sound(s))
+                    stop.clicked.connect(lambda __=False, s=sid: self._stop_one(s))
                     ch.addWidget(name)
                     ch.addWidget(stop)
                     self._chips_hl.addWidget(chip)
@@ -1442,7 +1446,7 @@ class MainWindow(QMainWindow):
             # its width); a row that shrank and grew back with every overlapping
             # sound resized and repainted the whole board under it
             self.playing_row.setMinimumHeight(CHIPS_ROW_H)
-            self.playing_row.setVisible(len(ids) >= 2 or bool(queue) or lone)
+            self.playing_row.setVisible(bool(ids) or bool(queue))
         for sid, chip in self._chips.items():
             sel = "true" if sid == self.current else "false"
             if chip.property("sel") != sel:
@@ -4385,14 +4389,21 @@ class MainWindow(QMainWindow):
         """The player's ■. A second press within a double-click of the first that
         would stop a different sound is a double click (or a bouncy mouse): the queue's
         next sound had already taken the player, and it went too."""
-        now, (at, was) = time.monotonic(), self._stopped_at
-        if (self.current and was and self.current != was
-                and now - at < QApplication.doubleClickInterval() / 1000):
-            return
         if self.current:
-            self._stopped_at = (now, self.current)
-            self._stop_sound(self.current)
+            self._stop_one(self.current)
         self.start_frac = 0.0
+
+    def _stop_one(self, sid: str):
+        """A ■ for one sound (the player's, or a Now playing chip's). A second press
+        within a double-click of one that stopped a different sound does nothing: the
+        player had moved to the next sound, or the chips row was remade and the next
+        sound's ■ slid in under the mouse, and a double click (or a bouncy mouse)
+        stopped that one too, so stopping one sound stopped two or all of them."""
+        now, (at, was) = time.monotonic(), self._stopped_at
+        if was and sid != was and now - at < QApplication.doubleClickInterval() / 1000:
+            return
+        self._stopped_at = (now, sid)
+        self._stop_sound(sid)
 
     def _stop_sound(self, sid: str):
         """Stop one sound. If it was the player's and others still play, the player
