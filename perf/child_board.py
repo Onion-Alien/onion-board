@@ -562,7 +562,7 @@ class Child:
 
     def sc_voice_heavy(self):
         out = {}
-        for p in ("Talkbox", "Demon", "Female voice"):
+        for p in ("Talkbox", "Demon", "High voice"):
             from soundboard import voicefx
             if p in voicefx.PRESETS:
                 self.sc_voice_preset(p)

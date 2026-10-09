@@ -28,7 +28,7 @@ KEYS = ["voice-chipmunk", "voice-deep-voice", "voice-demon", "voice-robot", "voi
         "voice-stadium-announcer", "voice-cave", "voice-podcast-voice", "voice-custom",
         "voice-random",
         # the voices added later, which show a "?" until they get theirs
-        "voice-female-voice", "voice-male-voice", "voice-talkbox", "voice-autotune",
+        "voice-high-voice", "voice-male-voice", "voice-talkbox", "voice-autotune",
         "voice-masked-caller", "voice-anonymous", "voice-dark-lord", "voice-hothead"]
 
 

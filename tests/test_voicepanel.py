@@ -771,9 +771,10 @@ def test_switch_settings_and_cards_round_trip(panel):
     p.fx.pick("Walkie-talkie")
     radio = p.fx.rows["radio"]
     squelch = next(s for s in radio.sliders if s.q.key == "squelch")
-    assert squelch.switch is not None and squelch.slider is None and squelch.value() == 1
-    squelch.switch.setChecked(False)
-    assert p.fx.spec()["effects"]["radio"]["squelch"] == 0
+    # off in the preset: the clicks sounded like a hi-hat
+    assert squelch.switch is not None and squelch.slider is None and squelch.value() == 0
+    squelch.switch.setChecked(True)
+    assert p.fx.spec()["effects"]["radio"]["squelch"] == 1
     radio.reset()
     assert p.fx.spec()["effects"]["radio"]["low"] == voicefx.defaults("radio")["low"]
 
