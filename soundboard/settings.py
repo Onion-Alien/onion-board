@@ -2401,11 +2401,29 @@ class SettingsDialog(QDialog):
             sl.addWidget(go, 0, Qt.AlignLeft)
 
     def _set_feature(self, key: str, on: bool):
-        from soundboard import net
+        from soundboard import net, usage
         cfg = self.mw.cfg
+        was_on = key not in cfg.net_off
         off = [k for k in cfg.net_off if k != key] + ([] if on else [key])
         self.mw.set_option("net_off", off)   # saves
+        if key == usage.FEATURE and was_on and not on and net.allowed(key):
+            # Count me in switched off: one anonymous "opt-out/settings" goes first
+            # (usage.opt_out), and the switch takes hold the moment it's done
+            t = threading.Thread(target=usage.opt_out, args=("settings",), daemon=True,
+                                 name="usage-opt-out")
+            t.start()
+            self._opt_out_wait(t)
+            return
         net.configure_features(cfg.net_off, cfg.net_offline)   # applies at once
+        self._net_sync()
+
+    def _opt_out_wait(self, t):
+        from soundboard import net
+        if t.is_alive():
+            QTimer.singleShot(100, lambda: self._opt_out_wait(t))
+            return
+        cfg = self.mw.cfg
+        net.configure_features(cfg.net_off, cfg.net_offline)
         self._net_sync()
 
     def _set_offline(self, on: bool):

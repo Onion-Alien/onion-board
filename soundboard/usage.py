@@ -377,19 +377,38 @@ def uninstall_event() -> str:
     return f"uninstall/{__version__}"
 
 
+OPT_OUT_WHERE = ("installer", "settings")
+OPT_OUT_TIMEOUT_S = 5   # the installer waits on it: never long
+
+
+def opt_out(where: str) -> bool:
+    """Count me in switched from on to off (`where`: the installer's box or Settings):
+    one last "opt-out/<where>" so we know how many people aren't counted, then nothing
+    ever again. No random ID, no tag, no session: it can't be tied to anything they
+    sent before. Only while the count is still allowed (call it before switching it
+    off). Waits for the answer: call it off the UI thread."""
+    if where not in OPT_OUT_WHERE or not enabled() or not net.allowed(FEATURE):
+        return False
+    name = f"opt-out/{where}"
+    netlog.cause(FEATURE, f"Anonymous usage count ({name}, the last one)")
+    return send([{"path": name, "title": name, "event": True}],
+                timeout=OPT_OUT_TIMEOUT_S, no_sessions=True)
+
+
 def update_event(to: str) -> str:
     """The event for *Update now* from this version to `to`."""
     return f"update-now/{__version__}-to-{to}"
 
 
-def send(payload: list[dict]) -> bool:
+def send(payload: list[dict], timeout: float = TIMEOUT_S, no_sessions: bool = False) -> bool:
     """POST them to the counter. True if it took them. Call off the UI thread."""
-    body = json.dumps({"hits": payload}).encode("utf-8")
+    body = json.dumps({"hits": payload, "no_sessions": True} if no_sessions
+                      else {"hits": payload}).encode("utf-8")
     req = urllib.request.Request(ENDPOINT, data=body, method="POST", headers={
         "Authorization": f"Bearer {TOKEN}", "Content-Type": "application/json",
         "User-Agent": "OnionBoard"})
     try:
-        with net.urlopen(req, timeout=TIMEOUT_S, feature=FEATURE) as r:
+        with net.urlopen(req, timeout=timeout, feature=FEATURE) as r:
             return 200 <= r.status < 300
     except Exception as e:  # noqa: BLE001 - offline, switched off meanwhile, counter down
         log.info("usage count not sent: %s", e)
