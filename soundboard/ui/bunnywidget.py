@@ -41,7 +41,17 @@ DUST_INK = QColor("#b3a9c7")
 # build(): when each part of the act ends, in seconds from the start
 DASH_END, CLOUD_END, BACK_END = 0.45, 1.6, 2.1
 SWING = 0.55     # one hammer blow, seconds
-TALK = 0.05        # mic level that counts as talking (same as the wizard's "Hearing you")
+TALK = 0.008       # mic level that counts as talking (-42 dBFS; also the wizard's "Hearing you")
+LOUD = 0.25        # mic level that opens his mouth all the way (-12 dBFS)
+
+
+def loudness(level: float) -> float:
+    """A raw mic peak (0..1) as 0..1 on a dB scale, like the level bar: 0 at TALK,
+    1 at LOUD. Speech peaks sit far below 1 in linear terms, so a linear scale left
+    him still until you yelled."""
+    if level <= TALK:
+        return 0.0
+    return min(1.0, math.log(level / TALK) / math.log(LOUD / TALK))
 FPS = 30
 FAST_MS = 1000 // FPS
 IDLE_MS = 100      # at rest only the slow bob and ear sway move: a few frames a second do
@@ -286,18 +296,19 @@ class BunnyWidget(QWidget):
         self.puffs = [f for f in self.puffs if f.age < f.life]
         talking = self._level > TALK
         # mouth follows the voice with a quick attack and a flappy wobble
-        target = min(1.0, self._level * 4) if talking else 0.0
+        loud = loudness(self._level)
+        target = 0.3 + 0.7 * loud if talking else 0.0
         if talking:
             target *= 0.65 + 0.35 * abs(math.sin((now - self._t0) * 17))
         self._mouth += (target - self._mouth) * min(1.0, dt * (22 if target > self._mouth else 12))
-        hop = min(1.0, self._level * 5) * 6 if talking else 0.0
+        hop = (0.3 + 0.7 * loud) * 6 if talking else 0.0
         self._bounce += (hop - self._bounce) * min(1.0, dt * 10)
         # notes: a stream while talking, scaled by how loud
         if talking:
-            self._note_debt += dt * (2 + 10 * min(1.0, self._level * 3))
+            self._note_debt += dt * (2 + 10 * loud)
             while self._note_debt >= 1:
                 self._note_debt -= 1
-                self._spawn(min(1.0, self._level * 3))
+                self._spawn(max(0.3, loud))
         elif self.prop == "headphones":
             self._note_debt += dt * 0.7   # something's always playing in his headphones
             if self._note_debt >= 1:
