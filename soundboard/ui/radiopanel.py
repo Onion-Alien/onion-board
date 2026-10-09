@@ -630,8 +630,8 @@ QFrame#stations QPushButton#seg:hover { color:$text_hi; background:$card_hi; }
 QFrame#stations QPushButton#seg:checked { background:$accent; color:$on_accent; }
 QFrame#stations QWidget#segbox { background:$inset; border-radius:9px; }
 QFrame#stations QPushButton#genre { border-radius:12px; padding:3px 10px; font-size:8.5pt;
-    background:$btn; border:1px solid $border; color:$text; }
-QFrame#stations QPushButton#genre:hover { border-color:$border_hi; }
+    background:$btn; border:1px solid transparent; color:$text; }
+QFrame#stations QPushButton#genre:hover { background:$btn_hover; }
 QFrame#stations QPushButton#genre:checked { background:$accent; border-color:$accent;
     color:$on_accent; }
 QFrame#stations QComboBox { background:$card; padding:4px 8px; font-size:9pt; }

@@ -83,7 +83,7 @@ def test_save_video_copies_under_the_title_without_clobbering(tmp_path):
 def test_settings_page_switches_low_data_mode_and_saves_it(window):  # noqa: F811
     d = SettingsDialog(window, "data")
     page = d.tabs.currentWidget().widget()
-    assert {"LOW DATA MODE", "DOWNLOADS", "RADIO", "SOUNDS FROM THE WEB"} <= {
+    assert {"Low data mode", "Downloads", "Radio", "Sounds from the web"} <= {
         lb.text() for lb in page.findChildren(QLabel)}
     assert not d.data_low.isChecked()
     assert not d._data_widgets["video_height"].isEnabled()   # until videos are kept

@@ -383,7 +383,7 @@ class EqPanel(QWidget):
         pv = QVBoxLayout(self)
         pv.setContentsMargins(0, 0, 0, 0)
         pv.setSpacing(8)
-        pv.addWidget(section_label(_("EQUALIZER")))
+        pv.addWidget(section_label(_("Equalizer")))
         row = QHBoxLayout()
         self.chk_on = QCheckBox(_("EQ on"))
         self.chk_on.setChecked(enabled)

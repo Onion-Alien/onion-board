@@ -2,7 +2,7 @@
 (speed, pitch, EQ, boost, reverse and every voice effect, modules' included)."""
 from __future__ import annotations
 
-from PySide6.QtCore import Qt, Signal
+from PySide6.QtCore import Qt, QTimer, Signal
 from PySide6.QtWidgets import (QButtonGroup, QCheckBox, QComboBox, QDialog, QDialogButtonBox,
                                QFormLayout, QHBoxLayout, QLabel, QLineEdit, QPushButton,
                                QScrollArea, QSlider, QTabWidget, QVBoxLayout, QWidget)
@@ -39,7 +39,7 @@ class EffectsPanel(QWidget):
     def __init__(self, fx: dict | None, meta: SoundMeta | None = None):
         super().__init__()
         v = QVBoxLayout(self)
-        v.setContentsMargins(0, 0, 8, 0)
+        v.setContentsMargins(0, 14, 8, 0)   # room under the dialog's tab bar
         v.setSpacing(8)
 
         prow = QHBoxLayout()
@@ -57,7 +57,7 @@ class EffectsPanel(QWidget):
         prow.addWidget(reset)
         v.addLayout(prow)
 
-        v.addWidget(section_label(_("TRIM")))
+        v.addWidget(section_label(_("Trim")))
         peaks, length = original_peaks(meta) if meta is not None else ([], 0.0)
         self.trim = TrimPanel(peaks, length)
         v.addWidget(self.trim)              # in the layout first: shown with no parent,
@@ -65,7 +65,7 @@ class EffectsPanel(QWidget):
         if length <= 0:
             v.addWidget(hint_label(_("Trimming works once the sound has loaded.")))
 
-        v.addWidget(section_label(_("SPEED & PITCH")))
+        v.addWidget(section_label(_("Speed & pitch")))
         self.speed = ParamSlider(SPEED, 1.0)
         self.pitch = ParamSlider(PITCH, 0.0)
         self.tape = QCheckBox(_("Tape mode: speed changes the pitch too (nightcore / slowed)"))
@@ -74,7 +74,7 @@ class EffectsPanel(QWidget):
         for w in (self.speed, self.pitch, self.tape):
             v.addWidget(w)
 
-        v.addWidget(section_label(_("LOUDNESS")))
+        v.addWidget(section_label(_("Loudness")))
         self.boost = ParamSlider(BOOST, 0.0)
         v.addWidget(self.boost)
         self.boost_hint = hint_label("")
@@ -87,7 +87,7 @@ class EffectsPanel(QWidget):
         self.eq.cb_target.hide()
         v.addWidget(self.eq)
 
-        v.addWidget(section_label(_("EFFECTS")))
+        v.addWidget(section_label(_("Effects")))
         self.rows: dict[str, EffectRow] = {}
         for etype, cls in voicefx.REGISTRY.items():
             if etype == "pitch":   # the Pitch slider above does this, better
@@ -200,6 +200,8 @@ class EditDialog(QDialog):
 
         basics = QWidget()
         form = QFormLayout(basics)
+        m = form.contentsMargins()
+        form.setContentsMargins(m.left(), 14, m.right(), m.bottom())   # room under the tabs
         form.setLabelAlignment(Qt.AlignRight)
         self.name = QLineEdit(meta.name)
         form.addRow(_("Name"), self.name)
@@ -298,34 +300,51 @@ class EditDialog(QDialog):
         if tab == "effects":
             self.tabs.setCurrentIndex(1)
 
-        prow = QHBoxLayout()
-        prev = QPushButton(_("Preview (only you hear it)"))
-        icons.set_icon(prev, "headphones")
-
-        def play_preview():
-            release = busy.hold(prev, _("Rendering the effects…"))
-            got = preview_cb(self.meta.id, self.vol.value() / 100, self.effects.fx(),
-                             self.fades(), lambda ok: release(
-                                 _("▶  Playing") if ok else _("Couldn't render it")))
-            if got != "rendering":
-                release(_("Not loaded yet — try again in a moment") if got == "missing"
-                        else _("▶  Playing"), 1200)
-        prev.clicked.connect(play_preview)
-        prow.addWidget(prev)
+        # what the effects add up to, on its own line (hidden when there are none)
         self.fx_note = QLabel()
         self.fx_note.setObjectName("muted")
-        prow.addWidget(self.fx_note, 1)
-        lay.addLayout(prow)
+        self.fx_note.setWordWrap(True)
+        lay.addWidget(self.fx_note)
         self.effects.changed.connect(self._fx_note)
         self._fx_note()
 
+        # one row at the bottom: a headphones icon to preview on the left, the
+        # dialog's own buttons on the right
+        prev = self.btn_preview = QPushButton()
+        prev.setObjectName("iconbutton")
+        prev.setProperty("quiet", True)
+        icons.set_icon(prev, "headphones")
+        prev.setToolTip(_("Preview (only you hear it)"))
+        prev.setAccessibleName(_("Preview (only you hear it)"))
+
+        def play_preview():
+            busy.set_busy(prev, True)
+            self._say(_("Rendering the effects…"), 0)
+
+            def done(ok, ms=1500):
+                busy.set_busy(prev, False)
+                self._say(_("▶  Playing") if ok else _("Couldn't render it"), ms)
+            got = preview_cb(self.meta.id, self.vol.value() / 100, self.effects.fx(),
+                             self.fades(), done)
+            if got != "rendering":
+                busy.set_busy(prev, False)
+                self._say(_("Not loaded yet — try again in a moment") if got == "missing"
+                          else _("▶  Playing"), 1500)
+        prev.clicked.connect(play_preview)
+
         bb = QDialogButtonBox(QDialogButtonBox.Save | QDialogButtonBox.Cancel)
+        bb.button(QDialogButtonBox.Save).setObjectName("primary")   # the one filled button
+        bb.button(QDialogButtonBox.Cancel).setProperty("quiet", True)
         copy = bb.addButton(_("Save as new sound"), QDialogButtonBox.AcceptRole)
         copy.setToolTip(_("Keep this sound as it is and add the edited version as a new pad"))
         copy.clicked.connect(lambda: setattr(self, "as_copy", True))
         bb.accepted.connect(self.accept)
         bb.rejected.connect(self.reject)
-        lay.addWidget(bb)
+        brow = QHBoxLayout()
+        brow.addWidget(prev)
+        brow.addStretch(1)
+        brow.addWidget(bb)
+        lay.addLayout(brow)
         self.setMinimumWidth(500)
         self.resize(540, 640)
 
@@ -357,8 +376,27 @@ class EditDialog(QDialog):
         return self.fade_in.value() / 10, self.fade_out.value() / 10
 
     def _fx_note(self):
+        if getattr(self, "_saying", False):
+            return   # a preview message is up: it puts the summary back when it's done
         s = soundfx.summary(self.effects.fx())
         self.fx_note.setText(_("Effects: {s}", s=s) if s else "")
+        self.fx_note.setVisible(bool(s))
+
+    def _say(self, text: str, ms: int):
+        """A preview message where the effects summary goes; back to the summary after
+        ``ms`` (0: stays until the next message)."""
+        self._saying = True
+        self.fx_note.setText(text)
+        self.fx_note.show()
+        self._said = getattr(self, "_said", 0) + 1
+        if ms:
+            n = self._said
+
+            def back():
+                if n == self._said:
+                    self._saying = False
+                    self._fx_note()
+            QTimer.singleShot(ms, self, back)
 
     def _set_color(self, c):
         self.color = c

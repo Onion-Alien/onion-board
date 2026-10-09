@@ -488,7 +488,7 @@ QFrame#card[interactive="true"] { border:1px solid transparent; }
 QFrame#card[interactive="true"][hovered="true"] { background:$card_hi; border-color:$border_hi; }
 QFrame#card[interactive="true"]:focus { background:$card_hi; border-color:$accent; }
 QFrame#card[interactive="true"][playing="true"] { background:$card_hi; border:2px solid $accent; }
-QLabel#section { color:$section; font-size:8pt; font-weight:700; letter-spacing:0.3px; padding-top:8px;
+QLabel#section { color:$heading; font-size:10pt; font-weight:600; padding-top:8px;
                  qproperty-indent:0; }  /* padding alone makes Qt indent the text 3 px */
 QLabel#section[head="true"] { padding-top:0; }
 QLabel#hint, QLabel#muted { color:$muted; }
@@ -661,9 +661,9 @@ QRadioButton::indicator:checked { image:url("$radio_on"); }
 QRadioButton::indicator:checked:hover { image:url("$radio_on_hover"); }
 QRadioButton::indicator:disabled { image:url("$radio_off"); }
 QRadioButton::indicator:checked:disabled { image:url("$radio_on_off"); }
-QListWidget#settingscategories { background:$panel; border:1px solid $border; outline:0; }
-QListWidget#settingscategories::item { padding:4px; }
-QListWidget#settingscategories::item:selected { background:$accent; color:$on_accent; }
+QListWidget#settingscategories { background:transparent; border:none; outline:0; }
+QListWidget#settingscategories::item { padding:4px; border-radius:8px; }
+QListWidget#settingscategories::item:selected { background:$card_hi; color:$text_hi; }
 QListWidget#settingscategories::item:hover:!selected { background:$inset; }
 QScrollArea, QScrollArea > QWidget > QWidget { background:transparent; }
 QScrollBar:vertical { background:transparent; width:10px; }
@@ -680,7 +680,7 @@ QMenu::item:selected { background:$accent; color:$on_accent; }
 QMenu::item:disabled { color:$faint; }
 QMenu::icon { padding-left:10px; }
 QMenu::separator { height:1px; background:$border; margin:5px 8px; }
-QFrame#tabcard { background:$card_hi; border:1px solid $border; border-radius:10px; margin:3px 4px; }
+QFrame#tabcard { background:$card_hi; border:1px solid transparent; border-radius:10px; margin:3px 4px; }
 QFrame#tabcard:hover { border-color:$accent; background:$btn_hover; }
 QLabel#tabcardpic { background:$inset; border-radius:12px; }
 QLabel#tabcardtitle { font-size:11pt; font-weight:700; color:$text_hi; background:transparent; }
@@ -721,9 +721,9 @@ QSlider#hue::groove:horizontal { height:12px; border-radius:6px; border:1px soli
 QSlider#hue::sub-page:horizontal, QSlider#hue::sub-page:horizontal:disabled { background:transparent; }
 QSlider#hue::handle:horizontal { width:16px; height:16px; margin:-3px 0; border-radius:8px;
     border:2px solid $text_hi; }
-QPlainTextEdit#speechlog { background:$bg; border:1px solid $border; border-radius:8px; padding:8px; }
+QPlainTextEdit#speechlog { background:$bg; border:1px solid transparent; border-radius:8px; padding:8px; }
 
-QFrame#fxcard { background:$card; border:1px solid $border; border-radius:12px; }
+QFrame#fxcard { background:$card; border:1px solid transparent; border-radius:12px; }
 QFrame#fxcard:hover { border-color:$border_hi; }
 QFrame#fxcard[on="true"] { border-color:$accent; }
 QFrame#fxcard[hero="true"] { background:$card; }
@@ -734,10 +734,10 @@ QLabel#fxdesc { color:$muted; font-size:8.5pt; }
 QLabel#fxparam { color:$text; font-size:9pt; }
 QLabel#fxvalue { color:$accent_hi; font-size:9pt; font-weight:700; }
 QLabel#fxend { color:$muted; font-size:7.5pt; }   /* faint was 2.6:1 on some */
-QLabel#fxgroup { color:$section; font-size:8pt; font-weight:700; letter-spacing:0.3px; padding-top:6px; }
+QLabel#fxgroup { color:$text; font-size:9pt; font-weight:600; padding-top:6px; }
 QPushButton#fxreset, QFrame#card QPushButton#fxreset, QFrame#card[roomy="true"] QPushButton#fxreset { background:transparent; border:none; color:$muted; padding:2px 6px; min-height:0; font-size:8pt; }
 QPushButton#fxreset:hover, QFrame#card QPushButton#fxreset:hover, QFrame#card[roomy="true"] QPushButton#fxreset:hover { color:$text; background:transparent; }
-QLabel#pill { background:$inset; border:1px solid $border; border-radius:10px; padding:3px 10px; color:$muted; font-size:8.5pt; font-weight:600; }
+QLabel#pill { background:$inset; border:1px solid transparent; border-radius:10px; padding:3px 10px; color:$muted; font-size:8.5pt; font-weight:600; }
 QLabel#pill[slow="true"] { color:$warn_text; border-color:$warn_text; }
 QLabel#pill[on="true"] { color:$live_text; border-color:$live_border; }
 QPushButton#fold { background:transparent; border:none; color:$muted; padding:3px 6px; font-size:8.5pt; font-weight:600; }
@@ -757,7 +757,7 @@ QFrame#setcard QPushButton#primary { background:$accent; color:$on_accent; borde
 QFrame#setcard QPushButton#power:checked { background:$live; border:1px solid $live_hi; color:$on_live; }
 QFrame#setcard QPushButton#primary:hover { background:$accent_hover; }
 QTableView, QFrame#setcard QTableView { background:$card; alternate-background-color:$card_hi;
-    color:$text; border:1px solid $border; border-radius:6px;
+    color:$text; border:1px solid transparent; border-radius:6px;
     selection-background-color:$accent; selection-color:$on_accent; }
 QTableView::item { padding:5px 8px; border:none; }
 QTableView::item:hover { background:$btn_hover; }
@@ -767,7 +767,7 @@ QHeaderView::section, QFrame#setcard QHeaderView::section { background:$btn; col
     padding:8px; border:none; border-bottom:1px solid $border; font-weight:600; }
 QTableCornerButton::section { background:$btn; border:none; }
 QFrame#setcard QPlainTextEdit { background:$card; color:$text;
-    border:1px solid $border; border-radius:6px; padding:8px;
+    border:1px solid transparent; border-radius:6px; padding:8px;
     selection-background-color:$accent; selection-color:$on_accent; }
 QProgressBar#downloadprogress, QFrame#card QProgressBar#downloadprogress {
     background:$groove; border:none; border-radius:2px; }
@@ -1003,6 +1003,16 @@ def _texture_url(kind: str, base: str) -> str:
     return path.as_posix()
 
 
+# Themes whose controls and cards keep an outline at rest: the others draw buttons,
+# boxes and cards as flat fills, which in High Contrast (black on black) vanish.
+OUTLINED = {"High Contrast"}
+OUTLINE_STYLE = Template("""
+QPushButton, QPushButton#danger, QLineEdit, QComboBox, QAbstractSpinBox,
+QFrame#chip, QFrame#card QFrame#chip, QFrame#fxcard, QLabel#pill { border:1px solid $border; }
+QFrame#card, QFrame#setcard { border:1px solid $border; }
+""")
+
+
 def is_light(name: str | None = None) -> bool:
     """Whether theme `name` (default: the current one) has a light background."""
     c = QColor(THEMES.get(name or current_name, THEMES[DEFAULT])["bg"])
@@ -1012,6 +1022,9 @@ def is_light(name: str | None = None) -> bool:
 def stylesheet(name: str | None = None) -> str:
     tk = tokens(name)
     tk.setdefault("font", FONT)
+    outlined = (name or current_name) in OUTLINED
+    # card titles in the text colour; High Contrast keeps its yellow to scan by
+    tk["heading"] = tk["section"] if outlined else tk["text_hi"]
     tk["check"] = _check_url(tk["on_accent"])
     tk["check_off"] = _check_url(tk["muted"])   # ticked but greyed out: on $inset
     tk["radio"] = _radio_url(tk["off"], tk["card"])
@@ -1028,6 +1041,8 @@ def stylesheet(name: str | None = None) -> str:
         tk["left" + key] = _chevron_url(colour, 10, False, side="left")
         tk["right" + key] = _chevron_url(colour, 10, False, side="right")
     css = STYLE.substitute(tk)
+    if outlined:
+        css += OUTLINE_STYLE.substitute(tk)
     if tk.get("texture") and (url := _texture_url(tk["texture"], tk["panel"])):
         css += ("QFrame#card, QFrame#transport, QFrame#deck, QFrame#setcard "
                 f'{{ background-image:url("{url}"); }}\n')

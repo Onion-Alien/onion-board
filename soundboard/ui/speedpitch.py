@@ -186,7 +186,7 @@ class SpeedPitchButton(QPushButton):
         outer, v = v, QVBoxLayout(left_w)     # the speed & pitch column
         v.setContentsMargins(0, 0, 0, 0)
         v.setSpacing(8)
-        v.addWidget(section_label(_("SPEED & PITCH") if self.has_speed else _("PITCH")))
+        v.addWidget(section_label(_("Speed & pitch") if self.has_speed else _("Pitch")))
         self.speed = self._slider(SPEED, 1.0)
         self.pitch = self._slider(PITCH, 0.0)
         v.addWidget(self.speed)
@@ -261,7 +261,7 @@ class SpeedPitchButton(QPushButton):
         v = QVBoxLayout(box)
         v.setContentsMargins(0, 0, 0, 0)
         v.setSpacing(8)
-        v.addWidget(section_label(_("EFFECTS")))
+        v.addWidget(section_label(_("Effects")))
         self.fx = {}
         for q in livefx.PARAMS:
             s = self._slider(q, q.default, FX_NAME_W)

@@ -62,16 +62,16 @@ def test_support_opens_the_project_page_not_an_address_in_the_app(window, monkey
 
 
 def test_each_page_opens_by_name_and_holds_its_cards(window):  # noqa: F811
-    where = {"privacy": ("WHAT GOES ONLINE", "SOUNDS AND RADIO", "VOICES",
-                         "UPDATES AND ADD-ONS", "SETUP DOWNLOADS", "NETWORK INFORMATION"),
-             "connection": ("CONNECTION", "NETWORK ACTIVITY"),
-             "audio": ("DEVICES", "YOUR MIC", "WHO'S LISTENING", "AUDIO BUFFERING"),
-             "hotkeys": ("HOTKEY SOUNDS",),
-             "general": ("WINDOW", "RUNNING IN THE BACKGROUND", "BACKUP"),
-             "help": ("ADD-ONS", "FEEDBACK AND PROBLEMS",
-                         "SUPPORT ONION BOARD"),
-             "updates": ("APP UPDATES", "DOWNLOADER (YT-DLP)"),
-             "remote": ("REMOTE CONTROL (STREAM DECK, SCRIPTS)", "SET IT UP THE EASY WAY")}
+    where = {"privacy": ("What goes online", "Sounds and radio", "Voices",
+                         "Updates and add-ons", "Setup downloads", "Network information"),
+             "connection": ("Connection", "Network activity"),
+             "audio": ("Devices", "Your mic", "Who's listening", "Audio buffering"),
+             "hotkeys": ("Hotkey sounds",),
+             "general": ("Window", "Running in the background", "Backup"),
+             "help": ("Add-ons", "Feedback and problems",
+                         "Support Onion Board"),
+             "updates": ("App updates", "Downloader (yt-dlp)"),
+             "remote": ("Remote control (Stream Deck, scripts)", "Set it up the easy way")}
     for page, titles in where.items():
         d = SettingsDialog(window, page)
         shown = {lb.text() for lb in d.tabs.currentWidget().widget().findChildren(QLabel)}
@@ -95,7 +95,7 @@ def test_the_cog_builds_only_the_page_it_opens_and_the_rest_when_shown(window): 
     assert d.size().height() >= 600   # sized for the tall pages it hasn't built yet
     d.categories.setCurrentRow(d._page_keys.index("updates"))
     page = d.tabs.currentWidget().widget()
-    assert page is not None and "APP UPDATES" in {lb.text() for lb in page.findChildren(QLabel)}
+    assert page is not None and "App updates" in {lb.text() for lb in page.findChildren(QLabel)}
     assert not d.upd_btn.isEnabled()   # greyed by Privacy, though that page isn't built
     d.close()
     d = SettingsDialog(window, "nonsense", lazy=True)
@@ -358,7 +358,7 @@ def test_about_shows_the_version_and_only_opens_pages(window, monkeypatch):  # n
     d = SettingsDialog(window, "about")
     page = d.tabs.currentWidget().widget()
     shown = {lb.text() for lb in page.findChildren(QLabel)}
-    assert {"ONION BOARD", "GET IN TOUCH", "A NOTE FROM ME", "THE BORING BIT"} <= shown
+    assert {"Onion Board", "Get in touch", "A note from me", "The boring bit"} <= shown
     assert d.about_version.text() == f"Version {version_text()}"
     for b in page.findChildren(QPushButton):
         b.click()
@@ -371,7 +371,7 @@ def test_live_tabs_comes_first_on_appearance_tint_or_dot(window, qapp):  # noqa:
     d = SettingsDialog(window, "appearance")
     assert d.live_green.isChecked() == window.cfg.live_tab_green
     card = d.live_green.parentWidget()
-    assert card.findChild(QLabel).text() == "LIVE TABS"
+    assert card.findChild(QLabel).text() == "Live tabs"
     # right under the language, above the themes
     assert card.parentWidget().layout().itemAt(1).widget() is card
     d.live_dot.click()
@@ -453,7 +453,7 @@ def test_language_comes_first_on_appearance_and_opens_the_picker(window, monkeyp
     card = btn.parentWidget()
     assert card.parentWidget().layout().itemAt(0).widget() is card    # first on the page
     # the title in Windows' language too: found by someone who can't read English
-    assert card.findChild(QLabel).text() == "LANGUAGE · SPRACHE"
+    assert card.findChild(QLabel).text() == "Language · Sprache"
     assert btn.text().startswith("English") and not d.lang_restart.isVisibleTo(d)
     seen = []
 

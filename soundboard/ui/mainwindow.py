@@ -730,9 +730,9 @@ class MainWindow(QMainWindow):
         self._paint_logo()
 
         # only a sign: the one switch is "Hear what they hear" in the mixer at the bottom
-        self.mic_banner = BannerButton(_("YOU'RE HEARING YOUR MIC OUTPUT  —  mic + sounds, "
+        self.mic_banner = BannerButton(_("You're hearing your mic output  —  mic + sounds, "
                                          "exactly what others hear"),
-                                       _("HEARING YOUR MIC OUTPUT"))
+                                       _("Hearing your mic output"))
         self.mic_banner.setObjectName("micbanner")
         self.mic_banner.setFocusPolicy(Qt.NoFocus)
         self.mic_banner.hide()
@@ -1570,7 +1570,7 @@ class MainWindow(QMainWindow):
         page.setWidget(inner)
 
         # ---- how it works + the one thing to set in Discord
-        howcard, cv = card(_("YOUR VIRTUAL MIC"), roomy=True)
+        howcard, cv = card(_("Your virtual mic"), roomy=True)
         self.how_title = cv.itemAt(0).widget()   # renamed when not using the cable
         self.flow_mic = QLabel()
         self.flow_snd = QLabel(_("Your sounds, radio and voice effects"))
@@ -1650,7 +1650,7 @@ class MainWindow(QMainWindow):
         self.btn_rescan.clicked.connect(lambda: self.rescan_with_feedback(self.btn_rescan))
         icons.set_icon(self.btn_rescan, "reload")
         cv.addWidget(self.btn_rescan, 0, Qt.AlignLeft)
-        helpcard, hv = card(_("CONNECT YOUR CHAT"),
+        helpcard, hv = card(_("Connect your chat"),
                             _("Choose your app for the recommended microphone settings."),
                             roomy=True)
         chat = Flow(gap=8)   # at their own size, wrapping, not five full-width bars
@@ -1682,7 +1682,7 @@ class MainWindow(QMainWindow):
         lcol.addWidget(helpcard)
 
         # ---- devices
-        devcard, av = card(_("DEVICES"), _("Already set up for you — only change these if "
+        devcard, av = card(_("Devices"), _("Already set up for you — only change these if "
                                            "something's wrong."), roomy=True)
         grid = QGridLayout()
         grid.setHorizontalSpacing(10)
@@ -1738,7 +1738,7 @@ class MainWindow(QMainWindow):
         lcol.addWidget(devcard)
 
         # ---- who's listening: shape the sounds for the voice chat on the other end
-        destcard, dv = card(_("WHO'S LISTENING"), _("Where people hear you: a game, a voice "
+        destcard, dv = card(_("Who's listening"), _("Where people hear you: a game, a voice "
                                                     "chat app, or a stream. Your sounds are "
                                                     "shaped to come through clearly."),
                             roomy=True)
@@ -1748,7 +1748,7 @@ class MainWindow(QMainWindow):
         lcol.addStretch(1)
 
         # ---- test
-        testcard, tv = card(_("TEST IT"), _("Talk while a sound plays. Records what goes out "
+        testcard, tv = card(_("Test it"), _("Talk while a sound plays. Records what goes out "
                                             "to others (what Discord, the game or OBS "
                                             "receives), plays it back, and tells you if your "
                                             "voice + sounds are in it."), roomy=True)
@@ -1774,7 +1774,7 @@ class MainWindow(QMainWindow):
         ev.addWidget(self.eq)
         rcol.addWidget(eqcard)
         rcol.addWidget(destcard)
-        utilitycard, uv = card(_("VOLUME & SHORTCUTS"), roomy=True)
+        utilitycard, uv = card(_("Volume & shortcuts"), roomy=True)
         self.chk_level = QCheckBox(_("Level volumes (all sounds equally loud)"))
         self.chk_level.setChecked(c.level_volumes)
         self.chk_level.toggled.connect(self.on_level_toggle)
@@ -2292,8 +2292,8 @@ class MainWindow(QMainWindow):
         cb.blockSignals(False)
         for v in list(getattr(self, "also_views", ())):   # (not built yet at start)
             v.rebuild()
-        self.how_title.setText(_("YOUR VIRTUAL MIC") if route == "cable" else
-                               _("YOUR MIC") if route == "mic" else _("WHERE YOUR SOUNDS GO"))
+        self.how_title.setText(_("Your virtual mic") if route == "cable" else
+                               _("Your mic") if route == "mic" else _("Where your sounds go"))
 
     def _main_name(self) -> str | None:
         """The device that gets what others hear: none when sending nowhere, and

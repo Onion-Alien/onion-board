@@ -272,7 +272,7 @@ class AiVoiceBrowser(QDialog):
         sections = self._sections()
         for title, voices in sections:
             if title:
-                grid.addWidget(section_label(title.upper()), r, 0, 1, 2)
+                grid.addWidget(section_label(title), r, 0, 1, 2)
                 r += 1
             for i, vo in enumerate(voices):
                 c = VoiceCard(vo, vo["id"] == self.current, can_hear)
@@ -458,6 +458,7 @@ class AiVoiceEditor(QDialog):
         hrow.addWidget(self.status, 1)
         lay.addLayout(hrow)
         self.box = QDialogButtonBox(QDialogButtonBox.Save | QDialogButtonBox.Cancel)
+        self.box.button(QDialogButtonBox.Save).setObjectName("primary")
         self.box.accepted.connect(self.accept)
         self.box.rejected.connect(self.reject)
         lay.addWidget(self.box)

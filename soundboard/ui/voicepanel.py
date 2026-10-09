@@ -532,7 +532,7 @@ class VoiceFxPanel(QWidget):
         v = QVBoxLayout(self)
         v.setContentsMargins(0, 0, 0, 0)
         v.setSpacing(12)
-        self.title = section_label(_("VOICE CHANGER"))
+        self.title = section_label(_("Voice changer"))
         v.addWidget(self.title)
         v.addWidget(hint_label(_("Change your mic live for whoever you send sounds to (Discord, "
                                  "a game, OBS). Pick a voice to turn it on, then use Hear what "
@@ -1471,7 +1471,7 @@ class SpeechPanel(QWidget):
         v.setSpacing(12)
 
         # ---- live voice to speech
-        self.title = section_label(_("SPEAK ANOTHER LANGUAGE"))
+        self.title = section_label(_("Speak another language"))
         v.addWidget(self.title)
         self.lbl_intro = hint_label(_(
             "Talk in English and others hear another language. The AI voice or the voice "
@@ -1611,7 +1611,7 @@ class SpeechPanel(QWidget):
         v.addWidget(self.start_box)
         # everything the voice was asked to say, live or typed, newest at the bottom
         lrow = QHBoxLayout()
-        lrow.addWidget(section_label(_("WHAT THE VOICE SAID")))
+        lrow.addWidget(section_label(_("What the voice said")))
         lrow.addStretch(1)
         b_clear = QPushButton(_("Clear"))
         b_clear.setMinimumHeight(32)
@@ -1706,7 +1706,7 @@ class SpeechPanel(QWidget):
         ov = QVBoxLayout(self.custom_box)
         ov.setContentsMargins(0, 0, 0, 0)
         ov.setSpacing(8)
-        self.custom_box.title = section_label(_("CUSTOM VOICES"))   # the card's head
+        self.custom_box.title = section_label(_("Custom voices"))   # the card's head
         ov.addWidget(hint_label(_("Use a TTS server running on your PC (Kokoro, AllTalk, any "
                                   "OpenAI-style one) or drop voice packs (Piper) into the "
                                   "voices folder. They join the Voice list above.")))
@@ -1959,6 +1959,7 @@ class SpeechPanel(QWidget):
         err.hide()
         form.addRow(err)
         btns = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
+        btns.button(QDialogButtonBox.Ok).setObjectName("primary")
         form.addRow(btns)
         btns.rejected.connect(dlg.reject)
 
@@ -2555,7 +2556,7 @@ class ModulesList(QWidget):
         v = QVBoxLayout(self)
         v.setContentsMargins(0, 0, 0, 0)
         v.setSpacing(12)
-        self.title = section_label(_("ADD-ONS"))
+        self.title = section_label(_("Add-ons"))
         v.addWidget(self.title)
         self.list = QVBoxLayout()
         self.list.setSpacing(10)

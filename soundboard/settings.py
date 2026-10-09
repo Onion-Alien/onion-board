@@ -559,7 +559,7 @@ class SettingsDialog(QDialog):
         for i in range(self.categories.count()):
             item = self.categories.item(i)
             name = item.data(Qt.UserRole)
-            item.setIcon(icons.icon(name, selected="on_accent"))
+            item.setIcon(icons.icon(name, selected="text_hi"))
 
     # ------------------------------------------------------------------ pages
     @staticmethod
@@ -618,7 +618,7 @@ class SettingsDialog(QDialog):
         v = QVBoxLayout(card)
         v.setContentsMargins(14, 12, 14, 14)
         v.setSpacing(8)
-        t = QLabel(title.upper())
+        t = QLabel(title)
         t.setObjectName("section")
         v.addWidget(t)
         if hint:
