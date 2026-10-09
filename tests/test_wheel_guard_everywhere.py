@@ -4,8 +4,9 @@ Scrolling down a page and passing over one used to change it (the Voice tab's
 "Speak in" language jumped while the user was just scrolling). The guard is
 installed per widget (wheelguard.py), so this walks the real window and Settings
 and names any control a new panel forgot to guard."""
+from PySide6.QtCore import QEvent
 from PySide6.QtWidgets import (QAbstractScrollArea, QAbstractSlider, QAbstractSpinBox,
-                               QComboBox, QScrollBar, QWidget)
+                               QApplication, QComboBox, QScrollBar, QWidget)
 
 from soundboard.settings import SettingsDialog
 from test_mainwindow import window  # noqa: F401  (the real MainWindow fixture)
@@ -39,3 +40,5 @@ def test_settings_controls_ignore_the_wheel(window):  # noqa: F811
         assert _unguarded(d) == []
     finally:
         d.close()
+        d.deleteLater()   # every page was built: don't leave them alive for later tests
+        QApplication.sendPostedEvents(None, QEvent.DeferredDelete)
