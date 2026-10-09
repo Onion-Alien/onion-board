@@ -2915,8 +2915,12 @@ class SettingsDialog(QDialog):
         row.addWidget(key, 1, 1)
         show = QPushButton(_("Show"))
         show.setCheckable(True)
-        show.toggled.connect(lambda b: key.setEchoMode(QLineEdit.Normal if b
-                                                       else QLineEdit.Password))
+
+        def show_key(b: bool):
+            key.setEchoMode(QLineEdit.Normal if b else QLineEdit.Password)
+            show.setText(_("Hide") if b else _("Show"))
+
+        show.toggled.connect(show_key)
         row.addWidget(show, 1, 2)
         new = QPushButton(_("New key"))
         new.setToolTip(_("Make a new key: anything using the old one stops working"))
@@ -2944,6 +2948,8 @@ class SettingsDialog(QDialog):
 
         def refresh(err: str = ""):
             key.setText(cfg.api_token)
+            if not cfg.api_enabled:
+                show.setChecked(False)   # turning it off hides the key again
             for w in (port, key, show, new, copy):
                 w.setEnabled(cfg.api_enabled)
             if not cfg.api_enabled:
