@@ -26,7 +26,8 @@ without (`step/added-radio-tab`, `-apps-`, `-triggers-`): sent when it happens, 
 a tab opened after the first daily count waits a day, and most people trying the app
 never send that one.
 And when someone answers *Send feedback*'s "What would you improve?", their picks
-(`improve/sounds`: names from IMPROVE only), and what they typed under Other as dashed
+(`improve/sounds`: names from IMPROVE only, sent with a one-off random session, not this
+PC's ID), and what they typed under Other as dashed
 words (`improve/other/more-anime-sounds`), with email addresses, links and long numbers
 taken out first.
 Nothing else: no name, sounds, settings, devices, games or IP address in the message
@@ -471,7 +472,9 @@ def other_tag(text: str) -> str:
 def improve(cfg, picks, other: str = "") -> bool:
     """The feedback box's "What would you improve?" picks, sent now as `improve/<name>`
     (names from IMPROVE only), and what was typed under Other as `improve/other/<words>`
-    (other_tag). False when nothing can be sent (usage count off, offline, running from
+    (other_tag). Anonymous: they go with a one-off random session made for this send,
+    never this PC's stats_id, so they can't be linked to the daily count or to each
+    other. False when nothing can be sent (usage count off, offline, running from
     source)."""
     events = [f"improve/{k}" for k in IMPROVE if k in picks]
     tag = other_tag(other) if "other" in picks else ""
@@ -479,7 +482,7 @@ def improve(cfg, picks, other: str = "") -> bool:
         events = [e if e != "improve/other" else f"improve/other/{tag}" for e in events]
     if not events or not enabled() or not net.allowed(FEATURE):
         return False
-    sid = install_id(cfg)
+    sid = uuid.uuid4().hex   # not install_id(cfg): the box says it isn't linked to this PC
     netlog.cause(FEATURE, "Anonymous usage count (feedback picks)")
     threading.Thread(target=send, args=([_event(e, sid) for e in events],), daemon=True,
                      name="usage-count").start()
