@@ -28,7 +28,8 @@ without (`step/added-radio-tab`, `-apps-`, `-triggers-`): sent when it happens, 
 a tab opened after the first daily count waits a day, and most people trying the app
 never send that one.
 And when someone answers *Send feedback*'s "What would you improve?", their picks
-(`improve/sounds`: names from IMPROVE only), and what they typed under Other as dashed
+(`improve/sounds`: names from IMPROVE only, sent with a one-off random session, not this
+PC's ID), and what they typed under Other as dashed
 words (`improve/other/more-anime-sounds`), with email addresses, links and long numbers
 taken out first.
 Nothing else: no name, sounds, settings, devices, games or IP address in the message
@@ -385,19 +386,38 @@ def uninstall_event() -> str:
     return f"uninstall/{__version__}"
 
 
+OPT_OUT_WHERE = ("installer", "settings")
+OPT_OUT_TIMEOUT_S = 5   # the installer waits on it: never long
+
+
+def opt_out(where: str) -> bool:
+    """Count me in switched from on to off (`where`: the installer's box or Settings):
+    one last "opt-out/<where>" so we know how many people aren't counted, then nothing
+    ever again. No random ID, no tag, no session: it can't be tied to anything they
+    sent before. Only while the count is still allowed (call it before switching it
+    off). Waits for the answer: call it off the UI thread."""
+    if where not in OPT_OUT_WHERE or not enabled() or not net.allowed(FEATURE):
+        return False
+    name = f"opt-out/{where}"
+    netlog.cause(FEATURE, f"Anonymous usage count ({name}, the last one)")
+    return send([{"path": name, "title": name, "event": True}],
+                timeout=OPT_OUT_TIMEOUT_S, no_sessions=True)
+
+
 def update_event(to: str) -> str:
     """The event for *Update now* from this version to `to`."""
     return f"update-now/{__version__}-to-{to}"
 
 
-def send(payload: list[dict]) -> bool:
+def send(payload: list[dict], timeout: float = TIMEOUT_S, no_sessions: bool = False) -> bool:
     """POST them to the counter. True if it took them. Call off the UI thread."""
-    body = json.dumps({"hits": payload}).encode("utf-8")
+    body = json.dumps({"hits": payload, "no_sessions": True} if no_sessions
+                      else {"hits": payload}).encode("utf-8")
     req = urllib.request.Request(ENDPOINT, data=body, method="POST", headers={
         "Authorization": f"Bearer {TOKEN}", "Content-Type": "application/json",
         "User-Agent": "OnionBoard"})
     try:
-        with net.urlopen(req, timeout=TIMEOUT_S, feature=FEATURE) as r:
+        with net.urlopen(req, timeout=timeout, feature=FEATURE) as r:
             return 200 <= r.status < 300
     except Exception as e:  # noqa: BLE001 - offline, switched off meanwhile, counter down
         log.info("usage count not sent: %s", e)
@@ -482,7 +502,9 @@ def other_tag(text: str) -> str:
 def improve(cfg, picks, other: str = "") -> bool:
     """The feedback box's "What would you improve?" picks, sent now as `improve/<name>`
     (names from IMPROVE only), and what was typed under Other as `improve/other/<words>`
-    (other_tag). False when nothing can be sent (usage count off, offline, running from
+    (other_tag). Anonymous: they go with a one-off random session made for this send,
+    never this PC's stats_id, so they can't be linked to the daily count or to each
+    other. False when nothing can be sent (usage count off, offline, running from
     source)."""
     events = [f"improve/{k}" for k in IMPROVE if k in picks]
     tag = other_tag(other) if "other" in picks else ""
@@ -490,7 +512,7 @@ def improve(cfg, picks, other: str = "") -> bool:
         events = [e if e != "improve/other" else f"improve/other/{tag}" for e in events]
     if not events or not enabled() or not net.allowed(FEATURE):
         return False
-    sid = install_id(cfg)
+    sid = uuid.uuid4().hex   # not install_id(cfg): the box says it isn't linked to this PC
     netlog.cause(FEATURE, "Anonymous usage count (feedback picks)")
     threading.Thread(target=send, args=([_event(e, sid) for e in events],), daemon=True,
                      name="usage-count").start()

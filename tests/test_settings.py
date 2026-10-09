@@ -508,3 +508,45 @@ def test_search_hides_cards_and_pages_without_the_word(window, qapp):  # noqa: F
         assert all(d.categories.item(i).isHidden() for i in range(d.categories.count()))
     finally:
         d.close()
+
+
+def test_switching_count_me_in_off_sends_one_opt_out_first(window, qapp, monkeypatch):  # noqa: F811
+    """Count me in on -> off: the anonymous opt-out goes while the count is still
+    allowed, and the switch takes hold right after; other switches never send it."""
+    from soundboard import usage
+    calls = []
+    monkeypatch.setattr(usage, "opt_out",
+                        lambda where: calls.append((where, net.allowed("usage_stats"))))
+    monkeypatch.setattr(window, "_save_later", lambda: None)
+    window.cfg.net_off = []
+    net.configure_features()
+    d = SettingsDialog(window)
+    try:
+        box = d.net_boxes["usage_stats"]
+        box.setChecked(False)
+        assert process_events(qapp, lambda: not net.allowed("usage_stats"))
+        assert calls == [("settings", True)] and "usage_stats" in window.cfg.net_off
+        d.net_boxes["radio"].setChecked(False)   # other switches never send it
+        assert calls == [("settings", True)]
+    finally:
+        d.close()
+        net.configure_features()
+
+
+def test_count_me_in_eye_opens_the_table(window):  # noqa: F811
+    """Count me in's hint stays short; its eye opens the table of what's sent, with
+    an example and a reason on every row, and it never touches the switch."""
+    from soundboard.ui import countdialog
+    d = SettingsDialog(window)
+    try:
+        box = d.net_boxes["usage_stats"]
+        was = box.isChecked()
+        assert len(d.NET_HINTS["usage_stats"]) < 120
+        d.count_eye.click()
+        dlg = d.count_dialog
+        assert isinstance(dlg, countdialog.CountDialog) and dlg.isVisible()
+        assert all(what and example and why for what, example, why in countdialog.rows())
+        assert box.isChecked() == was
+        dlg.close()
+    finally:
+        d.close()

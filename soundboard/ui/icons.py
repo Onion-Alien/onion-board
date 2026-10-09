@@ -537,7 +537,8 @@ SHAPES = {
     "shield": _shield, "info": _info,
     "next": _next, "edit": _edit, "trash": _trash, "keyboard": _keyboard,
     "palette": _palette, "gamepad": _gamepad, "image": _image, "video": _video, "radio": _radio,
-    "apps": _apps, "triggers": _eye, "fold": _chevron("right"), "fold_open": _chevron("down"),
+    "apps": _apps, "triggers": _eye, "eye": _eye,
+    "fold": _chevron("right"), "fold_open": _chevron("down"),
 }
 
 
