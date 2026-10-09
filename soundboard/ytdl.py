@@ -675,7 +675,7 @@ def _ydl():
         try:
             import yt_dlp
         except ImportError as e:
-            raise FetchError(_("The downloader (yt-dlp) isn't installed — "
+            raise FetchError(_("The downloader (yt-dlp) isn't installed, "
                                "Settings → Updates → Reset downloader.")) from e
         yield yt_dlp
 
@@ -786,9 +786,9 @@ def _extract(target: str, opts: dict) -> dict:
 def _check(info: dict) -> dict:
     """Refuse what isn't one sound."""
     if info.get("_type") == "playlist":
-        raise DownloadError(_("That's a playlist — open one video and try again."))
+        raise DownloadError(_("That's a playlist: open one video and try again."))
     if info.get("is_live"):
-        raise DownloadError(_("Can't add a live stream — use Record instead."))
+        raise DownloadError(_("Can't add a live stream, use Record instead."))
     return info
 
 

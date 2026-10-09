@@ -31,7 +31,7 @@ from soundboard.speech.aivoice import AiVoiceController
 from soundboard.speech.live import SpeechController, clean_settings
 from soundboard.ui import appstate, art, busy, icons
 from soundboard.ui.panel import (Flow, UndoBar, VolumeControl, bar, capped, card, hint_label,
-                                 icon_label, section_label, vsep)
+                                 icon_label, section_label, steady_number, vsep)
 from soundboard.ui.responsive import FitWidth
 from soundboard.ui.widgets import Meter
 from soundboard.wheelguard import no_wheel
@@ -491,7 +491,7 @@ class EffectRow(QFrame):
 
 POWER_TEXT = {False: _("Voice changer is OFF"), True: _("Voice changer is ON")}
 POWER_SHORT = {False: _("Voice changer is OFF"),
-               True: _("ON  —  everyone hears it")}   # narrow
+               True: _("ON: everyone hears it")}   # narrow
 VOICE_ICONS = {"Walkie-talkie": "radio", "Old telephone": "speech",
                "Megaphone": "volume", "Stadium announcer": "volume",
                "Podcast voice": "mic", "Demon": "voice", "Ghost": "voice",
@@ -688,6 +688,8 @@ class VoiceFxPanel(QWidget):
         srow.addWidget(self.btn_bin)
         self.delay = QLabel()
         self.delay.setObjectName("pill")
+        steady_number(self.delay, _("{ms} ms delay", ms="000"))
+        self.delay.setAlignment(Qt.AlignCenter)
         srow.addWidget(self.delay)
         self.hero_box = QVBoxLayout()
         self.hero_box.setSpacing(10)
@@ -1989,7 +1991,7 @@ class SpeechPanel(QWidget):
         btns.accepted.connect(ok)
         if dlg.exec() == QDialog.Accepted:
             self.changed.emit(dict(self.s))
-            busy.toast(self, _("✓ Saved “{name}” — loading its voices…",
+            busy.toast(self, _("✓ Saved “{name}”: loading its voices…",
                                name=html.escape(ed_name.text().strip() or "Voice server")),
                        "ok")
             self._recheck_voices_asked()

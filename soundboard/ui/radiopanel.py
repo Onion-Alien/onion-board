@@ -388,7 +388,7 @@ class NowPlaying(QWidget):
             p.setPen(QColor(t["muted"]))
             p.setFont(f)
             p.drawText(r.adjusted(10, 0, -4, 0), Qt.AlignLeft | Qt.AlignVCenter,
-                       p.fontMetrics().elidedText(_("Nothing playing — click a station"),
+                       p.fontMetrics().elidedText(_("Nothing playing: click a station"),
                                                   Qt.ElideRight, int(r.width()) - 14))
             p.end()
             return
@@ -566,7 +566,7 @@ class RadioTab(QWidget):
         self.btn_rec = QPushButton(_("Record"))
         self.btn_rec.setObjectName("rec")
         self.btn_rec.setCheckable(True)
-        self.btn_rec.setToolTip(_("Record the radio. Click again to stop — the clip is "
+        self.btn_rec.setToolTip(_("Record the radio. Click again to stop and the clip is "
                                   "added to your Sounds."))
         icons.set_icon(self.btn_rec, "record", "#ff4d4f", "#ffffff", size=14)
         self.btn_rec.toggled.connect(self._on_rec)
@@ -965,7 +965,7 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
             stale = getattr(self.dir, "globe_stale", "")
             self._refresh_info(
                 f"<span style='color:{theme.status('warn')}'>"
-                + _("Couldn't reach the station directory — showing the saved list.")
+                + _("Couldn't reach the station directory, showing the saved list.")
                 + "</span>" if stale else
                 f"<span style='color:{theme.status('ok')}'>✓ "
                 + ngettext("Station list updated: {n} station.",
@@ -1142,7 +1142,7 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
         if not stations:
             if self._query:
                 empty = (_("Searching…") if self._results is None else
-                         _("Search failed — press Enter to try again.") if self._search_failed
+                         _("Search failed: press Enter to try again.") if self._search_failed
                          else _("No stations found."))
             elif source and self.filters_on():
                 empty = _("No stations match these filters.\nTry another genre or country.")
@@ -1263,7 +1263,7 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
 
     def live_tip(self) -> str:
         """The "● ON" line for the Radio tab's tooltip while a station plays."""
-        return ("● ON: a station is playing — others hear it" if self.engine.radio_live
+        return ("● ON: a station is playing, others hear it" if self.engine.radio_live
                 else "● ON: a station is playing (only you hear it)")
 
     def _report_active(self):
@@ -1343,7 +1343,7 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
 
     def _no_stations_text(self) -> str:
         if self._globe_error:
-            return _("Can't reach the station directory — press ↻ to try again.")
+            return _("Can't reach the station directory, press ↻ to try again.")
         return _("Finding stations…") if self._started else ""
 
     def _refresh_info(self, msg: str = ""):
@@ -1356,15 +1356,15 @@ QFrame#stations QFrame#rule { background:$border; max-height:1px; border:none; }
         st, state = self.player.station, self.player.status
         if st is None:
             n = len(self._globe_list)
-            text = (ngettext("{n} popular station — click a dot on the map, or search. "
+            text = (ngettext("{n} popular station: click a dot on the map, or search. "
                              "Click a station to play it.",
-                             "{n} popular stations — click a dot on the map, or search. "
+                             "{n} popular stations: click a dot on the map, or search. "
                              "Click a station to play it.", n, n=f"{n:,}") if n else
                     self._no_stations_text())
             if not n and self._globe_error:
                 red = theme.status("error")
                 text = (f"<span style='color:{red}'>"
-                        + _("Can't reach the station directory ({error}) — press ↻ to try "
+                        + _("Can't reach the station directory ({error}), press ↻ to try "
                             "again.", error=html.escape(self._globe_error)) + "</span>")
         else:
             name = html.escape(st.name)

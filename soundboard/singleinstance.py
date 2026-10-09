@@ -56,7 +56,7 @@ def claim_single_instance() -> bool:
             from PySide6.QtWidgets import QMessageBox
             QMessageBox.information(
                 None, "Onion Board is already running",
-                "Onion Board is already open — look for its icon in the taskbar tray "
+                "Onion Board is already open. Look for its icon in the taskbar tray "
                 "(the ^ arrow by the clock).\n\nIf you can't find it, end “Onion Board” "
                 "in Task Manager and start it again.")
         except Exception:  # noqa: BLE001

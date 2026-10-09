@@ -436,7 +436,7 @@ class AiVoicePanel(QWidget):
 
         def progress(done: int, total: int):
             if total:
-                busy.emit(self._install_line, _("downloading: {percent} % of {size} MB",
+                busy.emit(self._install_line, _("downloading: {percent}% of {size} MB",
                                                 percent=done * 100 // total,
                                                 size=f"{total / 1e6:.0f}"))
 

@@ -93,7 +93,7 @@ NOTE = _("Hey, thanks for actually using this. Onion Board started because every
           "nights and a lot of testing, so if something's broken, ugly or confusing, tell "
           "me. Honestly. I'd way rather hear \"this part is cooked\" than have you quietly "
           "uninstall it.\n\nIt's free and it's staying free. Have fun with it, don't be a "
-          "menace with it, and go make your friends jump in voice chat.\n\n— OnionAlien")
+          "menace with it, and go make your friends jump in voice chat.\n\nOnionAlien")
 # Plain words, not a contract: the LICENSE file is the real terms.
 DISCLAIMER = _(
     "Onion Board is provided as is, with no warranty: use it at your own risk (the "
@@ -231,7 +231,7 @@ class HotkeyDialog(QDialog):
             warn = theme.status("warn")
             self.hint.setText(_("<span style='color:{warn}'><b>{key}</b> on its own would stop "
                                 "working for typing everywhere (chat, games, browser). Add Ctrl, "
-                                "Alt or Shift — or press it again to use it anyway.</span>",
+                                "Alt or Shift, or press it again to use it anyway.</span>",
                                 warn=warn, key=key))
             return
         self.result_combo = winkeys.combo_name(mods, vk)
@@ -976,7 +976,7 @@ class SettingsDialog(QDialog):
         v.addWidget(card)
 
         card, cv = self._card(_("Pick sounds"),
-                              _("Nine tiles a page, in the same order as your pads — drag pads "
+                              _("Nine tiles a page, in the same order as your pads. Drag pads "
                                 "in the Sounds tab to rearrange them."))
         cv.addWidget(self._ov_combo("keys", ovl.KEY_CHOICES, s.keys))
         after = QCheckBox(_("Hide after picking a sound"))
@@ -1028,7 +1028,7 @@ class SettingsDialog(QDialog):
         note = QLabel(_("Games in true exclusive fullscreen can't have anything drawn over them: "
                         "there the keys still work and you hear beeps instead (turn on hotkey "
                         "beeps above). Borderless / windowed fullscreen shows the overlay. Some "
-                        "games also see the number keys you press — if picking a sound switches "
+                        "games also see the number keys you press. If picking a sound switches "
                         "your weapon, use the numpad."))
         note.setObjectName("hint")
         note.setWordWrap(True)
@@ -1052,10 +1052,10 @@ class SettingsDialog(QDialog):
         sl = QSlider(Qt.Horizontal)
         sl.setRange(lo, hi)
         sl.setValue(value)
-        val = QLabel(_("{percent} %", percent=value))
+        val = QLabel(_("{percent}%", percent=value))
         val.setFixedWidth(48)
         val.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
-        sl.valueChanged.connect(lambda x: (val.setText(_("{percent} %", percent=x)),
+        sl.valueChanged.connect(lambda x: (val.setText(_("{percent}%", percent=x)),
                                            self._ov_set(key, x)))
         no_wheel(sl)
         row.addWidget(sl, 1)
@@ -1130,7 +1130,7 @@ class SettingsDialog(QDialog):
                                 "uses bigger buffers: a little more delay, far fewer drop-outs."))
         lat = QComboBox()
         lat.addItem(_("Low (default)"), "low")
-        lat.addItem(_("Safer — bigger buffers"), "high")
+        lat.addItem(_("Safer: bigger buffers"), "high")
         lat.setCurrentIndex(max(0, lat.findData(self.mw.cfg.latency)))
         lat.currentIndexChanged.connect(lambda i: self.mw.set_latency(lat.itemData(i)))
         no_wheel(lat)
@@ -1198,8 +1198,8 @@ class SettingsDialog(QDialog):
         grid.setVerticalSpacing(6)
         self.dev_combos = []
         for r, (text, src, attr) in enumerate((
-                (_("Input — my mic"), mw.cb_mic, "mic_device"),
-                (_("Output — my headphones"), mw.cb_mon, "mon_device"),
+                (_("Input: my mic"), mw.cb_mic, "mic_device"),
+                (_("Output: my headphones"), mw.cb_mon, "mon_device"),
                 (_("Send my sounds to"), mw.cb_route, "route"))):
             cb = QComboBox()
             cb.setMinimumWidth(120)
@@ -1956,7 +1956,7 @@ class SettingsDialog(QDialog):
         btn = QPushButton(_("♥  Support Onion Board"))
         btn.clicked.connect(lambda: busy.open_url(
             f"https://github.com/{REPO}#support-onion-board", btn,
-            opened=_("✓ Opened in your browser — thank you!"),
+            opened=_("✓ Opened in your browser, thank you!"),
             failed=_("Couldn't open your browser. The page is")))
         row = QHBoxLayout()
         row.addWidget(btn)
@@ -1998,7 +1998,7 @@ class SettingsDialog(QDialog):
                 auto.blockSignals(True)
                 auto.setChecked(autostart.is_enabled())
                 auto.blockSignals(False)
-                busy.toast(self, _("Couldn't change Windows startup — see the log in "
+                busy.toast(self, _("Couldn't change Windows startup, see the log in "
                                    "{folder}.", folder=r"%APPDATA%\OnionBoard"), "warn")
             sync_hidden()
         auto.toggled.connect(set_auto)
@@ -2895,7 +2895,7 @@ class SettingsDialog(QDialog):
                               _("Lets programs on this PC play your sounds: a Stream Deck (its "
                                 "API-request or website buttons, Bitfocus Companion, Touch "
                                 "Portal), AutoHotkey or a script. Only this PC can connect, and "
-                                "only with the key below — treat it like a password."))
+                                "only with the key below, treat it like a password."))
         on = QCheckBox(_("Enable remote control"))
         on.setChecked(cfg.api_enabled)
         cv.addWidget(on)
@@ -2924,7 +2924,7 @@ class SettingsDialog(QDialog):
         cv.addLayout(row)
         crow = QHBoxLayout()
         copy = QPushButton(_("Copy an example link"))
-        copy.setToolTip(_("A link that plays a random sound — paste it into a Stream Deck "
+        copy.setToolTip(_("A link that plays a random sound, paste it into a Stream Deck "
                           "website / API-request button, or open it to try it"))
         crow.addWidget(copy)
         state = QLabel()

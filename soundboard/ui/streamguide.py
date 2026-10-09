@@ -46,7 +46,7 @@ class StreamerGuide(QDialog):
         super().__init__(parent)
         fit.watch(self)
         self.mw = mw
-        self.setWindowTitle(_("Streamer guide — play sounds from your Stream Deck and chat"))
+        self.setWindowTitle(_("Streamer guide: play sounds from your Stream Deck and chat"))
         self.setMinimumWidth(660)
         v = QVBoxLayout(self)
         v.setContentsMargins(24, 20, 24, 18)
@@ -61,8 +61,8 @@ class StreamerGuide(QDialog):
         li = "<li style='margin-bottom:8px'>{}</li>"
         items = [
             _("<b>Turn it on.</b> Click <b>Turn it on</b> below (or tick <i>Enable remote "
-              "control</i> in Settings → Remote). Onion Board has to be open — the tray is "
-              "fine."),
+              "control</i> in Settings → Remote). Onion Board has to be open (the tray is "
+              "fine)."),
             _("<b>Test it.</b> Click <b>Random sound</b> below to copy its link, paste it "
               "into your web browser's address bar and press Enter. You hear a random sound "
               "and the page shows <span style='color:{ok_colour}'>\"playing\"</span>. It "
@@ -99,7 +99,7 @@ class StreamerGuide(QDialog):
             + "".join(li.format(t) for t in items)
             + "<li>" + _("<b>Keep the key secret.</b> Every link holds your key. Don't show "
                          "it on stream or paste it into chat. If it leaks, click <b>New "
-                         "key</b> in Settings → Remote — the old links stop working and you "
+                         "key</b> in Settings → Remote: the old links stop working and you "
                          "paste the new ones.") + "</li></ol>"
             "<span style='font-size:9.5pt'>"
             + _("Stuck, or want something fancier (a key per category, a random sound for "
