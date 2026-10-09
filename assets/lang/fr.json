@@ -1363,7 +1363,6 @@
   "Support Onion Board": "Soutenir Onion Board",
   "Switch by itself": "Changer tout seul",
   "Switch category by program": "Changer de catégorie selon le programme",
-  "Switch off the tabs you don't use. A switched-off tab is gone from the window and doesn't load at all, so nothing of it runs in the background. Switch it back on any time, here or with + More tabs beside the tabs.": "Coupe les onglets que tu n'utilises pas. Un onglet coupé disparaît de la fenêtre et ne se charge pas du tout, donc rien de lui ne tourne en arrière-plan. Réactive-le à tout moment, ici ou avec + Plus d'onglets à côté des onglets.",
   "Switch to the mode that suits what's listening": "Passer au mode adapté à ce qui écoute",
   "Switching the cable to 48 kHz…": "Passage du câble à 48 kHz…",
   "TEST IT": "TESTE-LE",
@@ -2415,7 +2414,6 @@
   "error {code}": "erreur {code}",
   "failed (exit code {code})": "échec (code de sortie {code})",
   "failed to load: {error}": "échec du chargement : {error}",
-  "ffmpeg failed": "ffmpeg a échoué",
   "ffmpeg took longer than {seconds}s": "ffmpeg a pris plus de {seconds} s",
   "higher": "plus haut",
   "hoo-ray!": "hourra !",
@@ -2828,5 +2826,15 @@
   "{ok} {mode} mode on for <b>{name}</b>. Next time it switches by itself.": "Le mode {ok} {mode} est activé pour <b>{name}</b> . La prochaine fois, il changera tout seul.",
   "{program}  (never asks)": "{program} (ne demande jamais)",
   "{warn} Its noise removal can wipe out music: set it to keep the original sound.": "{warn} Sa suppression du bruit peut effacer la musique : configurez-la pour conserver le son d'origine.",
-  "✓ Added to Sounds": "✓ Ajouté aux sons"
+  "✓ Added to Sounds": "✓ Ajouté aux sons",
+  "Hide this tab": "Masquer cet onglet",
+  "This tab is always shown": "Cet onglet est toujours affiché",
+  "{tab} hidden. Bring it back with + More tabs or Settings > Tabs.": "{tab} masqué. Ramenez-le avec + Plus d'onglets ou Paramètres > Onglets.",
+  "Switch off the tabs you don't use. A switched-off tab is gone from the window and doesn't load at all, so nothing of it runs in the background. Switch it back on any time, here or with + More tabs after the tabs. Right-click a tab to hide it.": "Désactivez les onglets que vous n'utilisez pas. Un onglet désactivé a disparu de la fenêtre et ne se charge pas du tout, donc rien ne s'exécute en arrière-plan. Réactivez-le à tout moment, ici ou avec + Plus d'onglets après les onglets. Cliquez avec le bouton droit sur un onglet pour le masquer.",
+  "Add more to Onion Board": "Ajouter plus à la planche à oignons",
+  "Change your voice live: robots, monsters, other languages, or let it speak what you type.": "Changez votre voix en direct : robots, monstres, autres langues, ou laissez-la prononcer ce que vous tapez.",
+  "Free, and each one only loads once you add it.": "Gratuit, et chacun ne se charge qu’une fois que vous l’ajoutez.",
+  "Plays a sound by itself when something shows up in your game: a YOU DIED, a kill, a queue popping.": "Joue un son tout seul lorsque quelque chose apparaît dans votre jeu : un YOU DIED, un kill, une file d'attente qui éclate.",
+  "Share Spotify, a video or a game's sound with your friends, kept apart from your own.": "Partagez Spotify, une vidéo ou le son d'un jeu avec vos amis, en dehors des vôtres.",
+  "Thousands of live stations from all over the world. Listen yourself, or send one into the call for everyone.": "Des milliers de stations en direct du monde entier. Écoutez-vous ou envoyez-en un à l'appel pour tout le monde."
 }

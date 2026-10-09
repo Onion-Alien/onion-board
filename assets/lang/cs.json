@@ -1217,7 +1217,6 @@
   "Support Onion Board": "Podpoř Onion Board",
   "Switch by itself": "Přepínat samo",
   "Switch category by program": "Přepínat kategorii podle programu",
-  "Switch off the tabs you don't use. A switched-off tab is gone from the window and doesn't load at all, so nothing of it runs in the background. Switch it back on any time, here or with + More tabs beside the tabs.": "Vypni karty, které nepoužíváš. Vypnutá karta zmizí z okna a vůbec se nenačte, takže z ní nic neběží na pozadí. Zapnout ji můžeš kdykoli zase tady nebo přes + Další karty vedle karet.",
   "Switch to the mode that suits what's listening": "Přepnout na režim, který sedí k tomu, co poslouchá",
   "Switched to “{shown}” ({exe} is in front)": "Přepnuto na „{shown}“ ({exe} je vpředu)",
   "Switching the cable to 48 kHz…": "Přepínám kabel na 48 kHz…",
@@ -2465,7 +2464,6 @@
   "error {code}": "chyba {code}",
   "failed (exit code {code})": "se nezdařilo (kód ukončení {code})",
   "failed to load: {error}": "nepodařilo se načíst: {error}",
-  "ffmpeg failed": "ffmpeg se nezdařil",
   "ffmpeg took longer than {seconds}s": "ffmpeg trvalo déle než {seconds} s",
   "higher": "vyšší",
   "hoo-ray!": "hurá!",
@@ -2888,5 +2886,15 @@
   "{ok} {mode} mode on for <b>{name}</b>. Next time it switches by itself.": "{ok} Režim {mode} zapnutý pro <b>{name}</b> . Příště se to přepne samo.",
   "{program}  (never asks)": "{program} (nikdy se neptá)",
   "{warn} Its noise removal can wipe out music: set it to keep the original sound.": "{warn} Jeho odstranění šumu může zničit hudbu: nastavte jej tak, aby zachoval původní zvuk.",
-  "✓ Added to Sounds": "✓ Přidáno do Zvuků"
+  "✓ Added to Sounds": "✓ Přidáno do Zvuků",
+  "Hide this tab": "Skrýt tuto kartu",
+  "This tab is always shown": "Tato karta je vždy zobrazena",
+  "{tab} hidden. Bring it back with + More tabs or Settings > Tabs.": "{tab} skryto. Vraťte jej zpět pomocí karet + Další nebo Nastavení > Karty.",
+  "Switch off the tabs you don't use. A switched-off tab is gone from the window and doesn't load at all, so nothing of it runs in the background. Switch it back on any time, here or with + More tabs after the tabs. Right-click a tab to hide it.": "Vypněte karty, které nepoužíváte. Vypnutá karta je z okna pryč a vůbec se nenačte, takže nic z toho neběží na pozadí. Kdykoli jej znovu zapněte, zde nebo pomocí karet + Další po kartách. Kliknutím pravým tlačítkem na kartu ji skryjete.",
+  "Add more to Onion Board": "Přidejte další do Cibulové desky",
+  "Change your voice live: robots, monsters, other languages, or let it speak what you type.": "Změňte svůj hlas živě: roboti, monstra, jiné jazyky nebo ho nechte mluvit, co píšete.",
+  "Free, and each one only loads once you add it.": "Zdarma a každá se načte, až když ji přidáte.",
+  "Plays a sound by itself when something shows up in your game: a YOU DIED, a kill, a queue popping.": "Přehraje zvuk sám o sobě, když se ve vaší hře něco objeví: a YOU DIED, kill, fronta praskání.",
+  "Share Spotify, a video or a game's sound with your friends, kept apart from your own.": "Sdílejte Spotify, video nebo zvuk hry se svými přáteli, odděleně od svých vlastních.",
+  "Thousands of live stations from all over the world. Listen yourself, or send one into the call for everyone.": "Tisíce živých stanic z celého světa. Poslouchejte sami sebe, nebo pošlete jednoho do hovoru pro všechny."
 }

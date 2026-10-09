@@ -1201,7 +1201,6 @@
   "Support Onion Board": "Støt Onion Board",
   "Switch by itself": "Skift af sig selv",
   "Switch category by program": "Skift kategori efter program",
-  "Switch off the tabs you don't use. A switched-off tab is gone from the window and doesn't load at all, so nothing of it runs in the background. Switch it back on any time, here or with + More tabs beside the tabs.": "Slå de faner fra, du ikke bruger. En fane, der er slået fra, er væk fra vinduet og indlæses slet ikke, så intet af den kører i baggrunden. Slå den til igen når som helst, her eller med + Flere faner ved siden af fanerne.",
   "Switch to the mode that suits what's listening": "Skift til den tilstand, der passer til det, der lytter",
   "Switched to “{shown}” ({exe} is in front)": "Skiftede til “{shown}” ({exe} er forrest)",
   "Switching the cable to 48 kHz…": "Skifter kablet til 48 kHz…",
@@ -2415,7 +2414,6 @@
   "error {code}": "fejl {code}",
   "failed (exit code {code})": "mislykkedes (udgangskode {code})",
   "failed to load: {error}": "kunne ikke indlæses: {error}",
-  "ffmpeg failed": "ffmpeg mislykkedes",
   "ffmpeg took longer than {seconds}s": "ffmpeg tog længere tid end {seconds} s",
   "higher": "højere",
   "hoo-ray!": "hov-stråle!",
@@ -2828,5 +2826,15 @@
   "{ok} {mode} mode on for <b>{name}</b>. Next time it switches by itself.": "{ok} {mode} tilstand aktiveret for <b>{name}</b> . Næste gang skifter den af ​​sig selv.",
   "{program}  (never asks)": "{program} (spørger aldrig)",
   "{warn} Its noise removal can wipe out music: set it to keep the original sound.": "{warn} Dens støjfjernelse kan udslette musik: Indstil den til at beholde den originale lyd.",
-  "✓ Added to Sounds": "✓ Tilføjet til lyde"
+  "✓ Added to Sounds": "✓ Tilføjet til lyde",
+  "Hide this tab": "Skjul denne fane",
+  "This tab is always shown": "Denne fane vises altid",
+  "{tab} hidden. Bring it back with + More tabs or Settings > Tabs.": "{tab} skjult. Få det tilbage med + Flere faner eller Indstillinger > Faner.",
+  "Switch off the tabs you don't use. A switched-off tab is gone from the window and doesn't load at all, so nothing of it runs in the background. Switch it back on any time, here or with + More tabs after the tabs. Right-click a tab to hide it.": "Sluk de faner, du ikke bruger. En slukket fane er væk fra vinduet og indlæses slet ikke, så intet af den kører i baggrunden. Tænd det igen når som helst, her eller med + Flere faner efter fanerne. Højreklik på en fane for at skjule den.",
+  "Add more to Onion Board": "Tilføj mere til Onion Board",
+  "Change your voice live: robots, monsters, other languages, or let it speak what you type.": "Skift din stemme live: robotter, monstre, andre sprog, eller lad den tale, hvad du skriver.",
+  "Free, and each one only loads once you add it.": "Gratis, og hver enkelt indlæses kun, når du tilføjer den.",
+  "Plays a sound by itself when something shows up in your game: a YOU DIED, a kill, a queue popping.": "Afspiller en lyd af sig selv, når noget dukker op i dit spil: en YOU DØD, et dræb, en kø, der springer.",
+  "Share Spotify, a video or a game's sound with your friends, kept apart from your own.": "Del Spotify, en video eller et spils lyd med dine venner, holdt adskilt fra dine egne.",
+  "Thousands of live stations from all over the world. Listen yourself, or send one into the call for everyone.": "Tusindvis af live-stationer fra hele verden. Lyt selv, eller send en ind i opkaldet til alle."
 }

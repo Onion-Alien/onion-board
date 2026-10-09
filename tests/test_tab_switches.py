@@ -1,6 +1,7 @@
 """Settings > Tabs: switching the Radio, Apps, Triggers and Voice tabs off and on
 (Config.tabs_off, ui/taboff.py). A switched-off tab is hidden and never built."""
 import pytest
+from PySide6.QtCore import Qt
 
 from conftest import process_events
 
@@ -456,15 +457,55 @@ def test_more_tabs_lists_the_switched_off_ones_and_adds_one(window, monkeypatch)
     assert not w.btn_more_tabs.isHidden()
     menu = w.btn_more_tabs.menu()
     menu.aboutToShow.emit()
-    texts = [a.text() for a in menu.actions() if not a.isSeparator()]
+    texts = [a.text() for a in menu.actions() if not a.isSeparator() and a.text()]
     assert texts[0].startswith("Radio: ") and texts[1].startswith("Triggers: ")
     assert texts[-1] == "Choose tabs in Settings…" and len(texts) == 3
     opened = []
     monkeypatch.setattr(w, "open_settings", lambda page="privacy": opened.append(page))
     menu.actions()[-1].trigger()
     assert opened == ["tabs"]
-    menu.actions()[1].trigger()                            # Triggers
+    [a for a in menu.actions() if a.text().startswith("Triggers")][0].trigger()
     assert w.tab_on("triggers") and w.tabs.currentIndex() == main.TAB_INDEX["triggers"]
     assert steps == ["added-triggers-tab"]   # counted now, not with tomorrow's count
     w.set_tab_on("radio", True)
     assert w.btn_more_tabs.isHidden()
+
+
+def test_right_click_hides_a_tab_and_more_tabs_brings_it_back(window, monkeypatch):
+    w = window
+    shown = []
+    monkeypatch.setattr(w, "toast", lambda text, kind="": shown.append(text))
+    w.tabs.setCurrentIndex(main.TAB_INDEX["radio"])
+    w.hide_tab("radio")
+    assert not w.tab_on("radio") and w.tabs.currentIndex() == 0
+    assert "More tabs" in shown[0]
+    assert w.tabs.cornerWidget(Qt.TopRightCorner).isAncestorOf(w.btn_more_tabs)
+    assert not w.btn_more_tabs.isHidden()
+    menu = w.btn_more_tabs.menu()
+    menu.aboutToShow.emit()
+    [a for a in menu.actions() if a.text().startswith("Radio")][0].trigger()
+    assert w.tab_on("radio")
+
+
+def test_more_tabs_counts_opened_added_and_closed(window, qapp, monkeypatch):
+    from soundboard import usage
+    w = window
+    seen = []
+    monkeypatch.setattr(usage, "used", seen.append)
+    w.set_tab_on("radio", False)
+    w.set_tab_on("voice", False)
+    menu = w.btn_more_tabs.menu()
+    menu.aboutToShow.emit()                  # looked, closed, added nothing
+    menu.aboutToHide.emit()
+    process_events(qapp, lambda: "more-tabs-closed" in seen)
+    assert seen == ["more-tabs-opened", "more-tabs-closed"]
+    seen.clear()
+    menu.aboutToShow.emit()                  # a card picked: the menu hides first
+    menu.aboutToHide.emit()
+    from soundboard.ui.moretabs import TabCard
+    [c for c in menu.findChildren(TabCard)][0].picked.emit()
+    process_events(qapp, lambda: False, timeout=0.2)   # the closed check runs, and passes
+    assert seen == ["more-tabs-opened", "more-tabs-added-radio"] and w.tab_on("radio")
+    w.hide_tab("voice")
+    assert seen[-1] == "tab-hidden-voice"
+    assert all(k in usage.FEATURES for k in seen)

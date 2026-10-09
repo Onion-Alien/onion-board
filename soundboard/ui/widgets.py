@@ -299,6 +299,27 @@ class TabInfoCorner(QWidget):
         return size
 
 
+class TabEndCorner(TabInfoCorner):
+    """The tab row's right corner stretched back to the last tab: `lead` sits right
+    after the tabs (like a browser's + tab) and `trail` at the far right. Qt gives a
+    corner widget its size hint's width, so the hint is the room the tabs leave; its
+    minimum stays the buttons', so a narrow window still shrinks the tabs first."""
+
+    def __init__(self, tabs, lead, trail):
+        super().__init__(tabs, lead)
+        self.layout().addStretch(1)
+        self.layout().addWidget(trail, 0, Qt.AlignVCenter)
+
+    def sizeHint(self):
+        size = super().sizeHint()
+        room = self.tabs.width() - self.tabs.tabBar().sizeHint().width() - 6
+        size.setWidth(max(size.width(), room))
+        return size
+
+    def minimumSizeHint(self):
+        return super().sizeHint()
+
+
 class SteadyTabs(QObject):
     """Keeps a QTabWidget from repainting all of itself when nothing it lays out
     changed. It answers every layout request from inside (a label's new text, a

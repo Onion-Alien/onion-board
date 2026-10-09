@@ -1201,7 +1201,6 @@
   "Support Onion Board": "Apoiar o Onion Board",
   "Switch by itself": "Mudar sozinho",
   "Switch category by program": "Mudar de categoria consoante o programa",
-  "Switch off the tabs you don't use. A switched-off tab is gone from the window and doesn't load at all, so nothing of it runs in the background. Switch it back on any time, here or with + More tabs beside the tabs.": "Desliga os separadores que não usas. Um separador desligado desaparece da janela e nem sequer carrega, por isso nada dele corre em segundo plano. Volta a ligá-lo quando quiseres, aqui ou com + Mais separadores ao lado dos separadores.",
   "Switch to the mode that suits what's listening": "Mudar para o modo que se adequa a quem está a ouvir",
   "Switched to “{shown}” ({exe} is in front)": "Mudou para “{shown}” ({exe} está à frente)",
   "Switching the cable to 48 kHz…": "A mudar o cabo para 48 kHz…",
@@ -2415,7 +2414,6 @@
   "error {code}": "erro {code}",
   "failed (exit code {code})": "falhou (código de saída {code})",
   "failed to load: {error}": "falha ao carregar: {error}",
-  "ffmpeg failed": "ffmpeg falhou",
   "ffmpeg took longer than {seconds}s": "ffmpeg demorou mais de {seconds} s",
   "higher": "mais alto",
   "hoo-ray!": "hoo-ray!",
@@ -2828,5 +2826,15 @@
   "{ok} {mode} mode on for <b>{name}</b>. Next time it switches by itself.": "{ok} modo {mode} ativado para <b>{name}</b> . Da próxima vez muda sozinho.",
   "{program}  (never asks)": "{program} (nunca pergunta)",
   "{warn} Its noise removal can wipe out music: set it to keep the original sound.": "{warn} A sua remoção de ruído pode acabar com a música: configure-a para manter o som original.",
-  "✓ Added to Sounds": "✓ Adicionado aos sons"
+  "✓ Added to Sounds": "✓ Adicionado aos sons",
+  "Hide this tab": "Ocultar esta guia",
+  "This tab is always shown": "Esta aba é sempre mostrada",
+  "{tab} hidden. Bring it back with + More tabs or Settings > Tabs.": "{tab} oculto. Traga-o de volta com + Mais separadores ou Definições > Separadores.",
+  "Switch off the tabs you don't use. A switched-off tab is gone from the window and doesn't load at all, so nothing of it runs in the background. Switch it back on any time, here or with + More tabs after the tabs. Right-click a tab to hide it.": "Desligue as guias que não utiliza. Um separador desligado desaparece da janela e não carrega, pelo que nada é executado em segundo plano. Ligue-o novamente a qualquer momento, aqui ou com + Mais separadores após os separadores. Clique com o botão direito do rato numa guia para ocultá-la.",
+  "Add more to Onion Board": "Adicione mais ao Onion Board",
+  "Change your voice live: robots, monsters, other languages, or let it speak what you type.": "Mude a sua voz ao vivo: robôs, monstros, outras línguas ou deixe falar o que escreve.",
+  "Free, and each one only loads once you add it.": "Gratuito e cada um só carrega depois de adicionado.",
+  "Plays a sound by itself when something shows up in your game: a YOU DIED, a kill, a queue popping.": "Toca um som sozinho quando algo aparece no teu jogo: MORRESTE, uma morte, uma fila a rebentar.",
+  "Share Spotify, a video or a game's sound with your friends, kept apart from your own.": "Partilhe o Spotify, um vídeo ou o som de um jogo com os seus amigos, separados dos seus.",
+  "Thousands of live stations from all over the world. Listen yourself, or send one into the call for everyone.": "Milhares de estações em direto de todo o mundo. Ouça você mesmo ou envie um na chamada para todos."
 }

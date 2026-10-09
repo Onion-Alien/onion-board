@@ -1342,7 +1342,6 @@
   "Support Onion Board": "양파보드 지원",
   "Switch by itself": "자체적으로 전환",
   "Switch category by program": "프로그램별로 카테고리 전환",
-  "Switch off the tabs you don't use. A switched-off tab is gone from the window and doesn't load at all, so nothing of it runs in the background. Switch it back on any time, here or with + More tabs beside the tabs.": "사용하지 않는 탭을 끄세요. 꺼진 탭은 창에서 사라지고 전혀 로드되지 않으므로 백그라운드에서 아무것도 실행되지 않습니다. 여기에서 또는 탭 옆에 있는 + 더보기 탭을 사용하여 언제든지 다시 전환할 수 있습니다.",
   "Switch to the mode that suits what's listening": "듣고 있는 음악에 맞는 모드로 전환하세요",
   "Switching the cable to 48 kHz…": "케이블을 48kHz로 전환 중…",
   "TEST IT": "테스트해보세요",
@@ -2365,7 +2364,6 @@
   "error {code}": "오류 {code}",
   "failed (exit code {code})": "실패(종료 코드 {code})",
   "failed to load: {error}": "로드하지 못했습니다: {error}",
-  "ffmpeg failed": "ffmpeg 실패",
   "ffmpeg took longer than {seconds}s": "ffmpeg가 {seconds} 초보다 오래 걸렸습니다.",
   "higher": "더 높은",
   "hoo-ray!": "후-레이!",
@@ -2768,5 +2766,15 @@
   "{ok} {mode} mode on for <b>{name}</b>. Next time it switches by itself.": "{ok} <b>{name}</b> 에 대한 { {mode} 모드가 켜져 있습니다. 다음번에는 자동으로 전환됩니다.",
   "{program}  (never asks)": "{program} (묻지 않음)",
   "{warn} Its noise removal can wipe out music: set it to keep the original sound.": "{warn} 소음 제거로 인해 음악이 지워질 수 있습니다. 원래 사운드를 유지하도록 설정하세요.",
-  "✓ Added to Sounds": "✓ 소리에 추가됨"
+  "✓ Added to Sounds": "✓ 소리에 추가됨",
+  "Hide this tab": "이 탭 숨기기",
+  "This tab is always shown": "이 탭은 항상 표시됩니다.",
+  "{tab} hidden. Bring it back with + More tabs or Settings > Tabs.": "{tab} 이 숨겨져 있습니다. + 탭 더보기 또는 설정 > 탭을 사용하여 다시 가져오세요.",
+  "Switch off the tabs you don't use. A switched-off tab is gone from the window and doesn't load at all, so nothing of it runs in the background. Switch it back on any time, here or with + More tabs after the tabs. Right-click a tab to hide it.": "사용하지 않는 탭을 끄세요. 꺼진 탭은 창에서 사라지고 전혀 로드되지 않으므로 백그라운드에서 아무것도 실행되지 않습니다. 언제든지 여기에서 또는 탭 뒤의 + 더보기 탭을 사용하여 다시 전환할 수 있습니다. 탭을 숨기려면 마우스 오른쪽 버튼을 클릭하세요.",
+  "Add more to Onion Board": "양파보드에 더 추가하기",
+  "Change your voice live: robots, monsters, other languages, or let it speak what you type.": "로봇, 괴물, 기타 언어 등 실시간으로 음성을 변경하거나 입력한 내용을 음성으로 말하게 하세요.",
+  "Free, and each one only loads once you add it.": "무료이며 각 항목은 추가한 후에만 로드됩니다.",
+  "Plays a sound by itself when something shows up in your game: a YOU DIED, a kill, a queue popping.": "게임에 뭔가가 나타날 때 소리가 저절로 재생됩니다. 즉, 사망, 처치, 대기열 팝업 등이 발생합니다.",
+  "Share Spotify, a video or a game's sound with your friends, kept apart from your own.": "Spotify, 비디오 또는 게임 사운드를 자신의 것과 별도로 친구들과 공유하세요.",
+  "Thousands of live stations from all over the world. Listen yourself, or send one into the call for everyone.": "전 세계 수천 개의 라이브 스테이션. 자신의 말을 듣거나 모든 사람을 위해 통화에 하나를 보내십시오."
 }

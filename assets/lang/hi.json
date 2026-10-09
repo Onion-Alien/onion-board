@@ -1365,7 +1365,6 @@
   "Support Onion Board": "प्याज बोर्ड का समर्थन करें",
   "Switch by itself": "अपने आप स्विच करें",
   "Switch category by program": "प्रोग्राम के अनुसार श्रेणी बदलें",
-  "Switch off the tabs you don't use. A switched-off tab is gone from the window and doesn't load at all, so nothing of it runs in the background. Switch it back on any time, here or with + More tabs beside the tabs.": "उन टैब को बंद कर दें जिनका आप उपयोग नहीं करते हैं। एक स्विच-ऑफ टैब विंडो से चला गया है और बिल्कुल भी लोड नहीं होता है, इसलिए इसका कुछ भी पृष्ठभूमि में नहीं चलता है। किसी भी समय, यहां या टैब के बगल में + अधिक टैब के साथ इसे वापस चालू करें।",
   "Switch to the mode that suits what's listening": "उस मोड पर स्विच करें जो सुनने के लिए उपयुक्त हो",
   "Switching the cable to 48 kHz…": "केबल को 48 kHz पर स्विच किया जा रहा है…",
   "TEST IT": "इसका परीक्षण करें",
@@ -2415,7 +2414,6 @@
   "error {code}": "त्रुटि {code}",
   "failed (exit code {code})": "विफल (निकास कोड {code})",
   "failed to load: {error}": "लोड करने में विफल: {error}",
-  "ffmpeg failed": "एफएफएमपीईजी विफल",
   "ffmpeg took longer than {seconds}s": "ffmpeg को {seconds} s से अधिक समय लगा",
   "higher": "उच्च",
   "hoo-ray!": "हू-रे!",
@@ -2828,5 +2826,15 @@
   "{ok} {mode} mode on for <b>{name}</b>. Next time it switches by itself.": "<b>{name}</b> के लिए {ok} {mode} मोड चालू। अगली बार यह अपने आप बदल जाता है।",
   "{program}  (never asks)": "{program} (कभी नहीं पूछता)",
   "{warn} Its noise removal can wipe out music: set it to keep the original sound.": "{warn} इसका शोर हटाने से संगीत ख़त्म हो सकता है: इसे मूल ध्वनि बनाए रखने के लिए सेट करें।",
-  "✓ Added to Sounds": "✓ ध्वनि में जोड़ा गया"
+  "✓ Added to Sounds": "✓ ध्वनि में जोड़ा गया",
+  "Hide this tab": "इस टैब को छिपाएँ",
+  "This tab is always shown": "यह टैब हमेशा दिखाया जाता है",
+  "{tab} hidden. Bring it back with + More tabs or Settings > Tabs.": "{tab} छिपा हुआ. इसे + अधिक टैब या सेटिंग्स > टैब के साथ वापस लाएं।",
+  "Switch off the tabs you don't use. A switched-off tab is gone from the window and doesn't load at all, so nothing of it runs in the background. Switch it back on any time, here or with + More tabs after the tabs. Right-click a tab to hide it.": "उन टैब को बंद कर दें जिनका आप उपयोग नहीं करते हैं। एक स्विच-ऑफ टैब विंडो से चला गया है और बिल्कुल भी लोड नहीं होता है, इसलिए इसका कुछ भी पृष्ठभूमि में नहीं चलता है। इसे किसी भी समय, यहां या टैब के बाद + अधिक टैब के साथ वापस चालू करें। किसी टैब को छिपाने के लिए उस पर राइट-क्लिक करें।",
+  "Add more to Onion Board": "प्याज बोर्ड में और जोड़ें",
+  "Change your voice live: robots, monsters, other languages, or let it speak what you type.": "अपनी आवाज़ को लाइव बदलें: रोबोट, राक्षस, अन्य भाषाएँ, या आप जो टाइप करते हैं उसे बोलने दें।",
+  "Free, and each one only loads once you add it.": "निःशुल्क, और प्रत्येक आपके द्वारा इसे जोड़ने के बाद ही लोड होता है।",
+  "Plays a sound by itself when something shows up in your game: a YOU DIED, a kill, a queue popping.": "जब आपके गेम में कुछ दिखाई देता है तो अपने आप एक ध्वनि बजाता है: एक आप मर गए, एक मार, एक कतार पॉपिंग।",
+  "Share Spotify, a video or a game's sound with your friends, kept apart from your own.": "Spotify, किसी वीडियो या गेम की ध्वनि को अपने दोस्तों से साझा करें, अपने मित्रों से अलग रखें।",
+  "Thousands of live stations from all over the world. Listen yourself, or send one into the call for everyone.": "दुनिया भर से हजारों लाइव स्टेशन। स्वयं सुनें, या सभी के लिए कॉल में से एक भेजें।"
 }

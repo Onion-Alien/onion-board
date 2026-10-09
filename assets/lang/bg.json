@@ -1201,7 +1201,6 @@
   "Support Onion Board": "Подкрепи Onion Board",
   "Switch by itself": "Превключвай сам",
   "Switch category by program": "Смяна на категорията според програмата",
-  "Switch off the tabs you don't use. A switched-off tab is gone from the window and doesn't load at all, so nothing of it runs in the background. Switch it back on any time, here or with + More tabs beside the tabs.": "Изключи разделите, които не ползваш. Изключеният раздел изчезва от прозореца и изобщо не се зарежда, така че нищо от него не работи на заден план. Включи го пак по всяко време, тук или с + Още раздели до разделите.",
   "Switch to the mode that suits what's listening": "Превключи на режима, който пасва на това, което слуша",
   "Switched to “{shown}” ({exe} is in front)": "Превключено на „{shown}“ ({exe} е отпред)",
   "Switching the cable to 48 kHz…": "Превключвам кабела на 48 kHz…",
@@ -2415,7 +2414,6 @@
   "error {code}": "грешка {code}",
   "failed (exit code {code})": "неуспешно (код за изход {code})",
   "failed to load: {error}": "неуспешно зареждане: {error}",
-  "ffmpeg failed": "ffmpeg се провали",
   "ffmpeg took longer than {seconds}s": "ffmpeg отне повече от {seconds} s",
   "higher": "по-високо",
   "hoo-ray!": "ура-рей!",
@@ -2828,5 +2826,15 @@
   "{ok} {mode} mode on for <b>{name}</b>. Next time it switches by itself.": "Режимът {ok} {mode} е включен за <b>{name}</b> . Следващият път превключва сам.",
   "{program}  (never asks)": "{program} (никога не пита)",
   "{warn} Its noise removal can wipe out music: set it to keep the original sound.": "{warn} Неговото премахване на шума може да заличи музиката: настройте го да запази оригиналния звук.",
-  "✓ Added to Sounds": "✓ Добавено към Звуци"
+  "✓ Added to Sounds": "✓ Добавено към Звуци",
+  "Hide this tab": "Скрийте този раздел",
+  "This tab is always shown": "Този раздел винаги се показва",
+  "{tab} hidden. Bring it back with + More tabs or Settings > Tabs.": "{tab} скрит. Върнете го с + Още раздели или Настройки > Раздели.",
+  "Switch off the tabs you don't use. A switched-off tab is gone from the window and doesn't load at all, so nothing of it runs in the background. Switch it back on any time, here or with + More tabs after the tabs. Right-click a tab to hide it.": "Изключете разделите, които не използвате. Изключен раздел е изчезнал от прозореца и изобщо не се зарежда, така че нищо от него не работи във фонов режим. Включете го отново по всяко време, тук или с + Още раздели след разделите. Щракнете с десния бутон върху раздел, за да го скриете.",
+  "Add more to Onion Board": "Добавете още към Onion Board",
+  "Change your voice live: robots, monsters, other languages, or let it speak what you type.": "Променете гласа си на живо: роботи, чудовища, други езици или го оставете да говори това, което въвеждате.",
+  "Free, and each one only loads once you add it.": "Безплатен и всеки се зарежда само след като го добавите.",
+  "Plays a sound by itself when something shows up in your game: a YOU DIED, a kill, a queue popping.": "Възпроизвежда звук сам, когато нещо се появи в играта ви: YOU DIED, убийство, изскачане на опашка.",
+  "Share Spotify, a video or a game's sound with your friends, kept apart from your own.": "Споделете Spotify, видео или звук от игра с приятелите си, държани отделно от вашите собствени.",
+  "Thousands of live stations from all over the world. Listen yourself, or send one into the call for everyone.": "Хиляди станции на живо от цял ​​свят. Слушайте себе си или изпратете по един в разговора за всички."
 }

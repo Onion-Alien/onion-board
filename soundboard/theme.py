@@ -520,9 +520,10 @@ QPushButton#tabinfo { padding:0; border-radius:8px; background:transparent; bord
 QPushButton#tabinfo:hover { background:$btn_hover; border-color:$border_hi; }
 QPushButton#tabinfo:pressed { background:$btn_press; border-color:$accent; }
 QPushButton#tabinfo:focus { border-color:$accent; }
-QPushButton#moretabs { padding:3px 10px; border-radius:8px; background:transparent; border:1px dashed $border_hi; }
-QPushButton#moretabs:hover { background:$btn_hover; border-color:$accent; }
-QPushButton#moretabs:pressed, QPushButton#moretabs:focus { border-color:$accent; }
+QPushButton#moretabs { padding:4px 10px; border-radius:8px; background:transparent; border:1px solid transparent; color:$muted; }
+QPushButton#moretabs:hover { background:$btn_hover; border-color:$border_hi; color:$text_hi; }
+QPushButton#moretabs:pressed { background:$btn_press; }
+QPushButton#moretabs:focus { border-color:$accent; }
 QPushButton#moretabs::menu-indicator { image:none; width:0; }
 QPushButton#settings { padding:6px 14px; font-weight:600; }
 QFrame#transport, QFrame#deck { background:$panel; border-radius:12px; }
@@ -668,6 +669,13 @@ QMenu::item:selected { background:$accent; color:$on_accent; }
 QMenu::item:disabled { color:$faint; }
 QMenu::icon { padding-left:10px; }
 QMenu::separator { height:1px; background:$border; margin:5px 8px; }
+QFrame#tabcard { background:$card_hi; border:1px solid $border; border-radius:10px; margin:3px 4px; }
+QFrame#tabcard:hover { border-color:$accent; background:$btn_hover; }
+QLabel#tabcardpic { background:$inset; border-radius:12px; }
+QLabel#tabcardtitle { font-size:11pt; font-weight:700; color:$text_hi; background:transparent; }
+QLabel#tabcardblurb { color:$muted; background:transparent; }
+QLabel#tabcardhead { font-size:12pt; font-weight:700; color:$text_hi; background:transparent; }
+QWidget#tabcardtop { background:transparent; }
 QToolTip { background:$card; color:$text; border:1px solid $border_hi; border-radius:6px; padding:5px 8px; }
 QTabWidget::pane { border:none; }
 QTabBar { qproperty-drawBase: 0; }

@@ -1201,7 +1201,6 @@
   "Support Onion Board": "Tue Onion Boardia",
   "Switch by itself": "Vaihda itsestään",
   "Switch category by program": "Vaihda kategoriaa ohjelman mukaan",
-  "Switch off the tabs you don't use. A switched-off tab is gone from the window and doesn't load at all, so nothing of it runs in the background. Switch it back on any time, here or with + More tabs beside the tabs.": "Laita pois välilehdet, joita et käytä. Pois laitettu välilehti katoaa ikkunasta eikä lataudu ollenkaan, joten mitään siitä ei pyöri taustalla. Laita se takaisin päälle milloin tahansa, täällä tai välilehtien vieressä olevalla + Lisää välilehtiä.",
   "Switch to the mode that suits what's listening": "Vaihda tilaan, joka sopii kuuntelijalle",
   "Switched to “{shown}” ({exe} is in front)": "Vaihdettiin kohteeseen “{shown}” ({exe} on edessä)",
   "Switching the cable to 48 kHz…": "Vaihdetaan kaapeli 48 kHz:iin…",
@@ -2415,7 +2414,6 @@
   "error {code}": "virhe {code}",
   "failed (exit code {code})": "epäonnistui (poistumiskoodi {code})",
   "failed to load: {error}": "lataus epäonnistui: {error}",
-  "ffmpeg failed": "ffmpeg epäonnistui",
   "ffmpeg took longer than {seconds}s": "ffmpeg kesti kauemmin kuin {seconds} s",
   "higher": "korkeampi",
   "hoo-ray!": "Hurraa!",
@@ -2828,5 +2826,15 @@
   "{ok} {mode} mode on for <b>{name}</b>. Next time it switches by itself.": "{ok} {mode} -tila päällä käyttäjälle <b>{name}</b> . Seuraavalla kerralla se vaihtuu itsestään.",
   "{program}  (never asks)": "{program} (ei koskaan kysy)",
   "{warn} Its noise removal can wipe out music: set it to keep the original sound.": "{warn} Sen kohinanpoisto voi pyyhkiä pois musiikin: aseta se säilyttämään alkuperäisen äänen.",
-  "✓ Added to Sounds": "✓ Lisätty Ääniin"
+  "✓ Added to Sounds": "✓ Lisätty Ääniin",
+  "Hide this tab": "Piilota tämä välilehti",
+  "This tab is always shown": "Tämä välilehti näkyy aina",
+  "{tab} hidden. Bring it back with + More tabs or Settings > Tabs.": "{tab} piilotettu. Tuo se takaisin valitsemalla + Lisää välilehtiä tai Asetukset > Välilehdet.",
+  "Switch off the tabs you don't use. A switched-off tab is gone from the window and doesn't load at all, so nothing of it runs in the background. Switch it back on any time, here or with + More tabs after the tabs. Right-click a tab to hide it.": "Sammuta välilehdet, joita et käytä. Pois päältä kytketty välilehti on poissa ikkunasta eikä lataudu ollenkaan, joten mikään siitä ei toimi taustalla. Kytke se takaisin päälle milloin tahansa täällä tai + Lisää välilehtiä välilehtien jälkeen. Napsauta välilehteä hiiren kakkospainikkeella piilottaaksesi sen.",
+  "Add more to Onion Board": "Lisää sipulilautaan",
+  "Change your voice live: robots, monsters, other languages, or let it speak what you type.": "Vaihda ääntäsi livenä: robotit, hirviöt, muut kielet tai anna sen puhua mitä kirjoitat.",
+  "Free, and each one only loads once you add it.": "Ilmainen, ja jokainen latautuu vasta, kun lisäät sen.",
+  "Plays a sound by itself when something shows up in your game: a YOU DIED, a kill, a queue popping.": "Toistaa äänen itsestään, kun jotain näkyy pelissäsi: YOU DIED, tappo, jono poksahtaa.",
+  "Share Spotify, a video or a game's sound with your friends, kept apart from your own.": "Jaa Spotify, video tai pelin ääni ystäviesi kanssa erillään omastasi.",
+  "Thousands of live stations from all over the world. Listen yourself, or send one into the call for everyone.": "Tuhansia live-asemia eri puolilta maailmaa. Kuuntele itse tai lähetä yksi puheluun kaikille."
 }

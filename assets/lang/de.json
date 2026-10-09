@@ -1363,7 +1363,6 @@
   "Support Onion Board": "Onion Board unterstützen",
   "Switch by itself": "Von selbst wechseln",
   "Switch category by program": "Kategorie je nach Programm wechseln",
-  "Switch off the tabs you don't use. A switched-off tab is gone from the window and doesn't load at all, so nothing of it runs in the background. Switch it back on any time, here or with + More tabs beside the tabs.": "Schalte die Tabs aus, die du nicht nutzt. Ein ausgeschalteter Tab verschwindet aus dem Fenster und wird gar nicht geladen, also läuft nichts davon im Hintergrund. Schalte ihn jederzeit wieder ein, hier oder mit + Mehr Tabs neben den Tabs.",
   "Switch to the mode that suits what's listening": "Zu dem Modus wechseln, der zu dem passt, was zuhört",
   "Switching the cable to 48 kHz…": "Kabel wird auf 48 kHz umgestellt…",
   "TEST IT": "TESTEN",
@@ -2415,7 +2414,6 @@
   "error {code}": "Fehler {code}",
   "failed (exit code {code})": "fehlgeschlagen (Exit-Code {code})",
   "failed to load: {error}": "Laden fehlgeschlagen: {error}",
-  "ffmpeg failed": "ffmpeg ist fehlgeschlagen",
   "ffmpeg took longer than {seconds}s": "ffmpeg dauerte länger als {seconds} s",
   "higher": "höher",
   "hoo-ray!": "Hurra!",
@@ -2828,5 +2826,15 @@
   "{ok} {mode} mode on for <b>{name}</b>. Next time it switches by itself.": "{ok} {mode} Modus für <b>{name}</b> aktiviert. Das nächste Mal schaltet es von selbst um.",
   "{program}  (never asks)": "{program} (fragt nie)",
   "{warn} Its noise removal can wipe out music: set it to keep the original sound.": "{warn} Die Rauschunterdrückung kann Musik auslöschen: Stellen Sie sie so ein, dass der Originalton erhalten bleibt.",
-  "✓ Added to Sounds": "✓ Zu Sounds hinzugefügt"
+  "✓ Added to Sounds": "✓ Zu Sounds hinzugefügt",
+  "Hide this tab": "Blenden Sie diese Registerkarte aus",
+  "This tab is always shown": "Diese Registerkarte wird immer angezeigt",
+  "{tab} hidden. Bring it back with + More tabs or Settings > Tabs.": "{tab} ausgeblendet. Bringen Sie es mit + Weitere Registerkarten oder Einstellungen > Registerkarten zurück.",
+  "Switch off the tabs you don't use. A switched-off tab is gone from the window and doesn't load at all, so nothing of it runs in the background. Switch it back on any time, here or with + More tabs after the tabs. Right-click a tab to hide it.": "Schalten Sie die Tabs aus, die Sie nicht verwenden. Ein ausgeschalteter Tab ist aus dem Fenster verschwunden und wird überhaupt nicht geladen, daher läuft nichts davon im Hintergrund. Schalten Sie es jederzeit wieder ein, hier oder mit + Weitere Tabs nach den Tabs. Klicken Sie mit der rechten Maustaste auf eine Registerkarte, um sie auszublenden.",
+  "Add more to Onion Board": "Fügen Sie mehr zum Onion Board hinzu",
+  "Change your voice live: robots, monsters, other languages, or let it speak what you type.": "Ändern Sie Ihre Stimme live: Roboter, Monster, andere Sprachen, oder lassen Sie sie sprechen, was Sie eingeben.",
+  "Free, and each one only loads once you add it.": "Kostenlos und jedes wird erst geladen, wenn Sie es hinzufügen.",
+  "Plays a sound by itself when something shows up in your game: a YOU DIED, a kill, a queue popping.": "Spielt von selbst einen Ton ab, wenn etwas in Ihrem Spiel auftaucht: ein DU IST gestorben, ein Kill, ein Platzen in der Warteschlange.",
+  "Share Spotify, a video or a game's sound with your friends, kept apart from your own.": "Teilen Sie Spotify, ein Video oder den Sound eines Spiels mit Ihren Freunden, getrennt von Ihren eigenen.",
+  "Thousands of live stations from all over the world. Listen yourself, or send one into the call for everyone.": "Tausende Live-Sender aus aller Welt. Hören Sie selbst zu oder senden Sie einen für alle in den Anruf."
 }

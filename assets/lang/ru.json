@@ -1386,7 +1386,6 @@
   "Support Onion Board": "Поддержать Onion Board",
   "Switch by itself": "Переключать само",
   "Switch category by program": "Переключать категорию по программе",
-  "Switch off the tabs you don't use. A switched-off tab is gone from the window and doesn't load at all, so nothing of it runs in the background. Switch it back on any time, here or with + More tabs beside the tabs.": "Выключи вкладки, которыми не пользуешься. Выключенная вкладка пропадает из окна и вообще не загружается, так что ничего из неё не работает в фоне. Включить её снова можно в любой момент здесь или кнопкой «+ Ещё вкладки» рядом с вкладками.",
   "Switch to the mode that suits what's listening": "Переключиться на режим под того, кто слушает",
   "Switching the cable to 48 kHz…": "Переключаю кабель на 48 кГц…",
   "TEST IT": "ПРОВЕРЬ",
@@ -2465,7 +2464,6 @@
   "error {code}": "ошибка {code}",
   "failed (exit code {code})": "не удалось (код выхода {code})",
   "failed to load: {error}": "не удалось загрузить: {error}",
-  "ffmpeg failed": "ffmpeg не удалось",
   "ffmpeg took longer than {seconds}s": "ffmpeg занял больше {seconds} с.",
   "higher": "выше",
   "hoo-ray!": "Ура!",
@@ -2888,5 +2886,15 @@
   "{ok} {mode} mode on for <b>{name}</b>. Next time it switches by itself.": "{ok} Режим {mode} включен для <b>{name}</b> . В следующий раз он переключится сам.",
   "{program}  (never asks)": "{program} (никогда не спрашивает)",
   "{warn} Its noise removal can wipe out music: set it to keep the original sound.": "{warn} Функция удаления шума может уничтожить музыку: установите исходный звук.",
-  "✓ Added to Sounds": "✓ Добавлено в звуки"
+  "✓ Added to Sounds": "✓ Добавлено в звуки",
+  "Hide this tab": "Скрыть эту вкладку",
+  "This tab is always shown": "Эта вкладка всегда отображается",
+  "{tab} hidden. Bring it back with + More tabs or Settings > Tabs.": "{tab} скрыта. Верните его, выбрав + Дополнительные вкладки или Настройки > Вкладки.",
+  "Switch off the tabs you don't use. A switched-off tab is gone from the window and doesn't load at all, so nothing of it runs in the background. Switch it back on any time, here or with + More tabs after the tabs. Right-click a tab to hide it.": "Отключите вкладки, которые вы не используете. Отключенная вкладка исчезла из окна и вообще не загружается, поэтому в фоновом режиме ничего не запускается. Включите его снова в любое время здесь или с помощью + Дополнительные вкладки после вкладок. Щелкните вкладку правой кнопкой мыши, чтобы скрыть ее.",
+  "Add more to Onion Board": "Добавьте больше к луковой доске",
+  "Change your voice live: robots, monsters, other languages, or let it speak what you type.": "Измените свой голос в реальном времени: роботы, монстры, другие языки или позвольте ему говорить то, что вы печатаете.",
+  "Free, and each one only loads once you add it.": "Бесплатно, и каждый из них загружается только после того, как вы его добавите.",
+  "Plays a sound by itself when something shows up in your game: a YOU DIED, a kill, a queue popping.": "Воспроизводит звук сам по себе, когда что-то появляется в вашей игре: ВЫ УМЕРЛИ, убийство, появление очереди.",
+  "Share Spotify, a video or a game's sound with your friends, kept apart from your own.": "Поделитесь Spotify, видео или звуком игры со своими друзьями, держа их отдельно от своих.",
+  "Thousands of live stations from all over the world. Listen yourself, or send one into the call for everyone.": "Тысячи живых станций со всего мира. Слушайте сами или отправьте одно сообщение для всех."
 }
