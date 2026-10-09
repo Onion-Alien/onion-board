@@ -125,7 +125,6 @@
   "A restore point is saved first, so you can undo this.": "Първо се запазва точка за възстановяване, така че можеш да отмениш това.",
   "A short “Did you know?” about a feature, at most once a day, never while a game is up.": "Кратко „Знаеше ли?“ за някоя функция, най-много веднъж на ден, никога докато има пусната игра.",
   "A small dot on its icon": "Малка точка на иконата му",
-  "A soft wash and a coloured icon in the theme's colour, easy to spot from across the room": "Леко оцветяване и цветна икона в цвета на темата, лесно се вижда от другия край на стаята",
   "A soundboard is most useful left running: your hotkeys and the overlay work while the window is closed. The tray icon (by the clock) opens it again; right-click it to quit.": "Саундбордът е най-полезен, когато си стои пуснат: бързите клавиши и овърлеят работят и при затворен прозорец. Иконата в трея (до часовника) го отваря пак; десен клик върху нея, за да излезеш.",
   "A tab whose feature is on right now (a sound playing, the voice changer, the radio…) is marked, so nothing is left on without you noticing.": "Раздел, чиято функция е включена в момента (звучи звук, гласовият модулатор, радиото…), е отбелязан, за да не остане нищо включено, без да забележиш.",
   "A virtual cable (not installed yet)": "Виртуален кабел (още не е инсталиран)",
@@ -1246,7 +1245,6 @@
   "Throw this recording away?": "Да изхвърля ли този запис?",
   "TikTok sounds": "TikTok звуци",
   "Time": "Време",
-  "Tint the tab": "Оцвети раздела",
   "To hear it live instead, use Hear what they hear at the bottom.": "За да го чуваш на живо вместо това, ползвай Чуй каквото чуват те най-долу.",
   "To use Tor, get it first: about 22 MB from the Tor Project, checked before it's used. {blocked_hint}": "За да ползваш Tor, първо го вземи: около 22 MB от Tor Project, проверено преди да се ползва. {blocked_hint}",
   "Toggle — press again stops it": "Превключване — ново натискане го спира",
@@ -2860,5 +2858,10 @@
   "by {name}": "от {name}",
   "{language} needs a one-time download of its translation model ({size} MB). Offline mode is on, so it can't be downloaded now.": "{language} се нуждае от еднократно изтегляне на неговия модел за превод ( {size} MB). Офлайн режимът е включен, така че не може да бъде изтеглен сега.",
   "{n} MB": "{n} MB",
-  "⚠ Windows has no {language} voice yet, so {language} can't be spoken properly. Offline mode is on, so it can't be installed now.": "⚠ Windows все още няма {language} глас, така че {language} не може да се говори правилно. Офлайн режимът е включен, така че не може да се инсталира сега."
+  "⚠ Windows has no {language} voice yet, so {language} can't be spoken properly. Offline mode is on, so it can't be installed now.": "⚠ Windows все още няма {language} глас, така че {language} не може да се говори правилно. Офлайн режимът е включен, така че не може да се инсталира сега.",
+  "A bar at the edge of the tabs and a coloured icon, in the highlight colour: easy to spot from across the room": "Лента в края на разделите и цветна икона, в цвета на осветяването: лесна за забелязване от другия край на стаята",
+  "A bar beside the tab": "Лента до раздела",
+  "Show tab names": "Показване на имена на раздели",
+  "Hide tab names": "Скриване на имената на разделите",
+  "Show only the icons": "Показване само на иконите"
 }

@@ -722,7 +722,6 @@
   "A restore point is saved first, so you can undo this.": "Un point de restauration est d'abord enregistré, pour que tu puisses annuler.",
   "A short “Did you know?” about a feature, at most once a day, never while a game is up.": "Un court « Le savais-tu ? » sur une fonction, au plus une fois par jour, jamais pendant un jeu.",
   "A small dot on its icon": "Un petit point sur son icône",
-  "A soft wash and a coloured icon in the theme's colour, easy to spot from across the room": "Un léger voile et une icône colorée dans la couleur du thème, facile à repérer de l'autre bout de la pièce",
   "A soundboard is most useful left running: your hotkeys and the overlay work while the window is closed. The tray icon (by the clock) opens it again; right-click it to quit.": "Une soundboard est plus utile laissée ouverte : tes raccourcis et l'overlay marchent même fenêtre fermée. L'icône de la zone de notification (près de l'horloge) la rouvre ; clic droit dessus pour quitter.",
   "A tab whose feature is on right now (a sound playing, the voice changer, the radio…) is marked, so nothing is left on without you noticing.": "Un onglet dont la fonction est active en ce moment (un son qui joue, le changeur de voix, la radio…) est marqué, pour que rien ne reste actif sans que tu le remarques.",
   "About": "À propos",
@@ -1375,7 +1374,6 @@
   "Through a proxy or Tor, everything the app fetches (searches, downloads, radio, updates) goes through it, and site names are looked up there, not on this PC. If it can't be reached, nothing is fetched: the app never quietly goes direct. This PC's own addresses (127.0.0.1) stay direct.": "Via un proxy ou Tor, tout ce que l'appli récupère (recherches, téléchargements, radio, mises à jour) passe par lui, et les noms de sites y sont résolus, pas sur ce PC. S'il est injoignable, rien n'est récupéré : l'appli ne passe jamais en direct en douce. Les adresses propres à ce PC (127.0.0.1) restent en direct.",
   "TikTok sounds": "Sons TikTok",
   "Time": "Heure",
-  "Tint the tab": "Teinter l'onglet",
   "To use Tor, get it first: about 22 MB from the Tor Project, checked before it's used. {blocked_hint}": "Pour utiliser Tor, récupère-le d'abord : environ 22 Mo depuis le Tor Project, vérifié avant d'être utilisé. {blocked_hint}",
   "Tor download": "Téléchargement de Tor",
   "Tor sends everything through three volunteer computers around the world, so the sites you search and download from and the radio stations you play see a Tor address, not yours. It's slower, and YouTube often turns Tor away: the app then tries other Tor routes, and only goes without Tor if you click to.": "Tor fait passer tout par trois ordinateurs bénévoles dans le monde, donc les sites où tu cherches et télécharges et les stations de radio que tu joues voient une adresse Tor, pas la tienne. C'est plus lent, et YouTube refuse souvent Tor : l'appli essaie alors d'autres itinéraires Tor, et ne se passe de Tor que si tu cliques pour.",
@@ -2860,5 +2858,10 @@
   "by {name}": "par {name}",
   "{language} needs a one-time download of its translation model ({size} MB). Offline mode is on, so it can't be downloaded now.": "{language} nécessite un téléchargement unique de son modèle de traduction ( {size} Mo). Le mode hors ligne est activé, il ne peut donc pas être téléchargé pour le moment.",
   "{n} MB": "{n} Mo",
-  "⚠ Windows has no {language} voice yet, so {language} can't be spoken properly. Offline mode is on, so it can't be installed now.": "⚠ Windows n'a pas encore de voix en {language} , donc {language} ne peut pas être prononcée correctement. Le mode hors ligne est activé, il ne peut donc pas être installé maintenant."
+  "⚠ Windows has no {language} voice yet, so {language} can't be spoken properly. Offline mode is on, so it can't be installed now.": "⚠ Windows n'a pas encore de voix en {language} , donc {language} ne peut pas être prononcée correctement. Le mode hors ligne est activé, il ne peut donc pas être installé maintenant.",
+  "A bar at the edge of the tabs and a coloured icon, in the highlight colour: easy to spot from across the room": "Une barre en bord des onglets et une icône colorée, dans la couleur de surbrillance : facile à repérer depuis l'autre bout de la pièce",
+  "A bar beside the tab": "Une barre à côté de l'onglet",
+  "Show tab names": "Afficher les noms des onglets",
+  "Hide tab names": "Masquer les noms des onglets",
+  "Show only the icons": "Afficher uniquement les icônes"
 }

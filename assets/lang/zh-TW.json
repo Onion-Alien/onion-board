@@ -705,7 +705,6 @@
   "A restore point is saved first, so you can undo this.": "會先建立還原點，所以你可以復原這個動作。",
   "A short “Did you know?” about a feature, at most once a day, never while a game is up.": "一則關於功能的「你知道嗎？」小提示，一天最多一次，玩遊戲時絕不顯示。",
   "A small dot on its icon": "圖示上的小圓點",
-  "A soft wash and a coloured icon in the theme's colour, easy to spot from across the room": "柔和的底色和主題顏色的圖示，在房間另一頭也看得清楚",
   "A soundboard is most useful left running: your hotkeys and the overlay work while the window is closed. The tray icon (by the clock) opens it again; right-click it to quit.": "音效板最好一直開著：關掉視窗後，你的快速鍵和覆蓋畫面仍然有效。系統匣圖示（在時鐘旁邊）可以再次開啟它；在圖示上按右鍵即可結束。",
   "A tab whose feature is on right now (a sound playing, the voice changer, the radio…) is marked, so nothing is left on without you noticing.": "功能目前開啟中的分頁（音效正在播放、變聲器、電台…）會有標記，這樣就不會有東西在你沒注意時一直開著。",
   "About": "關於",
@@ -1352,7 +1351,6 @@
   "Through a proxy or Tor, everything the app fetches (searches, downloads, radio, updates) goes through it, and site names are looked up there, not on this PC. If it can't be reached, nothing is fetched: the app never quietly goes direct. This PC's own addresses (127.0.0.1) stay direct.": "透過代理伺服器或 Tor 時，程式抓取的所有東西（搜尋、下載、電台、更新）都會經過它，網站名稱也會在那裡查詢，而不是在這台電腦上。如果連不上，就什麼都不會抓取：程式絕不會偷偷改成直接連線。這台電腦自己的位址（127.0.0.1）會保持直接連線。",
   "TikTok sounds": "TikTok 音效",
   "Time": "時間",
-  "Tint the tab": "為分頁著色",
   "To use Tor, get it first: about 22 MB from the Tor Project, checked before it's used. {blocked_hint}": "要使用 Tor，請先取得它：從 Tor Project 下載大約 22 MB，使用前會先檢查。{blocked_hint}",
   "Tor download": "Tor 下載",
   "Tor sends everything through three volunteer computers around the world, so the sites you search and download from and the radio stations you play see a Tor address, not yours. It's slower, and YouTube often turns Tor away: the app then tries other Tor routes, and only goes without Tor if you click to.": "Tor 會把所有東西經過世界各地三台志工的電腦傳送，所以你搜尋和下載的網站以及你播放的電台看到的是 Tor 的位址，而不是你的。速度比較慢，而且 YouTube 常常會拒絕 Tor：這時程式會試其他 Tor 路線，只有在你點選時才會不經過 Tor。",
@@ -2800,5 +2798,10 @@
   "by {name}": "透過{name}",
   "{language} needs a one-time download of its translation model ({size} MB). Offline mode is on, so it can't be downloaded now.": "{language}需要一次下載其翻譯模型 ( {size} MB)。離線模式已開啟，因此現在無法下載。",
   "{n} MB": "{n} MB",
-  "⚠ Windows has no {language} voice yet, so {language} can't be spoken properly. Offline mode is on, so it can't be installed now.": "⚠ Windows 還沒有{language}語音，因此無法正常說出{language} 。離線模式已開啟，因此現在無法安裝。"
+  "⚠ Windows has no {language} voice yet, so {language} can't be spoken properly. Offline mode is on, so it can't be installed now.": "⚠ Windows 還沒有{language}語音，因此無法正常說出{language} 。離線模式已開啟，因此現在無法安裝。",
+  "A bar at the edge of the tabs and a coloured icon, in the highlight colour: easy to spot from across the room": "選項卡邊緣的欄和突出顯示顏色的彩色圖示：從房間的另一邊很容易發現",
+  "A bar beside the tab": "選項卡旁邊的欄",
+  "Show tab names": "顯示選項卡名稱",
+  "Hide tab names": "隱藏選項卡名稱",
+  "Show only the icons": "僅顯示圖示"
 }

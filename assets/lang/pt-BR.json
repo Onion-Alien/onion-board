@@ -722,7 +722,6 @@
   "A restore point is saved first, so you can undo this.": "Um ponto de restauração é salvo antes, para você poder desfazer isto.",
   "A short “Did you know?” about a feature, at most once a day, never while a game is up.": "Um “Você sabia?” curto sobre um recurso, no máximo uma vez por dia, nunca com um jogo aberto.",
   "A small dot on its icon": "Um pontinho no ícone",
-  "A soft wash and a coloured icon in the theme's colour, easy to spot from across the room": "Um fundo suave e um ícone colorido na cor do tema, fácil de ver do outro lado da sala",
   "A soundboard is most useful left running: your hotkeys and the overlay work while the window is closed. The tray icon (by the clock) opens it again; right-click it to quit.": "Uma soundboard é mais útil deixada rodando: seus atalhos e a sobreposição funcionam com a janela fechada. O ícone na bandeja (perto do relógio) abre de novo; clique com o botão direito nele para sair.",
   "A tab whose feature is on right now (a sound playing, the voice changer, the radio…) is marked, so nothing is left on without you noticing.": "Uma aba cujo recurso está ligado agora (um som tocando, o modificador de voz, a rádio…) fica marcada, para nada ficar ligado sem você perceber.",
   "About": "Sobre",
@@ -1375,7 +1374,6 @@
   "Through a proxy or Tor, everything the app fetches (searches, downloads, radio, updates) goes through it, and site names are looked up there, not on this PC. If it can't be reached, nothing is fetched: the app never quietly goes direct. This PC's own addresses (127.0.0.1) stay direct.": "Por um proxy ou Tor, tudo que o app baixa (buscas, downloads, rádio, atualizações) passa por ele, e os nomes dos sites são resolvidos lá, não neste PC. Se ele não estiver acessível, nada é baixado: o app nunca vai direto escondido. Os próprios endereços deste PC (127.0.0.1) continuam diretos.",
   "TikTok sounds": "Sons do TikTok",
   "Time": "Hora",
-  "Tint the tab": "Colorir a aba",
   "To use Tor, get it first: about 22 MB from the Tor Project, checked before it's used. {blocked_hint}": "Para usar o Tor, pegue ele primeiro: uns 22 MB do Tor Project, conferido antes de ser usado. {blocked_hint}",
   "Tor download": "Download do Tor",
   "Tor sends everything through three volunteer computers around the world, so the sites you search and download from and the radio stations you play see a Tor address, not yours. It's slower, and YouTube often turns Tor away: the app then tries other Tor routes, and only goes without Tor if you click to.": "O Tor manda tudo por três computadores voluntários pelo mundo, então os sites em que você busca e baixa e as estações de rádio que você toca veem um endereço do Tor, não o seu. É mais lento, e o YouTube costuma recusar o Tor: aí o app tenta outras rotas do Tor, e só vai sem Tor se você clicar para isso.",
@@ -2860,5 +2858,10 @@
   "by {name}": "por {name}",
   "{language} needs a one-time download of its translation model ({size} MB). Offline mode is on, so it can't be downloaded now.": "{language} precisa de um download único do modelo de tradução ( {size} MB). O modo offline está ativado, por isso não pode ser baixado agora.",
   "{n} MB": "{n} MB",
-  "⚠ Windows has no {language} voice yet, so {language} can't be spoken properly. Offline mode is on, so it can't be installed now.": "⚠ O Windows ainda não tem voz em {language} , então {language} não pode ser falado corretamente. O modo offline está ativado, portanto não pode ser instalado agora."
+  "⚠ Windows has no {language} voice yet, so {language} can't be spoken properly. Offline mode is on, so it can't be installed now.": "⚠ O Windows ainda não tem voz em {language} , então {language} não pode ser falado corretamente. O modo offline está ativado, portanto não pode ser instalado agora.",
+  "A bar at the edge of the tabs and a coloured icon, in the highlight colour: easy to spot from across the room": "Uma barra na borda das guias e um ícone colorido, na cor de destaque: fácil de localizar do outro lado da sala",
+  "A bar beside the tab": "Uma barra ao lado da guia",
+  "Show tab names": "Mostrar nomes de guias",
+  "Hide tab names": "Ocultar nomes de guias",
+  "Show only the icons": "Mostrar apenas os ícones"
 }

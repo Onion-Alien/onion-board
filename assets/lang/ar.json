@@ -790,7 +790,6 @@
   "A restore point is saved first, so you can undo this.": "يتم حفظ نقطة الاستعادة أولاً، حتى تتمكن من التراجع عن هذا الأمر.",
   "A short “Did you know?” about a feature, at most once a day, never while a game is up.": "باختصار \"هل تعلم؟\" حول إحدى الميزات، مرة واحدة يوميًا على الأكثر، وليس أثناء تشغيل اللعبة.",
   "A small dot on its icon": "نقطة صغيرة على أيقونتها",
-  "A soft wash and a coloured icon in the theme's colour, easy to spot from across the room": "لون ناعم وأيقونة ملونة بلون التصميم، يسهل اكتشافها من جميع أنحاء الغرفة",
   "A soundboard is most useful left running: your hotkeys and the overlay work while the window is closed. The tray icon (by the clock) opens it again; right-click it to quit.": "تعتبر لوحة الصوت مفيدة جدًا عند تركها قيد التشغيل: تعمل مفاتيح التشغيل السريع والتراكب أثناء إغلاق النافذة. أيقونة الدرج (بالساعة) تفتحه مرة أخرى؛ انقر بزر الماوس الأيمن عليه للخروج.",
   "A tab whose feature is on right now (a sound playing, the voice changer, the radio…) is marked, so nothing is left on without you noticing.": "تم وضع علامة على علامة التبويب التي تكون ميزاتها قيد التشغيل الآن (تشغيل الصوت، ومغير الصوت، والراديو...) بحيث لا يتم ترك أي شيء دون أن تلاحظ.",
   "About": "عن",
@@ -1469,7 +1468,6 @@
   "Through a proxy or Tor, everything the app fetches (searches, downloads, radio, updates) goes through it, and site names are looked up there, not on this PC. If it can't be reached, nothing is fetched: the app never quietly goes direct. This PC's own addresses (127.0.0.1) stay direct.": "من خلال وكيل أو Tor، كل ما يجلبه التطبيق (عمليات البحث والتنزيلات والراديو والتحديثات) يمر عبره، ويتم البحث عن أسماء المواقع هناك، وليس على هذا الكمبيوتر. إذا تعذر الوصول إليه، فلن يتم جلب أي شيء: لا يتم تشغيل التطبيق بشكل مباشر بهدوء. تظل العناوين الخاصة بهذا الكمبيوتر الشخصي (127.0.0.1) مباشرة.",
   "TikTok sounds": "أصوات تيك توك",
   "Time": "وقت",
-  "Tint the tab": "تلوين علامة التبويب",
   "To use Tor, get it first: about 22 MB from the Tor Project, checked before it's used. {blocked_hint}": "لاستخدام Tor، احصل عليه أولاً: حوالي 22 ميجا بايت من مشروع Tor، وقم بفحصه قبل استخدامه. {blocked_hint}",
   "Tor download": "تحميل تور",
   "Tor sends everything through three volunteer computers around the world, so the sites you search and download from and the radio stations you play see a Tor address, not yours. It's slower, and YouTube often turns Tor away: the app then tries other Tor routes, and only goes without Tor if you click to.": "يرسل Tor كل شيء عبر ثلاثة أجهزة كمبيوتر تطوعية حول العالم، وبالتالي فإن المواقع التي تبحث عنها وتنزل منها ومحطات الراديو التي تشغلها ترى عنوان Tor، وليس عنوانك. إنه أبطأ، وغالبًا ما يقوم YouTube بإبعاد Tor: يقوم التطبيق بعد ذلك بتجربة مسارات Tor الأخرى، ولا يعمل بدون Tor إلا إذا نقرت عليه.",
@@ -3100,5 +3098,10 @@
   "by {name}": "بواسطة {name}",
   "{language} needs a one-time download of its translation model ({size} MB). Offline mode is on, so it can't be downloaded now.": "تحتاج {language} إلى تنزيل نموذج الترجمة الخاص بها مرة واحدة ( {size} ميغابايت). وضع عدم الاتصال قيد التشغيل، لذا لا يمكن تنزيله الآن.",
   "{n} MB": "{n} ميغابايت",
-  "⚠ Windows has no {language} voice yet, so {language} can't be spoken properly. Offline mode is on, so it can't be installed now.": "⚠ لا يوجد لدى Windows صوت {language} حتى الآن، لذلك لا يمكن نطق {language} بشكل صحيح. وضع عدم الاتصال قيد التشغيل، لذا لا يمكن تثبيته الآن."
+  "⚠ Windows has no {language} voice yet, so {language} can't be spoken properly. Offline mode is on, so it can't be installed now.": "⚠ لا يوجد لدى Windows صوت {language} حتى الآن، لذلك لا يمكن نطق {language} بشكل صحيح. وضع عدم الاتصال قيد التشغيل، لذا لا يمكن تثبيته الآن.",
+  "A bar at the edge of the tabs and a coloured icon, in the highlight colour: easy to spot from across the room": "شريط على حافة علامات التبويب وأيقونة ملونة بلون التمييز: يسهل اكتشافها من جميع أنحاء الغرفة",
+  "A bar beside the tab": "شريط بجانب علامة التبويب",
+  "Show tab names": "إظهار أسماء علامات التبويب",
+  "Hide tab names": "إخفاء أسماء علامات التبويب",
+  "Show only the icons": "إظهار الأيقونات فقط"
 }

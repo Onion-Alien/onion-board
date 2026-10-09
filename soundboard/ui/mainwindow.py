@@ -23,7 +23,7 @@ from PySide6.QtWidgets import (QApplication, QCheckBox, QComboBox, QDialog, QFil
                                QGraphicsOpacityEffect, QGridLayout, QHBoxLayout, QInputDialog,
                                QLabel, QLineEdit, QMainWindow, QMenu, QMessageBox,
                                QPushButton, QScrollArea, QSizePolicy, QSlider, QStackedWidget,
-                               QSystemTrayIcon, QTabBar, QTabWidget, QToolTip, QVBoxLayout,
+                               QSystemTrayIcon, QTabBar, QToolTip, QVBoxLayout,
                                QWidget, QWidgetAction)
 from shiboken6 import isValid as qt_valid
 
@@ -54,9 +54,11 @@ from soundboard.ui.panel import (EqPanel, Flow, VolumeControl, bar, capped, card
                                  hint_label, icon_label, vsep)
 from soundboard.ui.linkbar import PLAY_ID as LINK_ID
 from soundboard.ui.linkbar import LinkBar
-from soundboard.ui.livedot import is_tab_live, set_tab_live
+from soundboard.ui.livedot import set_tab_live
 from soundboard.ui.livedot import set_tint as set_live_tint
 from soundboard.ui.logowidget import LogoWidget, glow_icon
+from soundboard.ui import sidebar
+from soundboard.ui.sidebar import SideTabs
 from soundboard.ui.ytsearch import SearchResults
 from soundboard.ui.setupshow import SetupShow
 from soundboard.ui.spacekey import SpaceKey
@@ -68,7 +70,7 @@ from soundboard.ui.triggerstab import TriggersTab
 from soundboard.ui.radiopanel import RadioOff, RadioTab
 from soundboard.ui.voicepanel import VoicePanel
 from soundboard.ui.widgets import (Meter, NameAndSeek, Pad, PadGrid, SeekSlider, SteadyTabs,
-                                   TabEndCorner, expand_dropped, fmt_pos, pad_height, spectrum,
+                                   expand_dropped, fmt_pos, pad_height, spectrum,
                                    SLIM_PAD_H)
 from soundboard.wheelguard import no_wheel
 from soundboard.winkeys import Hotkeys
@@ -137,6 +139,8 @@ RECOVER_WAIT_S = (20, 40, 80, 160, 300)
 GONE_CHECKS, GONE_WAIT_S = 4, 6
 LOOSE_WAIT_MS = 1500   # a file dragged into the sounds folder is looked at again (ms)
 LOOSE_EMPTY_LOOKS = 20   # an empty file that long (~30 s) waits for the folder to change
+BODY_SIDE = 14         # the gap around the window's content (beside the tab rail too)...
+BODY_SIDE_TIGHT = 8    # ...and beside the rail in a narrow window
 MINI_SIZE = QSize(440, 380)   # below this the window becomes the mini player...
 MINI_PAD_ROWS = 1             # ...which has the pads above it when this many rows fit
 QUEUE_CHIPS = 5          # queued sounds shown by name above the pads (then "+n more")
@@ -508,6 +512,7 @@ class MainWindow(QMainWindow):
             self.tabs.blockSignals(True)
             self.tabs.setCurrentWidget(self.setup_page)
             self.tabs.blockSignals(False)
+            self.rail.sync()   # (it heard nothing)
         self._rebuild_pads()
         splash.pump()
         self._load_all()
@@ -656,26 +661,28 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(self._pages)
         root = self._full = QWidget()
         self._pages.addWidget(root)
-        rv = QVBoxLayout(root)
-        rv.setContentsMargins(14, 10, 14, 10)
+        self._full_row = QHBoxLayout(root)   # the tab rail (ui/sidebar.py), then the rest
+        self._full_row.setContentsMargins(0, 0, 0, 0)
+        self._full_row.setSpacing(0)
+        body = QWidget()
+        self._full_row.addWidget(body, 1)
+        rv = QVBoxLayout(body)
+        self._body_lay = rv
+        rv.setContentsMargins(BODY_SIDE, 10, BODY_SIDE, 10)
         rv.setSpacing(8)
 
-        # ---- header: logo + name, then setup status, Stop all, Settings
+        # ---- header: setup status, Stop all, Settings (the logo and name are on top of
+        # the tab rail, made here for _paint_logo)
         head = QHBoxLayout()
         head.setSpacing(10)
         self.logo = LogoWidget()
-        head.addWidget(self.logo)
-        names = QVBoxLayout()
-        names.setSpacing(0)
         self.wordmark = QLabel("Onion Board")
         self.wordmark.setObjectName("wordmark")
         self.tagline = QLabel(_("an app by Onion Alien · v{version_text}",
                                 version_text=version_text()))
         self.tagline.setObjectName("tagline")
-        names.addWidget(self.wordmark)
-        names.addWidget(self.tagline)
-        head.addLayout(names)
-        head.addStretch(1)
+        # on the rail, the name and the version each on a line of their own
+        self.tagline.setText(self.tagline.text().replace(" · ", "\n", 1))
         self.pill = QPushButton()
         self.pill.setObjectName("pill")
         self.pill.setCursor(Qt.PointingHandCursor)
@@ -724,8 +731,9 @@ class MainWindow(QMainWindow):
         self.gear.setProperty("quiet", True)
         self.gear.setToolTip(_("Themes, hotkeys and more"))
         self.gear.clicked.connect(lambda: self.open_settings())
-        icons.set_icon(self.gear, "settings")
-        head.addWidget(self.gear)
+        icons.set_icon(self.gear, "settings", size=sidebar.ICON)
+        self.gear.setProperty("railtext", _("Settings"))   # at the foot of the tab rail
+        head.addStretch(1)
         rv.addLayout(head)
         self._paint_logo()
 
@@ -848,10 +856,9 @@ class MainWindow(QMainWindow):
 
         # ---- tabs
         self.tab_info: dict[str, tuple[str, str]] = {}   # page attr -> (title, text) for ⓘ
-        self.tabs = QTabWidget()
+        self.tabs = SideTabs()   # its bar hidden: the rail down the left shows the tabs
         self.tabs.setDocumentMode(True)
-        self.tabs.setIconSize(QSize(18, 18))
-        self.tabs.tabBar().setUsesScrollButtons(False)   # small windows drop the tab text
+        self.tabs.setIconSize(QSize(sidebar.ICON, sidebar.ICON))
         SteadyTabs(self.tabs)   # a change inside a page doesn't repaint the whole board
         rv.addWidget(self.tabs, 1)
         self.sounds_page = self._build_sounds_page()
@@ -878,9 +885,9 @@ class MainWindow(QMainWindow):
         # one ⓘ at the end of the tab bar: the tab's explanation, instead of a banner
         self.btn_info = QPushButton()
         self.btn_info.setObjectName("tabinfo")
-        self.btn_info.setFixedSize(32, 32)
+        self.btn_info.setProperty("railtext", _("About this tab"))
         self.btn_info.setAccessibleName(_("About this tab"))
-        icons.set_icon(self.btn_info, "info", size=20)
+        icons.set_icon(self.btn_info, "info", size=sidebar.ICON)
         self.btn_info.setCursor(Qt.PointingHandCursor)
         self.btn_info.setToolTip(_("What's this tab for?"))
         self.btn_info.clicked.connect(self._show_tab_info)
@@ -888,7 +895,8 @@ class MainWindow(QMainWindow):
         # click to add one; only there while one is off. Right after the last tab
         self.btn_more_tabs = QPushButton(_("More tabs"))
         self.btn_more_tabs.setObjectName("moretabs")
-        icons.set_icon(self.btn_more_tabs, "plus")
+        icons.set_icon(self.btn_more_tabs, "plus", size=sidebar.ICON)
+        self.btn_more_tabs.setProperty("railtext", _("More tabs"))
         self.btn_more_tabs.setCursor(Qt.PointingHandCursor)
         self.btn_more_tabs.setFocusPolicy(Qt.TabFocus)   # a click left an accent ring on it
         self.btn_more_tabs.setToolTip(_("Add a tab: radio, sending a program's sound, screen "
@@ -899,12 +907,15 @@ class MainWindow(QMainWindow):
         mt.aboutToHide.connect(self._more_tabs_hidden)
         self.btn_more_tabs.setMenu(mt)
         self._update_more_tabs()
-        self.tabs.setCornerWidget(TabEndCorner(self.tabs, self.btn_more_tabs, self.btn_info),
-                                  Qt.TopRightCorner)
+        self.rail = sidebar.SideRail(
+            self.tabs, self.logo, self.wordmark, self.tagline,
+            [self.btn_more_tabs, self.btn_info], self.cfg.sidebar_open, [self.gear],
+            self._rail_opened)
+        self._full_row.insertWidget(0, self.rail)
         # right-click a tab: hide it (+ More tabs or Settings > Tabs bring it back)
-        bar = self.tabs.tabBar()
-        bar.setContextMenuPolicy(Qt.CustomContextMenu)
-        bar.customContextMenuRequested.connect(self._tab_menu)
+        for b in self.rail.buttons:
+            b.customContextMenuRequested.connect(
+                lambda pos, b=b: self.tab_menu(b.index).exec(b.mapToGlobal(pos)))
         # every tab has a line for the ⓘ (the Apps tab brings its own): one tab with
         # the button and the rest without looked like a slip
         self.tab_info.setdefault("sounds_page", (
@@ -3383,12 +3394,20 @@ class MainWindow(QMainWindow):
         self.set_tab_on(key, True)
         self.tabs.setCurrentIndex(TAB_INDEX[key])
 
-    def _tab_menu(self, pos):
-        """Right-click on a tab: Hide this tab (not Sounds or Setup)."""
-        bar = self.tabs.tabBar()
-        i = bar.tabAt(pos)
-        if i >= 0:
-            self.tab_menu(i).exec(bar.mapToGlobal(pos))
+    def _squeeze_rail(self, tight: bool):
+        """A narrow window: the rail shut (opened out, it shuts again) and the gap
+        beside it narrower, so the pages keep their room before the mini player."""
+        self.rail.squeeze(tight)
+        self._body_lay.setContentsMargins(BODY_SIDE_TIGHT if tight else BODY_SIDE, 10,
+                                          BODY_SIDE, 10)
+
+    def _rail_opened(self, on: bool):
+        """The rail opened out or shut: save it, and fit the window to its new width
+        (shut, what had given way for it comes back)."""
+        self.set_option("sidebar_open", on)
+        if hasattr(self, "_fit"):
+            self._fit.reset()
+            self._refit()
 
     def tab_menu(self, i: int) -> QMenu:
         key = TAB_KEYS[i]
@@ -3467,6 +3486,7 @@ class MainWindow(QMainWindow):
             self.tabs.setTabToolTip(i, tip)
             bar.setAccessibleTabName(i, name)
             self.tabs.setCurrentIndex(cur)
+        self.rail.sync()
         icons.set_tab_icon(self.tabs, i, key)
         old.deleteLater()
         self._tab_live(key, False)
@@ -7375,7 +7395,9 @@ class MainWindow(QMainWindow):
         numbers go first; width and height are handled separately."""
         r = responsive
         f = self._fit = r.Fitter(self._full)
-        f.add(10, "w", r.hide(self.tagline))
+        # last: opened out, the rail stays open until nothing else can give (it shut
+        # again at once when opened in a mid-sized window)
+        f.add(90, "w", self._squeeze_rail)
         f.add(10, "w", r.hide(*self._pad_size))
         f.add(18, "w", r.icon_only(self.btn_view))   # its tooltip says what it is
         # the label and the dropdown go together: a lone "Clean" said nothing (the full
@@ -7389,13 +7411,11 @@ class MainWindow(QMainWindow):
         f.add(58, "w", r.icon_only(self.stop_btn))
         f.add(24, "w", self._shorten_air(1))
         f.add(65, "w", self._shorten_air(2))
-        f.add(22, "w", r.icon_only(self.gear))
         f.add(30, "w", r.hide(self.chk_monitor))
         f.add(28, "w", r.icon_only(self.chk_mic))   # its tooltip still explains it
         f.add(55, "w", r.hide(*self._mixer_hp))
         f.add(40, "w", r.hide(*self._transport_vol))
         f.add(50, "w", r.hide(self.np_name))
-        f.add(60, "w", r.hide(self.wordmark))
         f.add(60, "w", r.icon_only(self.btn_add))
         # a bare red dot read as a warning light, so Record keeps its word until the
         # folder, Backup and the Listening dropdown have gone
@@ -7406,10 +7426,8 @@ class MainWindow(QMainWindow):
         f.add(35, "w", r.hide(self.btn_more))   # also in Settings → General
         f.add(15, "w", r.icon_only(self.btn_folder))
         f.add(33, "w", r.hide(self.btn_folder))   # also in the Backup menu
-        f.add(60, "w", self._tab_icons_only)
         f.add(70, "w", r.hide(self.btn_check, *self._mixer_send, *self._mixer_others))
         f.add(80, "w", self._show_pill)
-        f.add(85, "w", self._tabs_tight)   # else the icons alone held it at ~480 px
         self._radio_steps = self.radio.fit_steps()   # swapped with the tab (Privacy)
         f.extend(self._radio_steps)
         self._tab_steps = {k: getattr(self, k).fit_steps() for k in ("voice", "triggers")}
@@ -7434,31 +7452,6 @@ class MainWindow(QMainWindow):
         if short != self._pill_short:
             self._pill_short = short
             self._update_flow()
-
-    def _tab_icons_only(self, compact: bool):
-        for i, (text, _tip) in enumerate(TABS):
-            self.tabs.setTabText(i, "" if compact else text)
-            self.tabs.tabBar().setAccessibleTabName(i, text)   # icon-only tabs aren't silent
-            base = text if compact else ""   # only an icon-only tab needs its name on hover
-            old = self.tabs.property(f"_tip{i}")   # set_tab_live's copy of the plain tip
-            if old is not None:
-                cur = self.tabs.tabToolTip(i)
-                self.tabs.setProperty(f"_tip{i}", base)
-                live = None   # keep its "● ON" line
-                if is_tab_live(self.tabs, i):
-                    live = cur if not old else cur[:-len(old) - 1] if cur.endswith(
-                        "\n" + old) else None
-                if live:
-                    base = f"{live}\n{base}" if base else live
-            self.tabs.setTabToolTip(i, base)
-
-    def _tabs_tight(self, compact: bool):
-        """Icon-only tabs packed close: their padding was the widest thing left, so a
-        window the rest fits turned into the mini player."""
-        bar = self.tabs.tabBar()
-        bar.setStyleSheet("QTabBar::tab { padding:8px 6px; margin-right:0px; }"
-                          if compact else "")
-        responsive.touch(bar)
 
     def _refit(self):
         size = self._pages.size()

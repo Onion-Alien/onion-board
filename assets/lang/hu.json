@@ -125,7 +125,6 @@
   "A restore point is saved first, so you can undo this.": "Előbb visszaállítási pont készül, így visszavonhatod.",
   "A short “Did you know?” about a feature, at most once a day, never while a game is up.": "Egy rövid „Tudtad?” egy funkcióról, legfeljebb naponta egyszer, soha nem játék közben.",
   "A small dot on its icon": "Egy kis pötty az ikonján",
-  "A soft wash and a coloured icon in the theme's colour, easy to spot from across the room": "Halvány kiemelés és színes ikon a téma színében, a szoba túloldaláról is látszik",
   "A soundboard is most useful left running: your hotkeys and the overlay work while the window is closed. The tray icon (by the clock) opens it again; right-click it to quit.": "Egy soundboard akkor a leghasznosabb, ha fut: a gyorsbillentyűid és az overlay akkor is működnek, ha az ablak zárva van. A tálcaikon (az óra mellett) újra megnyitja; jobb klikk rajta a kilépéshez.",
   "A tab whose feature is on right now (a sound playing, the voice changer, the radio…) is marked, so nothing is left on without you noticing.": "Az a lap, amelynek funkciója éppen be van kapcsolva (szól egy hang, a hangtorzító, a rádió…), jelölést kap, így semmi nem marad bekapcsolva észrevétlenül.",
   "A virtual cable (not installed yet)": "Virtuális kábel (még nincs telepítve)",
@@ -1246,7 +1245,6 @@
   "Throw this recording away?": "Eldobod ezt a felvételt?",
   "TikTok sounds": "TikTok-hangok",
   "Time": "Idő",
-  "Tint the tab": "A lap színezése",
   "To hear it live instead, use Hear what they hear at the bottom.": "Ha inkább élőben akarod hallani, használd lent a Halld, amit ők hallanak gombot.",
   "To use Tor, get it first: about 22 MB from the Tor Project, checked before it's used. {blocked_hint}": "A Tor használatához előbb szerezd be: kb. 22 MB a Tor Projecttől, használat előtt ellenőrizve. {blocked_hint}",
   "Toggle — press again stops it": "Kapcsoló — újabb nyomás leállítja",
@@ -2860,5 +2858,10 @@
   "by {name}": "{name}",
   "{language} needs a one-time download of its translation model ({size} MB). Offline mode is on, so it can't be downloaded now.": "{language} nyelvnek egyszeri letöltésre van szüksége a fordítási modelljéhez ( {size} MB). Az offline mód be van kapcsolva, ezért most nem lehet letölteni.",
   "{n} MB": "{n} MB",
-  "⚠ Windows has no {language} voice yet, so {language} can't be spoken properly. Offline mode is on, so it can't be installed now.": "⚠ A Windowsnak még nincs {language} hangja, így {language} nyelvet nem lehet megfelelően kimondani. Az offline mód be van kapcsolva, ezért most nem telepíthető."
+  "⚠ Windows has no {language} voice yet, so {language} can't be spoken properly. Offline mode is on, so it can't be installed now.": "⚠ A Windowsnak még nincs {language} hangja, így {language} nyelvet nem lehet megfelelően kimondani. Az offline mód be van kapcsolva, ezért most nem telepíthető.",
+  "A bar at the edge of the tabs and a coloured icon, in the highlight colour: easy to spot from across the room": "Egy sáv a fülek szélén és egy színes ikon kiemelt színben: könnyen észrevehető a szoba túloldaláról",
+  "A bar beside the tab": "Egy sáv a lap mellett",
+  "Show tab names": "Lapnevek megjelenítése",
+  "Hide tab names": "Lapnevek elrejtése",
+  "Show only the icons": "Csak az ikonok megjelenítése"
 }

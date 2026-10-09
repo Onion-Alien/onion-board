@@ -288,7 +288,6 @@ def test_apps_switched_off_right_after_it_is_built(window, qapp):
 
 
 def test_keyboard_never_lands_on_a_hidden_tab(window, qapp):
-    from PySide6.QtCore import Qt
     from PySide6.QtTest import QTest
     for key in taboff.KEYS:
         window.set_tab_on(key, False)
@@ -479,7 +478,7 @@ def test_right_click_hides_a_tab_and_more_tabs_brings_it_back(window, monkeypatc
     w.hide_tab("radio")
     assert not w.tab_on("radio") and w.tabs.currentIndex() == 0
     assert "More tabs" in shown[0]
-    assert w.tabs.cornerWidget(Qt.TopRightCorner).isAncestorOf(w.btn_more_tabs)
+    assert w.rail.isAncestorOf(w.btn_more_tabs)   # under the tabs on the rail
     assert not w.btn_more_tabs.isHidden()
     menu = w.btn_more_tabs.menu()
     menu.aboutToShow.emit()

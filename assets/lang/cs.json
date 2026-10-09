@@ -126,7 +126,6 @@
   "A restore point is saved first, so you can undo this.": "Nejdřív se uloží bod obnovení, takže to můžeš vrátit.",
   "A short “Did you know?” about a feature, at most once a day, never while a game is up.": "Krátké „Víš, že…?“ o nějaké funkci, nejvýš jednou denně, nikdy když běží hra.",
   "A small dot on its icon": "Malá tečka na ikoně",
-  "A soft wash and a coloured icon in the theme's colour, easy to spot from across the room": "Jemný nádech a barevná ikona v barvě motivu, snadno vidět i přes celou místnost",
   "A soundboard is most useful left running: your hotkeys and the overlay work while the window is closed. The tray icon (by the clock) opens it again; right-click it to quit.": "Soundboard je nejužitečnější, když běží: tvoje zkratky a překryv fungují, i když je okno zavřené. Ikona v oznamovací oblasti (u hodin) ho znovu otevře; pravým klikem na ni aplikaci ukončíš.",
   "A tab whose feature is on right now (a sound playing, the voice changer, the radio…) is marked, so nothing is left on without you noticing.": "Karta, jejíž funkce právě běží (hraje zvuk, měnič hlasu, rádio…), je označená, takže nic nezůstane zapnuté bez tvého vědomí.",
   "A virtual cable (not installed yet)": "Virtuální kabel (zatím nenainstalovaný)",
@@ -1262,7 +1261,6 @@
   "Throw this recording away?": "Zahodit tuto nahrávku?",
   "TikTok sounds": "Zvuky z TikToku",
   "Time": "Čas",
-  "Tint the tab": "Obarvit kartu",
   "To hear it live instead, use Hear what they hear at the bottom.": "Pokud to chceš slyšet naživo, použij dole Slyšet, co slyší oni.",
   "To use Tor, get it first: about 22 MB from the Tor Project, checked before it's used. {blocked_hint}": "Pro použití Toru si ho nejdřív stáhni: asi 22 MB z Tor Project, před použitím se ověří. {blocked_hint}",
   "Toggle — press again stops it": "Přepínat — další stisk ho zastaví",
@@ -2920,5 +2918,10 @@
   "by {name}": "od {name}",
   "{language} needs a one-time download of its translation model ({size} MB). Offline mode is on, so it can't be downloaded now.": "{language} potřebuje jednorázové stažení svého překladového modelu ( {size} MB). Offline režim je zapnutý, takže jej nyní nelze stáhnout.",
   "{n} MB": "{n} MB",
-  "⚠ Windows has no {language} voice yet, so {language} can't be spoken properly. Offline mode is on, so it can't be installed now.": "⚠ Windows zatím nemá žádný hlas v {language} , takže {language} nelze správně mluvit. Offline režim je zapnutý, takže jej nyní nelze nainstalovat."
+  "⚠ Windows has no {language} voice yet, so {language} can't be spoken properly. Offline mode is on, so it can't be installed now.": "⚠ Windows zatím nemá žádný hlas v {language} , takže {language} nelze správně mluvit. Offline režim je zapnutý, takže jej nyní nelze nainstalovat.",
+  "A bar at the edge of the tabs and a coloured icon, in the highlight colour: easy to spot from across the room": "Lišta na okraji záložek a barevná ikona v barvě zvýraznění: snadno viditelná z celé místnosti",
+  "A bar beside the tab": "Lišta vedle karty",
+  "Show tab names": "Zobrazit názvy karet",
+  "Hide tab names": "Skrýt názvy karet",
+  "Show only the icons": "Zobrazit pouze ikony"
 }

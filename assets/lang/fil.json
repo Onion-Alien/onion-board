@@ -125,7 +125,6 @@
   "A restore point is saved first, so you can undo this.": "May restore point na sine-save muna, kaya maa-undo mo ito.",
   "A short “Did you know?” about a feature, at most once a day, never while a game is up.": "Maikling “Alam mo ba?” tungkol sa isang feature, hanggang isang beses kada araw, hindi kailanman habang may game na bukas.",
   "A small dot on its icon": "Maliit na tuldok sa icon nito",
-  "A soft wash and a coloured icon in the theme's colour, easy to spot from across the room": "Malambot na kulay at may kulay na icon sa kulay ng theme, madaling makita kahit malayo",
   "A soundboard is most useful left running: your hotkeys and the overlay work while the window is closed. The tray icon (by the clock) opens it again; right-click it to quit.": "Pinaka-useful ang soundboard kapag nakabukas lang: gumagana ang mga hotkey at overlay mo kahit sarado ang window. Binubuksan ulit ito ng tray icon (malapit sa orasan); i-right-click ito para mag-quit.",
   "A tab whose feature is on right now (a sound playing, the voice changer, the radio…) is marked, so nothing is left on without you noticing.": "May marka ang tab na naka-on ang feature ngayon (may sound na nagpe-play, voice changer, radio…), para walang maiwang naka-on nang hindi mo napapansin.",
   "A virtual cable (not installed yet)": "Virtual cable (hindi pa naka-install)",
@@ -1246,7 +1245,6 @@
   "Throw this recording away?": "Itapon ang recording na ito?",
   "TikTok sounds": "TikTok sounds",
   "Time": "Oras",
-  "Tint the tab": "Kulayan ang tab",
   "To hear it live instead, use Hear what they hear at the bottom.": "Para marinig ito nang live, gamitin ang Pakinggan ang naririnig nila sa ibaba.",
   "To use Tor, get it first: about 22 MB from the Tor Project, checked before it's used. {blocked_hint}": "Para gumamit ng Tor, kunin muna ito: mga 22 MB mula sa Tor Project, sinusuri bago gamitin. {blocked_hint}",
   "Toggle — press again stops it": "Toggle — pindutin ulit para itigil",
@@ -2860,5 +2858,10 @@
   "by {name}": "ni {name}",
   "{language} needs a one-time download of its translation model ({size} MB). Offline mode is on, so it can't be downloaded now.": "Kailangan ng {language} ng isang beses na pag-download ng modelo ng pagsasalin nito ( {size} MB). Naka-on ang offline mode, kaya hindi ito mada-download ngayon.",
   "{n} MB": "{n} MB",
-  "⚠ Windows has no {language} voice yet, so {language} can't be spoken properly. Offline mode is on, so it can't be installed now.": "⚠ Ang Windows ay wala pang {language} na boses, kaya {language} ay hindi mabigkas nang maayos. Naka-on ang offline mode, kaya hindi ito mai-install ngayon."
+  "⚠ Windows has no {language} voice yet, so {language} can't be spoken properly. Offline mode is on, so it can't be installed now.": "⚠ Ang Windows ay wala pang {language} na boses, kaya {language} ay hindi mabigkas nang maayos. Naka-on ang offline mode, kaya hindi ito mai-install ngayon.",
+  "A bar at the edge of the tabs and a coloured icon, in the highlight colour: easy to spot from across the room": "Isang bar sa gilid ng mga tab at may kulay na icon, sa kulay ng highlight: madaling makita mula sa buong kwarto",
+  "A bar beside the tab": "Isang bar sa tabi ng tab",
+  "Show tab names": "Ipakita ang mga pangalan ng tab",
+  "Hide tab names": "Itago ang mga pangalan ng tab",
+  "Show only the icons": "Ipakita lamang ang mga icon"
 }

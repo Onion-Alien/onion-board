@@ -363,6 +363,7 @@ class Config:
     pad_sort: str = "custom"   # the Sounds tab's order: PAD_SORTS
     pad_view: str = "grid"     # "grid" (cards) or "list" (one-line rows)
     app_card_width: int = 300
+    sidebar_open: bool = False   # the tab rail opened out to show the tabs' names
     tab: int = 0     # 0 = sounds, 1 = radio, 2 = apps, 3 = triggers, 4 = voice, 5 = setup
     # Settings > Tabs: the tabs switched off ("radio", "apps", "triggers", "voice"), gone
     # from the window and never built (a new user starts with BASIC_TABS_OFF)

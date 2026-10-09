@@ -739,7 +739,6 @@
   "A restore point is saved first, so you can undo this.": "Сначала сохраняется точка восстановления, так что это можно отменить.",
   "A short “Did you know?” about a feature, at most once a day, never while a game is up.": "Короткое «А ты знал?» о какой-нибудь функции, не чаще раза в день и никогда во время игры.",
   "A small dot on its icon": "Маленькая точка на значке",
-  "A soft wash and a coloured icon in the theme's colour, easy to spot from across the room": "Мягкая подсветка и цветной значок в цвете темы, видно даже через всю комнату",
   "A soundboard is most useful left running: your hotkeys and the overlay work while the window is closed. The tray icon (by the clock) opens it again; right-click it to quit.": "Саундборд полезнее всего, когда работает в фоне: горячие клавиши и оверлей работают и при закрытом окне. Значок в трее (у часов) снова его открывает; ПКМ по нему — выйти.",
   "A tab whose feature is on right now (a sound playing, the voice changer, the radio…) is marked, so nothing is left on without you noticing.": "Вкладка, функция которой сейчас включена (играет звук, изменитель голоса, радио…), помечается, чтобы ничего не осталось включённым незаметно.",
   "About": "О программе",
@@ -1398,7 +1397,6 @@
   "Through a proxy or Tor, everything the app fetches (searches, downloads, radio, updates) goes through it, and site names are looked up there, not on this PC. If it can't be reached, nothing is fetched: the app never quietly goes direct. This PC's own addresses (127.0.0.1) stay direct.": "Через прокси или Tor всё, что скачивает приложение (поиск, загрузки, радио, обновления), идёт через них, и имена сайтов определяются там, а не на этом ПК. Если до них не достучаться, ничего не скачивается: приложение никогда втихую не идёт напрямую. Собственные адреса этого ПК (127.0.0.1) остаются напрямую.",
   "TikTok sounds": "Звуки TikTok",
   "Time": "Время",
-  "Tint the tab": "Подсвечивать вкладку",
   "To use Tor, get it first: about 22 MB from the Tor Project, checked before it's used. {blocked_hint}": "Чтобы использовать Tor, сначала скачай его: около 22 МБ с сайта Tor Project, с проверкой перед использованием. {blocked_hint}",
   "Tor download": "Загрузка Tor",
   "Tor sends everything through three volunteer computers around the world, so the sites you search and download from and the radio stations you play see a Tor address, not yours. It's slower, and YouTube often turns Tor away: the app then tries other Tor routes, and only goes without Tor if you click to.": "Tor пропускает всё через три компьютера добровольцев по всему миру, так что сайты, где ты ищешь и качаешь, и радиостанции, которые ты слушаешь, видят адрес Tor, а не твой. Это медленнее, и YouTube часто не пускает Tor: тогда приложение пробует другие маршруты Tor и идёт без Tor, только если ты сам нажмёшь.",
@@ -2920,5 +2918,10 @@
   "by {name}": "по {name}",
   "{language} needs a one-time download of its translation model ({size} MB). Offline mode is on, so it can't be downloaded now.": "Для {language} требуется единоразовая загрузка модели перевода ( {size} МБ). Офлайн-режим включен, поэтому загрузить его сейчас невозможно.",
   "{n} MB": "{n} МБ",
-  "⚠ Windows has no {language} voice yet, so {language} can't be spoken properly. Offline mode is on, so it can't be installed now.": "⚠ В Windows пока нет голоса {language} , поэтому на {language} невозможно произнести правильно. Оффлайн-режим включен, поэтому сейчас его невозможно установить."
+  "⚠ Windows has no {language} voice yet, so {language} can't be spoken properly. Offline mode is on, so it can't be installed now.": "⚠ В Windows пока нет голоса {language} , поэтому на {language} невозможно произнести правильно. Оффлайн-режим включен, поэтому сейчас его невозможно установить.",
+  "A bar at the edge of the tabs and a coloured icon, in the highlight colour: easy to spot from across the room": "Полоса по краям вкладок и цветной значок, выделенный цветом: его легко заметить с другого конца комнаты.",
+  "A bar beside the tab": "Панель рядом с вкладкой",
+  "Show tab names": "Показать названия вкладок",
+  "Hide tab names": "Скрыть названия вкладок",
+  "Show only the icons": "Показать только значки"
 }

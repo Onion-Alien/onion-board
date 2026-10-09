@@ -51,19 +51,20 @@ def test_a_crash_report_open_over_a_dialog_outlives_it(qapp, win, monkeypatch):
     kept[0].done(0)
 
 
-def test_live_tab_warning_survives_the_icons_only_tab_bar(qapp, win):
+def test_live_tab_warning_shows_on_the_rail(qapp, win):
     vi = win.tabs.indexOf(win.voice)
+    b = win.rail.buttons[vi]
+    plain = b.icon().cacheKey()
     set_tab_live(win.tabs, vi, True, "● ON: others hear your changed voice", "voice")
-    for compact in (True, False):
-        win._tab_icons_only(compact)
-        tip = win.tabs.tabToolTip(vi)
-        assert tip.startswith("● ON"), tip
-        assert tip.endswith("\nVoice") == compact
+    for is_open in (False, True):
+        win.rail.set_open(is_open)
+        assert b.toolTip().startswith("● ON"), b.toolTip()
+        assert b.toolTip().endswith("\nVoice") == (not is_open)
+    assert b.icon().cacheKey() != plain   # the live icon came across
     set_tab_live(win.tabs, vi, False)
-    assert not win.tabs.tabToolTip(vi).startswith("●")   # the right plain tip is back
-    other = win.tabs.indexOf(win.setup_page)
-    win._tab_icons_only(True)
-    assert not win.tabs.tabToolTip(other).startswith("●")
+    assert not b.toolTip().startswith("●")   # the right plain tip is back
+    win.rail.set_open(False)
+    assert not win.rail.buttons[win.tabs.indexOf(win.setup_page)].toolTip().startswith("●")
 
 
 def _contrast(a: str, b: str) -> float:

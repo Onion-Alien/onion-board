@@ -722,7 +722,6 @@
   "A restore point is saved first, so you can undo this.": "Vorher wird ein Wiederherstellungspunkt gespeichert, damit du das rückgängig machen kannst.",
   "A short “Did you know?” about a feature, at most once a day, never while a game is up.": "Ein kurzes „Wusstest du?“ zu einer Funktion, höchstens einmal am Tag, nie während ein Spiel läuft.",
   "A small dot on its icon": "Ein kleiner Punkt auf seinem Symbol",
-  "A soft wash and a coloured icon in the theme's colour, easy to spot from across the room": "Ein sanfter Schimmer und ein farbiges Symbol in der Farbe des Themes, gut von der anderen Zimmerseite zu sehen",
   "A soundboard is most useful left running: your hotkeys and the overlay work while the window is closed. The tray icon (by the clock) opens it again; right-click it to quit.": "Ein Soundboard ist am nützlichsten, wenn es weiterläuft: Deine Hotkeys und das Overlay gehen auch bei geschlossenem Fenster. Das Symbol im Infobereich (bei der Uhr) öffnet es wieder; Rechtsklick darauf zum Beenden.",
   "A tab whose feature is on right now (a sound playing, the voice changer, the radio…) is marked, so nothing is left on without you noticing.": "Ein Tab, dessen Funktion gerade an ist (ein Sound spielt, der Stimmverzerrer, das Radio…), wird markiert, damit nichts unbemerkt an bleibt.",
   "About": "Info",
@@ -1375,7 +1374,6 @@
   "Through a proxy or Tor, everything the app fetches (searches, downloads, radio, updates) goes through it, and site names are looked up there, not on this PC. If it can't be reached, nothing is fetched: the app never quietly goes direct. This PC's own addresses (127.0.0.1) stay direct.": "Über einen Proxy oder Tor geht alles, was die App holt (Suchen, Downloads, Radio, Updates), darüber, und Seitennamen werden dort aufgelöst, nicht auf diesem PC. Wenn er nicht erreichbar ist, wird nichts geholt: Die App geht nie heimlich direkt. Die eigenen Adressen dieses PCs (127.0.0.1) bleiben direkt.",
   "TikTok sounds": "TikTok-Sounds",
   "Time": "Zeit",
-  "Tint the tab": "Tab einfärben",
   "To use Tor, get it first: about 22 MB from the Tor Project, checked before it's used. {blocked_hint}": "Um Tor zu nutzen, hol es dir zuerst: etwa 22 MB vom Tor Project, wird vor der Nutzung geprüft. {blocked_hint}",
   "Tor download": "Tor-Download",
   "Tor sends everything through three volunteer computers around the world, so the sites you search and download from and the radio stations you play see a Tor address, not yours. It's slower, and YouTube often turns Tor away: the app then tries other Tor routes, and only goes without Tor if you click to.": "Tor schickt alles über drei Freiwilligen-Computer auf der ganzen Welt, also sehen die Seiten, auf denen du suchst und von denen du lädst, und die Radiosender, die du spielst, eine Tor-Adresse statt deiner. Es ist langsamer, und YouTube weist Tor oft ab: Die App versucht dann andere Tor-Routen und geht nur ohne Tor, wenn du dafür klickst.",
@@ -2860,5 +2858,10 @@
   "by {name}": "von {name}",
   "{language} needs a one-time download of its translation model ({size} MB). Offline mode is on, so it can't be downloaded now.": "{language} benötigt einen einmaligen Download seines Übersetzungsmodells ( {size} MB). Der Offline-Modus ist aktiviert und kann daher derzeit nicht heruntergeladen werden.",
   "{n} MB": "{n} MB",
-  "⚠ Windows has no {language} voice yet, so {language} can't be spoken properly. Offline mode is on, so it can't be installed now.": "⚠ Windows hat noch keine {language} -Stimme, daher kann {language} nicht richtig gesprochen werden. Der Offline-Modus ist aktiviert und kann daher derzeit nicht installiert werden."
+  "⚠ Windows has no {language} voice yet, so {language} can't be spoken properly. Offline mode is on, so it can't be installed now.": "⚠ Windows hat noch keine {language} -Stimme, daher kann {language} nicht richtig gesprochen werden. Der Offline-Modus ist aktiviert und kann daher derzeit nicht installiert werden.",
+  "A bar at the edge of the tabs and a coloured icon, in the highlight colour: easy to spot from across the room": "Eine Leiste am Rand der Registerkarten und ein farbiges Symbol in der Hervorhebungsfarbe: von der anderen Seite des Raums aus leicht zu erkennen",
+  "A bar beside the tab": "Eine Leiste neben der Registerkarte",
+  "Show tab names": "Tab-Namen anzeigen",
+  "Hide tab names": "Tab-Namen ausblenden",
+  "Show only the icons": "Nur die Symbole anzeigen"
 }
