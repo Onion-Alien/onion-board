@@ -37,6 +37,57 @@ def grid_of(n, width=100):
 
 # ---------------------------------------------------------------------- the grid
 
+@pytest.mark.parametrize("change", ["grow", "shrink", "filter", "add", "reorder"])
+def test_resizing_cards_repaints_the_entire_drop_hint(qapp, change):
+    """The old dashed box must disappear in the same frame as the cards move."""
+    from PySide6.QtCore import QEvent, QObject
+    from PySide6.QtGui import QRegion
+
+    grid = grid_of(6)
+    grid.show()
+    qapp.processEvents()
+    old = grid.drop_area().toAlignedRect()
+    painted = QRegion()
+
+    class Watch(QObject):
+        def eventFilter(self, obj, event):
+            nonlocal painted
+            if event.type() == QEvent.Paint:
+                painted |= event.region()
+            return False
+
+    watch = Watch()
+    grid.installEventFilter(watch)
+    try:
+        if change == "grow":
+            grid.set_pad_width(105)  # four columns become three; both rows get taller
+        elif change == "shrink":
+            grid.set_pad_width(80)   # all six cards now fit in two shorter rows
+        elif change == "filter":
+            for pad in grid.pads[3:]:
+                pad.setProperty("filtered", True)
+            grid.relayout(force=True)
+        elif change == "add":
+            grid.set_pads(grid.pads + [
+                Pad(SoundMeta(id=f"new{i}", name="New sound", file=""), 100)
+                for i in range(3)])
+        else:
+            grid.set_pads(grid.pads[1:] + grid.pads[:1])
+        new = grid.drop_area().toAlignedRect()
+        qapp.processEvents()
+        background = QRegion(old.united(new))
+        for pad in grid.pads:
+            if not pad.isHidden():
+                background -= QRegion(pad.geometry())
+        assert (background - painted).isEmpty()
+        shown = [p for p in grid.pads if not p.isHidden()]
+        assert all(not new.intersects(p.geometry()) for p in shown)
+        assert all(not a.geometry().intersects(b.geometry())
+                   for i, a in enumerate(shown) for b in shown[i + 1:])
+    finally:
+        grid.close()
+
+
 def test_regrid_adds_pads_with_the_layout_switched_off(qapp):
     """Each pad shown into a live grid laid the whole grid out again: clearing a
     search over 600 pads took 85-145 ms. The layout is off until they're all in."""

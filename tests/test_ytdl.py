@@ -438,9 +438,9 @@ def test_link_add_as_sound(qapp, window, monkeypatch, tmp_path):  # noqa: F811
     assert calls == ["https://youtu.be/abc"]
     assert not (tmp_path / "sb-ytdl-1").exists()                   # the download is cleaned up
     assert "Added" in window.linkbar.info.text()
-    window.linkbar.add()                                     # the same again: refused
-    assert process_events(qapp, lambda: "already in your Sounds" in
-                          window.linkbar.info.text(), 5)
+    window.linkbar.add()                                     # repeated Add is already done
+    assert "Added" in window.linkbar.info.text()
+    assert calls == ["https://youtu.be/abc"] and len(window.cfg.sounds) == 3
     assert len(window.cfg.sounds) == 3
 
 

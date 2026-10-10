@@ -32,7 +32,7 @@ from soundboard.ui.bunnywidget import BunnyWidget
 from soundboard.ui.owl import H as OWL_H
 from soundboard.ui.owl import W as OWL_W
 from soundboard.ui.owl import OwlWidget
-from soundboard.ui.panel import CardGrid, HoverCard
+from soundboard.ui.panel import CardGrid, HoverCard, RoundedFrame
 from soundboard.ui.responsive import FitWidth
 from soundboard.ui.widgets import LoadingBar, fmt_time, paint_now_playing
 from soundboard import errors
@@ -431,7 +431,6 @@ class ResultRow(HoverCard):
         self.sub.setObjectName("muted")
         self.stats = StatsLabel()
         self.stats.setObjectName("muted")
-        self.stats.set_stats(r)
         self.btn_play = QPushButton(_("Play"))
         self.btn_play.setObjectName("cardplay")
         self.btn_play.setToolTip(_("Download its audio and play it once (it isn't kept)"))
@@ -469,6 +468,9 @@ class ResultRow(HoverCard):
         box.setSpacing(14 if wide else 8)
         box.addWidget(self.thumb)
         box.addLayout(self.text_box, 1)
+        # set_stats shows the label when metadata exists. Adopt it first so each
+        # search result cannot flash a tiny standalone window on the desktop.
+        self.stats.set_stats(r)
         self._style()
         self._release = {}      # "play" / "add" -> busy.hold's release while it's fetched
         self._added = False
@@ -654,7 +656,7 @@ class ResultRow(HoverCard):
         self.thumb.set_pixmap(pm)
 
 
-class SearchResults(QFrame):
+class SearchResults(RoundedFrame):
     """`play(Result)` / `add(Result)` when a row's button is pressed; `closed()`
     when its "My sounds" back button is (the owner shows its pads again). The site
     buttons in the header pick where the search goes and re-run it there."""
@@ -676,7 +678,7 @@ class SearchResults(QFrame):
         self._done.connect(self._on_done)
 
         v = QVBoxLayout(self)
-        v.setContentsMargins(0, 0, 0, 0)
+        v.setContentsMargins(12, 12, 12, 12)
         v.setSpacing(6)
         head = QHBoxLayout()
         back = self.btn_back = QPushButton(_("Back to my sounds"))

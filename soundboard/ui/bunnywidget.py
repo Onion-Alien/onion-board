@@ -21,6 +21,10 @@ poke him `ANNOY_CLICKS` times and he storms off the same way, comes back with a
 baseball bat and challenges you to Pong (ui/bunpong.py) over the page.
 Closing the game calls `calm_down()`, and he's back to how he was.
 
+`naps=True`: in the small hours (NAP_HOURS, by this PC's own clock; nothing is sent
+anywhere) he's asleep in a nightcap, breathing slowly, with Zzz floating up. A click
+wakes him, grumpy, for WOKEN_S seconds; then he nods off again.
+
 The widget is bigger than Bun himself so there's room around him for the notes,
 which also gives him even breathing room in a layout. The timer only runs while
 he's on screen, always at the same 30 fps (a slower idle pace made the bob judder
@@ -36,6 +40,7 @@ from PySide6.QtCore import QPointF, QRectF, QSize, Qt, QTimer, Signal
 from PySide6.QtGui import QColor, QFont, QPainter, QPainterPath, QPen
 from PySide6.QtWidgets import QSizePolicy, QWidget
 
+from soundboard import theme, usage
 from soundboard.bunny import H, INK, W, WOOD, draw_bunny, music_note, sparkle
 from soundboard.i18n import _
 from soundboard.ui import appstate
@@ -66,6 +71,14 @@ BEG = 2.8          # how long a begging line stays up, seconds
 # his bat; from GRUMPY_AT on he's already getting cross
 ANNOY_CLICKS, ANNOY_WINDOW, GRUMPY_AT = 7, 3.0, 4
 TAUNT = 1.5        # how long he taps the bat before the game opens, seconds
+NAP_HOURS = (2, 3, 4)   # local hours (2:00 to 4:59) he's asleep, with naps=True
+WOKEN_S = 30.0     # how long a click keeps him awake
+ZZZ_EVERY = 1.1    # seconds between Zs
+
+
+def local_hour() -> int:
+    """The hour on this PC's clock (read here only, never sent anywhere)."""
+    return time.localtime().tm_hour
 
 
 class _Note:
@@ -97,9 +110,15 @@ class BunnyWidget(QWidget):
 
     def __init__(self, prop: str | None = None, height: int = 110, pad: int = 26,
                  celebrate: bool = False, parent=None, *, sad: float = 0.0,
-                 lines=(), hope_lines=(), joy_lines=(), pong: bool = False):
+                 lines=(), hope_lines=(), joy_lines=(), pong: bool = False,
+                 naps: bool = False):
         super().__init__(parent)
         self.pong = pong
+        self.naps = naps
+        self._woken_until = 0.0         # a click woke him: awake until then
+        self._hour, self._hour_at = -1, -1e9   # the clock's hour, read once a few seconds
+        self.zzz: list[list[float]] = []      # [x, y, age]: Zs floating up while he sleeps
+        self._zzz_debt = 0.0
         self._pokes: list[float] = []   # recent click times (the Pong Easter egg)
         self._angry = 0.0               # how cross he looks right now (smoothed)
         self._cross_until = 0.0         # ... and stays cross until then
@@ -183,7 +202,37 @@ class BunnyWidget(QWidget):
         self.burst(6)
         self._say(self.joy_lines, 1.6)
 
+    @property
+    def asleep(self) -> bool:
+        """Napping right now: naps on, the small hours, not just woken, not mid-act."""
+        if not self.naps or self.building:
+            return False
+        now = time.monotonic()
+        if now < self._woken_until:
+            return False
+        if now - self._hour_at > 5:
+            self._hour, self._hour_at = local_hour(), now
+        return self._hour in NAP_HOURS
+
+    def wake(self):
+        """A click while he naps: up he gets, grumpy, for WOKEN_S seconds."""
+        now = time.monotonic()
+        usage.used("egg-bun-woken")   # the name only (usage.py)
+        self._woken_until = now + WOKEN_S
+        self._cross_until = now + 1.6
+        self.zzz.clear()
+        self.say = self._rng.choice((_("huh?! wha…"), _("five more minutes…"),
+                                     _("it's the middle of the night!"), _("zzz… hm?!")))
+        self._say_until = now + 2.2
+
     def mousePressEvent(self, ev):
+        if ev.button() == Qt.LeftButton and self.asleep:
+            self.wake()
+            self.clicked.emit()
+            super().mousePressEvent(ev)
+            return
+        if ev.button() == Qt.LeftButton and self.naps:
+            self._woken_until = max(self._woken_until, time.monotonic() + WOKEN_S)
         if ev.button() == Qt.LeftButton and self.joy_lines:
             if not self.poke():
                 self.cheer()
@@ -401,7 +450,21 @@ class BunnyWidget(QWidget):
             self._next_sigh = now + self._rng.uniform(5, 9)
         if self.say and now >= self._say_until:
             self.say = ""
-        if (self.lines and self._sad > 0.3 and not self.say and now >= self._next_beg
+        asleep = self.asleep
+        if asleep:   # Zs drift up and off to the side of his head, growing as they go
+            self._sad = 0.0
+            self._zzz_debt += dt
+            if self._zzz_debt >= ZZZ_EVERY:
+                self._zzz_debt = 0.0
+                r = self._bun_rect()
+                self.zzz.append([r.left() + r.width() * 0.74, r.top() + r.height() * 0.24, 0.0])
+        for z in self.zzz:   # (mostly sideways: there's more room beside him than above)
+            z[2] += dt
+            z[0] += dt * (17 + 7 * math.sin(z[2] * 3))
+            z[1] -= dt * 9
+        self.zzz = [z for z in self.zzz if z[2] < 2.4]
+        if (not asleep and self.lines and self._sad > 0.3 and not self.say
+                and now >= self._next_beg
                 and not (0 <= now - self._sigh_at < 1.6)):
             self._beg_at = now
             self._say(self.lines, BEG)
@@ -460,7 +523,14 @@ class BunnyWidget(QWidget):
             ears -= 8
         if self._angry > 0.05 and phase in (None, "bat"):   # a cross little shake
             dx += 1.6 * self._angry * math.sin(t * 40)
-        return {"blink": blink, "mouth": self._mouth, "ears": ears, "dy": dy,
+        mouth = self._mouth
+        if self.asleep:   # eyes shut, slow deep breaths, a little snoring "o"
+            blink = 1.0
+            breath = math.sin(t * 1.3)
+            dy = 1.8 * breath
+            ears = 22 + 4 * breath
+            mouth = 0.1 + 0.07 * max(0.0, breath)
+        return {"blink": blink, "mouth": mouth, "ears": ears, "dy": dy,
                 "dx": dx, "swing": swing, "shown": shown, "sad": self._sad,
                 "angry": self._angry}
 
@@ -491,11 +561,23 @@ class BunnyWidget(QWidget):
         if pose["shown"]:
             draw_bunny(p, r.translated(pose["dx"], pose["dy"]), self.prop,
                        blink=pose["blink"], mouth=pose["mouth"], ears=pose["ears"],
-                       swing=pose["swing"], sad=pose["sad"], angry=pose["angry"])
+                       swing=pose["swing"], sad=pose["sad"], angry=pose["angry"],
+                       nightcap=self.asleep)
         else:
             self._paint_scuffle(p)
         if self.say and pose["shown"]:
             self._bubble(p, self.say, r.translated(pose["dx"], pose["dy"]))
+        if self.zzz:
+            f = QFont(self.font())
+            f.setBold(True)
+            col = QColor(theme.T["text_hi"])
+            for x, y, age in self.zzz:
+                k = age / 2.4
+                f.setPixelSize(max(9, round(self.bun_h * (0.14 + 0.12 * k))))
+                p.setFont(f)
+                col.setAlphaF(min(1.0, age * 3) * (1 - k) ** 1.1 * 0.95)
+                p.setPen(col)
+                p.drawText(QPointF(x, y), "z" if k < 0.35 else "Z")
         for n in self.notes:
             k = n.age / n.life
             alpha = min(1.0, n.age * 6) * (1 - k) ** 1.4

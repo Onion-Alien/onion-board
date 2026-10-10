@@ -3,7 +3,7 @@ and everything that's changing what others hear from it (the voice changer, the 
 voice, the computer voice, the language you speak in), whichever cards are folded.
 
 Each thing that's on is a chip; clicking it opens its card. With nothing on, one
-quiet chip says others hear your real voice."""
+plain label explains that the mic voice is unchanged."""
 from __future__ import annotations
 
 from PySide6.QtCore import QSize, Qt, Signal
@@ -21,7 +21,7 @@ GAP = 16            # between the mic half and the chips, side by side
 
 class Chip(QPushButton):
     """One thing that's on: a rounded label with a picture, the accent colour while
-    it's on, the warning colour when it went wrong, muted for "your real voice"."""
+    it's on, the warning colour when it went wrong."""
 
     def __init__(self, key: str):
         super().__init__()
@@ -82,9 +82,7 @@ class VoiceStatusBar(QFrame):
         mh.addWidget(self.lbl_mic)
         self.meter = Meter()
         self.meter.setMinimumWidth(80)
-        self.meter.setMaximumWidth(420)    # a level, not a stripe across a wide window
         mh.addWidget(self.meter, 1)
-        mh.addStretch(0)
         box.addWidget(mic, 1)
 
         right = self._right = QWidget()
@@ -94,7 +92,7 @@ class VoiceStatusBar(QFrame):
         self.lbl_heard = icon_label("ear", _("What others hear from your mic"))
         rh.addWidget(self.lbl_heard)
         box.addWidget(right, 0)
-        self.chips: dict[str, Chip] = {}
+        self.chips: dict[str, Chip | QLabel] = {}
         self._no_mic = None
 
     # ---- what's on
@@ -109,11 +107,20 @@ class VoiceStatusBar(QFrame):
         for key, text, state, icon, picture, tip in items:
             chip = self.chips.get(key)
             if chip is None:
-                chip = self.chips[key] = Chip(key)
-                chip.clicked.connect(lambda _=False, k=key: self.open_card.emit(k))
-            chip.show_as(text, state, icon, picture, tip)
+                if key == "none":
+                    chip = QLabel()
+                    chip.setObjectName("voicebarlabel")
+                else:
+                    chip = Chip(key)
+                    chip.clicked.connect(lambda _=False, k=key: self.open_card.emit(k))
+                self.chips[key] = chip
+            if isinstance(chip, Chip):
+                chip.show_as(text, state, icon, picture, tip)
+            else:
+                chip.setText(text)
+                chip.setToolTip(tip)
         order = [self.chips[k] for k in keys]
-        if [w for w in self._row_widgets() if isinstance(w, Chip)] != order:
+        if [w for w in self._row_widgets() if w in self.chips.values()] != order:
             for w in order:                       # after "Others hear", in order
                 row.removeWidget(w)
             for w in order:
@@ -124,7 +131,7 @@ class VoiceStatusBar(QFrame):
 
     def texts(self) -> list[str]:
         """The chips' words, in order (tests, the tab's accessible summary)."""
-        return [w.text() for w in self._row_widgets() if isinstance(w, Chip)]
+        return [w.text() for w in self._row_widgets() if w in self.chips.values()]
 
     def _row_widgets(self) -> list:
         row = self._chips_row
@@ -139,6 +146,7 @@ class VoiceStatusBar(QFrame):
             self._no_mic = no_mic
             self.lbl_mic.setVisible(no_mic)
             icons.set_label_icon(self.mic_icon, "mic", "warn_text" if no_mic else "muted")
+            self._fit()
 
     # ---- one row, or two when it's narrow
     def resizeEvent(self, e):
@@ -149,10 +157,16 @@ class VoiceStatusBar(QFrame):
         m = self._box.contentsMargins()
         room = self.width() - m.left() - m.right()
         line = sum(w.sizeHint().width() + 6 for w in self._row_widgets())   # one line
-        need = 160 + GAP + line
+        # Keep at least half the bar for the meter. If the status chips would
+        # squeeze it below that, put them underneath instead.
+        mic_labels = self._mic.minimumSizeHint().width() - self.meter.minimumWidth()
+        need = max(160, (self.width() + 1) // 2 + mic_labels) + GAP + line
         d = QBoxLayout.LeftToRight if room >= need else QBoxLayout.TopToBottom
         # beside the meter the chips keep to one line; under it they wrap
         self._right.setMinimumWidth(line if d == QBoxLayout.LeftToRight else 0)
+        # Flow's hint remembers its last width. Without a cap it takes the spare
+        # room on the next layout pass and squeezes the mic meter to its minimum.
+        self._right.setMaximumWidth(line if d == QBoxLayout.LeftToRight else 16777215)
         if self._box.direction() != d:
             self._box.setDirection(d)
             self._box.setSpacing(GAP if d == QBoxLayout.LeftToRight else 8)
