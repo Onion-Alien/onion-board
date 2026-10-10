@@ -47,6 +47,22 @@ def test_expiry_clears_note_but_never_a_replacement(qapp):
         parent.deleteLater()
 
 
+def test_note_sits_centred_in_the_page_not_over_the_rail(window):  # noqa: F811
+    note = window.status
+    page = note.parentWidget()
+    assert page is not window.rail and not page.isAncestorOf(window.rail)
+    window.resize(1100, 760)
+    window.show()
+    note.setText("Added “Socket Adapters are Getting Out of Hand” (900.0s) to Sounds: "
+                 "right-click it there to rename or set a hotkey.")
+    note.place()
+    g = note.geometry()
+    assert g.width() <= note.MAX_W
+    assert abs(g.center().x() - page.width() // 2) <= 1
+    rail_right = window.rail.mapTo(window, window.rail.rect().topRight()).x()
+    assert note.mapTo(window, note.rect().topLeft()).x() > rail_right
+
+
 def test_sidebar_controls_have_no_hover_help_in_both_sizes(window):  # noqa: F811
     rail = window.rail
     for opened in (False, True, False):
