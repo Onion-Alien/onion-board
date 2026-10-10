@@ -184,6 +184,9 @@ Build steps, in order: `scripts\version_info.py` (the .exe's version resource),
 if g++ is missing), PyInstaller (bundles `installer\install-vbcable.ps1` and
 `assets\onionboard.ico` as data, both at the root of `_internal\`, and `obmic.dll` in
 `_internal\directmic\`),
+`scripts\vc_runtime.py` (overwrites any older copy of the C++ runtime, `msvcp140.dll`
+and the rest, with the newest, PySide6's own: an older one from the build PC stops the
+app at start with "The specified procedure could not be found"),
 `scripts\prune_build.py` (removes the parts of Qt the app never loads — QML, 3D,
 charts, the web engine, unused image formats, translations — by walking the DLL import tables; the
 build fails if a kept file would lose an import), `OnionBoard.exe --selftest` (the
