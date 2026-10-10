@@ -9,9 +9,8 @@ import threading
 import time
 
 from PySide6.QtCore import QObject, QRectF, QSignalBlocker, QSize, Qt, QTimer, Signal
-from PySide6.QtGui import (QBrush, QColor, QFont, QKeySequence, QPainter, QPainterPath,
-                           QShortcut,
-                           QPixmap)
+from PySide6.QtGui import (QColor, QFont, QKeySequence, QPainter, QPainterPath,
+                           QShortcut)
 from PySide6.QtWidgets import (QAbstractButton, QApplication, QButtonGroup, QCheckBox,
                                QColorDialog, QComboBox,
                                QDialog, QFrame,
@@ -336,12 +335,7 @@ class ThemeCard(QPushButton):
         p.fillPath(win, QColor(t["bg"]))
         # side panel, pads and a slider, in the theme's own colours
         p.setPen(Qt.NoPen)
-        tex = t.get("texture")
-        if tex:   # carbon's weave drawn finer, to read at this size
-            tile = theme.texture_image(tex, t["panel"], 6 if tex == "carbon" else None)
-            p.setBrush(QBrush(QPixmap.fromImage(tile)))
-        else:
-            p.setBrush(QColor(t["panel"]))
+        p.setBrush(QColor(t["panel"]))
         p.drawRoundedRect(QRectF(r.right() - 44, r.top() + 6, 38, r.height() - 12), 5, 5)
         for i, col in enumerate(("#7c5cff", "#ff5c8a", "#1fb6ff", "#13ce66")):
             x = r.left() + 7 + (i % 2) * 44

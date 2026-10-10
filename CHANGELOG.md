@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Themes use clean, flat cards and a faint accent glow, without window grain,
+  dark background fades or panel textures. High Contrast keeps its strong outlines.
+
 - AI voices puts Start and live status at the top, with a wider voice picker,
   grouped pitch controls and shorter explanatory text in every language.
 - The note that pops up above the player ("Added … to Sounds", device changes and so
