@@ -8,6 +8,7 @@ from PySide6.QtCore import QPointF, Qt
 from PySide6.QtTest import QTest
 from PySide6.QtWidgets import QStackedWidget, QVBoxLayout, QWidget
 
+from soundboard import usage
 from soundboard.ui import bunnywidget as bw
 from soundboard.ui import bunpong
 from soundboard.ui.bunnywidget import BunnyWidget
@@ -214,4 +215,25 @@ def test_bun_stays_whole_on_the_court_and_still_reaches_the_edges(qapp):
                 break
         assert c.vx > 0 and c.score == {"you": 0, "bun": 0}   # he got it, bat stretched
     game.finish()
+    stack.close()
+
+
+def test_pong_counts_opened_quit_won_and_lost(qapp, monkeypatch):
+    monkeypatch.setattr(usage, "_used", set())
+    stack, page, _other, bun = _page_with_bun()
+    stack.show()
+    bun.fetch_bat()
+    game = bunpong.open_for(bun)
+    assert usage._used == {"egg-pong-opened"}
+    game.court.serve("bun")
+    game.reject()                       # closed mid-game
+    assert usage._used == {"egg-pong-opened", "egg-pong-quit"}
+    for who, key in (("you", "egg-pong-won"), ("bun", "egg-pong-lost")):
+        usage._used.clear()
+        stack2, g = _game()
+        for _ in range(WIN_AT):
+            g.court._point(who)
+        g.finish()                      # closed after the end: not a quit
+        assert usage._used == {key}
+        stack2.close()
     stack.close()

@@ -176,7 +176,8 @@ class ModeButton(QPushButton):
             a.setToolTip(mode_tip(q))
             a.triggered.connect(lambda _c=False, k=q.key: self.pick(k))
         self.menu_.addSeparator()
-        self.menu_.addAction(_("What do these do?"), lambda: ModesHelp(self.mw).exec())
+        self.menu_.addAction(icons.icon("info"), _("What do these do?"),
+                             lambda: ModesHelp(self.mw).exec())
         icons.set_icon(self, MODE_ICONS[p.key], size=sidebar.ICON)
         name = (_("Advanced: {label}", label=destination.resolve(d).name)
                 if p is profiles.ADVANCED else p.name)

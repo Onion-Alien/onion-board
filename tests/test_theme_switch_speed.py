@@ -1,18 +1,22 @@
 """Picking a theme in Settings restyles every widget in the app: in 1.7.2 that froze the
 window for 5-6 s (the freeze reports). These keep it quick on the real main window
 with every Settings page built."""
+import os
 import time
 
 from PySide6.QtCore import QObject
 from PySide6.QtWidgets import QApplication
 from test_mainwindow import window as main_window  # noqa: F401 - the real window, offscreen
 
-from soundboard import theme
+from soundboard import hangwatch, theme
 from soundboard.library import SoundMeta
 from soundboard.settings import SettingsDialog
 import pytest
 
-BUDGET_S = 2.0   # ~0.5 s here; the freeze reports start at 5 s (hangwatch.HANG_S)
+# ~0.5 s on a real PC. Hosted CI runners take 1.2-2.5 s for the same unchanged code
+# (shared cores, three other test workers beside it), so there the budget is the
+# point the app itself calls a freeze and reports it (hangwatch.HANG_S).
+BUDGET_S = hangwatch.HANG_S if os.environ.get("CI") else 2.0
 
 
 @pytest.fixture
