@@ -579,6 +579,22 @@ def test_enter_searches_youtube_and_a_result_plays_through_the_link_bar(
     assert not window._pads_scroll.isHidden() and window.ytresults.isHidden()
 
 
+def test_web_results_hide_the_empty_category_bar(qapp, window,  # noqa: F811
+                                                 monkeypatch):
+    """The category bar's empty row stayed in the layout while web results showed,
+    which left a gap between the toolbar and the results' buttons. It now goes with
+    the results and comes back when they close."""
+    monkeypatch.setattr(ytdl, "search", lambda q, count=20, source="youtube": [])
+    assert window.ytresults.layout().contentsMargins().top() == 0
+    window.search.setText("cat")
+    window.search.returnPressed.emit()
+    assert process_events(qapp, lambda: not window.ytresults.isHidden(), 5)
+    assert window.cat_bar.isHidden()
+    window.ytresults.close_results()
+    assert process_events(qapp, lambda: window.ytresults.isHidden(), 5)
+    assert not window.cat_bar.isHidden()
+
+
 def test_search_tiktok_and_youtube_music_go_through_youtube(monkeypatch):
     seen = fake_yt_dlp(monkeypatch, {"_type": "playlist", "entries": [
         {"id": "HEXWRTEbj1I", "title": "What Is Love"}]})

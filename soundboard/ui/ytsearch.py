@@ -678,7 +678,7 @@ class SearchResults(RoundedFrame):
         self._done.connect(self._on_done)
 
         v = QVBoxLayout(self)
-        v.setContentsMargins(12, 12, 12, 12)
+        v.setContentsMargins(12, 0, 12, 12)
         v.setSpacing(6)
         header = QWidget()
         header.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Fixed)
