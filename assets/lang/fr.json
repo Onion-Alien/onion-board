@@ -2032,7 +2032,6 @@
   "Only others in the call get it, not your stream output": "Seules les autres personnes participant à l'appel l'obtiennent, pas la sortie de votre flux.",
   "Only your stream output gets it (music for your viewers), not the call": "Seule la sortie de votre flux l'obtient (musique pour vos téléspectateurs), pas l'appel.",
   "Or type a line and it's spoken in the voice": "Ou tapez une ligne et elle est prononcée dans la voix",
-  "Or type a line and press Enter…": "Ou tapez une ligne et appuyez sur Entrée…",
   "Other pasted links": "Autres liens collés",
   "Others hear only the spoken voice, not your real one.": "D'autres n'entendent que la voix parlée, pas votre vraie voix.",
   "Others in the call and your stream output both get it": "Les autres participants à l'appel et la sortie de votre flux l'ont tous deux compris",
@@ -2167,7 +2166,6 @@
   "Streaming, recording, Voicemeeter or a mixer.": "Streaming, enregistrement, Voicemeter ou mixeur.",
   "Switch effects on and drag their sliders to build your own voice. Changing anything switches to “My own mix”; like it? Save it as a voice and it gets a button of its own.": "Activez les effets et faites glisser leurs curseurs pour créer votre propre voix. Changer quoi que ce soit passe à « Mon propre mix » ; tu aimes ça ? Enregistrez-le en tant que voix et il aura son propre bouton.",
   "Take this program off the list": "Retirez ce programme de la liste",
-  "Talk in English and others hear another language. The AI voice or the voice changer says it when one of them is on; otherwise press Start and a computer voice does. Or type a line at the bottom.": "Parlez en anglais et les autres entendent une autre langue. La voix de l'IA ou le changeur de voix le dit lorsque l'un d'eux est activé ; sinon, appuyez sur Démarrer et une voix de synthèse le fait. Ou tapez une ligne en bas.",
   "Talk, and others hear a different person: your words and tone, another voice, live. It runs on this PC (about one CPU core while you talk, nothing while you're quiet); what you say never leaves it.": "Parlez, et les autres entendent une personne différente : vos mots et votre ton, une autre voix, en direct. Il fonctionne sur ce PC (environ un cœur de processeur pendant que vous parlez, rien lorsque vous êtes silencieux) ; ce que tu dis ne le quitte jamais.",
   "Talkbox": "Boîte de discussion",
   "Talking inside a helmet, mask or metal box.": "Parler à l’intérieur d’un casque, d’un masque ou d’une boîte métallique.",
@@ -3019,5 +3017,7 @@
   "Library": "Bibliothèque",
   "Quick hotkeys": "Raccourcis rapides",
   "{route}: {status}": "{route} : {status}",
-  "Listening: {mode}": "Écoute : {mode}"
+  "Listening: {mode}": "Écoute : {mode}",
+  "Talk in English and others hear another language. The AI voice or the voice changer says it when one of them is on; otherwise press Start and a computer voice does.": "Parlez en anglais et les autres entendent une autre langue. La voix de l'IA ou le changeur de voix le dit lorsque l'un d'eux est activé ; sinon, appuyez sur Démarrer et une voix de synthèse le fait.",
+  "Type a line and press Enter…": "Tapez une ligne et appuyez sur Entrée…"
 }

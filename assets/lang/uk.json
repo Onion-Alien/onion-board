@@ -2077,7 +2077,6 @@
   "Only others in the call get it, not your stream output": "Його отримують лише інші учасники дзвінка, а не ваш потік",
   "Only your stream output gets it (music for your viewers), not the call": "Це отримує лише ваш потік (музика для ваших глядачів), а не дзвінок",
   "Or type a line and it's spoken in the voice": "Або введіть рядок, і він прозвучить голосом",
-  "Or type a line and press Enter…": "Або введіть рядок і натисніть Enter…",
   "Other pasted links": "Інші вставлені посилання",
   "Others hear only the spoken voice, not your real one.": "Інші чують лише розмовний голос, а не ваш справжній.",
   "Others in the call and your stream output both get it": "Інші учасники дзвінка та вихідні дані вашого потоку отримують це",
@@ -2215,7 +2214,6 @@
   "Streaming, recording, Voicemeeter or a mixer.": "Потокове передавання, запис, Voicemeeter або мікшер.",
   "Switch effects on and drag their sliders to build your own voice. Changing anything switches to “My own mix”; like it? Save it as a voice and it gets a button of its own.": "Увімкніть ефекти та перетягніть їхні повзунки, щоб створити власний голос. Зміна будь-чого перемикається на «Мій власний мікс»; подобається? Збережіть його як голос, і він отримає власну кнопку.",
   "Take this program off the list": "Вилучити цю програму зі списку",
-  "Talk in English and others hear another language. The AI voice or the voice changer says it when one of them is on; otherwise press Start and a computer voice does. Or type a line at the bottom.": "Розмовляйте англійською, і інші почують іншу мову. Голос штучного інтелекту або програма зміни голосу вимовляє це, коли один із них увімкнено; інакше натисніть «Пуск», і комп’ютерний голос зробить це. Або введіть рядок внизу.",
   "Talk, and others hear a different person: your words and tone, another voice, live. It runs on this PC (about one CPU core while you talk, nothing while you're quiet); what you say never leaves it.": "Говоріть, і інші почують іншу людину: ваші слова і тон, інший голос, наживо. Він працює на цьому ПК (приблизно одне ядро ​​ЦП, поки ви розмовляєте, нічого, поки ви мовчите); те, що ти кажеш, ніколи не залишає його.",
   "Talkbox": "Talkbox",
   "Talking inside a helmet, mask or metal box.": "Розмова в шоломі, масці або металевій коробці.",
@@ -3083,5 +3081,7 @@
   "Library": "Бібліотека",
   "Quick hotkeys": "Швидкі клавіші",
   "{route}: {status}": "{route}: {status}",
-  "Listening: {mode}": "Прослуховування: {mode}"
+  "Listening: {mode}": "Прослуховування: {mode}",
+  "Talk in English and others hear another language. The AI voice or the voice changer says it when one of them is on; otherwise press Start and a computer voice does.": "Розмовляйте англійською, і інші почують іншу мову. Голос штучного інтелекту або програма зміни голосу вимовляє це, коли один із них увімкнено; інакше натисніть «Пуск», і комп’ютерний голос зробить це.",
+  "Type a line and press Enter…": "Введіть рядок і натисніть Enter…"
 }

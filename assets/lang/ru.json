@@ -1984,7 +1984,6 @@
   "Only others in the call get it, not your stream output": "Его получают только другие участники вызова, а не ваш поток вывода.",
   "Only your stream output gets it (music for your viewers), not the call": "Его получает только выход вашего потока (музыка для ваших зрителей), а не вызов.",
   "Or type a line and it's spoken in the voice": "Или введите строку, и она будет произнесена голосом",
-  "Or type a line and press Enter…": "Или введите строку и нажмите Enter…",
   "Other pasted links": "Другие вставленные ссылки",
   "Others hear only the spoken voice, not your real one.": "Другие слышат только произнесенный голос, а не ваш настоящий.",
   "Others in the call and your stream output both get it": "Другие участники звонка и выходные данные вашего потока понимают это.",
@@ -2120,7 +2119,6 @@
   "Streaming, recording, Voicemeeter or a mixer.": "Потоковая передача, запись, Voicemeeter или микшер.",
   "Switch effects on and drag their sliders to build your own voice. Changing anything switches to “My own mix”; like it? Save it as a voice and it gets a button of its own.": "Включите эффекты и перетащите их ползунки, чтобы создать свой собственный голос. Изменение чего-либо переключается на «Мой собственный микс»; нравится? Сохраните его как голос, и он получит собственную кнопку.",
   "Take this program off the list": "Уберите эту программу из списка",
-  "Talk in English and others hear another language. The AI voice or the voice changer says it when one of them is on; otherwise press Start and a computer voice does. Or type a line at the bottom.": "Говорите на английском, и другие слышат другой язык. Голос AI или устройство смены голоса произносит это, когда один из них включен; в противном случае нажмите «Пуск», и это сделает компьютерный голос. Или введите строку внизу.",
   "Talk, and others hear a different person: your words and tone, another voice, live. It runs on this PC (about one CPU core while you talk, nothing while you're quiet); what you say never leaves it.": "Говорите, и другие слышат другого человека: ваши слова и тон, другой голос, живой. Он работает на этом ПК (около одного ядра ЦП, пока вы говорите, и ничего, пока вы молчите); то, что ты говоришь, никогда не покидает его.",
   "Talkbox": "Talkbox",
   "Talking inside a helmet, mask or metal box.": "Разговор внутри шлема, маски или металлического ящика.",
@@ -3083,5 +3081,7 @@
   "Library": "Библиотека",
   "Quick hotkeys": "Быстрые клавиши",
   "{route}: {status}": "{route}: {status}",
-  "Listening: {mode}": "Прослушивание: {mode}"
+  "Listening: {mode}": "Прослушивание: {mode}",
+  "Talk in English and others hear another language. The AI voice or the voice changer says it when one of them is on; otherwise press Start and a computer voice does.": "Говорите на английском, и другие слышат другой язык. Голос AI или устройство смены голоса произносит это, когда один из них включен; в противном случае нажмите «Пуск», и это сделает компьютерный голос.",
+  "Type a line and press Enter…": "Введите строку и нажмите Enter…"
 }

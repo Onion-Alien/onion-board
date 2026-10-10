@@ -2029,7 +2029,6 @@
   "Only others in the call get it, not your stream output": "Bare andre i samtalen får det, ikke strømutgangen din",
   "Only your stream output gets it (music for your viewers), not the call": "Bare strømutgangen din får det (musikk for seerne), ikke samtalen",
   "Or type a line and it's spoken in the voice": "Eller skriv inn en linje og den uttales i stemmen",
-  "Or type a line and press Enter…": "Eller skriv inn en linje og trykk Enter...",
   "Other pasted links": "Andre limte lenker",
   "Others hear only the spoken voice, not your real one.": "Andre hører bare den talte stemmen, ikke din virkelige.",
   "Others in the call and your stream output both get it": "Andre i samtalen og strømutgangen din får det begge",
@@ -2164,7 +2163,6 @@
   "Streaming, recording, Voicemeeter or a mixer.": "Streaming, opptak, Voicemeter eller en mikser.",
   "Switch effects on and drag their sliders to build your own voice. Changing anything switches to “My own mix”; like it? Save it as a voice and it gets a button of its own.": "Slå på effekter og dra glidebryterne deres for å bygge din egen stemme. Hvis du endrer noe, byttes til \"Min egen blanding\"; liker det? Lagre den som en stemme, og den får en egen knapp.",
   "Take this program off the list": "Ta dette programmet av listen",
-  "Talk in English and others hear another language. The AI voice or the voice changer says it when one of them is on; otherwise press Start and a computer voice does. Or type a line at the bottom.": "Snakk på engelsk og andre hører et annet språk. AI-stemmen eller stemmeveksleren sier det når en av dem er på; ellers trykker du på Start og en datamaskinstemme gjør det. Eller skriv inn en linje nederst.",
   "Talk, and others hear a different person: your words and tone, another voice, live. It runs on this PC (about one CPU core while you talk, nothing while you're quiet); what you say never leaves it.": "Snakk, og andre hører en annen person: dine ord og tone, en annen stemme, live. Den kjører på denne PC-en (omtrent én CPU-kjerne mens du snakker, ingenting mens du er stille); det du sier forlater det aldri.",
   "Talkbox": "Talkboks",
   "Talking inside a helmet, mask or metal box.": "Snakker inne i en hjelm, maske eller metallboks.",
@@ -3019,5 +3017,7 @@
   "Library": "Bibliotek",
   "Quick hotkeys": "Hurtigtaster",
   "{route}: {status}": "{route}: {status}",
-  "Listening: {mode}": "Lytting: {mode}"
+  "Listening: {mode}": "Lytting: {mode}",
+  "Talk in English and others hear another language. The AI voice or the voice changer says it when one of them is on; otherwise press Start and a computer voice does.": "Snakk på engelsk og andre hører et annet språk. AI-stemmen eller stemmeveksleren sier det når en av dem er på; ellers trykker du på Start og en datamaskinstemme gjør det.",
+  "Type a line and press Enter…": "Skriv inn en linje og trykk Enter…"
 }

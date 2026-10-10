@@ -1987,7 +1987,6 @@
   "Only others in the call get it, not your stream output": "Hanya orang lain dalam panggilan yang mendapatkannya, bukan keluaran streaming Anda",
   "Only your stream output gets it (music for your viewers), not the call": "Hanya keluaran streaming Anda yang mendapatkannya (musik untuk pemirsa Anda), bukan panggilannya",
   "Or type a line and it's spoken in the voice": "Atau ketik satu baris dan itu diucapkan dalam suara",
-  "Or type a line and press Enter…": "Atau ketik satu baris dan tekan Enter…",
   "Other pasted links": "Tautan lain yang ditempel",
   "Others hear only the spoken voice, not your real one.": "Orang lain hanya mendengar suara yang diucapkan, bukan suara asli Anda.",
   "Others in the call and your stream output both get it": "Orang lain dalam panggilan dan keluaran streaming Anda memahaminya",
@@ -2119,7 +2118,6 @@
   "Streaming, recording, Voicemeeter or a mixer.": "Streaming, rekaman, Voicemeeter atau mixer.",
   "Switch effects on and drag their sliders to build your own voice. Changing anything switches to “My own mix”; like it? Save it as a voice and it gets a button of its own.": "Aktifkan efek dan seret penggesernya untuk menghasilkan suara Anda sendiri. Mengubah apa pun akan beralih ke “Campuran saya sendiri”; suka itu? Simpan sebagai suara dan ia mendapat tombolnya sendiri.",
   "Take this program off the list": "Hapus program ini dari daftar",
-  "Talk in English and others hear another language. The AI voice or the voice changer says it when one of them is on; otherwise press Start and a computer voice does. Or type a line at the bottom.": "Berbicara dalam bahasa Inggris dan orang lain mendengar bahasa lain. Suara AI atau pengubah suara mengucapkannya saat salah satunya aktif; jika tidak, tekan Mulai dan suara komputer akan berbunyi. Atau ketikkan baris di bagian bawah.",
   "Talk, and others hear a different person: your words and tone, another voice, live. It runs on this PC (about one CPU core while you talk, nothing while you're quiet); what you say never leaves it.": "Bicaralah, dan orang lain akan mendengar orang yang berbeda: kata-kata dan nada bicara Anda, suara lain, hidup. Ini berjalan pada PC ini (sekitar satu inti CPU saat Anda berbicara, tidak ada apa pun saat Anda diam); apa yang Anda katakan tidak pernah meninggalkannya.",
   "Talkbox": "kotak bicara",
   "Talking inside a helmet, mask or metal box.": "Berbicara di dalam helm, topeng atau kotak logam.",
@@ -2955,5 +2953,7 @@
   "Library": "Pustaka",
   "Quick hotkeys": "Hotkey cepat",
   "{route}: {status}": "{route}: {status}",
-  "Listening: {mode}": "Mendengarkan: {mode}"
+  "Listening: {mode}": "Mendengarkan: {mode}",
+  "Talk in English and others hear another language. The AI voice or the voice changer says it when one of them is on; otherwise press Start and a computer voice does.": "Berbicara dalam bahasa Inggris dan orang lain mendengar bahasa lain. Suara AI atau pengubah suara mengucapkannya saat salah satunya aktif; jika tidak, tekan Mulai dan suara komputer akan berbunyi.",
+  "Type a line and press Enter…": "Ketik satu baris dan tekan Enter…"
 }
