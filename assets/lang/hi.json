@@ -2055,7 +2055,6 @@
   "Phasmophobia, Lethal Company and other Unity games with Photon Voice or Dissonance: Opus at 17-30 kbps, 12 kHz at most, voice activation.": "फास्मोफोबिया, लेथल कंपनी और फोटॉन वॉयस या डिसोनेंस के साथ अन्य यूनिटी गेम्स: 17-30 केबीपीएस पर ओपस, अधिकतम 12 किलोहर्ट्ज, वॉयस एक्टिवेशन।",
   "Photon or Dissonance": "फोटॉन या डिसोनेंस",
   "Pick a program that's playing (a music player, a browser, a game, even a call in another app) and it goes out to whoever's listening, on its own volume, the same way your sounds do (your mic, the cable or the device you picked on the Setup tab, and the stream output). Sending to Nobody: only the stream output gets it. Only that program: nothing else you play is touched, and it keeps playing on your speakers as before. Programs you switch on are remembered and picked up again next time they run.": "एक ऐसा प्रोग्राम चुनें जो चल रहा हो - एक म्यूजिक प्लेयर, एक ब्राउज़र, एक गेम, यहां तक ​​कि किसी अन्य ऐप में एक कॉल - और यह अपने वॉल्यूम पर, जो कोई भी सुन रहा है, उसके पास चला जाता है, उसी तरह जैसे आपकी ध्वनियां (आपका माइक, केबल या वह डिवाइस जिसे आपने सेटअप टैब पर चुना है, और स्ट्रीम आउटपुट)। किसी को नहीं भेजना: केवल स्ट्रीम आउटपुट ही इसे प्राप्त करता है। केवल वह प्रोग्राम: आपके द्वारा चलाए जाने वाले किसी भी अन्य चीज़ को छुआ नहीं जाता है, और यह आपके स्पीकर पर पहले की तरह चलता रहता है। आपके द्वारा चालू किए गए प्रोग्राम याद रखे जाते हैं और अगली बार चलने पर फिर से उठाए जाते हैं।",
-  "Pick a voice, press Start, then just talk.": "कोई आवाज़ चुनें, स्टार्ट दबाएँ, फिर बात करें।",
   "Pick the exact voice chat yourself, or make your own.": "सटीक वॉयस चैट स्वयं चुनें, या अपना खुद का बनाएं।",
   "Pitch & voice": "पिच और आवाज",
   "Pitch, Randomize, every effect, and your saved voices: build your own voice in a window beside the app": "पिच, रैंडमाइज़, हर प्रभाव और आपकी सहेजी गई आवाज़ें: ऐप के बगल में एक विंडो में अपनी आवाज़ बनाएं",
@@ -2165,7 +2164,6 @@
   "Squash": "स्क्वाश",
   "Stadium announcer": "स्टेडियम उद्घोषक",
   "Start from a voice, mix a bit of another one in, then set how deep and how high it is. Press Hear it to try it.": "एक आवाज से शुरू करें, उसमें थोड़ी सी दूसरी आवाज मिलाएं, फिर सेट करें कि यह कितनी गहरी और कितनी ऊंची है। इसे आज़माने के लिए इसे सुनें दबाएँ।",
-  "Start the AI voice": "एआई आवाज प्रारंभ करें",
   "Start the computer voice": "कंप्यूटर वॉइस प्रारंभ करें",
   "Starting Onion Watch…": "प्याज घड़ी शुरू हो रही है...",
   "Starting the translation…": "अनुवाद शुरू हो रहा है...",
@@ -2173,7 +2171,6 @@
   "Steam voice": "भाप भरी आवाज",
   "Stop  {time}": "रुकें {time}",
   "Stop sending": "भेजना बंद करो",
-  "Stop the AI voice": "एआई आवाज बंद करो",
   "Stop the computer voice": "कंप्यूटर की आवाज बंद करो",
   "Stop the computer voice to change this": "इसे बदलने के लिए कंप्यूटर की आवाज़ बंद करें",
   "Stop the voice to download this": "इसे डाउनलोड करने के लिए आवाज बंद करें",
@@ -3024,5 +3021,8 @@
   "Show me everything": "मुझे सब दिखाओ",
   "Streaming": "स्ट्रीमिंग",
   "What will you use Onion Board for?": "आप Onion Board किस लिए इस्तेमाल करेंगे?",
-  "Adds the <b>Apps</b> tab (send music or a game to your stream). The last step links the <b>Streamer guide</b> (Stream Deck keys, chat commands).": "<b>ऐप्स</b> टैब जोड़ता है (अपनी स्ट्रीम में म्यूज़िक या गेम भेजें)। आख़िरी स्टेप में <b>स्ट्रीमर गाइड</b> का लिंक है (Stream Deck की कीज़, चैट कमांड)।"
+  "Adds the <b>Apps</b> tab (send music or a game to your stream). The last step links the <b>Streamer guide</b> (Stream Deck keys, chat commands).": "<b>ऐप्स</b> टैब जोड़ता है (अपनी स्ट्रीम में म्यूज़िक या गेम भेजें)। आख़िरी स्टेप में <b>स्ट्रीमर गाइड</b> का लिंक है (Stream Deck की कीज़, चैट कमांड)।",
+  "Start AI voice": "एआई आवाज प्रारंभ करें",
+  "Stop AI voice": "एआई आवाज बंद करो",
+  "Your words and tone, a different voice. Live on this PC.": "आपके शब्द और लहजा, एक अलग आवाज़। इसी पीसी पर लाइव।"
 }

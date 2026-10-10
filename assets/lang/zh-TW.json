@@ -2010,7 +2010,6 @@
   "Phasmophobia, Lethal Company and other Unity games with Photon Voice or Dissonance: Opus at 17-30 kbps, 12 kHz at most, voice activation.": "Phasmophobia、Lethal Company 和其他具有 Photon Voice 或 Dissonance: Opus 的 Unity 遊戲，速度為 17-30 kbps，最高 12 kHz，語音啟動。",
   "Photon or Dissonance": "光子或不和諧",
   "Pick a program that's playing (a music player, a browser, a game, even a call in another app) and it goes out to whoever's listening, on its own volume, the same way your sounds do (your mic, the cable or the device you picked on the Setup tab, and the stream output). Sending to Nobody: only the stream output gets it. Only that program: nothing else you play is touched, and it keeps playing on your speakers as before. Programs you switch on are remembered and picked up again next time they run.": "選擇一個正在播放的程式，音樂播放器、瀏覽器、遊戲，甚至是另一個應用程式中的通話，它就會以自己的音量發送給正在收聽的人，就像你的聲音一樣（你的麥克風、電纜或你在「設定」標籤上選擇的設備，以及串流輸出）。發送給沒有人：只有流輸出才能獲取它。只有該程式：您播放的任何其他內容都不會受到影響，並且它會像以前一樣在揚聲器上播放。您打開的程式會被記住，並在下次運行時再次被拾取。",
-  "Pick a voice, press Start, then just talk.": "選擇一個聲音，按“開始”，然後就可以說話了。",
   "Pick the exact voice chat yourself, or make your own.": "自己選擇確切的語音聊天，或創建自己的語音聊天。",
   "Pitch & voice": "音調和聲音",
   "Pitch, Randomize, every effect, and your saved voices: build your own voice in a window beside the app": "音調、隨機化、每種效果以及您保存的聲音：在應用程式旁邊的視窗中建立自己的聲音",
@@ -2117,7 +2116,6 @@
   "Squash": "壁球",
   "Stadium announcer": "體育場播音員",
   "Start from a voice, mix a bit of another one in, then set how deep and how high it is. Press Hear it to try it.": "從一個聲音開始，混合一點另一種聲音，然後設定它的深度和高度。按下“聽”來試試。",
-  "Start the AI voice": "啟動AI語音",
   "Start the computer voice": "啟動電腦語音",
   "Starting Onion Watch…": "開始洋蔥觀察...",
   "Starting the translation…": "開始翻譯...",
@@ -2125,7 +2123,6 @@
   "Steam voice": "蒸氣語音",
   "Stop  {time}": "停止{time}",
   "Stop sending": "停止發送",
-  "Stop the AI voice": "停止AI語音",
   "Stop the computer voice": "停止電腦聲音",
   "Stop the computer voice to change this": "停止電腦聲音來改變這個",
   "Stop the voice to download this": "停止聲音來下載這個",
@@ -2960,5 +2957,8 @@
   "Show me everything": "全部顯示",
   "Streaming": "直播",
   "What will you use Onion Board for?": "你打算用 Onion Board 做什麼？",
-  "Adds the <b>Apps</b> tab (send music or a game to your stream). The last step links the <b>Streamer guide</b> (Stream Deck keys, chat commands).": "新增<b>應用程式</b>分頁（把音樂或遊戲聲音送進直播）。最後一步附有<b>實況主教學</b>的連結（Stream Deck 按鍵、聊天指令）。"
+  "Adds the <b>Apps</b> tab (send music or a game to your stream). The last step links the <b>Streamer guide</b> (Stream Deck keys, chat commands).": "新增<b>應用程式</b>分頁（把音樂或遊戲聲音送進直播）。最後一步附有<b>實況主教學</b>的連結（Stream Deck 按鍵、聊天指令）。",
+  "Start AI voice": "啟動AI語音",
+  "Stop AI voice": "停止AI語音",
+  "Your words and tone, a different voice. Live on this PC.": "保留你的話語和語氣，換一種聲音。在這台電腦上即時轉換。"
 }

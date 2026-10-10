@@ -2097,7 +2097,6 @@
   "Phasmophobia, Lethal Company and other Unity games with Photon Voice or Dissonance: Opus at 17-30 kbps, 12 kHz at most, voice activation.": "Phasmophobia, Lethal Company și alte jocuri Unity cu Photon Voice sau Dissonance: Opus la 17-30 kbps, 12 kHz cel mult, activare vocală.",
   "Photon or Dissonance": "Foton sau disonanță",
   "Pick a program that's playing (a music player, a browser, a game, even a call in another app) and it goes out to whoever's listening, on its own volume, the same way your sounds do (your mic, the cable or the device you picked on the Setup tab, and the stream output). Sending to Nobody: only the stream output gets it. Only that program: nothing else you play is touched, and it keeps playing on your speakers as before. Programs you switch on are remembered and picked up again next time they run.": "Alegeți un program care rulează, un player muzical, un browser, un joc, chiar și un apel într-o altă aplicație, și acesta va fi transmis oricui ascultă, la propriul volum, la fel cum fac sunetele dvs. (microfonul, cablul sau dispozitivul pe care l-ați ales în fila Configurare și ieșirea fluxului). Trimiterea către Nimeni: numai rezultatul fluxului îl primește. Numai acel program: nimic altceva pe care îl redați nu este atins și se redă în continuare pe difuzoarele dvs. ca înainte. Programele pe care le porniți sunt memorate și preluate din nou data viitoare când rulează.",
-  "Pick a voice, press Start, then just talk.": "Alegeți o voce, apăsați pe Start, apoi vorbiți.",
   "Pick the exact voice chat yourself, or make your own.": "Alegeți singur chatul vocal exact sau creați-l pe al dvs.",
   "Pitch & voice": "Ton și voce",
   "Pitch, Randomize, every effect, and your saved voices: build your own voice in a window beside the app": "Pitch, Randomize, fiecare efect și vocile tale salvate: construiește-ți propria voce într-o fereastră de lângă aplicație",
@@ -2210,7 +2209,6 @@
   "Squash": "Suc de fructe",
   "Stadium announcer": "Crainic de stadion",
   "Start from a voice, mix a bit of another one in, then set how deep and how high it is. Press Hear it to try it.": "Începeți de la o voce, amestecați puțin din alta, apoi setați cât de adâncă și cât de înaltă este. Apăsați pe Ascultați pentru a o încerca.",
-  "Start the AI voice": "Porniți vocea AI",
   "Start the computer voice": "Porniți vocea computerului",
   "Starting Onion Watch…": "Se pornește ceapa ceapă...",
   "Starting the translation…": "Se începe traducerea...",
@@ -2218,7 +2216,6 @@
   "Steam voice": "Voce de abur",
   "Stop  {time}": "Opriți {time}",
   "Stop sending": "Nu mai trimite",
-  "Stop the AI voice": "Opriți vocea AI",
   "Stop the computer voice": "Opriți vocea computerului",
   "Stop the computer voice to change this": "Opriți vocea computerului pentru a schimba acest lucru",
   "Stop the voice to download this": "Opriți vocea pentru a descărca acest lucru",
@@ -3088,5 +3085,8 @@
   "Show me everything": "Arată-mi tot",
   "Streaming": "Streaming",
   "What will you use Onion Board for?": "Pentru ce vei folosi Onion Board?",
-  "Adds the <b>Apps</b> tab (send music or a game to your stream). The last step links the <b>Streamer guide</b> (Stream Deck keys, chat commands).": "Adaugă fila <b>Aplicații</b> (trimite muzică sau un joc pe stream). Ultimul pas duce la <b>Ghid pentru streameri</b> (taste Stream Deck, comenzi în chat)."
+  "Adds the <b>Apps</b> tab (send music or a game to your stream). The last step links the <b>Streamer guide</b> (Stream Deck keys, chat commands).": "Adaugă fila <b>Aplicații</b> (trimite muzică sau un joc pe stream). Ultimul pas duce la <b>Ghid pentru streameri</b> (taste Stream Deck, comenzi în chat).",
+  "Start AI voice": "Porniți vocea AI",
+  "Stop AI voice": "Opriți vocea AI",
+  "Your words and tone, a different voice. Live on this PC.": "Cuvintele și tonul tău, o altă voce. În direct pe acest PC."
 }

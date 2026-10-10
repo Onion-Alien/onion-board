@@ -2010,7 +2010,6 @@
   "Phasmophobia, Lethal Company and other Unity games with Photon Voice or Dissonance: Opus at 17-30 kbps, 12 kHz at most, voice activation.": "Photon Voice 또는 Dissonance를 사용하는 Phasmophobia, Lethal Company 및 기타 Unity 게임: 17-30kbps의 Opus, 최대 12kHz, 음성 활성화.",
   "Photon or Dissonance": "광자 또는 불협화음",
   "Pick a program that's playing (a music player, a browser, a game, even a call in another app) and it goes out to whoever's listening, on its own volume, the same way your sounds do (your mic, the cable or the device you picked on the Setup tab, and the stream output). Sending to Nobody: only the stream output gets it. Only that program: nothing else you play is touched, and it keeps playing on your speakers as before. Programs you switch on are remembered and picked up again next time they run.": "재생 중인 프로그램(음악 플레이어, 브라우저, 게임, 심지어 다른 앱의 통화)을 선택하면 소리가 들리는 방식(마이크, 설정 탭에서 선택한 케이블 또는 장치, 스트림 출력)과 동일한 방식으로 자체 볼륨으로 듣고 있는 누구에게나 출력됩니다. 누구에게도 보내기: 스트림 출력만 이를 얻습니다. 해당 프로그램만 재생됩니다. 재생하는 다른 항목은 건드리지 않으며 이전과 마찬가지로 스피커에서 계속 재생됩니다. 켜는 프로그램은 기억되어 다음에 실행될 때 다시 선택됩니다.",
-  "Pick a voice, press Start, then just talk.": "음성을 선택하고 시작을 누른 다음 말하세요.",
   "Pick the exact voice chat yourself, or make your own.": "정확한 음성 채팅을 직접 선택하거나 직접 만들어 보세요.",
   "Pitch & voice": "피치 및 음성",
   "Pitch, Randomize, every effect, and your saved voices: build your own voice in a window beside the app": "피치, 무작위화, 모든 효과 및 저장된 음성: 앱 옆 창에서 나만의 음성 만들기",
@@ -2117,7 +2116,6 @@
   "Squash": "스쿼시",
   "Stadium announcer": "경기장 아나운서",
   "Start from a voice, mix a bit of another one in, then set how deep and how high it is. Press Hear it to try it.": "한 목소리에서 시작하여 다른 목소리를 조금 섞은 다음 그 깊이와 높이를 설정하세요. 들어보려면 들어보세요를 누르세요.",
-  "Start the AI voice": "AI 음성 시작",
   "Start the computer voice": "컴퓨터 음성 시작",
   "Starting Onion Watch…": "Onion Watch를 시작하는 중…",
   "Starting the translation…": "번역을 시작하는 중…",
@@ -2125,7 +2123,6 @@
   "Steam voice": "스팀 보이스",
   "Stop  {time}": "{time} 에 중지",
   "Stop sending": "전송 중지",
-  "Stop the AI voice": "AI 음성 중지",
   "Stop the computer voice": "컴퓨터 음성 중지",
   "Stop the computer voice to change this": "이것을 변경하려면 컴퓨터 음성을 중지하세요.",
   "Stop the voice to download this": "다운로드하려면 음성을 중지하세요.",
@@ -2960,5 +2957,8 @@
   "Show me everything": "전부 보여줘",
   "Streaming": "방송",
   "What will you use Onion Board for?": "Onion Board를 어디에 쓰실 건가요?",
-  "Adds the <b>Apps</b> tab (send music or a game to your stream). The last step links the <b>Streamer guide</b> (Stream Deck keys, chat commands).": "<b>앱</b> 탭(음악이나 게임 소리를 방송으로 보내기)을 추가해요. 마지막 단계에 <b>스트리머 가이드</b>(Stream Deck 키, 채팅 명령어) 링크가 있어요."
+  "Adds the <b>Apps</b> tab (send music or a game to your stream). The last step links the <b>Streamer guide</b> (Stream Deck keys, chat commands).": "<b>앱</b> 탭(음악이나 게임 소리를 방송으로 보내기)을 추가해요. 마지막 단계에 <b>스트리머 가이드</b>(Stream Deck 키, 채팅 명령어) 링크가 있어요.",
+  "Start AI voice": "AI 음성 시작",
+  "Stop AI voice": "AI 음성 중지",
+  "Your words and tone, a different voice. Live on this PC.": "말과 말투는 그대로, 목소리만 다르게. 이 PC에서 실시간으로."
 }

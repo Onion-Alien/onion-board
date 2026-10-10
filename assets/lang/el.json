@@ -2052,7 +2052,6 @@
   "Phasmophobia, Lethal Company and other Unity games with Photon Voice or Dissonance: Opus at 17-30 kbps, 12 kHz at most, voice activation.": "Phasmophobia, Lethal Company και άλλα παιχνίδια Unity με Photon Voice ή Dissonance: Opus στα 17-30 kbps, 12 kHz το πολύ, φωνητική ενεργοποίηση.",
   "Photon or Dissonance": "Φωτόνιο ή Διαφωνία",
   "Pick a program that's playing (a music player, a browser, a game, even a call in another app) and it goes out to whoever's listening, on its own volume, the same way your sounds do (your mic, the cable or the device you picked on the Setup tab, and the stream output). Sending to Nobody: only the stream output gets it. Only that program: nothing else you play is touched, and it keeps playing on your speakers as before. Programs you switch on are remembered and picked up again next time they run.": "Επιλέξτε ένα πρόγραμμα που παίζει, ένα πρόγραμμα αναπαραγωγής μουσικής, ένα πρόγραμμα περιήγησης, ένα παιχνίδι, ακόμη και μια κλήση σε άλλη εφαρμογή, και βγαίνει σε όποιον ακούει, με τη δική του ένταση, με τον ίδιο τρόπο που κάνουν οι ήχοι σας (το μικρόφωνο, το καλώδιο ή η συσκευή που επιλέξατε στην καρτέλα Ρύθμιση και η έξοδος ροής). Αποστολή σε κανέναν: το λαμβάνει μόνο η έξοδος ροής. Μόνο αυτό το πρόγραμμα: τίποτα άλλο που παίζετε δεν αγγίζεται και συνεχίζει να παίζει στα ηχεία σας όπως πριν. Τα προγράμματα που ενεργοποιείτε απομνημονεύονται και επαναλαμβάνονται την επόμενη φορά που θα εκτελεστούν.",
-  "Pick a voice, press Start, then just talk.": "Επιλέξτε μια φωνή, πατήστε Έναρξη και μετά απλώς μιλήστε.",
   "Pick the exact voice chat yourself, or make your own.": "Επιλέξτε μόνοι σας την ακριβή φωνητική συνομιλία ή φτιάξτε τη δική σας.",
   "Pitch & voice": "Βήμα & φωνή",
   "Pitch, Randomize, every effect, and your saved voices: build your own voice in a window beside the app": "Προώθηση, τυχαιοποίηση, κάθε εφέ και οι αποθηκευμένες φωνές σας: δημιουργήστε τη δική σας φωνή σε ένα παράθυρο δίπλα στην εφαρμογή",
@@ -2162,7 +2161,6 @@
   "Squash": "Σκουός",
   "Stadium announcer": "Εκφωνητής γηπέδου",
   "Start from a voice, mix a bit of another one in, then set how deep and how high it is. Press Hear it to try it.": "Ξεκινήστε από μια φωνή, ανακατέψτε λίγο από μια άλλη και μετά ορίστε πόσο βαθιά και πόσο ψηλά είναι. Πατήστε Ακούστε το για να το δοκιμάσετε.",
-  "Start the AI voice": "Ξεκινήστε τη φωνή AI",
   "Start the computer voice": "Εκκινήστε τη φωνή του υπολογιστή",
   "Starting Onion Watch…": "Έναρξη Onion Watch…",
   "Starting the translation…": "Έναρξη της μετάφρασης…",
@@ -2170,7 +2168,6 @@
   "Steam voice": "Steam φωνή",
   "Stop  {time}": "Διακοπή {time}",
   "Stop sending": "Σταματήστε την αποστολή",
-  "Stop the AI voice": "Σταματήστε τη φωνή AI",
   "Stop the computer voice": "Διακόψτε τη φωνή του υπολογιστή",
   "Stop the computer voice to change this": "Σταματήστε τη φωνή του υπολογιστή για να το αλλάξετε",
   "Stop the voice to download this": "Σταματήστε τη φωνή για να το κατεβάσετε",
@@ -3024,5 +3021,8 @@
   "Show me everything": "Δείξε μου τα πάντα",
   "Streaming": "Streaming",
   "What will you use Onion Board for?": "Για τι θα χρησιμοποιείς το Onion Board;",
-  "Adds the <b>Apps</b> tab (send music or a game to your stream). The last step links the <b>Streamer guide</b> (Stream Deck keys, chat commands).": "Προσθέτει την καρτέλα <b>Εφαρμογές</b> (στείλε μουσική ή ένα παιχνίδι στο stream σου). Το τελευταίο βήμα έχει σύνδεσμο στον <b>Οδηγός για streamers</b> (πλήκτρα Stream Deck, εντολές στο chat)."
+  "Adds the <b>Apps</b> tab (send music or a game to your stream). The last step links the <b>Streamer guide</b> (Stream Deck keys, chat commands).": "Προσθέτει την καρτέλα <b>Εφαρμογές</b> (στείλε μουσική ή ένα παιχνίδι στο stream σου). Το τελευταίο βήμα έχει σύνδεσμο στον <b>Οδηγός για streamers</b> (πλήκτρα Stream Deck, εντολές στο chat).",
+  "Start AI voice": "Ξεκινήστε τη φωνή AI",
+  "Stop AI voice": "Σταματήστε τη φωνή AI",
+  "Your words and tone, a different voice. Live on this PC.": "Τα λόγια και ο τόνος σου, με άλλη φωνή. Ζωντανά σε αυτόν τον υπολογιστή."
 }

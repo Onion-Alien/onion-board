@@ -130,3 +130,29 @@ def test_a_native_error_that_was_caught_is_cleared_at_the_next_heartbeat(app_dir
     assert "caught and survived" in caplog.text
     w._survived()   # nothing new: nothing logged twice
     assert caplog.text.count("caught and survived") == 1
+
+
+_COM = ("Windows fatal exception: code 0x8001010d\n\n"
+        "Thread 0x00004bbc (most recent call first):\n"
+        '  File "threading.py", line 359 in wait\n'
+        '  File "soundboard\\thumbs.py", line 259 in _read_loop\n')
+
+
+def test_a_harmless_windows_code_is_not_a_warning_or_a_crash(app_dir, caplog):
+    """0x8001010d is COM saying "not now" and catching it itself: faulthandler still
+    writes it down, but it's no warning, and no reason a run ended."""
+    w = exitwatch.start(app_dir)
+    w._native.write(_COM)
+    w._native.flush()
+    with caplog.at_level("WARNING"):
+        w._survived()
+    assert "caught and survived" not in caplog.text
+    assert exitwatch.read_last(app_dir)[1] == ""   # cleared all the same
+    assert exitwatch.only_harmless(_COM)
+    assert exitwatch.diagnose({}, _COM, [], 0.0) == ("ended", "")
+    # a real crash alongside it still counts
+    both = _COM + "\n" + _native()
+    assert not exitwatch.only_harmless(both)
+    assert exitwatch.diagnose({}, both, [], 0.0)[0] == "native-crash"
+    assert not exitwatch.only_harmless("Windows fatal exception: code 0xc0000005\n")
+    assert not exitwatch.only_harmless("")

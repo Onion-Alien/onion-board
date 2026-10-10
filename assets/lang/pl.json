@@ -2100,7 +2100,6 @@
   "Phasmophobia, Lethal Company and other Unity games with Photon Voice or Dissonance: Opus at 17-30 kbps, 12 kHz at most, voice activation.": "Phasmofobia, Lethal Company i inne gry Unity z Photon Voice lub Dissonance: Opus przy 17-30 kbps, maksymalnie 12 kHz, aktywacja głosowa.",
   "Photon or Dissonance": "Foton czy Dysonans",
   "Pick a program that's playing (a music player, a browser, a game, even a call in another app) and it goes out to whoever's listening, on its own volume, the same way your sounds do (your mic, the cable or the device you picked on the Setup tab, and the stream output). Sending to Nobody: only the stream output gets it. Only that program: nothing else you play is touched, and it keeps playing on your speakers as before. Programs you switch on are remembered and picked up again next time they run.": "Wybierz odtwarzany program, odtwarzacz muzyki, przeglądarkę, grę, a nawet połączenie w innej aplikacji, a dźwięk zostanie przesłany do każdego, kto słucha, na własnej głośności, w taki sam sposób, w jaki odtwarzane są Twoje dźwięki (mikrofon, kabel lub urządzenie wybrane na karcie Konfiguracja oraz wyjście strumieniowe). Wysyłanie do nikogo: tylko wyjście strumieniowe otrzymuje to. Tylko ten program: nic innego, co odtwarzasz, nie zostanie dotknięte i będzie odtwarzane na głośnikach tak jak poprzednio. Włączone programy są zapamiętywane i odtwarzane przy następnym uruchomieniu.",
-  "Pick a voice, press Start, then just talk.": "Wybierz głos, naciśnij Start i po prostu mów.",
   "Pick the exact voice chat yourself, or make your own.": "Sam wybierz odpowiedni czat głosowy lub utwórz własny.",
   "Pitch & voice": "Wysokość i głos",
   "Pitch, Randomize, every effect, and your saved voices: build your own voice in a window beside the app": "Pitch, Randomize, każdy efekt i zapisane głosy: utwórz własny głos w oknie obok aplikacji",
@@ -2213,7 +2212,6 @@
   "Squash": "Zdusić",
   "Stadium announcer": "Spiker stadionowy",
   "Start from a voice, mix a bit of another one in, then set how deep and how high it is. Press Hear it to try it.": "Zacznij od głosu, dodaj trochę innego, a następnie ustaw jego głębokość i wysokość. Naciśnij Posłuchaj, aby spróbować.",
-  "Start the AI voice": "Uruchom głos AI",
   "Start the computer voice": "Uruchom głos komputerowy",
   "Starting Onion Watch…": "Uruchamiam zegarek cebulowy…",
   "Starting the translation…": "Rozpoczynanie tłumaczenia…",
@@ -2221,7 +2219,6 @@
   "Steam voice": "Głos parowy",
   "Stop  {time}": "Zatrzymaj {time}",
   "Stop sending": "Przestań wysyłać",
-  "Stop the AI voice": "Zatrzymaj głos AI",
   "Stop the computer voice": "Zatrzymaj głos komputera",
   "Stop the computer voice to change this": "Zatrzymaj głos komputera, aby to zmienić",
   "Stop the voice to download this": "Zatrzymaj głos, aby to pobrać",
@@ -3088,5 +3085,8 @@
   "Show me everything": "Pokaż wszystko",
   "Streaming": "Streamowanie",
   "What will you use Onion Board for?": "Do czego będziesz używać Onion Board?",
-  "Adds the <b>Apps</b> tab (send music or a game to your stream). The last step links the <b>Streamer guide</b> (Stream Deck keys, chat commands).": "Dodaje zakładkę <b>Aplikacje</b> (wysyłaj muzykę lub grę na stream). Ostatni krok prowadzi do: <b>Przewodnik po streamerze</b> (klawisze Stream Decka, komendy na czacie)."
+  "Adds the <b>Apps</b> tab (send music or a game to your stream). The last step links the <b>Streamer guide</b> (Stream Deck keys, chat commands).": "Dodaje zakładkę <b>Aplikacje</b> (wysyłaj muzykę lub grę na stream). Ostatni krok prowadzi do: <b>Przewodnik po streamerze</b> (klawisze Stream Decka, komendy na czacie).",
+  "Start AI voice": "Uruchom głos AI",
+  "Stop AI voice": "Zatrzymaj głos AI",
+  "Your words and tone, a different voice. Live on this PC.": "Twoje słowa i ton, inny głos. Na żywo na tym komputerze."
 }

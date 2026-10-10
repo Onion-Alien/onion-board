@@ -2006,7 +2006,6 @@
   "Pasted {length} at {position}: it's {total} long now. Ctrl+Z undoes it.": "Вставлено {length} в {position} : теперь длина {total} . Ctrl+Z отменяет это.",
   "Phasmophobia, Lethal Company and other Unity games with Photon Voice or Dissonance: Opus at 17-30 kbps, 12 kHz at most, voice activation.": "Phasmophobia, Lethal Company и другие игры на Unity с Photon Voice или Dissonance: Opus на скорости 17-30 кбит/с, максимум 12 кГц, голосовая активация.",
   "Photon or Dissonance": "Фотон или диссонанс",
-  "Pick a voice, press Start, then just talk.": "Выберите голос, нажмите «Старт» и просто говорите.",
   "Pick the exact voice chat yourself, or make your own.": "Выберите нужный голосовой чат самостоятельно или создайте свой собственный.",
   "Pitch & voice": "Высота и голос",
   "Pitch, Randomize, every effect, and your saved voices: build your own voice in a window beside the app": "Высота тона, рандомизация, каждый эффект и ваши сохраненные голоса: создайте свой собственный голос в окне рядом с приложением.",
@@ -2118,7 +2117,6 @@
   "Squash": "Давить",
   "Stadium announcer": "Диктор стадиона",
   "Start from a voice, mix a bit of another one in, then set how deep and how high it is. Press Hear it to try it.": "Начните с голоса, добавьте немного другого, затем установите его глубину и высоту. Нажмите «Послушать», чтобы попробовать.",
-  "Start the AI voice": "Запустите голос ИИ",
   "Start the computer voice": "Запустить компьютерный голос",
   "Starting Onion Watch…": "Запускаем Onion Watch…",
   "Starting the translation…": "Начинаем перевод…",
@@ -2126,7 +2124,6 @@
   "Steam voice": "Паровой голос",
   "Stop  {time}": "Стоп {time}",
   "Stop sending": "Прекратить отправку",
-  "Stop the AI voice": "Остановите голос ИИ",
   "Stop the computer voice": "Останови компьютерный голос",
   "Stop the computer voice to change this": "Остановите компьютерный голос, чтобы изменить это.",
   "Stop the voice to download this": "Остановите голос, чтобы скачать это",
@@ -3088,5 +3085,8 @@
   "Show me everything": "Покажи всё",
   "Streaming": "Стриминг",
   "What will you use Onion Board for?": "Для чего ты будешь использовать Onion Board?",
-  "Adds the <b>Apps</b> tab (send music or a game to your stream). The last step links the <b>Streamer guide</b> (Stream Deck keys, chat commands).": "Добавляет вкладку <b>Программы</b> (отправляй музыку или игру на стрим). На последнем шаге есть ссылка: <b>Гайд для стримеров</b> (кнопки Stream Deck, команды в чате)."
+  "Adds the <b>Apps</b> tab (send music or a game to your stream). The last step links the <b>Streamer guide</b> (Stream Deck keys, chat commands).": "Добавляет вкладку <b>Программы</b> (отправляй музыку или игру на стрим). На последнем шаге есть ссылка: <b>Гайд для стримеров</b> (кнопки Stream Deck, команды в чате).",
+  "Start AI voice": "Запустите голос ИИ",
+  "Stop AI voice": "Остановите голос ИИ",
+  "Your words and tone, a different voice. Live on this PC.": "Твои слова и интонация, другой голос. Вживую на этом ПК."
 }

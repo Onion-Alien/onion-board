@@ -2010,7 +2010,6 @@
   "Phasmophobia, Lethal Company and other Unity games with Photon Voice or Dissonance: Opus at 17-30 kbps, 12 kHz at most, voice activation.": "Phasmophobia, Lethal Company và các trò chơi Unity khác có Photon Voice hoặc Dissonance: Opus ở tốc độ 17-30 kbps, tối đa 12 kHz, kích hoạt bằng giọng nói.",
   "Photon or Dissonance": "Photon hoặc sự bất hòa",
   "Pick a program that's playing (a music player, a browser, a game, even a call in another app) and it goes out to whoever's listening, on its own volume, the same way your sounds do (your mic, the cable or the device you picked on the Setup tab, and the stream output). Sending to Nobody: only the stream output gets it. Only that program: nothing else you play is touched, and it keeps playing on your speakers as before. Programs you switch on are remembered and picked up again next time they run.": "Chọn một chương trình đang phát, trình phát nhạc, trình duyệt, trò chơi, thậm chí là cuộc gọi trong ứng dụng khác, và chương trình đó sẽ truyền đến bất kỳ ai đang nghe, với âm lượng riêng, giống như cách âm thanh của bạn phát ra (micrô, cáp hoặc thiết bị bạn đã chọn trên tab Thiết lập và đầu ra luồng). Gửi tới không ai: chỉ đầu ra luồng mới nhận được. Chỉ có chương trình đó: không có gì khác mà bạn chơi được chạm vào và nó vẫn tiếp tục phát trên loa của bạn như trước. Các chương trình bạn bật sẽ được ghi nhớ và chọn lại vào lần chạy tiếp theo.",
-  "Pick a voice, press Start, then just talk.": "Chọn một giọng nói, nhấn Bắt đầu, sau đó chỉ cần nói.",
   "Pick the exact voice chat yourself, or make your own.": "Hãy tự mình chọn cuộc trò chuyện bằng giọng nói chính xác hoặc tự tạo cuộc trò chuyện bằng giọng nói của riêng bạn.",
   "Pitch & voice": "Cao độ và giọng nói",
   "Pitch, Randomize, every effect, and your saved voices: build your own voice in a window beside the app": "Cao độ, Ngẫu nhiên hóa, mọi hiệu ứng và giọng nói đã lưu của bạn: tạo giọng nói của riêng bạn trong cửa sổ bên cạnh ứng dụng",
@@ -2117,7 +2116,6 @@
   "Squash": "bí",
   "Stadium announcer": "Phát thanh viên sân vận động",
   "Start from a voice, mix a bit of another one in, then set how deep and how high it is. Press Hear it to try it.": "Bắt đầu từ một giọng nói, trộn một chút giọng khác vào, sau đó đặt độ sâu và độ cao của nó. Nhấn Nghe để thử.",
-  "Start the AI voice": "Bắt đầu giọng nói AI",
   "Start the computer voice": "Khởi động giọng nói máy tính",
   "Starting Onion Watch…": "Đang bắt đầu xem hành tây…",
   "Starting the translation…": "Bắt đầu dịch…",
@@ -2125,7 +2123,6 @@
   "Steam voice": "Giọng nói hơi nước",
   "Stop  {time}": "Dừng lại {time}",
   "Stop sending": "Dừng gửi",
-  "Stop the AI voice": "Dừng giọng nói AI",
   "Stop the computer voice": "Dừng giọng nói máy tính",
   "Stop the computer voice to change this": "Dừng giọng nói máy tính để thay đổi điều này",
   "Stop the voice to download this": "Dừng giọng nói để tải xuống",
@@ -2960,5 +2957,8 @@
   "Show me everything": "Cho tôi xem tất cả",
   "Streaming": "Phát trực tiếp",
   "What will you use Onion Board for?": "Bạn sẽ dùng Onion Board để làm gì?",
-  "Adds the <b>Apps</b> tab (send music or a game to your stream). The last step links the <b>Streamer guide</b> (Stream Deck keys, chat commands).": "Thêm tab <b>Ứng dụng</b> (gửi nhạc hoặc âm thanh game vào stream). Bước cuối có liên kết tới <b>Hướng dẫn truyền phát</b> (phím Stream Deck, lệnh chat)."
+  "Adds the <b>Apps</b> tab (send music or a game to your stream). The last step links the <b>Streamer guide</b> (Stream Deck keys, chat commands).": "Thêm tab <b>Ứng dụng</b> (gửi nhạc hoặc âm thanh game vào stream). Bước cuối có liên kết tới <b>Hướng dẫn truyền phát</b> (phím Stream Deck, lệnh chat).",
+  "Start AI voice": "Bắt đầu giọng nói AI",
+  "Stop AI voice": "Dừng giọng nói AI",
+  "Your words and tone, a different voice. Live on this PC.": "Lời nói và ngữ điệu của bạn, một giọng khác. Trực tiếp trên PC này."
 }
