@@ -7,10 +7,18 @@
   library tools, Voice opens its presets on first visit, and secondary text reads more
   clearly. The full-width drop target is preserved.
 
+- AI voices puts Start and live status at the top, with a wider voice picker,
+  grouped pitch controls and shorter explanatory text in every language.
+- The note that pops up above the player ("Added … to Sounds", device changes and so
+  on) now sits centred over the page instead of jammed in the bottom-left corner on
+  top of the sidebar, and is no wider than 560 px.
 - YouTube and YouTube Music searches are about a second faster after the first one:
   YouTube's page settings are kept for an hour instead of being fetched before every
   search (Direct connection only; if a search with them fails, it's done again the old
   way, with fresh ones).
+- The log no longer warns about "a native error was caught and survived" for Windows
+  error code 0x8001010d and its kin: COM raises and handles those itself, so they're
+  harmless. They no longer count as a crash at the next start either.
 
 ## 1.9.28 — 2026-10-10
 
