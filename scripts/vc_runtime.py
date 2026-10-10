@@ -15,6 +15,12 @@ whichever Windows picks is new enough. A C++ runtime DLL shiboken6 ships that
 PyInstaller left out goes into `_internal\\shiboken6\\`, the folder PySide6 adds to
 the DLL search.
 
+It also deletes any ICU DLL (`icuuc.dll`, `icudt78.dll`.) PyInstaller picked up. Qt
+uses Windows' own ICU from System32 and PySide6 ships none, but a folder on the build
+PC's PATH holding another program's ICU (a newer one, with other function names) gets
+bundled in its place, and the app fails at start with the same "DLL load failed while
+importing QtWidgets" error.
+
 Usage: python scripts/vc_runtime.py dist/OnionBoard [--dry-run]
 """
 from __future__ import annotations
@@ -96,6 +102,12 @@ def plan(app_dir: Path, source: Path | None = None,
     return moves
 
 
+def foreign_icu(app_dir: Path) -> list[Path]:
+    """ICU DLLs in the app: none belong there (Qt loads Windows' own, System32\\icuuc.dll)."""
+    return sorted(p for p in (app_dir / "_internal").rglob("*.dll")
+                  if p.name.lower().startswith("icu"))
+
+
 def main(argv: list[str]) -> int:
     dry = "--dry-run" in argv
     args = [a for a in argv if not a.startswith("--")]
@@ -114,6 +126,11 @@ def main(argv: list[str]) -> int:
             shutil.copy2(src, dst)
     if not moves:
         print("one C++ runtime version already")
+    for p in foreign_icu(app_dir):
+        print(("would delete " if dry else "deleting ") + f"{p.relative_to(app_dir)}"
+              " (another program's ICU; Qt uses Windows' own)")
+        if not dry:
+            p.unlink()
     return 0
 
 

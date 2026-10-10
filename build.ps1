@@ -41,6 +41,13 @@ if ($LASTEXITCODE -ne 0) { throw "version_info.py failed" }
 # MinGW-w64 (winget install BrechtSanders.WinLibs.POSIX.UCRT), bundled as directmic\.
 & $py scripts\build_directmic.py
 if ($LASTEXITCODE -ne 0) { throw "build_directmic.py failed (is MinGW-w64's g++ installed?)" }
+# PyInstaller looks for the DLLs it bundles on PATH too, so a folder there with another
+# program's copy (an AI tool's ICU, an older C++ runtime) ends up in the app and Qt
+# can't start. Only Windows' own folders while it runs; vc_runtime.py below cleans up
+# whatever an older, cached analysis still brings in.
+$fullPath = $env:PATH
+$env:PATH = "$env:SystemRoot\System32;$env:SystemRoot;$env:SystemRoot\System32\Wbem"
+try {
 & $py -m PyInstaller --noconfirm @cleanArg --windowed `
     --name OnionBoard --icon assets\onionboard.ico `
     --version-file installer\version_info.txt `
@@ -61,11 +68,13 @@ if ($LASTEXITCODE -ne 0) { throw "build_directmic.py failed (is MinGW-w64's g++ 
     --exclude-module PySide6.QtWebChannel --exclude-module PySide6.QtPdf `
     --paths . `
     main.py
+} finally { $env:PATH = $fullPath }
 if ($LASTEXITCODE -ne 0) { throw "PyInstaller failed" }
 
 # One C++ runtime: PyInstaller can bundle an older msvcp140.dll from this PC next to
 # the newer one PySide6 ships, and if Windows loads the older one Qt can't start ("DLL
 # load failed while importing QtWidgets: The specified procedure could not be found").
+# It also deletes any bundled ICU DLL (same error): Qt uses Windows' own.
 & $py scripts\vc_runtime.py dist\OnionBoard
 if ($LASTEXITCODE -ne 0) { throw "vc_runtime.py failed" }
 

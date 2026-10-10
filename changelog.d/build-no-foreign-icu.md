@@ -1,0 +1,1 @@
+- **Builds no longer pick up another program's DLLs.** A build made on a PC with another program's ICU on PATH failed at start ("DLL load failed while importing QtWidgets"): `build.ps1` now runs PyInstaller with only Windows' folders on PATH, and `scripts/vc_runtime.py` deletes any bundled ICU DLL (Qt uses Windows' own).
