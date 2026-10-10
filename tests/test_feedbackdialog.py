@@ -35,6 +35,29 @@ def test_improve_sends_only_known_names_and_the_tidied_other(monkeypatch):
     assert sent[0][0]["session"] not in sessions | {"abc"}
 
 
+def test_follow_ups_go_under_their_pick_and_only_known_names(monkeypatch):
+    sent = []
+    monkeypatch.setattr(usage, "enabled", lambda: True)
+    monkeypatch.setattr(usage.net, "allowed", lambda f: True)
+    monkeypatch.setattr(usage, "send", lambda payload: sent.append(payload) or True)
+    monkeypatch.setattr(usage.threading, "Thread",
+                        lambda target, args, **kw: SimpleNamespace(start=lambda: target(*args)))
+    picks = ["bugs", "bugs/crashes", "sounds/made-up", "looks/crowded", "sounds", "sounds/music"]
+    usage.improve(SimpleNamespace(stats_id="abc"), picks, bugs="Crashes when I alt-tab")
+    assert [h["path"] for h in sent[0]] == [
+        "improve/sounds", "improve/sounds/music",
+        "improve/bugs", "improve/bugs/said/crashes-when-i-alt-tab"]
+    long = usage.other_tag("bug " * 100, usage.BUGS_MAX)   # bugs get more room than Other
+    assert usage.OTHER_MAX < len(long) <= usage.BUGS_MAX
+
+
+def test_every_follow_up_is_a_counted_name():
+    more = feedbackdialog.follow_ups()
+    assert set(more) == set(usage.IMPROVE_MORE)
+    for key, subs in more.items():
+        assert [k for k, _t in subs] == list(usage.IMPROVE_MORE[key])
+
+
 def test_improve_sends_nothing_when_the_count_is_off(monkeypatch):
     monkeypatch.setattr(usage, "enabled", lambda: True)
     monkeypatch.setattr(usage.net, "allowed", lambda f: False)
@@ -48,8 +71,8 @@ def test_every_pick_is_a_counted_name():
 
 def test_the_box_asks_then_thanks_and_opens_the_form(qapp, monkeypatch):
     calls, opened = [], []
-    monkeypatch.setattr(usage, "improve", lambda cfg, picks, other="": calls.append(
-        (picks, other)) or False)
+    monkeypatch.setattr(usage, "improve", lambda cfg, picks, other="", bugs="": calls.append(
+        (picks, other, bugs)) or False)
     monkeypatch.setattr(busy.QDesktopServices, "openUrl", lambda u: opened.append(u.toString())
                         or True)
     dlg = feedbackdialog.FeedbackDialog(SimpleNamespace())
@@ -60,11 +83,42 @@ def test_the_box_asks_then_thanks_and_opens_the_form(qapp, monkeypatch):
     assert dlg.other.isVisible() and dlg.send_btn.isEnabled()
     dlg.other.setText("a dark theme")
     dlg.send_btn.click()
-    assert calls == [(["speed", "other"], "a dark theme")]
+    assert calls == [(["speed", "other"], "a dark theme", "")]
     assert dlg.pages.currentIndex() == 1
     assert dlg.not_sent.isVisible()          # the count is off here: say so
     assert "Anonymous" in dlg.anon_note.text()
     dlg.form_btn.click()
     assert opened == [feedback.feedback_url(__version__, improve=["speed", "other"])]
     assert "improve=speed%2Cother" in opened[0]
+    dlg.deleteLater()
+
+
+def test_ticking_a_pick_opens_its_follow_ups(qapp, monkeypatch):
+    calls = []
+    monkeypatch.setattr(usage, "improve", lambda cfg, picks, other="", bugs="": calls.append(
+        (picks, other, bugs)) or True)
+    from PySide6.QtWidgets import QApplication
+
+    def settle():
+        for _ in range(3):
+            QApplication.processEvents()
+    dlg = feedbackdialog.FeedbackDialog(SimpleNamespace())
+    dlg.show()
+    settle()
+    closed = dlg.height()
+    assert not any(p.isVisible() for p in dlg.more.values())
+    dlg.boxes["looks"].setChecked(True)
+    settle()
+    assert dlg.height() > closed               # grows with its follow-ups
+    dlg.boxes["looks"].setChecked(False)
+    settle()
+    assert dlg.height() == closed              # and shrinks back, no gap left
+    dlg.boxes["bugs"].setChecked(True)
+    assert dlg.more["bugs"].isVisible() and dlg.bugs_text.isVisible()
+    assert not [k for k in dlg.sub_boxes if k.startswith("bugs/")]   # bugs: words only
+    assert not dlg.more["sounds"].isVisible()
+    dlg.sub_boxes["sounds/music"].setChecked(True)    # its pick isn't ticked: not sent
+    dlg.bugs_text.setText("crashes on alt-tab")
+    dlg.send()
+    assert calls == [(["bugs"], "", "crashes on alt-tab")]
     dlg.deleteLater()

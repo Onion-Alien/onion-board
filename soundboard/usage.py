@@ -30,7 +30,8 @@ a tab opened after the first daily count waits a day, and most people trying the
 never send that one.
 And when someone answers *Send feedback*'s "What would you improve?", their picks
 (`improve/sounds`: names from IMPROVE only, sent with a one-off random session, not this
-PC's ID), and what they typed under Other as dashed
+PC's ID), the follow-up ticks under a pick (`improve/sounds/memes`: IMPROVE_MORE only),
+and what they typed under Other or Fewer bugs as dashed
 words (`improve/other/more-anime-sounds`), with email addresses, links and long numbers
 taken out first.
 Nothing else: no name, sounds, settings, devices, games or IP address in the message
@@ -97,6 +98,17 @@ ROUTES = ("cable", "device", "off", "mic")   # library.ROUTES
 IMPROVE = ("sounds", "setup", "voice-chat", "voice-changer", "speed", "looks", "bugs",
            "other")
 OTHER_MAX = 100   # characters of what was typed under Other, as dashed words
+# the follow-up ticks that open under a pick ("More sounds" > "Memes"), sent as
+# improve/<pick>/<name>; only these names
+IMPROVE_MORE = {
+    "sounds": ("memes", "music", "game", "reactions", "voice-lines"),
+    "setup": ("others-hear-me", "pick-mic", "hotkeys", "install"),
+    "voice-chat": ("discord", "in-game", "calls", "streaming"),
+    "voice-changer": ("more-voices", "more-real", "less-delay", "ai-voices"),
+    "speed": ("starts-slow", "heavy", "lags-games", "stutters"),
+    "looks": ("crowded", "hard-to-find", "themes", "text-size"),
+}
+BUGS_MAX = 200   # characters of "What bugs did you hit?" (Fewer bugs opens only that)
 LANG_RE = r"[a-z]{2,3}(?:-[A-Za-z0-9]{2,4})?"
 DAY_S = 24 * 3600
 
@@ -511,10 +523,10 @@ def step(cfg, name: str, saved=None) -> None:
     maybe_send(cfg, saved, event=f"step/{name}")
 
 
-def other_tag(text: str) -> str:
+def other_tag(text: str, limit: int = OTHER_MAX) -> str:
     """What was typed under Other as dashed words ("more-anime-sounds"), any language.
     Anything that could say who someone is is dropped first: an email address, a link,
-    a long number (a phone), an @name. At most OTHER_MAX characters, cut at a word."""
+    a long number (a phone), an @name. At most `limit` characters, cut at a word."""
     words = []
     for w in str(text or "").lower().split():
         if ("@" in w or "/" in w or "www." in w or re.search(r"\.[a-z]{2,4}$", w)
@@ -523,23 +535,32 @@ def other_tag(text: str) -> str:
         words += [p for p in re.split(r"[\W_]+", w) if p]
     out = ""
     for w in words:
-        if len(out) + len(w) + 1 > OTHER_MAX:
+        if len(out) + len(w) + 1 > limit:
             break
         out = f"{out}-{w}" if out else w
     return out
 
 
-def improve(cfg, picks, other: str = "") -> bool:
+def improve(cfg, picks, other: str = "", bugs: str = "") -> bool:
     """The feedback box's "What would you improve?" picks, sent now as `improve/<name>`
-    (names from IMPROVE only), and what was typed under Other as `improve/other/<words>`
-    (other_tag). Anonymous: they go with a one-off random session made for this send,
-    never this PC's stats_id, so they can't be linked to the daily count or to each
-    other. False when nothing can be sent (usage count off, offline, running from
+    (names from IMPROVE only), their follow-up ticks (`sounds/memes` in `picks`) as
+    `improve/sounds/memes` (names from IMPROVE_MORE only), what was typed under Other
+    as `improve/other/<words>` and under Fewer bugs as `improve/bugs/said/<words>`
+    (other_tag, BUGS_MAX for bugs). Anonymous: they go with a one-off random session
+    made for this send, never this PC's stats_id, so they can't be linked to the daily
+    count or to each other. False when nothing can be sent (usage count off, offline, running from
     source)."""
-    events = [f"improve/{k}" for k in IMPROVE if k in picks]
-    tag = other_tag(other) if "other" in picks else ""
-    if tag:
-        events = [e if e != "improve/other" else f"improve/other/{tag}" for e in events]
+    events = []
+    for k in IMPROVE:
+        if k not in picks:
+            continue
+        tag = other_tag(other) if k == "other" else ""
+        events.append(f"improve/{k}/{tag}" if tag else f"improve/{k}")
+        events += [f"improve/{k}/{sub}" for sub in IMPROVE_MORE.get(k, ())
+                   if f"{k}/{sub}" in picks]
+        said = other_tag(bugs, BUGS_MAX) if k == "bugs" else ""
+        if said:
+            events.append(f"improve/bugs/said/{said}")
     if not events or not enabled() or not net.allowed(FEATURE):
         return False
     sid = uuid.uuid4().hex   # not install_id(cfg): the box says it isn't linked to this PC
