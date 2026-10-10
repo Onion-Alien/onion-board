@@ -32,7 +32,7 @@ from soundboard.ui.bunnywidget import BunnyWidget
 from soundboard.ui.owl import H as OWL_H
 from soundboard.ui.owl import W as OWL_W
 from soundboard.ui.owl import OwlWidget
-from soundboard.ui.panel import CardGrid, HoverCard
+from soundboard.ui.panel import CardGrid, HoverCard, RoundedFrame
 from soundboard.ui.responsive import FitWidth
 from soundboard.ui.widgets import LoadingBar, fmt_time, paint_now_playing
 from soundboard import errors
@@ -656,7 +656,7 @@ class ResultRow(HoverCard):
         self.thumb.set_pixmap(pm)
 
 
-class SearchResults(QFrame):
+class SearchResults(RoundedFrame):
     """`play(Result)` / `add(Result)` when a row's button is pressed; `closed()`
     when its "My sounds" back button is (the owner shows its pads again). The site
     buttons in the header pick where the search goes and re-run it there."""
@@ -678,7 +678,7 @@ class SearchResults(QFrame):
         self._done.connect(self._on_done)
 
         v = QVBoxLayout(self)
-        v.setContentsMargins(0, 0, 0, 0)
+        v.setContentsMargins(12, 12, 12, 12)
         v.setSpacing(6)
         head = QHBoxLayout()
         back = self.btn_back = QPushButton(_("Back to my sounds"))
