@@ -1,0 +1,1 @@
+- Tests: the highlight-colour test no longer writes its test board ("Boom", "Airhorn") into the real settings folder; a check stops tests from undoing every patch at once again.
