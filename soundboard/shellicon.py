@@ -148,8 +148,8 @@ if sys.platform == "win32":
     PID_ID, PID_COMMAND, PID_ICON, PID_DISPLAY_NAME = 5, 2, 3, 4
     VT_EMPTY, VT_LPWSTR = 0, 31
     STGM_READ = 0
-    SHCNE_UPDATEITEM, SHCNE_ASSOCCHANGED = 0x00002000, 0x08000000
-    SHCNF_IDLIST, SHCNF_PATHW = 0x0000, 0x0005
+    SHCNE_UPDATEITEM = 0x00002000
+    SHCNF_PATHW = 0x0005
 
     def _known_folder(guid_text: str) -> Path | None:
         out = ctypes.c_wchar_p()
@@ -305,13 +305,16 @@ def shortcut_folders() -> list[Path]:
 
 
 def _notify(paths: list[Path]) -> None:
+    """Tell Explorer just these shortcuts changed. Never SHCNE_ASSOCCHANGED: that
+    drops the whole icon cache and redraws every Desktop icon (a visible flash on
+    each start that re-icons them). Not needed: every look has its own .ico name,
+    so re-reading the .lnk is enough to show the new one."""
     if sys.platform != "win32" or not paths:
         return
     try:
         for p in paths:
             _shell32.SHChangeNotify(SHCNE_UPDATEITEM, SHCNF_PATHW,
                                     ctypes.c_wchar_p(str(p)), None)
-        _shell32.SHChangeNotify(SHCNE_ASSOCCHANGED, SHCNF_IDLIST, None, None)  # icon caches
     except OSError:
         log.debug("SHChangeNotify failed", exc_info=True)
 
