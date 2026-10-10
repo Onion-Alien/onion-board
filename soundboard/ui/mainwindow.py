@@ -19,7 +19,7 @@ from PySide6.QtCore import (QEvent, QFileSystemWatcher, QObject, QPoint, QSignal
                             Qt, QTimer, QUrl, Signal)
 from PySide6.QtGui import (QActionGroup, QColor, QCursor, QDesktopServices, QIcon,
                            QKeySequence, QPainter, QPixmap, QShortcut)
-from PySide6.QtWidgets import (QApplication, QBoxLayout, QCheckBox, QComboBox, QDialog, QFileDialog,
+from PySide6.QtWidgets import (QApplication, QCheckBox, QComboBox, QDialog, QFileDialog,
                                QFrame,
                                QGraphicsOpacityEffect, QGridLayout, QHBoxLayout, QInputDialog,
                                QLabel, QLineEdit, QMainWindow, QMenu, QMessageBox,
@@ -7903,14 +7903,6 @@ class MainWindow(QMainWindow):
             # room for a whole row of pads comes before the mixer, the status line and
             # the rest: without it they kept their room and the pads got a slit
             self._pads_scroll.setMinimumHeight(self.grid.row_height())
-            stacked = self.width() < 1050
-            self._mixer_layout.setDirection(QBoxLayout.TopToBottom if stacked
-                                            else QBoxLayout.LeftToRight)
-            self._mixer_layout.setSpacing(4 if stacked else 14)
-            for row in self._deck_rows:
-                row.setAlignment(Qt.AlignLeft if stacked else Qt.Alignment())
-            for group in self._decks[1:]:
-                group[0].setMaximumHeight(0 if stacked else 16777215)
             narrow = self.width() < 860   # two cards side by side get cramped below this
             # Translated controls can need more room than the fixed breakpoint.
             # Measure both Setup columns even while they are stacked, so growing
