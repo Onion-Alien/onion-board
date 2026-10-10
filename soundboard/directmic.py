@@ -1164,6 +1164,24 @@ def _note(name: str, v) -> str:
     return f"{name}=raw:{kind}:{raw.hex()}"
 
 
+def _note_value(item: str):
+    """The value a "Before" note puts back (None: it wasn't there). A raw note (an odd
+    kind) can't be compared to what's there: `_MISSING`."""
+    _, _, value = item.partition("=")
+    if not value:
+        return None
+    if value.startswith("multi:"):
+        return value[6:].split("|") if value[6:] else []
+    if value.startswith("dword:"):
+        return int(value[6:])
+    if value.startswith("raw:"):
+        return _MISSING
+    return value.removeprefix("sz:")
+
+
+_MISSING = object()
+
+
 def _put_back(fx, item: str):
     """Undo one "Before" note (see _note)."""
     name, _, value = item.partition("=")
@@ -1183,29 +1201,40 @@ def _put_back(fx, item: str):
 def _uninstall_endpoint(guid: str):
     """Put one mic back as it was before _install_endpoint. If Windows already took the
     effect off (a driver update or "Reset sound settings" rewrote the mic's effects),
-    what's there now is the driver's own and stays: the notes are only dropped."""
+    what's there now is the driver's own and stays: the notes are only dropped. If the
+    uninstall itself was cut off half-way (a crash, a reboot), the slot already matches
+    the notes and the rest of the change is finished now."""
     base = rf"{CAPTURE_KEY}\{guid}"
     with _StateKey(rf"{ENDPOINTS_KEY}\{guid}") as state:
         before = (state.get("Before") or ([],))[0] or []
         created = (state.get("FxCreated") or (0,))[0]
-        if not before and state.get("Slot"):   # an early test build's notes
-            pid = state.get("Slot")[0]
-            before = [f"{FX % pid}=sz:{state.get('Original')[0]}"
-                      if (state.get("Original") or ("",))[0] else f"{FX % pid}="]
+        slot = (state.get("Slot") or (None,))[0]
+        if not before and slot is not None:   # an early test build's notes
+            before = [f"{FX % slot}=sz:{state.get('Original')[0]}"
+                      if (state.get("Original") or ("",))[0] else f"{FX % slot}="]
             if (state.get("ModesCreated") or (0,))[0]:
                 before.append(f"{MODES_KEY % state.get('ModesCreated')[0]}=")
             if (state.get("AssocCreated") or (0,))[0]:
                 before.append(f"{FX % 0}=")
     try:
         with _BackupKey(base + r"\FxProperties", create=False) as fx:
-            ours = any(_is_ours((fx.get(FX % p) or (None,))[0])
-                       for p in OUR_SLOTS)
-            if ours:
+            if slot is None:
+                restore = any(_is_ours((fx.get(FX % p) or (None,))[0]) for p in OUR_SLOTS)
+            else:
+                cur = (fx.get(FX % slot) or (None,))[0]
+                want = _note_value(next((b for b in before
+                                         if b.partition("=")[0] == FX % slot),
+                                        f"{FX % slot}="))
+                # our CLSID still in the slot, or the slot already matches the notes (an
+                # uninstall cut off half-way): finish it. A slot holding some other value
+                # means Windows reset the mic: leave it all.
+                restore = _is_ours(cur) or cur == want
+            if restore:
                 for item in before:
                     _put_back(fx, item)
             else:
                 log.info("%s: Windows already took the effect off; left as it is", guid)
-        if created and ours:
+        if created and restore:
             _delete_if_empty(base + r"\FxProperties")
     except FileNotFoundError:
         pass   # the mic is gone

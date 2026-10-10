@@ -345,6 +345,31 @@ def test_a_set_up_cut_off_anywhere_can_be_undone(fake_reg, mic):
         assert not _all_ours(fake_reg) and not fake_reg.installed_on()
 
 
+@pytest.mark.parametrize("mic", MICS)
+def test_an_uninstall_cut_off_anywhere_finishes_on_the_next_run(fake_reg, mic):
+    """Taking it off killed part-way (a crash, a reboot): the effect may already be out
+    of the slot while the rest of the change is still there. A second uninstall must
+    still leave the mic exactly as it was (it used to see the effect gone from the slot
+    and mistake it for Windows having reset the mic, leaving the rest changed)."""
+    _mic(fake_reg, MICS[mic])
+    before = {k: dict(v) for k, v in fake_reg.keys.items()}
+    dm._install_endpoint(GUID, None)
+    installed = {k: dict(v) for k, v in fake_reg.keys.items()}
+    fake_reg.writes = 0
+    dm._uninstall_endpoint(GUID)
+    total = fake_reg.writes
+    for n in range(1, total + 1):
+        fake_reg.keys = {k: dict(v) for k, v in installed.items()}
+        fake_reg.writes, fake_reg.kill_at = 0, n
+        with pytest.raises(Killed):
+            dm._uninstall_endpoint(GUID)
+        fake_reg.kill_at = None
+        for guid in fake_reg.installed_on():   # the retry (a later uninstall)
+            dm._uninstall_endpoint(guid)
+        assert fake_reg.mics() == {k: v for k, v in before.items() if v}, n
+        assert not _all_ours(fake_reg) and not fake_reg.installed_on()
+
+
 def test_repair_after_windows_reset_keeps_the_new_driver_effects(fake_reg):
     """A driver update / "Reset sound settings" rewrote the mic's effects: repairing and
     later taking it off leave the driver's new ones, not the stale ones from before."""
