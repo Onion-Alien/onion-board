@@ -2,7 +2,8 @@
 itself is the Onion Watch add-on (soundboard.watchaddon); this is Onion Board's
 side of it:
 
-  * Until the add-on is installed, Hoot and a *Get Onion Watch* button. One click
+  * Until the add-on is installed, entering the tab opens a dismissible install
+    dialog with Hoot and a *Get Onion Watch* button. One click
     downloads it (nothing is fetched before that), installs it into
     %APPDATA%\\OnionBoard\\modules and loads it into this tab, no restart needed.
     Triggers made before the add-on existed are kept in Config.screen meanwhile,
@@ -23,14 +24,14 @@ import logging
 import threading
 
 from PySide6.QtCore import Qt, QTimer, Signal
-from PySide6.QtWidgets import (QHBoxLayout, QMessageBox, QProgressBar, QPushButton,
+from PySide6.QtWidgets import (QDialog, QHBoxLayout, QMessageBox, QProgressBar, QPushButton,
                                QStackedWidget, QVBoxLayout, QWidget)
 
 from soundboard import modules, net, netlog, theme, updates, watchaddon
 from soundboard.i18n import _, ngettext
 from soundboard.ui import busy, icons
 from soundboard.ui.owl import OwlWidget
-from soundboard.ui.panel import card, hint_label, section_label
+from soundboard.ui.panel import Flow, card, hint_label, section_label
 from soundboard.ui.widgets import LoadingBar
 from soundboard import errors
 
@@ -81,6 +82,7 @@ class TriggersTab(QWidget):
         self.info: modules.ModuleInfo | None = None
         self.offer: watchaddon.Offer | None = None   # a newer version to update to
         self._busy = False
+        self._closed = False
         self._cancel = False
         self._compact: dict[str, bool] = {}          # fit steps applied (see fit_steps)
         self._progress.connect(self._on_progress)
@@ -119,12 +121,19 @@ class TriggersTab(QWidget):
         page = QWidget()
         pv = QVBoxLayout(page)
         pv.setContentsMargins(0, 8, 0, 0)
+        self.install_popup = QDialog(self)
+        self.install_popup.setWindowTitle(_("Get Onion Watch for the Triggers tab"))
+        self.install_popup.setWindowModality(Qt.WindowModal)
+        self.install_popup.setMaximumWidth(620)
+        self.install_popup.resize(620, 1)
+        self.install_popup.rejected.connect(self._dismiss_install)
+        popup_layout = QVBoxLayout(self.install_popup)
+        popup_layout.setContentsMargins(12, 12, 12, 12)
         box, bv = card()
         row = QHBoxLayout()
         row.setSpacing(18)
-        # the same room both sides, so he stands in the middle of his corner of the
-        # card (his speech bubble may overlap him a little on the right)
-        side = round(HOOT_PX * 0.6)
+        # Enough room for Hoot's speech bubble without squeezing the dialog's text.
+        side = 16
         self.hoot = OwlWidget(HOOT_PX, HOOT_BEGS, HOOT_JOY, left=side, right=side)
         self.hoot.setToolTip(_("Hoot is waiting for Onion Watch"))
         row.addWidget(self.hoot, 0, Qt.AlignCenter)
@@ -145,7 +154,7 @@ class TriggersTab(QWidget):
         theme.set_tone(self.error, "warn")
         self.error.hide()
         text.addWidget(self.error)
-        buttons = QHBoxLayout()
+        buttons = Flow(gap=8)
         self.btn_get = QPushButton()
         self.btn_get.setObjectName("primary")
         icons.set_icon(self.btn_get, "triggers", "on_accent")
@@ -158,7 +167,9 @@ class TriggersTab(QWidget):
         buttons.addWidget(self.btn_cancel)
         self.btn_remove_broken = self._remove_button()
         buttons.addWidget(self.btn_remove_broken)
-        buttons.addStretch(1)
+        self.btn_close_install = QPushButton(_("Close"))
+        self.btn_close_install.clicked.connect(self.install_popup.reject)
+        buttons.addWidget(self.btn_close_install)
         text.addLayout(buttons)
         # the download's real progress, and a pill gliding along while there's no
         # number to show (asking GitHub for the newest, installing, starting it): one
@@ -179,10 +190,16 @@ class TriggersTab(QWidget):
             "checked before it's installed. It only looks at your screen: it never "
             "clicks, types or touches your game."))
         text.addWidget(self.privacy)
-        text.addStretch(1)
+        text.setAlignment(Qt.AlignTop)
         row.addLayout(text, 1)
         bv.addLayout(row)
-        pv.addWidget(box)
+        popup_layout.addWidget(box)
+        from soundboard.ui import fit
+        fit.watch(self.install_popup)
+        self.get_again = QPushButton(_("Get Onion Watch"))
+        icons.set_icon(self.get_again, "triggers")
+        self.get_again.clicked.connect(self._show_install_popup)
+        pv.addWidget(self.get_again, 0, Qt.AlignLeft)
         pv.addStretch(1)
         self.get_page = page
         self.stack.addWidget(page)
@@ -238,6 +255,8 @@ class TriggersTab(QWidget):
                            _("Get Onion Watch for the Triggers tab"))
         self.btn_get.setText(_("Get Onion Watch again") if broken and error
                              else _("Get Onion Watch"))
+        self.get_again.setText(self.btn_get.text())
+        self.install_popup.setWindowTitle(self.title.text())
         local = watchaddon.local_zip()
         self.btn_get.setToolTip(_("Install {file}", file=local) if local is not None else
                                 _("Download Onion Watch from GitHub and install it"))
@@ -299,6 +318,23 @@ class TriggersTab(QWidget):
             # well, in case that paint never comes
             self._load_queued = True
             QTimer.singleShot(SHOW_LOAD_MS, self, self._load_on_show)
+        elif not self.pending:
+            QTimer.singleShot(0, self, self._show_install_popup)
+
+    def hideEvent(self, event):
+        super().hideEvent(event)
+        self.install_popup.reject()
+
+    def _show_install_popup(self):
+        if (self._closed or self.pending or self.panel is not None or not self.isVisible()
+                or self.install_popup.isVisible()):
+            return
+        self.install_popup.open()
+        self.btn_get.setFocus(Qt.OtherFocusReason)
+
+    def _dismiss_install(self):
+        if self._busy and self.panel is None:
+            self.cancel()
 
     def _painted(self):
         if self._load_queued:
@@ -321,6 +357,7 @@ class TriggersTab(QWidget):
         if self.info is None:
             self._label_get(error)
             self.stack.setCurrentWidget(self.get_page)
+            QTimer.singleShot(0, self, self._show_install_popup)
             return False
         try:
             entry = modules.load_package(self.info)
@@ -329,6 +366,7 @@ class TriggersTab(QWidget):
             log.warning("Onion Watch couldn't be loaded: %s", e, exc_info=True)
             self._label_get(watchaddon.friendly(e))
             self.stack.setCurrentWidget(self.get_page)
+            QTimer.singleShot(0, self, self._show_install_popup)
             return False
         self.panel = panel
         lay = self.board_page.layout()
@@ -351,6 +389,7 @@ class TriggersTab(QWidget):
         for key, compact in self._compact.items():
             self._apply_fit(key, compact)
         self.stack.setCurrentWidget(self.board_page)
+        self.install_popup.accept()
         log.info("Onion Watch %s is the Triggers tab", self.info.version)
         self.loaded.emit()
         if self.is_active():
@@ -576,6 +615,8 @@ class TriggersTab(QWidget):
             self.panel.retheme()
 
     def shutdown(self):
+        self._closed = True
+        self.install_popup.reject()
         self._cancel = True
         if self.panel is not None:
             try:
@@ -590,14 +631,12 @@ class TriggersTab(QWidget):
     def fit_steps(self):
         """What the main window may squeeze here when it gets small (ui/responsive.py).
         They apply to the add-on's tab whenever it's in, also when it arrives later."""
-        from soundboard.ui import responsive as r
-
         def step(key):
             def apply(compact: bool):
                 self._compact[key] = compact
                 self._apply_fit(key, compact)
             return apply
-        return [(20, "h", step("hint")), (21, "h", r.hide(self.hoot, self.blurb)),
+        return [(20, "h", step("hint")),
                 (25, "w", step("cut")), (26, "w", step("paste")), (27, "w", step("add")),
                 (28, "w", step("watch")), (29, "w", step("interval_label"))]
 

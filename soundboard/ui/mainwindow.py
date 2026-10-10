@@ -1639,11 +1639,9 @@ class MainWindow(QMainWindow):
         sections = QVBoxLayout(body)
         sections.setContentsMargins(0, 0, 0, 0)
         sections.setSpacing(16)
-        routing = self._setup_top = QHBoxLayout()
-        routing.setSpacing(16)
-        sections.addLayout(routing)
         cols = self._setup_cols = QHBoxLayout()
         sections.addLayout(cols)
+        sections.addStretch(1)
         cols.setContentsMargins(0, 0, 0, 0)
         cols.setSpacing(16)
         lcol, rcol = QVBoxLayout(), QVBoxLayout()
@@ -1841,9 +1839,8 @@ class MainWindow(QMainWindow):
         icons.set_icon(ref, "reload")
         ref.clicked.connect(lambda: self.rescan_with_feedback(ref))
         av.addWidget(ref, 0, Qt.AlignLeft)
-        routing.addWidget(devcard, 1)
-        lcol.addWidget(howcard)
-        lcol.addWidget(helpcard)
+        lcol.addWidget(devcard)
+        rcol.addWidget(howcard)
 
         # ---- who's listening: shape the sounds for the voice chat on the other end
         destcard, dv = card(_("Who's listening"), _("Where people hear you: a game, a voice "
@@ -1853,7 +1850,6 @@ class MainWindow(QMainWindow):
         from soundboard.ui.destpanel import DestPanel
         self.dest_panel = DestPanel(self)
         dv.addWidget(self.dest_panel)
-        lcol.addStretch(1)
 
         # ---- sound shaping
         eqcard, ev = card(roomy=True)
@@ -1861,7 +1857,8 @@ class MainWindow(QMainWindow):
         self.eq.changed.connect(self.on_eq)
         ev.addWidget(self.eq)
         rcol.addWidget(destcard)
-        rcol.addWidget(eqcard)
+        rcol.addWidget(helpcard)
+        lcol.addWidget(eqcard)
         utilitycard, uv = card(_("Volume & shortcuts"), roomy=True)
         self.chk_level = QCheckBox(_("Level volumes (all sounds equally loud)"))
         self.chk_level.setChecked(c.level_volumes)
@@ -1871,6 +1868,7 @@ class MainWindow(QMainWindow):
         hk.clicked.connect(lambda: self.open_settings("hotkeys"))
         uv.addWidget(hk, 0, Qt.AlignLeft)
         rcol.addWidget(utilitycard)
+        lcol.addStretch(1)
         rcol.addStretch(1)
         self.on_eq(*self.eq.state())   # push the saved EQ into the engine
         destination.apply(self.cfg, self.engine)   # ...and the destination mode (Who's listening)
@@ -3634,7 +3632,7 @@ class MainWindow(QMainWindow):
                 self._tab_steps[key] = new.fit_steps()
                 self._fit.extend(self._tab_steps[key])
             if key == "voice":
-                self._stack_cols = (*self._stack_cols[:2], *new.stack_steps())
+                self._stack_cols = (*self._stack_cols[:1], *new.stack_steps())
             self._refit()
 
     def _follow_switches(self):
@@ -7733,7 +7731,7 @@ class MainWindow(QMainWindow):
         f.add(40, "h", lambda tight: r.hide(self.mixer)(
             tight and (self.height() < 520 or self.width() < 760)))
         f.add(50, "h", r.hide(self.cat_bar))   # the overlay's category key still works
-        self._stack_cols = (r.stack(self._setup_cols), r.stack(self._setup_top),
+        self._stack_cols = (r.stack(self._setup_cols),
                             *self.voice.stack_steps())
         self.setMinimumSize(responsive.MIN_SIZE)
 
@@ -7764,11 +7762,11 @@ class MainWindow(QMainWindow):
             # the window brings them back only when neither will be clipped.
             margins = self.setup_page.widget().layout().contentsMargins()
             room = self.setup_page.viewport().width() - margins.left() - margins.right()
-            for i, cols in enumerate((self._setup_cols, self._setup_top)):
+            for i, cols in enumerate((self._setup_cols,)):
                 available = min(room, cols.parentWidget().maximumWidth())
                 needed = sum(cols.itemAt(j).minimumSize().width() for j in range(cols.count()))
                 self._stack_cols[i](narrow or needed + cols.spacing() > available)
-            for apply in self._stack_cols[2:]:
+            for apply in self._stack_cols[1:]:
                 apply(narrow)
             need = self._fit.fit(size)   # even the smallest layout won't fit
             if need.width() > size.width() or need.height() > size.height():

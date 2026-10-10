@@ -1093,6 +1093,35 @@ def test_audit_setup_routes_precede_advanced_controls(window, qapp):
     assert window.cb_route.mapTo(view, QPoint()).y() < window.eq.mapTo(view, QPoint()).y()
 
 
+def test_devices_card_aligns_with_setup_columns_and_stacks_when_narrow(window, qapp):
+    window.apply_theme("Dark")
+    # The offscreen fallback font needs wider columns than the app's Segoe UI.
+    window._setup_cols.parentWidget().setMaximumWidth(1500)
+    window.tabs.setCurrentWidget(window.setup_page)
+    window.show()
+    card = window.cb_main.parentWidget()
+    for width, height in ((1920, 1080), (1180, 720), (800, 600), (1920, 1080)):
+        window.resize(width, height)
+        for _ in range(5):
+            qapp.processEvents()
+        assert not window.is_mini()
+        assert window.setup_page.horizontalScrollBar().maximum() == 0
+        assert card.x() == 0
+        for combo in (window.cb_mon, window.cb_mic, window.cb_route):
+            assert card.rect().contains(combo.mapTo(card, combo.rect().bottomRight()))
+        if width == 1920:
+            mic_card = window.how_title.parentWidget()
+            assert card.width() == mic_card.width()
+            assert card.y() == mic_card.y()
+            assert card.width() <= 750
+            assert card.geometry().right() < mic_card.x()
+            eq_card = window.eq.parentWidget()
+            assert eq_card.x() == card.x() and eq_card.width() == card.width()
+            assert eq_card.y() == card.geometry().bottom() + 17
+        else:
+            assert card.width() <= window.setup_page.viewport().width()
+
+
 def test_drop_target_keeps_the_full_board_width(window, qapp):
     window.show()
     window.tabs.setCurrentIndex(0)

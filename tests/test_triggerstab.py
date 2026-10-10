@@ -126,6 +126,52 @@ def test_without_the_add_on_it_shows_hoot_and_keeps_the_triggers(qapp, tmp_path)
     assert TriggersTab(FakeHost(), [tmp_path / "m"]).kept.isHidden()
 
 
+def test_install_prompt_opens_on_entry_and_can_be_reopened(qapp, tmp_path):
+    tab = TriggersTab(FakeHost(), [tmp_path / "modules"])
+    try:
+        assert not tab.install_popup.isVisible()
+        tab.resize(1700, 800)
+        tab.show()
+        assert process_events(qapp, tab.install_popup.isVisible)
+        assert tab.install_popup.width() <= 620
+        assert tab.btn_get.isVisible() and tab.btn_close_install.isVisible()
+        assert tab.blurb.wordWrap() and tab.privacy.wordWrap()
+        tab.btn_close_install.click()
+        assert not tab.install_popup.isVisible() and tab.get_again.isVisible()
+        qapp.processEvents()
+        assert not tab.install_popup.isVisible()
+        tab.get_again.click()
+        assert tab.install_popup.isVisible()
+        tab.hide()
+        assert not tab.install_popup.isVisible()
+        tab.show()
+        assert process_events(qapp, tab.install_popup.isVisible)
+    finally:
+        tab.shutdown()
+        tab.close()
+        tab.deleteLater()
+
+
+def test_deferred_install_prompt_waits_until_the_tab_is_visible(qapp, tmp_path):
+    tab = TriggersTab(FakeHost(), [tmp_path / "modules"], defer=True)
+    try:
+        tab.load()
+        qapp.processEvents()
+        assert not tab.install_popup.isVisible()
+        tab.show()
+        assert process_events(qapp, tab.install_popup.isVisible)
+        tab._busy = True
+        tab.btn_close_install.click()
+        assert tab._cancel and not tab.install_popup.isVisible()
+        tab._finish(None, "Cancelled", False)
+        tab.get_again.click()
+        assert tab.install_popup.isVisible() and tab.error.isVisible()
+    finally:
+        tab.shutdown()
+        tab.close()
+        tab.deleteLater()
+
+
 def test_a_deferred_tab_loads_the_add_on_only_when_asked(qapp, tmp_path, pkg, monkeypatch):
     """The window builds the tab with defer=True and loads Onion Watch once it's up:
     loading it took up to a second before the window could show."""
@@ -331,11 +377,14 @@ def test_get_installs_it_and_loads_it_into_the_tab(qapp, tmp_path, addon_zip, mo
     step[28](True)                        # the window is small before it's even loaded
     live = []
     tab.active_changed.connect(live.append)
+    tab.show()
+    assert process_events(qapp, tab.install_popup.isVisible)
     tab.btn_get.click()
     assert process_events(qapp, lambda: tab.panel is not None)
     assert tab.stack.currentWidget() is tab.board_page and not tab.needs_nudge()
     assert (tmp_path / "modules" / "onion-watch" / "module.json").is_file()
     assert tab.panel.host is host
+    assert not tab.install_popup.isVisible()
     assert tab.panel.watch.text() == ""   # ...so its Watch button came in icon only
     tab.panel.set_active(True)
     assert live == [True] and tab.is_active()
@@ -373,6 +422,11 @@ def test_an_installed_add_on_loads_on_start(qapp, tmp_path, addon_zip):
     watchaddon.install(addon_zip(), tmp_path / "modules")
     tab = TriggersTab(FakeHost(), [tmp_path / "modules"])
     assert tab.panel is not None and tab.stack.currentWidget() is tab.board_page
+    tab.show()
+    qapp.processEvents()
+    assert not tab.install_popup.isVisible()
+    tab.shutdown()
+    tab.close()
 
 
 def test_one_that_breaks_shows_hoot_with_why(qapp, tmp_path, addon_zip):
