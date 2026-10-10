@@ -16,11 +16,15 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - {name: tabs-a, heap: "0", tests: tests/test_tab_switches.py, count: "25"}
-          - {name: tabs-b, heap: "0", tests: tests/test_tab_switches.py, count: "25"}
+          - {name: none, heap: "0", tests: "tests/test_zz_stress339.py -k test_v_none", count: "600"}
+          - {name: settings, heap: "0", tests: "tests/test_zz_stress339.py -k test_v_settings", count: "600"}
+          - {name: voice, heap: "0", tests: "tests/test_zz_stress339.py -k test_v_voice", count: "600"}
+          - {name: radio, heap: "0", tests: "tests/test_zz_stress339.py -k test_v_radio", count: "600"}
+          - {name: apps, heap: "0", tests: "tests/test_zz_stress339.py -k test_v_apps", count: "600"}
+          - {name: triggers, heap: "0", tests: "tests/test_zz_stress339.py -k test_v_triggers", count: "600"}
     name: ${{ matrix.name }}
     runs-on: windows-latest
-    timeout-minutes: 60
+    timeout-minutes: 40
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-python@v7
