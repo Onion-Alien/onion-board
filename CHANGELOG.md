@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Mini player shows connection status and a microphone mute switch. Expanded sidebar
+  actions have labels; Setup puts devices and the local mix test first. Sounds groups
+  library tools, Voice opens its presets on first visit, and secondary text reads more
+  clearly. The full-width drop target is preserved.
+
 - Add sounds and Record use matching rounded buttons, with a subtle gradient on
   Add sounds and a quiet raised surface on Record.
 - AI voices puts Start and live status at the top, with a wider voice picker,

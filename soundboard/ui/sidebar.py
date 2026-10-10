@@ -19,7 +19,7 @@ from soundboard.ui import icons
 
 ICON = 20          # a tab's icon on the rail
 SHUT_W = 43        # the rail's width, shut: its 1 px edge, 4, a 34 px button, 4...
-OPEN_W = 180       # ...and opened out (room for "an app by Onion Alien" in any theme font)
+OPEN_W = 190       # room for the brand and expanded listening status
 LOGO = 24          # the onion: with its 5 px glow room, a tab button's width (BUTTON_W)
 BUTTON_W = 34      # a button on the shut rail; open, its icon stays in this column
 COMPACT_H = 28     # every button's height in a short window (else as tall as a tab's)
@@ -180,7 +180,7 @@ class RailTab(QToolButton):
 
 def put(w: QPushButton, text: str, full: str = "", tip: str = ""):
     """What a status button on the rail (`status`: Live, Stop all, the setup pill…)
-    says. It's only its icon, open or shut (as words they crowded the rail): `full`
+    says. Expanded rails show its label; collapsed rails show its icon. `full`
     (default `text`) is its name for a screen reader and the first line of its tip,
     over `tip`."""
     w.setProperty("railtext", text)
@@ -193,8 +193,8 @@ def put(w: QPushButton, text: str, full: str = "", tip: str = ""):
 
 class SideRail(QFrame):
     """The rail. `extras` (More tabs, ⓘ) sit under the tabs; at the bottom `status`
-    (Live, Stop all, the setup pill…: what used to be the window's header) as icons,
-    in a column when shut and a row when open, then `foot` (Settings) and the open /
+    (Live, Stop all, the setup pill…: what used to be the window's header) in a
+    column, with readable labels when open, then `foot` (Settings) and the open /
     shut button. Extras show their "railtext" property as their words while open.
     `on_open(bool)` is called when the user opens or shuts it (to save it)."""
 
@@ -397,7 +397,10 @@ class SideRail(QFrame):
     def show_status(self, w: QPushButton):
         """A status button as `put` left it, for the rail open or shut."""
         full, tip = w.property("railfull") or "", w.property("railtip") or ""
-        w.setText("")
+        text = w.property("railtext") or full
+        if w.objectName() == "modebtn":
+            text = _("Listening: {mode}", mode=text)
+        w.setText(self._fit(w, text) if self.is_open() else "")
         w.setAccessibleName(full)
         if "<br>" in tip:   # rich text (Who's listening's tip)
             w.setToolTip(f"{html.escape(full)}<br>{tip}")
@@ -460,13 +463,13 @@ class SideRail(QFrame):
             self._label(w, w.property("railtext") or "", w.property("railtip"), shown)
             w.style().unpolish(w)
             w.style().polish(w)
-        self._status_box.setDirection(QBoxLayout.LeftToRight if shown
-                                      else QBoxLayout.TopToBottom)
-        pad_h = QSizePolicy.Expanding if shown else QSizePolicy.Minimum
+        self._status_box.setDirection(QBoxLayout.TopToBottom)
+        pad_h = QSizePolicy.Minimum
         self._status_pad_before.changeSize(0, 0, pad_h, QSizePolicy.Minimum)
         self._status_pad_after.changeSize(0, 0, pad_h, QSizePolicy.Minimum)
         self._status_box.invalidate()
         for w in self.status:
+            w.setFixedWidth(OPEN_W - 2 * SIDE_OPEN - 1 if shown else BUTTON_W)
             w.setProperty("railopen", shown)
             self.show_status(w)
             w.style().unpolish(w)
@@ -495,3 +498,4 @@ class SideRail(QFrame):
                 w.style().polish(w)
         for w in everything:
             w.setFixedHeight(h)
+        self.updateGeometry()
