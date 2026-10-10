@@ -643,6 +643,7 @@ def test_the_whole_window_comes_back_after_the_mini_player(window, qapp):
     assert not window.is_mini()
 
 
+@pytest.mark.windows   # Segoe UI's text widths
 def test_every_tab_stays_the_whole_window_down_to_the_mini_size(window, qapp):
     """The icon-only tabs' padding alone needed ~480 px, so a window the rest fits
     (480 px is a 600 px window at 125 %) turned into the mini player."""

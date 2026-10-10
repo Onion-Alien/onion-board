@@ -4,6 +4,7 @@ fading out, COM init ownership, and cable fixing trying every end."""
 from types import SimpleNamespace
 
 import numpy as np
+import pytest
 
 from soundboard import appaudio, cableformat, livefx
 from soundboard.destination import Dest
@@ -151,6 +152,7 @@ def test_effect_fade_has_no_jump():
 
 # ----------------------------------------------------------------- COM init
 
+@pytest.mark.windows   # COM
 def test_co_init_owns_s_false_but_not_changed_mode(monkeypatch):
     for hr, own in ((0, True), (1, True), (appaudio.RPC_E_CHANGED_MODE, False)):
         monkeypatch.setattr(appaudio, "_ole32",

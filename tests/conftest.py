@@ -16,11 +16,9 @@ if str(ROOT) not in sys.path:
 
 # Off Windows (Linux, macOS) Windows' registry and DLLs are stood in for, so the app
 # imports, and tests marked `windows` are skipped (tests/offwindows.py).
-from offwindows import install as _off_windows  # noqa: E402
+import offwindows  # noqa: E402
 
-_off_windows()
-import offwindows as _ow  # noqa: E402
-_ow.quiet_hotkeys()
+offwindows.install()
 
 # Garbage collection on the main thread only, as in the app (soundboard.uigc): a
 # collection on a test server's or the relay's thread freed a leftover Qt object with

@@ -6,6 +6,8 @@ import sys
 import textwrap
 from pathlib import Path
 
+import pytest
+
 from soundboard.app import restart_cmdline
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -23,6 +25,7 @@ def test_source_run_names_the_script_by_full_path(tmp_path, monkeypatch):
         subprocess.list2cmdline([str(tmp_path / "main.py")])
 
 
+@pytest.mark.windows   # PowerShell and RegisterApplicationRestart
 def test_windows_accepts_the_registration():
     """In a child process: it registers, and Windows hands the same line back."""
     child = textwrap.dedent("""

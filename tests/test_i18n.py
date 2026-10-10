@@ -211,6 +211,7 @@ def _import_time_translations(path) -> list[int]:
     return found
 
 
+@pytest.mark.windows   # imports the app in a child process
 def test_modules_imported_before_the_language_is_picked_translate_on_use():
     """app.main imports some modules before i18n.startup(): text they translate at
     import time would stay English for good. Finds them (app.py's own imports and

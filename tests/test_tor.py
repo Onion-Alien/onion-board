@@ -230,6 +230,7 @@ def test_starts_bootstraps_and_hands_net_its_socks_port(fake_tor, tmp_path):
     assert f"__OwningControllerProcess {os.getpid()}" in torrc
 
 
+@pytest.mark.windows   # job objects
 def test_new_identity_and_stop(fake_tor, tmp_path, monkeypatch):
     monkeypatch.setattr(tor, "NEWNYM_EVERY_S", 0.0)
     t = fake_tor()
@@ -244,6 +245,7 @@ def test_new_identity_and_stop(fake_tor, tmp_path, monkeypatch):
                                                                             "SHUTDOWN"]
 
 
+@pytest.mark.windows   # job objects
 def test_turning_tor_mode_off_stops_it(fake_tor):
     t = fake_tor()
     t.configure(True)
@@ -255,6 +257,7 @@ def test_turning_tor_mode_off_stops_it(fake_tor):
         t.gate(1)
 
 
+@pytest.mark.windows   # job objects
 def test_changing_bridges_restarts_a_running_tor(fake_tor, tmp_path, monkeypatch):
     monkeypatch.setattr(tor, "load_pt_config", lambda path=None: PT)
     t = fake_tor()
@@ -266,6 +269,7 @@ def test_changing_bridges_restarts_a_running_tor(fake_tor, tmp_path, monkeypatch
     assert "Bridge snowflake" in (tmp_path / "tor" / "torrc").read_text()
 
 
+@pytest.mark.windows   # job objects
 def test_turning_tor_off_doesnt_wait_for_it_to_exit(fake_tor):
     t = fake_tor()
     t.configure(True)
@@ -358,6 +362,7 @@ def test_missing_tor_exe(tmp_path, monkeypatch):
 
 # ---------------------------------------------------------------- job object
 
+@pytest.mark.windows   # job objects
 def test_job_object_kills_its_process_when_closed():
     sleeper = subprocess.Popen([sys.executable, "-c", "import time; time.sleep(60)"])
     try:
@@ -371,6 +376,7 @@ def test_job_object_kills_its_process_when_closed():
             sleeper.kill()
 
 
+@pytest.mark.windows   # job objects
 def test_tor_dies_when_the_app_crashes(tmp_path):
     """A process that put a child in its job object and then dies without cleaning up
     (os._exit, like a crash) takes the child with it."""

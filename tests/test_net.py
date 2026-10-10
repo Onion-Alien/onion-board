@@ -270,6 +270,7 @@ def test_the_relay_tunnels_connect_and_refuses_local_targets(site, socks):
     assert out.startswith(b"HTTP/1.1 502") and b"unreachable" in out
 
 
+@pytest.mark.windows   # Windows' environment ignores case
 def test_every_mode_points_ffmpeg_at_the_relay_as_the_radio(socks, monkeypatch):
     monkeypatch.setattr(net, "_env_saved", None)
     monkeypatch.setenv("HTTP_PROXY", "http://users-own:1")

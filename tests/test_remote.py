@@ -81,6 +81,7 @@ def test_a_taken_port_is_reported(qapp, ctl):
     assert not other.running
 
 
+@pytest.mark.windows   # Windows takes a just-closed port again at once
 def test_the_server_sleeps_until_asked_and_stops_at_once(qapp, monkeypatch):
     """It used to wake 4 times a second to see whether it should stop; now it waits
     for a connection, and stopping wakes it straight away, so the same port can be
