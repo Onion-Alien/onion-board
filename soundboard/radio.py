@@ -502,6 +502,22 @@ def _let_go():
         QTimer.singleShot(100, _let_go)
 
 
+_nam: QNetworkAccessManager | None = None
+
+
+def _the_nam() -> QNetworkAccessManager:
+    """The one network manager every RadioDirectory asks through, made on first use and
+    kept as long as the app. One per directory was made and freed with every Radio
+    tab: switching the tab off and on, making the next one crashed Windows now and
+    then (an access violation in QNetworkAccessManager's constructor, issue #339)."""
+    global _nam
+    if _nam is None:
+        from PySide6.QtCore import QCoreApplication
+        _nam = QNetworkAccessManager(QCoreApplication.instance())
+        net.apply_qt(_nam, FEATURE)   # Settings > Connection and Privacy & security
+    return _nam
+
+
 class RadioDirectory(QObject):
     """Talks to Radio Browser. Every call answers with a signal on the UI thread."""
     globe_ready = Signal(list)          # [Station] with a location, most listened first
@@ -515,8 +531,6 @@ class RadioDirectory(QObject):
         super().__init__(parent)
         self.cache_dir = cache_dir or radio_dir()
         self.bases = list(bases)
-        self.nam = QNetworkAccessManager(self)
-        net.apply_qt(self.nam, FEATURE)   # Settings > Connection and Privacy & security
         self._search_gen = 0
         self._pending: dict[int, list] = {}
         self._call.connect(self._run_call)
@@ -536,10 +550,10 @@ class RadioDirectory(QObject):
                 if not isinstance(e, ValueError):
                     log.warning("radio directory: reading the answer failed", exc_info=True)
                 after = bad
-            try:
-                self._call.emit(after)
-            except RuntimeError:   # the Radio tab was closed meanwhile
-                pass
+            # emitted on the UI thread: the Radio tab switched off during an emit from
+            # here freed this mid-emit (an access violation, issue #339)
+            from soundboard.ui import busy
+            busy.emit(self._call, after)
         _start_for(self, run, "radio-directory")
 
     @property
@@ -562,7 +576,8 @@ class RadioDirectory(QObject):
         req.setAttribute(QNetworkRequest.RedirectPolicyAttribute,
                          QNetworkRequest.NoLessSafeRedirectPolicy)
         started = time.monotonic()
-        reply = self.nam.get(req)
+        reply = _the_nam().get(req)
+        reply.setParent(self)   # this directory going (its tab switched off) aborts it
 
         def finished():
             reply.deleteLater()
@@ -884,7 +899,8 @@ class RadioPlayer(QObject):
         except ValueError:   # a name: where it leads is looked up first, off the UI thread
             self._set_state("connecting")
             gen = self._gen
-            _start_for(self, lambda: self._looked_up.emit(gen, _name_is_local(host)),
+            from soundboard.ui import busy   # (emitted on the UI thread, as above)
+            _start_for(self, lambda: busy.emit(self._looked_up, gen, _name_is_local(host)),
                        "radio-lookup")
             return
         self._open()
@@ -941,9 +957,28 @@ class RadioPlayer(QObject):
         self._gen += 1
         self._watch.stop()
         if self._player is not None:
+            # Qt's stop() waits for its decoding thread while this thread holds Python's
+            # lock; a buffer that thread is handing to _on_buffer needs that lock too: a
+            # deadlock. So _on_buffer is unhooked first and a buffer already on its way
+            # gets a moment (the GIL let go) to finish; station None makes it return.
+            self._unhook_buffers()
+            time.sleep(0.005)
             self._player.stop()
             self._player.setSource(QUrl())
+            if not self._closed:
+                self._hook_buffers()
         self._set_state("stopped")
+
+    def _hook_buffers(self):
+        if self._out is not None:
+            self._out.audioBufferReceived.connect(self._on_buffer, Qt.DirectConnection)
+
+    def _unhook_buffers(self):
+        if self._out is not None:
+            try:
+                self._out.audioBufferReceived.disconnect(self._on_buffer)
+            except (RuntimeError, TypeError):   # not connected / already gone
+                pass
 
     def _set_state(self, st: str):
         if st != self._state:
@@ -1053,14 +1088,9 @@ class RadioPlayer(QObject):
         waited out, so it never calls into a freed player (a crash)."""
         if self._closed:
             return
-        self.stop()
-        if self._out is not None:
-            try:
-                self._out.audioBufferReceived.disconnect(self._on_buffer)
-            except (RuntimeError, TypeError):   # never connected / already gone
-                pass
         with self._buffer_lock:
-            self._closed = True
+            self._closed = True   # stop() leaves the buffers unhooked
+        self.stop()
 
 
 def _tor_ready() -> bool:
