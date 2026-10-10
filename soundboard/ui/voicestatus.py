@@ -153,6 +153,9 @@ class VoiceStatusBar(QFrame):
         d = QBoxLayout.LeftToRight if room >= need else QBoxLayout.TopToBottom
         # beside the meter the chips keep to one line; under it they wrap
         self._right.setMinimumWidth(line if d == QBoxLayout.LeftToRight else 0)
+        # Flow's hint remembers its last width. Without a cap it takes the spare
+        # room on the next layout pass and squeezes the mic meter to its minimum.
+        self._right.setMaximumWidth(line if d == QBoxLayout.LeftToRight else 16777215)
         if self._box.direction() != d:
             self._box.setDirection(d)
             self._box.setSpacing(GAP if d == QBoxLayout.LeftToRight else 8)
