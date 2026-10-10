@@ -167,14 +167,17 @@ ROUTE_DEVICE = "device:"
 
 
 class StatusLine(QLabel):
-    """The status message: a small note floating at the bottom left, just above the
-    player and mixer. Not in any layout, so it never adds a row to the window (a row
-    under the mixer pushed the whole board up for one sentence). Hidden while
-    there's nothing to say, while the window is too short for it (set_room), and
-    when clicked. Notes expire after eight seconds unless a caller opts out."""
+    """The status message: a small note floating centred over the page, just above
+    the player and mixer. Its parent is the page area, not the whole window, so it
+    never covers the tab rail (pinned at the far left it sat over the rail's
+    buttons). Not in any layout, so it never adds a row to the window (a row under
+    the mixer pushed the whole board up for one sentence). Hidden while there's
+    nothing to say, while the window is too short for it (set_room), and when
+    clicked. Notes expire after eight seconds unless a caller opts out."""
 
     room = True
     GAP = 6
+    MAX_W = 560
 
     def __init__(self, parent: QWidget, above: Callable[[], int]):
         super().__init__(parent)
@@ -208,13 +211,14 @@ class StatusLine(QLabel):
     def place(self):
         if not self.isVisible():
             return
-        room = max(80, self.parentWidget().width() - 28)
+        pw = self.parentWidget().width()
+        room = max(80, min(self.MAX_W, pw - 28))
         # one line when it fits (a wrapping label's size hint is a narrow column)
         self.setWordWrap(False)
         w = min(room, self.sizeHint().width())
         self.setWordWrap(True)
         h = self.heightForWidth(w)
-        self.setGeometry(14, self._above() - h - self.GAP, w, h)
+        self.setGeometry((pw - w) // 2, self._above() - h - self.GAP, w, h)
         self.raise_()
 
     def eventFilter(self, obj, e):
@@ -997,10 +1001,11 @@ class MainWindow(QMainWindow):
         # ---- mixer strip: the things that apply whatever tab you're on
         rv.addWidget(self._build_mixer())
 
-        # floats above the player (or the mixer when the player's hidden), in no layout
-        self.status = StatusLine(root, lambda: next(
+        # floats above the player (or the mixer when the player's hidden), in no
+        # layout; in the page area so it never covers the tab rail
+        self.status = StatusLine(body, lambda: next(
             (w.geometry().top() for w in (self.transport, self.mixer) if w.isVisible()),
-            root.height() - 10))
+            body.height() - 10))
         self.status.setObjectName("statusnote")
         self.status.hide()
         self._pages.addWidget(self._build_mini())

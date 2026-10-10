@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- The note that pops up above the player ("Added … to Sounds", device changes and so
+  on) now sits centred over the page instead of jammed in the bottom-left corner on
+  top of the sidebar, and is no wider than 560 px.
 - AI voices: when the AI voice stops, the message says "Others now hear your real
   voice" (it said "my"), and no longer ends the error with two full stops.
 - Quick setup: when *Straight into my mic* is already set up and working, the guide uses
