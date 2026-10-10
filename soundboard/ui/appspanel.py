@@ -55,6 +55,7 @@ REFRESH_HIDDEN_MS = 5000   # ...and while it isn't (a remembered program still g
 # picked up runs, or this long has gone by
 HIDDEN_FULL_S = 30.0
 METER_MS = 60
+IDLE_SECONDS = 10 * 60   # quiet, unused cards disappear until their program makes sound again
 MAX_REMEMBERED = 30
 CARD_MIN_W = 300        # programs are cards, as many across as fit at this width
 CARD_MAX_W = 900        # the Card size slider's widest: one big card across most windows
@@ -237,6 +238,7 @@ class AppRow(HoverCard):
         self.path = path                # path_key of the program it is ("" not known yet)
         self.folder = ""                # shown after the name: two programs share it
         self.app: appaudio.App | None = None
+        self.last_sound_at = time.monotonic()
         self.capture: appaudio.AppCapture | None = None
         self.remember_pending = False   # Send clicked: remembered once the capture is up
         self.src = None                 # engine.AuxSource while sending
@@ -490,6 +492,7 @@ class AppsTab(QWidget):
         if not isinstance(cfg.apps_paths, dict):
             cfg.apps_paths = {}
         self.rows: dict[str, AppRow] = {}     # exe (lower) or path_key -> row
+        self._idle_hidden: set[str] = set()   # temporary; unlike explicitly forgotten programs
         self._stopping: list[appaudio.AppCapture] = []   # stopped, maybe not ended yet
         self._sending: tuple[str, ...] = ()   # the programs being sent, as last reported
         v = QVBoxLayout(self)
@@ -653,14 +656,12 @@ class AppsTab(QWidget):
         self.lister.refresh(watch, waiting)
 
     def _watching(self) -> bool:
-        """Something to keep an eye on while the tab is hidden: a remembered program
-        (picked up when it starts) or a captured one (let go when it closes)."""
-        return any(row.capture is not None or self._spec(key) is not None
-                   for key, row in self.rows.items())
+        """Keep checking existing cards while hidden, including their idle deadlines."""
+        return bool(self.rows)
 
     def _pace_list(self):
         """Re-read the list every 1.5 s while shown, every 5 s while hidden, and not
-        at all while hidden with nothing remembered or captured."""
+        at all while hidden with no cards left."""
         if not self._started:
             return
         ms = (REFRESH_MS if self.isVisible() else
@@ -830,7 +831,9 @@ class AppsTab(QWidget):
         if n != self._listing:
             return
         hidden = self._hidden()
-        new = [key for key in dict.fromkeys(self._keys_for(apps))
+        new = [key for key in dict.fromkeys(
+                   key for app, key in zip(apps, self._keys_for(apps))
+                   if key not in self._idle_hidden or self._sound_active(app))
                if key not in self.rows and key not in hidden]
         if len(new) > NEW_CARDS:
             now = set(new[:NEW_CARDS])
@@ -844,10 +847,15 @@ class AppsTab(QWidget):
             return
         self._on_apps(apps, alive)
 
+    def _sound_active(self, app: appaudio.App) -> bool:
+        live = self.peaks.peak(app.pid)
+        return app.peak > 0 or (live is not None and live > 0)
+
     def _on_apps(self, apps: list, alive: dict[int, str] | None = None):
         """`apps` the programs with an audio session; `alive` every running process
-        (pid -> exe), when known. Browsers and chat apps close their session when they
-        go quiet: while the process still runs, its card stays (and keeps sending)."""
+        (pid -> exe), when known. Quiet processes keep their cards for ten minutes;
+        remembered programs, recordings and clip editors stay available."""
+        now = time.monotonic()
         stream = self._stream_output()   # set or cleared in Settings meanwhile
         for row in self.rows.values():
             row.show_to(stream)
@@ -856,12 +864,19 @@ class AppsTab(QWidget):
         for app, key in zip(apps, self._keys_for(apps)):
             if key in hidden and key not in self.rows:
                 continue                          # taken off the list with ✕
+            audible = self._sound_active(app)
+            if key in self._idle_hidden:
+                if not audible:
+                    continue
+                self._idle_hidden.discard(key)
             cur = self.rows.get(key)
             if cur is not None and cur.capture is not None and cur.capture.pid == app.pid:
                 by_key[key] = app   # two copies running: stay on the one being captured
             else:
                 by_key.setdefault(key, app)
             self._row(app.exe, key=key)
+            if audible:
+                self.rows[key].last_sound_at = now
         for key, row in list(self.rows.items()):
             app = by_key.get(key)
             if (app is None and alive is not None and row.app is not None
@@ -875,6 +890,12 @@ class AppsTab(QWidget):
                     spec["path"] = row.path   # remembered by an older version: by name only
                     self._save()
             remembered = self._spec(key) is not None
+            if (now - row.last_sound_at >= IDLE_SECONDS and not remembered
+                    and not row.sending and row.rec is None and row.listen is None
+                    and not self._has_take(row)):
+                self._idle_hidden.add(key)
+                self._drop_row(row)
+                continue
             if app is None:                       # not running
                 self._stop_capture(row)
                 row.set_sending(False)
@@ -945,6 +966,10 @@ class AppsTab(QWidget):
             return
         for row in list(self.rows.values()):
             rec = row.rec
+            if row.app is not None:
+                live = self.peaks.peak(row.app.pid)
+                if live is not None and live > 0:
+                    row.last_sound_at = time.monotonic()
             if rec is not None:
                 secs = rec.seconds
                 if secs >= MAX_SECONDS:

@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Idle Apps cards disappear after ten minutes without sound and return when sound
+  resumes. Sending, remembered programs, recordings and clip edits stay available.
 - **No stray outline on Sounds.** Sidebar tabs show a focus ring only during
   keyboard navigation, so startup focus no longer looks like a second selected tab.
 - The Voice tab's off state says "Voice effects off — mic unchanged" as plain

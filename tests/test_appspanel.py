@@ -146,6 +146,91 @@ def test_quiet_sent_program_keeps_sending(tab):
     assert row.sending and row.capture is cap and not cap.stopped
 
 
+@pytest.mark.parametrize("session_open", [False, True])
+def test_idle_card_expires_and_only_returns_with_sound(tab, monkeypatch, session_open):
+    clock = [0.0]
+    monkeypatch.setattr(appspanel.time, "monotonic", lambda: clock[0])
+    tab._on_apps([music()], {100: "music.exe"})
+    quiet = App(100, "music.exe", music().path, active=True, peak=0.0)
+    apps = [quiet] if session_open else []
+    clock[0] = 599
+    tab._on_apps(apps, {100: "music.exe"})
+    assert "music.exe" in tab.rows
+    clock[0] = 600
+    tab._on_apps(apps, {100: "music.exe"})
+    assert tab.rows == {} and tab.empty.isVisibleTo(tab)
+    assert not tab.cfg.apps_hidden and not tab.cfg.apps
+    tab._on_apps([quiet], {100: "music.exe"})
+    assert tab.rows == {}   # an open audio session alone isn't sound activity
+    tab._on_apps([music()], {100: "music.exe"})
+    assert "music.exe" in tab.rows and not tab.empty.isVisibleTo(tab)
+
+
+def test_sound_resets_each_cards_idle_deadline(tab, monkeypatch):
+    clock = [0.0]
+    monkeypatch.setattr(appspanel.time, "monotonic", lambda: clock[0])
+    tab._on_apps([music(), App(200, "game.exe")])
+    clock[0] = 500
+    tab._on_apps([music()], {100: "music.exe", 200: "game.exe"})
+    clock[0] = 600
+    tab._on_apps([], {100: "music.exe", 200: "game.exe"})
+    assert set(tab.rows) == {"music.exe"}
+    clock[0] = 1100
+    tab._on_apps([], {100: "music.exe"})
+    assert not tab.rows
+
+
+def test_idle_hidden_cards_do_not_keep_scheduling_listing_batches(tab, monkeypatch):
+    clock = [0.0]
+    monkeypatch.setattr(appspanel.time, "monotonic", lambda: clock[0])
+    apps = [App(100 + i, f"player{i}.exe", peak=0.0)
+            for i in range(appspanel.NEW_CARDS + 2)]
+    tab._on_apps(apps)
+    clock[0] = 600
+    tab._on_apps(apps)
+    assert not tab.rows
+    scheduled = []
+    monkeypatch.setattr(appspanel.QTimer, "singleShot", lambda *args: scheduled.append(args))
+    tab._on_listed((apps, None))
+    assert not tab.rows and not scheduled
+
+
+def test_brief_sound_between_list_refreshes_resets_idle_deadline(tab, monkeypatch):
+    clock = [0.0]
+    monkeypatch.setattr(appspanel.time, "monotonic", lambda: clock[0])
+    tab._on_apps([music()])
+    tab.show()
+    clock[0] = 599
+    monkeypatch.setattr(tab.peaks, "peak", lambda pid: 0.1)
+    tab._meters()
+    monkeypatch.setattr(tab.peaks, "peak", lambda pid: 0.0)
+    clock[0] = 600
+    tab._on_apps([], {100: "music.exe"})
+    assert "music.exe" in tab.rows
+
+
+@pytest.mark.parametrize("using", ["send", "record", "clip", "take", "remembered"])
+def test_idle_timeout_preserves_programs_in_use(tab, monkeypatch, using):
+    clock = [0.0]
+    monkeypatch.setattr(appspanel.time, "monotonic", lambda: clock[0])
+    tab._on_apps([music()])
+    row = tab.rows["music.exe"]
+    if using == "send":
+        row.btn_send.setChecked(True)
+    elif using == "record":
+        row.btn_rec.setChecked(True)
+    elif using == "clip":
+        tab._on_clip(row, True)
+    elif using == "take":
+        monkeypatch.setattr(tab, "_has_take", lambda r: True)
+    else:
+        tab.cfg.apps["music.exe"] = {"vol": 1.0}
+    clock[0] = 600
+    tab._on_apps([], {100: "music.exe"})
+    assert tab.rows["music.exe"] is row
+    assert not tab._idle_hidden
+
+
 def test_tab_reports_programs_being_sent_for_the_live_dot(tab):
     seen = []
     tab.active_changed.connect(seen.append)
@@ -344,14 +429,14 @@ def test_send_off_does_not_wait_for_the_capture_to_end(tab):
     assert getattr(second, "joined", None) is not None and tab._stopping == []
 
 
-def test_hidden_tab_stops_rereading_when_there_is_nothing_to_watch(tab, qapp):
+def test_hidden_tab_stops_rereading_when_there_is_nothing_to_watch(tab, qapp, monkeypatch):
     """Shown: the list is re-read every 1.5 s. Hidden: every 5 s while a program is
-    remembered or captured, not at all otherwise."""
+    on the list, including an unused card's idle deadline, not at all otherwise."""
     tab._on_apps([music()])
     tab.show()
     assert tab.timer.isActive() and tab.timer.interval() == appspanel.REFRESH_MS
     tab.hide()
-    assert not tab.timer.isActive()                # nothing remembered or sent
+    assert tab.timer.isActive() and tab.timer.interval() == appspanel.REFRESH_HIDDEN_MS
     tab.show()
     tab.rows["music.exe"].btn_send.setChecked(True)
     tab.hide()
@@ -360,7 +445,12 @@ def test_hidden_tab_stops_rereading_when_there_is_nothing_to_watch(tab, qapp):
     tab._on_apps([music()])
     assert tab.timer.isActive()
     tab._on_send(tab.rows["music.exe"], False)     # Send off: forgotten
-    tab._on_apps([music()])                        # the next re-read: nothing left
+    tab._on_apps([music()])                        # unused: still watching for idle timeout
+    assert tab.timer.isActive()
+    row = tab.rows["music.exe"]
+    monkeypatch.setattr(appspanel.time, "monotonic", lambda: row.last_sound_at + 600)
+    tab._on_apps([], {100: "music.exe"})
+    assert not tab.rows
     assert not tab.timer.isActive()
 
 
