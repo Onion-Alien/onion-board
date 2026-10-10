@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- A pad's *Picture → From a link* no longer opens a file on this PC or a network share
+  when the web page names one as its preview picture: only web pictures are fetched.
 - The left navigation rail blends into the window with a soft theme tint and a
   subtle divider, keeping the selected tab easy to spot.
 - Fixed a build that wouldn't start ("DLL load failed while importing QtWidgets: The
