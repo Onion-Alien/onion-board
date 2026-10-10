@@ -1584,10 +1584,15 @@ class MainWindow(QMainWindow):
         # ---- how it works + the one thing to set in Discord
         howcard, cv = card(_("Your virtual mic"), roomy=True)
         self.how_title = cv.itemAt(0).widget()   # renamed when not using the cable
+        flow = QFrame()
+        flow.setObjectName("micflow")
+        fv = QVBoxLayout(flow)
+        fv.setContentsMargins(14, 14, 14, 14)
+        fv.setSpacing(10)
         self.flow_mic = QLabel()
         self.flow_snd = QLabel(_("Your sounds, radio and voice effects"))
         arrow = QLabel(_("↓   the app mixes them together"))
-        arrow.setObjectName("muted")
+        arrow.setObjectName("hint")
         self.flow_out = QLabel()
         for ic, w in (("mic", self.flow_mic), ("volume", self.flow_snd), ("", arrow),
                       ("live", self.flow_out)):   # mic or cable alike
@@ -1600,12 +1605,27 @@ class MainWindow(QMainWindow):
             else:
                 row.addSpacing(26)
             row.addWidget(w, 1)
-            cv.addLayout(row)
+            if w is self.flow_out:
+                output = QFrame()
+                output.setObjectName("micoutput")
+                ov = QVBoxLayout(output)
+                ov.setContentsMargins(12, 12, 12, 12)
+                ov.addLayout(row)
+                fv.addWidget(output)
+            else:
+                fv.addLayout(row)
+        cv.addWidget(flow)
         self.step_lbl = QLabel()
         self.step_lbl.setWordWrap(True)
         self.step_lbl.setTextFormat(Qt.RichText)
-        self.step_lbl.setObjectName("stepbox")
+        self.step_lbl.setObjectName("micguide")
         cv.addWidget(self.step_lbl)
+        self.mic_update_note = QLabel()
+        self.mic_update_note.setTextFormat(Qt.RichText)
+        self.mic_update_note.setWordWrap(True)
+        self.mic_update_note.setObjectName("micupdatenote")
+        self.mic_update_note.hide()
+        cv.addWidget(self.mic_update_note)
         self.setup_show = SetupShow(height=96)   # Bun builds your mic (instead of the button)
         self.setup_show.done.connect(self._update_flow)   # (the button's back, if needed)
         cv.addWidget(self.setup_show)
@@ -2621,15 +2641,11 @@ class MainWindow(QMainWindow):
                      "<b style='color:{colour}'>✓</b>", colour=ok, name=name)
                    + ("  " + _("<b style='color:{colour}'>(live)</b>", colour=ok)
                       if apps else ""))
-            step = (_("<b>Nothing to set.</b> Discord and games keep your normal mic, and "
+            step = _("<b>Nothing to set.</b> Discord and games keep your normal mic, and "
                       "your sounds are in it. If sounds get chopped up, switch off the "
                       "voice app's noise suppression (Discord: <b>Input Profile → Custom</b>, "
                       "<b>Noise Suppression → None</b>, <b>Echo Cancellation</b> off. Not "
-                      "Studio: it skips Onion Board).")
-                    + (_("<br><br><b>Optional:</b> your mic part works, and a newer "
-                         "version is here. It's not needed: update below whenever suits "
-                         "you (Windows asks once, and your sound drops out for a second).")
-                       if direct == "outdated" else ""))
+                      "Studio: it skips Onion Board).").replace("</b>", "</b><br>", 1)
         elif route == "mic":
             state = "unrouted"
             out = _("Into your mic  <b style='color:{colour}'>✗ can't reach it</b>",
@@ -2720,6 +2736,11 @@ class MainWindow(QMainWindow):
         self.flow_out.setText(out)
         self.step_lbl.setText(step)
         update = route == "mic" and state == "ok" and direct == "outdated"
+        self.mic_update_note.setVisible(update)
+        if update:
+            self.mic_update_note.setText(_("<br><br><b>Optional:</b> your mic part works, and a newer "
+                         "version is here. It's not needed: update below whenever suits "
+                         "you (Windows asks once, and your sound drops out for a second).").removeprefix("<br><br>"))
         # setting up, or Windows still loading it: the button stays "Setting up…" and
         # takes no clicks (attach_mic holds it) until it works or the wait is over
         mic_busy = route == "mic" and (self._attaching or (settling and state != "ok"))
@@ -2738,7 +2759,7 @@ class MainWindow(QMainWindow):
                 _("Put my sounds straight into my mic") if direct in ("missing", "other") else
                 _("Repair (one click)"))
             icons.set_icon(self.btn_install, "mic" if route == "mic" else "cable",
-                           "on_accent")
+                           "muted" if update else "on_accent")
         # the mic is the main way: on the cable route the cable's button comes second
         self._set_primary(self.btn_install, route == "mic" and not update)   # (optional)
         self._set_primary(self.btn_attach, route == "cable")
