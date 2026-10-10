@@ -1252,7 +1252,10 @@ class PadGrid(QWidget):
         room = self.height() - top - m.bottom() - 4
         if room < 90:
             return None
-        return QRectF(m.left() + 2, top, cols * (w + sp) - sp - 4, min(room, 110))
+        # the full width, whatever the pad size: as wide as the pads' columns, it
+        # jumped about as Pad size moved
+        return QRectF(m.left() + 2, top, self.width() - m.left() - m.right() - 4,
+                      min(room, 110))
 
     def resizeEvent(self, e):
         super().resizeEvent(e)

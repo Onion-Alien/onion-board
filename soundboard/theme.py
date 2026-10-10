@@ -522,7 +522,7 @@ QPushButton#primary:hover { background:$accent_hover; }
 QPushButton#primary:focus { border:1px solid $text_hi; }
 QFrame#soundstoolbar { background:$panel; background-image:none; border:none;
     border-radius:12px; }
-QFrame#soundstoolbar QLabel { background:transparent; }
+QFrame#soundstoolbar QLabel, QFrame#soundstoolbar QSlider { background:transparent; }
 QFrame#soundstoolbar QPushButton { background:transparent; border:1px solid transparent;
     border-radius:9px; padding:0 10px; }
 QFrame#soundstoolbar QPushButton:hover { background:$btn_hover; }
