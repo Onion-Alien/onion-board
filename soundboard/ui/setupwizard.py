@@ -640,11 +640,12 @@ class SetupWizard(QDialog):
 
     def _update_next(self):
         i = self.stack.currentIndex()
-        # while the cable installs or mic attaches, stay on its page: leaving it
-        # (or finishing) would lose track of the installer / setup
+        # while the cable installs, stay on its page: leaving it (or finishing) would
+        # lose track of the installer (a mic set-up is the main window's: it reports
+        # back through mic_attached wherever the guide is)
         # (greyed out with set_busy, not setEnabled: that would throw the keyboard focus
         # to another control; the click handlers check too, for Enter on the dialog)
-        installing = self._proc is not None or self.win._attaching
+        installing = self._proc is not None
         busy.set_busy(self.btn_next, installing)
         busy.set_busy(self.btn_back, installing)
         if i == self.PAGES - 1:
@@ -655,12 +656,12 @@ class SetupWizard(QDialog):
             self.btn_next.setText(_("Next  →"))
 
     def back_clicked(self):
-        if self._proc is None and not self.win._attaching:
+        if self._proc is None:
             self.go(self.stack.currentIndex() - 1)
 
     def next_clicked(self):
-        if self._proc is not None or self.win._attaching:
-            return   # the cable is installing or mic is attaching: stay on its page
+        if self._proc is not None:
+            return   # the cable is installing: stay on its page
         i = self.stack.currentIndex()
         if i == self.PAGES - 1:
             self.finish()
