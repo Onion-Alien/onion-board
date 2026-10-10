@@ -2663,7 +2663,6 @@
   "Only stations streaming at least this bitrate": "Μόνο οι σταθμοί μεταδίδουν τουλάχιστον αυτό το bitrate",
   "Others hear the radio. Click so only you do.": "Άλλοι ακούν το ραδιόφωνο. Κάντε κλικ έτσι μόνο εσείς.",
   "Play a random station": "Παίξτε έναν τυχαίο σταθμό",
-  "Play a random station from the list showing (pick a genre or country first to narrow it)": "Αναπαραγωγή ενός τυχαίου σταθμού από τη λίστα που εμφανίζεται (επιλέξτε πρώτα ένα είδος ή χώρα για να το περιορίσετε)",
   "Playing now": "Παίζει τώρα",
   "Playing {name}": "Παίζει {name}",
   "Playing {name}: {title}": "Παίζοντας {name} : {title}",

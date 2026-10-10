@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- The Radio tab's random button always plays a random popular station, whatever list,
+  search or filters are showing. Before, it did nothing on an empty list such as
+  Favorites with no favorites yet.
 - Apps cards are grouped under Browsers, Music & media, Calls & chat, Games and Other
   headings. Left-drag a card's header to reorder it within its category for the
   current session. Unrecognized applications appear in Other.
