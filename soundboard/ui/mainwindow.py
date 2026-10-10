@@ -1217,11 +1217,15 @@ class MainWindow(QMainWindow):
                        "folder")
         icons.set_icon(mm.addAction(_("Free sound packs…"), self.show_packs), "download")
         om = mm.addMenu(_("Import from another soundboard"))
+        icons.set_icon(om.menuAction(), "copy")
         for src in otherboards.sources():
-            om.addAction(f"{src.name}…", lambda src=src: self.import_other(src))
+            icons.set_icon(om.addAction(f"{src.name}…", lambda src=src: self.import_other(src)),
+                           "sounds")
         mm.addSeparator()
-        mm.addAction(_("Export everything (sounds + settings)…"), self.export_board)
+        icons.set_icon(mm.addAction(_("Export everything (sounds + settings)…"),
+                                    self.export_board), "download")
         self._act_export_cat = mm.addAction(_("Export this category…"), self.export_category)
+        icons.set_icon(self._act_export_cat, "download")
         mm.addSeparator()
         icons.set_icon(mm.addAction(_("Recently deleted sounds…"), self.show_deleted), "trash")
         icons.set_icon(mm.addAction(_("Open the sounds folder"), self.open_sounds_folder),
@@ -3433,10 +3437,10 @@ class MainWindow(QMainWindow):
         menu = QMenu(self)
         menu.setAttribute(Qt.WA_DeleteOnClose)
         if key in taboff.KEYS:
-            act = menu.addAction(_("Hide this tab"))
+            act = menu.addAction(icons.icon("offline"), _("Hide this tab"))
             act.triggered.connect(lambda: self.hide_tab(key))
         else:
-            act = menu.addAction(_("This tab is always shown"))
+            act = menu.addAction(icons.icon("check"), _("This tab is always shown"))
             act.setEnabled(False)
         menu.addSeparator()
         menu.addAction(icons.icon("settings"), _("Choose tabs in Settings…"),
@@ -3826,8 +3830,8 @@ class MainWindow(QMainWindow):
         for attr in (*self.QUICK_HOTKEYS, "ptt_key"):
             combo = getattr(self.cfg, attr)
             key = pretty_key(combo) or (_("Off") if attr == "ptt_key" else _("not set"))
-            menu.addAction(f"{labels[attr]}	{key}",
-                           lambda a=attr: self._quick_set_hotkey(a))
+            icons.set_icon(menu.addAction(f"{labels[attr]}	{key}",
+                                          lambda a=attr: self._quick_set_hotkey(a)), "keyboard")
         menu.addSeparator()
         icons.set_icon(menu.addAction(_("All hotkeys…"), lambda: self.open_settings("hotkeys")),
                        "settings")
@@ -4941,7 +4945,8 @@ class MainWindow(QMainWindow):
         a_hk = menu.addAction(icons.icon("keyboard"),
                               _("Random-sound hotkey: {hk} (change…)", hk=pretty_key(hk)) if hk
                               else _("Set a random-sound hotkey…"))
-        a_nohk = menu.addAction(_("Clear the random-sound hotkey")) if hk else None
+        a_nohk = menu.addAction(icons.icon("trash"),
+                               _("Clear the random-sound hotkey")) if hk else None
         a_rand = menu.addAction(icons.icon("play"), _("Play a random sound from it"))
         a_all = menu.addAction(icons.icon("next"), _("Play them all, in order"))
         a_shuf = menu.addAction(icons.icon("next"), _("Play them all, shuffled"))
@@ -4961,10 +4966,11 @@ class MainWindow(QMainWindow):
             a_cols[a] = col
         if now:
             cm.addSeparator()
-            a_cols[cm.addAction(_("No colour"))] = ""
+            a_cols[cm.addAction(icons.icon("palette", checked_color="text"), _("No colour"))] = ""
         menu.addSeparator()
         a_prog = menu.addAction(icons.icon("apps"), _("Show this when a program is in front…"))
-        a_unprog = {menu.addAction(_("Stop showing this for {exe}", exe=exe)): exe
+        a_unprog = {menu.addAction(icons.icon("offline"),
+                                  _("Stop showing this for {exe}", exe=exe)): exe
                     for exe in catswitch.programs_for(self.cfg.category_programs, name)}
         menu.addSeparator()
         a_del = menu.addAction(icons.icon("trash", "danger_text"),
@@ -5458,8 +5464,11 @@ class MainWindow(QMainWindow):
                 "newest": _("The sounds added last first"),
                 "plays": _("The sounds you play most first (counted from now on)")}
         group = QActionGroup(menu)
+        sort_icons = {"custom": "sort", "name": "rename", "newest": "history",
+                      "plays": "star"}
         for key, name in self._sort_names().items():
             a = menu.addAction(name, lambda k=key: self.set_pad_sort(k))
+            icons.set_icon(a, sort_icons[key], checked_color="text")
             a.setCheckable(True)
             a.setChecked(self.cfg.pad_sort == key)
             a.setToolTip(tips[key])
@@ -5469,7 +5478,8 @@ class MainWindow(QMainWindow):
         for key, name, icon, tip in (
                 ("grid", _("Pads"), "sounds", _("Cards, with pictures")),
                 ("list", _("List"), "list", _("One line each: many more sounds on the screen"))):
-            a = menu.addAction(icons.icon(icon), name, lambda k=key: self.set_pad_view(k))
+            a = menu.addAction(name, lambda k=key: self.set_pad_view(k))
+            icons.set_icon(a, icon, checked_color="text")
             a.setCheckable(True)
             a.setChecked(self.cfg.pad_view == key)
             a.setToolTip(tip)
@@ -5565,15 +5575,15 @@ class MainWindow(QMainWindow):
             hk = menu.addMenu(icons.icon("keyboard"), _("Hotkey: {hotkey}",
                                                         hotkey=pretty_key(m.hotkey)))
             hk.setToolTipsVisible(True)
-            a_hk = add(None, _("Change…"), _("Press a new key or combo for it"), hk)
-            a_hk_clear = add(None, _("Remove hotkey"), "", hk)
+            a_hk = add(("keyboard",), _("Change…"), _("Press a new key or combo for it"), hk)
+            a_hk_clear = add(("trash",), _("Remove hotkey"), "", hk)
         else:
             a_hk = add(("keyboard",), _("Set hotkey…"), _("A key or combo that plays it, even "
                                                           "in-game"))
         cats = menu.addMenu(icons.icon("tag"), _("Categories"))
         cat_acts = {}
         for c in self.cfg.categories:
-            a = cats.addAction(c.replace("&", "&&"))
+            a = cats.addAction(icons.icon("tag", checked_color="text"), c.replace("&", "&&"))
             a.setCheckable(True)
             a.setChecked(c in m.tags)
             cat_acts[a] = c
@@ -5583,14 +5593,14 @@ class MainWindow(QMainWindow):
         a_nopic = None
         pic = menu.addMenu(icons.icon("image"), _("Picture") if m.image else _("Add picture"))
         pic.setToolTipsVisible(True)
-        a_pic = pic.addAction(_("From a file…"))
+        a_pic = pic.addAction(icons.icon("folder"), _("From a file…"))
         a_pic.setToolTip(_("Shown on the pad (you can also drop a picture on it, or copy one, "
                            "click the pad and press Ctrl+V)"))
-        a_piclink = pic.addAction(_("From a link…"))
+        a_piclink = pic.addAction(icons.icon("browser"), _("From a link…"))
         a_piclink.setToolTip(_("Paste a picture's address, or a link to a YouTube video or a "
                                "web page to use its picture"))
         if m.image:
-            a_nopic = pic.addAction(_("Remove picture"))
+            a_nopic = pic.addAction(icons.icon("trash"), _("Remove picture"))
         menu.addSeparator()
         a_dup = add(("copy",), _("Duplicate"), _("A second pad with the same sound, to give "
                                                  "its own effects or hotkey"))
@@ -6422,7 +6432,7 @@ class MainWindow(QMainWindow):
             feedback.DISCORD_URL)), "speech")
         icons.set_icon(menu.addAction(_("Send feedback"), self.ask_feedback), "edit")
         menu.addSeparator()
-        menu.addAction(_("Quit"), self.quit_app)
+        icons.set_icon(menu.addAction(_("Quit"), self.quit_app), "stop")
         t.setContextMenu(menu)
         t.activated.connect(self._on_tray)
         t.messageClicked.connect(self.show_from_tray)
