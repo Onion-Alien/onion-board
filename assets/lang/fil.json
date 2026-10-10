@@ -2399,7 +2399,6 @@
   "mono output devices aren't supported": "hindi sinusuportahan ang mga mono output device",
   "monster": "halimaw",
   "music, please?": "musika, mangyaring?",
-  "my real voice": "ang tunay kong boses",
   "my turn yet?": "turn ko pa?",
   "new voice only": "bagong boses lang",
   "no reason given": "walang ibinigay na dahilan",
@@ -3013,5 +3012,6 @@
   "How it works": "Paano ito gumagana",
   "Onion Board plays your sounds into your mic, so people in Discord or your game hear them the same way they hear you.{gap}Add sounds on the Sounds tab, then double-click one or press its hotkey. The strip at the bottom shows your mic, what others hear and your headphones.{gap}Right-click a tab on the left and pick About this tab to see what it does.": "Pinapatugtog ng Onion Board ang sounds mo sa mic mo, kaya naririnig ito ng mga tao sa Discord o sa game mo gaya ng pagkarinig nila sa'yo.{gap}Magdagdag ng sounds sa Sounds tab, tapos i-double-click ang isa o pindutin ang hotkey nito. Ipinapakita ng strip sa ibaba ang mic mo, ang naririnig ng iba at ang headphones mo.{gap}I-right-click ang isang tab sa kaliwa at piliin ang Tungkol sa tab na ito para makita kung ano ang ginagawa nito.",
   "Put your sounds into the mic you already use, so Discord and games need no changes": "Ilagay ang sounds mo sa mic na gamit mo na, kaya walang kailangang baguhin sa Discord at mga game",
-  "Straight into my mic instead": "Diretso na lang sa mic ko"
+  "Straight into my mic instead": "Diretso na lang sa mic ko",
+  "your real voice": "ang tunay mong boses"
 }

@@ -202,7 +202,7 @@ def test_overlapping_pack_reset_and_removal_preserve_first_pack(window, tmp_path
 
 
 @pytest.mark.parametrize("mode, heard", [("voice", "built-in voice"),
-                                       ("mic", "my real voice"), ("mute", "silence")])
+                                       ("mic", "your real voice"), ("mute", "silence")])
 def test_ai_fallback_is_consistent_during_start_failure_and_retry(window, monkeypatch, mode, heard):
     ai = window.voice.ai
     ai.cb_backup.setCurrentIndex(ai.cb_backup.findData(mode))
@@ -217,3 +217,9 @@ def test_ai_fallback_is_consistent_during_start_failure_and_retry(window, monkey
     monkeypatch.setattr(ai, "_start_helper", lambda: True)
     ai._on_event({"type": "stopped"})
     assert ai.status() == "starting" and heard in ai.lbl_state.text()
+
+
+def test_ai_failure_text_has_one_full_stop_after_the_error(window):
+    # a dropped connection's message ends in its own "." and used to show "dropped.."
+    text = window.voice.ai.failure_text("The connection was dropped.")
+    assert "dropped." in text and ".." not in text

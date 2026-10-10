@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- AI voices: when the AI voice stops, the message says "Others now hear your real
+  voice" (it said "my"), and no longer ends the error with two full stops.
 - The quick setup guide no longer opens on every start after you close it with the X;
   it's still in the Setup tab (*Step-by-step guide*). Its buttons are all the normal
   size now (the big mic button and the wide Next button were oversized).

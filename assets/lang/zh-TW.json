@@ -2349,7 +2349,6 @@
   "mono output devices aren't supported": "不支援單聲道輸出設備",
   "monster": "怪物",
   "music, please?": "音樂，好嗎？",
-  "my real voice": "我真實的聲音",
   "my turn yet?": "輪到我了嗎？",
   "new voice only": "限新聲音",
   "no reason given": "沒有給出理由",
@@ -2949,5 +2948,6 @@
   "How it works": "運作方式",
   "Onion Board plays your sounds into your mic, so people in Discord or your game hear them the same way they hear you.{gap}Add sounds on the Sounds tab, then double-click one or press its hotkey. The strip at the bottom shows your mic, what others hear and your headphones.{gap}Right-click a tab on the left and pick About this tab to see what it does.": "Onion Board 把你的音效放進麥克風，Discord 或遊戲裡的人聽到它們就像聽到你說話一樣。{gap}在「音效」分頁加入音效，然後雙擊一個或按它的快速鍵。底部的條顯示你的麥克風、別人聽到的聲音和你的耳機。{gap}在左側的分頁上按右鍵，選擇「關於這個分頁」，就能看到它是做什麼的。",
   "Put your sounds into the mic you already use, so Discord and games need no changes": "把音效放進你已經在用的麥克風，Discord 和遊戲都不用改設定",
-  "Straight into my mic instead": "改為直接送進我的麥克風"
+  "Straight into my mic instead": "改為直接送進我的麥克風",
+  "your real voice": "你真實的聲音"
 }

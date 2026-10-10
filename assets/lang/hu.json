@@ -2399,7 +2399,6 @@
   "mono output devices aren't supported": "mono kimeneti eszközök nem támogatottak",
   "monster": "szörnyeteg",
   "music, please?": "zene, kérem?",
-  "my real voice": "az igazi hangom",
   "my turn yet?": "még rám kerül a sor?",
   "new voice only": "csak új hang",
   "no reason given": "indoklás nélkül",
@@ -3013,5 +3012,6 @@
   "How it works": "Így működik",
   "Onion Board plays your sounds into your mic, so people in Discord or your game hear them the same way they hear you.{gap}Add sounds on the Sounds tab, then double-click one or press its hotkey. The strip at the bottom shows your mic, what others hear and your headphones.{gap}Right-click a tab on the left and pick About this tab to see what it does.": "Az Onion Board a mikrofonodba játssza a hangjaidat, így a Discordon vagy a játékodban ugyanúgy hallják őket, mint téged.{gap}Adj hozzá hangokat a Hangok lapon, aztán kattints duplán az egyikre, vagy nyomd meg a gyorsbillentyűjét. Az alsó sáv mutatja a mikrofonodat, amit mások hallanak, és a fejhallgatódat.{gap}Kattints jobb gombbal egy lapra bal oldalt, és válaszd az Erről a lapról pontot, hogy lásd, mire való.",
   "Put your sounds into the mic you already use, so Discord and games need no changes": "Tedd a hangjaidat abba a mikrofonba, amit már használsz, így a Discordon és a játékokban semmit sem kell átállítani",
-  "Straight into my mic instead": "Inkább egyenesen a mikrofonomba"
+  "Straight into my mic instead": "Inkább egyenesen a mikrofonomba",
+  "your real voice": "az igazi hangod"
 }
