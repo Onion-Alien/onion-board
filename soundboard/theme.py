@@ -540,7 +540,6 @@ QToolButton#railtab { background:transparent; color:$muted; border:1px solid tra
     border-radius:8px; padding:7px 6px; font-weight:600; text-align:left; }
 QToolButton#railtab:hover { background:$btn_hover; color:$text; }
 QToolButton#railtab:checked { background:transparent; color:$text_hi; }   /* + the rail's fill */
-QToolButton#railtab:focus { border-color:$accent; }
 QFrame#sidebar QPushButton#moretabs, QFrame#sidebar QPushButton#tabinfo,
 QFrame#sidebar QPushButton#settings, QFrame#sidebar QPushButton#modebtn,
 QFrame#sidebar QPushButton#railtoggle { padding:7px 6px; text-align:left; color:$muted;
