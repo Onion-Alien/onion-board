@@ -493,6 +493,14 @@ class SetupWizard(QDialog):
                                     "output)"))
         self.btn_other.clicked.connect(lambda: self._show_other(True))
         buttons.addWidget(self.btn_other)
+        # the cable (or another device) works: the mic as the other way, not the main one
+        self.btn_mic_instead = QPushButton(_("Straight into my mic instead"))
+        icons.set_icon(self.btn_mic_instead, "mic")
+        self.btn_mic_instead.setToolTip(_("Put your sounds into the mic you already use, "
+                                          "so Discord and games need no changes"))
+        self.btn_mic_instead.clicked.connect(self.attach_mic)
+        self.btn_mic_instead.hide()
+        buttons.insertWidget(0, self.btn_mic_instead)
         buttons.addStretch(1)
         v.addLayout(buttons)
         self.other_box = QWidget()
@@ -771,11 +779,18 @@ class SetupWizard(QDialog):
                                    and not self.setup_show.on)
         self.btn_attach.setEnabled(not attaching)
         state = directmic.status(self.win.cfg.mic_device)
+        # another way already works (the cable, a device): the mic is then an option in
+        # the row below, not the big button that looked like it had to be set up again
+        other_works = route != "mic" and not attaching and self.route_ok()
+        if other_works:
+            self.btn_attach.hide()
+        self.btn_mic_instead.setVisible(other_works and not busy and not self.setup_show.on)
         self.btn_attach.setText(_("Setting up… click Yes when Windows asks") if attaching
                                 else _("Repair (one click)") if directmic.needs_repair(state)
                                 else _("Put my sounds straight into my mic"))
         if self.setup_show.on and not attaching:
-            self.setup_show.finish(self.route_ok())
+            # the show is the mic's: a working cable doesn't make a failed mic set-up a win
+            self.setup_show.finish(route == "mic" and self.route_ok())
         if route == "mic" and not busy and not self._cable_tries and not self._needs_restart:
             self.other_box.hide()
             if self.setup_show.on:

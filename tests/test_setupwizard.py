@@ -87,6 +87,26 @@ def test_cable_present_routes_output_and_finishes(wizard, devices):
     assert library.Config.load().setup_done
 
 
+def test_a_working_cable_offers_the_mic_as_a_plain_option(wizard, monkeypatch):
+    # "Installed and connected" with the big set-up button under it read as "set it up
+    # again"; and a mic set-up that failed still ended Bun's show as a win (the cable
+    # worked)
+    from soundboard import directmic
+    w, wiz = wizard
+    wiz.show()
+    wiz.go(2)
+    assert w.cfg.route == "cable" and "Installed and" in wiz.cable_status.text()
+    assert wiz.btn_attach.isHidden() and not wiz.btn_mic_instead.isHidden()
+    monkeypatch.setattr(w, "attach_mic", lambda: None)
+    wiz.btn_mic_instead.click()
+    assert wiz.setup_show.on and wiz.btn_mic_instead.isHidden()
+    results = []
+    monkeypatch.setattr(wiz.setup_show, "finish", results.append)
+    monkeypatch.setattr(directmic, "status", lambda name=None: "absent")
+    w.mic_attached.emit("Headset Mic (USB)", "Windows said no")
+    assert results and not any(results)
+
+
 def test_missing_cable_offers_install_and_guide_returns(wizard, devices):
     devices["cable"] = False
     w, wiz = wizard
