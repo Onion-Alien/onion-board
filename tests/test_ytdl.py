@@ -6,6 +6,7 @@ import json
 import sys
 import tempfile
 import threading
+import os
 import time
 import types
 import zipfile
@@ -251,10 +252,26 @@ def test_leftovers_of_a_cut_short_update_are_tidied_at_startup(pypi):
     ytdl.update()
     ytdl._pkg_dir().rename(ytdl.root() / "old-1")   # stopped between the two renames
     (ytdl.root() / "new-abc" / "yt_dlp").mkdir(parents=True)
+    long_ago = time.time() - ytdl.TIDY_AFTER_S - 60   # left by an earlier run
+    os.utime(ytdl.root() / "new-abc", (long_ago, long_ago))
     ytdl.install()
     assert ytdl.active_version() == ("2099.1.1", True)
     assert (ytdl._pkg_dir() / "yt_dlp" / "__init__.py").is_file()
     assert not list(ytdl.root().glob("old-*")) and not list(ytdl.root().glob("new-*"))
+
+
+def test_tidying_leaves_an_update_in_progress_alone(pypi):
+    """A download helper starting up (ytworker: a new process, so ytdl.install() runs
+    _tidy again) while the app is unpacking or swapping in a new yt-dlp: its fresh
+    new-* folder, and the copy just moved aside before the new one is in place, are
+    the app's, not leftovers."""
+    ytdl.update()
+    moved = ytdl.root() / f"old-{time.time_ns()}"
+    ytdl._pkg_dir().rename(moved)                    # mid-swap: no current copy yet
+    (ytdl.root() / "new-abc" / "yt_dlp").mkdir(parents=True)   # mid-unpack
+    ytdl._tidy()
+    assert moved.is_dir() and (ytdl.root() / "new-abc" / "yt_dlp").is_dir()
+    assert not ytdl._pkg_dir().exists()             # the swap's own rename comes next
 
 
 def test_reset_clears_and_reinstalls(pypi):

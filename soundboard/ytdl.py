@@ -292,15 +292,33 @@ def install():
         sys.meta_path.insert(0, _finder)
 
 
+TIDY_AFTER_S = 600   # an update unpacks and swaps in seconds: older folders are leftovers
+
+
+def _moved_at(d: Path) -> float:
+    """When update() moved the copy `d` (old-<time_ns>) aside: its name says (the
+    folder's own times are the copy's, from when it was unpacked)."""
+    try:
+        return int(d.name.removeprefix("old-")) / 1e9
+    except ValueError:
+        return d.stat().st_mtime
+
+
 def _tidy():
     """Clear what an update cut short left behind: a half-unpacked new-* folder, and
-    old-* copies (one is put back first if the swap stopped before `current` was)."""
+    old-* copies (one is put back first if the swap stopped before `current` was).
+    Only ones older than TIDY_AFTER_S: this also runs in each download helper as it
+    starts (ytworker, a process of its own), maybe while the app is updating, and a
+    fresh new-* or old-* is that update's own."""
     try:
-        olds = sorted(root().glob("old-*"), key=lambda d: d.stat().st_mtime)
+        cutoff = time.time() - TIDY_AFTER_S
+        olds = sorted((d for d in root().glob("old-*") if _moved_at(d) < cutoff),
+                      key=_moved_at)
+        news = [d for d in root().glob("new-*") if d.stat().st_mtime < cutoff]
         if olds and not _pkg_dir().exists():
             olds.pop().rename(_pkg_dir())
             log.info("put back the yt-dlp copy an update had moved aside")
-        for d in olds + list(root().glob("new-*")):
+        for d in olds + news:
             shutil.rmtree(d, ignore_errors=True)
     except OSError:
         log.warning("couldn't tidy %s", root(), exc_info=True)
