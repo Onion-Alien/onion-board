@@ -3,6 +3,33 @@
 ## Unreleased
 
 - Web search has a padded header and evenly sized source buttons with site icons.
+- **No stray outline on Sounds.** Sidebar tabs show a focus ring only during
+  keyboard navigation, so startup focus no longer looks like a second selected tab.
+- The Voice tab's off state says "Voice effects off — mic unchanged" as plain
+  status text. It no longer looks clickable or opens the voice changer.
+- **Cards and the file-drop hint stay in sync.** Resizing, moving, adding or filtering sounds clears the old drop-area border and label as soon as the cards move.
+- Floating status notes, including headphones changes and added sounds, disappear
+  after eight seconds. Clicking dismisses them completely, so resizing the window
+  cannot bring them back.
+- Removed redundant hover tooltips from About this tab, More tabs, Settings and
+  the sidebar arrow; their labels and screen-reader help remain available.
+
+- **Readable voice meter.** The Voice tab's status chips no longer squeeze the
+  mic meter into a tiny bar. It fills the available space and takes at least
+  half the bar in roomy windows; status chips wrap below when needed.
+- Live effects open over the app in a draggable window, stay open while using the
+  board, and keep their position when reopened or when Redline is toggled.
+- The speed gauge enters its red zone at 8x, like a car rev counter.
+- Web search results no longer flash tiny windows while their cards are being built.
+- The tray menu now shows a board icon beside **Open Onion Board**.
+- The recording window has clearer source choices, a larger timer and a compact
+  studio panel, with matching styling for trimming and saving a take.
+- Web search and the Radio map have rounded outer corners, matching the other panels.
+- Added missing menu icons, including sorting and Backup, and fixed checked menu icons disappearing against dark backgrounds.
+- Adding and playing the same web result share one download. Repeated clicks no
+  longer queue a duplicate import, and a failed download finishes both actions
+  together. A thumbnail save failure no longer reports a successful audio import
+  as failed.
 - ***Count me in* also counts roughly how long the app was open** since the last daily count (under 15 minutes, up to an hour, 1-3 hours, 3-8 hours or more), so we can tell quick checks from all-evening use. Never the times of day; nothing is sent while it's off.
 - **Clearer privacy text for *Count me in*.** It now says plainly that the random ID sent with the anonymous count links your counts together, so we can see how people use the app over time (which tabs, which versions, whether they come back) and what to improve. The only new thing sent is a short tag made from that same ID, so one person's days link up; switching *Count me in* off sends one last anonymous count (no ID) so we know how many people opted out, then nothing at all.
 - **Shorter, plainer *Count me in* text.** Settings says it in one line (anonymous usage stats once a day; never your name, IP address or device info), and the eye next to it opens a small table of everything it sends, with an example and why, plus links to the full list and GoatCounter's privacy policy. The installer says the same.

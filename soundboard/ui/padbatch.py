@@ -150,13 +150,13 @@ class PadSelection(QObject):
         m.addSection(count(n))
         self._fill_colors(m.addMenu(swatch(PAD_COLORS[0]), _("Colour")))
         m.addAction(icons.icon("volume"), _("Volume…"), self.ask_volume)
-        m.addAction(_("Fade in / out…"), self.ask_fades)
-        self._fill_cats(m.addMenu(_("Categories")))
+        m.addAction(icons.icon("wave"), _("Fade in / out…"), self.ask_fades)
+        self._fill_cats(m.addMenu(icons.icon("tag"), _("Categories")))
         m.addAction(icons.icon("folder"), _("Export…"),
                     lambda: self.mw.export_sounds(
                         self.sounds(), count(n)))
         m.addSeparator()
-        m.addAction(_("Clear selection"), self.clear)
+        m.addAction(icons.icon("stop"), _("Clear selection"), self.clear)
         m.addAction(icons.icon("trash", "danger_text"), _("Remove {count}",
                                                           count=count(n)), self.delete)
         m.exec(pos)
@@ -180,7 +180,8 @@ class PadSelection(QObject):
         sounds = self.sounds()
         for c in self.mw.cfg.categories:
             have = sum(1 for m in sounds if c in m.tags)
-            a = menu.addAction(c.replace("&", "&&"))   # a lone & is a shortcut marker
+            a = menu.addAction(icons.icon("tag", checked_color="text"),
+                               c.replace("&", "&&"))   # a lone & is a shortcut marker
             a.setCheckable(True)
             a.setChecked(have == len(sounds) and have > 0)
             # all of them in it: takes them out; otherwise puts them all in

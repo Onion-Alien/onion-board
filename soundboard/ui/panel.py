@@ -6,8 +6,8 @@ from __future__ import annotations
 
 import math
 
-from PySide6.QtCore import QEvent, QPoint, QRect, QSize, Qt, Signal
-from PySide6.QtGui import QColor, QFont, QPainter
+from PySide6.QtCore import QEvent, QPoint, QRect, QRectF, QSize, Qt, Signal
+from PySide6.QtGui import QColor, QFont, QPainter, QPainterPath, QRegion
 from PySide6.QtWidgets import (QCheckBox, QComboBox, QFrame, QGridLayout, QHBoxLayout, QLabel,
                                QLayout, QSlider, QSpinBox, QVBoxLayout, QWidget)
 
@@ -19,6 +19,16 @@ from soundboard.ui import icons
 from soundboard.ui.widgets import EqCurve, Meter
 from soundboard.wheelguard import no_wheel
 from soundboard.i18n import _
+
+
+class RoundedFrame(QFrame):
+    """Clip a panel and its children to the same corners as the app's cards."""
+
+    def resizeEvent(self, event):
+        super().resizeEvent(event)
+        path = QPainterPath()
+        path.addRoundedRect(QRectF(self.rect()), 12, 12)
+        self.setMask(QRegion(path.toFillPolygon().toPolygon()))
 
 
 def section_label(text: str) -> QLabel:
