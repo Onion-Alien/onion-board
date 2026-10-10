@@ -7920,6 +7920,9 @@ class MainWindow(QMainWindow):
             for apply in self._stack_cols[2:]:
                 apply(narrow)
             need = self._fit.fit(size)   # even the smallest layout won't fit
+            if need.width() > size.width() or need.height() > size.height():
+                # A restored mixer needs one width pass before considering a wrap.
+                need = self._fit.fit(size)
             if (self.width() >= 760 and need.width() > size.width()
                     and self.mixer.minimumSizeHint().width() + self.rail.width() > size.width()):
                 # Wrap only when the visible groups need it, e.g. with larger fonts.
@@ -7930,9 +7933,6 @@ class MainWindow(QMainWindow):
                 self.mixer.setMinimumSize(0, 0)
                 self._mixer_layout.activate()
                 responsive.touch(self.mixer)
-            if need.width() > size.width() or need.height() > size.height():
-                # Growing can restore the mixer after width fitting has finished.
-                # Fit its newly visible controls before deciding to use mini mode.
                 need = self._fit.fit(size)
             mini = need.width() > size.width() or need.height() > size.height()
             if mini and not self.is_mini():
