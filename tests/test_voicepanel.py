@@ -851,6 +851,8 @@ def test_add_ons_refresh_lets_go_of_the_button_when_the_scan_fails(panel, monkey
 def test_resizing_within_one_shape_does_no_layout_passes(panel, monkeypatch):
     p, _ = panel
     fx = p.fx
+    fx._set_shape(True, 1)              # the narrowest shape's own width, in this font
+    narrow = fx.minimumSizeHint().width() - 1
     fx._fit_width(1100)
     shapes = []
     real = type(fx)._set_shape
@@ -859,10 +861,10 @@ def test_resizing_within_one_shape_does_no_layout_passes(panel, monkeypatch):
     for w in range(1100, 1000, -4):     # roomy all the way: nothing to try
         fx._fit_width(w)                # what each resize step does
     assert shapes == []
-    fx._fit_width(250)                  # narrower than anything: tried, then left alone
+    fx._fit_width(narrow)               # narrower than anything: tried, then left alone
     tried = len(shapes)
     assert tried and (fx._short, fx._tile_cols) == (True, 1)
-    for w in range(250, 200, -4):
+    for w in range(narrow, narrow - 50, -4):
         fx._fit_width(w)
     assert len(shapes) == tried
     fx._fit_width(1100)

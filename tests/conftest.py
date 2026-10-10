@@ -85,12 +85,19 @@ _CLOSED_PORTS: set[int] = set()
 _V4_ONLY_PORTS: set[int] = set()
 
 
+_HELD: list = []   # closed_port()'s sockets: bound, never listening, kept to the end
+
+
 def closed_port() -> int:
+    """A port nothing listens on, refused at once. Its socket stays bound (not
+    listening) for the rest of the run: closed, the system handed the same number to a
+    later test's server (Linux reuses them soon), and every connection to that server
+    was "refused" here."""
     import socket
     s = socket.socket()
     s.bind(("127.0.0.1", 0))
+    _HELD.append(s)
     port = s.getsockname()[1]
-    s.close()
     _CLOSED_PORTS.add(port)
     return port
 
@@ -174,6 +181,10 @@ def qapp():
     app = QApplication.instance() or QApplication([])
     from soundboard.wheelguard import AppStyle
     app.setStyle(AppStyle("Fusion"))   # as the app sets it (app.main)
+    if not app.styleSheet():   # the app's theme and font, as the window applies them:
+        from soundboard import theme   # without it a worker's first tests measured
+        from soundboard.library import Config   # text in Qt's plain font, and the
+        theme.apply(app, Config().theme)   # ones after a window in the app's
     if not hasattr(app, "_collector"):   # collects while a test spins the event loop
         from soundboard.uigc import UiCollector
         app._collector = UiCollector(parent=app)

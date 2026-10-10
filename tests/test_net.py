@@ -489,3 +489,23 @@ def test_the_relay_cuts_a_side_that_stopped_reading(monkeypatch):
     assert done.wait(5)             # timed out instead of waiting for ever
     for s in (a, b, client, site):
         s.close()
+
+
+def test_a_closed_port_is_never_handed_to_a_later_server():
+    """closed_port()'s number stayed "refused at once" for the whole run, but its
+    socket was closed: Linux soon gave the same number to a later test's server, and
+    every connection to it was refused (three tests failed that way on CI)."""
+    import socket
+    from conftest import _CLOSED_PORTS, closed_port
+    taken = {closed_port() for _ in range(50)}
+    assert taken <= _CLOSED_PORTS
+    servers = []
+    try:
+        for _ in range(4000):   # ports the system hands out next: none of those
+            s = socket.socket()
+            s.bind(("127.0.0.1", 0))
+            servers.append(s)
+            assert s.getsockname()[1] not in _CLOSED_PORTS
+    finally:
+        for s in servers:
+            s.close()
