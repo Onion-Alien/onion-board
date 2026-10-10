@@ -678,6 +678,37 @@ def test_a_broken_block_from_a_program_is_silenced():
     assert np.isfinite(eng.finite(y)).all() and y[1, 0] == np.float32(0.2)
 
 
+def test_a_broken_mic_block_never_switches_the_voice_off():
+    """A NaN / Inf sample from the mic (a driver's effect, or the clean mic in the ring
+    file, which anyone signed in can write) went into the voice chain as it was: the
+    effects it broke were bypassed for the rest of the session (chain.errors), so the
+    real voice went out, and the NaN stuck in what's sent. It's silenced first."""
+    from soundboard.voicefx import PRESETS, VoiceChain
+    e = Engine()
+    e.main_stream = object()             # stands in for an open cable output
+    e.ring_main.prefill = 0
+    e.voice_chain = chain = VoiceChain()
+    chain.configure({"enabled": True, "effects": {
+        t: {"on": True, **p} for t, p in PRESETS["Walkie-talkie"].items()}})
+    voice = np.full((480, 1), 0.2, np.float32)
+    e._mic(voice)
+    effects = [fx.type for fx in chain._effects]
+    assert effects
+    bad = voice.copy()
+    bad[7, 0], bad[100, 0] = np.inf, np.nan
+    e._mic(bad)
+    for _ in range(3):
+        e._mic(voice)
+    assert not chain.errors and [fx.type for fx in chain._effects] == effects
+    assert np.isfinite(e.level_mic) and np.isfinite(e._mic_pow).all()
+    stereo = np.full((480, 2), 0.2, np.float32)
+    stereo[3, 1] = np.nan
+    e._mic(stereo)                       # a two-channel mic: its channel check too
+    assert np.isfinite(e._mic_pow).all() and not chain.errors
+    sent = e.ring_main.read(480 * 5)
+    assert sent is not None and np.isfinite(sent).all()
+
+
 @pytest.mark.parametrize("name", [
     "CABLE Input (VB-Audio Virtual Cable)", "CABLE-A Output (VB-Audio Cable A)",
     "Hi-Fi Cable Input (VB-Audio Hi-Fi Cable)", "VoiceMeeter Input (VB-Audio VoiceMeeter VAIO)",

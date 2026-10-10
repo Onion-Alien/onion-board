@@ -19,6 +19,9 @@
   download starts at the same moment.
 - Switching off *Count me in* in Settings while in Tor mode no longer sends the last
   anonymous opt-out count, as the privacy page promises.
+- A glitch from the mic (a broken sample from its driver) can no longer switch off
+  parts of your voice effect for the rest of the session and let your real voice
+  through.
 - The left navigation rail blends into the window with a soft theme tint and a
   subtle divider, keeping the selected tab easy to spot.
 - Fixed a build that wouldn't start ("DLL load failed while importing QtWidgets: The
