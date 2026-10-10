@@ -1230,6 +1230,7 @@ class MainWindow(QMainWindow):
         add.clicked.connect(self.add_dialog)
         icons.set_icon(add, "plus", "on_accent", size=18)
         self.btn_record = QPushButton(_("Record"))
+        self.btn_record.setObjectName("soundrecord")
         icons.set_icon(self.btn_record, "mic", size=18)
         self.btn_record.clicked.connect(self.record_dialog)
         self.search = QLineEdit()
@@ -1334,7 +1335,7 @@ class MainWindow(QMainWindow):
         self.btn_view.setProperty("toolbarMenu", True)
         self._label_view()
         tb.addWidget(self.btn_view)
-        # Add sounds is the one filled button; the rest are plain until hovered
+        # Creation actions have their own surfaces; library tools stay quiet.
         for b in (self.btn_record, self.btn_folder, more, self.btn_bin, self.btn_keys,
                   self.btn_yt, self.btn_view):
             b.setProperty("quiet", True)
