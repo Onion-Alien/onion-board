@@ -48,6 +48,13 @@ class BoardHost:
         self._adding: list[tuple[str, Callable[[str | None], None]]] = []   # (fingerprint, done)
         self._pressed: dict[str, set[str]] = {}     # tag -> pads its one-shots pressed
 
+    def count(self, key: str):
+        """The add-on's feature `key` was used or is set up (onionwatch/usage.py
+        FEATURES): `used/triggers-<key>` with the next daily usage count, when Count me
+        in is on. Names outside usage.FEATURES are dropped (usage.used)."""
+        from soundboard import usage
+        usage.used(f"triggers-{key}")
+
     def tab_info(self, title: str, text: str):
         """Onion Watch's explanation goes behind the ⓘ by the tabs, not a banner."""
         self.win.tab_info["triggers"] = (title, text)

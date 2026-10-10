@@ -262,7 +262,8 @@ def keep_netlog() -> int:
 def set_usage_count(on: bool, heard: str = "") -> int:
     """`OnionBoard.exe --usage-count on|off [--heard-from <answer>]`: the installer's
     "Count me in" box. Off adds the usage count to the switched-off features in
-    config.json before the app's first start, so it never sends one; on takes it out
+    config.json before the app's first start, after one anonymous "opt-out/installer"
+    if it was on until now (usage.opt_out: no ID); on takes it out
     (only a box the user saw: a silent update never passes on). `heard` is the
     installer's "Where did you hear about Onion Board?", kept for the first-start
     event. Other settings are kept; nothing connects. No window. Returns 0 once it's
@@ -274,6 +275,15 @@ def set_usage_count(on: bool, heard: str = "") -> int:
     if cfg.read_only:
         print("FAIL: config.json is locked by another program", file=sys.stderr)
         return 1
+    if not on and "usage_stats" not in cfg.net_off:   # on until now: say so once
+        try:
+            from soundboard import net, usage
+            net.configure_from(cfg)
+            if net.mode() != net.TOR:   # Tor isn't running: don't start it
+                log.info("--usage-count off: opt-out %s",
+                         "sent" if usage.opt_out("installer") else "not sent")
+        except Exception:  # noqa: BLE001 - never in the installer's way
+            log.warning("--usage-count off: opt-out failed", exc_info=True)
     cfg.net_off = [k for k in cfg.net_off if k != "usage_stats"] + ([] if on else ["usage_stats"])
     if heard:
         cfg.stats_heard = heard[:200]
@@ -417,6 +427,11 @@ def main():
         app.setLayoutDirection(_Qt.RightToLeft)
     from soundboard import theme as _theme
     i18n.use_fonts(_theme.font_families())
+    # same-width digits everywhere, so a number that changes doesn't make its text jump
+    from PySide6.QtGui import QFont as _QFont
+    _font = app.font()
+    _font.setFeature(_QFont.Tag("tnum"), 1)
+    app.setFont(_font)
     i18n.translate_qt_buttons(app)   # OK, Cancel, Yes… in Qt's own dialogs
     from soundboard.ui import quietbox
     quietbox.install(app)   # no Windows ding from tips and warnings
@@ -494,6 +509,10 @@ def main():
     # left running for days
     QTimer.singleShot(45_000, w.check_updates)
     QTimer.singleShot(60_000, w.send_usage)   # the anonymous daily count (usage.py)
+    w.tick_usage()   # how long it's open, for the daily count: from now
+    open_timer = QTimer(w)
+    open_timer.timeout.connect(w.tick_usage)
+    open_timer.start(usage.OPEN_TICK_S * 1000)
     recheck = QTimer(w)
     recheck.timeout.connect(w.check_updates)
     recheck.timeout.connect(w.send_usage)

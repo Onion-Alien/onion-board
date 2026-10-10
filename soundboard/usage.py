@@ -2,7 +2,9 @@
 
 Once a day the installed app sends one "still here" to the project's GoatCounter
 (a privacy-friendly counter): the version number and a random ID made on this PC, so
-the same person isn't counted twice. Also a one-off "first start" (with where they
+the same person isn't counted twice and we can follow how people use the app over time
+(which tabs, which versions, whether they come back) to see what to improve.
+Also a one-off "first start" (with where they
 heard about the app, if they picked it on the installer's last page), and "updated" when
 *Update now* installs a new version. With the daily one: which tabs were opened since the
 last one (their names only). Soon after a start: how many problems there were since the
@@ -16,15 +18,23 @@ this PC). And `uninstall/<version>` when the uninstaller removes it.
 With the daily one, a rough picture of how it's used, each as a bucket or a name from a
 fixed list: how long ago it was installed (`age/days-2-7`), where sounds go
 (`route/mic`), how many sounds the board has and how many were played since the last
-one (`sounds/11-50`, `played/1-10`), the app's language (`lang/de`), and which features
+one (`sounds/11-50`, `played/1-10`), how long the app was open since then
+(`open/1-3h`), the app's language (`lang/de`), and which features
 were used since then (`used/voice-changer`, `used/more-tabs-added-radio`: the names
-in FEATURES only). And once each,
+in FEATURES only; for the Triggers tab, the names the Onion Watch add-on passes to
+triggershost.BoardHost.count, as `used/triggers-mode-colour`). And once each,
 the first steps of a new install (`step/added-sound`, `step/played-sound`,
 `step/sent-to-others`), to see where new people get stuck; never for a copy that was
 counted before these existed. Also once each, switching on a tab a new user starts
 without (`step/added-radio-tab`, `-apps-`, `-triggers-`): sent when it happens, since
 a tab opened after the first daily count waits a day, and most people trying the app
 never send that one.
+And when someone answers *Send feedback*'s "What would you improve?", their picks
+(`improve/sounds`: names from IMPROVE only, sent with a one-off random session, not this
+PC's ID), the follow-up ticks under a pick (`improve/sounds/memes`: IMPROVE_MORE only),
+and what they typed under Other or Fewer bugs as dashed
+words (`improve/other/more-anime-sounds`), with email addresses, links and long numbers
+taken out first.
 Nothing else: no name, sounds, settings, devices, games or IP address in the message
 (GoatCounter sees the connection's address like any site does, and isn't sent it to
 keep or look up).
@@ -37,6 +47,7 @@ one on a PC with ONIONBOARD_NO_STATS set (the developer's own PCs and test VMs:
 GoatCounter's "Ignore IPs" can't catch these sends, as they carry no IP)."""
 from __future__ import annotations
 
+import hashlib
 import json
 import logging
 import os
@@ -72,6 +83,14 @@ TABS = ("sounds", "radio", "apps", "triggers", "voice", "setup")
 RUNNING = "running.txt"     # in the app folder while the app runs (mark_running)
 MAX_PROBLEMS = 10           # problem events per send: a bug in a loop isn't 1000 hits
 VERSION_RE = r"[0-9][0-9A-Za-z.\-]{0,20}"
+# the Onion Watch add-on's feature names (onionwatch/usage.py USED + SET_UP)
+TRIGGERS_FEATURES = (
+    "watching", "went-off", "test", "cut-from-window", "picture-file", "paste-picture",
+    "area-trigger", "duplicate", "pick-windows", "pack-export", "pack-import",
+    "history", "restore-deleted",
+    "mode-appear", "mode-vanish", "mode-change", "mode-still", "mode-colour", "ring",
+    "several-places", "every-copy", "area", "hold", "quiet-in-front", "own-interval",
+    "categories", "profiles")
 # what else is counted, only ever these names (see the docstring)
 FEATURES = ("add-files", "youtube", "record", "clip", "clip-editor", "import-board",
             "voice-changer", "text-to-speech", "hotkeys", "phone-remote", "also-send",
@@ -80,6 +99,10 @@ FEATURES = ("add-files", "youtube", "record", "clip", "clip-editor", "import-boa
             "more-tabs-opened", "more-tabs-closed",
             *(f"more-tabs-added-{k}" for k in ("radio", "apps", "triggers", "voice")),
             *(f"tab-hidden-{k}" for k in ("radio", "apps", "triggers", "voice")),
+            # the Triggers tab (the Onion Watch add-on) says which of its features were
+            # used or are set up (triggershost.BoardHost.count): onionwatch/usage.py's
+            # FEATURES, keep in step
+            *(f"triggers-{k}" for k in TRIGGERS_FEATURES),
             # the Easter eggs, to see if anyone finds them: Pong with Bun opened, left
             # before the end, won or lost; the header onion made to cry; sleepy Bun woken
             "egg-pong-opened", "egg-pong-quit", "egg-pong-won", "egg-pong-lost",
@@ -88,6 +111,21 @@ STEPS = ("added-sound", "played-sound", "sent-to-others",
          # a tab a new user starts without (+ More tabs, Settings > Tabs)
          "added-radio-tab", "added-apps-tab", "added-triggers-tab")
 ROUTES = ("cable", "device", "off", "mic")   # library.ROUTES
+# the feedback box's "What would you improve?" picks (ui/feedbackdialog.py)
+IMPROVE = ("sounds", "setup", "voice-chat", "voice-changer", "speed", "looks", "bugs",
+           "other")
+OTHER_MAX = 100   # characters of what was typed under Other, as dashed words
+# the follow-up ticks that open under a pick ("More sounds" > "Memes"), sent as
+# improve/<pick>/<name>; only these names
+IMPROVE_MORE = {
+    "sounds": ("memes", "music", "game", "reactions", "voice-lines"),
+    "setup": ("others-hear-me", "pick-mic", "hotkeys", "install"),
+    "voice-chat": ("discord", "in-game", "calls", "streaming"),
+    "voice-changer": ("more-voices", "more-real", "less-delay", "ai-voices"),
+    "speed": ("starts-slow", "heavy", "lags-games", "stutters"),
+    "looks": ("crowded", "hard-to-find", "themes", "text-size"),
+}
+BUGS_MAX = 200   # characters of "What bugs did you hit?" (Fewer bugs opens only that)
 LANG_RE = r"[a-z]{2,3}(?:-[A-Za-z0-9]{2,4})?"
 DAY_S = 24 * 3600
 
@@ -103,6 +141,14 @@ def install_id(cfg) -> str:
     if not cfg.stats_id:
         cfg.stats_id = uuid.uuid4().hex
     return cfg.stats_id
+
+
+def user_tag(sid: str) -> str:
+    """A short tag made from the random ID, sent as each count's "ref". GoatCounter
+    swaps "session" for its own number that starts over after 8 hours, so the daily
+    counts of one person only link up across days through this (Onion Stats' User
+    paths). A hash, so the ID itself isn't what's kept there."""
+    return "u-" + hashlib.sha256(sid.encode()).hexdigest()[:12]
 
 
 def _wordlike(w: str) -> bool:
@@ -135,7 +181,7 @@ def heard_tag(text: str) -> str:
 
 
 def _event(name: str, sid: str) -> dict:
-    return {"path": name, "title": name, "event": True, "session": sid}
+    return {"path": name, "title": name, "event": True, "session": sid, "ref": user_tag(sid)}
 
 
 def hits(cfg, now: float, event: str = "", extra=()) -> list[dict]:
@@ -149,7 +195,7 @@ def hits(cfg, now: float, event: str = "", extra=()) -> list[dict]:
     if now - cfg.stats_sent < EVERY_S:
         return out
     out.insert(0, {"path": f"/app/{__version__}", "title": f"Onion Board {__version__}",
-                   "session": sid})
+                   "session": sid, "ref": user_tag(sid)})
     if not cfg.stats_sent:
         heard = heard_tag(cfg.stats_heard)
         out.append(_event(f"first-start/heard-{heard}" if heard else "first-start", sid))
@@ -167,6 +213,31 @@ def age_bucket(days: float) -> str:
     """How long ago it was installed, roughly."""
     return ("day-1" if days < 1 else "days-2-7" if days < 7 else "days-8-30" if days < 30
             else "days-31-plus")
+
+
+# how long the app was open: added up every OPEN_TICK_S (open_tick); a longer gap than
+# OPEN_GAP_S (the PC slept or hibernated) counts as nothing
+OPEN_TICK_S = 300
+OPEN_GAP_S = 600
+_open_mark: float | None = None
+
+
+def open_tick(cfg, now: float | None = None) -> None:
+    """Add the time since the last tick to cfg.stats_open_s (for the next daily count's
+    `open/`). Called at start, every OPEN_TICK_S, before a send and at quit."""
+    global _open_mark
+    now = time.monotonic() if now is None else now
+    counting = enabled() and net.allowed(FEATURE)   # off: nothing piles up for later
+    if counting and _open_mark is not None and 0 < now - _open_mark <= OPEN_GAP_S:
+        cfg.stats_open_s = max(0.0, float(cfg.stats_open_s or 0)) + (now - _open_mark)
+    _open_mark = now
+
+
+def open_bucket(seconds: float) -> str:
+    """How long it was open, roughly."""
+    h = seconds / 3600
+    return ("under-15m" if h < 0.25 else "15m-1h" if h < 1 else "1-3h" if h < 3
+            else "3-8h" if h < 8 else "8h-plus")
 
 
 def total_plays(cfg) -> int:
@@ -232,6 +303,7 @@ def about(cfg, now: float) -> list[str]:
         out.append(f"route/{cfg.route}")
     out.append(f"sounds/{bucket(len(cfg.sounds))}")
     out.append(f"played/{bucket(total_plays(cfg) - cfg.stats_plays)}")
+    out.append(f"open/{open_bucket(cfg.stats_open_s or 0)}")
     lang = cfg.language if re.fullmatch(LANG_RE, cfg.language or "") else "auto"
     out.append(f"lang/{lang}")
     have = (set(cfg.stats_used if isinstance(cfg.stats_used, list) else [])
@@ -370,19 +442,38 @@ def uninstall_event() -> str:
     return f"uninstall/{__version__}"
 
 
+OPT_OUT_WHERE = ("installer", "settings")
+OPT_OUT_TIMEOUT_S = 5   # the installer waits on it: never long
+
+
+def opt_out(where: str) -> bool:
+    """Count me in switched from on to off (`where`: the installer's box or Settings):
+    one last "opt-out/<where>" so we know how many people aren't counted, then nothing
+    ever again. No random ID, no tag, no session: it can't be tied to anything they
+    sent before. Only while the count is still allowed (call it before switching it
+    off). Waits for the answer: call it off the UI thread."""
+    if where not in OPT_OUT_WHERE or not enabled() or not net.allowed(FEATURE):
+        return False
+    name = f"opt-out/{where}"
+    netlog.cause(FEATURE, f"Anonymous usage count ({name}, the last one)")
+    return send([{"path": name, "title": name, "event": True}],
+                timeout=OPT_OUT_TIMEOUT_S, no_sessions=True)
+
+
 def update_event(to: str) -> str:
     """The event for *Update now* from this version to `to`."""
     return f"update-now/{__version__}-to-{to}"
 
 
-def send(payload: list[dict]) -> bool:
+def send(payload: list[dict], timeout: float = TIMEOUT_S, no_sessions: bool = False) -> bool:
     """POST them to the counter. True if it took them. Call off the UI thread."""
-    body = json.dumps({"hits": payload}).encode("utf-8")
+    body = json.dumps({"hits": payload, "no_sessions": True} if no_sessions
+                      else {"hits": payload}).encode("utf-8")
     req = urllib.request.Request(ENDPOINT, data=body, method="POST", headers={
         "Authorization": f"Bearer {TOKEN}", "Content-Type": "application/json",
         "User-Agent": "OnionBoard"})
     try:
-        with net.urlopen(req, timeout=TIMEOUT_S, feature=FEATURE) as r:
+        with net.urlopen(req, timeout=timeout, feature=FEATURE) as r:
             return 200 <= r.status < 300
     except Exception as e:  # noqa: BLE001 - offline, switched off meanwhile, counter down
         log.info("usage count not sent: %s", e)
@@ -408,6 +499,7 @@ def maybe_send(cfg, saved=None, event: str = "", app_dir: Path | None = None) ->
             found, newest = problems(app_dir, cfg.stats_problems_seen)
             extra += found
         extra = extra[:MAX_PROBLEMS]
+    open_tick(cfg)
     payload = hits(cfg, now, event, extra)
     if not payload:
         return
@@ -415,6 +507,7 @@ def maybe_send(cfg, saved=None, event: str = "", app_dir: Path | None = None) ->
     tabs = [h["path"][4:] for h in payload if h["path"].startswith("tab/")]
     feats = [h["path"][5:] for h in payload if h["path"].startswith("used/")]
     plays = total_plays(cfg)
+    opened = cfg.stats_open_s or 0
     netlog.cause(FEATURE, "Anonymous usage count" + (f" ({event})" if event
                                                      else " (once a day)" if daily
                                                      else " (problems)"))
@@ -427,6 +520,7 @@ def maybe_send(cfg, saved=None, event: str = "", app_dir: Path | None = None) ->
             cfg.stats_tabs = [t for t in cfg.stats_tabs if t not in tabs]
             cfg.stats_used = [k for k in cfg.stats_used if k not in feats]
             cfg.stats_plays = plays
+            cfg.stats_open_s = max(0.0, (cfg.stats_open_s or 0) - opened)   # since then
         del _pending[:taken]
         cfg.stats_problems_seen = max(cfg.stats_problems_seen, newest)
         if saved is not None:
@@ -444,6 +538,53 @@ def step(cfg, name: str, saved=None) -> None:
         return
     cfg.stats_steps = [*cfg.stats_steps, name]
     maybe_send(cfg, saved, event=f"step/{name}")
+
+
+def other_tag(text: str, limit: int = OTHER_MAX) -> str:
+    """What was typed under Other as dashed words ("more-anime-sounds"), any language.
+    Anything that could say who someone is is dropped first: an email address, a link,
+    a long number (a phone), an @name. At most `limit` characters, cut at a word."""
+    words = []
+    for w in str(text or "").lower().split():
+        if ("@" in w or "/" in w or "www." in w or re.search(r"\.[a-z]{2,4}$", w)
+                or re.search(r"\d{4,}", w)):
+            continue
+        words += [p for p in re.split(r"[\W_]+", w) if p]
+    out = ""
+    for w in words:
+        if len(out) + len(w) + 1 > limit:
+            break
+        out = f"{out}-{w}" if out else w
+    return out
+
+
+def improve(cfg, picks, other: str = "", bugs: str = "") -> bool:
+    """The feedback box's "What would you improve?" picks, sent now as `improve/<name>`
+    (names from IMPROVE only), their follow-up ticks (`sounds/memes` in `picks`) as
+    `improve/sounds/memes` (names from IMPROVE_MORE only), what was typed under Other
+    as `improve/other/<words>` and under Fewer bugs as `improve/bugs/said/<words>`
+    (other_tag, BUGS_MAX for bugs). Anonymous: they go with a one-off random session
+    made for this send, never this PC's stats_id, so they can't be linked to the daily
+    count or to each other. False when nothing can be sent (usage count off, offline, running from
+    source)."""
+    events = []
+    for k in IMPROVE:
+        if k not in picks:
+            continue
+        tag = other_tag(other) if k == "other" else ""
+        events.append(f"improve/{k}/{tag}" if tag else f"improve/{k}")
+        events += [f"improve/{k}/{sub}" for sub in IMPROVE_MORE.get(k, ())
+                   if f"{k}/{sub}" in picks]
+        said = other_tag(bugs, BUGS_MAX) if k == "bugs" else ""
+        if said:
+            events.append(f"improve/bugs/said/{said}")
+    if not events or not enabled() or not net.allowed(FEATURE):
+        return False
+    sid = uuid.uuid4().hex   # not install_id(cfg): the box says it isn't linked to this PC
+    netlog.cause(FEATURE, "Anonymous usage count (feedback picks)")
+    threading.Thread(target=send, args=([_event(e, sid) for e in events],), daemon=True,
+                     name="usage-count").start()
+    return True
 
 
 def send_now(cfg, event: str) -> bool:

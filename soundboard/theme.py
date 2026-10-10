@@ -534,8 +534,32 @@ QPushButton#moretabs:hover { background:$btn_hover; border-color:$border_hi; col
 QPushButton#moretabs:pressed { background:$btn_press; }
 QPushButton#moretabs:focus { border-color:$accent; }
 QPushButton#moretabs::menu-indicator { image:none; width:0; }
+QFrame#sidebar { background:$panel; border:none; border-right:1px solid $border; }
+QFrame#sidebar[rtl="true"] { border-right:none; border-left:1px solid $border; }   /* mirrored */
+QToolButton#railtab { background:transparent; color:$muted; border:1px solid transparent;
+    border-radius:8px; padding:7px 6px; font-weight:600; text-align:left; }
+QToolButton#railtab:hover { background:$btn_hover; color:$text; }
+QToolButton#railtab:checked { background:transparent; color:$text_hi; }   /* + the rail's fill */
+QFrame#sidebar QPushButton#moretabs, QFrame#sidebar QPushButton#tabinfo,
+QFrame#sidebar QPushButton#settings, QFrame#sidebar QPushButton#modebtn,
+QFrame#sidebar QPushButton#railtoggle { padding:7px 6px; text-align:left; color:$muted;
+    background:transparent; border:1px solid transparent; border-radius:8px; }
+QFrame#sidebar QPushButton#moretabs:hover, QFrame#sidebar QPushButton#tabinfo:hover,
+QFrame#sidebar QPushButton#settings:hover, QFrame#sidebar QPushButton#modebtn:hover,
+QFrame#sidebar QPushButton#railtoggle:hover { background:$btn_hover; color:$text_hi; }
+QFrame#sidebar QPushButton#moretabs:focus, QFrame#sidebar QPushButton#tabinfo:focus,
+QFrame#sidebar QPushButton#settings:focus, QFrame#sidebar QPushButton#modebtn:focus,
+QFrame#sidebar QPushButton#railtoggle:focus { border-color:$accent; }
+QFrame#sidebar QLabel#tagline { font-size:8pt; }
+QFrame#sidebar QPushButton#pill, QFrame#sidebar QPushButton#onair,
+QFrame#sidebar QPushButton#danger { padding:7px 6px; border-radius:8px; text-align:left; }
+QFrame#sidebar QLabel#wordmark { font-size:11pt; }
+QFrame#sidebar QWidget#railslot { background:transparent; }
+QFrame#sidebar[compact="true"] QToolButton#railtab,
+QFrame#sidebar[compact="true"] QPushButton { padding-top:2px; padding-bottom:2px; }
 QPushButton#settings { padding:6px 14px; font-weight:600; }
 QFrame#transport, QFrame#deck { background:$panel; border-radius:12px; }
+QDialog#transport { background:$panel; }
 QFrame#mixer { background:transparent; }
 QFrame#card QPushButton#primary { background:$accent; color:$on_accent; border:none; padding:9px; }
 QFrame#card QPushButton#primary:hover { background:$accent_hover; }
@@ -600,6 +624,7 @@ QFrame#urgentbar QPushButton#urgenthide { background:transparent; color:$warn_te
     border-radius:14px; padding:0; font-size:12pt; }
 QFrame#urgentbar QPushButton#urgenthide:hover { background:$danger_bg; }
 QPushButton#miccheck:checked { background:#d32f2f; border:1px solid #ff6b6b; color:white; }
+QDialog#transport QLabel, QDialog#transport QCheckBox, QDialog#transport QSlider,
 QFrame#transport QLabel, QFrame#transport QCheckBox, QFrame#transport QSlider,
 QFrame#deck QLabel, QFrame#deck QCheckBox, QFrame#deck QSlider { background:transparent; }
 QPushButton#round { padding:0; font-size:14pt; border-radius:10px; }
@@ -737,6 +762,13 @@ QLabel#fxend { color:$muted; font-size:7.5pt; }   /* faint was 2.6:1 on some */
 QLabel#fxgroup { color:$text; font-size:9pt; font-weight:600; padding-top:6px; }
 QPushButton#fxreset, QFrame#card QPushButton#fxreset, QFrame#card[roomy="true"] QPushButton#fxreset { background:transparent; border:none; color:$muted; padding:2px 6px; min-height:0; font-size:8pt; }
 QPushButton#fxreset:hover, QFrame#card QPushButton#fxreset:hover, QFrame#card[roomy="true"] QPushButton#fxreset:hover { color:$text; background:transparent; }
+QFrame#voicebar { background:$panel; border-radius:12px; }
+QWidget#voicebarpart, QFrame#voicebar QLabel { background:transparent; }
+QLabel#voicebarlabel { color:$muted; font-size:9pt; font-weight:600; }
+QPushButton#vchip { background:$inset; border:1px solid transparent; border-radius:13px; padding:4px 11px; color:$muted; font-size:9pt; font-weight:600; min-height:0; }
+QPushButton#vchip:hover { color:$text; }
+QPushButton#vchip[state="on"] { color:$live_text; border-color:$live_border; }
+QPushButton#vchip[state="warn"] { color:$warn_text; border-color:$warn_text; background:$warn_bg; }
 QLabel#pill { background:$inset; border:1px solid transparent; border-radius:10px; padding:3px 10px; color:$muted; font-size:8.5pt; font-weight:600; }
 QLabel#pill[slow="true"] { color:$warn_text; border-color:$warn_text; }
 QLabel#pill[on="true"] { color:$live_text; border-color:$live_border; }
@@ -748,14 +780,36 @@ QPushButton#power:checked, QFrame#card QPushButton#power:checked { background:$l
 QPushButton#power:checked:hover, QFrame#card QPushButton#power:checked:hover { background:$live_hi; }
 QPushButton#live:checked { background:#d32f2f; border:1px solid #ff6b6b; color:white; }
 QPushButton#rec:checked { background:#d32f2f; border:1px solid #ff6b6b; color:white; font-weight:700; }
+QDialog#recorddialog QLabel#recordtitle { font-size:19pt; font-weight:700; color:$text_hi; }
+QDialog#recorddialog QPushButton#recordmark { background:$panel; border:1px solid $border; border-radius:14px; padding:0; }
+QDialog#recorddialog QRadioButton#recordsource { background:$panel; border:1px solid $border; border-radius:12px; padding:12px 14px; spacing:8px; font-weight:600; }
+QDialog#recorddialog QRadioButton#recordsource:hover { background:$card_hi; border-color:$border_hi; }
+QDialog#recorddialog QRadioButton#recordsource:checked { background:$card_hi; border-color:$accent; color:$text_hi; }
+QDialog#recorddialog QRadioButton#recordsource:focus { border-color:$text_hi; }
+QDialog#recorddialog QRadioButton#recordsource:disabled { color:$muted; }
+QFrame#recordstudio, QFrame#recordreview { background:$panel; border:1px solid $border; border-radius:16px; }
+QFrame#recordstudio QLabel, QFrame#recordreview QLabel { background:transparent; }
+QDialog#recorddialog QLabel#recordtime { font-size:28pt; font-weight:600; color:$text_hi; }
+QDialog#recorddialog QLabel#recordphase { color:$muted; font-size:9pt; }
+QDialog#recorddialog QLabel#recordphase[recording="true"] { color:$danger_text; }
+QDialog#recorddialog QPushButton#rec { background:$danger_bg; border:1px solid $danger_border; color:$danger_text; border-radius:14px; font-weight:700; }
+QDialog#recorddialog QPushButton#rec:hover { background:$danger_hover; border-color:$danger_text; }
+QDialog#recorddialog QPushButton#rec:checked { background:#d32f2f; border-color:#ff6b6b; color:white; }
+QDialog#recorddialog QPushButton#rec:checked:hover { background:#b92424; }
+QDialog#recorddialog QPushButton#rec:focus { border-color:$text_hi; }
+QDialog#recorddialog QPushButton#rec:disabled { background:$inset; border-color:$border; color:$muted; }
 QFrame#setcard { background:$panel; border-radius:12px; }
 QFrame#setcard QWidget { background:transparent; }
 QFrame#setcard QPushButton { background:$btn; }
 QFrame#setcard QPushButton:hover { background:$btn_hover; }
+QFrame#setcard QPushButton[quiet="true"] { background:transparent; }
+QFrame#setcard QPushButton[quiet="true"]:hover { background:$btn_hover; }
 QFrame#setcard QPushButton:checked { background:$accent; color:$on_accent; }
 QFrame#setcard QPushButton#primary { background:$accent; color:$on_accent; border:none; }
 QFrame#setcard QPushButton#power:checked { background:$live; border:1px solid $live_hi; color:$on_live; }
 QFrame#setcard QPushButton#primary:hover { background:$accent_hover; }
+QFrame#setcard QLineEdit, QFrame#setcard QComboBox { background:$bg; }
+QFrame#setcard QLineEdit:hover, QFrame#setcard QComboBox:hover { background:$card; }
 QTableView, QFrame#setcard QTableView { background:$card; alternate-background-color:$card_hi;
     color:$text; border:1px solid transparent; border-radius:6px;
     selection-background-color:$btn_press; selection-color:$text_hi; }
@@ -1125,8 +1179,8 @@ def _texture_url(kind: str, base: str) -> str:
 OUTLINED = {"High Contrast"}
 OUTLINE_STYLE = Template("""
 QPushButton, QPushButton#danger, QLineEdit, QComboBox, QAbstractSpinBox,
-QFrame#chip, QFrame#card QFrame#chip, QFrame#fxcard, QLabel#pill { border:1px solid $border; }
-QFrame#card, QFrame#setcard { border:1px solid $border; }
+QFrame#chip, QFrame#card QFrame#chip, QFrame#fxcard, QLabel#pill, QPushButton#vchip { border:1px solid $border; }
+QFrame#card, QFrame#setcard, QFrame#voicebar { border:1px solid $border; }
 """)
 
 
@@ -1163,7 +1217,7 @@ def stylesheet(name: str | None = None) -> str:
     else:
         css += POLISH_STYLE.substitute(polish_tokens(tk, is_light(name)))
     if tk.get("texture") and (url := _texture_url(tk["texture"], tk["panel"])):
-        css += ("QFrame#card, QFrame#transport, QFrame#deck, QFrame#setcard "
+        css += ("QFrame#card, QFrame#transport, QDialog#transport, QFrame#deck, QFrame#setcard "
                 f'{{ background-image:url("{url}"); }}\n')
     return css
 

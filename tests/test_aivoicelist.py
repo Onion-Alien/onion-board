@@ -232,7 +232,7 @@ def test_make_your_own_voice_from_two_others(qapp, app_dir):
         assert v["name"] == "Gravel Nova" and avl.is_mine(v)
         assert v["formant"] == -0.5 and v["pitch_hz"] == 215
         assert dict(v["mix"])[156] == pytest.approx(0.125)
-        assert v["description"] == "Made from Nova with 25 % Brick."
+        assert v["description"] == "Made from Nova with 25% Brick."
         assert v["recipe"] == {"base": "nova", "other": "brick", "amount": 0.25}
         kept = avl.Store().put(v)
         again = AiVoiceEditor(avl.BUILT_IN, kept, FakePreviewer())

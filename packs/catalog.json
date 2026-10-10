@@ -4,7 +4,7 @@
     {
       "id": "gm-starter",
       "name": "GM starter pack",
-      "emoji": "🐉",
+      "emoji": "🎲",
       "description": "For tabletop games (D&D and friends): tavern, travel, weather, dungeon, combat, magic, boss and ending sounds. Music loops, and Ctrl+Alt+1/2/3 switch tavern, battle and boss music.",
       "url": "https://github.com/Onion-Alien/onion-board/releases/download/gm-pack-1/onion-board-gm-starter-pack.zip",
       "sha256": "bfb53856bb8f225f336e5391b9ceb0773da2bca61923de0102abf888d499f09d",
@@ -13,6 +13,32 @@
       "license": "CC0 + CC BY (credits inside)",
       "author": "Onion Board",
       "categories": ["Tavern", "Travel", "Weather", "Dungeon", "Combat", "Magic", "Boss", "Endings"]
+    },
+    {
+      "id": "esports",
+      "name": "Esports pack",
+      "emoji": "🏆",
+      "description": "For streams, casting, LAN parties and voice chat: arena crowd cheers and boos, air horn, a fighting-game announcer (3, 2, 1, Fight!, Multi kill, Flawless victory), shooter callouts, plays and memes. Hype music loops; Ctrl+Alt+1 hype music, Ctrl+Alt+3 the countdown.",
+      "url": "https://github.com/Onion-Alien/onion-board/releases/download/esports-pack-1/onion-board-esports-pack.zip",
+      "sha256": "661dee49cef5796519fb95bd16ce21283bdfae955ca6fbe973c7b35943791ba5",
+      "size": 18546197,
+      "sounds": 51,
+      "license": "CC0",
+      "author": "Onion Board",
+      "categories": ["Hype music", "Crowd", "Announcer", "Callouts", "Plays", "Memes"]
+    },
+    {
+      "id": "podcast",
+      "name": "Podcast pack",
+      "emoji": "🎙️",
+      "description": "For podcasts, talk streams and live shows: intro, outro and background music, stingers, ba-dum-tss, bleep, audience laughs and applause, comedy sounds, game-show buzzers and studio sounds (phone, doorbell, typewriter).",
+      "url": "https://github.com/Onion-Alien/onion-board/releases/download/podcast-pack-1/onion-board-podcast-pack.zip",
+      "sha256": "c560b16bb4f87120394ff43986645119bb7a7071c54d6ceb256a4def3bae69d9",
+      "size": 15628205,
+      "sounds": 51,
+      "license": "CC0 (applause public domain)",
+      "author": "Onion Board",
+      "categories": ["Show music", "Stingers", "Reactions", "Comedy", "Game show", "Studio"]
     }
   ]
 }

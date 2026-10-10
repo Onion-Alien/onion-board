@@ -37,6 +37,7 @@ def sent(app_dir, monkeypatch):
     monkeypatch.delenv("ONIONBOARD_NO_STATS", raising=False)
     monkeypatch.setattr(usage, "threading", SimpleNamespace(Thread=_Inline))
     monkeypatch.setattr(usage, "_used", set())
+    monkeypatch.setattr(usage, "_open_mark", None)
     net.configure_features()
     yield out
     net.configure_features()
@@ -50,7 +51,7 @@ class _Inline:
         self.target()
 
 
-ABOUT = ("age/", "route/", "sounds/", "played/", "lang/", "used/")
+ABOUT = ("age/", "route/", "sounds/", "played/", "open/", "lang/", "used/")
 
 
 def _hits(req, about=False) -> list[dict]:
@@ -69,8 +70,11 @@ def test_a_new_install_counts_once_a_day(sent):
     hits = _hits(req)
     assert [h["path"] for h in hits] == [f"/app/{__version__}", "first-start"]
     assert {h["session"] for h in hits} == {cfg.stats_id} and len(cfg.stats_id) == 32
+    # the same short tag on every count, so one person's days link up (not the ID itself)
+    assert {h["ref"] for h in hits} == {usage.user_tag(cfg.stats_id)}
+    assert usage.user_tag(cfg.stats_id) != cfg.stats_id and len(usage.user_tag("x")) == 14
     # nothing but these fields leaves the PC
-    assert all(set(h) <= {"path", "title", "event", "session"} for h in hits)
+    assert all(set(h) <= {"path", "title", "event", "session", "ref"} for h in hits)
     usage.maybe_send(cfg)   # the same day: nothing
     assert len(sent) == 1
     cfg.stats_sent -= usage.EVERY_S   # a day later: only the daily one
@@ -193,6 +197,31 @@ def test_the_installer_box(cli):
     assert cfg.stats_heard == "Reddit" and cfg.net_off == ["radio"]
     assert app.set_usage_count(True) == 0   # no answer keeps the last one
     assert Config.load().stats_heard == "Reddit"
+
+
+def _body(req) -> dict:
+    return json.loads(req.data.decode("utf-8"))
+
+
+def test_unticking_sends_one_anonymous_opt_out(sent, app_dir, monkeypatch):
+    """Count me in going from on to off says so once, with nothing that ties it to the
+    person (no ID, tag or session), then nothing more."""
+    monkeypatch.setattr(app, "APP_DIR", app_dir)
+    monkeypatch.setattr(applog, "setup", lambda d: d / "log")
+    assert app.set_usage_count(False) == 0          # unticked on a first install
+    ((req, feature),) = sent
+    assert feature == usage.FEATURE and _body(req)["no_sessions"] is True
+    assert _body(req)["hits"] == [{"path": "opt-out/installer", "title": "opt-out/installer",
+                                   "event": True}]
+    assert Config.load().net_off == ["usage_stats"] and not Config.load().stats_id
+    net.configure_features()
+    assert app.set_usage_count(False) == 0          # unticked again on an update: already off
+    assert len(sent) == 1
+    Config(net_offline=True).save()                 # Offline mode: never
+    assert app.set_usage_count(False) == 0 and len(sent) == 1
+    net.configure_features()
+    assert not usage.opt_out("somewhere-else") and len(sent) == 1
+    assert usage.opt_out("settings") and _body(sent[-1][0])["hits"][0]["path"] == "opt-out/settings"
 
 
 def test_update_now_fetches_its_own_copy_of_the_installer():
@@ -475,6 +504,19 @@ def test_first_steps_obey_the_switch(sent):
     assert sent == [] and cfg.stats_steps == []
 
 
+def test_the_triggers_tab_counts_its_features(sent):
+    """The Onion Watch add-on passes its feature names through BoardHost.count: sent as
+    used/triggers-<name>, anything else dropped."""
+    from soundboard.ui.triggershost import BoardHost
+    host = BoardHost.__new__(BoardHost)    # count() needs nothing of the window
+    host.count("mode-colour")
+    host.count("pack-import")
+    host.count("D:/pics/secret.png")
+    usage.maybe_send(Config())
+    used = {p for p in _paths(sent[0][0]) if p.startswith("used/")}
+    assert used == {"used/triggers-mode-colour", "used/triggers-pack-import"}
+
+
 def test_features_used_survive_a_quit(app_dir):
     cfg = Config()
     usage._used.clear()
@@ -483,3 +525,38 @@ def test_features_used_survive_a_quit(app_dir):
     cfg.save()
     assert Config.load().stats_used == ["youtube"]
 
+
+
+# ---- how long it was open ------------------------------------------------------------
+
+def test_open_time_adds_up_ticks_and_skips_sleep(sent):
+    cfg = Config()
+    usage.open_tick(cfg, now=1000)        # the start: nothing yet
+    usage.open_tick(cfg, now=1300)        # 5 min
+    usage.open_tick(cfg, now=1600)        # 5 min
+    usage.open_tick(cfg, now=1600 + 3600)   # an hour's gap: the PC slept, not counted
+    usage.open_tick(cfg, now=5200 + 300)  # 5 min
+    assert cfg.stats_open_s == 900
+
+
+def test_open_time_doesnt_pile_up_while_the_count_is_off(sent):
+    cfg = Config(net_off=["usage_stats"])
+    net.configure_features(cfg.net_off)
+    usage.open_tick(cfg, now=0)
+    usage.open_tick(cfg, now=300)
+    assert cfg.stats_open_s == 0
+
+
+def test_the_daily_count_says_roughly_how_long_it_was_open(sent):
+    cfg = Config(stats_open_s=2 * 3600)
+    usage.maybe_send(cfg)
+    paths = [p for p in _paths(sent[0][0]) if p.startswith("open/")]
+    assert paths == ["open/1-3h"]
+    assert cfg.stats_open_s < 60    # counted: starts again from about nothing
+
+
+@pytest.mark.parametrize("seconds, b", [(0, "under-15m"), (899, "under-15m"),
+                                        (900, "15m-1h"), (3600, "1-3h"),
+                                        (3 * 3600, "3-8h"), (8 * 3600, "8h-plus")])
+def test_open_time_is_a_rough_bucket(seconds, b):
+    assert usage.open_bucket(seconds) == b

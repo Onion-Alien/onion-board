@@ -2,7 +2,8 @@
 
 Where they come from: the video thumbnail yt-dlp saves next to a downloaded link
 (YouTube, TikTok and the other sites it supports), the cover art / first frame of an
-imported file (needs ffmpeg), or any image the user picks, drops or pastes on a pad.
+imported file (needs ffmpeg), any image the user picks, drops or pastes on a pad, or
+one from a link (fetch()).
 
 Everything here uses QImage, which is safe off the UI thread (the download and
 import workers call store()). Only pixmap() and fitted() need the UI thread; they
@@ -11,11 +12,15 @@ read the file on a worker thread and answer None until it's in.
 from __future__ import annotations
 
 import logging
+import html
 import queue
+import re
 import subprocess
 import tempfile
 import threading
 import time
+import urllib.parse
+import urllib.request
 import uuid
 import weakref
 from collections import OrderedDict
@@ -26,6 +31,7 @@ from PySide6.QtGui import QColor, QImage, QLinearGradient, QPainter, QPainterPat
 from shiboken6 import isValid as qt_valid
 
 from soundboard import library
+from soundboard.i18n import _
 from soundboard.library import SoundMeta
 
 log = logging.getLogger(__name__)
@@ -109,6 +115,77 @@ def from_clipboard(mime) -> QImage | None:
                 if not img.isNull():
                     return img
     return None
+
+
+LINK_FEATURE = "sounds_web.other"   # soundboard.net's switch: "Other pasted links"
+MAX_LINK_BYTES = 15 << 20            # a picture (or the page around one) bigger than this isn't
+_HEADERS = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+                          "(KHTML, like Gecko) Chrome/140.0 Safari/537.36",
+            "Accept": "image/*,text/html;q=0.9,*/*;q=0.8"}
+_YOUTUBE = re.compile(r"(?:youtube\.com/(?:watch\?(?:.*&)?v=|shorts/|embed/|live/)|youtu\.be/)"
+                      r"([\w-]{11})")
+_PAGE_PIC = re.compile(r"<meta\b[^>]*?(?:property|name)\s*=\s*[\"']"
+                       r"(?:og:image(?::secure_url|:url)?|twitter:image(?::src)?)[\"'][^>]*>", re.I)
+_CONTENT = re.compile(r"content\s*=\s*[\"']([^\"']+)", re.I)
+
+
+class LinkError(Exception):
+    """fetch() couldn't make a picture of the link; the message says why, for the user."""
+
+
+def link_picture(page: str, base: str) -> str:
+    """The picture a web page shares itself with (og:image / twitter:image), as an
+    absolute URL; "" when it names none."""
+    for tag in _PAGE_PIC.finditer(page):
+        m = _CONTENT.search(tag.group(0))
+        if m:
+            return urllib.parse.urljoin(base, html.unescape(m.group(1)).strip())
+    return ""
+
+
+def _get(url: str) -> tuple[bytes, str]:
+    from soundboard import net
+    req = urllib.request.Request(url, headers=_HEADERS)
+    with net.urlopen(req, timeout=20, feature=LINK_FEATURE) as r:
+        body = r.read(MAX_LINK_BYTES + 1)
+        kind = (r.headers.get_content_type() or "").lower()
+    if len(body) > MAX_LINK_BYTES:
+        raise LinkError(_("That picture is too big (over {mb} MB).", mb=MAX_LINK_BYTES >> 20))
+    return body, kind
+
+
+def fetch(url: str) -> QImage:
+    """The picture at a link: an image's own address, or a web page (a YouTube video,
+    a post…) whose preview picture is taken. Blocks (call it off the UI thread);
+    raises LinkError, or net.FeatureOff when links are switched off."""
+    from soundboard import errors, net
+    url = url.strip()
+    if url and "://" not in url:
+        url = "https://" + url
+    parts = urllib.parse.urlsplit(url)
+    if parts.scheme.lower() not in ("http", "https") or not parts.hostname or \
+            any(c.isspace() for c in url):
+        raise LinkError(_("That isn't a web link. Copy the picture's address (right-click "
+                          "it → Copy image address) and paste it here."))
+    yt = _YOUTUBE.search(url)
+    if yt:   # straight to the video's thumbnail: YouTube's page can ask for cookies first
+        url = f"https://i.ytimg.com/vi/{yt.group(1)}/hqdefault.jpg"
+    try:
+        body, kind = _get(url)
+        img = QImage.fromData(body)
+        if img.isNull() and ("html" in kind or body[:500].lstrip().lower().startswith(b"<")):
+            pic = link_picture(body.decode("utf-8", "replace"), url)
+            if pic:
+                body, kind = _get(pic)
+                img = QImage.fromData(body)
+    except (LinkError, net.FeatureOff):
+        raise
+    except Exception as e:  # noqa: BLE001 - offline, 404, blocked…: say why
+        raise LinkError(_("Couldn't get the picture ({error}).", error=errors.plain(e))) from e
+    if img.isNull():
+        raise LinkError(_("There's no picture at that link. Right-click the picture → Copy "
+                          "image address, and paste that."))
+    return img
 
 
 def set_image(meta: SoundMeta, src: str | Path | QImage) -> bool:

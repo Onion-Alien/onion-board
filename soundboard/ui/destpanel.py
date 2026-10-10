@@ -10,7 +10,7 @@ import html
 from PySide6.QtCore import Qt, QTimer, Signal
 from PySide6.QtWidgets import (QButtonGroup, QCheckBox, QComboBox, QDialog, QDialogButtonBox,
                                QFormLayout, QHBoxLayout, QLabel, QLineEdit, QListWidget,
-                               QPushButton, QSlider, QVBoxLayout, QWidget)
+                               QMenu, QPushButton, QSlider, QVBoxLayout, QWidget)
 
 from soundboard import destination, profiles, voicesdk
 from soundboard.destination import CEILINGS, LOWCUTS, Dest
@@ -94,7 +94,7 @@ def set_exact(mw, mode_key: str):
 
 
 def _refresh_views(mw):
-    for name in ("mode_combo", "dest_panel"):
+    for name in ("mode_btn", "dest_panel"):
         w = getattr(mw, name, None)
         if w is not None and hasattr(w, "refresh"):
             w.refresh()
@@ -126,53 +126,80 @@ class ModesHelp(QDialog):
         v.addWidget(bb)
 
 
-class ModeCombo(QComboBox):
-    """Who's listening as one small dropdown (the Sounds tab's top bar): the simple
-    modes, the same setting as DestPanel's buttons. Each one's tooltip says what it
-    does."""
+MODE_ICONS = {"game": "gamepad", "voice": "headphones", "clean": "wave",
+              "advanced": "sliders"}
+
+
+class ModeButton(QPushButton):
+    """Who's listening as one icon on the tab rail, beside Live (it was a dropdown on
+    the Sounds tab's top bar, though it shapes what's sent from every tab): the mode
+    in use as its icon; a click lists the simple modes, each one's tip saying what it
+    does, and What do these do?. The same setting as DestPanel's buttons."""
 
     def __init__(self, mw):
         super().__init__()
         self.mw = mw
-        self.setAccessibleName(_("Who's listening"))
-        self.setSizeAdjustPolicy(QComboBox.AdjustToMinimumContentsLengthWithIcon)
-        self.setMinimumContentsLength(10)
-        no_wheel(self)
-        self.currentIndexChanged.connect(self._picked)
+        self.setObjectName("modebtn")
+        self.setCursor(Qt.PointingHandCursor)
+        self.menu_ = QMenu(self)
+        self.menu_.setToolTipsVisible(True)
+        self.menu_.aboutToShow.connect(self.refresh)   # changed elsewhere meanwhile
+        self.clicked.connect(self._pop)
         sig = getattr(mw, "voice_engine", None)
         if sig is not None:
-            sig.connect(self._on_voice_engine)   # a simple mode picked new shaping
+            sig.connect(lambda _key: self.refresh())   # a simple mode picked new shaping
         self.refresh()
 
+    def currentData(self) -> str:
+        return profiles.current(_dest_cfg(self.mw)).key
+
     def refresh(self):
+        from soundboard.ui import icons, sidebar
         d = _dest_cfg(self.mw)
         p = profiles.current(d)
-        self.blockSignals(True)
-        self.clear()
+        self.menu_.clear()
         for q in profiles.PROFILES:
             label = q.name
             if q is profiles.ADVANCED:
                 label = (_("Advanced: {label}", label=destination.resolve(d).name)
                          if p is q else _("Advanced…"))
-            self.addItem(label, q.key)
-            self.setItemData(self.count() - 1, mode_tip(q), Qt.ToolTipRole)
-        self.setCurrentIndex(max(0, self.findData(p.key)))
-        self.view().setMinimumWidth(self.view().sizeHintForColumn(0) + 32)   # long names whole
-        self.blockSignals(False)
-        self.setToolTip(
-            _("Who's listening: {explain}<br><br>Hover a mode in the list to see what it does. "
-              "More in Settings → Audio → Who's listening.",
-              explain=html.escape(profiles.explain(d, getattr(self.mw, 'mode_why', '')))))
+            # the one in use: its icon in the highlight colour and its name in bold (a
+            # tick doesn't show beside an icon)
+            a = self.menu_.addAction(
+                icons.icon(MODE_ICONS[q.key], "live_text" if q is p else None), label)
+            a.setCheckable(True)
+            a.setChecked(q is p)
+            if q is p:
+                f = a.font()
+                f.setBold(True)
+                a.setFont(f)
+            a.setToolTip(mode_tip(q))
+            a.triggered.connect(lambda _c=False, k=q.key: self.pick(k))
+        self.menu_.addSeparator()
+        self.menu_.addAction(icons.icon("info"), _("What do these do?"),
+                             lambda: ModesHelp(self.mw).exec())
+        icons.set_icon(self, MODE_ICONS[p.key], size=sidebar.ICON)
+        name = (_("Advanced: {label}", label=destination.resolve(d).name)
+                if p is profiles.ADVANCED else p.name)
+        who = _("Who's listening")
+        sidebar.put(self, name, f"{who}: {name}", _(
+            "Who's listening: {explain}<br><br>Hover a mode in the list to see what it does. "
+            "More in Settings → Audio → Who's listening.",
+            explain=html.escape(profiles.explain(d, getattr(self.mw, 'mode_why', '')))))
 
-    def showEvent(self, e):
-        super().showEvent(e)
-        self.refresh()   # changed on the Setup tab or in Settings meanwhile
+    def _pop(self):
+        """Beside the button, on the rail's outer side (as + More tabs opens)."""
+        from PySide6.QtCore import QPoint
+        self.menu_.adjustSize()
+        at = self.mapToGlobal(QPoint(0, 0))
+        x = (at.x() - 8 - self.menu_.width() if self.isRightToLeft()
+             else at.x() + self.width() + 8)
+        room = self.screen().availableGeometry()
+        self.menu_.popup(QPoint(max(room.left(), min(x, room.right() + 1 - self.menu_.width())),
+                                max(room.top(), min(at.y() + self.height() - self.menu_.height(),
+                                                    room.bottom() + 1 - self.menu_.height()))))
 
-    def _on_voice_engine(self, _key):
-        self.refresh()
-
-    def _picked(self, i: int):
-        key = self.itemData(i)
+    def pick(self, key: str):
         if key not in profiles.BY_KEY:
             return
         set_simple(self.mw, key)
@@ -236,11 +263,12 @@ class DestPanel(QWidget):
         arow = QHBoxLayout()
         self.combo = QComboBox()
         no_wheel(self.combo)
-        arow.addWidget(self.combo, 1)
+        arow.addWidget(self.combo)
         custom = QPushButton(_("Custom modes…"))
         custom.setToolTip(_("Describe another codec or service by what it does to the sound"))
         custom.clicked.connect(self.edit_custom)
         arow.addWidget(custom)
+        arow.addStretch(1)
         av.addLayout(arow)
         self.desc = hint_label("")
         av.addWidget(self.desc)
@@ -268,7 +296,8 @@ class DestPanel(QWidget):
             self.cb_duck.addItem(label, db)
         self.cb_duck.setToolTip(_("Turns your sounds down while the mic hears you, so your voice "
                                   "isn't buried under a song"))
-        duck.addWidget(self.cb_duck, 1)
+        duck.addWidget(self.cb_duck)
+        duck.addStretch(1)
         v.addLayout(duck)
         self.chk_gate = QCheckBox(_("Mute my mic while a sound plays"))
         self.chk_gate.setToolTip(_("Others hear only the sound, clean, and your mic comes back "
@@ -319,9 +348,9 @@ class DestPanel(QWidget):
         self.advanced.setVisible(p is profiles.ADVANCED)
         self.desc.setText(describe(destination.resolve(cfg)))
         self._show_suggestion()
-        combo = getattr(self.mw, "mode_combo", None)   # the Sounds tab's dropdown
-        if combo is not None:
-            combo.refresh()
+        btn = getattr(self.mw, "mode_btn", None)   # the tab rail's
+        if btn is not None:
+            btn.refresh()
 
     def show_help(self):
         dlg = ModesHelp(self.mw, self)
@@ -595,7 +624,7 @@ class CustomDestDialog(QDialog):
         self._commit()
         name = gone.get("label") or _("mode")
         self.undo_bar.show_for(
-            _("Removed “{name}” — Who's listening is Off now", name=name) if was_on
+            _("Removed “{name}”: Who's listening is Off now", name=name) if was_on
             else _("Removed “{name}”", name=name),
             lambda: self._put_back(row, gone, was_on))
 

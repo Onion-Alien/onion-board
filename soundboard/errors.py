@@ -155,6 +155,9 @@ def _winerr(code: int) -> str:
              "blocked it)."),
         112: _("The disk is full."),
         206: _("The file's path is too long."),
+        448: _("Windows won't follow a folder link (a junction or a drive mounted as a "
+               "folder) on the way to that file. Copy the file to a normal folder and "
+               "try again."),
         1223: _("It was cancelled."),
         1392: _("The file is damaged and can't be read."),
         10054: _("The connection was dropped."),
@@ -202,6 +205,13 @@ def _os_error(e: OSError) -> str:
         return _winerr(11001)
     if isinstance(e, TimeoutError):
         return _winerr(10060)
+    if getattr(e, "winerror", None) == 448 and e.filename:
+        from soundboard import winpath
+        if (link := winpath.first_link(e.filename)) is not None:
+            return _("Windows won't follow the folder link “{link}” (it points to "
+                     "“{target}”). Copy the file to a normal folder (like Desktop) and try "
+                     "again, or make that folder a real folder instead of a link.",
+                     link=link[0], target=link[1])
     words = _winerr(getattr(e, "winerror", None) or 0) or _errno(e.errno or 0)
     if words:
         return words

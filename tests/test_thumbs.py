@@ -2,11 +2,14 @@
 import json
 
 import numpy as np
+import pytest
 from PySide6.QtGui import QColor, QImage
+from PySide6.QtWidgets import QMessageBox
 
 from soundboard import library, thumbs
+from soundboard import net as thumbs_net
 from soundboard.library import SR, Config, SoundMeta
-from soundboard.ui.widgets import Pad, spectrum
+from soundboard.ui.widgets import Pad, loudness, spectrum
 
 
 def make_image(path, w=800, h=450, color="#ff0000"):
@@ -171,6 +174,30 @@ def test_pad_bars_jump_up_and_fall_back(qapp):
     assert pad.bands is None
 
 
+def test_loudness_follows_the_sound_and_its_volume():
+    t = np.arange(SR) / SR
+    loud = (np.sin(2 * np.pi * 440 * t) * 0.7 * 32767).astype(np.int16)
+    quiet_then_loud = np.stack([np.r_[np.zeros(SR, np.int16), loud]] * 2, axis=1)
+    assert loudness(quiet_then_loud, 0.4) == 0.0          # silence
+    full = loudness(quiet_then_loud, 0.8)
+    assert 0.85 < full < 0.95                             # ~-6 dBFS RMS
+    half = loudness(quiet_then_loud, 0.8, gain=0.5)       # -6 dB more: 1/8 lower
+    assert abs((full - half) - 6 / 48) < 0.01
+    assert loudness(quiet_then_loud, 0.8, gain=4.0) == 1.0
+    assert loudness(None, 0.5) == 0.0
+
+
+def test_pad_meter_jumps_up_and_falls_back(qapp):
+    pad = Pad(SoundMeta(id="p", name="n", file="f"), 150)
+    pad.set_meter(0.9)
+    pad.set_meter(0.0)
+    assert 0.6 < pad.meter < 0.9 and pad.meter_peak > pad.meter
+    pad.set_meter(1.0)
+    assert pad.meter == pad.meter_peak == 1.0
+    pad.set_meter(None)
+    assert pad.meter is None
+
+
 def test_pad_paints_picture_and_visualizer(qapp, app_dir, tmp_path):
     m = SoundMeta(id="p", name="A very long sound name that wraps", file="f", duration=3.0)
     thumbs.set_image(m, make_image(tmp_path / "a.png", color="#2040ff"))
@@ -178,6 +205,7 @@ def test_pad_paints_picture_and_visualizer(qapp, app_dir, tmp_path):
     pad.state = "ready"
     pad.progress = 0.5
     pad.set_levels(np.linspace(0, 1, pad.n_bands))
+    pad.set_meter(1.0)
     img = pad.grab().toImage()
     assert not img.isNull()
     mid = img.pixelColor(img.width() // 2, img.height() // 3)
@@ -224,6 +252,8 @@ def test_link_add_uses_the_video_thumbnail(qapp, window, monkeypatch, tmp_path):
     m = window.cfg.sounds[-1]
     assert m.image and thumbs.Path(m.image).parent == library.THUMBS_DIR
     assert thumbs.pixmap(m.image) is not None
+    # named after the video in its site's folder, not after the temp file ("vid")
+    assert m.file == str(library.SOUNDS_DIR / "YouTube" / "A Tone.wav")
 
 
 def test_image_dropped_on_a_pad_becomes_its_picture(qapp, window, tmp_path):  # noqa: F811
@@ -282,3 +312,96 @@ def test_fitted_keeps_one_size_per_picture_and_trim_lets_all_go(qapp, app_dir, t
     assert thumbs._fitted_bytes == thumbs._bytes == 0
     c = thumbs.fitted(p, 200, 124, 1.25)                      # made again on the next paint
     assert c is not None and c.toImage() == b.toImage()
+
+
+class _Reply:
+    def __init__(self, body: bytes, kind: str):
+        self.body, self.kind = body, kind
+        self.headers = self
+
+    def get_content_type(self):
+        return self.kind
+
+    def read(self, n=-1):
+        return self.body
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *a):
+        return False
+
+
+def fake_web(monkeypatch, pages: dict):
+    """net.urlopen answering from `pages` {url: (bytes, content type)}; returns the
+    list of URLs asked for (and the feature each was asked under)."""
+    asked = []
+
+    def urlopen(req, timeout=30, feature=None, direct=False):
+        asked.append((req.full_url, feature))
+        thumbs_net.check(feature)
+        if req.full_url not in pages:
+            raise OSError("404")
+        return _Reply(*pages[req.full_url])
+    monkeypatch.setattr(thumbs_net, "urlopen", urlopen)
+    return asked
+
+
+def png_bytes(tmp_path) -> bytes:
+    return make_image(tmp_path / "p.png").read_bytes()
+
+
+
+def test_fetch_takes_an_image_link_or_a_pages_preview_picture(qapp, tmp_path, monkeypatch):
+    png = png_bytes(tmp_path)
+    page = (b'<html><head><meta property="og:image" content="/pics/a.png?x=1&amp;y=2">'
+            b"</head></html>")
+    asked = fake_web(monkeypatch, {"https://ex.com/a.png": (png, "image/png"),
+                                   "https://ex.com/post/1": (page, "text/html"),
+                                   "https://ex.com/pics/a.png?x=1&y=2": (png, "image/png")})
+    assert not thumbs.fetch("https://ex.com/a.png").isNull()
+    assert not thumbs.fetch("ex.com/post/1").isNull()   # no https:// typed: added
+    assert [u for u, __ in asked] == ["https://ex.com/a.png", "https://ex.com/post/1",
+                                      "https://ex.com/pics/a.png?x=1&y=2"]
+    assert {f for __, f in asked} == {"sounds_web.other"}   # "Other pasted links" switch
+
+
+def test_fetch_goes_straight_to_a_youtube_videos_thumbnail(qapp, tmp_path, monkeypatch):
+    asked = fake_web(monkeypatch, {"https://i.ytimg.com/vi/HEXWRTEbj1I/hqdefault.jpg":
+                                   (png_bytes(tmp_path), "image/jpeg")})
+    for link in ("https://www.youtube.com/watch?v=HEXWRTEbj1I&t=30",
+                 "https://youtu.be/HEXWRTEbj1I", "youtube.com/shorts/HEXWRTEbj1I"):
+        assert not thumbs.fetch(link).isNull()
+    assert len(asked) == 3
+
+
+def test_fetch_says_why_it_couldnt(qapp, monkeypatch):
+    fake_web(monkeypatch, {"https://ex.com/page": (b"<html>no picture</html>", "text/html")})
+    for link, says in (("not a link", "isn't a web link"), ("ftp://ex.com/a.png",
+                       "isn't a web link"), ("https://ex.com/page", "no picture"),
+                       ("https://ex.com/gone.png", "Couldn't get the picture")):
+        with pytest.raises(thumbs.LinkError, match=says):
+            thumbs.fetch(link)
+    thumbs_net.configure_features(off=["sounds_web.other"])
+    try:
+        with pytest.raises(thumbs_net.FeatureOff):
+            thumbs.fetch("https://ex.com/page")
+    finally:
+        thumbs_net.configure_features()
+
+
+def test_picture_from_a_link_goes_on_the_pad(qapp, window, tmp_path, monkeypatch):  # noqa: F811
+    img = QImage(str(make_image(tmp_path / "a.png")))
+    monkeypatch.setattr(thumbs, "fetch", lambda url: img if url == "https://ex.com/a" else
+                        (_ for _ in ()).throw(thumbs.LinkError("There's no picture at that link.")))
+    window.picture_from_link("s0", " https://ex.com/a ")
+    m = window.meta("s0")
+    assert process_events(qapp, lambda: bool(m.image))
+    assert thumbs.Path(m.image).parent == library.THUMBS_DIR
+    assert window._saver.flush(10) and Config.load().sounds[0].image == m.image
+
+    warned = []
+    monkeypatch.setattr(QMessageBox, "warning", lambda *a: warned.append(a[2]))
+    window.picture_from_link("s1", "https://ex.com/b")
+    assert process_events(qapp, lambda: warned)
+    assert warned == ["There's no picture at that link."] and not window.meta("s1").image

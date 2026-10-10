@@ -6,8 +6,8 @@ from __future__ import annotations
 
 import math
 
-from PySide6.QtCore import QEvent, QPoint, QRect, QSize, Qt, Signal
-from PySide6.QtGui import QColor, QPainter
+from PySide6.QtCore import QEvent, QPoint, QRect, QRectF, QSize, Qt, Signal
+from PySide6.QtGui import QColor, QFont, QPainter, QPainterPath, QRegion
 from PySide6.QtWidgets import (QCheckBox, QComboBox, QFrame, QGridLayout, QHBoxLayout, QLabel,
                                QLayout, QSlider, QSpinBox, QVBoxLayout, QWidget)
 
@@ -21,9 +21,34 @@ from soundboard.wheelguard import no_wheel
 from soundboard.i18n import _
 
 
+class RoundedFrame(QFrame):
+    """Clip a panel and its children to the same corners as the app's cards."""
+
+    def resizeEvent(self, event):
+        super().resizeEvent(event)
+        path = QPainterPath()
+        path.addRoundedRect(QRectF(self.rect()), 12, 12)
+        self.setMask(QRegion(path.toFillPolygon().toPolygon()))
+
+
 def section_label(text: str) -> QLabel:
     lbl = QLabel(text)
     lbl.setObjectName("section")
+    return lbl
+
+
+def steady_number(lbl: QLabel, widest: str) -> QLabel:
+    """A number that changes in place (9% → 100%) keeps its width: same-width digits,
+    room for the widest value, right-aligned, so nothing beside it moves."""
+    lbl.ensurePolished()
+    f = lbl.font()
+    f.setFeature(QFont.Tag("tnum"), 1)
+    lbl.setFont(f)
+    text = lbl.text()
+    lbl.setText(widest)                 # its size hint counts the stylesheet's padding too
+    lbl.setMinimumWidth(lbl.sizeHint().width() + 2)
+    lbl.setText(text)
+    lbl.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
     return lbl
 
 
@@ -396,12 +421,15 @@ class EqPanel(QWidget):
             self.cb_target.addItem(label, key)
         icons.set_item_icons(self.cb_target, ["mic", "volume", "wave"])
         self.cb_target.setCurrentIndex(max(0, self.cb_target.findData(target)))
-        row.addWidget(self.cb_target, 1)
+        row.addWidget(self.cb_target)
+        row.addStretch(1)
         pv.addLayout(row)
 
         self.cb_preset = QComboBox()
-        for name in EQ_PRESETS:   # the item data is the preset's key, "Custom" for none
-            self.cb_preset.addItem(name, name)
+        # the item data is the preset's key, "Custom" for none; the keys are saved in
+        # config, so they keep their old dash and only the shown name drops it
+        for name in EQ_PRESETS:
+            self.cb_preset.addItem(name.replace(" — ", ": "), name)
         self.cb_preset.addItem(_("Custom"), "Custom")
         pv.addWidget(self.cb_preset)
         no_wheel(self.cb_target, self.cb_preset)

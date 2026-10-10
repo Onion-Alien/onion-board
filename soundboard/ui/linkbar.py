@@ -23,7 +23,8 @@ from PySide6.QtCore import Qt, Signal
 from PySide6.QtWidgets import QFrame, QHBoxLayout, QLabel, QPushButton
 
 from soundboard import net, netlog, quality, theme, thumbs, videos, ytdl
-from soundboard.library import (SR, decode, fingerprint, import_file, level_gain, to_int16)
+from soundboard.library import (SR, decode, fingerprint, import_file, level_gain,
+                                site_folder, to_int16)
 from soundboard.ui import busy
 from soundboard.ui.widgets import fmt_time
 from soundboard import errors
@@ -62,6 +63,7 @@ class LinkBar(QFrame):
         self.title = ""
         self._text = ""               # the search box's text last seen
         self._busy = ""               # "", "add" or "play": one download at a time
+        self._busy_url = ""
         self._got = None              # (url, file, int16 audio, gain) of the last download
         # (url, int16 audio, gain) of the last add: Play after it is instant. Dropped with
         # the link, like _got: a 15-minute song is ~170 MB
@@ -157,6 +159,9 @@ class LinkBar(QFrame):
     def add(self) -> bool:
         if not self.url:
             return False
+        if self.url == getattr(self, "_added", ""):
+            self.done.emit(self.url, "add", True)
+            return True
         if self._busy:
             return self._queue("add")
         self._start("add")
@@ -178,8 +183,10 @@ class LinkBar(QFrame):
 
     def _queue(self, kind: str) -> bool:
         """Another download is running (one at a time): do this one after it."""
+        if self.url == self._busy_url and kind == self._busy:
+            return True   # already running: don't import the same sound twice
         if self._queued == kind:
-            return False
+            return True
         self._queued = kind
         name = html.escape(self.title or self._host())
         self._say(_("<b>{name}</b> is next: waiting for the download before it to finish…",
@@ -195,6 +202,7 @@ class LinkBar(QFrame):
     def _start(self, kind: str, direct: bool = False):
         self._blocked = ""
         self._busy = kind
+        self._busy_url = self.url
         self._buttons()
         got, self._got = self._got, None   # the worker owns (and deletes) it now
         # Settings > Data & quality: Add as sound keeps the video too (Play never does)
@@ -203,7 +211,7 @@ class LinkBar(QFrame):
             _drop_temp(got[1])
             got = None
         args = (kind, self.url, got, self._color_for(), self._known_for(),
-                bool(self.cfg.ytdlp_auto_optin), direct, video)
+                bool(self.cfg.ytdlp_auto_optin), direct, video, self.title)
         what = netlog.quoted(self.title) if self.title else "a link"
         netlog.cause(ytdl.FEATURE, (f"You clicked Play on {what}" if kind == "play" else
                                     f"You added {what} as a sound")
@@ -219,16 +227,18 @@ class LinkBar(QFrame):
         gain = gain if self.cfg.level_volumes else 1.0
         v = self.engine.play(PLAY_ID, data, gain, mode="restart")
         if v is None:
-            self._say(_("No audio device is open — pick one in Setup."), theme.status("warn"))
+            self._say(_("No audio device is open, pick one in Setup."), theme.status("warn"))
         else:
             self.played.emit(self.title or _("Link"), data, gain)
             name = html.escape(self.title or _("it"))
-            self._say(_("▶ Playing <b>{name}</b> ({time}) — <i>Add as sound</i> keeps it.",
+            self._say(_("▶ Playing <b>{name}</b> ({time}): <i>Add as sound</i> keeps it.",
                         name=name, time=fmt_time(len(data) / SR)))
 
     # ------------------------------------------------------------------ workers
-    def _work(self, kind, url, got, color, known, auto_update, direct=False, video=False):
-        """Download (unless `got` already holds it), then import or decode."""
+    def _work(self, kind, url, got, color, known, auto_update, direct=False, video=False,
+              shown=""):
+        """Download (unless `got` already holds it), then import or decode. `shown`:
+        the link's title as the bar has it (the file's name when `got` is used)."""
         path = got[1] if got else None
         title = ""
         keep = False
@@ -250,9 +260,14 @@ class LinkBar(QFrame):
             if fp and fp in known:
                 raise ytdl.DownloadError(_("It's already in your Sounds as “{name}”.",
                                            name=known[fp]))
-            meta, data = import_file(str(path), color)
-            if (pic := thumbs.find_in(Path(path).parent)) is not None:
-                meta.image = thumbs.store(pic, meta.id)   # the video's thumbnail
+            # named after the video, in a folder for the site: YouTube/<title>.flac
+            meta, data = import_file(str(path), color, name=title or shown,
+                                     folder=site_folder(url))
+            try:
+                if (pic := thumbs.find_in(Path(path).parent)) is not None:
+                    meta.image = thumbs.store(pic, meta.id)   # the video's thumbnail
+            except OSError as e:
+                log.warning("couldn't keep the thumbnail of %s: %s", url, e)
             self.engine.prepare(meta.id, data)
             saved = ""
             if video:
@@ -299,6 +314,7 @@ class LinkBar(QFrame):
             return
         # the download finished one way or another
         was, self._busy = self._busy, ""
+        self._busy_url = ""
         if kind == "blocked":
             blocked_kind, payload = payload
             kind = "error"
@@ -335,6 +351,11 @@ class LinkBar(QFrame):
             else:   # it was for a link no longer showing: don't lose the reason
                 busy.toast(self.window(), payload, "error", 8000)
             self.done.emit(url, was or "add", False)
+            if current and self._queued:
+                # Both clicks were waiting for this same failed download. A second
+                # fetch would leave an error visible even if the retry succeeded.
+                queued, self._queued = self._queued, ""
+                self.done.emit(url, queued, False)
         if self._queued and self.url:
             queued, self._queued = self._queued, ""
             if queued == "add":

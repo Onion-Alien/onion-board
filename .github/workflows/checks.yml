@@ -28,6 +28,22 @@ jobs:
           python-version: "3.13"
       - name: Personal data and secrets (repo rules)
         run: python scripts/check_sensitive.py --history
+      # A commit's time zone says where its author is: new commits must be in UTC
+      # (CLAUDE.md, "Commit times"). A PR: its commits not on main yet. main: what
+      # the push added (a merge made with GitHub's button or `gh pr merge` fails here).
+      - name: Commit times in UTC
+        if: github.event_name != 'workflow_dispatch'
+        env:
+          EVENT: ${{ github.event_name }}
+          PR_HEAD: ${{ github.event.pull_request.head.sha }}
+          BEFORE: ${{ github.event.before }}
+          AFTER: ${{ github.event.after }}
+        run: |
+          if [ "$EVENT" = pull_request ]; then
+            sh scripts/check_utc.sh "$PR_HEAD" --not origin/main
+          else
+            sh scripts/check_utc.sh "$BEFORE..$AFTER"
+          fi
       # The CLI rather than gitleaks-action: the action scans `<first commit>^..`,
       # which errors on a repo's first push (the root commit has no parent).
       - name: gitleaks (full history)
@@ -62,8 +78,26 @@ jobs:
           python -m venv .venv
           .venv\Scripts\python -m pip install -r requirements.txt -r requirements-dev.txt
       - run: .venv\Scripts\ruff check .
+      # A test worker that dies outright ("worker 'gw0' crashed", no traceback: a heap
+      # corruption fast-fail is past faulthandler) leaves a Windows crash dump here,
+      # uploaded below, so the native stack of the crash can be read.
+      - name: Keep crash dumps
+        shell: pwsh
+        run: |
+          $key = 'HKLM:\SOFTWARE\Microsoft\Windows\Windows Error Reporting\LocalDumps\python.exe'
+          New-Item -Path $key -Force | Out-Null
+          New-ItemProperty -Path $key -Name DumpFolder -Value "$env:RUNNER_TEMP\crashdumps" -PropertyType ExpandString -Force | Out-Null
+          New-ItemProperty -Path $key -Name DumpType -Value 1 -PropertyType DWord -Force | Out-Null
+          New-ItemProperty -Path $key -Name DumpCount -Value 5 -PropertyType DWord -Force | Out-Null
       # --durations: the slowest tests are listed at the end of every run, so one that
       # got slow (or hangs: pyproject's faulthandler_timeout stops it) shows up there
       - run: .venv\Scripts\python -m pytest --durations=20
         env:
           QT_QPA_PLATFORM: offscreen
+      - if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: crashdumps
+          path: ${{ runner.temp }}/crashdumps
+          if-no-files-found: ignore
+          retention-days: 14

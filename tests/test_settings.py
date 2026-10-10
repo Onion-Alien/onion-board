@@ -1,4 +1,5 @@
 """The Settings window's layout: pages scroll instead of squashing their rows."""
+import time
 from contextlib import contextmanager
 
 import pytest
@@ -111,7 +112,7 @@ def test_audio_page_picks_input_and_output_through_the_window(window, monkeypatc
                         lambda cb, attr: picked.append((attr, cb.currentData())))
     d = SettingsDialog(window, "audio")
     mic, mon = d.dev_combos[0][0], d.dev_combos[1][0]
-    assert [mic.itemText(i) for i in range(mic.count())] == ["— none —", "Mic A", "Headset Mic"]
+    assert [mic.itemText(i) for i in range(mic.count())] == ["(none)", "Mic A", "Headset Mic"]
     assert mon.currentText() == "Speakers"
     mic.activated.emit(2)
     mon.activated.emit(2)
@@ -126,14 +127,17 @@ def test_feedback_and_problem_buttons_only_open_the_browser(window, monkeypatch)
     monkeypatch.setattr(busy.QDesktopServices, "openUrl", lambda u: opened.append(u.toString()))
     d = SettingsDialog(window, "help")
     monkeypatch.setattr(feedback, "FORM_URL", "https://forms.example.com/r/x")
-    d.feedback_btn.click()
+    d.feedback_btn.click()      # asks "What would you improve?" first (test_feedbackdialog)
+    assert d.feedback_box.isVisible() and not opened
+    d.feedback_box.boxes["looks"].setChecked(True)
+    d.feedback_box.send()
+    d.feedback_box.form_btn.click()
     d.problem_btn.click()
-    assert opened[0] == f"https://forms.example.com/r/x?version={__version__}"
+    assert opened[0] == f"https://forms.example.com/r/x?version={__version__}&improve=looks"
     assert opened[1].startswith("https://github.com/Onion-Alien/onion-board/issues/new?labels=bug")
     assert __version__ in opened[1]
     monkeypatch.setattr(feedback, "FORM_URL", "")       # no form: feedback goes to GitHub too
-    d.feedback_btn.click()
-    assert opened[2] == opened[1]
+    assert feedback.feedback_url(__version__) == feedback.problem_url(__version__)
     d.close()
 
 
@@ -295,6 +299,12 @@ def test_each_switch_writes_its_setting_and_applies_at_once(window, monkeypatch)
         for key, box in d.net_boxes.items():
             assert box.isChecked() and net.allowed(key)
             box.setChecked(False)
+            # Count me in waits for its last anonymous opt-out count first
+            # (SettingsDialog._opt_out_wait checks every 100 ms)
+            end = time.monotonic() + 5
+            while net.allowed(key) and time.monotonic() < end:
+                QApplication.processEvents()
+                time.sleep(0.02)
             assert key in window.cfg.net_off and not net.allowed(key)
             box.setChecked(True)
             assert key not in window.cfg.net_off and net.allowed(key)
@@ -503,5 +513,47 @@ def test_search_hides_cards_and_pages_without_the_word(window, qapp):  # noqa: F
         assert all(not d.categories.item(i).isHidden() for i in range(d.categories.count()))
         d._apply_search("no such words here")
         assert all(d.categories.item(i).isHidden() for i in range(d.categories.count()))
+    finally:
+        d.close()
+
+
+def test_switching_count_me_in_off_sends_one_opt_out_first(window, qapp, monkeypatch):  # noqa: F811
+    """Count me in on -> off: the anonymous opt-out goes while the count is still
+    allowed, and the switch takes hold right after; other switches never send it."""
+    from soundboard import usage
+    calls = []
+    monkeypatch.setattr(usage, "opt_out",
+                        lambda where: calls.append((where, net.allowed("usage_stats"))))
+    monkeypatch.setattr(window, "_save_later", lambda: None)
+    window.cfg.net_off = []
+    net.configure_features()
+    d = SettingsDialog(window)
+    try:
+        box = d.net_boxes["usage_stats"]
+        box.setChecked(False)
+        assert process_events(qapp, lambda: not net.allowed("usage_stats"))
+        assert calls == [("settings", True)] and "usage_stats" in window.cfg.net_off
+        d.net_boxes["radio"].setChecked(False)   # other switches never send it
+        assert calls == [("settings", True)]
+    finally:
+        d.close()
+        net.configure_features()
+
+
+def test_count_me_in_eye_opens_the_table(window):  # noqa: F811
+    """Count me in's hint stays short; its eye opens the table of what's sent, with
+    an example and a reason on every row, and it never touches the switch."""
+    from soundboard.ui import countdialog
+    d = SettingsDialog(window)
+    try:
+        box = d.net_boxes["usage_stats"]
+        was = box.isChecked()
+        assert len(d.NET_HINTS["usage_stats"]) < 120
+        d.count_eye.click()
+        dlg = d.count_dialog
+        assert isinstance(dlg, countdialog.CountDialog) and dlg.isVisible()
+        assert all(what and example and why for what, example, why in countdialog.rows())
+        assert box.isChecked() == was
+        dlg.close()
     finally:
         d.close()

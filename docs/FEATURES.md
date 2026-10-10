@@ -302,7 +302,7 @@ The full list. The [README](../README.md) has the short version and how to get s
   **Tor** (*Get Tor* downloads the Tor Project's own, checked first), and never
   quietly goes direct if that fails. **Network activity** (Settings → Connection)
   lists every connection the app makes and why. By itself it only checks for updates
-  and sends an anonymous daily count (version + a random ID); each has its own switch.
+  and sends an anonymous daily count (version, tabs opened, and a random ID that shows how people use the app over time); each has its own switch.
   Little touches that follow the time of day read your PC's clock and never send it.
 - **Runs in the background:** closing the window keeps it in the tray (hotkeys and
   the overlay keep working; right-click the tray icon for *Open Onion Board*, *Stop

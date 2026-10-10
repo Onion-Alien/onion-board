@@ -980,7 +980,7 @@ def test_the_voice_thats_on_speaks_the_language_picked(panel, monkeypatch):
 def test_the_card_is_just_the_switch_the_voices_and_one_button(panel):
     p, _ = panel
     fx = p.fx
-    on_card = [w for w in (fx.btn_power, fx.meter, fx.btn_tweak, *fx.tiles.buttons())]
+    on_card = [w for w in (fx.btn_power, fx.btn_tweak, *fx.tiles.buttons())]
     assert all(w.window() is not fx.dlg for w in on_card)
     for w in (fx.hero_box.parentWidget(), fx.btn_random, fx.btn_save, fx.btn_share,
               fx.btn_import, fx.btn_bin, fx.more, *fx.rows.values()):
@@ -1223,3 +1223,62 @@ def test_remembered_voices_only_count_for_the_same_voices_and_a_sound_entry():
     for bad in (None, "x", {"fp": ["A", "B"]}, {"fp": ["A", "B"], "voices": [["Zira"]]},
                 {"fp": ["A", "B"], "voices": [[1, "en"]]}, {"fp": "AB", "voices": []}):
         assert tts.remembered_voices(bad, fp) is None
+
+
+# ---------------------------------------------------------------- the status bar
+
+def test_status_bar_off_label_cannot_open_a_card(panel):
+    from PySide6.QtCore import Qt
+    from PySide6.QtTest import QTest
+    from PySide6.QtWidgets import QLabel
+    p, _ = panel
+    opened = []
+    p.bar.open_card.connect(opened.append)
+    label = p.bar.chips["none"]
+    assert isinstance(label, QLabel)
+    assert label.focusPolicy() == Qt.NoFocus
+    assert label.cursor().shape() == Qt.ArrowCursor
+    QTest.mouseClick(label, Qt.LeftButton)
+    p._open_card("none")
+    assert not opened
+    assert all(not head.is_open() for head in p._heads.values())
+    p.fx.pick("Robot")
+    p.bar.chips["fx"].click()
+    assert opened == ["fx"] and p._heads["fx"].is_open()
+
+
+def test_status_bar_says_what_others_hear_and_opens_its_card(panel):
+    p, eng = panel
+    assert p.bar.texts() == ["Voice effects off — mic unchanged"]
+    p.fx.pick("Robot")
+    assert p.bar.texts() == ["Robot"]          # short; the full words are its tip
+    assert "Voice changer" in p.bar.chips["fx"].toolTip()
+    assert p.bar.chips["fx"].property("state") == "on"
+    p.fx.btn_power.setChecked(False)
+    assert p.bar.texts() == ["Voice effects off — mic unchanged"]
+    # a chip opens its folded card
+    assert not p._heads["speak"].is_open()
+    p.speech.b_live.setChecked(True)
+    assert "Computer voice" in p.bar.texts()
+    p.bar.chips["speak"].click()
+    assert p._heads["speak"].is_open() and p.speech.isVisibleTo(p)
+    p.speech.b_live.setChecked(False)
+    # the mic: its level, or that none is open
+    p.bar.set_level(None)
+    assert not p.bar.lbl_mic.isHidden() and p.bar.lbl_mic.text() == "No mic open"
+    p.bar.set_level(0.5)
+    assert p.bar.lbl_mic.isHidden() and p.bar.meter.level == 0.5
+    assert not hasattr(p.fx, "meter")                     # one meter, in the bar
+
+
+def test_status_bar_shows_the_ai_voice_starting_on_and_failed(panel, monkeypatch):
+    p, _ = panel
+    ai = p.ai
+    monkeypatch.setattr(ai, "is_on", lambda: True)
+    monkeypatch.setattr(ai, "voice_title", lambda: "Squeak")
+    for st, words, state in (("starting", "Squeak…", "on"), ("on", "Squeak", "on"),
+                             ("failed", "AI voice off", "warn")):
+        monkeypatch.setattr(ai, "status", lambda st=st: st)
+        p._update_bar()
+        assert p.bar.texts() == [words]
+        assert p.bar.chips["ai"].property("state") == state

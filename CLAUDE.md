@@ -53,19 +53,24 @@ errors) does all of this **before committing**, not "later":
 Never wrap log messages, settings keys, file names, the control API's JSON or the changelog. A new language goes into
 both apps at once. Details: [docs/TRANSLATING.md](docs/TRANSLATING.md).
 
-## New UI: narrow by default
+## Any UI work: read docs/DESIGN.md first
 
-The author has had to shrink nearly every new control, card and window by hand. New UI
-is **as narrow as its content**, never stretched to fill the space:
+**[docs/DESIGN.md](docs/DESIGN.md) is the design system**: tokens, layout, buttons,
+colour, text, behaviour, a "never" list and a checklist. Build every new screen, card,
+dialog and button from it. The rules people trip over most:
 
-- Buttons, drop-downs and boxes are as wide as their text (`QSizePolicy.Maximum` /
-  `AdjustToContents`, a `addStretch(1)` after them in the row). No stretch factor on a
-  control unless it really holds long text (a search box, a slider, a path).
-- Dialogs and pop-ups get a fixed or capped width that fits their content (about
-  ≤ 620 px), not the parent's width or the screen's. Grids: few columns of fixed-size
-  tiles, scroll down instead of spreading out.
-- Long text wraps (`setWordWrap`) or goes on two lines; don't widen the layout for it.
-- Before sending pictures, look at them for empty horizontal space and fix it first.
+- **Narrow by default**: controls as wide as their words, then `addStretch(1)`;
+  dialogs ≤ ~620 px; tiles in fixed-size grids that scroll down.
+- **Buttons on the left, the main one first** (`[Send] [Cancel]`), one filled
+  `#primary` button per card or dialog at most.
+- **Icons and pop-ups over long buttons**: a button is one to three words; anything
+  a picture says is an icon with a tooltip; how-to text goes behind an ⓘ pop-up.
+- **Cards look designed, not like a form**: heading icon, status pill, choice tiles,
+  pictures, an inner area; never a heading over stacked plain rows.
+- Theme tokens only, never a hex colour; ticks and on-states stay the accent colour.
+- Sentence case, no long dashes, `23%`, every string through `_()`.
+- Before sending pictures of a change, look at every state yourself for empty space,
+  cut-off words and invisible controls.
 
 ## Working in the code
 
@@ -91,6 +96,23 @@ or installing anything. The short version:
   mangles UTF-8 (this codebase uses symbols like ⚙ ⏺ 🐰 in strings).
 - Audio callbacks never block or take the engine lock ([docs/CODE.md](docs/CODE.md) → *Audio notes*).
 - Code layout is the table in [docs/CODE.md](docs/CODE.md); keep it current when adding modules.
+- **Commit times: UTC only.** Every commit's author and committer time must be
+  `+0000`: a local time zone in a public repo says where the author lives. The
+  enforcement:
+  - `git config core.hooksPath .githooks` (required) turns on the hooks:
+    `post-commit` and `post-merge` re-stamp new commits in UTC, and `pre-push` refuses
+    anything that isn't.
+  - CI's *Commit times in UTC* step fails a PR (and main) that has any.
+  - **Never merge a PR with `gh pr merge`, GitHub's Merge button or GitHub's
+    *Update branch*.** GitHub writes those commits in your local time zone, and no
+    hook can touch them. Merge with `sh scripts/merge_pr.sh N [--delete-branch]`: it
+    checks CI is green, makes the merge commit here in UTC and pushes it to main.
+  - Bring main into a branch with a local `git merge origin/main` (the hook stamps
+    it).
+  - A branch whose commits aren't UTC: `sh scripts/utc_fix.sh`, then
+    `git push --force-with-lease`.
+  - The same goes for anything else that records where you are: never write your time
+    zone, locale, city or machine names into commits, PR text or files.
 - Never rewrite history already pushed to `main` (no filter-repo, rebase or force-push):
   commits get new IDs, so every fork or branch that merges `main` sees them all as new
   and conflicts. To clean up old commits, add a new commit instead.

@@ -72,7 +72,7 @@ LOCAL_SETTINGS = {"version", "sounds", "categories", "category", "main_device", 
                   "api_token", "remote_addons", "net_mode", "net_proxy",
                   "net_off", "net_offline", "tor_bridges", "data", "stats_id",
                   "stats_sent", "stats_heard", "stats_tabs", "stats_problems_seen",
-                  "stats_started", "stats_steps", "stats_used", "stats_plays",
+                  "stats_started", "stats_steps", "stats_used", "stats_plays", "stats_open_s",
                   "tips_seen", "tip_day"}
 # per-sound fields that are written to sound.json (the paths are replaced by names)
 SOUND_FIELDS = ("name", "volume", "hotkey", "mode", "loop", "color", "level_gain",
@@ -106,6 +106,8 @@ def export(dest: str | Path, sounds: list[SoundMeta], cfg: Config | None = None,
                 folder = f"sounds/{len(folders) + 1:03d} {_safe(m.name)}"
                 entry = {k: getattr(m, k) for k in SOUND_FIELDS}
                 entry["audio"] = _safe(_original_name(audio), keep_ext=True)
+                if lib_folder := library._folder_of(audio):   # comes back in it: "YouTube"
+                    entry["folder"] = lib_folder
                 entry["picture"] = ""
                 if audio.suffix.lower() in AUDIO_EXTS:
                     _add_file(z, audio, f"{folder}/{entry['audio']}")
@@ -145,6 +147,14 @@ def settings_of(cfg: Config) -> dict:
     if voices := savedvoices.saved():
         out[SAVED_VOICES] = voices
     return out
+
+
+def _lib_folder(v) -> str:
+    """The library folder a sound in a backup goes in: the one it was in when it was
+    saved ("YouTube"), as one plain folder name; else My sounds."""
+    if not isinstance(v, str) or not v.strip(" ."):
+        return library.MY_SOUNDS
+    return library.file_stem(v)   # no "/", "..", or anything Windows refuses
 
 
 def _original_name(audio: Path) -> str:
@@ -490,14 +500,13 @@ def _size(n: int) -> str:
 def _install_one(src: _Source, ps: PackedSound, name: str, color: str | None,
                  budget: _Budget | None = None) -> SoundMeta:
     sid = uuid.uuid4().hex[:10]
-    library.SOUNDS_DIR.mkdir(parents=True, exist_ok=True)
-    audio_name = _safe(PurePosixPath(ps.audio).name, keep_ext=True)
-    dest = library.SOUNDS_DIR / f"{sid}_{audio_name}"
-    _extract(src, ps.audio, dest, budget=budget)
+    ext = PurePosixPath(_safe(PurePosixPath(ps.audio).name, keep_ext=True)).suffix
+    dest = library.new_file(name, ext, _lib_folder(ps.entry.get("folder")))
     try:
+        _extract(src, ps.audio, dest, budget=budget)
         return _fill_meta(src, ps, sid, name, color, dest, budget)
     except BaseException:
-        dest.unlink(missing_ok=True)   # don't leave an orphan audio file behind
+        library.discard(dest)   # don't leave an orphan audio file behind
         raise
 
 
