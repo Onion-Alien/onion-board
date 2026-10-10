@@ -6066,6 +6066,7 @@ class MainWindow(QMainWindow):
         d.hotkeys_changed.connect(self.register_hotkeys)
         ok = d.exec()
         self.drop_preview()                        # a preview still rendering
+        self.engine.stop(f"{sid}:preview")         # and the one playing, either kind
         self.engine.stop(f"{sid}~fx:preview")
         try:
             if ok and d.as_copy:
