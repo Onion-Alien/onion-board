@@ -924,21 +924,17 @@ def test_every_value_a_slider_shows_fits_its_label(panel):
                 assert fm.horizontalAdvance(param_text(s.q, v)) <= room, (s.q.key, v)
 
 
-def test_cards_start_folded_and_unfold(qapp, monkeypatch):
-    """The tab opens with every card folded (it all fits on one screen); what's
-    folded is still saved for older versions."""
+def test_cards_restore_saved_folds_and_unfold(qapp, monkeypatch):
+    """Saved folds are restored, including unknown keys from newer versions."""
     monkeypatch.setattr(tts.SapiTTS, "warm_up", lambda self: [])
     from soundboard.ui.voicepanel import VoicePanel
     p = VoicePanel(FakeEngine(), {}, {"folded": ["ai", 7, "later"]})   # 7: junk
     try:
-        assert all(not h.is_open() for h in p._heads.values())
-        assert p.ai.isHidden() and p.fx.isHidden() and p.speech.isHidden()
-        assert p.addons.isHidden() and p.speech.custom_box.isHidden()
+        assert not p._heads["ai"].is_open() and p._heads["fx"].is_open()
+        assert p.ai.isHidden() and not p.fx.isHidden()
         saved = []
         p.speech_changed.connect(saved.append)
-        p._heads["fx"].arrow.click()                 # open the voice changer
-        assert not p.fx.isHidden() and not saved     # it was open last time too
-        p._heads["fx"].arrow.click()                 # fold it again
+        p._heads["fx"].arrow.click()                 # fold the restored voice changer
         assert p.fx.isHidden() and saved[-1]["folded"] == ["ai", "fx", "later"]
         p._heads["ai"].arrow.click()                 # and open the AI voices again
         # "later": a newer version's card, kept for it
@@ -1240,10 +1236,11 @@ def test_status_bar_off_label_cannot_open_a_card(panel):
     assert isinstance(label, QLabel)
     assert label.focusPolicy() == Qt.NoFocus
     assert label.cursor().shape() == Qt.ArrowCursor
+    before = [head.is_open() for head in p._heads.values()]
     QTest.mouseClick(label, Qt.LeftButton)
     p._open_card("none")
     assert not opened
-    assert all(not head.is_open() for head in p._heads.values())
+    assert [head.is_open() for head in p._heads.values()] == before
     p.fx.pick("Robot")
     p.bar.chips["fx"].click()
     assert opened == ["fx"] and p._heads["fx"].is_open()
@@ -1284,3 +1281,9 @@ def test_status_bar_shows_the_ai_voice_starting_on_and_failed(panel, monkeypatch
         p._update_bar()
         assert p.bar.texts() == [words]
         assert p.bar.chips["ai"].property("state") == state
+
+
+def test_first_visit_exposes_voice_presets(panel):
+    p, _ = panel
+    assert p._heads["fx"].is_open() and not p.fx.isHidden()
+    assert not p._heads["ai"].is_open()

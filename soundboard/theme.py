@@ -395,6 +395,13 @@ def _add_hover_token(t: dict[str, str]) -> None:
 
 
 for _t in THEMES.values():
+    # Secondary text must read on the brightest surface used behind it.
+    for key in ("muted", "faint"):
+        _t[key] = next(c for c in (_mix(_t[key], _t["text_hi"], i / 20)
+                                  for i in range(21))
+                       if min(_contrast(c, _t[bg]) for bg in
+                              ("bg", "panel", "card", "card_hi", "btn")) >= 4.5
+                       or c == _t["text_hi"])
     _add_live_tokens(_t)
     _add_hover_token(_t)
 
@@ -529,9 +536,14 @@ QFrame#soundstoolbar QPushButton:hover { background:$btn_hover; }
 QFrame#soundstoolbar QPushButton:pressed { background:$btn_press; }
 QFrame#soundstoolbar QPushButton:focus { border-color:$accent; }
 QFrame#soundstoolbar QPushButton#primary { background:$accent; color:$on_accent;
-    border:1px solid transparent; font-weight:600; padding:0 14px; }
+    border:1px solid transparent; border-radius:12px; font-weight:600; padding:0 14px; }
 QFrame#soundstoolbar QPushButton#primary:hover { background:$accent_hover; }
+QFrame#soundstoolbar QPushButton#primary:pressed { background:$accent; }
 QFrame#soundstoolbar QPushButton#primary:focus { border-color:$text_hi; }
+QFrame#soundstoolbar QPushButton#soundrecord { background:$card_hi; color:$text;
+    border-radius:12px; padding:0 10px; }
+QFrame#soundstoolbar QPushButton#soundrecord:hover { background:$btn_hover; }
+QFrame#soundstoolbar QPushButton#soundrecord:pressed { background:$btn_press; }
 QFrame#soundstoolbar QPushButton[toolbarMenu="true"] { padding-right:22px; }
 QLineEdit#soundssearch { background:$bg; border:1px solid $border; border-radius:10px;
     padding:0 10px 0 4px; }
@@ -602,7 +614,7 @@ QPushButton#onair { border-radius:15px; padding:5px 14px; font-weight:700;
 QPushButton#onair:checked { background:$live; border:1px solid transparent; color:$on_live; }
 QPushButton#onair:checked:hover { background:$live_hi; }
 QWidget#decktop { background:transparent; }
-QLabel#decktitle { color:$muted; font-size:9pt; font-weight:600; }
+QLabel#decktitle { color:$text; font-size:9pt; font-weight:600; }
 QLabel#statusnote { background:$card_hi; color:$text; border-radius:8px; padding:6px 10px; }
 QPushButton#pill[state="warn"] { background:$warn_bg; color:$warn_text; }
 QAbstractSpinBox { background:$bg; border:1px solid transparent; border-radius:6px; padding:3px 6px; }
@@ -651,6 +663,7 @@ QFrame#transport QLabel, QFrame#transport QCheckBox, QFrame#transport QSlider,
 QFrame#deck QLabel, QFrame#deck QCheckBox, QFrame#deck QSlider { background:transparent; }
 QPushButton#round { padding:0; font-size:14pt; border-radius:10px; }
 QPushButton#transport_play { background:$accent; border:1px solid transparent; border-radius:17px; padding:0; }
+QPushButton#transport_play[mini="true"] { border-radius:14px; }
 QPushButton#transport_play:hover { background:$accent_hi; }
 QPushButton#transport_play:pressed { background:$accent; }
 QPushButton#transport_play:disabled { background:$btn; border:1px solid $border; }
@@ -658,7 +671,7 @@ QPushButton#transport_stop { background:$btn; border:1px solid $border; border-r
 QPushButton#transport_stop:hover { background:$btn_hover; border-color:$danger_text; }
 QPushButton#transport_stop:pressed { background:$btn_press; }
 QPushButton#transport_stop:disabled { background:$btn; border:1px solid $border; }
-QSlider#seek::groove:horizontal { height:6px; border-radius:3px; }
+QSlider#seek::groove:horizontal { margin:0 8px; height:6px; border-radius:3px; }
 QSlider#seek::sub-page:horizontal { border-radius:3px; }
 QLineEdit, QComboBox { background:$card; border:1px solid transparent; border-radius:8px; padding:6px 8px; }
 QLineEdit:hover, QComboBox:hover { background:$card_hi; }
@@ -691,6 +704,9 @@ QPushButton::menu-indicator:open { image:url("$up"); }
 QSlider::groove:horizontal { height:4px; background:$groove; border-radius:2px; }
 QSlider::sub-page:horizontal { background:$muted; border-radius:2px; }
 QSlider#seek::sub-page:horizontal { background:$accent; }
+QSlider#seek::sub-page:horizontal:disabled { background:$groove; }
+QSlider#seek::handle:horizontal { background:$text_hi; border:1px solid transparent; width:14px; height:14px; margin:-4px 0; border-radius:7px; }
+QSlider#seek::handle:horizontal:disabled { background:$off; }
 QSlider::handle:horizontal { background:$text_hi; border:1px solid transparent; width:14px; height:14px; margin:-5px 0; border-radius:7px; }
 /* room for the whole handle: Qt sizes a slider to its groove, which cut the circle's top
    and bottom off flat */
@@ -934,6 +950,11 @@ QPushButton#primary, QFrame#card QPushButton#primary, QFrame#setcard QPushButton
 QPushButton#primary:hover, QFrame#card QPushButton#primary:hover,
 QFrame#setcard QPushButton#primary:hover {
     background:qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 $accent_top_hi, stop:1 $accent_hover); }
+QFrame#soundstoolbar QPushButton#primary {
+    background:qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 $accent_top, stop:1 $accent); }
+QFrame#soundstoolbar QPushButton#primary:hover {
+    background:qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 $accent_top_hi, stop:1 $accent_hover); }
+QFrame#soundstoolbar QPushButton#primary:pressed { background:$accent; }
 QPushButton#onair:checked, QPushButton#power:checked, QFrame#card QPushButton#power:checked,
 QFrame#setcard QPushButton#power:checked {
     background:qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 $live_top, stop:1 $live); }
