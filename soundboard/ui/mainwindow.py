@@ -6413,7 +6413,7 @@ class MainWindow(QMainWindow):
         t = self.tray = QSystemTrayIcon(glow_icon(theme.T["accent"], theme.T["accent2"], 0.0), self)
         t.setToolTip(self.title)
         menu = QMenu(self)
-        menu.addAction(_("Open Onion Board"), self.show_from_tray)
+        icons.set_icon(menu.addAction(_("Open Onion Board"), self.show_from_tray), "sounds")
         icons.set_icon(menu.addAction(_("Stop all sounds"), self.stop_all), "stop")
         menu.addSeparator()
         # the Discord opens in the browser (feedback.py); Send feedback asks first
