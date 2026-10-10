@@ -4400,6 +4400,8 @@ class MainWindow(QMainWindow):
             return
         self._pads_scroll.hide()
         self._cat_row.hide()
+        self._results_open = True
+        self._sync_cat_bar()
 
     def on_search_enter(self):
         self.flush_search()   # a link pasted a moment ago: the link bar has it now
@@ -4426,6 +4428,8 @@ class MainWindow(QMainWindow):
             return
         self._pads_scroll.hide()
         self._cat_row.hide()
+        self._results_open = True
+        self._sync_cat_bar()
 
     def _from_youtube(self, r, play: bool):
         if play and r.url == self._link_url and self.audio.get(LINK_ID) is not None:
@@ -4756,6 +4760,8 @@ class MainWindow(QMainWindow):
         """"My sounds": all of them. The search box also filters the pads, so the web
         search still in it left a board of only the pads matching "cat meow" (often
         none, with nothing saying why). Something else typed in it since stays."""
+        self._results_open = False
+        self._sync_cat_bar()
         query = " ".join(self.ytresults.query.split())
         if query and " ".join(self.search.text().split()) == query:
             self.search.clear()
@@ -7691,6 +7697,8 @@ class MainWindow(QMainWindow):
         numbers go first; width and height are handled separately."""
         r = responsive
         f = self._fit = r.Fitter(self._full)
+        self._results_open = False      # web results are taking the pads' place
+        self._cat_bar_compact = False   # the fitter's last say on the category bar
         # last: opened out, the rail stays open until nothing else can give (it shut
         # again at once when opened in a mid-sized window)
         f.add(90, "w", self._squeeze_rail)
@@ -7730,10 +7738,22 @@ class MainWindow(QMainWindow):
         f.add(10, "h", self.status.set_room)
         f.add(40, "h", lambda tight: r.hide(self.mixer)(
             tight and (self.height() < 520 or self.width() < 760)))
-        f.add(50, "h", r.hide(self.cat_bar))   # the overlay's category key still works
+        f.add(50, "h", self._cat_bar_step)   # the overlay's category key still works
         self._stack_cols = (r.stack(self._setup_cols),
                             *self.voice.stack_steps())
         self.setMinimumSize(responsive.MIN_SIZE)
+
+    def _cat_bar_step(self, compact: bool):
+        """The fitter's say on the category bar: it hides it when the window is short."""
+        self._cat_bar_compact = compact
+        self._sync_cat_bar()
+
+    def _sync_cat_bar(self):
+        """The category bar is hidden when the window is short (the fitter) or when web
+        results take the pads' place: leaving its empty row in the layout kept a gap
+        between the toolbar and the results' buttons."""
+        self.cat_bar.setVisible(not self._cat_bar_compact and not self._results_open)
+        responsive.touch(self.cat_bar)
 
     def _show_pill(self):
         """The setup pill: only while something needs fixing."""
