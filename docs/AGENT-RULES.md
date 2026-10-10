@@ -5,6 +5,16 @@ mistakes made again. Each rule below is one of those mistakes, with commits that
 fixed it (`git show <hash>` to see the fix). Check your change against the rules for the area
 you touched before committing. When you fix a new kind of regression, add a line here.
 
+## Before the first edit: latest main, open PRs
+
+Every task, before changing anything (details in `CLAUDE.md`):
+
+1. `git fetch origin` and work on a new branch (or worktree) off `origin/main`.
+   Never edit someone else's dirty checkout.
+2. Confirm it: `git status -sb` doesn't say `behind`; your `HEAD` is `origin/main`'s.
+3. `gh pr list --state open`: if a PR already does this or touches the same code,
+   stop and tell the user. No duplicate work.
+
 ## What to read for a task (don't read the rest)
 
 | Task | Read | Skip |
