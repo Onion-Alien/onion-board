@@ -957,9 +957,28 @@ class RadioPlayer(QObject):
         self._gen += 1
         self._watch.stop()
         if self._player is not None:
+            # Qt's stop() waits for its decoding thread while this thread holds Python's
+            # lock; a buffer that thread is handing to _on_buffer needs that lock too: a
+            # deadlock. So _on_buffer is unhooked first and a buffer already on its way
+            # gets a moment (the GIL let go) to finish; station None makes it return.
+            self._unhook_buffers()
+            time.sleep(0.005)
             self._player.stop()
             self._player.setSource(QUrl())
+            if not self._closed:
+                self._hook_buffers()
         self._set_state("stopped")
+
+    def _hook_buffers(self):
+        if self._out is not None:
+            self._out.audioBufferReceived.connect(self._on_buffer, Qt.DirectConnection)
+
+    def _unhook_buffers(self):
+        if self._out is not None:
+            try:
+                self._out.audioBufferReceived.disconnect(self._on_buffer)
+            except (RuntimeError, TypeError):   # not connected / already gone
+                pass
 
     def _set_state(self, st: str):
         if st != self._state:
@@ -1069,14 +1088,9 @@ class RadioPlayer(QObject):
         waited out, so it never calls into a freed player (a crash)."""
         if self._closed:
             return
-        self.stop()
-        if self._out is not None:
-            try:
-                self._out.audioBufferReceived.disconnect(self._on_buffer)
-            except (RuntimeError, TypeError):   # never connected / already gone
-                pass
         with self._buffer_lock:
-            self._closed = True
+            self._closed = True   # stop() leaves the buffers unhooked
+        self.stop()
 
 
 def _tor_ready() -> bool:
