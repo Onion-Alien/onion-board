@@ -2476,7 +2476,6 @@
   "so quiet…": "atât de liniștit…",
   "so… bored…": "deci... plictisit...",
   "starting…": "pornire…",
-  "starting… (a built-in voice covers you until it's ready)": "pornind... (o voce încorporată te acoperă până când este gata)",
   "stopped": "oprit",
   "stopped: it took over {n} minute. Check your internet connection and press it again.": [
     "oprit: a durat peste {n} minut. Verificați-vă conexiunea la internet și apăsați din nou.",
@@ -2948,7 +2947,6 @@
   "That isn't a web link. Copy the picture's address (right-click it → Copy image address) and paste it here.": "Acesta nu este un link web. Copiați adresa imaginii (clic dreapta pe ea → Copiați adresa imaginii) și inserați-o aici.",
   "There's no picture at that link. Right-click the picture → Copy image address, and paste that.": "Nu este nicio poză pe link-ul respectiv. Faceți clic dreapta pe imagine → Copiați adresa imaginii și inserați-o.",
   "Couldn't get the picture ({error}).": "Nu s-a putut obține imaginea ( {error} ).",
-  "starting again… (a built-in voice covers you until it's ready)": "pornind din nou... (o voce încorporată te acoperă până când este gata)",
   "huh?! wha…": "huh?! ce…",
   "five more minutes…": "încă cinci minute...",
   "it's the middle of the night!": "e miez de noapte!",
@@ -3065,7 +3063,6 @@
   "Voice effects off — mic unchanged": "Efecte vocale dezactivate — microfon neschimbat",
   "Your mic voice is unchanged. Open Voice changer or AI voices below to choose a voice.": "Vocea dvs. de microfon este neschimbată. Deschideți mai jos Schimbător de voce sau voci AI pentru a alege o voce.",
   "AI voice off": "Vocea AI oprită",
-  "The AI voice stopped: a built-in voice covers you. Click to open AI voices.": "Vocea AI s-a oprit: o voce încorporată te acoperă. Faceți clic pentru a deschide voci AI.",
   "Click to open AI voices.": "Faceți clic pentru a deschide voci AI.",
   "AI voice: {voice}, starting.": "Voce AI: {voice} , pornind.",
   "AI voice: {voice}.": "Voce AI: {voice} .",
@@ -3074,5 +3071,7 @@
   "Getting Python ready…": "Se pregătește Python…",
   "Installing the voice engine (a few minutes)…": "Se instalează motorul de voci (câteva minute)…",
   "Downloading the voices…": "Se descarcă vocile…",
-  "Downloading the voices: {percent}%": "Se descarcă vocile: {percent}%"
+  "Downloading the voices: {percent}%": "Se descarcă vocile: {percent}%",
+  "Others now hear {backup}.": "Ceilalți aud acum {backup}.",
+  "starting again…": "se pornește din nou…"
 }

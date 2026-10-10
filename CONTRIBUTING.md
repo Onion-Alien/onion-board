@@ -12,8 +12,9 @@ and how the UI should look in [docs/DESIGN.md](docs/DESIGN.md); this file is the
 python scripts\check_sensitive.py
 ```
 
-All four must pass. CI runs the same checks, on Windows and on Linux. Not on Windows?
-The tests run on Linux and macOS too, skipping the ones that need Windows: see
+All four must pass. CI runs the same checks, on Windows and on Linux (on a PR, only
+the tests of what it changed). Not on Windows? The tests run on Linux and macOS too,
+skipping the ones that need Windows: see
 [DEVELOPING.md](docs/DEVELOPING.md#3-check-it-headless).
 
 Turn on the hooks once per clone: the secrets check runs before every commit, and

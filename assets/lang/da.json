@@ -2426,7 +2426,6 @@
   "so quiet…": "så stille...",
   "so… bored…": "så … keder sig…",
   "starting…": "starter…",
-  "starting… (a built-in voice covers you until it's ready)": "starter... (en indbygget stemme dækker dig, indtil den er klar)",
   "stopped": "stoppet",
   "stopped: it took over {n} minute. Check your internet connection and press it again.": [
     "stoppet: det tog over {n} minut. Tjek din internetforbindelse, og tryk på den igen.",
@@ -2888,7 +2887,6 @@
   "That isn't a web link. Copy the picture's address (right-click it → Copy image address) and paste it here.": "Det er ikke et weblink. Kopier billedets adresse (højreklik på det → Kopier billedadresse) og indsæt det her.",
   "There's no picture at that link. Right-click the picture → Copy image address, and paste that.": "Der er intet billede på det link. Højreklik på billedet → Kopier billedadresse, og indsæt det.",
   "Couldn't get the picture ({error}).": "Kunne ikke hente billedet ( {error} ).",
-  "starting again… (a built-in voice covers you until it's ready)": "starter igen... (en indbygget stemme dækker dig, indtil den er klar)",
   "huh?! wha…": "hva'?! hvad…",
   "five more minutes…": "fem minutter mere...",
   "it's the middle of the night!": "det er midt om natten!",
@@ -3001,7 +2999,6 @@
   "Voice effects off — mic unchanged": "Stemmeeffekter slukket — mikrofonen uændret",
   "Your mic voice is unchanged. Open Voice changer or AI voices below to choose a voice.": "Din mikrofonstemme er uændret. Åbn Voice changer eller AI-stemmer nedenfor for at vælge en stemme.",
   "AI voice off": "AI-stemme slukket",
-  "The AI voice stopped: a built-in voice covers you. Click to open AI voices.": "AI-stemmen stoppede: en indbygget stemme dækker dig. Klik for at åbne AI-stemmer.",
   "Click to open AI voices.": "Klik for at åbne AI-stemmer.",
   "AI voice: {voice}, starting.": "AI-stemme: {voice} , starter.",
   "AI voice: {voice}.": "AI-stemme: {voice} .",
@@ -3010,5 +3007,7 @@
   "Getting Python ready…": "Gør Python klar…",
   "Installing the voice engine (a few minutes)…": "Installerer stemmemotoren (et par minutter)…",
   "Downloading the voices…": "Henter stemmerne…",
-  "Downloading the voices: {percent}%": "Henter stemmerne: {percent}%"
+  "Downloading the voices: {percent}%": "Henter stemmerne: {percent}%",
+  "Others now hear {backup}.": "Andre hører nu {backup}.",
+  "starting again…": "starter igen…"
 }

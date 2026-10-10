@@ -2426,7 +2426,6 @@
   "so quiet…": "इतना शआंत…",
   "so… bored…": "इतना उबाऊ…",
   "starting…": "प्रारंभ...",
-  "starting… (a built-in voice covers you until it's ready)": "शुरू हो रहा है... (एक अंतर्निर्मित आवाज तैयार होने तक आपको कवर करती है)",
   "stopped": "रुक गया",
   "stopped: it took over {n} minute. Check your internet connection and press it again.": [
     "रुका: इसमें {n} मिनट से अधिक का समय लगा। अपना इंटरनेट कनेक्शन जांचें और इसे दोबारा दबाएं।",
@@ -2888,7 +2887,6 @@
   "That isn't a web link. Copy the picture's address (right-click it → Copy image address) and paste it here.": "वह कोई वेब लिंक नहीं है. चित्र का पता कॉपी करें (इसे राइट-क्लिक करें → छवि पता कॉपी करें) और इसे यहां पेस्ट करें।",
   "There's no picture at that link. Right-click the picture → Copy image address, and paste that.": "उस लिंक पर कोई चित्र नहीं है. चित्र पर राइट-क्लिक करें → छवि पता कॉपी करें, और उसे पेस्ट करें।",
   "Couldn't get the picture ({error}).": "चित्र नहीं मिल सका ( {error} )।",
-  "starting again… (a built-in voice covers you until it's ready)": "फिर से शुरू हो रहा है... (एक अंतर्निहित आवाज़ आपको तैयार होने तक कवर करती है)",
   "huh?! wha…": "हुह?! क्या...",
   "five more minutes…": "और पाँच मिनट…",
   "it's the middle of the night!": "यह आधी रात है!",
@@ -3001,7 +2999,6 @@
   "Voice effects off — mic unchanged": "ध्वनि प्रभाव बंद - माइक अपरिवर्तित",
   "Your mic voice is unchanged. Open Voice changer or AI voices below to choose a voice.": "आपके माइक की आवाज़ अपरिवर्तित है. आवाज चुनने के लिए नीचे वॉयस चेंजर या एआई वॉयस खोलें।",
   "AI voice off": "एआई आवाज बंद",
-  "The AI voice stopped: a built-in voice covers you. Click to open AI voices.": "एआई आवाज बंद हो गई: एक अंतर्निहित आवाज आपको कवर करती है। एआई वॉयस खोलने के लिए क्लिक करें।",
   "Click to open AI voices.": "एआई वॉयस खोलने के लिए क्लिक करें।",
   "AI voice: {voice}, starting.": "एआई आवाज: {voice} , प्रारंभ।",
   "AI voice: {voice}.": "एआई आवाज: {voice} ।",
@@ -3010,5 +3007,7 @@
   "Getting Python ready…": "Python तैयार हो रहा है…",
   "Installing the voice engine (a few minutes)…": "आवाज़ इंजन इंस्टॉल हो रहा है (कुछ मिनट)…",
   "Downloading the voices…": "आवाज़ें डाउनलोड हो रही हैं…",
-  "Downloading the voices: {percent}%": "आवाज़ें डाउनलोड हो रही हैं: {percent}%"
+  "Downloading the voices: {percent}%": "आवाज़ें डाउनलोड हो रही हैं: {percent}%",
+  "Others now hear {backup}.": "दूसरों को अब {backup} सुनाई दे रहा है।",
+  "starting again…": "फिर से शुरू हो रहा है…"
 }

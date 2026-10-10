@@ -2426,7 +2426,6 @@
   "so quiet…": "niin hiljaista…",
   "so… bored…": "niin… tylsää…",
   "starting…": "alkaa…",
-  "starting… (a built-in voice covers you until it's ready)": "alkaa… (sisäänrakennettu ääni peittää sinut, kunnes se on valmis)",
   "stopped": "pysähtyi",
   "stopped: it took over {n} minute. Check your internet connection and press it again.": [
     "pysähtyi: kesti yli {n} minuuttia. Tarkista Internet-yhteytesi ja paina sitä uudelleen.",
@@ -2888,7 +2887,6 @@
   "That isn't a web link. Copy the picture's address (right-click it → Copy image address) and paste it here.": "Se ei ole web-linkki. Kopioi kuvan osoite (napsauta sitä hiiren kakkospainikkeella → Kopioi kuvan osoite) ja liitä se tähän.",
   "There's no picture at that link. Right-click the picture → Copy image address, and paste that.": "Tuossa linkissä ei ole kuvaa. Napsauta kuvaa hiiren kakkospainikkeella → Kopioi kuvan osoite ja liitä se.",
   "Couldn't get the picture ({error}).": "Kuvaa ei saatu ( {error} ).",
-  "starting again… (a built-in voice covers you until it's ready)": "alkaa alusta… (sisäänrakennettu ääni peittää sinut, kunnes se on valmis)",
   "huh?! wha…": "häh?! mitä…",
   "five more minutes…": "vielä viisi minuuttia…",
   "it's the middle of the night!": "on keskellä yötä!",
@@ -3001,7 +2999,6 @@
   "Voice effects off — mic unchanged": "Äänitehosteet pois päältä – mikrofoni ennallaan",
   "Your mic voice is unchanged. Open Voice changer or AI voices below to choose a voice.": "Mikrofonin äänesi on ennallaan. Valitse ääni avaamalla Voice Changer tai AI voices alta.",
   "AI voice off": "AI-ääni pois päältä",
-  "The AI voice stopped: a built-in voice covers you. Click to open AI voices.": "AI-ääni pysähtyi: sisäänrakennettu ääni peittää sinut. Napsauta avataksesi AI-äänet.",
   "Click to open AI voices.": "Napsauta avataksesi AI-äänet.",
   "AI voice: {voice}, starting.": "AI-ääni: {voice} , alkaa.",
   "AI voice: {voice}.": "AI-ääni: {voice} .",
@@ -3010,5 +3007,7 @@
   "Getting Python ready…": "Valmistellaan Pythonia…",
   "Installing the voice engine (a few minutes)…": "Asennetaan äänimoottoria (muutama minuutti)…",
   "Downloading the voices…": "Ladataan ääniä…",
-  "Downloading the voices: {percent}%": "Ladataan ääniä: {percent}%"
+  "Downloading the voices: {percent}%": "Ladataan ääniä: {percent}%",
+  "Others now hear {backup}.": "Muut kuulevat nyt {backup}.",
+  "starting again…": "käynnistetään uudelleen…"
 }

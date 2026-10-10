@@ -2626,7 +2626,6 @@
   "so quiet…": "هادئ جدا…",
   "so… bored…": "هكذا…ملل…",
   "starting…": "البدء…",
-  "starting… (a built-in voice covers you until it's ready)": "البدء... (صوت مدمج يغطيك حتى يصبح جاهزًا)",
   "stopped": "توقف",
   "stopped: it took over {n} minute. Check your internet connection and press it again.": [
     "توقف: استغرق الأمر أكثر من {n} دقيقة. تحقق من اتصالك بالإنترنت واضغط عليه مرة أخرى.",
@@ -3128,7 +3127,6 @@
   "That isn't a web link. Copy the picture's address (right-click it → Copy image address) and paste it here.": "هذا ليس رابط ويب. انسخ عنوان الصورة (انقر بزر الماوس الأيمن عليها → انسخ عنوان الصورة) والصقه هنا.",
   "There's no picture at that link. Right-click the picture → Copy image address, and paste that.": "لا توجد صورة على هذا الرابط. انقر بزر الماوس الأيمن على الصورة → انسخ عنوان الصورة، ثم الصقه.",
   "Couldn't get the picture ({error}).": "تعذر الحصول على الصورة ( {error} ).",
-  "starting again… (a built-in voice covers you until it's ready)": "البدء من جديد... (صوت مدمج يغطيك حتى يصبح جاهزًا)",
   "huh?! wha…": "هاه؟! وا...",
   "five more minutes…": "خمس دقائق أخرى…",
   "it's the middle of the night!": "إنه منتصف الليل!",
@@ -3257,7 +3255,6 @@
   "Voice effects off — mic unchanged": "تم إيقاف تشغيل المؤثرات الصوتية - لم يتغير الميكروفون",
   "Your mic voice is unchanged. Open Voice changer or AI voices below to choose a voice.": "صوت الميكروفون الخاص بك لم يتغير. افتح مغير الصوت أو أصوات الذكاء الاصطناعي أدناه لاختيار صوت.",
   "AI voice off": "إيقاف صوت الذكاء الاصطناعي",
-  "The AI voice stopped: a built-in voice covers you. Click to open AI voices.": "توقف صوت الذكاء الاصطناعي: صوت مدمج يغطيك. انقر لفتح أصوات الذكاء الاصطناعي.",
   "Click to open AI voices.": "انقر لفتح أصوات الذكاء الاصطناعي.",
   "AI voice: {voice}, starting.": "صوت الذكاء الاصطناعي: {voice} ، البدء.",
   "AI voice: {voice}.": "صوت الذكاء الاصطناعي: {voice} .",
@@ -3266,5 +3263,7 @@
   "Getting Python ready…": "جارٍ تجهيز Python…",
   "Installing the voice engine (a few minutes)…": "جارٍ تثبيت محرك الأصوات (بضع دقائق)…",
   "Downloading the voices…": "جارٍ تنزيل الأصوات…",
-  "Downloading the voices: {percent}%": "جارٍ تنزيل الأصوات: {percent}%"
+  "Downloading the voices: {percent}%": "جارٍ تنزيل الأصوات: {percent}%",
+  "Others now hear {backup}.": "يسمع الآخرون الآن {backup}.",
+  "starting again…": "جارٍ البدء مجددًا…"
 }

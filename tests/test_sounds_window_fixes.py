@@ -280,7 +280,7 @@ def test_a_sound_pack_is_removed_in_one_go_and_undone(window, tmp_path, qapp):
     assert backup.packs() == {}
 
 
-def test_sounds_from_an_older_import_join_the_pack(window, tmp_path, qapp):
+def test_import_without_provenance_stays_independent(window, tmp_path, qapp):
     door, *_rest = _import_three(window, tmp_path, qapp)
     for m in window.cfg.sounds[3:]:   # imported before packs were kept
         m.pack = m.pack_item = ""
@@ -288,7 +288,9 @@ def test_sounds_from_an_older_import_join_the_pack(window, tmp_path, qapp):
     window.import_package(str(_three_pack(tmp_path)))
     process_events(qapp, lambda: "already" in window.status.text(), 10)
     pid, = backup.packs()
-    assert [m.pack for m in window.cfg.sounds[3:]] == [pid] * 3
+    assert [m.pack for m in window.cfg.sounds[3:]] == [""] * 3
+    window.remove_pack(pid, ask=False)
+    assert len(window.cfg.sounds) == 6
 
 
 def test_the_same_hotkeys_box_keeps_mine_on_escape(window, qapp):

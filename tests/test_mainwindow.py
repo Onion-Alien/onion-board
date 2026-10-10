@@ -612,6 +612,28 @@ def test_pads_fit_the_width_with_no_sideways_scrolling(window, qapp):
     assert not window.is_mini() and window.pads["s0"].width() == 240
 
 
+def test_setup_stacks_long_controls_without_sideways_scrolling(window, qapp):
+    """Long translated controls must fit the viewport, then unfold at a wider size."""
+    from PySide6.QtWidgets import QBoxLayout
+
+    window.cfg.route = "mic"
+    window._update_flow()
+    window.btn_install.setText("Meine Sounds direkt in mein Mikro legen")
+    # The offscreen test font needs wider cards than the shipped Segoe UI font.
+    window._setup_cols.parentWidget().setMaximumWidth(1500)
+    window.tabs.setCurrentWidget(window.setup_page)
+    window.show()
+    for width in (900, 1600, 900):
+        window.resize(width, 700)
+        for _ in range(6):
+            qapp.processEvents()
+            window._refit()
+        assert not window.is_mini()
+        assert window.setup_page.horizontalScrollBar().maximum() == 0
+        assert window._setup_cols.direction() == (
+            QBoxLayout.TopToBottom if width == 900 else QBoxLayout.LeftToRight)
+
+
 def test_an_empty_board_shrinks_with_the_window(window, qapp):
     """No sounds, then a small window: the "drop sound files here" bunny came along at
     the big window's width, so the mini player showed an empty void you had to
