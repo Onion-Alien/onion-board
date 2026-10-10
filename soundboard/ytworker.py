@@ -13,6 +13,7 @@ its errors go back to ytdl, which words them for the user.
 """
 from __future__ import annotations
 
+import copy
 import logging
 import os
 import subprocess
@@ -195,9 +196,70 @@ def _slim(info):
     return out
 
 
-def _lookup(conn, yt_dlp, target: str, opts: dict):
+# Before every search, yt-dlp fetches a YouTube page only to read its settings (the
+# "client config"): about a second, half of a search. They don't change from one
+# search to the next, so a search with `keep` reuses the last ones for CONFIG_KEEP_S.
+# ytdl only asks for that in Direct mode: in Tor mode the settings (they carry a
+# visitor id) would tie searches made over different Tor routes together.
+CONFIG_KEEP_S = 3600
+_CONFIG_IES = ("YoutubeSearch", "YoutubeMusicSearchURL")
+_configs: dict[str, tuple[float, dict]] = {}
+_configs_lock = threading.Lock()
+
+
+def forget_configs():
+    with _configs_lock:
+        _configs.clear()
+
+
+def _keep_configs(ydl, used: list, fresh: bool = False) -> None:
+    """ydl's YouTube searches reuse the kept settings (`used` gets a True each time
+    they do; `fresh`: never, they're fetched and kept for the next search). When
+    yt-dlp has changed and this can't be done, it fetches them as before."""
+    for key in _CONFIG_IES:
+        try:
+            ie = ydl.get_info_extractor(key)
+            fetch = ie._download_ytcfg
+        except Exception:  # noqa: BLE001 - yt-dlp changed: leave it as it is
+            continue
+
+        def cached(client, video_id, fetch=fetch):
+            with _configs_lock:
+                hit = _configs.get(client)
+            if hit and not fresh and time.monotonic() - hit[0] < CONFIG_KEEP_S:
+                used.append(True)
+                return copy.deepcopy(hit[1])
+            cfg = fetch(client, video_id)
+            if cfg:
+                with _configs_lock:
+                    _configs[client] = (time.monotonic(), copy.deepcopy(cfg))
+            return cfg
+        ie._download_ytcfg = cached
+
+
+def extract(yt_dlp, target: str, opts: dict, keep: bool = False):
+    """yt-dlp's look-up of `target`. With `keep`, YouTube searches reuse the kept
+    settings; if that fails, it's done again the old way, with fresh ones."""
+    used: list = []
+    if keep:
+        try:
+            with yt_dlp.YoutubeDL(opts) as ydl:
+                _keep_configs(ydl, used)
+                return ydl.extract_info(target, download=False)
+        except Exception as e:  # noqa: BLE001 - retried below, or raised as it is
+            if not used:
+                raise
+            forget_configs()
+            log.info("search with the kept YouTube settings failed (%s); fresh ones",
+                     str(e)[:120])
     with yt_dlp.YoutubeDL(opts) as ydl:
-        return _slim(ydl.extract_info(target, download=False))
+        if keep:
+            _keep_configs(ydl, [], fresh=True)
+        return ydl.extract_info(target, download=False)
+
+
+def _lookup(conn, yt_dlp, target: str, opts: dict, keep: bool = False):
+    return _slim(extract(yt_dlp, target, opts, keep))
 
 
 def _download(conn, yt_dlp, url: str, opts: dict, max_seconds: float):

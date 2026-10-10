@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- YouTube and YouTube Music searches are about a second faster after the first one:
+  YouTube's page settings are kept for an hour instead of being fetched before every
+  search (Direct connection only; if a search with them fails, it's done again the old
+  way, with fresh ones).
+
 ## 1.9.28 — 2026-10-10
 
 - AI voices: when the AI voice stops, the message says "Others now hear your real
