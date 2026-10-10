@@ -193,7 +193,7 @@ def clean_setting(k: str, v):
         return clean_programs(v)
     if k == "net_mode":   # a mode this version doesn't know (a newer one's): fail
         return v if v in NET_MODES else "proxy"   # closed, never quietly direct
-    if k in ("net_off", "tabs_off", "tips_seen"):   # keys (strings); unknown ones kept, so a
+    if k in ("net_off", "tabs_off", "tips_seen", "sidebar_order"):   # keys; unknown ones kept
         # newer version's switch stays off after a downgrade and an upgrade
         return list(dict.fromkeys(x for x in v if isinstance(x, str) and x))
     if k == "route":   # a newer version's route: back to the cable, the safe default
@@ -367,6 +367,7 @@ class Config:
     pad_view: str = "grid"     # "grid" (cards) or "list" (one-line rows)
     app_card_width: int = 300
     sidebar_open: bool = False   # the tab rail opened out to show the tabs' names
+    sidebar_order: list[str] = field(default_factory=list)   # stable tab keys, visual order
     tab: int = 0     # 0 = sounds, 1 = radio, 2 = apps, 3 = triggers, 4 = voice, 5 = setup
     # Settings > Tabs: the tabs switched off ("radio", "apps", "triggers", "voice"), gone
     # from the window and never built (a new user starts with BASIC_TABS_OFF)

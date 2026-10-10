@@ -9,7 +9,7 @@ import html
 
 from PySide6.QtCore import QEvent, QObject, QRectF, QSize, Qt, Signal
 from PySide6.QtGui import QColor, QPainter, QPen
-from PySide6.QtWidgets import (QBoxLayout, QFrame, QHBoxLayout, QLabel, QPushButton,
+from PySide6.QtWidgets import (QApplication, QBoxLayout, QFrame, QHBoxLayout, QLabel, QPushButton,
                                QSizePolicy, QSpacerItem, QTabWidget, QToolButton,
                                QVBoxLayout, QWidget)
 
@@ -81,6 +81,8 @@ class RailTab(QToolButton):
         super().__init__()
         self.rail, self.index = rail, index
         self._kbd_focus = False
+        self._press_pos = None
+        self._dragging = False
         self.setObjectName("railtab")
         self.setCheckable(True)   # (the rail checks the current one: see SideRail.sync)
         self.setCursor(Qt.PointingHandCursor)
@@ -114,11 +116,40 @@ class RailTab(QToolButton):
         self.update()
 
     def mousePressEvent(self, e):
+        if e.button() == Qt.LeftButton:
+            self._press_pos = e.globalPosition().toPoint()
+            self._dragging = False
         # TabFocus keeps the old tab focused after clicking another one.
         for b in self.rail.buttons:
             b._kbd_focus = False
             b.update()
         super().mousePressEvent(e)
+
+    def mouseMoveEvent(self, e):
+        if self._press_pos is not None and e.buttons() & Qt.LeftButton:
+            pos = e.globalPosition().toPoint()
+            if (pos - self._press_pos).manhattanLength() >= QApplication.startDragDistance():
+                self._dragging = True
+                self.setDown(False)
+                self.setCursor(Qt.ClosedHandCursor)
+            if self._dragging:
+                self.rail.preview_move(self, self.rail.mapFromGlobal(pos))
+                e.accept()
+                return
+        super().mouseMoveEvent(e)
+
+    def mouseReleaseEvent(self, e):
+        if e.button() == Qt.LeftButton:
+            dragging = self._dragging
+            self._press_pos = None
+            self._dragging = False
+            self.setCursor(Qt.PointingHandCursor)
+            if dragging:
+                self.setDown(False)
+                self.rail.finish_move(self, self.rail.mapFromGlobal(e.globalPosition().toPoint()))
+                e.accept()
+                return
+        super().mouseReleaseEvent(e)
 
     def keyPressEvent(self, e):
         """Up / down: the tab before / after it, as the arrows did on the old top bar
@@ -167,9 +198,11 @@ class SideRail(QFrame):
     shut button. Extras show their "railtext" property as their words while open.
     `on_open(bool)` is called when the user opens or shuts it (to save it)."""
 
+    orderChanged = Signal(list)
+
     def __init__(self, tabs: SideTabs, logo: QWidget, brand: QLabel, byline: QLabel,
                  extras: list[QPushButton], is_open: bool, foot: list[QPushButton] = (),
-                 on_open=None, status: list[QPushButton] = ()):
+                 on_open=None, status: list[QPushButton] = (), order=()):
         super().__init__()
         self.setObjectName("sidebar")
         self.tabs = tabs
@@ -177,6 +210,7 @@ class SideRail(QFrame):
         self._squeezed = False   # a narrow window: shut, whatever was picked
         self._compact = False    # a short window: the buttons closer together
         self._on_open = on_open
+        self._drop_y = None
         lay = self._lay = QVBoxLayout(self)
         lay.setSpacing(4)
         # the onion in the icons' column, open or shut, and when open the name and
@@ -209,6 +243,7 @@ class SideRail(QFrame):
             b.clicked.connect(lambda _c=False, i=i: (tabs.setCurrentIndex(i), self.sync()))
             lay.addWidget(b)
             self.buttons.append(b)
+        self.set_order(order)
         self.extras = [*extras, *foot]
         for w in self.extras:   # the keyboard's ring, not one left by a click
             w.setFocusPolicy(Qt.TabFocus)
@@ -240,6 +275,54 @@ class SideRail(QFrame):
         tabs.currentChanged.connect(self.sync)
         self._apply()
 
+    def set_order(self, order):
+        """Move the rail buttons, retaining the pages' fixed indexes everywhere else."""
+        by_index = {b.index: b for b in self.buttons}
+        indexes = list(dict.fromkeys(i for i in order if i in by_index))
+        indexes.extend(i for i in by_index if i not in indexes)
+        before = self.buttons[0].previousInFocusChain() if self.buttons else None
+        after = self.buttons[-1].nextInFocusChain() if self.buttons else None
+        for b in self.buttons:
+            self._lay.removeWidget(b)
+        self.buttons = [by_index[i] for i in indexes]
+        for slot, b in enumerate(self.buttons, 2):
+            self._lay.insertWidget(slot, b)
+        if before not in self.buttons and after not in self.buttons:
+            chain = [before, *self.buttons, after]
+            for first, second in zip(chain, chain[1:]):
+                if first is not None and second is not None:
+                    QWidget.setTabOrder(first, second)
+
+    def _move_target(self, button, pos):
+        visible = [b for b in self.buttons if b.isVisible()]
+        if len(visible) < 2 or button not in visible or not self.rect().contains(pos):
+            return None
+        others = [b for b in visible if b is not button]
+        slot = sum(pos.y() > b.geometry().center().y() for b in others)
+        y = (others[slot].geometry().top() - 2 if slot < len(others)
+             else others[-1].geometry().bottom() + 2)
+        return visible, others, slot, y
+
+    def preview_move(self, button, pos):
+        target = self._move_target(button, pos)
+        self._drop_y = target[3] if target else None
+        self.update()
+
+    def finish_move(self, button, pos):
+        target = self._move_target(button, pos)
+        self._drop_y = None
+        self.update()
+        if target is None:
+            return
+        visible, others, slot, _y = target
+        others.insert(slot, button)
+        # Hidden tabs keep their slots when More tabs adds them later.
+        replacements = iter(others)
+        order = [next(replacements).index if b in visible else b.index for b in self.buttons]
+        if order != [b.index for b in self.buttons]:
+            self.set_order(order)
+            self.orderChanged.emit(order)
+
     def changeEvent(self, e):
         super().changeEvent(e)
         if e.type() == QEvent.LayoutDirectionChange and hasattr(self, "toggle"):
@@ -250,6 +333,11 @@ class SideRail(QFrame):
         beside it, in the highlight colour, with its icon in that colour too. A wash
         like the old tab bar's looked just like the current tab's fill."""
         super().paintEvent(e)
+        if self._drop_y is not None:
+            p = QPainter(self)
+            p.setPen(QPen(QColor(theme.T["accent"]), 2))
+            p.drawLine(SIDE_OPEN, self._drop_y, self.width() - SIDE_OPEN, self._drop_y)
+            p.end()
         if not self.tabs.property("_live_tint"):
             return   # the dot: in the icon itself (livedot / icons.set_tab_icon)
         p = QPainter(self)

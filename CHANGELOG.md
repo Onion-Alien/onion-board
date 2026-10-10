@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- **Reorder sidebar tabs.** Hold the left mouse button on a tab and drag it up or
+  down. The new order is remembered next time you open the app.
+
 - **No stray outline on Sounds.** Sidebar tabs show a focus ring only during
   keyboard navigation, so startup focus no longer looks like a second selected tab.
 - ***Count me in* also counts roughly how long the app was open** since the last daily count (under 15 minutes, up to an hour, 1-3 hours, 3-8 hours or more), so we can tell quick checks from all-evening use. Never the times of day; nothing is sent while it's off.
