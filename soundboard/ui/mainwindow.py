@@ -2917,7 +2917,10 @@ class MainWindow(QMainWindow):
             QTimer.singleShot(int(self.SETTLE_S * 1000) + 200, self._update_status)
             self.cfg.route = "cable"   # so set_route() applies "mic" in full
             self.set_route("mic")
-            self.toast(_("Done: Discord and games hear your sounds through your mic now."))
+            from soundboard.ui.setupwizard import SetupWizard
+            modal = QApplication.activeModalWidget()
+            if not isinstance(modal, SetupWizard):
+                self.toast(_("Done: Discord and games hear your sounds through your mic now."))
             if is_hands_free(mic):
                 self.toast(_("That's a Bluetooth headset's call mic: some of them skip Windows' "
                              "sound effects. If nobody hears your sounds, use the headset's USB "

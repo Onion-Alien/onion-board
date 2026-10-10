@@ -16,9 +16,9 @@ from __future__ import annotations
 import html
 from collections.abc import Callable
 
-from PySide6.QtCore import QEvent, QObject, Qt, QTimer, QUrl
+from PySide6.QtCore import QEvent, QObject, QPointF, Qt, QTimer, QUrl
 from PySide6.QtGui import QDesktopServices, QIcon
-from PySide6.QtWidgets import QApplication, QLabel, QWidget
+from PySide6.QtWidgets import QApplication, QDialog, QLabel, QPushButton, QWidget
 
 from soundboard import theme
 from soundboard import errors
@@ -220,7 +220,18 @@ class _Toast(QLabel):
         # the height for this width: adjustSize() kept the old one when the window
         # shrank under a toast (into the mini player), cutting its last lines off
         self.resize(w, self.heightForWidth(w))
-        self.move((host.width() - w) // 2, max(0, host.height() - self.height() - 18))
+        bottom_pad = 18
+        if isinstance(host, QDialog):
+            buttons = [b for b in host.findChildren(QPushButton)
+                       if b.isVisible() and b is not self and b.parent() is not self]
+            if buttons:
+                bottom_btns = [
+                    b for b in buttons
+                    if b.mapTo(host, QPointF(0, 0)).y() + b.height() >= host.height() - 70]
+                if bottom_btns:
+                    top_y = min(b.mapTo(host, QPointF(0, 0)).y() for b in bottom_btns)
+                    bottom_pad = max(18, int(host.height() - top_y + 8))
+        self.move((host.width() - w) // 2, max(0, int(host.height() - self.height() - bottom_pad)))
 
     def eventFilter(self, obj: QObject, ev: QEvent) -> bool:
         if ev.type() == QEvent.Resize and self.isVisible():
