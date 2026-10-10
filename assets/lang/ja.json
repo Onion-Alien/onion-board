@@ -2609,7 +2609,6 @@
   "Only stations streaming at least this bitrate": "少なくともこのビットレートでストリーミングしているステーションのみ",
   "Others hear the radio. Click so only you do.": "他の人はラジオを聞いています。あなただけがそうするようにクリックしてください。",
   "Play a random station": "ランダムなステーションを再生する",
-  "Play a random station from the list showing (pick a genre or country first to narrow it)": "表示されているリストからランダムな放送局を再生します (最初にジャンルまたは国を選択して絞り込みます)",
   "Playing now": "今プレイ中",
   "Playing {name}": "{name}をプレイしています",
   "Playing {name}: {title}": "{name}を再生中: {title}",

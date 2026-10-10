@@ -2663,7 +2663,6 @@
   "Only stations streaming at least this bitrate": "केवल स्टेशन ही कम से कम इस बिटरेट की स्ट्रीमिंग करते हैं",
   "Others hear the radio. Click so only you do.": "अन्य लोग रेडियो सुनते हैं। क्लिक करें ताकि केवल आप ही ऐसा करें.",
   "Play a random station": "एक यादृच्छिक स्टेशन खेलें",
-  "Play a random station from the list showing (pick a genre or country first to narrow it)": "प्रदर्शित सूची से एक यादृच्छिक स्टेशन चलाएं (इसे सीमित करने के लिए पहले एक शैली या देश चुनें)",
   "Playing now": "अभी खेल रहा हूँ",
   "Playing {name}": "{name} चला रहा हूँ",
   "Playing {name}: {title}": "{name} चलाया जा रहा है : {title}",

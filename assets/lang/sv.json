@@ -2663,7 +2663,6 @@
   "Only stations streaming at least this bitrate": "Endast stationer som streamar minst denna bithastighet",
   "Others hear the radio. Click so only you do.": "Andra hör radion. Klicka så bara du gör.",
   "Play a random station": "Spela en slumpmässig station",
-  "Play a random station from the list showing (pick a genre or country first to narrow it)": "Spela en slumpmässig station från listan som visas (välj en genre eller ett land först för att begränsa den)",
   "Playing now": "Spelar nu",
   "Playing {name}": "Spelar {name}",
   "Playing {name}: {title}": "Spelar {name} : {title}",
