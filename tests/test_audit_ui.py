@@ -145,7 +145,7 @@ def test_installing_greys_the_guide_buttons_without_disabling_them(qapp):
     stack.setCurrentIndex(2)
     went = []
     fake = SimpleNamespace(stack=stack, btn_next=QPushButton(), btn_back=QPushButton(),
-                           _proc=object(), PAGES=4, route_ok=lambda: False,
+                           _proc=object(), PAGES=4, base=0, route_ok=lambda: False,
                            go=went.append, finish=lambda: went.append("finish"))
     setupwizard.SetupWizard._update_next(fake)
     assert fake.btn_next.isEnabled() and busy.is_busy(fake.btn_next)

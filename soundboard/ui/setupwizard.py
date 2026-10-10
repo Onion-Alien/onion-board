@@ -8,6 +8,9 @@ Step-by-step guide button any time after).
                                            it if not; or another device / nowhere instead)
   4. Tell Discord / your game / OBS       (the one setting outside the app)
 
+On the very first launch only (Config.use_mode is "" just then), a page before them
+asks what the app is for (USES) and switches on the tabs that fit.
+
 Every choice is applied to the engine as it's made, so the level bar and the test
 sound use the real devices. The window's own device boxes are refreshed at the end.
 """
@@ -156,6 +159,32 @@ TITLE_CSS = "font-size:17pt; font-weight:800;"
 BODY_CSS = "font-size:11pt;"
 
 
+def uses() -> tuple[tuple[str, str, str, str], ...]:
+    """The first page's answers to "What's it for?": (key, icon, title, what it adds).
+    A function, not a constant: the words follow the language picked at start-up."""
+    return (("normal", "volume", _("Just sounds"),
+             _("Play sounds in Discord and games. Nothing else to learn.")),
+            ("streamer", "live", _("Streaming"),
+             _("Adds the <b>Apps</b> tab (send music or a game to your stream). The last step "
+               "links the <b>Streamer guide</b> (Stream Deck keys, chat commands).")),
+            ("games", "gamepad", _("Competitive games"),
+             _("Adds the <b>Triggers</b> tab: Onion Watch plays a sound when something "
+               "shows up on your screen (a kill, \u201cYOU DIED\u201d).")),
+            ("all", "star", _("Show me everything"),
+             _("Every tab: <b>Radio</b>, <b>Apps</b> and <b>Triggers</b> too.")))
+
+
+# the tabs each answer switches on (the rest stay as they are: a plain soundboard)
+USE_TABS = {"streamer": ("apps",), "games": ("triggers",),
+            "all": ("radio", "apps", "triggers")}
+
+
+def apply_use(win, use: str):
+    """Switch on the tabs that fit what the app is for (Settings > Tabs can undo it)."""
+    for key in USE_TABS.get(use, ()):
+        win.set_tab_on(key, True)
+
+
 def _ok() -> str:    # status colours readable on the current theme (theme.status)
     return theme.status("ok")
 
@@ -271,6 +300,12 @@ class SetupWizard(QDialog):
                                "mon_device": win.cfg.mon_device}
         self._user_picked: set[str] = set()   # the ones they actually clicked
         self._chose_cable = False   # "Virtual cable instead" clicked here
+        # the first launch only: a "What's it for?" page goes before the mic, and the
+        # device pages move up one (self.base)
+        self._ask_use = win.cfg.use_mode == ""
+        self._use = "normal"
+        self.base = 1 if self._ask_use else 0
+        self.PAGES = SetupWizard.PAGES + self.base
 
         v = QVBoxLayout(self)
         v.setContentsMargins(24, 20, 24, 18)
@@ -280,6 +315,8 @@ class SetupWizard(QDialog):
         v.addWidget(self.progress)
         self.stack = QStackedWidget()
         v.addWidget(self.stack, 1)
+        if self._ask_use:
+            self.stack.addWidget(self._page_use())
         self.stack.addWidget(self._page_mic())
         self.stack.addWidget(self._page_headphones())
         self.stack.addWidget(self._page_cable())
@@ -307,7 +344,7 @@ class SetupWizard(QDialog):
             self.bun_cable.build()
         if win._attaching:
             self.setup_show.start()
-        self.go(2 if resumed or self._proc is not None or win._attaching else 0)
+        self.go(self.base + 2 if resumed or self._proc is not None or win._attaching else 0)
 
     # ------------------------------------------------------------------ pages
     def _choice_list(self, names: list[str], current: str | None,
@@ -346,6 +383,68 @@ class SetupWizard(QDialog):
         scroll.setFrameShape(QFrame.NoFrame)
         scroll.setWidget(box)
         return scroll, group
+
+    def _page_use(self) -> QWidget:
+        """First launch only: what the app is for. Each answer switches on the tabs
+        that fit (USE_TABS) when they press Next; the words under the tiles say what."""
+        p = QWidget()
+        v = QVBoxLayout(p)
+        v.addLayout(_header(_("What will you use Onion Board for?"),
+                            _label(_("Pick the closest one. It only decides which tabs you "
+                                     "start with: change it any time in <b>Settings</b> "
+                                     "\u2192 <b>Tabs</b>.")),
+                            BunnyWidget("star")))
+        box = QWidget()
+        t = theme.T
+        box.setStyleSheet(   # the device pages' tiles (_choice_list)
+            f"QRadioButton#choice {{ font-size:12pt; padding:11px 14px; spacing:12px; "
+            f"background:{t['panel']}; border:1px solid transparent; border-radius:10px; }}"
+            f"QRadioButton#choice:hover {{ background:{t['card_hi']}; "
+            f"border-color:{t['border_hi']}; }}"
+            f"QRadioButton#choice:checked {{ background:{t['card_hi']}; "
+            f"border:2px solid {t['accent']}; padding:10px 13px; }}")
+        bv = QVBoxLayout(box)
+        bv.setContentsMargins(0, 0, 0, 0)
+        bv.setSpacing(8)
+        self.use_group = QButtonGroup(box)
+        self.use_buttons: dict[str, QRadioButton] = {}
+        self._use_words: dict[str, str] = {}
+        for key, icon, title, words in uses():
+            rb = QRadioButton(title)
+            rb.setObjectName("choice")
+            icons.set_icon(rb, icon, size=20)
+            rb.setProperty("use", key)
+            rb.setChecked(key == self._use)
+            self.use_group.addButton(rb)
+            bv.addWidget(rb)
+            self.use_buttons[key] = rb
+            self._use_words[key] = words
+        v.addSpacing(6)
+        v.addWidget(box)
+        v.addSpacing(10)
+        card, cl = _card(14, 6, roomy=False)
+        self.use_hint = _label("")
+        cl.addWidget(self.use_hint)
+        v.addWidget(card)
+        v.addStretch(1)
+        self.use_group.buttonClicked.connect(lambda b: self._pick_use(b.property("use")))
+        self._pick_use(self._use)
+        return p
+
+    def _pick_use(self, key: str):
+        self._use = key
+        self.use_hint.setText(self._use_words[key])
+
+    def _save_use(self):
+        """Leaving the "What's it for?" page: remember the answer (so it's never asked
+        again, even if the guide is closed later) and add the tabs that fit."""
+        cfg = self.win.cfg
+        if cfg.use_mode == self._use:
+            return
+        cfg.use_mode = self._use
+        apply_use(self.win, self._use)
+        cfg.save()
+        self._fill_discord()   # the streamer guide's button on the last page
 
     def _page_mic(self) -> QWidget:
         p = QWidget()
@@ -617,6 +716,14 @@ class SetupWizard(QDialog):
                                       "Meet): the settings that matter"))
         self.btn_meeting.clicked.connect(lambda: self.show_guide("meeting"))
         games.addWidget(self.btn_meeting)
+        # said "Streaming" on the first page: the remote-control guide, right here
+        self.btn_streamer = QPushButton(_("Streamer guide"))
+        icons.set_icon(self.btn_streamer, "live")
+        self.btn_streamer.setToolTip(_("Play sounds from your Stream Deck, channel points and "
+                                       "chat commands"))
+        self.btn_streamer.clicked.connect(self.show_streamer_guide)
+        self.btn_streamer.hide()
+        games.addWidget(self.btn_streamer)
         games.addStretch(1)
         cl.addLayout(games)
         v.addWidget(self.help_card)
@@ -630,17 +737,20 @@ class SetupWizard(QDialog):
     # ------------------------------------------------------------------ navigation
     def go(self, i: int):
         i = max(0, min(self.PAGES - 1, i))
-        if i != 2 and self.setup_show.on:
+        if self._ask_use and self.stack.currentIndex() == 0 and i > 0:
+            self._save_use()   # leaving "What's it for?"
+        page = i - self.base   # 0 mic, 1 headphones, 2 cable, 3 Discord; -1 what it's for
+        if page != 2 and self.setup_show.on:
             self.setup_show._stop()
         self.stack.setCurrentIndex(i)
         self.progress.setText(_("Step {step} of {pages}", step=i + 1, pages=self.PAGES))
         self.btn_back.setVisible(i > 0)
-        self.timer.setInterval(TICK_MS if i == 0 else SLOW_TICK_MS)
-        if i == 2:
+        self.timer.setInterval(TICK_MS if page == 0 else SLOW_TICK_MS)
+        if page == 2:
             self.cable_status.setText(_("Checking…"))
             self.cable_status.repaint()   # the check can take a moment (it may reopen devices)
             self.recheck_cable(rescan=False)
-        elif i == 3:
+        elif page == 3:
             self._fill_discord()
         self._update_next()
 
@@ -656,7 +766,7 @@ class SetupWizard(QDialog):
         busy.set_busy(self.btn_back, installing)
         if i == self.PAGES - 1:
             self.btn_next.setText(_("Finish  ✓"))
-        elif i == 2 and not self.route_ok():
+        elif i == self.base + 2 and not self.route_ok():
             self.btn_next.setText(_("Skip for now  →"))
         else:
             self.btn_next.setText(_("Next  →"))
@@ -699,6 +809,9 @@ class SetupWizard(QDialog):
         self.timer.stop()
         if self.setup_show.on:
             self.setup_show._stop()
+        if not self.win.cfg.use_mode:   # closed on "What's it for?": asked once is enough
+            self.win.cfg.use_mode = "normal"
+            self.win.cfg.save()
         if r != QDialog.Accepted:
             for k, v in self._saved_devices.items():   # keep what they had, unless
                 if k not in self._user_picked:         # they picked another one here
@@ -1037,7 +1150,9 @@ class SetupWizard(QDialog):
         self.discord_tip.setVisible(bool(self.discord_tip.text()))
         games = not self.btn_steam.isHidden()
         self.games_label.setVisible(games)
-        self.help_card.setVisible(games or not self.btn_discord.isHidden())
+        streamer = self.win.cfg.use_mode == "streamer"
+        self.btn_streamer.setVisible(streamer)
+        self.help_card.setVisible(games or streamer or not self.btn_discord.isHidden())
 
     def _fill_discord_text(self):
         cfg = self.win.cfg
@@ -1131,6 +1246,13 @@ class SetupWizard(QDialog):
     def show_steam_guide(self):
         self.show_guide("steam")
 
+    def show_streamer_guide(self):
+        from soundboard.ui.crashdialog import free_dialog
+        from soundboard.ui.streamguide import StreamerGuide
+        g = StreamerGuide(self, self.win)
+        g.exec()
+        free_dialog(g)
+
     def show_guide(self, which: str):
         from soundboard.ui.chatguide import show_guide
         show_guide(which, self, self.win, self._vm)
@@ -1140,7 +1262,7 @@ class SetupWizard(QDialog):
         busy.flash(self.btn_copy, _("✓  Copied"))
 
     def _tick(self):
-        if self.stack.currentIndex() == 0:   # the mic page: its meter and Bun
+        if self.stack.currentIndex() == self.base:   # the mic page: its meter and Bun
             e = self.win.engine
             lvl = e.level_mic if e.mic_stream is not None else 0.0
             self.mic_meter.set_level(lvl)

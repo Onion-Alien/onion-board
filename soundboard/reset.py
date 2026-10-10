@@ -56,7 +56,7 @@ PROGRAM_FIELDS = ("apps", "apps_paths", "apps_hidden")
 # what "Settings" leaves alone: the other parts, what the user made (sounds,
 # categories, triggers, radio favourites) and the app's own bookkeeping
 KEEP = {"version", "sounds", "categories", "category", "category_hotkeys", "screen",
-        "setup_done", "ptt_key", "update_checked", "update_pending", "update_skip",
+        "setup_done", "use_mode", "ptt_key", "update_checked", "update_pending", "update_skip",
         "stats_id", "stats_sent", "stats_heard", "stats_started", "stats_steps", "mic_first",
         "stats_version", "stats_pending",
         *DEVICE_FIELDS, *PROGRAM_FIELDS}

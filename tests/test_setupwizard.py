@@ -516,14 +516,14 @@ def test_new_users_are_offered_their_mic_first(mic_wizard, monkeypatch):
     from soundboard import directmic
     w, wiz = mic_wizard
     assert w.cfg.route == "mic"
-    wiz.go(2)
+    wiz.go(wiz.base + 2)
     assert not wiz.btn_attach.isHidden() and "straight into my mic" in wiz.btn_attach.text()
     assert "permission once" in wiz.cable_status.text()
     assert "instead" in wiz.btn_cable.text()
-    wiz.go(3)   # not on the mic yet: the last page says so
+    wiz.go(wiz.base + 3)   # not on the mic yet: the last page says so
     assert "isn't on your mic yet" in wiz.discord_text.text()
     monkeypatch.setattr(directmic, "status", lambda name=None: "ready")
-    wiz.go(3)
+    wiz.go(wiz.base + 3)
     assert "nothing to pick" in wiz.discord_title.text()
     assert wiz.btn_copy.isHidden() and not wiz.btn_discord.isHidden()
 
@@ -532,7 +532,7 @@ def test_a_repair_is_offered_as_one(mic_wizard, monkeypatch):
     from soundboard import directmic
     _, wiz = mic_wizard
     monkeypatch.setattr(directmic, "status", lambda name=None: "wiped")
-    wiz.go(2)
+    wiz.go(wiz.base + 2)
     wiz.recheck_cable(rescan=False)
     assert "Repair" in wiz.btn_attach.text() and "repair" in wiz.cable_status.text()
 
@@ -541,7 +541,7 @@ def test_cable_instead_doesnt_reinstall_a_cable_that_is_there(mic_wizard, monkey
     w, wiz = mic_wizard
     monkeypatch.setattr(setupwizard.subprocess, "Popen",
                         lambda *a, **k: pytest.fail("installed the cable again"))
-    wiz.go(2)
+    wiz.go(wiz.base + 2)
     wiz.install_cable()
     assert w.cfg.route == "cable" and wiz._proc is None
 
@@ -571,7 +571,7 @@ def test_mic_attach_plays_show_in_wizard_without_blocking_buttons(mic_wizard, mo
     from soundboard import directmic
     w, wiz = mic_wizard
     wiz.show()
-    wiz.go(2)
+    wiz.go(wiz.base + 2)
     assert not wiz.btn_attach.isHidden()
     assert wiz.setup_show.isHidden()
 
@@ -620,4 +620,53 @@ def test_toast_places_above_dialog_bottom_buttons(qapp):
 
     assert t.y() + t.height() <= btn.y()
     dlg.close()
+
+
+def test_only_a_brand_new_install_is_asked_what_its_for(wizard, app_dir):
+    _, wiz = wizard   # an older config (use_mode saved or missing): no question
+    assert not wiz._ask_use and wiz.base == 0 and wiz.PAGES == 4
+    assert Config.from_raw({"version": 2}).use_mode == "normal"
+    assert FIRST_START.__func__(Config).use_mode == ""
+
+
+def test_the_first_launch_asks_what_its_for_first(mic_wizard):
+    w, wiz = mic_wizard
+    assert wiz._ask_use and wiz.PAGES == 5 and wiz.stack.currentIndex() == 0
+    assert wiz.use_buttons["normal"].isChecked()
+    assert "Step 1 of 5" in wiz.progress.text()
+    wiz.use_buttons["games"].click()
+    assert "Triggers" in wiz.use_hint.text()
+    assert not w.tab_on("triggers")   # nothing changes until Next
+    wiz.next_clicked()
+    assert w.cfg.use_mode == "games" and w.tab_on("triggers")
+    assert not w.tab_on("apps") and not w.tab_on("radio")
+    assert wiz.stack.currentIndex() == wiz.base   # on to the mic
+
+
+def test_streaming_adds_the_apps_tab_and_the_streamer_guide(mic_wizard):
+    w, wiz = mic_wizard
+    wiz.use_buttons["streamer"].click()
+    wiz.next_clicked()
+    assert w.tab_on("apps") and not w.tab_on("triggers")
+    wiz.go(wiz.PAGES - 1)
+    assert not wiz.btn_streamer.isHidden() and wiz.btn_streamer.toolTip()
+
+
+def test_just_sounds_changes_nothing(mic_wizard):
+    w, wiz = mic_wizard
+    off = list(w.cfg.tabs_off)
+    wiz.next_clicked()
+    assert w.cfg.use_mode == "normal" and w.cfg.tabs_off == off
+    wiz.go(wiz.PAGES - 1)
+    assert wiz.btn_streamer.isHidden()
+
+
+def test_closing_on_the_question_never_asks_again(mic_wizard):
+    w, wiz = mic_wizard
+    wiz.done(0)
+    assert w.cfg.use_mode == "normal"
+    again = setupwizard.SetupWizard(w)
+    assert not again._ask_use
+    again.done(0)
+    again.deleteLater()
 

@@ -5,11 +5,15 @@
 - Themes use clean, flat cards and a faint accent glow, without window grain,
   dark background fades or panel textures. High Contrast keeps its strong outlines.
 
+- Quick setup: on the very first launch the guide starts by asking what you'll use Onion
+  Board for. *Just sounds* changes nothing, *Streaming* adds the Apps tab and links
+  the *Streamer guide* on the last step, *Competitive games* adds the Triggers tab
+  (Onion Watch), and *Show me everything* adds every tab. It's asked once only; Settings →
+  Tabs changes it later.
 - Mini player shows connection status and a microphone mute switch. Expanded sidebar
   actions have labels; Setup puts devices and the local mix test first. Sounds groups
   library tools, Voice opens its presets on first visit, and secondary text reads more
   clearly. The full-width drop target is preserved.
-
 - Add sounds and Record use matching rounded buttons, with a subtle gradient on
   Add sounds and a quiet raised surface on Record.
 - AI voices puts Start and live status at the top, with a wider voice picker,
