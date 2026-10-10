@@ -534,7 +534,7 @@ QFrame#soundstoolbar QPushButton#primary:hover { background:$accent_hover; }
 QFrame#soundstoolbar QPushButton#primary:focus { border-color:$text_hi; }
 QFrame#soundstoolbar QPushButton[toolbarMenu="true"] { padding-right:22px; }
 QLineEdit#soundssearch { background:$bg; border:1px solid $border; border-radius:10px;
-    padding:0 10px; }
+    padding:0 10px 0 4px; }
 QLineEdit#soundssearch:hover { border-color:$border_hi; }
 QLineEdit#soundssearch:focus { border-color:$accent; }
 QPushButton#danger { background:$danger_bg; border:1px solid transparent; color:$danger_text; font-weight:600; }
