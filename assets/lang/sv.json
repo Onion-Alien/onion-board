@@ -1354,7 +1354,6 @@
   "What's new": "Nyheter",
   "What's playing": "Vad som spelas",
   "What's switched on (the voice changer, Live, a live tab) is shown in the theme's colour. Slide to pick your own; it stays when you change theme.": "Det som är påslaget (röstförvrängaren, Live, en liveflik) visas i temats färg. Dra för att välja din egen; den blir kvar när du byter tema.",
-  "What's this tab for?": "Vad är den här fliken till för?",
   "Whatever listens to <b>{main}</b> gets your sounds (and your voice, if you send it): OBS, Voicemeeter, a mixer or a capture card.": "Det som lyssnar på <b>{main}</b> får dina ljud (och din röst, om du skickar den): OBS, Voicemeeter, en mixer eller ett capture-kort.",
   "Whatever played last, from a pad, a hotkey or the random key.": "Det som spelades senast, från en ruta, en snabbtangent eller slumptangenten.",
   "When Discord, TeamSpeak, Mumble or a game with a known voice chat is listening to your mic (or the cable), use its mode without asking. With nothing listening, the mode stays as it is.": "När Discord, TeamSpeak, Mumble eller ett spel med känd röstchatt lyssnar på din mikrofon (eller kabeln), använd dess läge utan att fråga. När inget lyssnar förblir läget som det är.",
@@ -3009,5 +3008,10 @@
   "Downloading the voices…": "Laddar ner rösterna…",
   "Downloading the voices: {percent}%": "Laddar ner rösterna: {percent}%",
   "Others now hear {backup}.": "Andra hör nu {backup}.",
-  "starting again…": "startar igen…"
+  "starting again…": "startar igen…",
+  "How Onion Board works": "Så fungerar Onion Board",
+  "How it works": "Så fungerar det",
+  "Onion Board plays your sounds into your mic, so people in Discord or your game hear them the same way they hear you.{gap}Add sounds on the Sounds tab, then double-click one or press its hotkey. The strip at the bottom shows your mic, what others hear and your headphones.{gap}Right-click a tab on the left and pick About this tab to see what it does.": "Onion Board spelar dina ljud in i din mikrofon, så att folk i Discord eller ditt spel hör dem på samma sätt som de hör dig.{gap}Lägg till ljud på fliken Ljud, dubbelklicka sedan på ett eller tryck på dess snabbtangent. Remsan längst ner visar din mikrofon, vad andra hör och dina hörlurar.{gap}Högerklicka på en flik till vänster och välj Om den här fliken för att se vad den gör.",
+  "Put your sounds into the mic you already use, so Discord and games need no changes": "Lägg dina ljud i mikrofonen du redan använder, så behöver Discord och spel inga ändringar",
+  "Straight into my mic instead": "Direkt i min mikrofon i stället"
 }

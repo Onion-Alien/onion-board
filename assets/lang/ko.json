@@ -508,7 +508,6 @@
   "Watch this sound's video while it plays. The sound still goes out as normal; the video is only for you.": "재생하는 동안 이 사운드의 동영상을 봐요. 사운드는 평소처럼 나가고, 동영상은 나만 봐요.",
   "What's new": "새로운 기능",
   "What's playing": "재생 중인 소리",
-  "What's this tab for?": "이 탭은 뭔가요?",
   "Whatever listens to <b>{main}</b> gets your sounds (and your voice, if you send it): OBS, Voicemeeter, a mixer or a capture card.": "<b>{main}</b>을(를) 듣는 것은 모두 사운드(보내면 목소리도)를 받아요: OBS, Voicemeeter, 믹서, 캡처 카드.",
   "When one of these programs comes to the front, the board shows “{category}” by itself. When it closes, the board goes back to what it showed before.": "이 프로그램 중 하나가 앞에 오면 보드가 자동으로 “{category}”을(를) 보여줘요. 닫히면 보드는 전에 보던 화면으로 돌아가요.",
   "Where I dragged it": "내가 끌어다 놓은 곳",
@@ -2945,5 +2944,10 @@
   "Downloading the voices…": "목소리 다운로드 중…",
   "Downloading the voices: {percent}%": "목소리 다운로드 중: {percent}%",
   "Others now hear {backup}.": "다른 사람에게는 지금 {backup}이 들립니다.",
-  "starting again…": "다시 시작 중…"
+  "starting again…": "다시 시작 중…",
+  "How Onion Board works": "Onion Board 작동 방식",
+  "How it works": "작동 방식",
+  "Onion Board plays your sounds into your mic, so people in Discord or your game hear them the same way they hear you.{gap}Add sounds on the Sounds tab, then double-click one or press its hotkey. The strip at the bottom shows your mic, what others hear and your headphones.{gap}Right-click a tab on the left and pick About this tab to see what it does.": "Onion Board는 사운드를 마이크로 재생해요. 그래서 Discord나 게임 속 사람들이 당신 목소리를 듣는 것과 똑같이 사운드를 들어요.{gap}사운드 탭에서 사운드를 추가한 다음, 하나를 더블클릭하거나 단축키를 누르세요. 맨 아래 막대에는 마이크, 다른 사람들이 듣는 것, 헤드폰이 표시돼요.{gap}왼쪽의 탭을 우클릭하고 이 탭에 대해를 고르면 그 탭이 무슨 일을 하는지 볼 수 있어요.",
+  "Put your sounds into the mic you already use, so Discord and games need no changes": "이미 쓰는 마이크에 사운드를 넣어요, 그래서 Discord와 게임은 아무것도 바꿀 필요가 없어요",
+  "Straight into my mic instead": "대신 마이크로 바로"
 }

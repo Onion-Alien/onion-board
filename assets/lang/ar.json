@@ -538,7 +538,6 @@
   "Watch this sound's video while it plays. The sound still goes out as normal; the video is only for you.": "شاهد فيديو هذا الصوت أثناء تشغيله. الصوت يخرج كالمعتاد؛ والفيديو لك وحدك.",
   "What's new": "ما الجديد",
   "What's playing": "ما يُشغَّل",
-  "What's this tab for?": "ما فائدة هذا التبويب؟",
   "Whatever listens to <b>{main}</b> gets your sounds (and your voice, if you send it): OBS, Voicemeeter, a mixer or a capture card.": "أي شيء يستمع إلى <b>{main}</b> يحصل على أصواتك (وصوتك إن أرسلته): OBS، أو Voicemeeter، أو جهاز مزج، أو بطاقة التقاط.",
   "When one of these programs comes to the front, the board shows “{category}” by itself. When it closes, the board goes back to what it showed before.": "عندما يصبح أحد هذه البرامج في المقدمة، تُظهر اللوحة “{category}” تلقائيًا. وعند إغلاقه تعود اللوحة إلى ما كانت تُظهره.",
   "Where I dragged it": "حيث سحبته",
@@ -3265,5 +3264,10 @@
   "Downloading the voices…": "جارٍ تنزيل الأصوات…",
   "Downloading the voices: {percent}%": "جارٍ تنزيل الأصوات: {percent}%",
   "Others now hear {backup}.": "يسمع الآخرون الآن {backup}.",
-  "starting again…": "جارٍ البدء مجددًا…"
+  "starting again…": "جارٍ البدء مجددًا…",
+  "How Onion Board works": "كيف يعمل Onion Board",
+  "How it works": "كيف يعمل",
+  "Onion Board plays your sounds into your mic, so people in Discord or your game hear them the same way they hear you.{gap}Add sounds on the Sounds tab, then double-click one or press its hotkey. The strip at the bottom shows your mic, what others hear and your headphones.{gap}Right-click a tab on the left and pick About this tab to see what it does.": "يشغّل Onion Board أصواتك في الميكروفون الخاص بك، فيسمعها الناس في Discord أو في لعبتك كما يسمعونك تمامًا.{gap}أضف أصواتًا في تبويب \"الأصوات\"، ثم انقر نقرًا مزدوجًا على أحدها أو اضغط مفتاح الاختصار الخاص به. يعرض الشريط السفلي الميكروفون الخاص بك وما يسمعه الآخرون وسماعاتك.{gap}انقر بزر الماوس الأيمن على أحد التبويبات في الشريط الجانبي واختر \"عن هذا التبويب\" لترى ما يفعله.",
+  "Put your sounds into the mic you already use, so Discord and games need no changes": "ضع أصواتك في الميكروفون الذي تستخدمه أصلًا، فلا يحتاج Discord والألعاب إلى أي تغيير",
+  "Straight into my mic instead": "مباشرة إلى الميكروفون بدلًا من ذلك"
 }

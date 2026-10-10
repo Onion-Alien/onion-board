@@ -1371,7 +1371,6 @@
   "What's new": "Co je nového",
   "What's playing": "Co hraje",
   "What's switched on (the voice changer, Live, a live tab) is shown in the theme's colour. Slide to pick your own; it stays when you change theme.": "Co je zapnuté (měnič hlasu, Živě, živá karta), se ukazuje v barvě motivu. Posuň a vyber si vlastní; zůstane i při změně motivu.",
-  "What's this tab for?": "K čemu je tahle karta?",
   "Whatever listens to <b>{main}</b> gets your sounds (and your voice, if you send it): OBS, Voicemeeter, a mixer or a capture card.": "Cokoli poslouchá <b>{main}</b>, dostane tvoje zvuky (a tvůj hlas, pokud ho posíláš): OBS, Voicemeeter, mixpult nebo záznamová karta.",
   "Whatever played last, from a pad, a hotkey or the random key.": "Cokoli hrálo naposledy, z padu, zkratky nebo náhodné klávesy.",
   "When Discord, TeamSpeak, Mumble or a game with a known voice chat is listening to your mic (or the cable), use its mode without asking. With nothing listening, the mode stays as it is.": "Když tvůj mikrofon (nebo kabel) poslouchá Discord, TeamSpeak, Mumble nebo hra se známým voice chatem, použije jeho režim bez ptaní. Když nic neposlouchá, režim zůstane, jak je.",
@@ -3073,5 +3072,10 @@
   "Downloading the voices…": "Stahuji hlasy…",
   "Downloading the voices: {percent}%": "Stahuji hlasy: {percent}%",
   "Others now hear {backup}.": "Ostatní nyní slyší {backup}.",
-  "starting again…": "znovu se spouští…"
+  "starting again…": "znovu se spouští…",
+  "How Onion Board works": "Jak Onion Board funguje",
+  "How it works": "Jak to funguje",
+  "Onion Board plays your sounds into your mic, so people in Discord or your game hear them the same way they hear you.{gap}Add sounds on the Sounds tab, then double-click one or press its hotkey. The strip at the bottom shows your mic, what others hear and your headphones.{gap}Right-click a tab on the left and pick About this tab to see what it does.": "Onion Board pouští tvoje zvuky do tvého mikrofonu, takže je lidé v Discordu nebo ve hře slyší stejně jako tebe.{gap}Přidej zvuky na kartě Zvuky a pak na jeden dvakrát klikni nebo zmáčkni jeho zkratku. Pruh dole ukazuje tvůj mikrofon, co slyší ostatní, a tvoje sluchátka.{gap}Klikni pravým tlačítkem na kartu vlevo a vyber „O této kartě“, ať vidíš, co dělá.",
+  "Put your sounds into the mic you already use, so Discord and games need no changes": "Pusť svoje zvuky do mikrofonu, který už používáš, takže v Discordu ani ve hrách nemusíš nic měnit",
+  "Straight into my mic instead": "Místo toho rovnou do mikrofonu"
 }

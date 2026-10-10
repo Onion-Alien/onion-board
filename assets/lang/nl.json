@@ -514,7 +514,6 @@
   "Watch this sound's video while it plays. The sound still goes out as normal; the video is only for you.": "Bekijk de video van dit geluid terwijl het speelt. Het geluid gaat gewoon naar buiten; de video is alleen voor jou.",
   "What's new": "Wat is er nieuw",
   "What's playing": "Wat er speelt",
-  "What's this tab for?": "Waar is dit tabblad voor?",
   "Whatever listens to <b>{main}</b> gets your sounds (and your voice, if you send it): OBS, Voicemeeter, a mixer or a capture card.": "Alles wat naar <b>{main}</b> luistert, krijgt je geluiden (en je stem, als je die stuurt): OBS, Voicemeeter, een mixer of een capturekaart.",
   "When one of these programs comes to the front, the board shows “{category}” by itself. When it closes, the board goes back to what it showed before.": "Als een van deze programma's vooraan komt, toont de board vanzelf “{category}”. Als het sluit, gaat de board terug naar wat hij eerst toonde.",
   "Where I dragged it": "Waar ik hem heen sleepte",
@@ -3009,5 +3008,10 @@
   "Downloading the voices…": "Stemmen downloaden…",
   "Downloading the voices: {percent}%": "Stemmen downloaden: {percent}%",
   "Others now hear {backup}.": "Anderen horen nu {backup}.",
-  "starting again…": "opnieuw starten…"
+  "starting again…": "opnieuw starten…",
+  "How Onion Board works": "Hoe Onion Board werkt",
+  "How it works": "Hoe het werkt",
+  "Onion Board plays your sounds into your mic, so people in Discord or your game hear them the same way they hear you.{gap}Add sounds on the Sounds tab, then double-click one or press its hotkey. The strip at the bottom shows your mic, what others hear and your headphones.{gap}Right-click a tab on the left and pick About this tab to see what it does.": "Onion Board speelt je geluiden af in je microfoon, zodat mensen in Discord of je game ze net zo horen als ze jou horen.{gap}Voeg geluiden toe op het tabblad Geluiden en dubbelklik er dan een of druk op de sneltoets ervan. De balk onderaan toont je microfoon, wat anderen horen en je koptelefoon.{gap}Rechtsklik een tabblad links en kies Over dit tabblad om te zien wat het doet.",
+  "Put your sounds into the mic you already use, so Discord and games need no changes": "Zet je geluiden in de microfoon die je al gebruikt, zodat je in Discord en games niets hoeft te veranderen",
+  "Straight into my mic instead": "In plaats daarvan rechtstreeks in mijn mic"
 }

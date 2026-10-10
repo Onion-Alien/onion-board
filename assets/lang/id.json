@@ -508,7 +508,6 @@
   "Watch this sound's video while it plays. The sound still goes out as normal; the video is only for you.": "Tonton video suara ini selagi diputar. Suaranya tetap terkirim seperti biasa; videonya hanya untukmu.",
   "What's new": "Yang baru",
   "What's playing": "Yang sedang diputar",
-  "What's this tab for?": "Tab ini untuk apa?",
   "Whatever listens to <b>{main}</b> gets your sounds (and your voice, if you send it): OBS, Voicemeeter, a mixer or a capture card.": "Apa pun yang mendengarkan <b>{main}</b> akan menerima suaramu (dan suara bicaramu, kalau kamu kirim): OBS, Voicemeeter, mixer, atau capture card.",
   "When one of these programs comes to the front, the board shows “{category}” by itself. When it closes, the board goes back to what it showed before.": "Saat salah satu program ini muncul di depan, board otomatis menampilkan “{category}”. Saat program itu ditutup, board kembali ke tampilan sebelumnya.",
   "Where I dragged it": "Tempat aku menyeretnya",
@@ -2945,5 +2944,10 @@
   "Downloading the voices…": "Mengunduh suara…",
   "Downloading the voices: {percent}%": "Mengunduh suara: {percent}%",
   "Others now hear {backup}.": "Orang lain sekarang mendengar {backup}.",
-  "starting again…": "memulai lagi…"
+  "starting again…": "memulai lagi…",
+  "How Onion Board works": "Cara kerja Onion Board",
+  "How it works": "Cara kerjanya",
+  "Onion Board plays your sounds into your mic, so people in Discord or your game hear them the same way they hear you.{gap}Add sounds on the Sounds tab, then double-click one or press its hotkey. The strip at the bottom shows your mic, what others hear and your headphones.{gap}Right-click a tab on the left and pick About this tab to see what it does.": "Onion Board memutar suaramu ke mic-mu, jadi orang di Discord atau game-mu mendengarnya sama seperti mereka mendengarmu.{gap}Tambahkan suara di tab Suara, lalu klik dua kali salah satunya atau tekan hotkey-nya. Bilah di bawah menampilkan mic-mu, apa yang orang lain dengar, dan headphone-mu.{gap}Klik kanan tab di kiri dan pilih Tentang tab ini untuk melihat apa fungsinya.",
+  "Put your sounds into the mic you already use, so Discord and games need no changes": "Masukkan suaramu ke mic yang sudah kamu pakai, jadi Discord dan game tidak perlu diubah",
+  "Straight into my mic instead": "Langsung ke mic-ku saja"
 }

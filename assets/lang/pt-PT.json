@@ -1354,7 +1354,6 @@
   "What's new": "Novidades",
   "What's playing": "O que está a tocar",
   "What's switched on (the voice changer, Live, a live tab) is shown in the theme's colour. Slide to pick your own; it stays when you change theme.": "O que está ligado (o modificador de voz, Em direto, um separador ativo) aparece na cor do tema. Desliza para escolheres a tua; mantém-se quando mudas de tema.",
-  "What's this tab for?": "Para que serve este separador?",
   "Whatever listens to <b>{main}</b> gets your sounds (and your voice, if you send it): OBS, Voicemeeter, a mixer or a capture card.": "O que estiver a ouvir <b>{main}</b> recebe os teus sons (e a tua voz, se a enviares): OBS, Voicemeeter, uma mesa de mistura ou uma placa de captura.",
   "Whatever played last, from a pad, a hotkey or the random key.": "O que tocou por último, de um botão, de um atalho ou da tecla aleatória.",
   "When Discord, TeamSpeak, Mumble or a game with a known voice chat is listening to your mic (or the cable), use its mode without asking. With nothing listening, the mode stays as it is.": "Quando o Discord, o TeamSpeak, o Mumble ou um jogo com um chat de voz conhecido está a ouvir o teu microfone (ou o cabo), usa o modo dele sem perguntar. Sem nada a ouvir, o modo fica como está.",
@@ -3009,5 +3008,10 @@
   "Downloading the voices…": "A transferir as vozes…",
   "Downloading the voices: {percent}%": "A transferir as vozes: {percent}%",
   "Others now hear {backup}.": "Os outros ouvem agora {backup}.",
-  "starting again…": "a iniciar novamente…"
+  "starting again…": "a iniciar novamente…",
+  "How Onion Board works": "Como funciona o Onion Board",
+  "How it works": "Como funciona",
+  "Onion Board plays your sounds into your mic, so people in Discord or your game hear them the same way they hear you.{gap}Add sounds on the Sounds tab, then double-click one or press its hotkey. The strip at the bottom shows your mic, what others hear and your headphones.{gap}Right-click a tab on the left and pick About this tab to see what it does.": "O Onion Board toca os teus sons no teu microfone, por isso as pessoas no Discord ou no teu jogo ouvem-nos da mesma forma que te ouvem a ti.{gap}Adiciona sons no separador Sons e depois faz duplo clique num deles ou carrega no atalho dele. A barra em baixo mostra o teu microfone, o que os outros ouvem e os teus auscultadores.{gap}Clica com o botão direito num separador à esquerda e escolhe Acerca deste separador para veres o que faz.",
+  "Put your sounds into the mic you already use, so Discord and games need no changes": "Põe os teus sons no microfone que já usas, assim o Discord e os jogos não precisam de alterações",
+  "Straight into my mic instead": "Diretamente no meu microfone"
 }

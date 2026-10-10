@@ -508,7 +508,6 @@
   "Watch this sound's video while it plays. The sound still goes out as normal; the video is only for you.": "ดูวิดีโอของเสียงนี้ระหว่างที่เล่น เสียงยังส่งออกไปตามปกติ วิดีโอมีไว้ให้คุณดูคนเดียว",
   "What's new": "มีอะไรใหม่",
   "What's playing": "สิ่งที่กำลังเล่น",
-  "What's this tab for?": "แท็บนี้มีไว้ทำอะไร?",
   "Whatever listens to <b>{main}</b> gets your sounds (and your voice, if you send it): OBS, Voicemeeter, a mixer or a capture card.": "อะไรก็ตามที่ฟัง <b>{main}</b> จะได้เสียงของคุณ (และเสียงพูดคุณ ถ้าคุณส่ง): OBS, Voicemeeter, มิกเซอร์ หรือการ์ดแคปเจอร์",
   "When one of these programs comes to the front, the board shows “{category}” by itself. When it closes, the board goes back to what it showed before.": "เมื่อโปรแกรมใดในนี้ขึ้นมาด้านหน้า บอร์ดจะแสดง “{category}” เอง เมื่อโปรแกรมปิด บอร์ดจะกลับไปแสดงสิ่งที่แสดงก่อนหน้า",
   "Where I dragged it": "ตรงที่ฉันลากไว้",
@@ -2945,5 +2944,10 @@
   "Downloading the voices…": "กำลังดาวน์โหลดเสียง…",
   "Downloading the voices: {percent}%": "กำลังดาวน์โหลดเสียง: {percent}%",
   "Others now hear {backup}.": "ตอนนี้คนอื่นได้ยิน {backup}",
-  "starting again…": "กำลังเริ่มใหม่…"
+  "starting again…": "กำลังเริ่มใหม่…",
+  "How Onion Board works": "Onion Board ทำงานอย่างไร",
+  "How it works": "วิธีการทำงาน",
+  "Onion Board plays your sounds into your mic, so people in Discord or your game hear them the same way they hear you.{gap}Add sounds on the Sounds tab, then double-click one or press its hotkey. The strip at the bottom shows your mic, what others hear and your headphones.{gap}Right-click a tab on the left and pick About this tab to see what it does.": "Onion Board เล่นเสียงของคุณเข้าไมค์ของคุณ คนใน Discord หรือในเกมจึงได้ยินเสียงเหล่านั้นแบบเดียวกับที่ได้ยินคุณ{gap}เพิ่มเสียงในแท็บเสียง แล้วดับเบิลคลิกที่เสียงหนึ่งหรือกดปุ่มลัดของเสียงนั้น แถบด้านล่างแสดงไมค์ของคุณ สิ่งที่คนอื่นได้ยิน และหูฟังของคุณ{gap}คลิกขวาที่แท็บด้านซ้ายแล้วเลือก เกี่ยวกับแท็บนี้ เพื่อดูว่าแท็บนั้นทำอะไร",
+  "Put your sounds into the mic you already use, so Discord and games need no changes": "ส่งเสียงของคุณเข้าไมค์ที่ใช้อยู่แล้ว Discord และเกมจึงไม่ต้องเปลี่ยนอะไร",
+  "Straight into my mic instead": "เข้าไมค์โดยตรงแทน"
 }

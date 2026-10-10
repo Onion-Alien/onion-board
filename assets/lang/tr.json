@@ -514,7 +514,6 @@
   "Watch this sound's video while it plays. The sound still goes out as normal; the video is only for you.": "Bu ses çalarken videosunu izle. Ses yine normal şekilde gider; video sadece senin için.",
   "What's new": "Yenilikler",
   "What's playing": "Çalan",
-  "What's this tab for?": "Bu sekme ne işe yarar?",
   "Whatever listens to <b>{main}</b> gets your sounds (and your voice, if you send it): OBS, Voicemeeter, a mixer or a capture card.": "<b>{main}</b> ucunu dinleyen her şey seslerini (ve gönderiyorsan sesini) alır: OBS, Voicemeeter, bir mikser ya da bir yakalama kartı.",
   "When one of these programs comes to the front, the board shows “{category}” by itself. When it closes, the board goes back to what it showed before.": "Bu programlardan biri öne gelince panel “{category}” kategorisini kendiliğinden gösterir. Program kapanınca panel önceki görünümüne döner.",
   "Where I dragged it": "Sürüklediğim yer",
@@ -3009,5 +3008,10 @@
   "Downloading the voices…": "Sesler indiriliyor…",
   "Downloading the voices: {percent}%": "Sesler indiriliyor: {percent}%",
   "Others now hear {backup}.": "Diğerleri artık {backup} duyuyor.",
-  "starting again…": "yeniden başlatılıyor…"
+  "starting again…": "yeniden başlatılıyor…",
+  "How Onion Board works": "Onion Board nasıl çalışır",
+  "How it works": "Nasıl çalışır",
+  "Onion Board plays your sounds into your mic, so people in Discord or your game hear them the same way they hear you.{gap}Add sounds on the Sounds tab, then double-click one or press its hotkey. The strip at the bottom shows your mic, what others hear and your headphones.{gap}Right-click a tab on the left and pick About this tab to see what it does.": "Onion Board seslerini mikrofonuna çalar, böylece Discord'daki ya da oyunundaki insanlar onları seni duydukları gibi duyar.{gap}Sesler sekmesinden ses ekle, sonra birine çift tıkla ya da kısayol tuşuna bas. Alttaki şerit mikrofonunu, başkalarının duyduklarını ve kulaklığını gösterir.{gap}Ne işe yaradığını görmek için soldaki bir sekmeye sağ tıkla ve Bu sekme hakkında seçeneğini seç.",
+  "Put your sounds into the mic you already use, so Discord and games need no changes": "Seslerini zaten kullandığın mikrofona ver, böylece Discord ve oyunlarda hiçbir şey değiştirmen gerekmez",
+  "Straight into my mic instead": "Onun yerine doğrudan mikrofonuma"
 }

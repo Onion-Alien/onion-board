@@ -1354,7 +1354,6 @@
   "What's new": "Mitä uutta",
   "What's playing": "Mitä soi",
   "What's switched on (the voice changer, Live, a live tab) is shown in the theme's colour. Slide to pick your own; it stays when you change theme.": "Päällä oleva (äänenmuunnin, Live, live-välilehti) näytetään teeman värissä. Liu'uta valitaksesi oman; se pysyy, kun vaihdat teemaa.",
-  "What's this tab for?": "Mihin tämä välilehti on?",
   "Whatever listens to <b>{main}</b> gets your sounds (and your voice, if you send it): OBS, Voicemeeter, a mixer or a capture card.": "Mikä tahansa, joka kuuntelee laitetta <b>{main}</b>, saa äänesi (ja puheesi, jos lähetät sen): OBS, Voicemeeter, mikseri tai kaappauskortti.",
   "Whatever played last, from a pad, a hotkey or the random key.": "Mikä tahansa soi viimeksi, napista, pikanäppäimestä tai satunnaisnäppäimestä.",
   "When Discord, TeamSpeak, Mumble or a game with a known voice chat is listening to your mic (or the cable), use its mode without asking. With nothing listening, the mode stays as it is.": "Kun Discord, TeamSpeak, Mumble tai peli, jonka puhechatti tunnetaan, kuuntelee mikkiäsi (tai kaapelia), käytä sen tilaa kysymättä. Kun mikään ei kuuntele, tila pysyy ennallaan.",
@@ -3009,5 +3008,10 @@
   "Downloading the voices…": "Ladataan ääniä…",
   "Downloading the voices: {percent}%": "Ladataan ääniä: {percent}%",
   "Others now hear {backup}.": "Muut kuulevat nyt {backup}.",
-  "starting again…": "käynnistetään uudelleen…"
+  "starting again…": "käynnistetään uudelleen…",
+  "How Onion Board works": "Näin Onion Board toimii",
+  "How it works": "Näin se toimii",
+  "Onion Board plays your sounds into your mic, so people in Discord or your game hear them the same way they hear you.{gap}Add sounds on the Sounds tab, then double-click one or press its hotkey. The strip at the bottom shows your mic, what others hear and your headphones.{gap}Right-click a tab on the left and pick About this tab to see what it does.": "Onion Board soittaa äänesi mikkiisi, joten Discordissa tai pelissäsi ihmiset kuulevat ne samalla tavalla kuin sinut.{gap}Lisää ääniä Äänet-välilehdellä, sitten tuplaklikkaa yhtä tai paina sen pikanäppäintä. Alareunan palkki näyttää mikkisi, mitä muut kuulevat ja kuulokkeesi.{gap}Klikkaa oikealla välilehteä vasemmalla ja valitse Tietoa tästä välilehdestä nähdäksesi, mitä se tekee.",
+  "Put your sounds into the mic you already use, so Discord and games need no changes": "Laita äänesi mikkiin, jota jo käytät, niin Discordiin ja peleihin ei tarvitse muuttaa mitään",
+  "Straight into my mic instead": "Suoraan mikkiini sen sijaan"
 }

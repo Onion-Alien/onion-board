@@ -24,10 +24,9 @@ function Step($name, [scriptblock]$cmd) {
 
 Step "ruff" { & (Join-Path $root ".venv\Scripts\ruff.exe") check . }
 Step "sensitive data" { & $py scripts\check_sensitive.py }
-# a warning, not a stop: catalogs can lag main; texts YOU added must not be missing
-Write-Host "== translations" -ForegroundColor Cyan
-& $py scripts\i18n_extract.py --check | Select-String -Pattern "missing" -SimpleMatch
-if ($LASTEXITCODE -ne 0) { Write-Host "WARNING: catalogs not complete (see above)" -ForegroundColor Yellow }
+# as CI's pick job: every text in every catalog, and every module in docs/CODE.md
+Step "translations" { & $py scripts\i18n_extract.py --check }
+Step "CODE.md modules" { & $py scripts\check_code_doc.py }
 
 if ($All) { $tests = @("tests") }
 else {
