@@ -2752,9 +2752,10 @@ class MainWindow(QMainWindow):
         update = route == "mic" and state == "ok" and direct == "outdated"
         self.mic_update_note.setVisible(update)
         if update:
-            self.mic_update_note.setText(_("<br><br><b>Optional:</b> your mic part works, and a newer "
-                         "version is here. It's not needed: update below whenever suits "
-                         "you (Windows asks once, and your sound drops out for a second).").removeprefix("<br><br>"))
+            note = _("<br><br><b>Optional:</b> your mic part works, and a newer "
+                     "version is here. It's not needed: update below whenever suits "
+                     "you (Windows asks once, and your sound drops out for a second).")
+            self.mic_update_note.setText(note.removeprefix("<br><br>"))
         # setting up, or Windows still loading it: the button stays "Setting up…" and
         # takes no clicks (attach_mic holds it) until it works or the wait is over
         mic_busy = route == "mic" and (self._attaching or (settling and state != "ok"))
