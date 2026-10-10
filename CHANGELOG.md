@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 1.9.28 — 2026-10-10
+
 - AI voices: when the AI voice stops, the message says "Others now hear your real
   voice" (it said "my"), and no longer ends the error with two full stops.
 - Quick setup: when *Straight into my mic* is already set up and working, the guide uses
