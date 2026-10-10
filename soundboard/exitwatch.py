@@ -55,6 +55,15 @@ _CODES = {0xC0000005: "access-violation", 0xC0000409: "fast-fail",
           0x80000003: "breakpoint", 0xC000001D: "illegal-instruction",
           0xC0000094: "divide-by-zero", 0xE06D7363: "cpp-exception",
           0xC0000420: "assertion", 0x40000015: "abort"}
+# Codes COM and RPC raise to tell a caller "not now / not here" and catch themselves.
+# faulthandler still writes stacks for them (0x8001010d came from a Qt window message
+# while a COM call was in flight), but they never end the app.
+_HARMLESS = {0x8001010D,   # RPC_E_CANTCALLOUT_ININPUTSYNCCALL
+             0x8001010E,   # RPC_E_WRONG_THREAD
+             0x800706BA,   # RPC_S_SERVER_UNAVAILABLE
+             0x800706BE}   # RPC_S_CALL_FAILED
+_FAULT_CODE = re.compile(r"^Windows fatal exception: code (0x[0-9a-f]+)", re.M | re.I)
+_FAULT_OTHER = re.compile(r"^(?:Fatal Python error|Windows fatal exception: (?!code ))", re.M)
 _DLL = re.compile(r"^[A-Za-z0-9_.\-]{1,40}\.(?:dll|exe|pyd)$", re.I)
 
 
@@ -99,7 +108,11 @@ class ExitWatch:
             text = (self.dir / NATIVE).read_text(encoding="utf-8", errors="replace")
         except (OSError, ValueError):
             return
-        log.warning("a native error was caught and survived:\n%s", text[:4000].strip())
+        if only_harmless(text):   # Windows' own, handled by Windows: not worth a warning
+            log.debug("a harmless Windows error code was caught: %s",
+                      ", ".join(_FAULT_CODE.findall(text)))
+        else:
+            log.warning("a native error was caught and survived:\n%s", text[:4000].strip())
         self._arm()
 
     def _write(self):
@@ -252,6 +265,14 @@ def code_name(code: str) -> str:
     return _CODES.get(n, f"0x{n:08x}")
 
 
+def only_harmless(native: str) -> bool:
+    """faulthandler's output holds only codes Windows raises and handles itself
+    (_HARMLESS): no crash, nothing to report."""
+    codes = _FAULT_CODE.findall(native)
+    return (bool(codes) and not _FAULT_OTHER.search(native)
+            and all(int(c, 16) & 0xFFFFFFFF in _HARMLESS for c in codes))
+
+
 def native_summary(native: str) -> tuple[str, str]:
     """From faulthandler's output: the error (`access-violation`) and the deepest of
     our own lines on the crashing thread (`soundboard/engine.py:1090`)."""
@@ -278,7 +299,7 @@ def native_summary(native: str) -> tuple[str, str]:
 def diagnose(state: dict, native: str, events: list[dict], booted: float) -> tuple[str, str]:
     """(kind, detail tag) for a run that ended without closing itself; the tag is short
     and safe to count (an error name, a DLL name, our own file:line), or ""."""
-    err, where = native_summary(native)
+    err, where = native_summary("" if only_harmless(native) else native)
     if err or where:
         return "native-crash", "@".join(p for p in (err, where) if p)
     for ev in events:
