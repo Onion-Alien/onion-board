@@ -19,7 +19,7 @@ from PySide6.QtCore import (QEvent, QFileSystemWatcher, QObject, QPoint, QSignal
                             Qt, QTimer, QUrl, Signal)
 from PySide6.QtGui import (QActionGroup, QColor, QCursor, QDesktopServices, QIcon,
                            QKeySequence, QPainter, QPixmap, QShortcut)
-from PySide6.QtWidgets import (QApplication, QCheckBox, QComboBox, QDialog, QFileDialog,
+from PySide6.QtWidgets import (QApplication, QBoxLayout, QCheckBox, QComboBox, QDialog, QFileDialog,
                                QFrame,
                                QGraphicsOpacityEffect, QGridLayout, QHBoxLayout, QInputDialog,
                                QLabel, QLineEdit, QMainWindow, QMenu, QMessageBox,
@@ -7879,7 +7879,8 @@ class MainWindow(QMainWindow):
         # height: the status line, then the whole mixer strip
         f.add(5, "h", self.rail.compact)   # the rail's buttons closer together, first
         f.add(10, "h", self.status.set_room)
-        f.add(40, "h", lambda tight: r.hide(self.mixer)(tight and self.height() < 520))
+        f.add(40, "h", lambda tight: r.hide(self.mixer)(
+            tight and (self.height() < 520 or self.width() < 760)))
         f.add(50, "h", r.hide(self.cat_bar))   # the overlay's category key still works
         self._stack_cols = (r.stack(self._setup_cols), r.stack(self._setup_top),
                             *self.voice.stack_steps())
@@ -7898,6 +7899,10 @@ class MainWindow(QMainWindow):
             # whole window fits (nothing is painted before this returns)
             self._set_mini(False)
             self.rail.compact(self.rail._compact)
+            self._mixer_layout.setDirection(QBoxLayout.LeftToRight)
+            self._mixer_layout.setSpacing(14)
+            for group in self._decks[1:]:
+                group[0].setMaximumHeight(16777215)
             responsive.touch(self._pads_scroll)
             # room for a whole row of pads comes before the mixer, the status line and
             # the rest: without it they kept their room and the pads got a slit
@@ -7915,6 +7920,16 @@ class MainWindow(QMainWindow):
             for apply in self._stack_cols[2:]:
                 apply(narrow)
             need = self._fit.fit(size)   # even the smallest layout won't fit
+            if (self.width() >= 760 and need.width() > size.width()
+                    and self.mixer.minimumSizeHint().width() + self.rail.width() > size.width()):
+                # Wrap only when the visible groups need it, e.g. with larger fonts.
+                self._mixer_layout.setDirection(QBoxLayout.TopToBottom)
+                self._mixer_layout.setSpacing(4)
+                for group in self._decks[1:]:
+                    group[0].setMaximumHeight(0)
+                self.mixer.setMinimumSize(0, 0)
+                self._mixer_layout.activate()
+                responsive.touch(self.mixer)
             if need.width() > size.width() or need.height() > size.height():
                 # Growing can restore the mixer after width fitting has finished.
                 # Fit its newly visible controls before deciding to use mini mode.

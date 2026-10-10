@@ -1110,7 +1110,7 @@ def test_medium_footer_uses_the_width_without_empty_control_gaps(window, qapp):
         for _ in range(5):
             qapp.processEvents()
     assert not window.is_mini()
-    assert window.mixer.height() < 70
+    assert window.mixer.height() < 100
     assert window.btn_check.isVisibleTo(window)
     right = window.btn_check.mapTo(window.mixer, window.btn_check.rect().topRight()).x()
     assert window.mixer.width() - right <= 20
