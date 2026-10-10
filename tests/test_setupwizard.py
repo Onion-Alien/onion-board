@@ -107,6 +107,25 @@ def test_a_working_cable_offers_the_mic_as_a_plain_option(wizard, monkeypatch):
     assert results and not any(results)
 
 
+def test_mic_already_set_up_is_used_not_offered_again(wizard, monkeypatch):
+    # on the cable with the mic effect already working: the page said "Installed and
+    # connected" and offered to set the mic up again
+    from soundboard import directmic
+    w, wiz = wizard
+    monkeypatch.setattr(directmic, "status", lambda name=None: "ready")
+    asked = []
+    monkeypatch.setattr(w, "attach_mic", lambda: asked.append(1))
+    w.cfg.route = "cable"
+    wiz.show()
+    wiz.go(2)
+    assert w.cfg.route == "mic" and not asked
+    assert "On your mic" in wiz.cable_status.text() and wiz.btn_mic_instead.isHidden()
+    wiz._pick_route("cable")   # picked the cable on purpose: it stays
+    assert w.cfg.route == "cable"
+    wiz.attach_mic()           # and back: no admin prompt, it's already there
+    assert w.cfg.route == "mic" and not asked
+
+
 def test_missing_cable_offers_install_and_guide_returns(wizard, devices):
     devices["cable"] = False
     w, wiz = wizard
