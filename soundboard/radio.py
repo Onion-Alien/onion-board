@@ -502,6 +502,22 @@ def _let_go():
         QTimer.singleShot(100, _let_go)
 
 
+_nam: QNetworkAccessManager | None = None
+
+
+def _the_nam() -> QNetworkAccessManager:
+    """The one network manager every RadioDirectory asks through, made on first use and
+    kept as long as the app. One per directory was made and freed with every Radio
+    tab: switching the tab off and on, making the next one crashed Windows now and
+    then (an access violation in QNetworkAccessManager's constructor, issue #339)."""
+    global _nam
+    if _nam is None:
+        from PySide6.QtCore import QCoreApplication
+        _nam = QNetworkAccessManager(QCoreApplication.instance())
+        net.apply_qt(_nam, FEATURE)   # Settings > Connection and Privacy & security
+    return _nam
+
+
 class RadioDirectory(QObject):
     """Talks to Radio Browser. Every call answers with a signal on the UI thread."""
     globe_ready = Signal(list)          # [Station] with a location, most listened first
@@ -515,8 +531,6 @@ class RadioDirectory(QObject):
         super().__init__(parent)
         self.cache_dir = cache_dir or radio_dir()
         self.bases = list(bases)
-        self.nam = QNetworkAccessManager(self)
-        net.apply_qt(self.nam, FEATURE)   # Settings > Connection and Privacy & security
         self._search_gen = 0
         self._pending: dict[int, list] = {}
         self._call.connect(self._run_call)
@@ -562,7 +576,8 @@ class RadioDirectory(QObject):
         req.setAttribute(QNetworkRequest.RedirectPolicyAttribute,
                          QNetworkRequest.NoLessSafeRedirectPolicy)
         started = time.monotonic()
-        reply = self.nam.get(req)
+        reply = _the_nam().get(req)
+        reply.setParent(self)   # this directory going (its tab switched off) aborts it
 
         def finished():
             reply.deleteLater()

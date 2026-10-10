@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Switching the Radio tab off and on again (Settings → Tabs) can no longer crash the
+  app now and then.
 - Quick setup: on the very first launch the guide starts by asking what you'll use Onion
   Board for. *Just sounds* changes nothing, *Streaming* adds the Apps tab and links
   the *Streamer guide* on the last step, *Competitive games* adds the Triggers tab
