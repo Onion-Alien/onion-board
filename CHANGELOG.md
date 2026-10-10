@@ -5,6 +5,10 @@
 - The note that pops up above the player ("Added … to Sounds", device changes and so
   on) now sits centred over the page instead of jammed in the bottom-left corner on
   top of the sidebar, and is no wider than 560 px.
+- YouTube and YouTube Music searches are about a second faster after the first one:
+  YouTube's page settings are kept for an hour instead of being fetched before every
+  search (Direct connection only; if a search with them fails, it's done again the old
+  way, with fresh ones).
 
 ## 1.9.28 — 2026-10-10
 
